@@ -81,6 +81,11 @@ export class WikiReviewService {
 
     const isApprove = input.decision === 'approve';
     const finalStatus = isApprove ? 'approved' : 'rejected';
+    const applyWithWikiRuntime =
+      isApprove &&
+      (Boolean(revision.recipeSnapshot) ||
+        revision.revisionKind !== 'content' ||
+        revision.operation !== 'edit');
 
     await this.dataSource.transaction(async (manager) => {
       await manager.update(
@@ -104,17 +109,24 @@ export class WikiReviewService {
         },
       );
 
-      if (isApprove) {
+      if (isApprove && !applyWithWikiRuntime) {
         await manager.update(
           CharacterPageEntity,
           { characterId: revision.characterId },
-          { currentRevisionId: revision.id },
+          {
+            currentRevisionId: revision.id,
+            title: revision.contentSnapshot.name,
+            lifecycleStatus: 'active',
+          },
         );
         await this.edits.applySnapshotToCharacter(
           manager,
           revision.characterId,
           revision.contentSnapshot,
         );
+      }
+
+      if (isApprove) {
         const profile =
           (await manager.findOne(UserWikiProfileEntity, {
             where: { userId: revision.editorUserId },
@@ -144,6 +156,10 @@ export class WikiReviewService {
       reviewerProfile.patrolledCount += 1;
       await manager.save(reviewerProfile);
     });
+
+    if (applyWithWikiRuntime) {
+      await this.edits.applyApprovedRevision(revision, reviewer.id);
+    }
 
     if (isApprove) {
       void this.roles.checkPromotion(revision.editorUserId).catch(() => undefined);
@@ -209,6 +225,9 @@ export class WikiReviewService {
     if (target.status !== 'approved') {
       throw new BadRequestException('只能回滚到 approved 版本');
     }
+    if (target.revisionKind === 'lifecycle') {
+      throw new BadRequestException('生命周期版本请通过删除 / 恢复申请处理，不支持直接回滚');
+    }
     const page = await this.pageRepo.findOne({ where: { characterId } });
     if (!page) throw new NotFoundException('词条不存在');
     if (page.currentRevisionId === target.id) {
@@ -240,11 +259,15 @@ export class WikiReviewService {
         parentRevisionId: page.currentRevisionId ?? null,
         baseRevisionId: page.currentRevisionId ?? null,
         contentSnapshot: target.contentSnapshot,
+        recipeSnapshot: target.recipeSnapshot ?? null,
         diffFromParent: { changed: ['__revert__'], revertTo: target.version },
         editorUserId: reviewer.id,
         editorRoleAtTime: reviewer.role,
         editSummary: `Revert to v${target.version}: ${input.reason ?? ''}`.slice(0, 500),
         status: 'approved',
+        revisionKind: target.recipeSnapshot ? 'recipe' : 'content',
+        operation: 'revert',
+        riskLevel: target.recipeSnapshot ? 'high' : 'low',
         changeSource: 'revert',
         isMinor: false,
         isPatrolled: true,
@@ -258,14 +281,18 @@ export class WikiReviewService {
         { characterId },
         {
           currentRevisionId: saved.id,
+          title: target.contentSnapshot.name,
+          lifecycleStatus: 'active',
           editCount: page.editCount + 1,
         },
       );
-      await this.edits.applySnapshotToCharacter(
-        manager,
-        characterId,
-        target.contentSnapshot,
-      );
+      if (!target.recipeSnapshot) {
+        await this.edits.applySnapshotToCharacter(
+          manager,
+          characterId,
+          target.contentSnapshot,
+        );
+      }
 
       if (supersededRevs.length > 0) {
         await manager.update(
@@ -311,6 +338,10 @@ export class WikiReviewService {
 
       return saved;
     });
+
+    if (newRev.recipeSnapshot) {
+      await this.edits.applyApprovedRevision(newRev, reviewer.id);
+    }
 
     return { revisionId: newRev.id, version: newRev.version };
   }

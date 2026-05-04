@@ -18,6 +18,7 @@
 | **管理后台**       | React + Vite + `@yinjie/ui`（`apps/admin/`）                                 | 5181 |
 | **云世界管理平台** | React + Vite（`apps/cloud-console/`）                                        | 5182 |
 | 官网               | React + Vite，公开项目介绍、多语言官网与在线体验入口（`apps/site/`）        | 5183 |
+| **世界角色管理平台** | React + Vite，维基式角色创建、编辑、审核与巡查平台（`apps/wiki/`）        | 5184 |
 | 微信同步本地连接器 | Node.js loopback HTTP 适配层（`apps/wechat-connector/`）                    | 17364 |
 | 桌面端壳           | Tauri 远程客户端壳（`apps/desktop/`）                                        | -    |
 | Android 壳         | Capacitor 壳（`apps/android-shell/`）                                        | -    |
@@ -25,7 +26,7 @@
 
 ## 后端模块（`api/src/modules/`）
 
-`action-runtime` · `admin` · `ai` · `analytics` · `auth` · `characters` · `chat` · `cloud-runtime` · `config` · `cyber-avatar` · `events` · `feed` · `followup-runtime` · `games` · `inference` · `moderation` · `moments` · `narrative` · `need-discovery` · `official-accounts` · `real-world-sync` · `reminder-runtime` · `scheduler` · `self-agent` · `social` · `subscription` · `system` · `world`
+`action-runtime` · `admin` · `ai` · `analytics` · `auth` · `characters` · `chat` · `cloud-runtime` · `config` · `cyber-avatar` · `events` · `feed` · `followup-runtime` · `games` · `inference` · `moderation` · `moments` · `narrative` · `need-discovery` · `official-accounts` · `real-world-sync` · `reminder-runtime` · `scheduler` · `self-agent` · `social` · `subscription` · `system` · `wiki` · `world`
 
 ## 主 App 结构（`apps/app/src/`）
 
@@ -35,24 +36,25 @@
 
 `routes/` · `site-shell.tsx` · `site-content.ts` · `site-links.ts` · `use-site-copy.ts`
 
-## Wiki 百科结构（`apps/wiki/src/`）
+## 世界角色管理平台结构（`apps/wiki/src/`）
 
 `routes/` · `components/` · `lib/`
 
-## Wiki 百科页面（`apps/wiki/src/routes/`）
+## 世界角色管理平台页面（`apps/wiki/src/routes/`）
 
-- `home-page.tsx`：角色百科首页，承载词条索引与基础浏览入口
-- `character-page.tsx`：角色词条页，承载阅读、编辑、历史、讨论与编辑冲突处理
-- `recent-changes-page.tsx`：最近修改页，集中查看百科编辑动态
-- `search-page.tsx`：百科搜索结果页，由顶栏搜索框进入
+- `home-page.tsx`：世界角色管理平台首页，承载角色索引、生命周期状态与创建入口
+- `create-character-page.tsx`：角色创建页，普通登录用户提交新角色创建请求，审核通过后写入运行时角色注册表
+- `character-page.tsx`：角色词条页，承载阅读、内容编辑、角色逻辑 recipe 编辑、历史、讨论、生命周期申请与编辑冲突处理
+- `recent-changes-page.tsx`：最近修改页，集中查看角色内容 / 逻辑 / 生命周期编辑动态
+- `search-page.tsx`：角色词条搜索结果页，由顶栏搜索框进入
 - `watchlist-page.tsx`：观察列表页，登录用户查看关注词条与讨论动态
 - `pending-reviews-page.tsx`：待审编辑页，巡查员处理待审核修改
-- `admin-users-page.tsx`：百科用户管理页
-- `admin-blocks-page.tsx`：百科封禁管理页
-- `admin-protection-page.tsx`：百科保护管理页
-- `admin-reports-page.tsx`：百科举报队列页，管理员处理词条 / 讨论 / 修订举报
-- `login-page.tsx`：百科登录页
-- `register-page.tsx`：百科注册页
+- `admin-users-page.tsx`：平台用户管理页
+- `admin-blocks-page.tsx`：平台封禁管理页
+- `admin-protection-page.tsx`：平台保护管理页
+- `admin-reports-page.tsx`：平台举报队列页，管理员处理词条 / 讨论 / 修订举报
+- `login-page.tsx`：平台登录页
+- `register-page.tsx`：平台注册页
 
 ## 主 App 页面（`apps/app/src/routes/`）
 
@@ -122,7 +124,7 @@
 - `friend-moments-page.tsx`：桌面端好友朋友圈独立页，当前由 `desktop/friend-moments/$characterId` 承载，从通讯录 / 资料页 / 聊天信息等入口进入单个好友的朋友圈时间线
 - `chat-room-page` · `group-chat-page` · `character-detail-page` · `friend-requests-page` · `create-group-page`
 
-## 数据库实体（58个，物理表保持兼容）
+## 数据库实体（含 Wiki 实体，物理表保持兼容）
 
 **核心**：User（运行时语义为单例 World Owner） · Character · Conversation · Message · SystemConfig
 
@@ -164,6 +166,8 @@
 
 **后台**：AdminConversationReview
 
+**世界角色管理平台 / Wiki**：CharacterPage · CharacterRevision · EditSubmission · UserWikiProfile · WikiBlock · WikiProtectionLog · WikiTalkThread · WikiTalkPost · WikiWatchlist
+
 ## 单用户世界约束（2026-04-08）
 
 - `1 个服务端实例 = 1 个真实用户的世界`
@@ -178,6 +182,7 @@
   - `PATCH /api/world/owner/chat-background`
   - `DELETE /api/world/owner/chat-background`
 - `/system/status` 使用 `worldSurface` 语义，实例状态以 `ownerCount` 表示单世界主人数量
+- `ownerCount` 只统计 `User.userType = world_owner`，不包含世界角色管理平台的 wiki 用户
 
 ## 云世界平台实体（`apps/cloud-api/src/entities/`）
 
@@ -298,13 +303,43 @@
   - `GET /api/moderation/reports`
   - `POST /api/moderation/reports`
   - `PATCH /api/moderation/reports/:id/status`
-- Wiki 百科路由：
+- 世界角色管理平台 / Wiki 路由：
   - `GET /api/wiki/recent-changes`
   - `GET /api/wiki/search`
+  - `GET /api/wiki/pages`
+  - `POST /api/wiki/pages`
   - `GET /api/wiki/pages/:id`
   - `GET /api/wiki/pages/:id/history`
+  - `GET /api/wiki/pages/:id/pending`
+  - `GET /api/wiki/pages/:id/diff`
   - `GET /api/wiki/pages/:id/revisions/:revisionId`
   - `POST /api/wiki/pages/:id/edits`
+  - `POST /api/wiki/pages/:id/delete-request`
+  - `POST /api/wiki/pages/:id/restore-request`
+  - `POST /api/wiki/pages/:id/delete`
+  - `POST /api/wiki/pages/:id/restore`
+  - `POST /api/wiki/pages/:id/revert`
+  - `PATCH /api/wiki/pages/:id/protection`
+  - `GET /api/wiki/pages/:id/protection-log`
+  - `GET /api/wiki/pending-reviews`
+  - `POST /api/wiki/edits/:revisionId/review`
+  - `POST /api/wiki/edits/:revisionId/patrol`
+  - `GET /api/wiki/users`
+  - `POST /api/wiki/users/:id/role`
+  - `GET /api/wiki/blocks`
+  - `POST /api/wiki/users/:id/block`
+  - `DELETE /api/wiki/blocks/:blockId`
+  - `GET /api/wiki/watchlist`
+  - `GET /api/wiki/watchlist/feed`
+  - `GET /api/wiki/watchlist/status/:characterId`
+  - `POST /api/wiki/watchlist/:characterId`
+  - `DELETE /api/wiki/watchlist/:characterId`
+  - `GET /api/wiki/talk/:characterId/threads`
+  - `POST /api/wiki/talk/:characterId/threads`
+  - `GET /api/wiki/talk/threads/:threadId/posts`
+  - `POST /api/wiki/talk/threads/:threadId/posts`
+  - `PATCH /api/wiki/talk/threads/:threadId/flags`
+  - `DELETE /api/wiki/talk/posts/:postId`
   - `POST /api/wiki/reports`
   - `GET /api/wiki/reports`
   - `PATCH /api/wiki/reports/:id/status`

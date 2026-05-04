@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth/auth.module';
 import { CharacterEntity } from '../characters/character.entity';
+import { CharactersModule } from '../characters/characters.module';
 import { UserEntity } from '../auth/user.entity';
 import { ModerationReportEntity } from '../moderation/moderation-report.entity';
 import { CharacterPageEntity } from './entities/character-page.entity';
@@ -37,6 +38,7 @@ import { WikiReportController } from './controllers/wiki-report.controller';
 @Module({
   imports: [
     AuthModule,
+    CharactersModule,
     TypeOrmModule.forFeature([
       CharacterEntity,
       UserEntity,

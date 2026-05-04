@@ -44,6 +44,26 @@ export class WikiPageController {
     return this.pages.search(q ?? '', limit);
   }
 
+  @Get('pages')
+  listPages() {
+    return this.pages.listPages();
+  }
+
+  @Post('pages')
+  @UseGuards(JwtAuthGuard)
+  createPage(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body()
+    body: {
+      characterId?: string | null;
+      recipeSnapshot?: Record<string, unknown> | null;
+      contentSnapshot?: Record<string, unknown> | null;
+      editSummary?: string | null;
+    },
+  ) {
+    return this.edits.createPage(user, body);
+  }
+
   @Get('pages/:id')
   view(@Param('id') id: string) {
     return this.pages.getPageView(id);
@@ -55,6 +75,16 @@ export class WikiPageController {
     @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
   ) {
     return this.pages.getHistory(id, limit);
+  }
+
+  @Get('pages/:id/pending')
+  pending(@Param('id') id: string) {
+    return this.pages.getPending(id);
+  }
+
+  @Get('pages/:id/diff')
+  diff(@Query('from') from: string, @Query('to') to: string) {
+    return this.pages.getDiff(from, to);
   }
 
   @Get('pages/:id/revisions/:revisionId')

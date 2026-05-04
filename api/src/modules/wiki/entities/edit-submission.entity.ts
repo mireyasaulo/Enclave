@@ -21,6 +21,12 @@ export class EditSubmissionEntity {
   @Column()
   submitterId: string;
 
+  @Column({ default: 'edit' })
+  operation: string;
+
+  @Column({ default: 'low' })
+  riskLevel: string;
+
   @Column({ type: 'text', nullable: true })
   decision?: string | null; // 'approve' | 'reject' | 'request_changes'
 

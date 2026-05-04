@@ -26,6 +26,11 @@ const CharacterPage = lazy(async () => {
   return { default: mod.CharacterPage };
 });
 
+const CreateCharacterPage = lazy(async () => {
+  const mod = await import("./routes/create-character-page");
+  return { default: mod.CreateCharacterPage };
+});
+
 const PendingReviewsPage = lazy(async () => {
   const mod = await import("./routes/pending-reviews-page");
   return { default: mod.PendingReviewsPage };
@@ -92,6 +97,12 @@ const characterRoute = createRoute({
   component: CharacterPage,
 });
 
+const createCharacterRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/create",
+  component: CreateCharacterPage,
+});
+
 const pendingReviewsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/pending-reviews",
@@ -148,6 +159,7 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   registerRoute,
   characterRoute,
+  createCharacterRoute,
   pendingReviewsRoute,
   recentChangesRoute,
   adminUsersRoute,

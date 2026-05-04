@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { CharacterBlueprintRecipe } from "@yinjie/contracts";
 import {
   Button,
   Card,
@@ -38,15 +39,20 @@ export function CharacterPage() {
   });
   const softDeleteMut = useMutation({
     mutationFn: () =>
-      pageQ.data?.page.isDeleted
-        ? wikiApi.restorePage(characterId)
-        : wikiApi.softDeletePage(characterId),
+      pageQ.data?.page.isDeleted ||
+      pageQ.data?.page.lifecycleStatus === "deleted"
+        ? wikiApi.requestRestorePage(characterId)
+        : wikiApi.requestDeletePage(characterId),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["wiki", "page", characterId] });
       void qc.invalidateQueries({ queryKey: ["wiki", "characters"] });
+      void qc.invalidateQueries({ queryKey: ["wiki", "pending-reviews"] });
     },
   });
-  const isDeleted = pageQ.data?.page.isDeleted ?? false;
+  const lifecycleStatus = pageQ.data?.page.lifecycleStatus ?? "active";
+  const isDeleted =
+    pageQ.data?.page.isDeleted === true || lifecycleStatus === "deleted";
+  const isPendingCreate = lifecycleStatus === "pending_create";
 
   return (
     <div className="space-y-4">
@@ -68,15 +74,21 @@ export function CharacterPage() {
             <ProtectionInfo level={pageQ.data.page.protectionLevel} />
           )}
           {isDeleted && <StatusPill>已删除</StatusPill>}
+          {isPendingCreate && <StatusPill>待创建</StatusPill>}
+          {pageQ.data?.pendingRevision && <StatusPill>有待审版本</StatusPill>}
           <WatchToggle characterId={characterId} />
-          {hasRole(user, "admin") && pageQ.data && (
+          {user && pageQ.data && (
             <Button
               size="sm"
               variant={isDeleted ? "primary" : "danger"}
               disabled={softDeleteMut.isPending}
               onClick={() => softDeleteMut.mutate()}
             >
-              {isDeleted ? "恢复词条" : "软删除"}
+              {softDeleteMut.isPending
+                ? "提交中..."
+                : isDeleted
+                  ? "申请恢复"
+                  : "申请删除"}
             </Button>
           )}
         </div>
@@ -88,7 +100,15 @@ export function CharacterPage() {
             <strong className="text-[var(--state-danger-text)]">
               此词条已被软删除（红链）
             </strong>
-            。普通用户无法编辑，但底层角色数据仍存在以保持运行时引用一致。
+            。恢复也按编辑审核流提交，底层角色数据保留以保持运行时引用一致。
+          </div>
+        </Card>
+      )}
+
+      {isPendingCreate && (
+        <Card className="p-4 border-[var(--border-subtle)] bg-[rgba(255,251,235,0.7)]">
+          <div className="text-sm">
+            此角色仍在待创建队列中。巡查员通过创建版本后，才会写入运行时角色注册表。
           </div>
         </Card>
       )}
@@ -153,6 +173,7 @@ function ProtectionInfo({ level }: { level: string }) {
 
 function ReadView({ view }: { view: WikiPageView }) {
   const c = view.content;
+  const recipe = view.recipe;
   return (
     <Card className="p-6 space-y-4">
       <header className="flex items-start gap-4">
@@ -189,6 +210,40 @@ function ReadView({ view }: { view: WikiPageView }) {
             ))}
           </div>
         </Section>
+      )}
+      {recipe && (
+        <>
+          <Section label="核心逻辑">
+            {recipe.prompting.coreLogic || "—"}
+          </Section>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Section label="聊天 Prompt">
+              {recipe.prompting.scenePrompts.chat || "—"}
+            </Section>
+            <Section label="主动触达 Prompt">
+              {recipe.prompting.scenePrompts.proactive || "—"}
+            </Section>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Section label="发圈频率">
+              {recipe.lifeStrategy.momentsFrequency}
+            </Section>
+            <Section label="广场频率">
+              {recipe.lifeStrategy.feedFrequency}
+            </Section>
+            <Section label="活跃时段">
+              {recipe.lifeStrategy.activeHoursStart ?? "—"}-
+              {recipe.lifeStrategy.activeHoursEnd ?? "—"}
+            </Section>
+          </div>
+        </>
+      )}
+      {view.pendingRevision && (
+        <div className="text-sm rounded border border-[var(--border-subtle)] bg-[var(--bg-canvas)] p-3">
+          有一个待审版本：
+          <strong className="mx-1">v{view.pendingRevision.version}</strong>
+          {view.pendingRevision.operation} / {view.pendingRevision.riskLevel}
+        </div>
       )}
       <footer className="text-xs text-[var(--text-muted)] pt-3 border-t border-[var(--border-subtle)]">
         当前版本：
@@ -235,7 +290,13 @@ function EditView({
     }),
     [view.content],
   );
+  const initialRecipe = useMemo(
+    () => (view.recipe ? cloneRecipe(view.recipe) : null),
+    [view.recipe],
+  );
   const [draft, setDraft] = useState<WikiContentSnapshot>(initial);
+  const [recipeDraft, setRecipeDraft] =
+    useState<CharacterBlueprintRecipe | null>(initialRecipe);
   const [summary, setSummary] = useState("");
   const [isMinor, setIsMinor] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -247,6 +308,7 @@ function EditView({
   } | null>(null);
 
   useEffect(() => setDraft(initial), [initial]);
+  useEffect(() => setRecipeDraft(initialRecipe), [initialRecipe]);
 
   const submitMut = useMutation({
     mutationFn: (override?: {
@@ -255,6 +317,9 @@ function EditView({
     }) =>
       wikiApi.submitEdit(characterId, {
         contentSnapshot: override?.snapshot ?? draft,
+        recipeSnapshot: recipeDraft
+          ? mergeContentIntoRecipe(recipeDraft, override?.snapshot ?? draft)
+          : undefined,
         baseRevisionId:
           override?.baseRevisionId ?? view.page.currentRevisionId,
         editSummary: summary,
@@ -277,9 +342,14 @@ function EditView({
           | {
               conflictingFields?: string[];
               currentSnapshot?: WikiContentSnapshot;
+              currentRecipeSnapshot?: CharacterBlueprintRecipe;
               currentRevisionId?: string;
             }
           | null;
+        if (payload?.currentRecipeSnapshot) {
+          setError("角色逻辑存在并发修改，请刷新页面后基于最新版本重新编辑。");
+          return;
+        }
         if (
           payload?.conflictingFields &&
           payload?.currentSnapshot &&
@@ -310,8 +380,13 @@ function EditView({
     <Card className="p-6 space-y-4">
       <p className="text-sm text-[var(--text-muted)]">
         当前你的权限是<strong className="mx-1">{user.role}</strong>
-        。仅可编辑下列<strong>内容字段</strong>，运行参数（模型、活跃度等）请去后台修改。
+        。内容字段和角色逻辑都走同一套版本、冲突检测和巡查审核。
       </p>
+      {view.pendingRevision && (
+        <div className="text-sm rounded border border-[var(--border-subtle)] bg-[var(--bg-canvas)] p-3">
+          当前已有待审版本 v{view.pendingRevision.version}，继续提交可能触发编辑冲突。
+        </div>
+      )}
       <FormRow label="名称">
         <TextField
           value={draft.name}
@@ -384,6 +459,12 @@ function EditView({
           }
         />
       </FormRow>
+      {recipeDraft && (
+        <LogicEditor
+          recipe={recipeDraft}
+          onChange={(next) => setRecipeDraft(next)}
+        />
+      )}
       <FormRow label="修改摘要">
         <TextField
           value={summary}
@@ -433,6 +514,551 @@ function EditView({
         </Button>
       </div>
     </Card>
+  );
+}
+
+function cloneRecipe(recipe: CharacterBlueprintRecipe): CharacterBlueprintRecipe {
+  return JSON.parse(JSON.stringify(recipe)) as CharacterBlueprintRecipe;
+}
+
+function splitList(value: string): string[] {
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function parseNonNegativeInt(value: string, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? Math.max(0, Math.round(parsed)) : fallback;
+}
+
+function parseHour(value: string): number | null {
+  if (value.trim() === "") return null;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return null;
+  return Math.min(Math.max(Math.round(parsed), 0), 23);
+}
+
+function mergeContentIntoRecipe(
+  recipe: CharacterBlueprintRecipe,
+  content: WikiContentSnapshot,
+): CharacterBlueprintRecipe {
+  return {
+    ...recipe,
+    identity: {
+      ...recipe.identity,
+      name: content.name,
+      avatar: content.avatar,
+      bio: content.bio,
+      relationship: content.relationship,
+      relationshipType: content.relationshipType,
+    },
+    expertise: {
+      ...recipe.expertise,
+      expertDomains: [...content.expertDomains],
+    },
+    tone: {
+      ...recipe.tone,
+      emotionalTone: content.personality ?? "",
+    },
+    lifeStrategy: {
+      ...recipe.lifeStrategy,
+      triggerScenes: [...(content.triggerScenes ?? [])],
+    },
+  };
+}
+
+function LogicEditor({
+  recipe,
+  onChange,
+}: {
+  recipe: CharacterBlueprintRecipe;
+  onChange: (next: CharacterBlueprintRecipe) => void;
+}) {
+  return (
+    <div className="rounded border border-[var(--border-subtle)] p-4 space-y-4">
+      <div>
+        <h3 className="text-base font-semibold">角色信息与逻辑</h3>
+        <p className="text-sm text-[var(--text-muted)]">
+          这些字段会进入角色工厂发布流，属于影响运行时行为的高风险编辑。
+        </p>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormRow label="职业 / 身份">
+          <TextField
+            value={recipe.identity.occupation}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                identity: {
+                  ...recipe.identity,
+                  occupation: event.target.value,
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="活动频率">
+          <TextField
+            value={recipe.lifeStrategy.activityFrequency}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                lifeStrategy: {
+                  ...recipe.lifeStrategy,
+                  activityFrequency: event.target.value,
+                },
+              })
+            }
+          />
+        </FormRow>
+      </div>
+      <FormRow label="背景">
+        <TextAreaField
+          rows={3}
+          value={recipe.identity.background}
+          onChange={(event) =>
+            onChange({
+              ...recipe,
+              identity: { ...recipe.identity, background: event.target.value },
+            })
+          }
+        />
+      </FormRow>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormRow label="动机">
+          <TextAreaField
+            rows={3}
+            value={recipe.identity.motivation}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                identity: {
+                  ...recipe.identity,
+                  motivation: event.target.value,
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="世界观">
+          <TextAreaField
+            rows={3}
+            value={recipe.identity.worldview}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                identity: {
+                  ...recipe.identity,
+                  worldview: event.target.value,
+                },
+              })
+            }
+          />
+        </FormRow>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <FormRow label="专长说明">
+          <TextAreaField
+            rows={4}
+            value={recipe.expertise.expertiseDescription}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                expertise: {
+                  ...recipe.expertise,
+                  expertiseDescription: event.target.value,
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="知识边界">
+          <TextAreaField
+            rows={4}
+            value={recipe.expertise.knowledgeLimits}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                expertise: {
+                  ...recipe.expertise,
+                  knowledgeLimits: event.target.value,
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="拒答风格">
+          <TextAreaField
+            rows={4}
+            value={recipe.expertise.refusalStyle}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                expertise: {
+                  ...recipe.expertise,
+                  refusalStyle: event.target.value,
+                },
+              })
+            }
+          />
+        </FormRow>
+      </div>
+      <FormRow label="核心指令">
+        <TextAreaField
+          rows={4}
+          value={recipe.tone.coreDirective}
+          onChange={(event) =>
+            onChange({
+              ...recipe,
+              tone: { ...recipe.tone, coreDirective: event.target.value },
+            })
+          }
+        />
+      </FormRow>
+      <FormRow label="Base Prompt">
+        <TextAreaField
+          rows={5}
+          value={recipe.tone.basePrompt}
+          onChange={(event) =>
+            onChange({
+              ...recipe,
+              tone: { ...recipe.tone, basePrompt: event.target.value },
+            })
+          }
+        />
+      </FormRow>
+      <FormRow label="System Prompt">
+        <TextAreaField
+          rows={5}
+          value={recipe.tone.systemPrompt}
+          onChange={(event) =>
+            onChange({
+              ...recipe,
+              tone: { ...recipe.tone, systemPrompt: event.target.value },
+            })
+          }
+        />
+      </FormRow>
+      <FormRow label="核心逻辑">
+        <TextAreaField
+          rows={5}
+          value={recipe.prompting.coreLogic}
+          onChange={(event) =>
+            onChange({
+              ...recipe,
+              prompting: {
+                ...recipe.prompting,
+                coreLogic: event.target.value,
+              },
+            })
+          }
+        />
+      </FormRow>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <ScenePromptField
+          label="聊天 Prompt"
+          value={recipe.prompting.scenePrompts.chat}
+          onChange={(value) =>
+            onChange({
+              ...recipe,
+              prompting: {
+                ...recipe.prompting,
+                scenePrompts: {
+                  ...recipe.prompting.scenePrompts,
+                  chat: value,
+                },
+              },
+            })
+          }
+        />
+        <ScenePromptField
+          label="问候 Prompt"
+          value={recipe.prompting.scenePrompts.greeting}
+          onChange={(value) =>
+            onChange({
+              ...recipe,
+              prompting: {
+                ...recipe.prompting,
+                scenePrompts: {
+                  ...recipe.prompting.scenePrompts,
+                  greeting: value,
+                },
+              },
+            })
+          }
+        />
+        <ScenePromptField
+          label="主动触达 Prompt"
+          value={recipe.prompting.scenePrompts.proactive}
+          onChange={(value) =>
+            onChange({
+              ...recipe,
+              prompting: {
+                ...recipe.prompting,
+                scenePrompts: {
+                  ...recipe.prompting.scenePrompts,
+                  proactive: value,
+                },
+              },
+            })
+          }
+        />
+        <ScenePromptField
+          label="朋友圈 Prompt"
+          value={recipe.prompting.scenePrompts.moments_post}
+          onChange={(value) =>
+            onChange({
+              ...recipe,
+              prompting: {
+                ...recipe.prompting,
+                scenePrompts: {
+                  ...recipe.prompting.scenePrompts,
+                  moments_post: value,
+                },
+              },
+            })
+          }
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormRow label="记忆摘要">
+          <TextAreaField
+            rows={4}
+            value={recipe.memorySeed.memorySummary}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                memorySeed: {
+                  ...recipe.memorySeed,
+                  memorySummary: event.target.value,
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="核心记忆">
+          <TextAreaField
+            rows={4}
+            value={recipe.memorySeed.coreMemory}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                memorySeed: {
+                  ...recipe.memorySeed,
+                  coreMemory: event.target.value,
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="近期摘要 Prompt">
+          <TextAreaField
+            rows={4}
+            value={recipe.memorySeed.recentSummaryPrompt}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                memorySeed: {
+                  ...recipe.memorySeed,
+                  recentSummaryPrompt: event.target.value,
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="核心记忆 Prompt">
+          <TextAreaField
+            rows={4}
+            value={recipe.memorySeed.coreMemoryPrompt}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                memorySeed: {
+                  ...recipe.memorySeed,
+                  coreMemoryPrompt: event.target.value,
+                },
+              })
+            }
+          />
+        </FormRow>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <FormRow label="发圈频率">
+          <TextField
+            type="number"
+            min={0}
+            value={recipe.lifeStrategy.momentsFrequency}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                lifeStrategy: {
+                  ...recipe.lifeStrategy,
+                  momentsFrequency: parseNonNegativeInt(
+                    event.target.value,
+                    recipe.lifeStrategy.momentsFrequency,
+                  ),
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="广场频率">
+          <TextField
+            type="number"
+            min={0}
+            value={recipe.lifeStrategy.feedFrequency}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                lifeStrategy: {
+                  ...recipe.lifeStrategy,
+                  feedFrequency: parseNonNegativeInt(
+                    event.target.value,
+                    recipe.lifeStrategy.feedFrequency,
+                  ),
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="活跃开始小时">
+          <TextField
+            type="number"
+            min={0}
+            max={23}
+            value={recipe.lifeStrategy.activeHoursStart ?? ""}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                lifeStrategy: {
+                  ...recipe.lifeStrategy,
+                  activeHoursStart: parseHour(event.target.value),
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="活跃结束小时">
+          <TextField
+            type="number"
+            min={0}
+            max={23}
+            value={recipe.lifeStrategy.activeHoursEnd ?? ""}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                lifeStrategy: {
+                  ...recipe.lifeStrategy,
+                  activeHoursEnd: parseHour(event.target.value),
+                },
+              })
+            }
+          />
+        </FormRow>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={recipe.reasoning.enableCoT}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                reasoning: {
+                  ...recipe.reasoning,
+                  enableCoT: event.target.checked,
+                },
+              })
+            }
+          />
+          启用 CoT
+        </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={recipe.reasoning.enableReflection}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                reasoning: {
+                  ...recipe.reasoning,
+                  enableReflection: event.target.checked,
+                },
+              })
+            }
+          />
+          启用反思
+        </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={recipe.reasoning.enableRouting}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                reasoning: {
+                  ...recipe.reasoning,
+                  enableRouting: event.target.checked,
+                },
+              })
+            }
+          />
+          启用路由
+        </label>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormRow label="口头禅（逗号分隔）">
+          <TextField
+            value={recipe.tone.catchphrases.join(", ")}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                tone: {
+                  ...recipe.tone,
+                  catchphrases: splitList(event.target.value),
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="禁忌（逗号分隔）">
+          <TextField
+            value={recipe.tone.taboos.join(", ")}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                tone: {
+                  ...recipe.tone,
+                  taboos: splitList(event.target.value),
+                },
+              })
+            }
+          />
+        </FormRow>
+      </div>
+    </div>
+  );
+}
+
+function ScenePromptField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <FormRow label={label}>
+      <TextAreaField
+        rows={4}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      />
+    </FormRow>
   );
 }
 
@@ -556,6 +1182,11 @@ function RevisionCard({
             {new Date(rev.createdAt).toLocaleString()}
           </span>
           <StatusPill>{rev.status}</StatusPill>
+          <StatusPill>{rev.operation}</StatusPill>
+          {rev.revisionKind !== "content" && (
+            <StatusPill>{rev.revisionKind}</StatusPill>
+          )}
+          {rev.riskLevel === "high" && <StatusPill>高风险</StatusPill>}
           {rev.changeSource !== "edit" && (
             <StatusPill>{rev.changeSource}</StatusPill>
           )}
@@ -595,6 +1226,16 @@ function RevisionCard({
               after={rev.contentSnapshot}
               changedFields={rev.diffFromParent?.changed}
             />
+            {rev.recipeSnapshot && (
+              <details className="mt-3 text-xs">
+                <summary className="cursor-pointer text-[var(--text-muted)]">
+                  查看角色逻辑快照
+                </summary>
+                <pre className="mt-2 p-3 bg-[var(--bg-canvas)] rounded overflow-x-auto">
+                  {JSON.stringify(rev.recipeSnapshot, null, 2)}
+                </pre>
+              </details>
+            )}
           </div>
         )}
         {showRevert && (

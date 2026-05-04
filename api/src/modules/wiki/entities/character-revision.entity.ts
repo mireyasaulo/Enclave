@@ -5,6 +5,7 @@ import {
   Index,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import type { CharacterBlueprintRecipeValue } from '../../characters/character-blueprint.types';
 
 export type WikiContentSnapshot = {
   name: string;
@@ -41,6 +42,9 @@ export class CharacterRevisionEntity {
   contentSnapshot: WikiContentSnapshot;
 
   @Column('simple-json', { nullable: true })
+  recipeSnapshot?: CharacterBlueprintRecipeValue | null;
+
+  @Column('simple-json', { nullable: true })
   diffFromParent?: unknown | null;
 
   @Column()
@@ -54,6 +58,15 @@ export class CharacterRevisionEntity {
 
   @Column()
   status: string; // 'pending' | 'approved' | 'rejected' | 'reverted' | 'superseded'
+
+  @Column({ default: 'content' })
+  revisionKind: string; // 'content' | 'recipe' | 'lifecycle'
+
+  @Column({ default: 'edit' })
+  operation: string; // 'edit' | 'create' | 'soft_delete' | 'restore' | 'revert'
+
+  @Column({ default: 'low' })
+  riskLevel: string; // 'low' | 'high'
 
   @Column()
   changeSource: string; // 'edit' | 'revert' | 'admin_override' | 'merge' | 'ai_regen'

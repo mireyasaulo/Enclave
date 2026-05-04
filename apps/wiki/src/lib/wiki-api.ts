@@ -1,4 +1,5 @@
 import { clearSession, getToken } from "./auth-store";
+import type { CharacterBlueprintRecipe } from "@yinjie/contracts";
 
 const API_BASE = "/api";
 
@@ -73,7 +74,10 @@ export type WikiPageView = {
   characterId: string;
   page: {
     characterId: string;
+    title?: string | null;
     currentRevisionId: string | null;
+    lifecycleStatus: string;
+    reviewPolicy: string;
     protectionLevel: string;
     protectionExpiresAt: string | null;
     protectionReason: string | null;
@@ -84,6 +88,8 @@ export type WikiPageView = {
   };
   currentRevision: WikiRevisionSummary | null;
   content: WikiContentSnapshot;
+  recipe: CharacterBlueprintRecipe | null;
+  pendingRevision: WikiRevisionSummary | null;
   exists: boolean;
 };
 
@@ -94,11 +100,15 @@ export type WikiRevisionSummary = {
   parentRevisionId: string | null;
   baseRevisionId: string | null;
   contentSnapshot: WikiContentSnapshot;
+  recipeSnapshot?: CharacterBlueprintRecipe | null;
   diffFromParent: { changed?: string[] } | null;
   editorUserId: string;
   editorRoleAtTime: string;
   editSummary: string;
   status: string;
+  revisionKind: string;
+  operation: string;
+  riskLevel: string;
   changeSource: string;
   isMinor: boolean;
   isPatrolled: boolean;
@@ -112,6 +122,8 @@ export type EditSubmission = {
   revisionId: string;
   characterId: string;
   submitterId: string;
+  operation: string;
+  riskLevel: string;
   decision: string | null;
   reviewerId: string | null;
   decidedAt: string | null;
@@ -224,6 +236,8 @@ export type CharacterListItem = {
   relationship: string;
   relationshipType: string;
   sourceType: string;
+  lifecycleStatus: string;
+  protectionLevel: string;
 };
 
 export const wikiApi = {
@@ -250,7 +264,24 @@ export const wikiApi = {
     }>("/auth/me");
   },
   listCharacters() {
-    return request<CharacterListItem[]>("/characters");
+    return request<CharacterListItem[]>("/wiki/pages", { auth: false });
+  },
+  createPage(payload: {
+    characterId?: string | null;
+    contentSnapshot?: WikiContentSnapshot;
+    recipeSnapshot?: CharacterBlueprintRecipe | null;
+    editSummary?: string | null;
+  }) {
+    return request<{
+      characterId: string;
+      revisionId: string;
+      status: string;
+      isPatrolled: boolean;
+      appliedToCharacter: boolean;
+    }>("/wiki/pages", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
   },
   getPage(characterId: string) {
     return request<WikiPageView>(
@@ -268,6 +299,7 @@ export const wikiApi = {
     characterId: string,
     payload: {
       contentSnapshot: WikiContentSnapshot;
+      recipeSnapshot?: CharacterBlueprintRecipe | null;
       baseRevisionId?: string | null;
       editSummary?: string;
       isMinor?: boolean;
@@ -476,6 +508,18 @@ export const wikiApi = {
   restorePage(characterId: string) {
     return request<unknown>(
       `/wiki/pages/${encodeURIComponent(characterId)}/restore`,
+      { method: "POST", body: JSON.stringify({}) },
+    );
+  },
+  requestDeletePage(characterId: string) {
+    return request<unknown>(
+      `/wiki/pages/${encodeURIComponent(characterId)}/delete-request`,
+      { method: "POST", body: JSON.stringify({}) },
+    );
+  },
+  requestRestorePage(characterId: string) {
+    return request<unknown>(
+      `/wiki/pages/${encodeURIComponent(characterId)}/restore-request`,
       { method: "POST", body: JSON.stringify({}) },
     );
   },

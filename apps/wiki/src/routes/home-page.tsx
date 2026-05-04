@@ -1,9 +1,12 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Card, ErrorBlock, LoadingBlock } from "@yinjie/ui";
+import { Button, Card, ErrorBlock, LoadingBlock, StatusPill } from "@yinjie/ui";
+import { useAuth } from "../lib/use-auth";
 import { wikiApi } from "../lib/wiki-api";
 
 export function HomePage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const charactersQ = useQuery({
     queryKey: ["wiki", "characters"],
     queryFn: () => wikiApi.listCharacters(),
@@ -11,13 +14,20 @@ export function HomePage() {
 
   return (
     <div className="space-y-6">
-      <Card className="p-6">
-        <h1 className="text-2xl font-semibold mb-2">隐界角色百科</h1>
-        <p className="text-[var(--text-muted)] leading-relaxed">
-          仿维基百科的角色档案协作平台。任何登录用户都可以提交对角色档案的修改，由
-          <strong className="mx-1">巡查员</strong>
-          审核后生效。运行参数（模型路由、活跃度等）继续由管理后台控制，本平台仅治理对外可见的内容字段。
-        </p>
+      <Card className="p-6 flex flex-col md:flex-row md:items-start gap-4">
+        <div className="flex-1">
+          <h1 className="text-2xl font-semibold mb-2">
+            隐界世界角色管理平台
+          </h1>
+          <p className="text-[var(--text-muted)] leading-relaxed">
+            按维基百科模式管理世界角色。任何登录用户都能创建角色、编辑画像和运行逻辑、申请删除或恢复；高风险改动进入巡查队列，通过后才发布到角色运行时。
+          </p>
+        </div>
+        {user && (
+          <Button variant="primary" onClick={() => void navigate({ to: "/create" })}>
+            创建角色
+          </Button>
+        )}
       </Card>
 
       <Card className="p-6">
@@ -40,6 +50,21 @@ export function HomePage() {
                 >
                   {c.name}
                 </Link>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {c.lifecycleStatus !== "active" && (
+                    <StatusPill>
+                      {c.lifecycleStatus === "pending_create"
+                        ? "待创建"
+                        : c.lifecycleStatus}
+                    </StatusPill>
+                  )}
+                  {c.protectionLevel !== "none" && (
+                    <StatusPill>{c.protectionLevel}</StatusPill>
+                  )}
+                  {c.sourceType === "wiki_contributed" && (
+                    <StatusPill>社区创建</StatusPill>
+                  )}
+                </div>
                 <div className="text-xs text-[var(--text-muted)] mt-1">
                   {c.relationship} · {c.relationshipType}
                 </div>

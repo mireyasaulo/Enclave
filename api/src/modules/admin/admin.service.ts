@@ -32,7 +32,7 @@ export class AdminService {
 
   async getStats() {
     const [ownerCount, characterCount, totalMessages, aiMessages] = await Promise.all([
-      this.userRepo.count(),
+      this.userRepo.count({ where: { userType: 'world_owner' } }),
       this.characterRepo.count(),
       this.messageRepo.count(),
       this.messageRepo.count({ where: { senderType: 'character' } }),

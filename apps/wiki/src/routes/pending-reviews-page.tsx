@@ -101,6 +101,9 @@ function ReviewCard({
           {rev.characterId}
         </Link>
         <StatusPill>v{rev.version}</StatusPill>
+        <StatusPill>{rev.operation}</StatusPill>
+        <StatusPill>{rev.revisionKind}</StatusPill>
+        {rev.riskLevel === "high" && <StatusPill>高风险</StatusPill>}
         <span className="text-[var(--text-muted)]">
           由 {rev.editorUserId}（{rev.editorRoleAtTime}）提交于
           {new Date(rev.createdAt).toLocaleString()}
@@ -120,6 +123,16 @@ function ReviewCard({
           {JSON.stringify(rev.contentSnapshot, null, 2)}
         </pre>
       </details>
+      {rev.recipeSnapshot && (
+        <details className="text-sm">
+          <summary className="cursor-pointer text-[var(--text-muted)]">
+            查看角色逻辑快照
+          </summary>
+          <pre className="mt-2 p-3 bg-[var(--bg-canvas)] rounded text-xs overflow-x-auto">
+            {JSON.stringify(rev.recipeSnapshot, null, 2)}
+          </pre>
+        </details>
+      )}
       <label className="block">
         <span className="text-sm mb-1 block">审核备注（可选）</span>
         <TextField

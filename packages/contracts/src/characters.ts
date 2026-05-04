@@ -15,6 +15,7 @@ export type CharacterSourceType =
   | "need_generated"
   | "shake_generated"
   | "ai_generated"
+  | "wiki_contributed"
   | "wechat_import"
   | "model_persona";
 export type CharacterDeletionPolicy = "protected" | "archive_allowed";

@@ -95,6 +95,11 @@ function ChangeRow({
             {rev.characterId}
           </Link>
           <StatusPill>{rev.status}</StatusPill>
+          <StatusPill>{rev.operation}</StatusPill>
+          {rev.revisionKind !== "content" && (
+            <StatusPill>{rev.revisionKind}</StatusPill>
+          )}
+          {rev.riskLevel === "high" && <StatusPill>高风险</StatusPill>}
           {rev.changeSource !== "edit" && (
             <StatusPill>{rev.changeSource}</StatusPill>
           )}

@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CharacterEntity } from '../../characters/character.entity';
+import { CharacterBlueprintService } from '../../characters/character-blueprint.service';
+import type { CharacterBlueprintRecipeValue } from '../../characters/character-blueprint.types';
 import { CharacterPageEntity } from '../entities/character-page.entity';
 import {
   CharacterRevisionEntity,
@@ -14,6 +16,8 @@ export type WikiPageView = {
   page: CharacterPageEntity;
   currentRevision: CharacterRevisionEntity | null;
   content: WikiContentSnapshot;
+  recipe: CharacterBlueprintRecipeValue | null;
+  pendingRevision: CharacterRevisionEntity | null;
   exists: boolean;
 };
 
@@ -26,6 +30,7 @@ export class WikiPageService {
     private readonly pageRepo: Repository<CharacterPageEntity>,
     @InjectRepository(CharacterRevisionEntity)
     private readonly revisionRepo: Repository<CharacterRevisionEntity>,
+    private readonly blueprints: CharacterBlueprintService,
   ) {}
 
   async getOrInitPage(characterId: string): Promise<CharacterPageEntity> {
@@ -39,7 +44,10 @@ export class WikiPageService {
     }
     page = this.pageRepo.create({
       characterId,
+      title: character.name,
       currentRevisionId: null,
+      lifecycleStatus: 'active',
+      reviewPolicy: 'pending_changes',
       protectionLevel: character.sourceType === 'ai_generated' ? 'semi' : 'none',
       isPatrolled: false,
       watcherCount: 0,
@@ -53,26 +61,106 @@ export class WikiPageService {
     const character = await this.characterRepo.findOne({
       where: { id: characterId },
     });
-    if (!character) {
+    const existingPage = await this.pageRepo.findOne({ where: { characterId } });
+    if (!character && !existingPage) {
       throw new NotFoundException(`角色 ${characterId} 不存在`);
     }
-    const page = await this.getOrInitPage(characterId);
+    const page = character ? await this.getOrInitPage(characterId) : existingPage!;
     let currentRevision: CharacterRevisionEntity | null = null;
     if (page.currentRevisionId) {
       currentRevision = await this.revisionRepo.findOne({
         where: { id: page.currentRevisionId },
       });
     }
+    const pendingRevision =
+      (await this.revisionRepo.findOne({
+        where: { characterId, status: 'pending' },
+        order: { createdAt: 'DESC' },
+      })) ?? null;
+    const factorySnapshot = character
+      ? await this.blueprints.getFactorySnapshot(characterId).catch(() => null)
+      : null;
+    const recipe =
+      currentRevision?.recipeSnapshot ??
+      factorySnapshot?.blueprint.publishedRecipe ??
+      factorySnapshot?.blueprint.draftRecipe ??
+      pendingRevision?.recipeSnapshot ??
+      null;
     const content = currentRevision
       ? currentRevision.contentSnapshot
-      : snapshotFromCharacter(character as unknown as Record<string, unknown>);
+      : character
+        ? snapshotFromCharacter(character as unknown as Record<string, unknown>)
+        : pendingRevision?.contentSnapshot;
+    if (!content) {
+      throw new NotFoundException(`角色 ${characterId} 不存在`);
+    }
     return {
       characterId,
       page,
       currentRevision,
       content,
-      exists: !page.isDeleted,
+      recipe,
+      pendingRevision,
+      exists: !page.isDeleted && page.lifecycleStatus !== 'pending_create',
     };
+  }
+
+  async listPages(): Promise<
+    Array<{
+      id: string;
+      name: string;
+      avatar: string;
+      bio: string;
+      relationship: string;
+      relationshipType: string;
+      sourceType: string;
+      lifecycleStatus: string;
+      protectionLevel: string;
+    }>
+  > {
+    const characters = await this.characterRepo.find({ order: { name: 'ASC' } });
+    const pages = await this.pageRepo.find();
+    const pendingRevisions = await this.revisionRepo.find({
+      where: { operation: 'create', status: 'pending' },
+      order: { createdAt: 'DESC' },
+    });
+    const pageMap = new Map(pages.map((page) => [page.characterId, page]));
+    const rows = characters
+      .filter((character) => {
+        const page = pageMap.get(character.id);
+        return !page?.isDeleted && page?.lifecycleStatus !== 'deleted';
+      })
+      .map((character) => {
+        const page = pageMap.get(character.id);
+        return {
+          id: character.id,
+          name: character.name,
+          avatar: character.avatar,
+          bio: character.bio,
+          relationship: character.relationship,
+          relationshipType: character.relationshipType,
+          sourceType: character.sourceType,
+          lifecycleStatus: page?.lifecycleStatus ?? 'active',
+          protectionLevel: page?.protectionLevel ?? 'none',
+        };
+      });
+    const existingIds = new Set(rows.map((row) => row.id));
+    for (const revision of pendingRevisions) {
+      if (existingIds.has(revision.characterId)) continue;
+      rows.push({
+        id: revision.characterId,
+        name: revision.contentSnapshot.name,
+        avatar: revision.contentSnapshot.avatar,
+        bio: revision.contentSnapshot.bio,
+        relationship: revision.contentSnapshot.relationship,
+        relationshipType: revision.contentSnapshot.relationshipType,
+        sourceType: 'wiki_contributed',
+        lifecycleStatus: 'pending_create',
+        protectionLevel: pageMap.get(revision.characterId)?.protectionLevel ?? 'none',
+      });
+      existingIds.add(revision.characterId);
+    }
+    return rows.sort((a, b) => a.name.localeCompare(b.name, 'zh-Hans-CN'));
   }
 
   async getHistory(
@@ -104,7 +192,10 @@ export class WikiPageService {
         'p',
         'p.characterId = r.characterId',
       )
-      .where('(p.isDeleted = 0 OR p.isDeleted IS NULL)')
+      .where(
+        '((p.isDeleted = 0 OR p.isDeleted IS NULL) OR r.operation IN (:...lifecycleOps))',
+        { lifecycleOps: ['soft_delete', 'restore'] },
+      )
       .orderBy('r.createdAt', 'DESC')
       .take(limit);
     if (input.onlyUnpatrolled) {
@@ -118,6 +209,25 @@ export class WikiPageService {
       });
     }
     return qb.getMany();
+  }
+
+  async getPending(characterId: string): Promise<CharacterRevisionEntity[]> {
+    return this.revisionRepo.find({
+      where: { characterId, status: 'pending' },
+      order: { createdAt: 'DESC' },
+      take: 50,
+    });
+  }
+
+  async getDiff(fromId: string, toId: string) {
+    const [from, to] = await Promise.all([
+      this.getRevisionOrThrow(fromId),
+      this.getRevisionOrThrow(toId),
+    ]);
+    if (from.characterId !== to.characterId) {
+      throw new NotFoundException('版本不属于同一词条');
+    }
+    return { from, to };
   }
 
   async search(query: string, limit = 20): Promise<
@@ -192,6 +302,7 @@ export class WikiPageService {
       { characterId },
       {
         isDeleted,
+        lifecycleStatus: isDeleted ? 'deleted' : 'active',
         deletedAt: isDeleted ? new Date() : null,
         deletedBy: isDeleted ? actorId : null,
       },

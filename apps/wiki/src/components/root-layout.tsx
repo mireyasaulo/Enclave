@@ -13,12 +13,17 @@ export function RootLayout() {
       <header className="border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center gap-6">
           <Link to="/" className="text-lg font-semibold">
-            隐界角色百科
+            隐界世界角色管理平台
           </Link>
           <nav className="flex items-center gap-4 text-sm">
             <Link to="/" className="hover:underline">
-              首页
+              角色
             </Link>
+            {user && (
+              <Link to="/create" className="hover:underline">
+                创建
+              </Link>
+            )}
             <Link to="/recent-changes" className="hover:underline">
               最近修改
             </Link>
@@ -108,7 +113,7 @@ export function RootLayout() {
         </Suspense>
       </main>
       <footer className="border-t border-[var(--border-subtle)] py-4 text-center text-xs text-[var(--text-muted)]">
-        隐界角色百科 · 任何登录用户都可以提交编辑，由巡查员审核生效
+        隐界世界角色管理平台 · 任何登录用户都可以提交角色创建、编辑和生命周期变更，由巡查员审核生效
       </footer>
     </div>
   );

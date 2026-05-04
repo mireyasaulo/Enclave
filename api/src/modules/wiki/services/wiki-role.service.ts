@@ -83,6 +83,12 @@ export class WikiRoleService {
     if (user.userType !== 'wiki_member' && input.role !== 'admin') {
       throw new ForbiddenException('该用户非 wiki 成员，仅可保留为 admin 角色');
     }
+    if (user.role === 'admin' && input.role !== 'admin') {
+      const adminCount = await this.userRepo.count({ where: { role: 'admin' } });
+      if (adminCount <= 1) {
+        throw new ForbiddenException('至少需要保留一名 wiki admin');
+      }
+    }
     user.role = input.role;
     user.roleGrantedAt = new Date();
     user.roleGrantedBy = `admin:${actor.username}${
