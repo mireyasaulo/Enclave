@@ -4,7 +4,9 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   BookText,
   ChevronRight,
+  CreditCard,
   FileText,
+  LogOut,
   Settings,
   ShieldCheck,
 } from "lucide-react";
@@ -13,7 +15,9 @@ import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../components/avatar-chip";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+import { clearCloudRuntimeSession } from "../lib/cloud-session";
 import { normalizePathname } from "../lib/normalize-pathname";
+import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
 export function ProfilePage() {
@@ -32,6 +36,7 @@ export function ProfilePage() {
   const username = useWorldOwnerStore((state) => state.username);
   const avatar = useWorldOwnerStore((state) => state.avatar);
   const signature = useWorldOwnerStore((state) => state.signature);
+  const runtimeConfig = useAppRuntimeConfig();
   const desktopProfilePath = "/tabs/profile";
   const normalizedPathname = normalizePathname(pathname);
   const desktopPathMismatch =
@@ -39,6 +44,7 @@ export function ProfilePage() {
   const settingsPath = isDesktopLayout
     ? "/desktop/settings"
     : "/profile/settings";
+  const showCloudAccountEntries = runtimeConfig.worldAccessMode === "cloud";
 
   useEffect(() => {
     if (!desktopPathMismatch) {
@@ -108,6 +114,25 @@ export function ProfilePage() {
             label={t(msg`设置`)}
             to={settingsPath}
           />
+          {showCloudAccountEntries ? (
+            <ProfileEntry
+              icon={CreditCard}
+              iconClassName="bg-[rgba(22,163,74,0.12)] text-[#15803d]"
+              label="Membership Center"
+              to="/profile/subscription"
+            />
+          ) : null}
+          {showCloudAccountEntries ? (
+            <ProfileActionEntry
+              icon={LogOut}
+              iconClassName="bg-[rgba(220,38,38,0.10)] text-[#b42318]"
+              label="Sign Out"
+              onClick={() => {
+                clearCloudRuntimeSession();
+                void navigate({ to: "/welcome", replace: true });
+              }}
+            />
+          ) : null}
         </ProfileEntryGroup>
 
         <ProfileEntryGroup className="mt-1">
@@ -186,5 +211,41 @@ function ProfileEntry({
         className="shrink-0 text-[color:var(--text-dim)]"
       />
     </Link>
+  );
+}
+
+function ProfileActionEntry({
+  icon: Icon,
+  iconClassName,
+  label,
+  onClick,
+}: {
+  icon: React.ElementType;
+  iconClassName?: string;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-full items-center gap-2.5 px-4 py-2.75 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:bg-[color:var(--surface-card-hover)]"
+    >
+      <div
+        className={cn(
+          "flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-[9px]",
+          iconClassName,
+        )}
+      >
+        <Icon size={15} />
+      </div>
+      <div className="min-w-0 flex-1 text-[14px] text-[color:var(--text-primary)]">
+        {label}
+      </div>
+      <ChevronRight
+        size={13}
+        className="shrink-0 text-[color:var(--text-dim)]"
+      />
+    </button>
   );
 }

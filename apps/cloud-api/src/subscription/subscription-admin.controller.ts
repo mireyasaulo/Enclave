@@ -4,7 +4,7 @@ import { AdminGuard } from "../auth/admin.guard";
 import { UpsertSubscriptionPlanDto } from "../http-dto/cloud-api.dto";
 import { SubscriptionService } from "./subscription.service";
 
-@Controller("cloud/admin/subscription-plans")
+@Controller("admin/cloud/subscription-plans")
 @UseGuards(AdminGuard)
 export class SubscriptionAdminController {
   constructor(private readonly subscription: SubscriptionService) {}

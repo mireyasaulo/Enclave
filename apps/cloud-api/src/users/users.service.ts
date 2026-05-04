@@ -254,7 +254,7 @@ export class UsersService implements OnModuleInit {
   }
 
   async serializeUserSummary(user: CloudUserEntity): Promise<CloudUserSummary> {
-    const [active, latest, ownInviteCode, inviter] = await Promise.all([
+    const [active, latest, ownInviteCode, inviter, world] = await Promise.all([
       this.subscription.findActiveSubscription(user.id),
       this.subscription.findLatestSubscription(user.id),
       user.inviteCodeId
@@ -263,6 +263,7 @@ export class UsersService implements OnModuleInit {
       user.invitedByCodeId
         ? this.resolveInviterPhoneByCodeId(user.invitedByCodeId)
         : Promise.resolve(null),
+      this.worldRepo.findOne({ where: { phone: user.phone } }),
     ]);
 
     let subscriptionStatus: SubscriptionStatus = "none";
@@ -277,6 +278,7 @@ export class UsersService implements OnModuleInit {
       subscriptionStatus,
       subscriptionExpiresAt: active?.expiresAt.toISOString() ?? latest?.expiresAt.toISOString() ?? null,
       currentPlanCode: active?.planCode ?? latest?.planCode ?? null,
+      worldStatus: world?.status ?? null,
       inviterPhone: inviter,
       inviteCode: ownInviteCode?.code ?? null,
       redeemCount: ownInviteCode?.redeemCount ?? 0,

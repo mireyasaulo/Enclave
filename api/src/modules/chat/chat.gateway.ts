@@ -12,6 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { ChatService } from './chat.service';
 import { AiProviderAuthError } from '../ai/ai.types';
 import { ReplyLogicRulesService } from '../ai/reply-logic-rules.service';
+import { SubscriptionExpiredException } from '../subscription/subscription-expired.exception';
 import {
   WorldLanguageService,
   type WorldLanguageCode,
@@ -260,7 +261,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return { event: 'message_sent', data: { conversationId: convId } };
     } catch (err) {
       this.logger.error('Error handling message', err);
-      client.emit('error', { message: await this.describeReplyFailure(err) });
+      client.emit(
+        'error',
+        this.toChatErrorPayload(await this.describeReplyFailure(err), err),
+      );
     }
   }
 
@@ -362,7 +366,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         await this.emitSystemNotice(convId, failureMessage);
         return;
       }
-      this.emitConversationError(convId, failureMessage);
+      this.emitConversationError(
+        convId,
+        this.toChatErrorPayload(failureMessage, error),
+      );
     }
   }
 
@@ -377,10 +384,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  private emitConversationError(conversationId: string, message: string) {
-    this.server.to(conversationId).emit('error', {
-      message,
-    });
+  private emitConversationError(
+    conversationId: string,
+    payload: { message: string; code?: string; meta?: unknown },
+  ) {
+    this.server.to(conversationId).emit('error', payload);
+  }
+
+  private toChatErrorPayload(defaultMessage: string, error: unknown) {
+    if (error instanceof SubscriptionExpiredException) {
+      const response = error.getResponse() as {
+        code?: string;
+        message?: string;
+        meta?: unknown;
+      };
+      return {
+        message: response.message || error.message,
+        code: response.code || SubscriptionExpiredException.CODE,
+        meta: response.meta,
+      };
+    }
+
+    return {
+      message: defaultMessage,
+    };
   }
 
   private shouldPersistReplyFailure(error: unknown) {

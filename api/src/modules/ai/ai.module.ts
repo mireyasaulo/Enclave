@@ -15,11 +15,13 @@ import { ConversationEntity } from '../chat/conversation.entity';
 import { GroupEntity } from '../chat/group.entity';
 import { MessageEntity } from '../chat/message.entity';
 import { InferenceModule } from '../inference/inference.module';
+import { SubscriptionModule } from '../subscription/subscription.module';
 
 @Module({
   imports: [
     SystemConfigModule,
     InferenceModule,
+    SubscriptionModule,
     forwardRef(() => WorldModule),
     TypeOrmModule.forFeature([
       AiUsageLedgerEntity,

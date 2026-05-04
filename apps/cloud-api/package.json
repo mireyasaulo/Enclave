@@ -16,6 +16,7 @@
     "start:status": "node ../../scripts/dev-services.mjs status cloud-api",
     "db:migrate": "typeorm-ts-node-commonjs -d src/database/cloud-data-source.ts migration:run",
     "db:migration:show": "typeorm-ts-node-commonjs -d src/database/cloud-data-source.ts migration:show",
+    "saas:backfill": "node ./scripts/backfill-cloud-saas-users.mjs",
     "test": "node --test --test-concurrency=1 --require ts-node/register test/**/*.test.ts",
     "pretest:e2e": "npm run build",
     "test:e2e": "node ./scripts/cloud-api-e2e.mjs",

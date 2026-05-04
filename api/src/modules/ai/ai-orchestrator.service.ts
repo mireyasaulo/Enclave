@@ -42,6 +42,7 @@ import {
   InferenceService,
   type ResolvedInferenceCapabilityProfile,
 } from '../inference/inference.service';
+import { SubscriptionService } from '../subscription/subscription.service';
 
 const DEFAULT_TTS_VOICE = 'alloy';
 const MAX_INLINE_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -207,6 +208,7 @@ export class AiOrchestratorService {
     private readonly replyLogicRules: ReplyLogicRulesService,
     private readonly usageLedger: AiUsageLedgerService,
     private readonly momentGenerationContext: MomentGenerationContextService,
+    private readonly subscription: SubscriptionService,
   ) {
     this.client = new OpenAI({
       apiKey: this.config.get<string>('DEEPSEEK_API_KEY'),
@@ -2006,6 +2008,7 @@ export class AiOrchestratorService {
   async generateReply(
     options: GenerateReplyOptions,
   ): Promise<GenerateReplyResult> {
+    await this.subscription.assertCanUseAi('text');
     const {
       profile,
       conversationHistory,
@@ -2201,6 +2204,7 @@ export class AiOrchestratorService {
   }
 
   async generateMoment(options: GenerateMomentOptions): Promise<string> {
+    await this.subscription.assertCanUseAi('text');
     const {
       profile,
       currentTime,
@@ -2336,6 +2340,7 @@ export class AiOrchestratorService {
     personName: string,
     usageContext?: AiUsageContext,
   ): Promise<Record<string, unknown>> {
+    await this.subscription.assertCanUseAi('text');
     const prompt = await this.promptBuilder.buildPersonalityExtractionPrompt(
       chatSample,
       personName,
@@ -2386,6 +2391,7 @@ export class AiOrchestratorService {
       temperature?: number;
     },
   ): Promise<Record<string, unknown>> {
+    await this.subscription.assertCanUseAi('text');
     const prompt = await this.worldLanguage.prependTaskLanguageInstruction(
       options?.userPrompt?.trim() ||
         `你是隐界的角色设计师。根据以下描述，生成一个完整的虚拟角色 JSON 草稿，严格输出合法 JSON，不要输出任何其他内容。
@@ -2486,6 +2492,7 @@ export class AiOrchestratorService {
     temperature?: number;
     fallback?: Record<string, unknown>;
   }): Promise<Record<string, unknown>> {
+    await this.subscription.assertCanUseAi('text');
     try {
       const prompt = await this.worldLanguage.prependTaskLanguageInstruction(
         options.prompt,
@@ -2524,6 +2531,7 @@ export class AiOrchestratorService {
     temperature?: number;
     fallback?: string;
   }): Promise<string> {
+    await this.subscription.assertCanUseAi('text');
     try {
       const prompt = await this.worldLanguage.prependTaskLanguageInstruction(
         options.prompt,
@@ -2553,6 +2561,7 @@ export class AiOrchestratorService {
     profile: PersonalityProfile,
     usageContext?: AiUsageContext,
   ): Promise<string> {
+    await this.subscription.assertCanUseAi('text');
     const chatHistory = history
       .filter((m) => m.role !== 'system')
       .map((m) => `${m.role === 'user' ? '用户' : profile.name}：${m.content}`)
@@ -2602,6 +2611,7 @@ export class AiOrchestratorService {
     profile: PersonalityProfile,
     usageContext?: AiUsageContext,
   ): Promise<string> {
+    await this.subscription.assertCanUseAi('text');
     const prompt = await this.promptBuilder.buildCoreMemoryExtractionPrompt(
       interactionHistory,
       profile,
@@ -2773,6 +2783,7 @@ export class AiOrchestratorService {
   async generateImage(
     options: ImageGenerationOptions,
   ): Promise<ImageGenerationResult> {
+    await this.subscription.assertCanUseAi('image');
     const prompt = options.prompt.trim();
     if (!prompt) {
       throw new BadRequestException('请先提供图片生成描述。');
@@ -2917,6 +2928,7 @@ export class AiOrchestratorService {
     file: UploadedAudioFile,
     options: { conversationId?: string; characterId?: string; mode?: string },
   ) {
+    await this.subscription.assertCanUseAi('audio');
     if (!file.buffer?.length) {
       throw new BadRequestException('没有收到可转写的音频内容。');
     }
@@ -3043,6 +3055,7 @@ export class AiOrchestratorService {
   async synthesizeSpeech(
     options: SpeechSynthesisOptions,
   ): Promise<SpeechSynthesisResult> {
+    await this.subscription.assertCanUseAi('audio');
     const primaryProvider = await this.resolveRuntimeProvider({
       characterId: options.characterId,
     });

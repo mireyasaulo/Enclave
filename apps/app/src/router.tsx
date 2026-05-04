@@ -168,6 +168,11 @@ const ProfileSettingsPage = lazy(async () => {
   return { default: mod.ProfileSettingsPage };
 });
 
+const ProfileSubscriptionPage = lazy(async () => {
+  const mod = await import("./routes/profile-subscription-page");
+  return { default: mod.ProfileSubscriptionPage };
+});
+
 const DesktopMobilePage = lazy(async () => {
   const mod = await import("./routes/desktop-mobile-page");
   return { default: mod.DesktopMobilePage };
@@ -766,6 +771,13 @@ const profileSettingsRoute = createRoute({
   component: ProfileSettingsPage,
 });
 
+const profileSubscriptionRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/subscription",
+  beforeLoad: requireWorldReady,
+  component: ProfileSubscriptionPage,
+});
+
 const desktopMobileRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/desktop/mobile",
@@ -921,6 +933,7 @@ const routeTree = rootRoute.addChildren([
   discoverGamesRoute,
   discoverMiniProgramsRoute,
   profileSettingsRoute,
+  profileSubscriptionRoute,
   desktopMobileRoute,
   mobileFriendMomentsRoute,
   desktopFriendMomentsRoute,

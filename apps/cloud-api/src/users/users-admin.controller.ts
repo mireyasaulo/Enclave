@@ -23,7 +23,7 @@ import {
 import { SubscriptionService } from "../subscription/subscription.service";
 import { UsersService } from "./users.service";
 
-@Controller("cloud/admin/users")
+@Controller("admin/cloud/users")
 @UseGuards(AdminGuard)
 export class UsersAdminController {
   constructor(

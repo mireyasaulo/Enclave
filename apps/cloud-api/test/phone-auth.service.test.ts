@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { DataSource } from "typeorm";
 import { PhoneAuthService } from "../src/auth/phone-auth.service";
+import { CloudUserEntity } from "../src/entities/cloud-user.entity";
 import { PhoneVerificationSessionEntity } from "../src/entities/phone-verification-session.entity";
 
 function createConfig(values: Record<string, string | undefined>) {
@@ -18,7 +19,7 @@ async function createPhoneAuthDataSource() {
   const dataSource = new DataSource({
     type: "better-sqlite3",
     database: ":memory:",
-    entities: [PhoneVerificationSessionEntity],
+    entities: [PhoneVerificationSessionEntity, CloudUserEntity],
     synchronize: true,
   });
 
@@ -33,9 +34,11 @@ test("sendCode cleans up persisted sessions when the sms provider fails", async 
   });
 
   const sessionRepo = dataSource.getRepository(PhoneVerificationSessionEntity);
+  const userRepo = dataSource.getRepository(CloudUserEntity);
   let sendAttempts = 0;
   const service = new PhoneAuthService(
     sessionRepo,
+    userRepo,
     createConfig({}) as never,
     {} as never,
     {

@@ -13,7 +13,7 @@ import type {
   SubscriptionStateResponse,
   SubscriptionStatus,
 } from "@yinjie/contracts";
-import { In, MoreThan, Repository } from "typeorm";
+import { Between, In, MoreThan, Repository } from "typeorm";
 import { CloudConfigService } from "../cloud-config/cloud-config.service";
 import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { InviteCodeEntity } from "../entities/invite-code.entity";
@@ -88,11 +88,13 @@ export class SubscriptionService {
   }
 
   async findActiveSubscription(userId: string) {
+    const now = new Date();
     return this.subscriptionRepo.findOne({
       where: {
         userId,
         status: "active",
-        expiresAt: MoreThan(new Date()),
+        startsAt: Between(new Date(0), now),
+        expiresAt: MoreThan(now),
       },
       order: { expiresAt: "DESC" },
     });

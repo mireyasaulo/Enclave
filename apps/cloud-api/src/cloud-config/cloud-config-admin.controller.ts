@@ -3,7 +3,7 @@ import { AdminGuard, type AdminRequest } from "../auth/admin.guard";
 import { UpsertCloudConfigDto } from "../http-dto/cloud-api.dto";
 import { CloudConfigService } from "./cloud-config.service";
 
-@Controller("cloud/admin/configs")
+@Controller("admin/cloud/configs")
 @UseGuards(AdminGuard)
 export class CloudConfigAdminController {
   constructor(private readonly configService: CloudConfigService) {}

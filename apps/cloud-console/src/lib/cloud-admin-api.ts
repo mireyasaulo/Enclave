@@ -28,10 +28,19 @@ import type {
   CloudWorldRequestStatus,
   CloudWorldSummary,
   CloudApiErrorResponse,
+  CloudConfigEntry,
+  CloudUserDetail,
+  CloudUserListQuery,
+  CloudUserListResponse,
+  BanCloudUserRequest,
+  GrantSubscriptionRequest,
   IssueCloudAdminAccessTokenResponse,
+  InviteRedemptionListQuery,
+  InviteRedemptionListResponse,
   ReplayFailedCloudWaitingSessionSyncTasksResponse,
   ReplayFilteredFailedCloudWaitingSessionSyncTasksRequest,
   ReplayFilteredFailedCloudWaitingSessionSyncTasksResponse,
+  RejectInviteRedemptionRequest,
   RevokeCloudAdminSessionSourceGroupRequest,
   RevokeCloudAdminSessionSourceGroupResponse,
   RevokeCloudAdminSessionSourceGroupsByRiskRequest,
@@ -39,6 +48,10 @@ import type {
   RevokeCloudAdminSessionsByFilterRequest,
   RevokeCloudAdminSessionsByFilterResponse,
   RevokeCloudAdminSessionsByIdResponse,
+  SubscriptionPlanSummary,
+  SubscriptionRecordSummary,
+  UpsertCloudConfigRequest,
+  UpsertSubscriptionPlanRequest,
   WorldLifecycleJobSummary,
 } from "@yinjie/contracts";
 import {
@@ -1200,4 +1213,73 @@ export const cloudAdminApi = {
         body: JSON.stringify(payload),
       },
     ),
+
+  listCloudUsers: (query?: CloudUserListQuery) =>
+    adminFetch<CloudUserListResponse>(
+      `/users${buildQueryString({
+        query: query?.query,
+        subscriptionStatus: query?.subscriptionStatus,
+        status: query?.status,
+        inviterPhone: query?.inviterPhone,
+        registeredFrom: query?.registeredFrom,
+        registeredTo: query?.registeredTo,
+        page: query?.page,
+        pageSize: query?.pageSize,
+      })}`,
+    ),
+
+  getCloudUser: (id: string) => adminFetch<CloudUserDetail>(`/users/${id}`),
+
+  grantSubscription: (id: string, payload: GrantSubscriptionRequest) =>
+    adminFetch<SubscriptionRecordSummary>(`/users/${id}/subscriptions`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  banUser: (id: string, payload: BanCloudUserRequest) =>
+    adminFetch<{ success: true }>(`/users/${id}/ban`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  unbanUser: (id: string) =>
+    adminFetch<{ success: true }>(`/users/${id}/unban`, {
+      method: "POST",
+    }),
+
+  listSubscriptionPlans: () =>
+    adminFetch<SubscriptionPlanSummary[]>("/subscription-plans"),
+
+  upsertSubscriptionPlan: (payload: UpsertSubscriptionPlanRequest) =>
+    adminFetch<SubscriptionPlanSummary>("/subscription-plans", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  listCloudConfigs: () => adminFetch<CloudConfigEntry[]>("/configs"),
+
+  upsertCloudConfig: (payload: UpsertCloudConfigRequest) =>
+    adminFetch<CloudConfigEntry>("/configs", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  listInviteRedemptions: (query?: InviteRedemptionListQuery) =>
+    adminFetch<InviteRedemptionListResponse>(
+      `/invites/redemptions${buildQueryString({
+        query: query?.query,
+        status: query?.status,
+        page: query?.page,
+        pageSize: query?.pageSize,
+      })}`,
+    ),
+
+  rejectInviteRedemption: (
+    id: string,
+    payload: RejectInviteRedemptionRequest,
+  ) =>
+    adminFetch<{ success: true }>(`/invites/redemptions/${id}/reject`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
 };

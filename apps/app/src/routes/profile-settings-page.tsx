@@ -23,6 +23,7 @@ import {
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { DesktopUtilityShell } from "../features/shell/desktop-utility-shell";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+import { clearCloudRuntimeSession } from "../lib/cloud-session";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import {
   formatChatSendShortcutLabel,
@@ -94,6 +95,8 @@ export function ProfileSettingsPage() {
   const [draftSignature, setDraftSignature] = useState(signature);
   const [apiKeyDraft, setApiKeyDraft] = useState("");
   const [apiBaseDraft, setApiBaseDraft] = useState("");
+
+  const showCloudAccountEntries = runtimeConfig.worldAccessMode === "cloud";
 
   useEffect(() => {
     setDraftName(username ?? "");
@@ -187,6 +190,11 @@ export function ProfileSettingsPage() {
 
   function handleMobileBack() {
     void navigate({ to: backTo });
+  }
+
+  function handleCloudLogout() {
+    clearCloudRuntimeSession();
+    void navigate({ to: "/welcome", replace: true });
   }
 
   function handleRetryOwnerLoad() {
@@ -707,6 +715,34 @@ export function ProfileSettingsPage() {
             </MobileSettingsSection>
           ) : null}
         </>
+      ) : null}
+      {showCloudAccountEntries ? (
+        <MobileSettingsSection
+          desktop={desktopMode}
+          title={desktopMode ? "Cloud account" : undefined}
+          description={
+            desktopMode
+              ? "Open membership details or sign out from the current cloud account."
+              : "Manage membership and sign out from the current cloud account."
+          }
+        >
+          <div className="space-y-2">
+            <Button
+              variant="secondary"
+              className="h-9 w-full rounded-[10px] border-[color:var(--border-faint)] bg-white text-[12px] shadow-none hover:bg-[#f5f7f7]"
+              onClick={() => void navigate({ to: "/profile/subscription" })}
+            >
+              Membership Center
+            </Button>
+            <Button
+              variant="secondary"
+              className="h-9 w-full rounded-[10px] border-[rgba(220,38,38,0.14)] bg-white text-[12px] text-[#b42318] shadow-none hover:bg-[#fff5f5]"
+              onClick={handleCloudLogout}
+            >
+              Sign Out
+            </Button>
+          </div>
+        </MobileSettingsSection>
       ) : null}
     </>
   );

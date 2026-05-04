@@ -1,17 +1,23 @@
 import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { getWorldOwner } from "@yinjie/contracts";
+import { getMyCloudProfile, getWorldOwner } from "@yinjie/contracts";
 import { AppPage, AppSection, InlineNotice } from "@yinjie/ui";
 import { readPersistedMobileWebRoute } from "../features/shell/mobile-web-route-persistence";
+import { clearCloudRuntimeSession } from "../lib/cloud-session";
 import { requiresRemoteServiceConfiguration } from "../lib/runtime-config";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { isMobileWebRuntime, resolveAppRuntimeContext } from "../runtime/platform";
+import {
+  isCloudSessionExpired,
+  useCloudSessionStore,
+} from "../store/cloud-session-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
 export function SplashPage() {
   const navigate = useNavigate();
   const runtimeConfig = useAppRuntimeConfig();
   const hydrateOwner = useWorldOwnerStore((state) => state.hydrateOwner);
+  const setCloudProfile = useCloudSessionStore((state) => state.setProfile);
 
   useEffect(() => {
     let cancelled = false;
@@ -24,6 +30,44 @@ export function SplashPage() {
         runtimeContext.hostRole === "host" ||
         requiresRemoteServiceConfiguration()
       ) {
+        if (!cancelled) {
+          void navigate({ to: "/welcome", replace: true });
+        }
+        return;
+      }
+
+      if (runtimeConfig.worldAccessMode === "cloud") {
+        const cloudSession = useCloudSessionStore.getState();
+        if (
+          !runtimeConfig.apiBaseUrl ||
+          !cloudSession.accessToken ||
+          isCloudSessionExpired(cloudSession.expiresAt)
+        ) {
+          clearCloudRuntimeSession();
+          if (!cancelled) {
+            void navigate({ to: "/welcome", replace: true });
+          }
+          return;
+        }
+
+        try {
+          const profile = await getMyCloudProfile(
+            cloudSession.accessToken,
+            runtimeConfig.cloudApiBaseUrl,
+          );
+          if (!cancelled) {
+            setCloudProfile(profile);
+          }
+        } catch {
+          clearCloudRuntimeSession();
+          if (!cancelled) {
+            void navigate({ to: "/welcome", replace: true });
+          }
+          return;
+        }
+      }
+
+      if (!runtimeConfig.apiBaseUrl) {
         if (!cancelled) {
           void navigate({ to: "/welcome", replace: true });
         }
@@ -47,6 +91,9 @@ export function SplashPage() {
           });
         }
       } catch {
+        if (runtimeConfig.worldAccessMode === "cloud") {
+          clearCloudRuntimeSession();
+        }
         if (!cancelled) {
           void navigate({ to: "/welcome", replace: true });
         }
@@ -63,7 +110,9 @@ export function SplashPage() {
     navigate,
     runtimeConfig.apiBaseUrl,
     runtimeConfig.appPlatform,
+    runtimeConfig.cloudApiBaseUrl,
     runtimeConfig.worldAccessMode,
+    setCloudProfile,
   ]);
 
   return (

@@ -33,8 +33,11 @@ export function buildWorldBootstrapConfig(
   const env = {
     PUBLIC_API_BASE_URL: suggestedApiBaseUrl ?? DEFAULT_WORLD_API_BASE_URL_PLACEHOLDER,
     CLOUD_PLATFORM_BASE_URL: cloudPlatformBaseUrl,
+    CLOUD_API_BASE_URL: cloudPlatformBaseUrl,
     CLOUD_WORLD_ID: world.id,
+    CLOUD_OWNER_PHONE: world.phone,
     CLOUD_WORLD_CALLBACK_TOKEN: callbackToken,
+    CLOUD_SERVICE_TOKEN: trimToNull(config.get<string>("CLOUD_SERVICE_TOKEN")) ?? "",
     CLOUD_WORLD_HEARTBEAT_INTERVAL_MS: resolveDefaultHeartbeatInterval(config),
   };
 

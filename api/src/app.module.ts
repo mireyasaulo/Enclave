@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { APP_FILTER } from '@nestjs/core';
 import { AiModule } from './modules/ai/ai.module';
 import { ChatModule } from './modules/chat/chat.module';
 import { CharactersModule } from './modules/characters/characters.module';
@@ -27,6 +28,8 @@ import { RealWorldSyncModule } from './modules/real-world-sync/real-world-sync.m
 import { FollowupRuntimeModule } from './modules/followup-runtime/followup-runtime.module';
 import { InferenceModule } from './modules/inference/inference.module';
 import { ReminderRuntimeModule } from './modules/reminder-runtime/reminder-runtime.module';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
+import { SubscriptionExpiredFilter } from './modules/subscription/subscription-expired.filter';
 import { WikiModule } from './modules/wiki/wiki.module';
 
 // Entities
@@ -216,9 +219,16 @@ import {
     FollowupRuntimeModule,
     ReminderRuntimeModule,
     InferenceModule,
+    SubscriptionModule,
     CloudRuntimeModule,
     SystemModule,
     WikiModule,
+  ],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: SubscriptionExpiredFilter,
+    },
   ],
 })
 export class AppModule {}

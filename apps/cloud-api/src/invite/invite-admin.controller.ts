@@ -7,7 +7,7 @@ import {
 } from "../http-dto/cloud-api.dto";
 import { InviteService } from "./invite.service";
 
-@Controller("cloud/admin/invites")
+@Controller("admin/cloud/invites")
 @UseGuards(AdminGuard)
 export class InviteAdminController {
   constructor(private readonly invite: InviteService) {}

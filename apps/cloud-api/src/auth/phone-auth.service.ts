@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -17,14 +18,17 @@ import {
   resolveCloudClientJwtAudience,
   resolveCloudJwtIssuer,
 } from "../config/cloud-runtime-config";
-import { MockSmsProviderService } from "./mock-sms-provider.service";
+import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { PhoneVerificationSessionEntity } from "../entities/phone-verification-session.entity";
+import { MockSmsProviderService } from "./mock-sms-provider.service";
 
 @Injectable()
 export class PhoneAuthService {
   constructor(
     @InjectRepository(PhoneVerificationSessionEntity)
     private readonly sessionRepo: Repository<PhoneVerificationSessionEntity>,
+    @InjectRepository(CloudUserEntity)
+    private readonly userRepo: Repository<CloudUserEntity>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly smsProvider: MockSmsProviderService,
@@ -98,6 +102,17 @@ export class PhoneAuthService {
 
     session.verifiedAt = new Date();
     await this.sessionRepo.save(session);
+
+    const existingUser = await this.userRepo.findOne({
+      where: { phone: normalizedPhone },
+    });
+    if (existingUser && existingUser.status !== "active") {
+      throw new ForbiddenException(
+        existingUser.status === "banned"
+          ? "This cloud account has been banned."
+          : "This cloud account has been archived.",
+      );
+    }
 
     if (this.userPostVerifyHook) {
       try {

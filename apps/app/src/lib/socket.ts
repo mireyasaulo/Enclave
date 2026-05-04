@@ -94,15 +94,15 @@ export function onConversationUpdated(handler: (payload: ConversationUpdatedPayl
   return () => active.off(CHAT_EVENTS.conversationUpdated, handler);
 }
 
-export function onChatError(handler: (message: string) => void) {
+export function onChatError(handler: (payload: ChatErrorPayload) => void) {
   const active = getChatSocket();
   const listener = (payload: ChatErrorPayload | string) => {
     if (typeof payload === "string") {
-      handler(payload);
+      handler({ message: payload });
       return;
     }
 
-    handler(payload.message);
+    handler(payload);
   };
 
   active.on(CHAT_EVENTS.error, listener);
