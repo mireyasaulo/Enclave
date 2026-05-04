@@ -95,6 +95,8 @@ import { UserWikiProfileEntity } from './modules/wiki/entities/user-wiki-profile
 import { CharacterPageEntity } from './modules/wiki/entities/character-page.entity';
 import { CharacterRevisionEntity } from './modules/wiki/entities/character-revision.entity';
 import { EditSubmissionEntity } from './modules/wiki/entities/edit-submission.entity';
+import { WikiBlockEntity } from './modules/wiki/entities/wiki-block.entity';
+import { WikiProtectionLogEntity } from './modules/wiki/entities/wiki-protection-log.entity';
 import {
   prepareDatabasePath,
   resolveApiPath,
@@ -180,6 +182,8 @@ import {
           CharacterPageEntity,
           CharacterRevisionEntity,
           EditSubmissionEntity,
+          WikiBlockEntity,
+          WikiProtectionLogEntity,
         ],
         synchronize: true,
       }),

@@ -16,7 +16,9 @@ import {
 import { EditSubmissionEntity } from '../entities/edit-submission.entity';
 import { UserWikiProfileEntity } from '../entities/user-wiki-profile.entity';
 import { rankOf } from '../guards/wiki-role.guard';
+import { WikiBlockService } from './wiki-block.service';
 import { WikiPageService } from './wiki-page.service';
+import { WikiRoleService } from './wiki-role.service';
 import {
   WIKI_CONTENT_FIELDS,
   diffFields,
@@ -54,6 +56,8 @@ export class WikiEditService {
     @InjectRepository(UserWikiProfileEntity)
     private readonly profileRepo: Repository<UserWikiProfileEntity>,
     private readonly pages: WikiPageService,
+    private readonly blocks: WikiBlockService,
+    private readonly roles: WikiRoleService,
   ) {}
 
   async submit(
@@ -61,6 +65,7 @@ export class WikiEditService {
     user: AuthenticatedUser,
     input: SubmitEditInput,
   ): Promise<SubmitEditResult> {
+    await this.blocks.assertCanEdit(user, characterId);
     const page = await this.pages.getOrInitPage(characterId);
     if (page.isDeleted) {
       throw new ForbiddenException('该词条已被删除，无法编辑');
@@ -180,6 +185,10 @@ export class WikiEditService {
 
       return savedRev;
     });
+
+    if (autoApprove) {
+      void this.roles.checkPromotion(user.id).catch(() => undefined);
+    }
 
     return {
       revisionId: result.id,

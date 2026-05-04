@@ -12,6 +12,7 @@ import { CharacterRevisionEntity } from '../entities/character-revision.entity';
 import { EditSubmissionEntity } from '../entities/edit-submission.entity';
 import { UserWikiProfileEntity } from '../entities/user-wiki-profile.entity';
 import { WikiEditService } from './wiki-edit.service';
+import { WikiRoleService } from './wiki-role.service';
 
 export type ReviewDecisionInput = {
   decision: 'approve' | 'reject' | 'request_changes';
@@ -32,6 +33,7 @@ export class WikiReviewService {
     @InjectRepository(UserWikiProfileEntity)
     private readonly profileRepo: Repository<UserWikiProfileEntity>,
     private readonly edits: WikiEditService,
+    private readonly roles: WikiRoleService,
   ) {}
 
   async listPending(limit = 50): Promise<
@@ -143,6 +145,9 @@ export class WikiReviewService {
       await manager.save(reviewerProfile);
     });
 
+    if (isApprove) {
+      void this.roles.checkPromotion(revision.editorUserId).catch(() => undefined);
+    }
     return { status: finalStatus, pageId: revision.characterId };
   }
 
