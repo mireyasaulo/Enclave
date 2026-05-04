@@ -99,18 +99,42 @@ export class WikiPageService {
     const limit = Math.min(Math.max(input.limit ?? 50, 1), 200);
     const qb = this.revisionRepo
       .createQueryBuilder('r')
+      .leftJoin(
+        CharacterPageEntity,
+        'p',
+        'p.characterId = r.characterId',
+      )
+      .where('(p.isDeleted = 0 OR p.isDeleted IS NULL)')
       .orderBy('r.createdAt', 'DESC')
       .take(limit);
     if (input.onlyUnpatrolled) {
-      qb.where('r.status = :status AND r.isPatrolled = :patrolled', {
+      qb.andWhere('r.status = :status AND r.isPatrolled = :patrolled', {
         status: 'approved',
         patrolled: false,
       });
     } else {
-      qb.where('r.status IN (:...statuses)', {
+      qb.andWhere('r.status IN (:...statuses)', {
         statuses: ['approved', 'pending', 'reverted'],
       });
     }
     return qb.getMany();
+  }
+
+  async setDeletedFlag(
+    characterId: string,
+    actorId: string,
+    isDeleted: boolean,
+  ): Promise<CharacterPageEntity> {
+    const page = await this.getOrInitPage(characterId);
+    if (page.isDeleted === isDeleted) return page;
+    await this.pageRepo.update(
+      { characterId },
+      {
+        isDeleted,
+        deletedAt: isDeleted ? new Date() : null,
+        deletedBy: isDeleted ? actorId : null,
+      },
+    );
+    return (await this.pageRepo.findOne({ where: { characterId } }))!;
   }
 }

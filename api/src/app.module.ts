@@ -97,6 +97,9 @@ import { CharacterRevisionEntity } from './modules/wiki/entities/character-revis
 import { EditSubmissionEntity } from './modules/wiki/entities/edit-submission.entity';
 import { WikiBlockEntity } from './modules/wiki/entities/wiki-block.entity';
 import { WikiProtectionLogEntity } from './modules/wiki/entities/wiki-protection-log.entity';
+import { WikiTalkThreadEntity } from './modules/wiki/entities/wiki-talk-thread.entity';
+import { WikiTalkPostEntity } from './modules/wiki/entities/wiki-talk-post.entity';
+import { WikiWatchlistEntity } from './modules/wiki/entities/wiki-watchlist.entity';
 import {
   prepareDatabasePath,
   resolveApiPath,
@@ -184,6 +187,9 @@ import {
           EditSubmissionEntity,
           WikiBlockEntity,
           WikiProtectionLogEntity,
+          WikiTalkThreadEntity,
+          WikiTalkPostEntity,
+          WikiWatchlistEntity,
         ],
         synchronize: true,
       }),
