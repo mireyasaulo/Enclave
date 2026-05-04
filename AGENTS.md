@@ -191,7 +191,12 @@
 - `PhoneVerificationSession`：手机号验证码会话
 - `CloudWorld`：官方云世界记录，手机号唯一绑定
 - `CloudWorldRequest`：客户端发起的建世界申请单
-
+- `RevenueSharingPolicy`：角色使用收益分成策略版本，承载事件单价、固定池比例、贡献权重与结算阈值
+- `RevenuePayee`：云端收益人档案，绑定世界主人、wiki 用户、角色、平台或运行方外部引用
+- `RevenueContributionEvent`：世界实例回传的角色创建、编辑、审核、巡查与逻辑发布贡献事件
+- `RevenueUsageEvent`：世界实例回传的角色聊天、语音、视频、内容与逻辑运行使用收入事件
+- `RevenueAllocationLedger`：按策略计算出的收益分配账本，区分 payable / held / settled
+- `RevenueSettlementBatch`：云后台生成的收益结算批次，仅记录应付账本，不执行真实打款
 ## 云世界平台职责（当前真实口径）
 
 - 云平台当前负责：
@@ -199,10 +204,25 @@
   - 云世界申请单管理
   - 云世界记录与地址回填
   - 官方控制台审核与状态流转
+  - 角色使用收益分成策略、收益人档案、贡献事件、使用事件、分配账本与结算批次管理
 - 云平台当前**不负责**：
   - 自动创建每个用户的世界实例
   - 自动编排、拉起、销毁世界实例
   - 托管单个实例内的多用户管理
+  - 真实支付、提现、税务、发票或 KYC
+
+## 云世界管理平台收益分成路由
+
+- `GET /admin/cloud/revenue-sharing/policy`
+- `PATCH /admin/cloud/revenue-sharing/policy`
+- `GET /admin/cloud/revenue-sharing/payees`
+- `POST /admin/cloud/revenue-sharing/payees`
+- `GET /admin/cloud/revenue-sharing/events`
+- `GET /admin/cloud/revenue-sharing/ledger`
+- `POST /admin/cloud/revenue-sharing/settlements/preview`
+- `POST /admin/cloud/revenue-sharing/settlements/generate`
+- `POST /internal/worlds/:worldId/revenue/contribution-events`
+- `POST /internal/worlds/:worldId/revenue/usage-events`
 
 ## 会话管理结构（2026-04-08）
 
@@ -640,6 +660,7 @@
 - 官方云世界创建流程为客户端提交申请、官方平台人工开通、再回填世界地址
 - 管理后台仅用于实例运维，不承载实例内用户管理
 - 实例现已支持多个 Provider 账户与多个模型目录项；默认路由继续兼容旧版 `system/provider`，角色可切换为继承默认或角色专属模型路由
+- 云世界管理平台现包含 `Revenue Sharing` 页面，用于配置角色使用事件单价、固定收益池、贡献权重、收益人、事件流、分配账本与结算批次
 
 ## 部署
 

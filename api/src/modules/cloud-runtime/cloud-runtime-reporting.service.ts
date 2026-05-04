@@ -1,9 +1,12 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
+import { AiUsageLedgerEntity } from '../analytics/ai-usage-ledger.entity';
 import { ConversationEntity } from '../chat/conversation.entity';
 import { GroupEntity } from '../chat/group.entity';
+import { CharacterRevisionEntity } from '../wiki/entities/character-revision.entity';
+import { EditSubmissionEntity } from '../wiki/entities/edit-submission.entity';
 
 type RuntimeReportPayload = {
   apiBaseUrl?: string | null;
@@ -13,6 +16,38 @@ type RuntimeReportPayload = {
   healthMessage?: string | null;
   reportedAt?: string | null;
   lastInteractiveAt?: string | null;
+};
+
+type RevenueUsageEventPayload = {
+  sourceEventId: string;
+  eventType:
+    | 'character_chat_message'
+    | 'character_voice_turn'
+    | 'character_video_turn'
+    | 'character_content_use'
+    | 'character_logic_run';
+  characterId: string;
+  characterName?: string | null;
+  quantity?: number;
+  occurredAt?: string | null;
+  metadata?: Record<string, unknown> | null;
+};
+
+type RevenueContributionEventPayload = {
+  sourceEventId: string;
+  eventType:
+    | 'character_create'
+    | 'character_content_edit_approved'
+    | 'character_logic_edit_approved'
+    | 'character_review_approved'
+    | 'character_patrol'
+    | 'character_logic_publish';
+  characterId: string;
+  contributorExternalRefType: 'wiki_user';
+  contributorExternalRefId: string;
+  occurredAt?: string | null;
+  reversedAt?: string | null;
+  metadata?: Record<string, unknown> | null;
 };
 
 type ReportingConfig = {
@@ -34,10 +69,16 @@ export class CloudRuntimeReportingService implements OnModuleInit, OnModuleDestr
 
   constructor(
     private readonly configService: ConfigService,
+    @InjectRepository(AiUsageLedgerEntity)
+    private readonly usageLedgerRepo: Repository<AiUsageLedgerEntity>,
     @InjectRepository(ConversationEntity)
     private readonly conversationRepo: Repository<ConversationEntity>,
     @InjectRepository(GroupEntity)
     private readonly groupRepo: Repository<GroupEntity>,
+    @InjectRepository(CharacterRevisionEntity)
+    private readonly characterRevisionRepo: Repository<CharacterRevisionEntity>,
+    @InjectRepository(EditSubmissionEntity)
+    private readonly editSubmissionRepo: Repository<EditSubmissionEntity>,
   ) {}
 
   onModuleInit() {
@@ -106,9 +147,188 @@ export class CloudRuntimeReportingService implements OnModuleInit, OnModuleDestr
           this.lastReportedInteractiveAt = lastInteractiveIso;
         }
       }
+
+      await this.reportRevenueEvents(config);
     } finally {
       this.reporting = false;
     }
+  }
+
+  private async reportRevenueEvents(config: ReportingConfig) {
+    const [usageEvents, contributionEvents] = await Promise.all([
+      this.buildUsageRevenueEvents(),
+      this.buildContributionRevenueEvents(),
+    ]);
+
+    if (usageEvents.length) {
+      await this.postRevenueSignal(config, 'usage-events', {
+        events: usageEvents,
+      });
+    }
+    if (contributionEvents.length) {
+      await this.postRevenueSignal(config, 'contribution-events', {
+        events: contributionEvents,
+      });
+    }
+  }
+
+  private async buildUsageRevenueEvents(): Promise<RevenueUsageEventPayload[]> {
+    const records = await this.usageLedgerRepo.find({
+      where: { status: 'success' },
+      order: { occurredAt: 'DESC', createdAt: 'DESC' },
+      take: 100,
+    });
+
+    return records
+      .filter((record) => Boolean(record.characterId))
+      .map((record) => ({
+        sourceEventId: `ai_usage:${record.id}`,
+        eventType: this.resolveUsageRevenueEventType(record.scene),
+        characterId: record.characterId as string,
+        characterName: record.characterName ?? null,
+        quantity: 1,
+        occurredAt: record.occurredAt.toISOString(),
+        metadata: {
+          scene: record.scene,
+          surface: record.surface,
+          scopeType: record.scopeType,
+          scopeId: record.scopeId ?? null,
+          conversationId: record.conversationId ?? null,
+          groupId: record.groupId ?? null,
+          model: record.model ?? null,
+          providerKey: record.providerKey ?? null,
+          totalTokens: record.totalTokens ?? null,
+          estimatedCost: record.estimatedCost ?? null,
+          currency: record.currency,
+        },
+      }));
+  }
+
+  private async buildContributionRevenueEvents(): Promise<
+    RevenueContributionEventPayload[]
+  > {
+    const revisions = await this.characterRevisionRepo.find({
+      where: { status: In(['approved', 'reverted']) },
+      order: { createdAt: 'DESC' },
+      take: 100,
+    });
+    const revisionIds = revisions.map((revision) => revision.id);
+    const submissions = revisionIds.length
+      ? await this.editSubmissionRepo.find({
+          where: { revisionId: In(revisionIds) },
+        })
+      : [];
+    const submissionByRevisionId = new Map(
+      submissions.map((submission) => [submission.revisionId, submission]),
+    );
+    const events: RevenueContributionEventPayload[] = [];
+
+    for (const revision of revisions) {
+      const reversedAt =
+        revision.status === 'reverted' ? new Date().toISOString() : null;
+      const editorEventType =
+        revision.operation === 'create'
+          ? 'character_create'
+          : revision.revisionKind === 'recipe'
+            ? 'character_logic_edit_approved'
+            : 'character_content_edit_approved';
+      events.push({
+        sourceEventId: `wiki_revision:${revision.id}:editor`,
+        eventType: editorEventType,
+        characterId: revision.characterId,
+        contributorExternalRefType: 'wiki_user',
+        contributorExternalRefId: revision.editorUserId,
+        occurredAt: revision.createdAt.toISOString(),
+        reversedAt,
+        metadata: {
+          revisionId: revision.id,
+          version: revision.version,
+          operation: revision.operation,
+          revisionKind: revision.revisionKind,
+          editSummary: revision.editSummary,
+        },
+      });
+
+      if (revision.revisionKind === 'recipe') {
+        events.push({
+          sourceEventId: `wiki_revision:${revision.id}:logic_publish`,
+          eventType: 'character_logic_publish',
+          characterId: revision.characterId,
+          contributorExternalRefType: 'wiki_user',
+          contributorExternalRefId: revision.editorUserId,
+          occurredAt: revision.createdAt.toISOString(),
+          reversedAt,
+          metadata: {
+            revisionId: revision.id,
+            version: revision.version,
+            operation: revision.operation,
+          },
+        });
+      }
+
+      const submission = submissionByRevisionId.get(revision.id);
+      if (submission?.decision === 'approve' && submission.reviewerId) {
+        events.push({
+          sourceEventId: `wiki_revision:${revision.id}:reviewer`,
+          eventType: 'character_review_approved',
+          characterId: revision.characterId,
+          contributorExternalRefType: 'wiki_user',
+          contributorExternalRefId: submission.reviewerId,
+          occurredAt:
+            submission.decidedAt?.toISOString() ?? revision.createdAt.toISOString(),
+          reversedAt,
+          metadata: {
+            revisionId: revision.id,
+            submissionId: submission.id,
+            riskLevel: submission.riskLevel,
+          },
+        });
+      }
+
+      if (revision.patrolledBy) {
+        events.push({
+          sourceEventId: `wiki_revision:${revision.id}:patrol`,
+          eventType: 'character_patrol',
+          characterId: revision.characterId,
+          contributorExternalRefType: 'wiki_user',
+          contributorExternalRefId: revision.patrolledBy,
+          occurredAt:
+            revision.patrolledAt?.toISOString() ?? revision.createdAt.toISOString(),
+          reversedAt,
+          metadata: {
+            revisionId: revision.id,
+            version: revision.version,
+          },
+        });
+      }
+    }
+
+    return events;
+  }
+
+  private resolveUsageRevenueEventType(scene: string): RevenueUsageEventPayload['eventType'] {
+    const normalized = scene.toLowerCase();
+    if (normalized.includes('voice')) return 'character_voice_turn';
+    if (normalized.includes('video')) return 'character_video_turn';
+    if (
+      normalized.includes('moment') ||
+      normalized.includes('feed') ||
+      normalized.includes('channel') ||
+      normalized.includes('post') ||
+      normalized.includes('comment')
+    ) {
+      return 'character_content_use';
+    }
+    if (
+      normalized.includes('factory') ||
+      normalized.includes('memory') ||
+      normalized.includes('extract') ||
+      normalized.includes('plan') ||
+      normalized.includes('runtime')
+    ) {
+      return 'character_logic_run';
+    }
+    return 'character_chat_message';
   }
 
   private async resolveLatestInteractiveAt() {
@@ -165,6 +385,44 @@ export class CloudRuntimeReportingService implements OnModuleInit, OnModuleDestr
       const responseText = await response.text().catch(() => '');
       this.logger.warn(
         `Cloud platform rejected ${action} report with ${response.status}: ${responseText || 'no body'}`,
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  private async postRevenueSignal(
+    config: ReportingConfig,
+    action: 'usage-events' | 'contribution-events',
+    payload: {
+      events: RevenueUsageEventPayload[] | RevenueContributionEventPayload[];
+    },
+  ) {
+    const response = await fetch(
+      `${config.cloudPlatformBaseUrl}/internal/worlds/${config.worldId}/revenue/${action}`,
+      {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-world-callback-token': config.callbackToken,
+        },
+        body: JSON.stringify(payload),
+      },
+    ).catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Failed to report revenue ${action} to cloud platform: ${message}`);
+      return null;
+    });
+
+    if (!response) {
+      return false;
+    }
+
+    if (!response.ok) {
+      const responseText = await response.text().catch(() => '');
+      this.logger.warn(
+        `Cloud platform rejected revenue ${action} report with ${response.status}: ${responseText || 'no body'}`,
       );
       return false;
     }

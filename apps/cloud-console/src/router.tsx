@@ -51,6 +51,11 @@ const WaitingSessionSyncPage = lazy(async () => {
   return { default: mod.WaitingSessionSyncPage };
 });
 
+const RevenueSharingPage = lazy(async () => {
+  const mod = await import("./routes/revenue-sharing-page");
+  return { default: mod.RevenueSharingPage };
+});
+
 const rootRoute = createRootRoute({
   component: RootLayout,
 });
@@ -108,6 +113,12 @@ const waitingSessionSyncRoute = createRoute({
   component: WaitingSessionSyncPage,
 });
 
+const revenueSharingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/revenue-sharing",
+  component: RevenueSharingPage,
+});
+
 export const routeTree = rootRoute.addChildren([
   indexRoute,
   requestsRoute,
@@ -117,6 +128,7 @@ export const routeTree = rootRoute.addChildren([
   jobsRoute,
   adminSessionsRoute,
   waitingSessionSyncRoute,
+  revenueSharingRoute,
 ]);
 
 type AppRouterOptions = {

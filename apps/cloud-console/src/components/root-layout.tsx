@@ -88,6 +88,14 @@ function getRouteMeta(pathname: string): RouteMeta {
     };
   }
 
+  if (pathname.startsWith("/revenue-sharing")) {
+    return {
+      eyebrow: "Cloud monetization",
+      title: "Revenue Sharing",
+      detail: "Configure role usage pricing, payees, contribution weights, and settlement ledgers.",
+    };
+  }
+
   return {
     eyebrow: "Cloud operations",
     title: "Dashboard",
@@ -256,6 +264,20 @@ function RootLayoutContent() {
         >
           <NavLinkContent label="Waiting Sync" hint="Durable tasks" />
         </WaitingSyncPermalinkLink>
+      ),
+    },
+    {
+      key: "revenue-sharing",
+      label: "Revenue Sharing",
+      hint: "Payees and ledgers",
+      content: (
+        <Link
+          to="/revenue-sharing"
+          className={pathname === "/revenue-sharing" ? NAV_LINK_ACTIVE : NAV_LINK}
+          aria-current={pathname === "/revenue-sharing" ? "page" : undefined}
+        >
+          <NavLinkContent label="Revenue Sharing" hint="Payees and ledgers" />
+        </Link>
       ),
     },
   ] as const;

@@ -24,6 +24,7 @@ import { ManualDockerComputeProviderService } from "./providers/manual-docker-co
 import { ManualDockerRemoteExecutorService } from "./providers/manual-docker-remote-executor.service";
 import { WorldRuntimeController } from "./runtime-callbacks/world-runtime.controller";
 import { WorldRuntimeService } from "./runtime-callbacks/world-runtime.service";
+import { RevenueSharingModule } from "./revenue-sharing/revenue-sharing.module";
 import { SubscriptionModule } from "./subscription/subscription.module";
 import { UsersModule } from "./users/users.module";
 import { WorldAccessController } from "./world-access/world-access.controller";
@@ -53,6 +54,7 @@ import { WaitingSessionSyncService } from "./world-access/waiting-session-sync.s
     SubscriptionModule,
     InviteModule,
     UsersModule,
+    RevenueSharingModule,
   ],
   controllers: [
     AdminAuthController,

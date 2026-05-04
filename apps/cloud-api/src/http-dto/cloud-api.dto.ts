@@ -88,6 +88,36 @@ const CLOUD_ADMIN_SESSION_SOURCE_GROUP_RISK_LEVELS = [
   "watch",
   "critical",
 ] as const;
+const REVENUE_USAGE_EVENT_TYPES = [
+  "character_chat_message",
+  "character_voice_turn",
+  "character_video_turn",
+  "character_content_use",
+  "character_logic_run",
+] as const;
+const REVENUE_CONTRIBUTION_EVENT_TYPES = [
+  "character_create",
+  "character_content_edit_approved",
+  "character_logic_edit_approved",
+  "character_review_approved",
+  "character_patrol",
+  "character_logic_publish",
+] as const;
+const REVENUE_PAYEE_EXTERNAL_REF_TYPES = [
+  "world_owner",
+  "wiki_user",
+  "character",
+  "system",
+  "provider",
+  "runtime_operator",
+] as const;
+const REVENUE_PAYEE_STATUSES = [
+  "pending",
+  "active",
+  "paused",
+  "archived",
+] as const;
+const REVENUE_ALLOCATION_STATUSES = ["held", "payable", "settled"] as const;
 
 function trimString({ value }: { value: unknown }) {
   return typeof value === "string" ? value.trim() : value;
@@ -843,6 +873,268 @@ export class ListAdminSessionsQueryDto {
   @Min(1, { message: "pageSize 最小为 1。" })
   @Max(100, { message: "pageSize 最大为 100。" })
   pageSize?: number;
+}
+
+export class UpdateRevenueSharingPolicyDto {
+  @Transform(parseBoolean)
+  @IsOptional()
+  @IsBoolean({ message: "enabled 必须是布尔值。" })
+  enabled?: boolean;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString({ message: "currency 必须是字符串。" })
+  @MinLength(3, { message: "currency 至少 3 个字符。" })
+  @MaxLength(8, { message: "currency 不能超过 8 个字符。" })
+  currency?: string;
+
+  @IsOptional()
+  @IsArray({ message: "eventPrices 必须是数组。" })
+  @ArrayMaxSize(20, { message: "eventPrices 最多允许 20 条。" })
+  eventPrices?: unknown[];
+
+  @IsOptional()
+  @IsArray({ message: "fixedShares 必须是数组。" })
+  @ArrayMaxSize(10, { message: "fixedShares 最多允许 10 条。" })
+  fixedShares?: unknown[];
+
+  @Transform(parseInteger)
+  @IsOptional()
+  @IsInt({ message: "contributionPoolBasisPoints 必须是整数。" })
+  @Min(0, { message: "contributionPoolBasisPoints 不能小于 0。" })
+  @Max(10000, { message: "contributionPoolBasisPoints 不能超过 10000。" })
+  contributionPoolBasisPoints?: number;
+
+  @IsOptional()
+  @IsArray({ message: "contributionWeights 必须是数组。" })
+  @ArrayMaxSize(20, { message: "contributionWeights 最多允许 20 条。" })
+  contributionWeights?: unknown[];
+
+  @Transform(parseInteger)
+  @IsOptional()
+  @IsInt({ message: "contributionWindowDays 必须是整数。" })
+  @Min(1, { message: "contributionWindowDays 至少为 1。" })
+  @Max(3650, { message: "contributionWindowDays 最多为 3650。" })
+  contributionWindowDays?: number;
+
+  @Transform(parseInteger)
+  @IsOptional()
+  @IsInt({ message: "minimumSettlementCents 必须是整数。" })
+  @Min(0, { message: "minimumSettlementCents 不能小于 0。" })
+  @Max(100000000, { message: "minimumSettlementCents 不能超过 100000000。" })
+  minimumSettlementCents?: number;
+}
+
+export class UpsertRevenuePayeeDto {
+  @Transform(trimString)
+  @IsOptional()
+  @IsUUID("4", { message: "id 必须是合法 UUID。" })
+  id?: string;
+
+  @Transform(trimString)
+  @IsString({ message: "displayName 必须是字符串。" })
+  @MinLength(1, { message: "displayName 不能为空。" })
+  @MaxLength(128, { message: "displayName 不能超过 128 个字符。" })
+  displayName: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsIn(REVENUE_PAYEE_STATUSES, { message: "status 不是合法的收益人状态。" })
+  status?: (typeof REVENUE_PAYEE_STATUSES)[number];
+
+  @Transform(trimString)
+  @IsIn(REVENUE_PAYEE_EXTERNAL_REF_TYPES, {
+    message: "externalRefType 不是合法的收益人外部引用类型。",
+  })
+  externalRefType: (typeof REVENUE_PAYEE_EXTERNAL_REF_TYPES)[number];
+
+  @Transform(trimString)
+  @IsString({ message: "externalRefId 必须是字符串。" })
+  @MinLength(1, { message: "externalRefId 不能为空。" })
+  @MaxLength(255, { message: "externalRefId 不能超过 255 个字符。" })
+  externalRefId: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString({ message: "contact 必须是字符串。" })
+  @MaxLength(500, { message: "contact 不能超过 500 个字符。" })
+  contact?: string | null;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString({ message: "payoutNote 必须是字符串。" })
+  @MaxLength(1000, { message: "payoutNote 不能超过 1000 个字符。" })
+  payoutNote?: string | null;
+}
+
+export class ListRevenueLedgerQueryDto {
+  @Transform(trimString)
+  @IsOptional()
+  @IsUUID("4", { message: "worldId 必须是合法 UUID。" })
+  worldId?: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString({ message: "characterId 必须是字符串。" })
+  @MaxLength(255, { message: "characterId 不能超过 255 个字符。" })
+  characterId?: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsUUID("4", { message: "payeeId 必须是合法 UUID。" })
+  payeeId?: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsIn(REVENUE_ALLOCATION_STATUSES, {
+    message: "status 不是合法的收益分配状态。",
+  })
+  status?: (typeof REVENUE_ALLOCATION_STATUSES)[number];
+
+  @Transform(parseInteger)
+  @IsOptional()
+  @IsInt({ message: "page 必须是整数。" })
+  @Min(1, { message: "page 最小为 1。" })
+  page?: number;
+
+  @Transform(parseInteger)
+  @IsOptional()
+  @IsInt({ message: "pageSize 必须是整数。" })
+  @Min(1, { message: "pageSize 最小为 1。" })
+  @Max(100, { message: "pageSize 最大为 100。" })
+  pageSize?: number;
+}
+
+export class ListRevenueEventsQueryDto {
+  @Transform(trimString)
+  @IsOptional()
+  @IsUUID("4", { message: "worldId 必须是合法 UUID。" })
+  worldId?: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString({ message: "characterId 必须是字符串。" })
+  @MaxLength(255, { message: "characterId 不能超过 255 个字符。" })
+  characterId?: string;
+}
+
+export class RevenueSettlementPreviewDto {
+  @Transform(trimString)
+  @IsOptional()
+  @IsISO8601({ strict: true }, { message: "from 必须是 ISO8601 时间。" })
+  from?: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsISO8601({ strict: true }, { message: "to 必须是 ISO8601 时间。" })
+  to?: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsUUID("4", { message: "payeeId 必须是合法 UUID。" })
+  payeeId?: string;
+}
+
+export class RevenueContributionEventDto {
+  @Transform(trimString)
+  @IsString({ message: "sourceEventId 必须是字符串。" })
+  @MinLength(1, { message: "sourceEventId 不能为空。" })
+  @MaxLength(255, { message: "sourceEventId 不能超过 255 个字符。" })
+  sourceEventId: string;
+
+  @Transform(trimString)
+  @IsIn(REVENUE_CONTRIBUTION_EVENT_TYPES, {
+    message: "eventType 不是合法的贡献事件类型。",
+  })
+  eventType: (typeof REVENUE_CONTRIBUTION_EVENT_TYPES)[number];
+
+  @Transform(trimString)
+  @IsString({ message: "characterId 必须是字符串。" })
+  @MinLength(1, { message: "characterId 不能为空。" })
+  @MaxLength(255, { message: "characterId 不能超过 255 个字符。" })
+  characterId: string;
+
+  @Transform(trimString)
+  @IsIn(REVENUE_PAYEE_EXTERNAL_REF_TYPES, {
+    message: "contributorExternalRefType 不是合法的收益人引用类型。",
+  })
+  contributorExternalRefType: (typeof REVENUE_PAYEE_EXTERNAL_REF_TYPES)[number];
+
+  @Transform(trimString)
+  @IsString({ message: "contributorExternalRefId 必须是字符串。" })
+  @MinLength(1, { message: "contributorExternalRefId 不能为空。" })
+  @MaxLength(255, { message: "contributorExternalRefId 不能超过 255 个字符。" })
+  contributorExternalRefId: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString({ message: "contributorDisplayName 必须是字符串。" })
+  @MaxLength(128, { message: "contributorDisplayName 不能超过 128 个字符。" })
+  contributorDisplayName?: string | null;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsISO8601({ strict: true }, { message: "occurredAt 必须是 ISO8601 时间。" })
+  occurredAt?: string | null;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsISO8601({ strict: true }, { message: "reversedAt 必须是 ISO8601 时间。" })
+  reversedAt?: string | null;
+
+  metadata?: Record<string, unknown> | null;
+}
+
+export class ReportRevenueContributionEventsDto {
+  @IsArray({ message: "events 必须是数组。" })
+  @ArrayMaxSize(100, { message: "events 最多允许 100 条。" })
+  events: RevenueContributionEventDto[];
+}
+
+export class RevenueUsageEventDto {
+  @Transform(trimString)
+  @IsString({ message: "sourceEventId 必须是字符串。" })
+  @MinLength(1, { message: "sourceEventId 不能为空。" })
+  @MaxLength(255, { message: "sourceEventId 不能超过 255 个字符。" })
+  sourceEventId: string;
+
+  @Transform(trimString)
+  @IsIn(REVENUE_USAGE_EVENT_TYPES, {
+    message: "eventType 不是合法的角色使用事件类型。",
+  })
+  eventType: (typeof REVENUE_USAGE_EVENT_TYPES)[number];
+
+  @Transform(trimString)
+  @IsString({ message: "characterId 必须是字符串。" })
+  @MinLength(1, { message: "characterId 不能为空。" })
+  @MaxLength(255, { message: "characterId 不能超过 255 个字符。" })
+  characterId: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString({ message: "characterName 必须是字符串。" })
+  @MaxLength(128, { message: "characterName 不能超过 128 个字符。" })
+  characterName?: string | null;
+
+  @Transform(parseInteger)
+  @IsOptional()
+  @IsInt({ message: "quantity 必须是整数。" })
+  @Min(1, { message: "quantity 至少为 1。" })
+  @Max(100000, { message: "quantity 不能超过 100000。" })
+  quantity?: number;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsISO8601({ strict: true }, { message: "occurredAt 必须是 ISO8601 时间。" })
+  occurredAt?: string | null;
+
+  metadata?: Record<string, unknown> | null;
+}
+
+export class ReportRevenueUsageEventsDto {
+  @IsArray({ message: "events 必须是数组。" })
+  @ArrayMaxSize(100, { message: "events 最多允许 100 条。" })
+  events: RevenueUsageEventDto[];
 }
 
 export class RuntimeCallbackDto {

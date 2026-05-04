@@ -32,6 +32,13 @@ import type {
   ReplayFailedCloudWaitingSessionSyncTasksResponse,
   ReplayFilteredFailedCloudWaitingSessionSyncTasksRequest,
   ReplayFilteredFailedCloudWaitingSessionSyncTasksResponse,
+  RevenueEventListResponse,
+  RevenueLedgerListResponse,
+  RevenuePayeeSummary,
+  RevenueSettlementBatchSummary,
+  RevenueSettlementPreviewRequest,
+  RevenueSettlementPreviewResponse,
+  RevenueSharingPolicySummary,
   RevokeCloudAdminSessionSourceGroupRequest,
   RevokeCloudAdminSessionSourceGroupResponse,
   RevokeCloudAdminSessionSourceGroupsByRiskRequest,
@@ -39,6 +46,8 @@ import type {
   RevokeCloudAdminSessionsByFilterRequest,
   RevokeCloudAdminSessionsByFilterResponse,
   RevokeCloudAdminSessionsByIdResponse,
+  UpdateRevenueSharingPolicyRequest,
+  UpsertRevenuePayeeRequest,
   WorldLifecycleJobSummary,
 } from "@yinjie/contracts";
 import {
@@ -1198,6 +1207,69 @@ export const cloudAdminApi = {
       {
         method: "POST",
         body: JSON.stringify(payload),
+      },
+    ),
+
+  getRevenueSharingPolicy: () =>
+    adminFetch<RevenueSharingPolicySummary>("/revenue-sharing/policy"),
+
+  updateRevenueSharingPolicy: (payload: UpdateRevenueSharingPolicyRequest) =>
+    adminFetch<RevenueSharingPolicySummary>("/revenue-sharing/policy", {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }),
+
+  listRevenuePayees: () =>
+    adminFetch<RevenuePayeeSummary[]>("/revenue-sharing/payees"),
+
+  upsertRevenuePayee: (payload: UpsertRevenuePayeeRequest) =>
+    adminFetch<RevenuePayeeSummary>("/revenue-sharing/payees", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  listRevenueEvents: (filters?: { worldId?: string; characterId?: string }) =>
+    adminFetch<RevenueEventListResponse>(
+      `/revenue-sharing/events${buildQueryString({
+        worldId: filters?.worldId,
+        characterId: filters?.characterId,
+      })}`,
+    ),
+
+  listRevenueLedger: (filters?: {
+    worldId?: string;
+    characterId?: string;
+    payeeId?: string;
+    status?: string;
+    page?: number;
+    pageSize?: number;
+  }) =>
+    adminFetch<RevenueLedgerListResponse>(
+      `/revenue-sharing/ledger${buildQueryString({
+        worldId: filters?.worldId,
+        characterId: filters?.characterId,
+        payeeId: filters?.payeeId,
+        status: filters?.status,
+        page: filters?.page,
+        pageSize: filters?.pageSize,
+      })}`,
+    ),
+
+  previewRevenueSettlement: (payload?: RevenueSettlementPreviewRequest) =>
+    adminFetch<RevenueSettlementPreviewResponse>(
+      "/revenue-sharing/settlements/preview",
+      {
+        method: "POST",
+        body: JSON.stringify(payload ?? {}),
+      },
+    ),
+
+  generateRevenueSettlement: (payload?: RevenueSettlementPreviewRequest) =>
+    adminFetch<RevenueSettlementBatchSummary>(
+      "/revenue-sharing/settlements/generate",
+      {
+        method: "POST",
+        body: JSON.stringify(payload ?? {}),
       },
     ),
 };
