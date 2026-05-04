@@ -36,6 +36,21 @@ const RecentChangesPage = lazy(async () => {
   return { default: mod.RecentChangesPage };
 });
 
+const AdminUsersPage = lazy(async () => {
+  const mod = await import("./routes/admin-users-page");
+  return { default: mod.AdminUsersPage };
+});
+
+const AdminBlocksPage = lazy(async () => {
+  const mod = await import("./routes/admin-blocks-page");
+  return { default: mod.AdminBlocksPage };
+});
+
+const AdminProtectionPage = lazy(async () => {
+  const mod = await import("./routes/admin-protection-page");
+  return { default: mod.AdminProtectionPage };
+});
+
 const rootRoute = createRootRoute({ component: RootLayout });
 
 const indexRoute = createRoute({
@@ -74,6 +89,24 @@ const recentChangesRoute = createRoute({
   component: RecentChangesPage,
 });
 
+const adminUsersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin/users",
+  component: AdminUsersPage,
+});
+
+const adminBlocksRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin/blocks",
+  component: AdminBlocksPage,
+});
+
+const adminProtectionRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin/protection",
+  component: AdminProtectionPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
@@ -81,6 +114,9 @@ const routeTree = rootRoute.addChildren([
   characterRoute,
   pendingReviewsRoute,
   recentChangesRoute,
+  adminUsersRoute,
+  adminBlocksRoute,
+  adminProtectionRoute,
 ]);
 
 export const router = createRouter({ routeTree });

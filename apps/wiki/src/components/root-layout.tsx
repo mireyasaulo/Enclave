@@ -25,6 +25,19 @@ export function RootLayout() {
                 待审编辑
               </Link>
             )}
+            {hasRole(user, "admin") && (
+              <>
+                <Link to="/admin/users" className="hover:underline">
+                  用户
+                </Link>
+                <Link to="/admin/blocks" className="hover:underline">
+                  封禁
+                </Link>
+                <Link to="/admin/protection" className="hover:underline">
+                  保护
+                </Link>
+              </>
+            )}
           </nav>
           <div className="ml-auto flex items-center gap-3 text-sm">
             {user ? (

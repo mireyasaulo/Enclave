@@ -75,6 +75,8 @@ export type WikiPageView = {
     characterId: string;
     currentRevisionId: string | null;
     protectionLevel: string;
+    protectionExpiresAt: string | null;
+    protectionReason: string | null;
     isPatrolled: boolean;
     watcherCount: number;
     editCount: number;
@@ -121,6 +123,47 @@ export type EditSubmission = {
 export type PendingReviewItem = {
   submission: EditSubmission;
   revision: WikiRevisionSummary;
+};
+
+export type WikiUserRow = {
+  id: string;
+  username: string;
+  role: string;
+  userType: string;
+  createdAt: string;
+  roleGrantedAt: string | null;
+  profile: {
+    editCount: number;
+    approvedEditCount: number;
+    revertedCount: number;
+    patrolledCount: number;
+    lastEditAt: string | null;
+    autoconfirmedAt: string | null;
+  } | null;
+};
+
+export type WikiBlockRow = {
+  id: string;
+  userId: string;
+  scope: string;
+  targetCharacterId: string | null;
+  reason: string;
+  createdBy: string;
+  expiresAt: string | null;
+  revokedAt: string | null;
+  revokedBy: string | null;
+  createdAt: string;
+};
+
+export type WikiProtectionLogRow = {
+  id: string;
+  characterId: string;
+  oldLevel: string;
+  newLevel: string;
+  changedBy: string;
+  reason: string | null;
+  expiresAt: string | null;
+  createdAt: string;
 };
 
 export type CharacterListItem = {
@@ -228,6 +271,77 @@ export const wikiApi = {
     const qs = params.toString();
     return request<WikiRevisionSummary[]>(
       `/wiki/recent-changes${qs ? `?${qs}` : ""}`,
+      { auth: false },
+    );
+  },
+  listUsers() {
+    return request<WikiUserRow[]>("/wiki/users");
+  },
+  setUserRole(
+    userId: string,
+    role: "newcomer" | "autoconfirmed" | "patroller" | "admin",
+    reason?: string,
+  ) {
+    return request<WikiUserRow>(
+      `/wiki/users/${encodeURIComponent(userId)}/role`,
+      {
+        method: "POST",
+        body: JSON.stringify({ role, reason }),
+      },
+    );
+  },
+  listBlocks(opts: { active?: boolean; userId?: string } = {}) {
+    const params = new URLSearchParams();
+    if (opts.active === false) params.set("active", "0");
+    if (opts.userId) params.set("userId", opts.userId);
+    const qs = params.toString();
+    return request<WikiBlockRow[]>(`/wiki/blocks${qs ? `?${qs}` : ""}`);
+  },
+  blockUser(input: {
+    userId: string;
+    scope: "global" | "page" | "talk";
+    targetCharacterId?: string;
+    reason: string;
+    expiresAt?: string | null;
+  }) {
+    return request<WikiBlockRow>(
+      `/wiki/users/${encodeURIComponent(input.userId)}/block`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          scope: input.scope,
+          targetCharacterId: input.targetCharacterId,
+          reason: input.reason,
+          expiresAt: input.expiresAt ?? null,
+        }),
+      },
+    );
+  },
+  revokeBlock(blockId: string) {
+    return request<{ success: true }>(
+      `/wiki/blocks/${encodeURIComponent(blockId)}`,
+      { method: "DELETE" },
+    );
+  },
+  setProtection(
+    characterId: string,
+    input: {
+      level: "none" | "semi" | "full";
+      expiresAt?: string | null;
+      reason?: string;
+    },
+  ) {
+    return request<unknown>(
+      `/wiki/pages/${encodeURIComponent(characterId)}/protection`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(input),
+      },
+    );
+  },
+  protectionLog(characterId: string) {
+    return request<WikiProtectionLogRow[]>(
+      `/wiki/pages/${encodeURIComponent(characterId)}/protection-log`,
       { auth: false },
     );
   },
