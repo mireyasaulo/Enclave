@@ -56,6 +56,16 @@ const WatchlistPage = lazy(async () => {
   return { default: mod.WatchlistPage };
 });
 
+const SearchPage = lazy(async () => {
+  const mod = await import("./routes/search-page");
+  return { default: mod.SearchPage };
+});
+
+const AdminReportsPage = lazy(async () => {
+  const mod = await import("./routes/admin-reports-page");
+  return { default: mod.AdminReportsPage };
+});
+
 const rootRoute = createRootRoute({ component: RootLayout });
 
 const indexRoute = createRoute({
@@ -118,6 +128,21 @@ const watchlistRoute = createRoute({
   component: WatchlistPage,
 });
 
+const searchRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/search",
+  validateSearch: (search: Record<string, unknown>) => ({
+    q: typeof search.q === "string" ? search.q : "",
+  }),
+  component: SearchPage,
+});
+
+const adminReportsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin/reports",
+  component: AdminReportsPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
@@ -128,7 +153,9 @@ const routeTree = rootRoute.addChildren([
   adminUsersRoute,
   adminBlocksRoute,
   adminProtectionRoute,
+  adminReportsRoute,
   watchlistRoute,
+  searchRoute,
 ]);
 
 export const router = createRouter({ routeTree });

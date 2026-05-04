@@ -205,6 +205,17 @@ export type WatchlistFeedItem =
   | { kind: "revision"; characterId: string; revision: WikiRevisionSummary }
   | { kind: "talk"; characterId: string; thread: WikiTalkThread };
 
+export type ModerationReport = {
+  id: string;
+  ownerId: string;
+  targetType: string;
+  targetId: string;
+  reason: string;
+  details: string | null;
+  status: string;
+  createdAt: string;
+};
+
 export type CharacterListItem = {
   id: string;
   name: string;
@@ -466,6 +477,47 @@ export const wikiApi = {
     return request<unknown>(
       `/wiki/pages/${encodeURIComponent(characterId)}/restore`,
       { method: "POST", body: JSON.stringify({}) },
+    );
+  },
+  search(q: string, limit = 20) {
+    const params = new URLSearchParams({ q, limit: String(limit) });
+    return request<
+      Array<{
+        characterId: string;
+        name: string;
+        bio: string;
+        relationship: string;
+        score: number;
+      }>
+    >(`/wiki/search?${params.toString()}`, { auth: false });
+  },
+  reportTarget(input: {
+    targetType: "wiki_revision" | "wiki_talk_post" | "wiki_page";
+    targetId: string;
+    reason: string;
+    details?: string;
+  }) {
+    return request<ModerationReport>("/wiki/reports", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  },
+  listReports(status?: "open" | "resolved" | "dismissed") {
+    const params = new URLSearchParams();
+    if (status) {
+      params.set("status", status);
+    }
+    return request<ModerationReport[]>(
+      `/wiki/reports${params.size > 0 ? `?${params.toString()}` : ""}`,
+    );
+  },
+  updateReportStatus(id: string, status: "open" | "resolved" | "dismissed") {
+    return request<ModerationReport>(
+      `/wiki/reports/${encodeURIComponent(id)}/status`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+      },
     );
   },
 };

@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '../auth/auth.module';
 import { CharacterEntity } from '../characters/character.entity';
 import { UserEntity } from '../auth/user.entity';
+import { ModerationReportEntity } from '../moderation/moderation-report.entity';
 import { CharacterPageEntity } from './entities/character-page.entity';
 import { CharacterRevisionEntity } from './entities/character-revision.entity';
 import { EditSubmissionEntity } from './entities/edit-submission.entity';
@@ -21,6 +22,7 @@ import { WikiProtectionService } from './services/wiki-protection.service';
 import { WikiRoleService } from './services/wiki-role.service';
 import { WikiTalkService } from './services/wiki-talk.service';
 import { WikiWatchlistService } from './services/wiki-watchlist.service';
+import { WikiReportService } from './services/wiki-report.service';
 import { WikiPageController } from './controllers/wiki-page.controller';
 import { WikiReviewController } from './controllers/wiki-review.controller';
 import { WikiRevertController } from './controllers/wiki-revert.controller';
@@ -30,6 +32,7 @@ import { WikiUserController } from './controllers/wiki-user.controller';
 import { WikiTalkController } from './controllers/wiki-talk.controller';
 import { WikiWatchlistController } from './controllers/wiki-watchlist.controller';
 import { WikiSoftDeleteController } from './controllers/wiki-soft-delete.controller';
+import { WikiReportController } from './controllers/wiki-report.controller';
 
 @Module({
   imports: [
@@ -46,6 +49,7 @@ import { WikiSoftDeleteController } from './controllers/wiki-soft-delete.control
       WikiTalkThreadEntity,
       WikiTalkPostEntity,
       WikiWatchlistEntity,
+      ModerationReportEntity,
     ]),
   ],
   controllers: [
@@ -58,6 +62,7 @@ import { WikiSoftDeleteController } from './controllers/wiki-soft-delete.control
     WikiTalkController,
     WikiWatchlistController,
     WikiSoftDeleteController,
+    WikiReportController,
   ],
   providers: [
     WikiPageService,
@@ -68,6 +73,7 @@ import { WikiSoftDeleteController } from './controllers/wiki-soft-delete.control
     WikiRoleService,
     WikiTalkService,
     WikiWatchlistService,
+    WikiReportService,
     WikiRoleGuard,
   ],
   exports: [
@@ -79,6 +85,7 @@ import { WikiSoftDeleteController } from './controllers/wiki-soft-delete.control
     WikiRoleService,
     WikiTalkService,
     WikiWatchlistService,
+    WikiReportService,
   ],
 })
 export class WikiModule {}

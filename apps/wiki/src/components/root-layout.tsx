@@ -1,11 +1,13 @@
-import { Link, Outlet } from "@tanstack/react-router";
-import { Suspense } from "react";
+import { Link, Outlet, useNavigate } from "@tanstack/react-router";
+import { Suspense, useState } from "react";
 import { LoadingBlock } from "@yinjie/ui";
 import { clearSession, hasRole, roleLabel } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
 
 export function RootLayout() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [q, setQ] = useState("");
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
@@ -41,10 +43,30 @@ export function RootLayout() {
                 <Link to="/admin/protection" className="hover:underline">
                   保护
                 </Link>
+                <Link to="/admin/reports" className="hover:underline">
+                  举报
+                </Link>
               </>
             )}
           </nav>
-          <div className="ml-auto flex items-center gap-3 text-sm">
+          <form
+            className="ml-auto flex items-center"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const term = q.trim();
+              if (!term) return;
+              void navigate({ to: "/search", search: { q: term } });
+            }}
+          >
+            <input
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="搜索词条…"
+              className="text-sm border border-[var(--border-subtle)] rounded px-3 py-1 w-48 bg-white"
+            />
+          </form>
+          <div className="flex items-center gap-3 text-sm">
             {user ? (
               <>
                 <span className="text-[var(--text-muted)]">

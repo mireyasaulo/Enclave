@@ -120,6 +120,67 @@ export class WikiPageService {
     return qb.getMany();
   }
 
+  async search(query: string, limit = 20): Promise<
+    Array<{
+      characterId: string;
+      name: string;
+      bio: string;
+      relationship: string;
+      score: number;
+    }>
+  > {
+    const q = query.trim();
+    if (!q) return [];
+    const like = `%${q.replace(/[%_]/g, (m) => `\\${m}`)}%`;
+    const rows = await this.characterRepo
+      .createQueryBuilder('c')
+      .leftJoin(
+        CharacterPageEntity,
+        'p',
+        'p.characterId = c.id',
+      )
+      .where('(p.isDeleted = 0 OR p.isDeleted IS NULL)')
+      .andWhere(
+        '(c.name LIKE :like ESCAPE \'\\\\\' OR c.bio LIKE :like ESCAPE \'\\\\\' OR c.personality LIKE :like ESCAPE \'\\\\\' OR c.expertDomains LIKE :like ESCAPE \'\\\\\')',
+        { like },
+      )
+      .select([
+        'c.id AS id',
+        'c.name AS name',
+        'c.bio AS bio',
+        'c.relationship AS relationship',
+        'c.personality AS personality',
+        'c.expertDomains AS expertDomains',
+      ])
+      .limit(Math.min(Math.max(limit, 1), 100))
+      .getRawMany<{
+        id: string;
+        name: string;
+        bio: string;
+        relationship: string;
+        personality: string | null;
+        expertDomains: string;
+      }>();
+
+    const lower = q.toLowerCase();
+    return rows
+      .map((r) => {
+        let score = 0;
+        if (r.name?.toLowerCase().includes(lower)) score += 10;
+        if (r.bio?.toLowerCase().includes(lower)) score += 3;
+        if (r.personality?.toLowerCase().includes(lower)) score += 2;
+        if (r.expertDomains?.toLowerCase().includes(lower)) score += 5;
+        return {
+          characterId: r.id,
+          name: r.name,
+          bio: r.bio,
+          relationship: r.relationship,
+          score,
+        };
+      })
+      .sort((a, b) => b.score - a.score);
+  }
+
   async setDeletedFlag(
     characterId: string,
     actorId: string,

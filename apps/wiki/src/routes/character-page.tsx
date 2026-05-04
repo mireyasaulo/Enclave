@@ -22,6 +22,8 @@ import {
 import { SnapshotDiff } from "../components/snapshot-diff";
 import { TalkPanel } from "../components/talk-panel";
 import { WatchToggle } from "../components/watch-toggle";
+import { ConflictResolver } from "../components/conflict-resolver";
+import { WikiApiError } from "../lib/wiki-api";
 
 type Tab = "read" | "edit" | "history" | "talk";
 
@@ -238,19 +240,29 @@ function EditView({
   const [isMinor, setIsMinor] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [conflict, setConflict] = useState<{
+    fields: string[];
+    serverCurrent: WikiContentSnapshot;
+    newBaseRevisionId: string;
+  } | null>(null);
 
   useEffect(() => setDraft(initial), [initial]);
 
   const submitMut = useMutation({
-    mutationFn: () =>
+    mutationFn: (override?: {
+      snapshot: WikiContentSnapshot;
+      baseRevisionId: string;
+    }) =>
       wikiApi.submitEdit(characterId, {
-        contentSnapshot: draft,
-        baseRevisionId: view.page.currentRevisionId,
+        contentSnapshot: override?.snapshot ?? draft,
+        baseRevisionId:
+          override?.baseRevisionId ?? view.page.currentRevisionId,
         editSummary: summary,
         isMinor,
       }),
     onSuccess: (res) => {
       setError(null);
+      setConflict(null);
       setInfo(
         res.appliedToCharacter
           ? "修改已直接生效（自动确认/巡查员/管理员）"
@@ -260,6 +272,28 @@ function EditView({
     },
     onError: (err: Error) => {
       setInfo(null);
+      if (err instanceof WikiApiError && err.status === 409) {
+        const payload = err.payload as
+          | {
+              conflictingFields?: string[];
+              currentSnapshot?: WikiContentSnapshot;
+              currentRevisionId?: string;
+            }
+          | null;
+        if (
+          payload?.conflictingFields &&
+          payload?.currentSnapshot &&
+          payload?.currentRevisionId
+        ) {
+          setConflict({
+            fields: payload.conflictingFields,
+            serverCurrent: payload.currentSnapshot,
+            newBaseRevisionId: payload.currentRevisionId,
+          });
+          setError(null);
+          return;
+        }
+      }
       setError(err.message);
     },
   });
@@ -372,12 +406,28 @@ function EditView({
           {info}
         </div>
       )}
+      {conflict && (
+        <ConflictResolver
+          base={initial}
+          serverCurrent={conflict.serverCurrent}
+          mine={draft}
+          conflictingFields={conflict.fields}
+          onResolve={(merged) => {
+            setDraft(merged);
+            submitMut.mutate({
+              snapshot: merged,
+              baseRevisionId: conflict.newBaseRevisionId,
+            });
+          }}
+          onCancel={() => setConflict(null)}
+        />
+      )}
       <div className="flex gap-3">
         <Button
           type="button"
           variant="primary"
-          disabled={submitMut.isPending}
-          onClick={() => submitMut.mutate()}
+          disabled={submitMut.isPending || !!conflict}
+          onClick={() => submitMut.mutate(undefined)}
         >
           {submitMut.isPending ? "提交中..." : "提交编辑"}
         </Button>

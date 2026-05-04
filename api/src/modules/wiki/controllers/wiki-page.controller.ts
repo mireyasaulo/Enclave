@@ -36,6 +36,14 @@ export class WikiPageController {
     });
   }
 
+  @Get('search')
+  search(
+    @Query('q') q: string,
+    @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
+  ) {
+    return this.pages.search(q ?? '', limit);
+  }
+
   @Get('pages/:id')
   view(@Param('id') id: string) {
     return this.pages.getPageView(id);

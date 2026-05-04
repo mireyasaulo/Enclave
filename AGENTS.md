@@ -25,7 +25,7 @@
 
 ## 后端模块（`api/src/modules/`）
 
-`action-runtime` · `admin` · `ai` · `analytics` · `auth` · `characters` · `chat` · `cloud-runtime` · `config` · `cyber-avatar` · `events` · `feed` · `followup-runtime` · `games` · `inference` · `moderation` · `moments` · `narrative` · `need-discovery` · `official-accounts` · `real-world-sync` · `reminder-runtime` · `scheduler` · `self-agent` · `social` · `system` · `world`
+`action-runtime` · `admin` · `ai` · `analytics` · `auth` · `characters` · `chat` · `cloud-runtime` · `config` · `cyber-avatar` · `events` · `feed` · `followup-runtime` · `games` · `inference` · `moderation` · `moments` · `narrative` · `need-discovery` · `official-accounts` · `real-world-sync` · `reminder-runtime` · `scheduler` · `self-agent` · `social` · `subscription` · `system` · `world`
 
 ## 主 App 结构（`apps/app/src/`）
 
@@ -34,6 +34,25 @@
 ## 官网结构（`apps/site/src/`）
 
 `routes/` · `site-shell.tsx` · `site-content.ts` · `site-links.ts` · `use-site-copy.ts`
+
+## Wiki 百科结构（`apps/wiki/src/`）
+
+`routes/` · `components/` · `lib/`
+
+## Wiki 百科页面（`apps/wiki/src/routes/`）
+
+- `home-page.tsx`：角色百科首页，承载词条索引与基础浏览入口
+- `character-page.tsx`：角色词条页，承载阅读、编辑、历史、讨论与编辑冲突处理
+- `recent-changes-page.tsx`：最近修改页，集中查看百科编辑动态
+- `search-page.tsx`：百科搜索结果页，由顶栏搜索框进入
+- `watchlist-page.tsx`：观察列表页，登录用户查看关注词条与讨论动态
+- `pending-reviews-page.tsx`：待审编辑页，巡查员处理待审核修改
+- `admin-users-page.tsx`：百科用户管理页
+- `admin-blocks-page.tsx`：百科封禁管理页
+- `admin-protection-page.tsx`：百科保护管理页
+- `admin-reports-page.tsx`：百科举报队列页，管理员处理词条 / 讨论 / 修订举报
+- `login-page.tsx`：百科登录页
+- `register-page.tsx`：百科注册页
 
 ## 主 App 页面（`apps/app/src/routes/`）
 
@@ -279,6 +298,16 @@
   - `GET /api/moderation/reports`
   - `POST /api/moderation/reports`
   - `PATCH /api/moderation/reports/:id/status`
+- Wiki 百科路由：
+  - `GET /api/wiki/recent-changes`
+  - `GET /api/wiki/search`
+  - `GET /api/wiki/pages/:id`
+  - `GET /api/wiki/pages/:id/history`
+  - `GET /api/wiki/pages/:id/revisions/:revisionId`
+  - `POST /api/wiki/pages/:id/edits`
+  - `POST /api/wiki/reports`
+  - `GET /api/wiki/reports`
+  - `PATCH /api/wiki/reports/:id/status`
 - 公众号消息路由：
   - `GET /api/official-accounts/message-entries`
   - `GET /api/official-accounts/subscription-inbox`
@@ -542,7 +571,7 @@
 
 ## 环境变量（`api/.env`）
 
-`DEEPSEEK_API_KEY` · `OPENAI_BASE_URL` · `AI_MODEL` · `ADMIN_SECRET` · `DATABASE_PATH` · `PORT` · `CORS_ALLOWED_ORIGINS` · `PUBLIC_API_BASE_URL` · `USER_API_KEY_ENCRYPTION_SECRET` · `DIGITAL_HUMAN_PROVIDER_MODE` · `DIGITAL_HUMAN_PLAYER_URL_TEMPLATE` · `DIGITAL_HUMAN_PROVIDER_CALLBACK_TOKEN`
+`DEEPSEEK_API_KEY` · `OPENAI_BASE_URL` · `AI_MODEL` · `ADMIN_SECRET` · `DATABASE_PATH` · `PORT` · `CORS_ALLOWED_ORIGINS` · `PUBLIC_API_BASE_URL` · `USER_API_KEY_ENCRYPTION_SECRET` · `DIGITAL_HUMAN_PROVIDER_MODE` · `DIGITAL_HUMAN_PLAYER_URL_TEMPLATE` · `DIGITAL_HUMAN_PROVIDER_CALLBACK_TOKEN` · `CLOUD_OWNER_PHONE` · `CLOUD_API_BASE_URL` · `CLOUD_SERVICE_TOKEN`
 
 ## 环境变量（`apps/cloud-api/.env`）
 
