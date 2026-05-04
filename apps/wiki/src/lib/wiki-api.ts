@@ -166,6 +166,45 @@ export type WikiProtectionLogRow = {
   createdAt: string;
 };
 
+export type WikiTalkThread = {
+  id: string;
+  characterId: string;
+  title: string;
+  authorId: string;
+  isLocked: boolean;
+  isResolved: boolean;
+  postCount: number;
+  lastReplyAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type WikiTalkPost = {
+  id: string;
+  threadId: string;
+  parentPostId: string | null;
+  authorId: string;
+  body: string;
+  editedAt: string | null;
+  deletedAt: string | null;
+  deletedBy: string | null;
+  createdAt: string;
+};
+
+export type WatchlistEntry = {
+  characterId: string;
+  notifyOnEdit: boolean;
+  notifyOnTalk: boolean;
+  addedAt: string;
+  isDeleted: boolean;
+  currentRevisionId: string | null;
+  protectionLevel: string;
+};
+
+export type WatchlistFeedItem =
+  | { kind: "revision"; characterId: string; revision: WikiRevisionSummary }
+  | { kind: "talk"; characterId: string; thread: WikiTalkThread };
+
 export type CharacterListItem = {
   id: string;
   name: string;
@@ -343,6 +382,90 @@ export const wikiApi = {
     return request<WikiProtectionLogRow[]>(
       `/wiki/pages/${encodeURIComponent(characterId)}/protection-log`,
       { auth: false },
+    );
+  },
+  listThreads(characterId: string) {
+    return request<WikiTalkThread[]>(
+      `/wiki/talk/${encodeURIComponent(characterId)}/threads`,
+      { auth: false },
+    );
+  },
+  createThread(characterId: string, title: string, body: string) {
+    return request<{ thread: WikiTalkThread; firstPost: WikiTalkPost }>(
+      `/wiki/talk/${encodeURIComponent(characterId)}/threads`,
+      {
+        method: "POST",
+        body: JSON.stringify({ title, body }),
+      },
+    );
+  },
+  listPosts(threadId: string) {
+    return request<WikiTalkPost[]>(
+      `/wiki/talk/threads/${encodeURIComponent(threadId)}/posts`,
+      { auth: false },
+    );
+  },
+  createPost(threadId: string, body: string, parentPostId?: string | null) {
+    return request<WikiTalkPost>(
+      `/wiki/talk/threads/${encodeURIComponent(threadId)}/posts`,
+      {
+        method: "POST",
+        body: JSON.stringify({ body, parentPostId }),
+      },
+    );
+  },
+  setThreadFlags(
+    threadId: string,
+    flags: { isLocked?: boolean; isResolved?: boolean },
+  ) {
+    return request<WikiTalkThread>(
+      `/wiki/talk/threads/${encodeURIComponent(threadId)}/flags`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(flags),
+      },
+    );
+  },
+  deletePost(postId: string) {
+    return request<WikiTalkPost>(
+      `/wiki/talk/posts/${encodeURIComponent(postId)}`,
+      { method: "DELETE" },
+    );
+  },
+  watchlist() {
+    return request<WatchlistEntry[]>("/wiki/watchlist");
+  },
+  watchlistFeed(since?: string) {
+    const qs = since ? `?since=${encodeURIComponent(since)}` : "";
+    return request<WatchlistFeedItem[]>(`/wiki/watchlist/feed${qs}`);
+  },
+  isWatching(characterId: string) {
+    return request<{ watching: boolean }>(
+      `/wiki/watchlist/status/${encodeURIComponent(characterId)}`,
+    );
+  },
+  watch(characterId: string) {
+    return request<unknown>(
+      `/wiki/watchlist/${encodeURIComponent(characterId)}`,
+      { method: "POST", body: JSON.stringify({}) },
+    );
+  },
+  unwatch(characterId: string) {
+    return request<{ success: true }>(
+      `/wiki/watchlist/${encodeURIComponent(characterId)}`,
+      { method: "DELETE" },
+    );
+  },
+  softDeletePage(characterId: string) {
+    return request<unknown>(
+      `/wiki/pages/${encodeURIComponent(characterId)}/delete`,
+      { method: "POST", body: JSON.stringify({}) },
+    );
+  },
+  restorePage(characterId: string) {
+    return request<unknown>(
+      `/wiki/pages/${encodeURIComponent(characterId)}/restore`,
+      { method: "POST", body: JSON.stringify({}) },
     );
   },
 };

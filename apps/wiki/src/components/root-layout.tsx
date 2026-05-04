@@ -20,6 +20,11 @@ export function RootLayout() {
             <Link to="/recent-changes" className="hover:underline">
               最近修改
             </Link>
+            {user && (
+              <Link to="/watchlist" className="hover:underline">
+                观察列表
+              </Link>
+            )}
             {hasRole(user, "patroller") && (
               <Link to="/pending-reviews" className="hover:underline">
                 待审编辑

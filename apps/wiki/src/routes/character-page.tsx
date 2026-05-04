@@ -20,16 +20,31 @@ import {
   type WikiRevisionSummary,
 } from "../lib/wiki-api";
 import { SnapshotDiff } from "../components/snapshot-diff";
+import { TalkPanel } from "../components/talk-panel";
+import { WatchToggle } from "../components/watch-toggle";
 
-type Tab = "read" | "edit" | "history";
+type Tab = "read" | "edit" | "history" | "talk";
 
 export function CharacterPage() {
   const { characterId } = useParams({ from: "/character/$characterId" });
+  const { user } = useAuth();
+  const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("read");
   const pageQ = useQuery({
     queryKey: ["wiki", "page", characterId],
     queryFn: () => wikiApi.getPage(characterId),
   });
+  const softDeleteMut = useMutation({
+    mutationFn: () =>
+      pageQ.data?.page.isDeleted
+        ? wikiApi.restorePage(characterId)
+        : wikiApi.softDeletePage(characterId),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["wiki", "page", characterId] });
+      void qc.invalidateQueries({ queryKey: ["wiki", "characters"] });
+    },
+  });
+  const isDeleted = pageQ.data?.page.isDeleted ?? false;
 
   return (
     <div className="space-y-4">
@@ -43,10 +58,38 @@ export function CharacterPage() {
         <TabButton active={tab === "history"} onClick={() => setTab("history")}>
           历史
         </TabButton>
-        {pageQ.data && (
-          <ProtectionInfo level={pageQ.data.page.protectionLevel} />
-        )}
+        <TabButton active={tab === "talk"} onClick={() => setTab("talk")}>
+          讨论
+        </TabButton>
+        <div className="ml-auto flex items-center gap-2">
+          {pageQ.data && (
+            <ProtectionInfo level={pageQ.data.page.protectionLevel} />
+          )}
+          {isDeleted && <StatusPill>已删除</StatusPill>}
+          <WatchToggle characterId={characterId} />
+          {hasRole(user, "admin") && pageQ.data && (
+            <Button
+              size="sm"
+              variant={isDeleted ? "primary" : "danger"}
+              disabled={softDeleteMut.isPending}
+              onClick={() => softDeleteMut.mutate()}
+            >
+              {isDeleted ? "恢复词条" : "软删除"}
+            </Button>
+          )}
+        </div>
       </div>
+
+      {isDeleted && (
+        <Card className="p-4 border-[var(--border-danger)] bg-[rgba(255,245,245,0.7)]">
+          <div className="text-sm">
+            <strong className="text-[var(--state-danger-text)]">
+              此词条已被软删除（红链）
+            </strong>
+            。普通用户无法编辑，但底层角色数据仍存在以保持运行时引用一致。
+          </div>
+        </Card>
+      )}
 
       {pageQ.isLoading && <LoadingBlock />}
       {pageQ.isError && <ErrorBlock message={(pageQ.error as Error).message} />}
@@ -68,6 +111,7 @@ export function CharacterPage() {
           onChanged={() => void pageQ.refetch()}
         />
       )}
+      {tab === "talk" && <TalkPanel characterId={characterId} />}
     </div>
   );
 }

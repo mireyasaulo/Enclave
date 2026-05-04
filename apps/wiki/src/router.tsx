@@ -51,6 +51,11 @@ const AdminProtectionPage = lazy(async () => {
   return { default: mod.AdminProtectionPage };
 });
 
+const WatchlistPage = lazy(async () => {
+  const mod = await import("./routes/watchlist-page");
+  return { default: mod.WatchlistPage };
+});
+
 const rootRoute = createRootRoute({ component: RootLayout });
 
 const indexRoute = createRoute({
@@ -107,6 +112,12 @@ const adminProtectionRoute = createRoute({
   component: AdminProtectionPage,
 });
 
+const watchlistRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/watchlist",
+  component: WatchlistPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
@@ -117,6 +128,7 @@ const routeTree = rootRoute.addChildren([
   adminUsersRoute,
   adminBlocksRoute,
   adminProtectionRoute,
+  watchlistRoute,
 ]);
 
 export const router = createRouter({ routeTree });
