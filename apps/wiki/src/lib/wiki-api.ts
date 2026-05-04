@@ -295,7 +295,7 @@ export const wikiApi = {
       { auth: false },
     );
   },
-  getDiff(fromRevisionId: string, toRevisionId: string) {
+  getDiff(characterId: string, fromRevisionId: string, toRevisionId: string) {
     const params = new URLSearchParams({
       from: fromRevisionId,
       to: toRevisionId,
@@ -303,7 +303,9 @@ export const wikiApi = {
     return request<{
       from: WikiRevisionSummary;
       to: WikiRevisionSummary;
-    }>(`/wiki/pages/_/diff?${params.toString()}`, { auth: false });
+    }>(`/wiki/pages/${encodeURIComponent(characterId)}/diff?${params.toString()}`, {
+      auth: false,
+    });
   },
   submitEdit(
     characterId: string,

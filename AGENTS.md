@@ -184,6 +184,7 @@
   - `DELETE /api/world/owner/chat-background`
 - `/system/status` 使用 `worldSurface` 语义，实例状态以 `ownerCount` 表示单世界主人数量
 - `ownerCount` 只统计 `User.userType = world_owner`，不包含世界角色管理平台的 wiki 用户
+- 世界角色管理平台若尚无任何 `role = admin` 用户，首个通过 `/api/auth/register` 注册的 `wiki_member` 会自动成为 wiki admin，用于启动审核、保护、封禁与角色晋升流程
 
 ## 云世界平台实体（`apps/cloud-api/src/entities/`）
 

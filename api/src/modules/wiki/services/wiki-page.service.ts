@@ -219,13 +219,16 @@ export class WikiPageService {
     });
   }
 
-  async getDiff(fromId: string, toId: string) {
+  async getDiff(characterId: string, fromId: string, toId: string) {
     const [from, to] = await Promise.all([
       this.getRevisionOrThrow(fromId),
       this.getRevisionOrThrow(toId),
     ]);
     if (from.characterId !== to.characterId) {
       throw new NotFoundException('版本不属于同一词条');
+    }
+    if (characterId !== '_' && to.characterId !== characterId) {
+      throw new NotFoundException('版本不属于当前词条');
     }
     return { from, to };
   }

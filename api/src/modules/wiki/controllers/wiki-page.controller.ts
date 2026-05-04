@@ -83,8 +83,8 @@ export class WikiPageController {
   }
 
   @Get('pages/:id/diff')
-  diff(@Query('from') from: string, @Query('to') to: string) {
-    return this.pages.getDiff(from, to);
+  diff(@Param('id') id: string, @Query('from') from: string, @Query('to') to: string) {
+    return this.pages.getDiff(id, from, to);
   }
 
   @Get('pages/:id/revisions/:revisionId')

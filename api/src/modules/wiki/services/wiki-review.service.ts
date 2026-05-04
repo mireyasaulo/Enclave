@@ -52,6 +52,7 @@ export class WikiReviewService {
     const revisions = await this.revisionRepo
       .createQueryBuilder('r')
       .where('r.id IN (:...ids)', { ids: revIds })
+      .andWhere('r.status = :status', { status: 'pending' })
       .getMany();
     const revMap = new Map(revisions.map((r) => [r.id, r]));
     return submissions
@@ -142,29 +143,87 @@ export class WikiReviewService {
         await manager.save(profile);
       }
 
-      const reviewerProfile =
-        (await manager.findOne(UserWikiProfileEntity, {
-          where: { userId: reviewer.id },
-        })) ??
-        manager.create(UserWikiProfileEntity, {
-          userId: reviewer.id,
-          editCount: 0,
-          approvedEditCount: 0,
-          revertedCount: 0,
-          patrolledCount: 0,
-        });
-      reviewerProfile.patrolledCount += 1;
-      await manager.save(reviewerProfile);
+      if (isApprove) {
+        const reviewerProfile =
+          (await manager.findOne(UserWikiProfileEntity, {
+            where: { userId: reviewer.id },
+          })) ??
+          manager.create(UserWikiProfileEntity, {
+            userId: reviewer.id,
+            editCount: 0,
+            approvedEditCount: 0,
+            revertedCount: 0,
+            patrolledCount: 0,
+          });
+        reviewerProfile.patrolledCount += 1;
+        await manager.save(reviewerProfile);
+      }
     });
 
     if (applyWithWikiRuntime) {
-      await this.edits.applyApprovedRevision(revision, reviewer.id);
+      try {
+        await this.edits.applyApprovedRevision(revision, reviewer.id);
+      } catch (error) {
+        await this.rollbackRuntimeApproval(revision, submission.id, reviewer.id);
+        throw error;
+      }
     }
 
     if (isApprove) {
       void this.roles.checkPromotion(revision.editorUserId).catch(() => undefined);
     }
     return { status: finalStatus, pageId: revision.characterId };
+  }
+
+  private async rollbackRuntimeApproval(
+    revision: CharacterRevisionEntity,
+    submissionId: string,
+    reviewerId: string,
+  ): Promise<void> {
+    await this.dataSource.transaction(async (manager) => {
+      await manager.update(
+        CharacterRevisionEntity,
+        { id: revision.id },
+        {
+          status: 'pending',
+          isPatrolled: false,
+          patrolledBy: null,
+          patrolledAt: null,
+        },
+      );
+      await manager.update(
+        EditSubmissionEntity,
+        { id: submissionId },
+        {
+          decision: null,
+          reviewerId: null,
+          decidedAt: null,
+          reviewerNote: null,
+        },
+      );
+
+      const authorProfile = await manager.findOne(UserWikiProfileEntity, {
+        where: { userId: revision.editorUserId },
+      });
+      if (authorProfile) {
+        authorProfile.approvedEditCount = Math.max(
+          0,
+          authorProfile.approvedEditCount - 1,
+        );
+        await manager.save(authorProfile);
+      }
+
+      const reviewerProfile = await manager.findOne(UserWikiProfileEntity, {
+        where: { userId: reviewerId },
+      });
+      if (reviewerProfile) {
+        reviewerProfile.patrolledCount = Math.max(
+          0,
+          reviewerProfile.patrolledCount - 1,
+        );
+        await manager.save(reviewerProfile);
+      }
+    });
   }
 
   async markPatrolled(

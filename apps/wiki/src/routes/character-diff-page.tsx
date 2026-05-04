@@ -1,4 +1,4 @@
-import { Link, useSearch } from "@tanstack/react-router";
+import { Link, useParams, useSearch } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Card, ErrorBlock, LoadingBlock, StatusPill } from "@yinjie/ui";
 import { SnapshotDiff } from "../components/snapshot-diff";
@@ -6,9 +6,10 @@ import { wikiApi } from "../lib/wiki-api";
 
 export function CharacterDiffPage() {
   const search = useSearch({ from: "/character/$characterId/diff" });
+  const { characterId } = useParams({ from: "/character/$characterId/diff" });
   const diffQ = useQuery({
-    queryKey: ["wiki", "diff", search.from, search.to],
-    queryFn: () => wikiApi.getDiff(search.from, search.to),
+    queryKey: ["wiki", "diff", characterId, search.from, search.to],
+    queryFn: () => wikiApi.getDiff(characterId, search.from, search.to),
     enabled: Boolean(search.from && search.to),
   });
 
