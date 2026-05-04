@@ -43,8 +43,9 @@
 ## 世界角色管理平台页面（`apps/wiki/src/routes/`）
 
 - `home-page.tsx`：世界角色管理平台首页，承载角色索引、生命周期状态与创建入口
-- `create-character-page.tsx`：角色创建页，普通登录用户提交新角色创建请求，审核通过后写入运行时角色注册表
+- `create-character-page.tsx`：角色创建页，普通登录用户提交新角色创建请求，可选携带完整角色逻辑 recipe JSON，审核通过后写入运行时角色注册表
 - `character-page.tsx`：角色词条页，承载阅读、内容编辑、角色逻辑 recipe 编辑、历史、讨论、生命周期申请与编辑冲突处理
+- `character-diff-page.tsx`：角色版本独立对比页，由历史页进入，集中展示内容字段与角色逻辑快照差异
 - `recent-changes-page.tsx`：最近修改页，集中查看角色内容 / 逻辑 / 生命周期编辑动态
 - `search-page.tsx`：角色词条搜索结果页，由顶栏搜索框进入
 - `watchlist-page.tsx`：观察列表页，登录用户查看关注词条与讨论动态
@@ -311,9 +312,9 @@
   - `GET /api/wiki/pages/:id`
   - `GET /api/wiki/pages/:id/history`
   - `GET /api/wiki/pages/:id/pending`
-  - `GET /api/wiki/pages/:id/diff`
+- `GET /api/wiki/pages/:id/diff`
   - `GET /api/wiki/pages/:id/revisions/:revisionId`
-  - `POST /api/wiki/pages/:id/edits`
+- `POST /api/wiki/pages/:id/edits`
   - `POST /api/wiki/pages/:id/delete-request`
   - `POST /api/wiki/pages/:id/restore-request`
   - `POST /api/wiki/pages/:id/delete`

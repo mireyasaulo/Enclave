@@ -27,7 +27,10 @@ import {
   createDefaultWikiRecipe,
   diffFields,
   diffPaths,
+  hasPathOverlap,
   isHighRiskRecipeChange,
+  mergeContentSnapshot,
+  mergeValueByPaths,
   normalizeWikiRecipe,
   pickWikiContent,
   snapshotFromRecipe,
@@ -97,11 +100,10 @@ export class WikiEditService {
         }))!.contentSnapshot
       : snapshotFromCharacter(character as unknown as Record<string, unknown>);
 
-    const after = pickWikiContent(input.contentSnapshot ?? {});
-    const changed = diffFields(before, after);
-    if (changed.length === 0) {
-      throw new BadRequestException('未检测到变更');
-    }
+    const submitted = pickWikiContent(input.contentSnapshot ?? {});
+    let after = submitted;
+    let changed = diffFields(before, after);
+    let changeSource = 'edit';
 
     if (
       input.baseRevisionId &&
@@ -114,8 +116,9 @@ export class WikiEditService {
       if (!baseRev) {
         throw new BadRequestException('基线版本无效');
       }
+      const userChanged = diffFields(baseRev.contentSnapshot, submitted);
       const concurrentChanged = diffFields(baseRev.contentSnapshot, before);
-      const overlap = changed.filter((f) => concurrentChanged.includes(f));
+      const overlap = userChanged.filter((f) => concurrentChanged.includes(f));
       if (overlap.length > 0) {
         throw new ConflictException({
           message: '存在编辑冲突，请基于最新版本重新提交',
@@ -124,6 +127,13 @@ export class WikiEditService {
           currentSnapshot: before,
         });
       }
+      after = mergeContentSnapshot(before, submitted, userChanged);
+      changed = diffFields(before, after);
+      changeSource = 'merge';
+    }
+
+    if (changed.length === 0) {
+      throw new BadRequestException('未检测到变更');
     }
 
     const autoApprove = rankOf(user.role) >= rankOf('autoconfirmed');
@@ -149,7 +159,7 @@ export class WikiEditService {
         revisionKind: 'content',
         operation: 'edit',
         riskLevel: 'low',
-        changeSource: 'edit',
+        changeSource,
         isMinor: Boolean(input.isMinor),
         isPatrolled: false,
       });
@@ -523,15 +533,12 @@ export class WikiEditService {
       currentRevision?.recipeSnapshot ??
       factorySnapshot.blueprint.publishedRecipe ??
       factorySnapshot.blueprint.draftRecipe;
-    const afterRecipe = normalizeWikiRecipe(input.recipeSnapshot ?? {}, beforeRecipe);
+    let afterRecipe = normalizeWikiRecipe(input.recipeSnapshot ?? {}, beforeRecipe);
     const beforeContent =
       currentRevision?.contentSnapshot ??
       snapshotFromCharacter(character as unknown as Record<string, unknown>);
-    const afterContent = snapshotFromRecipe(afterRecipe);
-    const changed = diffPaths(beforeRecipe, afterRecipe);
-    if (changed.length === 0) {
-      throw new BadRequestException('未检测到变更');
-    }
+    let changed = diffPaths(beforeRecipe, afterRecipe);
+    let changeSource = 'edit';
 
     if (
       input.baseRevisionId &&
@@ -544,8 +551,15 @@ export class WikiEditService {
       if (!baseRev?.recipeSnapshot) {
         throw new BadRequestException('基线版本无效');
       }
+      const submittedRecipe = normalizeWikiRecipe(
+        input.recipeSnapshot ?? {},
+        baseRev.recipeSnapshot,
+      );
+      const userChanged = diffPaths(baseRev.recipeSnapshot, submittedRecipe);
       const concurrentChanged = diffPaths(baseRev.recipeSnapshot, beforeRecipe);
-      const overlap = changed.filter((path) => concurrentChanged.includes(path));
+      const overlap = userChanged.filter((path) =>
+        hasPathOverlap([path], concurrentChanged),
+      );
       if (overlap.length > 0) {
         throw new ConflictException({
           message: '存在编辑冲突，请基于最新版本重新提交',
@@ -555,7 +569,15 @@ export class WikiEditService {
           currentRecipeSnapshot: beforeRecipe,
         });
       }
+      afterRecipe = mergeValueByPaths(beforeRecipe, submittedRecipe, userChanged);
+      changed = diffPaths(beforeRecipe, afterRecipe);
+      changeSource = 'merge';
     }
+
+    if (changed.length === 0) {
+      throw new BadRequestException('未检测到变更');
+    }
+    const afterContent = snapshotFromRecipe(afterRecipe);
 
     const riskLevel = isHighRiskRecipeChange(changed) ? 'high' : 'low';
     const autoApprove =
@@ -578,7 +600,7 @@ export class WikiEditService {
         revisionKind: 'recipe',
         operation: 'edit',
         riskLevel,
-        changeSource: 'edit',
+        changeSource,
         isMinor: Boolean(input.isMinor),
         isPatrolled: false,
       });

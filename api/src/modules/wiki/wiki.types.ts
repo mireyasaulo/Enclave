@@ -336,6 +336,48 @@ export function diffPaths(left: unknown, right: unknown, prefix = ''): string[] 
   return result;
 }
 
+export function hasPathOverlap(left: string[], right: string[]): boolean {
+  return left.some((leftPath) =>
+    right.some(
+      (rightPath) =>
+        leftPath === rightPath ||
+        leftPath.startsWith(`${rightPath}.`) ||
+        rightPath.startsWith(`${leftPath}.`),
+    ),
+  );
+}
+
+export function mergeContentSnapshot(
+  current: WikiContentSnapshot,
+  submitted: WikiContentSnapshot,
+  changedFields: WikiContentField[],
+): WikiContentSnapshot {
+  const merged: WikiContentSnapshot = {
+    ...current,
+    expertDomains: [...current.expertDomains],
+    triggerScenes: current.triggerScenes ? [...current.triggerScenes] : undefined,
+  };
+  for (const field of changedFields) {
+    const value = submitted[field];
+    (merged as Record<string, unknown>)[field] = Array.isArray(value)
+      ? [...value]
+      : value;
+  }
+  return merged;
+}
+
+export function mergeValueByPaths<T>(current: T, submitted: T, paths: string[]): T {
+  const merged = structuredCloneFallback(current);
+  for (const path of paths) {
+    setPathValue(
+      merged as Record<string, unknown>,
+      path,
+      structuredCloneFallback(getPathValue(submitted, path)),
+    );
+  }
+  return merged;
+}
+
 export function isHighRiskRecipeChange(paths: string[]): boolean {
   return paths.some((path) =>
     [
@@ -349,6 +391,39 @@ export function isHighRiskRecipeChange(paths: string[]): boolean {
       'realityLink',
     ].some((prefix) => path === prefix.replace(/\.$/, '') || path.startsWith(prefix)),
   );
+}
+
+function getPathValue(input: unknown, path: string): unknown {
+  return path.split('.').reduce<unknown>((value, segment) => {
+    if (value && typeof value === 'object') {
+      return (value as Record<string, unknown>)[segment];
+    }
+    return undefined;
+  }, input);
+}
+
+function setPathValue(
+  target: Record<string, unknown>,
+  path: string,
+  value: unknown,
+): void {
+  const segments = path.split('.');
+  let cursor: Record<string, unknown> = target;
+  for (const segment of segments.slice(0, -1)) {
+    const next = cursor[segment];
+    if (!next || typeof next !== 'object' || Array.isArray(next)) {
+      cursor[segment] = {};
+    }
+    cursor = cursor[segment] as Record<string, unknown>;
+  }
+  cursor[segments[segments.length - 1] ?? path] = value;
+}
+
+function structuredCloneFallback<T>(value: T): T {
+  if (typeof structuredClone === 'function') {
+    return structuredClone(value);
+  }
+  return JSON.parse(JSON.stringify(value)) as T;
 }
 
 export function diffFields(

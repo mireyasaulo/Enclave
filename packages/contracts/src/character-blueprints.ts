@@ -1,4 +1,4 @@
-import type { Character } from "./characters";
+import type { Character, RealityLinkConfig } from "./characters";
 
 export type CharacterBlueprintSourceType =
   | "default_seed"
@@ -105,6 +105,7 @@ export interface CharacterBlueprintRecipe {
     initialOnline: boolean;
     initialActivity: string | null;
   };
+  realityLink?: RealityLinkConfig | null;
 }
 
 export interface CharacterBlueprint {

@@ -295,6 +295,16 @@ export const wikiApi = {
       { auth: false },
     );
   },
+  getDiff(fromRevisionId: string, toRevisionId: string) {
+    const params = new URLSearchParams({
+      from: fromRevisionId,
+      to: toRevisionId,
+    });
+    return request<{
+      from: WikiRevisionSummary;
+      to: WikiRevisionSummary;
+    }>(`/wiki/pages/_/diff?${params.toString()}`, { auth: false });
+  },
   submitEdit(
     characterId: string,
     payload: {

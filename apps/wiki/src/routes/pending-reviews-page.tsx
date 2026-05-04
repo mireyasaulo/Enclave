@@ -25,7 +25,7 @@ export function PendingReviewsPage() {
   const decideMut = useMutation({
     mutationFn: (input: {
       revisionId: string;
-      decision: "approve" | "reject";
+      decision: "approve" | "reject" | "request_changes";
       note?: string;
     }) => wikiApi.decide(input.revisionId, input.decision, input.note),
     onSuccess: () => {
@@ -85,7 +85,10 @@ function ReviewCard({
   loading,
 }: {
   item: PendingReviewItem;
-  onDecide: (decision: "approve" | "reject", note?: string) => void;
+  onDecide: (
+    decision: "approve" | "reject" | "request_changes",
+    note?: string,
+  ) => void;
   loading: boolean;
 }) {
   const [note, setNote] = useState("");
@@ -148,6 +151,13 @@ function ReviewCard({
           onClick={() => onDecide("approve", note || undefined)}
         >
           通过
+        </Button>
+        <Button
+          variant="secondary"
+          disabled={loading}
+          onClick={() => onDecide("request_changes", note || undefined)}
+        >
+          要求修改
         </Button>
         <Button
           variant="danger"

@@ -2,6 +2,7 @@ import type { FormEvent, ReactNode } from "react";
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { CharacterBlueprintRecipe } from "@yinjie/contracts";
 import { Button, Card, ErrorBlock, TextAreaField, TextField } from "@yinjie/ui";
 import { useAuth } from "../lib/use-auth";
 import { wikiApi, type WikiContentSnapshot } from "../lib/wiki-api";
@@ -27,6 +28,7 @@ export function CreateCharacterPage() {
   const [expertDomains, setExpertDomains] = useState("general");
   const [triggerScenes, setTriggerScenes] = useState("");
   const [summary, setSummary] = useState("");
+  const [recipeText, setRecipeText] = useState("");
 
   const createMut = useMutation({
     mutationFn: () => {
@@ -40,9 +42,13 @@ export function CreateCharacterPage() {
         relationship: relationship.trim(),
         relationshipType: relationshipType.trim(),
       };
+      const recipeSnapshot = recipeText.trim()
+        ? (JSON.parse(recipeText) as CharacterBlueprintRecipe)
+        : null;
       return wikiApi.createPage({
         characterId: characterId.trim() || null,
         contentSnapshot,
+        recipeSnapshot,
         editSummary: summary.trim() || "创建角色词条",
       });
     },
@@ -147,6 +153,14 @@ export function CreateCharacterPage() {
             value={summary}
             onChange={(event) => setSummary(event.target.value)}
             maxLength={500}
+          />
+        </FormRow>
+        <FormRow label="完整角色逻辑 recipe JSON（可选）">
+          <TextAreaField
+            rows={8}
+            value={recipeText}
+            onChange={(event) => setRecipeText(event.target.value)}
+            placeholder="留空则按上方档案字段生成默认角色逻辑"
           />
         </FormRow>
         {createMut.isError && (

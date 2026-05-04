@@ -26,6 +26,11 @@ const CharacterPage = lazy(async () => {
   return { default: mod.CharacterPage };
 });
 
+const CharacterDiffPage = lazy(async () => {
+  const mod = await import("./routes/character-diff-page");
+  return { default: mod.CharacterDiffPage };
+});
+
 const CreateCharacterPage = lazy(async () => {
   const mod = await import("./routes/create-character-page");
   return { default: mod.CreateCharacterPage };
@@ -97,6 +102,16 @@ const characterRoute = createRoute({
   component: CharacterPage,
 });
 
+const characterDiffRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/character/$characterId/diff",
+  validateSearch: (search: Record<string, unknown>) => ({
+    from: typeof search.from === "string" ? search.from : "",
+    to: typeof search.to === "string" ? search.to : "",
+  }),
+  component: CharacterDiffPage,
+});
+
 const createCharacterRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/create",
@@ -159,6 +174,7 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   registerRoute,
   characterRoute,
+  characterDiffRoute,
   createCharacterRoute,
   pendingReviewsRoute,
   recentChangesRoute,

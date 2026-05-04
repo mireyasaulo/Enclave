@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "@tanstack/react-router";
+import { Link, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CharacterBlueprintRecipe } from "@yinjie/contracts";
 import {
@@ -576,6 +576,16 @@ function LogicEditor({
   recipe: CharacterBlueprintRecipe;
   onChange: (next: CharacterBlueprintRecipe) => void;
 }) {
+  const [realityLinkText, setRealityLinkText] = useState(() =>
+    JSON.stringify(recipe.realityLink ?? null, null, 2),
+  );
+  const [realityLinkError, setRealityLinkError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setRealityLinkText(JSON.stringify(recipe.realityLink ?? null, null, 2));
+    setRealityLinkError(null);
+  }, [recipe.realityLink]);
+
   return (
     <div className="rounded border border-[var(--border-subtle)] p-4 space-y-4">
       <div>
@@ -705,6 +715,100 @@ function LogicEditor({
           />
         </FormRow>
       </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormRow label="说话模式（逗号分隔）">
+          <TextField
+            value={recipe.tone.speechPatterns.join(", ")}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                tone: {
+                  ...recipe.tone,
+                  speechPatterns: splitList(event.target.value),
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="兴趣主题（逗号分隔）">
+          <TextField
+            value={recipe.tone.topicsOfInterest.join(", ")}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                tone: {
+                  ...recipe.tone,
+                  topicsOfInterest: splitList(event.target.value),
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="回复长度">
+          <select
+            className="w-full border rounded px-2 py-2 bg-white"
+            value={recipe.tone.responseLength}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                tone: {
+                  ...recipe.tone,
+                  responseLength: event.target
+                    .value as CharacterBlueprintRecipe["tone"]["responseLength"],
+                },
+              })
+            }
+          >
+            <option value="short">短</option>
+            <option value="medium">中</option>
+            <option value="long">长</option>
+          </select>
+        </FormRow>
+        <FormRow label="Emoji 使用">
+          <select
+            className="w-full border rounded px-2 py-2 bg-white"
+            value={recipe.tone.emojiUsage}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                tone: {
+                  ...recipe.tone,
+                  emojiUsage: event.target
+                    .value as CharacterBlueprintRecipe["tone"]["emojiUsage"],
+                },
+              })
+            }
+          >
+            <option value="none">不使用</option>
+            <option value="occasional">偶尔</option>
+            <option value="frequent">频繁</option>
+          </select>
+        </FormRow>
+        <FormRow label="工作风格">
+          <TextAreaField
+            rows={3}
+            value={recipe.tone.workStyle}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                tone: { ...recipe.tone, workStyle: event.target.value },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="社交风格">
+          <TextAreaField
+            rows={3}
+            value={recipe.tone.socialStyle}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                tone: { ...recipe.tone, socialStyle: event.target.value },
+              })
+            }
+          />
+        </FormRow>
+      </div>
       <FormRow label="核心指令">
         <TextAreaField
           rows={4}
@@ -821,6 +925,70 @@ function LogicEditor({
             })
           }
         />
+        <ScenePromptField
+          label="朋友圈评论 Prompt"
+          value={recipe.prompting.scenePrompts.moments_comment}
+          onChange={(value) =>
+            onChange({
+              ...recipe,
+              prompting: {
+                ...recipe.prompting,
+                scenePrompts: {
+                  ...recipe.prompting.scenePrompts,
+                  moments_comment: value,
+                },
+              },
+            })
+          }
+        />
+        <ScenePromptField
+          label="广场发帖 Prompt"
+          value={recipe.prompting.scenePrompts.feed_post}
+          onChange={(value) =>
+            onChange({
+              ...recipe,
+              prompting: {
+                ...recipe.prompting,
+                scenePrompts: {
+                  ...recipe.prompting.scenePrompts,
+                  feed_post: value,
+                },
+              },
+            })
+          }
+        />
+        <ScenePromptField
+          label="视频号内容 Prompt"
+          value={recipe.prompting.scenePrompts.channel_post}
+          onChange={(value) =>
+            onChange({
+              ...recipe,
+              prompting: {
+                ...recipe.prompting,
+                scenePrompts: {
+                  ...recipe.prompting.scenePrompts,
+                  channel_post: value,
+                },
+              },
+            })
+          }
+        />
+        <ScenePromptField
+          label="广场评论 Prompt"
+          value={recipe.prompting.scenePrompts.feed_comment}
+          onChange={(value) =>
+            onChange({
+              ...recipe,
+              prompting: {
+                ...recipe.prompting,
+                scenePrompts: {
+                  ...recipe.prompting.scenePrompts,
+                  feed_comment: value,
+                },
+              },
+            })
+          }
+        />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormRow label="记忆摘要">
@@ -848,6 +1016,47 @@ function LogicEditor({
                 memorySeed: {
                   ...recipe.memorySeed,
                   coreMemory: event.target.value,
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="近期摘要种子">
+          <TextAreaField
+            rows={4}
+            value={recipe.memorySeed.recentSummarySeed}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                memorySeed: {
+                  ...recipe.memorySeed,
+                  recentSummarySeed: event.target.value,
+                },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label="遗忘曲线">
+          <TextField
+            type="number"
+            min={0}
+            max={100}
+            value={recipe.memorySeed.forgettingCurve}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                memorySeed: {
+                  ...recipe.memorySeed,
+                  forgettingCurve: Math.min(
+                    Math.max(
+                      parseNonNegativeInt(
+                        event.target.value,
+                        recipe.memorySeed.forgettingCurve,
+                      ),
+                      0,
+                    ),
+                    100,
+                  ),
                 },
               })
             }
@@ -1037,7 +1246,134 @@ function LogicEditor({
             }
           />
         </FormRow>
+        <FormRow label="小癖好（逗号分隔）">
+          <TextField
+            value={recipe.tone.quirks.join(", ")}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                tone: {
+                  ...recipe.tone,
+                  quirks: splitList(event.target.value),
+                },
+              })
+            }
+          />
+        </FormRow>
       </div>
+      <div className="rounded border border-[var(--border-subtle)] p-3 space-y-3">
+        <h4 className="text-sm font-medium">发布映射</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={recipe.publishMapping.isTemplate}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  publishMapping: {
+                    ...recipe.publishMapping,
+                    isTemplate: event.target.checked,
+                  },
+                })
+              }
+            />
+            模板角色
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={recipe.publishMapping.initialOnline}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  publishMapping: {
+                    ...recipe.publishMapping,
+                    initialOnline: event.target.checked,
+                  },
+                })
+              }
+            />
+            初始在线
+          </label>
+          <FormRow label="初始活动">
+            <TextField
+              value={recipe.publishMapping.initialActivity ?? ""}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  publishMapping: {
+                    ...recipe.publishMapping,
+                    initialActivity: event.target.value.trim() || null,
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label="在线模式默认值">
+            <select
+              className="w-full border rounded px-2 py-2 bg-white"
+              value={recipe.publishMapping.onlineModeDefault}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  publishMapping: {
+                    ...recipe.publishMapping,
+                    onlineModeDefault: event.target
+                      .value as CharacterBlueprintRecipe["publishMapping"]["onlineModeDefault"],
+                  },
+                })
+              }
+            >
+              <option value="auto">自动</option>
+              <option value="manual">手动</option>
+            </select>
+          </FormRow>
+          <FormRow label="活动模式默认值">
+            <select
+              className="w-full border rounded px-2 py-2 bg-white"
+              value={recipe.publishMapping.activityModeDefault}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  publishMapping: {
+                    ...recipe.publishMapping,
+                    activityModeDefault: event.target
+                      .value as CharacterBlueprintRecipe["publishMapping"]["activityModeDefault"],
+                  },
+                })
+              }
+            >
+              <option value="auto">自动</option>
+              <option value="manual">手动</option>
+            </select>
+          </FormRow>
+        </div>
+      </div>
+      <FormRow label="现实联动配置 JSON">
+        <TextAreaField
+          rows={8}
+          value={realityLinkText}
+          onChange={(event) => {
+            const nextText = event.target.value;
+            setRealityLinkText(nextText);
+            try {
+              const parsed = JSON.parse(nextText) as
+                | CharacterBlueprintRecipe["realityLink"]
+                | null;
+              onChange({ ...recipe, realityLink: parsed });
+              setRealityLinkError(null);
+            } catch {
+              setRealityLinkError("JSON 格式无效，修正后才会写入草稿。");
+            }
+          }}
+        />
+        {realityLinkError && (
+          <div className="mt-1 text-xs text-[var(--state-danger-text)]">
+            {realityLinkError}
+          </div>
+        )}
+      </FormRow>
     </div>
   );
 }
@@ -1209,6 +1545,16 @@ function RevisionCard({
           >
             {showDiff ? "收起对比" : "查看对比"}
           </button>
+          {previous && (
+            <Link
+              to="/character/$characterId/diff"
+              params={{ characterId: rev.characterId }}
+              search={{ from: previous.id, to: rev.id }}
+              className="underline hover:text-[var(--text-primary)]"
+            >
+              独立对比
+            </Link>
+          )}
           {canRevert && !isCurrent && rev.status === "approved" && (
             <button
               type="button"
