@@ -1,9 +1,17 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams } from "@tanstack/react-router";
+import { formatDateTime } from "@yinjie/i18n";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock } from "@yinjie/ui";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import { useCloudConsoleText } from "../lib/cloud-console-i18n";
+
+function formatTimestamp(value?: string | null) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return formatDateTime(date, { dateStyle: "medium", timeStyle: "short" });
+}
 
 export function UserDetailPage() {
   const t = useCloudConsoleText();
@@ -87,7 +95,7 @@ export function UserDetailPage() {
               <br />
               {t("Current plan:")} {user.currentPlanCode || "-"}
               <br />
-              {t("Expires at:")} {user.subscriptionExpiresAt || "-"}
+              {t("Expires at:")} {formatTimestamp(user.subscriptionExpiresAt)}
               <br />
               {t("Invite code:")} {user.inviteCode || "-"}
               <br />
@@ -194,7 +202,7 @@ export function UserDetailPage() {
                 <div className="mt-1 text-[color:var(--text-secondary)]">
                   {t(subscription.status)} | {subscription.source}
                   <br />
-                  {subscription.startsAt} {"->"} {subscription.expiresAt}
+                  {formatTimestamp(subscription.startsAt)} {"->"} {formatTimestamp(subscription.expiresAt)}
                   <br />
                   {subscription.note || "-"}
                 </div>
@@ -222,7 +230,7 @@ export function UserDetailPage() {
                   {record.inviteePhoneMasked}
                 </div>
                 <div className="mt-1 text-[color:var(--text-secondary)]">
-                  {t(record.status)} | {record.createdAt}
+                  {t(record.status)} | {formatTimestamp(record.createdAt)}
                   {record.rejectReason ? ` | ${record.rejectReason}` : ""}
                 </div>
               </div>

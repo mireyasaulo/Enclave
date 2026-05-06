@@ -1,9 +1,17 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { InviteRedemptionStatus } from "@yinjie/contracts";
+import { formatDateTime } from "@yinjie/i18n";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock } from "@yinjie/ui";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import { useCloudConsoleText } from "../lib/cloud-console-i18n";
+
+function formatTimestamp(value?: string | null) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return formatDateTime(date, { dateStyle: "medium", timeStyle: "short" });
+}
 
 export function InviteAuditPage() {
   const t = useCloudConsoleText();
@@ -92,7 +100,7 @@ export function InviteAuditPage() {
                     {t("Device:")} {item.inviteeDeviceFingerprint || "-"}
                   </div>
                   <div>
-                    {t("Created at:")} {item.createdAt}
+                    {t("Created at:")} {formatTimestamp(item.createdAt)}
                   </div>
                   {item.rejectReason ? (
                     <div>
