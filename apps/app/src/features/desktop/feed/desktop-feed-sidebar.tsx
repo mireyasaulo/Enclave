@@ -1,8 +1,14 @@
-import { type FeedPostWithComments } from "@yinjie/contracts";
+import {
+  type FeedComment,
+  type FeedPostWithComments,
+} from "@yinjie/contracts";
 import { Button } from "@yinjie/ui";
 import { Bot, PenSquare, UserRound } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
-import { DesktopFeedDetailPanel } from "./desktop-feed-detail-panel";
+import {
+  DesktopFeedDetailPanel,
+  type FeedCommentReplyTarget,
+} from "./desktop-feed-detail-panel";
 
 export type DesktopFeedAuthorSummary = {
   authorAvatar: string;
@@ -34,12 +40,15 @@ type DesktopFeedSidebarProps = {
   selectedPostId: string | null;
   totalPostsCount: number;
   aiReactedPostsCount: number;
+  commentReplyTarget?: FeedCommentReplyTarget | null;
   isPostFavorite: (postId: string) => boolean;
+  onCancelCommentReply?: () => void;
   onCloseDetail: () => void;
   onCommentChange: (postId: string, value: string) => void;
   onCommentSubmit: (postId: string) => void;
   onLike: (postId: string) => void;
   onOpenCompose: () => void;
+  onStartCommentReply?: (comment: FeedComment) => void;
   onToggleFavorite: (postId: string) => void;
 };
 
@@ -60,12 +69,15 @@ export function DesktopFeedSidebar({
   selectedPostId,
   totalPostsCount,
   aiReactedPostsCount,
+  commentReplyTarget = null,
   isPostFavorite,
+  onCancelCommentReply,
   onCloseDetail,
   onCommentChange,
   onCommentSubmit,
   onLike,
   onOpenCompose,
+  onStartCommentReply,
   onToggleFavorite,
 }: DesktopFeedSidebarProps) {
   if (mode === "detail" && selectedPostId) {
@@ -79,10 +91,17 @@ export function DesktopFeedSidebar({
           likeLoading={likePendingPostId === selectedPostId}
           loading={detailLoading}
           post={selectedPost}
+          replyTarget={
+            commentReplyTarget?.postId === selectedPostId
+              ? commentReplyTarget
+              : null
+          }
+          onCancelReply={onCancelCommentReply}
           onClose={onCloseDetail}
           onCommentChange={(value) => onCommentChange(selectedPostId, value)}
           onCommentSubmit={() => onCommentSubmit(selectedPostId)}
           onLike={() => onLike(selectedPostId)}
+          onStartReply={onStartCommentReply}
           onToggleFavorite={() => onToggleFavorite(selectedPostId)}
         />
       </aside>

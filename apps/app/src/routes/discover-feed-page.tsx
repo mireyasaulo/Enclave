@@ -22,6 +22,8 @@ import {
   getBlockedCharacters,
   getFeed,
   likeFeedPost,
+  replyFeedComment,
+  type FeedComment,
 } from "@yinjie/contracts";
 import { AppPage, Button, InlineNotice, TextField } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
@@ -91,6 +93,12 @@ export function DiscoverFeedPage() {
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>(
     {},
   );
+  const [desktopReplyTarget, setDesktopReplyTarget] = useState<{
+    authorId: string;
+    authorName: string;
+    commentId: string;
+    postId: string;
+  } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [notice, setNotice] = useState("");
   const [noticeTone, setNoticeTone] = useState<"success" | "info">("success");
@@ -166,26 +174,44 @@ export function DiscoverFeedPage() {
   });
 
   const commentMutation = useMutation({
-    mutationFn: (postId: string) => {
-      const text = commentDrafts[postId]?.trim();
+    mutationFn: (input: {
+      postId: string;
+      replyTarget?: {
+        authorId: string;
+        authorName: string;
+        commentId: string;
+        postId: string;
+      } | null;
+      text: string;
+    }) => {
+      const text = input.text.trim();
       if (!text) {
         throw new Error(t(msg`请先输入评论内容。`));
       }
 
-      return addFeedComment(
-        postId,
-        {
-          text,
-        },
-        baseUrl,
-      );
+      if (input.replyTarget) {
+        return replyFeedComment(
+          input.replyTarget.commentId,
+          { text },
+          baseUrl,
+        );
+      }
+
+      return addFeedComment(input.postId, { text }, baseUrl);
     },
-    onSuccess: async (_, postId) => {
-      setCommentDrafts((current) => ({ ...current, [postId]: "" }));
+    onSuccess: async (_, input) => {
+      setCommentDrafts((current) => ({ ...current, [input.postId]: "" }));
+      setDesktopReplyTarget((current) =>
+        current?.postId === input.postId ? null : current,
+      );
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice(t(msg`广场互动已更新。`));
+      setNotice(
+        input.replyTarget
+          ? t(msg`广场回复已发送。`)
+          : t(msg`广场互动已更新。`),
+      );
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
         queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] }),
@@ -193,11 +219,29 @@ export function DiscoverFeedPage() {
     },
   });
 
+  function submitComment(
+    postId: string,
+    options?: {
+      replyTarget?: {
+        authorId: string;
+        authorName: string;
+        commentId: string;
+        postId: string;
+      } | null;
+    },
+  ) {
+    commentMutation.mutate({
+      postId,
+      replyTarget: options?.replyTarget ?? null,
+      text: commentDrafts[postId] ?? "",
+    });
+  }
+
   const pendingLikePostId = likeMutation.isPending
     ? likeMutation.variables
     : null;
   const pendingCommentPostId = commentMutation.isPending
-    ? commentMutation.variables
+    ? (commentMutation.variables?.postId ?? null)
     : null;
   const blockedCharacterIds = new Set(
     (blockedQuery.data ?? []).map((item) => item.characterId),
@@ -552,13 +596,25 @@ export function DiscoverFeedPage() {
             favoriteSourceIds.includes(`feed-${postId}`)
           }
           setShowCompose={setShowCompose}
+          commentReplyTarget={desktopReplyTarget}
+          onCancelCommentReply={() => setDesktopReplyTarget(null)}
           onCommentChange={(postId, value) =>
             setCommentDrafts((current) => ({
               ...current,
               [postId]: value,
             }))
           }
-          onCommentSubmit={(postId) => commentMutation.mutate(postId)}
+          onCommentSubmit={(postId) =>
+            submitComment(postId, { replyTarget: desktopReplyTarget })
+          }
+          onStartCommentReply={(comment: FeedComment) =>
+            setDesktopReplyTarget({
+              authorId: comment.authorId,
+              authorName: comment.authorName,
+              commentId: comment.id,
+              postId: comment.postId,
+            })
+          }
           onCreate={() => createMutation.mutate()}
           onImageFilesSelected={(files) => {
             void handleImageFilesSelected(files);
@@ -945,7 +1001,7 @@ export function DiscoverFeedPage() {
                         !(commentDrafts[post.id] ?? "").trim() ||
                         commentMutation.isPending
                       }
-                      onClick={() => commentMutation.mutate(post.id)}
+                      onClick={() => submitComment(post.id)}
                       variant="primary"
                       size="sm"
                       className="h-8 px-3 text-[12px]"

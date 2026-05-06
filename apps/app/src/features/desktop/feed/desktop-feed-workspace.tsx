@@ -1,8 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getFeedPost, type FeedPostListItem } from "@yinjie/contracts";
+import {
+  getFeedPost,
+  type FeedComment,
+  type FeedPostListItem,
+} from "@yinjie/contracts";
 import { parseTimestamp } from "../../../lib/format";
 import { DesktopFeedComposePanel } from "./desktop-feed-compose-panel";
+import { type FeedCommentReplyTarget } from "./desktop-feed-detail-panel";
 import { DesktopFeedList } from "./desktop-feed-list";
 import {
   DesktopFeedSidebar,
@@ -37,11 +42,14 @@ type DesktopFeedWorkspaceProps = {
   successNotice?: string;
   text: string;
   videoDraft: MomentVideoDraft | null;
+  commentReplyTarget?: FeedCommentReplyTarget | null;
   isPostFavorite: (postId: string) => boolean;
   setShowCompose: (nextValue: boolean) => void;
+  onCancelCommentReply?: () => void;
   onCommentChange: (postId: string, value: string) => void;
   onCommentSubmit: (postId: string) => void;
   onCreate: () => void;
+  onStartCommentReply?: (comment: FeedComment) => void;
   onImageFilesSelected: (files: FileList | null) => void;
   onLike: (postId: string) => void;
   onRemoveImage: (id: string) => void;
@@ -75,12 +83,15 @@ export function DesktopFeedWorkspace({
   successNotice,
   text,
   videoDraft,
+  commentReplyTarget = null,
   isPostFavorite,
   setShowCompose,
+  onCancelCommentReply,
   onCommentChange,
   onCommentSubmit,
   onCreate,
   onImageFilesSelected,
+  onStartCommentReply,
   onLike,
   onRemoveImage,
   onRemoveVideo,
@@ -230,6 +241,7 @@ export function DesktopFeedWorkspace({
         authorSummaries={authorSummaries}
         commentDrafts={commentDrafts}
         commentPendingPostId={commentPendingPostId}
+        commentReplyTarget={commentReplyTarget}
         detailErrorMessage={
           selectedPostQuery.isError && selectedPostQuery.error instanceof Error
             ? selectedPostQuery.error.message
@@ -248,11 +260,13 @@ export function DesktopFeedWorkspace({
         totalPostsCount={posts.length}
         aiReactedPostsCount={aiReactedPostsCount}
         isPostFavorite={isPostFavorite}
+        onCancelCommentReply={onCancelCommentReply}
         onCloseDetail={() => setSelectedPostId(null)}
         onCommentChange={onCommentChange}
         onCommentSubmit={onCommentSubmit}
         onLike={onLike}
         onOpenCompose={() => setShowCompose(true)}
+        onStartCommentReply={onStartCommentReply}
         onToggleFavorite={onToggleFavorite}
       />
 

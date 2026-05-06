@@ -14,8 +14,10 @@ import {
   getMyCloudWorldAccessSession,
   getWorldOwner,
   resolveMyCloudWorldAccess,
+  sendCloudEmailCode,
   sendCloudPhoneCode,
   updateWorldOwner,
+  verifyCloudEmailCode,
   verifyCloudPhoneCode,
   type WorldAccessSessionSummary,
 } from "@yinjie/contracts";
@@ -259,6 +261,8 @@ export function WelcomePage() {
   const [localApiBaseUrl, setLocalApiBaseUrl] = useState(resolveDefaultLocalApiBaseUrl(runtimeConfig.apiBaseUrl) ?? "");
   const [phone, setPhone] = useState(savedCloudPhone ?? runtimeConfig.cloudPhone ?? "");
   const [code, setCode] = useState("");
+  const [accountType, setAccountType] = useState<"phone" | "email">("phone");
+  const [email, setEmail] = useState("");
   const [cloudAccessToken, setCloudAccessToken] = useState(
     !isCloudSessionExpired(savedCloudExpiresAt) ? savedCloudAccessToken ?? "" : "",
   );
@@ -526,6 +530,27 @@ export function WelcomePage() {
     },
   });
 
+  const sendEmailCodeMutation = useMutation({
+    mutationFn: () =>
+      sendCloudEmailCode(
+        { email: email.trim().toLowerCase() },
+        normalizedCloudApiBaseUrl || undefined,
+      ),
+    onSuccess: (result) => {
+      setEmail(result.email);
+      setCode(result.debugCode ?? "");
+      setCloudAccessToken("");
+      setCloudAccessSessionId(null);
+      setConnectedAccessSessionId(null);
+      setNotice(
+        result.debugCode
+          ? t(msg`开发模式：验证码已打印到服务端日志。`)
+          : t(msg`验证码已发送，请查收邮箱（含垃圾邮件箱）。`),
+      );
+      setEntryError("");
+    },
+  });
+
   function chooseMode(nextMode: WorldAccessMode) {
     if (nextMode === "local" && !localWorldEntryEnabled) {
       return;
@@ -583,8 +608,12 @@ export function WelcomePage() {
   }
 
   async function continueWithCloudWorld() {
-    if (!phone.trim()) {
+    if (accountType === "phone" && !phone.trim()) {
       setEntryError(t(msg`请输入手机号。`));
+      return;
+    }
+    if (accountType === "email" && !email.trim()) {
+      setEntryError(t(msg`请输入邮箱。`));
       return;
     }
 
@@ -602,26 +631,49 @@ export function WelcomePage() {
       let verifiedPhone = phone.trim();
 
       if (!accessToken) {
-        const verifyResult = await verifyCloudPhoneCode(
-          {
-            phone: phone.trim(),
-            code: code.trim(),
-            inviteCode: inviteCode || undefined,
-            deviceFingerprint: getDeviceFingerprint(),
-          },
-          normalizedCloudApiBaseUrl || undefined,
-        );
+        if (accountType === "email") {
+          const verifyResult = await verifyCloudEmailCode(
+            {
+              email: email.trim().toLowerCase(),
+              code: code.trim(),
+              inviteCode: inviteCode || undefined,
+              deviceFingerprint: getDeviceFingerprint(),
+            },
+            normalizedCloudApiBaseUrl || undefined,
+          );
 
-        accessToken = verifyResult.accessToken;
-        verifiedPhone = verifyResult.phone;
-        setPhone(verifyResult.phone);
-        setCloudAccessToken(verifyResult.accessToken);
-        saveCloudSession({
-          accessToken: verifyResult.accessToken,
-          expiresAt: verifyResult.expiresAt,
-          phone: verifyResult.phone,
-          profile: null,
-        });
+          accessToken = verifyResult.accessToken;
+          verifiedPhone = "";
+          setEmail(verifyResult.email);
+          setCloudAccessToken(verifyResult.accessToken);
+          saveCloudSession({
+            accessToken: verifyResult.accessToken,
+            expiresAt: verifyResult.expiresAt,
+            phone: null,
+            profile: null,
+          });
+        } else {
+          const verifyResult = await verifyCloudPhoneCode(
+            {
+              phone: phone.trim(),
+              code: code.trim(),
+              inviteCode: inviteCode || undefined,
+              deviceFingerprint: getDeviceFingerprint(),
+            },
+            normalizedCloudApiBaseUrl || undefined,
+          );
+
+          accessToken = verifyResult.accessToken;
+          verifiedPhone = verifyResult.phone;
+          setPhone(verifyResult.phone);
+          setCloudAccessToken(verifyResult.accessToken);
+          saveCloudSession({
+            accessToken: verifyResult.accessToken,
+            expiresAt: verifyResult.expiresAt,
+            phone: verifyResult.phone,
+            profile: null,
+          });
+        }
       }
 
       const session = await resolveMyCloudWorldAccess(
@@ -731,23 +783,79 @@ export function WelcomePage() {
     if (mode === "cloud") {
       return (
         <div className="space-y-4">
-          <label className="block space-y-2">
-            <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
-              {t(msg`手机号`)}
-            </span>
-            <TextField
-              value={phone}
-              onChange={(event) => {
-                setPhone(event.target.value);
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant={accountType === "phone" ? "primary" : "ghost"}
+              onClick={() => {
+                setAccountType("phone");
                 setCode("");
+                setEntryError("");
                 setCloudAccessToken("");
                 setCloudAccessSessionId(null);
                 setConnectedAccessSessionId(null);
-                setEntryError("");
               }}
-              placeholder={t(msg`请输入手机号`)}
-            />
-          </label>
+              size="md"
+              className="flex-1"
+            >
+              {t(msg`手机号`)}
+            </Button>
+            <Button
+              type="button"
+              variant={accountType === "email" ? "primary" : "ghost"}
+              onClick={() => {
+                setAccountType("email");
+                setCode("");
+                setEntryError("");
+                setCloudAccessToken("");
+                setCloudAccessSessionId(null);
+                setConnectedAccessSessionId(null);
+              }}
+              size="md"
+              className="flex-1"
+            >
+              {t(msg`邮箱`)}
+            </Button>
+          </div>
+
+          {accountType === "phone" ? (
+            <label className="block space-y-2">
+              <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+                {t(msg`手机号`)}
+              </span>
+              <TextField
+                value={phone}
+                onChange={(event) => {
+                  setPhone(event.target.value);
+                  setCode("");
+                  setCloudAccessToken("");
+                  setCloudAccessSessionId(null);
+                  setConnectedAccessSessionId(null);
+                  setEntryError("");
+                }}
+                placeholder={t(msg`请输入手机号`)}
+              />
+            </label>
+          ) : (
+            <label className="block space-y-2">
+              <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+                {t(msg`邮箱`)}
+              </span>
+              <TextField
+                type="email"
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setCode("");
+                  setCloudAccessToken("");
+                  setCloudAccessSessionId(null);
+                  setConnectedAccessSessionId(null);
+                  setEntryError("");
+                }}
+                placeholder={t(msg`you@example.com`)}
+              />
+            </label>
+          )}
 
           <div className="space-y-2">
             <span className="block text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
@@ -761,17 +869,33 @@ export function WelcomePage() {
                     setCode(event.target.value);
                     setEntryError("");
                   }}
-                  placeholder={t(msg`请输入验证码（默认 123456 即可通过）`)}
+                  placeholder={
+                    accountType === "phone"
+                      ? t(msg`请输入验证码（默认 123456 即可通过）`)
+                      : t(msg`请输入邮箱收到的 6 位验证码`)
+                  }
                 />
               </div>
               <Button
-                onClick={() => sendCodeMutation.mutate()}
-                disabled={!phone.trim() || sendCodeMutation.isPending}
+                onClick={() =>
+                  accountType === "phone"
+                    ? sendCodeMutation.mutate()
+                    : sendEmailCodeMutation.mutate()
+                }
+                disabled={
+                  accountType === "phone"
+                    ? !phone.trim() || sendCodeMutation.isPending
+                    : !email.trim() || sendEmailCodeMutation.isPending
+                }
                 variant="secondary"
                 size="lg"
                 className="shrink-0 rounded-2xl border-black/5 bg-[#f5f5f5] px-5 shadow-none hover:border-[rgba(7,193,96,0.16)] hover:bg-white"
               >
-                {sendCodeMutation.isPending
+                {(
+                  accountType === "phone"
+                    ? sendCodeMutation.isPending
+                    : sendEmailCodeMutation.isPending
+                )
                   ? t(msg`发送中...`)
                   : t(msg`发送验证码`)}
               </Button>
