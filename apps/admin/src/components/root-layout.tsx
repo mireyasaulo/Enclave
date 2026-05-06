@@ -37,7 +37,14 @@ export function RootLayout() {
     () => resolveBreadcrumb(location.pathname),
     [activationVersion, locale, location.pathname],
   );
-  const navItems = useMemo(() => resolveNavItems(), [activationVersion, locale]);
+  const navGroups = useMemo(
+    () => resolveNavItems(),
+    [activationVersion, locale],
+  );
+  const activeGroupId = useMemo(
+    () => findActiveGroupId(location.pathname, navGroups),
+    [location.pathname, navGroups],
+  );
   const digitalHumanSummary = useMemo(
     () => buildDigitalHumanAdminSummary(statusQuery.data?.digitalHumanGateway),
     [activationVersion, locale, statusQuery.data?.digitalHumanGateway],
@@ -123,7 +130,8 @@ export function RootLayout() {
               )}
               digitalHumanSummary={digitalHumanSummary}
               ownerCount={statusQuery.data?.worldSurface.ownerCount ?? null}
-              navLinks={navItems}
+              navGroups={navGroups}
+              activeGroupId={activeGroupId}
             />
           }
           topbar={
@@ -150,83 +158,145 @@ function resolveNavItems() {
 
   return [
     {
-      to: "/",
-      label: t(msg`运行总览`),
-      hint: t(msg`实例健康、Provider、诊断和运维动作的统一入口。`),
+      id: "ops",
+      label: t(msg`运营`),
+      iconName: "gauge" as const,
+      items: [
+        {
+          to: "/" as const,
+          label: t(msg`运行总览`),
+          hint: t(msg`实例健康、Provider、诊断和运维动作的统一入口。`),
+        },
+        {
+          to: "/setup" as const,
+          label: t(msg`运行设置`),
+          hint: t(msg`补齐推理 Provider、实例连通性和运行前置条件。`),
+        },
+        {
+          to: "/token-usage" as const,
+          label: t(msg`Token 用量`),
+          hint: t(msg`查看 AI 请求、Token 花费、预算预警和价格配置。`),
+        },
+        {
+          to: "/evals" as const,
+          label: t(msg`评测分析`),
+          hint: t(msg`集中查看 runs、compare 和 trace。`),
+        },
+      ],
     },
     {
-      to: "/characters",
-      label: t(msg`角色中心`),
-      hint: t(msg`查看角色名册、角色工厂和运行逻辑台。`),
+      id: "characters",
+      label: t(msg`角色与内容`),
+      iconName: "users" as const,
+      items: [
+        {
+          to: "/characters" as const,
+          label: t(msg`角色中心`),
+          hint: t(msg`查看角色名册、角色工厂和运行逻辑台。`),
+        },
+        {
+          to: "/games" as const,
+          label: t(msg`游戏目录`),
+          hint: t(msg`查看 AI 游戏中心目录、来源结构和当前审核状态。`),
+        },
+        {
+          to: "/chat-records" as const,
+          label: t(msg`聊天记录`),
+          hint: t(
+            msg`回看世界主人与角色的真实单聊样本、搜索命中和会话成本。`,
+          ),
+        },
+        {
+          to: "/real-world-sync" as const,
+          label: t(msg`现实联动`),
+          roleBadge: t(msg`承接：界闻/联动角色`),
+          hint: t(
+            msg`查看角色现实新闻同步、每日 digest、scene patch 和现实发圈锚点。`,
+          ),
+        },
+      ],
     },
     {
-      to: "/inference",
-      label: t(msg`模型与路由`),
-      hint: t(msg`管理 Provider 账户、模型目录、默认路由和模型角色批量安装。`),
+      id: "models",
+      label: t(msg`智能与模型`),
+      iconName: "sparkles" as const,
+      items: [
+        {
+          to: "/inference" as const,
+          label: t(msg`模型与路由`),
+          hint: t(
+            msg`管理 Provider 账户、模型目录、默认路由和模型角色批量安装。`,
+          ),
+        },
+        {
+          to: "/reply-logic" as const,
+          label: t(msg`回复逻辑`),
+          hint: t(msg`围绕角色、会话和全局规则排查回复链路。`),
+        },
+        {
+          to: "/need-discovery" as const,
+          label: t(msg`需求发现`),
+          hint: t(msg`配置短期/长期角色生成策略，并查看候选与运行记录。`),
+        },
+        {
+          to: "/cyber-avatar" as const,
+          label: t(msg`赛博分身`),
+          hint: t(msg`查看行为信号、画像状态、投影提示词与建模运行记录。`),
+        },
+      ],
     },
     {
-      to: "/games",
-      label: t(msg`游戏目录`),
-      hint: t(msg`查看 AI 游戏中心目录、来源结构和当前审核状态。`),
-    },
-    {
-      to: "/chat-records",
-      label: t(msg`聊天记录`),
-      hint: t(msg`回看世界主人与角色的真实单聊样本、搜索命中和会话成本。`),
-    },
-    {
-      to: "/need-discovery",
-      label: t(msg`需求发现`),
-      hint: t(msg`配置短期/长期角色生成策略，并查看候选与运行记录。`),
-    },
-    {
-      to: "/followup-runtime",
-      label: t(msg`主动跟进`),
-      roleBadge: t(msg`承接：我自己`),
-      hint: t(msg`配置我自己回捞未闭环事项的规则、Prompt 和推荐链路。`),
-    },
-    {
-      to: "/self-agent",
-      label: t(msg`主代理`),
-      roleBadge: t(msg`承接：我自己主代理`),
-      hint: t(msg`查看 self-agent workspace、heartbeat、standing orders 和近期巡检记录。`),
-    },
-    {
-      to: "/reminder-runtime",
-      label: t(msg`提醒运行时`),
-      roleBadge: t(msg`承接：小盯`),
-      hint: t(
-        msg`查看小盯的活跃提醒、最近触发 / 完成、私聊出站与轻提醒发圈记录。`,
-      ),
-    },
-    {
-      to: "/token-usage",
-      label: t(msg`Token 用量`),
-      hint: t(msg`查看 AI 请求、Token 花费、预算预警和价格配置。`),
-    },
-    {
-      to: "/action-runtime",
-      label: t(msg`真实世界动作`),
-      roleBadge: t(msg`承接：行动助理`),
-      hint: t(msg`查看行动助理的动作门控、连接器、规则和执行轨迹。`),
-    },
-    {
-      to: "/cyber-avatar",
-      label: t(msg`赛博分身`),
-      hint: t(msg`查看行为信号、画像状态、投影提示词与建模运行记录。`),
-    },
-    {
-      to: "/real-world-sync",
-      label: t(msg`现实联动`),
-      roleBadge: t(msg`承接：界闻/联动角色`),
-      hint: t(
-        msg`查看角色现实新闻同步、每日 digest、scene patch 和现实发圈锚点。`,
-      ),
-    },
-    {
-      to: "/evals",
-      label: t(msg`评测分析`),
-      hint: t(msg`集中查看 runs、compare 和 trace。`),
+      id: "runtimes",
+      label: t(msg`运行时`),
+      iconName: "cpu" as const,
+      items: [
+        {
+          to: "/followup-runtime" as const,
+          label: t(msg`主动跟进`),
+          roleBadge: t(msg`承接：我自己`),
+          hint: t(msg`配置我自己回捞未闭环事项的规则、Prompt 和推荐链路。`),
+        },
+        {
+          to: "/self-agent" as const,
+          label: t(msg`主代理`),
+          roleBadge: t(msg`承接：我自己主代理`),
+          hint: t(
+            msg`查看 self-agent workspace、heartbeat、standing orders 和近期巡检记录。`,
+          ),
+        },
+        {
+          to: "/reminder-runtime" as const,
+          label: t(msg`提醒运行时`),
+          roleBadge: t(msg`承接：小盯`),
+          hint: t(
+            msg`查看小盯的活跃提醒、最近触发 / 完成、私聊出站与轻提醒发圈记录。`,
+          ),
+        },
+        {
+          to: "/action-runtime" as const,
+          label: t(msg`真实世界动作`),
+          roleBadge: t(msg`承接：行动助理`),
+          hint: t(msg`查看行动助理的动作门控、连接器、规则和执行轨迹。`),
+        },
+      ],
     },
   ] as const;
+}
+
+export function findActiveGroupId(
+  pathname: string,
+  groups: ReturnType<typeof resolveNavItems>,
+): string | null {
+  for (const group of groups) {
+    for (const item of group.items) {
+      if (
+        item.to === pathname ||
+        (item.to !== "/" && pathname.startsWith(item.to + "/"))
+      ) {
+        return group.id;
+      }
+    }
+  }
+  if (pathname.startsWith("/characters/")) return "characters";
+  return null;
 }
