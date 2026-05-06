@@ -158,11 +158,13 @@ test("accepts typing in moments comment composers", async ({ page }) => {
 
   const desktopCard = page.locator(`#desktop-moment-post-${moment.id}`);
   await expect(desktopCard).toBeVisible();
-  await desktopCard.getByRole("button", { name: "评论" }).click();
   const desktopInput = desktopCard.getByPlaceholder("写评论...");
-  await expect(desktopInput).toBeFocused();
-  await page.keyboard.type("桌面端评论输入");
+  await expect(desktopInput).toBeVisible();
+  await desktopInput.fill("桌面端评论输入");
   await expect(desktopInput).toHaveValue("桌面端评论输入");
+  await desktopCard.getByRole("button", { name: "发送" }).click();
+  await expect(desktopInput).toHaveValue("");
+  await expect(desktopCard.getByText("桌面端评论输入")).toBeVisible();
 });
 
 async function createSmokeMoment(text: string) {
