@@ -20,6 +20,7 @@ import { WikiRateLimitGuard } from './guards/wiki-rate-limit.guard';
 import { WikiRoleGuard } from './guards/wiki-role.guard';
 import { AbuseFilterService } from './services/abuse-filter.service';
 import { AbuseFilterController } from './controllers/abuse-filter.controller';
+import { WikiSystemUserService } from './services/wiki-system-user.service';
 import { WikiPageService } from './services/wiki-page.service';
 import { WikiEditService } from './services/wiki-edit.service';
 import { WikiReviewService } from './services/wiki-review.service';
@@ -85,6 +86,7 @@ import { WikiReportController } from './controllers/wiki-report.controller';
     WikiWatchlistService,
     WikiReportService,
     AbuseFilterService,
+    WikiSystemUserService,
     WikiRoleGuard,
     WikiRateLimitGuard,
   ],

@@ -12,7 +12,10 @@ import { CharacterRevisionEntity } from '../entities/character-revision.entity';
 import { EditSubmissionEntity } from '../entities/edit-submission.entity';
 import { UserWikiProfileEntity } from '../entities/user-wiki-profile.entity';
 import { WikiEditService } from './wiki-edit.service';
+import { WikiProtectionService } from './wiki-protection.service';
 import { WikiRoleService } from './wiki-role.service';
+import { WikiSystemUserService } from './wiki-system-user.service';
+import { rankOf } from '../guards/wiki-role.guard';
 
 export type ReviewDecisionInput = {
   decision: 'approve' | 'reject' | 'request_changes';
@@ -34,6 +37,8 @@ export class WikiReviewService {
     private readonly profileRepo: Repository<UserWikiProfileEntity>,
     private readonly edits: WikiEditService,
     private readonly roles: WikiRoleService,
+    private readonly protection: WikiProtectionService,
+    private readonly systemUsers: WikiSystemUserService,
   ) {}
 
   async listPending(limit?: number): Promise<
@@ -316,6 +321,7 @@ export class WikiReviewService {
     if (!input.toRevisionId) {
       throw new BadRequestException('缺少 toRevisionId');
     }
+    await this.assert3RR(characterId, reviewer);
     const target = await this.revisionRepo.findOne({
       where: { id: input.toRevisionId },
     });
@@ -443,6 +449,66 @@ export class WikiReviewService {
       await this.edits.applyApprovedRevision(newRev, reviewer.id);
     }
 
+    await this.maybeAutoLock(characterId);
+
     return { revisionId: newRev.id, version: newRev.version };
+  }
+
+  /**
+   * Wikipedia 3RR 风格规则：
+   *   (A) 同一 patroller 在 24h 内对同一 character revert > 3 次 → 拒绝。admin 例外。
+   * 与 maybeAutoLock 配套防编辑战。
+   */
+  private async assert3RR(
+    characterId: string,
+    reviewer: AuthenticatedUser,
+  ): Promise<void> {
+    if (rankOf(reviewer.role) >= rankOf('admin')) return;
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const count = await this.revisionRepo.count({
+      where: {
+        characterId,
+        operation: 'revert',
+        editorUserId: reviewer.id,
+        createdAt: MoreThan(cutoff),
+      },
+    });
+    if (count >= 3) {
+      throw new ForbiddenException(
+        '24 小时内已对该词条回退 3 次（3RR）。请改为讨论页协商或申请管理员介入',
+      );
+    }
+  }
+
+  /**
+   * (B) 同一 character 在 24h 内被 revert > 5 次 → 自动 semi 保护 24h。
+   * 已是 semi/full 的页面不重复升级。
+   */
+  private async maybeAutoLock(characterId: string): Promise<void> {
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const count = await this.revisionRepo.count({
+      where: {
+        characterId,
+        operation: 'revert',
+        createdAt: MoreThan(cutoff),
+      },
+    });
+    if (count <= 5) return;
+    const page = await this.pageRepo.findOne({ where: { characterId } });
+    if (!page || page.protectionLevel !== 'none') return;
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    try {
+      await this.protection.setProtection(
+        characterId,
+        this.systemUsers.systemActor() as AuthenticatedUser,
+        {
+          level: 'semi',
+          expiresAt: expiresAt.toISOString(),
+          reason: 'auto_3rr_lock: 24h 内 revert 次数过多，自动半保护 24 小时',
+        },
+      );
+    } catch {
+      // best-effort; never block the revert response on lock failure
+    }
   }
 }
