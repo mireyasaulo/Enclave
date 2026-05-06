@@ -5,13 +5,17 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import { Suspense, useEffect, useMemo, useState } from "react";
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
+import { LanguageSwitcher, translateRuntimeMessage } from "@yinjie/i18n";
 import { Button, LoadingBlock } from "@yinjie/ui";
-import { clearSession, hasRole, roleLabel } from "../lib/auth-store";
+import { clearSession, hasRole, useRoleLabel } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
 
 type NavItem = {
   to: string;
-  label: string;
+  label: MessageDescriptor;
   icon: string;
   /** True when the item should be highlighted given the current pathname. */
   match?: (pathname: string) => boolean;
@@ -20,17 +24,17 @@ type NavItem = {
 };
 
 type NavGroup = {
-  title: string;
+  title: MessageDescriptor;
   items: NavItem[];
 };
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    title: "浏览",
+    title: msg`浏览`,
     items: [
       {
         to: "/",
-        label: "角色目录",
+        label: msg`角色目录`,
         icon: "📚",
         match: (p) =>
           p === "/" ||
@@ -39,82 +43,82 @@ const NAV_GROUPS: NavGroup[] = [
       },
       {
         to: "/recent-changes",
-        label: "最近修改",
+        label: msg`最近修改`,
         icon: "🕘",
         show: () => true,
       },
       {
         to: "/search",
-        label: "搜索",
+        label: msg`搜索`,
         icon: "🔍",
         show: () => true,
       },
     ],
   },
   {
-    title: "编辑",
+    title: msg`编辑`,
     items: [
       {
         to: "/create",
-        label: "创建角色",
+        label: msg`创建角色`,
         icon: "✨",
         show: (u) => !!u,
       },
       {
         to: "/watchlist",
-        label: "我的观察列表",
+        label: msg`我的观察列表`,
         icon: "👁",
         show: (u) => !!u,
       },
     ],
   },
   {
-    title: "巡查",
+    title: msg`巡查`,
     items: [
       {
         to: "/pending-reviews",
-        label: "待审编辑",
+        label: msg`待审编辑`,
         icon: "📝",
         show: (u) => hasRole(u, "patroller"),
       },
     ],
   },
   {
-    title: "管理",
+    title: msg`管理`,
     items: [
       {
         to: "/admin/users",
-        label: "用户与权限",
+        label: msg`用户与权限`,
         icon: "👤",
         show: (u) => hasRole(u, "admin"),
       },
       {
         to: "/admin/blocks",
-        label: "封禁",
+        label: msg`封禁`,
         icon: "⛔",
         show: (u) => hasRole(u, "admin"),
       },
       {
         to: "/admin/protection",
-        label: "页面保护",
+        label: msg`页面保护`,
         icon: "🛡",
         show: (u) => hasRole(u, "admin"),
       },
       {
         to: "/admin/reports",
-        label: "举报队列",
+        label: msg`举报队列`,
         icon: "🚩",
         show: (u) => hasRole(u, "admin"),
       },
       {
         to: "/admin/abuse-filters",
-        label: "反破坏过滤器",
+        label: msg`反破坏过滤器`,
         icon: "🧪",
         show: (u) => hasRole(u, "admin"),
       },
       {
         to: "/admin/wiki-stats",
-        label: "治理仪表盘",
+        label: msg`治理仪表盘`,
         icon: "📊",
         show: (u) => hasRole(u, "admin"),
       },
@@ -123,7 +127,9 @@ const NAV_GROUPS: NavGroup[] = [
 ];
 
 export function RootLayout() {
+  const t = translateRuntimeMessage;
   const { user } = useAuth();
+  const roleLabel = useRoleLabel();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [q, setQ] = useState("");
@@ -157,7 +163,7 @@ export function RootLayout() {
           <button
             type="button"
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[color:var(--border-subtle)] bg-white text-lg lg:hidden"
-            aria-label="打开导航"
+            aria-label={t(msg`打开导航`)}
             onClick={() => setMobileNavOpen((v) => !v)}
           >
             ☰
@@ -167,12 +173,14 @@ export function RootLayout() {
             className="flex min-w-0 items-center gap-2 text-base font-semibold sm:text-lg"
           >
             <span className="grid h-9 w-9 place-items-center rounded-2xl bg-[image:var(--brand-gradient)] text-base text-[color:var(--text-on-brand)] shadow-[var(--shadow-card)]">
-              隐
+              <Trans>隐</Trans>
             </span>
             <span className="hidden truncate sm:inline">
-              隐界世界角色管理平台
+              <Trans>隐界世界角色管理平台</Trans>
             </span>
-            <span className="truncate sm:hidden">隐界角色管理</span>
+            <span className="truncate sm:hidden">
+              <Trans>隐界角色管理</Trans>
+            </span>
           </Link>
           <form
             className="ml-auto hidden flex-1 max-w-md md:block"
@@ -186,12 +194,13 @@ export function RootLayout() {
                 type="search"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="搜索角色词条…（回车）"
+                placeholder={t(msg`搜索角色词条…（回车）`)}
                 className="h-10 w-full rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-input)] pl-9 pr-3 text-sm shadow-[var(--shadow-soft)] outline-none focus:border-[color:var(--brand-primary)]"
               />
             </div>
           </form>
           <div className="ml-auto flex items-center gap-2 md:ml-4">
+            <LanguageSwitcher variant="compact" description={null} />
             {user ? (
               <>
                 <div className="hidden text-right text-xs leading-tight md:block">
@@ -210,7 +219,7 @@ export function RootLayout() {
                     window.location.href = "/login";
                   }}
                 >
-                  退出
+                  <Trans>退出</Trans>
                 </Button>
               </>
             ) : (
@@ -220,14 +229,14 @@ export function RootLayout() {
                   size="sm"
                   onClick={() => void navigate({ to: "/login" })}
                 >
-                  登录
+                  <Trans>登录</Trans>
                 </Button>
                 <Button
                   variant="primary"
                   size="sm"
                   onClick={() => void navigate({ to: "/register" })}
                 >
-                  注册
+                  <Trans>注册</Trans>
                 </Button>
               </>
             )}
@@ -244,7 +253,7 @@ export function RootLayout() {
                 type="search"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="搜索词条…"
+                placeholder={t(msg`搜索词条…`)}
                 className="h-10 w-full rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-input)] pl-9 pr-3 text-sm shadow-[var(--shadow-soft)] outline-none focus:border-[color:var(--brand-primary)]"
               />
             </div>
@@ -274,7 +283,10 @@ export function RootLayout() {
       </div>
 
       <footer className="border-t border-[color:var(--border-subtle)] py-4 text-center text-xs text-[color:var(--text-muted)]">
-        隐界世界角色管理平台 · 任何登录用户都可以提交角色创建、编辑和生命周期变更，由巡查员审核生效
+        <Trans>
+          隐界世界角色管理平台 ·
+          任何登录用户都可以提交角色创建、编辑和生命周期变更，由巡查员审核生效
+        </Trans>
       </footer>
     </div>
   );
@@ -287,41 +299,45 @@ function NavList({
   groups: NavGroup[];
   pathname: string;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <nav className="space-y-5">
-      {groups.map((group) => (
-        <div key={group.title}>
-          <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
-            {group.title}
+      {groups.map((group) => {
+        const groupTitle = t(group.title);
+        return (
+          <div key={groupTitle}>
+            <div className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+              {groupTitle}
+            </div>
+            <ul className="space-y-0.5">
+              {group.items.map((item) => {
+                const active = item.match
+                  ? item.match(pathname)
+                  : pathname === item.to ||
+                    pathname.startsWith(`${item.to}/`);
+                return (
+                  <li key={item.to}>
+                    <Link
+                      to={item.to}
+                      aria-current={active ? "page" : undefined}
+                      className={`flex items-center gap-3 rounded-2xl px-3 py-2 text-sm transition-colors ${
+                        active
+                          ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)] shadow-[var(--shadow-soft)]"
+                          : "text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
+                      }`}
+                    >
+                      <span aria-hidden className="text-base leading-none">
+                        {item.icon}
+                      </span>
+                      <span className="truncate">{t(item.label)}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
-          <ul className="space-y-0.5">
-            {group.items.map((item) => {
-              const active = item.match
-                ? item.match(pathname)
-                : pathname === item.to ||
-                  pathname.startsWith(`${item.to}/`);
-              return (
-                <li key={item.to}>
-                  <Link
-                    to={item.to}
-                    aria-current={active ? "page" : undefined}
-                    className={`flex items-center gap-3 rounded-2xl px-3 py-2 text-sm transition-colors ${
-                      active
-                        ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)] shadow-[var(--shadow-soft)]"
-                        : "text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
-                    }`}
-                  >
-                    <span aria-hidden className="text-base leading-none">
-                      {item.icon}
-                    </span>
-                    <span className="truncate">{item.label}</span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ))}
+        );
+      })}
     </nav>
   );
 }

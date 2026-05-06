@@ -1,6 +1,10 @@
 import { useState } from "react";
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   Button,
   Card,
@@ -19,6 +23,7 @@ import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
 
 export function PendingReviewsPage() {
+  const t = translateRuntimeMessage;
   const { user } = useAuth();
   const qc = useQueryClient();
   const [operation, setOperation] = useState("");
@@ -50,16 +55,18 @@ export function PendingReviewsPage() {
 
   if (!user) {
     return (
-      <PageShell eyebrow="审核" title="待审编辑">
-        <Card className="p-6 text-sm">请先登录。</Card>
+      <PageShell eyebrow={t(msg`审核`)} title={t(msg`待审编辑`)}>
+        <Card className="p-6 text-sm">
+          <Trans>请先登录。</Trans>
+        </Card>
       </PageShell>
     );
   }
   if (!hasRole(user, "patroller")) {
     return (
-      <PageShell eyebrow="审核" title="待审编辑">
+      <PageShell eyebrow={t(msg`审核`)} title={t(msg`待审编辑`)}>
         <InlineNotice tone="warning">
-          仅巡查员及以上可访问待审编辑队列。
+          <Trans>仅巡查员及以上可访问待审编辑队列。</Trans>
         </InlineNotice>
       </PageShell>
     );
@@ -68,42 +75,48 @@ export function PendingReviewsPage() {
   const items = pendingQ.data ?? [];
   return (
     <PageShell
-      eyebrow="审核"
-      title={`待审编辑${items.length > 0 ? `（${items.length}）` : ""}`}
-      description="所有等待巡查的提交。可按操作类型、修订类型、风险等级筛选；快速通过 / 要求修改 / 驳回。"
+      eyebrow={t(msg`审核`)}
+      title={
+        items.length > 0
+          ? t(msg`待审编辑（${items.length}）`)
+          : t(msg`待审编辑`)
+      }
+      description={t(
+        msg`所有等待巡查的提交。可按操作类型、修订类型、风险等级筛选；快速通过 / 要求修改 / 驳回。`,
+      )}
     >
       <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-3 text-sm shadow-[var(--shadow-soft)]">
         <FilterSelect
-          label="操作"
+          label={t(msg`操作`)}
           value={operation}
           onChange={setOperation}
           options={[
-            ["", "全部"],
-            ["create", "创建"],
-            ["edit", "编辑"],
-            ["soft_delete", "删除"],
-            ["restore", "恢复"],
+            ["", msg`全部`],
+            ["create", msg`创建`],
+            ["edit", msg`编辑`],
+            ["soft_delete", msg`删除`],
+            ["restore", msg`恢复`],
           ]}
         />
         <FilterSelect
-          label="类型"
+          label={t(msg`类型`)}
           value={revisionKind}
           onChange={setRevisionKind}
           options={[
-            ["", "全部"],
-            ["content", "档案"],
-            ["recipe", "逻辑"],
-            ["lifecycle", "生命周期"],
+            ["", msg`全部`],
+            ["content", msg`档案`],
+            ["recipe", msg`逻辑`],
+            ["lifecycle", msg`生命周期`],
           ]}
         />
         <FilterSelect
-          label="风险"
+          label={t(msg`风险`)}
           value={riskLevel}
           onChange={setRiskLevel}
           options={[
-            ["", "全部"],
-            ["low", "低风险"],
-            ["high", "高风险"],
+            ["", msg`全部`],
+            ["low", msg`低风险`],
+            ["high", msg`高风险`],
           ]}
         />
       </div>
@@ -112,7 +125,7 @@ export function PendingReviewsPage() {
         <ErrorBlock message={(pendingQ.error as Error).message} />
       )}
       {!pendingQ.isLoading && items.length === 0 && (
-        <PanelEmpty message="待审队列为空，喘口气吧 ☕。" />
+        <PanelEmpty message={t(msg`待审队列为空，喘口气吧 ☕。`)} />
       )}
       <ul className="space-y-3">
         {items.map((item) => (
@@ -144,8 +157,9 @@ function FilterSelect({
   label: string;
   value: string;
   onChange: (next: string) => void;
-  options: [string, string][];
+  options: [string, MessageDescriptor][];
 }) {
+  const t = translateRuntimeMessage;
   return (
     <label className="flex items-center gap-2">
       <span className="text-xs text-[color:var(--text-muted)]">{label}</span>
@@ -156,7 +170,7 @@ function FilterSelect({
       >
         {options.map(([v, l]) => (
           <option key={v} value={v}>
-            {l}
+            {t(l)}
           </option>
         ))}
       </select>
@@ -176,6 +190,7 @@ function ReviewCard({
   ) => void;
   loading: boolean;
 }) {
+  const t = translateRuntimeMessage;
   const [note, setNote] = useState("");
   const rev = item.revision;
   const isHigh = rev.riskLevel === "high";
@@ -198,23 +213,31 @@ function ReviewCard({
         <StatusPill>v{rev.version}</StatusPill>
         <StatusPill>{rev.operation}</StatusPill>
         <StatusPill>{rev.revisionKind}</StatusPill>
-        {isHigh && <StatusPill>高风险</StatusPill>}
+        {isHigh && (
+          <StatusPill>
+            <Trans>高风险</Trans>
+          </StatusPill>
+        )}
         <span className="ml-auto text-xs text-[color:var(--text-muted)]">
-          由 {rev.editorUserId}（{rev.editorRoleAtTime}）提交于{" "}
-          {new Date(rev.createdAt).toLocaleString()}
+          <Trans>
+            由 {rev.editorUserId}（{rev.editorRoleAtTime}）提交于{" "}
+            {new Date(rev.createdAt).toLocaleString()}
+          </Trans>
         </span>
       </div>
       <div className="space-y-3 px-4 py-4 text-sm">
         {rev.editSummary && (
           <div>
             <span className="text-xs text-[color:var(--text-muted)]">
-              摘要
+              <Trans>摘要</Trans>
             </span>
             <div className="mt-0.5 leading-6">{rev.editSummary}</div>
           </div>
         )}
         <div className="text-xs text-[color:var(--text-muted)]">
-          改动字段：{rev.diffFromParent?.changed?.join(", ") ?? "—"}
+          <Trans>
+            改动字段：{rev.diffFromParent?.changed?.join(", ") ?? "—"}
+          </Trans>
         </div>
         <div className="rounded-xl border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas)] p-3">
           <SnapshotDiff
@@ -225,7 +248,7 @@ function ReviewCard({
         </div>
         <details className="text-xs">
           <summary className="cursor-pointer text-[color:var(--text-muted)]">
-            查看完整快照
+            <Trans>查看完整快照</Trans>
           </summary>
           <pre className="mt-2 overflow-x-auto rounded bg-[var(--bg-canvas)] p-3">
             {JSON.stringify(rev.contentSnapshot, null, 2)}
@@ -234,7 +257,7 @@ function ReviewCard({
         {rev.recipeSnapshot && (
           <details className="text-xs">
             <summary className="cursor-pointer text-[color:var(--text-muted)]">
-              查看角色逻辑快照
+              <Trans>查看角色逻辑快照</Trans>
             </summary>
             <pre className="mt-2 overflow-x-auto rounded bg-[var(--bg-canvas)] p-3">
               {JSON.stringify(rev.recipeSnapshot, null, 2)}
@@ -242,13 +265,13 @@ function ReviewCard({
           </details>
         )}
         <FormRow
-          label="审核备注（可选）"
-          hint="留给提交者的反馈。要求修改 / 驳回时建议填写"
+          label={t(msg`审核备注（可选）`)}
+          hint={t(msg`留给提交者的反馈。要求修改 / 驳回时建议填写`)}
         >
           <TextField
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="例如：请补充背景说明"
+            placeholder={t(msg`例如：请补充背景说明`)}
           />
         </FormRow>
       </div>
@@ -259,7 +282,7 @@ function ReviewCard({
           disabled={loading}
           onClick={() => onDecide("approve", note || undefined)}
         >
-          ✓ 通过
+          <Trans>✓ 通过</Trans>
         </Button>
         <Button
           variant="secondary"
@@ -267,7 +290,7 @@ function ReviewCard({
           disabled={loading}
           onClick={() => onDecide("request_changes", note || undefined)}
         >
-          要求修改
+          <Trans>要求修改</Trans>
         </Button>
         <Button
           variant="danger"
@@ -275,7 +298,7 @@ function ReviewCard({
           disabled={loading}
           onClick={() => onDecide("reject", note || undefined)}
         >
-          驳回
+          <Trans>驳回</Trans>
         </Button>
       </div>
     </div>

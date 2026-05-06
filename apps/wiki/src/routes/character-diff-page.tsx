@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Link, useParams, useSearch } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Card, ErrorBlock, LoadingBlock, StatusPill } from "@yinjie/ui";
@@ -16,7 +17,9 @@ export function CharacterDiffPage() {
   if (!search.from || !search.to) {
     return (
       <Card className="p-6">
-        <p className="text-sm text-[var(--text-muted)]">缺少对比版本参数。</p>
+        <p className="text-sm text-[var(--text-muted)]">
+          <Trans>缺少对比版本参数。</Trans>
+        </p>
       </Card>
     );
   }
@@ -35,13 +38,17 @@ export function CharacterDiffPage() {
           params={{ characterId: data.to.characterId }}
           className="text-sm underline text-[var(--text-muted)]"
         >
-          返回词条
+          <Trans>返回词条</Trans>
         </Link>
         <h1 className="text-xl font-semibold">
-          v{data.from.version} 对比 v{data.to.version}
+          <Trans>v{data.from.version} 对比 v{data.to.version}</Trans>
         </h1>
         <StatusPill>{data.to.operation}</StatusPill>
-        {data.to.riskLevel === "high" && <StatusPill>高风险</StatusPill>}
+        {data.to.riskLevel === "high" && (
+          <StatusPill>
+            <Trans>高风险</Trans>
+          </StatusPill>
+        )}
       </div>
       <Card className="p-4 space-y-4">
         <SnapshotDiff
@@ -52,13 +59,17 @@ export function CharacterDiffPage() {
         {(data.from.recipeSnapshot || data.to.recipeSnapshot) && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 text-xs">
             <div>
-              <h2 className="font-medium mb-2">旧角色逻辑</h2>
+              <h2 className="font-medium mb-2">
+                <Trans>旧角色逻辑</Trans>
+              </h2>
               <pre className="p-3 rounded bg-[var(--bg-canvas)] overflow-x-auto">
                 {JSON.stringify(data.from.recipeSnapshot ?? null, null, 2)}
               </pre>
             </div>
             <div>
-              <h2 className="font-medium mb-2">新角色逻辑</h2>
+              <h2 className="font-medium mb-2">
+                <Trans>新角色逻辑</Trans>
+              </h2>
               <pre className="p-3 rounded bg-[var(--bg-canvas)] overflow-x-auto">
                 {JSON.stringify(data.to.recipeSnapshot ?? null, null, 2)}
               </pre>

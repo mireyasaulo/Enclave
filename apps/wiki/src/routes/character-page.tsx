@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
 import { Link, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CharacterBlueprintRecipe } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   AppSection,
   Button,
@@ -34,6 +37,7 @@ import { FormRow } from "../components/form-row";
 type Tab = "read" | "edit" | "history" | "talk";
 
 export function CharacterPage() {
+  const t = translateRuntimeMessage;
   const { characterId } = useParams({ from: "/character/$characterId" });
   const { user } = useAuth();
   const qc = useQueryClient();
@@ -73,28 +77,40 @@ export function CharacterPage() {
       <div className="flex flex-wrap items-center gap-3">
         <div className="inline-flex rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-1 shadow-[var(--shadow-soft)]">
           <TabButton active={tab === "read"} onClick={() => setTab("read")}>
-            阅读
+            <Trans>阅读</Trans>
           </TabButton>
           <TabButton active={tab === "edit"} onClick={() => setTab("edit")}>
-            编辑
+            <Trans>编辑</Trans>
           </TabButton>
           <TabButton
             active={tab === "history"}
             onClick={() => setTab("history")}
           >
-            历史
+            <Trans>历史</Trans>
           </TabButton>
           <TabButton active={tab === "talk"} onClick={() => setTab("talk")}>
-            讨论
+            <Trans>讨论</Trans>
           </TabButton>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
           {pageQ.data && (
             <ProtectionInfo level={pageQ.data.page.protectionLevel} />
           )}
-          {isDeleted && <StatusPill>已删除</StatusPill>}
-          {isPendingCreate && <StatusPill>待创建</StatusPill>}
-          {pageQ.data?.pendingRevision && <StatusPill>有待审版本</StatusPill>}
+          {isDeleted && (
+            <StatusPill>
+              <Trans>已删除</Trans>
+            </StatusPill>
+          )}
+          {isPendingCreate && (
+            <StatusPill>
+              <Trans>待创建</Trans>
+            </StatusPill>
+          )}
+          {pageQ.data?.pendingRevision && (
+            <StatusPill>
+              <Trans>有待审版本</Trans>
+            </StatusPill>
+          )}
           {viewerCanSeeCurrent &&
             pageQ.data?.latestRevision?.id !==
               pageQ.data?.stableRevision?.id && (
@@ -108,7 +124,7 @@ export function CharacterPage() {
                   }`}
                   onClick={() => setViewMode("stable")}
                 >
-                  稳定版
+                  <Trans>稳定版</Trans>
                 </button>
                 <button
                   type="button"
@@ -119,7 +135,7 @@ export function CharacterPage() {
                   }`}
                   onClick={() => setViewMode("current")}
                 >
-                  最新版
+                  <Trans>最新版</Trans>
                 </button>
               </div>
             )}
@@ -131,7 +147,7 @@ export function CharacterPage() {
               disabled={softDeleteMut.isPending}
               onClick={() => setShowLifecycleForm((value) => !value)}
             >
-              {isDeleted ? "申请恢复" : "申请删除"}
+              {isDeleted ? t(msg`申请恢复`) : t(msg`申请删除`)}
             </Button>
           )}
         </div>
@@ -141,7 +157,7 @@ export function CharacterPage() {
         <Card className="p-4 space-y-3">
           <label className="block">
             <span className="text-sm mb-1 block">
-              {isDeleted ? "恢复理由" : "删除理由"}
+              {isDeleted ? t(msg`恢复理由`) : t(msg`删除理由`)}
             </span>
             <TextAreaField
               rows={3}
@@ -149,8 +165,8 @@ export function CharacterPage() {
               onChange={(event) => setLifecycleReason(event.target.value)}
               placeholder={
                 isDeleted
-                  ? "说明为什么这个角色词条应恢复"
-                  : "说明为什么这个角色词条应归档为红链"
+                  ? t(msg`说明为什么这个角色词条应恢复`)
+                  : t(msg`说明为什么这个角色词条应归档为红链`)
               }
             />
           </label>
@@ -167,17 +183,17 @@ export function CharacterPage() {
               onClick={() => softDeleteMut.mutate(lifecycleReason.trim())}
             >
               {softDeleteMut.isPending
-                ? "提交中..."
+                ? t(msg`提交中...`)
                 : isDeleted
-                  ? "提交恢复申请"
-                  : "提交删除申请"}
+                  ? t(msg`提交恢复申请`)
+                  : t(msg`提交删除申请`)}
             </Button>
             <Button
               size="sm"
               variant="ghost"
               onClick={() => setShowLifecycleForm(false)}
             >
-              取消
+              <Trans>取消</Trans>
             </Button>
           </div>
         </Card>
@@ -185,14 +201,20 @@ export function CharacterPage() {
 
       {isDeleted && (
         <InlineNotice tone="danger">
-          <strong>此词条已被软删除（红链）。</strong>
-          恢复也按编辑审核流提交，底层角色数据保留以保持运行时引用一致。
+          <strong>
+            <Trans>此词条已被软删除（红链）。</Trans>
+          </strong>
+          <Trans>
+            恢复也按编辑审核流提交，底层角色数据保留以保持运行时引用一致。
+          </Trans>
         </InlineNotice>
       )}
 
       {isPendingCreate && (
         <InlineNotice tone="warning">
-          此角色仍在待创建队列中。巡查员通过创建版本后，才会写入运行时角色注册表。
+          <Trans>
+            此角色仍在待创建队列中。巡查员通过创建版本后，才会写入运行时角色注册表。
+          </Trans>
         </InlineNotice>
       )}
 
@@ -257,15 +279,17 @@ function TabButton({
 }
 
 function ProtectionInfo({ level }: { level: string }) {
+  const t = translateRuntimeMessage;
   if (level === "none") return null;
   return (
     <StatusPill className="ml-auto">
-      {level === "semi" ? "半保护" : "完全保护"}
+      {level === "semi" ? t(msg`半保护`) : t(msg`完全保护`)}
     </StatusPill>
   );
 }
 
 function ReadView({ view }: { view: WikiPageView }) {
+  const t = translateRuntimeMessage;
   const c = view.content;
   const recipe = view.recipe;
   return (
@@ -285,10 +309,12 @@ function ReadView({ view }: { view: WikiPageView }) {
           </div>
         </div>
       </header>
-      <Section label="简介">{c.bio || "—"}</Section>
-      {c.personality && <Section label="性格">{c.personality}</Section>}
+      <Section label={t(msg`简介`)}>{c.bio || "—"}</Section>
+      {c.personality && (
+        <Section label={t(msg`性格`)}>{c.personality}</Section>
+      )}
       {c.expertDomains.length > 0 && (
-        <Section label="专长领域">
+        <Section label={t(msg`专长领域`)}>
           <div className="flex flex-wrap gap-2">
             {c.expertDomains.map((d) => (
               <TagBadge key={d}>{d}</TagBadge>
@@ -297,7 +323,7 @@ function ReadView({ view }: { view: WikiPageView }) {
         </Section>
       )}
       {c.triggerScenes && c.triggerScenes.length > 0 && (
-        <Section label="触发场景">
+        <Section label={t(msg`触发场景`)}>
           <div className="flex flex-wrap gap-2">
             {c.triggerScenes.map((s) => (
               <TagBadge key={s}>{s}</TagBadge>
@@ -307,25 +333,25 @@ function ReadView({ view }: { view: WikiPageView }) {
       )}
       {recipe && (
         <>
-          <Section label="核心逻辑">
+          <Section label={t(msg`核心逻辑`)}>
             {recipe.prompting.coreLogic || "—"}
           </Section>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Section label="聊天 Prompt">
+            <Section label={t(msg`聊天 Prompt`)}>
               {recipe.prompting.scenePrompts.chat || "—"}
             </Section>
-            <Section label="主动触达 Prompt">
+            <Section label={t(msg`主动触达 Prompt`)}>
               {recipe.prompting.scenePrompts.proactive || "—"}
             </Section>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Section label="发圈频率">
+            <Section label={t(msg`发圈频率`)}>
               {recipe.lifeStrategy.momentsFrequency}
             </Section>
-            <Section label="广场频率">
+            <Section label={t(msg`广场频率`)}>
               {recipe.lifeStrategy.feedFrequency}
             </Section>
-            <Section label="活跃时段">
+            <Section label={t(msg`活跃时段`)}>
               {recipe.lifeStrategy.activeHoursStart ?? "—"}-
               {recipe.lifeStrategy.activeHoursEnd ?? "—"}
             </Section>
@@ -334,20 +360,24 @@ function ReadView({ view }: { view: WikiPageView }) {
       )}
       {view.pendingRevision && (
         <InlineNotice tone="info">
-          有 {view.pendingRevisions.length} 个待审版本，最新为：
+          <Trans>
+            有 {view.pendingRevisions.length} 个待审版本，最新为：
+          </Trans>
           <strong className="mx-1">v{view.pendingRevision.version}</strong>
           {view.pendingRevision.operation} / {view.pendingRevision.riskLevel}
         </InlineNotice>
       )}
       <footer className="text-xs text-[var(--text-muted)] pt-3 border-t border-[var(--border-subtle)]">
-        {view.viewMode === "current" ? "最新版" : "稳定版"}：
+        {view.viewMode === "current" ? t(msg`最新版`) : t(msg`稳定版`)}：
         {view.currentRevision
-          ? `v${view.currentRevision.version} · 由 ${view.currentRevision.editorUserId} 提交于 ${new Date(view.currentRevision.createdAt).toLocaleString()}`
-          : "尚未有 wiki 版本（显示后台原始数据）"}
+          ? t(
+              msg`v${view.currentRevision.version} · 由 ${view.currentRevision.editorUserId} 提交于 ${new Date(view.currentRevision.createdAt).toLocaleString()}`,
+            )
+          : t(msg`尚未有 wiki 版本（显示后台原始数据）`)}
         {view.stableRevision &&
           view.latestRevision &&
           view.stableRevision.id !== view.latestRevision.id &&
-          ` · 稳定版 v${view.stableRevision.version} / 最新版 v${view.latestRevision.version}`}
+          ` · ${t(msg`稳定版 v${view.stableRevision.version} / 最新版 v${view.latestRevision.version}`)}`}
       </footer>
     </Card>
   );
@@ -379,6 +409,7 @@ function EditView({
   view: WikiPageView;
   onSubmitted: () => void;
 }) {
+  const t = translateRuntimeMessage;
   const { user } = useAuth();
   const initial = useMemo<WikiContentSnapshot>(
     () => ({
@@ -428,8 +459,8 @@ function EditView({
       setConflict(null);
       setInfo(
         res.appliedToCharacter
-          ? "修改已直接生效（自动确认/巡查员/管理员）"
-          : "修改已提交，等待巡查员审核",
+          ? t(msg`修改已直接生效（自动确认/巡查员/管理员）`)
+          : t(msg`修改已提交，等待巡查员审核`),
       );
       setTimeout(onSubmitted, 800);
     },
@@ -445,7 +476,9 @@ function EditView({
             }
           | null;
         if (payload?.currentRecipeSnapshot) {
-          setError("角色逻辑存在并发修改，请刷新页面后基于最新版本重新编辑。");
+          setError(
+            t(msg`角色逻辑存在并发修改，请刷新页面后基于最新版本重新编辑。`),
+          );
           return;
         }
         if (
@@ -469,7 +502,9 @@ function EditView({
   if (!user) {
     return (
       <Card className="p-6">
-        <p>请先登录后再编辑。</p>
+        <p>
+          <Trans>请先登录后再编辑。</Trans>
+        </p>
       </Card>
     );
   }
@@ -477,27 +512,31 @@ function EditView({
   return (
     <Card className="p-6 space-y-4">
       <p className="text-sm text-[var(--text-muted)]">
-        当前你的权限是<strong className="mx-1">{user.role}</strong>
-        。内容字段和角色逻辑都走同一套版本、冲突检测和巡查审核。
+        <Trans>
+          当前你的权限是<strong className="mx-1">{user.role}</strong>
+          。内容字段和角色逻辑都走同一套版本、冲突检测和巡查审核。
+        </Trans>
       </p>
       {view.pendingRevision && (
         <InlineNotice tone="warning">
-          ⚠ 当前已有待审版本 v{view.pendingRevision.version}，继续提交可能触发编辑冲突。
+          <Trans>
+            ⚠ 当前已有待审版本 v{view.pendingRevision.version}，继续提交可能触发编辑冲突。
+          </Trans>
         </InlineNotice>
       )}
-      <FormRow label="名称">
+      <FormRow label={t(msg`名称`)}>
         <TextField
           value={draft.name}
           onChange={(e) => setDraft({ ...draft, name: e.target.value })}
         />
       </FormRow>
-      <FormRow label="头像 URL">
+      <FormRow label={t(msg`头像 URL`)}>
         <TextField
           value={draft.avatar}
           onChange={(e) => setDraft({ ...draft, avatar: e.target.value })}
         />
       </FormRow>
-      <FormRow label="关系描述">
+      <FormRow label={t(msg`关系描述`)}>
         <TextField
           value={draft.relationship}
           onChange={(e) =>
@@ -505,7 +544,7 @@ function EditView({
           }
         />
       </FormRow>
-      <FormRow label="关系类型">
+      <FormRow label={t(msg`关系类型`)}>
         <TextField
           value={draft.relationshipType}
           onChange={(e) =>
@@ -513,14 +552,14 @@ function EditView({
           }
         />
       </FormRow>
-      <FormRow label="角色简介（bio）">
+      <FormRow label={t(msg`角色简介（bio）`)}>
         <TextAreaField
           rows={4}
           value={draft.bio}
           onChange={(e) => setDraft({ ...draft, bio: e.target.value })}
         />
       </FormRow>
-      <FormRow label="性格 ⚠ 影响 AI 行为">
+      <FormRow label={t(msg`性格 ⚠ 影响 AI 行为`)}>
         <TextAreaField
           rows={3}
           value={draft.personality ?? ""}
@@ -529,7 +568,7 @@ function EditView({
           }
         />
       </FormRow>
-      <FormRow label="专长领域（逗号分隔） ⚠ 影响 AI 行为">
+      <FormRow label={t(msg`专长领域（逗号分隔） ⚠ 影响 AI 行为`)}>
         <TextField
           value={draft.expertDomains.join(", ")}
           onChange={(e) =>
@@ -543,7 +582,7 @@ function EditView({
           }
         />
       </FormRow>
-      <FormRow label="触发场景（逗号分隔） ⚠ 影响 AI 行为">
+      <FormRow label={t(msg`触发场景（逗号分隔） ⚠ 影响 AI 行为`)}>
         <TextField
           value={(draft.triggerScenes ?? []).join(", ")}
           onChange={(e) =>
@@ -567,13 +606,15 @@ function EditView({
         />
       )}
       <FormRow
-        label="修改摘要"
-        hint="高风险字段（人格/记忆/逻辑等）、创建词条、生命周期变更要求 ≥10 字"
+        label={t(msg`修改摘要`)}
+        hint={t(
+          msg`高风险字段（人格/记忆/逻辑等）、创建词条、生命周期变更要求 ≥10 字`,
+        )}
       >
         <TextField
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
-          placeholder="例如：补充了职业信息"
+          placeholder={t(msg`例如：补充了职业信息`)}
           maxLength={500}
         />
       </FormRow>
@@ -583,7 +624,7 @@ function EditView({
           checked={isMinor}
           onChange={(e) => setIsMinor(e.target.checked)}
         />
-        小修改（错别字、格式调整等）
+        <Trans>小修改（错别字、格式调整等）</Trans>
       </label>
       {error && <InlineNotice tone="danger">{error}</InlineNotice>}
       {info && <InlineNotice tone="success">{info}</InlineNotice>}
@@ -610,7 +651,7 @@ function EditView({
           disabled={submitMut.isPending || !!conflict}
           onClick={() => submitMut.mutate(undefined)}
         >
-          {submitMut.isPending ? "提交中..." : "提交编辑"}
+          {submitMut.isPending ? t(msg`提交中...`) : t(msg`提交编辑`)}
         </Button>
       </div>
     </Card>
@@ -682,6 +723,7 @@ export function LogicEditor({
   currentRole?: string;
   baselineRecipe?: CharacterBlueprintRecipe | null;
 }) {
+  const t = translateRuntimeMessage;
   const [realityLinkText, setRealityLinkText] = useState(() =>
     JSON.stringify(recipe.realityLink ?? null, null, 2),
   );
@@ -695,751 +737,761 @@ export function LogicEditor({
   return (
     <div className="space-y-4">
       <InlineNotice tone="warning">
-        ⚠ 以下字段会进入角色工厂发布流，属于影响运行时行为的高风险编辑。修改后请仔细核对。
+        <Trans>
+          ⚠ 以下字段会进入角色工厂发布流，属于影响运行时行为的高风险编辑。修改后请仔细核对。
+        </Trans>
       </InlineNotice>
       <LogicSection
-        title="身份"
-        description="角色的基础信息：职业、背景、动机、世界观。"
+        title={t(msg`身份`)}
+        description={t(msg`角色的基础信息：职业、背景、动机、世界观。`)}
       >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormRow label="职业 / 身份">
-          <TextField
-            value={recipe.identity.occupation}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                identity: {
-                  ...recipe.identity,
-                  occupation: event.target.value,
-                },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="活动频率">
-          <TextField
-            value={recipe.lifeStrategy.activityFrequency}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                lifeStrategy: {
-                  ...recipe.lifeStrategy,
-                  activityFrequency: event.target.value,
-                },
-              })
-            }
-          />
-        </FormRow>
-      </div>
-      <FormRow label="背景">
-        <TextAreaField
-          rows={3}
-          value={recipe.identity.background}
-          onChange={(event) =>
-            onChange({
-              ...recipe,
-              identity: { ...recipe.identity, background: event.target.value },
-            })
-          }
-        />
-      </FormRow>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormRow label="动机">
-          <TextAreaField
-            rows={3}
-            value={recipe.identity.motivation}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                identity: {
-                  ...recipe.identity,
-                  motivation: event.target.value,
-                },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="世界观">
-          <TextAreaField
-            rows={3}
-            value={recipe.identity.worldview}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                identity: {
-                  ...recipe.identity,
-                  worldview: event.target.value,
-                },
-              })
-            }
-          />
-        </FormRow>
-      </div>
-      </LogicSection>
-      <LogicSection
-        title="专长"
-        description="角色的知识范围、知识边界、拒答风格。"
-      >
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <FormRow label="专长说明">
-          <TextAreaField
-            rows={4}
-            value={recipe.expertise.expertiseDescription}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                expertise: {
-                  ...recipe.expertise,
-                  expertiseDescription: event.target.value,
-                },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="知识边界">
-          <TextAreaField
-            rows={4}
-            value={recipe.expertise.knowledgeLimits}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                expertise: {
-                  ...recipe.expertise,
-                  knowledgeLimits: event.target.value,
-                },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="拒答风格">
-          <TextAreaField
-            rows={4}
-            value={recipe.expertise.refusalStyle}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                expertise: {
-                  ...recipe.expertise,
-                  refusalStyle: event.target.value,
-                },
-              })
-            }
-          />
-        </FormRow>
-      </div>
-      </LogicSection>
-      <LogicSection
-        title="语气与人设"
-        description="决定 AI 说话风格、表达密度，以及 base / system prompt 的核心字段。"
-      >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormRow label="说话模式（逗号分隔）">
-          <TextField
-            value={recipe.tone.speechPatterns.join(", ")}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                tone: {
-                  ...recipe.tone,
-                  speechPatterns: splitList(event.target.value),
-                },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="兴趣主题（逗号分隔）">
-          <TextField
-            value={recipe.tone.topicsOfInterest.join(", ")}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                tone: {
-                  ...recipe.tone,
-                  topicsOfInterest: splitList(event.target.value),
-                },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="回复长度">
-          <select
-            className="w-full border rounded px-2 py-2 bg-white"
-            value={recipe.tone.responseLength}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                tone: {
-                  ...recipe.tone,
-                  responseLength: event.target
-                    .value as CharacterBlueprintRecipe["tone"]["responseLength"],
-                },
-              })
-            }
-          >
-            <option value="short">短</option>
-            <option value="medium">中</option>
-            <option value="long">长</option>
-          </select>
-        </FormRow>
-        <FormRow label="Emoji 使用">
-          <select
-            className="w-full border rounded px-2 py-2 bg-white"
-            value={recipe.tone.emojiUsage}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                tone: {
-                  ...recipe.tone,
-                  emojiUsage: event.target
-                    .value as CharacterBlueprintRecipe["tone"]["emojiUsage"],
-                },
-              })
-            }
-          >
-            <option value="none">不使用</option>
-            <option value="occasional">偶尔</option>
-            <option value="frequent">频繁</option>
-          </select>
-        </FormRow>
-        <FormRow label="工作风格">
-          <TextAreaField
-            rows={3}
-            value={recipe.tone.workStyle}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                tone: { ...recipe.tone, workStyle: event.target.value },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="社交风格">
-          <TextAreaField
-            rows={3}
-            value={recipe.tone.socialStyle}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                tone: { ...recipe.tone, socialStyle: event.target.value },
-              })
-            }
-          />
-        </FormRow>
-      </div>
-      <FormRow label="核心指令">
-        <TextAreaField
-          rows={4}
-          value={recipe.tone.coreDirective}
-          onChange={(event) =>
-            onChange({
-              ...recipe,
-              tone: { ...recipe.tone, coreDirective: event.target.value },
-            })
-          }
-        />
-      </FormRow>
-      <FormRow label="Base Prompt">
-        <TextAreaField
-          rows={5}
-          value={recipe.tone.basePrompt}
-          onChange={(event) =>
-            onChange({
-              ...recipe,
-              tone: { ...recipe.tone, basePrompt: event.target.value },
-            })
-          }
-        />
-      </FormRow>
-      <FormRow label="System Prompt">
-        <TextAreaField
-          rows={5}
-          value={recipe.tone.systemPrompt}
-          onChange={(event) =>
-            onChange({
-              ...recipe,
-              tone: { ...recipe.tone, systemPrompt: event.target.value },
-            })
-          }
-        />
-      </FormRow>
-      </LogicSection>
-      <LogicSection
-        title="提示词"
-        description="核心逻辑、各场景 prompt、ScenePrompt 预览。"
-      >
-      {characterId && (
-        <ScenePromptPreview
-          characterId={characterId}
-          recipe={recipe}
-          baselineRecipe={baselineRecipe ?? null}
-        />
-      )}
-      <FormRow
-        label="核心逻辑"
-        badge={
-          characterId ? (
-            <RiskBadge
-              characterId={characterId}
-              path="prompting.coreLogic"
-              currentRole={currentRole}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormRow label={t(msg`职业 / 身份`)}>
+            <TextField
+              value={recipe.identity.occupation}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  identity: {
+                    ...recipe.identity,
+                    occupation: event.target.value,
+                  },
+                })
+              }
             />
-          ) : undefined
-        }
-      >
-        <TextAreaField
-          rows={5}
-          value={recipe.prompting.coreLogic}
-          onChange={(event) =>
-            onChange({
-              ...recipe,
-              prompting: {
-                ...recipe.prompting,
-                coreLogic: event.target.value,
-              },
-            })
-          }
-        />
-      </FormRow>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ScenePromptField
-          label="聊天 Prompt"
-          scene="chat"
-          characterId={characterId}
-          currentRole={currentRole}
-          value={recipe.prompting.scenePrompts.chat}
-          onChange={(value) =>
-            onChange({
-              ...recipe,
-              prompting: {
-                ...recipe.prompting,
-                scenePrompts: {
-                  ...recipe.prompting.scenePrompts,
-                  chat: value,
-                },
-              },
-            })
-          }
-        />
-        <ScenePromptField
-          label="问候 Prompt"
-          scene="greeting"
-          characterId={characterId}
-          currentRole={currentRole}
-          value={recipe.prompting.scenePrompts.greeting}
-          onChange={(value) =>
-            onChange({
-              ...recipe,
-              prompting: {
-                ...recipe.prompting,
-                scenePrompts: {
-                  ...recipe.prompting.scenePrompts,
-                  greeting: value,
-                },
-              },
-            })
-          }
-        />
-        <ScenePromptField
-          label="主动触达 Prompt"
-          scene="proactive"
-          characterId={characterId}
-          currentRole={currentRole}
-          value={recipe.prompting.scenePrompts.proactive}
-          onChange={(value) =>
-            onChange({
-              ...recipe,
-              prompting: {
-                ...recipe.prompting,
-                scenePrompts: {
-                  ...recipe.prompting.scenePrompts,
-                  proactive: value,
-                },
-              },
-            })
-          }
-        />
-        <ScenePromptField
-          label="朋友圈 Prompt"
-          value={recipe.prompting.scenePrompts.moments_post}
-          onChange={(value) =>
-            onChange({
-              ...recipe,
-              prompting: {
-                ...recipe.prompting,
-                scenePrompts: {
-                  ...recipe.prompting.scenePrompts,
-                  moments_post: value,
-                },
-              },
-            })
-          }
-        />
-        <ScenePromptField
-          label="朋友圈评论 Prompt"
-          value={recipe.prompting.scenePrompts.moments_comment}
-          onChange={(value) =>
-            onChange({
-              ...recipe,
-              prompting: {
-                ...recipe.prompting,
-                scenePrompts: {
-                  ...recipe.prompting.scenePrompts,
-                  moments_comment: value,
-                },
-              },
-            })
-          }
-        />
-        <ScenePromptField
-          label="广场发帖 Prompt"
-          value={recipe.prompting.scenePrompts.feed_post}
-          onChange={(value) =>
-            onChange({
-              ...recipe,
-              prompting: {
-                ...recipe.prompting,
-                scenePrompts: {
-                  ...recipe.prompting.scenePrompts,
-                  feed_post: value,
-                },
-              },
-            })
-          }
-        />
-        <ScenePromptField
-          label="视频号内容 Prompt"
-          value={recipe.prompting.scenePrompts.channel_post}
-          onChange={(value) =>
-            onChange({
-              ...recipe,
-              prompting: {
-                ...recipe.prompting,
-                scenePrompts: {
-                  ...recipe.prompting.scenePrompts,
-                  channel_post: value,
-                },
-              },
-            })
-          }
-        />
-        <ScenePromptField
-          label="广场评论 Prompt"
-          value={recipe.prompting.scenePrompts.feed_comment}
-          onChange={(value) =>
-            onChange({
-              ...recipe,
-              prompting: {
-                ...recipe.prompting,
-                scenePrompts: {
-                  ...recipe.prompting.scenePrompts,
-                  feed_comment: value,
-                },
-              },
-            })
-          }
-        />
-      </div>
-      </LogicSection>
-      <LogicSection
-        title="记忆"
-        description="记忆摘要、核心记忆、近期摘要 prompt 与遗忘曲线。"
-      >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormRow label="记忆摘要">
+          </FormRow>
+          <FormRow label={t(msg`活动频率`)}>
+            <TextField
+              value={recipe.lifeStrategy.activityFrequency}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  lifeStrategy: {
+                    ...recipe.lifeStrategy,
+                    activityFrequency: event.target.value,
+                  },
+                })
+              }
+            />
+          </FormRow>
+        </div>
+        <FormRow label={t(msg`背景`)}>
           <TextAreaField
-            rows={4}
-            value={recipe.memorySeed.memorySummary}
+            rows={3}
+            value={recipe.identity.background}
             onChange={(event) =>
               onChange({
                 ...recipe,
-                memorySeed: {
-                  ...recipe.memorySeed,
-                  memorySummary: event.target.value,
-                },
+                identity: { ...recipe.identity, background: event.target.value },
               })
             }
           />
         </FormRow>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormRow label={t(msg`动机`)}>
+            <TextAreaField
+              rows={3}
+              value={recipe.identity.motivation}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  identity: {
+                    ...recipe.identity,
+                    motivation: event.target.value,
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`世界观`)}>
+            <TextAreaField
+              rows={3}
+              value={recipe.identity.worldview}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  identity: {
+                    ...recipe.identity,
+                    worldview: event.target.value,
+                  },
+                })
+              }
+            />
+          </FormRow>
+        </div>
+      </LogicSection>
+      <LogicSection
+        title={t(msg`专长`)}
+        description={t(msg`角色的知识范围、知识边界、拒答风格。`)}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <FormRow label={t(msg`专长说明`)}>
+            <TextAreaField
+              rows={4}
+              value={recipe.expertise.expertiseDescription}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  expertise: {
+                    ...recipe.expertise,
+                    expertiseDescription: event.target.value,
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`知识边界`)}>
+            <TextAreaField
+              rows={4}
+              value={recipe.expertise.knowledgeLimits}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  expertise: {
+                    ...recipe.expertise,
+                    knowledgeLimits: event.target.value,
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`拒答风格`)}>
+            <TextAreaField
+              rows={4}
+              value={recipe.expertise.refusalStyle}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  expertise: {
+                    ...recipe.expertise,
+                    refusalStyle: event.target.value,
+                  },
+                })
+              }
+            />
+          </FormRow>
+        </div>
+      </LogicSection>
+      <LogicSection
+        title={t(msg`语气与人设`)}
+        description={t(
+          msg`决定 AI 说话风格、表达密度，以及 base / system prompt 的核心字段。`,
+        )}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormRow label={t(msg`说话模式（逗号分隔）`)}>
+            <TextField
+              value={recipe.tone.speechPatterns.join(", ")}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  tone: {
+                    ...recipe.tone,
+                    speechPatterns: splitList(event.target.value),
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`兴趣主题（逗号分隔）`)}>
+            <TextField
+              value={recipe.tone.topicsOfInterest.join(", ")}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  tone: {
+                    ...recipe.tone,
+                    topicsOfInterest: splitList(event.target.value),
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`回复长度`)}>
+            <select
+              className="w-full border rounded px-2 py-2 bg-white"
+              value={recipe.tone.responseLength}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  tone: {
+                    ...recipe.tone,
+                    responseLength: event.target
+                      .value as CharacterBlueprintRecipe["tone"]["responseLength"],
+                  },
+                })
+              }
+            >
+              <option value="short">{t(msg`短`)}</option>
+              <option value="medium">{t(msg`中`)}</option>
+              <option value="long">{t(msg`长`)}</option>
+            </select>
+          </FormRow>
+          <FormRow label={t(msg`Emoji 使用`)}>
+            <select
+              className="w-full border rounded px-2 py-2 bg-white"
+              value={recipe.tone.emojiUsage}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  tone: {
+                    ...recipe.tone,
+                    emojiUsage: event.target
+                      .value as CharacterBlueprintRecipe["tone"]["emojiUsage"],
+                  },
+                })
+              }
+            >
+              <option value="none">{t(msg`不使用`)}</option>
+              <option value="occasional">{t(msg`偶尔`)}</option>
+              <option value="frequent">{t(msg`频繁`)}</option>
+            </select>
+          </FormRow>
+          <FormRow label={t(msg`工作风格`)}>
+            <TextAreaField
+              rows={3}
+              value={recipe.tone.workStyle}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  tone: { ...recipe.tone, workStyle: event.target.value },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`社交风格`)}>
+            <TextAreaField
+              rows={3}
+              value={recipe.tone.socialStyle}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  tone: { ...recipe.tone, socialStyle: event.target.value },
+                })
+              }
+            />
+          </FormRow>
+        </div>
+        <FormRow label={t(msg`核心指令`)}>
+          <TextAreaField
+            rows={4}
+            value={recipe.tone.coreDirective}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                tone: { ...recipe.tone, coreDirective: event.target.value },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label={t(msg`Base Prompt`)}>
+          <TextAreaField
+            rows={5}
+            value={recipe.tone.basePrompt}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                tone: { ...recipe.tone, basePrompt: event.target.value },
+              })
+            }
+          />
+        </FormRow>
+        <FormRow label={t(msg`System Prompt`)}>
+          <TextAreaField
+            rows={5}
+            value={recipe.tone.systemPrompt}
+            onChange={(event) =>
+              onChange({
+                ...recipe,
+                tone: { ...recipe.tone, systemPrompt: event.target.value },
+              })
+            }
+          />
+        </FormRow>
+      </LogicSection>
+      <LogicSection
+        title={t(msg`提示词`)}
+        description={t(msg`核心逻辑、各场景 prompt、ScenePrompt 预览。`)}
+      >
+        {characterId && (
+          <ScenePromptPreview
+            characterId={characterId}
+            recipe={recipe}
+            baselineRecipe={baselineRecipe ?? null}
+          />
+        )}
         <FormRow
-          label="核心记忆"
+          label={t(msg`核心逻辑`)}
           badge={
             characterId ? (
               <RiskBadge
                 characterId={characterId}
-                path="memorySeed.coreMemory"
+                path="prompting.coreLogic"
                 currentRole={currentRole}
               />
             ) : undefined
           }
         >
           <TextAreaField
-            rows={4}
-            value={recipe.memorySeed.coreMemory}
+            rows={5}
+            value={recipe.prompting.coreLogic}
             onChange={(event) =>
               onChange({
                 ...recipe,
-                memorySeed: {
-                  ...recipe.memorySeed,
-                  coreMemory: event.target.value,
+                prompting: {
+                  ...recipe.prompting,
+                  coreLogic: event.target.value,
                 },
               })
             }
           />
         </FormRow>
-        <FormRow label="近期摘要种子">
-          <TextAreaField
-            rows={4}
-            value={recipe.memorySeed.recentSummarySeed}
-            onChange={(event) =>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ScenePromptField
+            label={t(msg`聊天 Prompt`)}
+            scene="chat"
+            characterId={characterId}
+            currentRole={currentRole}
+            value={recipe.prompting.scenePrompts.chat}
+            onChange={(value) =>
               onChange({
                 ...recipe,
-                memorySeed: {
-                  ...recipe.memorySeed,
-                  recentSummarySeed: event.target.value,
+                prompting: {
+                  ...recipe.prompting,
+                  scenePrompts: {
+                    ...recipe.prompting.scenePrompts,
+                    chat: value,
+                  },
                 },
               })
             }
           />
-        </FormRow>
-        <FormRow label="遗忘曲线">
-          <TextField
-            type="number"
-            min={0}
-            max={100}
-            value={recipe.memorySeed.forgettingCurve}
-            onChange={(event) =>
+          <ScenePromptField
+            label={t(msg`问候 Prompt`)}
+            scene="greeting"
+            characterId={characterId}
+            currentRole={currentRole}
+            value={recipe.prompting.scenePrompts.greeting}
+            onChange={(value) =>
               onChange({
                 ...recipe,
-                memorySeed: {
-                  ...recipe.memorySeed,
-                  forgettingCurve: Math.min(
-                    Math.max(
-                      parseNonNegativeInt(
-                        event.target.value,
-                        recipe.memorySeed.forgettingCurve,
+                prompting: {
+                  ...recipe.prompting,
+                  scenePrompts: {
+                    ...recipe.prompting.scenePrompts,
+                    greeting: value,
+                  },
+                },
+              })
+            }
+          />
+          <ScenePromptField
+            label={t(msg`主动触达 Prompt`)}
+            scene="proactive"
+            characterId={characterId}
+            currentRole={currentRole}
+            value={recipe.prompting.scenePrompts.proactive}
+            onChange={(value) =>
+              onChange({
+                ...recipe,
+                prompting: {
+                  ...recipe.prompting,
+                  scenePrompts: {
+                    ...recipe.prompting.scenePrompts,
+                    proactive: value,
+                  },
+                },
+              })
+            }
+          />
+          <ScenePromptField
+            label={t(msg`朋友圈 Prompt`)}
+            value={recipe.prompting.scenePrompts.moments_post}
+            onChange={(value) =>
+              onChange({
+                ...recipe,
+                prompting: {
+                  ...recipe.prompting,
+                  scenePrompts: {
+                    ...recipe.prompting.scenePrompts,
+                    moments_post: value,
+                  },
+                },
+              })
+            }
+          />
+          <ScenePromptField
+            label={t(msg`朋友圈评论 Prompt`)}
+            value={recipe.prompting.scenePrompts.moments_comment}
+            onChange={(value) =>
+              onChange({
+                ...recipe,
+                prompting: {
+                  ...recipe.prompting,
+                  scenePrompts: {
+                    ...recipe.prompting.scenePrompts,
+                    moments_comment: value,
+                  },
+                },
+              })
+            }
+          />
+          <ScenePromptField
+            label={t(msg`广场发帖 Prompt`)}
+            value={recipe.prompting.scenePrompts.feed_post}
+            onChange={(value) =>
+              onChange({
+                ...recipe,
+                prompting: {
+                  ...recipe.prompting,
+                  scenePrompts: {
+                    ...recipe.prompting.scenePrompts,
+                    feed_post: value,
+                  },
+                },
+              })
+            }
+          />
+          <ScenePromptField
+            label={t(msg`视频号内容 Prompt`)}
+            value={recipe.prompting.scenePrompts.channel_post}
+            onChange={(value) =>
+              onChange({
+                ...recipe,
+                prompting: {
+                  ...recipe.prompting,
+                  scenePrompts: {
+                    ...recipe.prompting.scenePrompts,
+                    channel_post: value,
+                  },
+                },
+              })
+            }
+          />
+          <ScenePromptField
+            label={t(msg`广场评论 Prompt`)}
+            value={recipe.prompting.scenePrompts.feed_comment}
+            onChange={(value) =>
+              onChange({
+                ...recipe,
+                prompting: {
+                  ...recipe.prompting,
+                  scenePrompts: {
+                    ...recipe.prompting.scenePrompts,
+                    feed_comment: value,
+                  },
+                },
+              })
+            }
+          />
+        </div>
+      </LogicSection>
+      <LogicSection
+        title={t(msg`记忆`)}
+        description={t(msg`记忆摘要、核心记忆、近期摘要 prompt 与遗忘曲线。`)}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormRow label={t(msg`记忆摘要`)}>
+            <TextAreaField
+              rows={4}
+              value={recipe.memorySeed.memorySummary}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  memorySeed: {
+                    ...recipe.memorySeed,
+                    memorySummary: event.target.value,
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow
+            label={t(msg`核心记忆`)}
+            badge={
+              characterId ? (
+                <RiskBadge
+                  characterId={characterId}
+                  path="memorySeed.coreMemory"
+                  currentRole={currentRole}
+                />
+              ) : undefined
+            }
+          >
+            <TextAreaField
+              rows={4}
+              value={recipe.memorySeed.coreMemory}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  memorySeed: {
+                    ...recipe.memorySeed,
+                    coreMemory: event.target.value,
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`近期摘要种子`)}>
+            <TextAreaField
+              rows={4}
+              value={recipe.memorySeed.recentSummarySeed}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  memorySeed: {
+                    ...recipe.memorySeed,
+                    recentSummarySeed: event.target.value,
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`遗忘曲线`)}>
+            <TextField
+              type="number"
+              min={0}
+              max={100}
+              value={recipe.memorySeed.forgettingCurve}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  memorySeed: {
+                    ...recipe.memorySeed,
+                    forgettingCurve: Math.min(
+                      Math.max(
+                        parseNonNegativeInt(
+                          event.target.value,
+                          recipe.memorySeed.forgettingCurve,
+                        ),
+                        0,
                       ),
-                      0,
+                      100,
                     ),
-                    100,
-                  ),
-                },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="近期摘要 Prompt">
-          <TextAreaField
-            rows={4}
-            value={recipe.memorySeed.recentSummaryPrompt}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                memorySeed: {
-                  ...recipe.memorySeed,
-                  recentSummaryPrompt: event.target.value,
-                },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="核心记忆 Prompt">
-          <TextAreaField
-            rows={4}
-            value={recipe.memorySeed.coreMemoryPrompt}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                memorySeed: {
-                  ...recipe.memorySeed,
-                  coreMemoryPrompt: event.target.value,
-                },
-              })
-            }
-          />
-        </FormRow>
-      </div>
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`近期摘要 Prompt`)}>
+            <TextAreaField
+              rows={4}
+              value={recipe.memorySeed.recentSummaryPrompt}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  memorySeed: {
+                    ...recipe.memorySeed,
+                    recentSummaryPrompt: event.target.value,
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`核心记忆 Prompt`)}>
+            <TextAreaField
+              rows={4}
+              value={recipe.memorySeed.coreMemoryPrompt}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  memorySeed: {
+                    ...recipe.memorySeed,
+                    coreMemoryPrompt: event.target.value,
+                  },
+                })
+              }
+            />
+          </FormRow>
+        </div>
       </LogicSection>
       <LogicSection
-        title="生活策略与推理"
-        description="发圈/广场频率、活跃时段，以及 CoT / 反思 / 路由开关。"
+        title={t(msg`生活策略与推理`)}
+        description={t(
+          msg`发圈/广场频率、活跃时段，以及 CoT / 反思 / 路由开关。`,
+        )}
       >
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <FormRow label="发圈频率">
-          <TextField
-            type="number"
-            min={0}
-            value={recipe.lifeStrategy.momentsFrequency}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                lifeStrategy: {
-                  ...recipe.lifeStrategy,
-                  momentsFrequency: parseNonNegativeInt(
-                    event.target.value,
-                    recipe.lifeStrategy.momentsFrequency,
-                  ),
-                },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="广场频率">
-          <TextField
-            type="number"
-            min={0}
-            value={recipe.lifeStrategy.feedFrequency}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                lifeStrategy: {
-                  ...recipe.lifeStrategy,
-                  feedFrequency: parseNonNegativeInt(
-                    event.target.value,
-                    recipe.lifeStrategy.feedFrequency,
-                  ),
-                },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="活跃开始小时">
-          <TextField
-            type="number"
-            min={0}
-            max={23}
-            value={recipe.lifeStrategy.activeHoursStart ?? ""}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                lifeStrategy: {
-                  ...recipe.lifeStrategy,
-                  activeHoursStart: parseHour(event.target.value),
-                },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="活跃结束小时">
-          <TextField
-            type="number"
-            min={0}
-            max={23}
-            value={recipe.lifeStrategy.activeHoursEnd ?? ""}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                lifeStrategy: {
-                  ...recipe.lifeStrategy,
-                  activeHoursEnd: parseHour(event.target.value),
-                },
-              })
-            }
-          />
-        </FormRow>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={recipe.reasoning.enableCoT}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                reasoning: {
-                  ...recipe.reasoning,
-                  enableCoT: event.target.checked,
-                },
-              })
-            }
-          />
-          启用 CoT
-        </label>
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={recipe.reasoning.enableReflection}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                reasoning: {
-                  ...recipe.reasoning,
-                  enableReflection: event.target.checked,
-                },
-              })
-            }
-          />
-          启用反思
-        </label>
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={recipe.reasoning.enableRouting}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                reasoning: {
-                  ...recipe.reasoning,
-                  enableRouting: event.target.checked,
-                },
-              })
-            }
-          />
-          启用路由
-        </label>
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <FormRow label={t(msg`发圈频率`)}>
+            <TextField
+              type="number"
+              min={0}
+              value={recipe.lifeStrategy.momentsFrequency}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  lifeStrategy: {
+                    ...recipe.lifeStrategy,
+                    momentsFrequency: parseNonNegativeInt(
+                      event.target.value,
+                      recipe.lifeStrategy.momentsFrequency,
+                    ),
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`广场频率`)}>
+            <TextField
+              type="number"
+              min={0}
+              value={recipe.lifeStrategy.feedFrequency}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  lifeStrategy: {
+                    ...recipe.lifeStrategy,
+                    feedFrequency: parseNonNegativeInt(
+                      event.target.value,
+                      recipe.lifeStrategy.feedFrequency,
+                    ),
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`活跃开始小时`)}>
+            <TextField
+              type="number"
+              min={0}
+              max={23}
+              value={recipe.lifeStrategy.activeHoursStart ?? ""}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  lifeStrategy: {
+                    ...recipe.lifeStrategy,
+                    activeHoursStart: parseHour(event.target.value),
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`活跃结束小时`)}>
+            <TextField
+              type="number"
+              min={0}
+              max={23}
+              value={recipe.lifeStrategy.activeHoursEnd ?? ""}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  lifeStrategy: {
+                    ...recipe.lifeStrategy,
+                    activeHoursEnd: parseHour(event.target.value),
+                  },
+                })
+              }
+            />
+          </FormRow>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={recipe.reasoning.enableCoT}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  reasoning: {
+                    ...recipe.reasoning,
+                    enableCoT: event.target.checked,
+                  },
+                })
+              }
+            />
+            <Trans>启用 CoT</Trans>
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={recipe.reasoning.enableReflection}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  reasoning: {
+                    ...recipe.reasoning,
+                    enableReflection: event.target.checked,
+                  },
+                })
+              }
+            />
+            <Trans>启用反思</Trans>
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={recipe.reasoning.enableRouting}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  reasoning: {
+                    ...recipe.reasoning,
+                    enableRouting: event.target.checked,
+                  },
+                })
+              }
+            />
+            <Trans>启用路由</Trans>
+          </label>
+        </div>
       </LogicSection>
       <LogicSection
-        title="个性细节"
-        description="口头禅、禁忌、小癖好——通常是低风险但能让角色更立体的字段。"
+        title={t(msg`个性细节`)}
+        description={t(
+          msg`口头禅、禁忌、小癖好——通常是低风险但能让角色更立体的字段。`,
+        )}
       >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FormRow label="口头禅（逗号分隔）">
-          <TextField
-            value={recipe.tone.catchphrases.join(", ")}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                tone: {
-                  ...recipe.tone,
-                  catchphrases: splitList(event.target.value),
-                },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="禁忌（逗号分隔）">
-          <TextField
-            value={recipe.tone.taboos.join(", ")}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                tone: {
-                  ...recipe.tone,
-                  taboos: splitList(event.target.value),
-                },
-              })
-            }
-          />
-        </FormRow>
-        <FormRow label="小癖好（逗号分隔）">
-          <TextField
-            value={recipe.tone.quirks.join(", ")}
-            onChange={(event) =>
-              onChange({
-                ...recipe,
-                tone: {
-                  ...recipe.tone,
-                  quirks: splitList(event.target.value),
-                },
-              })
-            }
-          />
-        </FormRow>
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormRow label={t(msg`口头禅（逗号分隔）`)}>
+            <TextField
+              value={recipe.tone.catchphrases.join(", ")}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  tone: {
+                    ...recipe.tone,
+                    catchphrases: splitList(event.target.value),
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`禁忌（逗号分隔）`)}>
+            <TextField
+              value={recipe.tone.taboos.join(", ")}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  tone: {
+                    ...recipe.tone,
+                    taboos: splitList(event.target.value),
+                  },
+                })
+              }
+            />
+          </FormRow>
+          <FormRow label={t(msg`小癖好（逗号分隔）`)}>
+            <TextField
+              value={recipe.tone.quirks.join(", ")}
+              onChange={(event) =>
+                onChange({
+                  ...recipe,
+                  tone: {
+                    ...recipe.tone,
+                    quirks: splitList(event.target.value),
+                  },
+                })
+              }
+            />
+          </FormRow>
+        </div>
       </LogicSection>
       <LogicSection
-        title="发布映射"
-        description="角色发布到运行时后的初始状态：模板、上线、活动模式默认值。"
+        title={t(msg`发布映射`)}
+        description={t(
+          msg`角色发布到运行时后的初始状态：模板、上线、活动模式默认值。`,
+        )}
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <label className="flex items-center gap-2">
@@ -1456,7 +1508,7 @@ export function LogicEditor({
                 })
               }
             />
-            模板角色
+            <Trans>模板角色</Trans>
           </label>
           <label className="flex items-center gap-2">
             <input
@@ -1472,9 +1524,9 @@ export function LogicEditor({
                 })
               }
             />
-            初始在线
+            <Trans>初始在线</Trans>
           </label>
-          <FormRow label="初始活动">
+          <FormRow label={t(msg`初始活动`)}>
             <TextField
               value={recipe.publishMapping.initialActivity ?? ""}
               onChange={(event) =>
@@ -1488,7 +1540,7 @@ export function LogicEditor({
               }
             />
           </FormRow>
-          <FormRow label="在线模式默认值">
+          <FormRow label={t(msg`在线模式默认值`)}>
             <select
               className="w-full border rounded px-2 py-2 bg-white"
               value={recipe.publishMapping.onlineModeDefault}
@@ -1503,11 +1555,11 @@ export function LogicEditor({
                 })
               }
             >
-              <option value="auto">自动</option>
-              <option value="manual">手动</option>
+              <option value="auto">{t(msg`自动`)}</option>
+              <option value="manual">{t(msg`手动`)}</option>
             </select>
           </FormRow>
-          <FormRow label="活动模式默认值">
+          <FormRow label={t(msg`活动模式默认值`)}>
             <select
               className="w-full border rounded px-2 py-2 bg-white"
               value={recipe.publishMapping.activityModeDefault}
@@ -1522,51 +1574,53 @@ export function LogicEditor({
                 })
               }
             >
-              <option value="auto">自动</option>
-              <option value="manual">手动</option>
+              <option value="auto">{t(msg`自动`)}</option>
+              <option value="manual">{t(msg`手动`)}</option>
             </select>
           </FormRow>
         </div>
       </LogicSection>
       <LogicSection
-        title="现实联动"
-        description="可选 JSON：从外部数据源（社交账号、自媒体、API 等）读取动态信号注入提示词。"
-      >
-      <FormRow
-        label="现实联动配置 JSON"
-        badge={
-          characterId ? (
-            <RiskBadge
-              characterId={characterId}
-              path="realityLink"
-              currentRole={currentRole}
-            />
-          ) : undefined
-        }
-      >
-        <TextAreaField
-          rows={8}
-          value={realityLinkText}
-          onChange={(event) => {
-            const nextText = event.target.value;
-            setRealityLinkText(nextText);
-            try {
-              const parsed = JSON.parse(nextText) as
-                | CharacterBlueprintRecipe["realityLink"]
-                | null;
-              onChange({ ...recipe, realityLink: parsed });
-              setRealityLinkError(null);
-            } catch {
-              setRealityLinkError("JSON 格式无效，修正后才会写入草稿。");
-            }
-          }}
-        />
-        {realityLinkError && (
-          <div className="mt-1 text-xs text-[var(--state-danger-text)]">
-            {realityLinkError}
-          </div>
+        title={t(msg`现实联动`)}
+        description={t(
+          msg`可选 JSON：从外部数据源（社交账号、自媒体、API 等）读取动态信号注入提示词。`,
         )}
-      </FormRow>
+      >
+        <FormRow
+          label={t(msg`现实联动配置 JSON`)}
+          badge={
+            characterId ? (
+              <RiskBadge
+                characterId={characterId}
+                path="realityLink"
+                currentRole={currentRole}
+              />
+            ) : undefined
+          }
+        >
+          <TextAreaField
+            rows={8}
+            value={realityLinkText}
+            onChange={(event) => {
+              const nextText = event.target.value;
+              setRealityLinkText(nextText);
+              try {
+                const parsed = JSON.parse(nextText) as
+                  | CharacterBlueprintRecipe["realityLink"]
+                  | null;
+                onChange({ ...recipe, realityLink: parsed });
+                setRealityLinkError(null);
+              } catch {
+                setRealityLinkError(t(msg`JSON 格式无效，修正后才会写入草稿。`));
+              }
+            }}
+          />
+          {realityLinkError && (
+            <div className="mt-1 text-xs text-[var(--state-danger-text)]">
+              {realityLinkError}
+            </div>
+          )}
+        </FormRow>
       </LogicSection>
     </div>
   );
@@ -1683,7 +1737,7 @@ function HistoryView({
       {revisions.length === 0 && (
         <Card className="p-4">
           <p className="text-sm text-[var(--text-muted)]">
-            还没有任何编辑记录。
+            <Trans>还没有任何编辑记录。</Trans>
           </p>
         </Card>
       )}
@@ -1722,6 +1776,7 @@ function RevisionCard({
   onRevert: (reason: string) => void;
   reverting: boolean;
 }) {
+  const t = translateRuntimeMessage;
   const [showDiff, setShowDiff] = useState(false);
   const [showRevert, setShowRevert] = useState(false);
   const [reason, setReason] = useState("");
@@ -1744,28 +1799,38 @@ function RevisionCard({
           {rev.revisionKind !== "content" && (
             <StatusPill>{rev.revisionKind}</StatusPill>
           )}
-          {rev.riskLevel === "high" && <StatusPill>高风险</StatusPill>}
+          {rev.riskLevel === "high" && (
+            <StatusPill>
+              <Trans>高风险</Trans>
+            </StatusPill>
+          )}
           {rev.changeSource !== "edit" && (
             <StatusPill>{rev.changeSource}</StatusPill>
           )}
-          {isCurrent && <StatusPill>当前版本</StatusPill>}
+          {isCurrent && (
+            <StatusPill>
+              <Trans>当前版本</Trans>
+            </StatusPill>
+          )}
           {!rev.isPatrolled && rev.status === "approved" && (
             <span className="text-xs px-2 py-0.5 rounded bg-[rgba(254,243,199,0.6)] text-[#92400e]">
-              待巡查
+              <Trans>待巡查</Trans>
             </span>
           )}
         </div>
         {rev.editSummary && <div className="mt-1">{rev.editSummary}</div>}
         <div className="text-xs text-[var(--text-muted)] mt-1 flex items-center gap-3">
           {rev.diffFromParent?.changed && (
-            <span>字段：{rev.diffFromParent.changed.join(", ")}</span>
+            <span>
+              <Trans>字段：{rev.diffFromParent.changed.join(", ")}</Trans>
+            </span>
           )}
           <button
             type="button"
             className="underline hover:text-[var(--text-primary)]"
             onClick={() => setShowDiff((v) => !v)}
           >
-            {showDiff ? "收起对比" : "查看对比"}
+            {showDiff ? t(msg`收起对比`) : t(msg`查看对比`)}
           </button>
           {previous && (
             <Link
@@ -1774,7 +1839,7 @@ function RevisionCard({
               search={{ from: previous.id, to: rev.id }}
               className="underline hover:text-[var(--text-primary)]"
             >
-              独立对比
+              <Trans>独立对比</Trans>
             </Link>
           )}
           {canRevert && !isCurrent && rev.status === "approved" && (
@@ -1783,7 +1848,7 @@ function RevisionCard({
               className="underline hover:text-[var(--text-primary)]"
               onClick={() => setShowRevert((v) => !v)}
             >
-              回滚到此版本
+              <Trans>回滚到此版本</Trans>
             </button>
           )}
         </div>
@@ -1797,7 +1862,7 @@ function RevisionCard({
             {rev.recipeSnapshot && (
               <details className="mt-3 text-xs">
                 <summary className="cursor-pointer text-[var(--text-muted)]">
-                  查看角色逻辑快照
+                  <Trans>查看角色逻辑快照</Trans>
                 </summary>
                 <pre className="mt-2 p-3 bg-[var(--bg-canvas)] rounded overflow-x-auto">
                   {JSON.stringify(rev.recipeSnapshot, null, 2)}
@@ -1809,11 +1874,13 @@ function RevisionCard({
         {showRevert && (
           <div className="mt-3 rounded border border-[var(--border-subtle)] p-3 space-y-2">
             <label className="block text-sm">
-              <span className="block mb-1">回滚原因（必填）</span>
+              <span className="block mb-1">
+                <Trans>回滚原因（必填）</Trans>
+              </span>
               <TextField
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                placeholder="例如：v3 涉及破坏性内容"
+                placeholder={t(msg`例如：v3 涉及破坏性内容`)}
               />
             </label>
             <div className="flex gap-2">
@@ -1827,14 +1894,14 @@ function RevisionCard({
                   setReason("");
                 }}
               >
-                {reverting ? "回滚中..." : "确认回滚"}
+                {reverting ? t(msg`回滚中...`) : t(msg`确认回滚`)}
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowRevert(false)}
               >
-                取消
+                <Trans>取消</Trans>
               </Button>
             </div>
           </div>
@@ -1858,6 +1925,7 @@ function DriftBanner({
   };
   onSynced: () => void;
 }) {
+  const t = translateRuntimeMessage;
   const syncMut = useMutation({
     mutationFn: () => wikiApi.syncPageFromCharacter(characterId),
     onSuccess: () => onSynced(),
@@ -1867,23 +1935,29 @@ function DriftBanner({
     <Card className="border-[color:var(--state-warning-bg)] bg-[rgba(255,247,205,0.6)] p-4">
       <div className="flex items-start gap-2">
         <div className="flex-1 text-sm">
-          <strong>⚠ 角色已被管理员后台直接修改</strong>
+          <strong>
+            <Trans>⚠ 角色已被管理员后台直接修改</Trans>
+          </strong>
           <p className="mt-1 text-[var(--text-muted)]">
-            wiki 当前版本与运行时实际角色数据存在 {totalDrift} 处差异
-            （source: {drift.source}）。点击右侧按钮可把当前实际值作为新版本写入 wiki 历史。
+            <Trans>
+              wiki 当前版本与运行时实际角色数据存在 {totalDrift} 处差异
+              （source: {drift.source}）。点击右侧按钮可把当前实际值作为新版本写入 wiki 历史。
+            </Trans>
           </p>
           {drift.contentDrift.length > 0 && (
             <p className="mt-1 text-xs">
-              内容字段：
+              <Trans>内容字段：</Trans>
               <span className="font-mono">{drift.contentDrift.join(", ")}</span>
             </p>
           )}
           {drift.recipeDrift.length > 0 && (
             <p className="mt-1 text-xs">
-              逻辑字段：
+              <Trans>逻辑字段：</Trans>
               <span className="font-mono">
                 {drift.recipeDrift.slice(0, 8).join(", ")}
-                {drift.recipeDrift.length > 8 ? ` … (+${drift.recipeDrift.length - 8})` : ""}
+                {drift.recipeDrift.length > 8
+                  ? ` ${t(msg`… (+${drift.recipeDrift.length - 8})`)}`
+                  : ""}
               </span>
             </p>
           )}
@@ -1894,7 +1968,7 @@ function DriftBanner({
           disabled={syncMut.isPending}
           onClick={() => syncMut.mutate()}
         >
-          {syncMut.isPending ? "同步中..." : "纳入 wiki 历史"}
+          {syncMut.isPending ? t(msg`同步中...`) : t(msg`纳入 wiki 历史`)}
         </Button>
       </div>
       {syncMut.isError && (

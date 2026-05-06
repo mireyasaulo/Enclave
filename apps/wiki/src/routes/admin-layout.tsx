@@ -1,27 +1,34 @@
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Card } from "@yinjie/ui";
 import { hasRole } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
 
-const ADMIN_TABS: { to: string; label: string }[] = [
-  { to: "/admin/users", label: "用户与权限" },
-  { to: "/admin/blocks", label: "封禁" },
-  { to: "/admin/protection", label: "页面保护" },
-  { to: "/admin/reports", label: "举报队列" },
-  { to: "/admin/abuse-filters", label: "反破坏过滤器" },
-  { to: "/admin/wiki-stats", label: "治理仪表盘" },
+const ADMIN_TABS: { to: string; label: MessageDescriptor }[] = [
+  { to: "/admin/users", label: msg`用户与权限` },
+  { to: "/admin/blocks", label: msg`封禁` },
+  { to: "/admin/protection", label: msg`页面保护` },
+  { to: "/admin/reports", label: msg`举报队列` },
+  { to: "/admin/abuse-filters", label: msg`反破坏过滤器` },
+  { to: "/admin/wiki-stats", label: msg`治理仪表盘` },
 ];
 
 export function AdminLayout() {
+  const t = translateRuntimeMessage;
   const { user } = useAuth();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   if (!hasRole(user, "admin")) {
     return (
       <Card className="p-6">
-        <h1 className="text-lg font-semibold">需要管理员权限</h1>
+        <h1 className="text-lg font-semibold">
+          <Trans>需要管理员权限</Trans>
+        </h1>
         <p className="mt-2 text-sm text-[color:var(--text-muted)]">
-          仅管理员可访问此区域。请用管理员账号登录后再试。
+          <Trans>仅管理员可访问此区域。请用管理员账号登录后再试。</Trans>
         </p>
       </Card>
     );
@@ -45,7 +52,7 @@ export function AdminLayout() {
                       : "text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
                   }`}
                 >
-                  {tab.label}
+                  {t(tab.label)}
                 </Link>
               </li>
             );

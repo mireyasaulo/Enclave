@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   AppSection,
   Button,
@@ -14,11 +17,12 @@ import { FormRow } from "../components/form-row";
 type Mode = "password" | "email";
 
 export function LoginPage() {
+  const t = translateRuntimeMessage;
   const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>("password");
 
   return (
-    <PageShell narrow eyebrow="账号" title="登录">
+    <PageShell narrow eyebrow={t(msg`账号`)} title={t(msg`登录`)}>
       <AppSection>
         <div className="mb-4 flex gap-2">
           <Button
@@ -27,7 +31,7 @@ export function LoginPage() {
             onClick={() => setMode("password")}
             className="flex-1"
           >
-            用户名密码
+            <Trans>用户名密码</Trans>
           </Button>
           <Button
             type="button"
@@ -35,7 +39,7 @@ export function LoginPage() {
             onClick={() => setMode("email")}
             className="flex-1"
           >
-            邮箱验证码
+            <Trans>邮箱验证码</Trans>
           </Button>
         </div>
 
@@ -46,15 +50,17 @@ export function LoginPage() {
         )}
 
         <div className="mt-4 text-center text-sm text-[color:var(--text-muted)]">
-          还没有账号？
+          <Trans>还没有账号？</Trans>
           <Link
             to="/register"
             className="ml-1 font-medium text-[color:var(--brand-primary)] hover:underline"
           >
-            创建一个
+            <Trans>创建一个</Trans>
           </Link>
           {mode === "password" ? (
-            <span className="ml-1">或直接用邮箱登录。</span>
+            <span className="ml-1">
+              <Trans>或直接用邮箱登录。</Trans>
+            </span>
           ) : null}
         </div>
       </AppSection>
@@ -63,6 +69,7 @@ export function LoginPage() {
 }
 
 function PasswordForm({ onSuccess }: { onSuccess: () => void }) {
+  const t = translateRuntimeMessage;
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -85,7 +92,7 @@ function PasswordForm({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <FormRow label="用户名">
+      <FormRow label={t(msg`用户名`)}>
         <TextField
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -93,7 +100,7 @@ function PasswordForm({ onSuccess }: { onSuccess: () => void }) {
           autoFocus
         />
       </FormRow>
-      <FormRow label="密码">
+      <FormRow label={t(msg`密码`)}>
         <TextField
           type="password"
           value={password}
@@ -108,13 +115,14 @@ function PasswordForm({ onSuccess }: { onSuccess: () => void }) {
         disabled={loading}
         className="w-full"
       >
-        {loading ? "登录中..." : "登录"}
+        {loading ? t(msg`登录中...`) : t(msg`登录`)}
       </Button>
     </form>
   );
 }
 
 function EmailCodeForm({ onSuccess }: { onSuccess: () => void }) {
+  const t = translateRuntimeMessage;
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -154,8 +162,8 @@ function EmailCodeForm({ onSuccess }: { onSuccess: () => void }) {
       startCooldown(60);
       setInfo(
         result.debugCode
-          ? `开发模式：验证码已打印到服务端日志（debug=${result.debugCode}）`
-          : "验证码已发送，请查收邮箱（含垃圾邮件箱）。",
+          ? t(msg`开发模式：验证码已打印到服务端日志（debug=${result.debugCode}）`)
+          : t(msg`验证码已发送，请查收邮箱（含垃圾邮件箱）。`),
       );
     } catch (err) {
       setError((err as Error).message);
@@ -181,7 +189,7 @@ function EmailCodeForm({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      <FormRow label="邮箱">
+      <FormRow label={t(msg`邮箱`)}>
         <TextField
           type="email"
           value={email}
@@ -191,7 +199,7 @@ function EmailCodeForm({ onSuccess }: { onSuccess: () => void }) {
           placeholder="you@example.com"
         />
       </FormRow>
-      <FormRow label="验证码" hint="6 位数字，10 分钟内有效">
+      <FormRow label={t(msg`验证码`)} hint={t(msg`6 位数字，10 分钟内有效`)}>
         <div className="flex gap-2">
           <TextField
             value={code}
@@ -208,10 +216,10 @@ function EmailCodeForm({ onSuccess }: { onSuccess: () => void }) {
             onClick={() => void sendCode()}
           >
             {cooldown > 0
-              ? `${cooldown}s 后重发`
+              ? t(msg`${cooldown}s 后重发`)
               : sending
-                ? "发送中..."
-                : "发送验证码"}
+                ? t(msg`发送中...`)
+                : t(msg`发送验证码`)}
           </Button>
         </div>
       </FormRow>
@@ -223,7 +231,7 @@ function EmailCodeForm({ onSuccess }: { onSuccess: () => void }) {
         disabled={verifying || !email.trim() || code.trim().length < 6}
         className="w-full"
       >
-        {verifying ? "登录中..." : "登录 / 注册"}
+        {verifying ? t(msg`登录中...`) : t(msg`登录 / 注册`)}
       </Button>
     </form>
   );

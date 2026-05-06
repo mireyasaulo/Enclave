@@ -1,4 +1,7 @@
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   ErrorBlock,
   LoadingBlock,
@@ -9,6 +12,7 @@ import { wikiApi } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
 
 export function AdminStatsPage() {
+  const t = translateRuntimeMessage;
   const dailyQ = useQuery({
     queryKey: ["wiki", "stats", "daily"],
     queryFn: () => wikiApi.wikiStatsDaily(),
@@ -24,9 +28,11 @@ export function AdminStatsPage() {
 
   return (
     <PageShell
-      eyebrow="管理"
-      title="治理仪表盘"
-      description="日度新建/审核数据、被回滚最多的用户、过滤器近 7 天命中量。"
+      eyebrow={t(msg`管理`)}
+      title={t(msg`治理仪表盘`)}
+      description={t(
+        msg`日度新建/审核数据、被回滚最多的用户、过滤器近 7 天命中量。`,
+      )}
     >
       {dailyQ.isLoading && <LoadingBlock />}
       {dailyQ.isError && (
@@ -34,32 +40,45 @@ export function AdminStatsPage() {
       )}
       {dailyQ.data && (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
-          <MetricCard label="今日新建词条" value={dailyQ.data.todayCreates} />
           <MetricCard
-            label="近 7 天新建词条"
+            label={t(msg`今日新建词条`)}
+            value={dailyQ.data.todayCreates}
+          />
+          <MetricCard
+            label={t(msg`近 7 天新建词条`)}
             value={dailyQ.data.weekCreates}
           />
           <MetricCard
-            label="待审队列长度"
+            label={t(msg`待审队列长度`)}
             value={dailyQ.data.pendingQueueLength}
           />
-          <MetricCard label="今日通过审核" value={dailyQ.data.todayApproved} />
-          <MetricCard label="今日驳回" value={dailyQ.data.todayRejected} />
           <MetricCard
-            label="今日反破坏命中"
+            label={t(msg`今日通过审核`)}
+            value={dailyQ.data.todayApproved}
+          />
+          <MetricCard
+            label={t(msg`今日驳回`)}
+            value={dailyQ.data.todayRejected}
+          />
+          <MetricCard
+            label={t(msg`今日反破坏命中`)}
             value={dailyQ.data.abuseHitsToday}
           />
           <MetricCard
-            label="本周新晋自动确认"
+            label={t(msg`本周新晋自动确认`)}
             value={dailyQ.data.autoconfirmedThisWeek}
           />
         </div>
       )}
 
       <section className="space-y-3">
-        <h2 className="text-base font-semibold">被回滚最多的用户（top 20）</h2>
+        <h2 className="text-base font-semibold">
+          <Trans>被回滚最多的用户（top 20）</Trans>
+        </h2>
         {topQ.isLoading && <LoadingBlock />}
-        {topQ.data?.length === 0 && <PanelEmpty message="无记录" />}
+        {topQ.data?.length === 0 && (
+          <PanelEmpty message={t(msg`无记录`)} />
+        )}
         <ul className="space-y-1.5">
           {topQ.data?.map((u) => (
             <li
@@ -85,9 +104,13 @@ export function AdminStatsPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-base font-semibold">过滤器命中（近 7 天）</h2>
+        <h2 className="text-base font-semibold">
+          <Trans>过滤器命中（近 7 天）</Trans>
+        </h2>
         {filterQ.isLoading && <LoadingBlock />}
-        {filterQ.data?.length === 0 && <PanelEmpty message="无记录" />}
+        {filterQ.data?.length === 0 && (
+          <PanelEmpty message={t(msg`无记录`)} />
+        )}
         <ul className="space-y-1.5">
           {filterQ.data?.map(({ filter, recentHits }) => (
             <li
@@ -98,7 +121,9 @@ export function AdminStatsPage() {
               <span className="text-xs text-[color:var(--text-muted)]">
                 action: {filter.action}
               </span>
-              <span className="ml-auto">近 7 天 {recentHits} 命中</span>
+              <span className="ml-auto">
+                <Trans>近 7 天 {recentHits} 命中</Trans>
+              </span>
             </li>
           ))}
         </ul>

@@ -1,4 +1,7 @@
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   Button,
   ErrorBlock,
@@ -14,6 +17,7 @@ import {
 import { PageShell } from "../components/page-shell";
 
 export function AdminAbuseFiltersPage() {
+  const t = translateRuntimeMessage;
   const qc = useQueryClient();
   const filtersQ = useQuery({
     queryKey: ["wiki", "abuse-filters"],
@@ -37,9 +41,11 @@ export function AdminAbuseFiltersPage() {
 
   return (
     <PageShell
-      eyebrow="管理"
-      title="反破坏过滤器"
-      description="每次 wiki 写入都会按规则匹配；命中后可触发记录、警告、强制人工审核或直接拦截。"
+      eyebrow={t(msg`管理`)}
+      title={t(msg`反破坏过滤器`)}
+      description={t(
+        msg`每次 wiki 写入都会按规则匹配；命中后可触发记录、警告、强制人工审核或直接拦截。`,
+      )}
     >
       {filtersQ.isLoading && <LoadingBlock />}
       {filtersQ.isError && (
@@ -54,7 +60,7 @@ export function AdminAbuseFiltersPage() {
                 toggleMut.mutate({ id: f.id, enabled })
               }
               onDelete={() => {
-                if (window.confirm(`删除规则 ${f.name}？`)) {
+                if (window.confirm(t(msg`删除规则 ${f.name}？`))) {
                   deleteMut.mutate(f.id);
                 }
               }}
@@ -62,15 +68,21 @@ export function AdminAbuseFiltersPage() {
           </li>
         ))}
         {filtersQ.data?.length === 0 && (
-          <PanelEmpty message="暂无过滤规则。模块启动会自动种入预置规则；如全部被删，可重启 API 重置。" />
+          <PanelEmpty
+            message={t(
+              msg`暂无过滤规则。模块启动会自动种入预置规则；如全部被删，可重启 API 重置。`,
+            )}
+          />
         )}
       </ul>
 
       <section className="space-y-3 pt-4">
-        <h2 className="text-base font-semibold">最近命中（50 条）</h2>
+        <h2 className="text-base font-semibold">
+          <Trans>最近命中（50 条）</Trans>
+        </h2>
         {hitsQ.isLoading && <LoadingBlock />}
         {hitsQ.data?.length === 0 && (
-          <PanelEmpty message="尚无命中记录。" />
+          <PanelEmpty message={t(msg`尚无命中记录。`)} />
         )}
         <ul className="space-y-1.5">
           {hitsQ.data?.map((h) => (
@@ -113,6 +125,7 @@ function FilterCard({
   onToggle: (enabled: boolean) => void;
   onDelete: () => void;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <div
       className={`space-y-2 rounded-2xl border bg-[color:var(--surface-card)] px-4 py-3 text-sm shadow-[var(--shadow-soft)] ${
@@ -130,11 +143,15 @@ function FilterCard({
         <span className="text-xs text-[color:var(--text-muted)]">
           scope: {filter.scope}
         </span>
-        {!filter.enabled && <StatusPill>已停用</StatusPill>}
+        {!filter.enabled && (
+          <StatusPill>
+            <Trans>已停用</Trans>
+          </StatusPill>
+        )}
         <span className="ml-auto text-xs text-[color:var(--text-muted)]">
-          命中 {filter.hitCount} 次
+          <Trans>命中 {filter.hitCount} 次</Trans>
           {filter.lastHitAt
-            ? ` · 最近 ${new Date(filter.lastHitAt).toLocaleString()}`
+            ? ` · ${t(msg`最近 ${new Date(filter.lastHitAt).toLocaleString()}`)}`
             : ""}
         </span>
       </div>
@@ -157,10 +174,10 @@ function FilterCard({
           variant={filter.enabled ? "secondary" : "primary"}
           onClick={() => onToggle(!filter.enabled)}
         >
-          {filter.enabled ? "停用" : "启用"}
+          {filter.enabled ? t(msg`停用`) : t(msg`启用`)}
         </Button>
         <Button size="sm" variant="danger" onClick={onDelete}>
-          删除
+          <Trans>删除</Trans>
         </Button>
       </div>
     </div>
@@ -168,14 +185,15 @@ function FilterCard({
 }
 
 function ActionPill({ action }: { action: AbuseFilterAction }) {
+  const t = translateRuntimeMessage;
   const label =
     action === "block"
-      ? "拦截"
+      ? t(msg`拦截`)
       : action === "tag_high_risk"
-        ? "标高风险"
+        ? t(msg`标高风险`)
         : action === "warn"
-          ? "警告"
-          : "记录";
+          ? t(msg`警告`)
+          : t(msg`记录`);
   const tone =
     action === "block"
       ? "bg-[color:var(--state-danger-bg)] text-[color:var(--state-danger-text)]"

@@ -1,3 +1,7 @@
+import { useCallback } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage, useAppLocale } from "@yinjie/i18n";
+
 const TOKEN_KEY = "yinjie.wiki.token";
 const USER_KEY = "yinjie.wiki.user";
 
@@ -66,16 +70,25 @@ export function hasRole(
 }
 
 export function roleLabel(role: string): string {
+  const t = translateRuntimeMessage;
   switch (role) {
     case "admin":
-      return "管理员";
+      return t(msg`管理员`);
     case "patroller":
-      return "巡查员";
+      return t(msg`巡查员`);
     case "autoconfirmed":
-      return "自动确认";
+      return t(msg`自动确认`);
     case "newcomer":
-      return "新人";
+      return t(msg`新人`);
     default:
       return role;
   }
+}
+
+export function useRoleLabel() {
+  const { activationVersion, locale } = useAppLocale();
+  return useCallback(
+    (role: string) => roleLabel(role),
+    [activationVersion, locale],
+  );
 }

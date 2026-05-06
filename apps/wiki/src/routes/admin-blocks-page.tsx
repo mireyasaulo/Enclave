@@ -1,5 +1,8 @@
 import { useState } from "react";
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   AppSection,
   Button,
@@ -16,6 +19,7 @@ import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
 
 export function AdminBlocksPage() {
+  const t = translateRuntimeMessage;
   const { user } = useAuth();
   const qc = useQueryClient();
   const [showRevoked, setShowRevoked] = useState(false);
@@ -55,20 +59,24 @@ export function AdminBlocksPage() {
 
   return (
     <PageShell
-      eyebrow="管理"
-      title="封禁管理"
-      description="对违规用户进行全站、单条目或讨论范围的封禁，可设置到期时间或永久。已撤销/到期的记录可勾选展示。"
+      eyebrow={t(msg`管理`)}
+      title={t(msg`封禁管理`)}
+      description={t(
+        msg`对违规用户进行全站、单条目或讨论范围的封禁，可设置到期时间或永久。已撤销/到期的记录可勾选展示。`,
+      )}
     >
       <AppSection className="space-y-4">
-        <h2 className="text-base font-semibold">新增封禁</h2>
+        <h2 className="text-base font-semibold">
+          <Trans>新增封禁</Trans>
+        </h2>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          <FormRow label="目标用户" required>
+          <FormRow label={t(msg`目标用户`)} required>
             <select
               className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
               value={form.userId}
               onChange={(e) => setForm({ ...form, userId: e.target.value })}
             >
-              <option value="">— 选择用户 —</option>
+              <option value="">{t(msg`— 选择用户 —`)}</option>
               {(usersQ.data ?? [])
                 .filter((u) => u.id !== currentUserId)
                 .map((u) => (
@@ -78,7 +86,7 @@ export function AdminBlocksPage() {
                 ))}
             </select>
           </FormRow>
-          <FormRow label="范围" required>
+          <FormRow label={t(msg`范围`)} required>
             <select
               className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
               value={form.scope}
@@ -89,32 +97,32 @@ export function AdminBlocksPage() {
                 })
               }
             >
-              <option value="global">全站</option>
-              <option value="page">单条目</option>
-              <option value="talk">讨论</option>
+              <option value="global">{t(msg`全站`)}</option>
+              <option value="page">{t(msg`单条目`)}</option>
+              <option value="talk">{t(msg`讨论`)}</option>
             </select>
           </FormRow>
           {form.scope === "page" && (
-            <FormRow label="条目 ID" required className="md:col-span-2">
+            <FormRow label={t(msg`条目 ID`)} required className="md:col-span-2">
               <TextField
                 value={form.targetCharacterId}
                 onChange={(e) =>
                   setForm({ ...form, targetCharacterId: e.target.value })
                 }
-                placeholder="例如：char-celebrity-andrej-karpathy"
+                placeholder={t(msg`例如：char-celebrity-andrej-karpathy`)}
               />
             </FormRow>
           )}
-          <FormRow label="原因" required className="md:col-span-2">
+          <FormRow label={t(msg`原因`)} required className="md:col-span-2">
             <TextField
               value={form.reason}
               onChange={(e) => setForm({ ...form, reason: e.target.value })}
-              placeholder="说明为什么对此用户/范围执行封禁"
+              placeholder={t(msg`说明为什么对此用户/范围执行封禁`)}
             />
           </FormRow>
           <FormRow
-            label="到期时间"
-            hint="可选 ISO 时间，留空 = 永久"
+            label={t(msg`到期时间`)}
+            hint={t(msg`可选 ISO 时间，留空 = 永久`)}
             className="md:col-span-2"
           >
             <TextField
@@ -148,7 +156,7 @@ export function AdminBlocksPage() {
               })
             }
           >
-            {blockMut.isPending ? "提交中..." : "提交封禁"}
+            {blockMut.isPending ? t(msg`提交中...`) : t(msg`提交封禁`)}
           </Button>
           {blockMut.isError && (
             <span className="text-sm text-[color:var(--state-danger-text)]">
@@ -159,14 +167,16 @@ export function AdminBlocksPage() {
       </AppSection>
 
       <div className="flex flex-wrap items-center gap-3">
-        <h2 className="text-base font-semibold">封禁列表</h2>
+        <h2 className="text-base font-semibold">
+          <Trans>封禁列表</Trans>
+        </h2>
         <label className="ml-auto inline-flex items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] px-3 py-1.5 text-sm shadow-[var(--shadow-soft)]">
           <input
             type="checkbox"
             checked={showRevoked}
             onChange={(e) => setShowRevoked(e.target.checked)}
           />
-          含已撤销 / 已到期
+          <Trans>含已撤销 / 已到期</Trans>
         </label>
       </div>
       {blocksQ.isLoading && <LoadingBlock />}
@@ -179,7 +189,7 @@ export function AdminBlocksPage() {
         </InlineNotice>
       )}
       {blocksQ.data?.length === 0 && (
-        <PanelEmpty message="没有相关封禁记录。" />
+        <PanelEmpty message={t(msg`没有相关封禁记录。`)} />
       )}
       <ul className="space-y-2">
         {blocksQ.data?.map((b) => (
@@ -207,6 +217,7 @@ function BlockRow({
   onRevoke: () => void;
   revoking: boolean;
 }) {
+  const t = translateRuntimeMessage;
   const isActive =
     !block.revokedAt &&
     (!block.expiresAt || new Date(block.expiresAt) > new Date());
@@ -219,11 +230,17 @@ function BlockRow({
           </strong>
           <StatusPill>{block.scope}</StatusPill>
           {isActive ? (
-            <StatusPill>生效中</StatusPill>
+            <StatusPill>
+              <Trans>生效中</Trans>
+            </StatusPill>
           ) : block.revokedAt ? (
-            <StatusPill>已撤销</StatusPill>
+            <StatusPill>
+              <Trans>已撤销</Trans>
+            </StatusPill>
           ) : (
-            <StatusPill>已到期</StatusPill>
+            <StatusPill>
+              <Trans>已到期</Trans>
+            </StatusPill>
           )}
           {block.targetCharacterId && (
             <span className="text-xs text-[color:var(--text-muted)]">
@@ -233,11 +250,11 @@ function BlockRow({
         </div>
         <div>{block.reason}</div>
         <div className="text-xs text-[color:var(--text-muted)]">
-          创建于 {new Date(block.createdAt).toLocaleString()}
+          <Trans>创建于 {new Date(block.createdAt).toLocaleString()}</Trans>
           {block.expiresAt &&
-            ` · 到期 ${new Date(block.expiresAt).toLocaleString()}`}
+            ` · ${t(msg`到期 ${new Date(block.expiresAt).toLocaleString()}`)}`}
           {block.revokedAt &&
-            ` · 撤销于 ${new Date(block.revokedAt).toLocaleString()}`}
+            ` · ${t(msg`撤销于 ${new Date(block.revokedAt).toLocaleString()}`)}`}
         </div>
       </div>
       {isActive && (
@@ -247,7 +264,7 @@ function BlockRow({
           disabled={revoking}
           onClick={onRevoke}
         >
-          撤销
+          <Trans>撤销</Trans>
         </Button>
       )}
     </li>

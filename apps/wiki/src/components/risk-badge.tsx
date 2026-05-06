@@ -1,4 +1,7 @@
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { wikiApi } from "../lib/wiki-api";
 
 const HIGH_RISK_PREFIXES = [
@@ -21,11 +24,11 @@ function isHighRisk(path: string): boolean {
   );
 }
 
-const ROLE_LABEL: Record<string, string> = {
-  newcomer: "新人",
-  autoconfirmed: "自动确认",
-  patroller: "巡查员",
-  admin: "管理员",
+const ROLE_LABEL: Record<string, MessageDescriptor> = {
+  newcomer: msg`新人`,
+  autoconfirmed: msg`自动确认`,
+  patroller: msg`巡查员`,
+  admin: msg`管理员`,
 };
 
 const ROLE_RANK: Record<string, number> = {
@@ -65,6 +68,7 @@ export function RiskBadge({
   path: string;
   currentRole?: string;
 }) {
+  const t = translateRuntimeMessage;
   const policyQ = useQuery({
     queryKey: ["wiki", "field-protection", characterId],
     queryFn: () => wikiApi.effectiveFieldProtection(characterId),
@@ -82,16 +86,19 @@ export function RiskBadge({
   const blocked = userRank < minRank;
 
   if (blocked) {
+    const minRoleLabel = ROLE_LABEL[minRole]
+      ? t(ROLE_LABEL[minRole])
+      : minRole;
     return (
       <span className="ml-2 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-red-50 text-red-700">
-        🔒 {ROLE_LABEL[minRole]}+ 才能改
+        🔒 {t(msg`${minRoleLabel}+ 才能改`)}
       </span>
     );
   }
   if (highRisk) {
     return (
       <span className="ml-2 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-orange-50 text-orange-700">
-        ⚠ 高风险（patroller 审核）
+        ⚠ {t(msg`高风险（patroller 审核）`)}
       </span>
     );
   }

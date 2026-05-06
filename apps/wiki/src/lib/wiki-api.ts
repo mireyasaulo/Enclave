@@ -1,3 +1,5 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { clearSession, getToken } from "./auth-store";
 import type { CharacterBlueprintRecipe } from "@yinjie/contracts";
 
@@ -42,7 +44,7 @@ async function request<T>(
     const message =
       (payload && typeof payload === "object" && "message" in payload
         ? String((payload as { message: unknown }).message)
-        : null) ?? `请求失败 (${res.status})`;
+        : null) ?? translateRuntimeMessage(msg`请求失败 (${res.status})`);
     throw new WikiApiError(res.status, payload, message);
   }
   return payload as T;
@@ -560,16 +562,26 @@ export const wikiApi = {
       { method: "DELETE" },
     );
   },
-  softDeletePage(characterId: string, reason = "管理员直接删除词条") {
+  softDeletePage(characterId: string, reason?: string) {
     return request<unknown>(
       `/wiki/pages/${encodeURIComponent(characterId)}/delete`,
-      { method: "POST", body: JSON.stringify({ reason }) },
+      {
+        method: "POST",
+        body: JSON.stringify({
+          reason: reason ?? translateRuntimeMessage(msg`管理员直接删除词条`),
+        }),
+      },
     );
   },
-  restorePage(characterId: string, reason = "管理员直接恢复词条") {
+  restorePage(characterId: string, reason?: string) {
     return request<unknown>(
       `/wiki/pages/${encodeURIComponent(characterId)}/restore`,
-      { method: "POST", body: JSON.stringify({ reason }) },
+      {
+        method: "POST",
+        body: JSON.stringify({
+          reason: reason ?? translateRuntimeMessage(msg`管理员直接恢复词条`),
+        }),
+      },
     );
   },
   requestDeletePage(characterId: string, reason: string) {

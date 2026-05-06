@@ -1,5 +1,8 @@
 import { useState } from "react";
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   AppSection,
   Button,
@@ -12,6 +15,7 @@ import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
 
 export function RegisterPage() {
+  const t = translateRuntimeMessage;
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -36,13 +40,15 @@ export function RegisterPage() {
   return (
     <PageShell
       narrow
-      eyebrow="账号"
-      title="注册"
-      description="新账号默认为「新人」。提交的编辑需经巡查员审核后生效；累积达标后会自动晋升为「自动确认」。"
+      eyebrow={t(msg`账号`)}
+      title={t(msg`注册`)}
+      description={t(
+        msg`新账号默认为「新人」。提交的编辑需经巡查员审核后生效；累积达标后会自动晋升为「自动确认」。`,
+      )}
     >
       <AppSection>
         <form onSubmit={submit} className="space-y-4">
-          <FormRow label="用户名" hint="≥ 2 字">
+          <FormRow label={t(msg`用户名`)} hint={t(msg`≥ 2 字`)}>
             <TextField
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -51,7 +57,7 @@ export function RegisterPage() {
               autoFocus
             />
           </FormRow>
-          <FormRow label="密码" hint="≥ 6 位">
+          <FormRow label={t(msg`密码`)} hint={t(msg`≥ 6 位`)}>
             <TextField
               type="password"
               value={password}
@@ -67,16 +73,16 @@ export function RegisterPage() {
             disabled={loading}
             className="w-full"
           >
-            {loading ? "注册中..." : "注册"}
+            {loading ? t(msg`注册中...`) : t(msg`注册`)}
           </Button>
         </form>
         <div className="mt-4 text-center text-sm text-[color:var(--text-muted)]">
-          已有账号？
+          <Trans>已有账号？</Trans>
           <Link
             to="/login"
             className="ml-1 font-medium text-[color:var(--brand-primary)] hover:underline"
           >
-            登录
+            <Trans>登录</Trans>
           </Link>
         </div>
       </AppSection>
