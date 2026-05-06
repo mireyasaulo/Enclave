@@ -61,6 +61,15 @@ const cloudConsoleText: LocaleDictionary = {
     Jobs: "任务",
     Sessions: "会话",
     "Waiting Sync": "等待同步",
+    Users: "用户",
+    Plans: "套餐",
+    Configs: "配置",
+    "Invite Audit": "邀请审计",
+    "Invite audit": "邀请审计",
+    "Revenue Sharing": "收益分成",
+    "SaaS operations": "SaaS 运维",
+    "Cloud monetization": "云平台收益",
+    "User detail": "用户详情",
     "Fleet Dashboard": "舰队仪表盘",
     "World requests": "世界申请",
     "Managed worlds": "托管世界",
@@ -961,6 +970,7 @@ const cloudConsoleChineseTextOverrides: Record<string, string> = {
     "审批与手动交付队列快捷入口已接入申请投影筛选器。",
   "Approval and projected-world shortcuts surfaced in the main dashboard header.":
     "审批与预计世界状态快捷入口已显示在主仪表盘顶部。",
+  "Accounts and expiry": "账号与到期",
   "Aggregate sessions by issue IP and client under the current filters, then revoke an entire source in one action.":
     "按当前筛选条件聚合签发 IP 与客户端来源，并可一次性吊销整个来源。",
   "Alerts upgraded because retry or stale-heartbeat thresholds were crossed.":
@@ -978,6 +988,10 @@ const cloudConsoleChineseTextOverrides: Record<string, string> = {
   "Clear world scope": "清除世界范围",
   "Close review": "关闭复核",
   "Cloud platform:": "云平台：",
+  "Configure role usage pricing, payees, contribution weights, and settlement ledgers.":
+    "配置角色使用定价、收益人、贡献权重与结算账本。",
+  "Configure trial, monthly, quarterly, yearly, and invite reward plans shown to the app.":
+    "配置 App 展示的试用、月付、季付、年付和邀请奖励套餐。",
   "Compatibility view for the older approval workflow. Staff can still use it when manual intervention is needed.":
     "旧审批流程的兼容视图，需要人工介入时运维人员仍可使用。",
   "Context groups": "上下文分组",
@@ -1028,6 +1042,8 @@ const cloudConsoleChineseTextOverrides: Record<string, string> = {
   "Focused source": "聚焦来源",
   "Focus path:": "聚焦路径：",
   "Group risk": "分组风险",
+  "Manage SaaS trial, invite, feature, copy, and public app URL configuration.":
+    "管理 SaaS 试用、邀请、功能、文案和公开 App URL 配置。",
   "Health endpoint:": "健康端点：",
   "Heartbeat endpoint:": "心跳端点：",
   "Heartbeat stale": "心跳陈旧",
@@ -1045,12 +1061,22 @@ const cloudConsoleChineseTextOverrides: Record<string, string> = {
   "No waiting sync tasks match this filter.":
     "没有等待同步任务匹配当前筛选。",
   "No admin sessions match this filter.": "没有管理会话匹配当前筛选。",
+  "No active attention items. The fleet currently looks healthy.":
+    "当前没有活跃关注项。舰队状态看起来健康。",
+  "No pending or running jobs in the operator queue.":
+    "运维队列暂无待处理或运行中的任务。",
+  "No provider allocation data yet.": "暂无供应方分配数据。",
+  "No recent failed jobs.": "暂无最近失败任务。",
+  "No recent superseded jobs.": "暂无最近已替代任务。",
+  "No request workflow items yet.": "暂无申请工作流条目。",
   Next: "下一页",
   "Ops note": "运维备注",
   Page: "页",
+  "Payees and ledgers": "收益人与账本",
   "Page size": "每页数量",
   "per page": "每页",
   Previous: "上一页",
+  "Pricing and access": "价格与访问",
   "Project:": "项目：",
   "Projected world": "预计世界",
   "power:": "电源：",
@@ -1073,7 +1099,12 @@ const cloudConsoleChineseTextOverrides: Record<string, string> = {
   "Retry threshold:": "重试阈值：",
   "Review live admin sessions, inspect where they were issued from, filter by revocation path, and page through longer audit history.":
     "查看实时管理会话，检查签发来源，按吊销路径筛选，并分页浏览更长的审计历史。",
+  "Review cloud account status, subscription expiry, inviter attribution, and world linkage.":
+    "复核云账号状态、订阅到期、邀请人归因和世界关联。",
+  "Review reward redemptions, device and IP signals, and manual reversals.":
+    "复核奖励兑换、设备与 IP 信号以及人工撤销。",
   "Review requests (": "复核申请（",
+  "Rewards and risk": "奖励与风控",
   Reviewing: "复核中",
   Revocation: "吊销",
   "Revocation reason": "吊销原因",
@@ -1118,6 +1149,7 @@ const cloudConsoleChineseTextOverrides: Record<string, string> = {
   "Target values:": "目标值：",
   Targets: "目标",
   Task: "任务",
+  "Trial and copy": "试用与文案",
   "Task highlighted": "任务已高亮",
   "Task permalink focus": "任务固定链接聚焦",
   "Task types:": "任务类型：",

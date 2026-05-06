@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import { getSurfaceTextDictionary } from "@yinjie/i18n";
 import { installCloudAdminApiMock, renderRoute } from "./test-helpers";
 import { resolveCloudAdminApiBaseFromLocation } from "../src/lib/cloud-admin-api";
 
@@ -55,6 +56,22 @@ describe("cloud-console router smoke", () => {
     expect(
       (await screen.findByRole("link", { name: "申请" })).getAttribute("href"),
     ).toBe("/requests");
+    expect(
+      (await screen.findByRole("link", { name: "用户" })).getAttribute("href"),
+    ).toBe("/users");
+    expect(await screen.findByText("账号与到期")).toBeTruthy();
+    expect(
+      (await screen.findByRole("link", { name: "套餐" })).getAttribute("href"),
+    ).toBe("/subscription-plans");
+    expect(await screen.findByText("收益人与账本")).toBeTruthy();
+
+    const zhDictionary = getSurfaceTextDictionary("cloud-console", "zh-CN");
+    expect(zhDictionary.get("No provider allocation data yet.")).toBe(
+      "暂无供应方分配数据。",
+    );
+    expect(
+      zhDictionary.get("No active attention items. The fleet currently looks healthy."),
+    ).toBe("当前没有活跃关注项。舰队状态看起来健康。");
   });
 
   it("pauses cloud queries until the admin secret is saved", async () => {
