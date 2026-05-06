@@ -509,9 +509,12 @@ export function CharacterEditorPage() {
           </div>
           {aiGenerateMutation.isError &&
           aiGenerateMutation.error instanceof Error ? (
-            <ErrorBlock
+            <AdminErrorState
               className="mt-3"
-              message={aiGenerateMutation.error.message}
+              title="AI 生成失败"
+              detail={aiGenerateMutation.error.message}
+              onRetry={() => aiGenerateMutation.reset()}
+              retryLabel="清除错误"
             />
           ) : null}
         </Card>
@@ -691,9 +694,11 @@ export function CharacterEditorPage() {
           />
           {inferenceOverviewQuery.isError &&
           inferenceOverviewQuery.error instanceof Error ? (
-            <ErrorBlock
+            <AdminErrorState
               className="mt-4"
-              message={inferenceOverviewQuery.error.message}
+              title="模型路由读取失败"
+              detail={inferenceOverviewQuery.error.message}
+              onRetry={() => inferenceOverviewQuery.refetch()}
             />
           ) : null}
         </Card>
