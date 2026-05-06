@@ -994,11 +994,7 @@ export function WelcomePage() {
             </div>
           </button>
           </div>
-        ) : (
-          <InlineNotice tone="info">
-            Cloud sign-in is required in this build. Local world entry remains available only for development and internal environments.
-          </InlineNotice>
-        )}
+        ) : null}
 
         {notice ? (
           isDesktopLayout ? <InlineNotice tone="success">{notice}</InlineNotice> : <MobileWelcomeNotice tone="success">{notice}</MobileWelcomeNotice>
