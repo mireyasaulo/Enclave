@@ -48,19 +48,19 @@ export function getRequestToneStyles(tone: RequestStatusTone) {
     case "success":
       return {
         panel:
-          "border-emerald-300/50 bg-emerald-500/10 hover:border-emerald-200/80",
-        count: "text-emerald-50",
-        detail: "text-emerald-100/85",
+          "border-emerald-400/60 bg-emerald-500/10 hover:border-emerald-500/80",
+        count: "text-emerald-800",
+        detail: "text-emerald-700",
         badge:
-          "border-emerald-300/50 bg-emerald-500/10 text-emerald-100",
+          "border-emerald-400/60 bg-emerald-500/15 text-emerald-800",
       };
     case "danger":
       return {
         panel:
-          "border-rose-300/60 bg-rose-500/10 hover:border-rose-200/80",
-        count: "text-rose-100",
-        detail: "text-rose-100/80",
-        badge: "border-rose-300/60 bg-rose-500/10 text-rose-200",
+          "border-rose-400/60 bg-rose-500/10 hover:border-rose-500/80",
+        count: "text-rose-800",
+        detail: "text-rose-700",
+        badge: "border-rose-400/60 bg-rose-500/15 text-rose-800",
       };
     case "neutral":
       return {
@@ -69,16 +69,16 @@ export function getRequestToneStyles(tone: RequestStatusTone) {
         count: "text-[color:var(--text-primary)]",
         detail: "text-[color:var(--text-secondary)]",
         badge:
-          "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]",
+          "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-secondary)]",
       };
     case "warning":
     default:
       return {
         panel:
-          "border-amber-300/50 bg-amber-500/10 hover:border-amber-200/70",
-        count: "text-amber-50",
-        detail: "text-amber-100/85",
-        badge: "border-amber-300/50 bg-amber-500/10 text-amber-100",
+          "border-amber-400/60 bg-amber-500/15 hover:border-amber-500/80",
+        count: "text-amber-900",
+        detail: "text-amber-800",
+        badge: "border-amber-400/60 bg-amber-500/20 text-amber-900",
       };
   }
 }
