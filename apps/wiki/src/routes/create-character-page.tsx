@@ -6,6 +6,7 @@ import type { CharacterBlueprintRecipe } from "@yinjie/contracts";
 import { Button, Card, ErrorBlock, TextAreaField, TextField } from "@yinjie/ui";
 import { useAuth } from "../lib/use-auth";
 import { wikiApi, type WikiContentSnapshot } from "../lib/wiki-api";
+import { LogicEditor, mergeContentIntoRecipe } from "./character-page";
 
 function splitList(value: string): string[] {
   return value
@@ -29,6 +30,9 @@ export function CreateCharacterPage() {
   const [triggerScenes, setTriggerScenes] = useState("");
   const [summary, setSummary] = useState("");
   const [recipeText, setRecipeText] = useState("");
+  const [recipeDraft, setRecipeDraft] = useState<CharacterBlueprintRecipe>(() =>
+    buildDefaultRecipe(),
+  );
 
   const createMut = useMutation({
     mutationFn: () => {
@@ -44,7 +48,7 @@ export function CreateCharacterPage() {
       };
       const recipeSnapshot = recipeText.trim()
         ? (JSON.parse(recipeText) as CharacterBlueprintRecipe)
-        : null;
+        : mergeContentIntoRecipe(recipeDraft, contentSnapshot);
       return wikiApi.createPage({
         characterId: characterId.trim() || null,
         contentSnapshot,
@@ -155,7 +159,16 @@ export function CreateCharacterPage() {
             maxLength={500}
           />
         </FormRow>
-        <FormRow label="完整角色逻辑 recipe JSON（可选）">
+        <div className="rounded border border-[var(--border-subtle)] p-4 space-y-3">
+          <div>
+            <h2 className="text-base font-semibold">角色逻辑</h2>
+            <p className="text-sm text-[var(--text-muted)] mt-1">
+              创建申请会携带完整角色逻辑；巡查员审核通过后才会写入运行时角色注册表。
+            </p>
+          </div>
+          <LogicEditor recipe={recipeDraft} onChange={setRecipeDraft} />
+        </div>
+        <FormRow label="高级：完整角色逻辑 recipe JSON 覆盖（可选）">
           <TextAreaField
             rows={8}
             value={recipeText}
@@ -176,6 +189,85 @@ export function CreateCharacterPage() {
       </form>
     </Card>
   );
+}
+
+function buildDefaultRecipe(): CharacterBlueprintRecipe {
+  return {
+    identity: {
+      name: "未命名角色",
+      relationship: "世界角色",
+      relationshipType: "custom",
+      avatar: "",
+      bio: "",
+      occupation: "",
+      background: "",
+      motivation: "",
+      worldview: "",
+    },
+    expertise: {
+      expertDomains: ["general"],
+      expertiseDescription: "",
+      knowledgeLimits: "",
+      refusalStyle: "",
+    },
+    tone: {
+      speechPatterns: [],
+      catchphrases: [],
+      topicsOfInterest: [],
+      emotionalTone: "grounded",
+      responseLength: "medium",
+      emojiUsage: "occasional",
+      workStyle: "",
+      socialStyle: "",
+      taboos: [],
+      quirks: [],
+      coreDirective: "",
+      basePrompt: "",
+      systemPrompt: "",
+    },
+    prompting: {
+      coreLogic: "",
+      scenePrompts: {
+        chat: "",
+        moments_post: "",
+        moments_comment: "",
+        feed_post: "",
+        channel_post: "",
+        feed_comment: "",
+        greeting: "",
+        proactive: "",
+      },
+    },
+    memorySeed: {
+      memorySummary: "",
+      coreMemory: "",
+      recentSummarySeed: "",
+      forgettingCurve: 70,
+      recentSummaryPrompt: "",
+      coreMemoryPrompt: "",
+    },
+    reasoning: {
+      enableCoT: true,
+      enableReflection: true,
+      enableRouting: true,
+    },
+    lifeStrategy: {
+      activityFrequency: "normal",
+      momentsFrequency: 1,
+      feedFrequency: 1,
+      activeHoursStart: 8,
+      activeHoursEnd: 23,
+      triggerScenes: [],
+    },
+    publishMapping: {
+      isTemplate: false,
+      onlineModeDefault: "auto",
+      activityModeDefault: "auto",
+      initialOnline: false,
+      initialActivity: "free",
+    },
+    realityLink: null,
+  };
 }
 
 function FormRow({

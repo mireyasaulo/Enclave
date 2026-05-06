@@ -34,14 +34,16 @@ export function AdminProtectionPage() {
 
   const [form, setForm] = useState<{
     level: "none" | "semi" | "full";
+    reviewPolicy: "open" | "pending_changes";
     expiresAt: string;
     reason: string;
-  }>({ level: "none", expiresAt: "", reason: "" });
+  }>({ level: "none", reviewPolicy: "open", expiresAt: "", reason: "" });
 
   const setProtMut = useMutation({
     mutationFn: () =>
       wikiApi.setProtection(characterId, {
         level: form.level,
+        reviewPolicy: form.reviewPolicy,
         expiresAt: form.expiresAt.trim() || null,
         reason: form.reason.trim() || undefined,
       }),
@@ -72,7 +74,12 @@ export function AdminProtectionPage() {
             value={characterId}
             onChange={(e) => {
               setCharacterId(e.target.value);
-              setForm({ level: "none", expiresAt: "", reason: "" });
+              setForm({
+                level: "none",
+                reviewPolicy: "open",
+                expiresAt: "",
+                reason: "",
+              });
             }}
           >
             <option value="">— 选择 —</option>
@@ -99,6 +106,14 @@ export function AdminProtectionPage() {
                     ? "半保护"
                     : "完全保护"}
                 </StatusPill>
+                <span className="ml-2">
+                  审核策略：
+                  <StatusPill>
+                    {pageQ.data.page.reviewPolicy === "pending_changes"
+                      ? "待审变更"
+                      : "开放编辑"}
+                  </StatusPill>
+                </span>
                 {pageQ.data.page.protectionLevel !== "none" &&
                   pageQ.data.page.protectionExpiresAt && (
                     <span className="ml-2 text-xs text-[var(--text-muted)]">
@@ -109,7 +124,7 @@ export function AdminProtectionPage() {
                     </span>
                   )}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <label className="block text-sm">
                   <span className="block mb-1">新级别</span>
                   <select
@@ -125,6 +140,23 @@ export function AdminProtectionPage() {
                     <option value="none">无保护</option>
                     <option value="semi">半保护（仅自动确认+）</option>
                     <option value="full">完全保护（仅管理员）</option>
+                  </select>
+                </label>
+                <label className="block text-sm">
+                  <span className="block mb-1">审核策略</span>
+                  <select
+                    className="w-full border rounded px-2 py-2 bg-white"
+                    value={form.reviewPolicy}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        reviewPolicy: e.target
+                          .value as typeof form.reviewPolicy,
+                      })
+                    }
+                  >
+                    <option value="open">开放编辑</option>
+                    <option value="pending_changes">待审变更</option>
                   </select>
                 </label>
                 <label className="block text-sm">

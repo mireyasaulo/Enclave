@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, IsNull, MoreThan, Repository } from 'typeorm';
+import { DataSource, In, MoreThan, Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
 import { CharacterPageEntity } from '../entities/character-page.entity';
 import { CharacterRevisionEntity } from '../entities/character-revision.entity';
@@ -36,17 +36,53 @@ export class WikiReviewService {
     private readonly roles: WikiRoleService,
   ) {}
 
-  async listPending(limit = 50): Promise<
+  async listPending(limit?: number): Promise<
+    Array<{
+      submission: EditSubmissionEntity;
+      revision: CharacterRevisionEntity;
+    }>
+  >;
+  async listPending(input?: {
+    limit?: number;
+    operation?: string;
+    riskLevel?: string;
+    revisionKind?: string;
+  }): Promise<
+    Array<{
+      submission: EditSubmissionEntity;
+      revision: CharacterRevisionEntity;
+    }>
+  >;
+  async listPending(
+    input:
+      | number
+      | {
+          limit?: number;
+          operation?: string;
+          riskLevel?: string;
+          revisionKind?: string;
+        } = {},
+  ): Promise<
     Array<{
       submission: EditSubmissionEntity;
       revision: CharacterRevisionEntity;
     }>
   > {
-    const submissions = await this.submissionRepo.find({
-      where: { decision: IsNull() },
-      order: { priority: 'DESC', createdAt: 'ASC' },
-      take: Math.min(Math.max(limit, 1), 200),
-    });
+    const opts = typeof input === 'number' ? { limit: input } : input;
+    const limit = Math.min(Math.max(opts.limit ?? 50, 1), 200);
+    const qb = this.submissionRepo
+      .createQueryBuilder('s')
+      .where('s.decision IS NULL')
+      .orderBy('s.priority', 'DESC')
+      .addOrderBy('s.createdAt', 'ASC')
+      .take(opts.revisionKind ? 200 : limit);
+    if (opts.operation) {
+      qb.andWhere('s.operation = :operation', { operation: opts.operation });
+    }
+    if (opts.riskLevel) {
+      qb.andWhere('s.riskLevel = :riskLevel', { riskLevel: opts.riskLevel });
+    }
+    const submissions = await qb.getMany();
     const revIds = submissions.map((s) => s.revisionId);
     if (revIds.length === 0) return [];
     const revisions = await this.revisionRepo
@@ -57,7 +93,12 @@ export class WikiReviewService {
     const revMap = new Map(revisions.map((r) => [r.id, r]));
     return submissions
       .map((s) => ({ submission: s, revision: revMap.get(s.revisionId)! }))
-      .filter((entry) => entry.revision);
+      .filter((entry) => entry.revision)
+      .filter(
+        (entry) =>
+          !opts.revisionKind || entry.revision.revisionKind === opts.revisionKind,
+      )
+      .slice(0, limit);
   }
 
   async decide(

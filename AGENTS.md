@@ -43,16 +43,16 @@
 ## 世界角色管理平台页面（`apps/wiki/src/routes/`）
 
 - `home-page.tsx`：世界角色管理平台首页，承载角色索引、生命周期状态与创建入口
-- `create-character-page.tsx`：角色创建页，普通登录用户提交新角色创建请求，可选携带完整角色逻辑 recipe JSON，审核通过后写入运行时角色注册表
-- `character-page.tsx`：角色词条页，承载阅读、内容编辑、角色逻辑 recipe 编辑、历史、讨论、生命周期申请与编辑冲突处理
+- `create-character-page.tsx`：角色创建页，普通登录用户提交新角色创建请求，内置完整角色逻辑 recipe 可视化编辑，高级模式可用 JSON 覆盖，审核通过后写入运行时角色注册表
+- `character-page.tsx`：角色词条页，承载稳定版 / 最新版阅读、内容编辑、角色逻辑 recipe 编辑、历史、讨论、生命周期申请与编辑冲突处理
 - `character-diff-page.tsx`：角色版本独立对比页，由历史页进入，集中展示内容字段与角色逻辑快照差异
 - `recent-changes-page.tsx`：最近修改页，集中查看角色内容 / 逻辑 / 生命周期编辑动态
 - `search-page.tsx`：角色词条搜索结果页，由顶栏搜索框进入
 - `watchlist-page.tsx`：观察列表页，登录用户查看关注词条与讨论动态
-- `pending-reviews-page.tsx`：待审编辑页，巡查员处理待审核修改
+- `pending-reviews-page.tsx`：待审编辑页，巡查员按操作、风险和修订类型筛选并处理待审核修改
 - `admin-users-page.tsx`：平台用户管理页
 - `admin-blocks-page.tsx`：平台封禁管理页
-- `admin-protection-page.tsx`：平台保护管理页
+- `admin-protection-page.tsx`：平台保护管理页，管理员维护页面保护级别、待审变更策略、到期时间与保护日志
 - `admin-reports-page.tsx`：平台举报队列页，管理员处理词条 / 讨论 / 修订举报
 - `login-page.tsx`：平台登录页
 - `register-page.tsx`：平台注册页
@@ -168,7 +168,7 @@
 
 **后台**：AdminConversationReview
 
-**世界角色管理平台 / Wiki**：CharacterPage · CharacterRevision · EditSubmission · UserWikiProfile · WikiBlock · WikiProtectionLog · WikiTalkThread · WikiTalkPost · WikiWatchlist
+**世界角色管理平台 / Wiki**：CharacterPage（稳定版本 `currentRevisionId` / 最新提交 `latestRevisionId` / `reviewPolicy`） · CharacterRevision · EditSubmission · UserWikiProfile · WikiBlock · WikiProtectionLog · WikiTalkThread · WikiTalkPost · WikiWatchlist
 
 ## 单用户世界约束（2026-04-08）
 
@@ -370,20 +370,20 @@
   - `GET /api/wiki/search`
   - `GET /api/wiki/pages`
   - `POST /api/wiki/pages`
-  - `GET /api/wiki/pages/:id`
+  - `GET /api/wiki/pages/:id`，支持 `view=stable|current`，游客默认稳定版，登录用户可查看最新版 / 待审上下文
   - `GET /api/wiki/pages/:id/history`
   - `GET /api/wiki/pages/:id/pending`
-- `GET /api/wiki/pages/:id/diff`
+  - `GET /api/wiki/pages/:id/diff`
   - `GET /api/wiki/pages/:id/revisions/:revisionId`
-- `POST /api/wiki/pages/:id/edits`
-  - `POST /api/wiki/pages/:id/delete-request`
-  - `POST /api/wiki/pages/:id/restore-request`
-  - `POST /api/wiki/pages/:id/delete`
-  - `POST /api/wiki/pages/:id/restore`
+  - `POST /api/wiki/pages/:id/edits`
+  - `POST /api/wiki/pages/:id/delete-request`，提交软删除归档申请，body 需携带 `reason`
+  - `POST /api/wiki/pages/:id/restore-request`，提交恢复申请，body 需携带 `reason`
+  - `POST /api/wiki/pages/:id/delete`，管理员直接提交并自动通过软删除归档修订
+  - `POST /api/wiki/pages/:id/restore`，管理员直接提交并自动通过恢复修订
   - `POST /api/wiki/pages/:id/revert`
-  - `PATCH /api/wiki/pages/:id/protection`
+  - `PATCH /api/wiki/pages/:id/protection`，支持 `level`、`reviewPolicy`、`expiresAt` 与 `reason`
   - `GET /api/wiki/pages/:id/protection-log`
-  - `GET /api/wiki/pending-reviews`
+  - `GET /api/wiki/pending-reviews`，支持 `operation`、`riskLevel`、`revisionKind` 与 `limit` 筛选
   - `POST /api/wiki/edits/:revisionId/review`
   - `POST /api/wiki/edits/:revisionId/patrol`
   - `GET /api/wiki/users`

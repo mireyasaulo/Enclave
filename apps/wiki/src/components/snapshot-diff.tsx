@@ -29,7 +29,14 @@ export function SnapshotDiff({
   const keys = (Object.keys(after) as (keyof WikiContentSnapshot)[]).filter(
     (k) => {
       if (changedFields && changedFields.length > 0) {
-        if (changedFields.includes("__revert__")) return true;
+        if (
+          changedFields.includes("__create__") ||
+          changedFields.includes("__delete__") ||
+          changedFields.includes("__restore__") ||
+          changedFields.includes("__revert__")
+        ) {
+          return true;
+        }
         return changedFields.includes(k);
       }
       return JSON.stringify(before?.[k] ?? null) !== JSON.stringify(after[k] ?? null);

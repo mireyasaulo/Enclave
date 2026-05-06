@@ -14,6 +14,7 @@ import {
   JwtAuthGuard,
   type AuthenticatedUser,
 } from '../../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../../auth/optional-jwt-auth.guard';
 import { WikiEditService } from '../services/wiki-edit.service';
 import { WikiPageService } from '../services/wiki-page.service';
 
@@ -65,8 +66,13 @@ export class WikiPageController {
   }
 
   @Get('pages/:id')
-  view(@Param('id') id: string) {
-    return this.pages.getPageView(id);
+  @UseGuards(OptionalJwtAuthGuard)
+  view(
+    @Param('id') id: string,
+    @Query('view') view: 'stable' | 'current' | undefined,
+    @CurrentUser() user?: AuthenticatedUser,
+  ) {
+    return this.pages.getPageView(id, { view, user });
   }
 
   @Get('pages/:id/history')
@@ -100,6 +106,7 @@ export class WikiPageController {
     @Body()
     body: {
       contentSnapshot: Record<string, unknown>;
+      recipeSnapshot?: Record<string, unknown> | null;
       baseRevisionId?: string | null;
       editSummary?: string;
       isMinor?: boolean;

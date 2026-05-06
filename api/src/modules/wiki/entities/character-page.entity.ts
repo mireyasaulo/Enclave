@@ -17,10 +17,13 @@ export class CharacterPageEntity {
   @Column({ type: 'text', nullable: true })
   currentRevisionId?: string | null;
 
+  @Column({ type: 'text', nullable: true })
+  latestRevisionId?: string | null;
+
   @Column({ default: 'active' })
   lifecycleStatus: string; // 'active' | 'pending_create' | 'deleted'
 
-  @Column({ default: 'pending_changes' })
+  @Column({ default: 'open' })
   reviewPolicy: string;
 
   @Column({ default: 'none' })

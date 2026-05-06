@@ -12,13 +12,22 @@ import {
 import { hasRole } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
 import { wikiApi, type PendingReviewItem } from "../lib/wiki-api";
+import { SnapshotDiff } from "../components/snapshot-diff";
 
 export function PendingReviewsPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
+  const [operation, setOperation] = useState("");
+  const [riskLevel, setRiskLevel] = useState("");
+  const [revisionKind, setRevisionKind] = useState("");
   const pendingQ = useQuery({
-    queryKey: ["wiki", "pending-reviews"],
-    queryFn: () => wikiApi.listPending(),
+    queryKey: ["wiki", "pending-reviews", operation, riskLevel, revisionKind],
+    queryFn: () =>
+      wikiApi.listPending({
+        operation: operation || undefined,
+        riskLevel: riskLevel || undefined,
+        revisionKind: revisionKind || undefined,
+      }),
     enabled: hasRole(user, "patroller"),
   });
 
@@ -30,6 +39,8 @@ export function PendingReviewsPage() {
     }) => wikiApi.decide(input.revisionId, input.decision, input.note),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["wiki", "pending-reviews"] });
+      void qc.invalidateQueries({ queryKey: ["wiki", "recent-changes"] });
+      void qc.invalidateQueries({ queryKey: ["wiki", "characters"] });
     },
   });
 
@@ -51,16 +62,46 @@ export function PendingReviewsPage() {
   if (pendingQ.isError)
     return <ErrorBlock message={(pendingQ.error as Error).message} />;
   const items = pendingQ.data ?? [];
-  if (items.length === 0) {
-    return (
-      <Card className="p-6">
-        <p className="text-sm text-[var(--text-muted)]">待审队列为空。</p>
-      </Card>
-    );
-  }
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">待审编辑（{items.length}）</h1>
+      <div className="flex flex-wrap items-center gap-3">
+        <h1 className="text-xl font-semibold">待审编辑（{items.length}）</h1>
+        <select
+          className="ml-auto border border-[var(--border-subtle)] rounded px-2 py-1 text-sm bg-white"
+          value={operation}
+          onChange={(event) => setOperation(event.target.value)}
+        >
+          <option value="">全部操作</option>
+          <option value="create">创建</option>
+          <option value="edit">编辑</option>
+          <option value="soft_delete">删除</option>
+          <option value="restore">恢复</option>
+        </select>
+        <select
+          className="border border-[var(--border-subtle)] rounded px-2 py-1 text-sm bg-white"
+          value={revisionKind}
+          onChange={(event) => setRevisionKind(event.target.value)}
+        >
+          <option value="">全部类型</option>
+          <option value="content">档案</option>
+          <option value="recipe">逻辑</option>
+          <option value="lifecycle">生命周期</option>
+        </select>
+        <select
+          className="border border-[var(--border-subtle)] rounded px-2 py-1 text-sm bg-white"
+          value={riskLevel}
+          onChange={(event) => setRiskLevel(event.target.value)}
+        >
+          <option value="">全部风险</option>
+          <option value="low">低风险</option>
+          <option value="high">高风险</option>
+        </select>
+      </div>
+      {items.length === 0 && (
+        <Card className="p-6">
+          <p className="text-sm text-[var(--text-muted)]">待审队列为空。</p>
+        </Card>
+      )}
       {items.map((item) => (
         <ReviewCard
           key={item.submission.id}
@@ -117,6 +158,13 @@ function ReviewCard({
       )}
       <div className="text-xs text-[var(--text-muted)]">
         改动字段：{rev.diffFromParent?.changed?.join(", ") ?? "—"}
+      </div>
+      <div className="rounded border border-[var(--border-subtle)] p-3">
+        <SnapshotDiff
+          before={null}
+          after={rev.contentSnapshot}
+          changedFields={rev.diffFromParent?.changed}
+        />
       </div>
       <details className="text-sm">
         <summary className="cursor-pointer text-[var(--text-muted)]">

@@ -76,6 +76,7 @@ export type WikiPageView = {
     characterId: string;
     title?: string | null;
     currentRevisionId: string | null;
+    latestRevisionId: string | null;
     lifecycleStatus: string;
     reviewPolicy: string;
     protectionLevel: string;
@@ -87,9 +88,14 @@ export type WikiPageView = {
     isDeleted: boolean;
   };
   currentRevision: WikiRevisionSummary | null;
+  stableRevision: WikiRevisionSummary | null;
+  latestRevision: WikiRevisionSummary | null;
   content: WikiContentSnapshot;
+  visibleContent: WikiContentSnapshot;
   recipe: CharacterBlueprintRecipe | null;
   pendingRevision: WikiRevisionSummary | null;
+  pendingRevisions: WikiRevisionSummary[];
+  viewMode: "stable" | "current";
   exists: boolean;
 };
 
@@ -283,10 +289,10 @@ export const wikiApi = {
       body: JSON.stringify(payload),
     });
   },
-  getPage(characterId: string) {
+  getPage(characterId: string, view?: "stable" | "current") {
+    const qs = view ? `?view=${encodeURIComponent(view)}` : "";
     return request<WikiPageView>(
-      `/wiki/pages/${encodeURIComponent(characterId)}`,
-      { auth: false },
+      `/wiki/pages/${encodeURIComponent(characterId)}${qs}`,
     );
   },
   getHistory(characterId: string, limit = 50) {
@@ -327,8 +333,25 @@ export const wikiApi = {
       body: JSON.stringify(payload),
     });
   },
-  listPending(limit = 50) {
-    return request<PendingReviewItem[]>(`/wiki/pending-reviews?limit=${limit}`);
+  listPending(
+    opts:
+      | number
+      | {
+          limit?: number;
+          operation?: string;
+          riskLevel?: string;
+          revisionKind?: string;
+        } = 50,
+  ) {
+    const input = typeof opts === "number" ? { limit: opts } : opts;
+    const params = new URLSearchParams();
+    if (input.limit) params.set("limit", String(input.limit));
+    if (input.operation) params.set("operation", input.operation);
+    if (input.riskLevel) params.set("riskLevel", input.riskLevel);
+    if (input.revisionKind) params.set("revisionKind", input.revisionKind);
+    return request<PendingReviewItem[]>(
+      `/wiki/pending-reviews?${params.toString()}`,
+    );
   },
   decide(
     revisionId: string,
@@ -421,6 +444,7 @@ export const wikiApi = {
     characterId: string,
     input: {
       level: "none" | "semi" | "full";
+      reviewPolicy?: "open" | "pending_changes";
       expiresAt?: string | null;
       reason?: string;
     },
@@ -511,28 +535,28 @@ export const wikiApi = {
       { method: "DELETE" },
     );
   },
-  softDeletePage(characterId: string) {
+  softDeletePage(characterId: string, reason = "管理员直接删除词条") {
     return request<unknown>(
       `/wiki/pages/${encodeURIComponent(characterId)}/delete`,
-      { method: "POST", body: JSON.stringify({}) },
+      { method: "POST", body: JSON.stringify({ reason }) },
     );
   },
-  restorePage(characterId: string) {
+  restorePage(characterId: string, reason = "管理员直接恢复词条") {
     return request<unknown>(
       `/wiki/pages/${encodeURIComponent(characterId)}/restore`,
-      { method: "POST", body: JSON.stringify({}) },
+      { method: "POST", body: JSON.stringify({ reason }) },
     );
   },
-  requestDeletePage(characterId: string) {
+  requestDeletePage(characterId: string, reason: string) {
     return request<unknown>(
       `/wiki/pages/${encodeURIComponent(characterId)}/delete-request`,
-      { method: "POST", body: JSON.stringify({}) },
+      { method: "POST", body: JSON.stringify({ reason }) },
     );
   },
-  requestRestorePage(characterId: string) {
+  requestRestorePage(characterId: string, reason: string) {
     return request<unknown>(
       `/wiki/pages/${encodeURIComponent(characterId)}/restore-request`,
-      { method: "POST", body: JSON.stringify({}) },
+      { method: "POST", body: JSON.stringify({ reason }) },
     );
   },
   search(q: string, limit = 20) {

@@ -33,20 +33,28 @@ export function CharacterPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("read");
+  const [viewMode, setViewMode] = useState<"stable" | "current">("stable");
+  const [lifecycleReason, setLifecycleReason] = useState("");
+  const [showLifecycleForm, setShowLifecycleForm] = useState(false);
   const pageQ = useQuery({
-    queryKey: ["wiki", "page", characterId],
-    queryFn: () => wikiApi.getPage(characterId),
+    queryKey: ["wiki", "page", characterId, viewMode],
+    queryFn: () => wikiApi.getPage(characterId, viewMode),
   });
+  useEffect(() => {
+    if (!user && viewMode === "current") setViewMode("stable");
+  }, [user, viewMode]);
   const softDeleteMut = useMutation({
-    mutationFn: () =>
+    mutationFn: (reason: string) =>
       pageQ.data?.page.isDeleted ||
       pageQ.data?.page.lifecycleStatus === "deleted"
-        ? wikiApi.requestRestorePage(characterId)
-        : wikiApi.requestDeletePage(characterId),
+        ? wikiApi.requestRestorePage(characterId, reason)
+        : wikiApi.requestDeletePage(characterId, reason),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["wiki", "page", characterId] });
       void qc.invalidateQueries({ queryKey: ["wiki", "characters"] });
       void qc.invalidateQueries({ queryKey: ["wiki", "pending-reviews"] });
+      setLifecycleReason("");
+      setShowLifecycleForm(false);
     },
   });
   const lifecycleStatus = pageQ.data?.page.lifecycleStatus ?? "active";
@@ -76,23 +84,91 @@ export function CharacterPage() {
           {isDeleted && <StatusPill>已删除</StatusPill>}
           {isPendingCreate && <StatusPill>待创建</StatusPill>}
           {pageQ.data?.pendingRevision && <StatusPill>有待审版本</StatusPill>}
+          {user && pageQ.data?.latestRevision?.id !== pageQ.data?.stableRevision?.id && (
+            <div className="flex items-center border border-[var(--border-subtle)] rounded overflow-hidden text-xs">
+              <button
+                type="button"
+                className={`px-2 py-1 ${
+                  viewMode === "stable"
+                    ? "bg-[var(--accent)] text-white"
+                    : "bg-white text-[var(--text-muted)]"
+                }`}
+                onClick={() => setViewMode("stable")}
+              >
+                稳定版
+              </button>
+              <button
+                type="button"
+                className={`px-2 py-1 ${
+                  viewMode === "current"
+                    ? "bg-[var(--accent)] text-white"
+                    : "bg-white text-[var(--text-muted)]"
+                }`}
+                onClick={() => setViewMode("current")}
+              >
+                最新版
+              </button>
+            </div>
+          )}
           <WatchToggle characterId={characterId} />
           {user && pageQ.data && (
             <Button
               size="sm"
               variant={isDeleted ? "primary" : "danger"}
               disabled={softDeleteMut.isPending}
-              onClick={() => softDeleteMut.mutate()}
+              onClick={() => setShowLifecycleForm((value) => !value)}
             >
-              {softDeleteMut.isPending
-                ? "提交中..."
-                : isDeleted
-                  ? "申请恢复"
-                  : "申请删除"}
+              {isDeleted ? "申请恢复" : "申请删除"}
             </Button>
           )}
         </div>
       </div>
+
+      {showLifecycleForm && (
+        <Card className="p-4 space-y-3">
+          <label className="block">
+            <span className="text-sm mb-1 block">
+              {isDeleted ? "恢复理由" : "删除理由"}
+            </span>
+            <TextAreaField
+              rows={3}
+              value={lifecycleReason}
+              onChange={(event) => setLifecycleReason(event.target.value)}
+              placeholder={
+                isDeleted
+                  ? "说明为什么这个角色词条应恢复"
+                  : "说明为什么这个角色词条应归档为红链"
+              }
+            />
+          </label>
+          {softDeleteMut.isError && (
+            <ErrorBlock message={(softDeleteMut.error as Error).message} />
+          )}
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant={isDeleted ? "primary" : "danger"}
+              disabled={
+                softDeleteMut.isPending || lifecycleReason.trim().length === 0
+              }
+              onClick={() => softDeleteMut.mutate(lifecycleReason.trim())}
+            >
+              {softDeleteMut.isPending
+                ? "提交中..."
+                : isDeleted
+                  ? "提交恢复申请"
+                  : "提交删除申请"}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setShowLifecycleForm(false)}
+            >
+              取消
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {isDeleted && (
         <Card className="p-4 border-[var(--border-danger)] bg-[rgba(255,245,245,0.7)]">
@@ -240,16 +316,20 @@ function ReadView({ view }: { view: WikiPageView }) {
       )}
       {view.pendingRevision && (
         <div className="text-sm rounded border border-[var(--border-subtle)] bg-[var(--bg-canvas)] p-3">
-          有一个待审版本：
+          有 {view.pendingRevisions.length} 个待审版本，最新为：
           <strong className="mx-1">v{view.pendingRevision.version}</strong>
           {view.pendingRevision.operation} / {view.pendingRevision.riskLevel}
         </div>
       )}
       <footer className="text-xs text-[var(--text-muted)] pt-3 border-t border-[var(--border-subtle)]">
-        当前版本：
+        {view.viewMode === "current" ? "最新版" : "稳定版"}：
         {view.currentRevision
           ? `v${view.currentRevision.version} · 由 ${view.currentRevision.editorUserId} 提交于 ${new Date(view.currentRevision.createdAt).toLocaleString()}`
           : "尚未有 wiki 版本（显示后台原始数据）"}
+        {view.stableRevision &&
+          view.latestRevision &&
+          view.stableRevision.id !== view.latestRevision.id &&
+          ` · 稳定版 v${view.stableRevision.version} / 最新版 v${view.latestRevision.version}`}
       </footer>
     </Card>
   );
@@ -540,7 +620,7 @@ function parseHour(value: string): number | null {
   return Math.min(Math.max(Math.round(parsed), 0), 23);
 }
 
-function mergeContentIntoRecipe(
+export function mergeContentIntoRecipe(
   recipe: CharacterBlueprintRecipe,
   content: WikiContentSnapshot,
 ): CharacterBlueprintRecipe {
@@ -569,7 +649,7 @@ function mergeContentIntoRecipe(
   };
 }
 
-function LogicEditor({
+export function LogicEditor({
   recipe,
   onChange,
 }: {

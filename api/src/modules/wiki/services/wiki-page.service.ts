@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CharacterEntity } from '../../characters/character.entity';
 import { CharacterBlueprintService } from '../../characters/character-blueprint.service';
 import type { CharacterBlueprintRecipeValue } from '../../characters/character-blueprint.types';
+import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
 import { CharacterPageEntity } from '../entities/character-page.entity';
 import {
   CharacterRevisionEntity,
@@ -15,9 +16,14 @@ export type WikiPageView = {
   characterId: string;
   page: CharacterPageEntity;
   currentRevision: CharacterRevisionEntity | null;
+  stableRevision: CharacterRevisionEntity | null;
+  latestRevision: CharacterRevisionEntity | null;
   content: WikiContentSnapshot;
+  visibleContent: WikiContentSnapshot;
   recipe: CharacterBlueprintRecipeValue | null;
   pendingRevision: CharacterRevisionEntity | null;
+  pendingRevisions: CharacterRevisionEntity[];
+  viewMode: 'stable' | 'current';
   exists: boolean;
 };
 
@@ -46,8 +52,9 @@ export class WikiPageService {
       characterId,
       title: character.name,
       currentRevisionId: null,
+      latestRevisionId: null,
       lifecycleStatus: 'active',
-      reviewPolicy: 'pending_changes',
+      reviewPolicy: 'open',
       protectionLevel: character.sourceType === 'ai_generated' ? 'semi' : 'none',
       isPatrolled: false,
       watcherCount: 0,
@@ -57,7 +64,10 @@ export class WikiPageService {
     return this.pageRepo.save(page);
   }
 
-  async getPageView(characterId: string): Promise<WikiPageView> {
+  async getPageView(
+    characterId: string,
+    input: { view?: 'stable' | 'current'; user?: AuthenticatedUser } = {},
+  ): Promise<WikiPageView> {
     const character = await this.characterRepo.findOne({
       where: { id: characterId },
     });
@@ -66,28 +76,43 @@ export class WikiPageService {
       throw new NotFoundException(`角色 ${characterId} 不存在`);
     }
     const page = character ? await this.getOrInitPage(characterId) : existingPage!;
-    let currentRevision: CharacterRevisionEntity | null = null;
+    let stableRevision: CharacterRevisionEntity | null = null;
     if (page.currentRevisionId) {
-      currentRevision = await this.revisionRepo.findOne({
+      stableRevision = await this.revisionRepo.findOne({
         where: { id: page.currentRevisionId },
       });
     }
-    const pendingRevision =
-      (await this.revisionRepo.findOne({
-        where: { characterId, status: 'pending' },
-        order: { createdAt: 'DESC' },
-      })) ?? null;
+    let latestRevision: CharacterRevisionEntity | null = null;
+    if (page.latestRevisionId) {
+      latestRevision = await this.revisionRepo.findOne({
+        where: { id: page.latestRevisionId },
+      });
+    }
+    const pendingRevisions = await this.revisionRepo.find({
+      where: { characterId, status: 'pending' },
+      order: { version: 'DESC' },
+      take: 50,
+    });
+    const pendingRevision = pendingRevisions[0] ?? null;
+    if (!latestRevision) {
+      latestRevision = pendingRevision ?? stableRevision;
+    }
     const factorySnapshot = character
       ? await this.blueprints.getFactorySnapshot(characterId).catch(() => null)
       : null;
+    const canViewCurrent = Boolean(input.user);
+    const viewMode =
+      input.view === 'current' && canViewCurrent ? 'current' : 'stable';
+    const visibleRevision =
+      viewMode === 'current' ? latestRevision ?? stableRevision : stableRevision;
     const recipe =
-      currentRevision?.recipeSnapshot ??
+      visibleRevision?.recipeSnapshot ??
       factorySnapshot?.blueprint.publishedRecipe ??
       factorySnapshot?.blueprint.draftRecipe ??
       pendingRevision?.recipeSnapshot ??
       null;
-    const content = currentRevision
-      ? currentRevision.contentSnapshot
+    const content = visibleRevision
+      ? visibleRevision.contentSnapshot
       : character
         ? snapshotFromCharacter(character as unknown as Record<string, unknown>)
         : pendingRevision?.contentSnapshot;
@@ -97,10 +122,15 @@ export class WikiPageService {
     return {
       characterId,
       page,
-      currentRevision,
+      currentRevision: visibleRevision,
+      stableRevision,
+      latestRevision,
       content,
+      visibleContent: content,
       recipe,
       pendingRevision,
+      pendingRevisions,
+      viewMode,
       exists: !page.isDeleted && page.lifecycleStatus !== 'pending_create',
     };
   }

@@ -27,8 +27,16 @@ export class WikiReviewController {
   @RequireRole('patroller')
   list(
     @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
+    @Query('operation') operation?: string,
+    @Query('riskLevel') riskLevel?: string,
+    @Query('revisionKind') revisionKind?: string,
   ) {
-    return this.review.listPending(limit);
+    return this.review.listPending({
+      limit,
+      operation,
+      riskLevel,
+      revisionKind,
+    });
   }
 
   @Post('edits/:revisionId/review')

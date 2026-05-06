@@ -182,6 +182,7 @@ export class WikiEditService {
           { characterId },
           {
             currentRevisionId: savedRev.id,
+            latestRevisionId: savedRev.id,
             title: after.name,
             lifecycleStatus: 'active',
             editCount: page.editCount + 1,
@@ -210,7 +211,7 @@ export class WikiEditService {
         await manager.update(
           CharacterPageEntity,
           { characterId },
-          { editCount: page.editCount + 1 },
+          { latestRevisionId: savedRev.id, editCount: page.editCount + 1 },
         );
       }
 
@@ -270,8 +271,9 @@ export class WikiEditService {
           characterId,
           title: content.name,
           currentRevisionId: null,
+          latestRevisionId: null,
           lifecycleStatus: 'pending_create',
-          reviewPolicy: 'pending_changes',
+          reviewPolicy: 'open',
           protectionLevel: 'none',
           isPatrolled: false,
           watcherCount: 0,
@@ -303,6 +305,16 @@ export class WikiEditService {
         isPatrolled: false,
       });
       const saved = await manager.save(created);
+      await manager.update(
+        CharacterPageEntity,
+        { characterId },
+        {
+          currentRevisionId: autoApprove ? saved.id : null,
+          latestRevisionId: saved.id,
+          title: content.name,
+          lifecycleStatus: autoApprove ? 'active' : 'pending_create',
+        },
+      );
       if (!autoApprove) {
         await manager.save(
           manager.create(EditSubmissionEntity, {
@@ -343,6 +355,11 @@ export class WikiEditService {
     await this.blocks.assertCanEdit(user, characterId);
     const page = await this.pages.getOrInitPage(characterId);
     this.assertProtection(page.protectionLevel, user.role);
+    if (!reason?.trim()) {
+      throw new BadRequestException(
+        operation === 'soft_delete' ? '申请删除必须填写理由' : '申请恢复必须填写理由',
+      );
+    }
     const character = await this.characterRepo.findOne({ where: { id: characterId } });
     if (!character) throw new BadRequestException('角色不存在');
     const currentRevision = page.currentRevisionId
@@ -395,7 +412,7 @@ export class WikiEditService {
       await manager.update(
         CharacterPageEntity,
         { characterId },
-        { editCount: page.editCount + 1 },
+        { latestRevisionId: saved.id, editCount: page.editCount + 1 },
       );
       await this.bumpProfile(manager, user.id, autoApprove);
       return saved;
@@ -418,6 +435,7 @@ export class WikiEditService {
     revision: CharacterRevisionEntity,
     actorId: string,
   ): Promise<void> {
+    const latestRevisionId = await this.resolveLatestRevisionId(revision);
     if (revision.operation === 'create') {
       if (!revision.recipeSnapshot) {
         throw new BadRequestException('创建角色缺少 recipeSnapshot');
@@ -438,6 +456,7 @@ export class WikiEditService {
         {
           title: revision.contentSnapshot.name,
           currentRevisionId: revision.id,
+          latestRevisionId,
           lifecycleStatus: 'active',
           isDeleted: false,
           deletedAt: null,
@@ -452,6 +471,7 @@ export class WikiEditService {
         { characterId: revision.characterId },
         {
           currentRevisionId: revision.id,
+          latestRevisionId,
           lifecycleStatus: 'deleted',
           isDeleted: true,
           deletedAt: new Date(),
@@ -466,12 +486,14 @@ export class WikiEditService {
         { characterId: revision.characterId },
         {
           currentRevisionId: revision.id,
+          latestRevisionId,
           lifecycleStatus: 'active',
           isDeleted: false,
           deletedAt: null,
           deletedBy: null,
         },
       );
+      return;
     }
 
     if (revision.recipeSnapshot) {
@@ -485,6 +507,7 @@ export class WikiEditService {
         {
           title: revision.contentSnapshot.name,
           currentRevisionId: revision.id,
+          latestRevisionId,
           lifecycleStatus: 'active',
           isDeleted: false,
           deletedAt: null,
@@ -506,6 +529,7 @@ export class WikiEditService {
         {
           title: revision.contentSnapshot.name,
           currentRevisionId: revision.id,
+          latestRevisionId,
           lifecycleStatus: 'active',
         },
       );
@@ -623,6 +647,7 @@ export class WikiEditService {
         { characterId },
         {
           title: afterContent.name,
+          latestRevisionId: saved.id,
           editCount: page.editCount + 1,
         },
       );
@@ -665,6 +690,23 @@ export class WikiEditService {
       .select('MAX(r.version)', 'max')
       .getRawOne<{ max: number | null }>();
     return lastVersion?.max ?? 0;
+  }
+
+  private async resolveLatestRevisionId(
+    revision: CharacterRevisionEntity,
+  ): Promise<string> {
+    const page = await this.pageRepo.findOne({
+      where: { characterId: revision.characterId },
+    });
+    if (!page?.latestRevisionId || page.latestRevisionId === revision.id) {
+      return revision.id;
+    }
+    const latest = await this.revisionRepo.findOne({
+      where: { id: page.latestRevisionId },
+    });
+    return latest && latest.version > revision.version
+      ? page.latestRevisionId
+      : revision.id;
   }
 
   private async bumpProfile(
