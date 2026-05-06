@@ -32,6 +32,7 @@ import {
   onTypingStart,
   onTypingStop,
 } from "../../lib/socket";
+import { handleSocketSubscriptionExpiredError } from "../../lib/subscription-expired";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../../store/world-owner-store";
 
@@ -273,9 +274,10 @@ export function useConversationThread(conversationId: string) {
       });
     });
 
-    const offError = onChatError((message) => {
+    const offError = onChatError((payload) => {
       setMessages((current) => markThreadMessagesFailed(current));
-      setSocketError(message);
+      handleSocketSubscriptionExpiredError(payload);
+      setSocketError(payload.message);
     });
 
     return () => {

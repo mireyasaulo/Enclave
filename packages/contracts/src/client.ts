@@ -186,6 +186,7 @@ import type {
   CheckoutRequest,
   CheckoutResponse,
   CloudConfigEntry,
+  CloudProfileResponse,
   CloudUserDetail,
   CloudUserListQuery,
   CloudUserListResponse,
@@ -208,6 +209,48 @@ export const DEFAULT_CORE_API_BASE_URL = "http://localhost:3000";
 export const DEFAULT_CLOUD_API_BASE_URL = "http://localhost:3001";
 let coreApiBaseUrlProvider: (() => string | null | undefined) | null = null;
 let cloudApiBaseUrlProvider: (() => string | null | undefined) | null = null;
+let apiRequestErrorHandler:
+  | ((error: ApiRequestError) => void)
+  | null = null;
+
+type RequestErrorBody = {
+  statusCode?: number;
+  errorCode?: string;
+  code?: string;
+  message?: string | string[];
+  params?: Record<string, string | number | boolean | null>;
+  requestId?: string | null;
+  meta?: unknown;
+};
+
+export class ApiRequestError extends Error {
+  readonly statusCode: number;
+  readonly errorCode: string | null;
+  readonly code: string | null;
+  readonly requestId: string | null;
+  readonly params: Record<string, string | number | boolean | null> | null;
+  readonly meta: unknown;
+
+  constructor(
+    message: string,
+    options: {
+      statusCode: number;
+      errorCode?: string | null;
+      requestId?: string | null;
+      params?: Record<string, string | number | boolean | null> | null;
+      meta?: unknown;
+    },
+  ) {
+    super(message);
+    this.name = "ApiRequestError";
+    this.statusCode = options.statusCode;
+    this.errorCode = options.errorCode ?? null;
+    this.code = options.errorCode ?? null;
+    this.requestId = options.requestId ?? null;
+    this.params = options.params ?? null;
+    this.meta = options.meta;
+  }
+}
 
 export function resolveCoreApiBaseUrl(
   override?: string,
@@ -253,6 +296,16 @@ export function setCloudApiBaseUrlProvider(
   cloudApiBaseUrlProvider = provider;
 }
 
+export function setApiRequestErrorHandler(
+  handler: ((error: ApiRequestError) => void) | null,
+) {
+  apiRequestErrorHandler = handler;
+}
+
+export function isApiRequestError(error: unknown): error is ApiRequestError {
+  return error instanceof ApiRequestError;
+}
+
 async function request<T>(
   path: string,
   init?: RequestInit,
@@ -274,11 +327,11 @@ async function request<T>(
   const rawBody = await response.text();
 
   if (!response.ok) {
-    let body: { message?: string } | null = null;
+    let body: RequestErrorBody | null = null;
 
     if (rawBody) {
       try {
-        body = JSON.parse(rawBody) as { message?: string };
+        body = JSON.parse(rawBody) as RequestErrorBody;
       } catch {
         body = null;
       }
@@ -289,7 +342,34 @@ async function request<T>(
       body?.message,
       rawBody,
     );
-    throw new Error(message || `Request failed: ${response.status}`);
+    const requestId =
+      response.headers.get("X-Request-Id")?.trim() ||
+      (typeof body?.requestId === "string" ? body.requestId : null);
+    const error = new ApiRequestError(
+      message || `Request failed: ${response.status}`,
+      {
+        statusCode: response.status,
+        errorCode:
+          typeof body?.errorCode === "string"
+            ? body.errorCode
+            : typeof body?.code === "string"
+              ? body.code
+              : null,
+        requestId,
+        params: body?.params ?? null,
+        meta: body?.meta,
+      },
+    );
+
+    if (apiRequestErrorHandler) {
+      try {
+        apiRequestErrorHandler(error);
+      } catch {
+        // Ignore consumer-side handler failures and preserve the original error.
+      }
+    }
+
+    throw error;
   }
 
   return (rawBody ? (JSON.parse(rawBody) as T) : undefined) as T;
@@ -297,10 +377,16 @@ async function request<T>(
 
 function resolveRequestErrorMessage(
   status: number,
-  bodyMessage: string | undefined,
+  bodyMessage: string | string[] | undefined,
   rawBody: string,
 ) {
-  const normalizedBodyMessage = bodyMessage?.trim();
+  const normalizedBodyMessage = Array.isArray(bodyMessage)
+    ? bodyMessage
+        .filter((value): value is string => typeof value === "string")
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .join(" ")
+    : bodyMessage?.trim();
   if (normalizedBodyMessage) {
     if (normalizedBodyMessage === "File too large") {
       return "上传内容过大，请缩小文件后重试。";
@@ -3111,6 +3197,14 @@ export function getMyCloudSubscription(accessToken: string, baseUrl?: string) {
   );
 }
 
+export function getMyCloudProfile(accessToken: string, baseUrl?: string) {
+  return requestCloudApi<CloudProfileResponse>(
+    "/cloud/me/profile",
+    buildCloudAuthHeaders(accessToken),
+    baseUrl,
+  );
+}
+
 export function getMyCloudInviteSummary(accessToken: string, baseUrl?: string) {
   return requestCloudApi<InviteSummaryResponse>(
     "/cloud/me/invite/summary",
@@ -3149,6 +3243,30 @@ export function postMyCloudCheckout(
   );
 }
 
+export function getMySubscription(accessToken: string, baseUrl?: string) {
+  return getMyCloudSubscription(accessToken, baseUrl);
+}
+
+export function getMyInviteSummary(accessToken: string, baseUrl?: string) {
+  return getMyCloudInviteSummary(accessToken, baseUrl);
+}
+
+export function redeemInvite(
+  payload: RedeemInviteRequest,
+  accessToken: string,
+  baseUrl?: string,
+) {
+  return redeemMyCloudInvite(payload, accessToken, baseUrl);
+}
+
+export function createCheckout(
+  payload: CheckoutRequest,
+  accessToken: string,
+  baseUrl?: string,
+) {
+  return postMyCloudCheckout(payload, accessToken, baseUrl);
+}
+
 function buildCloudAdminHeaders(init?: RequestInit): RequestInit {
   return {
     ...init,
@@ -3173,7 +3291,7 @@ export function listCloudUsersAdmin(
   baseUrl?: string,
 ) {
   return requestCloudApi<CloudUserListResponse>(
-    `/cloud/admin/users${buildCloudAdminQueryString(query as Record<string, unknown>)}`,
+    `/admin/cloud/users${buildCloudAdminQueryString(query as Record<string, unknown>)}`,
     buildCloudAdminHeaders(init),
     baseUrl,
   );
@@ -3185,7 +3303,7 @@ export function getCloudUserAdmin(
   baseUrl?: string,
 ) {
   return requestCloudApi<CloudUserDetail>(
-    `/cloud/admin/users/${encodeURIComponent(id)}`,
+    `/admin/cloud/users/${encodeURIComponent(id)}`,
     buildCloudAdminHeaders(init),
     baseUrl,
   );
@@ -3198,7 +3316,7 @@ export function grantCloudUserSubscriptionAdmin(
   baseUrl?: string,
 ) {
   return requestCloudApi<SubscriptionRecordSummary>(
-    `/cloud/admin/users/${encodeURIComponent(id)}/subscriptions`,
+    `/admin/cloud/users/${encodeURIComponent(id)}/subscriptions`,
     buildCloudAdminHeaders({
       ...init,
       method: "POST",
@@ -3219,7 +3337,7 @@ export function banCloudUserAdmin(
   baseUrl?: string,
 ) {
   return requestCloudApi<{ success: true }>(
-    `/cloud/admin/users/${encodeURIComponent(id)}/ban`,
+    `/admin/cloud/users/${encodeURIComponent(id)}/ban`,
     buildCloudAdminHeaders({
       ...init,
       method: "POST",
@@ -3239,7 +3357,7 @@ export function unbanCloudUserAdmin(
   baseUrl?: string,
 ) {
   return requestCloudApi<{ success: true }>(
-    `/cloud/admin/users/${encodeURIComponent(id)}/unban`,
+    `/admin/cloud/users/${encodeURIComponent(id)}/unban`,
     buildCloudAdminHeaders({
       ...init,
       method: "POST",
@@ -3253,7 +3371,7 @@ export function listSubscriptionPlansAdmin(
   baseUrl?: string,
 ) {
   return requestCloudApi<SubscriptionPlanSummary[]>(
-    "/cloud/admin/subscription-plans",
+    "/admin/cloud/subscription-plans",
     buildCloudAdminHeaders(init),
     baseUrl,
   );
@@ -3265,7 +3383,7 @@ export function upsertSubscriptionPlanAdmin(
   baseUrl?: string,
 ) {
   return requestCloudApi<SubscriptionPlanSummary>(
-    "/cloud/admin/subscription-plans",
+    "/admin/cloud/subscription-plans",
     buildCloudAdminHeaders({
       ...init,
       method: "POST",
@@ -3284,7 +3402,7 @@ export function listCloudConfigsAdmin(
   baseUrl?: string,
 ) {
   return requestCloudApi<CloudConfigEntry[]>(
-    "/cloud/admin/configs",
+    "/admin/cloud/configs",
     buildCloudAdminHeaders(init),
     baseUrl,
   );
@@ -3296,7 +3414,7 @@ export function upsertCloudConfigAdmin(
   baseUrl?: string,
 ) {
   return requestCloudApi<CloudConfigEntry>(
-    "/cloud/admin/configs",
+    "/admin/cloud/configs",
     buildCloudAdminHeaders({
       ...init,
       method: "POST",
@@ -3316,7 +3434,7 @@ export function listInviteRedemptionsAdmin(
   baseUrl?: string,
 ) {
   return requestCloudApi<InviteRedemptionListResponse>(
-    `/cloud/admin/invites/redemptions${buildCloudAdminQueryString(query as Record<string, unknown>)}`,
+    `/admin/cloud/invites/redemptions${buildCloudAdminQueryString(query as Record<string, unknown>)}`,
     buildCloudAdminHeaders(init),
     baseUrl,
   );
@@ -3329,7 +3447,7 @@ export function rejectInviteRedemptionAdmin(
   baseUrl?: string,
 ) {
   return requestCloudApi<{ success: true }>(
-    `/cloud/admin/invites/redemptions/${encodeURIComponent(id)}/reject`,
+    `/admin/cloud/invites/redemptions/${encodeURIComponent(id)}/reject`,
     buildCloudAdminHeaders({
       ...init,
       method: "POST",
@@ -3341,4 +3459,93 @@ export function rejectInviteRedemptionAdmin(
     }),
     baseUrl,
   );
+}
+
+export function listCloudUsers(
+  query: CloudUserListQuery | undefined,
+  init: RequestInit | undefined,
+  baseUrl?: string,
+) {
+  return listCloudUsersAdmin(query, init, baseUrl);
+}
+
+export function getCloudUser(
+  id: string,
+  init: RequestInit | undefined,
+  baseUrl?: string,
+) {
+  return getCloudUserAdmin(id, init, baseUrl);
+}
+
+export function grantSubscription(
+  id: string,
+  payload: GrantSubscriptionRequest,
+  init: RequestInit | undefined,
+  baseUrl?: string,
+) {
+  return grantCloudUserSubscriptionAdmin(id, payload, init, baseUrl);
+}
+
+export function banUser(
+  id: string,
+  payload: BanCloudUserRequest,
+  init: RequestInit | undefined,
+  baseUrl?: string,
+) {
+  return banCloudUserAdmin(id, payload, init, baseUrl);
+}
+
+export function unbanUser(
+  id: string,
+  init: RequestInit | undefined,
+  baseUrl?: string,
+) {
+  return unbanCloudUserAdmin(id, init, baseUrl);
+}
+
+export function listSubscriptionPlans(
+  init: RequestInit | undefined,
+  baseUrl?: string,
+) {
+  return listSubscriptionPlansAdmin(init, baseUrl);
+}
+
+export function upsertSubscriptionPlan(
+  payload: UpsertSubscriptionPlanRequest,
+  init: RequestInit | undefined,
+  baseUrl?: string,
+) {
+  return upsertSubscriptionPlanAdmin(payload, init, baseUrl);
+}
+
+export function listCloudConfigs(
+  init: RequestInit | undefined,
+  baseUrl?: string,
+) {
+  return listCloudConfigsAdmin(init, baseUrl);
+}
+
+export function upsertCloudConfig(
+  payload: UpsertCloudConfigRequest,
+  init: RequestInit | undefined,
+  baseUrl?: string,
+) {
+  return upsertCloudConfigAdmin(payload, init, baseUrl);
+}
+
+export function listInviteRedemptions(
+  query: InviteRedemptionListQuery | undefined,
+  init: RequestInit | undefined,
+  baseUrl?: string,
+) {
+  return listInviteRedemptionsAdmin(query, init, baseUrl);
+}
+
+export function rejectInviteRedemption(
+  id: string,
+  payload: RejectInviteRedemptionRequest,
+  init: RequestInit | undefined,
+  baseUrl?: string,
+) {
+  return rejectInviteRedemptionAdmin(id, payload, init, baseUrl);
 }

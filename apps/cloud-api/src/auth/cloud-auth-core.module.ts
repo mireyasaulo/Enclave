@@ -1,5 +1,6 @@
 import { Global, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { PhoneVerificationSessionEntity } from "../entities/phone-verification-session.entity";
 import { CloudClientAuthGuard } from "./cloud-client-auth.guard";
 import { MockSmsProviderService } from "./mock-sms-provider.service";
@@ -8,7 +9,12 @@ import { ServiceTokenGuard } from "./service-token.guard";
 
 @Global()
 @Module({
-  imports: [TypeOrmModule.forFeature([PhoneVerificationSessionEntity])],
+  imports: [
+    TypeOrmModule.forFeature([
+      PhoneVerificationSessionEntity,
+      CloudUserEntity,
+    ]),
+  ],
   providers: [
     PhoneAuthService,
     MockSmsProviderService,

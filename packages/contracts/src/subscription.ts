@@ -3,6 +3,16 @@ export type SubscriptionSource = "trial" | "purchase" | "invite_reward" | "admin
 export type CloudUserStatus = "active" | "banned" | "archived";
 export type InviteRedemptionStatus = "rewarded" | "rejected";
 
+export interface CloudProfileResponse {
+  id: string;
+  phone: string;
+  displayName: string | null;
+  status: CloudUserStatus;
+  firstLoginAt: string | null;
+  lastLoginAt: string | null;
+  createdAt: string;
+}
+
 export interface SubscriptionPlanSummary {
   id: string;
   code: string;
@@ -126,6 +136,7 @@ export interface CloudUserSummary {
   subscriptionStatus: SubscriptionStatus;
   subscriptionExpiresAt: string | null;
   currentPlanCode: string | null;
+  worldStatus: string | null;
   inviterPhone: string | null;
   inviteCode: string | null;
   redeemCount: number;
@@ -158,7 +169,6 @@ export interface CloudUserDetail extends CloudUserSummary {
   redemptionsAsInviter: InviteRedemptionSummary[];
   redemptionAsInvitee: InviteRedemptionSummary | null;
   worldId: string | null;
-  worldStatus: string | null;
   worldApiBaseUrl: string | null;
 }
 

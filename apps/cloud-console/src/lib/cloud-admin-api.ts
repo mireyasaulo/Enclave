@@ -28,7 +28,15 @@ import type {
   CloudWorldRequestStatus,
   CloudWorldSummary,
   CloudApiErrorResponse,
+  CloudConfigEntry,
+  CloudUserDetail,
+  CloudUserListQuery,
+  CloudUserListResponse,
+  BanCloudUserRequest,
+  GrantSubscriptionRequest,
   IssueCloudAdminAccessTokenResponse,
+  InviteRedemptionListQuery,
+  InviteRedemptionListResponse,
   ReplayFailedCloudWaitingSessionSyncTasksResponse,
   ReplayFilteredFailedCloudWaitingSessionSyncTasksRequest,
   ReplayFilteredFailedCloudWaitingSessionSyncTasksResponse,
@@ -39,6 +47,7 @@ import type {
   RevenueSettlementPreviewRequest,
   RevenueSettlementPreviewResponse,
   RevenueSharingPolicySummary,
+  RejectInviteRedemptionRequest,
   RevokeCloudAdminSessionSourceGroupRequest,
   RevokeCloudAdminSessionSourceGroupResponse,
   RevokeCloudAdminSessionSourceGroupsByRiskRequest,
@@ -46,8 +55,12 @@ import type {
   RevokeCloudAdminSessionsByFilterRequest,
   RevokeCloudAdminSessionsByFilterResponse,
   RevokeCloudAdminSessionsByIdResponse,
+  SubscriptionPlanSummary,
+  SubscriptionRecordSummary,
   UpdateRevenueSharingPolicyRequest,
+  UpsertCloudConfigRequest,
   UpsertRevenuePayeeRequest,
+  UpsertSubscriptionPlanRequest,
   WorldLifecycleJobSummary,
 } from "@yinjie/contracts";
 import {
@@ -105,9 +118,8 @@ export function getCloudAdminApiErrorCode(error: unknown) {
   return error instanceof CloudAdminApiError ? error.errorCode : null;
 }
 
-let inFlightAdminTokenPromise:
-  | Promise<IssueCloudAdminAccessTokenResponse>
-  | null = null;
+let inFlightAdminTokenPromise: Promise<IssueCloudAdminAccessTokenResponse> | null =
+  null;
 
 type CloudAdminSecretInvalidEventDetail = {
   requestId: string | null;
@@ -451,7 +463,9 @@ async function issueCloudAdminAccessToken(
   const normalizedSecret = secret.trim();
   if (!normalizedSecret) {
     throw new CloudAdminApiError(
-      translateCloudConsoleTextForActiveLocale("CLOUD_ADMIN_SECRET is required."),
+      translateCloudConsoleTextForActiveLocale(
+        "CLOUD_ADMIN_SECRET is required.",
+      ),
       null,
       {
         errorCode: "CLOUD_ADMIN_SECRET_REQUIRED",
@@ -477,7 +491,9 @@ async function issueCloudAdminAccessToken(
     const requestId = getResponseRequestId(response);
     notifyCloudAdminSecretInvalid(requestId);
     throw new CloudAdminApiError(
-      translateCloudConsoleTextForActiveLocale("CLOUD_ADMIN_SECRET is invalid."),
+      translateCloudConsoleTextForActiveLocale(
+        "CLOUD_ADMIN_SECRET is invalid.",
+      ),
       requestId,
       {
         errorCode: "CLOUD_ADMIN_SECRET_INVALID",
@@ -616,7 +632,8 @@ async function ensureCloudAdminAccessToken(forceRefresh = false) {
   const storedRefreshToken = getStoredCloudAdminRefreshToken();
   if (
     storedRefreshToken &&
-    storedRefreshToken.expiresAt - Date.now() > ADMIN_ACCESS_TOKEN_REFRESH_SKEW_MS
+    storedRefreshToken.expiresAt - Date.now() >
+      ADMIN_ACCESS_TOKEN_REFRESH_SKEW_MS
   ) {
     inFlightAdminTokenPromise = refreshCloudAdminAccessToken(
       storedRefreshToken.token,
@@ -638,7 +655,9 @@ async function ensureCloudAdminAccessToken(forceRefresh = false) {
 
   if (!secret) {
     throw new CloudAdminApiError(
-      translateCloudConsoleTextForActiveLocale("CLOUD_ADMIN_SECRET is required."),
+      translateCloudConsoleTextForActiveLocale(
+        "CLOUD_ADMIN_SECRET is required.",
+      ),
       null,
       {
         errorCode: "CLOUD_ADMIN_SECRET_REQUIRED",
@@ -671,8 +690,8 @@ async function sendAdminRequest(
       headers: mergeHeaders(
         createCloudAdminLocaleHeaders(),
         {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         optionHeaders,
       ),
@@ -869,7 +888,9 @@ export const cloudAdminApi = {
 
   getJob: (id: string) => adminFetch<WorldLifecycleJobSummary>(`/jobs/${id}`),
 
-  listWaitingSessionSyncTasks: (filters?: CloudWaitingSessionSyncTaskListQuery) =>
+  listWaitingSessionSyncTasks: (
+    filters?: CloudWaitingSessionSyncTaskListQuery,
+  ) =>
     adminFetch<CloudWaitingSessionSyncTaskListResponse>(
       `/waiting-session-sync-tasks${buildQueryString({
         status: filters?.status,
@@ -1053,9 +1074,7 @@ export const cloudAdminApi = {
       })}`,
     ),
 
-  listAdminSessionSourceGroups: (
-    filters?: CloudAdminSessionSourceGroupQuery,
-  ) =>
+  listAdminSessionSourceGroups: (filters?: CloudAdminSessionSourceGroupQuery) =>
     adminFetch<CloudAdminSessionSourceGroupListResponse>(
       `/admin-session-source-groups${buildQueryString({
         status: filters?.status,
@@ -1077,9 +1096,12 @@ export const cloudAdminApi = {
     }),
 
   revokeAdminSessionByIdWithMeta: (sessionId: string) =>
-    adminFetchWithMeta<{ success: true }>(`/admin-sessions/${sessionId}/revoke`, {
-      method: "POST",
-    }),
+    adminFetchWithMeta<{ success: true }>(
+      `/admin-sessions/${sessionId}/revoke`,
+      {
+        method: "POST",
+      },
+    ),
 
   revokeAdminSessionsById: (sessionIds: string[]) =>
     adminFetch<RevokeCloudAdminSessionsByIdResponse>("/admin-sessions/revoke", {
@@ -1228,6 +1250,28 @@ export const cloudAdminApi = {
       body: JSON.stringify(payload),
     }),
 
+  listCloudUsers: (query?: CloudUserListQuery) =>
+    adminFetch<CloudUserListResponse>(
+      `/users${buildQueryString({
+        query: query?.query,
+        subscriptionStatus: query?.subscriptionStatus,
+        status: query?.status,
+        inviterPhone: query?.inviterPhone,
+        registeredFrom: query?.registeredFrom,
+        registeredTo: query?.registeredTo,
+        page: query?.page,
+        pageSize: query?.pageSize,
+      })}`,
+    ),
+
+  getCloudUser: (id: string) => adminFetch<CloudUserDetail>(`/users/${id}`),
+
+  grantSubscription: (id: string, payload: GrantSubscriptionRequest) =>
+    adminFetch<SubscriptionRecordSummary>(`/users/${id}/subscriptions`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
   listRevenueEvents: (filters?: { worldId?: string; characterId?: string }) =>
     adminFetch<RevenueEventListResponse>(
       `/revenue-sharing/events${buildQueryString({
@@ -1272,4 +1316,51 @@ export const cloudAdminApi = {
         body: JSON.stringify(payload ?? {}),
       },
     ),
+
+  banUser: (id: string, payload: BanCloudUserRequest) =>
+    adminFetch<{ success: true }>(`/users/${id}/ban`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  unbanUser: (id: string) =>
+    adminFetch<{ success: true }>(`/users/${id}/unban`, {
+      method: "POST",
+    }),
+
+  listSubscriptionPlans: () =>
+    adminFetch<SubscriptionPlanSummary[]>("/subscription-plans"),
+
+  upsertSubscriptionPlan: (payload: UpsertSubscriptionPlanRequest) =>
+    adminFetch<SubscriptionPlanSummary>("/subscription-plans", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  listCloudConfigs: () => adminFetch<CloudConfigEntry[]>("/configs"),
+
+  upsertCloudConfig: (payload: UpsertCloudConfigRequest) =>
+    adminFetch<CloudConfigEntry>("/configs", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  listInviteRedemptions: (query?: InviteRedemptionListQuery) =>
+    adminFetch<InviteRedemptionListResponse>(
+      `/invites/redemptions${buildQueryString({
+        query: query?.query,
+        status: query?.status,
+        page: query?.page,
+        pageSize: query?.pageSize,
+      })}`,
+    ),
+
+  rejectInviteRedemption: (
+    id: string,
+    payload: RejectInviteRedemptionRequest,
+  ) =>
+    adminFetch<{ success: true }>(`/invites/redemptions/${id}/reject`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
 };

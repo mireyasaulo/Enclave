@@ -32,11 +32,57 @@ type RouteMeta = {
 
 // i18n-ignore-start: Cloud console route metadata is localized by the surface text dictionary.
 function getRouteMeta(pathname: string): RouteMeta {
+  if (pathname.startsWith("/users/")) {
+    return {
+      eyebrow: "SaaS operations",
+      title: "User detail",
+      detail:
+        "Inspect subscription history, invite rewards, and one cloud account's world linkage.",
+    };
+  }
+
+  if (pathname.startsWith("/users")) {
+    return {
+      eyebrow: "SaaS operations",
+      title: "Users",
+      detail:
+        "Review cloud account status, subscription expiry, inviter attribution, and world linkage.",
+    };
+  }
+
+  if (pathname.startsWith("/subscription-plans")) {
+    return {
+      eyebrow: "SaaS operations",
+      title: "Plans",
+      detail:
+        "Configure trial, monthly, quarterly, yearly, and invite reward plans shown to the app.",
+    };
+  }
+
+  if (pathname.startsWith("/configs")) {
+    return {
+      eyebrow: "SaaS operations",
+      title: "Configs",
+      detail:
+        "Manage SaaS trial, invite, feature, copy, and public app URL configuration.",
+    };
+  }
+
+  if (pathname.startsWith("/invite-audit")) {
+    return {
+      eyebrow: "SaaS operations",
+      title: "Invite audit",
+      detail:
+        "Review reward redemptions, device and IP signals, and manual reversals.",
+    };
+  }
+
   if (pathname.startsWith("/requests/")) {
     return {
       eyebrow: "Cloud operations",
       title: "Request detail",
-      detail: "Review one phone-based world application and its delivery state.",
+      detail:
+        "Review one phone-based world application and its delivery state.",
     };
   }
 
@@ -44,7 +90,8 @@ function getRouteMeta(pathname: string): RouteMeta {
     return {
       eyebrow: "Cloud operations",
       title: "Requests",
-      detail: "Review application status, projected world state, and manual delivery handoffs.",
+      detail:
+        "Review application status, projected world state, and manual delivery handoffs.",
     };
   }
 
@@ -52,7 +99,8 @@ function getRouteMeta(pathname: string): RouteMeta {
     return {
       eyebrow: "Cloud operations",
       title: "World detail",
-      detail: "Inspect instance placement, runtime status, bootstrap material, and lifecycle jobs.",
+      detail:
+        "Inspect instance placement, runtime status, bootstrap material, and lifecycle jobs.",
     };
   }
 
@@ -60,7 +108,8 @@ function getRouteMeta(pathname: string): RouteMeta {
     return {
       eyebrow: "Cloud operations",
       title: "Worlds",
-      detail: "Track provider placement, power state, heartbeat freshness, and operator attention.",
+      detail:
+        "Track provider placement, power state, heartbeat freshness, and operator attention.",
     };
   }
 
@@ -68,7 +117,8 @@ function getRouteMeta(pathname: string): RouteMeta {
     return {
       eyebrow: "Cloud operations",
       title: "Jobs",
-      detail: "Inspect provisioning, resume, suspend, and reconcile work across the fleet.",
+      detail:
+        "Inspect provisioning, resume, suspend, and reconcile work across the fleet.",
     };
   }
 
@@ -76,7 +126,8 @@ function getRouteMeta(pathname: string): RouteMeta {
     return {
       eyebrow: "Cloud operations",
       title: "Sessions",
-      detail: "Review admin access, risk groups, revocation paths, and source activity.",
+      detail:
+        "Review admin access, risk groups, revocation paths, and source activity.",
     };
   }
 
@@ -84,7 +135,8 @@ function getRouteMeta(pathname: string): RouteMeta {
     return {
       eyebrow: "Cloud operations",
       title: "Waiting Sync",
-      detail: "Replay exhausted compensation tasks and clear stale failures from one queue.",
+      detail:
+        "Replay exhausted compensation tasks and clear stale failures from one queue.",
     };
   }
 
@@ -92,25 +144,21 @@ function getRouteMeta(pathname: string): RouteMeta {
     return {
       eyebrow: "Cloud monetization",
       title: "Revenue Sharing",
-      detail: "Configure role usage pricing, payees, contribution weights, and settlement ledgers.",
+      detail:
+        "Configure role usage pricing, payees, contribution weights, and settlement ledgers.",
     };
   }
 
   return {
     eyebrow: "Cloud operations",
     title: "Dashboard",
-    detail: "Monitor world availability, lifecycle jobs, request flow, and cloud runtime drift.",
+    detail:
+      "Monitor world availability, lifecycle jobs, request flow, and cloud runtime drift.",
   };
 }
 // i18n-ignore-end
 
-function NavLinkContent({
-  label,
-  hint,
-}: {
-  label: string;
-  hint: string;
-}) {
+function NavLinkContent({ label, hint }: { label: string; hint: string }) {
   return (
     <span className="block min-w-0">
       <span className="block truncate leading-5">{label}</span>
@@ -207,7 +255,9 @@ function RootLayoutContent() {
       hint: "Applications and handoffs",
       content: (
         <RequestsPermalinkLink
-          className={pathname.startsWith("/requests") ? NAV_LINK_ACTIVE : NAV_LINK}
+          className={
+            pathname.startsWith("/requests") ? NAV_LINK_ACTIVE : NAV_LINK
+          }
           aria-current={pathname.startsWith("/requests") ? "page" : undefined}
         >
           <NavLinkContent label="Requests" hint="Applications and handoffs" />
@@ -220,7 +270,9 @@ function RootLayoutContent() {
       hint: "Instances and health",
       content: (
         <WorldsPermalinkLink
-          className={pathname.startsWith("/worlds") ? NAV_LINK_ACTIVE : NAV_LINK}
+          className={
+            pathname.startsWith("/worlds") ? NAV_LINK_ACTIVE : NAV_LINK
+          }
           aria-current={pathname.startsWith("/worlds") ? "page" : undefined}
         >
           <NavLinkContent label="Worlds" hint="Instances and health" />
@@ -267,13 +319,83 @@ function RootLayoutContent() {
       ),
     },
     {
+      key: "users",
+      label: "Users",
+      hint: "Accounts and expiry",
+      content: (
+        <Link
+          to="/users"
+          className={pathname.startsWith("/users") ? NAV_LINK_ACTIVE : NAV_LINK}
+          aria-current={pathname.startsWith("/users") ? "page" : undefined}
+        >
+          <NavLinkContent label="Users" hint="Accounts and expiry" />
+        </Link>
+      ),
+    },
+    {
+      key: "plans",
+      label: "Plans",
+      hint: "Pricing and access",
+      content: (
+        <Link
+          to="/subscription-plans"
+          className={
+            pathname.startsWith("/subscription-plans")
+              ? NAV_LINK_ACTIVE
+              : NAV_LINK
+          }
+          aria-current={
+            pathname.startsWith("/subscription-plans") ? "page" : undefined
+          }
+        >
+          <NavLinkContent label="Plans" hint="Pricing and access" />
+        </Link>
+      ),
+    },
+    {
+      key: "configs",
+      label: "Configs",
+      hint: "Trial and copy",
+      content: (
+        <Link
+          to="/configs"
+          className={
+            pathname.startsWith("/configs") ? NAV_LINK_ACTIVE : NAV_LINK
+          }
+          aria-current={pathname.startsWith("/configs") ? "page" : undefined}
+        >
+          <NavLinkContent label="Configs" hint="Trial and copy" />
+        </Link>
+      ),
+    },
+    {
+      key: "invite-audit",
+      label: "Invite Audit",
+      hint: "Rewards and risk",
+      content: (
+        <Link
+          to="/invite-audit"
+          className={
+            pathname.startsWith("/invite-audit") ? NAV_LINK_ACTIVE : NAV_LINK
+          }
+          aria-current={
+            pathname.startsWith("/invite-audit") ? "page" : undefined
+          }
+        >
+          <NavLinkContent label="Invite Audit" hint="Rewards and risk" />
+        </Link>
+      ),
+    },
+    {
       key: "revenue-sharing",
       label: "Revenue Sharing",
       hint: "Payees and ledgers",
       content: (
         <Link
           to="/revenue-sharing"
-          className={pathname === "/revenue-sharing" ? NAV_LINK_ACTIVE : NAV_LINK}
+          className={
+            pathname === "/revenue-sharing" ? NAV_LINK_ACTIVE : NAV_LINK
+          }
           aria-current={pathname === "/revenue-sharing" ? "page" : undefined}
         >
           <NavLinkContent label="Revenue Sharing" hint="Payees and ledgers" />

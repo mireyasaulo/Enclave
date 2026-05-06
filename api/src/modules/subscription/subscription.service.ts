@@ -76,7 +76,7 @@ export class SubscriptionService {
       expiredAt: status.expiresAt,
       plans: status.plans,
       copy: status.copy,
-      ctaUrl: '/me/subscription',
+      ctaUrl: '/profile/subscription',
     };
     throw new SubscriptionExpiredException(status.copy.expiredMessage, meta);
   }

@@ -138,6 +138,7 @@ export interface CloudApiErrorResponse {
   message: string;
   params?: Record<string, string | number | boolean | null>;
   requestId?: string | null;
+  meta?: unknown;
 }
 
 export interface RevokeCloudAdminSessionsByIdRequest {

@@ -2,9 +2,11 @@ import {
   DEFAULT_CLOUD_API_BASE_URL,
   resolveCloudApiBaseUrl,
   resolveCoreApiBaseUrl,
+  setApiRequestErrorHandler,
   setCloudApiBaseUrlProvider,
   setCoreApiBaseUrlProvider,
 } from "@yinjie/contracts";
+import { handleApiSubscriptionExpiredError } from "./subscription-expired";
 import { resolveAppRuntimeContext } from "../runtime/platform";
 import { getAppRuntimeConfig } from "../runtime/runtime-config-store";
 
@@ -52,6 +54,9 @@ export function configureContractsRuntime() {
   setCloudApiBaseUrlProvider(() => {
     const runtimeConfig = getAppRuntimeConfig();
     return runtimeConfig.cloudApiBaseUrl ?? DEFAULT_CLOUD_API_BASE_URL;
+  });
+  setApiRequestErrorHandler((error) => {
+    handleApiSubscriptionExpiredError(error);
   });
 }
 

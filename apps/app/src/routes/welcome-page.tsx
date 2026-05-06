@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 import { msg } from "@lingui/macro";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   DEFAULT_CORE_API_BASE_URL,
@@ -22,9 +22,13 @@ import {
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, AppSection, Button, ErrorBlock, InlineNotice, LoadingBlock, TextField } from "@yinjie/ui";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+import { getDeviceFingerprint } from "../lib/device-fingerprint";
+import { persistInviteCode, readStoredInviteCode } from "../lib/invite-code-storage";
 import { describeRequestError } from "../lib/request-error";
+import { isLocalWorldEntryEnabled } from "../lib/world-access-mode";
 import { assertWorldReachable } from "../lib/world-entry";
 import { setAppRuntimeConfig, useAppRuntimeConfig } from "../runtime/runtime-config-store";
+import { isCloudSessionExpired, useCloudSessionStore } from "../store/cloud-session-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
 type WorldAccessMode = "cloud" | "local";
@@ -232,20 +236,32 @@ function mobileNoticeTone(
 export function WelcomePage() {
   const t = useRuntimeTranslator();
   const navigate = useNavigate();
+  const searchStr = useRouterState({
+    select: (state) => state.location.searchStr,
+  });
   const queryClient = useQueryClient();
   const isDesktopLayout = useDesktopLayout();
   const runtimeConfig = useAppRuntimeConfig();
   const hydrateOwner = useWorldOwnerStore((state) => state.hydrateOwner);
   const storedName = useWorldOwnerStore((state) => state.username);
   const onboardingCompleted = useWorldOwnerStore((state) => state.onboardingCompleted);
+  const savedCloudAccessToken = useCloudSessionStore((state) => state.accessToken);
+  const savedCloudExpiresAt = useCloudSessionStore((state) => state.expiresAt);
+  const savedCloudPhone = useCloudSessionStore((state) => state.phone);
+  const saveCloudSession = useCloudSessionStore((state) => state.setSession);
+  const localWorldEntryEnabled = isLocalWorldEntryEnabled();
 
   const [mode, setMode] = useState<WorldAccessMode>(
-    runtimeConfig.worldAccessMode ?? (runtimeConfig.apiBaseUrl ? "local" : "cloud"),
+    !localWorldEntryEnabled
+      ? "cloud"
+      : runtimeConfig.worldAccessMode ?? (runtimeConfig.apiBaseUrl ? "local" : "cloud"),
   );
   const [localApiBaseUrl, setLocalApiBaseUrl] = useState(resolveDefaultLocalApiBaseUrl(runtimeConfig.apiBaseUrl) ?? "");
-  const [phone, setPhone] = useState(runtimeConfig.cloudPhone ?? "");
+  const [phone, setPhone] = useState(savedCloudPhone ?? runtimeConfig.cloudPhone ?? "");
   const [code, setCode] = useState("");
-  const [cloudAccessToken, setCloudAccessToken] = useState("");
+  const [cloudAccessToken, setCloudAccessToken] = useState(
+    !isCloudSessionExpired(savedCloudExpiresAt) ? savedCloudAccessToken ?? "" : "",
+  );
   const [cloudAccessSessionId, setCloudAccessSessionId] = useState<string | null>(null);
   const [connectedAccessSessionId, setConnectedAccessSessionId] = useState<string | null>(null);
   const [ownerName, setOwnerName] = useState(storedName ?? "");
@@ -255,6 +271,7 @@ export function WelcomePage() {
   const [entryError, setEntryError] = useState("");
   const [ownerError, setOwnerError] = useState("");
   const [isContinuing, setIsContinuing] = useState(false);
+  const [inviteCode, setInviteCode] = useState(readStoredInviteCode());
   const cloudConnectKeyRef = useRef<string | null>(null);
 
   const normalizedTypedLocalApiBaseUrl = normalizeBaseUrl(localApiBaseUrl);
@@ -278,15 +295,40 @@ export function WelcomePage() {
 
   useEffect(() => {
     setLocalApiBaseUrl(resolveDefaultLocalApiBaseUrl(runtimeConfig.apiBaseUrl) ?? "");
-    setPhone(runtimeConfig.cloudPhone ?? "");
-    if (runtimeConfig.worldAccessMode) {
+    setPhone(savedCloudPhone ?? runtimeConfig.cloudPhone ?? "");
+    if (!localWorldEntryEnabled) {
+      setMode("cloud");
+    } else if (runtimeConfig.worldAccessMode) {
       setMode(runtimeConfig.worldAccessMode);
     }
-  }, [runtimeConfig.apiBaseUrl, runtimeConfig.cloudPhone, runtimeConfig.worldAccessMode]);
+  }, [
+    localWorldEntryEnabled,
+    runtimeConfig.apiBaseUrl,
+    runtimeConfig.cloudPhone,
+    runtimeConfig.worldAccessMode,
+    savedCloudPhone,
+  ]);
+
+  useEffect(() => {
+    setCloudAccessToken(
+      !isCloudSessionExpired(savedCloudExpiresAt) ? savedCloudAccessToken ?? "" : "",
+    );
+  }, [savedCloudAccessToken, savedCloudExpiresAt]);
 
   useEffect(() => {
     setOwnerName(storedName ?? "");
   }, [storedName]);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(searchStr);
+    const queryInviteCode = searchParams.get("invite");
+    if (queryInviteCode) {
+      setInviteCode(persistInviteCode(queryInviteCode));
+      return;
+    }
+
+    setInviteCode(readStoredInviteCode());
+  }, [searchStr]);
 
   useEffect(() => {
     if (!notice) {
@@ -480,6 +522,9 @@ export function WelcomePage() {
   });
 
   function chooseMode(nextMode: WorldAccessMode) {
+    if (nextMode === "local" && !localWorldEntryEnabled) {
+      return;
+    }
     setMode(nextMode);
     setEntryError("");
     setOwnerError("");
@@ -556,6 +601,8 @@ export function WelcomePage() {
           {
             phone: phone.trim(),
             code: code.trim(),
+            inviteCode: inviteCode || undefined,
+            deviceFingerprint: getDeviceFingerprint(),
           },
           normalizedCloudApiBaseUrl || undefined,
         );
@@ -564,6 +611,12 @@ export function WelcomePage() {
         verifiedPhone = verifyResult.phone;
         setPhone(verifyResult.phone);
         setCloudAccessToken(verifyResult.accessToken);
+        saveCloudSession({
+          accessToken: verifyResult.accessToken,
+          expiresAt: verifyResult.expiresAt,
+          phone: verifyResult.phone,
+          profile: null,
+        });
       }
 
       const session = await resolveMyCloudWorldAccess(
@@ -901,7 +954,8 @@ export function WelcomePage() {
   function renderEntryStep() {
     return (
       <div className="space-y-5">
-        <div className="grid grid-cols-2 gap-3">
+        {localWorldEntryEnabled ? (
+          <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
             onClick={() => chooseMode("cloud")}
@@ -939,7 +993,12 @@ export function WelcomePage() {
               )}
             </div>
           </button>
-        </div>
+          </div>
+        ) : (
+          <InlineNotice tone="info">
+            Cloud sign-in is required in this build. Local world entry remains available only for development and internal environments.
+          </InlineNotice>
+        )}
 
         {notice ? (
           isDesktopLayout ? <InlineNotice tone="success">{notice}</InlineNotice> : <MobileWelcomeNotice tone="success">{notice}</MobileWelcomeNotice>

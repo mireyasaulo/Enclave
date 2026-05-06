@@ -56,6 +56,31 @@ const RevenueSharingPage = lazy(async () => {
   return { default: mod.RevenueSharingPage };
 });
 
+const UsersPage = lazy(async () => {
+  const mod = await import("./routes/users-page");
+  return { default: mod.UsersPage };
+});
+
+const UserDetailPage = lazy(async () => {
+  const mod = await import("./routes/user-detail-page");
+  return { default: mod.UserDetailPage };
+});
+
+const SubscriptionPlansPage = lazy(async () => {
+  const mod = await import("./routes/subscription-plans-page");
+  return { default: mod.SubscriptionPlansPage };
+});
+
+const CloudConfigsPage = lazy(async () => {
+  const mod = await import("./routes/cloud-configs-page");
+  return { default: mod.CloudConfigsPage };
+});
+
+const InviteAuditPage = lazy(async () => {
+  const mod = await import("./routes/invite-audit-page");
+  return { default: mod.InviteAuditPage };
+});
+
 const rootRoute = createRootRoute({
   component: RootLayout,
 });
@@ -119,6 +144,36 @@ const revenueSharingRoute = createRoute({
   component: RevenueSharingPage,
 });
 
+const usersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/users",
+  component: UsersPage,
+});
+
+const userDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/users/$userId",
+  component: UserDetailPage,
+});
+
+const subscriptionPlansRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/subscription-plans",
+  component: SubscriptionPlansPage,
+});
+
+const cloudConfigsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/configs",
+  component: CloudConfigsPage,
+});
+
+const inviteAuditRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/invite-audit",
+  component: InviteAuditPage,
+});
+
 export const routeTree = rootRoute.addChildren([
   indexRoute,
   requestsRoute,
@@ -128,6 +183,11 @@ export const routeTree = rootRoute.addChildren([
   jobsRoute,
   adminSessionsRoute,
   waitingSessionSyncRoute,
+  usersRoute,
+  userDetailRoute,
+  subscriptionPlansRoute,
+  cloudConfigsRoute,
+  inviteAuditRoute,
   revenueSharingRoute,
 ]);
 

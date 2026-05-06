@@ -1,0 +1,144 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import type { CloudUserStatus, SubscriptionStatus } from "@yinjie/contracts";
+import { ErrorBlock, InlineNotice, LoadingBlock } from "@yinjie/ui";
+import { cloudAdminApi } from "../lib/cloud-admin-api";
+
+export function UsersPage() {
+  const [query, setQuery] = useState("");
+  const [status, setStatus] = useState<CloudUserStatus | "">("");
+  const [subscriptionStatus, setSubscriptionStatus] =
+    useState<SubscriptionStatus | "">("");
+  const [page, setPage] = useState(1);
+
+  const usersQuery = useQuery({
+    queryKey: ["cloud-console", "saas-users", query, status, subscriptionStatus, page],
+    queryFn: () =>
+      cloudAdminApi.listCloudUsers({
+        query: query || undefined,
+        status: status || undefined,
+        subscriptionStatus: subscriptionStatus || undefined,
+        page,
+        pageSize: 20,
+      }),
+  });
+
+  return (
+    <section className="space-y-4 rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
+      <div className="grid gap-3 md:grid-cols-4">
+        <input
+          value={query}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setPage(1);
+          }}
+          placeholder="Search phone"
+          className="rounded-2xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm"
+        />
+        <select
+          value={status}
+          onChange={(event) => {
+            setStatus(event.target.value as CloudUserStatus | "");
+            setPage(1);
+          }}
+          className="rounded-2xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm"
+        >
+          <option value="">All account states</option>
+          <option value="active">active</option>
+          <option value="banned">banned</option>
+          <option value="archived">archived</option>
+        </select>
+        <select
+          value={subscriptionStatus}
+          onChange={(event) => {
+            setSubscriptionStatus(event.target.value as SubscriptionStatus | "");
+            setPage(1);
+          }}
+          className="rounded-2xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm"
+        >
+          <option value="">All subscription states</option>
+          <option value="active">active</option>
+          <option value="expired">expired</option>
+          <option value="none">none</option>
+        </select>
+        <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white px-3 py-2 text-sm text-[color:var(--text-secondary)]">
+          Page {usersQuery.data?.page ?? page} / {usersQuery.data?.totalPages ?? 1}
+        </div>
+      </div>
+
+      {usersQuery.isLoading ? <LoadingBlock label="Loading SaaS users..." /> : null}
+      {usersQuery.isError ? (
+        <ErrorBlock
+          message={
+            usersQuery.error instanceof Error
+              ? usersQuery.error.message
+              : "Failed to load users."
+          }
+        />
+      ) : null}
+
+      {usersQuery.data ? (
+        <div className="overflow-hidden rounded-[24px] border border-[color:var(--border-faint)] bg-white">
+          <table className="min-w-full divide-y divide-[color:var(--border-faint)] text-sm">
+            <thead className="bg-[#f8faf8] text-left text-[color:var(--text-muted)]">
+              <tr>
+                <th className="px-4 py-3 font-medium">Phone</th>
+                <th className="px-4 py-3 font-medium">Account</th>
+                <th className="px-4 py-3 font-medium">Subscription</th>
+                <th className="px-4 py-3 font-medium">Expires</th>
+                <th className="px-4 py-3 font-medium">Inviter</th>
+                <th className="px-4 py-3 font-medium">World</th>
+                <th className="px-4 py-3 font-medium">Plan</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[color:var(--border-faint)]">
+              {usersQuery.data.items.map((user) => (
+                <tr key={user.id} className="align-top">
+                  <td className="px-4 py-3">
+                    <Link
+                      to="/users/$userId"
+                      params={{ userId: user.id }}
+                      className="font-medium text-[color:var(--brand-primary)]"
+                    >
+                      {user.phone}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3">{user.status}</td>
+                  <td className="px-4 py-3">{user.subscriptionStatus}</td>
+                  <td className="px-4 py-3">{user.subscriptionExpiresAt || "-"}</td>
+                  <td className="px-4 py-3">{user.inviterPhone || "-"}</td>
+                  <td className="px-4 py-3">{user.worldStatus || "-"}</td>
+                  <td className="px-4 py-3">{user.currentPlanCode || "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
+
+      {usersQuery.data && !usersQuery.data.items.length ? (
+        <InlineNotice tone="muted">No cloud users matched the current filters.</InlineNotice>
+      ) : null}
+
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          className="rounded-2xl border border-[color:var(--border-subtle)] bg-white px-4 py-2 text-sm"
+          onClick={() => setPage((current) => Math.max(current - 1, 1))}
+          disabled={page <= 1}
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          className="rounded-2xl border border-[color:var(--border-subtle)] bg-white px-4 py-2 text-sm"
+          onClick={() => setPage((current) => current + 1)}
+          disabled={Boolean(usersQuery.data && page >= usersQuery.data.totalPages)}
+        >
+          Next
+        </button>
+      </div>
+    </section>
+  );
+}

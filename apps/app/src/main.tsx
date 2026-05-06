@@ -19,6 +19,7 @@ import {
 } from "./runtime/native-locale";
 import { NativeLocaleSync } from "./runtime/native-locale-sync";
 import { router } from "./router";
+import { hydrateCloudSessionStore } from "./store/cloud-session-store";
 import { hydrateNativeRuntimeConfig } from "./runtime/runtime-config-store";
 
 const VITE_PRELOAD_RECOVERY_KEY = "yinjie-app-vite-preload-recovery";
@@ -75,6 +76,7 @@ installStaleAssetRecovery();
 
 async function bootstrap() {
   const runtimeConfig = await hydrateNativeRuntimeConfig();
+  await hydrateCloudSessionStore();
   const androidLocalePreference = await readNativeLocalePreference();
   const desktopLocalePreference = androidLocalePreference
     ? null

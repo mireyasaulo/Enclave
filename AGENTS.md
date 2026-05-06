@@ -84,6 +84,7 @@
 - `official-account-service-page.tsx`：服务号消息页，移动端承载服务号独立消息线程，桌面端复用消息工作区右侧服务号面板
 - `subscription-inbox-page.tsx`：订阅号消息页，移动端承载“消息 -> 订阅号消息”聚合流，桌面端承载消息工作区内的订阅号阅读面板
 - `profile/settings`：我的二级设置页，集中承载资料编辑与专属 API Key 配置
+- `profile/subscription`：统一会员中心页，集中展示手机号、订阅状态、套餐价格、邀请码、邀请记录与手动开通入口
 - `friend-moments/$characterId`：移动端好友朋友圈独立页，对齐微信手机版，由好友资料页进入某个好友的独立朋友圈时间线
 - `desktop/mobile`：桌面端底部“手机”入口承接页，后续承接设备联动能力
 - `desktop/friend-moments/$characterId`：桌面端好友朋友圈独立页，对齐微信电脑版，从联系人资料入口进入某个好友的独立朋友圈时间线
@@ -189,27 +190,66 @@
 ## 云世界平台实体（`apps/cloud-api/src/entities/`）
 
 - `PhoneVerificationSession`：手机号验证码会话
+- `CloudUser`：云账号主体，手机号唯一绑定，承载账号状态、邀请码与注册元信息
 - `CloudWorld`：官方云世界记录，手机号唯一绑定
 - `CloudWorldRequest`：客户端发起的建世界申请单
+- `SubscriptionPlan`：试用 / 月 / 季 / 年 / 邀请奖励套餐定义
+- `UserSubscription`：用户订阅记录，承载来源、起止时间、状态与备注
+- `InviteCode`：用户邀请码
+- `InviteRedemption`：邀请码兑换与奖励审计记录
+- `CloudConfig`：SaaS 配置中心，承载 `trial.* / invite.* / feature.* / copy.* / app.publicBaseUrl`
+- `WorldAccessSession`：云世界解析 / 唤醒会话
+- `CloudAdminSession`：云平台管理员短期会话
+- `CloudInstance` · `WorldLifecycleJob` · `WaitingSessionSyncTask`：实例编排、生命周期任务与补偿任务
 - `RevenueSharingPolicy`：角色使用收益分成策略版本，承载事件单价、固定池比例、贡献权重与结算阈值
 - `RevenuePayee`：云端收益人档案，绑定世界主人、wiki 用户、角色、平台或运行方外部引用
 - `RevenueContributionEvent`：世界实例回传的角色创建、编辑、审核、巡查与逻辑发布贡献事件
 - `RevenueUsageEvent`：世界实例回传的角色聊天、语音、视频、内容与逻辑运行使用收入事件
 - `RevenueAllocationLedger`：按策略计算出的收益分配账本，区分 payable / held / settled
 - `RevenueSettlementBatch`：云后台生成的收益结算批次，仅记录应付账本，不执行真实打款
+
 ## 云世界平台职责（当前真实口径）
 
 - 云平台当前负责：
   - 手机号验证
+  - 云账号创建、封禁 / 停用状态校验
+  - 7 天试用、月 / 季 / 年订阅、后台赠送订阅
+  - 邀请码生成、邀请奖励发放与风控撤销
+  - SaaS 配置下发（套餐、文案、试用与邀请规则）
+  - 云世界解析 / 唤醒会话与世界地址回填
   - 云世界申请单管理
   - 云世界记录与地址回填
   - 官方控制台审核与状态流转
   - 角色使用收益分成策略、收益人档案、贡献事件、使用事件、分配账本与结算批次管理
 - 云平台当前**不负责**：
-  - 自动创建每个用户的世界实例
-  - 自动编排、拉起、销毁世界实例
   - 托管单个实例内的多用户管理
+  - 微信 / 支付宝等正式支付网关与订单中心
   - 真实支付、提现、税务、发票或 KYC
+
+## 云世界平台 SaaS 路由
+
+- 客户端路由：
+  - `GET /cloud/me/profile`
+  - `GET /cloud/me/subscription`
+  - `GET /cloud/me/invite/summary`
+  - `POST /cloud/me/invite/redeem`
+  - `POST /cloud/me/checkout`
+  - `POST /cloud/me/world-access/resolve`
+  - `GET /cloud/me/world-access/sessions/:sessionId`
+- 控制台路由：
+  - `GET /admin/cloud/users`
+  - `GET /admin/cloud/users/:id`
+  - `POST /admin/cloud/users/:id/subscriptions`
+  - `POST /admin/cloud/users/:id/ban`
+  - `POST /admin/cloud/users/:id/unban`
+  - `GET /admin/cloud/subscription-plans`
+  - `POST /admin/cloud/subscription-plans`
+  - `GET /admin/cloud/configs`
+  - `POST /admin/cloud/configs`
+  - `GET /admin/cloud/invites/redemptions`
+  - `POST /admin/cloud/invites/redemptions/:id/reject`
+- 迁移脚本：
+  - `pnpm --filter @yinjie/cloud-api saas:backfill`：从 `CloudWorld.phone` 回填 SaaS 用户、邀请码与一次性迁移订阅
 
 ## 云世界管理平台收益分成路由
 
@@ -385,10 +425,14 @@
 ## 前端状态约束
 
 - 世界主人主状态存放于 `apps/app/src/store/world-owner-store.ts`
+- 云账号会话主状态存放于 `apps/app/src/store/cloud-session-store.ts`
+- 会员到期统一弹窗状态存放于 `apps/app/src/store/subscription-expired-dialog-store.ts`
 - 世界主人资料契约现已支持 `defaultChatBackground`，用于承载实例默认聊天背景配置
 - `apps/app/src/store/session-store.ts` 目前仅作为兼容别名导出，底层仍指向世界主人 store；后续收口时应删除
 - `token`、`userId`、`onboardingCompleted` 等兼容字段目前仍通过该 store 暴露，后续收口时应继续移除
 - 运行时世界入口状态存放于 `apps/app/src/runtime/runtime-config.ts` / `runtime-config-store.ts`
+- 云账号登出必须同步清空 `cloud-session-store`、`world-owner-store` 与 `runtime-config`
+- 生产环境默认仅开放云世界登录；本地世界入口仅在开发 / 内部环境通过 `VITE_ENABLE_LOCAL_WORLD_ENTRY=true` 保留
 - Setup 页必须先完成世界入口选择（云世界或本地世界）后才能继续进入应用
 
 ## 客户端运行约束
@@ -426,6 +470,19 @@
 - `setup-page.tsx`：运行时与 Provider 初始化配置页
 - `reply-logic-page.tsx`：AI 回复逻辑总览页，查看实际链路、effective prompt、上下文窗口、记忆与硬编码常量
 - `action-runtime-page.tsx`：真实世界动作运行时控制台，围绕 self 角色查看动作门控、提示模板、连接器配置、自检结果、动作重试与执行轨迹
+
+## 云世界管理平台页面（`apps/cloud-console/src/routes/`）
+
+- `dashboard-page.tsx`：云平台总览，查看世界可用性、漂移与生命周期状态
+- `requests-page.tsx` / `request-detail-page.tsx`：云世界申请单列表与详情
+- `worlds-page.tsx` / `world-detail-page.tsx`：云世界实例列表与详情
+- `jobs-page.tsx`：生命周期任务队列与审计
+- `admin-sessions-page.tsx`：管理员会话审计与风险聚合
+- `waiting-session-sync-page.tsx`：补偿任务与失败重放
+- `users-page.tsx` / `user-detail-page.tsx`：SaaS 用户列表与详情，支持封禁 / 解封、赠送会员、查看邀请与订阅历史
+- `subscription-plans-page.tsx`：套餐管理，维护 trial / monthly / quarterly / yearly / invite_reward
+- `cloud-configs-page.tsx`：SaaS 配置管理，维护试用、邀请、功能开关与文案
+- `invite-audit-page.tsx`：邀请奖励审计，查看 IP / 设备指纹并支持撤销奖励
 
 ## 管理后台世界运行配置路由
 

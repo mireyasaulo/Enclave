@@ -8,6 +8,7 @@ import type {
   VoiceAttachment,
 } from "./attachments";
 import type { GroupMessage, Message } from "./chat";
+import type { SubscriptionExpiredErrorBody } from "./subscription";
 
 export const CHAT_NAMESPACE = "/chat";
 
@@ -105,4 +106,6 @@ export interface ConversationUpdatedPayload {
 
 export interface ChatErrorPayload {
   message: string;
+  code?: string;
+  meta?: SubscriptionExpiredErrorBody["meta"] | Record<string, unknown> | null;
 }
