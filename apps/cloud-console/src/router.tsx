@@ -7,23 +7,12 @@ import {
 import { RootLayout } from "./components/root-layout";
 import { validateAdminSessionsRouteSearch } from "./lib/admin-sessions-route-search";
 import { validateJobsRouteSearch } from "./lib/job-route-search";
-import { validateRequestsRouteSearch } from "./lib/request-route-search";
 import { validateWaitingSessionSyncRouteSearch } from "./lib/waiting-session-sync-helpers";
 import { validateWorldsRouteSearch } from "./lib/world-route-search";
 
 const DashboardPage = lazy(async () => {
   const mod = await import("./routes/dashboard-page");
   return { default: mod.DashboardPage };
-});
-
-const RequestsPage = lazy(async () => {
-  const mod = await import("./routes/requests-page");
-  return { default: mod.RequestsPage };
-});
-
-const RequestDetailPage = lazy(async () => {
-  const mod = await import("./routes/request-detail-page");
-  return { default: mod.RequestDetailPage };
 });
 
 const WorldsPage = lazy(async () => {
@@ -89,19 +78,6 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: DashboardPage,
-});
-
-const requestsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/requests",
-  validateSearch: validateRequestsRouteSearch,
-  component: RequestsPage,
-});
-
-const requestDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/requests/$requestId",
-  component: RequestDetailPage,
 });
 
 const worldsRoute = createRoute({
@@ -176,8 +152,6 @@ const inviteAuditRoute = createRoute({
 
 export const routeTree = rootRoute.addChildren([
   indexRoute,
-  requestsRoute,
-  requestDetailRoute,
   worldsRoute,
   worldDetailRoute,
   jobsRoute,

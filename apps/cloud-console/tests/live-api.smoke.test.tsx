@@ -8,7 +8,7 @@ import {
   it,
   vi,
 } from "vitest";
-import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import { cleanup, screen, waitFor } from "@testing-library/react";
 import {
   apiFetch,
   assertSuccessfulPost,
@@ -100,28 +100,21 @@ describe("cloud-console live api smoke", () => {
       liveApiServer.adminSecret,
     );
 
-    renderRoute(`/requests/${request.id}`, {
-      adminSecret: liveApiServer.adminSecret,
-    });
-
-    expect(await screen.findByText("Request guidance")).toBeTruthy();
-
-    fireEvent.change(screen.getByLabelText("Status"), {
-      target: { value: "active" },
-    });
-    fireEvent.change(screen.getByLabelText("World API base URL"), {
-      target: { value: "https://live-world.example.com/api/" },
-    });
-    fireEvent.change(screen.getByLabelText("World admin URL"), {
-      target: { value: "https://live-world.example.com/admin/" },
-    });
-    fireEvent.change(screen.getByLabelText("Ops note"), {
-      target: { value: "Activated by live console smoke." },
-    });
-    fireEvent.click(screen.getByRole("button", { name: "Save request" }));
-
-    expect(await screen.findByText("World request saved.")).toBeTruthy();
-    expect(await screen.findByText("Request id")).toBeTruthy();
+    const activateResponse = await apiFetch(
+      liveApiServer.baseUrl,
+      `/admin/cloud/world-requests/${request.id}`,
+      {
+        method: "PATCH",
+        headers: adminHeaders,
+        body: {
+          status: "active",
+          apiBaseUrl: "https://live-world.example.com/api/",
+          adminUrl: "https://live-world.example.com/admin/",
+          note: "Activated by live console smoke.",
+        },
+      },
+    );
+    expect(activateResponse.status).toBe(200);
 
     let worldId = "";
     await waitFor(async () => {
@@ -138,7 +131,6 @@ describe("cloud-console live api smoke", () => {
       worldId = worldsResponse.body[0].id;
     });
 
-    cleanup();
     renderRoute("/", {
       adminSecret: liveApiServer.adminSecret,
     });

@@ -4,7 +4,6 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { LanguageSwitcher } from "@yinjie/i18n";
 import { InlineNotice } from "@yinjie/ui";
 import { JobsPermalinkLink } from "./jobs-permalink-link";
-import { RequestsPermalinkLink } from "./requests-permalink-link";
 import { SessionsPermalinkLink } from "./sessions-permalink-link";
 import { WaitingSyncPermalinkLink } from "./waiting-sync-permalink-link";
 import { WorldsPermalinkLink } from "./worlds-permalink-link";
@@ -77,24 +76,6 @@ function getRouteMeta(pathname: string): RouteMeta {
     };
   }
 
-  if (pathname.startsWith("/requests/")) {
-    return {
-      eyebrow: "Cloud operations",
-      title: "Request detail",
-      detail:
-        "Review one phone-based world application and its delivery state.",
-    };
-  }
-
-  if (pathname.startsWith("/requests")) {
-    return {
-      eyebrow: "Cloud operations",
-      title: "Requests",
-      detail:
-        "Review application status, projected world state, and manual delivery handoffs.",
-    };
-  }
-
   if (pathname.startsWith("/worlds/")) {
     return {
       eyebrow: "Cloud operations",
@@ -153,7 +134,7 @@ function getRouteMeta(pathname: string): RouteMeta {
     eyebrow: "Cloud operations",
     title: "Dashboard",
     detail:
-      "Monitor world availability, lifecycle jobs, request flow, and cloud runtime drift.",
+      "Monitor world availability, lifecycle jobs, and cloud runtime drift.",
   };
 }
 // i18n-ignore-end
@@ -247,21 +228,6 @@ function RootLayoutContent() {
         >
           <NavLinkContent label="Dashboard" hint="Availability and drift" />
         </Link>
-      ),
-    },
-    {
-      key: "requests",
-      label: "Requests",
-      hint: "Applications and handoffs",
-      content: (
-        <RequestsPermalinkLink
-          className={
-            pathname.startsWith("/requests") ? NAV_LINK_ACTIVE : NAV_LINK
-          }
-          aria-current={pathname.startsWith("/requests") ? "page" : undefined}
-        >
-          <NavLinkContent label="Requests" hint="Applications and handoffs" />
-        </RequestsPermalinkLink>
       ),
     },
     {

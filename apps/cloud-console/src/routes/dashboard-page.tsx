@@ -18,29 +18,13 @@ import {
 } from "../components/cloud-admin-error-block";
 import { ConsoleConfirmDialog } from "../components/console-confirm-dialog";
 import { JobsPermalinkLink } from "../components/jobs-permalink-link";
-import { RequestsPermalinkLink } from "../components/requests-permalink-link";
 import { useConsoleNotice } from "../components/console-notice";
-import {
-  RequestProjectionBadges,
-  RequestStatusBadge,
-} from "../components/request-controls";
 import { WorldsPermalinkLink } from "../components/worlds-permalink-link";
 import { WorldLifecycleActionButtons } from "../components/world-lifecycle-action-buttons";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import { resolveQueueState } from "../lib/job-queue-state";
 import { describeJobResult, getJobAuditBadgeLabel } from "../lib/job-result";
 import { buildCompactJobsRouteSearch } from "../lib/job-route-search";
-import {
-  getRequestStatusTone,
-  getRequestToneStyles,
-  getRequestWorkflowProjection,
-  isRequestWorkflowCardStatus,
-  REQUEST_WORKFLOW_CARD_STATUSES,
-} from "../lib/request-helpers";
-import {
-  buildCompactRequestsRouteSearch,
-  buildRequestsRouteSearch,
-} from "../lib/request-route-search";
 import {
   createRequestScopedNotice,
   showRequestScopedNotice,
@@ -203,38 +187,6 @@ function describeAttentionJobsLabel(item: CloudWorldAttentionItem) {
   return "Related jobs";
 }
 
-function buildPendingRequestsSearch() {
-  return buildRequestsRouteSearch({
-    status: "pending",
-    projectedWorldStatus: "queued",
-    desiredState: "running",
-  });
-}
-
-function buildProvisioningRequestsSearch() {
-  return buildRequestsRouteSearch({
-    status: "provisioning",
-    projectedWorldStatus: "creating",
-    desiredState: "running",
-  });
-}
-
-function buildRejectedRequestsSearch() {
-  return buildRequestsRouteSearch({
-    status: "rejected",
-    projectedWorldStatus: "failed",
-    desiredState: "running",
-  });
-}
-
-function buildDisabledRequestsSearch() {
-  return buildRequestsRouteSearch({
-    status: "disabled",
-    projectedWorldStatus: "disabled",
-    desiredState: "sleeping",
-  });
-}
-
 type QuickActionConfirmState = {
   worldId: string;
   worldName: string;
@@ -268,11 +220,6 @@ export function DashboardPage() {
   const jobSummaryQuery = useQuery({
     queryKey: ["cloud-console", "dashboard", "job-summary"],
     queryFn: () => cloudAdminApi.getJobSummary(),
-    refetchInterval: 15_000,
-  });
-  const requestsQuery = useQuery({
-    queryKey: ["cloud-console", "dashboard", "requests"],
-    queryFn: () => cloudAdminApi.listRequests(),
     refetchInterval: 15_000,
   });
 
@@ -463,77 +410,6 @@ export function DashboardPage() {
         .slice(0, 4),
     [jobsQuery.data],
   );
-  const requestWorkflowSummary = useMemo(() => {
-    const counts = {
-      pending: 0,
-      provisioning: 0,
-      rejected: 0,
-      disabled: 0,
-    } satisfies Record<(typeof REQUEST_WORKFLOW_CARD_STATUSES)[number], number>;
-
-    for (const request of requestsQuery.data ?? []) {
-      if (isRequestWorkflowCardStatus(request.status)) {
-        counts[request.status] += 1;
-      }
-    }
-
-    return {
-      total: (requestsQuery.data ?? []).length,
-      cards: [
-        {
-          key: "pending",
-          label: "Pending approvals",
-          compactLabel: "Pending",
-          tone: getRequestStatusTone("pending"),
-          ...getRequestWorkflowProjection("pending"),
-          count: counts.pending,
-          search: buildPendingRequestsSearch(),
-          ariaLabel: "Open pending requests",
-          alertAriaLabel: "Open pending requests from request alerts",
-        },
-        {
-          key: "provisioning",
-          label: "Provisioning handoffs",
-          compactLabel: "Provisioning",
-          tone: getRequestStatusTone("provisioning"),
-          ...getRequestWorkflowProjection("provisioning"),
-          count: counts.provisioning,
-          search: buildProvisioningRequestsSearch(),
-          ariaLabel: "Open provisioning requests",
-          alertAriaLabel: "Open provisioning requests from request alerts",
-        },
-        {
-          key: "rejected",
-          label: "Rejected requests",
-          compactLabel: "Rejected",
-          tone: getRequestStatusTone("rejected"),
-          ...getRequestWorkflowProjection("rejected"),
-          count: counts.rejected,
-          search: buildRejectedRequestsSearch(),
-          ariaLabel: "Open rejected requests",
-          alertAriaLabel: "Open rejected requests from request alerts",
-        },
-        {
-          key: "disabled",
-          label: "Disabled requests",
-          compactLabel: "Disabled",
-          tone: getRequestStatusTone("disabled"),
-          ...getRequestWorkflowProjection("disabled"),
-          count: counts.disabled,
-          search: buildDisabledRequestsSearch(),
-          ariaLabel: "Open disabled requests",
-          alertAriaLabel: "Open disabled requests from request alerts",
-        },
-      ] as const,
-    };
-  }, [requestsQuery.data]);
-  const recentRequests = useMemo(
-    () =>
-      [...(requestsQuery.data ?? [])]
-        .sort((left, right) => compareNewest(left.updatedAt, right.updatedAt))
-        .slice(0, 4),
-    [requestsQuery.data],
-  );
   const quickActionMutation = useMutation({
     mutationFn: (input: { worldId: string; action: WorldLifecycleAction }) =>
       performWorldLifecycleActionWithMeta(input.worldId, input.action),
@@ -571,7 +447,6 @@ export function DashboardPage() {
     instanceFleetQuery.error,
     providersQuery.error,
     jobsQuery.error,
-    requestsQuery.error,
   ].filter((error): error is Error => error instanceof Error);
   const activeConfirm = confirmAction
     ? createWorldActionConfirmationCopy(confirmAction.action, {
@@ -636,58 +511,6 @@ export function DashboardPage() {
             ))}
           </div>
         ) : null}
-
-        <div className="mt-5 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                Request alerts
-              </div>
-              <div className="mt-1 text-xs text-[color:var(--text-secondary)]">
-                Approval and projected-world shortcuts surfaced in the main
-                dashboard header.
-              </div>
-            </div>
-
-            <RequestsPermalinkLink
-              search={buildCompactRequestsRouteSearch()}
-              aria-label="Open all requests from request alerts"
-              className="text-sm text-[color:var(--text-secondary)] underline decoration-[color:var(--border-strong)] underline-offset-4 hover:text-[color:var(--text-primary)]"
-            >
-              Review requests ({requestWorkflowSummary.total})
-            </RequestsPermalinkLink>
-          </div>
-
-          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {requestWorkflowSummary.cards.map((item) => {
-              const toneStyles = getRequestToneStyles(item.tone);
-              return (
-                <RequestsPermalinkLink
-                  key={`alert-${item.key}`}
-                  search={buildCompactRequestsRouteSearch(item.search)}
-                  aria-label={item.alertAriaLabel}
-                  data-tone={item.tone}
-                  className={`rounded-2xl border p-3 transition ${toneStyles.panel}`}
-                >
-                  <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                    {item.compactLabel}
-                  </div>
-                  <div className={`mt-2 text-2xl font-semibold ${toneStyles.count}`}>
-                    {item.count}
-                  </div>
-                  <RequestProjectionBadges
-                    projectedWorldStatus={item.projectedWorldStatus}
-                    projectedDesiredState={item.projectedDesiredState}
-                    projectedLabel="Projected:"
-                    desiredLabel="Desired:"
-                    projectedRowClassName={`mt-2 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.18em] ${toneStyles.detail}`}
-                    desiredRowClassName={`mt-2 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.18em] ${toneStyles.detail}`}
-                  />
-                </RequestsPermalinkLink>
-              );
-            })}
-          </div>
-        </div>
 
         <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <WorldsPermalinkLink
@@ -876,114 +699,6 @@ export function DashboardPage() {
         <div className="mt-4 text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
           Last generated {formatDateTime(driftSummary?.generatedAt)}
         </div>
-      </div>
-
-      <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-lg font-semibold text-[color:var(--text-primary)]">
-              Request Workflow
-            </div>
-            <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              Approval and manual delivery queue shortcuts wired to the request
-              projection filters.
-            </div>
-          </div>
-
-          <RequestsPermalinkLink
-            search={buildCompactRequestsRouteSearch()}
-            className="text-sm text-[color:var(--text-secondary)] underline decoration-[color:var(--border-strong)] underline-offset-4 hover:text-[color:var(--text-primary)]"
-          >
-            Open requests ({requestWorkflowSummary.total})
-          </RequestsPermalinkLink>
-        </div>
-
-        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {requestWorkflowSummary.cards.map((item) => {
-            const toneStyles = getRequestToneStyles(item.tone);
-            return (
-              <RequestsPermalinkLink
-                key={item.key}
-                search={buildCompactRequestsRouteSearch(item.search)}
-                aria-label={item.ariaLabel}
-                data-tone={item.tone}
-                className={`rounded-2xl border p-4 transition ${toneStyles.panel}`}
-              >
-                <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-                  {item.label}
-                </div>
-                <div className={`mt-3 text-3xl font-semibold ${toneStyles.count}`}>
-                  {item.count}
-                </div>
-                <RequestProjectionBadges
-                  projectedWorldStatus={item.projectedWorldStatus}
-                  projectedDesiredState={item.projectedDesiredState}
-                  projectedLabel="Projected:"
-                  desiredLabel="Desired:"
-                  projectedRowClassName={`mt-2 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.18em] ${toneStyles.detail}`}
-                  desiredRowClassName={`mt-2 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.18em] ${toneStyles.detail}`}
-                />
-              </RequestsPermalinkLink>
-            );
-          })}
-        </div>
-
-        {recentRequests.length ? (
-          <div className="mt-5">
-            <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-              Recent request changes
-            </div>
-            <div className="mt-3 grid gap-3 xl:grid-cols-2">
-              {recentRequests.map((request) => {
-                return (
-                  <Link
-                    key={request.id}
-                    to="/requests/$requestId"
-                    params={{ requestId: request.id }}
-                    aria-label={`Open request ${request.worldName}`}
-                    className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 transition hover:border-[color:var(--border-strong)]"
-                  >
-                    <div className="flex flex-wrap items-center gap-3">
-                      <RequestStatusBadge status={request.status} />
-                      <span className="text-xs text-[color:var(--text-muted)]">
-                        Updated {formatDateTime(request.updatedAt)}
-                      </span>
-                    </div>
-                    <div className="mt-3 text-sm text-[color:var(--text-primary)]">
-                      {request.worldName}
-                    </div>
-                    <div className="mt-1 text-xs text-[color:var(--text-secondary)]">
-                      {request.phone}
-                    </div>
-                    <div className="mt-3 text-sm text-[color:var(--text-secondary)]">
-                      {request.displayStatus ?? request.note ?? "No request status detail"}
-                    </div>
-                    <RequestProjectionBadges
-                      projectedWorldStatus={request.projectedWorldStatus}
-                      projectedDesiredState={request.projectedDesiredState}
-                      projectedLabel="Projected:"
-                      desiredLabel="Desired:"
-                      projectedRowClassName="mt-3 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]"
-                      desiredRowClassName="mt-2 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]"
-                    />
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        ) : null}
-
-        {!requestsQuery.isLoading && requestWorkflowSummary.total === 0 ? (
-          <div className="mt-4 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 text-sm text-[color:var(--text-secondary)]">
-            No request workflow items yet.
-          </div>
-        ) : null}
-
-        {requestsQuery.isLoading ? (
-          <div className="mt-4 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 text-sm text-[color:var(--text-muted)]">
-            Loading request workflow...
-          </div>
-        ) : null}
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">

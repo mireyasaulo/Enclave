@@ -46,6 +46,11 @@ const RecentChangesPage = lazy(async () => {
   return { default: mod.RecentChangesPage };
 });
 
+const AdminLayout = lazy(async () => {
+  const mod = await import("./routes/admin-layout");
+  return { default: mod.AdminLayout };
+});
+
 const AdminUsersPage = lazy(async () => {
   const mod = await import("./routes/admin-users-page");
   return { default: mod.AdminUsersPage };
@@ -140,20 +145,26 @@ const recentChangesRoute = createRoute({
   component: RecentChangesPage,
 });
 
-const adminUsersRoute = createRoute({
+const adminLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
+  id: "admin",
+  component: AdminLayout,
+});
+
+const adminUsersRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
   path: "/admin/users",
   component: AdminUsersPage,
 });
 
 const adminBlocksRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => adminLayoutRoute,
   path: "/admin/blocks",
   component: AdminBlocksPage,
 });
 
 const adminProtectionRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => adminLayoutRoute,
   path: "/admin/protection",
   component: AdminProtectionPage,
 });
@@ -174,19 +185,19 @@ const searchRoute = createRoute({
 });
 
 const adminReportsRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => adminLayoutRoute,
   path: "/admin/reports",
   component: AdminReportsPage,
 });
 
 const adminAbuseFiltersRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => adminLayoutRoute,
   path: "/admin/abuse-filters",
   component: AdminAbuseFiltersPage,
 });
 
 const adminStatsRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => adminLayoutRoute,
   path: "/admin/wiki-stats",
   component: AdminStatsPage,
 });
@@ -200,12 +211,14 @@ const routeTree = rootRoute.addChildren([
   createCharacterRoute,
   pendingReviewsRoute,
   recentChangesRoute,
-  adminUsersRoute,
-  adminBlocksRoute,
-  adminProtectionRoute,
-  adminReportsRoute,
-  adminAbuseFiltersRoute,
-  adminStatsRoute,
+  adminLayoutRoute.addChildren([
+    adminUsersRoute,
+    adminBlocksRoute,
+    adminProtectionRoute,
+    adminReportsRoute,
+    adminAbuseFiltersRoute,
+    adminStatsRoute,
+  ]),
   watchlistRoute,
   searchRoute,
 ]);

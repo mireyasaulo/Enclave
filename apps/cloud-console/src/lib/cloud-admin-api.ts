@@ -24,8 +24,6 @@ import type {
   CloudInstanceSummary,
   CloudWorldLifecycleJobListQuery,
   CloudWorldLifecycleStatus,
-  CloudWorldRequestRecord,
-  CloudWorldRequestStatus,
   CloudWorldSummary,
   CloudApiErrorResponse,
   CloudConfigEntry,
@@ -759,46 +757,6 @@ async function adminFetch<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const cloudAdminApi = {
-  listRequests: (status?: CloudWorldRequestStatus) =>
-    adminFetch<CloudWorldRequestRecord[]>(
-      `/world-requests${buildQueryString({ status })}`,
-    ),
-
-  getRequest: (id: string) =>
-    adminFetch<CloudWorldRequestRecord>(`/world-requests/${id}`),
-
-  updateRequest: (
-    id: string,
-    payload: {
-      phone?: string;
-      worldName?: string;
-      status?: CloudWorldRequestStatus;
-      note?: string | null;
-      apiBaseUrl?: string | null;
-      adminUrl?: string | null;
-    },
-  ) =>
-    adminFetch<CloudWorldRequestRecord>(`/world-requests/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify(payload),
-    }),
-
-  updateRequestWithMeta: (
-    id: string,
-    payload: {
-      phone?: string;
-      worldName?: string;
-      status?: CloudWorldRequestStatus;
-      note?: string | null;
-      apiBaseUrl?: string | null;
-      adminUrl?: string | null;
-    },
-  ) =>
-    adminFetchWithMeta<CloudWorldRequestRecord>(`/world-requests/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify(payload),
-    }),
-
   listWorlds: (status?: CloudWorldLifecycleStatus) =>
     adminFetch<CloudWorldSummary[]>(`/worlds${buildQueryString({ status })}`),
 

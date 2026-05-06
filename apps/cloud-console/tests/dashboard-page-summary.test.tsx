@@ -59,13 +59,6 @@ describe("dashboard job summary", () => {
     ).toBe("/jobs");
     expect(
       (
-        await screen.findByRole("link", {
-          name: "Open all requests from request alerts",
-        })
-      ).getAttribute("href"),
-    ).toBe("/requests");
-    expect(
-      (
         await screen.findByRole("link", { name: "Open worlds" })
       ).getAttribute("href"),
     ).toBe("/worlds");
