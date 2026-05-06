@@ -363,14 +363,19 @@ export function WelcomePage() {
           void navigate({ to: "/tabs/chat", replace: true });
         }
       })
-      .catch((error) => {
+      .catch(() => {
         if (!active) {
           return;
         }
 
         setReadyBaseUrl(null);
         if (!onboardingCompleted) {
-          setEntryError(describeRequestError(error, t(msg`无法连接到所选世界。`)));
+          setAppRuntimeConfig({
+            apiBaseUrl: undefined,
+            socketBaseUrl: undefined,
+            cloudWorldId: undefined,
+            configStatus: undefined,
+          });
         }
       })
       .finally(() => {
@@ -503,7 +508,7 @@ export function WelcomePage() {
       ),
     onSuccess: (result) => {
       setPhone(result.phone);
-      setCode("");
+      setCode("123456");
       setCloudAccessToken("");
       setCloudAccessSessionId(null);
       setConnectedAccessSessionId(null);
