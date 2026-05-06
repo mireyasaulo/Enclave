@@ -102,6 +102,7 @@ export interface InviteSummaryResponse {
   shareTitle: string;
   shareBody: string;
   shareUrl: string | null;
+  publicAppBaseUrl: string | null;
   rewardDays: number;
   redeemCount: number;
   rewardDaysGranted: number;

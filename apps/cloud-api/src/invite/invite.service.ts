@@ -223,9 +223,13 @@ export class InviteService {
         this.cloudConfig.getString("app.publicBaseUrl", ""),
       ]);
 
+    const trimmedBaseUrl = publicBaseUrl.replace(/\/+$/, "");
+    const isPlaceholderBase =
+      !trimmedBaseUrl || trimmedBaseUrl === "https://app.example.com";
+    const effectiveBaseUrl = isPlaceholderBase ? null : trimmedBaseUrl;
     const shareUrl =
-      publicBaseUrl && code
-        ? `${publicBaseUrl.replace(/\/+$/, "")}/?invite=${encodeURIComponent(code.code)}`
+      effectiveBaseUrl && code
+        ? `${effectiveBaseUrl}/?invite=${encodeURIComponent(code.code)}`
         : null;
 
     return {
@@ -234,6 +238,7 @@ export class InviteService {
       shareTitle,
       shareBody,
       shareUrl,
+      publicAppBaseUrl: effectiveBaseUrl,
       rewardDays,
       redeemCount: code?.redeemCount ?? 0,
       rewardDaysGranted: code?.rewardDaysGranted ?? 0,
