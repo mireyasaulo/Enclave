@@ -40,5 +40,6 @@ export * from "./subscription";
 export * from "./system";
 export * from "./token-usage";
 export * from "./wechat-sync";
+export * from "./wiki-sync";
 export * from "./world";
 export * from "./ws";

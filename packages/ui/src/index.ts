@@ -13,6 +13,7 @@ export * from "./components/metric-card";
 export * from "./components/panel-empty";
 export * from "./components/provider-setup-form";
 export * from "./components/select-field";
+export * from "./components/snapshot-diff";
 export * from "./components/snapshot-panel";
 export * from "./components/section-heading";
 export * from "./components/setup-scaffold";

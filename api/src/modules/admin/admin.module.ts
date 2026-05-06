@@ -40,6 +40,10 @@ import { RealWorldSyncModule } from '../real-world-sync/real-world-sync.module';
 import { FollowupRuntimeModule } from '../followup-runtime/followup-runtime.module';
 import { ReminderRuntimeModule } from '../reminder-runtime/reminder-runtime.module';
 import { SelfAgentModule } from '../self-agent/self-agent.module';
+import { WikiModule } from '../wiki/wiki.module';
+import { CharacterPageEntity } from '../wiki/entities/character-page.entity';
+import { CharacterRevisionEntity } from '../wiki/entities/character-revision.entity';
+import { WikiSyncAdminService } from './wiki-sync-admin.service';
 
 @Module({
   imports: [
@@ -59,6 +63,7 @@ import { SelfAgentModule } from '../self-agent/self-agent.module';
     FollowupRuntimeModule,
     ReminderRuntimeModule,
     SelfAgentModule,
+    WikiModule,
     TypeOrmModule.forFeature([
       UserEntity,
       CharacterEntity,
@@ -77,6 +82,8 @@ import { SelfAgentModule } from '../self-agent/self-agent.module';
       AdminConversationReviewEntity,
       FriendRequestEntity,
       FriendshipEntity,
+      CharacterPageEntity,
+      CharacterRevisionEntity,
     ]),
   ],
   providers: [
@@ -84,6 +91,7 @@ import { SelfAgentModule } from '../self-agent/self-agent.module';
     ReplyLogicAdminService,
     ChatRecordsAdminService,
     WechatSyncAdminService,
+    WikiSyncAdminService,
     AdminGuard,
   ],
   controllers: [AdminController, ChatRecordsAdminController],
