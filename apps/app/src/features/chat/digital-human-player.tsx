@@ -204,11 +204,11 @@ function resolveRenderStatusLabel(renderStatus?: DigitalHumanSession["renderStat
 function resolveRenderStatusHint(renderStatus?: DigitalHumanSession["renderStatus"]) {
   switch (renderStatus) {
     case "queued":
-      return "上游正在排队准备数字人画面，当前先保持会话占位。";
+      return "正在排队准备数字人画面。";
     case "rendering":
-      return "数字人画面正在生成中，保持当前页面即可等待结果。";
+      return "数字人画面生成中，请稍候。";
     case "ready":
-      return "数字人视频流已经可用，后续会优先展示实时画面。";
+      return "数字人视频流已就绪。";
     case "failed":
       return "本轮视频流没有成功生成，但语音回复链路仍然可继续使用。";
     default:

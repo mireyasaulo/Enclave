@@ -371,9 +371,7 @@ export function DesktopFeedbackPage() {
                   ))
                 ) : (
                   <div className="rounded-[12px] border border-dashed border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-4 text-sm leading-7 text-[color:var(--text-secondary)]">
-                    {t(
-                      msg`还没有保存过反馈。先把一个真实问题记下来，后续再接正式提交流。`,
-                    )}
+                    {t(msg`还没有保存过反馈。`)}
                   </div>
                 )}
               </div>

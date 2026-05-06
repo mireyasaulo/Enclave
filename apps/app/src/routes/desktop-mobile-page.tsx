@@ -984,11 +984,6 @@ export function DesktopMobilePage() {
                 <div className="mt-2 text-sm text-[color:var(--text-primary)]">
                   {t(msg`把 ${callHandoffTitle} 的通话入口带到手机继续。`)}
                 </div>
-                <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                  {t(
-                    msg`桌面端先不假做本地通话，直接把当前聊天接力到手机，更贴近微信电脑端“到手机继续”的真实工作流。`,
-                  )}
-                </div>
               </div>
               <button
                 type="button"

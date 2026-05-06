@@ -247,7 +247,7 @@ export function DesktopDirectCallPanel({
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "queued") {
-      return "数字人视频流已进入上游队列，当前先保持会话连接和语音链路。";
+      return "数字人视频流已进入排队，可以先保持语音通话。";
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "failed") {
@@ -497,11 +497,6 @@ export function DesktopDirectCallPanel({
           </div>
 
           <div className="mt-4 space-y-3">
-            {isVideoMode ? (
-              <InlineNotice tone="info">
-                当前先接入桌面数字人舞台与语音回合链路，后续再接真实数字人视频流。
-              </InlineNotice>
-            ) : null}
             {isVideoMode && !cameraEnabled ? (
               <InlineNotice tone="info">
                 你已关闭本地摄像头，仍可继续进行数字人视频通话。

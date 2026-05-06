@@ -167,9 +167,6 @@ function MobileDiscoverEncounterPage() {
             </div>
           </div>
         </div>
-        <div className="border-t border-black/5 px-4 py-3 text-[13px] leading-6 text-[#6b7280]">
-          当前先采用轻入口方案：点一下就完成一次相遇并保留结果，后续再补更细的预览与确认流程。
-        </div>
       </section>
 
       {shakeMutation.isError && shakeMutation.error instanceof Error ? (

@@ -483,7 +483,7 @@ export function DiscoverPage() {
                   </div>
                   <div className="mt-2 text-xs leading-6 text-[color:var(--text-muted)]">
                     {t(
-                      msg`朋友圈和广场动态共用同一套发现入口，但可见范围完全不同，桌面端先把这层分界讲清楚。`,
+                      msg`朋友圈和广场动态共用同一套发现入口，但可见范围完全不同。`,
                     )}
                   </div>
                 </div>

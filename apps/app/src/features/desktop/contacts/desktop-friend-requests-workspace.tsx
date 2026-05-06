@@ -45,9 +45,6 @@ export function DesktopFriendRequestsWorkspace({
               <UserPlus size={16} className="text-[#07c160]" />
               <span>好友入口</span>
             </div>
-            <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-              桌面端按微信式结构拆成“添加朋友”和“新的朋友”两个工作区。
-            </div>
           </div>
 
           <div className="min-h-0 flex-1 overflow-auto p-3">

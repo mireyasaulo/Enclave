@@ -223,9 +223,6 @@ export function DesktopChannelsWorkspace({
             <div className="mt-1 text-[22px] font-semibold text-[color:var(--text-primary)]">
               视频号
             </div>
-            <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-              桌面端收成微信式内容浏览结构，主区域看视频，右侧接住作者、评论和推荐队列。
-            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" size="sm" onClick={onRefresh}>
@@ -301,7 +298,7 @@ export function DesktopChannelsWorkspace({
         {!isLoading && !posts.length ? (
           <EmptyState
             title="视频号还没有内容"
-            description="先等系统注入 AI 演示内容，或者后续接入真实生成视频后再回来查看。"
+            description="暂时还没有可看的内容。"
           />
         ) : null}
 
@@ -440,9 +437,6 @@ export function DesktopChannelsWorkspace({
                     </div>
                   </div>
 
-                  <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3 text-[12px] leading-6 text-[color:var(--text-secondary)]">
-                    评论、作者入口和推荐队列已经收进右侧，主区域只保留当前内容播放和正文信息。
-                  </div>
                 </div>
               </article>
             </section>
@@ -694,9 +688,6 @@ function DesktopChannelAuthorPanel({
         <div>
           <div className="text-sm font-medium text-[color:var(--text-primary)]">
             作者主页
-          </div>
-          <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
-            桌面端把作者资料收进当前工作区，避免单开整页后丢掉当前内容上下文。
           </div>
         </div>
         <Button variant="secondary" size="sm" onClick={onClose}>
