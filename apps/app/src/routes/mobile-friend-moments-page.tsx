@@ -695,12 +695,18 @@ function MobileFriendMomentCard({
                     (item) => item.id === comment.replyToCommentId,
                   )?.authorName ?? null)
                 : null;
+              const isActiveTarget = replyTarget?.commentId === comment.id;
               return (
                 <button
                   key={comment.id}
                   type="button"
                   onClick={() => onStartReply(comment)}
-                  className="block w-full text-left text-[12px] leading-6 text-[color:var(--text-secondary)]"
+                  className={cn(
+                    "block w-full rounded-[8px] px-1.5 py-0.5 text-left text-[12px] leading-6 text-[color:var(--text-secondary)] transition-colors",
+                    isActiveTarget
+                      ? "bg-[rgba(7,193,96,0.12)]"
+                      : "hover:bg-white",
+                  )}
                 >
                   <span className="font-medium text-[color:var(--text-primary)]">
                     {comment.authorName}
@@ -722,17 +728,33 @@ function MobileFriendMomentCard({
           </div>
         ) : null}
         {replyTarget ? (
-          <div className="mt-2 flex items-center justify-between gap-2 rounded-[12px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[12px] text-[color:var(--text-secondary)]">
-            <div className="truncate">正在回复 {replyTarget.authorName}</div>
-            <button
-              type="button"
-              onClick={onCancelReply}
-              aria-label="取消回复"
-              className="shrink-0 rounded-full px-2 py-0.5 text-[11px] text-[color:var(--text-muted)] hover:bg-white"
-            >
-              取消
-            </button>
-          </div>
+          (() => {
+            const replyTargetComment = moment.comments.find(
+              (item) => item.id === replyTarget.commentId,
+            );
+            return (
+              <div className="mt-2 flex items-start justify-between gap-2 rounded-[12px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[12px] text-[color:var(--text-secondary)]">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="truncate">
+                    正在回复 {replyTarget.authorName}
+                  </div>
+                  {replyTargetComment ? (
+                    <div className="truncate text-[color:var(--text-muted)]">
+                      「{replyTargetComment.text}」
+                    </div>
+                  ) : null}
+                </div>
+                <button
+                  type="button"
+                  onClick={onCancelReply}
+                  aria-label="取消回复"
+                  className="shrink-0 rounded-full px-2 py-0.5 text-[11px] text-[color:var(--text-muted)] hover:bg-white"
+                >
+                  取消
+                </button>
+              </div>
+            );
+          })()
         ) : null}
         <div className="mt-3 flex items-center gap-2">
           <MomentCommentComposer

@@ -16,7 +16,7 @@ import {
   toggleMomentLike,
   type Moment,
 } from "@yinjie/contracts";
-import { AppPage, Button, InlineNotice } from "@yinjie/ui";
+import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import { MomentMediaGallery } from "../components/moment-media-gallery";
 import { MomentCommentComposer } from "../components/moment-comment-composer";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -1104,8 +1104,10 @@ export function MomentsPage() {
                     const commentsById = new Map(
                       moment.comments.map((comment) => [comment.id, comment] as const),
                     );
-                    const visibleComments = moment.comments.slice(-3);
-                    const hasComments = visibleComments.length > 0;
+                    const replyTargetComment = activeReply
+                      ? (commentsById.get(activeReply.commentId) ?? null)
+                      : null;
+                    const hasComments = moment.comments.length > 0;
                     if (!hasComments && !activeReply) {
                       return null;
                     }
@@ -1113,11 +1115,13 @@ export function MomentsPage() {
                       <div className="space-y-2">
                         {hasComments ? (
                           <div className="space-y-1.5 rounded-[14px] bg-[color:var(--surface-soft)] p-2.5">
-                            {visibleComments.map((comment) => {
+                            {moment.comments.map((comment) => {
                               const replyToName = comment.replyToCommentId
                                 ? (commentsById.get(comment.replyToCommentId)
                                     ?.authorName ?? null)
                                 : null;
+                              const isActiveTarget =
+                                activeReply?.commentId === comment.id;
                               return (
                                 <button
                                   key={comment.id}
@@ -1130,7 +1134,12 @@ export function MomentsPage() {
                                       postId: moment.id,
                                     })
                                   }
-                                  className="block w-full text-left text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)]"
+                                  className={cn(
+                                    "block w-full rounded-[8px] px-1.5 py-0.5 text-left text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)] transition-colors",
+                                    isActiveTarget
+                                      ? "bg-[rgba(7,193,96,0.12)]"
+                                      : "hover:bg-white",
+                                  )}
                                 >
                                   <span className="text-[color:var(--text-primary)]">
                                     {comment.authorName}
@@ -1152,9 +1161,16 @@ export function MomentsPage() {
                           </div>
                         ) : null}
                         {activeReply ? (
-                          <div className="flex items-center justify-between gap-2 rounded-[12px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[11px] text-[color:var(--text-secondary)]">
-                            <div className="truncate">
-                              正在回复 {activeReply.authorName}
+                          <div className="flex items-start justify-between gap-2 rounded-[12px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[11px] text-[color:var(--text-secondary)]">
+                            <div className="min-w-0 flex-1 space-y-1">
+                              <div className="truncate">
+                                正在回复 {activeReply.authorName}
+                              </div>
+                              {replyTargetComment ? (
+                                <div className="truncate text-[color:var(--text-muted)]">
+                                  「{replyTargetComment.text}」
+                                </div>
+                              ) : null}
                             </div>
                             <button
                               type="button"

@@ -302,21 +302,35 @@ export function DesktopMomentRow({
             )}
 
             {activeReply ? (
-              <div className="mt-3 flex items-center justify-between gap-2 rounded-[10px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[12px] text-[color:var(--text-secondary)]">
-                <div className="truncate">
-                  正在回复 {activeReply.authorName}
-                </div>
-                {onCancelCommentReply ? (
-                  <button
-                    type="button"
-                    onClick={onCancelCommentReply}
-                    aria-label="取消回复"
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[color:var(--text-muted)] hover:bg-white"
-                  >
-                    <X size={12} />
-                  </button>
-                ) : null}
-              </div>
+              (() => {
+                const replyTargetComment = commentsById.get(
+                  activeReply.commentId,
+                );
+                return (
+                  <div className="mt-3 flex items-start justify-between gap-2 rounded-[10px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[12px] text-[color:var(--text-secondary)]">
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="truncate">
+                        正在回复 {activeReply.authorName}
+                      </div>
+                      {replyTargetComment ? (
+                        <div className="truncate text-[color:var(--text-muted)]">
+                          「{replyTargetComment.text}」
+                        </div>
+                      ) : null}
+                    </div>
+                    {onCancelCommentReply ? (
+                      <button
+                        type="button"
+                        onClick={onCancelCommentReply}
+                        aria-label="取消回复"
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[color:var(--text-muted)] hover:bg-white"
+                      >
+                        <X size={12} />
+                      </button>
+                    ) : null}
+                  </div>
+                );
+              })()
             ) : null}
 
             <div className="mt-3 border-t border-[color:var(--border-faint)] pt-3">
