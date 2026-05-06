@@ -4,7 +4,6 @@ import Database from 'better-sqlite3';
 
 const API_ROOT = path.resolve(__dirname, '../..');
 const REPO_ROOT = path.resolve(API_ROOT, '..');
-const DEFAULT_DATABASE_PATH = './data/database.sqlite';
 
 type DatabaseFileCandidate = {
   path: string;
@@ -21,11 +20,28 @@ export function resolveRepoPath(...segments: string[]) {
   return path.resolve(REPO_ROOT, ...segments);
 }
 
+export function resolveDataRoot() {
+  const configured = process.env.YINJIE_DATA_ROOT?.trim();
+  if (configured) {
+    return path.isAbsolute(configured)
+      ? configured
+      : path.resolve(REPO_ROOT, configured);
+  }
+  return path.resolve(REPO_ROOT, 'data');
+}
+
+export function resolveDataPath(...segments: string[]) {
+  return path.resolve(resolveDataRoot(), ...segments);
+}
+
 export function resolveDatabasePath(configuredPath?: string | null) {
-  const normalizedPath = configuredPath?.trim() || DEFAULT_DATABASE_PATH;
-  return path.isAbsolute(normalizedPath)
-    ? normalizedPath
-    : path.resolve(REPO_ROOT, normalizedPath);
+  const normalizedPath = configuredPath?.trim();
+  if (normalizedPath) {
+    return path.isAbsolute(normalizedPath)
+      ? normalizedPath
+      : path.resolve(REPO_ROOT, normalizedPath);
+  }
+  return resolveDataPath('database.sqlite');
 }
 
 function readDatabaseFileCandidate(filePath: string): DatabaseFileCandidate | null {
@@ -113,6 +129,7 @@ export function prepareDatabasePath(configuredPath?: string | null) {
       targetPath,
       resolveApiPath('database.sqlite'),
       resolveApiPath('data', 'database.sqlite'),
+      path.resolve(REPO_ROOT, 'data', 'database.sqlite'),
     ]),
   );
 

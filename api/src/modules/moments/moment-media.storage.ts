@@ -2,11 +2,11 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import {
   resolveApiPath,
-  resolveRepoPath,
+  resolveDataPath,
 } from '../../database/database-path';
 
 export function resolvePrimaryMomentMediaStorageDir() {
-  return resolveRepoPath('data', 'moments-media');
+  return resolveDataPath('moments-media');
 }
 
 export function resolveLegacyMomentMediaStorageDir() {

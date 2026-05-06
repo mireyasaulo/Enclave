@@ -3,7 +3,7 @@ import path from 'node:path';
 import { Injectable } from '@nestjs/common';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { CharacterEntity } from '../characters/character.entity';
-import { resolveRepoPath } from '../../database/database-path';
+import { resolveDataPath } from '../../database/database-path';
 
 type SelfAgentWorkspaceFileName =
   | 'AGENTS.md'
@@ -297,7 +297,7 @@ export class SelfAgentWorkspaceService {
   }
 
   private resolveWorkspaceRoot() {
-    return resolveRepoPath('data', 'self-agent-workspace');
+    return resolveDataPath('self-agent-workspace');
   }
 
   private resolveMemoryDir() {
