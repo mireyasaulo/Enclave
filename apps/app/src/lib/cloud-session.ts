@@ -8,14 +8,18 @@ import { useWorldOwnerStore } from "../store/world-owner-store";
 
 export function shouldShowCloudAccountControls(input: {
   worldAccessMode?: AppRuntimeConfig["worldAccessMode"];
+  runtimeApiBaseUrl?: string | null;
   runtimeCloudPhone?: string | null;
   accessToken?: string | null;
   sessionPhone?: string | null;
+  worldOwnerId?: string | null;
 }) {
   return (
     input.worldAccessMode === "cloud" ||
     Boolean(
       input.accessToken?.trim() ||
+      input.worldOwnerId?.trim() ||
+      input.runtimeApiBaseUrl?.trim() ||
       input.sessionPhone?.trim() ||
       input.runtimeCloudPhone?.trim(),
     )

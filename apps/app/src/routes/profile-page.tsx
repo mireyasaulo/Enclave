@@ -38,6 +38,7 @@ export function ProfilePage() {
     select: (state) => state.location.hash,
   });
   const username = useWorldOwnerStore((state) => state.username);
+  const ownerId = useWorldOwnerStore((state) => state.id);
   const avatar = useWorldOwnerStore((state) => state.avatar);
   const signature = useWorldOwnerStore((state) => state.signature);
   const cloudAccessToken = useCloudSessionStore((state) => state.accessToken);
@@ -54,9 +55,11 @@ export function ProfilePage() {
     !isDesktopLayout &&
     shouldShowCloudAccountControls({
       worldAccessMode: runtimeConfig.worldAccessMode,
+      runtimeApiBaseUrl: runtimeConfig.apiBaseUrl,
       runtimeCloudPhone: runtimeConfig.cloudPhone,
       accessToken: cloudAccessToken,
       sessionPhone: cloudPhone,
+      worldOwnerId: ownerId,
     });
 
   useEffect(() => {

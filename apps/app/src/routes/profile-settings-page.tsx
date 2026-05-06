@@ -86,6 +86,7 @@ export function ProfileSettingsPage() {
   const isDesktopLayout = useDesktopLayout();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
+  const ownerId = useWorldOwnerStore((state) => state.id);
   const username = useWorldOwnerStore((state) => state.username);
   const signature = useWorldOwnerStore((state) => state.signature);
   const cloudAccessToken = useCloudSessionStore((state) => state.accessToken);
@@ -109,9 +110,11 @@ export function ProfileSettingsPage() {
 
   const showCloudAccountEntries = shouldShowCloudAccountControls({
     worldAccessMode: runtimeConfig.worldAccessMode,
+    runtimeApiBaseUrl: runtimeConfig.apiBaseUrl,
     runtimeCloudPhone: runtimeConfig.cloudPhone,
     accessToken: cloudAccessToken,
     sessionPhone: cloudPhone,
+    worldOwnerId: ownerId,
   });
 
   useEffect(() => {
