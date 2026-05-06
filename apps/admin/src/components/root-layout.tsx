@@ -145,6 +145,9 @@ export function RootLayout() {
               onMobileNavOpen={() => setMobileNavOpen(true)}
             />
           }
+          mobileNavOpen={mobileNavOpen}
+          onCloseMobileNav={() => setMobileNavOpen(false)}
+          pathname={location.pathname}
         >
           <Outlet />
         </AdminShell>
