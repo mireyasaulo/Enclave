@@ -76,6 +76,10 @@ import type {
   UpsertFavoriteNoteRequest,
 } from "./favorites";
 import type {
+  SubmitCloudFeedbackRequest,
+  SubmitCloudFeedbackResponse,
+} from "./feedback";
+import type {
   FollowupRecommendationEventResult,
   MarkFollowupRecommendationFriendRequestPendingRequest,
 } from "./followup-runtime";
@@ -958,6 +962,20 @@ export function sendCloudPhoneCode(
 ) {
   return requestCloudApi<SendPhoneCodeResponse>(
     "/cloud/auth/send-code",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
+export function submitCloudFeedback(
+  payload: SubmitCloudFeedbackRequest,
+  baseUrl?: string,
+) {
+  return requestCloudApi<SubmitCloudFeedbackResponse>(
+    "/cloud/feedback",
     {
       method: "POST",
       body: JSON.stringify(payload),

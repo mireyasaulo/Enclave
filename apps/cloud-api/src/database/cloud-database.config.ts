@@ -33,6 +33,7 @@ import { CreateInviteAndConfigTables1776651600000 } from "./migrations/177665160
 import { SeedDefaultSubscriptionPlansAndConfigs1776652200000 } from "./migrations/1776652200000-seed-default-subscription-plans-and-configs";
 import { CreateRevenueSharingTables1776652800000 } from "./migrations/1776652800000-create-revenue-sharing-tables";
 import { AddEmailAuth1776653400000 } from "./migrations/1776653400000-add-email-auth";
+import { MakeCloudUsersPhoneNullable1776654600000 } from "./migrations/1776654600000-make-cloud-users-phone-nullable";
 import { resolveCloudDatabasePath } from "../config/cloud-runtime-config";
 
 type ConfigReader = {
@@ -76,6 +77,7 @@ export const cloudMigrations = [
   SeedDefaultSubscriptionPlansAndConfigs1776652200000,
   CreateRevenueSharingTables1776652800000,
   AddEmailAuth1776653400000,
+  MakeCloudUsersPhoneNullable1776654600000,
 ];
 
 export function buildCloudDataSourceOptions(config: ConfigReader): DataSourceOptions {

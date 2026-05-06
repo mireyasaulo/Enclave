@@ -16,6 +16,7 @@ export * from "./cyber-avatar";
 export * from "./evals";
 export * from "./feed";
 export * from "./favorites";
+export * from "./feedback";
 export * from "./followup-runtime";
 export * from "./games";
 export * from "./inference";
