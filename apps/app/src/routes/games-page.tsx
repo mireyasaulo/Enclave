@@ -62,6 +62,7 @@ import {
 } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { normalizePathname } from "../lib/normalize-pathname";
+import { searchStringToObject } from "../lib/route-search";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import {
   isMobileWebShareSurface,
@@ -270,7 +271,7 @@ export function GamesPage() {
 
     void navigate({
       to: "/tabs/games",
-      search: nextSearch || undefined,
+      search: searchStringToObject(nextSearch),
       replace: true,
     });
   }, [
@@ -311,7 +312,7 @@ export function GamesPage() {
 
     void navigate({
       to: pathname,
-      search: nextSearch || undefined,
+      search: searchStringToObject(nextSearch),
       replace: true,
     });
   }, [

@@ -51,6 +51,7 @@ import { useSearchIndex } from "../features/search/use-search-index";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { navigateBackOrFallback } from "../lib/history-back";
 import { normalizePathname } from "../lib/normalize-pathname";
+import { searchStringToObject } from "../lib/route-search";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 const DesktopSearchWorkspace = lazy(async () => {
@@ -374,7 +375,7 @@ export function SearchPage() {
     handleCommitSearch(effectiveSearchText);
     void navigate({
       to: navigationTarget.to as never,
-      search: navigationTarget.search as never,
+      search: searchStringToObject(navigationTarget.search) as never,
       hash: navigationTarget.hash,
     });
   }
@@ -391,7 +392,7 @@ export function SearchPage() {
     );
     void navigate({
       to: navigationTarget.to as never,
-      search: navigationTarget.search as never,
+      search: searchStringToObject(navigationTarget.search) as never,
       hash: navigationTarget.hash,
     });
   }

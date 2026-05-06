@@ -61,6 +61,7 @@ import { buildMobileMiniProgramsRouteSearch } from "../features/mini-programs/mo
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { formatTimestamp } from "../lib/format";
 import { normalizePathname } from "../lib/normalize-pathname";
+import { searchStringToObject } from "../lib/route-search";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
@@ -1012,7 +1013,7 @@ function DiscoverMobileEntryRow({
         event.preventDefault();
         void navigate({
           to: item.to,
-          search: nextSearch,
+          search: searchStringToObject(nextSearch),
           hash: nextHash,
         });
       }}

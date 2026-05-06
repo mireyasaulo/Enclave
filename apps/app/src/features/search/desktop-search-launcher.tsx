@@ -31,6 +31,7 @@ import { Button, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../components/avatar-chip";
 import { getConversationPreviewParts } from "../../lib/conversation-preview";
 import { formatMessageTimestamp } from "../../lib/format";
+import { searchStringToObject } from "../../lib/route-search";
 import {
   getConversationThreadLabel,
   isPersistedGroupConversation,
@@ -735,7 +736,7 @@ export function DesktopSearchDropdownPanel({
       void navigate({
         hash: navigationTarget.hash,
         to: navigationTarget.to as never,
-        search: navigationTarget.search as never,
+        search: searchStringToObject(navigationTarget.search) as never,
       });
     },
     [applyDesktopSearchReturn, navigate, onClose],
