@@ -164,7 +164,7 @@ function describeCloudSession(
   session?: WorldAccessSessionSummary | null,
 ) {
   if (!session) {
-    return t(msg`请先验证手机号，以解析你的云世界。`);
+    return t(msg`请先验证邮箱，以解析你的云世界。`);
   }
 
   if (session.status === "ready") {
@@ -265,7 +265,7 @@ export function WelcomePage() {
   const [localApiBaseUrl, setLocalApiBaseUrl] = useState(resolveDefaultLocalApiBaseUrl(runtimeConfig.apiBaseUrl) ?? "");
   const [phone, setPhone] = useState(savedCloudPhone ?? runtimeConfig.cloudPhone ?? "");
   const [code, setCode] = useState("");
-  const [accountType, setAccountType] = useState<"phone" | "email">("phone");
+  const [accountType, setAccountType] = useState<"phone" | "email">("email");
   const [email, setEmail] = useState("");
   const [cloudAccessToken, setCloudAccessToken] = useState(
     !isCloudSessionExpired(savedCloudExpiresAt) ? savedCloudAccessToken ?? "" : "",
@@ -836,41 +836,6 @@ export function WelcomePage() {
             </Button>
           </div>
 
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant={accountType === "phone" ? "primary" : "ghost"}
-              onClick={() => {
-                setAccountType("phone");
-                setCode("");
-                setEntryError("");
-                setCloudAccessToken("");
-                setCloudAccessSessionId(null);
-                setConnectedAccessSessionId(null);
-              }}
-              size="md"
-              className="flex-1"
-            >
-              {t(msg`手机号`)}
-            </Button>
-            <Button
-              type="button"
-              variant={accountType === "email" ? "primary" : "ghost"}
-              onClick={() => {
-                setAccountType("email");
-                setCode("");
-                setEntryError("");
-                setCloudAccessToken("");
-                setCloudAccessSessionId(null);
-                setConnectedAccessSessionId(null);
-              }}
-              size="md"
-              className="flex-1"
-            >
-              {t(msg`邮箱`)}
-            </Button>
-          </div>
-
           {accountType === "phone" ? (
             <label className="block space-y-2">
               <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
@@ -992,7 +957,7 @@ export function WelcomePage() {
                 badge={t(msg`云世界`)}
                 title={t(msg`正在解析你的世界`)}
                 description={t(
-                  msg`我们正在判断是为这个手机号创建新世界，还是唤醒它已拥有的世界。`,
+                  msg`我们正在判断是为这个邮箱创建新世界，还是唤醒它已拥有的世界。`,
                 )}
               />
             )
@@ -1179,7 +1144,7 @@ export function WelcomePage() {
             </div>
             <div className="mt-2 text-xs leading-6 text-[color:var(--text-secondary)]">
               {t(
-                msg`通过手机号登录。新用户会获得一个全新的世界，老用户会唤醒自己已有的世界。`,
+                msg`通过邮箱登录。新用户会获得一个全新的世界，老用户会唤醒自己已有的世界。`,
               )}
             </div>
           </button>
