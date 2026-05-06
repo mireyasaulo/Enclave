@@ -187,7 +187,7 @@ export function ProfileSettingsPage() {
   const desktopSettingsPath = "/desktop/settings";
   const desktopMode = isDesktopLayout;
   const desktopSettingsRoute = pathname.startsWith("/desktop/settings");
-  const desktopPathMismatch = desktopMode && pathname !== desktopSettingsPath;
+  const desktopPathMismatch = desktopMode && pathname === "/profile/settings";
   const backTo = desktopMode ? "/tabs/chat" : "/tabs/profile";
   const desktopBackTo = desktopSettingsRoute ? "/tabs/chat" : "/tabs/profile";
   const desktopBackLabel = desktopSettingsRoute
