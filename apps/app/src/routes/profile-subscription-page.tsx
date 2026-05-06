@@ -349,16 +349,22 @@ export function ProfileSubscriptionPage() {
     enabled: Boolean(accessToken),
   });
 
+  // 订阅/邀请数据会被后端"被邀请人注册"等异步事件影响，
+  // 必须每次进页面强制刷新，否则 mobile 上 60s 缓存让用户看不到刚到账的奖励。
   const subscriptionQuery = useQuery({
     queryKey: ["cloud-subscription", accessToken],
     queryFn: () => getMyCloudSubscription(accessToken ?? ""),
     enabled: Boolean(accessToken),
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   const inviteQuery = useQuery({
     queryKey: ["cloud-invite-summary", accessToken],
     queryFn: () => getMyCloudInviteSummary(accessToken ?? ""),
     enabled: Boolean(accessToken),
+    staleTime: 0,
+    refetchOnMount: "always",
   });
 
   useEffect(() => {
@@ -448,7 +454,12 @@ export function ProfileSubscriptionPage() {
   const expiresLabel = formatDateTime(subscription.expiresAt) ?? fallbackNotSet;
 
   return (
-    <AppPage className="bg-[color:var(--bg-canvas)] px-4 py-6">
+    <AppPage
+      className="bg-[color:var(--bg-canvas)] px-4 pt-6"
+      style={{
+        paddingBottom: "max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 1.5rem))",
+      }}
+    >
       <div className="mx-auto flex max-w-4xl flex-col gap-4">
         <AppSection className="overflow-hidden rounded-[28px] border-black/5 bg-[linear-gradient(135deg,#f7fff8,#ffffff)] px-6 py-6 shadow-none">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
