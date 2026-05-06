@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock } from "@yinjie/ui";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
+import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
 export function CloudConfigsPage() {
+  const t = useCloudConsoleText();
   const queryClient = useQueryClient();
   const configsQuery = useQuery({
     queryKey: ["cloud-console", "cloud-configs"],
@@ -37,7 +39,7 @@ export function CloudConfigsPage() {
         parsedValue = JSON.parse(draftValue);
       } catch (error) {
         setParseError(
-          error instanceof Error ? error.message : "Invalid JSON value.",
+          error instanceof Error ? error.message : t("Invalid JSON value."),
         );
         throw error;
       }
@@ -56,7 +58,7 @@ export function CloudConfigsPage() {
   });
 
   if (configsQuery.isLoading) {
-    return <LoadingBlock label="Loading cloud configs..." />;
+    return <LoadingBlock label={t("Loading cloud configs...")} />;
   }
 
   if (configsQuery.isError) {
@@ -65,7 +67,7 @@ export function CloudConfigsPage() {
         message={
           configsQuery.error instanceof Error
             ? configsQuery.error.message
-            : "Failed to load cloud configs."
+            : t("Failed to load cloud configs.")
         }
       />
     );
@@ -75,7 +77,7 @@ export function CloudConfigsPage() {
     <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
       <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-section)]">
         <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-          Config keys
+          {t("Config keys")}
         </div>
         <div className="mt-3 space-y-3">
           {configsQuery.data?.map((config) => (
@@ -93,7 +95,7 @@ export function CloudConfigsPage() {
                 {config.key}
               </div>
               <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-                {config.description || "No description"}
+                {config.description || t("No description")}
               </div>
             </button>
           ))}
@@ -105,13 +107,13 @@ export function CloudConfigsPage() {
           <input
             value={draftKey}
             onChange={(event) => setDraftKey(event.target.value)}
-            placeholder="config key"
+            placeholder={t("config key")}
             className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
           />
           <input
             value={draftDescription}
             onChange={(event) => setDraftDescription(event.target.value)}
-            placeholder="description"
+            placeholder={t("description")}
             className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
           />
           <textarea
@@ -127,7 +129,7 @@ export function CloudConfigsPage() {
             disabled={saveMutation.isPending}
             onClick={() => saveMutation.mutate()}
           >
-            Save config
+            {t("Save config")}
           </Button>
           <Button
             variant="secondary"
@@ -139,7 +141,7 @@ export function CloudConfigsPage() {
               setDraftValue("null");
             }}
           >
-            New config
+            {t("New config")}
           </Button>
         </div>
         {parseError ? (
@@ -149,7 +151,7 @@ export function CloudConfigsPage() {
         ) : null}
         {saveMutation.isSuccess ? (
           <InlineNotice className="mt-4" tone="success">
-            Cloud config saved.
+            {t("Cloud config saved.")}
           </InlineNotice>
         ) : null}
       </div>

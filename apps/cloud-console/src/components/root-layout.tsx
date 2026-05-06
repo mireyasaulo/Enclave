@@ -13,7 +13,10 @@ import {
   revokeStoredCloudAdminSession,
   setCloudAdminSecret,
 } from "../lib/cloud-admin-api";
-import { translateCloudConsoleTextForActiveLocale } from "../lib/cloud-console-i18n";
+import {
+  translateCloudConsoleTextForActiveLocale,
+  useCloudConsoleText,
+} from "../lib/cloud-console-i18n";
 import { ConsoleNoticeProvider, useConsoleNotice } from "./console-notice";
 
 const NAV_LINK =
@@ -166,6 +169,7 @@ function StatusDot({ tone }: { tone: "ready" | "warning" }) {
 }
 
 function RootLayoutContent() {
+  const t = useCloudConsoleText();
   const queryClient = useQueryClient();
   const { notice, showNotice } = useConsoleNotice();
   const pathname = useRouterState({
@@ -175,7 +179,12 @@ function RootLayoutContent() {
   const [editingSecret, setEditingSecret] = useState(!getCloudAdminSecret());
   const [draft, setDraft] = useState(getCloudAdminSecret);
   const hasSecret = Boolean(secret.trim());
-  const routeMeta = getRouteMeta(pathname);
+  const rawRouteMeta = getRouteMeta(pathname);
+  const routeMeta = {
+    eyebrow: t(rawRouteMeta.eyebrow),
+    title: t(rawRouteMeta.title),
+    detail: t(rawRouteMeta.detail),
+  };
 
   useEffect(
     () =>
@@ -226,7 +235,10 @@ function RootLayoutContent() {
           className={pathname === "/" ? NAV_LINK_ACTIVE : NAV_LINK}
           aria-current={pathname === "/" ? "page" : undefined}
         >
-          <NavLinkContent label="Dashboard" hint="Availability and drift" />
+          <NavLinkContent
+            label={t("Dashboard")}
+            hint={t("Availability and drift")}
+          />
         </Link>
       ),
     },
@@ -241,7 +253,10 @@ function RootLayoutContent() {
           }
           aria-current={pathname.startsWith("/worlds") ? "page" : undefined}
         >
-          <NavLinkContent label="Worlds" hint="Instances and health" />
+          <NavLinkContent
+            label={t("Worlds")}
+            hint={t("Instances and health")}
+          />
         </WorldsPermalinkLink>
       ),
     },
@@ -254,7 +269,10 @@ function RootLayoutContent() {
           className={pathname === "/jobs" ? NAV_LINK_ACTIVE : NAV_LINK}
           aria-current={pathname === "/jobs" ? "page" : undefined}
         >
-          <NavLinkContent label="Jobs" hint="Queue and leases" />
+          <NavLinkContent
+            label={t("Jobs")}
+            hint={t("Queue and leases")}
+          />
         </JobsPermalinkLink>
       ),
     },
@@ -267,7 +285,10 @@ function RootLayoutContent() {
           className={pathname === "/sessions" ? NAV_LINK_ACTIVE : NAV_LINK}
           aria-current={pathname === "/sessions" ? "page" : undefined}
         >
-          <NavLinkContent label="Sessions" hint="Access audit" />
+          <NavLinkContent
+            label={t("Sessions")}
+            hint={t("Access audit")}
+          />
         </SessionsPermalinkLink>
       ),
     },
@@ -280,7 +301,10 @@ function RootLayoutContent() {
           className={pathname === "/waiting-sync" ? NAV_LINK_ACTIVE : NAV_LINK}
           aria-current={pathname === "/waiting-sync" ? "page" : undefined}
         >
-          <NavLinkContent label="Waiting Sync" hint="Durable tasks" />
+          <NavLinkContent
+            label={t("Waiting Sync")}
+            hint={t("Durable tasks")}
+          />
         </WaitingSyncPermalinkLink>
       ),
     },
@@ -294,7 +318,10 @@ function RootLayoutContent() {
           className={pathname.startsWith("/users") ? NAV_LINK_ACTIVE : NAV_LINK}
           aria-current={pathname.startsWith("/users") ? "page" : undefined}
         >
-          <NavLinkContent label="Users" hint="Accounts and expiry" />
+          <NavLinkContent
+            label={t("Users")}
+            hint={t("Accounts and expiry")}
+          />
         </Link>
       ),
     },
@@ -314,7 +341,10 @@ function RootLayoutContent() {
             pathname.startsWith("/subscription-plans") ? "page" : undefined
           }
         >
-          <NavLinkContent label="Plans" hint="Pricing and access" />
+          <NavLinkContent
+            label={t("Plans")}
+            hint={t("Pricing and access")}
+          />
         </Link>
       ),
     },
@@ -330,7 +360,10 @@ function RootLayoutContent() {
           }
           aria-current={pathname.startsWith("/configs") ? "page" : undefined}
         >
-          <NavLinkContent label="Configs" hint="Trial and copy" />
+          <NavLinkContent
+            label={t("Configs")}
+            hint={t("Trial and copy")}
+          />
         </Link>
       ),
     },
@@ -348,7 +381,10 @@ function RootLayoutContent() {
             pathname.startsWith("/invite-audit") ? "page" : undefined
           }
         >
-          <NavLinkContent label="Invite Audit" hint="Rewards and risk" />
+          <NavLinkContent
+            label={t("Invite Audit")}
+            hint={t("Rewards and risk")}
+          />
         </Link>
       ),
     },
@@ -364,7 +400,10 @@ function RootLayoutContent() {
           }
           aria-current={pathname === "/revenue-sharing" ? "page" : undefined}
         >
-          <NavLinkContent label="Revenue Sharing" hint="Payees and ledgers" />
+          <NavLinkContent
+            label={t("Revenue Sharing")}
+            hint={t("Payees and ledgers")}
+          />
         </Link>
       ),
     },
@@ -389,10 +428,10 @@ function RootLayoutContent() {
           <div className="flex flex-wrap items-center justify-between gap-3 px-1">
             <div className="min-w-0">
               <div className="text-[10px] uppercase tracking-[0.3em] text-[color:var(--text-muted)]">
-                Yinjie Cloud Ops
+                {t("Yinjie Cloud Ops")}
               </div>
               <div className="break-words text-base font-semibold leading-tight text-[color:var(--text-primary)]">
-                Cloud World Console
+                {t("Cloud World Console")}
               </div>
             </div>
             <span
@@ -402,7 +441,7 @@ function RootLayoutContent() {
                   : "rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700"
               }
             >
-              {hasSecret ? "Ready" : "Setup"}
+              {hasSecret ? t("Ready") : t("Setup")}
             </span>
           </div>
 
@@ -410,7 +449,9 @@ function RootLayoutContent() {
             <div className="flex min-w-0 items-center gap-1.5">
               <StatusDot tone={hasSecret ? "ready" : "warning"} />
               <span className="min-w-0 break-words text-xs leading-4 text-[color:var(--text-muted)]">
-                {hasSecret ? "Admin secret configured" : "Admin secret missing"}
+                {hasSecret
+                  ? t("Admin secret configured")
+                  : t("Admin secret missing")}
               </span>
             </div>
           </div>
@@ -418,7 +459,7 @@ function RootLayoutContent() {
           <nav className="mt-4 flex-1 space-y-5 overflow-y-auto pr-1">
             <section>
               <div className="px-1 text-[10px] uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
-                Navigation
+                {t("Navigation")}
               </div>
               <div className="mt-2 space-y-1">
                 {navItems.map((item) => (
@@ -432,13 +473,13 @@ function RootLayoutContent() {
             {editingSecret ? (
               <div className="space-y-2">
                 <div className="px-1 text-[10px] uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
-                  Cloud access
+                  {t("Cloud access")}
                 </div>
                 <input
                   type="password"
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
-                  placeholder="Enter CLOUD_ADMIN_SECRET"
+                  placeholder={t("Enter CLOUD_ADMIN_SECRET")}
                   className={SECRET_INPUT}
                   onKeyDown={(event) =>
                     event.key === "Enter" && void saveSecret()
@@ -449,22 +490,24 @@ function RootLayoutContent() {
                   className="w-full rounded-2xl border border-[color:var(--border-brand)] bg-[color:var(--brand-soft)] px-3 py-2 text-sm font-medium text-[color:var(--brand-primary)] transition hover:border-[color:var(--border-strong)]"
                   onClick={() => void saveSecret()}
                 >
-                  Save
+                  {t("Save")}
                 </button>
               </div>
             ) : (
               <div className="flex items-center justify-between gap-2 px-1">
                 <span className="text-xs text-[color:var(--text-muted)]">
                   {secret
-                    ? "Admin secret saved locally. Console uses short-lived admin tokens."
-                    : "Admin secret is missing."}
+                    ? t(
+                        "Admin secret saved locally. Console uses short-lived admin tokens.",
+                      )
+                    : t("Admin secret is missing.")}
                 </span>
                 <button
                   type="button"
                   className="shrink-0 text-xs font-medium text-[color:var(--brand-primary)] transition hover:text-[color:var(--brand-secondary)]"
                   onClick={() => setEditingSecret(true)}
                 >
-                  Edit
+                  {t("Edit")}
                 </button>
               </div>
             )}
@@ -489,7 +532,7 @@ function RootLayoutContent() {
                 <div className="flex min-w-0 flex-wrap items-center gap-2 md:justify-end">
                   <LanguageSwitcher variant="compact" description={null} />
                   <div className="max-w-full rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-primary)] px-3 py-1 text-center text-xs text-[color:var(--text-muted)]">
-                    {hasSecret ? "Ready" : "Setup"}
+                    {hasSecret ? t("Ready") : t("Setup")}
                   </div>
                 </div>
               </div>
@@ -504,7 +547,7 @@ function RootLayoutContent() {
                   {notice.requestId ? (
                     <div className="mt-3 border-t border-current/15 pt-3 text-xs leading-5 text-current/90">
                       <div className="uppercase tracking-[0.12em] opacity-80">
-                        Request id
+                        {t("Request id")}
                       </div>
                       <div className="mt-1 break-all font-mono">
                         {notice.requestId}
@@ -520,10 +563,13 @@ function RootLayoutContent() {
             ) : (
               <section className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
                 <InlineNotice tone="warning">
-                  <div className="font-semibold">Admin access required</div>
+                  <div className="font-semibold">
+                    {t("Admin access required")}
+                  </div>
                   <div className="mt-2 text-sm leading-6">
-                    Enter CLOUD_ADMIN_SECRET to unlock the console. Cloud
-                    requests are paused until a secret is saved locally.
+                    {t(
+                      "Enter CLOUD_ADMIN_SECRET to unlock the console. Cloud requests are paused until a secret is saved locally.",
+                    )}
                   </div>
                 </InlineNotice>
               </section>

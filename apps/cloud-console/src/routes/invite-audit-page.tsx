@@ -3,8 +3,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { InviteRedemptionStatus } from "@yinjie/contracts";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock } from "@yinjie/ui";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
+import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
 export function InviteAuditPage() {
+  const t = useCloudConsoleText();
   const queryClient = useQueryClient();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<InviteRedemptionStatus | "">("");
@@ -36,7 +38,7 @@ export function InviteAuditPage() {
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search phone or code"
+          placeholder={t("Search phone or code")}
           className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
         />
         <select
@@ -46,19 +48,21 @@ export function InviteAuditPage() {
           }
           className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
         >
-          <option value="">All redemption states</option>
-          <option value="rewarded">rewarded</option>
-          <option value="rejected">rejected</option>
+          <option value="">{t("All redemption states")}</option>
+          <option value="rewarded">{t("rewarded")}</option>
+          <option value="rejected">{t("rejected")}</option>
         </select>
       </div>
 
-      {redemptionsQuery.isLoading ? <LoadingBlock label="Loading invite audit..." /> : null}
+      {redemptionsQuery.isLoading ? (
+        <LoadingBlock label={t("Loading invite audit...")} />
+      ) : null}
       {redemptionsQuery.isError ? (
         <ErrorBlock
           message={
             redemptionsQuery.error instanceof Error
               ? redemptionsQuery.error.message
-              : "Failed to load invite audit."
+              : t("Failed to load invite audit.")
           }
         />
       ) : null}
@@ -75,12 +79,26 @@ export function InviteAuditPage() {
                   <div className="font-medium text-[color:var(--text-primary)]">
                     {item.inviteePhone} {"->"} {item.inviterPhone}
                   </div>
-                  <div>Code: {item.inviteCode}</div>
-                  <div>Status: {item.status}</div>
-                  <div>IP: {item.inviteeIp || "-"}</div>
-                  <div>Device: {item.inviteeDeviceFingerprint || "-"}</div>
-                  <div>Created at: {item.createdAt}</div>
-                  {item.rejectReason ? <div>Reason: {item.rejectReason}</div> : null}
+                  <div>
+                    {t("Code:")} {item.inviteCode}
+                  </div>
+                  <div>
+                    {t("Status:")} {t(item.status)}
+                  </div>
+                  <div>
+                    {t("IP:")} {item.inviteeIp || "-"}
+                  </div>
+                  <div>
+                    {t("Device:")} {item.inviteeDeviceFingerprint || "-"}
+                  </div>
+                  <div>
+                    {t("Created at:")} {item.createdAt}
+                  </div>
+                  {item.rejectReason ? (
+                    <div>
+                      {t("Reason:")} {item.rejectReason}
+                    </div>
+                  ) : null}
                 </div>
                 <Button
                   variant="secondary"
@@ -88,15 +106,17 @@ export function InviteAuditPage() {
                   disabled={rejectMutation.isPending || item.status === "rejected"}
                   onClick={() => {
                     const reason =
-                      window.prompt("Reject reason", item.rejectReason || "manual-review") ||
-                      "";
+                      window.prompt(
+                        t("Reject reason"),
+                        item.rejectReason || "manual-review",
+                      ) || "";
                     if (!reason.trim()) {
                       return;
                     }
                     rejectMutation.mutate({ id: item.id, reason });
                   }}
                 >
-                  Reject reward
+                  {t("Reject reward")}
                 </Button>
               </div>
             </div>
@@ -105,7 +125,9 @@ export function InviteAuditPage() {
       ) : null}
 
       {redemptionsQuery.data && !redemptionsQuery.data.items.length ? (
-        <InlineNotice tone="muted">No invite redemptions matched the current filters.</InlineNotice>
+        <InlineNotice tone="muted">
+          {t("No invite redemptions matched the current filters.")}
+        </InlineNotice>
       ) : null}
     </section>
   );

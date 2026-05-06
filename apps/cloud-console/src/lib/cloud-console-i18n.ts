@@ -1,7 +1,9 @@
+import { useCallback } from "react";
 import {
   getActiveLocale,
   getSurfaceTextDictionary,
   resolveSupportedLocale,
+  useAppLocale,
   type SupportedLocale,
 } from "@yinjie/i18n";
 
@@ -596,6 +598,14 @@ export function translateCloudConsoleTextForActiveLocale(value: string) {
   return translateCloudConsoleText(value, getCurrentCloudConsoleLocale());
 }
 
+export function useCloudConsoleText() {
+  const { locale } = useAppLocale();
+  return useCallback(
+    (value: string) => translateCloudConsoleText(value, locale),
+    [locale],
+  );
+}
+
 export function selectCloudConsoleText(
   locale: string | null | undefined,
   messages: LocalizedTextSet,
@@ -637,6 +647,80 @@ export function formatCloudConsoleApiStatusError(
     "zh-CN": `云世界管理 API 错误 ${status}`,
     "ja-JP": `クラウド管理 API エラー ${status}`,
     "ko-KR": `클라우드 관리자 API 오류 ${status}`,
+  });
+}
+
+export function formatCloudConsolePageOfTotal(
+  page: number,
+  totalPages: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Page ${page} / ${totalPages}`,
+    "zh-CN": `第 ${page} 页 / 共 ${totalPages} 页`,
+    "ja-JP": `${page} / ${totalPages} ページ`,
+    "ko-KR": `${page} / ${totalPages} 페이지`,
+  });
+}
+
+export function formatCloudConsoleActiveVersion(
+  version: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Active version ${version}`,
+    "zh-CN": `当前版本 ${version}`,
+    "ja-JP": `現行バージョン ${version}`,
+    "ko-KR": `현재 버전 ${version}`,
+  });
+}
+
+export function formatCloudConsoleVersionShort(
+  version: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `v${version}`,
+    "zh-CN": `v${version}`,
+    "ja-JP": `v${version}`,
+    "ko-KR": `v${version}`,
+  });
+}
+
+export function formatCloudConsolePayeeProfileCount(
+  count: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `${count} payee profiles`,
+    "zh-CN": `${count} 个收益人档案`,
+    "ja-JP": `${count} 件の受取人プロファイル`,
+    "ko-KR": `${count}개 수취인 프로필`,
+  });
+}
+
+export function formatCloudConsoleAllocationCount(
+  count: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `${count} allocations`,
+    "zh-CN": `${count} 条分配记录`,
+    "ja-JP": `${count} 件の割当`,
+    "ko-KR": `${count}건 할당`,
+  });
+}
+
+export function formatCloudConsoleSettlementGenerated(
+  batchId: string,
+  amount: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Settlement ${batchId} generated for ${amount}.`,
+    "zh-CN": `已生成结算 ${batchId}，金额 ${amount}。`,
+    "ja-JP": `決済 ${batchId} を金額 ${amount} で生成しました。`,
+    "ko-KR": `정산 ${batchId}을(를) 금액 ${amount}(으)로 생성했습니다.`,
   });
 }
 // i18n-ignore-end

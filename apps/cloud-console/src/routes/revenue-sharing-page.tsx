@@ -7,12 +7,22 @@ import type {
   UpdateRevenueSharingPolicyRequest,
   UpsertRevenuePayeeRequest,
 } from "@yinjie/contracts";
+import { useAppLocale } from "@yinjie/i18n";
 import {
   CloudAdminErrorBlock,
   showCloudAdminErrorNotice,
 } from "../components/cloud-admin-error-block";
 import { useConsoleNotice } from "../components/console-notice";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
+import {
+  formatCloudConsoleActiveVersion,
+  formatCloudConsoleAllocationCount,
+  formatCloudConsolePayeeProfileCount,
+  formatCloudConsoleSettlementGenerated,
+  formatCloudConsoleVersionShort,
+  translateCloudConsoleText,
+  useCloudConsoleText,
+} from "../lib/cloud-console-i18n";
 
 const SECTION =
   "rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]";
@@ -44,8 +54,8 @@ function formatMoney(cents: number, currency: string) {
   return `${currency} ${(cents / 100).toFixed(2)}`;
 }
 
-function formatDateTime(value?: string | null) {
-  if (!value) return "Not available";
+function formatDateTime(value: string | null | undefined, locale?: string | null) {
+  if (!value) return translateCloudConsoleText("Not available", locale);
   return new Date(value).toLocaleString();
 }
 
@@ -53,11 +63,11 @@ function stringifyJson(value: unknown) {
   return JSON.stringify(value, null, 2);
 }
 
-function parseJsonField<T>(raw: string, label: string): T {
+function parseJsonField<T>(raw: string, errorMessage: string): T {
   try {
     return JSON.parse(raw) as T;
   } catch {
-    throw new Error(`${label} JSON is invalid.`);
+    throw new Error(errorMessage);
   }
 }
 
@@ -85,22 +95,25 @@ function buildPolicyDraft(config: RevenueSharingPolicyConfig): PolicyDraft {
   };
 }
 
-function buildPolicyPayload(draft: PolicyDraft): UpdateRevenueSharingPolicyRequest {
+function buildPolicyPayload(
+  draft: PolicyDraft,
+  t: (value: string) => string,
+): UpdateRevenueSharingPolicyRequest {
   return {
     enabled: draft.enabled,
     currency: draft.currency,
     eventPrices: parseJsonField(
       draft.eventPricesJson,
-      "Event prices",
+      t("Event prices JSON is invalid."),
     ) as UpdateRevenueSharingPolicyRequest["eventPrices"],
     fixedShares: parseJsonField(
       draft.fixedSharesJson,
-      "Fixed shares",
+      t("Fixed shares JSON is invalid."),
     ) as UpdateRevenueSharingPolicyRequest["fixedShares"],
     contributionPoolBasisPoints: draft.contributionPoolBasisPoints,
     contributionWeights: parseJsonField(
       draft.contributionWeightsJson,
-      "Contribution weights",
+      t("Contribution weights JSON is invalid."),
     ) as UpdateRevenueSharingPolicyRequest["contributionWeights"],
     contributionWindowDays: draft.contributionWindowDays,
     minimumSettlementCents: draft.minimumSettlementCents,
@@ -108,6 +121,8 @@ function buildPolicyPayload(draft: PolicyDraft): UpdateRevenueSharingPolicyReque
 }
 
 export function RevenueSharingPage() {
+  const t = useCloudConsoleText();
+  const { locale } = useAppLocale();
   const queryClient = useQueryClient();
   const { showNotice } = useConsoleNotice();
   const policyQuery = useQuery({
@@ -151,11 +166,13 @@ export function RevenueSharingPage() {
 
   const updatePolicyMutation = useMutation({
     mutationFn: () => {
-      if (!policyDraft) throw new Error("Policy is not loaded.");
-      return cloudAdminApi.updateRevenueSharingPolicy(buildPolicyPayload(policyDraft));
+      if (!policyDraft) throw new Error(t("Policy is not loaded."));
+      return cloudAdminApi.updateRevenueSharingPolicy(
+        buildPolicyPayload(policyDraft, t),
+      );
     },
     onSuccess: () => {
-      showNotice("Revenue policy saved.", "success");
+      showNotice(t("Revenue policy saved."), "success");
       void queryClient.invalidateQueries({
         queryKey: ["cloud-console", "revenue-sharing"],
       });
@@ -166,7 +183,7 @@ export function RevenueSharingPage() {
   const upsertPayeeMutation = useMutation({
     mutationFn: () => cloudAdminApi.upsertRevenuePayee(payeeDraft),
     onSuccess: () => {
-      showNotice("Payee saved.", "success");
+      showNotice(t("Payee saved."), "success");
       setPayeeDraft({
         displayName: "",
         status: "active",
@@ -186,7 +203,11 @@ export function RevenueSharingPage() {
     mutationFn: () => cloudAdminApi.generateRevenueSettlement(),
     onSuccess: (batch) => {
       showNotice(
-        `Settlement ${batch.id} generated for ${formatMoney(batch.totalAmountCents, batch.currency)}.`,
+        formatCloudConsoleSettlementGenerated(
+          batch.id,
+          formatMoney(batch.totalAmountCents, batch.currency),
+          locale,
+        ),
         "success",
       );
       void queryClient.invalidateQueries({
@@ -201,30 +222,32 @@ export function RevenueSharingPage() {
     const ledger = ledgerQuery.data;
     return [
       {
-        label: "Policy",
-        value: policy?.status === "active" ? "Active" : "Inactive",
+        label: t("Policy"),
+        value: policy?.status === "active" ? t("Active") : t("Inactive"),
       },
       {
-        label: "Version",
-        value: policy ? `v${policy.version}` : "Not loaded",
+        label: t("Version"),
+        value: policy
+          ? formatCloudConsoleVersionShort(policy.version, locale)
+          : t("Not loaded"),
       },
       {
-        label: "Payable",
+        label: t("Payable"),
         value: ledger
           ? formatMoney(
               ledger.summary.totalPayableCents,
               ledger.summary.currency,
             )
-          : "Not loaded",
+          : t("Not loaded"),
       },
       {
-        label: "Held",
+        label: t("Held"),
         value: ledger
           ? formatMoney(ledger.summary.totalHeldCents, ledger.summary.currency)
-          : "Not loaded",
+          : t("Not loaded"),
       },
     ];
-  }, [ledgerQuery.data, policyQuery.data]);
+  }, [ledgerQuery.data, locale, policyQuery.data, t]);
 
   const pageError =
     policyQuery.error ??
@@ -259,10 +282,13 @@ export function RevenueSharingPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
-              Revenue policy
+              {t("Revenue policy")}
             </h2>
             <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              Active version {policyQuery.data?.version ?? 0}
+              {formatCloudConsoleActiveVersion(
+                policyQuery.data?.version ?? 0,
+                locale,
+              )}
             </div>
           </div>
           <button
@@ -271,7 +297,7 @@ export function RevenueSharingPage() {
             disabled={!policyDraft || updatePolicyMutation.isPending}
             onClick={() => updatePolicyMutation.mutate()}
           >
-            Save policy
+            {t("Save policy")}
           </button>
         </div>
 
@@ -279,7 +305,7 @@ export function RevenueSharingPage() {
           <div className="mt-5 grid gap-4 xl:grid-cols-2">
             <label className="space-y-2">
               <span className="text-xs font-medium text-[color:var(--text-muted)]">
-                Enabled
+                {t("Enabled")}
               </span>
               <select
                 className={FIELD}
@@ -291,13 +317,13 @@ export function RevenueSharingPage() {
                   })
                 }
               >
-                <option value="false">Inactive</option>
-                <option value="true">Active</option>
+                <option value="false">{t("Inactive")}</option>
+                <option value="true">{t("Active")}</option>
               </select>
             </label>
             <label className="space-y-2">
               <span className="text-xs font-medium text-[color:var(--text-muted)]">
-                Currency
+                {t("Currency")}
               </span>
               <input
                 className={FIELD}
@@ -309,7 +335,7 @@ export function RevenueSharingPage() {
             </label>
             <label className="space-y-2">
               <span className="text-xs font-medium text-[color:var(--text-muted)]">
-                Contribution pool bps
+                {t("Contribution pool bps")}
               </span>
               <input
                 type="number"
@@ -327,7 +353,7 @@ export function RevenueSharingPage() {
             </label>
             <label className="space-y-2">
               <span className="text-xs font-medium text-[color:var(--text-muted)]">
-                Contribution window days
+                {t("Contribution window days")}
               </span>
               <input
                 type="number"
@@ -344,7 +370,7 @@ export function RevenueSharingPage() {
             </label>
             <label className="space-y-2">
               <span className="text-xs font-medium text-[color:var(--text-muted)]">
-                Minimum settlement cents
+                {t("Minimum settlement cents")}
               </span>
               <input
                 type="number"
@@ -361,7 +387,7 @@ export function RevenueSharingPage() {
             </label>
             <label className="space-y-2 xl:col-span-2">
               <span className="text-xs font-medium text-[color:var(--text-muted)]">
-                Event prices
+                {t("Event prices")}
               </span>
               <textarea
                 className={TEXTAREA}
@@ -376,7 +402,7 @@ export function RevenueSharingPage() {
             </label>
             <label className="space-y-2">
               <span className="text-xs font-medium text-[color:var(--text-muted)]">
-                Fixed shares
+                {t("Fixed shares")}
               </span>
               <textarea
                 className={TEXTAREA}
@@ -391,7 +417,7 @@ export function RevenueSharingPage() {
             </label>
             <label className="space-y-2">
               <span className="text-xs font-medium text-[color:var(--text-muted)]">
-                Contribution weights
+                {t("Contribution weights")}
               </span>
               <textarea
                 className={TEXTAREA}
@@ -407,7 +433,7 @@ export function RevenueSharingPage() {
           </div>
         ) : (
           <div className="mt-5 text-sm text-[color:var(--text-secondary)]">
-            Loading policy.
+            {t("Loading policy.")}
           </div>
         )}
       </section>
@@ -416,10 +442,13 @@ export function RevenueSharingPage() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
-              Payees
+              {t("Payees")}
             </h2>
             <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              {payeesQuery.data?.length ?? 0} payee profiles
+              {formatCloudConsolePayeeProfileCount(
+                payeesQuery.data?.length ?? 0,
+                locale,
+              )}
             </div>
           </div>
           <button
@@ -428,7 +457,7 @@ export function RevenueSharingPage() {
             disabled={upsertPayeeMutation.isPending}
             onClick={() => upsertPayeeMutation.mutate()}
           >
-            Save payee
+            {t("Save payee")}
           </button>
         </div>
 
@@ -436,7 +465,7 @@ export function RevenueSharingPage() {
           <div className="space-y-3 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-primary)] p-4">
             <input
               className={FIELD}
-              placeholder="Display name"
+              placeholder={t("Display name")}
               value={payeeDraft.displayName}
               onChange={(event) =>
                 setPayeeDraft({ ...payeeDraft, displayName: event.target.value })
@@ -454,7 +483,7 @@ export function RevenueSharingPage() {
             >
               {PAYEE_STATUSES.map((status) => (
                 <option key={status} value={status}>
-                  {status}
+                  {t(status)}
                 </option>
               ))}
             </select>
@@ -477,7 +506,7 @@ export function RevenueSharingPage() {
             </select>
             <input
               className={FIELD}
-              placeholder="External ref id"
+              placeholder={t("External ref id")}
               value={payeeDraft.externalRefId}
               onChange={(event) =>
                 setPayeeDraft({
@@ -488,7 +517,7 @@ export function RevenueSharingPage() {
             />
             <input
               className={FIELD}
-              placeholder="Contact"
+              placeholder={t("Contact")}
               value={payeeDraft.contact ?? ""}
               onChange={(event) =>
                 setPayeeDraft({ ...payeeDraft, contact: event.target.value })
@@ -496,7 +525,7 @@ export function RevenueSharingPage() {
             />
             <textarea
               className={TEXTAREA}
-              placeholder="Payout note"
+              placeholder={t("Payout note")}
               value={payeeDraft.payoutNote ?? ""}
               onChange={(event) =>
                 setPayeeDraft({ ...payeeDraft, payoutNote: event.target.value })
@@ -508,27 +537,29 @@ export function RevenueSharingPage() {
             <table className="min-w-full text-left text-sm">
               <thead className="bg-[color:var(--surface-soft)] text-xs uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Name</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">External ref</th>
-                  <th className="px-4 py-3 font-medium">Updated</th>
+                  <th className="px-4 py-3 font-medium">{t("Name")}</th>
+                  <th className="px-4 py-3 font-medium">{t("Status")}</th>
+                  <th className="px-4 py-3 font-medium">{t("External ref")}</th>
+                  <th className="px-4 py-3 font-medium">{t("Updated")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[color:var(--border-faint)]">
                 {(payeesQuery.data ?? []).map((payee) => (
                   <tr key={payee.id}>
                     <td className="px-4 py-3 font-medium">{payee.displayName}</td>
-                    <td className="px-4 py-3">{payee.status}</td>
+                    <td className="px-4 py-3">{t(payee.status)}</td>
                     <td className="px-4 py-3 font-mono text-xs">
                       {payee.externalRefType}:{payee.externalRefId}
                     </td>
-                    <td className="px-4 py-3">{formatDateTime(payee.updatedAt)}</td>
+                    <td className="px-4 py-3">
+                      {formatDateTime(payee.updatedAt, locale)}
+                    </td>
                   </tr>
                 ))}
                 {payeesQuery.data?.length === 0 ? (
                   <tr>
                     <td className="px-4 py-6 text-[color:var(--text-muted)]" colSpan={4}>
-                      No payees.
+                      {t("No payees.")}
                     </td>
                   </tr>
                 ) : null}
@@ -542,10 +573,13 @@ export function RevenueSharingPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
-              Ledger
+              {t("Ledger")}
             </h2>
             <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              {ledgerQuery.data?.total ?? 0} allocations
+              {formatCloudConsoleAllocationCount(
+                ledgerQuery.data?.total ?? 0,
+                locale,
+              )}
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -554,11 +588,11 @@ export function RevenueSharingPage() {
               className={SECONDARY_BUTTON}
               onClick={() =>
                 void settlementPreviewQuery.refetch().then(() =>
-                  showNotice("Settlement preview refreshed.", "info"),
+                  showNotice(t("Settlement preview refreshed."), "info"),
                 )
               }
             >
-              Preview
+              {t("Preview")}
             </button>
             <button
               type="button"
@@ -566,7 +600,7 @@ export function RevenueSharingPage() {
               disabled={generateSettlementMutation.isPending}
               onClick={() => generateSettlementMutation.mutate()}
             >
-              Generate settlement
+              {t("Generate settlement")}
             </button>
           </div>
         </div>
@@ -574,7 +608,7 @@ export function RevenueSharingPage() {
         <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-primary)] p-4">
             <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-              Settlement preview
+              {t("Settlement preview")}
             </div>
             <div className="mt-3 text-2xl font-semibold">
               {settlementPreviewQuery.data
@@ -582,10 +616,13 @@ export function RevenueSharingPage() {
                     settlementPreviewQuery.data.totalAmountCents,
                     settlementPreviewQuery.data.currency,
                   )
-                : "Not loaded"}
+                : t("Not loaded")}
             </div>
             <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-              {settlementPreviewQuery.data?.allocationCount ?? 0} allocations
+              {formatCloudConsoleAllocationCount(
+                settlementPreviewQuery.data?.allocationCount ?? 0,
+                locale,
+              )}
             </div>
             <div className="mt-4 space-y-2">
               {(settlementPreviewQuery.data?.payees ?? []).slice(0, 6).map((payee) => (
@@ -609,31 +646,33 @@ export function RevenueSharingPage() {
             <table className="min-w-full text-left text-sm">
               <thead className="bg-[color:var(--surface-soft)] text-xs uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Payee</th>
-                  <th className="px-4 py-3 font-medium">Participant</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Amount</th>
-                  <th className="px-4 py-3 font-medium">Created</th>
+                  <th className="px-4 py-3 font-medium">{t("Payee")}</th>
+                  <th className="px-4 py-3 font-medium">{t("Participant")}</th>
+                  <th className="px-4 py-3 font-medium">{t("Status")}</th>
+                  <th className="px-4 py-3 font-medium">{t("Amount")}</th>
+                  <th className="px-4 py-3 font-medium">{t("Created")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[color:var(--border-faint)]">
                 {(ledgerQuery.data?.items ?? []).map((item) => (
                   <tr key={item.id}>
                     <td className="px-4 py-3">
-                      {item.payeeDisplayName ?? "Unassigned"}
+                      {item.payeeDisplayName ?? t("Unassigned")}
                     </td>
                     <td className="px-4 py-3">{item.participantType}</td>
-                    <td className="px-4 py-3">{item.status}</td>
+                    <td className="px-4 py-3">{t(item.status)}</td>
                     <td className="px-4 py-3 font-semibold">
                       {formatMoney(item.amountCents, item.currency)}
                     </td>
-                    <td className="px-4 py-3">{formatDateTime(item.createdAt)}</td>
+                    <td className="px-4 py-3">
+                      {formatDateTime(item.createdAt, locale)}
+                    </td>
                   </tr>
                 ))}
                 {ledgerQuery.data?.items.length === 0 ? (
                   <tr>
                     <td className="px-4 py-6 text-[color:var(--text-muted)]" colSpan={5}>
-                      No allocations.
+                      {t("No allocations.")}
                     </td>
                   </tr>
                 ) : null}
@@ -645,17 +684,17 @@ export function RevenueSharingPage() {
 
       <section className={SECTION}>
         <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
-          Events
+          {t("Events")}
         </h2>
         <div className="mt-5 grid gap-4 xl:grid-cols-2">
           <div className="overflow-x-auto rounded-2xl border border-[color:var(--border-faint)]">
             <table className="min-w-full text-left text-sm">
               <thead className="bg-[color:var(--surface-soft)] text-xs uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Usage type</th>
-                  <th className="px-4 py-3 font-medium">Character</th>
-                  <th className="px-4 py-3 font-medium">Gross</th>
-                  <th className="px-4 py-3 font-medium">Occurred</th>
+                  <th className="px-4 py-3 font-medium">{t("Usage type")}</th>
+                  <th className="px-4 py-3 font-medium">{t("Character")}</th>
+                  <th className="px-4 py-3 font-medium">{t("Gross")}</th>
+                  <th className="px-4 py-3 font-medium">{t("Occurred")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[color:var(--border-faint)]">
@@ -666,7 +705,9 @@ export function RevenueSharingPage() {
                     <td className="px-4 py-3">
                       {formatMoney(event.grossAmountCents, event.currency)}
                     </td>
-                    <td className="px-4 py-3">{formatDateTime(event.occurredAt)}</td>
+                    <td className="px-4 py-3">
+                      {formatDateTime(event.occurredAt, locale)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -677,10 +718,10 @@ export function RevenueSharingPage() {
             <table className="min-w-full text-left text-sm">
               <thead className="bg-[color:var(--surface-soft)] text-xs uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Contribution type</th>
-                  <th className="px-4 py-3 font-medium">Contributor</th>
-                  <th className="px-4 py-3 font-medium">State</th>
-                  <th className="px-4 py-3 font-medium">Occurred</th>
+                  <th className="px-4 py-3 font-medium">{t("Contribution type")}</th>
+                  <th className="px-4 py-3 font-medium">{t("Contributor")}</th>
+                  <th className="px-4 py-3 font-medium">{t("State")}</th>
+                  <th className="px-4 py-3 font-medium">{t("Occurred")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[color:var(--border-faint)]">
@@ -691,9 +732,11 @@ export function RevenueSharingPage() {
                       {event.contributorExternalRefType}:{event.contributorExternalRefId}
                     </td>
                     <td className="px-4 py-3">
-                      {event.reversedAt ? "reversed" : "active"}
+                      {event.reversedAt ? t("reversed") : t("active")}
                     </td>
-                    <td className="px-4 py-3">{formatDateTime(event.occurredAt)}</td>
+                    <td className="px-4 py-3">
+                      {formatDateTime(event.occurredAt, locale)}
+                    </td>
                   </tr>
                 ))}
               </tbody>
