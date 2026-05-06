@@ -484,12 +484,24 @@ importers:
 
   apps/wiki:
     dependencies:
+      '@lingui/core':
+        specifier: 5.9.5
+        version: 5.9.5(@lingui/babel-plugin-lingui-macro@5.9.5)
+      '@lingui/macro':
+        specifier: 5.9.5
+        version: 5.9.5(@lingui/babel-plugin-lingui-macro@5.9.5)(react@19.2.4)
+      '@lingui/react':
+        specifier: 5.9.5
+        version: 5.9.5(@lingui/babel-plugin-lingui-macro@5.9.5)(react@19.2.4)
       '@tanstack/react-query':
         specifier: ^5.66.8
         version: 5.96.1(react@19.2.4)
       '@tanstack/react-router':
         specifier: ^1.109.2
         version: 1.168.10(react-dom@19.2.4)(react@19.2.4)
+      '@yinjie/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@yinjie/i18n':
         specifier: workspace:*
         version: link:../../packages/i18n

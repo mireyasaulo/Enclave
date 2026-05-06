@@ -43,11 +43,19 @@ const siteCatalogLoaders: CatalogLoaderMap = {
   "ko-KR": () => import("../../catalogs/site/ko-KR.po"),
 };
 
+const wikiCatalogLoaders: CatalogLoaderMap = {
+  "zh-CN": () => import("../../catalogs/wiki/zh-CN.po"),
+  "en-US": () => import("../../catalogs/wiki/en-US.po"),
+  "ja-JP": () => import("../../catalogs/wiki/ja-JP.po"),
+  "ko-KR": () => import("../../catalogs/wiki/ko-KR.po"),
+};
+
 const surfaceCatalogLoaders: Record<I18nAppSurface, CatalogLoaderMap> = {
   app: appCatalogLoaders,
   admin: adminCatalogLoaders,
   "cloud-console": cloudConsoleCatalogLoaders,
   site: siteCatalogLoaders,
+  wiki: wikiCatalogLoaders,
 };
 
 const messageCache = new Map<string, Promise<Messages>>();

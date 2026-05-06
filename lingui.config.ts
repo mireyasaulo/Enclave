@@ -37,6 +37,11 @@ const config: LinguiConfig = {
       include: ["<rootDir>/apps/site/src"],
       exclude: ["**/node_modules/**"],
     },
+    {
+      path: "<rootDir>/packages/i18n/catalogs/wiki/{locale}",
+      include: ["<rootDir>/apps/wiki/src"],
+      exclude: ["**/node_modules/**"],
+    },
   ],
 };
 

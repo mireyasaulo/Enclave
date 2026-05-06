@@ -12,7 +12,7 @@ import { router } from "./router";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <AppLocaleProvider
-      surface="site"
+      surface="wiki"
       fallback={<LoadingBlock className="m-6" />}
     >
       <QueryClientProvider client={queryClient}>
