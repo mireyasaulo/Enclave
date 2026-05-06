@@ -10,6 +10,8 @@
     "dev:restart": "node ../../scripts/dev-services.mjs restart app",
     "dev:status": "node ../../scripts/dev-services.mjs status app",
     "build": "tsc -p tsconfig.app.json && vite build",
+    "build:fast": "vite build",
+    "build:watch": "vite build --watch",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "lint": "eslint .",
     "lint:desktop-web": "eslint \"src/features/desktop/**/*.{ts,tsx}\" \"src/features/contacts/**/*.{ts,tsx}\" \"src/features/moments/**/*.{ts,tsx}\" \"src/features/channels/**/*.{ts,tsx}\" \"src/features/favorites/**/*.{ts,tsx}\" src/features/shell/use-desktop-layout.ts src/features/shell/desktop-shell.tsx src/routes/contacts-page.tsx src/routes/character-detail-page.tsx src/routes/discover-feed-page.tsx src/routes/moments-page.tsx src/routes/friend-moments-page.tsx src/routes/channels-page.tsx src/routes/favorites-page.tsx",
