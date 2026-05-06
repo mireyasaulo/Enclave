@@ -39,6 +39,22 @@ const SOURCE_OPTIONS: Array<{ value: CloudFeedbackSource; label: string }> = [
   { value: "wechat", label: "WeChat" },
 ];
 
+function categoryLabel(value: CloudFeedbackCategory) {
+  return CATEGORY_OPTIONS.find((opt) => opt.value === value)?.label ?? value;
+}
+
+function priorityLabel(value: CloudFeedbackPriority) {
+  return PRIORITY_OPTIONS.find((opt) => opt.value === value)?.label ?? value;
+}
+
+function statusLabel(value: CloudFeedbackStatus) {
+  return STATUS_OPTIONS.find((opt) => opt.value === value)?.label ?? value;
+}
+
+function sourceLabel(value: CloudFeedbackSource) {
+  return SOURCE_OPTIONS.find((opt) => opt.value === value)?.label ?? value;
+}
+
 function priorityTone(priority: CloudFeedbackPriority) {
   if (priority === "high") {
     return "border-rose-200 bg-rose-50 text-rose-700";
@@ -255,17 +271,17 @@ export function FeedbacksPage() {
                   >
                     <div className="flex flex-wrap items-center gap-2 text-xs">
                       <Pill tone={priorityTone(item.priority)}>
-                        {t(item.priority)}
+                        {t(priorityLabel(item.priority))}
                       </Pill>
                       <Pill tone={statusTone(item.status)}>
-                        {t(item.status)}
+                        {t(statusLabel(item.status))}
                       </Pill>
                       <span className="text-[color:var(--text-muted)]">
-                        {t(item.category)}
+                        {t(categoryLabel(item.category))}
                       </span>
                       <span className="text-[color:var(--text-muted)]">·</span>
                       <span className="text-[color:var(--text-muted)]">
-                        {t(item.source)}
+                        {t(sourceLabel(item.source))}
                       </span>
                     </div>
                     <div className="mt-2 line-clamp-1 text-sm font-medium text-[color:var(--text-primary)]">
@@ -436,11 +452,19 @@ function FeedbackDetailPanel({
   return (
     <div className="rounded-[22px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-soft)]">
       <div className="flex flex-wrap items-center gap-2 text-xs">
-        <Pill tone={priorityTone(item.priority)}>{t(item.priority)}</Pill>
-        <Pill tone={statusTone(item.status)}>{t(item.status)}</Pill>
-        <span className="text-[color:var(--text-muted)]">{t(item.category)}</span>
+        <Pill tone={priorityTone(item.priority)}>
+          {t(priorityLabel(item.priority))}
+        </Pill>
+        <Pill tone={statusTone(item.status)}>
+          {t(statusLabel(item.status))}
+        </Pill>
+        <span className="text-[color:var(--text-muted)]">
+          {t(categoryLabel(item.category))}
+        </span>
         <span className="text-[color:var(--text-muted)]">·</span>
-        <span className="text-[color:var(--text-muted)]">{t(item.source)}</span>
+        <span className="text-[color:var(--text-muted)]">
+          {t(sourceLabel(item.source))}
+        </span>
       </div>
       <h2 className="mt-3 text-lg font-semibold text-[color:var(--text-primary)]">
         {item.title}
