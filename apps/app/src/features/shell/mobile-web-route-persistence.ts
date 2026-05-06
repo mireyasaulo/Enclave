@@ -74,6 +74,39 @@ function getStorage() {
   }
 }
 
+function safeGetItem(storage: Storage | null, key: string) {
+  if (!storage) {
+    return null;
+  }
+  try {
+    return storage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSetItem(storage: Storage | null, key: string, value: string) {
+  if (!storage) {
+    return;
+  }
+  try {
+    storage.setItem(key, value);
+  } catch {
+    // ignore quota / privacy mode errors
+  }
+}
+
+function safeRemoveItem(storage: Storage | null, key: string) {
+  if (!storage) {
+    return;
+  }
+  try {
+    storage.removeItem(key);
+  } catch {
+    // ignore privacy mode errors
+  }
+}
+
 function normalizePersistablePath(path: string) {
   if (!path.startsWith("/")) {
     return null;
@@ -170,12 +203,16 @@ export function persistMobileWebRoute(path: string) {
     path: normalizedPath,
     updatedAt: Date.now(),
   };
-  storage.setItem(MOBILE_WEB_LAST_ROUTE_STORAGE_KEY, JSON.stringify(payload));
+  safeSetItem(
+    storage,
+    MOBILE_WEB_LAST_ROUTE_STORAGE_KEY,
+    JSON.stringify(payload),
+  );
 }
 
 export function readPersistedMobileWebRoute() {
   const storage = getStorage();
-  const rawValue = storage?.getItem(MOBILE_WEB_LAST_ROUTE_STORAGE_KEY);
+  const rawValue = safeGetItem(storage, MOBILE_WEB_LAST_ROUTE_STORAGE_KEY);
   if (!rawValue) {
     return null;
   }
@@ -191,17 +228,18 @@ export function readPersistedMobileWebRoute() {
       typeof payload.updatedAt !== "number" ||
       !Number.isFinite(payload.updatedAt)
     ) {
-      storage?.removeItem(MOBILE_WEB_LAST_ROUTE_STORAGE_KEY);
+      safeRemoveItem(storage, MOBILE_WEB_LAST_ROUTE_STORAGE_KEY);
       return null;
     }
 
     if (Date.now() - payload.updatedAt > MAX_ROUTE_AGE_MS) {
-      storage?.removeItem(MOBILE_WEB_LAST_ROUTE_STORAGE_KEY);
+      safeRemoveItem(storage, MOBILE_WEB_LAST_ROUTE_STORAGE_KEY);
       return null;
     }
 
     if (normalizedPath !== payload.path) {
-      storage?.setItem(
+      safeSetItem(
+        storage,
         MOBILE_WEB_LAST_ROUTE_STORAGE_KEY,
         JSON.stringify({
           path: normalizedPath,
@@ -212,7 +250,7 @@ export function readPersistedMobileWebRoute() {
 
     return normalizedPath;
   } catch {
-    storage?.removeItem(MOBILE_WEB_LAST_ROUTE_STORAGE_KEY);
+    safeRemoveItem(storage, MOBILE_WEB_LAST_ROUTE_STORAGE_KEY);
     return null;
   }
 }
