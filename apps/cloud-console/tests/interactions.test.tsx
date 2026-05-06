@@ -2186,17 +2186,22 @@ describe("cloud-console interactions", () => {
 
   it("refreshes the admin session from a stored refresh token", async () => {
     const { requests } = installCloudAdminApiMock();
+    const futureRefreshExpiry = new Date(
+      Date.now() + 7 * 24 * 60 * 60 * 1000,
+    ).toISOString();
     renderRoute("/", {
       adminAccessToken: "expired-admin-access-token",
       adminAccessTokenExpiresAt: "2026-04-19T00:00:00.000Z",
       adminRefreshToken: "test-admin-refresh-token",
-      adminRefreshTokenExpiresAt: "2026-04-28T01:00:00.000Z",
+      adminRefreshTokenExpiresAt: futureRefreshExpiry,
     });
 
     expect(await screen.findByText("Fleet Dashboard")).toBeTruthy();
-    expect(
-      requests.some((entry) => entry.url === "POST /admin/cloud/auth/refresh"),
-    ).toBe(true);
+    await waitFor(() => {
+      expect(
+        requests.some((entry) => entry.url === "POST /admin/cloud/auth/refresh"),
+      ).toBe(true);
+    });
     expect(
       requests.some((entry) => entry.url === "POST /admin/cloud/auth/token"),
     ).toBe(false);

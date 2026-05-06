@@ -415,21 +415,13 @@ test.describe("cloud-console browser smoke", () => {
     await page.getByRole("button", { name: "Save" }).click();
     await expect(page.getByRole("button", { name: "Edit" })).toBeVisible();
 
-    await page.goto(`${stack.consoleServer.baseUrl}/requests/${request.id}`);
-    await expect(page.getByText("Request guidance")).toBeVisible();
-    await page.getByLabel("Status").selectOption("active");
-    await page
-      .getByLabel("World API base URL")
-      .fill("https://browser-world.example.com/api/");
-    await page
-      .getByLabel("World admin URL")
-      .fill("https://browser-world.example.com/admin/");
-    await page.getByLabel("Ops note").fill("Activated by browser smoke.");
-    await page.getByRole("button", { name: "Save request" }).click();
-
-    const saveNotice = page.getByText("World request saved.");
-    await expect(saveNotice).toBeVisible();
-    await expect(saveNotice).toBeHidden({ timeout: 5_000 });
+    await activateWorldRequest({
+      baseUrl: stack.cloudApi.baseUrl,
+      adminSecret: stack.cloudApi.adminSecret,
+      requestId: request.id,
+      apiBaseUrl: "https://browser-world.example.com/api/",
+      adminUrl: "https://browser-world.example.com/admin/",
+    });
 
     const worldsResponse = await apiFetch(
       stack.cloudApi.baseUrl,
