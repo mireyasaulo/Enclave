@@ -7,6 +7,7 @@ export type CharacterBlueprintSourceTypeValue =
   | 'manual_admin'
   | 'template_clone'
   | 'ai_generated'
+  | 'wiki_contributed'
   | 'need_generated'
   | 'shake_generated';
 

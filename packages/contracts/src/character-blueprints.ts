@@ -1,11 +1,12 @@
-import type { Character } from "./characters";
+import type { Character, RealityLinkConfig } from "./characters";
 
 export type CharacterBlueprintSourceType =
   | "default_seed"
   | "preset_catalog"
   | "manual_admin"
   | "template_clone"
-  | "ai_generated";
+  | "ai_generated"
+  | "wiki_contributed";
 
 export type CharacterBlueprintStatus = "draft" | "published" | "archived";
 export type CharacterFactoryFieldSourceStatus =
@@ -104,6 +105,7 @@ export interface CharacterBlueprintRecipe {
     initialOnline: boolean;
     initialActivity: string | null;
   };
+  realityLink?: RealityLinkConfig | null;
 }
 
 export interface CharacterBlueprint {

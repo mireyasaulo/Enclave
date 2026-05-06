@@ -199,7 +199,7 @@ function describeCloudButtonLabel(
   }
 
   if (!session) {
-    return t(msg`解析我的世界`);
+    return t(msg`进入我的世界`);
   }
 
   if (session.status === "ready") {
@@ -212,7 +212,7 @@ function describeCloudButtonLabel(
       : t(msg`正在创建世界...`);
   }
 
-  return t(msg`解析我的世界`);
+  return t(msg`进入我的世界`);
 }
 
 function mobileNoticeTone(
@@ -756,7 +756,7 @@ export function WelcomePage() {
                     setCode(event.target.value);
                     setEntryError("");
                   }}
-                  placeholder={t(msg`请输入验证码`)}
+                  placeholder={t(msg`请输入验证码（默认 123456 即可通过）`)}
                 />
               </div>
               <Button
@@ -994,11 +994,7 @@ export function WelcomePage() {
             </div>
           </button>
           </div>
-        ) : (
-          <InlineNotice tone="info">
-            Cloud sign-in is required in this build. Local world entry remains available only for development and internal environments.
-          </InlineNotice>
-        )}
+        ) : null}
 
         {notice ? (
           isDesktopLayout ? <InlineNotice tone="success">{notice}</InlineNotice> : <MobileWelcomeNotice tone="success">{notice}</MobileWelcomeNotice>

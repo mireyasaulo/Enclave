@@ -5,6 +5,7 @@ import {
   type AuthenticatedUser,
 } from '../../auth/jwt-auth.guard';
 import { RequireRole } from '../decorators/require-role.decorator';
+import { WikiRateLimitGuard } from '../guards/wiki-rate-limit.guard';
 import { WikiRoleGuard } from '../guards/wiki-role.guard';
 import { WikiReviewService } from '../services/wiki-review.service';
 
@@ -15,6 +16,7 @@ export class WikiRevertController {
 
   @Post(':id/revert')
   @RequireRole('patroller')
+  @UseGuards(WikiRateLimitGuard)
   revert(
     @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,

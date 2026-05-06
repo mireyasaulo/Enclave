@@ -1,25 +1,25 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  AppSection,
   Button,
-  Card,
   ErrorBlock,
+  InlineNotice,
   LoadingBlock,
+  PanelEmpty,
   StatusPill,
   TextField,
 } from "@yinjie/ui";
-import { hasRole } from "../lib/auth-store";
-import { useAuth } from "../lib/use-auth";
 import { wikiApi } from "../lib/wiki-api";
+import { PageShell } from "../components/page-shell";
+import { FormRow } from "../components/form-row";
 
 export function AdminProtectionPage() {
-  const { user } = useAuth();
   const qc = useQueryClient();
   const [characterId, setCharacterId] = useState("");
   const charactersQ = useQuery({
     queryKey: ["wiki", "characters"],
     queryFn: () => wikiApi.listCharacters(),
-    enabled: hasRole(user, "admin"),
   });
   const pageQ = useQuery({
     queryKey: ["wiki", "page", characterId],
@@ -34,14 +34,16 @@ export function AdminProtectionPage() {
 
   const [form, setForm] = useState<{
     level: "none" | "semi" | "full";
+    reviewPolicy: "open" | "pending_changes";
     expiresAt: string;
     reason: string;
-  }>({ level: "none", expiresAt: "", reason: "" });
+  }>({ level: "none", reviewPolicy: "open", expiresAt: "", reason: "" });
 
   const setProtMut = useMutation({
     mutationFn: () =>
       wikiApi.setProtection(characterId, {
         level: form.level,
+        reviewPolicy: form.reviewPolicy,
         expiresAt: form.expiresAt.trim() || null,
         reason: form.reason.trim() || undefined,
       }),
@@ -53,26 +55,25 @@ export function AdminProtectionPage() {
     },
   });
 
-  if (!hasRole(user, "admin")) {
-    return (
-      <Card className="p-6">
-        <p>仅管理员可访问。</p>
-      </Card>
-    );
-  }
-
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold">页面保护</h1>
-      <Card className="p-4">
-        <label className="block text-sm">
-          <span className="block mb-1">选择条目</span>
+    <PageShell
+      eyebrow="管理"
+      title="页面保护"
+      description="对单个角色词条设置编辑保护级别和审核策略：无保护 / 半保护（自动确认及以上）/ 完全保护（仅管理员）。"
+    >
+      <AppSection>
+        <FormRow label="选择条目">
           <select
-            className="w-full border rounded px-2 py-2 bg-white"
+            className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
             value={characterId}
             onChange={(e) => {
               setCharacterId(e.target.value);
-              setForm({ level: "none", expiresAt: "", reason: "" });
+              setForm({
+                level: "none",
+                reviewPolicy: "open",
+                expiresAt: "",
+                reason: "",
+              });
             }}
           >
             <option value="">— 选择 —</option>
@@ -82,26 +83,39 @@ export function AdminProtectionPage() {
               </option>
             ))}
           </select>
-        </label>
-      </Card>
+        </FormRow>
+      </AppSection>
 
       {characterId && (
         <>
           {pageQ.isLoading && <LoadingBlock />}
+          {pageQ.isError && (
+            <ErrorBlock message={(pageQ.error as Error).message} />
+          )}
           {pageQ.data && (
-            <Card className="p-4 space-y-3">
-              <div className="text-sm">
-                当前级别：
+            <AppSection className="space-y-4">
+              <div className="flex flex-wrap items-center gap-2 text-sm">
+                <span className="text-[color:var(--text-muted)]">
+                  当前级别
+                </span>
                 <StatusPill>
                   {pageQ.data.page.protectionLevel === "none"
                     ? "无保护"
                     : pageQ.data.page.protectionLevel === "semi"
-                    ? "半保护"
-                    : "完全保护"}
+                      ? "半保护"
+                      : "完全保护"}
+                </StatusPill>
+                <span className="ml-3 text-[color:var(--text-muted)]">
+                  审核策略
+                </span>
+                <StatusPill>
+                  {pageQ.data.page.reviewPolicy === "pending_changes"
+                    ? "待审变更"
+                    : "开放编辑"}
                 </StatusPill>
                 {pageQ.data.page.protectionLevel !== "none" &&
                   pageQ.data.page.protectionExpiresAt && (
-                    <span className="ml-2 text-xs text-[var(--text-muted)]">
+                    <span className="ml-3 text-xs text-[color:var(--text-muted)]">
                       到期：
                       {new Date(
                         pageQ.data.page.protectionExpiresAt,
@@ -109,11 +123,10 @@ export function AdminProtectionPage() {
                     </span>
                   )}
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <label className="block text-sm">
-                  <span className="block mb-1">新级别</span>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <FormRow label="新级别">
                   <select
-                    className="w-full border rounded px-2 py-2 bg-white"
+                    className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
                     value={form.level}
                     onChange={(e) =>
                       setForm({
@@ -123,73 +136,89 @@ export function AdminProtectionPage() {
                     }
                   >
                     <option value="none">无保护</option>
-                    <option value="semi">半保护（仅自动确认+）</option>
+                    <option value="semi">半保护（自动确认+）</option>
                     <option value="full">完全保护（仅管理员）</option>
                   </select>
-                </label>
-                <label className="block text-sm">
-                  <span className="block mb-1">到期时间（可选 ISO）</span>
+                </FormRow>
+                <FormRow label="审核策略">
+                  <select
+                    className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
+                    value={form.reviewPolicy}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        reviewPolicy: e.target
+                          .value as typeof form.reviewPolicy,
+                      })
+                    }
+                  >
+                    <option value="open">开放编辑</option>
+                    <option value="pending_changes">待审变更</option>
+                  </select>
+                </FormRow>
+                <FormRow label="到期时间" hint="可选 ISO，留空 = 永久">
                   <TextField
                     value={form.expiresAt}
                     onChange={(e) =>
                       setForm({ ...form, expiresAt: e.target.value })
                     }
-                    placeholder="留空 = 永久"
+                    placeholder="2026-06-01T00:00:00Z"
                   />
-                </label>
-                <label className="block text-sm">
-                  <span className="block mb-1">原因</span>
+                </FormRow>
+                <FormRow label="原因">
                   <TextField
                     value={form.reason}
                     onChange={(e) =>
                       setForm({ ...form, reason: e.target.value })
                     }
                   />
-                </label>
+                </FormRow>
               </div>
-              <Button
-                variant="primary"
-                disabled={setProtMut.isPending}
-                onClick={() => setProtMut.mutate()}
-              >
-                {setProtMut.isPending ? "保存中..." : "应用保护级别"}
-              </Button>
-              {setProtMut.isError && (
-                <ErrorBlock message={(setProtMut.error as Error).message} />
-              )}
-            </Card>
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  variant="primary"
+                  disabled={setProtMut.isPending}
+                  onClick={() => setProtMut.mutate()}
+                >
+                  {setProtMut.isPending ? "保存中..." : "应用保护级别"}
+                </Button>
+                {setProtMut.isError && (
+                  <InlineNotice tone="danger" className="flex-1">
+                    {(setProtMut.error as Error).message}
+                  </InlineNotice>
+                )}
+              </div>
+            </AppSection>
           )}
 
-          <Card className="p-4">
-            <h2 className="font-medium mb-2">变更历史</h2>
+          <AppSection>
+            <h2 className="mb-3 text-base font-semibold">变更历史</h2>
             {logQ.isLoading && <LoadingBlock />}
-            {logQ.data?.length === 0 && (
-              <p className="text-sm text-[var(--text-muted)]">暂无记录。</p>
-            )}
+            {logQ.data?.length === 0 && <PanelEmpty message="暂无记录。" />}
             <ul className="space-y-2">
               {logQ.data?.map((row) => (
                 <li
                   key={row.id}
-                  className="text-sm border-b border-[var(--border-subtle)] pb-2 last:border-0"
+                  className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-3 py-2 text-sm"
                 >
                   <div>
                     <code>{row.oldLevel}</code> → <code>{row.newLevel}</code>
                   </div>
-                  <div className="text-xs text-[var(--text-muted)] mt-1">
+                  <div className="mt-1 text-xs text-[color:var(--text-muted)]">
                     {new Date(row.createdAt).toLocaleString()} · 由{" "}
                     {row.changedBy}
                     {row.expiresAt &&
                       ` · 到期 ${new Date(row.expiresAt).toLocaleString()}`}
                   </div>
                   {row.reason && (
-                    <div className="text-xs mt-1">{row.reason}</div>
+                    <div className="mt-1 text-xs">{row.reason}</div>
                   )}
                 </li>
               ))}
             </ul>
-          </Card>
+          </AppSection>
         </>
       )}
-    </div>
+    </PageShell>
   );
 }

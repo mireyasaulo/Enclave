@@ -45,6 +45,8 @@ import {
 } from "../lib/job-route-search";
 import { copyTextToClipboard } from "../lib/clipboard";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
+import { translateCloudConsoleTextForActiveLocale,
+  useCloudConsoleText } from "../lib/cloud-console-i18n";
 import {
   createRequestScopedNotice,
   showRequestScopedNotice,
@@ -64,7 +66,7 @@ const UNASSIGNED_PROVIDER_FILTER = "__unassigned__";
 
 function formatDateTime(value?: string | null) {
   if (!value) {
-    return "Not available";
+    return translateCloudConsoleTextForActiveLocale("Not available");
   }
 
   return formatLocaleDateTime(new Date(value), {
@@ -79,11 +81,11 @@ function formatLeaseOwner(value?: string | null) {
 
 function formatDuration(value?: number | null) {
   if (value == null) {
-    return "Not leased";
+    return translateCloudConsoleTextForActiveLocale("Not leased");
   }
 
   if (value <= 0) {
-    return "Expired";
+    return translateCloudConsoleTextForActiveLocale("Expired");
   }
 
   const minutes = Math.floor(value / 60);
@@ -129,6 +131,7 @@ type QuickActionConfirmState = {
 };
 
 export function JobsPage() {
+  const t = useCloudConsoleText();
   const navigate = useNavigate({ from: "/jobs" });
   const queryClient = useQueryClient();
   const { showNotice } = useConsoleNotice();
@@ -255,7 +258,7 @@ export function JobsPage() {
           const providerKey = resolveProviderKey(item);
           const providerLabel = providerKey
             ? (providerLabelByKey.get(providerKey) ?? providerKey)
-            : "Unassigned";
+            : t("Unassigned");
 
           return [
             item.world.id,
@@ -296,7 +299,7 @@ export function JobsPage() {
         key,
         label:
           key === UNASSIGNED_PROVIDER_FILTER
-            ? "Unassigned"
+            ? t("Unassigned")
             : (providerLabelByKey.get(key) ?? key),
       }));
   }, [instanceFleetQuery.data, providerLabelByKey]);
@@ -347,29 +350,29 @@ export function JobsPage() {
   const summaryCards = [
     {
       key: "active",
-      label: "Active jobs",
+      label: t("Active jobs"),
       count: jobSummary?.activeJobs ?? jobSummaryFallback.activeJobs,
     },
     {
       key: "failed",
-      label: "Failed jobs",
+      label: t("Failed jobs"),
       count: jobSummary?.failedJobs ?? jobSummaryFallback.failedJobs,
     },
     {
       key: "superseded",
-      label: "Superseded jobs",
+      label: t("Superseded jobs"),
       count: jobSummary?.supersededJobs ?? jobSummaryFallback.supersededJobs,
     },
     {
       key: "running_now",
-      label: "Running jobs",
+      label: t("Running jobs"),
       count:
         jobSummary?.queueState.runningNow ??
         jobSummaryFallback.queueState.runningNow,
     },
     {
       key: "lease_expired",
-      label: "Lease expired jobs",
+      label: t("Lease expired jobs"),
       count:
         jobSummary?.queueState.leaseExpired ??
         jobSummaryFallback.queueState.leaseExpired,
@@ -378,7 +381,7 @@ export function JobsPage() {
       key: "delayed",
       label:
         queueStateFilter === "all"
-          ? "Delayed jobs"
+          ? t("Delayed jobs")
           : "Delayed jobs in filter",
       count:
         jobSummary?.queueState.delayed ?? jobSummaryFallback.queueState.delayed,
@@ -443,7 +446,7 @@ export function JobsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="text-xl font-semibold text-[color:var(--text-primary)]">
-            Lifecycle jobs
+            {t("Lifecycle jobs")}
           </div>
           <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
             {worldId
@@ -458,7 +461,7 @@ export function JobsPage() {
             onClick={() => void copyJobsPermalink()}
             className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:bg-[color:var(--surface-soft)]"
           >
-            Copy jobs permalink
+            {t("Copy jobs permalink")}
           </button>
 
           <input
@@ -466,7 +469,7 @@ export function JobsPage() {
             onChange={(event) =>
               updateFilters({ query: event.target.value, page: 1 })
             }
-            placeholder="Search world, phone, job, lease..."
+            placeholder={t("Search world, phone, job, lease...")}
             className="min-w-[16rem] rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)] placeholder:text-[color:var(--text-muted)]"
           />
 
@@ -626,7 +629,7 @@ export function JobsPage() {
       {worldId ? (
         <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-4 py-3">
           <div className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-            World scope
+            {t("World scope")}
           </div>
           <Link
             to="/worlds/$worldId"
@@ -643,7 +646,7 @@ export function JobsPage() {
             onClick={() => updateFilters({ worldId: "", page: 1 })}
             className="rounded-xl border border-[color:var(--border-faint)] px-3 py-1 text-xs uppercase tracking-[0.16em] text-[color:var(--text-primary)]"
           >
-            Clear world scope
+            {t("Clear world scope")}
           </button>
         </div>
       ) : null}
@@ -665,7 +668,7 @@ export function JobsPage() {
       </div>
 
       <div className="mt-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Summary counts reflect all jobs matching the current filters, not just this page.
+        {t("Summary counts reflect all jobs matching the current filters, not just this page.")}
       </div>
 
       {pageErrors.length ? (
@@ -680,16 +683,16 @@ export function JobsPage() {
         <table className="min-w-[84rem] border-collapse text-left text-sm">
           <thead className="bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]">
             <tr>
-              <th className="px-4 py-3">Job</th>
-              <th className="px-4 py-3">World</th>
-              <th className="px-4 py-3">Provider</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Attempt</th>
-              <th className="px-4 py-3">Lease</th>
-              <th className="px-4 py-3">Started</th>
-              <th className="px-4 py-3">Finished</th>
-              <th className="px-4 py-3">Result</th>
-              <th className="px-4 py-3">Actions</th>
+              <th className="px-4 py-3">{t("Job")}</th>
+              <th className="px-4 py-3">{t("World")}</th>
+              <th className="px-4 py-3">{t("Provider")}</th>
+              <th className="px-4 py-3">{t("Status")}</th>
+              <th className="px-4 py-3">{t("Attempt")}</th>
+              <th className="px-4 py-3">{t("Lease")}</th>
+              <th className="px-4 py-3">{t("Started")}</th>
+              <th className="px-4 py-3">{t("Finished")}</th>
+              <th className="px-4 py-3">{t("Result")}</th>
+              <th className="px-4 py-3">{t("Actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -753,7 +756,7 @@ export function JobsPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-[color:var(--text-secondary)]">
-                      <div>{worldInfo?.providerLabel ?? "Unassigned"}</div>
+                      <div>{worldInfo?.providerLabel ?? t("Unassigned")}</div>
                       <div className="mt-1 text-xs text-[color:var(--text-muted)]">
                         power {worldInfo?.powerState ?? "absent"}
                       </div>
@@ -835,13 +838,13 @@ export function JobsPage() {
 
         {jobsQuery.isLoading ? (
           <div className="p-4 text-sm text-[color:var(--text-muted)]">
-            Loading jobs...
+            {t("Loading jobs...")}
           </div>
         ) : null}
 
         {!jobsQuery.isLoading && !pageErrors.length && jobs.length === 0 ? (
           <div className="p-4 text-sm text-[color:var(--text-muted)]">
-            No jobs match this filter.
+            {t("No jobs match this filter.")}
           </div>
         ) : null}
       </div>
@@ -858,7 +861,7 @@ export function JobsPage() {
             onClick={() => updateFilters({ page: page - 1 })}
             className="rounded-xl border border-[color:var(--border-faint)] px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Previous page
+            {t("Previous page")}
           </button>
           <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
             Page {page} / {totalPages}
@@ -869,7 +872,7 @@ export function JobsPage() {
             onClick={() => updateFilters({ page: page + 1 })}
             className="rounded-xl border border-[color:var(--border-faint)] px-4 py-2 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Next page
+            {t("Next page")}
           </button>
         </div>
       </div>

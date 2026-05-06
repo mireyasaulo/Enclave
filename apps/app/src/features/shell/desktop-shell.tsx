@@ -919,7 +919,9 @@ export function DesktopShell({ children }: PropsWithChildren) {
                         msg`口令仅保存在当前浏览器或桌面客户端本地，用来阻止离开座位时工作区继续暴露。`,
                       )
                     : lockPasscodeLength
-                      ? t(msg`当前已启用 ${lockPasscodeLength} 位本地锁定口令。`)
+                      ? t(
+                          msg`当前已启用 ${lockPasscodeLength} 位本地锁定口令。`,
+                        )
                       : t(msg`当前设备尚未保存锁定口令。`)}
                 </div>
                 {lockedAt ? (
@@ -1140,11 +1142,7 @@ function DesktopOwnerQuickCard({
     <div className="absolute left-[calc(100%+0.75rem)] top-0 z-30 w-[286px] rounded-[22px] border border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.98)] p-3 shadow-[var(--shadow-overlay)] backdrop-blur-xl">
       <div className="rounded-[18px] bg-[linear-gradient(180deg,rgba(7,193,96,0.12),rgba(255,255,255,0.92))] p-3.5">
         <div className="flex items-start gap-3">
-          <AvatarChip
-            name={ownerDisplayName}
-            src={ownerAvatar}
-            size="lg"
-          />
+          <AvatarChip name={ownerDisplayName} src={ownerAvatar} size="lg" />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <div className="truncate text-[17px] font-semibold text-[color:var(--text-primary)]">

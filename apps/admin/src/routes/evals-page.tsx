@@ -23,7 +23,6 @@ import {
 import {
   Button,
   Card,
-  ErrorBlock,
   InlineNotice,
   ListItemCard,
   MetricCard,
@@ -38,6 +37,7 @@ import {
   AdminActionFeedback,
   AdminDetailPanel,
   AdminEmptyState,
+  AdminErrorState,
   AdminInlineSelectField,
   AdminInlineTextField,
   AdminInfoRows,
@@ -1344,10 +1344,42 @@ export function EvalsPage() {
             description={successNotice}
           />
         ) : null}
-        {runDatasetMutation.isError && runDatasetMutation.error instanceof Error ? <ErrorBlock className="mt-4" message={runDatasetMutation.error.message} /> : null}
-        {runPairwiseMutation.isError && runPairwiseMutation.error instanceof Error ? <ErrorBlock className="mt-4" message={runPairwiseMutation.error.message} /> : null}
-        {runExperimentPresetMutation.isError && runExperimentPresetMutation.error instanceof Error ? <ErrorBlock className="mt-4" message={runExperimentPresetMutation.error.message} /> : null}
-        {updateReportDecisionMutation.isError && updateReportDecisionMutation.error instanceof Error ? <ErrorBlock className="mt-4" message={updateReportDecisionMutation.error.message} /> : null}
+        {runDatasetMutation.isError && runDatasetMutation.error instanceof Error ? (
+          <AdminErrorState
+            className="mt-4"
+            title="数据集评测失败"
+            detail={runDatasetMutation.error.message}
+            onRetry={() => runDatasetMutation.reset()}
+            retryLabel="清除错误"
+          />
+        ) : null}
+        {runPairwiseMutation.isError && runPairwiseMutation.error instanceof Error ? (
+          <AdminErrorState
+            className="mt-4"
+            title="对比评测失败"
+            detail={runPairwiseMutation.error.message}
+            onRetry={() => runPairwiseMutation.reset()}
+            retryLabel="清除错误"
+          />
+        ) : null}
+        {runExperimentPresetMutation.isError && runExperimentPresetMutation.error instanceof Error ? (
+          <AdminErrorState
+            className="mt-4"
+            title="预设实验运行失败"
+            detail={runExperimentPresetMutation.error.message}
+            onRetry={() => runExperimentPresetMutation.reset()}
+            retryLabel="清除错误"
+          />
+        ) : null}
+        {updateReportDecisionMutation.isError && updateReportDecisionMutation.error instanceof Error ? (
+          <AdminErrorState
+            className="mt-4"
+            title="评测决议更新失败"
+            detail={updateReportDecisionMutation.error.message}
+            onRetry={() => updateReportDecisionMutation.reset()}
+            retryLabel="清除错误"
+          />
+        ) : null}
       </Card>
 
       <Card id="eval-presets" className="bg-[color:var(--surface-console)]">

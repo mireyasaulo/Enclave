@@ -10,9 +10,7 @@ import { getSystemStatus } from "@yinjie/contracts";
 import {
   Button,
   Card,
-  ErrorBlock,
   InlineNotice,
-  LoadingBlock,
   MetricCard,
   SectionHeading,
   StatusPill,
@@ -22,11 +20,13 @@ import {
   AdminCallout,
   AdminActionFeedback,
   AdminCodeBlock as CodeBlock,
+  AdminErrorState,
   AdminInfoRows,
   AdminPanelEmpty,
   AdminPageHero,
   AdminRecordCard,
   AdminSectionHeader,
+  AdminSkeletonCard,
   AdminTabs,
   AdminSelectField as SelectFieldBlock,
   AdminTextArea as TextAreaBlock,
@@ -203,15 +203,27 @@ export function CharacterFactoryPage() {
   }
 
   if (factoryQuery.isLoading) {
-    return <LoadingBlock label="正在加载角色工厂..." />;
+    return <AdminSkeletonCard rows={6} showAction />;
   }
 
   if (factoryQuery.isError && factoryQuery.error instanceof Error) {
-    return <ErrorBlock message={factoryQuery.error.message} />;
+    return (
+      <AdminErrorState
+        title="角色工厂加载失败"
+        detail={factoryQuery.error.message}
+        onRetry={() => factoryQuery.refetch()}
+      />
+    );
   }
 
   if (!factoryQuery.data || !draft) {
-    return <ErrorBlock message="角色工厂数据暂不可用。" />;
+    return (
+      <AdminErrorState
+        title="角色工厂数据暂不可用"
+        detail="未能从远程获取到工厂快照。"
+        onRetry={() => factoryQuery.refetch()}
+      />
+    );
   }
 
   const snapshot = factoryQuery.data;
@@ -312,17 +324,37 @@ export function CharacterFactoryPage() {
       />
 
       {saveMutation.isError && saveMutation.error instanceof Error ? (
-        <ErrorBlock message={saveMutation.error.message} />
+        <AdminErrorState
+          title="保存草稿失败"
+          detail={saveMutation.error.message}
+          onRetry={() => saveMutation.reset()}
+          retryLabel="清除错误"
+        />
       ) : null}
       {publishMutation.isError && publishMutation.error instanceof Error ? (
-        <ErrorBlock message={publishMutation.error.message} />
+        <AdminErrorState
+          title="发布到运行时失败"
+          detail={publishMutation.error.message}
+          onRetry={() => publishMutation.reset()}
+          retryLabel="清除错误"
+        />
       ) : null}
       {restoreMutation.isError && restoreMutation.error instanceof Error ? (
-        <ErrorBlock message={restoreMutation.error.message} />
+        <AdminErrorState
+          title="恢复版本失败"
+          detail={restoreMutation.error.message}
+          onRetry={() => restoreMutation.reset()}
+          retryLabel="清除错误"
+        />
       ) : null}
       {aiGenerateMutation.isError &&
       aiGenerateMutation.error instanceof Error ? (
-        <ErrorBlock message={aiGenerateMutation.error.message} />
+        <AdminErrorState
+          title="AI 生成失败"
+          detail={aiGenerateMutation.error.message}
+          onRetry={() => aiGenerateMutation.reset()}
+          retryLabel="清除错误"
+        />
       ) : null}
 
       <InlineNotice tone="muted">
@@ -1295,11 +1327,16 @@ export function CharacterFactoryPage() {
               <Card className="bg-[color:var(--surface-console)]">
                 <SectionHeading>版本记录</SectionHeading>
                 {revisionsQuery.isLoading ? (
-                  <LoadingBlock className="mt-4" label="正在加载版本..." />
+                  <AdminSkeletonCard className="mt-4" rows={3} />
                 ) : null}
                 {revisionsQuery.isError &&
                 revisionsQuery.error instanceof Error ? (
-                  <ErrorBlock message={revisionsQuery.error.message} />
+                  <AdminErrorState
+                    className="mt-4"
+                    title="加载版本失败"
+                    detail={revisionsQuery.error.message}
+                    onRetry={() => revisionsQuery.refetch()}
+                  />
                 ) : null}
                 <div className="mt-4 space-y-4">
                   {revisions.map((revision) => (

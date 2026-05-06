@@ -2,10 +2,17 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import type { CloudUserStatus, SubscriptionStatus } from "@yinjie/contracts";
+import { useAppLocale } from "@yinjie/i18n";
 import { ErrorBlock, InlineNotice, LoadingBlock } from "@yinjie/ui";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
+import {
+  formatCloudConsolePageOfTotal,
+  useCloudConsoleText,
+} from "../lib/cloud-console-i18n";
 
 export function UsersPage() {
+  const t = useCloudConsoleText();
+  const { locale } = useAppLocale();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<CloudUserStatus | "">("");
   const [subscriptionStatus, setSubscriptionStatus] =
@@ -33,7 +40,7 @@ export function UsersPage() {
             setQuery(event.target.value);
             setPage(1);
           }}
-          placeholder="Search phone"
+          placeholder={t("Search phone")}
           className="rounded-2xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm"
         />
         <select
@@ -44,10 +51,10 @@ export function UsersPage() {
           }}
           className="rounded-2xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm"
         >
-          <option value="">All account states</option>
-          <option value="active">active</option>
-          <option value="banned">banned</option>
-          <option value="archived">archived</option>
+          <option value="">{t("All account states")}</option>
+          <option value="active">{t("active")}</option>
+          <option value="banned">{t("banned")}</option>
+          <option value="archived">{t("archived")}</option>
         </select>
         <select
           value={subscriptionStatus}
@@ -57,23 +64,29 @@ export function UsersPage() {
           }}
           className="rounded-2xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm"
         >
-          <option value="">All subscription states</option>
-          <option value="active">active</option>
-          <option value="expired">expired</option>
-          <option value="none">none</option>
+          <option value="">{t("All subscription states")}</option>
+          <option value="active">{t("active")}</option>
+          <option value="expired">{t("expired")}</option>
+          <option value="none">{t("none")}</option>
         </select>
         <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white px-3 py-2 text-sm text-[color:var(--text-secondary)]">
-          Page {usersQuery.data?.page ?? page} / {usersQuery.data?.totalPages ?? 1}
+          {formatCloudConsolePageOfTotal(
+            usersQuery.data?.page ?? page,
+            usersQuery.data?.totalPages ?? 1,
+            locale,
+          )}
         </div>
       </div>
 
-      {usersQuery.isLoading ? <LoadingBlock label="Loading SaaS users..." /> : null}
+      {usersQuery.isLoading ? (
+        <LoadingBlock label={t("Loading SaaS users...")} />
+      ) : null}
       {usersQuery.isError ? (
         <ErrorBlock
           message={
             usersQuery.error instanceof Error
               ? usersQuery.error.message
-              : "Failed to load users."
+              : t("Failed to load users.")
           }
         />
       ) : null}
@@ -83,13 +96,13 @@ export function UsersPage() {
           <table className="min-w-full divide-y divide-[color:var(--border-faint)] text-sm">
             <thead className="bg-[#f8faf8] text-left text-[color:var(--text-muted)]">
               <tr>
-                <th className="px-4 py-3 font-medium">Phone</th>
-                <th className="px-4 py-3 font-medium">Account</th>
-                <th className="px-4 py-3 font-medium">Subscription</th>
-                <th className="px-4 py-3 font-medium">Expires</th>
-                <th className="px-4 py-3 font-medium">Inviter</th>
-                <th className="px-4 py-3 font-medium">World</th>
-                <th className="px-4 py-3 font-medium">Plan</th>
+                <th className="px-4 py-3 font-medium">{t("Phone")}</th>
+                <th className="px-4 py-3 font-medium">{t("Account")}</th>
+                <th className="px-4 py-3 font-medium">{t("Subscription")}</th>
+                <th className="px-4 py-3 font-medium">{t("Expires")}</th>
+                <th className="px-4 py-3 font-medium">{t("Inviter")}</th>
+                <th className="px-4 py-3 font-medium">{t("World")}</th>
+                <th className="px-4 py-3 font-medium">{t("Plan")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[color:var(--border-faint)]">
@@ -104,11 +117,13 @@ export function UsersPage() {
                       {user.phone}
                     </Link>
                   </td>
-                  <td className="px-4 py-3">{user.status}</td>
-                  <td className="px-4 py-3">{user.subscriptionStatus}</td>
+                  <td className="px-4 py-3">{t(user.status)}</td>
+                  <td className="px-4 py-3">{t(user.subscriptionStatus)}</td>
                   <td className="px-4 py-3">{user.subscriptionExpiresAt || "-"}</td>
                   <td className="px-4 py-3">{user.inviterPhone || "-"}</td>
-                  <td className="px-4 py-3">{user.worldStatus || "-"}</td>
+                  <td className="px-4 py-3">
+                    {user.worldStatus ? t(user.worldStatus) : "-"}
+                  </td>
                   <td className="px-4 py-3">{user.currentPlanCode || "-"}</td>
                 </tr>
               ))}
@@ -118,7 +133,9 @@ export function UsersPage() {
       ) : null}
 
       {usersQuery.data && !usersQuery.data.items.length ? (
-        <InlineNotice tone="muted">No cloud users matched the current filters.</InlineNotice>
+        <InlineNotice tone="muted">
+          {t("No cloud users matched the current filters.")}
+        </InlineNotice>
       ) : null}
 
       <div className="flex items-center justify-between">
@@ -128,7 +145,7 @@ export function UsersPage() {
           onClick={() => setPage((current) => Math.max(current - 1, 1))}
           disabled={page <= 1}
         >
-          Previous
+          {t("Previous")}
         </button>
         <button
           type="button"
@@ -136,7 +153,7 @@ export function UsersPage() {
           onClick={() => setPage((current) => current + 1)}
           disabled={Boolean(usersQuery.data && page >= usersQuery.data.totalPages)}
         >
-          Next
+          {t("Next")}
         </button>
       </div>
     </section>

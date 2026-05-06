@@ -7,23 +7,12 @@ import {
 import { RootLayout } from "./components/root-layout";
 import { validateAdminSessionsRouteSearch } from "./lib/admin-sessions-route-search";
 import { validateJobsRouteSearch } from "./lib/job-route-search";
-import { validateRequestsRouteSearch } from "./lib/request-route-search";
 import { validateWaitingSessionSyncRouteSearch } from "./lib/waiting-session-sync-helpers";
 import { validateWorldsRouteSearch } from "./lib/world-route-search";
 
 const DashboardPage = lazy(async () => {
   const mod = await import("./routes/dashboard-page");
   return { default: mod.DashboardPage };
-});
-
-const RequestsPage = lazy(async () => {
-  const mod = await import("./routes/requests-page");
-  return { default: mod.RequestsPage };
-});
-
-const RequestDetailPage = lazy(async () => {
-  const mod = await import("./routes/request-detail-page");
-  return { default: mod.RequestDetailPage };
 });
 
 const WorldsPage = lazy(async () => {
@@ -49,6 +38,11 @@ const AdminSessionsPage = lazy(async () => {
 const WaitingSessionSyncPage = lazy(async () => {
   const mod = await import("./routes/waiting-session-sync-page");
   return { default: mod.WaitingSessionSyncPage };
+});
+
+const RevenueSharingPage = lazy(async () => {
+  const mod = await import("./routes/revenue-sharing-page");
+  return { default: mod.RevenueSharingPage };
 });
 
 const UsersPage = lazy(async () => {
@@ -86,19 +80,6 @@ const indexRoute = createRoute({
   component: DashboardPage,
 });
 
-const requestsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/requests",
-  validateSearch: validateRequestsRouteSearch,
-  component: RequestsPage,
-});
-
-const requestDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/requests/$requestId",
-  component: RequestDetailPage,
-});
-
 const worldsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/worlds",
@@ -133,6 +114,12 @@ const waitingSessionSyncRoute = createRoute({
   component: WaitingSessionSyncPage,
 });
 
+const revenueSharingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/revenue-sharing",
+  component: RevenueSharingPage,
+});
+
 const usersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/users",
@@ -165,8 +152,6 @@ const inviteAuditRoute = createRoute({
 
 export const routeTree = rootRoute.addChildren([
   indexRoute,
-  requestsRoute,
-  requestDetailRoute,
   worldsRoute,
   worldDetailRoute,
   jobsRoute,
@@ -177,6 +162,7 @@ export const routeTree = rootRoute.addChildren([
   subscriptionPlansRoute,
   cloudConfigsRoute,
   inviteAuditRoute,
+  revenueSharingRoute,
 ]);
 
 type AppRouterOptions = {

@@ -12,19 +12,19 @@ import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   Button,
   Card,
-  ErrorBlock,
   InlineNotice,
-  LoadingBlock,
   StatusPill,
 } from "@yinjie/ui";
 import {
   AdminActionFeedback,
   AdminCallout,
   AdminDraftStatusPill,
+  AdminErrorState,
   AdminPageHero,
   AdminSectionHeader,
   AdminSelectableCard,
   AdminSelectField as SelectField,
+  AdminSkeletonCard,
   AdminSoftBox,
   AdminTabs,
   AdminTextArea as TextAreaField,
@@ -760,10 +760,14 @@ export function InferencePage() {
       />
 
       {overviewQuery.isLoading ? (
-        <LoadingBlock label="正在读取模型路由工作台..." />
+        <AdminSkeletonCard rows={4} showAction />
       ) : null}
       {overviewQuery.isError && overviewQuery.error instanceof Error ? (
-        <ErrorBlock message={overviewQuery.error.message} />
+        <AdminErrorState
+          title="模型路由工作台读取失败"
+          detail={overviewQuery.error.message}
+          onRetry={() => overviewQuery.refetch()}
+        />
       ) : null}
 
       {saveMutation.isSuccess ? (
@@ -804,27 +808,62 @@ export function InferencePage() {
         />
       ) : null}
       {saveMutation.isError && saveMutation.error instanceof Error ? (
-        <ErrorBlock message={saveMutation.error.message} />
+        <AdminErrorState
+          title="保存 Provider 账户失败"
+          detail={saveMutation.error.message}
+          onRetry={() => saveMutation.reset()}
+          retryLabel="清除错误"
+        />
       ) : null}
       {testMutation.isError && testMutation.error instanceof Error ? (
-        <ErrorBlock message={testMutation.error.message} />
+        <AdminErrorState
+          title="连通性测试失败"
+          detail={testMutation.error.message}
+          onRetry={() => testMutation.reset()}
+          retryLabel="清除错误"
+        />
       ) : null}
       {diagnosticMutation.isError && diagnosticMutation.error instanceof Error ? (
-        <ErrorBlock message={diagnosticMutation.error.message} />
+        <AdminErrorState
+          title="单项诊断失败"
+          detail={diagnosticMutation.error.message}
+          onRetry={() => diagnosticMutation.reset()}
+          retryLabel="清除错误"
+        />
       ) : null}
       {runAllDiagnosticMutation.isError &&
       runAllDiagnosticMutation.error instanceof Error ? (
-        <ErrorBlock message={runAllDiagnosticMutation.error.message} />
+        <AdminErrorState
+          title="全量诊断失败"
+          detail={runAllDiagnosticMutation.error.message}
+          onRetry={() => runAllDiagnosticMutation.reset()}
+          retryLabel="清除错误"
+        />
       ) : null}
       {installMutation.isError && installMutation.error instanceof Error ? (
-        <ErrorBlock message={installMutation.error.message} />
+        <AdminErrorState
+          title="批量安装模型人格失败"
+          detail={installMutation.error.message}
+          onRetry={() => installMutation.reset()}
+          retryLabel="清除错误"
+        />
       ) : null}
       {installSelectedMutation.isError &&
       installSelectedMutation.error instanceof Error ? (
-        <ErrorBlock message={installSelectedMutation.error.message} />
+        <AdminErrorState
+          title="选中模型人格安装失败"
+          detail={installSelectedMutation.error.message}
+          onRetry={() => installSelectedMutation.reset()}
+          retryLabel="清除错误"
+        />
       ) : null}
       {rebindMutation.isError && rebindMutation.error instanceof Error ? (
-        <ErrorBlock message={rebindMutation.error.message} />
+        <AdminErrorState
+          title="模型人格换绑失败"
+          detail={rebindMutation.error.message}
+          onRetry={() => rebindMutation.reset()}
+          retryLabel="清除错误"
+        />
       ) : null}
 
       <AdminTabs
@@ -1307,7 +1346,7 @@ export function InferencePage() {
                       <div className="mt-3 text-xs leading-5 text-[color:var(--text-secondary)]">
                         {resolveDiagnosticMessage(item.message)}
                       </div>
-                      <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[color:var(--text-tertiary)]">
+                      <div className="mt-3 flex flex-wrap gap-2 text-[12px] text-[color:var(--text-tertiary)]">
                         <span>{item.configured ? "已配置" : "未配置"}</span>
                         <span>{item.declared ? "已声明" : "未声明"}</span>
                         <span>

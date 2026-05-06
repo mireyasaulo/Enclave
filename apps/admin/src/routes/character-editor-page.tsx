@@ -11,16 +11,17 @@ import {
 import {
   Button,
   Card,
-  ErrorBlock,
   InlineNotice,
-  LoadingBlock,
   SectionHeading,
   StatusPill,
 } from "@yinjie/ui";
 import {
   AdminActionFeedback,
+  AdminErrorState,
   AdminPageHero,
   AdminSectionHeader,
+  AdminSkeletonCard,
+  AdminStickyFooter,
   AdminTabs,
   AdminSelectField as SelectField,
   AdminTextArea as TextAreaField,
@@ -433,12 +434,16 @@ export function CharacterEditorPage() {
       </div>
 
       {!isNew && characterQuery.isLoading ? (
-        <LoadingBlock label="正在加载角色草稿..." />
+        <AdminSkeletonCard rows={6} />
       ) : null}
       {!isNew &&
       characterQuery.isError &&
       characterQuery.error instanceof Error ? (
-        <ErrorBlock message={characterQuery.error.message} />
+        <AdminErrorState
+          title="角色草稿加载失败"
+          detail={characterQuery.error.message}
+          onRetry={() => characterQuery.refetch()}
+        />
       ) : null}
       {!canSave ? (
         <InlineNotice tone="warning">
@@ -446,7 +451,12 @@ export function CharacterEditorPage() {
         </InlineNotice>
       ) : null}
       {saveMutation.isError && saveMutation.error instanceof Error ? (
-        <ErrorBlock message={saveMutation.error.message} />
+        <AdminErrorState
+          title="保存角色失败"
+          detail={saveMutation.error.message}
+          onRetry={() => saveMutation.reset()}
+          retryLabel="清除错误"
+        />
       ) : null}
       {saveMutation.isSuccess ? (
         <AdminActionFeedback
@@ -499,9 +509,12 @@ export function CharacterEditorPage() {
           </div>
           {aiGenerateMutation.isError &&
           aiGenerateMutation.error instanceof Error ? (
-            <ErrorBlock
+            <AdminErrorState
               className="mt-3"
-              message={aiGenerateMutation.error.message}
+              title="AI 生成失败"
+              detail={aiGenerateMutation.error.message}
+              onRetry={() => aiGenerateMutation.reset()}
+              retryLabel="清除错误"
             />
           ) : null}
         </Card>
@@ -681,9 +694,11 @@ export function CharacterEditorPage() {
           />
           {inferenceOverviewQuery.isError &&
           inferenceOverviewQuery.error instanceof Error ? (
-            <ErrorBlock
+            <AdminErrorState
               className="mt-4"
-              message={inferenceOverviewQuery.error.message}
+              title="模型路由读取失败"
+              detail={inferenceOverviewQuery.error.message}
+              onRetry={() => inferenceOverviewQuery.refetch()}
             />
           ) : null}
         </Card>
@@ -1130,6 +1145,30 @@ export function CharacterEditorPage() {
           </div>
         </Card>
       ) : null}
+
+      <AdminStickyFooter
+        dirty={!saveMutation.isSuccess}
+        busy={saveMutation.isPending}
+        dirtyLabel="尚未保存"
+        syncedLabel="已保存"
+        secondary={
+          <Link to="/characters">
+            <Button variant="secondary" size="md">
+              返回角色中心
+            </Button>
+          </Link>
+        }
+        primary={
+          <Button
+            onClick={() => saveMutation.mutate()}
+            disabled={!canSave || saveMutation.isPending}
+            variant="primary"
+            size="md"
+          >
+            {saveMutation.isPending ? "保存中..." : "保存角色"}
+          </Button>
+        }
+      />
     </div>
   );
 }

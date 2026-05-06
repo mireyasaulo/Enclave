@@ -49,6 +49,25 @@ const manualProvider = {
   },
 };
 
+const localProcessProvider = {
+  key: "local-process",
+  summary: {
+    key: "local-process",
+    label: "Local Process",
+    description: "local",
+    provisionStrategy: "local-process",
+    deploymentMode: "local-process",
+    defaultRegion: "local",
+    defaultZone: "local-a",
+    capabilities: {
+      managedProvisioning: true,
+      managedLifecycle: true,
+      bootstrapPackage: false,
+      snapshots: false,
+    },
+  },
+};
+
 test("compute provider registry rejects invalid configured default providers", () => {
   const service = new ComputeProviderRegistryService(
     createConfig({
@@ -56,6 +75,7 @@ test("compute provider registry rejects invalid configured default providers", (
     }) as never,
     mockProvider as never,
     manualProvider as never,
+    localProcessProvider as never,
   );
 
   assert.throws(

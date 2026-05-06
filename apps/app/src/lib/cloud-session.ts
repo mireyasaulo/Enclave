@@ -1,6 +1,30 @@
-import { getAppRuntimeConfig, setAppRuntimeConfig } from "../runtime/runtime-config-store";
+import type { AppRuntimeConfig } from "../runtime/runtime-config";
+import {
+  getAppRuntimeConfig,
+  setAppRuntimeConfig,
+} from "../runtime/runtime-config-store";
 import { useCloudSessionStore } from "../store/cloud-session-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
+
+export function shouldShowCloudAccountControls(input: {
+  worldAccessMode?: AppRuntimeConfig["worldAccessMode"];
+  runtimeApiBaseUrl?: string | null;
+  runtimeCloudPhone?: string | null;
+  accessToken?: string | null;
+  sessionPhone?: string | null;
+  worldOwnerId?: string | null;
+}) {
+  return (
+    input.worldAccessMode === "cloud" ||
+    Boolean(
+      input.accessToken?.trim() ||
+      input.worldOwnerId?.trim() ||
+      input.runtimeApiBaseUrl?.trim() ||
+      input.sessionPhone?.trim() ||
+      input.runtimeCloudPhone?.trim(),
+    )
+  );
+}
 
 export function clearCloudRuntimeSession() {
   const runtimeConfig = getAppRuntimeConfig();

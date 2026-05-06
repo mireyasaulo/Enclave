@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { OptionalJwtAuthGuard } from './optional-jwt-auth.guard';
 import { UserEntity } from './user.entity';
 import { WorldOwnerService } from './world-owner.service';
 
@@ -21,7 +22,13 @@ import { WorldOwnerService } from './world-owner.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [WorldOwnerService, AuthService, JwtAuthGuard],
-  exports: [WorldOwnerService, AuthService, JwtAuthGuard, JwtModule],
+  providers: [WorldOwnerService, AuthService, JwtAuthGuard, OptionalJwtAuthGuard],
+  exports: [
+    WorldOwnerService,
+    AuthService,
+    JwtAuthGuard,
+    OptionalJwtAuthGuard,
+    JwtModule,
+  ],
 })
 export class AuthModule {}

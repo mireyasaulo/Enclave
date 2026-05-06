@@ -2522,7 +2522,7 @@ function SelectionDeck({
                 </div>
               </div>
               {active ? (
-                <span className="rounded-full border border-[color:var(--border-brand)] bg-white px-2 py-1 text-[11px] font-medium text-[color:var(--brand-primary)]">
+                <span className="rounded-full border border-[color:var(--border-brand)] bg-white px-2 py-1 text-[12px] font-medium text-[color:var(--brand-primary)]">
                   当前
                 </span>
               ) : null}
@@ -2599,7 +2599,7 @@ function QuickRangeButton({
     >
       <span>{label}</span>
       {active ? (
-        <span className="rounded-full border border-white/30 bg-white/15 px-1.5 py-0.5 text-[10px] font-semibold tracking-[0.08em]">
+        <span className="rounded-full border border-white/30 bg-white/15 px-1.5 py-0.5 text-[12px] font-semibold tracking-[0.08em]">
           当前
         </span>
       ) : null}
@@ -3308,7 +3308,7 @@ function ReviewSampleList({
                   </div>
                 </div>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[color:var(--text-muted)]">
+              <div className="mt-3 flex flex-wrap gap-2 text-[12px] text-[color:var(--text-muted)]">
                 {sample.reviewTags.length ? (
                   sample.reviewTags.map((tag) => (
                     <span
@@ -3492,7 +3492,7 @@ function PriorityBadge({ score }: { score: number }) {
 
   return (
     <span
-      className={`rounded-full border px-2 py-1 text-[11px] font-medium ${className}`}
+      className={`rounded-full border px-2 py-1 text-[12px] font-medium ${className}`}
     >
       {label} {score}
     </span>

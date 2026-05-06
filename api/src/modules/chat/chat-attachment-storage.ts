@@ -2,11 +2,11 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import {
   resolveApiPath,
-  resolveRepoPath,
+  resolveDataPath,
 } from '../../database/database-path';
 
 export function resolvePrimaryChatAttachmentStorageDir() {
-  return resolveRepoPath('data', 'chat-attachments');
+  return resolveDataPath('chat-attachments');
 }
 
 export function resolveLegacyChatAttachmentStorageDir() {

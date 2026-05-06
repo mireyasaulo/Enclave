@@ -250,7 +250,6 @@ describe("waiting session sync copy", () => {
         "Lease owner: Not available",
         "Last error: heartbeat callback failed",
         "Review permalink: /waiting-sync?reviewContext=runtime.heartbeat&reviewTaskId=44444444-4444-4444-8444-444444444444",
-        "Requests path: /requests?query=world-1",
         "Worlds path: /worlds?query=world-1",
         "World detail: /worlds/world-1",
       ].join("\n"),

@@ -70,9 +70,6 @@ describe("waiting session sync artifact builders", () => {
       },
       contextGroups: [MOCK_GROUP],
     });
-    expect(filteredPayload.tasks[0]?.lookup.requestsPath).toBe(
-      "/requests?query=world-1",
-    );
     expect(filteredPayload.tasks[0]?.lookup.worldsPath).toBe(
       "/worlds?query=world-1",
     );

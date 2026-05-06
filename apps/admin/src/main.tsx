@@ -8,9 +8,11 @@ import "@yinjie/ui/tokens.css";
 import "./index.css";
 import { queryClient } from "./lib/query-client";
 import { configureAdminContractsRuntime } from "./lib/core-api-base";
+import { initAdminDensity } from "./lib/use-density";
 import { router } from "./router";
 
 configureAdminContractsRuntime();
+initAdminDensity();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

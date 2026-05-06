@@ -19,6 +19,8 @@ import { useConsoleNotice } from "../components/console-notice";
 import { WorldLifecycleActionButtons } from "../components/world-lifecycle-action-buttons";
 import { copyTextToClipboard } from "../lib/clipboard";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
+import { translateCloudConsoleTextForActiveLocale,
+  useCloudConsoleText } from "../lib/cloud-console-i18n";
 import {
   createRequestScopedNotice,
   showRequestScopedNotice,
@@ -50,7 +52,7 @@ import {
 
 function formatDateTime(value?: string | null) {
   if (!value) {
-    return "Not available";
+    return translateCloudConsoleTextForActiveLocale("Not available");
   }
 
   return formatLocaleDateTime(new Date(value), {
@@ -74,19 +76,19 @@ function getAttentionTone(severity: CloudWorldAttentionItem["severity"]) {
 function getAttentionLabel(item: CloudWorldAttentionItem) {
   switch (item.reason) {
     case "failed_world":
-      return "Failed";
+      return translateCloudConsoleTextForActiveLocale("Failed");
     case "provider_error":
-      return "Provider error";
+      return translateCloudConsoleTextForActiveLocale("Provider error");
     case "deployment_drift":
-      return "Runtime drift";
+      return translateCloudConsoleTextForActiveLocale("Runtime drift");
     case "sleep_drift":
-      return "Sleep drift";
+      return translateCloudConsoleTextForActiveLocale("Sleep drift");
     case "heartbeat_stale":
-      return "Heartbeat stale";
+      return translateCloudConsoleTextForActiveLocale("Heartbeat stale");
     case "recovery_queued":
-      return "Recovery queued";
+      return translateCloudConsoleTextForActiveLocale("Recovery queued");
     default:
-      return "Attention";
+      return translateCloudConsoleTextForActiveLocale("Attention");
   }
 }
 
@@ -123,20 +125,20 @@ function getHealthTone(status?: string | null) {
 function formatPowerStateLabel(value: CloudInstancePowerState) {
   switch (value) {
     case "provisioning":
-      return "Provisioning";
+      return translateCloudConsoleTextForActiveLocale("Provisioning");
     case "running":
-      return "Running";
+      return translateCloudConsoleTextForActiveLocale("Running");
     case "stopped":
-      return "Stopped";
+      return translateCloudConsoleTextForActiveLocale("Stopped");
     case "starting":
-      return "Starting";
+      return translateCloudConsoleTextForActiveLocale("Starting");
     case "stopping":
-      return "Stopping";
+      return translateCloudConsoleTextForActiveLocale("Stopping");
     case "error":
-      return "Error";
+      return translateCloudConsoleTextForActiveLocale("Error");
     case "absent":
     default:
-      return "Absent";
+      return translateCloudConsoleTextForActiveLocale("Absent");
   }
 }
 
@@ -167,7 +169,7 @@ function resolveProviderLabel(
 ) {
   const providerKey = resolveProviderKey(item);
   if (!providerKey) {
-    return "Unassigned";
+    return translateCloudConsoleTextForActiveLocale("Unassigned");
   }
   return labelByKey.get(providerKey) ?? providerKey;
 }
@@ -272,6 +274,7 @@ type QuickActionConfirmState = {
 };
 
 export function WorldsPage() {
+  const t = useCloudConsoleText();
   const navigate = useNavigate({ from: "/worlds" });
   const filters = useSearch({ from: "/worlds" });
   const queryClient = useQueryClient();
@@ -374,7 +377,7 @@ export function WorldsPage() {
         key,
         label:
           key === UNASSIGNED_PROVIDER_FILTER
-            ? "Unassigned"
+            ? t("Unassigned")
             : (providerLabelByKey.get(key) ?? key),
       }));
   }, [instanceFleetQuery.data, providerLabelByKey]);
@@ -490,7 +493,7 @@ export function WorldsPage() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="text-xl font-semibold text-[color:var(--text-primary)]">
-              World drift summary
+              {t("World drift summary")}
             </div>
             <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
               This panel folds together runtime heartbeat freshness,
@@ -506,7 +509,7 @@ export function WorldsPage() {
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              Attention worlds
+              {t("Attention worlds")}
             </div>
             <div
               className={`mt-2 text-3xl font-semibold ${getMetricTone(driftSummaryQuery.data?.attentionWorlds ?? 0)}`}
@@ -514,12 +517,12 @@ export function WorldsPage() {
               {driftSummaryQuery.data?.attentionWorlds ?? 0}
             </div>
             <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              Worlds that currently need operator attention.
+              {t("Worlds that currently need operator attention.")}
             </div>
           </div>
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              Critical alerts
+              {t("Critical alerts")}
             </div>
             <div
               className={`mt-2 text-3xl font-semibold ${getMetricTone(driftSummaryQuery.data?.criticalAttentionWorlds ?? 0)}`}
@@ -533,7 +536,7 @@ export function WorldsPage() {
           </div>
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              Escalated worlds
+              {t("Escalated worlds")}
             </div>
             <div
               className={`mt-2 text-3xl font-semibold ${getMetricTone(driftSummaryQuery.data?.escalatedWorlds ?? 0)}`}
@@ -547,7 +550,7 @@ export function WorldsPage() {
           </div>
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              Recovery queued
+              {t("Recovery queued")}
             </div>
             <div
               className={`mt-2 text-3xl font-semibold ${getMetricTone(driftSummaryQuery.data?.recoveryQueuedWorlds ?? 0)}`}
@@ -564,7 +567,7 @@ export function WorldsPage() {
         <div className="mt-3 grid gap-3 md:grid-cols-2">
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              Heartbeat stale
+              {t("Heartbeat stale")}
             </div>
             <div
               className={`mt-2 text-3xl font-semibold ${getMetricTone(driftSummaryQuery.data?.heartbeatStaleWorlds ?? 0)}`}
@@ -572,12 +575,12 @@ export function WorldsPage() {
               {driftSummaryQuery.data?.heartbeatStaleWorlds ?? 0}
             </div>
             <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              Runtime is not checking in within the configured stale window.
+              {t("Runtime is not checking in within the configured stale window.")}
             </div>
           </div>
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              Provider drift
+              {t("Provider drift")}
             </div>
             <div
               className={`mt-2 text-3xl font-semibold ${getMetricTone(driftSummaryQuery.data?.providerDriftWorlds ?? 0)}`}
@@ -593,7 +596,7 @@ export function WorldsPage() {
 
         <div className="mt-5 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
           <div className="text-sm font-medium text-[color:var(--text-primary)]">
-            Top attention items
+            {t("Top attention items")}
           </div>
           <div className="mt-3 space-y-3">
             {(driftSummaryQuery.data?.attentionItems ?? [])
@@ -619,7 +622,7 @@ export function WorldsPage() {
                       </span>
                       {item.escalated ? (
                         <span className="rounded-full border border-rose-300/60 bg-rose-500/10 px-2 py-1 text-[11px] uppercase tracking-[0.18em] text-rose-200">
-                          Escalated
+                          {t("Escalated")}
                         </span>
                       ) : null}
                     </div>
@@ -644,7 +647,7 @@ export function WorldsPage() {
 
             {driftSummaryQuery.isLoading ? (
               <div className="text-sm text-[color:var(--text-muted)]">
-                Loading drift summary...
+                {t("Loading drift summary...")}
               </div>
             ) : null}
 
@@ -657,7 +660,7 @@ export function WorldsPage() {
             !driftSummaryQuery.isError &&
             !driftSummaryQuery.data?.attentionItems.length ? (
               <div className="text-sm text-[color:var(--text-muted)]">
-                No active drift or heartbeat issues right now.
+                {t("No active drift or heartbeat issues right now.")}
               </div>
             ) : null}
           </div>
@@ -668,7 +671,7 @@ export function WorldsPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-xl font-semibold text-[color:var(--text-primary)]">
-              Managed worlds
+              {t("Managed worlds")}
             </div>
             <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
               Each phone owns exactly one world. New users provision a fresh
@@ -682,7 +685,7 @@ export function WorldsPage() {
               onClick={() => void copyWorldsPermalink()}
               className="rounded-full border border-[color:var(--border-faint)] px-4 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
             >
-              Copy worlds permalink
+              {t("Copy worlds permalink")}
             </button>
             {WORLD_STATUS_FILTERS.map((status) => (
               <button
@@ -703,14 +706,14 @@ export function WorldsPage() {
 
         <div className="mt-4 max-w-xl">
           <label className="text-sm text-[color:var(--text-secondary)]">
-            <div className="mb-2">Search worlds</div>
+            <div className="mb-2">{t("Search worlds")}</div>
             <input
-              aria-label="World search"
+              aria-label={t("World search")}
               value={queryFilter}
               onChange={(event) =>
                 updateFilters({ query: event.target.value })
               }
-              placeholder="world id, phone, name, provider, or endpoint"
+              placeholder={t("world id, phone, name, provider, or endpoint")}
               className="w-full rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3 text-[color:var(--text-primary)] placeholder-[color:var(--text-muted)]"
             />
           </label>
@@ -720,14 +723,14 @@ export function WorldsPage() {
           <table className="min-w-[72rem] border-collapse text-left text-sm">
             <thead className="bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]">
               <tr>
-                <th className="px-4 py-3">World</th>
-                <th className="px-4 py-3">Phone</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Attention</th>
-                <th className="px-4 py-3">Health</th>
+                <th className="px-4 py-3">{t("World")}</th>
+                <th className="px-4 py-3">{t("Phone")}</th>
+                <th className="px-4 py-3">{t("Status")}</th>
+                <th className="px-4 py-3">{t("Attention")}</th>
+                <th className="px-4 py-3">{t("Health")}</th>
                 <th className="px-4 py-3">API</th>
-                <th className="px-4 py-3">Last interactive</th>
-                <th className="px-4 py-3">Updated</th>
+                <th className="px-4 py-3">{t("Last interactive")}</th>
+                <th className="px-4 py-3">{t("Updated")}</th>
               </tr>
             </thead>
             <tbody>
@@ -764,7 +767,7 @@ export function WorldsPage() {
                           </div>
                           {attention.escalated ? (
                             <div className="text-[11px] uppercase tracking-[0.18em] text-rose-200">
-                              Escalated
+                              {t("Escalated")}
                             </div>
                           ) : null}
                           <div className="max-w-[18rem] text-xs text-[color:var(--text-secondary)]">
@@ -773,7 +776,7 @@ export function WorldsPage() {
                         </div>
                       ) : (
                         <span className="text-[color:var(--text-secondary)]">
-                          Healthy
+                          {t("Healthy")}
                         </span>
                       )}
                     </td>
@@ -781,7 +784,7 @@ export function WorldsPage() {
                       {item.healthStatus ?? "unknown"}
                     </td>
                     <td className="max-w-[18rem] truncate px-4 py-3 text-[color:var(--text-secondary)]">
-                      {item.apiBaseUrl ?? "Not set"}
+                      {item.apiBaseUrl ?? t("Not set")}
                     </td>
                     <td className="px-4 py-3 text-[color:var(--text-secondary)]">
                       {formatDateTime(item.lastInteractiveAt)}
@@ -803,7 +806,7 @@ export function WorldsPage() {
 
           {worldsQuery.isLoading ? (
             <div className="p-4 text-sm text-[color:var(--text-muted)]">
-              Loading worlds...
+              {t("Loading worlds...")}
             </div>
           ) : null}
 
@@ -811,7 +814,7 @@ export function WorldsPage() {
           !worldsQuery.isError &&
           !filteredWorlds.length ? (
             <div className="p-4 text-sm text-[color:var(--text-muted)]">
-              No worlds match this filter.
+              {t("No worlds match this filter.")}
             </div>
           ) : null}
         </div>
@@ -821,7 +824,7 @@ export function WorldsPage() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="text-xl font-semibold text-[color:var(--text-primary)]">
-              Instance fleet
+              {t("Instance fleet")}
             </div>
             <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
               Work from the instance point of view: provider placement, power
@@ -898,7 +901,7 @@ export function WorldsPage() {
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              Visible rows
+              {t("Visible rows")}
             </div>
             <div className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">
               {fleetMetrics.total}
@@ -906,7 +909,7 @@ export function WorldsPage() {
           </div>
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              Running now
+              {t("Running now")}
             </div>
             <div className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">
               {fleetMetrics.running}
@@ -914,7 +917,7 @@ export function WorldsPage() {
           </div>
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              No instance
+              {t("No instance")}
             </div>
             <div className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">
               {fleetMetrics.absent}
@@ -922,7 +925,7 @@ export function WorldsPage() {
           </div>
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              Needs action
+              {t("Needs action")}
             </div>
             <div className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">
               {fleetMetrics.attention}
@@ -940,15 +943,15 @@ export function WorldsPage() {
           <table className="min-w-[90rem] border-collapse text-left text-sm">
             <thead className="bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]">
               <tr>
-                <th className="px-4 py-3">World</th>
-                <th className="px-4 py-3">Provider</th>
-                <th className="px-4 py-3">Instance</th>
-                <th className="px-4 py-3">Power</th>
-                <th className="px-4 py-3">Attention</th>
-                <th className="px-4 py-3">Health</th>
-                <th className="px-4 py-3">Access</th>
-                <th className="px-4 py-3">Heartbeat</th>
-                <th className="px-4 py-3">Actions</th>
+                <th className="px-4 py-3">{t("World")}</th>
+                <th className="px-4 py-3">{t("Provider")}</th>
+                <th className="px-4 py-3">{t("Instance")}</th>
+                <th className="px-4 py-3">{t("Power")}</th>
+                <th className="px-4 py-3">{t("Attention")}</th>
+                <th className="px-4 py-3">{t("Health")}</th>
+                <th className="px-4 py-3">{t("Access")}</th>
+                <th className="px-4 py-3">{t("Heartbeat")}</th>
+                <th className="px-4 py-3">{t("Actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -1019,7 +1022,7 @@ export function WorldsPage() {
                         </div>
                       ) : (
                         <span className="text-[color:var(--text-secondary)]">
-                          Healthy
+                          {t("Healthy")}
                         </span>
                       )}
                     </td>
@@ -1032,10 +1035,10 @@ export function WorldsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="max-w-[16rem] truncate text-[color:var(--text-secondary)]">
-                        API: {item.world.apiBaseUrl ?? "Not set"}
+                        API: {item.world.apiBaseUrl ?? t("Not set")}
                       </div>
                       <div className="mt-1 max-w-[16rem] truncate text-xs text-[color:var(--text-muted)]">
-                        Admin: {item.world.adminUrl ?? "Not set"}
+                        Admin: {item.world.adminUrl ?? t("Not set")}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-[color:var(--text-secondary)]">
@@ -1087,7 +1090,7 @@ export function WorldsPage() {
 
           {instanceFleetQuery.isLoading ? (
             <div className="p-4 text-sm text-[color:var(--text-muted)]">
-              Loading instances...
+              {t("Loading instances...")}
             </div>
           ) : null}
 
@@ -1095,7 +1098,7 @@ export function WorldsPage() {
           !instanceFleetQuery.isError &&
           !filteredInstanceFleet.length ? (
             <div className="p-4 text-sm text-[color:var(--text-muted)]">
-              No instance rows match the current filter set.
+              {t("No instance rows match the current filter set.")}
             </div>
           ) : null}
         </div>

@@ -18,29 +18,15 @@ import {
 } from "../components/cloud-admin-error-block";
 import { ConsoleConfirmDialog } from "../components/console-confirm-dialog";
 import { JobsPermalinkLink } from "../components/jobs-permalink-link";
-import { RequestsPermalinkLink } from "../components/requests-permalink-link";
 import { useConsoleNotice } from "../components/console-notice";
-import {
-  RequestProjectionBadges,
-  RequestStatusBadge,
-} from "../components/request-controls";
 import { WorldsPermalinkLink } from "../components/worlds-permalink-link";
 import { WorldLifecycleActionButtons } from "../components/world-lifecycle-action-buttons";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
+import { translateCloudConsoleTextForActiveLocale,
+  useCloudConsoleText } from "../lib/cloud-console-i18n";
 import { resolveQueueState } from "../lib/job-queue-state";
 import { describeJobResult, getJobAuditBadgeLabel } from "../lib/job-result";
 import { buildCompactJobsRouteSearch } from "../lib/job-route-search";
-import {
-  getRequestStatusTone,
-  getRequestToneStyles,
-  getRequestWorkflowProjection,
-  isRequestWorkflowCardStatus,
-  REQUEST_WORKFLOW_CARD_STATUSES,
-} from "../lib/request-helpers";
-import {
-  buildCompactRequestsRouteSearch,
-  buildRequestsRouteSearch,
-} from "../lib/request-route-search";
 import {
   createRequestScopedNotice,
   showRequestScopedNotice,
@@ -76,7 +62,7 @@ const JOB_AUDIT_BADGE_CLASS_NAME =
 
 function formatDateTime(value?: string | null) {
   if (!value) {
-    return "Not available";
+    return translateCloudConsoleTextForActiveLocale("Not available");
   }
 
   return formatLocaleDateTime(new Date(value), {
@@ -117,20 +103,20 @@ function getPowerStateTone(powerState: CloudInstancePowerState) {
 function formatPowerState(powerState: CloudInstancePowerState) {
   switch (powerState) {
     case "running":
-      return "Running";
+      return translateCloudConsoleTextForActiveLocale("Running");
     case "starting":
-      return "Starting";
+      return translateCloudConsoleTextForActiveLocale("Starting");
     case "provisioning":
-      return "Provisioning";
+      return translateCloudConsoleTextForActiveLocale("Provisioning");
     case "stopped":
-      return "Stopped";
+      return translateCloudConsoleTextForActiveLocale("Stopped");
     case "stopping":
-      return "Stopping";
+      return translateCloudConsoleTextForActiveLocale("Stopping");
     case "error":
-      return "Error";
+      return translateCloudConsoleTextForActiveLocale("Error");
     case "absent":
     default:
-      return "Absent";
+      return translateCloudConsoleTextForActiveLocale("Absent");
   }
 }
 
@@ -148,7 +134,7 @@ function resolveProviderLabel(
 ) {
   const providerKey = resolveProviderKey(item);
   if (!providerKey) {
-    return "Unassigned";
+    return translateCloudConsoleTextForActiveLocale("Unassigned");
   }
 
   return labelByKey.get(providerKey) ?? providerKey;
@@ -200,39 +186,7 @@ function describeAttentionJobsLabel(item: CloudWorldAttentionItem) {
     return `${item.activeJobType} jobs`;
   }
 
-  return "Related jobs";
-}
-
-function buildPendingRequestsSearch() {
-  return buildRequestsRouteSearch({
-    status: "pending",
-    projectedWorldStatus: "queued",
-    desiredState: "running",
-  });
-}
-
-function buildProvisioningRequestsSearch() {
-  return buildRequestsRouteSearch({
-    status: "provisioning",
-    projectedWorldStatus: "creating",
-    desiredState: "running",
-  });
-}
-
-function buildRejectedRequestsSearch() {
-  return buildRequestsRouteSearch({
-    status: "rejected",
-    projectedWorldStatus: "failed",
-    desiredState: "running",
-  });
-}
-
-function buildDisabledRequestsSearch() {
-  return buildRequestsRouteSearch({
-    status: "disabled",
-    projectedWorldStatus: "disabled",
-    desiredState: "sleeping",
-  });
+  return translateCloudConsoleTextForActiveLocale("Related jobs");
 }
 
 type QuickActionConfirmState = {
@@ -242,6 +196,7 @@ type QuickActionConfirmState = {
 };
 
 export function DashboardPage() {
+  const t = useCloudConsoleText();
   const queryClient = useQueryClient();
   const { showNotice } = useConsoleNotice();
   const [confirmAction, setConfirmAction] =
@@ -268,11 +223,6 @@ export function DashboardPage() {
   const jobSummaryQuery = useQuery({
     queryKey: ["cloud-console", "dashboard", "job-summary"],
     queryFn: () => cloudAdminApi.getJobSummary(),
-    refetchInterval: 15_000,
-  });
-  const requestsQuery = useQuery({
-    queryKey: ["cloud-console", "dashboard", "requests"],
-    queryFn: () => cloudAdminApi.listRequests(),
     refetchInterval: 15_000,
   });
 
@@ -331,7 +281,7 @@ export function DashboardPage() {
       const providerKey = resolveProviderKey(item) || "__unassigned__";
       const label =
         providerKey === "__unassigned__"
-          ? "Unassigned"
+          ? t("Unassigned")
           : (providerLabelByKey.get(providerKey) ?? providerKey);
       const powerState = resolvePowerState(item);
       const entry = summaryByProvider.get(providerKey) ?? {
@@ -428,17 +378,17 @@ export function DashboardPage() {
     return [
       {
         key: "running_now",
-        label: "Running jobs",
+        label: t("Running jobs"),
         count: counts.running_now,
       },
       {
         key: "lease_expired",
-        label: "Lease expired jobs",
+        label: t("Lease expired jobs"),
         count: counts.lease_expired,
       },
       {
         key: "delayed",
-        label: "Delayed jobs",
+        label: t("Delayed jobs"),
         count: counts.delayed,
       },
     ] as const;
@@ -462,77 +412,6 @@ export function DashboardPage() {
         .sort((left, right) => compareNewest(left.updatedAt, right.updatedAt))
         .slice(0, 4),
     [jobsQuery.data],
-  );
-  const requestWorkflowSummary = useMemo(() => {
-    const counts = {
-      pending: 0,
-      provisioning: 0,
-      rejected: 0,
-      disabled: 0,
-    } satisfies Record<(typeof REQUEST_WORKFLOW_CARD_STATUSES)[number], number>;
-
-    for (const request of requestsQuery.data ?? []) {
-      if (isRequestWorkflowCardStatus(request.status)) {
-        counts[request.status] += 1;
-      }
-    }
-
-    return {
-      total: (requestsQuery.data ?? []).length,
-      cards: [
-        {
-          key: "pending",
-          label: "Pending approvals",
-          compactLabel: "Pending",
-          tone: getRequestStatusTone("pending"),
-          ...getRequestWorkflowProjection("pending"),
-          count: counts.pending,
-          search: buildPendingRequestsSearch(),
-          ariaLabel: "Open pending requests",
-          alertAriaLabel: "Open pending requests from request alerts",
-        },
-        {
-          key: "provisioning",
-          label: "Provisioning handoffs",
-          compactLabel: "Provisioning",
-          tone: getRequestStatusTone("provisioning"),
-          ...getRequestWorkflowProjection("provisioning"),
-          count: counts.provisioning,
-          search: buildProvisioningRequestsSearch(),
-          ariaLabel: "Open provisioning requests",
-          alertAriaLabel: "Open provisioning requests from request alerts",
-        },
-        {
-          key: "rejected",
-          label: "Rejected requests",
-          compactLabel: "Rejected",
-          tone: getRequestStatusTone("rejected"),
-          ...getRequestWorkflowProjection("rejected"),
-          count: counts.rejected,
-          search: buildRejectedRequestsSearch(),
-          ariaLabel: "Open rejected requests",
-          alertAriaLabel: "Open rejected requests from request alerts",
-        },
-        {
-          key: "disabled",
-          label: "Disabled requests",
-          compactLabel: "Disabled",
-          tone: getRequestStatusTone("disabled"),
-          ...getRequestWorkflowProjection("disabled"),
-          count: counts.disabled,
-          search: buildDisabledRequestsSearch(),
-          ariaLabel: "Open disabled requests",
-          alertAriaLabel: "Open disabled requests from request alerts",
-        },
-      ] as const,
-    };
-  }, [requestsQuery.data]);
-  const recentRequests = useMemo(
-    () =>
-      [...(requestsQuery.data ?? [])]
-        .sort((left, right) => compareNewest(left.updatedAt, right.updatedAt))
-        .slice(0, 4),
-    [requestsQuery.data],
   );
   const quickActionMutation = useMutation({
     mutationFn: (input: { worldId: string; action: WorldLifecycleAction }) =>
@@ -571,7 +450,6 @@ export function DashboardPage() {
     instanceFleetQuery.error,
     providersQuery.error,
     jobsQuery.error,
-    requestsQuery.error,
   ].filter((error): error is Error => error instanceof Error);
   const activeConfirm = confirmAction
     ? createWorldActionConfirmationCopy(confirmAction.action, {
@@ -605,7 +483,7 @@ export function DashboardPage() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="text-xl font-semibold text-[color:var(--text-primary)]">
-              Fleet Dashboard
+              {t("Fleet Dashboard")}
             </div>
             <div className="mt-1 max-w-3xl text-sm text-[color:var(--text-secondary)]">
               Quick view of world availability, queued recovery, and the most
@@ -618,13 +496,13 @@ export function DashboardPage() {
               search={buildCompactWorldsRouteSearch()}
               className="rounded-full border border-[color:var(--border-faint)] px-4 py-2 text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
             >
-              Open worlds
+              {t("Open worlds")}
             </WorldsPermalinkLink>
             <JobsPermalinkLink
               search={buildCompactJobsRouteSearch()}
               className="rounded-full border border-[color:var(--border-faint)] px-4 py-2 text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
             >
-              Inspect jobs
+              {t("Inspect jobs")}
             </JobsPermalinkLink>
           </div>
         </div>
@@ -637,66 +515,14 @@ export function DashboardPage() {
           </div>
         ) : null}
 
-        <div className="mt-5 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                Request alerts
-              </div>
-              <div className="mt-1 text-xs text-[color:var(--text-secondary)]">
-                Approval and projected-world shortcuts surfaced in the main
-                dashboard header.
-              </div>
-            </div>
-
-            <RequestsPermalinkLink
-              search={buildCompactRequestsRouteSearch()}
-              aria-label="Open all requests from request alerts"
-              className="text-sm text-[color:var(--text-secondary)] underline decoration-[color:var(--border-strong)] underline-offset-4 hover:text-[color:var(--text-primary)]"
-            >
-              Review requests ({requestWorkflowSummary.total})
-            </RequestsPermalinkLink>
-          </div>
-
-          <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {requestWorkflowSummary.cards.map((item) => {
-              const toneStyles = getRequestToneStyles(item.tone);
-              return (
-                <RequestsPermalinkLink
-                  key={`alert-${item.key}`}
-                  search={buildCompactRequestsRouteSearch(item.search)}
-                  aria-label={item.alertAriaLabel}
-                  data-tone={item.tone}
-                  className={`rounded-2xl border p-3 transition ${toneStyles.panel}`}
-                >
-                  <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                    {item.compactLabel}
-                  </div>
-                  <div className={`mt-2 text-2xl font-semibold ${toneStyles.count}`}>
-                    {item.count}
-                  </div>
-                  <RequestProjectionBadges
-                    projectedWorldStatus={item.projectedWorldStatus}
-                    projectedDesiredState={item.projectedDesiredState}
-                    projectedLabel="Projected:"
-                    desiredLabel="Desired:"
-                    projectedRowClassName={`mt-2 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.18em] ${toneStyles.detail}`}
-                    desiredRowClassName={`mt-2 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.18em] ${toneStyles.detail}`}
-                  />
-                </RequestsPermalinkLink>
-              );
-            })}
-          </div>
-        </div>
-
         <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <WorldsPermalinkLink
             search={buildCompactWorldsRouteSearch({ status: "ready" })}
-            aria-label="Filter worlds by ready status"
+            aria-label={t("Filter worlds by ready status")}
             className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 transition hover:border-[color:var(--border-strong)]"
           >
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              Ready worlds
+              {t("Ready worlds")}
             </div>
             <div
               className={`mt-3 text-3xl font-semibold ${getMetricTone(
@@ -712,11 +538,11 @@ export function DashboardPage() {
 
           <WorldsPermalinkLink
             search={buildCompactWorldsRouteSearch({ attention: "critical" })}
-            aria-label="Filter worlds by critical attention"
+            aria-label={t("Filter worlds by critical attention")}
             className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 transition hover:border-[color:var(--border-strong)]"
           >
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              Critical attention
+              {t("Critical attention")}
             </div>
             <div
               className={`mt-3 text-3xl font-semibold ${getMetricTone(
@@ -732,7 +558,7 @@ export function DashboardPage() {
 
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              Recovery queued
+              {t("Recovery queued")}
             </div>
             <div
               className={`mt-3 text-3xl font-semibold ${getMetricTone(
@@ -748,7 +574,7 @@ export function DashboardPage() {
 
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              Provider drift
+              {t("Provider drift")}
             </div>
             <div
               className={`mt-3 text-3xl font-semibold ${getMetricTone(
@@ -767,7 +593,7 @@ export function DashboardPage() {
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="flex items-center justify-between gap-3">
               <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                Instance pool
+                {t("Instance pool")}
               </div>
               <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                 {fleetItems.length} worlds
@@ -777,11 +603,11 @@ export function DashboardPage() {
             <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <WorldsPermalinkLink
                 search={buildCompactWorldsRouteSearch({ powerState: "running" })}
-                aria-label="Filter worlds by running instances"
+                aria-label={t("Filter worlds by running instances")}
                 className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 transition hover:border-[color:var(--border-strong)]"
               >
                 <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                  Running
+                  {t("Running")}
                 </div>
                 <div className={`mt-2 text-2xl font-semibold ${getMetricTone(fleetSummary.running)}`}>
                   {fleetSummary.running}
@@ -789,11 +615,11 @@ export function DashboardPage() {
               </WorldsPermalinkLink>
               <WorldsPermalinkLink
                 search={buildCompactWorldsRouteSearch({ powerState: "stopped" })}
-                aria-label="Filter worlds by stopped instances"
+                aria-label={t("Filter worlds by stopped instances")}
                 className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 transition hover:border-[color:var(--border-strong)]"
               >
                 <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                  Stopped
+                  {t("Stopped")}
                 </div>
                 <div className={`mt-2 text-2xl font-semibold ${getMetricTone(fleetSummary.stopped)}`}>
                   {fleetSummary.stopped}
@@ -801,11 +627,11 @@ export function DashboardPage() {
               </WorldsPermalinkLink>
               <WorldsPermalinkLink
                 search={buildCompactWorldsRouteSearch({ powerState: "error" })}
-                aria-label="Filter worlds by error instances"
+                aria-label={t("Filter worlds by error instances")}
                 className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 transition hover:border-[color:var(--border-strong)]"
               >
                 <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                  Error
+                  {t("Error")}
                 </div>
                 <div className={`mt-2 text-2xl font-semibold ${getMetricTone(fleetSummary.error)}`}>
                   {fleetSummary.error}
@@ -815,11 +641,11 @@ export function DashboardPage() {
                 search={buildCompactWorldsRouteSearch({
                   provider: UNASSIGNED_PROVIDER_FILTER,
                 })}
-                aria-label="Filter worlds by unassigned provider"
+                aria-label={t("Filter worlds by unassigned provider")}
                 className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 transition hover:border-[color:var(--border-strong)]"
               >
                 <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                  Unassigned
+                  {t("Unassigned")}
                 </div>
                 <div
                   className={`mt-2 text-2xl font-semibold ${getMetricTone(fleetSummary.unassignedWorlds)}`}
@@ -833,7 +659,7 @@ export function DashboardPage() {
           <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
             <div className="flex items-center justify-between gap-3">
               <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                Provider spread
+                {t("Provider spread")}
               </div>
               <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                 {fleetSummary.assignedProviders.size} active providers
@@ -866,7 +692,7 @@ export function DashboardPage() {
 
               {!instanceFleetQuery.isLoading && providerSummary.length === 0 ? (
                 <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 text-sm text-[color:var(--text-muted)]">
-                  No provider allocation data yet.
+                  {t("No provider allocation data yet.")}
                 </div>
               ) : null}
             </div>
@@ -878,123 +704,15 @@ export function DashboardPage() {
         </div>
       </div>
 
-      <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-lg font-semibold text-[color:var(--text-primary)]">
-              Request Workflow
-            </div>
-            <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              Approval and manual delivery queue shortcuts wired to the request
-              projection filters.
-            </div>
-          </div>
-
-          <RequestsPermalinkLink
-            search={buildCompactRequestsRouteSearch()}
-            className="text-sm text-[color:var(--text-secondary)] underline decoration-[color:var(--border-strong)] underline-offset-4 hover:text-[color:var(--text-primary)]"
-          >
-            Open requests ({requestWorkflowSummary.total})
-          </RequestsPermalinkLink>
-        </div>
-
-        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {requestWorkflowSummary.cards.map((item) => {
-            const toneStyles = getRequestToneStyles(item.tone);
-            return (
-              <RequestsPermalinkLink
-                key={item.key}
-                search={buildCompactRequestsRouteSearch(item.search)}
-                aria-label={item.ariaLabel}
-                data-tone={item.tone}
-                className={`rounded-2xl border p-4 transition ${toneStyles.panel}`}
-              >
-                <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-                  {item.label}
-                </div>
-                <div className={`mt-3 text-3xl font-semibold ${toneStyles.count}`}>
-                  {item.count}
-                </div>
-                <RequestProjectionBadges
-                  projectedWorldStatus={item.projectedWorldStatus}
-                  projectedDesiredState={item.projectedDesiredState}
-                  projectedLabel="Projected:"
-                  desiredLabel="Desired:"
-                  projectedRowClassName={`mt-2 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.18em] ${toneStyles.detail}`}
-                  desiredRowClassName={`mt-2 flex flex-wrap items-center gap-2 text-[11px] uppercase tracking-[0.18em] ${toneStyles.detail}`}
-                />
-              </RequestsPermalinkLink>
-            );
-          })}
-        </div>
-
-        {recentRequests.length ? (
-          <div className="mt-5">
-            <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-              Recent request changes
-            </div>
-            <div className="mt-3 grid gap-3 xl:grid-cols-2">
-              {recentRequests.map((request) => {
-                return (
-                  <Link
-                    key={request.id}
-                    to="/requests/$requestId"
-                    params={{ requestId: request.id }}
-                    aria-label={`Open request ${request.worldName}`}
-                    className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 transition hover:border-[color:var(--border-strong)]"
-                  >
-                    <div className="flex flex-wrap items-center gap-3">
-                      <RequestStatusBadge status={request.status} />
-                      <span className="text-xs text-[color:var(--text-muted)]">
-                        Updated {formatDateTime(request.updatedAt)}
-                      </span>
-                    </div>
-                    <div className="mt-3 text-sm text-[color:var(--text-primary)]">
-                      {request.worldName}
-                    </div>
-                    <div className="mt-1 text-xs text-[color:var(--text-secondary)]">
-                      {request.phone}
-                    </div>
-                    <div className="mt-3 text-sm text-[color:var(--text-secondary)]">
-                      {request.displayStatus ?? request.note ?? "No request status detail"}
-                    </div>
-                    <RequestProjectionBadges
-                      projectedWorldStatus={request.projectedWorldStatus}
-                      projectedDesiredState={request.projectedDesiredState}
-                      projectedLabel="Projected:"
-                      desiredLabel="Desired:"
-                      projectedRowClassName="mt-3 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]"
-                      desiredRowClassName="mt-2 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]"
-                    />
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        ) : null}
-
-        {!requestsQuery.isLoading && requestWorkflowSummary.total === 0 ? (
-          <div className="mt-4 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 text-sm text-[color:var(--text-secondary)]">
-            No request workflow items yet.
-          </div>
-        ) : null}
-
-        {requestsQuery.isLoading ? (
-          <div className="mt-4 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 text-sm text-[color:var(--text-muted)]">
-            Loading request workflow...
-          </div>
-        ) : null}
-      </div>
-
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="text-lg font-semibold text-[color:var(--text-primary)]">
-                Operator Queue
+                {t("Operator Queue")}
               </div>
               <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-                Pending and running lifecycle work across the instance fleet.
+                {t("Pending and running lifecycle work across the instance fleet.")}
               </div>
             </div>
 
@@ -1002,7 +720,7 @@ export function DashboardPage() {
               search={buildCompactJobsRouteSearch()}
               className="text-sm text-[color:var(--text-secondary)] underline decoration-[color:var(--border-strong)] underline-offset-4 hover:text-[color:var(--text-primary)]"
             >
-              Open jobs
+              {t("Open jobs")}
             </JobsPermalinkLink>
           </div>
 
@@ -1059,7 +777,7 @@ export function DashboardPage() {
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2 text-xs">
                       <span className="rounded-full border border-[color:var(--border-faint)] px-3 py-1 text-[color:var(--text-secondary)]">
-                        {worldMeta?.providerLabel ?? "Unassigned"}
+                        {worldMeta?.providerLabel ?? t("Unassigned")}
                       </span>
                       <span
                         className={`rounded-full border px-3 py-1 uppercase tracking-[0.18em] ${getPowerStateTone(
@@ -1103,7 +821,7 @@ export function DashboardPage() {
                       aria-label={`Open operator jobs for ${worldMeta?.worldName ?? job.worldId}`}
                       className="rounded-lg border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--text-primary)] transition hover:border-[color:var(--border-strong)]"
                     >
-                      World operator jobs
+                      {t("World operator jobs")}
                     </JobsPermalinkLink>
                   </div>
                 </div>
@@ -1112,13 +830,13 @@ export function DashboardPage() {
 
             {!jobsQuery.isLoading && activeJobs.length === 0 ? (
               <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 text-sm text-[color:var(--text-secondary)]">
-                No pending or running jobs in the operator queue.
+                {t("No pending or running jobs in the operator queue.")}
               </div>
             ) : null}
 
             {jobsQuery.isLoading ? (
               <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 text-sm text-[color:var(--text-muted)]">
-                Loading lifecycle jobs...
+                {t("Loading lifecycle jobs...")}
               </div>
             ) : null}
           </div>
@@ -1129,10 +847,10 @@ export function DashboardPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="text-lg font-semibold text-[color:var(--text-primary)]">
-                  Recent Failures
+                  {t("Recent Failures")}
                 </div>
                 <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-                  Latest failed lifecycle work that may need manual recovery.
+                  {t("Latest failed lifecycle work that may need manual recovery.")}
                 </div>
               </div>
 
@@ -1201,7 +919,7 @@ export function DashboardPage() {
                       ) : null}
                       <div className="mt-3 flex flex-wrap gap-2 text-xs">
                         <span className="rounded-full border border-[color:var(--border-faint)] px-3 py-1 text-[color:var(--text-secondary)]">
-                          {worldMeta?.providerLabel ?? "Unassigned"}
+                          {worldMeta?.providerLabel ?? t("Unassigned")}
                         </span>
                         <span
                           className={`rounded-full border px-3 py-1 uppercase tracking-[0.18em] ${getPowerStateTone(
@@ -1246,7 +964,7 @@ export function DashboardPage() {
                         aria-label={`Open failed jobs for ${worldMeta?.worldName ?? job.worldId}`}
                         className="rounded-lg border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--text-primary)] transition hover:border-[color:var(--border-strong)]"
                       >
-                        World failed jobs
+                        {t("World failed jobs")}
                       </JobsPermalinkLink>
                     </div>
                   </div>
@@ -1255,7 +973,7 @@ export function DashboardPage() {
 
               {!jobsQuery.isLoading && failedJobs.length === 0 ? (
                 <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 text-sm text-[color:var(--text-secondary)]">
-                  No recent failed jobs.
+                  {t("No recent failed jobs.")}
                 </div>
               ) : null}
             </div>
@@ -1265,10 +983,10 @@ export function DashboardPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="text-lg font-semibold text-[color:var(--text-primary)]">
-                  Superseded Queue
+                  {t("Superseded Queue")}
                 </div>
                 <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-                  Latest lifecycle jobs that were replaced by newer work.
+                  {t("Latest lifecycle jobs that were replaced by newer work.")}
                 </div>
               </div>
 
@@ -1321,7 +1039,7 @@ export function DashboardPage() {
                       </div>
                       <div className="mt-3 flex flex-wrap gap-2 text-xs">
                         <span className="rounded-full border border-[color:var(--border-faint)] px-3 py-1 text-[color:var(--text-secondary)]">
-                          {worldMeta?.providerLabel ?? "Unassigned"}
+                          {worldMeta?.providerLabel ?? t("Unassigned")}
                         </span>
                         <span
                           className={`rounded-full border px-3 py-1 uppercase tracking-[0.18em] ${getPowerStateTone(
@@ -1345,7 +1063,7 @@ export function DashboardPage() {
                         aria-label={`Open superseded jobs for ${worldLabel}`}
                         className="rounded-lg border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--text-primary)] transition hover:border-[color:var(--border-strong)]"
                       >
-                        World superseded jobs
+                        {t("World superseded jobs")}
                       </JobsPermalinkLink>
                     </div>
                   </div>
@@ -1354,13 +1072,13 @@ export function DashboardPage() {
 
               {!jobsQuery.isLoading && supersededJobs.length === 0 ? (
                 <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 text-sm text-[color:var(--text-secondary)]">
-                  No recent superseded jobs.
+                  {t("No recent superseded jobs.")}
                 </div>
               ) : null}
 
               {jobsQuery.isLoading ? (
                 <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 text-sm text-[color:var(--text-muted)]">
-                  Loading superseded lifecycle jobs...
+                  {t("Loading superseded lifecycle jobs...")}
                 </div>
               ) : null}
             </div>
@@ -1372,10 +1090,10 @@ export function DashboardPage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-lg font-semibold text-[color:var(--text-primary)]">
-              Attention Queue
+              {t("Attention Queue")}
             </div>
             <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              Most urgent worlds needing manual inspection or follow-up.
+              {t("Most urgent worlds needing manual inspection or follow-up.")}
             </div>
           </div>
 
@@ -1383,7 +1101,7 @@ export function DashboardPage() {
             search={buildCompactWorldsRouteSearch()}
             className="text-sm text-[color:var(--text-secondary)] underline decoration-[color:var(--border-strong)] underline-offset-4 hover:text-[color:var(--text-primary)]"
           >
-            Open world fleet
+            {t("Open world fleet")}
           </WorldsPermalinkLink>
         </div>
 
@@ -1425,7 +1143,7 @@ export function DashboardPage() {
                   </div>
                   <div className="mt-3 flex flex-wrap gap-2 text-xs">
                     <span className="rounded-full border border-[color:var(--border-faint)] px-3 py-1 text-[color:var(--text-secondary)]">
-                      {fleetMeta?.providerLabel ?? "Unassigned"}
+                      {fleetMeta?.providerLabel ?? t("Unassigned")}
                     </span>
                     <span
                       className={`rounded-full border px-3 py-1 uppercase tracking-[0.18em] ${getPowerStateTone(
@@ -1484,13 +1202,13 @@ export function DashboardPage() {
           !driftSummaryQuery.isError &&
           attentionItems.length === 0 ? (
             <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 text-sm text-[color:var(--text-secondary)]">
-              No active attention items. The fleet currently looks healthy.
+              {t("No active attention items. The fleet currently looks healthy.")}
             </div>
           ) : null}
 
           {driftSummaryQuery.isLoading ? (
             <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 text-sm text-[color:var(--text-muted)]">
-              Loading fleet dashboard...
+              {t("Loading fleet dashboard...")}
             </div>
           ) : null}
         </div>

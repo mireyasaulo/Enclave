@@ -1219,6 +1219,22 @@ export class CharacterBlueprintService {
     };
   }
 
+  /**
+   * Build a synthetic PersonalityProfile from a recipe without persisting.
+   * Used by wiki preview-prompt to render a "before/after" system prompt.
+   */
+  buildProfileFromRecipe(
+    recipe: CharacterBlueprintRecipeValue,
+    characterId: string,
+  ): CharacterEntity['profile'] {
+    const stub = new CharacterEntity();
+    stub.id = characterId;
+    stub.profile = {} as CharacterEntity['profile'];
+    stub.expertDomains = [];
+    this.applyRecipeToCharacter(stub, recipe);
+    return stub.profile;
+  }
+
   private applyRecipeToCharacter(
     character: CharacterEntity,
     recipe: CharacterBlueprintRecipeValue,

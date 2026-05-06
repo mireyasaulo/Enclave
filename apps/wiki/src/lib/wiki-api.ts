@@ -1,4 +1,5 @@
 import { clearSession, getToken } from "./auth-store";
+import type { CharacterBlueprintRecipe } from "@yinjie/contracts";
 
 const API_BASE = "/api";
 
@@ -73,7 +74,11 @@ export type WikiPageView = {
   characterId: string;
   page: {
     characterId: string;
+    title?: string | null;
     currentRevisionId: string | null;
+    latestRevisionId: string | null;
+    lifecycleStatus: string;
+    reviewPolicy: string;
     protectionLevel: string;
     protectionExpiresAt: string | null;
     protectionReason: string | null;
@@ -83,7 +88,21 @@ export type WikiPageView = {
     isDeleted: boolean;
   };
   currentRevision: WikiRevisionSummary | null;
+  stableRevision: WikiRevisionSummary | null;
+  latestRevision: WikiRevisionSummary | null;
   content: WikiContentSnapshot;
+  visibleContent: WikiContentSnapshot;
+  recipe: CharacterBlueprintRecipe | null;
+  pendingRevision: WikiRevisionSummary | null;
+  pendingRevisions: WikiRevisionSummary[];
+  viewMode: "stable" | "current";
+  viewerCanSeeCurrent: boolean;
+  drift: {
+    hasDrift: boolean;
+    contentDrift: string[];
+    recipeDrift: string[];
+    source: "admin_override" | "unknown" | "none";
+  };
   exists: boolean;
 };
 
@@ -94,11 +113,15 @@ export type WikiRevisionSummary = {
   parentRevisionId: string | null;
   baseRevisionId: string | null;
   contentSnapshot: WikiContentSnapshot;
+  recipeSnapshot?: CharacterBlueprintRecipe | null;
   diffFromParent: { changed?: string[] } | null;
   editorUserId: string;
   editorRoleAtTime: string;
   editSummary: string;
   status: string;
+  revisionKind: string;
+  operation: string;
+  riskLevel: string;
   changeSource: string;
   isMinor: boolean;
   isPatrolled: boolean;
@@ -112,6 +135,8 @@ export type EditSubmission = {
   revisionId: string;
   characterId: string;
   submitterId: string;
+  operation: string;
+  riskLevel: string;
   decision: string | null;
   reviewerId: string | null;
   decidedAt: string | null;
@@ -224,6 +249,8 @@ export type CharacterListItem = {
   relationship: string;
   relationshipType: string;
   sourceType: string;
+  lifecycleStatus: string;
+  protectionLevel: string;
 };
 
 export const wikiApi = {
@@ -250,12 +277,29 @@ export const wikiApi = {
     }>("/auth/me");
   },
   listCharacters() {
-    return request<CharacterListItem[]>("/characters");
+    return request<CharacterListItem[]>("/wiki/pages", { auth: false });
   },
-  getPage(characterId: string) {
+  createPage(payload: {
+    characterId?: string | null;
+    contentSnapshot?: WikiContentSnapshot;
+    recipeSnapshot?: CharacterBlueprintRecipe | null;
+    editSummary?: string | null;
+  }) {
+    return request<{
+      characterId: string;
+      revisionId: string;
+      status: string;
+      isPatrolled: boolean;
+      appliedToCharacter: boolean;
+    }>("/wiki/pages", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
+  getPage(characterId: string, view?: "stable" | "current") {
+    const qs = view ? `?view=${encodeURIComponent(view)}` : "";
     return request<WikiPageView>(
-      `/wiki/pages/${encodeURIComponent(characterId)}`,
-      { auth: false },
+      `/wiki/pages/${encodeURIComponent(characterId)}${qs}`,
     );
   },
   getHistory(characterId: string, limit = 50) {
@@ -264,10 +308,23 @@ export const wikiApi = {
       { auth: false },
     );
   },
+  getDiff(characterId: string, fromRevisionId: string, toRevisionId: string) {
+    const params = new URLSearchParams({
+      from: fromRevisionId,
+      to: toRevisionId,
+    });
+    return request<{
+      from: WikiRevisionSummary;
+      to: WikiRevisionSummary;
+    }>(`/wiki/pages/${encodeURIComponent(characterId)}/diff?${params.toString()}`, {
+      auth: false,
+    });
+  },
   submitEdit(
     characterId: string,
     payload: {
       contentSnapshot: WikiContentSnapshot;
+      recipeSnapshot?: CharacterBlueprintRecipe | null;
       baseRevisionId?: string | null;
       editSummary?: string;
       isMinor?: boolean;
@@ -283,8 +340,25 @@ export const wikiApi = {
       body: JSON.stringify(payload),
     });
   },
-  listPending(limit = 50) {
-    return request<PendingReviewItem[]>(`/wiki/pending-reviews?limit=${limit}`);
+  listPending(
+    opts:
+      | number
+      | {
+          limit?: number;
+          operation?: string;
+          riskLevel?: string;
+          revisionKind?: string;
+        } = 50,
+  ) {
+    const input = typeof opts === "number" ? { limit: opts } : opts;
+    const params = new URLSearchParams();
+    if (input.limit) params.set("limit", String(input.limit));
+    if (input.operation) params.set("operation", input.operation);
+    if (input.riskLevel) params.set("riskLevel", input.riskLevel);
+    if (input.revisionKind) params.set("revisionKind", input.revisionKind);
+    return request<PendingReviewItem[]>(
+      `/wiki/pending-reviews?${params.toString()}`,
+    );
   },
   decide(
     revisionId: string,
@@ -377,6 +451,7 @@ export const wikiApi = {
     characterId: string,
     input: {
       level: "none" | "semi" | "full";
+      reviewPolicy?: "open" | "pending_changes";
       expiresAt?: string | null;
       reason?: string;
     },
@@ -467,16 +542,28 @@ export const wikiApi = {
       { method: "DELETE" },
     );
   },
-  softDeletePage(characterId: string) {
+  softDeletePage(characterId: string, reason = "管理员直接删除词条") {
     return request<unknown>(
       `/wiki/pages/${encodeURIComponent(characterId)}/delete`,
-      { method: "POST", body: JSON.stringify({}) },
+      { method: "POST", body: JSON.stringify({ reason }) },
     );
   },
-  restorePage(characterId: string) {
+  restorePage(characterId: string, reason = "管理员直接恢复词条") {
     return request<unknown>(
       `/wiki/pages/${encodeURIComponent(characterId)}/restore`,
-      { method: "POST", body: JSON.stringify({}) },
+      { method: "POST", body: JSON.stringify({ reason }) },
+    );
+  },
+  requestDeletePage(characterId: string, reason: string) {
+    return request<unknown>(
+      `/wiki/pages/${encodeURIComponent(characterId)}/delete-request`,
+      { method: "POST", body: JSON.stringify({ reason }) },
+    );
+  },
+  requestRestorePage(characterId: string, reason: string) {
+    return request<unknown>(
+      `/wiki/pages/${encodeURIComponent(characterId)}/restore-request`,
+      { method: "POST", body: JSON.stringify({ reason }) },
     );
   },
   search(q: string, limit = 20) {
@@ -520,4 +607,191 @@ export const wikiApi = {
       },
     );
   },
+  previewPrompt(
+    characterId: string,
+    recipe: unknown,
+    scene: string,
+  ) {
+    return request<{ prompt: string }>(
+      `/wiki/pages/${encodeURIComponent(characterId)}/preview-prompt`,
+      {
+        method: "POST",
+        body: JSON.stringify({ recipe, scene }),
+        auth: false,
+      },
+    );
+  },
+  syncPageFromCharacter(characterId: string) {
+    return request<{ revisionId: string; status: string }>(
+      `/wiki/pages/${encodeURIComponent(characterId)}/sync-from-character`,
+      { method: "POST" },
+    );
+  },
+  listFieldProtection(characterId?: string) {
+    const params = new URLSearchParams();
+    if (characterId) params.set("characterId", characterId);
+    return request<FieldProtection[]>(
+      `/wiki/field-protection${params.size > 0 ? `?${params.toString()}` : ""}`,
+    );
+  },
+  effectiveFieldProtection(characterId: string) {
+    return request<Array<{ fieldPath: string; minRoleToEdit: string }>>(
+      `/wiki/field-protection/effective/${encodeURIComponent(characterId)}`,
+    );
+  },
+  createFieldProtection(body: {
+    characterId: string;
+    fieldPath: string;
+    minRoleToEdit: string;
+    reason?: string | null;
+  }) {
+    return request<FieldProtection>("/wiki/field-protection", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  },
+  updateFieldProtection(
+    id: string,
+    patch: Partial<FieldProtection>,
+  ) {
+    return request<FieldProtection>(
+      `/wiki/field-protection/${encodeURIComponent(id)}`,
+      { method: "PATCH", body: JSON.stringify(patch) },
+    );
+  },
+  deleteFieldProtection(id: string) {
+    return request<void>(
+      `/wiki/field-protection/${encodeURIComponent(id)}`,
+      { method: "DELETE" },
+    );
+  },
+  wikiStatsDaily() {
+    return request<{
+      todayCreates: number;
+      weekCreates: number;
+      pendingQueueLength: number;
+      todayApproved: number;
+      todayRejected: number;
+      abuseHitsToday: number;
+      autoconfirmedThisWeek: number;
+    }>("/wiki/admin/stats/daily");
+  },
+  wikiStatsTopReverted(limit = 20) {
+    return request<
+      Array<{
+        userId: string;
+        editCount: number;
+        approvedEditCount: number;
+        revertedCount: number;
+        patrolledCount: number;
+        lastEditAt: string | null;
+      }>
+    >(`/wiki/admin/stats/top-reverted-users?limit=${limit}`);
+  },
+  wikiStatsAbuseFilters() {
+    return request<
+      Array<{
+        filter: AbuseFilter;
+        recentHits: number;
+      }>
+    >("/wiki/admin/stats/abuse-filters");
+  },
+  listAbuseFilters() {
+    return request<AbuseFilter[]>("/wiki/admin/abuse-filters");
+  },
+  getAbuseFilter(id: string) {
+    return request<AbuseFilter>(
+      `/wiki/admin/abuse-filters/${encodeURIComponent(id)}`,
+    );
+  },
+  listAbuseFilterHits(opts: {
+    filterId?: string;
+    userId?: string;
+    limit?: number;
+  } = {}) {
+    const params = new URLSearchParams();
+    if (opts.filterId) params.set("filterId", opts.filterId);
+    if (opts.userId) params.set("userId", opts.userId);
+    if (opts.limit) params.set("limit", String(opts.limit));
+    return request<AbuseFilterHit[]>(
+      `/wiki/admin/abuse-filters/hits${params.size > 0 ? `?${params.toString()}` : ""}`,
+    );
+  },
+  createAbuseFilter(body: {
+    name: string;
+    description?: string;
+    enabled?: boolean;
+    pattern: AbuseFilterPattern;
+    scope?: AbuseFilterScope;
+    action: AbuseFilterAction;
+    severity?: "low" | "medium" | "high";
+  }) {
+    return request<AbuseFilter>("/wiki/admin/abuse-filters", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  },
+  updateAbuseFilter(id: string, patch: Partial<AbuseFilter>) {
+    return request<AbuseFilter>(
+      `/wiki/admin/abuse-filters/${encodeURIComponent(id)}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(patch),
+      },
+    );
+  },
+  deleteAbuseFilter(id: string) {
+    return request<void>(
+      `/wiki/admin/abuse-filters/${encodeURIComponent(id)}`,
+      { method: "DELETE" },
+    );
+  },
+};
+
+export type FieldProtection = {
+  id: string;
+  characterId: string;
+  fieldPath: string;
+  minRoleToEdit: string;
+  reason: string | null;
+  createdBy: string | null;
+  createdAt: string;
+};
+
+export type AbuseFilterAction = "log" | "warn" | "block" | "tag_high_risk";
+export type AbuseFilterScope = "content" | "recipe" | "all";
+
+export type AbuseFilterPattern =
+  | { type: "regex"; regex: string; flags?: string; fields?: string[] }
+  | { type: "shrink"; field: string; threshold: number }
+  | { type: "frequency"; windowSec: number; maxEdits: number }
+  | { type: "link_flood"; threshold: number }
+  | { type: "keyword_list"; keywords: string[]; caseSensitive?: boolean };
+
+export type AbuseFilter = {
+  id: string;
+  name: string;
+  description: string;
+  enabled: boolean;
+  pattern: AbuseFilterPattern;
+  scope: AbuseFilterScope;
+  action: AbuseFilterAction;
+  severity: "low" | "medium" | "high";
+  createdBy: string | null;
+  hitCount: number;
+  lastHitAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AbuseFilterHit = {
+  id: string;
+  filterId: string;
+  userId: string;
+  characterId: string | null;
+  revisionId: string | null;
+  matchedText: string;
+  actionTaken: AbuseFilterAction;
+  operation: string;
+  createdAt: string;
 };

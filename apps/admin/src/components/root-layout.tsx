@@ -12,6 +12,8 @@ import { DesktopRuntimeGuard } from "./desktop-runtime-guard";
 import { getAdminSecret, setAdminSecret } from "../lib/admin-api";
 import { resolveAdminCoreApiBaseUrl } from "../lib/core-api-base";
 import { buildDigitalHumanAdminSummary } from "../lib/digital-human-admin-summary";
+import { resolveBreadcrumb } from "../lib/route-breadcrumb";
+import { useAdminDensity } from "../lib/use-density";
 
 export function RootLayout() {
   const queryClient = useQueryClient();
@@ -22,6 +24,8 @@ export function RootLayout() {
   const [secret, setSecret] = useState(getAdminSecret);
   const [editingSecret, setEditingSecret] = useState(!getAdminSecret());
   const [draft, setDraft] = useState(getAdminSecret);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const { density, setDensity } = useAdminDensity();
 
   const statusQuery = useQuery({
     queryKey: ["admin-shell-system-status", baseUrl],
@@ -29,11 +33,18 @@ export function RootLayout() {
     retry: false,
   });
 
-  const routeMeta = useMemo(
-    () => resolveRouteMeta(location.pathname),
+  const breadcrumb = useMemo(
+    () => resolveBreadcrumb(location.pathname),
     [activationVersion, locale, location.pathname],
   );
-  const navItems = useMemo(() => resolveNavItems(), [activationVersion, locale]);
+  const navGroups = useMemo(
+    () => resolveNavItems(),
+    [activationVersion, locale],
+  );
+  const activeGroupId = useMemo(
+    () => findActiveGroupId(location.pathname, navGroups),
+    [location.pathname, navGroups],
+  );
   const digitalHumanSummary = useMemo(
     () => buildDigitalHumanAdminSummary(statusQuery.data?.digitalHumanGateway),
     [activationVersion, locale, statusQuery.data?.digitalHumanGateway],
@@ -119,18 +130,24 @@ export function RootLayout() {
               )}
               digitalHumanSummary={digitalHumanSummary}
               ownerCount={statusQuery.data?.worldSurface.ownerCount ?? null}
-              navLinks={navItems}
+              navGroups={navGroups}
+              activeGroupId={activeGroupId}
             />
           }
           topbar={
             <AdminTopbar
-              eyebrow={routeMeta.eyebrow}
-              title={routeMeta.title}
+              breadcrumb={breadcrumb}
               statusLabel={shellStatus.label}
               statusTone={shellStatus.tone}
               statusDetailLabel={shellStatus.detailLabel}
+              density={density}
+              onDensityChange={setDensity}
+              onMobileNavOpen={() => setMobileNavOpen(true)}
             />
           }
+          mobileNavOpen={mobileNavOpen}
+          onCloseMobileNav={() => setMobileNavOpen(false)}
+          pathname={location.pathname}
         >
           <Outlet />
         </AdminShell>
@@ -144,275 +161,145 @@ function resolveNavItems() {
 
   return [
     {
-      to: "/",
-      label: t(msg`运行总览`),
-      hint: t(msg`实例健康、Provider、诊断和运维动作的统一入口。`),
+      id: "ops",
+      label: t(msg`运营`),
+      iconName: "gauge" as const,
+      items: [
+        {
+          to: "/" as const,
+          label: t(msg`运行总览`),
+          hint: t(msg`实例健康、Provider、诊断和运维动作的统一入口。`),
+        },
+        {
+          to: "/setup" as const,
+          label: t(msg`运行设置`),
+          hint: t(msg`补齐推理 Provider、实例连通性和运行前置条件。`),
+        },
+        {
+          to: "/token-usage" as const,
+          label: t(msg`Token 用量`),
+          hint: t(msg`查看 AI 请求、Token 花费、预算预警和价格配置。`),
+        },
+        {
+          to: "/evals" as const,
+          label: t(msg`评测分析`),
+          hint: t(msg`集中查看 runs、compare 和 trace。`),
+        },
+      ],
     },
     {
-      to: "/characters",
-      label: t(msg`角色中心`),
-      hint: t(msg`查看角色名册、角色工厂和运行逻辑台。`),
+      id: "characters",
+      label: t(msg`角色与内容`),
+      iconName: "users" as const,
+      items: [
+        {
+          to: "/characters" as const,
+          label: t(msg`角色中心`),
+          hint: t(msg`查看角色名册、角色工厂和运行逻辑台。`),
+        },
+        {
+          to: "/games" as const,
+          label: t(msg`游戏目录`),
+          hint: t(msg`查看 AI 游戏中心目录、来源结构和当前审核状态。`),
+        },
+        {
+          to: "/chat-records" as const,
+          label: t(msg`聊天记录`),
+          hint: t(
+            msg`回看世界主人与角色的真实单聊样本、搜索命中和会话成本。`,
+          ),
+        },
+        {
+          to: "/real-world-sync" as const,
+          label: t(msg`现实联动`),
+          roleBadge: t(msg`承接：界闻/联动角色`),
+          hint: t(
+            msg`查看角色现实新闻同步、每日 digest、scene patch 和现实发圈锚点。`,
+          ),
+        },
+      ],
     },
     {
-      to: "/inference",
-      label: t(msg`模型与路由`),
-      hint: t(msg`管理 Provider 账户、模型目录、默认路由和模型角色批量安装。`),
+      id: "models",
+      label: t(msg`智能与模型`),
+      iconName: "sparkles" as const,
+      items: [
+        {
+          to: "/inference" as const,
+          label: t(msg`模型与路由`),
+          hint: t(
+            msg`管理 Provider 账户、模型目录、默认路由和模型角色批量安装。`,
+          ),
+        },
+        {
+          to: "/reply-logic" as const,
+          label: t(msg`回复逻辑`),
+          hint: t(msg`围绕角色、会话和全局规则排查回复链路。`),
+        },
+        {
+          to: "/need-discovery" as const,
+          label: t(msg`需求发现`),
+          hint: t(msg`配置短期/长期角色生成策略，并查看候选与运行记录。`),
+        },
+        {
+          to: "/cyber-avatar" as const,
+          label: t(msg`赛博分身`),
+          hint: t(msg`查看行为信号、画像状态、投影提示词与建模运行记录。`),
+        },
+      ],
     },
     {
-      to: "/games",
-      label: t(msg`游戏目录`),
-      hint: t(msg`查看 AI 游戏中心目录、来源结构和当前审核状态。`),
-    },
-    {
-      to: "/chat-records",
-      label: t(msg`聊天记录`),
-      hint: t(msg`回看世界主人与角色的真实单聊样本、搜索命中和会话成本。`),
-    },
-    {
-      to: "/need-discovery",
-      label: t(msg`需求发现`),
-      hint: t(msg`配置短期/长期角色生成策略，并查看候选与运行记录。`),
-    },
-    {
-      to: "/followup-runtime",
-      label: t(msg`主动跟进`),
-      roleBadge: t(msg`承接：我自己`),
-      hint: t(msg`配置我自己回捞未闭环事项的规则、Prompt 和推荐链路。`),
-    },
-    {
-      to: "/self-agent",
-      label: t(msg`主代理`),
-      roleBadge: t(msg`承接：我自己主代理`),
-      hint: t(msg`查看 self-agent workspace、heartbeat、standing orders 和近期巡检记录。`),
-    },
-    {
-      to: "/reminder-runtime",
-      label: t(msg`提醒运行时`),
-      roleBadge: t(msg`承接：小盯`),
-      hint: t(
-        msg`查看小盯的活跃提醒、最近触发 / 完成、私聊出站与轻提醒发圈记录。`,
-      ),
-    },
-    {
-      to: "/token-usage",
-      label: t(msg`Token 用量`),
-      hint: t(msg`查看 AI 请求、Token 花费、预算预警和价格配置。`),
-    },
-    {
-      to: "/action-runtime",
-      label: t(msg`真实世界动作`),
-      roleBadge: t(msg`承接：行动助理`),
-      hint: t(msg`查看行动助理的动作门控、连接器、规则和执行轨迹。`),
-    },
-    {
-      to: "/cyber-avatar",
-      label: t(msg`赛博分身`),
-      hint: t(msg`查看行为信号、画像状态、投影提示词与建模运行记录。`),
-    },
-    {
-      to: "/real-world-sync",
-      label: t(msg`现实联动`),
-      roleBadge: t(msg`承接：界闻/联动角色`),
-      hint: t(
-        msg`查看角色现实新闻同步、每日 digest、scene patch 和现实发圈锚点。`,
-      ),
-    },
-    {
-      to: "/evals",
-      label: t(msg`评测分析`),
-      hint: t(msg`集中查看 runs、compare 和 trace。`),
+      id: "runtimes",
+      label: t(msg`运行时`),
+      iconName: "cpu" as const,
+      items: [
+        {
+          to: "/followup-runtime" as const,
+          label: t(msg`主动跟进`),
+          roleBadge: t(msg`承接：我自己`),
+          hint: t(msg`配置我自己回捞未闭环事项的规则、Prompt 和推荐链路。`),
+        },
+        {
+          to: "/self-agent" as const,
+          label: t(msg`主代理`),
+          roleBadge: t(msg`承接：我自己主代理`),
+          hint: t(
+            msg`查看 self-agent workspace、heartbeat、standing orders 和近期巡检记录。`,
+          ),
+        },
+        {
+          to: "/reminder-runtime" as const,
+          label: t(msg`提醒运行时`),
+          roleBadge: t(msg`承接：小盯`),
+          hint: t(
+            msg`查看小盯的活跃提醒、最近触发 / 完成、私聊出站与轻提醒发圈记录。`,
+          ),
+        },
+        {
+          to: "/action-runtime" as const,
+          label: t(msg`真实世界动作`),
+          roleBadge: t(msg`承接：行动助理`),
+          hint: t(msg`查看行动助理的动作门控、连接器、规则和执行轨迹。`),
+        },
+      ],
     },
   ] as const;
 }
 
-function resolveRouteMeta(pathname: string) {
-  const t = translateRuntimeMessage;
-
-  if (pathname === "/") {
-    return {
-      eyebrow: t(msg`运营控制台`),
-      title: t(msg`实例状态与配置`),
-      description: t(msg`接入检查、推理配置、数字人设置和运维操作的统一入口。`),
-    };
+export function findActiveGroupId(
+  pathname: string,
+  groups: ReturnType<typeof resolveNavItems>,
+): string | null {
+  for (const group of groups) {
+    for (const item of group.items) {
+      if (
+        item.to === pathname ||
+        (item.to !== "/" && pathname.startsWith(item.to + "/"))
+      ) {
+        return group.id;
+      }
+    }
   }
-
-  if (pathname === "/setup") {
-    return {
-      eyebrow: t(msg`运行设置`),
-      title: t(msg`运行时与 Provider 初始化`),
-      description: t(
-        msg`补齐推理 Provider、实例连通性和运行前置条件，确保后台操作与真实生成链路可用。`,
-      ),
-    };
-  }
-
-  if (pathname === "/characters") {
-    return {
-      eyebrow: t(msg`角色中心`),
-      title: t(msg`角色名册与工作入口`),
-      description: t(msg`在一个工作区里完成角色筛选、摘要查看和快捷跳转。`),
-    };
-  }
-
-  if (pathname === "/inference") {
-    return {
-      eyebrow: t(msg`模型与路由`),
-      title: t(msg`多模型账户与角色路由`),
-      description: t(
-        msg`集中管理多个 Provider 账户、模型目录、默认模型路由，以及批量安装模型人格角色。`,
-      ),
-    };
-  }
-
-  if (pathname === "/games") {
-    return {
-      eyebrow: t(msg`游戏目录`),
-      title: t(msg`AI 游戏中心目录与来源结构`),
-      description: t(
-        msg`先承接 AI 游戏中心的目录、来源、运行模式和审核状态，后续再补详情、发布与运营能力。`,
-      ),
-    };
-  }
-
-  if (pathname === "/need-discovery") {
-    return {
-      eyebrow: t(msg`需求发现`),
-      title: t(msg`角色缺口识别与自动加友`),
-      description: t(
-        msg`配置短周期和每日节奏的提示词、频率、角色生成策略，并查看运行记录与候选结果。`,
-      ),
-    };
-  }
-
-  if (pathname === "/followup-runtime") {
-    return {
-      eyebrow: t(msg`主动跟进`),
-      title: t(msg`我自己回捞未闭环事项`),
-      description: t(
-        msg`配置 open loop 提取、推荐候选打分、我自己主动消息文案，并查看推荐后的打开、加好友和开聊动作。`,
-      ),
-    };
-  }
-
-  if (pathname === "/self-agent") {
-    return {
-      eyebrow: t(msg`Self Agent`),
-      title: t(msg`我自己的 workspace 与 heartbeat`),
-      description: t(
-        msg`把“我自己”升级成主代理后，在这里查看 standing orders、workspace 文件、巡检结果和近期待处理事项。`,
-      ),
-    };
-  }
-
-  if (pathname === "/reminder-runtime") {
-    return {
-      eyebrow: t(msg`提醒运行时`),
-      title: t(msg`小盯的任务、触发与轻提醒发圈`),
-      description: t(
-        msg`查看提醒角色当前在盯哪些事项、最近有没有真正提醒出去，以及晨间 / 晚间的长期习惯提醒是否稳定落地。`,
-      ),
-    };
-  }
-
-  if (pathname.startsWith("/characters/") && pathname.endsWith("/factory")) {
-    return {
-      eyebrow: t(msg`角色工厂`),
-      title: t(msg`角色制造与发布`),
-      description: t(msg`整理配方、比对发布差异，并把草稿发布到运行时。`),
-    };
-  }
-
-  if (pathname.startsWith("/characters/") && pathname.endsWith("/runtime")) {
-    return {
-      eyebrow: t(msg`角色运行逻辑台`),
-      title: t(msg`角色当前状态与可观测性`),
-      description: t(msg`查看这个角色现在如何运行，并在同一页面完成人工干预。`),
-    };
-  }
-
-  if (pathname.startsWith("/characters/")) {
-    return {
-      eyebrow: t(msg`角色编辑`),
-      title: t(msg`角色资料编辑`),
-      description: t(
-        msg`按模块整理基础资料、人格设定与行为约束，减少长表单迷路感。`,
-      ),
-    };
-  }
-
-  if (pathname === "/chat-records") {
-    return {
-      eyebrow: t(msg`聊天记录`),
-      title: t(msg`世界样本与会话档案`),
-      description: t(
-        msg`集中查看世界主人与各角色的真实单聊历史、搜索命中上下文和会话级 Token 成本。`,
-      ),
-    };
-  }
-
-  if (pathname === "/token-usage") {
-    return {
-      eyebrow: t(msg`Token 用量`),
-      title: t(msg`AI 成本与请求账本`),
-      description: t(
-        msg`集中查看 Token 消耗、时间趋势、角色分布、预算预警和价格配置。`,
-      ),
-    };
-  }
-
-  if (pathname === "/reply-logic") {
-    return {
-      eyebrow: t(msg`回复逻辑`),
-      title: t(msg`世界级回复调试台`),
-      description: t(
-        msg`围绕角色、会话和全局规则排查回复链路，而不是在长页面里找模块。`,
-      ),
-    };
-  }
-
-  if (pathname === "/action-runtime") {
-    return {
-      eyebrow: t(msg`真实世界动作`),
-      title: t(msg`行动助理动作运行时`),
-      description: t(
-        msg`围绕动作识别、澄清、确认、连接器和执行轨迹查看真实世界动作能力。`,
-      ),
-    };
-  }
-
-  if (pathname === "/cyber-avatar") {
-    return {
-      eyebrow: t(msg`赛博分身`),
-      title: t(msg`用户行为建模与 Prompt 投影`),
-      description: t(
-        msg`集中查看赛博分身如何从行为信号收敛成画像，再投影成后续世界内外可消费的提示词。`,
-      ),
-    };
-  }
-
-  if (pathname === "/real-world-sync") {
-    return {
-      eyebrow: t(msg`现实联动`),
-      title: t(msg`角色现实世界同步与日更`),
-      description: t(
-        msg`集中查看每日外部信号、摘要 digest、scene patch 和现实发圈锚点。`,
-      ),
-    };
-  }
-
-  if (pathname === "/evals") {
-    return {
-      eyebrow: t(msg`评测分析`),
-      title: t(msg`评测运行与 Trace 工作台`),
-      description: t(
-        msg`集中查看 runs、compare 和 trace，逐步收口成更清晰的多视图结构。`,
-      ),
-    };
-  }
-
-  return {
-    eyebrow: t(msg`管理后台`),
-    title: t(msg`运营工作台`),
-    description: t(msg`围绕实例运行、角色运营和回复分析组织后台操作。`),
-  };
+  if (pathname.startsWith("/characters/")) return "characters";
+  return null;
 }

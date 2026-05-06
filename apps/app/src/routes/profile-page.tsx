@@ -15,9 +15,13 @@ import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../components/avatar-chip";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
-import { clearCloudRuntimeSession } from "../lib/cloud-session";
+import {
+  clearCloudRuntimeSession,
+  shouldShowCloudAccountControls,
+} from "../lib/cloud-session";
 import { normalizePathname } from "../lib/normalize-pathname";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+import { useCloudSessionStore } from "../store/cloud-session-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
 export function ProfilePage() {
@@ -34,8 +38,11 @@ export function ProfilePage() {
     select: (state) => state.location.hash,
   });
   const username = useWorldOwnerStore((state) => state.username);
+  const ownerId = useWorldOwnerStore((state) => state.id);
   const avatar = useWorldOwnerStore((state) => state.avatar);
   const signature = useWorldOwnerStore((state) => state.signature);
+  const cloudAccessToken = useCloudSessionStore((state) => state.accessToken);
+  const cloudPhone = useCloudSessionStore((state) => state.phone);
   const runtimeConfig = useAppRuntimeConfig();
   const desktopProfilePath = "/tabs/profile";
   const normalizedPathname = normalizePathname(pathname);
@@ -44,7 +51,16 @@ export function ProfilePage() {
   const settingsPath = isDesktopLayout
     ? "/desktop/settings"
     : "/profile/settings";
-  const showCloudAccountEntries = runtimeConfig.worldAccessMode === "cloud";
+  const showCloudAccountEntries =
+    !isDesktopLayout &&
+    shouldShowCloudAccountControls({
+      worldAccessMode: runtimeConfig.worldAccessMode,
+      runtimeApiBaseUrl: runtimeConfig.apiBaseUrl,
+      runtimeCloudPhone: runtimeConfig.cloudPhone,
+      accessToken: cloudAccessToken,
+      sessionPhone: cloudPhone,
+      worldOwnerId: ownerId,
+    });
 
   useEffect(() => {
     if (!desktopPathMismatch) {
@@ -118,7 +134,7 @@ export function ProfilePage() {
             <ProfileEntry
               icon={CreditCard}
               iconClassName="bg-[rgba(22,163,74,0.12)] text-[#15803d]"
-              label="Membership Center"
+              label={t(msg`会员中心`)}
               to="/profile/subscription"
             />
           ) : null}
@@ -126,7 +142,7 @@ export function ProfilePage() {
             <ProfileActionEntry
               icon={LogOut}
               iconClassName="bg-[rgba(220,38,38,0.10)] text-[#b42318]"
-              label="Sign Out"
+              label={t(msg`退出登录`)}
               onClick={() => {
                 clearCloudRuntimeSession();
                 void navigate({ to: "/welcome", replace: true });

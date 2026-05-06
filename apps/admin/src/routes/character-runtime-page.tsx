@@ -4,15 +4,15 @@ import type { ReplyLogicCharacterSnapshot } from "@yinjie/contracts";
 import {
   Button,
   Card,
-  ErrorBlock,
-  LoadingBlock,
   MetricCard,
   SectionHeading,
   StatusPill,
 } from "@yinjie/ui";
 import {
+  AdminErrorState,
   AdminPageHero,
   AdminRecordCard,
+  AdminSkeletonCard,
   AdminValueCard as ValueCard,
 } from "../components/admin-workbench";
 import { adminApi } from "../lib/admin-api";
@@ -41,15 +41,27 @@ export function CharacterRuntimePage() {
 
 
   if (snapshotQuery.isLoading) {
-    return <LoadingBlock label="正在加载角色运行逻辑..." />;
+    return <AdminSkeletonCard rows={5} showAction />;
   }
 
   if (snapshotQuery.isError && snapshotQuery.error instanceof Error) {
-    return <ErrorBlock message={snapshotQuery.error.message} />;
+    return (
+      <AdminErrorState
+        title="角色运行逻辑加载失败"
+        detail={snapshotQuery.error.message}
+        onRetry={() => snapshotQuery.refetch()}
+      />
+    );
   }
 
   if (!snapshotQuery.data) {
-    return <ErrorBlock message="角色运行逻辑暂不可用。" />;
+    return (
+      <AdminErrorState
+        title="角色运行逻辑暂不可用"
+        detail="未能从远程获取到 reply-logic 快照。"
+        onRetry={() => snapshotQuery.refetch()}
+      />
+    );
   }
 
   const snapshot = snapshotQuery.data;

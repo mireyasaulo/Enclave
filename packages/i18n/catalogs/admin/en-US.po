@@ -13,16 +13,16 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. placeholder {0}: values.lastCoreApiError
-#: apps/admin/src/routes/dashboard-page.tsx:2580
+#: apps/admin/src/routes/dashboard-page.tsx:2560
 msgid " · 最近错误={0}"
 msgstr " · last error={0}"
 
 #. placeholder {0}: values.desktopLogPath
-#: apps/admin/src/routes/dashboard-page.tsx:2577
+#: apps/admin/src/routes/dashboard-page.tsx:2557
 msgid " · 日志={0}"
 msgstr " · log={0}"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2583
+#: apps/admin/src/routes/dashboard-page.tsx:2591
 msgid " · 端口占用中"
 msgstr " · port occupied"
 
@@ -65,7 +65,7 @@ msgstr "{0}; the remaining items also need review."
 msgid "{blockerCount} 个阻塞项"
 msgstr "{blockerCount} blockers"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2616
+#: apps/admin/src/routes/dashboard-page.tsx:2627
 msgid "{hours} 小时 {minutes} 分钟"
 msgstr "{hours}h {minutes}m"
 
@@ -102,15 +102,15 @@ msgstr "Core API is unhealthy"
 msgid "heartbeat 命中了 {0} 类待处理事项。"
 msgstr "Heartbeat found {0} categories of pending items."
 
-#: apps/admin/src/routes/dashboard-page.tsx:2555
+#: apps/admin/src/routes/dashboard-page.tsx:2569
 msgid "Linux 依赖正常"
 msgstr "Linux dependencies OK"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2600
+#: apps/admin/src/routes/dashboard-page.tsx:2611
 msgid "PATH 查找"
 msgstr "PATH lookup"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2599
+#: apps/admin/src/routes/dashboard-page.tsx:2610
 msgid "PATH 查找（内置 sidecar 缺失）"
 msgstr "PATH lookup (bundled sidecar missing)"
 
@@ -122,11 +122,11 @@ msgstr "provider-state callbacks can be authenticated."
 msgid "Self Agent"
 msgstr "Self Agent"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2603
+#: apps/admin/src/routes/dashboard-page.tsx:2614
 msgid "sidecar 已就绪"
 msgstr "Sidecar ready"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2603
+#: apps/admin/src/routes/dashboard-page.tsx:2614
 msgid "sidecar 缺失"
 msgstr "Sidecar missing"
 
@@ -314,7 +314,7 @@ msgstr "Run inference previews, export diagnostics, restore backups, and inspect
 msgid "健康"
 msgstr "Healthy"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2569
+#: apps/admin/src/routes/dashboard-page.tsx:2583
 msgid "健康探测失败"
 msgstr "Health probe failed"
 
@@ -386,11 +386,11 @@ msgstr "Content Output"
 msgid "内置 iframe"
 msgstr "Built-in iframe"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2592
+#: apps/admin/src/routes/dashboard-page.tsx:2603
 msgid "内置 sidecar"
 msgstr "Bundled sidecar"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2565
+#: apps/admin/src/routes/dashboard-page.tsx:2579
 msgid "内置 sidecar 缺失"
 msgstr "Bundled sidecar missing"
 
@@ -567,11 +567,11 @@ msgstr "Includes all one-on-one chat history"
 msgid "启用任务"
 msgstr "Enabled Jobs"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2583
+#: apps/admin/src/routes/dashboard-page.tsx:2591
 msgid "命令正常"
 msgstr "Command OK"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2583
+#: apps/admin/src/routes/dashboard-page.tsx:2591
 msgid "命令缺失"
 msgstr "Command Missing"
 
@@ -1032,7 +1032,7 @@ msgstr "Pending Run"
 #: apps/admin/src/routes/dashboard-page.tsx:894
 #: apps/admin/src/routes/dashboard-page.tsx:902
 #: apps/admin/src/routes/dashboard-page.tsx:904
-#: apps/admin/src/routes/dashboard-page.tsx:2611
+#: apps/admin/src/routes/dashboard-page.tsx:2622
 msgid "待探测"
 msgstr "Pending Probe"
 
@@ -1224,7 +1224,7 @@ msgstr "Spot-check latest character, moments, and feed samples."
 msgid "抽查角色在线状态、画像和运行工作区。"
 msgstr "Spot-check character online state, profile, and runtime workspace."
 
-#: apps/admin/src/routes/dashboard-page.tsx:2567
+#: apps/admin/src/routes/dashboard-page.tsx:2581
 msgid "拉起失败"
 msgstr "Spawn Failed"
 
@@ -1474,12 +1474,12 @@ msgstr "Future Generation"
 msgid "未生效"
 msgstr "Inactive"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2575
+#: apps/admin/src/routes/dashboard-page.tsx:2589
 msgid "未由桌面壳托管"
 msgstr "Not managed by desktop shell"
 
 #: apps/admin/src/routes/dashboard-page.tsx:554
-#: apps/admin/src/routes/dashboard-page.tsx:2570
+#: apps/admin/src/routes/dashboard-page.tsx:2584
 msgid "未知"
 msgstr "Unknown"
 
@@ -1860,7 +1860,7 @@ msgstr "Version"
 msgid "状态"
 msgstr "Status"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2595
+#: apps/admin/src/routes/dashboard-page.tsx:2606
 msgid "环境变量覆盖"
 msgstr "Environment override"
 
@@ -1887,7 +1887,7 @@ msgid "用户行为建模与 Prompt 投影"
 msgstr "User Behavior Modeling and Prompt Projection"
 
 #. placeholder {0}: values.managedChildPid ? ` pid=${values.managedChildPid}` : ""
-#: apps/admin/src/routes/dashboard-page.tsx:2573
+#: apps/admin/src/routes/dashboard-page.tsx:2587
 msgid "由桌面壳托管{0}"
 msgstr "Managed by desktop shell{0}"
 
@@ -1929,7 +1929,7 @@ msgstr "Run Now"
 msgid "立即配置"
 msgstr "Configure now"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2563
+#: apps/admin/src/routes/dashboard-page.tsx:2577
 msgid "端口已占用"
 msgstr "Port Occupied"
 
@@ -1998,7 +1998,7 @@ msgid "缺回调"
 msgstr "Missing callback"
 
 #. placeholder {0}: values.linuxMissingPackages.join(", ")
-#: apps/admin/src/routes/dashboard-page.tsx:2554
+#: apps/admin/src/routes/dashboard-page.tsx:2568
 msgid "缺失依赖={0}"
 msgstr "missing dependencies={0}"
 
@@ -2327,6 +2327,10 @@ msgstr "Remote Instance"
 #: apps/admin/src/routes/dashboard-page.tsx:1053
 msgid "远程模式"
 msgstr "Remote Mode"
+
+#: apps/admin/src/routes/dashboard-page.tsx:2600
+msgid "远程连接"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:2251
 msgid "追问推荐调度"

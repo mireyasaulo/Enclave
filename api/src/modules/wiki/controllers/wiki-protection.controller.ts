@@ -31,6 +31,7 @@ export class WikiProtectionController {
     @Body()
     body: {
       level: 'none' | 'semi' | 'full';
+      reviewPolicy?: 'open' | 'pending_changes';
       expiresAt?: string | null;
       reason?: string | null;
     },

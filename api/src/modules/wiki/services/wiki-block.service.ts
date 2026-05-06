@@ -7,6 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
+import { UserEntity } from '../../auth/user.entity';
 import { WikiBlockEntity } from '../entities/wiki-block.entity';
 
 const VALID_SCOPES = new Set(['global', 'page', 'talk']);
@@ -16,6 +17,8 @@ export class WikiBlockService {
   constructor(
     @InjectRepository(WikiBlockEntity)
     private readonly blockRepo: Repository<WikiBlockEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepo: Repository<UserEntity>,
   ) {}
 
   async create(
@@ -37,6 +40,17 @@ export class WikiBlockService {
     if (!input.reason?.trim()) {
       throw new BadRequestException('封禁必须填写理由');
     }
+    if (input.userId === actor.id) {
+      throw new BadRequestException('不能封禁自己');
+    }
+    const target = await this.userRepo.findOne({ where: { id: input.userId } });
+    if (!target) {
+      throw new NotFoundException('目标用户不存在');
+    }
+    const expiresAt = input.expiresAt ? new Date(input.expiresAt) : null;
+    if (expiresAt && Number.isNaN(expiresAt.getTime())) {
+      throw new BadRequestException('expiresAt 不是有效时间');
+    }
     const entity = this.blockRepo.create({
       userId: input.userId,
       scope: input.scope,
@@ -44,7 +58,7 @@ export class WikiBlockService {
         input.scope === 'page' ? input.targetCharacterId : null,
       reason: input.reason.trim(),
       createdBy: actor.id,
-      expiresAt: input.expiresAt ? new Date(input.expiresAt) : null,
+      expiresAt,
     });
     return this.blockRepo.save(entity);
   }

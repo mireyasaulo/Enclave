@@ -344,7 +344,6 @@ export function buildWaitingSessionSyncTaskReviewCopy(
       locale,
     ),
     formatCopyLine("Review permalink", reviewPath, locale),
-    formatCopyLine("Requests path", lookup.requestsPath, locale),
     formatCopyLine("Worlds path", lookup.worldsPath, locale),
     formatCopyLine(
       "World detail",

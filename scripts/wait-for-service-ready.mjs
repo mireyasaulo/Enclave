@@ -29,8 +29,8 @@ while (Date.now() - startedAt < timeoutMs) {
       },
     });
 
-    if (response.ok) {
-      console.log(`[${label}] ready: ${url}`);
+    if (response.status < 500) {
+      console.log(`[${label}] ready: ${url} (status ${response.status})`);
       process.exit(0);
     }
   } catch {

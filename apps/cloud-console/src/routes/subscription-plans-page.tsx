@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock } from "@yinjie/ui";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
+import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
 export function SubscriptionPlansPage() {
+  const t = useCloudConsoleText();
   const queryClient = useQueryClient();
   const plansQuery = useQuery({
     queryKey: ["cloud-console", "subscription-plans"],
@@ -70,7 +72,7 @@ export function SubscriptionPlansPage() {
   });
 
   if (plansQuery.isLoading) {
-    return <LoadingBlock label="Loading subscription plans..." />;
+    return <LoadingBlock label={t("Loading subscription plans...")} />;
   }
 
   if (plansQuery.isError) {
@@ -79,7 +81,7 @@ export function SubscriptionPlansPage() {
         message={
           plansQuery.error instanceof Error
             ? plansQuery.error.message
-            : "Failed to load subscription plans."
+            : t("Failed to load subscription plans.")
         }
       />
     );
@@ -89,7 +91,7 @@ export function SubscriptionPlansPage() {
     <section className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
       <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-section)]">
         <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-          Plans
+          {t("Plans")}
         </div>
         <div className="mt-3 space-y-3">
           {plansQuery.data?.map((plan) => (
@@ -106,8 +108,25 @@ export function SubscriptionPlansPage() {
               <div className="font-medium text-[color:var(--text-primary)]">
                 {plan.name}
               </div>
-              <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-                {plan.code} | {plan.durationDays} days | {plan.priceCents}
+              <div className="mt-1 space-y-0.5 text-sm text-[color:var(--text-secondary)]">
+                <div>
+                  <span className="text-[color:var(--text-tertiary)]">
+                    {t("code")}:
+                  </span>{" "}
+                  {plan.code}
+                </div>
+                <div>
+                  <span className="text-[color:var(--text-tertiary)]">
+                    {t("durationDays")}:
+                  </span>{" "}
+                  {plan.durationDays}
+                </div>
+                <div>
+                  <span className="text-[color:var(--text-tertiary)]">
+                    {t("priceCents")}:
+                  </span>{" "}
+                  {plan.priceCents} ({plan.currency.toUpperCase()})
+                </div>
               </div>
             </button>
           ))}
@@ -119,44 +138,44 @@ export function SubscriptionPlansPage() {
           <input
             value={draft.code}
             onChange={(event) => setDraft((current) => ({ ...current, code: event.target.value }))}
-            placeholder="code"
+            placeholder={t("code")}
             className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
           />
           <input
             value={draft.name}
             onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))}
-            placeholder="name"
+            placeholder={t("name")}
             className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
           />
           <input
             value={draft.durationDays}
             onChange={(event) => setDraft((current) => ({ ...current, durationDays: event.target.value }))}
-            placeholder="durationDays"
+            placeholder={t("durationDays")}
             className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
           />
           <input
             value={draft.priceCents}
             onChange={(event) => setDraft((current) => ({ ...current, priceCents: event.target.value }))}
-            placeholder="priceCents"
+            placeholder={t("priceCents")}
             className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
           />
           <input
             value={draft.currency}
             onChange={(event) => setDraft((current) => ({ ...current, currency: event.target.value }))}
-            placeholder="currency"
+            placeholder={t("currency")}
             className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
           />
           <input
             value={draft.sortOrder}
             onChange={(event) => setDraft((current) => ({ ...current, sortOrder: event.target.value }))}
-            placeholder="sortOrder"
+            placeholder={t("sortOrder")}
             className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
           />
         </div>
         <textarea
           value={draft.description}
           onChange={(event) => setDraft((current) => ({ ...current, description: event.target.value }))}
-          placeholder="description"
+          placeholder={t("description")}
           className="mt-3 min-h-28 w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
         />
         <div className="mt-3 grid gap-2 sm:grid-cols-3">
@@ -166,7 +185,7 @@ export function SubscriptionPlansPage() {
               checked={draft.isActive}
               onChange={(event) => setDraft((current) => ({ ...current, isActive: event.target.checked }))}
             />
-            active
+            {t("active")}
           </label>
           <label className="flex items-center gap-2 text-sm">
             <input
@@ -174,7 +193,7 @@ export function SubscriptionPlansPage() {
               checked={draft.isTrial}
               onChange={(event) => setDraft((current) => ({ ...current, isTrial: event.target.checked }))}
             />
-            trial
+            {t("trial")}
           </label>
           <label className="flex items-center gap-2 text-sm">
             <input
@@ -187,7 +206,7 @@ export function SubscriptionPlansPage() {
                 }))
               }
             />
-            purchasable
+            {t("purchasable")}
           </label>
         </div>
         <div className="mt-4 flex gap-3">
@@ -197,7 +216,7 @@ export function SubscriptionPlansPage() {
             disabled={saveMutation.isPending}
             onClick={() => saveMutation.mutate()}
           >
-            Save plan
+            {t("Save plan")}
           </Button>
           <Button
             variant="secondary"
@@ -218,12 +237,12 @@ export function SubscriptionPlansPage() {
               })
             }
           >
-            New plan
+            {t("New plan")}
           </Button>
         </div>
         {saveMutation.isSuccess ? (
           <InlineNotice className="mt-4" tone="success">
-            Subscription plan saved.
+            {t("Subscription plan saved.")}
           </InlineNotice>
         ) : null}
       </div>

@@ -3,8 +3,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams } from "@tanstack/react-router";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock } from "@yinjie/ui";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
+import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
 export function UserDetailPage() {
+  const t = useCloudConsoleText();
   const { userId } = useParams({ strict: false }) as { userId: string };
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -50,7 +52,7 @@ export function UserDetailPage() {
   });
 
   if (userQuery.isLoading) {
-    return <LoadingBlock label="Loading cloud user..." />;
+    return <LoadingBlock label={t("Loading cloud user...")} />;
   }
 
   if (userQuery.isError || !userQuery.data) {
@@ -59,7 +61,7 @@ export function UserDetailPage() {
         message={
           userQuery.error instanceof Error
             ? userQuery.error.message
-            : "Failed to load cloud user."
+            : t("Failed to load cloud user.")
         }
       />
     );
@@ -73,25 +75,26 @@ export function UserDetailPage() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
-              SaaS user
+              {t("SaaS user")}
             </div>
             <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">
               {user.phone}
             </h2>
             <div className="mt-2 text-sm leading-7 text-[color:var(--text-secondary)]">
-              Account: {user.status}
+              {t("Account:")} {t(user.status)}
               <br />
-              Subscription: {user.subscriptionStatus}
+              {t("Subscription:")} {t(user.subscriptionStatus)}
               <br />
-              Current plan: {user.currentPlanCode || "-"}
+              {t("Current plan:")} {user.currentPlanCode || "-"}
               <br />
-              Expires at: {user.subscriptionExpiresAt || "-"}
+              {t("Expires at:")} {user.subscriptionExpiresAt || "-"}
               <br />
-              Invite code: {user.inviteCode || "-"}
+              {t("Invite code:")} {user.inviteCode || "-"}
               <br />
-              World status: {user.worldStatus || "-"}
+              {t("World status:")} {user.worldStatus ? t(user.worldStatus) : "-"}
               <br />
-              World: {user.worldId || "-"} {user.worldApiBaseUrl ? `(${user.worldApiBaseUrl})` : ""}
+              {t("World:")} {user.worldId || "-"}{" "}
+              {user.worldApiBaseUrl ? `(${user.worldApiBaseUrl})` : ""}
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -106,14 +109,14 @@ export function UserDetailPage() {
                   })
                 }
               >
-                Open world
+                {t("Open world")}
               </Button>
             ) : null}
             <Link
               to="/users"
               className="rounded-2xl border border-[color:var(--border-subtle)] bg-white px-4 py-2 text-sm"
             >
-              Back to users
+              {t("Back to users")}
             </Link>
           </div>
         </div>
@@ -122,7 +125,7 @@ export function UserDetailPage() {
       <section className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-section)]">
           <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-            Manual grant
+            {t("Manual grant")}
           </div>
           <div className="mt-3 flex gap-3">
             <input
@@ -136,21 +139,21 @@ export function UserDetailPage() {
               disabled={grantMutation.isPending}
               onClick={() => grantMutation.mutate()}
             >
-              Grant days
+              {t("Grant days")}
             </Button>
           </div>
         </div>
 
         <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-section)]">
           <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-            Account state
+            {t("Account state")}
           </div>
           <div className="mt-3 flex flex-col gap-3">
             <input
               value={banReason}
               onChange={(event) => setBanReason(event.target.value)}
               className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
-              placeholder="Ban reason"
+              placeholder={t("Ban reason")}
             />
             <div className="flex gap-3">
               <Button
@@ -159,7 +162,7 @@ export function UserDetailPage() {
                 disabled={banMutation.isPending || user.status === "banned"}
                 onClick={() => banMutation.mutate()}
               >
-                Ban
+                {t("Ban")}
               </Button>
               <Button
                 variant="secondary"
@@ -167,7 +170,7 @@ export function UserDetailPage() {
                 disabled={unbanMutation.isPending || user.status === "active"}
                 onClick={() => unbanMutation.mutate()}
               >
-                Unban
+                {t("Unban")}
               </Button>
             </div>
           </div>
@@ -177,7 +180,7 @@ export function UserDetailPage() {
       <section className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-section)]">
           <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-            Subscription history
+            {t("Subscription history")}
           </div>
           <div className="mt-3 space-y-3">
             {user.subscriptions.map((subscription) => (
@@ -189,7 +192,7 @@ export function UserDetailPage() {
                   {subscription.planName}
                 </div>
                 <div className="mt-1 text-[color:var(--text-secondary)]">
-                  {subscription.status} | {subscription.source}
+                  {t(subscription.status)} | {subscription.source}
                   <br />
                   {subscription.startsAt} {"->"} {subscription.expiresAt}
                   <br />
@@ -198,14 +201,16 @@ export function UserDetailPage() {
               </div>
             ))}
             {!user.subscriptions.length ? (
-              <InlineNotice tone="muted">No subscription records found.</InlineNotice>
+              <InlineNotice tone="muted">
+                {t("No subscription records found.")}
+              </InlineNotice>
             ) : null}
           </div>
         </div>
 
         <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-section)]">
           <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-            Invite history
+            {t("Invite history")}
           </div>
           <div className="mt-3 space-y-3">
             {user.redemptionsAsInviter.map((record) => (
@@ -217,13 +222,15 @@ export function UserDetailPage() {
                   {record.inviteePhoneMasked}
                 </div>
                 <div className="mt-1 text-[color:var(--text-secondary)]">
-                  {record.status} | {record.createdAt}
+                  {t(record.status)} | {record.createdAt}
                   {record.rejectReason ? ` | ${record.rejectReason}` : ""}
                 </div>
               </div>
             ))}
             {!user.redemptionsAsInviter.length ? (
-              <InlineNotice tone="muted">No invite rewards recorded.</InlineNotice>
+              <InlineNotice tone="muted">
+                {t("No invite rewards recorded.")}
+              </InlineNotice>
             ) : null}
           </div>
         </div>

@@ -572,7 +572,7 @@ export function GameSubmissionWorkbench({
         <Card className="bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(247,250,250,0.96))]">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+              <div className="text-[12px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                 {isCreating ? "New Submission" : "Submission Editor"}
               </div>
               <div className="mt-2 text-xl font-semibold text-[color:var(--text-primary)]">
@@ -689,7 +689,7 @@ export function GameSubmissionWorkbench({
                 <div className="rounded-[20px] border border-[rgba(7,193,96,0.14)] bg-[linear-gradient(180deg,rgba(240,253,244,0.96),rgba(255,255,255,0.98))] p-4">
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div>
-                      <div className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+                      <div className="text-[12px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                         Character Intake
                       </div>
                       <div className="mt-2 text-lg font-semibold text-[color:var(--text-primary)]">

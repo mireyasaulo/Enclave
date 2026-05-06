@@ -11,6 +11,7 @@ import { WikiProtectionLogEntity } from '../entities/wiki-protection-log.entity'
 import { WikiPageService } from './wiki-page.service';
 
 const VALID_LEVELS = new Set(['none', 'semi', 'full']);
+const VALID_REVIEW_POLICIES = new Set(['open', 'pending_changes']);
 
 @Injectable()
 export class WikiProtectionService {
@@ -27,14 +28,26 @@ export class WikiProtectionService {
   async setProtection(
     characterId: string,
     actor: AuthenticatedUser,
-    input: { level: string; expiresAt?: string | null; reason?: string | null },
+    input: {
+      level: string;
+      reviewPolicy?: string;
+      expiresAt?: string | null;
+      reason?: string | null;
+    },
   ): Promise<CharacterPageEntity> {
     if (!VALID_LEVELS.has(input.level)) {
       throw new BadRequestException('level 必须是 none / semi / full');
     }
+    if (
+      input.reviewPolicy !== undefined &&
+      !VALID_REVIEW_POLICIES.has(input.reviewPolicy)
+    ) {
+      throw new BadRequestException('reviewPolicy 必须是 open / pending_changes');
+    }
     const page = await this.pages.getOrInitPage(characterId);
     const oldLevel = page.protectionLevel;
     const newLevel = input.level;
+    const nextReviewPolicy = input.reviewPolicy ?? page.reviewPolicy;
     const expiresAt = input.expiresAt ? new Date(input.expiresAt) : null;
 
     await this.dataSource.transaction(async (manager) => {
@@ -43,6 +56,7 @@ export class WikiProtectionService {
         { characterId },
         {
           protectionLevel: newLevel,
+          reviewPolicy: nextReviewPolicy,
           protectionExpiresAt: newLevel === 'none' ? null : expiresAt,
           protectionReason: newLevel === 'none' ? null : input.reason ?? null,
         },

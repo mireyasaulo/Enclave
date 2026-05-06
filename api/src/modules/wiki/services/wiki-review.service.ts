@@ -5,14 +5,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, IsNull, MoreThan, Repository } from 'typeorm';
+import { DataSource, In, MoreThan, Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
 import { CharacterPageEntity } from '../entities/character-page.entity';
 import { CharacterRevisionEntity } from '../entities/character-revision.entity';
 import { EditSubmissionEntity } from '../entities/edit-submission.entity';
 import { UserWikiProfileEntity } from '../entities/user-wiki-profile.entity';
 import { WikiEditService } from './wiki-edit.service';
+import { WikiProtectionService } from './wiki-protection.service';
 import { WikiRoleService } from './wiki-role.service';
+import { WikiSystemUserService } from './wiki-system-user.service';
+import { rankOf } from '../guards/wiki-role.guard';
 
 export type ReviewDecisionInput = {
   decision: 'approve' | 'reject' | 'request_changes';
@@ -34,29 +37,73 @@ export class WikiReviewService {
     private readonly profileRepo: Repository<UserWikiProfileEntity>,
     private readonly edits: WikiEditService,
     private readonly roles: WikiRoleService,
+    private readonly protection: WikiProtectionService,
+    private readonly systemUsers: WikiSystemUserService,
   ) {}
 
-  async listPending(limit = 50): Promise<
+  async listPending(limit?: number): Promise<
+    Array<{
+      submission: EditSubmissionEntity;
+      revision: CharacterRevisionEntity;
+    }>
+  >;
+  async listPending(input?: {
+    limit?: number;
+    operation?: string;
+    riskLevel?: string;
+    revisionKind?: string;
+  }): Promise<
+    Array<{
+      submission: EditSubmissionEntity;
+      revision: CharacterRevisionEntity;
+    }>
+  >;
+  async listPending(
+    input:
+      | number
+      | {
+          limit?: number;
+          operation?: string;
+          riskLevel?: string;
+          revisionKind?: string;
+        } = {},
+  ): Promise<
     Array<{
       submission: EditSubmissionEntity;
       revision: CharacterRevisionEntity;
     }>
   > {
-    const submissions = await this.submissionRepo.find({
-      where: { decision: IsNull() },
-      order: { priority: 'DESC', createdAt: 'ASC' },
-      take: Math.min(Math.max(limit, 1), 200),
-    });
+    const opts = typeof input === 'number' ? { limit: input } : input;
+    const limit = Math.min(Math.max(opts.limit ?? 50, 1), 200);
+    const qb = this.submissionRepo
+      .createQueryBuilder('s')
+      .where('s.decision IS NULL')
+      .orderBy('s.priority', 'DESC')
+      .addOrderBy('s.createdAt', 'ASC')
+      .take(opts.revisionKind ? 200 : limit);
+    if (opts.operation) {
+      qb.andWhere('s.operation = :operation', { operation: opts.operation });
+    }
+    if (opts.riskLevel) {
+      qb.andWhere('s.riskLevel = :riskLevel', { riskLevel: opts.riskLevel });
+    }
+    const submissions = await qb.getMany();
     const revIds = submissions.map((s) => s.revisionId);
     if (revIds.length === 0) return [];
     const revisions = await this.revisionRepo
       .createQueryBuilder('r')
       .where('r.id IN (:...ids)', { ids: revIds })
+      .andWhere('r.status = :status', { status: 'pending' })
       .getMany();
     const revMap = new Map(revisions.map((r) => [r.id, r]));
     return submissions
       .map((s) => ({ submission: s, revision: revMap.get(s.revisionId)! }))
-      .filter((entry) => entry.revision);
+      .filter((entry) => entry.revision)
+      .filter(
+        (entry) =>
+          !opts.revisionKind || entry.revision.revisionKind === opts.revisionKind,
+      )
+      .slice(0, limit);
   }
 
   async decide(
@@ -81,6 +128,11 @@ export class WikiReviewService {
 
     const isApprove = input.decision === 'approve';
     const finalStatus = isApprove ? 'approved' : 'rejected';
+    const applyWithWikiRuntime =
+      isApprove &&
+      (Boolean(revision.recipeSnapshot) ||
+        revision.revisionKind !== 'content' ||
+        revision.operation !== 'edit');
 
     await this.dataSource.transaction(async (manager) => {
       await manager.update(
@@ -104,17 +156,24 @@ export class WikiReviewService {
         },
       );
 
-      if (isApprove) {
+      if (isApprove && !applyWithWikiRuntime) {
         await manager.update(
           CharacterPageEntity,
           { characterId: revision.characterId },
-          { currentRevisionId: revision.id },
+          {
+            currentRevisionId: revision.id,
+            title: revision.contentSnapshot.name,
+            lifecycleStatus: 'active',
+          },
         );
         await this.edits.applySnapshotToCharacter(
           manager,
           revision.characterId,
           revision.contentSnapshot,
         );
+      }
+
+      if (isApprove) {
         const profile =
           (await manager.findOne(UserWikiProfileEntity, {
             where: { userId: revision.editorUserId },
@@ -130,25 +189,87 @@ export class WikiReviewService {
         await manager.save(profile);
       }
 
-      const reviewerProfile =
-        (await manager.findOne(UserWikiProfileEntity, {
-          where: { userId: reviewer.id },
-        })) ??
-        manager.create(UserWikiProfileEntity, {
-          userId: reviewer.id,
-          editCount: 0,
-          approvedEditCount: 0,
-          revertedCount: 0,
-          patrolledCount: 0,
-        });
-      reviewerProfile.patrolledCount += 1;
-      await manager.save(reviewerProfile);
+      if (isApprove) {
+        const reviewerProfile =
+          (await manager.findOne(UserWikiProfileEntity, {
+            where: { userId: reviewer.id },
+          })) ??
+          manager.create(UserWikiProfileEntity, {
+            userId: reviewer.id,
+            editCount: 0,
+            approvedEditCount: 0,
+            revertedCount: 0,
+            patrolledCount: 0,
+          });
+        reviewerProfile.patrolledCount += 1;
+        await manager.save(reviewerProfile);
+      }
     });
+
+    if (applyWithWikiRuntime) {
+      try {
+        await this.edits.applyApprovedRevision(revision, reviewer.id);
+      } catch (error) {
+        await this.rollbackRuntimeApproval(revision, submission.id, reviewer.id);
+        throw error;
+      }
+    }
 
     if (isApprove) {
       void this.roles.checkPromotion(revision.editorUserId).catch(() => undefined);
     }
     return { status: finalStatus, pageId: revision.characterId };
+  }
+
+  private async rollbackRuntimeApproval(
+    revision: CharacterRevisionEntity,
+    submissionId: string,
+    reviewerId: string,
+  ): Promise<void> {
+    await this.dataSource.transaction(async (manager) => {
+      await manager.update(
+        CharacterRevisionEntity,
+        { id: revision.id },
+        {
+          status: 'pending',
+          isPatrolled: false,
+          patrolledBy: null,
+          patrolledAt: null,
+        },
+      );
+      await manager.update(
+        EditSubmissionEntity,
+        { id: submissionId },
+        {
+          decision: null,
+          reviewerId: null,
+          decidedAt: null,
+          reviewerNote: null,
+        },
+      );
+
+      const authorProfile = await manager.findOne(UserWikiProfileEntity, {
+        where: { userId: revision.editorUserId },
+      });
+      if (authorProfile) {
+        authorProfile.approvedEditCount = Math.max(
+          0,
+          authorProfile.approvedEditCount - 1,
+        );
+        await manager.save(authorProfile);
+      }
+
+      const reviewerProfile = await manager.findOne(UserWikiProfileEntity, {
+        where: { userId: reviewerId },
+      });
+      if (reviewerProfile) {
+        reviewerProfile.patrolledCount = Math.max(
+          0,
+          reviewerProfile.patrolledCount - 1,
+        );
+        await manager.save(reviewerProfile);
+      }
+    });
   }
 
   async markPatrolled(
@@ -200,6 +321,7 @@ export class WikiReviewService {
     if (!input.toRevisionId) {
       throw new BadRequestException('缺少 toRevisionId');
     }
+    await this.assert3RR(characterId, reviewer);
     const target = await this.revisionRepo.findOne({
       where: { id: input.toRevisionId },
     });
@@ -208,6 +330,9 @@ export class WikiReviewService {
     }
     if (target.status !== 'approved') {
       throw new BadRequestException('只能回滚到 approved 版本');
+    }
+    if (target.revisionKind === 'lifecycle') {
+      throw new BadRequestException('生命周期版本请通过删除 / 恢复申请处理，不支持直接回滚');
     }
     const page = await this.pageRepo.findOne({ where: { characterId } });
     if (!page) throw new NotFoundException('词条不存在');
@@ -240,11 +365,15 @@ export class WikiReviewService {
         parentRevisionId: page.currentRevisionId ?? null,
         baseRevisionId: page.currentRevisionId ?? null,
         contentSnapshot: target.contentSnapshot,
+        recipeSnapshot: target.recipeSnapshot ?? null,
         diffFromParent: { changed: ['__revert__'], revertTo: target.version },
         editorUserId: reviewer.id,
         editorRoleAtTime: reviewer.role,
         editSummary: `Revert to v${target.version}: ${input.reason ?? ''}`.slice(0, 500),
         status: 'approved',
+        revisionKind: target.recipeSnapshot ? 'recipe' : 'content',
+        operation: 'revert',
+        riskLevel: target.recipeSnapshot ? 'high' : 'low',
         changeSource: 'revert',
         isMinor: false,
         isPatrolled: true,
@@ -258,14 +387,18 @@ export class WikiReviewService {
         { characterId },
         {
           currentRevisionId: saved.id,
+          title: target.contentSnapshot.name,
+          lifecycleStatus: 'active',
           editCount: page.editCount + 1,
         },
       );
-      await this.edits.applySnapshotToCharacter(
-        manager,
-        characterId,
-        target.contentSnapshot,
-      );
+      if (!target.recipeSnapshot) {
+        await this.edits.applySnapshotToCharacter(
+          manager,
+          characterId,
+          target.contentSnapshot,
+        );
+      }
 
       if (supersededRevs.length > 0) {
         await manager.update(
@@ -312,6 +445,70 @@ export class WikiReviewService {
       return saved;
     });
 
+    if (newRev.recipeSnapshot) {
+      await this.edits.applyApprovedRevision(newRev, reviewer.id);
+    }
+
+    await this.maybeAutoLock(characterId);
+
     return { revisionId: newRev.id, version: newRev.version };
+  }
+
+  /**
+   * Wikipedia 3RR 风格规则：
+   *   (A) 同一 patroller 在 24h 内对同一 character revert > 3 次 → 拒绝。admin 例外。
+   * 与 maybeAutoLock 配套防编辑战。
+   */
+  private async assert3RR(
+    characterId: string,
+    reviewer: AuthenticatedUser,
+  ): Promise<void> {
+    if (rankOf(reviewer.role) >= rankOf('admin')) return;
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const count = await this.revisionRepo.count({
+      where: {
+        characterId,
+        operation: 'revert',
+        editorUserId: reviewer.id,
+        createdAt: MoreThan(cutoff),
+      },
+    });
+    if (count >= 3) {
+      throw new ForbiddenException(
+        '24 小时内已对该词条回退 3 次（3RR）。请改为讨论页协商或申请管理员介入',
+      );
+    }
+  }
+
+  /**
+   * (B) 同一 character 在 24h 内被 revert > 5 次 → 自动 semi 保护 24h。
+   * 已是 semi/full 的页面不重复升级。
+   */
+  private async maybeAutoLock(characterId: string): Promise<void> {
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const count = await this.revisionRepo.count({
+      where: {
+        characterId,
+        operation: 'revert',
+        createdAt: MoreThan(cutoff),
+      },
+    });
+    if (count <= 5) return;
+    const page = await this.pageRepo.findOne({ where: { characterId } });
+    if (!page || page.protectionLevel !== 'none') return;
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    try {
+      await this.protection.setProtection(
+        characterId,
+        this.systemUsers.systemActor() as AuthenticatedUser,
+        {
+          level: 'semi',
+          expiresAt: expiresAt.toISOString(),
+          reason: 'auto_3rr_lock: 24h 内 revert 次数过多，自动半保护 24 小时',
+        },
+      );
+    } catch {
+      // best-effort; never block the revert response on lock failure
+    }
   }
 }

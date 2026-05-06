@@ -2563,7 +2563,7 @@ export class SystemService {
       latestDiagnostics,
     ] =
       await Promise.all([
-        this.userRepo.count(),
+        this.userRepo.count({ where: { userType: 'world_owner' } }),
         this.characterRepo.count(),
         this.narrativeArcRepo.count(),
         this.behaviorLogRepo.count(),

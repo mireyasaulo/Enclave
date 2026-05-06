@@ -12,7 +12,19 @@ export class CharacterPageEntity {
   characterId: string;
 
   @Column({ type: 'text', nullable: true })
+  title?: string | null;
+
+  @Column({ type: 'text', nullable: true })
   currentRevisionId?: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  latestRevisionId?: string | null;
+
+  @Column({ default: 'active' })
+  lifecycleStatus: string; // 'active' | 'pending_create' | 'deleted'
+
+  @Column({ default: 'open' })
+  reviewPolicy: string;
 
   @Column({ default: 'none' })
   protectionLevel: string; // 'none' | 'semi' | 'full'

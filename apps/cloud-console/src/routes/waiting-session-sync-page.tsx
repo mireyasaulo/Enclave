@@ -11,7 +11,6 @@ import {
   showCloudAdminErrorNotice,
 } from "../components/cloud-admin-error-block";
 import { ConsoleConfirmDialog } from "../components/console-confirm-dialog";
-import { RequestsPermalinkLink } from "../components/requests-permalink-link";
 import { useConsoleNotice } from "../components/console-notice";
 import {
   getWaitingSessionSyncActionLinkClassName,
@@ -1165,16 +1164,6 @@ export function WaitingSessionSyncPage() {
                 >
                   Export focus CSV
                 </WaitingSessionSyncActionButton>
-                <RequestsPermalinkLink
-                  search={{
-                    query: focusedTarget.targetValue,
-                  }}
-                  className={getWaitingSessionSyncActionLinkClassName({
-                    tone: "emerald",
-                  })}
-                >
-                  Open requests
-                </RequestsPermalinkLink>
                 <WorldsPermalinkLink
                   search={{
                     query: focusedTarget.targetValue,
@@ -1552,28 +1541,16 @@ export function WaitingSessionSyncPage() {
                             Open world
                           </Link>
                         ) : (
-                          <>
-                            <RequestsPermalinkLink
-                              search={{
-                                query: task.targetValue,
-                              }}
-                              className={getWaitingSessionSyncActionLinkClassName({
-                                tone: "sky",
-                              })}
-                            >
-                              Open requests
-                            </RequestsPermalinkLink>
-                            <WorldsPermalinkLink
-                              search={{
-                                query: task.targetValue,
-                              }}
-                              className={getWaitingSessionSyncActionLinkClassName({
-                                tone: "sky",
-                              })}
-                            >
-                              Open worlds
-                            </WorldsPermalinkLink>
-                          </>
+                          <WorldsPermalinkLink
+                            search={{
+                              query: task.targetValue,
+                            }}
+                            className={getWaitingSessionSyncActionLinkClassName({
+                              tone: "sky",
+                            })}
+                          >
+                            Open worlds
+                          </WorldsPermalinkLink>
                         )}
                       </div>
                     </article>
@@ -1764,30 +1741,17 @@ export function WaitingSessionSyncPage() {
                             Open world
                           </Link>
                         ) : (
-                          <>
-                            <RequestsPermalinkLink
-                              search={{
-                                query: task.targetValue,
-                              }}
-                              className={getWaitingSessionSyncActionLinkClassName({
-                                tone: "neutral",
-                                variant: "chip",
-                              })}
-                            >
-                              Open requests
-                            </RequestsPermalinkLink>
-                            <WorldsPermalinkLink
-                              search={{
-                                query: task.targetValue,
-                              }}
-                              className={getWaitingSessionSyncActionLinkClassName({
-                                tone: "neutral",
-                                variant: "chip",
-                              })}
-                            >
-                              Open worlds
-                            </WorldsPermalinkLink>
-                          </>
+                          <WorldsPermalinkLink
+                            search={{
+                              query: task.targetValue,
+                            }}
+                            className={getWaitingSessionSyncActionLinkClassName({
+                              tone: "neutral",
+                              variant: "chip",
+                            })}
+                          >
+                            Open worlds
+                          </WorldsPermalinkLink>
                         )}
                       </div>
                     </td>

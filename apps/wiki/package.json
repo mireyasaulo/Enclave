@@ -13,6 +13,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.66.8",
     "@tanstack/react-router": "^1.109.2",
+    "@yinjie/i18n": "workspace:*",
     "@yinjie/ui": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

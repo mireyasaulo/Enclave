@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import { getSurfaceTextDictionary } from "@yinjie/i18n";
 import { installCloudAdminApiMock, renderRoute } from "./test-helpers";
 import { resolveCloudAdminApiBaseFromLocation } from "../src/lib/cloud-admin-api";
 
@@ -21,11 +22,6 @@ describe("cloud-console router smoke", () => {
     expect(await screen.findByText("Fleet Dashboard")).toBeTruthy();
     expect(await screen.findByText("Attention Queue")).toBeTruthy();
     expect(await screen.findByText("Ready worlds")).toBeTruthy();
-    expect(
-      (await screen.findByRole("link", { name: "Requests" })).getAttribute(
-        "href",
-      ),
-    ).toBe("/requests");
     expect(
       (await screen.findByRole("link", { name: "Worlds" })).getAttribute(
         "href",
@@ -53,8 +49,21 @@ describe("cloud-console router smoke", () => {
     expect(await screen.findByText("关注队列")).toBeTruthy();
     expect(await screen.findByText("就绪世界")).toBeTruthy();
     expect(
-      (await screen.findByRole("link", { name: "申请" })).getAttribute("href"),
-    ).toBe("/requests");
+      (await screen.findByRole("link", { name: "用户" })).getAttribute("href"),
+    ).toBe("/users");
+    expect(await screen.findByText("账号与到期")).toBeTruthy();
+    expect(
+      (await screen.findByRole("link", { name: "套餐" })).getAttribute("href"),
+    ).toBe("/subscription-plans");
+    expect(await screen.findByText("收益人与账本")).toBeTruthy();
+
+    const zhDictionary = getSurfaceTextDictionary("cloud-console", "zh-CN");
+    expect(zhDictionary.get("No provider allocation data yet.")).toBe(
+      "暂无供应方分配数据。",
+    );
+    expect(
+      zhDictionary.get("No active attention items. The fleet currently looks healthy."),
+    ).toBe("当前没有活跃关注项。舰队状态看起来健康。");
   });
 
   it("pauses cloud queries until the admin secret is saved", async () => {
@@ -128,15 +137,13 @@ describe("cloud-console router smoke", () => {
 
     fireEvent.change(languageSelect, { target: { value: "en-US" } });
     expect(await screen.findByText("Fleet Dashboard")).toBeTruthy();
-    expect(await screen.findByRole("link", { name: "Requests" })).toBeTruthy();
+    expect(await screen.findByRole("link", { name: "Worlds" })).toBeTruthy();
 
     fireEvent.change(languageSelect, { target: { value: "ja-JP" } });
     expect(await screen.findByText("フリートダッシュボード")).toBeTruthy();
-    expect(await screen.findByRole("link", { name: "申請" })).toBeTruthy();
 
     fireEvent.change(languageSelect, { target: { value: "ko-KR" } });
     expect(await screen.findByText("플릿 대시보드")).toBeTruthy();
-    expect(await screen.findByRole("link", { name: "요청" })).toBeTruthy();
   });
 
   it("uses the persisted cloud console locale preference", async () => {
@@ -146,28 +153,11 @@ describe("cloud-console router smoke", () => {
     expect(await screen.findByText("관심 큐")).toBeTruthy();
   });
 
-  it("navigates through compact request and world nav links", async () => {
+  it("navigates through compact world nav links", async () => {
     renderRoute("/");
 
-    fireEvent.click(await screen.findByRole("link", { name: "Requests" }));
-    expect(await screen.findByText("World requests")).toBeTruthy();
-
-    fireEvent.click(screen.getByRole("link", { name: "Worlds" }));
+    fireEvent.click(await screen.findByRole("link", { name: "Worlds" }));
     expect(await screen.findByText("Managed worlds")).toBeTruthy();
-  });
-
-  it("renders the requests route", async () => {
-    renderRoute("/requests");
-
-    expect(await screen.findByText("World requests")).toBeTruthy();
-    expect(await screen.findByText("Mock Request World")).toBeTruthy();
-  });
-
-  it("renders the request detail route", async () => {
-    renderRoute("/requests/request-1");
-
-    expect(await screen.findByText("Request guidance")).toBeTruthy();
-    expect(await screen.findAllByText("Mock Request World")).toBeTruthy();
   });
 
   it("renders the worlds route", async () => {

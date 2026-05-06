@@ -26,6 +26,16 @@ const CharacterPage = lazy(async () => {
   return { default: mod.CharacterPage };
 });
 
+const CharacterDiffPage = lazy(async () => {
+  const mod = await import("./routes/character-diff-page");
+  return { default: mod.CharacterDiffPage };
+});
+
+const CreateCharacterPage = lazy(async () => {
+  const mod = await import("./routes/create-character-page");
+  return { default: mod.CreateCharacterPage };
+});
+
 const PendingReviewsPage = lazy(async () => {
   const mod = await import("./routes/pending-reviews-page");
   return { default: mod.PendingReviewsPage };
@@ -34,6 +44,11 @@ const PendingReviewsPage = lazy(async () => {
 const RecentChangesPage = lazy(async () => {
   const mod = await import("./routes/recent-changes-page");
   return { default: mod.RecentChangesPage };
+});
+
+const AdminLayout = lazy(async () => {
+  const mod = await import("./routes/admin-layout");
+  return { default: mod.AdminLayout };
 });
 
 const AdminUsersPage = lazy(async () => {
@@ -66,6 +81,16 @@ const AdminReportsPage = lazy(async () => {
   return { default: mod.AdminReportsPage };
 });
 
+const AdminAbuseFiltersPage = lazy(async () => {
+  const mod = await import("./routes/admin-abuse-filters-page");
+  return { default: mod.AdminAbuseFiltersPage };
+});
+
+const AdminStatsPage = lazy(async () => {
+  const mod = await import("./routes/admin-stats-page");
+  return { default: mod.AdminStatsPage };
+});
+
 const rootRoute = createRootRoute({ component: RootLayout });
 
 const indexRoute = createRoute({
@@ -92,6 +117,22 @@ const characterRoute = createRoute({
   component: CharacterPage,
 });
 
+const characterDiffRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/character/$characterId/diff",
+  validateSearch: (search: Record<string, unknown>) => ({
+    from: typeof search.from === "string" ? search.from : "",
+    to: typeof search.to === "string" ? search.to : "",
+  }),
+  component: CharacterDiffPage,
+});
+
+const createCharacterRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/create",
+  component: CreateCharacterPage,
+});
+
 const pendingReviewsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/pending-reviews",
@@ -104,20 +145,26 @@ const recentChangesRoute = createRoute({
   component: RecentChangesPage,
 });
 
-const adminUsersRoute = createRoute({
+const adminLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
+  id: "admin",
+  component: AdminLayout,
+});
+
+const adminUsersRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
   path: "/admin/users",
   component: AdminUsersPage,
 });
 
 const adminBlocksRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => adminLayoutRoute,
   path: "/admin/blocks",
   component: AdminBlocksPage,
 });
 
 const adminProtectionRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => adminLayoutRoute,
   path: "/admin/protection",
   component: AdminProtectionPage,
 });
@@ -138,9 +185,21 @@ const searchRoute = createRoute({
 });
 
 const adminReportsRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => adminLayoutRoute,
   path: "/admin/reports",
   component: AdminReportsPage,
+});
+
+const adminAbuseFiltersRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/admin/abuse-filters",
+  component: AdminAbuseFiltersPage,
+});
+
+const adminStatsRoute = createRoute({
+  getParentRoute: () => adminLayoutRoute,
+  path: "/admin/wiki-stats",
+  component: AdminStatsPage,
 });
 
 const routeTree = rootRoute.addChildren([
@@ -148,12 +207,18 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   registerRoute,
   characterRoute,
+  characterDiffRoute,
+  createCharacterRoute,
   pendingReviewsRoute,
   recentChangesRoute,
-  adminUsersRoute,
-  adminBlocksRoute,
-  adminProtectionRoute,
-  adminReportsRoute,
+  adminLayoutRoute.addChildren([
+    adminUsersRoute,
+    adminBlocksRoute,
+    adminProtectionRoute,
+    adminReportsRoute,
+    adminAbuseFiltersRoute,
+    adminStatsRoute,
+  ]),
   watchlistRoute,
   searchRoute,
 ]);

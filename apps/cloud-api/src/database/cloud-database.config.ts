@@ -9,6 +9,12 @@ import { CloudWorldEntity } from "../entities/cloud-world.entity";
 import { InviteCodeEntity } from "../entities/invite-code.entity";
 import { InviteRedemptionEntity } from "../entities/invite-redemption.entity";
 import { PhoneVerificationSessionEntity } from "../entities/phone-verification-session.entity";
+import { RevenueAllocationLedgerEntity } from "../entities/revenue-allocation-ledger.entity";
+import { RevenueContributionEventEntity } from "../entities/revenue-contribution-event.entity";
+import { RevenuePayeeEntity } from "../entities/revenue-payee.entity";
+import { RevenueSettlementBatchEntity } from "../entities/revenue-settlement-batch.entity";
+import { RevenueSharingPolicyEntity } from "../entities/revenue-sharing-policy.entity";
+import { RevenueUsageEventEntity } from "../entities/revenue-usage-event.entity";
 import { SubscriptionPlanEntity } from "../entities/subscription-plan.entity";
 import { UserSubscriptionEntity } from "../entities/user-subscription.entity";
 import { WaitingSessionSyncTaskEntity } from "../entities/waiting-session-sync-task.entity";
@@ -24,6 +30,7 @@ import { AddActiveWorldLifecycleJobUniqueIndex1776650400000 } from "./migrations
 import { CreateCloudUserAndSubscriptionTables1776651000000 } from "./migrations/1776651000000-create-cloud-user-and-subscription-tables";
 import { CreateInviteAndConfigTables1776651600000 } from "./migrations/1776651600000-create-invite-and-config-tables";
 import { SeedDefaultSubscriptionPlansAndConfigs1776652200000 } from "./migrations/1776652200000-seed-default-subscription-plans-and-configs";
+import { CreateRevenueSharingTables1776652800000 } from "./migrations/1776652800000-create-revenue-sharing-tables";
 import { resolveCloudDatabasePath } from "../config/cloud-runtime-config";
 
 type ConfigReader = {
@@ -45,6 +52,12 @@ export const cloudEntities = [
   InviteCodeEntity,
   InviteRedemptionEntity,
   CloudConfigEntity,
+  RevenueSharingPolicyEntity,
+  RevenuePayeeEntity,
+  RevenueContributionEventEntity,
+  RevenueUsageEventEntity,
+  RevenueAllocationLedgerEntity,
+  RevenueSettlementBatchEntity,
 ] as const;
 
 export const cloudMigrations = [
@@ -58,6 +71,7 @@ export const cloudMigrations = [
   CreateCloudUserAndSubscriptionTables1776651000000,
   CreateInviteAndConfigTables1776651600000,
   SeedDefaultSubscriptionPlansAndConfigs1776652200000,
+  CreateRevenueSharingTables1776652800000,
 ];
 
 export function buildCloudDataSourceOptions(config: ConfigReader): DataSourceOptions {

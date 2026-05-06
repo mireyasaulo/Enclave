@@ -18,6 +18,7 @@
 | **管理后台**       | React + Vite + `@yinjie/ui`（`apps/admin/`）                                 | 5181 |
 | **云世界管理平台** | React + Vite（`apps/cloud-console/`）                                        | 5182 |
 | 官网               | React + Vite，公开项目介绍、多语言官网与在线体验入口（`apps/site/`）        | 5183 |
+| **世界角色管理平台** | React + Vite，维基式角色创建、编辑、审核与巡查平台（`apps/wiki/`）        | 5184 |
 | 微信同步本地连接器 | Node.js loopback HTTP 适配层（`apps/wechat-connector/`）                    | 17364 |
 | 桌面端壳           | Tauri 远程客户端壳（`apps/desktop/`）                                        | -    |
 | Android 壳         | Capacitor 壳（`apps/android-shell/`）                                        | -    |
@@ -25,7 +26,7 @@
 
 ## 后端模块（`api/src/modules/`）
 
-`action-runtime` · `admin` · `ai` · `analytics` · `auth` · `characters` · `chat` · `cloud-runtime` · `config` · `cyber-avatar` · `events` · `feed` · `followup-runtime` · `games` · `inference` · `moderation` · `moments` · `narrative` · `need-discovery` · `official-accounts` · `real-world-sync` · `reminder-runtime` · `scheduler` · `self-agent` · `social` · `subscription` · `system` · `world`
+`action-runtime` · `admin` · `ai` · `analytics` · `auth` · `characters` · `chat` · `cloud-runtime` · `config` · `cyber-avatar` · `events` · `feed` · `followup-runtime` · `games` · `inference` · `moderation` · `moments` · `narrative` · `need-discovery` · `official-accounts` · `real-world-sync` · `reminder-runtime` · `scheduler` · `self-agent` · `social` · `subscription` · `system` · `wiki` · `world`
 
 ## 主 App 结构（`apps/app/src/`）
 
@@ -35,24 +36,26 @@
 
 `routes/` · `site-shell.tsx` · `site-content.ts` · `site-links.ts` · `use-site-copy.ts`
 
-## Wiki 百科结构（`apps/wiki/src/`）
+## 世界角色管理平台结构（`apps/wiki/src/`）
 
 `routes/` · `components/` · `lib/`
 
-## Wiki 百科页面（`apps/wiki/src/routes/`）
+## 世界角色管理平台页面（`apps/wiki/src/routes/`）
 
-- `home-page.tsx`：角色百科首页，承载词条索引与基础浏览入口
-- `character-page.tsx`：角色词条页，承载阅读、编辑、历史、讨论与编辑冲突处理
-- `recent-changes-page.tsx`：最近修改页，集中查看百科编辑动态
-- `search-page.tsx`：百科搜索结果页，由顶栏搜索框进入
+- `home-page.tsx`：世界角色管理平台首页，承载角色索引、生命周期状态与创建入口
+- `create-character-page.tsx`：角色创建页，普通登录用户提交新角色创建请求，内置完整角色逻辑 recipe 可视化编辑，高级模式可用 JSON 覆盖，审核通过后写入运行时角色注册表
+- `character-page.tsx`：角色词条页，承载稳定版 / 最新版阅读、内容编辑、角色逻辑 recipe 编辑、历史、讨论、生命周期申请与编辑冲突处理
+- `character-diff-page.tsx`：角色版本独立对比页，由历史页进入，集中展示内容字段与角色逻辑快照差异
+- `recent-changes-page.tsx`：最近修改页，集中查看角色内容 / 逻辑 / 生命周期编辑动态
+- `search-page.tsx`：角色词条搜索结果页，由顶栏搜索框进入
 - `watchlist-page.tsx`：观察列表页，登录用户查看关注词条与讨论动态
-- `pending-reviews-page.tsx`：待审编辑页，巡查员处理待审核修改
-- `admin-users-page.tsx`：百科用户管理页
-- `admin-blocks-page.tsx`：百科封禁管理页
-- `admin-protection-page.tsx`：百科保护管理页
-- `admin-reports-page.tsx`：百科举报队列页，管理员处理词条 / 讨论 / 修订举报
-- `login-page.tsx`：百科登录页
-- `register-page.tsx`：百科注册页
+- `pending-reviews-page.tsx`：待审编辑页，巡查员按操作、风险和修订类型筛选并处理待审核修改
+- `admin-users-page.tsx`：平台用户管理页
+- `admin-blocks-page.tsx`：平台封禁管理页
+- `admin-protection-page.tsx`：平台保护管理页，管理员维护页面保护级别、待审变更策略、到期时间与保护日志
+- `admin-reports-page.tsx`：平台举报队列页，管理员处理词条 / 讨论 / 修订举报
+- `login-page.tsx`：平台登录页
+- `register-page.tsx`：平台注册页
 
 ## 主 App 页面（`apps/app/src/routes/`）
 
@@ -123,7 +126,7 @@
 - `friend-moments-page.tsx`：桌面端好友朋友圈独立页，当前由 `desktop/friend-moments/$characterId` 承载，从通讯录 / 资料页 / 聊天信息等入口进入单个好友的朋友圈时间线
 - `chat-room-page` · `group-chat-page` · `character-detail-page` · `friend-requests-page` · `create-group-page`
 
-## 数据库实体（58个，物理表保持兼容）
+## 数据库实体（含 Wiki 实体，物理表保持兼容）
 
 **核心**：User（运行时语义为单例 World Owner） · Character · Conversation · Message · SystemConfig
 
@@ -165,6 +168,8 @@
 
 **后台**：AdminConversationReview
 
+**世界角色管理平台 / Wiki**：CharacterPage（稳定版本 `currentRevisionId` / 最新提交 `latestRevisionId` / `reviewPolicy`） · CharacterRevision · EditSubmission · UserWikiProfile · WikiBlock · WikiProtectionLog · WikiTalkThread · WikiTalkPost · WikiWatchlist
+
 ## 单用户世界约束（2026-04-08）
 
 - `1 个服务端实例 = 1 个真实用户的世界`
@@ -179,6 +184,8 @@
   - `PATCH /api/world/owner/chat-background`
   - `DELETE /api/world/owner/chat-background`
 - `/system/status` 使用 `worldSurface` 语义，实例状态以 `ownerCount` 表示单世界主人数量
+- `ownerCount` 只统计 `User.userType = world_owner`，不包含世界角色管理平台的 wiki 用户
+- 世界角色管理平台若尚无任何 `role = admin` 用户，首个通过 `/api/auth/register` 注册的 `wiki_member` 会自动成为 wiki admin，用于启动审核、保护、封禁与角色晋升流程
 
 ## 云世界平台实体（`apps/cloud-api/src/entities/`）
 
@@ -194,6 +201,12 @@
 - `WorldAccessSession`：云世界解析 / 唤醒会话
 - `CloudAdminSession`：云平台管理员短期会话
 - `CloudInstance` · `WorldLifecycleJob` · `WaitingSessionSyncTask`：实例编排、生命周期任务与补偿任务
+- `RevenueSharingPolicy`：角色使用收益分成策略版本，承载事件单价、固定池比例、贡献权重与结算阈值
+- `RevenuePayee`：云端收益人档案，绑定世界主人、wiki 用户、角色、平台或运行方外部引用
+- `RevenueContributionEvent`：世界实例回传的角色创建、编辑、审核、巡查与逻辑发布贡献事件
+- `RevenueUsageEvent`：世界实例回传的角色聊天、语音、视频、内容与逻辑运行使用收入事件
+- `RevenueAllocationLedger`：按策略计算出的收益分配账本，区分 payable / held / settled
+- `RevenueSettlementBatch`：云后台生成的收益结算批次，仅记录应付账本，不执行真实打款
 
 ## 云世界平台职责（当前真实口径）
 
@@ -207,9 +220,11 @@
   - 云世界申请单管理
   - 云世界记录与地址回填
   - 官方控制台审核与状态流转
+  - 角色使用收益分成策略、收益人档案、贡献事件、使用事件、分配账本与结算批次管理
 - 云平台当前**不负责**：
-  - 微信 / 支付宝等正式支付网关与订单中心
   - 托管单个实例内的多用户管理
+  - 微信 / 支付宝等正式支付网关与订单中心
+  - 真实支付、提现、税务、发票或 KYC
 
 ## 云世界平台 SaaS 路由
 
@@ -235,6 +250,19 @@
   - `POST /admin/cloud/invites/redemptions/:id/reject`
 - 迁移脚本：
   - `pnpm --filter @yinjie/cloud-api saas:backfill`：从 `CloudWorld.phone` 回填 SaaS 用户、邀请码与一次性迁移订阅
+
+## 云世界管理平台收益分成路由
+
+- `GET /admin/cloud/revenue-sharing/policy`
+- `PATCH /admin/cloud/revenue-sharing/policy`
+- `GET /admin/cloud/revenue-sharing/payees`
+- `POST /admin/cloud/revenue-sharing/payees`
+- `GET /admin/cloud/revenue-sharing/events`
+- `GET /admin/cloud/revenue-sharing/ledger`
+- `POST /admin/cloud/revenue-sharing/settlements/preview`
+- `POST /admin/cloud/revenue-sharing/settlements/generate`
+- `POST /internal/worlds/:worldId/revenue/contribution-events`
+- `POST /internal/worlds/:worldId/revenue/usage-events`
 
 ## 会话管理结构（2026-04-08）
 
@@ -337,13 +365,43 @@
   - `GET /api/moderation/reports`
   - `POST /api/moderation/reports`
   - `PATCH /api/moderation/reports/:id/status`
-- Wiki 百科路由：
+- 世界角色管理平台 / Wiki 路由：
   - `GET /api/wiki/recent-changes`
   - `GET /api/wiki/search`
-  - `GET /api/wiki/pages/:id`
+  - `GET /api/wiki/pages`
+  - `POST /api/wiki/pages`
+  - `GET /api/wiki/pages/:id`，支持 `view=stable|current`，游客默认稳定版，登录用户可查看最新版 / 待审上下文
   - `GET /api/wiki/pages/:id/history`
+  - `GET /api/wiki/pages/:id/pending`
+  - `GET /api/wiki/pages/:id/diff`
   - `GET /api/wiki/pages/:id/revisions/:revisionId`
   - `POST /api/wiki/pages/:id/edits`
+  - `POST /api/wiki/pages/:id/delete-request`，提交软删除归档申请，body 需携带 `reason`
+  - `POST /api/wiki/pages/:id/restore-request`，提交恢复申请，body 需携带 `reason`
+  - `POST /api/wiki/pages/:id/delete`，管理员直接提交并自动通过软删除归档修订
+  - `POST /api/wiki/pages/:id/restore`，管理员直接提交并自动通过恢复修订
+  - `POST /api/wiki/pages/:id/revert`
+  - `PATCH /api/wiki/pages/:id/protection`，支持 `level`、`reviewPolicy`、`expiresAt` 与 `reason`
+  - `GET /api/wiki/pages/:id/protection-log`
+  - `GET /api/wiki/pending-reviews`，支持 `operation`、`riskLevel`、`revisionKind` 与 `limit` 筛选
+  - `POST /api/wiki/edits/:revisionId/review`
+  - `POST /api/wiki/edits/:revisionId/patrol`
+  - `GET /api/wiki/users`
+  - `POST /api/wiki/users/:id/role`
+  - `GET /api/wiki/blocks`
+  - `POST /api/wiki/users/:id/block`
+  - `DELETE /api/wiki/blocks/:blockId`
+  - `GET /api/wiki/watchlist`
+  - `GET /api/wiki/watchlist/feed`
+  - `GET /api/wiki/watchlist/status/:characterId`
+  - `POST /api/wiki/watchlist/:characterId`
+  - `DELETE /api/wiki/watchlist/:characterId`
+  - `GET /api/wiki/talk/:characterId/threads`
+  - `POST /api/wiki/talk/:characterId/threads`
+  - `GET /api/wiki/talk/threads/:threadId/posts`
+  - `POST /api/wiki/talk/threads/:threadId/posts`
+  - `PATCH /api/wiki/talk/threads/:threadId/flags`
+  - `DELETE /api/wiki/talk/posts/:postId`
   - `POST /api/wiki/reports`
   - `GET /api/wiki/reports`
   - `PATCH /api/wiki/reports/:id/status`
@@ -659,6 +717,7 @@
 - 官方云世界创建流程为客户端提交申请、官方平台人工开通、再回填世界地址
 - 管理后台仅用于实例运维，不承载实例内用户管理
 - 实例现已支持多个 Provider 账户与多个模型目录项；默认路由继续兼容旧版 `system/provider`，角色可切换为继承默认或角色专属模型路由
+- 云世界管理平台现包含 `Revenue Sharing` 页面，用于配置角色使用事件单价、固定收益池、贡献权重、收益人、事件流、分配账本与结算批次
 
 ## 部署
 

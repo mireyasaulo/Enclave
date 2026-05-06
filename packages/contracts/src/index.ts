@@ -29,6 +29,7 @@ export * from "./reminders";
 export * from "./reply-logic";
 export * from "./real-world-sync";
 export * from "./reminder-runtime";
+export * from "./revenue-sharing";
 export * from "./self-agent";
 export * from "./social";
 export * from "./shake-discovery";

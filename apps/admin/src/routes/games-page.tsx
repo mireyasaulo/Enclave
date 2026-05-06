@@ -602,7 +602,7 @@ export function GamesPage() {
             <Card className="bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(247,250,250,0.96))]">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <div className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+                  <div className="text-[12px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                     Queue View
                   </div>
                   <div className="mt-2 text-xl font-semibold text-[color:var(--text-primary)]">
@@ -755,7 +755,7 @@ export function GamesPage() {
             <Card className="bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(255,248,240,0.94),rgba(239,250,245,0.92))]">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
-                  <div className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+                  <div className="text-[12px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                     Active Workspace
                   </div>
                   <div className="mt-2 flex flex-wrap items-center gap-2">

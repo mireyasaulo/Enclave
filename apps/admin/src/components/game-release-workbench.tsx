@@ -248,7 +248,7 @@ export function GameReleaseWorkbench({
       ) : (
         <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
           <Card className="bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(248,252,249,0.98))]">
-            <div className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+            <div className="text-[12px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
               Release Flow
             </div>
             <div className="mt-2 text-xl font-semibold text-[color:var(--text-primary)]">
@@ -336,7 +336,7 @@ export function GameReleaseWorkbench({
           <Card className="bg-[color:var(--surface-console)]">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <div className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+                <div className="text-[12px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                   Revision Timeline
                 </div>
                 <div className="mt-2 text-xl font-semibold text-[color:var(--text-primary)]">
@@ -372,7 +372,7 @@ export function GameReleaseWorkbench({
               <Card className="mt-5 border border-[color:var(--border-faint)] bg-white">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                   <div>
-                    <div className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+                    <div className="text-[12px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                       Snapshot Diff
                     </div>
                     <div className="mt-2 text-lg font-semibold text-[color:var(--text-primary)]">

@@ -46,6 +46,8 @@ export class AuthService {
     if (exists) throw new ConflictException('用户名已被占用');
 
     const passwordHash = await bcrypt.hash(password, 10);
+    const adminCount = await this.userRepo.count({ where: { role: 'admin' } });
+    const bootstrapAsAdmin = adminCount === 0;
     const user = this.userRepo.create({
       username: trimmed,
       passwordHash,
@@ -56,7 +58,9 @@ export class AuthService {
       customApiBase: null,
       defaultChatBackgroundPayload: null,
       userType: 'wiki_member',
-      role: 'newcomer',
+      role: bootstrapAsAdmin ? 'admin' : 'newcomer',
+      roleGrantedAt: bootstrapAsAdmin ? new Date() : null,
+      roleGrantedBy: bootstrapAsAdmin ? 'first_wiki_member_bootstrap' : null,
     });
     const saved = await this.userRepo.save(user);
     return this.buildSession(saved);

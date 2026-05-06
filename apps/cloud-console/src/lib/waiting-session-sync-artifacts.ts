@@ -1,9 +1,5 @@
 import type { CloudWaitingSessionSyncTaskSummary } from "@yinjie/contracts";
 import {
-  buildRequestsPermalink,
-  buildRequestsRouteSearch,
-} from "./request-route-search";
-import {
   buildCompactWaitingSessionSyncRouteSearch,
   buildWaitingSessionSyncRouteSearch,
   type WaitingSessionSyncRouteSearch,
@@ -39,8 +35,6 @@ export type WaitingSessionSyncArtifactPagination = {
 };
 
 export type WaitingSessionSyncSnapshotLookup = {
-  requestsRoute: ReturnType<typeof buildRequestsRouteSearch>;
-  requestsPath: string;
   worldsRoute: ReturnType<typeof buildWorldsRouteSearch>;
   worldsPath: string;
   worldDetailPath?: string;
@@ -151,16 +145,11 @@ export function summarizeWaitingSessionSyncTasks(
 export function buildWaitingSessionSyncSnapshotLookup(
   task: Pick<CloudWaitingSessionSyncTaskSummary, "targetValue" | "taskType">,
 ): WaitingSessionSyncSnapshotLookup {
-  const requestsRoute = buildRequestsRouteSearch({
-    query: task.targetValue,
-  });
   const worldsRoute = buildWorldsRouteSearch({
     query: task.targetValue,
   });
 
   return {
-    requestsRoute,
-    requestsPath: buildRequestsPermalink(requestsRoute),
     worldsRoute,
     worldsPath: buildWorldsPermalink(worldsRoute),
     worldDetailPath:
@@ -288,7 +277,6 @@ export function buildWaitingSessionSyncTasksCsv(
     "finishedAt",
     "lastError",
     "leaseOwner",
-    "requestsPath",
     "worldsPath",
     "worldDetailPath",
   ], locale);
@@ -308,7 +296,6 @@ export function buildWaitingSessionSyncTasksCsv(
       task.finishedAt ?? "",
       task.lastError ?? "",
       task.leaseOwner ?? "",
-      lookup.requestsPath,
       lookup.worldsPath,
       lookup.worldDetailPath ?? "",
     ];

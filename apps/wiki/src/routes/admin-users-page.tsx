@@ -1,8 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Card, ErrorBlock, LoadingBlock, StatusPill } from "@yinjie/ui";
-import { hasRole, roleLabel } from "../lib/auth-store";
+import {
+  ErrorBlock,
+  InlineNotice,
+  LoadingBlock,
+  StatusPill,
+} from "@yinjie/ui";
+import { roleLabel } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
-import { wikiApi, type WikiUserRow } from "../lib/wiki-api";
+import { wikiApi } from "../lib/wiki-api";
+import { PageShell } from "../components/page-shell";
 
 type WikiRole = "newcomer" | "autoconfirmed" | "patroller" | "admin";
 
@@ -19,7 +25,6 @@ export function AdminUsersPage() {
   const usersQ = useQuery({
     queryKey: ["wiki", "users"],
     queryFn: () => wikiApi.listUsers(),
-    enabled: hasRole(user, "admin"),
   });
   const setRoleMut = useMutation({
     mutationFn: (input: {
@@ -30,83 +35,92 @@ export function AdminUsersPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["wiki", "users"] }),
   });
 
-  if (!hasRole(user, "admin")) {
-    return (
-      <Card className="p-6">
-        <p>仅管理员可访问。</p>
-      </Card>
-    );
-  }
-  if (usersQ.isLoading) return <LoadingBlock />;
-  if (usersQ.isError)
-    return <ErrorBlock message={(usersQ.error as Error).message} />;
-
   return (
-    <div className="space-y-3">
-      <h1 className="text-xl font-semibold">用户与角色（{usersQ.data?.length ?? 0}）</h1>
-      <Card className="p-0 overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="text-left text-xs text-[var(--text-muted)] border-b border-[var(--border-subtle)]">
-            <tr>
-              <th className="py-2 px-3">用户</th>
-              <th className="py-2 px-3">类型</th>
-              <th className="py-2 px-3">注册</th>
-              <th className="py-2 px-3">角色</th>
-              <th className="py-2 px-3">编辑/通过/被回滚/巡查</th>
-              <th className="py-2 px-3">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            {usersQ.data?.map((u) => (
-              <tr key={u.id} className="border-b border-[var(--border-subtle)]">
-                <td className="py-2 px-3 font-medium">{u.username}</td>
-                <td className="py-2 px-3 text-xs">
-                  {u.userType === "world_owner" ? (
-                    <StatusPill>世界主</StatusPill>
-                  ) : (
-                    "wiki 成员"
-                  )}
-                </td>
-                <td className="py-2 px-3 text-xs text-[var(--text-muted)]">
-                  {new Date(u.createdAt).toLocaleDateString()}
-                </td>
-                <td className="py-2 px-3">
-                  <StatusPill>{roleLabel(u.role)}</StatusPill>
-                </td>
-                <td className="py-2 px-3 text-xs text-[var(--text-muted)]">
-                  {u.profile
-                    ? `${u.profile.editCount}/${u.profile.approvedEditCount}/${u.profile.revertedCount}/${u.profile.patrolledCount}`
-                    : "—"}
-                </td>
-                <td className="py-2 px-3">
-                  <select
-                    className="text-sm border rounded px-2 py-1 bg-white"
-                    value={u.role}
-                    disabled={
-                      u.id === user?.id || setRoleMut.isPending
-                    }
-                    onChange={(e) =>
-                      setRoleMut.mutate({
-                        userId: u.id,
-                        role: e.target.value as WikiRole,
-                      })
-                    }
-                  >
-                    {ROLE_OPTIONS.map((r) => (
-                      <option key={r} value={r}>
-                        {roleLabel(r)}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
-      {setRoleMut.isError && (
-        <ErrorBlock message={(setRoleMut.error as Error).message} />
+    <PageShell
+      eyebrow="管理"
+      title={`用户与权限${
+        usersQ.data ? `（${usersQ.data.length}）` : ""
+      }`}
+      description="设置用户的 wiki 角色：新人 / 自动确认 / 巡查员 / 管理员。无法修改自己的角色。"
+    >
+      {usersQ.isLoading && <LoadingBlock />}
+      {usersQ.isError && (
+        <ErrorBlock message={(usersQ.error as Error).message} />
       )}
-    </div>
+      {setRoleMut.isError && (
+        <InlineNotice tone="danger">
+          {(setRoleMut.error as Error).message}
+        </InlineNotice>
+      )}
+      {usersQ.data && (
+        <div className="overflow-hidden rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] shadow-[var(--shadow-soft)]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-[color:var(--surface-card-hover)] text-left text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                <tr>
+                  <th className="px-4 py-3 font-medium">用户</th>
+                  <th className="px-4 py-3 font-medium">类型</th>
+                  <th className="px-4 py-3 font-medium">注册</th>
+                  <th className="px-4 py-3 font-medium">角色</th>
+                  <th className="px-4 py-3 font-medium">编辑/通过/被回滚/巡查</th>
+                  <th className="px-4 py-3 font-medium">设置角色</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[color:var(--border-faint)]">
+                {usersQ.data.map((u) => (
+                  <tr
+                    key={u.id}
+                    className="transition-colors hover:bg-[color:var(--surface-card-hover)]"
+                  >
+                    <td className="px-4 py-3 font-medium text-[color:var(--text-primary)]">
+                      {u.username}
+                    </td>
+                    <td className="px-4 py-3 text-xs">
+                      {u.userType === "world_owner" ? (
+                        <StatusPill>世界主</StatusPill>
+                      ) : (
+                        <span className="text-[color:var(--text-muted)]">
+                          wiki 成员
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-[color:var(--text-muted)]">
+                      {new Date(u.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3">
+                      <StatusPill>{roleLabel(u.role)}</StatusPill>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-[color:var(--text-muted)]">
+                      {u.profile
+                        ? `${u.profile.editCount} / ${u.profile.approvedEditCount} / ${u.profile.revertedCount} / ${u.profile.patrolledCount}`
+                        : "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <select
+                        className="rounded-full border border-[color:var(--border-subtle)] bg-white px-3 py-1.5 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none disabled:opacity-50"
+                        value={u.role}
+                        disabled={u.id === user?.id || setRoleMut.isPending}
+                        onChange={(e) =>
+                          setRoleMut.mutate({
+                            userId: u.id,
+                            role: e.target.value as WikiRole,
+                          })
+                        }
+                      >
+                        {ROLE_OPTIONS.map((r) => (
+                          <option key={r} value={r}>
+                            {roleLabel(r)}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </PageShell>
   );
 }

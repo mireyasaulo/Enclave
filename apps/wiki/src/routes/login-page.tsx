@@ -1,8 +1,15 @@
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { Button, Card, ErrorBlock, TextField } from "@yinjie/ui";
+import { Link, useNavigate } from "@tanstack/react-router";
+import {
+  AppSection,
+  Button,
+  InlineNotice,
+  TextField,
+} from "@yinjie/ui";
 import { setSession } from "../lib/auth-store";
 import { wikiApi } from "../lib/wiki-api";
+import { PageShell } from "../components/page-shell";
+import { FormRow } from "../components/form-row";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -27,31 +34,45 @@ export function LoginPage() {
   }
 
   return (
-    <Card className="max-w-md mx-auto p-6">
-      <h1 className="text-xl font-semibold mb-4">登录</h1>
-      <form onSubmit={submit} className="space-y-3">
-        <label className="block">
-          <span className="text-sm mb-1 block">用户名</span>
-          <TextField
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-        </label>
-        <label className="block">
-          <span className="text-sm mb-1 block">密码</span>
-          <TextField
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
-        {error && <ErrorBlock message={error} />}
-        <Button type="submit" variant="primary" disabled={loading}>
-          {loading ? "登录中..." : "登录"}
-        </Button>
-      </form>
-    </Card>
+    <PageShell narrow eyebrow="账号" title="登录">
+      <AppSection>
+        <form onSubmit={submit} className="space-y-4">
+          <FormRow label="用户名">
+            <TextField
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              autoFocus
+            />
+          </FormRow>
+          <FormRow label="密码">
+            <TextField
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </FormRow>
+          {error && <InlineNotice tone="danger">{error}</InlineNotice>}
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={loading}
+            className="w-full"
+          >
+            {loading ? "登录中..." : "登录"}
+          </Button>
+        </form>
+        <div className="mt-4 text-center text-sm text-[color:var(--text-muted)]">
+          还没有账号？
+          <Link
+            to="/register"
+            className="ml-1 font-medium text-[color:var(--brand-primary)] hover:underline"
+          >
+            创建一个
+          </Link>
+        </div>
+      </AppSection>
+    </PageShell>
   );
 }

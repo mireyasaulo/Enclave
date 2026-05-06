@@ -1,8 +1,15 @@
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { Button, Card, ErrorBlock, TextField } from "@yinjie/ui";
+import { Link, useNavigate } from "@tanstack/react-router";
+import {
+  AppSection,
+  Button,
+  InlineNotice,
+  TextField,
+} from "@yinjie/ui";
 import { setSession } from "../lib/auth-store";
 import { wikiApi } from "../lib/wiki-api";
+import { PageShell } from "../components/page-shell";
+import { FormRow } from "../components/form-row";
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -27,37 +34,52 @@ export function RegisterPage() {
   }
 
   return (
-    <Card className="max-w-md mx-auto p-6">
-      <h1 className="text-xl font-semibold mb-4">注册</h1>
-      <p className="text-sm text-[var(--text-muted)] mb-3">
-        新账号默认为<strong className="mx-1">新人</strong>
-        ，提交的编辑需经巡查员审核后生效。
-      </p>
-      <form onSubmit={submit} className="space-y-3">
-        <label className="block">
-          <span className="text-sm mb-1 block">用户名</span>
-          <TextField
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            minLength={2}
-          />
-        </label>
-        <label className="block">
-          <span className="text-sm mb-1 block">密码</span>
-          <TextField
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-          />
-        </label>
-        {error && <ErrorBlock message={error} />}
-        <Button type="submit" variant="primary" disabled={loading}>
-          {loading ? "注册中..." : "注册"}
-        </Button>
-      </form>
-    </Card>
+    <PageShell
+      narrow
+      eyebrow="账号"
+      title="注册"
+      description="新账号默认为「新人」。提交的编辑需经巡查员审核后生效；累积达标后会自动晋升为「自动确认」。"
+    >
+      <AppSection>
+        <form onSubmit={submit} className="space-y-4">
+          <FormRow label="用户名" hint="≥ 2 字">
+            <TextField
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              minLength={2}
+              autoFocus
+            />
+          </FormRow>
+          <FormRow label="密码" hint="≥ 6 位">
+            <TextField
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+            />
+          </FormRow>
+          {error && <InlineNotice tone="danger">{error}</InlineNotice>}
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={loading}
+            className="w-full"
+          >
+            {loading ? "注册中..." : "注册"}
+          </Button>
+        </form>
+        <div className="mt-4 text-center text-sm text-[color:var(--text-muted)]">
+          已有账号？
+          <Link
+            to="/login"
+            className="ml-1 font-medium text-[color:var(--brand-primary)] hover:underline"
+          >
+            登录
+          </Link>
+        </div>
+      </AppSection>
+    </PageShell>
   );
 }

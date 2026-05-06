@@ -17,6 +17,7 @@ import { CloudRuntimeConfigValidator } from "./config/cloud-runtime-config.valid
 import { resolveCloudAuthTokenTtl, resolveCloudJwtSecret } from "./config/cloud-runtime-config";
 import { buildCloudTypeOrmOptions, cloudEntities } from "./database/cloud-database.config";
 import { InviteModule } from "./invite/invite.module";
+import { LocalProcessComputeProviderService } from "./orchestration/local-process-compute-provider.service";
 import { MockComputeProviderService } from "./orchestration/mock-compute-provider.service";
 import { WorldLifecycleWorkerService } from "./orchestration/world-lifecycle-worker.service";
 import { ComputeProviderRegistryService } from "./providers/compute-provider-registry.service";
@@ -24,6 +25,7 @@ import { ManualDockerComputeProviderService } from "./providers/manual-docker-co
 import { ManualDockerRemoteExecutorService } from "./providers/manual-docker-remote-executor.service";
 import { WorldRuntimeController } from "./runtime-callbacks/world-runtime.controller";
 import { WorldRuntimeService } from "./runtime-callbacks/world-runtime.service";
+import { RevenueSharingModule } from "./revenue-sharing/revenue-sharing.module";
 import { SubscriptionModule } from "./subscription/subscription.module";
 import { UsersModule } from "./users/users.module";
 import { WorldAccessController } from "./world-access/world-access.controller";
@@ -53,6 +55,7 @@ import { WaitingSessionSyncService } from "./world-access/waiting-session-sync.s
     SubscriptionModule,
     InviteModule,
     UsersModule,
+    RevenueSharingModule,
   ],
   controllers: [
     AdminAuthController,
@@ -72,6 +75,7 @@ import { WaitingSessionSyncService } from "./world-access/waiting-session-sync.s
     MockComputeProviderService,
     ManualDockerComputeProviderService,
     ManualDockerRemoteExecutorService,
+    LocalProcessComputeProviderService,
     ComputeProviderRegistryService,
     CloudRuntimeConfigValidator,
     WorldLifecycleWorkerService,

@@ -322,7 +322,7 @@ function GameIdHints({ games }: { games: AdminGameCatalogItem[] }) {
 
   return (
     <Card className="bg-[linear-gradient(180deg,rgba(252,252,249,0.98),rgba(255,255,255,0.98))]">
-      <div className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+      <div className="text-[12px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
         Catalog Index
       </div>
       <div className="mt-2 text-base font-semibold text-[color:var(--text-primary)]">
@@ -354,7 +354,7 @@ function SectionHeader({
   return (
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div>
-        <div className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+        <div className="text-[12px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
           {title}
         </div>
         <div className="mt-2 text-lg font-semibold text-[color:var(--text-primary)]">
