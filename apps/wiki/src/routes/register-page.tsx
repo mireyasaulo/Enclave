@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Button, Card, ErrorBlock, TextField } from "@yinjie/ui";
 import { setSession } from "../lib/auth-store";
 import { wikiApi } from "../lib/wiki-api";
@@ -58,6 +58,15 @@ export function RegisterPage() {
           {loading ? "注册中..." : "注册"}
         </Button>
       </form>
+      <div className="mt-4 text-sm text-[var(--text-muted)]">
+        已有账号？
+        <Link
+          to="/login"
+          className="ml-1 text-[var(--accent)] hover:underline"
+        >
+          登录
+        </Link>
+      </div>
     </Card>
   );
 }
