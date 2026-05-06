@@ -82,12 +82,21 @@ export function ProfileSubscriptionPage() {
     }
   }, [profileQuery.data, setProfile]);
 
+  const [checkoutError, setCheckoutError] = useState("");
   const checkoutMutation = useMutation({
     mutationFn: (planCode: string) =>
       createCheckout({ planCode }, accessToken ?? ""),
     onSuccess: (result) => {
+      setCheckoutError("");
       setCheckoutNotice(
-        [result.hint, result.contact].filter(Boolean).join(" "),
+        [result.hint, result.contact].filter(Boolean).join(" ") ||
+          t(msg`已提交开通申请，请联系运营完成支付。`),
+      );
+    },
+    onError: (error) => {
+      setCheckoutNotice("");
+      setCheckoutError(
+        describeRequestError(error, t(msg`提交开通申请失败，请稍后重试。`)),
       );
     },
   });
@@ -204,11 +213,6 @@ export function ProfileSubscriptionPage() {
               {subscription.copy.welcomePromoBanner}
             </InlineNotice>
           ) : null}
-          {checkoutNotice ? (
-            <InlineNotice className="mt-4" tone="info">
-              {checkoutNotice}
-            </InlineNotice>
-          ) : null}
         </AppSection>
 
         <div className="grid gap-4 lg:grid-cols-[1.25fr_0.95fr]">
@@ -216,6 +220,16 @@ export function ProfileSubscriptionPage() {
             <div className="text-sm font-semibold text-[color:var(--text-primary)]">
               {t(msg`可购套餐`)}
             </div>
+            {checkoutNotice ? (
+              <InlineNotice className="mt-4" tone="info">
+                {checkoutNotice}
+              </InlineNotice>
+            ) : null}
+            {checkoutError ? (
+              <InlineNotice className="mt-4" tone="danger">
+                {checkoutError}
+              </InlineNotice>
+            ) : null}
             <div className="mt-4 space-y-3">
               {purchasePlans.map((plan) => (
                 <div
