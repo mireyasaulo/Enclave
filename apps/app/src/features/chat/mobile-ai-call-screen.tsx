@@ -109,10 +109,20 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
   const [playbackSettling, setPlaybackSettling] = useState(false);
   const [diagnosticsExpanded, setDiagnosticsExpanded] = useState(false);
   const recordButtonPointerIdRef = useRef<number | null>(null);
+  const leavingScreenRef = useRef(false);
   const waitingNoticeSentRef = useRef(false);
   const connectedNoticeSentRef = useRef(false);
   const endedNoticeSentRef = useRef(false);
   const previousPlaybackStateRef = useRef<"idle" | "playing">("idle");
+
+  const beginLeaving = () => {
+    if (leavingScreenRef.current) {
+      return false;
+    }
+    leavingScreenRef.current = true;
+    setLeavingScreen(true);
+    return true;
+  };
 
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
@@ -569,12 +579,11 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
   };
 
   const handleBack = async () => {
-    if (leavingScreen) {
+    if (!beginLeaving()) {
       return;
     }
 
     recordButtonPointerIdRef.current = null;
-    setLeavingScreen(true);
     setRecordButtonHolding(false);
     if (isVideoMode) {
       setCameraEnabled(false);
@@ -652,12 +661,11 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
   );
 
   const handleSwitchToVoiceCall = async () => {
-    if (leavingScreen) {
+    if (!beginLeaving()) {
       return;
     }
 
     recordButtonPointerIdRef.current = null;
-    setLeavingScreen(true);
     setRecordButtonHolding(false);
     setCameraEnabled(false);
     activeCall.cancelRecordingTurn();
