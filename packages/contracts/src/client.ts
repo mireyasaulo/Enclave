@@ -320,8 +320,8 @@ async function request<T>(
   }
 
   const response = await fetch(`${resolveCoreApiBaseUrl(baseUrl)}${path}`, {
-    headers,
     ...init,
+    headers,
   });
 
   const rawBody = await response.text();
