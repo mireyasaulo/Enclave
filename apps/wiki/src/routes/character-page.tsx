@@ -190,6 +190,16 @@ export function CharacterPage() {
         </Card>
       )}
 
+      {pageQ.data?.drift?.hasDrift && hasRole(user, "patroller") && (
+        <DriftBanner
+          characterId={characterId}
+          drift={pageQ.data.drift}
+          onSynced={() =>
+            qc.invalidateQueries({ queryKey: ["wiki", "page", characterId] })
+          }
+        />
+      )}
+
       {pageQ.isLoading && <LoadingBlock />}
       {pageQ.isError && <ErrorBlock message={(pageQ.error as Error).message} />}
       {pageQ.data && tab === "read" && <ReadView view={pageQ.data} />}
@@ -1711,6 +1721,68 @@ function RevisionCard({
           </div>
         )}
       </div>
+    </Card>
+  );
+}
+
+function DriftBanner({
+  characterId,
+  drift,
+  onSynced,
+}: {
+  characterId: string;
+  drift: {
+    hasDrift: boolean;
+    contentDrift: string[];
+    recipeDrift: string[];
+    source: string;
+  };
+  onSynced: () => void;
+}) {
+  const syncMut = useMutation({
+    mutationFn: () => wikiApi.syncPageFromCharacter(characterId),
+    onSuccess: () => onSynced(),
+  });
+  const totalDrift = drift.contentDrift.length + drift.recipeDrift.length;
+  return (
+    <Card className="p-4 border-[var(--border-warning)] bg-[rgba(255,247,205,0.6)]">
+      <div className="flex items-start gap-2">
+        <div className="flex-1 text-sm">
+          <strong>⚠ 角色已被管理员后台直接修改</strong>
+          <p className="mt-1 text-[var(--text-muted)]">
+            wiki 当前版本与运行时实际角色数据存在 {totalDrift} 处差异
+            （source: {drift.source}）。点击右侧按钮可把当前实际值作为新版本写入 wiki 历史。
+          </p>
+          {drift.contentDrift.length > 0 && (
+            <p className="mt-1 text-xs">
+              内容字段：
+              <span className="font-mono">{drift.contentDrift.join(", ")}</span>
+            </p>
+          )}
+          {drift.recipeDrift.length > 0 && (
+            <p className="mt-1 text-xs">
+              逻辑字段：
+              <span className="font-mono">
+                {drift.recipeDrift.slice(0, 8).join(", ")}
+                {drift.recipeDrift.length > 8 ? ` … (+${drift.recipeDrift.length - 8})` : ""}
+              </span>
+            </p>
+          )}
+        </div>
+        <Button
+          size="sm"
+          variant="primary"
+          disabled={syncMut.isPending}
+          onClick={() => syncMut.mutate()}
+        >
+          {syncMut.isPending ? "同步中..." : "纳入 wiki 历史"}
+        </Button>
+      </div>
+      {syncMut.isError && (
+        <p className="mt-2 text-xs text-[var(--state-danger-text)]">
+          {(syncMut.error as Error).message}
+        </p>
+      )}
     </Card>
   );
 }

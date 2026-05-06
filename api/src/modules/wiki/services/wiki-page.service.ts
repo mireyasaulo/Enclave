@@ -11,7 +11,19 @@ import {
   type WikiContentSnapshot,
 } from '../entities/character-revision.entity';
 import { rankOf } from '../guards/wiki-role.guard';
-import { snapshotFromCharacter } from '../wiki.types';
+import {
+  WIKI_CONTENT_FIELDS,
+  type WikiContentField,
+  diffPaths,
+  snapshotFromCharacter,
+} from '../wiki.types';
+
+export type DriftReport = {
+  hasDrift: boolean;
+  contentDrift: WikiContentField[];
+  recipeDrift: string[];
+  source: 'admin_override' | 'unknown' | 'none';
+};
 
 export type WikiPageView = {
   characterId: string;
@@ -26,6 +38,7 @@ export type WikiPageView = {
   pendingRevisions: CharacterRevisionEntity[];
   viewMode: 'stable' | 'current';
   viewerCanSeeCurrent: boolean;
+  drift: DriftReport;
   exists: boolean;
 };
 
@@ -122,6 +135,12 @@ export class WikiPageService {
     if (!content) {
       throw new NotFoundException(`角色 ${characterId} 不存在`);
     }
+    const drift = await this.computeDrift(
+      character,
+      stableRevision,
+      factorySnapshot?.blueprint.publishedRecipe ?? null,
+    );
+
     return {
       characterId,
       page,
@@ -135,7 +154,43 @@ export class WikiPageService {
       pendingRevisions,
       viewMode,
       viewerCanSeeCurrent: canViewCurrent,
+      drift,
       exists: !page.isDeleted && page.lifecycleStatus !== 'pending_create',
+    };
+  }
+
+  /**
+   * Compares the live `character` row + published blueprint recipe to the
+   * latest stable revision's snapshots. Drift = admin (or any non-wiki path)
+   * touched the runtime state without going through wiki review.
+   */
+  private async computeDrift(
+    character: CharacterEntity | null,
+    stableRevision: CharacterRevisionEntity | null,
+    publishedRecipe: CharacterBlueprintRecipeValue | null,
+  ): Promise<DriftReport> {
+    if (!character || !stableRevision) {
+      return { hasDrift: false, contentDrift: [], recipeDrift: [], source: 'none' };
+    }
+    const liveContent = snapshotFromCharacter(
+      character as unknown as Record<string, unknown>,
+    );
+    const contentDrift: WikiContentField[] = [];
+    for (const field of WIKI_CONTENT_FIELDS) {
+      const a = JSON.stringify(liveContent[field] ?? null);
+      const b = JSON.stringify(stableRevision.contentSnapshot[field] ?? null);
+      if (a !== b) contentDrift.push(field);
+    }
+    let recipeDrift: string[] = [];
+    if (stableRevision.recipeSnapshot && publishedRecipe) {
+      recipeDrift = diffPaths(stableRevision.recipeSnapshot, publishedRecipe);
+    }
+    const hasDrift = contentDrift.length > 0 || recipeDrift.length > 0;
+    return {
+      hasDrift,
+      contentDrift,
+      recipeDrift,
+      source: hasDrift ? 'admin_override' : 'none',
     };
   }
 

@@ -21,6 +21,7 @@ import { UserWikiProfileEntity } from '../entities/user-wiki-profile.entity';
 import { rankOf } from '../guards/wiki-role.guard';
 import { AbuseFilterService } from './abuse-filter.service';
 import { WikiBlockService } from './wiki-block.service';
+import { WikiFieldProtectionService } from './wiki-field-protection.service';
 import { WikiPageService } from './wiki-page.service';
 import { WikiRoleService } from './wiki-role.service';
 import {
@@ -77,6 +78,7 @@ export class WikiEditService {
     private readonly roles: WikiRoleService,
     private readonly blueprints: CharacterBlueprintService,
     private readonly filters: AbuseFilterService,
+    private readonly fieldProtection: WikiFieldProtectionService,
   ) {}
 
   async submit(
@@ -490,6 +492,75 @@ export class WikiEditService {
     };
   }
 
+  /**
+   * 把 character 当前态（含 admin 后台直改产生的漂移）作为新 revision 写入 wiki，
+   * 自动 approved + patrolled，changeSource='admin_override'。仅 patroller+ 可调。
+   * 用于消除"admin 直改 → wiki 显示与实际不一致"的漂移横幅。
+   */
+  async syncFromCharacter(
+    characterId: string,
+    actor: AuthenticatedUser,
+  ): Promise<SubmitEditResult> {
+    if (rankOf(actor.role) < rankOf('patroller')) {
+      throw new ForbiddenException('仅巡查员及以上可触发漂移同步');
+    }
+    const page = await this.pages.getOrInitPage(characterId);
+    const character = await this.characterRepo.findOne({
+      where: { id: characterId },
+    });
+    if (!character) throw new BadRequestException('角色不存在');
+    const liveContent = snapshotFromCharacter(
+      character as unknown as Record<string, unknown>,
+    );
+    const factorySnapshot = await this.blueprints.getFactorySnapshot(characterId);
+    const liveRecipe =
+      factorySnapshot.blueprint.publishedRecipe ??
+      factorySnapshot.blueprint.draftRecipe ??
+      null;
+    const lastVersion = await this.getLastVersion(characterId);
+    const saved = await this.dataSource.transaction(async (manager) => {
+      const created = manager.create(CharacterRevisionEntity, {
+        characterId,
+        version: lastVersion + 1,
+        parentRevisionId: page.currentRevisionId ?? null,
+        baseRevisionId: page.currentRevisionId ?? null,
+        contentSnapshot: liveContent,
+        recipeSnapshot: liveRecipe,
+        diffFromParent: { changed: ['__sync_from_character__'] },
+        editorUserId: actor.id,
+        editorRoleAtTime: actor.role,
+        editSummary: '同步管理员直改的角色字段到 wiki 历史',
+        status: 'approved',
+        revisionKind: liveRecipe ? 'recipe' : 'content',
+        operation: 'edit',
+        riskLevel: 'low',
+        changeSource: 'admin_override',
+        isMinor: false,
+        isPatrolled: true,
+        patrolledBy: actor.id,
+        patrolledAt: new Date(),
+      });
+      const savedRev = await manager.save(created);
+      await manager.update(
+        CharacterPageEntity,
+        { characterId },
+        {
+          title: liveContent.name,
+          currentRevisionId: savedRev.id,
+          latestRevisionId: savedRev.id,
+          editCount: page.editCount + 1,
+        },
+      );
+      return savedRev;
+    });
+    return {
+      revisionId: saved.id,
+      status: saved.status,
+      isPatrolled: saved.isPatrolled,
+      appliedToCharacter: false, // already on character; this just records history
+    };
+  }
+
   async applyApprovedRevision(
     revision: CharacterRevisionEntity,
     actorId: string,
@@ -660,6 +731,7 @@ export class WikiEditService {
     if (changed.length === 0) {
       throw new BadRequestException('未检测到变更');
     }
+    await this.fieldProtection.assertCanEditPaths(user, characterId, changed);
     const afterContent = snapshotFromRecipe(afterRecipe);
 
     const riskReport = isHighRiskRecipeChange(changed);

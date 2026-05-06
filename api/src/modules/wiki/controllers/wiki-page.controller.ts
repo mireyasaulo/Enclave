@@ -99,6 +99,15 @@ export class WikiPageController {
     return this.pages.getRevisionOrThrow(revisionId);
   }
 
+  @Post('pages/:id/sync-from-character')
+  @UseGuards(JwtAuthGuard)
+  syncFromCharacter(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.edits.syncFromCharacter(id, user);
+  }
+
   @Post('pages/:id/edits')
   @UseGuards(JwtAuthGuard, WikiRateLimitGuard)
   submit(

@@ -97,6 +97,12 @@ export type WikiPageView = {
   pendingRevisions: WikiRevisionSummary[];
   viewMode: "stable" | "current";
   viewerCanSeeCurrent: boolean;
+  drift: {
+    hasDrift: boolean;
+    contentDrift: string[];
+    recipeDrift: string[];
+    source: "admin_override" | "unknown" | "none";
+  };
   exists: boolean;
 };
 
@@ -601,6 +607,50 @@ export const wikiApi = {
       },
     );
   },
+  syncPageFromCharacter(characterId: string) {
+    return request<{ revisionId: string; status: string }>(
+      `/wiki/pages/${encodeURIComponent(characterId)}/sync-from-character`,
+      { method: "POST" },
+    );
+  },
+  listFieldProtection(characterId?: string) {
+    const params = new URLSearchParams();
+    if (characterId) params.set("characterId", characterId);
+    return request<FieldProtection[]>(
+      `/wiki/field-protection${params.size > 0 ? `?${params.toString()}` : ""}`,
+    );
+  },
+  effectiveFieldProtection(characterId: string) {
+    return request<Array<{ fieldPath: string; minRoleToEdit: string }>>(
+      `/wiki/field-protection/effective/${encodeURIComponent(characterId)}`,
+    );
+  },
+  createFieldProtection(body: {
+    characterId: string;
+    fieldPath: string;
+    minRoleToEdit: string;
+    reason?: string | null;
+  }) {
+    return request<FieldProtection>("/wiki/field-protection", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  },
+  updateFieldProtection(
+    id: string,
+    patch: Partial<FieldProtection>,
+  ) {
+    return request<FieldProtection>(
+      `/wiki/field-protection/${encodeURIComponent(id)}`,
+      { method: "PATCH", body: JSON.stringify(patch) },
+    );
+  },
+  deleteFieldProtection(id: string) {
+    return request<void>(
+      `/wiki/field-protection/${encodeURIComponent(id)}`,
+      { method: "DELETE" },
+    );
+  },
   listAbuseFilters() {
     return request<AbuseFilter[]>("/wiki/admin/abuse-filters");
   },
@@ -651,6 +701,16 @@ export const wikiApi = {
       { method: "DELETE" },
     );
   },
+};
+
+export type FieldProtection = {
+  id: string;
+  characterId: string;
+  fieldPath: string;
+  minRoleToEdit: string;
+  reason: string | null;
+  createdBy: string | null;
+  createdAt: string;
 };
 
 export type AbuseFilterAction = "log" | "warn" | "block" | "tag_high_risk";
