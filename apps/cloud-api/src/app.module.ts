@@ -17,6 +17,7 @@ import { CloudRuntimeConfigValidator } from "./config/cloud-runtime-config.valid
 import { resolveCloudAuthTokenTtl, resolveCloudJwtSecret } from "./config/cloud-runtime-config";
 import { buildCloudTypeOrmOptions, cloudEntities } from "./database/cloud-database.config";
 import { InviteModule } from "./invite/invite.module";
+import { LocalProcessComputeProviderService } from "./orchestration/local-process-compute-provider.service";
 import { MockComputeProviderService } from "./orchestration/mock-compute-provider.service";
 import { WorldLifecycleWorkerService } from "./orchestration/world-lifecycle-worker.service";
 import { ComputeProviderRegistryService } from "./providers/compute-provider-registry.service";
@@ -74,6 +75,7 @@ import { WaitingSessionSyncService } from "./world-access/waiting-session-sync.s
     MockComputeProviderService,
     ManualDockerComputeProviderService,
     ManualDockerRemoteExecutorService,
+    LocalProcessComputeProviderService,
     ComputeProviderRegistryService,
     CloudRuntimeConfigValidator,
     WorldLifecycleWorkerService,
