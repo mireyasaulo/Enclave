@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -7,6 +8,7 @@ import {
   getMyCloudProfile,
   getMyCloudSubscription,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppPage,
   AppSection,
@@ -39,6 +41,7 @@ function formatDateTime(value?: string | null) {
 }
 
 export function ProfileSubscriptionPage() {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const isDesktopLayout = useDesktopLayout();
   const accessToken = useCloudSessionStore((state) => state.accessToken);
@@ -80,7 +83,8 @@ export function ProfileSubscriptionPage() {
   }, [profileQuery.data, setProfile]);
 
   const checkoutMutation = useMutation({
-    mutationFn: (planCode: string) => createCheckout({ planCode }, accessToken ?? ""),
+    mutationFn: (planCode: string) =>
+      createCheckout({ planCode }, accessToken ?? ""),
     onSuccess: (result) => {
       setCheckoutNotice(
         [result.hint, result.contact].filter(Boolean).join(" "),
@@ -102,6 +106,11 @@ export function ProfileSubscriptionPage() {
     inviteQuery.isLoading;
   const error =
     profileQuery.error ?? subscriptionQuery.error ?? inviteQuery.error ?? null;
+
+  function handleCloudLogout() {
+    clearCloudRuntimeSession();
+    void navigate({ to: "/welcome", replace: true });
+  }
 
   if (!accessToken) {
     return null;
@@ -157,17 +166,28 @@ export function ProfileSubscriptionPage() {
                 Expires at: {formatDateTime(subscription.expiresAt)}
               </p>
             </div>
-            <Button
-              variant="secondary"
-              className="rounded-2xl border-[color:var(--border-faint)] bg-white shadow-none"
-              onClick={() =>
-                void navigate({
-                  to: isDesktopLayout ? "/desktop/settings" : "/profile/settings",
-                })
-              }
-            >
-              Back
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="secondary"
+                className="rounded-2xl border-[color:var(--border-faint)] bg-white shadow-none"
+                onClick={() =>
+                  void navigate({
+                    to: isDesktopLayout
+                      ? "/desktop/settings"
+                      : "/profile/settings",
+                  })
+                }
+              >
+                {t(msg`返回设置`)}
+              </Button>
+              <Button
+                variant="secondary"
+                className="rounded-2xl border-[rgba(220,38,38,0.14)] bg-white text-[#b42318] shadow-none hover:bg-[#fff5f5]"
+                onClick={handleCloudLogout}
+              >
+                {t(msg`退出登录`)}
+              </Button>
+            </div>
           </div>
           {subscription.copy.welcomePromoBanner ? (
             <InlineNotice className="mt-4" tone="success">
@@ -211,7 +231,9 @@ export function ProfileSubscriptionPage() {
                         disabled={checkoutMutation.isPending}
                         onClick={() => checkoutMutation.mutate(plan.code)}
                       >
-                        {checkoutMutation.isPending ? "Submitting..." : "Contact to activate"}
+                        {checkoutMutation.isPending
+                          ? "Submitting..."
+                          : "Contact to activate"}
                       </Button>
                     </div>
                   </div>
@@ -261,7 +283,9 @@ export function ProfileSubscriptionPage() {
                     </div>
                     <div className="mt-1">Status: {item.status}</div>
                     <div>Created at: {formatDateTime(item.createdAt)}</div>
-                    {item.rejectReason ? <div>Reason: {item.rejectReason}</div> : null}
+                    {item.rejectReason ? (
+                      <div>Reason: {item.rejectReason}</div>
+                    ) : null}
                   </div>
                 ))}
                 {!invite.recentRedemptions.length ? (

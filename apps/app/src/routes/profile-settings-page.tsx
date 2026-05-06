@@ -23,8 +23,12 @@ import {
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { DesktopUtilityShell } from "../features/shell/desktop-utility-shell";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
-import { clearCloudRuntimeSession } from "../lib/cloud-session";
+import {
+  clearCloudRuntimeSession,
+  shouldShowCloudAccountControls,
+} from "../lib/cloud-session";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+import { useCloudSessionStore } from "../store/cloud-session-store";
 import {
   formatChatSendShortcutLabel,
   type ChatSendShortcut,
@@ -79,6 +83,8 @@ export function ProfileSettingsPage() {
   const baseUrl = runtimeConfig.apiBaseUrl;
   const username = useWorldOwnerStore((state) => state.username);
   const signature = useWorldOwnerStore((state) => state.signature);
+  const cloudAccessToken = useCloudSessionStore((state) => state.accessToken);
+  const cloudPhone = useCloudSessionStore((state) => state.phone);
   const updateOwnerStore = useWorldOwnerStore((state) => state.updateOwner);
   const hydrateOwner = useWorldOwnerStore((state) => state.hydrateOwner);
   const sendMessageShortcut = useChatPreferencesStore(
@@ -96,7 +102,12 @@ export function ProfileSettingsPage() {
   const [apiKeyDraft, setApiKeyDraft] = useState("");
   const [apiBaseDraft, setApiBaseDraft] = useState("");
 
-  const showCloudAccountEntries = runtimeConfig.worldAccessMode === "cloud";
+  const showCloudAccountEntries = shouldShowCloudAccountControls({
+    worldAccessMode: runtimeConfig.worldAccessMode,
+    runtimeCloudPhone: runtimeConfig.cloudPhone,
+    accessToken: cloudAccessToken,
+    sessionPhone: cloudPhone,
+  });
 
   useEffect(() => {
     setDraftName(username ?? "");
@@ -719,11 +730,11 @@ export function ProfileSettingsPage() {
       {showCloudAccountEntries ? (
         <MobileSettingsSection
           desktop={desktopMode}
-          title={desktopMode ? "Cloud account" : undefined}
+          title={desktopMode ? t(msg`云账号`) : undefined}
           description={
             desktopMode
-              ? "Open membership details or sign out from the current cloud account."
-              : "Manage membership and sign out from the current cloud account."
+              ? t(msg`查看会员信息，或退出当前云账号并回到世界入口。`)
+              : t(msg`管理会员与当前云账号登录状态`)
           }
         >
           <div className="space-y-2">
@@ -732,14 +743,14 @@ export function ProfileSettingsPage() {
               className="h-9 w-full rounded-[10px] border-[color:var(--border-faint)] bg-white text-[12px] shadow-none hover:bg-[#f5f7f7]"
               onClick={() => void navigate({ to: "/profile/subscription" })}
             >
-              Membership Center
+              {t(msg`会员中心`)}
             </Button>
             <Button
               variant="secondary"
               className="h-9 w-full rounded-[10px] border-[rgba(220,38,38,0.14)] bg-white text-[12px] text-[#b42318] shadow-none hover:bg-[#fff5f5]"
               onClick={handleCloudLogout}
             >
-              Sign Out
+              {t(msg`退出登录`)}
             </Button>
           </div>
         </MobileSettingsSection>
