@@ -103,6 +103,9 @@ import { WikiProtectionLogEntity } from './modules/wiki/entities/wiki-protection
 import { WikiTalkThreadEntity } from './modules/wiki/entities/wiki-talk-thread.entity';
 import { WikiTalkPostEntity } from './modules/wiki/entities/wiki-talk-post.entity';
 import { WikiWatchlistEntity } from './modules/wiki/entities/wiki-watchlist.entity';
+import { WikiFieldProtectionEntity } from './modules/wiki/entities/wiki-field-protection.entity';
+import { AbuseFilterEntity } from './modules/wiki/entities/abuse-filter.entity';
+import { AbuseFilterHitEntity } from './modules/wiki/entities/abuse-filter-hit.entity';
 import {
   prepareDatabasePath,
   resolveApiPath,
@@ -193,6 +196,9 @@ import {
           WikiTalkThreadEntity,
           WikiTalkPostEntity,
           WikiWatchlistEntity,
+          WikiFieldProtectionEntity,
+          AbuseFilterEntity,
+          AbuseFilterHitEntity,
         ],
         synchronize: true,
       }),

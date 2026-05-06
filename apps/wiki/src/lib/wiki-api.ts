@@ -607,6 +607,20 @@ export const wikiApi = {
       },
     );
   },
+  previewPrompt(
+    characterId: string,
+    recipe: unknown,
+    scene: string,
+  ) {
+    return request<{ prompt: string }>(
+      `/wiki/pages/${encodeURIComponent(characterId)}/preview-prompt`,
+      {
+        method: "POST",
+        body: JSON.stringify({ recipe, scene }),
+        auth: false,
+      },
+    );
+  },
   syncPageFromCharacter(characterId: string) {
     return request<{ revisionId: string; status: string }>(
       `/wiki/pages/${encodeURIComponent(characterId)}/sync-from-character`,

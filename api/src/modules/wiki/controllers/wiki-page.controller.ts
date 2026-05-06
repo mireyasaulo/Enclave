@@ -15,7 +15,12 @@ import {
   type AuthenticatedUser,
 } from '../../auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../../auth/optional-jwt-auth.guard';
+import { CharacterBlueprintService } from '../../characters/character-blueprint.service';
+import type { CharacterBlueprintRecipeValue } from '../../characters/character-blueprint.types';
+import { PromptBuilderService } from '../../ai/prompt-builder.service';
+import type { SceneKey } from '../../ai/ai.types';
 import { WikiRateLimitGuard } from '../guards/wiki-rate-limit.guard';
+import { normalizeWikiRecipe } from '../wiki.types';
 import { WikiEditService } from '../services/wiki-edit.service';
 import { WikiPageService } from '../services/wiki-page.service';
 
@@ -24,6 +29,8 @@ export class WikiPageController {
   constructor(
     private readonly pages: WikiPageService,
     private readonly edits: WikiEditService,
+    private readonly blueprints: CharacterBlueprintService,
+    private readonly promptBuilder: PromptBuilderService,
   ) {}
 
   @Get('recent-changes')
@@ -97,6 +104,27 @@ export class WikiPageController {
   @Get('pages/:id/revisions/:revisionId')
   revision(@Param('revisionId') revisionId: string) {
     return this.pages.getRevisionOrThrow(revisionId);
+  }
+
+  @Post('pages/:id/preview-prompt')
+  @UseGuards(OptionalJwtAuthGuard)
+  async previewPrompt(
+    @Param('id') id: string,
+    @Body()
+    body: {
+      recipe: Record<string, unknown> | CharacterBlueprintRecipeValue;
+      scene: SceneKey;
+    },
+  ) {
+    const recipe = normalizeWikiRecipe(
+      body.recipe as Record<string, unknown>,
+    );
+    const profile = this.blueprints.buildProfileFromRecipe(recipe, id);
+    const prompt = await this.promptBuilder.buildSceneSystemPrompt(
+      profile,
+      body.scene,
+    );
+    return { prompt };
   }
 
   @Post('pages/:id/sync-from-character')

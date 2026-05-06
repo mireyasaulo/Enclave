@@ -25,6 +25,7 @@ import { TalkPanel } from "../components/talk-panel";
 import { WatchToggle } from "../components/watch-toggle";
 import { ConflictResolver } from "../components/conflict-resolver";
 import { RiskBadge } from "../components/risk-badge";
+import { ScenePromptPreview } from "../components/scene-prompt-preview";
 import { WikiApiError } from "../lib/wiki-api";
 
 type Tab = "read" | "edit" | "history" | "talk";
@@ -557,6 +558,7 @@ function EditView({
           onChange={(next) => setRecipeDraft(next)}
           characterId={characterId}
           currentRole={user?.role}
+          baselineRecipe={view.recipe}
         />
       )}
       <FormRow
@@ -671,11 +673,13 @@ export function LogicEditor({
   onChange,
   characterId,
   currentRole,
+  baselineRecipe,
 }: {
   recipe: CharacterBlueprintRecipe;
   onChange: (next: CharacterBlueprintRecipe) => void;
   characterId?: string;
   currentRole?: string;
+  baselineRecipe?: CharacterBlueprintRecipe | null;
 }) {
   const [realityLinkText, setRealityLinkText] = useState(() =>
     JSON.stringify(recipe.realityLink ?? null, null, 2),
@@ -946,6 +950,13 @@ export function LogicEditor({
           }
         />
       </FormRow>
+      {characterId && (
+        <ScenePromptPreview
+          characterId={characterId}
+          recipe={recipe}
+          baselineRecipe={baselineRecipe ?? null}
+        />
+      )}
       <FormRow
         label="核心逻辑"
         badge={

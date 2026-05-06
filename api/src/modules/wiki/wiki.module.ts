@@ -1,5 +1,6 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AiModule } from '../ai/ai.module';
 import { AuthModule } from '../auth/auth.module';
 import { CharacterEntity } from '../characters/character.entity';
 import { CharactersModule } from '../characters/characters.module';
@@ -48,6 +49,7 @@ import { WikiReportController } from './controllers/wiki-report.controller';
   imports: [
     AuthModule,
     CharactersModule,
+    forwardRef(() => AiModule),
     TypeOrmModule.forFeature([
       CharacterEntity,
       UserEntity,
