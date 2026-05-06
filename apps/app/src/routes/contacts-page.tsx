@@ -2089,7 +2089,7 @@ function SectionHeader({
         "z-10 px-4 py-1.25 font-medium tracking-[0.08em] text-[color:var(--text-muted)]",
         desktop
           ? "sticky top-0 border-b border-[color:var(--border-faint)] bg-white/78 backdrop-blur-xl"
-          : "sticky top-[78px] text-[11px] bg-[rgba(247,247,247,0.94)] backdrop-blur",
+          : "sticky top-[92px] text-[11px] bg-[rgba(247,247,247,0.94)] backdrop-blur",
       )}
     >
       {title}
