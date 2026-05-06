@@ -1343,6 +1343,7 @@ function MobileChannelsViewport({
 }: MobileChannelsViewportProps) {
   const [activePostId, setActivePostId] = useState<string | null>(null);
   const cardRefs = useRef(new Map<string, HTMLElement>());
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     if (!posts.length) {
@@ -1378,9 +1379,27 @@ function MobileChannelsViewport({
       },
     );
 
+    observerRef.current = observer;
     cardRefs.current.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
-  }, [posts]);
+    return () => {
+      observer.disconnect();
+      observerRef.current = null;
+    };
+  }, []);
+
+  const registerCardRef = (postId: string, node: HTMLElement | null) => {
+    const previous = cardRefs.current.get(postId);
+    if (previous && previous !== node) {
+      observerRef.current?.unobserve(previous);
+    }
+
+    if (node) {
+      cardRefs.current.set(postId, node);
+      observerRef.current?.observe(node);
+    } else {
+      cardRefs.current.delete(postId);
+    }
+  };
 
   useEffect(() => {
     if (!routeSelectedPostId) {
@@ -1415,14 +1434,7 @@ function MobileChannelsViewport({
           favorite={Boolean(post.ownerState?.hasFavorited)}
           likePending={likePendingPostId === post.id}
           post={post}
-          setCardRef={(node) => {
-            if (node) {
-              cardRefs.current.set(post.id, node);
-              return;
-            }
-
-            cardRefs.current.delete(post.id);
-          }}
+          setCardRef={(node) => registerCardRef(post.id, node)}
           onLike={() => onLike(post.id)}
           onOpenAuthor={() => onOpenAuthor(post)}
           onOpenComments={() => onOpenComments(post)}
