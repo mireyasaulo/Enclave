@@ -54,14 +54,17 @@ function saveGeneratedFileWithBrowser(
     type: input.mimeType?.trim() || "application/octet-stream",
   });
   const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = normalizeGeneratedFileName(input.fileName);
-  anchor.rel = "noreferrer";
-  document.body.append(anchor);
-  anchor.click();
-  anchor.remove();
-  URL.revokeObjectURL(url);
+  try {
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = normalizeGeneratedFileName(input.fileName);
+    anchor.rel = "noreferrer";
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 
   return {
     status: "started",
