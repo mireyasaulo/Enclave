@@ -1118,6 +1118,10 @@ msgstr "云世界"
 msgid "云世界访问会话缺失。"
 msgstr "云世界访问会话缺失。"
 
+#: apps/app/src/routes/profile-subscription-page.tsx:255
+msgid "云端管理后台暂未开放可购套餐。"
+msgstr "云端管理后台暂未开放可购套餐。"
+
 #: apps/app/src/routes/profile-settings-page.tsx:743
 msgid "云账号"
 msgstr "云账号"
@@ -1321,6 +1325,7 @@ msgstr "会同步到朋友圈时间线，适合发日常照片、短视频和临
 #: apps/app/src/routes/profile-page.tsx:137
 #: apps/app/src/routes/profile-settings-page.tsx:754
 #: apps/app/src/routes/profile-settings-page.tsx:777
+#: apps/app/src/routes/profile-subscription-page.tsx:166
 msgid "会员中心"
 msgstr "会员中心"
 
@@ -2457,6 +2462,10 @@ msgstr "最近群邀请记录"
 msgid "最近还没有使用过表情。"
 msgstr "最近还没有使用过表情。"
 
+#: apps/app/src/routes/profile-subscription-page.tsx:284
+msgid "最近邀请记录"
+msgstr "最近邀请记录"
+
 #: apps/app/src/i18n/static-dom-seed.ts:555
 msgid "最适合精确查找"
 msgstr "最适合精确查找"
@@ -2664,6 +2673,10 @@ msgstr "刚补发过，先等回流。"
 msgid "创业与写作导师映射"
 msgstr "创业与写作导师映射"
 
+#: apps/app/src/routes/profile-subscription-page.tsx:304
+msgid "创建时间"
+msgstr "创建时间"
+
 #. placeholder {0}: nextManageSticker.label ?? nextManageSticker.stickerId
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:1113
 msgid "删后跳到：{0}"
@@ -2747,6 +2760,10 @@ msgstr "别人可以通过隐界号或二维码找到你"
 #: apps/app/src/i18n/static-dom-seed.ts:808
 msgid "到手机继续"
 msgstr "到手机继续"
+
+#: apps/app/src/routes/profile-subscription-page.tsx:176
+msgid "到期时间"
+msgstr "到期时间"
 
 #: apps/app/src/i18n/static-dom-seed.ts:40
 #: apps/app/src/routes/desktop-mobile-page.tsx:1261
@@ -2874,6 +2891,10 @@ msgstr "协议与规范"
 #: apps/app/src/routes/desktop-mobile-page.tsx:2235
 msgid "单人控台"
 msgstr "单人控台"
+
+#: apps/app/src/routes/profile-subscription-page.tsx:269
+msgid "单次邀请奖励天数"
+msgstr "单次邀请奖励天数"
 
 #: apps/app/src/i18n/static-dom-seed.ts:982
 msgid "单独设置"
@@ -3350,6 +3371,10 @@ msgstr "可能是新窗口参数被清掉了。回到消息页后重新打开一
 #: apps/app/src/routes/discover-page.tsx:702
 msgid "可见动态"
 msgstr "可见动态"
+
+#: apps/app/src/routes/profile-subscription-page.tsx:217
+msgid "可购套餐"
+msgstr "可购套餐"
 
 #: apps/app/src/routes/profile-settings-page.tsx:526
 msgid "可选，例如 https://api.openai.com/v1"
@@ -4304,6 +4329,14 @@ msgstr "已加入黑名单。"
 msgid "已加载"
 msgstr "已加载"
 
+#: apps/app/src/routes/profile-subscription-page.tsx:290
+msgid "已发放"
+msgstr "已发放"
+
+#: apps/app/src/routes/profile-subscription-page.tsx:273
+msgid "已发放奖励天数"
+msgstr "已发放奖励天数"
+
 #: apps/app/src/runtime/file-runtime-i18n.ts:58
 msgid "已取消保存。"
 msgstr "已取消保存。"
@@ -4459,6 +4492,10 @@ msgstr "已找到"
 msgid "已把群邀请发到 {0}。"
 msgstr "已把群邀请发到 {0}。"
 
+#: apps/app/src/routes/profile-subscription-page.tsx:291
+msgid "已拒绝"
+msgstr "已拒绝"
+
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:389
 #: apps/app/src/routes/chat-details-page.tsx:602
 msgid "已提交投诉。"
@@ -4590,6 +4627,10 @@ msgstr "已设为星标朋友。"
 #: apps/app/src/i18n/static-dom-seed.ts:366
 msgid "已赞"
 msgstr "已赞"
+
+#: apps/app/src/routes/profile-subscription-page.tsx:151
+msgid "已过期"
+msgstr "已过期"
 
 #: apps/app/src/routes/discover-page.tsx:512
 msgid "已过滤"
@@ -5061,6 +5102,10 @@ msgstr "当前回流来源"
 #: apps/app/src/i18n/static-dom-seed.ts:988
 msgid "当前在线"
 msgstr "当前在线"
+
+#: apps/app/src/routes/profile-subscription-page.tsx:173
+msgid "当前套餐"
+msgstr "当前套餐"
 
 #: apps/app/src/i18n/static-dom-seed.ts:508
 #: apps/app/src/routes/desktop-feedback-page.tsx:322
@@ -5581,6 +5626,10 @@ msgstr "意见反馈当前仅提供桌面布局"
 msgid "懂酒吧和鸡尾酒的人"
 msgstr "懂酒吧和鸡尾酒的人"
 
+#: apps/app/src/routes/profile-subscription-page.tsx:271
+msgid "成功邀请数"
+msgstr "成功邀请数"
+
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:506
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:697
 #: apps/app/src/routes/group-chat-details-page.tsx:599
@@ -5713,6 +5762,7 @@ msgstr "手机"
 msgid "手机入口"
 msgstr "手机入口"
 
+#: apps/app/src/routes/profile-subscription-page.tsx:169
 #: apps/app/src/routes/welcome-page.tsx:731
 msgid "手机号"
 msgstr "手机号"
@@ -6097,6 +6147,10 @@ msgstr "投递到最近会话"
 msgid "拒绝"
 msgstr "拒绝"
 
+#: apps/app/src/routes/profile-subscription-page.tsx:309
+msgid "拒绝原因"
+msgstr "拒绝原因"
+
 #: apps/app/src/routes/group-qr-page.tsx:2707
 msgid "拖得久且还活跃，先追这条。"
 msgstr "拖得久且还活跃，先追这条。"
@@ -6348,6 +6402,10 @@ msgstr "描述你看到的现象、涉及的页面或入口。"
 #: apps/app/src/routes/chat-details-page.tsx:1192
 msgid "提交一次聊天场景投诉"
 msgstr "提交一次聊天场景投诉"
+
+#: apps/app/src/routes/profile-subscription-page.tsx:246
+msgid "提交中…"
+msgstr "提交中…"
 
 #: apps/app/src/i18n/static-dom-seed.ts:511
 #: apps/app/src/routes/desktop-feedback-page.tsx:508
@@ -6851,6 +6909,10 @@ msgstr "新的朋友"
 msgid "新窗口打开"
 msgstr "新窗口打开"
 
+#: apps/app/src/routes/profile-subscription-page.tsx:174
+msgid "无"
+msgstr "无"
+
 #: apps/app/src/i18n/static-dom-seed.ts:1003
 msgid "无人加入"
 msgstr "无人加入"
@@ -6905,6 +6967,11 @@ msgstr "日程"
 #: apps/app/src/i18n/static-dom-seed.ts:247
 msgid "日程管家"
 msgstr "日程管家"
+
+#. placeholder {0}: plan.durationDays
+#: apps/app/src/routes/profile-subscription-page.tsx:232
+msgid "时长 {0} 天"
+msgstr "时长 {0} 天"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:444
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:752
@@ -6993,6 +7060,7 @@ msgstr "暂不建议"
 #: apps/app/src/routes/desktop-feedback-page.tsx:121
 #: apps/app/src/routes/desktop-mobile-page.tsx:1235
 #: apps/app/src/routes/group-chat-details-page.tsx:703
+#: apps/app/src/routes/profile-subscription-page.tsx:267
 msgid "暂无"
 msgstr "暂无"
 
@@ -7021,6 +7089,10 @@ msgstr "暂无签名"
 #: apps/app/src/routes/desktop-mobile-page.tsx:640
 msgid "暂无记录"
 msgstr "暂无记录"
+
+#: apps/app/src/routes/profile-subscription-page.tsx:317
+msgid "暂无邀请记录。"
+msgstr "暂无邀请记录。"
 
 #: apps/app/src/features/shell/desktop-runtime-guard.tsx:168
 #: apps/app/src/i18n/static-dom-seed.ts:8
@@ -7305,6 +7377,10 @@ msgstr "未填写主题"
 msgid "未就绪"
 msgstr "未就绪"
 
+#: apps/app/src/routes/profile-subscription-page.tsx:152
+msgid "未开通"
+msgstr "未开通"
+
 #: apps/app/src/routes/desktop-mobile-page.tsx:155
 msgid "未归入主链路的补充接力入口。"
 msgstr "未归入主链路的补充接力入口。"
@@ -7337,6 +7413,7 @@ msgstr "未知时间"
 #: apps/app/src/routes/character-detail-page.tsx:248
 #: apps/app/src/routes/chat-details-page.tsx:295
 #: apps/app/src/routes/group-chat-details-page.tsx:813
+#: apps/app/src/routes/profile-subscription-page.tsx:153
 msgid "未设置"
 msgstr "未设置"
 
@@ -8013,6 +8090,10 @@ msgstr "正在加载世界主人"
 #: apps/app/src/routes/welcome-page.tsx:1007
 msgid "正在加载世界主人..."
 msgstr "正在加载世界主人..."
+
+#: apps/app/src/routes/profile-subscription-page.tsx:123
+msgid "正在加载会员信息…"
+msgstr "正在加载会员信息…"
 
 #: apps/app/src/routes/discover-feed-page.tsx:671
 #: apps/app/src/routes/discover-page.tsx:660
@@ -8789,6 +8870,8 @@ msgid "特朗普"
 msgstr "特朗普"
 
 #: apps/app/src/i18n/static-dom-seed.ts:121
+#: apps/app/src/routes/profile-subscription-page.tsx:171
+#: apps/app/src/routes/profile-subscription-page.tsx:301
 msgid "状态"
 msgstr "状态"
 
@@ -8848,6 +8931,10 @@ msgstr "琥珀"
 #: apps/app/src/i18n/static-dom-seed.ts:608
 msgid "生成预热内容"
 msgstr "生成预热内容"
+
+#: apps/app/src/routes/profile-subscription-page.tsx:149
+msgid "生效中"
+msgstr "生效中"
 
 #: apps/app/src/i18n/static-dom-seed.ts:150
 msgid "生活"
@@ -10118,6 +10205,10 @@ msgstr "联系人资料已更新。"
 msgid "联系人资料暂时不可用"
 msgstr "联系人资料暂时不可用"
 
+#: apps/app/src/routes/profile-subscription-page.tsx:247
+msgid "联系开通"
+msgstr "联系开通"
+
 #: apps/app/src/i18n/static-dom-seed.ts:85
 msgid "聚会"
 msgstr "聚会"
@@ -10320,6 +10411,10 @@ msgstr "解锁继续使用"
 #: apps/app/src/i18n/static-dom-seed.ts:687
 msgid "言初"
 msgstr "言初"
+
+#: apps/app/src/routes/profile-subscription-page.tsx:163
+msgid "订阅"
+msgstr "订阅"
 
 #: apps/app/src/i18n/static-dom-seed.ts:412
 msgid "订阅号"
@@ -11024,7 +11119,7 @@ msgstr "返回聊天拍摄"
 
 #: apps/app/src/i18n/static-dom-seed.ts:620
 #: apps/app/src/i18n/static-dom-seed.ts:885
-#: apps/app/src/routes/profile-subscription-page.tsx:181
+#: apps/app/src/routes/profile-subscription-page.tsx:191
 msgid "返回设置"
 msgstr "返回设置"
 
@@ -11519,7 +11614,7 @@ msgstr "退出后你将不再收到这个群的消息，当前会话也会从桌
 #: apps/app/src/routes/profile-page.tsx:145
 #: apps/app/src/routes/profile-settings-page.tsx:761
 #: apps/app/src/routes/profile-settings-page.tsx:784
-#: apps/app/src/routes/profile-subscription-page.tsx:188
+#: apps/app/src/routes/profile-subscription-page.tsx:198
 msgid "退出登录"
 msgstr "退出登录"
 
@@ -11676,6 +11771,14 @@ msgstr "邀请两位好友合奏可解锁限定海报。"
 #: apps/app/src/routes/group-qr-page.tsx:293
 msgid "邀请你加入「{groupDisplayName}」"
 msgstr "邀请你加入「{groupDisplayName}」"
+
+#: apps/app/src/routes/profile-subscription-page.tsx:264
+msgid "邀请奖励"
+msgstr "邀请奖励"
+
+#: apps/app/src/routes/profile-subscription-page.tsx:267
+msgid "邀请码"
+msgstr "邀请码"
 
 #: apps/app/src/routes/group-qr-page.tsx:232
 #: apps/app/src/routes/group-qr-page.tsx:295

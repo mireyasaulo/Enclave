@@ -29,7 +29,7 @@ function formatPrice(priceCents: number, currency: string) {
 
 function formatDateTime(value?: string | null) {
   if (!value) {
-    return "Not set";
+    return null;
   }
 
   const timestamp = Date.parse(value);
@@ -120,7 +120,7 @@ export function ProfileSubscriptionPage() {
     return (
       <AppPage className="px-4 py-6">
         <AppSection className="mx-auto max-w-3xl">
-          <LoadingBlock label="Loading membership information..." />
+          <LoadingBlock label={t(msg`正在加载会员信息…`)} />
         </AppSection>
       </AppPage>
     );
@@ -144,6 +144,15 @@ export function ProfileSubscriptionPage() {
     return null;
   }
 
+  const subscriptionStatusLabel =
+    subscription.status === "active"
+      ? t(msg`生效中`)
+      : subscription.status === "expired"
+        ? t(msg`已过期`)
+        : t(msg`未开通`);
+  const fallbackNotSet = t(msg`未设置`);
+  const expiresLabel = formatDateTime(subscription.expiresAt) ?? fallbackNotSet;
+
   return (
     <AppPage className="bg-[color:var(--bg-canvas)] px-4 py-6">
       <div className="mx-auto flex max-w-4xl flex-col gap-4">
@@ -151,19 +160,20 @@ export function ProfileSubscriptionPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <div className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
-                Subscription
+                {t(msg`订阅`)}
               </div>
               <h1 className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">
-                Membership Center
+                {t(msg`会员中心`)}
               </h1>
               <p className="mt-2 text-sm leading-7 text-[color:var(--text-secondary)]">
-                Phone: {profile.phone || phone || "-"}
+                {t(msg`手机号`)}: {profile.phone || phone || "-"}
                 <br />
-                Status: {subscription.status}
+                {t(msg`状态`)}: {subscriptionStatusLabel}
                 <br />
-                Current plan: {subscription.currentPlanName || "None"}
+                {t(msg`当前套餐`)}:{" "}
+                {subscription.currentPlanName || t(msg`无`)}
                 <br />
-                Expires at: {formatDateTime(subscription.expiresAt)}
+                {t(msg`到期时间`)}: {expiresLabel}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -204,7 +214,7 @@ export function ProfileSubscriptionPage() {
         <div className="grid gap-4 lg:grid-cols-[1.25fr_0.95fr]">
           <AppSection className="rounded-[28px] border-black/5 bg-white px-6 py-6 shadow-none">
             <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-              Purchase plans
+              {t(msg`可购套餐`)}
             </div>
             <div className="mt-4 space-y-3">
               {purchasePlans.map((plan) => (
@@ -218,7 +228,8 @@ export function ProfileSubscriptionPage() {
                         {plan.name}
                       </div>
                       <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-                        {plan.description || `${plan.durationDays} days`}
+                        {plan.description ||
+                          t(msg`时长 ${plan.durationDays} 天`)}
                       </div>
                     </div>
                     <div className="text-right">
@@ -232,8 +243,8 @@ export function ProfileSubscriptionPage() {
                         onClick={() => checkoutMutation.mutate(plan.code)}
                       >
                         {checkoutMutation.isPending
-                          ? "Submitting..."
-                          : "Contact to activate"}
+                          ? t(msg`提交中…`)
+                          : t(msg`联系开通`)}
                       </Button>
                     </div>
                   </div>
@@ -241,7 +252,7 @@ export function ProfileSubscriptionPage() {
               ))}
               {!purchasePlans.length ? (
                 <InlineNotice tone="muted">
-                  No public plans are enabled in cloud admin right now.
+                  {t(msg`云端管理后台暂未开放可购套餐。`)}
                 </InlineNotice>
               ) : null}
             </div>
@@ -250,16 +261,16 @@ export function ProfileSubscriptionPage() {
           <div className="space-y-4">
             <AppSection className="rounded-[28px] border-black/5 bg-white px-6 py-6 shadow-none">
               <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                Invite rewards
+                {t(msg`邀请奖励`)}
               </div>
               <div className="mt-3 text-sm leading-7 text-[color:var(--text-secondary)]">
-                Invite code: {invite.code || "Not available"}
+                {t(msg`邀请码`)}: {invite.code || t(msg`暂无`)}
                 <br />
-                Reward days per successful invite: {invite.rewardDays}
+                {t(msg`单次邀请奖励天数`)}: {invite.rewardDays}
                 <br />
-                Successful invites: {invite.redeemCount}
+                {t(msg`成功邀请数`)}: {invite.redeemCount}
                 <br />
-                Reward days granted: {invite.rewardDaysGranted}
+                {t(msg`已发放奖励天数`)}: {invite.rewardDaysGranted}
               </div>
               {invite.shareUrl ? (
                 <div className="mt-4 rounded-[18px] bg-[#f7f7f7] px-4 py-3 text-xs leading-6 text-[color:var(--text-secondary)]">
@@ -270,27 +281,40 @@ export function ProfileSubscriptionPage() {
 
             <AppSection className="rounded-[28px] border-black/5 bg-white px-6 py-6 shadow-none">
               <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                Recent invite history
+                {t(msg`最近邀请记录`)}
               </div>
               <div className="mt-4 space-y-3">
-                {invite.recentRedemptions.map((item) => (
-                  <div
-                    key={item.id}
-                    className="rounded-[18px] border border-black/5 bg-[#fafafa] px-4 py-3 text-sm text-[color:var(--text-secondary)]"
-                  >
-                    <div className="font-medium text-[color:var(--text-primary)]">
-                      {item.inviteePhoneMasked}
+                {invite.recentRedemptions.map((item) => {
+                  const statusLabel =
+                    item.status === "rewarded"
+                      ? t(msg`已发放`)
+                      : t(msg`已拒绝`);
+                  return (
+                    <div
+                      key={item.id}
+                      className="rounded-[18px] border border-black/5 bg-[#fafafa] px-4 py-3 text-sm text-[color:var(--text-secondary)]"
+                    >
+                      <div className="font-medium text-[color:var(--text-primary)]">
+                        {item.inviteePhoneMasked}
+                      </div>
+                      <div className="mt-1">
+                        {t(msg`状态`)}: {statusLabel}
+                      </div>
+                      <div>
+                        {t(msg`创建时间`)}:{" "}
+                        {formatDateTime(item.createdAt) ?? fallbackNotSet}
+                      </div>
+                      {item.rejectReason ? (
+                        <div>
+                          {t(msg`拒绝原因`)}: {item.rejectReason}
+                        </div>
+                      ) : null}
                     </div>
-                    <div className="mt-1">Status: {item.status}</div>
-                    <div>Created at: {formatDateTime(item.createdAt)}</div>
-                    {item.rejectReason ? (
-                      <div>Reason: {item.rejectReason}</div>
-                    ) : null}
-                  </div>
-                ))}
+                  );
+                })}
                 {!invite.recentRedemptions.length ? (
                   <InlineNotice tone="muted">
-                    No invite rewards have been recorded yet.
+                    {t(msg`暂无邀请记录。`)}
                   </InlineNotice>
                 ) : null}
               </div>
