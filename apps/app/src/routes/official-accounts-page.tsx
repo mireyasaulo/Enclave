@@ -164,7 +164,7 @@ function MobileOfficialAccountsPage() {
   }
 
   return (
-    <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
+    <AppPage className="relative space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
       <TabPageTopBar
         title="公众号"
         titleAlign="center"
@@ -332,6 +332,16 @@ function MobileOfficialAccountsPage() {
             />
           </div>
         ) : null}
+      </div>
+      <div className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[3px]">
+        <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-6 py-5 text-center shadow-[var(--shadow-card)]">
+          <div className="text-[15px] font-semibold text-[color:var(--text-primary)]">
+            功能开发中
+          </div>
+          <div className="mt-1.5 text-[12px] text-[color:var(--text-secondary)]">
+            敬请期待
+          </div>
+        </div>
       </div>
     </AppPage>
   );

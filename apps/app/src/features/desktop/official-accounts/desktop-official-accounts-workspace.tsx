@@ -646,7 +646,7 @@ export function DesktopOfficialAccountsWorkspace({
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-[color:var(--bg-app)]">
+    <div className="relative flex h-full min-h-0 flex-col bg-[color:var(--bg-app)]">
       <header className="shrink-0 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.92)] px-5 py-3.5 backdrop-blur-xl">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -1120,6 +1120,16 @@ export function DesktopOfficialAccountsWorkspace({
           </section>
         </div>
       )}
+      <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[3px]">
+        <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-8 py-6 text-center shadow-[var(--shadow-card)]">
+          <div className="text-lg font-semibold text-[color:var(--text-primary)]">
+            功能开发中
+          </div>
+          <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
+            敬请期待
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1463,17 +1463,35 @@ export function DesktopSearchWorkspace({
                           selectedResultId={selectedResultId}
                         />
                       ) : section.category === "officialAccounts" ? (
-                        <DesktopSearchOfficialAccountResults
-                          accountResults={entry.previewOfficialAccounts}
-                          keyword={normalizedKeyword}
-                          officialAccountGroups={entry.previewOfficialAccountGroups}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
+                        <div className="relative">
+                          <DesktopSearchOfficialAccountResults
+                            accountResults={entry.previewOfficialAccounts}
+                            keyword={normalizedKeyword}
+                            officialAccountGroups={entry.previewOfficialAccountGroups}
+                            onOpen={onOpenResult}
+                            onSelect={handleSelectResult}
+                            registerResultRef={(resultId, node) => {
+                              resultButtonRefs.current[resultId] = node;
+                            }}
+                            selectedResultId={selectedResultId}
+                          />
+                          <DesktopSearchComingSoonOverlay />
+                        </div>
+                      ) : section.category === "miniPrograms" ? (
+                        <div className="relative">
+                          <DesktopSearchFeatureResults
+                            category={section.category}
+                            items={entry.previewFeatureResults}
+                            keyword={normalizedKeyword}
+                            onOpen={onOpenResult}
+                            onSelect={handleSelectResult}
+                            registerResultRef={(resultId, node) => {
+                              resultButtonRefs.current[resultId] = node;
+                            }}
+                            selectedResultId={selectedResultId}
+                          />
+                          <DesktopSearchComingSoonOverlay />
+                        </div>
                       ) : isDesktopFeatureCardCategory(section.category) ? (
                         <DesktopSearchFeatureResults
                           category={section.category}
@@ -1545,17 +1563,35 @@ export function DesktopSearchWorkspace({
                     selectedResultId={selectedResultId}
                   />
                 ) : activeCategory === "officialAccounts" ? (
-                  <DesktopSearchOfficialAccountResults
-                    accountResults={officialAccountOnlyResults}
-                    keyword={normalizedKeyword}
-                    officialAccountGroups={officialAccountGroups}
-                    onOpen={onOpenResult}
-                    onSelect={handleSelectResult}
-                    registerResultRef={(resultId, node) => {
-                      resultButtonRefs.current[resultId] = node;
-                    }}
-                    selectedResultId={selectedResultId}
-                  />
+                  <div className="relative">
+                    <DesktopSearchOfficialAccountResults
+                      accountResults={officialAccountOnlyResults}
+                      keyword={normalizedKeyword}
+                      officialAccountGroups={officialAccountGroups}
+                      onOpen={onOpenResult}
+                      onSelect={handleSelectResult}
+                      registerResultRef={(resultId, node) => {
+                        resultButtonRefs.current[resultId] = node;
+                      }}
+                      selectedResultId={selectedResultId}
+                    />
+                    <DesktopSearchComingSoonOverlay />
+                  </div>
+                ) : activeCategory === "miniPrograms" ? (
+                  <div className="relative">
+                    <DesktopSearchFeatureResults
+                      category={activeCategory}
+                      items={visibleResults}
+                      keyword={normalizedKeyword}
+                      onOpen={onOpenResult}
+                      onSelect={handleSelectResult}
+                      registerResultRef={(resultId, node) => {
+                        resultButtonRefs.current[resultId] = node;
+                      }}
+                      selectedResultId={selectedResultId}
+                    />
+                    <DesktopSearchComingSoonOverlay />
+                  </div>
                 ) : isDesktopFeatureCardCategory(activeCategory) ? (
                   <DesktopSearchFeatureResults
                     category={activeCategory}
@@ -3113,4 +3149,19 @@ function getDesktopSearchScopeCount(
   }
 
   return scopeCounts.feed;
+}
+
+function DesktopSearchComingSoonOverlay() {
+  return (
+    <div className="pointer-events-auto absolute inset-0 z-30 flex items-center justify-center rounded-[18px] bg-black/30 backdrop-blur-[3px]">
+      <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-6 py-5 text-center shadow-[var(--shadow-card)]">
+        <div className="text-base font-semibold text-[color:var(--text-primary)]">
+          功能开发中
+        </div>
+        <div className="mt-1.5 text-xs text-[color:var(--text-secondary)]">
+          敬请期待
+        </div>
+      </div>
+    </div>
+  );
 }
