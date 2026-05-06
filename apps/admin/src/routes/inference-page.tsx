@@ -1307,7 +1307,7 @@ export function InferencePage() {
                       <div className="mt-3 text-xs leading-5 text-[color:var(--text-secondary)]">
                         {resolveDiagnosticMessage(item.message)}
                       </div>
-                      <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[color:var(--text-tertiary)]">
+                      <div className="mt-3 flex flex-wrap gap-2 text-[12px] text-[color:var(--text-tertiary)]">
                         <span>{item.configured ? "已配置" : "未配置"}</span>
                         <span>{item.declared ? "已声明" : "未声明"}</span>
                         <span>

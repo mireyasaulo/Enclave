@@ -59,7 +59,7 @@ export function AdminContextBadge({
   return (
     <span
       className={cn(
-        "inline-flex max-w-full min-w-0 items-center justify-center break-words rounded-full border border-[color:var(--border-subtle)] bg-white/80 px-2.5 py-1 text-center text-[11px] font-medium leading-4 text-[color:var(--text-secondary)] shadow-[var(--shadow-soft)]",
+        "inline-flex max-w-full min-w-0 items-center justify-center break-words rounded-full border border-[color:var(--border-subtle)] bg-white/80 px-2.5 py-1 text-center text-[12px] font-medium leading-4 text-[color:var(--text-secondary)] shadow-[var(--shadow-soft)]",
         className,
       )}
     >
@@ -86,7 +86,7 @@ export function AdminPageHero({
     >
       <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
         <div className="max-w-2xl">
-          <div className="text-[10px] uppercase tracking-[0.28em] text-[color:var(--text-muted)]">{eyebrow}</div>
+          <div className="text-[12px] uppercase tracking-[0.28em] text-[color:var(--text-muted)]">{eyebrow}</div>
           <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">{title}</h2>
           <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{description}</p>
           {badges?.length ? (
@@ -463,7 +463,7 @@ export function AdminEyebrow({
   className?: string;
 }) {
   return (
-    <div className={cn("text-[11px] uppercase tracking-[0.26em] text-[color:var(--text-muted)]", className)}>
+    <div className={cn("text-[12px] uppercase tracking-[0.26em] text-[color:var(--text-muted)]", className)}>
       {children}
     </div>
   );
@@ -642,7 +642,7 @@ export function AdminCompactStatusCard({
       )}
     >
       <div className="flex items-center justify-between gap-3">
-        <div className="text-[11px] uppercase tracking-[0.22em] text-[color:var(--text-muted)]">{label}</div>
+        <div className="text-[12px] uppercase tracking-[0.22em] text-[color:var(--text-muted)]">{label}</div>
         <StatusPill tone={tone}>{value}</StatusPill>
       </div>
     </div>
@@ -778,7 +778,7 @@ export function AdminValueCard({
         className,
       )}
     >
-      <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{label}</div>
+      <div className="text-[12px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{label}</div>
       <div className="mt-2 text-sm text-[color:var(--text-secondary)]">{value}</div>
     </div>
   );
@@ -1011,7 +1011,7 @@ export function AdminTextArea({
             <button
               type="button"
               onClick={(e) => { e.preventDefault(); setShowDefault((v) => !v); }}
-              className="shrink-0 rounded-md px-2 py-0.5 text-[11px] text-[color:var(--text-muted)] ring-1 ring-[color:var(--border-faint)] transition hover:bg-[color:var(--surface-secondary)] hover:text-[color:var(--text-secondary)]"
+              className="shrink-0 rounded-md px-2 py-0.5 text-[12px] text-[color:var(--text-muted)] ring-1 ring-[color:var(--border-faint)] transition hover:bg-[color:var(--surface-secondary)] hover:text-[color:var(--text-secondary)]"
             >
               {showDefault ? t(msg`收起`) : t(msg`查看默认`)}
             </button>
@@ -1021,7 +1021,7 @@ export function AdminTextArea({
           <div className="mb-2 text-xs leading-5 text-[color:var(--text-secondary)]">{description}</div>
         ) : null}
         {showDefault && defaultPrompt ? (
-          <pre className="mb-2 overflow-x-auto whitespace-pre-wrap break-words rounded-[16px] border border-[color:var(--border-faint)] bg-white/80 p-3 text-[11px] leading-[1.7] text-[color:var(--text-secondary)]">
+          <pre className="mb-2 overflow-x-auto whitespace-pre-wrap break-words rounded-[16px] border border-[color:var(--border-faint)] bg-white/80 p-3 text-[12px] leading-[1.7] text-[color:var(--text-secondary)]">
             {defaultPrompt}
           </pre>
         ) : null}
@@ -1164,7 +1164,7 @@ export function AdminSubTabs({
  *   body   text-[length:var(--density-font-body)] leading-[var(--density-leading-body)]
  *   meta   text-[length:var(--density-font-meta)]
  *   eyebrow text-[12px] uppercase tracking-[0.22em]
- * 禁用 text-[10px] / text-[11px]
+ * 禁用 text-[12px] / text-[12px]
  * ========================================================================= */
 
 type AdminSectionTone = "card" | "console" | "soft";

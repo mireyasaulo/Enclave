@@ -4471,7 +4471,7 @@ function HistoryDiffCard({
       </div>
       <div className="mt-3 grid gap-3">
         <div>
-          <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+          <div className="text-[12px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
             {currentHeading}
           </div>
           <div className="mt-1 rounded-2xl border border-[color:var(--border-faint)] bg-white/80 px-3 py-2 text-sm leading-6 text-[color:var(--text-secondary)]">
@@ -4479,7 +4479,7 @@ function HistoryDiffCard({
           </div>
         </div>
         <div>
-          <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+          <div className="text-[12px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
             {nextHeading}
           </div>
           <div className="mt-1 rounded-2xl border border-[color:var(--border-faint)] bg-white/80 px-3 py-2 text-sm leading-6 text-[color:var(--text-secondary)]">
@@ -6691,7 +6691,7 @@ function PreviewCharacterCard({
                     key={`${message.timestamp}-${message.text}`}
                     className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-3 py-2"
                   >
-                    <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                    <div className="text-[12px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                       {message.sender || formatDirection(message.direction)} ·{" "}
                       {message.timestamp}
                     </div>
@@ -6724,7 +6724,7 @@ function PreviewCharacterCard({
                           key={`raw-${message.timestamp}-${message.text}`}
                           className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-3 py-2"
                         >
-                          <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                          <div className="text-[12px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                             {message.sender || formatDirection(message.direction)} ·{" "}
                             {message.timestamp}
                           </div>
@@ -6745,7 +6745,7 @@ function PreviewCharacterCard({
                           key={`moment-${moment.postedAt}-${moment.text}`}
                           className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-3 py-2"
                         >
-                          <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                          <div className="text-[12px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                             {formatDateTime(moment.postedAt)}
                             {moment.location ? ` · ${moment.location}` : ""}
                             {moment.mediaHint ? ` · ${moment.mediaHint}` : ""}
@@ -7145,7 +7145,7 @@ function WechatSyncPreviewDraftCard({
                     key={`${message.timestamp}-${message.text}`}
                     className="rounded-2xl border border-[color:var(--border-faint)] bg-white/80 px-3 py-2"
                   >
-                    <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                    <div className="text-[12px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                       {message.sender || formatDirection(message.direction)} ·{" "}
                       {message.timestamp}
                     </div>
@@ -7178,7 +7178,7 @@ function WechatSyncPreviewDraftCard({
                           key={`raw-${message.timestamp}-${message.text}`}
                           className="rounded-2xl border border-[color:var(--border-faint)] bg-white/80 px-3 py-2"
                         >
-                          <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                          <div className="text-[12px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                             {message.sender || formatDirection(message.direction)} ·{" "}
                             {message.timestamp}
                           </div>
@@ -7199,7 +7199,7 @@ function WechatSyncPreviewDraftCard({
                           key={`moment-${moment.postedAt}-${moment.text}`}
                           className="rounded-2xl border border-[color:var(--border-faint)] bg-white/80 px-3 py-2"
                         >
-                          <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                          <div className="text-[12px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                             {formatDateTime(moment.postedAt)}
                             {moment.location ? ` · ${moment.location}` : ""}
                             {moment.mediaHint ? ` · ${moment.mediaHint}` : ""}
@@ -7426,7 +7426,7 @@ function WechatSyncPreviewDraftCard({
             <summary className="cursor-pointer select-none text-sm font-medium text-[color:var(--text-primary)]">
               展开查看完整 draftCharacter JSON
             </summary>
-            <pre className="mt-3 max-h-[32rem] overflow-auto rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-3 py-3 font-mono text-[11px] leading-6 text-[color:var(--text-secondary)]">
+            <pre className="mt-3 max-h-[32rem] overflow-auto rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-3 py-3 font-mono text-[12px] leading-6 text-[color:var(--text-secondary)]">
               {rawDraftJson}
             </pre>
           </details>
@@ -7471,7 +7471,7 @@ function PreviewMetricChip({
 }) {
   return (
     <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/80 px-3 py-2 shadow-[var(--shadow-soft)]">
-      <div className="text-[10px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+      <div className="text-[12px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
         {label}
       </div>
       <div className="mt-1 text-sm font-semibold text-[color:var(--text-primary)]">
@@ -7494,7 +7494,7 @@ function PreviewReadBlock({
 }) {
   return (
     <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/80 px-3 py-3">
-      <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+      <div className="text-[12px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
         {label}
       </div>
       <div
@@ -7523,7 +7523,7 @@ function PreviewChipList({
 }) {
   return (
     <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/80 px-3 py-3">
-      <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+      <div className="text-[12px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
         {label}
       </div>
       {values.length ? (
@@ -7573,7 +7573,7 @@ function PreviewExpandableTextBlock({
       <summary className="cursor-pointer list-none select-none">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+            <div className="text-[12px] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
               {label}
             </div>
             <div className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">

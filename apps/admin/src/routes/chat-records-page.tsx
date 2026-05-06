@@ -636,7 +636,7 @@ export function ChatRecordsPage() {
                   <div className="text-lg font-semibold text-[color:var(--text-primary)]">
                     {conversations.length}
                   </div>
-                  <div className="text-[11px] text-[color:var(--text-muted)]">
+                  <div className="text-[12px] text-[color:var(--text-muted)]">
                     本页会话
                   </div>
                 </div>
@@ -925,7 +925,7 @@ export function ChatRecordsPage() {
                             {formatMessageType(item.messageType)}
                           </div>
                         </div>
-                        <span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[11px] font-medium text-sky-700">
+                        <span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[12px] font-medium text-sky-700">
                           定位
                         </span>
                       </div>
@@ -1503,7 +1503,7 @@ function ConversationListItemCard({
               {item.characterName}
             </div>
             {active ? (
-              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[12px] font-medium text-emerald-700">
                 当前
               </span>
             ) : null}
@@ -1512,7 +1512,7 @@ function ConversationListItemCard({
             {item.relationship || "未标注关系"}
           </div>
         </div>
-        <div className="shrink-0 text-right text-[11px] text-[color:var(--text-muted)]">
+        <div className="shrink-0 text-right text-[12px] text-[color:var(--text-muted)]">
           <div>{formatCompactDate(item.lastActivityAt)}</div>
           <div className="mt-1">7d {item.recentMessageCount7d}</div>
         </div>
@@ -1522,7 +1522,7 @@ function ConversationListItemCard({
         {formatPreview(item.lastVisibleMessage ?? item.lastStoredMessage ?? null, 96)}
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-[color:var(--text-muted)]">
+      <div className="mt-3 flex flex-wrap gap-2 text-[12px] text-[color:var(--text-muted)]">
         <span>可见 {item.visibleMessageCount}</span>
         <span>留存 {item.storedMessageCount}</span>
         <span>30 天 {item.recentMessageCount30d}</span>
@@ -1565,7 +1565,7 @@ function ConversationWorkspaceHeader({
       <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-[0.28em] text-[color:var(--text-muted)]">
+            <div className="text-[12px] uppercase tracking-[0.28em] text-[color:var(--text-muted)]">
               当前工作会话
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-3">
@@ -1694,7 +1694,7 @@ function TimelineDateDivider({ value }: { value: string }) {
   return (
     <div className="flex items-center gap-3 py-1">
       <div className="h-px flex-1 bg-[color:var(--border-faint)]" />
-      <span className="rounded-full border border-[color:var(--border-faint)] bg-white px-3 py-1 text-[11px] font-medium text-[color:var(--text-muted)]">
+      <span className="rounded-full border border-[color:var(--border-faint)] bg-white px-3 py-1 text-[12px] font-medium text-[color:var(--text-muted)]">
         {formatTimelineDate(value)}
       </span>
       <div className="h-px flex-1 bg-[color:var(--border-faint)]" />
@@ -1750,7 +1750,7 @@ function MessageCard({
             }`}
           >
             {highlighted ? (
-              <span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[11px] font-medium text-sky-700">
+              <span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[12px] font-medium text-sky-700">
                 命中
               </span>
             ) : null}
@@ -1807,10 +1807,10 @@ function TrendBars({
               title={`${item.date} · 总 ${item.totalMessages} · 用户 ${item.userMessages} · 角色 ${item.characterMessages}`}
             />
           </div>
-          <div className="text-[11px] text-[color:var(--text-muted)]">
+          <div className="text-[12px] text-[color:var(--text-muted)]">
             {item.date.slice(5).replace("-", "/")}
           </div>
-          <div className="text-[11px] font-medium text-[color:var(--text-primary)]">
+          <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
             {item.totalMessages}
           </div>
         </div>
@@ -1882,8 +1882,8 @@ function TokenTrendBars({
               title={`${item.label} · Token ${item.totalTokens} · 请求 ${item.requestCount}`}
             />
           </div>
-          <div className="text-[11px] text-[color:var(--text-muted)]">{item.label}</div>
-          <div className="text-[11px] font-medium text-[color:var(--text-primary)]">
+          <div className="text-[12px] text-[color:var(--text-muted)]">{item.label}</div>
+          <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
             {compactInteger(item.totalTokens)}
           </div>
         </div>

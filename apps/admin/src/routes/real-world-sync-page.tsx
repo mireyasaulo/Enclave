@@ -1309,7 +1309,7 @@ export function RealWorldSyncPage() {
                   <Card className="bg-[color:var(--surface-console)]">
                     <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                       <div className="max-w-3xl">
-                        <div className="text-[10px] uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+                        <div className="text-[12px] uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
                           角色工作台
                         </div>
                         <h3 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">
