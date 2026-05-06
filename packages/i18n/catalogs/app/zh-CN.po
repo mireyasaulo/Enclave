@@ -10652,13 +10652,13 @@ msgstr "请输入群昵称"
 msgid "请输入群聊名称"
 msgstr "请输入群聊名称"
 
-#: apps/app/src/routes/welcome-page.tsx:759
-msgid "请输入验证码"
-msgstr "请输入验证码"
-
 #: apps/app/src/routes/welcome-page.tsx:587
 msgid "请输入验证码。"
 msgstr "请输入验证码。"
+
+#: apps/app/src/routes/welcome-page.tsx:759
+msgid "请输入验证码（默认 123456 即可通过）"
+msgstr "请输入验证码（默认 123456 即可通过）"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:531
 #: apps/app/src/routes/character-detail-page.tsx:274

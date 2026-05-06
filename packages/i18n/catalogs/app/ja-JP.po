@@ -10652,13 +10652,13 @@ msgstr "グループ内ニックネームを入力"
 msgid "请输入群聊名称"
 msgstr "グループチャット名を入力"
 
-#: apps/app/src/routes/welcome-page.tsx:759
-msgid "请输入验证码"
-msgstr "認証コードを入力"
-
 #: apps/app/src/routes/welcome-page.tsx:587
 msgid "请输入验证码。"
 msgstr "認証コードを入力してください。"
+
+#: apps/app/src/routes/welcome-page.tsx:759
+msgid "请输入验证码（默认 123456 即可通过）"
+msgstr ""
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:531
 #: apps/app/src/routes/character-detail-page.tsx:274

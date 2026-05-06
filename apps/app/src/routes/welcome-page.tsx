@@ -756,7 +756,7 @@ export function WelcomePage() {
                     setCode(event.target.value);
                     setEntryError("");
                   }}
-                  placeholder={t(msg`请输入验证码`)}
+                  placeholder={t(msg`请输入验证码（默认 123456 即可通过）`)}
                 />
               </div>
               <Button
