@@ -2032,7 +2032,7 @@ function FriendListRow({
         "flex w-full items-center gap-3 bg-[color:var(--bg-canvas-elevated)] text-left transition-colors",
         desktop
           ? "px-4 py-3.5 hover:bg-[color:var(--surface-console)]"
-          : "px-4 py-2.5 hover:bg-[color:var(--surface-card-hover)]",
+          : "py-2.5 pl-4 pr-7 hover:bg-[color:var(--surface-card-hover)]",
         index > 0 ? "border-t border-[color:var(--border-faint)]" : undefined,
         active
           ? "border border-[rgba(7,193,96,0.16)] bg-[rgba(240,247,243,0.94)] shadow-[inset_0_0_0_1px_rgba(7,193,96,0.06)]"
