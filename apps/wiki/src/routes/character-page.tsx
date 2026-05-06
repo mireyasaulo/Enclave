@@ -24,6 +24,7 @@ import { SnapshotDiff } from "../components/snapshot-diff";
 import { TalkPanel } from "../components/talk-panel";
 import { WatchToggle } from "../components/watch-toggle";
 import { ConflictResolver } from "../components/conflict-resolver";
+import { RiskBadge } from "../components/risk-badge";
 import { WikiApiError } from "../lib/wiki-api";
 
 type Tab = "read" | "edit" | "history" | "talk";
@@ -554,6 +555,8 @@ function EditView({
         <LogicEditor
           recipe={recipeDraft}
           onChange={(next) => setRecipeDraft(next)}
+          characterId={characterId}
+          currentRole={user?.role}
         />
       )}
       <FormRow
@@ -666,9 +669,13 @@ export function mergeContentIntoRecipe(
 export function LogicEditor({
   recipe,
   onChange,
+  characterId,
+  currentRole,
 }: {
   recipe: CharacterBlueprintRecipe;
   onChange: (next: CharacterBlueprintRecipe) => void;
+  characterId?: string;
+  currentRole?: string;
 }) {
   const [realityLinkText, setRealityLinkText] = useState(() =>
     JSON.stringify(recipe.realityLink ?? null, null, 2),
@@ -939,7 +946,18 @@ export function LogicEditor({
           }
         />
       </FormRow>
-      <FormRow label="核心逻辑">
+      <FormRow
+        label="核心逻辑"
+        badge={
+          characterId ? (
+            <RiskBadge
+              characterId={characterId}
+              path="prompting.coreLogic"
+              currentRole={currentRole}
+            />
+          ) : undefined
+        }
+      >
         <TextAreaField
           rows={5}
           value={recipe.prompting.coreLogic}
@@ -957,6 +975,9 @@ export function LogicEditor({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <ScenePromptField
           label="聊天 Prompt"
+          scene="chat"
+          characterId={characterId}
+          currentRole={currentRole}
           value={recipe.prompting.scenePrompts.chat}
           onChange={(value) =>
             onChange({
@@ -973,6 +994,9 @@ export function LogicEditor({
         />
         <ScenePromptField
           label="问候 Prompt"
+          scene="greeting"
+          characterId={characterId}
+          currentRole={currentRole}
           value={recipe.prompting.scenePrompts.greeting}
           onChange={(value) =>
             onChange({
@@ -989,6 +1013,9 @@ export function LogicEditor({
         />
         <ScenePromptField
           label="主动触达 Prompt"
+          scene="proactive"
+          characterId={characterId}
+          currentRole={currentRole}
           value={recipe.prompting.scenePrompts.proactive}
           onChange={(value) =>
             onChange({
@@ -1100,7 +1127,18 @@ export function LogicEditor({
             }
           />
         </FormRow>
-        <FormRow label="核心记忆">
+        <FormRow
+          label="核心记忆"
+          badge={
+            characterId ? (
+              <RiskBadge
+                characterId={characterId}
+                path="memorySeed.coreMemory"
+                currentRole={currentRole}
+              />
+            ) : undefined
+          }
+        >
           <TextAreaField
             rows={4}
             value={recipe.memorySeed.coreMemory}
@@ -1444,7 +1482,18 @@ export function LogicEditor({
           </FormRow>
         </div>
       </div>
-      <FormRow label="现实联动配置 JSON">
+      <FormRow
+        label="现实联动配置 JSON"
+        badge={
+          characterId ? (
+            <RiskBadge
+              characterId={characterId}
+              path="realityLink"
+              currentRole={currentRole}
+            />
+          ) : undefined
+        }
+      >
         <TextAreaField
           rows={8}
           value={realityLinkText}
@@ -1476,13 +1525,30 @@ function ScenePromptField({
   label,
   value,
   onChange,
+  characterId,
+  currentRole,
+  scene,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  characterId?: string;
+  currentRole?: string;
+  scene?: string;
 }) {
   return (
-    <FormRow label={label}>
+    <FormRow
+      label={label}
+      badge={
+        characterId && scene ? (
+          <RiskBadge
+            characterId={characterId}
+            path={`prompting.scenePrompts.${scene}`}
+            currentRole={currentRole}
+          />
+        ) : undefined
+      }
+    >
       <TextAreaField
         rows={4}
         value={value}
@@ -1495,16 +1561,19 @@ function ScenePromptField({
 function FormRow({
   label,
   hint,
+  badge,
   children,
 }: {
   label: string;
   hint?: string;
+  badge?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <label className="block">
       <span className="text-sm mb-1 block">
         {label}
+        {badge}
         {hint && (
           <span className="ml-2 text-xs text-[var(--text-muted)] font-normal">
             {hint}
