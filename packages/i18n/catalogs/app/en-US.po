@@ -12,8 +12,8 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: apps/app/src/routes/discover-feed-page.tsx:871
-#: apps/app/src/routes/discover-page.tsx:752
+#: apps/app/src/routes/discover-feed-page.tsx:868
+#: apps/app/src/routes/discover-page.tsx:750
 msgid " · AI 已参与回应"
 msgstr " · AI has joined the reply"
 
@@ -121,7 +121,7 @@ msgid "{0} 位联系人"
 msgstr "{0} contacts"
 
 #. placeholder {0}: request.characterName
-#: apps/app/src/routes/discover-page.tsx:314
+#: apps/app/src/routes/discover-page.tsx:312
 msgid "{0} 在{translatedSceneLabel}里注意到了你：{greeting}"
 msgstr "{0} noticed you at {translatedSceneLabel}: {greeting}"
 
@@ -203,7 +203,7 @@ msgid "{0} 正在直播中，切到手机端继续查看频道表现。"
 msgstr "{0} is live. Switch to mobile to keep tracking channel performance."
 
 #. placeholder {0}: post.authorName
-#: apps/app/src/routes/discover-feed-page.tsx:435
+#: apps/app/src/routes/discover-feed-page.tsx:432
 msgid "{0} 的广场动态"
 msgstr "{0}'s feed post"
 
@@ -221,19 +221,19 @@ msgid "{0} 群聊"
 msgstr "{0} group chat"
 
 #. placeholder {0}: post.commentCount
-#: apps/app/src/routes/discover-feed-page.tsx:870
+#: apps/app/src/routes/discover-feed-page.tsx:867
 msgid "{0} 评论"
 msgstr "{0} comments"
 
 #. placeholder {0}: post.likeCount
-#: apps/app/src/routes/discover-feed-page.tsx:869
+#: apps/app/src/routes/discover-feed-page.tsx:866
 msgid "{0} 赞"
 msgstr "{0} likes"
 
 #. placeholder {0}: post.likeCount
 #. placeholder {1}: post.commentCount
 #. placeholder {2}: post.aiReacted ? t(msg` · AI 已参与回应`) : ""
-#: apps/app/src/routes/discover-page.tsx:752
+#: apps/app/src/routes/discover-page.tsx:750
 msgid "{0} 赞 · {1} 评论{2}"
 msgstr "{0} likes · {1} comments{2}"
 
@@ -253,7 +253,7 @@ msgid "{0}，在手机上继续直播准备与内容导流。"
 msgstr "{0}. Continue live prep and traffic routing on mobile."
 
 #. placeholder {0}: post.authorName
-#: apps/app/src/routes/discover-feed-page.tsx:436
+#: apps/app/src/routes/discover-feed-page.tsx:433
 msgid "{0}：{postSummary}"
 msgstr "{0}: {postSummary}"
 
@@ -279,7 +279,7 @@ msgstr "{callHandoffTitle} {callHandoffKindLabel}"
 msgid "{categoryLabel} · {count} 条"
 msgstr "{categoryLabel} · {count} items"
 
-#: apps/app/src/routes/discover-page.tsx:277
+#: apps/app/src/routes/discover-page.tsx:275
 msgid "{characterName} 已加入通讯录：{greeting}"
 msgstr "{characterName} has been added to Contacts: {greeting}"
 
@@ -448,11 +448,11 @@ msgid "{totalSeconds} 秒"
 msgstr "{totalSeconds} sec"
 
 #. placeholder {0}: session.estimatedWaitSeconds
-#: apps/app/src/routes/welcome-page.tsx:176
+#: apps/app/src/routes/welcome-page.tsx:180
 msgid "{translatedDisplayStatus} 预计等待：{0} 秒。"
 msgstr "{translatedDisplayStatus} Estimated wait: {0} seconds."
 
-#: apps/app/src/routes/discover-page.tsx:306
+#: apps/app/src/routes/discover-page.tsx:304
 msgid "{translatedSceneLabel} 里暂时没有新的相遇。"
 msgstr "No new encounters in {translatedSceneLabel} for now."
 
@@ -559,12 +559,12 @@ msgstr "AI digital human"
 msgid "AI 正在播报"
 msgstr "AI is speaking"
 
-#: apps/app/src/routes/profile-settings-page.tsx:42
-#: apps/app/src/routes/profile-settings-page.tsx:378
+#: apps/app/src/routes/profile-settings-page.tsx:47
+#: apps/app/src/routes/profile-settings-page.tsx:405
 msgid "AI 设置"
 msgstr "AI Settings"
 
-#: apps/app/src/routes/profile-settings-page.tsx:408
+#: apps/app/src/routes/profile-settings-page.tsx:435
 msgid "AI 设置暂时不可用"
 msgstr "AI settings are temporarily unavailable"
 
@@ -590,7 +590,7 @@ msgstr "Core API {0}"
 msgid "Ctrl/Cmd + Enter 发送"
 msgstr "Ctrl/Cmd + Enter to send"
 
-#: apps/app/src/routes/profile-settings-page.tsx:65
+#: apps/app/src/routes/profile-settings-page.tsx:75
 msgid "Ctrl/Cmd + Enter 发送消息"
 msgstr "Ctrl/Cmd + Enter to send"
 
@@ -616,7 +616,7 @@ msgstr "Enter send current"
 msgid "Enter 发送"
 msgstr "Enter to send"
 
-#: apps/app/src/routes/profile-settings-page.tsx:60
+#: apps/app/src/routes/profile-settings-page.tsx:70
 msgid "Enter 发送消息"
 msgstr "Enter to send"
 
@@ -797,25 +797,25 @@ msgstr "Different places trigger different ways for characters to approach, then
 msgid "不在冷却中，可直接继续补发"
 msgstr "Not in cooldown and ready to resend"
 
-#: apps/app/src/routes/profile-settings-page.tsx:482
+#: apps/app/src/routes/profile-settings-page.tsx:509
 msgid "专属 API Key"
 msgstr "Dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:384
+#: apps/app/src/routes/profile-settings-page.tsx:411
 msgid "专属 API Key 与兼容 Base URL"
 msgstr "Dedicated API Key and compatible Base URL"
 
-#: apps/app/src/routes/profile-settings-page.tsx:578
-#: apps/app/src/routes/profile-settings-page.tsx:582
+#: apps/app/src/routes/profile-settings-page.tsx:605
+#: apps/app/src/routes/profile-settings-page.tsx:609
 msgid "专属 API Key 已保存。"
 msgstr "Dedicated API Key saved."
 
-#: apps/app/src/routes/profile-settings-page.tsx:589
-#: apps/app/src/routes/profile-settings-page.tsx:593
+#: apps/app/src/routes/profile-settings-page.tsx:616
+#: apps/app/src/routes/profile-settings-page.tsx:620
 msgid "专属 API Key 已清除。"
 msgstr "Dedicated API Key cleared."
 
-#: apps/app/src/routes/profile-settings-page.tsx:462
+#: apps/app/src/routes/profile-settings-page.tsx:489
 msgid "专属 Key"
 msgstr "Dedicated key"
 
@@ -824,22 +824,22 @@ msgid "专门替你记事、盯时间、到点提醒的人"
 msgstr "Keeps notes, watches time, and reminds you on schedule"
 
 #: apps/app/src/i18n/static-dom-seed.ts:178
-#: apps/app/src/routes/welcome-page.tsx:956
+#: apps/app/src/routes/welcome-page.tsx:1011
 msgid "世界"
 msgstr "World"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2415
 #: apps/app/src/features/shell/desktop-shell.tsx:145
-#: apps/app/src/features/shell/desktop-shell.tsx:1136
-#: apps/app/src/features/shell/desktop-shell.tsx:1154
+#: apps/app/src/features/shell/desktop-shell.tsx:1138
+#: apps/app/src/features/shell/desktop-shell.tsx:1152
 #: apps/app/src/routes/desktop-feedback-page.tsx:118
 #: apps/app/src/routes/desktop-mobile-page.tsx:207
 #: apps/app/src/routes/desktop-mobile-page.tsx:1225
-#: apps/app/src/routes/discover-feed-page.tsx:827
-#: apps/app/src/routes/profile-page.tsx:81
-#: apps/app/src/routes/profile-page.tsx:88
-#: apps/app/src/routes/profile-page.tsx:91
-#: apps/app/src/routes/profile-settings-page.tsx:788
+#: apps/app/src/routes/discover-feed-page.tsx:824
+#: apps/app/src/routes/profile-page.tsx:103
+#: apps/app/src/routes/profile-page.tsx:110
+#: apps/app/src/routes/profile-page.tsx:113
+#: apps/app/src/routes/profile-settings-page.tsx:888
 msgid "世界主人"
 msgstr "World owner"
 
@@ -861,8 +861,8 @@ msgstr "The world owner will not appear in the removal list."
 msgid "世界人"
 msgstr "World person"
 
-#: apps/app/src/routes/welcome-page.tsx:1052
-#: apps/app/src/routes/welcome-page.tsx:1069
+#: apps/app/src/routes/welcome-page.tsx:1107
+#: apps/app/src/routes/welcome-page.tsx:1124
 msgid "世界入口"
 msgstr "World Entry"
 
@@ -883,7 +883,7 @@ msgstr "World public feed"
 msgid "世界内自然认识"
 msgstr "Met naturally in the world"
 
-#: apps/app/src/routes/welcome-page.tsx:45
+#: apps/app/src/routes/welcome-page.tsx:49
 msgid "世界启动失败。"
 msgstr "World startup failed."
 
@@ -895,7 +895,7 @@ msgstr "World online"
 msgid "世界地图"
 msgstr "World Map"
 
-#: apps/app/src/routes/welcome-page.tsx:959
+#: apps/app/src/routes/welcome-page.tsx:1014
 msgid "世界地址已连通，正在进入应用前同步世界主人资料。"
 msgstr "The world address is reachable. Syncing world owner profile before entering the app."
 
@@ -903,40 +903,40 @@ msgstr "The world address is reachable. Syncing world owner profile before enter
 msgid "世界实例在线"
 msgstr "World instance online"
 
-#: apps/app/src/routes/discover-feed-page.tsx:618
-#: apps/app/src/routes/discover-page.tsx:471
+#: apps/app/src/routes/discover-feed-page.tsx:615
+#: apps/app/src/routes/discover-page.tsx:469
 msgid "世界居民公开可见"
 msgstr "Visible to world residents"
 
-#: apps/app/src/routes/welcome-page.tsx:418
+#: apps/app/src/routes/welcome-page.tsx:460
 msgid "世界已就绪，但暂时还无法访问。"
 msgstr "The world is ready, but it cannot be reached yet."
 
-#: apps/app/src/routes/welcome-page.tsx:165
+#: apps/app/src/routes/welcome-page.tsx:169
 msgid "世界已就绪，正在连接..."
 msgstr "World is ready. Connecting..."
 
-#: apps/app/src/routes/welcome-page.tsx:43
+#: apps/app/src/routes/welcome-page.tsx:47
 msgid "世界已就绪。"
 msgstr "World is ready."
 
-#: apps/app/src/routes/welcome-page.tsx:42
+#: apps/app/src/routes/welcome-page.tsx:46
 msgid "世界已经启动完成，但暂时还没有可用的 API 地址。"
 msgstr "The world has finished starting, but no API address is available yet."
 
-#: apps/app/src/routes/welcome-page.tsx:47
+#: apps/app/src/routes/welcome-page.tsx:51
 msgid "世界已被停用。"
 msgstr "The world has been disabled."
 
-#: apps/app/src/routes/welcome-page.tsx:384
+#: apps/app/src/routes/welcome-page.tsx:426
 msgid "世界已解析完成，但没有可用的 API 地址。"
 msgstr "The world resolved successfully, but no API address is available."
 
-#: apps/app/src/routes/welcome-page.tsx:152
+#: apps/app/src/routes/welcome-page.tsx:156
 msgid "世界当前不可用。"
 msgstr "This world is currently unavailable."
 
-#: apps/app/src/routes/welcome-page.tsx:46
+#: apps/app/src/routes/welcome-page.tsx:50
 msgid "世界暂时无法启动。"
 msgstr "The world cannot be started right now."
 
@@ -952,11 +952,11 @@ msgstr "World Archive"
 msgid "世界模式"
 msgstr "World mode"
 
-#: apps/app/src/routes/welcome-page.tsx:51
+#: apps/app/src/routes/welcome-page.tsx:55
 msgid "世界正在删除，无法恢复。"
 msgstr "The world is being deleted and cannot be resumed."
 
-#: apps/app/src/routes/welcome-page.tsx:49
+#: apps/app/src/routes/welcome-page.tsx:53
 msgid "世界正在删除中。"
 msgstr "The world is being deleted."
 
@@ -964,7 +964,7 @@ msgstr "The world is being deleted."
 msgid "世界相册"
 msgstr "World Album"
 
-#: apps/app/src/routes/welcome-page.tsx:40
+#: apps/app/src/routes/welcome-page.tsx:44
 msgid "世界缺少可用的 API 地址。"
 msgstr "The world is missing an available API address."
 
@@ -978,7 +978,7 @@ msgstr "World contact"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:674
 #: apps/app/src/routes/character-detail-page.tsx:250
 #: apps/app/src/routes/contacts-page.tsx:1179
-#: apps/app/src/routes/discover-page.tsx:275
+#: apps/app/src/routes/discover-page.tsx:273
 msgid "世界角色"
 msgstr "World character"
 
@@ -990,7 +990,7 @@ msgstr "World character updates"
 msgid "世界角色搜索结果"
 msgstr "World character search results"
 
-#: apps/app/src/routes/discover-page.tsx:458
+#: apps/app/src/routes/discover-page.tsx:456
 msgid "世界角色日常"
 msgstr "World character updates"
 
@@ -1006,7 +1006,7 @@ msgstr "World character directory"
 msgid "世界角色目录暂时没有刷新成功。"
 msgstr "World character directory failed to refresh."
 
-#: apps/app/src/routes/discover-page.tsx:462
+#: apps/app/src/routes/discover-page.tsx:460
 msgid "世界里的角色会自然更新近况，你也可以随时把这一刻发进去。"
 msgstr "Characters in the world update naturally, and you can post this moment anytime."
 
@@ -1018,8 +1018,8 @@ msgstr "The two passcodes do not match."
 msgid "个"
 msgstr "items"
 
-#: apps/app/src/routes/profile-settings-page.tsx:40
-#: apps/app/src/routes/profile-settings-page.tsx:223
+#: apps/app/src/routes/profile-settings-page.tsx:45
+#: apps/app/src/routes/profile-settings-page.tsx:250
 msgid "个人资料"
 msgstr "Profile"
 
@@ -1040,7 +1040,7 @@ msgstr "results"
 msgid "中"
 msgstr "Medium"
 
-#: apps/app/src/routes/welcome-page.tsx:831
+#: apps/app/src/routes/welcome-page.tsx:884
 msgid "为世界主人命名"
 msgstr "Name the World Owner"
 
@@ -1052,7 +1052,7 @@ msgstr "Recommended for you"
 msgid "为后续回放与直播精彩片段整理预留标记位。"
 msgstr "Reserve markers for later replay and highlight clipping."
 
-#: apps/app/src/routes/welcome-page.tsx:846
+#: apps/app/src/routes/welcome-page.tsx:899
 msgid "为这个世界设置主人的名字"
 msgstr "Set a name for this world's owner"
 
@@ -1108,15 +1108,19 @@ msgstr "You can add images or GIFs now, or go back to delete mode first and clea
 msgid "云上农场"
 msgstr "Cloud Farm"
 
-#: apps/app/src/routes/welcome-page.tsx:731
-#: apps/app/src/routes/welcome-page.tsx:915
+#: apps/app/src/routes/welcome-page.tsx:784
+#: apps/app/src/routes/welcome-page.tsx:969
 msgid "云世界"
 msgstr "Cloud World"
 
-#: apps/app/src/routes/welcome-page.tsx:53
-#: apps/app/src/routes/welcome-page.tsx:356
+#: apps/app/src/routes/welcome-page.tsx:57
+#: apps/app/src/routes/welcome-page.tsx:398
 msgid "云世界访问会话缺失。"
 msgstr "Cloud world access session is missing."
+
+#: apps/app/src/routes/profile-settings-page.tsx:743
+msgid "云账号"
+msgstr ""
 
 #: apps/app/src/i18n/static-dom-seed.ts:137
 msgid "互访"
@@ -1175,11 +1179,11 @@ msgstr "Today's Plan"
 msgid "今日推荐"
 msgstr "Today's picks"
 
-#: apps/app/src/routes/discover-page.tsx:490
+#: apps/app/src/routes/discover-page.tsx:488
 msgid "今日相遇"
 msgstr "Today's encounters"
 
-#: apps/app/src/routes/profile-settings-page.tsx:244
+#: apps/app/src/routes/profile-settings-page.tsx:271
 msgid "介绍一下你自己，或者写一句当前状态"
 msgstr "Introduce yourself, or write your current status"
 
@@ -1314,6 +1318,12 @@ msgstr "Submit a chat-scene report using the current conversation as the source.
 msgid "会同步到朋友圈时间线，适合发日常照片、短视频和临时心情。"
 msgstr "This syncs to the Moments timeline and works well for daily photos, short videos, and quick thoughts."
 
+#: apps/app/src/routes/profile-page.tsx:137
+#: apps/app/src/routes/profile-settings-page.tsx:754
+#: apps/app/src/routes/profile-settings-page.tsx:777
+msgid "会员中心"
+msgstr ""
+
 #: apps/app/src/routes/chat-details-page.tsx:872
 #: apps/app/src/routes/group-qr-page.tsx:1604
 #: apps/app/src/routes/group-qr-page.tsx:1621
@@ -1364,12 +1374,12 @@ msgstr "Author profile"
 msgid "你先发一条，或者等世界里的其他人先开口。"
 msgstr "Post one first, or wait for someone else in the world to speak."
 
-#: apps/app/src/routes/discover-feed-page.tsx:1012
-#: apps/app/src/routes/discover-page.tsx:832
+#: apps/app/src/routes/discover-feed-page.tsx:1009
+#: apps/app/src/routes/discover-page.tsx:830
 msgid "你先发一条居民公开可见的动态，或者等世界里的居民先开口。"
 msgstr "Post something visible to residents, or wait for residents to speak first."
 
-#: apps/app/src/routes/profile-settings-page.tsx:382
+#: apps/app/src/routes/profile-settings-page.tsx:409
 msgid "你可以为当前世界主人单独配置专属 API Key 和兼容 Base URL。"
 msgstr "You can configure a dedicated API Key and compatible Base URL for the current world owner."
 
@@ -1393,7 +1403,7 @@ msgstr "Your responsibilities"
 msgid "你需要对自己发送的消息、评论、动态、资料修改和举报内容负责，不得利用隐界发布违法、骚扰、仇恨、侵权或误导性内容。"
 msgstr "You are responsible for messages, comments, posts, profile edits, and reports you submit. Do not use Yinjie for illegal, harassing, hateful, infringing, or misleading content."
 
-#: apps/app/src/routes/profile-settings-page.tsx:799
+#: apps/app/src/routes/profile-settings-page.tsx:899
 msgid "使用实例级 Provider"
 msgstr "Using instance-level Provider"
 
@@ -1419,18 +1429,18 @@ msgstr "Side panel"
 msgid "保存"
 msgstr "Save"
 
-#: apps/app/src/routes/profile-settings-page.tsx:519
+#: apps/app/src/routes/profile-settings-page.tsx:546
 msgid "保存专属 API Key"
 msgstr "Save dedicated API Key"
 
-#: apps/app/src/routes/welcome-page.tsx:640
+#: apps/app/src/routes/welcome-page.tsx:693
 msgid "保存世界主人资料失败。"
 msgstr "Failed to save world owner profile."
 
 #: apps/app/src/routes/character-detail-page.tsx:293
-#: apps/app/src/routes/profile-settings-page.tsx:262
-#: apps/app/src/routes/profile-settings-page.tsx:518
-#: apps/app/src/routes/welcome-page.tsx:893
+#: apps/app/src/routes/profile-settings-page.tsx:289
+#: apps/app/src/routes/profile-settings-page.tsx:545
+#: apps/app/src/routes/welcome-page.tsx:946
 msgid "保存中..."
 msgstr "Saving..."
 
@@ -1496,7 +1506,7 @@ msgstr "Save cropped image"
 msgid "保存裁剪截图"
 msgstr "Save cropped screenshot"
 
-#: apps/app/src/routes/profile-settings-page.tsx:263
+#: apps/app/src/routes/profile-settings-page.tsx:290
 msgid "保存资料"
 msgstr "Save profile"
 
@@ -1610,7 +1620,7 @@ msgstr "Follow a subscription account first; later pushes will be gathered here.
 msgid "先关注后，这个订阅号的推送才会进入聚合流。"
 msgstr "Follow first, then posts from this subscription account will enter the aggregate feed."
 
-#: apps/app/src/routes/discover-page.tsx:439
+#: apps/app/src/routes/discover-page.tsx:437
 msgid "先决定发给好友，还是发给居民"
 msgstr "Choose whether to post to friends or residents"
 
@@ -1712,7 +1722,7 @@ msgstr "Browse image messages first"
 msgid "先收口桌面直播准备、状态检查和本地历史。"
 msgstr "Centralize desktop live prep, status checks, and local history first."
 
-#: apps/app/src/routes/discover-page.tsx:532
+#: apps/app/src/routes/discover-page.tsx:530
 msgid "先生成临时候选，你决定要不要把他留下。"
 msgstr "Generate a temporary candidate first, then decide whether to keep them."
 
@@ -1903,11 +1913,11 @@ msgstr "Park"
 msgid "公开"
 msgstr "Public"
 
-#: apps/app/src/routes/discover-feed-page.tsx:665
+#: apps/app/src/routes/discover-feed-page.tsx:662
 msgid "公开可见"
 msgstr "Publicly visible"
 
-#: apps/app/src/routes/discover-page.tsx:698
+#: apps/app/src/routes/discover-page.tsx:696
 msgid "公开流"
 msgstr "Public feed"
 
@@ -2101,7 +2111,7 @@ msgstr "Close partial quote panel"
 msgid "其他"
 msgstr "Other"
 
-#: apps/app/src/routes/profile-settings-page.tsx:495
+#: apps/app/src/routes/profile-settings-page.tsx:522
 msgid "兼容 Base URL"
 msgstr "Compatible Base URL"
 
@@ -2114,7 +2124,7 @@ msgstr "Content"
 msgid "内容不能为空"
 msgstr "Content cannot be empty"
 
-#: apps/app/src/routes/discover-page.tsx:885
+#: apps/app/src/routes/discover-page.tsx:883
 msgid "内容与服务"
 msgstr "Content and services"
 
@@ -2143,11 +2153,11 @@ msgstr "Content organization"
 msgid "内容流"
 msgstr "Content feed"
 
-#: apps/app/src/routes/discover-page.tsx:436
+#: apps/app/src/routes/discover-page.tsx:434
 msgid "内容视角"
 msgstr "Content view"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:225
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:229
 msgid "内置 Core API：{bundledCoreApiStatusLabel}"
 msgstr "Bundled Core API: {bundledCoreApiStatusLabel}"
 
@@ -2169,7 +2179,7 @@ msgstr "If you release it later, this will only continue to accumulate."
 msgid "再拖下去，最好的回流口会变钝。"
 msgstr "Wait any longer and the best return window will cool off."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:981
+#: apps/app/src/features/shell/desktop-shell.tsx:983
 msgid "再次输入口令确认"
 msgstr "Enter the passcode again to confirm"
 
@@ -2177,7 +2187,7 @@ msgstr "Enter the passcode again to confirm"
 msgid "再生成一批内容后，这里会逐步形成更连续的视频推荐流。"
 msgstr "Generate another batch and this will become a more continuous video recommendation feed."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:238
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:242
 #: apps/app/src/i18n/static-dom-seed.ts:11
 msgid "再试一次"
 msgstr "Try again"
@@ -2303,7 +2313,7 @@ msgid "最近删除：{0}"
 msgstr "Recently deleted: {0}"
 
 #: apps/app/src/i18n/static-dom-seed.ts:35
-#: apps/app/src/routes/discover-feed-page.tsx:738
+#: apps/app/src/routes/discover-feed-page.tsx:735
 msgid "最近动态"
 msgstr "Recent posts"
 
@@ -2459,14 +2469,14 @@ msgstr "Write a group announcement. Members will see it in the chat."
 msgid "写下你对这条视频号内容的评论..."
 msgstr "Write your comment on this Channels post..."
 
-#: apps/app/src/routes/discover-feed-page.tsx:669
-#: apps/app/src/routes/discover-page.tsx:605
+#: apps/app/src/routes/discover-feed-page.tsx:666
+#: apps/app/src/routes/discover-page.tsx:603
 msgid "写点想让世界居民都能看到的内容..."
 msgstr "Write something for all world residents to see..."
 
 #: apps/app/src/i18n/static-dom-seed.ts:431
-#: apps/app/src/routes/discover-feed-page.tsx:943
-#: apps/app/src/routes/discover-page.tsx:795
+#: apps/app/src/routes/discover-feed-page.tsx:940
+#: apps/app/src/routes/discover-page.tsx:793
 msgid "写评论..."
 msgstr "Write a comment..."
 
@@ -2541,7 +2551,7 @@ msgstr "Share group chat"
 msgid "分享群链接"
 msgstr "Share group link"
 
-#: apps/app/src/routes/discover-feed-page.tsx:839
+#: apps/app/src/routes/discover-feed-page.tsx:836
 msgid "分享这条动态"
 msgstr "Share this post"
 
@@ -2614,19 +2624,19 @@ msgstr "Switch to voice input"
 msgid "切换到键盘输入"
 msgstr "Switch to keyboard input"
 
-#: apps/app/src/routes/profile-settings-page.tsx:726
+#: apps/app/src/routes/profile-settings-page.tsx:805
 msgid "切换当前端的界面语言和本地化格式。"
 msgstr "Switch this client's interface language and localization formats."
 
-#: apps/app/src/routes/profile-settings-page.tsx:607
+#: apps/app/src/routes/profile-settings-page.tsx:634
 msgid "切换当前设备的界面语言"
 msgstr "Switch the interface language on this device"
 
-#: apps/app/src/routes/profile-settings-page.tsx:606
+#: apps/app/src/routes/profile-settings-page.tsx:633
 msgid "切换桌面端、Web、Android、iOS 共用业务界面的显示语言。"
 msgstr "Change the display language shared by the desktop, web, Android, and iOS app surfaces."
 
-#: apps/app/src/routes/discover-page.tsx:276
+#: apps/app/src/routes/discover-page.tsx:274
 msgid "刚刚和你打了招呼。"
 msgstr "just greeted you."
 
@@ -2844,7 +2854,7 @@ msgstr "Load window"
 msgid "动态"
 msgstr "Posts"
 
-#: apps/app/src/routes/discover-feed-page.tsx:477
+#: apps/app/src/routes/discover-feed-page.tsx:474
 msgid "动态摘要已复制。"
 msgstr "Post summary copied."
 
@@ -2856,8 +2866,8 @@ msgstr "Matching method"
 msgid "升学与职业选择顾问映射"
 msgstr "Education and career-choice advisor mapping"
 
-#: apps/app/src/routes/profile-settings-page.tsx:44
-#: apps/app/src/routes/profile-settings-page.tsx:662
+#: apps/app/src/routes/profile-settings-page.tsx:49
+#: apps/app/src/routes/profile-settings-page.tsx:689
 msgid "协议与规范"
 msgstr "Policies and Guidelines"
 
@@ -2985,7 +2995,7 @@ msgstr "The feedback workspace is currently available only in the web desktop la
 msgid "反馈已保存到本地工作区。"
 msgstr "Feedback saved to the local workspace."
 
-#: apps/app/src/routes/discover-page.tsx:511
+#: apps/app/src/routes/discover-page.tsx:509
 msgid "反馈状态"
 msgstr "Feedback status"
 
@@ -2993,10 +3003,10 @@ msgstr "Feedback status"
 msgid "反馈草稿已清空。"
 msgstr "Feedback draft cleared."
 
-#: apps/app/src/routes/discover-feed-page.tsx:650
-#: apps/app/src/routes/discover-feed-page.tsx:661
-#: apps/app/src/routes/discover-feed-page.tsx:1021
-#: apps/app/src/routes/discover-page.tsx:572
+#: apps/app/src/routes/discover-feed-page.tsx:647
+#: apps/app/src/routes/discover-feed-page.tsx:658
+#: apps/app/src/routes/discover-feed-page.tsx:1018
+#: apps/app/src/routes/discover-page.tsx:570
 msgid "发一条广场动态"
 msgstr "Post to the feed"
 
@@ -3016,7 +3026,7 @@ msgstr "Send Prep to Mobile"
 msgid "发到最近会话"
 msgstr "Send to recent conversations"
 
-#: apps/app/src/routes/discover-feed-page.tsx:663
+#: apps/app/src/routes/discover-feed-page.tsx:660
 msgid "发到广场后，世界里的居民都可能看到、点赞，甚至继续接话。"
 msgstr "After posting to the feed, residents may see it, like it, and continue the conversation."
 
@@ -3038,15 +3048,15 @@ msgstr "Send to chat"
 msgid "发动态"
 msgstr "Post"
 
-#: apps/app/src/routes/discover-feed-page.tsx:673
+#: apps/app/src/routes/discover-feed-page.tsx:670
 msgid "发布"
 msgstr "Publish"
 
-#: apps/app/src/routes/discover-page.tsx:594
+#: apps/app/src/routes/discover-page.tsx:592
 msgid "发布中"
 msgstr "Publishing"
 
-#: apps/app/src/routes/discover-page.tsx:663
+#: apps/app/src/routes/discover-page.tsx:661
 msgid "发布到广场"
 msgstr "Publish to feed"
 
@@ -3058,7 +3068,7 @@ msgstr "After publishing, it will be inserted at the top of the public feed."
 msgid "发布后会直接插入到动态流顶部。"
 msgstr "After publishing, it will be inserted at the top of the Moments feed."
 
-#: apps/app/src/routes/discover-page.tsx:666
+#: apps/app/src/routes/discover-page.tsx:664
 msgid "发布后会直接进入右侧公开流，世界居民公开可见。"
 msgstr "After publishing, it enters the public feed on the right and is visible to residents."
 
@@ -3066,11 +3076,11 @@ msgstr "After publishing, it enters the public feed on the right and is visible 
 msgid "发布或修改群内置顶公告"
 msgstr "Publish or edit the pinned group announcement"
 
-#: apps/app/src/routes/discover-page.tsx:591
+#: apps/app/src/routes/discover-page.tsx:589
 msgid "发布状态"
 msgstr "Publish status"
 
-#: apps/app/src/routes/discover-page.tsx:581
+#: apps/app/src/routes/discover-page.tsx:579
 msgid "发帖区"
 msgstr "Composer"
 
@@ -3096,8 +3106,8 @@ msgstr "Message"
 
 #: apps/app/src/components/mobile-shell.tsx:33
 #: apps/app/src/routes/desktop-mobile-page.tsx:179
-#: apps/app/src/routes/discover-page.tsx:423
-#: apps/app/src/routes/discover-page.tsx:868
+#: apps/app/src/routes/discover-page.tsx:421
+#: apps/app/src/routes/discover-page.tsx:866
 msgid "发现"
 msgstr "Discover"
 
@@ -3105,7 +3115,7 @@ msgstr "Discover"
 msgid "发现工具"
 msgstr "Discovery tool"
 
-#: apps/app/src/routes/discover-page.tsx:426
+#: apps/app/src/routes/discover-page.tsx:424
 msgid "发现页把随机相遇、场景相遇和居民公开动态拆开排布，让桌面上的探索节奏更清晰，也把角色近况流和居民公开流分得更明白。"
 msgstr "Discover separates random encounters, scene encounters, and resident public posts so desktop exploration is clearer."
 
@@ -3144,8 +3154,8 @@ msgstr "Start group chat"
 #: apps/app/src/components/chat-composer.tsx:3297
 #: apps/app/src/components/chat-composer.tsx:3994
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:202
-#: apps/app/src/routes/discover-feed-page.tsx:958
-#: apps/app/src/routes/discover-page.tsx:809
+#: apps/app/src/routes/discover-feed-page.tsx:955
+#: apps/app/src/routes/discover-page.tsx:807
 msgid "发送"
 msgstr "Send"
 
@@ -3157,9 +3167,9 @@ msgstr "Sending"
 #: apps/app/src/components/chat-composer.tsx:5324
 #: apps/app/src/components/mobile-chat-attachment-preview.tsx:109
 #: apps/app/src/routes/character-detail-page.tsx:284
-#: apps/app/src/routes/discover-feed-page.tsx:957
-#: apps/app/src/routes/discover-page.tsx:808
-#: apps/app/src/routes/welcome-page.tsx:717
+#: apps/app/src/routes/discover-feed-page.tsx:954
+#: apps/app/src/routes/discover-page.tsx:806
+#: apps/app/src/routes/welcome-page.tsx:770
 msgid "发送中..."
 msgstr "Sending..."
 
@@ -3187,7 +3197,7 @@ msgstr "Sent a file: {0}."
 msgid "发送于 {0}"
 msgstr "Sent by {0}"
 
-#: apps/app/src/routes/profile-settings-page.tsx:66
+#: apps/app/src/routes/profile-settings-page.tsx:76
 msgid "发送前多一道组合键确认，更接近微信桌面版可切换方式。"
 msgstr "Use an extra shortcut before sending, closer to WeChat desktop behavior."
 
@@ -3211,7 +3221,7 @@ msgstr "Send failed. Try again later."
 msgid "发送好友申请"
 msgstr "Send friend request"
 
-#: apps/app/src/routes/profile-settings-page.tsx:803
+#: apps/app/src/routes/profile-settings-page.tsx:903
 msgid "发送快捷键"
 msgstr "Send shortcut"
 
@@ -3231,7 +3241,7 @@ msgstr "Send note"
 msgid "发送附件"
 msgstr "Send attachment"
 
-#: apps/app/src/routes/welcome-page.tsx:718
+#: apps/app/src/routes/welcome-page.tsx:771
 msgid "发送验证码"
 msgstr "Send code"
 
@@ -3276,7 +3286,7 @@ msgstr "Cancel reminder"
 msgid "取消提醒失败，请稍后再试。"
 msgstr "Failed to cancel the reminder. Try again later."
 
-#: apps/app/src/routes/discover-feed-page.tsx:912
+#: apps/app/src/routes/discover-feed-page.tsx:909
 msgid "取消收藏"
 msgstr "Remove favorite"
 
@@ -3285,7 +3295,7 @@ msgstr "Remove favorite"
 msgid "取消置顶"
 msgstr "Unpin"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:998
+#: apps/app/src/features/shell/desktop-shell.tsx:1000
 msgid "取消锁定"
 msgstr "Cancel Lock"
 
@@ -3337,11 +3347,11 @@ msgstr "Ready to resend now"
 msgid "可能是新窗口参数被清掉了。回到消息页后重新打开一次即可。"
 msgstr "The new-window parameters may have been cleared. Return to Messages and open it again."
 
-#: apps/app/src/routes/discover-page.tsx:704
+#: apps/app/src/routes/discover-page.tsx:702
 msgid "可见动态"
 msgstr "Visible posts"
 
-#: apps/app/src/routes/profile-settings-page.tsx:499
+#: apps/app/src/routes/profile-settings-page.tsx:526
 msgid "可选，例如 https://api.openai.com/v1"
 msgstr "Optional, e.g. https://api.openai.com/v1"
 
@@ -3362,7 +3372,7 @@ msgstr "Selected members to remove will appear on the right"
 msgid "右侧承接当前实例、诊断摘要和系统状态。"
 msgstr "The right side holds the current instance, diagnostic summary, and system status."
 
-#: apps/app/src/routes/profile-settings-page.tsx:780
+#: apps/app/src/routes/profile-settings-page.tsx:880
 msgid "右侧显示世界主人信息和当前配置摘要。"
 msgstr "The right side shows world owner info and current configuration summary."
 
@@ -3420,7 +3430,7 @@ msgstr "Mini-game runtime, friend party invites, and real event orchestration wi
 msgid "向下移回按钮区域，可以继续保留本次语音。"
 msgstr "Move back down into the button area to keep this recording."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:190
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:194
 msgid "否"
 msgstr "No"
 
@@ -3441,7 +3451,7 @@ msgid "周燃"
 msgstr "Zhou Ran"
 
 #. placeholder {0}: diagnostics.coreApiCommandSource
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:224
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:228
 msgid "命令来源：{0}"
 msgstr "Command source: {0}"
 
@@ -3549,8 +3559,8 @@ msgstr "Images and videos"
 msgid "图片最多 9 张，视频当前支持 1 条且不超过 5 分钟，暂不支持图片和视频混发。"
 msgstr "Up to 9 images are supported. Videos currently support 1 item under 5 minutes. Mixed image and video posts are not supported yet."
 
-#: apps/app/src/routes/discover-feed-page.tsx:385
-#: apps/app/src/routes/discover-page.tsx:402
+#: apps/app/src/routes/discover-feed-page.tsx:382
+#: apps/app/src/routes/discover-page.tsx:400
 msgid "图片选择失败，请稍后重试。"
 msgstr "Image selection failed. Try again later."
 
@@ -3570,7 +3580,7 @@ msgstr "Continue viewing contacts, starred friends, and official account entries
 msgid "在替你记着那些容易被忙乱吞掉的事。"
 msgstr "Keeping track of the things that busy days tend to swallow."
 
-#: apps/app/src/routes/profile-settings-page.tsx:720
+#: apps/app/src/routes/profile-settings-page.tsx:799
 msgid "在桌面工作区里管理世界主人的资料与签名。"
 msgstr "Manage the world owner profile and signature in the desktop workspace."
 
@@ -3578,7 +3588,7 @@ msgstr "Manage the world owner profile and signature in the desktop workspace."
 msgid "在独立窗口打开"
 msgstr "Open in separate window"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:1161
+#: apps/app/src/features/shell/desktop-shell.tsx:1159
 msgid "在现实之外，进入另一片世界。"
 msgstr "Beyond reality, enter another world."
 
@@ -3617,7 +3627,7 @@ msgstr "Map service"
 msgid "地点"
 msgstr "Place"
 
-#: apps/app/src/routes/discover-page.tsx:503
+#: apps/app/src/routes/discover-page.tsx:501
 msgid "场景"
 msgstr "Scenes"
 
@@ -3625,7 +3635,7 @@ msgstr "Scenes"
 msgid "场景相遇"
 msgstr "Scene encounter"
 
-#: apps/app/src/routes/discover-page.tsx:310
+#: apps/app/src/routes/discover-page.tsx:308
 msgid "场景相遇已写入好友申请列表。"
 msgstr "Scene encounter was added to friend requests."
 
@@ -3641,8 +3651,8 @@ msgstr "Basic info"
 msgid "塔勒布"
 msgstr "Taleb"
 
-#: apps/app/src/routes/discover-feed-page.tsx:883
-#: apps/app/src/routes/discover-page.tsx:764
+#: apps/app/src/routes/discover-feed-page.tsx:880
+#: apps/app/src/routes/discover-page.tsx:762
 msgid "处理中..."
 msgstr "Processing..."
 
@@ -3698,7 +3708,7 @@ msgstr "Copy to Mobile"
 msgid "复制到手机失败，请稍后重试。"
 msgstr "Failed to copy to mobile phone, please try again later."
 
-#: apps/app/src/routes/discover-feed-page.tsx:490
+#: apps/app/src/routes/discover-feed-page.tsx:487
 msgid "复制动态摘要失败，请稍后重试。"
 msgstr "Failed to copy post summary. Try again later."
 
@@ -3803,7 +3813,7 @@ msgstr "Copy cropped image"
 msgid "复制这张隐界名片"
 msgstr "Copy this Yinjie card"
 
-#: apps/app/src/routes/discover-feed-page.tsx:840
+#: apps/app/src/routes/discover-feed-page.tsx:837
 msgid "复制这条动态摘要"
 msgstr "Copy this post summary"
 
@@ -3906,7 +3916,7 @@ msgstr "If you switch to {0} first, the number of conversations ready for immedi
 msgid "如果改做备选，这轮结构也不会立刻变化，因为它当前还在冷却里。"
 msgstr "If you change it to an alternative, the structure of this round will not change immediately because it is still cooldown down."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:181
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:185
 #: apps/app/src/i18n/static-dom-seed.ts:10
 msgid "如果长时间没有恢复，稍后重新打开应用即可。"
 msgstr "If it does not recover for a while, reopen the app later."
@@ -4005,7 +4015,7 @@ msgstr "Instance URL: {0}"
 msgid "实例模式"
 msgstr "Instance mode"
 
-#: apps/app/src/routes/profile-settings-page.tsx:463
+#: apps/app/src/routes/profile-settings-page.tsx:490
 msgid "实例级"
 msgstr "Instance-level"
 
@@ -4026,7 +4036,7 @@ msgstr "Hide, clear, or apply safety actions to {0}."
 msgid "对于违规内容或越界行为，平台与实例拥有者保留做降级、限制互动、封禁关系、保留审计记录和中止服务的权利。"
 msgstr "For violations or boundary-crossing behavior, the platform and instance owner may degrade features, limit interactions, block relationships, keep audit records, or suspend service."
 
-#: apps/app/src/routes/discover-page.tsx:311
+#: apps/app/src/routes/discover-page.tsx:309
 msgid "对你产生了兴趣。"
 msgstr "became interested in you."
 
@@ -4099,13 +4109,13 @@ msgstr "Not added to My Mini Programs yet"
 msgid "居民"
 msgstr "Residents"
 
-#: apps/app/src/routes/discover-page.tsx:588
-#: apps/app/src/routes/discover-page.tsx:707
+#: apps/app/src/routes/discover-page.tsx:586
+#: apps/app/src/routes/discover-page.tsx:705
 msgid "居民公开"
 msgstr "Residents public"
 
-#: apps/app/src/routes/discover-feed-page.tsx:854
-#: apps/app/src/routes/discover-page.tsx:736
+#: apps/app/src/routes/discover-feed-page.tsx:851
+#: apps/app/src/routes/discover-page.tsx:734
 msgid "居民公开可见"
 msgstr "Visible to residents"
 
@@ -4113,8 +4123,8 @@ msgstr "Visible to residents"
 msgid "居民办事"
 msgstr "Resident Services"
 
-#: apps/app/src/routes/discover-feed-page.tsx:828
-#: apps/app/src/routes/discover-page.tsx:507
+#: apps/app/src/routes/discover-feed-page.tsx:825
+#: apps/app/src/routes/discover-page.tsx:505
 msgid "居民动态"
 msgstr "Resident post"
 
@@ -4195,7 +4205,7 @@ msgstr "Saved {0} / {1}"
 msgid "已保存 {0} / {1}，支持图片和 GIF"
 msgstr "Saved {0} / {1}, supports images and GIFs"
 
-#: apps/app/src/routes/profile-settings-page.tsx:489
+#: apps/app/src/routes/profile-settings-page.tsx:516
 msgid "已保存专属 API Key，输入新的值可替换"
 msgstr "Dedicated API Key saved. Enter a new value to replace it."
 
@@ -4423,7 +4433,7 @@ msgstr "File opened."
 #: apps/app/src/i18n/static-dom-seed.ts:875
 #: apps/app/src/routes/character-detail-page.tsx:739
 #: apps/app/src/routes/chat-details-page.tsx:371
-#: apps/app/src/routes/discover-feed-page.tsx:444
+#: apps/app/src/routes/discover-feed-page.tsx:441
 #: apps/app/src/routes/group-chat-details-page.tsx:398
 #: apps/app/src/routes/group-qr-page.tsx:917
 #: apps/app/src/routes/group-qr-page.tsx:969
@@ -4439,7 +4449,7 @@ msgstr "Opened cropped screenshot location."
 msgid "已打开邀请卡所在位置。"
 msgstr "The location of the invitation card has been opened."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:186
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:190
 msgid "已找到"
 msgstr "Found"
 
@@ -4562,8 +4572,8 @@ msgid "已腾出 {customUploadResumedSlots} 个空位，可直接添加"
 msgstr "{customUploadResumedSlots} slots freed, you can add now"
 
 #. placeholder {0}: currentCloudSession.resolvedApiBaseUrl
-#: apps/app/src/routes/welcome-page.tsx:756
-#: apps/app/src/routes/welcome-page.tsx:762
+#: apps/app/src/routes/welcome-page.tsx:809
+#: apps/app/src/routes/welcome-page.tsx:815
 msgid "已解析到世界地址：{0}"
 msgstr "Resolved world address: {0}"
 
@@ -4581,7 +4591,7 @@ msgstr "Added to starred friends."
 msgid "已赞"
 msgstr "Liked"
 
-#: apps/app/src/routes/discover-page.tsx:514
+#: apps/app/src/routes/discover-page.tsx:512
 msgid "已过滤"
 msgstr "Filtered"
 
@@ -4592,11 +4602,11 @@ msgstr "Filtered"
 msgid "已连接"
 msgstr "Connected"
 
-#: apps/app/src/routes/welcome-page.tsx:410
+#: apps/app/src/routes/welcome-page.tsx:452
 msgid "已连接到云世界。"
 msgstr "Connected to cloud world."
 
-#: apps/app/src/routes/welcome-page.tsx:526
+#: apps/app/src/routes/welcome-page.tsx:571
 msgid "已连接到本地世界。"
 msgstr "Connected to local world."
 
@@ -4650,7 +4660,7 @@ msgstr "Invited"
 msgid "已配置"
 msgstr "Configured"
 
-#: apps/app/src/routes/profile-settings-page.tsx:798
+#: apps/app/src/routes/profile-settings-page.tsx:898
 msgid "已配置专属 API Key"
 msgstr "Dedicated API Key configured"
 
@@ -4707,13 +4717,13 @@ msgid "平台可以做什么"
 msgstr "What the platform may do"
 
 #: apps/app/src/features/shell/desktop-nav-matching.ts:86
-#: apps/app/src/routes/discover-feed-page.tsx:1009
+#: apps/app/src/routes/discover-feed-page.tsx:1006
 msgid "广场"
 msgstr "Square"
 
-#: apps/app/src/routes/discover-feed-page.tsx:191
-#: apps/app/src/routes/discover-page.tsx:326
-#: apps/app/src/routes/discover-page.tsx:342
+#: apps/app/src/routes/discover-feed-page.tsx:188
+#: apps/app/src/routes/discover-page.tsx:324
+#: apps/app/src/routes/discover-page.tsx:340
 msgid "广场互动已更新。"
 msgstr "Feed interaction updated."
 
@@ -4723,31 +4733,31 @@ msgstr "The feed brings public posts from many non-friend world people into one 
 
 #: apps/app/src/features/shell/desktop-nav-matching.ts:85
 #: apps/app/src/i18n/static-dom-seed.ts:67
-#: apps/app/src/routes/discover-feed-page.tsx:597
-#: apps/app/src/routes/discover-feed-page.tsx:617
-#: apps/app/src/routes/discover-feed-page.tsx:902
+#: apps/app/src/routes/discover-feed-page.tsx:594
+#: apps/app/src/routes/discover-feed-page.tsx:614
+#: apps/app/src/routes/discover-feed-page.tsx:899
 #: apps/app/src/routes/discover-page.tsx:148
-#: apps/app/src/routes/discover-page.tsx:468
-#: apps/app/src/routes/discover-page.tsx:691
+#: apps/app/src/routes/discover-page.tsx:466
+#: apps/app/src/routes/discover-page.tsx:689
 msgid "广场动态"
 msgstr "Public Feed"
 
 #. placeholder {0}: formatTimestamp(post.createdAt)
-#: apps/app/src/routes/discover-feed-page.tsx:595
-#: apps/app/src/routes/discover-feed-page.tsx:899
+#: apps/app/src/routes/discover-feed-page.tsx:592
+#: apps/app/src/routes/discover-feed-page.tsx:896
 msgid "广场动态 · {0}"
 msgstr "Feed post · {0}"
 
-#: apps/app/src/routes/discover-feed-page.tsx:149
-#: apps/app/src/routes/discover-page.tsx:253
+#: apps/app/src/routes/discover-feed-page.tsx:146
+#: apps/app/src/routes/discover-page.tsx:251
 msgid "广场动态已发布，世界居民公开可见。"
 msgstr "Feed post published and visible to world residents."
 
-#: apps/app/src/routes/discover-feed-page.tsx:787
+#: apps/app/src/routes/discover-feed-page.tsx:784
 msgid "广场动态暂时不可用"
 msgstr "Feed is temporarily unavailable"
 
-#: apps/app/src/routes/discover-page.tsx:569
+#: apps/app/src/routes/discover-page.tsx:567
 msgid "广场发布"
 msgstr "Feed publishing"
 
@@ -4755,7 +4765,7 @@ msgstr "Feed publishing"
 msgid "广场概览"
 msgstr "Feed overview"
 
-#: apps/app/src/routes/discover-page.tsx:830
+#: apps/app/src/routes/discover-page.tsx:828
 msgid "广场还没有新动态"
 msgstr "No new feed posts yet"
 
@@ -4819,7 +4829,7 @@ msgstr "Go-live check"
 msgid "开播检查清单"
 msgstr "Go-live checklist"
 
-#: apps/app/src/routes/discover-page.tsx:515
+#: apps/app/src/routes/discover-page.tsx:513
 msgid "开放"
 msgstr "Open"
 
@@ -4872,11 +4882,11 @@ msgstr "Group call cannot be started now"
 msgid "当前不能发起通话"
 msgstr "Call cannot be started now"
 
-#: apps/app/src/routes/profile-settings-page.tsx:787
+#: apps/app/src/routes/profile-settings-page.tsx:887
 msgid "当前世界主人"
 msgstr "Current world owner"
 
-#: apps/app/src/routes/profile-settings-page.tsx:468
+#: apps/app/src/routes/profile-settings-page.tsx:495
 msgid "当前世界主人已启用专属 API Key。"
 msgstr "The current world owner has enabled a dedicated API Key."
 
@@ -4896,12 +4906,12 @@ msgstr "The current top recommendation is already in cooldown, so the queue will
 msgid "当前仅展示前 {MAX_VISIBLE_RESULTS} 条结果，请继续缩小范围查找。"
 msgstr "Showing only the first {MAX_VISIBLE_RESULTS} results. Narrow the scope to find more."
 
-#: apps/app/src/routes/profile-settings-page.tsx:362
-#: apps/app/src/routes/profile-settings-page.tsx:368
+#: apps/app/src/routes/profile-settings-page.tsx:389
+#: apps/app/src/routes/profile-settings-page.tsx:395
 msgid "当前仅影响桌面和 Web 的键盘聊天输入，移动端仍以发送按钮和语音入口为主。"
 msgstr "This only affects desktop and web keyboard chat input. Mobile still uses the send button and voice entry."
 
-#: apps/app/src/routes/profile-settings-page.tsx:469
+#: apps/app/src/routes/profile-settings-page.tsx:496
 msgid "当前仍使用实例级 Provider 配置。"
 msgstr "Currently using instance-level Provider configuration."
 
@@ -4949,15 +4959,15 @@ msgid "当前会附带世界连接、数据库、推理网关和实例模式摘�
 msgstr "This includes world connection, database, inference gateway, and instance mode summaries, but no sensitive message body."
 
 #. placeholder {0}: ownerQuery.data.customApiBase
-#: apps/app/src/routes/profile-settings-page.tsx:442
+#: apps/app/src/routes/profile-settings-page.tsx:469
 msgid "当前使用专属 API Key，Base URL：{0}。"
 msgstr "Using dedicated API Key, Base URL: {0}."
 
-#: apps/app/src/routes/profile-settings-page.tsx:444
+#: apps/app/src/routes/profile-settings-page.tsx:471
 msgid "当前使用专属 API Key。"
 msgstr "Using dedicated API Key."
 
-#: apps/app/src/routes/profile-settings-page.tsx:445
+#: apps/app/src/routes/profile-settings-page.tsx:472
 msgid "当前使用实例级 Provider。"
 msgstr "Using instance-level Provider."
 
@@ -5070,7 +5080,7 @@ msgstr "Current Mini Program Workspace"
 msgid "当前工作台"
 msgstr "Current workspace"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:922
+#: apps/app/src/features/shell/desktop-shell.tsx:923
 msgid "当前已启用 {lockPasscodeLength} 位本地锁定口令。"
 msgstr "A {lockPasscodeLength}-digit local lock passcode is enabled."
 
@@ -5106,7 +5116,7 @@ msgstr "Now playing"
 msgid "当前播放："
 msgstr "Now playing:"
 
-#: apps/app/src/routes/profile-settings-page.tsx:808
+#: apps/app/src/routes/profile-settings-page.tsx:908
 msgid "当前文档"
 msgstr "Current document"
 
@@ -5123,7 +5133,7 @@ msgstr "Current source"
 msgid "当前来自 {0}"
 msgstr "Currently from {0}"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:168
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:172
 msgid "当前桌面包里没有找到内置 Core API，宿主端还没法完整启动。"
 msgstr "The desktop package does not include a bundled Core API, so the host cannot start fully yet."
 
@@ -5200,8 +5210,8 @@ msgstr "This message does not support partial quote yet."
 #: apps/app/src/i18n/static-dom-seed.ts:163
 #: apps/app/src/i18n/static-dom-seed.ts:900
 #: apps/app/src/routes/character-detail-page.tsx:306
-#: apps/app/src/routes/profile-settings-page.tsx:451
-#: apps/app/src/routes/profile-settings-page.tsx:777
+#: apps/app/src/routes/profile-settings-page.tsx:478
+#: apps/app/src/routes/profile-settings-page.tsx:877
 msgid "当前状态"
 msgstr "Current status"
 
@@ -5229,7 +5239,7 @@ msgstr "This environment does not support copying the official account summary."
 msgid "当前环境暂不支持复制到手机。"
 msgstr "The current environment does not support copying to mobile phones."
 
-#: apps/app/src/routes/discover-feed-page.tsx:464
+#: apps/app/src/routes/discover-feed-page.tsx:461
 msgid "当前环境暂不支持复制动态摘要。"
 msgstr "This environment does not support copying post summaries."
 
@@ -5371,7 +5381,7 @@ msgstr "This device does not support voice messages. Use keyboard input instead.
 msgid "当前设备不支持语音发送。"
 msgstr "This device doesn't support voice sending."
 
-#: apps/app/src/features/shell/desktop-shell.tsx:923
+#: apps/app/src/features/shell/desktop-shell.tsx:925
 msgid "当前设备尚未保存锁定口令。"
 msgstr "No lock passcode is saved on this device yet."
 
@@ -5390,7 +5400,7 @@ msgstr "This device cannot open the camera right now. Use the album instead."
 #: apps/app/src/i18n/static-dom-seed.ts:876
 #: apps/app/src/routes/character-detail-page.tsx:753
 #: apps/app/src/routes/chat-details-page.tsx:385
-#: apps/app/src/routes/discover-feed-page.tsx:463
+#: apps/app/src/routes/discover-feed-page.tsx:460
 #: apps/app/src/routes/group-chat-details-page.tsx:410
 #: apps/app/src/routes/group-qr-page.tsx:927
 #: apps/app/src/routes/group-qr-page.tsx:978
@@ -5403,7 +5413,7 @@ msgstr "This device cannot open the system share sheet right now. Please try aga
 msgid "当前设备未直接预览，已打开系统面板，可继续在其他应用中打开。"
 msgstr "This device did not preview it directly. The system panel is open so you can open it in another app."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:177
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:181
 msgid "当前设备还没有配置远程世界地址，请先回到 setup 连接你的实例。"
 msgstr "This device has no remote world address configured. Return to setup to connect your instance first."
 
@@ -5451,7 +5461,7 @@ msgstr "Tasks"
 msgid "待办 {completedTaskCount}/{totalTaskCount}"
 msgstr "Tasks {completedTaskCount}/{totalTaskCount}"
 
-#: apps/app/src/routes/discover-page.tsx:595
+#: apps/app/src/routes/discover-page.tsx:593
 msgid "待发送"
 msgstr "Ready to send"
 
@@ -5609,7 +5619,7 @@ msgstr "Member seats"
 #: apps/app/src/routes/character-detail-page.tsx:116
 #: apps/app/src/routes/chat-details-page.tsx:106
 #: apps/app/src/routes/group-chat-details-page.tsx:365
-#: apps/app/src/routes/profile-page.tsx:59
+#: apps/app/src/routes/profile-page.tsx:81
 msgid "我"
 msgstr "Me"
 
@@ -5617,11 +5627,11 @@ msgstr "Me"
 msgid "我们会保存什么"
 msgstr "What we store"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:173
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:177
 msgid "我们正在为你整理入口，稍等片刻后再试一次就好。"
 msgstr "We are preparing the entry point. Wait a moment and try again."
 
-#: apps/app/src/routes/welcome-page.tsx:734
+#: apps/app/src/routes/welcome-page.tsx:787
 msgid "我们正在判断是为这个手机号创建新世界，还是唤醒它已拥有的世界。"
 msgstr "We are checking whether to create a new world for this phone number or wake the world it already owns."
 
@@ -5703,7 +5713,7 @@ msgstr "Phone"
 msgid "手机入口"
 msgstr "Mobile Entry Points"
 
-#: apps/app/src/routes/welcome-page.tsx:678
+#: apps/app/src/routes/welcome-page.tsx:731
 msgid "手机号"
 msgstr "Phone number"
 
@@ -5733,7 +5743,7 @@ msgstr "Open"
 msgid "打开世界主人快捷卡片"
 msgstr "Open world owner quick card"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:1178
+#: apps/app/src/features/shell/desktop-shell.tsx:1176
 msgid "打开中..."
 msgstr "Opening..."
 
@@ -5785,7 +5795,7 @@ msgstr "Open mini program"
 msgid "打开小程序面板"
 msgstr "Open Mini Program Panel"
 
-#: apps/app/src/routes/profile-settings-page.tsx:697
+#: apps/app/src/routes/profile-settings-page.tsx:724
 msgid "打开当前文档"
 msgstr "Open Current Document"
 
@@ -5899,7 +5909,7 @@ msgstr "Open subscription messages"
 msgid "打开记录"
 msgstr "Open history"
 
-#: apps/app/src/routes/profile-page.tsx:68
+#: apps/app/src/routes/profile-page.tsx:90
 msgid "打开设置"
 msgstr "Open settings"
 
@@ -5982,7 +5992,7 @@ msgstr "Add unfinished afternoon chat items to the timeline."
 msgid "把世界里的办事流程做成一个统一入口。"
 msgstr "Turns world service workflows into one unified entry."
 
-#: apps/app/src/routes/discover-page.tsx:576
+#: apps/app/src/routes/discover-page.tsx:574
 msgid "把你的想法发到居民广场，让世界里的居民都可能看到并回应。"
 msgstr "Post your thoughts to the resident feed so world residents can see and respond."
 
@@ -6062,7 +6072,7 @@ msgstr "Move profile editing, API Key, and world settings to mobile to continue.
 msgid "把跑图、收集和碎片叙事拼到一条轻冒险旅线上，适合放进新游榜和编辑推荐。"
 msgstr "Combines map running, collection, and fragmented story into a light adventure route, suited for new games and editor picks."
 
-#: apps/app/src/routes/discover-page.tsx:475
+#: apps/app/src/routes/discover-page.tsx:473
 msgid "把这一刻发到居民广场，让世界里的居民也能看见并回应。"
 msgstr "Post this moment to the resident feed so world residents can see and respond."
 
@@ -6182,7 +6192,7 @@ msgstr "Send original (Cmd/Ctrl+Enter)"
 msgid "按号查看"
 msgstr "View by account"
 
-#: apps/app/src/routes/profile-settings-page.tsx:61
+#: apps/app/src/routes/profile-settings-page.tsx:71
 msgid "按回车直接发送，保持当前更顺手的输入节奏。"
 msgstr "Press Enter to send directly and keep a faster typing flow."
 
@@ -6279,7 +6289,7 @@ msgstr "Try another message type, or switch back to all types to keep browsing."
 msgid "换个群成员试试，或者返回筛选页查看全部成员。"
 msgstr "Try another member, or go back to filters to view all members."
 
-#: apps/app/src/routes/discover-page.tsx:497
+#: apps/app/src/routes/discover-page.tsx:495
 msgid "探索区"
 msgstr "Explore area"
 
@@ -6567,7 +6577,7 @@ msgid "摆摊"
 msgstr "Stalls"
 
 #: apps/app/src/routes/discover-page.tsx:121
-#: apps/app/src/routes/discover-page.tsx:529
+#: apps/app/src/routes/discover-page.tsx:527
 msgid "摇一摇"
 msgstr "Shake"
 
@@ -6673,7 +6683,7 @@ msgstr "Pay/Collect"
 #: apps/app/src/features/shell/desktop-nav-matching.ts:65
 #: apps/app/src/features/shell/desktop-nav-matching.ts:66
 #: apps/app/src/i18n/static-dom-seed.ts:65
-#: apps/app/src/routes/discover-feed-page.tsx:912
+#: apps/app/src/routes/discover-feed-page.tsx:909
 msgid "收藏"
 msgstr "Favorites"
 
@@ -6853,11 +6863,11 @@ msgstr "Couldn't start recording. Check the app's microphone permission."
 msgid "无法启动录音，请检查浏览器麦克风权限。"
 msgstr "Couldn't start recording. Check the browser's microphone permission."
 
-#: apps/app/src/routes/welcome-page.tsx:331
+#: apps/app/src/routes/welcome-page.tsx:373
 msgid "无法连接到所选世界。"
 msgstr "Unable to connect to the selected world."
 
-#: apps/app/src/routes/welcome-page.tsx:529
+#: apps/app/src/routes/welcome-page.tsx:574
 msgid "无法连接到本地世界。"
 msgstr "Unable to connect to the local world."
 
@@ -6931,7 +6941,7 @@ msgstr "Starfield Train"
 msgid "昨天"
 msgstr "Yesterday"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:189
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:193
 msgid "是"
 msgstr "Yes"
 
@@ -6962,7 +6972,7 @@ msgstr "Nickname: {0} · {1}"
 msgid "昵称：{rawName}"
 msgstr "Nickname: {rawName}"
 
-#: apps/app/src/routes/profile-settings-page.tsx:231
+#: apps/app/src/routes/profile-settings-page.tsx:258
 msgid "显示名称"
 msgstr "Display name"
 
@@ -7004,7 +7014,7 @@ msgstr "No status yet"
 
 #: apps/app/src/i18n/static-dom-seed.ts:13
 #: apps/app/src/routes/desktop-feedback-page.tsx:119
-#: apps/app/src/routes/profile-settings-page.tsx:792
+#: apps/app/src/routes/profile-settings-page.tsx:892
 msgid "暂无签名"
 msgstr "No signature yet"
 
@@ -7012,7 +7022,7 @@ msgstr "No signature yet"
 msgid "暂无记录"
 msgstr "No records yet"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:164
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:168
 #: apps/app/src/i18n/static-dom-seed.ts:8
 msgid "暂时无法进入隐界"
 msgstr "Unable to enter Yinjie right now"
@@ -7094,8 +7104,8 @@ msgstr "More likely to trigger a more direct opener."
 msgid "更强调节奏、排名和对抗感。"
 msgstr "Emphasizes pace, ranking, and competition."
 
-#: apps/app/src/routes/discover-feed-page.tsx:710
-#: apps/app/src/routes/discover-page.tsx:649
+#: apps/app/src/routes/discover-feed-page.tsx:707
+#: apps/app/src/routes/discover-page.tsx:647
 msgid "更换视频"
 msgstr "Replace video"
 
@@ -7163,15 +7173,15 @@ msgstr "Friend info"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:687
 #: apps/app/src/features/shell/desktop-nav-matching.ts:71
 #: apps/app/src/features/shell/desktop-nav-matching.ts:72
-#: apps/app/src/features/shell/desktop-shell.tsx:1170
+#: apps/app/src/features/shell/desktop-shell.tsx:1168
 #: apps/app/src/i18n/static-dom-seed.ts:33
 #: apps/app/src/routes/character-detail-page.tsx:298
 #: apps/app/src/routes/discover-page.tsx:108
-#: apps/app/src/routes/discover-page.tsx:455
+#: apps/app/src/routes/discover-page.tsx:453
 msgid "朋友圈"
 msgstr "Moments"
 
-#: apps/app/src/routes/discover-page.tsx:876
+#: apps/app/src/routes/discover-page.tsx:874
 msgid "朋友圈、相遇、视频号和小程序都从这里继续打开。"
 msgstr "Moments, encounters, Channels, and Mini Programs continue from here."
 
@@ -7179,7 +7189,7 @@ msgstr "Moments, encounters, Channels, and Mini Programs continue from here."
 msgid "朋友圈互动已更新。"
 msgstr "Moments interaction updated."
 
-#: apps/app/src/routes/discover-page.tsx:443
+#: apps/app/src/routes/discover-page.tsx:441
 msgid "朋友圈和广场动态共用同一套发现入口，但可见范围完全不同，桌面端先把这层分界讲清楚。"
 msgstr "Moments and feed share Discover entry points, but their visibility is completely different. Desktop makes that boundary clear first."
 
@@ -7207,7 +7217,7 @@ msgstr "Moments overview"
 msgid "朋友圈视频"
 msgstr "Moment video"
 
-#: apps/app/src/routes/discover-page.tsx:424
+#: apps/app/src/routes/discover-page.tsx:422
 msgid "朋友圈给世界角色，广场给居民"
 msgstr "Moments for world characters, feed for residents"
 
@@ -7252,13 +7262,13 @@ msgstr "Service Account Messages"
 msgid "服务号消息暂时不可用"
 msgstr "Service account messages are temporarily unavailable"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:178
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:182
 #: apps/app/src/i18n/static-dom-seed.ts:9
 msgid "服务器暂时不可用，请稍后再试。"
 msgstr "The server is temporarily unavailable. Try again later."
 
-#: apps/app/src/routes/profile-page.tsx:123
-#: apps/app/src/routes/profile-settings-page.tsx:641
+#: apps/app/src/routes/profile-page.tsx:164
+#: apps/app/src/routes/profile-settings-page.tsx:668
 msgid "服务条款"
 msgstr "Terms of Service"
 
@@ -7299,7 +7309,7 @@ msgstr "Not ready"
 msgid "未归入主链路的补充接力入口。"
 msgstr "Supplementary handoff entries not grouped into the main flows."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:187
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:191
 msgid "未找到"
 msgstr "Not found"
 
@@ -7369,11 +7379,11 @@ msgstr "Flowerbed co-op opens this week"
 msgid "本周效率专题"
 msgstr "This week's productivity feature"
 
-#: apps/app/src/routes/welcome-page.tsx:934
+#: apps/app/src/routes/welcome-page.tsx:988
 msgid "本地世界"
 msgstr "Local World"
 
-#: apps/app/src/routes/welcome-page.tsx:790
+#: apps/app/src/routes/welcome-page.tsx:843
 msgid "本地世界地址"
 msgstr "Local world address"
 
@@ -7381,7 +7391,7 @@ msgstr "Local world address"
 msgid "本地摄像头已关闭"
 msgstr "Local camera is off"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:170
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:174
 msgid "本地端口似乎已经被占用，桌面壳正在尝试重新接管入口。"
 msgstr "The local port seems occupied. The desktop shell is trying to take back the entry point."
 
@@ -7587,7 +7597,7 @@ msgstr "View"
 msgid "查看 1 条新消息"
 msgstr "View 1 new message"
 
-#: apps/app/src/routes/profile-page.tsx:95
+#: apps/app/src/routes/profile-page.tsx:117
 msgid "查看与编辑个人资料"
 msgstr "View and edit profile"
 
@@ -7595,11 +7605,11 @@ msgstr "View and edit profile"
 msgid "查看专题"
 msgstr "View feature"
 
-#: apps/app/src/routes/profile-settings-page.tsx:703
+#: apps/app/src/routes/profile-settings-page.tsx:730
 msgid "查看世界服务使用协议。"
 msgstr "View the world service terms."
 
-#: apps/app/src/routes/profile-settings-page.tsx:704
+#: apps/app/src/routes/profile-settings-page.tsx:731
 msgid "查看世界社区规范和反馈口径。"
 msgstr "View the world community guidelines and feedback policy."
 
@@ -7611,9 +7621,13 @@ msgstr "View world characters"
 msgid "查看世界角色目录"
 msgstr "View world character directory"
 
-#: apps/app/src/routes/profile-settings-page.tsx:701
+#: apps/app/src/routes/profile-settings-page.tsx:728
 msgid "查看世界隐私政策和数据使用说明。"
 msgstr "View the world privacy policy and data usage notes."
+
+#: apps/app/src/routes/profile-settings-page.tsx:745
+msgid "查看会员信息，或退出当前云账号并回到世界入口。"
+msgstr ""
 
 #: apps/app/src/i18n/static-dom-seed.ts:302
 msgid "查看入口"
@@ -7680,7 +7694,7 @@ msgstr "View recent posts from followed subscription accounts"
 msgid "查看并处理好友申请"
 msgstr "View and handle friend requests"
 
-#: apps/app/src/routes/profile-settings-page.tsx:727
+#: apps/app/src/routes/profile-settings-page.tsx:808
 msgid "查看当前世界相关的协议和社区规范。"
 msgstr "View policies and community guidelines for this world."
 
@@ -7870,7 +7884,7 @@ msgstr "Drafts and recent live records in Desktop Live Companion will be sent fr
 msgid "桌面端优先给出最近打开的小程序，形成类似微信面板的稳定回访入口。"
 msgstr "Desktop prioritizes recently opened mini programs to create a stable WeChat-like return entry."
 
-#: apps/app/src/routes/profile-settings-page.tsx:663
+#: apps/app/src/routes/profile-settings-page.tsx:690
 msgid "桌面端保留当前文档切换和独立打开入口。"
 msgstr "Desktop keeps document switching and independent open entry points."
 
@@ -7878,7 +7892,7 @@ msgstr "Desktop keeps document switching and independent open entry points."
 msgid "桌面端先不假做本地通话，直接把当前聊天接力到手机，更贴近微信电脑端“到手机继续”的真实工作流。"
 msgstr "Desktop does not fake a local call first. It hands off the current chat directly to mobile, which is closer to WeChat Desktop's real \"Continue on phone\" workflow."
 
-#: apps/app/src/routes/profile-settings-page.tsx:745
+#: apps/app/src/routes/profile-settings-page.tsx:826
 msgid "桌面端把资料、AI 配置和协议查看收口到同一个工作区。"
 msgstr "Desktop groups profile, AI configuration, and policy viewing into one workspace."
 
@@ -7890,11 +7904,11 @@ msgstr "Desktop uses a WeChat-like content browsing layout: video in the main ar
 msgid "桌面锁定口令已设置，请输入口令解锁。"
 msgstr "Desktop lock passcode is set. Enter it to unlock."
 
-#: apps/app/src/routes/welcome-page.tsx:806
+#: apps/app/src/routes/welcome-page.tsx:859
 msgid "检测到你输入的是 /api 路径，已自动换算为对应的世界入口地址：{normalizedLocalApiBaseUrl}"
 msgstr "Detected an /api path and converted it to the corresponding world entry address: {normalizedLocalApiBaseUrl}"
 
-#: apps/app/src/routes/welcome-page.tsx:809
+#: apps/app/src/routes/welcome-page.tsx:862
 msgid "检测到你输入的是本机应用地址，已自动换算为对应的 Core API 地址：{normalizedLocalApiBaseUrl}"
 msgstr "Detected a local app address and converted it to the corresponding Core API address: {normalizedLocalApiBaseUrl}"
 
@@ -7950,11 +7964,11 @@ msgstr "Switching to the chat details sidebar in the desktop chat workspace."
 msgid "正在切换到桌面聊天工作区中的聊天记录搜索侧栏。"
 msgstr "Switching to the chat history search sidebar in the desktop chat workspace."
 
-#: apps/app/src/routes/welcome-page.tsx:208
+#: apps/app/src/routes/welcome-page.tsx:212
 msgid "正在创建世界..."
 msgstr "Creating world..."
 
-#: apps/app/src/routes/welcome-page.tsx:52
+#: apps/app/src/routes/welcome-page.tsx:56
 msgid "正在创建全新的世界。"
 msgstr "Creating a brand-new world."
 
@@ -7963,7 +7977,7 @@ msgstr "Creating a brand-new world."
 msgid "正在删除..."
 msgstr "Deleting..."
 
-#: apps/app/src/routes/discover-feed-page.tsx:779
+#: apps/app/src/routes/discover-feed-page.tsx:776
 msgid "正在刷新广场动态"
 msgstr "Refreshing feed posts"
 
@@ -7976,7 +7990,7 @@ msgid "正在刷新通讯录"
 msgstr "Refreshing contacts"
 
 #. placeholder {0}: t(scene.label)
-#: apps/app/src/routes/discover-page.tsx:547
+#: apps/app/src/routes/discover-page.tsx:545
 msgid "正在前往{0}..."
 msgstr "Heading to {0}..."
 
@@ -7984,7 +7998,7 @@ msgstr "Heading to {0}..."
 msgid "正在加入..."
 msgstr "Blocking..."
 
-#: apps/app/src/routes/profile-settings-page.tsx:396
+#: apps/app/src/routes/profile-settings-page.tsx:423
 msgid "正在加载 AI 配置"
 msgstr "Loading AI settings"
 
@@ -7992,16 +8006,16 @@ msgstr "Loading AI settings"
 msgid "正在加载..."
 msgstr "Loading..."
 
-#: apps/app/src/routes/welcome-page.tsx:957
+#: apps/app/src/routes/welcome-page.tsx:1012
 msgid "正在加载世界主人"
 msgstr "Loading world owner"
 
-#: apps/app/src/routes/welcome-page.tsx:952
+#: apps/app/src/routes/welcome-page.tsx:1007
 msgid "正在加载世界主人..."
 msgstr "Loading world owner..."
 
-#: apps/app/src/routes/discover-feed-page.tsx:674
-#: apps/app/src/routes/discover-page.tsx:662
+#: apps/app/src/routes/discover-feed-page.tsx:671
+#: apps/app/src/routes/discover-page.tsx:660
 msgid "正在发布..."
 msgstr "Publishing..."
 
@@ -8015,19 +8029,19 @@ msgstr "Sending..."
 msgid "正在听你说话，停止后会继续整理转写。"
 msgstr "Listening. Stop and transcription will continue."
 
-#: apps/app/src/routes/welcome-page.tsx:207
+#: apps/app/src/routes/welcome-page.tsx:211
 msgid "正在唤醒世界..."
 msgstr "Waking world..."
 
-#: apps/app/src/routes/welcome-page.tsx:44
+#: apps/app/src/routes/welcome-page.tsx:48
 msgid "正在唤醒已有世界。"
 msgstr "Waking existing world."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:183
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:187
 msgid "正在唤醒隐界..."
 msgstr "Waking Yinjie..."
 
-#: apps/app/src/routes/discover-page.tsx:528
+#: apps/app/src/routes/discover-page.tsx:526
 msgid "正在寻找..."
 msgstr "Searching..."
 
@@ -8043,7 +8057,7 @@ msgstr "Opening chat..."
 msgid "正在打开桌面公众号文章"
 msgstr "Opening desktop official account article"
 
-#: apps/app/src/routes/discover-feed-page.tsx:510
+#: apps/app/src/routes/discover-feed-page.tsx:507
 msgid "正在打开桌面发现"
 msgstr "Opening desktop Discover"
 
@@ -8158,11 +8172,11 @@ msgstr "Generating group invitation card..."
 msgid "正在移除..."
 msgstr "Removing..."
 
-#: apps/app/src/routes/welcome-page.tsx:732
+#: apps/app/src/routes/welcome-page.tsx:785
 msgid "正在解析你的世界"
 msgstr "Resolving your world"
 
-#: apps/app/src/routes/welcome-page.tsx:727
+#: apps/app/src/routes/welcome-page.tsx:780
 msgid "正在解析你的云世界..."
 msgstr "Resolving your cloud world..."
 
@@ -8200,7 +8214,7 @@ msgstr "Loading friend requests..."
 msgid "正在读取实例状态..."
 msgstr "Reading instance status..."
 
-#: apps/app/src/routes/discover-page.tsx:715
+#: apps/app/src/routes/discover-page.tsx:713
 msgid "正在读取广场动态..."
 msgstr "Loading feed posts..."
 
@@ -8269,7 +8283,7 @@ msgstr "Transcribing voice..."
 msgid "正在载入桌面消息工作区，马上显示最近会话。"
 msgstr "Loading the desktop messages workspace. Recent conversations will appear shortly."
 
-#: apps/app/src/routes/discover-feed-page.tsx:512
+#: apps/app/src/routes/discover-feed-page.tsx:509
 msgid "正在载入桌面看一看工作区，马上显示当前动态内容。"
 msgstr "Loading desktop Discover workspace. Current posts will appear shortly."
 
@@ -8285,7 +8299,7 @@ msgstr "Loading stickers..."
 msgid "正在退出..."
 msgstr "Leaving..."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:184
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:188
 msgid "正在重新检查入口..."
 msgstr "Rechecking entry point..."
 
@@ -8525,8 +8539,8 @@ msgstr "Add"
 msgid "添加到通讯录"
 msgstr "Add to contacts"
 
-#: apps/app/src/routes/discover-feed-page.tsx:699
-#: apps/app/src/routes/discover-page.tsx:634
+#: apps/app/src/routes/discover-feed-page.tsx:696
+#: apps/app/src/routes/discover-page.tsx:632
 msgid "添加图片"
 msgstr "Add image"
 
@@ -8543,8 +8557,8 @@ msgstr "Add members"
 msgid "添加朋友"
 msgstr "Add Friend"
 
-#: apps/app/src/routes/discover-feed-page.tsx:710
-#: apps/app/src/routes/discover-page.tsx:650
+#: apps/app/src/routes/discover-feed-page.tsx:707
+#: apps/app/src/routes/discover-page.tsx:648
 msgid "添加视频"
 msgstr "Add video"
 
@@ -8669,11 +8683,11 @@ msgstr "Clear history"
 msgid "清空重试"
 msgstr "Clear and retry"
 
-#: apps/app/src/routes/profile-settings-page.tsx:529
+#: apps/app/src/routes/profile-settings-page.tsx:556
 msgid "清除专属 API Key"
 msgstr "Clear dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:528
+#: apps/app/src/routes/profile-settings-page.tsx:555
 msgid "清除中..."
 msgstr "Clearing..."
 
@@ -8749,8 +8763,8 @@ msgstr "Click to preview"
 msgid "点按展开查看提醒。"
 msgstr "Tap to expand reminders."
 
-#: apps/app/src/routes/discover-feed-page.tsx:884
-#: apps/app/src/routes/discover-page.tsx:765
+#: apps/app/src/routes/discover-feed-page.tsx:881
+#: apps/app/src/routes/discover-page.tsx:763
 msgid "点赞"
 msgstr "Like"
 
@@ -8843,8 +8857,8 @@ msgstr "Life"
 msgid "用当前世界的真实会话、公众号和运行状态做跨端继续。"
 msgstr "Use the real conversations, official accounts, and runtime state of the current world to continue across devices."
 
-#: apps/app/src/routes/profile-settings-page.tsx:49
-#: apps/app/src/routes/profile-settings-page.tsx:813
+#: apps/app/src/routes/profile-settings-page.tsx:59
+#: apps/app/src/routes/profile-settings-page.tsx:913
 msgid "用户协议"
 msgstr "User Agreement"
 
@@ -8864,7 +8878,7 @@ msgstr "Requesting camera permission"
 msgid "界闻"
 msgstr "Jiewen"
 
-#: apps/app/src/routes/profile-settings-page.tsx:603
+#: apps/app/src/routes/profile-settings-page.tsx:630
 msgid "界面语言"
 msgstr "Interface Language"
 
@@ -8981,7 +8995,7 @@ msgstr "Album tool"
 msgid "看最近添加"
 msgstr "View recent adds"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:1171
+#: apps/app/src/features/shell/desktop-shell.tsx:1169
 msgid "看看我最近发了什么"
 msgstr "See what I posted recently"
 
@@ -9069,7 +9083,7 @@ msgstr "Social"
 msgid "社交与内容"
 msgstr "Social and Content"
 
-#: apps/app/src/routes/discover-page.tsx:881
+#: apps/app/src/routes/discover-page.tsx:879
 msgid "社交与动态"
 msgstr "Social and updates"
 
@@ -9081,10 +9095,10 @@ msgstr "Social popularity"
 msgid "社交热玩"
 msgstr "Social hits"
 
-#: apps/app/src/routes/profile-page.tsx:129
-#: apps/app/src/routes/profile-settings-page.tsx:50
-#: apps/app/src/routes/profile-settings-page.tsx:649
-#: apps/app/src/routes/profile-settings-page.tsx:814
+#: apps/app/src/routes/profile-page.tsx:170
+#: apps/app/src/routes/profile-settings-page.tsx:60
+#: apps/app/src/routes/profile-settings-page.tsx:676
+#: apps/app/src/routes/profile-settings-page.tsx:914
 msgid "社区规范"
 msgstr "Community Guidelines"
 
@@ -9135,8 +9149,8 @@ msgstr "No Channels content yet"
 msgid "视频封面"
 msgstr "Video cover"
 
-#: apps/app/src/routes/discover-feed-page.tsx:397
-#: apps/app/src/routes/discover-page.tsx:414
+#: apps/app/src/routes/discover-feed-page.tsx:394
+#: apps/app/src/routes/discover-page.tsx:412
 msgid "视频选择失败，请稍后重试。"
 msgstr "Video selection failed. Try again later."
 
@@ -9251,11 +9265,11 @@ msgstr "Please wait while recent conversations and message entries sync."
 msgid "稍等一下，正在同步最近的订阅推送。"
 msgstr "One moment, syncing recent subscription pushes."
 
-#: apps/app/src/routes/discover-feed-page.tsx:780
+#: apps/app/src/routes/discover-feed-page.tsx:777
 msgid "稍等一下，正在同步居民公开动态和互动状态。"
 msgstr "Please wait while resident posts and interactions sync."
 
-#: apps/app/src/routes/profile-settings-page.tsx:397
+#: apps/app/src/routes/profile-settings-page.tsx:424
 msgid "稍等一下，正在同步当前世界主人的专属配置。"
 msgstr "Please wait while dedicated settings for the current world owner sync."
 
@@ -9339,7 +9353,7 @@ msgstr "Competitive hits"
 msgid "竞速"
 msgstr "Racing"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:226
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:230
 msgid "端口占用：{portOccupiedLabel}"
 msgstr "Port occupied: {portOccupiedLabel}"
 
@@ -9419,8 +9433,8 @@ msgstr "Filter scope"
 
 #: apps/app/src/i18n/static-dom-seed.ts:12
 #: apps/app/src/routes/desktop-feedback-page.tsx:414
-#: apps/app/src/routes/profile-settings-page.tsx:239
-#: apps/app/src/routes/profile-settings-page.tsx:791
+#: apps/app/src/routes/profile-settings-page.tsx:266
+#: apps/app/src/routes/profile-settings-page.tsx:891
 msgid "签名"
 msgstr "Signature"
 
@@ -9440,13 +9454,17 @@ msgstr "Lawyer Jianheng"
 msgid "管理"
 msgstr "Manage"
 
-#: apps/app/src/routes/profile-settings-page.tsx:724
+#: apps/app/src/routes/profile-settings-page.tsx:803
 msgid "管理专属 API Key 和兼容 Base URL。"
 msgstr "Manage your dedicated API Key and compatible Base URL."
 
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:1101
 msgid "管理中：点击表情右上角删除，删完会自动顺到下一张，按 Esc 可直接完成。"
 msgstr "Manage mode: tap delete in the top right of a sticker. Focus moves to the next one automatically, and Esc can finish directly."
+
+#: apps/app/src/routes/profile-settings-page.tsx:769
+msgid "管理会员与当前云账号登录状态"
+msgstr ""
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1313
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1317
@@ -9456,6 +9474,10 @@ msgstr "Manage mode: tap delete in the top right of a sticker. Focus moves to th
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1029
 msgid "管理员"
 msgstr "Admin"
+
+#: apps/app/src/routes/profile-settings-page.tsx:807
+msgid "管理当前云账号与退出登录。"
+msgstr ""
 
 #. placeholder {0}: catalog.customStickerCount
 #. placeholder {1}: catalog.maxCustomStickerCount
@@ -9503,7 +9525,7 @@ msgstr "System sharing"
 #: apps/app/src/i18n/static-dom-seed.ts:882
 #: apps/app/src/routes/character-detail-page.tsx:777
 #: apps/app/src/routes/chat-details-page.tsx:409
-#: apps/app/src/routes/discover-feed-page.tsx:489
+#: apps/app/src/routes/discover-feed-page.tsx:486
 #: apps/app/src/routes/group-chat-details-page.tsx:441
 #: apps/app/src/routes/group-qr-page.tsx:941
 msgid "系统分享失败，请稍后重试。"
@@ -9517,7 +9539,7 @@ msgstr "System share is temporarily unavailable; location content copied."
 msgid "系统分享暂时不可用，已复制公众号摘要。"
 msgstr "System share is temporarily unavailable; official account summary copied."
 
-#: apps/app/src/routes/discover-feed-page.tsx:476
+#: apps/app/src/routes/discover-feed-page.tsx:473
 msgid "系统分享暂时不可用，已复制动态摘要。"
 msgstr "System share is unavailable; post summary copied."
 
@@ -9669,7 +9691,7 @@ msgstr "Continue game"
 msgid "继续管理"
 msgstr "Resume manage"
 
-#: apps/app/src/routes/discover-feed-page.tsx:252
+#: apps/app/src/routes/discover-feed-page.tsx:249
 msgid "继续编辑"
 msgstr "Continue editing"
 
@@ -9946,7 +9968,7 @@ msgstr "The group link has been copied."
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:576
 #: apps/app/src/features/chat/chat-reminder-entries.ts:70
 #: apps/app/src/features/chat/chat-reminder-entries.ts:95
-#: apps/app/src/routes/profile-settings-page.tsx:41
+#: apps/app/src/routes/profile-settings-page.tsx:46
 msgid "聊天"
 msgstr "Chat"
 
@@ -10056,7 +10078,7 @@ msgstr "Chat History Management"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:810
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1558
 #: apps/app/src/routes/group-chat-details-page.tsx:757
-#: apps/app/src/routes/profile-settings-page.tsx:302
+#: apps/app/src/routes/profile-settings-page.tsx:329
 msgid "聊天设置"
 msgstr "Chat settings"
 
@@ -10169,8 +10191,8 @@ msgstr "Custom sticker library"
 msgid "苏语"
 msgstr "Suyu"
 
-#: apps/app/src/routes/discover-page.tsx:587
-#: apps/app/src/routes/discover-page.tsx:707
+#: apps/app/src/routes/discover-page.tsx:585
+#: apps/app/src/routes/discover-page.tsx:705
 msgid "范围"
 msgstr "Scope"
 
@@ -10178,7 +10200,7 @@ msgstr "Scope"
 msgid "荐"
 msgstr "F"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:1179
+#: apps/app/src/features/shell/desktop-shell.tsx:1177
 #: apps/app/src/i18n/static-dom-seed.ts:677
 msgid "行动助理"
 msgstr "Action Assistant"
@@ -10283,20 +10305,15 @@ msgstr "Character bio"
 msgid "角色资料不存在，暂时无法打开朋友圈。"
 msgstr "Character profile does not exist, so Moments cannot be opened now."
 
-#: apps/app/src/routes/welcome-page.tsx:194
+#: apps/app/src/routes/welcome-page.tsx:198
 msgid "解析中..."
 msgstr "Resolving..."
 
-#: apps/app/src/routes/welcome-page.tsx:608
+#: apps/app/src/routes/welcome-page.tsx:661
 msgid "解析云世界访问失败。"
 msgstr "Failed to resolve cloud world access."
 
-#: apps/app/src/routes/welcome-page.tsx:198
-#: apps/app/src/routes/welcome-page.tsx:211
-msgid "解析我的世界"
-msgstr "Resolve my world"
-
-#: apps/app/src/features/shell/desktop-shell.tsx:1029
+#: apps/app/src/features/shell/desktop-shell.tsx:1031
 msgid "解锁继续使用"
 msgstr "Unlock to Continue"
 
@@ -10341,21 +10358,21 @@ msgstr "Star this friend"
 #: apps/app/src/features/shell/desktop-nav-config.ts:124
 #: apps/app/src/features/shell/desktop-shell.tsx:852
 #: apps/app/src/routes/desktop-mobile-page.tsx:186
-#: apps/app/src/routes/profile-page.tsx:108
-#: apps/app/src/routes/profile-settings-page.tsx:717
-#: apps/app/src/routes/profile-settings-page.tsx:831
+#: apps/app/src/routes/profile-page.tsx:130
+#: apps/app/src/routes/profile-settings-page.tsx:796
+#: apps/app/src/routes/profile-settings-page.tsx:931
 msgid "设置"
 msgstr "Settings"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:962
+#: apps/app/src/features/shell/desktop-shell.tsx:964
 msgid "设置 4 到 6 位数字口令"
 msgstr "Set a 4 to 6 digit passcode"
 
-#: apps/app/src/routes/profile-settings-page.tsx:742
+#: apps/app/src/routes/profile-settings-page.tsx:823
 msgid "设置分类"
 msgstr "Settings Categories"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:990
+#: apps/app/src/features/shell/desktop-shell.tsx:992
 msgid "设置口令并锁定"
 msgstr "Set Passcode and Lock"
 
@@ -10383,7 +10400,7 @@ msgstr "Set tags"
 msgid "设置桌面锁定口令"
 msgstr "Set Desktop Lock Passcode"
 
-#: apps/app/src/routes/profile-settings-page.tsx:306
+#: apps/app/src/routes/profile-settings-page.tsx:333
 msgid "设置键盘聊天输入时的发送快捷键"
 msgstr "Set the send shortcut for keyboard chat input"
 
@@ -10461,7 +10478,7 @@ msgstr "Try another keyword, or go back to filters and switch to another categor
 msgid "试试换个筛选条件，或者稍后再来查看。"
 msgstr "Try another filter, or check again later."
 
-#: apps/app/src/routes/welcome-page.tsx:48
+#: apps/app/src/routes/welcome-page.tsx:52
 msgid "该世界当前已被运维停用。"
 msgstr "This world is currently disabled by operations."
 
@@ -10490,15 +10507,15 @@ msgstr "Details"
 msgid "语气风格"
 msgstr "Tone style"
 
-#: apps/app/src/routes/profile-settings-page.tsx:43
+#: apps/app/src/routes/profile-settings-page.tsx:48
 msgid "语言"
 msgstr "Language"
 
-#: apps/app/src/routes/profile-settings-page.tsx:621
+#: apps/app/src/routes/profile-settings-page.tsx:648
 msgid "语言偏好会保存在当前设备；桌面端、管理后台和云控制台有各自的切换入口。"
 msgstr "Language preferences are saved on this device; desktop, admin, and cloud console each have their own switcher."
 
-#: apps/app/src/routes/profile-settings-page.tsx:615
+#: apps/app/src/routes/profile-settings-page.tsx:642
 msgid "语言偏好按端保存；后续新增语言会自动出现在这里，不需要每个页面单独加入口。"
 msgstr "Language preferences are saved per surface; new languages will appear here automatically without adding page-specific switchers."
 
@@ -10574,15 +10591,15 @@ msgstr "Please fill in a feedback title first."
 msgid "请先补充问题描述。"
 msgstr "Please add an issue description first."
 
-#: apps/app/src/routes/discover-feed-page.tsx:175
+#: apps/app/src/routes/discover-feed-page.tsx:172
 msgid "请先输入评论内容。"
 msgstr "Enter a comment first."
 
-#: apps/app/src/routes/welcome-page.tsx:622
+#: apps/app/src/routes/welcome-page.tsx:675
 msgid "请先连接世界，再设置世界主人名称。"
 msgstr "Connect to a world first, then set the World Owner name."
 
-#: apps/app/src/routes/welcome-page.tsx:161
+#: apps/app/src/routes/welcome-page.tsx:165
 msgid "请先验证手机号，以解析你的云世界。"
 msgstr "Verify your phone number first to resolve your cloud world."
 
@@ -10598,12 +10615,12 @@ msgstr "Request failed. Please try again later."
 msgid "请求已中断，请稍后重试。"
 msgstr "Request was interrupted. Please try again later."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:211
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:215
 #: apps/app/src/i18n/static-dom-seed.ts:7
 msgid "请稍候"
 msgstr "Please wait"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:238
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:242
 msgid "请稍候..."
 msgstr "Please wait..."
 
@@ -10611,19 +10628,19 @@ msgstr "Please wait..."
 msgid "请设置 4 到 6 位数字口令。"
 msgstr "Set a 4 to 6 digit passcode."
 
-#: apps/app/src/routes/welcome-page.tsx:617
+#: apps/app/src/routes/welcome-page.tsx:670
 msgid "请输入世界主人的名字。"
 msgstr "Enter the World Owner's name."
 
-#: apps/app/src/routes/welcome-page.tsx:690
+#: apps/app/src/routes/welcome-page.tsx:743
 msgid "请输入手机号"
 msgstr "Enter phone number"
 
-#: apps/app/src/routes/welcome-page.tsx:537
+#: apps/app/src/routes/welcome-page.tsx:582
 msgid "请输入手机号。"
 msgstr "Enter phone number."
 
-#: apps/app/src/routes/welcome-page.tsx:491
+#: apps/app/src/routes/welcome-page.tsx:536
 msgid "请输入本地世界 API 地址。"
 msgstr "Enter the local world API address."
 
@@ -10635,11 +10652,11 @@ msgstr "Enter a group nickname"
 msgid "请输入群聊名称"
 msgstr "Enter a group name"
 
-#: apps/app/src/routes/welcome-page.tsx:706
+#: apps/app/src/routes/welcome-page.tsx:759
 msgid "请输入验证码"
 msgstr "Enter verification code"
 
-#: apps/app/src/routes/welcome-page.tsx:542
+#: apps/app/src/routes/welcome-page.tsx:587
 msgid "请输入验证码。"
 msgstr "Enter verification code."
 
@@ -10648,10 +10665,10 @@ msgstr "Enter verification code."
 #: apps/app/src/routes/chat-details-page.tsx:749
 #: apps/app/src/routes/chat-list-page.tsx:740
 #: apps/app/src/routes/contacts-page.tsx:1931
-#: apps/app/src/routes/discover-feed-page.tsx:778
+#: apps/app/src/routes/discover-feed-page.tsx:775
 #: apps/app/src/routes/group-chat-details-page.tsx:578
 #: apps/app/src/routes/group-qr-page.tsx:1088
-#: apps/app/src/routes/profile-settings-page.tsx:395
+#: apps/app/src/routes/profile-settings-page.tsx:422
 msgid "读取中"
 msgstr "Loading"
 
@@ -10666,8 +10683,8 @@ msgstr "Failed to read the image. Try another one."
 #: apps/app/src/routes/chat-details-page.tsx:786
 #: apps/app/src/routes/chat-details-page.tsx:799
 #: apps/app/src/routes/chat-list-page.tsx:750
-#: apps/app/src/routes/discover-feed-page.tsx:786
-#: apps/app/src/routes/profile-settings-page.tsx:407
+#: apps/app/src/routes/discover-feed-page.tsx:783
+#: apps/app/src/routes/profile-settings-page.tsx:434
 msgid "读取失败"
 msgstr "Load failed"
 
@@ -10679,7 +10696,7 @@ msgstr "Failed to read the file. Select it again."
 msgid "读取群成员失败"
 msgstr "Failed to load group members"
 
-#: apps/app/src/routes/profile-settings-page.tsx:391
+#: apps/app/src/routes/profile-settings-page.tsx:418
 msgid "读取配置..."
 msgstr "Loading settings..."
 
@@ -10695,11 +10712,11 @@ msgstr "Who can view"
 msgid "调整文字标注大小"
 msgstr "Resize text annotation"
 
-#: apps/app/src/routes/profile-settings-page.tsx:305
+#: apps/app/src/routes/profile-settings-page.tsx:332
 msgid "调整桌面和 Web 键盘聊天输入时的发送快捷键。"
 msgstr "Adjust the send shortcut for desktop and web keyboard chat input."
 
-#: apps/app/src/routes/profile-settings-page.tsx:722
+#: apps/app/src/routes/profile-settings-page.tsx:801
 msgid "调整桌面和 Web 键盘聊天输入的发送快捷键。"
 msgstr "Adjust send shortcuts for desktop and web keyboard chat input."
 
@@ -10710,6 +10727,10 @@ msgstr "Resize crop area"
 #: apps/app/src/i18n/static-dom-seed.ts:699
 msgid "财富与自由思维导师映射"
 msgstr "Wealth and freedom mindset mentor mapping"
+
+#: apps/app/src/routes/profile-settings-page.tsx:54
+msgid "账号与退出"
+msgstr ""
 
 #. placeholder {0}: resolveLiveQualityLabel(liveDraft.quality)
 #: apps/app/src/routes/desktop-mobile-page.tsx:1610
@@ -10725,7 +10746,7 @@ msgstr "Feynman"
 msgid "资料"
 msgstr "Profile"
 
-#: apps/app/src/routes/profile-settings-page.tsx:717
+#: apps/app/src/routes/profile-settings-page.tsx:796
 msgid "资料与设置"
 msgstr "Profile and Settings"
 
@@ -10733,8 +10754,8 @@ msgstr "Profile and Settings"
 msgid "资料关键词"
 msgstr "Profile keywords"
 
-#: apps/app/src/routes/profile-settings-page.tsx:289
-#: apps/app/src/routes/profile-settings-page.tsx:292
+#: apps/app/src/routes/profile-settings-page.tsx:316
+#: apps/app/src/routes/profile-settings-page.tsx:319
 msgid "资料已更新。"
 msgstr "Profile updated."
 
@@ -10806,11 +10827,11 @@ msgstr "Light decor plus light story management with a soft look, suited for mob
 msgid "轻松治愈"
 msgstr "Relaxing"
 
-#: apps/app/src/routes/discover-page.tsx:493
+#: apps/app/src/routes/discover-page.tsx:491
 msgid "轻轻试一次，就可能遇到一段新的关系线索。"
 msgstr "Try once and you may find a new relationship lead."
 
-#: apps/app/src/routes/discover-feed-page.tsx:514
+#: apps/app/src/routes/discover-feed-page.tsx:511
 msgid "载入桌面发现工作区..."
 msgstr "Loading desktop Discover workspace..."
 
@@ -10826,11 +10847,11 @@ msgstr "Loading desktop Contacts..."
 msgid "辅助查看当前加载窗口与提醒数量。"
 msgstr "Helps inspect the current loaded window and reminder count."
 
-#: apps/app/src/routes/welcome-page.tsx:938
+#: apps/app/src/routes/welcome-page.tsx:992
 msgid "输入世界入口地址并直接连接。若你拿到的是 /api 地址，也可以直接粘贴。"
 msgstr "Enter the world entry address and connect directly. If you have an /api address, you can paste it as is."
 
-#: apps/app/src/routes/profile-settings-page.tsx:490
+#: apps/app/src/routes/profile-settings-page.tsx:517
 msgid "输入你的专属 API Key"
 msgstr "Enter your dedicated API Key"
 
@@ -10842,7 +10863,7 @@ msgstr "Typing a keyword pauses delete mode temporarily. Clearing search returns
 msgid "输入文字"
 msgstr "Enter text"
 
-#: apps/app/src/routes/profile-settings-page.tsx:235
+#: apps/app/src/routes/profile-settings-page.tsx:262
 msgid "输入显示名称"
 msgstr "Enter display name"
 
@@ -10858,7 +10879,7 @@ msgstr "Enter the local passcode to restore desktop access"
 msgid "输入标注文字"
 msgstr "Enter annotation text"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:1020
+#: apps/app/src/features/shell/desktop-shell.tsx:1022
 msgid "输入桌面锁定口令"
 msgstr "Enter desktop lock passcode"
 
@@ -10903,7 +10924,7 @@ msgstr "R"
 
 #: apps/app/src/features/chat-details/chat-details-shell.tsx:45
 #: apps/app/src/routes/character-detail-page.tsx:271
-#: apps/app/src/routes/welcome-page.tsx:884
+#: apps/app/src/routes/welcome-page.tsx:937
 msgid "返回"
 msgstr "Back"
 
@@ -10911,7 +10932,7 @@ msgstr "Back"
 msgid "返回上一层"
 msgstr "Back"
 
-#: apps/app/src/routes/welcome-page.tsx:866
+#: apps/app/src/routes/welcome-page.tsx:919
 msgid "返回上一步"
 msgstr "Back to previous step"
 
@@ -10919,11 +10940,11 @@ msgstr "Back to previous step"
 #: apps/app/src/i18n/static-dom-seed.ts:884
 #: apps/app/src/routes/character-detail-page.tsx:272
 #: apps/app/src/routes/chat-details-page.tsx:189
+#: apps/app/src/routes/discover-feed-page.tsx:245
 #: apps/app/src/routes/discover-feed-page.tsx:248
-#: apps/app/src/routes/discover-feed-page.tsx:251
-#: apps/app/src/routes/discover-feed-page.tsx:767
-#: apps/app/src/routes/discover-feed-page.tsx:806
-#: apps/app/src/routes/discover-feed-page.tsx:1021
+#: apps/app/src/routes/discover-feed-page.tsx:764
+#: apps/app/src/routes/discover-feed-page.tsx:803
+#: apps/app/src/routes/discover-feed-page.tsx:1018
 #: apps/app/src/routes/group-chat-details-page.tsx:134
 #: apps/app/src/routes/group-chat-details-page.tsx:167
 #: apps/app/src/routes/group-qr-page.tsx:725
@@ -10946,8 +10967,8 @@ msgid "返回朋友圈"
 msgstr "Back to Moments"
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:876
-#: apps/app/src/routes/profile-settings-page.tsx:172
-#: apps/app/src/routes/profile-settings-page.tsx:175
+#: apps/app/src/routes/profile-settings-page.tsx:194
+#: apps/app/src/routes/profile-settings-page.tsx:197
 msgid "返回消息"
 msgstr "Back to Messages"
 
@@ -11003,14 +11024,15 @@ msgstr "Back to chat and take a photo"
 
 #: apps/app/src/i18n/static-dom-seed.ts:620
 #: apps/app/src/i18n/static-dom-seed.ts:885
+#: apps/app/src/routes/profile-subscription-page.tsx:181
 msgid "返回设置"
 msgstr "Back to Settings"
 
-#: apps/app/src/routes/profile-settings-page.tsx:173
+#: apps/app/src/routes/profile-settings-page.tsx:195
 msgid "返回资料"
 msgstr "Back to profile"
 
-#: apps/app/src/routes/profile-settings-page.tsx:175
+#: apps/app/src/routes/profile-settings-page.tsx:197
 msgid "返回资料页"
 msgstr "Back to profile page"
 
@@ -11140,7 +11162,7 @@ msgstr "Not opened yet · only in catalog"
 msgid "还没有收藏内容"
 msgstr "No favorites yet"
 
-#: apps/app/src/routes/discover-feed-page.tsx:1010
+#: apps/app/src/routes/discover-feed-page.tsx:1007
 msgid "还没有新动态"
 msgstr "No new posts yet"
 
@@ -11284,7 +11306,7 @@ msgstr "This desktop is currently carrying your world."
 msgid "这条也值得补发，但综合活跃度和回流时长后仍排在主推荐后面。"
 msgstr "This one is also worth resending, but it still ranks behind the top recommendation after balancing activity and return wait time."
 
-#: apps/app/src/routes/discover-feed-page.tsx:671
+#: apps/app/src/routes/discover-feed-page.tsx:668
 msgid "这条内容会进入公开动态流，更适合发讨论、状态和世界广播。"
 msgstr "This goes into the public feed, better for discussions, status, and world broadcasts."
 
@@ -11357,8 +11379,8 @@ msgstr "This article is temporarily unavailable"
 msgid "这里不只看朋友，世界主人和居民的公开发言都会进入这条流。"
 msgstr "This is not only friends: public posts from the world owner and residents enter this feed."
 
-#: apps/app/src/routes/discover-feed-page.tsx:741
-#: apps/app/src/routes/discover-page.tsx:694
+#: apps/app/src/routes/discover-feed-page.tsx:738
+#: apps/app/src/routes/discover-page.tsx:692
 msgid "这里不只看朋友，也能看到世界里的居民正在说什么。"
 msgstr "This shows not just friends, but what residents in the world are saying."
 
@@ -11390,11 +11412,11 @@ msgstr "This holds WeChat-style fixed frequent entries."
 msgid "这里承接桌面端完整小程序目录。"
 msgstr "This holds the full desktop mini program catalog."
 
-#: apps/app/src/routes/profile-settings-page.tsx:226
+#: apps/app/src/routes/profile-settings-page.tsx:253
 msgid "这里的名称和签名会用于移动端资料页和世界主人展示。"
 msgstr "This name and signature are used on the mobile profile page and world owner display."
 
-#: apps/app/src/routes/welcome-page.tsx:893
+#: apps/app/src/routes/welcome-page.tsx:946
 msgid "进入世界"
 msgstr "Enter world"
 
@@ -11426,6 +11448,11 @@ msgstr "Enter delete mode."
 msgid "进入小程序结果"
 msgstr "Open mini program results"
 
+#: apps/app/src/routes/welcome-page.tsx:202
+#: apps/app/src/routes/welcome-page.tsx:215
+msgid "进入我的世界"
+msgstr ""
+
 #: apps/app/src/i18n/static-dom-seed.ts:328
 msgid "进入收藏结果"
 msgstr "Open favorites results"
@@ -11434,7 +11461,7 @@ msgstr "Open favorites results"
 msgid "进入朋友圈结果"
 msgstr "Open Moments results"
 
-#: apps/app/src/features/shell/desktop-shell.tsx:1181
+#: apps/app/src/features/shell/desktop-shell.tsx:1179
 msgid "进入真实世界动作会话"
 msgstr "Open the real-world action conversation"
 
@@ -11462,14 +11489,14 @@ msgstr "Open account"
 msgid "远程模式下，相关数据会发送到世界实例的 Core API 与推理网关；自托管或特定部署模式下，数据会保存在对应实例的运行目录与数据库里。"
 msgstr "In remote mode, related data is sent to the world instance Core API and inference gateway. In self-hosted or specific deployments, it is stored in that instance's runtime directory and database."
 
-#: apps/app/src/routes/welcome-page.tsx:190
-#: apps/app/src/routes/welcome-page.tsx:202
-#: apps/app/src/routes/welcome-page.tsx:821
+#: apps/app/src/routes/welcome-page.tsx:194
+#: apps/app/src/routes/welcome-page.tsx:206
+#: apps/app/src/routes/welcome-page.tsx:874
 msgid "连接中..."
 msgstr "Connecting..."
 
-#: apps/app/src/routes/welcome-page.tsx:1055
-#: apps/app/src/routes/welcome-page.tsx:1072
+#: apps/app/src/routes/welcome-page.tsx:1110
+#: apps/app/src/routes/welcome-page.tsx:1127
 msgid "连接你的世界"
 msgstr "Connect your world"
 
@@ -11477,7 +11504,7 @@ msgstr "Connect your world"
 msgid "连接异常"
 msgstr "Connection Issue"
 
-#: apps/app/src/routes/welcome-page.tsx:821
+#: apps/app/src/routes/welcome-page.tsx:874
 msgid "连接本地世界"
 msgstr "Connect local world"
 
@@ -11488,6 +11515,13 @@ msgstr "Connection Status"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1445
 msgid "退出后你将不再收到这个群的消息，当前会话也会从桌面端列表中移除。"
 msgstr "After leaving, you will no longer receive messages from this group, and the current thread will be removed from the desktop list."
+
+#: apps/app/src/routes/profile-page.tsx:145
+#: apps/app/src/routes/profile-settings-page.tsx:761
+#: apps/app/src/routes/profile-settings-page.tsx:784
+#: apps/app/src/routes/profile-subscription-page.tsx:188
+msgid "退出登录"
+msgstr ""
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1443
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1446
@@ -11614,7 +11648,7 @@ msgstr "Call"
 msgid "通话暂时不可用"
 msgstr "Call is temporarily unavailable"
 
-#: apps/app/src/routes/welcome-page.tsx:919
+#: apps/app/src/routes/welcome-page.tsx:973
 msgid "通过手机号登录。新用户会获得一个全新的世界，老用户会唤醒自己已有的世界。"
 msgstr "Sign in with your phone number. New users get a brand-new world, while returning users wake their existing world."
 
@@ -11652,7 +11686,7 @@ msgstr "Invitation code: {inviteCode}"
 msgid "部分加入"
 msgstr "Partially joined"
 
-#: apps/app/src/routes/profile-settings-page.tsx:795
+#: apps/app/src/routes/profile-settings-page.tsx:895
 msgid "配置状态"
 msgstr "Configuration status"
 
@@ -11668,12 +11702,12 @@ msgstr "Redo annotation (Cmd/Ctrl+Shift+Z / Cmd/Ctrl+Y)"
 msgid "重新拖拽可修改裁剪区域。"
 msgstr "Drag again to adjust the crop area."
 
-#: apps/app/src/routes/welcome-page.tsx:984
-#: apps/app/src/routes/welcome-page.tsx:1030
+#: apps/app/src/routes/welcome-page.tsx:1039
+#: apps/app/src/routes/welcome-page.tsx:1085
 msgid "重新解析"
 msgstr "Resolve again"
 
-#: apps/app/src/routes/welcome-page.tsx:984
+#: apps/app/src/routes/welcome-page.tsx:1039
 msgid "重新连接"
 msgstr "Reconnect"
 
@@ -11700,8 +11734,8 @@ msgstr "Retry follow"
 #: apps/app/src/routes/character-detail-page.tsx:780
 #: apps/app/src/routes/chat-details-page.tsx:388
 #: apps/app/src/routes/chat-details-page.tsx:412
-#: apps/app/src/routes/discover-feed-page.tsx:456
-#: apps/app/src/routes/discover-feed-page.tsx:482
+#: apps/app/src/routes/discover-feed-page.tsx:453
+#: apps/app/src/routes/discover-feed-page.tsx:479
 #: apps/app/src/routes/group-chat-details-page.tsx:415
 #: apps/app/src/routes/group-chat-details-page.tsx:446
 #: apps/app/src/routes/group-qr-page.tsx:928
@@ -11711,7 +11745,7 @@ msgstr "Retry follow"
 msgid "重试分享"
 msgstr "Retry sharing"
 
-#: apps/app/src/routes/welcome-page.tsx:1006
+#: apps/app/src/routes/welcome-page.tsx:1061
 msgid "重试发送"
 msgstr "Retry sending"
 
@@ -11732,8 +11766,8 @@ msgstr "Retry removing star"
 #: apps/app/src/routes/character-detail-page.tsx:781
 #: apps/app/src/routes/chat-details-page.tsx:389
 #: apps/app/src/routes/chat-details-page.tsx:413
-#: apps/app/src/routes/discover-feed-page.tsx:456
-#: apps/app/src/routes/discover-feed-page.tsx:482
+#: apps/app/src/routes/discover-feed-page.tsx:453
+#: apps/app/src/routes/discover-feed-page.tsx:479
 #: apps/app/src/routes/group-chat-details-page.tsx:422
 #: apps/app/src/routes/group-chat-details-page.tsx:447
 #: apps/app/src/routes/group-qr-page.tsx:953
@@ -11764,15 +11798,15 @@ msgstr "Retry starring"
 #: apps/app/src/routes/contacts-page.tsx:1261
 #: apps/app/src/routes/contacts-page.tsx:1278
 #: apps/app/src/routes/contacts-page.tsx:1292
-#: apps/app/src/routes/discover-feed-page.tsx:249
-#: apps/app/src/routes/discover-feed-page.tsx:767
-#: apps/app/src/routes/discover-feed-page.tsx:798
-#: apps/app/src/routes/discover-feed-page.tsx:806
+#: apps/app/src/routes/discover-feed-page.tsx:246
+#: apps/app/src/routes/discover-feed-page.tsx:764
+#: apps/app/src/routes/discover-feed-page.tsx:795
+#: apps/app/src/routes/discover-feed-page.tsx:803
 #: apps/app/src/routes/group-chat-details-page.tsx:148
 #: apps/app/src/routes/group-qr-page.tsx:1114
 #: apps/app/src/routes/group-qr-page.tsx:1148
 #: apps/app/src/routes/group-qr-page.tsx:1635
-#: apps/app/src/routes/profile-settings-page.tsx:419
+#: apps/app/src/routes/profile-settings-page.tsx:446
 msgid "重试读取"
 msgstr "Retry loading"
 
@@ -11794,7 +11828,7 @@ msgid "锁定"
 msgstr "Lock"
 
 #. placeholder {0}: formatTimestamp(lockedAt)
-#: apps/app/src/features/shell/desktop-shell.tsx:928
+#: apps/app/src/features/shell/desktop-shell.tsx:930
 msgid "锁定时间 {0}"
 msgstr "Locked at {0}"
 
@@ -11866,7 +11900,7 @@ msgstr "Attachment inserted into the note."
 msgid "附带实例诊断摘要"
 msgstr "Attach instance diagnostic summary"
 
-#: apps/app/src/routes/discover-page.tsx:270
+#: apps/app/src/routes/discover-page.tsx:268
 msgid "附近暂时没有新的相遇。"
 msgstr "No new encounters nearby for now."
 
@@ -11890,7 +11924,7 @@ msgstr "Yinjie stores your account profile, chat activity, posts, and necessary 
 msgid "隐界会在维持世界运行、会话同步和安全审计所需的范围内处理你的资料与互动数据。"
 msgstr "Yinjie processes your profile and interaction data only as needed to run the world, sync conversations, and support safety audits."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:180
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:184
 msgid "隐界会继续在后台恢复，你只需要稍候片刻。"
 msgstr "Yinjie will keep recovering in the background. Please wait a moment."
 
@@ -11917,7 +11951,7 @@ msgstr "Yinjie ID: yinjie_{0}"
 msgid "隐界日报"
 msgstr "Yinjie Daily"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:163
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:167
 msgid "隐界正在醒来"
 msgstr "Yinjie is waking up"
 
@@ -11929,10 +11963,10 @@ msgstr "Yinjie Game Lab"
 msgid "隐界群聊"
 msgstr "Hidden world group chat"
 
-#: apps/app/src/routes/profile-page.tsx:117
-#: apps/app/src/routes/profile-settings-page.tsx:48
-#: apps/app/src/routes/profile-settings-page.tsx:633
-#: apps/app/src/routes/profile-settings-page.tsx:811
+#: apps/app/src/routes/profile-page.tsx:158
+#: apps/app/src/routes/profile-settings-page.tsx:58
+#: apps/app/src/routes/profile-settings-page.tsx:660
+#: apps/app/src/routes/profile-settings-page.tsx:911
 msgid "隐私政策"
 msgstr "Privacy Policy"
 
@@ -11970,7 +12004,7 @@ msgstr "More random and more open in tone."
 msgid "随机相遇"
 msgstr "Random encounter"
 
-#: apps/app/src/routes/discover-page.tsx:274
+#: apps/app/src/routes/discover-page.tsx:272
 msgid "随机相遇已写入通讯录。"
 msgstr "Random encounter was added to Contacts."
 
@@ -12073,11 +12107,11 @@ msgstr "Group with top item"
 msgid "马斯克"
 msgstr "Musk"
 
-#: apps/app/src/routes/welcome-page.tsx:696
+#: apps/app/src/routes/welcome-page.tsx:749
 msgid "验证码"
 msgstr "Verification code"
 
-#: apps/app/src/routes/welcome-page.tsx:468
+#: apps/app/src/routes/welcome-page.tsx:510
 msgid "验证码已发送。"
 msgstr "Verification code sent."
 
@@ -12129,7 +12163,7 @@ msgstr "Show {0} first."
 msgid "默认回车"
 msgstr "Default Enter"
 
-#: apps/app/src/routes/profile-settings-page.tsx:474
+#: apps/app/src/routes/profile-settings-page.tsx:501
 msgid "默认地址"
 msgstr "Default address"
 

@@ -13,16 +13,16 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. placeholder {0}: values.lastCoreApiError
-#: apps/admin/src/routes/dashboard-page.tsx:2580
+#: apps/admin/src/routes/dashboard-page.tsx:2560
 msgid " · 最近错误={0}"
 msgstr " · 最近错误={0}"
 
 #. placeholder {0}: values.desktopLogPath
-#: apps/admin/src/routes/dashboard-page.tsx:2577
+#: apps/admin/src/routes/dashboard-page.tsx:2557
 msgid " · 日志={0}"
 msgstr " · 日志={0}"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2583
+#: apps/admin/src/routes/dashboard-page.tsx:2591
 msgid " · 端口占用中"
 msgstr " · 端口占用中"
 
@@ -65,7 +65,7 @@ msgstr "{0}，其余项也需要继续检查。"
 msgid "{blockerCount} 个阻塞项"
 msgstr "{blockerCount} 个阻塞项"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2616
+#: apps/admin/src/routes/dashboard-page.tsx:2627
 msgid "{hours} 小时 {minutes} 分钟"
 msgstr "{hours} 小时 {minutes} 分钟"
 
@@ -102,15 +102,15 @@ msgstr "Core API 当前不健康"
 msgid "heartbeat 命中了 {0} 类待处理事项。"
 msgstr "heartbeat 命中了 {0} 类待处理事项。"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2555
+#: apps/admin/src/routes/dashboard-page.tsx:2569
 msgid "Linux 依赖正常"
 msgstr "Linux 依赖正常"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2600
+#: apps/admin/src/routes/dashboard-page.tsx:2611
 msgid "PATH 查找"
 msgstr "PATH 查找"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2599
+#: apps/admin/src/routes/dashboard-page.tsx:2610
 msgid "PATH 查找（内置 sidecar 缺失）"
 msgstr "PATH 查找（内置 sidecar 缺失）"
 
@@ -122,11 +122,11 @@ msgstr "provider-state 回调可走鉴权。"
 msgid "Self Agent"
 msgstr "Self Agent"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2603
+#: apps/admin/src/routes/dashboard-page.tsx:2614
 msgid "sidecar 已就绪"
 msgstr "sidecar 已就绪"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2603
+#: apps/admin/src/routes/dashboard-page.tsx:2614
 msgid "sidecar 缺失"
 msgstr "sidecar 缺失"
 
@@ -314,7 +314,7 @@ msgstr "做推理预览、导出诊断、备份恢复和日志查看。"
 msgid "健康"
 msgstr "健康"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2569
+#: apps/admin/src/routes/dashboard-page.tsx:2583
 msgid "健康探测失败"
 msgstr "健康探测失败"
 
@@ -386,11 +386,11 @@ msgstr "内容产出"
 msgid "内置 iframe"
 msgstr "内置 iframe"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2592
+#: apps/admin/src/routes/dashboard-page.tsx:2603
 msgid "内置 sidecar"
 msgstr "内置 sidecar"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2565
+#: apps/admin/src/routes/dashboard-page.tsx:2579
 msgid "内置 sidecar 缺失"
 msgstr "内置 sidecar 缺失"
 
@@ -567,11 +567,11 @@ msgstr "含全部单聊历史消息"
 msgid "启用任务"
 msgstr "启用任务"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2583
+#: apps/admin/src/routes/dashboard-page.tsx:2591
 msgid "命令正常"
 msgstr "命令正常"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2583
+#: apps/admin/src/routes/dashboard-page.tsx:2591
 msgid "命令缺失"
 msgstr "命令缺失"
 
@@ -1032,7 +1032,7 @@ msgstr "待执行"
 #: apps/admin/src/routes/dashboard-page.tsx:894
 #: apps/admin/src/routes/dashboard-page.tsx:902
 #: apps/admin/src/routes/dashboard-page.tsx:904
-#: apps/admin/src/routes/dashboard-page.tsx:2611
+#: apps/admin/src/routes/dashboard-page.tsx:2622
 msgid "待探测"
 msgstr "待探测"
 
@@ -1224,7 +1224,7 @@ msgstr "抽查角色、朋友圈和广场动态最新样本。"
 msgid "抽查角色在线状态、画像和运行工作区。"
 msgstr "抽查角色在线状态、画像和运行工作区。"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2567
+#: apps/admin/src/routes/dashboard-page.tsx:2581
 msgid "拉起失败"
 msgstr "拉起失败"
 
@@ -1474,12 +1474,12 @@ msgstr "未来生成"
 msgid "未生效"
 msgstr "未生效"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2575
+#: apps/admin/src/routes/dashboard-page.tsx:2589
 msgid "未由桌面壳托管"
 msgstr "未由桌面壳托管"
 
 #: apps/admin/src/routes/dashboard-page.tsx:554
-#: apps/admin/src/routes/dashboard-page.tsx:2570
+#: apps/admin/src/routes/dashboard-page.tsx:2584
 msgid "未知"
 msgstr "未知"
 
@@ -1860,7 +1860,7 @@ msgstr "版本"
 msgid "状态"
 msgstr "状态"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2595
+#: apps/admin/src/routes/dashboard-page.tsx:2606
 msgid "环境变量覆盖"
 msgstr "环境变量覆盖"
 
@@ -1887,7 +1887,7 @@ msgid "用户行为建模与 Prompt 投影"
 msgstr "用户行为建模与 Prompt 投影"
 
 #. placeholder {0}: values.managedChildPid ? ` pid=${values.managedChildPid}` : ""
-#: apps/admin/src/routes/dashboard-page.tsx:2573
+#: apps/admin/src/routes/dashboard-page.tsx:2587
 msgid "由桌面壳托管{0}"
 msgstr "由桌面壳托管{0}"
 
@@ -1929,7 +1929,7 @@ msgstr "立即执行"
 msgid "立即配置"
 msgstr "立即配置"
 
-#: apps/admin/src/routes/dashboard-page.tsx:2563
+#: apps/admin/src/routes/dashboard-page.tsx:2577
 msgid "端口已占用"
 msgstr "端口已占用"
 
@@ -1998,7 +1998,7 @@ msgid "缺回调"
 msgstr "缺回调"
 
 #. placeholder {0}: values.linuxMissingPackages.join(", ")
-#: apps/admin/src/routes/dashboard-page.tsx:2554
+#: apps/admin/src/routes/dashboard-page.tsx:2568
 msgid "缺失依赖={0}"
 msgstr "缺失依赖={0}"
 
@@ -2327,6 +2327,10 @@ msgstr "远程实例"
 #: apps/admin/src/routes/dashboard-page.tsx:1053
 msgid "远程模式"
 msgstr "远程模式"
+
+#: apps/admin/src/routes/dashboard-page.tsx:2600
+msgid "远程连接"
+msgstr "远程连接"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2251
 msgid "追问推荐调度"
