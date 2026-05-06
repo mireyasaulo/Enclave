@@ -2,6 +2,7 @@ import type { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import type { DataSourceOptions } from "typeorm";
 import { CloudAdminSessionEntity } from "../entities/cloud-admin-session.entity";
 import { CloudConfigEntity } from "../entities/cloud-config.entity";
+import { CloudFeedbackEntity } from "../entities/cloud-feedback.entity";
 import { CloudInstanceEntity } from "../entities/cloud-instance.entity";
 import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { CloudWorldRequestEntity } from "../entities/cloud-world-request.entity";
@@ -33,7 +34,9 @@ import { CreateInviteAndConfigTables1776651600000 } from "./migrations/177665160
 import { SeedDefaultSubscriptionPlansAndConfigs1776652200000 } from "./migrations/1776652200000-seed-default-subscription-plans-and-configs";
 import { CreateRevenueSharingTables1776652800000 } from "./migrations/1776652800000-create-revenue-sharing-tables";
 import { AddEmailAuth1776653400000 } from "./migrations/1776653400000-add-email-auth";
+import { CreateCloudFeedbackTable1776654000000 } from "./migrations/1776654000000-create-cloud-feedback-table";
 import { MakeCloudUsersPhoneNullable1776654600000 } from "./migrations/1776654600000-make-cloud-users-phone-nullable";
+import { UpdateAppPublicBaseUrl1776655200000 } from "./migrations/1776655200000-update-app-public-base-url";
 import { resolveCloudDatabasePath } from "../config/cloud-runtime-config";
 
 type ConfigReader = {
@@ -62,6 +65,7 @@ export const cloudEntities = [
   RevenueUsageEventEntity,
   RevenueAllocationLedgerEntity,
   RevenueSettlementBatchEntity,
+  CloudFeedbackEntity,
 ] as const;
 
 export const cloudMigrations = [
@@ -77,7 +81,9 @@ export const cloudMigrations = [
   SeedDefaultSubscriptionPlansAndConfigs1776652200000,
   CreateRevenueSharingTables1776652800000,
   AddEmailAuth1776653400000,
+  CreateCloudFeedbackTable1776654000000,
   MakeCloudUsersPhoneNullable1776654600000,
+  UpdateAppPublicBaseUrl1776655200000,
 ];
 
 export function buildCloudDataSourceOptions(config: ConfigReader): DataSourceOptions {
