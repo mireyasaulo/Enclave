@@ -243,16 +243,23 @@ export function AdminCallout({
 }
 
 export function AdminEmptyState({
+  icon,
   title,
   description,
   actions,
+  primaryAction,
+  secondaryAction,
   className,
 }: {
+  icon?: ReactNode;
   title: ReactNode;
   description: ReactNode;
   actions?: ReactNode;
+  primaryAction?: ReactNode;
+  secondaryAction?: ReactNode;
   className?: string;
 }) {
+  const hasActionRow = Boolean(actions || primaryAction || secondaryAction);
   return (
     <div
       className={cn(
@@ -260,9 +267,25 @@ export function AdminEmptyState({
         className,
       )}
     >
+      {icon ? (
+        <div
+          aria-hidden="true"
+          className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/70 text-[color:var(--text-muted)]"
+        >
+          {icon}
+        </div>
+      ) : null}
       <div className="text-base font-semibold text-[color:var(--text-primary)]">{title}</div>
-      <div className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{description}</div>
-      {actions ? <div className="mt-4 flex flex-wrap justify-center gap-3">{actions}</div> : null}
+      <div className="mt-2 text-[length:var(--density-font-body)] leading-[var(--density-leading-body)] text-[color:var(--text-secondary)]">
+        {description}
+      </div>
+      {hasActionRow ? (
+        <div className="mt-4 flex flex-wrap justify-center gap-3">
+          {actions}
+          {primaryAction}
+          {secondaryAction}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -1130,5 +1153,391 @@ export function AdminSubTabs({
         </button>
       ))}
     </div>
+  );
+}
+
+/* ============================================================================
+ * 字号基线（与 packages/ui/src/tokens.css 中 --density-* 配合）
+ *   h1     text-[22px] font-semibold leading-7
+ *   h2     text-[18px] font-semibold leading-6
+ *   lead   text-[18px] leading-7
+ *   body   text-[length:var(--density-font-body)] leading-[var(--density-leading-body)]
+ *   meta   text-[length:var(--density-font-meta)]
+ *   eyebrow text-[12px] uppercase tracking-[0.22em]
+ * 禁用 text-[10px] / text-[11px]
+ * ========================================================================= */
+
+type AdminSectionTone = "card" | "console" | "soft";
+
+export function AdminSection({
+  title,
+  eyebrow,
+  description,
+  action,
+  collapsible,
+  defaultOpen = true,
+  tone = "card",
+  className,
+  contentClassName,
+  children,
+}: {
+  title?: ReactNode;
+  eyebrow?: ReactNode;
+  description?: ReactNode;
+  action?: ReactNode;
+  collapsible?: boolean;
+  defaultOpen?: boolean;
+  tone?: AdminSectionTone;
+  className?: string;
+  contentClassName?: string;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const hasHeader = Boolean(title || eyebrow || description || action || collapsible);
+  const toneClass =
+    tone === "console"
+      ? "border-[color:var(--border-faint)] bg-[color:var(--surface-console)]"
+      : tone === "soft"
+        ? "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)]"
+        : "border-[color:var(--border-faint)] bg-[color:var(--surface-section)]";
+  return (
+    <section
+      className={cn(
+        "rounded-[var(--density-radius-card)] border shadow-[var(--shadow-soft)]",
+        toneClass,
+        className,
+      )}
+      style={{ padding: "var(--density-pad-card)" }}
+    >
+      {hasHeader ? (
+        <header className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            {eyebrow ? (
+              <div className="text-[12px] uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+                {eyebrow}
+              </div>
+            ) : null}
+            {title ? (
+              <h2
+                className={cn(
+                  "text-[18px] font-semibold leading-6 text-[color:var(--text-primary)]",
+                  eyebrow ? "mt-1" : null,
+                )}
+              >
+                {title}
+              </h2>
+            ) : null}
+            {description ? (
+              <div className="mt-1 text-[length:var(--density-font-body)] leading-[var(--density-leading-body)] text-[color:var(--text-secondary)]">
+                {description}
+              </div>
+            ) : null}
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            {action}
+            {collapsible ? (
+              <button
+                type="button"
+                onClick={() => setOpen((value) => !value)}
+                aria-expanded={open}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-primary)] text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="14"
+                  height="14"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className={`transition-transform duration-[var(--motion-fast)] ${open ? "" : "-rotate-90"}`}
+                  aria-hidden="true"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+            ) : null}
+          </div>
+        </header>
+      ) : null}
+      {open ? (
+        <div className={cn(hasHeader ? "mt-4" : null, contentClassName)}>
+          {children}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+export function AdminToolbar({
+  search,
+  filters,
+  actions,
+  sticky,
+  className,
+}: {
+  search?: {
+    value: string;
+    onChange: (value: string) => void;
+    placeholder?: string;
+  };
+  filters?: ReactNode;
+  actions?: ReactNode;
+  sticky?: boolean;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-[var(--density-radius-card)] border border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.84)] backdrop-blur",
+        sticky ? "sticky top-[68px] z-10 lg:top-[76px]" : null,
+        className,
+      )}
+      style={{ padding: "var(--density-pad-row) var(--density-pad-card)" }}
+    >
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-3">
+        {search ? (
+          <div className="md:flex-1">
+            <input
+              type="search"
+              value={search.value}
+              onChange={(event) => search.onChange(event.target.value)}
+              placeholder={search.placeholder}
+              className="w-full rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-input)] px-3.5 py-1.5 text-[length:var(--density-font-body)] text-[color:var(--text-primary)] placeholder-[color:var(--text-muted)] outline-none transition focus:border-[color:var(--border-brand)]"
+              style={{ height: "var(--density-control-h)" }}
+            />
+          </div>
+        ) : null}
+        {filters ? (
+          <div className="flex flex-wrap items-center gap-2">{filters}</div>
+        ) : null}
+        {actions ? (
+          <div className="flex flex-wrap items-center gap-2 md:ml-auto">
+            {actions}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+export function AdminErrorState({
+  title,
+  detail,
+  onRetry,
+  retryLabel,
+  icon,
+  className,
+}: {
+  title: ReactNode;
+  detail?: ReactNode;
+  onRetry?: () => void;
+  retryLabel?: ReactNode;
+  icon?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-[var(--density-radius-card)] border border-[color:var(--border-danger)] bg-[color:var(--state-danger-bg)] px-5 py-5 text-[color:var(--state-danger-text)] shadow-[var(--shadow-soft)]",
+        className,
+      )}
+      role="alert"
+    >
+      <div className="flex items-start gap-3">
+        {icon ? (
+          <span className="mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/70">
+            {icon}
+          </span>
+        ) : null}
+        <div className="min-w-0 flex-1">
+          <div className="text-[15px] font-semibold">{title}</div>
+          {detail ? (
+            <div className="mt-1 text-[length:var(--density-font-body)] leading-[var(--density-leading-body)] text-[color:var(--state-danger-text)]/85">
+              {detail}
+            </div>
+          ) : null}
+          {onRetry ? (
+            <button
+              type="button"
+              onClick={onRetry}
+              className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-[color:var(--border-danger)] bg-white px-3 py-1 text-[13px] font-medium text-[color:var(--state-danger-text)] transition hover:border-[color:var(--state-danger-text)]"
+            >
+              {retryLabel ?? "重试"}
+            </button>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function AdminSkeletonRow({
+  lines = 1,
+  className,
+}: {
+  lines?: number;
+  className?: string;
+}) {
+  return (
+    <div className={cn("space-y-2", className)} aria-busy="true" aria-live="polite">
+      {Array.from({ length: lines }).map((_, index) => (
+        <div
+          key={index}
+          className="h-3 animate-pulse rounded-full bg-[color:var(--surface-soft)]"
+          style={{
+            width: `${85 - index * 8}%`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+export function AdminSkeletonCard({
+  rows = 3,
+  showAction,
+  className,
+}: {
+  rows?: number;
+  showAction?: boolean;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-[var(--density-radius-card)] border border-[color:var(--border-faint)] bg-[color:var(--surface-section)] shadow-[var(--shadow-soft)]",
+        className,
+      )}
+      style={{ padding: "var(--density-pad-card)" }}
+      aria-busy="true"
+      aria-live="polite"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <div className="h-4 w-1/3 animate-pulse rounded-full bg-[color:var(--surface-soft)]" />
+        {showAction ? (
+          <div className="h-7 w-20 animate-pulse rounded-full bg-[color:var(--surface-soft)]" />
+        ) : null}
+      </div>
+      <div className="mt-4">
+        <AdminSkeletonRow lines={rows} />
+      </div>
+    </div>
+  );
+}
+
+export function AdminStickyFooter({
+  dirty,
+  dirtyLabel,
+  syncedLabel,
+  primary,
+  secondary,
+  busy,
+  className,
+}: {
+  dirty: boolean;
+  dirtyLabel?: ReactNode;
+  syncedLabel?: ReactNode;
+  primary: ReactNode;
+  secondary?: ReactNode;
+  busy?: boolean;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "sticky bottom-0 z-30 -mx-4 mt-6 border-t border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.92)] px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8",
+        className,
+      )}
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <span
+            className={cn(
+              "inline-block h-2 w-2 rounded-full",
+              dirty ? "bg-amber-500" : "bg-emerald-500",
+            )}
+            aria-hidden="true"
+          />
+          <span className="text-[length:var(--density-font-meta)] text-[color:var(--text-secondary)]">
+            {busy
+              ? "保存中…"
+              : dirty
+                ? (dirtyLabel ?? "有未保存的修改")
+                : (syncedLabel ?? "已保存")}
+          </span>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {secondary}
+          {primary}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export type AdminBreadcrumbItem = {
+  label: ReactNode;
+  to?: string;
+};
+
+export function AdminBreadcrumb({
+  items,
+  className,
+}: {
+  items: AdminBreadcrumbItem[];
+  className?: string;
+}) {
+  return (
+    <nav
+      aria-label="breadcrumb"
+      className={cn(
+        "flex flex-wrap items-center gap-1.5 text-[length:var(--density-font-meta)] text-[color:var(--text-muted)]",
+        className,
+      )}
+    >
+      {items.map((item, index) => {
+        const isLast = index === items.length - 1;
+        return (
+          <span key={index} className="inline-flex items-center gap-1.5">
+            {index > 0 ? (
+              <svg
+                viewBox="0 0 24 24"
+                width="12"
+                height="12"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                className="text-[color:var(--text-dim)]"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            ) : null}
+            {item.to && !isLast ? (
+              <a
+                href={item.to}
+                className="transition hover:text-[color:var(--text-primary)]"
+              >
+                {item.label}
+              </a>
+            ) : (
+              <span
+                className={
+                  isLast
+                    ? "font-semibold text-[color:var(--text-primary)]"
+                    : undefined
+                }
+              >
+                {item.label}
+              </span>
+            )}
+          </span>
+        );
+      })}
+    </nav>
   );
 }
