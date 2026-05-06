@@ -191,6 +191,7 @@ function describeCloudButtonLabel(
   session: WorldAccessSessionSummary | null,
   isContinuing: boolean,
   ownerSyncing: boolean,
+  authMode: "login" | "register" = "login",
 ) {
   if (ownerSyncing) {
     return t(msg`连接中...`);
@@ -200,8 +201,11 @@ function describeCloudButtonLabel(
     return t(msg`解析中...`);
   }
 
+  const idleLabel =
+    authMode === "register" ? t(msg`注册并进入`) : t(msg`登录并进入`);
+
   if (!session) {
-    return t(msg`进入我的世界`);
+    return idleLabel;
   }
 
   if (session.status === "ready") {
@@ -214,7 +218,7 @@ function describeCloudButtonLabel(
       : t(msg`正在创建世界...`);
   }
 
-  return t(msg`进入我的世界`);
+  return idleLabel;
 }
 
 function mobileNoticeTone(
@@ -276,6 +280,12 @@ export function WelcomePage() {
   const [ownerError, setOwnerError] = useState("");
   const [isContinuing, setIsContinuing] = useState(false);
   const [inviteCode, setInviteCode] = useState(readStoredInviteCode());
+  const [authMode, setAuthMode] = useState<"login" | "register">(() =>
+    readStoredInviteCode() ? "register" : "login",
+  );
+  const [inviteCodeAutoFilled, setInviteCodeAutoFilled] = useState(() =>
+    Boolean(readStoredInviteCode()),
+  );
   const cloudConnectKeyRef = useRef<string | null>(null);
 
   const normalizedTypedLocalApiBaseUrl = normalizeBaseUrl(localApiBaseUrl);
@@ -327,11 +337,17 @@ export function WelcomePage() {
     const searchParams = new URLSearchParams(searchStr);
     const queryInviteCode = searchParams.get("invite");
     if (queryInviteCode) {
-      setInviteCode(persistInviteCode(queryInviteCode));
+      const normalized = persistInviteCode(queryInviteCode);
+      setInviteCode(normalized);
+      setInviteCodeAutoFilled(true);
+      // 通过邀请链接进入的用户默认走注册流程
+      setAuthMode("register");
       return;
     }
 
-    setInviteCode(readStoredInviteCode());
+    const stored = readStoredInviteCode();
+    setInviteCode(stored);
+    setInviteCodeAutoFilled(Boolean(stored));
   }, [searchStr]);
 
   useEffect(() => {
@@ -631,12 +647,14 @@ export function WelcomePage() {
       let verifiedPhone = phone.trim();
 
       if (!accessToken) {
+        const inviteCodePayload =
+          authMode === "register" && inviteCode ? inviteCode : undefined;
         if (accountType === "email") {
           const verifyResult = await verifyCloudEmailCode(
             {
               email: email.trim().toLowerCase(),
               code: code.trim(),
-              inviteCode: inviteCode || undefined,
+              inviteCode: inviteCodePayload,
               deviceFingerprint: getDeviceFingerprint(),
             },
             normalizedCloudApiBaseUrl || undefined,
@@ -657,7 +675,7 @@ export function WelcomePage() {
             {
               phone: phone.trim(),
               code: code.trim(),
-              inviteCode: inviteCode || undefined,
+              inviteCode: inviteCodePayload,
               deviceFingerprint: getDeviceFingerprint(),
             },
             normalizedCloudApiBaseUrl || undefined,
@@ -783,6 +801,41 @@ export function WelcomePage() {
     if (mode === "cloud") {
       return (
         <div className="space-y-4">
+          <div className="flex rounded-2xl bg-[#f5f5f5] p-1">
+            <Button
+              type="button"
+              variant={authMode === "login" ? "primary" : "ghost"}
+              onClick={() => {
+                setAuthMode("login");
+                setEntryError("");
+              }}
+              size="md"
+              className={`flex-1 rounded-xl shadow-none ${
+                authMode === "login"
+                  ? "bg-white text-[color:var(--text-primary)] hover:bg-white"
+                  : "bg-transparent hover:bg-transparent"
+              }`}
+            >
+              {t(msg`登录`)}
+            </Button>
+            <Button
+              type="button"
+              variant={authMode === "register" ? "primary" : "ghost"}
+              onClick={() => {
+                setAuthMode("register");
+                setEntryError("");
+              }}
+              size="md"
+              className={`flex-1 rounded-xl shadow-none ${
+                authMode === "register"
+                  ? "bg-white text-[color:var(--text-primary)] hover:bg-white"
+                  : "bg-transparent hover:bg-transparent"
+              }`}
+            >
+              {t(msg`注册`)}
+            </Button>
+          </div>
+
           <div className="flex gap-2">
             <Button
               type="button"
@@ -902,6 +955,32 @@ export function WelcomePage() {
             </div>
           </div>
 
+          {authMode === "register" ? (
+            <label className="block space-y-2">
+              <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+                {t(msg`邀请码（选填）`)}
+              </span>
+              <TextField
+                value={inviteCode}
+                onChange={(event) => {
+                  const next = event.target.value
+                    .trim()
+                    .toUpperCase();
+                  setInviteCode(next);
+                  persistInviteCode(next);
+                  setInviteCodeAutoFilled(false);
+                  setEntryError("");
+                }}
+                placeholder={t(msg`填写邀请人给你的 6 位邀请码`)}
+              />
+              {inviteCodeAutoFilled && inviteCode ? (
+                <span className="text-xs text-[color:var(--text-muted)]">
+                  {t(msg`已通过邀请链接自动填入，可手动修改。`)}
+                </span>
+              ) : null}
+            </label>
+          ) : null}
+
           {cloudAccessSessionQuery.isLoading ? (
             isDesktopLayout ? (
               <LoadingBlock
@@ -959,6 +1038,7 @@ export function WelcomePage() {
               currentCloudSession,
               isContinuing,
               ownerSyncing,
+              authMode,
             )}
           </Button>
         </div>
