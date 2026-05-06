@@ -3,10 +3,26 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-echo "[restart-app] 1/4 重启后端 API (3000)..."
-node scripts/dev-services.mjs restart api
-if ! node scripts/wait-for-service-ready.mjs api http://127.0.0.1:3000/health 60000 1000; then
-  tail -n 80 logs/dev-services/api.err.log || true
+export CLOUD_LOCAL_PROCESS_PROVIDER="${CLOUD_LOCAL_PROCESS_PROVIDER:-1}"
+
+echo "[restart-app] 0/4 准备账号数据 (默认 17757541197)..."
+if [ ! -f data/accounts/17757541197/database.sqlite ]; then
+  if [ -f data/database.sqlite ]; then
+    echo "[restart-app] 检测到老 data/database.sqlite，迁移到 data/accounts/17757541197/..."
+    node scripts/migrate-account-data.mjs 17757541197
+  else
+    mkdir -p data/accounts/17757541197
+    echo "[restart-app] 既无老库也无账号库，将由 cloud-api 在首次访问时新建"
+  fi
+fi
+
+echo "[restart-app] 0.5/4 构建 main-api dist (per-account 子进程依赖)..."
+( cd api && pnpm exec nest build )
+
+echo "[restart-app] 1/4 重启 cloud-api (3001)..."
+node scripts/dev-services.mjs restart cloud-api
+if ! node scripts/wait-for-service-ready.mjs cloud-api http://127.0.0.1:3001/ 60000 1000; then
+  tail -n 80 logs/dev-services/cloud-api.err.log || true
   exit 1
 fi
 
@@ -35,7 +51,10 @@ fi
 
 echo ""
 echo "服务地址："
-echo "  后端 API:       http://127.0.0.1:3000"
+echo "  Cloud API:      http://127.0.0.1:3001  (按手机号 spawn 独立 main-api 子进程)"
 echo "  主 App:         http://127.0.0.1:5180"
 echo "  Wiki 角色平台:  http://127.0.0.1:5184"
 echo "  管理后台:       http://127.0.0.1:5181"
+echo ""
+echo "提示: 每个手机号的数据隔离在 data/accounts/{phone}/ 下。"
+echo "      子进程日志：logs/dev-services/api-{phone}.{out,err}.log"

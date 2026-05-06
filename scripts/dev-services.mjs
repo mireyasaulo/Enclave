@@ -13,9 +13,14 @@ const pnpmBinary = "pnpm";
 const command = process.argv[2] ?? "status";
 const target = process.argv[3] ?? "workspace";
 
+// Note: `api` is intentionally NOT in any group. With per-account isolation
+// (CLOUD_LOCAL_PROCESS_PROVIDER=1), main-api children are spawned on demand
+// by cloud-api per phone, on dynamic ports (3010+). Starting it here would
+// fight cloud-api for port 3000 and break the per-account routing. Use
+// `node scripts/dev-services.mjs start api` only for legacy single-tenant debug.
 const serviceGroups = {
   workspace: ["app", "admin", "wiki", "cloud-api", "cloud-console"],
-  all: ["api", "app", "admin", "wiki", "cloud-api", "cloud-console", "site", "wechat-connector"],
+  all: ["app", "admin", "wiki", "cloud-api", "cloud-console", "site", "wechat-connector"],
 };
 
 const services = {
