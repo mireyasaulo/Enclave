@@ -24,6 +24,7 @@ import { WikiPageService } from './wiki-page.service';
 import { WikiRoleService } from './wiki-role.service';
 import {
   WIKI_CONTENT_FIELDS,
+  assertWikiEditSummary,
   createDefaultWikiRecipe,
   diffFields,
   diffPaths,
@@ -33,9 +34,11 @@ import {
   mergeValueByPaths,
   normalizeWikiRecipe,
   pickWikiContent,
+  resolveMinorEdit as resolveMinorEditPure,
   snapshotFromRecipe,
   snapshotFromCharacter,
 } from '../wiki.types';
+import { WIKI_ROLE_RANK } from '../guards/wiki-role.guard';
 
 export type SubmitEditInput = {
   contentSnapshot: Record<string, unknown>;
@@ -136,6 +139,13 @@ export class WikiEditService {
       throw new BadRequestException('未检测到变更');
     }
 
+    this.assertEditSummary({
+      operation: 'edit',
+      riskLevel: 'low',
+      revisionKind: 'content',
+      summary: input.editSummary,
+    });
+
     const autoApprove = rankOf(user.role) >= rankOf('autoconfirmed');
     const lastVersion = await this.revisionRepo
       .createQueryBuilder('r')
@@ -160,7 +170,7 @@ export class WikiEditService {
         operation: 'edit',
         riskLevel: 'low',
         changeSource,
-        isMinor: Boolean(input.isMinor),
+        isMinor: this.resolveMinorEdit(input.isMinor, user.role),
         isPatrolled: false,
       });
       const savedRev = await manager.save(revision);
@@ -263,6 +273,12 @@ export class WikiEditService {
       createDefaultWikiRecipe(seedInput),
     );
     const content = snapshotFromRecipe(recipe);
+    this.assertEditSummary({
+      operation: 'create',
+      riskLevel: 'high',
+      revisionKind: 'recipe',
+      summary: input.editSummary,
+    });
     const autoApprove = rankOf(user.role) >= rankOf('patroller');
     const revision = await this.dataSource.transaction(async (manager) => {
       const page =
@@ -355,11 +371,12 @@ export class WikiEditService {
     await this.blocks.assertCanEdit(user, characterId);
     const page = await this.pages.getOrInitPage(characterId);
     this.assertProtection(page.protectionLevel, user.role);
-    if (!reason?.trim()) {
-      throw new BadRequestException(
-        operation === 'soft_delete' ? '申请删除必须填写理由' : '申请恢复必须填写理由',
-      );
-    }
+    this.assertEditSummary({
+      operation,
+      riskLevel: 'high',
+      revisionKind: 'lifecycle',
+      summary: reason,
+    });
     const character = await this.characterRepo.findOne({ where: { id: characterId } });
     if (!character) throw new BadRequestException('角色不存在');
     const currentRevision = page.currentRevisionId
@@ -605,6 +622,12 @@ export class WikiEditService {
 
     const riskReport = isHighRiskRecipeChange(changed);
     const riskLevel = riskReport.highRisk ? 'high' : 'low';
+    this.assertEditSummary({
+      operation: 'edit',
+      riskLevel,
+      revisionKind: 'recipe',
+      summary: input.editSummary,
+    });
     const autoApprove =
       rankOf(user.role) >= rankOf('patroller') ||
       (riskLevel === 'low' && rankOf(user.role) >= rankOf('autoconfirmed'));
@@ -631,7 +654,7 @@ export class WikiEditService {
         operation: 'edit',
         riskLevel,
         changeSource,
-        isMinor: Boolean(input.isMinor),
+        isMinor: this.resolveMinorEdit(input.isMinor, user.role),
         isPatrolled: false,
       });
       const saved = await manager.save(created);
@@ -750,6 +773,23 @@ export class WikiEditService {
         : `char_wiki_${normalized}`;
     }
     return `char_wiki_${Date.now()}_${randomUUID().slice(0, 8)}`;
+  }
+
+  private assertEditSummary(input: {
+    operation: string;
+    riskLevel: string;
+    revisionKind: string;
+    summary: string | null | undefined;
+  }): void {
+    assertWikiEditSummary(input);
+  }
+
+  private resolveMinorEdit(input: boolean | undefined, role: string): boolean {
+    return resolveMinorEditPure(
+      input,
+      rankOf(role),
+      WIKI_ROLE_RANK.autoconfirmed,
+    );
   }
 
   private assertProtection(level: string, role: string): void {

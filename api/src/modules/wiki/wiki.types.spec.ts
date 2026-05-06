@@ -2,8 +2,10 @@ import { BadRequestException } from '@nestjs/common';
 import {
   WIKI_CONTENT_SCHEMA_VERSION,
   WIKI_REJECTED_FIELDS,
+  assertWikiEditSummary,
   isHighRiskRecipeChange,
   pickWikiContent,
+  resolveMinorEdit,
   snapshotFromCharacter,
   snapshotFromRecipe,
   createDefaultWikiRecipe,
@@ -140,6 +142,97 @@ describe('snapshotFromCharacter', () => {
     expect(snap.name).toBe('N');
     expect(Object.keys(snap)).not.toContain('isOnline');
     expect(Object.keys(snap)).not.toContain('modelRoutingMode');
+  });
+});
+
+describe('assertWikiEditSummary', () => {
+  it('requires ≥10 chars for create operation', () => {
+    expect(() =>
+      assertWikiEditSummary({
+        operation: 'create',
+        riskLevel: 'high',
+        revisionKind: 'recipe',
+        summary: '',
+      }),
+    ).toThrow(BadRequestException);
+    expect(() =>
+      assertWikiEditSummary({
+        operation: 'create',
+        riskLevel: 'high',
+        revisionKind: 'recipe',
+        summary: '太短',
+      }),
+    ).toThrow(BadRequestException);
+    expect(() =>
+      assertWikiEditSummary({
+        operation: 'create',
+        riskLevel: 'high',
+        revisionKind: 'recipe',
+        summary: '创建一个全新的角色词条',
+      }),
+    ).not.toThrow();
+  });
+
+  it('requires ≥10 chars for high-risk edits', () => {
+    expect(() =>
+      assertWikiEditSummary({
+        operation: 'edit',
+        riskLevel: 'high',
+        revisionKind: 'recipe',
+        summary: '',
+      }),
+    ).toThrow(BadRequestException);
+  });
+
+  it('requires ≥10 chars for lifecycle ops', () => {
+    expect(() =>
+      assertWikiEditSummary({
+        operation: 'soft_delete',
+        riskLevel: 'high',
+        revisionKind: 'lifecycle',
+        summary: '想删',
+      }),
+    ).toThrow(BadRequestException);
+  });
+
+  it('does not require summary for low-risk content edits', () => {
+    expect(() =>
+      assertWikiEditSummary({
+        operation: 'edit',
+        riskLevel: 'low',
+        revisionKind: 'content',
+        summary: '',
+      }),
+    ).not.toThrow();
+  });
+
+  it('treats whitespace-only summary as empty', () => {
+    expect(() =>
+      assertWikiEditSummary({
+        operation: 'create',
+        riskLevel: 'high',
+        revisionKind: 'recipe',
+        summary: '          ',
+      }),
+    ).toThrow(BadRequestException);
+  });
+});
+
+describe('resolveMinorEdit', () => {
+  // newcomer=0, autoconfirmed=1
+  it('returns false when input is undefined or false', () => {
+    expect(resolveMinorEdit(undefined, 5, 1)).toBe(false);
+    expect(resolveMinorEdit(false, 5, 1)).toBe(false);
+  });
+
+  it('returns true only when role rank ≥ autoconfirmed rank', () => {
+    expect(resolveMinorEdit(true, 0, 1)).toBe(false); // newcomer
+    expect(resolveMinorEdit(true, 1, 1)).toBe(true); // autoconfirmed
+    expect(resolveMinorEdit(true, 2, 1)).toBe(true); // patroller
+  });
+
+  it('returns false for unknown role (rank -1)', () => {
+    expect(resolveMinorEdit(true, -1, 1)).toBe(false);
   });
 });
 

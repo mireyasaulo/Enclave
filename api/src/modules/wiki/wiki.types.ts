@@ -475,6 +475,39 @@ export type HighRiskRecipeReport = {
   reasons: string[];
 };
 
+/**
+ * 编辑摘要必填规则：create / high-risk / lifecycle 操作必须 ≥10 字非空摘要。
+ * 其他操作（low-risk 内容编辑）不强制。
+ */
+export function assertWikiEditSummary(input: {
+  operation: string;
+  riskLevel: string;
+  revisionKind: string;
+  summary: string | null | undefined;
+}): void {
+  const required =
+    input.operation === 'create' ||
+    input.riskLevel === 'high' ||
+    input.revisionKind === 'lifecycle';
+  if (!required) return;
+  const trimmed = (input.summary ?? '').trim();
+  if (trimmed.length < 10) {
+    throw new BadRequestException('该编辑需提供至少 10 字编辑摘要');
+  }
+}
+
+/**
+ * minor edit 标记需 autoconfirmed+ 才能设置；newcomer 提交带 isMinor 时静默改回 false。
+ */
+export function resolveMinorEdit(
+  input: boolean | undefined,
+  rank: number,
+  autoconfirmedRank: number,
+): boolean {
+  if (!input) return false;
+  return rank >= autoconfirmedRank;
+}
+
 export function isHighRiskRecipeChange(paths: string[]): HighRiskRecipeReport {
   const reasons: string[] = [];
   for (const path of paths) {

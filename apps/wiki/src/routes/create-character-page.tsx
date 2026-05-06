@@ -53,7 +53,7 @@ export function CreateCharacterPage() {
         characterId: characterId.trim() || null,
         contentSnapshot,
         recipeSnapshot,
-        editSummary: summary.trim() || "创建角色词条",
+        editSummary: summary.trim() || "由当前贡献者初始化创建的角色词条",
       });
     },
     onSuccess: (res) => {
@@ -152,7 +152,10 @@ export function CreateCharacterPage() {
             />
           </FormRow>
         </div>
-        <FormRow label="创建摘要">
+        <FormRow
+          label="创建摘要"
+          hint="≥10 字（必填）。说明这个角色为什么值得加入"
+        >
           <TextField
             value={summary}
             onChange={(event) => setSummary(event.target.value)}
@@ -272,14 +275,23 @@ function buildDefaultRecipe(): CharacterBlueprintRecipe {
 
 function FormRow({
   label,
+  hint,
   children,
 }: {
   label: string;
+  hint?: string;
   children: ReactNode;
 }) {
   return (
     <label className="block">
-      <span className="text-sm mb-1 block">{label}</span>
+      <span className="text-sm mb-1 block">
+        {label}
+        {hint && (
+          <span className="ml-2 text-xs text-[var(--text-muted)] font-normal">
+            {hint}
+          </span>
+        )}
+      </span>
       {children}
     </label>
   );

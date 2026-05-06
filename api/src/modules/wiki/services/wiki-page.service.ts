@@ -10,6 +10,7 @@ import {
   CharacterRevisionEntity,
   type WikiContentSnapshot,
 } from '../entities/character-revision.entity';
+import { rankOf } from '../guards/wiki-role.guard';
 import { snapshotFromCharacter } from '../wiki.types';
 
 export type WikiPageView = {
@@ -24,6 +25,7 @@ export type WikiPageView = {
   pendingRevision: CharacterRevisionEntity | null;
   pendingRevisions: CharacterRevisionEntity[];
   viewMode: 'stable' | 'current';
+  viewerCanSeeCurrent: boolean;
   exists: boolean;
 };
 
@@ -100,7 +102,8 @@ export class WikiPageService {
     const factorySnapshot = character
       ? await this.blueprints.getFactorySnapshot(characterId).catch(() => null)
       : null;
-    const canViewCurrent = Boolean(input.user);
+    const canViewCurrent =
+      rankOf(input.user?.role) >= rankOf('autoconfirmed');
     const viewMode =
       input.view === 'current' && canViewCurrent ? 'current' : 'stable';
     const visibleRevision =
@@ -131,6 +134,7 @@ export class WikiPageService {
       pendingRevision,
       pendingRevisions,
       viewMode,
+      viewerCanSeeCurrent: canViewCurrent,
       exists: !page.isDeleted && page.lifecycleStatus !== 'pending_create',
     };
   }

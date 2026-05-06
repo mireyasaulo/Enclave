@@ -40,9 +40,10 @@ export function CharacterPage() {
     queryKey: ["wiki", "page", characterId, viewMode],
     queryFn: () => wikiApi.getPage(characterId, viewMode),
   });
+  const viewerCanSeeCurrent = pageQ.data?.viewerCanSeeCurrent ?? false;
   useEffect(() => {
-    if (!user && viewMode === "current") setViewMode("stable");
-  }, [user, viewMode]);
+    if (!viewerCanSeeCurrent && viewMode === "current") setViewMode("stable");
+  }, [viewerCanSeeCurrent, viewMode]);
   const softDeleteMut = useMutation({
     mutationFn: (reason: string) =>
       pageQ.data?.page.isDeleted ||
@@ -84,7 +85,7 @@ export function CharacterPage() {
           {isDeleted && <StatusPill>已删除</StatusPill>}
           {isPendingCreate && <StatusPill>待创建</StatusPill>}
           {pageQ.data?.pendingRevision && <StatusPill>有待审版本</StatusPill>}
-          {user && pageQ.data?.latestRevision?.id !== pageQ.data?.stableRevision?.id && (
+          {viewerCanSeeCurrent && pageQ.data?.latestRevision?.id !== pageQ.data?.stableRevision?.id && (
             <div className="flex items-center border border-[var(--border-subtle)] rounded overflow-hidden text-xs">
               <button
                 type="button"
@@ -545,7 +546,10 @@ function EditView({
           onChange={(next) => setRecipeDraft(next)}
         />
       )}
-      <FormRow label="修改摘要">
+      <FormRow
+        label="修改摘要"
+        hint="高风险字段（人格/记忆/逻辑等）、创建词条、生命周期变更要求 ≥10 字"
+      >
         <TextField
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
@@ -1480,14 +1484,23 @@ function ScenePromptField({
 
 function FormRow({
   label,
+  hint,
   children,
 }: {
   label: string;
+  hint?: string;
   children: React.ReactNode;
 }) {
   return (
     <label className="block">
-      <span className="text-sm mb-1 block">{label}</span>
+      <span className="text-sm mb-1 block">
+        {label}
+        {hint && (
+          <span className="ml-2 text-xs text-[var(--text-muted)] font-normal">
+            {hint}
+          </span>
+        )}
+      </span>
       {children}
     </label>
   );

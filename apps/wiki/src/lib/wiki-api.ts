@@ -96,6 +96,7 @@ export type WikiPageView = {
   pendingRevision: WikiRevisionSummary | null;
   pendingRevisions: WikiRevisionSummary[];
   viewMode: "stable" | "current";
+  viewerCanSeeCurrent: boolean;
   exists: boolean;
 };
 
