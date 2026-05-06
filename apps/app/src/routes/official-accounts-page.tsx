@@ -164,7 +164,7 @@ function MobileOfficialAccountsPage() {
   }
 
   return (
-    <AppPage className="relative space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
+    <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
       <TabPageTopBar
         title="公众号"
         titleAlign="center"
@@ -333,14 +333,49 @@ function MobileOfficialAccountsPage() {
           </div>
         ) : null}
       </div>
-      <div className="pointer-events-auto absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[3px]">
-        <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-6 py-5 text-center shadow-[var(--shadow-card)]">
-          <div className="text-[15px] font-semibold text-[color:var(--text-primary)]">
+      <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-[3px]">
+        <Button
+          type="button"
+          onClick={() =>
+            navigateBackOrFallback(() => {
+              if (navigateToRouteStateReturn()) {
+                return;
+              }
+
+              void navigate({ to: "/tabs/contacts" });
+            })
+          }
+          variant="ghost"
+          size="icon"
+          aria-label="返回"
+          className="absolute left-3 top-3 h-10 w-10 rounded-full bg-white/90 text-[color:var(--text-primary)] shadow-[var(--shadow-card)] active:bg-white"
+        >
+          <ArrowLeft size={18} />
+        </Button>
+        <div className="mx-6 max-w-[280px] rounded-2xl border border-[color:var(--border-faint)] bg-white/98 px-6 py-6 text-center shadow-[var(--shadow-card)]">
+          <div className="text-[17px] font-semibold text-[color:var(--text-primary)]">
             功能开发中
           </div>
-          <div className="mt-1.5 text-[12px] text-[color:var(--text-secondary)]">
+          <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
             敬请期待
           </div>
+          <Button
+            type="button"
+            onClick={() =>
+              navigateBackOrFallback(() => {
+                if (navigateToRouteStateReturn()) {
+                  return;
+                }
+
+                void navigate({ to: "/tabs/contacts" });
+              })
+            }
+            variant="primary"
+            size="md"
+            className="mt-5 h-10 w-full rounded-full bg-[color:var(--brand-primary)] text-white"
+          >
+            返回
+          </Button>
         </div>
       </div>
     </AppPage>
