@@ -27,6 +27,10 @@ import {
 } from "../lib/job-queue-state";
 import { buildCompactJobsRouteSearch } from "../lib/job-route-search";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
+import {
+  translateCloudConsoleTextForActiveLocale,
+  useCloudConsoleText,
+} from "../lib/cloud-console-i18n";
 import { describeJobResult, getJobAuditBadgeLabel } from "../lib/job-result";
 import {
   createRequestScopedNotice,
@@ -63,7 +67,7 @@ const JOB_AUDIT_BADGE_CLASS_NAME =
 
 function formatDateTime(value?: string | null) {
   if (!value) {
-    return "Not available";
+    return translateCloudConsoleTextForActiveLocale("Not available");
   }
 
   return formatLocaleDateTime(new Date(value), {
@@ -74,7 +78,7 @@ function formatDateTime(value?: string | null) {
 
 function formatLeaseOwner(value?: string | null) {
   if (!value) {
-    return "Unleased";
+    return translateCloudConsoleTextForActiveLocale("Unleased");
   }
 
   return value;
@@ -82,11 +86,11 @@ function formatLeaseOwner(value?: string | null) {
 
 function formatDuration(value?: number | null) {
   if (value == null) {
-    return "Not leased";
+    return translateCloudConsoleTextForActiveLocale("Not leased");
   }
 
   if (value <= 0) {
-    return "Expired";
+    return translateCloudConsoleTextForActiveLocale("Expired");
   }
 
   const minutes = Math.floor(value / 60);
@@ -103,7 +107,7 @@ function compareNewest(left?: string | null, right?: string | null) {
 }
 
 function formatOptional(value?: string | null) {
-  return value?.trim() || "Not set";
+  return value?.trim() || translateCloudConsoleTextForActiveLocale("Not set");
 }
 
 function getJobStatusTone(status: WorldLifecycleJobStatus) {
@@ -139,15 +143,15 @@ function getEscalationLabel(
 ) {
   switch (reason) {
     case "world_failed":
-      return "World failed";
+      return translateCloudConsoleTextForActiveLocale("World failed");
     case "provider_error":
-      return "Provider error";
+      return translateCloudConsoleTextForActiveLocale("Provider error");
     case "retry_threshold":
-      return "Retry threshold";
+      return translateCloudConsoleTextForActiveLocale("Retry threshold");
     case "heartbeat_duration":
-      return "Heartbeat duration";
+      return translateCloudConsoleTextForActiveLocale("Heartbeat duration");
     default:
-      return "Not escalated";
+      return translateCloudConsoleTextForActiveLocale("Not escalated");
   }
 }
 
@@ -179,7 +183,9 @@ function buildProviderOptions(
     {
       key: providerKey,
       label: `${providerKey} (legacy)`,
-      description: "This provider key is not in the current catalog yet.",
+      description: translateCloudConsoleTextForActiveLocale(
+        "This provider key is not in the current catalog yet.",
+      ),
       provisionStrategy: providerKey,
       deploymentMode: "custom",
       defaultRegion: null,
@@ -201,15 +207,15 @@ function validateWorldForm(params: {
   apiBaseUrl: string;
 }) {
   if (!params.phone.trim()) {
-    return "Phone is required.";
+    return translateCloudConsoleTextForActiveLocale("Phone is required.");
   }
 
   if (!params.name.trim()) {
-    return "World name is required.";
+    return translateCloudConsoleTextForActiveLocale("World name is required.");
   }
 
   if (params.status === "ready" && !params.apiBaseUrl.trim()) {
-    return "A ready world must include a world API base URL.";
+    return translateCloudConsoleTextForActiveLocale("A ready world must include a world API base URL.");
   }
 
   return null;
@@ -236,6 +242,7 @@ type WorldConfirmAction =
   | "rotate-callback-token";
 
 export function WorldDetailPage() {
+  const t = useCloudConsoleText();
   const { worldId } = useParams({ from: "/worlds/$worldId" });
   const queryClient = useQueryClient();
   const { showNotice } = useConsoleNotice();
@@ -442,36 +449,36 @@ export function WorldDetailPage() {
   const jobSummaryCards = [
     {
       key: "active",
-      label: "Active jobs",
+      label: t("Active jobs"),
       count: jobSummary?.activeJobs ?? jobSummaryFallback.activeJobs,
     },
     {
       key: "failed",
-      label: "Failed jobs",
+      label: t("Failed jobs"),
       count: jobSummary?.failedJobs ?? jobSummaryFallback.failedJobs,
     },
     {
       key: "superseded",
-      label: "Superseded jobs",
+      label: t("Superseded jobs"),
       count: jobSummary?.supersededJobs ?? jobSummaryFallback.supersededJobs,
     },
     {
       key: "running_now",
-      label: "Running jobs",
+      label: t("Running jobs"),
       count:
         jobSummary?.queueState.runningNow ??
         jobSummaryFallback.queueState.runningNow,
     },
     {
       key: "lease_expired",
-      label: "Lease expired jobs",
+      label: t("Lease expired jobs"),
       count:
         jobSummary?.queueState.leaseExpired ??
         jobSummaryFallback.queueState.leaseExpired,
     },
     {
       key: "delayed",
-      label: "Delayed jobs",
+      label: t("Delayed jobs"),
       count:
         jobSummary?.queueState.delayed ?? jobSummaryFallback.queueState.delayed,
     },
@@ -541,7 +548,7 @@ export function WorldDetailPage() {
   if (!world) {
     return (
       <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5">
-        Loading world...
+        {t("Loading world...")}
       </div>
     );
   }
@@ -586,7 +593,7 @@ export function WorldDetailPage() {
     };
   } else if (confirmAction === "rotate-callback-token") {
     activeConfirm = {
-      title: "Rotate the callback token?",
+      title: t("Rotate the callback token?"),
       description:
         "Existing bootstrap packages and runtime env overlays will become stale until operators redeploy the updated token.",
       confirmLabel: "Rotate token",
@@ -642,7 +649,7 @@ export function WorldDetailPage() {
 
           <div className="mt-5 grid gap-4">
             <label className="grid gap-2 text-sm">
-              <span>Phone</span>
+              <span>{t("Phone")}</span>
               <input
                 value={phone}
                 onChange={(event) => setPhone(event.target.value)}
@@ -651,7 +658,7 @@ export function WorldDetailPage() {
             </label>
 
             <label className="grid gap-2 text-sm">
-              <span>World name</span>
+              <span>{t("World name")}</span>
               <input
                 value={name}
                 onChange={(event) => setName(event.target.value)}
@@ -660,7 +667,7 @@ export function WorldDetailPage() {
             </label>
 
             <label className="grid gap-2 text-sm">
-              <span>Status</span>
+              <span>{t("Status")}</span>
               <select
                 value={draftStatus}
                 onChange={(event) =>
@@ -679,7 +686,7 @@ export function WorldDetailPage() {
             </label>
 
             <label className="grid gap-2 text-sm">
-              <span>Provision strategy</span>
+              <span>{t("Provision strategy")}</span>
               <input
                 value={provisionStrategy}
                 onChange={(event) => setProvisionStrategy(event.target.value)}
@@ -689,7 +696,7 @@ export function WorldDetailPage() {
             </label>
 
             <label className="grid gap-2 text-sm">
-              <span>Provider key</span>
+              <span>{t("Provider key")}</span>
               <select
                 value={providerKey}
                 onChange={(event) =>
@@ -698,7 +705,7 @@ export function WorldDetailPage() {
                 className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3 text-[color:var(--text-primary)]"
               >
                 {!providerKey ? (
-                  <option value="">Select provider</option>
+                  <option value="">{t("Select provider")}</option>
                 ) : null}
                 {providerOptions.map((provider) => (
                   <option key={provider.key} value={provider.key}>
@@ -715,7 +722,7 @@ export function WorldDetailPage() {
             {selectedProvider ? (
               <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3 text-sm text-[color:var(--text-secondary)]">
                 <div className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                  Provider profile
+                  {t("Provider profile")}
                 </div>
                 <div className="mt-2 font-medium text-[color:var(--text-primary)]">
                   {selectedProvider.label}
@@ -752,13 +759,13 @@ export function WorldDetailPage() {
               </div>
             ) : providersQuery.isLoading ? (
               <div className="text-sm text-[color:var(--text-muted)]">
-                Loading provider catalog...
+                {t("Loading provider catalog...")}
               </div>
             ) : null}
 
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="grid gap-2 text-sm">
-                <span>Provider region</span>
+                <span>{t("Provider region")}</span>
                 <input
                   value={providerRegion}
                   onChange={(event) => setProviderRegion(event.target.value)}
@@ -768,7 +775,7 @@ export function WorldDetailPage() {
               </label>
 
               <label className="grid gap-2 text-sm">
-                <span>Provider zone</span>
+                <span>{t("Provider zone")}</span>
                 <input
                   value={providerZone}
                   onChange={(event) => setProviderZone(event.target.value)}
@@ -779,7 +786,7 @@ export function WorldDetailPage() {
             </div>
 
             <label className="grid gap-2 text-sm">
-              <span>World API base URL</span>
+              <span>{t("World API base URL")}</span>
               <input
                 value={apiBaseUrl}
                 onChange={(event) => setApiBaseUrl(event.target.value)}
@@ -789,7 +796,7 @@ export function WorldDetailPage() {
             </label>
 
             <label className="grid gap-2 text-sm">
-              <span>World admin URL</span>
+              <span>{t("World admin URL")}</span>
               <input
                 value={adminUrl}
                 onChange={(event) => setAdminUrl(event.target.value)}
@@ -799,7 +806,7 @@ export function WorldDetailPage() {
             </label>
 
             <label className="grid gap-2 text-sm">
-              <span>Ops note</span>
+              <span>{t("Ops note")}</span>
               <textarea
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
@@ -831,23 +838,23 @@ export function WorldDetailPage() {
         <div className="grid gap-6">
           <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
             <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-              Lifecycle summary
+              {t("Lifecycle summary")}
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {[
                 {
-                  label: "Desired state",
+                  label: t("Desired state"),
                   value: world.desiredState ?? "running",
                 },
-                { label: "Health", value: world.healthStatus ?? "unknown" },
+                { label: t("Health"), value: world.healthStatus ?? "unknown" },
                 {
-                  label: "Strategy",
+                  label: t("Strategy"),
                   value: world.provisionStrategy ?? "unknown",
                 },
-                { label: "Provider", value: world.providerKey ?? "unknown" },
-                { label: "Region", value: world.providerRegion ?? "unknown" },
-                { label: "Zone", value: world.providerZone ?? "unknown" },
-                { label: "Failure code", value: world.failureCode ?? "none" },
+                { label: t("Provider"), value: world.providerKey ?? "unknown" },
+                { label: t("Region"), value: world.providerRegion ?? "unknown" },
+                { label: t("Zone"), value: world.providerZone ?? "unknown" },
+                { label: t("Failure code"), value: world.failureCode ?? "none" },
               ].map((item) => (
                 <div
                   key={item.label}
@@ -882,7 +889,7 @@ export function WorldDetailPage() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                  Alert status
+                  {t("Alert status")}
                 </div>
                 <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
                   Current alert severity after applying retry and
@@ -924,7 +931,7 @@ export function WorldDetailPage() {
                 </div>
                 <div>
                   Retry threshold:{" "}
-                  {alertSummary?.thresholds.retryCount ?? "Not set"}
+                  {alertSummary?.thresholds.retryCount ?? t("Not set")}
                 </div>
                 <div>
                   Critical stale threshold:{" "}
@@ -935,18 +942,18 @@ export function WorldDetailPage() {
               </div>
             ) : alertSummaryQuery.isLoading ? (
               <div className="mt-4 text-sm text-[color:var(--text-muted)]">
-                Loading alert status...
+                {t("Loading alert status...")}
               </div>
             ) : (
               <div className="mt-4 text-sm text-[color:var(--text-muted)]">
-                No current alert. This world is below escalation thresholds.
+                {t("No current alert. This world is below escalation thresholds.")}
               </div>
             )}
           </div>
 
           <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
             <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-              Instance
+              {t("Instance")}
             </div>
             {instanceQuery.isError && instanceQuery.error instanceof Error ? (
               <div className="mt-4">
@@ -975,7 +982,7 @@ export function WorldDetailPage() {
                 <div>Zone: {formatOptional(instance.zone)}</div>
                 <div>Image: {formatOptional(instance.imageId)}</div>
                 <div>Flavor: {formatOptional(instance.flavor)}</div>
-                <div>Disk: {instance.diskSizeGb ?? "Not set"} GB</div>
+                <div>Disk: {instance.diskSizeGb ?? t("Not set")} GB</div>
                 <div>
                   Bootstrapped: {formatDateTime(instance.bootstrappedAt)}
                 </div>
@@ -998,7 +1005,7 @@ export function WorldDetailPage() {
             {instance?.launchConfig ? (
               <label className="mt-4 grid gap-2 text-sm">
                 <span className="text-[color:var(--text-primary)]">
-                  Launch config snapshot
+                  {t("Launch config snapshot")}
                 </span>
                 <textarea
                   readOnly
@@ -1016,7 +1023,7 @@ export function WorldDetailPage() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                  Runtime observation
+                  {t("Runtime observation")}
                 </div>
                 <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
                   Provider-side deployment status observed from the current
@@ -1074,7 +1081,7 @@ export function WorldDetailPage() {
               </div>
             ) : runtimeStatusQuery.isLoading ? (
               <div className="mt-4 text-sm text-[color:var(--text-muted)]">
-                Loading runtime status...
+                {t("Loading runtime status...")}
               </div>
             ) : null}
           </div>
@@ -1083,7 +1090,7 @@ export function WorldDetailPage() {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                  Bootstrap package
+                  {t("Bootstrap package")}
                 </div>
                 <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
                   Use this env overlay when deploying the user's dedicated world
@@ -1105,7 +1112,7 @@ export function WorldDetailPage() {
                     }
                     className={SECONDARY_ACTION_BUTTON}
                   >
-                    Copy endpoints
+                    {t("Copy endpoints")}
                   </button>
                 ) : null}
                 <button
@@ -1172,7 +1179,7 @@ export function WorldDetailPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     <span>
                       Callback token:{" "}
-                      {bootstrapConfig.callbackToken || "Not set"}
+                      {bootstrapConfig.callbackToken || t("Not set")}
                     </span>
                     {bootstrapConfig.callbackToken ? (
                       <button
@@ -1183,10 +1190,10 @@ export function WorldDetailPage() {
                             "Callback token copied.",
                           )
                         }
-                        aria-label="Copy callback token"
+                        aria-label={t("Copy callback token")}
                         className="rounded-lg border border-[color:var(--border-faint)] px-2 py-1 text-xs text-[color:var(--text-primary)] transition hover:border-[color:var(--border-strong)]"
                       >
-                        Copy token
+                        {t("Copy token")}
                       </button>
                     ) : null}
                   </div>
@@ -1215,7 +1222,7 @@ export function WorldDetailPage() {
 
                 <label className="grid gap-2 text-sm">
                   <span className="flex items-center justify-between gap-3 text-[color:var(--text-primary)]">
-                    <span>Runtime env overlay</span>
+                    <span>{t("Runtime env overlay")}</span>
                     <button
                       type="button"
                       onClick={() =>
@@ -1224,10 +1231,10 @@ export function WorldDetailPage() {
                           "Runtime env overlay copied.",
                         )
                       }
-                      aria-label="Copy runtime env overlay"
+                      aria-label={t("Copy runtime env overlay")}
                       className="rounded-lg border border-[color:var(--border-faint)] px-2 py-1 text-xs font-normal text-[color:var(--text-primary)] transition hover:border-[color:var(--border-strong)]"
                     >
-                      Copy env
+                      {t("Copy env")}
                     </button>
                   </span>
                   <textarea
@@ -1240,7 +1247,7 @@ export function WorldDetailPage() {
 
                 <label className="grid gap-2 text-sm">
                   <span className="flex items-center justify-between gap-3 text-[color:var(--text-primary)]">
-                    <span>Docker compose snippet</span>
+                    <span>{t("Docker compose snippet")}</span>
                     <button
                       type="button"
                       onClick={() =>
@@ -1249,10 +1256,10 @@ export function WorldDetailPage() {
                           "Docker compose snippet copied.",
                         )
                       }
-                      aria-label="Copy docker compose snippet"
+                      aria-label={t("Copy docker compose snippet")}
                       className="rounded-lg border border-[color:var(--border-faint)] px-2 py-1 text-xs font-normal text-[color:var(--text-primary)] transition hover:border-[color:var(--border-strong)]"
                     >
-                      Copy compose
+                      {t("Copy compose")}
                     </button>
                   </span>
                   <textarea
@@ -1266,7 +1273,7 @@ export function WorldDetailPage() {
                 {bootstrapConfig.notes.length ? (
                   <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3">
                     <div className="text-[11px] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                      Ops notes
+                      {t("Ops notes")}
                     </div>
                     <div className="mt-2 space-y-2 text-sm text-[color:var(--text-secondary)]">
                       {bootstrapConfig.notes.map((note) => (
@@ -1278,7 +1285,7 @@ export function WorldDetailPage() {
               </div>
             ) : bootstrapConfigQuery.isLoading ? (
               <div className="mt-4 text-sm text-[color:var(--text-muted)]">
-                Loading bootstrap package...
+                {t("Loading bootstrap package...")}
               </div>
             ) : null}
           </div>
@@ -1287,7 +1294,7 @@ export function WorldDetailPage() {
 
       <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
         <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-          Recent lifecycle jobs
+          {t("Recent lifecycle jobs")}
         </div>
         <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
           Jobs show how this world moved through provision, resume, and suspend
@@ -1344,7 +1351,7 @@ export function WorldDetailPage() {
             })}
             className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:bg-[color:var(--surface-soft)]"
           >
-            Open full queue
+            {t("Open full queue")}
           </JobsPermalinkLink>
         </div>
 
@@ -1357,12 +1364,12 @@ export function WorldDetailPage() {
           <table className="min-w-[52rem] border-collapse text-left text-sm">
             <thead className="bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]">
               <tr>
-                <th className="px-4 py-3">Job</th>
-                <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3">Attempt</th>
-                <th className="px-4 py-3">Lease</th>
-                <th className="px-4 py-3">Updated</th>
-                <th className="px-4 py-3">Outcome</th>
+                <th className="px-4 py-3">{t("Job")}</th>
+                <th className="px-4 py-3">{t("Status")}</th>
+                <th className="px-4 py-3">{t("Attempt")}</th>
+                <th className="px-4 py-3">{t("Lease")}</th>
+                <th className="px-4 py-3">{t("Updated")}</th>
+                <th className="px-4 py-3">{t("Outcome")}</th>
               </tr>
             </thead>
             <tbody>
@@ -1444,7 +1451,7 @@ export function WorldDetailPage() {
 
           {!jobsQuery.isLoading && !jobsQuery.isError && jobs.length === 0 ? (
             <div className="p-4 text-sm text-[color:var(--text-muted)]">
-              No jobs recorded for this world yet.
+              {t("No jobs recorded for this world yet.")}
             </div>
           ) : null}
 
@@ -1453,7 +1460,7 @@ export function WorldDetailPage() {
           jobs.length > 0 &&
           visibleJobs.length === 0 ? (
             <div className="p-4 text-sm text-[color:var(--text-muted)]">
-              No jobs match the selected queue filter.
+              {t("No jobs match the selected queue filter.")}
             </div>
           ) : null}
         </div>
