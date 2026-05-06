@@ -1383,29 +1383,36 @@ export function DesktopSearchDropdownPanel({
               ) : null}
 
               {officialMatches.length ? (
-                <SearchLauncherCollectionCard
-                  countLabel={`${officialMatches.length} 个入口`}
-                  highlighted={
-                    activeFocusContext.panelId === "officialSuggestions"
-                  }
-                  title="公众号"
-                >
-                  <div className="space-y-1.5">
-                    {officialMatches.map((group) => (
-                      <SearchLauncherOfficialGroupCard
-                        key={group.id}
-                        activeArticleId={activeActionId}
-                        activeHeaderId={activeActionId}
-                        group={group}
-                        keyword={trimmedKeyword}
-                        onOpenArticle={(item) => handleOpenQuickLink(item)}
-                        onOpenHeader={(item) => handleOpenQuickLink(item)}
-                        onSelectArticle={(item) => activatePanelAction(item.id)}
-                        onSelectHeader={(item) => activatePanelAction(item.id)}
-                      />
-                    ))}
-                  </div>
-                </SearchLauncherCollectionCard>
+                <div className="relative">
+                  <SearchLauncherCollectionCard
+                    countLabel={`${officialMatches.length} 个入口`}
+                    highlighted={
+                      activeFocusContext.panelId === "officialSuggestions"
+                    }
+                    title="公众号"
+                  >
+                    <div className="space-y-1.5">
+                      {officialMatches.map((group) => (
+                        <SearchLauncherOfficialGroupCard
+                          key={group.id}
+                          activeArticleId={activeActionId}
+                          activeHeaderId={activeActionId}
+                          group={group}
+                          keyword={trimmedKeyword}
+                          onOpenArticle={(item) => handleOpenQuickLink(item)}
+                          onOpenHeader={(item) => handleOpenQuickLink(item)}
+                          onSelectArticle={(item) =>
+                            activatePanelAction(item.id)
+                          }
+                          onSelectHeader={(item) =>
+                            activatePanelAction(item.id)
+                          }
+                        />
+                      ))}
+                    </div>
+                  </SearchLauncherCollectionCard>
+                  <SearchLauncherComingSoonOverlay />
+                </div>
               ) : null}
 
               {friendMatches.length ? (
@@ -1508,27 +1515,30 @@ export function DesktopSearchDropdownPanel({
               ) : null}
 
               {miniProgramMatches.length ? (
-                <SearchLauncherCollectionCard
-                  countLabel={`${miniProgramMatches.length} 个入口`}
-                  highlighted={
-                    activeFocusContext.panelId === "miniProgramSuggestions"
-                  }
-                  title="小程序"
-                >
-                  <div className="space-y-1.5">
-                    {miniProgramMatches.map((item) => (
-                      <SearchLauncherFeatureRow
-                        key={item.id}
-                        active={activeActionId === item.id}
-                        item={item}
-                        keyword={trimmedKeyword}
-                        variant="miniPrograms"
-                        onMouseEnter={() => activatePanelAction(item.id)}
-                        onClick={() => handleOpenQuickLink(item)}
-                      />
-                    ))}
-                  </div>
-                </SearchLauncherCollectionCard>
+                <div className="relative">
+                  <SearchLauncherCollectionCard
+                    countLabel={`${miniProgramMatches.length} 个入口`}
+                    highlighted={
+                      activeFocusContext.panelId === "miniProgramSuggestions"
+                    }
+                    title="小程序"
+                  >
+                    <div className="space-y-1.5">
+                      {miniProgramMatches.map((item) => (
+                        <SearchLauncherFeatureRow
+                          key={item.id}
+                          active={activeActionId === item.id}
+                          item={item}
+                          keyword={trimmedKeyword}
+                          variant="miniPrograms"
+                          onMouseEnter={() => activatePanelAction(item.id)}
+                          onClick={() => handleOpenQuickLink(item)}
+                        />
+                      ))}
+                    </div>
+                  </SearchLauncherCollectionCard>
+                  <SearchLauncherComingSoonOverlay />
+                </div>
               ) : null}
 
               {!hasSuggestionResults ? (
@@ -1593,51 +1603,59 @@ export function DesktopSearchDropdownPanel({
             ) : null}
 
             {recentOfficials.length ? (
-              <SearchLauncherCollectionCard
-                countLabel={`${recentOfficials.length} 个入口`}
-                highlighted={activeFocusContext.panelId === "recentOfficials"}
-                title="最近公众号"
-              >
-                <div className="space-y-1.5">
-                  {recentOfficials.map((group) => (
-                    <SearchLauncherOfficialGroupCard
-                      key={group.id}
-                      activeArticleId={activeActionId}
-                      activeHeaderId={activeActionId}
-                      group={group}
-                      keyword=""
-                      onOpenArticle={(item) => handleOpenQuickLink(item)}
-                      onOpenHeader={(item) => handleOpenQuickLink(item)}
-                      onSelectArticle={(item) => activatePanelAction(item.id)}
-                      onSelectHeader={(item) => activatePanelAction(item.id)}
-                    />
-                  ))}
-                </div>
-              </SearchLauncherCollectionCard>
+              <div className="relative">
+                <SearchLauncherCollectionCard
+                  countLabel={`${recentOfficials.length} 个入口`}
+                  highlighted={activeFocusContext.panelId === "recentOfficials"}
+                  title="最近公众号"
+                >
+                  <div className="space-y-1.5">
+                    {recentOfficials.map((group) => (
+                      <SearchLauncherOfficialGroupCard
+                        key={group.id}
+                        activeArticleId={activeActionId}
+                        activeHeaderId={activeActionId}
+                        group={group}
+                        keyword=""
+                        onOpenArticle={(item) => handleOpenQuickLink(item)}
+                        onOpenHeader={(item) => handleOpenQuickLink(item)}
+                        onSelectArticle={(item) =>
+                          activatePanelAction(item.id)
+                        }
+                        onSelectHeader={(item) => activatePanelAction(item.id)}
+                      />
+                    ))}
+                  </div>
+                </SearchLauncherCollectionCard>
+                <SearchLauncherComingSoonOverlay />
+              </div>
             ) : null}
 
             {recentMiniPrograms.length ? (
-              <SearchLauncherCollectionCard
-                countLabel={`${recentMiniPrograms.length} 个入口`}
-                highlighted={
-                  activeFocusContext.panelId === "recentMiniPrograms"
-                }
-                title="最近使用的小程序"
-              >
-                <div className="space-y-1.5">
-                  {recentMiniPrograms.map((item) => (
-                    <SearchLauncherFeatureRow
-                      key={item.id}
-                      active={activeActionId === item.id}
-                      item={item}
-                      keyword=""
-                      variant="miniPrograms"
-                      onMouseEnter={() => activatePanelAction(item.id)}
-                      onClick={() => handleOpenQuickLink(item)}
-                    />
-                  ))}
-                </div>
-              </SearchLauncherCollectionCard>
+              <div className="relative">
+                <SearchLauncherCollectionCard
+                  countLabel={`${recentMiniPrograms.length} 个入口`}
+                  highlighted={
+                    activeFocusContext.panelId === "recentMiniPrograms"
+                  }
+                  title="最近使用的小程序"
+                >
+                  <div className="space-y-1.5">
+                    {recentMiniPrograms.map((item) => (
+                      <SearchLauncherFeatureRow
+                        key={item.id}
+                        active={activeActionId === item.id}
+                        item={item}
+                        keyword=""
+                        variant="miniPrograms"
+                        onMouseEnter={() => activatePanelAction(item.id)}
+                        onClick={() => handleOpenQuickLink(item)}
+                      />
+                    ))}
+                  </div>
+                </SearchLauncherCollectionCard>
+                <SearchLauncherComingSoonOverlay />
+              </div>
             ) : null}
 
             {favoritesLoading ? (
@@ -2431,4 +2449,19 @@ function matchesLauncherQuickLink(
     .join(" ")
     .toLowerCase()
     .includes(keyword);
+}
+
+function SearchLauncherComingSoonOverlay() {
+  return (
+    <div className="pointer-events-auto absolute inset-0 z-30 flex items-center justify-center rounded-[16px] bg-black/30 backdrop-blur-[3px]">
+      <div className="rounded-[14px] border border-[color:var(--border-faint)] bg-white/95 px-4 py-3 text-center shadow-[var(--shadow-card)]">
+        <div className="text-[13px] font-semibold text-[color:var(--text-primary)]">
+          功能开发中
+        </div>
+        <div className="mt-1 text-[11px] text-[color:var(--text-secondary)]">
+          敬请期待
+        </div>
+      </div>
+    </div>
+  );
 }
