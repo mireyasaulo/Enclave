@@ -1497,10 +1497,16 @@ function MobileChannelsCard({
         <div className="absolute inset-y-0 right-0 flex items-center pr-3.5">
           <div className="flex flex-col items-center gap-2.5">
             <ActionRailButton
+              active={Boolean(post.ownerState?.hasLiked)}
               label={likePending ? "处理中" : String(post.likeCount)}
               onClick={onLike}
             >
-              <ThumbsUp size={17} />
+              <ThumbsUp
+                size={17}
+                className={
+                  post.ownerState?.hasLiked ? "fill-current" : undefined
+                }
+              />
             </ActionRailButton>
             <ActionRailButton
               label={String(post.commentCount)}

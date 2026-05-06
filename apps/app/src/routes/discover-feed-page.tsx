@@ -12,6 +12,7 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Copy,
+  Heart,
   ImagePlus,
   PenSquare,
   Share2,
@@ -931,10 +932,23 @@ export function DiscoverFeedPage() {
                       onClick={() => likeMutation.mutate(post.id)}
                       variant="secondary"
                       size="sm"
+                      className={
+                        post.ownerState?.hasLiked
+                          ? "border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] text-[#07c160]"
+                          : undefined
+                      }
                     >
+                      <Heart
+                        size={13}
+                        className={
+                          post.ownerState?.hasLiked ? "fill-current" : undefined
+                        }
+                      />
                       {pendingLikePostId === post.id
                         ? t(msg`处理中...`)
-                        : t(msg`点赞`)}
+                        : post.ownerState?.hasLiked
+                          ? t(msg`已赞`)
+                          : t(msg`点赞`)}
                     </Button>
                     <Button
                       variant="secondary"
