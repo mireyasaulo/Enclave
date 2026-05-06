@@ -53,7 +53,16 @@ export function configureContractsRuntime() {
   setCoreApiBaseUrlProvider(() => resolveAppCoreApiBaseUrl());
   setCloudApiBaseUrlProvider(() => {
     const runtimeConfig = getAppRuntimeConfig();
-    return runtimeConfig.cloudApiBaseUrl ?? DEFAULT_CLOUD_API_BASE_URL;
+    if (runtimeConfig.cloudApiBaseUrl) {
+      return runtimeConfig.cloudApiBaseUrl;
+    }
+    // 浏览器同源回落：用户从 vicp.fun 等远程域名访问时，localhost:3001 会打到用户设备本机；
+    // 此时 vite dev / 反代会把 /cloud/* 转发到真实的 cloud-api。
+    const browserBaseUrl = fallbackBrowserBaseUrl();
+    if (browserBaseUrl) {
+      return browserBaseUrl;
+    }
+    return DEFAULT_CLOUD_API_BASE_URL;
   });
   setApiRequestErrorHandler((error) => {
     handleApiSubscriptionExpiredError(error);

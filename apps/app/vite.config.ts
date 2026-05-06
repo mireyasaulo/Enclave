@@ -138,6 +138,16 @@ export default defineConfig(({ command }) => ({
         changeOrigin: true,
         ws: true,
       },
+      // 远程访问（花生壳/反代）时，前端 cloudApiBaseUrl 回落到浏览器同源，
+      // 这里把 /cloud/* 转发到本机 cloud-api（端口 3001）。
+      "/cloud": {
+        target: "http://127.0.0.1:3001",
+        changeOrigin: true,
+      },
+      "/admin/cloud": {
+        target: "http://127.0.0.1:3001",
+        changeOrigin: true,
+      },
     },
   },
 }));
