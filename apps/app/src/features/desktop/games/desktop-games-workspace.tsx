@@ -140,7 +140,7 @@ export function DesktopGamesWorkspace({
     "shadow-[inset_3px_0_0_0_var(--brand-primary),0_10px_24px_rgba(15,23,42,0.05)]";
 
   return (
-    <div className="flex h-full min-h-0 bg-[color:var(--bg-app)]">
+    <div className="relative flex h-full min-h-0 bg-[color:var(--bg-app)]">
       <aside className="flex w-[284px] shrink-0 flex-col border-r border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.88)]">
         <div className="border-b border-[color:var(--border-faint)] bg-white/78 px-5 py-5 backdrop-blur-xl">
           <div className="text-[11px] font-medium text-[color:var(--text-muted)]">
@@ -755,6 +755,16 @@ export function DesktopGamesWorkspace({
           </div>
         </div>
       </section>
+      <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[3px]">
+        <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-8 py-6 text-center shadow-[var(--shadow-card)]">
+          <div className="text-lg font-semibold text-[color:var(--text-primary)]">
+            功能开发中
+          </div>
+          <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
+            敬请期待
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
