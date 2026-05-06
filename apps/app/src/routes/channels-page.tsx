@@ -39,8 +39,9 @@ import {
   unfavoriteFeedPost,
   unfollowChannelAuthor,
   viewFeedPost,
-  type FeedComment,
+  type FeedChannelHomeResponse,
   type FeedChannelHomeSection,
+  type FeedComment,
   type FeedPostListItem,
   type FeedPostWithComments,
 } from "@yinjie/contracts";
@@ -146,6 +147,50 @@ export function ChannelsPage() {
 
   const likeMutation = useMutation({
     mutationFn: (postId: string) => likeFeedPost(postId, baseUrl),
+    onMutate: async (postId) => {
+      await queryClient.cancelQueries({
+        queryKey: ["app-channels-home", baseUrl],
+      });
+      const snapshots = queryClient.getQueriesData<FeedChannelHomeResponse>({
+        queryKey: ["app-channels-home", baseUrl],
+      });
+      snapshots.forEach(([key, data]) => {
+        if (!data?.posts) {
+          return;
+        }
+        queryClient.setQueryData<FeedChannelHomeResponse>(key, {
+          ...data,
+          posts: data.posts.map((post) =>
+            post.id === postId && !post.ownerState?.hasLiked
+              ? {
+                  ...post,
+                  likeCount: post.likeCount + 1,
+                  ownerState: {
+                    ...(post.ownerState ?? {
+                      hasLiked: false,
+                      hasFavorited: false,
+                      isFollowingAuthor: false,
+                      isNotInterested: false,
+                      hasViewed: false,
+                      hasShared: false,
+                      lastViewedAt: null,
+                      watchProgressSeconds: null,
+                      completed: false,
+                    }),
+                    hasLiked: true,
+                  },
+                }
+              : post,
+          ),
+        });
+      });
+      return { snapshots };
+    },
+    onError: (_error, _postId, context) => {
+      context?.snapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+    },
     onSuccess: async () => {
       setNoticeTone("success");
       setNoticeActionLabel(null);

@@ -60,9 +60,9 @@ export class UsersService implements OnModuleInit {
       }
     });
 
-    this.emailAuth.registerPostVerifyHook(async (email, extras) => {
+    this.emailAuth.registerPostVerifyHook(async (email, synthPhone, extras) => {
       try {
-        await this.ensureUserByEmail(email, {
+        await this.ensureUserByEmail(email, synthPhone, {
           inviteCode: extras.inviteCode ?? null,
           ip: extras.ip ?? null,
           deviceFingerprint: extras.deviceFingerprint ?? null,
@@ -142,7 +142,11 @@ export class UsersService implements OnModuleInit {
     return user;
   }
 
-  async ensureUserByEmail(email: string, context: EnsureUserContext = {}) {
+  async ensureUserByEmail(
+    email: string,
+    synthPhone: string,
+    context: EnsureUserContext = {},
+  ) {
     const now = new Date();
     let user = await this.userRepo.findOne({ where: { email } });
     let isNewUser = false;
@@ -150,7 +154,7 @@ export class UsersService implements OnModuleInit {
     if (!user) {
       isNewUser = true;
       user = this.userRepo.create({
-        phone: null,
+        phone: synthPhone,
         email,
         emailVerifiedAt: now,
         firstLoginAt: now,
@@ -161,6 +165,7 @@ export class UsersService implements OnModuleInit {
       user = await this.userRepo.save(user);
     } else {
       user.lastLoginAt = now;
+      if (!user.phone) user.phone = synthPhone;
       if (!user.emailVerifiedAt) user.emailVerifiedAt = now;
       if (!user.registrationIp && context.ip) user.registrationIp = context.ip;
       if (!user.registrationDeviceFingerprint && context.deviceFingerprint) {

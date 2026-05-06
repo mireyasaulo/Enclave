@@ -15,6 +15,7 @@ import type {
   VerifyEmailCodeResponse,
 } from "@yinjie/contracts";
 import { MoreThan, Repository } from "typeorm";
+import { createHash } from "node:crypto";
 import {
   parseJwtDurationToMs,
   resolveCloudAuthTokenTtl,
@@ -23,10 +24,19 @@ import {
 } from "../config/cloud-runtime-config";
 import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { EmailVerificationSessionEntity } from "../entities/email-verification-session.entity";
+import { CLOUD_CLIENT_ACCESS_TOKEN_PURPOSE } from "./cloud-jwt.constants";
 import { CloudMailService } from "./cloud-mail.service";
 
 const DEV_BYPASS_CODE = "123456";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// 邮箱用户的合成手机号：前缀 "9" + email sha256 前 16 位转十进制截 13 位，纯数字共 14 位。
+// 与真实手机号不会冲突（各国个人手机号几乎不以 9 开头作完整号码段），且对同一邮箱稳定。
+export function synthesizePhoneFromEmail(email: string): string {
+  const hash = createHash("sha256").update(email).digest("hex");
+  const num = BigInt("0x" + hash.slice(0, 16)).toString().padStart(13, "0");
+  return "9" + num.slice(0, 13);
+}
 
 export type EmailVerifyExtras = {
   inviteCode?: string | null;
@@ -127,25 +137,29 @@ export class EmailAuthService {
       );
     }
 
+    const synthPhone = synthesizePhoneFromEmail(normalized);
+
     if (this.userPostVerifyHook) {
       try {
-        await this.userPostVerifyHook(normalized, extras ?? {});
+        await this.userPostVerifyHook(normalized, synthPhone, extras ?? {});
       } catch {
         // ensureUser 不应阻塞登录
       }
     }
 
+    // 邮箱用户在云端用合成 phone 作为身份标识，CloudClientAuthGuard 与下游 by-phone 查询都能命中。
     const accessToken = await this.jwtService.signAsync(
       {
         sid: session.id,
+        phone: synthPhone,
         email: normalized,
-        purpose: session.purpose,
+        purpose: CLOUD_CLIENT_ACCESS_TOKEN_PURPOSE,
       },
       {
         expiresIn: resolveCloudAuthTokenTtl(this.configService) as never,
         issuer: resolveCloudJwtIssuer(this.configService),
         audience: resolveCloudClientJwtAudience(this.configService),
-        subject: normalized,
+        subject: synthPhone,
       },
     );
     const expiresAt = new Date(Date.now() + this.getTokenTtlMs()).toISOString();
@@ -158,11 +172,19 @@ export class EmailAuthService {
   }
 
   private userPostVerifyHook:
-    | ((email: string, extras: EmailVerifyExtras) => Promise<void>)
+    | ((
+        email: string,
+        synthPhone: string,
+        extras: EmailVerifyExtras,
+      ) => Promise<void>)
     | null = null;
 
   registerPostVerifyHook(
-    hook: (email: string, extras: EmailVerifyExtras) => Promise<void>,
+    hook: (
+      email: string,
+      synthPhone: string,
+      extras: EmailVerifyExtras,
+    ) => Promise<void>,
   ) {
     this.userPostVerifyHook = hook;
   }

@@ -25,6 +25,7 @@ import {
   likeFeedPost,
   replyFeedComment,
   type FeedComment,
+  type FeedListResponse,
 } from "@yinjie/contracts";
 import { AppPage, Button, InlineNotice, TextField } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
@@ -162,6 +163,48 @@ export function DiscoverFeedPage() {
 
   const likeMutation = useMutation({
     mutationFn: (postId: string) => likeFeedPost(postId, baseUrl),
+    onMutate: async (postId) => {
+      await queryClient.cancelQueries({ queryKey: ["app-feed", baseUrl] });
+      const snapshots = queryClient.getQueriesData<FeedListResponse>({
+        queryKey: ["app-feed", baseUrl],
+      });
+      snapshots.forEach(([key, data]) => {
+        if (!data?.posts) {
+          return;
+        }
+        queryClient.setQueryData<FeedListResponse>(key, {
+          ...data,
+          posts: data.posts.map((post) =>
+            post.id === postId && !post.ownerState?.hasLiked
+              ? {
+                  ...post,
+                  likeCount: post.likeCount + 1,
+                  ownerState: {
+                    ...(post.ownerState ?? {
+                      hasLiked: false,
+                      hasFavorited: false,
+                      isFollowingAuthor: false,
+                      isNotInterested: false,
+                      hasViewed: false,
+                      hasShared: false,
+                      lastViewedAt: null,
+                      watchProgressSeconds: null,
+                      completed: false,
+                    }),
+                    hasLiked: true,
+                  },
+                }
+              : post,
+          ),
+        });
+      });
+      return { snapshots };
+    },
+    onError: (_error, _postId, context) => {
+      context?.snapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+    },
     onSuccess: async () => {
       setNoticeTone("success");
       setNoticeActionLabel(null);
