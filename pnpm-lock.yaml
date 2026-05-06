@@ -462,6 +462,9 @@ importers:
       '@tanstack/react-router':
         specifier: ^1.109.2
         version: 1.168.10(react-dom@19.2.4)(react@19.2.4)
+      '@yinjie/i18n':
+        specifier: workspace:*
+        version: link:../../packages/i18n
       '@yinjie/ui':
         specifier: workspace:*
         version: link:../../packages/ui
