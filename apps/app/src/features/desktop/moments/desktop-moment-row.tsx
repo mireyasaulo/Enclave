@@ -1,4 +1,4 @@
-import { type MouseEvent as ReactMouseEvent } from "react";
+import { useMemo, type MouseEvent as ReactMouseEvent } from "react";
 import { type Moment, type MomentComment } from "@yinjie/contracts";
 import { Button, cn } from "@yinjie/ui";
 import {
@@ -74,9 +74,20 @@ export function DesktopMomentRow({
   const activeActionClassName =
     "border-[rgba(7,193,96,0.12)] bg-white text-[color:var(--text-primary)] shadow-[inset_0_-2px_0_0_var(--brand-primary)]";
 
-  const commentsById = new Map(
-    moment.comments.map((comment) => [comment.id, comment] as const),
+  const commentsById = useMemo(
+    () =>
+      new Map(moment.comments.map((comment) => [comment.id, comment] as const)),
+    [moment.comments],
   );
+  const authorNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const comment of moment.comments) {
+      if (comment.authorId && comment.authorName) {
+        map.set(comment.authorId, comment.authorName);
+      }
+    }
+    return map;
+  }, [moment.comments]);
 
   function lookupReplyToName(comment: MomentComment) {
     if (!comment.replyToAuthorId) {
@@ -88,7 +99,7 @@ export function DesktopMomentRow({
         return target.authorName;
       }
     }
-    return null;
+    return authorNameById.get(comment.replyToAuthorId) ?? null;
   }
 
   return (
