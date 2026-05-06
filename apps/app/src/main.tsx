@@ -6,7 +6,10 @@ import {
   AppLocaleProvider,
   readPersistedLocale,
   readQueryLocale,
+  resolveSupportedLocale,
+  type SupportedLocale,
 } from "@yinjie/i18n";
+import { getWorldLanguage, setWorldLanguage } from "@yinjie/contracts";
 import "@yinjie/ui/tokens.css";
 import "./index.css";
 import { BootstrapScreen } from "./components/bootstrap-screen";
@@ -90,10 +93,31 @@ async function bootstrap() {
   ];
   const explicitWebLocalePreference =
     readQueryLocale() ?? readPersistedLocale("app");
+
+  const backendLanguage = await getWorldLanguage()
+    .then((config) => resolveSupportedLocale(config.language))
+    .catch(() => null);
+
+  if (
+    explicitWebLocalePreference &&
+    backendLanguage &&
+    explicitWebLocalePreference !== backendLanguage
+  ) {
+    void setWorldLanguage({ language: explicitWebLocalePreference }).catch(
+      () => {},
+    );
+  }
+
   const initialLocale =
     desktopLocalePreference && explicitWebLocalePreference
       ? explicitWebLocalePreference
-      : nativeLocalePreference?.locale;
+      : (nativeLocalePreference?.locale ??
+        (explicitWebLocalePreference ? null : backendLanguage));
+
+  const handleLocaleChange = (locale: SupportedLocale) => {
+    void setWorldLanguage({ language: locale }).catch(() => {});
+    return syncNativeLocalePreference(locale);
+  };
 
   ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
@@ -101,7 +125,7 @@ async function bootstrap() {
         surface="app"
         fallback={<BootstrapScreen />}
         initialLocale={initialLocale ?? null}
-        onLocaleChange={syncNativeLocalePreference}
+        onLocaleChange={handleLocaleChange}
         preferredLocales={preferredLocales}
       >
         <NativeLocaleSync

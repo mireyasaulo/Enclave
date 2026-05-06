@@ -158,9 +158,11 @@ import type {
   SystemStatus,
 } from "./system";
 import type {
+  UpdateWorldLanguageRequest,
   UpdateWorldOwnerApiKeyRequest,
   UpdateWorldOwnerRequest,
   WorldContext,
+  WorldLanguageConfig,
   WorldOwner,
 } from "./world";
 import type {
@@ -1498,6 +1500,28 @@ export function getAvailableModels(baseUrl?: string) {
   return requestLegacyApi<AvailableModelsResponse>(
     "/config/available-models",
     undefined,
+    baseUrl,
+  );
+}
+
+export function getWorldLanguage(baseUrl?: string) {
+  return requestLegacyApi<WorldLanguageConfig>(
+    "/config/world-language",
+    undefined,
+    baseUrl,
+  );
+}
+
+export function setWorldLanguage(
+  payload: UpdateWorldLanguageRequest,
+  baseUrl?: string,
+) {
+  return requestLegacyApi<WorldLanguageConfig>(
+    "/config/world-language",
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    },
     baseUrl,
   );
 }
