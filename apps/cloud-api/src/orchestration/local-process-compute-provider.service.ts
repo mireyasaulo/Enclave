@@ -32,7 +32,21 @@ type RunningChild = {
   startedAt: Date;
 };
 
-const REPO_ROOT = path.resolve(__dirname, "..", "..", "..", "..", "..");
+function findRepoRoot(start: string): string {
+  let dir = start;
+  for (let i = 0; i < 12; i += 1) {
+    if (existsSync(path.join(dir, "pnpm-workspace.yaml"))) {
+      return dir;
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return process.cwd();
+}
+
+const REPO_ROOT =
+  process.env.YINJIE_REPO_ROOT?.trim() || findRepoRoot(__dirname);
 const API_DIST_ENTRY = path.join(REPO_ROOT, "api", "dist", "main.js");
 const ACCOUNTS_ROOT = path.join(REPO_ROOT, "data", "accounts");
 const LOG_DIR = path.join(REPO_ROOT, "logs", "dev-services");
