@@ -72,7 +72,9 @@ export function DesktopDirectCallPanel({
   const [startedAt] = useState(() => new Date().toISOString());
   const onPanelOpenedRef = useRef(onPanelOpened);
 
-  onPanelOpenedRef.current = onPanelOpened;
+  useEffect(() => {
+    onPanelOpenedRef.current = onPanelOpened;
+  });
   const voiceCall = useVoiceCallSession({
     baseUrl: runtimeConfig.apiBaseUrl,
     conversationId,
@@ -344,6 +346,26 @@ export function DesktopDirectCallPanel({
   useEffect(() => {
     setCameraEnabled(kind === "video");
   }, [kind]);
+
+  const activeCallRef = useRef(activeCall);
+  const digitalHumanCallRef = useRef(digitalHumanCall);
+  const isVideoModeRef = useRef(isVideoMode);
+
+  useEffect(() => {
+    activeCallRef.current = activeCall;
+    digitalHumanCallRef.current = digitalHumanCall;
+    isVideoModeRef.current = isVideoMode;
+  });
+
+  useEffect(() => {
+    return () => {
+      activeCallRef.current.cancelRecordingTurn();
+      activeCallRef.current.stopReplyPlayback();
+      if (isVideoModeRef.current) {
+        void digitalHumanCallRef.current.endSession().catch(() => {});
+      }
+    };
+  }, []);
 
   const handleEndCall = async () => {
     if (endCallPending) {
