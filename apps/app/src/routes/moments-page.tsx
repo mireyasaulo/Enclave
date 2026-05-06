@@ -2,19 +2,19 @@ import {
   Suspense,
   lazy,
   useEffect,
-  useEffectEvent,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { ArrowLeft, Copy, PenSquare, Share2 } from "lucide-react";
+import { ArrowLeft, Copy, Heart, PenSquare, Share2 } from "lucide-react";
 import {
   addMomentComment,
   getBlockedCharacters,
   getMoments,
   toggleMomentLike,
+  type Moment,
 } from "@yinjie/contracts";
 import { AppPage, Button, InlineNotice } from "@yinjie/ui";
 import { MomentMediaGallery } from "../components/moment-media-gallery";
@@ -163,6 +163,59 @@ export function MomentsPage() {
 
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
+    onMutate: async (momentId) => {
+      if (!ownerId) {
+        return { snapshots: [] as Array<[readonly unknown[], Moment[] | undefined]> };
+      }
+      await queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] });
+      const snapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments", baseUrl],
+      });
+      snapshots.forEach(([key, data]) => {
+        if (!data) {
+          return;
+        }
+        queryClient.setQueryData<Moment[]>(
+          key,
+          data.map((moment) => {
+            if (moment.id !== momentId) {
+              return moment;
+            }
+            const alreadyLiked = moment.likes.some(
+              (like) => like.authorId === ownerId,
+            );
+            const nextLikes = alreadyLiked
+              ? moment.likes.filter((like) => like.authorId !== ownerId)
+              : [
+                  ...moment.likes,
+                  {
+                    id: `optimistic-${ownerId}-${moment.id}`,
+                    postId: moment.id,
+                    authorId: ownerId,
+                    authorName: ownerUsername ?? "我",
+                    authorAvatar: ownerAvatar ?? "",
+                    authorType: "user" as const,
+                    createdAt: new Date().toISOString(),
+                  },
+                ];
+            return {
+              ...moment,
+              likes: nextLikes,
+              likeCount: Math.max(
+                0,
+                moment.likeCount + (alreadyLiked ? -1 : 1),
+              ),
+            };
+          }),
+        );
+      });
+      return { snapshots };
+    },
+    onError: (_error, _momentId, context) => {
+      context?.snapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+    },
     onSuccess: async () => {
       setNoticeTone("success");
       setNoticeActionLabel(null);
@@ -235,22 +288,6 @@ export function MomentsPage() {
     normalizedPathname === "/moments" ||
     normalizedPathname === "/discover/moments";
   const interactionActionLabel = safeReturnPath ? "返回上一页" : "重试读取";
-  const handleDesktopRouteStateChange = useEffectEvent(
-    (state: { momentId?: string }) => {
-      const nextHash = buildDesktopMomentsRouteHash(state);
-      const currentNormalizedHash = hash.startsWith("#") ? hash.slice(1) : hash;
-
-      if (currentNormalizedHash === (nextHash ?? "")) {
-        return;
-      }
-
-      void navigate({
-        to: desktopMomentsPath,
-        hash: nextHash,
-        replace: true,
-      });
-    },
-  );
 
   function openMobileMomentsPublishPage() {
     void navigate({
@@ -652,7 +689,7 @@ export function MomentsPage() {
           ownerAvatar={ownerAvatar}
           ownerId={ownerId}
           ownerUsername={ownerUsername}
-          routeSelectedMomentId={routeSelectedMomentId}
+          scrollToMomentId={routeSelectedMomentId}
           showCompose={showCompose}
           successNotice={notice}
           text={composeDraft.text}
@@ -688,39 +725,6 @@ export function MomentsPage() {
                 momentId: moment.id,
                 returnPath: safeReturnPath,
                 returnHash: safeReturnHash,
-              }),
-            });
-          }}
-          onOpenAuthorMoments={({ authorId, momentId }) => {
-            const targetMoment =
-              (momentId
-                ? visibleMoments.find((item) => item.id === momentId)
-                : visibleMoments.find((item) => item.authorId === authorId)) ??
-              null;
-
-            if (targetMoment?.authorType !== "character") {
-              void navigate({
-                to: pathname,
-                hash: buildDesktopMomentsRouteHash({
-                  momentId: targetMoment?.id ?? momentId ?? undefined,
-                  returnPath: safeReturnPath,
-                  returnHash: safeReturnHash,
-                }),
-                replace: true,
-              });
-              return;
-            }
-
-            void navigate({
-              to: "/desktop/friend-moments/$characterId",
-              params: { characterId: targetMoment.authorId },
-              hash: buildDesktopFriendMomentsRouteHash({
-                momentId: targetMoment.id,
-                source: "moments",
-                returnPath: desktopMomentsPath,
-                returnHash: buildDesktopMomentsRouteHash({
-                  momentId: targetMoment.id,
-                }),
               }),
             });
           }}
@@ -760,7 +764,6 @@ export function MomentsPage() {
               void blockedQuery.refetch();
             }
           }}
-          onRouteStateChange={handleDesktopRouteStateChange}
           onTextChange={composeDraft.setText}
           onRemoveImage={(id) => composeDraft.removeImageDraft(id)}
           onRemoveVideo={() => composeDraft.clearVideoDraft()}
@@ -1008,14 +1011,36 @@ export function MomentsPage() {
                         Ta 的朋友圈
                       </Button>
                     ) : null}
-                    <Button
-                      disabled={likeMutation.isPending}
-                      onClick={() => likeMutation.mutate(moment.id)}
-                      variant="secondary"
-                      size="sm"
-                    >
-                      {pendingLikeMomentId === moment.id ? "处理中..." : "点赞"}
-                    </Button>
+                    {(() => {
+                      const liked =
+                        Boolean(ownerId) &&
+                        moment.likes.some(
+                          (like) => like.authorId === ownerId,
+                        );
+                      return (
+                        <Button
+                          disabled={likeMutation.isPending}
+                          onClick={() => likeMutation.mutate(moment.id)}
+                          variant="secondary"
+                          size="sm"
+                          className={
+                            liked
+                              ? "border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] text-[#07c160]"
+                              : undefined
+                          }
+                        >
+                          <Heart
+                            size={13}
+                            className={liked ? "fill-current" : undefined}
+                          />
+                          {pendingLikeMomentId === moment.id
+                            ? "处理中..."
+                            : liked
+                              ? "已赞"
+                              : "点赞"}
+                        </Button>
+                      );
+                    })()}
                     <Button
                       variant="secondary"
                       size="sm"
