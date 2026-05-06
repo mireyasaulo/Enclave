@@ -2,6 +2,7 @@ import { Injectable, Logger, ServiceUnavailableException } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config";
 import * as nodemailer from "nodemailer";
 import type { Transporter } from "nodemailer";
+import { SocksClient } from "socks";
 import { MockEmailProviderService } from "./mock-email-provider.service";
 
 @Injectable()
@@ -69,13 +70,18 @@ export class CloudMailService {
     const secure = secureRaw !== "false";
     const user = this.config.get<string>("CLOUD_SMTP_USER");
     const pass = this.config.get<string>("CLOUD_SMTP_PASS");
+    const proxy = this.config.get<string>("CLOUD_SMTP_PROXY");
 
     this.transporter = nodemailer.createTransport({
       host,
       port,
       secure,
       auth: user && pass ? { user, pass } : undefined,
+      ...(proxy ? { proxy } : {}),
     });
+    if (proxy) {
+      this.transporter.set("proxy_socks_module", { SocksClient });
+    }
     return this.transporter;
   }
 }

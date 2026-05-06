@@ -2,6 +2,7 @@ import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
+import { SocksClient } from 'socks';
 
 export type SendVerificationCodeResult = {
   delivered: boolean;
@@ -69,13 +70,19 @@ export class MailService {
     const secure = secureRaw !== 'false';
     const user = this.config.get<string>('SMTP_USER');
     const pass = this.config.get<string>('SMTP_PASS');
+    const proxy = this.config.get<string>('SMTP_PROXY');
 
     this.transporter = nodemailer.createTransport({
       host,
       port,
       secure,
       auth: user && pass ? { user, pass } : undefined,
+      ...(proxy ? { proxy } : {}),
     });
+    if (proxy) {
+      // nodemailer 需要显式注入 socks 客户端模块以解析 socks 代理
+      this.transporter.set('proxy_socks_module', { SocksClient });
+    }
     return this.transporter;
   }
 }
