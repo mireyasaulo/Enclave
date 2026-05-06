@@ -7,6 +7,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
@@ -77,6 +79,7 @@ type FeedCommentReplyTarget = {
 };
 
 export function ChannelsPage() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
   const navigate = useNavigate();
   const pathname = useRouterState({
@@ -192,7 +195,7 @@ export function ChannelsPage() {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice("视频号互动已更新。");
+      setNotice(t(msg`视频号互动已更新。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-channels-home", baseUrl],
       });
@@ -212,7 +215,7 @@ export function ChannelsPage() {
     }) => {
       const text = input.text.trim();
       if (!text) {
-        throw new Error("请先输入评论内容。");
+        throw new Error(t(msg`请先输入评论内容。`));
       }
 
       if (input.replyTarget) {
@@ -245,7 +248,9 @@ export function ChannelsPage() {
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(
-        input.replyTarget ? "视频号回复已发送。" : "视频号评论已发送。",
+        input.replyTarget
+          ? t(msg`视频号回复已发送。`)
+          : t(msg`视频号评论已发送。`),
       );
       await Promise.all([
         queryClient.invalidateQueries({
@@ -263,7 +268,7 @@ export function ChannelsPage() {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice("已生成一条新的 AI 视频号内容。");
+      setNotice(t(msg`已生成一条新的 AI 视频号内容。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-channels-home", baseUrl],
       });
@@ -278,7 +283,11 @@ export function ChannelsPage() {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice(input.favorited ? "已取消收藏。" : "已收藏这条视频号内容。");
+      setNotice(
+        input.favorited
+          ? t(msg`已取消收藏。`)
+          : t(msg`已收藏这条视频号内容。`),
+      );
       await queryClient.invalidateQueries({
         queryKey: ["app-channels-home", baseUrl],
       });
@@ -293,7 +302,11 @@ export function ChannelsPage() {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice(input.following ? "已取消关注。" : "已关注该视频号作者。");
+      setNotice(
+        input.following
+          ? t(msg`已取消关注。`)
+          : t(msg`已关注该视频号作者。`),
+      );
       await queryClient.invalidateQueries({
         queryKey: ["app-channels-home", baseUrl],
       });
@@ -305,7 +318,7 @@ export function ChannelsPage() {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice("这类内容会减少推荐。");
+      setNotice(t(msg`这类内容会减少推荐。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-channels-home", baseUrl],
       });
@@ -318,7 +331,7 @@ export function ChannelsPage() {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice("评论互动已更新。");
+      setNotice(t(msg`评论互动已更新。`));
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-channels-home", baseUrl],
@@ -409,12 +422,12 @@ export function ChannelsPage() {
   >(
     () =>
       channelsQuery.data?.sections ?? [
-        { key: "recommended", label: "推荐", count: 0 },
-        { key: "friends", label: "朋友", count: 0 },
-        { key: "following", label: "关注", count: 0 },
-        { key: "live", label: "直播", count: 0 },
+        { key: "recommended", label: t(msg`推荐`), count: 0 },
+        { key: "friends", label: t(msg`朋友`), count: 0 },
+        { key: "following", label: t(msg`关注`), count: 0 },
+        { key: "live", label: t(msg`直播`), count: 0 },
       ],
-    [channelsQuery.data?.sections],
+    [channelsQuery.data?.sections, t],
   );
   const errorMessage =
     (channelsQuery.isError && channelsQuery.error instanceof Error
@@ -461,7 +474,7 @@ export function ChannelsPage() {
   const mobileCommentSheetRetryAction =
     mobileCommentsQuery.isError && mobileCommentSheetPostId
       ? {
-          label: "重试读取评论",
+          label: t(msg`重试读取评论`),
           onClick: () => {
             void mobileCommentsQuery.refetch();
           },
@@ -470,7 +483,7 @@ export function ChannelsPage() {
           likeCommentMutation.error instanceof Error &&
           likeCommentMutation.variables?.postId === mobileCommentSheetPostId
         ? {
-            label: "重试评论点赞",
+            label: t(msg`重试评论点赞`),
             onClick: () => {
               likeCommentMutation.mutate(likeCommentMutation.variables);
             },
@@ -481,8 +494,8 @@ export function ChannelsPage() {
             commentMutation.variables.text.trim()
           ? {
               label: commentMutation.variables.replyTarget
-                ? "重试回复评论"
-                : "重试发送评论",
+                ? t(msg`重试回复评论`)
+                : t(msg`重试发送评论`),
               onClick: () => {
                 commentMutation.mutate(commentMutation.variables);
               },
@@ -707,7 +720,7 @@ export function ChannelsPage() {
 
     if (nativeMobileShareSupported) {
       const shared = await shareWithNativeShell({
-        title: `${post.authorName} 的视频号动态`,
+        title: t(msg`${post.authorName} 的视频号动态`),
         text: `${post.authorName}：${post.text}`,
         url: shareUrl,
       });
@@ -717,7 +730,7 @@ export function ChannelsPage() {
         setNoticeTone("success");
         setNoticeActionLabel(null);
         setNoticeAction(null);
-        setNotice("已打开系统分享面板。");
+        setNotice(t(msg`已打开系统分享面板。`));
         return;
       }
     }
@@ -728,14 +741,16 @@ export function ChannelsPage() {
       typeof navigator.clipboard.writeText !== "function"
     ) {
       setNoticeTone("info");
-      setNoticeActionLabel(nativeMobileShareSupported ? "重试分享" : "重试复制");
+      setNoticeActionLabel(
+        nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
+      );
       setNoticeAction(() => () => {
         void handleSharePost(post);
       });
       setNotice(
         nativeMobileShareSupported
-          ? "当前设备暂时无法打开系统分享，请稍后重试。"
-          : "当前环境暂不支持复制内容摘要。",
+          ? t(msg`当前设备暂时无法打开系统分享，请稍后重试。`)
+          : t(msg`当前环境暂不支持复制内容摘要。`),
       );
       return;
     }
@@ -748,19 +763,21 @@ export function ChannelsPage() {
       setNoticeAction(null);
       setNotice(
         nativeMobileShareSupported
-          ? "系统分享暂时不可用，已复制内容摘要。"
-          : "内容摘要已复制。",
+          ? t(msg`系统分享暂时不可用，已复制内容摘要。`)
+          : t(msg`内容摘要已复制。`),
       );
     } catch {
       setNoticeTone("info");
-      setNoticeActionLabel(nativeMobileShareSupported ? "重试分享" : "重试复制");
+      setNoticeActionLabel(
+        nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
+      );
       setNoticeAction(() => () => {
         void handleSharePost(post);
       });
       setNotice(
         nativeMobileShareSupported
-          ? "系统分享失败，请稍后重试。"
-          : "复制内容摘要失败，请稍后重试。",
+          ? t(msg`系统分享失败，请稍后重试。`)
+          : t(msg`复制内容摘要失败，请稍后重试。`),
       );
     }
   }
@@ -781,9 +798,9 @@ export function ChannelsPage() {
         category: "channels",
         title: post.authorName,
         description: post.text,
-        meta: `视频号 · ${formatTimestamp(post.createdAt)}`,
+        meta: t(msg`视频号 · ${formatTimestamp(post.createdAt)}`),
         to: `/tabs/channels${routeHash ? `#${routeHash}` : ""}`,
-        badge: "视频号",
+        badge: t(msg`视频号`),
         avatarName: post.authorName,
         avatarSrc: post.authorAvatar,
       });
@@ -914,9 +931,11 @@ export function ChannelsPage() {
   if (isDesktopLayout && desktopRoutePostPending) {
     return (
       <RouteRedirectState
-        title="正在定位桌面视频号内容"
-        description="当前链接指向的内容不在推荐流里，正在补齐这条视频后再切进工作区。"
-        loadingLabel="定位视频号内容..."
+        title={t(msg`正在定位桌面视频号内容`)}
+        description={t(
+          msg`当前链接指向的内容不在推荐流里，正在补齐这条视频后再切进工作区。`,
+        )}
+        loadingLabel={t(msg`定位视频号内容...`)}
       />
     );
   }
@@ -926,9 +945,11 @@ export function ChannelsPage() {
       <Suspense
         fallback={
           <RouteRedirectState
-            title="正在打开桌面视频号"
-            description="正在载入桌面视频号工作区，马上显示当前频道内容。"
-            loadingLabel="载入桌面视频号..."
+            title={t(msg`正在打开桌面视频号`)}
+            description={t(
+              msg`正在载入桌面视频号工作区，马上显示当前频道内容。`,
+            )}
+            loadingLabel={t(msg`载入桌面视频号...`)}
           />
         }
       >
@@ -1002,8 +1023,8 @@ export function ChannelsPage() {
   return (
     <AppPage className="space-y-0 px-0 pb-0 pt-0">
       <TabPageTopBar
-        title="视频号"
-        subtitle="内容推荐与视频动态"
+        title={t(msg`视频号`)}
+        subtitle={t(msg`内容推荐与视频动态`)}
         titleAlign="center"
         className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
         leftActions={
@@ -1036,7 +1057,7 @@ export function ChannelsPage() {
             className="h-8 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] px-3.5 text-[12px] font-medium text-[color:var(--text-primary)] hover:bg-white"
             disabled={generateMutation.isPending}
           >
-            {generateMutation.isPending ? "生成中..." : "换一批"}
+            {generateMutation.isPending ? t(msg`生成中...`) : t(msg`换一批`)}
           </Button>
         }
       >
@@ -1084,7 +1105,7 @@ export function ChannelsPage() {
                     onClick={handleStatusBack}
                     className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
                   >
-                    {safeReturnPath ? "返回上一页" : "重试读取"}
+                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`重试读取`)}
                   </button>
                 </div>
               </div>
@@ -1095,9 +1116,9 @@ export function ChannelsPage() {
         ) : null}
         {errorMessage ? (
           <MobileChannelsStatusCard
-            badge="读取失败"
+            badge={t(msg`读取失败`)}
             description={errorMessage}
-            title="视频号暂时不可用"
+            title={t(msg`视频号暂时不可用`)}
             tone="danger"
             action={
               <div className="flex flex-wrap items-center justify-center gap-2">
@@ -1107,7 +1128,7 @@ export function ChannelsPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                   onClick={handleRetryLoad}
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </Button>
                 <Button
                   variant="secondary"
@@ -1115,7 +1136,7 @@ export function ChannelsPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                   onClick={handleStatusBack}
                 >
-                  {safeReturnPath ? "返回上一页" : "重试读取"}
+                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`重试读取`)}
                 </Button>
               </div>
             }
@@ -1123,18 +1144,20 @@ export function ChannelsPage() {
         ) : null}
         {channelsQuery.isLoading ? (
           <MobileChannelsStatusCard
-            badge="读取中"
-            title="正在刷新视频号内容"
-            description="稍等一下，正在同步推荐流和互动状态。"
+            badge={t(msg`读取中`)}
+            title={t(msg`正在刷新视频号内容`)}
+            description={t(msg`稍等一下，正在同步推荐流和互动状态。`)}
             tone="loading"
           />
         ) : null}
 
         {!channelsQuery.isLoading && !visiblePosts.length ? (
           <MobileChannelsStatusCard
-            badge="视频号"
-            title="还没有内容"
-            description="再生成一批内容后，这里会逐步形成更连续的视频推荐流。"
+            badge={t(msg`视频号`)}
+            title={t(msg`还没有内容`)}
+            description={t(
+              msg`再生成一批内容后，这里会逐步形成更连续的视频推荐流。`,
+            )}
             action={
               <Button
                 variant="primary"
@@ -1144,10 +1167,10 @@ export function ChannelsPage() {
                 onClick={handleEmptyStateAction}
               >
                 {safeReturnPath
-                  ? "返回上一页"
+                  ? t(msg`返回上一页`)
                   : generateMutation.isPending
-                    ? "生成中..."
-                    : "换一批"}
+                    ? t(msg`生成中...`)
+                    : t(msg`换一批`)}
               </Button>
             }
           />
@@ -1441,6 +1464,7 @@ function MobileChannelsCard({
   onToggleFollowAuthor,
   onToggleFavorite,
 }: MobileChannelsCardProps) {
+  const t = useRuntimeTranslator();
   return (
     <article
       ref={setCardRef}
@@ -1451,10 +1475,10 @@ function MobileChannelsCard({
         <div className="flex h-[64dvh] w-full items-center justify-center bg-black px-6 text-center">
           <div>
             <div className="text-[16px] font-semibold text-white">
-              视频功能正在开发中
+              {t(msg`视频功能正在开发中`)}
             </div>
             <div className="mt-2 text-[13px] leading-6 text-white/72">
-              敬请期待
+              {t(msg`敬请期待`)}
             </div>
           </div>
         </div>
@@ -1463,11 +1487,11 @@ function MobileChannelsCard({
 
         <div className="absolute left-3.5 top-3.5 flex items-center gap-1.5">
           <div className="rounded-full bg-[rgba(15,23,42,0.62)] px-2.5 py-1 text-[10px] font-medium tracking-[0.04em] text-white">
-            视频号推荐
+            {t(msg`视频号推荐`)}
           </div>
           {post.aiReacted ? (
             <div className="rounded-full bg-[rgba(7,193,96,0.9)] px-2.5 py-1 text-[10px] font-medium text-white">
-              AI 已互动
+              {t(msg`AI 已互动`)}
             </div>
           ) : null}
         </div>
@@ -1476,7 +1500,7 @@ function MobileChannelsCard({
           <div className="flex flex-col items-center gap-2.5">
             <ActionRailButton
               active={Boolean(post.ownerState?.hasLiked)}
-              label={likePending ? "处理中" : String(post.likeCount)}
+              label={likePending ? t(msg`处理中`) : String(post.likeCount)}
               onClick={onLike}
             >
               <ThumbsUp
@@ -1494,7 +1518,7 @@ function MobileChannelsCard({
             </ActionRailButton>
             <ActionRailButton
               active={favorite}
-              label={favorite ? "已收藏" : "收藏"}
+              label={favorite ? t(msg`已收藏`) : t(msg`收藏`)}
               onClick={onToggleFavorite}
             >
               {favorite ? (
@@ -1503,10 +1527,13 @@ function MobileChannelsCard({
                 <Bookmark size={17} />
               )}
             </ActionRailButton>
-            <ActionRailButton label="分享" onClick={onShare}>
+            <ActionRailButton label={t(msg`分享`)} onClick={onShare}>
               <Share2 size={17} />
             </ActionRailButton>
-            <ActionRailButton label="减少推荐" onClick={onNotInterested}>
+            <ActionRailButton
+              label={t(msg`减少推荐`)}
+              onClick={onNotInterested}
+            >
               <EyeOff size={17} />
             </ActionRailButton>
           </div>
@@ -1530,7 +1557,9 @@ function MobileChannelsCard({
                     {post.authorName}
                   </div>
                   <div className="mt-0.5 text-[9px] text-white/70">
-                    {formatTimestamp(post.createdAt)} · 视频号动态
+                    {t(
+                      msg`${formatTimestamp(post.createdAt)} · 视频号动态`,
+                    )}
                   </div>
                 </div>
               </button>
@@ -1544,7 +1573,9 @@ function MobileChannelsCard({
                     : "bg-[#07c160] text-white",
                 )}
               >
-                {post.ownerState?.isFollowingAuthor ? "已关注" : "+关注"}
+                {post.ownerState?.isFollowingAuthor
+                  ? t(msg`已关注`)
+                  : t(msg`+关注`)}
               </button>
             </div>
             {post.title ? (
@@ -1571,13 +1602,13 @@ function MobileChannelsCard({
               </div>
             ) : null}
             <div className="mt-2 text-[9px] text-white/65">
-              {formatChannelMeta(post)}
+              {formatChannelMeta(post, t)}
             </div>
             <div className="mt-2 rounded-[16px] bg-[rgba(255,255,255,0.12)] px-2.5 py-2 text-[10px] leading-4 text-white/86 backdrop-blur">
               {post.commentsPreview.length ? (
                 <>
                   <div className="mb-1 text-[9px] uppercase tracking-[0.03em] text-white/60">
-                    最近评论
+                    {t(msg`最近评论`)}
                   </div>
                   <div className="space-y-1">
                     {post.commentsPreview.slice(0, 2).map((comment) => (
@@ -1591,7 +1622,7 @@ function MobileChannelsCard({
                   </div>
                 </>
               ) : (
-                <span>还没有评论，先聊一句。</span>
+                <span>{t(msg`还没有评论，先聊一句。`)}</span>
               )}
             </div>
           </div>
@@ -1600,9 +1631,11 @@ function MobileChannelsCard({
 
       <div className="flex items-center justify-between gap-3 border-t border-[color:var(--border-subtle)] bg-white px-3.5 py-3">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-[color:var(--text-muted)]">
-          <span>{post.mediaType === "video" ? "短片" : "内容卡片"}</span>
-          <span>{post.likeCount} 赞</span>
-          <span>{post.commentCount} 评论</span>
+          <span>
+            {post.mediaType === "video" ? t(msg`短片`) : t(msg`内容卡片`)}
+          </span>
+          <span>{t(msg`${post.likeCount} 赞`)}</span>
+          <span>{t(msg`${post.commentCount} 评论`)}</span>
         </div>
         <Button
           variant="secondary"
@@ -1610,7 +1643,7 @@ function MobileChannelsCard({
           onClick={onOpenComments}
           className="h-8 rounded-full border-[color:var(--border-subtle)] bg-[#f8f8f8] px-3 text-[11px] text-[color:var(--text-primary)] shadow-none"
         >
-          打开评论
+          {t(msg`打开评论`)}
         </Button>
       </div>
     </article>
@@ -1689,6 +1722,7 @@ function MobileChannelCommentsSheet({
   onReply: (comment: FeedComment) => void;
   onSubmit: () => void;
 }) {
+  const t = useRuntimeTranslator();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const commentAuthorNameMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -1729,7 +1763,7 @@ function MobileChannelCommentsSheet({
       <button
         type="button"
         className="absolute inset-0"
-        aria-label="关闭评论面板"
+        aria-label={t(msg`关闭评论面板`)}
         onClick={onClose}
       />
       <div className="absolute inset-x-0 bottom-0 flex max-h-[80dvh] flex-col overflow-hidden rounded-t-[20px] border-t border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] pb-[calc(env(safe-area-inset-bottom,0px)+0.25rem)] pt-2 shadow-[0_-14px_28px_rgba(15,23,42,0.10)]">
@@ -1739,9 +1773,11 @@ function MobileChannelCommentsSheet({
         <div className="flex items-start justify-between gap-3 px-4 pb-3">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <div className="text-[14px] font-medium text-[#111827]">评论</div>
+              <div className="text-[14px] font-medium text-[#111827]">
+                {t(msg`评论`)}
+              </div>
               <div className="rounded-full bg-[rgba(7,193,96,0.1)] px-2 py-0.5 text-[10px] font-medium text-[#07c160]">
-                {post.commentCount} 条
+                {t(msg`${post.commentCount} 条`)}
               </div>
             </div>
             <div className="mt-1 line-clamp-2 text-[11px] leading-[1.35rem] text-[#6b7280]">
@@ -1780,7 +1816,7 @@ function MobileChannelCommentsSheet({
                     onClick={onClose}
                     className="rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[#6b7280]"
                   >
-                    返回视频号
+                    {t(msg`返回视频号`)}
                   </button>
                 </div>
               </div>
@@ -1788,12 +1824,12 @@ function MobileChannelCommentsSheet({
           ) : null}
           {isLoading && !comments.length ? (
             <div className="rounded-[16px] border border-[color:var(--border-subtle)] bg-white px-4 py-5 text-center text-[12px] text-[#6b7280]">
-              正在读取评论...
+              {t(msg`正在读取评论...`)}
             </div>
           ) : null}
           {!isLoading && !comments.length ? (
             <div className="rounded-[16px] border border-dashed border-[color:var(--border-subtle)] bg-white px-4 py-5 text-center text-[12px] leading-6 text-[#6b7280]">
-              还没有评论，先发第一句。
+              {t(msg`还没有评论，先发第一句。`)}
             </div>
           ) : null}
           {comments.length ? (
@@ -1826,7 +1862,7 @@ function MobileChannelCommentsSheet({
                         <div className="mt-1 text-[12px] leading-6 text-[#111827]">
                           {replyTargetName ? (
                             <span className="text-[#6b7280]">
-                              回复 {replyTargetName}
+                              {t(msg`回复 ${replyTargetName}`)}
                               {"："}
                             </span>
                           ) : null}
@@ -1838,7 +1874,7 @@ function MobileChannelCommentsSheet({
                             onClick={() => onReply(comment)}
                             className="transition active:text-[#111827]"
                           >
-                            回复
+                            {t(msg`回复`)}
                           </button>
                           <button
                             type="button"
@@ -1856,10 +1892,10 @@ function MobileChannelCommentsSheet({
                           >
                             <ThumbsUp size={12} />
                             {likePendingCommentId === comment.id
-                              ? "处理中"
+                              ? t(msg`处理中`)
                               : comment.likedByOwner
-                                ? `已赞 ${comment.likeCount}`
-                                : `赞 ${comment.likeCount}`}
+                                ? t(msg`已赞 ${comment.likeCount}`)
+                                : t(msg`赞 ${comment.likeCount}`)}
                           </button>
                         </div>
                       </div>
@@ -1874,13 +1910,15 @@ function MobileChannelCommentsSheet({
         <div className="border-t border-[color:var(--border-subtle)] bg-white px-4 pb-2 pt-3">
           {replyTarget ? (
             <div className="mb-2 flex items-center justify-between gap-3 rounded-[12px] bg-[rgba(7,193,96,0.08)] px-3 py-2 text-[11px] text-[#166534]">
-              <div className="truncate">正在回复 {replyTarget.authorName}</div>
+              <div className="truncate">
+                {t(msg`正在回复 ${replyTarget.authorName}`)}
+              </div>
               <button
                 type="button"
                 onClick={onCancelReply}
                 className="text-[#166534] transition active:opacity-70"
               >
-                取消
+                {t(msg`取消`)}
               </button>
             </div>
           ) : null}
@@ -1892,8 +1930,8 @@ function MobileChannelCommentsSheet({
               onChange={(event) => onDraftChange(event.target.value)}
               placeholder={
                 replyTarget
-                  ? `回复 ${replyTarget.authorName}...`
-                  : "说点什么..."
+                  ? t(msg`回复 ${replyTarget.authorName}...`)
+                  : t(msg`说点什么...`)
               }
               className="min-h-[72px] flex-1 rounded-[16px] border-[color:var(--border-subtle)] bg-[#f7f7f7] px-3 py-2 text-[13px] shadow-none focus:border-[rgba(7,193,96,0.2)] focus:bg-white"
             />
@@ -1904,7 +1942,7 @@ function MobileChannelCommentsSheet({
               onClick={onSubmit}
               className="mb-1 h-10 rounded-full bg-[#07c160] px-4 text-[12px] text-white shadow-none hover:bg-[#06ad56]"
             >
-              {submitPending ? "发送中..." : "发送"}
+              {submitPending ? t(msg`发送中...`) : t(msg`发送`)}
             </Button>
           </div>
         </div>
@@ -1913,11 +1951,15 @@ function MobileChannelCommentsSheet({
   );
 }
 
-function formatChannelMeta(post: FeedPostListItem) {
-  const pieces = [`${post.viewCount ?? 0} 播放`];
+function formatChannelMeta(
+  post: FeedPostListItem,
+  t: ReturnType<typeof useRuntimeTranslator>,
+) {
+  const pieces = [t(msg`${post.viewCount ?? 0} 播放`)];
 
   if (typeof post.durationMs === "number" && post.durationMs > 0) {
-    pieces.push(`${Math.max(1, Math.round(post.durationMs / 1000))} 秒`);
+    const seconds = Math.max(1, Math.round(post.durationMs / 1000));
+    pieces.push(t(msg`${seconds} 秒`));
   }
 
   if (post.topicTags?.length) {
