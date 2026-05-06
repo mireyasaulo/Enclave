@@ -108,7 +108,35 @@ export class WikiEditService {
         }))!.contentSnapshot
       : snapshotFromCharacter(character as unknown as Record<string, unknown>);
 
-    const submitted = pickWikiContent(input.contentSnapshot ?? {});
+    // Reject malformed bodies that would silently blank fields. Missing keys
+    // in the patch fall back to `before`; explicit empty values stay through
+    // (so users can clear e.g. avatar), but `name` must remain non-empty.
+    const rawPatch =
+      input.contentSnapshot && typeof input.contentSnapshot === 'object'
+        ? input.contentSnapshot
+        : null;
+    if (!rawPatch) {
+      throw new BadRequestException('contentSnapshot 必须为对象');
+    }
+    const presentKeys = WIKI_CONTENT_FIELDS.filter((field) => field in rawPatch);
+    if (presentKeys.length === 0) {
+      throw new BadRequestException(
+        'contentSnapshot 至少需提交一个内容字段（name/avatar/bio/personality/expertDomains/triggerScenes/relationship/relationshipType）',
+      );
+    }
+    const submittedPick = pickWikiContent(rawPatch);
+    const submitted: WikiContentSnapshot = {
+      ...before,
+      schemaVersion: submittedPick.schemaVersion,
+    };
+    for (const field of presentKeys) {
+      (submitted as Record<string, unknown>)[field] = (
+        submittedPick as Record<string, unknown>
+      )[field];
+    }
+    if (!submitted.name.trim()) {
+      throw new BadRequestException('name 不能为空');
+    }
     let after = submitted;
     let changed = diffFields(before, after);
     let changeSource = 'edit';
