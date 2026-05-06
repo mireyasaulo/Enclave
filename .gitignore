@@ -48,6 +48,9 @@ data/database.sqlite-journal
 data/database.sqlite-wal
 data/database.sqlite-shm
 data/chat-attachments/
+data/moments-media/
+data/self-agent-workspace/
+data/accounts/
 api/storage/chat-attachments/
 api/storage/ai-speech/
 runtime-data/app-web-nginx/
