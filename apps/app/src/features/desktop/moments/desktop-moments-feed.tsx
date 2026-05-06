@@ -10,14 +10,12 @@ type DesktopMomentsFeedProps = {
   likePendingMomentId: string | null;
   moments: Moment[];
   ownerId?: string | null;
-  selectedMomentId: string | null;
   isMomentFavorite: (momentId: string) => boolean;
   onCommentChange: (momentId: string, value: string) => void;
   onCommentSubmit: (momentId: string) => void;
   onLike: (momentId: string) => void;
   onToggleFavorite: (momentId: string) => void;
   onOpenCompose: () => void;
-  onOpenDetail: (momentId: string) => void;
   onSelectAuthor?: (input: {
     anchorElement: HTMLButtonElement;
     moment: Moment;
@@ -31,14 +29,12 @@ export function DesktopMomentsFeed({
   likePendingMomentId,
   moments,
   ownerId,
-  selectedMomentId,
   isMomentFavorite,
   onCommentChange,
   onCommentSubmit,
   onLike,
   onToggleFavorite,
   onOpenCompose,
-  onOpenDetail,
   onSelectAuthor,
 }: DesktopMomentsFeedProps) {
   return (
@@ -55,7 +51,6 @@ export function DesktopMomentsFeed({
           {moments.map((moment) => (
             <DesktopMomentRow
               key={moment.id}
-              active={moment.id === selectedMomentId}
               commentDraft={commentDrafts[moment.id] ?? ""}
               commentLoading={commentPendingMomentId === moment.id}
               likeLoading={likePendingMomentId === moment.id}
@@ -66,7 +61,6 @@ export function DesktopMomentsFeed({
               onCommentSubmit={() => onCommentSubmit(moment.id)}
               onLike={() => onLike(moment.id)}
               onToggleFavorite={() => onToggleFavorite(moment.id)}
-              onOpenDetail={() => onOpenDetail(moment.id)}
               onSelectAuthor={
                 moment.authorType === "character" && onSelectAuthor
                   ? (event) =>

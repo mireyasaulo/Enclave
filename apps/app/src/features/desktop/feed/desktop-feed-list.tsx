@@ -1,38 +1,57 @@
-import { type FeedPostListItem } from "@yinjie/contracts";
+import {
+  type FeedComment,
+  type FeedPostListItem,
+  type FeedPostWithComments,
+} from "@yinjie/contracts";
 import { Button, LoadingBlock } from "@yinjie/ui";
 import { EmptyState } from "../../../components/empty-state";
 import { DesktopFeedRow } from "./desktop-feed-row";
+import { type FeedCommentReplyTarget } from "./feed-types";
 
 type DesktopFeedListProps = {
   commentDrafts: Record<string, string>;
   commentPendingPostId: string | null;
+  commentReplyTarget?: FeedCommentReplyTarget | null;
+  detailErrorMessage?: string | null;
+  detailLoading: boolean;
+  detailPost?: FeedPostWithComments | null;
+  expandedPostId: string | null;
   isLoading: boolean;
   likePendingPostId: string | null;
   posts: FeedPostListItem[];
-  selectedPostId: string | null;
   isPostFavorite: (postId: string) => boolean;
+  onCancelCommentReply?: () => void;
+  onCollapse: () => void;
   onCommentChange: (postId: string, value: string) => void;
   onCommentSubmit: (postId: string) => void;
+  onExpand: (postId: string) => void;
   onLike: (postId: string) => void;
-  onToggleFavorite: (postId: string) => void;
   onOpenCompose: () => void;
-  onOpenDetail: (postId: string) => void;
+  onStartCommentReply?: (comment: FeedComment) => void;
+  onToggleFavorite: (postId: string) => void;
 };
 
 export function DesktopFeedList({
   commentDrafts,
   commentPendingPostId,
+  commentReplyTarget = null,
+  detailErrorMessage = null,
+  detailLoading,
+  detailPost = null,
+  expandedPostId,
   isLoading,
   likePendingPostId,
   posts,
-  selectedPostId,
   isPostFavorite,
+  onCancelCommentReply,
+  onCollapse,
   onCommentChange,
   onCommentSubmit,
+  onExpand,
   onLike,
-  onToggleFavorite,
   onOpenCompose,
-  onOpenDetail,
+  onStartCommentReply,
+  onToggleFavorite,
 }: DesktopFeedListProps) {
   return (
     <>
@@ -45,22 +64,36 @@ export function DesktopFeedList({
 
       {!isLoading && posts.length > 0 ? (
         <div className="space-y-4 pb-6">
-          {posts.map((post) => (
-            <DesktopFeedRow
-              key={post.id}
-              active={post.id === selectedPostId}
-              commentDraft={commentDrafts[post.id] ?? ""}
-              commentLoading={commentPendingPostId === post.id}
-              favorite={isPostFavorite(post.id)}
-              likeLoading={likePendingPostId === post.id}
-              post={post}
-              onCommentChange={(value) => onCommentChange(post.id, value)}
-              onCommentSubmit={() => onCommentSubmit(post.id)}
-              onLike={() => onLike(post.id)}
-              onOpenDetail={() => onOpenDetail(post.id)}
-              onToggleFavorite={() => onToggleFavorite(post.id)}
-            />
-          ))}
+          {posts.map((post) => {
+            const expanded = post.id === expandedPostId;
+            return (
+              <DesktopFeedRow
+                key={post.id}
+                commentDraft={commentDrafts[post.id] ?? ""}
+                commentLoading={commentPendingPostId === post.id}
+                commentReplyTarget={
+                  expanded ? commentReplyTarget : null
+                }
+                detailErrorMessage={expanded ? detailErrorMessage : null}
+                detailLoading={expanded ? detailLoading : false}
+                detailPost={
+                  expanded && detailPost?.id === post.id ? detailPost : null
+                }
+                expanded={expanded}
+                favorite={isPostFavorite(post.id)}
+                likeLoading={likePendingPostId === post.id}
+                post={post}
+                onCancelCommentReply={onCancelCommentReply}
+                onCollapse={onCollapse}
+                onCommentChange={(value) => onCommentChange(post.id, value)}
+                onCommentSubmit={() => onCommentSubmit(post.id)}
+                onExpand={() => onExpand(post.id)}
+                onLike={() => onLike(post.id)}
+                onStartCommentReply={onStartCommentReply}
+                onToggleFavorite={() => onToggleFavorite(post.id)}
+              />
+            );
+          })}
         </div>
       ) : null}
 

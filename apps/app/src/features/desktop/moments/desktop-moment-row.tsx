@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type MouseEvent as ReactMouseEvent,
-} from "react";
+import { type MouseEvent as ReactMouseEvent } from "react";
 import { type Moment } from "@yinjie/contracts";
 import { Button, cn } from "@yinjie/ui";
 import {
@@ -20,8 +15,8 @@ import { MomentMediaGallery } from "../../../components/moment-media-gallery";
 import { formatTimestamp } from "../../../lib/format";
 
 type DesktopMomentRowProps = {
-  active: boolean;
   authorActionAriaLabel?: string;
+  authorActionLabel?: string;
   commentDraft: string;
   commentLoading: boolean;
   likeLoading: boolean;
@@ -32,13 +27,13 @@ type DesktopMomentRowProps = {
   onCommentSubmit: () => void;
   onLike: () => void;
   onToggleFavorite: () => void;
-  onOpenDetail: () => void;
+  onAuthorAction?: () => void;
   onSelectAuthor?: (event: ReactMouseEvent<HTMLButtonElement>) => void;
 };
 
 export function DesktopMomentRow({
-  active,
   authorActionAriaLabel,
+  authorActionLabel,
   commentDraft,
   commentLoading,
   likeLoading,
@@ -49,65 +44,27 @@ export function DesktopMomentRow({
   onCommentSubmit,
   onLike,
   onToggleFavorite,
-  onOpenDetail,
+  onAuthorAction,
   onSelectAuthor,
 }: DesktopMomentRowProps) {
-  const [showComposer, setShowComposer] = useState(false);
-  const composerInputRef = useRef<HTMLTextAreaElement | null>(null);
-  const commentsPreview = moment.comments.slice(-2);
   const likedByOwner = Boolean(
     ownerId && moment.likes.some((like) => like.authorId === ownerId),
   );
   const hasText = Boolean(moment.text.trim());
-
-  useEffect(() => {
-    if (commentDraft.trim()) {
-      setShowComposer(true);
-    }
-  }, [commentDraft]);
-
-  useEffect(() => {
-    if (!commentLoading && !commentDraft.trim()) {
-      setShowComposer(false);
-    }
-  }, [commentDraft, commentLoading]);
-
-  useEffect(() => {
-    if (!showComposer) {
-      return;
-    }
-
-    const frame = window.requestAnimationFrame(() => {
-      composerInputRef.current?.focus();
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, [showComposer]);
-
-  const activeRowClassName =
-    "border-[rgba(7,193,96,0.12)] bg-white shadow-[inset_3px_0_0_0_var(--brand-primary),0_10px_24px_rgba(15,23,42,0.05)]";
+  const canSelectAuthor = Boolean(onSelectAuthor);
   const activeActionClassName =
     "border-[rgba(7,193,96,0.12)] bg-white text-[color:var(--text-primary)] shadow-[inset_0_-2px_0_0_var(--brand-primary)]";
-  const canSelectAuthor = Boolean(onSelectAuthor);
 
   return (
     <article
       id={`desktop-moment-post-${moment.id}`}
-      onClick={onOpenDetail}
-      className={cn(
-        "cursor-pointer rounded-[16px] border px-4 py-4 transition-[border-color,background-color,box-shadow] duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
-        active
-          ? activeRowClassName
-          : "border-[color:var(--border-faint)] bg-white hover:bg-[color:var(--surface-console)] hover:shadow-[var(--shadow-section)]",
-      )}
+      className="rounded-[16px] border border-[color:var(--border-faint)] bg-white px-4 py-4 shadow-[var(--shadow-section)]"
     >
       <div className="flex items-start gap-3">
         {canSelectAuthor ? (
           <button
             type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              onSelectAuthor?.(event);
-            }}
+            onClick={(event) => onSelectAuthor?.(event)}
             className="shrink-0 rounded-[18px]"
             aria-label={
               authorActionAriaLabel ?? `查看 ${moment.authorName} 的朋友圈`
@@ -133,10 +90,7 @@ export function DesktopMomentRow({
               {canSelectAuthor ? (
                 <button
                   type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onSelectAuthor?.(event);
-                  }}
+                  onClick={(event) => onSelectAuthor?.(event)}
                   className="truncate text-left text-[15px] font-semibold text-[color:var(--text-primary)]"
                 >
                   {moment.authorName}
@@ -184,7 +138,6 @@ export function DesktopMomentRow({
               <MomentMediaGallery
                 contentType={moment.contentType}
                 media={moment.media}
-                stopPropagation
               />
             </div>
           ) : null}
@@ -199,10 +152,7 @@ export function DesktopMomentRow({
               <button
                 type="button"
                 disabled={likeLoading}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onLike();
-                }}
+                onClick={onLike}
                 className={cn(
                   "inline-flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-[12px] transition-[background-color,border-color,color] disabled:opacity-55",
                   likedByOwner
@@ -218,21 +168,7 @@ export function DesktopMomentRow({
               </button>
               <button
                 type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setShowComposer((current) => !current);
-                }}
-                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[color:var(--border-faint)] px-2.5 text-[12px] text-[color:var(--text-secondary)] transition-[background-color,color] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
-              >
-                <MessageCircle size={14} />
-                评论
-              </button>
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onToggleFavorite();
-                }}
+                onClick={onToggleFavorite}
                 className={cn(
                   "inline-flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-[12px] transition-[background-color,border-color,color]",
                   favorite
@@ -243,77 +179,74 @@ export function DesktopMomentRow({
                 <Star size={14} className={favorite ? "fill-current" : ""} />
                 {favorite ? "已收藏" : "收藏"}
               </button>
+              {onAuthorAction ? (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={onAuthorAction}
+                  className="border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
+                >
+                  {authorActionLabel ?? "打开 TA 的朋友圈"}
+                </Button>
+              ) : null}
             </div>
           </div>
 
-          {moment.likes.length > 0 || commentsPreview.length > 0 ? (
-            <div
-              className="mt-3 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3"
-              onClick={(event) => {
-                event.stopPropagation();
-                onOpenDetail();
-              }}
-            >
-              {moment.likes.length > 0 ? (
-                <div className="text-[12px] leading-6 text-[color:var(--text-secondary)]">
-                  <span className="font-medium text-[color:var(--text-primary)]">
-                    点赞
-                  </span>
-                  <span className="mx-2 text-[color:var(--text-dim)]">/</span>
-                  <span>
-                    {moment.likes.map((like) => like.authorName).join("、")}
-                  </span>
-                </div>
-              ) : null}
-              {commentsPreview.length > 0 ? (
-                <div
-                  className={cn(
-                    "space-y-2 text-[13px] leading-6 text-[color:var(--text-secondary)]",
-                    moment.likes.length > 0
-                      ? "mt-3 border-t border-[color:var(--border-faint)] pt-3"
-                      : "",
-                  )}
-                >
-                  {commentsPreview.map((comment) => (
-                    <div key={comment.id}>
-                      <span className="font-medium text-[color:var(--text-primary)]">
-                        {comment.authorName}
-                      </span>
-                      <span className="text-[color:var(--text-dim)]">：</span>
-                      <span>{comment.text}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-              {moment.comments.length > commentsPreview.length ? (
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onOpenDetail();
-                  }}
-                  className="mt-3 text-[12px] font-medium text-[color:var(--brand-primary)]"
-                >
-                  查看全部 {moment.commentCount} 条评论
-                </button>
-              ) : null}
+          {moment.likes.length > 0 ? (
+            <div className="mt-3 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] leading-6 text-[color:var(--text-secondary)]">
+                <Heart
+                  size={12}
+                  className="text-[color:var(--brand-primary)]"
+                />
+                <span>
+                  {moment.likes.map((like) => like.authorName).join("、")}
+                </span>
+              </div>
             </div>
           ) : null}
 
-          {showComposer ? (
-            <div className="mt-3" onClick={(event) => event.stopPropagation()}>
+          <div className="mt-3 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-[12px] font-medium text-[color:var(--text-primary)]">
+                <MessageCircle size={13} />
+                评论
+              </div>
+              <span className="text-[11px] text-[color:var(--text-muted)]">
+                {moment.commentCount} 条
+              </span>
+            </div>
+
+            {moment.comments.length > 0 ? (
+              <div className="mt-3 space-y-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
+                {moment.comments.map((comment) => (
+                  <div key={comment.id}>
+                    <span className="font-medium text-[color:var(--text-primary)]">
+                      {comment.authorName}
+                    </span>
+                    <span className="text-[color:var(--text-dim)]">：</span>
+                    <span>{comment.text}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-3 text-[12px] text-[color:var(--text-muted)]">
+                还没有评论，你可以成为第一个回应的人。
+              </div>
+            )}
+
+            <div className="mt-3 border-t border-[color:var(--border-faint)] pt-3">
               <MomentCommentComposer
-                inputRef={composerInputRef}
                 value={commentDraft}
                 onChange={onCommentChange}
                 onSubmit={onCommentSubmit}
                 pending={commentLoading}
                 placeholder="写评论..."
-                inputClassName="rounded-xl border-[color:var(--border-faint)] bg-white px-4 py-2 text-[13px] shadow-none hover:bg-[color:var(--surface-console)] focus:border-[rgba(7,193,96,0.14)] focus:shadow-none"
+                inputClassName="rounded-xl border-[color:var(--border-faint)] bg-white px-4 py-2 text-[13px] shadow-none hover:bg-white focus:border-[rgba(7,193,96,0.14)] focus:shadow-none"
                 buttonClassName="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
               />
             </div>
-          ) : null}
+          </div>
         </div>
       </div>
     </article>

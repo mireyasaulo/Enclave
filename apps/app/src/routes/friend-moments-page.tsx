@@ -489,7 +489,7 @@ export function FriendMomentsPage() {
         ownerAvatar={ownerAvatar}
         ownerId={ownerId}
         ownerUsername={ownerUsername}
-        routeSelectedMomentId={routeSelectedMomentId}
+        scrollToMomentId={routeSelectedMomentId}
         showCompose={showCompose}
         signature={signature}
         successNotice={notice}
@@ -532,26 +532,6 @@ export function FriendMomentsPage() {
               characterId,
               showWorldCharacters: !friendItem,
             }),
-          });
-        }}
-        onRouteStateChange={(state) => {
-          const nextHash = buildDesktopFriendMomentsRouteHash({
-            ...state,
-            source: routeState.source,
-            returnPath: routeState.returnPath,
-            returnHash: routeState.returnHash,
-          });
-          const normalizedHash = hash.startsWith("#") ? hash.slice(1) : hash;
-
-          if (normalizedHash === (nextHash ?? "")) {
-            return;
-          }
-
-          void navigate({
-            to: "/desktop/friend-moments/$characterId",
-            params: { characterId },
-            hash: nextHash,
-            replace: true,
           });
         }}
         onTextChange={composeDraft.setText}

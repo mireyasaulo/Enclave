@@ -1,17 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { type Moment } from "@yinjie/contracts";
-import { parseTimestamp } from "../../../lib/format";
-import { type DesktopMomentsRouteState } from "./desktop-moments-route-state";
 import { DesktopMomentComposePanel } from "./desktop-moment-compose-panel";
 import { DesktopMomentsFeed } from "./desktop-moments-feed";
 import {
   type MomentImageDraft,
   type MomentVideoDraft,
 } from "../../moments/moment-compose-media";
-import {
-  DesktopMomentsSidebar,
-  type DesktopMomentAuthorSummary,
-} from "./desktop-moments-sidebar";
 import { DesktopMomentsToolbar } from "./desktop-moments-toolbar";
 
 type DesktopMomentsWorkspaceProps = {
@@ -29,7 +23,7 @@ type DesktopMomentsWorkspaceProps = {
   ownerAvatar?: string | null;
   ownerId?: string | null;
   ownerUsername?: string | null;
-  routeSelectedMomentId?: string | null;
+  scrollToMomentId?: string | null;
   showCompose: boolean;
   successNotice?: string;
   text: string;
@@ -41,10 +35,6 @@ type DesktopMomentsWorkspaceProps = {
   onCreate: () => void;
   onImageFilesSelected: (files: FileList | null) => void;
   onLike: (momentId: string) => void;
-  onOpenAuthorMoments?: (input: {
-    authorId: string;
-    momentId?: string;
-  }) => void;
   onOpenAuthorPopover?: (input: {
     anchorElement: HTMLButtonElement;
     moment: Moment;
@@ -53,7 +43,6 @@ type DesktopMomentsWorkspaceProps = {
   onRemoveVideo: () => void;
   onToggleFavorite: (momentId: string) => void;
   onRefresh: () => void;
-  onRouteStateChange?: (state: DesktopMomentsRouteState) => void;
   onTextChange: (value: string) => void;
   onVideoFileSelected: (file: File | null) => void;
 };
@@ -73,7 +62,7 @@ export function DesktopMomentsWorkspace({
   ownerAvatar,
   ownerId,
   ownerUsername,
-  routeSelectedMomentId = null,
+  scrollToMomentId = null,
   showCompose,
   successNotice,
   text,
@@ -85,97 +74,37 @@ export function DesktopMomentsWorkspace({
   onCreate,
   onImageFilesSelected,
   onLike,
-  onOpenAuthorMoments,
   onOpenAuthorPopover,
   onRemoveImage,
   onRemoveVideo,
   onToggleFavorite,
   onRefresh,
-  onRouteStateChange,
   onTextChange,
   onVideoFileSelected,
 }: DesktopMomentsWorkspaceProps) {
-  const [selectedMomentId, setSelectedMomentId] = useState<string | null>(
-    routeSelectedMomentId,
-  );
   const scrollViewportRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setSelectedMomentId((current) =>
-      current === routeSelectedMomentId ? current : routeSelectedMomentId,
-    );
-  }, [routeSelectedMomentId]);
-
-  const authorSummaries = useMemo(() => {
-    const map = new Map<string, Omit<DesktopMomentAuthorSummary, "authorId">>();
-
-    moments.forEach((moment) => {
-      const current = map.get(moment.authorId);
-      if (current) {
-        current.count += 1;
-        if (current.latestPostedAt < moment.postedAt) {
-          current.latestPostedAt = moment.postedAt;
-        }
-        return;
-      }
-
-      map.set(moment.authorId, {
-        authorAvatar: moment.authorAvatar,
-        authorName: moment.authorName,
-        authorType: moment.authorType,
-        count: 1,
-        latestPostedAt: moment.postedAt,
-      });
-    });
-
-    return Array.from(map.entries())
-      .map(([authorId, summary]) => ({
-        authorId,
-        ...summary,
-      }))
-      .sort(
-        (left, right) =>
-          (parseTimestamp(right.latestPostedAt) ?? 0) -
-          (parseTimestamp(left.latestPostedAt) ?? 0),
-      );
-  }, [moments]);
-
-  useEffect(() => {
-    if (
-      selectedMomentId &&
-      !moments.some((moment) => moment.id === selectedMomentId)
-    ) {
-      setSelectedMomentId(null);
-    }
-  }, [moments, selectedMomentId]);
-
-  const selectedMoment = useMemo(
-    () => moments.find((moment) => moment.id === selectedMomentId) ?? null,
-    [moments, selectedMomentId],
-  );
-  const sidebarMode = selectedMoment ? "detail" : "summary";
-
-  useEffect(() => {
-    onRouteStateChange?.({
-      momentId: selectedMomentId ?? undefined,
-    });
-  }, [onRouteStateChange, selectedMomentId]);
-
-  function focusAuthor(authorId: string, momentId?: string) {
-    if (onOpenAuthorMoments) {
-      onOpenAuthorMoments({
-        authorId,
-        momentId,
-      });
+    if (!scrollToMomentId || typeof document === "undefined") {
       return;
     }
 
-    setSelectedMomentId(momentId ?? null);
-  }
+    const target = moments.find((moment) => moment.id === scrollToMomentId);
+    if (!target) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      document
+        .getElementById(`desktop-moment-post-${scrollToMomentId}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [moments, scrollToMomentId]);
 
   return (
     <div className="relative flex h-full min-h-0 bg-[rgba(244,247,246,0.98)]">
-      <section className="min-w-0 flex-1 border-r border-[color:var(--border-faint)] bg-[rgba(245,248,247,0.96)]">
+      <section className="min-w-0 flex-1 bg-[rgba(245,248,247,0.96)]">
         <div className="flex h-full min-h-0 flex-col">
           <DesktopMomentsToolbar
             commentErrorMessage={commentErrorMessage}
@@ -205,42 +134,18 @@ export function DesktopMomentsWorkspace({
                 likePendingMomentId={likePendingMomentId}
                 moments={moments}
                 ownerId={ownerId}
-                selectedMomentId={selectedMomentId}
                 isMomentFavorite={isMomentFavorite}
                 onCommentChange={onCommentChange}
                 onCommentSubmit={onCommentSubmit}
                 onLike={onLike}
                 onToggleFavorite={onToggleFavorite}
                 onOpenCompose={() => setShowCompose(true)}
-                onOpenDetail={(momentId) => setSelectedMomentId(momentId)}
                 onSelectAuthor={onOpenAuthorPopover}
               />
             </div>
           </div>
         </div>
       </section>
-
-      <DesktopMomentsSidebar
-        authorSummaries={authorSummaries}
-        commentDrafts={commentDrafts}
-        commentPendingMomentId={commentPendingMomentId}
-        likePendingMomentId={likePendingMomentId}
-        mode={sidebarMode}
-        moments={moments}
-        ownerAvatar={ownerAvatar}
-        ownerId={ownerId}
-        ownerUsername={ownerUsername}
-        selectedMoment={selectedMoment}
-        isMomentFavorite={isMomentFavorite}
-        onCloseDetail={() => setSelectedMomentId(null)}
-        onCommentChange={onCommentChange}
-        onCommentSubmit={onCommentSubmit}
-        onLike={onLike}
-        onToggleFavorite={onToggleFavorite}
-        onOpenCompose={() => setShowCompose(true)}
-        onOpenAuthorProfilePopover={onOpenAuthorPopover}
-        onSelectAuthor={focusAuthor}
-      />
 
       {showCompose ? (
         <DesktopMomentComposePanel
