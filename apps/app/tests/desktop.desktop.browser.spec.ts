@@ -200,6 +200,16 @@ test("desktop moments support replying to a specific comment", async ({
     desktopCard.getByText("这是一条针对评论的回复"),
   ).toBeVisible();
   await expect(desktopCard.getByText(/^正在回复 /)).toBeHidden();
+
+  // 关键：新评论必须以 "X 回复 Y：内容" 的形式渲染，不能是裸的 "X：内容"
+  const replyComment = desktopCard
+    .getByRole("button", { name: /这是一条针对评论的回复$/ })
+    .first();
+  const replyText = (await replyComment.innerText()).replace(/\s+/g, "");
+  expect(replyText).toMatch(/回复.+：这是一条针对评论的回复/);
+
+  // 原始评论也仍然在
+  await expect(desktopCard.getByText("被回复的原始评论")).toBeVisible();
 });
 
 async function createSmokeMoment(text: string) {
