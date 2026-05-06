@@ -4,6 +4,7 @@ import {
   ArrayNotEmpty,
   ArrayUnique,
   IsBoolean,
+  IsEmail,
   IsISO8601,
   IsIn,
   IsInt,
@@ -196,6 +197,42 @@ export class RedeemInviteDto {
   @MinLength(1, { message: "code 不能为空。" })
   @MaxLength(32, { message: "code 不能超过 32 个字符。" })
   code: string;
+}
+
+export class SendEmailCodeDto {
+  @Transform(({ value }) =>
+    typeof value === "string" ? value.trim().toLowerCase() : value,
+  )
+  @IsEmail({}, { message: "email 格式不正确。" })
+  @MaxLength(254, { message: "email 不能超过 254 个字符。" })
+  email: string;
+}
+
+export class VerifyEmailCodeDto {
+  @Transform(({ value }) =>
+    typeof value === "string" ? value.trim().toLowerCase() : value,
+  )
+  @IsEmail({}, { message: "email 格式不正确。" })
+  @MaxLength(254, { message: "email 不能超过 254 个字符。" })
+  email: string;
+
+  @Transform(trimString)
+  @Matches(CODE_PATTERN, { message: "code 格式不正确。" })
+  code: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString({ message: "inviteCode 必须是字符串。" })
+  @MinLength(1, { message: "inviteCode 不能为空。" })
+  @MaxLength(32, { message: "inviteCode 不能超过 32 个字符。" })
+  inviteCode?: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString({ message: "deviceFingerprint 必须是字符串。" })
+  @MinLength(1, { message: "deviceFingerprint 不能为空。" })
+  @MaxLength(128, { message: "deviceFingerprint 不能超过 128 个字符。" })
+  deviceFingerprint?: string;
 }
 
 export class CheckoutDto {

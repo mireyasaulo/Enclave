@@ -6,6 +6,7 @@ import { CloudInstanceEntity } from "../entities/cloud-instance.entity";
 import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { CloudWorldRequestEntity } from "../entities/cloud-world-request.entity";
 import { CloudWorldEntity } from "../entities/cloud-world.entity";
+import { EmailVerificationSessionEntity } from "../entities/email-verification-session.entity";
 import { InviteCodeEntity } from "../entities/invite-code.entity";
 import { InviteRedemptionEntity } from "../entities/invite-redemption.entity";
 import { PhoneVerificationSessionEntity } from "../entities/phone-verification-session.entity";
@@ -31,6 +32,7 @@ import { CreateCloudUserAndSubscriptionTables1776651000000 } from "./migrations/
 import { CreateInviteAndConfigTables1776651600000 } from "./migrations/1776651600000-create-invite-and-config-tables";
 import { SeedDefaultSubscriptionPlansAndConfigs1776652200000 } from "./migrations/1776652200000-seed-default-subscription-plans-and-configs";
 import { CreateRevenueSharingTables1776652800000 } from "./migrations/1776652800000-create-revenue-sharing-tables";
+import { AddEmailAuth1776653400000 } from "./migrations/1776653400000-add-email-auth";
 import { resolveCloudDatabasePath } from "../config/cloud-runtime-config";
 
 type ConfigReader = {
@@ -40,6 +42,7 @@ type ConfigReader = {
 export const cloudEntities = [
   CloudAdminSessionEntity,
   PhoneVerificationSessionEntity,
+  EmailVerificationSessionEntity,
   CloudWorldEntity,
   CloudWorldRequestEntity,
   CloudInstanceEntity,
@@ -72,6 +75,7 @@ export const cloudMigrations = [
   CreateInviteAndConfigTables1776651600000,
   SeedDefaultSubscriptionPlansAndConfigs1776652200000,
   CreateRevenueSharingTables1776652800000,
+  AddEmailAuth1776653400000,
 ];
 
 export function buildCloudDataSourceOptions(config: ConfigReader): DataSourceOptions {

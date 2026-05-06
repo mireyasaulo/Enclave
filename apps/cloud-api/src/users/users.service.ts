@@ -8,6 +8,7 @@ import type {
   SubscriptionStatus,
 } from "@yinjie/contracts";
 import { Between, Brackets, In, Repository } from "typeorm";
+import { EmailAuthService } from "../auth/email-auth.service";
 import { PhoneAuthService } from "../auth/phone-auth.service";
 import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { CloudWorldEntity } from "../entities/cloud-world.entity";
@@ -41,6 +42,7 @@ export class UsersService implements OnModuleInit {
     private readonly subscription: SubscriptionService,
     private readonly invite: InviteService,
     private readonly phoneAuth: PhoneAuthService,
+    private readonly emailAuth: EmailAuthService,
   ) {}
 
   onModuleInit() {
@@ -54,6 +56,20 @@ export class UsersService implements OnModuleInit {
       } catch (error) {
         this.logger.warn(
           `ensureUser hook failed for phone=${phone}: ${(error as Error).message}`,
+        );
+      }
+    });
+
+    this.emailAuth.registerPostVerifyHook(async (email, extras) => {
+      try {
+        await this.ensureUserByEmail(email, {
+          inviteCode: extras.inviteCode ?? null,
+          ip: extras.ip ?? null,
+          deviceFingerprint: extras.deviceFingerprint ?? null,
+        });
+      } catch (error) {
+        this.logger.warn(
+          `ensureUserByEmail hook failed for email=${email}: ${(error as Error).message}`,
         );
       }
     });
@@ -110,7 +126,79 @@ export class UsersService implements OnModuleInit {
             code: inviteCode,
             inviteeUserId: user.id,
             context: {
-              inviteePhone: user.phone,
+              inviteePhone: user.phone ?? "",
+              inviteeIp: context.ip ?? null,
+              inviteeDeviceFingerprint: context.deviceFingerprint ?? null,
+            },
+          });
+        }
+      } catch (error) {
+        this.logger.warn(
+          `Invite redemption failed for user=${user.id}: ${(error as Error).message}`,
+        );
+      }
+    }
+
+    return user;
+  }
+
+  async ensureUserByEmail(email: string, context: EnsureUserContext = {}) {
+    const now = new Date();
+    let user = await this.userRepo.findOne({ where: { email } });
+    let isNewUser = false;
+
+    if (!user) {
+      isNewUser = true;
+      user = this.userRepo.create({
+        phone: null,
+        email,
+        emailVerifiedAt: now,
+        firstLoginAt: now,
+        lastLoginAt: now,
+        registrationIp: context.ip ?? null,
+        registrationDeviceFingerprint: context.deviceFingerprint ?? null,
+      });
+      user = await this.userRepo.save(user);
+    } else {
+      user.lastLoginAt = now;
+      if (!user.emailVerifiedAt) user.emailVerifiedAt = now;
+      if (!user.registrationIp && context.ip) user.registrationIp = context.ip;
+      if (!user.registrationDeviceFingerprint && context.deviceFingerprint) {
+        user.registrationDeviceFingerprint = context.deviceFingerprint;
+      }
+      user = await this.userRepo.save(user);
+    }
+
+    const code = await this.invite.ensureCodeForUser(user.id);
+    if (!user.inviteCodeId || user.inviteCodeId !== code.id) {
+      user.inviteCodeId = code.id;
+      user = await this.userRepo.save(user);
+    }
+
+    if (isNewUser) {
+      try {
+        await this.subscription.grantTrialIfNeeded(user.id, "email-auth:trial");
+      } catch (error) {
+        this.logger.warn(
+          `Trial grant failed for user=${user.id}: ${(error as Error).message}`,
+        );
+      }
+    }
+
+    if (isNewUser && context.inviteCode) {
+      try {
+        const inviteCode = await this.invite.findCodeByCodeString(
+          context.inviteCode,
+        );
+        if (inviteCode && inviteCode.ownerUserId !== user.id) {
+          user.invitedByCodeId = inviteCode.id;
+          await this.userRepo.save(user);
+          await this.invite.assessAndRecordRedemption({
+            inviterUserId: inviteCode.ownerUserId,
+            code: inviteCode,
+            inviteeUserId: user.id,
+            context: {
+              inviteePhone: user.phone ?? "",
               inviteeIp: context.ip ?? null,
               inviteeDeviceFingerprint: context.deviceFingerprint ?? null,
             },
@@ -219,7 +307,9 @@ export class UsersService implements OnModuleInit {
       this.redemptionRepo.findOne({
         where: { inviteeUserId: user.id },
       }),
-      this.worldRepo.findOne({ where: { phone: user.phone } }),
+      user.phone
+        ? this.worldRepo.findOne({ where: { phone: user.phone } })
+        : Promise.resolve(null),
     ]);
 
     const redemptionAsInvitee = redemptionAsInviteeRaw
@@ -263,7 +353,9 @@ export class UsersService implements OnModuleInit {
       user.invitedByCodeId
         ? this.resolveInviterPhoneByCodeId(user.invitedByCodeId)
         : Promise.resolve(null),
-      this.worldRepo.findOne({ where: { phone: user.phone } }),
+      user.phone
+        ? this.worldRepo.findOne({ where: { phone: user.phone } })
+        : Promise.resolve(null),
     ]);
 
     let subscriptionStatus: SubscriptionStatus = "none";
@@ -272,7 +364,7 @@ export class UsersService implements OnModuleInit {
 
     return {
       id: user.id,
-      phone: user.phone,
+      phone: user.phone ?? "",
       displayName: user.displayName,
       status: user.status as CloudUserStatus,
       subscriptionStatus,
