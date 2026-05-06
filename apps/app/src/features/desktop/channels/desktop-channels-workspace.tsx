@@ -154,6 +154,7 @@ export function DesktopChannelsWorkspace({
     }
 
     let cancelled = false;
+    let pendingTimer: ReturnType<typeof setTimeout> | null = null;
 
     const syncLiveCompanionState = async () => {
       const store = await hydrateLiveCompanionFromNative();
@@ -165,14 +166,24 @@ export function DesktopChannelsWorkspace({
       setLiveHistory(store.history);
     };
 
+    const scheduleSync = () => {
+      if (pendingTimer !== null) {
+        return;
+      }
+      pendingTimer = setTimeout(() => {
+        pendingTimer = null;
+        void syncLiveCompanionState();
+      }, 100);
+    };
+
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        void syncLiveCompanionState();
+        scheduleSync();
       }
     };
 
     const handleFocus = () => {
-      void syncLiveCompanionState();
+      scheduleSync();
     };
 
     void syncLiveCompanionState();
@@ -183,6 +194,9 @@ export function DesktopChannelsWorkspace({
 
     return () => {
       cancelled = true;
+      if (pendingTimer !== null) {
+        clearTimeout(pendingTimer);
+      }
       window.removeEventListener("focus", handleFocus);
       window.removeEventListener("storage", handleFocus);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
