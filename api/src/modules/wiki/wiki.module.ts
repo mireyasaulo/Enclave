@@ -5,6 +5,8 @@ import { CharacterEntity } from '../characters/character.entity';
 import { CharactersModule } from '../characters/characters.module';
 import { UserEntity } from '../auth/user.entity';
 import { ModerationReportEntity } from '../moderation/moderation-report.entity';
+import { AbuseFilterEntity } from './entities/abuse-filter.entity';
+import { AbuseFilterHitEntity } from './entities/abuse-filter-hit.entity';
 import { CharacterPageEntity } from './entities/character-page.entity';
 import { CharacterRevisionEntity } from './entities/character-revision.entity';
 import { EditSubmissionEntity } from './entities/edit-submission.entity';
@@ -16,6 +18,8 @@ import { WikiTalkPostEntity } from './entities/wiki-talk-post.entity';
 import { WikiWatchlistEntity } from './entities/wiki-watchlist.entity';
 import { WikiRateLimitGuard } from './guards/wiki-rate-limit.guard';
 import { WikiRoleGuard } from './guards/wiki-role.guard';
+import { AbuseFilterService } from './services/abuse-filter.service';
+import { AbuseFilterController } from './controllers/abuse-filter.controller';
 import { WikiPageService } from './services/wiki-page.service';
 import { WikiEditService } from './services/wiki-edit.service';
 import { WikiReviewService } from './services/wiki-review.service';
@@ -53,6 +57,8 @@ import { WikiReportController } from './controllers/wiki-report.controller';
       WikiTalkPostEntity,
       WikiWatchlistEntity,
       ModerationReportEntity,
+      AbuseFilterEntity,
+      AbuseFilterHitEntity,
     ]),
   ],
   controllers: [
@@ -66,6 +72,7 @@ import { WikiReportController } from './controllers/wiki-report.controller';
     WikiWatchlistController,
     WikiSoftDeleteController,
     WikiReportController,
+    AbuseFilterController,
   ],
   providers: [
     WikiPageService,
@@ -77,6 +84,7 @@ import { WikiReportController } from './controllers/wiki-report.controller';
     WikiTalkService,
     WikiWatchlistService,
     WikiReportService,
+    AbuseFilterService,
     WikiRoleGuard,
     WikiRateLimitGuard,
   ],
@@ -90,6 +98,7 @@ import { WikiReportController } from './controllers/wiki-report.controller';
     WikiTalkService,
     WikiWatchlistService,
     WikiReportService,
+    AbuseFilterService,
   ],
 })
 export class WikiModule {}

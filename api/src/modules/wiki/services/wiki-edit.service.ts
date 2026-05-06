@@ -19,6 +19,7 @@ import {
 import { EditSubmissionEntity } from '../entities/edit-submission.entity';
 import { UserWikiProfileEntity } from '../entities/user-wiki-profile.entity';
 import { rankOf } from '../guards/wiki-role.guard';
+import { AbuseFilterService } from './abuse-filter.service';
 import { WikiBlockService } from './wiki-block.service';
 import { WikiPageService } from './wiki-page.service';
 import { WikiRoleService } from './wiki-role.service';
@@ -53,6 +54,7 @@ export type SubmitEditResult = {
   status: string;
   isPatrolled: boolean;
   appliedToCharacter: boolean;
+  warnings?: string[];
 };
 
 @Injectable()
@@ -74,6 +76,7 @@ export class WikiEditService {
     private readonly blocks: WikiBlockService,
     private readonly roles: WikiRoleService,
     private readonly blueprints: CharacterBlueprintService,
+    private readonly filters: AbuseFilterService,
   ) {}
 
   async submit(
@@ -146,7 +149,18 @@ export class WikiEditService {
       summary: input.editSummary,
     });
 
-    const autoApprove = rankOf(user.role) >= rankOf('autoconfirmed');
+    const abuse = await this.filters.check({
+      user,
+      characterId,
+      contentSnapshot: after,
+      beforeContent: before,
+      operation: 'edit',
+    });
+
+    let autoApprove = rankOf(user.role) >= rankOf('autoconfirmed');
+    if (abuse.action === 'tag_high_risk') {
+      autoApprove = false;
+    }
     const lastVersion = await this.revisionRepo
       .createQueryBuilder('r')
       .where('r.characterId = :id', { id: characterId })
@@ -155,20 +169,26 @@ export class WikiEditService {
     const nextVersion = (lastVersion?.max ?? 0) + 1;
 
     const result = await this.dataSource.transaction(async (manager) => {
+      const contentRiskLevel =
+        abuse.action === 'tag_high_risk' ? 'high' : 'low';
+      const contentDiff: Record<string, unknown> = { changed };
+      if (abuse.hits.length > 0) {
+        contentDiff.abuseFilterHits = abuse.hits.map((h) => h.filterName);
+      }
       const revision = manager.create(CharacterRevisionEntity, {
         characterId,
         version: nextVersion,
         parentRevisionId: page.currentRevisionId ?? null,
         baseRevisionId: input.baseRevisionId ?? page.currentRevisionId ?? null,
         contentSnapshot: after,
-        diffFromParent: { changed },
+        diffFromParent: contentDiff,
         editorUserId: user.id,
         editorRoleAtTime: user.role,
         editSummary: (input.editSummary ?? '').slice(0, 500),
         status: autoApprove ? 'approved' : 'pending',
         revisionKind: 'content',
         operation: 'edit',
-        riskLevel: 'low',
+        riskLevel: contentRiskLevel,
         changeSource,
         isMinor: this.resolveMinorEdit(input.isMinor, user.role),
         isPatrolled: false,
@@ -237,6 +257,7 @@ export class WikiEditService {
       status: result.status,
       isPatrolled: result.isPatrolled,
       appliedToCharacter: autoApprove,
+      warnings: abuse.warnings.length > 0 ? abuse.warnings : undefined,
     };
   }
 
@@ -279,6 +300,16 @@ export class WikiEditService {
       revisionKind: 'recipe',
       summary: input.editSummary,
     });
+    const abuseCreate = await this.filters.check({
+      user,
+      characterId,
+      contentSnapshot: content,
+      recipeSnapshot: recipe,
+      operation: 'create',
+      isCreate: true,
+    });
+    // tag_high_risk on create is a no-op (create is already high-risk &
+    // patroller-only); but persist hits for visibility.
     const autoApprove = rankOf(user.role) >= rankOf('patroller');
     const revision = await this.dataSource.transaction(async (manager) => {
       const page =
@@ -359,6 +390,7 @@ export class WikiEditService {
       status: revision.status,
       isPatrolled: revision.isPatrolled,
       appliedToCharacter: autoApprove,
+      warnings: abuseCreate.warnings.length > 0 ? abuseCreate.warnings : undefined,
     };
   }
 
@@ -376,6 +408,12 @@ export class WikiEditService {
       riskLevel: 'high',
       revisionKind: 'lifecycle',
       summary: reason,
+    });
+    const abuseLifecycle = await this.filters.check({
+      user,
+      characterId,
+      contentSnapshot: { name: '', avatar: '', bio: reason ?? '', expertDomains: [], relationship: '', relationshipType: '' } as WikiContentSnapshot,
+      operation,
     });
     const character = await this.characterRepo.findOne({ where: { id: characterId } });
     if (!character) throw new BadRequestException('角色不存在');
@@ -445,6 +483,10 @@ export class WikiEditService {
       status: revision.status,
       isPatrolled: revision.isPatrolled,
       appliedToCharacter: autoApprove,
+      warnings:
+        abuseLifecycle.warnings.length > 0
+          ? abuseLifecycle.warnings
+          : undefined,
     };
   }
 
@@ -621,18 +663,39 @@ export class WikiEditService {
     const afterContent = snapshotFromRecipe(afterRecipe);
 
     const riskReport = isHighRiskRecipeChange(changed);
-    const riskLevel = riskReport.highRisk ? 'high' : 'low';
+    let riskLevel = riskReport.highRisk ? 'high' : 'low';
     this.assertEditSummary({
       operation: 'edit',
       riskLevel,
       revisionKind: 'recipe',
       summary: input.editSummary,
     });
+    const abuseRecipe = await this.filters.check({
+      user,
+      characterId,
+      contentSnapshot: afterContent,
+      recipeSnapshot: afterRecipe,
+      beforeContent,
+      beforeRecipe,
+      operation: 'edit',
+    });
+    if (abuseRecipe.action === 'tag_high_risk') {
+      riskLevel = 'high';
+    }
     const autoApprove =
-      rankOf(user.role) >= rankOf('patroller') ||
-      (riskLevel === 'low' && rankOf(user.role) >= rankOf('autoconfirmed'));
+      abuseRecipe.action === 'tag_high_risk'
+        ? false
+        : rankOf(user.role) >= rankOf('patroller') ||
+          (riskLevel === 'low' && rankOf(user.role) >= rankOf('autoconfirmed'));
     const lastVersion = await this.getLastVersion(characterId);
     const revision = await this.dataSource.transaction(async (manager) => {
+      const recipeDiff: Record<string, unknown> = { changed };
+      if (riskReport.highRisk) {
+        recipeDiff.highRiskReasons = riskReport.reasons;
+      }
+      if (abuseRecipe.hits.length > 0) {
+        recipeDiff.abuseFilterHits = abuseRecipe.hits.map((h) => h.filterName);
+      }
       const created = manager.create(CharacterRevisionEntity, {
         characterId,
         version: lastVersion + 1,
@@ -640,12 +703,7 @@ export class WikiEditService {
         baseRevisionId: input.baseRevisionId ?? page.currentRevisionId ?? null,
         contentSnapshot: afterContent,
         recipeSnapshot: afterRecipe,
-        diffFromParent: {
-          changed,
-          ...(riskReport.highRisk
-            ? { highRiskReasons: riskReport.reasons }
-            : {}),
-        },
+        diffFromParent: recipeDiff,
         editorUserId: user.id,
         editorRoleAtTime: user.role,
         editSummary: (input.editSummary ?? '').slice(0, 500),
@@ -694,6 +752,8 @@ export class WikiEditService {
       status: revision.status,
       isPatrolled: revision.isPatrolled,
       appliedToCharacter: autoApprove,
+      warnings:
+        abuseRecipe.warnings.length > 0 ? abuseRecipe.warnings : undefined,
     };
   }
 

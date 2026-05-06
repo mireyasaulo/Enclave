@@ -76,6 +76,11 @@ const AdminReportsPage = lazy(async () => {
   return { default: mod.AdminReportsPage };
 });
 
+const AdminAbuseFiltersPage = lazy(async () => {
+  const mod = await import("./routes/admin-abuse-filters-page");
+  return { default: mod.AdminAbuseFiltersPage };
+});
+
 const rootRoute = createRootRoute({ component: RootLayout });
 
 const indexRoute = createRoute({
@@ -169,6 +174,12 @@ const adminReportsRoute = createRoute({
   component: AdminReportsPage,
 });
 
+const adminAbuseFiltersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin/abuse-filters",
+  component: AdminAbuseFiltersPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
@@ -182,6 +193,7 @@ const routeTree = rootRoute.addChildren([
   adminBlocksRoute,
   adminProtectionRoute,
   adminReportsRoute,
+  adminAbuseFiltersRoute,
   watchlistRoute,
   searchRoute,
 ]);

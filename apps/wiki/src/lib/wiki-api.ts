@@ -601,4 +601,92 @@ export const wikiApi = {
       },
     );
   },
+  listAbuseFilters() {
+    return request<AbuseFilter[]>("/wiki/admin/abuse-filters");
+  },
+  getAbuseFilter(id: string) {
+    return request<AbuseFilter>(
+      `/wiki/admin/abuse-filters/${encodeURIComponent(id)}`,
+    );
+  },
+  listAbuseFilterHits(opts: {
+    filterId?: string;
+    userId?: string;
+    limit?: number;
+  } = {}) {
+    const params = new URLSearchParams();
+    if (opts.filterId) params.set("filterId", opts.filterId);
+    if (opts.userId) params.set("userId", opts.userId);
+    if (opts.limit) params.set("limit", String(opts.limit));
+    return request<AbuseFilterHit[]>(
+      `/wiki/admin/abuse-filters/hits${params.size > 0 ? `?${params.toString()}` : ""}`,
+    );
+  },
+  createAbuseFilter(body: {
+    name: string;
+    description?: string;
+    enabled?: boolean;
+    pattern: AbuseFilterPattern;
+    scope?: AbuseFilterScope;
+    action: AbuseFilterAction;
+    severity?: "low" | "medium" | "high";
+  }) {
+    return request<AbuseFilter>("/wiki/admin/abuse-filters", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  },
+  updateAbuseFilter(id: string, patch: Partial<AbuseFilter>) {
+    return request<AbuseFilter>(
+      `/wiki/admin/abuse-filters/${encodeURIComponent(id)}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(patch),
+      },
+    );
+  },
+  deleteAbuseFilter(id: string) {
+    return request<void>(
+      `/wiki/admin/abuse-filters/${encodeURIComponent(id)}`,
+      { method: "DELETE" },
+    );
+  },
+};
+
+export type AbuseFilterAction = "log" | "warn" | "block" | "tag_high_risk";
+export type AbuseFilterScope = "content" | "recipe" | "all";
+
+export type AbuseFilterPattern =
+  | { type: "regex"; regex: string; flags?: string; fields?: string[] }
+  | { type: "shrink"; field: string; threshold: number }
+  | { type: "frequency"; windowSec: number; maxEdits: number }
+  | { type: "link_flood"; threshold: number }
+  | { type: "keyword_list"; keywords: string[]; caseSensitive?: boolean };
+
+export type AbuseFilter = {
+  id: string;
+  name: string;
+  description: string;
+  enabled: boolean;
+  pattern: AbuseFilterPattern;
+  scope: AbuseFilterScope;
+  action: AbuseFilterAction;
+  severity: "low" | "medium" | "high";
+  createdBy: string | null;
+  hitCount: number;
+  lastHitAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AbuseFilterHit = {
+  id: string;
+  filterId: string;
+  userId: string;
+  characterId: string | null;
+  revisionId: string | null;
+  matchedText: string;
+  actionTaken: AbuseFilterAction;
+  operation: string;
+  createdAt: string;
 };

@@ -51,6 +51,9 @@ export function RootLayout() {
                 <Link to="/admin/reports" className="hover:underline">
                   举报
                 </Link>
+                <Link to="/admin/abuse-filters" className="hover:underline">
+                  反破坏
+                </Link>
               </>
             )}
           </nav>
