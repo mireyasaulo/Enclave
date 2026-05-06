@@ -5,8 +5,6 @@ import { listCharacters, type Character } from "@yinjie/contracts";
 import {
   Button,
   Card,
-  ErrorBlock,
-  LoadingBlock,
   MetricCard,
   StatusPill,
 } from "@yinjie/ui";
@@ -14,12 +12,14 @@ import {
   AdminCallout,
   AdminDangerZone,
   AdminEmptyState,
+  AdminErrorState,
   AdminPageHero,
   AdminPillSelectField,
   AdminPillTextField,
   AdminRecordCard,
   AdminSelectableCard,
   AdminSectionHeader,
+  AdminSkeletonCard,
   AdminSoftBox,
   AdminTabs,
   AdminValueCard,
@@ -267,27 +267,37 @@ export function CharactersPage() {
   return (
     <div className="space-y-6">
       {charactersQuery.isLoading ? (
-        <LoadingBlock label="正在加载角色中心..." />
+        <AdminSkeletonCard rows={4} showAction />
       ) : null}
       {charactersQuery.isError && charactersQuery.error instanceof Error ? (
-        <ErrorBlock message={charactersQuery.error.message} />
+        <AdminErrorState
+          title="角色名册加载失败"
+          detail={charactersQuery.error.message}
+          onRetry={() => charactersQuery.refetch()}
+          retryLabel="重新加载角色"
+        />
       ) : null}
       {friendIdsQuery.isError && friendIdsQuery.error instanceof Error ? (
-        <ErrorBlock message={friendIdsQuery.error.message} />
+        <AdminErrorState
+          title="朋友角色列表加载失败"
+          detail={friendIdsQuery.error.message}
+          onRetry={() => friendIdsQuery.refetch()}
+          retryLabel="重新加载好友标记"
+        />
       ) : null}
       {deleteMutation.isError && deleteMutation.error instanceof Error ? (
-        <ErrorBlock message={deleteMutation.error.message} />
+        <AdminErrorState
+          title="删除角色失败"
+          detail={deleteMutation.error.message}
+          onRetry={() => deleteMutation.reset()}
+          retryLabel="清除错误"
+        />
       ) : null}
 
       <AdminPageHero
         eyebrow="角色中心"
         title="角色运营工作台"
         description="先看角色池结构和运营焦点，再进入单角色工作区做编辑、运行排查和工厂操作。"
-        badges={[
-          "角色名册",
-          "运行状态抽查",
-          "画像维护与工厂跳转",
-        ]}
         actions={
           <>
             <Link to="/characters/$characterId" params={{ characterId: "new" }}>

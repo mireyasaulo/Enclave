@@ -52,6 +52,7 @@ import {
   AdminCompactStatusCard,
   AdminDetailPanel,
   AdminDangerZone,
+  AdminErrorState,
   AdminEyebrow,
   AdminJumpCard,
   AdminMetaText,
@@ -595,13 +596,25 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       {adminStatsQuery.isError && adminStatsQuery.error instanceof Error ? (
-        <ErrorBlock message={adminStatsQuery.error.message} />
+        <AdminErrorState
+          title="角色统计加载失败"
+          detail={adminStatsQuery.error.message}
+          onRetry={() => adminStatsQuery.refetch()}
+        />
       ) : null}
       {adminSystemQuery.isError && adminSystemQuery.error instanceof Error ? (
-        <ErrorBlock message={adminSystemQuery.error.message} />
+        <AdminErrorState
+          title="后台运行状态加载失败"
+          detail={adminSystemQuery.error.message}
+          onRetry={() => adminSystemQuery.refetch()}
+        />
       ) : null}
       {statusQuery.isError && statusQuery.error instanceof Error ? (
-        <ErrorBlock message={statusQuery.error.message} />
+        <AdminErrorState
+          title="实例状态读取失败"
+          detail={statusQuery.error.message}
+          onRetry={() => statusQuery.refetch()}
+        />
       ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">

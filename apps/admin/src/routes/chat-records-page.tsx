@@ -32,8 +32,10 @@ import {
 import {
   AdminCallout,
   AdminEmptyState,
+  AdminErrorState,
   AdminInfoRows,
   AdminPageHero,
+  AdminSkeletonCard,
 } from "../components/admin-workbench";
 import { adminApi } from "../lib/admin-api";
 import { chatRecordsAdminApi } from "../lib/chat-records-api";
@@ -449,13 +451,25 @@ export function ChatRecordsPage() {
   }
 
   if (overviewQuery.isLoading && conversationsQuery.isLoading) {
-    return <LoadingBlock label="正在加载聊天记录..." />;
+    return <AdminSkeletonCard rows={5} showAction />;
   }
   if (overviewQuery.error instanceof Error) {
-    return <ErrorBlock message={overviewQuery.error.message} />;
+    return (
+      <AdminErrorState
+        title="聊天记录概览加载失败"
+        detail={overviewQuery.error.message}
+        onRetry={() => overviewQuery.refetch()}
+      />
+    );
   }
   if (conversationsQuery.error instanceof Error) {
-    return <ErrorBlock message={conversationsQuery.error.message} />;
+    return (
+      <AdminErrorState
+        title="会话列表加载失败"
+        detail={conversationsQuery.error.message}
+        onRetry={() => conversationsQuery.refetch()}
+      />
+    );
   }
 
   return (
