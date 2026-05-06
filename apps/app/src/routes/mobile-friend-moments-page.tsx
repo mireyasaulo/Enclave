@@ -9,6 +9,7 @@ import {
   getMoments,
   toggleMomentLike,
   type Moment,
+  type MomentComment,
 } from "@yinjie/contracts";
 import {
   AppPage,
@@ -70,6 +71,12 @@ export function MobileFriendMomentsPage() {
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>(
     {},
   );
+  const [replyTarget, setReplyTarget] = useState<{
+    authorId: string;
+    authorName: string;
+    commentId: string;
+    postId: string;
+  } | null>(null);
   const [notice, setNotice] = useState<{
     tone: "success" | "info";
     message: string;
@@ -113,16 +120,24 @@ export function MobileFriendMomentsPage() {
         throw new Error("请先输入评论内容。");
       }
 
+      const replyTo =
+        replyTarget && replyTarget.postId === momentId ? replyTarget : null;
+
       return addMomentComment(
         momentId,
         {
           text,
+          replyToCommentId: replyTo?.commentId,
+          replyToAuthorId: replyTo?.authorId,
         },
         baseUrl,
       );
     },
     onSuccess: async (_, momentId) => {
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
+      setReplyTarget((current) =>
+        current?.postId === momentId ? null : current,
+      );
       setNotice({
         tone: "success",
         message: "朋友圈互动已更新。",
@@ -506,6 +521,10 @@ export function MobileFriendMomentsPage() {
                     commentDraft={commentDrafts[moment.id] ?? ""}
                     commentPending={pendingCommentMomentId === moment.id}
                     likePending={pendingLikeMomentId === moment.id}
+                    replyTarget={
+                      replyTarget?.postId === moment.id ? replyTarget : null
+                    }
+                    onCancelReply={() => setReplyTarget(null)}
                     onCommentChange={(value) =>
                       setCommentDrafts((current) => ({
                         ...current,
@@ -514,6 +533,14 @@ export function MobileFriendMomentsPage() {
                     }
                     onCommentSubmit={() => commentMutation.mutate(moment.id)}
                     onLike={() => likeMutation.mutate(moment.id)}
+                    onStartReply={(comment) =>
+                      setReplyTarget({
+                        authorId: comment.authorId,
+                        authorName: comment.authorName,
+                        commentId: comment.id,
+                        postId: moment.id,
+                      })
+                    }
                   />
                 ))}
               </div>
@@ -570,17 +597,28 @@ function MobileFriendMomentCard({
   commentDraft,
   commentPending,
   likePending,
+  replyTarget,
+  onCancelReply,
   onCommentChange,
   onCommentSubmit,
   onLike,
+  onStartReply,
 }: {
   moment: Moment;
   commentDraft: string;
   commentPending: boolean;
   likePending: boolean;
+  replyTarget: {
+    authorId: string;
+    authorName: string;
+    commentId: string;
+    postId: string;
+  } | null;
+  onCancelReply: () => void;
   onCommentChange: (value: string) => void;
   onCommentSubmit: () => void;
   onLike: () => void;
+  onStartReply: (comment: MomentComment) => void;
 }) {
   const dateLabel = formatTimelineDate(moment.postedAt);
   const hasText = Boolean(moment.text.trim());
@@ -651,17 +689,49 @@ function MobileFriendMomentCard({
                 {` · ${moment.likes.map((item) => item.authorName).join("，")}`}
               </div>
             ) : null}
-            {moment.comments.map((comment) => (
-              <div
-                key={comment.id}
-                className="text-[12px] leading-6 text-[color:var(--text-secondary)]"
-              >
-                <span className="font-medium text-[color:var(--text-primary)]">
-                  {comment.authorName}
-                </span>
-                {`：${comment.text}`}
-              </div>
-            ))}
+            {moment.comments.map((comment) => {
+              const replyToName = comment.replyToCommentId
+                ? (moment.comments.find(
+                    (item) => item.id === comment.replyToCommentId,
+                  )?.authorName ?? null)
+                : null;
+              return (
+                <button
+                  key={comment.id}
+                  type="button"
+                  onClick={() => onStartReply(comment)}
+                  className="block w-full text-left text-[12px] leading-6 text-[color:var(--text-secondary)]"
+                >
+                  <span className="font-medium text-[color:var(--text-primary)]">
+                    {comment.authorName}
+                  </span>
+                  {replyToName ? (
+                    <>
+                      <span className="text-[color:var(--text-muted)]">
+                        {" "}回复{" "}
+                      </span>
+                      <span className="font-medium text-[color:var(--text-primary)]">
+                        {replyToName}
+                      </span>
+                    </>
+                  ) : null}
+                  {`：${comment.text}`}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+        {replyTarget ? (
+          <div className="mt-2 flex items-center justify-between gap-2 rounded-[12px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[12px] text-[color:var(--text-secondary)]">
+            <div className="truncate">正在回复 {replyTarget.authorName}</div>
+            <button
+              type="button"
+              onClick={onCancelReply}
+              aria-label="取消回复"
+              className="shrink-0 rounded-full px-2 py-0.5 text-[11px] text-[color:var(--text-muted)] hover:bg-white"
+            >
+              取消
+            </button>
           </div>
         ) : null}
         <div className="mt-3 flex items-center gap-2">
@@ -670,7 +740,9 @@ function MobileFriendMomentCard({
             onChange={onCommentChange}
             onSubmit={onCommentSubmit}
             pending={commentPending}
-            placeholder="说点什么..."
+            placeholder={
+              replyTarget ? `回复 ${replyTarget.authorName}...` : "说点什么..."
+            }
             inputClassName="rounded-full py-1.5 text-[16px]"
             buttonClassName="h-8 px-3 text-[12px]"
           />

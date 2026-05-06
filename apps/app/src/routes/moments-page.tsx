@@ -1096,21 +1096,79 @@ export function MomentsPage() {
                   </div>
                 }
                 secondary={
-                  moment.comments.length > 0 ? (
-                    <div className="space-y-1.5 rounded-[14px] bg-[color:var(--surface-soft)] p-2.5">
-                      {moment.comments.slice(-3).map((comment) => (
-                        <div
-                          key={comment.id}
-                          className="text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)]"
-                        >
-                          <span className="text-[color:var(--text-primary)]">
-                            {comment.authorName}
-                          </span>
-                          {`：${comment.text}`}
-                        </div>
-                      ))}
-                    </div>
-                  ) : null
+                  (() => {
+                    const activeReply =
+                      desktopReplyTarget?.postId === moment.id
+                        ? desktopReplyTarget
+                        : null;
+                    const commentsById = new Map(
+                      moment.comments.map((comment) => [comment.id, comment] as const),
+                    );
+                    const visibleComments = moment.comments.slice(-3);
+                    const hasComments = visibleComments.length > 0;
+                    if (!hasComments && !activeReply) {
+                      return null;
+                    }
+                    return (
+                      <div className="space-y-2">
+                        {hasComments ? (
+                          <div className="space-y-1.5 rounded-[14px] bg-[color:var(--surface-soft)] p-2.5">
+                            {visibleComments.map((comment) => {
+                              const replyToName = comment.replyToCommentId
+                                ? (commentsById.get(comment.replyToCommentId)
+                                    ?.authorName ?? null)
+                                : null;
+                              return (
+                                <button
+                                  key={comment.id}
+                                  type="button"
+                                  onClick={() =>
+                                    setDesktopReplyTarget({
+                                      authorId: comment.authorId,
+                                      authorName: comment.authorName,
+                                      commentId: comment.id,
+                                      postId: moment.id,
+                                    })
+                                  }
+                                  className="block w-full text-left text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)]"
+                                >
+                                  <span className="text-[color:var(--text-primary)]">
+                                    {comment.authorName}
+                                  </span>
+                                  {replyToName ? (
+                                    <>
+                                      <span className="text-[color:var(--text-muted)]">
+                                        {" "}回复{" "}
+                                      </span>
+                                      <span className="text-[color:var(--text-primary)]">
+                                        {replyToName}
+                                      </span>
+                                    </>
+                                  ) : null}
+                                  {`：${comment.text}`}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ) : null}
+                        {activeReply ? (
+                          <div className="flex items-center justify-between gap-2 rounded-[12px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[11px] text-[color:var(--text-secondary)]">
+                            <div className="truncate">
+                              正在回复 {activeReply.authorName}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setDesktopReplyTarget(null)}
+                              aria-label="取消回复"
+                              className="shrink-0 rounded-full px-2 py-0.5 text-[11px] text-[color:var(--text-muted)] hover:bg-white"
+                            >
+                              取消
+                            </button>
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })()
                 }
                 composer={
                   <MomentCommentComposer
@@ -1124,7 +1182,11 @@ export function MomentsPage() {
                     onSubmit={() => commentMutation.mutate(moment.id)}
                     pending={pendingCommentMomentId === moment.id}
                     disabled={commentMutation.isPending}
-                    placeholder="写评论..."
+                    placeholder={
+                      desktopReplyTarget?.postId === moment.id
+                        ? `回复 ${desktopReplyTarget.authorName}...`
+                        : "写评论..."
+                    }
                     pendingLabel="发送中..."
                     className="w-full"
                     inputClassName="rounded-full py-1.5 text-[16px]"

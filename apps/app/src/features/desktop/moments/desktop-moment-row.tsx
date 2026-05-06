@@ -259,47 +259,39 @@ export function DesktopMomentRow({
                   const replyToName = lookupReplyToName(comment);
                   const isActiveReply =
                     activeReply?.commentId === comment.id;
+                  if (!canReply) {
+                    return (
+                      <div
+                        key={comment.id}
+                        className="rounded-[10px] px-2 py-1.5 text-[13px] leading-6"
+                      >
+                        <CommentLine
+                          authorName={comment.authorName}
+                          replyToName={replyToName}
+                          text={comment.text}
+                        />
+                      </div>
+                    );
+                  }
                   return (
-                    <div
+                    <button
                       key={comment.id}
+                      type="button"
+                      onClick={() => onStartCommentReply?.(comment)}
                       className={cn(
-                        "group rounded-[10px] px-2 py-1.5 text-[13px] leading-6",
+                        "block w-full rounded-[10px] px-2 py-1.5 text-left text-[13px] leading-6 transition-colors",
                         isActiveReply
-                          ? "bg-[rgba(7,193,96,0.08)]"
+                          ? "bg-[rgba(7,193,96,0.12)]"
                           : "hover:bg-white",
                       )}
+                      title="回复这条评论"
                     >
-                      <div className="flex items-baseline gap-1">
-                        <span className="font-medium text-[color:var(--text-primary)]">
-                          {comment.authorName}
-                        </span>
-                        {replyToName ? (
-                          <>
-                            <span className="text-[color:var(--text-dim)]">
-                              回复
-                            </span>
-                            <span className="font-medium text-[color:var(--text-primary)]">
-                              {replyToName}
-                            </span>
-                          </>
-                        ) : null}
-                        <span className="text-[color:var(--text-dim)]">
-                          ：
-                        </span>
-                        <span className="min-w-0 flex-1 text-[color:var(--text-secondary)]">
-                          {comment.text}
-                        </span>
-                        {canReply ? (
-                          <button
-                            type="button"
-                            onClick={() => onStartCommentReply?.(comment)}
-                            className="shrink-0 rounded-full px-2 py-0.5 text-[11px] text-[color:var(--text-muted)] opacity-0 transition-opacity hover:bg-white hover:text-[color:var(--text-primary)] group-hover:opacity-100"
-                          >
-                            回复
-                          </button>
-                        ) : null}
-                      </div>
-                    </div>
+                      <CommentLine
+                        authorName={comment.authorName}
+                        replyToName={replyToName}
+                        text={comment.text}
+                      />
+                    </button>
                   );
                 })}
               </div>
@@ -344,5 +336,33 @@ export function DesktopMomentRow({
         </div>
       </div>
     </article>
+  );
+}
+
+function CommentLine({
+  authorName,
+  replyToName,
+  text,
+}: {
+  authorName: string;
+  replyToName: string | null;
+  text: string;
+}) {
+  return (
+    <span>
+      <span className="font-medium text-[color:var(--text-primary)]">
+        {authorName}
+      </span>
+      {replyToName ? (
+        <>
+          <span className="text-[color:var(--text-dim)]"> 回复 </span>
+          <span className="font-medium text-[color:var(--text-primary)]">
+            {replyToName}
+          </span>
+        </>
+      ) : null}
+      <span className="text-[color:var(--text-dim)]">：</span>
+      <span className="text-[color:var(--text-secondary)]">{text}</span>
+    </span>
   );
 }

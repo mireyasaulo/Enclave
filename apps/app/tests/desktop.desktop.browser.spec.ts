@@ -183,13 +183,11 @@ test("desktop moments support replying to a specific comment", async ({
   await desktopCard.getByRole("button", { name: "发送" }).click();
   await expect(desktopCard.getByText("被回复的原始评论")).toBeVisible();
 
-  // 把鼠标移到刚才那条评论上让「回复」按钮出现
+  // 点击刚才那条评论本身就是开始回复
   const targetComment = desktopCard
-    .locator("div", { hasText: "被回复的原始评论" })
-    .filter({ has: page.getByRole("button", { name: "回复" }) })
+    .getByRole("button", { name: /被回复的原始评论$/ })
     .first();
-  await targetComment.hover();
-  await targetComment.getByRole("button", { name: "回复" }).click();
+  await targetComment.click();
 
   // 出现回复指示条 + placeholder 切换
   await expect(desktopCard.getByText(/^正在回复 /)).toBeVisible();
