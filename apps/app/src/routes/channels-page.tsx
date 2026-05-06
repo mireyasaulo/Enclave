@@ -14,12 +14,8 @@ import {
   Bookmark,
   EyeOff,
   MessageCircleMore,
-  Pause,
-  Play,
   Share2,
   ThumbsUp,
-  Volume2,
-  VolumeX,
   X,
 } from "lucide-react";
 import {
@@ -1438,7 +1434,6 @@ type MobileChannelsCardProps = {
 };
 
 function MobileChannelsCard({
-  active,
   favorite,
   likePending,
   post,
@@ -1451,41 +1446,6 @@ function MobileChannelsCard({
   onToggleFollowAuthor,
   onToggleFavorite,
 }: MobileChannelsCardProps) {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [muted, setMuted] = useState(true);
-  const [manuallyPaused, setManuallyPaused] = useState(false);
-
-  useEffect(() => {
-    if (!videoRef.current) {
-      return;
-    }
-
-    videoRef.current.muted = muted;
-  }, [muted]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) {
-      return;
-    }
-
-    if (!active) {
-      video.pause();
-      setManuallyPaused(false);
-      return;
-    }
-
-    if (manuallyPaused) {
-      video.pause();
-      return;
-    }
-
-    const playPromise = video.play();
-    if (playPromise && typeof playPromise.catch === "function") {
-      playPromise.catch(() => {});
-    }
-  }, [active, manuallyPaused]);
-
   return (
     <article
       ref={setCardRef}
@@ -1493,16 +1453,16 @@ function MobileChannelsCard({
       className="snap-start scroll-mt-2 overflow-hidden rounded-[18px] border border-[color:var(--border-subtle)] bg-white shadow-none"
     >
       <div className="relative min-h-[calc(100dvh-12rem)] bg-[#0f1115]">
-        <video
-          ref={videoRef}
-          src={post.mediaUrl}
-          loop
-          muted
-          playsInline
-          preload="metadata"
-          className="block h-[64dvh] w-full bg-black object-cover"
-          onClick={() => setManuallyPaused((current) => !current)}
-        />
+        <div className="flex h-[64dvh] w-full items-center justify-center bg-black px-6 text-center">
+          <div>
+            <div className="text-[16px] font-semibold text-white">
+              视频功能正在开发中
+            </div>
+            <div className="mt-2 text-[13px] leading-6 text-white/72">
+              敬请期待
+            </div>
+          </div>
+        </div>
         <div className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-[linear-gradient(180deg,rgba(15,23,42,0.78),rgba(15,23,42,0))]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-[linear-gradient(180deg,rgba(15,23,42,0),rgba(15,23,42,0.88))]" />
 
@@ -1515,28 +1475,6 @@ function MobileChannelsCard({
               AI 已互动
             </div>
           ) : null}
-          {active ? (
-            <div className="rounded-full bg-[rgba(7,193,96,0.82)] px-2.5 py-1 text-[10px] font-medium text-white">
-              当前播放
-            </div>
-          ) : null}
-        </div>
-
-        <div className="absolute right-3.5 top-3.5 flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => setMuted((current) => !current)}
-            className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[rgba(15,23,42,0.62)] text-white backdrop-blur transition active:scale-[0.97] active:bg-[rgba(15,23,42,0.78)]"
-          >
-            {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
-          </button>
-          <button
-            type="button"
-            onClick={() => setManuallyPaused((current) => !current)}
-            className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[rgba(15,23,42,0.62)] text-white backdrop-blur transition active:scale-[0.97] active:bg-[rgba(15,23,42,0.78)]"
-          >
-            {manuallyPaused ? <Play size={15} /> : <Pause size={15} />}
-          </button>
         </div>
 
         <div className="absolute inset-y-0 right-0 flex items-center pr-3.5">
