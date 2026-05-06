@@ -199,7 +199,7 @@ function describeCloudButtonLabel(
   }
 
   if (!session) {
-    return t(msg`解析我的世界`);
+    return t(msg`进入我的世界`);
   }
 
   if (session.status === "ready") {
@@ -212,7 +212,7 @@ function describeCloudButtonLabel(
       : t(msg`正在创建世界...`);
   }
 
-  return t(msg`解析我的世界`);
+  return t(msg`进入我的世界`);
 }
 
 function mobileNoticeTone(

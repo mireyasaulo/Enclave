@@ -81,6 +81,11 @@ const AdminAbuseFiltersPage = lazy(async () => {
   return { default: mod.AdminAbuseFiltersPage };
 });
 
+const AdminStatsPage = lazy(async () => {
+  const mod = await import("./routes/admin-stats-page");
+  return { default: mod.AdminStatsPage };
+});
+
 const rootRoute = createRootRoute({ component: RootLayout });
 
 const indexRoute = createRoute({
@@ -180,6 +185,12 @@ const adminAbuseFiltersRoute = createRoute({
   component: AdminAbuseFiltersPage,
 });
 
+const adminStatsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/admin/wiki-stats",
+  component: AdminStatsPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   loginRoute,
@@ -194,6 +205,7 @@ const routeTree = rootRoute.addChildren([
   adminProtectionRoute,
   adminReportsRoute,
   adminAbuseFiltersRoute,
+  adminStatsRoute,
   watchlistRoute,
   searchRoute,
 ]);

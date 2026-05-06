@@ -665,6 +665,37 @@ export const wikiApi = {
       { method: "DELETE" },
     );
   },
+  wikiStatsDaily() {
+    return request<{
+      todayCreates: number;
+      weekCreates: number;
+      pendingQueueLength: number;
+      todayApproved: number;
+      todayRejected: number;
+      abuseHitsToday: number;
+      autoconfirmedThisWeek: number;
+    }>("/wiki/admin/stats/daily");
+  },
+  wikiStatsTopReverted(limit = 20) {
+    return request<
+      Array<{
+        userId: string;
+        editCount: number;
+        approvedEditCount: number;
+        revertedCount: number;
+        patrolledCount: number;
+        lastEditAt: string | null;
+      }>
+    >(`/wiki/admin/stats/top-reverted-users?limit=${limit}`);
+  },
+  wikiStatsAbuseFilters() {
+    return request<
+      Array<{
+        filter: AbuseFilter;
+        recentHits: number;
+      }>
+    >("/wiki/admin/stats/abuse-filters");
+  },
   listAbuseFilters() {
     return request<AbuseFilter[]>("/wiki/admin/abuse-filters");
   },

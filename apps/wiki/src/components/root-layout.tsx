@@ -54,6 +54,9 @@ export function RootLayout() {
                 <Link to="/admin/abuse-filters" className="hover:underline">
                   反破坏
                 </Link>
+                <Link to="/admin/wiki-stats" className="hover:underline">
+                  治理仪表
+                </Link>
               </>
             )}
           </nav>

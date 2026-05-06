@@ -25,6 +25,9 @@ import { AbuseFilterController } from './controllers/abuse-filter.controller';
 import { WikiFieldProtectionService } from './services/wiki-field-protection.service';
 import { WikiFieldProtectionController } from './controllers/wiki-field-protection.controller';
 import { WikiSystemUserService } from './services/wiki-system-user.service';
+import { WikiAntivandalBotService } from './services/wiki-antivandal-bot.service';
+import { WikiStatsService } from './services/wiki-stats.service';
+import { WikiStatsController } from './controllers/wiki-stats.controller';
 import { WikiPageService } from './services/wiki-page.service';
 import { WikiEditService } from './services/wiki-edit.service';
 import { WikiReviewService } from './services/wiki-review.service';
@@ -81,6 +84,7 @@ import { WikiReportController } from './controllers/wiki-report.controller';
     WikiReportController,
     AbuseFilterController,
     WikiFieldProtectionController,
+    WikiStatsController,
   ],
   providers: [
     WikiPageService,
@@ -95,6 +99,8 @@ import { WikiReportController } from './controllers/wiki-report.controller';
     AbuseFilterService,
     WikiFieldProtectionService,
     WikiSystemUserService,
+    WikiAntivandalBotService,
+    WikiStatsService,
     WikiRoleGuard,
     WikiRateLimitGuard,
   ],
