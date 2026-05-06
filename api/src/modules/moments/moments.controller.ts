@@ -109,9 +109,17 @@ export class MomentsController {
   @Post(':id/comment')
   addComment(
     @Param('id') postId: string,
-    @Body() body: { text: string },
+    @Body()
+    body: {
+      text: string;
+      replyToCommentId?: string | null;
+      replyToAuthorId?: string | null;
+    },
   ) {
-    return this.momentsService.addOwnerComment(postId, body.text);
+    return this.momentsService.addOwnerComment(postId, body.text, {
+      replyToCommentId: body.replyToCommentId ?? null,
+      replyToAuthorId: body.replyToAuthorId ?? null,
+    });
   }
 
   @Post(':id/like')

@@ -1,5 +1,5 @@
 import { type MouseEvent as ReactMouseEvent } from "react";
-import { type Moment } from "@yinjie/contracts";
+import { type Moment, type MomentComment } from "@yinjie/contracts";
 import { Button, cn } from "@yinjie/ui";
 import {
   Bot,
@@ -8,24 +8,35 @@ import {
   MessageCircle,
   Star,
   UserRound,
+  X,
 } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { MomentCommentComposer } from "../../../components/moment-comment-composer";
 import { MomentMediaGallery } from "../../../components/moment-media-gallery";
 import { formatTimestamp } from "../../../lib/format";
 
+export type MomentCommentReplyTarget = {
+  authorId: string;
+  authorName: string;
+  commentId: string;
+  postId: string;
+};
+
 type DesktopMomentRowProps = {
   authorActionAriaLabel?: string;
   authorActionLabel?: string;
   commentDraft: string;
   commentLoading: boolean;
+  commentReplyTarget?: MomentCommentReplyTarget | null;
   likeLoading: boolean;
   moment: Moment;
   ownerId?: string | null;
   favorite: boolean;
+  onCancelCommentReply?: () => void;
   onCommentChange: (value: string) => void;
   onCommentSubmit: () => void;
   onLike: () => void;
+  onStartCommentReply?: (comment: MomentComment) => void;
   onToggleFavorite: () => void;
   onAuthorAction?: () => void;
   onSelectAuthor?: (event: ReactMouseEvent<HTMLButtonElement>) => void;
@@ -36,13 +47,16 @@ export function DesktopMomentRow({
   authorActionLabel,
   commentDraft,
   commentLoading,
+  commentReplyTarget = null,
   likeLoading,
   moment,
   ownerId,
   favorite,
+  onCancelCommentReply,
   onCommentChange,
   onCommentSubmit,
   onLike,
+  onStartCommentReply,
   onToggleFavorite,
   onAuthorAction,
   onSelectAuthor,
@@ -52,8 +66,30 @@ export function DesktopMomentRow({
   );
   const hasText = Boolean(moment.text.trim());
   const canSelectAuthor = Boolean(onSelectAuthor);
+  const canReply = Boolean(onStartCommentReply);
+  const activeReply =
+    commentReplyTarget && commentReplyTarget.postId === moment.id
+      ? commentReplyTarget
+      : null;
   const activeActionClassName =
     "border-[rgba(7,193,96,0.12)] bg-white text-[color:var(--text-primary)] shadow-[inset_0_-2px_0_0_var(--brand-primary)]";
+
+  const commentsById = new Map(
+    moment.comments.map((comment) => [comment.id, comment] as const),
+  );
+
+  function lookupReplyToName(comment: MomentComment) {
+    if (!comment.replyToAuthorId) {
+      return null;
+    }
+    if (comment.replyToCommentId) {
+      const target = commentsById.get(comment.replyToCommentId);
+      if (target?.authorName) {
+        return target.authorName;
+      }
+    }
+    return null;
+  }
 
   return (
     <article
@@ -218,16 +254,54 @@ export function DesktopMomentRow({
             </div>
 
             {moment.comments.length > 0 ? (
-              <div className="mt-3 space-y-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-                {moment.comments.map((comment) => (
-                  <div key={comment.id}>
-                    <span className="font-medium text-[color:var(--text-primary)]">
-                      {comment.authorName}
-                    </span>
-                    <span className="text-[color:var(--text-dim)]">：</span>
-                    <span>{comment.text}</span>
-                  </div>
-                ))}
+              <div className="mt-3 space-y-1.5">
+                {moment.comments.map((comment) => {
+                  const replyToName = lookupReplyToName(comment);
+                  const isActiveReply =
+                    activeReply?.commentId === comment.id;
+                  return (
+                    <div
+                      key={comment.id}
+                      className={cn(
+                        "group rounded-[10px] px-2 py-1.5 text-[13px] leading-6",
+                        isActiveReply
+                          ? "bg-[rgba(7,193,96,0.08)]"
+                          : "hover:bg-white",
+                      )}
+                    >
+                      <div className="flex items-baseline gap-1">
+                        <span className="font-medium text-[color:var(--text-primary)]">
+                          {comment.authorName}
+                        </span>
+                        {replyToName ? (
+                          <>
+                            <span className="text-[color:var(--text-dim)]">
+                              回复
+                            </span>
+                            <span className="font-medium text-[color:var(--text-primary)]">
+                              {replyToName}
+                            </span>
+                          </>
+                        ) : null}
+                        <span className="text-[color:var(--text-dim)]">
+                          ：
+                        </span>
+                        <span className="min-w-0 flex-1 text-[color:var(--text-secondary)]">
+                          {comment.text}
+                        </span>
+                        {canReply ? (
+                          <button
+                            type="button"
+                            onClick={() => onStartCommentReply?.(comment)}
+                            className="shrink-0 rounded-full px-2 py-0.5 text-[11px] text-[color:var(--text-muted)] opacity-0 transition-opacity hover:bg-white hover:text-[color:var(--text-primary)] group-hover:opacity-100"
+                          >
+                            回复
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <div className="mt-3 text-[12px] text-[color:var(--text-muted)]">
@@ -235,13 +309,33 @@ export function DesktopMomentRow({
               </div>
             )}
 
+            {activeReply ? (
+              <div className="mt-3 flex items-center justify-between gap-2 rounded-[10px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[12px] text-[color:var(--text-secondary)]">
+                <div className="truncate">
+                  正在回复 {activeReply.authorName}
+                </div>
+                {onCancelCommentReply ? (
+                  <button
+                    type="button"
+                    onClick={onCancelCommentReply}
+                    aria-label="取消回复"
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[color:var(--text-muted)] hover:bg-white"
+                  >
+                    <X size={12} />
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+
             <div className="mt-3 border-t border-[color:var(--border-faint)] pt-3">
               <MomentCommentComposer
                 value={commentDraft}
                 onChange={onCommentChange}
                 onSubmit={onCommentSubmit}
                 pending={commentLoading}
-                placeholder="写评论..."
+                placeholder={
+                  activeReply ? `回复 ${activeReply.authorName}...` : "写评论..."
+                }
                 inputClassName="rounded-xl border-[color:var(--border-faint)] bg-white px-4 py-2 text-[13px] shadow-none hover:bg-white focus:border-[rgba(7,193,96,0.14)] focus:shadow-none"
                 buttonClassName="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
               />

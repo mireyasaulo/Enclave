@@ -167,6 +167,43 @@ test("accepts typing in moments comment composers", async ({ page }) => {
   await expect(desktopCard.getByText("桌面端评论输入")).toBeVisible();
 });
 
+test("desktop moments support replying to a specific comment", async ({
+  page,
+}) => {
+  const moment = await createSmokeMoment("朋友圈评论回复回归");
+
+  await page.setViewportSize({ width: 1440, height: 960 });
+  await page.goto(`${stack.app.baseUrl}/tabs/moments`);
+
+  const desktopCard = page.locator(`#desktop-moment-post-${moment.id}`);
+  await expect(desktopCard).toBeVisible();
+
+  const composerInput = desktopCard.getByPlaceholder("写评论...");
+  await composerInput.fill("被回复的原始评论");
+  await desktopCard.getByRole("button", { name: "发送" }).click();
+  await expect(desktopCard.getByText("被回复的原始评论")).toBeVisible();
+
+  // 把鼠标移到刚才那条评论上让「回复」按钮出现
+  const targetComment = desktopCard
+    .locator("div", { hasText: "被回复的原始评论" })
+    .filter({ has: page.getByRole("button", { name: "回复" }) })
+    .first();
+  await targetComment.hover();
+  await targetComment.getByRole("button", { name: "回复" }).click();
+
+  // 出现回复指示条 + placeholder 切换
+  await expect(desktopCard.getByText(/^正在回复 /)).toBeVisible();
+  const replyInput = desktopCard.getByPlaceholder(/^回复 /);
+  await replyInput.fill("这是一条针对评论的回复");
+  await desktopCard.getByRole("button", { name: "发送" }).click();
+
+  // 新评论显示「X 回复 Y：内容」
+  await expect(
+    desktopCard.getByText("这是一条针对评论的回复"),
+  ).toBeVisible();
+  await expect(desktopCard.getByText(/^正在回复 /)).toBeHidden();
+});
+
 async function createSmokeMoment(text: string) {
   const response = await fetch(
     `${stack.coreApi.baseUrl}/api/moments/user-post`,

@@ -55,6 +55,8 @@ export interface MomentComment {
   authorAvatar: string;
   authorType: "user" | "character";
   text: string;
+  replyToCommentId?: string | null;
+  replyToAuthorId?: string | null;
   createdAt: string;
 }
 
@@ -93,6 +95,8 @@ export interface CreateUserMomentRequest {
 
 export interface CreateMomentCommentRequest {
   text: string;
+  replyToCommentId?: string | null;
+  replyToAuthorId?: string | null;
 }
 
 export interface ToggleMomentLikeResult {

@@ -86,6 +86,12 @@ export function MomentsPage() {
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>(
     {},
   );
+  const [desktopReplyTarget, setDesktopReplyTarget] = useState<{
+    authorId: string;
+    authorName: string;
+    commentId: string;
+    postId: string;
+  } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [notice, setNotice] = useState("");
   const [noticeTone, setNoticeTone] = useState<"success" | "info">("success");
@@ -234,16 +240,26 @@ export function MomentsPage() {
         throw new Error("请先输入评论内容。");
       }
 
+      const replyTo =
+        desktopReplyTarget && desktopReplyTarget.postId === momentId
+          ? desktopReplyTarget
+          : null;
+
       return addMomentComment(
         momentId,
         {
           text,
+          replyToCommentId: replyTo?.commentId,
+          replyToAuthorId: replyTo?.authorId,
         },
         baseUrl,
       );
     },
     onSuccess: async (_, momentId) => {
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
+      setDesktopReplyTarget((current) =>
+        current?.postId === momentId ? null : current,
+      );
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
@@ -697,7 +713,9 @@ export function MomentsPage() {
           isMomentFavorite={(momentId) =>
             favoriteSourceIds.includes(`moment-${momentId}`)
           }
+          commentReplyTarget={desktopReplyTarget}
           setShowCompose={setShowCompose}
+          onCancelCommentReply={() => setDesktopReplyTarget(null)}
           onCommentChange={(momentId, value) =>
             setCommentDrafts((current) => ({
               ...current,
@@ -705,6 +723,14 @@ export function MomentsPage() {
             }))
           }
           onCommentSubmit={(momentId) => commentMutation.mutate(momentId)}
+          onStartCommentReply={({ momentId, comment }) =>
+            setDesktopReplyTarget({
+              authorId: comment.authorId,
+              authorName: comment.authorName,
+              commentId: comment.id,
+              postId: momentId,
+            })
+          }
           onCreate={() => createMutation.mutate()}
           onImageFilesSelected={(files) => {
             void handleImageFilesSelected(files);

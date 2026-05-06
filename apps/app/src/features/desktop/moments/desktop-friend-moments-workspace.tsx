@@ -1,12 +1,19 @@
 import { useEffect, useMemo, useRef } from "react";
-import { type Character, type Moment } from "@yinjie/contracts";
+import {
+  type Character,
+  type Moment,
+  type MomentComment,
+} from "@yinjie/contracts";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock } from "@yinjie/ui";
 import { ArrowLeft, Clock3, MessageCircle, Newspaper } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
 import { formatTimestamp, parseTimestamp } from "../../../lib/format";
 import { DesktopMomentComposePanel } from "./desktop-moment-compose-panel";
-import { DesktopMomentRow } from "./desktop-moment-row";
+import {
+  DesktopMomentRow,
+  type MomentCommentReplyTarget,
+} from "./desktop-moment-row";
 import {
   type MomentImageDraft,
   type MomentVideoDraft,
@@ -17,6 +24,7 @@ type DesktopFriendMomentsWorkspaceProps = {
   commentDrafts: Record<string, string>;
   commentErrorMessage?: string | null;
   commentPendingMomentId: string | null;
+  commentReplyTarget?: MomentCommentReplyTarget | null;
   composeErrorMessage?: string | null;
   createPending: boolean;
   displayName: string;
@@ -39,6 +47,7 @@ type DesktopFriendMomentsWorkspaceProps = {
   isMomentFavorite: (momentId: string) => boolean;
   setShowCompose: (nextValue: boolean) => void;
   onBack: () => void;
+  onCancelCommentReply?: () => void;
   onCommentChange: (momentId: string, value: string) => void;
   onCommentSubmit: (momentId: string) => void;
   onCreate: () => void;
@@ -52,6 +61,10 @@ type DesktopFriendMomentsWorkspaceProps = {
   }) => void;
   onRemoveImage: (id: string) => void;
   onRemoveVideo: () => void;
+  onStartCommentReply?: (input: {
+    momentId: string;
+    comment: MomentComment;
+  }) => void;
   onTextChange: (value: string) => void;
   onToggleFavorite: (momentId: string) => void;
   onVideoFileSelected: (file: File | null) => void;
@@ -62,6 +75,7 @@ export function DesktopFriendMomentsWorkspace({
   commentDrafts,
   commentErrorMessage,
   commentPendingMomentId,
+  commentReplyTarget = null,
   composeErrorMessage,
   createPending,
   displayName,
@@ -84,6 +98,7 @@ export function DesktopFriendMomentsWorkspace({
   isMomentFavorite,
   setShowCompose,
   onBack,
+  onCancelCommentReply,
   onCommentChange,
   onCommentSubmit,
   onCreate,
@@ -94,6 +109,7 @@ export function DesktopFriendMomentsWorkspace({
   onOpenProfilePopover,
   onRemoveImage,
   onRemoveVideo,
+  onStartCommentReply,
   onTextChange,
   onToggleFavorite,
   onVideoFileSelected,
@@ -196,13 +212,28 @@ export function DesktopFriendMomentsWorkspace({
             authorActionLabel="查看资料"
             commentDraft={commentDrafts[moment.id] ?? ""}
             commentLoading={commentPendingMomentId === moment.id}
+            commentReplyTarget={
+              commentReplyTarget?.postId === moment.id
+                ? commentReplyTarget
+                : null
+            }
             likeLoading={likePendingMomentId === moment.id}
             moment={moment}
             ownerId={ownerId}
             favorite={isMomentFavorite(moment.id)}
+            onCancelCommentReply={onCancelCommentReply}
             onCommentChange={(value) => onCommentChange(moment.id, value)}
             onCommentSubmit={() => onCommentSubmit(moment.id)}
             onLike={() => onLike(moment.id)}
+            onStartCommentReply={
+              onStartCommentReply
+                ? (comment) =>
+                    onStartCommentReply({
+                      momentId: comment.postId,
+                      comment,
+                    })
+                : undefined
+            }
             onAuthorAction={onOpenProfile}
             onSelectAuthor={(event) =>
               openProfilePopover(event.currentTarget, moment.id)

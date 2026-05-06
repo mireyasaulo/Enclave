@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
-import { type Moment } from "@yinjie/contracts";
+import { type Moment, type MomentComment } from "@yinjie/contracts";
 import { DesktopMomentComposePanel } from "./desktop-moment-compose-panel";
 import { DesktopMomentsFeed } from "./desktop-moments-feed";
+import { type MomentCommentReplyTarget } from "./desktop-moment-row";
 import {
   type MomentImageDraft,
   type MomentVideoDraft,
@@ -12,6 +13,7 @@ type DesktopMomentsWorkspaceProps = {
   commentDrafts: Record<string, string>;
   commentErrorMessage?: string | null;
   commentPendingMomentId: string | null;
+  commentReplyTarget?: MomentCommentReplyTarget | null;
   composeErrorMessage?: string | null;
   createPending: boolean;
   errors?: string[];
@@ -30,6 +32,7 @@ type DesktopMomentsWorkspaceProps = {
   videoDraft: MomentVideoDraft | null;
   isMomentFavorite: (momentId: string) => boolean;
   setShowCompose: (nextValue: boolean) => void;
+  onCancelCommentReply?: () => void;
   onCommentChange: (momentId: string, value: string) => void;
   onCommentSubmit: (momentId: string) => void;
   onCreate: () => void;
@@ -41,6 +44,10 @@ type DesktopMomentsWorkspaceProps = {
   }) => void;
   onRemoveImage: (id: string) => void;
   onRemoveVideo: () => void;
+  onStartCommentReply?: (input: {
+    momentId: string;
+    comment: MomentComment;
+  }) => void;
   onToggleFavorite: (momentId: string) => void;
   onRefresh: () => void;
   onTextChange: (value: string) => void;
@@ -51,6 +58,7 @@ export function DesktopMomentsWorkspace({
   commentDrafts,
   commentErrorMessage,
   commentPendingMomentId,
+  commentReplyTarget = null,
   composeErrorMessage,
   createPending,
   errors = [],
@@ -69,6 +77,7 @@ export function DesktopMomentsWorkspace({
   videoDraft,
   isMomentFavorite,
   setShowCompose,
+  onCancelCommentReply,
   onCommentChange,
   onCommentSubmit,
   onCreate,
@@ -77,6 +86,7 @@ export function DesktopMomentsWorkspace({
   onOpenAuthorPopover,
   onRemoveImage,
   onRemoveVideo,
+  onStartCommentReply,
   onToggleFavorite,
   onRefresh,
   onTextChange,
@@ -130,14 +140,25 @@ export function DesktopMomentsWorkspace({
               <DesktopMomentsFeed
                 commentDrafts={commentDrafts}
                 commentPendingMomentId={commentPendingMomentId}
+                commentReplyTarget={commentReplyTarget}
                 isLoading={isLoading}
                 likePendingMomentId={likePendingMomentId}
                 moments={moments}
                 ownerId={ownerId}
                 isMomentFavorite={isMomentFavorite}
+                onCancelCommentReply={onCancelCommentReply}
                 onCommentChange={onCommentChange}
                 onCommentSubmit={onCommentSubmit}
                 onLike={onLike}
+                onStartCommentReply={
+                  onStartCommentReply
+                    ? (comment) =>
+                        onStartCommentReply({
+                          momentId: comment.postId,
+                          comment,
+                        })
+                    : undefined
+                }
                 onToggleFavorite={onToggleFavorite}
                 onOpenCompose={() => setShowCompose(true)}
                 onSelectAuthor={onOpenAuthorPopover}

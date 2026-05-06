@@ -168,6 +168,10 @@ export class MomentsService implements OnModuleInit {
   async addOwnerComment(
     postId: string,
     text: string,
+    replyTo?: {
+      replyToCommentId?: string | null;
+      replyToAuthorId?: string | null;
+    },
   ): Promise<MomentCommentEntity> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     await this.assertOwnerCanInteractWithPost(postId);
@@ -178,6 +182,7 @@ export class MomentsService implements OnModuleInit {
       owner.avatar ?? '',
       text,
       'user',
+      replyTo,
     );
   }
 
@@ -200,7 +205,17 @@ export class MomentsService implements OnModuleInit {
     authorAvatar: string,
     text: string,
     authorType = 'user',
+    replyTo?: {
+      replyToCommentId?: string | null;
+      replyToAuthorId?: string | null;
+    },
   ): Promise<MomentCommentEntity> {
+    const replyToCommentId = replyTo?.replyToCommentId?.trim() || null;
+    let replyToAuthorId = replyTo?.replyToAuthorId?.trim() || null;
+    if (replyToCommentId && !replyToAuthorId) {
+      const target = await this.commentRepo.findOneBy({ id: replyToCommentId });
+      replyToAuthorId = target?.authorId ?? null;
+    }
     const comment = this.commentRepo.create({
       postId,
       authorId,
@@ -208,6 +223,8 @@ export class MomentsService implements OnModuleInit {
       authorAvatar,
       authorType,
       text,
+      replyToCommentId,
+      replyToAuthorId,
     });
     const saved = await this.commentRepo.save(comment);
     await this.postRepo.increment({ id: postId }, 'commentCount', 1);
