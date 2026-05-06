@@ -347,7 +347,7 @@ function MobileWorldCharactersPage() {
           <section className="mt-1 overflow-hidden border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]">
             {sections.map((section) => (
               <div key={section.key}>
-                <div className="sticky top-[78px] z-10 bg-[rgba(247,247,247,0.94)] px-4 py-1 text-[11px] font-medium tracking-[0.06em] text-[color:var(--text-muted)] backdrop-blur">
+                <div className="bg-[rgba(247,247,247,0.94)] px-4 py-1 text-[11px] font-medium tracking-[0.06em] text-[color:var(--text-muted)]">
                   {section.title}
                 </div>
                 {section.items.map((item, index) => (
