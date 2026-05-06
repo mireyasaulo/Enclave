@@ -1,5 +1,8 @@
+import { BadRequestException } from '@nestjs/common';
 import type { WikiContentSnapshot } from './entities/character-revision.entity';
 import type { CharacterBlueprintRecipeValue } from '../characters/character-blueprint.types';
+
+export const WIKI_CONTENT_SCHEMA_VERSION = 2 as const;
 
 export const WIKI_CONTENT_FIELDS = [
   'name',
@@ -14,8 +17,56 @@ export const WIKI_CONTENT_FIELDS = [
 
 export type WikiContentField = (typeof WIKI_CONTENT_FIELDS)[number];
 
+/**
+ * D 类（运行时态）+ E 类（平台/账户）字段：永远不允许通过 wiki 通道写入。
+ * 来自 CharacterEntity，详情见 plan 字段归属决策表。
+ */
+export const WIKI_REJECTED_FIELDS = [
+  'isOnline',
+  'onlineMode',
+  'activityMode',
+  'currentStatus',
+  'currentActivity',
+  'lastActiveAt',
+  'intimacyLevel',
+  'aiRelationships',
+  'sourceType',
+  'sourceKey',
+  'deletionPolicy',
+  'isTemplate',
+  'modelRoutingMode',
+  'inferenceProviderAccountId',
+  'inferenceModelId',
+  'allowOwnerKeyOverride',
+  'modelRoutingNotes',
+] as const;
+
+export type WikiRejectedField = (typeof WIKI_REJECTED_FIELDS)[number];
+
+/**
+ * Recipe 顶层路径（即 CharacterBlueprintRecipeValue 的根 key）。
+ */
+export const WIKI_RECIPE_ROOT_PATHS = [
+  'identity',
+  'expertise',
+  'tone',
+  'prompting',
+  'memorySeed',
+  'reasoning',
+  'lifeStrategy',
+  'publishMapping',
+  'realityLink',
+] as const;
+
 export function pickWikiContent(input: Record<string, unknown>): WikiContentSnapshot {
+  const rejected = WIKI_REJECTED_FIELDS.filter((key) => input[key] !== undefined);
+  if (rejected.length > 0) {
+    throw new BadRequestException(
+      `字段 ${rejected.join(', ')} 不能通过 wiki 通道修改`,
+    );
+  }
   return {
+    schemaVersion: WIKI_CONTENT_SCHEMA_VERSION,
     name: String(input.name ?? '').trim(),
     avatar: String(input.avatar ?? '').trim(),
     bio: String(input.bio ?? '').trim(),
@@ -35,13 +86,31 @@ export function pickWikiContent(input: Record<string, unknown>): WikiContentSnap
 }
 
 export function snapshotFromCharacter(char: Record<string, unknown>): WikiContentSnapshot {
-  return pickWikiContent(char);
+  return {
+    schemaVersion: WIKI_CONTENT_SCHEMA_VERSION,
+    name: String(char.name ?? '').trim(),
+    avatar: String(char.avatar ?? '').trim(),
+    bio: String(char.bio ?? '').trim(),
+    personality:
+      char.personality === undefined || char.personality === null
+        ? undefined
+        : String(char.personality),
+    expertDomains: Array.isArray(char.expertDomains)
+      ? (char.expertDomains as unknown[]).map((v) => String(v))
+      : [],
+    triggerScenes: Array.isArray(char.triggerScenes)
+      ? (char.triggerScenes as unknown[]).map((v) => String(v))
+      : undefined,
+    relationship: String(char.relationship ?? '').trim(),
+    relationshipType: String(char.relationshipType ?? '').trim(),
+  };
 }
 
 export function snapshotFromRecipe(
   recipe: CharacterBlueprintRecipeValue,
 ): WikiContentSnapshot {
   return {
+    schemaVersion: WIKI_CONTENT_SCHEMA_VERSION,
     name: recipe.identity.name,
     avatar: recipe.identity.avatar,
     bio: recipe.identity.bio,
@@ -378,19 +447,46 @@ export function mergeValueByPaths<T>(current: T, submitted: T, paths: string[]):
   return merged;
 }
 
-export function isHighRiskRecipeChange(paths: string[]): boolean {
-  return paths.some((path) =>
-    [
-      'prompting.',
-      'memorySeed.',
-      'reasoning.',
-      'lifeStrategy.',
-      'tone.',
-      'expertise.',
-      'publishMapping.',
-      'realityLink',
-    ].some((prefix) => path === prefix.replace(/\.$/, '') || path.startsWith(prefix)),
-  );
+/**
+ * 进入 system prompt 注入或影响平台行为的高风险路径。
+ * 命中任一前缀的 recipe path 都需 patroller+ 审核。
+ *
+ * 注意：`identity.background` / `motivation` / `worldview` 会作为 legacy fallback
+ * 注入 `<core_logic>`（见 prompt-builder.service.ts），所以也属高风险。
+ * 而 `identity.name` / `avatar` / `bio` / `relationship*` / `occupation` 是公共
+ * 显示字段，由 content snapshot 通道治理，不在 high-risk 列表。
+ */
+const HIGH_RISK_PREFIXES = [
+  'prompting.',
+  'memorySeed.',
+  'reasoning.',
+  'lifeStrategy.',
+  'tone.',
+  'expertise.',
+  'publishMapping.',
+  'realityLink',
+  'identity.background',
+  'identity.motivation',
+  'identity.worldview',
+] as const;
+
+export type HighRiskRecipeReport = {
+  highRisk: boolean;
+  reasons: string[];
+};
+
+export function isHighRiskRecipeChange(paths: string[]): HighRiskRecipeReport {
+  const reasons: string[] = [];
+  for (const path of paths) {
+    for (const prefix of HIGH_RISK_PREFIXES) {
+      const stripped = prefix.replace(/\.$/, '');
+      if (path === stripped || path.startsWith(prefix)) {
+        reasons.push(path);
+        break;
+      }
+    }
+  }
+  return { highRisk: reasons.length > 0, reasons };
 }
 
 function getPathValue(input: unknown, path: string): unknown {

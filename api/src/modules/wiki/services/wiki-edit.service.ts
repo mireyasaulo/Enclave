@@ -603,7 +603,8 @@ export class WikiEditService {
     }
     const afterContent = snapshotFromRecipe(afterRecipe);
 
-    const riskLevel = isHighRiskRecipeChange(changed) ? 'high' : 'low';
+    const riskReport = isHighRiskRecipeChange(changed);
+    const riskLevel = riskReport.highRisk ? 'high' : 'low';
     const autoApprove =
       rankOf(user.role) >= rankOf('patroller') ||
       (riskLevel === 'low' && rankOf(user.role) >= rankOf('autoconfirmed'));
@@ -616,7 +617,12 @@ export class WikiEditService {
         baseRevisionId: input.baseRevisionId ?? page.currentRevisionId ?? null,
         contentSnapshot: afterContent,
         recipeSnapshot: afterRecipe,
-        diffFromParent: { changed },
+        diffFromParent: {
+          changed,
+          ...(riskReport.highRisk
+            ? { highRiskReasons: riskReport.reasons }
+            : {}),
+        },
         editorUserId: user.id,
         editorRoleAtTime: user.role,
         editSummary: (input.editSummary ?? '').slice(0, 500),

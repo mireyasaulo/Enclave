@@ -8,6 +8,11 @@ import {
 import type { CharacterBlueprintRecipeValue } from '../../characters/character-blueprint.types';
 
 export type WikiContentSnapshot = {
+  /**
+   * 兼容标记：旧 revision 不带此字段（视为 1）；新写入强制为 2。
+   * 仅作为后续若需扩字段（如 occupation 升 content）时的迁移指针。
+   */
+  schemaVersion?: 1 | 2;
   name: string;
   avatar: string;
   bio: string;
