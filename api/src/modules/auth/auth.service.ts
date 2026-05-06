@@ -70,6 +70,11 @@ export class AuthService {
     const trimmed = username.trim();
     const user = await this.userRepo.findOne({ where: { username: trimmed } });
     if (!user) throw new UnauthorizedException('账号或密码错误');
+    if (!user.passwordHash) {
+      throw new UnauthorizedException(
+        '该账号通过邮箱验证码注册，请使用邮箱验证码登录。',
+      );
+    }
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) throw new UnauthorizedException('账号或密码错误');
     return this.buildSession(user);

@@ -4,14 +4,18 @@ import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { EmailAuthService } from './email-auth.service';
+import { EmailVerificationSessionEntity } from './email-verification-session.entity';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { MailModule } from '../mail/mail.module';
 import { OptionalJwtAuthGuard } from './optional-jwt-auth.guard';
 import { UserEntity } from './user.entity';
 import { WorldOwnerService } from './world-owner.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, EmailVerificationSessionEntity]),
+    MailModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -22,10 +26,17 @@ import { WorldOwnerService } from './world-owner.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [WorldOwnerService, AuthService, JwtAuthGuard, OptionalJwtAuthGuard],
+  providers: [
+    WorldOwnerService,
+    AuthService,
+    EmailAuthService,
+    JwtAuthGuard,
+    OptionalJwtAuthGuard,
+  ],
   exports: [
     WorldOwnerService,
     AuthService,
+    EmailAuthService,
     JwtAuthGuard,
     OptionalJwtAuthGuard,
     JwtModule,

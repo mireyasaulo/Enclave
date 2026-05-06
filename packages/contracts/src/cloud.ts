@@ -112,6 +112,29 @@ export interface VerifyPhoneCodeResponse {
   expiresAt: string;
 }
 
+export interface SendEmailCodeRequest {
+  email: string;
+}
+
+export interface SendEmailCodeResponse {
+  email: string;
+  expiresAt: string;
+  debugCode?: string | null;
+}
+
+export interface VerifyEmailCodeRequest {
+  email: string;
+  code: string;
+  inviteCode?: string;
+  deviceFingerprint?: string;
+}
+
+export interface VerifyEmailCodeResponse {
+  accessToken: string;
+  email: string;
+  expiresAt: string;
+}
+
 export interface IssueCloudAdminAccessTokenResponse {
   accessToken: string;
   expiresAt: string;

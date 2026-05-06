@@ -268,6 +268,24 @@ export const wikiApi = {
       auth: false,
     });
   },
+  sendEmailCode(email: string) {
+    return request<{
+      email: string;
+      expiresAt: string;
+      debugCode?: string | null;
+    }>("/auth/email/send-code", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+      auth: false,
+    });
+  },
+  verifyEmailCode(email: string, code: string) {
+    return request<AuthSession>("/auth/email/verify-code", {
+      method: "POST",
+      body: JSON.stringify({ email, code }),
+      auth: false,
+    });
+  },
   me() {
     return request<{
       id: string;

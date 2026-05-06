@@ -37,8 +37,12 @@ import type {
   CreateCloudWorldRequest,
   ResolveWorldAccessRequest,
   ResolveWorldAccessResponse,
+  SendEmailCodeRequest,
+  SendEmailCodeResponse,
   SendPhoneCodeRequest,
   SendPhoneCodeResponse,
+  VerifyEmailCodeRequest,
+  VerifyEmailCodeResponse,
   VerifyPhoneCodeRequest,
   VerifyPhoneCodeResponse,
   WorldAccessSessionSummary,
@@ -968,6 +972,34 @@ export function verifyCloudPhoneCode(
 ) {
   return requestCloudApi<VerifyPhoneCodeResponse>(
     "/cloud/auth/verify-code",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
+export function sendCloudEmailCode(
+  payload: SendEmailCodeRequest,
+  baseUrl?: string,
+) {
+  return requestCloudApi<SendEmailCodeResponse>(
+    "/cloud/auth/email/send-code",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
+export function verifyCloudEmailCode(
+  payload: VerifyEmailCodeRequest,
+  baseUrl?: string,
+) {
+  return requestCloudApi<VerifyEmailCodeResponse>(
+    "/cloud/auth/email/verify-code",
     {
       method: "POST",
       body: JSON.stringify(payload),
