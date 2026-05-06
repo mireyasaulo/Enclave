@@ -50,12 +50,14 @@ export function ProfilePage() {
   const settingsPath = isDesktopLayout
     ? "/desktop/settings"
     : "/profile/settings";
-  const showCloudAccountEntries = shouldShowCloudAccountControls({
-    worldAccessMode: runtimeConfig.worldAccessMode,
-    runtimeCloudPhone: runtimeConfig.cloudPhone,
-    accessToken: cloudAccessToken,
-    sessionPhone: cloudPhone,
-  });
+  const showCloudAccountEntries =
+    !isDesktopLayout &&
+    shouldShowCloudAccountControls({
+      worldAccessMode: runtimeConfig.worldAccessMode,
+      runtimeCloudPhone: runtimeConfig.cloudPhone,
+      accessToken: cloudAccessToken,
+      sessionPhone: cloudPhone,
+    });
 
   useEffect(() => {
     if (!desktopPathMismatch) {

@@ -36,7 +36,7 @@ import {
 } from "../store/chat-preferences-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
-type SettingsTab = "profile" | "chat" | "ai" | "language" | "legal";
+type SettingsTab = "profile" | "chat" | "ai" | "language" | "legal" | "account";
 type LegalTab = "privacy" | "terms" | "community";
 type ProfileSettingsMessage = ReturnType<typeof msg>;
 
@@ -48,6 +48,11 @@ const settingsTabs: Array<{ id: SettingsTab; label: ProfileSettingsMessage }> =
     { id: "language", label: msg`语言` },
     { id: "legal", label: msg`协议与规范` },
   ];
+
+const desktopAccountTab = {
+  id: "account",
+  label: msg`账号与退出`,
+} satisfies { id: SettingsTab; label: ProfileSettingsMessage };
 
 const legalTabs: Array<{ id: LegalTab; label: ProfileSettingsMessage }> = [
   { id: "privacy", label: msg`隐私政策` },
@@ -728,32 +733,56 @@ export function ProfileSettingsPage() {
         </>
       ) : null}
       {showCloudAccountEntries ? (
-        <MobileSettingsSection
-          desktop={desktopMode}
-          title={desktopMode ? t(msg`云账号`) : undefined}
-          description={
-            desktopMode
-              ? t(msg`查看会员信息，或退出当前云账号并回到世界入口。`)
-              : t(msg`管理会员与当前云账号登录状态`)
-          }
-        >
-          <div className="space-y-2">
-            <Button
-              variant="secondary"
-              className="h-9 w-full rounded-[10px] border-[color:var(--border-faint)] bg-white text-[12px] shadow-none hover:bg-[#f5f7f7]"
-              onClick={() => void navigate({ to: "/profile/subscription" })}
+        desktopMode ? (
+          activeTab === "account" ? (
+            <MobileSettingsSection
+              desktop
+              title={t(msg`云账号`)}
+              description={t(
+                msg`查看会员信息，或退出当前云账号并回到世界入口。`,
+              )}
             >
-              {t(msg`会员中心`)}
-            </Button>
-            <Button
-              variant="secondary"
-              className="h-9 w-full rounded-[10px] border-[rgba(220,38,38,0.14)] bg-white text-[12px] text-[#b42318] shadow-none hover:bg-[#fff5f5]"
-              onClick={handleCloudLogout}
-            >
-              {t(msg`退出登录`)}
-            </Button>
-          </div>
-        </MobileSettingsSection>
+              <div className="space-y-2">
+                <Button
+                  variant="secondary"
+                  className="h-9 w-full rounded-[10px] border-[color:var(--border-faint)] bg-white text-[12px] shadow-none hover:bg-[#f5f7f7]"
+                  onClick={() => void navigate({ to: "/profile/subscription" })}
+                >
+                  {t(msg`会员中心`)}
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="h-9 w-full rounded-[10px] border-[rgba(220,38,38,0.14)] bg-white text-[12px] text-[#b42318] shadow-none hover:bg-[#fff5f5]"
+                  onClick={handleCloudLogout}
+                >
+                  {t(msg`退出登录`)}
+                </Button>
+              </div>
+            </MobileSettingsSection>
+          ) : null
+        ) : (
+          <MobileSettingsSection
+            title={undefined}
+            description={t(msg`管理会员与当前云账号登录状态`)}
+          >
+            <div className="space-y-2">
+              <Button
+                variant="secondary"
+                className="h-9 w-full rounded-[10px] border-[color:var(--border-faint)] bg-white text-[12px] shadow-none hover:bg-[#f5f7f7]"
+                onClick={() => void navigate({ to: "/profile/subscription" })}
+              >
+                {t(msg`会员中心`)}
+              </Button>
+              <Button
+                variant="secondary"
+                className="h-9 w-full rounded-[10px] border-[rgba(220,38,38,0.14)] bg-white text-[12px] text-[#b42318] shadow-none hover:bg-[#fff5f5]"
+                onClick={handleCloudLogout}
+              >
+                {t(msg`退出登录`)}
+              </Button>
+            </div>
+          </MobileSettingsSection>
+        )
       ) : null}
     </>
   );
@@ -771,7 +800,9 @@ export function ProfileSettingsPage() {
                 ? t(msg`管理专属 API Key 和兼容 Base URL。`)
                 : activeTab === "language"
                   ? t(msg`切换当前端的界面语言和本地化格式。`)
-                  : t(msg`查看当前世界相关的协议和社区规范。`)
+                  : activeTab === "account"
+                    ? t(msg`管理当前云账号与退出登录。`)
+                    : t(msg`查看当前世界相关的协议和社区规范。`)
         }
         toolbar={
           <Button
@@ -815,6 +846,25 @@ export function ProfileSettingsPage() {
                 ))}
               </div>
             </div>
+            {showCloudAccountEntries ? (
+              <div className="border-t border-[color:var(--border-faint)] p-3">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab(desktopAccountTab.id)}
+                  className={cn(
+                    "flex w-full items-center justify-between rounded-[12px] px-3 py-2.5 text-left text-sm transition",
+                    activeTab === desktopAccountTab.id
+                      ? "bg-[rgba(220,38,38,0.08)] text-[#b42318]"
+                      : "text-[#b42318] hover:bg-[#fff5f5]",
+                  )}
+                >
+                  <span>{t(desktopAccountTab.label)}</span>
+                  {activeTab === desktopAccountTab.id ? (
+                    <span className="h-2 w-2 rounded-full bg-[#b42318]" />
+                  ) : null}
+                </button>
+              </div>
+            ) : null}
           </div>
         }
         aside={

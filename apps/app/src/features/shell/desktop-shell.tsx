@@ -11,7 +11,6 @@ import {
   Clock3,
   Copy,
   LockKeyhole,
-  LogOut,
   MessageSquareText,
   Minus,
   ShieldCheck,
@@ -25,10 +24,6 @@ import {
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, TextField, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../components/avatar-chip";
-import {
-  clearCloudRuntimeSession,
-  shouldShowCloudAccountControls,
-} from "../../lib/cloud-session";
 import { recordAppNavigation } from "../../lib/history-back";
 import { normalizePathname } from "../../lib/normalize-pathname";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
@@ -37,7 +32,6 @@ import {
   shouldNavigateCurrentWindow,
   type DesktopMainWindowNavigatePayload,
 } from "../../runtime/desktop-windowing";
-import { useCloudSessionStore } from "../../store/cloud-session-store";
 import { useWorldOwnerStore } from "../../store/world-owner-store";
 import { formatTimestamp } from "../../lib/format";
 import { hydrateDesktopFavoritesFromNative } from "../desktop/favorites/desktop-favorites-storage";
@@ -140,8 +134,6 @@ export function DesktopShell({ children }: PropsWithChildren) {
   const standaloneDesktopRoute = isStandaloneDesktopRoute(pathname);
   const profileRouteActive = isDesktopProfileRoute(pathname);
   const runtimeConfig = useAppRuntimeConfig();
-  const cloudAccessToken = useCloudSessionStore((state) => state.accessToken);
-  const cloudPhone = useCloudSessionStore((state) => state.phone);
   const ownerId = useWorldOwnerStore((state) => state.id);
   const ownerName = useWorldOwnerStore((state) => state.username);
   const ownerAvatar = useWorldOwnerStore((state) => state.avatar);
@@ -154,14 +146,6 @@ export function DesktopShell({ children }: PropsWithChildren) {
   const ownerDisplayName = ownerName?.trim() || ownerFallbackName;
   const brandInitial = t(msg`隐`);
   const baseUrl = runtimeConfig.apiBaseUrl;
-  const showCloudLogout = shouldShowCloudAccountControls({
-    worldAccessMode: runtimeConfig.worldAccessMode,
-    runtimeCloudPhone: runtimeConfig.cloudPhone,
-    accessToken: cloudAccessToken,
-    sessionPhone: cloudPhone,
-  });
-  const cloudAccountLabel =
-    cloudPhone?.trim() || runtimeConfig.cloudPhone?.trim() || null;
   const nativeDesktopShell = runtimeConfig.appPlatform === "desktop";
   const [desktopWindow, setDesktopWindow] =
     useState<DesktopWindowHandle | null>(null);
@@ -605,14 +589,6 @@ export function DesktopShell({ children }: PropsWithChildren) {
     }
   };
 
-  const handleCloudLogout = () => {
-    setIsMoreMenuOpen(false);
-    setIsOwnerCardOpen(false);
-    setOwnerCardNotice(null);
-    clearCloudRuntimeSession();
-    navigateDesktopShellTo("/welcome");
-  };
-
   if (nativeDesktopShell && (!lockStoreReady || !favoritesStoreReady)) {
     return null;
   }
@@ -785,7 +761,6 @@ export function DesktopShell({ children }: PropsWithChildren) {
                     ownerAvatar={ownerAvatar}
                     ownerSignature={ownerSignature}
                     appTitle={appTitle}
-                    cloudAccountLabel={cloudAccountLabel}
                     notice={ownerCardNotice}
                     isOpeningActionOperatorConversation={
                       isOpeningActionOperatorConversation
@@ -794,9 +769,6 @@ export function DesktopShell({ children }: PropsWithChildren) {
                     onOpenActionOperatorConversation={() => {
                       void openActionOperatorConversationShortcut();
                     }}
-                    onCloudLogout={
-                      showCloudLogout ? handleCloudLogout : undefined
-                    }
                   />
                 ) : null}
               </div>
@@ -1148,23 +1120,19 @@ function DesktopOwnerQuickCard({
   ownerAvatar,
   ownerSignature,
   appTitle,
-  cloudAccountLabel,
   notice,
   isOpeningActionOperatorConversation,
   onOpenMoments,
   onOpenActionOperatorConversation,
-  onCloudLogout,
 }: {
   ownerName: string | null;
   ownerAvatar: string;
   ownerSignature: string;
   appTitle: string;
-  cloudAccountLabel: string | null;
   notice: string | null;
   isOpeningActionOperatorConversation: boolean;
   onOpenMoments: () => void;
   onOpenActionOperatorConversation: () => void;
-  onCloudLogout?: () => void;
 }) {
   const t = useRuntimeTranslator();
   const ownerFallbackName = t(msg`世界主人`);
@@ -1213,26 +1181,6 @@ function DesktopOwnerQuickCard({
           disabled={isOpeningActionOperatorConversation}
         />
       </div>
-
-      {onCloudLogout ? (
-        <button
-          type="button"
-          onClick={onCloudLogout}
-          className="mt-3 flex w-full items-center gap-2.5 rounded-[14px] border border-[rgba(220,38,38,0.14)] bg-white px-3 py-2.5 text-left text-[#b42318] appearance-none transition hover:bg-[#fff5f5]"
-        >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-[rgba(220,38,38,0.08)]">
-            <LogOut size={15} />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[13px] font-medium">
-              {t(msg`退出登录`)}
-            </span>
-            <span className="mt-0.5 block truncate text-[11px] text-[color:var(--text-muted)]">
-              {cloudAccountLabel || t(msg`当前云账号`)}
-            </span>
-          </span>
-        </button>
-      ) : null}
 
       {notice ? (
         <div className="mt-3 rounded-[14px] border border-[rgba(255,159,10,0.24)] bg-[rgba(255,244,223,0.92)] px-3 py-2 text-[12px] leading-5 text-[#9a6700]">
