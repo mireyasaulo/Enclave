@@ -43,6 +43,7 @@ import {
 } from "@yinjie/contracts";
 import { AppPage, Button, cn, InlineNotice } from "@yinjie/ui";
 import { AvatarChip } from "../components/avatar-chip";
+import { ExpandableText } from "../components/expandable-text";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import {
   buildDesktopChannelsRouteHash,
@@ -1551,9 +1552,12 @@ function MobileChannelsCard({
                 {post.title}
               </div>
             ) : null}
-            <div className="mt-1 text-[12px] leading-[1.35rem] text-white">
-              {post.text}
-            </div>
+            <ExpandableText
+              text={post.text}
+              className="mt-1"
+              textClassName="text-[12px] leading-[1.35rem] text-white"
+              toggleClassName="text-[11px] text-white/82"
+            />
             {post.topicTags?.length ? (
               <div className="mt-2 flex flex-wrap gap-1.5 text-[9px] text-white/72">
                 {post.topicTags.slice(0, 3).map((tag) => (

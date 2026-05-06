@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
+import { ExpandableText } from "../../../components/expandable-text";
 import {
   hydrateLiveCompanionFromNative,
   readLiveDraft,
@@ -373,9 +374,11 @@ export function DesktopChannelsWorkspace({
                           {selectedPost.title}
                         </div>
                       ) : null}
-                      <div className="mt-4 text-[15px] leading-8 text-[color:var(--text-primary)]">
-                        {selectedPost.text}
-                      </div>
+                      <ExpandableText
+                        text={selectedPost.text}
+                        className="mt-4"
+                        textClassName="text-[15px] leading-8 text-[color:var(--text-primary)]"
+                      />
                       {selectedPost.topicTags?.length ? (
                         <div className="mt-3 flex flex-wrap gap-2">
                           {selectedPost.topicTags.slice(0, 4).map((tag) => (
