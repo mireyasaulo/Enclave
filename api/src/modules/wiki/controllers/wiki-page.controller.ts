@@ -15,6 +15,7 @@ import {
   type AuthenticatedUser,
 } from '../../auth/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../../auth/optional-jwt-auth.guard';
+import { WikiRateLimitGuard } from '../guards/wiki-rate-limit.guard';
 import { WikiEditService } from '../services/wiki-edit.service';
 import { WikiPageService } from '../services/wiki-page.service';
 
@@ -51,7 +52,7 @@ export class WikiPageController {
   }
 
   @Post('pages')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, WikiRateLimitGuard)
   createPage(
     @CurrentUser() user: AuthenticatedUser,
     @Body()
@@ -99,7 +100,7 @@ export class WikiPageController {
   }
 
   @Post('pages/:id/edits')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, WikiRateLimitGuard)
   submit(
     @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,

@@ -5,6 +5,7 @@ import {
   type AuthenticatedUser,
 } from '../../auth/jwt-auth.guard';
 import { RequireRole } from '../decorators/require-role.decorator';
+import { WikiRateLimitGuard } from '../guards/wiki-rate-limit.guard';
 import { WikiRoleGuard } from '../guards/wiki-role.guard';
 import { WikiEditService } from '../services/wiki-edit.service';
 
@@ -14,6 +15,7 @@ export class WikiSoftDeleteController {
   constructor(private readonly edits: WikiEditService) {}
 
   @Post(':id/delete-request')
+  @UseGuards(WikiRateLimitGuard)
   requestDelete(
     @Param('id') id: string,
     @CurrentUser() actor: AuthenticatedUser,
@@ -23,6 +25,7 @@ export class WikiSoftDeleteController {
   }
 
   @Post(':id/restore-request')
+  @UseGuards(WikiRateLimitGuard)
   requestRestore(
     @Param('id') id: string,
     @CurrentUser() actor: AuthenticatedUser,

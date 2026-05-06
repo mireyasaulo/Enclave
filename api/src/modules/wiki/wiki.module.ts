@@ -14,6 +14,7 @@ import { WikiProtectionLogEntity } from './entities/wiki-protection-log.entity';
 import { WikiTalkThreadEntity } from './entities/wiki-talk-thread.entity';
 import { WikiTalkPostEntity } from './entities/wiki-talk-post.entity';
 import { WikiWatchlistEntity } from './entities/wiki-watchlist.entity';
+import { WikiRateLimitGuard } from './guards/wiki-rate-limit.guard';
 import { WikiRoleGuard } from './guards/wiki-role.guard';
 import { WikiPageService } from './services/wiki-page.service';
 import { WikiEditService } from './services/wiki-edit.service';
@@ -77,6 +78,7 @@ import { WikiReportController } from './controllers/wiki-report.controller';
     WikiWatchlistService,
     WikiReportService,
     WikiRoleGuard,
+    WikiRateLimitGuard,
   ],
   exports: [
     WikiPageService,

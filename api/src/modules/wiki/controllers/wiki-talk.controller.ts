@@ -13,6 +13,7 @@ import {
   JwtAuthGuard,
   type AuthenticatedUser,
 } from '../../auth/jwt-auth.guard';
+import { WikiRateLimitGuard } from '../guards/wiki-rate-limit.guard';
 import { WikiTalkService } from '../services/wiki-talk.service';
 
 @Controller('wiki/talk')
@@ -25,7 +26,7 @@ export class WikiTalkController {
   }
 
   @Post(':characterId/threads')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, WikiRateLimitGuard)
   createThread(
     @Param('characterId') characterId: string,
     @CurrentUser() user: AuthenticatedUser,
@@ -40,7 +41,7 @@ export class WikiTalkController {
   }
 
   @Post('threads/:threadId/posts')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, WikiRateLimitGuard)
   createPost(
     @Param('threadId') threadId: string,
     @CurrentUser() user: AuthenticatedUser,
