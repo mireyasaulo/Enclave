@@ -5,7 +5,9 @@ import {
   Button,
   Card,
   ErrorBlock,
+  InlineNotice,
   LoadingBlock,
+  PanelEmpty,
   StatusPill,
   TextField,
 } from "@yinjie/ui";
@@ -13,6 +15,8 @@ import { hasRole } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
 import { wikiApi, type PendingReviewItem } from "../lib/wiki-api";
 import { SnapshotDiff } from "../components/snapshot-diff";
+import { PageShell } from "../components/page-shell";
+import { FormRow } from "../components/form-row";
 
 export function PendingReviewsPage() {
   const { user } = useAuth();
@@ -46,77 +50,117 @@ export function PendingReviewsPage() {
 
   if (!user) {
     return (
-      <Card className="p-6">
-        <p>请先登录。</p>
-      </Card>
+      <PageShell eyebrow="审核" title="待审编辑">
+        <Card className="p-6 text-sm">请先登录。</Card>
+      </PageShell>
     );
   }
   if (!hasRole(user, "patroller")) {
     return (
-      <Card className="p-6">
-        <p>仅巡查员及以上可访问待审编辑队列。</p>
-      </Card>
+      <PageShell eyebrow="审核" title="待审编辑">
+        <InlineNotice tone="warning">
+          仅巡查员及以上可访问待审编辑队列。
+        </InlineNotice>
+      </PageShell>
     );
   }
-  if (pendingQ.isLoading) return <LoadingBlock />;
-  if (pendingQ.isError)
-    return <ErrorBlock message={(pendingQ.error as Error).message} />;
+
   const items = pendingQ.data ?? [];
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-xl font-semibold">待审编辑（{items.length}）</h1>
-        <select
-          className="ml-auto border border-[var(--border-subtle)] rounded px-2 py-1 text-sm bg-white"
+    <PageShell
+      eyebrow="审核"
+      title={`待审编辑${items.length > 0 ? `（${items.length}）` : ""}`}
+      description="所有等待巡查的提交。可按操作类型、修订类型、风险等级筛选；快速通过 / 要求修改 / 驳回。"
+    >
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-3 text-sm shadow-[var(--shadow-soft)]">
+        <FilterSelect
+          label="操作"
           value={operation}
-          onChange={(event) => setOperation(event.target.value)}
-        >
-          <option value="">全部操作</option>
-          <option value="create">创建</option>
-          <option value="edit">编辑</option>
-          <option value="soft_delete">删除</option>
-          <option value="restore">恢复</option>
-        </select>
-        <select
-          className="border border-[var(--border-subtle)] rounded px-2 py-1 text-sm bg-white"
-          value={revisionKind}
-          onChange={(event) => setRevisionKind(event.target.value)}
-        >
-          <option value="">全部类型</option>
-          <option value="content">档案</option>
-          <option value="recipe">逻辑</option>
-          <option value="lifecycle">生命周期</option>
-        </select>
-        <select
-          className="border border-[var(--border-subtle)] rounded px-2 py-1 text-sm bg-white"
-          value={riskLevel}
-          onChange={(event) => setRiskLevel(event.target.value)}
-        >
-          <option value="">全部风险</option>
-          <option value="low">低风险</option>
-          <option value="high">高风险</option>
-        </select>
-      </div>
-      {items.length === 0 && (
-        <Card className="p-6">
-          <p className="text-sm text-[var(--text-muted)]">待审队列为空。</p>
-        </Card>
-      )}
-      {items.map((item) => (
-        <ReviewCard
-          key={item.submission.id}
-          item={item}
-          onDecide={(decision, note) =>
-            decideMut.mutate({
-              revisionId: item.revision.id,
-              decision,
-              note,
-            })
-          }
-          loading={decideMut.isPending}
+          onChange={setOperation}
+          options={[
+            ["", "全部"],
+            ["create", "创建"],
+            ["edit", "编辑"],
+            ["soft_delete", "删除"],
+            ["restore", "恢复"],
+          ]}
         />
-      ))}
-    </div>
+        <FilterSelect
+          label="类型"
+          value={revisionKind}
+          onChange={setRevisionKind}
+          options={[
+            ["", "全部"],
+            ["content", "档案"],
+            ["recipe", "逻辑"],
+            ["lifecycle", "生命周期"],
+          ]}
+        />
+        <FilterSelect
+          label="风险"
+          value={riskLevel}
+          onChange={setRiskLevel}
+          options={[
+            ["", "全部"],
+            ["low", "低风险"],
+            ["high", "高风险"],
+          ]}
+        />
+      </div>
+      {pendingQ.isLoading && <LoadingBlock />}
+      {pendingQ.isError && (
+        <ErrorBlock message={(pendingQ.error as Error).message} />
+      )}
+      {!pendingQ.isLoading && items.length === 0 && (
+        <PanelEmpty message="待审队列为空，喘口气吧 ☕。" />
+      )}
+      <ul className="space-y-3">
+        {items.map((item) => (
+          <li key={item.submission.id}>
+            <ReviewCard
+              item={item}
+              onDecide={(decision, note) =>
+                decideMut.mutate({
+                  revisionId: item.revision.id,
+                  decision,
+                  note,
+                })
+              }
+              loading={decideMut.isPending}
+            />
+          </li>
+        ))}
+      </ul>
+    </PageShell>
+  );
+}
+
+function FilterSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (next: string) => void;
+  options: [string, string][];
+}) {
+  return (
+    <label className="flex items-center gap-2">
+      <span className="text-xs text-[color:var(--text-muted)]">{label}</span>
+      <select
+        className="rounded-full border border-[color:var(--border-subtle)] bg-white px-3 py-1.5 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {options.map(([v, l]) => (
+          <option key={v} value={v}>
+            {l}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 
@@ -134,74 +178,92 @@ function ReviewCard({
 }) {
   const [note, setNote] = useState("");
   const rev = item.revision;
+  const isHigh = rev.riskLevel === "high";
   return (
-    <Card className="p-4 space-y-3">
-      <div className="flex items-center gap-2 text-sm">
+    <div
+      className={`overflow-hidden rounded-2xl border bg-[color:var(--surface-card)] shadow-[var(--shadow-soft)] ${
+        isHigh
+          ? "border-[color:var(--border-danger)]"
+          : "border-[color:var(--border-faint)]"
+      }`}
+    >
+      <div className="flex flex-wrap items-center gap-2 border-b border-[color:var(--border-faint)] px-4 py-3 text-sm">
         <Link
           to="/character/$characterId"
           params={{ characterId: rev.characterId }}
-          className="font-medium hover:underline"
+          className="font-medium text-[color:var(--text-primary)] hover:underline"
         >
           {rev.characterId}
         </Link>
         <StatusPill>v{rev.version}</StatusPill>
         <StatusPill>{rev.operation}</StatusPill>
         <StatusPill>{rev.revisionKind}</StatusPill>
-        {rev.riskLevel === "high" && <StatusPill>高风险</StatusPill>}
-        <span className="text-[var(--text-muted)]">
-          由 {rev.editorUserId}（{rev.editorRoleAtTime}）提交于
+        {isHigh && <StatusPill>高风险</StatusPill>}
+        <span className="ml-auto text-xs text-[color:var(--text-muted)]">
+          由 {rev.editorUserId}（{rev.editorRoleAtTime}）提交于{" "}
           {new Date(rev.createdAt).toLocaleString()}
         </span>
       </div>
-      {rev.editSummary && (
-        <div className="text-sm">摘要：{rev.editSummary}</div>
-      )}
-      <div className="text-xs text-[var(--text-muted)]">
-        改动字段：{rev.diffFromParent?.changed?.join(", ") ?? "—"}
-      </div>
-      <div className="rounded border border-[var(--border-subtle)] p-3">
-        <SnapshotDiff
-          before={null}
-          after={rev.contentSnapshot}
-          changedFields={rev.diffFromParent?.changed}
-        />
-      </div>
-      <details className="text-sm">
-        <summary className="cursor-pointer text-[var(--text-muted)]">
-          查看完整快照
-        </summary>
-        <pre className="mt-2 p-3 bg-[var(--bg-canvas)] rounded text-xs overflow-x-auto">
-          {JSON.stringify(rev.contentSnapshot, null, 2)}
-        </pre>
-      </details>
-      {rev.recipeSnapshot && (
-        <details className="text-sm">
-          <summary className="cursor-pointer text-[var(--text-muted)]">
-            查看角色逻辑快照
+      <div className="space-y-3 px-4 py-4 text-sm">
+        {rev.editSummary && (
+          <div>
+            <span className="text-xs text-[color:var(--text-muted)]">
+              摘要
+            </span>
+            <div className="mt-0.5 leading-6">{rev.editSummary}</div>
+          </div>
+        )}
+        <div className="text-xs text-[color:var(--text-muted)]">
+          改动字段：{rev.diffFromParent?.changed?.join(", ") ?? "—"}
+        </div>
+        <div className="rounded-xl border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas)] p-3">
+          <SnapshotDiff
+            before={null}
+            after={rev.contentSnapshot}
+            changedFields={rev.diffFromParent?.changed}
+          />
+        </div>
+        <details className="text-xs">
+          <summary className="cursor-pointer text-[color:var(--text-muted)]">
+            查看完整快照
           </summary>
-          <pre className="mt-2 p-3 bg-[var(--bg-canvas)] rounded text-xs overflow-x-auto">
-            {JSON.stringify(rev.recipeSnapshot, null, 2)}
+          <pre className="mt-2 overflow-x-auto rounded bg-[var(--bg-canvas)] p-3">
+            {JSON.stringify(rev.contentSnapshot, null, 2)}
           </pre>
         </details>
-      )}
-      <label className="block">
-        <span className="text-sm mb-1 block">审核备注（可选）</span>
-        <TextField
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="留给提交者的反馈"
-        />
-      </label>
-      <div className="flex gap-2">
+        {rev.recipeSnapshot && (
+          <details className="text-xs">
+            <summary className="cursor-pointer text-[color:var(--text-muted)]">
+              查看角色逻辑快照
+            </summary>
+            <pre className="mt-2 overflow-x-auto rounded bg-[var(--bg-canvas)] p-3">
+              {JSON.stringify(rev.recipeSnapshot, null, 2)}
+            </pre>
+          </details>
+        )}
+        <FormRow
+          label="审核备注（可选）"
+          hint="留给提交者的反馈。要求修改 / 驳回时建议填写"
+        >
+          <TextField
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="例如：请补充背景说明"
+          />
+        </FormRow>
+      </div>
+      <div className="flex flex-wrap items-center gap-2 border-t border-[color:var(--border-faint)] bg-[color:var(--surface-card-hover)] px-4 py-3">
         <Button
           variant="primary"
+          size="sm"
           disabled={loading}
           onClick={() => onDecide("approve", note || undefined)}
         >
-          通过
+          ✓ 通过
         </Button>
         <Button
           variant="secondary"
+          size="sm"
           disabled={loading}
           onClick={() => onDecide("request_changes", note || undefined)}
         >
@@ -209,12 +271,13 @@ function ReviewCard({
         </Button>
         <Button
           variant="danger"
+          size="sm"
           disabled={loading}
           onClick={() => onDecide("reject", note || undefined)}
         >
           驳回
         </Button>
       </div>
-    </Card>
+    </div>
   );
 }

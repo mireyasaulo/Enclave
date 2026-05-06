@@ -3,9 +3,11 @@ import { Link, useParams } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CharacterBlueprintRecipe } from "@yinjie/contracts";
 import {
+  AppSection,
   Button,
   Card,
   ErrorBlock,
+  InlineNotice,
   LoadingBlock,
   StatusPill,
   TagBadge,
@@ -27,6 +29,7 @@ import { ConflictResolver } from "../components/conflict-resolver";
 import { RiskBadge } from "../components/risk-badge";
 import { ScenePromptPreview } from "../components/scene-prompt-preview";
 import { WikiApiError } from "../lib/wiki-api";
+import { FormRow } from "../components/form-row";
 
 type Tab = "read" | "edit" | "history" | "talk";
 
@@ -66,53 +69,60 @@ export function CharacterPage() {
   const isPendingCreate = lifecycleStatus === "pending_create";
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3 border-b border-[var(--border-subtle)] pb-2">
-        <TabButton active={tab === "read"} onClick={() => setTab("read")}>
-          阅读
-        </TabButton>
-        <TabButton active={tab === "edit"} onClick={() => setTab("edit")}>
-          编辑
-        </TabButton>
-        <TabButton active={tab === "history"} onClick={() => setTab("history")}>
-          历史
-        </TabButton>
-        <TabButton active={tab === "talk"} onClick={() => setTab("talk")}>
-          讨论
-        </TabButton>
-        <div className="ml-auto flex items-center gap-2">
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="inline-flex rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-1 shadow-[var(--shadow-soft)]">
+          <TabButton active={tab === "read"} onClick={() => setTab("read")}>
+            阅读
+          </TabButton>
+          <TabButton active={tab === "edit"} onClick={() => setTab("edit")}>
+            编辑
+          </TabButton>
+          <TabButton
+            active={tab === "history"}
+            onClick={() => setTab("history")}
+          >
+            历史
+          </TabButton>
+          <TabButton active={tab === "talk"} onClick={() => setTab("talk")}>
+            讨论
+          </TabButton>
+        </div>
+        <div className="ml-auto flex flex-wrap items-center gap-2">
           {pageQ.data && (
             <ProtectionInfo level={pageQ.data.page.protectionLevel} />
           )}
           {isDeleted && <StatusPill>已删除</StatusPill>}
           {isPendingCreate && <StatusPill>待创建</StatusPill>}
           {pageQ.data?.pendingRevision && <StatusPill>有待审版本</StatusPill>}
-          {viewerCanSeeCurrent && pageQ.data?.latestRevision?.id !== pageQ.data?.stableRevision?.id && (
-            <div className="flex items-center border border-[var(--border-subtle)] rounded overflow-hidden text-xs">
-              <button
-                type="button"
-                className={`px-2 py-1 ${
-                  viewMode === "stable"
-                    ? "bg-[var(--accent)] text-white"
-                    : "bg-white text-[var(--text-muted)]"
-                }`}
-                onClick={() => setViewMode("stable")}
-              >
-                稳定版
-              </button>
-              <button
-                type="button"
-                className={`px-2 py-1 ${
-                  viewMode === "current"
-                    ? "bg-[var(--accent)] text-white"
-                    : "bg-white text-[var(--text-muted)]"
-                }`}
-                onClick={() => setViewMode("current")}
-              >
-                最新版
-              </button>
-            </div>
-          )}
+          {viewerCanSeeCurrent &&
+            pageQ.data?.latestRevision?.id !==
+              pageQ.data?.stableRevision?.id && (
+              <div className="inline-flex overflow-hidden rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] text-xs shadow-[var(--shadow-soft)]">
+                <button
+                  type="button"
+                  className={`px-3 py-1.5 ${
+                    viewMode === "stable"
+                      ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
+                      : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+                  }`}
+                  onClick={() => setViewMode("stable")}
+                >
+                  稳定版
+                </button>
+                <button
+                  type="button"
+                  className={`px-3 py-1.5 ${
+                    viewMode === "current"
+                      ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
+                      : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+                  }`}
+                  onClick={() => setViewMode("current")}
+                >
+                  最新版
+                </button>
+              </div>
+            )}
           <WatchToggle characterId={characterId} />
           {user && pageQ.data && (
             <Button
@@ -174,22 +184,16 @@ export function CharacterPage() {
       )}
 
       {isDeleted && (
-        <Card className="p-4 border-[var(--border-danger)] bg-[rgba(255,245,245,0.7)]">
-          <div className="text-sm">
-            <strong className="text-[var(--state-danger-text)]">
-              此词条已被软删除（红链）
-            </strong>
-            。恢复也按编辑审核流提交，底层角色数据保留以保持运行时引用一致。
-          </div>
-        </Card>
+        <InlineNotice tone="danger">
+          <strong>此词条已被软删除（红链）。</strong>
+          恢复也按编辑审核流提交，底层角色数据保留以保持运行时引用一致。
+        </InlineNotice>
       )}
 
       {isPendingCreate && (
-        <Card className="p-4 border-[var(--border-subtle)] bg-[rgba(255,251,235,0.7)]">
-          <div className="text-sm">
-            此角色仍在待创建队列中。巡查员通过创建版本后，才会写入运行时角色注册表。
-          </div>
-        </Card>
+        <InlineNotice tone="warning">
+          此角色仍在待创建队列中。巡查员通过创建版本后，才会写入运行时角色注册表。
+        </InlineNotice>
       )}
 
       {pageQ.data?.drift?.hasDrift && hasRole(user, "patroller") && (
@@ -240,10 +244,11 @@ function TabButton({
     <button
       type="button"
       onClick={onClick}
-      className={`px-3 py-2 text-sm rounded-t border-b-2 ${
+      aria-current={active ? "page" : undefined}
+      className={`min-w-[68px] rounded-full px-4 py-1.5 text-sm transition-colors ${
         active
-          ? "border-[var(--brand-primary)] text-[var(--text-primary)] font-medium"
-          : "border-transparent text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+          ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)] shadow-[var(--shadow-soft)]"
+          : "text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
       }`}
     >
       {children}
@@ -328,11 +333,11 @@ function ReadView({ view }: { view: WikiPageView }) {
         </>
       )}
       {view.pendingRevision && (
-        <div className="text-sm rounded border border-[var(--border-subtle)] bg-[var(--bg-canvas)] p-3">
+        <InlineNotice tone="info">
           有 {view.pendingRevisions.length} 个待审版本，最新为：
           <strong className="mx-1">v{view.pendingRevision.version}</strong>
           {view.pendingRevision.operation} / {view.pendingRevision.riskLevel}
-        </div>
+        </InlineNotice>
       )}
       <footer className="text-xs text-[var(--text-muted)] pt-3 border-t border-[var(--border-subtle)]">
         {view.viewMode === "current" ? "最新版" : "稳定版"}：
@@ -476,9 +481,9 @@ function EditView({
         。内容字段和角色逻辑都走同一套版本、冲突检测和巡查审核。
       </p>
       {view.pendingRevision && (
-        <div className="text-sm rounded border border-[var(--border-subtle)] bg-[var(--bg-canvas)] p-3">
-          当前已有待审版本 v{view.pendingRevision.version}，继续提交可能触发编辑冲突。
-        </div>
+        <InlineNotice tone="warning">
+          ⚠ 当前已有待审版本 v{view.pendingRevision.version}，继续提交可能触发编辑冲突。
+        </InlineNotice>
       )}
       <FormRow label="名称">
         <TextField
@@ -580,12 +585,8 @@ function EditView({
         />
         小修改（错别字、格式调整等）
       </label>
-      {error && <ErrorBlock message={error} />}
-      {info && (
-        <div className="text-sm text-[var(--state-success-text,#0a7d4f)]">
-          {info}
-        </div>
-      )}
+      {error && <InlineNotice tone="danger">{error}</InlineNotice>}
+      {info && <InlineNotice tone="success">{info}</InlineNotice>}
       {conflict && (
         <ConflictResolver
           base={initial}
@@ -692,13 +693,14 @@ export function LogicEditor({
   }, [recipe.realityLink]);
 
   return (
-    <div className="rounded border border-[var(--border-subtle)] p-4 space-y-4">
-      <div>
-        <h3 className="text-base font-semibold">角色信息与逻辑</h3>
-        <p className="text-sm text-[var(--text-muted)]">
-          这些字段会进入角色工厂发布流，属于影响运行时行为的高风险编辑。
-        </p>
-      </div>
+    <div className="space-y-4">
+      <InlineNotice tone="warning">
+        ⚠ 以下字段会进入角色工厂发布流，属于影响运行时行为的高风险编辑。修改后请仔细核对。
+      </InlineNotice>
+      <LogicSection
+        title="身份"
+        description="角色的基础信息：职业、背景、动机、世界观。"
+      >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormRow label="职业 / 身份">
           <TextField
@@ -773,6 +775,11 @@ export function LogicEditor({
           />
         </FormRow>
       </div>
+      </LogicSection>
+      <LogicSection
+        title="专长"
+        description="角色的知识范围、知识边界、拒答风格。"
+      >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FormRow label="专长说明">
           <TextAreaField
@@ -820,6 +827,11 @@ export function LogicEditor({
           />
         </FormRow>
       </div>
+      </LogicSection>
+      <LogicSection
+        title="语气与人设"
+        description="决定 AI 说话风格、表达密度，以及 base / system prompt 的核心字段。"
+      >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormRow label="说话模式（逗号分隔）">
           <TextField
@@ -950,6 +962,11 @@ export function LogicEditor({
           }
         />
       </FormRow>
+      </LogicSection>
+      <LogicSection
+        title="提示词"
+        description="核心逻辑、各场景 prompt、ScenePrompt 预览。"
+      >
       {characterId && (
         <ScenePromptPreview
           characterId={characterId}
@@ -1122,6 +1139,11 @@ export function LogicEditor({
           }
         />
       </div>
+      </LogicSection>
+      <LogicSection
+        title="记忆"
+        description="记忆摘要、核心记忆、近期摘要 prompt 与遗忘曲线。"
+      >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormRow label="记忆摘要">
           <TextAreaField
@@ -1236,6 +1258,11 @@ export function LogicEditor({
           />
         </FormRow>
       </div>
+      </LogicSection>
+      <LogicSection
+        title="生活策略与推理"
+        description="发圈/广场频率、活跃时段，以及 CoT / 反思 / 路由开关。"
+      >
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <FormRow label="发圈频率">
           <TextField
@@ -1360,6 +1387,11 @@ export function LogicEditor({
           启用路由
         </label>
       </div>
+      </LogicSection>
+      <LogicSection
+        title="个性细节"
+        description="口头禅、禁忌、小癖好——通常是低风险但能让角色更立体的字段。"
+      >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormRow label="口头禅（逗号分隔）">
           <TextField
@@ -1404,8 +1436,11 @@ export function LogicEditor({
           />
         </FormRow>
       </div>
-      <div className="rounded border border-[var(--border-subtle)] p-3 space-y-3">
-        <h4 className="text-sm font-medium">发布映射</h4>
+      </LogicSection>
+      <LogicSection
+        title="发布映射"
+        description="角色发布到运行时后的初始状态：模板、上线、活动模式默认值。"
+      >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <label className="flex items-center gap-2">
             <input
@@ -1492,7 +1527,11 @@ export function LogicEditor({
             </select>
           </FormRow>
         </div>
-      </div>
+      </LogicSection>
+      <LogicSection
+        title="现实联动"
+        description="可选 JSON：从外部数据源（社交账号、自媒体、API 等）读取动态信号注入提示词。"
+      >
       <FormRow
         label="现实联动配置 JSON"
         badge={
@@ -1528,7 +1567,34 @@ export function LogicEditor({
           </div>
         )}
       </FormRow>
+      </LogicSection>
     </div>
+  );
+}
+
+function LogicSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <AppSection className="space-y-4">
+      <div>
+        <h3 className="text-base font-semibold text-[color:var(--text-primary)]">
+          {title}
+        </h3>
+        {description && (
+          <p className="mt-0.5 text-xs text-[color:var(--text-muted)]">
+            {description}
+          </p>
+        )}
+      </div>
+      {children}
+    </AppSection>
   );
 }
 
@@ -1566,33 +1632,6 @@ function ScenePromptField({
         onChange={(event) => onChange(event.target.value)}
       />
     </FormRow>
-  );
-}
-
-function FormRow({
-  label,
-  hint,
-  badge,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  badge?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="block">
-      <span className="text-sm mb-1 block">
-        {label}
-        {badge}
-        {hint && (
-          <span className="ml-2 text-xs text-[var(--text-muted)] font-normal">
-            {hint}
-          </span>
-        )}
-      </span>
-      {children}
-    </label>
   );
 }
 
@@ -1825,7 +1864,7 @@ function DriftBanner({
   });
   const totalDrift = drift.contentDrift.length + drift.recipeDrift.length;
   return (
-    <Card className="p-4 border-[var(--border-warning)] bg-[rgba(255,247,205,0.6)]">
+    <Card className="border-[color:var(--state-warning-bg)] bg-[rgba(255,247,205,0.6)] p-4">
       <div className="flex items-start gap-2">
         <div className="flex-1 text-sm">
           <strong>⚠ 角色已被管理员后台直接修改</strong>

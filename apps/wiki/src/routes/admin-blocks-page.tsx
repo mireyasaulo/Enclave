@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  AppSection,
   Button,
-  Card,
   ErrorBlock,
+  InlineNotice,
   LoadingBlock,
+  PanelEmpty,
   StatusPill,
   TextField,
 } from "@yinjie/ui";
-import { hasRole } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
 import { wikiApi, type WikiBlockRow } from "../lib/wiki-api";
+import { PageShell } from "../components/page-shell";
+import { FormRow } from "../components/form-row";
 
 export function AdminBlocksPage() {
   const { user } = useAuth();
@@ -19,12 +22,10 @@ export function AdminBlocksPage() {
   const blocksQ = useQuery({
     queryKey: ["wiki", "blocks", showRevoked],
     queryFn: () => wikiApi.listBlocks({ active: !showRevoked }),
-    enabled: hasRole(user, "admin"),
   });
   const usersQ = useQuery({
     queryKey: ["wiki", "users"],
     queryFn: () => wikiApi.listUsers(),
-    enabled: hasRole(user, "admin"),
   });
   const blockMut = useMutation({
     mutationFn: wikiApi.blockUser,
@@ -49,28 +50,21 @@ export function AdminBlocksPage() {
     expiresAt: "",
   });
 
-  if (!user || !hasRole(user, "admin")) {
-    return (
-      <Card className="p-6">
-        <p>仅管理员可访问。</p>
-      </Card>
-    );
-  }
-
   const usersById = new Map((usersQ.data ?? []).map((u) => [u.id, u.username]));
-  const currentUserId = user.id;
+  const currentUserId = user?.id;
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold">封禁管理</h1>
-
-      <Card className="p-4 space-y-3">
-        <h2 className="font-medium">新增封禁</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <label className="block text-sm">
-            <span className="block mb-1">目标用户</span>
+    <PageShell
+      eyebrow="管理"
+      title="封禁管理"
+      description="对违规用户进行全站、单条目或讨论范围的封禁，可设置到期时间或永久。已撤销/到期的记录可勾选展示。"
+    >
+      <AppSection className="space-y-4">
+        <h2 className="text-base font-semibold">新增封禁</h2>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <FormRow label="目标用户" required>
             <select
-              className="w-full border rounded px-2 py-2 bg-white"
+              className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
               value={form.userId}
               onChange={(e) => setForm({ ...form, userId: e.target.value })}
             >
@@ -83,11 +77,10 @@ export function AdminBlocksPage() {
                   </option>
                 ))}
             </select>
-          </label>
-          <label className="block text-sm">
-            <span className="block mb-1">范围</span>
+          </FormRow>
+          <FormRow label="范围" required>
             <select
-              className="w-full border rounded px-2 py-2 bg-white"
+              className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
               value={form.scope}
               onChange={(e) =>
                 setForm({
@@ -100,10 +93,9 @@ export function AdminBlocksPage() {
               <option value="page">单条目</option>
               <option value="talk">讨论</option>
             </select>
-          </label>
+          </FormRow>
           {form.scope === "page" && (
-            <label className="block text-sm md:col-span-2">
-              <span className="block mb-1">条目 ID</span>
+            <FormRow label="条目 ID" required className="md:col-span-2">
               <TextField
                 value={form.targetCharacterId}
                 onChange={(e) =>
@@ -111,69 +103,83 @@ export function AdminBlocksPage() {
                 }
                 placeholder="例如：char-celebrity-andrej-karpathy"
               />
-            </label>
+            </FormRow>
           )}
-          <label className="block text-sm md:col-span-2">
-            <span className="block mb-1">原因（必填）</span>
+          <FormRow label="原因" required className="md:col-span-2">
             <TextField
               value={form.reason}
               onChange={(e) => setForm({ ...form, reason: e.target.value })}
+              placeholder="说明为什么对此用户/范围执行封禁"
             />
-          </label>
-          <label className="block text-sm">
-            <span className="block mb-1">到期时间（可选 ISO，如 2026-06-01T00:00:00Z）</span>
+          </FormRow>
+          <FormRow
+            label="到期时间"
+            hint="可选 ISO 时间，留空 = 永久"
+            className="md:col-span-2"
+          >
             <TextField
               value={form.expiresAt}
-              onChange={(e) => setForm({ ...form, expiresAt: e.target.value })}
-              placeholder="留空 = 永久"
+              onChange={(e) =>
+                setForm({ ...form, expiresAt: e.target.value })
+              }
+              placeholder="2026-06-01T00:00:00Z"
             />
-          </label>
+          </FormRow>
         </div>
-        <Button
-          variant="danger"
-          disabled={
-            !form.userId ||
-            !form.reason.trim() ||
-            (form.scope === "page" && !form.targetCharacterId.trim()) ||
-            blockMut.isPending
-          }
-          onClick={() =>
-            blockMut.mutate({
-              userId: form.userId,
-              scope: form.scope,
-              targetCharacterId:
-                form.scope === "page" ? form.targetCharacterId.trim() : undefined,
-              reason: form.reason.trim(),
-              expiresAt: form.expiresAt.trim() || null,
-            })
-          }
-        >
-          {blockMut.isPending ? "提交中..." : "封禁"}
-        </Button>
-        {blockMut.isError && (
-          <ErrorBlock message={(blockMut.error as Error).message} />
-        )}
-      </Card>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            variant="danger"
+            disabled={
+              !form.userId ||
+              !form.reason.trim() ||
+              (form.scope === "page" && !form.targetCharacterId.trim()) ||
+              blockMut.isPending
+            }
+            onClick={() =>
+              blockMut.mutate({
+                userId: form.userId,
+                scope: form.scope,
+                targetCharacterId:
+                  form.scope === "page"
+                    ? form.targetCharacterId.trim()
+                    : undefined,
+                reason: form.reason.trim(),
+                expiresAt: form.expiresAt.trim() || null,
+              })
+            }
+          >
+            {blockMut.isPending ? "提交中..." : "提交封禁"}
+          </Button>
+          {blockMut.isError && (
+            <span className="text-sm text-[color:var(--state-danger-text)]">
+              {(blockMut.error as Error).message}
+            </span>
+          )}
+        </div>
+      </AppSection>
 
-      <div className="flex items-center gap-3">
-        <h2 className="font-medium">封禁列表</h2>
-        <label className="ml-auto text-sm flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-3">
+        <h2 className="text-base font-semibold">封禁列表</h2>
+        <label className="ml-auto inline-flex items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] px-3 py-1.5 text-sm shadow-[var(--shadow-soft)]">
           <input
             type="checkbox"
             checked={showRevoked}
             onChange={(e) => setShowRevoked(e.target.checked)}
           />
-          含已撤销
+          含已撤销 / 已到期
         </label>
       </div>
       {blocksQ.isLoading && <LoadingBlock />}
       {blocksQ.isError && (
         <ErrorBlock message={(blocksQ.error as Error).message} />
       )}
+      {revokeMut.isError && (
+        <InlineNotice tone="danger">
+          {(revokeMut.error as Error).message}
+        </InlineNotice>
+      )}
       {blocksQ.data?.length === 0 && (
-        <Card className="p-4 text-sm text-[var(--text-muted)]">
-          没有相关封禁记录。
-        </Card>
+        <PanelEmpty message="没有相关封禁记录。" />
       )}
       <ul className="space-y-2">
         {blocksQ.data?.map((b) => (
@@ -186,7 +192,7 @@ export function AdminBlocksPage() {
           />
         ))}
       </ul>
-    </div>
+    </PageShell>
   );
 }
 
@@ -205,10 +211,12 @@ function BlockRow({
     !block.revokedAt &&
     (!block.expiresAt || new Date(block.expiresAt) > new Date());
   return (
-    <Card className="p-3 flex items-start gap-3 text-sm">
-      <div className="flex-1">
-        <div className="flex items-center gap-2 flex-wrap">
-          <strong>{username}</strong>
+    <li className="flex items-start gap-3 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-3 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[color:var(--surface-card-hover)]">
+      <div className="min-w-0 flex-1 space-y-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <strong className="text-[color:var(--text-primary)]">
+            {username}
+          </strong>
           <StatusPill>{block.scope}</StatusPill>
           {isActive ? (
             <StatusPill>生效中</StatusPill>
@@ -218,13 +226,13 @@ function BlockRow({
             <StatusPill>已到期</StatusPill>
           )}
           {block.targetCharacterId && (
-            <span className="text-xs text-[var(--text-muted)]">
+            <span className="text-xs text-[color:var(--text-muted)]">
               {block.targetCharacterId}
             </span>
           )}
         </div>
-        <div className="mt-1">{block.reason}</div>
-        <div className="text-xs text-[var(--text-muted)] mt-1">
+        <div>{block.reason}</div>
+        <div className="text-xs text-[color:var(--text-muted)]">
           创建于 {new Date(block.createdAt).toLocaleString()}
           {block.expiresAt &&
             ` · 到期 ${new Date(block.expiresAt).toLocaleString()}`}
@@ -233,10 +241,15 @@ function BlockRow({
         </div>
       </div>
       {isActive && (
-        <Button size="sm" disabled={revoking} onClick={onRevoke}>
+        <Button
+          size="sm"
+          variant="secondary"
+          disabled={revoking}
+          onClick={onRevoke}
+        >
           撤销
         </Button>
       )}
-    </Card>
+    </li>
   );
 }
