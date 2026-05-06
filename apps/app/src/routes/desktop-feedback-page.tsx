@@ -739,35 +739,33 @@ export function DesktopFeedbackPage() {
 
     let remoteOk = false;
     let remoteError: string | null = null;
-    if (cloudApiBaseUrl) {
-      try {
-        await submitCloudFeedback(
-          {
-            source: runtimeConfig.appPlatform === "desktop" ? "desktop" : "web",
-            category: draft.category,
-            priority: draft.priority,
-            title: normalizedTitle,
-            detail: normalizedDetail,
-            reproduction: normalizedReproduction,
-            expected: normalizedExpected,
-            diagnosticSummary,
-            includeSystemSnapshot: draft.includeSystemSnapshot,
-            clientRecordId,
-            clientSubmittedAt,
-            appPlatform: runtimeConfig.appPlatform || "web",
-            apiBaseUrl: baseUrl || null,
-            ownerName: ownerName || null,
-            ownerSignature: ownerSignature || null,
-          },
-          cloudApiBaseUrl,
-        );
-        remoteOk = true;
-      } catch (submitError) {
-        remoteError =
-          submitError instanceof Error
-            ? submitError.message
-            : t(msg`未知错误`);
-      }
+    try {
+      await submitCloudFeedback(
+        {
+          source: runtimeConfig.appPlatform === "desktop" ? "desktop" : "web",
+          category: draft.category,
+          priority: draft.priority,
+          title: normalizedTitle,
+          detail: normalizedDetail,
+          reproduction: normalizedReproduction,
+          expected: normalizedExpected,
+          diagnosticSummary,
+          includeSystemSnapshot: draft.includeSystemSnapshot,
+          clientRecordId,
+          clientSubmittedAt,
+          appPlatform: runtimeConfig.appPlatform || "web",
+          apiBaseUrl: baseUrl || null,
+          ownerName: ownerName || null,
+          ownerSignature: ownerSignature || null,
+        },
+        cloudApiBaseUrl || undefined,
+      );
+      remoteOk = true;
+    } catch (submitError) {
+      remoteError =
+        submitError instanceof Error
+          ? submitError.message
+          : t(msg`未知错误`);
     }
 
     const nextHistory = pushDesktopFeedbackRecord({
@@ -789,17 +787,12 @@ export function DesktopFeedbackPage() {
         message: t(msg`反馈已提交到云世界控制台。`),
         tone: "success",
       });
-    } else if (remoteError) {
-      setNotice({
-        message: t(
-          msg`已保存到本地，但同步到云世界控制台失败：${remoteError}`,
-        ),
-        tone: "danger",
-      });
     } else {
       setNotice({
-        message: t(msg`反馈已保存到本地工作区（未配置云世界 API 地址）。`),
-        tone: "success",
+        message: t(
+          msg`已保存到本地，但同步到云世界控制台失败：${remoteError ?? t(msg`未知错误`)}`,
+        ),
+        tone: "danger",
       });
     }
   }

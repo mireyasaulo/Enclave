@@ -35,6 +35,9 @@ const services = {
     cwd: path.join(rootDir, "apps", "app"),
     command: nodeBinary,
     args: [path.join(rootDir, "apps", "app", "node_modules", "vite", "bin", "vite.js")],
+    env: {
+      VITE_CLOUD_API_BASE_URL: "http://127.0.0.1:3001",
+    },
     port: 5180,
     url: "http://127.0.0.1:5180/",
   },
@@ -42,6 +45,9 @@ const services = {
     cwd: path.join(rootDir, "apps", "admin"),
     command: nodeBinary,
     args: [path.join(rootDir, "apps", "admin", "node_modules", "vite", "bin", "vite.js")],
+    env: {
+      VITE_CLOUD_API_BASE_URL: "http://127.0.0.1:3001",
+    },
     port: 5181,
     url: "http://127.0.0.1:5181/",
   },
