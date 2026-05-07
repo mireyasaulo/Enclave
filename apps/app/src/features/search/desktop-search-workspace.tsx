@@ -1130,33 +1130,33 @@ export function DesktopSearchWorkspace({
       onKeyDownCapture={handleWorkspaceKeyDownCapture}
     >
       <header className="shrink-0 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.92)] backdrop-blur-xl">
-        <div className="mx-auto w-full max-w-[1160px] px-6 py-5">
-          <div className="overflow-hidden rounded-[24px] border border-[#dce9dd] bg-[linear-gradient(135deg,rgba(7,193,96,0.14),rgba(7,193,96,0.05)_40%,white)]">
-            <div className="px-5 py-5">
-              <div className="flex items-start gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-white text-[color:var(--brand-primary)] shadow-[0_10px_24px_rgba(7,193,96,0.10)]">
-                  <Search size={18} />
+        <div className="mx-auto w-full max-w-[1160px] px-6 py-2">
+          <div className="overflow-hidden rounded-[18px] border border-[#dce9dd] bg-[linear-gradient(135deg,rgba(7,193,96,0.14),rgba(7,193,96,0.05)_40%,white)]">
+            <div className="px-4 py-2.5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-white text-[color:var(--brand-primary)] shadow-[0_10px_24px_rgba(7,193,96,0.10)]">
+                  <Search size={16} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-[color:var(--text-dim)]">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex min-w-0 items-baseline gap-2">
+                      <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[color:var(--text-dim)]">
                         搜一搜
                       </div>
-                      <div className="mt-2 truncate text-lg font-medium text-[color:var(--text-primary)]">
+                      <div className="min-w-0 truncate text-sm font-medium text-[color:var(--text-primary)]">
                         {headerTitle}
                       </div>
-                      <div className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">
+                      <div className="min-w-0 truncate text-xs text-[color:var(--text-secondary)]">
                         {categorySummary}
                       </div>
                     </div>
-                    <div className="shrink-0 rounded-full bg-white/90 px-3 py-1.5 text-[11px] text-[color:var(--text-muted)] shadow-[0_8px_18px_rgba(15,23,42,0.04)]">
+                    <div className="shrink-0 rounded-full bg-white/90 px-2.5 py-1 text-[11px] text-[color:var(--text-muted)] shadow-[0_8px_18px_rgba(15,23,42,0.04)]">
                       {headerBadge}
                     </div>
                   </div>
 
                   <form
-                    className="relative mt-4"
+                    className="relative mt-2"
                     onSubmit={(event) => {
                       event.preventDefault();
                       onCommitSearch(searchText);
@@ -1182,7 +1182,7 @@ export function DesktopSearchWorkspace({
                       onChange={(event) => setSearchText(event.target.value)}
                       onKeyDown={handleSearchInputKeyDown}
                       placeholder="搜索聊天记录、联系人、公众号、收藏和小程序"
-                      className="h-12 w-full rounded-[16px] border border-white/80 bg-white/96 pl-11 pr-20 text-sm text-[color:var(--text-primary)] outline-none transition-[border-color,box-shadow] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.4)] focus:shadow-[0_0_0_4px_rgba(7,193,96,0.08)]"
+                      className="h-9 w-full rounded-[12px] border border-white/80 bg-white/96 pl-10 pr-20 text-sm text-[color:var(--text-primary)] outline-none transition-[border-color,box-shadow] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.4)] focus:shadow-[0_0_0_4px_rgba(7,193,96,0.08)]"
                     />
                     {searchText ? (
                       <DesktopSearchActionButton
@@ -1201,13 +1201,13 @@ export function DesktopSearchWorkspace({
 
             <div
               className={cn(
-                "border-t border-white/80 px-5 py-3 transition-[background-color,box-shadow]",
+                "border-t border-white/80 px-4 py-1.5 transition-[background-color,box-shadow]",
                 keyboardFocusRegion === "categories"
                   ? "bg-[rgba(255,255,255,0.42)] shadow-[inset_0_1px_0_rgba(255,255,255,0.65),inset_0_0_0_1px_rgba(7,193,96,0.08)]"
                   : null,
               )}
             >
-              <div className="flex gap-2 overflow-x-auto pb-1">
+              <div className="flex gap-1.5 overflow-x-auto">
                 {searchCategoryLabels.map((item) => {
                   const countLabel = !hasKeyword
                     ? null
@@ -1227,7 +1227,7 @@ export function DesktopSearchWorkspace({
                         handleSelectCategory(item.id, { focusInput: true })
                       }
                       className={cn(
-                        "inline-flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-sm transition",
+                        "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition",
                         desktopSearchChipFocusClassName,
                         activeCategory === item.id
                           ? "border-[rgba(7,193,96,0.16)] bg-white text-[color:var(--text-primary)] shadow-[0_8px_18px_rgba(15,23,42,0.04)]"
@@ -1257,7 +1257,7 @@ export function DesktopSearchWorkspace({
       </header>
 
       <div ref={scrollViewportRef} className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto flex w-full max-w-[1160px] min-h-full flex-col px-6 py-6">
+        <div className="mx-auto flex w-full max-w-[1160px] min-h-full flex-col px-6 py-3">
           {loading ? (
             <DesktopSearchStatusCard
               badgeLabel="准备中"
@@ -2046,50 +2046,44 @@ function DesktopSearchContextBar({
         : "bg-[rgba(59,130,246,0.10)] text-[#1d4ed8]";
 
   return (
-    <div className="sticky top-0 z-10 mb-4 pt-1">
+    <div className="sticky top-0 z-10 mb-2">
       <section
         data-search-context-bar=""
-        className="rounded-[18px] border border-[rgba(7,193,96,0.14)] bg-[rgba(255,255,255,0.94)] p-4 shadow-[0_18px_42px_rgba(15,23,42,0.06)] backdrop-blur-xl"
+        className="rounded-[14px] border border-[rgba(7,193,96,0.14)] bg-[rgba(255,255,255,0.94)] px-3 py-2 shadow-[0_18px_42px_rgba(15,23,42,0.06)] backdrop-blur-xl"
       >
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[10px] font-medium text-[color:var(--brand-primary)]">
-                搜索上下文
-              </span>
-              <span className="rounded-full bg-[color:var(--surface-console)] px-2.5 py-1 text-[10px] text-[color:var(--text-muted)]">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="rounded-full bg-[rgba(7,193,96,0.10)] px-2 py-0.5 text-[10px] font-medium text-[color:var(--brand-primary)]">
                 {categoryTitle}
               </span>
-              <span className="rounded-full bg-[color:var(--surface-console)] px-2.5 py-1 text-[10px] text-[color:var(--text-muted)]">
+              <span className="rounded-full bg-[color:var(--surface-console)] px-2 py-0.5 text-[10px] text-[color:var(--text-muted)]">
                 {count} 条命中
               </span>
               {activeCategory === "all" && activeSectionTitle ? (
-                <span className="rounded-full bg-[rgba(7,193,96,0.08)] px-2.5 py-1 text-[10px] text-[color:var(--brand-primary)]">
-                  当前位于 {activeSectionTitle}
+                <span className="rounded-full bg-[rgba(7,193,96,0.08)] px-2 py-0.5 text-[10px] text-[color:var(--brand-primary)]">
+                  位于 {activeSectionTitle}
                 </span>
               ) : null}
+              <span className="truncate text-xs font-medium text-[color:var(--text-primary)]">
+                关键词“{keyword}”
+              </span>
               <span
                 className={cn(
-                  "rounded-full px-2.5 py-1 text-[10px] font-medium",
+                  "rounded-full px-2 py-0.5 text-[10px] font-medium",
                   focusRegionToneClassName,
                 )}
               >
-                当前位于 {focusRegionLabel}
+                {focusRegionLabel}
               </span>
             </div>
-            <div className="mt-3 text-sm font-medium text-[color:var(--text-primary)]">
-              关键词“{keyword}”
-            </div>
-            <div className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">
-              {contextDescription}
-            </div>
             {keyboardHint ? (
-              <div className="mt-2 inline-flex items-center rounded-full bg-[rgba(7,193,96,0.08)] px-2.5 py-1 text-[10px] text-[color:var(--brand-primary)]">
+              <div className="mt-1 truncate text-[10px] text-[color:var(--text-muted)]">
                 {keyboardHint}
               </div>
             ) : null}
           </div>
-          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
             {onBackToAll ? (
               <DesktopSearchActionButton
                 onClick={onBackToAll}
@@ -2116,18 +2110,15 @@ function DesktopSearchContextBar({
           </div>
         </div>
         {sectionItems?.length ? (
-          <div className="mt-4 border-t border-[rgba(15,23,42,0.06)] pt-4">
-            <div className="mb-2 text-[11px] font-medium uppercase tracking-[0.14em] text-[color:var(--text-dim)]">
-              结果分区
-            </div>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="mt-2 border-t border-[rgba(15,23,42,0.06)] pt-2">
+            <div className="flex gap-1.5 overflow-x-auto">
               {sectionItems.map((item) => (
                 <button
                   key={item.category}
                   type="button"
                   onClick={() => onSelectSection?.(item.category)}
                   className={cn(
-                    "inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-xs transition",
+                    "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] transition",
                     desktopSearchChipFocusClassName,
                     activeSection === item.category
                       ? "border-[rgba(7,193,96,0.16)] bg-[rgba(7,193,96,0.08)] text-[color:var(--brand-primary)]"
