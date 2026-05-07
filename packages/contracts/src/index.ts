@@ -14,6 +14,7 @@ export * from "./contact-import";
 export * from "./contact-import-parser";
 export * from "./cyber-avatar";
 export * from "./evals";
+export * from "./farm";
 export * from "./feed";
 export * from "./favorites";
 export * from "./feedback";

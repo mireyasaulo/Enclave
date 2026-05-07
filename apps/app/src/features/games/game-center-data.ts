@@ -248,6 +248,27 @@ export const gameCenterGames: GameCenterGame[] = [
     tags: ["对打", "同屏", "组局"],
   },
   {
+    id: "yinjie-farm",
+    name: "隐界农场",
+    slogan: "世界角色和你一起种地，连偷菜的都是熟人。",
+    description:
+      "把 QQ 农场的小时级节奏搬进隐界世界。NPC 自治种植、自治串门、自治偷菜；好感度真的会变。每个角色都按自己的性格、专长在玩——你下线时也一样。",
+    studio: "隐界游戏实验室",
+    badge: "世界自治",
+    heroLabel: "小时级农场",
+    category: "strategy",
+    tone: "forest",
+    playersLabel: "世界自治",
+    friendsLabel: "全员 NPC",
+    updateNote: "首发 14 种作物 + 偷菜小道消息",
+    deckLabel: "世界经营",
+    estimatedDuration: "随时回收",
+    rewardLabel: "金币 + 经验 + 好感度",
+    sessionObjective:
+      "先种两块成熟作物，再去隔壁串个门——记得看看谁夜里来过你家。",
+    tags: ["农场", "偷菜", "NPC自治", "长线"],
+  },
+  {
     id: "cloud-farm",
     name: "云上农场",
     slogan: "种地、收菜、帮邻居浇水，节奏慢但黏性很强。",
@@ -290,6 +311,7 @@ export const gameCenterGames: GameCenterGame[] = [
 ];
 
 export const gameCenterFeaturedGameIds = [
+  "yinjie-farm",
   "parking-war",
   "signal-squad",
   "night-market",
@@ -313,7 +335,7 @@ export const gameCenterShelves: GameCenterShelf[] = [
     id: "easy-return",
     title: "适合碎片时间继续",
     description: "放可以随时返回、继续经营或推进的项目。",
-    gameIds: ["cloud-farm", "night-market", "cat-inn"],
+    gameIds: ["yinjie-farm", "cloud-farm", "night-market", "cat-inn"],
   },
 ];
 
