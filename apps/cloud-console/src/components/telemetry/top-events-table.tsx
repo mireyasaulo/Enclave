@@ -23,7 +23,7 @@ export function TelemetryTopEventsTable({ data }: { data: TelemetryTopEventsResp
         </thead>
         <tbody className="divide-y divide-(--border-faint)">
           {data.rows.map((row) => (
-            <tr key={`${row.appId}:${row.eventName}`}>
+            <tr key={`${row.appId}:${row.eventName}:${row.eventType}`}>
               <Td><Pill>{row.appId}</Pill></Td>
               <Td className="font-medium text-(--text-primary)">{row.eventName}</Td>
               <Td><span className="text-xs text-(--text-muted)">{row.eventType}</span></Td>
