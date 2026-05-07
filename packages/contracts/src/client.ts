@@ -67,6 +67,14 @@ import type {
   FeedSurface,
   FeedViewRequest,
 } from "./feed";
+import type {
+  FarmCropId,
+  FarmEventView,
+  FarmHarvestResult,
+  FarmNeighborDetail,
+  FarmNeighborSummary,
+  FarmPlayerStateView,
+} from "./farm";
 import type { GameCenterHomeResponse, GameCenterOwnerState } from "./games";
 import type {
   CreateMessageFavoriteRequest,
@@ -2861,6 +2869,156 @@ export function dismissGameCenterActiveGame(baseUrl?: string) {
     {
       method: "DELETE",
     },
+    baseUrl,
+  );
+}
+
+export function getFarmState(baseUrl?: string) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/state",
+    undefined,
+    baseUrl,
+  );
+}
+
+export function getFarmNeighbors(
+  options?: { limit?: number },
+  baseUrl?: string,
+) {
+  const params = new URLSearchParams();
+  if (options?.limit != null) params.set("limit", String(options.limit));
+  const qs = params.toString();
+  return requestLegacyApi<FarmNeighborSummary[]>(
+    qs ? `/games/farm/neighbors?${qs}` : "/games/farm/neighbors",
+    undefined,
+    baseUrl,
+  );
+}
+
+export function getFarmNeighborDetail(characterId: string, baseUrl?: string) {
+  return requestLegacyApi<FarmNeighborDetail>(
+    `/games/farm/neighbors/${encodeURIComponent(characterId)}`,
+    undefined,
+    baseUrl,
+  );
+}
+
+export function plantFarmCrop(
+  input: { plotIndex: number; cropId: FarmCropId },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/plant",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function waterFarmPlot(
+  input: { plotIndex: number; characterId?: string },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/water",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function weedFarmPlot(
+  input: { plotIndex: number; characterId?: string },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/weed",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function debugFarmPlot(
+  input: { plotIndex: number; characterId?: string },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/debug",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function harvestFarmPlot(
+  input: { plotIndex: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmHarvestResult>(
+    "/games/farm/harvest",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function buyFarmSeed(
+  input: { cropId: FarmCropId; quantity: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/buy-seed",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function sellFarmCrop(
+  input: { cropId: FarmCropId; quantity: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/sell-crop",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function getFarmEvents(
+  options?: { since?: string; limit?: number },
+  baseUrl?: string,
+) {
+  const params = new URLSearchParams();
+  if (options?.since) params.set("since", options.since);
+  if (options?.limit != null) params.set("limit", String(options.limit));
+  const qs = params.toString();
+  return requestLegacyApi<FarmEventView[]>(
+    qs ? `/games/farm/events?${qs}` : "/games/farm/events",
+    undefined,
     baseUrl,
   );
 }

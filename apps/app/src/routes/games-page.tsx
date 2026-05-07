@@ -369,6 +369,10 @@ export function GamesPage() {
     const game = getGameCenterGame(gameId);
     launchGame(gameId);
     setSelectedGameId(gameId);
+    if (gameId === "yinjie-farm") {
+      void navigate({ to: "/tabs/games/yinjie-farm" });
+      return;
+    }
     setNoticeTone("success");
     setSuccessNotice(
       `${game?.name ?? "该游戏"} 已加入最近玩过。首期先以游戏中心内容工作区承接，后续再接小游戏容器。`,

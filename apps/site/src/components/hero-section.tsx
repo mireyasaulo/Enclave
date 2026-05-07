@@ -83,13 +83,19 @@ export async function HeroSection({ locale }: { locale: SupportedLocale }) {
               <span className="size-2.5 rounded-full bg-emerald-300/80" />
               <span className="ml-3 text-[11px] font-medium text-(--text-dim)">{labels.coreLoop}</span>
             </div>
+            {/*
+              Animated WebP cuts the GIF payload by ~80%, dramatically
+              improving LCP on the hero. unoptimized: skip Next's image
+              optimizer (which would lose animation frames).
+            */}
             <Image
-              src={`/animations/${locale}.gif`}
+              src={`/animations/${locale}.webp`}
               alt={labels.gifAlt}
               width={1200}
               height={750}
               unoptimized
               priority
+              fetchPriority="high"
               className="block w-full h-auto"
             />
           </div>

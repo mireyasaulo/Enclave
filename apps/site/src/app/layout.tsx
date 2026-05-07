@@ -2,8 +2,18 @@ import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import { DEFAULT_LOCALE, isSupportedLocale, type SupportedLocale } from "@/lib/locales";
 import { SITE_BASE_URL } from "@/lib/seo-metadata";
+import { siteLinks } from "@/lib/site-links";
 import { SiteAnalyticsProvider } from "@/components/site-analytics-provider";
 import "./globals.css";
+
+// Origin for preconnect/dns-prefetch — strip path/query, keep scheme + host + port.
+const SAAS_ORIGIN = (() => {
+  try {
+    return new URL(siteLinks.app).origin;
+  } catch {
+    return null;
+  }
+})();
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_BASE_URL),
@@ -36,6 +46,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = pickLocaleFromPath(h.get("x-pathname"));
   return (
     <html lang={locale}>
+      <head>
+        {SAAS_ORIGIN ? (
+          <>
+            <link rel="preconnect" href={SAAS_ORIGIN} />
+            <link rel="dns-prefetch" href={SAAS_ORIGIN} />
+          </>
+        ) : null}
+      </head>
       <body data-locale={locale}>
         <SiteAnalyticsProvider>{children}</SiteAnalyticsProvider>
       </body>

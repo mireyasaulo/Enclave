@@ -78,6 +78,11 @@ const GamesPage = lazy(async () => {
   return { default: mod.GamesPage };
 });
 
+const YinjieFarmPage = lazy(async () => {
+  const mod = await import("./routes/yinjie-farm-page");
+  return { default: mod.YinjieFarmPage };
+});
+
 const MiniProgramsPage = lazy(async () => {
   const mod = await import("./routes/mini-programs-page");
   return { default: mod.MiniProgramsPage };
@@ -472,6 +477,13 @@ const gamesRoute = createRoute({
   getParentRoute: () => tabsRoute,
   path: "/games",
   component: GamesPage,
+});
+
+const yinjieFarmRoute = createRoute({
+  getParentRoute: () => tabsRoute,
+  path: "/games/yinjie-farm",
+  beforeLoad: requireWorldReady,
+  component: YinjieFarmPage,
 });
 
 const miniProgramsRoute = createRoute({
@@ -887,6 +899,7 @@ const routeTree = rootRoute.addChildren([
     channelsRoute,
     searchRoute,
     gamesRoute,
+    yinjieFarmRoute,
     miniProgramsRoute,
     discoverRoute,
     contactsRoute,

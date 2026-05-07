@@ -113,7 +113,7 @@ export async function DownloadCards({ locale }: { locale: SupportedLocale }) {
                 </span>
               ) : null}
             </div>
-            <h3 className="mt-4 text-lg font-semibold text-(--text-primary)">{i18n._(card.titleZh)}</h3>
+            <h2 className="mt-4 text-lg font-semibold text-(--text-primary)">{i18n._(card.titleZh)}</h2>
             <p className="mt-2 text-sm leading-6 text-(--text-secondary)">{i18n._(card.hintZh)}</p>
             <div className="mt-5 flex-1" />
             {card.available ? (

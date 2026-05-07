@@ -65,13 +65,46 @@ for (const [locale, suffix] of Object.entries(LOCALE_SUFFIX)) {
   }
 }
 
-// Animations
-for (const [locale, suffix] of Object.entries(LOCALE_SUFFIX)) {
-  const src = path.join(repoRoot, "docs", "assets", `yinjie-core-loop${suffix}.gif`);
-  const dst = path.join(siteRoot, "public", "animations", `${locale}.gif`);
-  if (copyIfChanged(src, dst)) copied++;
+// Animations: copy GIF + transcode to animated WebP (LCP optimization).
+// Sharp keeps animated WebP about 70-80% smaller than the source GIF.
+const ANIM_SOURCES = Object.entries(LOCALE_SUFFIX).map(([locale, suffix]) => ({
+  locale,
+  src: path.join(repoRoot, "docs", "assets", `yinjie-core-loop${suffix}.gif`),
+  gifDst: path.join(siteRoot, "public", "animations", `${locale}.gif`),
+  webpDst: path.join(siteRoot, "public", "animations", `${locale}.webp`),
+}));
+
+for (const { src, gifDst } of ANIM_SOURCES) {
+  if (copyIfChanged(src, gifDst)) copied++;
   else skipped++;
 }
+
+async function emitAnimatedWebp() {
+  let sharp;
+  try {
+    sharp = (await import("sharp")).default;
+  } catch {
+    console.warn("[site:sync-assets] sharp unavailable, skipping animated WebP");
+    return 0;
+  }
+  let written = 0;
+  for (const { src, webpDst } of ANIM_SOURCES) {
+    if (!existsSync(src)) continue;
+    if (existsSync(webpDst)) {
+      const s = statSync(src).mtimeMs;
+      const d = statSync(webpDst).mtimeMs;
+      if (d >= s) continue;
+    }
+    await sharp(src, { animated: true })
+      .webp({ quality: 80, effort: 4 })
+      .toFile(webpDst);
+    written++;
+  }
+  return written;
+}
+
+const webpExtra = await emitAnimatedWebp();
+copied += webpExtra;
 
 // Favicon (Tauri icon as PNG source)
 const faviconSrc = path.join(repoRoot, "apps", "desktop", "src-tauri", "icons", "icon.png");
