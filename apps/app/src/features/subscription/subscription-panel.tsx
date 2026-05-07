@@ -22,6 +22,7 @@ import {
   shareWithNativeShell,
 } from "../../runtime/mobile-bridge";
 import { useCloudSessionStore } from "../../store/cloud-session-store";
+import { CheckoutContactDialog } from "./checkout-contact-dialog";
 
 function formatPrice(priceCents: number, currency: string) {
   const amount = (priceCents / 100).toFixed(1);
@@ -333,7 +334,12 @@ export function SubscriptionPanel({
   const accessToken = useCloudSessionStore((state) => state.accessToken);
   const phone = useCloudSessionStore((state) => state.phone);
   const setProfile = useCloudSessionStore((state) => state.setProfile);
-  const [checkoutNotice, setCheckoutNotice] = useState("");
+  const [contactDialog, setContactDialog] = useState<{
+    open: boolean;
+    hint: string;
+    contact: string;
+    planName: string;
+  }>({ open: false, hint: "", contact: "", planName: "" });
 
   const profileQuery = useQuery({
     queryKey: ["cloud-profile", accessToken],
@@ -365,17 +371,21 @@ export function SubscriptionPanel({
 
   const [checkoutError, setCheckoutError] = useState("");
   const checkoutMutation = useMutation({
-    mutationFn: (planCode: string) =>
+    mutationFn: ({ planCode }: { planCode: string; planName: string }) =>
       createCheckout({ planCode }, accessToken ?? ""),
-    onSuccess: (result) => {
+    onSuccess: (result, variables) => {
       setCheckoutError("");
-      setCheckoutNotice(
-        [result.hint, result.contact].filter(Boolean).join(" ") ||
-          t(msg`已提交开通申请，请联系运营完成支付。`),
-      );
+      const hint =
+        result.hint || t(msg`已提交开通申请，请联系运营完成支付。`);
+      setContactDialog({
+        open: true,
+        hint,
+        contact: result.contact ?? "",
+        planName: variables.planName,
+      });
     },
     onError: (error) => {
-      setCheckoutNotice("");
+      setContactDialog((prev) => ({ ...prev, open: false }));
       setCheckoutError(
         describeRequestError(error, t(msg`提交开通申请失败，请稍后重试。`)),
       );
@@ -478,11 +488,6 @@ export function SubscriptionPanel({
           <div className="text-sm font-semibold text-[color:var(--text-primary)]">
             {t(msg`可购套餐`)}
           </div>
-          {checkoutNotice ? (
-            <InlineNotice className="mt-4" tone="info">
-              {checkoutNotice}
-            </InlineNotice>
-          ) : null}
           {checkoutError ? (
             <InlineNotice className="mt-4" tone="danger">
               {checkoutError}
@@ -512,7 +517,12 @@ export function SubscriptionPanel({
                       variant="primary"
                       className="mt-3 rounded-2xl bg-[#07c160] text-white shadow-none hover:bg-[#06ad56]"
                       disabled={checkoutMutation.isPending}
-                      onClick={() => checkoutMutation.mutate(plan.code)}
+                      onClick={() =>
+                        checkoutMutation.mutate({
+                          planCode: plan.code,
+                          planName: plan.name,
+                        })
+                      }
                     >
                       {checkoutMutation.isPending
                         ? t(msg`提交中…`)
@@ -575,6 +585,16 @@ export function SubscriptionPanel({
           </AppSection>
         </div>
       </div>
+
+      <CheckoutContactDialog
+        open={contactDialog.open}
+        hint={contactDialog.hint}
+        contact={contactDialog.contact}
+        planName={contactDialog.planName}
+        onClose={() =>
+          setContactDialog((prev) => ({ ...prev, open: false }))
+        }
+      />
     </div>
   );
 }
