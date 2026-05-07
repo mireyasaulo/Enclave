@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -129,11 +130,13 @@ export function HomePage() {
 }
 
 function Avatar({ name, url }: { name: string; url?: string }) {
-  if (url) {
+  const [broken, setBroken] = useState(false);
+  if (url && !broken) {
     return (
       <img
         src={url}
         alt={name}
+        onError={() => setBroken(true)}
         className="h-12 w-12 shrink-0 rounded-2xl object-cover"
       />
     );

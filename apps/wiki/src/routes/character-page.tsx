@@ -118,9 +118,14 @@ export function CharacterPage() {
         {viewerCanSeeCurrent &&
           pageQ.data?.latestRevision?.id !==
             pageQ.data?.stableRevision?.id && (
-            <div className="inline-flex overflow-hidden rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] text-xs shadow-[var(--shadow-soft)]">
+            <div
+              role="group"
+              aria-label={t(msg`版本切换`)}
+              className="inline-flex overflow-hidden rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] text-xs shadow-[var(--shadow-soft)]"
+            >
               <button
                 type="button"
+                aria-pressed={viewMode === "stable"}
                 className={`px-3 py-1.5 ${
                   viewMode === "stable"
                     ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
@@ -132,6 +137,7 @@ export function CharacterPage() {
               </button>
               <button
                 type="button"
+                aria-pressed={viewMode === "current"}
                 className={`px-3 py-1.5 ${
                   viewMode === "current"
                     ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
