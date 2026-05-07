@@ -5714,7 +5714,6 @@ msgid "快捷键"
 msgstr "快捷键"
 
 #: apps/app/src/routes/profile-settings-page.tsx:64
-#: apps/app/src/routes/profile-settings-page.tsx:348
 msgid "快捷键设置"
 msgstr "快捷键设置"
 
@@ -10344,6 +10343,10 @@ msgstr "聊天已置顶。"
 #: apps/app/src/routes/chat-details-page.tsx:570
 msgid "聊天已隐藏。"
 msgstr "聊天已隐藏。"
+
+#: apps/app/src/routes/profile-settings-page.tsx:348
+msgid "聊天快捷键"
+msgstr "聊天快捷键"
 
 #: apps/app/src/routes/chat-details-page.tsx:1011
 msgid "聊天扩展"

@@ -345,7 +345,7 @@ export function ProfileSettingsPage() {
       {activeTab === "chat" ? (
         <MobileSettingsSection
           desktop={desktopMode}
-          title={desktopMode ? t(msg`快捷键设置`) : undefined}
+          title={desktopMode ? t(msg`聊天快捷键`) : undefined}
           description={
             desktopMode
               ? t(msg`调整桌面和 Web 键盘聊天输入时的发送快捷键。`)
