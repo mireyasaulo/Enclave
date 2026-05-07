@@ -365,6 +365,8 @@ export function DesktopAddFriendWorkspace() {
 
   const submitKeywordSearch = (keyword: string) => {
     const nextKeyword = keyword.trim();
+    setSelectedCharacterId(null);
+    setSendDialogCharacterId(null);
     void navigate({
       to: "/desktop/add-friend",
       hash: buildDesktopAddFriendRouteHash({
