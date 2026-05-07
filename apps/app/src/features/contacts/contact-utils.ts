@@ -1,7 +1,12 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { Character, FriendListItem } from "@yinjie/contracts";
+
+const t = translateRuntimeMessage;
 
 const latinSectionOrder = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
+// i18n-ignore-start: 拼音段首参考字符，仅用于按字母分段排序，非 UI 文本
 const chineseSectionBoundaries = [
   { label: "A", start: "阿" },
   { label: "B", start: "芭" },
@@ -28,9 +33,11 @@ const chineseSectionBoundaries = [
   { label: "Z", start: "匝" },
 ] as const;
 
+// i18n-ignore-next-line: 拼音排序固定使用 zh-CN 拼音 Collator
 const pinyinCollator = new Intl.Collator("zh-CN-u-co-pinyin", {
   sensitivity: "base",
 });
+// i18n-ignore-end
 
 export type FriendDirectoryItem = FriendListItem & {
   indexLabel: string;
@@ -125,7 +132,7 @@ export function buildDesktopFriendSections(
   return [
     {
       key: "starred-friends",
-      title: "星标朋友",
+      title: t(msg`星标朋友`),
       indexLabel: "★",
       anchorId: "contact-section-starred",
       items: starredItems,

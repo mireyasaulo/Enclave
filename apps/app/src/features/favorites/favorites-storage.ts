@@ -1,5 +1,9 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { FavoriteCategory, FavoriteRecord } from "@yinjie/contracts";
 import { isDesktopRuntimeAvailable } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 
 export type DesktopFavoriteCategory = FavoriteCategory;
 export type DesktopFavoriteRecord = FavoriteRecord;
@@ -179,13 +183,13 @@ export function removeDesktopFavorite(sourceId: string) {
 }
 
 export function buildFavoriteShareText(item: DesktopFavoriteRecord) {
-  const lines = [`[收藏] ${item.title}`];
+  const lines = [t(msg`[收藏] ${item.title}`)];
 
   if (item.description.trim()) {
     lines.push(item.description.trim());
   }
 
-  lines.push(`来自 ${item.badge}`);
+  lines.push(t(msg`来自 ${item.badge}`));
 
   if (item.meta.trim()) {
     lines.push(item.meta.trim());

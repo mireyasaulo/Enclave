@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 
 export function ContactIndexList({
   items,
@@ -195,7 +199,7 @@ export function ContactIndexList({
               showIndicator(item.indexLabel, 280);
               onSelect(item.key, "smooth");
             }}
-            aria-label={`跳转到 ${item.indexLabel}`}
+            aria-label={t(msg`跳转到 ${item.indexLabel}`)}
             className={cn(
               "flex items-center justify-center rounded-full leading-none transition-colors",
               compact ? "h-3.5 w-3.5 text-[9px]" : "h-4 w-4 text-[10px]",

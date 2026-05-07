@@ -15,9 +15,9 @@ export function TelemetryRangePicker(props: {
   ];
   const appIds: Array<{ value: TelemetryAppId | ""; label: string }> = [
     { value: "", label: t("All apps") },
-    { value: "app", label: "App" },
-    { value: "site", label: "Site" },
-    { value: "wiki", label: "Wiki" },
+    { value: "app", label: t("App") },
+    { value: "site", label: t("Site") },
+    { value: "wiki", label: t("Wiki") },
   ];
   return (
     <div className="flex flex-wrap items-center gap-3">

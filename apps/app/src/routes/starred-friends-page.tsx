@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { ArrowLeft, Search, Star, Tag } from "lucide-react";
@@ -23,6 +25,8 @@ import {
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+
+const t = translateRuntimeMessage;
 
 export function StarredFriendsPage() {
   const isDesktopLayout = useDesktopLayout();
@@ -57,9 +61,9 @@ export function StarredFriendsPage() {
   if (isDesktopLayout) {
     return (
       <RouteRedirectState
-        title="正在切换到桌面星标朋友"
-        description="星标朋友在桌面布局里并入了通讯录工作区，这里会自动带你打开对应视图。"
-        loadingLabel="正在打开桌面星标朋友..."
+        title={t(msg`正在切换到桌面星标朋友`)}
+        description={t(msg`星标朋友在桌面布局里并入了通讯录工作区，这里会自动带你打开对应视图。`)}
+        loadingLabel={t(msg`正在打开桌面星标朋友...`)}
       />
     );
   }
@@ -175,12 +179,12 @@ function MobileStarredFriendsPage() {
     void friendsQuery.refetch();
   }
 
-  const statusBackLabel = safeReturnPath ? "返回上一页" : "查看联系人标签";
+  const statusBackLabel = safeReturnPath ? t(msg`返回上一页`) : t(msg`查看联系人标签`);
 
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
       <TabPageTopBar
-        title="星标朋友"
+        title={t(msg`星标朋友`)}
         titleAlign="center"
         className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
         leftActions={
@@ -198,7 +202,7 @@ function MobileStarredFriendsPage() {
                 void navigate({ to: "/tabs/contacts" });
               })
             }
-            aria-label="返回通讯录"
+            aria-label={t(msg`返回通讯录`)}
           >
             <ArrowLeft size={17} />
           </Button>
@@ -210,7 +214,7 @@ function MobileStarredFriendsPage() {
             size="icon"
             className="h-9 w-9 rounded-full text-[color:var(--text-primary)] active:bg-black/[0.05]"
             onClick={openTags}
-            aria-label="查看联系人标签"
+            aria-label={t(msg`查看联系人标签`)}
           >
             <Tag size={17} />
           </Button>
@@ -223,7 +227,7 @@ function MobileStarredFriendsPage() {
               type="search"
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
-              placeholder="搜索星标朋友"
+              placeholder={t(msg`搜索星标朋友`)}
               className="min-w-0 flex-1 bg-transparent text-[12px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
             />
           </label>
@@ -234,9 +238,9 @@ function MobileStarredFriendsPage() {
         {friendsQuery.isLoading ? (
           <div className="px-4 pt-2.5">
             <MobileStarredFriendsStatusCard
-              badge="读取中"
-              title="正在读取星标朋友"
-              description="稍等一下，正在同步你标记过的常联系好友。"
+              badge={t(msg`读取中`)}
+              title={t(msg`正在读取星标朋友`)}
+              description={t(msg`稍等一下，正在同步你标记过的常联系好友。`)}
               tone="loading"
             />
           </div>
@@ -244,8 +248,8 @@ function MobileStarredFriendsPage() {
         {friendsQuery.isError && friendsQuery.error instanceof Error ? (
           <div className="px-4 pt-2.5">
             <MobileStarredFriendsStatusCard
-              badge="读取失败"
-              title="星标朋友暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`星标朋友暂时不可用`)}
               description={friendsQuery.error.message}
               action={
                 <div className="flex flex-wrap items-center justify-center gap-2">
@@ -255,7 +259,7 @@ function MobileStarredFriendsPage() {
                     className="h-8 rounded-full px-3 text-[11px]"
                     onClick={handleRetryFriends}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     type="button"
@@ -277,16 +281,16 @@ function MobileStarredFriendsPage() {
         !filteredFriends.length ? (
           <div className="px-4 pt-4">
             <MobileStarredFriendsStatusCard
-              badge={normalizedSearchText ? "暂无结果" : "星标"}
+              badge={normalizedSearchText ? t(msg`暂无结果`) : t(msg`星标`)}
               title={
                 normalizedSearchText
-                  ? "没有找到匹配的星标朋友"
-                  : "还没有星标朋友"
+                  ? t(msg`没有找到匹配的星标朋友`)
+                  : t(msg`还没有星标朋友`)
               }
               description={
                 normalizedSearchText
-                  ? "换个关键词再试试。"
-                  : "先去联系人资料里把常联系的好友设为星标朋友。"
+                  ? t(msg`换个关键词再试试。`)
+                  : t(msg`先去联系人资料里把常联系的好友设为星标朋友。`)
               }
               action={
                 <Button

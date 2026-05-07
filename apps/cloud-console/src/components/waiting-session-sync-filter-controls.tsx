@@ -2,6 +2,7 @@ import type {
   WaitingSessionSyncTaskStatusFilter,
   WaitingSessionSyncTaskTypeFilter,
 } from "../lib/waiting-session-sync-helpers";
+import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 import { WaitingSessionSyncActionButton } from "./waiting-session-sync-fragments";
 
 const FIELD_LABEL_CLASS = "text-sm text-[color:var(--text-secondary)]";
@@ -31,12 +32,13 @@ export function WaitingSessionSyncFilterControls({
   onTaskTypeChange: (taskType: WaitingSessionSyncTaskTypeFilter) => void;
   onQueryChange: (query: string) => void;
 }) {
+  const t = useCloudConsoleText();
   return (
     <div className="grid gap-4 md:grid-cols-4">
       <label className={FIELD_LABEL_CLASS}>
         <div className="mb-2">Status</div>
         <select
-          aria-label="Waiting sync status"
+          aria-label={t("Waiting sync status")}
           value={status}
           onChange={(event) =>
             onStatusChange(event.target.value as WaitingSessionSyncTaskStatusFilter)
@@ -54,7 +56,7 @@ export function WaitingSessionSyncFilterControls({
       <label className={FIELD_LABEL_CLASS}>
         <div className="mb-2">Task type</div>
         <select
-          aria-label="Waiting sync task type"
+          aria-label={t("Waiting sync task type")}
           value={taskType}
           onChange={(event) =>
             onTaskTypeChange(event.target.value as WaitingSessionSyncTaskTypeFilter)
@@ -72,10 +74,10 @@ export function WaitingSessionSyncFilterControls({
       <label className={`${FIELD_LABEL_CLASS} md:col-span-2`}>
         <div className="mb-2">Search</div>
         <input
-          aria-label="Waiting sync search"
+          aria-label={t("Waiting sync search")}
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
-          placeholder="task key, target, context, or error"
+          placeholder={t("task key, target, context, or error")}
           className={`${FIELD_INPUT_CLASS} placeholder-[color:var(--text-muted)]`}
         />
       </label>
@@ -100,6 +102,7 @@ export function WaitingSessionSyncPaginationControls({
   onPrevious: () => void;
   onNext: () => void;
 }) {
+  const t = useCloudConsoleText();
   return (
     <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--border-faint)] pt-4">
       <div className="text-sm text-[color:var(--text-secondary)]">
@@ -110,7 +113,7 @@ export function WaitingSessionSyncPaginationControls({
         <label className="flex items-center gap-2 text-sm text-[color:var(--text-secondary)]">
           <span>Page size</span>
           <select
-            aria-label="Waiting sync page size"
+            aria-label={t("Waiting sync page size")}
             value={pageSize}
             onChange={(event) =>
               onPageSizeChange(Number.parseInt(event.target.value, 10))

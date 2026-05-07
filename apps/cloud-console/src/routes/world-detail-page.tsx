@@ -190,7 +190,7 @@ function buildProviderOptions(
     ...providers,
     {
       key: providerKey,
-      label: `${providerKey} (legacy)`,
+      label: `${providerKey} ${translateCloudConsoleTextForActiveLocale("(legacy)")}`,
       description: translateCloudConsoleTextForActiveLocale(
         "This provider key is not in the current catalog yet.",
       ),
@@ -783,6 +783,7 @@ export function WorldDetailPage() {
                 <input
                   value={providerRegion}
                   onChange={(event) => setProviderRegion(event.target.value)}
+                  // i18n-ignore-next-line: example identifier value, not UI copy.
                   placeholder="mock-local"
                   className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3 text-[color:var(--text-primary)]"
                 />
@@ -793,6 +794,7 @@ export function WorldDetailPage() {
                 <input
                   value={providerZone}
                   onChange={(event) => setProviderZone(event.target.value)}
+                  // i18n-ignore-next-line: example identifier value, not UI copy.
                   placeholder="mock-a"
                   className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3 text-[color:var(--text-primary)]"
                 />
@@ -804,6 +806,7 @@ export function WorldDetailPage() {
               <input
                 value={apiBaseUrl}
                 onChange={(event) => setApiBaseUrl(event.target.value)}
+                // i18n-ignore-next-line: example URL value, not UI copy.
                 placeholder="https://world-api.example.com"
                 className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3 text-[color:var(--text-primary)]"
               />
@@ -814,6 +817,7 @@ export function WorldDetailPage() {
               <input
                 value={adminUrl}
                 onChange={(event) => setAdminUrl(event.target.value)}
+                // i18n-ignore-next-line: example URL value, not UI copy.
                 placeholder="https://world-admin.example.com"
                 className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3 text-[color:var(--text-primary)]"
               />

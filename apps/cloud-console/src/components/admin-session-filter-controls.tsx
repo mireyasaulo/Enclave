@@ -14,6 +14,7 @@ import {
   formatAdminSessionSortFieldLabel,
   formatAdminSessionStatusFilterLabel,
 } from "../lib/admin-session-helpers";
+import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
 const SELECT_CLASS_NAME =
   "rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-3 py-2 text-sm normal-case tracking-normal text-[color:var(--text-primary)] outline-none focus:border-[color:var(--border-strong)]";
@@ -57,6 +58,7 @@ export function AdminSessionFilterControls({
   onPageSizeChange,
   className = "grid gap-3 md:grid-cols-2 xl:grid-cols-5",
 }: AdminSessionFilterControlsProps) {
+  const t = useCloudConsoleText();
   return (
     <div className={className}>
       <label className="flex min-w-0 flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
@@ -64,7 +66,7 @@ export function AdminSessionFilterControls({
         <input
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
-          placeholder="Session id, IP, client, revoker"
+          placeholder={t("Session id, IP, client, revoker")}
           className={`${SELECT_CLASS_NAME} placeholder-[color:var(--text-muted)]`}
         />
       </label>

@@ -1,3 +1,5 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type {
   OfficialAccountArticleDetail,
   OfficialAccountArticleSummary,
@@ -6,6 +8,8 @@ import type {
 } from "@yinjie/contracts";
 import { formatTimestamp } from "../../lib/format";
 import type { DesktopFavoriteRecord } from "./favorites-storage";
+
+const t = translateRuntimeMessage;
 
 export function buildOfficialAccountFavoriteRecord(
   account: OfficialAccountSummary | OfficialAccountDetail,
@@ -18,12 +22,10 @@ export function buildOfficialAccountFavoriteRecord(
     description:
       account.description ||
       account.recentArticle?.title ||
-      "查看公众号资料与最近文章。",
-    meta: `${account.accountType === "service" ? "服务号" : "订阅号"} · @${
-      account.handle
-    }`,
+      t(msg`查看公众号资料与最近文章。`),
+    meta: t(msg`${account.accountType === "service" ? t(msg`服务号`) : t(msg`订阅号`)} · @${account.handle}`),
     to: `/official-accounts/${account.id}`,
-    badge: account.accountType === "service" ? "服务号" : "订阅号",
+    badge: account.accountType === "service" ? t(msg`服务号`) : t(msg`订阅号`),
     avatarName: account.name,
     avatarSrc: account.avatar,
   };
@@ -47,7 +49,7 @@ export function buildOfficialArticleSummaryFavoriteRecord(
     description: article.summary,
     meta: `${account.name} · ${formatTimestamp(article.publishedAt)}`,
     to: `/official-accounts/articles/${article.id}`,
-    badge: "公众号文章",
+    badge: t(msg`公众号文章`),
     avatarName: account.name,
     avatarSrc: account.avatar,
   };

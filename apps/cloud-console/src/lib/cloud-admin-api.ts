@@ -112,6 +112,7 @@ export class CloudAdminApiError extends Error {
     } = {},
   ) {
     super(message);
+    // i18n-ignore-next-line: Error class identifier, not user-facing copy.
     this.name = "CloudAdminApiError";
     this.requestId = requestId;
     this.errorCode = options.errorCode ?? null;

@@ -3,6 +3,10 @@ import type {
   CloudWorldSummary,
 } from "@yinjie/contracts";
 import { cloudAdminApi } from "./cloud-admin-api";
+import {
+  formatCloudConsoleSuspendWorldTitle,
+  formatCloudConsoleRetryWorldRecoveryTitle,
+} from "./cloud-console-i18n";
 
 export type WorldLifecycleAction =
   | "resume"

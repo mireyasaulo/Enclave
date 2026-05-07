@@ -1197,7 +1197,7 @@ export function WaitingSessionSyncPage() {
           <>
             {showReviewedContextSection ? (
               <section
-                aria-label="Context task review"
+                aria-label={t("Context task review")}
                 className="mt-5 rounded-[26px] border border-sky-300/30 bg-sky-50 p-5"
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -1353,7 +1353,7 @@ export function WaitingSessionSyncPage() {
                     {visibleHighlightedTaskReceipts.length > 0 ? (
                       <div
                         role="region"
-                        aria-label="Recent task receipts"
+                        aria-label={t("Recent task receipts")}
                         className="mt-4 rounded-2xl border border-sky-200/20 bg-[color:var(--surface-console)]/40 p-4"
                       >
                         <div className="flex flex-wrap items-start justify-between gap-3">

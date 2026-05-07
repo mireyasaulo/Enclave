@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { ArrowLeft, Search, Star, Tag } from "lucide-react";
@@ -21,6 +23,8 @@ import { getFriendDisplayName } from "../features/contacts/contact-utils";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+
+const t = translateRuntimeMessage;
 
 export function TagsPage() {
   const isDesktopLayout = useDesktopLayout();
@@ -54,9 +58,9 @@ export function TagsPage() {
   if (isDesktopLayout) {
     return (
       <RouteRedirectState
-        title="正在切换到桌面标签"
-        description="标签页在桌面布局里并入了通讯录工作区，这里会自动带你打开标签视图。"
-        loadingLabel="正在打开桌面标签..."
+        title={t(msg`正在切换到桌面标签`)}
+        description={t(msg`标签页在桌面布局里并入了通讯录工作区，这里会自动带你打开标签视图。`)}
+        loadingLabel={t(msg`正在打开桌面标签...`)}
       />
     );
   }
@@ -160,12 +164,12 @@ function MobileTagsPage() {
     void friendsQuery.refetch();
   }
 
-  const statusBackLabel = safeReturnPath ? "返回上一页" : "查看星标朋友";
+  const statusBackLabel = safeReturnPath ? t(msg`返回上一页`) : t(msg`查看星标朋友`);
 
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
       <TabPageTopBar
-        title="标签"
+        title={t(msg`标签`)}
         titleAlign="center"
         className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
         leftActions={
@@ -183,7 +187,7 @@ function MobileTagsPage() {
                 void navigate({ to: "/tabs/contacts" });
               })
             }
-            aria-label="返回通讯录"
+            aria-label={t(msg`返回通讯录`)}
           >
             <ArrowLeft size={17} />
           </Button>
@@ -195,7 +199,7 @@ function MobileTagsPage() {
             size="icon"
             className="h-9 w-9 rounded-full text-[color:var(--text-primary)] active:bg-black/[0.05]"
             onClick={openStarredFriends}
-            aria-label="查看星标朋友"
+            aria-label={t(msg`查看星标朋友`)}
           >
             <Star size={17} />
           </Button>
@@ -208,7 +212,7 @@ function MobileTagsPage() {
               type="search"
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
-              placeholder="搜索标签或联系人"
+              placeholder={t(msg`搜索标签或联系人`)}
               className="min-w-0 flex-1 bg-transparent text-[12px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
             />
           </label>
@@ -219,9 +223,9 @@ function MobileTagsPage() {
         {friendsQuery.isLoading ? (
           <div className="px-4 pt-2.5">
             <MobileTagStatusCard
-              badge="读取中"
-              title="正在读取标签"
-              description="稍等一下，正在同步联系人标签和分组。"
+              badge={t(msg`读取中`)}
+              title={t(msg`正在读取标签`)}
+              description={t(msg`稍等一下，正在同步联系人标签和分组。`)}
               tone="loading"
             />
           </div>
@@ -229,8 +233,8 @@ function MobileTagsPage() {
         {friendsQuery.isError && friendsQuery.error instanceof Error ? (
           <div className="px-4 pt-2.5">
             <MobileTagStatusCard
-              badge="读取失败"
-              title="标签页暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`标签页暂时不可用`)}
               description={friendsQuery.error.message}
               action={
                 <div className="flex flex-wrap items-center justify-center gap-2">
@@ -240,7 +244,7 @@ function MobileTagsPage() {
                     className="h-8 rounded-full px-3 text-[11px]"
                     onClick={handleRetryTags}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     type="button"
@@ -262,12 +266,12 @@ function MobileTagsPage() {
         !tagGroups.length ? (
           <div className="px-4 pt-4">
             <MobileTagStatusCard
-              badge={hasSearchText ? "暂无结果" : "标签"}
-              title={hasSearchText ? "没有找到匹配的标签" : "还没有联系人标签"}
+              badge={hasSearchText ? t(msg`暂无结果`) : t(msg`标签`)}
+              title={hasSearchText ? t(msg`没有找到匹配的标签`) : t(msg`还没有联系人标签`)}
               description={
                 hasSearchText
-                  ? "换个标签名或联系人名称试试。"
-                  : "先在联系人资料里补上标签，通讯录标签页就会自动聚合。"
+                  ? t(msg`换个标签名或联系人名称试试。`)
+                  : t(msg`先在联系人资料里补上标签，通讯录标签页就会自动聚合。`)
               }
               action={
                 <Button
@@ -296,7 +300,7 @@ function MobileTagsPage() {
                     <span>{group.tag}</span>
                   </div>
                   <div className="text-[10px] text-[color:var(--text-muted)]">
-                    {group.items.length} 位联系人
+                    {t(msg`${group.items.length} 位联系人`)}
                   </div>
                 </div>
 
