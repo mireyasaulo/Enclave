@@ -9,9 +9,10 @@ import { useRouterState } from "@tanstack/react-router";
 import {
   Camera,
   Clock3,
-  Copy,
   LockKeyhole,
+  Maximize2,
   MessageSquareText,
+  Minimize2,
   Minus,
   ShieldCheck,
   X,
@@ -664,7 +665,11 @@ export function DesktopShell({ children }: PropsWithChildren) {
                   void desktopWindow.toggleMaximize();
                 }}
               >
-                <Copy size={14} strokeWidth={1.8} />
+                {isMaximized ? (
+                  <Minimize2 size={14} strokeWidth={1.8} />
+                ) : (
+                  <Maximize2 size={14} strokeWidth={1.8} />
+                )}
               </DesktopWindowButton>
               <DesktopWindowButton
                 danger
