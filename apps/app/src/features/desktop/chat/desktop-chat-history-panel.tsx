@@ -65,6 +65,7 @@ export function DesktopChatHistoryPanel({
   const baseUrl = runtimeConfig.apiBaseUrl;
   const isGroupConversation = isPersistedGroupConversation(conversation);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const customDateInputRef = useRef<HTMLInputElement | null>(null);
   const [keyword, setKeyword] = useState("");
   const [debouncedKeyword, setDebouncedKeyword] = useState("");
   const [activeCategory, setActiveCategory] =
@@ -433,11 +434,31 @@ export function DesktopChatHistoryPanel({
                 );
               })}
 
-              <div className="ml-auto flex items-center gap-2">
-                <span className="text-[11px] text-[color:var(--text-dim)]">
-                  {t(msg`指定日期`)}
-                </span>
+              <div className="relative ml-auto flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const node = customDateInputRef.current;
+                    if (!node) return;
+                    if (typeof node.showPicker === "function") {
+                      node.showPicker();
+                    } else {
+                      node.focus();
+                      node.click();
+                    }
+                  }}
+                  className={cn(
+                    "h-7 inline-flex items-center gap-1 rounded-full px-3 text-[12px] transition",
+                    customDate
+                      ? "bg-[rgba(7,193,96,0.12)] text-[color:var(--brand-primary)]"
+                      : "bg-[#f4f4f4] text-[color:var(--text-secondary)] hover:bg-[#ececec] hover:text-[color:var(--text-primary)]",
+                  )}
+                >
+                  <span>{customDate || t(msg`指定日期`)}</span>
+                  <ChevronDown size={11} className="shrink-0 opacity-70" />
+                </button>
                 <input
+                  ref={customDateInputRef}
                   type="date"
                   value={customDate}
                   onChange={(event) => {
@@ -448,7 +469,9 @@ export function DesktopChatHistoryPanel({
                       setSelectorView(null);
                     }
                   }}
-                  className="h-7 rounded-[8px] border border-[rgba(0,0,0,0.08)] bg-white px-2 text-[12px] text-[color:var(--text-primary)] outline-none transition focus:border-[rgba(7,193,96,0.38)]"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  className="pointer-events-none absolute right-0 bottom-0 h-0 w-0 opacity-0"
                 />
                 {customDate ? (
                   <button
@@ -668,8 +691,8 @@ export function DesktopChatHistoryPanel({
                                     {resolveSearchResultBadgeLabel(item)}
                                   </span>
                                 </div>
-                                <div className="flex shrink-0 items-center">
-                                  <span className="block whitespace-nowrap text-[10px] tabular-nums text-[color:var(--text-dim)] group-hover:hidden">
+                                <div className="relative flex h-6 shrink-0 items-center">
+                                  <span className="whitespace-nowrap text-[10px] tabular-nums text-[color:var(--text-dim)] transition-opacity duration-100 group-hover:opacity-0">
                                     {formatMessageTimestamp(item.createdAt)}
                                   </span>
                                   <button
@@ -677,7 +700,7 @@ export function DesktopChatHistoryPanel({
                                     onClick={() =>
                                       onOpenMessage(item.messageId)
                                     }
-                                    className="hidden h-6 items-center gap-1 whitespace-nowrap rounded-full bg-[rgba(7,193,96,0.1)] px-2.5 text-[11px] font-medium text-[color:var(--brand-primary)] transition hover:bg-[rgba(7,193,96,0.18)] group-hover:inline-flex"
+                                    className="pointer-events-none absolute inset-y-0 right-0 flex items-center gap-1 whitespace-nowrap rounded-full bg-[rgba(7,193,96,0.1)] px-2.5 text-[11px] font-medium text-[color:var(--brand-primary)] opacity-0 transition-opacity duration-100 hover:bg-[rgba(7,193,96,0.18)] group-hover:pointer-events-auto group-hover:opacity-100"
                                   >
                                     {t(msg`定位到聊天位置`)}
                                   </button>

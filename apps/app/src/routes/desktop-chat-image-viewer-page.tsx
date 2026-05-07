@@ -6,6 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
@@ -17,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { getConversations } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, InlineNotice } from "@yinjie/ui";
 import { EmptyState } from "../components/empty-state";
 import { InlineNoticeActionButton } from "../components/inline-notice-action-button";
@@ -48,6 +50,7 @@ import { saveRemoteFile } from "../runtime/save-remote-file";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 export function DesktopChatImageViewerPage() {
+  const t = useRuntimeTranslator();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const nativeDesktopShell = runtimeConfig.appPlatform === "desktop";
@@ -191,7 +194,7 @@ export function DesktopChatImageViewerPage() {
       url: input.url,
       fileName: input.fileName,
       kind: "image",
-      dialogTitle: "保存图片",
+      dialogTitle: t(msg`保存图片`),
     }).then((result) => {
       if (result.status === "cancelled") {
         return;
@@ -204,15 +207,15 @@ export function DesktopChatImageViewerPage() {
       setSaveNotice({
         message: result.message,
         tone: result.status === "failed" ? "danger" : "success",
-        actionLabel: canRevealSavedFile ? "打开位置" : undefined,
+        actionLabel: canRevealSavedFile ? t(msg`打开位置`) : undefined,
         onAction:
           savedPath
             ? () => {
                 void revealSavedFile(savedPath).then((revealed) => {
                   setSaveNotice({
                     message: revealed
-                      ? "已打开所在位置。"
-                      : "打开所在位置失败，请稍后再试。",
+                      ? t(msg`已打开所在位置。`)
+                      : t(msg`打开所在位置失败，请稍后再试。`),
                     tone: revealed ? "success" : "danger",
                   });
                 });
@@ -431,8 +434,8 @@ export function DesktopChatImageViewerPage() {
       <div className="flex h-full min-h-0 items-center justify-center bg-[#1f1f1f] p-6">
         <div className="w-full max-w-lg rounded-[20px] border border-white/10 bg-[#2a2a2a] p-8 shadow-[0_24px_64px_rgba(0,0,0,0.28)]">
           <EmptyState
-            title="这张图片已经失去上下文"
-            description="可能是新窗口参数被清掉了。回到消息页后重新打开一次即可。"
+            title={t(msg`这张图片已经失去上下文`)}
+            description={t(msg`可能是新窗口参数被清掉了。回到消息页后重新打开一次即可。`)}
           />
           <div className="mt-6 flex justify-center">
             <Button
@@ -440,7 +443,7 @@ export function DesktopChatImageViewerPage() {
               onClick={() => focusReturnTargetWindow(fallbackPath)}
               className="h-9 rounded-[9px] bg-[color:var(--brand-primary)] px-4 text-white hover:opacity-95"
             >
-              回到消息页
+              {t(msg`回到消息页`)}
             </Button>
           </div>
         </div>
@@ -496,7 +499,7 @@ export function DesktopChatImageViewerPage() {
 
         <div className="flex items-center gap-2">
           <StandaloneActionButton
-            label="保存图片"
+            label={t(msg`保存图片`)}
             onClick={() => {
               handleImageSave({
                 url: activeItem.imageUrl,
@@ -507,21 +510,21 @@ export function DesktopChatImageViewerPage() {
             <Download size={16} />
           </StandaloneActionButton>
           <StandaloneActionButton
-            label="打印图片"
+            label={t(msg`打印图片`)}
             onClick={() => requestCurrentWindowPrint()}
           >
             <Printer size={16} />
           </StandaloneActionButton>
           {activeItemReturnTo ? (
             <StandaloneActionButton
-              label="定位到聊天位置"
+              label={t(msg`定位到聊天位置`)}
               onClick={() => focusReturnTargetWindow(activeItemReturnTo)}
             >
               <ArrowLeft size={16} />
             </StandaloneActionButton>
           ) : null}
           <StandaloneActionButton
-            label="关闭窗口"
+            label={t(msg`关闭窗口`)}
             onClick={() => closeStandaloneWindow(fallbackPath)}
           >
             <X size={16} />
@@ -531,7 +534,7 @@ export function DesktopChatImageViewerPage() {
 
       {activeItemIndex > 0 ? (
         <ViewerNavButton
-          label="上一张图片"
+          label={t(msg`上一张图片`)}
           side="left"
           onClick={() => navigateToItem(viewerItems[activeItemIndex - 1]!)}
           className="yj-desktop-image-print-hidden"
@@ -541,7 +544,7 @@ export function DesktopChatImageViewerPage() {
       ) : null}
       {activeItemIndex < viewerItems.length - 1 ? (
         <ViewerNavButton
-          label="下一张图片"
+          label={t(msg`下一张图片`)}
           side="right"
           onClick={() => navigateToItem(viewerItems[activeItemIndex + 1]!)}
           className="yj-desktop-image-print-hidden"

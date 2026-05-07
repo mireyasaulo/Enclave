@@ -1,8 +1,10 @@
 import { useEffect, useMemo } from "react";
+import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { ArrowLeft, X } from "lucide-react";
 import { getConversations } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button } from "@yinjie/ui";
 import { EmptyState } from "../components/empty-state";
 import { DesktopChatWorkspace } from "../features/desktop/chat/desktop-chat-workspace";
@@ -21,6 +23,7 @@ import {
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 export function DesktopChatWindowPage() {
+  const t = useRuntimeTranslator();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const nativeDesktopShell = runtimeConfig.appPlatform === "desktop";
@@ -42,7 +45,7 @@ export function DesktopChatWindowPage() {
         ) ?? null
       : null;
   const fallbackPath = routeState?.returnTo ?? "/tabs/chat";
-  const headerTitle = activeConversation?.title ?? routeState?.title ?? "聊天";
+  const headerTitle = activeConversation?.title ?? routeState?.title ?? t(msg`聊天`);
   const headerType =
     activeConversation?.type ?? routeState?.conversationType ?? "direct";
 
@@ -136,11 +139,11 @@ export function DesktopChatWindowPage() {
       <div className="flex h-full min-h-0 items-center justify-center bg-[color:var(--bg-app)] p-6">
         <div className="w-full max-w-lg rounded-[20px] border border-[color:var(--border-faint)] bg-white p-8 shadow-[var(--shadow-card)]">
           <div className="mb-5 inline-flex rounded-full border border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.07)] px-3 py-1 text-[11px] tracking-[0.12em] text-[color:var(--brand-primary)]">
-            独立聊天窗口
+            {t(msg`独立聊天窗口`)}
           </div>
           <EmptyState
-            title="这段聊天已经失去上下文"
-            description="可能是新窗口参数被清掉了。回到消息页后重新打开一次即可。"
+            title={t(msg`这段聊天已经失去上下文`)}
+            description={t(msg`可能是新窗口参数被清掉了。回到消息页后重新打开一次即可。`)}
           />
           <div className="mt-6 flex justify-center">
             <Button
@@ -150,7 +153,7 @@ export function DesktopChatWindowPage() {
               }}
               className="h-9 rounded-[9px] bg-[color:var(--brand-primary)] px-4 text-white hover:opacity-95"
             >
-              回到消息页
+              {t(msg`回到消息页`)}
             </Button>
           </div>
         </div>
@@ -167,11 +170,11 @@ export function DesktopChatWindowPage() {
       <div className="flex h-full min-h-0 items-center justify-center bg-[color:var(--bg-app)] p-6">
         <div className="w-full max-w-lg rounded-[20px] border border-[color:var(--border-faint)] bg-white p-8 shadow-[var(--shadow-card)]">
           <div className="mb-5 inline-flex rounded-full border border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.07)] px-3 py-1 text-[11px] tracking-[0.12em] text-[color:var(--brand-primary)]">
-            独立聊天窗口
+            {t(msg`独立聊天窗口`)}
           </div>
           <EmptyState
-            title="这段聊天已经不存在"
-            description="它可能已被隐藏、删除，或者当前窗口上下文已经失效。"
+            title={t(msg`这段聊天已经不存在`)}
+            description={t(msg`它可能已被隐藏、删除，或者当前窗口上下文已经失效。`)}
           />
           <div className="mt-6 flex justify-center">
             <Button
@@ -181,7 +184,7 @@ export function DesktopChatWindowPage() {
               }}
               className="h-9 rounded-[9px] bg-[color:var(--brand-primary)] px-4 text-white hover:opacity-95"
             >
-              回到消息页
+              {t(msg`回到消息页`)}
             </Button>
           </div>
         </div>
@@ -194,25 +197,25 @@ export function DesktopChatWindowPage() {
       <header className="flex shrink-0 items-center justify-between gap-4 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.78)] px-4 py-3 backdrop-blur-xl">
         <div className="min-w-0">
           <div className="inline-flex rounded-full border border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.07)] px-2.5 py-1 text-[11px] tracking-[0.08em] text-[color:var(--brand-primary)]">
-            {headerType === "group" ? "群聊独立窗口" : "聊天独立窗口"}
+            {headerType === "group" ? t(msg`群聊独立窗口`) : t(msg`聊天独立窗口`)}
           </div>
           <div className="mt-2 truncate text-[15px] font-medium text-[color:var(--text-primary)]">
             {headerTitle}
           </div>
           <div className="mt-1 text-[12px] text-[color:var(--text-muted)]">
-            新窗口内延续当前聊天上下文
+            {t(msg`新窗口内延续当前聊天上下文`)}
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <StandaloneActionButton
-            label="回到主窗口"
+            label={t(msg`回到主窗口`)}
             onClick={() => focusMainChatWindow(fallbackPath)}
           >
             <ArrowLeft size={16} />
           </StandaloneActionButton>
           <StandaloneActionButton
-            label="关闭窗口"
+            label={t(msg`关闭窗口`)}
             onClick={() => closeStandaloneWindow(fallbackPath)}
           >
             <X size={16} />
