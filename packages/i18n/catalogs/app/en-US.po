@@ -18,7 +18,7 @@ msgstr ""
 msgid ""
 "\n"
 "位置：{0}"
-msgstr "\nLocation: {0}"
+msgstr "Location: {0}"
 
 #. placeholder {0}: moment.likes.map((item) => item.authorName).join("，")
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:693
@@ -2476,7 +2476,7 @@ msgstr "Tap “Send to chat” from Friends Playing and the recent conversation 
 #. placeholder {0}: post.authorName
 #: apps/app/src/routes/live-companion-page.tsx:941
 msgid "从「{0}」这条视频号内容展开今晚的直播节奏"
-msgstr "Build tonight's livestream rhythm from this Channels piece: \"{0}\""
+msgstr "Build tonight's live show flow from the channel post \"{0}\""
 
 #. placeholder {0}: getCategoryTitle(activeCategory)
 #: apps/app/src/features/search/desktop-search-workspace.tsx:1455
@@ -2531,7 +2531,7 @@ msgstr "After entering Search from chats, Contacts, or the left navigation, keyw
 
 #: apps/app/src/routes/group-qr-page.tsx:1531
 msgid "从聊天线程点了“回到群邀请”后，会把最近回流入口记在这里，方便再次回到消息流。"
-msgstr "After clicking \"Return to Group Invitation\" from the chat thread, the latest return entry will be recorded here to facilitate returning to the message flow again."
+msgstr "When you tap \"Back to group invite\" from a chat thread, the recent return point is saved here so you can jump back to the message stream."
 
 #: apps/app/src/routes/chat-list-page.tsx:1197
 msgid "从这里开始第一句问候"
@@ -6699,7 +6699,7 @@ msgstr "Continue viewing contacts, starred friends, and official account entries
 
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:379
 msgid "在推荐卡片或列表里点“加入常用”，这里就会像微信一样沉淀你的固定入口。"
-msgstr "Tap \"Add to frequently used\" on a recommendation card or list, and your pinned entries will accumulate here just like WeChat."
+msgstr "Tap \"Pin\" on a recommendation card or list item to keep it here as a permanent shortcut, just like in WeChat."
 
 #: apps/app/src/i18n/static-dom-seed.ts:727
 msgid "在替你记着那些容易被忙乱吞掉的事。"
@@ -8252,7 +8252,7 @@ msgstr "Selected text inserted."
 
 #: apps/app/src/features/search/desktop-search-workspace.tsx:666
 msgid "已应用历史关键词“{keyword}”，结果已回到顶部。"
-msgstr "Applied history keyword \"{keyword}\"; results returned to the top."
+msgstr "Applied recent keyword \"{keyword}\"; results are back at the top."
 
 #: apps/app/src/features/chat/reminder-task-panel.tsx:350
 msgid "已延后到 {snoozedTimestamp}"
@@ -9293,7 +9293,7 @@ msgstr "Currently using instance-level Provider configuration."
 
 #: apps/app/src/features/search/desktop-search-workspace.tsx:1934
 msgid "当前仍保留关键词“{keyword}”，共 {count} 条命中；返回时会回到聚合页里的对应分区。"
-msgstr "Keeping keyword \"{keyword}\", {count} matches; returning will bring you back to the same section in the aggregated page."
+msgstr "Keeping keyword \"{keyword}\" with {count} matches; tapping back returns to the matching section in the aggregate view."
 
 #: apps/app/src/features/chat/digital-human-gateway-copy.ts:79
 msgid "当前仍在内置数字人播放器模式，播放器壳已经接通，但尚未切到真实外部数字人 Provider。"
@@ -9630,12 +9630,12 @@ msgstr "Mobile handoff records are split by content type here so you can disting
 #. placeholder {1}: visibleMiniPrograms.length
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:234
 msgid "当前搜索“{0}”命中 {1} 个小程序。"
-msgstr "Search \"{0}\" matched {1} mini programs."
+msgstr "Current search \"{0}\" matched {1} mini programs."
 
 #. placeholder {0}: searchText.trim()
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:274
 msgid "当前搜索“{0}”没有命中结果，试试换个关键词或切回全部分类。"
-msgstr "Search \"{0}\" found no results. Try another keyword or switch back to All categories."
+msgstr "No results for \"{0}\". Try a different keyword or switch back to All categories."
 
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:1040
 msgid "当前搜索已暂停删除管理，可按 Esc 或清空搜索恢复。"
@@ -10048,7 +10048,7 @@ msgstr "This group chat does not exist, so a group call cannot be started now."
 
 #: apps/app/src/routes/group-chat-background-page.tsx:592
 msgid "当前群聊会直接沿用默认背景图。切换到“单独设置”后，可以挑选群聊专属背景。"
-msgstr "This group chat uses the default background. Switch to \"Custom\" to pick a group-specific background."
+msgstr "This group chat is using the default background. Switch to \"Custom\" to pick a group-specific background."
 
 #: apps/app/src/routes/group-chat-details-page.tsx:671
 msgid "当前群聊共有 {totalMemberCount} 位成员。"
@@ -10094,7 +10094,7 @@ msgstr "Current chat"
 
 #: apps/app/src/routes/chat-background-page.tsx:600
 msgid "当前聊天会直接沿用默认背景图。切换到“单独设置”后，可以挑选好友专属背景。"
-msgstr "This chat uses the default background. Switch to \"Custom\" to pick a friend-specific background."
+msgstr "This chat is using the default background. Switch to \"Custom\" to pick a friend-specific background."
 
 #: apps/app/src/i18n/static-dom-seed.ts:978
 #: apps/app/src/routes/chat-background-page.tsx:227
@@ -11313,7 +11313,7 @@ msgstr "Keep pre-live prep, status checks, and reference content together."
 #. placeholder {0}: launchContext.sourceGroupName
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:460
 msgid "把当前接龙进度同步回“{0}”，减少群成员反复追问。"
-msgstr "Sync the current signup progress back to \"{0}\" so members don't keep asking."
+msgstr "Sync the current sign-up progress back to \"{0}\" to keep members from asking repeatedly."
 
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:366
 msgid "把当前统计结果同步回群聊，避免大家反复追问。"
@@ -12003,13 +12003,13 @@ msgstr "Search"
 #. placeholder {1}: visibleMiniPrograms.length
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:446
 msgid "搜索“{0}”命中 {1} 个结果。"
-msgstr "Search \"{0}\" matched {1} results."
+msgstr "Search \"{0}\" returned {1} results."
 
 #. placeholder {0}: searchText.trim()
 #. placeholder {1}: filteredFavorites.length
 #: apps/app/src/routes/favorites-page.tsx:423
 msgid "搜索“{0}”命中 {1} 项"
-msgstr "Search \"{0}\" matched {1} items"
+msgstr "Search \"{0}\" returned {1} items"
 
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-workspace.tsx:419
 msgid "搜索“{submittedKeyword}”"
@@ -12832,11 +12832,11 @@ msgstr "Digital human stage"
 
 #: apps/app/src/features/chat/use-digital-human-call-session.ts:531
 msgid "数字人语音已生成，但当前设备没有成功播放。可以点“重播上一句”再试。"
-msgstr "Digital human voice was generated, but the current device didn't play it. Tap \"Replay last line\" to try again."
+msgstr "Digital human voice was generated but didn't play on this device. Tap \"Replay last line\" to try again."
 
 #: apps/app/src/features/chat/use-digital-human-call-session.ts:532
 msgid "数字人语音已生成，但浏览器没有成功播放。可以点“重播上一句”再试。"
-msgstr "Digital human voice was generated, but the browser didn't play it. Tap \"Replay last line\" to try again."
+msgstr "Digital human voice was generated but the browser didn't play it. Tap \"Replay last line\" to try again."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:740
 msgid "数字人还没恢复，先重试或改用语音继续。"
@@ -15045,7 +15045,7 @@ msgstr "Visiting neighbors..."
 #. placeholder {0}: launchContext.sourceGroupName
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:247
 msgid "正在从“{0}”打开群接龙，可以边看群聊边处理报名和回填。"
-msgstr "Opening group sign-up from \"{0}\"; you can manage signups and fill back while viewing the group chat."
+msgstr "Opening the group sign-up from \"{0}\". You can browse the chat while handling registrations and updates."
 
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:148
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:169
@@ -17168,7 +17168,7 @@ msgstr "Baishi"
 
 #: apps/app/src/features/games/game-invite-route.ts:118
 msgid "的《"
-msgstr " — \""
+msgstr " - \""
 
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:93
 msgid "的农场"
@@ -20169,11 +20169,11 @@ msgstr "Voice is ready to send"
 
 #: apps/app/src/features/chat/use-voice-call-session.ts:292
 msgid "语音已生成，但当前设备没有成功播放。可以点“重播上一句”再试。"
-msgstr "Voice was generated, but the current device didn't play it. Tap \"Replay last line\" to try again."
+msgstr "Voice was generated but didn't play on this device. Tap \"Replay last line\" to try again."
 
 #: apps/app/src/features/chat/use-voice-call-session.ts:293
 msgid "语音已生成，但浏览器没有成功播放。可以点“重播上一句”再试。"
-msgstr "Voice was generated, but the browser didn't play it. Tap \"Replay last line\" to try again."
+msgstr "Voice was generated but the browser didn't play it. Tap \"Replay last line\" to try again."
 
 #: apps/app/src/features/chat/use-speech-input.ts:712
 msgid "语音时长"
@@ -21378,7 +21378,7 @@ msgstr "No recent conversations available for forwarding"
 
 #: apps/app/src/features/chat/reminder-task-panel.tsx:217
 msgid "还没有在替你记的事。直接发一句“明早8点提醒我吃药”或“每周五提醒我买猫粮”就行。"
-msgstr "Nothing tracked yet. Just say something like \"Remind me to take meds at 8 AM tomorrow\" or \"Remind me to buy cat food every Friday.\""
+msgstr "No reminders yet. Just send something like \"remind me to take meds at 8 tomorrow\" or \"remind me to buy cat food every Friday\"."
 
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:1261
 msgid "还没有常看的公众号"
@@ -22422,7 +22422,7 @@ msgstr "Invite QR code"
 #: apps/app/src/routes/group-qr-page.tsx:230
 #: apps/app/src/routes/group-qr-page.tsx:293
 msgid "邀请你加入「{groupDisplayName}」"
-msgstr "Invite you to join \"{groupDisplayName}\""
+msgstr "Invited you to join \"{groupDisplayName}\""
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:195
 msgid "邀请功能暂未开放。"
@@ -23320,7 +23320,7 @@ msgstr "First fill-back"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:880
 msgid "首次进入可先点下方成员席位切换“已加入/待加入”，再点“同步最新状态”把在线人数回写到群聊卡片。"
-msgstr "On first entry, tap a member seat below to toggle Joined/Pending, then tap \"Sync latest status\" to write the online count back to the group chat card."
+msgstr "On first visit, tap a member seat below to toggle \"Joined/Pending\", then tap \"Sync latest\" to write the active count back to the group card."
 
 #: apps/app/src/features/shell/desktop-shell.tsx:699
 msgid "首次锁定需要先设置本机口令"
