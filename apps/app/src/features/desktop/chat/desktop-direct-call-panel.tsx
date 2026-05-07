@@ -147,42 +147,42 @@ export function DesktopDirectCallPanel({
     : voiceCall.lastTurn;
   const statusLabel = useMemo(() => {
     if (isVideoMode && digitalHumanCall.sessionState === "connecting") {
-      return "连接数字人中";
+      return t(msg`连接数字人中`);
     }
 
     if (isVideoMode && digitalHumanCall.sessionState === "error") {
-      return "连接失败";
+      return t(msg`连接失败`);
     }
 
     if (micMuted) {
-      return "麦克风已静音";
+      return t(msg`麦克风已静音`);
     }
 
     if (activeCall.turnMutation.isPending) {
-      return isVideoMode ? "数字人整理回复中" : "AI 回复中";
+      return isVideoMode ? t(msg`数字人整理回复中`) : t(msg`AI 回复中`);
     }
 
     if (activeCall.playbackState === "playing") {
-      return isVideoMode ? "数字人正在说话" : "正在播报";
+      return isVideoMode ? t(msg`数字人正在说话`) : t(msg`正在播报`);
     }
 
     if (
       speech.status === "requesting-permission" ||
       speech.status === "listening"
     ) {
-      return isVideoMode ? "正在听你说话" : "正在聆听";
+      return isVideoMode ? t(msg`正在听你说话`) : t(msg`正在聆听`);
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "rendering") {
-      return "数字人渲染中";
+      return t(msg`数字人渲染中`);
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "queued") {
-      return "数字人排队中";
+      return t(msg`数字人排队中`);
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "failed") {
-      return "数字人画面失败";
+      return t(msg`数字人画面失败`);
     }
 
     if (
@@ -190,7 +190,7 @@ export function DesktopDirectCallPanel({
       digitalHumanCall.session?.renderStatus === "ready" &&
       (digitalHumanCall.session?.playerUrl || digitalHumanCall.session?.streamUrl)
     ) {
-      return "数字人视频已接通";
+      return t(msg`数字人视频已接通`);
     }
 
     if (isVideoMode && digitalHumanGatewayCopy?.statusLabel) {
@@ -198,10 +198,10 @@ export function DesktopDirectCallPanel({
     }
 
     if (latestTurn) {
-      return isVideoMode ? "继续通话" : "继续说话";
+      return isVideoMode ? t(msg`继续通话`) : t(msg`继续说话`);
     }
 
-    return "按住说话";
+    return t(msg`按住说话`);
   }, [
     activeCall.playbackState,
     activeCall.turnMutation.isPending,
@@ -217,43 +217,48 @@ export function DesktopDirectCallPanel({
   ]);
   const statusHint = useMemo(() => {
     if (isVideoMode && digitalHumanCall.sessionState === "connecting") {
-      return "正在建立数字人视频工作台，会话就绪后即可开始这一轮通话。";
+      return t(msg`正在建立数字人视频工作台，会话就绪后即可开始这一轮通话。`);
     }
 
     if (isVideoMode && digitalHumanCall.sessionState === "error") {
       return (
-        digitalHumanCall.sessionError || "连接数字人工作台失败，请稍后再试。"
+        digitalHumanCall.sessionError ||
+        t(msg`连接数字人工作台失败，请稍后再试。`)
       );
     }
 
     if (micMuted) {
       return isVideoMode
-        ? "先取消静音，再开始这一轮数字人视频通话。"
-        : "先取消静音，再开始这一轮语音对话。";
+        ? t(msg`先取消静音，再开始这一轮数字人视频通话。`)
+        : t(msg`先取消静音，再开始这一轮语音对话。`);
     }
 
     if (activeCall.turnMutation.isPending) {
       return isVideoMode
-        ? "本轮语音已收到，数字人正在整理文本、语音与舞台播报。"
-        : "本轮语音已收到，正在转写并组织回复。";
+        ? t(msg`本轮语音已收到，数字人正在整理文本、语音与舞台播报。`)
+        : t(msg`本轮语音已收到，正在转写并组织回复。`);
     }
 
     if (activeCall.playbackState === "playing") {
       return isVideoMode
-        ? "当前为半双工数字人视频通话，等 TA 说完后再开始下一轮。"
-        : "当前为半双工模式，等 TA 说完后再开始下一轮。";
+        ? t(msg`当前为半双工数字人视频通话，等 TA 说完后再开始下一轮。`)
+        : t(msg`当前为半双工模式，等 TA 说完后再开始下一轮。`);
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "rendering") {
-      return "语音回复已经生成，数字人视频画面正在渲染，完成后会自动切到 provider 画面。";
+      return t(
+        msg`语音回复已经生成，数字人视频画面正在渲染，完成后会自动切到 provider 画面。`,
+      );
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "queued") {
-      return "数字人视频流已进入排队，可以先保持语音通话。";
+      return t(msg`数字人视频流已进入排队，可以先保持语音通话。`);
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "failed") {
-      return "当前数字人画面渲染失败，但语音回复链路仍然可继续；可直接重试连接数字人。";
+      return t(
+        msg`当前数字人画面渲染失败，但语音回复链路仍然可继续；可直接重试连接数字人。`,
+      );
     }
 
     if (
@@ -261,7 +266,7 @@ export function DesktopDirectCallPanel({
       digitalHumanCall.session?.renderStatus === "ready" &&
       (digitalHumanCall.session?.playerUrl || digitalHumanCall.session?.streamUrl)
     ) {
-      return "数字人视频流已经就绪，桌面端会优先展示 provider 侧画面。";
+      return t(msg`数字人视频流已经就绪，桌面端会优先展示 provider 侧画面。`);
     }
 
     if (
@@ -269,14 +274,14 @@ export function DesktopDirectCallPanel({
       speech.status === "listening"
     ) {
       return isVideoMode
-        ? "松开按钮后会自动发起这一轮数字人视频通话。"
-        : "松开按钮后会自动发起这一轮语音通话。";
+        ? t(msg`松开按钮后会自动发起这一轮数字人视频通话。`)
+        : t(msg`松开按钮后会自动发起这一轮语音通话。`);
     }
 
     if (!speech.supported) {
       return isVideoMode
-        ? "当前浏览器不支持桌面端语音录制，暂时无法继续数字人视频通话。"
-        : "当前浏览器不支持桌面端语音录制，请改用键盘聊天。";
+        ? t(msg`当前浏览器不支持桌面端语音录制，暂时无法继续数字人视频通话。`)
+        : t(msg`当前浏览器不支持桌面端语音录制，请改用键盘聊天。`);
     }
 
     if (isVideoMode && digitalHumanGatewayCopy?.statusHint) {
@@ -284,8 +289,10 @@ export function DesktopDirectCallPanel({
     }
 
     return isVideoMode
-      ? "远端是 AI 数字人舞台，本地摄像头只用于你的桌面预览，不影响 AI 回复链路。"
-      : "按住说一段，AI 会写入聊天并自动语音回复。";
+      ? t(
+          msg`远端是 AI 数字人舞台，本地摄像头只用于你的桌面预览，不影响 AI 回复链路。`,
+        )
+      : t(msg`按住说一段，AI 会写入聊天并自动语音回复。`);
   }, [
     isVideoMode,
     micMuted,
@@ -300,21 +307,23 @@ export function DesktopDirectCallPanel({
     digitalHumanCall.sessionState,
     digitalHumanGatewayCopy?.statusHint,
   ]);
-  const callLabel = isVideoMode ? "AI 数字人视频通话" : "桌面 AI 语音通话";
+  const callLabel = isVideoMode
+    ? t(msg`AI 数字人视频通话`)
+    : t(msg`桌面 AI 语音通话`);
   const callSubtitle = isVideoMode
-    ? "当前为半双工数字人视频通话，你说一轮，TA 回一轮。"
-    : "当前是回合制语音对话，AI 会在每轮结束后自动播报回复。";
+    ? t(msg`当前为半双工数字人视频通话，你说一轮，TA 回一轮。`)
+    : t(msg`当前是回合制语音对话，AI 会在每轮结束后自动播报回复。`);
   const recordButtonLabel = activeCall.turnMutation.isPending
     ? isVideoMode
-      ? "数字人回复中"
-      : "AI 回复中"
+      ? t(msg`数字人回复中`)
+      : t(msg`AI 回复中`)
     : activeCall.playbackState === "playing"
-      ? "播放中"
+      ? t(msg`播放中`)
       : recordButtonHolding || speech.status === "listening"
-        ? "松开发送"
+        ? t(msg`松开发送`)
         : micMuted
-          ? "麦克风已静音"
-          : "按住说话";
+          ? t(msg`麦克风已静音`)
+          : t(msg`按住说话`);
 
   const handlePressStart = async () => {
     if (micMuted || activeCall.busy) {
@@ -394,7 +403,9 @@ export function DesktopDirectCallPanel({
       onClose();
     } catch (error) {
       setEndCallError(
-        error instanceof Error ? error.message : "结束通话失败，请稍后再试。",
+        error instanceof Error
+          ? error.message
+          : t(msg`结束通话失败，请稍后再试。`),
       );
     } finally {
       setEndCallPending(false);
@@ -435,33 +446,33 @@ export function DesktopDirectCallPanel({
             onClick={handleClose}
             className="shrink-0 rounded-[10px] border-[color:var(--border-faint)] bg-[color:var(--surface-console)] text-[color:var(--text-secondary)] shadow-none hover:bg-white hover:text-[color:var(--text-primary)]"
           >
-            返回聊天
+            {t(msg`返回聊天`)}
           </Button>
         </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           <CallMetricCard
-            label="当前状态"
+            label={t(msg`当前状态`)}
             value={statusLabel}
             detail={statusHint}
           />
           <CallMetricCard
-            label="发起时间"
+            label={t(msg`发起时间`)}
             value={formatDetailedMessageTimestamp(startedAt)}
             detail={
               isVideoMode
-                ? "本页承接 AI 数字人视频工作台，不接真人 RTC。"
-                : "本页只承接 AI 语音，不接真人 RTC。"
+                ? t(msg`本页承接 AI 数字人视频工作台，不接真人 RTC。`)
+                : t(msg`本页只承接 AI 语音，不接真人 RTC。`)
             }
           />
           <CallMetricCard
-            label="最近一轮"
+            label={t(msg`最近一轮`)}
             value={
               latestTurn
                 ? formatDurationLabel(latestTurn.totalDurationMs)
-                : "等待开始"
+                : t(msg`等待开始`)
             }
-            detail="成功后会同步写入当前聊天消息流。"
+            detail={t(msg`成功后会同步写入当前聊天消息流。`)}
           />
         </div>
 
@@ -469,7 +480,7 @@ export function DesktopDirectCallPanel({
           <div className="flex flex-wrap gap-3">
             <CallControlButton
               active={!micMuted}
-              label={micMuted ? "解除麦克风静音" : "静音麦克风"}
+              label={micMuted ? t(msg`解除麦克风静音`) : t(msg`静音麦克风`)}
               icon={micMuted ? <Mic size={16} /> : <MicOff size={16} />}
               onClick={() => {
                 if (!micMuted) {
@@ -481,7 +492,7 @@ export function DesktopDirectCallPanel({
             />
             <CallControlButton
               active={speakerEnabled}
-              label={speakerEnabled ? "扬声器已开" : "开启扬声器"}
+              label={speakerEnabled ? t(msg`扬声器已开`) : t(msg`开启扬声器`)}
               icon={
                 speakerEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />
               }
@@ -490,7 +501,11 @@ export function DesktopDirectCallPanel({
             {isVideoMode ? (
               <CallControlButton
                 active={cameraEnabled}
-                label={cameraEnabled ? "关闭本地摄像头" : "打开本地摄像头"}
+                label={
+                  cameraEnabled
+                    ? t(msg`关闭本地摄像头`)
+                    : t(msg`打开本地摄像头`)
+                }
                 icon={
                   cameraEnabled ? (
                     <CameraOff size={16} />
@@ -503,7 +518,7 @@ export function DesktopDirectCallPanel({
             ) : null}
             <CallControlButton
               active={Boolean(latestTurn)}
-              label="重播上一句"
+              label={t(msg`重播上一句`)}
               icon={
                 activeCall.playbackState === "playing" ? (
                   <Pause size={16} />
@@ -521,7 +536,7 @@ export function DesktopDirectCallPanel({
           <div className="mt-4 space-y-3">
             {isVideoMode && !cameraEnabled ? (
               <InlineNotice tone="info">
-                你已关闭本地摄像头，仍可继续进行数字人视频通话。
+                {t(msg`你已关闭本地摄像头，仍可继续进行数字人视频通话。`)}
               </InlineNotice>
             ) : null}
             {isVideoMode &&
@@ -539,7 +554,7 @@ export function DesktopDirectCallPanel({
             ) : null}
             {!speech.supported ? (
               <InlineNotice tone="warning">
-                当前浏览器不支持桌面端语音录制，请改用键盘聊天或切换浏览器。
+                {t(msg`当前浏览器不支持桌面端语音录制，请改用键盘聊天或切换浏览器。`)}
               </InlineNotice>
             ) : null}
             {activeCall.turnMutation.error instanceof Error ? (
@@ -579,7 +594,7 @@ export function DesktopDirectCallPanel({
               <RecordButton
                 disabled={micMuted || activeCall.busy || !speech.supported}
                 label={recordButtonLabel}
-                hint="空闲时即可开始下一轮语音"
+                hint={t(msg`空闲时即可开始下一轮语音`)}
                 onPressStart={handlePressStart}
                 onPressEnd={handlePressEnd}
                 playbackState={activeCall.playbackState}
@@ -627,7 +642,7 @@ export function DesktopDirectCallPanel({
             className="rounded-[10px] border-[color:var(--border-faint)] bg-[color:var(--surface-console)] text-[color:var(--text-secondary)] shadow-none hover:bg-white hover:text-[color:var(--text-primary)]"
           >
             <RotateCcw size={16} />
-            重播上一句
+            {t(msg`重播上一句`)}
           </Button>
           <Button
             type="button"
@@ -635,7 +650,7 @@ export function DesktopDirectCallPanel({
             onClick={handleClose}
             className="rounded-[10px] border-[color:var(--border-faint)] bg-[color:var(--surface-console)] text-[color:var(--text-secondary)] shadow-none hover:bg-white hover:text-[color:var(--text-primary)]"
           >
-            切回聊天
+            {t(msg`切回聊天`)}
           </Button>
           <Button
             type="button"
@@ -645,7 +660,7 @@ export function DesktopDirectCallPanel({
             className="rounded-[10px] border-[rgba(220,38,38,0.14)] bg-[rgba(254,242,242,0.92)] text-[#d74b45] shadow-none hover:border-[rgba(220,38,38,0.2)] hover:bg-[rgba(254,226,226,0.96)]"
           >
             <PhoneOff size={16} />
-            {endCallPending ? "结束中..." : "结束通话"}
+            {endCallPending ? t(msg`结束中...`) : t(msg`结束通话`)}
           </Button>
         </div>
       </div>
@@ -686,7 +701,7 @@ export function DesktopDirectCallPanel({
             />
           ) : null}
           <TranscriptCard
-            label="我"
+            label={t(msg`我`)}
             text={
               activeCall.turnMutation.isPending
                 ? speech.displayText || t(msg`本轮语音已发出，正在整理...`)
@@ -702,8 +717,8 @@ export function DesktopDirectCallPanel({
             text={
               latestTurn?.assistantText ||
               (isVideoMode
-                ? "数字人的回复会显示在这里，同时驱动当前舞台播报。"
-                : "AI 的回复文本会显示在这里，同时自动播报。")
+                ? t(msg`数字人的回复会显示在这里，同时驱动当前舞台播报。`)
+                : t(msg`AI 的回复文本会显示在这里，同时自动播报。`))
             }
           />
         </div>
@@ -845,10 +860,12 @@ function CameraPreviewCard({
     <section className="overflow-hidden rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] shadow-[var(--shadow-soft)]">
       <div className="flex items-center justify-between border-b border-[color:var(--border-faint)] bg-white/82 px-4 py-3 backdrop-blur-xl">
         <div className="text-[11px] tracking-[0.12em] text-[color:var(--text-dim)]">
-          我的摄像头预览
+          {translateRuntimeMessage(msg`我的摄像头预览`)}
         </div>
         <div className="text-xs text-[color:var(--text-muted)]">
-          {cameraEnabled ? "预览中" : "已关闭"}
+          {cameraEnabled
+            ? translateRuntimeMessage(msg`预览中`)
+            : translateRuntimeMessage(msg`已关闭`)}
         </div>
       </div>
       <div className="relative aspect-[4/3] bg-[linear-gradient(180deg,rgba(55,65,81,0.98),rgba(17,24,39,0.98))]">
@@ -876,9 +893,9 @@ function CameraPreviewCard({
             <div className="text-[13px] leading-6">
               {cameraEnabled
                 ? status === "requesting-permission"
-                  ? "申请摄像头权限中"
-                  : error || "等待本地画面接通"
-                : "本地摄像头已关闭"}
+                  ? translateRuntimeMessage(msg`申请摄像头权限中`)
+                  : error || translateRuntimeMessage(msg`等待本地画面接通`)
+                : translateRuntimeMessage(msg`本地摄像头已关闭`)}
             </div>
           </div>
         )}
@@ -941,14 +958,14 @@ function resolveLatestTurnTranscript(turn: VoiceCallTurnResult | null) {
 function formatDurationLabel(durationMs: number) {
   const totalSeconds = Math.max(Math.round(durationMs / 1000), 0);
   if (totalSeconds < 60) {
-    return `${totalSeconds} 秒`;
+    return translateRuntimeMessage(msg`${totalSeconds} 秒`);
   }
 
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   if (!seconds) {
-    return `${minutes} 分钟`;
+    return translateRuntimeMessage(msg`${minutes} 分钟`);
   }
 
-  return `${minutes} 分 ${seconds} 秒`;
+  return translateRuntimeMessage(msg`${minutes} 分 ${seconds} 秒`);
 }

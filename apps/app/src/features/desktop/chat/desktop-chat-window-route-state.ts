@@ -1,3 +1,5 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { isDesktopRuntimeAvailable } from "@yinjie/ui";
 import {
   buildDesktopStandaloneWindowLabel,
@@ -21,7 +23,7 @@ export function buildDesktopChatWindowRouteHash(
   const params = new URLSearchParams();
   params.set("conversationId", input.conversationId);
   params.set("type", input.conversationType);
-  params.set("title", input.title.trim() || "聊天");
+  params.set("title", input.title.trim() || translateRuntimeMessage(msg`聊天`));
 
   if (input.returnTo?.trim()) {
     params.set("returnTo", input.returnTo.trim());
@@ -110,7 +112,7 @@ export async function openDesktopChatWindow(input: DesktopChatWindowRouteState) 
     await openDesktopStandaloneWindow({
       label: windowLabel,
       url: routePath,
-      title: input.title.trim() || "聊天",
+      title: input.title.trim() || translateRuntimeMessage(msg`聊天`),
       width,
       height,
       minWidth: 1040,

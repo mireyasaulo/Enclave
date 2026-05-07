@@ -6,6 +6,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage, useRuntimeTranslator } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createFavoriteNote,
@@ -95,6 +97,7 @@ export function DesktopNotesWorkspace({
   returnTo,
   onSavedNote,
 }: DesktopNotesWorkspaceProps) {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const runtimeConfig = useAppRuntimeConfig();
@@ -166,7 +169,7 @@ export function DesktopNotesWorkspace({
       }
       setNotice({
         tone: "success",
-        message: "笔记已保存到收藏。",
+        message: t(msg`笔记已保存到收藏。`),
       });
 
       saveDesktopNoteDraft({
@@ -207,7 +210,7 @@ export function DesktopNotesWorkspace({
       setNotice({
         tone: "danger",
         message:
-          error instanceof Error ? error.message : "保存失败，请稍后再试。",
+          error instanceof Error ? error.message : t(msg`保存失败，请稍后再试。`),
       });
     },
   });
@@ -259,7 +262,7 @@ export function DesktopNotesWorkspace({
       setNotice({
         tone: "danger",
         message:
-          error instanceof Error ? error.message : "删除失败，请稍后再试。",
+          error instanceof Error ? error.message : t(msg`删除失败，请稍后再试。`),
       });
     },
   });
@@ -267,16 +270,19 @@ export function DesktopNotesWorkspace({
     mutationFn: async (conversation: ConversationListItem) => {
       const note = sendDialogNote;
       if (!note) {
-        throw new Error("当前没有可发送的笔记。");
+        throw new Error("NOTE_SEND_EMPTY");
       }
 
       const attachment = buildNoteCardAttachment(note);
+      const noteCardText = translateRuntimeMessage(
+        msg`[笔记] ${attachment.title}`,
+      );
       if (isPersistedGroupConversation(conversation)) {
         await sendGroupMessage(
           conversation.id,
           {
             type: "note_card",
-            text: `[笔记] ${attachment.title}`,
+            text: noteCardText,
             attachment,
           },
           baseUrl,
@@ -284,7 +290,7 @@ export function DesktopNotesWorkspace({
       } else {
         const characterId = conversation.participants[0]?.trim();
         if (!characterId) {
-          throw new Error("当前会话没有可用的接收目标。");
+          throw new Error("NOTE_SEND_NO_TARGET");
         }
 
         joinConversationRoom({ conversationId: conversation.id });
@@ -292,7 +298,7 @@ export function DesktopNotesWorkspace({
           conversationId: conversation.id,
           characterId,
           type: "note_card",
-          text: `[笔记] ${attachment.title}`,
+          text: noteCardText,
           attachment,
         });
       }
@@ -303,7 +309,7 @@ export function DesktopNotesWorkspace({
       setSendDialogNote(null);
       setNotice({
         tone: "success",
-        message: `笔记已发送到 ${conversationTitle}。`,
+        message: t(msg`笔记已发送到 ${conversationTitle}。`),
       });
       await queryClient.invalidateQueries({
         queryKey: ["app-conversations", baseUrl],
@@ -313,7 +319,13 @@ export function DesktopNotesWorkspace({
       setNotice({
         tone: "danger",
         message:
-          error instanceof Error ? error.message : "发送失败，请稍后再试。",
+          error instanceof Error
+            ? error.message === "NOTE_SEND_EMPTY"
+              ? t(msg`当前没有可发送的笔记。`)
+              : error.message === "NOTE_SEND_NO_TARGET"
+                ? t(msg`当前会话没有可用的接收目标。`)
+                : error.message
+            : t(msg`发送失败，请稍后再试。`),
       });
     },
   });
@@ -360,7 +372,7 @@ export function DesktopNotesWorkspace({
         if (treatLocalDraftAsNewNote) {
           setNotice({
             tone: "danger",
-            message: "原笔记已不存在，当前草稿会按新笔记保存。",
+            message: t(msg`原笔记已不存在，当前草稿会按新笔记保存。`),
           });
         }
         initializedSessionKeyRef.current = sessionKey;
@@ -448,9 +460,11 @@ export function DesktopNotesWorkspace({
   }, [notice]);
 
   useEffect(() => {
-    const title = `${noteTitle}${isDirty ? " · 未保存" : ""}`;
+    const title = isDirty
+      ? t(msg`${noteTitle} · 未保存`)
+      : noteTitle;
     document.title = title;
-  }, [isDirty, noteTitle]);
+  }, [isDirty, noteTitle, t]);
 
   useEffect(() => {
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -620,13 +634,15 @@ export function DesktopNotesWorkspace({
       });
       setNotice({
         tone: "success",
-        message: "附件已插入到笔记。",
+        message: t(msg`附件已插入到笔记。`),
       });
     } catch (error) {
       setNotice({
         tone: "danger",
         message:
-          error instanceof Error ? error.message : "附件上传失败，请稍后再试。",
+          error instanceof Error
+            ? error.message
+            : t(msg`附件上传失败，请稍后再试。`),
       });
     } finally {
       setAttachmentPending(false);
@@ -776,7 +792,7 @@ export function DesktopNotesWorkspace({
     if (!hasSendableContent) {
       setNotice({
         tone: "danger",
-        message: "先写一点内容，再把这条笔记发送出去。",
+        message: t(msg`先写一点内容，再把这条笔记发送出去。`),
       });
       return;
     }
@@ -801,7 +817,7 @@ export function DesktopNotesWorkspace({
     if (!nextNote) {
       setNotice({
         tone: "danger",
-        message: "笔记还没有保存成功，请稍后再试。",
+        message: t(msg`笔记还没有保存成功，请稍后再试。`),
       });
       return;
     }
@@ -816,7 +832,7 @@ export function DesktopNotesWorkspace({
   ) {
     return (
       <div className="flex h-full items-center justify-center bg-[color:var(--bg-canvas)]">
-        <LoadingBlock label="正在读取笔记..." />
+        <LoadingBlock label={t(msg`正在读取笔记...`)} />
       </div>
     );
   }
@@ -833,7 +849,7 @@ export function DesktopNotesWorkspace({
             message={
               noteQuery.error instanceof Error
                 ? noteQuery.error.message
-                : "读取笔记失败，请稍后再试。"
+                : t(msg`读取笔记失败，请稍后再试。`)
             }
           />
           <div className="mt-5 flex justify-end">
@@ -842,7 +858,7 @@ export function DesktopNotesWorkspace({
               onClick={() => void handleClose()}
               className="rounded-[10px] border-[color:var(--border-faint)] bg-white shadow-none"
             >
-              回到来源
+              {t(msg`回到来源`)}
             </Button>
           </div>
         </div>
@@ -868,7 +884,7 @@ export function DesktopNotesWorkspace({
                 type="button"
                 onClick={() => void handleClose()}
                 className="flex h-8 w-8 items-center justify-center rounded-[10px] text-[color:var(--text-secondary)] transition hover:bg-white hover:text-[color:var(--text-primary)]"
-                aria-label="返回收藏"
+                aria-label={t(msg`返回收藏`)}
               >
                 <ArrowLeft size={16} />
               </button>
@@ -879,12 +895,12 @@ export function DesktopNotesWorkspace({
           </div>
           <div className="mt-1 text-xs text-[color:var(--text-muted)]">
             {saveMutation.isPending
-              ? "正在保存到收藏..."
+              ? t(msg`正在保存到收藏...`)
               : isDirty
-                ? "存在未保存修改"
+                ? t(msg`存在未保存修改`)
                 : noteId
-                  ? "已保存到收藏"
-                  : "新建笔记"}
+                  ? t(msg`已保存到收藏`)
+                  : t(msg`新建笔记`)}
           </div>
         </div>
 
@@ -897,7 +913,7 @@ export function DesktopNotesWorkspace({
               className="inline-flex h-9 items-center gap-2 rounded-[10px] border border-[color:var(--border-faint)] bg-white px-3 text-[13px] text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)] hover:text-[color:var(--state-danger-text)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Trash2 size={15} />
-              删除
+              {t(msg`删除`)}
             </button>
           ) : null}
           <Button
@@ -907,7 +923,7 @@ export function DesktopNotesWorkspace({
             className="h-9 rounded-[10px] border-[color:var(--border-faint)] bg-white px-4 shadow-none hover:bg-[color:var(--surface-console)]"
           >
             <Send size={15} />
-            {sendMutation.isPending ? "发送中..." : "发送"}
+            {sendMutation.isPending ? t(msg`发送中...`) : t(msg`发送`)}
           </Button>
           <Button
             variant="primary"
@@ -916,14 +932,14 @@ export function DesktopNotesWorkspace({
             className="h-9 rounded-[10px] bg-[color:var(--brand-primary)] px-4 text-white hover:opacity-95"
           >
             <Save size={15} />
-            {saveMutation.isPending ? "保存中..." : "保存"}
+            {saveMutation.isPending ? t(msg`保存中...`) : t(msg`保存`)}
           </Button>
           {standaloneWindow ? (
             <button
               type="button"
               onClick={requestClose}
               className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
-              aria-label="关闭笔记窗口"
+              aria-label={t(msg`关闭笔记窗口`)}
             >
               <X size={16} />
             </button>
@@ -933,40 +949,40 @@ export function DesktopNotesWorkspace({
 
       <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.78)] px-5 py-3 backdrop-blur-xl">
         <ToolbarButton
-          label="附件"
+          label={t(msg`附件`)}
           onClick={() => fileInputRef.current?.click()}
         >
           <FolderUp size={15} />
         </ToolbarButton>
         <ToolbarButton
-          label="粗体"
+          label={t(msg`粗体`)}
           onClick={() => applyDocumentCommand("bold")}
         >
           <Bold size={15} />
         </ToolbarButton>
         <ToolbarButton
-          label="斜体"
+          label={t(msg`斜体`)}
           onClick={() => applyDocumentCommand("italic")}
         >
           <Italic size={15} />
         </ToolbarButton>
         <ToolbarButton
-          label="下划线"
+          label={t(msg`下划线`)}
           onClick={() => applyDocumentCommand("underline")}
         >
           <Underline size={15} />
         </ToolbarButton>
         <ToolbarButton
-          label="列表"
+          label={t(msg`列表`)}
           onClick={() => applyDocumentCommand("insertUnorderedList")}
         >
           <List size={15} />
         </ToolbarButton>
-        <ToolbarButton label="待办" onClick={insertTodoAtCursor}>
+        <ToolbarButton label={t(msg`待办`)} onClick={insertTodoAtCursor}>
           <ListTodo size={15} />
         </ToolbarButton>
         <ToolbarButton
-          label="标签"
+          label={t(msg`标签`)}
           active={tagEditorOpen}
           onClick={() => setTagEditorOpen((current) => !current)}
         >
@@ -974,7 +990,7 @@ export function DesktopNotesWorkspace({
         </ToolbarButton>
         {attachmentPending ? (
           <span className="rounded-full bg-[rgba(7,193,96,0.08)] px-2.5 py-1 text-[11px] text-[color:var(--brand-primary)]">
-            正在上传附件...
+            {t(msg`正在上传附件...`)}
           </span>
         ) : null}
       </div>
@@ -991,7 +1007,7 @@ export function DesktopNotesWorkspace({
                 type="button"
                 onClick={() => handleRemoveTag(tag)}
                 className="flex h-4 w-4 items-center justify-center rounded-full text-[color:var(--brand-primary)] transition hover:bg-[rgba(7,193,96,0.12)]"
-                aria-label={`移除标签 ${tag}`}
+                aria-label={t(msg`移除标签 ${tag}`)}
               >
                 <X size={12} />
               </button>
@@ -1010,7 +1026,7 @@ export function DesktopNotesWorkspace({
                   event.preventDefault();
                   handleTagCommit();
                 }}
-                placeholder="输入标签后回车"
+                placeholder={t(msg`输入标签后回车`)}
                 className="h-9 w-[180px] rounded-[10px] border border-[color:var(--border-faint)] bg-white px-3 text-[13px] text-[color:var(--text-primary)] outline-none transition focus:border-[color:var(--brand-primary)]"
               />
               <Button
@@ -1018,7 +1034,7 @@ export function DesktopNotesWorkspace({
                 onClick={handleTagCommit}
                 className="h-9 rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 shadow-none"
               >
-                添加
+                {t(msg`添加`)}
               </Button>
             </div>
           ) : null}
@@ -1035,14 +1051,14 @@ export function DesktopNotesWorkspace({
         <div className="mx-auto flex w-full max-w-[840px] flex-col rounded-[24px] border border-[rgba(15,23,42,0.08)] bg-white px-10 py-8 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
           <div className="mb-4 flex items-center gap-2 text-[11px] tracking-[0.12em] text-[color:var(--text-dim)]">
             <span className="rounded-full border border-[rgba(15,23,42,0.08)] px-2 py-1">
-              收藏笔记
+              {t(msg`收藏笔记`)}
             </span>
-            <span>{noteId ? "已保存文稿" : "未保存草稿"}</span>
+            <span>{noteId ? t(msg`已保存文稿`) : t(msg`未保存草稿`)}</span>
           </div>
           <div className="relative">
             {!editorState.contentText.trim() ? (
               <div className="pointer-events-none absolute left-0 top-0 text-[15px] leading-8 text-[color:var(--text-dim)]">
-                写点什么。支持富文本、待办、图片和文件。
+                {t(msg`写点什么。支持富文本、待办、图片和文件。`)}
               </div>
             ) : null}
             <div
@@ -1065,10 +1081,10 @@ export function DesktopNotesWorkspace({
 
       <DesktopChatConfirmDialog
         open={deleteDialogOpen}
-        title="删除笔记"
-        description="删除后，这条收藏笔记会从收藏列表中移除。"
-        confirmLabel="删除"
-        pendingLabel="正在删除..."
+        title={t(msg`删除笔记`)}
+        description={t(msg`删除后，这条收藏笔记会从收藏列表中移除。`)}
+        confirmLabel={t(msg`删除`)}
+        pendingLabel={t(msg`正在删除...`)}
         danger
         pending={deleteMutation.isPending}
         onClose={() => setDeleteDialogOpen(false)}
@@ -1151,6 +1167,7 @@ function DesktopNoteUnsavedDialog({
   onDiscard: () => void;
   onSave: () => void;
 }) {
+  const t = useRuntimeTranslator();
   if (!open) {
     return null;
   }
@@ -1159,7 +1176,7 @@ function DesktopNoteUnsavedDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(17,24,39,0.28)] p-6 backdrop-blur-[3px]">
       <button
         type="button"
-        aria-label="关闭未保存提示"
+        aria-label={t(msg`关闭未保存提示`)}
         onClick={onClose}
         className="absolute inset-0"
       />
@@ -1167,10 +1184,10 @@ function DesktopNoteUnsavedDialog({
       <div className="relative w-full max-w-[560px] overflow-hidden rounded-[20px] border border-[color:var(--border-faint)] bg-white/96 shadow-[var(--shadow-overlay)]">
         <div className="border-b border-[color:var(--border-faint)] px-6 py-5">
           <div className="text-[18px] font-medium text-[color:var(--text-primary)]">
-            这条笔记还没有保存
+            {t(msg`这条笔记还没有保存`)}
           </div>
           <div className="mt-2 text-[13px] leading-7 text-[color:var(--text-muted)]">
-            保存后会进入收藏；如果直接关闭，当前草稿改动会被丢弃。
+            {t(msg`保存后会进入收藏；如果直接关闭，当前草稿改动会被丢弃。`)}
           </div>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-3 px-6 py-4">
@@ -1180,7 +1197,7 @@ function DesktopNoteUnsavedDialog({
             disabled={pending}
             className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-5 shadow-none"
           >
-            取消
+            {t(msg`取消`)}
           </Button>
           <Button
             variant="danger"
@@ -1188,7 +1205,7 @@ function DesktopNoteUnsavedDialog({
             disabled={pending}
             className="rounded-[10px] px-5"
           >
-            不保存
+            {t(msg`不保存`)}
           </Button>
           <Button
             variant="primary"
@@ -1196,7 +1213,7 @@ function DesktopNoteUnsavedDialog({
             disabled={pending}
             className="rounded-[10px] bg-[color:var(--brand-primary)] px-5 text-white hover:opacity-95"
           >
-            {pending ? "保存中..." : "保存并关闭"}
+            {pending ? t(msg`保存中...`) : t(msg`保存并关闭`)}
           </Button>
         </div>
       </div>
@@ -1304,7 +1321,7 @@ function resolveNoteTitle(contentText: string) {
     .map((line) => line.trim())
     .find(Boolean);
 
-  return firstLine?.slice(0, 28) || "无标题笔记";
+  return firstLine?.slice(0, 28) || translateRuntimeMessage(msg`无标题笔记`);
 }
 
 function resolveNoteExcerpt(contentText: string, title: string) {
@@ -1393,7 +1410,7 @@ function buildFavoriteNoteRecord(note: FavoriteNoteDocument): FavoriteRecord {
     description: note.excerpt,
     meta: formatFavoriteTimestamp(note.updatedAt),
     to: `/tabs/favorites#draftId=${encodeURIComponent(note.id)}&noteId=${encodeURIComponent(note.id)}`,
-    badge: "笔记",
+    badge: translateRuntimeMessage(msg`笔记`),
     avatarName: note.title,
     collectedAt: note.updatedAt,
   };
@@ -1453,7 +1470,9 @@ function formatFavoriteTimestamp(iso: string) {
   const day = date.getDate();
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${month}月${day}日 ${hours}:${minutes}`;
+  return translateRuntimeMessage(
+    msg`${month}月${day}日 ${hours}:${minutes}`,
+  );
 }
 
 function escapeHtml(value: string) {

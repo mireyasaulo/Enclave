@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
 import { X } from "lucide-react";
 import type { Character } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 
@@ -23,6 +25,7 @@ export function DesktopAddFriendSendDialog({
   onClose,
   onSubmit,
 }: DesktopAddFriendSendDialogProps) {
+  const t = useRuntimeTranslator();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [greeting, setGreeting] = useState("");
 
@@ -31,8 +34,8 @@ export function DesktopAddFriendSendDialog({
       return;
     }
 
-    setGreeting(buildDefaultGreeting(ownerName));
-  }, [character, open, ownerName]);
+    setGreeting(buildDefaultGreeting(ownerName, t));
+  }, [character, open, ownerName, t]);
 
   useEffect(() => {
     if (!open) {
@@ -84,7 +87,7 @@ export function DesktopAddFriendSendDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(17,24,39,0.18)] p-6 backdrop-blur-[2px]">
       <button
         type="button"
-        aria-label="关闭发送好友申请弹层"
+        aria-label={t(msg`关闭发送好友申请弹层`)}
         onClick={() => {
           if (!pending) {
             onClose();
@@ -96,14 +99,14 @@ export function DesktopAddFriendSendDialog({
       <div className="relative w-full max-w-[460px] overflow-hidden rounded-[10px] border border-[rgba(15,23,42,0.10)] bg-white shadow-[var(--shadow-overlay)]">
         <div className="border-b border-[rgba(15,23,42,0.06)] bg-[#f7f7f7] px-6 py-4">
           <div className="text-center text-[17px] font-medium text-[color:var(--text-primary)]">
-            发送添加朋友申请
+            {t(msg`发送添加朋友申请`)}
           </div>
           <button
             type="button"
             onClick={onClose}
             disabled={pending}
             className="absolute right-4 top-3.5 flex h-8 w-8 items-center justify-center rounded-[8px] text-[color:var(--text-secondary)] transition hover:bg-white hover:text-[color:var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-60"
-            aria-label="关闭"
+            aria-label={t(msg`关闭`)}
           >
             <X size={16} />
           </button>
@@ -123,24 +126,24 @@ export function DesktopAddFriendSendDialog({
           </div>
 
           <div className="mt-4 text-[13px] leading-6 text-[color:var(--text-muted)]">
-            你需要发送验证申请，等待对方通过。
+            {t(msg`你需要发送验证申请，等待对方通过。`)}
           </div>
 
           <div className="mt-4">
             <div className="mb-2 text-[13px] font-medium text-[color:var(--text-primary)]">
-              验证信息
+              {t(msg`验证信息`)}
             </div>
             <textarea
               ref={textareaRef}
               value={greeting}
               maxLength={60}
               onChange={(event) => setGreeting(event.target.value)}
-              placeholder="请输入验证信息"
+              placeholder={t(msg`请输入验证信息`)}
               rows={4}
               className="min-h-[128px] w-full resize-none rounded-[8px] border border-[rgba(15,23,42,0.10)] bg-white px-4 py-3 text-[14px] leading-7 text-[color:var(--text-primary)] outline-none transition-[border-color,box-shadow] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.42)] focus:shadow-[0_0_0_3px_rgba(7,193,96,0.10)]"
             />
             <div className="mt-2 flex items-center justify-between text-[11px] text-[color:var(--text-dim)]">
-              <span>支持按 `Ctrl/Cmd + Enter` 直接发送</span>
+              <span>{t(msg`支持按 \`Ctrl/Cmd + Enter\` 直接发送`)}</span>
               <span>{greeting.length}/60</span>
             </div>
           </div>
@@ -154,7 +157,7 @@ export function DesktopAddFriendSendDialog({
             disabled={pending}
             className="rounded-[8px] border-[rgba(15,23,42,0.10)] bg-white px-5 shadow-none hover:bg-[color:var(--surface-console)]"
           >
-            取消
+            {t(msg`取消`)}
           </Button>
           <Button
             type="button"
@@ -163,7 +166,7 @@ export function DesktopAddFriendSendDialog({
             onClick={() => void onSubmit(greeting.trim())}
             className="rounded-[8px] bg-[#07c160] px-5 text-white shadow-none hover:bg-[#06ad56]"
           >
-            {pending ? "发送中..." : "发送"}
+            {pending ? t(msg`发送中...`) : t(msg`发送`)}
           </Button>
         </div>
       </div>
@@ -171,7 +174,10 @@ export function DesktopAddFriendSendDialog({
   );
 }
 
-function buildDefaultGreeting(ownerName: string) {
-  const normalizedOwnerName = ownerName.trim() || "我";
-  return `你好，我是${normalizedOwnerName}，想把你添加到通讯录里。`;
+function buildDefaultGreeting(
+  ownerName: string,
+  t: ReturnType<typeof useRuntimeTranslator>,
+) {
+  const normalizedOwnerName = ownerName.trim() || t(msg`我`);
+  return t(msg`你好，我是${normalizedOwnerName}，想把你添加到通讯录里。`);
 }

@@ -1,4 +1,13 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator, translateRuntimeMessage } from "@yinjie/i18n";
 import { useNavigate } from "@tanstack/react-router";
 import type {
   FeedChannelAuthorProfile,
@@ -18,25 +27,19 @@ import {
   Bookmark,
   ChevronDown,
   ChevronRight,
-  Clapperboard,
+  ChevronUp,
   MessageCircleMore,
   PlaySquare,
   RadioTower,
   RefreshCcw,
   Share2,
   ThumbsUp,
+  X,
 } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
 import { ExpandableText } from "../../../components/expandable-text";
 import { FeatureUnavailableDialog } from "../../../components/feature-unavailable-dialog";
-import {
-  hydrateLiveCompanionFromNative,
-  readLiveDraft,
-  readLiveHistory,
-  type LiveDraft,
-  type LiveSessionRecord,
-} from "./live-companion-storage";
 import { formatTimestamp } from "../../../lib/format";
 
 type DesktopChannelsWorkspaceProps = {
@@ -127,12 +130,25 @@ export function DesktopChannelsWorkspace({
   sections,
 }: DesktopChannelsWorkspaceProps) {
   const navigate = useNavigate();
+  const t = useRuntimeTranslator();
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
-  const [liveDraft, setLiveDraft] = useState<LiveDraft>(() => readLiveDraft());
-  const [liveHistory, setLiveHistory] = useState<LiveSessionRecord[]>(() =>
-    readLiveHistory(),
-  );
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [commentDrawerPostId, setCommentDrawerPostId] = useState<string | null>(
+    null,
+  );
+
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const slideRefs = useRef(new Map<string, HTMLDivElement>());
+  const registerSlide = useCallback(
+    (postId: string, node: HTMLDivElement | null) => {
+      if (node) {
+        slideRefs.current.set(postId, node);
+      } else {
+        slideRefs.current.delete(postId);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     setSelectedPostId((current) =>
@@ -151,69 +167,11 @@ export function DesktopChannelsWorkspace({
     }
   }, [posts, selectedPostId]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    let cancelled = false;
-    let pendingTimer: ReturnType<typeof setTimeout> | null = null;
-
-    const syncLiveCompanionState = async () => {
-      const store = await hydrateLiveCompanionFromNative();
-      if (cancelled) {
-        return;
-      }
-
-      setLiveDraft(store.draft);
-      setLiveHistory(store.history);
-    };
-
-    const scheduleSync = () => {
-      if (pendingTimer !== null) {
-        return;
-      }
-      pendingTimer = setTimeout(() => {
-        pendingTimer = null;
-        void syncLiveCompanionState();
-      }, 100);
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        scheduleSync();
-      }
-    };
-
-    const handleFocus = () => {
-      scheduleSync();
-    };
-
-    void syncLiveCompanionState();
-
-    window.addEventListener("focus", handleFocus);
-    window.addEventListener("storage", handleFocus);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      cancelled = true;
-      if (pendingTimer !== null) {
-        clearTimeout(pendingTimer);
-      }
-      window.removeEventListener("focus", handleFocus);
-      window.removeEventListener("storage", handleFocus);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, []);
-
   const selectedPost =
     posts.find((post) => post.id === selectedPostId) ?? posts[0] ?? null;
-  const activeLiveSession =
-    liveHistory.find((item) => item.status === "live") ?? null;
-  const liveCompanionReferencePostId =
-    activeLiveSession?.channelPostId ?? liveDraft.referencePostId;
-  const liveCompanionReferencePost =
-    posts.find((post) => post.id === liveCompanionReferencePostId) ?? null;
+  const selectedIndex = selectedPost
+    ? posts.findIndex((post) => post.id === selectedPost.id)
+    : -1;
   const authorPanelVisible = Boolean(routeSelectedAuthorId);
 
   useEffect(() => {
@@ -225,6 +183,101 @@ export function DesktopChannelsWorkspace({
 
     onViewPost(selectedPost.id);
   }, [onSelectedPostChange, onViewPost, selectedPost?.id]);
+
+  // Close the comment drawer whenever the active post changes
+  useEffect(() => {
+    setCommentDrawerPostId((current) =>
+      current && current === selectedPost?.id ? current : null,
+    );
+  }, [selectedPost?.id]);
+
+  // IntersectionObserver: keep selectedPostId in sync with whichever slide
+  // is currently filling the viewport.
+  useEffect(() => {
+    const root = scrollContainerRef.current;
+    if (!root || posts.length === 0) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) {
+          return;
+        }
+
+        const postId = (visible.target as HTMLElement).dataset.postId;
+        if (postId) {
+          setSelectedPostId(postId);
+        }
+      },
+      { root, threshold: [0.6] },
+    );
+
+    slideRefs.current.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, [posts]);
+
+  // When routeSelectedPostId changes (e.g. opened via #post=xxx),
+  // scroll the matching slide into view.
+  useEffect(() => {
+    if (!routeSelectedPostId) {
+      return;
+    }
+
+    const node = slideRefs.current.get(routeSelectedPostId);
+    if (node) {
+      node.scrollIntoView({ behavior: "auto", block: "start" });
+    }
+  }, [routeSelectedPostId, posts]);
+
+  // Esc closes whichever overlay is on top (drawer first, then author panel).
+  useEffect(() => {
+    if (!commentDrawerPostId && !authorPanelVisible) {
+      return;
+    }
+
+    const handler = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+      event.preventDefault();
+      if (commentDrawerPostId) {
+        setCommentDrawerPostId(null);
+      } else if (authorPanelVisible) {
+        onCloseAuthor();
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [authorPanelVisible, commentDrawerPostId, onCloseAuthor]);
+
+  const scrollToOffset = useCallback((delta: number) => {
+    const container = scrollContainerRef.current;
+    if (!container) {
+      return;
+    }
+    container.scrollBy({ top: delta, behavior: "smooth" });
+  }, []);
+
+  const handlePrev = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) {
+      return;
+    }
+    scrollToOffset(-container.clientHeight);
+  }, [scrollToOffset]);
+
+  const handleNext = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) {
+      return;
+    }
+    scrollToOffset(container.clientHeight);
+  }, [scrollToOffset]);
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-[rgba(244,247,246,0.98)]">
@@ -266,7 +319,7 @@ export function DesktopChannelsWorkspace({
           <div className="flex items-center gap-2">
             <Button variant="secondary" size="sm" onClick={onRefresh}>
               <RefreshCcw size={14} />
-              换一批
+              {t(msg`换一批`)}
             </Button>
             <Button
               variant="primary"
@@ -276,7 +329,7 @@ export function DesktopChannelsWorkspace({
               }
             >
               <RadioTower size={14} />
-              直播伴侣
+              {t(msg`直播伴侣`)}
             </Button>
           </div>
         </div>
@@ -296,356 +349,104 @@ export function DesktopChannelsWorkspace({
         ) : null}
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto px-6 py-6">
-        {isLoading ? <LoadingBlock label="正在读取视频号内容..." /> : null}
-
-        {!isLoading && !posts.length ? (
-          <EmptyState
-            title="视频号还没有内容"
-            description="暂时还没有可看的内容。"
-          />
+      <div className="relative min-h-0 flex-1 overflow-hidden bg-[#101013]">
+        {isLoading ? (
+          <div className="flex h-full items-center justify-center">
+            <LoadingBlock label={t(msg`正在读取视频号内容...`)} />
+          </div>
         ) : null}
 
-        {!isLoading && selectedPost ? (
-          <div className="mx-auto grid max-w-[1180px] gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-            <section className="min-w-0">
-              <div className="flex items-start gap-4">
-                <article className="min-w-0 flex-1 overflow-hidden rounded-[20px] border border-[color:var(--border-faint)] bg-white shadow-[var(--shadow-section)]">
-                  <div className="relative mx-auto flex aspect-[9/16] w-full max-w-[420px] items-center justify-center bg-[#0d0e12] text-center">
-                    <div className="px-6">
-                      <div className="text-[16px] font-semibold text-white">
-                        视频功能正在开发中
-                      </div>
-                      <div className="mt-2 text-[13px] leading-6 text-white/72">
-                        敬请期待
-                      </div>
-                    </div>
-                    <div className="pointer-events-none absolute left-4 top-4 rounded-md bg-[rgba(15,23,42,0.68)] px-2.5 py-1 text-[11px] font-medium text-white">
-                      视频号推荐
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 px-5 py-4">
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => onOpenAuthor(selectedPost.authorId)}
-                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
-                      >
-                        <AvatarChip
-                          name={selectedPost.authorName}
-                          src={selectedPost.authorAvatar}
-                          size="wechat"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="truncate text-[15px] font-semibold text-[color:var(--text-primary)]">
-                            {selectedPost.authorName}
-                          </div>
-                          <div className="mt-0.5 text-[12px] text-[color:var(--text-muted)]">
-                            {formatTimestamp(selectedPost.createdAt)} ·{" "}
-                            {formatChannelMeta(selectedPost)}
-                          </div>
-                        </div>
-                      </button>
-                      <Button
-                        variant={
-                          selectedPost.ownerState?.isFollowingAuthor
-                            ? "secondary"
-                            : "primary"
-                        }
-                        size="sm"
-                        onClick={() =>
-                          onToggleAuthorFollow(
-                            selectedPost.authorId,
-                            Boolean(selectedPost.ownerState?.isFollowingAuthor),
-                          )
-                        }
-                        className={
-                          selectedPost.ownerState?.isFollowingAuthor
-                            ? "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
-                            : "bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
-                        }
-                      >
-                        {selectedPost.ownerState?.isFollowingAuthor
-                          ? "已关注"
-                          : "+关注"}
-                      </Button>
-                    </div>
-                    {selectedPost.title ? (
-                      <div className="text-[16px] font-semibold text-[color:var(--text-primary)]">
-                        {selectedPost.title}
-                      </div>
-                    ) : null}
-                    <ExpandableText
-                      text={selectedPost.text}
-                      textClassName="text-[14px] leading-7 text-[color:var(--text-primary)]"
-                    />
-                    {selectedPost.topicTags?.length ? (
-                      <div className="flex flex-wrap gap-2 pt-1">
-                        {selectedPost.topicTags.slice(0, 4).map((tag) => (
-                          <span
-                            key={tag}
-                            className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                </article>
-
-                <div className="flex w-12 flex-shrink-0 flex-col items-center gap-4 pt-12">
-                  <ChannelActionButton
-                    icon={<ThumbsUp size={18} />}
-                    label={`${selectedPost.likeCount}`}
-                    active={Boolean(selectedPost.ownerState?.hasLiked)}
-                    pending={likePendingPostId === selectedPost.id}
-                    onClick={() => onLike(selectedPost.id)}
-                  />
-                  <ChannelActionButton
-                    icon={<MessageCircleMore size={18} />}
-                    label={`${selectedPost.commentCount}`}
-                    onClick={() => {
-                      if (typeof document !== "undefined") {
-                        document
-                          .getElementById("desktop-channel-comments-panel")
-                          ?.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                          });
-                      }
-                    }}
-                  />
-                  <ChannelActionButton
-                    icon={<Share2 size={18} />}
-                    label="转发"
-                    onClick={() => setShareDialogOpen(true)}
-                  />
-                  <ChannelActionButton
-                    icon={<Bookmark size={18} />}
-                    label={isPostFavorite(selectedPost.id) ? "已收藏" : "收藏"}
-                    active={isPostFavorite(selectedPost.id)}
-                    onClick={() => onToggleFavorite(selectedPost)}
-                  />
-                </div>
-              </div>
-            </section>
-
-            <aside className="space-y-4">
-              {authorPanelVisible ? (
-                <DesktopChannelAuthorPanel
-                  authorId={routeSelectedAuthorId}
-                  errorMessage={authorProfileErrorMessage}
-                  isLoading={authorProfileLoading}
-                  profile={authorProfile}
-                  selectedPostId={selectedPost.id}
-                  onClose={onCloseAuthor}
-                  onOpenPost={onOpenAuthorPost}
-                  onToggleFollow={onToggleAuthorFollow}
-                />
-              ) : (
-                <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-section)]">
-                  <div className="flex items-start gap-3">
-                    <AvatarChip
-                      name={selectedPost.authorName}
-                      src={selectedPost.authorAvatar}
-                      size="wechat"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-[16px] font-semibold text-[color:var(--text-primary)]">
-                        {selectedPost.authorName}
-                      </div>
-                      <div className="mt-1 text-[12px] leading-6 text-[color:var(--text-muted)]">
-                        {formatTimestamp(selectedPost.createdAt)} ·{" "}
-                        {selectedPost.viewCount} 播放
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-3 flex gap-2">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => onOpenAuthor(selectedPost.authorId)}
-                    >
-                      <PlaySquare size={14} />
-                      作者主页
-                    </Button>
-                    <Button
-                      variant={
-                        selectedPost.ownerState?.isFollowingAuthor
-                          ? "secondary"
-                          : "primary"
-                      }
-                      size="sm"
-                      onClick={() =>
-                        onToggleAuthorFollow(
-                          selectedPost.authorId,
-                          Boolean(selectedPost.ownerState?.isFollowingAuthor),
-                        )
-                      }
-                      className={
-                        selectedPost.ownerState?.isFollowingAuthor
-                          ? "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
-                          : "bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
-                      }
-                    >
-                      {selectedPost.ownerState?.isFollowingAuthor
-                        ? "已关注"
-                        : "+关注"}
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              <div
-                id="desktop-channel-comments-panel"
-                className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-section)]"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                      热门评论
-                    </div>
-                    <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                      当前内容下的完整评论列表与回复输入区
-                    </div>
-                  </div>
-                  <span className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
-                    {selectedPost.commentCount} 条
-                  </span>
-                </div>
-                {commentsErrorMessage ? (
-                  <div className="mt-3">
-                    <ErrorBlock message={commentsErrorMessage} />
-                  </div>
-                ) : null}
-                <DesktopChannelCommentsPanel
-                  comments={comments}
-                  commentsLoading={commentsLoading}
-                  draft={commentDrafts[selectedPost.id] ?? ""}
-                  likePendingCommentId={commentLikePendingId}
-                  replyTarget={commentReplyTarget}
-                  selectedPost={selectedPost}
-                  submitPending={commentPendingPostId === selectedPost.id}
-                  onCancelReply={onCancelCommentReply}
-                  onDraftChange={(value) => onCommentChange(selectedPost.id, value)}
-                  onLikeComment={onLikeComment}
-                  onReplyToComment={onReplyToComment}
-                  onSubmit={() => onCommentSubmit(selectedPost.id)}
-                />
-              </div>
-
-              <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-section)]">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                    直播伴侣
-                  </div>
-                  <Clapperboard
-                    size={16}
-                    className="text-[color:var(--brand-primary)]"
-                  />
-                </div>
-                <div className="mt-2 text-sm leading-6 text-[color:var(--text-primary)]">
-                  {activeLiveSession?.title ||
-                    liveDraft.title.trim() ||
-                    "还没有直播准备稿"}
-                </div>
-                <div className="mt-2 text-xs leading-6 text-[color:var(--text-muted)]">
-                  {activeLiveSession
-                    ? `直播中 · ${resolveLiveModeLabel(activeLiveSession.mode)} · ${resolveLiveQualityLabel(activeLiveSession.quality)}`
-                    : liveDraft.title.trim()
-                      ? `准备中 · ${resolveLiveModeLabel(liveDraft.mode)} · ${resolveLiveQualityLabel(liveDraft.quality)}`
-                      : "从直播伴侣挑一条内容后，这里会回带当前准备状态。"}
-                </div>
-                {liveCompanionReferencePost ? (
-                  <div className="mt-3 rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 py-3">
-                    <div className="text-[11px] font-medium text-[color:var(--text-muted)]">
-                      当前参考内容
-                    </div>
-                    <div className="mt-2 line-clamp-2 text-sm leading-6 text-[color:var(--text-primary)]">
-                      {liveCompanionReferencePost.text}
-                    </div>
-                    <div className="mt-2 text-xs text-[color:var(--text-muted)]">
-                      {liveCompanionReferencePost.authorName} ·{" "}
-                      {formatTimestamp(liveCompanionReferencePost.createdAt)}
-                    </div>
-                  </div>
-                ) : null}
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() =>
-                      void navigate({ to: "/desktop/channels/live-companion" })
-                    }
-                  >
-                    <RadioTower size={14} />
-                    打开伴侣
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    disabled={!liveCompanionReferencePost}
-                    onClick={() => {
-                      if (liveCompanionReferencePost) {
-                        setSelectedPostId(liveCompanionReferencePost.id);
-                      }
-                    }}
-                  >
-                    定位参考内容
-                  </Button>
-                </div>
-              </div>
-
-              <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-section)]">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                    推荐队列
-                  </div>
-                  <span className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
-                    {posts.length} 条
-                  </span>
-                </div>
-                <div className="mt-3 space-y-2">
-                  {posts.map((post) => (
-                    <button
-                      key={post.id}
-                      type="button"
-                      onClick={() => setSelectedPostId(post.id)}
-                      className={cn(
-                        "w-full rounded-[16px] border px-3 py-3 text-left transition-[background-color,box-shadow]",
-                        selectedPost.id === post.id
-                          ? "border-[rgba(7,193,96,0.14)] bg-white shadow-[inset_3px_0_0_0_var(--brand-primary),0_8px_18px_rgba(15,23,42,0.04)]"
-                          : "border-[color:var(--border-faint)] bg-[color:var(--surface-console)] hover:bg-white hover:shadow-[0_8px_18px_rgba(15,23,42,0.04)]",
-                      )}
-                    >
-                      <div className="line-clamp-2 text-sm leading-6 text-[color:var(--text-primary)]">
-                        {post.text}
-                      </div>
-                      <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-[color:var(--text-muted)]">
-                        <span>{post.authorName}</span>
-                        <span>·</span>
-                        <span>{formatTimestamp(post.createdAt)}</span>
-                        {post.id === liveCompanionReferencePostId ? (
-                          <span className="rounded-md border border-[rgba(7,193,96,0.12)] bg-[rgba(7,193,96,0.06)] px-2 py-0.5 text-[10px] font-medium text-[color:var(--brand-primary)]">
-                            直播参考
-                          </span>
-                        ) : null}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </aside>
+        {!isLoading && !posts.length ? (
+          <div className="flex h-full items-center justify-center">
+            <EmptyState
+              title={t(msg`视频号还没有内容`)}
+              description={t(msg`暂时还没有可看的内容。`)}
+            />
           </div>
+        ) : null}
+
+        {!isLoading && posts.length ? (
+          <>
+            <div
+              ref={scrollContainerRef}
+              className="h-full snap-y snap-mandatory overflow-y-scroll scroll-smooth"
+            >
+              {posts.map((post) => (
+                <ChannelFeedSlide
+                  key={post.id}
+                  post={post}
+                  registerSlide={registerSlide}
+                  isFavorite={isPostFavorite(post.id)}
+                  likePending={likePendingPostId === post.id}
+                  onLike={() => onLike(post.id)}
+                  onOpenAuthor={() => onOpenAuthor(post.authorId)}
+                  onShare={() => setShareDialogOpen(true)}
+                  onToggleAuthorFollow={() =>
+                    onToggleAuthorFollow(
+                      post.authorId,
+                      Boolean(post.ownerState?.isFollowingAuthor),
+                    )
+                  }
+                  onToggleCommentDrawer={() =>
+                    setCommentDrawerPostId((current) =>
+                      current === post.id ? null : post.id,
+                    )
+                  }
+                  onToggleFavorite={() => onToggleFavorite(post)}
+                />
+              ))}
+            </div>
+
+            <FeedNavArrows
+              canPrev={selectedIndex > 0}
+              canNext={
+                selectedIndex >= 0 && selectedIndex < posts.length - 1
+              }
+              onPrev={handlePrev}
+              onNext={handleNext}
+            />
+
+            {selectedPost && commentDrawerPostId === selectedPost.id ? (
+              <ChannelCommentsDrawer
+                comments={comments}
+                commentsErrorMessage={commentsErrorMessage}
+                commentsLoading={commentsLoading}
+                draft={commentDrafts[selectedPost.id] ?? ""}
+                likePendingCommentId={commentLikePendingId}
+                replyTarget={commentReplyTarget}
+                selectedPost={selectedPost}
+                submitPending={commentPendingPostId === selectedPost.id}
+                onCancelReply={onCancelCommentReply}
+                onClose={() => setCommentDrawerPostId(null)}
+                onDraftChange={(value) =>
+                  onCommentChange(selectedPost.id, value)
+                }
+                onLikeComment={onLikeComment}
+                onReplyToComment={onReplyToComment}
+                onSubmit={() => onCommentSubmit(selectedPost.id)}
+              />
+            ) : null}
+          </>
+        ) : null}
+
+        {authorPanelVisible ? (
+          <ChannelAuthorOverlay
+            authorId={routeSelectedAuthorId}
+            errorMessage={authorProfileErrorMessage}
+            isLoading={authorProfileLoading}
+            profile={authorProfile}
+            selectedPostId={selectedPost?.id ?? null}
+            onClose={onCloseAuthor}
+            onOpenPost={onOpenAuthorPost}
+            onToggleFollow={onToggleAuthorFollow}
+          />
         ) : null}
       </div>
 
       <FeatureUnavailableDialog
         open={shareDialogOpen}
-        title="转发还在路上"
-        description="视频号转发能力还在开发中，等播放器到位后会一起开放。"
+        title={t(msg`转发还在路上`)}
+        description={t(msg`视频号转发能力还在开发中，等播放器到位后会一起开放。`)}
         onClose={() => setShareDialogOpen(false)}
       />
     </div>
@@ -657,14 +458,17 @@ function ChannelActionButton({
   icon,
   label,
   pending = false,
+  surface = "light",
   onClick,
 }: {
   active?: boolean;
   icon: ReactNode;
   label: string;
   pending?: boolean;
+  surface?: "light" | "dark";
   onClick: () => void;
 }) {
+  const isDark = surface === "dark";
   return (
     <button
       type="button"
@@ -678,10 +482,14 @@ function ChannelActionButton({
     >
       <span
         className={cn(
-          "flex h-11 w-11 items-center justify-center rounded-full border bg-white shadow-[var(--shadow-section)] transition-colors",
-          active
-            ? "border-[rgba(7,193,96,0.42)] text-[color:var(--brand-primary)]"
-            : "border-[color:var(--border-faint)] text-[color:var(--text-secondary)] group-hover:bg-[color:var(--surface-console)] group-hover:text-[color:var(--text-primary)]",
+          "flex h-11 w-11 items-center justify-center rounded-full border transition-colors",
+          isDark
+            ? active
+              ? "border-[rgba(7,193,96,0.65)] bg-white/12 text-[color:var(--brand-primary)]"
+              : "border-white/14 bg-white/12 text-white group-hover:bg-white/22"
+            : active
+              ? "border-[rgba(7,193,96,0.42)] bg-white text-[color:var(--brand-primary)] shadow-[var(--shadow-section)]"
+              : "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-[var(--shadow-section)] group-hover:bg-[color:var(--surface-console)] group-hover:text-[color:var(--text-primary)]",
         )}
       >
         {icon}
@@ -689,14 +497,325 @@ function ChannelActionButton({
       <span
         className={cn(
           "text-[11px]",
-          active
-            ? "font-medium text-[color:var(--brand-primary)]"
-            : "text-[color:var(--text-muted)]",
+          isDark
+            ? active
+              ? "font-medium text-[color:var(--brand-primary)]"
+              : "text-white/72"
+            : active
+              ? "font-medium text-[color:var(--brand-primary)]"
+              : "text-[color:var(--text-muted)]",
         )}
       >
         {label}
       </span>
     </button>
+  );
+}
+
+function ChannelFeedSlide({
+  post,
+  registerSlide,
+  isFavorite,
+  likePending,
+  onLike,
+  onOpenAuthor,
+  onShare,
+  onToggleAuthorFollow,
+  onToggleCommentDrawer,
+  onToggleFavorite,
+}: {
+  post: FeedPostListItem;
+  registerSlide: (postId: string, node: HTMLDivElement | null) => void;
+  isFavorite: boolean;
+  likePending: boolean;
+  onLike: () => void;
+  onOpenAuthor: () => void;
+  onShare: () => void;
+  onToggleAuthorFollow: () => void;
+  onToggleCommentDrawer: () => void;
+  onToggleFavorite: () => void;
+}) {
+  const t = useRuntimeTranslator();
+  return (
+    <div
+      ref={(node) => registerSlide(post.id, node)}
+      data-post-id={post.id}
+      className="flex h-full min-h-[640px] snap-start snap-always items-center justify-center px-6 py-6"
+    >
+      <div className="flex max-h-full items-end gap-4">
+        <article className="relative flex aspect-[9/16] h-[min(82vh,800px)] flex-shrink-0 overflow-hidden rounded-[20px] bg-[#0d0e12] shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
+          <div className="flex flex-1 items-center justify-center text-center">
+            <div className="px-6">
+              <div className="text-[16px] font-semibold text-white">
+                {t(msg`视频功能正在开发中`)}
+              </div>
+              <div className="mt-2 text-[13px] leading-6 text-white/72">
+                {t(msg`敬请期待`)}
+              </div>
+            </div>
+          </div>
+          <div className="pointer-events-none absolute left-4 top-4 rounded-md bg-[rgba(15,23,42,0.68)] px-2.5 py-1 text-[11px] font-medium text-white">
+            {t(msg`视频号推荐`)}
+          </div>
+
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[rgba(0,0,0,0.82)] via-[rgba(0,0,0,0.36)] to-transparent px-5 pb-5 pt-14">
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onOpenAuthor}
+                className="flex min-w-0 flex-1 items-center gap-3 text-left"
+              >
+                <AvatarChip
+                  name={post.authorName}
+                  src={post.authorAvatar}
+                  size="wechat"
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[14px] font-semibold text-white">
+                    {post.authorName}
+                  </div>
+                  <div className="mt-0.5 text-[11px] text-white/72">
+                    {formatTimestamp(post.createdAt)} ·{" "}
+                    {formatChannelMeta(post)}
+                  </div>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={onToggleAuthorFollow}
+                className={cn(
+                  "rounded-full px-3 py-1 text-[12px] transition",
+                  post.ownerState?.isFollowingAuthor
+                    ? "border border-white/28 bg-transparent text-white/85 hover:bg-white/10"
+                    : "bg-[color:var(--brand-primary)] text-white hover:opacity-95",
+                )}
+              >
+                {post.ownerState?.isFollowingAuthor
+                  ? t(msg`已关注`)
+                  : t(msg`+ 关注`)}
+              </button>
+            </div>
+            {post.title ? (
+              <div className="mt-3 line-clamp-2 text-[15px] font-semibold text-white">
+                {post.title}
+              </div>
+            ) : null}
+            {post.text ? (
+              <div className="mt-2 line-clamp-3 text-[13px] leading-6 text-white/82">
+                {post.text}
+              </div>
+            ) : null}
+            {post.topicTags?.length ? (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {post.topicTags.slice(0, 4).map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-white/14 px-2 py-0.5 text-[10px] text-white"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </article>
+
+        <div className="flex w-12 flex-shrink-0 flex-col items-center gap-3 pb-12">
+          <ChannelActionButton
+            surface="dark"
+            icon={<ThumbsUp size={18} />}
+            label={`${post.likeCount}`}
+            active={Boolean(post.ownerState?.hasLiked)}
+            pending={likePending}
+            onClick={onLike}
+          />
+          <ChannelActionButton
+            surface="dark"
+            icon={<MessageCircleMore size={18} />}
+            label={`${post.commentCount}`}
+            onClick={onToggleCommentDrawer}
+          />
+          <ChannelActionButton
+            surface="dark"
+            icon={<Share2 size={18} />}
+            label={t(msg`转发`)}
+            onClick={onShare}
+          />
+          <ChannelActionButton
+            surface="dark"
+            icon={<Bookmark size={18} />}
+            label={isFavorite ? t(msg`已收藏`) : t(msg`收藏`)}
+            active={isFavorite}
+            onClick={onToggleFavorite}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChannelCommentsDrawer({
+  comments,
+  commentsErrorMessage,
+  commentsLoading,
+  draft,
+  likePendingCommentId,
+  replyTarget,
+  selectedPost,
+  submitPending,
+  onCancelReply,
+  onClose,
+  onDraftChange,
+  onLikeComment,
+  onReplyToComment,
+  onSubmit,
+}: {
+  comments: FeedComment[];
+  commentsErrorMessage?: string | null;
+  commentsLoading: boolean;
+  draft: string;
+  likePendingCommentId: string | null;
+  replyTarget: {
+    authorId: string;
+    authorName: string;
+    commentId: string;
+    postId: string;
+  } | null;
+  selectedPost: FeedPostListItem;
+  submitPending: boolean;
+  onCancelReply: () => void;
+  onClose: () => void;
+  onDraftChange: (value: string) => void;
+  onLikeComment: (comment: FeedComment) => void;
+  onReplyToComment: (comment: FeedComment) => void;
+  onSubmit: () => void;
+}) {
+  const t = useRuntimeTranslator();
+  return (
+    <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center px-6">
+      <div className="pointer-events-auto flex h-[min(82vh,800px)] w-[380px] flex-col overflow-hidden rounded-[20px] border border-[color:var(--border-faint)] bg-white shadow-[0_24px_60px_rgba(0,0,0,0.32)] sm:translate-x-[260px]">
+        <div className="flex items-center justify-between gap-3 border-b border-[color:var(--border-faint)] px-4 py-3">
+          <div>
+            <div className="text-[14px] font-medium text-[color:var(--text-primary)]">
+              {t(msg`评论 ${selectedPost.commentCount}`)}
+            </div>
+            <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
+              {selectedPost.authorName}
+            </div>
+          </div>
+          <button
+            type="button"
+            aria-label={t(msg`关闭评论`)}
+            onClick={onClose}
+            className="flex h-7 w-7 items-center justify-center rounded-full text-[color:var(--text-muted)] transition hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-auto px-4 pb-4 pt-2">
+          {commentsErrorMessage ? (
+            <div className="mt-3">
+              <ErrorBlock message={commentsErrorMessage} />
+            </div>
+          ) : null}
+          <DesktopChannelCommentsPanel
+            comments={comments}
+            commentsLoading={commentsLoading}
+            draft={draft}
+            likePendingCommentId={likePendingCommentId}
+            replyTarget={replyTarget}
+            selectedPost={selectedPost}
+            submitPending={submitPending}
+            onCancelReply={onCancelReply}
+            onDraftChange={onDraftChange}
+            onLikeComment={onLikeComment}
+            onReplyToComment={onReplyToComment}
+            onSubmit={onSubmit}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChannelAuthorOverlay({
+  authorId,
+  errorMessage,
+  isLoading,
+  profile,
+  selectedPostId,
+  onClose,
+  onOpenPost,
+  onToggleFollow,
+}: {
+  authorId: string | null;
+  errorMessage?: string | null;
+  isLoading: boolean;
+  profile: FeedChannelAuthorProfile | null;
+  selectedPostId: string | null;
+  onClose: () => void;
+  onOpenPost: (postId: string, authorId: string) => void;
+  onToggleFollow: (authorId: string, following: boolean) => void;
+}) {
+  const t = useRuntimeTranslator();
+  return (
+    <div className="absolute inset-0 z-40 flex items-center justify-center bg-[rgba(0,0,0,0.55)] p-8 backdrop-blur-sm">
+      <button
+        type="button"
+        aria-label={t(msg`关闭作者主页`)}
+        onClick={onClose}
+        className="absolute inset-0"
+      />
+      <div className="relative flex max-h-[90vh] w-full max-w-[720px] flex-col overflow-auto rounded-[24px] bg-white shadow-[var(--shadow-overlay)]">
+        <DesktopChannelAuthorPanel
+          authorId={authorId}
+          errorMessage={errorMessage}
+          isLoading={isLoading}
+          profile={profile}
+          selectedPostId={selectedPostId}
+          onClose={onClose}
+          onOpenPost={onOpenPost}
+          onToggleFollow={onToggleFollow}
+        />
+      </div>
+    </div>
+  );
+}
+
+function FeedNavArrows({
+  canPrev,
+  canNext,
+  onPrev,
+  onNext,
+}: {
+  canPrev: boolean;
+  canNext: boolean;
+  onPrev: () => void;
+  onNext: () => void;
+}) {
+  const t = useRuntimeTranslator();
+  return (
+    <div className="pointer-events-none absolute bottom-6 right-6 z-20 flex flex-col gap-3">
+      <button
+        type="button"
+        aria-label={t(msg`上一条`)}
+        disabled={!canPrev}
+        onClick={onPrev}
+        className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/22 bg-white/14 text-white transition hover:bg-white/24 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-white/14"
+      >
+        <ChevronUp size={20} />
+      </button>
+      <button
+        type="button"
+        aria-label={t(msg`下一条`)}
+        disabled={!canNext}
+        onClick={onNext}
+        className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-white/22 bg-white/14 text-white transition hover:bg-white/24 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-white/14"
+      >
+        <ChevronDown size={20} />
+      </button>
+    </div>
   );
 }
 
@@ -887,34 +1006,6 @@ function DesktopChannelAuthorPanel({
       ) : null}
     </div>
   );
-}
-
-function resolveLiveModeLabel(
-  mode: LiveDraft["mode"] | LiveSessionRecord["mode"],
-) {
-  if (mode === "product") {
-    return "产品讲解";
-  }
-
-  if (mode === "story") {
-    return "剧情陪看";
-  }
-
-  return "单人控台";
-}
-
-function resolveLiveQualityLabel(
-  quality: LiveDraft["quality"] | LiveSessionRecord["quality"],
-) {
-  if (quality === "standard") {
-    return "标准";
-  }
-
-  if (quality === "ultra") {
-    return "超清";
-  }
-
-  return "高清";
 }
 
 function formatChannelMeta(post: FeedPostListItem) {

@@ -1,7 +1,6 @@
 import {
   useEffect,
   useState,
-  type MouseEvent as ReactMouseEvent,
   type PropsWithChildren,
 } from "react";
 import { msg } from "@lingui/macro";
@@ -10,12 +9,8 @@ import {
   Camera,
   Clock3,
   LockKeyhole,
-  Maximize2,
   MessageSquareText,
-  Minimize2,
-  Minus,
   ShieldCheck,
-  X,
 } from "lucide-react";
 import {
   SELF_CHARACTER_SOURCE_KEY,
@@ -53,74 +48,6 @@ import {
   verifyDesktopLockPasscode,
 } from "./desktop-lock-storage";
 
-type DesktopWindowHandle = {
-  close: () => Promise<void>;
-  isMaximized: () => Promise<boolean>;
-  minimize: () => Promise<void>;
-  onResized: (handler: () => void) => Promise<() => void>;
-  startDragging: () => Promise<void>;
-  toggleMaximize: () => Promise<void>;
-};
-
-async function resolveDesktopWindowHandle(): Promise<DesktopWindowHandle | null> {
-  try {
-    const [{ invoke }, { getCurrentWindow }] = await Promise.all([
-      import("@tauri-apps/api/core"),
-      import("@tauri-apps/api/window"),
-    ]);
-    const currentWindow = getCurrentWindow();
-
-    return {
-      close: async () => {
-        try {
-          await currentWindow.close();
-        } catch {
-          await invoke("desktop_window_close");
-        }
-      },
-      isMaximized: async () => {
-        try {
-          return await currentWindow.isMaximized();
-        } catch {
-          return await invoke<boolean>("desktop_window_is_maximized");
-        }
-      },
-      minimize: async () => {
-        try {
-          await currentWindow.minimize();
-        } catch {
-          await invoke("desktop_window_minimize");
-        }
-      },
-      onResized: async (handler) => {
-        try {
-          return await currentWindow.onResized(() => {
-            handler();
-          });
-        } catch {
-          return () => {};
-        }
-      },
-      startDragging: async () => {
-        try {
-          await currentWindow.startDragging();
-        } catch {
-          await invoke("desktop_window_drag");
-        }
-      },
-      toggleMaximize: async () => {
-        try {
-          await currentWindow.toggleMaximize();
-        } catch {
-          await invoke("desktop_window_toggle_maximize");
-        }
-      },
-    };
-  } catch {
-    return null;
-  }
-}
-
 export function DesktopShell({ children }: PropsWithChildren) {
   const t = useRuntimeTranslator();
   const pathname = useRouterState({
@@ -142,15 +69,10 @@ export function DesktopShell({ children }: PropsWithChildren) {
   const onboardingCompleted = useWorldOwnerStore(
     (state) => state.onboardingCompleted,
   );
-  const appTitle = runtimeConfig.publicAppName.trim() || "Yinjie";
   const ownerFallbackName = t(msg`世界主人`);
   const ownerDisplayName = ownerName?.trim() || ownerFallbackName;
-  const brandInitial = t(msg`隐`);
   const baseUrl = runtimeConfig.apiBaseUrl;
   const nativeDesktopShell = runtimeConfig.appPlatform === "desktop";
-  const [desktopWindow, setDesktopWindow] =
-    useState<DesktopWindowHandle | null>(null);
-  const [isMaximized, setIsMaximized] = useState(false);
   const [isOwnerCardOpen, setIsOwnerCardOpen] = useState(false);
   const [isOpeningSelfChat, setIsOpeningSelfChat] = useState(false);
   const [ownerCardNotice, setOwnerCardNotice] = useState<string | null>(null);
@@ -218,49 +140,7 @@ export function DesktopShell({ children }: PropsWithChildren) {
     if (!nativeDesktopShell) {
       setFavoritesStoreReady(true);
       setLockStoreReady(true);
-      setDesktopWindow(null);
-      setIsMaximized(false);
-      return;
     }
-
-    let cancelled = false;
-    let unlistenResize: (() => void) | null = null;
-
-    async function bindDesktopWindow() {
-      const currentWindow = await resolveDesktopWindowHandle();
-
-      if (cancelled || !currentWindow) {
-        return;
-      }
-
-      setDesktopWindow(currentWindow);
-
-      const syncMaximizedState = async () => {
-        try {
-          const nextValue = await currentWindow.isMaximized();
-          if (!cancelled) {
-            setIsMaximized(nextValue);
-          }
-        } catch {
-          if (!cancelled) {
-            setIsMaximized(false);
-          }
-        }
-      };
-
-      await syncMaximizedState();
-      unlistenResize = await currentWindow.onResized(() => {
-        void syncMaximizedState();
-      });
-    }
-
-    void bindDesktopWindow();
-
-    return () => {
-      cancelled = true;
-      setDesktopWindow(null);
-      unlistenResize?.();
-    };
   }, [nativeDesktopShell]);
 
   useEffect(() => {
@@ -461,21 +341,6 @@ export function DesktopShell({ children }: PropsWithChildren) {
     onboardingCompleted &&
     !isDesktopEntryRoute(pathname);
 
-  const handleTitleBarMouseDown = (event: ReactMouseEvent<HTMLDivElement>) => {
-    if (event.button !== 0 || !desktopWindow) {
-      return;
-    }
-
-    const target = event.target as HTMLElement | null;
-    if (
-      target?.closest("button, a, input, textarea, select, [role='button']")
-    ) {
-      return;
-    }
-
-    void desktopWindow.startDragging();
-  };
-
   const openDesktopLock = () => {
     const snapshot = setDesktopLocked(true);
 
@@ -608,85 +473,6 @@ export function DesktopShell({ children }: PropsWithChildren) {
           <div className="absolute right-[-4%] top-[10%] h-48 w-48 rounded-full bg-[rgba(56,189,248,0.08)] blur-3xl" />
           <div className="absolute bottom-[-6%] left-1/3 h-44 w-44 rounded-full bg-[rgba(148,163,184,0.08)] blur-3xl" />
         </div>
-
-        {nativeDesktopShell && showDesktopNavigation ? (
-          <header className="relative z-10 flex h-14 shrink-0 items-center gap-3 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.74)] px-4 backdrop-blur-xl">
-            <div
-              className={cn(
-                "flex min-w-0 flex-1 select-none items-center gap-3",
-                nativeDesktopShell ? "cursor-grab active:cursor-grabbing" : "",
-              )}
-              data-tauri-drag-region={nativeDesktopShell ? "" : undefined}
-              onMouseDown={handleTitleBarMouseDown}
-              onDoubleClick={() => {
-                if (!nativeDesktopShell || !desktopWindow) {
-                  return;
-                }
-
-                void desktopWindow.toggleMaximize();
-              }}
-            >
-              <div className="flex min-w-0 items-center gap-3 rounded-[12px] border border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.88)] px-3 py-1.5 shadow-[var(--shadow-soft)]">
-                <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[color:var(--brand-primary)] [background-image:var(--brand-gradient)] text-[13px] font-semibold text-[color:var(--text-on-brand)]">
-                  {brandInitial}
-                </div>
-                <div className="min-w-0 leading-none">
-                  <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
-                    {appTitle}
-                  </div>
-                  <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[color:var(--text-muted)]">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--brand-primary)]" />
-                    <span className="truncate">{ownerDisplayName}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <DesktopWindowButton
-                label={t(msg`最小化`)}
-                onClick={() => {
-                  if (!desktopWindow) {
-                    return;
-                  }
-
-                  void desktopWindow.minimize();
-                }}
-              >
-                <Minus size={15} strokeWidth={1.8} />
-              </DesktopWindowButton>
-              <DesktopWindowButton
-                label={isMaximized ? t(msg`还原`) : t(msg`最大化`)}
-                onClick={() => {
-                  if (!desktopWindow) {
-                    return;
-                  }
-
-                  void desktopWindow.toggleMaximize();
-                }}
-              >
-                {isMaximized ? (
-                  <Minimize2 size={14} strokeWidth={1.8} />
-                ) : (
-                  <Maximize2 size={14} strokeWidth={1.8} />
-                )}
-              </DesktopWindowButton>
-              <DesktopWindowButton
-                danger
-                label={t(msg`关闭`)}
-                onClick={() => {
-                  if (!desktopWindow) {
-                    return;
-                  }
-
-                  void desktopWindow.close();
-                }}
-              >
-                <X size={14} strokeWidth={1.9} />
-              </DesktopWindowButton>
-            </div>
-          </header>
-        ) : null}
 
         <div
           className={cn(
@@ -1234,36 +1020,6 @@ function DesktopOwnerShortcutButton({
           {description}
         </div>
       </div>
-    </button>
-  );
-}
-
-function DesktopWindowButton({
-  children,
-  danger = false,
-  label,
-  onClick,
-}: PropsWithChildren<{
-  danger?: boolean;
-  label: string;
-  onClick: () => void;
-}>) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      onClick={(event) => {
-        event.stopPropagation();
-        onClick();
-      }}
-      className={cn(
-        "flex h-8 w-8 items-center justify-center rounded-[10px] border bg-transparent text-[color:var(--text-muted)] appearance-none transition-[background-color,color,border-color] duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
-        danger
-          ? "border-[color:var(--border-faint)] bg-[color:var(--surface-card)] hover:border-[color:var(--border-danger)] hover:bg-[color:var(--state-danger-bg)] hover:text-[color:var(--state-danger-text)]"
-          : "border-[color:var(--border-faint)] bg-[color:var(--surface-card)] hover:border-[rgba(7,193,96,0.16)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]",
-      )}
-    >
-      {children}
     </button>
   );
 }

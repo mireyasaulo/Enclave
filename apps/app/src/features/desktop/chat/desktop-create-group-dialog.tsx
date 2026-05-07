@@ -6,6 +6,8 @@ import {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage, useRuntimeTranslator } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { Check, Search, X } from "lucide-react";
@@ -53,6 +55,7 @@ export function DesktopCreateGroupDialog({
   onClose,
   onCreated,
 }: DesktopCreateGroupDialogProps) {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const runtimeConfig = useAppRuntimeConfig();
@@ -427,7 +430,7 @@ export function DesktopCreateGroupDialog({
 
       if (current.length >= MAX_SHARED_MESSAGE_COUNT) {
         setMessageSelectionNotice(
-          `最多选择 ${MAX_SHARED_MESSAGE_COUNT} 条聊天记录。`,
+          t(msg`最多选择 ${MAX_SHARED_MESSAGE_COUNT} 条聊天记录。`),
         );
         return current;
       }
@@ -440,7 +443,7 @@ export function DesktopCreateGroupDialog({
     const dedupedIds = [...new Set(messageIds)];
     if (dedupedIds.length > MAX_SHARED_MESSAGE_COUNT) {
       setMessageSelectionNotice(
-        `最多选择 ${MAX_SHARED_MESSAGE_COUNT} 条聊天记录。`,
+        t(msg`最多选择 ${MAX_SHARED_MESSAGE_COUNT} 条聊天记录。`),
       );
     }
 
@@ -639,7 +642,7 @@ export function DesktopCreateGroupDialog({
             </div>
             {isSourceFriend ? (
               <span className="shrink-0 rounded-full bg-[rgba(7,193,96,0.08)] px-1.5 py-0.5 text-[10px] text-[color:var(--brand-primary)]">
-                当前聊天
+                {t(msg`当前聊天`)}
               </span>
             ) : null}
             {aliasName ? (
@@ -649,7 +652,7 @@ export function DesktopCreateGroupDialog({
             ) : null}
           </div>
           <div className="mt-1 truncate text-[12px] text-[color:var(--text-muted)]">
-            {item.character.relationship || "世界联系人"}
+            {item.character.relationship || t(msg`世界联系人`)}
           </div>
         </div>
         <div
@@ -687,7 +690,7 @@ export function DesktopCreateGroupDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(17,24,39,0.18)] p-6 backdrop-blur-[2px]">
       <button
         type="button"
-        aria-label="关闭发起群聊弹层"
+        aria-label={t(msg`关闭发起群聊弹层`)}
         onClick={() => {
           if (!createMutation.isPending) {
             onClose();
@@ -702,7 +705,7 @@ export function DesktopCreateGroupDialog({
       >
         <div className="relative border-b border-[rgba(15,23,42,0.08)] bg-[#f7f7f7] px-6 py-4 text-center">
           <div className="text-[16px] font-medium tracking-[0.01em] text-[color:var(--text-primary)]">
-            选择联系人
+            {t(msg`选择联系人`)}
           </div>
           <button
             type="button"
@@ -712,7 +715,7 @@ export function DesktopCreateGroupDialog({
               }
             }}
             disabled={createMutation.isPending}
-            aria-label="关闭"
+            aria-label={t(msg`关闭`)}
             className="absolute right-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-[color:var(--text-secondary)] transition hover:bg-black/[0.04] hover:text-[color:var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <X size={16} />
@@ -731,14 +734,14 @@ export function DesktopCreateGroupDialog({
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
               onKeyDown={handleSearchKeyDown}
-              placeholder="搜索联系人"
+              placeholder={t(msg`搜索联系人`)}
               className="h-10 w-full rounded-[10px] border border-[color:var(--border-faint)] bg-white pl-10 pr-10 text-sm text-[color:var(--text-primary)] outline-none transition placeholder:text-[color:var(--text-dim)] focus:border-[color:var(--border-brand)]"
             />
             {searchTerm.trim() ? (
               <button
                 type="button"
                 onClick={clearSearch}
-                aria-label="清空联系人搜索"
+                aria-label={t(msg`清空联系人搜索`)}
                 className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-[color:var(--text-dim)] transition hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
               >
                 <X size={14} />
@@ -774,7 +777,7 @@ export function DesktopCreateGroupDialog({
                       </span>
                       {isSourceFriend ? (
                         <span className="rounded-full bg-[rgba(7,193,96,0.08)] px-1.5 py-0.5 text-[10px] text-[color:var(--brand-primary)]">
-                          当前
+                          {t(msg`当前`)}
                         </span>
                       ) : null}
                     </button>
@@ -783,14 +786,15 @@ export function DesktopCreateGroupDialog({
               </div>
             ) : (
               <div className="flex min-h-[42px] items-center text-[12px] text-[color:var(--text-muted)]">
-                已选联系人会显示在这里
+                {t(msg`已选联系人会显示在这里`)}
               </div>
             )}
           </div>
           {seedMemberIds.length ? (
             <div className="mt-2 text-[12px] text-[color:var(--text-muted)]">
-              已默认选择
-              {sourceFriendName ? `“${sourceFriendName}”` : "当前聊天对象"}
+              {sourceFriendName
+                ? t(msg`已默认选择 “${sourceFriendName}”`)
+                : t(msg`已默认选择当前聊天对象`)}
             </div>
           ) : null}
         </div>
@@ -802,7 +806,7 @@ export function DesktopCreateGroupDialog({
           {friendsQuery.isLoading ? (
             <LoadingBlock
               className="px-4 py-5 text-left"
-              label="正在读取联系人..."
+              label={t(msg`正在读取联系人...`)}
             />
           ) : null}
           {friendsQuery.isError && friendsQuery.error instanceof Error ? (
@@ -821,8 +825,8 @@ export function DesktopCreateGroupDialog({
           !friendItems.length ? (
             <div className="px-4 py-10">
               <EmptyState
-                title="还没有可拉进群的人"
-                description="先去通讯录里建立一些关系，再回来创建群聊。"
+                title={t(msg`还没有可拉进群的人`)}
+                description={t(msg`先去通讯录里建立一些关系，再回来创建群聊。`)}
               />
             </div>
           ) : null}
@@ -833,8 +837,8 @@ export function DesktopCreateGroupDialog({
           !filteredFriends.length ? (
             <div className="px-4 py-10">
               <EmptyState
-                title="没有匹配的联系人"
-                description="换个名字、备注名或关系关键词试试。"
+                title={t(msg`没有匹配的联系人`)}
+                description={t(msg`换个名字、备注名或关系关键词试试。`)}
               />
             </div>
           ) : null}
@@ -844,8 +848,8 @@ export function DesktopCreateGroupDialog({
           filteredFriends.length ? (
             <div className="border-b border-[rgba(15,23,42,0.06)] px-4 py-2 text-[11px] text-[color:var(--text-dim)]">
               {searchTerm.trim()
-                ? `搜索结果 ${filteredFriends.length} 位联系人`
-                : `共 ${filteredFriends.length} 位联系人`}
+                ? t(msg`搜索结果 ${filteredFriends.length} 位联系人`)
+                : t(msg`共 ${filteredFriends.length} 位联系人`)}
             </div>
           ) : null}
 
@@ -854,7 +858,7 @@ export function DesktopCreateGroupDialog({
               {pinnedSourceFriend ? (
                 <div>
                   <div className="border-b border-[rgba(15,23,42,0.06)] bg-[#fafafa] px-4 py-2 text-[11px] font-medium tracking-[0.08em] text-[color:var(--brand-primary)]">
-                    当前聊天
+                    {t(msg`当前聊天`)}
                   </div>
                   {renderFriendRow(pinnedSourceFriend)}
                 </div>
@@ -878,7 +882,7 @@ export function DesktopCreateGroupDialog({
           <div className="border-t border-[rgba(15,23,42,0.08)] bg-[#fafafa] px-4 py-3">
             <div className="mb-3 flex items-center justify-between gap-3">
               <div className="text-[13px] font-medium text-[color:var(--text-primary)]">
-                分享聊天内容
+                {t(msg`分享聊天内容`)}
               </div>
               <button
                 type="button"
@@ -889,7 +893,7 @@ export function DesktopCreateGroupDialog({
                 }}
                 className="text-[12px] text-[color:var(--text-muted)] transition hover:text-[color:var(--text-primary)]"
               >
-                收起
+                {t(msg`收起`)}
               </button>
             </div>
 
@@ -901,7 +905,7 @@ export function DesktopCreateGroupDialog({
             {shareableMessagesQuery.isLoading ? (
               <LoadingBlock
                 className="px-0 py-3 text-left"
-                label="正在读取最近聊天记录..."
+                label={t(msg`正在读取最近聊天记录...`)}
               />
             ) : null}
             {shareableMessagesQuery.isError &&
@@ -912,7 +916,7 @@ export function DesktopCreateGroupDialog({
             !shareableMessagesQuery.isError &&
             !shareableMessages.length ? (
               <div className="rounded-[10px] border border-[rgba(15,23,42,0.08)] bg-white px-3 py-3 text-[12px] text-[color:var(--text-muted)]">
-                当前单聊里还没有可分享的消息。
+                {t(msg`当前单聊里还没有可分享的消息。`)}
               </div>
             ) : null}
             {!shareableMessagesQuery.isLoading &&
@@ -921,12 +925,9 @@ export function DesktopCreateGroupDialog({
               <>
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <div className="text-[12px] text-[color:var(--text-muted)]">
-                    已选择 {selectedMessageIds.length} /{" "}
-                    {Math.min(
-                      MAX_SHARED_MESSAGE_COUNT,
-                      shareableMessages.length,
-                    )}{" "}
-                    条
+                    {t(
+                      msg`已选择 ${selectedMessageIds.length} / ${Math.min(MAX_SHARED_MESSAGE_COUNT, shareableMessages.length)} 条`,
+                    )}
                   </div>
                   <div className="flex flex-wrap items-center gap-2 text-[12px]">
                     {SHARE_HISTORY_PRESET_COUNTS.map((count) => (
@@ -941,7 +942,7 @@ export function DesktopCreateGroupDialog({
                             : "border-[rgba(15,23,42,0.08)] bg-white text-[color:var(--text-secondary)] hover:bg-[rgba(0,0,0,0.03)]",
                         )}
                       >
-                        最近{count}条
+                        {t(msg`最近 ${count} 条`)}
                       </button>
                     ))}
                     <button
@@ -958,14 +959,14 @@ export function DesktopCreateGroupDialog({
                           : "border-[rgba(15,23,42,0.08)] bg-white text-[color:var(--text-secondary)] hover:bg-[rgba(0,0,0,0.03)]",
                       )}
                     >
-                      全选
+                      {t(msg`全选`)}
                     </button>
                     <button
                       type="button"
                       onClick={() => setSelectedMessageIds([])}
                       className="rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2.5 py-1 text-[color:var(--text-secondary)] transition hover:bg-[rgba(0,0,0,0.03)]"
                     >
-                      清空
+                      {t(msg`清空`)}
                     </button>
                   </div>
                 </div>
@@ -974,7 +975,7 @@ export function DesktopCreateGroupDialog({
                   tabIndex={0}
                   onKeyDown={handleSharedMessagesKeyDown}
                   className="max-h-56 overflow-auto rounded-[10px] border border-[rgba(15,23,42,0.08)] bg-white outline-none ring-offset-0 focus:ring-2 focus:ring-[rgba(7,193,96,0.14)]"
-                  aria-label="可分享聊天记录列表"
+                  aria-label={t(msg`可分享聊天记录列表`)}
                 >
                   {shareableMessageSections.map((section) => (
                     <div key={section.key}>

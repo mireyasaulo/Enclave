@@ -777,7 +777,7 @@ export function JobsPage() {
                           : t("Unassigned")}
                       </div>
                       <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                        {t("power")} {worldInfo?.powerState ?? t("absent")}
+                        {t("Power state")}: {worldInfo?.powerState ?? t("absent")}
                       </div>
                     </td>
                     <td className="px-4 py-3">

@@ -1,4 +1,5 @@
 import type { KeyboardEvent, ReactNode, RefObject } from "react";
+import { msg } from "@lingui/macro";
 import {
   LoaderCircle,
   Mic,
@@ -6,6 +7,7 @@ import {
   Square,
   type LucideIcon,
 } from "lucide-react";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppPage,
   ErrorBlock,
@@ -90,6 +92,7 @@ export function DesktopContactsWorkspace({
   onSelectWorldCharacter,
   detailContent,
 }: DesktopContactsWorkspaceProps) {
+  const t = useRuntimeTranslator();
   return (
     <div className="h-full min-h-0">
       <AppPage className="h-full min-h-0 space-y-0 bg-[#f5f5f5] px-0 py-0">
@@ -98,7 +101,7 @@ export function DesktopContactsWorkspace({
             <div className="border-b border-[rgba(0,0,0,0.06)] bg-[#f7f7f7] px-4 py-3">
               <div className="flex items-center justify-between">
                 <div className="text-[15px] font-medium text-[color:var(--text-primary)]">
-                  通讯录
+                  {t(msg`通讯录`)}
                 </div>
                 <div className="text-[11px] text-[color:var(--text-muted)]">
                   {directoryCountLabel}
@@ -117,7 +120,7 @@ export function DesktopContactsWorkspace({
                     onChange={(event) => onSearchTextChange(event.target.value)}
                     onFocus={onSearchOpen}
                     onKeyDown={onSearchKeyDown}
-                    placeholder="搜索"
+                    placeholder={t(msg`搜索`)}
                     className="min-w-0 flex-1 bg-transparent text-sm text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
                   />
                   <button
@@ -125,14 +128,14 @@ export function DesktopContactsWorkspace({
                     onClick={onSpeechButtonClick}
                     className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[6px] text-[color:var(--text-dim)] transition hover:bg-white/70 hover:text-[color:var(--text-primary)]"
                     aria-label={
-                      speechListening ? "结束语音输入" : "开始语音输入"
+                      speechListening ? t(msg`结束语音输入`) : t(msg`开始语音输入`)
                     }
                     title={
                       speechSupported
                         ? speechListening
-                          ? "结束语音输入"
-                          : "语音输入"
-                        : "当前浏览器不支持语音输入"
+                          ? t(msg`结束语音输入`)
+                          : t(msg`语音输入`)
+                        : t(msg`当前浏览器不支持语音输入`)
                     }
                     disabled={speechButtonDisabled || !speechSupported}
                   >
@@ -173,13 +176,13 @@ export function DesktopContactsWorkspace({
               {loading ? (
                 <LoadingBlock
                   className="px-4 py-6 text-left"
-                  label="正在读取联系人..."
+                  label={t(msg`正在读取联系人...`)}
                 />
               ) : null}
 
               {!loading && friendSections.length ? (
                 <div className="overflow-hidden">
-                  <DesktopDirectoryTitle title="联系人" />
+                  <DesktopDirectoryTitle title={t(msg`联系人`)} />
                   {friendSections.map((section, sectionIndex) => (
                     <div
                       key={section.key}
@@ -263,6 +266,7 @@ function DesktopFriendListRow({
   onClick: () => void;
   onDoubleClick?: () => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <button
       type="button"
@@ -287,12 +291,12 @@ function DesktopFriendListRow({
         </div>
         <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
           {pendingCharacterId === item.character.id
-            ? "正在打开会话..."
+            ? t(msg`正在打开会话...`)
             : item.displayName !== item.character.name
-              ? `昵称：${item.character.name}`
+              ? t(msg`昵称：${item.character.name}`)
               : item.character.currentStatus?.trim() ||
                 item.character.relationship ||
-                "保持联系"}
+                t(msg`保持联系`)}
         </div>
       </div>
     </button>
@@ -310,6 +314,7 @@ function DesktopWorldCharacterRow({
   active?: boolean;
   onClick: () => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <button
       type="button"
@@ -334,7 +339,7 @@ function DesktopWorldCharacterRow({
         <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
           {item.character.relationship ||
             item.character.currentStatus?.trim() ||
-            "查看角色资料"}
+            t(msg`查看角色资料`)}
         </div>
       </div>
     </button>
