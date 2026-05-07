@@ -16,11 +16,6 @@ import {
   ShieldCheck,
   X,
 } from "lucide-react";
-import {
-  ACTION_OPERATOR_SOURCE_KEY,
-  getOrCreateConversation,
-  listCharacters,
-} from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, TextField, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../components/avatar-chip";
@@ -35,7 +30,6 @@ import {
 import { useWorldOwnerStore } from "../../store/world-owner-store";
 import { formatTimestamp } from "../../lib/format";
 import { hydrateDesktopFavoritesFromNative } from "../desktop/favorites/desktop-favorites-storage";
-import { buildDesktopChatThreadPath } from "../desktop/chat/desktop-chat-route-state";
 import {
   desktopBottomNavItems,
   desktopMoreMenuItems,
@@ -134,7 +128,6 @@ export function DesktopShell({ children }: PropsWithChildren) {
   const standaloneDesktopRoute = isStandaloneDesktopRoute(pathname);
   const profileRouteActive = isDesktopProfileRoute(pathname);
   const runtimeConfig = useAppRuntimeConfig();
-  const ownerId = useWorldOwnerStore((state) => state.id);
   const ownerName = useWorldOwnerStore((state) => state.username);
   const ownerAvatar = useWorldOwnerStore((state) => state.avatar);
   const ownerSignature = useWorldOwnerStore((state) => state.signature);
@@ -145,16 +138,11 @@ export function DesktopShell({ children }: PropsWithChildren) {
   const ownerFallbackName = t(msg`世界主人`);
   const ownerDisplayName = ownerName?.trim() || ownerFallbackName;
   const brandInitial = t(msg`隐`);
-  const baseUrl = runtimeConfig.apiBaseUrl;
   const nativeDesktopShell = runtimeConfig.appPlatform === "desktop";
   const [desktopWindow, setDesktopWindow] =
     useState<DesktopWindowHandle | null>(null);
   const [isMaximized, setIsMaximized] = useState(false);
   const [isOwnerCardOpen, setIsOwnerCardOpen] = useState(false);
-  const [
-    isOpeningActionOperatorConversation,
-    setIsOpeningActionOperatorConversation,
-  ] = useState(false);
   const [ownerCardNotice, setOwnerCardNotice] = useState<string | null>(null);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isLocked, setIsLocked] = useState(
@@ -549,44 +537,10 @@ export function DesktopShell({ children }: PropsWithChildren) {
     navigateDesktopShellTo("/tabs/moments");
   };
 
-  const openActionOperatorConversationShortcut = async () => {
-    if (!ownerId || isOpeningActionOperatorConversation) {
-      return;
-    }
-
+  const openSelfChatShortcut = () => {
     setOwnerCardNotice(null);
-    setIsOpeningActionOperatorConversation(true);
-
-    try {
-      const characters = await listCharacters(baseUrl);
-      const actionOperatorCharacter = characters.find(
-        (item) => item.sourceKey?.trim() === ACTION_OPERATOR_SOURCE_KEY,
-      );
-
-      if (!actionOperatorCharacter) {
-        throw new Error(t(msg`当前世界还没有“行动助理”角色。`));
-      }
-
-      const conversation = await getOrCreateConversation(
-        { characterId: actionOperatorCharacter.id },
-        baseUrl,
-      );
-
-      setIsOwnerCardOpen(false);
-      navigateDesktopShellTo(
-        buildDesktopChatThreadPath({
-          conversationId: conversation.id,
-        }),
-      );
-    } catch (error) {
-      setOwnerCardNotice(
-        error instanceof Error
-          ? error.message
-          : t(msg`打开会话失败，请稍后再试。`),
-      );
-    } finally {
-      setIsOpeningActionOperatorConversation(false);
-    }
+    setIsOwnerCardOpen(false);
+    navigateDesktopShellTo("/tabs/chat");
   };
 
   if (nativeDesktopShell && (!lockStoreReady || !favoritesStoreReady)) {
@@ -760,15 +714,9 @@ export function DesktopShell({ children }: PropsWithChildren) {
                     ownerName={ownerName}
                     ownerAvatar={ownerAvatar}
                     ownerSignature={ownerSignature}
-                    appTitle={appTitle}
                     notice={ownerCardNotice}
-                    isOpeningActionOperatorConversation={
-                      isOpeningActionOperatorConversation
-                    }
                     onOpenMoments={openMomentsShortcut}
-                    onOpenActionOperatorConversation={() => {
-                      void openActionOperatorConversationShortcut();
-                    }}
+                    onOpenSelfChat={openSelfChatShortcut}
                   />
                 ) : null}
               </div>
@@ -1119,24 +1067,20 @@ function DesktopOwnerQuickCard({
   ownerName,
   ownerAvatar,
   ownerSignature,
-  appTitle,
   notice,
-  isOpeningActionOperatorConversation,
   onOpenMoments,
-  onOpenActionOperatorConversation,
+  onOpenSelfChat,
 }: {
   ownerName: string | null;
   ownerAvatar: string;
   ownerSignature: string;
-  appTitle: string;
   notice: string | null;
-  isOpeningActionOperatorConversation: boolean;
   onOpenMoments: () => void;
-  onOpenActionOperatorConversation: () => void;
+  onOpenSelfChat: () => void;
 }) {
   const t = useRuntimeTranslator();
-  const ownerFallbackName = t(msg`世界主人`);
-  const ownerDisplayName = ownerName?.trim() || ownerFallbackName;
+  const ownerDisplayName = ownerName?.trim() || "";
+  const trimmedSignature = ownerSignature.trim();
 
   return (
     <div className="absolute left-[calc(100%+0.75rem)] top-0 z-30 w-[286px] rounded-[22px] border border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.98)] p-3 shadow-[var(--shadow-overlay)] backdrop-blur-xl">
@@ -1144,25 +1088,24 @@ function DesktopOwnerQuickCard({
         <div className="flex items-start gap-3">
           <AvatarChip name={ownerDisplayName} src={ownerAvatar} size="lg" />
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
+            {ownerDisplayName ? (
               <div className="truncate text-[17px] font-semibold text-[color:var(--text-primary)]">
                 {ownerDisplayName}
               </div>
-              <div className="rounded-full bg-[rgba(7,193,96,0.12)] px-2 py-0.5 text-[10px] font-medium tracking-[0.08em] text-[#15803d]">
-                {t(msg`世界主人`)}
-              </div>
-            </div>
-            <div className="mt-1 text-[12px] text-[color:var(--text-secondary)]">
-              {appTitle}
-            </div>
-            <div className="mt-2 line-clamp-2 text-[12px] leading-5 text-[color:var(--text-secondary)]">
-              {ownerSignature.trim() || t(msg`在现实之外，进入另一片世界。`)}
+            ) : null}
+            <div
+              className={cn(
+                "line-clamp-2 text-[12px] leading-5 text-[color:var(--text-secondary)]",
+                ownerDisplayName ? "mt-2" : "",
+              )}
+            >
+              {trimmedSignature}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2">
+      <div className="mt-3 grid grid-cols-1 gap-2">
         <DesktopOwnerShortcutButton
           icon={Camera}
           label={t(msg`朋友圈`)}
@@ -1171,14 +1114,9 @@ function DesktopOwnerQuickCard({
         />
         <DesktopOwnerShortcutButton
           icon={MessageSquareText}
-          label={
-            isOpeningActionOperatorConversation
-              ? t(msg`打开中...`)
-              : t(msg`行动助理`)
-          }
-          description={t(msg`进入真实世界动作会话`)}
-          onClick={onOpenActionOperatorConversation}
-          disabled={isOpeningActionOperatorConversation}
+          label={t(msg`发消息`)}
+          description={t(msg`进入我的聊天`)}
+          onClick={onOpenSelfChat}
         />
       </div>
 
