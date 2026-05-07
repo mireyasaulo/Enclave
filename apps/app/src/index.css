@@ -288,3 +288,11 @@ body.yj-mobile::after {
 .yj-mobile-shell * {
   -webkit-tap-highlight-color: transparent;
 }
+
+/* iOS Safari 在 input/textarea 字号小于 16px 时聚焦会自动放大且不复原。
+ * 当前 mobile-web 没有任何文本输入显式声明 ≥16px，所以直接强制 16px 即可。
+ * 排除非文本类型 (checkbox/radio/file 等) 不会渲染文本。 */
+.yj-mobile-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="range"]):not([type="color"]):not([type="button"]):not([type="submit"]):not([type="reset"]),
+.yj-mobile-shell textarea {
+  font-size: 16px;
+}
