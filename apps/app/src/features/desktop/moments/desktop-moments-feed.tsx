@@ -95,7 +95,7 @@ export function DesktopMomentsFeed({
       ) : null}
 
       {!isLoading && !moments.length ? (
-        <div className="mx-auto max-w-[560px] py-10">
+        <div className="mx-auto flex min-h-[60vh] w-full max-w-[560px] items-center justify-center py-10">
           <EmptyState
             title={t(msg`朋友圈还很安静`)}
             description={t(msg`你先发一条，或者等世界里的其他人先开口。`)}

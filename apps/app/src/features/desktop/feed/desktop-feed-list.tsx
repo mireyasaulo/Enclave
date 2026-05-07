@@ -101,7 +101,7 @@ export function DesktopFeedList({
       ) : null}
 
       {!isLoading && !posts.length ? (
-        <div className="mx-auto max-w-[560px] py-10">
+        <div className="mx-auto flex min-h-[60vh] w-full max-w-[560px] items-center justify-center py-10">
           <EmptyState
             title={t(msg`广场还没有新动态`)}
             description={t(msg`你先发一条居民公开可见的动态，或者等世界里的居民先开口。`)}
