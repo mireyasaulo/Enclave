@@ -47,21 +47,25 @@ type SettingsTab =
 type LegalTab = "privacy" | "terms" | "community";
 type ProfileSettingsMessage = ReturnType<typeof msg>;
 
-const baseSettingsTabs: Array<{
-  id: SettingsTab;
-  label: ProfileSettingsMessage;
-}> = [
-  { id: "profile", label: msg`个人资料` },
-  { id: "chat", label: msg`聊天` },
-  { id: "ai", label: msg`AI 设置` },
-  { id: "language", label: msg`语言` },
-  { id: "legal", label: msg`协议与规范` },
-];
+const profileTab = {
+  id: "profile",
+  label: msg`个人资料`,
+} satisfies { id: SettingsTab; label: ProfileSettingsMessage };
 
 const subscriptionTab = {
   id: "subscription",
   label: msg`会员中心`,
 } satisfies { id: SettingsTab; label: ProfileSettingsMessage };
+
+const restSettingsTabs: Array<{
+  id: SettingsTab;
+  label: ProfileSettingsMessage;
+}> = [
+  { id: "chat", label: msg`快捷键设置` },
+  { id: "ai", label: msg`AI 设置` },
+  { id: "language", label: msg`语言` },
+  { id: "legal", label: msg`协议与规范` },
+];
 
 const legalTabs: Array<{ id: LegalTab; label: ProfileSettingsMessage }> = [
   { id: "privacy", label: msg`隐私政策` },
@@ -128,8 +132,8 @@ export function ProfileSettingsPage() {
   });
 
   const settingsTabs = showCloudAccountEntries
-    ? [...baseSettingsTabs, subscriptionTab]
-    : baseSettingsTabs;
+    ? [profileTab, subscriptionTab, ...restSettingsTabs]
+    : [profileTab, ...restSettingsTabs];
 
   useEffect(() => {
     setDraftName(username ?? "");
@@ -341,7 +345,7 @@ export function ProfileSettingsPage() {
       {activeTab === "chat" ? (
         <MobileSettingsSection
           desktop={desktopMode}
-          title={desktopMode ? t(msg`聊天设置`) : undefined}
+          title={desktopMode ? t(msg`快捷键设置`) : undefined}
           description={
             desktopMode
               ? t(msg`调整桌面和 Web 键盘聊天输入时的发送快捷键。`)
