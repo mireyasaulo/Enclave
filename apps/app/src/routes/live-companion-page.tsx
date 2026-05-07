@@ -246,9 +246,10 @@ export function LiveCompanionPage() {
   }
 
   return (
-    <DesktopUtilityShell
-      title="直播伴侣"
-      subtitle="把开播前准备、状态检查和参考内容收在一起。"
+    <div className="relative isolate h-full min-h-0">
+      <DesktopUtilityShell
+        title="直播伴侣"
+        subtitle="把开播前准备、状态检查和参考内容收在一起。"
       toolbar={
         <div className="rounded-full border border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.07)] px-3 py-1 text-[11px] font-medium text-[color:var(--brand-primary)]">
           {activeSession ? "直播中" : "待开播"}
@@ -769,6 +770,17 @@ export function LiveCompanionPage() {
         </div>
       </div>
     </DesktopUtilityShell>
+      <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[3px]">
+        <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-8 py-6 text-center shadow-[var(--shadow-card)]">
+          <div className="text-lg font-semibold text-[color:var(--text-primary)]">
+            功能开发中
+          </div>
+          <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
+            敬请期待
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -29,8 +29,14 @@ function resolveKeyboardInset(input: {
   platform: string | null;
 }) {
   const viewportInset = readKeyboardInset();
-  if (input.platform !== "android" || input.nativeKeyboardHeight <= 0) {
+  if (input.nativeKeyboardHeight <= 0) {
     return viewportInset;
+  }
+
+  if (input.platform === "ios") {
+    // iOS Capacitor 在 contentInset:"always" 下 WebView 不会收缩，
+    // visualViewport 通常已经反映键盘高度；此处插件值仅作为兜底（max 取较大者）。
+    return Math.max(viewportInset, input.nativeKeyboardHeight);
   }
 
   // Android WebView may overlay the IME without resizing the page.
@@ -129,6 +135,9 @@ export function useKeyboardInset() {
     window.addEventListener("resize", handleViewportChange);
     window.addEventListener("focusin", handleFocusChange);
     window.addEventListener("focusout", handleFocusChange);
+    // BFCache 恢复 / 后台切前台时，iOS Safari 不一定触发 visualViewport.resize
+    window.addEventListener("pageshow", handleViewportChange);
+    document.addEventListener("visibilitychange", handleViewportChange);
 
     return () => {
       viewport?.removeEventListener("resize", handleViewportChange);
@@ -136,11 +145,16 @@ export function useKeyboardInset() {
       window.removeEventListener("resize", handleViewportChange);
       window.removeEventListener("focusin", handleFocusChange);
       window.removeEventListener("focusout", handleFocusChange);
+      window.removeEventListener("pageshow", handleViewportChange);
+      document.removeEventListener("visibilitychange", handleViewportChange);
     };
   }, [updateInset]);
 
   useEffect(() => {
-    if (!Capacitor.isNativePlatform() || nativePlatform !== "android") {
+    if (
+      !Capacitor.isNativePlatform() ||
+      (nativePlatform !== "android" && nativePlatform !== "ios")
+    ) {
       return;
     }
 

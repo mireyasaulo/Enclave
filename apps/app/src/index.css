@@ -20,6 +20,8 @@ body {
   font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   position: relative;
   background:
     var(--bg-accent),
@@ -287,4 +289,22 @@ body.yj-mobile::after {
 .yj-mobile-shell,
 .yj-mobile-shell * {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* iOS Safari/WKWebView 默认对图片/链接长按弹出系统菜单（存图、拷贝、分享等），
+ * 对头像、聊天气泡、moments 媒体等"非可复制"区域会破坏体验。
+ * 通过 .yj-no-callout 关闭长按菜单与文本选中；可复制文本/输入区不要加该类。 */
+.yj-no-callout,
+.yj-no-callout * {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* iOS Safari 在 input/textarea 字号小于 16px 时聚焦会自动放大且不复原。
+ * 当前 mobile-web 没有任何文本输入显式声明 ≥16px，所以直接强制 16px 即可。
+ * 排除非文本类型 (checkbox/radio/file 等) 不会渲染文本。 */
+.yj-mobile-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="range"]):not([type="color"]):not([type="button"]):not([type="submit"]):not([type="reset"]),
+.yj-mobile-shell textarea {
+  font-size: 16px;
 }

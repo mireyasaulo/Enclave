@@ -2,11 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  CheckCircle2,
   ChevronRight,
-  QrCode,
   Search,
-  Sparkles,
   UserPlus,
   Users,
   type LucideIcon,
@@ -68,9 +65,6 @@ export function DesktopAddFriendWorkspace() {
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const ownerName = useWorldOwnerStore((state) => state.username) ?? "我";
-  const ownerAvatar = useWorldOwnerStore((state) => state.avatar);
-  const ownerId = useWorldOwnerStore((state) => state.id);
-  const ownerSignature = useWorldOwnerStore((state) => state.signature);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [searchText, setSearchText] = useState(routeState.keyword);
   const [notice, setNotice] = useState<{
@@ -157,10 +151,8 @@ export function DesktopAddFriendWorkspace() {
   });
 
   useEffect(() => {
-    if (searchText !== routeState.keyword) {
-      setSearchText(routeState.keyword);
-    }
-  }, [routeState.keyword, searchText]);
+    setSearchText(routeState.keyword);
+  }, [routeState.keyword]);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -373,6 +365,8 @@ export function DesktopAddFriendWorkspace() {
 
   const submitKeywordSearch = (keyword: string) => {
     const nextKeyword = keyword.trim();
+    setSelectedCharacterId(null);
+    setSendDialogCharacterId(null);
     void navigate({
       to: "/desktop/add-friend",
       hash: buildDesktopAddFriendRouteHash({
@@ -388,7 +382,7 @@ export function DesktopAddFriendWorkspace() {
     setSendDialogCharacterId(null);
     void navigate({
       to: "/desktop/add-friend",
-      hash: undefined,
+      hash: "",
       replace: true,
     });
 
@@ -494,69 +488,6 @@ export function DesktopAddFriendWorkspace() {
                 <DesktopAddFriendGuideRow
                   label="资料关键词"
                   value="支持备注、标签、签名和关系描述"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      }
-      aside={
-        <div className="flex h-full min-h-0 flex-col bg-[#f3f3f3]">
-          <div className="border-b border-[rgba(15,23,42,0.06)] bg-[#f7f7f7] px-5 py-4">
-            <div className="flex items-center gap-2 text-[14px] font-medium text-[color:var(--text-primary)]">
-              <QrCode size={16} className="text-[#15803d]" />
-              <span>我的隐界名片</span>
-            </div>
-            <div className="mt-1 text-[12px] text-[color:var(--text-muted)]">
-              别人可以通过隐界号或二维码找到你
-            </div>
-          </div>
-
-          <div className="min-h-0 flex-1 overflow-auto p-5">
-            <div className="rounded-[10px] border border-[rgba(15,23,42,0.08)] bg-white p-5 shadow-none">
-              <div className="flex items-center gap-3">
-                <AvatarChip name={ownerName} src={ownerAvatar} size="wechat" />
-                <div className="min-w-0">
-                  <div className="truncate text-[16px] font-medium text-[color:var(--text-primary)]">
-                    {ownerName}
-                  </div>
-                  <div className="mt-1 text-[13px] text-[color:var(--text-muted)]">
-                    {ownerId
-                      ? buildCharacterIdentifier(ownerId)
-                      : "隐界号待生成"}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 rounded-[8px] border border-[rgba(15,23,42,0.06)] bg-[#fafafa] p-4">
-                <FakeQrPanel />
-              </div>
-
-              <div className="mt-4 rounded-[8px] bg-[#f7f7f7] px-3 py-3 text-[12px] leading-6 text-[color:var(--text-secondary)]">
-                {ownerSignature?.trim() ||
-                  "把自己的世界展示给别人，也可以通过隐界号被快速搜索到。"}
-              </div>
-            </div>
-
-            <div className="mt-4 overflow-hidden rounded-[10px] border border-[rgba(15,23,42,0.08)] bg-white">
-              <div className="border-b border-[rgba(15,23,42,0.06)] px-4 py-3 text-[12px] font-medium tracking-[0.08em] text-[color:var(--text-muted)]">
-                当前状态
-              </div>
-              <div className="px-4 py-2">
-                <StatusMetaRow
-                  icon={Sparkles}
-                  label="待处理好友申请"
-                  value={`${pendingRequestCount}`}
-                />
-                <StatusMetaRow
-                  icon={CheckCircle2}
-                  label="已在通讯录"
-                  value={`${friendsQuery.data?.length ?? 0}`}
-                />
-                <StatusMetaRow
-                  icon={Users}
-                  label="可搜索角色"
-                  value={`${charactersQuery.data?.length ?? 0}`}
                 />
               </div>
             </div>
@@ -1211,56 +1142,3 @@ function getSearchResultDisplayName(
     : item.character.name;
 }
 
-function FakeQrPanel() {
-  const cells = [
-    1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1,
-    0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1,
-    1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 1,
-    1, 0, 1, 1, 0, 1,
-  ];
-
-  return (
-    <div className="flex flex-col items-center">
-      <div className="grid h-[144px] w-[144px] grid-cols-9 gap-[3px] rounded-[10px] bg-white p-[10px] shadow-[inset_0_0_0_1px_rgba(15,23,42,0.06)]">
-        {cells.map((cell, index) => (
-          <div
-            key={index}
-            className={cn(
-              "rounded-[2px]",
-              cell ? "bg-[#111827]" : "bg-transparent",
-            )}
-          />
-        ))}
-      </div>
-      <div className="mt-3 text-[12px] text-[color:var(--text-muted)]">
-        扫一扫上面的二维码图案，加我为朋友
-      </div>
-    </div>
-  );
-}
-
-function StatusMetaRow({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: LucideIcon;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="flex items-center gap-3 border-b border-[rgba(15,23,42,0.06)] py-3 last:border-b-0">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-[#f5f5f5] text-[#15803d]">
-        <Icon size={14} />
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="text-[12px] text-[color:var(--text-muted)]">
-          {label}
-        </div>
-        <div className="mt-0.5 text-[14px] font-medium text-[color:var(--text-primary)]">
-          {value}
-        </div>
-      </div>
-    </div>
-  );
-}

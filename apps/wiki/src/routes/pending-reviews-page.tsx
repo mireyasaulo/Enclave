@@ -21,6 +21,7 @@ import { wikiApi, type PendingReviewItem } from "../lib/wiki-api";
 import { SnapshotDiff } from "../components/snapshot-diff";
 import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
+import { formatDateTime } from "../lib/format";
 
 export function PendingReviewsPage() {
   const t = translateRuntimeMessage;
@@ -125,7 +126,13 @@ export function PendingReviewsPage() {
         <ErrorBlock message={(pendingQ.error as Error).message} />
       )}
       {!pendingQ.isLoading && items.length === 0 && (
-        <PanelEmpty message={t(msg`待审队列为空，喘口气吧 ☕。`)} />
+        <PanelEmpty
+          message={
+            operation || riskLevel || revisionKind
+              ? t(msg`没有符合筛选条件的待审项。试试清空筛选。`)
+              : t(msg`待审队列为空，喘口气吧 ☕。`)
+          }
+        />
       )}
       <ul className="space-y-3">
         {items.map((item) => (
@@ -221,7 +228,7 @@ function ReviewCard({
         <span className="ml-auto text-xs text-[color:var(--text-muted)]">
           <Trans>
             由 {rev.editorUserId}（{rev.editorRoleAtTime}）提交于{" "}
-            {new Date(rev.createdAt).toLocaleString()}
+            {formatDateTime(rev.createdAt)}
           </Trans>
         </span>
       </div>
@@ -250,7 +257,7 @@ function ReviewCard({
           <summary className="cursor-pointer text-[color:var(--text-muted)]">
             <Trans>查看完整快照</Trans>
           </summary>
-          <pre className="mt-2 overflow-x-auto rounded bg-[var(--bg-canvas)] p-3">
+          <pre className="mt-2 overflow-auto max-h-[40vh] md:max-h-[60vh] rounded bg-[var(--bg-canvas)] p-3">
             {JSON.stringify(rev.contentSnapshot, null, 2)}
           </pre>
         </details>
@@ -259,7 +266,7 @@ function ReviewCard({
             <summary className="cursor-pointer text-[color:var(--text-muted)]">
               <Trans>查看角色逻辑快照</Trans>
             </summary>
-            <pre className="mt-2 overflow-x-auto rounded bg-[var(--bg-canvas)] p-3">
+            <pre className="mt-2 overflow-auto max-h-[40vh] md:max-h-[60vh] rounded bg-[var(--bg-canvas)] p-3">
               {JSON.stringify(rev.recipeSnapshot, null, 2)}
             </pre>
           </details>

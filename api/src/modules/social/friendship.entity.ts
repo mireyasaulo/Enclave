@@ -40,4 +40,13 @@ export class FriendshipEntity {
 
   @Column({ type: 'datetime', nullable: true })
   lastInteractedAt?: Date;
+
+  @Column({ type: 'int', default: 0 })
+  sparkStreak: number;
+
+  @Column({ type: 'datetime', nullable: true })
+  sparkStartedAt?: Date | null;
+
+  @Column({ type: 'varchar', length: 10, nullable: true })
+  sparkLastDay?: string | null;
 }

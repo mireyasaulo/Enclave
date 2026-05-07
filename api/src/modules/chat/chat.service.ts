@@ -20,12 +20,14 @@ import { WorldOwnerService } from '../auth/world-owner.service';
 import { WorldLanguageService } from '../config/world-language.service';
 import { REMINDER_CHARACTER_ID } from '../characters/reminder-character';
 import { CharactersService } from '../characters/characters.service';
+import { AppEvents, EventBusService } from '../events/event-bus.service';
 import { NarrativeService } from '../narrative/narrative.service';
 import { ReminderRuntimeService } from '../reminder-runtime/reminder-runtime.service';
 import { ActionRuntimeService } from '../action-runtime/action-runtime.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { SELF_CHARACTER_ID } from '../characters/default-characters';
 import { SelfAgentService } from '../self-agent/self-agent.service';
+import { FriendshipEntity } from '../social/friendship.entity';
 import { ConversationEntity } from './conversation.entity';
 import {
   filterUserFacingConversations,
@@ -171,6 +173,7 @@ export class ChatService {
     private readonly customStickersService: CustomStickersService,
     private readonly reminderRuntime: ReminderRuntimeService,
     private readonly worldLanguage: WorldLanguageService,
+    private readonly eventBus: EventBusService,
     @Inject(forwardRef(() => ReplyArtifactJobService))
     private readonly replyArtifactJobs: ReplyArtifactJobService,
     private readonly mediaInsightJobs: MediaInsightJobService,
@@ -184,6 +187,8 @@ export class ChatService {
     private groupMemberRepo: Repository<GroupMemberEntity>,
     @InjectRepository(GroupMessageEntity)
     private groupMessageRepo: Repository<GroupMessageEntity>,
+    @InjectRepository(FriendshipEntity)
+    private friendshipRepo: Repository<FriendshipEntity>,
   ) {}
 
   async getOrCreateConversation(
@@ -256,6 +261,17 @@ export class ChatService {
       }),
     );
 
+    const friendships = await this.friendshipRepo.find({
+      where: { ownerId: owner.id },
+      select: ['characterId', 'sparkStreak'],
+    });
+    const sparkByCharacterId = new Map<string, number>();
+    for (const f of friendships) {
+      if ((f.sparkStreak ?? 0) > 0) {
+        sparkByCharacterId.set(f.characterId, f.sparkStreak);
+      }
+    }
+
     const result: (Conversation & {
       lastMessage?: Message;
       unreadCount: number;
@@ -279,8 +295,18 @@ export class ChatService {
         }),
       });
 
+      const serialized = await this.serializeConversation(conv);
+      const directCharacterId =
+        serialized.type === 'direct'
+          ? serialized.participants?.[0]
+          : undefined;
+      const sparkStreak = directCharacterId
+        ? sparkByCharacterId.get(directCharacterId)
+        : undefined;
+
       result.push({
-        ...(await this.serializeConversation(conv)),
+        ...serialized,
+        ...(sparkStreak ? { sparkStreak } : {}),
         lastMessage,
         unreadCount,
       });
@@ -837,6 +863,15 @@ export class ChatService {
       entity,
       userMsgEntity.createdAt ?? new Date(),
     );
+
+    const sparkCharacterId = entity.participants?.[0];
+    if (sparkCharacterId && entity.type === 'direct') {
+      this.eventBus.emit(AppEvents.USER_SENT_MESSAGE, {
+        ownerId: owner.id,
+        characterId: sparkCharacterId,
+        conversationId: convId,
+      });
+    }
 
     const enrichedAttachment = normalizedInput.attachment
       ? await this.mediaInsightJobs.ensureConversationMessageInsight({

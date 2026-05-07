@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode, type Ref } from "react";
+import { msg } from "@lingui/macro";
 import { MoreHorizontal, Phone, Search, Video } from "lucide-react";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
 
 export type DesktopChatSidePanelMode = "history" | "details" | null;
@@ -24,6 +26,7 @@ export function DesktopChatHeaderActions({
   const callMenuRef = useRef<HTMLDivElement | null>(null);
   const historyActive = activePanelMode === "history";
   const detailsActive = activePanelMode === "details";
+  const t = useRuntimeTranslator();
 
   useEffect(() => {
     if (!callMenuOpen) {
@@ -48,7 +51,7 @@ export function DesktopChatHeaderActions({
       <DesktopChatHeaderButton
         active={historyActive}
         tone="brand"
-        label="查找聊天记录"
+        label={t(msg`查找聊天记录`)}
         onClick={() => onToggleHistory?.()}
       >
         <Search size={16} />
@@ -58,7 +61,7 @@ export function DesktopChatHeaderActions({
         <DesktopChatHeaderButton
           active={callMenuOpen}
           tone="neutral"
-          label="通话"
+          label={t(msg`通话`)}
           onClick={() => setCallMenuOpen((current) => !current)}
         >
           <Phone size={16} />
@@ -67,7 +70,7 @@ export function DesktopChatHeaderActions({
         {callMenuOpen ? (
           <div className="absolute right-0 top-[calc(100%+0.45rem)] z-30 w-40 overflow-hidden rounded-[14px] border border-[color:var(--border-faint)] bg-white/96 p-1.5 shadow-[var(--shadow-overlay)] backdrop-blur-xl">
             <CallMenuButton
-              label="语音通话"
+              label={t(msg`语音通话`)}
               icon={
                 <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[rgba(7,193,96,0.07)] text-[color:var(--brand-primary)]">
                   <Phone size={15} />
@@ -79,7 +82,7 @@ export function DesktopChatHeaderActions({
               }}
             />
             <CallMenuButton
-              label="视频通话"
+              label={t(msg`视频通话`)}
               icon={
                 <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[rgba(7,193,96,0.07)] text-[color:var(--brand-primary)]">
                   <Video size={15} />
@@ -97,7 +100,7 @@ export function DesktopChatHeaderActions({
       <DesktopChatHeaderButton
         active={detailsActive}
         tone="neutral"
-        label="更多"
+        label={t(msg`更多`)}
         onClick={() => onToggleDetails?.()}
       >
         <MoreHorizontal size={16} />

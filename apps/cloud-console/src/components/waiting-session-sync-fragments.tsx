@@ -13,9 +13,9 @@ const TASK_STATUS_BADGE_STYLES: Record<
   CloudWaitingSessionSyncTaskSummary["status"],
   string
 > = {
-  failed: "border-rose-300/60 bg-rose-500/10 text-rose-200",
-  pending: "border-amber-300/60 bg-amber-500/10 text-amber-100",
-  running: "border-sky-300/60 bg-sky-500/10 text-sky-100",
+  failed: "border-rose-300/70 bg-rose-50 text-rose-700",
+  pending: "border-amber-300/70 bg-amber-50 text-amber-700",
+  running: "border-sky-300/70 bg-sky-50 text-sky-700",
 };
 
 const TASK_STATUS_LABELS: Record<
@@ -79,27 +79,27 @@ const ACTION_COLOR_CLASS_MAP: Record<
   },
   danger: {
     default:
-      "border-rose-400/40 bg-rose-500/10 text-rose-100 hover:border-rose-300/60",
+      "border-rose-400/60 bg-rose-50 text-rose-700 hover:border-rose-500 hover:bg-rose-100",
     ghost:
-      "border-rose-300/40 text-rose-100 hover:border-rose-200/60 hover:text-white",
+      "border-rose-300/60 text-rose-700 hover:border-rose-400 hover:text-rose-800",
     chip:
-      "border-rose-300/40 text-rose-100 hover:border-rose-200/60 hover:text-white",
+      "border-rose-300/60 text-rose-700 hover:border-rose-400 hover:text-rose-800",
   },
   sky: {
     default:
-      "border-sky-200/30 bg-sky-400/10 text-sky-50 hover:border-sky-100/50",
+      "border-sky-300/60 bg-sky-50 text-sky-700 hover:border-sky-400 hover:bg-sky-100",
     ghost:
-      "border-sky-200/30 text-sky-100 hover:border-sky-100/50 hover:text-white",
+      "border-sky-300/60 text-sky-700 hover:border-sky-400 hover:text-sky-800",
     chip:
-      "border-sky-200/30 text-sky-50 hover:border-sky-100/50",
+      "border-sky-300/60 bg-sky-50 text-sky-700 hover:border-sky-400",
   },
   emerald: {
     default:
-      "border-emerald-200/30 bg-emerald-400/10 text-emerald-50 hover:border-emerald-100/50",
+      "border-emerald-300/60 bg-emerald-50 text-emerald-700 hover:border-emerald-400 hover:bg-emerald-100",
     ghost:
-      "border-emerald-200/30 text-emerald-100 hover:border-emerald-100/50 hover:text-white",
+      "border-emerald-300/60 text-emerald-700 hover:border-emerald-400 hover:text-emerald-800",
     chip:
-      "border-emerald-200/30 text-emerald-50 hover:border-emerald-100/50",
+      "border-emerald-300/60 bg-emerald-50 text-emerald-700 hover:border-emerald-400",
   },
   neutral: {
     default:
@@ -250,13 +250,13 @@ export function WaitingSessionSyncStatusPills({
 }) {
   return (
     <div className={joinClasses("flex flex-wrap gap-2 text-xs", className)}>
-      <span className="rounded-full border border-rose-300/40 bg-rose-500/10 px-3 py-1 text-rose-100">
+      <span className="rounded-full border border-rose-300/40 bg-rose-50 px-3 py-1 text-rose-700">
         Failed {summary.failed}
       </span>
-      <span className="rounded-full border border-amber-300/40 bg-amber-500/10 px-3 py-1 text-amber-100">
+      <span className="rounded-full border border-amber-300/40 bg-amber-50 px-3 py-1 text-amber-700">
         Pending {summary.pending}
       </span>
-      <span className="rounded-full border border-sky-300/40 bg-sky-500/10 px-3 py-1 text-sky-100">
+      <span className="rounded-full border border-sky-300/40 bg-sky-50 px-3 py-1 text-sky-700">
         Running {summary.running}
       </span>
     </div>
@@ -273,11 +273,11 @@ export function WaitingSessionSyncArtifactSummary({
   return (
     <div
       className={joinClasses(
-        "rounded-2xl border border-sky-200/30 bg-sky-400/10 px-4 py-3 text-xs text-sky-50",
+        "rounded-2xl border border-sky-200/30 bg-sky-50 px-4 py-3 text-xs text-sky-700",
         className,
       )}
     >
-      <div className="uppercase tracking-[0.18em] text-sky-100/80">
+      <div className="uppercase tracking-[0.18em] text-sky-700/80">
         Artifact summary
       </div>
       <div className="mt-2 flex flex-wrap gap-2">
@@ -291,7 +291,7 @@ export function WaitingSessionSyncArtifactSummary({
           Targets {artifact.targetValues.length}
         </span>
       </div>
-      <div className="mt-3 leading-6 text-sky-50/85">
+      <div className="mt-3 leading-6 text-sky-700/85">
         <div>Target values: {artifact.targetValues.join(" · ")}</div>
         {artifact.worldDetailPath ? (
           <div>World detail: {artifact.worldDetailPath}</div>

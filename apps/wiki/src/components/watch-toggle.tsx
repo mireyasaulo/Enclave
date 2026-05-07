@@ -14,15 +14,25 @@ export function WatchToggle({ characterId }: { characterId: string }) {
     queryFn: () => wikiApi.isWatching(characterId),
     enabled: !!user,
   });
+  const statusKey = ["wiki", "watchlist", "status", characterId];
   const watchMut = useMutation({
     mutationFn: () =>
       statusQ.data?.watching
         ? wikiApi.unwatch(characterId)
         : wikiApi.watch(characterId),
-    onSuccess: () => {
-      void qc.invalidateQueries({
-        queryKey: ["wiki", "watchlist", "status", characterId],
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: statusKey });
+      const prev = qc.getQueryData<{ watching: boolean }>(statusKey);
+      qc.setQueryData<{ watching: boolean }>(statusKey, {
+        watching: !(prev?.watching ?? false),
       });
+      return { prev };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.prev) qc.setQueryData(statusKey, ctx.prev);
+    },
+    onSettled: () => {
+      void qc.invalidateQueries({ queryKey: statusKey });
       void qc.invalidateQueries({ queryKey: ["wiki", "watchlist"] });
     },
   });

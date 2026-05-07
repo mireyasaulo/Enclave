@@ -8,7 +8,7 @@ import type {
   CloudWorldLifecycleStatus,
   WorldLifecycleJobStatus,
 } from "@yinjie/contracts";
-import { formatDateTime as formatLocaleDateTime } from "@yinjie/i18n";
+import { formatDateTime as formatLocaleDateTime, useAppLocale } from "@yinjie/i18n";
 import { ErrorBlock } from "@yinjie/ui";
 import {
   CloudAdminErrorBlock,
@@ -28,9 +28,14 @@ import {
 import { buildCompactJobsRouteSearch } from "../lib/job-route-search";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import {
+  formatCloudConsoleJobsGroupCount,
   translateCloudConsoleTextForActiveLocale,
   useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
+import {
+  localizeProviderDescription,
+  localizeProviderLabel,
+} from "../lib/provider-i18n";
 import { describeJobResult, getJobAuditBadgeLabel } from "../lib/job-result";
 import {
   createRequestScopedNotice,
@@ -63,7 +68,7 @@ const WORLD_STATUSES: CloudWorldLifecycleStatus[] = [
 const SECONDARY_ACTION_BUTTON =
   "rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-secondary)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:bg-[color:var(--surface-tertiary)] disabled:opacity-60";
 const JOB_AUDIT_BADGE_CLASS_NAME =
-  "rounded-full border border-amber-300/50 bg-amber-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-amber-100";
+  "rounded-full border border-amber-300/50 bg-amber-50 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-amber-700";
 
 function formatDateTime(value?: string | null) {
   if (!value) {
@@ -113,13 +118,13 @@ function formatOptional(value?: string | null) {
 function getJobStatusTone(status: WorldLifecycleJobStatus) {
   switch (status) {
     case "running":
-      return "border-sky-300/50 bg-sky-500/10 text-sky-100";
+      return "border-sky-300/50 bg-sky-50 text-sky-700";
     case "pending":
       return "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-primary)]";
     case "failed":
-      return "border-rose-300/60 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/60 bg-rose-50 text-rose-700";
     case "succeeded":
-      return "border-emerald-300/50 bg-emerald-500/10 text-emerald-100";
+      return "border-emerald-300/50 bg-emerald-50 text-emerald-700";
     case "cancelled":
     default:
       return "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]";
@@ -129,12 +134,12 @@ function getJobStatusTone(status: WorldLifecycleJobStatus) {
 function getAttentionTone(severity: CloudWorldAttentionItem["severity"]) {
   switch (severity) {
     case "critical":
-      return "border-rose-300/60 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/60 bg-rose-50 text-rose-700";
     case "warning":
-      return "border-amber-300/50 bg-amber-500/10 text-amber-100";
+      return "border-amber-300/50 bg-amber-50 text-amber-700";
     case "info":
     default:
-      return "border-sky-300/50 bg-sky-500/10 text-sky-100";
+      return "border-sky-300/50 bg-sky-50 text-sky-700";
   }
 }
 
@@ -243,6 +248,7 @@ type WorldConfirmAction =
 
 export function WorldDetailPage() {
   const t = useCloudConsoleText();
+  const { locale } = useAppLocale();
   const { worldId } = useParams({ from: "/worlds/$worldId" });
   const queryClient = useQueryClient();
   const { showNotice } = useConsoleNotice();
@@ -641,10 +647,9 @@ export function WorldDetailPage() {
           </div>
 
           <div className="mt-3 text-xs leading-6 text-[color:var(--text-muted)]">
-            Resume is available for worlds that still need to move back toward
-            running, including sleeping, failed, queued, and stopping states.
-            Suspend is limited to worlds that are currently active. Retry is
-            reserved for failed or in-flight lifecycle states.
+            {t(
+              "Resume is available for worlds that still need to move back toward running, including sleeping, failed, queued, and stopping states. Suspend is limited to worlds that are currently active. Retry is reserved for failed or in-flight lifecycle states.",
+            )}
           </div>
 
           <div className="mt-5 grid gap-4">
@@ -709,7 +714,7 @@ export function WorldDetailPage() {
                 ) : null}
                 {providerOptions.map((provider) => (
                   <option key={provider.key} value={provider.key}>
-                    {provider.label} ({provider.key})
+                    {localizeProviderLabel(provider.key, provider.label, locale)} ({provider.key})
                   </option>
                 ))}
               </select>
@@ -725,35 +730,40 @@ export function WorldDetailPage() {
                   {t("Provider profile")}
                 </div>
                 <div className="mt-2 font-medium text-[color:var(--text-primary)]">
-                  {selectedProvider.label}
+                  {localizeProviderLabel(selectedProvider.key, selectedProvider.label, locale)}
                 </div>
                 <div className="mt-1 leading-6">
-                  {selectedProvider.description}
+                  {localizeProviderDescription(selectedProvider.key, selectedProvider.description, locale)}
                 </div>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  <div>Deployment: {selectedProvider.deploymentMode}</div>
                   <div>
-                    Default region:{" "}
+                    {t("Deployment")}: {selectedProvider.deploymentMode}
+                  </div>
+                  <div>
+                    {t("Default region")}:{" "}
                     {formatOptional(selectedProvider.defaultRegion)}
                   </div>
                   <div>
-                    Default zone: {formatOptional(selectedProvider.defaultZone)}
+                    {t("Default zone")}:{" "}
+                    {formatOptional(selectedProvider.defaultZone)}
                   </div>
                   <div>
-                    Managed lifecycle:{" "}
+                    {t("Managed lifecycle")}:{" "}
                     {selectedProvider.capabilities.managedLifecycle
-                      ? "Yes"
-                      : "No"}
+                      ? t("Yes")
+                      : t("No")}
                   </div>
                   <div>
-                    Managed provisioning:{" "}
+                    {t("Managed provisioning")}:{" "}
                     {selectedProvider.capabilities.managedProvisioning
-                      ? "Yes"
-                      : "No"}
+                      ? t("Yes")
+                      : t("No")}
                   </div>
                   <div>
-                    Snapshots:{" "}
-                    {selectedProvider.capabilities.snapshots ? "Yes" : "No"}
+                    {t("Snapshots")}:{" "}
+                    {selectedProvider.capabilities.snapshots
+                      ? t("Yes")
+                      : t("No")}
                   </div>
                 </div>
               </div>
@@ -825,7 +835,7 @@ export function WorldDetailPage() {
               onClick={() => updateMutation.mutate()}
               className="rounded-xl bg-[color:var(--surface-secondary)] px-4 py-3 text-[color:var(--text-primary)] hover:bg-[color:var(--surface-tertiary)] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {updateMutation.isPending ? "Saving..." : "Save world"}
+              {updateMutation.isPending ? t("Saving...") : t("Save world")}
             </button>
 
             {validationMessage ? (
@@ -871,17 +881,32 @@ export function WorldDetailPage() {
             </div>
 
             <div className="mt-4 space-y-2 text-sm text-[color:var(--text-secondary)]">
-              <div>Health message: {formatOptional(world.healthMessage)}</div>
-              <div>Failure message: {formatOptional(world.failureMessage)}</div>
-              <div>API: {formatOptional(world.apiBaseUrl)}</div>
-              <div>Admin: {formatOptional(world.adminUrl)}</div>
-              <div>Last accessed: {formatDateTime(world.lastAccessedAt)}</div>
               <div>
-                Last interactive: {formatDateTime(world.lastInteractiveAt)}
+                {t("Health message")}: {formatOptional(world.healthMessage)}
               </div>
-              <div>Last booted: {formatDateTime(world.lastBootedAt)}</div>
-              <div>Last heartbeat: {formatDateTime(world.lastHeartbeatAt)}</div>
-              <div>Last suspended: {formatDateTime(world.lastSuspendedAt)}</div>
+              <div>
+                {t("Failure message")}: {formatOptional(world.failureMessage)}
+              </div>
+              <div>API: {formatOptional(world.apiBaseUrl)}</div>
+              <div>
+                {t("Admin")}: {formatOptional(world.adminUrl)}
+              </div>
+              <div>
+                {t("Last accessed")}: {formatDateTime(world.lastAccessedAt)}
+              </div>
+              <div>
+                {t("Last interactive")}:{" "}
+                {formatDateTime(world.lastInteractiveAt)}
+              </div>
+              <div>
+                {t("Last booted")}: {formatDateTime(world.lastBootedAt)}
+              </div>
+              <div>
+                {t("Last heartbeat")}: {formatDateTime(world.lastHeartbeatAt)}
+              </div>
+              <div>
+                {t("Last suspended")}: {formatDateTime(world.lastSuspendedAt)}
+              </div>
             </div>
           </div>
 
@@ -892,8 +917,9 @@ export function WorldDetailPage() {
                   {t("Alert status")}
                 </div>
                 <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
-                  Current alert severity after applying retry and
-                  stale-heartbeat thresholds.
+                  {t(
+                    "Current alert severity after applying retry and stale-heartbeat thresholds.",
+                  )}
                 </div>
               </div>
 
@@ -916,28 +942,30 @@ export function WorldDetailPage() {
             {currentAlert ? (
               <div className="mt-4 space-y-3 text-sm text-[color:var(--text-secondary)]">
                 <div>{currentAlert.message}</div>
-                <div>Reason: {currentAlert.reason}</div>
-                <div>Escalated: {currentAlert.escalated ? "Yes" : "No"}</div>
+                <div>{t("Reason:")} {currentAlert.reason}</div>
                 <div>
-                  Escalation reason:{" "}
+                  {t("Escalated:")} {currentAlert.escalated ? t("Yes") : t("No")}
+                </div>
+                <div>
+                  {t("Escalation reason:")}{" "}
                   {getEscalationLabel(currentAlert.escalationReason)}
                 </div>
-                <div>Retry count: {currentAlert.retryCount}</div>
+                <div>{t("Retry count:")} {currentAlert.retryCount}</div>
                 <div>
-                  Stale heartbeat seconds:{" "}
+                  {t("Stale heartbeat seconds:")}{" "}
                   {typeof currentAlert.staleHeartbeatSeconds === "number"
                     ? currentAlert.staleHeartbeatSeconds
-                    : "Not stale"}
+                    : t("Not stale")}
                 </div>
                 <div>
-                  Retry threshold:{" "}
+                  {t("Retry threshold:")}{" "}
                   {alertSummary?.thresholds.retryCount ?? t("Not set")}
                 </div>
                 <div>
-                  Critical stale threshold:{" "}
+                  {t("Critical stale threshold:")}{" "}
                   {alertSummary?.thresholds.criticalHeartbeatStaleSeconds
                     ? `${alertSummary.thresholds.criticalHeartbeatStaleSeconds}s`
-                    : "Disabled"}
+                    : t("Disabled")}
                 </div>
               </div>
             ) : alertSummaryQuery.isLoading ? (
@@ -963,42 +991,67 @@ export function WorldDetailPage() {
 
             {instance ? (
               <div className="mt-4 space-y-2 text-sm text-[color:var(--text-secondary)]">
-                <div>Name: {instance.name}</div>
-                <div>Power state: {instance.powerState}</div>
                 <div>
-                  Provider instance:{" "}
+                  {t("Name")}: {instance.name}
+                </div>
+                <div>
+                  {t("Power state")}: {instance.powerState}
+                </div>
+                <div>
+                  {t("Provider instance")}:{" "}
                   {formatOptional(instance.providerInstanceId)}
                 </div>
                 <div>
-                  Provider volume: {formatOptional(instance.providerVolumeId)}
+                  {t("Provider volume")}:{" "}
+                  {formatOptional(instance.providerVolumeId)}
                 </div>
                 <div>
-                  Provider snapshot:{" "}
+                  {t("Provider snapshot")}:{" "}
                   {formatOptional(instance.providerSnapshotId)}
                 </div>
-                <div>Private IP: {formatOptional(instance.privateIp)}</div>
-                <div>Public IP: {formatOptional(instance.publicIp)}</div>
-                <div>Region: {formatOptional(instance.region)}</div>
-                <div>Zone: {formatOptional(instance.zone)}</div>
-                <div>Image: {formatOptional(instance.imageId)}</div>
-                <div>Flavor: {formatOptional(instance.flavor)}</div>
-                <div>Disk: {instance.diskSizeGb ?? t("Not set")} GB</div>
                 <div>
-                  Bootstrapped: {formatDateTime(instance.bootstrappedAt)}
+                  {t("Private IP")}: {formatOptional(instance.privateIp)}
                 </div>
                 <div>
-                  Last heartbeat: {formatDateTime(instance.lastHeartbeatAt)}
+                  {t("Public IP")}: {formatOptional(instance.publicIp)}
                 </div>
                 <div>
-                  Last operation: {formatDateTime(instance.lastOperationAt)}
+                  {t("Region")}: {formatOptional(instance.region)}
                 </div>
-                <div>Created: {formatDateTime(instance.createdAt)}</div>
-                <div>Updated: {formatDateTime(instance.updatedAt)}</div>
+                <div>
+                  {t("Zone")}: {formatOptional(instance.zone)}
+                </div>
+                <div>
+                  {t("Image")}: {formatOptional(instance.imageId)}
+                </div>
+                <div>
+                  {t("Flavor")}: {formatOptional(instance.flavor)}
+                </div>
+                <div>
+                  {t("Disk")}: {instance.diskSizeGb ?? t("Not set")} GB
+                </div>
+                <div>
+                  {t("Bootstrapped")}:{" "}
+                  {formatDateTime(instance.bootstrappedAt)}
+                </div>
+                <div>
+                  {t("Last heartbeat")}:{" "}
+                  {formatDateTime(instance.lastHeartbeatAt)}
+                </div>
+                <div>
+                  {t("Last operation")}:{" "}
+                  {formatDateTime(instance.lastOperationAt)}
+                </div>
+                <div>
+                  {t("Created")}: {formatDateTime(instance.createdAt)}
+                </div>
+                <div>
+                  {t("Updated")}: {formatDateTime(instance.updatedAt)}
+                </div>
               </div>
             ) : (
               <div className="mt-4 text-sm text-[color:var(--text-muted)]">
-                No instance record exists yet. Provisioning will create one
-                automatically.
+                {t("No instance record exists yet. Provisioning will create one automatically.")}
               </div>
             )}
 
@@ -1026,8 +1079,9 @@ export function WorldDetailPage() {
                   {t("Runtime observation")}
                 </div>
                 <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
-                  Provider-side deployment status observed from the current
-                  compute adapter.
+                  {t(
+                    "Provider-side deployment status observed from the current compute adapter.",
+                  )}
                 </div>
               </div>
 
@@ -1038,8 +1092,8 @@ export function WorldDetailPage() {
                 className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-secondary)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:bg-[color:var(--surface-tertiary)] disabled:opacity-60"
               >
                 {runtimeStatusQuery.isFetching
-                  ? "Refreshing..."
-                  : "Refresh status"}
+                  ? t("Refreshing...")
+                  : t("Refresh status")}
               </button>
             </div>
 
@@ -1052,30 +1106,39 @@ export function WorldDetailPage() {
 
             {runtimeStatus ? (
               <div className="mt-4 space-y-2 text-sm text-[color:var(--text-secondary)]">
-                <div>Deployment state: {runtimeStatus.deploymentState}</div>
                 <div>
-                  Deployment mode:{" "}
+                  {t("Deployment state")}: {runtimeStatus.deploymentState}
+                </div>
+                <div>
+                  {t("Deployment mode")}:{" "}
                   {formatOptional(runtimeStatus.deploymentMode)}
                 </div>
                 <div>
-                  Executor mode: {formatOptional(runtimeStatus.executorMode)}
+                  {t("Executor mode")}:{" "}
+                  {formatOptional(runtimeStatus.executorMode)}
                 </div>
                 <div>
-                  Remote host: {formatOptional(runtimeStatus.remoteHost)}
+                  {t("Remote host")}: {formatOptional(runtimeStatus.remoteHost)}
                 </div>
                 <div>
-                  Remote path: {formatOptional(runtimeStatus.remoteDeployPath)}
-                </div>
-                <div>Project: {formatOptional(runtimeStatus.projectName)}</div>
-                <div>
-                  Container: {formatOptional(runtimeStatus.containerName)}
-                </div>
-                <div>Raw status: {formatOptional(runtimeStatus.rawStatus)}</div>
-                <div>
-                  Observed at: {formatDateTime(runtimeStatus.observedAt)}
+                  {t("Remote path")}:{" "}
+                  {formatOptional(runtimeStatus.remoteDeployPath)}
                 </div>
                 <div>
-                  Provider message:{" "}
+                  {t("Project")}: {formatOptional(runtimeStatus.projectName)}
+                </div>
+                <div>
+                  {t("Container")}:{" "}
+                  {formatOptional(runtimeStatus.containerName)}
+                </div>
+                <div>
+                  {t("Raw status")}: {formatOptional(runtimeStatus.rawStatus)}
+                </div>
+                <div>
+                  {t("Observed at")}: {formatDateTime(runtimeStatus.observedAt)}
+                </div>
+                <div>
+                  {t("Provider message")}:{" "}
                   {formatOptional(runtimeStatus.providerMessage)}
                 </div>
               </div>
@@ -1093,8 +1156,9 @@ export function WorldDetailPage() {
                   {t("Bootstrap package")}
                 </div>
                 <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
-                  Use this env overlay when deploying the user's dedicated world
-                  runtime.
+                  {t(
+                    "Use this env overlay when deploying the user's dedicated world runtime.",
+                  )}
                 </div>
               </div>
 
@@ -1122,8 +1186,8 @@ export function WorldDetailPage() {
                   className={SECONDARY_ACTION_BUTTON}
                 >
                   {rotateCallbackTokenMutation.isPending
-                    ? "Rotating..."
-                    : "Rotate callback token"}
+                    ? t("Rotating...")
+                    : t("Rotate callback token")}
                 </button>
               </div>
             </div>
@@ -1139,46 +1203,50 @@ export function WorldDetailPage() {
               <div className="mt-4 grid gap-4">
                 <div className="space-y-2 text-sm text-[color:var(--text-secondary)]">
                   <div>
-                    Provider:{" "}
+                    {t("Provider:")}{" "}
                     {formatOptional(
-                      bootstrapConfig.providerLabel ??
+                      localizeProviderLabel(
                         bootstrapConfig.providerKey,
+                        bootstrapConfig.providerLabel ??
+                          bootstrapConfig.providerKey,
+                        locale,
+                      ),
                     )}
                   </div>
                   <div>
-                    Deployment: {formatOptional(bootstrapConfig.deploymentMode)}
+                    {t("Deployment:")} {formatOptional(bootstrapConfig.deploymentMode)}
                   </div>
                   <div>
-                    Executor: {formatOptional(bootstrapConfig.executorMode)}
+                    {t("Executor:")} {formatOptional(bootstrapConfig.executorMode)}
                   </div>
                   <div>
-                    Cloud platform: {bootstrapConfig.cloudPlatformBaseUrl}
+                    {t("Cloud platform:")} {bootstrapConfig.cloudPlatformBaseUrl}
                   </div>
                   <div>
-                    Suggested API:{" "}
+                    {t("Suggested API:")}{" "}
                     {formatOptional(bootstrapConfig.suggestedApiBaseUrl)}
                   </div>
                   <div>
-                    Suggested admin:{" "}
+                    {t("Suggested admin:")}{" "}
                     {formatOptional(bootstrapConfig.suggestedAdminUrl)}
                   </div>
-                  <div>Image: {formatOptional(bootstrapConfig.image)}</div>
+                  <div>{t("Image:")} {formatOptional(bootstrapConfig.image)}</div>
                   <div>
-                    Container: {formatOptional(bootstrapConfig.containerName)}
+                    {t("Container:")} {formatOptional(bootstrapConfig.containerName)}
                   </div>
                   <div>
-                    Volume: {formatOptional(bootstrapConfig.volumeName)}
+                    {t("Volume:")} {formatOptional(bootstrapConfig.volumeName)}
                   </div>
                   <div>
-                    Project: {formatOptional(bootstrapConfig.projectName)}
+                    {t("Project:")} {formatOptional(bootstrapConfig.projectName)}
                   </div>
                   <div>
-                    Remote path:{" "}
+                    {t("Remote path:")}{" "}
                     {formatOptional(bootstrapConfig.remoteDeployPath)}
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span>
-                      Callback token:{" "}
+                      {t("Callback token:")}{" "}
                       {bootstrapConfig.callbackToken || t("Not set")}
                     </span>
                     {bootstrapConfig.callbackToken ? (
@@ -1201,22 +1269,22 @@ export function WorldDetailPage() {
 
                 <div className="grid gap-3 text-sm text-[color:var(--text-secondary)]">
                   <div>
-                    Bootstrap endpoint:{" "}
+                    {t("Bootstrap endpoint:")}{" "}
                     {bootstrapConfig.callbackEndpoints.bootstrap}
                   </div>
                   <div>
-                    Heartbeat endpoint:{" "}
+                    {t("Heartbeat endpoint:")}{" "}
                     {bootstrapConfig.callbackEndpoints.heartbeat}
                   </div>
                   <div>
-                    Activity endpoint:{" "}
+                    {t("Activity endpoint:")}{" "}
                     {bootstrapConfig.callbackEndpoints.activity}
                   </div>
                   <div>
-                    Health endpoint: {bootstrapConfig.callbackEndpoints.health}
+                    {t("Health endpoint:")} {bootstrapConfig.callbackEndpoints.health}
                   </div>
                   <div>
-                    Fail endpoint: {bootstrapConfig.callbackEndpoints.fail}
+                    {t("Fail endpoint:")} {bootstrapConfig.callbackEndpoints.fail}
                   </div>
                 </div>
 
@@ -1297,8 +1365,9 @@ export function WorldDetailPage() {
           {t("Recent lifecycle jobs")}
         </div>
         <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
-          Jobs show how this world moved through provision, resume, and suspend
-          work.
+          {t(
+            "Jobs show how this world moved through provision, resume, and suspend work.",
+          )}
         </div>
 
         {jobsQuery.isError && jobsQuery.error instanceof Error ? (
@@ -1356,8 +1425,9 @@ export function WorldDetailPage() {
         </div>
 
         <div className="mt-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-          Queue totals reflect all jobs for this world, not just the recent 20
-          jobs below.
+          {t(
+            "Queue totals reflect all jobs for this world, not just the recent 20 jobs below.",
+          )}
         </div>
 
         <div className="mt-4 overflow-x-auto rounded-2xl border border-[color:var(--border-faint)]">
@@ -1386,7 +1456,7 @@ export function WorldDetailPage() {
                         {group.state.label}
                       </span>
                       <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                        {group.jobs.length} jobs
+                        {formatCloudConsoleJobsGroupCount(group.jobs.length, locale)}
                       </span>
                     </div>
                   </td>

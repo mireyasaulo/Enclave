@@ -11,6 +11,7 @@ import type {
 import {
   compareByLocale,
   formatDateTime as formatLocaleDateTime,
+  useAppLocale,
 } from "@yinjie/i18n";
 import {
   CloudAdminErrorBlock,
@@ -22,8 +23,14 @@ import { useConsoleNotice } from "../components/console-notice";
 import { WorldsPermalinkLink } from "../components/worlds-permalink-link";
 import { WorldLifecycleActionButtons } from "../components/world-lifecycle-action-buttons";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
-import { translateCloudConsoleTextForActiveLocale,
-  useCloudConsoleText } from "../lib/cloud-console-i18n";
+import {
+  formatCloudConsoleLastGeneratedAt,
+  formatCloudConsoleProviderRunningError,
+  formatCloudConsoleProviderWorldsCount,
+  translateCloudConsoleTextForActiveLocale,
+  useCloudConsoleText,
+} from "../lib/cloud-console-i18n";
+import { localizeProviderLabel } from "../lib/provider-i18n";
 import { resolveQueueState } from "../lib/job-queue-state";
 import { describeJobResult, getJobAuditBadgeLabel } from "../lib/job-result";
 import { buildCompactJobsRouteSearch } from "../lib/job-route-search";
@@ -58,7 +65,7 @@ function getMetricTone(value: number) {
 }
 
 const JOB_AUDIT_BADGE_CLASS_NAME =
-  "rounded-full border border-amber-300/50 bg-amber-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-amber-100";
+  "rounded-full border border-amber-300/50 bg-amber-50 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-amber-700";
 
 function formatDateTime(value?: string | null) {
   if (!value) {
@@ -74,25 +81,25 @@ function formatDateTime(value?: string | null) {
 function getAttentionTone(severity: CloudWorldAttentionItem["severity"]) {
   switch (severity) {
     case "critical":
-      return "border-rose-300/60 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/60 bg-rose-50 text-rose-700";
     case "warning":
-      return "border-amber-300/50 bg-amber-500/10 text-amber-100";
+      return "border-amber-300/50 bg-amber-50 text-amber-700";
     case "info":
     default:
-      return "border-sky-300/50 bg-sky-500/10 text-sky-100";
+      return "border-sky-300/50 bg-sky-50 text-sky-700";
   }
 }
 
 function getPowerStateTone(powerState: CloudInstancePowerState) {
   switch (powerState) {
     case "running":
-      return "border-emerald-300/50 bg-emerald-500/10 text-emerald-100";
+      return "border-emerald-300/50 bg-emerald-50 text-emerald-700";
     case "starting":
     case "provisioning":
     case "stopping":
-      return "border-sky-300/50 bg-sky-500/10 text-sky-100";
+      return "border-sky-300/50 bg-sky-50 text-sky-700";
     case "error":
-      return "border-rose-300/60 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/60 bg-rose-50 text-rose-700";
     case "stopped":
     case "absent":
     default:
@@ -147,13 +154,13 @@ function buildProviderLabelMap(providers: CloudComputeProviderSummary[] | undefi
 function getJobStatusTone(status: WorldLifecycleJobSummary["status"]) {
   switch (status) {
     case "running":
-      return "border-sky-300/50 bg-sky-500/10 text-sky-100";
+      return "border-sky-300/50 bg-sky-50 text-sky-700";
     case "pending":
       return "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-primary)]";
     case "failed":
-      return "border-rose-300/60 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/60 bg-rose-50 text-rose-700";
     case "succeeded":
-      return "border-emerald-300/50 bg-emerald-500/10 text-emerald-100";
+      return "border-emerald-300/50 bg-emerald-50 text-emerald-700";
     case "cancelled":
     default:
       return "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]";
@@ -197,6 +204,7 @@ type QuickActionConfirmState = {
 
 export function DashboardPage() {
   const t = useCloudConsoleText();
+  const { locale } = useAppLocale();
   const queryClient = useQueryClient();
   const { showNotice } = useConsoleNotice();
   const [confirmAction, setConfirmAction] =
@@ -667,28 +675,42 @@ export function DashboardPage() {
             </div>
 
             <div className="mt-4 space-y-3">
-              {providerSummary.map((provider) => (
-                <WorldsPermalinkLink
-                  key={provider.key}
-                  search={buildCompactWorldsRouteSearch({
-                    provider: provider.key,
-                  })}
-                  aria-label={`Filter worlds by provider ${provider.label}`}
-                  className="block rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 transition hover:border-[color:var(--border-strong)]"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="text-sm text-[color:var(--text-primary)]">
-                      {provider.label}
+              {providerSummary.map((provider) => {
+                const localizedProviderLabel = localizeProviderLabel(
+                  provider.key,
+                  provider.label,
+                  locale,
+                );
+                return (
+                  <WorldsPermalinkLink
+                    key={provider.key}
+                    search={buildCompactWorldsRouteSearch({
+                      provider: provider.key,
+                    })}
+                    aria-label={`${t("Filter worlds by provider")} ${localizedProviderLabel}`}
+                    className="block rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 transition hover:border-[color:var(--border-strong)]"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-sm text-[color:var(--text-primary)]">
+                        {localizedProviderLabel}
+                      </div>
+                      <div className="text-xs text-[color:var(--text-muted)]">
+                        {formatCloudConsoleProviderWorldsCount(
+                          provider.worlds,
+                          locale,
+                        )}
+                      </div>
                     </div>
-                    <div className="text-xs text-[color:var(--text-muted)]">
-                      {provider.worlds} worlds
+                    <div className="mt-2 text-xs text-[color:var(--text-secondary)]">
+                      {formatCloudConsoleProviderRunningError(
+                        provider.running,
+                        provider.error,
+                        locale,
+                      )}
                     </div>
-                  </div>
-                  <div className="mt-2 text-xs text-[color:var(--text-secondary)]">
-                    Running {provider.running} · Error {provider.error}
-                  </div>
-                </WorldsPermalinkLink>
-              ))}
+                  </WorldsPermalinkLink>
+                );
+              })}
 
               {!instanceFleetQuery.isLoading && providerSummary.length === 0 ? (
                 <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 text-sm text-[color:var(--text-muted)]">
@@ -700,7 +722,10 @@ export function DashboardPage() {
         </div>
 
         <div className="mt-4 text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-          Last generated {formatDateTime(driftSummary?.generatedAt)}
+          {formatCloudConsoleLastGeneratedAt(
+            formatDateTime(driftSummary?.generatedAt),
+            locale,
+          )}
         </div>
       </div>
 

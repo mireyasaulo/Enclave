@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { ArrowLeft, ImagePlus, Video } from "lucide-react";
@@ -44,6 +44,7 @@ export function MobileMomentsPublishPage() {
   const resetComposeDraft = composeDraft.reset;
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
+  const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -87,7 +88,7 @@ export function MobileMomentsPublishPage() {
     });
   }, [isDesktopLayout, navigate, safeReturnHash, safeReturnPath]);
 
-  function handleBack() {
+  function performBack() {
     navigateBackOrFallback(() => {
       if (safeReturnPath) {
         void navigate({
@@ -99,6 +100,20 @@ export function MobileMomentsPublishPage() {
 
       void navigate({ to: "/discover/moments" });
     });
+  }
+
+  function handleBack() {
+    if (composeDraft.hasContent && !createMutation.isPending) {
+      setDiscardConfirmOpen(true);
+      return;
+    }
+    performBack();
+  }
+
+  function handleConfirmDiscard() {
+    setDiscardConfirmOpen(false);
+    composeDraft.reset();
+    performBack();
   }
 
   async function handleImageFilesSelected(files: FileList | null) {
@@ -271,6 +286,43 @@ export function MobileMomentsPublishPage() {
           </div>
         </section>
       </div>
+
+      {discardConfirmOpen ? (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]">
+          <button
+            type="button"
+            aria-label="关闭提示"
+            onClick={() => setDiscardConfirmOpen(false)}
+            className="absolute inset-0"
+          />
+          <div className="relative w-full max-w-[320px] overflow-hidden rounded-[18px] bg-white shadow-[var(--shadow-overlay)]">
+            <div className="px-6 pb-3 pt-6 text-center">
+              <div className="text-[16px] font-medium text-[color:var(--text-primary)]">
+                放弃发表
+              </div>
+              <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-muted)]">
+                返回会丢失已编辑的文字与媒体，确定不发布吗？
+              </div>
+            </div>
+            <div className="grid grid-cols-2 border-t border-[color:var(--border-faint)]">
+              <button
+                type="button"
+                onClick={() => setDiscardConfirmOpen(false)}
+                className="border-r border-[color:var(--border-faint)] py-3 text-[15px] text-[color:var(--text-secondary)] active:bg-black/[0.04]"
+              >
+                继续编辑
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDiscard}
+                className="py-3 text-[15px] font-medium text-[#fa5151] active:bg-black/[0.04]"
+              >
+                放弃
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <input
         ref={imageInputRef}

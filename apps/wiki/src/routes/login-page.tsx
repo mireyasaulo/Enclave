@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   AppSection,
@@ -19,7 +19,23 @@ type Mode = "password" | "email";
 export function LoginPage() {
   const t = translateRuntimeMessage;
   const navigate = useNavigate();
+  const { redirect } = useSearch({ from: "/login" }) as { redirect?: string };
   const [mode, setMode] = useState<Mode>("password");
+
+  function gotoTarget() {
+    // 防开放跳转：只接受站内绝对路径，且要排除 // 和 /\ 这类 protocol-relative
+    // 形式（浏览器会把它当外站）。任何非 / 开头或带 \\ / // 前缀的值都丢弃。
+    const safe =
+      redirect &&
+      redirect.startsWith("/") &&
+      !redirect.startsWith("//") &&
+      !redirect.startsWith("/\\");
+    if (safe) {
+      window.location.href = redirect;
+    } else {
+      void navigate({ to: "/" });
+    }
+  }
 
   return (
     <PageShell narrow eyebrow={t(msg`账号`)} title={t(msg`登录`)}>
@@ -44,9 +60,9 @@ export function LoginPage() {
         </div>
 
         {mode === "password" ? (
-          <PasswordForm onSuccess={() => void navigate({ to: "/" })} />
+          <PasswordForm onSuccess={gotoTarget} />
         ) : (
-          <EmailCodeForm onSuccess={() => void navigate({ to: "/" })} />
+          <EmailCodeForm onSuccess={gotoTarget} />
         )}
 
         <div className="mt-4 text-center text-sm text-[color:var(--text-muted)]">
@@ -196,6 +212,7 @@ function EmailCodeForm({ onSuccess }: { onSuccess: () => void }) {
           onChange={(e) => setEmail(e.target.value)}
           required
           autoFocus
+          autoComplete="email"
           placeholder="you@example.com"
         />
       </FormRow>
@@ -208,6 +225,7 @@ function EmailCodeForm({ onSuccess }: { onSuccess: () => void }) {
             inputMode="numeric"
             pattern="[0-9]{6}"
             maxLength={6}
+            autoComplete="one-time-code"
           />
           <Button
             type="button"

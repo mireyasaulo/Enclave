@@ -12,6 +12,7 @@ import { roleLabel } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
 import { wikiApi } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
+import { formatDate } from "../lib/format";
 
 type WikiRole = "newcomer" | "autoconfirmed" | "patroller" | "admin";
 
@@ -69,16 +70,16 @@ export function AdminUsersPage() {
                   <th className="px-4 py-3 font-medium">
                     <Trans>用户</Trans>
                   </th>
-                  <th className="px-4 py-3 font-medium">
+                  <th className="hidden px-4 py-3 font-medium sm:table-cell">
                     <Trans>类型</Trans>
                   </th>
-                  <th className="px-4 py-3 font-medium">
+                  <th className="hidden px-4 py-3 font-medium md:table-cell">
                     <Trans>注册</Trans>
                   </th>
                   <th className="px-4 py-3 font-medium">
                     <Trans>角色</Trans>
                   </th>
-                  <th className="px-4 py-3 font-medium">
+                  <th className="hidden px-4 py-3 font-medium lg:table-cell">
                     <Trans>编辑/通过/被回滚/巡查</Trans>
                   </th>
                   <th className="px-4 py-3 font-medium">
@@ -95,7 +96,7 @@ export function AdminUsersPage() {
                     <td className="px-4 py-3 font-medium text-[color:var(--text-primary)]">
                       {u.username}
                     </td>
-                    <td className="px-4 py-3 text-xs">
+                    <td className="hidden px-4 py-3 text-xs sm:table-cell">
                       {u.userType === "world_owner" ? (
                         <StatusPill>
                           <Trans>世界主</Trans>
@@ -106,13 +107,13 @@ export function AdminUsersPage() {
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-xs text-[color:var(--text-muted)]">
-                      {new Date(u.createdAt).toLocaleDateString()}
+                    <td className="hidden px-4 py-3 text-xs text-[color:var(--text-muted)] md:table-cell">
+                      {formatDate(u.createdAt)}
                     </td>
                     <td className="px-4 py-3">
                       <StatusPill>{roleLabel(u.role)}</StatusPill>
                     </td>
-                    <td className="px-4 py-3 text-xs text-[color:var(--text-muted)]">
+                    <td className="hidden px-4 py-3 text-xs text-[color:var(--text-muted)] lg:table-cell">
                       {u.profile
                         ? `${u.profile.editCount} / ${u.profile.approvedEditCount} / ${u.profile.revertedCount} / ${u.profile.patrolledCount}`
                         : "—"}

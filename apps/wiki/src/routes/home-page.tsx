@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -66,9 +67,11 @@ export function HomePage() {
       )}
       {charactersQ.data && charactersQ.data.length === 0 && (
         <PanelEmpty
-          message={t(
-            msg`还没有任何角色词条。登录后点右上方"创建角色"开始第一个。`,
-          )}
+          message={
+            user
+              ? t(msg`还没有任何角色词条。点右上方"✨ 创建角色"开始第一个。`)
+              : t(msg`还没有任何角色词条。登录后即可创建第一个。`)
+          }
         />
       )}
       {charactersQ.data && charactersQ.data.length > 0 && (
@@ -127,18 +130,20 @@ export function HomePage() {
 }
 
 function Avatar({ name, url }: { name: string; url?: string }) {
-  if (url) {
+  const [broken, setBroken] = useState(false);
+  if (url && !broken) {
     return (
       <img
         src={url}
         alt={name}
-        className="h-12 w-12 shrink-0 rounded-2xl object-cover"
+        onError={() => setBroken(true)}
+        className="h-10 w-10 shrink-0 rounded-2xl object-cover md:h-12 md:w-12"
       />
     );
   }
   const initial = name?.[0] ?? "?";
   return (
-    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[image:var(--brand-gradient)] text-base font-semibold text-[color:var(--text-on-brand)]">
+    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[image:var(--brand-gradient)] text-base font-semibold text-[color:var(--text-on-brand)] md:h-12 md:w-12">
       {initial}
     </div>
   );

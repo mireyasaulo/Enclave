@@ -157,12 +157,17 @@ export function UserDetailPage() {
             {t("Account state")}
           </div>
           <div className="mt-3 flex flex-col gap-3">
-            <input
-              value={banReason}
-              onChange={(event) => setBanReason(event.target.value)}
-              className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
-              placeholder={t("Ban reason")}
-            />
+            <label className="block">
+              <span className="mb-1 block text-xs font-medium text-[color:var(--text-secondary)]">
+                {t("Ban reason")}
+              </span>
+              <input
+                value={banReason}
+                onChange={(event) => setBanReason(event.target.value)}
+                className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
+                placeholder={t("Ban reason")}
+              />
+            </label>
             <div className="flex gap-3">
               <Button
                 variant="secondary"

@@ -1,11 +1,11 @@
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CharacterBlueprintRecipe } from "@yinjie/contracts";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppSection,
   Button,
@@ -28,14 +28,17 @@ function splitList(value: string): string[] {
 }
 
 export function CreateCharacterPage() {
-  const t = translateRuntimeMessage;
+  const t = useRuntimeTranslator();
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [characterId, setCharacterId] = useState("");
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState("");
-  const [relationship, setRelationship] = useState(t(msg`世界角色`));
+  // 默认值仅在用户未填写时生效；切换语言时依然展示首次渲染时的字面量。
+  const [relationship, setRelationship] = useState(() =>
+    t(msg`世界角色`),
+  );
   const [relationshipType, setRelationshipType] = useState("custom");
   const [bio, setBio] = useState("");
   const [personality, setPersonality] = useState("");
@@ -46,6 +49,16 @@ export function CreateCharacterPage() {
   const [recipeDraft, setRecipeDraft] = useState<CharacterBlueprintRecipe>(() =>
     buildDefaultRecipe(),
   );
+
+  const recipeJsonError = useMemo(() => {
+    if (!recipeText.trim()) return null;
+    try {
+      JSON.parse(recipeText);
+      return null;
+    } catch (err) {
+      return (err as Error).message;
+    }
+  }, [recipeText]);
 
   const createMut = useMutation({
     mutationFn: () => {
@@ -183,6 +196,14 @@ export function CreateCharacterPage() {
               onChange={(event) => setSummary(event.target.value)}
               maxLength={500}
             />
+            <div className="mt-1 text-xs text-[color:var(--text-muted)]">
+              {summary.trim().length}/500
+              {summary.trim().length > 0 && summary.trim().length < 10 && (
+                <span className="ml-2 text-[color:var(--state-warning-text)]">
+                  <Trans>至少需要 10 字</Trans>
+                </span>
+              )}
+            </div>
           </FormRow>
         </AppSection>
 
@@ -203,6 +224,12 @@ export function CreateCharacterPage() {
             onChange={(event) => setRecipeText(event.target.value)}
             placeholder={t(msg`留空则按上方档案字段生成默认角色逻辑`)}
           />
+          {recipeJsonError && (
+            <InlineNotice tone="danger">
+              <Trans>高级 recipe JSON 格式无效：</Trans>{" "}
+              <span className="font-mono text-xs">{recipeJsonError}</span>
+            </InlineNotice>
+          )}
         </AppSection>
 
         {createMut.isError && (
@@ -214,7 +241,12 @@ export function CreateCharacterPage() {
           <Button
             type="submit"
             variant="primary"
-            disabled={createMut.isPending || name.trim().length === 0}
+            disabled={
+              createMut.isPending ||
+              name.trim().length === 0 ||
+              summary.trim().length < 10 ||
+              recipeJsonError !== null
+            }
           >
             {createMut.isPending ? t(msg`提交中...`) : t(msg`✨ 提交创建`)}
           </Button>
@@ -225,11 +257,12 @@ export function CreateCharacterPage() {
 }
 
 function buildDefaultRecipe(): CharacterBlueprintRecipe {
-  const t = translateRuntimeMessage;
+  // identity.name / relationship 这里给空串占位；提交前 mergeContentIntoRecipe
+  // 会用表单中的实际值覆盖，所以默认值不会被用户看到，无需国际化。
   return {
     identity: {
-      name: t(msg`未命名角色`),
-      relationship: t(msg`世界角色`),
+      name: "",
+      relationship: "",
       relationshipType: "custom",
       avatar: "",
       bio: "",

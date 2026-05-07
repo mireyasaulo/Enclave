@@ -124,13 +124,13 @@ describe("admin session metadata", () => {
 
   it("keeps tone mappings aligned with shared badge styles", () => {
     expect(getAdminSessionToneStyles("success").badge).toBe(
-      "border-emerald-300/50 bg-emerald-500/10 text-emerald-100",
+      "border-emerald-300/70 bg-emerald-50 text-emerald-700",
     );
     expect(getAdminSessionToneStyles("warning").badge).toBe(
-      "border-amber-300/50 bg-amber-500/10 text-amber-100",
+      "border-amber-300/70 bg-amber-50 text-amber-700",
     );
     expect(getAdminSessionToneStyles("danger").badge).toBe(
-      "border-rose-300/60 bg-rose-500/10 text-rose-200",
+      "border-rose-300/70 bg-rose-50 text-rose-700",
     );
     expect(getAdminSessionToneStyles("neutral").badge).toBe(
       "border-[color:var(--border-faint)] bg-[color:var(--surface-input)] text-[color:var(--text-secondary)]",

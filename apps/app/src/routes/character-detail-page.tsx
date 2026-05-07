@@ -33,6 +33,7 @@ import {
 import { AvatarChip } from "../components/avatar-chip";
 import { EmptyState } from "../components/empty-state";
 import { InlineNoticeActionButton } from "../components/inline-notice-action-button";
+import { SparkBadge } from "../components/spark-badge";
 import { DigitalHumanEntryNotice } from "../features/chat/digital-human-entry-notice";
 import { buildMobileChatRouteHash } from "../features/chat/mobile-chat-route-state";
 import { useDigitalHumanEntryGuard } from "../features/chat/use-digital-human-entry-guard";
@@ -698,12 +699,13 @@ export function CharacterDetailPage() {
 
   const handleVoiceCall = () => {
     setNotice(null);
-    resetEntryGuard();
+    setMobileSheetAction(null);
     openCallMutation.mutate("voice");
   };
 
   const handleVideoCall = () => {
     setNotice(null);
+    setMobileSheetAction(null);
     if (!guardVideoEntry()) {
       return;
     }
@@ -1135,9 +1137,9 @@ export function CharacterDetailPage() {
     <AppPage
       className={cn(
         "min-h-full space-y-0 bg-[#ededed] px-0 py-0 text-[color:var(--text-primary)]",
-        !isDesktopLayout
-          ? "flex h-full min-h-0 flex-col overflow-hidden"
-          : undefined,
+        isDesktopLayout
+          ? "h-full overflow-y-auto"
+          : "flex h-full min-h-0 flex-col overflow-hidden",
       )}
     >
       <header
@@ -1245,7 +1247,7 @@ export function CharacterDetailPage() {
               "space-y-2.5 px-3 pt-2",
               isDesktopLayout
                 ? "mx-auto w-full max-w-[720px] pb-8 pt-3"
-                : "pb-4",
+                : "pb-6",
             )}
           >
             {notice ? (
@@ -1697,6 +1699,23 @@ export function CharacterDetailPage() {
                   compact={!isDesktopLayout}
                 />
               ) : null}
+              {isFriend && (friendship?.sparkStreak ?? 0) >= 3 ? (
+                <ProfileRow
+                  label={t(msg`火花`)}
+                  value={
+                    <span className="inline-flex items-center justify-end gap-1.5">
+                      <SparkBadge
+                        streak={friendship?.sparkStreak}
+                        size={isDesktopLayout ? "md" : "sm"}
+                      />
+                      <span className="text-[12px] text-[color:var(--text-muted)]">
+                        {t(msg`已连续 ${friendship?.sparkStreak ?? 0} 天`)}
+                      </span>
+                    </span>
+                  }
+                  compact={!isDesktopLayout}
+                />
+              ) : null}
               {commonGroups.length ? (
                 <ProfileRow
                   label={commonGroupsLabel}
@@ -1843,7 +1862,7 @@ export function CharacterDetailPage() {
       </div>
 
       {!isDesktopLayout && character ? (
-        <div className="shrink-0 border-t border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.96)] px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-3 backdrop-blur-xl">
+        <div className="shrink-0 border-t border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.96)] px-4 pb-3 pt-3 backdrop-blur-xl">
           <div
             className={cn(
               "grid gap-2",
@@ -2073,7 +2092,7 @@ function ProfileRow({
   compact = false,
 }: {
   label: string;
-  value: string;
+  value: ReactNode;
   onClick?: () => void;
   danger?: boolean;
   disabled?: boolean;

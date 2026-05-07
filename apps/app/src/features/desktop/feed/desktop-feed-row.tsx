@@ -387,7 +387,7 @@ function CommentRow({
       )}
     >
       <div className="flex items-center gap-2 text-[12px]">
-        <span className="font-medium text-[color:var(--text-primary)]">
+        <span className="font-medium text-[#07c160]">
           {comment.authorName}
         </span>
         <span
@@ -406,11 +406,13 @@ function CommentRow({
       </div>
       <div className="mt-1.5 text-[13px] leading-6 text-[color:var(--text-secondary)]">
         {replyToName ? (
-          <span className="text-[color:var(--text-muted)]">
-            回复 {replyToName}：
-          </span>
+          <>
+            <span className="text-[color:var(--text-secondary)]">回复 </span>
+            <span className="font-medium text-[#07c160]">{replyToName}</span>
+            <span className="text-[color:var(--text-secondary)]">：</span>
+          </>
         ) : null}
-        {comment.text}
+        <span className="text-[color:var(--text-primary)]">{comment.text}</span>
       </div>
       {canReply ? (
         <div className="mt-1 flex justify-end">

@@ -25,6 +25,17 @@ function fmt(value: unknown): string {
   return String(value);
 }
 
+function shallowEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (a == null || b == null) return a == null && b == null;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+    return true;
+  }
+  return false;
+}
+
 export function ConflictResolver({
   base,
   serverCurrent,
@@ -59,9 +70,7 @@ export function ConflictResolver({
         const side = picks[f as string] ?? "mine";
         const value = side === "server" ? serverCurrent[f] : mine[f];
         (merged as Record<string, unknown>)[f] = value;
-      } else if (
-        JSON.stringify(mine[f] ?? null) !== JSON.stringify(base[f] ?? null)
-      ) {
+      } else if (!shallowEqual(mine[f], base[f])) {
         (merged as Record<string, unknown>)[f] = mine[f];
       }
     }
@@ -82,7 +91,7 @@ export function ConflictResolver({
         {fields.map((f) => (
           <div
             key={f}
-            className="grid grid-cols-[7rem_1fr_1fr] gap-2 text-xs items-start"
+            className="grid grid-cols-1 gap-2 text-xs items-start sm:grid-cols-[7rem_1fr_1fr]"
           >
             <div className="font-medium text-[var(--text-muted)] pt-2">
               {FIELD_LABELS[f] ? t(FIELD_LABELS[f]) : f}

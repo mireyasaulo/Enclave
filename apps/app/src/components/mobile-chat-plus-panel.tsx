@@ -558,7 +558,7 @@ export function MobileChatPlusPanel({
             />
           ) : null}
           {friends.length ? (
-            <div className="mx-2.5 max-h-64 overflow-auto rounded-[14px] border border-[color:var(--border-subtle)] bg-white">
+            <div className="mx-2.5 max-h-[40dvh] overflow-auto rounded-[14px] border border-[color:var(--border-subtle)] bg-white">
               {friends.map(({ character }, index) => (
                 <button
                   key={character.id}
@@ -632,7 +632,7 @@ export function MobileChatPlusPanel({
             />
           ) : null}
           {favoriteRecords.length ? (
-            <div className="mx-2.5 max-h-64 overflow-auto rounded-[14px] border border-[color:var(--border-subtle)] bg-white">
+            <div className="mx-2.5 max-h-[40dvh] overflow-auto rounded-[14px] border border-[color:var(--border-subtle)] bg-white">
               {favoriteRecords.map((item, index) => (
                 <button
                   key={item.id}
@@ -774,10 +774,10 @@ function PanelHeader({
         <button
           type="button"
           onClick={onBack}
-          className="absolute left-3 flex h-7 w-7 items-center justify-center rounded-[8px] text-[color:var(--text-secondary)] transition active:bg-[color:var(--surface-card-hover)]"
+          className="absolute left-3 flex h-9 w-9 items-center justify-center rounded-[8px] text-[color:var(--text-secondary)] transition active:bg-[color:var(--surface-card-hover)]"
           aria-label="返回"
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={18} />
         </button>
       ) : null}
       <div className="text-[13px] font-medium text-[#111827]">{title}</div>
@@ -785,10 +785,10 @@ function PanelHeader({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-3 flex h-7 w-7 items-center justify-center rounded-[8px] text-[color:var(--text-secondary)] transition active:bg-[color:var(--surface-card-hover)]"
+          className="absolute right-3 flex h-9 w-9 items-center justify-center rounded-[8px] text-[color:var(--text-secondary)] transition active:bg-[color:var(--surface-card-hover)]"
           aria-label="切换到键盘输入"
         >
-          <Keyboard size={16} />
+          <Keyboard size={18} />
         </button>
       ) : null}
     </div>

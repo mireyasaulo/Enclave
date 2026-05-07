@@ -9,6 +9,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import {
+  resolveApiPath,
+  resolveDataPath,
+} from '../../database/database-path';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { ConversationEntity } from './conversation.entity';
 import { GroupEntity } from './group.entity';
@@ -186,6 +190,15 @@ export class ChatBackgroundsService {
     return this.resolveBackgroundStorageDir();
   }
 
+  resolveReadableBackgroundPath(fileName: string) {
+    const normalized = this.normalizeBackgroundFileName(fileName);
+    const candidates = [
+      path.join(this.resolveBackgroundStorageDir(), normalized),
+      path.join(this.resolveLegacyBackgroundStorageDir(), normalized),
+    ];
+    return candidates.find((candidatePath) => existsSync(candidatePath)) ?? candidates[0];
+  }
+
   normalizeBackgroundFileName(fileName: string) {
     const normalized = path.basename(fileName).trim();
     if (!normalized) {
@@ -225,14 +238,11 @@ export class ChatBackgroundsService {
   }
 
   private resolveBackgroundStorageDir() {
-    const cwd = process.cwd();
-    const apiRoot =
-      existsSync(path.join(cwd, 'src')) &&
-      existsSync(path.join(cwd, 'package.json'))
-        ? cwd
-        : path.join(cwd, 'api');
+    return resolveDataPath('chat-backgrounds');
+  }
 
-    return path.join(apiRoot, 'storage', 'chat-backgrounds');
+  private resolveLegacyBackgroundStorageDir() {
+    return resolveApiPath('storage', 'chat-backgrounds');
   }
 
   private resolvePublicApiBaseUrl() {

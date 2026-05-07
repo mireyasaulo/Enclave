@@ -22,7 +22,7 @@ export function AdminSessionSourceGroupSummaryPills({
   return (
     <div className={className}>
       <span
-        className={`rounded-full border border-emerald-300/40 bg-emerald-500/10 text-emerald-100 ${pillClassName}`}
+        className={`rounded-full border border-emerald-300/40 bg-emerald-50 text-emerald-700 ${pillClassName}`}
       >
         {activeSessions} active
       </span>
@@ -42,14 +42,14 @@ export function AdminSessionSourceGroupSummaryPills({
       ) : null}
       {typeof expiredSessions === "number" && expiredSessions > 0 ? (
         <span
-          className={`rounded-full border border-amber-300/40 bg-amber-500/10 text-amber-100 ${pillClassName}`}
+          className={`rounded-full border border-amber-300/40 bg-amber-50 text-amber-700 ${pillClassName}`}
         >
           {expiredSessions} expired
         </span>
       ) : null}
       {typeof revokedSessions === "number" && revokedSessions > 0 ? (
         <span
-          className={`rounded-full border border-rose-300/40 bg-rose-500/10 text-rose-200 ${pillClassName}`}
+          className={`rounded-full border border-rose-300/40 bg-rose-50 text-rose-700 ${pillClassName}`}
         >
           {revokedSessions} revoked
         </span>
@@ -57,7 +57,7 @@ export function AdminSessionSourceGroupSummaryPills({
       {typeof refreshTokenReuseRevocations === "number" &&
       refreshTokenReuseRevocations > 0 ? (
         <span
-          className={`rounded-full border border-rose-300/40 bg-rose-500/10 text-rose-200 ${pillClassName}`}
+          className={`rounded-full border border-rose-300/40 bg-rose-50 text-rose-700 ${pillClassName}`}
         >
           {refreshTokenReuseRevocations} refresh reuse
         </span>

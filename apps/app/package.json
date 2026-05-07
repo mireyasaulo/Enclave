@@ -19,6 +19,7 @@
     "audit:desktop-web:routing": "node ./scripts/audit-desktop-web-routing.mjs",
     "audit:desktop-web": "pnpm typecheck && pnpm lint:desktop-web && pnpm audit:desktop-web:routing && pnpm build",
     "audit:mobile-web:routes": "node ./scripts/audit-mobile-routes.mjs",
+    "audit:mobile-web:screenshots": "node ./scripts/screenshot-mobile-routes.mjs",
     "audit:mobile-web": "pnpm typecheck && pnpm lint:mobile-web && pnpm audit:mobile-web:routes && pnpm build",
     "test:desktop-unit": "vitest run --environment jsdom tests/desktop-route-state.test.ts",
     "test:desktop-browser": "pnpm --dir ../../api build && playwright test --config playwright.config.ts",
@@ -27,6 +28,8 @@
   "dependencies": {
     "@capacitor/core": "^7.1.1",
     "@capacitor/keyboard": "^7.0.6",
+    "@capacitor/splash-screen": "^7.0.5",
+    "@capacitor/status-bar": "^7.0.6",
     "@hookform/resolvers": "^3.10.0",
     "@lingui/macro": "5.9.5",
     "@lingui/react": "5.9.5",

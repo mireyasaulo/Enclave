@@ -219,6 +219,9 @@ export const DEFAULT_CORE_API_BASE_URL = "http://localhost:3000";
 export const DEFAULT_CLOUD_API_BASE_URL = "http://localhost:3001";
 let coreApiBaseUrlProvider: (() => string | null | undefined) | null = null;
 let cloudApiBaseUrlProvider: (() => string | null | undefined) | null = null;
+let coreApiAdminSecretProvider:
+  | (() => string | null | undefined)
+  | null = null;
 let apiRequestErrorHandler:
   | ((error: ApiRequestError) => void)
   | null = null;
@@ -306,6 +309,16 @@ export function setCloudApiBaseUrlProvider(
   cloudApiBaseUrlProvider = provider;
 }
 
+// Admin clients (e.g. apps/admin) register a provider that returns the
+// configured ADMIN_SECRET. When set, the contract layer attaches it as the
+// `X-Admin-Secret` header on every request. Tenant-facing apps never call
+// this, so they cannot reach AdminGuard-protected endpoints.
+export function setCoreApiAdminSecretProvider(
+  provider: (() => string | null | undefined) | null,
+) {
+  coreApiAdminSecretProvider = provider;
+}
+
 export function setApiRequestErrorHandler(
   handler: ((error: ApiRequestError) => void) | null,
 ) {
@@ -327,6 +340,13 @@ async function request<T>(
 
   if (!headers.has("Content-Type") && init?.body && !isFormDataBody) {
     headers.set("Content-Type", "application/json");
+  }
+
+  if (!headers.has("X-Admin-Secret")) {
+    const adminSecret = coreApiAdminSecretProvider?.()?.trim();
+    if (adminSecret) {
+      headers.set("X-Admin-Secret", adminSecret);
+    }
   }
 
   const response = await fetch(`${resolveCoreApiBaseUrl(baseUrl)}${path}`, {
@@ -1408,26 +1428,6 @@ export function listPersonaAssets(_baseUrl?: string) {
 export function exportDiagnostics(baseUrl?: string) {
   return requestLegacyApi<OperationResult>(
     "/system/diag/export",
-    {
-      method: "POST",
-    },
-    baseUrl,
-  );
-}
-
-export function createBackup(baseUrl?: string) {
-  return requestLegacyApi<OperationResult>(
-    "/system/backup/create",
-    {
-      method: "POST",
-    },
-    baseUrl,
-  );
-}
-
-export function restoreBackup(baseUrl?: string) {
-  return requestLegacyApi<OperationResult>(
-    "/system/backup/restore",
     {
       method: "POST",
     },

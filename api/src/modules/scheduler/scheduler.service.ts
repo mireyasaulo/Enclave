@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   Between,
   LessThan,
+  LessThanOrEqual,
   MoreThanOrEqual,
   MoreThan,
   Repository,
@@ -149,6 +150,15 @@ export class SchedulerService {
       'expire_friend_requests',
       () => this.handleExpireFriendRequests(),
       'Failed to expire friend requests',
+    );
+  }
+
+  @Cron('*/30 * * * * *')
+  async autoAcceptDueFriendRequests() {
+    await this.runScheduledJob(
+      'auto_accept_friend_requests',
+      () => this.handleAutoAcceptDueFriendRequests(),
+      'Failed to auto-accept due friend requests',
     );
   }
 
@@ -385,6 +395,22 @@ export class SchedulerService {
     );
   }
 
+  @Cron('5 0 * * *')
+  async resetExpiredSparks() {
+    await this.runScheduledJob(
+      'reset_expired_sparks',
+      () => this.handleResetExpiredSparks(),
+      'Failed to reset expired sparks',
+    );
+  }
+
+  private async handleResetExpiredSparks(): Promise<TrackedJobResult> {
+    const resetCount = await this.socialService.resetExpiredSparks();
+    return {
+      summary: resetCount > 0 ? `已清算 ${resetCount} 条到期火花` : '无到期火花',
+    };
+  }
+
   async runJobNow(jobId: string) {
     try {
       const summary = await this.executeManualJob(jobId as SchedulerJobId);
@@ -442,6 +468,12 @@ export class SchedulerService {
         return (
           await this.executeTrackedJob(jobId, () =>
             this.handleExpireFriendRequests(),
+          )
+        ).summary;
+      case 'auto_accept_friend_requests':
+        return (
+          await this.executeTrackedJob(jobId, () =>
+            this.handleAutoAcceptDueFriendRequests(),
           )
         ).summary;
       case 'discover_need_characters_short_interval':
@@ -526,6 +558,12 @@ export class SchedulerService {
         return (
           await this.executeTrackedJob(jobId, () =>
             this.handleUpdateCoreMemoryWeekly(),
+          )
+        ).summary;
+      case 'reset_expired_sparks':
+        return (
+          await this.executeTrackedJob(jobId, () =>
+            this.handleResetExpiredSparks(),
           )
         ).summary;
       default:
@@ -663,6 +701,40 @@ export class SchedulerService {
         runtimeRules.schedulerTextTemplates.jobSummaryExpiredFriendRequests,
         { count: expiringRequests.length },
       ),
+    };
+  }
+
+  private async handleAutoAcceptDueFriendRequests(): Promise<TrackedJobResult> {
+    const now = new Date();
+    const dueRequests = await this.friendRequestRepo.find({
+      where: {
+        status: 'pending',
+        acceptAt: LessThanOrEqual(now),
+      },
+      order: { acceptAt: 'ASC', createdAt: 'ASC' },
+      take: 50,
+    });
+    let acceptedCount = 0;
+    for (const req of dueRequests) {
+      try {
+        await this.socialService.acceptRequest(req.id, {
+          acceptedBy: 'character',
+          ownerId: req.ownerId,
+        });
+        acceptedCount += 1;
+      } catch (error) {
+        this.logger.error(
+          `auto-accept failed for ${req.id}: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+    }
+    return {
+      summary:
+        acceptedCount > 0
+          ? `本轮共 ${acceptedCount} 位世界角色通过了用户的好友请求。`
+          : '当前没有到点的好友请求。',
     };
   }
 

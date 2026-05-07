@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -16,6 +16,7 @@ import {
 import { wikiApi } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
+import { formatDateTime } from "../lib/format";
 
 export function AdminProtectionPage() {
   const t = translateRuntimeMessage;
@@ -43,12 +44,33 @@ export function AdminProtectionPage() {
     reason: string;
   }>({ level: "none", reviewPolicy: "open", expiresAt: "", reason: "" });
 
+  // 选中条目后用其当前保护设置预填表单，避免用户从空白开始重输。
+  // datetime-local 需要 "YYYY-MM-DDTHH:mm" 格式（无秒、无时区）。
+  useEffect(() => {
+    if (!pageQ.data) return;
+    const p = pageQ.data.page;
+    setForm({
+      level:
+        p.protectionLevel === "semi" || p.protectionLevel === "full"
+          ? p.protectionLevel
+          : "none",
+      reviewPolicy:
+        p.reviewPolicy === "pending_changes" ? "pending_changes" : "open",
+      expiresAt: p.protectionExpiresAt
+        ? new Date(p.protectionExpiresAt).toISOString().slice(0, 16)
+        : "",
+      reason: p.protectionReason ?? "",
+    });
+  }, [pageQ.data]);
+
   const setProtMut = useMutation({
     mutationFn: () =>
       wikiApi.setProtection(characterId, {
         level: form.level,
         reviewPolicy: form.reviewPolicy,
-        expiresAt: form.expiresAt.trim() || null,
+        expiresAt: form.expiresAt
+          ? new Date(form.expiresAt).toISOString()
+          : null,
         reason: form.reason.trim() || undefined,
       }),
     onSuccess: () => {
@@ -72,15 +94,7 @@ export function AdminProtectionPage() {
           <select
             className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
             value={characterId}
-            onChange={(e) => {
-              setCharacterId(e.target.value);
-              setForm({
-                level: "none",
-                reviewPolicy: "open",
-                expiresAt: "",
-                reason: "",
-              });
-            }}
+            onChange={(e) => setCharacterId(e.target.value)}
           >
             <option value="">{t(msg`— 选择 —`)}</option>
             {(charactersQ.data ?? []).map((c) => (
@@ -124,9 +138,7 @@ export function AdminProtectionPage() {
                     <span className="ml-3 text-xs text-[color:var(--text-muted)]">
                       <Trans>
                         到期：
-                        {new Date(
-                          pageQ.data.page.protectionExpiresAt,
-                        ).toLocaleString()}
+                        {formatDateTime(pageQ.data.page.protectionExpiresAt)}
                       </Trans>
                     </span>
                   )}
@@ -164,13 +176,14 @@ export function AdminProtectionPage() {
                     <option value="pending_changes">{t(msg`待审变更`)}</option>
                   </select>
                 </FormRow>
-                <FormRow label={t(msg`到期时间`)} hint={t(msg`可选 ISO，留空 = 永久`)}>
-                  <TextField
+                <FormRow label={t(msg`到期时间`)} hint={t(msg`可选；留空 = 永久`)}>
+                  <input
+                    type="datetime-local"
+                    className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
                     value={form.expiresAt}
                     onChange={(e) =>
                       setForm({ ...form, expiresAt: e.target.value })
                     }
-                    placeholder="2026-06-01T00:00:00Z"
                   />
                 </FormRow>
                 <FormRow label={t(msg`原因`)}>
@@ -218,11 +231,11 @@ export function AdminProtectionPage() {
                   </div>
                   <div className="mt-1 text-xs text-[color:var(--text-muted)]">
                     <Trans>
-                      {new Date(row.createdAt).toLocaleString()} · 由{" "}
+                      {formatDateTime(row.createdAt)} · 由{" "}
                       {row.changedBy}
                     </Trans>
                     {row.expiresAt &&
-                      ` · ${t(msg`到期 ${new Date(row.expiresAt).toLocaleString()}`)}`}
+                      ` · ${t(msg`到期 ${formatDateTime(row.expiresAt)}`)}`}
                   </div>
                   {row.reason && (
                     <div className="mt-1 text-xs">{row.reason}</div>

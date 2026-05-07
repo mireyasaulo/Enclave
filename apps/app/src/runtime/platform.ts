@@ -70,8 +70,17 @@ export function isMobileWebRuntime(platform = detectAppPlatform()) {
   const userAgent =
     typeof navigator === "undefined" ? "" : navigator.userAgent;
   const coarsePointer = window.matchMedia?.("(pointer: coarse)").matches ?? false;
+  // iPadOS 13+ 默认伪装为桌面 Safari（Macintosh UA），需要靠 maxTouchPoints 判别
+  const isIpadOsDesktopUa =
+    /Macintosh/.test(userAgent) &&
+    typeof navigator !== "undefined" &&
+    (navigator.maxTouchPoints ?? 0) > 1;
 
-  return MOBILE_WEB_BROWSER_PATTERN.test(userAgent) || coarsePointer;
+  return (
+    MOBILE_WEB_BROWSER_PATTERN.test(userAgent) ||
+    coarsePointer ||
+    isIpadOsDesktopUa
+  );
 }
 
 function resolveAppChannel(platform: AppPlatform): AppChannel {

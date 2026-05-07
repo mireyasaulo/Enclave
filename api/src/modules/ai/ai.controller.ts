@@ -98,8 +98,6 @@ export class AiController {
 
   @Get('speech/:fileName')
   getSpeech(@Param('fileName') fileName: string, @Res() response: Response) {
-    return response.sendFile(this.speechAssets.normalizeFileName(fileName), {
-      root: this.speechAssets.getStorageDir(),
-    });
+    return response.sendFile(this.speechAssets.resolveReadablePath(fileName));
   }
 }

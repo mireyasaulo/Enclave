@@ -78,6 +78,19 @@ export function RiskBadge({
     ? findProtectedRule(path, policyQ.data)
     : null;
   const highRisk = isHighRisk(path);
+
+  // 自定义字段保护规则加载失败时，UI 看不到锁，但服务器仍会拦截 ——
+  // 这里显式提示用户"无法读取保护规则"，避免误以为字段开放编辑。
+  if (policyQ.isError) {
+    return (
+      <span
+        className="ml-2 inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-[color:var(--state-warning-bg)] text-[color:var(--state-warning-text)]"
+        title={(policyQ.error as Error | null)?.message ?? ""}
+      >
+        ⚠ {t(msg`保护规则加载失败`)}
+      </span>
+    );
+  }
   if (!highRisk && !protectedRule) return null;
 
   const minRole = protectedRule?.minRoleToEdit ?? "patroller";

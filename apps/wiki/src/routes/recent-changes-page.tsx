@@ -15,6 +15,7 @@ import { hasRole } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
 import { wikiApi, type WikiRevisionSummary } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
+import { formatDateTime } from "../lib/format";
 
 export function RecentChangesPage() {
   const t = translateRuntimeMessage;
@@ -47,6 +48,7 @@ export function RecentChangesPage() {
           <label className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] px-3 py-2 text-sm shadow-[var(--shadow-soft)]">
             <input
               type="checkbox"
+              className="h-4 w-4"
               checked={onlyUnpatrolled}
               onChange={(e) => setOnlyUnpatrolled(e.target.checked)}
             />
@@ -60,7 +62,13 @@ export function RecentChangesPage() {
         <ErrorBlock message={(listQ.error as Error).message} />
       )}
       {listQ.data && listQ.data.length === 0 && (
-        <PanelEmpty message={t(msg`暂无变更。`)} />
+        <PanelEmpty
+          message={
+            onlyUnpatrolled
+              ? t(msg`所有变更都已巡查 ✅。取消勾选可看完整列表。`)
+              : t(msg`暂无变更。`)
+          }
+        />
       )}
       {listQ.data && listQ.data.length > 0 && (
         <ul className="space-y-2">
@@ -131,7 +139,7 @@ function ChangeRow({
         <div className="text-xs text-[color:var(--text-muted)]">
           <Trans>
             {rev.editorUserId}（{rev.editorRoleAtTime}） ·{" "}
-            {new Date(rev.createdAt).toLocaleString()}
+            {formatDateTime(rev.createdAt)}
           </Trans>
         </div>
         {rev.editSummary && (

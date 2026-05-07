@@ -9,15 +9,16 @@ import { useRouterState } from "@tanstack/react-router";
 import {
   Camera,
   Clock3,
-  Copy,
   LockKeyhole,
+  Maximize2,
   MessageSquareText,
+  Minimize2,
   Minus,
   ShieldCheck,
   X,
 } from "lucide-react";
 import {
-  ACTION_OPERATOR_SOURCE_KEY,
+  SELF_CHARACTER_SOURCE_KEY,
   getOrCreateConversation,
   listCharacters,
 } from "@yinjie/contracts";
@@ -151,10 +152,7 @@ export function DesktopShell({ children }: PropsWithChildren) {
     useState<DesktopWindowHandle | null>(null);
   const [isMaximized, setIsMaximized] = useState(false);
   const [isOwnerCardOpen, setIsOwnerCardOpen] = useState(false);
-  const [
-    isOpeningActionOperatorConversation,
-    setIsOpeningActionOperatorConversation,
-  ] = useState(false);
+  const [isOpeningSelfChat, setIsOpeningSelfChat] = useState(false);
   const [ownerCardNotice, setOwnerCardNotice] = useState<string | null>(null);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isLocked, setIsLocked] = useState(
@@ -549,26 +547,28 @@ export function DesktopShell({ children }: PropsWithChildren) {
     navigateDesktopShellTo("/tabs/moments");
   };
 
-  const openActionOperatorConversationShortcut = async () => {
-    if (!ownerId || isOpeningActionOperatorConversation) {
+  const openSelfChatShortcut = async () => {
+    if (!ownerId || isOpeningSelfChat) {
       return;
     }
 
     setOwnerCardNotice(null);
-    setIsOpeningActionOperatorConversation(true);
+    setIsOpeningSelfChat(true);
 
     try {
       const characters = await listCharacters(baseUrl);
-      const actionOperatorCharacter = characters.find(
-        (item) => item.sourceKey?.trim() === ACTION_OPERATOR_SOURCE_KEY,
+      const selfCharacter = characters.find(
+        (item) =>
+          item.relationshipType === "self" ||
+          item.sourceKey?.trim() === SELF_CHARACTER_SOURCE_KEY,
       );
 
-      if (!actionOperatorCharacter) {
-        throw new Error(t(msg`当前世界还没有“行动助理”角色。`));
+      if (!selfCharacter) {
+        throw new Error(t(msg`当前世界还没有"我自己"角色。`));
       }
 
       const conversation = await getOrCreateConversation(
-        { characterId: actionOperatorCharacter.id },
+        { characterId: selfCharacter.id },
         baseUrl,
       );
 
@@ -585,7 +585,7 @@ export function DesktopShell({ children }: PropsWithChildren) {
           : t(msg`打开会话失败，请稍后再试。`),
       );
     } finally {
-      setIsOpeningActionOperatorConversation(false);
+      setIsOpeningSelfChat(false);
     }
   };
 
@@ -665,7 +665,11 @@ export function DesktopShell({ children }: PropsWithChildren) {
                   void desktopWindow.toggleMaximize();
                 }}
               >
-                <Copy size={14} strokeWidth={1.8} />
+                {isMaximized ? (
+                  <Minimize2 size={14} strokeWidth={1.8} />
+                ) : (
+                  <Maximize2 size={14} strokeWidth={1.8} />
+                )}
               </DesktopWindowButton>
               <DesktopWindowButton
                 danger
@@ -760,14 +764,11 @@ export function DesktopShell({ children }: PropsWithChildren) {
                     ownerName={ownerName}
                     ownerAvatar={ownerAvatar}
                     ownerSignature={ownerSignature}
-                    appTitle={appTitle}
                     notice={ownerCardNotice}
-                    isOpeningActionOperatorConversation={
-                      isOpeningActionOperatorConversation
-                    }
+                    isOpeningSelfChat={isOpeningSelfChat}
                     onOpenMoments={openMomentsShortcut}
-                    onOpenActionOperatorConversation={() => {
-                      void openActionOperatorConversationShortcut();
+                    onOpenSelfChat={() => {
+                      void openSelfChatShortcut();
                     }}
                   />
                 ) : null}
@@ -1119,50 +1120,51 @@ function DesktopOwnerQuickCard({
   ownerName,
   ownerAvatar,
   ownerSignature,
-  appTitle,
   notice,
-  isOpeningActionOperatorConversation,
+  isOpeningSelfChat,
   onOpenMoments,
-  onOpenActionOperatorConversation,
+  onOpenSelfChat,
 }: {
   ownerName: string | null;
   ownerAvatar: string;
   ownerSignature: string;
-  appTitle: string;
   notice: string | null;
-  isOpeningActionOperatorConversation: boolean;
+  isOpeningSelfChat: boolean;
   onOpenMoments: () => void;
-  onOpenActionOperatorConversation: () => void;
+  onOpenSelfChat: () => void;
 }) {
   const t = useRuntimeTranslator();
-  const ownerFallbackName = t(msg`世界主人`);
-  const ownerDisplayName = ownerName?.trim() || ownerFallbackName;
+  const ownerDisplayName = ownerName?.trim() || "";
+  const trimmedSignature = ownerSignature.trim();
+  const signaturePlaceholder = t(msg`还没有签名，去个人资料写一句吧`);
 
   return (
-    <div className="absolute left-[calc(100%+0.75rem)] top-0 z-30 w-[286px] rounded-[22px] border border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.98)] p-3 shadow-[var(--shadow-overlay)] backdrop-blur-xl">
-      <div className="rounded-[18px] bg-[linear-gradient(180deg,rgba(7,193,96,0.12),rgba(255,255,255,0.92))] p-3.5">
-        <div className="flex items-start gap-3">
+    <div className="absolute left-[calc(100%+0.75rem)] top-0 z-30 w-[300px] rounded-[22px] border border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.98)] p-3 shadow-[var(--shadow-overlay)] backdrop-blur-xl">
+      <div className="rounded-[18px] bg-[linear-gradient(180deg,rgba(7,193,96,0.12),rgba(255,255,255,0.92))] px-4 py-4">
+        <div className="flex items-center gap-3">
           <AvatarChip name={ownerDisplayName} src={ownerAvatar} size="lg" />
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <div className="truncate text-[17px] font-semibold text-[color:var(--text-primary)]">
+            {ownerDisplayName ? (
+              <div className="truncate text-[17px] font-semibold leading-tight text-[color:var(--text-primary)]">
                 {ownerDisplayName}
               </div>
-              <div className="rounded-full bg-[rgba(7,193,96,0.12)] px-2 py-0.5 text-[10px] font-medium tracking-[0.08em] text-[#15803d]">
-                {t(msg`世界主人`)}
-              </div>
-            </div>
-            <div className="mt-1 text-[12px] text-[color:var(--text-secondary)]">
-              {appTitle}
-            </div>
-            <div className="mt-2 line-clamp-2 text-[12px] leading-5 text-[color:var(--text-secondary)]">
-              {ownerSignature.trim() || t(msg`在现实之外，进入另一片世界。`)}
+            ) : null}
+            <div
+              className={cn(
+                "line-clamp-2 text-[12px] leading-5",
+                ownerDisplayName ? "mt-1.5" : "",
+                trimmedSignature
+                  ? "text-[color:var(--text-secondary)]"
+                  : "text-[color:var(--text-muted)]",
+              )}
+            >
+              {trimmedSignature || signaturePlaceholder}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2">
+      <div className="mt-2 flex flex-col gap-1">
         <DesktopOwnerShortcutButton
           icon={Camera}
           label={t(msg`朋友圈`)}
@@ -1172,18 +1174,16 @@ function DesktopOwnerQuickCard({
         <DesktopOwnerShortcutButton
           icon={MessageSquareText}
           label={
-            isOpeningActionOperatorConversation
-              ? t(msg`打开中...`)
-              : t(msg`行动助理`)
+            isOpeningSelfChat ? t(msg`打开中...`) : t(msg`发消息`)
           }
-          description={t(msg`进入真实世界动作会话`)}
-          onClick={onOpenActionOperatorConversation}
-          disabled={isOpeningActionOperatorConversation}
+          description={t(msg`和"我自己"对话`)}
+          onClick={onOpenSelfChat}
+          disabled={isOpeningSelfChat}
         />
       </div>
 
       {notice ? (
-        <div className="mt-3 rounded-[14px] border border-[rgba(255,159,10,0.24)] bg-[rgba(255,244,223,0.92)] px-3 py-2 text-[12px] leading-5 text-[#9a6700]">
+        <div className="mt-2 rounded-[12px] border border-[rgba(255,159,10,0.24)] bg-[rgba(255,244,223,0.92)] px-3 py-2 text-[12px] leading-5 text-[#9a6700]">
           {notice}
         </div>
       ) : null}
@@ -1210,25 +1210,29 @@ function DesktopOwnerShortcutButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "flex min-h-[92px] flex-col items-start rounded-[16px] border bg-transparent px-3 py-3 text-left appearance-none transition-[transform,background-color,border-color,box-shadow] duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
+        "flex w-full items-center gap-3 rounded-[14px] border bg-transparent px-3 py-2.5 text-left appearance-none transition-[transform,background-color,border-color,box-shadow] duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
         disabled
           ? "cursor-wait border-[color:var(--border-faint)] bg-[rgba(148,163,184,0.08)] text-[color:var(--text-muted)]"
-          : "border-[color:var(--border-faint)] bg-[color:var(--surface-card)] text-[color:var(--text-primary)] hover:-translate-y-[1px] hover:border-[rgba(7,193,96,0.2)] hover:bg-[rgba(7,193,96,0.08)] hover:shadow-[0_12px_24px_rgba(15,23,42,0.08)]",
+          : "border-transparent bg-transparent text-[color:var(--text-primary)] hover:border-[rgba(7,193,96,0.2)] hover:bg-[rgba(7,193,96,0.08)]",
       )}
     >
       <div
         className={cn(
-          "flex h-10 w-10 items-center justify-center rounded-[12px]",
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]",
           disabled
             ? "bg-[rgba(148,163,184,0.16)]"
             : "bg-[rgba(7,193,96,0.12)] text-[#15803d]",
         )}
       >
-        <Icon size={18} />
+        <Icon size={17} />
       </div>
-      <div className="mt-3 text-[14px] font-medium">{label}</div>
-      <div className="mt-1 text-[12px] leading-5 text-[color:var(--text-secondary)]">
-        {description}
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-[14px] font-medium leading-tight">
+          {label}
+        </div>
+        <div className="mt-0.5 truncate text-[12px] leading-5 text-[color:var(--text-secondary)]">
+          {description}
+        </div>
       </div>
     </button>
   );

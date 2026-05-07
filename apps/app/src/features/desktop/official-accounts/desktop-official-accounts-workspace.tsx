@@ -646,7 +646,7 @@ export function DesktopOfficialAccountsWorkspace({
   }
 
   return (
-    <div className="relative flex h-full min-h-0 flex-col bg-[color:var(--bg-app)]">
+    <div className="relative isolate flex h-full min-h-0 flex-col bg-[color:var(--bg-app)]">
       <header className="shrink-0 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.92)] px-5 py-3.5 backdrop-blur-xl">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

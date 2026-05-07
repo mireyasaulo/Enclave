@@ -45,6 +45,7 @@ import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import { AvatarChip } from "../components/avatar-chip";
 import { OfficialServiceConversationCard } from "../components/official-service-conversation-card";
 import { RouteRedirectState } from "../components/route-redirect-state";
+import { SparkBadge } from "../components/spark-badge";
 import { SubscriptionInboxCard } from "../components/subscription-inbox-card";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useLocalChatMessageActionState } from "../features/chat/local-chat-message-actions";
@@ -663,7 +664,7 @@ function MobileChatListPage() {
             aria-hidden="true"
             className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-[color:var(--text-dim)]"
           />
-          <div className="h-7.5 w-full rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] pl-9 pr-4 text-[12px] leading-[30px] text-[color:var(--text-dim)] transition-[background-color,border-color] duration-[var(--motion-fast)] ease-[var(--ease-standard)]">
+          <div className="h-9 w-full rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] pl-9 pr-4 text-[12px] leading-9 text-[color:var(--text-dim)] transition-[background-color,border-color] duration-[var(--motion-fast)] ease-[var(--ease-standard)]">
             {t(msg`搜索`)}
           </div>
         </button>
@@ -775,7 +776,7 @@ function MobileChatListPage() {
                 <BellRing size={13} className="text-[#07c160]" />
                 <span>{t(msg`消息提醒`)}</span>
               </div>
-              <div className="text-[8px] text-[#8f9992]">
+              <div className="text-[10px] text-[#8f9992]">
                 <ChatReminderSummaryText
                   summary={filteredReminderSummary}
                   className="opacity-80"
@@ -805,7 +806,7 @@ function MobileChatListPage() {
                           <div className="flex items-center gap-2">
                             <span
                               className={cn(
-                                "rounded-full px-1.5 py-0.5 text-[8px] font-medium",
+                                "rounded-full px-1.5 py-0.5 text-[10px] font-medium",
                                 group.status === "notified"
                                   ? "bg-[#fff7e6] text-[#d48806]"
                                   : group.status === "due"
@@ -827,7 +828,7 @@ function MobileChatListPage() {
                                     ),
                                   );
                                 }}
-                                className="px-2 py-0.5 text-[8px] text-[#7b847e]"
+                                className="px-2 py-1 text-[10px] text-[#7b847e]"
                               >
                                 {getChatReminderGroupClearLabel(group.status)}
                               </ChatReminderControlButton>
@@ -838,7 +839,7 @@ function MobileChatListPage() {
                                   (current) => !current,
                                 )
                               }
-                              className="px-2 py-0.5 text-[8px] text-[#8f9992]"
+                              className="px-2 py-1 text-[10px] text-[#8f9992]"
                               aria-label={
                                 collapsed
                                   ? t(msg`展开已通知提醒`)
@@ -857,7 +858,7 @@ function MobileChatListPage() {
                           <div className="flex items-center gap-2">
                             <span
                               className={cn(
-                                "rounded-full px-1.5 py-0.5 text-[8px] font-medium",
+                                "rounded-full px-1.5 py-0.5 text-[10px] font-medium",
                                 group.status === "notified"
                                   ? "bg-[#fff7e6] text-[#d48806]"
                                   : group.status === "due"
@@ -868,7 +869,7 @@ function MobileChatListPage() {
                               {group.title}
                             </span>
                           </div>
-                          <ChatReminderMetaPill className="px-1.5 py-0.5 text-[8px] text-[#8f9992]">
+                          <ChatReminderMetaPill className="px-1.5 py-0.5 text-[10px] text-[#8f9992]">
                             <ChatReminderCountText count={group.count} />
                           </ChatReminderMetaPill>
                         </div>
@@ -900,7 +901,7 @@ function MobileChatListPage() {
                                 <div className="flex items-center gap-1.5">
                                   <span
                                     className={cn(
-                                      "rounded-full px-1.5 py-[1px] text-[7px] font-medium",
+                                      "rounded-full px-1.5 py-0.5 text-[10px] font-medium",
                                       getChatReminderStatus(entry) ===
                                         "notified"
                                         ? "bg-[#fff7e6] text-[#d48806]"
@@ -911,15 +912,15 @@ function MobileChatListPage() {
                                   >
                                     {getChatReminderStatusLabel(entry)}
                                   </span>
-                                  <span className="min-w-0 truncate text-[9.5px] font-medium text-[#111827]">
+                                  <span className="min-w-0 truncate text-[11px] font-medium text-[#111827]">
                                     {entry.title}
                                   </span>
                                 </div>
                                 <div className="mt-0.5 flex items-center gap-1.5 text-[#8c8c8c]">
-                                  <span className="min-w-0 flex-1 truncate text-[8px] leading-[1.35] text-[#5f6368]">
+                                  <span className="min-w-0 flex-1 truncate text-[11px] leading-[1.35] text-[#5f6368]">
                                     {entry.previewText}
                                   </span>
-                                  <span className="shrink-0 text-[7px]">
+                                  <span className="shrink-0 text-[10px]">
                                     {formatReminderListTimestamp(
                                       entry.remindAt,
                                       entry.isDue,
@@ -934,7 +935,7 @@ function MobileChatListPage() {
                                   void completeReminder(entry);
                                 }}
                                 className={cn(
-                                  "shrink-0 self-center rounded-full px-1.5 py-0.5 text-[7px] leading-none transition-colors",
+                                  "shrink-0 self-center rounded-full px-2 py-1 text-[11px] leading-none transition-colors",
                                   getChatReminderActionTone(entry) === "warning"
                                     ? "border border-[#f3ddba] bg-[#fff9ef] text-[#ba740f] hover:bg-[#fff2df]"
                                     : "border border-transparent bg-[#f5f7f5] text-[#6b736d] hover:bg-[#edf1ee]",
@@ -1115,7 +1116,7 @@ function MobileChatListStatusCard({
     >
       <div
         className={cn(
-          "mx-auto inline-flex rounded-full px-2.5 py-1 text-[9px] font-medium tracking-[0.04em]",
+          "mx-auto inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium tracking-[0.04em]",
           tone === "danger"
             ? "bg-[rgba(220,38,38,0.08)] text-[color:var(--state-danger-text)]"
             : "bg-[rgba(7,193,96,0.1)] text-[#07c160]",
@@ -1294,12 +1295,17 @@ function ConversationListItemLink({
             </div>
           </div>
           <div className="flex shrink-0 flex-col items-end gap-0.5">
-            <div className="text-[9px] text-[color:var(--text-dim)]">
-              {formatConversationTimestamp(
-                visibleLastMessage?.createdAt ??
-                  conversation.lastMessage?.createdAt ??
-                  conversation.updatedAt,
-              )}
+            <div className="flex items-center gap-1.5">
+              {conversation.sparkStreak ? (
+                <SparkBadge streak={conversation.sparkStreak} size="sm" />
+              ) : null}
+              <div className="text-[11px] text-[color:var(--text-dim)]">
+                {formatConversationTimestamp(
+                  visibleLastMessage?.createdAt ??
+                    conversation.lastMessage?.createdAt ??
+                    conversation.updatedAt,
+                )}
+              </div>
             </div>
             <div className="flex min-h-[18px] items-center gap-1">
               {conversation.isMuted ? (
@@ -1318,7 +1324,7 @@ function ConversationListItemLink({
                 ) : (
                   <div
                     className={cn(
-                      "flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#fa5151] px-1 text-[9px] leading-none text-white shadow-[0_4px_12px_rgba(250,81,81,0.18)]",
+                      "flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#fa5151] px-1 text-[11px] leading-none text-white shadow-[0_4px_12px_rgba(250,81,81,0.18)]",
                       conversation.unreadCount > 9 ? "min-w-[22px]" : undefined,
                     )}
                   >
@@ -1396,7 +1402,7 @@ function ConversationListItemLink({
           onClick={onTogglePinned}
           className="flex w-[68px] items-center justify-center bg-[#c4c7cc] text-white active:brightness-[0.96]"
         >
-          <div className="flex flex-col items-center gap-0.5 text-[9px]">
+          <div className="flex flex-col items-center gap-0.5 text-[11px]">
             <Pin size={13} />
             <span>
               {conversation.isPinned ? t(msg`取消置顶`) : t(msg`置顶`)}
@@ -1411,7 +1417,7 @@ function ConversationListItemLink({
             muteActionClassName,
           )}
         >
-          <div className="flex flex-col items-center gap-0.5 text-[9px]">
+          <div className="flex flex-col items-center gap-0.5 text-[11px]">
             <BellOff size={13} />
             <span>
               {conversation.isMuted ? t(msg`取消免打扰`) : t(msg`免打扰`)}
@@ -1424,7 +1430,7 @@ function ConversationListItemLink({
             onClick={onToggleReadState}
             className="flex w-[68px] items-center justify-center bg-[#5b8efc] text-white active:brightness-[0.96]"
           >
-            <div className="flex flex-col items-center gap-0.5 text-[9px]">
+            <div className="flex flex-col items-center gap-0.5 text-[11px]">
               {conversation.unreadCount > 0 ? (
                 <CheckCheck size={13} />
               ) : (
@@ -1439,7 +1445,7 @@ function ConversationListItemLink({
           onClick={onHide}
           className="flex w-[68px] items-center justify-center bg-[#fa5151] text-white active:brightness-[0.96]"
         >
-          <div className="flex flex-col items-center gap-0.5 text-[9px]">
+          <div className="flex flex-col items-center gap-0.5 text-[11px]">
             <Trash2 size={13} />
             <span>{t(msg`删除`)}</span>
           </div>

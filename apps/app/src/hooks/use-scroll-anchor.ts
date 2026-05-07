@@ -1,4 +1,10 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import {
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 type ScrollBehaviorMode = "auto" | "smooth";
 
@@ -7,16 +13,19 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
   const previousItemCountRef = useRef(itemCount);
   const initializedRef = useRef(false);
   const suppressNextPendingCountRef = useRef(false);
+  const isAtBottomRef = useRef(true);
+  const lastUserGestureAtRef = useRef(0);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
 
-  const syncBottomState = useEffectEvent(() => {
+  const syncBottomStateFromDom = useEffectEvent(() => {
     const element = ref.current;
     if (!element) {
       return;
     }
 
     const nextIsAtBottom = isScrolledNearBottom(element);
+    isAtBottomRef.current = nextIsAtBottom;
     setIsAtBottom(nextIsAtBottom);
     if (nextIsAtBottom) {
       setPendingCount(0);
@@ -39,8 +48,11 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
         });
       }
 
+      isAtBottomRef.current = true;
       setIsAtBottom(true);
       setPendingCount(0);
+      // Treat the upcoming scroll events as ours, not user-driven.
+      lastUserGestureAtRef.current = 0;
     },
   );
 
@@ -54,19 +66,40 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
       return;
     }
 
-    syncBottomState();
+    const markUserGesture = () => {
+      lastUserGestureAtRef.current = performance.now();
+    };
 
     const handleScroll = () => {
-      syncBottomState();
+      const now = performance.now();
+      // Only treat scroll events as authoritative when a user gesture happened
+      // recently (within USER_SCROLL_WINDOW_MS). Layout-only or programmatic
+      // scrolls do not have an associated gesture and should not flip the
+      // "at bottom" ref. Ongoing scrolls keep refreshing the window.
+      if (now - lastUserGestureAtRef.current >= USER_SCROLL_WINDOW_MS) {
+        return;
+      }
+      lastUserGestureAtRef.current = now;
+      syncBottomStateFromDom();
     };
 
     element.addEventListener("scroll", handleScroll, { passive: true });
+    element.addEventListener("wheel", markUserGesture, { passive: true });
+    element.addEventListener("touchmove", markUserGesture, { passive: true });
+    element.addEventListener("touchstart", markUserGesture, { passive: true });
+    element.addEventListener("mousedown", markUserGesture, { passive: true });
+    element.addEventListener("keydown", markUserGesture);
     return () => {
       element.removeEventListener("scroll", handleScroll);
+      element.removeEventListener("wheel", markUserGesture);
+      element.removeEventListener("touchmove", markUserGesture);
+      element.removeEventListener("touchstart", markUserGesture);
+      element.removeEventListener("mousedown", markUserGesture);
+      element.removeEventListener("keydown", markUserGesture);
     };
-  }, [syncBottomState]);
+  }, [syncBottomStateFromDom]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const previousItemCount = previousItemCountRef.current;
     previousItemCountRef.current = itemCount;
 
@@ -76,9 +109,7 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
       }
 
       initializedRef.current = true;
-      window.requestAnimationFrame(() => {
-        scrollToBottom("auto");
-      });
+      scrollToBottom("auto");
       return;
     }
 
@@ -88,10 +119,8 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
 
     const addedCount = itemCount - previousItemCount;
     const element = ref.current;
-    if (!element || isScrolledNearBottom(element)) {
-      window.requestAnimationFrame(() => {
-        scrollToBottom("auto");
-      });
+    if (!element || isAtBottomRef.current) {
+      scrollToBottom("auto");
       return;
     }
 
@@ -121,3 +150,4 @@ function isScrolledNearBottom(element: HTMLElement) {
 }
 
 const SCROLL_BOTTOM_THRESHOLD = 72;
+const USER_SCROLL_WINDOW_MS = 500;

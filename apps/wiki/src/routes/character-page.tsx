@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
 import { Link, useParams } from "@tanstack/react-router";
@@ -33,6 +33,7 @@ import { RiskBadge } from "../components/risk-badge";
 import { ScenePromptPreview } from "../components/scene-prompt-preview";
 import { WikiApiError } from "../lib/wiki-api";
 import { FormRow } from "../components/form-row";
+import { formatDateTime } from "../lib/format";
 
 type Tab = "read" | "edit" | "history" | "talk";
 
@@ -93,64 +94,73 @@ export function CharacterPage() {
           </TabButton>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          {pageQ.data && (
-            <ProtectionInfo level={pageQ.data.page.protectionLevel} />
-          )}
-          {isDeleted && (
-            <StatusPill>
-              <Trans>已删除</Trans>
-            </StatusPill>
-          )}
-          {isPendingCreate && (
-            <StatusPill>
-              <Trans>待创建</Trans>
-            </StatusPill>
-          )}
-          {pageQ.data?.pendingRevision && (
-            <StatusPill>
-              <Trans>有待审版本</Trans>
-            </StatusPill>
-          )}
-          {viewerCanSeeCurrent &&
-            pageQ.data?.latestRevision?.id !==
-              pageQ.data?.stableRevision?.id && (
-              <div className="inline-flex overflow-hidden rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] text-xs shadow-[var(--shadow-soft)]">
-                <button
-                  type="button"
-                  className={`px-3 py-1.5 ${
-                    viewMode === "stable"
-                      ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
-                      : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
-                  }`}
-                  onClick={() => setViewMode("stable")}
-                >
-                  <Trans>稳定版</Trans>
-                </button>
-                <button
-                  type="button"
-                  className={`px-3 py-1.5 ${
-                    viewMode === "current"
-                      ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
-                      : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
-                  }`}
-                  onClick={() => setViewMode("current")}
-                >
-                  <Trans>最新版</Trans>
-                </button>
-              </div>
-            )}
           <WatchToggle characterId={characterId} />
-          {user && pageQ.data && (
-            <Button
-              size="sm"
-              variant={isDeleted ? "primary" : "danger"}
-              disabled={softDeleteMut.isPending}
-              onClick={() => setShowLifecycleForm((value) => !value)}
-            >
-              {isDeleted ? t(msg`申请恢复`) : t(msg`申请删除`)}
-            </Button>
-          )}
         </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        {pageQ.data && (
+          <ProtectionInfo level={pageQ.data.page.protectionLevel} />
+        )}
+        {isDeleted && (
+          <StatusPill>
+            <Trans>已删除</Trans>
+          </StatusPill>
+        )}
+        {isPendingCreate && (
+          <StatusPill>
+            <Trans>待创建</Trans>
+          </StatusPill>
+        )}
+        {pageQ.data?.pendingRevision && (
+          <StatusPill>
+            <Trans>有待审版本</Trans>
+          </StatusPill>
+        )}
+        {viewerCanSeeCurrent &&
+          pageQ.data?.latestRevision?.id !==
+            pageQ.data?.stableRevision?.id && (
+            <div
+              role="group"
+              aria-label={t(msg`版本切换`)}
+              className="ml-auto inline-flex shrink-0 overflow-hidden rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] text-xs shadow-[var(--shadow-soft)]"
+            >
+              <button
+                type="button"
+                aria-pressed={viewMode === "stable"}
+                className={`px-3 py-1.5 ${
+                  viewMode === "stable"
+                    ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
+                    : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+                }`}
+                onClick={() => setViewMode("stable")}
+              >
+                <Trans>稳定版</Trans>
+              </button>
+              <button
+                type="button"
+                aria-pressed={viewMode === "current"}
+                className={`px-3 py-1.5 ${
+                  viewMode === "current"
+                    ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
+                    : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+                }`}
+                onClick={() => setViewMode("current")}
+              >
+                <Trans>最新版</Trans>
+              </button>
+            </div>
+          )}
+        {user && pageQ.data && (
+          <Button
+            size="sm"
+            variant={isDeleted ? "primary" : "danger"}
+            className="ml-auto"
+            disabled={softDeleteMut.isPending}
+            onClick={() => setShowLifecycleForm((value) => !value)}
+          >
+            {isDeleted ? t(msg`申请恢复`) : t(msg`申请删除`)}
+          </Button>
+        )}
       </div>
 
       {showLifecycleForm && (
@@ -282,7 +292,7 @@ function ProtectionInfo({ level }: { level: string }) {
   const t = translateRuntimeMessage;
   if (level === "none") return null;
   return (
-    <StatusPill className="ml-auto">
+    <StatusPill>
       {level === "semi" ? t(msg`半保护`) : t(msg`完全保护`)}
     </StatusPill>
   );
@@ -299,7 +309,7 @@ function ReadView({ view }: { view: WikiPageView }) {
           <img
             src={c.avatar}
             alt={c.name}
-            className="w-20 h-20 rounded-full object-cover bg-gray-100"
+            className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover bg-[color:var(--surface-soft)]"
           />
         )}
         <div className="flex-1">
@@ -371,7 +381,7 @@ function ReadView({ view }: { view: WikiPageView }) {
         {view.viewMode === "current" ? t(msg`最新版`) : t(msg`稳定版`)}：
         {view.currentRevision
           ? t(
-              msg`v${view.currentRevision.version} · 由 ${view.currentRevision.editorUserId} 提交于 ${new Date(view.currentRevision.createdAt).toLocaleString()}`,
+              msg`v${view.currentRevision.version} · 由 ${view.currentRevision.editorUserId} 提交于 ${formatDateTime(view.currentRevision.createdAt)}`,
             )
           : t(msg`尚未有 wiki 版本（显示后台原始数据）`)}
         {view.stableRevision &&
@@ -435,9 +445,68 @@ function EditView({
     serverCurrent: WikiContentSnapshot;
     newBaseRevisionId: string;
   } | null>(null);
+  // Track whether the user has touched the form. Without this, a background
+  // refetch (e.g. after a sibling mutation invalidates the page query) wipes
+  // their in-progress edits.
+  const dirtyRef = useRef(false);
+  const submitTimerRef = useRef<number | null>(null);
+  // 保留上次见到的服务器值序列化，用于区分"react-query 给了新引用但内容相同"
+  // 与"内容真的变了"两种情况，避免在前者下误弹"服务器有新版本"。
+  const lastInitialSigRef = useRef<string>(JSON.stringify(initial));
+  const lastInitialRecipeSigRef = useRef<string>(
+    JSON.stringify(initialRecipe),
+  );
+  const [serverChangedWhileEditing, setServerChangedWhileEditing] =
+    useState(false);
 
-  useEffect(() => setDraft(initial), [initial]);
-  useEffect(() => setRecipeDraft(initialRecipe), [initialRecipe]);
+  useEffect(
+    () => () => {
+      if (submitTimerRef.current !== null) {
+        window.clearTimeout(submitTimerRef.current);
+        submitTimerRef.current = null;
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const sig = JSON.stringify(initial);
+    const changed = sig !== lastInitialSigRef.current;
+    lastInitialSigRef.current = sig;
+    if (!dirtyRef.current) {
+      setDraft(initial);
+    } else if (changed) {
+      setServerChangedWhileEditing(true);
+    }
+  }, [initial]);
+  useEffect(() => {
+    const sig = JSON.stringify(initialRecipe);
+    const changed = sig !== lastInitialRecipeSigRef.current;
+    lastInitialRecipeSigRef.current = sig;
+    if (!dirtyRef.current) {
+      setRecipeDraft(initialRecipe);
+    } else if (changed) {
+      setServerChangedWhileEditing(true);
+    }
+  }, [initialRecipe]);
+
+  const setDraftDirty = (next: WikiContentSnapshot) => {
+    dirtyRef.current = true;
+    setDraft(next);
+  };
+  const setRecipeDraftDirty = (next: CharacterBlueprintRecipe) => {
+    dirtyRef.current = true;
+    setRecipeDraft(next);
+  };
+
+  function loadLatestFromServer() {
+    setDraft(initial);
+    setRecipeDraft(initialRecipe);
+    lastInitialSigRef.current = JSON.stringify(initial);
+    lastInitialRecipeSigRef.current = JSON.stringify(initialRecipe);
+    dirtyRef.current = false;
+    setServerChangedWhileEditing(false);
+  }
 
   const submitMut = useMutation({
     mutationFn: (override?: {
@@ -457,12 +526,15 @@ function EditView({
     onSuccess: (res) => {
       setError(null);
       setConflict(null);
+      dirtyRef.current = false;
+      setServerChangedWhileEditing(false);
       setInfo(
         res.appliedToCharacter
           ? t(msg`修改已直接生效（自动确认/巡查员/管理员）`)
           : t(msg`修改已提交，等待巡查员审核`),
       );
-      setTimeout(onSubmitted, 800);
+      const handle = window.setTimeout(onSubmitted, 800);
+      submitTimerRef.current = handle;
     },
     onError: (err: Error) => {
       setInfo(null);
@@ -524,23 +596,39 @@ function EditView({
           </Trans>
         </InlineNotice>
       )}
+      {serverChangedWhileEditing && (
+        <InlineNotice tone="info">
+          <Trans>
+            服务器上的版本已经发生变化，但你正在编辑的草稿已保留。
+          </Trans>{" "}
+          <button
+            type="button"
+            className="ml-1 underline"
+            onClick={loadLatestFromServer}
+          >
+            <Trans>加载最新覆盖草稿</Trans>
+          </button>
+        </InlineNotice>
+      )}
       <FormRow label={t(msg`名称`)}>
         <TextField
           value={draft.name}
-          onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+          onChange={(e) => setDraftDirty({ ...draft, name: e.target.value })}
         />
       </FormRow>
       <FormRow label={t(msg`头像 URL`)}>
         <TextField
           value={draft.avatar}
-          onChange={(e) => setDraft({ ...draft, avatar: e.target.value })}
+          onChange={(e) =>
+            setDraftDirty({ ...draft, avatar: e.target.value })
+          }
         />
       </FormRow>
       <FormRow label={t(msg`关系描述`)}>
         <TextField
           value={draft.relationship}
           onChange={(e) =>
-            setDraft({ ...draft, relationship: e.target.value })
+            setDraftDirty({ ...draft, relationship: e.target.value })
           }
         />
       </FormRow>
@@ -548,7 +636,7 @@ function EditView({
         <TextField
           value={draft.relationshipType}
           onChange={(e) =>
-            setDraft({ ...draft, relationshipType: e.target.value })
+            setDraftDirty({ ...draft, relationshipType: e.target.value })
           }
         />
       </FormRow>
@@ -556,7 +644,7 @@ function EditView({
         <TextAreaField
           rows={4}
           value={draft.bio}
-          onChange={(e) => setDraft({ ...draft, bio: e.target.value })}
+          onChange={(e) => setDraftDirty({ ...draft, bio: e.target.value })}
         />
       </FormRow>
       <FormRow label={t(msg`性格 ⚠ 影响 AI 行为`)}>
@@ -564,7 +652,7 @@ function EditView({
           rows={3}
           value={draft.personality ?? ""}
           onChange={(e) =>
-            setDraft({ ...draft, personality: e.target.value })
+            setDraftDirty({ ...draft, personality: e.target.value })
           }
         />
       </FormRow>
@@ -572,7 +660,7 @@ function EditView({
         <TextField
           value={draft.expertDomains.join(", ")}
           onChange={(e) =>
-            setDraft({
+            setDraftDirty({
               ...draft,
               expertDomains: e.target.value
                 .split(",")
@@ -586,7 +674,7 @@ function EditView({
         <TextField
           value={(draft.triggerScenes ?? []).join(", ")}
           onChange={(e) =>
-            setDraft({
+            setDraftDirty({
               ...draft,
               triggerScenes: e.target.value
                 .split(",")
@@ -599,7 +687,7 @@ function EditView({
       {recipeDraft && (
         <LogicEditor
           recipe={recipeDraft}
-          onChange={(next) => setRecipeDraft(next)}
+          onChange={(next) => setRecipeDraftDirty(next)}
           characterId={characterId}
           currentRole={user?.role}
           baselineRecipe={view.recipe}
@@ -617,6 +705,9 @@ function EditView({
           placeholder={t(msg`例如：补充了职业信息`)}
           maxLength={500}
         />
+        <div className="mt-1 text-xs text-[color:var(--text-muted)]">
+          {summary.trim().length}/500
+        </div>
       </FormRow>
       <label className="flex items-center gap-2 text-sm">
         <input
@@ -644,16 +735,39 @@ function EditView({
           onCancel={() => setConflict(null)}
         />
       )}
-      <div className="flex gap-3">
-        <Button
-          type="button"
-          variant="primary"
-          disabled={submitMut.isPending || !!conflict}
-          onClick={() => submitMut.mutate(undefined)}
-        >
-          {submitMut.isPending ? t(msg`提交中...`) : t(msg`提交编辑`)}
-        </Button>
-      </div>
+      {(() => {
+        const personalityChanged =
+          (draft.personality ?? "") !== (initial.personality ?? "");
+        const recipeChanged = recipeDraft
+          ? JSON.stringify(recipeDraft) !== JSON.stringify(initialRecipe)
+          : false;
+        const requiresLongSummary = personalityChanged || recipeChanged;
+        const summaryTooShort =
+          requiresLongSummary && summary.trim().length < 10;
+        return (
+          <div className="flex flex-col gap-2">
+            {summaryTooShort && (
+              <div className="text-xs text-[color:var(--state-warning-text)]">
+                <Trans>
+                  你修改了高风险字段（人格 / 角色逻辑），修改摘要至少 10 字。
+                </Trans>
+              </div>
+            )}
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="primary"
+                disabled={
+                  submitMut.isPending || !!conflict || summaryTooShort
+                }
+                onClick={() => submitMut.mutate(undefined)}
+              >
+                {submitMut.isPending ? t(msg`提交中...`) : t(msg`提交编辑`)}
+              </Button>
+            </div>
+          </div>
+        );
+      })()}
     </Card>
   );
 }
@@ -1792,7 +1906,7 @@ function RevisionCard({
             {rev.editorRoleAtTime}
           </span>
           <span className="text-xs text-[var(--text-muted)]">
-            {new Date(rev.createdAt).toLocaleString()}
+            {formatDateTime(rev.createdAt)}
           </span>
           <StatusPill>{rev.status}</StatusPill>
           <StatusPill>{rev.operation}</StatusPill>
@@ -1864,7 +1978,7 @@ function RevisionCard({
                 <summary className="cursor-pointer text-[var(--text-muted)]">
                   <Trans>查看角色逻辑快照</Trans>
                 </summary>
-                <pre className="mt-2 p-3 bg-[var(--bg-canvas)] rounded overflow-x-auto">
+                <pre className="mt-2 p-3 bg-[var(--bg-canvas)] rounded overflow-auto max-h-[40vh] md:max-h-[60vh]">
                   {JSON.stringify(rev.recipeSnapshot, null, 2)}
                 </pre>
               </details>

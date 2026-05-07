@@ -10,15 +10,11 @@ use std::{
 
 use serde::{Deserialize, Serialize};
 use tauri::{
-    menu::MenuBuilder,
+    menu::{MenuBuilder, PredefinedMenuItem, Submenu, SubmenuBuilder},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager, Window, WindowEvent,
 };
 use tauri_plugin_dialog::DialogExt;
-#[cfg(target_os = "macos")]
-use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
-#[cfg(target_os = "windows")]
-use window_vibrancy::apply_acrylic;
 
 const MAIN_WINDOW_LABEL: &str = "main";
 const TRAY_ICON_ID: &str = "main-tray";
@@ -44,6 +40,12 @@ enum DesktopTextKey {
     RemoteStartNoop,
     RemoteStopNoop,
     RemoteRestartNoop,
+    MenuEdit,
+    MenuWindow,
+    CloseDialogTitle,
+    CloseDialogBody,
+    CloseDialogHide,
+    CloseDialogExit,
 }
 
 struct DesktopWindowState {
@@ -245,6 +247,32 @@ fn write_desktop_locale(app: &tauri::AppHandle, locale: &str) -> Result<(), Stri
     std::fs::write(target_file_path, contents).map_err(|error| error.to_string())
 }
 
+#[cfg(target_os = "windows")]
+fn read_close_choice(app: &tauri::AppHandle) -> Option<&'static str> {
+    let target_file_path = resolve_runtime_paths(app)
+        .ok()?
+        .runtime_data_dir
+        .join("desktop-close-choice.json");
+    let contents = std::fs::read_to_string(target_file_path).ok()?;
+    let parsed = serde_json::from_str::<serde_json::Value>(&contents).ok()?;
+    let value = parsed.get("choice").and_then(serde_json::Value::as_str)?;
+    match value {
+        "hide" => Some("hide"),
+        "exit" => Some("exit"),
+        _ => None,
+    }
+}
+
+#[cfg(target_os = "windows")]
+fn write_close_choice(app: &tauri::AppHandle, choice: &str) -> Result<(), String> {
+    let target_file_path = resolve_runtime_paths(app)?
+        .runtime_data_dir
+        .join("desktop-close-choice.json");
+    ensure_parent_dir_exists(&target_file_path)?;
+    let contents = serde_json::json!({ "choice": choice }).to_string();
+    std::fs::write(target_file_path, contents).map_err(|error| error.to_string())
+}
+
 fn apply_desktop_locale(app: &tauri::AppHandle, locale: &str) -> Result<(), String> {
     let locale = resolve_supported_locale(locale).unwrap_or(DEFAULT_DESKTOP_LOCALE);
     if let Some(window) = app.get_webview_window(MAIN_WINDOW_LABEL) {
@@ -374,6 +402,44 @@ fn desktop_text(locale: &str, key: DesktopTextKey) -> &'static str {
             "桌面壳不再重启本地 Core API，请改为重新检查远程服务器。"
         }
 
+        ("en-US", DesktopTextKey::CloseDialogTitle) => "Close Yinjie",
+        ("ja-JP", DesktopTextKey::CloseDialogTitle) => "Yinjie を閉じる",
+        ("ko-KR", DesktopTextKey::CloseDialogTitle) => "Yinjie 닫기",
+        (_, DesktopTextKey::CloseDialogTitle) => "关闭隐界",
+
+        ("en-US", DesktopTextKey::CloseDialogBody) => {
+            "When you click the X button…\n\n• Hide to system tray — keep running in the background.\n• Quit — end the process completely.\n\nYour choice will be remembered. Right-click the tray icon → Quit at any time to force exit."
+        }
+        ("ja-JP", DesktopTextKey::CloseDialogBody) => {
+            "閉じるボタン (X) を押した時の動作を選択してください…\n\n• トレイに隠す — バックグラウンドで実行を継続。\n• 完全に終了 — プロセスを完全に終了。\n\n選択は記憶されます。トレイアイコンを右クリック → 終了でいつでも強制終了できます。"
+        }
+        ("ko-KR", DesktopTextKey::CloseDialogBody) => {
+            "닫기 (X) 버튼을 누를 때의 동작을 선택하세요…\n\n• 트레이에 숨김 — 백그라운드에서 계속 실행합니다.\n• 완전히 종료 — 프로세스를 완전히 종료합니다.\n\n선택은 기억됩니다. 트레이 아이콘 오른쪽 클릭 → 종료로 언제든 강제 종료할 수 있습니다."
+        }
+        (_, DesktopTextKey::CloseDialogBody) => {
+            "希望点击 X 时…\n\n• 隐藏到任务栏托盘 —— 继续在后台运行收消息。\n• 完全退出 —— 结束所有进程。\n\n本次选择会被记住。任意时候右键托盘图标 → 退出，可强制结束后台进程。"
+        }
+
+        ("en-US", DesktopTextKey::CloseDialogHide) => "Hide to Tray",
+        ("ja-JP", DesktopTextKey::CloseDialogHide) => "トレイに隠す",
+        ("ko-KR", DesktopTextKey::CloseDialogHide) => "트레이에 숨김",
+        (_, DesktopTextKey::CloseDialogHide) => "隐藏到托盘",
+
+        ("en-US", DesktopTextKey::CloseDialogExit) => "Quit",
+        ("ja-JP", DesktopTextKey::CloseDialogExit) => "完全に終了",
+        ("ko-KR", DesktopTextKey::CloseDialogExit) => "완전히 종료",
+        (_, DesktopTextKey::CloseDialogExit) => "完全退出",
+
+        ("en-US", DesktopTextKey::MenuEdit) => "Edit",
+        ("ja-JP", DesktopTextKey::MenuEdit) => "編集",
+        ("ko-KR", DesktopTextKey::MenuEdit) => "편집",
+        (_, DesktopTextKey::MenuEdit) => "编辑",
+
+        ("en-US", DesktopTextKey::MenuWindow) => "Window",
+        ("ja-JP", DesktopTextKey::MenuWindow) => "ウインドウ",
+        ("ko-KR", DesktopTextKey::MenuWindow) => "윈도우",
+        (_, DesktopTextKey::MenuWindow) => "窗口",
+
         (_, DesktopTextKey::RemoteResponded)
         | (_, DesktopTextKey::RemoteUnreachable)
         | (_, DesktopTextKey::RemoteCanReach)
@@ -482,18 +548,9 @@ fn main() {
                     desktop_locale.locale,
                     DesktopTextKey::AppTitle,
                 ));
-
-                #[cfg(target_os = "windows")]
-                {
-                    let _ = apply_acrylic(&window, Some((18, 22, 30, 160)));
-                }
-
-                #[cfg(target_os = "macos")]
-                {
-                    let _ = apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None);
-                }
             }
 
+            setup_app_menu(app, desktop_locale.locale)?;
             setup_system_tray(app, desktop_locale.locale)?;
 
             Ok(())
@@ -549,6 +606,58 @@ fn main() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running yinjie desktop");
+}
+
+fn setup_app_menu(
+    app: &mut tauri::App,
+    locale: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    use tauri::menu::AboutMetadata;
+
+    let app_title = desktop_text(locale, DesktopTextKey::AppTitle);
+
+    let app_submenu: Submenu<tauri::Wry> = SubmenuBuilder::new(app, app_title)
+        .item(&PredefinedMenuItem::about(
+            app,
+            None,
+            Some(AboutMetadata::default()),
+        )?)
+        .separator()
+        .item(&PredefinedMenuItem::services(app, None)?)
+        .separator()
+        .item(&PredefinedMenuItem::hide(app, None)?)
+        .item(&PredefinedMenuItem::hide_others(app, None)?)
+        .item(&PredefinedMenuItem::show_all(app, None)?)
+        .separator()
+        .item(&PredefinedMenuItem::quit(app, None)?)
+        .build()?;
+
+    let edit_submenu: Submenu<tauri::Wry> =
+        SubmenuBuilder::new(app, desktop_text(locale, DesktopTextKey::MenuEdit))
+            .item(&PredefinedMenuItem::undo(app, None)?)
+            .item(&PredefinedMenuItem::redo(app, None)?)
+            .separator()
+            .item(&PredefinedMenuItem::cut(app, None)?)
+            .item(&PredefinedMenuItem::copy(app, None)?)
+            .item(&PredefinedMenuItem::paste(app, None)?)
+            .item(&PredefinedMenuItem::select_all(app, None)?)
+            .build()?;
+
+    let window_submenu: Submenu<tauri::Wry> =
+        SubmenuBuilder::new(app, desktop_text(locale, DesktopTextKey::MenuWindow))
+            .item(&PredefinedMenuItem::minimize(app, None)?)
+            .item(&PredefinedMenuItem::maximize(app, None)?)
+            .item(&PredefinedMenuItem::fullscreen(app, None)?)
+            .separator()
+            .item(&PredefinedMenuItem::close_window(app, None)?)
+            .build()?;
+
+    let menu = MenuBuilder::new(app)
+        .items(&[&app_submenu, &edit_submenu, &window_submenu])
+        .build()?;
+
+    app.set_menu(menu)?;
+    Ok(())
 }
 
 fn setup_system_tray(
@@ -619,8 +728,60 @@ fn handle_window_event(window: &Window, event: &WindowEvent) {
         }
 
         api.prevent_close();
-        let _ = hide_main_window(&window.app_handle());
+        let app_handle = window.app_handle();
+
+        #[cfg(target_os = "windows")]
+        {
+            match read_close_choice(app_handle) {
+                Some("exit") => {
+                    state.allow_exit.store(true, Ordering::SeqCst);
+                    app_handle.exit(0);
+                }
+                Some("hide") => {
+                    let _ = hide_main_window(app_handle);
+                }
+                _ => {
+                    show_close_choice_dialog(app_handle.clone());
+                }
+            }
+            return;
+        }
+
+        #[cfg(not(target_os = "windows"))]
+        {
+            let _ = hide_main_window(app_handle);
+        }
     }
+}
+
+#[cfg(target_os = "windows")]
+fn show_close_choice_dialog(app: tauri::AppHandle) {
+    use tauri_plugin_dialog::{MessageDialogButtons, MessageDialogKind};
+
+    let locale = resolve_desktop_locale(&app).locale;
+    let title = desktop_text(locale, DesktopTextKey::CloseDialogTitle).to_string();
+    let body = desktop_text(locale, DesktopTextKey::CloseDialogBody).to_string();
+    let hide_label = desktop_text(locale, DesktopTextKey::CloseDialogHide).to_string();
+    let exit_label = desktop_text(locale, DesktopTextKey::CloseDialogExit).to_string();
+
+    let app_for_callback = app.clone();
+    app.dialog()
+        .message(body)
+        .title(title)
+        .kind(MessageDialogKind::Info)
+        .buttons(MessageDialogButtons::OkCancelCustom(hide_label, exit_label))
+        .show(move |hide_chosen| {
+            if hide_chosen {
+                let _ = write_close_choice(&app_for_callback, "hide");
+                let _ = hide_main_window(&app_for_callback);
+            } else {
+                let _ = write_close_choice(&app_for_callback, "exit");
+                if let Some(state) = app_for_callback.try_state::<DesktopWindowState>() {
+                    state.allow_exit.store(true, Ordering::SeqCst);
+                }
+                app_for_callback.exit(0);
+            }
+        });
 }
 
 fn hide_main_window(app: &AppHandle) -> tauri::Result<()> {

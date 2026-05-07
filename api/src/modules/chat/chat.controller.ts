@@ -291,10 +291,7 @@ export class ChatStickerController {
     @Res() response: Response,
   ) {
     return response.sendFile(
-      this.customStickersService.normalizeCustomStickerFileName(fileName),
-      {
-        root: this.customStickersService.getCustomStickerStorageDir(),
-      },
+      this.customStickersService.resolveReadableCustomStickerPath(fileName),
     );
   }
 }

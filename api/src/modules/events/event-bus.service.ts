@@ -10,6 +10,8 @@ export const AppEvents = {
   FRIEND_REQUEST_ACCEPTED: 'friend_request.accepted',
   FRIEND_REQUEST_DECLINED: 'friend_request.declined',
   FRIEND_REQUEST_EXPIRED: 'friend_request.expired',
+  SPARK_UPGRADED: 'social.spark_upgraded',
+  SPARK_RESET: 'social.spark_reset',
 } as const;
 
 @Injectable()

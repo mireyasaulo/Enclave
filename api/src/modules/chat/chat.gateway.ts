@@ -209,11 +209,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const activity = await this.chatService.getCharacterActivity(characterId);
       const runtimeRules = await this.replyLogicRules.getRules();
       if (activity === 'sleeping') {
-        await this.emitSystemMessage(
-          convId,
-          'sleeping',
-          runtimeRules.sleepHintMessages,
-        );
         const delay =
           runtimeRules.sleepDelayMs.min +
           Math.random() *
@@ -230,13 +225,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
 
       if (activity && ['working', 'commuting'].includes(activity)) {
-        const busyActivity =
-          activity as keyof typeof runtimeRules.busyHintMessages;
-        await this.emitSystemMessage(
-          convId,
-          busyActivity,
-          runtimeRules.busyHintMessages[busyActivity] ?? [],
-        );
         const delay =
           runtimeRules.busyDelayMs.min +
           Math.random() *
@@ -300,24 +288,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     );
     this.emitThreadMessage(convId, message);
     return message;
-  }
-
-  private async emitSystemMessage(
-    conversationId: string,
-    kind: 'sleeping' | 'working' | 'commuting',
-    hints: string[],
-  ) {
-    const language = await this.worldLanguage.getLanguage();
-    const candidates =
-      language === 'zh-CN'
-        ? hints
-        : this.getLocalizedStateGateHints(language, kind);
-    const message = await this.chatService.saveSystemMessage(
-      conversationId,
-      candidates[Math.floor(Math.random() * candidates.length)] ??
-        this.getLocalizedStateGateHints(language, kind)[0],
-    );
-    this.emitThreadMessage(conversationId, message);
   }
 
   private async emitSystemNotice(conversationId: string, text: string) {
@@ -436,86 +406,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     return this.getLocalizedReplyFailure(language, 'temporary');
-  }
-
-  private getLocalizedStateGateHints(
-    language: WorldLanguageCode,
-    kind: 'sleeping' | 'working' | 'commuting',
-  ) {
-    const values: Record<
-      WorldLanguageCode,
-      Record<'sleeping' | 'working' | 'commuting', string[]>
-    > = {
-      'zh-CN': {
-        sleeping: [
-          '对方已经睡着了，明天醒来会看到这条消息。',
-          '夜深了，对方暂时离线，明天再继续聊吧。',
-          '这条消息已经送达，只是对方现在还在休息。',
-        ],
-        working: [
-          '对方正在忙工作，稍后会回来。',
-          '消息已经送达，对方处理完手头的事会回复你。',
-          '对方这会儿有点忙，先把消息留在这里。',
-        ],
-        commuting: [
-          '对方正在路上，稍后会查看消息。',
-          '消息已经送达，对方安顿下来后会回复你。',
-          '对方现在可能在移动中，信号稳定后会回来。',
-        ],
-      },
-      'en-US': {
-        sleeping: [
-          'They are asleep now and will see this when they wake up.',
-          'It is late, and they are offline for now. You can keep talking tomorrow.',
-          'The message was delivered, but they are resting right now.',
-        ],
-        working: [
-          'They are busy with work and will come back later.',
-          'The message was delivered. They will reply after handling what is in front of them.',
-          'They are a little busy right now, so the message is waiting here.',
-        ],
-        commuting: [
-          'They are on the move and will check the message later.',
-          'The message was delivered. They will reply after they settle in.',
-          'They may be moving right now and will come back when the connection is stable.',
-        ],
-      },
-      'ja-JP': {
-        sleeping: [
-          '相手はもう眠っています。起きたらこのメッセージを見るはずです。',
-          '夜も遅いので、相手は今オフラインです。続きは明日にしましょう。',
-          'メッセージは届いていますが、相手はいま休んでいます。',
-        ],
-        working: [
-          '相手はいま仕事で忙しいようです。あとで戻ってきます。',
-          'メッセージは届いています。手元の用事が落ち着いたら返信します。',
-          '相手はいま少し忙しいので、メッセージだけ先に置いておきます。',
-        ],
-        commuting: [
-          '相手はいま移動中です。あとでメッセージを確認します。',
-          'メッセージは届いています。落ち着いたら返信します。',
-          '相手はいま移動中かもしれません。通信が安定したら戻ってきます。',
-        ],
-      },
-      'ko-KR': {
-        sleeping: [
-          '상대는 이미 잠들었고, 일어나면 이 메시지를 볼 거예요.',
-          '밤이 늦어 상대가 잠시 오프라인이에요. 내일 이어서 이야기해요.',
-          '메시지는 전달됐지만, 상대는 지금 쉬고 있어요.',
-        ],
-        working: [
-          '상대는 지금 일로 바빠서 조금 뒤에 돌아올 거예요.',
-          '메시지는 전달됐어요. 하던 일을 마치면 답장할 거예요.',
-          '상대가 지금 조금 바빠서, 메시지를 먼저 남겨둘게요.',
-        ],
-        commuting: [
-          '상대는 지금 이동 중이라 나중에 메시지를 확인할 거예요.',
-          '메시지는 전달됐어요. 자리를 잡으면 답장할 거예요.',
-          '상대가 이동 중일 수 있어요. 연결이 안정되면 돌아올 거예요.',
-        ],
-      },
-    };
-    return values[language][kind];
   }
 
   private getLocalizedReplyFailure(

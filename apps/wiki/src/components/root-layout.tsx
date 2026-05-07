@@ -261,21 +261,25 @@ export function RootLayout() {
         </div>
       </header>
 
-      <div className="mx-auto flex w-full max-w-screen-2xl flex-1 gap-6 px-4 pb-12 pt-6 sm:px-6">
+      <div className="relative mx-auto flex w-full max-w-screen-2xl flex-1 gap-6 px-4 pb-12 pt-6 sm:px-6">
+        {mobileNavOpen && (
+          <button
+            type="button"
+            aria-label={t(msg`关闭导航`)}
+            onClick={() => setMobileNavOpen(false)}
+            className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm lg:hidden"
+          />
+        )}
         <aside
-          className={`${
-            mobileNavOpen ? "block" : "hidden"
-          } lg:block lg:w-64 lg:shrink-0`}
+          className={`fixed inset-y-0 left-0 z-40 w-72 max-w-[85%] transform overflow-y-auto border-r border-[color:var(--border-subtle)] bg-[color:var(--surface-shell)] px-4 py-5 shadow-2xl transition-transform duration-[var(--motion-fast)] ease-[var(--ease-standard)] lg:static lg:z-auto lg:block lg:w-64 lg:max-w-none lg:shrink-0 lg:translate-x-0 lg:border-r-0 lg:bg-transparent lg:px-0 lg:py-0 lg:shadow-none lg:overflow-visible ${
+            mobileNavOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
         >
           <div className="lg:sticky lg:top-[88px]">
             <NavList groups={visibleGroups} pathname={pathname} />
           </div>
         </aside>
-        <main
-          className={`${
-            mobileNavOpen ? "hidden" : "block"
-          } min-w-0 flex-1 lg:block`}
-        >
+        <main className="min-w-0 flex-1">
           <Suspense fallback={<LoadingBlock className="m-6" />}>
             <Outlet />
           </Suspense>

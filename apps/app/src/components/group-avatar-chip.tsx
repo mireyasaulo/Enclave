@@ -35,7 +35,7 @@ export function GroupAvatarChip({
 
   return (
     <div
-      className={`${frameClassName} grid grid-cols-2 gap-[2px] overflow-hidden border border-white/80 bg-[#ececec] shadow-[var(--shadow-soft)]`}
+      className={`${frameClassName} yj-no-callout grid grid-cols-2 gap-[2px] overflow-hidden border border-white/80 bg-[#ececec] shadow-[var(--shadow-soft)]`}
       aria-label={name ?? "group avatar"}
     >
       {sources.map((source, index) => (
@@ -44,6 +44,7 @@ export function GroupAvatarChip({
           src={source}
           alt=""
           loading="lazy"
+          draggable={false}
           className={`${cellClassName} h-full w-full object-cover`}
         />
       ))}

@@ -37,7 +37,7 @@ export function resolveQueueState(
     return {
       key: "running_now",
       label: "Running",
-      tone: "border-sky-300/50 bg-sky-500/10 text-sky-100",
+      tone: "border-sky-300/50 bg-sky-50 text-sky-700",
       sortOrder: 0,
     };
   }
@@ -46,7 +46,7 @@ export function resolveQueueState(
     return {
       key: "lease_expired",
       label: "Lease expired",
-      tone: "border-rose-300/60 bg-rose-500/10 text-rose-200",
+      tone: "border-rose-300/60 bg-rose-50 text-rose-700",
       sortOrder: 1,
     };
   }
@@ -59,7 +59,7 @@ export function resolveQueueState(
     return {
       key: "delayed",
       label: "Delayed",
-      tone: "border-amber-300/50 bg-amber-500/10 text-amber-100",
+      tone: "border-amber-300/50 bg-amber-50 text-amber-700",
       sortOrder: 2,
     };
   }

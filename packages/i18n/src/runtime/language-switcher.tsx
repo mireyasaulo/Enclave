@@ -27,7 +27,7 @@ export function LanguageSwitcher({
   const resolvedDescription =
     description === undefined ? (
       <Trans>
-        语言偏好会保存在当前设备，并立即应用到已接入的界面文案和格式化规则。
+        语言偏好保存在当前设备并立即生效，同时决定好友回复使用的语言。
       </Trans>
     ) : (
       description

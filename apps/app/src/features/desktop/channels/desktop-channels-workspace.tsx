@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import type {
   FeedChannelAuthorProfile,
@@ -23,11 +23,13 @@ import {
   PlaySquare,
   RadioTower,
   RefreshCcw,
+  Share2,
   ThumbsUp,
 } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
 import { ExpandableText } from "../../../components/expandable-text";
+import { FeatureUnavailableDialog } from "../../../components/feature-unavailable-dialog";
 import {
   hydrateLiveCompanionFromNative,
   readLiveDraft,
@@ -130,6 +132,7 @@ export function DesktopChannelsWorkspace({
   const [liveHistory, setLiveHistory] = useState<LiveSessionRecord[]>(() =>
     readLiveHistory(),
   );
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   useEffect(() => {
     setSelectedPostId((current) =>
@@ -211,11 +214,7 @@ export function DesktopChannelsWorkspace({
     activeLiveSession?.channelPostId ?? liveDraft.referencePostId;
   const liveCompanionReferencePost =
     posts.find((post) => post.id === liveCompanionReferencePostId) ?? null;
-  const activeFavoriteActionClassName =
-    "border-[rgba(180,123,23,0.18)] bg-white text-[color:var(--text-primary)] shadow-[inset_0_-2px_0_0_rgba(180,123,23,0.78)]";
   const authorPanelVisible = Boolean(routeSelectedAuthorId);
-  const activeSectionLabel =
-    sections.find((section) => section.key === activeSection)?.label ?? "推荐";
 
   useEffect(() => {
     onSelectedPostChange(selectedPost?.id ?? null);
@@ -229,17 +228,42 @@ export function DesktopChannelsWorkspace({
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-[rgba(244,247,246,0.98)]">
-      <div className="border-b border-[color:var(--border-faint)] bg-white/78 px-6 py-5 backdrop-blur-xl">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="text-[11px] font-medium text-[color:var(--text-muted)]">
-              Channels
-            </div>
-            <div className="mt-1 text-[22px] font-semibold text-[color:var(--text-primary)]">
-              视频号
-            </div>
+      <div className="border-b border-[color:var(--border-faint)] bg-white/92 backdrop-blur-xl">
+        <div className="flex h-14 items-center justify-between gap-4 px-6">
+          <div className="flex h-full items-stretch gap-7">
+            {sections.map((section) => {
+              const active = activeSection === section.key;
+              return (
+                <button
+                  key={section.key}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => onSectionChange(section.key)}
+                  className="relative flex h-full items-center text-[14px] outline-none"
+                >
+                  <span
+                    className={cn(
+                      "transition-colors",
+                      active
+                        ? "font-medium text-[color:var(--text-primary)]"
+                        : "text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]",
+                    )}
+                  >
+                    {section.label}
+                    {section.count > 0 ? (
+                      <span className="ml-1 text-[11px] text-[color:var(--text-muted)]">
+                        {section.count}
+                      </span>
+                    ) : null}
+                  </span>
+                  {active ? (
+                    <span className="pointer-events-none absolute bottom-0 left-1/2 h-[2px] w-7 -translate-x-1/2 rounded-full bg-[color:var(--brand-primary)]" />
+                  ) : null}
+                </button>
+              );
+            })}
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2">
             <Button variant="secondary" size="sm" onClick={onRefresh}>
               <RefreshCcw size={14} />
               换一批
@@ -257,52 +281,17 @@ export function DesktopChannelsWorkspace({
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          {sections.map((section) => (
-            <button
-              key={section.key}
-              type="button"
-              aria-pressed={activeSection === section.key}
-              onClick={() => onSectionChange(section.key)}
-              className={cn(
-                "rounded-full border px-3.5 py-1.5 text-[12px] transition",
-                activeSection === section.key
-                  ? "border-[rgba(7,193,96,0.22)] bg-[rgba(7,193,96,0.12)] font-medium text-[#07c160]"
-                  : "border-[color:var(--border-subtle)] bg-white text-[color:var(--text-secondary)] hover:border-[rgba(7,193,96,0.2)] hover:text-[color:var(--text-primary)]",
-              )}
-            >
-              {section.label}
-              {section.count > 0 ? ` ${section.count}` : ""}
-            </button>
-          ))}
-        </div>
-
-        {selectedPost ? (
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-[12px] text-[color:var(--text-muted)]">
-            <span className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1">
-              {activeSectionLabel} {posts.length} 条
-            </span>
-            <span>当前播放：{selectedPost.authorName}</span>
-            <span>·</span>
-            <span>{formatTimestamp(selectedPost.createdAt)}</span>
-            <span>·</span>
-            <span>{formatChannelMeta(selectedPost)}</span>
-          </div>
-        ) : null}
-
-        {successNotice ? (
-          <div className="mt-4">
-            <InlineNotice
-              tone="success"
-              className="border-[color:var(--border-faint)] bg-white"
-            >
-              {successNotice}
-            </InlineNotice>
-          </div>
-        ) : null}
-        {errorMessage ? (
-          <div className="mt-4">
-            <ErrorBlock message={errorMessage} />
+        {successNotice || errorMessage ? (
+          <div className="space-y-2 border-t border-[color:var(--border-faint)] bg-white/76 px-6 py-2">
+            {successNotice ? (
+              <InlineNotice
+                tone="success"
+                className="border-[color:var(--border-faint)] bg-white"
+              >
+                {successNotice}
+              </InlineNotice>
+            ) : null}
+            {errorMessage ? <ErrorBlock message={errorMessage} /> : null}
           </div>
         ) : null}
       </div>
@@ -318,144 +307,129 @@ export function DesktopChannelsWorkspace({
         ) : null}
 
         {!isLoading && selectedPost ? (
-          <div className="mx-auto grid max-w-[1240px] gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="mx-auto grid max-w-[1180px] gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
             <section className="min-w-0">
-              <article className="overflow-hidden rounded-[22px] border border-[color:var(--border-faint)] bg-white shadow-[var(--shadow-section)]">
-                <div className="relative flex aspect-video items-center justify-center bg-[#0f1115] text-center">
-                  <div className="px-6">
-                    <div className="text-[16px] font-semibold text-white">
-                      视频功能正在开发中
-                    </div>
-                    <div className="mt-2 text-[13px] leading-6 text-white/72">
-                      敬请期待
-                    </div>
-                  </div>
-                  <div className="pointer-events-none absolute left-5 top-5 rounded-md bg-[rgba(15,23,42,0.68)] px-3 py-1 text-[11px] font-medium text-white">
-                    视频号推荐
-                  </div>
-                </div>
-
-                <div className="space-y-5 px-6 py-5">
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-3">
-                        <button
-                          type="button"
-                          onClick={() => onOpenAuthor(selectedPost.authorId)}
-                          className="flex min-w-0 flex-1 items-center gap-3 text-left"
-                        >
-                          <AvatarChip
-                            name={selectedPost.authorName}
-                            src={selectedPost.authorAvatar}
-                            size="wechat"
-                          />
-                          <div className="min-w-0 flex-1">
-                            <div className="truncate text-base font-semibold text-[color:var(--text-primary)]">
-                              {selectedPost.authorName}
-                            </div>
-                            <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                              {formatTimestamp(selectedPost.createdAt)} ·{" "}
-                              {formatChannelMeta(selectedPost)}
-                            </div>
-                          </div>
-                        </button>
-                        <Button
-                          variant={
-                            selectedPost.ownerState?.isFollowingAuthor
-                              ? "secondary"
-                              : "primary"
-                          }
-                          size="sm"
-                          onClick={() =>
-                            onToggleAuthorFollow(
-                              selectedPost.authorId,
-                              Boolean(selectedPost.ownerState?.isFollowingAuthor),
-                            )
-                          }
-                          className={
-                            selectedPost.ownerState?.isFollowingAuthor
-                              ? "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
-                              : "bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
-                          }
-                        >
-                          {selectedPost.ownerState?.isFollowingAuthor
-                            ? "已关注"
-                            : "+关注"}
-                        </Button>
+              <div className="flex items-start gap-4">
+                <article className="min-w-0 flex-1 overflow-hidden rounded-[20px] border border-[color:var(--border-faint)] bg-white shadow-[var(--shadow-section)]">
+                  <div className="relative mx-auto flex aspect-[9/16] w-full max-w-[420px] items-center justify-center bg-[#0d0e12] text-center">
+                    <div className="px-6">
+                      <div className="text-[16px] font-semibold text-white">
+                        视频功能正在开发中
                       </div>
-                      {selectedPost.title ? (
-                        <div className="mt-4 text-[18px] font-semibold text-[color:var(--text-primary)]">
-                          {selectedPost.title}
-                        </div>
-                      ) : null}
-                      <ExpandableText
-                        text={selectedPost.text}
-                        className="mt-4"
-                        textClassName="text-[15px] leading-8 text-[color:var(--text-primary)]"
-                      />
-                      {selectedPost.topicTags?.length ? (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {selectedPost.topicTags.slice(0, 4).map((tag) => (
-                            <span
-                              key={tag}
-                              className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]"
-                            >
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-                      ) : null}
+                      <div className="mt-2 text-[13px] leading-6 text-white/72">
+                        敬请期待
+                      </div>
                     </div>
+                    <div className="pointer-events-none absolute left-4 top-4 rounded-md bg-[rgba(15,23,42,0.68)] px-2.5 py-1 text-[11px] font-medium text-white">
+                      视频号推荐
+                    </div>
+                  </div>
 
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => onLike(selectedPost.id)}
-                        disabled={likePendingPostId === selectedPost.id}
-                        className="border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
+                  <div className="space-y-3 px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => onOpenAuthor(selectedPost.authorId)}
+                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
                       >
-                        <ThumbsUp size={15} />
-                        {likePendingPostId === selectedPost.id
-                          ? "处理中..."
-                          : `${selectedPost.likeCount} 赞`}
-                      </Button>
+                        <AvatarChip
+                          name={selectedPost.authorName}
+                          src={selectedPost.authorAvatar}
+                          size="wechat"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-[15px] font-semibold text-[color:var(--text-primary)]">
+                            {selectedPost.authorName}
+                          </div>
+                          <div className="mt-0.5 text-[12px] text-[color:var(--text-muted)]">
+                            {formatTimestamp(selectedPost.createdAt)} ·{" "}
+                            {formatChannelMeta(selectedPost)}
+                          </div>
+                        </div>
+                      </button>
                       <Button
-                        variant="secondary"
+                        variant={
+                          selectedPost.ownerState?.isFollowingAuthor
+                            ? "secondary"
+                            : "primary"
+                        }
                         size="sm"
-                        onClick={() => {
-                          if (typeof document !== "undefined") {
-                            document
-                              .getElementById("desktop-channel-comments-panel")
-                              ?.scrollIntoView({
-                                behavior: "smooth",
-                                block: "start",
-                              });
-                          }
-                        }}
-                        className="border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
-                      >
-                        <MessageCircleMore size={15} />
-                        {selectedPost.commentCount} 评论
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => onToggleFavorite(selectedPost)}
+                        onClick={() =>
+                          onToggleAuthorFollow(
+                            selectedPost.authorId,
+                            Boolean(selectedPost.ownerState?.isFollowingAuthor),
+                          )
+                        }
                         className={
-                          isPostFavorite(selectedPost.id)
-                            ? activeFavoriteActionClassName
-                            : "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
+                          selectedPost.ownerState?.isFollowingAuthor
+                            ? "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
+                            : "bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
                         }
                       >
-                        <Bookmark size={15} />
-                        {isPostFavorite(selectedPost.id) ? "取消收藏" : "收藏"}
+                        {selectedPost.ownerState?.isFollowingAuthor
+                          ? "已关注"
+                          : "+关注"}
                       </Button>
                     </div>
+                    {selectedPost.title ? (
+                      <div className="text-[16px] font-semibold text-[color:var(--text-primary)]">
+                        {selectedPost.title}
+                      </div>
+                    ) : null}
+                    <ExpandableText
+                      text={selectedPost.text}
+                      textClassName="text-[14px] leading-7 text-[color:var(--text-primary)]"
+                    />
+                    {selectedPost.topicTags?.length ? (
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {selectedPost.topicTags.slice(0, 4).map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
+                </article>
 
+                <div className="flex w-12 flex-shrink-0 flex-col items-center gap-4 pt-12">
+                  <ChannelActionButton
+                    icon={<ThumbsUp size={18} />}
+                    label={`${selectedPost.likeCount}`}
+                    active={Boolean(selectedPost.ownerState?.hasLiked)}
+                    pending={likePendingPostId === selectedPost.id}
+                    onClick={() => onLike(selectedPost.id)}
+                  />
+                  <ChannelActionButton
+                    icon={<MessageCircleMore size={18} />}
+                    label={`${selectedPost.commentCount}`}
+                    onClick={() => {
+                      if (typeof document !== "undefined") {
+                        document
+                          .getElementById("desktop-channel-comments-panel")
+                          ?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          });
+                      }
+                    }}
+                  />
+                  <ChannelActionButton
+                    icon={<Share2 size={18} />}
+                    label="转发"
+                    onClick={() => setShareDialogOpen(true)}
+                  />
+                  <ChannelActionButton
+                    icon={<Bookmark size={18} />}
+                    label={isPostFavorite(selectedPost.id) ? "已收藏" : "收藏"}
+                    active={isPostFavorite(selectedPost.id)}
+                    onClick={() => onToggleFavorite(selectedPost)}
+                  />
                 </div>
-              </article>
+              </div>
             </section>
 
             <aside className="space-y-4">
@@ -524,6 +498,44 @@ export function DesktopChannelsWorkspace({
                 </div>
               )}
 
+              <div
+                id="desktop-channel-comments-panel"
+                className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-section)]"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-sm font-medium text-[color:var(--text-primary)]">
+                      热门评论
+                    </div>
+                    <div className="mt-1 text-xs text-[color:var(--text-muted)]">
+                      当前内容下的完整评论列表与回复输入区
+                    </div>
+                  </div>
+                  <span className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
+                    {selectedPost.commentCount} 条
+                  </span>
+                </div>
+                {commentsErrorMessage ? (
+                  <div className="mt-3">
+                    <ErrorBlock message={commentsErrorMessage} />
+                  </div>
+                ) : null}
+                <DesktopChannelCommentsPanel
+                  comments={comments}
+                  commentsLoading={commentsLoading}
+                  draft={commentDrafts[selectedPost.id] ?? ""}
+                  likePendingCommentId={commentLikePendingId}
+                  replyTarget={commentReplyTarget}
+                  selectedPost={selectedPost}
+                  submitPending={commentPendingPostId === selectedPost.id}
+                  onCancelReply={onCancelCommentReply}
+                  onDraftChange={(value) => onCommentChange(selectedPost.id, value)}
+                  onLikeComment={onLikeComment}
+                  onReplyToComment={onReplyToComment}
+                  onSubmit={() => onCommentSubmit(selectedPost.id)}
+                />
+              </div>
+
               <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-section)]">
                 <div className="flex items-center justify-between gap-3">
                   <div className="text-sm font-medium text-[color:var(--text-primary)]">
@@ -586,44 +598,6 @@ export function DesktopChannelsWorkspace({
                 </div>
               </div>
 
-              <div
-                id="desktop-channel-comments-panel"
-                className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-section)]"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                      评论面板
-                    </div>
-                    <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                      当前内容下的完整评论列表与回复输入区
-                    </div>
-                  </div>
-                  <span className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
-                    {selectedPost.commentCount} 条
-                  </span>
-                </div>
-                {commentsErrorMessage ? (
-                  <div className="mt-3">
-                    <ErrorBlock message={commentsErrorMessage} />
-                  </div>
-                ) : null}
-                <DesktopChannelCommentsPanel
-                  comments={comments}
-                  commentsLoading={commentsLoading}
-                  draft={commentDrafts[selectedPost.id] ?? ""}
-                  likePendingCommentId={commentLikePendingId}
-                  replyTarget={commentReplyTarget}
-                  selectedPost={selectedPost}
-                  submitPending={commentPendingPostId === selectedPost.id}
-                  onCancelReply={onCancelCommentReply}
-                  onDraftChange={(value) => onCommentChange(selectedPost.id, value)}
-                  onLikeComment={onLikeComment}
-                  onReplyToComment={onReplyToComment}
-                  onSubmit={() => onCommentSubmit(selectedPost.id)}
-                />
-              </div>
-
               <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-section)]">
                 <div className="flex items-center justify-between gap-3">
                   <div className="text-sm font-medium text-[color:var(--text-primary)]">
@@ -667,7 +641,62 @@ export function DesktopChannelsWorkspace({
           </div>
         ) : null}
       </div>
+
+      <FeatureUnavailableDialog
+        open={shareDialogOpen}
+        title="转发还在路上"
+        description="视频号转发能力还在开发中，等播放器到位后会一起开放。"
+        onClose={() => setShareDialogOpen(false)}
+      />
     </div>
+  );
+}
+
+function ChannelActionButton({
+  active = false,
+  icon,
+  label,
+  pending = false,
+  onClick,
+}: {
+  active?: boolean;
+  icon: ReactNode;
+  label: string;
+  pending?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      disabled={pending}
+      onClick={onClick}
+      className={cn(
+        "group flex flex-col items-center gap-1 outline-none",
+        pending && "opacity-60",
+      )}
+    >
+      <span
+        className={cn(
+          "flex h-11 w-11 items-center justify-center rounded-full border bg-white shadow-[var(--shadow-section)] transition-colors",
+          active
+            ? "border-[rgba(7,193,96,0.42)] text-[color:var(--brand-primary)]"
+            : "border-[color:var(--border-faint)] text-[color:var(--text-secondary)] group-hover:bg-[color:var(--surface-console)] group-hover:text-[color:var(--text-primary)]",
+        )}
+      >
+        {icon}
+      </span>
+      <span
+        className={cn(
+          "text-[11px]",
+          active
+            ? "font-medium text-[color:var(--brand-primary)]"
+            : "text-[color:var(--text-muted)]",
+        )}
+      >
+        {label}
+      </span>
+    </button>
   );
 }
 
@@ -1110,7 +1139,7 @@ function DesktopChannelCommentsPanel({
         </div>
       ) : null}
       {commentThreads.length ? (
-        <div className="max-h-[320px] space-y-3 overflow-auto pr-1">
+        <div className="max-h-[420px] space-y-3 overflow-auto pr-1">
           {commentThreads.map(({ replies, rootComment }) => (
             <div
               key={rootComment.id}

@@ -143,6 +143,22 @@ export const SCHEDULER_JOB_DEFINITIONS = [
     nextRunHint: '每周一 04:00',
     enabled: true,
   },
+  {
+    id: 'reset_expired_sparks',
+    name: '火花到期清算',
+    cadence: '5 0 * * *',
+    description: '每日零点扫描所有好友的火花连续天数，断签则清零并通知前端。',
+    nextRunHint: '每日 00:05',
+    enabled: true,
+  },
+  {
+    id: 'auto_accept_friend_requests',
+    name: '世界角色自动通过',
+    cadence: '*/30 * * * * *',
+    description: '扫描到点的待处理好友请求，由世界角色自动通过。',
+    nextRunHint: '每 30 秒',
+    enabled: true,
+  },
 ] as const;
 
 export type SchedulerJobId = (typeof SCHEDULER_JOB_DEFINITIONS)[number]['id'];

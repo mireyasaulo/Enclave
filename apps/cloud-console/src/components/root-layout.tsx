@@ -111,7 +111,7 @@ function getRouteMeta(pathname: string): RouteMeta {
       eyebrow: "Cloud operations",
       title: "Jobs",
       detail:
-        "Inspect provisioning, resume, suspend, and reconcile work across the fleet.",
+        "Inspect provisioning, resume, suspend, and reconcile work across the managed world fleet.",
     };
   }
 
@@ -146,7 +146,7 @@ function getRouteMeta(pathname: string): RouteMeta {
     eyebrow: "Cloud operations",
     title: "Dashboard",
     detail:
-      "Monitor world availability, lifecycle jobs, and cloud runtime drift.",
+      "Monitor world availability, lifecycle jobs, request flow, and cloud runtime drift.",
   };
 }
 // i18n-ignore-end

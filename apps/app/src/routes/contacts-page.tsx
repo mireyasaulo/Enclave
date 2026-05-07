@@ -44,6 +44,7 @@ import {
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../components/avatar-chip";
+import { SparkBadge } from "../components/spark-badge";
 import { EmptyState } from "../components/empty-state";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
@@ -1871,7 +1872,7 @@ export function ContactsPage() {
                   }),
                 });
               }}
-              className="flex h-7.5 w-full items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] px-3 text-[12px] text-[color:var(--text-dim)]"
+              className="flex h-9 w-full items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] px-3 text-[12px] text-[color:var(--text-dim)]"
               aria-label={t(msg`打开搜一搜`)}
             >
               <Search size={14} className="shrink-0" />
@@ -2071,6 +2072,7 @@ function FriendListRow({
           </div>
         ) : null}
       </div>
+      <SparkBadge streak={item.friendship.sparkStreak} size="sm" />
       {item.friendship.isStarred ? (
         <Star
           size={15}

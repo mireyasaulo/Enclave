@@ -1,4 +1,6 @@
 import { type ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 
 export type DesktopOfficialMessageContextMenuItem = {
   key: string;
@@ -29,6 +31,7 @@ export function DesktopOfficialMessageContextMenu({
   onClose,
   items,
 }: DesktopOfficialMessageContextMenuProps) {
+  const t = useRuntimeTranslator();
   const visibleItems = items.filter((item) => item);
   const dividerCount = visibleItems.filter((item) => item.dividerBefore).length;
   const menuHeight =
@@ -56,7 +59,7 @@ export function DesktopOfficialMessageContextMenu({
       <button
         type="button"
         onClick={onClose}
-        aria-label="关闭公众号消息菜单"
+        aria-label={t(msg`关闭公众号消息菜单`)}
         className="absolute inset-0 cursor-default bg-transparent"
       />
 

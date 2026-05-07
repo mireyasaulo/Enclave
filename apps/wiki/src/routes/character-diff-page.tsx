@@ -62,7 +62,7 @@ export function CharacterDiffPage() {
               <h2 className="font-medium mb-2">
                 <Trans>旧角色逻辑</Trans>
               </h2>
-              <pre className="p-3 rounded bg-[var(--bg-canvas)] overflow-x-auto">
+              <pre className="p-3 rounded bg-[var(--bg-canvas)] overflow-auto max-h-[40vh] md:max-h-[60vh]">
                 {JSON.stringify(data.from.recipeSnapshot ?? null, null, 2)}
               </pre>
             </div>
@@ -70,7 +70,7 @@ export function CharacterDiffPage() {
               <h2 className="font-medium mb-2">
                 <Trans>新角色逻辑</Trans>
               </h2>
-              <pre className="p-3 rounded bg-[var(--bg-canvas)] overflow-x-auto">
+              <pre className="p-3 rounded bg-[var(--bg-canvas)] overflow-auto max-h-[40vh] md:max-h-[60vh]">
                 {JSON.stringify(data.to.recipeSnapshot ?? null, null, 2)}
               </pre>
             </div>

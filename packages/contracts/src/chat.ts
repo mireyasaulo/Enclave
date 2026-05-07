@@ -93,6 +93,7 @@ export interface Conversation {
   lastReadAt?: string;
   lastClearedAt?: string;
   lastActivityAt: string;
+  sparkStreak?: number;
 }
 
 export interface ConversationListItem extends Conversation {

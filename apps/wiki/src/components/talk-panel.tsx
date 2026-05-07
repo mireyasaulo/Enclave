@@ -19,6 +19,7 @@ import {
   type WikiTalkPost,
   type WikiTalkThread,
 } from "../lib/wiki-api";
+import { formatDateTime } from "../lib/format";
 
 export function TalkPanel({ characterId }: { characterId: string }) {
   const t = translateRuntimeMessage;
@@ -135,7 +136,12 @@ function ThreadCard({
 }) {
   return (
     <Card className="p-3">
-      <div className="flex items-center gap-2 cursor-pointer" onClick={onToggle}>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        className="flex w-full items-center gap-2 text-left"
+      >
         <span className="font-medium">{thread.title}</span>
         {thread.isLocked && (
           <StatusPill>
@@ -151,11 +157,11 @@ function ThreadCard({
           <Trans>
             {thread.postCount} 条 · 最近{" "}
             {thread.lastReplyAt
-              ? new Date(thread.lastReplyAt).toLocaleString()
+              ? formatDateTime(thread.lastReplyAt)
               : "—"}
           </Trans>
         </span>
-      </div>
+      </button>
       {isOpen && <ThreadDetail threadId={thread.id} thread={thread} />}
     </Card>
   );
@@ -234,7 +240,11 @@ function ThreadDetail({
       <PostTree
         posts={postsQ.data ?? []}
         onReply={(postId) => setReplyTo(postId)}
-        onDelete={(postId) => deleteMut.mutate(postId)}
+        onDelete={(postId) => {
+          if (window.confirm(t(msg`确认删除这条回复？删除后会标记为「已删除」。`))) {
+            deleteMut.mutate(postId);
+          }
+        }}
         canDelete={(post) =>
           (user?.id === post.authorId || isPatroller) && !post.deletedAt
         }
@@ -291,6 +301,7 @@ function PostTree({
   parentId?: string | null;
   depth?: number;
 }) {
+  if (depth > 12) return null;
   const children = posts.filter((p) => (p.parentPostId ?? null) === parentId);
   if (children.length === 0) return null;
   return (
@@ -299,13 +310,13 @@ function PostTree({
         <li
           key={post.id}
           className="text-sm border-l-2 border-[var(--border-subtle)] pl-3"
-          style={{ marginLeft: depth * 16 }}
+          style={{ marginInlineStart: Math.min(depth, 6) * 16 }}
         >
           <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
             <strong className="text-[var(--text-primary)]">
               {post.authorId.slice(0, 8)}
             </strong>
-            <span>{new Date(post.createdAt).toLocaleString()}</span>
+            <span>{formatDateTime(post.createdAt)}</span>
             {post.deletedAt && (
               <StatusPill>
                 <Trans>已删除</Trans>

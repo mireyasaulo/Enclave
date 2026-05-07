@@ -1,3 +1,5 @@
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button } from "@yinjie/ui";
 import { AppPage } from "@yinjie/ui";
 import { DesktopUtilityShell } from "./desktop-utility-shell";
@@ -27,22 +29,23 @@ export function DesktopPlaceholderWorkspace({
   title,
 }: DesktopPlaceholderWorkspaceProps) {
   const isDesktopLayout = useDesktopLayout();
+  const t = useRuntimeTranslator();
 
   if (!isDesktopLayout) {
     return (
       <AppPage className="flex h-full items-center justify-center bg-[color:var(--bg-app)]">
         <div className="w-full max-w-md rounded-[20px] border border-[color:var(--border-faint)] bg-white p-8 shadow-[var(--shadow-card)]">
           <div className="text-xl font-semibold text-[color:var(--text-primary)]">
-            该入口当前仅提供桌面布局
+            {t(msg`该入口当前仅提供桌面布局`)}
           </div>
           <div className="mt-3 text-sm leading-7 text-[color:var(--text-secondary)]">
-            这项能力优先对齐微信电脑版工作区，移动端暂时不单独开放。
+            {t(msg`这项能力优先对齐微信电脑版工作区，移动端暂时不单独开放。`)}
           </div>
           <a
             href={mobileFallbackTo}
             className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-[10px] bg-[color:var(--brand-primary)] px-4 text-sm font-medium text-white hover:opacity-95"
           >
-            返回继续使用
+            {t(msg`返回继续使用`)}
           </a>
         </div>
       </AppPage>
@@ -62,17 +65,17 @@ export function DesktopPlaceholderWorkspace({
         <div className="flex h-full flex-col bg-[rgba(247,250,250,0.86)]">
           <div className="border-b border-[color:var(--border-faint)] bg-white/78 px-5 py-4 backdrop-blur-xl">
             <div className="text-[15px] font-medium text-[color:var(--text-primary)]">
-              当前重点
+              {t(msg`工作区指引`)}
             </div>
             <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-              先把桌面工作区骨架和关键信息位补完整。
+              {t(msg`先把桌面工作区骨架和关键信息位补完整。`)}
             </div>
           </div>
 
           <div className="flex-1 px-4 py-4">
             <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-section)]">
               <div className="text-xs tracking-[0.14em] text-[color:var(--text-dim)]">
-                当前重点
+                {t(msg`当前重点`)}
               </div>
               <div className="mt-3 text-xl font-semibold text-[color:var(--text-primary)]">
                 {spotlightTitle}
@@ -89,7 +92,7 @@ export function DesktopPlaceholderWorkspace({
       <div className="space-y-5 p-5">
         <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-6 shadow-[var(--shadow-card)]">
           <div className="text-xs tracking-[0.14em] text-[color:var(--text-dim)]">
-            工作区规划
+            {t(msg`工作区规划`)}
           </div>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {highlights.map((item) => (

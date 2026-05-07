@@ -69,8 +69,12 @@ import {
 } from "../lib/cloud-admin-api";
 import { copyTextToClipboard } from "../lib/clipboard";
 import {
+  formatCloudConsolePageOfTotal,
+  formatCloudConsoleVisibleGroupsRange,
+  formatCloudConsoleVisibleSessionsRange,
   translateCloudConsoleCsvRow,
   translateCloudConsoleText,
+  useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
 import {
   createRequestScopedNotice,
@@ -203,14 +207,20 @@ function formatTimelinePointTimestampLabel(
   return formatDateTime(point.timestamp);
 }
 
-function describeVisibleRange(total: number, page: number, pageSize: number, count: number) {
+function describeVisibleRange(
+  total: number,
+  page: number,
+  pageSize: number,
+  count: number,
+  locale?: string | null,
+) {
   if (total === 0 || count === 0) {
-    return "Showing 0 sessions";
+    return formatCloudConsoleVisibleSessionsRange(0, -1, 0, locale);
   }
 
   const start = (page - 1) * pageSize + 1;
   const end = start + count - 1;
-  return `Showing ${start}-${end} of ${total}`;
+  return formatCloudConsoleVisibleSessionsRange(start, end, total, locale);
 }
 
 function describeSourceGroupRange(
@@ -218,14 +228,15 @@ function describeSourceGroupRange(
   page: number,
   pageSize: number,
   count: number,
+  locale?: string | null,
 ) {
   if (total === 0 || count === 0) {
-    return "Showing 0 groups";
+    return formatCloudConsoleVisibleGroupsRange(0, -1, 0, locale);
   }
 
   const start = (page - 1) * pageSize + 1;
   const end = start + count - 1;
-  return `Showing ${start}-${end} of ${total} groups`;
+  return formatCloudConsoleVisibleGroupsRange(start, end, total, locale);
 }
 
 function buildSourceGroupSnapshotFilename(group: { issuedFromIp?: string | null }) {
@@ -343,13 +354,13 @@ const SOURCE_GROUP_RISK_THRESHOLD_RULES = [
     id: "watch",
     label: "Watch threshold",
     description: `${WATCH_SOURCE_GROUP_ACTIVE_SESSION_THRESHOLD}+ active or ${WATCH_SOURCE_GROUP_REVOKED_SESSION_THRESHOLD}+ revoked`,
-    tone: "border-amber-300/50 bg-amber-500/10 text-amber-100",
+    tone: "border-amber-300/50 bg-amber-50 text-amber-700",
   },
   {
     id: "critical",
     label: "Critical threshold",
     description: `${CRITICAL_SOURCE_GROUP_ACTIVE_SESSION_THRESHOLD}+ active or any refresh reuse`,
-    tone: "border-rose-300/50 bg-rose-500/10 text-rose-200",
+    tone: "border-rose-300/50 bg-rose-50 text-rose-700",
   },
 ] as const;
 
@@ -1092,6 +1103,7 @@ export function AdminSessionsPage() {
   const queryClient = useQueryClient();
   const { showNotice } = useConsoleNotice();
   const { locale } = useAppLocale();
+  const t = useCloudConsoleText();
   const adminSessionsSectionRef = useRef<HTMLElement | null>(null);
   const [pendingSession, setPendingSession] =
     useState<CloudAdminSessionSummary | null>(null);
@@ -1822,8 +1834,8 @@ export function AdminSessionsPage() {
     sourceGroupRevokeMutation.isPending ||
     sourceGroupRiskRevokeMutation.isPending;
   const summary = useMemo(
-    () => describeVisibleRange(total, filters.page, filters.pageSize, sessions.length),
-    [filters.page, filters.pageSize, sessions.length, total],
+    () => describeVisibleRange(total, filters.page, filters.pageSize, sessions.length, locale),
+    [filters.page, filters.pageSize, sessions.length, total, locale],
   );
   const sourceGroupSummary = useMemo(
     () =>
@@ -1832,8 +1844,9 @@ export function AdminSessionsPage() {
         filters.sourcePage,
         filters.sourcePageSize,
         sourceGroups.length,
+        locale,
       ),
-    [filters.sourcePage, filters.sourcePageSize, sourceGroupTotal, sourceGroups.length],
+    [filters.sourcePage, filters.sourcePageSize, sourceGroupTotal, sourceGroups.length, locale],
   );
   const focusedSourceRiskTimeline = useMemo(() => {
     if (!focusedSourceSnapshotQuery.data) {
@@ -2220,7 +2233,7 @@ export function AdminSessionsPage() {
                 sourceGroupRiskSnapshotMutation.mutate();
               }}
             >
-              Export risk snapshot
+              {t("Export risk snapshot")}
             </AdminSessionActionButton>
             <AdminSessionActionButton
               disabled={
@@ -2232,7 +2245,7 @@ export function AdminSessionsPage() {
                 sourceGroupRiskGroupsCsvMutation.mutate();
               }}
             >
-              Export risk groups CSV
+              {t("Export risk groups CSV")}
             </AdminSessionActionButton>
             <AdminSessionActionButton
               disabled={
@@ -2244,13 +2257,13 @@ export function AdminSessionsPage() {
                 sourceGroupRiskSessionsCsvMutation.mutate();
               }}
             >
-              Export risk sessions CSV
+              {t("Export risk sessions CSV")}
             </AdminSessionActionButton>
             <AdminSessionActionButton
               disabled={!hasSourceRiskFilter || !hasVisibleSourceGroups || isRevoking}
               onClick={() => setPendingRiskGroupRevoke(true)}
             >
-              Revoke matching risk groups
+              {t("Revoke matching risk groups")}
             </AdminSessionActionButton>
           </div>
         </div>
@@ -2263,7 +2276,7 @@ export function AdminSessionsPage() {
 
         {sourceGroupsQuery.isLoading ? (
           <div className="mt-4 text-sm text-[color:var(--text-muted)]">
-            Loading source groups...
+            {t("Loading source groups...")}
           </div>
         ) : null}
 
@@ -2271,7 +2284,7 @@ export function AdminSessionsPage() {
         !sourceGroupsQuery.isError &&
         !sourceGroups.length ? (
           <div className="mt-4 text-sm text-[color:var(--text-muted)]">
-            No source groups match this filter.
+            {t("No source groups match this filter.")}
           </div>
         ) : null}
 
@@ -2296,14 +2309,14 @@ export function AdminSessionsPage() {
                       tone={group.sourceKey === filters.sourceKey ? "brand" : "neutral"}
                     >
                       {group.sourceKey === filters.sourceKey
-                        ? "Viewing sessions"
-                        : "View sessions"}
+                        ? t("Viewing sessions")
+                        : t("View sessions")}
                     </AdminSessionActionButton>
                     <AdminSessionActionButton
                       disabled={sourceGroupSnapshotMutation.isPending}
                       onClick={() => sourceGroupSnapshotMutation.mutate(group)}
                     >
-                      Export snapshot
+                      {t("Export snapshot")}
                     </AdminSessionActionButton>
                     <AdminSessionActionButton
                       disabled={group.activeSessions === 0 || isRevoking}
@@ -2314,7 +2327,7 @@ export function AdminSessionsPage() {
                         })
                       }
                     >
-                      Revoke group
+                      {t("Revoke group")}
                     </AdminSessionActionButton>
                   </div>
                 </div>
@@ -2381,13 +2394,17 @@ export function AdminSessionsPage() {
             <div>{sourceGroupSummary}</div>
             <div className="flex items-center gap-3">
               <span>
-                Page {filters.sourcePage} of {sourceGroupTotalPages}
+                {formatCloudConsolePageOfTotal(
+                  filters.sourcePage,
+                  sourceGroupTotalPages,
+                  locale,
+                )}
               </span>
               <AdminSessionActionButton
                 disabled={filters.sourcePage <= 1 || sourceGroupsQuery.isLoading}
                 onClick={() => updateFilters({ sourcePage: filters.sourcePage - 1 })}
               >
-                Previous groups
+                {t("Previous groups")}
               </AdminSessionActionButton>
               <AdminSessionActionButton
                 disabled={
@@ -2397,7 +2414,7 @@ export function AdminSessionsPage() {
                 }
                 onClick={() => updateFilters({ sourcePage: filters.sourcePage + 1 })}
               >
-                Next groups
+                {t("Next groups")}
               </AdminSessionActionButton>
             </div>
           </div>
@@ -2679,7 +2696,7 @@ export function AdminSessionsPage() {
                                           }
                                           aria-label={`Revoke ${match.session.id} from timeline`}
                                         >
-                                          Revoke now
+                                          {t("Revoke now")}
                                         </AdminSessionActionButton>
                                       ) : null}
                                     </div>
@@ -2728,21 +2745,24 @@ export function AdminSessionsPage() {
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-4 py-3">
         <div className="text-sm text-[color:var(--text-secondary)]">
           {selectedSessionIds.length > 0
-            ? `${selectedSessionIds.length} active session(s) selected on this page.`
-            : "Select active sessions on this page to revoke them in one action."}
+            ? t("{count} active session(s) selected on this page.").replace(
+                "{count}",
+                String(selectedSessionIds.length),
+              )
+            : t("Select active sessions on this page to revoke them in one action.")}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <AdminSessionActionButton
             disabled={!hasVisibleSessions || isRevoking}
             onClick={() => setPendingFilteredRevoke(true)}
           >
-            Revoke all matching
+            {t("Revoke all matching")}
           </AdminSessionActionButton>
           <AdminSessionActionButton
             disabled={selectedSessionIds.length === 0 || isRevoking}
             onClick={() => setPendingBulkSessionIds(selectedSessionIds)}
           >
-            Revoke selected
+            {t("Revoke selected")}
           </AdminSessionActionButton>
         </div>
       </div>
@@ -2763,15 +2783,15 @@ export function AdminSessionsPage() {
                   className="h-4 w-4 rounded border-[color:var(--border-faint)] bg-[color:var(--surface-input)]"
                 />
               </th>
-              <th className="px-4 py-3">Session</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Issued from</th>
-              <th className="px-4 py-3">Last client</th>
-              <th className="px-4 py-3">Created</th>
-              <th className="px-4 py-3">Last used</th>
-              <th className="px-4 py-3">Refresh expiry</th>
-              <th className="px-4 py-3">Revocation</th>
-              <th className="px-4 py-3 text-right">Action</th>
+              <th className="px-4 py-3">{t("Session")}</th>
+              <th className="px-4 py-3">{t("Status")}</th>
+              <th className="px-4 py-3">{t("Issued from")}</th>
+              <th className="px-4 py-3">{t("Last client")}</th>
+              <th className="px-4 py-3">{t("Created")}</th>
+              <th className="px-4 py-3">{t("Last used")}</th>
+              <th className="px-4 py-3">{t("Refresh expiry")}</th>
+              <th className="px-4 py-3">{t("Revocation")}</th>
+              <th className="px-4 py-3 text-right">{t("Action")}</th>
             </tr>
           </thead>
           <tbody>
@@ -3145,7 +3165,7 @@ export function AdminSessionsPage() {
 
         {sessionsQuery.isLoading ? (
           <div className="p-4 text-sm text-[color:var(--text-muted)]">
-            Loading admin sessions...
+            {t("Loading admin sessions...")}
           </div>
         ) : null}
 
@@ -3153,7 +3173,7 @@ export function AdminSessionsPage() {
         !sessionsQuery.isError &&
         !sessions.length ? (
           <div className="p-4 text-sm text-[color:var(--text-muted)]">
-            No admin sessions match this filter.
+            {t("No admin sessions match this filter.")}
           </div>
         ) : null}
       </div>

@@ -26,6 +26,7 @@ import {
 } from "@yinjie/contracts";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { ChatComposer } from "../../components/chat-composer";
+import { FeatureUnavailableDialog } from "../../components/feature-unavailable-dialog";
 import { ChatMessageList } from "../../components/chat-message-list";
 import {
   encodeChatReplyText,
@@ -991,26 +992,10 @@ export function GroupChatThreadPanel({
     });
   };
 
+  const [callUnavailableKind, setCallUnavailableKind] =
+    useState<DesktopChatCallKind | null>(null);
   const handleDesktopCallAction = (kind: DesktopChatCallKind) => {
-    if (isDesktop) {
-      setDesktopCallPanelState({
-        kind,
-        source: "desktop",
-      });
-      return;
-    }
-
-    void navigate({
-      to:
-        kind === "voice"
-          ? "/group/$groupId/voice-call"
-          : "/group/$groupId/video-call",
-      params: { groupId },
-      ...(currentMobileGroupRouteHash
-        ? { hash: currentMobileGroupRouteHash }
-        : {}),
-    });
-    onDesktopCallAction?.(kind);
+    setCallUnavailableKind(kind);
   };
 
   useEffect(() => {
@@ -1487,10 +1472,12 @@ export function GroupChatThreadPanel({
             />
           </div>
         )}
-        {!isDesktop &&
-        !selectionModeActive &&
-        (!isAtBottom || pendingCount > 0) ? (
-          <div className="pointer-events-none absolute right-2.5 bottom-3 z-10">
+        {!selectionModeActive && (!isAtBottom || pendingCount > 0) ? (
+          <div
+            className={`pointer-events-none absolute z-10 ${
+              isDesktop ? "right-5 bottom-5" : "right-2.5 bottom-3"
+            }`}
+          >
             <div className="pointer-events-auto">
               <MobileChatScrollBottomButton
                 pendingCount={pendingCount}
@@ -1553,6 +1540,17 @@ export function GroupChatThreadPanel({
           onSubmit={() => void handleSubmit()}
         />
       ) : null}
+
+      <FeatureUnavailableDialog
+        open={callUnavailableKind !== null}
+        title={
+          callUnavailableKind === "video"
+            ? "视频通话功能开发中"
+            : "语音通话功能开发中"
+        }
+        description="该功能暂未开放，敬请期待。"
+        onClose={() => setCallUnavailableKind(null)}
+      />
     </div>
   );
 }

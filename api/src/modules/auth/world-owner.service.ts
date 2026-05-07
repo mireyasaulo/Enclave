@@ -24,6 +24,7 @@ import {
   normalizeChatBackgroundAsset,
   parseChatBackgroundAsset,
 } from '../chat/chat-background.utils';
+import { WelcomeMessageService } from './welcome-message.service';
 
 type UpdateWorldOwnerInput = {
   username?: string;
@@ -51,6 +52,7 @@ export class WorldOwnerService {
     private readonly userRepo: Repository<UserEntity>,
     @InjectDataSource()
     private readonly dataSource: DataSource,
+    private readonly welcomeMessageService: WelcomeMessageService,
   ) {}
 
   async ensureSingleOwnerMigration(): Promise<UserEntity> {
@@ -71,7 +73,9 @@ export class WorldOwnerService {
         defaultChatBackgroundPayload: null,
         userType: 'world_owner',
       });
-      return this.userRepo.save(owner);
+      const saved = await this.userRepo.save(owner);
+      await this.welcomeMessageService.sendWelcomeMessage(saved.id);
+      return saved;
     }
 
     const [owner, ...others] = users;

@@ -21,8 +21,10 @@ import {
   cn,
 } from "@yinjie/ui";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
+import { DesktopChatConfirmDialog } from "../features/desktop/chat/desktop-chat-confirm-dialog";
 import { DesktopUtilityShell } from "../features/shell/desktop-utility-shell";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+import { SubscriptionPanel } from "../features/subscription/subscription-panel";
 import {
   clearCloudRuntimeSession,
   shouldShowCloudAccountControls,
@@ -30,29 +32,40 @@ import {
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useCloudSessionStore } from "../store/cloud-session-store";
 import {
-  formatChatSendShortcutLabel,
   type ChatSendShortcut,
   useChatPreferencesStore,
 } from "../store/chat-preferences-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
-type SettingsTab = "profile" | "chat" | "ai" | "language" | "legal" | "account";
+type SettingsTab =
+  | "profile"
+  | "chat"
+  | "ai"
+  | "language"
+  | "legal"
+  | "subscription";
 type LegalTab = "privacy" | "terms" | "community";
 type ProfileSettingsMessage = ReturnType<typeof msg>;
 
-const settingsTabs: Array<{ id: SettingsTab; label: ProfileSettingsMessage }> =
-  [
-    { id: "profile", label: msg`个人资料` },
-    { id: "chat", label: msg`聊天` },
-    { id: "ai", label: msg`AI 设置` },
-    { id: "language", label: msg`语言` },
-    { id: "legal", label: msg`协议与规范` },
-  ];
-
-const desktopAccountTab = {
-  id: "account",
-  label: msg`账号与退出`,
+const profileTab = {
+  id: "profile",
+  label: msg`个人资料`,
 } satisfies { id: SettingsTab; label: ProfileSettingsMessage };
+
+const subscriptionTab = {
+  id: "subscription",
+  label: msg`会员中心`,
+} satisfies { id: SettingsTab; label: ProfileSettingsMessage };
+
+const restSettingsTabs: Array<{
+  id: SettingsTab;
+  label: ProfileSettingsMessage;
+}> = [
+  { id: "chat", label: msg`快捷键设置` },
+  { id: "ai", label: msg`AI 设置` },
+  { id: "language", label: msg`语言` },
+  { id: "legal", label: msg`协议与规范` },
+];
 
 const legalTabs: Array<{ id: LegalTab; label: ProfileSettingsMessage }> = [
   { id: "privacy", label: msg`隐私政策` },
@@ -102,6 +115,8 @@ export function ProfileSettingsPage() {
 
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
   const [activeLegalTab, setActiveLegalTab] = useState<LegalTab>("privacy");
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
 
   const [draftName, setDraftName] = useState(username ?? "");
   const [draftSignature, setDraftSignature] = useState(signature);
@@ -116,6 +131,10 @@ export function ProfileSettingsPage() {
     sessionPhone: cloudPhone,
     worldOwnerId: ownerId,
   });
+
+  const settingsTabs = showCloudAccountEntries
+    ? [profileTab, subscriptionTab, ...restSettingsTabs]
+    : [profileTab, ...restSettingsTabs];
 
   useEffect(() => {
     setDraftName(username ?? "");
@@ -207,11 +226,31 @@ export function ProfileSettingsPage() {
     });
   }, [desktopPathMismatch, desktopSettingsPath, navigate]);
 
-  function handleMobileBack() {
+  const profileDirty =
+    draftName.trim() !== (username ?? "").trim() ||
+    draftSignature.trim() !== signature.trim();
+
+  function performMobileBack() {
     void navigate({ to: backTo });
   }
 
+  function handleMobileBack() {
+    if (profileDirty && !saveProfileMutation.isPending) {
+      setDiscardConfirmOpen(true);
+      return;
+    }
+    performMobileBack();
+  }
+
+  function handleConfirmDiscardProfile() {
+    setDiscardConfirmOpen(false);
+    setDraftName(username ?? "");
+    setDraftSignature(signature);
+    performMobileBack();
+  }
+
   function handleCloudLogout() {
+    setLogoutConfirmOpen(false);
     clearCloudRuntimeSession();
     void navigate({ to: "/welcome", replace: true });
   }
@@ -326,7 +365,7 @@ export function ProfileSettingsPage() {
       {activeTab === "chat" ? (
         <MobileSettingsSection
           desktop={desktopMode}
-          title={desktopMode ? t(msg`聊天设置`) : undefined}
+          title={desktopMode ? t(msg`聊天快捷键`) : undefined}
           description={
             desktopMode
               ? t(msg`调整桌面和 Web 键盘聊天输入时的发送快捷键。`)
@@ -460,17 +499,15 @@ export function ProfileSettingsPage() {
           ) : null}
           {ownerQuery.data ? (
             desktopMode ? (
-              <InlineNotice
-                tone={ownerQuery.data.hasCustomApiKey ? "success" : "muted"}
-              >
-                {ownerQuery.data.hasCustomApiKey
-                  ? ownerQuery.data.customApiBase
+              ownerQuery.data.hasCustomApiKey ? (
+                <InlineNotice tone="success">
+                  {ownerQuery.data.customApiBase
                     ? t(
                         msg`当前使用专属 API Key，Base URL：${ownerQuery.data.customApiBase}。`,
                       )
-                    : t(msg`当前使用专属 API Key。`)
-                  : t(msg`当前使用实例级 Provider。`)}
-              </InlineNotice>
+                    : t(msg`当前使用专属 API Key。`)}
+                </InlineNotice>
+              ) : null
             ) : (
               <div className="rounded-[16px] border border-[color:var(--border-faint)] bg-[#f7f7f7] px-3.5 py-3">
                 <div className="flex items-center justify-between gap-3">
@@ -628,27 +665,11 @@ export function ProfileSettingsPage() {
         <MobileSettingsSection
           desktop={desktopMode}
           title={desktopMode ? t(msg`界面语言`) : undefined}
-          description={
-            desktopMode
-              ? t(msg`切换桌面端、Web、Android、iOS 共用业务界面的显示语言。`)
-              : t(msg`切换当前设备的界面语言`)
-          }
+          description={t(
+            msg`切换界面语言，好友回复也会跟随此设置使用对应语言。`,
+          )}
         >
           <LanguageSwitcher />
-
-          {desktopMode ? (
-            <InlineNotice tone="muted">
-              {t(
-                msg`语言偏好按端保存；后续新增语言会自动出现在这里，不需要每个页面单独加入口。`,
-              )}
-            </InlineNotice>
-          ) : (
-            <MobileSettingsInlineNotice tone="muted">
-              {t(
-                msg`语言偏好会保存在当前设备；桌面端、管理后台和云控制台有各自的切换入口。`,
-              )}
-            </MobileSettingsInlineNotice>
-          )}
         </MobileSettingsSection>
       ) : null}
 
@@ -735,58 +756,44 @@ export function ProfileSettingsPage() {
           ) : null}
         </>
       ) : null}
-      {showCloudAccountEntries ? (
-        desktopMode ? (
-          activeTab === "account" ? (
-            <MobileSettingsSection
-              desktop
-              title={t(msg`云账号`)}
-              description={t(
-                msg`查看会员信息，或退出当前云账号并回到世界入口。`,
-              )}
-            >
-              <div className="space-y-2">
-                <Button
-                  variant="secondary"
-                  className="h-9 w-full rounded-[10px] border-[color:var(--border-faint)] bg-white text-[12px] shadow-none hover:bg-[#f5f7f7]"
-                  onClick={() => void navigate({ to: "/profile/subscription" })}
-                >
-                  {t(msg`会员中心`)}
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="h-9 w-full rounded-[10px] border-[rgba(220,38,38,0.14)] bg-white text-[12px] text-[#b42318] shadow-none hover:bg-[#fff5f5]"
-                  onClick={handleCloudLogout}
-                >
-                  {t(msg`退出登录`)}
-                </Button>
-              </div>
-            </MobileSettingsSection>
-          ) : null
-        ) : (
-          <MobileSettingsSection
-            title={undefined}
-            description={t(msg`管理会员与当前云账号登录状态`)}
-          >
-            <div className="space-y-2">
-              <Button
-                variant="secondary"
-                className="h-9 w-full rounded-[10px] border-[color:var(--border-faint)] bg-white text-[12px] shadow-none hover:bg-[#f5f7f7]"
-                onClick={() => void navigate({ to: "/profile/subscription" })}
-              >
-                {t(msg`会员中心`)}
-              </Button>
-              <Button
-                variant="secondary"
-                className="h-9 w-full rounded-[10px] border-[rgba(220,38,38,0.14)] bg-white text-[12px] text-[#b42318] shadow-none hover:bg-[#fff5f5]"
-                onClick={handleCloudLogout}
-              >
-                {t(msg`退出登录`)}
-              </Button>
-            </div>
-          </MobileSettingsSection>
-        )
+      {showCloudAccountEntries && activeTab === "subscription" ? (
+        <MobileSettingsSection
+          desktop={desktopMode}
+          title={desktopMode ? t(msg`会员中心`) : undefined}
+          description={
+            desktopMode
+              ? t(msg`查看当前云账号订阅状态、可购套餐与邀请奖励。`)
+              : undefined
+          }
+        >
+          <SubscriptionPanel embedded />
+        </MobileSettingsSection>
       ) : null}
+      {showCloudAccountEntries && !desktopMode ? (
+        <MobileSettingsSection
+          title={undefined}
+          description={t(msg`退出后会回到世界入口，下次需要重新登录云账号。`)}
+        >
+          <Button
+            variant="secondary"
+            className="h-9 w-full rounded-[10px] border-[rgba(220,38,38,0.14)] bg-white text-[12px] text-[#b42318] shadow-none hover:bg-[#fff5f5]"
+            onClick={() => setLogoutConfirmOpen(true)}
+          >
+            {t(msg`退出登录`)}
+          </Button>
+        </MobileSettingsSection>
+      ) : null}
+      <DesktopChatConfirmDialog
+        open={logoutConfirmOpen}
+        title={t(msg`确认退出登录？`)}
+        description={t(
+          msg`退出后会回到世界入口，下次需要重新登录云账号。`,
+        )}
+        confirmLabel={t(msg`退出登录`)}
+        danger
+        onClose={() => setLogoutConfirmOpen(false)}
+        onConfirm={handleCloudLogout}
+      />
     </>
   );
 
@@ -803,8 +810,8 @@ export function ProfileSettingsPage() {
                 ? t(msg`管理专属 API Key 和兼容 Base URL。`)
                 : activeTab === "language"
                   ? t(msg`切换当前端的界面语言和本地化格式。`)
-                  : activeTab === "account"
-                    ? t(msg`管理当前云账号与退出登录。`)
+                  : activeTab === "subscription"
+                    ? t(msg`查看当前云账号订阅状态、可购套餐与邀请奖励。`)
                     : t(msg`查看当前世界相关的协议和社区规范。`)
         }
         toolbar={
@@ -850,70 +857,13 @@ export function ProfileSettingsPage() {
               <div className="border-t border-[color:var(--border-faint)] p-3">
                 <button
                   type="button"
-                  onClick={() => setActiveTab(desktopAccountTab.id)}
-                  className={cn(
-                    "flex w-full items-center justify-between rounded-[12px] px-3 py-2.5 text-left text-sm transition",
-                    activeTab === desktopAccountTab.id
-                      ? "bg-[rgba(220,38,38,0.08)] text-[#b42318]"
-                      : "text-[#b42318] hover:bg-[#fff5f5]",
-                  )}
+                  onClick={() => setLogoutConfirmOpen(true)}
+                  className="flex w-full items-center justify-between rounded-[12px] px-3 py-2.5 text-left text-sm text-[#b42318] transition hover:bg-[#fff5f5]"
                 >
-                  <span>{t(desktopAccountTab.label)}</span>
-                  {activeTab === desktopAccountTab.id ? (
-                    <span className="h-2 w-2 rounded-full bg-[#b42318]" />
-                  ) : null}
+                  <span>{t(msg`退出登录`)}</span>
                 </button>
               </div>
             ) : null}
-          </div>
-        }
-        aside={
-          <div className="flex h-full min-h-0 flex-col">
-            <div className="border-b border-[color:var(--border-faint)] px-5 py-4">
-              <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                {t(msg`当前状态`)}
-              </div>
-              <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                {t(msg`右侧显示世界主人信息和当前配置摘要。`)}
-              </div>
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-auto p-5">
-              <div className="space-y-3">
-                <DesktopStatCard
-                  label={t(msg`当前世界主人`)}
-                  value={username ?? t(msg`世界主人`)}
-                />
-                <DesktopStatCard
-                  label={t(msg`签名`)}
-                  value={signature?.trim() || t(msg`暂无签名`)}
-                />
-                <DesktopStatCard
-                  label={t(msg`配置状态`)}
-                  value={
-                    ownerQuery.data?.hasCustomApiKey
-                      ? t(msg`已配置专属 API Key`)
-                      : t(msg`使用实例级 Provider`)
-                  }
-                />
-                <DesktopStatCard
-                  label={t(msg`发送快捷键`)}
-                  value={formatChatSendShortcutLabel(sendMessageShortcut)}
-                />
-                {activeTab === "legal" ? (
-                  <DesktopStatCard
-                    label={t(msg`当前文档`)}
-                    value={
-                      activeLegalTab === "privacy"
-                        ? t(msg`隐私政策`)
-                        : activeLegalTab === "terms"
-                          ? t(msg`用户协议`)
-                          : t(msg`社区规范`)
-                    }
-                  />
-                ) : null}
-              </div>
-            </div>
           </div>
         }
       >
@@ -940,18 +890,43 @@ export function ProfileSettingsPage() {
         }
       />
       <div className="space-y-1 pb-8">{content}</div>
+      {discardConfirmOpen ? (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]">
+          <button
+            type="button"
+            aria-label={t(msg`关闭提示`)}
+            onClick={() => setDiscardConfirmOpen(false)}
+            className="absolute inset-0"
+          />
+          <div className="relative w-full max-w-[320px] overflow-hidden rounded-[18px] bg-white shadow-[var(--shadow-overlay)]">
+            <div className="px-6 pb-3 pt-6 text-center">
+              <div className="text-[16px] font-medium text-[color:var(--text-primary)]">
+                {t(msg`放弃修改`)}
+              </div>
+              <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-muted)]">
+                {t(msg`返回会丢失刚刚修改的资料，确定不保存吗？`)}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 border-t border-[color:var(--border-faint)]">
+              <button
+                type="button"
+                onClick={() => setDiscardConfirmOpen(false)}
+                className="border-r border-[color:var(--border-faint)] py-3 text-[15px] text-[color:var(--text-secondary)] active:bg-black/[0.04]"
+              >
+                {t(msg`继续编辑`)}
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDiscardProfile}
+                className="py-3 text-[15px] font-medium text-[#fa5151] active:bg-black/[0.04]"
+              >
+                {t(msg`放弃`)}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </AppPage>
-  );
-}
-
-function DesktopStatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[14px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-soft)]">
-      <div className="text-xs text-[color:var(--text-muted)]">{label}</div>
-      <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
-        {value}
-      </div>
-    </div>
   );
 }
 

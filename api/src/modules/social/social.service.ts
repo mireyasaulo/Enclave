@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Not, Repository } from 'typeorm';
 import { FriendshipEntity } from './friendship.entity';
@@ -19,6 +20,7 @@ import { CharactersService } from '../characters/characters.service';
 import { AppEvents, EventBusService } from '../events/event-bus.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { WorldLanguageService } from '../config/world-language.service';
+import { addDays, formatLocalDate, getSparkTier } from './spark-utils';
 
 const ACTIVE_FRIENDSHIP_STATUSES = new Set(['friend', 'close', 'best']);
 export const DEFAULT_FRIENDSHIP_CHARACTER_IDS = [...DEFAULT_CHARACTER_IDS];
@@ -54,11 +56,17 @@ export class SocialService {
     });
   }
 
-  async acceptRequest(requestId: string): Promise<FriendshipEntity> {
-    const owner = await this.worldOwnerService.getOwnerOrThrow();
+  async acceptRequest(
+    requestId: string,
+    options?: { acceptedBy?: 'user' | 'character'; ownerId?: string },
+  ): Promise<FriendshipEntity> {
+    const acceptedBy = options?.acceptedBy ?? 'user';
+    const ownerId =
+      options?.ownerId ??
+      (await this.worldOwnerService.getOwnerOrThrow()).id;
     const req = await this.friendRequestRepo.findOneBy({
       id: requestId,
-      ownerId: owner.id,
+      ownerId,
     });
     if (!req) throw new Error('Request not found');
 
@@ -69,7 +77,7 @@ export class SocialService {
     }
 
     const friendship = await this.activateFriendship(
-      owner.id,
+      ownerId,
       req.characterId,
       req.characterName,
       {
@@ -81,19 +89,28 @@ export class SocialService {
       this.eventBus.emit(AppEvents.FRIEND_REQUEST_ACCEPTED, {
         requestId: req.id,
         characterId: req.characterId,
-        ownerId: owner.id,
+        ownerId,
         acceptedAt: new Date(),
       });
+      const isCharacterAccept = acceptedBy === 'character';
       await this.cyberAvatar.captureSignal({
-        ownerId: owner.id,
+        ownerId,
         signalType: 'friendship_event',
         sourceSurface: 'social',
-        sourceEntityType: 'friend_request_accept',
+        sourceEntityType: isCharacterAccept
+          ? 'friend_request_character_accept'
+          : 'friend_request_accept',
         sourceEntityId: req.id,
-        dedupeKey: `friendship:accept:${req.id}`,
-        summaryText: `用户接受了来自 ${req.characterName} 的好友请求。`,
+        dedupeKey: `friendship:${
+          isCharacterAccept ? 'character-accept' : 'accept'
+        }:${req.id}`,
+        summaryText: isCharacterAccept
+          ? `${req.characterName} 通过了用户的好友请求。`
+          : `用户接受了来自 ${req.characterName} 的好友请求。`,
         payload: {
-          action: 'accept_request',
+          action: isCharacterAccept
+            ? 'character_accept_request'
+            : 'accept_request',
           requestId: req.id,
           characterId: req.characterId,
           characterName: req.characterName,
@@ -479,6 +496,13 @@ export class SocialService {
       )) ?? (await this.characterRepo.findOneBy({ id: characterId }));
     if (!char) throw new Error('Character not found');
 
+    const initiator =
+      options?.initiator === 'character'
+        ? 'character'
+        : options?.initiator === 'system'
+          ? 'system'
+          : 'user';
+
     const existing = await this.friendRequestRepo.findOneBy({
       ownerId: owner.id,
       characterId,
@@ -486,6 +510,15 @@ export class SocialService {
     });
     if (existing) {
       if (!options?.autoAccept) {
+        if (
+          initiator === 'user' &&
+          (!existing.acceptAt || existing.acceptAt.getTime() === 0)
+        ) {
+          existing.acceptAt = new Date(
+            Date.now() + (30 + Math.floor(Math.random() * 60)) * 1000,
+          );
+          await this.friendRequestRepo.save(existing);
+        }
         return existing;
       }
 
@@ -524,6 +557,16 @@ export class SocialService {
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(23, 59, 59, 999);
 
+    let acceptAt: Date | null = null;
+    if (!options?.autoAccept && initiator === 'user') {
+      const delaySeconds = await this.decideCharacterAcceptDelay(
+        char,
+        greeting,
+        options?.triggerScene,
+      );
+      acceptAt = new Date(Date.now() + delaySeconds * 1000);
+    }
+
     const req = this.friendRequestRepo.create({
       ownerId: owner.id,
       characterId,
@@ -535,6 +578,7 @@ export class SocialService {
       greeting,
       status: options?.autoAccept ? 'accepted' : 'pending',
       expiresAt: options?.autoAccept ? null : (options?.expiresAt ?? tomorrow),
+      acceptAt: options?.autoAccept ? null : acceptAt,
     });
     const saved = await this.friendRequestRepo.save(req);
 
@@ -566,12 +610,6 @@ export class SocialService {
         occurredAt: new Date(),
       });
     } else {
-      const initiator =
-        options?.initiator === 'character'
-          ? 'character'
-          : options?.initiator === 'system'
-            ? 'system'
-            : 'user';
       await this.cyberAvatar.captureSignal({
         ownerId: owner.id,
         signalType: 'friendship_event',
@@ -615,6 +653,90 @@ export class SocialService {
     }
 
     return saved;
+  }
+
+  private async decideCharacterAcceptDelay(
+    character: CharacterEntity,
+    greeting: string,
+    triggerScene?: string,
+  ): Promise<number> {
+    const fallbackDelay = () => 30 + Math.floor(Math.random() * 60);
+    const personaSummary = [
+      character.personality?.trim(),
+      character.bio?.trim(),
+      character.relationship?.trim(),
+    ]
+      .filter(Boolean)
+      .slice(0, 3)
+      .join('\n')
+      .slice(0, 600);
+
+    const prompt = `你是「${character.name}」。
+角色档案：
+${personaSummary || '（暂无更多信息）'}
+
+刚刚有个陌生人向你发送了好友申请，开场白是：「${greeting?.trim() || '（对方没有写开场白）'}」。
+触发场景：${triggerScene?.trim() || '通讯录主动添加'}
+
+请根据你的性格和当时的状态，决定多快通过这个申请：
+- "immediate"：几乎不犹豫，立刻通过（开朗、社交主动型）
+- "short"：几分钟内通过（中性、礼貌型）
+- "medium"：半小时到几小时后通过（慢热、内向、忙碌）
+- "long"：要拖几小时甚至到次日才通过（高冷、谨慎、距离感强）
+
+只输出一个 JSON：{"category": "immediate" | "short" | "medium" | "long", "reason": "一句话说明"}。`;
+
+    try {
+      const result = await this.ai.generateJsonObject({
+        prompt,
+        usageContext: {
+          surface: 'app',
+          scene: 'friend_request_accept_delay',
+          scopeType: 'character',
+          scopeId: character.id,
+          scopeLabel: character.name,
+          characterId: character.id,
+          characterName: character.name,
+        },
+        maxTokens: 200,
+        temperature: 0.6,
+        fallback: { category: 'short' },
+      });
+      const category =
+        typeof result.category === 'string'
+          ? result.category.toLowerCase().trim()
+          : 'short';
+      const reason =
+        typeof result.reason === 'string' ? result.reason.slice(0, 120) : '';
+      const delaySeconds = this.delayCategoryToSeconds(category);
+      this.logger.debug(
+        `acceptDelay character=${character.name} category=${category} delay=${delaySeconds}s reason=${reason}`,
+      );
+      return delaySeconds;
+    } catch (error) {
+      this.logger.warn(
+        `decideCharacterAcceptDelay failed for ${character.name}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+      return fallbackDelay();
+    }
+  }
+
+  private delayCategoryToSeconds(category: string): number {
+    const jitter = (min: number, max: number) =>
+      min + Math.floor(Math.random() * Math.max(1, max - min));
+    switch (category) {
+      case 'immediate':
+        return jitter(0, 16);
+      case 'medium':
+        return jitter(1800, 7200);
+      case 'long':
+        return jitter(14400, 43200);
+      case 'short':
+      default:
+        return jitter(60, 300);
+    }
   }
 
   async blockCharacter(
@@ -792,6 +914,112 @@ export class SocialService {
     );
     friendship.lastInteractedAt = new Date();
     await this.friendshipRepo.save(friendship);
+  }
+
+  @OnEvent(AppEvents.USER_SENT_MESSAGE, { async: true })
+  async handleUserSentMessage(payload: {
+    ownerId: string;
+    characterId: string;
+    conversationId: string;
+  }): Promise<void> {
+    if (!payload?.characterId) return;
+    try {
+      await this.recordSparkInteraction(payload.characterId);
+    } catch (err) {
+      this.logger.warn(
+        `recordSparkInteraction failed for ${payload.characterId}: ${(err as Error).message}`,
+      );
+    }
+  }
+
+  async recordSparkInteraction(
+    characterId: string,
+  ): Promise<{ streak: number; tier: number; isNew: boolean }> {
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const friendship = await this.friendshipRepo.findOneBy({
+      ownerId: owner.id,
+      characterId,
+    });
+    if (!friendship) return { streak: 0, tier: 0, isNew: false };
+
+    const now = new Date();
+    const today = formatLocalDate(now);
+    const yesterday = formatLocalDate(addDays(now, -1));
+
+    if (friendship.sparkLastDay === today) {
+      return {
+        streak: friendship.sparkStreak,
+        tier: getSparkTier(friendship.sparkStreak),
+        isNew: false,
+      };
+    }
+
+    const prevStreak = friendship.sparkStreak ?? 0;
+    let nextStreak: number;
+    let startedAt: Date | null;
+    if (friendship.sparkLastDay === yesterday) {
+      nextStreak = prevStreak + 1;
+      startedAt = friendship.sparkStartedAt ?? now;
+    } else {
+      nextStreak = 1;
+      startedAt = now;
+    }
+
+    friendship.sparkStreak = nextStreak;
+    friendship.sparkStartedAt = startedAt;
+    friendship.sparkLastDay = today;
+    friendship.lastInteractedAt = now;
+    await this.friendshipRepo.save(friendship);
+
+    const prevTier = getSparkTier(prevStreak);
+    const currTier = getSparkTier(nextStreak);
+    if (currTier > prevTier) {
+      this.eventBus.emit(AppEvents.SPARK_UPGRADED, {
+        ownerId: owner.id,
+        characterId,
+        streak: nextStreak,
+        tier: currTier,
+      });
+    }
+
+    return { streak: nextStreak, tier: currTier, isNew: prevStreak < 3 && nextStreak >= 3 };
+  }
+
+  async resetExpiredSparks(): Promise<number> {
+    const now = new Date();
+    const today = formatLocalDate(now);
+    const yesterday = formatLocalDate(addDays(now, -1));
+
+    const stale = await this.friendshipRepo
+      .createQueryBuilder('f')
+      .where('f.sparkStreak > 0')
+      .andWhere(
+        '(f.sparkLastDay IS NULL OR (f.sparkLastDay <> :today AND f.sparkLastDay <> :yesterday))',
+        { today, yesterday },
+      )
+      .select(['f.id', 'f.ownerId', 'f.characterId'])
+      .getMany();
+
+    if (stale.length === 0) return 0;
+
+    await this.friendshipRepo
+      .createQueryBuilder()
+      .update(FriendshipEntity)
+      .set({ sparkStreak: 0, sparkStartedAt: null })
+      .whereInIds(stale.map((f) => f.id))
+      .andWhere(
+        '(sparkLastDay IS NULL OR (sparkLastDay <> :today AND sparkLastDay <> :yesterday))',
+        { today, yesterday },
+      )
+      .execute();
+
+    for (const f of stale) {
+      this.eventBus.emit(AppEvents.SPARK_RESET, {
+        ownerId: f.ownerId,
+        characterId: f.characterId,
+      });
+    }
+    return stale.length;
   }
 
   private async activateFriendship(
