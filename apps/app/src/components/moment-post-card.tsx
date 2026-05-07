@@ -4,6 +4,14 @@ import { AvatarChip } from "./avatar-chip";
 import { MomentCommentComposer } from "./moment-comment-composer";
 import { formatTimestamp } from "../lib/format";
 
+type MomentPostCardComment = {
+  id: string;
+  authorName: string;
+  text: string;
+  replyToCommentId?: string | null;
+  replyToAuthorName?: string | null;
+};
+
 type MomentPostCardProps = {
   authorName: string;
   authorAvatar?: string | null;
@@ -11,7 +19,7 @@ type MomentPostCardProps = {
   location?: string | null;
   postedAt: string;
   likes: { id: string; authorName: string }[];
-  comments: { id: string; authorName: string; text: string }[];
+  comments: MomentPostCardComment[];
   onLike: () => void;
   likeLoading: boolean;
   commentDraft: string;
@@ -101,13 +109,25 @@ export function MomentPostCard({
             ) : null}
 
             {/* Comments */}
-            {comments.map((comment) => (
-              <div key={comment.id} className="text-[color:var(--text-primary)]">
-                <span className="font-medium text-[#15803d]">{comment.authorName}</span>
-                <span className="text-[color:var(--text-muted)]">：</span>
-                <span>{comment.text}</span>
-              </div>
-            ))}
+            {comments.map((comment) => {
+              const replyToName =
+                comment.replyToCommentId && comment.replyToAuthorName
+                  ? comment.replyToAuthorName
+                  : null;
+              return (
+                <div key={comment.id} className="text-[color:var(--text-primary)]">
+                  <span className="font-medium text-[#15803d]">{comment.authorName}</span>
+                  {replyToName ? (
+                    <>
+                      <span className="text-[color:var(--text-muted)]"> 回复 </span>
+                      <span className="font-medium text-[#15803d]">{replyToName}</span>
+                    </>
+                  ) : null}
+                  <span className="text-[color:var(--text-muted)]">：</span>
+                  <span>{comment.text}</span>
+                </div>
+              );
+            })}
           </div>
         ) : null}
 

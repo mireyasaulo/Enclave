@@ -375,19 +375,15 @@ function CommentLine({
 }) {
   return (
     <span>
-      <span className="font-medium text-[color:var(--text-primary)]">
-        {authorName}
-      </span>
+      <span className="font-medium text-[#07c160]">{authorName}</span>
       {replyToName ? (
         <>
-          <span className="text-[color:var(--text-dim)]"> 回复 </span>
-          <span className="font-medium text-[color:var(--text-primary)]">
-            {replyToName}
-          </span>
+          <span className="text-[color:var(--text-secondary)]"> 回复 </span>
+          <span className="font-medium text-[#07c160]">{replyToName}</span>
         </>
       ) : null}
-      <span className="text-[color:var(--text-dim)]">：</span>
-      <span className="text-[color:var(--text-secondary)]">{text}</span>
+      <span className="text-[color:var(--text-secondary)]">：</span>
+      <span className="text-[color:var(--text-primary)]">{text}</span>
     </span>
   );
 }

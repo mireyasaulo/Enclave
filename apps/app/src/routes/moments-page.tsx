@@ -1135,26 +1135,27 @@ export function MomentsPage() {
                                     })
                                   }
                                   className={cn(
-                                    "block w-full rounded-[8px] px-1.5 py-0.5 text-left text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)] transition-colors",
+                                    "block w-full rounded-[8px] px-1.5 py-0.5 text-left text-[11px] leading-[1.35rem] transition-colors",
                                     isActiveTarget
                                       ? "bg-[rgba(7,193,96,0.12)]"
                                       : "hover:bg-white",
                                   )}
                                 >
-                                  <span className="text-[color:var(--text-primary)]">
+                                  <span className="font-medium text-[#07c160]">
                                     {comment.authorName}
                                   </span>
                                   {replyToName ? (
                                     <>
-                                      <span className="text-[color:var(--text-muted)]">
+                                      <span className="text-[color:var(--text-secondary)]">
                                         {" "}回复{" "}
                                       </span>
-                                      <span className="text-[color:var(--text-primary)]">
+                                      <span className="font-medium text-[#07c160]">
                                         {replyToName}
                                       </span>
                                     </>
                                   ) : null}
-                                  {`：${comment.text}`}
+                                  <span className="text-[color:var(--text-secondary)]">：</span>
+                                  <span className="text-[color:var(--text-primary)]">{comment.text}</span>
                                 </button>
                               );
                             })}
