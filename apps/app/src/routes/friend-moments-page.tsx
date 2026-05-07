@@ -5,6 +5,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
 import {
@@ -15,6 +16,7 @@ import {
   getMoments,
   toggleMomentLike,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { AppPage, Button, ErrorBlock, LoadingBlock } from "@yinjie/ui";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import { buildDesktopContactsRouteHash } from "../features/contacts/contacts-route-state";
@@ -41,6 +43,8 @@ import { formatTimestamp } from "../lib/format";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
+
+const t = translateRuntimeMessage;
 
 const DesktopFriendMomentsWorkspace = lazy(async () => {
   const mod =
@@ -129,7 +133,7 @@ export function FriendMomentsPage() {
     onSuccess: async () => {
       composeDraft.reset();
       setShowCompose(false);
-      setNotice("朋友圈已发布。");
+      setNotice(t(msg`朋友圈已发布。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
       });
@@ -138,7 +142,7 @@ export function FriendMomentsPage() {
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
     onSuccess: async () => {
-      setNotice("朋友圈互动已更新。");
+      setNotice(t(msg`朋友圈互动已更新。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
       });
@@ -148,7 +152,7 @@ export function FriendMomentsPage() {
     mutationFn: (momentId: string) => {
       const text = commentDrafts[momentId]?.trim();
       if (!text) {
-        throw new Error("请先输入评论内容。");
+        throw new Error(t(msg`请先输入评论内容。`));
       }
 
       const replyTo =
@@ -171,7 +175,7 @@ export function FriendMomentsPage() {
       setDesktopReplyTarget((current) =>
         current?.postId === momentId ? null : current,
       );
-      setNotice("朋友圈互动已更新。");
+      setNotice(t(msg`朋友圈互动已更新。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
       });
@@ -191,11 +195,11 @@ export function FriendMomentsPage() {
   );
   const displayName = friendItem
     ? getFriendDisplayName(friendItem)
-    : character?.name || "角色朋友圈";
+    : character?.name || t(msg`角色朋友圈`);
   const signature =
     character?.currentStatus?.trim() ||
     character?.bio?.trim() ||
-    "这个角色还没有个性签名。";
+    t(msg`这个角色还没有个性签名。`);
   const pendingLikeMomentId = likeMutation.isPending
     ? likeMutation.variables
     : null;
@@ -286,7 +290,7 @@ export function FriendMomentsPage() {
       await composeDraft.addImageFiles(files);
     } catch (error) {
       composeDraft.setMediaError(
-        error instanceof Error ? error.message : "图片选择失败，请稍后重试。",
+        error instanceof Error ? error.message : t(msg`图片选择失败，请稍后重试。`),
       );
     }
   }
@@ -296,7 +300,7 @@ export function FriendMomentsPage() {
       await composeDraft.replaceVideoFile(file);
     } catch (error) {
       composeDraft.setMediaError(
-        error instanceof Error ? error.message : "视频选择失败，请稍后重试。",
+        error instanceof Error ? error.message : t(msg`视频选择失败，请稍后重试。`),
       );
     }
   }
@@ -399,7 +403,7 @@ export function FriendMomentsPage() {
     return (
       <AppPage className="flex min-h-full items-center justify-center bg-[#f2f2f2] px-4 py-8">
         <LoadingBlock
-          label="正在切换到手机端角色朋友圈..."
+          label={t(msg`正在切换到手机端角色朋友圈...`)}
           className="w-full max-w-[360px] rounded-[24px] border-[color:var(--border-faint)] bg-white py-8 shadow-[var(--shadow-section)]"
         />
       </AppPage>
@@ -424,7 +428,7 @@ export function FriendMomentsPage() {
     return (
       <div className="flex h-full items-center justify-center bg-[rgba(244,247,246,0.98)] px-6">
         <LoadingBlock
-          label="正在读取角色朋友圈..."
+          label={t(msg`正在读取角色朋友圈...`)}
           className="w-full max-w-[420px] rounded-[24px] border-[color:var(--border-faint)] bg-white py-10 shadow-[var(--shadow-section)]"
         />
       </div>
@@ -436,10 +440,10 @@ export function FriendMomentsPage() {
       <div className="flex h-full items-center justify-center bg-[rgba(244,247,246,0.98)] px-6">
         <div className="w-full max-w-[480px] rounded-[24px] border border-[color:var(--border-faint)] bg-white p-6 shadow-[var(--shadow-section)]">
           <div className="text-[18px] font-semibold text-[color:var(--text-primary)]">
-            无法打开这位角色的朋友圈
+            {t(msg`无法打开这位角色的朋友圈`)}
           </div>
           <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-            角色资料不存在，或者当前资料还没有同步完成。
+            {t(msg`角色资料不存在，或者当前资料还没有同步完成。`)}
           </div>
           {errors.length > 0 ? (
             <div className="mt-4 space-y-3">
@@ -450,13 +454,13 @@ export function FriendMomentsPage() {
           ) : null}
           <div className="mt-5 flex gap-2">
             <Button variant="secondary" onClick={handleBack}>
-              返回上一页
+              {t(msg`返回上一页`)}
             </Button>
             <Button
               variant="primary"
               onClick={() => void navigate({ to: "/tabs/moments" })}
             >
-              去朋友圈主页
+              {t(msg`去朋友圈主页`)}
             </Button>
           </div>
         </div>
@@ -468,9 +472,9 @@ export function FriendMomentsPage() {
     <Suspense
       fallback={
         <RouteRedirectState
-          title="正在打开桌面好友朋友圈"
-          description="正在载入桌面好友朋友圈工作区，马上显示角色动态详情。"
-          loadingLabel="载入桌面好友朋友圈..."
+          title={t(msg`正在打开桌面好友朋友圈`)}
+          description={t(msg`正在载入桌面好友朋友圈工作区，马上显示角色动态详情。`)}
+          loadingLabel={t(msg`载入桌面好友朋友圈...`)}
         />
       }
     >
@@ -579,12 +583,12 @@ export function FriendMomentsPage() {
                 category: "moments",
                 title: moment.authorName,
                 description: getMomentSummaryText(moment),
-                meta: `朋友圈 · ${formatTimestamp(moment.postedAt)}`,
+                meta: t(msg`朋友圈 · ${formatTimestamp(moment.postedAt)}`),
                 to: buildDesktopFriendMomentsPath(characterId, {
                   momentId: moment.id,
                   source: "moments",
                 }),
-                badge: "朋友圈",
+                badge: t(msg`朋友圈`),
                 avatarName: moment.authorName,
                 avatarSrc: moment.authorAvatar,
               });

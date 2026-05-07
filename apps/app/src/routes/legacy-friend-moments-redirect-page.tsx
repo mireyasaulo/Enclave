@@ -1,8 +1,12 @@
 import { useEffect } from "react";
+import { msg } from "@lingui/macro";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { AppPage, LoadingBlock } from "@yinjie/ui";
 import { coerceToMobileFriendMomentsRouteHash } from "../features/moments/mobile-friend-moments-route-state";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+
+const t = translateRuntimeMessage;
 
 export function LegacyFriendMomentsRedirectPage() {
   const { characterId } = useParams({
@@ -49,7 +53,7 @@ export function LegacyFriendMomentsRedirectPage() {
   return (
     <AppPage className="flex min-h-full items-center justify-center bg-[#f2f2f2] px-4 py-8">
       <LoadingBlock
-        label="正在打开角色朋友圈..."
+        label={t(msg`正在打开角色朋友圈...`)}
         className="w-full max-w-[360px] rounded-[24px] border-[color:var(--border-faint)] bg-white py-8 shadow-[var(--shadow-section)]"
       />
     </AppPage>

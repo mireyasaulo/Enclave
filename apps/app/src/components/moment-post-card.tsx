@@ -1,8 +1,12 @@
 import { useState } from "react";
+import { msg } from "@lingui/macro";
 import { Heart, MapPin, MessageCircle } from "lucide-react";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { AvatarChip } from "./avatar-chip";
 import { MomentCommentComposer } from "./moment-comment-composer";
 import { formatTimestamp } from "../lib/format";
+
+const t = translateRuntimeMessage;
 
 type MomentPostCardComment = {
   id: string;
@@ -119,7 +123,7 @@ export function MomentPostCard({
                   <span className="font-medium text-[#15803d]">{comment.authorName}</span>
                   {replyToName ? (
                     <>
-                      <span className="text-[color:var(--text-muted)]"> 回复 </span>
+                      <span className="text-[color:var(--text-muted)]">{t(msg` 回复 `)}</span>
                       <span className="font-medium text-[#15803d]">{replyToName}</span>
                     </>
                   ) : null}
@@ -139,7 +143,7 @@ export function MomentPostCard({
               onChange={onCommentChange}
               onSubmit={onCommentSubmit}
               pending={commentLoading}
-              placeholder="评论..."
+              placeholder={t(msg`评论...`)}
               className="w-full"
               inputClassName="rounded-full py-1.5 text-[16px]"
               buttonClassName="bg-[#07c160] text-white shadow-none hover:bg-[#06ad56]"

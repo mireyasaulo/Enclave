@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
 import {
@@ -11,6 +12,7 @@ import {
   type Moment,
   type MomentComment,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   AppPage,
   Button,
@@ -34,6 +36,8 @@ import { formatTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
+const t = translateRuntimeMessage;
+
 export function MobileFriendMomentsPage() {
   const { characterId } = useParams({
     strict: false,
@@ -56,10 +60,10 @@ export function MobileFriendMomentsPage() {
       : undefined;
   const safeReturnHash = safeReturnPath ? routeState.returnHash : undefined;
   const statusBackLabel = safeReturnPath
-    ? "返回上一页"
+    ? t(msg`返回上一页`)
     : resolvedCharacterId
-      ? "查看角色资料"
-      : "回朋友圈主页";
+      ? t(msg`查看角色资料`)
+      : t(msg`回朋友圈主页`);
   const currentRouteHash = useMemo(
     () =>
       buildMobileFriendMomentsRouteHash({
@@ -106,7 +110,7 @@ export function MobileFriendMomentsPage() {
     onSuccess: async () => {
       setNotice({
         tone: "success",
-        message: "朋友圈互动已更新。",
+        message: t(msg`朋友圈互动已更新。`),
       });
       await queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
@@ -117,7 +121,7 @@ export function MobileFriendMomentsPage() {
     mutationFn: (momentId: string) => {
       const text = commentDrafts[momentId]?.trim();
       if (!text) {
-        throw new Error("请先输入评论内容。");
+        throw new Error(t(msg`请先输入评论内容。`));
       }
 
       const replyTo =
@@ -140,7 +144,7 @@ export function MobileFriendMomentsPage() {
       );
       setNotice({
         tone: "success",
-        message: "朋友圈互动已更新。",
+        message: t(msg`朋友圈互动已更新。`),
       });
       await queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
@@ -163,12 +167,12 @@ export function MobileFriendMomentsPage() {
   );
   const displayName = friendItem
     ? getFriendDisplayName(friendItem)
-    : character?.name || "角色朋友圈";
+    : character?.name || t(msg`角色朋友圈`);
   const signature =
     character?.currentStatus?.trim() ||
     character?.bio?.trim() ||
-    "这个角色还没有个性签名。";
-  const profileActionAriaLabel = `查看 ${displayName} 的资料`;
+    t(msg`这个角色还没有个性签名。`);
+  const profileActionAriaLabel = t(msg`查看 ${displayName} 的资料`);
   const blockedCharacterIds = useMemo(
     () => new Set((blockedQuery.data ?? []).map((item) => item.characterId)),
     [blockedQuery.data],
@@ -277,8 +281,8 @@ export function MobileFriendMomentsPage() {
     return (
       <AppPage className="space-y-0 px-0 py-0">
         <TabPageTopBar
-          title="朋友圈"
-          subtitle="好友"
+          title={t(msg`朋友圈`)}
+          subtitle={t(msg`好友`)}
           titleAlign="center"
           className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
           leftActions={
@@ -293,7 +297,7 @@ export function MobileFriendMomentsPage() {
           }
         />
         <div className="px-4 py-6">
-          <ErrorBlock message="角色资料不存在，暂时无法打开朋友圈。" />
+          <ErrorBlock message={t(msg`角色资料不存在，暂时无法打开朋友圈。`)} />
         </div>
       </AppPage>
     );
@@ -303,7 +307,7 @@ export function MobileFriendMomentsPage() {
     <AppPage className="space-y-0 bg-[#f2f2f2] px-0 pb-0 pt-0">
       <TabPageTopBar
         title={displayName}
-        subtitle="朋友圈"
+        subtitle={t(msg`朋友圈`)}
         titleAlign="center"
         className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
         leftActions={
@@ -363,15 +367,15 @@ export function MobileFriendMomentsPage() {
             <div className="min-w-0">
               <div className="font-medium text-[color:var(--text-primary)]">
                 {relationshipLoading
-                  ? "正在确认可见范围..."
-                  : `${friendMoments.length} 条朋友圈`}
+                  ? t(msg`正在确认可见范围...`)
+                  : t(msg`${friendMoments.length} 条朋友圈`)}
               </div>
               <div className="mt-1 truncate text-[11px] text-[color:var(--text-muted)]">
                 {relationshipLoading
-                  ? "稍等一下，正在同步这位角色的动态。"
+                  ? t(msg`稍等一下，正在同步这位角色的动态。`)
                   : latestMoment
-                  ? `最近更新 ${formatTimestamp(latestMoment.postedAt)}`
-                  : "这位角色最近还没有发布新的朋友圈。"}
+                  ? t(msg`最近更新 ${formatTimestamp(latestMoment.postedAt)}`)
+                  : t(msg`这位角色最近还没有发布新的朋友圈。`)}
               </div>
             </div>
             <Button
@@ -382,7 +386,7 @@ export function MobileFriendMomentsPage() {
                 openCharacterDetail();
               }}
             >
-              查看资料
+              {t(msg`查看资料`)}
             </Button>
           </div>
         </section>
@@ -390,7 +394,7 @@ export function MobileFriendMomentsPage() {
         {!character && (characterQuery.isLoading || friendsQuery.isLoading) ? (
           <div className="rounded-[24px] border border-[color:var(--border-faint)] bg-white px-4 py-8">
             <LoadingBlock
-              label="正在读取角色朋友圈..."
+              label={t(msg`正在读取角色朋友圈...`)}
               className="border-0 bg-transparent py-2 shadow-none"
             />
           </div>
@@ -401,10 +405,10 @@ export function MobileFriendMomentsPage() {
         !friendsQuery.isLoading ? (
           <section className="rounded-[24px] border border-[color:var(--border-faint)] bg-white px-4 py-5">
             <div className="text-[18px] font-semibold text-[color:var(--text-primary)]">
-              无法打开这位角色的朋友圈
+              {t(msg`无法打开这位角色的朋友圈`)}
             </div>
             <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-              角色资料不存在，或者当前资料还没有同步完成。
+              {t(msg`角色资料不存在，或者当前资料还没有同步完成。`)}
             </div>
             {errors.length > 0 ? (
               <div className="mt-4 space-y-3">
@@ -415,7 +419,7 @@ export function MobileFriendMomentsPage() {
             ) : null}
             <div className="mt-5 flex gap-2">
               <Button variant="secondary" onClick={handleBack}>
-                返回上一页
+                {t(msg`返回上一页`)}
               </Button>
               <Button
                 variant="primary"
@@ -432,10 +436,10 @@ export function MobileFriendMomentsPage() {
                 }}
               >
                 {safeReturnPath
-                  ? "回到来源页"
+                  ? t(msg`回到来源页`)
                   : resolvedCharacterId
-                    ? "查看角色资料"
-                    : "去朋友圈主页"}
+                    ? t(msg`查看角色资料`)
+                    : t(msg`去朋友圈主页`)}
               </Button>
             </div>
           </section>
@@ -444,25 +448,25 @@ export function MobileFriendMomentsPage() {
         {character ? (
           <section className="space-y-3">
             <div className="px-1">
-              <div className="text-[11px] text-[color:var(--text-muted)]">最近内容</div>
+              <div className="text-[11px] text-[color:var(--text-muted)]">{t(msg`最近内容`)}</div>
             </div>
 
             {timelineLoading ? (
               <MobileFriendMomentsStateCard
-                badge="读取中"
-                title="正在刷新这位角色的朋友圈"
-                description="稍等一下，正在同步 TA 最近发布的动态。"
+                badge={t(msg`读取中`)}
+                title={t(msg`正在刷新这位角色的朋友圈`)}
+                description={t(msg`稍等一下，正在同步 TA 最近发布的动态。`)}
               />
             ) : null}
 
             {!timelineLoading && momentsQuery.isError ? (
               <MobileFriendMomentsStateCard
-                badge="读取失败"
-                title="朋友圈暂时不可用"
+                badge={t(msg`读取失败`)}
+                title={t(msg`朋友圈暂时不可用`)}
                 description={
                   momentsQuery.error instanceof Error
                     ? momentsQuery.error.message
-                    : "读取这位角色的朋友圈时出错了。"
+                    : t(msg`读取这位角色的朋友圈时出错了。`)
                 }
                 tone="danger"
                 action={
@@ -473,7 +477,7 @@ export function MobileFriendMomentsPage() {
                       className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                       onClick={handleRetryLoad}
                     >
-                      重试读取
+                      {t(msg`重试读取`)}
                     </Button>
                     <Button
                       variant="secondary"
@@ -492,9 +496,9 @@ export function MobileFriendMomentsPage() {
             !momentsQuery.isError &&
             isBlocked ? (
               <MobileFriendMomentsStateCard
-                badge="已隐藏"
-                title="这位角色的朋友圈当前不可见"
-                description="你已经将这位角色加入黑名单，相关朋友圈内容会先隐藏。"
+                badge={t(msg`已隐藏`)}
+                title={t(msg`这位角色的朋友圈当前不可见`)}
+                description={t(msg`你已经将这位角色加入黑名单，相关朋友圈内容会先隐藏。`)}
               />
             ) : null}
 
@@ -503,9 +507,9 @@ export function MobileFriendMomentsPage() {
             !isBlocked &&
             !friendMoments.length ? (
               <MobileFriendMomentsStateCard
-                badge="角色朋友圈"
-                title={`${displayName} 还没有发表朋友圈`}
-                description="先把这页留着，等 TA 下次更新时再回来看看。"
+                badge={t(msg`角色朋友圈`)}
+                title={t(msg`${displayName} 还没有发表朋友圈`)}
+                description={t(msg`先把这页留着，等 TA 下次更新时再回来看看。`)}
               />
             ) : null}
 
@@ -665,7 +669,7 @@ function MobileFriendMomentCard({
               disabled={likePending}
             >
               <Heart size={14} className="mr-1" />
-              {likePending ? "处理中..." : "赞"}
+              {likePending ? t(msg`处理中...`) : t(msg`赞`)}
             </Button>
             <Button
               variant="secondary"
@@ -675,7 +679,7 @@ function MobileFriendMomentCard({
               disabled={!commentDraft.trim() || commentPending}
             >
               <MessageCircle size={14} className="mr-1" />
-              {commentPending ? "发送中..." : "评论"}
+              {commentPending ? t(msg`发送中...`) : t(msg`评论`)}
             </Button>
           </div>
         </div>
@@ -684,9 +688,9 @@ function MobileFriendMomentCard({
             {moment.likes.length > 0 ? (
               <div className="text-[12px] leading-6 text-[color:var(--text-secondary)]">
                 <span className="font-medium text-[color:var(--text-primary)]">
-                  赞
+                  {t(msg`赞`)}
                 </span>
-                {` · ${moment.likes.map((item) => item.authorName).join("，")}`}
+                {t(msg` · ${moment.likes.map((item) => item.authorName).join("，")}`)}
               </div>
             ) : null}
             {moment.comments.map((comment) => {
@@ -714,14 +718,14 @@ function MobileFriendMomentCard({
                   {replyToName ? (
                     <>
                       <span className="text-[color:var(--text-secondary)]">
-                        {" "}回复{" "}
+                        {t(msg` 回复 `)}
                       </span>
                       <span className="font-medium text-[#07c160]">
                         {replyToName}
                       </span>
                     </>
                   ) : null}
-                  <span className="text-[color:var(--text-secondary)]">：</span>
+                  <span className="text-[color:var(--text-secondary)]">{t(msg`：`)}</span>
                   <span className="text-[color:var(--text-primary)]">{comment.text}</span>
                 </button>
               );
@@ -737,21 +741,21 @@ function MobileFriendMomentCard({
               <div className="mt-2 flex items-start justify-between gap-2 rounded-[12px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[12px] text-[color:var(--text-secondary)]">
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="truncate">
-                    正在回复 {replyTarget.authorName}
+                    {t(msg`正在回复 ${replyTarget.authorName}`)}
                   </div>
                   {replyTargetComment ? (
                     <div className="truncate text-[color:var(--text-muted)]">
-                      「{replyTargetComment.text}」
+                      {t(msg`「${replyTargetComment.text}」`)}
                     </div>
                   ) : null}
                 </div>
                 <button
                   type="button"
                   onClick={onCancelReply}
-                  aria-label="取消回复"
+                  aria-label={t(msg`取消回复`)}
                   className="shrink-0 rounded-full px-2 py-0.5 text-[11px] text-[color:var(--text-muted)] hover:bg-white"
                 >
-                  取消
+                  {t(msg`取消`)}
                 </button>
               </div>
             );
@@ -764,7 +768,7 @@ function MobileFriendMomentCard({
             onSubmit={onCommentSubmit}
             pending={commentPending}
             placeholder={
-              replyTarget ? `回复 ${replyTarget.authorName}...` : "说点什么..."
+              replyTarget ? t(msg`回复 ${replyTarget.authorName}...`) : t(msg`说点什么...`)
             }
             inputClassName="rounded-full py-1.5 text-[16px]"
             buttonClassName="h-8 px-3 text-[12px]"
@@ -825,7 +829,7 @@ function formatTimelineDate(value: string) {
   }
 
   return {
-    month: `${parsedDate.getMonth() + 1}月`,
+    month: t(msg`${parsedDate.getMonth() + 1}月`),
     day: `${parsedDate.getDate()}`.padStart(2, "0"),
   };
 }

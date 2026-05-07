@@ -1,4 +1,5 @@
 import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
+import { msg } from "@lingui/macro";
 import {
   type MomentContentType,
   type MomentImageAsset,
@@ -6,8 +7,11 @@ import {
   type MomentVideoAsset,
 } from "@yinjie/contracts";
 import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
 import { formatMomentDurationLabel } from "../features/moments/moment-compose-media";
+
+const t = translateRuntimeMessage;
 
 type MomentMediaGalleryProps = {
   contentType: MomentContentType;
@@ -115,12 +119,12 @@ export function MomentMediaGallery({
               setViewerState({ kind: "video" });
             }}
             className="group relative block w-full text-left"
-            aria-label="打开视频预览"
+            aria-label={t(msg`打开视频预览`)}
           >
             {video.posterUrl ? (
               <img
                 src={video.posterUrl}
-                alt={video.fileName || "朋友圈视频"}
+                alt={video.fileName || t(msg`朋友圈视频`)}
                 className="w-full bg-black object-cover"
                 style={{
                   aspectRatio:
@@ -153,7 +157,7 @@ export function MomentMediaGallery({
             </div>
             <div className="pointer-events-none absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/58 px-3 py-1 text-[11px] font-medium text-white">
               <Play size={12} className="fill-current" />
-              视频
+              {t(msg`视频`)}
             </div>
             {video.durationMs ? (
               <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/58 px-3 py-1 text-[11px] font-medium text-white">
@@ -217,13 +221,13 @@ export function MomentMediaGallery({
           >
             <img
               src={asset.thumbnailUrl || asset.url}
-              alt={asset.fileName || "朋友圈图片"}
+              alt={asset.fileName || t(msg`朋友圈图片`)}
               className="h-full w-full object-cover transition duration-200 hover:scale-[1.015]"
               loading="lazy"
             />
             {asset.livePhoto?.enabled ? (
               <div className="pointer-events-none absolute left-2 top-2 rounded-full bg-black/58 px-2.5 py-1 text-[10px] font-medium text-white">
-                实况
+                {t(msg`实况`)}
               </div>
             ) : null}
           </button>
@@ -298,20 +302,20 @@ function MomentImageViewerOverlay({
         type="button"
         onClick={onClose}
         className="absolute inset-0"
-        aria-label="关闭图片预览"
+        aria-label={t(msg`关闭图片预览`)}
       />
       <div className="absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+0.75rem)] z-10 flex items-center justify-between gap-3 px-4 text-white">
         <button
           type="button"
           onClick={onClose}
           className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/12 text-white"
-          aria-label="关闭图片预览"
+          aria-label={t(msg`关闭图片预览`)}
         >
           <X size={18} />
         </button>
         <div className="min-w-0 flex-1 text-center">
           <div className="truncate text-sm font-medium">
-            {image.fileName || "朋友圈图片"}
+            {image.fileName || t(msg`朋友圈图片`)}
           </div>
           <div className="mt-1 text-xs text-white/70">
             {activeIndex + 1} / {total}
@@ -323,7 +327,7 @@ function MomentImageViewerOverlay({
       <div className="absolute inset-0 flex items-center justify-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+4.5rem)] pt-[calc(env(safe-area-inset-top,0px)+4.5rem)]">
         <img
           src={image.url}
-          alt={image.fileName || "朋友圈图片"}
+          alt={image.fileName || t(msg`朋友圈图片`)}
           className="max-h-full max-w-full object-contain"
         />
       </div>
@@ -331,7 +335,7 @@ function MomentImageViewerOverlay({
       {onPrevious ? (
         <ViewerNavButton
           position={isMobile ? "bottom-left" : "left"}
-          label="上一张"
+          label={t(msg`上一张`)}
           onClick={onPrevious}
         >
           <ChevronLeft size={20} />
@@ -340,7 +344,7 @@ function MomentImageViewerOverlay({
       {onNext ? (
         <ViewerNavButton
           position={isMobile ? "bottom-right" : "right"}
-          label="下一张"
+          label={t(msg`下一张`)}
           onClick={onNext}
         >
           <ChevronRight size={20} />
@@ -363,16 +367,16 @@ function MomentVideoViewerOverlay({
         type="button"
         onClick={onClose}
         className="absolute inset-0"
-        aria-label="关闭视频预览"
+        aria-label={t(msg`关闭视频预览`)}
       />
       <div className="absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+0.75rem)] z-10 flex items-center justify-between gap-3 px-4 text-white">
         <div className="min-w-0">
           <div className="truncate text-sm font-medium">
-            {video.fileName || "朋友圈视频"}
+            {video.fileName || t(msg`朋友圈视频`)}
           </div>
           {video.durationMs ? (
             <div className="mt-1 text-xs text-white/70">
-              时长 {formatMomentDurationLabel(video.durationMs)}
+              {t(msg`时长 ${formatMomentDurationLabel(video.durationMs)}`)}
             </div>
           ) : null}
         </div>
@@ -380,7 +384,7 @@ function MomentVideoViewerOverlay({
           type="button"
           onClick={onClose}
           className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/12 text-white"
-          aria-label="关闭视频预览"
+          aria-label={t(msg`关闭视频预览`)}
         >
           <X size={18} />
         </button>

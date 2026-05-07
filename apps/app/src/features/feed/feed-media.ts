@@ -1,8 +1,12 @@
+import { msg } from "@lingui/macro";
 import type {
   FeedMediaAsset,
   FeedPost,
   MomentContentType,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
 
 export function resolveFeedMomentContentType(
   media: FeedMediaAsset[],
@@ -27,14 +31,14 @@ export function getFeedSummaryText(
   }
 
   if (post.media[0]?.kind === "video" || post.mediaType === "video") {
-    return "分享了一段视频";
+    return t(msg`分享了一段视频`);
   }
 
   const imageCount = post.media.filter(
     (asset) => asset.kind === "image",
   ).length;
   if (imageCount > 0) {
-    return `分享了 ${imageCount} 张图片`;
+    return t(msg`分享了 ${imageCount} 张图片`);
   }
 
   return "";

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
@@ -9,6 +10,7 @@ import {
   Trees,
 } from "lucide-react";
 import { triggerSceneFriendRequest } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   InlineNotice,
   cn,
@@ -20,29 +22,31 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
+const t = translateRuntimeMessage;
+
 const scenes = [
   {
     id: "coffee_shop",
-    label: "咖啡馆",
-    description: "适合轻松开场和日常寒暄。",
+    label: t(msg`咖啡馆`),
+    description: t(msg`适合轻松开场和日常寒暄。`),
     icon: Coffee,
   },
   {
     id: "gym",
-    label: "健身房",
-    description: "更容易遇到直接一点的搭话。",
+    label: t(msg`健身房`),
+    description: t(msg`更容易遇到直接一点的搭话。`),
     icon: Dumbbell,
   },
   {
     id: "library",
-    label: "图书馆",
-    description: "偏安静，也更像慢热型相遇。",
+    label: t(msg`图书馆`),
+    description: t(msg`偏安静，也更像慢热型相遇。`),
     icon: BookOpen,
   },
   {
     id: "park",
-    label: "公园",
-    description: "随机性更强，气氛也更开放。",
+    label: t(msg`公园`),
+    description: t(msg`随机性更强，气氛也更开放。`),
     icon: Trees,
   },
 ];
@@ -69,9 +73,9 @@ export function DiscoverScenePage() {
   if (isDesktopLayout) {
     return (
       <RouteRedirectState
-        title="正在切换到桌面发现页"
-        description="桌面端的场景相遇入口已经收口到桌面发现工作区，先回到主发现页。"
-        loadingLabel="正在切换到桌面发现页..."
+        title={t(msg`正在切换到桌面发现页`)}
+        description={t(msg`桌面端的场景相遇入口已经收口到桌面发现工作区，先回到主发现页。`)}
+        loadingLabel={t(msg`正在切换到桌面发现页...`)}
       />
     );
   }
@@ -107,11 +111,11 @@ function MobileDiscoverScenePage() {
       const sceneLabel = scenes.find((item) => item.id === scene)?.label ?? scene;
 
       if (!request) {
-        setMessage(`${sceneLabel} 里暂时没有新的相遇。`);
+        setMessage(t(msg`${sceneLabel} 里暂时没有新的相遇。`));
         return;
       }
 
-      setMessage(`${request.characterName} 在${sceneLabel}里注意到了你：${request.greeting ?? "对你产生了兴趣。"}`);
+      setMessage(t(msg`${request.characterName} 在${sceneLabel}里注意到了你：${request.greeting ?? t(msg`对你产生了兴趣。`)}`));
       void queryClient.invalidateQueries({ queryKey: ["app-friend-requests", baseUrl] });
     },
   });
@@ -145,12 +149,12 @@ function MobileDiscoverScenePage() {
 
   return (
     <MobileDiscoverToolShell
-      title="场景相遇"
-      subtitle="换一个地点，换一种相遇方式"
-      shareTitle="场景相遇"
-      shareSummary="选择一个地点，触发不同角色的靠近方式，并把结果直接写进新的好友申请。"
-      heroTitle="选择一个地点"
-      heroDescription="不同地点会触发不同角色的靠近方式，并把结果写进新的好友申请。"
+      title={t(msg`场景相遇`)}
+      subtitle={t(msg`换一个地点，换一种相遇方式`)}
+      shareTitle={t(msg`场景相遇`)}
+      shareSummary={t(msg`选择一个地点，触发不同角色的靠近方式，并把结果直接写进新的好友申请。`)}
+      heroTitle={t(msg`选择一个地点`)}
+      heroDescription={t(msg`不同地点会触发不同角色的靠近方式，并把结果写进新的好友申请。`)}
       heroVisual={<MapPin size={28} />}
       notice={
         message ? (
@@ -194,7 +198,7 @@ function MobileDiscoverScenePage() {
                   <Icon size={18} />
                 </div>
                 <div className="mt-3 text-[15px] font-medium text-[#111827]">
-                  {busy ? `正在前往${scene.label}...` : scene.label}
+                  {busy ? t(msg`正在前往${scene.label}...`) : scene.label}
                 </div>
                 <div className="mt-1 text-[12px] leading-5 text-[#8c8c8c]">
                   {scene.description}
@@ -204,7 +208,7 @@ function MobileDiscoverScenePage() {
           })}
         </div>
         <div className="border-t border-black/5 px-4 py-3 text-[13px] leading-6 text-[#6b7280]">
-          点一下就触发，不做多层确认，结果会直接回到好友申请里。
+          {t(msg`点一下就触发，不做多层确认，结果会直接回到好友申请里。`)}
         </div>
       </section>
 
@@ -222,7 +226,7 @@ function MobileDiscoverScenePage() {
                   onClick={() => sceneMutation.mutate(sceneMutation.variables)}
                   className="rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
                 >
-                  重试场景相遇
+                  {t(msg`重试场景相遇`)}
                 </button>
               ) : null}
               <button
@@ -231,8 +235,8 @@ function MobileDiscoverScenePage() {
                 className="rounded-full border border-[rgba(220,38,38,0.14)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--state-danger-text)]"
               >
                 {routeState.returnPath && !isDesktopOnlyPath(routeState.returnPath)
-                  ? "返回上一页"
-                  : "回发现页"}
+                  ? t(msg`返回上一页`)
+                  : t(msg`回发现页`)}
               </button>
             </div>
           </div>
