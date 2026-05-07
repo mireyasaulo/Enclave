@@ -209,7 +209,7 @@ export function DiscoverFeedPage() {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice("广场互动已更新。");
+      setNotice(t(msg`广场互动已更新。`));
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
         queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] }),
