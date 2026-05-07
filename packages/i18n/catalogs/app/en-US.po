@@ -2434,6 +2434,11 @@ msgstr "Today's Channels clip"
 msgid "今天这张背景，像不像我们刚刚路过的天气？"
 msgstr "Does this background feel like the weather we just walked through?"
 
+#. placeholder {0}: String(params.limit ?? "?")
+#: apps/app/src/lib/error-translate.ts:99
+msgid "今日偷菜次数已达上限（{0}/天）。"
+msgstr "Daily steal limit reached ({0}/day)."
+
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:114
 #: apps/app/src/i18n/static-dom-seed.ts:255
 msgid "今日安排"
@@ -2550,6 +2555,11 @@ msgstr "Choose contacts from your list to add to “{groupName}”."
 #: apps/app/src/features/games/farm/farm-page.tsx:157
 msgid "仓库"
 msgstr "Warehouse"
+
+#. placeholder {0}: String(params.cropName ?? "")
+#: apps/app/src/lib/error-translate.ts:85
+msgid "仓库中 {0} 不足。"
+msgstr "Insufficient {0} in warehouse."
 
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:60
 msgid "仓库还是空的，先去种点东西吧"
@@ -2769,7 +2779,7 @@ msgstr "Crops ripen by real-world hours. When you're offline, world characters k
 msgid "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。"
 msgstr "Crops ripen by real-world hours. When you're offline, world characters keep working their own fields."
 
-#: apps/app/src/lib/error-translate.ts:70
+#: apps/app/src/lib/error-translate.ts:76
 msgid "作物还没成熟。"
 msgstr "Crop is not ripe yet."
 
@@ -2838,6 +2848,10 @@ msgstr "Hi, I'm {normalizedOwnerName}. I'd like to add you to my contacts."
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:539
 msgid "你已关闭本地摄像头，仍可继续进行数字人视频通话。"
 msgstr "You've turned off your local camera, but the AI avatar video call can continue."
+
+#: apps/app/src/lib/error-translate.ts:90
+msgid "你已经偷过这块田了。"
+msgstr "You've already stolen from this plot."
 
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:191
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:501
@@ -6775,7 +6789,7 @@ msgstr "Map"
 msgid "地图服务"
 msgstr "Map service"
 
-#: apps/app/src/lib/error-translate.ts:68
+#: apps/app/src/lib/error-translate.ts:74
 msgid "地块上没有作物。"
 msgstr "No crop on this plot."
 
@@ -7481,6 +7495,11 @@ msgstr "Family car"
 #: apps/app/src/routes/chat-details-page.tsx:1165
 msgid "对 {0} 进行隐藏、清空或安全操作。"
 msgstr "Hide, clear, or apply safety actions to {0}."
+
+#. placeholder {0}: String(params.op ?? "")
+#: apps/app/src/lib/error-translate.ts:79
+msgid "对 NPC 的此操作将在邻居模块开放：{0}"
+msgstr "This NPC operation will open in the neighbour module: {0}"
 
 #: apps/app/src/i18n/static-dom-seed.ts:627
 #: apps/app/src/routes/legal-terms-page.tsx:24
@@ -11899,7 +11918,7 @@ msgstr "Failed to submit activation request. Please try again later."
 msgid "提交投诉"
 msgstr "Submit report"
 
-#: apps/app/src/lib/error-translate.ts:72
+#: apps/app/src/lib/error-translate.ts:102
 msgid "提交的数据无效，请检查后重试。"
 msgstr "Submitted data is invalid, please check and retry."
 
@@ -12880,6 +12899,10 @@ msgstr "Database"
 msgid "数据库{0}"
 msgstr "Database {0}"
 
+#: apps/app/src/lib/error-translate.ts:82
+msgid "数量必须为正整数。"
+msgstr "Quantity must be a positive integer."
+
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:275
 msgid "整理"
 msgstr "Organize"
@@ -13842,7 +13865,7 @@ msgstr "View service notifications and subscription articles here"
 msgid "服务器暂时不可用，请稍后再试。"
 msgstr "The server is temporarily unavailable. Try again later."
 
-#: apps/app/src/lib/error-translate.ts:74
+#: apps/app/src/lib/error-translate.ts:104
 msgid "服务暂时不可用，请稍后再试。"
 msgstr "Service temporarily unavailable, please try again later."
 
@@ -17128,6 +17151,10 @@ msgstr "Separate multiple tags with commas, for example: coworker, illustration,
 msgid "田块 {0}"
 msgstr "Plot {0}"
 
+#: apps/app/src/lib/error-translate.ts:70
+msgid "田块不存在。"
+msgstr "Plot does not exist."
+
 #: apps/app/src/features/games/farm/components/farm-mascot.tsx:82
 msgid "田里 {bugCount} 只虫子，记得清一下。"
 msgstr "{bugCount} bugs in the field — remember to clear them."
@@ -18309,6 +18336,12 @@ msgstr "Once messages arrive, you can search them here by keyword, images, files
 #: apps/app/src/lib/error-translate.ts:59
 msgid "等级不足：需 {0} 级才能种 {1}"
 msgstr "Level not enough: need level {0} to plant {1}"
+
+#. placeholder {0}: String(params.unlockLevel ?? "?")
+#. placeholder {1}: String(params.cropName ?? "")
+#: apps/app/src/lib/error-translate.ts:63
+msgid "等级不足：需 {0} 级才能购买 {1} 种子"
+msgstr "Level too low: need level {0} to buy {1} seed"
 
 #: apps/app/src/routes/chat-list-page.tsx:1070
 msgid "等角色、群聊或服务号开始发消息后，这里会显示最近会话。"
@@ -20153,6 +20186,10 @@ msgstr "Future interactions from this character will be blocked"
 msgid "该角色当前不可见。"
 msgstr "This character is currently not visible."
 
+#: apps/app/src/lib/error-translate.ts:88
+msgid "该角色还没有农场。"
+msgstr "This character doesn't have a farm yet."
+
 #: apps/app/src/features/games/game-center-session-panel.tsx:95
 msgid "详情页"
 msgstr "Details page"
@@ -21784,9 +21821,21 @@ msgstr "This character's Moments aren't visible right now"
 msgid "这台桌面端正在承接你的世界。"
 msgstr "This desktop is currently carrying your world."
 
-#: apps/app/src/lib/error-translate.ts:66
+#: apps/app/src/lib/error-translate.ts:72
 msgid "这块地现在不能种植。"
 msgstr "This plot can't be planted right now."
+
+#: apps/app/src/lib/error-translate.ts:92
+msgid "这块田今日已浇过水。"
+msgstr "This plot has already been watered today."
+
+#: apps/app/src/lib/error-translate.ts:96
+msgid "这块田没有害虫。"
+msgstr "This plot has no bugs."
+
+#: apps/app/src/lib/error-translate.ts:94
+msgid "这块田没有杂草。"
+msgstr "This plot has no weeds."
 
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:437
 msgid "这张图片已经失去上下文"
@@ -22893,7 +22942,7 @@ msgid "金币不足"
 msgstr "Not enough coins"
 
 #. placeholder {0}: String(params.required ?? "?")
-#: apps/app/src/lib/error-translate.ts:63
+#: apps/app/src/lib/error-translate.ts:67
 msgid "金币不足：需 {0}"
 msgstr "Not enough coins: need {0}"
 

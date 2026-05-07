@@ -58,16 +58,46 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(
         msg`等级不足：需 ${String(params.unlockLevel ?? "?")} 级才能种 ${String(params.cropName ?? "")}`,
       );
+    case "FARM_BUY_LEVEL_TOO_LOW":
+      return translateRuntimeMessage(
+        msg`等级不足：需 ${String(params.unlockLevel ?? "?")} 级才能购买 ${String(params.cropName ?? "")} 种子`,
+      );
     case "FARM_INSUFFICIENT_COINS":
       return translateRuntimeMessage(
         msg`金币不足：需 ${String(params.required ?? "?")}`,
       );
+    case "FARM_PLOT_NOT_FOUND":
+      return translateRuntimeMessage(msg`田块不存在。`);
     case "FARM_PLOT_NOT_PLANTABLE":
       return translateRuntimeMessage(msg`这块地现在不能种植。`);
     case "FARM_PLOT_EMPTY":
       return translateRuntimeMessage(msg`地块上没有作物。`);
     case "FARM_CROP_NOT_RIPE":
       return translateRuntimeMessage(msg`作物还没成熟。`);
+    case "FARM_NPC_OPERATION_NOT_OPEN":
+      return translateRuntimeMessage(
+        msg`对 NPC 的此操作将在邻居模块开放：${String(params.op ?? "")}`,
+      );
+    case "FARM_QUANTITY_INVALID":
+      return translateRuntimeMessage(msg`数量必须为正整数。`);
+    case "FARM_WAREHOUSE_INSUFFICIENT":
+      return translateRuntimeMessage(
+        msg`仓库中 ${String(params.cropName ?? "")} 不足。`,
+      );
+    case "FARM_NPC_NO_FARM":
+      return translateRuntimeMessage(msg`该角色还没有农场。`);
+    case "FARM_ALREADY_STOLEN":
+      return translateRuntimeMessage(msg`你已经偷过这块田了。`);
+    case "FARM_ALREADY_WATERED":
+      return translateRuntimeMessage(msg`这块田今日已浇过水。`);
+    case "FARM_NO_WEEDS":
+      return translateRuntimeMessage(msg`这块田没有杂草。`);
+    case "FARM_NO_BUGS":
+      return translateRuntimeMessage(msg`这块田没有害虫。`);
+    case "FARM_DAILY_STEAL_LIMIT":
+      return translateRuntimeMessage(
+        msg`今日偷菜次数已达上限（${String(params.limit ?? "?")}/天）。`,
+      );
     case "VALIDATION_FAILED":
       return translateRuntimeMessage(msg`提交的数据无效，请检查后重试。`);
     case "INTERNAL_ERROR":

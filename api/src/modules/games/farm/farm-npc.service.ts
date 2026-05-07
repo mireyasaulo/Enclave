@@ -1,7 +1,5 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CharactersService } from '../../characters/characters.service';
@@ -125,18 +123,28 @@ export class FarmNpcService {
     characterId: string,
   ): Promise<FarmNeighborDetail> {
     if (FARM_EXCLUDED_CHARACTER_IDS.has(characterId)) {
-      throw new NotFoundException('该角色不参与农场');
+      throw new AppError('FARM_CHARACTER_NOT_PARTICIPATING', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '该角色不参与农场',
+      });
     }
     const character = await this.charactersService.findById(characterId);
     if (!character) {
-      throw new NotFoundException(`角色不存在：${characterId}`);
+      throw new AppError('FARM_CHARACTER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { characterId },
+        legacyMessage: `角色不存在：${characterId}`,
+      });
     }
     const isVisible = await this.charactersService.isVisibleToOwner(
       characterId,
       ownerId,
     );
     if (!isVisible) {
-      throw new NotFoundException('该角色当前不可见');
+      throw new AppError('FARM_CHARACTER_NOT_VISIBLE', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '该角色当前不可见',
+      });
     }
     const npc = await this.getOrCreateNpcState(character, ownerId);
     const now = Date.now();

@@ -2436,6 +2436,11 @@ msgstr "今天的视频号片段"
 msgid "今天这张背景，像不像我们刚刚路过的天气？"
 msgstr "今天这张背景，像不像我们刚刚路过的天气？"
 
+#. placeholder {0}: String(params.limit ?? "?")
+#: apps/app/src/lib/error-translate.ts:99
+msgid "今日偷菜次数已达上限（{0}/天）。"
+msgstr "今日偷菜次数已达上限（{0}/天）。"
+
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:114
 #: apps/app/src/i18n/static-dom-seed.ts:255
 msgid "今日安排"
@@ -2552,6 +2557,11 @@ msgstr "从通讯录里选择要加入“{groupName}”的角色。"
 #: apps/app/src/features/games/farm/farm-page.tsx:157
 msgid "仓库"
 msgstr "仓库"
+
+#. placeholder {0}: String(params.cropName ?? "")
+#: apps/app/src/lib/error-translate.ts:85
+msgid "仓库中 {0} 不足。"
+msgstr "仓库中 {0} 不足。"
 
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:60
 msgid "仓库还是空的，先去种点东西吧"
@@ -2771,7 +2781,7 @@ msgstr "作物按真实小时数成熟。下线时世界角色仍在自己的田
 msgid "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。"
 msgstr "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。"
 
-#: apps/app/src/lib/error-translate.ts:70
+#: apps/app/src/lib/error-translate.ts:76
 msgid "作物还没成熟。"
 msgstr "作物还没成熟。"
 
@@ -2840,6 +2850,10 @@ msgstr "你好，我是{normalizedOwnerName}，想把你添加到通讯录里。
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:539
 msgid "你已关闭本地摄像头，仍可继续进行数字人视频通话。"
 msgstr "你已关闭本地摄像头，仍可继续进行数字人视频通话。"
+
+#: apps/app/src/lib/error-translate.ts:90
+msgid "你已经偷过这块田了。"
+msgstr "你已经偷过这块田了。"
 
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:191
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:501
@@ -6777,7 +6791,7 @@ msgstr "地图"
 msgid "地图服务"
 msgstr "地图服务"
 
-#: apps/app/src/lib/error-translate.ts:68
+#: apps/app/src/lib/error-translate.ts:74
 msgid "地块上没有作物。"
 msgstr "地块上没有作物。"
 
@@ -7483,6 +7497,11 @@ msgstr "家用车"
 #: apps/app/src/routes/chat-details-page.tsx:1165
 msgid "对 {0} 进行隐藏、清空或安全操作。"
 msgstr "对 {0} 进行隐藏、清空或安全操作。"
+
+#. placeholder {0}: String(params.op ?? "")
+#: apps/app/src/lib/error-translate.ts:79
+msgid "对 NPC 的此操作将在邻居模块开放：{0}"
+msgstr "对 NPC 的此操作将在邻居模块开放：{0}"
 
 #: apps/app/src/i18n/static-dom-seed.ts:627
 #: apps/app/src/routes/legal-terms-page.tsx:24
@@ -11901,7 +11920,7 @@ msgstr "提交开通申请失败，请稍后重试。"
 msgid "提交投诉"
 msgstr "提交投诉"
 
-#: apps/app/src/lib/error-translate.ts:72
+#: apps/app/src/lib/error-translate.ts:102
 msgid "提交的数据无效，请检查后重试。"
 msgstr "提交的数据无效，请检查后重试。"
 
@@ -12882,6 +12901,10 @@ msgstr "数据库"
 msgid "数据库{0}"
 msgstr "数据库{0}"
 
+#: apps/app/src/lib/error-translate.ts:82
+msgid "数量必须为正整数。"
+msgstr "数量必须为正整数。"
+
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:275
 msgid "整理"
 msgstr "整理"
@@ -13844,7 +13867,7 @@ msgstr "服务号通知和订阅号文章都在这里查看"
 msgid "服务器暂时不可用，请稍后再试。"
 msgstr "服务器暂时不可用，请稍后再试。"
 
-#: apps/app/src/lib/error-translate.ts:74
+#: apps/app/src/lib/error-translate.ts:104
 msgid "服务暂时不可用，请稍后再试。"
 msgstr "服务暂时不可用，请稍后再试。"
 
@@ -17130,6 +17153,10 @@ msgstr "用逗号分隔多个标签，例如：同事，插画，策展。"
 msgid "田块 {0}"
 msgstr "田块 {0}"
 
+#: apps/app/src/lib/error-translate.ts:70
+msgid "田块不存在。"
+msgstr "田块不存在。"
+
 #: apps/app/src/features/games/farm/components/farm-mascot.tsx:82
 msgid "田里 {bugCount} 只虫子，记得清一下。"
 msgstr "田里 {bugCount} 只虫子，记得清一下。"
@@ -18311,6 +18338,12 @@ msgstr "等有消息后，这里会按关键词、图片、文件和链接帮你
 #: apps/app/src/lib/error-translate.ts:59
 msgid "等级不足：需 {0} 级才能种 {1}"
 msgstr "等级不足：需 {0} 级才能种 {1}"
+
+#. placeholder {0}: String(params.unlockLevel ?? "?")
+#. placeholder {1}: String(params.cropName ?? "")
+#: apps/app/src/lib/error-translate.ts:63
+msgid "等级不足：需 {0} 级才能购买 {1} 种子"
+msgstr "等级不足：需 {0} 级才能购买 {1} 种子"
 
 #: apps/app/src/routes/chat-list-page.tsx:1070
 msgid "等角色、群聊或服务号开始发消息后，这里会显示最近会话。"
@@ -20155,6 +20188,10 @@ msgstr "该角色后续互动会被拦截"
 msgid "该角色当前不可见。"
 msgstr "该角色当前不可见。"
 
+#: apps/app/src/lib/error-translate.ts:88
+msgid "该角色还没有农场。"
+msgstr "该角色还没有农场。"
+
 #: apps/app/src/features/games/game-center-session-panel.tsx:95
 msgid "详情页"
 msgstr "详情页"
@@ -21786,9 +21823,21 @@ msgstr "这位角色的朋友圈当前不可见"
 msgid "这台桌面端正在承接你的世界。"
 msgstr "这台桌面端正在承接你的世界。"
 
-#: apps/app/src/lib/error-translate.ts:66
+#: apps/app/src/lib/error-translate.ts:72
 msgid "这块地现在不能种植。"
 msgstr "这块地现在不能种植。"
+
+#: apps/app/src/lib/error-translate.ts:92
+msgid "这块田今日已浇过水。"
+msgstr "这块田今日已浇过水。"
+
+#: apps/app/src/lib/error-translate.ts:96
+msgid "这块田没有害虫。"
+msgstr "这块田没有害虫。"
+
+#: apps/app/src/lib/error-translate.ts:94
+msgid "这块田没有杂草。"
+msgstr "这块田没有杂草。"
 
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:437
 msgid "这张图片已经失去上下文"
@@ -22895,7 +22944,7 @@ msgid "金币不足"
 msgstr "金币不足"
 
 #. placeholder {0}: String(params.required ?? "?")
-#: apps/app/src/lib/error-translate.ts:63
+#: apps/app/src/lib/error-translate.ts:67
 msgid "金币不足：需 {0}"
 msgstr "金币不足：需 {0}"
 
