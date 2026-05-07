@@ -219,3 +219,136 @@ msgstr "내 캐릭터"
 #. js-lingui-explicit-id
 msgid "你与 AI 化身的资料卡"
 msgstr "당신과 AI 아바타의 프로필 카드"
+#. js-lingui-explicit-id
+msgid "理念"
+msgstr "철학"
+#. js-lingui-explicit-id
+msgid "一个属于你的世界，从架构开始"
+msgstr "당신만의 세계, 설계 단계부터"
+#. js-lingui-explicit-id
+msgid "隐界不是一个共享的 chatbot 服务，而是一套可独立部署的 AI 社交基础设施。每个实例只为一个人存在。"
+msgstr "엔클레이브는 공유 챗봇 서비스가 아니라, 자체 배포 가능한 AI 소셜 인프라입니다. 인스턴스는 사용자당 하나입니다."
+#. js-lingui-explicit-id
+msgid "一人一世界"
+msgstr "한 사람당 하나의 세계"
+#. js-lingui-explicit-id
+msgid "独立实例架构，数据真正属于用户。隐私不靠承诺，靠架构层保障。"
+msgstr "독립 인스턴스 구조. 데이터는 진정으로 당신의 것이며, 개인정보는 약속이 아니라 아키텍처로 보호됩니다."
+#. js-lingui-explicit-id
+msgid "数据自主"
+msgstr "데이터 주권"
+#. js-lingui-explicit-id
+msgid "全部数据可导入导出，可整包迁移；离开隐界，世界还是你的。"
+msgstr "모든 데이터는 가져오기·내보내기 및 통째 이전이 가능합니다. 엔클레이브를 떠나도 세계는 그대로 당신의 것입니다."
+#. js-lingui-explicit-id
+msgid "AI 平权"
+msgstr "AI 평등권"
+#. js-lingui-explicit-id
+msgid "高质量对话不应被少数平台垄断。隐界让任何人都能拥有自己的 AI 居民。"
+msgstr "양질의 대화가 소수 플랫폼의 전유물이어선 안 됩니다. 엔클레이브는 누구나 자신의 AI 주민을 가질 수 있게 합니다."
+#. js-lingui-explicit-id
+msgid "不取代现实"
+msgstr "현실을 대체하지 않는다"
+#. js-lingui-explicit-id
+msgid "白天有同事、有老板，晚上回到隐界有心理咨询师；它补全你的情感维度，而不是替代真实关系。"
+msgstr "낮에는 동료와 상사가 있고, 밤에는 엔클레이브에 상담사가 있습니다. 현실의 관계를 대체하지 않고 감정의 결을 더해 줍니다."
+#. js-lingui-explicit-id
+msgid "移动随手用，桌面深度用"
+msgstr "모바일은 가볍게, 데스크톱은 깊게"
+#. js-lingui-explicit-id
+msgid "apps/app 是一份 React 19 + TypeScript 代码库，同时跑在 Web、iOS / Android Capacitor 壳、以及 Tauri 桌面壳上。"
+msgstr "apps/app 은 하나의 React 19 + TypeScript 코드베이스로, Web, iOS / Android (Capacitor), Tauri 데스크톱 셸에서 모두 동작합니다."
+#. js-lingui-explicit-id
+msgid "移动端"
+msgstr "모바일"
+#. js-lingui-explicit-id
+msgid "Web / iOS / Android"
+msgstr "Web / iOS / Android"
+#. js-lingui-explicit-id
+msgid "桌面端"
+msgstr "데스크톱"
+#. js-lingui-explicit-id
+msgid "Tauri · Windows / macOS / Linux"
+msgstr "Tauri · Windows / macOS / Linux"
+#. js-lingui-explicit-id
+msgid "聊天工作区（多窗口）"
+msgstr "채팅 워크스페이스(멀티 윈도우)"
+#. js-lingui-explicit-id
+msgid "聊天文件中心"
+msgstr "채팅 파일 센터"
+#. js-lingui-explicit-id
+msgid "聊天记录全局搜索"
+msgstr "전역 채팅 검색"
+#. js-lingui-explicit-id
+msgid "视频号直播伴侣"
+msgstr "라이브 컴패니언"
+#. js-lingui-explicit-id
+msgid "原生托盘 / 锁屏"
+msgstr "네이티브 트레이 / 잠금 화면"
+#. js-lingui-explicit-id
+msgid "克隆、起 docker、起飞"
+msgstr "클론, docker compose up, 시작"
+#. js-lingui-explicit-id
+msgid "完全开源，MIT 许可。无任何外部 SaaS 依赖；一台机器、一条 docker compose up，几分钟就能跑起来。"
+msgstr "완전 오픈소스, MIT 라이선스. 외부 SaaS 의존이 없으며, 한 대의 머신에서 docker compose up 으로 몇 분 만에 실행됩니다."
+#. js-lingui-explicit-id
+msgid "克隆仓库"
+msgstr "리포지토리 클론"
+#. js-lingui-explicit-id
+msgid "一键启动"
+msgstr "한 줄로 실행"
+#. js-lingui-explicit-id
+msgid "浏览器访问"
+msgstr "브라우저에서 열기"
+#. js-lingui-explicit-id
+msgid "查看完整自部署指南"
+msgstr "자체 호스팅 가이드 보기"
+#. js-lingui-explicit-id
+msgid "在 GitHub 上 Star"
+msgstr "GitHub 에서 Star"
+#. js-lingui-explicit-id
+msgid "常见问题"
+msgstr "자주 묻는 질문"
+#. js-lingui-explicit-id
+msgid "FAQ"
+msgstr "FAQ"
+#. js-lingui-explicit-id
+msgid "没找到你的问题？欢迎邮件联系我们。"
+msgstr "찾으시는 질문이 없나요? 언제든 이메일로 문의해 주세요."
+#. js-lingui-explicit-id
+msgid "隐界真的开源吗？"
+msgstr "엔클레이브는 정말 오픈소스인가요?"
+#. js-lingui-explicit-id
+msgid "是。整个 monorepo（apps/app、apps/desktop、cloud-api、admin、site 等）都在 GitHub 上以 MIT 许可证开放，欢迎自部署、二次开发、商用。"
+msgstr "네. 모든 monorepo (apps/app, apps/desktop, cloud-api, admin, site 등)가 MIT 라이선스로 GitHub 에 공개되어 있으며, 자체 호스팅 / 포크 / 상용화 모두 환영합니다."
+#. js-lingui-explicit-id
+msgid "我的数据保存在哪里？"
+msgstr "내 데이터는 어디에 저장되나요?"
+#. js-lingui-explicit-id
+msgid "保存在你自己部署的实例里。隐界采用一人一世界的独立实例架构，没有中心化的数据后台，没有跨用户的数据合并；你拥有数据所有权。"
+msgstr "직접 배포한 인스턴스에 저장됩니다. 엔클레이브는 한 사람당 하나의 인스턴스 구조로 운영되며, 중앙 데이터 백엔드도 사용자 간 데이터 병합도 없습니다. 데이터 소유권은 전적으로 사용자에게 있습니다."
+#. js-lingui-explicit-id
+msgid "用什么模型？能换模型吗？"
+msgstr "어떤 모델을 지원하나요? 교체할 수 있나요?"
+#. js-lingui-explicit-id
+msgid "默认与多家主流模型供应商兼容（OpenAI 兼容协议），可在订阅页或自部署配置里切换；本地模型同样支持，只要服务能开 OpenAI 兼容的 HTTP 接口。"
+msgstr "기본적으로 OpenAI 호환 프로토콜을 통해 주요 모델 제공자를 지원하며, 구독 화면 혹은 자체 호스팅 설정에서 전환할 수 있습니다. OpenAI 호환 HTTP 엔드포인트를 제공하면 로컬 모델도 그대로 사용할 수 있습니다."
+#. js-lingui-explicit-id
+msgid "可以离线使用吗？"
+msgstr "오프라인 사용이 가능한가요?"
+#. js-lingui-explicit-id
+msgid "本地客户端（Tauri 桌面壳、Capacitor 移动壳）可离线浏览历史；AI 对话需要联网到模型服务（无论你是连云端还是本地模型）。"
+msgstr "로컬 클라이언트(Tauri 데스크톱, Capacitor 모바일)는 오프라인에서도 기록을 볼 수 있습니다. AI 대화는 클라우드든 로컬이든 모델 서비스와의 통신이 필요합니다."
+#. js-lingui-explicit-id
+msgid "需要付费吗？"
+msgstr "유료인가요?"
+#. js-lingui-explicit-id
+msgid "自部署完全免费。如果选择官方托管的云服务，按使用量付费——账单与你接入的模型供应商绑定，没有中间溢价。"
+msgstr "자체 호스팅은 완전 무료입니다. 매니지드 클라우드를 선택하시면 사용량 기반으로 청구되며, 연결한 모델 제공자에게 직접 결제되고 중간 마진은 없습니다."
+#. js-lingui-explicit-id
+msgid "支持中英日韩之外的语言吗？"
+msgstr "중·영·일·한 외 다른 언어도 지원하나요?"
+#. js-lingui-explicit-id
+msgid "界面目前支持简中 / English / 日本語 / 한국어。AI 角色对话本身不限语种，跟着模型能力走。"
+msgstr "UI 는 현재 zh-CN / English / 日本語 / 한국어 를 지원합니다. AI 대화 자체는 언어에 구애받지 않으며, 모델의 역량을 따릅니다."
+

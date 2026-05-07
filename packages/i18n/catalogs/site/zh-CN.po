@@ -219,3 +219,136 @@ msgstr "我的角色"
 #. js-lingui-explicit-id
 msgid "你与 AI 化身的资料卡"
 msgstr "你与 AI 化身的资料卡"
+#. js-lingui-explicit-id
+msgid "理念"
+msgstr "理念"
+#. js-lingui-explicit-id
+msgid "一个属于你的世界，从架构开始"
+msgstr "一个属于你的世界，从架构开始"
+#. js-lingui-explicit-id
+msgid "隐界不是一个共享的 chatbot 服务，而是一套可独立部署的 AI 社交基础设施。每个实例只为一个人存在。"
+msgstr "隐界不是一个共享的 chatbot 服务，而是一套可独立部署的 AI 社交基础设施。每个实例只为一个人存在。"
+#. js-lingui-explicit-id
+msgid "一人一世界"
+msgstr "一人一世界"
+#. js-lingui-explicit-id
+msgid "独立实例架构，数据真正属于用户。隐私不靠承诺，靠架构层保障。"
+msgstr "独立实例架构，数据真正属于用户。隐私不靠承诺，靠架构层保障。"
+#. js-lingui-explicit-id
+msgid "数据自主"
+msgstr "数据自主"
+#. js-lingui-explicit-id
+msgid "全部数据可导入导出，可整包迁移；离开隐界，世界还是你的。"
+msgstr "全部数据可导入导出，可整包迁移；离开隐界，世界还是你的。"
+#. js-lingui-explicit-id
+msgid "AI 平权"
+msgstr "AI 平权"
+#. js-lingui-explicit-id
+msgid "高质量对话不应被少数平台垄断。隐界让任何人都能拥有自己的 AI 居民。"
+msgstr "高质量对话不应被少数平台垄断。隐界让任何人都能拥有自己的 AI 居民。"
+#. js-lingui-explicit-id
+msgid "不取代现实"
+msgstr "不取代现实"
+#. js-lingui-explicit-id
+msgid "白天有同事、有老板，晚上回到隐界有心理咨询师；它补全你的情感维度，而不是替代真实关系。"
+msgstr "白天有同事、有老板，晚上回到隐界有心理咨询师；它补全你的情感维度，而不是替代真实关系。"
+#. js-lingui-explicit-id
+msgid "移动随手用，桌面深度用"
+msgstr "移动随手用，桌面深度用"
+#. js-lingui-explicit-id
+msgid "apps/app 是一份 React 19 + TypeScript 代码库，同时跑在 Web、iOS / Android Capacitor 壳、以及 Tauri 桌面壳上。"
+msgstr "apps/app 是一份 React 19 + TypeScript 代码库，同时跑在 Web、iOS / Android Capacitor 壳、以及 Tauri 桌面壳上。"
+#. js-lingui-explicit-id
+msgid "移动端"
+msgstr "移动端"
+#. js-lingui-explicit-id
+msgid "Web / iOS / Android"
+msgstr "Web / iOS / Android"
+#. js-lingui-explicit-id
+msgid "桌面端"
+msgstr "桌面端"
+#. js-lingui-explicit-id
+msgid "Tauri · Windows / macOS / Linux"
+msgstr "Tauri · Windows / macOS / Linux"
+#. js-lingui-explicit-id
+msgid "聊天工作区（多窗口）"
+msgstr "聊天工作区（多窗口）"
+#. js-lingui-explicit-id
+msgid "聊天文件中心"
+msgstr "聊天文件中心"
+#. js-lingui-explicit-id
+msgid "聊天记录全局搜索"
+msgstr "聊天记录全局搜索"
+#. js-lingui-explicit-id
+msgid "视频号直播伴侣"
+msgstr "视频号直播伴侣"
+#. js-lingui-explicit-id
+msgid "原生托盘 / 锁屏"
+msgstr "原生托盘 / 锁屏"
+#. js-lingui-explicit-id
+msgid "克隆、起 docker、起飞"
+msgstr "克隆、起 docker、起飞"
+#. js-lingui-explicit-id
+msgid "完全开源，MIT 许可。无任何外部 SaaS 依赖；一台机器、一条 docker compose up，几分钟就能跑起来。"
+msgstr "完全开源，MIT 许可。无任何外部 SaaS 依赖；一台机器、一条 docker compose up，几分钟就能跑起来。"
+#. js-lingui-explicit-id
+msgid "克隆仓库"
+msgstr "克隆仓库"
+#. js-lingui-explicit-id
+msgid "一键启动"
+msgstr "一键启动"
+#. js-lingui-explicit-id
+msgid "浏览器访问"
+msgstr "浏览器访问"
+#. js-lingui-explicit-id
+msgid "查看完整自部署指南"
+msgstr "查看完整自部署指南"
+#. js-lingui-explicit-id
+msgid "在 GitHub 上 Star"
+msgstr "在 GitHub 上 Star"
+#. js-lingui-explicit-id
+msgid "常见问题"
+msgstr "常见问题"
+#. js-lingui-explicit-id
+msgid "FAQ"
+msgstr "FAQ"
+#. js-lingui-explicit-id
+msgid "没找到你的问题？欢迎邮件联系我们。"
+msgstr "没找到你的问题？欢迎邮件联系我们。"
+#. js-lingui-explicit-id
+msgid "隐界真的开源吗？"
+msgstr "隐界真的开源吗？"
+#. js-lingui-explicit-id
+msgid "是。整个 monorepo（apps/app、apps/desktop、cloud-api、admin、site 等）都在 GitHub 上以 MIT 许可证开放，欢迎自部署、二次开发、商用。"
+msgstr "是。整个 monorepo（apps/app、apps/desktop、cloud-api、admin、site 等）都在 GitHub 上以 MIT 许可证开放，欢迎自部署、二次开发、商用。"
+#. js-lingui-explicit-id
+msgid "我的数据保存在哪里？"
+msgstr "我的数据保存在哪里？"
+#. js-lingui-explicit-id
+msgid "保存在你自己部署的实例里。隐界采用一人一世界的独立实例架构，没有中心化的数据后台，没有跨用户的数据合并；你拥有数据所有权。"
+msgstr "保存在你自己部署的实例里。隐界采用一人一世界的独立实例架构，没有中心化的数据后台，没有跨用户的数据合并；你拥有数据所有权。"
+#. js-lingui-explicit-id
+msgid "用什么模型？能换模型吗？"
+msgstr "用什么模型？能换模型吗？"
+#. js-lingui-explicit-id
+msgid "默认与多家主流模型供应商兼容（OpenAI 兼容协议），可在订阅页或自部署配置里切换；本地模型同样支持，只要服务能开 OpenAI 兼容的 HTTP 接口。"
+msgstr "默认与多家主流模型供应商兼容（OpenAI 兼容协议），可在订阅页或自部署配置里切换；本地模型同样支持，只要服务能开 OpenAI 兼容的 HTTP 接口。"
+#. js-lingui-explicit-id
+msgid "可以离线使用吗？"
+msgstr "可以离线使用吗？"
+#. js-lingui-explicit-id
+msgid "本地客户端（Tauri 桌面壳、Capacitor 移动壳）可离线浏览历史；AI 对话需要联网到模型服务（无论你是连云端还是本地模型）。"
+msgstr "本地客户端（Tauri 桌面壳、Capacitor 移动壳）可离线浏览历史；AI 对话需要联网到模型服务（无论你是连云端还是本地模型）。"
+#. js-lingui-explicit-id
+msgid "需要付费吗？"
+msgstr "需要付费吗？"
+#. js-lingui-explicit-id
+msgid "自部署完全免费。如果选择官方托管的云服务，按使用量付费——账单与你接入的模型供应商绑定，没有中间溢价。"
+msgstr "自部署完全免费。如果选择官方托管的云服务，按使用量付费——账单与你接入的模型供应商绑定，没有中间溢价。"
+#. js-lingui-explicit-id
+msgid "支持中英日韩之外的语言吗？"
+msgstr "支持中英日韩之外的语言吗？"
+#. js-lingui-explicit-id
+msgid "界面目前支持简中 / English / 日本語 / 한국어。AI 角色对话本身不限语种，跟着模型能力走。"
+msgstr "界面目前支持简中 / English / 日本語 / 한국어。AI 角色对话本身不限语种，跟着模型能力走。"
+

@@ -2,6 +2,10 @@ import { isSupportedLocale, type SupportedLocale } from "@/lib/locales";
 import { HeroSection } from "@/components/hero-section";
 import { CapabilityGrid } from "@/components/capability-grid";
 import { MultiPlatformCarousel } from "@/components/multi-platform-carousel";
+import { OnePersonWorld } from "@/components/one-person-world";
+import { CrossPlatformSection } from "@/components/cross-platform-section";
+import { SelfHostSection } from "@/components/self-host-section";
+import { FaqAccordion } from "@/components/faq-accordion";
 
 export default async function HomePage({
   params,
@@ -16,6 +20,10 @@ export default async function HomePage({
       <HeroSection locale={safeLocale} />
       <CapabilityGrid locale={safeLocale} />
       <MultiPlatformCarousel locale={safeLocale} />
+      <OnePersonWorld locale={safeLocale} />
+      <CrossPlatformSection locale={safeLocale} />
+      <SelfHostSection locale={safeLocale} />
+      <FaqAccordion locale={safeLocale} />
     </>
   );
 }
