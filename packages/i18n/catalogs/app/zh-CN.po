@@ -2589,6 +2589,7 @@ msgstr "全部聊天文件"
 msgid "公众号"
 msgstr "公众号"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:461
 #: apps/app/src/routes/desktop-mobile-page.tsx:599
 #: apps/app/src/routes/official-account-detail-page.tsx:308
 msgid "公众号主页"
@@ -2694,6 +2695,8 @@ msgstr "关注后可从消息页查看这类内容。"
 msgid "关注失败"
 msgstr "关注失败"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:587
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:737
 #: apps/app/src/i18n/static-dom-seed.ts:1019
 msgid "关注服务号后，通知和文章卡片会出现在这里。"
 msgstr "关注服务号后，通知和文章卡片会出现在这里。"
@@ -2758,6 +2761,7 @@ msgid "关闭侧栏"
 msgstr "关闭侧栏"
 
 #: apps/app/src/features/desktop/chat/desktop-conversation-context-menu.tsx:119
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:498
 msgid "关闭免打扰"
 msgstr "关闭免打扰"
 
@@ -2821,6 +2825,7 @@ msgstr "关闭摄像头"
 msgid "关闭操作菜单"
 msgstr "关闭操作菜单"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:408
 #: apps/app/src/i18n/static-dom-seed.ts:1028
 msgid "关闭服务号菜单"
 msgstr "关闭服务号菜单"
@@ -3702,6 +3707,7 @@ msgid "别人可以通过隐界号或二维码找到你"
 msgstr "别人可以通过隐界号或二维码找到你"
 
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:283
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:469
 #: apps/app/src/i18n/static-dom-seed.ts:808
 msgid "到手机继续"
 msgstr "到手机继续"
@@ -4395,6 +4401,10 @@ msgstr "只在当前群聊里显示。"
 msgid "可以先添加成员，或者切换筛选查看特定角色。"
 msgstr "可以先添加成员，或者切换筛选查看特定角色。"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:548
+msgid "可以先返回服务号消息，稍后再试。"
+msgstr "可以先返回服务号消息，稍后再试。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:1022
 #: apps/app/src/routes/official-account-article-page.tsx:473
 #: apps/app/src/routes/official-account-detail-page.tsx:400
@@ -4509,6 +4519,7 @@ msgstr "同步中..."
 msgid "同步最新状态"
 msgstr "同步最新状态"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:691
 #: apps/app/src/routes/official-account-article-page.tsx:399
 msgid "同步失败"
 msgstr "同步失败"
@@ -4887,6 +4898,7 @@ msgid "处理中"
 msgstr "处理中"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-confirm-dialog.tsx:32
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:496
 #: apps/app/src/routes/channel-author-page.tsx:441
 #: apps/app/src/routes/discover-feed-page.tsx:991
 #: apps/app/src/routes/discover-page.tsx:820
@@ -5599,6 +5611,11 @@ msgstr "已保存到本地，但同步到云世界控制台失败：{0}"
 msgid "已保存到通讯录。"
 msgstr "已保存到通讯录。"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:241
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:247
+msgid "已免打扰"
+msgstr "已免打扰"
+
 #: apps/app/src/i18n/static-dom-seed.ts:504
 msgid "已全部加载"
 msgstr "已全部加载"
@@ -6149,6 +6166,8 @@ msgstr "已腾出 {customUploadResumedSlots} 个空位，可直接添加"
 msgid "已解析到世界地址：{0}"
 msgstr "已解析到世界地址：{0}"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:240
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:246
 #: apps/app/src/i18n/static-dom-seed.ts:785
 #: apps/app/src/routes/official-account-detail-page.tsx:486
 msgid "已认证"
@@ -7946,6 +7965,7 @@ msgstr "打开文件选择，继续添加自定义表情图片或 GIF。"
 msgid "打开服务号消息"
 msgstr "打开服务号消息"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:446
 #: apps/app/src/i18n/static-dom-seed.ts:1027
 msgid "打开服务号菜单"
 msgstr "打开服务号菜单"
@@ -9318,6 +9338,7 @@ msgstr "文档摘要已复制。"
 msgid "文章"
 msgstr "文章"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:528
 #: apps/app/src/i18n/static-dom-seed.ts:1006
 #: apps/app/src/routes/official-account-article-page.tsx:368
 msgid "文章暂时不可用"
@@ -9907,6 +9928,8 @@ msgstr "朋友资料已更新。"
 msgid "服务入口"
 msgstr "服务入口"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:245
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:735
 #: apps/app/src/i18n/static-dom-seed.ts:415
 #: apps/app/src/routes/official-account-detail-page.tsx:160
 #: apps/app/src/routes/official-account-detail-page.tsx:161
@@ -9923,12 +9946,16 @@ msgstr "服务号主页"
 msgid "服务号文章"
 msgstr "服务号文章"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:430
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:622
 #: apps/app/src/i18n/static-dom-seed.ts:788
 #: apps/app/src/routes/desktop-mobile-page.tsx:594
 #: apps/app/src/routes/official-account-detail-page.tsx:596
 msgid "服务号消息"
 msgstr "服务号消息"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:563
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:660
 #: apps/app/src/i18n/static-dom-seed.ts:1010
 msgid "服务号消息暂时不可用"
 msgstr "服务号消息暂时不可用"
@@ -10416,6 +10443,9 @@ msgstr "查看全部群聊"
 msgid "查看公众号"
 msgstr "查看公众号"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:681
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:713
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:746
 #: apps/app/src/i18n/static-dom-seed.ts:722
 msgid "查看公众号主页"
 msgstr "查看公众号主页"
@@ -10424,6 +10454,7 @@ msgstr "查看公众号主页"
 msgid "查看公众号主页、订阅号和服务号消息"
 msgstr "查看公众号主页、订阅号和服务号消息"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:638
 #: apps/app/src/i18n/static-dom-seed.ts:1029
 msgid "查看公众号资料"
 msgstr "查看公众号资料"
@@ -11384,6 +11415,7 @@ msgstr "正在读取广场动态..."
 msgid "正在读取收藏..."
 msgstr "正在读取收藏..."
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:519
 #: apps/app/src/i18n/static-dom-seed.ts:1007
 #: apps/app/src/routes/official-account-article-page.tsx:358
 msgid "正在读取文章"
@@ -11401,6 +11433,8 @@ msgstr "正在读取朋友资料"
 msgid "正在读取朋友资料..."
 msgstr "正在读取朋友资料..."
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:556
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:650
 #: apps/app/src/i18n/static-dom-seed.ts:1011
 msgid "正在读取服务号消息"
 msgstr "正在读取服务号消息"
@@ -11902,6 +11936,7 @@ msgstr "消息、笔记与联系人"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:826
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1560
 #: apps/app/src/features/desktop/chat/desktop-conversation-context-menu.tsx:119
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:499
 #: apps/app/src/routes/chat-details-page.tsx:966
 #: apps/app/src/routes/chat-list-page.tsx:1315
 #: apps/app/src/routes/group-chat-details-page.tsx:760
@@ -11931,6 +11966,10 @@ msgstr "消息提醒"
 #: apps/app/src/components/chat-message-list.tsx:3350
 msgid "消息操作"
 msgstr "消息操作"
+
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:692
+msgid "消息状态暂未同步"
+msgstr "消息状态暂未同步"
 
 #: apps/app/src/routes/chat-details-page.tsx:963
 msgid "消息设置"
@@ -13006,6 +13045,11 @@ msgstr "稍等一下，正在同步推荐流和互动状态。"
 msgid "稍等一下，正在同步新的好友申请。"
 msgstr "稍等一下，正在同步新的好友申请。"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:651
+msgid "稍等一下，正在同步服务通知和文章入口。"
+msgstr "稍等一下，正在同步服务通知和文章入口。"
+
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:520
 #: apps/app/src/i18n/static-dom-seed.ts:1023
 msgid "稍等一下，正在同步正文内容。"
 msgstr "稍等一下，正在同步正文内容。"
@@ -13058,6 +13102,10 @@ msgstr "稍等一下，正在同步这位角色的动态。"
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1378
 msgid "稍等一下，正在同步这段群聊里的消息。"
 msgstr "稍等一下，正在同步这段群聊里的消息。"
+
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:557
+msgid "稍等一下，正在同步通知和文章卡片。"
+msgstr "稍等一下，正在同步通知和文章卡片。"
 
 #: apps/app/src/routes/group-chat-background-page.tsx:335
 msgid "稍等一下，正在同步默认背景和当前群聊设置。"
@@ -14879,6 +14927,7 @@ msgstr "请输入验证码（默认 123456 即可通过）"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:531
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1376
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:649
 #: apps/app/src/features/search/mobile-search-workspace.tsx:182
 #: apps/app/src/routes/channels-page.tsx:1147
 #: apps/app/src/routes/character-detail-page.tsx:275
@@ -14914,6 +14963,7 @@ msgstr "读取中"
 msgid "读取图片失败，请换一张再试。"
 msgstr "读取图片失败，请换一张再试。"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:659
 #: apps/app/src/features/search/mobile-search-workspace.tsx:190
 #: apps/app/src/i18n/static-dom-seed.ts:37
 #: apps/app/src/routes/channel-author-page.tsx:313
@@ -15289,6 +15339,9 @@ msgstr "返回上一步"
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1466
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1507
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:261
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:681
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:713
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:746
 #: apps/app/src/features/search/mobile-search-workspace.tsx:208
 #: apps/app/src/i18n/static-dom-seed.ts:884
 #: apps/app/src/routes/channel-author-page.tsx:333
@@ -15397,6 +15450,7 @@ msgstr "返回更多功能"
 msgid "返回朋友圈"
 msgstr "返回朋友圈"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:423
 #: apps/app/src/routes/desktop-mobile-page.tsx:876
 #: apps/app/src/routes/favorites-page.tsx:377
 #: apps/app/src/routes/notes-page.tsx:49
@@ -15709,6 +15763,8 @@ msgstr "还没有新消息"
 msgid "还没有星标朋友"
 msgstr "还没有星标朋友"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:586
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:736
 #: apps/app/src/i18n/static-dom-seed.ts:1018
 msgid "还没有服务消息"
 msgstr "还没有服务消息"
@@ -16065,6 +16121,7 @@ msgstr "这段语音没有识别出有效文字，请再试一次。"
 msgid "这版预览先按聊天页真实气泡层级来做。"
 msgstr "这版预览先按聊天页真实气泡层级来做。"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:547
 #: apps/app/src/i18n/static-dom-seed.ts:1021
 #: apps/app/src/routes/official-account-article-page.tsx:472
 msgid "这篇文章暂时不可用"
@@ -16613,6 +16670,7 @@ msgstr "重试取消关注"
 msgid "重试取消星标"
 msgstr "重试取消星标"
 
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:704
 #: apps/app/src/routes/official-account-article-page.tsx:413
 #: apps/app/src/routes/subscription-inbox-page.tsx:280
 msgid "重试同步"
@@ -16711,6 +16769,7 @@ msgstr "重试评论点赞"
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:554
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:592
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:643
+#: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:672
 #: apps/app/src/features/search/mobile-search-workspace.tsx:201
 #: apps/app/src/i18n/static-dom-seed.ts:39
 #: apps/app/src/routes/channel-author-page.tsx:325
