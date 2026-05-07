@@ -226,6 +226,17 @@ let apiRequestErrorHandler:
   | ((error: ApiRequestError) => void)
   | null = null;
 
+export type ApiCallObservation = {
+  method: string;
+  path: string;
+  status: number;
+  durationMs: number;
+  ok: boolean;
+  errorCode?: string | null;
+};
+
+let apiCallObserver: ((observation: ApiCallObservation) => void) | null = null;
+
 type RequestErrorBody = {
   statusCode?: number;
   errorCode?: string;
@@ -325,6 +336,12 @@ export function setApiRequestErrorHandler(
   apiRequestErrorHandler = handler;
 }
 
+export function setApiCallObserver(
+  observer: ((observation: ApiCallObservation) => void) | null,
+) {
+  apiCallObserver = observer;
+}
+
 export function isApiRequestError(error: unknown): error is ApiRequestError {
   return error instanceof ApiRequestError;
 }
@@ -349,10 +366,28 @@ async function request<T>(
     }
   }
 
-  const response = await fetch(`${resolveCoreApiBaseUrl(baseUrl)}${path}`, {
-    ...init,
-    headers,
-  });
+  const method = (init?.method ?? "GET").toUpperCase();
+  const startedAt =
+    typeof performance !== "undefined" && typeof performance.now === "function"
+      ? performance.now()
+      : Date.now();
+  let response: Response;
+  try {
+    response = await fetch(`${resolveCoreApiBaseUrl(baseUrl)}${path}`, {
+      ...init,
+      headers,
+    });
+  } catch (networkError) {
+    notifyApiCallObserver({
+      method,
+      path,
+      status: 0,
+      durationMs: Math.round(currentTime() - startedAt),
+      ok: false,
+      errorCode: "network_error",
+    });
+    throw networkError;
+  }
 
   const rawBody = await response.text();
 
@@ -399,10 +434,43 @@ async function request<T>(
       }
     }
 
+    notifyApiCallObserver({
+      method,
+      path,
+      status: response.status,
+      durationMs: Math.round(currentTime() - startedAt),
+      ok: false,
+      errorCode: error.errorCode,
+    });
+
     throw error;
   }
 
+  notifyApiCallObserver({
+    method,
+    path,
+    status: response.status,
+    durationMs: Math.round(currentTime() - startedAt),
+    ok: true,
+    errorCode: null,
+  });
+
   return (rawBody ? (JSON.parse(rawBody) as T) : undefined) as T;
+}
+
+function currentTime(): number {
+  return typeof performance !== "undefined" && typeof performance.now === "function"
+    ? performance.now()
+    : Date.now();
+}
+
+function notifyApiCallObserver(observation: ApiCallObservation): void {
+  if (!apiCallObserver) return;
+  try {
+    apiCallObserver(observation);
+  } catch {
+    // Observer failures must never affect business code.
+  }
 }
 
 function resolveRequestErrorMessage(
