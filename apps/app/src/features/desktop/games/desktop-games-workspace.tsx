@@ -1,3 +1,5 @@
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, InlineNotice, cn } from "@yinjie/ui";
 import { Copy, Play, Share2 } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
@@ -56,6 +58,7 @@ export function DesktopGamesWorkspace({
   onDismissActiveGame,
   nativeMobileShareSupported,
 }: DesktopGamesWorkspaceProps) {
+  const t = useRuntimeTranslator();
   const featuredGames = resolveGames(gameCenterFeaturedGameIds);
   const selectedGame =
     getGameCenterGame(selectedGameId) ?? featuredGames[0] ?? null;
@@ -77,10 +80,10 @@ export function DesktopGamesWorkspace({
   const tone = getGameCenterToneStyle(selectedGame.tone);
 
   const launchLabel = isParkingActive
-    ? "退出游戏"
+    ? t(msg`退出游戏`)
     : isActive
-      ? "继续玩"
-      : "开始游戏";
+      ? t(msg`继续玩`)
+      : t(msg`开始游戏`);
   const handleLaunchClick = () => {
     if (isParkingActive) {
       onDismissActiveGame();
@@ -95,14 +98,16 @@ export function DesktopGamesWorkspace({
       <aside className="flex w-[320px] shrink-0 flex-col border-r border-[color:var(--border-faint)] bg-white">
         <div className="flex items-center justify-between border-b border-[color:var(--border-faint)] px-4 py-3">
           <span className="text-[16px] font-semibold text-[color:var(--text-primary)]">
-            游戏
+            {t(msg`游戏`)}
           </span>
           <button
             type="button"
             onClick={() => onCopyGameToMobile(selectedGame.id)}
             className="flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--text-secondary)] hover:bg-[rgba(0,0,0,0.04)]"
             aria-label={
-              nativeMobileShareSupported ? "分享当前游戏" : "复制游戏入口"
+              nativeMobileShareSupported
+                ? t(msg`分享当前游戏`)
+                : t(msg`复制游戏入口`)
             }
           >
             {nativeMobileShareSupported ? (
@@ -116,7 +121,7 @@ export function DesktopGamesWorkspace({
         <div className="min-h-0 flex-1 overflow-auto pb-4">
           {myGames.length > 0 ? (
             <>
-              <DesktopSectionHeader title="我的游戏" />
+              <DesktopSectionHeader title={t(msg`我的游戏`)} />
               <ul>
                 {myGames.map((game) => (
                   <DesktopGameRow
@@ -132,7 +137,7 @@ export function DesktopGamesWorkspace({
 
           {gameCenterFriendActivities.length > 0 ? (
             <>
-              <DesktopSectionHeader title="好友在玩" />
+              <DesktopSectionHeader title={t(msg`好友在玩`)} />
               <ul>
                 {gameCenterFriendActivities.map((activity) => {
                   const game = getGameCenterGame(activity.gameId);
@@ -153,7 +158,7 @@ export function DesktopGamesWorkspace({
 
           {featuredRest.length > 0 ? (
             <>
-              <DesktopSectionHeader title="精选小游戏" />
+              <DesktopSectionHeader title={t(msg`精选小游戏`)} />
               <ul>
                 {featuredRest.map((game) => (
                   <DesktopGameRow
@@ -168,7 +173,7 @@ export function DesktopGamesWorkspace({
             </>
           ) : null}
 
-          <DesktopSectionHeader title="热门小游戏" />
+          <DesktopSectionHeader title={t(msg`热门小游戏`)} />
           <ul>
             {gameCenterHotRankings.map((entry) => {
               const game = getGameCenterGame(entry.gameId);
@@ -186,7 +191,7 @@ export function DesktopGamesWorkspace({
             })}
           </ul>
 
-          <DesktopSectionHeader title="新游榜" />
+          <DesktopSectionHeader title={t(msg`新游榜`)} />
           <ul>
             {gameCenterNewRankings.map((entry) => {
               const game = getGameCenterGame(entry.gameId);
@@ -217,7 +222,9 @@ export function DesktopGamesWorkspace({
             onClick={() => onCopyGameToMobile(selectedGame.id)}
             className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[color:var(--border-subtle)] bg-white px-3 text-[12px] font-medium text-[color:var(--text-secondary)] hover:bg-[rgba(0,0,0,0.02)]"
             aria-label={
-              nativeMobileShareSupported ? "分享当前游戏" : "复制游戏入口"
+              nativeMobileShareSupported
+                ? t(msg`分享当前游戏`)
+                : t(msg`复制游戏入口`)
             }
           >
             {nativeMobileShareSupported ? (
@@ -225,7 +232,7 @@ export function DesktopGamesWorkspace({
             ) : (
               <Copy size={14} />
             )}
-            {nativeMobileShareSupported ? "系统分享" : "复制入口"}
+            {nativeMobileShareSupported ? t(msg`系统分享`) : t(msg`复制入口`)}
           </button>
         </div>
 
@@ -270,15 +277,15 @@ export function DesktopGamesWorkspace({
 
             <div className="grid grid-cols-3 gap-3">
               <DesktopMetricCell
-                label="玩家热度"
+                label={t(msg`玩家热度`)}
                 value={selectedGame.playersLabel}
               />
               <DesktopMetricCell
-                label="好友在玩"
+                label={t(msg`好友在玩`)}
                 value={selectedGame.friendsLabel}
               />
               <DesktopMetricCell
-                label="更新状态"
+                label={t(msg`更新状态`)}
                 value={selectedGame.updateNote}
               />
             </div>
@@ -339,7 +346,7 @@ export function DesktopGamesWorkspace({
             {detailFriends.length > 0 ? (
               <section className="rounded-[16px] border border-[color:var(--border-faint)] bg-white">
                 <div className="border-b border-[color:var(--border-faint)] px-4 py-2.5 text-[13px] font-medium text-[color:var(--text-primary)]">
-                  正在玩 {selectedGame.name} 的好友
+                  {t(msg`正在玩 ${selectedGame.name} 的好友`)}
                 </div>
                 <ul>
                   {detailFriends.map((activity) => (
@@ -460,6 +467,7 @@ function DesktopFriendListRow({
   active: boolean;
   onClick: () => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <li>
       <button
@@ -482,7 +490,7 @@ function DesktopFriendListRow({
             {activity.friendName}
           </div>
           <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
-            正在玩 {game.name}
+            {t(msg`正在玩 ${game.name}`)}
           </div>
         </div>
       </button>
@@ -518,6 +526,7 @@ function DesktopFriendDetailRow({
   invited: boolean;
   onInvite: () => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <li className="flex items-center gap-3 border-b border-[color:var(--border-faint)] px-4 py-3 last:border-b-0">
       <AvatarChip
@@ -542,7 +551,7 @@ function DesktopFriendDetailRow({
             : "bg-[#07C160] text-white hover:bg-[#06ad57]",
         )}
       >
-        {invited ? "已邀约" : "邀请"}
+        {invited ? t(msg`已邀约`) : t(msg`邀请`)}
       </button>
     </li>
   );
