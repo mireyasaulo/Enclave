@@ -2421,6 +2421,7 @@ msgid "全部会话"
 msgstr "すべての会話"
 
 #: apps/app/src/i18n/static-dom-seed.ts:410
+#: apps/app/src/routes/official-accounts-page.tsx:291
 msgid "全部公众号"
 msgstr "すべての公式アカウント"
 
@@ -2468,6 +2469,7 @@ msgstr "すべてのチャットファイル"
 #: apps/app/src/routes/desktop-mobile-page.tsx:129
 #: apps/app/src/routes/desktop-mobile-page.tsx:590
 #: apps/app/src/routes/official-account-detail-page.tsx:398
+#: apps/app/src/routes/official-accounts-page.tsx:173
 msgid "公众号"
 msgstr "公式アカウント"
 
@@ -2490,6 +2492,7 @@ msgid "公众号内容暂时不可用"
 msgstr "公式アカウント内容は一時的に利用できません"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1014
+#: apps/app/src/routes/official-accounts-page.tsx:237
 msgid "公众号列表暂时不可用"
 msgstr "公式アカウント一覧は一時的に利用できません"
 
@@ -2992,6 +2995,10 @@ msgstr "最近使ったミニプログラム"
 msgid "最近公众号内容"
 msgstr "最近の公式アカウント内容"
 
+#: apps/app/src/routes/official-accounts-page.tsx:266
+msgid "最近关注"
+msgstr "最近フォローした"
+
 #: apps/app/src/i18n/static-dom-seed.ts:826
 #: apps/app/src/routes/channel-author-page.tsx:411
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:450
@@ -3389,6 +3396,10 @@ msgstr "現在のクライアントの表示言語とローカライズ形式を
 msgid "切换桌面世界角色..."
 msgstr ""
 
+#: apps/app/src/routes/official-accounts-page.tsx:45
+msgid "切换桌面公众号视图..."
+msgstr "デスクトップ公式アカウント表示へ切り替え中..."
+
 #: apps/app/src/routes/official-account-detail-page.tsx:68
 msgid "切换桌面公众号详情..."
 msgstr "デスクトップ版の公式アカウント詳細へ切り替え中..."
@@ -3603,6 +3614,7 @@ msgid "功能和预期不一致、页面报错、数据错乱。"
 msgstr "機能が期待と異なる、ページでエラーが出る、またはデータが乱れています。"
 
 #: apps/app/src/routes/live-companion-page.tsx:790
+#: apps/app/src/routes/official-accounts-page.tsx:361
 msgid "功能开发中"
 msgstr ""
 
@@ -7758,6 +7770,8 @@ msgid "打开群聊查看最近消息。"
 msgstr "グループチャットを開いて最近のメッセージを表示します。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:416
+#: apps/app/src/routes/official-accounts-page.tsx:201
+#: apps/app/src/routes/official-accounts-page.tsx:333
 msgid "打开订阅号消息"
 msgstr "購読アカウントメッセージを開く"
 
@@ -8177,6 +8191,10 @@ msgstr ""
 msgid "换个名字、备注名或关系关键词试试。"
 msgstr "別の名前、備考名、関係キーワードを試してください。"
 
+#: apps/app/src/routes/official-accounts-page.tsx:321
+msgid "换个名字、简称或关键词试试。"
+msgstr "別の名前やハンドル、キーワードでお試しください。"
+
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:699
 msgid "换个成员试试，或者切回全部成员继续浏览。"
 msgstr "別のメンバーを試すか、全メンバーに戻して閲覧を続けてください。"
@@ -8374,6 +8392,7 @@ msgid "搜索中已暂停删除管理，清空搜索后可继续删除。"
 msgstr "検索中は削除管理が一時停止しています。検索をクリアすると削除を続けられます。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:417
+#: apps/app/src/routes/official-accounts-page.tsx:216
 msgid "搜索公众号"
 msgstr "公式アカウントを検索"
 
@@ -8785,6 +8804,7 @@ msgstr "効率"
 
 #: apps/app/src/routes/channels-page.tsx:1493
 #: apps/app/src/routes/live-companion-page.tsx:793
+#: apps/app/src/routes/official-accounts-page.tsx:364
 msgid "敬请期待"
 msgstr ""
 
@@ -9200,6 +9220,7 @@ msgstr "署名はまだありません"
 
 #: apps/app/src/routes/create-group-page.tsx:517
 #: apps/app/src/routes/group-contacts-page.tsx:233
+#: apps/app/src/routes/official-accounts-page.tsx:319
 #: apps/app/src/routes/starred-friends-page.tsx:286
 #: apps/app/src/routes/tags-page.tsx:271
 #: apps/app/src/routes/world-characters-page.tsx:324
@@ -9298,6 +9319,10 @@ msgstr "その他"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:740
 msgid "更多信息"
 msgstr "追加情報"
+
+#: apps/app/src/routes/official-accounts-page.tsx:291
+msgid "更多公众号"
+msgstr "ほかの公式アカウント"
 
 #: apps/app/src/components/chat-composer.tsx:3310
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:309
@@ -10424,6 +10449,10 @@ msgstr "モバイル版のキャラクターモーメントへ切り替え中...
 msgid "正在切换到桌面世界角色"
 msgstr ""
 
+#: apps/app/src/routes/official-accounts-page.tsx:43
+msgid "正在切换到桌面公众号"
+msgstr "デスクトップ公式アカウントへ切り替え中"
+
 #: apps/app/src/routes/official-account-detail-page.tsx:66
 msgid "正在切换到桌面公众号详情"
 msgstr "デスクトップ版の公式アカウント詳細へ切り替え中"
@@ -10895,6 +10924,7 @@ msgstr ""
 
 #: apps/app/src/i18n/static-dom-seed.ts:1013
 #: apps/app/src/routes/official-account-detail-page.tsx:357
+#: apps/app/src/routes/official-accounts-page.tsx:227
 msgid "正在读取公众号"
 msgstr "公式アカウントを読み込み中"
 
@@ -11062,6 +11092,10 @@ msgstr ""
 #: apps/app/src/routes/world-characters-page.tsx:57
 msgid "正在跳转到桌面通讯录工作区中的世界角色视图。"
 msgstr ""
+
+#: apps/app/src/routes/official-accounts-page.tsx:44
+msgid "正在跳转到桌面通讯录工作区中的公众号视图。"
+msgstr "デスクトップ連絡先の作業エリア内の公式アカウント表示へ遷移中です。"
 
 #: apps/app/src/routes/official-account-detail-page.tsx:67
 msgid "正在跳转到桌面通讯录工作区中的公众号详情。"
@@ -11245,6 +11279,10 @@ msgstr "一致する{0}は見つかりませんでした"
 #: apps/app/src/routes/world-characters-page.tsx:327
 msgid "没有找到匹配的世界角色"
 msgstr ""
+
+#: apps/app/src/routes/official-accounts-page.tsx:320
+msgid "没有找到匹配的公众号"
+msgstr "一致する公式アカウントは見つかりません"
 
 #: apps/app/src/routes/starred-friends-page.tsx:289
 msgid "没有找到匹配的星标朋友"
@@ -11563,6 +11601,7 @@ msgstr "現在のキーワードをクリアして、スタンプ結果を再表
 
 #: apps/app/src/routes/contacts-page.tsx:1422
 #: apps/app/src/routes/contacts-page.tsx:1968
+#: apps/app/src/routes/official-accounts-page.tsx:332
 msgid "清空搜索"
 msgstr "検索をクリア"
 
@@ -12438,6 +12477,10 @@ msgstr ""
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:961
 msgid "稍等一下，正在同步会话信息并准备当前通话链路。"
 msgstr ""
+
+#: apps/app/src/routes/official-accounts-page.tsx:228
+msgid "稍等一下，正在同步你关注和可浏览的公众号。"
+msgstr "少々お待ちを、フォロー中・閲覧可能な公式アカウントを同期しています。"
 
 #: apps/app/src/routes/starred-friends-page.tsx:245
 msgid "稍等一下，正在同步你标记过的常联系好友。"
@@ -14321,6 +14364,7 @@ msgstr "認証コードを入力（デフォルトの 123456 で通過可能）"
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:455
 #: apps/app/src/routes/moments-page.tsx:942
 #: apps/app/src/routes/official-account-detail-page.tsx:356
+#: apps/app/src/routes/official-accounts-page.tsx:226
 #: apps/app/src/routes/profile-settings-page.tsx:461
 #: apps/app/src/routes/starred-friends-page.tsx:243
 #: apps/app/src/routes/subscription-inbox-page.tsx:223
@@ -14358,6 +14402,7 @@ msgstr "画像の読み込みに失敗しました。別の画像で再試行し
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:463
 #: apps/app/src/routes/moments-page.tsx:950
 #: apps/app/src/routes/official-account-detail-page.tsx:366
+#: apps/app/src/routes/official-accounts-page.tsx:236
 #: apps/app/src/routes/profile-settings-page.tsx:473
 #: apps/app/src/routes/starred-friends-page.tsx:253
 #: apps/app/src/routes/subscription-inbox-page.tsx:233
@@ -14676,6 +14721,8 @@ msgstr "近"
 #: apps/app/src/routes/character-detail-page.tsx:272
 #: apps/app/src/routes/create-group-page.tsx:332
 #: apps/app/src/routes/group-member-picker-page.tsx:365
+#: apps/app/src/routes/official-accounts-page.tsx:354
+#: apps/app/src/routes/official-accounts-page.tsx:381
 #: apps/app/src/routes/welcome-page.tsx:1111
 msgid "返回"
 msgstr "戻る"
@@ -14739,6 +14786,8 @@ msgstr "前のステップに戻る"
 #: apps/app/src/routes/official-account-detail-page.tsx:419
 #: apps/app/src/routes/official-account-detail-page.tsx:454
 #: apps/app/src/routes/official-account-detail-page.tsx:557
+#: apps/app/src/routes/official-accounts-page.tsx:256
+#: apps/app/src/routes/official-accounts-page.tsx:330
 #: apps/app/src/routes/starred-friends-page.tsx:183
 #: apps/app/src/routes/subscription-inbox-page.tsx:255
 #: apps/app/src/routes/subscription-inbox-page.tsx:289
@@ -14920,6 +14969,7 @@ msgstr "プロフィールページへ戻る"
 #: apps/app/src/routes/character-detail-page.tsx:274
 #: apps/app/src/routes/group-contacts-page.tsx:145
 #: apps/app/src/routes/group-contacts-page.tsx:220
+#: apps/app/src/routes/official-accounts-page.tsx:256
 #: apps/app/src/routes/starred-friends-page.tsx:207
 #: apps/app/src/routes/tags-page.tsx:192
 #: apps/app/src/routes/world-characters-page.tsx:209
@@ -16092,6 +16142,7 @@ msgstr ""
 #: apps/app/src/routes/moments-page.tsx:970
 #: apps/app/src/routes/official-account-detail-page.tsx:379
 #: apps/app/src/routes/official-account-detail-page.tsx:410
+#: apps/app/src/routes/official-accounts-page.tsx:248
 #: apps/app/src/routes/profile-settings-page.tsx:485
 #: apps/app/src/routes/starred-friends-page.tsx:264
 #: apps/app/src/routes/subscription-inbox-page.tsx:246
