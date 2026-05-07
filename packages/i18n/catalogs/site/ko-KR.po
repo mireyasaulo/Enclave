@@ -15,17 +15,17 @@ msgstr ""
 #. js-lingui-explicit-id
 #: apps/site/src/app/not-found.tsx:19
 msgid "404"
-msgstr ""
+msgstr "404"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/site-header.tsx:21
 msgid "打开菜单"
-msgstr ""
+msgstr "메뉴 열기"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/site-header.tsx:22
 msgid "关闭菜单"
-msgstr ""
+msgstr "메뉴 닫기"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/capability-grid.tsx:11
@@ -378,7 +378,7 @@ msgstr "%s · Enclave"
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/opengraph-image.tsx:34
 msgid "私人 AI 世界 · 浏览器即开即用 · 多端同步"
-msgstr ""
+msgstr "프라이빗 AI 월드 · 브라우저에서 즉시 사용 · 멀티 디바이스 동기화"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/opengraph-image.tsx:118
@@ -575,7 +575,7 @@ msgstr "GitHub Releases 에서 전체 목록 보기"
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/changelog/page.tsx:113
 msgid "GitHub Release"
-msgstr ""
+msgstr "GitHub Release"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:150

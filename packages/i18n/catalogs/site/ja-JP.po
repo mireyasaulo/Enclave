@@ -15,17 +15,17 @@ msgstr ""
 #. js-lingui-explicit-id
 #: apps/site/src/app/not-found.tsx:19
 msgid "404"
-msgstr ""
+msgstr "404"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/site-header.tsx:21
 msgid "打开菜单"
-msgstr ""
+msgstr "メニューを開く"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/site-header.tsx:22
 msgid "关闭菜单"
-msgstr ""
+msgstr "メニューを閉じる"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/capability-grid.tsx:11
@@ -378,7 +378,7 @@ msgstr "%s · 隐界 Enclave"
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/opengraph-image.tsx:34
 msgid "私人 AI 世界 · 浏览器即开即用 · 多端同步"
-msgstr ""
+msgstr "プライベート AI ワールド · ブラウザですぐに利用可能 · マルチデバイス同期"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/opengraph-image.tsx:118
@@ -575,7 +575,7 @@ msgstr "GitHub Releases で全リリースを見る"
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/changelog/page.tsx:113
 msgid "GitHub Release"
-msgstr ""
+msgstr "GitHub Release"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:150

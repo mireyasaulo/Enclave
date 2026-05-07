@@ -54,7 +54,7 @@ msgstr "인터페이스 언어"
 
 #: packages/i18n/src/runtime/language-switcher.tsx:29
 msgid "语言偏好保存在当前设备并立即生效，同时决定好友回复使用的语言。"
-msgstr ""
+msgstr "언어 환경설정은 현재 기기에 저장되어 즉시 적용되며, 친구가 답장할 때 사용하는 언어도 함께 결정합니다."
 
 #: packages/ui/src/components/provider-setup-form.tsx:237
 msgid "转写 API 密钥"

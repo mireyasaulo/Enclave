@@ -83,7 +83,7 @@ msgstr "{watchItemCount} watch items"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:389
 msgid "AI 关系"
-msgstr ""
+msgstr "AI relationships"
 
 #: apps/admin/src/lib/route-breadcrumb.ts:148
 msgid "AI 成本与请求账本"
@@ -241,7 +241,7 @@ msgstr "Self-agent Heartbeat Schedule"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:387
 msgid "主动提醒"
-msgstr ""
+msgstr "Active reminder"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2191
 msgid "主动提醒调度"
@@ -258,7 +258,7 @@ msgstr "Event Contract"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:334
 msgid "人工锁定"
-msgstr ""
+msgstr "Manual lock"
 
 #. placeholder {0}: followupLimit[1]
 #: apps/admin/src/routes/dashboard-page.tsx:2385
@@ -272,7 +272,7 @@ msgstr "Tokens"
 #: apps/admin/src/routes/character-factory-page.tsx:49
 #: apps/admin/src/routes/character-runtime-page.tsx:30
 msgid "休息中"
-msgstr ""
+msgstr "Resting"
 
 #: apps/admin/src/components/admin-workbench.tsx:676
 msgid "优先"
@@ -324,7 +324,7 @@ msgstr "Duty Overview"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2040
 msgid "做推理预览、导出诊断和日志查看。"
-msgstr ""
+msgstr "Run inference previews, export diagnostics, and view logs."
 
 #: apps/admin/src/routes/dashboard-page.tsx:623
 #: apps/admin/src/routes/dashboard-page.tsx:1042
@@ -571,11 +571,11 @@ msgstr "Ready to Verify"
 #: apps/admin/src/routes/character-factory-page.tsx:48
 #: apps/admin/src/routes/character-runtime-page.tsx:29
 msgid "吃饭中"
-msgstr ""
+msgstr "Eating"
 
 #: apps/admin/src/lib/route-breadcrumb.ts:215
 msgid "后台"
-msgstr ""
+msgstr "Backend"
 
 #: apps/admin/src/routes/dashboard-page.tsx:839
 msgid "含全部单聊历史消息"
@@ -640,7 +640,7 @@ msgstr "Troubleshoot the reply pipeline around characters, sessions, and global 
 
 #: apps/admin/src/components/root-layout.tsx:237
 msgid "围绕角色、会话和全局规则排查回复链路。"
-msgstr ""
+msgstr "Trace reply chains around characters, sessions, and global rules."
 
 #: apps/admin/src/lib/route-breadcrumb.ts:42
 msgid "在一个工作区里完成角色筛选、摘要查看和快捷跳转。"
@@ -656,7 +656,7 @@ msgstr "Online {onlineCharacterCount}"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:377
 msgid "在线状态"
-msgstr ""
+msgstr "Online status"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2173
 msgid "在线状态调度"
@@ -677,7 +677,7 @@ msgstr "Scene Friend Request Schedule"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:385
 msgid "场景好友"
-msgstr ""
+msgstr "Scene friend"
 
 #. placeholder {0}: statusQuery.data?.inferenceGateway.inFlightRequests ?? 0
 #. placeholder {1}: statusQuery.data?.inferenceGateway.maxConcurrency ?? 0
@@ -765,7 +765,7 @@ msgstr "Realtime Connections and Contract"
 
 #: apps/admin/src/components/admin-topbar.tsx:74
 msgid "宽松"
-msgstr ""
+msgstr "Lenient"
 
 #: apps/admin/src/components/admin-sidebar.tsx:291
 msgid "密钥已配置"
@@ -781,7 +781,7 @@ msgstr "Export Diagnostics Package"
 
 #: apps/admin/src/routes/dashboard-page.tsx:1867
 msgid "导出诊断包，便于巡检和日常留档。"
-msgstr ""
+msgstr "Export diagnostic bundles for inspection and routine archiving."
 
 #: apps/admin/src/lib/route-breadcrumb.ts:99
 msgid "小盯的任务、触发与轻提醒发圈"
@@ -799,7 +799,7 @@ msgstr "Not Configured"
 #: apps/admin/src/routes/character-factory-page.tsx:47
 #: apps/admin/src/routes/character-runtime-page.tsx:28
 msgid "工作中"
-msgstr ""
+msgstr "Working"
 
 #: apps/admin/src/components/admin-workbench.tsx:597
 msgid "已同步"
@@ -1099,7 +1099,7 @@ msgstr "Pending setup"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:347
 msgid "忙碌延迟"
-msgstr ""
+msgstr "Busy delay"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2047
 msgid "快捷动作"
@@ -1147,7 +1147,7 @@ msgstr "Open Reply Logic"
 
 #: apps/admin/src/components/admin-topbar.tsx:91
 msgid "打开导航"
-msgstr ""
+msgstr "Open navigation"
 
 #: apps/admin/src/routes/dashboard-page.tsx:1296
 #: apps/admin/src/routes/dashboard-page.tsx:2057
@@ -1232,7 +1232,7 @@ msgstr "Keep job state, manual runs, and recent records in one place to reduce s
 
 #: apps/admin/src/lib/route-breadcrumb.ts:91
 msgid "把\"我自己\"升级成主代理后，在这里查看 standing orders、workspace 文件、巡检结果和近期待处理事项。"
-msgstr ""
+msgstr "Once you promote \"Me\" to a primary agent, review standing orders, workspace files, inspection results, and recent pending items here."
 
 #: apps/admin/src/routes/dashboard-page.tsx:815
 msgid "把世界状态、内容产出、消息体量和运行版本压缩成一屏摘要，避免重复扫读多块卡片。"
@@ -1240,7 +1240,7 @@ msgstr "Compress world state, content output, message volume, and runtime versio
 
 #: apps/admin/src/routes/dashboard-page.tsx:1719
 msgid "把模型调试、诊断导出和日志入口收敛到页面尾部。"
-msgstr ""
+msgstr "Consolidate model debugging, diagnostic exports, and log entry points at the bottom of the page."
 
 #: apps/admin/src/routes/dashboard-page.tsx:1420
 msgid "把自动运行风险和前端实时链路放在同一个排障平面。"
@@ -1443,11 +1443,11 @@ msgstr "Log Index"
 
 #: apps/admin/src/components/admin-topbar.tsx:134
 msgid "显示密度"
-msgstr ""
+msgstr "Display density"
 
 #: apps/admin/src/components/root-layout.tsx:224
 msgid "智能与模型"
-msgstr ""
+msgstr "Intelligence & models"
 
 #: apps/admin/src/routes/dashboard-page.tsx:842
 msgid "智能回复"
@@ -1511,7 +1511,7 @@ msgstr "Not occurred"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:349
 msgid "未应用"
-msgstr ""
+msgstr "Not applied"
 
 #: apps/admin/src/lib/format.ts:15
 msgid "未执行"
@@ -1645,7 +1645,7 @@ msgstr "Check character state and open the factory or runtime console."
 
 #: apps/admin/src/components/admin-topbar.tsx:73
 msgid "标准"
-msgstr ""
+msgstr "Standard"
 
 #: apps/admin/src/routes/dashboard-page.tsx:1035
 msgid "核心接口"
@@ -1878,7 +1878,7 @@ msgstr "Daily, extract and update recent summaries from the last 7 days of inter
 
 #: apps/admin/src/routes/character-runtime-page.tsx:379
 msgid "活动状态"
-msgstr ""
+msgstr "Activity state"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2189
 msgid "活动状态调度"
@@ -1959,12 +1959,12 @@ msgstr "Real-World Actions"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:345
 msgid "睡眠延迟"
-msgstr ""
+msgstr "Sleep delay"
 
 #: apps/admin/src/routes/character-factory-page.tsx:51
 #: apps/admin/src/routes/character-runtime-page.tsx:32
 msgid "睡觉中"
-msgstr ""
+msgstr "Sleeping"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2216
 msgid "短周期扫描新的人物需求，并生成候选角色。"
@@ -1972,7 +1972,7 @@ msgstr "Short-cycle scan for new character needs and generate candidates."
 
 #: apps/admin/src/routes/character-runtime-page.tsx:383
 msgid "视频号"
-msgstr ""
+msgstr "Video account"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2187
 msgid "视频号调度"
@@ -1990,11 +1990,11 @@ msgstr "Stable"
 #: apps/admin/src/routes/character-factory-page.tsx:46
 #: apps/admin/src/routes/character-runtime-page.tsx:27
 msgid "空闲"
-msgstr ""
+msgstr "Idle"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:351
 msgid "立即回复"
-msgstr ""
+msgstr "Reply now"
 
 #: apps/admin/src/routes/dashboard-page.tsx:1525
 msgid "立即执行"
@@ -2062,7 +2062,7 @@ msgstr "System status detected an external player template."
 
 #: apps/admin/src/components/admin-topbar.tsx:72
 msgid "紧凑"
-msgstr ""
+msgstr "Compact"
 
 #: apps/admin/src/routes/dashboard-page.tsx:1842
 msgid "结束原因"
@@ -2101,7 +2101,7 @@ msgstr "Chat Records"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:334
 msgid "自动调度"
-msgstr ""
+msgstr "Auto-schedule"
 
 #: apps/admin/src/components/admin-workbench.tsx:596
 msgid "草稿未保存"
@@ -2117,7 +2117,7 @@ msgstr "Complete inference Provider, instance connectivity, and runtime prerequi
 
 #: apps/admin/src/components/root-layout.tsx:176
 msgid "补齐推理 Provider、实例连通性和运行前置条件。"
-msgstr ""
+msgstr "Round out the inference provider, instance connectivity, and runtime prerequisites."
 
 #: apps/admin/src/routes/dashboard-page.tsx:412
 msgid "补齐推理配置"
@@ -2129,7 +2129,7 @@ msgstr "Complete model, endpoint, and API Key setup, otherwise real generation c
 
 #: apps/admin/src/components/root-layout.tsx:192
 msgid "角色与内容"
-msgstr ""
+msgstr "Characters & content"
 
 #: apps/admin/src/routes/dashboard-page.tsx:1260
 msgid "角色与内容摘要"
@@ -2286,7 +2286,7 @@ msgstr "Operations Actions"
 
 #: apps/admin/src/components/root-layout.tsx:165
 msgid "运营"
-msgstr ""
+msgstr "Operations"
 
 #: apps/admin/src/routes/dashboard-page.tsx:1249
 #: apps/admin/src/routes/dashboard-page.tsx:2029
@@ -2333,7 +2333,7 @@ msgstr "Runtime Data"
 
 #: apps/admin/src/components/root-layout.tsx:253
 msgid "运行时"
-msgstr ""
+msgstr "Runtime"
 
 #: apps/admin/src/routes/dashboard-page.tsx:1006
 msgid "运行时与 Core API"
@@ -2432,7 +2432,7 @@ msgstr "Remote Mode"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2524
 msgid "远程连接"
-msgstr ""
+msgstr "Remote connection"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2175
 msgid "追问推荐调度"
@@ -2441,7 +2441,7 @@ msgstr "Follow-up Recommendation Schedule"
 #: apps/admin/src/routes/character-factory-page.tsx:50
 #: apps/admin/src/routes/character-runtime-page.tsx:31
 msgid "通勤中"
-msgstr ""
+msgstr "Commuting"
 
 #: apps/admin/src/lib/route-breadcrumb.ts:81
 msgid "配置 open loop 提取、推荐候选打分、我自己主动消息文案，并查看推荐后的打开、加好友和开聊动作。"
@@ -2523,7 +2523,7 @@ msgstr "Need Discovery Short Cycle"
 
 #: apps/admin/src/components/admin-topbar.tsx:98
 msgid "面包屑"
-msgstr ""
+msgstr "Breadcrumbs"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2016
 msgid "页面导航"
