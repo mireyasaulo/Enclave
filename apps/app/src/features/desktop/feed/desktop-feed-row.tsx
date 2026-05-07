@@ -1,9 +1,11 @@
 import { useMemo } from "react";
+import { msg } from "@lingui/macro";
 import {
   type FeedComment,
   type FeedPostListItem,
   type FeedPostWithComments,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock, LoadingBlock, TextField, cn } from "@yinjie/ui";
 import { Bot, Heart, MessageCircle, Star, UserRound, X } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
@@ -56,6 +58,7 @@ export function DesktopFeedRow({
   onStartCommentReply,
   onToggleFavorite,
 }: DesktopFeedRowProps) {
+  const t = useRuntimeTranslator();
   const hasText = Boolean(post.text.trim());
   const hasMedia = post.media.length > 0;
   const mediaSummaryText = hasText ? "" : getFeedSummaryText(post);
@@ -110,17 +113,19 @@ export function DesktopFeedRow({
                 ) : (
                   <UserRound size={11} />
                 )}
-                {post.authorType === "character" ? "居民" : "世界主人"}
+                {post.authorType === "character"
+                  ? t(msg`居民`)
+                  : t(msg`世界主人`)}
               </span>
               {post.aiReacted ? (
                 <span className="rounded-md border border-[rgba(7,193,96,0.12)] bg-white px-2 py-1 text-[10px] font-medium text-[color:var(--text-primary)] shadow-[inset_0_-2px_0_0_var(--brand-primary)]">
-                  AI 已回应
+                  {t(msg`AI 已回应`)}
                 </span>
               ) : null}
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[color:var(--text-muted)]">
               <span>{formatTimestamp(post.createdAt)}</span>
-              <span>居民公开可见</span>
+              <span>{t(msg`居民公开可见`)}</span>
             </div>
           </div>
 
@@ -142,8 +147,8 @@ export function DesktopFeedRow({
           <div className="mt-3 flex items-center justify-between gap-4">
             <div className="text-[12px] text-[color:var(--text-muted)]">
               {post.likeCount > 0 || post.commentCount > 0
-                ? `${post.likeCount} 赞 · ${post.commentCount} 评论`
-                : mediaSummaryText || "还没有互动"}
+                ? t(msg`${post.likeCount} 赞 · ${post.commentCount} 评论`)
+                : mediaSummaryText || t(msg`还没有互动`)}
             </div>
             <div className="flex items-center gap-1.5">
               <button
@@ -153,7 +158,7 @@ export function DesktopFeedRow({
                 className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[color:var(--border-faint)] px-2.5 text-[12px] text-[color:var(--text-secondary)] transition-[background-color,color,border-color] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)] disabled:opacity-55"
               >
                 <Heart size={14} />
-                {likeLoading ? "处理中..." : "点赞"}
+                {likeLoading ? t(msg`处理中...`) : t(msg`点赞`)}
               </button>
               <button
                 type="button"
@@ -166,7 +171,7 @@ export function DesktopFeedRow({
                 )}
               >
                 <Star size={14} className={favorite ? "fill-current" : ""} />
-                {favorite ? "已收藏" : "收藏"}
+                {favorite ? t(msg`已收藏`) : t(msg`收藏`)}
               </button>
             </div>
           </div>
@@ -179,7 +184,9 @@ export function DesktopFeedRow({
                     <span className="font-medium text-[color:var(--text-primary)]">
                       {comment.authorName}
                     </span>
-                    <span className="text-[color:var(--text-dim)]">：</span>
+                    <span className="text-[color:var(--text-dim)]">
+                      {t(msg`：`)}
+                    </span>
                     <span>{comment.text}</span>
                   </div>
                 ))}
@@ -190,7 +197,7 @@ export function DesktopFeedRow({
                   onClick={onExpand}
                   className="mt-3 text-[12px] font-medium text-[color:var(--brand-primary)]"
                 >
-                  查看全部 {post.commentCount} 条评论
+                  {t(msg`查看全部 ${post.commentCount} 条评论`)}
                 </button>
               ) : null}
             </div>
@@ -203,7 +210,7 @@ export function DesktopFeedRow({
                 onClick={onExpand}
                 className="text-[12px] font-medium text-[color:var(--brand-primary)]"
               >
-                查看全部 {post.commentCount} 条评论
+                {t(msg`查看全部 ${post.commentCount} 条评论`)}
               </button>
             </div>
           ) : null}
@@ -213,16 +220,16 @@ export function DesktopFeedRow({
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 text-[12px] font-medium text-[color:var(--text-primary)]">
                   <MessageCircle size={13} />
-                  评论区
+                  {t(msg`评论区`)}
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] text-[color:var(--text-muted)]">
-                    {post.commentCount} 条
+                    {t(msg`${post.commentCount} 条`)}
                   </span>
                   <button
                     type="button"
                     onClick={onCollapse}
-                    aria-label="收起评论"
+                    aria-label={t(msg`收起评论`)}
                     className="flex h-7 w-7 items-center justify-center rounded-lg border border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)]"
                   >
                     <X size={12} />
@@ -232,7 +239,7 @@ export function DesktopFeedRow({
 
               {detailLoading ? (
                 <div className="mt-3">
-                  <LoadingBlock label="正在读取完整评论..." />
+                  <LoadingBlock label={t(msg`正在读取完整评论...`)} />
                 </div>
               ) : null}
 
@@ -296,7 +303,7 @@ export function DesktopFeedRow({
                   </div>
                 ) : (
                   <div className="mt-3 rounded-[12px] border border-dashed border-[color:var(--border-faint)] bg-white px-3.5 py-3 text-[12px] text-[color:var(--text-muted)]">
-                    暂时还没有评论，你可以先说一句。
+                    {t(msg`暂时还没有评论，你可以先说一句。`)}
                   </div>
                 )
               ) : null}
@@ -304,13 +311,13 @@ export function DesktopFeedRow({
               {commentReplyTarget ? (
                 <div className="mt-3 flex items-center justify-between gap-2 rounded-[12px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[12px] text-[color:var(--text-secondary)]">
                   <div className="truncate">
-                    正在回复 {commentReplyTarget.authorName}
+                    {t(msg`正在回复 ${commentReplyTarget.authorName}`)}
                   </div>
                   {onCancelCommentReply ? (
                     <button
                       type="button"
                       onClick={onCancelCommentReply}
-                      aria-label="取消回复"
+                      aria-label={t(msg`取消回复`)}
                       className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[color:var(--text-muted)] hover:bg-white"
                     >
                       <X size={12} />
@@ -325,8 +332,8 @@ export function DesktopFeedRow({
                   onChange={(event) => onCommentChange(event.target.value)}
                   placeholder={
                     commentReplyTarget
-                      ? `回复 ${commentReplyTarget.authorName}...`
-                      : "写评论..."
+                      ? t(msg`回复 ${commentReplyTarget.authorName}...`)
+                      : t(msg`写评论...`)
                   }
                   className="min-w-0 flex-1 rounded-xl border-[color:var(--border-faint)] bg-white px-4 py-2 text-[13px] shadow-none hover:bg-white focus:border-[rgba(7,193,96,0.18)] focus:shadow-none"
                 />
@@ -337,7 +344,7 @@ export function DesktopFeedRow({
                   onClick={onCommentSubmit}
                   className="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
                 >
-                  {commentLoading ? "发送中..." : "发送"}
+                  {commentLoading ? t(msg`发送中...`) : t(msg`发送`)}
                 </Button>
               </div>
             </div>
@@ -346,7 +353,7 @@ export function DesktopFeedRow({
               <TextField
                 value={commentDraft}
                 onChange={(event) => onCommentChange(event.target.value)}
-                placeholder="写评论..."
+                placeholder={t(msg`写评论...`)}
                 className="min-w-0 flex-1 rounded-xl border-[color:var(--border-faint)] bg-white px-4 py-2 text-[13px] shadow-none hover:bg-white focus:border-[rgba(7,193,96,0.18)] focus:shadow-none"
               />
               <Button
@@ -356,7 +363,7 @@ export function DesktopFeedRow({
                 onClick={onCommentSubmit}
                 className="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
               >
-                {commentLoading ? "发送中..." : "发送"}
+                {commentLoading ? t(msg`发送中...`) : t(msg`发送`)}
               </Button>
             </div>
           )}
@@ -379,6 +386,7 @@ function CommentRow({
   onStartReply?: () => void;
   replyToName: string | null;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <div
       className={cn(
@@ -398,7 +406,9 @@ function CommentRow({
               : "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)]",
           )}
         >
-          {comment.authorType === "character" ? "居民" : "世界主人"}
+          {comment.authorType === "character"
+            ? t(msg`居民`)
+            : t(msg`世界主人`)}
         </span>
         <span className="text-[color:var(--text-dim)]">
           {formatTimestamp(comment.createdAt)}
@@ -407,9 +417,13 @@ function CommentRow({
       <div className="mt-1.5 text-[13px] leading-6 text-[color:var(--text-secondary)]">
         {replyToName ? (
           <>
-            <span className="text-[color:var(--text-secondary)]">回复 </span>
+            <span className="text-[color:var(--text-secondary)]">
+              {t(msg`回复 `)}
+            </span>
             <span className="font-medium text-[#07c160]">{replyToName}</span>
-            <span className="text-[color:var(--text-secondary)]">：</span>
+            <span className="text-[color:var(--text-secondary)]">
+              {t(msg`：`)}
+            </span>
           </>
         ) : null}
         <span className="text-[color:var(--text-primary)]">{comment.text}</span>
@@ -421,7 +435,7 @@ function CommentRow({
             onClick={onStartReply}
             className="rounded-full border border-[color:var(--border-faint)] bg-white px-2.5 py-0.5 text-[11px] text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)]"
           >
-            回复
+            {t(msg`回复`)}
           </button>
         </div>
       ) : null}

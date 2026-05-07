@@ -331,7 +331,7 @@ function DirectChatDetailsPanel({
   const updateProfileMutation = useMutation({
     mutationFn: (payload: UpdateFriendProfileRequest) => {
       if (!targetCharacterId || !friendship) {
-        throw new Error("Friend not found");
+        throw new Error("FRIEND_NOT_FOUND");
       }
 
       return updateFriendProfile(targetCharacterId, payload, baseUrl);

@@ -1,4 +1,6 @@
 import { useEffect, useRef } from "react";
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock, TextAreaField } from "@yinjie/ui";
 import { ImagePlus, Video, X } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
@@ -45,6 +47,7 @@ export function DesktopMomentComposePanel({
   onTextChange,
   onVideoFileSelected,
 }: DesktopMomentComposePanelProps) {
+  const t = useRuntimeTranslator();
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -74,17 +77,17 @@ export function DesktopMomentComposePanel({
         <div className="flex items-center justify-between border-b border-[color:var(--border-faint)] bg-white/82 px-5 py-4 backdrop-blur-xl">
           <div>
             <div className="text-[11px] font-medium tracking-[0.12em] text-[color:var(--text-muted)]">
-              发朋友圈
+              {t(msg`发朋友圈`)}
             </div>
             <div className="mt-1 text-[16px] font-semibold text-[color:var(--text-primary)]">
-              直接发到当前动态流
+              {t(msg`直接发到当前动态流`)}
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
             className="flex h-9 w-9 items-center justify-center rounded-xl border border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)]"
-            aria-label="关闭发帖面板"
+            aria-label={t(msg`关闭发帖面板`)}
           >
             <X size={16} />
           </button>
@@ -96,22 +99,22 @@ export function DesktopMomentComposePanel({
               <AvatarChip name={ownerUsername} src={ownerAvatar} />
               <div className="min-w-0">
                 <div className="truncate text-[14px] font-medium text-[color:var(--text-primary)]">
-                  {ownerUsername ?? "我"}
+                  {ownerUsername ?? t(msg`我`)}
                 </div>
                 <div className="mt-1 text-[12px] text-[color:var(--text-muted)]">
-                  图文和单条视频都可以直接发到朋友圈
+                  {t(msg`图文和单条视频都可以直接发到朋友圈`)}
                 </div>
               </div>
             </div>
 
             <div className="mt-4 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3 text-[12px] leading-6 text-[color:var(--text-secondary)]">
-              图片最多 9 张，视频当前支持 1 条且不超过 5 分钟。图片和视频暂不混发。
+              {t(msg`图片最多 9 张，视频当前支持 1 条且不超过 5 分钟。图片和视频暂不混发。`)}
             </div>
 
             <TextAreaField
               value={text}
               onChange={(event) => onTextChange(event.target.value)}
-              placeholder="写下这一刻的想法..."
+              placeholder={t(msg`写下这一刻的想法...`)}
               className="mt-5 min-h-[220px] resize-none rounded-[18px] border-[color:var(--border-faint)] bg-white px-4 py-4 leading-7 shadow-none hover:bg-[color:var(--surface-console)] focus:border-[rgba(7,193,96,0.14)] focus:bg-white focus:shadow-none"
               autoFocus
             />
@@ -135,7 +138,7 @@ export function DesktopMomentComposePanel({
                 className="inline-flex h-10 items-center gap-2 rounded-full border border-[color:var(--border-faint)] bg-white px-4 text-[13px] text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <ImagePlus size={15} />
-                添加图片
+                {t(msg`添加图片`)}
               </button>
               <button
                 type="button"
@@ -144,7 +147,7 @@ export function DesktopMomentComposePanel({
                 className="inline-flex h-10 items-center gap-2 rounded-full border border-[color:var(--border-faint)] bg-white px-4 text-[13px] text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Video size={15} />
-                {videoDraft ? "更换视频" : "添加视频"}
+                {videoDraft ? t(msg`更换视频`) : t(msg`添加视频`)}
               </button>
             </div>
 
@@ -156,7 +159,7 @@ export function DesktopMomentComposePanel({
 
             <div className="mt-5 border-t border-[color:var(--border-faint)] pt-4">
               <div className="flex items-center justify-between gap-3 text-[12px] text-[color:var(--text-muted)]">
-                <span>发布后会直接插入到动态流顶部。</span>
+                <span>{t(msg`发布后会直接插入到动态流顶部。`)}</span>
                 <span className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[11px]">
                   {text.trim().length}/600
                 </span>
@@ -168,7 +171,7 @@ export function DesktopMomentComposePanel({
                   onClick={onClose}
                   className="border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
                 >
-                  取消
+                  {t(msg`取消`)}
                 </Button>
                 <Button
                   variant="primary"
@@ -176,7 +179,7 @@ export function DesktopMomentComposePanel({
                   onClick={onCreate}
                   className="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
                 >
-                  {createPending ? "发布中..." : "发布"}
+                  {createPending ? t(msg`发布中...`) : t(msg`发布`)}
                 </Button>
               </div>
             </div>

@@ -1,5 +1,8 @@
+import { msg } from "@lingui/macro";
+import type { MessageDescriptor } from "@lingui/core";
 import type { FriendRequest } from "@yinjie/contracts";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
 
@@ -26,6 +29,7 @@ export function DesktopContactsFriendRequestsPane({
   onAccept,
   onDecline,
 }: DesktopContactsFriendRequestsPaneProps) {
+  const t = useRuntimeTranslator();
   const pendingCount = requests.filter(
     (item) => item.status === "pending",
   ).length;
@@ -35,12 +39,12 @@ export function DesktopContactsFriendRequestsPane({
       <div className="border-b border-[color:var(--border-faint)] bg-white/82 px-8 py-6 backdrop-blur-xl">
         <div className="min-w-0">
           <div className="text-[22px] font-medium text-[color:var(--text-primary)]">
-            新的朋友
+            {t(msg`新的朋友`)}
           </div>
           <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
             {pendingCount > 0
-              ? `当前有 ${pendingCount} 条待处理好友申请`
-              : "查看收到的好友申请和处理结果。"}
+              ? t(msg`当前有 ${pendingCount} 条待处理好友申请`)
+              : t(msg`查看收到的好友申请和处理结果。`)}
           </div>
         </div>
       </div>
@@ -60,7 +64,7 @@ export function DesktopContactsFriendRequestsPane({
 
         {loading ? (
           <div className="flex h-full items-center justify-center">
-            <LoadingBlock label="正在读取好友请求..." />
+            <LoadingBlock label={t(msg`正在读取好友请求...`)} />
           </div>
         ) : error ? (
           <ErrorBlock message={error} />
@@ -90,13 +94,13 @@ export function DesktopContactsFriendRequestsPane({
                           </div>
                           <div className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-[color:var(--text-muted)]">
                             <span>
-                              {getFriendRequestSourceLabel(
+                              {t(getFriendRequestSourceLabel(
                                 request.triggerScene,
-                              )}
+                              ))}
                             </span>
                             <span>·</span>
                             <span>
-                              {formatFriendRequestDate(request.createdAt)}
+                              {formatFriendRequestDate(request.createdAt, t)}
                             </span>
                           </div>
                         </div>
@@ -111,15 +115,15 @@ export function DesktopContactsFriendRequestsPane({
                           )}
                         >
                           {request.status === "pending"
-                            ? "待处理"
+                            ? t(msg`待处理`)
                             : request.status === "accepted"
-                              ? "已通过"
-                              : "已忽略"}
+                              ? t(msg`已通过`)
+                              : t(msg`已忽略`)}
                         </div>
                       </div>
 
                       <div className="mt-4 rounded-[16px] bg-[rgba(245,247,247,0.92)] px-4 py-3 text-[14px] leading-7 text-[color:var(--text-secondary)]">
-                        {request.greeting || "想认识你。"}
+                        {request.greeting || t(msg`想认识你。`)}
                       </div>
 
                       <div className="mt-4 flex items-center justify-end gap-3">
@@ -131,8 +135,8 @@ export function DesktopContactsFriendRequestsPane({
                           className="rounded-[12px] border-[color:var(--border-faint)] bg-white px-5 shadow-none hover:bg-[color:var(--surface-console)]"
                         >
                           {declinePendingId === request.id
-                            ? "处理中..."
-                            : "拒绝"}
+                            ? t(msg`处理中...`)
+                            : t(msg`拒绝`)}
                         </Button>
                         <Button
                           variant="primary"
@@ -142,8 +146,8 @@ export function DesktopContactsFriendRequestsPane({
                           className="rounded-[12px] bg-[#07c160] px-5 text-white shadow-none hover:bg-[#06ad56]"
                         >
                           {acceptPendingId === request.id
-                            ? "接受中..."
-                            : "接受"}
+                            ? t(msg`接受中...`)
+                            : t(msg`接受`)}
                         </Button>
                       </div>
                     </div>
@@ -155,8 +159,8 @@ export function DesktopContactsFriendRequestsPane({
         ) : (
           <div className="flex h-full items-center justify-center">
             <EmptyState
-              title="暂时没有新的好友请求"
-              description="等待世界里的相遇事件触发新的申请。"
+              title={t(msg`暂时没有新的好友请求`)}
+              description={t(msg`等待世界里的相遇事件触发新的申请。`)}
             />
           </div>
         )}
@@ -165,19 +169,22 @@ export function DesktopContactsFriendRequestsPane({
   );
 }
 
-function getFriendRequestSourceLabel(triggerScene?: string) {
+function getFriendRequestSourceLabel(triggerScene?: string): MessageDescriptor {
   if (!triggerScene) {
-    return "新的朋友";
+    return msg`新的朋友`;
   }
 
   if (triggerScene === "shake") {
-    return "来自摇一摇";
+    return msg`来自摇一摇`;
   }
 
-  return `来自 ${triggerScene}`;
+  return msg`来自 ${triggerScene}`;
 }
 
-function formatFriendRequestDate(createdAt: string) {
+function formatFriendRequestDate(
+  createdAt: string,
+  t: (descriptor: MessageDescriptor) => string,
+) {
   const date = new Date(createdAt);
   if (Number.isNaN(date.getTime())) {
     return "";
@@ -189,10 +196,10 @@ function formatFriendRequestDate(createdAt: string) {
   const sameDay = sameMonth && date.getDate() === now.getDate();
 
   if (sameDay) {
-    return "今天";
+    return t(msg`今天`);
   }
 
-  const formatter = new Intl.DateTimeFormat("zh-CN", {
+  const formatter = new Intl.DateTimeFormat(undefined, {
     month: "2-digit",
     day: "2-digit",
   });

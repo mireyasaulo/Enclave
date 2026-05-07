@@ -1,4 +1,6 @@
+import { msg } from "@lingui/macro";
 import { type Moment, type MomentComment } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, LoadingBlock } from "@yinjie/ui";
 import { EmptyState } from "../../../components/empty-state";
 import {
@@ -46,11 +48,12 @@ export function DesktopMomentsFeed({
   onOpenCompose,
   onSelectAuthor,
 }: DesktopMomentsFeedProps) {
+  const t = useRuntimeTranslator();
   return (
     <>
       {isLoading ? (
         <LoadingBlock
-          label="正在读取朋友圈..."
+          label={t(msg`正在读取朋友圈...`)}
           className="rounded-[20px] border-[color:var(--border-faint)] bg-white py-10 shadow-[var(--shadow-section)]"
         />
       ) : null}
@@ -94,11 +97,11 @@ export function DesktopMomentsFeed({
       {!isLoading && !moments.length ? (
         <div className="mx-auto max-w-[560px] py-10">
           <EmptyState
-            title="朋友圈还很安静"
-            description="你先发一条，或者等世界里的其他人先开口。"
+            title={t(msg`朋友圈还很安静`)}
+            description={t(msg`你先发一条，或者等世界里的其他人先开口。`)}
             action={
               <Button variant="primary" onClick={onOpenCompose}>
-                发朋友圈
+                {t(msg`发朋友圈`)}
               </Button>
             }
           />

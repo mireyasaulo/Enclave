@@ -1,3 +1,5 @@
+import { msg } from "@lingui/macro";
+import type { MessageDescriptor } from "@lingui/core";
 import {
   CheckCircle2,
   MessageCircleMore,
@@ -6,6 +8,7 @@ import {
 } from "lucide-react";
 import type { Character, FriendListItem, FriendRequest } from "@yinjie/contracts";
 import { Button, cn } from "@yinjie/ui";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { getFriendDisplayName } from "../../contacts/contact-utils";
 
@@ -38,60 +41,76 @@ export function DesktopAddFriendResultCard({
   onOpenProfile,
   onPrimaryAction,
 }: DesktopAddFriendResultCardProps) {
+  const t = useRuntimeTranslator();
   const displayName = friendship
     ? getFriendDisplayName({ character, friendship })
     : character.name;
   const signature =
     character.currentStatus?.trim() ||
     character.bio?.trim() ||
-    "这个角色还没有签名。";
+    t(msg`这个角色还没有签名。`);
   const relationshipSummary =
     displayName !== character.name
-      ? `昵称：${character.name}`
-      : character.relationship?.trim() || "世界角色";
+      ? t(msg`昵称：${character.name}`)
+      : character.relationship?.trim() || t(msg`世界角色`);
   const expertDomains = character.expertDomains.slice(0, 4);
-  const statusMeta =
+  const statusMetaDescriptor: {
+    badge: MessageDescriptor;
+    badgeClassName: string;
+    helperText: MessageDescriptor;
+    icon: typeof MessageCircleMore;
+    primaryLabel: MessageDescriptor;
+    primaryDisabled: boolean;
+  } =
     status === "friend"
       ? {
-          badge: "已在通讯录中",
+          badge: msg`已在通讯录中`,
           badgeClassName:
             "border-[rgba(22,163,74,0.14)] bg-[rgba(22,163,74,0.08)] text-[#15803d]",
-          helperText: "你们已经是朋友，可以直接开始聊天。",
+          helperText: msg`你们已经是朋友，可以直接开始聊天。`,
           icon: MessageCircleMore,
-          primaryLabel: actionPending ? "打开中..." : "发消息",
+          primaryLabel: actionPending ? msg`打开中...` : msg`发消息`,
           primaryDisabled: actionPending,
         }
       : status === "pending"
         ? {
-            badge: "等待验证",
+            badge: msg`等待验证`,
             badgeClassName:
               "border-[rgba(202,138,4,0.16)] bg-[rgba(250,204,21,0.10)] text-[#a16207]",
             helperText: pendingRequest?.createdAt
-              ? "好友申请已发送，等待对方处理。"
-              : "当前申请还在等待对方通过。",
+              ? msg`好友申请已发送，等待对方处理。`
+              : msg`当前申请还在等待对方通过。`,
             icon: CheckCircle2,
-            primaryLabel: "已发送",
+            primaryLabel: msg`已发送`,
             primaryDisabled: true,
           }
         : status === "blocked"
           ? {
-              badge: "黑名单中",
+              badge: msg`黑名单中`,
               badgeClassName:
                 "border-[rgba(239,68,68,0.16)] bg-[rgba(254,226,226,0.82)] text-[#b91c1c]",
-              helperText: "当前角色已在黑名单中，移出黑名单后才能重新添加。",
+              helperText: msg`当前角色已在黑名单中，移出黑名单后才能重新添加。`,
               icon: ShieldBan,
-              primaryLabel: "已拉黑",
+              primaryLabel: msg`已拉黑`,
               primaryDisabled: true,
             }
           : {
-              badge: "可添加到通讯录",
+              badge: msg`可添加到通讯录`,
               badgeClassName:
                 "border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.08)] text-[#15803d]",
-              helperText: "发送验证申请后，对方通过即可成为朋友。",
+              helperText: msg`发送验证申请后，对方通过即可成为朋友。`,
               icon: UserPlus,
-              primaryLabel: actionPending ? "发送中..." : "添加到通讯录",
+              primaryLabel: actionPending
+                ? msg`发送中...`
+                : msg`添加到通讯录`,
               primaryDisabled: actionPending,
             };
+  const statusMeta = {
+    ...statusMetaDescriptor,
+    badge: t(statusMetaDescriptor.badge),
+    helperText: t(statusMetaDescriptor.helperText),
+    primaryLabel: t(statusMetaDescriptor.primaryLabel),
+  };
   const PrimaryIcon = statusMeta.icon;
 
   return (
@@ -132,29 +151,31 @@ export function DesktopAddFriendResultCard({
       </div>
 
       <div className="divide-y divide-[rgba(15,23,42,0.06)]">
-        <DesktopAddFriendDetailRow label="昵称" value={character.name} />
-        <DesktopAddFriendDetailRow label="隐界号" value={identifier} />
+        <DesktopAddFriendDetailRow label={t(msg`昵称`)} value={character.name} />
+        <DesktopAddFriendDetailRow label={t(msg`隐界号`)} value={identifier} />
         <DesktopAddFriendDetailRow
-          label="关系"
-          value={character.relationship?.trim() || "世界角色"}
+          label={t(msg`关系`)}
+          value={character.relationship?.trim() || t(msg`世界角色`)}
         />
         <DesktopAddFriendDetailRow
-          label="当前活动"
-          value={character.currentActivity?.trim() || "暂无活动"}
+          label={t(msg`当前活动`)}
+          value={character.currentActivity?.trim() || t(msg`暂无活动`)}
         />
         <DesktopAddFriendDetailRow
-          label="擅长领域"
-          value={expertDomains.length ? expertDomains.join(" / ") : "未设置"}
+          label={t(msg`擅长领域`)}
+          value={
+            expertDomains.length ? expertDomains.join(" / ") : t(msg`未设置`)
+          }
         />
         {friendship ? (
           <>
             <DesktopAddFriendDetailRow
-              label="备注"
-              value={friendship.remarkName?.trim() || "未设置"}
+              label={t(msg`备注`)}
+              value={friendship.remarkName?.trim() || t(msg`未设置`)}
             />
             <DesktopAddFriendDetailRow
-              label="来源"
-              value={friendship.source?.trim() || "未设置"}
+              label={t(msg`来源`)}
+              value={friendship.source?.trim() || t(msg`未设置`)}
             />
           </>
         ) : null}
@@ -171,7 +192,7 @@ export function DesktopAddFriendResultCard({
             onClick={onOpenProfile}
             className="rounded-[8px] border-[rgba(15,23,42,0.10)] bg-white px-5 shadow-none hover:bg-[color:var(--surface-console)]"
           >
-            查看资料
+            {t(msg`查看资料`)}
           </Button>
           <Button
             variant="primary"

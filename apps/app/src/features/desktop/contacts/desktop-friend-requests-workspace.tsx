@@ -1,6 +1,9 @@
+import { msg } from "@lingui/macro";
+import type { MessageDescriptor } from "@lingui/core";
 import { Clock3, UserPlus } from "lucide-react";
 import type { FriendRequest } from "@yinjie/contracts";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
 import { DesktopUtilityShell } from "../desktop-utility-shell";
@@ -28,22 +31,23 @@ export function DesktopFriendRequestsWorkspace({
   onDecline,
   onOpenAddFriend,
 }: DesktopFriendRequestsWorkspaceProps) {
+  const t = useRuntimeTranslator();
   const pendingCount = requests.filter((item) => item.status === "pending").length;
 
   return (
     <DesktopUtilityShell
-      title="新的朋友"
+      title={t(msg`新的朋友`)}
       subtitle={
         pendingCount > 0
-          ? `当前有 ${pendingCount} 条待处理好友申请`
-          : "查看并处理来自世界角色的好友申请"
+          ? t(msg`当前有 ${pendingCount} 条待处理好友申请`)
+          : t(msg`查看并处理来自世界角色的好友申请`)
       }
       sidebar={
         <div className="flex h-full min-h-0 flex-col">
           <div className="border-b border-[color:var(--border-faint)] px-4 py-4">
             <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
               <UserPlus size={16} className="text-[#07c160]" />
-              <span>好友入口</span>
+              <span>{t(msg`好友入口`)}</span>
             </div>
           </div>
 
@@ -55,10 +59,10 @@ export function DesktopFriendRequestsWorkspace({
             >
               <div className="min-w-0">
                 <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                  添加朋友
+                  {t(msg`添加朋友`)}
                 </div>
                 <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                  搜索隐界号或角色名，发送验证申请
+                  {t(msg`搜索隐界号或角色名，发送验证申请`)}
                 </div>
               </div>
             </button>
@@ -69,27 +73,27 @@ export function DesktopFriendRequestsWorkspace({
             >
               <div className="min-w-0">
                 <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                  新的朋友
+                  {t(msg`新的朋友`)}
                 </div>
                 <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                  查看好友申请和最新处理结果
+                  {t(msg`查看好友申请和最新处理结果`)}
                 </div>
               </div>
               <span className="rounded-full bg-white/90 px-2 py-0.5 text-[11px] text-[#15803d]">
-                当前
+                {t(msg`当前`)}
               </span>
             </button>
 
             <div className="mt-4 rounded-[16px] border border-[color:var(--border-faint)] bg-white p-4">
               <div className="text-xs font-medium tracking-[0.08em] text-[color:var(--text-muted)]">
-                处理建议
+                {t(msg`处理建议`)}
               </div>
               <div className="mt-3 space-y-2 text-xs leading-6 text-[color:var(--text-secondary)]">
                 <div className="rounded-[12px] bg-[color:var(--surface-console)] px-3 py-2.5">
-                  接受后会直接进入通讯录，可以立刻开始聊天。
+                  {t(msg`接受后会直接进入通讯录，可以立刻开始聊天。`)}
                 </div>
                 <div className="rounded-[12px] bg-[color:var(--surface-console)] px-3 py-2.5">
-                  拒绝只会处理当前申请，不会删除角色资料。
+                  {t(msg`拒绝只会处理当前申请，不会删除角色资料。`)}
                 </div>
               </div>
             </div>
@@ -100,31 +104,31 @@ export function DesktopFriendRequestsWorkspace({
         <div className="flex h-full min-h-0 flex-col">
           <div className="border-b border-[color:var(--border-faint)] px-5 py-4">
             <div className="text-sm font-medium text-[color:var(--text-primary)]">
-              请求概览
+              {t(msg`请求概览`)}
             </div>
             <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-              在桌面端集中处理所有待通过好友申请。
+              {t(msg`在桌面端集中处理所有待通过好友申请。`)}
             </div>
           </div>
 
           <div className="min-h-0 flex-1 overflow-auto p-5">
             <div className="space-y-3">
-              <MetaCard label="待处理" value={`${pendingCount}`} />
-              <MetaCard label="总申请" value={`${requests.length}`} />
+              <MetaCard label={t(msg`待处理`)} value={`${pendingCount}`} />
+              <MetaCard label={t(msg`总申请`)} value={`${requests.length}`} />
             </div>
 
             <div className="mt-5 rounded-[16px] border border-[color:var(--border-faint)] bg-white p-4">
               <div className="text-xs font-medium tracking-[0.08em] text-[color:var(--text-muted)]">
-                来源说明
+                {t(msg`来源说明`)}
               </div>
               <div className="mt-3 space-y-2">
                 <SourceHint
-                  title="来自搜索添加"
-                  description="桌面端手动搜索角色后发送的验证申请。"
+                  title={t(msg`来自搜索添加`)}
+                  description={t(msg`桌面端手动搜索角色后发送的验证申请。`)}
                 />
                 <SourceHint
-                  title="来自摇一摇/场景"
-                  description="系统事件触发的角色主动相遇请求。"
+                  title={t(msg`来自摇一摇/场景`)}
+                  description={t(msg`系统事件触发的角色主动相遇请求。`)}
                 />
               </div>
             </div>
@@ -142,7 +146,7 @@ export function DesktopFriendRequestsWorkspace({
         <div className="h-[calc(100%-4px)] overflow-hidden rounded-[24px] border border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.78)]">
           {loading ? (
             <div className="flex h-full items-center justify-center px-6">
-              <LoadingBlock label="正在读取好友请求..." />
+              <LoadingBlock label={t(msg`正在读取好友请求...`)} />
             </div>
           ) : error ? (
             <div className="px-6 py-6">
@@ -169,11 +173,11 @@ export function DesktopFriendRequestsWorkspace({
                               {request.characterName}
                             </div>
                             <div className="mt-1 flex flex-wrap items-center gap-2 text-[12px] text-[color:var(--text-muted)]">
-                              <span>{getFriendRequestSourceLabel(request.triggerScene)}</span>
+                              <span>{t(getFriendRequestSourceLabel(request.triggerScene))}</span>
                               <span>·</span>
                               <span className="inline-flex items-center gap-1">
                                 <Clock3 size={12} />
-                                {formatFriendRequestDate(request.createdAt)}
+                                {formatFriendRequestDate(request.createdAt, t)}
                               </span>
                             </div>
                           </div>
@@ -188,15 +192,15 @@ export function DesktopFriendRequestsWorkspace({
                             )}
                           >
                             {request.status === "pending"
-                              ? "待处理"
+                              ? t(msg`待处理`)
                               : request.status === "accepted"
-                                ? "已通过"
-                                : "已忽略"}
+                                ? t(msg`已通过`)
+                                : t(msg`已忽略`)}
                           </div>
                         </div>
 
                         <div className="mt-4 rounded-[16px] bg-[rgba(245,247,247,0.92)] px-4 py-3 text-[14px] leading-7 text-[color:var(--text-secondary)]">
-                          {request.greeting || "想认识你。"}
+                          {request.greeting || t(msg`想认识你。`)}
                         </div>
 
                         <div className="mt-4 flex items-center justify-end gap-3">
@@ -210,7 +214,7 @@ export function DesktopFriendRequestsWorkspace({
                             onClick={() => onDecline(request.id)}
                             className="rounded-[12px] border-[color:var(--border-faint)] bg-white px-5 shadow-none hover:bg-[color:var(--surface-console)]"
                           >
-                            {declinePendingId === request.id ? "处理中..." : "拒绝"}
+                            {declinePendingId === request.id ? t(msg`处理中...`) : t(msg`拒绝`)}
                           </Button>
                           <Button
                             variant="primary"
@@ -222,7 +226,7 @@ export function DesktopFriendRequestsWorkspace({
                             onClick={() => onAccept(request.id)}
                             className="rounded-[12px] bg-[#07c160] px-5 text-white shadow-none hover:bg-[#06ad56]"
                           >
-                            {acceptPendingId === request.id ? "接受中..." : "接受"}
+                            {acceptPendingId === request.id ? t(msg`接受中...`) : t(msg`接受`)}
                           </Button>
                         </div>
                       </div>
@@ -234,11 +238,11 @@ export function DesktopFriendRequestsWorkspace({
           ) : (
             <div className="flex h-full items-center justify-center px-6">
               <EmptyState
-                title="暂时没有新的好友请求"
-                description="去添加朋友里搜索角色，或等待世界里的相遇事件触发新的申请。"
+                title={t(msg`暂时没有新的好友请求`)}
+                description={t(msg`去添加朋友里搜索角色，或等待世界里的相遇事件触发新的申请。`)}
                 action={
                   <Button variant="secondary" onClick={onOpenAddFriend}>
-                    去添加朋友
+                    {t(msg`去添加朋友`)}
                   </Button>
                 }
               />
@@ -282,23 +286,26 @@ function SourceHint({
   );
 }
 
-function getFriendRequestSourceLabel(triggerScene?: string) {
+function getFriendRequestSourceLabel(triggerScene?: string): MessageDescriptor {
   if (!triggerScene) {
-    return "新的朋友";
+    return msg`新的朋友`;
   }
 
   if (triggerScene === "shake") {
-    return "来自摇一摇";
+    return msg`来自摇一摇`;
   }
 
   if (triggerScene === "manual_add") {
-    return "来自搜索添加";
+    return msg`来自搜索添加`;
   }
 
-  return `来自 ${triggerScene}`;
+  return msg`来自 ${triggerScene}`;
 }
 
-function formatFriendRequestDate(createdAt: string) {
+function formatFriendRequestDate(
+  createdAt: string,
+  t: (descriptor: MessageDescriptor) => string,
+) {
   const date = new Date(createdAt);
   if (Number.isNaN(date.getTime())) {
     return "";
@@ -310,10 +317,10 @@ function formatFriendRequestDate(createdAt: string) {
   const sameDay = sameMonth && date.getDate() === now.getDate();
 
   if (sameDay) {
-    return "今天";
+    return t(msg`今天`);
   }
 
-  const formatter = new Intl.DateTimeFormat("zh-CN", {
+  const formatter = new Intl.DateTimeFormat(undefined, {
     month: "2-digit",
     day: "2-digit",
   });

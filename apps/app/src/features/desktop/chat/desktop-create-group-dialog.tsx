@@ -1049,7 +1049,7 @@ export function DesktopCreateGroupDialog({
 
         <div className="flex items-center justify-between gap-4 border-t border-[rgba(15,23,42,0.08)] bg-[#f7f7f7] px-4 py-3">
           <div className="flex min-w-0 items-center gap-3 text-[12px] text-[color:var(--text-muted)]">
-            <span>已选择 {selectedIds.length} 位联系人</span>
+            <span>{t(msg`已选择 ${selectedIds.length} 位联系人`)}</span>
             {conversationId ? (
               <button
                 type="button"
@@ -1069,8 +1069,8 @@ export function DesktopCreateGroupDialog({
                 )}
               >
                 {shareHistory && selectedMessageIds.length
-                  ? `已分享 ${selectedMessageIds.length} 条聊天内容`
-                  : "分享聊天内容"}
+                  ? t(msg`已分享 ${selectedMessageIds.length} 条聊天内容`)
+                  : t(msg`分享聊天内容`)}
               </button>
             ) : selectedIds.length ? (
               <span className="truncate">{defaultGroupName}</span>
@@ -1084,7 +1084,7 @@ export function DesktopCreateGroupDialog({
               disabled={createMutation.isPending}
               className="rounded-[10px] border-[color:var(--border-faint)] bg-white shadow-none hover:bg-[color:var(--surface-console)]"
             >
-              取消
+              {t(msg`取消`)}
             </Button>
             <Button
               type="button"
@@ -1093,7 +1093,7 @@ export function DesktopCreateGroupDialog({
               disabled={!selectedIds.length || createMutation.isPending}
               className="rounded-[10px] bg-[color:var(--brand-primary)] px-6 text-white hover:opacity-95"
             >
-              {createMutation.isPending ? "正在创建..." : "完成"}
+              {createMutation.isPending ? t(msg`正在创建...`) : t(msg`完成`)}
             </Button>
           </div>
         </div>
@@ -1104,51 +1104,51 @@ export function DesktopCreateGroupDialog({
 
 function getMessagePreviewText(message: Message) {
   if (message.type === "system") {
-    return message.text.trim() || "[系统消息]";
+    return message.text.trim() || translateRuntimeMessage(msg`[系统消息]`);
   }
 
   return (
     resolveMessageSemanticPreview(message, {
       maxChars: 160,
       bracketedFallback: true,
-    }) || "[文本消息]"
+    }) || translateRuntimeMessage(msg`[文本消息]`)
   );
 }
 
 function formatMessageTypeLabel(message: Message) {
   if (message.type === "text" || message.type === "proactive") {
-    return "文字";
+    return translateRuntimeMessage(msg`文字`);
   }
 
   if (message.type === "system") {
-    return "系统";
+    return translateRuntimeMessage(msg`系统`);
   }
 
   if (message.type === "sticker") {
-    return "表情";
+    return translateRuntimeMessage(msg`表情`);
   }
 
   if (message.type === "image") {
-    return "图片";
+    return translateRuntimeMessage(msg`图片`);
   }
 
   if (message.type === "file") {
-    return "文件";
+    return translateRuntimeMessage(msg`文件`);
   }
 
   if (message.type === "voice") {
-    return "语音";
+    return translateRuntimeMessage(msg`语音`);
   }
 
   if (message.type === "contact_card") {
-    return "名片";
+    return translateRuntimeMessage(msg`名片`);
   }
 
   if (message.type === "note_card") {
-    return "笔记";
+    return translateRuntimeMessage(msg`笔记`);
   }
 
-  return "位置";
+  return translateRuntimeMessage(msg`位置`);
 }
 
 function buildDefaultGroupName(
@@ -1160,11 +1160,13 @@ function buildDefaultGroupName(
     .slice(0, 3);
 
   if (!names.length) {
-    return "临时群聊";
+    return translateRuntimeMessage(msg`临时群聊`);
   }
 
   if (items.length > 3) {
-    return `${names.join("、")}等${items.length}人`;
+    return translateRuntimeMessage(
+      msg`${names.join("、")}等${items.length}人`,
+    );
   }
 
   return names.join("、");
@@ -1239,7 +1241,7 @@ function resolveShareableMessageSectionKey(createdAt: string) {
 function resolveShareableMessageSectionLabel(createdAt: string) {
   const timestamp = parseTimestamp(createdAt);
   if (timestamp === null) {
-    return "未知时间";
+    return translateRuntimeMessage(msg`未知时间`);
   }
 
   const date = new Date(timestamp);
@@ -1248,22 +1250,22 @@ function resolveShareableMessageSectionLabel(createdAt: string) {
   yesterday.setDate(now.getDate() - 1);
 
   if (isSameCalendarDay(date, now)) {
-    return "今天";
+    return translateRuntimeMessage(msg`今天`);
   }
 
   if (isSameCalendarDay(date, yesterday)) {
-    return "昨天";
+    return translateRuntimeMessage(msg`昨天`);
   }
 
   if (date.getFullYear() === now.getFullYear()) {
-    return new Intl.DateTimeFormat("zh-CN", {
+    return new Intl.DateTimeFormat(undefined, {
       month: "numeric",
       day: "numeric",
       weekday: "short",
     }).format(date);
   }
 
-  return new Intl.DateTimeFormat("zh-CN", {
+  return new Intl.DateTimeFormat(undefined, {
     year: "numeric",
     month: "numeric",
     day: "numeric",
@@ -1277,7 +1279,7 @@ function formatShareableMessageTime(createdAt: string) {
     return "--:--";
   }
 
-  return new Intl.DateTimeFormat("zh-CN", {
+  return new Intl.DateTimeFormat(undefined, {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(timestamp));

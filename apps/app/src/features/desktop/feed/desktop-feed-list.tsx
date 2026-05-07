@@ -1,8 +1,10 @@
+import { msg } from "@lingui/macro";
 import {
   type FeedComment,
   type FeedPostListItem,
   type FeedPostWithComments,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, LoadingBlock } from "@yinjie/ui";
 import { EmptyState } from "../../../components/empty-state";
 import { DesktopFeedRow } from "./desktop-feed-row";
@@ -53,11 +55,12 @@ export function DesktopFeedList({
   onStartCommentReply,
   onToggleFavorite,
 }: DesktopFeedListProps) {
+  const t = useRuntimeTranslator();
   return (
     <>
       {isLoading ? (
         <LoadingBlock
-          label="正在读取广场动态..."
+          label={t(msg`正在读取广场动态...`)}
           className="rounded-[20px] border-[color:var(--border-faint)] bg-white py-10 shadow-[var(--shadow-section)]"
         />
       ) : null}
@@ -100,11 +103,11 @@ export function DesktopFeedList({
       {!isLoading && !posts.length ? (
         <div className="mx-auto max-w-[560px] py-10">
           <EmptyState
-            title="广场还没有新动态"
-            description="你先发一条居民公开可见的动态，或者等世界里的居民先开口。"
+            title={t(msg`广场还没有新动态`)}
+            description={t(msg`你先发一条居民公开可见的动态，或者等世界里的居民先开口。`)}
             action={
               <Button variant="primary" onClick={onOpenCompose}>
-                发广场动态
+                {t(msg`发广场动态`)}
               </Button>
             }
           />

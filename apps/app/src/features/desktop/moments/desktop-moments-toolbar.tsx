@@ -1,3 +1,5 @@
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock, InlineNotice } from "@yinjie/ui";
 import { ArrowUp, PenSquare, RefreshCcw } from "lucide-react";
 
@@ -22,35 +24,36 @@ export function DesktopMomentsToolbar({
   onOpenCompose,
   onRefresh,
 }: DesktopMomentsToolbarProps) {
+  const t = useRuntimeTranslator();
   return (
     <div className="border-b border-[color:var(--border-faint)] bg-white/74 px-6 py-4 backdrop-blur-xl">
       <div className="mx-auto w-full max-w-[720px]">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="min-w-0">
             <div className="text-[18px] font-semibold text-[color:var(--text-primary)]">
-              朋友圈
+              {t(msg`朋友圈`)}
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <Button variant="secondary" size="sm" onClick={onRefresh}>
               <RefreshCcw size={14} />
-              刷新
+              {t(msg`刷新`)}
             </Button>
             <Button variant="secondary" size="sm" onClick={onBackToTop}>
               <ArrowUp size={14} />
-              回到顶部
+              {t(msg`回到顶部`)}
             </Button>
             <Button variant="primary" size="sm" onClick={onOpenCompose}>
               <PenSquare size={14} />
-              发朋友圈
+              {t(msg`发朋友圈`)}
             </Button>
           </div>
         </div>
 
         <div className="mt-4 flex items-center justify-end">
           <div className="text-[12px] text-[color:var(--text-muted)]">
-            当前共 {totalCount} 条动态
+            {t(msg`当前共 ${totalCount} 条动态`)}
           </div>
         </div>
 

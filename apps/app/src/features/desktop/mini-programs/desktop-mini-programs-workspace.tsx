@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, InlineNotice, cn } from "@yinjie/ui";
 import { EmptyState } from "../../../components/empty-state";
 import { formatConversationTimestamp } from "../../../lib/format";
@@ -77,6 +79,7 @@ export function DesktopMiniProgramsWorkspace({
   onReturnToGroup,
   onSendRelaySummaryToGroup,
 }: DesktopMiniProgramsWorkspaceProps) {
+  const t = useRuntimeTranslator();
   const selectedMiniProgram =
     getMiniProgramEntry(selectedMiniProgramId) ??
     getMiniProgramEntry(featuredMiniProgramIds[0]) ??
@@ -123,10 +126,10 @@ export function DesktopMiniProgramsWorkspace({
             Mini Programs
           </div>
           <div className="mt-2 text-[22px] font-semibold text-[color:var(--text-primary)]">
-            小程序面板
+            {t(msg`小程序面板`)}
           </div>
           <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-            按微信电脑版工作区节奏，把最近使用、我的小程序、搜索和专题推荐统一收口。
+            {t(msg`按微信电脑版工作区节奏，把最近使用、我的小程序、搜索和专题推荐统一收口。`)}
           </div>
         </div>
 
@@ -137,7 +140,7 @@ export function DesktopMiniProgramsWorkspace({
                 type="search"
                 value={searchText}
                 onChange={(event) => onSearchTextChange(event.target.value)}
-                placeholder="搜索小程序、服务和场景"
+                placeholder={t(msg`搜索小程序、服务和场景`)}
                 className="h-11 w-full rounded-[16px] border border-transparent bg-[rgba(248,250,252,0.88)] px-4 pr-12 text-sm text-[color:var(--text-primary)] outline-none transition-[background-color,border-color] placeholder:text-[color:var(--text-dim)] focus:border-[color:var(--border-faint)] focus:bg-white"
               />
               {searchText ? (
@@ -146,7 +149,7 @@ export function DesktopMiniProgramsWorkspace({
                   onClick={() => onSearchTextChange("")}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-[color:var(--text-muted)]"
                 >
-                  清空
+                  {t(msg`清空`)}
                 </button>
               ) : null}
             </label>
@@ -176,8 +179,8 @@ export function DesktopMiniProgramsWorkspace({
           </div>
 
           <SidebarCard
-            title="最近使用"
-            emptyText="打开过的小程序会沉淀在这里，形成和微信类似的最近入口。"
+            title={t(msg`最近使用`)}
+            emptyText={t(msg`打开过的小程序会沉淀在这里，形成和微信类似的最近入口。`)}
           >
             {recentMiniPrograms.map((miniProgram) => (
               <SidebarMiniProgramButton
@@ -186,10 +189,12 @@ export function DesktopMiniProgramsWorkspace({
                 active={selectedMiniProgram.id === miniProgram.id}
                 detail={
                   lastOpenedAtById[miniProgram.id]
-                    ? `上次打开 ${formatConversationTimestamp(
-                        lastOpenedAtById[miniProgram.id],
-                      )}`
-                    : "还没有打开过"
+                    ? t(
+                        msg`上次打开 ${formatConversationTimestamp(
+                          lastOpenedAtById[miniProgram.id],
+                        )}`,
+                      )
+                    : t(msg`还没有打开过`)
                 }
                 onClick={() => onSelectMiniProgram(miniProgram.id)}
               />
@@ -197,8 +202,8 @@ export function DesktopMiniProgramsWorkspace({
           </SidebarCard>
 
           <SidebarCard
-            title="我的小程序"
-            emptyText="点击推荐区的“加入我的小程序”，这里就会形成固定常用入口。"
+            title={t(msg`我的小程序`)}
+            emptyText={t(msg`点击推荐区的“加入我的小程序”，这里就会形成固定常用入口。`)}
           >
             {pinnedMiniPrograms.map((miniProgram) => (
               <SidebarMiniProgramButton
@@ -218,15 +223,17 @@ export function DesktopMiniProgramsWorkspace({
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <div className="text-[11px] font-medium text-[color:var(--text-muted)]">
-                微信式桌面工作区
+                {t(msg`微信式桌面工作区`)}
               </div>
               <div className="mt-1 text-[20px] font-semibold text-[color:var(--text-primary)]">
-                最近使用、我的小程序、专题推荐和打开态都放进一个工作区
+                {t(msg`最近使用、我的小程序、专题推荐和打开态都放进一个工作区`)}
               </div>
               <div className="mt-1 text-[12px] leading-6 text-[color:var(--text-muted)]">
                 {searchText
-                  ? `当前搜索“${searchText.trim()}”命中 ${visibleMiniPrograms.length} 个小程序。`
-                  : "当前先以轻工作台承接最近任务，并支持把指定小程序接力到手机继续。"}
+                  ? t(
+                      msg`当前搜索“${searchText.trim()}”命中 ${visibleMiniPrograms.length} 个小程序。`,
+                    )
+                  : t(msg`当前先以轻工作台承接最近任务，并支持把指定小程序接力到手机继续。`)}
               </div>
             </div>
             {successNotice ? <InlineNotice tone={noticeTone}>{successNotice}</InlineNotice> : null}
@@ -236,7 +243,9 @@ export function DesktopMiniProgramsWorkspace({
               <InlineNotice tone="info">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="text-sm leading-6 text-[color:var(--text-secondary)]">
-                    正在从“{launchContext.sourceGroupName}”打开群接龙，可以边看群聊边处理报名和回填。
+                    {t(
+                      msg`正在从“${launchContext.sourceGroupName}”打开群接龙，可以边看群聊边处理报名和回填。`,
+                    )}
                   </div>
                   {onReturnToGroup ? (
                     <Button
@@ -245,7 +254,7 @@ export function DesktopMiniProgramsWorkspace({
                       onClick={onReturnToGroup}
                       className="shrink-0 rounded-xl"
                     >
-                      返回群聊
+                      {t(msg`返回群聊`)}
                     </Button>
                   ) : null}
                 </div>
@@ -258,11 +267,13 @@ export function DesktopMiniProgramsWorkspace({
           {showEmptyResults ? (
             <div className="rounded-[22px] border border-[color:var(--border-faint)] bg-white p-8 shadow-[var(--shadow-card)]">
               <EmptyState
-                title="没有匹配的小程序"
+                title={t(msg`没有匹配的小程序`)}
                 description={
                   searchText.trim()
-                    ? `当前搜索“${searchText.trim()}”没有命中结果，试试换个关键词或切回全部分类。`
-                    : "当前分类下还没有可展示的小程序，切换到其他分类看看。"
+                    ? t(
+                        msg`当前搜索“${searchText.trim()}”没有命中结果，试试换个关键词或切回全部分类。`,
+                      )
+                    : t(msg`当前分类下还没有可展示的小程序，切换到其他分类看看。`)
                 }
               />
             </div>
@@ -300,8 +311,14 @@ export function DesktopMiniProgramsWorkspace({
                   </div>
 
                   <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                    <DesktopMetric label="最近状态" value={selectedMiniProgram.serviceLabel} />
-                    <DesktopMetric label="更新" value={selectedMiniProgram.updateNote} />
+                    <DesktopMetric
+                      label={t(msg`最近状态`)}
+                      value={selectedMiniProgram.serviceLabel}
+                    />
+                    <DesktopMetric
+                      label={t(msg`更新`)}
+                      value={selectedMiniProgram.updateNote}
+                    />
                   </div>
 
                   <div className="mt-5 flex flex-wrap gap-2">
@@ -322,7 +339,7 @@ export function DesktopMiniProgramsWorkspace({
                       onClick={() => onOpenMiniProgram(selectedMiniProgram.id)}
                       className="border-white/18 bg-white text-[color:var(--text-primary)] hover:bg-white/92"
                     >
-                      打开小程序
+                      {t(msg`打开小程序`)}
                     </Button>
                     <Button
                       variant="secondary"
@@ -331,8 +348,8 @@ export function DesktopMiniProgramsWorkspace({
                       className="border-white/18 bg-white/10 text-white hover:bg-white/18"
                     >
                       {pinnedMiniProgramIds.includes(selectedMiniProgram.id)
-                        ? "移出我的小程序"
-                        : "加入我的小程序"}
+                        ? t(msg`移出我的小程序`)
+                        : t(msg`加入我的小程序`)}
                     </Button>
                   </div>
                 </div>
@@ -342,14 +359,14 @@ export function DesktopMiniProgramsWorkspace({
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                      最近使用
+                      {t(msg`最近使用`)}
                     </div>
                     <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
-                      桌面端优先给出最近打开的小程序，形成类似微信面板的稳定回访入口。
+                      {t(msg`桌面端优先给出最近打开的小程序，形成类似微信面板的稳定回访入口。`)}
                     </div>
                   </div>
                   <div className="text-xs text-[color:var(--text-muted)]">
-                    {recentMiniPrograms.length} 个
+                    {t(msg`${recentMiniPrograms.length} 个`)}
                   </div>
                 </div>
 
@@ -362,10 +379,12 @@ export function DesktopMiniProgramsWorkspace({
                       pinned={pinnedMiniProgramIds.includes(miniProgram.id)}
                       detail={
                         lastOpenedAtById[miniProgram.id]
-                          ? `上次打开 ${formatConversationTimestamp(
-                              lastOpenedAtById[miniProgram.id],
-                            )}`
-                          : "还没有打开过"
+                          ? t(
+                              msg`上次打开 ${formatConversationTimestamp(
+                                lastOpenedAtById[miniProgram.id],
+                              )}`,
+                            )
+                          : t(msg`还没有打开过`)
                       }
                       onOpen={onOpenMiniProgram}
                       onSelect={onSelectMiniProgram}
@@ -390,7 +409,7 @@ export function DesktopMiniProgramsWorkspace({
                       </div>
                     </div>
                     <div className="text-xs text-[color:var(--text-muted)]">
-                      {shelf.miniPrograms.length} 个
+                      {t(msg`${shelf.miniPrograms.length} 个`)}
                     </div>
                   </div>
 
@@ -434,20 +453,22 @@ export function DesktopMiniProgramsWorkspace({
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                        回填到原群聊
+                        {t(msg`回填到原群聊`)}
                       </div>
                       <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
-                        把当前接龙进度同步回“{launchContext.sourceGroupName}”，减少群成员反复追问。
+                        {t(
+                          msg`把当前接龙进度同步回“${launchContext.sourceGroupName}”，减少群成员反复追问。`,
+                        )}
                       </div>
                     </div>
                     <div className="rounded-full border border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.07)] px-3 py-1 text-[11px] font-medium text-[color:var(--brand-primary)]">
-                      群接龙闭环
+                      {t(msg`群接龙闭环`)}
                     </div>
                   </div>
 
                   <div className="mt-4 rounded-[18px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-4">
                     <div className="text-[11px] font-medium text-[color:var(--text-muted)]">
-                      发送预览
+                      {t(msg`发送预览`)}
                     </div>
                     <pre className="mt-3 whitespace-pre-wrap break-words font-sans text-sm leading-7 text-[color:var(--text-secondary)]">
                       {relaySummaryMessage}
@@ -460,10 +481,12 @@ export function DesktopMiniProgramsWorkspace({
                       onClick={onSendRelaySummaryToGroup}
                       disabled={relaySummaryPending || !onSendRelaySummaryToGroup}
                     >
-                      {relaySummaryPending ? "回填中..." : "一键回填到群聊"}
+                      {relaySummaryPending
+                        ? t(msg`回填中...`)
+                        : t(msg`一键回填到群聊`)}
                     </Button>
                     <div className="text-xs leading-6 text-[color:var(--text-muted)]">
-                      先用固定文案把工作台状态发回群聊，后续再补真实接龙结果卡片。
+                      {t(msg`先用固定文案把工作台状态发回群聊，后续再补真实接龙结果卡片。`)}
                     </div>
                   </div>
                 </section>
@@ -471,7 +494,7 @@ export function DesktopMiniProgramsWorkspace({
 
               <section className="rounded-[22px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-card)]">
                 <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                  今日推荐
+                  {t(msg`今日推荐`)}
                 </div>
                 <div className="mt-4 space-y-3">
                   {miniProgramCampaigns.map((campaign) => {
@@ -513,16 +536,16 @@ export function DesktopMiniProgramsWorkspace({
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                      浏览目录
+                      {t(msg`浏览目录`)}
                     </div>
                     <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
                       {searchText
-                        ? "当前结果按搜索和分类筛过。"
-                        : "这里承接桌面端完整小程序目录。"}
+                        ? t(msg`当前结果按搜索和分类筛过。`)
+                        : t(msg`这里承接桌面端完整小程序目录。`)}
                     </div>
                   </div>
                   <div className="text-xs text-[color:var(--text-muted)]">
-                    {visibleMiniPrograms.length} 个
+                    {t(msg`${visibleMiniPrograms.length} 个`)}
                   </div>
                 </div>
 
@@ -544,8 +567,8 @@ export function DesktopMiniProgramsWorkspace({
                   </div>
                 ) : (
                   <EmptyState
-                    title="没有匹配的小程序"
-                    description="换个关键词，或者切回全部分类继续浏览。"
+                    title={t(msg`没有匹配的小程序`)}
+                    description={t(msg`换个关键词，或者切回全部分类继续浏览。`)}
                   />
                 )}
                 </section>
@@ -557,10 +580,10 @@ export function DesktopMiniProgramsWorkspace({
       <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[3px]">
         <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-8 py-6 text-center shadow-[var(--shadow-card)]">
           <div className="text-lg font-semibold text-[color:var(--text-primary)]">
-            功能开发中
+            {t(msg`功能开发中`)}
           </div>
           <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-            敬请期待
+            {t(msg`敬请期待`)}
           </div>
         </div>
       </div>
@@ -658,6 +681,7 @@ function MiniProgramGridCard({
   onSelect: (miniProgramId: string) => void;
   onTogglePinned: (miniProgramId: string) => void;
 }) {
+  const t = useRuntimeTranslator();
   const tone = getMiniProgramToneStyle(miniProgram.tone);
 
   return (
@@ -702,7 +726,7 @@ function MiniProgramGridCard({
             onOpen(miniProgram.id);
           }}
         >
-          打开
+          {t(msg`打开`)}
         </Button>
         <Button
           variant="secondary"
@@ -713,7 +737,7 @@ function MiniProgramGridCard({
           }}
           className="border-[color:var(--border-faint)] bg-white shadow-none hover:bg-[color:var(--surface-console)]"
         >
-          {pinned ? "移出常用" : "加入常用"}
+          {pinned ? t(msg`移出常用`) : t(msg`加入常用`)}
         </Button>
       </div>
     </button>
@@ -739,6 +763,7 @@ function MiniProgramListRow({
   onSelect: (miniProgramId: string) => void;
   onTogglePinned: (miniProgramId: string) => void;
 }) {
+  const t = useRuntimeTranslator();
   const tone = getMiniProgramToneStyle(miniProgram.tone);
 
   return (
@@ -773,8 +798,12 @@ function MiniProgramListRow({
           </div>
           <div className="mt-2 text-[11px] leading-5 text-[color:var(--text-dim)]">
             {lastOpenedAt
-              ? `上次打开 ${formatConversationTimestamp(lastOpenedAt)} · 已打开 ${launchCount} 次`
-              : `还没有打开过 · 当前${pinned ? "已加入我的小程序" : "仅在目录中"}`}
+              ? t(
+                  msg`上次打开 ${formatConversationTimestamp(lastOpenedAt)} · 已打开 ${launchCount} 次`,
+                )
+              : pinned
+                ? t(msg`还没有打开过 · 当前已加入我的小程序`)
+                : t(msg`还没有打开过 · 当前仅在目录中`)}
           </div>
         </div>
       </div>
@@ -788,7 +817,7 @@ function MiniProgramListRow({
             onOpen(miniProgram.id);
           }}
         >
-          打开
+          {t(msg`打开`)}
         </Button>
         <Button
           variant="secondary"
@@ -799,7 +828,7 @@ function MiniProgramListRow({
           }}
           className="border-[color:var(--border-faint)] bg-white shadow-none hover:bg-[color:var(--surface-console)]"
         >
-          {pinned ? "移出常用" : "加入常用"}
+          {pinned ? t(msg`移出常用`) : t(msg`加入常用`)}
         </Button>
       </div>
     </button>

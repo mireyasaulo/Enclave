@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
+import type { MessageDescriptor } from "@lingui/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   ChevronRight,
@@ -44,13 +47,14 @@ type SearchResultItem = {
   character: Character;
   identifier: string;
   friendship?: FriendListItem["friendship"] | null;
-  matchReason: string;
+  matchReason: MessageDescriptor;
   pendingRequest?: FriendRequest | null;
   score: number;
   status: DesktopAddFriendRelationshipState;
 };
 
 export function DesktopAddFriendWorkspace() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -64,7 +68,7 @@ export function DesktopAddFriendWorkspace() {
   const routeState = parseDesktopAddFriendRouteState(liveHash);
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
-  const ownerName = useWorldOwnerStore((state) => state.username) ?? "我";
+  const ownerName = useWorldOwnerStore((state) => state.username) ?? t(msg`我`);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [searchText, setSearchText] = useState(routeState.keyword);
   const [notice, setNotice] = useState<{
@@ -135,7 +139,7 @@ export function DesktopAddFriendWorkspace() {
     onSuccess: async (_, variables) => {
       setNotice({
         tone: "success",
-        message: "好友申请已发送。",
+        message: t(msg`好友申请已发送。`),
       });
       setSendDialogCharacterId(null);
       await Promise.all([
@@ -396,9 +400,11 @@ export function DesktopAddFriendWorkspace() {
   if (!isDesktopLayout) {
     return (
       <DesktopLayoutRequiredState
-        title="添加朋友当前仅提供桌面布局"
-        description="添加朋友工作区目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到新的朋友继续处理联系人入口。"
-        actionLabel="查看新的朋友"
+        title={t(msg`添加朋友当前仅提供桌面布局`)}
+        description={t(
+          msg`添加朋友工作区目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到新的朋友继续处理联系人入口。`,
+        )}
+        actionLabel={t(msg`查看新的朋友`)}
         fallbackTo="/friend-requests"
       />
     );
@@ -406,15 +412,15 @@ export function DesktopAddFriendWorkspace() {
 
   return (
     <DesktopUtilityShell
-      title="添加朋友"
+      title={t(msg`添加朋友`)}
       subtitle={
         submittedKeyword
-          ? `搜索“${submittedKeyword}”`
+          ? t(msg`搜索“${submittedKeyword}”`)
           : routeSelectedResult
-            ? `查看“${getSearchResultDisplayName(routeSelectedResult)}”`
+            ? t(msg`查看“${getSearchResultDisplayName(routeSelectedResult)}”`)
             : routeCharacterId
-              ? "查看角色资料"
-              : "通过隐界号、角色名或资料关键词查找世界角色"
+              ? t(msg`查看角色资料`)
+              : t(msg`通过隐界号、角色名或资料关键词查找世界角色`)
       }
       toolbar={
         <Button
@@ -428,7 +434,7 @@ export function DesktopAddFriendWorkspace() {
           }}
           className="rounded-[8px] border-[color:var(--border-faint)] bg-white px-3 shadow-none hover:bg-[color:var(--surface-console)]"
         >
-          新的朋友
+          {t(msg`新的朋友`)}
           {pendingRequestCount > 0
             ? ` ${pendingRequestCount > 99 ? "99+" : pendingRequestCount}`
             : ""}
@@ -442,21 +448,21 @@ export function DesktopAddFriendWorkspace() {
         <div className="flex h-full min-h-0 flex-col bg-[#e9e9e9]">
           <div className="border-b border-[rgba(15,23,42,0.06)] px-4 py-4">
             <div className="text-[12px] font-medium tracking-[0.08em] text-[color:var(--text-muted)]">
-              好友功能
+              {t(msg`好友功能`)}
             </div>
           </div>
 
           <div className="min-h-0 flex-1 overflow-auto px-2 py-3">
             <DesktopAddFriendSidebarEntry
               icon={UserPlus}
-              label="添加朋友"
-              description="通过隐界号或角色名搜索"
+              label={t(msg`添加朋友`)}
+              description={t(msg`通过隐界号或角色名搜索`)}
               active
             />
             <DesktopAddFriendSidebarEntry
               icon={Users}
-              label="新的朋友"
-              description="查看并处理好友申请"
+              label={t(msg`新的朋友`)}
+              description={t(msg`查看并处理好友申请`)}
               badge={
                 pendingRequestCount > 0
                   ? pendingRequestCount > 99
@@ -474,20 +480,20 @@ export function DesktopAddFriendWorkspace() {
 
             <div className="mt-4 border-t border-[rgba(15,23,42,0.06)] px-2 pt-4">
               <div className="px-3 text-[11px] font-medium tracking-[0.08em] text-[color:var(--text-muted)]">
-                搜索建议
+                {t(msg`搜索建议`)}
               </div>
               <div className="mt-3 space-y-1.5">
                 <DesktopAddFriendGuideRow
-                  label="隐界号"
-                  value="最适合精确查找"
+                  label={t(msg`隐界号`)}
+                  value={t(msg`最适合精确查找`)}
                 />
                 <DesktopAddFriendGuideRow
-                  label="角色名"
-                  value="支持前缀和模糊匹配"
+                  label={t(msg`角色名`)}
+                  value={t(msg`支持前缀和模糊匹配`)}
                 />
                 <DesktopAddFriendGuideRow
-                  label="资料关键词"
-                  value="支持备注、标签、签名和关系描述"
+                  label={t(msg`资料关键词`)}
+                  value={t(msg`支持备注、标签、签名和关系描述`)}
                 />
               </div>
             </div>
@@ -513,7 +519,7 @@ export function DesktopAddFriendWorkspace() {
                 ref={inputRef}
                 value={searchText}
                 onChange={(event) => setSearchText(event.target.value)}
-                placeholder="输入隐界号、角色名或资料关键词"
+                placeholder={t(msg`输入隐界号、角色名或资料关键词`)}
                 className="min-w-0 flex-1 border-0 bg-transparent px-0 py-0 text-[14px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
               />
             </label>
@@ -522,7 +528,7 @@ export function DesktopAddFriendWorkspace() {
               variant="primary"
               className="h-10 rounded-[8px] bg-[#07c160] px-5 text-white shadow-none hover:bg-[#06ad56]"
             >
-              搜索
+              {t(msg`搜索`)}
             </Button>
             {searchText || submittedKeyword || routeCharacterId ? (
               <button
@@ -530,12 +536,12 @@ export function DesktopAddFriendWorkspace() {
                 onClick={clearSearch}
                 className="h-10 rounded-[8px] border border-[rgba(15,23,42,0.10)] bg-white px-4 text-[13px] text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)]"
               >
-                清空
+                {t(msg`清空`)}
               </button>
             ) : null}
           </div>
           <div className="mt-2 text-[12px] text-[color:var(--text-muted)]">
-            可通过隐界号、角色名、关系描述、签名或角色简介搜索。
+            {t(msg`可通过隐界号、角色名、关系描述、签名或角色简介搜索。`)}
           </div>
         </form>
 
@@ -560,7 +566,7 @@ export function DesktopAddFriendWorkspace() {
           <div className="flex h-full min-h-[420px] overflow-hidden rounded-[10px] border border-[rgba(15,23,42,0.08)] bg-white shadow-none">
             {loading ? (
               <div className="flex h-full w-full items-center justify-center px-6">
-                <LoadingBlock label="正在准备好友搜索目录..." />
+                <LoadingBlock label={t(msg`正在准备好友搜索目录...`)} />
               </div>
             ) : loadingError ? (
               <div className="w-full px-6 py-6">
@@ -593,14 +599,14 @@ export function DesktopAddFriendWorkspace() {
                   <div className="border-b border-[rgba(15,23,42,0.06)] bg-[#f8f8f8] px-5 py-4">
                     <div className="flex items-center justify-between gap-3">
                       <div className="text-[14px] font-medium text-[color:var(--text-primary)]">
-                        搜索结果
+                        {t(msg`搜索结果`)}
                       </div>
                       <div className="text-[12px] text-[color:var(--text-muted)]">
-                        {searchResults.length} 个
+                        {t(msg`${searchResults.length} 个`)}
                       </div>
                     </div>
                     <div className="mt-1 text-[12px] text-[color:var(--text-muted)]">
-                      按匹配度排序，优先展示最接近当前搜索的角色。
+                      {t(msg`按匹配度排序，优先展示最接近当前搜索的角色。`)}
                     </div>
                   </div>
 
@@ -625,10 +631,10 @@ export function DesktopAddFriendWorkspace() {
                 <div className="min-h-0 overflow-auto">
                   <div className="border-b border-[rgba(15,23,42,0.06)] bg-[#fbfbfb] px-6 py-4">
                     <div className="text-[14px] font-medium text-[color:var(--text-primary)]">
-                      详细资料
+                      {t(msg`详细资料`)}
                     </div>
                     <div className="mt-1 text-[12px] text-[color:var(--text-muted)]">
-                      查看资料后再决定是否发送好友申请。
+                      {t(msg`查看资料后再决定是否发送好友申请。`)}
                     </div>
                   </div>
 
@@ -637,7 +643,7 @@ export function DesktopAddFriendWorkspace() {
                       <DesktopAddFriendResultCard
                         character={selectedResult.character}
                         identifier={selectedResult.identifier}
-                        matchReason={selectedResult.matchReason}
+                        matchReason={t(selectedResult.matchReason)}
                         status={selectedResult.status}
                         friendship={selectedResult.friendship}
                         pendingRequest={selectedResult.pendingRequest}
@@ -720,6 +726,7 @@ function DesktopAddFriendWelcomeState({
   onFocusSearch: () => void;
   onQuickSearch: (keyword: string) => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <div className="flex h-full w-full items-center justify-center px-6 py-6">
       <div className="w-full max-w-[560px] text-center">
@@ -727,13 +734,18 @@ function DesktopAddFriendWelcomeState({
           <Search size={28} />
         </div>
         <div className="mt-5 text-[24px] font-medium tracking-[-0.02em] text-[color:var(--text-primary)]">
-          搜索隐界号或角色名
+          {t(msg`搜索隐界号或角色名`)}
         </div>
         <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-muted)]">
-          输入更完整的隐界号能更快命中目标角色，也可以通过角色名和资料关键词查找。
+          {t(msg`输入更完整的隐界号能更快命中目标角色，也可以通过角色名和资料关键词查找。`)}
         </div>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          {["yinjie_1234abcd", "白石", "数字人", "治愈系"].map((item) => (
+          {[
+            "yinjie_1234abcd",
+            t(msg`白石`),
+            t(msg`数字人`),
+            t(msg`治愈系`),
+          ].map((item) => (
             <SearchExampleChip
               key={item}
               label={item}
@@ -748,7 +760,7 @@ function DesktopAddFriendWelcomeState({
             onClick={onFocusSearch}
             className="rounded-[8px] border-[rgba(15,23,42,0.10)] bg-white px-5 shadow-none hover:bg-[color:var(--surface-console)]"
           >
-            开始搜索
+            {t(msg`开始搜索`)}
           </Button>
         </div>
       </div>
@@ -767,6 +779,7 @@ function DesktopAddFriendNoResultsState({
   onRetry: () => void;
   onQuickSearch: (keyword: string) => void;
 }) {
+  const t = useRuntimeTranslator();
   const missingDirectTarget = !keyword && Boolean(routeCharacterId);
 
   return (
@@ -776,15 +789,17 @@ function DesktopAddFriendNoResultsState({
           <Search size={28} />
         </div>
         <div className="mt-5 text-[22px] font-medium text-[color:var(--text-primary)]">
-          {missingDirectTarget ? "没有找到该角色" : `没有找到“${keyword}”`}
+          {missingDirectTarget
+            ? t(msg`没有找到该角色`)
+            : t(msg`没有找到“${keyword}”`)}
         </div>
         <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-muted)]">
           {missingDirectTarget
-            ? "这个角色可能已被移除，或者当前世界里还没有同步到该资料。你可以重新搜索其他角色。"
-            : "请检查隐界号是否完整，或者尝试使用角色名、签名和资料关键词重新搜索。"}
+            ? t(msg`这个角色可能已被移除，或者当前世界里还没有同步到该资料。你可以重新搜索其他角色。`)
+            : t(msg`请检查隐界号是否完整，或者尝试使用角色名、签名和资料关键词重新搜索。`)}
         </div>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
-          {["yinjie_", "角色名", "关系描述"].map((item) => (
+          {["yinjie_", t(msg`角色名`), t(msg`关系描述`)].map((item) => (
             <SearchExampleChip
               key={item}
               label={item}
@@ -799,7 +814,7 @@ function DesktopAddFriendNoResultsState({
             onClick={onRetry}
             className="rounded-[8px] border-[rgba(15,23,42,0.10)] bg-white px-5 shadow-none hover:bg-[color:var(--surface-console)]"
           >
-            重新输入
+            {t(msg`重新输入`)}
           </Button>
         </div>
       </div>
@@ -903,11 +918,13 @@ function DesktopAddFriendResultRow({
   selected: boolean;
   onClick: () => void;
 }) {
+  const t = useRuntimeTranslator();
   const displayName = getSearchResultDisplayName(item);
+  const matchReasonText = t(item.matchReason);
   const detailText =
     displayName !== item.character.name
-      ? `昵称：${item.character.name} · ${item.matchReason}`
-      : item.matchReason;
+      ? t(msg`昵称：${item.character.name} · ${matchReasonText}`)
+      : matchReasonText;
 
   return (
     <button
@@ -937,26 +954,28 @@ function DesktopAddFriendResultRow({
         </div>
       </div>
       <div className="shrink-0 text-[11px] text-[color:var(--text-muted)]">
-        {formatRelationshipStatus(item.status)}
+        {t(formatRelationshipStatus(item.status))}
       </div>
     </button>
   );
 }
 
-function formatRelationshipStatus(status: DesktopAddFriendRelationshipState) {
+function formatRelationshipStatus(
+  status: DesktopAddFriendRelationshipState,
+): MessageDescriptor {
   if (status === "friend") {
-    return "已添加";
+    return msg`已添加`;
   }
 
   if (status === "pending") {
-    return "待处理";
+    return msg`待处理`;
   }
 
   if (status === "blocked") {
-    return "黑名单";
+    return msg`黑名单`;
   }
 
-  return "可添加";
+  return msg`可添加`;
 }
 
 function buildSearchResults(
@@ -1005,8 +1024,8 @@ function buildSearchResults(
       friendship,
       identifier,
       matchReason: directRouteTarget
-        ? (match?.reason ?? "来自当前资料页")
-        : (match?.reason ?? "资料关键词匹配"),
+        ? (match?.reason ?? msg`来自当前资料页`)
+        : (match?.reason ?? msg`资料关键词匹配`),
       pendingRequest,
       score: directRouteTarget
         ? Math.min(match?.score ?? 0, 0)
@@ -1047,7 +1066,7 @@ function matchCharacter(
   ) {
     return {
       score: 0,
-      reason: "隐界号精确匹配",
+      reason: msg`隐界号精确匹配`,
     };
   }
 
@@ -1055,21 +1074,21 @@ function matchCharacter(
     if (normalizedRemarkName === normalizedKeyword) {
       return {
         score: 5,
-        reason: "备注名精确匹配",
+        reason: msg`备注名精确匹配`,
       };
     }
 
     if (normalizedRemarkName.startsWith(normalizedKeyword)) {
       return {
         score: 15,
-        reason: "备注名前缀匹配",
+        reason: msg`备注名前缀匹配`,
       };
     }
 
     if (normalizedRemarkName.includes(normalizedKeyword)) {
       return {
         score: 25,
-        reason: "备注名匹配",
+        reason: msg`备注名匹配`,
       };
     }
   }
@@ -1077,21 +1096,21 @@ function matchCharacter(
   if (normalizedName === normalizedKeyword) {
     return {
       score: 10,
-      reason: "角色名精确匹配",
+      reason: msg`角色名精确匹配`,
     };
   }
 
   if (normalizedName.startsWith(normalizedKeyword)) {
     return {
       score: 20,
-      reason: "角色名前缀匹配",
+      reason: msg`角色名前缀匹配`,
     };
   }
 
   if (normalizedName.includes(normalizedKeyword)) {
     return {
       score: 30,
-      reason: "角色名模糊匹配",
+      reason: msg`角色名模糊匹配`,
     };
   }
 
@@ -1107,7 +1126,7 @@ function matchCharacter(
     if (field?.toLowerCase().includes(normalizedKeyword)) {
       return {
         score: 40 + index,
-        reason: index === 0 ? "关系描述匹配" : "资料关键词匹配",
+        reason: index === 0 ? msg`关系描述匹配` : msg`资料关键词匹配`,
       };
     }
   }
@@ -1123,7 +1142,11 @@ function matchCharacter(
       return {
         score: 50 + index,
         reason:
-          index === 0 ? "地区匹配" : index === 1 ? "来源匹配" : "标签匹配",
+          index === 0
+            ? msg`地区匹配`
+            : index === 1
+              ? msg`来源匹配`
+              : msg`标签匹配`,
       };
     }
   }
