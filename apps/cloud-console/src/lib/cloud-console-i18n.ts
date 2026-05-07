@@ -275,6 +275,38 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Invite code:": "邀请码：",
     "World status:": "世界状态：",
     "World:": "世界：",
+    Overview: "概览",
+    Events: "事件",
+    Funnel: "漏斗",
+    "API health": "API 健康度",
+    Errors: "错误",
+    "Client telemetry, PV/UV, API health and frontend errors.":
+      "客户端埋点上报、PV/UV、API 健康度与前端错误。",
+    "Page views (by app)": "页面浏览（按端分组）",
+    "Failed to load overview": "加载概览失败",
+    "Failed to load line chart": "加载折线失败",
+    "Failed to load events": "加载事件失败",
+    "Failed to load funnel": "加载漏斗失败",
+    "Failed to load API health": "加载 API 健康度失败",
+    "Failed to load error list": "加载错误列表失败",
+    "Page views PV": "页面浏览 PV",
+    "Unique visitors UV": "独立访客 UV",
+    Sessions: "会话数",
+    "Frontend errors": "前端错误",
+    "Average session duration": "平均会话时长",
+    "24 hours": "24 小时",
+    "7 days": "7 天",
+    "30 days": "30 天",
+    "All apps": "全部端",
+    "Comma-separated event names (in order)": "逗号分隔的事件名（按顺序）",
+    "Apply funnel": "应用漏斗",
+    "Funnel is empty. Please enter steps first.": "漏斗为空。请先输入步骤。",
+    "No events in the current range.": "当前范围内无事件。",
+    "No API telemetry in the current range.": "当前范围内无 API 调用埋点。",
+    "No error events in the current range.": "当前范围内无错误事件。",
+    "Collapse stack": "收起堆栈",
+    "Expand stack": "展开堆栈",
+    Start: "起点",
   },
   "ja-JP": {
     "CLOUD_ADMIN_SECRET is required.": "CLOUD_ADMIN_SECRET を入力してください。",
@@ -551,6 +583,42 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Invite code:": "招待コード:",
     "World status:": "ワールドステータス:",
     "World:": "ワールド:",
+    Overview: "概要",
+    Events: "イベント",
+    Funnel: "ファネル",
+    "API health": "API ヘルス",
+    Errors: "エラー",
+    "Client telemetry, PV/UV, API health and frontend errors.":
+      "クライアント計測（PV/UV）、API ヘルス、フロントエンドエラー。",
+    "Page views (by app)": "ページビュー（アプリ別）",
+    "Failed to load overview": "概要の読み込みに失敗しました",
+    "Failed to load line chart": "折れ線グラフの読み込みに失敗しました",
+    "Failed to load events": "イベントの読み込みに失敗しました",
+    "Failed to load funnel": "ファネルの読み込みに失敗しました",
+    "Failed to load API health": "API ヘルスの読み込みに失敗しました",
+    "Failed to load error list": "エラー一覧の読み込みに失敗しました",
+    "Page views PV": "ページビュー PV",
+    "Unique visitors UV": "ユニークビジター UV",
+    Sessions: "セッション数",
+    "Frontend errors": "フロントエンドエラー",
+    "Average session duration": "平均セッション時間",
+    "24 hours": "24 時間",
+    "7 days": "7 日間",
+    "30 days": "30 日間",
+    "All apps": "すべてのアプリ",
+    "Comma-separated event names (in order)":
+      "カンマ区切りのイベント名（順番通り）",
+    "Apply funnel": "ファネルを適用",
+    "Funnel is empty. Please enter steps first.":
+      "ファネルが空です。先にステップを入力してください。",
+    "No events in the current range.": "現在の範囲にイベントがありません。",
+    "No API telemetry in the current range.":
+      "現在の範囲に API 計測がありません。",
+    "No error events in the current range.":
+      "現在の範囲にエラーイベントがありません。",
+    "Collapse stack": "スタックを折りたたむ",
+    "Expand stack": "スタックを展開",
+    Start: "起点",
   },
   "ko-KR": {
     "CLOUD_ADMIN_SECRET is required.": "CLOUD_ADMIN_SECRET을 입력하세요.",
@@ -823,6 +891,42 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Invite code:": "초대 코드:",
     "World status:": "월드 상태:",
     "World:": "월드:",
+    Overview: "개요",
+    Events: "이벤트",
+    Funnel: "퍼널",
+    "API health": "API 상태",
+    Errors: "오류",
+    "Client telemetry, PV/UV, API health and frontend errors.":
+      "클라이언트 텔레메트리(PV/UV), API 상태 및 프런트엔드 오류.",
+    "Page views (by app)": "페이지 조회수(앱별)",
+    "Failed to load overview": "개요를 불러오지 못했습니다",
+    "Failed to load line chart": "라인 차트를 불러오지 못했습니다",
+    "Failed to load events": "이벤트를 불러오지 못했습니다",
+    "Failed to load funnel": "퍼널을 불러오지 못했습니다",
+    "Failed to load API health": "API 상태를 불러오지 못했습니다",
+    "Failed to load error list": "오류 목록을 불러오지 못했습니다",
+    "Page views PV": "페이지 조회수 PV",
+    "Unique visitors UV": "순방문자 UV",
+    Sessions: "세션 수",
+    "Frontend errors": "프런트엔드 오류",
+    "Average session duration": "평균 세션 시간",
+    "24 hours": "24시간",
+    "7 days": "7일",
+    "30 days": "30일",
+    "All apps": "모든 앱",
+    "Comma-separated event names (in order)":
+      "쉼표로 구분된 이벤트 이름(순서대로)",
+    "Apply funnel": "퍼널 적용",
+    "Funnel is empty. Please enter steps first.":
+      "퍼널이 비어 있습니다. 먼저 단계를 입력하세요.",
+    "No events in the current range.": "현재 범위에 이벤트가 없습니다.",
+    "No API telemetry in the current range.":
+      "현재 범위에 API 텔레메트리가 없습니다.",
+    "No error events in the current range.":
+      "현재 범위에 오류 이벤트가 없습니다.",
+    "Collapse stack": "스택 접기",
+    "Expand stack": "스택 펼치기",
+    Start: "시작점",
   },
 };
 // i18n-ignore-end
@@ -1197,6 +1301,30 @@ export function formatCloudConsoleReceiptCountSummary(
     "zh-CN": `正在显示该复核任务的最近 ${visible} / 共 ${limit} 条回执。`,
     "ja-JP": `このレビュータスクの最新 ${visible} / 最大 ${limit} 件の受領を表示中。`,
     "ko-KR": `이 검토 작업에 대해 최신 ${visible} / 최대 ${limit}개 영수증을 표시 중.`,
+  });
+}
+
+export function formatCloudConsoleFunnelFromPrev(
+  percent: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `From previous step ${percent}%`,
+    "zh-CN": `从上一步 ${percent}%`,
+    "ja-JP": `前ステップから ${percent}%`,
+    "ko-KR": `이전 단계에서 ${percent}%`,
+  });
+}
+
+export function formatCloudConsoleFunnelOverall(
+  percent: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Overall ${percent}%`,
+    "zh-CN": `整体 ${percent}%`,
+    "ja-JP": `全体 ${percent}%`,
+    "ko-KR": `전체 ${percent}%`,
   });
 }
 // i18n-ignore-end
