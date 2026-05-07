@@ -162,6 +162,56 @@ DELETE /api/world/owner/api-key
 |--------|------|------|
 | `APP_PORT` | 否 | Web 服务映射到宿主机的端口，默认 `80` |
 
+## 桌面端构建（Tauri）
+
+桌面壳位于 `apps/desktop/`，使用 Tauri 2，前端复用 `apps/app` 的构建产物。运行时为远程模式：壳本身不启动 Core API，仅加载远程世界地址，因此不需要额外部署后端依赖。
+
+### Windows 构建
+
+任意装有 Rust + Node 的机器上：
+
+```bash
+pnpm --dir apps/desktop build:windows:x64
+```
+
+产物位于 `apps/desktop/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/`。
+
+### macOS 构建
+
+需要在 macOS 上执行（Apple Silicon 或 Intel 都行，必要时跨 Rust target）：
+
+依赖：
+
+- Xcode Command Line Tools（`xcode-select --install`，需要 `iconutil` 在 PATH 上）
+- Rust target：`rustup target add aarch64-apple-darwin x86_64-apple-darwin`
+
+构建命令：
+
+```bash
+# Apple Silicon
+pnpm --dir apps/desktop build:mac:aarch64
+
+# Intel
+pnpm --dir apps/desktop build:mac:x86_64
+```
+
+产物位于 `apps/desktop/src-tauri/target/{aarch64-apple-darwin,x86_64-apple-darwin}/release/bundle/`，包括 `.app` 与 `.dmg`。
+
+### macOS 代码签名 / 公证（TODO）
+
+当前 `apps/desktop/src-tauri/tauri.conf.json` 中 `signingIdentity` 与 `providerShortName` 都是 `null`，构建出来的 `.app/.dmg` 是**未签名**的，分发到他人 macOS 上会被 Gatekeeper 拦截，需要用户手动绕过。要做正式分发须先取得 Apple Developer 账号。可选三种接入方式：
+
+1. **直接写入 conf**（最简单，但泄露团队 ID 风险）：把 `signingIdentity` 改为 `"Developer ID Application: Your Company (TEAMID)"`，`providerShortName` 改为团队短名。
+2. **环境变量注入**（推荐 CI）：保持 conf 中为 `null`，在 `apps/desktop/scripts/run-tauri.mjs` 里读取 `APPLE_SIGNING_IDENTITY` / `APPLE_PROVIDER_SHORT_NAME`，构建时通过 `--config` 临时覆盖。
+3. **CI secret**：把签名身份与 App-specific password 存入 CI 密钥库（`APPLE_ID`、`APPLE_PASSWORD`、`APPLE_TEAM_ID`），构建后用 `xcrun notarytool submit` 提交公证。
+
+签名/公证落地前，桌面 macOS 包仍是**内部测试用**。审计校验脚本：
+
+```bash
+pnpm --dir apps/desktop audit:desktop-shell        # 全量
+pnpm --dir apps/desktop audit:desktop-shell:text-only  # 仅校验 4 语种翻译表完整性
+```
+
 ## 升级
 
 ```bash
