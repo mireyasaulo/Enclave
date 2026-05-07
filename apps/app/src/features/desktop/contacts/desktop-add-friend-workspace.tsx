@@ -151,10 +151,8 @@ export function DesktopAddFriendWorkspace() {
   });
 
   useEffect(() => {
-    if (searchText !== routeState.keyword) {
-      setSearchText(routeState.keyword);
-    }
-  }, [routeState.keyword, searchText]);
+    setSearchText(routeState.keyword);
+  }, [routeState.keyword]);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -382,7 +380,7 @@ export function DesktopAddFriendWorkspace() {
     setSendDialogCharacterId(null);
     void navigate({
       to: "/desktop/add-friend",
-      hash: undefined,
+      hash: "",
       replace: true,
     });
 
