@@ -1,3 +1,8 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
+
 export type PreparedCustomStickerUpload = {
   file: File;
   width: number;
@@ -30,7 +35,7 @@ export async function prepareCustomStickerUpload(
     input.file.type || inferStickerMimeType(input.file.name),
   );
   if (!normalizedMimeType.startsWith("image/")) {
-    throw new Error("只能上传图片或动图作为表情。");
+    throw new Error(t(msg`只能上传图片或动图作为表情。`));
   }
 
   const image = await loadImage(input.file);
@@ -41,13 +46,13 @@ export async function prepareCustomStickerUpload(
   if (normalizedMimeType === "image/gif") {
     if (largestEdge > MAX_GIF_STICKER_EDGE) {
       throw new Error(
-        `GIF 表情最大边长不能超过 ${MAX_GIF_STICKER_EDGE}px，请先压缩后再试。`,
+        t(msg`GIF 表情最大边长不能超过 ${MAX_GIF_STICKER_EDGE}px，请先压缩后再试。`),
       );
     }
 
     if (input.file.size > MAX_GIF_SIZE_BYTES) {
       throw new Error(
-        `GIF 表情不能超过 ${formatFileSize(MAX_GIF_SIZE_BYTES)}，请先压缩后再试。`,
+        t(msg`GIF 表情不能超过 ${formatFileSize(MAX_GIF_SIZE_BYTES)}，请先压缩后再试。`),
       );
     }
 
@@ -72,7 +77,7 @@ export async function prepareCustomStickerUpload(
 
   const context = canvas.getContext("2d");
   if (!context) {
-    throw new Error("当前浏览器暂不支持表情压缩。");
+    throw new Error(t(msg`当前浏览器暂不支持表情压缩。`));
   }
 
   context.clearRect(0, 0, nextWidth, nextHeight);
@@ -101,7 +106,7 @@ export async function prepareRemoteCustomStickerUpload(
 ): Promise<PreparedCustomStickerUpload> {
   const response = await fetch(input.url);
   if (!response.ok) {
-    throw new Error("读取表情资源失败，请稍后再试。");
+    throw new Error(t(msg`读取表情资源失败，请稍后再试。`));
   }
 
   const blob = await response.blob();
@@ -132,7 +137,7 @@ function loadImage(file: File) {
 
     image.onerror = () => {
       URL.revokeObjectURL(url);
-      reject(new Error("读取表情图片失败，请换一张再试。"));
+      reject(new Error(t(msg`读取表情图片失败，请换一张再试。`)));
     };
 
     image.src = url;
@@ -144,7 +149,7 @@ function canvasToBlob(canvas: HTMLCanvasElement) {
     canvas.toBlob(
       (blob) => {
         if (!blob) {
-          reject(new Error("处理表情失败，请换一张再试。"));
+          reject(new Error(t(msg`处理表情失败，请换一张再试。`)));
           return;
         }
 
