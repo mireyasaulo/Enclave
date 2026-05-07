@@ -992,25 +992,8 @@ export function GroupChatThreadPanel({
   };
 
   const handleDesktopCallAction = (kind: DesktopChatCallKind) => {
-    if (isDesktop) {
-      setDesktopCallPanelState({
-        kind,
-        source: "desktop",
-      });
-      return;
-    }
-
-    void navigate({
-      to:
-        kind === "voice"
-          ? "/group/$groupId/voice-call"
-          : "/group/$groupId/video-call",
-      params: { groupId },
-      ...(currentMobileGroupRouteHash
-        ? { hash: currentMobileGroupRouteHash }
-        : {}),
-    });
-    onDesktopCallAction?.(kind);
+    const label = kind === "video" ? "视频通话" : "语音通话";
+    window.alert(`${label}功能开发中，敬请期待`);
   };
 
   useEffect(() => {

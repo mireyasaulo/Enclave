@@ -364,12 +364,8 @@ export function ConversationThreadPanel({
   };
 
   const handleDesktopCallAction = (kind: DesktopChatCallKind) => {
-    if (kind === "video" && !guardVideoEntry()) {
-      return;
-    }
-
-    clearEntryNotice();
-    startDirectCall(kind);
+    const label = kind === "video" ? "视频通话" : "语音通话";
+    window.alert(`${label}功能开发中，敬请期待`);
   };
 
   const handleDismissRouteContextNotice = () => {
