@@ -23,7 +23,10 @@ const appDistDir = path.join(rootDir, "apps", "app", "dist");
 const apiUpstream = "http://127.0.0.1:3000";
 const cloudUpstream = "http://127.0.0.1:3001";
 const siteUpstream = "http://127.0.0.1:5185";
-const siteHost = "1gw06751dd053.vicp.fun";
+// vicp.fun HTTPS 隧道实际落到本机 5180（而非控制台显示的 5185）。两条隧道
+// 共用 5180 时只能靠 Host 头区分：HTTPS 隧道 Host=vicp.fun（无端口），HTTP
+// 隧道 Host=vicp.fun:29490。这里用 $http_host 精确匹配做分流。
+const siteHostExact = "1gw06751dd053.vicp.fun";
 const listenAddress = "127.0.0.1:5180";
 
 ensureDir(runtimeDir);
@@ -78,33 +81,25 @@ http {
     '' close;
   }
 
-  # 隐界官网（apps/site, Next.js）—— vicp.fun ${siteHost} 隧道命中本机
-  # 5180 时按 Host 反代到 ${siteUpstream}。其他 Host（含本机直连）走下方
-  # apps/app 默认服务。
-  server {
-    listen ${listenAddress};
-    server_name ${siteHost};
-
-    location / {
-      proxy_pass ${siteUpstream};
-      proxy_http_version 1.1;
-      proxy_set_header Host $host;
-      proxy_set_header X-Real-IP $remote_addr;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header X-Forwarded-Proto $scheme;
-      proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection $connection_upgrade;
-      proxy_read_timeout 60s;
-      proxy_send_timeout 60s;
-    }
-  }
-
   server {
     listen ${listenAddress} default_server;
     server_name _;
 
     root ${appDistDir};
     index index.html;
+
+    # location / 内 if 块通过 proxy_pass 反代到 5185 时不会继承 location 级
+    # 的 proxy_set_header，这里在 server 级提供默认值。其他显式声明 header
+    # 的 location 会按 nginx 全有或全无规则覆盖整组，不受影响。
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+    proxy_read_timeout 60s;
+    proxy_send_timeout 60s;
 
     location = /healthz {
       access_log off;
@@ -171,7 +166,12 @@ http {
       try_files $uri =404;
     }
 
+    # 公网 HTTPS 隧道 (Host 严格等于 ${siteHostExact}) -> 反代到官网
+    # Next.js (5185)；其他 Host（HTTP 隧道带端口、本地直连）走 app dist。
     location / {
+      if ($http_host = "${siteHostExact}") {
+        proxy_pass ${siteUpstream};
+      }
       add_header Cache-Control "no-store";
       try_files $uri $uri/ /index.html;
     }
