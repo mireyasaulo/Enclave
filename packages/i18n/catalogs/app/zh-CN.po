@@ -146,9 +146,11 @@ msgstr "{0} 在{sceneLabel}里注意到了你：{1}"
 msgid "{0} 在{translatedSceneLabel}里注意到了你：{greeting}"
 msgstr "{0} 在{translatedSceneLabel}里注意到了你：{greeting}"
 
+#. placeholder {0}: draft.trim().length
 #. placeholder {0}: normalizedDraft.length
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:129
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:150
+#: apps/app/src/routes/group-announcement-page.tsx:453
 msgid "{0} 字"
 msgstr "{0} 字"
 
@@ -267,6 +269,11 @@ msgstr "{0} 的当前工作台，带上最近使用和本地待办上下文。"
 #: apps/app/src/routes/channels-page.tsx:723
 msgid "{0} 的视频号动态"
 msgstr "{0} 的视频号动态"
+
+#. placeholder {0}: group.name
+#: apps/app/src/routes/group-announcement-page.tsx:172
+msgid "{0} 群公告"
+msgstr "{0} 群公告"
 
 #. placeholder {0}: group.name
 #: apps/app/src/routes/group-chat-details-page.tsx:379
@@ -1097,6 +1104,8 @@ msgstr "世界联系人"
 #: apps/app/src/routes/character-detail-page.tsx:251
 #: apps/app/src/routes/contacts-page.tsx:1186
 #: apps/app/src/routes/discover-page.tsx:276
+#: apps/app/src/routes/world-characters-page.tsx:191
+#: apps/app/src/routes/world-characters-page.tsx:324
 msgid "世界角色"
 msgstr "世界角色"
 
@@ -1113,6 +1122,8 @@ msgid "世界角色日常"
 msgstr "世界角色日常"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1083
+#: apps/app/src/routes/world-characters-page.tsx:256
+#: apps/app/src/routes/world-characters-page.tsx:288
 msgid "世界角色暂时不可用"
 msgstr "世界角色暂时不可用"
 
@@ -1636,6 +1647,7 @@ msgid "保存文件"
 msgstr "保存文件"
 
 #: apps/app/src/i18n/static-dom-seed.ts:772
+#: apps/app/src/routes/group-announcement-page.tsx:472
 msgid "保存群公告"
 msgstr "保存群公告"
 
@@ -2686,6 +2698,7 @@ msgid "最适合精确查找"
 msgstr "最适合精确查找"
 
 #: apps/app/src/i18n/static-dom-seed.ts:774
+#: apps/app/src/routes/group-announcement-page.tsx:447
 msgid "写一条群公告，群成员会在聊天页看到它。"
 msgstr "写一条群公告，群成员会在聊天页看到它。"
 
@@ -2768,6 +2781,10 @@ msgstr "分享工具"
 #: apps/app/src/i18n/static-dom-seed.ts:886
 msgid "分享文档"
 msgstr "分享文档"
+
+#: apps/app/src/routes/group-announcement-page.tsx:284
+msgid "分享群公告"
+msgstr "分享群公告"
 
 #: apps/app/src/routes/group-chat-details-page.tsx:562
 msgid "分享群聊"
@@ -2852,6 +2869,10 @@ msgstr "切换到键盘输入"
 #: apps/app/src/routes/profile-settings-page.tsx:812
 msgid "切换当前端的界面语言和本地化格式。"
 msgstr "切换当前端的界面语言和本地化格式。"
+
+#: apps/app/src/routes/world-characters-page.tsx:58
+msgid "切换桌面世界角色..."
+msgstr "切换桌面世界角色..."
 
 #: apps/app/src/routes/friend-requests-page.tsx:44
 msgid "切换桌面好友请求..."
@@ -4117,8 +4138,13 @@ msgid "复制组局链接失败，请稍后重试。"
 msgstr "复制组局链接失败，请稍后重试。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:773
+#: apps/app/src/routes/group-announcement-page.tsx:285
 msgid "复制群公告"
 msgstr "复制群公告"
+
+#: apps/app/src/routes/group-announcement-page.tsx:224
+msgid "复制群公告失败，请稍后重试。"
+msgstr "复制群公告失败，请稍后重试。"
 
 #: apps/app/src/routes/group-chat-details-page.tsx:563
 msgid "复制群聊摘要"
@@ -4853,6 +4879,7 @@ msgstr "已打开文件。"
 #: apps/app/src/routes/character-detail-page.tsx:741
 #: apps/app/src/routes/chat-details-page.tsx:371
 #: apps/app/src/routes/discover-feed-page.tsx:529
+#: apps/app/src/routes/group-announcement-page.tsx:185
 #: apps/app/src/routes/group-chat-details-page.tsx:398
 #: apps/app/src/routes/group-qr-page.tsx:917
 #: apps/app/src/routes/group-qr-page.tsx:969
@@ -5510,6 +5537,11 @@ msgstr "当前先采用轻入口方案：点一下就完成一次相遇并保留
 msgid "当前公告："
 msgstr "当前公告："
 
+#. placeholder {0}: groupQuery.data.announcement?.trim() || t(msg`暂未设置`)
+#: apps/app/src/routes/group-announcement-page.tsx:457
+msgid "当前公告：{0}"
+msgstr "当前公告：{0}"
+
 #: apps/app/src/i18n/static-dom-seed.ts:18
 msgid "当前共"
 msgstr "当前共"
@@ -5665,6 +5697,10 @@ msgstr "当前比首推晚 {searchSectionOffsetFromRecommended} 组"
 msgid "当前没有匹配成员"
 msgstr "当前没有匹配成员"
 
+#: apps/app/src/routes/world-characters-page.tsx:328
+msgid "当前没有可展示的世界角色"
+msgstr "当前没有可展示的世界角色"
+
 #: apps/app/src/routes/group-qr-page.tsx:1737
 msgid "当前没有可执行顺序。"
 msgstr "当前没有可执行顺序。"
@@ -5775,6 +5811,10 @@ msgstr "当前环境暂不支持复制文档摘要。"
 #: apps/app/src/i18n/static-dom-seed.ts:1049
 msgid "当前环境暂不支持复制组局链接。"
 msgstr "当前环境暂不支持复制组局链接。"
+
+#: apps/app/src/routes/group-announcement-page.tsx:200
+msgid "当前环境暂不支持复制群公告。"
+msgstr "当前环境暂不支持复制群公告。"
 
 #: apps/app/src/routes/group-chat-details-page.tsx:411
 msgid "当前环境暂不支持复制群聊摘要。"
@@ -5949,6 +5989,7 @@ msgstr "当前设备暂时无法打开相机，请先改用相册选图。"
 #: apps/app/src/routes/character-detail-page.tsx:755
 #: apps/app/src/routes/chat-details-page.tsx:385
 #: apps/app/src/routes/discover-feed-page.tsx:548
+#: apps/app/src/routes/group-announcement-page.tsx:199
 #: apps/app/src/routes/group-chat-details-page.tsx:410
 #: apps/app/src/routes/group-qr-page.tsx:927
 #: apps/app/src/routes/group-qr-page.tsx:978
@@ -5974,6 +6015,7 @@ msgid "当前说明"
 msgstr "当前说明"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1039
+#: apps/app/src/routes/group-announcement-page.tsx:162
 msgid "当前还没有可分享的群公告。"
 msgstr "当前还没有可分享的群公告。"
 
@@ -6444,6 +6486,10 @@ msgstr "打开服务号消息"
 msgid "打开服务号菜单"
 msgstr "打开服务号菜单"
 
+#: apps/app/src/routes/group-announcement-page.tsx:36
+msgid "打开桌面群公告..."
+msgstr "打开桌面群公告..."
+
 #: apps/app/src/routes/group-chat-details-page.tsx:51
 msgid "打开桌面群聊信息..."
 msgstr "打开桌面群聊信息..."
@@ -6871,6 +6917,7 @@ msgid "换个关键词，或者切回全部分类继续浏览。"
 msgstr "换个关键词，或者切回全部分类继续浏览。"
 
 #: apps/app/src/routes/starred-friends-page.tsx:294
+#: apps/app/src/routes/world-characters-page.tsx:332
 msgid "换个关键词再试试。"
 msgstr "换个关键词再试试。"
 
@@ -7066,6 +7113,7 @@ msgid "搜索“{trimmedKeyword}”"
 msgstr "搜索“{trimmedKeyword}”"
 
 #: apps/app/src/i18n/static-dom-seed.ts:407
+#: apps/app/src/routes/world-characters-page.tsx:234
 msgid "搜索世界角色"
 msgstr "搜索世界角色"
 
@@ -7696,6 +7744,7 @@ msgstr "暂无签名"
 #: apps/app/src/routes/create-group-page.tsx:517
 #: apps/app/src/routes/starred-friends-page.tsx:286
 #: apps/app/src/routes/tags-page.tsx:271
+#: apps/app/src/routes/world-characters-page.tsx:324
 msgid "暂无结果"
 msgstr "暂无结果"
 
@@ -7759,6 +7808,7 @@ msgid "暂未裁剪"
 msgstr "暂未裁剪"
 
 #: apps/app/src/i18n/static-dom-seed.ts:771
+#: apps/app/src/routes/group-announcement-page.tsx:457
 msgid "暂未设置"
 msgstr "暂未设置"
 
@@ -8442,6 +8492,10 @@ msgid "查看报名情况"
 msgstr "查看报名情况"
 
 #: apps/app/src/routes/contacts-page.tsx:1286
+#: apps/app/src/routes/world-characters-page.tsx:221
+#: apps/app/src/routes/world-characters-page.tsx:277
+#: apps/app/src/routes/world-characters-page.tsx:309
+#: apps/app/src/routes/world-characters-page.tsx:343
 msgid "查看新的朋友"
 msgstr "查看新的朋友"
 
@@ -8499,6 +8553,7 @@ msgstr "查看角色档案与扩展介绍"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:717
 #: apps/app/src/routes/character-detail-page.tsx:276
+#: apps/app/src/routes/world-characters-page.tsx:390
 msgid "查看角色资料"
 msgstr "查看角色资料"
 
@@ -8690,12 +8745,17 @@ msgstr "次优先备选"
 
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:148
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:169
+#: apps/app/src/routes/group-announcement-page.tsx:472
 msgid "正在保存..."
 msgstr "正在保存..."
 
 #: apps/app/src/i18n/static-dom-seed.ts:829
 msgid "正在准备桌面搜索索引，马上就能继续查看完整结果。"
 msgstr "正在准备桌面搜索索引，马上就能继续查看完整结果。"
+
+#: apps/app/src/routes/world-characters-page.tsx:56
+msgid "正在切换到桌面世界角色"
+msgstr "正在切换到桌面世界角色"
 
 #: apps/app/src/routes/discover-encounter-page.tsx:42
 #: apps/app/src/routes/discover-scene-page.tsx:84
@@ -8718,6 +8778,10 @@ msgstr "正在切换到桌面星标朋友"
 #: apps/app/src/routes/tags-page.tsx:60
 msgid "正在切换到桌面标签"
 msgstr "正在切换到桌面标签"
+
+#: apps/app/src/routes/group-announcement-page.tsx:35
+msgid "正在切换到桌面聊天工作区中的群公告编辑视图。"
+msgstr "正在切换到桌面聊天工作区中的群公告编辑视图。"
 
 #: apps/app/src/routes/group-chat-details-page.tsx:50
 msgid "正在切换到桌面聊天工作区中的群聊信息侧栏。"
@@ -8875,6 +8939,10 @@ msgstr "正在打开桌面消息"
 msgid "正在打开桌面视频号"
 msgstr "正在打开桌面视频号"
 
+#: apps/app/src/routes/group-announcement-page.tsx:34
+msgid "正在打开桌面群公告"
+msgstr "正在打开桌面群公告"
+
 #: apps/app/src/routes/group-chat-page.tsx:231
 msgid "正在打开桌面群聊"
 msgstr "正在打开桌面群聊"
@@ -9005,6 +9073,10 @@ msgstr "正在解析你的云世界..."
 msgid "正在请求麦克风权限..."
 msgstr "正在请求麦克风权限..."
 
+#: apps/app/src/routes/world-characters-page.tsx:246
+msgid "正在读取世界角色"
+msgstr "正在读取世界角色"
+
 #: apps/app/src/routes/desktop-mobile-page.tsx:1263
 msgid "正在读取会话..."
 msgstr "正在读取会话..."
@@ -9070,6 +9142,10 @@ msgstr "正在读取服务号消息"
 #: apps/app/src/routes/tags-page.tsx:229
 msgid "正在读取标签"
 msgstr "正在读取标签"
+
+#: apps/app/src/routes/group-announcement-page.tsx:301
+msgid "正在读取群公告"
+msgstr "正在读取群公告"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1489
 msgid "正在读取群成员..."
@@ -9143,6 +9219,10 @@ msgstr "正在读取资料..."
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:174
 msgid "正在读取这位角色的朋友圈..."
 msgstr "正在读取这位角色的朋友圈..."
+
+#: apps/app/src/routes/world-characters-page.tsx:57
+msgid "正在跳转到桌面通讯录工作区中的世界角色视图。"
+msgstr "正在跳转到桌面通讯录工作区中的世界角色视图。"
 
 #: apps/app/src/routes/friend-requests-page.tsx:43
 msgid "正在跳转到桌面通讯录工作区中的好友请求视图。"
@@ -9266,6 +9346,10 @@ msgstr "没有找到“{trimmedKeyword}”相关表情"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:832
 msgid "没有找到匹配的{0}"
 msgstr "没有找到匹配的{0}"
+
+#: apps/app/src/routes/world-characters-page.tsx:327
+msgid "没有找到匹配的世界角色"
+msgstr "没有找到匹配的世界角色"
 
 #: apps/app/src/routes/starred-friends-page.tsx:289
 msgid "没有找到匹配的星标朋友"
@@ -9848,6 +9932,7 @@ msgid "界面语言"
 msgstr "界面语言"
 
 #: apps/app/src/i18n/static-dom-seed.ts:768
+#: apps/app/src/routes/group-announcement-page.tsx:452
 msgid "留空后保存，会清空当前群公告。"
 msgstr "留空后保存，会清空当前群公告。"
 
@@ -10269,6 +10354,10 @@ msgstr "移除群成员"
 msgid "稍后"
 msgstr "稍后"
 
+#: apps/app/src/routes/world-characters-page.tsx:333
+msgid "稍后再回来看看，或者先去新的朋友里处理申请。"
+msgstr "稍后再回来看看，或者先去新的朋友里处理申请。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:252
 msgid "稍后再看"
 msgstr "稍后再看"
@@ -10284,6 +10373,10 @@ msgstr "稍后补发"
 #: apps/app/src/i18n/static-dom-seed.ts:810
 msgid "稍等一下，正在准备最近常读和最新推送。"
 msgstr "稍等一下，正在准备最近常读和最新推送。"
+
+#: apps/app/src/routes/world-characters-page.tsx:247
+msgid "稍等一下，正在同步世界角色目录。"
+msgstr "稍等一下，正在同步世界角色目录。"
 
 #: apps/app/src/routes/starred-friends-page.tsx:245
 msgid "稍等一下，正在同步你标记过的常联系好友。"
@@ -10308,6 +10401,10 @@ msgstr "稍等一下，正在同步居民公开动态和互动状态。"
 #: apps/app/src/routes/profile-settings-page.tsx:463
 msgid "稍等一下，正在同步当前世界主人的专属配置。"
 msgstr "稍等一下，正在同步当前世界主人的专属配置。"
+
+#: apps/app/src/routes/group-announcement-page.tsx:302
+msgid "稍等一下，正在同步当前群聊的公告内容。"
+msgstr "稍等一下，正在同步当前群聊的公告内容。"
 
 #: apps/app/src/routes/channels-page.tsx:1149
 msgid "稍等一下，正在同步推荐流和互动状态。"
@@ -10576,6 +10673,7 @@ msgstr "系统分享"
 #: apps/app/src/routes/character-detail-page.tsx:779
 #: apps/app/src/routes/chat-details-page.tsx:409
 #: apps/app/src/routes/discover-feed-page.tsx:574
+#: apps/app/src/routes/group-announcement-page.tsx:223
 #: apps/app/src/routes/group-chat-details-page.tsx:441
 #: apps/app/src/routes/group-qr-page.tsx:941
 msgid "系统分享失败，请稍后重试。"
@@ -10613,6 +10711,10 @@ msgstr "系统分享暂时不可用，已复制文档摘要。"
 #: apps/app/src/i18n/static-dom-seed.ts:954
 msgid "系统分享暂时不可用，已复制笔记摘要。"
 msgstr "系统分享暂时不可用，已复制笔记摘要。"
+
+#: apps/app/src/routes/group-announcement-page.tsx:216
+msgid "系统分享暂时不可用，已复制群公告。"
+msgstr "系统分享暂时不可用，已复制群公告。"
 
 #: apps/app/src/routes/group-chat-details-page.tsx:435
 msgid "系统分享暂时不可用，已复制群聊摘要。"
@@ -10832,6 +10934,8 @@ msgid "群二维码、群邀请卡和群入口接力。"
 msgstr "群二维码、群邀请卡和群入口接力。"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1514
+#: apps/app/src/routes/group-announcement-page.tsx:265
+#: apps/app/src/routes/group-announcement-page.tsx:442
 #: apps/app/src/routes/group-chat-details-page.tsx:702
 msgid "群公告"
 msgstr "群公告"
@@ -10841,9 +10945,17 @@ msgstr "群公告"
 msgid "群公告仍通知"
 msgstr "群公告仍通知"
 
+#: apps/app/src/routes/group-announcement-page.tsx:217
+msgid "群公告已复制。"
+msgstr "群公告已复制。"
+
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1071
 msgid "群公告已更新。"
 msgstr "群公告已更新。"
+
+#: apps/app/src/routes/group-announcement-page.tsx:311
+msgid "群公告暂时不可用"
+msgstr "群公告暂时不可用"
 
 #: apps/app/src/i18n/static-dom-seed.ts:196
 msgid "群协作"
@@ -10895,6 +11007,8 @@ msgstr "群管理"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:307
 #: apps/app/src/lib/conversation-route.ts:27
 #: apps/app/src/routes/contacts-page.tsx:1141
+#: apps/app/src/routes/group-announcement-page.tsx:310
+#: apps/app/src/routes/group-announcement-page.tsx:413
 #: apps/app/src/routes/group-chat-background-page.tsx:446
 #: apps/app/src/routes/group-chat-details-page.tsx:588
 #: apps/app/src/routes/group-chat-details-page.tsx:636
@@ -10905,12 +11019,14 @@ msgstr "群管理"
 msgid "群聊"
 msgstr "群聊"
 
+#: apps/app/src/routes/group-announcement-page.tsx:414
 #: apps/app/src/routes/group-chat-background-page.tsx:441
 #: apps/app/src/routes/group-chat-background-page.tsx:447
 #: apps/app/src/routes/group-chat-details-page.tsx:637
 msgid "群聊不存在"
 msgstr "群聊不存在"
 
+#: apps/app/src/routes/group-announcement-page.tsx:266
 #: apps/app/src/routes/group-chat-details-page.tsx:539
 #: apps/app/src/routes/group-chat-details-page.tsx:543
 msgid "群聊信息"
@@ -11845,12 +11961,14 @@ msgstr "请输入验证码（默认 123456 即可通过）"
 #: apps/app/src/routes/create-group-page.tsx:430
 #: apps/app/src/routes/discover-feed-page.tsx:875
 #: apps/app/src/routes/friend-requests-page.tsx:225
+#: apps/app/src/routes/group-announcement-page.tsx:300
 #: apps/app/src/routes/group-chat-background-page.tsx:333
 #: apps/app/src/routes/group-chat-details-page.tsx:578
 #: apps/app/src/routes/group-qr-page.tsx:1088
 #: apps/app/src/routes/profile-settings-page.tsx:461
 #: apps/app/src/routes/starred-friends-page.tsx:243
 #: apps/app/src/routes/tags-page.tsx:228
+#: apps/app/src/routes/world-characters-page.tsx:245
 msgid "读取中"
 msgstr "读取中"
 
@@ -11876,6 +11994,8 @@ msgstr "读取图片失败，请换一张再试。"
 #: apps/app/src/routes/profile-settings-page.tsx:473
 #: apps/app/src/routes/starred-friends-page.tsx:253
 #: apps/app/src/routes/tags-page.tsx:238
+#: apps/app/src/routes/world-characters-page.tsx:255
+#: apps/app/src/routes/world-characters-page.tsx:287
 msgid "读取失败"
 msgstr "读取失败"
 
@@ -12182,6 +12302,9 @@ msgstr "返回上一步"
 #: apps/app/src/routes/friend-requests-page.tsx:381
 #: apps/app/src/routes/friend-requests-page.tsx:419
 #: apps/app/src/routes/friend-requests-page.tsx:445
+#: apps/app/src/routes/group-announcement-page.tsx:330
+#: apps/app/src/routes/group-announcement-page.tsx:365
+#: apps/app/src/routes/group-announcement-page.tsx:432
 #: apps/app/src/routes/group-chat-background-page.tsx:365
 #: apps/app/src/routes/group-chat-background-page.tsx:397
 #: apps/app/src/routes/group-chat-background-page.tsx:419
@@ -12194,6 +12317,9 @@ msgstr "返回上一步"
 #: apps/app/src/routes/group-qr-page.tsx:1644
 #: apps/app/src/routes/starred-friends-page.tsx:183
 #: apps/app/src/routes/tags-page.tsx:168
+#: apps/app/src/routes/world-characters-page.tsx:277
+#: apps/app/src/routes/world-characters-page.tsx:309
+#: apps/app/src/routes/world-characters-page.tsx:343
 msgid "返回上一页"
 msgstr "返回上一页"
 
@@ -12229,6 +12355,7 @@ msgstr "返回消息"
 #: apps/app/src/routes/chat-background-page.tsx:475
 #: apps/app/src/routes/chat-details-page.tsx:190
 #: apps/app/src/routes/create-group-page.tsx:274
+#: apps/app/src/routes/group-announcement-page.tsx:432
 #: apps/app/src/routes/group-chat-background-page.tsx:465
 #: apps/app/src/routes/group-chat-details-page.tsx:134
 #: apps/app/src/routes/group-chat-details-page.tsx:167
@@ -12247,6 +12374,9 @@ msgstr "返回继续使用"
 msgid "返回群聊"
 msgstr "返回群聊"
 
+#: apps/app/src/routes/group-announcement-page.tsx:330
+#: apps/app/src/routes/group-announcement-page.tsx:365
+#: apps/app/src/routes/group-announcement-page.tsx:402
 #: apps/app/src/routes/group-chat-background-page.tsx:365
 #: apps/app/src/routes/group-chat-background-page.tsx:397
 #: apps/app/src/routes/group-chat-background-page.tsx:419
@@ -12312,6 +12442,7 @@ msgstr "返回资料页"
 #: apps/app/src/routes/character-detail-page.tsx:274
 #: apps/app/src/routes/starred-friends-page.tsx:207
 #: apps/app/src/routes/tags-page.tsx:192
+#: apps/app/src/routes/world-characters-page.tsx:209
 msgid "返回通讯录"
 msgstr "返回通讯录"
 
@@ -12566,6 +12697,7 @@ msgid "这个群目前没有可移除的角色成员。"
 msgstr "这个群目前没有可移除的角色成员。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1037
+#: apps/app/src/routes/group-announcement-page.tsx:415
 #: apps/app/src/routes/group-chat-background-page.tsx:448
 msgid "这个群聊暂时不可用，可以先重试读取，或返回上一页后再试。"
 msgstr "这个群聊暂时不可用，可以先重试读取，或返回上一页后再试。"
@@ -13102,6 +13234,10 @@ msgstr "重点放进我的小程序"
 msgid "重试"
 msgstr "重试"
 
+#: apps/app/src/routes/group-announcement-page.tsx:389
+msgid "重试保存"
+msgstr "重试保存"
+
 #: apps/app/src/routes/group-qr-page.tsx:847
 msgid "重试保存邀请卡"
 msgstr "重试保存邀请卡"
@@ -13119,6 +13255,8 @@ msgstr "重试关注"
 #: apps/app/src/routes/chat-details-page.tsx:412
 #: apps/app/src/routes/discover-feed-page.tsx:541
 #: apps/app/src/routes/discover-feed-page.tsx:567
+#: apps/app/src/routes/group-announcement-page.tsx:202
+#: apps/app/src/routes/group-announcement-page.tsx:226
 #: apps/app/src/routes/group-chat-details-page.tsx:415
 #: apps/app/src/routes/group-chat-details-page.tsx:446
 #: apps/app/src/routes/group-qr-page.tsx:928
@@ -13165,6 +13303,8 @@ msgstr "重试场景相遇"
 #: apps/app/src/routes/chat-details-page.tsx:413
 #: apps/app/src/routes/discover-feed-page.tsx:541
 #: apps/app/src/routes/discover-feed-page.tsx:567
+#: apps/app/src/routes/group-announcement-page.tsx:203
+#: apps/app/src/routes/group-announcement-page.tsx:227
 #: apps/app/src/routes/group-chat-details-page.tsx:422
 #: apps/app/src/routes/group-chat-details-page.tsx:447
 #: apps/app/src/routes/group-qr-page.tsx:953
@@ -13219,6 +13359,8 @@ msgstr "重试评论点赞"
 #: apps/app/src/routes/discover-feed-page.tsx:895
 #: apps/app/src/routes/discover-feed-page.tsx:903
 #: apps/app/src/routes/friend-requests-page.tsx:248
+#: apps/app/src/routes/group-announcement-page.tsx:322
+#: apps/app/src/routes/group-announcement-page.tsx:424
 #: apps/app/src/routes/group-chat-background-page.tsx:357
 #: apps/app/src/routes/group-chat-background-page.tsx:389
 #: apps/app/src/routes/group-chat-background-page.tsx:457
@@ -13229,6 +13371,8 @@ msgstr "重试评论点赞"
 #: apps/app/src/routes/profile-settings-page.tsx:485
 #: apps/app/src/routes/starred-friends-page.tsx:264
 #: apps/app/src/routes/tags-page.tsx:249
+#: apps/app/src/routes/world-characters-page.tsx:268
+#: apps/app/src/routes/world-characters-page.tsx:300
 msgid "重试读取"
 msgstr "重试读取"
 
