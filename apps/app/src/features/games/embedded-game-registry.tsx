@@ -16,6 +16,11 @@ const SignalSquadGame = lazy(async () => {
   return { default: mod.SignalSquadGame };
 });
 
+const NightMarketGame = lazy(async () => {
+  const mod = await import("./night-market/night-market-game");
+  return { default: mod.NightMarketGame };
+});
+
 export type EmbeddedGameProps = {
   variant?: "embedded" | "fullscreen";
   onExit?: () => void;
@@ -27,6 +32,7 @@ const EMBEDDED_GAME_COMPONENTS: Record<
 > = {
   "parking-war": ParkingWarGame,
   "signal-squad": SignalSquadGame,
+  "night-market": NightMarketGame,
 };
 
 export function hasEmbeddedGame(gameId: string | null | undefined): boolean {
