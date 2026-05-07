@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository } from 'typeorm';
+import { CharacterEntity } from '../../characters/character.entity';
 import { CharactersService } from '../../characters/characters.service';
+import { FeedService } from '../../feed/feed.service';
 import { FarmEventLogEntity } from './entities/farm-event-log.entity';
+import { getCropDefinition } from './crop-catalog';
 import {
+  FARM_INCIDENT_BROADCAST_CHANCE,
   FarmActorType,
+  FarmCropId,
   FarmEventKind,
   FarmEventView,
 } from './farm.types';
@@ -25,11 +30,64 @@ export interface RecordEventInput {
 
 @Injectable()
 export class FarmEventService {
+  private readonly logger = new Logger(FarmEventService.name);
+
   constructor(
     @InjectRepository(FarmEventLogEntity)
     private readonly repo: Repository<FarmEventLogEntity>,
     private readonly charactersService: CharactersService,
+    private readonly feedService: FeedService,
   ) {}
+
+  async maybeBroadcastIncident(input: {
+    ownerId: string;
+    thief: CharacterEntity;
+    target: { kind: FarmActorType; id: string; name: string };
+    cropId: FarmCropId;
+    amount: number;
+  }): Promise<boolean> {
+    if (Math.random() > FARM_INCIDENT_BROADCAST_CHANCE) return false;
+    const def = getCropDefinition(input.cropId);
+    const text = renderIncidentText(input.thief, input.target, def.nameZh, input.amount);
+    try {
+      const post = await this.feedService.createPost({
+        authorId: input.thief.id,
+        authorName: input.thief.name,
+        authorAvatar: input.thief.avatar ?? '',
+        authorType: 'character',
+        text,
+        sourceKind: 'character_generated',
+        surface: 'feed',
+        statsPayload: {
+          kind: 'farm_incident',
+          cropId: input.cropId,
+          amount: input.amount,
+          targetType: input.target.kind,
+          targetId: input.target.id,
+        },
+      });
+      await this.recordEvent({
+        ownerId: input.ownerId,
+        kind: 'incident_broadcast',
+        actorType: 'character',
+        actorId: input.thief.id,
+        actorName: input.thief.name,
+        targetType: input.target.kind,
+        targetId: input.target.id,
+        targetName: input.target.name,
+        cropId: input.cropId,
+        payload: { feedPostId: post.id, amount: input.amount },
+      });
+      return true;
+    } catch (error) {
+      this.logger.warn(
+        `feed broadcast failed for thief=${input.thief.id}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+      return false;
+    }
+  }
 
   async applyIntimacyChange(
     ownerId: string,
@@ -138,4 +196,36 @@ export class FarmEventService {
           : new Date(entity.createdAt).toISOString(),
     };
   }
+}
+
+function renderIncidentText(
+  thief: CharacterEntity,
+  target: { kind: FarmActorType; id: string; name: string },
+  cropName: string,
+  amount: number,
+): string {
+  const hour = new Date().getHours();
+  const periodLabel =
+    hour < 5
+      ? '半夜溜出来'
+      : hour < 11
+        ? '一大早跑去'
+        : hour < 14
+          ? '中午顺路过'
+          : hour < 19
+            ? '下午散步绕到'
+            : '入夜跑去';
+  const targetLabel = target.kind === 'owner' ? '世界主人' : target.name;
+  const tags = (
+    (thief.profile as { personalityTags?: string[] } | null)?.personalityTags ?? []
+  ).map((t) => String(t).toLowerCase());
+  const playful = tags.includes('playful') || tags.includes('mischievous');
+  const honest = tags.includes('honest') || tags.includes('trustworthy');
+  if (playful) {
+    return `${periodLabel}${targetLabel}的菜地，顺走了 ${amount} 颗${cropName}。下次别这么早睡嘛 🌚`;
+  }
+  if (honest) {
+    return `${periodLabel}${targetLabel}的菜地。${cropName}熟透了实在没忍住，回头还你 ${amount} 颗别的。`;
+  }
+  return `${periodLabel}${targetLabel}的菜地，${cropName} ×${amount} 入袋。世界这么大，菜怎么这么甜。`;
 }

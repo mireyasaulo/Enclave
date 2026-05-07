@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdminGuard } from '../../admin/admin.guard';
 import { AuthModule } from '../../auth/auth.module';
 import { CharactersModule } from '../../characters/characters.module';
+import { FeedModule } from '../../feed/feed.module';
 import { FarmAdminController } from './farm-admin.controller';
 import { FarmController } from './farm.controller';
 import { FarmEventService } from './farm-event.service';
@@ -22,6 +23,7 @@ import { FarmPlayerStateEntity } from './entities/farm-player-state.entity';
     ]),
     AuthModule,
     CharactersModule,
+    FeedModule,
   ],
   controllers: [FarmController, FarmAdminController],
   providers: [
