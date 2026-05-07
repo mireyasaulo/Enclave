@@ -130,7 +130,7 @@ import {
 } from "./desktop-official-message-context-menu";
 import { DesktopChatSidePanel } from "./desktop-chat-side-panel";
 import { DesktopChatDetailsPanel } from "./desktop-chat-details-panel";
-import { DesktopChatHistoryPanel } from "./desktop-chat-history-panel";
+import { DesktopChatHistoryDialog } from "./desktop-chat-history-dialog";
 import {
   buildDesktopMessageEntries,
   type DesktopMessageEntry,
@@ -521,6 +521,10 @@ export function DesktopChatWorkspace({
         return;
       }
 
+      if (rightPanelMode === "history") {
+        return;
+      }
+
       const target = event.target as Node;
       if (sidePanelRef.current?.contains(target)) {
         return;
@@ -788,7 +792,7 @@ export function DesktopChatWorkspace({
   }, [isQuickMenuOpen]);
 
   useEffect(() => {
-    if (!rightPanelMode) {
+    if (!rightPanelMode || rightPanelMode === "history") {
       return;
     }
 
@@ -1943,26 +1947,45 @@ export function DesktopChatWorkspace({
         )}
       </section>
 
-      {activeConversation && rightPanelMode ? (
+      {activeConversation && rightPanelMode === "details" ? (
         <DesktopChatSidePanel
           panelRef={sidePanelRef}
           mode={rightPanelMode}
-          title={
-            rightPanelMode === "history"
-              ? "查找聊天记录"
-              : activeConversation.title
-          }
-          subtitle={
-            rightPanelMode === "history" ? activeConversation.title : "聊天信息"
-          }
+          title={activeConversation.title}
+          subtitle="聊天信息"
           detailsVariant={
-            rightPanelMode === "details" &&
             isPersistedGroupConversation(activeConversation)
               ? "wechat"
               : "default"
           }
-          onBack={
-            rightPanelMode === "history" && historyPanelCanReturnToDetails
+          onClose={() => {
+            dismissSidePanel();
+          }}
+        >
+          <DesktopChatDetailsPanel
+            conversation={activeConversation}
+            actionRequest={detailsActionRequest}
+            onOpenHistory={() => {
+              handleOpenHistoryPanel("details");
+            }}
+            onCreateGroup={(input) => {
+              setCreateGroupDialogState(input);
+            }}
+          />
+        </DesktopChatSidePanel>
+      ) : null}
+
+      {activeConversation && rightPanelMode === "history" ? (
+        <DesktopChatHistoryDialog
+          open
+          conversation={activeConversation}
+          focusRequestKey={historyPanelFocusKey}
+          canReturnToDetails={historyPanelCanReturnToDetails}
+          onClose={() => {
+            dismissSidePanel();
+          }}
+          onBackToDetails={
+            historyPanelCanReturnToDetails
               ? () => {
                   setRightPanelMode("details");
                   setHistoryPanelCanReturnToDetails(false);
@@ -1977,58 +2000,18 @@ export function DesktopChatWorkspace({
                 }
               : undefined
           }
-          onClose={() => {
-            dismissSidePanel();
-          }}
-        >
-          {rightPanelMode === "history" ? (
-            <DesktopChatHistoryPanel
-              conversation={activeConversation}
-              focusRequestKey={historyPanelFocusKey}
-              onClose={() => {
-                dismissSidePanel();
-              }}
-              onBackToDetails={
-                historyPanelCanReturnToDetails
-                  ? () => {
-                      setRightPanelMode("details");
-                      setHistoryPanelCanReturnToDetails(false);
-                      setDetailsActionRequest(null);
-                      navigateToChatWorkspace({
-                        hash: buildCurrentChatRouteHash({
-                          panel: "details",
-                          detailsAction: undefined,
-                        }),
-                        replace: true,
-                      });
-                    }
-                  : undefined
-              }
-              onOpenMessage={(messageId) => {
-                setRightPanelMode(null);
-                setHistoryPanelCanReturnToDetails(false);
+          onOpenMessage={(messageId) => {
+            setRightPanelMode(null);
+            setHistoryPanelCanReturnToDetails(false);
 
-                void navigate({
-                  to: buildDesktopChatThreadPath({
-                    conversationId: activeConversation.id,
-                    messageId,
-                  }),
-                });
-              }}
-            />
-          ) : (
-            <DesktopChatDetailsPanel
-              conversation={activeConversation}
-              actionRequest={detailsActionRequest}
-              onOpenHistory={() => {
-                handleOpenHistoryPanel("details");
-              }}
-              onCreateGroup={(input) => {
-                setCreateGroupDialogState(input);
-              }}
-            />
-          )}
-        </DesktopChatSidePanel>
+            void navigate({
+              to: buildDesktopChatThreadPath({
+                conversationId: activeConversation.id,
+                messageId,
+              }),
+            });
+          }}
+        />
       ) : null}
 
       <DesktopCreateGroupDialog

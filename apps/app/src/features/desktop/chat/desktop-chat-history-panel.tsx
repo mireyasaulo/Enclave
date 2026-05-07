@@ -36,6 +36,7 @@ import { formatDateTime, translateRuntimeMessage } from "@yinjie/i18n";
 type DesktopChatHistoryPanelProps = {
   conversation: ConversationListItem;
   focusRequestKey?: number;
+  variant?: "panel" | "dialog";
   onBackToDetails?: () => void;
   onClose: () => void;
   onOpenMessage: (messageId: string) => void;
@@ -61,10 +62,12 @@ const t = translateRuntimeMessage;
 export function DesktopChatHistoryPanel({
   conversation,
   focusRequestKey = 0,
+  variant = "panel",
   onBackToDetails,
   onClose,
   onOpenMessage,
 }: DesktopChatHistoryPanelProps) {
+  const isDialog = variant === "dialog";
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const isGroupConversation = isPersistedGroupConversation(conversation);
@@ -114,6 +117,7 @@ export function DesktopChatHistoryPanel({
 
       if (selectorView) {
         event.preventDefault();
+        event.stopPropagation();
         setSelectorView(null);
         return;
       }
@@ -125,6 +129,7 @@ export function DesktopChatHistoryPanel({
         Boolean(customDate)
       ) {
         event.preventDefault();
+        event.stopPropagation();
         setActiveCategory("all");
         setQuickDateFilter("all");
         setCustomDate("");
@@ -135,7 +140,12 @@ export function DesktopChatHistoryPanel({
 
       if (onBackToDetails) {
         event.preventDefault();
+        event.stopPropagation();
         onBackToDetails();
+        return;
+      }
+
+      if (isDialog) {
         return;
       }
 
@@ -147,6 +157,7 @@ export function DesktopChatHistoryPanel({
   }, [
     activeCategory,
     customDate,
+    isDialog,
     onBackToDetails,
     onClose,
     quickDateFilter,
@@ -350,7 +361,17 @@ export function DesktopChatHistoryPanel({
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-[#f7f7f7]">
-      <div className="border-b border-[rgba(0,0,0,0.06)] bg-white px-4 py-3">
+      <div
+        className={cn(
+          "border-b border-[rgba(0,0,0,0.06)] bg-white",
+          isDialog ? "px-6 py-4" : "px-4 py-3",
+        )}
+      >
+        <div
+          className={cn(
+            isDialog ? "mx-auto w-full max-w-[680px]" : "",
+          )}
+        >
         {showHeaderActionsRow ? (
           <div className="flex justify-end">
             <button
@@ -396,19 +417,21 @@ export function DesktopChatHistoryPanel({
           ) : null}
         </label>
 
-        <div className="mt-2 flex min-w-0 flex-wrap items-center gap-1.5 rounded-[10px] bg-[#f6f6f6] px-3 py-2 text-[11px] text-[color:var(--text-muted)]">
-          <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] text-[color:var(--text-secondary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]">
-            {isGroupConversation ? t(msg`群聊`) : t(msg`单聊`)}
-          </span>
-          <span className="truncate text-[12px] text-[color:var(--text-primary)]">
-            {conversation.title}
-          </span>
-          {openedFromDetails ? (
-            <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] text-[color:var(--brand-primary)] shadow-[inset_0_0_0_1px_rgba(7,193,96,0.14)]">
-              {t(msg`聊天信息入口`)}
+        {isDialog ? null : (
+          <div className="mt-2 flex min-w-0 flex-wrap items-center gap-1.5 rounded-[10px] bg-[#f6f6f6] px-3 py-2 text-[11px] text-[color:var(--text-muted)]">
+            <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] text-[color:var(--text-secondary)] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]">
+              {isGroupConversation ? t(msg`群聊`) : t(msg`单聊`)}
             </span>
-          ) : null}
-        </div>
+            <span className="truncate text-[12px] text-[color:var(--text-primary)]">
+              {conversation.title}
+            </span>
+            {openedFromDetails ? (
+              <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] text-[color:var(--brand-primary)] shadow-[inset_0_0_0_1px_rgba(7,193,96,0.14)]">
+                {t(msg`聊天信息入口`)}
+              </span>
+            ) : null}
+          </div>
+        )}
 
         {activeFilterChips.length ? (
           <div className="mt-2.5 flex flex-wrap gap-1.5">
@@ -425,6 +448,7 @@ export function DesktopChatHistoryPanel({
             ))}
           </div>
         ) : null}
+        </div>
       </div>
 
       {selectorView === "date" ? (
@@ -432,7 +456,12 @@ export function DesktopChatHistoryPanel({
           title={t(msg`按日期查找`)}
           onBack={() => setSelectorView(null)}
         >
-          <div className="px-3 pb-4 pt-3">
+          <div
+            className={cn(
+              "pb-4 pt-3",
+              isDialog ? "mx-auto w-full max-w-[680px] px-6" : "px-3",
+            )}
+          >
             <div className="px-1 text-[11px] tracking-[0.08em] text-[color:var(--text-dim)]">
               {t(msg`快速选择`)}
             </div>
@@ -517,7 +546,12 @@ export function DesktopChatHistoryPanel({
           title={t(msg`按群成员查找`)}
           onBack={() => setSelectorView(null)}
         >
-          <div className="px-3 pb-4 pt-3">
+          <div
+            className={cn(
+              "pb-4 pt-3",
+              isDialog ? "mx-auto w-full max-w-[680px] px-6" : "px-3",
+            )}
+          >
             <label className="flex items-center gap-2 rounded-[10px] border border-[rgba(0,0,0,0.04)] bg-[#f4f4f4] px-3 py-2.5 transition-[border-color,background-color] focus-within:border-[rgba(7,193,96,0.2)] focus-within:bg-white">
               <Search
                 size={14}
@@ -596,7 +630,12 @@ export function DesktopChatHistoryPanel({
 
       {showSearchMainView ? (
         <div className="min-h-0 flex-1 overflow-auto">
-          <div className="px-3 pb-4 pt-3">
+          <div
+            className={cn(
+              "pb-4 pt-3",
+              isDialog ? "mx-auto w-full max-w-[680px] px-6" : "px-3",
+            )}
+          >
             <div className="px-1 text-[11px] tracking-[0.08em] text-[color:var(--text-dim)]">
               {t(msg`按条件查找`)}
             </div>
