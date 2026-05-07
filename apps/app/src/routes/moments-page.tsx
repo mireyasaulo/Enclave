@@ -8,6 +8,7 @@ import {
 } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { ArrowLeft, Copy, Heart, PenSquare, Share2 } from "lucide-react";
 import {
   addMomentComment,
@@ -16,6 +17,7 @@ import {
   toggleMomentLike,
   type Moment,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import { MomentMediaGallery } from "../components/moment-media-gallery";
 import { MomentCommentComposer } from "../components/moment-comment-composer";
@@ -62,6 +64,7 @@ const DesktopMessageAvatarPopover = lazy(async () => {
 });
 
 export function MomentsPage() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
   const navigate = useNavigate();
   const pathname = useRouterState({
@@ -160,7 +163,7 @@ export function MomentsPage() {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice("朋友圈已发布。");
+      setNotice(t(msg`朋友圈已发布。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
       });
@@ -198,7 +201,7 @@ export function MomentsPage() {
                     id: `optimistic-${ownerId}-${moment.id}`,
                     postId: moment.id,
                     authorId: ownerId,
-                    authorName: ownerUsername ?? "我",
+                    authorName: ownerUsername ?? t(msg`我`),
                     authorAvatar: ownerAvatar ?? "",
                     authorType: "user" as const,
                     createdAt: new Date().toISOString(),
@@ -226,7 +229,7 @@ export function MomentsPage() {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice("朋友圈互动已更新。");
+      setNotice(t(msg`朋友圈互动已更新。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
       });
@@ -237,7 +240,7 @@ export function MomentsPage() {
     mutationFn: (momentId: string) => {
       const text = commentDrafts[momentId]?.trim();
       if (!text) {
-        throw new Error("请先输入评论内容。");
+        throw new Error(t(msg`请先输入评论内容。`));
       }
 
       const replyTo =
@@ -263,7 +266,7 @@ export function MomentsPage() {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice("朋友圈互动已更新。");
+      setNotice(t(msg`朋友圈互动已更新。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
       });
@@ -303,7 +306,9 @@ export function MomentsPage() {
     normalizedPathname === desktopMomentsPath ||
     normalizedPathname === "/moments" ||
     normalizedPathname === "/discover/moments";
-  const interactionActionLabel = safeReturnPath ? "返回上一页" : "重试读取";
+  const interactionActionLabel = safeReturnPath
+    ? t(msg`返回上一页`)
+    : t(msg`重试读取`);
 
   function openMobileMomentsPublishPage() {
     void navigate({
@@ -538,7 +543,9 @@ export function MomentsPage() {
       await composeDraft.addImageFiles(files);
     } catch (error) {
       composeDraft.setMediaError(
-        error instanceof Error ? error.message : "图片选择失败，请稍后重试。",
+        error instanceof Error
+          ? error.message
+          : t(msg`图片选择失败，请稍后重试。`),
       );
     }
   }
@@ -548,7 +555,9 @@ export function MomentsPage() {
       await composeDraft.replaceVideoFile(file);
     } catch (error) {
       composeDraft.setMediaError(
-        error instanceof Error ? error.message : "视频选择失败，请稍后重试。",
+        error instanceof Error
+          ? error.message
+          : t(msg`视频选择失败，请稍后重试。`),
       );
     }
   }
@@ -582,16 +591,15 @@ export function MomentsPage() {
       typeof window === "undefined"
         ? sharePath
         : `${window.location.origin}${sharePath}`;
-    const summaryText = `${moment.authorName}：${summaryBody}${
-      moment.location ? `\n位置：${moment.location}` : ""
-    }\n${shareUrl}`;
+    const locationLine = moment.location
+      ? t(msg`\n位置：${moment.location}`)
+      : "";
+    const summaryText = `${moment.authorName}：${summaryBody}${locationLine}\n${shareUrl}`;
 
     if (nativeMobileShareSupported) {
       const shared = await shareWithNativeShell({
-        title: `${moment.authorName} 的朋友圈`,
-        text: `${moment.authorName}：${summaryBody}${
-          moment.location ? `\n位置：${moment.location}` : ""
-        }`,
+        title: t(msg`${moment.authorName} 的朋友圈`),
+        text: `${moment.authorName}：${summaryBody}${locationLine}`,
         url: shareUrl,
       });
 
@@ -599,7 +607,7 @@ export function MomentsPage() {
         setNoticeTone("success");
         setNoticeActionLabel(null);
         setNoticeAction(null);
-        setNotice("已打开系统分享面板。");
+        setNotice(t(msg`已打开系统分享面板。`));
         return;
       }
     }
@@ -610,14 +618,16 @@ export function MomentsPage() {
       typeof navigator.clipboard.writeText !== "function"
     ) {
       setNoticeTone("info");
-      setNoticeActionLabel(nativeMobileShareSupported ? "重试分享" : "重试复制");
+      setNoticeActionLabel(
+        nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
+      );
       setNoticeAction(() => () => {
         void handleShareMoment(moment);
       });
       setNotice(
         nativeMobileShareSupported
-          ? "当前设备暂时无法打开系统分享，请稍后重试。"
-          : "当前环境暂不支持复制动态摘要。",
+          ? t(msg`当前设备暂时无法打开系统分享，请稍后重试。`)
+          : t(msg`当前环境暂不支持复制动态摘要。`),
       );
       return;
     }
@@ -629,19 +639,21 @@ export function MomentsPage() {
       setNoticeAction(null);
       setNotice(
         nativeMobileShareSupported
-          ? "系统分享暂时不可用，已复制动态摘要。"
-          : "动态摘要已复制。",
+          ? t(msg`系统分享暂时不可用，已复制动态摘要。`)
+          : t(msg`动态摘要已复制。`),
       );
     } catch {
       setNoticeTone("info");
-      setNoticeActionLabel(nativeMobileShareSupported ? "重试分享" : "重试复制");
+      setNoticeActionLabel(
+        nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
+      );
       setNoticeAction(() => () => {
         void handleShareMoment(moment);
       });
       setNotice(
         nativeMobileShareSupported
-          ? "系统分享失败，请稍后重试。"
-          : "复制动态摘要失败，请稍后重试。",
+          ? t(msg`系统分享失败，请稍后重试。`)
+          : t(msg`复制动态摘要失败，请稍后重试。`),
       );
     }
   }
@@ -650,9 +662,9 @@ export function MomentsPage() {
     if (syncedRouteSelectedAuthorId) {
       return (
         <RouteRedirectState
-          title="正在打开好友朋友圈"
-          description="正在切换到桌面好友朋友圈工作区，马上显示对应居民的动态。"
-          loadingLabel="正在切换到桌面朋友圈..."
+          title={t(msg`正在打开好友朋友圈`)}
+          description={t(msg`正在切换到桌面好友朋友圈工作区，马上显示对应居民的动态。`)}
+          loadingLabel={t(msg`正在切换到桌面朋友圈...`)}
         />
       );
     }
@@ -671,9 +683,9 @@ export function MomentsPage() {
       <Suspense
         fallback={
           <RouteRedirectState
-            title="正在打开桌面朋友圈"
-            description="正在载入桌面朋友圈工作区，马上显示动态和详情。"
-            loadingLabel="载入桌面朋友圈..."
+            title={t(msg`正在打开桌面朋友圈`)}
+            description={t(msg`正在载入桌面朋友圈工作区，马上显示动态和详情。`)}
+            loadingLabel={t(msg`载入桌面朋友圈...`)}
           />
         }
       >
@@ -773,9 +785,9 @@ export function MomentsPage() {
                   category: "moments",
                   title: moment.authorName,
                   description: getMomentSummaryText(moment),
-                  meta: `朋友圈 · ${formatTimestamp(moment.postedAt)}`,
+                  meta: t(msg`朋友圈 · ${formatTimestamp(moment.postedAt)}`),
                   to: `/tabs/moments${routeHash ? `#${routeHash}` : ""}`,
-                  badge: "朋友圈",
+                  badge: t(msg`朋友圈`),
                   avatarName: moment.authorName,
                   avatarSrc: moment.authorAvatar,
                 });
@@ -823,8 +835,8 @@ export function MomentsPage() {
     <AppPage className="space-y-0 px-0 pb-0 pt-0">
       {isDiscoverSubPage ? (
         <TabPageTopBar
-          title="朋友圈"
-          subtitle="世界角色动态"
+          title={t(msg`朋友圈`)}
+          subtitle={t(msg`世界角色动态`)}
           titleAlign="center"
           className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
           leftActions={
@@ -856,7 +868,7 @@ export function MomentsPage() {
               size="icon"
               className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-black/[0.05]"
               onClick={openMobileMomentsPublishPage}
-              aria-label="发一条朋友圈"
+              aria-label={t(msg`发一条朋友圈`)}
             >
               <PenSquare size={17} />
             </Button>
@@ -864,8 +876,8 @@ export function MomentsPage() {
         />
       ) : (
         <TabPageTopBar
-          title="朋友圈"
-          subtitle="世界角色动态"
+          title={t(msg`朋友圈`)}
+          subtitle={t(msg`世界角色动态`)}
           className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
           rightActions={
             <Button
@@ -874,7 +886,7 @@ export function MomentsPage() {
               size="icon"
               className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-black/[0.05]"
               onClick={openMobileMomentsPublishPage}
-              aria-label="发一条朋友圈"
+              aria-label={t(msg`发一条朋友圈`)}
             >
               <PenSquare size={17} />
             </Button>
@@ -886,10 +898,10 @@ export function MomentsPage() {
         <section className="space-y-2">
           <div className="px-1">
             <div className="text-[11px] text-[color:var(--text-muted)]">
-              最近动态
+              {t(msg`最近动态`)}
             </div>
             <div className="mt-0.5 text-[10px] leading-4 text-[color:var(--text-muted)]">
-              这里会展示世界里的角色和你最近发布的朋友圈内容。
+              {t(msg`这里会展示世界里的角色和你最近发布的朋友圈内容。`)}
             </div>
           </div>
           {notice ? (
@@ -927,16 +939,16 @@ export function MomentsPage() {
           ) : null}
           {momentsQuery.isLoading ? (
             <MobileMomentsStatusCard
-              badge="读取中"
-              title="正在刷新朋友圈"
-              description="稍等一下，正在同步世界里的最新动态。"
+              badge={t(msg`读取中`)}
+              title={t(msg`正在刷新朋友圈`)}
+              description={t(msg`稍等一下，正在同步世界里的最新动态。`)}
               tone="loading"
             />
           ) : null}
           {momentsQuery.isError && momentsQuery.error instanceof Error ? (
             <MobileMomentsStatusCard
-              badge="读取失败"
-              title="朋友圈暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`朋友圈暂时不可用`)}
               description={momentsQuery.error.message}
               tone="danger"
               action={
@@ -947,7 +959,7 @@ export function MomentsPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleRetryLoad}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     variant="secondary"
@@ -955,7 +967,7 @@ export function MomentsPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? "返回上一页" : "重试读取"}
+                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`重试读取`)}
                   </Button>
                 </div>
               }
@@ -977,7 +989,7 @@ export function MomentsPage() {
                 authorAvatar={moment.authorAvatar}
                 authorActionAriaLabel={
                   moment.authorType === "character"
-                    ? `查看 ${moment.authorName} 的朋友圈`
+                    ? t(msg`查看 ${moment.authorName} 的朋友圈`)
                     : undefined
                 }
                 meta={formatTimestamp(moment.postedAt)}
@@ -995,8 +1007,8 @@ export function MomentsPage() {
                     onClick={() => void handleShareMoment(moment)}
                     aria-label={
                       nativeMobileShareSupported
-                        ? "分享这条朋友圈"
-                        : "复制这条动态摘要"
+                        ? t(msg`分享这条朋友圈`)
+                        : t(msg`复制这条动态摘要`)
                     }
                   >
                     {nativeMobileShareSupported ? (
@@ -1010,7 +1022,7 @@ export function MomentsPage() {
                   <>
                     {moment.authorType === "user" ? (
                       <div className="mb-2 inline-flex rounded-full bg-[rgba(47,122,63,0.12)] px-2 py-0.5 text-[10px] font-medium text-[#2f7a3f]">
-                        我的动态
+                        {t(msg`我的动态`)}
                       </div>
                     ) : null}
                     {moment.text.trim() ? <div>{moment.text}</div> : null}
@@ -1025,7 +1037,7 @@ export function MomentsPage() {
                     ) : null}
                   </>
                 }
-                summary={`${moment.likeCount} 赞 · ${moment.commentCount} 评论`}
+                summary={t(msg`${moment.likeCount} 赞 · ${moment.commentCount} 评论`)}
                 actions={
                   <div className="flex flex-wrap gap-2">
                     {moment.authorType === "character" ? (
@@ -1034,7 +1046,7 @@ export function MomentsPage() {
                         size="sm"
                         onClick={() => openMobileFriendMoments(moment.authorId)}
                       >
-                        Ta 的朋友圈
+                        {t(msg`Ta 的朋友圈`)}
                       </Button>
                     ) : null}
                     {(() => {
@@ -1060,10 +1072,10 @@ export function MomentsPage() {
                             className={liked ? "fill-current" : undefined}
                           />
                           {pendingLikeMomentId === moment.id
-                            ? "处理中..."
+                            ? t(msg`处理中...`)
                             : liked
-                              ? "已赞"
-                              : "点赞"}
+                              ? t(msg`已赞`)
+                              : t(msg`点赞`)}
                         </Button>
                       );
                     })()}
@@ -1079,9 +1091,9 @@ export function MomentsPage() {
                               category: "moments",
                               title: moment.authorName,
                               description: getMomentSummaryText(moment),
-                              meta: `朋友圈 · ${formatTimestamp(moment.postedAt)}`,
+                              meta: t(msg`朋友圈 · ${formatTimestamp(moment.postedAt)}`),
                               to: `/tabs/moments${routeHash ? `#${routeHash}` : ""}`,
-                              badge: "朋友圈",
+                              badge: t(msg`朋友圈`),
                               avatarName: moment.authorName,
                               avatarSrc: moment.authorAvatar,
                             });
@@ -1091,7 +1103,7 @@ export function MomentsPage() {
                         );
                       }}
                     >
-                      {collected ? "取消收藏" : "收藏"}
+                      {collected ? t(msg`取消收藏`) : t(msg`收藏`)}
                     </Button>
                   </div>
                 }
@@ -1147,7 +1159,7 @@ export function MomentsPage() {
                                   {replyToName ? (
                                     <>
                                       <span className="text-[color:var(--text-secondary)]">
-                                        {" "}回复{" "}
+                                        {" "}{t(msg`回复`)}{" "}
                                       </span>
                                       <span className="font-medium text-[#07c160]">
                                         {replyToName}
@@ -1165,7 +1177,7 @@ export function MomentsPage() {
                           <div className="flex items-start justify-between gap-2 rounded-[12px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[11px] text-[color:var(--text-secondary)]">
                             <div className="min-w-0 flex-1 space-y-1">
                               <div className="truncate">
-                                正在回复 {activeReply.authorName}
+                                {t(msg`正在回复 ${activeReply.authorName}`)}
                               </div>
                               {replyTargetComment ? (
                                 <div className="truncate text-[color:var(--text-muted)]">
@@ -1176,10 +1188,10 @@ export function MomentsPage() {
                             <button
                               type="button"
                               onClick={() => setDesktopReplyTarget(null)}
-                              aria-label="取消回复"
+                              aria-label={t(msg`取消回复`)}
                               className="shrink-0 rounded-full px-2 py-0.5 text-[11px] text-[color:var(--text-muted)] hover:bg-white"
                             >
-                              取消
+                              {t(msg`取消`)}
                             </button>
                           </div>
                         ) : null}
@@ -1201,10 +1213,10 @@ export function MomentsPage() {
                     disabled={commentMutation.isPending}
                     placeholder={
                       desktopReplyTarget?.postId === moment.id
-                        ? `回复 ${desktopReplyTarget.authorName}...`
-                        : "写评论..."
+                        ? t(msg`回复 ${desktopReplyTarget.authorName}...`)
+                        : t(msg`写评论...`)
                     }
-                    pendingLabel="发送中..."
+                    pendingLabel={t(msg`发送中...`)}
                     className="w-full"
                     inputClassName="rounded-full py-1.5 text-[16px]"
                     buttonClassName="h-8 px-3 text-[12px]"
@@ -1251,9 +1263,9 @@ export function MomentsPage() {
           !momentsQuery.isError &&
           !visibleMoments.length ? (
             <MobileMomentsStatusCard
-              badge="朋友圈"
-              title="还很安静"
-              description="你先发一条动态，或者等世界里的角色们先开口。"
+              badge={t(msg`朋友圈`)}
+              title={t(msg`还很安静`)}
+              description={t(msg`你先发一条动态，或者等世界里的角色们先开口。`)}
               action={
                 <Button
                   variant="primary"
@@ -1261,7 +1273,7 @@ export function MomentsPage() {
                   className="h-8 rounded-full bg-[#07c160] px-3.5 text-[11px] text-white hover:bg-[#06ad56]"
                   onClick={handleEmptyStateAction}
                 >
-                  {safeReturnPath ? "返回上一页" : "发一条朋友圈"}
+                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`发一条朋友圈`)}
                 </Button>
               }
             />

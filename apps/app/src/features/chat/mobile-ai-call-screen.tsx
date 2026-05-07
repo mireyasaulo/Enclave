@@ -230,6 +230,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
   const speechStatus = systemStatusQuery.data?.inferenceGateway;
   const digitalHumanGateway = systemStatusQuery.data?.digitalHumanGateway;
   const digitalHumanGatewayCopy = resolveDigitalHumanGatewayStatusCopy(
+    t,
     digitalHumanGateway,
   );
   const cameraPreviewMetaLabel = !cameraEnabled
@@ -366,55 +367,55 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
   const characterName =
     characterQuery.data?.name?.trim() ||
     conversation?.title?.trim() ||
-    (isVideoMode ? "视频通话" : "语音通话");
+    (isVideoMode ? t(msg`视频通话`) : t(msg`语音通话`));
   const characterAvatar = characterQuery.data?.avatar || undefined;
   const characterStatus =
     characterQuery.data?.currentStatus?.trim() ||
     characterQuery.data?.currentActivity?.trim() ||
-    "在线";
+    t(msg`在线`);
   const busy = activeCall.busy;
   const statusLabel = useMemo(() => {
     if (isVideoMode && digitalHumanCall.sessionState === "connecting") {
-      return "正在连接数字人";
+      return t(msg`正在连接数字人`);
     }
 
     if (isVideoMode && digitalHumanCall.sessionError) {
-      return "数字人连接失败";
+      return t(msg`数字人连接失败`);
     }
 
     if (activeCall.turnMutation.isPending) {
-      return isVideoMode ? "数字人整理回复中" : "AI 正在思考";
+      return isVideoMode ? t(msg`数字人整理回复中`) : t(msg`AI 正在思考`);
     }
 
     if (activeCall.playbackState === "playing") {
-      return isVideoMode ? "数字人正在说话" : "正在说话";
+      return isVideoMode ? t(msg`数字人正在说话`) : t(msg`正在说话`);
     }
 
     if (isVideoMode && playbackSettling) {
-      return "准备下一轮";
+      return t(msg`准备下一轮`);
     }
 
     if (
       speech.status === "requesting-permission" ||
       speech.status === "listening"
     ) {
-      return isVideoMode ? "正在听你说话" : "正在聆听";
+      return isVideoMode ? t(msg`正在听你说话`) : t(msg`正在聆听`);
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "rendering") {
-      return "数字人渲染中";
+      return t(msg`数字人渲染中`);
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "queued") {
-      return "数字人排队中";
+      return t(msg`数字人排队中`);
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "failed") {
-      return "数字人画面失败";
+      return t(msg`数字人画面失败`);
     }
 
     if (lastAssistantText) {
-      return isVideoMode ? "准备下一轮" : "继续说话";
+      return isVideoMode ? t(msg`准备下一轮`) : t(msg`继续说话`);
     }
 
     if (
@@ -422,14 +423,14 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
       digitalHumanCall.session?.renderStatus === "ready" &&
       (digitalHumanCall.session?.playerUrl || digitalHumanCall.session?.streamUrl)
     ) {
-      return "数字人视频已接通";
+      return t(msg`数字人视频已接通`);
     }
 
     if (isVideoMode && digitalHumanGatewayCopy?.statusLabel) {
       return digitalHumanGatewayCopy.statusLabel;
     }
 
-    return "按住说话";
+    return t(msg`按住说话`);
   }, [
     activeCall.playbackState,
     activeCall.turnMutation.isPending,
@@ -446,41 +447,39 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
   ]);
   const statusHint = useMemo(() => {
     if (isVideoMode && digitalHumanCall.sessionState === "connecting") {
-      return "正在接通数字人，接通后就能开始第一轮。";
+      return t(msg`正在接通数字人，接通后就能开始第一轮。`);
     }
 
     if (isVideoMode && digitalHumanCall.sessionError) {
-      return "数字人暂时没接通，可以重试，或先切到语音。";
+      return t(msg`数字人暂时没接通，可以重试，或先切到语音。`);
     }
 
     if (activeCall.turnMutation.isPending) {
-      return "这一句已收到，正在整理回复。";
+      return t(msg`这一句已收到，正在整理回复。`);
     }
 
     if (activeCall.playbackState === "playing") {
-      return isVideoMode
-        ? "等 TA 说完，再开始下一句。"
-        : "等 TA 说完，再开始下一句。";
+      return t(msg`等 TA 说完，再开始下一句。`);
     }
 
     if (isVideoMode && playbackSettling) {
-      return "这一轮刚结束，等播报收尾后再继续。";
+      return t(msg`这一轮刚结束，等播报收尾后再继续。`);
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "rendering") {
-      return "回复已生成，画面还在准备中。";
+      return t(msg`回复已生成，画面还在准备中。`);
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "queued") {
-      return "画面正在排队，语音会先继续。";
+      return t(msg`画面正在排队，语音会先继续。`);
     }
 
     if (isVideoMode && digitalHumanCall.session?.renderStatus === "failed") {
-      return "这一轮画面没出来，但语音还能继续。";
+      return t(msg`这一轮画面没出来，但语音还能继续。`);
     }
 
     if (isVideoMode && lastAssistantText) {
-      return "这一轮已经结束，准备好后继续说下一句。";
+      return t(msg`这一轮已经结束，准备好后继续说下一句。`);
     }
 
     if (
@@ -488,14 +487,14 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
       digitalHumanCall.session?.renderStatus === "ready" &&
       (digitalHumanCall.session?.playerUrl || digitalHumanCall.session?.streamUrl)
     ) {
-      return "视频已经就绪，会优先展示远端画面。";
+      return t(msg`视频已经就绪，会优先展示远端画面。`);
     }
 
     if (
       speech.status === "requesting-permission" ||
       speech.status === "listening"
     ) {
-      return "松开后会立刻发出这一句。";
+      return t(msg`松开后会立刻发出这一句。`);
     }
 
     if (isVideoMode && digitalHumanGatewayCopy?.statusHint) {
@@ -504,9 +503,9 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
 
     return isVideoMode
       ? digitalSession?.presentationMode === "mock_stage"
-        ? "先按住底部按钮说第一句，数字人会听完再用语音和画面回应。"
-        : "先按住底部按钮说第一句，数字人会听完再回应。"
-      : "每次说一段，AI 会回一段语音。";
+        ? t(msg`先按住底部按钮说第一句，数字人会听完再用语音和画面回应。`)
+        : t(msg`先按住底部按钮说第一句，数字人会听完再回应。`)
+      : t(msg`每次说一段，AI 会回一段语音。`);
   }, [
     activeCall.playbackState,
     activeCall.turnMutation.isPending,
@@ -633,7 +632,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
 
   const renderBackToChatAction = () => (
     <InlineNoticeActionButton
-      label="返回聊天"
+      label={t(msg`返回聊天`)}
       className="border-current/28 bg-white/12 active:bg-white/16"
       onClick={() => {
         void handleBack();
@@ -643,7 +642,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
 
   const renderRetryCharacterLoadAction = () => (
     <InlineNoticeActionButton
-      label="重试读取角色资料"
+      label={t(msg`重试读取角色资料`)}
       className="border-current/28 bg-white/12 active:bg-white/16"
       onClick={() => {
         void characterQuery.refetch();
@@ -737,14 +736,14 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
   const hasVideoPlaybackFailure =
     isVideoMode && Boolean(activeCall.playerError) && Boolean(lastAssistantText);
   const videoRecoveryMessage = hasVideoSessionFailure
-    ? "数字人还没恢复，先重试或改用语音继续。"
+    ? t(msg`数字人还没恢复，先重试或改用语音继续。`)
     : hasVideoRenderFailure
-      ? "这一轮画面没出来，当前已回到语音链路。"
+      ? t(msg`这一轮画面没出来，当前已回到语音链路。`)
       : null;
   const showPlaybackNudge = hasVideoPlaybackFailure || showPlaybackRecoveryAction;
   const playbackNudgeMessage = isVideoMode
-    ? "这一句没有自动播报，点一下继续听。"
-    : "这一句没有自动播报，点一下补播。";
+    ? t(msg`这一句没有自动播报，点一下继续听。`)
+    : t(msg`这一句没有自动播报，点一下补播。`);
   const hasCallProgress =
     Boolean(lastUserTranscript) ||
     Boolean(lastAssistantText) ||
@@ -763,7 +762,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
     activeCall.turnMutation.isPending ||
     activeCall.playbackState === "playing" ||
     leavingScreen;
-  const headerMetaLabel = isVideoMode ? "视频通话" : "语音通话";
+  const headerMetaLabel = isVideoMode ? t(msg`视频通话`) : t(msg`语音通话`);
   const callPhase = useMemo<
     | "error"
     | "connecting"
@@ -870,55 +869,55 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
   );
   const userBubblePlaceholder = useMemo(() => {
     if (callPhase === "error") {
-      return "上一轮没有顺利完成，准备好后可以重新录这一句。";
+      return t(msg`上一轮没有顺利完成，准备好后可以重新录这一句。`);
     }
 
     if (callPhase === "listening") {
-      return "正在听你这一句，松开后会立刻发出。";
+      return t(msg`正在听你这一句，松开后会立刻发出。`);
     }
 
     if (callPhase === "thinking") {
-      return "刚刚那句已经发出，正在等待这一轮回复。";
+      return t(msg`刚刚那句已经发出，正在等待这一轮回复。`);
     }
 
     if (callPhase === "speaking") {
-      return "这一轮先到这里，等 TA 说完后再继续。";
+      return t(msg`这一轮先到这里，等 TA 说完后再继续。`);
     }
 
     if (callPhase === "followup") {
-      return "这一轮已经完成，准备好后继续按住底部按钮说下一句。";
+      return t(msg`这一轮已经完成，准备好后继续按住底部按钮说下一句。`);
     }
 
     if (isVideoMode) {
-      return "按住底部按钮说第一句，画面会保持在当前视频通话里。";
+      return t(msg`按住底部按钮说第一句，画面会保持在当前视频通话里。`);
     }
 
-    return "按住底部按钮，说出你想对 TA 说的话。";
+    return t(msg`按住底部按钮，说出你想对 TA 说的话。`);
   }, [callPhase, isVideoMode]);
   const assistantBubblePlaceholder = useMemo(() => {
     if (callPhase === "error") {
-      return "这一轮的回复暂时没有顺利回来，恢复后会继续显示在这里。";
+      return t(msg`这一轮的回复暂时没有顺利回来，恢复后会继续显示在这里。`);
     }
 
     if (callPhase === "connecting") {
-      return "数字人接通后，会先在这里显示这一轮回复，再通过语音和画面回应你。";
+      return t(msg`数字人接通后，会先在这里显示这一轮回复，再通过语音和画面回应你。`);
     }
 
     if (callPhase === "thinking") {
-      return "正在整理这一轮回复，马上就会回到这里。";
+      return t(msg`正在整理这一轮回复，马上就会回到这里。`);
     }
 
     if (callPhase === "speaking") {
-      return "TA 正在说这一轮回复，等说完后可以继续下一句。";
+      return t(msg`TA 正在说这一轮回复，等说完后可以继续下一句。`);
     }
 
     if (callPhase === "followup") {
-      return "这一轮回复已经结束，下一轮内容也会继续显示在这里。";
+      return t(msg`这一轮回复已经结束，下一轮内容也会继续显示在这里。`);
     }
 
     return isVideoMode
-      ? "数字人的回复会先显示在这里，再通过语音自动播报。"
-      : "TA 的回复会在这里显示，并自动播报给你听。";
+      ? t(msg`数字人的回复会先显示在这里，再通过语音自动播报。`)
+      : t(msg`TA 的回复会在这里显示，并自动播报给你听。`);
   }, [callPhase, isVideoMode]);
 
   useEffect(() => {
@@ -946,14 +945,20 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
         {isDesktopLayout ? (
           <LoadingBlock
             label={
-              isVideoMode ? "正在连接数字人视频通话..." : "正在连接语音通话..."
+              isVideoMode
+                ? t(msg`正在连接数字人视频通话...`)
+                : t(msg`正在连接语音通话...`)
             }
           />
         ) : (
           <MobileCallStatusCard
-            badge="连接中"
-            title={isVideoMode ? "正在连接数字人视频通话" : "正在连接语音通话"}
-            description="稍等一下，正在同步会话信息并准备当前通话链路。"
+            badge={t(msg`连接中`)}
+            title={
+              isVideoMode
+                ? t(msg`正在连接数字人视频通话`)
+                : t(msg`正在连接语音通话`)
+            }
+            description={t(msg`稍等一下，正在同步会话信息并准备当前通话链路。`)}
             tone="loading"
           />
         )}
@@ -973,8 +978,8 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
           <ErrorBlock message={conversationsQuery.error.message} />
         ) : (
           <MobileCallStatusCard
-            badge="会话"
-            title="通话暂时不可用"
+            badge={t(msg`会话`)}
+            title={t(msg`通话暂时不可用`)}
             description={conversationsQuery.error.message}
             tone="danger"
             action={
@@ -983,7 +988,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                   onClick={handleRetryLoad}
                   className="min-w-[132px]"
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </MobileCallActionButton>
                 <MobileCallActionButton
                   onClick={() => {
@@ -991,7 +996,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                   }}
                   className="min-w-[132px]"
                 >
-                  返回聊天
+                  {t(msg`返回聊天`)}
                 </MobileCallActionButton>
               </div>
             }
@@ -1011,7 +1016,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
       >
         {isDesktopLayout ? (
           <>
-            <ErrorBlock message="当前聊天暂时不可用。" />
+            <ErrorBlock message={t(msg`当前聊天暂时不可用。`)} />
             <Button
               variant="secondary"
               onClick={handleBack}
@@ -1021,14 +1026,14 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                   : "rounded-full",
               )}
             >
-              返回聊天
+              {t(msg`返回聊天`)}
             </Button>
           </>
         ) : (
           <MobileCallStatusCard
-            badge="会话"
-            title="当前不能发起通话"
-            description="这段聊天暂时不可用，可以先重试读取，或返回聊天后再试。"
+            badge={t(msg`会话`)}
+            title={t(msg`当前不能发起通话`)}
+            description={t(msg`这段聊天暂时不可用，可以先重试读取，或返回聊天后再试。`)}
             tone="danger"
             action={
               <div className="flex flex-wrap justify-center gap-2">
@@ -1036,13 +1041,13 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                   onClick={handleRetryLoad}
                   className="min-w-[132px]"
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </MobileCallActionButton>
                 <MobileCallActionButton
                   onClick={handleBack}
                   className="min-w-[132px]"
                 >
-                  返回聊天
+                  {t(msg`返回聊天`)}
                 </MobileCallActionButton>
               </div>
             }
@@ -1065,8 +1070,8 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
             <ErrorBlock
               message={
                 isVideoMode
-                  ? "当前只支持在单聊里发起 AI 数字人视频通话。"
-                  : "当前只支持在单聊里发起 AI 语音通话。"
+                  ? t(msg`当前只支持在单聊里发起 AI 数字人视频通话。`)
+                  : t(msg`当前只支持在单聊里发起 AI 语音通话。`)
               }
             />
             <Button
@@ -1078,17 +1083,21 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                   : "rounded-full",
               )}
             >
-              返回聊天
+              {t(msg`返回聊天`)}
             </Button>
           </>
         ) : (
           <MobileCallStatusCard
-            badge="通话"
-            title={isVideoMode ? "当前不能发起视频通话" : "当前不能发起语音通话"}
+            badge={t(msg`通话`)}
+            title={
+              isVideoMode
+                ? t(msg`当前不能发起视频通话`)
+                : t(msg`当前不能发起语音通话`)
+            }
             description={
               isVideoMode
-                ? "目前只支持在单聊里发起 AI 数字人视频通话。"
-                : "目前只支持在单聊里发起 AI 语音通话。"
+                ? t(msg`目前只支持在单聊里发起 AI 数字人视频通话。`)
+                : t(msg`目前只支持在单聊里发起 AI 语音通话。`)
             }
             tone="danger"
             action={
@@ -1096,7 +1105,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                 onClick={handleBack}
                 className="min-w-[132px]"
               >
-                返回聊天
+                {t(msg`返回聊天`)}
               </MobileCallActionButton>
             }
           />
@@ -1115,19 +1124,19 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                 type="button"
                 onClick={handleBack}
                 className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-black/6 bg-white text-[color:var(--text-primary)] transition hover:bg-[#efefef]"
-                aria-label="返回聊天"
+                aria-label={t(msg`返回聊天`)}
               >
                 <ArrowLeft size={18} />
               </button>
               <div>
                 <div className="text-[11px] tracking-[0.12em] text-[color:var(--text-dim)]">
-                  {isVideoMode ? "视频通话" : "语音通话"}
+                  {isVideoMode ? t(msg`视频通话`) : t(msg`语音通话`)}
                 </div>
                 <div className="mt-1 text-[18px] font-medium text-[color:var(--text-primary)]">
                   {conversation.title}
                 </div>
                 <div className="mt-1 text-[12px] text-[color:var(--text-muted)]">
-                  桌面端通话入口已收口到聊天工作区顶部工具栏。
+                  {t(msg`桌面端通话入口已收口到聊天工作区顶部工具栏。`)}
                 </div>
               </div>
             </div>
@@ -1138,14 +1147,14 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
               onClick={handleBack}
               className="rounded-[10px] border-black/8 bg-white shadow-none hover:bg-[#efefef]"
             >
-              返回聊天
+              {t(msg`返回聊天`)}
             </Button>
           </header>
 
           <div className="flex min-h-0 flex-1 items-center justify-center p-6">
             <div className="w-full max-w-[760px] rounded-[18px] border border-black/6 bg-white p-8 shadow-[0_18px_48px_rgba(15,23,42,0.08)]">
               <div className="inline-flex rounded-full bg-[rgba(15,23,42,0.05)] px-3 py-1 text-[11px] tracking-[0.12em] text-[color:var(--text-dim)]">
-                桌面通话工作区
+                {t(msg`桌面通话工作区`)}
               </div>
               <div className="mt-5 flex items-start gap-4">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[14px] bg-[rgba(7,193,96,0.10)] text-[#1f8f4f]">
@@ -1153,10 +1162,12 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-[20px] font-medium text-[color:var(--text-primary)]">
-                    桌面端请从聊天页继续发起{isVideoMode ? "视频通话" : "语音通话"}
+                    {isVideoMode
+                      ? t(msg`桌面端请从聊天页继续发起视频通话`)
+                      : t(msg`桌面端请从聊天页继续发起语音通话`)}
                   </div>
                   <div className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
-                    当前独立路由主要保留给手机端通话流程。桌面端已经改为在聊天消息页内打开通话工作台，这样消息、侧栏信息和通话控制会保持在同一窗口里。
+                    {t(msg`当前独立路由主要保留给手机端通话流程。桌面端已经改为在聊天消息页内打开通话工作台，这样消息、侧栏信息和通话控制会保持在同一窗口里。`)}
                   </div>
                 </div>
               </div>
@@ -1164,7 +1175,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-[12px] border border-black/6 bg-[#fafafa] px-4 py-4">
                   <div className="text-[11px] tracking-[0.12em] text-[color:var(--text-dim)]">
-                    当前会话
+                    {t(msg`当前会话`)}
                   </div>
                   <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
                     {conversation.title}
@@ -1172,15 +1183,17 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                 </div>
                 <div className="rounded-[12px] border border-black/6 bg-[#fafafa] px-4 py-4">
                   <div className="text-[11px] tracking-[0.12em] text-[color:var(--text-dim)]">
-                    通话类型
+                    {t(msg`通话类型`)}
                   </div>
                   <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
-                    {isVideoMode ? "AI 数字人视频通话" : "AI 语音通话"}
+                    {isVideoMode
+                      ? t(msg`AI 数字人视频通话`)
+                      : t(msg`AI 语音通话`)}
                   </div>
                 </div>
                 <div className="rounded-[12px] border border-black/6 bg-[#fafafa] px-4 py-4">
                   <div className="text-[11px] tracking-[0.12em] text-[color:var(--text-dim)]">
-                    对话对象
+                    {t(msg`对话对象`)}
                   </div>
                   <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
                     {characterName}
@@ -1190,7 +1203,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
 
               <div className="mt-6">
                 <InlineNotice tone="info">
-                  回到聊天页后，继续使用顶部通话按钮即可进入桌面通话工作台。
+                  {t(msg`回到聊天页后，继续使用顶部通话按钮即可进入桌面通话工作台。`)}
                 </InlineNotice>
               </div>
 
@@ -1202,7 +1215,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                   className="rounded-[10px] bg-[#07c160] text-white hover:bg-[#06ad56]"
                 >
                   <MessageCircleMore size={16} />
-                  返回聊天继续
+                  {t(msg`返回聊天继续`)}
                 </Button>
                 <Button
                   type="button"
@@ -1217,7 +1230,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                   }}
                   className="rounded-[10px] border-black/8 bg-white shadow-none hover:bg-[#efefef]"
                 >
-                  查看聊天信息
+                  {t(msg`查看聊天信息`)}
                 </Button>
               </div>
             </div>
@@ -1237,7 +1250,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
             onClick={handleBack}
             disabled={leavingScreen}
             className={cn("mt-0.5", mobileCallIconButtonClass())}
-            aria-label="返回聊天"
+            aria-label={t(msg`返回聊天`)}
           >
             <ArrowLeft size={18} />
           </button>
@@ -1255,7 +1268,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                 <span className={phaseChipClass}>{statusLabel}</span>
                 {activeCall.audioMuted ? (
                   <MobileCallMetaChip>
-                    已静音播放
+                    {t(msg`已静音播放`)}
                   </MobileCallMetaChip>
                 ) : null}
               </div>
@@ -1275,7 +1288,9 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                     : "default",
               ),
             )}
-            aria-label={activeCall.audioMuted ? "取消静音播放" : "静音播放"}
+            aria-label={
+              activeCall.audioMuted ? t(msg`取消静音播放`) : t(msg`静音播放`)
+            }
           >
             {activeCall.audioMuted ? (
               <VolumeX size={18} />
@@ -1306,7 +1321,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
             <div className="absolute right-4 top-4 w-[124px] overflow-hidden rounded-[24px] border border-white/12 bg-[rgba(15,23,42,0.72)] shadow-[0_20px_48px_rgba(2,6,23,0.35)]">
               <div className="flex items-center justify-between border-b border-white/8 px-3 py-2">
                 <span className="text-[11px] uppercase tracking-[0.16em] text-white/48">
-                  我
+                  {t(msg`我`)}
                 </span>
                 <span className="text-[11px] text-white/48">
                   {cameraPreviewMetaLabel}
@@ -1397,17 +1412,17 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
           ) : null}
           {showPermissionPrimer ? (
             <MobileCallNotice tone="info">
-              首次使用请先允许麦克风权限。若自动播报被拦截，可直接补播这一句。
+              {t(msg`首次使用请先允许麦克风权限。若自动播报被拦截，可直接补播这一句。`)}
             </MobileCallNotice>
           ) : null}
           {showPermissionRequestHint ? (
             <MobileCallNotice tone="info">
-              正在请求麦克风权限，请在弹窗里点允许。
+              {t(msg`正在请求麦克风权限，请在弹窗里点允许。`)}
             </MobileCallNotice>
           ) : null}
           {showVideoFirstTurnPrimer ? (
             <MobileCallNotice tone="info">
-              数字人已接通。先按住底部按钮说第一句，松开后会自动回复。
+              {t(msg`数字人已接通。先按住底部按钮说第一句，松开后会自动回复。`)}
             </MobileCallNotice>
           ) : null}
           {isVideoMode &&
@@ -1448,7 +1463,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
           ) : null}
           {leavingScreen ? (
             <MobileCallNotice tone="info">
-              正在结束通话并返回聊天。
+              {t(msg`正在结束通话并返回聊天。`)}
             </MobileCallNotice>
           ) : null}
           {activeCall.turnMutation.error instanceof Error ? (
@@ -1509,7 +1524,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                 className="h-10 shrink-0 px-3.5 text-[12px]"
               >
                 <Volume2 size={15} />
-                补播这一句
+                {t(msg`补播这一句`)}
               </MobileCallActionButton>
             </MobileCallNotice>
           ) : null}
@@ -1524,7 +1539,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                   }
                 >
                   <RotateCcw size={16} />
-                  重试连接数字人
+                  {t(msg`重试连接数字人`)}
                 </MobileCallActionButton>
               ) : null}
               {(hasVideoSessionFailure || hasVideoRenderFailure) ? (
@@ -1535,7 +1550,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                   disabled={leavingScreen}
                 >
                   <PhoneOff size={16} />
-                  改用语音通话
+                  {t(msg`改用语音通话`)}
                 </MobileCallActionButton>
               ) : null}
             </div>
@@ -1548,7 +1563,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                   disabled={leavingScreen}
                 >
                   <RotateCcw size={16} />
-                  重新录这一轮
+                  {t(msg`重新录这一轮`)}
                 </MobileCallActionButton>
               ) : null}
             </div>
@@ -1569,10 +1584,10 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
 
         <div className="mt-3.5 grid gap-2.5">
           <CallBubble
-            label="我"
+            label={t(msg`我`)}
             text={
               activeCall.turnMutation.isPending
-                ? speech.displayText || "本轮语音已发出，正在整理..."
+                ? speech.displayText || t(msg`本轮语音已发出，正在整理...`)
                 : lastUserTranscript || userBubblePlaceholder
             }
             align="right"
@@ -1595,14 +1610,14 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                 >
                   {cameraEnabled ? <CameraOff size={16} /> : <Camera size={16} />}
                   {!cameraEnabled
-                    ? "打开摄像头"
+                    ? t(msg`打开摄像头`)
                     : cameraPreview.status === "requesting-permission"
-                      ? "等待摄像头授权"
+                      ? t(msg`等待摄像头授权`)
                       : cameraPreview.status === "ready"
-                        ? "关闭摄像头"
+                        ? t(msg`关闭摄像头`)
                         : cameraPreview.supported
-                          ? "重试摄像头"
-                          : "摄像头不可用"}
+                          ? t(msg`重试摄像头`)
+                          : t(msg`摄像头不可用`)}
                 </MobileCallActionButton>
               ) : null}
               {showReplayShortcut ? (
@@ -1614,7 +1629,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                   className="h-12 min-w-[120px] px-4"
                 >
                   <RotateCcw size={16} />
-                  重播上一句
+                  {t(msg`重播上一句`)}
                 </MobileCallActionButton>
               ) : null}
               {showBackShortcut ? (
@@ -1624,7 +1639,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                   className="h-12 min-w-[120px] px-4"
                 >
                   <MessageCircleMore size={16} />
-                  {leavingScreen ? "返回中..." : "切回聊天"}
+                  {leavingScreen ? t(msg`返回中...`) : t(msg`切回聊天`)}
                 </MobileCallActionButton>
               ) : null}
             </div>
@@ -1670,23 +1685,23 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                 )}
                 <span className="text-[17px] font-medium">
                   {digitalHumanCall.sessionState === "connecting"
-                    ? "连接中"
+                    ? t(msg`连接中`)
                     : isVideoMode && digitalHumanCall.sessionError
-                      ? "暂不可用"
+                      ? t(msg`暂不可用`)
                     : activeCall.turnMutation.isPending
-                    ? "AI 回复中"
+                    ? t(msg`AI 回复中`)
                     : speech.status === "listening" || recordButtonHolding
-                      ? "松开发送"
+                      ? t(msg`松开发送`)
                       : activeCall.playbackState === "playing"
-                        ? "播放中"
+                        ? t(msg`播放中`)
                         : isVideoMode && playbackSettling
-                          ? "准备下一轮"
-                        : "按住说话"}
+                          ? t(msg`准备下一轮`)
+                        : t(msg`按住说话`)}
                 </span>
                 <span className="text-xs text-white/72">
                   {isVideoMode
-                    ? "当前为半双工数字人视频通话"
-                    : "当前为半双工语音通话"}
+                    ? t(msg`当前为半双工数字人视频通话`)
+                    : t(msg`当前为半双工语音通话`)}
                 </span>
               </span>
             </button>
@@ -1700,7 +1715,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
               className="h-12 min-w-[132px]"
             >
               <PhoneOff size={16} />
-              {leavingScreen ? "挂断中..." : "挂断"}
+              {leavingScreen ? t(msg`挂断中...`) : t(msg`挂断`)}
             </MobileCallActionButton>
           </div>
         </div>

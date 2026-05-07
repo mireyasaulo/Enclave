@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import {
   ArrowLeft,
   Clapperboard,
@@ -15,6 +16,7 @@ import {
   unfollowChannelAuthor,
   type FeedPostListItem,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppPage,
   Button,
@@ -22,6 +24,8 @@ import {
   LoadingBlock,
   cn,
 } from "@yinjie/ui";
+
+type Translator = ReturnType<typeof useRuntimeTranslator>;
 import { AvatarChip } from "../components/avatar-chip";
 import { EmptyState } from "../components/empty-state";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -40,6 +44,7 @@ const CHANNEL_AUTHOR_COLLECTION_STORAGE_KEY =
   "yinjie:channels:author-collections";
 
 export function ChannelAuthorPage() {
+  const t = useRuntimeTranslator();
   const { authorId } = useParams({ from: "/channels/authors/$authorId" });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -92,7 +97,9 @@ export function ChannelAuthorPage() {
         : followChannelAuthor(authorId, baseUrl),
     onSuccess: async () => {
       setNotice({
-        message: profileQuery.data?.isFollowing ? "已取消关注。" : "已关注该视频号作者。",
+        message: profileQuery.data?.isFollowing
+          ? t(msg`已取消关注。`)
+          : t(msg`已关注该视频号作者。`),
         tone: "success",
       });
       await Promise.all([
@@ -213,16 +220,16 @@ export function ChannelAuthorPage() {
   const profile = profileQuery.data;
   const fallbackBio =
     profile?.authorType === "character"
-      ? "这位居民暂时还没有填写视频号简介。"
-      : "这个视频号作者暂时还没有填写简介。";
+      ? t(msg`这位居民暂时还没有填写视频号简介。`)
+      : t(msg`这个视频号作者暂时还没有填写简介。`);
   const collectionTabs = useMemo(
     () =>
       (
         [
-          { key: "all", label: "全部" },
-          { key: "videos", label: "视频" },
-          { key: "updates", label: "动态" },
-          { key: "live", label: "直播回放" },
+          { key: "all", label: t(msg`全部`) },
+          { key: "videos", label: t(msg`视频`) },
+          { key: "updates", label: t(msg`动态`) },
+          { key: "live", label: t(msg`直播回放`) },
         ] satisfies Array<{
           key: ChannelAuthorCollectionTab;
           label: string;
@@ -233,7 +240,7 @@ export function ChannelAuthorPage() {
           matchesChannelAuthorCollection(post, tab.key),
         ).length,
       })),
-    [profile?.recentPosts],
+    [profile?.recentPosts, t],
   );
   const visiblePosts = useMemo(
     () =>
@@ -243,7 +250,8 @@ export function ChannelAuthorPage() {
     [activeCollection, profile?.recentPosts],
   );
   const activeCollectionLabel =
-    collectionTabs.find((tab) => tab.key === activeCollection)?.label ?? "全部";
+    collectionTabs.find((tab) => tab.key === activeCollection)?.label ??
+    t(msg`全部`);
   const featuredLivePost = useMemo(
     () =>
       (profile?.recentPosts ?? []).find((post) => post.sourceKind === "live_clip") ??
@@ -254,9 +262,9 @@ export function ChannelAuthorPage() {
   if (isDesktopLayout) {
     return (
       <RouteRedirectState
-        title="正在切换到桌面视频号"
-        description="正在把作者页收回桌面视频号工作区，并恢复当前内容上下文。"
-        loadingLabel="切换桌面视频号..."
+        title={t(msg`正在切换到桌面视频号`)}
+        description={t(msg`正在把作者页收回桌面视频号工作区，并恢复当前内容上下文。`)}
+        loadingLabel={t(msg`切换桌面视频号...`)}
       />
     );
   }
@@ -269,8 +277,8 @@ export function ChannelAuthorPage() {
       )}
     >
       <TabPageTopBar
-        title={profile?.authorName ?? "视频号作者"}
-        subtitle="作者主页"
+        title={profile?.authorName ?? t(msg`视频号作者`)}
+        subtitle={t(msg`作者主页`)}
         titleAlign="center"
         className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
         leftActions={
@@ -296,14 +304,14 @@ export function ChannelAuthorPage() {
         ) : null}
         {profileQuery.isLoading ? (
           <div className="rounded-[22px] border border-[color:var(--border-faint)] bg-white px-5 py-8 shadow-[var(--shadow-section)]">
-            <LoadingBlock label="正在读取作者主页..." />
+            <LoadingBlock label={t(msg`正在读取作者主页...`)} />
           </div>
         ) : null}
         {profileQuery.isError && profileQuery.error instanceof Error ? (
           <div className="rounded-[22px] border border-[color:var(--border-faint)] bg-white px-5 py-8 shadow-[var(--shadow-section)]">
             <MobileChannelAuthorStatusCard
-              badge="读取失败"
-              title="作者主页暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`作者主页暂时不可用`)}
               description={profileQuery.error.message}
               tone="danger"
               action={
@@ -314,7 +322,7 @@ export function ChannelAuthorPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleRetryLoad}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     variant="secondary"
@@ -322,7 +330,7 @@ export function ChannelAuthorPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? "返回上一页" : "返回视频号"}
+                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`返回视频号`)}
                   </Button>
                 </div>
               }
@@ -332,8 +340,8 @@ export function ChannelAuthorPage() {
         {followMutation.isError && followMutation.error instanceof Error ? (
           <div className="mb-4 rounded-[22px] border border-[color:var(--border-faint)] bg-white px-5 py-5 shadow-[var(--shadow-section)]">
             <MobileChannelAuthorStatusCard
-              badge="关注失败"
-              title="作者状态暂未更新"
+              badge={t(msg`关注失败`)}
+              title={t(msg`作者状态暂未更新`)}
               description={followMutation.error.message}
               tone="danger"
               action={
@@ -345,7 +353,9 @@ export function ChannelAuthorPage() {
                       className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                       onClick={handleRetryFollow}
                     >
-                      {profileQuery.data.isFollowing ? "重试取消关注" : "重试关注"}
+                      {profileQuery.data.isFollowing
+                        ? t(msg`重试取消关注`)
+                        : t(msg`重试关注`)}
                     </Button>
                   ) : null}
                   <Button
@@ -354,7 +364,7 @@ export function ChannelAuthorPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? "返回上一页" : "返回视频号"}
+                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`返回视频号`)}
                   </Button>
                 </div>
               }
@@ -382,7 +392,9 @@ export function ChannelAuthorPage() {
                       {profile.authorName}
                     </div>
                     <span className="rounded-full bg-[rgba(15,23,42,0.06)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
-                      {profile.authorType === "character" ? "居民作者" : "世界主人"}
+                      {profile.authorType === "character"
+                        ? t(msg`居民作者`)
+                        : t(msg`世界主人`)}
                     </span>
                   </div>
                   <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
@@ -391,17 +403,17 @@ export function ChannelAuthorPage() {
                   <div className="mt-4 flex flex-wrap gap-2">
                     <ChannelAuthorHeaderStat
                       icon={<Users size={14} />}
-                      label="关注者"
+                      label={t(msg`关注者`)}
                       value={String(profile.followerCount)}
                     />
                     <ChannelAuthorHeaderStat
                       icon={<Clapperboard size={14} />}
-                      label="最近内容"
+                      label={t(msg`最近内容`)}
                       value={String(profile.recentPosts.length)}
                     />
                     <ChannelAuthorHeaderStat
                       icon={<RadioTower size={14} />}
-                      label="直播回放"
+                      label={t(msg`直播回放`)}
                       value={String(
                         (profile.recentPosts ?? []).filter(
                           (post) => post.sourceKind === "live_clip",
@@ -426,10 +438,10 @@ export function ChannelAuthorPage() {
                   )}
                 >
                   {followMutation.isPending
-                    ? "处理中..."
+                    ? t(msg`处理中...`)
                     : profile.isFollowing
-                      ? "已关注"
-                      : "+关注"}
+                      ? t(msg`已关注`)
+                      : t(msg`+关注`)}
                 </Button>
                 <Button
                   variant="secondary"
@@ -437,7 +449,7 @@ export function ChannelAuthorPage() {
                   onClick={navigateBackToChannels}
                   className="h-11 rounded-full border-[color:var(--border-faint)] bg-white px-5 text-[color:var(--text-primary)] shadow-none"
                 >
-                  返回视频号
+                  {t(msg`返回视频号`)}
                 </Button>
               </div>
             </section>
@@ -451,20 +463,23 @@ export function ChannelAuthorPage() {
                 <div className="min-w-0 flex-1">
                   <div className="inline-flex items-center gap-2 rounded-full bg-[rgba(127,29,29,0.08)] px-3 py-1 text-[11px] font-medium text-[#7f1d1d]">
                     <RadioTower size={13} />
-                    最近直播回放
+                    {t(msg`最近直播回放`)}
                   </div>
                   <div className="mt-3 line-clamp-1 text-[16px] font-semibold text-[color:var(--text-primary)]">
-                    {featuredLivePost.title?.trim() || "查看作者最近一次直播回放"}
+                    {featuredLivePost.title?.trim() ||
+                      t(msg`查看作者最近一次直播回放`)}
                   </div>
                   <div className="mt-1 text-[12px] text-[color:var(--text-muted)]">
-                    {formatTimestamp(featuredLivePost.createdAt)} · {featuredLivePost.viewCount} 播放
+                    {t(
+                      msg`${formatTimestamp(featuredLivePost.createdAt)} · ${featuredLivePost.viewCount} 播放`,
+                    )}
                   </div>
                   <div className="mt-2 line-clamp-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
                     {featuredLivePost.text}
                   </div>
                 </div>
                 <span className="shrink-0 rounded-full border border-[rgba(127,29,29,0.12)] bg-white px-3 py-1 text-[11px] font-medium text-[#7f1d1d]">
-                  查看回放
+                  {t(msg`查看回放`)}
                 </span>
               </button>
             ) : null}
@@ -497,13 +512,15 @@ export function ChannelAuthorPage() {
               </div>
 
               <div className="bg-[color:var(--surface-console)] px-4 py-3 text-[12px] text-[color:var(--text-secondary)]">
-                当前分栏：{activeCollectionLabel}，共 {visiblePosts.length} 条内容。
+                {t(
+                  msg`当前分栏：${activeCollectionLabel}，共 ${visiblePosts.length} 条内容。`,
+                )}
               </div>
 
               {visiblePosts.length ? (
                 <div className="divide-y divide-[color:var(--border-faint)] bg-white">
                   {visiblePosts.map((post) => {
-                    const postStatus = resolveChannelPostCardStatus(post);
+                    const postStatus = resolveChannelPostCardStatus(t, post);
 
                     return (
                       <button
@@ -559,11 +576,11 @@ export function ChannelAuthorPage() {
                           <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] text-[color:var(--text-muted)]">
                             <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--surface-console)] px-2.5 py-1">
                               <PlaySquare size={12} />
-                              {post.viewCount} 播放
+                              {t(msg`${post.viewCount} 播放`)}
                             </span>
                             <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--surface-console)] px-2.5 py-1">
                               <MessageCircleMore size={12} />
-                              {post.commentCount} 评论
+                              {t(msg`${post.commentCount} 评论`)}
                             </span>
                           </div>
                         </div>
@@ -575,8 +592,8 @@ export function ChannelAuthorPage() {
               ) : (
                 <div className="bg-white p-6">
                   <EmptyState
-                    title={`${activeCollectionLabel}分栏暂时没有内容`}
-                    description="切换其他分栏看看，或者等作者发布新的内容后再回来。"
+                    title={t(msg`${activeCollectionLabel}分栏暂时没有内容`)}
+                    description={t(msg`切换其他分栏看看，或者等作者发布新的内容后再回来。`)}
                   />
                 </div>
               )}
@@ -613,7 +630,8 @@ function ChannelAuthorHeaderStat({
 }
 
 function ChannelPostCover({ post }: { post: FeedPostListItem }) {
-  const coverPresentation = resolveChannelPostCoverPresentation(post);
+  const t = useRuntimeTranslator();
+  const coverPresentation = resolveChannelPostCoverPresentation(t, post);
 
   if (post.coverUrl?.trim()) {
     return (
@@ -699,18 +717,20 @@ function matchesChannelAuthorCollection(
   return post.mediaType !== "video";
 }
 
-function resolveChannelPostCoverPresentation(post: FeedPostListItem) {
+function resolveChannelPostCoverPresentation(t: Translator, post: FeedPostListItem) {
   if (post.sourceKind === "live_clip") {
     return {
       badgeClassName: "bg-[rgba(255,255,255,0.14)] text-white",
       icon: <RadioTower size={14} />,
-      label: "直播回放",
+      label: t(msg`直播回放`),
       overlayClassName:
         "bg-[linear-gradient(180deg,rgba(120,24,24,0.82),rgba(120,24,24,0))]",
       panelClassName:
         "bg-[linear-gradient(180deg,#7f1d1d,#451a03)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
-      secondaryLabel: `${formatTimestamp(post.createdAt)} · ${post.viewCount} 播放`,
-      title: "直播精选",
+      secondaryLabel: t(
+        msg`${formatTimestamp(post.createdAt)} · ${post.viewCount} 播放`,
+      ),
+      title: t(msg`直播精选`),
     };
   }
 
@@ -718,70 +738,72 @@ function resolveChannelPostCoverPresentation(post: FeedPostListItem) {
     return {
       badgeClassName: "bg-[rgba(255,255,255,0.14)] text-white",
       icon: <PlaySquare size={14} />,
-      label: "视频",
+      label: t(msg`视频`),
       overlayClassName:
         "bg-[linear-gradient(180deg,rgba(15,23,42,0.76),rgba(15,23,42,0))]",
       panelClassName:
         "bg-[linear-gradient(180deg,#1f2937,#0f172a)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
       secondaryLabel: post.durationMs
-        ? `${Math.max(1, Math.round(post.durationMs / 1000))} 秒 · ${post.viewCount} 播放`
-        : `${post.viewCount} 播放`,
-      title: "视频号短片",
+        ? t(
+            msg`${Math.max(1, Math.round(post.durationMs / 1000))} 秒 · ${post.viewCount} 播放`,
+          )
+        : t(msg`${post.viewCount} 播放`),
+      title: t(msg`视频号短片`),
     };
   }
 
   return {
     badgeClassName: "bg-[rgba(7,193,96,0.18)] text-white",
     icon: <MessageCircleMore size={14} />,
-    label: "动态",
+    label: t(msg`动态`),
     overlayClassName:
       "bg-[linear-gradient(180deg,rgba(22,101,52,0.72),rgba(22,101,52,0))]",
     panelClassName:
       "bg-[linear-gradient(180deg,#166534,#14532d)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
-    secondaryLabel: `${formatTimestamp(post.createdAt)} · 内容更新`,
-    title: "内容卡片",
+    secondaryLabel: t(msg`${formatTimestamp(post.createdAt)} · 内容更新`),
+    title: t(msg`内容卡片`),
   };
 }
 
-function resolveChannelPostCardStatus(post: FeedPostListItem) {
+function resolveChannelPostCardStatus(t: Translator, post: FeedPostListItem) {
   if (post.sourceKind === "live_clip") {
     return {
-      label: "直播回放",
-      metaLabel: "直播精选",
+      label: t(msg`直播回放`),
+      metaLabel: t(msg`直播精选`),
       primaryBadgeClassName:
         "border-[rgba(185,28,28,0.12)] bg-[rgba(185,28,28,0.08)] text-[#991b1b]",
       secondaryBadgeClassName:
         "border-[rgba(127,29,29,0.1)] bg-[rgba(127,29,29,0.05)] text-[#7f1d1d]",
       secondaryLabel: post.durationMs
-        ? `${Math.max(1, Math.round(post.durationMs / 60000))} 分钟回放`
-        : "作者直播内容",
+        ? t(msg`${Math.max(1, Math.round(post.durationMs / 60000))} 分钟回放`)
+        : t(msg`作者直播内容`),
     };
   }
 
   if (post.mediaType === "video") {
     return {
-      label: "视频",
-      metaLabel: "短片更新",
+      label: t(msg`视频`),
+      metaLabel: t(msg`短片更新`),
       primaryBadgeClassName:
         "border-[rgba(15,23,42,0.08)] bg-[rgba(15,23,42,0.05)] text-[#0f172a]",
       secondaryBadgeClassName:
         "border-[rgba(15,23,42,0.08)] bg-[color:var(--surface-console)] text-[color:var(--text-secondary)]",
       secondaryLabel: post.durationMs
-        ? `${Math.max(1, Math.round(post.durationMs / 1000))} 秒短片`
-        : "视频号短片",
+        ? t(msg`${Math.max(1, Math.round(post.durationMs / 1000))} 秒短片`)
+        : t(msg`视频号短片`),
     };
   }
 
   return {
-    label: "动态",
-    metaLabel: "内容卡片",
+    label: t(msg`动态`),
+    metaLabel: t(msg`内容卡片`),
     primaryBadgeClassName:
       "border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.08)] text-[color:var(--brand-primary)]",
     secondaryBadgeClassName:
       "border-[color:var(--border-faint)] bg-[color:var(--surface-console)] text-[color:var(--text-secondary)]",
     secondaryLabel: post.topicTags?.length
       ? `#${post.topicTags[0]}`
-      : "内容更新",
+      : t(msg`内容更新`),
   };
 }
 

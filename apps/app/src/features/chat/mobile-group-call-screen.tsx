@@ -9,7 +9,9 @@ import {
 } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { getGroup, getGroupMembers, sendGroupMessage } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import {
   ArrowLeft,
@@ -48,6 +50,7 @@ type MobileGroupCallScreenProps = {
 };
 
 export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
+  const t = useRuntimeTranslator();
   const { groupId } = useParams({
     strict: false,
   }) as {
@@ -66,7 +69,8 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
     [hash],
   );
   const effectiveSource = routeState?.source ?? "mobile";
-  const sourceLabel = effectiveSource === "desktop" ? "桌面端" : "手机端";
+  const sourceLabel =
+    effectiveSource === "desktop" ? t(msg`桌面端`) : t(msg`手机端`);
   const desktopThreadPath = useMemo(
     () =>
       buildDesktopChatThreadPath({
@@ -171,8 +175,9 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
   const activeCount = activeMembers.length;
   const totalCount = members.length;
   const waitingCount = Math.max(totalCount - activeCount, 0);
-  const groupName = groupQuery.data?.name ?? "群聊";
-  const callTitle = mode === "voice" ? "群语音通话" : "群视频通话";
+  const groupName = groupQuery.data?.name ?? t(msg`群聊`);
+  const callTitle =
+    mode === "voice" ? t(msg`群语音通话`) : t(msg`群视频通话`);
   const statusTitle = formatGroupCallStatusLabel(mode, "ongoing");
   const hasSyncedStatus =
     lastPublishedCounts?.activeCount === activeCount &&
@@ -418,7 +423,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
 
   const renderBackToGroupAction = () => (
     <InlineNoticeActionButton
-      label="返回群聊"
+      label={t(msg`返回群聊`)}
       className="border-current/28 bg-white/12 active:bg-white/16"
       onClick={handleBack}
     />
@@ -511,12 +516,12 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
         )}
       >
         {isDesktopLayout ? (
-          <LoadingBlock label={`正在连接${callTitle}...`} />
+          <LoadingBlock label={t(msg`正在连接${callTitle}...`)} />
         ) : (
           <MobileCallStatusCard
-            badge="连接中"
-            title={`正在连接${callTitle}`}
-            description="稍等一下，正在同步群资料和成员状态。"
+            badge={t(msg`连接中`)}
+            title={t(msg`正在连接${callTitle}`)}
+            description={t(msg`稍等一下，正在同步群资料和成员状态。`)}
             tone="loading"
           />
         )}
@@ -536,8 +541,8 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
           <ErrorBlock message={groupQuery.error.message} />
         ) : (
           <MobileCallStatusCard
-            badge="群聊"
-            title="群通话暂时不可用"
+            badge={t(msg`群聊`)}
+            title={t(msg`群通话暂时不可用`)}
             description={groupQuery.error.message}
             tone="danger"
             action={
@@ -546,13 +551,13 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                   onClick={handleRetryLoad}
                   className="min-w-[132px]"
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </MobileCallActionButton>
                 <MobileCallActionButton
                   onClick={handleBack}
                   className="min-w-[132px]"
                 >
-                  返回群聊
+                  {t(msg`返回群聊`)}
                 </MobileCallActionButton>
               </div>
             }
@@ -574,8 +579,8 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
           <ErrorBlock message={membersQuery.error.message} />
         ) : (
           <MobileCallStatusCard
-            badge="成员"
-            title="成员信息暂时不可用"
+            badge={t(msg`成员`)}
+            title={t(msg`成员信息暂时不可用`)}
             description={membersQuery.error.message}
             tone="danger"
             action={
@@ -584,13 +589,13 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                   onClick={handleRetryLoad}
                   className="min-w-[132px]"
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </MobileCallActionButton>
                 <MobileCallActionButton
                   onClick={handleBack}
                   className="min-w-[132px]"
                 >
-                  返回群聊
+                  {t(msg`返回群聊`)}
                 </MobileCallActionButton>
               </div>
             }
@@ -610,7 +615,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
       >
         {isDesktopLayout ? (
           <>
-            <ErrorBlock message="当前群聊不存在，暂时无法发起群通话。" />
+            <ErrorBlock message={t(msg`当前群聊不存在，暂时无法发起群通话。`)} />
             <Button
               variant="secondary"
               onClick={handleBack}
@@ -620,14 +625,14 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                   : "rounded-full",
               )}
             >
-              返回群聊
+              {t(msg`返回群聊`)}
             </Button>
           </>
         ) : (
           <MobileCallStatusCard
-            badge="群聊"
-            title="当前不能发起群通话"
-            description="这个群聊暂时不可用，可以先重试读取，或返回群聊后再试。"
+            badge={t(msg`群聊`)}
+            title={t(msg`当前不能发起群通话`)}
+            description={t(msg`这个群聊暂时不可用，可以先重试读取，或返回群聊后再试。`)}
             tone="danger"
             action={
               <div className="flex flex-wrap justify-center gap-2">
@@ -635,13 +640,13 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                   onClick={handleRetryLoad}
                   className="min-w-[132px]"
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </MobileCallActionButton>
                 <MobileCallActionButton
                   onClick={handleBack}
                   className="min-w-[132px]"
                 >
-                  返回群聊
+                  {t(msg`返回群聊`)}
                 </MobileCallActionButton>
               </div>
             }
@@ -661,7 +666,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                 type="button"
                 onClick={handleBack}
                 className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-black/6 bg-white text-[color:var(--text-primary)] transition hover:bg-[#efefef]"
-                aria-label="返回群聊"
+                aria-label={t(msg`返回群聊`)}
               >
                 <ArrowLeft size={18} />
               </button>
@@ -673,7 +678,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                   {groupName}
                 </div>
                 <div className="mt-1 text-[12px] text-[color:var(--text-muted)]">
-                  桌面端通话入口已收口到聊天工作区顶部工具栏。
+                  {t(msg`桌面端通话入口已收口到聊天工作区顶部工具栏。`)}
                 </div>
               </div>
             </div>
@@ -684,14 +689,14 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
               onClick={handleBack}
               className="rounded-[10px] border-black/8 bg-white shadow-none hover:bg-[#efefef]"
             >
-              返回群聊
+              {t(msg`返回群聊`)}
             </Button>
           </header>
 
           <div className="flex min-h-0 flex-1 items-center justify-center p-6">
             <div className="w-full max-w-[760px] rounded-[18px] border border-black/6 bg-white p-8 shadow-[0_18px_48px_rgba(15,23,42,0.08)]">
               <div className="rounded-full bg-[rgba(15,23,42,0.05)] px-3 py-1 text-[11px] tracking-[0.12em] text-[color:var(--text-dim)] inline-flex">
-                桌面通话工作区
+                {t(msg`桌面通话工作区`)}
               </div>
               <div className="mt-5 flex items-start gap-4">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[14px] bg-[rgba(7,193,96,0.10)] text-[#1f8f4f]">
@@ -699,10 +704,12 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-[20px] font-medium text-[color:var(--text-primary)]">
-                    桌面端请从聊天页继续发起{mode === "video" ? "群视频" : "群语音"}
+                    {mode === "video"
+                      ? t(msg`桌面端请从聊天页继续发起群视频`)
+                      : t(msg`桌面端请从聊天页继续发起群语音`)}
                   </div>
                   <div className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
-                    当前独立路由主要保留给手机端通话流程。桌面端已经改为在群聊消息页内打开通话工作台，这样成员调度、聊天记录和侧栏信息会保持在同一窗口里。
+                    {t(msg`当前独立路由主要保留给手机端通话流程。桌面端已经改为在群聊消息页内打开通话工作台，这样成员调度、聊天记录和侧栏信息会保持在同一窗口里。`)}
                   </div>
                 </div>
               </div>
@@ -710,7 +717,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-[12px] border border-black/6 bg-[#fafafa] px-4 py-4">
                   <div className="text-[11px] tracking-[0.12em] text-[color:var(--text-dim)]">
-                    当前群聊
+                    {t(msg`当前群聊`)}
                   </div>
                   <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
                     {groupName}
@@ -718,25 +725,27 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                 </div>
                 <div className="rounded-[12px] border border-black/6 bg-[#fafafa] px-4 py-4">
                   <div className="text-[11px] tracking-[0.12em] text-[color:var(--text-dim)]">
-                    通话类型
+                    {t(msg`通话类型`)}
                   </div>
                   <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
-                    {mode === "video" ? "群视频通话" : "群语音通话"}
+                    {mode === "video"
+                      ? t(msg`群视频通话`)
+                      : t(msg`群语音通话`)}
                   </div>
                 </div>
                 <div className="rounded-[12px] border border-black/6 bg-[#fafafa] px-4 py-4">
                   <div className="text-[11px] tracking-[0.12em] text-[color:var(--text-dim)]">
-                    成员规模
+                    {t(msg`成员规模`)}
                   </div>
                   <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
-                    {totalCount} 位成员
+                    {t(msg`${totalCount} 位成员`)}
                   </div>
                 </div>
               </div>
 
               <div className="mt-6">
                 <InlineNotice tone="info">
-                  回到群聊页后，继续使用顶部通话按钮即可进入桌面群通话控制台。
+                  {t(msg`回到群聊页后，继续使用顶部通话按钮即可进入桌面群通话控制台。`)}
                 </InlineNotice>
               </div>
 
@@ -748,7 +757,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                   className="rounded-[10px] bg-[#07c160] text-white hover:bg-[#06ad56]"
                 >
                   <Users size={16} />
-                  返回群聊继续
+                  {t(msg`返回群聊继续`)}
                 </Button>
                 <Button
                   type="button"
@@ -763,7 +772,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                   }}
                   className="rounded-[10px] border-black/8 bg-white shadow-none hover:bg-[#efefef]"
                 >
-                  查看群聊信息
+                  {t(msg`查看群聊信息`)}
                 </Button>
               </div>
             </div>
@@ -782,7 +791,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
             onClick={handleBack}
             disabled={leavingScreen}
             className={mobileCallIconButtonClass()}
-            aria-label="返回群聊"
+            aria-label={t(msg`返回群聊`)}
           >
             <ArrowLeft size={18} />
           </button>
@@ -793,7 +802,9 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
             </div>
           </div>
           <MobileCallMetaChip tone="success">
-            {effectiveSource === "desktop" ? "沿用桌面来源" : "手机端发起"}
+            {effectiveSource === "desktop"
+              ? t(msg`沿用桌面来源`)
+              : t(msg`手机端发起`)}
           </MobileCallMetaChip>
         </div>
       </header>
@@ -816,19 +827,19 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
 
           <div className="mt-3.5 grid grid-cols-3 gap-2.5">
             <CallMetricCard
-              label="当前在线"
-              value={`${activeCount} 人`}
-              detail="已加入本轮群通话"
+              label={t(msg`当前在线`)}
+              value={t(msg`${activeCount} 人`)}
+              detail={t(msg`已加入本轮群通话`)}
             />
             <CallMetricCard
-              label="等待加入"
-              value={`${waitingCount} 人`}
-              detail="可继续同步群状态"
+              label={t(msg`等待加入`)}
+              value={t(msg`${waitingCount} 人`)}
+              detail={t(msg`可继续同步群状态`)}
             />
             <CallMetricCard
-              label="发起时间"
+              label={t(msg`发起时间`)}
               value={formatDetailedMessageTimestamp(startedAt)}
-              detail="当前为移动群通话工作台"
+              detail={t(msg`当前为移动群通话工作台`)}
             />
           </div>
 
@@ -836,7 +847,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
             <CallControlButton
               active={!muted}
               disabled={leavingScreen}
-              label={muted ? "解除静音" : "静音麦克风"}
+              label={muted ? t(msg`解除静音`) : t(msg`静音麦克风`)}
               icon={muted ? <Mic size={16} /> : <MicOff size={16} />}
               onClick={() => {
                 setCallTipsDismissed(true);
@@ -846,7 +857,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
             <CallControlButton
               active={speakerEnabled}
               disabled={leavingScreen}
-              label={speakerEnabled ? "扬声器已开" : "开启扬声器"}
+              label={speakerEnabled ? t(msg`扬声器已开`) : t(msg`开启扬声器`)}
               icon={<Volume2 size={16} />}
               onClick={() => {
                 setCallTipsDismissed(true);
@@ -857,7 +868,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
               <CallControlButton
                 active={cameraEnabled}
                 disabled={leavingScreen}
-                label={cameraEnabled ? "关闭摄像头" : "打开摄像头"}
+                label={cameraEnabled ? t(msg`关闭摄像头`) : t(msg`打开摄像头`)}
                 icon={
                   cameraEnabled ? <VideoOff size={16} /> : <Camera size={16} />
                 }
@@ -873,12 +884,12 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
         <div className="mt-3.5 space-y-2.5">
           {showWorkspacePrimer ? (
             <MobileCallNotice tone="info">
-              首次进入可先点下方成员席位切换“已加入/待加入”，再点“同步最新状态”把在线人数回写到群聊卡片。
+              {t(msg`首次进入可先点下方成员席位切换"已加入/待加入"，再点"同步最新状态"把在线人数回写到群聊卡片。`)}
             </MobileCallNotice>
           ) : null}
           {showResumeHint ? (
             <MobileCallNotice tone="info">
-              当前沿用了上一端的群通话快照，可继续调整在线成员后再同步到群聊。
+              {t(msg`当前沿用了上一端的群通话快照，可继续调整在线成员后再同步到群聊。`)}
             </MobileCallNotice>
           ) : null}
           {workspaceSummaryLines.length ? (
@@ -892,14 +903,14 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
           ) : null}
           {mode === "video" ? (
             <MobileCallNotice tone="info">
-              当前群视频页先承载移动工作台状态，本地摄像头开关只影响当前页面提示，不会上传真实画面。
+              {t(msg`当前群视频页先承载移动工作台状态，本地摄像头开关只影响当前页面提示，不会上传真实画面。`)}
             </MobileCallNotice>
           ) : null}
           {!hasSyncedStatus && !syncStatusMutation.isError ? (
             <MobileCallNotice tone="warning">
               {syncStatusMutation.isPending
-                ? "正在把最新在线人数同步到群聊。"
-                : "成员状态刚有变化，系统会自动刷新群通话卡片。"}
+                ? t(msg`正在把最新在线人数同步到群聊。`)
+                : t(msg`成员状态刚有变化，系统会自动刷新群通话卡片。`)}
             </MobileCallNotice>
           ) : null}
           {syncStatusMutation.error instanceof Error ? (
@@ -913,7 +924,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
           ) : null}
           {syncStatusMutation.error instanceof Error ? (
             <MobileCallNotice tone="info">
-              这次群状态没有回写成功。你可以继续调整成员席位，确认后再手动重试同步。
+              {t(msg`这次群状态没有回写成功。你可以继续调整成员席位，确认后再手动重试同步。`)}
             </MobileCallNotice>
           ) : null}
           {syncStatusMutation.error instanceof Error ? (
@@ -923,14 +934,14 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                 disabled={leavingScreen}
               >
                 <Users size={16} />
-                重试同步状态
+                {t(msg`重试同步状态`)}
               </MobileCallActionButton>
               <MobileCallActionButton
                 onClick={handleContinueAfterSyncError}
                 disabled={leavingScreen}
               >
                 <Mic size={16} />
-                继续调整成员
+                {t(msg`继续调整成员`)}
               </MobileCallActionButton>
             </div>
           ) : null}
@@ -945,7 +956,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
           ) : null}
           {endStatusMutation.error instanceof Error ? (
             <MobileCallNotice tone="info">
-              结束群通话失败了，但当前工作台还在。你可以重试结束，或者先继续保留这一轮状态。
+              {t(msg`结束群通话失败了，但当前工作台还在。你可以重试结束，或者先继续保留这一轮状态。`)}
             </MobileCallNotice>
           ) : null}
           {endStatusMutation.error instanceof Error ? (
@@ -955,20 +966,20 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                 disabled={leavingScreen}
               >
                 <PhoneOff size={16} />
-                重试结束通话
+                {t(msg`重试结束通话`)}
               </MobileCallActionButton>
               <MobileCallActionButton
                 onClick={handleContinueAfterEndError}
                 disabled={leavingScreen}
               >
                 <Users size={16} />
-                继续保留当前状态
+                {t(msg`继续保留当前状态`)}
               </MobileCallActionButton>
             </div>
           ) : null}
           {leavingScreen ? (
             <MobileCallNotice tone="info">
-              正在结束当前群通话并返回群聊，请稍候。
+              {t(msg`正在结束当前群通话并返回群聊，请稍候。`)}
             </MobileCallNotice>
           ) : null}
         </div>
@@ -976,13 +987,13 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
         <section className="mt-3.5 min-h-0 flex-1 rounded-[28px] border border-white/8 bg-[rgba(15,23,42,0.76)] px-4 py-4 shadow-[0_24px_60px_rgba(2,6,23,0.34)]">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <div className="text-sm font-medium text-white">成员席位</div>
+              <div className="text-sm font-medium text-white">{t(msg`成员席位`)}</div>
               <div className="mt-1 text-[12px] leading-5 text-white/58">
-                点击角色成员可切换为已加入或待加入，快速同步这一轮群通话状态。
+                {t(msg`点击角色成员可切换为已加入或待加入，快速同步这一轮群通话状态。`)}
               </div>
             </div>
             <MobileCallMetaChip>
-              {activeCount}/{totalCount} 已加入
+              {t(msg`${activeCount}/${totalCount} 已加入`)}
             </MobileCallMetaChip>
           </div>
 
@@ -991,10 +1002,10 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
               const joined = joinedMemberIds.includes(member.memberId);
               const roleLabel =
                 member.role === "owner"
-                  ? "群主"
+                  ? t(msg`群主`)
                   : member.role === "admin"
-                    ? "管理员"
-                    : "群成员";
+                    ? t(msg`管理员`)
+                    : t(msg`群成员`);
 
               return (
                 <button
@@ -1030,10 +1041,10 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                       </div>
                       <div className="mt-0.5 text-[11px] leading-[18px] text-white/52">
                         {member.memberType === "user"
-                          ? "世界主人始终保留在当前群通话工作台"
+                          ? t(msg`世界主人始终保留在当前群通话工作台`)
                           : joined
-                            ? "当前已加入本轮群通话"
-                            : "点击后可加入本轮群通话"}
+                            ? t(msg`当前已加入本轮群通话`)
+                            : t(msg`点击后可加入本轮群通话`)}
                       </div>
                     </div>
                     <MobileCallMetaChip
@@ -1043,7 +1054,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                         joined ? null : "text-white/58",
                       )}
                     >
-                      {joined ? "已加入" : "待加入"}
+                      {joined ? t(msg`已加入`) : t(msg`待加入`)}
                     </MobileCallMetaChip>
                   </div>
                 </button>
@@ -1053,7 +1064,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
 
           {members.length > visibleMembers.length ? (
             <div className="mt-3 text-center text-[12px] text-white/50">
-              其余 {members.length - visibleMembers.length} 位成员先收口到聊天详情页管理。
+              {t(msg`其余 ${members.length - visibleMembers.length} 位成员先收口到聊天详情页管理。`)}
             </div>
           ) : null}
         </section>
@@ -1070,10 +1081,10 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
           >
             <Users size={16} />
             {syncStatusMutation.isPending
-              ? "同步中..."
+              ? t(msg`同步中...`)
               : hasSyncedStatus
-                ? "已同步群状态"
-                : "同步最新状态"}
+                ? t(msg`已同步群状态`)
+                : t(msg`同步最新状态`)}
           </MobileCallActionButton>
           <MobileCallActionButton
             tone="danger"
@@ -1085,8 +1096,8 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
           >
             <PhoneOff size={16} />
             {leavingScreen || endStatusMutation.isPending
-              ? "结束中..."
-              : "结束通话"}
+              ? t(msg`结束中...`)
+              : t(msg`结束通话`)}
           </MobileCallActionButton>
         </div>
       </div>

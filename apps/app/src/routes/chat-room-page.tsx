@@ -1,7 +1,9 @@
 import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { getConversations } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage } from "@yinjie/ui";
 import {
   buildChatCallReturnSearch,
@@ -34,6 +36,7 @@ const DesktopChatWorkspace = lazy(async () => {
 });
 
 export function ChatRoomPage() {
+  const t = useRuntimeTranslator();
   const { conversationId } = useParams({ from: "/chat/$conversationId" });
   const navigate = useNavigate();
   const isDesktopLayout = useDesktopLayout();
@@ -209,8 +212,15 @@ export function ChatRoomPage() {
     routeCallReturnKind === null
       ? null
       : {
-          actionLabel: "发语音继续",
-          description: `本轮${routeCallReturnKind === "voice" ? "语音" : "视频"}通话已结束。你可以直接继续输入，也可以切回语音发送。`,
+          actionLabel: t(msg`发语音继续`),
+          description:
+            routeCallReturnKind === "voice"
+              ? t(
+                  msg`本轮语音通话已结束。你可以直接继续输入，也可以切回语音发送。`,
+                )
+              : t(
+                  msg`本轮视频通话已结束。你可以直接继续输入，也可以切回语音发送。`,
+                ),
           onAction: () => {
             setRouteCallReturnKind(null);
             void navigate({
@@ -223,7 +233,7 @@ export function ChatRoomPage() {
               hash,
             });
           },
-          secondaryActionLabel: "继续打字",
+          secondaryActionLabel: t(msg`继续打字`),
           onSecondaryAction: () => {
             setRouteCallReturnKind(null);
           },
@@ -252,9 +262,9 @@ export function ChatRoomPage() {
       <Suspense
         fallback={
           <RouteRedirectState
-            title="正在打开桌面对话"
-            description="正在载入桌面聊天工作区，马上恢复当前会话。"
-            loadingLabel="载入桌面对话..."
+            title={t(msg`正在打开桌面对话`)}
+            description={t(msg`正在载入桌面聊天工作区，马上恢复当前会话。`)}
+            loadingLabel={t(msg`载入桌面对话...`)}
           />
         }
       >
