@@ -23,6 +23,8 @@
     "dev:app:stop": "node ./scripts/dev-services.mjs stop app",
     "dev:app:restart": "node ./scripts/dev-services.mjs restart app",
     "dev:app:status": "node ./scripts/dev-services.mjs status app",
+    "app:build": "pnpm --filter @yinjie/app build:fast",
+    "app:build:watch": "pnpm --filter @yinjie/app build:watch",
     "dev:admin": "node ./scripts/dev-services.mjs start admin",
     "dev:admin:stop": "node ./scripts/dev-services.mjs stop admin",
     "dev:admin:restart": "node ./scripts/dev-services.mjs restart admin",
@@ -127,5 +129,8 @@
     "prettier": "^3.4.2",
     "turbo": "^2.4.2",
     "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "socks": "^2.8.8"
   }
 }

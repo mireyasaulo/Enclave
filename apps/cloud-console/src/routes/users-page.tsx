@@ -2,13 +2,20 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import type { CloudUserStatus, SubscriptionStatus } from "@yinjie/contracts";
-import { useAppLocale } from "@yinjie/i18n";
+import { formatDateTime, useAppLocale } from "@yinjie/i18n";
 import { ErrorBlock, InlineNotice, LoadingBlock } from "@yinjie/ui";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import {
   formatCloudConsolePageOfTotal,
   useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
+
+function formatExpiresAt(value?: string | null) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return formatDateTime(date, { dateStyle: "medium", timeStyle: "short" });
+}
 
 export function UsersPage() {
   const t = useCloudConsoleText();
@@ -114,12 +121,14 @@ export function UsersPage() {
                       params={{ userId: user.id }}
                       className="font-medium text-[color:var(--brand-primary)]"
                     >
-                      {user.phone}
+                      {user.phone || t("(no phone)")}
                     </Link>
                   </td>
                   <td className="px-4 py-3">{t(user.status)}</td>
                   <td className="px-4 py-3">{t(user.subscriptionStatus)}</td>
-                  <td className="px-4 py-3">{user.subscriptionExpiresAt || "-"}</td>
+                  <td className="px-4 py-3">
+                    {formatExpiresAt(user.subscriptionExpiresAt)}
+                  </td>
                   <td className="px-4 py-3">{user.inviterPhone || "-"}</td>
                   <td className="px-4 py-3">
                     {user.worldStatus ? t(user.worldStatus) : "-"}

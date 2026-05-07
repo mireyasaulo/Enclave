@@ -1,9 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Button } from "@yinjie/ui";
 import { useAuth } from "../lib/use-auth";
 import { wikiApi } from "../lib/wiki-api";
 
 export function WatchToggle({ characterId }: { characterId: string }) {
+  const t = translateRuntimeMessage;
   const { user } = useAuth();
   const qc = useQueryClient();
   const statusQ = useQuery({
@@ -32,7 +35,7 @@ export function WatchToggle({ characterId }: { characterId: string }) {
       disabled={watchMut.isPending || statusQ.isLoading}
       onClick={() => watchMut.mutate()}
     >
-      {watching ? "★ 已观察" : "☆ 观察"}
+      {watching ? t(msg`★ 已观察`) : t(msg`☆ 观察`)}
     </Button>
   );
 }

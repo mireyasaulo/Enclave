@@ -78,7 +78,7 @@ export class InviteClientController {
       code,
       inviteeUserId: user.id,
       context: {
-        inviteePhone: user.phone,
+        inviteePhone: user.phone ?? "",
         inviteeIp: ip,
         inviteeDeviceFingerprint: user.registrationDeviceFingerprint,
       },

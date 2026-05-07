@@ -158,11 +158,58 @@ test("accepts typing in moments comment composers", async ({ page }) => {
 
   const desktopCard = page.locator(`#desktop-moment-post-${moment.id}`);
   await expect(desktopCard).toBeVisible();
-  await desktopCard.getByRole("button", { name: "评论" }).click();
   const desktopInput = desktopCard.getByPlaceholder("写评论...");
-  await expect(desktopInput).toBeFocused();
-  await page.keyboard.type("桌面端评论输入");
+  await expect(desktopInput).toBeVisible();
+  await desktopInput.fill("桌面端评论输入");
   await expect(desktopInput).toHaveValue("桌面端评论输入");
+  await desktopCard.getByRole("button", { name: "发送" }).click();
+  await expect(desktopInput).toHaveValue("");
+  await expect(desktopCard.getByText("桌面端评论输入")).toBeVisible();
+});
+
+test("desktop moments support replying to a specific comment", async ({
+  page,
+}) => {
+  const moment = await createSmokeMoment("朋友圈评论回复回归");
+
+  await page.setViewportSize({ width: 1440, height: 960 });
+  await page.goto(`${stack.app.baseUrl}/tabs/moments`);
+
+  const desktopCard = page.locator(`#desktop-moment-post-${moment.id}`);
+  await expect(desktopCard).toBeVisible();
+
+  const composerInput = desktopCard.getByPlaceholder("写评论...");
+  await composerInput.fill("被回复的原始评论");
+  await desktopCard.getByRole("button", { name: "发送" }).click();
+  await expect(desktopCard.getByText("被回复的原始评论")).toBeVisible();
+
+  // 点击刚才那条评论本身就是开始回复
+  const targetComment = desktopCard
+    .getByRole("button", { name: /被回复的原始评论$/ })
+    .first();
+  await targetComment.click();
+
+  // 出现回复指示条 + placeholder 切换
+  await expect(desktopCard.getByText(/^正在回复 /)).toBeVisible();
+  const replyInput = desktopCard.getByPlaceholder(/^回复 /);
+  await replyInput.fill("这是一条针对评论的回复");
+  await desktopCard.getByRole("button", { name: "发送" }).click();
+
+  // 新评论显示「X 回复 Y：内容」
+  await expect(
+    desktopCard.getByText("这是一条针对评论的回复"),
+  ).toBeVisible();
+  await expect(desktopCard.getByText(/^正在回复 /)).toBeHidden();
+
+  // 关键：新评论必须以 "X 回复 Y：内容" 的形式渲染，不能是裸的 "X：内容"
+  const replyComment = desktopCard
+    .getByRole("button", { name: /这是一条针对评论的回复$/ })
+    .first();
+  const replyText = (await replyComment.innerText()).replace(/\s+/g, "");
+  expect(replyText).toMatch(/回复.+：这是一条针对评论的回复/);
+
+  // 原始评论也仍然在
+  await expect(desktopCard.getByText("被回复的原始评论")).toBeVisible();
 });
 
 async function createSmokeMoment(text: string) {

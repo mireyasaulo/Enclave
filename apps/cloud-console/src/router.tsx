@@ -70,6 +70,11 @@ const InviteAuditPage = lazy(async () => {
   return { default: mod.InviteAuditPage };
 });
 
+const FeedbacksPage = lazy(async () => {
+  const mod = await import("./routes/feedbacks-page");
+  return { default: mod.FeedbacksPage };
+});
+
 const rootRoute = createRootRoute({
   component: RootLayout,
 });
@@ -150,6 +155,12 @@ const inviteAuditRoute = createRoute({
   component: InviteAuditPage,
 });
 
+const feedbacksRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/feedbacks",
+  component: FeedbacksPage,
+});
+
 export const routeTree = rootRoute.addChildren([
   indexRoute,
   worldsRoute,
@@ -162,6 +173,7 @@ export const routeTree = rootRoute.addChildren([
   subscriptionPlansRoute,
   cloudConfigsRoute,
   inviteAuditRoute,
+  feedbacksRoute,
   revenueSharingRoute,
 ]);
 

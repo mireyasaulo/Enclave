@@ -6,6 +6,14 @@ body,
   min-height: 100%;
 }
 
+:root[data-density="compact"] {
+  font-size: 14px;
+}
+
+:root[data-density="spacious"] {
+  font-size: 17.5px;
+}
+
 body {
   margin: 0;
   font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;

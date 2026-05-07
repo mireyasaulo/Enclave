@@ -46,6 +46,7 @@ import { resolveSearchNavigationTarget } from "../features/search/search-navigat
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { formatTimestamp } from "../lib/format";
 import { normalizePathname } from "../lib/normalize-pathname";
+import { searchStringToObject } from "../lib/route-search";
 import { getCurrentWindowTargetPath } from "../runtime/desktop-windowing";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
@@ -584,7 +585,7 @@ export function FavoritesPage() {
                     ) : (
                       <Link
                         to={selectedFavoriteNavigationTarget?.to as never}
-                        search={selectedFavoriteNavigationTarget?.search as never}
+                        search={searchStringToObject(selectedFavoriteNavigationTarget?.search) as never}
                         hash={selectedFavoriteNavigationTarget?.hash}
                         className="inline-flex h-10 items-center justify-center rounded-[10px] bg-[color:var(--brand-primary)] px-4 text-sm font-medium text-white transition hover:opacity-95"
                       >

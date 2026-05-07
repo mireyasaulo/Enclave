@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
+import { WelcomeMessageService } from './welcome-message.service';
 
 export type AuthUserPayload = {
   sub: string;
@@ -35,6 +36,7 @@ export class AuthService {
     private readonly userRepo: Repository<UserEntity>,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
+    private readonly welcomeMessageService: WelcomeMessageService,
   ) {}
 
   async register(username: string, password: string): Promise<AuthSession> {
@@ -63,6 +65,7 @@ export class AuthService {
       roleGrantedBy: bootstrapAsAdmin ? 'first_wiki_member_bootstrap' : null,
     });
     const saved = await this.userRepo.save(user);
+    await this.welcomeMessageService.sendWelcomeMessage(saved.id);
     return this.buildSession(saved);
   }
 
@@ -70,6 +73,11 @@ export class AuthService {
     const trimmed = username.trim();
     const user = await this.userRepo.findOne({ where: { username: trimmed } });
     if (!user) throw new UnauthorizedException('账号或密码错误');
+    if (!user.passwordHash) {
+      throw new UnauthorizedException(
+        '该账号通过邮箱验证码注册，请使用邮箱验证码登录。',
+      );
+    }
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) throw new UnauthorizedException('账号或密码错误');
     return this.buildSession(user);

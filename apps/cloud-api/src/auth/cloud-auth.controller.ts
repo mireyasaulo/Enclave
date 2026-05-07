@@ -1,5 +1,11 @@
 import { Body, Controller, Post, Req } from "@nestjs/common";
-import { SendCodeDto, VerifyCodeDto } from "../http-dto/cloud-api.dto";
+import {
+  SendCodeDto,
+  SendEmailCodeDto,
+  VerifyCodeDto,
+  VerifyEmailCodeDto,
+} from "../http-dto/cloud-api.dto";
+import { EmailAuthService } from "./email-auth.service";
 import { PhoneAuthService } from "./phone-auth.service";
 
 function extractIp(request: { headers: Record<string, string | string[] | undefined> }) {
@@ -19,7 +25,10 @@ function extractIp(request: { headers: Record<string, string | string[] | undefi
 
 @Controller("cloud/auth")
 export class CloudAuthController {
-  constructor(private readonly phoneAuthService: PhoneAuthService) {}
+  constructor(
+    private readonly phoneAuthService: PhoneAuthService,
+    private readonly emailAuthService: EmailAuthService,
+  ) {}
 
   @Post("send-code")
   sendCode(@Body() body: SendCodeDto) {
@@ -32,6 +41,23 @@ export class CloudAuthController {
     @Req() request: { headers: Record<string, string | string[] | undefined> },
   ) {
     return this.phoneAuthService.verifyCode(body.phone, body.code, {
+      inviteCode: body.inviteCode ?? null,
+      deviceFingerprint: body.deviceFingerprint ?? null,
+      ip: extractIp(request),
+    });
+  }
+
+  @Post("email/send-code")
+  sendEmailCode(@Body() body: SendEmailCodeDto) {
+    return this.emailAuthService.sendCode(body.email);
+  }
+
+  @Post("email/verify-code")
+  verifyEmailCode(
+    @Body() body: VerifyEmailCodeDto,
+    @Req() request: { headers: Record<string, string | string[] | undefined> },
+  ) {
+    return this.emailAuthService.verifyCode(body.email, body.code, {
       inviteCode: body.inviteCode ?? null,
       deviceFingerprint: body.deviceFingerprint ?? null,
       ip: extractIp(request),

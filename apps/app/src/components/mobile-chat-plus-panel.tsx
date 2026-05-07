@@ -108,8 +108,7 @@ const rootActions: Record<RootAction["key"], RootAction> = {
     disabled: true,
     disabledLabel: "待接入",
     unavailableTitle: "视频通话暂未接入",
-    unavailableDescription:
-      "当前先保留微信式入口位，后续会接到设备联动和真视频通话链路。",
+    unavailableDescription: "视频通话功能开发中，敬请期待。",
     fallbackLabel: "改为拍摄",
     fallbackAction: "camera",
   },
@@ -488,7 +487,7 @@ export function MobileChatPlusPanel({
                   </div>
                   <div className="mt-1 text-[11px] leading-[18px] text-[#7a7a7a]">
                     {unavailableAction.unavailableDescription ??
-                      "当前版本先保留这个入口位，后续再补完整链路。"}
+                      "功能开发中，敬请期待。"}
                   </div>
                 </div>
               </div>

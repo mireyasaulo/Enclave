@@ -67,12 +67,41 @@ function parseMobileHandoffRecord(input: unknown) {
   } satisfies MobileHandoffRecord;
 }
 
-function readLocalStorageHistory() {
+function safeGetLocalStorageItem(key: string) {
   if (typeof window === "undefined") {
-    return [] as MobileHandoffRecord[];
+    return null;
   }
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
 
-  const raw = window.localStorage.getItem(MOBILE_HANDOFF_STORAGE_KEY);
+function safeSetLocalStorageItem(key: string, value: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // ignore quota / privacy mode errors
+  }
+}
+
+function safeRemoveLocalStorageItem(key: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    // ignore privacy mode errors
+  }
+}
+
+function readLocalStorageHistory() {
+  const raw = safeGetLocalStorageItem(MOBILE_HANDOFF_STORAGE_KEY);
   if (!raw) {
     return [] as MobileHandoffRecord[];
   }
@@ -98,12 +127,12 @@ function writeLocalStorageHistory(history: MobileHandoffRecord[]) {
   }
 
   if (history.length) {
-    window.localStorage.setItem(
+    safeSetLocalStorageItem(
       MOBILE_HANDOFF_STORAGE_KEY,
       JSON.stringify(history),
     );
   } else {
-    window.localStorage.removeItem(MOBILE_HANDOFF_STORAGE_KEY);
+    safeRemoveLocalStorageItem(MOBILE_HANDOFF_STORAGE_KEY);
   }
 
   queueNativeMobileHandoffWrite(history);
@@ -189,15 +218,13 @@ export async function hydrateMobileHandoffHistoryFromNative() {
       return localHistory;
     }
 
-    if (typeof window !== "undefined") {
-      if (nativeHistory.length) {
-        window.localStorage.setItem(
-          MOBILE_HANDOFF_STORAGE_KEY,
-          JSON.stringify(nativeHistory),
-        );
-      } else {
-        window.localStorage.removeItem(MOBILE_HANDOFF_STORAGE_KEY);
-      }
+    if (nativeHistory.length) {
+      safeSetLocalStorageItem(
+        MOBILE_HANDOFF_STORAGE_KEY,
+        JSON.stringify(nativeHistory),
+      );
+    } else {
+      safeRemoveLocalStorageItem(MOBILE_HANDOFF_STORAGE_KEY);
     }
     return nativeHistory;
   } catch {

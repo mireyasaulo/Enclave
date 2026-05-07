@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
+import { ExpandableText } from "../../../components/expandable-text";
 import {
   hydrateLiveCompanionFromNative,
   readLiveDraft,
@@ -153,6 +154,7 @@ export function DesktopChannelsWorkspace({
     }
 
     let cancelled = false;
+    let pendingTimer: ReturnType<typeof setTimeout> | null = null;
 
     const syncLiveCompanionState = async () => {
       const store = await hydrateLiveCompanionFromNative();
@@ -164,14 +166,24 @@ export function DesktopChannelsWorkspace({
       setLiveHistory(store.history);
     };
 
+    const scheduleSync = () => {
+      if (pendingTimer !== null) {
+        return;
+      }
+      pendingTimer = setTimeout(() => {
+        pendingTimer = null;
+        void syncLiveCompanionState();
+      }, 100);
+    };
+
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        void syncLiveCompanionState();
+        scheduleSync();
       }
     };
 
     const handleFocus = () => {
-      void syncLiveCompanionState();
+      scheduleSync();
     };
 
     void syncLiveCompanionState();
@@ -182,6 +194,9 @@ export function DesktopChannelsWorkspace({
 
     return () => {
       cancelled = true;
+      if (pendingTimer !== null) {
+        clearTimeout(pendingTimer);
+      }
       window.removeEventListener("focus", handleFocus);
       window.removeEventListener("storage", handleFocus);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -222,9 +237,6 @@ export function DesktopChannelsWorkspace({
             </div>
             <div className="mt-1 text-[22px] font-semibold text-[color:var(--text-primary)]">
               视频号
-            </div>
-            <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-              桌面端收成微信式内容浏览结构，主区域看视频，右侧接住作者、评论和推荐队列。
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -301,7 +313,7 @@ export function DesktopChannelsWorkspace({
         {!isLoading && !posts.length ? (
           <EmptyState
             title="视频号还没有内容"
-            description="先等系统注入 AI 演示内容，或者后续接入真实生成视频后再回来查看。"
+            description="暂时还没有可看的内容。"
           />
         ) : null}
 
@@ -309,15 +321,15 @@ export function DesktopChannelsWorkspace({
           <div className="mx-auto grid max-w-[1240px] gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
             <section className="min-w-0">
               <article className="overflow-hidden rounded-[22px] border border-[color:var(--border-faint)] bg-white shadow-[var(--shadow-section)]">
-                <div className="relative bg-[#0f1115]">
-                  <video
-                    key={selectedPost.id}
-                    src={selectedPost.mediaUrl}
-                    controls
-                    playsInline
-                    preload="metadata"
-                    className="mx-auto block max-h-[720px] w-full bg-black object-contain"
-                  />
+                <div className="relative flex aspect-video items-center justify-center bg-[#0f1115] text-center">
+                  <div className="px-6">
+                    <div className="text-[16px] font-semibold text-white">
+                      视频功能正在开发中
+                    </div>
+                    <div className="mt-2 text-[13px] leading-6 text-white/72">
+                      敬请期待
+                    </div>
+                  </div>
                   <div className="pointer-events-none absolute left-5 top-5 rounded-md bg-[rgba(15,23,42,0.68)] px-3 py-1 text-[11px] font-medium text-white">
                     视频号推荐
                   </div>
@@ -376,9 +388,11 @@ export function DesktopChannelsWorkspace({
                           {selectedPost.title}
                         </div>
                       ) : null}
-                      <div className="mt-4 text-[15px] leading-8 text-[color:var(--text-primary)]">
-                        {selectedPost.text}
-                      </div>
+                      <ExpandableText
+                        text={selectedPost.text}
+                        className="mt-4"
+                        textClassName="text-[15px] leading-8 text-[color:var(--text-primary)]"
+                      />
                       {selectedPost.topicTags?.length ? (
                         <div className="mt-3 flex flex-wrap gap-2">
                           {selectedPost.topicTags.slice(0, 4).map((tag) => (
@@ -440,9 +454,6 @@ export function DesktopChannelsWorkspace({
                     </div>
                   </div>
 
-                  <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3 text-[12px] leading-6 text-[color:var(--text-secondary)]">
-                    评论、作者入口和推荐队列已经收进右侧，主区域只保留当前内容播放和正文信息。
-                  </div>
                 </div>
               </article>
             </section>
@@ -694,9 +705,6 @@ function DesktopChannelAuthorPanel({
         <div>
           <div className="text-sm font-medium text-[color:var(--text-primary)]">
             作者主页
-          </div>
-          <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
-            桌面端把作者资料收进当前工作区，避免单开整页后丢掉当前内容上下文。
           </div>
         </div>
         <Button variant="secondary" size="sm" onClick={onClose}>

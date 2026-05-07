@@ -18,6 +18,12 @@ import { ReplyLogicAdminService } from './reply-logic-admin.service';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import { AiUsageLedgerService } from '../analytics/ai-usage-ledger.service';
 import { WechatSyncAdminService } from './wechat-sync-admin.service';
+import { WikiSyncAdminService } from './wiki-sync-admin.service';
+import type {
+  WikiSyncApplyRequest,
+  WikiSyncImportRequest,
+  WikiSyncPreviewFilter,
+} from './wiki-sync.types';
 import { ActionRuntimeService } from '../action-runtime/action-runtime.service';
 import { CyberAvatarAdminService } from '../cyber-avatar/cyber-avatar-admin.service';
 import { NeedDiscoveryService } from '../need-discovery/need-discovery.service';
@@ -59,6 +65,7 @@ export class AdminController {
     private readonly ai: AiOrchestratorService,
     private readonly usageLedger: AiUsageLedgerService,
     private readonly wechatSyncAdminService: WechatSyncAdminService,
+    private readonly wikiSyncAdminService: WikiSyncAdminService,
     private readonly actionRuntimeService: ActionRuntimeService,
     private readonly cyberAvatarAdminService: CyberAvatarAdminService,
     private readonly needDiscoveryService: NeedDiscoveryService,
@@ -521,6 +528,32 @@ export class AdminController {
   @Post('characters/generate-quick')
   async generateQuickCharacter(@Body() body: { description: string }) {
     return this.ai.generateQuickCharacter(body.description?.trim() ?? '');
+  }
+
+  @Get('characters/wiki-sync/preview')
+  previewWikiSync(
+    @Query('characterId') characterId?: string,
+    @Query('filter') filter?: string,
+  ) {
+    const allowed: WikiSyncPreviewFilter[] = ['drift', 'all', 'wiki_only'];
+    const safeFilter: WikiSyncPreviewFilter | undefined =
+      filter && (allowed as string[]).includes(filter)
+        ? (filter as WikiSyncPreviewFilter)
+        : undefined;
+    return this.wikiSyncAdminService.preview({
+      characterId: characterId?.trim() || undefined,
+      filter: safeFilter,
+    });
+  }
+
+  @Post('characters/wiki-sync/apply')
+  applyWikiSync(@Body() body: WikiSyncApplyRequest) {
+    return this.wikiSyncAdminService.applyBatch(body);
+  }
+
+  @Post('characters/wiki-sync/import-missing')
+  importMissingFromWiki(@Body() body: WikiSyncImportRequest) {
+    return this.wikiSyncAdminService.importMissing(body);
   }
 
   @Post('wechat-sync/preview')

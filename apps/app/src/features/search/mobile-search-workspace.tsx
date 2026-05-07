@@ -352,6 +352,9 @@ export function MobileSearchWorkspace({
                 const sectionResults = expanded
                   ? section.results
                   : section.results.slice(0, 3);
+                const comingSoon =
+                  section.category === "miniPrograms" ||
+                  section.category === "officialAccounts";
 
                 return (
                   <section key={section.category} className="space-y-2.5">
@@ -359,7 +362,7 @@ export function MobileSearchWorkspace({
                       <div className="text-[14px] font-medium text-[color:var(--text-primary)]">
                         {section.label}
                       </div>
-                      {section.results.length > 3 ? (
+                      {section.results.length > 3 && !comingSoon ? (
                         <button
                           type="button"
                           onClick={() =>
@@ -376,7 +379,7 @@ export function MobileSearchWorkspace({
                         </button>
                       ) : null}
                     </div>
-                    <div className="space-y-1.5">
+                    <div className="relative space-y-1.5">
                       {sectionResults.map((item) => (
                         <SearchResultCard
                           key={item.id}
@@ -386,6 +389,7 @@ export function MobileSearchWorkspace({
                           onOpen={onOpenResult}
                         />
                       ))}
+                      {comingSoon ? <MobileSearchComingSoonOverlay /> : null}
                     </div>
                   </section>
                 );
@@ -397,15 +401,21 @@ export function MobileSearchWorkspace({
                 {searchCategoryTitles[activeCategory]} · {visibleResults.length}{" "}
                 条
               </div>
-              {visibleResults.map((item) => (
-                <SearchResultCard
-                  key={item.id}
-                  item={item}
-                  keyword={searchText.trim().toLowerCase()}
-                  layout="mobile"
-                  onOpen={onOpenResult}
-                />
-              ))}
+              <div className="relative space-y-1.5">
+                {visibleResults.map((item) => (
+                  <SearchResultCard
+                    key={item.id}
+                    item={item}
+                    keyword={searchText.trim().toLowerCase()}
+                    layout="mobile"
+                    onOpen={onOpenResult}
+                  />
+                ))}
+                {activeCategory === "miniPrograms" ||
+                activeCategory === "officialAccounts" ? (
+                  <MobileSearchComingSoonOverlay />
+                ) : null}
+              </div>
             </div>
           )
         ) : null}
@@ -461,6 +471,21 @@ function MobileSearchStatusCard({
       </p>
       {action ? <div className="mt-3 flex justify-center">{action}</div> : null}
     </section>
+  );
+}
+
+function MobileSearchComingSoonOverlay() {
+  return (
+    <div className="pointer-events-auto absolute inset-0 z-30 flex items-center justify-center rounded-[14px] bg-black/30 backdrop-blur-[3px]">
+      <div className="rounded-[14px] border border-[color:var(--border-faint)] bg-white/95 px-4 py-3 text-center shadow-[var(--shadow-card)]">
+        <div className="text-[13px] font-semibold text-[color:var(--text-primary)]">
+          功能开发中
+        </div>
+        <div className="mt-1 text-[11px] text-[color:var(--text-secondary)]">
+          敬请期待
+        </div>
+      </div>
+    </div>
   );
 }
 

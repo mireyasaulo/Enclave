@@ -16,6 +16,7 @@ import { CloudConfigModule } from "./cloud-config/cloud-config.module";
 import { CloudRuntimeConfigValidator } from "./config/cloud-runtime-config.validator";
 import { resolveCloudAuthTokenTtl, resolveCloudJwtSecret } from "./config/cloud-runtime-config";
 import { buildCloudTypeOrmOptions, cloudEntities } from "./database/cloud-database.config";
+import { FeedbackModule } from "./feedback/feedback.module";
 import { InviteModule } from "./invite/invite.module";
 import { LocalProcessComputeProviderService } from "./orchestration/local-process-compute-provider.service";
 import { MockComputeProviderService } from "./orchestration/mock-compute-provider.service";
@@ -56,6 +57,7 @@ import { WaitingSessionSyncService } from "./world-access/waiting-session-sync.s
     InviteModule,
     UsersModule,
     RevenueSharingModule,
+    FeedbackModule,
   ],
   controllers: [
     AdminAuthController,

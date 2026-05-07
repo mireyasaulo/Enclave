@@ -1,7 +1,12 @@
 export const SUPPORTED_LOCALES = ["zh-CN", "en-US", "ja-JP", "ko-KR"] as const;
 
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
-export type I18nAppSurface = "app" | "admin" | "cloud-console" | "site";
+export type I18nAppSurface =
+  | "app"
+  | "admin"
+  | "cloud-console"
+  | "site"
+  | "wiki";
 export type TextDirection = "ltr" | "rtl";
 
 export const DEFAULT_LOCALE: SupportedLocale = "zh-CN";

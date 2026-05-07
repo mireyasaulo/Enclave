@@ -58,6 +58,12 @@ import type {
   SelfAgentWorkspaceDocumentName,
   RealWorldNewsBulletinPublishRequest,
   RealWorldNewsBulletinPublishResult,
+  WikiSyncApplyRequest,
+  WikiSyncApplyResponse,
+  WikiSyncImportRequest,
+  WikiSyncImportResult,
+  WikiSyncPreviewFilter,
+  WikiSyncPreviewResponse,
   RealWorldSyncCharacterDetail,
   RealWorldSyncOverview,
   RealWorldSyncRunResult,
@@ -357,6 +363,28 @@ export const adminApi = {
       `/characters/${id}/factory/revisions/${revisionId}/restore`,
       { method: "POST" },
     ),
+  getWikiSyncPreview: (params?: {
+    characterId?: string;
+    filter?: WikiSyncPreviewFilter;
+  }) => {
+    const search = new URLSearchParams();
+    if (params?.characterId) search.set("characterId", params.characterId);
+    if (params?.filter) search.set("filter", params.filter);
+    const qs = search.toString();
+    return adminFetch<WikiSyncPreviewResponse>(
+      `/characters/wiki-sync/preview${qs ? `?${qs}` : ""}`,
+    );
+  },
+  applyWikiSync: (body: WikiSyncApplyRequest) =>
+    adminFetch<WikiSyncApplyResponse>("/characters/wiki-sync/apply", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  importMissingFromWiki: (body: WikiSyncImportRequest) =>
+    adminFetch<WikiSyncImportResult>("/characters/wiki-sync/import-missing", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
   getGamesCatalog: () => adminFetch<AdminGameCatalogItem[]>("/games"),
   getGameCatalogItem: (id: string) =>
     adminFetch<AdminGameCatalogDetail>(`/games/${id}`),

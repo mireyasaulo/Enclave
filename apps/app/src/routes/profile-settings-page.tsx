@@ -822,9 +822,6 @@ export function ProfileSettingsPage() {
               <div className="text-sm font-medium text-[color:var(--text-primary)]">
                 {t(msg`设置分类`)}
               </div>
-              <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                {t(msg`桌面端把资料、AI 配置和协议查看收口到同一个工作区。`)}
-              </div>
             </div>
 
             <div className="min-h-0 flex-1 overflow-auto p-3">

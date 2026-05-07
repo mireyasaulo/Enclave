@@ -1,8 +1,12 @@
 import { Global, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { CloudUserEntity } from "../entities/cloud-user.entity";
+import { EmailVerificationSessionEntity } from "../entities/email-verification-session.entity";
 import { PhoneVerificationSessionEntity } from "../entities/phone-verification-session.entity";
 import { CloudClientAuthGuard } from "./cloud-client-auth.guard";
+import { CloudMailService } from "./cloud-mail.service";
+import { EmailAuthService } from "./email-auth.service";
+import { MockEmailProviderService } from "./mock-email-provider.service";
 import { MockSmsProviderService } from "./mock-sms-provider.service";
 import { PhoneAuthService } from "./phone-auth.service";
 import { ServiceTokenGuard } from "./service-token.guard";
@@ -12,18 +16,25 @@ import { ServiceTokenGuard } from "./service-token.guard";
   imports: [
     TypeOrmModule.forFeature([
       PhoneVerificationSessionEntity,
+      EmailVerificationSessionEntity,
       CloudUserEntity,
     ]),
   ],
   providers: [
     PhoneAuthService,
+    EmailAuthService,
+    CloudMailService,
     MockSmsProviderService,
+    MockEmailProviderService,
     CloudClientAuthGuard,
     ServiceTokenGuard,
   ],
   exports: [
     PhoneAuthService,
+    EmailAuthService,
+    CloudMailService,
     MockSmsProviderService,
+    MockEmailProviderService,
     CloudClientAuthGuard,
     ServiceTokenGuard,
   ],

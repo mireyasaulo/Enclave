@@ -40,7 +40,7 @@ export function DesktopContactsFriendRequestsPane({
           <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
             {pendingCount > 0
               ? `当前有 ${pendingCount} 条待处理好友申请`
-              : "查看桌面端收到的好友申请和处理结果。"}
+              : "查看收到的好友申请和处理结果。"}
           </div>
         </div>
       </div>

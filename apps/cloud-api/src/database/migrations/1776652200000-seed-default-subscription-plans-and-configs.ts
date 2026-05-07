@@ -80,7 +80,7 @@ const CONFIG_SEEDS: ConfigSeed[] = [
   { key: "invite.maxRedeemPerIpPerDay", value: "3", description: "同一 IP 每 24 小时最多兑换次数" },
   { key: "invite.maxRedeemPerDevicePerDay", value: "2", description: "同一设备指纹每 24 小时最多兑换次数" },
   { key: "feature.aiHardBlock", value: "true", description: "AI 拦截总开关，false 时允许全员使用 AI（兜底）" },
-  { key: "app.publicBaseUrl", value: '"https://app.example.com"', description: "主 App 公网访问地址（用于邀请链接）" },
+  { key: "app.publicBaseUrl", value: '"https://1gw06751dd053.vicp.fun"', description: "主 App 公网访问地址（用于邀请链接）" },
   { key: "copy.subscriptionExpiredTitle", value: '"会员已到期"', description: "AI 到期弹窗标题" },
   { key: "copy.subscriptionExpiredMessage", value: '"你的隐界会员已到期，AI 能力暂时无法使用。"', description: "AI 到期弹窗正文" },
   { key: "copy.subscriptionExpiredCta", value: '"立即续费"', description: "AI 到期弹窗主按钮文案" },

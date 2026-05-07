@@ -880,6 +880,7 @@ export function DesktopMobilePage() {
   }
 
   return (
+    <div className="relative flex h-full min-h-0 flex-1">
     <DesktopUtilityShell
       title={t(msg`手机接力`)}
       subtitle={t(msg`把桌面内容带到移动端继续处理。`)}
@@ -982,11 +983,6 @@ export function DesktopMobilePage() {
                 </div>
                 <div className="mt-2 text-sm text-[color:var(--text-primary)]">
                   {t(msg`把 ${callHandoffTitle} 的通话入口带到手机继续。`)}
-                </div>
-                <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                  {t(
-                    msg`桌面端先不假做本地通话，直接把当前聊天接力到手机，更贴近微信电脑端“到手机继续”的真实工作流。`,
-                  )}
                 </div>
               </div>
               <button
@@ -2012,6 +2008,17 @@ export function DesktopMobilePage() {
         </section>
       </div>
     </DesktopUtilityShell>
+      <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[3px]">
+        <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-8 py-6 text-center shadow-[var(--shadow-card)]">
+          <div className="text-lg font-semibold text-[color:var(--text-primary)]">
+            功能开发中
+          </div>
+          <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
+            敬请期待
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

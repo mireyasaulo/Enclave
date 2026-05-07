@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
-import { getSystemStatus } from "@yinjie/contracts";
+import { getSystemStatus, submitCloudFeedback } from "@yinjie/contracts";
 import {
   AlertCircle,
   Bug,
@@ -115,6 +115,7 @@ export function DesktopFeedbackPage() {
   const ownerName = useWorldOwnerStore((state) => state.username);
   const ownerSignature = useWorldOwnerStore((state) => state.signature);
   const baseUrl = runtimeConfig.apiBaseUrl;
+  const cloudApiBaseUrl = runtimeConfig.cloudApiBaseUrl;
   const worldOwnerLabel = t(msg`世界主人`);
   const noSignatureLabel = t(msg`暂无签名`);
   const notConfiguredLabel = t(msg`未配置`);
@@ -370,9 +371,7 @@ export function DesktopFeedbackPage() {
                   ))
                 ) : (
                   <div className="rounded-[12px] border border-dashed border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-4 text-sm leading-7 text-[color:var(--text-secondary)]">
-                    {t(
-                      msg`还没有保存过反馈。先把一个真实问题记下来，后续再接正式提交流。`,
-                    )}
+                    {t(msg`还没有保存过反馈。`)}
                   </div>
                 )}
               </div>
@@ -720,6 +719,8 @@ export function DesktopFeedbackPage() {
   async function handleSubmitFeedback() {
     const normalizedTitle = draft.title.trim();
     const normalizedDetail = draft.detail.trim();
+    const normalizedReproduction = draft.reproduction.trim();
+    const normalizedExpected = draft.expected.trim();
 
     if (!normalizedTitle) {
       setError(t(msg`请先填写反馈标题。`));
@@ -731,12 +732,46 @@ export function DesktopFeedbackPage() {
       return;
     }
 
+    const clientRecordId = `desktop-feedback-${Date.now()}`;
+    const clientSubmittedAt = new Date().toISOString();
+
+    let remoteOk = false;
+    let remoteError: string | null = null;
+    try {
+      await submitCloudFeedback(
+        {
+          source: runtimeConfig.appPlatform === "desktop" ? "desktop" : "web",
+          category: draft.category,
+          priority: draft.priority,
+          title: normalizedTitle,
+          detail: normalizedDetail,
+          reproduction: normalizedReproduction,
+          expected: normalizedExpected,
+          diagnosticSummary,
+          includeSystemSnapshot: draft.includeSystemSnapshot,
+          clientRecordId,
+          clientSubmittedAt,
+          appPlatform: runtimeConfig.appPlatform || "web",
+          apiBaseUrl: baseUrl || null,
+          ownerName: ownerName || null,
+          ownerSignature: ownerSignature || null,
+        },
+        cloudApiBaseUrl || undefined,
+      );
+      remoteOk = true;
+    } catch (submitError) {
+      remoteError =
+        submitError instanceof Error
+          ? submitError.message
+          : t(msg`未知错误`);
+    }
+
     const nextHistory = pushDesktopFeedbackRecord({
       ...draft,
       title: normalizedTitle,
       detail: normalizedDetail,
-      reproduction: draft.reproduction.trim(),
-      expected: draft.expected.trim(),
+      reproduction: normalizedReproduction,
+      expected: normalizedExpected,
       diagnosticSummary,
     });
 
@@ -744,10 +779,20 @@ export function DesktopFeedbackPage() {
     setDraft({ ...defaultDesktopFeedbackDraft });
     clearDesktopFeedbackDraft();
     setError(null);
-    setNotice({
-      message: t(msg`反馈已保存到本地工作区。`),
-      tone: "success",
-    });
+
+    if (remoteOk) {
+      setNotice({
+        message: t(msg`反馈已提交到云世界控制台。`),
+        tone: "success",
+      });
+    } else {
+      setNotice({
+        message: t(
+          msg`已保存到本地，但同步到云世界控制台失败：${remoteError ?? t(msg`未知错误`)}`,
+        ),
+        tone: "danger",
+      });
+    }
   }
 
   function buildFeedbackPackage() {

@@ -12,6 +12,7 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Copy,
+  Heart,
   ImagePlus,
   PenSquare,
   Share2,
@@ -22,6 +23,9 @@ import {
   getBlockedCharacters,
   getFeed,
   likeFeedPost,
+  replyFeedComment,
+  type FeedComment,
+  type FeedListResponse,
 } from "@yinjie/contracts";
 import { AppPage, Button, InlineNotice, TextField } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
@@ -91,6 +95,12 @@ export function DiscoverFeedPage() {
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>(
     {},
   );
+  const [desktopReplyTarget, setDesktopReplyTarget] = useState<{
+    authorId: string;
+    authorName: string;
+    commentId: string;
+    postId: string;
+  } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [notice, setNotice] = useState("");
   const [noticeTone, setNoticeTone] = useState<"success" | "info">("success");
@@ -153,6 +163,48 @@ export function DiscoverFeedPage() {
 
   const likeMutation = useMutation({
     mutationFn: (postId: string) => likeFeedPost(postId, baseUrl),
+    onMutate: async (postId) => {
+      await queryClient.cancelQueries({ queryKey: ["app-feed", baseUrl] });
+      const snapshots = queryClient.getQueriesData<FeedListResponse>({
+        queryKey: ["app-feed", baseUrl],
+      });
+      snapshots.forEach(([key, data]) => {
+        if (!data?.posts) {
+          return;
+        }
+        queryClient.setQueryData<FeedListResponse>(key, {
+          ...data,
+          posts: data.posts.map((post) =>
+            post.id === postId && !post.ownerState?.hasLiked
+              ? {
+                  ...post,
+                  likeCount: post.likeCount + 1,
+                  ownerState: {
+                    ...(post.ownerState ?? {
+                      hasLiked: false,
+                      hasFavorited: false,
+                      isFollowingAuthor: false,
+                      isNotInterested: false,
+                      hasViewed: false,
+                      hasShared: false,
+                      lastViewedAt: null,
+                      watchProgressSeconds: null,
+                      completed: false,
+                    }),
+                    hasLiked: true,
+                  },
+                }
+              : post,
+          ),
+        });
+      });
+      return { snapshots };
+    },
+    onError: (_error, _postId, context) => {
+      context?.snapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+    },
     onSuccess: async () => {
       setNoticeTone("success");
       setNoticeActionLabel(null);
@@ -166,26 +218,44 @@ export function DiscoverFeedPage() {
   });
 
   const commentMutation = useMutation({
-    mutationFn: (postId: string) => {
-      const text = commentDrafts[postId]?.trim();
+    mutationFn: (input: {
+      postId: string;
+      replyTarget?: {
+        authorId: string;
+        authorName: string;
+        commentId: string;
+        postId: string;
+      } | null;
+      text: string;
+    }) => {
+      const text = input.text.trim();
       if (!text) {
         throw new Error(t(msg`请先输入评论内容。`));
       }
 
-      return addFeedComment(
-        postId,
-        {
-          text,
-        },
-        baseUrl,
-      );
+      if (input.replyTarget) {
+        return replyFeedComment(
+          input.replyTarget.commentId,
+          { text },
+          baseUrl,
+        );
+      }
+
+      return addFeedComment(input.postId, { text }, baseUrl);
     },
-    onSuccess: async (_, postId) => {
-      setCommentDrafts((current) => ({ ...current, [postId]: "" }));
+    onSuccess: async (_, input) => {
+      setCommentDrafts((current) => ({ ...current, [input.postId]: "" }));
+      setDesktopReplyTarget((current) =>
+        current?.postId === input.postId ? null : current,
+      );
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice(t(msg`广场互动已更新。`));
+      setNotice(
+        input.replyTarget
+          ? t(msg`广场回复已发送。`)
+          : t(msg`广场互动已更新。`),
+      );
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
         queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] }),
@@ -193,11 +263,29 @@ export function DiscoverFeedPage() {
     },
   });
 
+  function submitComment(
+    postId: string,
+    options?: {
+      replyTarget?: {
+        authorId: string;
+        authorName: string;
+        commentId: string;
+        postId: string;
+      } | null;
+    },
+  ) {
+    commentMutation.mutate({
+      postId,
+      replyTarget: options?.replyTarget ?? null,
+      text: commentDrafts[postId] ?? "",
+    });
+  }
+
   const pendingLikePostId = likeMutation.isPending
     ? likeMutation.variables
     : null;
   const pendingCommentPostId = commentMutation.isPending
-    ? commentMutation.variables
+    ? (commentMutation.variables?.postId ?? null)
     : null;
   const blockedCharacterIds = new Set(
     (blockedQuery.data ?? []).map((item) => item.characterId),
@@ -552,13 +640,25 @@ export function DiscoverFeedPage() {
             favoriteSourceIds.includes(`feed-${postId}`)
           }
           setShowCompose={setShowCompose}
+          commentReplyTarget={desktopReplyTarget}
+          onCancelCommentReply={() => setDesktopReplyTarget(null)}
           onCommentChange={(postId, value) =>
             setCommentDrafts((current) => ({
               ...current,
               [postId]: value,
             }))
           }
-          onCommentSubmit={(postId) => commentMutation.mutate(postId)}
+          onCommentSubmit={(postId) =>
+            submitComment(postId, { replyTarget: desktopReplyTarget })
+          }
+          onStartCommentReply={(comment: FeedComment) =>
+            setDesktopReplyTarget({
+              authorId: comment.authorId,
+              authorName: comment.authorName,
+              commentId: comment.id,
+              postId: comment.postId,
+            })
+          }
           onCreate={() => createMutation.mutate()}
           onImageFilesSelected={(files) => {
             void handleImageFilesSelected(files);
@@ -875,10 +975,23 @@ export function DiscoverFeedPage() {
                       onClick={() => likeMutation.mutate(post.id)}
                       variant="secondary"
                       size="sm"
+                      className={
+                        post.ownerState?.hasLiked
+                          ? "border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] text-[#07c160]"
+                          : undefined
+                      }
                     >
+                      <Heart
+                        size={13}
+                        className={
+                          post.ownerState?.hasLiked ? "fill-current" : undefined
+                        }
+                      />
                       {pendingLikePostId === post.id
                         ? t(msg`处理中...`)
-                        : t(msg`点赞`)}
+                        : post.ownerState?.hasLiked
+                          ? t(msg`已赞`)
+                          : t(msg`点赞`)}
                     </Button>
                     <Button
                       variant="secondary"
@@ -945,7 +1058,7 @@ export function DiscoverFeedPage() {
                         !(commentDrafts[post.id] ?? "").trim() ||
                         commentMutation.isPending
                       }
-                      onClick={() => commentMutation.mutate(post.id)}
+                      onClick={() => submitComment(post.id)}
                       variant="primary"
                       size="sm"
                       className="h-8 px-3 text-[12px]"

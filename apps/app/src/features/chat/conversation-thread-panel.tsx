@@ -420,7 +420,7 @@ export function ConversationThreadPanel({
       }`}
     >
       {isDesktop ? (
-        <header className="relative z-20 flex items-center gap-3 border-b border-[rgba(0,0,0,0.06)] bg-white px-6 py-3">
+        <header className="relative z-20 flex min-h-[64px] items-center gap-3 border-b border-[rgba(0,0,0,0.06)] bg-white px-6 py-3">
           <div className="min-w-0 flex-1 px-1 py-1">
             <div className="truncate text-[17px] font-medium text-[color:var(--text-primary)]">
               {conversationTitle}

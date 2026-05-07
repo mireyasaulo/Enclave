@@ -100,6 +100,21 @@ export class SubscriptionService {
     });
   }
 
+  // 返回"叠在 active 之后但还没开始"的最远 expiresAt，
+  // 用于会员中心展示总到期日（trial + invite_reward 这种排队场景）。
+  async findFurthestActiveExpiresAt(userId: string): Promise<Date | null> {
+    const now = new Date();
+    const record = await this.subscriptionRepo.findOne({
+      where: {
+        userId,
+        status: "active",
+        expiresAt: MoreThan(now),
+      },
+      order: { expiresAt: "DESC" },
+    });
+    return record?.expiresAt ?? null;
+  }
+
   async findLatestSubscription(userId: string) {
     return this.subscriptionRepo.findOne({
       where: { userId },
@@ -295,8 +310,9 @@ export class SubscriptionService {
   }
 
   async buildClientState(user: CloudUserEntity): Promise<SubscriptionStateResponse> {
-    const [active, plans, copy] = await Promise.all([
+    const [active, furthestExpiresAt, plans, copy] = await Promise.all([
       this.findActiveSubscription(user.id),
+      this.findFurthestActiveExpiresAt(user.id),
       this.listActivePlans(),
       this.loadCopy(),
     ]);
@@ -324,9 +340,13 @@ export class SubscriptionService {
 
     const publicAppBaseUrl = await this.cloudConfig.getString("app.publicBaseUrl", "");
 
+    // expiresAt 用所有 active 订阅里最远的那个，覆盖 trial+invite_reward 排队场景；
+    // currentPlanCode/isTrial/source 还按当前真正在跑的那条来。
+    const effectiveExpiresAt = furthestExpiresAt ?? active?.expiresAt ?? null;
+
     return {
       status,
-      expiresAt: active?.expiresAt.toISOString() ?? null,
+      expiresAt: effectiveExpiresAt?.toISOString() ?? null,
       currentPlanCode: active?.planCode ?? null,
       currentPlanName: active ? (planMap.get(active.planCode)?.name ?? active.planCode) : null,
       isTrial: active?.source === "trial",

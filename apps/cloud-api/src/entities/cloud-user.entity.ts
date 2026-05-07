@@ -12,9 +12,14 @@ export class CloudUserEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @Index({ unique: true })
-  @Column()
-  phone: string;
+  @Column({ type: "text", nullable: true })
+  phone: string | null;
+
+  @Column({ type: "text", nullable: true })
+  email: string | null;
+
+  @Column({ type: "datetime", nullable: true })
+  emailVerifiedAt: Date | null;
 
   @Column({ type: "text", nullable: true })
   displayName: string | null;

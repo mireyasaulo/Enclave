@@ -1,4 +1,7 @@
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   ErrorBlock,
   InlineNotice,
@@ -20,6 +23,7 @@ const ROLE_OPTIONS: WikiRole[] = [
 ];
 
 export function AdminUsersPage() {
+  const t = translateRuntimeMessage;
   const { user } = useAuth();
   const qc = useQueryClient();
   const usersQ = useQuery({
@@ -37,11 +41,15 @@ export function AdminUsersPage() {
 
   return (
     <PageShell
-      eyebrow="管理"
-      title={`用户与权限${
-        usersQ.data ? `（${usersQ.data.length}）` : ""
-      }`}
-      description="设置用户的 wiki 角色：新人 / 自动确认 / 巡查员 / 管理员。无法修改自己的角色。"
+      eyebrow={t(msg`管理`)}
+      title={
+        usersQ.data
+          ? t(msg`用户与权限（${usersQ.data.length}）`)
+          : t(msg`用户与权限`)
+      }
+      description={t(
+        msg`设置用户的 wiki 角色：新人 / 自动确认 / 巡查员 / 管理员。无法修改自己的角色。`,
+      )}
     >
       {usersQ.isLoading && <LoadingBlock />}
       {usersQ.isError && (
@@ -58,12 +66,24 @@ export function AdminUsersPage() {
             <table className="w-full text-sm">
               <thead className="bg-[color:var(--surface-card-hover)] text-left text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                 <tr>
-                  <th className="px-4 py-3 font-medium">用户</th>
-                  <th className="px-4 py-3 font-medium">类型</th>
-                  <th className="px-4 py-3 font-medium">注册</th>
-                  <th className="px-4 py-3 font-medium">角色</th>
-                  <th className="px-4 py-3 font-medium">编辑/通过/被回滚/巡查</th>
-                  <th className="px-4 py-3 font-medium">设置角色</th>
+                  <th className="px-4 py-3 font-medium">
+                    <Trans>用户</Trans>
+                  </th>
+                  <th className="px-4 py-3 font-medium">
+                    <Trans>类型</Trans>
+                  </th>
+                  <th className="px-4 py-3 font-medium">
+                    <Trans>注册</Trans>
+                  </th>
+                  <th className="px-4 py-3 font-medium">
+                    <Trans>角色</Trans>
+                  </th>
+                  <th className="px-4 py-3 font-medium">
+                    <Trans>编辑/通过/被回滚/巡查</Trans>
+                  </th>
+                  <th className="px-4 py-3 font-medium">
+                    <Trans>设置角色</Trans>
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[color:var(--border-faint)]">
@@ -77,10 +97,12 @@ export function AdminUsersPage() {
                     </td>
                     <td className="px-4 py-3 text-xs">
                       {u.userType === "world_owner" ? (
-                        <StatusPill>世界主</StatusPill>
+                        <StatusPill>
+                          <Trans>世界主</Trans>
+                        </StatusPill>
                       ) : (
                         <span className="text-[color:var(--text-muted)]">
-                          wiki 成员
+                          <Trans>wiki 成员</Trans>
                         </span>
                       )}
                     </td>

@@ -303,21 +303,24 @@ export function ContactsPage() {
   const effectiveSearchText = isDesktopLayout ? searchText : "";
   const deferredSearchText = useDeferredValue(effectiveSearchText);
   const desktopContactsPath = "/tabs/contacts";
-  const normalizedPathname = normalizePathname(pathname);
-  const desktopPathMismatch =
-    isDesktopLayout && normalizedPathname !== desktopContactsPath;
+  const initialPathnameRef = useRef(pathname);
+  const initialHashRef = useRef(hash);
 
   useEffect(() => {
-    if (!desktopPathMismatch) {
+    const initialPathname = normalizePathname(initialPathnameRef.current);
+    if (!isDesktopLayout || initialPathname === desktopContactsPath) {
       return;
     }
 
     void navigate({
       to: desktopContactsPath,
-      hash: hash || undefined,
+      hash: initialHashRef.current || undefined,
       replace: true,
     });
-  }, [desktopContactsPath, desktopPathMismatch, hash, navigate]);
+    // 仅在挂载时纠正一次 legacy 路径，挂载后 router 状态更新会触发重渲染
+    // 但此时 pathname 可能已经在向其他 tab 过渡，不应回弹到 /tabs/contacts。
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
@@ -359,16 +362,19 @@ export function ContactsPage() {
         return;
       }
 
-      navigate({
-        to: isDesktopLayout
-          ? buildDesktopChatThreadPath({
-              conversationId: conversation.id,
-            })
-          : "/chat/$conversationId",
-        params: isDesktopLayout
-          ? undefined
-          : { conversationId: conversation.id },
-      });
+      if (isDesktopLayout) {
+        void navigate({
+          to: "/tabs/chat",
+          hash: buildDesktopChatRouteHash({
+            conversationId: conversation.id,
+          }),
+        });
+      } else {
+        void navigate({
+          to: "/chat/$conversationId",
+          params: { conversationId: conversation.id },
+        });
+      }
     },
   });
 
@@ -2032,7 +2038,7 @@ function FriendListRow({
         "flex w-full items-center gap-3 bg-[color:var(--bg-canvas-elevated)] text-left transition-colors",
         desktop
           ? "px-4 py-3.5 hover:bg-[color:var(--surface-console)]"
-          : "px-4 py-2.5 hover:bg-[color:var(--surface-card-hover)]",
+          : "py-2.5 pl-4 pr-7 hover:bg-[color:var(--surface-card-hover)]",
         index > 0 ? "border-t border-[color:var(--border-faint)]" : undefined,
         active
           ? "border border-[rgba(7,193,96,0.16)] bg-[rgba(240,247,243,0.94)] shadow-[inset_0_0_0_1px_rgba(7,193,96,0.06)]"
@@ -2089,7 +2095,7 @@ function SectionHeader({
         "z-10 px-4 py-1.25 font-medium tracking-[0.08em] text-[color:var(--text-muted)]",
         desktop
           ? "sticky top-0 border-b border-[color:var(--border-faint)] bg-white/78 backdrop-blur-xl"
-          : "sticky top-[78px] text-[11px] bg-[rgba(247,247,247,0.94)] backdrop-blur",
+          : "text-[11px] bg-[rgba(247,247,247,0.94)]",
       )}
     >
       {title}

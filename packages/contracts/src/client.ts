@@ -37,8 +37,12 @@ import type {
   CreateCloudWorldRequest,
   ResolveWorldAccessRequest,
   ResolveWorldAccessResponse,
+  SendEmailCodeRequest,
+  SendEmailCodeResponse,
   SendPhoneCodeRequest,
   SendPhoneCodeResponse,
+  VerifyEmailCodeRequest,
+  VerifyEmailCodeResponse,
   VerifyPhoneCodeRequest,
   VerifyPhoneCodeResponse,
   WorldAccessSessionSummary,
@@ -71,6 +75,10 @@ import type {
   FavoriteRecord,
   UpsertFavoriteNoteRequest,
 } from "./favorites";
+import type {
+  SubmitCloudFeedbackRequest,
+  SubmitCloudFeedbackResponse,
+} from "./feedback";
 import type {
   FollowupRecommendationEventResult,
   MarkFollowupRecommendationFriendRequestPendingRequest,
@@ -150,9 +158,11 @@ import type {
   SystemStatus,
 } from "./system";
 import type {
+  UpdateWorldLanguageRequest,
   UpdateWorldOwnerApiKeyRequest,
   UpdateWorldOwnerRequest,
   WorldContext,
+  WorldLanguageConfig,
   WorldOwner,
 } from "./world";
 import type {
@@ -320,8 +330,8 @@ async function request<T>(
   }
 
   const response = await fetch(`${resolveCoreApiBaseUrl(baseUrl)}${path}`, {
-    headers,
     ...init,
+    headers,
   });
 
   const rawBody = await response.text();
@@ -962,12 +972,54 @@ export function sendCloudPhoneCode(
   );
 }
 
+export function submitCloudFeedback(
+  payload: SubmitCloudFeedbackRequest,
+  baseUrl?: string,
+) {
+  return requestCloudApi<SubmitCloudFeedbackResponse>(
+    "/cloud/feedback",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
 export function verifyCloudPhoneCode(
   payload: VerifyPhoneCodeRequest,
   baseUrl?: string,
 ) {
   return requestCloudApi<VerifyPhoneCodeResponse>(
     "/cloud/auth/verify-code",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
+export function sendCloudEmailCode(
+  payload: SendEmailCodeRequest,
+  baseUrl?: string,
+) {
+  return requestCloudApi<SendEmailCodeResponse>(
+    "/cloud/auth/email/send-code",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
+export function verifyCloudEmailCode(
+  payload: VerifyEmailCodeRequest,
+  baseUrl?: string,
+) {
+  return requestCloudApi<VerifyEmailCodeResponse>(
+    "/cloud/auth/email/verify-code",
     {
       method: "POST",
       body: JSON.stringify(payload),
@@ -1448,6 +1500,28 @@ export function getAvailableModels(baseUrl?: string) {
   return requestLegacyApi<AvailableModelsResponse>(
     "/config/available-models",
     undefined,
+    baseUrl,
+  );
+}
+
+export function getWorldLanguage(baseUrl?: string) {
+  return requestLegacyApi<WorldLanguageConfig>(
+    "/config/world-language",
+    undefined,
+    baseUrl,
+  );
+}
+
+export function setWorldLanguage(
+  payload: UpdateWorldLanguageRequest,
+  baseUrl?: string,
+) {
+  return requestLegacyApi<WorldLanguageConfig>(
+    "/config/world-language",
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    },
     baseUrl,
   );
 }

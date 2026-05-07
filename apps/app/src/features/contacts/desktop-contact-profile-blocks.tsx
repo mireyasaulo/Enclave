@@ -33,10 +33,10 @@ export function DesktopContactProfileShell({
   className?: string;
 }) {
   return (
-    <div className="flex h-full overflow-auto bg-[#f5f5f5]">
+    <div className="h-full overflow-auto bg-[#f5f5f5]">
       <div
         className={cn(
-          "mx-auto flex min-h-full w-full max-w-[560px] flex-col bg-[#f5f5f5] px-6 py-10",
+          "mx-auto w-full max-w-[560px] bg-[#f5f5f5] px-6 py-10",
           className,
         )}
       >

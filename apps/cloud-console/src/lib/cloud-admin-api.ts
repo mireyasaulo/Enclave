@@ -12,6 +12,7 @@ import type {
   CloudAdminSessionListQuery,
   CloudAdminSessionSummary,
   CloudComputeProviderSummary,
+  CloudFeedbackSummary,
   CloudWaitingSessionSyncTaskListQuery,
   CloudWaitingSessionSyncTaskListResponse,
   CloudWorldAlertSummary,
@@ -35,6 +36,9 @@ import type {
   IssueCloudAdminAccessTokenResponse,
   InviteRedemptionListQuery,
   InviteRedemptionListResponse,
+  ListCloudFeedbacksQuery,
+  ListCloudFeedbacksResponse,
+  UpdateCloudFeedbackStatusRequest,
   ReplayFailedCloudWaitingSessionSyncTasksResponse,
   ReplayFilteredFailedCloudWaitingSessionSyncTasksRequest,
   ReplayFilteredFailedCloudWaitingSessionSyncTasksResponse,
@@ -1319,6 +1323,31 @@ export const cloudAdminApi = {
   ) =>
     adminFetch<{ success: true }>(`/invites/redemptions/${id}/reject`, {
       method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  listFeedbacks: (query?: ListCloudFeedbacksQuery) =>
+    adminFetch<ListCloudFeedbacksResponse>(
+      `/feedback${buildQueryString({
+        query: query?.query,
+        category: query?.category,
+        priority: query?.priority,
+        status: query?.status,
+        source: query?.source,
+        page: query?.page,
+        pageSize: query?.pageSize,
+      })}`,
+    ),
+
+  getFeedback: (id: string) =>
+    adminFetch<CloudFeedbackSummary>(`/feedback/${id}`),
+
+  updateFeedbackStatus: (
+    id: string,
+    payload: UpdateCloudFeedbackStatusRequest,
+  ) =>
+    adminFetch<CloudFeedbackSummary>(`/feedback/${id}/status`, {
+      method: "PATCH",
       body: JSON.stringify(payload),
     }),
 };

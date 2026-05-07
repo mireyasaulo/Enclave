@@ -14,8 +14,10 @@ import {
   getMyCloudWorldAccessSession,
   getWorldOwner,
   resolveMyCloudWorldAccess,
+  sendCloudEmailCode,
   sendCloudPhoneCode,
   updateWorldOwner,
+  verifyCloudEmailCode,
   verifyCloudPhoneCode,
   type WorldAccessSessionSummary,
 } from "@yinjie/contracts";
@@ -162,7 +164,7 @@ function describeCloudSession(
   session?: WorldAccessSessionSummary | null,
 ) {
   if (!session) {
-    return t(msg`请先验证手机号，以解析你的云世界。`);
+    return t(msg`请先验证邮箱，以解析你的云世界。`);
   }
 
   if (session.status === "ready") {
@@ -189,6 +191,7 @@ function describeCloudButtonLabel(
   session: WorldAccessSessionSummary | null,
   isContinuing: boolean,
   ownerSyncing: boolean,
+  authMode: "login" | "register" = "login",
 ) {
   if (ownerSyncing) {
     return t(msg`连接中...`);
@@ -198,8 +201,11 @@ function describeCloudButtonLabel(
     return t(msg`解析中...`);
   }
 
+  const idleLabel =
+    authMode === "register" ? t(msg`注册并进入`) : t(msg`登录并进入`);
+
   if (!session) {
-    return t(msg`进入我的世界`);
+    return idleLabel;
   }
 
   if (session.status === "ready") {
@@ -212,7 +218,7 @@ function describeCloudButtonLabel(
       : t(msg`正在创建世界...`);
   }
 
-  return t(msg`进入我的世界`);
+  return idleLabel;
 }
 
 function mobileNoticeTone(
@@ -259,6 +265,8 @@ export function WelcomePage() {
   const [localApiBaseUrl, setLocalApiBaseUrl] = useState(resolveDefaultLocalApiBaseUrl(runtimeConfig.apiBaseUrl) ?? "");
   const [phone, setPhone] = useState(savedCloudPhone ?? runtimeConfig.cloudPhone ?? "");
   const [code, setCode] = useState("");
+  const [accountType, setAccountType] = useState<"phone" | "email">("email");
+  const [email, setEmail] = useState("");
   const [cloudAccessToken, setCloudAccessToken] = useState(
     !isCloudSessionExpired(savedCloudExpiresAt) ? savedCloudAccessToken ?? "" : "",
   );
@@ -272,6 +280,12 @@ export function WelcomePage() {
   const [ownerError, setOwnerError] = useState("");
   const [isContinuing, setIsContinuing] = useState(false);
   const [inviteCode, setInviteCode] = useState(readStoredInviteCode());
+  const [authMode, setAuthMode] = useState<"login" | "register">(() =>
+    readStoredInviteCode() ? "register" : "login",
+  );
+  const [inviteCodeAutoFilled, setInviteCodeAutoFilled] = useState(() =>
+    Boolean(readStoredInviteCode()),
+  );
   const cloudConnectKeyRef = useRef<string | null>(null);
 
   const normalizedTypedLocalApiBaseUrl = normalizeBaseUrl(localApiBaseUrl);
@@ -323,11 +337,17 @@ export function WelcomePage() {
     const searchParams = new URLSearchParams(searchStr);
     const queryInviteCode = searchParams.get("invite");
     if (queryInviteCode) {
-      setInviteCode(persistInviteCode(queryInviteCode));
+      const normalized = persistInviteCode(queryInviteCode);
+      setInviteCode(normalized);
+      setInviteCodeAutoFilled(true);
+      // 通过邀请链接进入的用户默认走注册流程
+      setAuthMode("register");
       return;
     }
 
-    setInviteCode(readStoredInviteCode());
+    const stored = readStoredInviteCode();
+    setInviteCode(stored);
+    setInviteCodeAutoFilled(Boolean(stored));
   }, [searchStr]);
 
   useEffect(() => {
@@ -363,14 +383,19 @@ export function WelcomePage() {
           void navigate({ to: "/tabs/chat", replace: true });
         }
       })
-      .catch((error) => {
+      .catch(() => {
         if (!active) {
           return;
         }
 
         setReadyBaseUrl(null);
         if (!onboardingCompleted) {
-          setEntryError(describeRequestError(error, t(msg`无法连接到所选世界。`)));
+          setAppRuntimeConfig({
+            apiBaseUrl: undefined,
+            socketBaseUrl: undefined,
+            cloudWorldId: undefined,
+            configStatus: undefined,
+          });
         }
       })
       .finally(() => {
@@ -503,7 +528,7 @@ export function WelcomePage() {
       ),
     onSuccess: (result) => {
       setPhone(result.phone);
-      setCode("");
+      setCode("123456");
       setCloudAccessToken("");
       setCloudAccessSessionId(null);
       setConnectedAccessSessionId(null);
@@ -518,6 +543,27 @@ export function WelcomePage() {
         cloudWorldId: undefined,
         bootstrapSource: "user",
       });
+    },
+  });
+
+  const sendEmailCodeMutation = useMutation({
+    mutationFn: () =>
+      sendCloudEmailCode(
+        { email: email.trim().toLowerCase() },
+        normalizedCloudApiBaseUrl || undefined,
+      ),
+    onSuccess: (result) => {
+      setEmail(result.email);
+      setCode(result.debugCode ?? "");
+      setCloudAccessToken("");
+      setCloudAccessSessionId(null);
+      setConnectedAccessSessionId(null);
+      setNotice(
+        result.debugCode
+          ? t(msg`开发模式：验证码已打印到服务端日志。`)
+          : t(msg`验证码已发送，请查收邮箱（含垃圾邮件箱）。`),
+      );
+      setEntryError("");
     },
   });
 
@@ -578,8 +624,12 @@ export function WelcomePage() {
   }
 
   async function continueWithCloudWorld() {
-    if (!phone.trim()) {
+    if (accountType === "phone" && !phone.trim()) {
       setEntryError(t(msg`请输入手机号。`));
+      return;
+    }
+    if (accountType === "email" && !email.trim()) {
+      setEntryError(t(msg`请输入邮箱。`));
       return;
     }
 
@@ -597,26 +647,51 @@ export function WelcomePage() {
       let verifiedPhone = phone.trim();
 
       if (!accessToken) {
-        const verifyResult = await verifyCloudPhoneCode(
-          {
-            phone: phone.trim(),
-            code: code.trim(),
-            inviteCode: inviteCode || undefined,
-            deviceFingerprint: getDeviceFingerprint(),
-          },
-          normalizedCloudApiBaseUrl || undefined,
-        );
+        const inviteCodePayload =
+          authMode === "register" && inviteCode ? inviteCode : undefined;
+        if (accountType === "email") {
+          const verifyResult = await verifyCloudEmailCode(
+            {
+              email: email.trim().toLowerCase(),
+              code: code.trim(),
+              inviteCode: inviteCodePayload,
+              deviceFingerprint: getDeviceFingerprint(),
+            },
+            normalizedCloudApiBaseUrl || undefined,
+          );
 
-        accessToken = verifyResult.accessToken;
-        verifiedPhone = verifyResult.phone;
-        setPhone(verifyResult.phone);
-        setCloudAccessToken(verifyResult.accessToken);
-        saveCloudSession({
-          accessToken: verifyResult.accessToken,
-          expiresAt: verifyResult.expiresAt,
-          phone: verifyResult.phone,
-          profile: null,
-        });
+          accessToken = verifyResult.accessToken;
+          verifiedPhone = "";
+          setEmail(verifyResult.email);
+          setCloudAccessToken(verifyResult.accessToken);
+          saveCloudSession({
+            accessToken: verifyResult.accessToken,
+            expiresAt: verifyResult.expiresAt,
+            phone: null,
+            profile: null,
+          });
+        } else {
+          const verifyResult = await verifyCloudPhoneCode(
+            {
+              phone: phone.trim(),
+              code: code.trim(),
+              inviteCode: inviteCodePayload,
+              deviceFingerprint: getDeviceFingerprint(),
+            },
+            normalizedCloudApiBaseUrl || undefined,
+          );
+
+          accessToken = verifyResult.accessToken;
+          verifiedPhone = verifyResult.phone;
+          setPhone(verifyResult.phone);
+          setCloudAccessToken(verifyResult.accessToken);
+          saveCloudSession({
+            accessToken: verifyResult.accessToken,
+            expiresAt: verifyResult.expiresAt,
+            phone: verifyResult.phone,
+            profile: null,
+          });
+        }
       }
 
       const session = await resolveMyCloudWorldAccess(
@@ -726,23 +801,79 @@ export function WelcomePage() {
     if (mode === "cloud") {
       return (
         <div className="space-y-4">
-          <label className="block space-y-2">
-            <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
-              {t(msg`手机号`)}
-            </span>
-            <TextField
-              value={phone}
-              onChange={(event) => {
-                setPhone(event.target.value);
-                setCode("");
-                setCloudAccessToken("");
-                setCloudAccessSessionId(null);
-                setConnectedAccessSessionId(null);
+          <div className="flex rounded-2xl bg-[#f5f5f5] p-1">
+            <Button
+              type="button"
+              variant={authMode === "login" ? "primary" : "ghost"}
+              onClick={() => {
+                setAuthMode("login");
                 setEntryError("");
               }}
-              placeholder={t(msg`请输入手机号`)}
-            />
-          </label>
+              size="md"
+              className={`flex-1 rounded-xl shadow-none ${
+                authMode === "login"
+                  ? "bg-white text-[color:var(--text-primary)] hover:bg-white"
+                  : "bg-transparent hover:bg-transparent"
+              }`}
+            >
+              {t(msg`登录`)}
+            </Button>
+            <Button
+              type="button"
+              variant={authMode === "register" ? "primary" : "ghost"}
+              onClick={() => {
+                setAuthMode("register");
+                setEntryError("");
+              }}
+              size="md"
+              className={`flex-1 rounded-xl shadow-none ${
+                authMode === "register"
+                  ? "bg-white text-[color:var(--text-primary)] hover:bg-white"
+                  : "bg-transparent hover:bg-transparent"
+              }`}
+            >
+              {t(msg`注册`)}
+            </Button>
+          </div>
+
+          {accountType === "phone" ? (
+            <label className="block space-y-2">
+              <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+                {t(msg`手机号`)}
+              </span>
+              <TextField
+                value={phone}
+                onChange={(event) => {
+                  setPhone(event.target.value);
+                  setCode("");
+                  setCloudAccessToken("");
+                  setCloudAccessSessionId(null);
+                  setConnectedAccessSessionId(null);
+                  setEntryError("");
+                }}
+                placeholder={t(msg`请输入手机号`)}
+              />
+            </label>
+          ) : (
+            <label className="block space-y-2">
+              <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+                {t(msg`邮箱`)}
+              </span>
+              <TextField
+                type="email"
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  setCode("");
+                  setCloudAccessToken("");
+                  setCloudAccessSessionId(null);
+                  setConnectedAccessSessionId(null);
+                  setEntryError("");
+                }}
+                placeholder={t(msg`you@example.com`)}
+              />
+            </label>
+          )}
 
           <div className="space-y-2">
             <span className="block text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
@@ -756,22 +887,64 @@ export function WelcomePage() {
                     setCode(event.target.value);
                     setEntryError("");
                   }}
-                  placeholder={t(msg`请输入验证码（默认 123456 即可通过）`)}
+                  placeholder={
+                    accountType === "phone"
+                      ? t(msg`请输入验证码（默认 123456 即可通过）`)
+                      : t(msg`请输入邮箱收到的 6 位验证码`)
+                  }
                 />
               </div>
               <Button
-                onClick={() => sendCodeMutation.mutate()}
-                disabled={!phone.trim() || sendCodeMutation.isPending}
+                onClick={() =>
+                  accountType === "phone"
+                    ? sendCodeMutation.mutate()
+                    : sendEmailCodeMutation.mutate()
+                }
+                disabled={
+                  accountType === "phone"
+                    ? !phone.trim() || sendCodeMutation.isPending
+                    : !email.trim() || sendEmailCodeMutation.isPending
+                }
                 variant="secondary"
                 size="lg"
                 className="shrink-0 rounded-2xl border-black/5 bg-[#f5f5f5] px-5 shadow-none hover:border-[rgba(7,193,96,0.16)] hover:bg-white"
               >
-                {sendCodeMutation.isPending
+                {(
+                  accountType === "phone"
+                    ? sendCodeMutation.isPending
+                    : sendEmailCodeMutation.isPending
+                )
                   ? t(msg`发送中...`)
                   : t(msg`发送验证码`)}
               </Button>
             </div>
           </div>
+
+          {authMode === "register" ? (
+            <label className="block space-y-2">
+              <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+                {t(msg`邀请码（选填）`)}
+              </span>
+              <TextField
+                value={inviteCode}
+                onChange={(event) => {
+                  const next = event.target.value
+                    .trim()
+                    .toUpperCase();
+                  setInviteCode(next);
+                  persistInviteCode(next);
+                  setInviteCodeAutoFilled(false);
+                  setEntryError("");
+                }}
+                placeholder={t(msg`填写邀请人给你的 6 位邀请码`)}
+              />
+              {inviteCodeAutoFilled && inviteCode ? (
+                <span className="text-xs text-[color:var(--text-muted)]">
+                  {t(msg`已通过邀请链接自动填入，可手动修改。`)}
+                </span>
+              ) : null}
+            </label>
+          ) : null}
 
           {cloudAccessSessionQuery.isLoading ? (
             isDesktopLayout ? (
@@ -784,7 +957,7 @@ export function WelcomePage() {
                 badge={t(msg`云世界`)}
                 title={t(msg`正在解析你的世界`)}
                 description={t(
-                  msg`我们正在判断是为这个手机号创建新世界，还是唤醒它已拥有的世界。`,
+                  msg`我们正在判断是为这个邮箱创建新世界，还是唤醒它已拥有的世界。`,
                 )}
               />
             )
@@ -830,6 +1003,7 @@ export function WelcomePage() {
               currentCloudSession,
               isContinuing,
               ownerSyncing,
+              authMode,
             )}
           </Button>
         </div>
@@ -970,7 +1144,7 @@ export function WelcomePage() {
             </div>
             <div className="mt-2 text-xs leading-6 text-[color:var(--text-secondary)]">
               {t(
-                msg`通过手机号登录。新用户会获得一个全新的世界，老用户会唤醒自己已有的世界。`,
+                msg`通过邮箱登录。新用户会获得一个全新的世界，老用户会唤醒自己已有的世界。`,
               )}
             </div>
           </button>

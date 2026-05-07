@@ -1,18 +1,22 @@
 import { useState } from "react";
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
 import { useMutation } from "@tanstack/react-query";
 import type { CharacterBlueprintRecipe } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Button } from "@yinjie/ui";
 import { wikiApi } from "../lib/wiki-api";
 
-const SCENES: Array<{ key: string; label: string }> = [
-  { key: "chat", label: "聊天" },
-  { key: "greeting", label: "问候" },
-  { key: "proactive", label: "主动触达" },
-  { key: "moments_post", label: "朋友圈" },
-  { key: "moments_comment", label: "朋友圈评论" },
-  { key: "feed_post", label: "广场发帖" },
-  { key: "feed_comment", label: "广场评论" },
-  { key: "channel_post", label: "视频号" },
+const SCENES: Array<{ key: string; label: MessageDescriptor }> = [
+  { key: "chat", label: msg`聊天` },
+  { key: "greeting", label: msg`问候` },
+  { key: "proactive", label: msg`主动触达` },
+  { key: "moments_post", label: msg`朋友圈` },
+  { key: "moments_comment", label: msg`朋友圈评论` },
+  { key: "feed_post", label: msg`广场发帖` },
+  { key: "feed_comment", label: msg`广场评论` },
+  { key: "channel_post", label: msg`视频号` },
 ];
 
 /**
@@ -30,6 +34,7 @@ export function ScenePromptPreview({
   recipe: CharacterBlueprintRecipe;
   baselineRecipe?: CharacterBlueprintRecipe | null;
 }) {
+  const t = translateRuntimeMessage;
   const [scene, setScene] = useState<string>("chat");
   const previewMut = useMutation({
     mutationFn: (input: { recipe: CharacterBlueprintRecipe; scene: string }) =>
@@ -50,7 +55,9 @@ export function ScenePromptPreview({
   return (
     <div className="rounded border border-[var(--border-subtle)] p-3 space-y-2">
       <div className="flex items-center gap-2">
-        <strong className="text-sm">Prompt 预览</strong>
+        <strong className="text-sm">
+          <Trans>Prompt 预览</Trans>
+        </strong>
         <select
           className="border rounded px-2 py-1 text-xs bg-white"
           value={scene}
@@ -58,7 +65,7 @@ export function ScenePromptPreview({
         >
           {SCENES.map((s) => (
             <option key={s.key} value={s.key}>
-              {s.label}
+              {t(s.label)}
             </option>
           ))}
         </select>
@@ -68,25 +75,31 @@ export function ScenePromptPreview({
           onClick={runBoth}
           disabled={previewMut.isPending || baselineMut.isPending}
         >
-          {previewMut.isPending ? "渲染中..." : "渲染"}
+          {previewMut.isPending ? t(msg`渲染中...`) : t(msg`渲染`)}
         </Button>
       </div>
       <p className="text-xs text-[var(--text-muted)]">
-        实时把当前编辑器中的 recipe 渲染成 AI 看到的 system prompt，避免误改。
+        <Trans>
+          实时把当前编辑器中的 recipe 渲染成 AI 看到的 system prompt，避免误改。
+        </Trans>
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {baselineRecipe && (
           <div>
-            <div className="text-xs text-[var(--text-muted)] mb-1">改前（baseline）</div>
+            <div className="text-xs text-[var(--text-muted)] mb-1">
+              <Trans>改前（baseline）</Trans>
+            </div>
             <pre className="bg-[rgba(0,0,0,0.04)] p-2 rounded text-xs whitespace-pre-wrap break-words max-h-72 overflow-auto">
-              {baselineMut.data?.prompt ?? "（点击渲染）"}
+              {baselineMut.data?.prompt ?? t(msg`（点击渲染）`)}
             </pre>
           </div>
         )}
         <div>
-          <div className="text-xs text-[var(--text-muted)] mb-1">改后（当前编辑）</div>
+          <div className="text-xs text-[var(--text-muted)] mb-1">
+            <Trans>改后（当前编辑）</Trans>
+          </div>
           <pre className="bg-[rgba(0,0,0,0.04)] p-2 rounded text-xs whitespace-pre-wrap break-words max-h-72 overflow-auto">
-            {previewMut.data?.prompt ?? "（点击渲染）"}
+            {previewMut.data?.prompt ?? t(msg`（点击渲染）`)}
           </pre>
         </div>
       </div>

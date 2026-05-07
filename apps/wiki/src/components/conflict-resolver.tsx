@@ -1,16 +1,20 @@
 import { useMemo, useState } from "react";
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Button, Card } from "@yinjie/ui";
 import type { WikiContentSnapshot } from "../lib/wiki-api";
 
-const FIELD_LABELS: Record<keyof WikiContentSnapshot, string> = {
-  name: "名称",
-  avatar: "头像",
-  bio: "简介",
-  personality: "性格",
-  expertDomains: "专长领域",
-  triggerScenes: "触发场景",
-  relationship: "关系描述",
-  relationshipType: "关系类型",
+const FIELD_LABELS: Record<keyof WikiContentSnapshot, MessageDescriptor> = {
+  name: msg`名称`,
+  avatar: msg`头像`,
+  bio: msg`简介`,
+  personality: msg`性格`,
+  expertDomains: msg`专长领域`,
+  triggerScenes: msg`触发场景`,
+  relationship: msg`关系描述`,
+  relationshipType: msg`关系类型`,
 };
 
 type Side = "server" | "mine";
@@ -36,6 +40,7 @@ export function ConflictResolver({
   onResolve: (merged: WikiContentSnapshot) => void;
   onCancel: () => void;
 }) {
+  const t = translateRuntimeMessage;
   const fields = useMemo(
     () =>
       (Object.keys(serverCurrent) as (keyof WikiContentSnapshot)[]).filter(
@@ -66,8 +71,12 @@ export function ConflictResolver({
   return (
     <Card className="p-4 border-[var(--border-danger)] bg-[rgba(255,251,235,0.7)] space-y-3">
       <div className="text-sm">
-        <strong className="text-[var(--state-danger-text)]">编辑冲突</strong>
-        ：服务器上的版本已被其他人修改了你也改过的字段。逐字段选择保留哪个版本后重新提交。
+        <strong className="text-[var(--state-danger-text)]">
+          <Trans>编辑冲突</Trans>
+        </strong>
+        <Trans>
+          ：服务器上的版本已被其他人修改了你也改过的字段。逐字段选择保留哪个版本后重新提交。
+        </Trans>
       </div>
       <div className="space-y-2">
         {fields.map((f) => (
@@ -76,7 +85,7 @@ export function ConflictResolver({
             className="grid grid-cols-[7rem_1fr_1fr] gap-2 text-xs items-start"
           >
             <div className="font-medium text-[var(--text-muted)] pt-2">
-              {FIELD_LABELS[f] ?? f}
+              {FIELD_LABELS[f] ? t(FIELD_LABELS[f]) : f}
             </div>
             <button
               type="button"
@@ -88,7 +97,7 @@ export function ConflictResolver({
               }`}
             >
               <div className="text-[10px] uppercase text-[var(--text-muted)] mb-1">
-                服务器当前
+                <Trans>服务器当前</Trans>
               </div>
               {fmt(serverCurrent[f])}
             </button>
@@ -102,7 +111,7 @@ export function ConflictResolver({
               }`}
             >
               <div className="text-[10px] uppercase text-[var(--text-muted)] mb-1">
-                我的修改
+                <Trans>我的修改</Trans>
               </div>
               {fmt(mine[f])}
             </button>
@@ -111,10 +120,10 @@ export function ConflictResolver({
       </div>
       <div className="flex gap-2">
         <Button variant="primary" onClick={commit}>
-          应用所选并重新提交
+          <Trans>应用所选并重新提交</Trans>
         </Button>
         <Button variant="ghost" onClick={onCancel}>
-          取消
+          <Trans>取消</Trans>
         </Button>
       </div>
     </Card>

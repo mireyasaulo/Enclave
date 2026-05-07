@@ -140,7 +140,7 @@ export function DesktopGamesWorkspace({
     "shadow-[inset_3px_0_0_0_var(--brand-primary),0_10px_24px_rgba(15,23,42,0.05)]";
 
   return (
-    <div className="flex h-full min-h-0 bg-[color:var(--bg-app)]">
+    <div className="relative flex h-full min-h-0 bg-[color:var(--bg-app)]">
       <aside className="flex w-[284px] shrink-0 flex-col border-r border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.88)]">
         <div className="border-b border-[color:var(--border-faint)] bg-white/78 px-5 py-5 backdrop-blur-xl">
           <div className="text-[11px] font-medium text-[color:var(--text-muted)]">
@@ -148,9 +148,6 @@ export function DesktopGamesWorkspace({
           </div>
           <div className="mt-2 text-[22px] font-semibold text-[color:var(--text-primary)]">
             游戏中心
-          </div>
-          <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-            按微信桌面端频道工作区的逻辑组织推荐、最近玩过、固定常玩和活动位。
           </div>
         </div>
 
@@ -273,14 +270,8 @@ export function DesktopGamesWorkspace({
         <div className="border-b border-[color:var(--border-faint)] bg-white/78 px-6 py-5 backdrop-blur-xl">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <div className="text-[11px] font-medium text-[color:var(--text-muted)]">
-                微信式桌面节奏
-              </div>
-              <div className="mt-1 text-[20px] font-semibold text-[color:var(--text-primary)]">
-                最近玩过、固定常玩、推荐位和活动位都放进一个工作区
-              </div>
-              <div className="mt-1 text-[12px] leading-6 text-[color:var(--text-muted)]">
-                首版先不做小游戏运行容器，点击开始游戏会先记录使用状态并回到内容工作区。
+              <div className="text-[20px] font-semibold text-[color:var(--text-primary)]">
+                游戏中心
               </div>
             </div>
             {successNotice ? (
@@ -734,27 +725,20 @@ export function DesktopGamesWorkspace({
                 </div>
               </section>
 
-              <section className="rounded-[22px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-card)]">
-                <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
-                  <Gamepad2
-                    size={16}
-                    className="text-[color:var(--brand-secondary)]"
-                  />
-                  首版说明
-                </div>
-                <div className="mt-3 space-y-3 text-xs leading-6 text-[color:var(--text-secondary)]">
-                  <div>
-                    点击“开始游戏”会先写入最近玩过和固定常玩状态，确保桌面与移动端入口节奏先成立。
-                  </div>
-                  <div>
-                    后续再补小游戏运行容器、好友组局邀请和真实活动编排，避免这次直接把范围做成平台级工程。
-                  </div>
-                </div>
-              </section>
             </div>
           </div>
         </div>
       </section>
+      <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[3px]">
+        <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-8 py-6 text-center shadow-[var(--shadow-card)]">
+          <div className="text-lg font-semibold text-[color:var(--text-primary)]">
+            功能开发中
+          </div>
+          <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
+            敬请期待
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

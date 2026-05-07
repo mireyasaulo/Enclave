@@ -168,6 +168,10 @@ export class MomentsService implements OnModuleInit {
   async addOwnerComment(
     postId: string,
     text: string,
+    replyTo?: {
+      replyToCommentId?: string | null;
+      replyToAuthorId?: string | null;
+    },
   ): Promise<MomentCommentEntity> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     await this.assertOwnerCanInteractWithPost(postId);
@@ -178,6 +182,7 @@ export class MomentsService implements OnModuleInit {
       owner.avatar ?? '',
       text,
       'user',
+      replyTo,
     );
   }
 
@@ -200,7 +205,17 @@ export class MomentsService implements OnModuleInit {
     authorAvatar: string,
     text: string,
     authorType = 'user',
+    replyTo?: {
+      replyToCommentId?: string | null;
+      replyToAuthorId?: string | null;
+    },
   ): Promise<MomentCommentEntity> {
+    const replyToCommentId = replyTo?.replyToCommentId?.trim() || null;
+    let replyToAuthorId = replyTo?.replyToAuthorId?.trim() || null;
+    if (replyToCommentId && !replyToAuthorId) {
+      const target = await this.commentRepo.findOneBy({ id: replyToCommentId });
+      replyToAuthorId = target?.authorId ?? null;
+    }
     const comment = this.commentRepo.create({
       postId,
       authorId,
@@ -208,12 +223,19 @@ export class MomentsService implements OnModuleInit {
       authorAvatar,
       authorType,
       text,
+      replyToCommentId,
+      replyToAuthorId,
     });
     const saved = await this.commentRepo.save(comment);
     await this.postRepo.increment({ id: postId }, 'commentCount', 1);
     // Schedule AI replies to user comment
     if (authorType === 'user') {
-      void this.scheduleAiCommentReplies(postId, authorName, text);
+      void this.scheduleAiCommentReplies(postId, {
+        commentId: saved.id,
+        authorId,
+        authorName,
+        text,
+      });
     }
     return saved;
   }
@@ -510,8 +532,12 @@ export class MomentsService implements OnModuleInit {
 
   private async scheduleAiCommentReplies(
     postId: string,
-    commenterName: string,
-    commentText: string,
+    sourceComment: {
+      commentId: string;
+      authorId: string;
+      authorName: string;
+      text: string;
+    },
   ) {
     const post = await this.postRepo.findOneBy({ id: postId });
     if (!post || post.authorType !== 'character') return;
@@ -535,7 +561,7 @@ export class MomentsService implements OnModuleInit {
           const reply = await this.ai.generateReply({
             profile,
             conversationHistory: [],
-            userMessage: `${commenterName}在你的朋友圈评论了："${commentText}"，你的朋友圈内容是：${observation.summary}，回复一下，不超过20字。`,
+            userMessage: `${sourceComment.authorName}在你的朋友圈评论了："${sourceComment.text}"，你的朋友圈内容是：${observation.summary}，回复一下，不超过20字。`,
             userMessageParts: observation.parts,
             usageContext: {
               surface: 'app',
@@ -554,6 +580,10 @@ export class MomentsService implements OnModuleInit {
             char.avatar,
             reply.text,
             'character',
+            {
+              replyToCommentId: sourceComment.commentId,
+              replyToAuthorId: sourceComment.authorId,
+            },
           );
         } catch {
           // ignore

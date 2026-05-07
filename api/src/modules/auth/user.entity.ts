@@ -8,8 +8,14 @@ export class UserEntity {
   @Column({ unique: true })
   username: string;
 
-  @Column()
-  passwordHash: string;
+  @Column({ type: 'text', nullable: true, unique: true })
+  email: string | null;
+
+  @Column({ type: 'datetime', nullable: true })
+  emailVerifiedAt: Date | null;
+
+  @Column({ type: 'text', nullable: true })
+  passwordHash: string | null;
 
   @Column({ default: false })
   onboardingCompleted: boolean;

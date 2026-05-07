@@ -77,6 +77,12 @@ export function FriendMomentsPage() {
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>(
     {},
   );
+  const [desktopReplyTarget, setDesktopReplyTarget] = useState<{
+    authorId: string;
+    authorName: string;
+    commentId: string;
+    postId: string;
+  } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [notice, setNotice] = useState("");
   const [favoriteSourceIds, setFavoriteSourceIds] = useState<string[]>([]);
@@ -145,16 +151,26 @@ export function FriendMomentsPage() {
         throw new Error("请先输入评论内容。");
       }
 
+      const replyTo =
+        desktopReplyTarget && desktopReplyTarget.postId === momentId
+          ? desktopReplyTarget
+          : null;
+
       return addMomentComment(
         momentId,
         {
           text,
+          replyToCommentId: replyTo?.commentId,
+          replyToAuthorId: replyTo?.authorId,
         },
         baseUrl,
       );
     },
     onSuccess: async (_, momentId) => {
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
+      setDesktopReplyTarget((current) =>
+        current?.postId === momentId ? null : current,
+      );
       setNotice("朋友圈互动已更新。");
       await queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
@@ -489,7 +505,7 @@ export function FriendMomentsPage() {
         ownerAvatar={ownerAvatar}
         ownerId={ownerId}
         ownerUsername={ownerUsername}
-        routeSelectedMomentId={routeSelectedMomentId}
+        scrollToMomentId={routeSelectedMomentId}
         showCompose={showCompose}
         signature={signature}
         successNotice={notice}
@@ -498,8 +514,10 @@ export function FriendMomentsPage() {
         isMomentFavorite={(momentId) =>
           favoriteSourceIds.includes(`moment-${momentId}`)
         }
+        commentReplyTarget={desktopReplyTarget}
         setShowCompose={setShowCompose}
         onBack={handleBack}
+        onCancelCommentReply={() => setDesktopReplyTarget(null)}
         onCommentChange={(momentId, value) =>
           setCommentDrafts((current) => ({
             ...current,
@@ -507,6 +525,14 @@ export function FriendMomentsPage() {
           }))
         }
         onCommentSubmit={(momentId) => commentMutation.mutate(momentId)}
+        onStartCommentReply={({ momentId, comment }) =>
+          setDesktopReplyTarget({
+            authorId: comment.authorId,
+            authorName: comment.authorName,
+            commentId: comment.id,
+            postId: momentId,
+          })
+        }
         onCreate={() => createMutation.mutate()}
         onImageFilesSelected={(files) => {
           void handleImageFilesSelected(files);
@@ -532,26 +558,6 @@ export function FriendMomentsPage() {
               characterId,
               showWorldCharacters: !friendItem,
             }),
-          });
-        }}
-        onRouteStateChange={(state) => {
-          const nextHash = buildDesktopFriendMomentsRouteHash({
-            ...state,
-            source: routeState.source,
-            returnPath: routeState.returnPath,
-            returnHash: routeState.returnHash,
-          });
-          const normalizedHash = hash.startsWith("#") ? hash.slice(1) : hash;
-
-          if (normalizedHash === (nextHash ?? "")) {
-            return;
-          }
-
-          void navigate({
-            to: "/desktop/friend-moments/$characterId",
-            params: { characterId },
-            hash: nextHash,
-            replace: true,
           });
         }}
         onTextChange={composeDraft.setText}

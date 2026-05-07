@@ -24,6 +24,7 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { buildGroupRelaySummaryMessage } from "../features/mini-programs/group-relay-message";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { normalizePathname } from "../lib/normalize-pathname";
+import { searchStringToObject } from "../lib/route-search";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import {
@@ -267,7 +268,7 @@ export function MiniProgramsPage() {
 
     void navigate({
       to: "/tabs/mini-programs",
-      search: nextSearch || undefined,
+      search: searchStringToObject(nextSearch),
       replace: true,
     });
   }, [
@@ -306,7 +307,7 @@ export function MiniProgramsPage() {
 
     void navigate({
       to: pathname,
-      search: nextSearch || undefined,
+      search: searchStringToObject(nextSearch),
       replace: true,
     });
   }, [

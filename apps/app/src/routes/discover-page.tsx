@@ -10,11 +10,13 @@ import {
   likeFeedPost,
   shake,
   triggerSceneFriendRequest,
+  type FeedListResponse,
 } from "@yinjie/contracts";
 import {
   Blocks,
   ChevronRight,
   Gamepad2,
+  Heart,
   ImagePlus,
   Newspaper,
   PlaySquare,
@@ -59,6 +61,7 @@ import { buildMobileMiniProgramsRouteSearch } from "../features/mini-programs/mo
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { formatTimestamp } from "../lib/format";
 import { normalizePathname } from "../lib/normalize-pathname";
+import { searchStringToObject } from "../lib/route-search";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
@@ -320,6 +323,48 @@ export function DiscoverPage() {
 
   const likeFeedMutation = useMutation({
     mutationFn: (postId: string) => likeFeedPost(postId, baseUrl),
+    onMutate: async (postId) => {
+      await queryClient.cancelQueries({ queryKey: ["app-feed", baseUrl] });
+      const snapshots = queryClient.getQueriesData<FeedListResponse>({
+        queryKey: ["app-feed", baseUrl],
+      });
+      snapshots.forEach(([key, data]) => {
+        if (!data?.posts) {
+          return;
+        }
+        queryClient.setQueryData<FeedListResponse>(key, {
+          ...data,
+          posts: data.posts.map((post) =>
+            post.id === postId && !post.ownerState?.hasLiked
+              ? {
+                  ...post,
+                  likeCount: post.likeCount + 1,
+                  ownerState: {
+                    ...(post.ownerState ?? {
+                      hasLiked: false,
+                      hasFavorited: false,
+                      isFollowingAuthor: false,
+                      isNotInterested: false,
+                      hasViewed: false,
+                      hasShared: false,
+                      lastViewedAt: null,
+                      watchProgressSeconds: null,
+                      completed: false,
+                    }),
+                    hasLiked: true,
+                  },
+                }
+              : post,
+          ),
+        });
+      });
+      return { snapshots };
+    },
+    onError: (_error, _postId, context) => {
+      context?.snapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+    },
     onSuccess: async () => {
       setSuccessNotice(t(msg`广场互动已更新。`));
       await queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
@@ -438,7 +483,7 @@ export function DiscoverPage() {
                   </div>
                   <div className="mt-2 text-xs leading-6 text-[color:var(--text-muted)]">
                     {t(
-                      msg`朋友圈和广场动态共用同一套发现入口，但可见范围完全不同，桌面端先把这层分界讲清楚。`,
+                      msg`朋友圈和广场动态共用同一套发现入口，但可见范围完全不同。`,
                     )}
                   </div>
                 </div>
@@ -757,10 +802,23 @@ export function DiscoverPage() {
                       onClick={() => likeFeedMutation.mutate(post.id)}
                       variant="secondary"
                       size="sm"
+                      className={
+                        post.ownerState?.hasLiked
+                          ? "border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] text-[#07c160]"
+                          : undefined
+                      }
                     >
+                      <Heart
+                        size={13}
+                        className={
+                          post.ownerState?.hasLiked ? "fill-current" : undefined
+                        }
+                      />
                       {pendingLikePostId === post.id
                         ? t(msg`处理中...`)
-                        : t(msg`点赞`)}
+                        : post.ownerState?.hasLiked
+                          ? t(msg`已赞`)
+                          : t(msg`点赞`)}
                     </Button>
                   }
                   secondary={
@@ -955,7 +1013,7 @@ function DiscoverMobileEntryRow({
         event.preventDefault();
         void navigate({
           to: item.to,
-          search: nextSearch,
+          search: searchStringToObject(nextSearch),
           hash: nextHash,
         });
       }}

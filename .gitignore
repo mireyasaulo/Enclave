@@ -47,6 +47,10 @@ data/database.sqlite
 data/database.sqlite-journal
 data/database.sqlite-wal
 data/database.sqlite-shm
+data/email-test.sqlite
+data/email-test.sqlite-journal
+data/email-test.sqlite-wal
+data/email-test.sqlite-shm
 data/chat-attachments/
 data/moments-media/
 data/self-agent-workspace/
@@ -87,6 +91,12 @@ jieshao/
 .cache/android-api/
 .artifacts/
 packages/i18n/catalogs/**/*.ts
+
+# Vite config 编译产物（tsc -b 的输出，不入仓）
+apps/*/vite.config.d.ts
+apps/*/vite.config.js
+apps/*/tsconfig.node.tsbuildinfo
+apps/*/tsconfig.app.tsbuildinfo
 
 # Runtime data
 runtime-data/

@@ -62,6 +62,7 @@ import {
 } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { normalizePathname } from "../lib/normalize-pathname";
+import { searchStringToObject } from "../lib/route-search";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import {
   isMobileWebShareSurface,
@@ -270,7 +271,7 @@ export function GamesPage() {
 
     void navigate({
       to: "/tabs/games",
-      search: nextSearch || undefined,
+      search: searchStringToObject(nextSearch),
       replace: true,
     });
   }, [
@@ -311,7 +312,7 @@ export function GamesPage() {
 
     void navigate({
       to: pathname,
-      search: nextSearch || undefined,
+      search: searchStringToObject(nextSearch),
       replace: true,
     });
   }, [
@@ -883,7 +884,11 @@ export function GamesPage() {
   }
 
   if (!selectedGame) {
-    return null;
+    return (
+      <AppPage className="space-y-0 px-0 pb-0 pt-0">
+        <MobileGamesComingSoonOverlay onBack={handleBack} />
+      </AppPage>
+    );
   }
 
   const selectedTone = getGameCenterToneStyle(selectedGame.tone);
@@ -891,6 +896,7 @@ export function GamesPage() {
 
   return (
     <AppPage className="space-y-0 px-0 pb-0 pt-0">
+      <MobileGamesComingSoonOverlay onBack={handleBack} />
       <TabPageTopBar
         title="游戏"
         subtitle="最近在玩与组局推荐"
@@ -1323,6 +1329,40 @@ export function GamesPage() {
         </AppSection>
       </div>
     </AppPage>
+  );
+}
+
+function MobileGamesComingSoonOverlay({ onBack }: { onBack: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/45 backdrop-blur-[3px]">
+      <Button
+        type="button"
+        onClick={onBack}
+        variant="ghost"
+        size="icon"
+        aria-label="返回"
+        className="absolute left-3 top-3 h-10 w-10 rounded-full bg-white/90 text-[color:var(--text-primary)] shadow-[var(--shadow-card)] active:bg-white"
+      >
+        <ArrowLeft size={18} />
+      </Button>
+      <div className="mx-6 max-w-[280px] rounded-2xl border border-[color:var(--border-faint)] bg-white/98 px-6 py-6 text-center shadow-[var(--shadow-card)]">
+        <div className="text-[17px] font-semibold text-[color:var(--text-primary)]">
+          功能开发中
+        </div>
+        <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
+          敬请期待
+        </div>
+        <Button
+          type="button"
+          onClick={onBack}
+          variant="primary"
+          size="md"
+          className="mt-5 h-10 w-full rounded-full bg-[color:var(--brand-primary)] text-white"
+        >
+          返回
+        </Button>
+      </div>
+    </div>
   );
 }
 

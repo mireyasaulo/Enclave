@@ -26,12 +26,13 @@ import {
 } from "../components/admin-workbench";
 import { adminApi } from "../lib/admin-api";
 import { resolveAdminCoreApiBaseUrl } from "../lib/core-api-base";
+import { CharactersWikiSyncSection } from "./characters-wiki-sync-section";
 import {
   compareAdminText,
   formatAdminDateTime as formatLocalizedDateTime,
 } from "../lib/format";
 
-type WorkspaceTab = "overview" | "registry";
+type WorkspaceTab = "overview" | "registry" | "wiki-sync";
 type FriendFilter = "all" | "friend" | "world";
 type StatusFilter = "all" | "online" | "offline";
 
@@ -53,6 +54,7 @@ type CharacterSummary = {
 const WORKSPACE_TABS: Array<{ key: WorkspaceTab; label: string }> = [
   { key: "overview", label: "运营总览" },
   { key: "registry", label: "角色名册" },
+  { key: "wiki-sync", label: "Wiki 同步" },
 ];
 
 export function CharactersPage() {
@@ -501,6 +503,11 @@ export function CharactersPage() {
             </div>
           </div>
         )
+      ) : workspaceTab === "wiki-sync" ? (
+        <CharactersWikiSyncSection
+          initialCharacterId={selectedCharacterId || undefined}
+          onClearInitialCharacter={() => setSelectedCharacterId("")}
+        />
       ) : (
         <div className="space-y-6">
           <Card className="bg-[color:var(--surface-console)]">
@@ -800,6 +807,13 @@ export function CharactersPage() {
                           </Button>
                         </Link>
                       </div>
+                      <Button
+                        variant="secondary"
+                        className="w-full justify-center"
+                        onClick={() => setWorkspaceTab("wiki-sync")}
+                      >
+                        从 Wiki 同步该角色
+                      </Button>
                     </div>
                   </Card>
 

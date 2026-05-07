@@ -23,6 +23,12 @@ export class MomentCommentEntity {
   @Column('text')
   text: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  replyToCommentId?: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  replyToAuthorId?: string | null;
+
   @CreateDateColumn()
   createdAt: Date;
 }

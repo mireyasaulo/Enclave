@@ -678,9 +678,6 @@ export function LiveCompanionPage() {
                 <div className="text-sm font-medium text-[color:var(--text-primary)]">
                   直播记录
                 </div>
-                <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                  当前先保留桌面本地历史，后面接真直播接口时继续沿用这块时间线。
-                </div>
               </div>
               <Button
                 type="button"

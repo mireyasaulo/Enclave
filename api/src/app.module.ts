@@ -37,6 +37,7 @@ import { CharacterEntity } from './modules/characters/character.entity';
 import { CharacterBlueprintEntity } from './modules/characters/character-blueprint.entity';
 import { CharacterBlueprintRevisionEntity } from './modules/characters/character-blueprint-revision.entity';
 import { UserEntity } from './modules/auth/user.entity';
+import { EmailVerificationSessionEntity } from './modules/auth/email-verification-session.entity';
 import { ConversationEntity } from './modules/chat/conversation.entity';
 import { MessageEntity } from './modules/chat/message.entity';
 import { SystemConfigEntity } from './modules/config/config.entity';
@@ -128,6 +129,7 @@ import {
         entities: [
           CharacterEntity,
           UserEntity,
+          EmailVerificationSessionEntity,
           ConversationEntity,
           MessageEntity,
           CharacterBlueprintEntity,

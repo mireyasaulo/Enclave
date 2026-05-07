@@ -1,7 +1,11 @@
-import { useEffect, useState } from "react";
-import { type FeedPostListItem } from "@yinjie/contracts";
-import { Button, TextField, cn } from "@yinjie/ui";
-import { Bot, Heart, MessageCircle, Star, UserRound } from "lucide-react";
+import { useMemo } from "react";
+import {
+  type FeedComment,
+  type FeedPostListItem,
+  type FeedPostWithComments,
+} from "@yinjie/contracts";
+import { Button, ErrorBlock, LoadingBlock, TextField, cn } from "@yinjie/ui";
+import { Bot, Heart, MessageCircle, Star, UserRound, X } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { MomentMediaGallery } from "../../../components/moment-media-gallery";
 import {
@@ -9,63 +13,74 @@ import {
   resolveFeedMomentContentType,
 } from "../../feed/feed-media";
 import { formatTimestamp } from "../../../lib/format";
+import { type FeedCommentReplyTarget } from "./feed-types";
 
 type DesktopFeedRowProps = {
-  active: boolean;
   commentDraft: string;
   commentLoading: boolean;
+  commentReplyTarget?: FeedCommentReplyTarget | null;
+  detailErrorMessage?: string | null;
+  detailLoading?: boolean;
+  detailPost?: FeedPostWithComments | null;
+  expanded: boolean;
   favorite: boolean;
   likeLoading: boolean;
   post: FeedPostListItem;
+  onCancelCommentReply?: () => void;
+  onCollapse: () => void;
   onCommentChange: (value: string) => void;
   onCommentSubmit: () => void;
+  onExpand: () => void;
   onLike: () => void;
-  onOpenDetail: () => void;
+  onStartCommentReply?: (comment: FeedComment) => void;
   onToggleFavorite: () => void;
 };
 
 export function DesktopFeedRow({
-  active,
   commentDraft,
   commentLoading,
+  commentReplyTarget = null,
+  detailErrorMessage = null,
+  detailLoading = false,
+  detailPost = null,
+  expanded,
   favorite,
   likeLoading,
   post,
+  onCancelCommentReply,
+  onCollapse,
   onCommentChange,
   onCommentSubmit,
+  onExpand,
   onLike,
-  onOpenDetail,
+  onStartCommentReply,
   onToggleFavorite,
 }: DesktopFeedRowProps) {
-  const [showComposer, setShowComposer] = useState(false);
-
-  useEffect(() => {
-    if (commentDraft.trim()) {
-      setShowComposer(true);
-    }
-  }, [commentDraft]);
-
-  useEffect(() => {
-    if (!commentLoading && !commentDraft.trim()) {
-      setShowComposer(false);
-    }
-  }, [commentDraft, commentLoading]);
-
-  const activeRowClassName =
-    "border-[rgba(7,193,96,0.12)] bg-white shadow-[inset_3px_0_0_0_var(--brand-primary),0_10px_24px_rgba(15,23,42,0.05)]";
   const hasText = Boolean(post.text.trim());
   const hasMedia = post.media.length > 0;
   const mediaSummaryText = hasText ? "" : getFeedSummaryText(post);
+  const previewCount = post.commentsPreview.length;
+  const hasMore = post.commentCount > previewCount;
+
+  const commentThreads = useMemo(() => {
+    if (!detailPost) {
+      return [] as Array<{ root: FeedComment; replies: FeedComment[] }>;
+    }
+    const rootComments = detailPost.comments.filter(
+      (comment) => !comment.parentCommentId,
+    );
+    return rootComments.map((root) => ({
+      root,
+      replies: detailPost.comments.filter(
+        (comment) => comment.parentCommentId === root.id,
+      ),
+    }));
+  }, [detailPost]);
 
   return (
     <article
-      onClick={onOpenDetail}
-      className={cn(
-        "cursor-pointer rounded-[16px] border px-4 py-4 transition-[border-color,background-color,box-shadow] duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
-        active
-          ? activeRowClassName
-          : "border-[color:var(--border-faint)] bg-white hover:bg-[color:var(--surface-console)] hover:shadow-[var(--shadow-section)]",
-      )}
+      id={`desktop-feed-post-${post.id}`}
+      className="rounded-[16px] border border-[color:var(--border-faint)] bg-white px-4 py-4 shadow-[var(--shadow-section)]"
     >
       <div className="flex items-start gap-3">
         <div className="shrink-0 rounded-[18px]">
@@ -120,7 +135,6 @@ export function DesktopFeedRow({
               <MomentMediaGallery
                 contentType={resolveFeedMomentContentType(post.media)}
                 media={post.media}
-                stopPropagation
               />
             </div>
           ) : null}
@@ -135,10 +149,7 @@ export function DesktopFeedRow({
               <button
                 type="button"
                 disabled={likeLoading}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onLike();
-                }}
+                onClick={onLike}
                 className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[color:var(--border-faint)] px-2.5 text-[12px] text-[color:var(--text-secondary)] transition-[background-color,color,border-color] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)] disabled:opacity-55"
               >
                 <Heart size={14} />
@@ -146,21 +157,7 @@ export function DesktopFeedRow({
               </button>
               <button
                 type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setShowComposer((current) => !current);
-                }}
-                className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[color:var(--border-faint)] px-2.5 text-[12px] text-[color:var(--text-secondary)] transition-[background-color,color,border-color] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
-              >
-                <MessageCircle size={14} />
-                评论
-              </button>
-              <button
-                type="button"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onToggleFavorite();
-                }}
+                onClick={onToggleFavorite}
                 className={cn(
                   "inline-flex h-8 items-center gap-1.5 rounded-xl border px-2.5 text-[12px] transition-[background-color,color,border-color]",
                   favorite
@@ -174,14 +171,8 @@ export function DesktopFeedRow({
             </div>
           </div>
 
-          {post.commentsPreview.length > 0 ? (
-            <div
-              className="mt-3 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3"
-              onClick={(event) => {
-                event.stopPropagation();
-                onOpenDetail();
-              }}
-            >
+          {!expanded && previewCount > 0 ? (
+            <div className="mt-3 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3">
               <div className="space-y-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
                 {post.commentsPreview.map((comment) => (
                   <div key={comment.id}>
@@ -193,13 +184,10 @@ export function DesktopFeedRow({
                   </div>
                 ))}
               </div>
-              {post.commentCount > post.commentsPreview.length ? (
+              {hasMore ? (
                 <button
                   type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onOpenDetail();
-                  }}
+                  onClick={onExpand}
                   className="mt-3 text-[12px] font-medium text-[color:var(--brand-primary)]"
                 >
                   查看全部 {post.commentCount} 条评论
@@ -208,11 +196,153 @@ export function DesktopFeedRow({
             </div>
           ) : null}
 
-          {showComposer ? (
-            <div
-              className="mt-3 flex items-center gap-2"
-              onClick={(event) => event.stopPropagation()}
-            >
+          {!expanded && previewCount === 0 && hasMore ? (
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={onExpand}
+                className="text-[12px] font-medium text-[color:var(--brand-primary)]"
+              >
+                查看全部 {post.commentCount} 条评论
+              </button>
+            </div>
+          ) : null}
+
+          {expanded ? (
+            <div className="mt-3 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-[12px] font-medium text-[color:var(--text-primary)]">
+                  <MessageCircle size={13} />
+                  评论区
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-[color:var(--text-muted)]">
+                    {post.commentCount} 条
+                  </span>
+                  <button
+                    type="button"
+                    onClick={onCollapse}
+                    aria-label="收起评论"
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)]"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              </div>
+
+              {detailLoading ? (
+                <div className="mt-3">
+                  <LoadingBlock label="正在读取完整评论..." />
+                </div>
+              ) : null}
+
+              {detailErrorMessage ? (
+                <div className="mt-3">
+                  <ErrorBlock message={detailErrorMessage} />
+                </div>
+              ) : null}
+
+              {!detailLoading && detailPost ? (
+                commentThreads.length > 0 ? (
+                  <div className="mt-3 space-y-3">
+                    {commentThreads.map(({ root, replies }) => (
+                      <div
+                        key={root.id}
+                        className="rounded-[12px] border border-[color:var(--border-faint)] bg-white px-3.5 py-3"
+                      >
+                        <CommentRow
+                          comment={root}
+                          replyToName={null}
+                          canReply={Boolean(onStartCommentReply)}
+                          active={commentReplyTarget?.commentId === root.id}
+                          onStartReply={
+                            onStartCommentReply
+                              ? () => onStartCommentReply(root)
+                              : undefined
+                          }
+                        />
+                        {replies.length > 0 ? (
+                          <div className="mt-3 space-y-2 border-l border-[color:var(--border-faint)] pl-3">
+                            {replies.map((reply) => {
+                              const replyToName =
+                                reply.replyToCommentId &&
+                                reply.replyToCommentId !== root.id
+                                  ? (replies.find(
+                                      (item) =>
+                                        item.id === reply.replyToCommentId,
+                                    )?.authorName ?? null)
+                                  : null;
+                              return (
+                                <CommentRow
+                                  key={reply.id}
+                                  comment={reply}
+                                  replyToName={replyToName}
+                                  canReply={Boolean(onStartCommentReply)}
+                                  active={
+                                    commentReplyTarget?.commentId === reply.id
+                                  }
+                                  onStartReply={
+                                    onStartCommentReply
+                                      ? () => onStartCommentReply(reply)
+                                      : undefined
+                                  }
+                                />
+                              );
+                            })}
+                          </div>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-3 rounded-[12px] border border-dashed border-[color:var(--border-faint)] bg-white px-3.5 py-3 text-[12px] text-[color:var(--text-muted)]">
+                    暂时还没有评论，你可以先说一句。
+                  </div>
+                )
+              ) : null}
+
+              {commentReplyTarget ? (
+                <div className="mt-3 flex items-center justify-between gap-2 rounded-[12px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[12px] text-[color:var(--text-secondary)]">
+                  <div className="truncate">
+                    正在回复 {commentReplyTarget.authorName}
+                  </div>
+                  {onCancelCommentReply ? (
+                    <button
+                      type="button"
+                      onClick={onCancelCommentReply}
+                      aria-label="取消回复"
+                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[color:var(--text-muted)] hover:bg-white"
+                    >
+                      <X size={12} />
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+
+              <div className="mt-3 flex items-center gap-2 border-t border-[color:var(--border-faint)] pt-3">
+                <TextField
+                  value={commentDraft}
+                  onChange={(event) => onCommentChange(event.target.value)}
+                  placeholder={
+                    commentReplyTarget
+                      ? `回复 ${commentReplyTarget.authorName}...`
+                      : "写评论..."
+                  }
+                  className="min-w-0 flex-1 rounded-xl border-[color:var(--border-faint)] bg-white px-4 py-2 text-[13px] shadow-none hover:bg-white focus:border-[rgba(7,193,96,0.18)] focus:shadow-none"
+                />
+                <Button
+                  variant="primary"
+                  size="sm"
+                  disabled={!commentDraft.trim() || commentLoading}
+                  onClick={onCommentSubmit}
+                  className="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
+                >
+                  {commentLoading ? "发送中..." : "发送"}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-3 flex items-center gap-2">
               <TextField
                 value={commentDraft}
                 onChange={(event) => onCommentChange(event.target.value)}
@@ -223,18 +353,76 @@ export function DesktopFeedRow({
                 variant="primary"
                 size="sm"
                 disabled={!commentDraft.trim() || commentLoading}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onCommentSubmit();
-                }}
+                onClick={onCommentSubmit}
                 className="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
               >
                 {commentLoading ? "发送中..." : "发送"}
               </Button>
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </article>
+  );
+}
+
+function CommentRow({
+  active,
+  canReply,
+  comment,
+  onStartReply,
+  replyToName,
+}: {
+  active: boolean;
+  canReply: boolean;
+  comment: FeedComment;
+  onStartReply?: () => void;
+  replyToName: string | null;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-[10px]",
+        active ? "bg-[rgba(7,193,96,0.06)] px-2 py-1.5" : null,
+      )}
+    >
+      <div className="flex items-center gap-2 text-[12px]">
+        <span className="font-medium text-[color:var(--text-primary)]">
+          {comment.authorName}
+        </span>
+        <span
+          className={cn(
+            "rounded-md border px-2 py-0.5 text-[10px] font-medium",
+            comment.authorType === "character"
+              ? "border-[rgba(7,193,96,0.12)] bg-[rgba(7,193,96,0.06)] text-[color:var(--brand-primary)]"
+              : "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)]",
+          )}
+        >
+          {comment.authorType === "character" ? "居民" : "世界主人"}
+        </span>
+        <span className="text-[color:var(--text-dim)]">
+          {formatTimestamp(comment.createdAt)}
+        </span>
+      </div>
+      <div className="mt-1.5 text-[13px] leading-6 text-[color:var(--text-secondary)]">
+        {replyToName ? (
+          <span className="text-[color:var(--text-muted)]">
+            回复 {replyToName}：
+          </span>
+        ) : null}
+        {comment.text}
+      </div>
+      {canReply ? (
+        <div className="mt-1 flex justify-end">
+          <button
+            type="button"
+            onClick={onStartReply}
+            className="rounded-full border border-[color:var(--border-faint)] bg-white px-2.5 py-0.5 text-[11px] text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)]"
+          >
+            回复
+          </button>
+        </div>
+      ) : null}
+    </div>
   );
 }

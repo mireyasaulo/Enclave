@@ -79,6 +79,15 @@ function getRouteMeta(pathname: string): RouteMeta {
     };
   }
 
+  if (pathname.startsWith("/feedbacks")) {
+    return {
+      eyebrow: "SaaS operations",
+      title: "Feedbacks",
+      detail:
+        "Review user-submitted desktop and web feedback, triage status, and assign handler notes.",
+    };
+  }
+
   if (pathname.startsWith("/worlds/")) {
     return {
       eyebrow: "Cloud operations",
@@ -384,6 +393,25 @@ function RootLayoutContent() {
           <NavLinkContent
             label={t("Invite Audit")}
             hint={t("Rewards and risk")}
+          />
+        </Link>
+      ),
+    },
+    {
+      key: "feedbacks",
+      label: "Feedbacks",
+      hint: "User-submitted reports",
+      content: (
+        <Link
+          to="/feedbacks"
+          className={
+            pathname.startsWith("/feedbacks") ? NAV_LINK_ACTIVE : NAV_LINK
+          }
+          aria-current={pathname.startsWith("/feedbacks") ? "page" : undefined}
+        >
+          <NavLinkContent
+            label={t("Feedbacks")}
+            hint={t("User-submitted reports")}
           />
         </Link>
       ),

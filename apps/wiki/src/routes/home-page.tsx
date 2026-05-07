@@ -1,5 +1,8 @@
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   Button,
   ErrorBlock,
@@ -12,6 +15,7 @@ import { wikiApi } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
 
 export function HomePage() {
+  const t = translateRuntimeMessage;
   const { user } = useAuth();
   const navigate = useNavigate();
   const charactersQ = useQuery({
@@ -23,31 +27,37 @@ export function HomePage() {
 
   return (
     <PageShell
-      eyebrow="角色目录"
-      title="所有角色词条"
-      description="按维基百科模式管理世界角色：任何登录用户都能创建角色、编辑画像和运行逻辑、申请删除或恢复；高风险改动进入巡查队列，通过后才发布到角色运行时。"
+      eyebrow={t(msg`角色目录`)}
+      title={t(msg`所有角色词条`)}
+      description={t(
+        msg`按维基百科模式管理世界角色：任何登录用户都能创建角色、编辑画像和运行逻辑、申请删除或恢复；高风险改动进入巡查队列，通过后才发布到角色运行时。`,
+      )}
       actions={
         user ? (
           <Button
             variant="primary"
             onClick={() => void navigate({ to: "/create" })}
           >
-            ✨ 创建角色
+            <Trans>✨ 创建角色</Trans>
           </Button>
         ) : (
           <Button
             variant="secondary"
             onClick={() => void navigate({ to: "/login" })}
           >
-            登录后参与编辑
+            <Trans>登录后参与编辑</Trans>
           </Button>
         )
       }
     >
       <div className="flex items-center gap-2 text-sm text-[color:var(--text-muted)]">
-        <span>共 {total} 个词条</span>
+        <span>
+          <Trans>共 {total} 个词条</Trans>
+        </span>
         <span className="opacity-50">·</span>
-        <span>点击进入查看 / 编辑 / 历史 / 讨论</span>
+        <span>
+          <Trans>点击进入查看 / 编辑 / 历史 / 讨论</Trans>
+        </span>
       </div>
 
       {charactersQ.isLoading && <LoadingBlock />}
@@ -55,7 +65,11 @@ export function HomePage() {
         <ErrorBlock message={(charactersQ.error as Error).message} />
       )}
       {charactersQ.data && charactersQ.data.length === 0 && (
-        <PanelEmpty message="还没有任何角色词条。登录后点右上方“创建角色”开始第一个。" />
+        <PanelEmpty
+          message={t(
+            msg`还没有任何角色词条。登录后点右上方"创建角色"开始第一个。`,
+          )}
+        />
       )}
       {charactersQ.data && charactersQ.data.length > 0 && (
         <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -81,23 +95,27 @@ export function HomePage() {
                   {c.lifecycleStatus !== "active" && (
                     <StatusPill>
                       {c.lifecycleStatus === "pending_create"
-                        ? "待创建"
+                        ? t(msg`待创建`)
                         : c.lifecycleStatus === "deleted"
-                          ? "已删除"
+                          ? t(msg`已删除`)
                           : c.lifecycleStatus}
                     </StatusPill>
                   )}
                   {c.protectionLevel !== "none" && (
                     <StatusPill>
-                      {c.protectionLevel === "semi" ? "半保护" : "完全保护"}
+                      {c.protectionLevel === "semi"
+                        ? t(msg`半保护`)
+                        : t(msg`完全保护`)}
                     </StatusPill>
                   )}
                   {c.sourceType === "wiki_contributed" && (
-                    <StatusPill>社区创建</StatusPill>
+                    <StatusPill>
+                      <Trans>社区创建</Trans>
+                    </StatusPill>
                   )}
                 </div>
                 <p className="line-clamp-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-                  {c.bio || "（暂无简介）"}
+                  {c.bio || t(msg`（暂无简介）`)}
                 </p>
               </Link>
             </li>

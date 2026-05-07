@@ -1,23 +1,27 @@
-import { type Moment } from "@yinjie/contracts";
+import { type Moment, type MomentComment } from "@yinjie/contracts";
 import { Button, LoadingBlock } from "@yinjie/ui";
 import { EmptyState } from "../../../components/empty-state";
-import { DesktopMomentRow } from "./desktop-moment-row";
+import {
+  DesktopMomentRow,
+  type MomentCommentReplyTarget,
+} from "./desktop-moment-row";
 
 type DesktopMomentsFeedProps = {
   commentDrafts: Record<string, string>;
   commentPendingMomentId: string | null;
+  commentReplyTarget?: MomentCommentReplyTarget | null;
   isLoading: boolean;
   likePendingMomentId: string | null;
   moments: Moment[];
   ownerId?: string | null;
-  selectedMomentId: string | null;
   isMomentFavorite: (momentId: string) => boolean;
+  onCancelCommentReply?: () => void;
   onCommentChange: (momentId: string, value: string) => void;
   onCommentSubmit: (momentId: string) => void;
   onLike: (momentId: string) => void;
+  onStartCommentReply?: (comment: MomentComment) => void;
   onToggleFavorite: (momentId: string) => void;
   onOpenCompose: () => void;
-  onOpenDetail: (momentId: string) => void;
   onSelectAuthor?: (input: {
     anchorElement: HTMLButtonElement;
     moment: Moment;
@@ -27,18 +31,19 @@ type DesktopMomentsFeedProps = {
 export function DesktopMomentsFeed({
   commentDrafts,
   commentPendingMomentId,
+  commentReplyTarget = null,
   isLoading,
   likePendingMomentId,
   moments,
   ownerId,
-  selectedMomentId,
   isMomentFavorite,
+  onCancelCommentReply,
   onCommentChange,
   onCommentSubmit,
   onLike,
+  onStartCommentReply,
   onToggleFavorite,
   onOpenCompose,
-  onOpenDetail,
   onSelectAuthor,
 }: DesktopMomentsFeedProps) {
   return (
@@ -55,18 +60,23 @@ export function DesktopMomentsFeed({
           {moments.map((moment) => (
             <DesktopMomentRow
               key={moment.id}
-              active={moment.id === selectedMomentId}
               commentDraft={commentDrafts[moment.id] ?? ""}
               commentLoading={commentPendingMomentId === moment.id}
+              commentReplyTarget={
+                commentReplyTarget?.postId === moment.id
+                  ? commentReplyTarget
+                  : null
+              }
               likeLoading={likePendingMomentId === moment.id}
               moment={moment}
               ownerId={ownerId}
               favorite={isMomentFavorite(moment.id)}
+              onCancelCommentReply={onCancelCommentReply}
               onCommentChange={(value) => onCommentChange(moment.id, value)}
               onCommentSubmit={() => onCommentSubmit(moment.id)}
               onLike={() => onLike(moment.id)}
+              onStartCommentReply={onStartCommentReply}
               onToggleFavorite={() => onToggleFavorite(moment.id)}
-              onOpenDetail={() => onOpenDetail(moment.id)}
               onSelectAuthor={
                 moment.authorType === "character" && onSelectAuthor
                   ? (event) =>

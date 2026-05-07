@@ -116,6 +116,7 @@ import { WikiReportController } from './controllers/wiki-report.controller';
     WikiReportService,
     AbuseFilterService,
     WikiFieldProtectionService,
+    WikiSystemUserService,
   ],
 })
 export class WikiModule {}

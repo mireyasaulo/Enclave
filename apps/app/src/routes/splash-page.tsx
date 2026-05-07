@@ -4,6 +4,7 @@ import { getMyCloudProfile, getWorldOwner } from "@yinjie/contracts";
 import { AppPage, AppSection, InlineNotice } from "@yinjie/ui";
 import { readPersistedMobileWebRoute } from "../features/shell/mobile-web-route-persistence";
 import { clearCloudRuntimeSession } from "../lib/cloud-session";
+import { persistInviteCode } from "../lib/invite-code-storage";
 import { requiresRemoteServiceConfiguration } from "../lib/runtime-config";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { isMobileWebRuntime, resolveAppRuntimeContext } from "../runtime/platform";
@@ -20,6 +21,17 @@ export function SplashPage() {
   const setCloudProfile = useCloudSessionStore((state) => state.setProfile);
 
   useEffect(() => {
+    // 通过 https://app/?invite=XXX 进来时，splash 立即 navigate 到 /welcome
+    // 会丢掉 query string，需要先把邀请码落到 localStorage，让 welcome 页能继续读到。
+    if (typeof window !== "undefined") {
+      const queryInvite = new URLSearchParams(window.location.search).get(
+        "invite",
+      );
+      if (queryInvite) {
+        persistInviteCode(queryInvite);
+      }
+    }
+
     let cancelled = false;
 
     async function continueBoot() {

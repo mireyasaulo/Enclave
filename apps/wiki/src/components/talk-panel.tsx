@@ -1,5 +1,8 @@
 import { useState } from "react";
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   Button,
   Card,
@@ -18,6 +21,7 @@ import {
 } from "../lib/wiki-api";
 
 export function TalkPanel({ characterId }: { characterId: string }) {
+  const t = translateRuntimeMessage;
   const { user } = useAuth();
   const qc = useQueryClient();
   const threadsQ = useQuery({
@@ -43,7 +47,9 @@ export function TalkPanel({ characterId }: { characterId: string }) {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <h2 className="font-medium">讨论页</h2>
+        <h2 className="font-medium">
+          <Trans>讨论页</Trans>
+        </h2>
         {user && (
           <Button
             size="sm"
@@ -51,7 +57,7 @@ export function TalkPanel({ characterId }: { characterId: string }) {
             className="ml-auto"
             onClick={() => setShowNew((v) => !v)}
           >
-            {showNew ? "取消" : "新建话题"}
+            {showNew ? t(msg`取消`) : t(msg`新建话题`)}
           </Button>
         )}
       </div>
@@ -59,7 +65,9 @@ export function TalkPanel({ characterId }: { characterId: string }) {
       {showNew && user && (
         <Card className="p-3 space-y-2">
           <label className="block text-sm">
-            <span className="block mb-1">标题</span>
+            <span className="block mb-1">
+              <Trans>标题</Trans>
+            </span>
             <TextField
               value={draft.title}
               onChange={(e) => setDraft({ ...draft, title: e.target.value })}
@@ -67,7 +75,9 @@ export function TalkPanel({ characterId }: { characterId: string }) {
             />
           </label>
           <label className="block text-sm">
-            <span className="block mb-1">正文</span>
+            <span className="block mb-1">
+              <Trans>正文</Trans>
+            </span>
             <TextAreaField
               rows={4}
               value={draft.body}
@@ -81,7 +91,7 @@ export function TalkPanel({ characterId }: { characterId: string }) {
             }
             onClick={() => newThreadMut.mutate()}
           >
-            {newThreadMut.isPending ? "发布中..." : "发布"}
+            {newThreadMut.isPending ? t(msg`发布中...`) : t(msg`发布`)}
           </Button>
           {newThreadMut.isError && (
             <ErrorBlock message={(newThreadMut.error as Error).message} />
@@ -95,7 +105,7 @@ export function TalkPanel({ characterId }: { characterId: string }) {
       )}
       {threadsQ.data?.length === 0 && (
         <Card className="p-4 text-sm text-[var(--text-muted)]">
-          还没有任何讨论。
+          <Trans>还没有任何讨论。</Trans>
         </Card>
       )}
       <ul className="space-y-2">
@@ -127,13 +137,23 @@ function ThreadCard({
     <Card className="p-3">
       <div className="flex items-center gap-2 cursor-pointer" onClick={onToggle}>
         <span className="font-medium">{thread.title}</span>
-        {thread.isLocked && <StatusPill>已锁定</StatusPill>}
-        {thread.isResolved && <StatusPill>已解决</StatusPill>}
+        {thread.isLocked && (
+          <StatusPill>
+            <Trans>已锁定</Trans>
+          </StatusPill>
+        )}
+        {thread.isResolved && (
+          <StatusPill>
+            <Trans>已解决</Trans>
+          </StatusPill>
+        )}
         <span className="text-xs text-[var(--text-muted)] ml-auto">
-          {thread.postCount} 条 · 最近{" "}
-          {thread.lastReplyAt
-            ? new Date(thread.lastReplyAt).toLocaleString()
-            : "—"}
+          <Trans>
+            {thread.postCount} 条 · 最近{" "}
+            {thread.lastReplyAt
+              ? new Date(thread.lastReplyAt).toLocaleString()
+              : "—"}
+          </Trans>
         </span>
       </div>
       {isOpen && <ThreadDetail threadId={thread.id} thread={thread} />}
@@ -148,6 +168,7 @@ function ThreadDetail({
   threadId: string;
   thread: WikiTalkThread;
 }) {
+  const t = translateRuntimeMessage;
   const { user } = useAuth();
   const qc = useQueryClient();
   const postsQ = useQuery({
@@ -195,14 +216,14 @@ function ThreadDetail({
             variant="ghost"
             onClick={() => flagsMut.mutate({ isLocked: !thread.isLocked })}
           >
-            {thread.isLocked ? "解锁" : "锁定"}
+            {thread.isLocked ? t(msg`解锁`) : t(msg`锁定`)}
           </Button>
           <Button
             size="sm"
             variant="ghost"
             onClick={() => flagsMut.mutate({ isResolved: !thread.isResolved })}
           >
-            {thread.isResolved ? "标记未解决" : "标记已解决"}
+            {thread.isResolved ? t(msg`标记未解决`) : t(msg`标记已解决`)}
           </Button>
         </div>
       )}
@@ -222,19 +243,19 @@ function ThreadDetail({
         <div className="space-y-2 pt-2">
           {replyTo && (
             <div className="text-xs text-[var(--text-muted)]">
-              回复楼中楼 · {replyTo.slice(0, 8)}…{" "}
+              <Trans>回复楼中楼 · {replyTo.slice(0, 8)}…</Trans>{" "}
               <button
                 type="button"
                 className="underline"
                 onClick={() => setReplyTo(null)}
               >
-                取消引用
+                <Trans>取消引用</Trans>
               </button>
             </div>
           )}
           <TextAreaField
             rows={3}
-            placeholder="写下你的回复"
+            placeholder={t(msg`写下你的回复`)}
             value={reply}
             onChange={(e) => setReply(e.target.value)}
           />
@@ -244,7 +265,7 @@ function ThreadDetail({
             disabled={!reply.trim() || replyMut.isPending}
             onClick={() => replyMut.mutate()}
           >
-            {replyMut.isPending ? "回复中..." : "回复"}
+            {replyMut.isPending ? t(msg`回复中...`) : t(msg`回复`)}
           </Button>
           {replyMut.isError && (
             <ErrorBlock message={(replyMut.error as Error).message} />
@@ -285,7 +306,11 @@ function PostTree({
               {post.authorId.slice(0, 8)}
             </strong>
             <span>{new Date(post.createdAt).toLocaleString()}</span>
-            {post.deletedAt && <StatusPill>已删除</StatusPill>}
+            {post.deletedAt && (
+              <StatusPill>
+                <Trans>已删除</Trans>
+              </StatusPill>
+            )}
             {!post.deletedAt && (
               <>
                 <button
@@ -293,7 +318,7 @@ function PostTree({
                   className="underline ml-auto hover:text-[var(--text-primary)]"
                   onClick={() => onReply(post.id)}
                 >
-                  回复
+                  <Trans>回复</Trans>
                 </button>
                 {canDelete(post) && (
                   <button
@@ -301,7 +326,7 @@ function PostTree({
                     className="underline hover:text-[var(--state-danger-text)]"
                     onClick={() => onDelete(post.id)}
                   >
-                    删除
+                    <Trans>删除</Trans>
                   </button>
                 )}
               </>

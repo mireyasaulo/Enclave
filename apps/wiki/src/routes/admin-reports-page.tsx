@@ -1,6 +1,10 @@
 import { useState } from "react";
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/macro";
+import { Trans } from "@lingui/react/macro";
 import { Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   Button,
   ErrorBlock,
@@ -12,6 +16,7 @@ import { wikiApi, type ModerationReport } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
 
 export function AdminReportsPage() {
+  const t = translateRuntimeMessage;
   const qc = useQueryClient();
   const [status, setStatus] = useState<"open" | "resolved" | "dismissed">(
     "open",
@@ -26,17 +31,19 @@ export function AdminReportsPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["wiki", "reports"] }),
   });
 
-  const tabs: [typeof status, string][] = [
-    ["open", "未处理"],
-    ["resolved", "已处理"],
-    ["dismissed", "已驳回"],
+  const tabs: [typeof status, MessageDescriptor][] = [
+    ["open", msg`未处理`],
+    ["resolved", msg`已处理`],
+    ["dismissed", msg`已驳回`],
   ];
 
   return (
     <PageShell
-      eyebrow="管理"
-      title="举报队列"
-      description="社区举报的内容会先进入“未处理”状态。逐条审核后选择已处理或驳回。"
+      eyebrow={t(msg`管理`)}
+      title={t(msg`举报队列`)}
+      description={t(
+        msg`社区举报的内容会先进入"未处理"状态。逐条审核后选择已处理或驳回。`,
+      )}
       actions={
         <div className="inline-flex rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-1 shadow-[var(--shadow-soft)]">
           {tabs.map(([s, label]) => (
@@ -51,7 +58,7 @@ export function AdminReportsPage() {
                   : "text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-card-hover)]"
               }`}
             >
-              {label}
+              {t(label)}
             </button>
           ))}
         </div>
@@ -62,7 +69,7 @@ export function AdminReportsPage() {
         <ErrorBlock message={(reportsQ.error as Error).message} />
       )}
       {reportsQ.data?.length === 0 && (
-        <PanelEmpty message="当前分类下暂无举报。" />
+        <PanelEmpty message={t(msg`当前分类下暂无举报。`)} />
       )}
       <ul className="space-y-2">
         {reportsQ.data?.map((r) => (
@@ -95,8 +102,10 @@ function ReportCard({
         <code className="text-xs">{report.targetId.slice(0, 12)}…</code>
         <StatusPill>{report.status}</StatusPill>
         <span className="ml-auto text-xs text-[color:var(--text-muted)]">
-          举报人 {report.ownerId.slice(0, 8)} ·{" "}
-          {new Date(report.createdAt).toLocaleString()}
+          <Trans>
+            举报人 {report.ownerId.slice(0, 8)} ·{" "}
+            {new Date(report.createdAt).toLocaleString()}
+          </Trans>
         </span>
       </div>
       <div>{report.reason}</div>
@@ -112,7 +121,7 @@ function ReportCard({
             params={{ characterId: report.targetId }}
             className="text-xs underline"
           >
-            打开词条
+            <Trans>打开词条</Trans>
           </Link>
         )}
         {report.status === "open" && (
@@ -123,7 +132,7 @@ function ReportCard({
               disabled={disabled}
               onClick={() => onDecide("resolved")}
             >
-              标记已处理
+              <Trans>标记已处理</Trans>
             </Button>
             <Button
               size="sm"
@@ -131,7 +140,7 @@ function ReportCard({
               disabled={disabled}
               onClick={() => onDecide("dismissed")}
             >
-              驳回
+              <Trans>驳回</Trans>
             </Button>
           </div>
         )}
