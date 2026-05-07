@@ -14,11 +14,11 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
   const initializedRef = useRef(false);
   const suppressNextPendingCountRef = useRef(false);
   const isAtBottomRef = useRef(true);
-  const programmaticScrollUntilRef = useRef(0);
+  const lastUserGestureAtRef = useRef(0);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
 
-  const syncBottomState = useEffectEvent(() => {
+  const syncBottomStateFromDom = useEffectEvent(() => {
     const element = ref.current;
     if (!element) {
       return;
@@ -51,11 +51,8 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
       isAtBottomRef.current = true;
       setIsAtBottom(true);
       setPendingCount(0);
-      programmaticScrollUntilRef.current =
-        performance.now() +
-        (behavior === "smooth"
-          ? PROGRAMMATIC_SCROLL_LOCK_SMOOTH_MS
-          : PROGRAMMATIC_SCROLL_LOCK_AUTO_MS);
+      // Treat the upcoming scroll events as ours, not user-driven.
+      lastUserGestureAtRef.current = 0;
     },
   );
 
@@ -69,32 +66,38 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
       return;
     }
 
-    syncBottomState();
-
-    const handleScroll = () => {
-      if (performance.now() < programmaticScrollUntilRef.current) {
-        return;
-      }
-      syncBottomState();
+    const markUserGesture = () => {
+      lastUserGestureAtRef.current = performance.now();
     };
 
-    const releaseProgrammaticLock = () => {
-      programmaticScrollUntilRef.current = 0;
+    const handleScroll = () => {
+      const now = performance.now();
+      // Only treat scroll events as authoritative when a user gesture happened
+      // recently (within USER_SCROLL_WINDOW_MS). Layout-only or programmatic
+      // scrolls do not have an associated gesture and should not flip the
+      // "at bottom" ref. Ongoing scrolls keep refreshing the window.
+      if (now - lastUserGestureAtRef.current >= USER_SCROLL_WINDOW_MS) {
+        return;
+      }
+      lastUserGestureAtRef.current = now;
+      syncBottomStateFromDom();
     };
 
     element.addEventListener("scroll", handleScroll, { passive: true });
-    element.addEventListener("wheel", releaseProgrammaticLock, {
-      passive: true,
-    });
-    element.addEventListener("touchmove", releaseProgrammaticLock, {
-      passive: true,
-    });
+    element.addEventListener("wheel", markUserGesture, { passive: true });
+    element.addEventListener("touchmove", markUserGesture, { passive: true });
+    element.addEventListener("touchstart", markUserGesture, { passive: true });
+    element.addEventListener("mousedown", markUserGesture, { passive: true });
+    element.addEventListener("keydown", markUserGesture);
     return () => {
       element.removeEventListener("scroll", handleScroll);
-      element.removeEventListener("wheel", releaseProgrammaticLock);
-      element.removeEventListener("touchmove", releaseProgrammaticLock);
+      element.removeEventListener("wheel", markUserGesture);
+      element.removeEventListener("touchmove", markUserGesture);
+      element.removeEventListener("touchstart", markUserGesture);
+      element.removeEventListener("mousedown", markUserGesture);
+      element.removeEventListener("keydown", markUserGesture);
     };
-  }, [syncBottomState]);
+  }, [syncBottomStateFromDom]);
 
   useLayoutEffect(() => {
     const previousItemCount = previousItemCountRef.current;
@@ -147,5 +150,4 @@ function isScrolledNearBottom(element: HTMLElement) {
 }
 
 const SCROLL_BOTTOM_THRESHOLD = 72;
-const PROGRAMMATIC_SCROLL_LOCK_AUTO_MS = 200;
-const PROGRAMMATIC_SCROLL_LOCK_SMOOTH_MS = 800;
+const USER_SCROLL_WINDOW_MS = 500;
