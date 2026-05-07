@@ -60,6 +60,11 @@ import {
 } from "../lib/waiting-session-sync-helpers";
 import { copyTextToClipboard } from "../lib/clipboard";
 import {
+  formatCloudConsoleAvailableAtLine,
+  formatCloudConsoleFinishedAtLine,
+  formatCloudConsoleProviderLeaseLabel,
+  formatCloudConsoleReceiptCountSummary,
+  formatCloudConsoleUpdatedAtLine,
   translateCloudConsoleText,
   useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
@@ -1483,12 +1488,20 @@ export function WaitingSessionSyncPage() {
                       </div>
 
                       <div className="mt-3 text-xs leading-6 text-sky-700/85">
-                        <div>Target: {task.targetValue}</div>
+                        <div>{t("Target")}: {task.targetValue}</div>
                         <div>
-                          Attempt: {task.attempt} / {task.maxAttempts}
+                          {t("Attempt")}: {task.attempt} / {task.maxAttempts}
                         </div>
-                        <div>Updated: {formatDateTime(task.updatedAt)}</div>
-                        <div>Last error: {task.lastError ? task.lastError : "None"}</div>
+                        <div>
+                          {formatCloudConsoleUpdatedAtLine(
+                            formatDateTime(task.updatedAt),
+                            locale,
+                          )}
+                        </div>
+                        <div>
+                          {t("Last error")}:{" "}
+                          {task.lastError ? task.lastError : t("None")}
+                        </div>
                       </div>
 
                       <div className="mt-4 flex flex-wrap gap-2">
@@ -1503,8 +1516,8 @@ export function WaitingSessionSyncPage() {
                           }
                         >
                           {highlightedReviewedTask?.id === task.id
-                            ? "Task highlighted"
-                            : "Highlight task"}
+                            ? t("Task highlighted")
+                            : t("Highlight task")}
                         </WaitingSessionSyncActionButton>
                         <WaitingSessionSyncActionAnchor
                           tone="sky"
@@ -1512,7 +1525,7 @@ export function WaitingSessionSyncPage() {
                           target="_blank"
                           rel="noreferrer"
                         >
-                          Open task permalink
+                          {t("Open task permalink")}
                         </WaitingSessionSyncActionAnchor>
                         <WaitingSessionSyncActionButton
                           tone="sky"
@@ -1526,14 +1539,14 @@ export function WaitingSessionSyncPage() {
                           }
                         >
                           {normalizedQuery === task.targetValue
-                            ? "Target focused"
-                            : "Focus target"}
+                            ? t("Target focused")
+                            : t("Focus target")}
                         </WaitingSessionSyncActionButton>
                         <WaitingSessionSyncActionButton
                           tone="sky"
                           onClick={() => void copyReviewedTask(task)}
                         >
-                          Copy task context
+                          {t("Copy task context")}
                         </WaitingSessionSyncActionButton>
                         {task.taskType === "refresh_world" ? (
                           <Link
@@ -1543,7 +1556,7 @@ export function WaitingSessionSyncPage() {
                               tone: "sky",
                             })}
                           >
-                            Open world
+                            {t("Open world")}
                           </Link>
                         ) : (
                           <WorldsPermalinkLink
@@ -1554,7 +1567,7 @@ export function WaitingSessionSyncPage() {
                               tone: "sky",
                             })}
                           >
-                            Open worlds
+                            {t("Open worlds")}
                           </WorldsPermalinkLink>
                         )}
                       </div>
@@ -1661,27 +1674,27 @@ export function WaitingSessionSyncPage() {
         {tasksQuery.error ? (
           <CloudAdminErrorBlock
             error={tasksQuery.error}
-            title="Unable to load waiting sync tasks"
+            title={t("Unable to load waiting sync tasks")}
           />
         ) : tasksQuery.isLoading ? (
           <div className="text-sm text-[color:var(--text-secondary)]">
-            Loading waiting sync tasks...
+            {t("Loading waiting sync tasks...")}
           </div>
         ) : tasks.length === 0 ? (
           <div className="text-sm text-[color:var(--text-secondary)]">
-            No tasks match this filter.
+            {t("No tasks match this filter.")}
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
+            <table className="min-w-[60rem] text-left text-sm">
               <thead className="text-[color:var(--text-muted)]">
                 <tr className="border-b border-[color:var(--border-faint)]">
-                  <th className="px-3 py-3 font-medium">Task</th>
-                  <th className="px-3 py-3 font-medium">Status</th>
-                  <th className="px-3 py-3 font-medium">Attempt</th>
-                  <th className="px-3 py-3 font-medium">Timing</th>
-                  <th className="px-3 py-3 font-medium">Last error</th>
-                  <th className="px-3 py-3 font-medium">Actions</th>
+                  <th className="px-3 py-3 font-medium">{t("Task")}</th>
+                  <th className="px-3 py-3 font-medium">{t("Status")}</th>
+                  <th className="px-3 py-3 font-medium">{t("Attempt")}</th>
+                  <th className="px-3 py-3 font-medium">{t("Timing")}</th>
+                  <th className="px-3 py-3 font-medium">{t("Last error")}</th>
+                  <th className="px-3 py-3 font-medium">{t("Actions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -1716,8 +1729,8 @@ export function WaitingSessionSyncPage() {
                           }
                         >
                           {normalizedQuery === task.context
-                            ? "Context focused"
-                            : "Focus context"}
+                            ? t("Context focused")
+                            : t("Focus context")}
                         </WaitingSessionSyncActionButton>
                         <WaitingSessionSyncActionButton
                           tone="neutral"
@@ -1731,8 +1744,8 @@ export function WaitingSessionSyncPage() {
                           }
                         >
                           {normalizedQuery === task.targetValue
-                            ? "Target focused"
-                            : "Focus target"}
+                            ? t("Target focused")
+                            : t("Focus target")}
                         </WaitingSessionSyncActionButton>
                         {task.taskType === "refresh_world" ? (
                           <Link
@@ -1764,7 +1777,10 @@ export function WaitingSessionSyncPage() {
                       <WaitingSessionSyncTaskStatusBadge status={task.status} />
                       {task.leaseOwner ? (
                         <div className="mt-2 text-xs text-[color:var(--text-muted)]">
-                          Lease {task.leaseOwner}
+                          {formatCloudConsoleProviderLeaseLabel(
+                            task.leaseOwner,
+                            locale,
+                          )}
                         </div>
                       ) : null}
                     </td>
@@ -1772,14 +1788,29 @@ export function WaitingSessionSyncPage() {
                       {task.attempt} / {task.maxAttempts}
                     </td>
                     <td className="px-3 py-4 text-xs leading-6 text-[color:var(--text-secondary)]">
-                      <div>Available: {formatDateTime(task.availableAt)}</div>
-                      <div>Updated: {formatDateTime(task.updatedAt)}</div>
+                      <div>
+                        {formatCloudConsoleAvailableAtLine(
+                          formatDateTime(task.availableAt),
+                          locale,
+                        )}
+                      </div>
+                      <div>
+                        {formatCloudConsoleUpdatedAtLine(
+                          formatDateTime(task.updatedAt),
+                          locale,
+                        )}
+                      </div>
                       {task.finishedAt ? (
-                        <div>Finished: {formatDateTime(task.finishedAt)}</div>
+                        <div>
+                          {formatCloudConsoleFinishedAtLine(
+                            formatDateTime(task.finishedAt),
+                            locale,
+                          )}
+                        </div>
                       ) : null}
                     </td>
                     <td className="px-3 py-4 text-xs leading-6 text-[color:var(--text-secondary)]">
-                      {task.lastError ? task.lastError : "None"}
+                      {task.lastError ? task.lastError : t("None")}
                     </td>
                     <td className="px-3 py-4">
                       {task.status === "failed" ? (
@@ -1790,7 +1821,7 @@ export function WaitingSessionSyncPage() {
                             disabled={replayTaskMutation.isPending}
                             onClick={() => replayTaskMutation.mutate(task)}
                           >
-                            Replay now
+                            {t("Replay now")}
                           </WaitingSessionSyncActionButton>
                           <WaitingSessionSyncActionButton
                             tone="danger"
@@ -1803,7 +1834,7 @@ export function WaitingSessionSyncPage() {
                               })
                             }
                           >
-                            Clear now
+                            {t("Clear now")}
                           </WaitingSessionSyncActionButton>
                         </div>
                       ) : (
