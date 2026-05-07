@@ -1708,7 +1708,7 @@ export function CharacterDetailPage() {
                         size={isDesktopLayout ? "md" : "sm"}
                       />
                       <span className="text-[12px] text-[color:var(--text-muted)]">
-                        {t(msg`已连续 ${friendship?.sparkStreak} 天`)}
+                        {t(msg`已连续 ${friendship?.sparkStreak ?? 0} 天`)}
                       </span>
                     </span>
                   }
