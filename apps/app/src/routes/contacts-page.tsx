@@ -429,9 +429,10 @@ export function ContactsPage() {
     () => buildContactSections(filteredFriendItems),
     [filteredFriendItems],
   );
+  const starredSectionTitle = t(msg`星标朋友`);
   const desktopFriendSections = useMemo(
-    () => buildDesktopFriendSections(filteredFriendItems),
-    [filteredFriendItems],
+    () => buildDesktopFriendSections(filteredFriendItems, starredSectionTitle),
+    [filteredFriendItems, starredSectionTitle],
   );
   const mobileIndexItems = useMemo(
     () =>
@@ -621,7 +622,7 @@ export function ContactsPage() {
       return blockCharacter(
         {
           characterId,
-          reason: "来自通讯录详情页加入黑名单",
+          reason: t(msg`来自通讯录详情页加入黑名单`),
         },
         baseUrl,
       );

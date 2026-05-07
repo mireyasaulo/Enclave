@@ -2,6 +2,7 @@ import type { Character, FriendListItem } from "@yinjie/contracts";
 
 const latinSectionOrder = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
+// i18n-ignore-start: 拼音首字母分段哨兵字符，仅用于 Intl.Collator 比较，不会展示到 UI
 const chineseSectionBoundaries = [
   { label: "A", start: "阿" },
   { label: "B", start: "芭" },
@@ -27,6 +28,7 @@ const chineseSectionBoundaries = [
   { label: "Y", start: "压" },
   { label: "Z", start: "匝" },
 ] as const;
+// i18n-ignore-end
 
 const pinyinCollator = new Intl.Collator("zh-CN-u-co-pinyin", {
   sensitivity: "base",
@@ -114,6 +116,7 @@ export function buildContactSections<TItem extends { indexLabel: string }>(
 
 export function buildDesktopFriendSections(
   items: FriendDirectoryItem[],
+  starredSectionTitle: string,
 ): ContactSection<FriendDirectoryItem>[] {
   const starredItems = items.filter((item) => item.friendship.isStarred);
   const regularSections = buildContactSections(
@@ -127,7 +130,7 @@ export function buildDesktopFriendSections(
   return [
     {
       key: "starred-friends",
-      title: "星标朋友",
+      title: starredSectionTitle,
       indexLabel: "★",
       anchorId: "contact-section-starred",
       items: starredItems,

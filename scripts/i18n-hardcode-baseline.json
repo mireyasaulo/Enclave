@@ -5,7 +5,7 @@
     "apps/app/src": {
       "rules": {
         "jsx-literal-prop": 394,
-        "object-ui-string": 256,
+        "object-ui-string": 232,
         "jsx-cjk-text": 19,
         "toast-dialog-string": 1,
         "setter-message-string": 18,
@@ -14,7 +14,7 @@
         "locale-compare-literal": 3,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 0,
-        "raw-cjk-line": 2442
+        "raw-cjk-line": 2417
       }
     },
     "apps/admin/src": {

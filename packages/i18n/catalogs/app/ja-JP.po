@@ -165,7 +165,7 @@ msgid "{0} 个"
 msgstr "{0}件"
 
 #. placeholder {0}: filteredWorldCharacterItems.length
-#: apps/app/src/routes/contacts-page.tsx:1372
+#: apps/app/src/routes/contacts-page.tsx:1373
 msgid "{0} 个世界角色"
 msgstr "世界キャラクター {0} 件"
 
@@ -212,13 +212,13 @@ msgid "{0} 人群聊 · 免打扰"
 msgstr ""
 
 #. placeholder {0}: starredFriends.length
-#: apps/app/src/routes/contacts-page.tsx:1213
+#: apps/app/src/routes/contacts-page.tsx:1214
 msgid "{0} 位常联系好友"
 msgstr "よく連絡する友だち {0} 人"
 
 #. placeholder {0}: filteredFriendItems.length
 #. placeholder {0}: group.items.length
-#: apps/app/src/routes/contacts-page.tsx:1370
+#: apps/app/src/routes/contacts-page.tsx:1371
 #: apps/app/src/routes/tags-page.tsx:309
 msgid "{0} 位联系人"
 msgstr "連絡先 {0} 人"
@@ -692,7 +692,7 @@ msgstr ""
 msgid "{fileCount} 个文件"
 msgstr "{fileCount} 件のファイル"
 
-#: apps/app/src/routes/contacts-page.tsx:1143
+#: apps/app/src/routes/contacts-page.tsx:1144
 msgid "{groupCount} 个群聊"
 msgstr "グループチャット {groupCount} 件"
 
@@ -791,7 +791,7 @@ msgstr "{ownerName} さんが連絡先に追加しようとしています。"
 msgid "{passedCheckCount} / {0} 项通过"
 msgstr ""
 
-#: apps/app/src/routes/contacts-page.tsx:1118
+#: apps/app/src/routes/contacts-page.tsx:1119
 msgid "{pendingRequestCount} 条待处理申请"
 msgstr "未処理の申請 {pendingRequestCount} 件"
 
@@ -835,7 +835,7 @@ msgstr ""
 msgid "{senderLabel}："
 msgstr "{senderLabel}:"
 
-#: apps/app/src/routes/contacts-page.tsx:1234
+#: apps/app/src/routes/contacts-page.tsx:1235
 msgid "{tagGroupCount} 个标签分组"
 msgstr "タググループ {tagGroupCount} 件"
 
@@ -1504,7 +1504,7 @@ msgstr "世界の連絡先"
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:196
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:213
 #: apps/app/src/routes/character-detail-page.tsx:251
-#: apps/app/src/routes/contacts-page.tsx:1186
+#: apps/app/src/routes/contacts-page.tsx:1187
 #: apps/app/src/routes/discover-page.tsx:276
 #: apps/app/src/routes/world-characters-page.tsx:191
 #: apps/app/src/routes/world-characters-page.tsx:324
@@ -1517,7 +1517,7 @@ msgstr "世界のキャラクター"
 msgid "世界角色动态"
 msgstr "世界キャラクターの更新"
 
-#: apps/app/src/routes/contacts-page.tsx:1439
+#: apps/app/src/routes/contacts-page.tsx:1440
 msgid "世界角色搜索结果"
 msgstr "世界キャラクターの検索結果"
 
@@ -1531,11 +1531,11 @@ msgstr "世界キャラクターの日常"
 msgid "世界角色暂时不可用"
 msgstr "世界キャラクターは一時的に利用できません"
 
-#: apps/app/src/routes/contacts-page.tsx:1440
+#: apps/app/src/routes/contacts-page.tsx:1441
 msgid "世界角色目录"
 msgstr "世界キャラクター一覧"
 
-#: apps/app/src/routes/contacts-page.tsx:1264
+#: apps/app/src/routes/contacts-page.tsx:1265
 msgid "世界角色目录暂时没有刷新成功。"
 msgstr "世界キャラクター一覧を更新できませんでした。"
 
@@ -2177,7 +2177,7 @@ msgstr ""
 msgid "保持原消息结构依次投递"
 msgstr ""
 
-#: apps/app/src/routes/contacts-page.tsx:2071
+#: apps/app/src/routes/contacts-page.tsx:2072
 msgid "保持联系"
 msgstr "連絡を保つ"
 
@@ -2266,7 +2266,7 @@ msgstr "上の入口や最近の内容からディープリンクをコピーす
 msgid "先从中间选择一条收藏"
 msgstr "まず中央からお気に入りを1件選択"
 
-#: apps/app/src/routes/contacts-page.tsx:1414
+#: apps/app/src/routes/contacts-page.tsx:1415
 msgid "先从新的朋友里建立关系，或者去看看世界角色。"
 msgstr "「新しい友だち」から関係を作るか、世界キャラクターを見てみましょう。"
 
@@ -2375,7 +2375,7 @@ msgstr "まず {0} に対処してください。"
 msgid "先处理主推荐"
 msgstr "主推奨を先に処理"
 
-#: apps/app/src/routes/contacts-page.tsx:1959
+#: apps/app/src/routes/contacts-page.tsx:1960
 msgid "先处理新的朋友，或者去浏览世界角色。"
 msgstr "まず新しい友だちを処理するか、世界キャラクターを見てみましょう。"
 
@@ -2577,7 +2577,7 @@ msgstr "すべてのチャットファイル"
 
 #: apps/app/src/features/search/mobile-search-workspace.tsx:317
 #: apps/app/src/i18n/static-dom-seed.ts:917
-#: apps/app/src/routes/contacts-page.tsx:1165
+#: apps/app/src/routes/contacts-page.tsx:1166
 #: apps/app/src/routes/desktop-mobile-page.tsx:129
 #: apps/app/src/routes/desktop-mobile-page.tsx:590
 #: apps/app/src/routes/favorites-page.tsx:70
@@ -2792,7 +2792,7 @@ msgid "关闭弹窗"
 msgstr ""
 
 #: apps/app/src/routes/chat-list-page.tsx:566
-#: apps/app/src/routes/contacts-page.tsx:1781
+#: apps/app/src/routes/contacts-page.tsx:1782
 msgid "关闭快捷菜单"
 msgstr "クイックメニューを閉じる"
 
@@ -5190,7 +5190,7 @@ msgstr "友だちがプレイ中"
 msgid "好友申请"
 msgstr ""
 
-#: apps/app/src/routes/contacts-page.tsx:1281
+#: apps/app/src/routes/contacts-page.tsx:1282
 msgid "好友申请入口暂时没有刷新成功。"
 msgstr "友だち申請入口を更新できませんでした。"
 
@@ -5202,7 +5202,7 @@ msgstr "友だち申請を送信しました。"
 msgid "好友申请待处理"
 msgstr ""
 
-#: apps/app/src/routes/contacts-page.tsx:687
+#: apps/app/src/routes/contacts-page.tsx:688
 #: apps/app/src/routes/friend-requests-page.tsx:110
 msgid "好友请求已处理。"
 msgstr "友だち申請を処理しました。"
@@ -5562,7 +5562,7 @@ msgstr "{0} に通知済み"
 msgid "已从当前设备删除这条消息。"
 msgstr "このメッセージを現在の端末から削除しました。"
 
-#: apps/app/src/routes/contacts-page.tsx:765
+#: apps/app/src/routes/contacts-page.tsx:766
 msgid "已从通讯录删除联系人。"
 msgstr "連絡先から削除しました。"
 
@@ -5640,7 +5640,7 @@ msgstr "グループメンバーのニックネーム表示をオフにしまし
 #: apps/app/src/routes/character-detail-page.tsx:599
 #: apps/app/src/routes/chat-details-page.tsx:444
 #: apps/app/src/routes/chat-list-page.tsx:337
-#: apps/app/src/routes/contacts-page.tsx:755
+#: apps/app/src/routes/contacts-page.tsx:756
 msgid "已关闭消息免打扰。"
 msgstr "チャット通知のサイレントをオフにしました。"
 
@@ -5716,7 +5716,7 @@ msgstr "ブロック済み"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:408
 #: apps/app/src/routes/character-detail-page.tsx:638
 #: apps/app/src/routes/chat-details-page.tsx:624
-#: apps/app/src/routes/contacts-page.tsx:631
+#: apps/app/src/routes/contacts-page.tsx:632
 msgid "已加入黑名单。"
 msgstr "ブロック済みにしました。"
 
@@ -5749,7 +5749,7 @@ msgstr "メッセージのお気に入りを解除しました。"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:324
 #: apps/app/src/routes/character-detail-page.tsx:557
-#: apps/app/src/routes/contacts-page.tsx:703
+#: apps/app/src/routes/contacts-page.tsx:704
 msgid "已取消星标朋友。"
 msgstr "星付きの友だちから外しました。"
 
@@ -5891,7 +5891,7 @@ msgstr "グループメンバーのニックネーム表示をオンにしまし
 #: apps/app/src/routes/character-detail-page.tsx:598
 #: apps/app/src/routes/chat-details-page.tsx:443
 #: apps/app/src/routes/chat-list-page.tsx:336
-#: apps/app/src/routes/contacts-page.tsx:754
+#: apps/app/src/routes/contacts-page.tsx:755
 msgid "已开启消息免打扰。"
 msgstr "チャット通知をサイレントにしました。"
 
@@ -6104,7 +6104,7 @@ msgid "已生成视频封面，发布后会按视频卡片展示。"
 msgstr "動画カバーを生成しました。公開後は動画カードとして表示されます。"
 
 #: apps/app/src/routes/character-detail-page.tsx:638
-#: apps/app/src/routes/contacts-page.tsx:631
+#: apps/app/src/routes/contacts-page.tsx:632
 msgid "已移出黑名单。"
 msgstr "ブロックリストから解除しました。"
 
@@ -6159,7 +6159,7 @@ msgstr "今回の完了を記録しました：{0}"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:324
 #: apps/app/src/routes/character-detail-page.tsx:557
-#: apps/app/src/routes/contacts-page.tsx:703
+#: apps/app/src/routes/contacts-page.tsx:704
 msgid "已设为星标朋友。"
 msgstr "星付きの友だちに設定しました。"
 
@@ -6298,7 +6298,7 @@ msgstr "選択済み連絡先"
 msgid "已通知"
 msgstr "通知済み"
 
-#: apps/app/src/routes/contacts-page.tsx:657
+#: apps/app/src/routes/contacts-page.tsx:658
 #: apps/app/src/routes/friend-requests-page.tsx:88
 msgid "已通过好友申请。"
 msgstr "友だち申請を承認しました。"
@@ -6991,7 +6991,7 @@ msgstr ""
 msgid "当前没有可执行顺序。"
 msgstr "現在、実行可能なシーケンスはありません。"
 
-#: apps/app/src/routes/contacts-page.tsx:1194
+#: apps/app/src/routes/contacts-page.tsx:1195
 msgid "当前没有可浏览的世界角色"
 msgstr "現在閲覧できる世界キャラクターはありません"
 
@@ -7539,7 +7539,7 @@ msgstr ""
 msgid "快节奏组队"
 msgstr "高速チームプレイ"
 
-#: apps/app/src/routes/contacts-page.tsx:1214
+#: apps/app/src/routes/contacts-page.tsx:1215
 msgid "快速查看设为星标的联系人"
 msgstr "スター付き連絡先をすばやく表示"
 
@@ -7892,7 +7892,7 @@ msgid "打开当前文档"
 msgstr "現在の文書を開く"
 
 #: apps/app/src/routes/chat-list-page.tsx:585
-#: apps/app/src/routes/contacts-page.tsx:1799
+#: apps/app/src/routes/contacts-page.tsx:1800
 msgid "打开快捷菜单"
 msgstr "クイックメニューを開く"
 
@@ -7903,7 +7903,7 @@ msgid "打开所在位置失败，请稍后再试。"
 msgstr "場所を開けませんでした。後でもう一度お試しください。"
 
 #: apps/app/src/routes/chat-list-page.tsx:661
-#: apps/app/src/routes/contacts-page.tsx:1876
+#: apps/app/src/routes/contacts-page.tsx:1877
 msgid "打开搜一搜"
 msgstr "検索を開く"
 
@@ -8413,7 +8413,7 @@ msgstr "ファイル名とファイルメッセージで絞り込み"
 msgid "按来源整理"
 msgstr "ソース別に整理"
 
-#: apps/app/src/routes/contacts-page.tsx:1235
+#: apps/app/src/routes/contacts-page.tsx:1236
 msgid "按标签整理联系人"
 msgstr "タグで連絡先を整理"
 
@@ -8455,11 +8455,11 @@ msgstr ""
 msgid "换个关键词试试，或者切到图片、文件、链接分类继续找。"
 msgstr "別のキーワードを試すか、画像・ファイル・リンクの分類に切り替えて探してください。"
 
-#: apps/app/src/routes/contacts-page.tsx:1413
+#: apps/app/src/routes/contacts-page.tsx:1414
 msgid "换个关键词试试，或者展开世界角色目录继续找人。"
 msgstr "別のキーワードを試すか、世界キャラクター一覧を展開して探しましょう。"
 
-#: apps/app/src/routes/contacts-page.tsx:1958
+#: apps/app/src/routes/contacts-page.tsx:1959
 msgid "换个关键词试试，或者继续搜索世界角色。"
 msgstr "別のキーワードを試すか、世界キャラクターを続けて検索しましょう。"
 
@@ -8670,8 +8670,8 @@ msgstr "モーメント・広場の投稿・公式アカウントを検索"
 #: apps/app/src/features/shell/desktop-nav-matching.ts:98
 #: apps/app/src/features/shell/desktop-shell.tsx:851
 #: apps/app/src/routes/chat-list-page.tsx:668
-#: apps/app/src/routes/contacts-page.tsx:1879
-#: apps/app/src/routes/contacts-page.tsx:1950
+#: apps/app/src/routes/contacts-page.tsx:1880
+#: apps/app/src/routes/contacts-page.tsx:1951
 #: apps/app/src/routes/create-group-page.tsx:419
 msgid "搜索"
 msgstr "検索"
@@ -9090,7 +9090,7 @@ msgstr "グループメンバーを折りたたむ"
 msgid "收起表情面板。"
 msgstr "スタンプパネルを閉じる。"
 
-#: apps/app/src/routes/contacts-page.tsx:1189
+#: apps/app/src/routes/contacts-page.tsx:1190
 msgid "收起角色目录"
 msgstr "キャラクター一覧を閉じる"
 
@@ -9346,7 +9346,7 @@ msgstr "新作ランキング"
 msgid "新的名称会同步显示在聊天页和群成员列表里。"
 msgstr "新しい名前はチャットページとグループメンバー一覧に同期表示されます。"
 
-#: apps/app/src/routes/contacts-page.tsx:1115
+#: apps/app/src/routes/contacts-page.tsx:1116
 #: apps/app/src/routes/friend-requests-page.tsx:186
 #: apps/app/src/routes/friend-requests-page.tsx:433
 #: apps/app/src/routes/friend-requests-page.tsx:459
@@ -9462,7 +9462,8 @@ msgstr "スター付き"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:346
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:812
-#: apps/app/src/routes/contacts-page.tsx:1210
+#: apps/app/src/routes/contacts-page.tsx:432
+#: apps/app/src/routes/contacts-page.tsx:1211
 #: apps/app/src/routes/starred-friends-page.tsx:189
 msgid "星标朋友"
 msgstr "星付きの友だち"
@@ -9503,7 +9504,7 @@ msgstr "ニックネーム"
 #: apps/app/src/features/desktop/chat/desktop-group-member-picker.tsx:245
 #: apps/app/src/routes/character-detail-page.tsx:1460
 #: apps/app/src/routes/chat-details-page.tsx:295
-#: apps/app/src/routes/contacts-page.tsx:2068
+#: apps/app/src/routes/contacts-page.tsx:2069
 #: apps/app/src/routes/create-group-page.tsx:550
 #: apps/app/src/routes/group-member-picker-page.tsx:186
 #: apps/app/src/routes/group-member-picker-page.tsx:236
@@ -10239,6 +10240,10 @@ msgstr ""
 msgid "来自聊天中的位置卡片"
 msgstr ""
 
+#: apps/app/src/routes/contacts-page.tsx:625
+msgid "来自通讯录详情页加入黑名单"
+msgstr "連絡先の詳細ページからブロック"
+
 #: apps/app/src/i18n/static-dom-seed.ts:216
 msgid "极光赛道"
 msgstr "オーロラコース"
@@ -10356,11 +10361,11 @@ msgstr "世界サービス利用規約を確認します。"
 msgid "查看世界社区规范和反馈口径。"
 msgstr "世界コミュニティガイドラインとフィードバック方針を確認します。"
 
-#: apps/app/src/routes/contacts-page.tsx:1976
+#: apps/app/src/routes/contacts-page.tsx:1977
 msgid "查看世界角色"
 msgstr "世界キャラクターを見る"
 
-#: apps/app/src/routes/contacts-page.tsx:1197
+#: apps/app/src/routes/contacts-page.tsx:1198
 msgid "查看世界角色目录"
 msgstr "世界キャラクター一覧を見る"
 
@@ -10401,7 +10406,7 @@ msgstr "すべての種類を見る"
 msgid "查看全部群成员"
 msgstr "全グループメンバーを表示"
 
-#: apps/app/src/routes/contacts-page.tsx:1143
+#: apps/app/src/routes/contacts-page.tsx:1144
 msgid "查看全部群聊"
 msgstr "すべてのグループチャットを見る"
 
@@ -10444,11 +10449,11 @@ msgid "查看图片"
 msgstr ""
 
 #: apps/app/src/routes/character-detail-page.tsx:284
-#: apps/app/src/routes/contacts-page.tsx:1119
+#: apps/app/src/routes/contacts-page.tsx:1120
 msgid "查看好友申请"
 msgstr "友だち申請を見る"
 
-#: apps/app/src/routes/contacts-page.tsx:1166
+#: apps/app/src/routes/contacts-page.tsx:1167
 msgid "查看已上线的内容账号"
 msgstr "公開中のコンテンツアカウントを見る"
 
@@ -10477,7 +10482,7 @@ msgstr "スクリーンショットのショートカットを表示 (?)"
 msgid "查看报名情况"
 msgstr "申込状況を見る"
 
-#: apps/app/src/routes/contacts-page.tsx:1286
+#: apps/app/src/routes/contacts-page.tsx:1287
 #: apps/app/src/routes/world-characters-page.tsx:221
 #: apps/app/src/routes/world-characters-page.tsx:277
 #: apps/app/src/routes/world-characters-page.tsx:309
@@ -10534,7 +10539,7 @@ msgstr ""
 msgid "查看群二维码"
 msgstr "グループQRコードを表示"
 
-#: apps/app/src/routes/contacts-page.tsx:1300
+#: apps/app/src/routes/contacts-page.tsx:1301
 msgid "查看群聊"
 msgstr "グループチャットを見る"
 
@@ -10624,7 +10629,7 @@ msgstr "注釈 {0} 件"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:256
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:660
 #: apps/app/src/routes/character-detail-page.tsx:291
-#: apps/app/src/routes/contacts-page.tsx:1231
+#: apps/app/src/routes/contacts-page.tsx:1232
 #: apps/app/src/routes/tags-page.tsx:174
 #: apps/app/src/routes/tags-page.tsx:271
 msgid "标签"
@@ -10954,7 +10959,7 @@ msgstr ""
 msgid "正在刷新这位角色的朋友圈"
 msgstr "このキャラクターのモーメントを更新中です"
 
-#: apps/app/src/routes/contacts-page.tsx:1939
+#: apps/app/src/routes/contacts-page.tsx:1940
 msgid "正在刷新通讯录"
 msgstr "連絡先を更新中"
 
@@ -11056,7 +11061,7 @@ msgstr "探しています..."
 msgid "正在打开..."
 msgstr "開いています..."
 
-#: apps/app/src/routes/contacts-page.tsx:2066
+#: apps/app/src/routes/contacts-page.tsx:2067
 msgid "正在打开会话..."
 msgstr "会話を開いています..."
 
@@ -11165,7 +11170,7 @@ msgstr "デスクトップのチャット履歴を開いています"
 msgid "正在打开桌面订阅号消息"
 msgstr "デスクトップ版の購読アカウント受信箱を開いています"
 
-#: apps/app/src/routes/contacts-page.tsx:1361
+#: apps/app/src/routes/contacts-page.tsx:1362
 msgid "正在打开桌面通讯录"
 msgstr "デスクトップ連絡先を開いています"
 
@@ -11583,7 +11588,7 @@ msgstr ""
 msgid "正在载入桌面聊天工作区，马上恢复当前群聊。"
 msgstr ""
 
-#: apps/app/src/routes/contacts-page.tsx:1363
+#: apps/app/src/routes/contacts-page.tsx:1364
 msgid "正在载入桌面通讯录工作区，马上显示联系人和详情。"
 msgstr "デスクトップ連絡先ワークスペースを読み込んでいます。まもなく連絡先と詳細を表示します。"
 
@@ -11733,8 +11738,8 @@ msgstr ""
 msgid "没有找到匹配的群聊"
 msgstr "一致するグループチャットは見つかりません"
 
-#: apps/app/src/routes/contacts-page.tsx:1408
-#: apps/app/src/routes/contacts-page.tsx:1953
+#: apps/app/src/routes/contacts-page.tsx:1409
+#: apps/app/src/routes/contacts-page.tsx:1954
 msgid "没有找到匹配的联系人"
 msgstr "一致する連絡先が見つかりません"
 
@@ -11819,7 +11824,7 @@ msgstr "アクティブな引き継ぎフロー"
 msgid "活跃群聊扩散"
 msgstr "アクティブなグループ拡散"
 
-#: apps/app/src/routes/contacts-page.tsx:1429
+#: apps/app/src/routes/contacts-page.tsx:1430
 #: apps/app/src/routes/friend-requests-page.tsx:214
 #: apps/app/src/routes/friend-requests-page.tsx:259
 #: apps/app/src/routes/friend-requests-page.tsx:382
@@ -11851,7 +11856,7 @@ msgstr "ブラウザが新しいウィンドウをブロックしました。ポ
 msgid "浏览目录"
 msgstr "カタログを見る"
 
-#: apps/app/src/routes/contacts-page.tsx:1269
+#: apps/app/src/routes/contacts-page.tsx:1270
 msgid "浏览角色"
 msgstr "キャラクターを閲覧"
 
@@ -12041,8 +12046,8 @@ msgstr "クリアして管理を再開"
 msgid "清空当前关键词，重新查看表情结果。"
 msgstr "現在のキーワードをクリアして、スタンプ結果を再表示します。"
 
-#: apps/app/src/routes/contacts-page.tsx:1422
-#: apps/app/src/routes/contacts-page.tsx:1968
+#: apps/app/src/routes/contacts-page.tsx:1423
+#: apps/app/src/routes/contacts-page.tsx:1969
 #: apps/app/src/routes/official-accounts-page.tsx:332
 msgid "清空搜索"
 msgstr "検索をクリア"
@@ -13027,7 +13032,7 @@ msgstr ""
 msgid "稍等一下，正在同步聊天资料和设置。"
 msgstr "しばらくお待ちください。チャット情報と設定を同期しています。"
 
-#: apps/app/src/routes/contacts-page.tsx:1940
+#: apps/app/src/routes/contacts-page.tsx:1941
 msgid "稍等一下，正在同步联系人、群聊和服务入口。"
 msgstr "連絡先、グループチャット、サービス入口を同期しています。しばらくお待ちください。"
 
@@ -13800,7 +13805,7 @@ msgstr "グループ管理"
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:633
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:307
 #: apps/app/src/lib/conversation-route.ts:27
-#: apps/app/src/routes/contacts-page.tsx:1141
+#: apps/app/src/routes/contacts-page.tsx:1142
 #: apps/app/src/routes/group-announcement-page.tsx:310
 #: apps/app/src/routes/group-announcement-page.tsx:413
 #: apps/app/src/routes/group-chat-background-page.tsx:446
@@ -13842,7 +13847,7 @@ msgstr "グループチャット情報"
 msgid "群聊信息暂时不可用"
 msgstr "グループチャット情報は一時的に利用できません"
 
-#: apps/app/src/routes/contacts-page.tsx:1295
+#: apps/app/src/routes/contacts-page.tsx:1296
 msgid "群聊入口暂时没有刷新成功。"
 msgstr "グループチャット入口を更新できませんでした。"
 
@@ -14050,7 +14055,7 @@ msgstr "チャットをリストから削除しました。"
 #: apps/app/src/routes/character-detail-page.tsx:577
 #: apps/app/src/routes/chat-details-page.tsx:429
 #: apps/app/src/routes/chat-list-page.tsx:308
-#: apps/app/src/routes/contacts-page.tsx:728
+#: apps/app/src/routes/contacts-page.tsx:729
 msgid "聊天已取消置顶。"
 msgstr "チャットのピン留めを解除しました。"
 
@@ -14058,7 +14063,7 @@ msgstr "チャットのピン留めを解除しました。"
 #: apps/app/src/routes/character-detail-page.tsx:577
 #: apps/app/src/routes/chat-details-page.tsx:429
 #: apps/app/src/routes/chat-list-page.tsx:308
-#: apps/app/src/routes/contacts-page.tsx:728
+#: apps/app/src/routes/contacts-page.tsx:729
 msgid "聊天已置顶。"
 msgstr "チャットをピン留めしました。"
 
@@ -14177,7 +14182,7 @@ msgstr "連絡先"
 msgid "联系人列表暂时不可用"
 msgstr "連絡先一覧は一時的に利用できません"
 
-#: apps/app/src/routes/contacts-page.tsx:1254
+#: apps/app/src/routes/contacts-page.tsx:1255
 msgid "联系人列表暂时没有刷新成功。"
 msgstr "連絡先リストを更新できませんでした。"
 
@@ -14878,7 +14883,7 @@ msgstr "認証コードを入力（デフォルトの 123456 で通過可能）"
 #: apps/app/src/routes/chat-background-page.tsx:342
 #: apps/app/src/routes/chat-details-page.tsx:749
 #: apps/app/src/routes/chat-list-page.tsx:741
-#: apps/app/src/routes/contacts-page.tsx:1938
+#: apps/app/src/routes/contacts-page.tsx:1939
 #: apps/app/src/routes/create-group-page.tsx:430
 #: apps/app/src/routes/discover-feed-page.tsx:875
 #: apps/app/src/routes/friend-requests-page.tsx:225
@@ -15179,7 +15184,7 @@ msgstr ""
 msgid "载入桌面订阅号消息..."
 msgstr "デスクトップ版の購読アカウント受信箱を読み込み中..."
 
-#: apps/app/src/routes/contacts-page.tsx:1365
+#: apps/app/src/routes/contacts-page.tsx:1366
 msgid "载入桌面通讯录..."
 msgstr "デスクトップ連絡先を読み込み中..."
 
@@ -15553,8 +15558,8 @@ msgid "还很安静"
 msgstr "まだ静かです"
 
 #. placeholder {0}: worldCharacterDirectoryItems.length
-#: apps/app/src/routes/contacts-page.tsx:1192
-#: apps/app/src/routes/contacts-page.tsx:1196
+#: apps/app/src/routes/contacts-page.tsx:1193
+#: apps/app/src/routes/contacts-page.tsx:1197
 msgid "还有 {0} 个世界角色可浏览"
 msgstr "閲覧できる世界キャラクターがあと {0} 件あります"
 
@@ -16351,8 +16356,8 @@ msgstr ""
 #: apps/app/src/components/mobile-shell.tsx:33
 #: apps/app/src/features/shell/desktop-nav-matching.ts:47
 #: apps/app/src/features/shell/desktop-nav-matching.ts:48
-#: apps/app/src/routes/contacts-page.tsx:1788
-#: apps/app/src/routes/contacts-page.tsx:1950
+#: apps/app/src/routes/contacts-page.tsx:1789
+#: apps/app/src/routes/contacts-page.tsx:1951
 #: apps/app/src/routes/desktop-mobile-page.tsx:172
 msgid "通讯录"
 msgstr "連絡先"
@@ -16370,8 +16375,8 @@ msgstr "連絡先情報は一時的に利用できません"
 msgid "通讯录朋友"
 msgstr "連絡先の友だち"
 
-#: apps/app/src/routes/contacts-page.tsx:1409
-#: apps/app/src/routes/contacts-page.tsx:1954
+#: apps/app/src/routes/contacts-page.tsx:1410
+#: apps/app/src/routes/contacts-page.tsx:1955
 msgid "通讯录还是空的"
 msgstr "連絡先はまだ空です"
 
@@ -16522,7 +16527,7 @@ msgstr "マイミニプログラムに優先配置"
 #: apps/app/src/components/chat-message-list.tsx:3131
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:517
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:603
-#: apps/app/src/routes/contacts-page.tsx:1919
+#: apps/app/src/routes/contacts-page.tsx:1920
 msgid "重试"
 msgstr "再試行"
 
@@ -16602,7 +16607,7 @@ msgstr ""
 msgid "重试取消关注"
 msgstr "フォロー解除を再試行"
 
-#: apps/app/src/routes/contacts-page.tsx:1327
+#: apps/app/src/routes/contacts-page.tsx:1328
 msgid "重试取消星标"
 msgstr "スター解除を再試行"
 
@@ -16661,7 +16666,7 @@ msgstr "もう一度電話にコピーしてみてください"
 msgid "重试打开文件"
 msgstr ""
 
-#: apps/app/src/routes/contacts-page.tsx:1311
+#: apps/app/src/routes/contacts-page.tsx:1312
 msgid "重试打开聊天"
 msgstr "チャットを開く操作を再試行"
 
@@ -16689,7 +16694,7 @@ msgstr ""
 msgid "重试结束通话"
 msgstr ""
 
-#: apps/app/src/routes/contacts-page.tsx:1326
+#: apps/app/src/routes/contacts-page.tsx:1327
 msgid "重试设为星标"
 msgstr "スター付けを再試行"
 
@@ -16717,10 +16722,10 @@ msgstr ""
 #: apps/app/src/routes/chat-details-page.tsx:209
 #: apps/app/src/routes/chat-list-page.tsx:731
 #: apps/app/src/routes/chat-list-page.tsx:766
-#: apps/app/src/routes/contacts-page.tsx:1258
-#: apps/app/src/routes/contacts-page.tsx:1268
-#: apps/app/src/routes/contacts-page.tsx:1285
-#: apps/app/src/routes/contacts-page.tsx:1299
+#: apps/app/src/routes/contacts-page.tsx:1259
+#: apps/app/src/routes/contacts-page.tsx:1269
+#: apps/app/src/routes/contacts-page.tsx:1286
+#: apps/app/src/routes/contacts-page.tsx:1300
 #: apps/app/src/routes/create-group-page.tsx:451
 #: apps/app/src/routes/discover-feed-page.tsx:334
 #: apps/app/src/routes/discover-feed-page.tsx:864
