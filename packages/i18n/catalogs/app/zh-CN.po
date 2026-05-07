@@ -109,7 +109,9 @@ msgid "{0} 主页"
 msgstr "{0} 主页"
 
 #. placeholder {0}: groupMembers.length
+#. placeholder {0}: selectedIds.length
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1496
+#: apps/app/src/routes/create-group-page.tsx:365
 msgid "{0} 人"
 msgstr "{0} 人"
 
@@ -301,6 +303,12 @@ msgstr "{0}优先级"
 #: apps/app/src/lib/conversation-preview.ts:106
 msgid "{0}撤回了一条消息"
 msgstr "{0}撤回了一条消息"
+
+#. placeholder {0}: names.join("、")
+#. placeholder {1}: items.length
+#: apps/app/src/routes/create-group-page.tsx:654
+msgid "{0}等{1}人"
+msgstr "{0}等{1}人"
 
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:195
 msgid "{activeCount} 人"
@@ -781,6 +789,12 @@ msgstr "上一张"
 msgid "上一张图片"
 msgstr "上一张图片"
 
+#: apps/app/src/routes/chat-background-page.tsx:512
+#: apps/app/src/routes/chat-background-page.tsx:578
+#: apps/app/src/routes/group-chat-background-page.tsx:507
+msgid "上传图片"
+msgstr "上传图片"
+
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:284
 msgid "上传表情失败，请稍后再试。"
 msgstr "上传表情失败，请稍后再试。"
@@ -1031,6 +1045,7 @@ msgstr "世界缺少可用的 API 地址。"
 #: apps/app/src/routes/character-detail-page.tsx:250
 #: apps/app/src/routes/chat-details-page.tsx:297
 #: apps/app/src/routes/chat-details-page.tsx:320
+#: apps/app/src/routes/create-group-page.tsx:619
 msgid "世界联系人"
 msgstr "世界联系人"
 
@@ -1099,6 +1114,10 @@ msgstr "个结果"
 #: apps/app/src/routes/desktop-feedback-page.tsx:87
 msgid "中"
 msgstr "中"
+
+#: apps/app/src/routes/create-group-page.tsx:650
+msgid "临时群聊"
+msgstr "临时群聊"
 
 #: apps/app/src/routes/welcome-page.tsx:1058
 msgid "为世界主人命名"
@@ -1392,12 +1411,15 @@ msgstr "会把选中的消息汇总成一条聊天摘要，再发送到目标会
 msgid "会按照原消息顺序依次投递到目标会话。"
 msgstr "会按照原消息顺序依次投递到目标会话。"
 
+#: apps/app/src/routes/chat-background-page.tsx:456
 #: apps/app/src/routes/chat-details-page.tsx:872
 #: apps/app/src/routes/group-qr-page.tsx:1604
 #: apps/app/src/routes/group-qr-page.tsx:1621
 msgid "会话"
 msgstr "会话"
 
+#: apps/app/src/routes/chat-background-page.tsx:451
+#: apps/app/src/routes/chat-background-page.tsx:457
 #: apps/app/src/routes/chat-details-page.tsx:873
 msgid "会话不存在"
 msgstr "会话不存在"
@@ -1541,6 +1563,18 @@ msgstr "保存图片"
 msgid "保存失败，请稍后再试。"
 msgstr "保存失败，请稍后再试。"
 
+#: apps/app/src/routes/group-chat-background-page.tsx:604
+msgid "保存当前群聊设置"
+msgstr "保存当前群聊设置"
+
+#: apps/app/src/routes/chat-background-page.tsx:585
+msgid "保存当前聊天背景"
+msgstr "保存当前聊天背景"
+
+#: apps/app/src/routes/chat-background-page.tsx:611
+msgid "保存当前聊天设置"
+msgstr "保存当前聊天设置"
+
 #: apps/app/src/routes/group-qr-page.tsx:1375
 msgid "保存当前邀请卡 SVG，后续可继续转发。"
 msgstr "保存当前邀请卡 SVG，后续可继续转发。"
@@ -1556,6 +1590,10 @@ msgstr "保存文件"
 #: apps/app/src/i18n/static-dom-seed.ts:772
 msgid "保存群公告"
 msgstr "保存群公告"
+
+#: apps/app/src/routes/group-chat-background-page.tsx:603
+msgid "保存群聊背景"
+msgstr "保存群聊背景"
 
 #: apps/app/src/routes/group-qr-page.tsx:829
 msgid "保存群邀请卡"
@@ -1581,6 +1619,11 @@ msgstr "保存邀请卡"
 #: apps/app/src/runtime/file-runtime-i18n.ts:37
 msgid "保存附件"
 msgstr "保存附件"
+
+#: apps/app/src/routes/chat-background-page.tsx:519
+#: apps/app/src/routes/group-chat-background-page.tsx:515
+msgid "保存默认背景"
+msgstr "保存默认背景"
 
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:239
 msgid "保持原消息结构依次投递"
@@ -1716,6 +1759,7 @@ msgid "先去通讯录建立一些关系，再回来把他们拉进群。"
 msgstr "先去通讯录建立一些关系，再回来把他们拉进群。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1035
+#: apps/app/src/routes/create-group-page.tsx:496
 msgid "先去通讯录里建立一些关系，再回来创建群聊。"
 msgstr "先去通讯录里建立一些关系，再回来创建群聊。"
 
@@ -1848,6 +1892,7 @@ msgid "先走主推荐更合适，先补 {0} 会先拿掉前排阻塞。"
 msgstr "先走主推荐更合适，先补 {0} 会先拿掉前排阻塞。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:427
+#: apps/app/src/routes/create-group-page.tsx:400
 msgid "先选择联系人，再开始一个新的群聊。"
 msgstr "先选择联系人，再开始一个新的群聊。"
 
@@ -2773,6 +2818,10 @@ msgstr "刚补发过，先等回流。"
 msgid "创业与写作导师映射"
 msgstr "创业与写作导师映射"
 
+#: apps/app/src/routes/create-group-page.tsx:350
+msgid "创建中"
+msgstr "创建中"
+
 #: apps/app/src/features/subscription/subscription-panel.tsx:568
 msgid "创建时间"
 msgstr "创建时间"
@@ -3002,6 +3051,8 @@ msgid "单次奖励"
 msgstr "单次奖励"
 
 #: apps/app/src/i18n/static-dom-seed.ts:982
+#: apps/app/src/routes/chat-background-page.tsx:559
+#: apps/app/src/routes/group-chat-background-page.tsx:550
 msgid "单独设置"
 msgstr "单独设置"
 
@@ -3014,6 +3065,10 @@ msgstr "单聊"
 #: apps/app/src/routes/desktop-mobile-page.tsx:120
 msgid "单聊、群聊和消息列表入口。"
 msgstr "单聊、群聊和消息列表入口。"
+
+#: apps/app/src/routes/chat-background-page.tsx:535
+msgid "单聊可设置专属背景，优先级高于默认背景图。"
+msgstr "单聊可设置专属背景，优先级高于默认背景图。"
 
 #: apps/app/src/routes/group-qr-page.tsx:2689
 msgid "单聊定向补发"
@@ -4715,6 +4770,10 @@ msgstr "已把群邀请发到 {0}。"
 msgid "已拒绝"
 msgstr "已拒绝"
 
+#: apps/app/src/routes/create-group-page.tsx:409
+msgid "已按当前单聊默认勾选对方，你可以继续添加其他联系人。"
+msgstr "已按当前单聊默认勾选对方，你可以继续添加其他联系人。"
+
 #: apps/app/src/features/subscription/subscription-panel.tsx:379
 msgid "已提交开通申请，请联系运营完成支付。"
 msgstr "已提交开通申请，请联系运营完成支付。"
@@ -4930,6 +4989,7 @@ msgid "已选消息"
 msgstr "已选消息"
 
 #: apps/app/src/i18n/static-dom-seed.ts:425
+#: apps/app/src/routes/create-group-page.tsx:361
 msgid "已选联系人"
 msgstr "已选联系人"
 
@@ -5064,6 +5124,8 @@ msgid "广场还没有新动态"
 msgstr "广场还没有新动态"
 
 #: apps/app/src/i18n/static-dom-seed.ts:763
+#: apps/app/src/routes/chat-background-page.tsx:499
+#: apps/app/src/routes/group-chat-background-page.tsx:490
 msgid "应用到所有未单独设置专属背景的聊天。"
 msgstr "应用到所有未单独设置专属背景的聊天。"
 
@@ -5174,6 +5236,21 @@ msgstr "当前 {focusedManageStickerPosition}/{0}"
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:1105
 msgid "当前："
 msgstr "当前："
+
+#. placeholder {0}: getChatBackgroundLabel(conversationDraft)
+#. placeholder {0}: getChatBackgroundLabel(defaultDraft)
+#. placeholder {0}: getChatBackgroundLabel(groupDraft)
+#: apps/app/src/routes/chat-background-page.tsx:500
+#: apps/app/src/routes/chat-background-page.tsx:540
+#: apps/app/src/routes/group-chat-background-page.tsx:491
+#: apps/app/src/routes/group-chat-background-page.tsx:534
+msgid "当前：{0}"
+msgstr "当前：{0}"
+
+#: apps/app/src/routes/chat-background-page.tsx:541
+#: apps/app/src/routes/group-chat-background-page.tsx:535
+msgid "当前：跟随默认背景"
+msgstr "当前：跟随默认背景"
 
 #: apps/app/src/i18n/static-dom-seed.ts:540
 #: apps/app/src/routes/desktop-feedback-page.tsx:393
@@ -5431,6 +5508,10 @@ msgstr "当前播放："
 msgid "当前无法连接到隐界实例，请先检查世界地址和网络连接。"
 msgstr "当前无法连接到隐界实例，请先检查世界地址和网络连接。"
 
+#: apps/app/src/routes/chat-background-page.tsx:536
+msgid "当前是群聊会话，暂不支持专属背景，默认跟随全局背景。"
+msgstr "当前是群聊会话，暂不支持专属背景，默认跟随全局背景。"
+
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:1065
 msgid "当前来源"
 msgstr "当前来源"
@@ -5620,15 +5701,38 @@ msgstr "当前群聊"
 msgid "当前群聊不存在，暂时无法发起群通话。"
 msgstr "当前群聊不存在，暂时无法发起群通话。"
 
+#: apps/app/src/routes/group-chat-background-page.tsx:591
+msgid "当前群聊会直接沿用默认背景图。切换到\"单独设置\"后，可以挑选群聊专属背景。"
+msgstr "当前群聊会直接沿用默认背景图。切换到\"单独设置\"后，可以挑选群聊专属背景。"
+
 #: apps/app/src/routes/group-chat-details-page.tsx:671
 msgid "当前群聊共有 {totalMemberCount} 位成员。"
 msgstr "当前群聊共有 {totalMemberCount} 位成员。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:979
+#: apps/app/src/routes/group-chat-background-page.tsx:219
+#: apps/app/src/routes/group-chat-background-page.tsx:232
 msgid "当前群聊已恢复跟随默认背景。"
 msgstr "当前群聊已恢复跟随默认背景。"
 
+#: apps/app/src/routes/group-chat-background-page.tsx:481
+msgid "当前群聊正在预览专属背景"
+msgstr "当前群聊正在预览专属背景"
+
+#: apps/app/src/routes/group-chat-background-page.tsx:482
+msgid "当前群聊正在预览默认背景"
+msgstr "当前群聊正在预览默认背景"
+
+#: apps/app/src/routes/group-chat-background-page.tsx:530
+msgid "当前群聊背景"
+msgstr "当前群聊背景"
+
+#: apps/app/src/routes/group-chat-background-page.tsx:218
+msgid "当前群聊背景已保存。"
+msgstr "当前群聊背景已保存。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:981
+#: apps/app/src/routes/group-chat-background-page.tsx:312
 msgid "当前群聊背景已切到新预览，保存后生效。"
 msgstr "当前群聊背景已切到新预览，保存后生效。"
 
@@ -5641,7 +5745,13 @@ msgstr "当前群邀请"
 msgid "当前聊天"
 msgstr "当前聊天"
 
+#: apps/app/src/routes/chat-background-page.tsx:599
+msgid "当前聊天会直接沿用默认背景图。切换到\"单独设置\"后，可以挑选好友专属背景。"
+msgstr "当前聊天会直接沿用默认背景图。切换到\"单独设置\"后，可以挑选好友专属背景。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:978
+#: apps/app/src/routes/chat-background-page.tsx:226
+#: apps/app/src/routes/chat-background-page.tsx:239
 msgid "当前聊天已恢复跟随默认背景。"
 msgstr "当前聊天已恢复跟随默认背景。"
 
@@ -5649,11 +5759,25 @@ msgstr "当前聊天已恢复跟随默认背景。"
 msgid "当前聊天暂时不可用。"
 msgstr "当前聊天暂时不可用。"
 
+#: apps/app/src/routes/chat-background-page.tsx:491
+msgid "当前聊天正在预览专属背景"
+msgstr "当前聊天正在预览专属背景"
+
 #: apps/app/src/i18n/static-dom-seed.ts:758
+#: apps/app/src/routes/chat-background-page.tsx:492
 msgid "当前聊天正在预览默认背景"
 msgstr "当前聊天正在预览默认背景"
 
+#: apps/app/src/routes/chat-background-page.tsx:532
+msgid "当前聊天背景"
+msgstr "当前聊天背景"
+
+#: apps/app/src/routes/chat-background-page.tsx:225
+msgid "当前聊天背景已保存。"
+msgstr "当前聊天背景已保存。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:980
+#: apps/app/src/routes/chat-background-page.tsx:321
 msgid "当前聊天背景已切到新预览，保存后生效。"
 msgstr "当前聊天背景已切到新预览，保存后生效。"
 
@@ -5898,6 +6022,11 @@ msgstr "恢复后回到上次删除位置"
 #: apps/app/src/routes/character-detail-page.tsx:938
 msgid "恢复正常联系"
 msgstr "恢复正常联系"
+
+#: apps/app/src/routes/chat-background-page.tsx:526
+#: apps/app/src/routes/group-chat-background-page.tsx:523
+msgid "恢复系统背景"
+msgstr "恢复系统背景"
 
 #: apps/app/src/features/shell/desktop-nav-config.ts:116
 #: apps/app/src/i18n/static-dom-seed.ts:510
@@ -6633,6 +6762,7 @@ msgid "换个分类试试，或者输入关键词直接搜索。"
 msgstr "换个分类试试，或者输入关键词直接搜索。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1036
+#: apps/app/src/routes/create-group-page.tsx:519
 msgid "换个名字、备注名或关系关键词试试。"
 msgstr "换个名字、备注名或关系关键词试试。"
 
@@ -6788,6 +6918,7 @@ msgstr "搜文本、附件和系统提示"
 #: apps/app/src/routes/chat-list-page.tsx:668
 #: apps/app/src/routes/contacts-page.tsx:1879
 #: apps/app/src/routes/contacts-page.tsx:1950
+#: apps/app/src/routes/create-group-page.tsx:419
 msgid "搜索"
 msgstr "搜索"
 
@@ -7341,6 +7472,7 @@ msgstr "昵称"
 #: apps/app/src/routes/character-detail-page.tsx:1460
 #: apps/app/src/routes/chat-details-page.tsx:295
 #: apps/app/src/routes/contacts-page.tsx:2068
+#: apps/app/src/routes/create-group-page.tsx:550
 msgid "昵称：{0}"
 msgstr "昵称：{0}"
 
@@ -7399,6 +7531,10 @@ msgstr "暂无状态"
 #: apps/app/src/routes/desktop-feedback-page.tsx:116
 msgid "暂无签名"
 msgstr "暂无签名"
+
+#: apps/app/src/routes/create-group-page.tsx:517
+msgid "暂无结果"
+msgstr "暂无结果"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:929
 msgid "暂无聊天记录"
@@ -7750,6 +7886,7 @@ msgid "未连接"
 msgstr "未连接"
 
 #: apps/app/src/i18n/static-dom-seed.ts:426
+#: apps/app/src/routes/create-group-page.tsx:366
 msgid "未选择"
 msgstr "未选择"
 
@@ -8297,6 +8434,14 @@ msgstr "桌面端保留当前文档切换和独立打开入口。"
 msgid "桌面端收成微信式内容浏览结构，主区域看视频，右侧接住作者、评论和推荐队列。"
 msgstr "桌面端收成微信式内容浏览结构，主区域看视频，右侧接住作者、评论和推荐队列。"
 
+#: apps/app/src/routes/group-chat-background-page.tsx:660
+msgid "桌面端预览会同步展示在群聊工作区"
+msgstr "桌面端预览会同步展示在群聊工作区"
+
+#: apps/app/src/routes/chat-background-page.tsx:668
+msgid "桌面端预览会同步展示在聊天工作区"
+msgstr "桌面端预览会同步展示在聊天工作区"
+
 #: apps/app/src/features/shell/desktop-shell.tsx:540
 msgid "桌面锁定口令已设置，请输入口令解锁。"
 msgstr "桌面锁定口令已设置，请输入口令解锁。"
@@ -8470,6 +8615,10 @@ msgstr "正在打开桌面公众号文章"
 #: apps/app/src/routes/discover-feed-page.tsx:595
 msgid "正在打开桌面发现"
 msgstr "正在打开桌面发现"
+
+#: apps/app/src/routes/create-group-page.tsx:294
+msgid "正在打开桌面发起群聊"
+msgstr "正在打开桌面发起群聊"
 
 #: apps/app/src/routes/chat-room-page.tsx:265
 msgid "正在打开桌面对话"
@@ -8679,6 +8828,14 @@ msgstr "正在读取群成员..."
 msgid "正在读取群聊信息"
 msgstr "正在读取群聊信息"
 
+#: apps/app/src/routes/group-chat-background-page.tsx:334
+msgid "正在读取群聊背景"
+msgstr "正在读取群聊背景"
+
+#: apps/app/src/routes/group-chat-background-page.tsx:330
+msgid "正在读取群聊背景..."
+msgstr "正在读取群聊背景..."
+
 #: apps/app/src/routes/group-message-search-page.tsx:105
 msgid "正在读取群聊记录..."
 msgstr "正在读取群聊记录..."
@@ -8691,9 +8848,21 @@ msgstr "正在读取聊天信息"
 msgid "正在读取聊天信息..."
 msgstr "正在读取聊天信息..."
 
+#: apps/app/src/routes/chat-background-page.tsx:343
+msgid "正在读取聊天背景"
+msgstr "正在读取聊天背景"
+
+#: apps/app/src/routes/chat-background-page.tsx:339
+msgid "正在读取聊天背景..."
+msgstr "正在读取聊天背景..."
+
 #: apps/app/src/routes/chat-message-search-page.tsx:114
 msgid "正在读取聊天记录..."
 msgstr "正在读取聊天记录..."
+
+#: apps/app/src/routes/create-group-page.tsx:431
+msgid "正在读取联系人"
+msgstr "正在读取联系人"
 
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:553
 #: apps/app/src/features/desktop/chat/desktop-group-member-picker.tsx:139
@@ -8721,6 +8890,10 @@ msgstr "正在转写语音..."
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:364
 msgid "正在转发"
 msgstr "正在转发"
+
+#: apps/app/src/routes/create-group-page.tsx:295
+msgid "正在载入桌面发起群聊对话框，马上恢复当前选择。"
+msgstr "正在载入桌面发起群聊对话框，马上恢复当前选择。"
 
 #: apps/app/src/routes/chat-list-page.tsx:177
 msgid "正在载入桌面消息工作区，马上显示最近会话。"
@@ -8843,6 +9016,10 @@ msgstr "没有找到相关群聊记录"
 #: apps/app/src/routes/chat-message-search-page.tsx:115
 msgid "没有找到相关聊天记录"
 msgstr "没有找到相关聊天记录"
+
+#: apps/app/src/routes/create-group-page.tsx:518
+msgid "没有找到联系人"
+msgstr "没有找到联系人"
 
 #: apps/app/src/components/chat-composer.tsx:1411
 msgid "没有拿到可用的屏幕画面。"
@@ -9544,8 +9721,14 @@ msgid "硅谷创业者映射"
 msgstr "硅谷创业者映射"
 
 #: apps/app/src/i18n/static-dom-seed.ts:424
+#: apps/app/src/routes/create-group-page.tsx:353
 msgid "确定"
 msgstr "确定"
+
+#. placeholder {0}: selectedIds.length
+#: apps/app/src/routes/create-group-page.tsx:352
+msgid "确定({0})"
+msgstr "确定({0})"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-confirm-dialog.tsx:31
 msgid "确认"
@@ -9822,6 +10005,10 @@ msgstr "稍等一下，正在同步最近会话和消息入口。"
 msgid "稍等一下，正在同步最近的订阅推送。"
 msgstr "稍等一下，正在同步最近的订阅推送。"
 
+#: apps/app/src/routes/create-group-page.tsx:432
+msgid "稍等一下，正在同步可拉进群的联系人。"
+msgstr "稍等一下，正在同步可拉进群的联系人。"
+
 #: apps/app/src/routes/discover-feed-page.tsx:877
 msgid "稍等一下，正在同步居民公开动态和互动状态。"
 msgstr "稍等一下，正在同步居民公开动态和互动状态。"
@@ -9861,6 +10048,14 @@ msgstr "稍等一下，正在同步账号资料和最近文章。"
 #: apps/app/src/routes/character-detail-page.tsx:257
 msgid "稍等一下，正在同步这个联系人的资料和关系状态。"
 msgstr "稍等一下，正在同步这个联系人的资料和关系状态。"
+
+#: apps/app/src/routes/group-chat-background-page.tsx:335
+msgid "稍等一下，正在同步默认背景和当前群聊设置。"
+msgstr "稍等一下，正在同步默认背景和当前群聊设置。"
+
+#: apps/app/src/routes/chat-background-page.tsx:344
+msgid "稍等一下，正在同步默认背景和当前聊天设置。"
+msgstr "稍等一下，正在同步默认背景和当前聊天设置。"
 
 #: apps/app/src/routes/group-qr-page.tsx:1607
 msgid "稍等一下，正在整理最近可投递的聊天入口。"
@@ -10401,6 +10596,7 @@ msgstr "群管理"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:309
 #: apps/app/src/lib/conversation-route.ts:27
 #: apps/app/src/routes/contacts-page.tsx:1141
+#: apps/app/src/routes/group-chat-background-page.tsx:446
 #: apps/app/src/routes/group-chat-details-page.tsx:588
 #: apps/app/src/routes/group-chat-details-page.tsx:636
 #: apps/app/src/routes/group-message-search-page.tsx:96
@@ -10410,6 +10606,8 @@ msgstr "群管理"
 msgid "群聊"
 msgstr "群聊"
 
+#: apps/app/src/routes/group-chat-background-page.tsx:441
+#: apps/app/src/routes/group-chat-background-page.tsx:447
 #: apps/app/src/routes/group-chat-details-page.tsx:637
 msgid "群聊不存在"
 msgstr "群聊不存在"
@@ -10431,6 +10629,10 @@ msgstr "群聊入口暂时没有刷新成功。"
 msgid "群聊协作"
 msgstr "群聊协作"
 
+#: apps/app/src/routes/group-chat-background-page.tsx:531
+msgid "群聊可设置专属背景，优先级高于默认背景图。"
+msgstr "群聊可设置专属背景，优先级高于默认背景图。"
+
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1508
 #: apps/app/src/routes/group-chat-details-page.tsx:690
 msgid "群聊名称"
@@ -10450,6 +10652,10 @@ msgstr "群聊已取消置顶。"
 msgid "群聊已置顶。"
 msgstr "群聊已置顶。"
 
+#: apps/app/src/routes/chat-background-page.tsx:600
+msgid "群聊当前只会使用默认背景图或系统背景。"
+msgstr "群聊当前只会使用默认背景图或系统背景。"
+
 #: apps/app/src/routes/group-chat-details-page.tsx:646
 msgid "群聊成员"
 msgstr "群聊成员"
@@ -10462,7 +10668,15 @@ msgstr "群聊扩散优先"
 msgid "群聊摘要已复制。"
 msgstr "群聊摘要已复制。"
 
+#: apps/app/src/routes/group-chat-background-page.tsx:628
+#: apps/app/src/routes/group-chat-background-page.tsx:631
+#: apps/app/src/routes/group-chat-background-page.tsx:673
+msgid "群聊背景"
+msgstr "群聊背景"
+
 #: apps/app/src/i18n/static-dom-seed.ts:985
+#: apps/app/src/routes/group-chat-background-page.tsx:346
+#: apps/app/src/routes/group-chat-background-page.tsx:378
 msgid "群聊背景暂时不可用"
 msgstr "群聊背景暂时不可用"
 
@@ -10634,11 +10848,16 @@ msgstr "聊天管理"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:769
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1626
+#: apps/app/src/routes/chat-background-page.tsx:636
+#: apps/app/src/routes/chat-background-page.tsx:639
+#: apps/app/src/routes/chat-background-page.tsx:681
 #: apps/app/src/routes/group-chat-details-page.tsx:741
 msgid "聊天背景"
 msgstr "聊天背景"
 
 #: apps/app/src/i18n/static-dom-seed.ts:984
+#: apps/app/src/routes/chat-background-page.tsx:356
+#: apps/app/src/routes/chat-background-page.tsx:388
 msgid "聊天背景暂时不可用"
 msgstr "聊天背景暂时不可用"
 
@@ -10682,10 +10901,12 @@ msgstr "聊天里的图片 / GIF 也能添加为表情"
 #: apps/app/src/i18n/static-dom-seed.ts:64
 #: apps/app/src/routes/character-detail-page.tsx:259
 #: apps/app/src/routes/chat-details-page.tsx:317
+#: apps/app/src/routes/create-group-page.tsx:494
 msgid "联系人"
 msgstr "联系人"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1033
+#: apps/app/src/routes/create-group-page.tsx:441
 msgid "联系人列表暂时不可用"
 msgstr "联系人列表暂时不可用"
 
@@ -10732,6 +10953,8 @@ msgid "聚合消息、笔记和内容收藏。"
 msgstr "聚合消息、笔记和内容收藏。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:974
+#: apps/app/src/routes/chat-background-page.tsx:162
+#: apps/app/src/routes/group-chat-background-page.tsx:155
 msgid "背景图已上传，记得保存当前设置。"
 msgstr "背景图已上传，记得保存当前设置。"
 
@@ -11204,6 +11427,14 @@ msgstr "说明你希望它变成什么样。"
 msgid "说点什么..."
 msgstr "说点什么..."
 
+#: apps/app/src/routes/group-chat-background-page.tsx:204
+msgid "请先为当前群聊选择背景图。"
+msgstr "请先为当前群聊选择背景图。"
+
+#: apps/app/src/routes/chat-background-page.tsx:211
+msgid "请先为当前聊天选择背景图。"
+msgstr "请先为当前聊天选择背景图。"
+
 #: apps/app/src/routes/desktop-feedback-page.tsx:704
 msgid "请先填写反馈标题。"
 msgstr "请先填写反馈标题。"
@@ -11220,6 +11451,11 @@ msgstr "请先输入评论内容。"
 #: apps/app/src/routes/welcome-page.tsx:750
 msgid "请先连接世界，再设置世界主人名称。"
 msgstr "请先连接世界，再设置世界主人名称。"
+
+#: apps/app/src/routes/chat-background-page.tsx:169
+#: apps/app/src/routes/group-chat-background-page.tsx:162
+msgid "请先选择默认背景图。"
+msgstr "请先选择默认背景图。"
 
 #: apps/app/src/routes/welcome-page.tsx:167
 msgid "请先验证邮箱，以解析你的云世界。"
@@ -11293,10 +11529,13 @@ msgstr "请输入验证码（默认 123456 即可通过）"
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:531
 #: apps/app/src/routes/channels-page.tsx:1147
 #: apps/app/src/routes/character-detail-page.tsx:275
+#: apps/app/src/routes/chat-background-page.tsx:342
 #: apps/app/src/routes/chat-details-page.tsx:749
 #: apps/app/src/routes/chat-list-page.tsx:741
 #: apps/app/src/routes/contacts-page.tsx:1938
+#: apps/app/src/routes/create-group-page.tsx:430
 #: apps/app/src/routes/discover-feed-page.tsx:875
+#: apps/app/src/routes/group-chat-background-page.tsx:333
 #: apps/app/src/routes/group-chat-details-page.tsx:578
 #: apps/app/src/routes/group-qr-page.tsx:1088
 #: apps/app/src/routes/profile-settings-page.tsx:461
@@ -11310,12 +11549,17 @@ msgstr "读取图片失败，请换一张再试。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:37
 #: apps/app/src/routes/channels-page.tsx:1119
+#: apps/app/src/routes/chat-background-page.tsx:355
+#: apps/app/src/routes/chat-background-page.tsx:387
 #: apps/app/src/routes/chat-details-page.tsx:760
 #: apps/app/src/routes/chat-details-page.tsx:773
 #: apps/app/src/routes/chat-details-page.tsx:786
 #: apps/app/src/routes/chat-details-page.tsx:799
 #: apps/app/src/routes/chat-list-page.tsx:751
+#: apps/app/src/routes/create-group-page.tsx:440
 #: apps/app/src/routes/discover-feed-page.tsx:883
+#: apps/app/src/routes/group-chat-background-page.tsx:345
+#: apps/app/src/routes/group-chat-background-page.tsx:377
 #: apps/app/src/routes/profile-settings-page.tsx:473
 msgid "读取失败"
 msgstr "读取失败"
@@ -11425,8 +11669,15 @@ msgid "超级智能研究导师"
 msgstr "超级智能研究导师"
 
 #: apps/app/src/i18n/static-dom-seed.ts:983
+#: apps/app/src/routes/chat-background-page.tsx:551
+#: apps/app/src/routes/group-chat-background-page.tsx:543
 msgid "跟随默认"
 msgstr "跟随默认"
+
+#: apps/app/src/routes/chat-background-page.tsx:592
+#: apps/app/src/routes/group-chat-background-page.tsx:579
+msgid "跟随默认背景"
+msgstr "跟随默认背景"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:673
 msgid "身份"
@@ -11484,6 +11735,10 @@ msgstr "轻轻试一次，就可能遇到一段新的关系线索。"
 #: apps/app/src/routes/discover-feed-page.tsx:599
 msgid "载入桌面发现工作区..."
 msgstr "载入桌面发现工作区..."
+
+#: apps/app/src/routes/create-group-page.tsx:296
+msgid "载入桌面发起群聊..."
+msgstr "载入桌面发起群聊..."
 
 #: apps/app/src/routes/chat-room-page.tsx:267
 msgid "载入桌面对话..."
@@ -11582,6 +11837,7 @@ msgstr "近"
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:790
 #: apps/app/src/features/chat-details/chat-details-shell.tsx:45
 #: apps/app/src/routes/character-detail-page.tsx:272
+#: apps/app/src/routes/create-group-page.tsx:332
 #: apps/app/src/routes/welcome-page.tsx:1111
 msgid "返回"
 msgstr "返回"
@@ -11600,12 +11856,21 @@ msgstr "返回上一步"
 #: apps/app/src/routes/channels-page.tsx:1139
 #: apps/app/src/routes/channels-page.tsx:1170
 #: apps/app/src/routes/character-detail-page.tsx:273
+#: apps/app/src/routes/chat-background-page.tsx:375
+#: apps/app/src/routes/chat-background-page.tsx:407
+#: apps/app/src/routes/chat-background-page.tsx:429
+#: apps/app/src/routes/chat-background-page.tsx:475
 #: apps/app/src/routes/chat-details-page.tsx:189
+#: apps/app/src/routes/create-group-page.tsx:267
 #: apps/app/src/routes/discover-feed-page.tsx:333
 #: apps/app/src/routes/discover-feed-page.tsx:336
 #: apps/app/src/routes/discover-feed-page.tsx:864
 #: apps/app/src/routes/discover-feed-page.tsx:903
 #: apps/app/src/routes/discover-feed-page.tsx:1131
+#: apps/app/src/routes/group-chat-background-page.tsx:365
+#: apps/app/src/routes/group-chat-background-page.tsx:397
+#: apps/app/src/routes/group-chat-background-page.tsx:419
+#: apps/app/src/routes/group-chat-background-page.tsx:465
 #: apps/app/src/routes/group-chat-details-page.tsx:134
 #: apps/app/src/routes/group-chat-details-page.tsx:167
 #: apps/app/src/routes/group-qr-page.tsx:725
@@ -11642,7 +11907,10 @@ msgstr "返回朋友圈"
 msgid "返回消息"
 msgstr "返回消息"
 
+#: apps/app/src/routes/chat-background-page.tsx:475
 #: apps/app/src/routes/chat-details-page.tsx:190
+#: apps/app/src/routes/create-group-page.tsx:274
+#: apps/app/src/routes/group-chat-background-page.tsx:465
 #: apps/app/src/routes/group-chat-details-page.tsx:134
 #: apps/app/src/routes/group-chat-details-page.tsx:167
 msgid "返回消息列表"
@@ -11660,6 +11928,10 @@ msgstr "返回继续使用"
 msgid "返回群聊"
 msgstr "返回群聊"
 
+#: apps/app/src/routes/group-chat-background-page.tsx:365
+#: apps/app/src/routes/group-chat-background-page.tsx:397
+#: apps/app/src/routes/group-chat-background-page.tsx:419
+#: apps/app/src/routes/group-chat-background-page.tsx:651
 #: apps/app/src/routes/group-qr-page.tsx:726
 #: apps/app/src/routes/group-qr-page.tsx:1122
 #: apps/app/src/routes/group-qr-page.tsx:1156
@@ -11667,6 +11939,10 @@ msgstr "返回群聊"
 #: apps/app/src/routes/group-qr-page.tsx:2434
 msgid "返回群聊信息"
 msgstr "返回群聊信息"
+
+#: apps/app/src/routes/create-group-page.tsx:269
+msgid "返回群聊列表"
+msgstr "返回群聊列表"
 
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:92
 msgid "返回群聊发语音"
@@ -11678,11 +11954,17 @@ msgstr "返回群聊拍摄"
 
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:188
 #: apps/app/src/i18n/static-dom-seed.ts:986
+#: apps/app/src/routes/create-group-page.tsx:273
 msgid "返回聊天"
 msgstr "返回聊天"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-history-dialog.tsx:78
 #: apps/app/src/features/desktop/chat/desktop-chat-side-panel.tsx:67
+#: apps/app/src/routes/chat-background-page.tsx:375
+#: apps/app/src/routes/chat-background-page.tsx:407
+#: apps/app/src/routes/chat-background-page.tsx:429
+#: apps/app/src/routes/chat-background-page.tsx:659
+#: apps/app/src/routes/create-group-page.tsx:271
 msgid "返回聊天信息"
 msgstr "返回聊天信息"
 
@@ -11807,6 +12089,7 @@ msgid "还没有可投递的最近会话。"
 msgstr "还没有可投递的最近会话。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1034
+#: apps/app/src/routes/create-group-page.tsx:495
 msgid "还没有可拉进群的人"
 msgstr "还没有可拉进群的人"
 
@@ -11957,12 +12240,17 @@ msgid "这个群目前没有可移除的角色成员。"
 msgstr "这个群目前没有可移除的角色成员。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1037
+#: apps/app/src/routes/group-chat-background-page.tsx:448
 msgid "这个群聊暂时不可用，可以先重试读取，或返回上一页后再试。"
 msgstr "这个群聊暂时不可用，可以先重试读取，或返回上一页后再试。"
 
 #: apps/app/src/routes/group-chat-details-page.tsx:638
 msgid "这个群聊暂时不可用，可以先重试读取，或返回消息列表后再试。"
 msgstr "这个群聊暂时不可用，可以先重试读取，或返回消息列表后再试。"
+
+#: apps/app/src/routes/group-chat-background-page.tsx:442
+msgid "这个群聊暂时不可用，返回上一页后再试一次。"
+msgstr "这个群聊暂时不可用，返回上一页后再试一次。"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:274
 msgid "这个联系人还没有签名。"
@@ -12060,6 +12348,14 @@ msgstr "这段聊天已经不存在"
 #: apps/app/src/routes/chat-details-page.tsx:874
 msgid "这段聊天暂时不可用，可以先重试读取，或返回消息列表后再试。"
 msgstr "这段聊天暂时不可用，可以先重试读取，或返回消息列表后再试。"
+
+#: apps/app/src/routes/chat-background-page.tsx:458
+msgid "这段聊天暂时不可用，可以先重试读取，或返回聊天页后再试。"
+msgstr "这段聊天暂时不可用，可以先重试读取，或返回聊天页后再试。"
+
+#: apps/app/src/routes/chat-background-page.tsx:452
+msgid "这段聊天暂时不可用，返回聊天页后再试一次。"
+msgstr "这段聊天暂时不可用，返回聊天页后再试一次。"
 
 #: apps/app/src/features/chat/use-speech-input.ts:561
 msgid "这段语音没有识别出有效文字，请再试一次。"
@@ -12289,6 +12585,7 @@ msgid "选择某一天的聊天记录"
 msgstr "选择某一天的聊天记录"
 
 #: apps/app/src/features/contacts/desktop-contact-profile-blocks.tsx:18
+#: apps/app/src/routes/create-group-page.tsx:322
 msgid "选择联系人"
 msgstr "选择联系人"
 
@@ -12560,6 +12857,9 @@ msgstr "重试评论点赞"
 #: apps/app/src/routes/channels-page.tsx:1131
 #: apps/app/src/routes/channels-page.tsx:1139
 #: apps/app/src/routes/character-detail-page.tsx:271
+#: apps/app/src/routes/chat-background-page.tsx:367
+#: apps/app/src/routes/chat-background-page.tsx:399
+#: apps/app/src/routes/chat-background-page.tsx:467
 #: apps/app/src/routes/chat-details-page.tsx:209
 #: apps/app/src/routes/chat-list-page.tsx:731
 #: apps/app/src/routes/chat-list-page.tsx:766
@@ -12567,10 +12867,14 @@ msgstr "重试评论点赞"
 #: apps/app/src/routes/contacts-page.tsx:1268
 #: apps/app/src/routes/contacts-page.tsx:1285
 #: apps/app/src/routes/contacts-page.tsx:1299
+#: apps/app/src/routes/create-group-page.tsx:451
 #: apps/app/src/routes/discover-feed-page.tsx:334
 #: apps/app/src/routes/discover-feed-page.tsx:864
 #: apps/app/src/routes/discover-feed-page.tsx:895
 #: apps/app/src/routes/discover-feed-page.tsx:903
+#: apps/app/src/routes/group-chat-background-page.tsx:357
+#: apps/app/src/routes/group-chat-background-page.tsx:389
+#: apps/app/src/routes/group-chat-background-page.tsx:457
 #: apps/app/src/routes/group-chat-details-page.tsx:148
 #: apps/app/src/routes/group-qr-page.tsx:1114
 #: apps/app/src/routes/group-qr-page.tsx:1148
@@ -12947,21 +13251,34 @@ msgid "默认推荐"
 msgstr "默认推荐"
 
 #: apps/app/src/i18n/static-dom-seed.ts:757
+#: apps/app/src/routes/chat-background-page.tsx:682
 msgid "默认背景和好友专属背景"
 msgstr "默认背景和好友专属背景"
 
+#: apps/app/src/routes/group-chat-background-page.tsx:674
+msgid "默认背景和群聊专属背景"
+msgstr "默认背景和群聊专属背景"
+
 #: apps/app/src/i18n/static-dom-seed.ts:762
+#: apps/app/src/routes/chat-background-page.tsx:498
+#: apps/app/src/routes/group-chat-background-page.tsx:489
 msgid "默认背景图"
 msgstr "默认背景图"
 
 #: apps/app/src/i18n/static-dom-seed.ts:975
+#: apps/app/src/routes/chat-background-page.tsx:176
+#: apps/app/src/routes/group-chat-background-page.tsx:169
 msgid "默认背景图已保存。"
 msgstr "默认背景图已保存。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:977
+#: apps/app/src/routes/chat-background-page.tsx:315
+#: apps/app/src/routes/group-chat-background-page.tsx:306
 msgid "默认背景图已切到新预览，保存后生效。"
 msgstr "默认背景图已切到新预览，保存后生效。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:976
+#: apps/app/src/routes/chat-background-page.tsx:190
+#: apps/app/src/routes/group-chat-background-page.tsx:183
 msgid "默认背景图已恢复系统背景。"
 msgstr "默认背景图已恢复系统背景。"

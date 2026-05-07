@@ -8,6 +8,7 @@ import {
 } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import {
   clearConversationBackground,
   clearWorldOwnerChatBackground,
@@ -18,6 +19,7 @@ import {
   type ChatBackgroundAsset,
   type ConversationBackgroundMode,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppPage,
   Button,
@@ -44,6 +46,7 @@ import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 type UploadTarget = "default" | "conversation";
 
 export function ChatBackgroundPage() {
+  const t = useRuntimeTranslator();
   const { conversationId } = useParams({
     from: "/chat/$conversationId/background",
   });
@@ -156,21 +159,21 @@ export function ChatBackgroundPage() {
         setConversationMode("custom");
         setConversationDraft(result.background);
       }
-      setNotice("背景图已上传，记得保存当前设置。");
+      setNotice(t(msg`背景图已上传，记得保存当前设置。`));
     },
   });
 
   const saveDefaultMutation = useMutation({
     mutationFn: async () => {
       if (!defaultDraft) {
-        throw new Error("请先选择默认背景图。");
+        throw new Error(t(msg`请先选择默认背景图。`));
       }
 
       return setWorldOwnerChatBackground({ background: defaultDraft }, baseUrl);
     },
     onSuccess: async (owner) => {
       setDefaultDraft(owner.defaultChatBackground ?? null);
-      setNotice("默认背景图已保存。");
+      setNotice(t(msg`默认背景图已保存。`));
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["world-owner", baseUrl] }),
         queryClient.invalidateQueries({
@@ -184,7 +187,7 @@ export function ChatBackgroundPage() {
     mutationFn: () => clearWorldOwnerChatBackground(baseUrl),
     onSuccess: async () => {
       setDefaultDraft(null);
-      setNotice("默认背景图已恢复系统背景。");
+      setNotice(t(msg`默认背景图已恢复系统背景。`));
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["world-owner", baseUrl] }),
         queryClient.invalidateQueries({
@@ -205,7 +208,7 @@ export function ChatBackgroundPage() {
       }
 
       if (!conversationDraft) {
-        throw new Error("请先为当前聊天选择背景图。");
+        throw new Error(t(msg`请先为当前聊天选择背景图。`));
       }
 
       return setConversationBackground(
@@ -219,8 +222,8 @@ export function ChatBackgroundPage() {
       setConversationDraft(settings.conversationBackground ?? null);
       setNotice(
         settings.mode === "custom"
-          ? "当前聊天背景已保存。"
-          : "当前聊天已恢复跟随默认背景。",
+          ? t(msg`当前聊天背景已保存。`)
+          : t(msg`当前聊天已恢复跟随默认背景。`),
       );
       await queryClient.invalidateQueries({
         queryKey: ["app-conversation-background", baseUrl, conversationId],
@@ -233,7 +236,7 @@ export function ChatBackgroundPage() {
     onSuccess: async () => {
       setConversationMode("inherit");
       setConversationDraft(null);
-      setNotice("当前聊天已恢复跟随默认背景。");
+      setNotice(t(msg`当前聊天已恢复跟随默认背景。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-conversation-background", baseUrl, conversationId],
       });
@@ -309,13 +312,13 @@ export function ChatBackgroundPage() {
   ) => {
     if (target === "default") {
       setDefaultDraft(background);
-      setNotice("默认背景图已切到新预览，保存后生效。");
+      setNotice(t(msg`默认背景图已切到新预览，保存后生效。`));
       return;
     }
 
     setConversationMode("custom");
     setConversationDraft(background);
-    setNotice("当前聊天背景已切到新预览，保存后生效。");
+    setNotice(t(msg`当前聊天背景已切到新预览，保存后生效。`));
   };
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -333,12 +336,12 @@ export function ChatBackgroundPage() {
     <>
       {conversationsQuery.isLoading || backgroundQuery.isLoading ? (
         isDesktopLayout ? (
-          <LoadingBlock label="正在读取聊天背景..." />
+          <LoadingBlock label={t(msg`正在读取聊天背景...`)} />
         ) : (
           <MobileBackgroundStatusCard
-            badge="读取中"
-            title="正在读取聊天背景"
-            description="稍等一下，正在同步默认背景和当前聊天设置。"
+            badge={t(msg`读取中`)}
+            title={t(msg`正在读取聊天背景`)}
+            description={t(msg`稍等一下，正在同步默认背景和当前聊天设置。`)}
             tone="loading"
           />
         )
@@ -349,8 +352,8 @@ export function ChatBackgroundPage() {
           <ErrorBlock message={conversationsQuery.error.message} />
         ) : (
           <MobileBackgroundStatusCard
-            badge="读取失败"
-            title="聊天背景暂时不可用"
+            badge={t(msg`读取失败`)}
+            title={t(msg`聊天背景暂时不可用`)}
             description={conversationsQuery.error.message}
             tone="danger"
             action={
@@ -361,7 +364,7 @@ export function ChatBackgroundPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                   onClick={handleRetryLoad}
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </Button>
                 <Button
                   variant="secondary"
@@ -369,7 +372,7 @@ export function ChatBackgroundPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                   onClick={handleErrorStateAction}
                 >
-                  {safeReturnPath ? "返回上一页" : "返回聊天信息"}
+                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`返回聊天信息`)}
                 </Button>
               </div>
             }
@@ -381,8 +384,8 @@ export function ChatBackgroundPage() {
           <ErrorBlock message={backgroundQuery.error.message} />
         ) : (
           <MobileBackgroundStatusCard
-            badge="读取失败"
-            title="聊天背景暂时不可用"
+            badge={t(msg`读取失败`)}
+            title={t(msg`聊天背景暂时不可用`)}
             description={backgroundQuery.error.message}
             tone="danger"
             action={
@@ -393,7 +396,7 @@ export function ChatBackgroundPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                   onClick={handleRetryLoad}
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </Button>
                 <Button
                   variant="secondary"
@@ -401,7 +404,7 @@ export function ChatBackgroundPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                   onClick={handleErrorStateAction}
                 >
-                  {safeReturnPath ? "返回上一页" : "返回聊天信息"}
+                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`返回聊天信息`)}
                 </Button>
               </div>
             }
@@ -423,7 +426,7 @@ export function ChatBackgroundPage() {
                 onClick={handleErrorStateAction}
                 className="shrink-0 rounded-full border border-[rgba(220,38,38,0.14)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--state-danger-text)]"
               >
-                {safeReturnPath ? "返回上一页" : "返回聊天信息"}
+                {safeReturnPath ? t(msg`返回上一页`) : t(msg`返回聊天信息`)}
               </button>
             </div>
           </InlineNotice>
@@ -445,14 +448,14 @@ export function ChatBackgroundPage() {
       {!conversationsQuery.isLoading && !conversation ? (
         isDesktopLayout ? (
           <EmptyPanel
-            title="会话不存在"
-            description="这段聊天暂时不可用，返回聊天页后再试一次。"
+            title={t(msg`会话不存在`)}
+            description={t(msg`这段聊天暂时不可用，返回聊天页后再试一次。`)}
           />
         ) : (
           <MobileBackgroundStatusCard
-            badge="会话"
-            title="会话不存在"
-            description="这段聊天暂时不可用，可以先重试读取，或返回聊天页后再试。"
+            badge={t(msg`会话`)}
+            title={t(msg`会话不存在`)}
+            description={t(msg`这段聊天暂时不可用，可以先重试读取，或返回聊天页后再试。`)}
             action={
               <div className="flex flex-wrap items-center justify-center gap-2">
                 <Button
@@ -461,7 +464,7 @@ export function ChatBackgroundPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                   onClick={handleRetryLoad}
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </Button>
                 <Button
                   variant="secondary"
@@ -469,7 +472,7 @@ export function ChatBackgroundPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                   onClick={handleMissingConversationAction}
                 >
-                  {safeReturnPath ? "返回上一页" : "返回消息列表"}
+                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`返回消息列表`)}
                 </Button>
               </div>
             }
@@ -485,16 +488,16 @@ export function ChatBackgroundPage() {
               title={conversation.title}
               subtitle={
                 conversationMode === "custom" && supportsConversationOverride
-                  ? "当前聊天正在预览专属背景"
-                  : "当前聊天正在预览默认背景"
+                  ? t(msg`当前聊天正在预览专属背景`)
+                  : t(msg`当前聊天正在预览默认背景`)
               }
             />
           ) : null}
 
           <SectionCard
-            title="默认背景图"
-            description="应用到所有未单独设置专属背景的聊天。"
-            status={getChatBackgroundLabel(defaultDraft)}
+            title={t(msg`默认背景图`)}
+            description={t(msg`应用到所有未单独设置专属背景的聊天。`)}
+            status={t(msg`当前：${getChatBackgroundLabel(defaultDraft)}`)}
           >
             <PresetGrid
               selectedAssetId={defaultDraft?.assetId}
@@ -506,36 +509,36 @@ export function ChatBackgroundPage() {
                 disabled={busy}
                 onClick={() => openPicker("default")}
               >
-                上传图片
+                {t(msg`上传图片`)}
               </Button>
               <Button
                 variant="primary"
                 disabled={busy || !defaultDraft}
                 onClick={() => saveDefaultMutation.mutate()}
               >
-                保存默认背景
+                {t(msg`保存默认背景`)}
               </Button>
               <Button
                 variant="ghost"
                 disabled={busy}
                 onClick={() => clearDefaultMutation.mutate()}
               >
-                恢复系统背景
+                {t(msg`恢复系统背景`)}
               </Button>
             </div>
           </SectionCard>
 
           <SectionCard
-            title="当前聊天背景"
+            title={t(msg`当前聊天背景`)}
             description={
               supportsConversationOverride
-                ? "单聊可设置专属背景，优先级高于默认背景图。"
-                : "当前是群聊会话，暂不支持专属背景，默认跟随全局背景。"
+                ? t(msg`单聊可设置专属背景，优先级高于默认背景图。`)
+                : t(msg`当前是群聊会话，暂不支持专属背景，默认跟随全局背景。`)
             }
             status={
               conversationMode === "custom" && supportsConversationOverride
-                ? getChatBackgroundLabel(conversationDraft)
-                : "跟随默认背景"
+                ? t(msg`当前：${getChatBackgroundLabel(conversationDraft)}`)
+                : t(msg`当前：跟随默认背景`)
             }
           >
             <div className="flex flex-wrap gap-2">
@@ -545,7 +548,7 @@ export function ChatBackgroundPage() {
                   !supportsConversationOverride
                 }
                 disabled={!supportsConversationOverride || busy}
-                label="跟随默认"
+                label={t(msg`跟随默认`)}
                 onClick={() => setConversationMode("inherit")}
               />
               <ModeChip
@@ -553,7 +556,7 @@ export function ChatBackgroundPage() {
                   conversationMode === "custom" && supportsConversationOverride
                 }
                 disabled={!supportsConversationOverride || busy}
-                label="单独设置"
+                label={t(msg`单独设置`)}
                 onClick={() => setConversationMode("custom")}
               />
             </div>
@@ -572,29 +575,29 @@ export function ChatBackgroundPage() {
                     disabled={busy}
                     onClick={() => openPicker("conversation")}
                   >
-                    上传图片
+                    {t(msg`上传图片`)}
                   </Button>
                   <Button
                     variant="primary"
                     disabled={busy || !conversationDraft}
                     onClick={() => saveConversationMutation.mutate()}
                   >
-                    保存当前聊天背景
+                    {t(msg`保存当前聊天背景`)}
                   </Button>
                   <Button
                     variant="ghost"
                     disabled={busy}
                     onClick={() => clearConversationMutation.mutate()}
                   >
-                    跟随默认背景
+                    {t(msg`跟随默认背景`)}
                   </Button>
                 </div>
               </>
             ) : (
               <div className="rounded-[20px] border border-dashed border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.62)] px-4 py-4 text-sm text-[color:var(--text-secondary)]">
                 {supportsConversationOverride
-                  ? "当前聊天会直接沿用默认背景图。切换到“单独设置”后，可以挑选好友专属背景。"
-                  : "群聊当前只会使用默认背景图或系统背景。"}
+                  ? t(msg`当前聊天会直接沿用默认背景图。切换到"单独设置"后，可以挑选好友专属背景。`)
+                  : t(msg`群聊当前只会使用默认背景图或系统背景。`)}
               </div>
             )}
 
@@ -605,7 +608,7 @@ export function ChatBackgroundPage() {
                   disabled={busy}
                   onClick={() => saveConversationMutation.mutate()}
                 >
-                  保存当前聊天设置
+                  {t(msg`保存当前聊天设置`)}
                 </Button>
               </div>
             ) : null}
@@ -630,10 +633,10 @@ export function ChatBackgroundPage() {
           <div className="flex items-center justify-between rounded-[16px] border border-[color:var(--border-faint)] bg-white/78 px-5 py-4 backdrop-blur-xl">
             <div>
               <div className="text-xs tracking-[0.12em] text-[color:var(--text-dim)]">
-                聊天背景
+                {t(msg`聊天背景`)}
               </div>
               <div className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">
-                {conversation?.title ?? "聊天背景"}
+                {conversation?.title ?? t(msg`聊天背景`)}
               </div>
             </div>
             <Button
@@ -653,7 +656,7 @@ export function ChatBackgroundPage() {
               }}
               className="rounded-[10px] border-[color:var(--border-faint)] bg-white shadow-none hover:bg-[color:var(--surface-console)]"
             >
-              返回聊天信息
+              {t(msg`返回聊天信息`)}
             </Button>
           </div>
           <div className="grid gap-5 xl:grid-cols-[400px_minmax(0,1fr)]">
@@ -662,7 +665,7 @@ export function ChatBackgroundPage() {
                 <ChatBackgroundPreview
                   background={effectivePreviewBackground}
                   title={conversation.title}
-                  subtitle="桌面端预览会同步展示在聊天工作区"
+                  subtitle={t(msg`桌面端预览会同步展示在聊天工作区`)}
                 />
               ) : null}
             </div>
@@ -675,8 +678,8 @@ export function ChatBackgroundPage() {
 
   return (
     <ChatDetailsShell
-      title={conversation?.title ?? "聊天背景"}
-      subtitle="默认背景和好友专属背景"
+      title={conversation?.title ?? t(msg`聊天背景`)}
+      subtitle={t(msg`默认背景和好友专属背景`)}
       onBack={() => {
         navigateBackOrFallback(() => {
           void navigate({
@@ -713,7 +716,7 @@ function SectionCard({
           {description}
         </div>
         <div className="mt-3 inline-flex rounded-[8px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 py-1 text-xs text-[color:var(--text-muted)]">
-          当前：{status}
+          {status}
         </div>
       </div>
       <div className="space-y-4">{children}</div>

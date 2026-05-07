@@ -9,13 +9,17 @@ import {
 } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { ArrowLeft, Check, Search, X } from "lucide-react";
 import {
   createGroup,
   getFriends,
   type FriendListItem,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
+
+type Translator = ReturnType<typeof useRuntimeTranslator>;
 import { AvatarChip } from "../components/avatar-chip";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import {
@@ -44,6 +48,7 @@ const DesktopCreateGroupDialog = lazy(async () => {
 });
 
 export function CreateGroupPage() {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const isDesktopLayout = useDesktopLayout();
   const hash = useRouterState({ select: (state) => state.location.hash });
@@ -93,8 +98,8 @@ export function CreateGroupPage() {
     [selectedFriendMap, selectedIds],
   );
   const defaultGroupName = useMemo(
-    () => buildDefaultGroupName(selectedFriends),
-    [selectedFriends],
+    () => buildDefaultGroupName(t, selectedFriends),
+    [t, selectedFriends],
   );
 
   const createMutation = useMutation({
@@ -259,14 +264,14 @@ export function CreateGroupPage() {
   };
 
   const statusBackLabel = safeReturnPath
-    ? "返回上一页"
+    ? t(msg`返回上一页`)
     : routeState.source === "group-contacts"
-      ? "返回群聊列表"
+      ? t(msg`返回群聊列表`)
       : routeState.source === "chat-details"
-        ? "返回聊天信息"
+        ? t(msg`返回聊天信息`)
         : routeState.source === "desktop-chat"
-          ? "返回聊天"
-          : "返回消息列表";
+          ? t(msg`返回聊天`)
+          : t(msg`返回消息列表`);
 
   const handleRetryLoad = () => {
     void friendsQuery.refetch();
@@ -286,9 +291,9 @@ export function CreateGroupPage() {
         <Suspense
           fallback={
             <RouteRedirectState
-              title="正在打开桌面发起群聊"
-              description="正在载入桌面发起群聊对话框，马上恢复当前选择。"
-              loadingLabel="载入桌面发起群聊..."
+              title={t(msg`正在打开桌面发起群聊`)}
+              description={t(msg`正在载入桌面发起群聊对话框，马上恢复当前选择。`)}
+              loadingLabel={t(msg`载入桌面发起群聊...`)}
             />
           }
         >
@@ -314,7 +319,7 @@ export function CreateGroupPage() {
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
       <TabPageTopBar
-        title="选择联系人"
+        title={t(msg`选择联系人`)}
         titleAlign="center"
         className="mx-0 mt-0 mb-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 py-3 text-[color:var(--text-primary)] shadow-none"
         leftActions={
@@ -324,7 +329,7 @@ export function CreateGroupPage() {
             size="icon"
             className="h-9 w-9 rounded-full text-[color:var(--text-primary)]"
             onClick={handleBack}
-            aria-label="返回"
+            aria-label={t(msg`返回`)}
           >
             <ArrowLeft size={18} />
           </Button>
@@ -342,10 +347,10 @@ export function CreateGroupPage() {
             )}
           >
             {createMutation.isPending
-              ? "创建中"
+              ? t(msg`创建中`)
               : selectedIds.length
-                ? `确定(${selectedIds.length})`
-                : "确定"}
+                ? t(msg`确定(${selectedIds.length})`)
+                : t(msg`确定`)}
           </button>
         }
       >
@@ -353,10 +358,12 @@ export function CreateGroupPage() {
           <div className="-mx-4 border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] px-4 py-3">
             <div className="flex items-center justify-between gap-3">
               <div className="text-[13px] font-medium text-[color:var(--text-primary)]">
-                已选联系人
+                {t(msg`已选联系人`)}
               </div>
               <div className="text-[12px] text-[color:var(--text-muted)]">
-                {selectedIds.length ? `${selectedIds.length} 人` : "未选择"}
+                {selectedIds.length
+                  ? t(msg`${selectedIds.length} 人`)
+                  : t(msg`未选择`)}
               </div>
             </div>
 
@@ -390,7 +397,7 @@ export function CreateGroupPage() {
               </div>
             ) : (
               <div className="mt-3 text-[12px] leading-5 text-[color:var(--text-muted)]">
-                先选择联系人，再开始一个新的群聊。
+                {t(msg`先选择联系人，再开始一个新的群聊。`)}
               </div>
             )}
           </div>
@@ -399,7 +406,7 @@ export function CreateGroupPage() {
             routeState.source === "desktop-chat") &&
           routeState.seedMemberIds.length ? (
             <div className="-mx-4 border-y border-[rgba(7,193,96,0.12)] bg-[rgba(7,193,96,0.06)] px-4 py-3 text-[12px] leading-5 text-[#2f7a4c]">
-              已按当前单聊默认勾选对方，你可以继续添加其他联系人。
+              {t(msg`已按当前单聊默认勾选对方，你可以继续添加其他联系人。`)}
             </div>
           ) : null}
 
@@ -409,7 +416,7 @@ export function CreateGroupPage() {
               type="search"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder="搜索"
+              placeholder={t(msg`搜索`)}
               className="min-w-0 flex-1 bg-transparent text-sm text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
             />
           </label>
@@ -420,9 +427,9 @@ export function CreateGroupPage() {
         {friendsQuery.isLoading ? (
           <div className="px-4 pt-4">
             <MobileCreateGroupStatusCard
-              badge="读取中"
-              title="正在读取联系人"
-              description="稍等一下，正在同步可拉进群的联系人。"
+              badge={t(msg`读取中`)}
+              title={t(msg`正在读取联系人`)}
+              description={t(msg`稍等一下，正在同步可拉进群的联系人。`)}
               tone="loading"
             />
           </div>
@@ -430,8 +437,8 @@ export function CreateGroupPage() {
         {friendsQuery.isError && friendsQuery.error instanceof Error ? (
           <div className="px-4 pt-4">
             <MobileCreateGroupStatusCard
-              badge="读取失败"
-              title="联系人列表暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`联系人列表暂时不可用`)}
               description={friendsQuery.error.message}
               action={
                 <div className="flex flex-wrap items-center justify-center gap-2">
@@ -441,7 +448,7 @@ export function CreateGroupPage() {
                     className="h-8 rounded-full px-3 text-[11px]"
                     onClick={handleRetryLoad}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     type="button"
@@ -484,9 +491,9 @@ export function CreateGroupPage() {
         !friendItems.length ? (
           <div className="px-4 pt-6">
             <MobileCreateGroupStatusCard
-              badge="联系人"
-              title="还没有可拉进群的人"
-              description="先去通讯录里建立一些关系，再回来创建群聊。"
+              badge={t(msg`联系人`)}
+              title={t(msg`还没有可拉进群的人`)}
+              description={t(msg`先去通讯录里建立一些关系，再回来创建群聊。`)}
               action={
                 <Button
                   type="button"
@@ -507,9 +514,9 @@ export function CreateGroupPage() {
         !filteredFriends.length ? (
           <div className="px-4 pt-6">
             <MobileCreateGroupStatusCard
-              badge="暂无结果"
-              title="没有找到联系人"
-              description="换个名字、备注名或关系关键词试试。"
+              badge={t(msg`暂无结果`)}
+              title={t(msg`没有找到联系人`)}
+              description={t(msg`换个名字、备注名或关系关键词试试。`)}
               action={
                 <Button
                   type="button"
@@ -540,7 +547,7 @@ export function CreateGroupPage() {
                       name={getFriendDisplayName(item)}
                       relationship={
                         getFriendDisplayName(item) !== item.character.name
-                          ? `昵称：${item.character.name}`
+                          ? t(msg`昵称：${item.character.name}`)
                           : item.character.relationship
                       }
                       src={item.character.avatar}
@@ -577,6 +584,7 @@ function FriendSelectionRow({
   withDivider?: boolean;
   onClick: () => void;
 }) {
+  const t = useRuntimeTranslator();
   const isDesktop = variant === "desktop";
 
   return (
@@ -608,7 +616,7 @@ function FriendSelectionRow({
         </div>
         {isDesktop ? (
           <div className="mt-1 truncate text-[12px] text-[color:var(--text-muted)]">
-            {relationship || "世界联系人"}
+            {relationship || t(msg`世界联系人`)}
           </div>
         ) : null}
       </div>
@@ -630,6 +638,7 @@ function FriendSelectionRow({
 }
 
 function buildDefaultGroupName(
+  t: Translator,
   items: Array<Pick<FriendListItem, "friendship" | "character">>,
 ) {
   const names = items
@@ -638,11 +647,11 @@ function buildDefaultGroupName(
     .slice(0, 3);
 
   if (!names.length) {
-    return "临时群聊";
+    return t(msg`临时群聊`);
   }
 
   if (items.length > 3) {
-    return `${names.join("、")}等${items.length}人`;
+    return t(msg`${names.join("、")}等${items.length}人`);
   }
 
   return names.join("、");
