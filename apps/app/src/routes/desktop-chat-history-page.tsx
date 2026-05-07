@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
@@ -11,6 +12,7 @@ import {
   type GroupMessage,
   type Message,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { DesktopLayoutRequiredState } from "../components/desktop-layout-required-state";
 import { AvatarChip } from "../components/avatar-chip";
@@ -46,6 +48,7 @@ const INITIAL_HISTORY_LIMIT = 80;
 const HISTORY_LOAD_STEP = 80;
 
 export function DesktopChatHistoryPage() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -188,7 +191,7 @@ export function DesktopChatHistoryPage() {
       return clearConversationHistory(conversation.id, baseUrl);
     },
     onSuccess: async (_, conversation) => {
-      setNotice(`${conversation.title} 的聊天记录已清空。`);
+      setNotice(t(msg`${conversation.title} 的聊天记录已清空。`));
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-conversations", baseUrl],
@@ -213,12 +216,13 @@ export function DesktopChatHistoryPage() {
           localMessageActionState,
         ),
         reminders,
+        t,
       ).sort(
         (left, right) =>
           (parseTimestamp(right.createdAt) ?? 0) -
           (parseTimestamp(left.createdAt) ?? 0),
       ),
-    [localMessageActionState, messagesQuery.data, reminders],
+    [localMessageActionState, messagesQuery.data, reminders, t],
   );
   const mayHaveEarlierMessages =
     historyRows.length > 0 && historyRows.length >= historyLimit;
@@ -251,9 +255,9 @@ export function DesktopChatHistoryPage() {
   if (!isDesktopLayout) {
     return (
       <DesktopLayoutRequiredState
-        title="聊天记录当前仅提供桌面布局"
-        description="聊天记录工作区目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到消息页继续查看会话。"
-        actionLabel="返回消息"
+        title={t(msg`聊天记录当前仅提供桌面布局`)}
+        description={t(msg`聊天记录工作区目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到消息页继续查看会话。`)}
+        actionLabel={t(msg`返回消息`)}
         fallbackTo="/tabs/chat"
       />
     );
@@ -261,11 +265,11 @@ export function DesktopChatHistoryPage() {
 
   return (
     <DesktopUtilityShell
-      title="聊天记录"
+      title={t(msg`聊天记录`)}
       subtitle={
         selectedConversation
-          ? `${selectedConversation.title} · 已加载 ${historyRows.length} 条`
-          : "按会话查看、展开和清理最近聊天记录"
+          ? t(msg`${selectedConversation.title} · 已加载 ${historyRows.length} 条`)
+          : t(msg`按会话查看、展开和清理最近聊天记录`)
       }
       toolbar={
         selectedConversation ? (
@@ -275,18 +279,18 @@ export function DesktopChatHistoryPage() {
               size="sm"
               onClick={() => {
                 void messagesQuery.refetch();
-                setNotice(`已刷新当前会话最近 ${historyRows.length} 条记录。`);
+                setNotice(t(msg`已刷新当前会话最近 ${historyRows.length} 条记录。`));
               }}
               className="h-8 rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 text-[12px] shadow-none hover:bg-[#f5f7f7]"
             >
-              刷新记录
+              {t(msg`刷新记录`)}
             </Button>
             <Button
               variant="secondary"
               size="sm"
               onClick={() => {
                 if (!mayHaveEarlierMessages) {
-                  setNotice("当前会话的聊天记录已经全部加载。");
+                  setNotice(t(msg`当前会话的聊天记录已经全部加载。`));
                   return;
                 }
 
@@ -296,10 +300,10 @@ export function DesktopChatHistoryPage() {
               className="h-8 rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 text-[12px] shadow-none hover:bg-[#f5f7f7]"
             >
               {messagesQuery.isFetching
-                ? "正在加载..."
+                ? t(msg`正在加载...`)
                 : mayHaveEarlierMessages
-                  ? "加载更早消息"
-                  : "历史已全部加载"}
+                  ? t(msg`加载更早消息`)
+                  : t(msg`历史已全部加载`)}
             </Button>
             <Button
               variant="secondary"
@@ -308,7 +312,7 @@ export function DesktopChatHistoryPage() {
               disabled={clearMutation.isPending}
               className="h-8 rounded-[10px] border-[rgba(239,68,68,0.18)] bg-[rgba(254,242,242,0.92)] px-3 text-[12px] text-[color:var(--state-danger-text)] shadow-none hover:bg-[rgba(254,226,226,0.95)]"
             >
-              {clearMutation.isPending ? "清空中..." : "清空记录"}
+              {clearMutation.isPending ? t(msg`清空中...`) : t(msg`清空记录`)}
             </Button>
           </>
         ) : null
@@ -317,16 +321,16 @@ export function DesktopChatHistoryPage() {
         <>
           <div className="border-b border-[color:var(--border-faint)] px-4 py-4">
             <div className="text-sm font-medium text-[color:var(--text-primary)]">
-              会话列表
+              {t(msg`会话列表`)}
             </div>
             <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-              选择一个会话后再查看历史消息。
+              {t(msg`选择一个会话后再查看历史消息。`)}
             </div>
           </div>
 
           <div className="min-h-0 flex-1 overflow-auto px-2 py-2">
             {conversationsQuery.isLoading ? (
-              <LoadingBlock label="正在读取会话..." />
+              <LoadingBlock label={t(msg`正在读取会话...`)} />
             ) : null}
             {conversationsQuery.isError &&
             conversationsQuery.error instanceof Error ? (
@@ -379,34 +383,34 @@ export function DesktopChatHistoryPage() {
           <div className="flex h-full min-h-0 flex-col">
             <div className="border-b border-[color:var(--border-faint)] px-5 py-4">
               <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                当前会话
+                {t(msg`当前会话`)}
               </div>
               <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                辅助查看当前加载窗口与提醒数量。
+                {t(msg`辅助查看当前加载窗口与提醒数量。`)}
               </div>
             </div>
 
             <div className="min-h-0 flex-1 overflow-auto p-5">
               <div className="space-y-3">
                 <InfoCard
-                  label="会话类型"
+                  label={t(msg`会话类型`)}
                   value={getConversationThreadLabel(selectedConversation)}
                 />
                 <InfoCard
-                  label="最近活跃"
+                  label={t(msg`最近活跃`)}
                   value={formatConversationTimestamp(
                     selectedConversation.lastActivityAt,
                   )}
                 />
-                <InfoCard label="已加载" value={`${historyRows.length} 条`} />
+                <InfoCard label={t(msg`已加载`)} value={t(msg`${historyRows.length} 条`)} />
                 <InfoCard
-                  label="本机提醒"
-                  value={`${historyRows.filter((item) => item.reminderAt).length} 条`}
+                  label={t(msg`本机提醒`)}
+                  value={t(msg`${historyRows.filter((item) => item.reminderAt).length} 条`)}
                 />
-                <InfoCard label="加载窗口" value={`最近 ${historyLimit} 条`} />
+                <InfoCard label={t(msg`加载窗口`)} value={t(msg`最近 ${historyLimit} 条`)} />
                 <InfoCard
-                  label="更早消息"
-                  value={mayHaveEarlierMessages ? "还可继续展开" : "已全部加载"}
+                  label={t(msg`更早消息`)}
+                  value={mayHaveEarlierMessages ? t(msg`还可继续展开`) : t(msg`已全部加载`)}
                 />
               </div>
             </div>
@@ -414,8 +418,8 @@ export function DesktopChatHistoryPage() {
         ) : (
           <div className="flex h-full items-center justify-center px-6">
             <EmptyState
-              title="先选会话"
-              description="右侧会显示当前会话的加载与提醒摘要。"
+              title={t(msg`先选会话`)}
+              description={t(msg`右侧会显示当前会话的加载与提醒摘要。`)}
             />
           </div>
         )
@@ -426,7 +430,7 @@ export function DesktopChatHistoryPage() {
 
         <div className="mt-4 space-y-2.5">
           {messagesQuery.isLoading ? (
-            <LoadingBlock label="正在读取聊天记录..." />
+            <LoadingBlock label={t(msg`正在读取聊天记录...`)} />
           ) : null}
           {messagesQuery.isError && messagesQuery.error instanceof Error ? (
             <ErrorBlock message={messagesQuery.error.message} />
@@ -438,8 +442,8 @@ export function DesktopChatHistoryPage() {
           {!selectedConversation ? (
             <div className="rounded-[18px] border border-dashed border-[color:var(--border-faint)] bg-white/80 p-6">
               <EmptyState
-                title="先从左侧选择一个会话"
-                description="聊天记录管理会优先按会话承接查看和清理操作。"
+                title={t(msg`先从左侧选择一个会话`)}
+                description={t(msg`聊天记录管理会优先按会话承接查看和清理操作。`)}
               />
             </div>
           ) : null}
@@ -465,7 +469,7 @@ export function DesktopChatHistoryPage() {
                       </span>
                       {item.reminderAt ? (
                         <span className="rounded-[8px] bg-[rgba(59,130,246,0.12)] px-2.5 py-1 text-[11px] text-[#2563eb]">
-                          提醒 · {formatMessageTimestamp(item.reminderAt)}
+                          {t(msg`提醒 · ${formatMessageTimestamp(item.reminderAt)}`)}
                         </span>
                       ) : null}
                     </div>
@@ -482,7 +486,7 @@ export function DesktopChatHistoryPage() {
                       }
                       className="h-8 rounded-[10px] border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 text-[12px] shadow-none hover:bg-white"
                     >
-                      定位到原消息
+                      {t(msg`定位到原消息`)}
                     </Button>
                   </div>
                 </div>
@@ -494,8 +498,8 @@ export function DesktopChatHistoryPage() {
           !historyRows.length ? (
             <div className="rounded-[18px] border border-dashed border-[color:var(--border-faint)] bg-white/80 p-6">
               <EmptyState
-                title="当前会话还没有可管理的记录"
-                description="可能刚刚清空过，或者这个会话目前还没有任何消息。"
+                title={t(msg`当前会话还没有可管理的记录`)}
+                description={t(msg`可能刚刚清空过，或者这个会话目前还没有任何消息。`)}
               />
             </div>
           ) : null}
@@ -515,8 +519,8 @@ export function DesktopChatHistoryPage() {
                 className="h-8 rounded-[10px] border-[color:var(--border-faint)] bg-white px-4 text-[12px] shadow-none hover:bg-[#f5f7f7]"
               >
                 {messagesQuery.isFetching
-                  ? "正在加载更早消息..."
-                  : "继续加载更早消息"}
+                  ? t(msg`正在加载更早消息...`)
+                  : t(msg`继续加载更早消息`)}
               </Button>
             </div>
           ) : null}
@@ -529,6 +533,7 @@ export function DesktopChatHistoryPage() {
 function normalizeHistoryRows(
   messages: Array<Message | GroupMessage>,
   reminders: Array<{ messageId: string; remindAt: string }>,
+  t: ReturnType<typeof useRuntimeTranslator>,
 ) {
   const reminderMap = new Map(
     reminders.map((item) => [item.messageId, item.remindAt]),
@@ -538,50 +543,56 @@ function normalizeHistoryRows(
     id: item.id,
     senderName: item.senderName,
     createdAt: item.createdAt,
-    preview: resolveMessagePreview(item),
+    preview: resolveMessagePreview(item, t),
     reminderAt: reminderMap.get(item.id),
-    typeLabel: resolveMessageTypeLabel(item.type),
+    typeLabel: resolveMessageTypeLabel(item.type, t),
   }));
 }
 
-function resolveMessagePreview(item: Message | GroupMessage) {
+function resolveMessagePreview(
+  item: Message | GroupMessage,
+  t: ReturnType<typeof useRuntimeTranslator>,
+) {
   return (
     resolveMessageSemanticPreview(item, {
       maxChars: 220,
-    }) || "这条消息没有文本内容。"
+    }) || t(msg`这条消息没有文本内容。`)
   );
 }
 
-function resolveMessageTypeLabel(type: Message["type"] | GroupMessage["type"]) {
+function resolveMessageTypeLabel(
+  type: Message["type"] | GroupMessage["type"],
+  t: ReturnType<typeof useRuntimeTranslator>,
+) {
   if (type === "image") {
-    return "图片";
+    return t(msg`图片`);
   }
 
   if (type === "file") {
-    return "文件";
+    return t(msg`文件`);
   }
 
   if (type === "voice") {
-    return "语音";
+    return t(msg`语音`);
   }
 
   if (type === "contact_card") {
-    return "名片";
+    return t(msg`名片`);
   }
 
   if (type === "location_card") {
-    return "位置";
+    return t(msg`位置`);
   }
 
   if (type === "sticker") {
-    return "表情";
+    return t(msg`表情`);
   }
 
   if (type === "system") {
-    return "系统";
+    return t(msg`系统`);
   }
 
-  return "文本";
+  return t(msg`文本`);
 }
 
 function InfoCard({ label, value }: { label: string; value: string }) {
