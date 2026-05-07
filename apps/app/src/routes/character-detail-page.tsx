@@ -698,13 +698,18 @@ export function CharacterDetailPage() {
   };
 
   const handleVoiceCall = () => {
-    setNotice({ tone: "info", message: "语音通话功能开发中，敬请期待" });
+    setNotice(null);
     setMobileSheetAction(null);
+    openCallMutation.mutate("voice");
   };
 
   const handleVideoCall = () => {
-    setNotice({ tone: "info", message: "视频通话功能开发中，敬请期待" });
+    setNotice(null);
     setMobileSheetAction(null);
+    if (!guardVideoEntry()) {
+      return;
+    }
+    openCallMutation.mutate("video");
   };
   const handleShareCharacterCard = async () => {
     if (!character) {
