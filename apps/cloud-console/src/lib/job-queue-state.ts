@@ -1,4 +1,5 @@
 import type { WorldLifecycleJobSummary } from "@yinjie/contracts";
+import { translateCloudConsoleTextForActiveLocale } from "./cloud-console-i18n";
 
 export type QueueStateFilter =
   | "all"
@@ -15,15 +16,36 @@ export type JobQueueState = {
   sortOrder: number;
 };
 
-export const QUEUE_STATE_FILTERS: Array<{
+export const QUEUE_STATE_FILTER_VALUES: readonly QueueStateFilter[] = [
+  "all",
+  "running_now",
+  "lease_expired",
+  "delayed",
+];
+
+export function getQueueStateFilters(): Array<{
   value: QueueStateFilter;
   label: string;
-}> = [
-  { value: "all", label: "queue: all" },
-  { value: "running_now", label: "queue: running" },
-  { value: "lease_expired", label: "queue: lease expired" },
-  { value: "delayed", label: "queue: delayed" },
-];
+}> {
+  return [
+    {
+      value: "all",
+      label: translateCloudConsoleTextForActiveLocale("queue: all"),
+    },
+    {
+      value: "running_now",
+      label: translateCloudConsoleTextForActiveLocale("queue: running"),
+    },
+    {
+      value: "lease_expired",
+      label: translateCloudConsoleTextForActiveLocale("queue: lease expired"),
+    },
+    {
+      value: "delayed",
+      label: translateCloudConsoleTextForActiveLocale("queue: delayed"),
+    },
+  ];
+}
 
 export function resolveQueueState(
   job: WorldLifecycleJobSummary,
@@ -36,7 +58,7 @@ export function resolveQueueState(
   if (job.status === "running") {
     return {
       key: "running_now",
-      label: "Running",
+      label: translateCloudConsoleTextForActiveLocale("Running"),
       tone: "border-sky-300/50 bg-sky-50 text-sky-700",
       sortOrder: 0,
     };
@@ -45,7 +67,7 @@ export function resolveQueueState(
   if (job.failureCode === "lease_expired") {
     return {
       key: "lease_expired",
-      label: "Lease expired",
+      label: translateCloudConsoleTextForActiveLocale("Lease expired"),
       tone: "border-rose-300/60 bg-rose-50 text-rose-700",
       sortOrder: 1,
     };
@@ -58,7 +80,7 @@ export function resolveQueueState(
   ) {
     return {
       key: "delayed",
-      label: "Delayed",
+      label: translateCloudConsoleTextForActiveLocale("Delayed"),
       tone: "border-amber-300/50 bg-amber-50 text-amber-700",
       sortOrder: 2,
     };
@@ -66,7 +88,7 @@ export function resolveQueueState(
 
   return {
     key: "other",
-    label: "Other",
+    label: translateCloudConsoleTextForActiveLocale("Other"),
     tone: "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]",
     sortOrder: 3,
   };

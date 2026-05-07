@@ -19,8 +19,8 @@ import { ConsoleConfirmDialog } from "../components/console-confirm-dialog";
 import { useConsoleNotice } from "../components/console-notice";
 import { WorldLifecycleActionButtons } from "../components/world-lifecycle-action-buttons";
 import {
+  getQueueStateFilters,
   groupJobsByQueueState,
-  QUEUE_STATE_FILTERS,
 } from "../lib/job-queue-state";
 import {
   describeJobResult,
@@ -548,7 +548,7 @@ export function JobsPage() {
             }
             className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)]"
             >
-              {QUEUE_STATE_FILTERS.map((item) => (
+              {getQueueStateFilters().map((item) => (
                 <option key={item.value} value={item.value}>
                   {item.label}
                 </option>

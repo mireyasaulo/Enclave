@@ -324,6 +324,43 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Rotating...": "轮换中…",
     "System ready": "系统正常",
     "System warning": "系统告警",
+
+    App: "应用",
+    Site: "站点",
+    Wiki: "Wiki",
+    "queue: all": "队列：全部",
+    "queue: running": "队列：运行中",
+    "queue: lease expired": "队列：租约过期",
+    "queue: delayed": "队列：延迟",
+    "Lease expired": "租约过期",
+    Delayed: "延迟",
+    Other: "其他",
+    "Session id, IP, client, revoker": "会话 ID、IP、客户端、撤销人",
+    "Waiting sync status": "等待同步状态",
+    "Waiting sync task type": "等待同步任务类型",
+    "Waiting sync search": "等待同步搜索",
+    "task key, target, context, or error": "任务键、目标、上下文或错误",
+    "Waiting sync page size": "等待同步分页大小",
+    "Context task review": "上下文任务复核",
+    "Recent task receipts": "最近任务回执",
+
+    "Admin sessions": "管理员会话",
+    "Review live admin sessions, inspect where they were issued from, filter by revocation path, and page through longer audit history.":
+      "查看实时的管理员会话、签发来源、按撤销路径筛选，并翻阅更长的审计历史。",
+    "Source groups": "来源分组",
+    "Aggregate sessions by issue IP and client under the current filters, then revoke an entire source in one action.":
+      "在当前筛选条件下按签发 IP 与客户端聚合会话，并可一键撤销整个来源。",
+    "Risk timeline": "风险时间线",
+    "Derived from session issue, expiry, and revoke events inside the focused source group under the current filters.":
+      "依据当前筛选下聚焦来源分组的会话签发、过期与撤销事件计算得出。",
+    "Current rationale": "当前判定依据",
+    "Select all active admin sessions": "选中全部活跃的管理员会话",
+    "Recent operation receipts": "最近操作回执",
+    "Revoke admin session?": "撤销管理员会话？",
+    "Revoke selected admin sessions?": "撤销所选的管理员会话？",
+    "Revoke all matching admin sessions?": "撤销全部匹配的管理员会话？",
+    "Revoke matching risk groups?": "撤销匹配的风险分组？",
+    "Revoke source group?": "撤销来源分组？",
   },
   "ja-JP": {
     "CLOUD_ADMIN_SECRET is required.": "CLOUD_ADMIN_SECRET を入力してください。",
@@ -653,6 +690,48 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Rotating...": "ローテーション中…",
     "System ready": "システム正常",
     "System warning": "システム警告",
+
+    App: "アプリ",
+    Site: "サイト",
+    Wiki: "Wiki",
+    "queue: all": "キュー：すべて",
+    "queue: running": "キュー：実行中",
+    "queue: lease expired": "キュー：リース期限切れ",
+    "queue: delayed": "キュー：遅延",
+    "Lease expired": "リース期限切れ",
+    Delayed: "遅延",
+    Other: "その他",
+    "Session id, IP, client, revoker":
+      "セッション ID、IP、クライアント、取り消し者",
+    "Waiting sync status": "待機同期ステータス",
+    "Waiting sync task type": "待機同期タスク種別",
+    "Waiting sync search": "待機同期検索",
+    "task key, target, context, or error":
+      "タスクキー、対象、コンテキスト、またはエラー",
+    "Waiting sync page size": "待機同期ページサイズ",
+    "Context task review": "コンテキストタスクレビュー",
+    "Recent task receipts": "最近のタスク受領",
+
+    "Admin sessions": "管理者セッション",
+    "Review live admin sessions, inspect where they were issued from, filter by revocation path, and page through longer audit history.":
+      "稼働中の管理者セッションを確認し、発行元を調べ、取り消し経路でフィルタリングし、より長い監査履歴をページングできます。",
+    "Source groups": "発行元グループ",
+    "Aggregate sessions by issue IP and client under the current filters, then revoke an entire source in one action.":
+      "現在のフィルター条件で発行 IP とクライアント単位にセッションを集計し、一括で発行元全体を取り消せます。",
+    "Risk timeline": "リスクタイムライン",
+    "Derived from session issue, expiry, and revoke events inside the focused source group under the current filters.":
+      "現在のフィルター条件で注目している発行元グループ内のセッション発行・期限・取り消しイベントから算出します。",
+    "Current rationale": "現在の判定根拠",
+    "Select all active admin sessions": "稼働中の管理者セッションをすべて選択",
+    "Recent operation receipts": "最近の操作受領",
+    "Revoke admin session?": "管理者セッションを取り消しますか？",
+    "Revoke selected admin sessions?":
+      "選択した管理者セッションを取り消しますか？",
+    "Revoke all matching admin sessions?":
+      "条件に一致する管理者セッションをすべて取り消しますか？",
+    "Revoke matching risk groups?":
+      "条件に一致するリスクグループを取り消しますか？",
+    "Revoke source group?": "発行元グループを取り消しますか？",
   },
   "ko-KR": {
     "CLOUD_ADMIN_SECRET is required.": "CLOUD_ADMIN_SECRET을 입력하세요.",
@@ -978,6 +1057,46 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Rotating...": "교체 중…",
     "System ready": "시스템 정상",
     "System warning": "시스템 경고",
+
+    App: "앱",
+    Site: "사이트",
+    Wiki: "Wiki",
+    "queue: all": "큐: 전체",
+    "queue: running": "큐: 실행 중",
+    "queue: lease expired": "큐: 리스 만료",
+    "queue: delayed": "큐: 지연",
+    "Lease expired": "리스 만료",
+    Delayed: "지연",
+    Other: "기타",
+    "Session id, IP, client, revoker":
+      "세션 ID, IP, 클라이언트, 취소자",
+    "Waiting sync status": "대기 동기화 상태",
+    "Waiting sync task type": "대기 동기화 작업 유형",
+    "Waiting sync search": "대기 동기화 검색",
+    "task key, target, context, or error":
+      "작업 키, 대상, 컨텍스트 또는 오류",
+    "Waiting sync page size": "대기 동기화 페이지 크기",
+    "Context task review": "컨텍스트 작업 검토",
+    "Recent task receipts": "최근 작업 영수증",
+
+    "Admin sessions": "관리자 세션",
+    "Review live admin sessions, inspect where they were issued from, filter by revocation path, and page through longer audit history.":
+      "활성 관리자 세션을 검토하고 발급 위치를 조사하며 취소 경로별로 필터링하고 더 긴 감사 이력을 페이지로 탐색합니다.",
+    "Source groups": "발급 그룹",
+    "Aggregate sessions by issue IP and client under the current filters, then revoke an entire source in one action.":
+      "현재 필터에서 발급 IP와 클라이언트별로 세션을 집계하고 한 번의 동작으로 발급원 전체를 취소합니다.",
+    "Risk timeline": "위험 타임라인",
+    "Derived from session issue, expiry, and revoke events inside the focused source group under the current filters.":
+      "현재 필터에서 주목 중인 발급 그룹 내의 세션 발급, 만료, 취소 이벤트에서 도출됩니다.",
+    "Current rationale": "현재 근거",
+    "Select all active admin sessions": "활성 관리자 세션 모두 선택",
+    "Recent operation receipts": "최근 작업 영수증",
+    "Revoke admin session?": "관리자 세션을 취소할까요?",
+    "Revoke selected admin sessions?": "선택한 관리자 세션을 취소할까요?",
+    "Revoke all matching admin sessions?":
+      "일치하는 모든 관리자 세션을 취소할까요?",
+    "Revoke matching risk groups?": "일치하는 위험 그룹을 취소할까요?",
+    "Revoke source group?": "발급 그룹을 취소할까요?",
   },
 };
 // i18n-ignore-end
@@ -1376,6 +1495,42 @@ export function formatCloudConsoleFunnelOverall(
     "zh-CN": `整体 ${percent}%`,
     "ja-JP": `全体 ${percent}%`,
     "ko-KR": `전체 ${percent}%`,
+  });
+}
+
+export function formatCloudConsoleSuspendWorldTitle(
+  worldName: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Suspend ${worldName}?`,
+    "zh-CN": `暂停世界 ${worldName}？`,
+    "ja-JP": `ワールド ${worldName} を一時停止しますか？`,
+    "ko-KR": `월드 ${worldName}을(를) 일시 중지할까요?`,
+  });
+}
+
+export function formatCloudConsoleRetryWorldRecoveryTitle(
+  worldName: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Retry recovery for ${worldName}?`,
+    "zh-CN": `为世界 ${worldName} 重试恢复？`,
+    "ja-JP": `ワールド ${worldName} の復旧を再試行しますか？`,
+    "ko-KR": `월드 ${worldName} 복구를 재시도할까요?`,
+  });
+}
+
+export function formatCloudConsoleLegacyProviderLabel(
+  providerKey: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `${providerKey} (legacy)`,
+    "zh-CN": `${providerKey}（遗留）`,
+    "ja-JP": `${providerKey}（レガシー）`,
+    "ko-KR": `${providerKey}(레거시)`,
   });
 }
 // i18n-ignore-end

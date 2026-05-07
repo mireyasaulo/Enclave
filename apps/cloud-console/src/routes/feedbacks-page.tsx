@@ -11,6 +11,8 @@ import { Button, ErrorBlock, InlineNotice, LoadingBlock } from "@yinjie/ui";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
+// i18n-ignore-start: English option labels are the source-of-truth keys; render
+// sites wrap them with t(...) (useCloudConsoleText) for runtime translation.
 const CATEGORY_OPTIONS: Array<{ value: CloudFeedbackCategory; label: string }> = [
   { value: "bug", label: "Bug" },
   { value: "interaction", label: "Interaction" },
@@ -38,6 +40,7 @@ const SOURCE_OPTIONS: Array<{ value: CloudFeedbackSource; label: string }> = [
   { value: "mobile", label: "Mobile" },
   { value: "wechat", label: "WeChat" },
 ];
+// i18n-ignore-end
 
 function categoryLabel(value: CloudFeedbackCategory) {
   return CATEGORY_OPTIONS.find((opt) => opt.value === value)?.label ?? value;

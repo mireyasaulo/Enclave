@@ -20,9 +20,9 @@ import { useConsoleNotice } from "../components/console-notice";
 import { WorldLifecycleActionButtons } from "../components/world-lifecycle-action-buttons";
 import { copyTextToClipboard } from "../lib/clipboard";
 import {
+  getQueueStateFilters,
   groupJobsByQueueState,
   matchesQueueStateFilter,
-  QUEUE_STATE_FILTERS,
   type QueueStateFilter,
 } from "../lib/job-queue-state";
 import { buildCompactJobsRouteSearch } from "../lib/job-route-search";
@@ -32,6 +32,7 @@ import {
   formatCloudConsoleJobLeaseExpires,
   formatCloudConsoleJobLeaseRemaining,
   formatCloudConsoleJobsGroupCount,
+  formatCloudConsoleLegacyProviderLabel,
   translateCloudConsoleTextForActiveLocale,
   useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
@@ -190,7 +191,7 @@ function buildProviderOptions(
     ...providers,
     {
       key: providerKey,
-      label: `${providerKey} ${translateCloudConsoleTextForActiveLocale("(legacy)")}`,
+      label: formatCloudConsoleLegacyProviderLabel(providerKey),
       description: translateCloudConsoleTextForActiveLocale(
         "This provider key is not in the current catalog yet.",
       ),
@@ -1414,7 +1415,7 @@ export function WorldDetailPage() {
             }
             className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)]"
           >
-            {QUEUE_STATE_FILTERS.map((item) => (
+            {getQueueStateFilters().map((item) => (
               <option key={item.value} value={item.value}>
                 {item.label}
               </option>

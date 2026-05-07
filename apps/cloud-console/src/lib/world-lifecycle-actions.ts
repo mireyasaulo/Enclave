@@ -170,7 +170,7 @@ export function createWorldActionConfirmationCopy(
   switch (action) {
     case "suspend":
       return {
-        title: `Suspend ${world.name}?`,
+        title: formatCloudConsoleSuspendWorldTitle(world.name),
         description:
           "The world will move toward sleeping state and active sessions may need to reconnect after it wakes again.",
         confirmLabel: "Suspend world",
@@ -180,7 +180,7 @@ export function createWorldActionConfirmationCopy(
     case "retry":
     default:
       return {
-        title: `Retry recovery for ${world.name}?`,
+        title: formatCloudConsoleRetryWorldRecoveryTitle(world.name),
         description:
           "This will queue a new recovery action and clear the current failure state for the world.",
         confirmLabel: "Retry recovery",
