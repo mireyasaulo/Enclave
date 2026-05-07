@@ -260,6 +260,103 @@ function ensurePlistArrayContainsString(source, key, value) {
   return `${source.slice(0, arrayEnd)}${insertion}${source.slice(arrayEnd)}`;
 }
 
+function ensurePlistStringValueIfHardcoded(source, key, knownHardcoded, replacement) {
+  const keyMarker = `<key>${key}</key>`;
+  const keyIndex = source.indexOf(keyMarker);
+  if (keyIndex === -1) {
+    return source;
+  }
+
+  const stringOpen = source.indexOf("<string>", keyIndex);
+  const stringClose = source.indexOf("</string>", stringOpen);
+  if (stringOpen === -1 || stringClose === -1) {
+    return source;
+  }
+
+  const currentValue = source.slice(stringOpen + "<string>".length, stringClose);
+  if (!knownHardcoded.includes(currentValue)) {
+    return source;
+  }
+
+  return `${source.slice(0, stringOpen)}<string>${escapeXml(replacement)}</string>${source.slice(stringClose + "</string>".length)}`;
+}
+
+function ensurePlistArmArchitecture(source) {
+  const keyMarker = "<key>UIRequiredDeviceCapabilities</key>";
+  const keyIndex = source.indexOf(keyMarker);
+  if (keyIndex === -1) {
+    return source;
+  }
+
+  const arrayStart = source.indexOf("<array>", keyIndex);
+  const arrayEnd = source.indexOf("</array>", arrayStart);
+  if (arrayStart === -1 || arrayEnd === -1) {
+    return source;
+  }
+
+  const before = source.slice(0, arrayStart);
+  const arrayBody = source.slice(arrayStart, arrayEnd);
+  const after = source.slice(arrayEnd);
+
+  if (!arrayBody.includes("<string>armv7</string>")) {
+    return source;
+  }
+
+  const patchedArrayBody = arrayBody.replace(
+    /<string>armv7<\/string>/g,
+    "<string>arm64</string>",
+  );
+  return `${before}${patchedArrayBody}${after}`;
+}
+
+function ensureAppTransportSecurity(source) {
+  if (source.includes("<key>NSAppTransportSecurity</key>")) {
+    return source;
+  }
+
+  const snippet = [
+    "\t<key>NSAppTransportSecurity</key>\n",
+    "\t<dict>\n",
+    "\t\t<key>NSAllowsArbitraryLoads</key>\n",
+    "\t\t<false/>\n",
+    "\t</dict>\n",
+  ].join("");
+
+  return insertBeforeDictEnd(source, snippet);
+}
+
+function ensureCapacitorConfigIosScheme() {
+  const configPath = path.join(cwd, "capacitor.config.ts");
+  if (!fs.existsSync(configPath)) {
+    return;
+  }
+
+  const source = fs.readFileSync(configPath, "utf8");
+  const issues = [];
+
+  if (/server\s*:\s*\{[\s\S]*?androidScheme/m.test(source)) {
+    issues.push("server.androidScheme is meaningless on iOS-only shell");
+  }
+  if (/server\s*:\s*\{[\s\S]*?hostname/m.test(source)) {
+    issues.push(
+      "server.hostname locks the WKWebView origin — once a build ships with it, changing or removing the value invalidates persistent Web storage on already-installed devices",
+    );
+  }
+  if (!/ios\s*:\s*\{[\s\S]*?scheme\s*:/m.test(source)) {
+    issues.push("ios.scheme is not declared (recommend explicit \"capacitor\")");
+  }
+
+  if (issues.length > 0) {
+    console.log("warn  capacitor.config.ts drift detected:");
+    for (const issue of issues) {
+      console.log(`        - ${issue}`);
+    }
+    console.log(
+      "        configure does not auto-rewrite TS to keep comments intact; doctor will fail until fixed manually.",
+    );
+  }
+}
+
 function ensureInfoPlistDefaults() {
   const templatePath = path.join(cwd, "xcode-template", "Info.plist.example");
   if (!fs.existsSync(infoPlistPath)) {
@@ -275,16 +372,63 @@ function ensureInfoPlistDefaults() {
     ["YinjieApiBaseUrl", ""],
     ["YinjieSocketBaseUrl", ""],
     ["YinjieEnvironment", ""],
-    ["YinjiePublicAppName", "隐界"],
-    ["NSCameraUsageDescription", "用于拍摄头像或动态图片。"],
-    ["NSPhotoLibraryUsageDescription", "用于从相册选择头像或动态图片。"],
-    ["NSPhotoLibraryAddUsageDescription", "用于将导出图片保存到相册。"],
-    ["NSMicrophoneUsageDescription", "用于语音输入或语音互动功能。"],
+    ["CFBundleDisplayName", ""],
+    ["YinjiePublicAppName", ""],
+    ["NSCameraUsageDescription", ""],
+    ["NSPhotoLibraryUsageDescription", ""],
+    ["NSPhotoLibraryAddUsageDescription", ""],
+    ["NSMicrophoneUsageDescription", ""],
   ];
 
   for (const [key, value] of requiredStrings) {
     plist = ensurePlistStringKey(plist, key, value);
   }
+
+  const localizedKeys = [
+    {
+      key: "CFBundleDisplayName",
+      hardcoded: ["隐界", "Yinjie"],
+    },
+    {
+      key: "YinjiePublicAppName",
+      hardcoded: ["隐界", "Yinjie"],
+    },
+    {
+      key: "NSCameraUsageDescription",
+      hardcoded: [
+        "用于拍摄头像或动态图片。",
+        "Used to take profile photos or moment images.",
+      ],
+    },
+    {
+      key: "NSPhotoLibraryUsageDescription",
+      hardcoded: [
+        "用于从相册选择头像或动态图片。",
+        "Used to choose profile photos or moment images from your photo library.",
+      ],
+    },
+    {
+      key: "NSPhotoLibraryAddUsageDescription",
+      hardcoded: [
+        "用于将导出图片保存到相册。",
+        "Used to save exported images to your photo library.",
+      ],
+    },
+    {
+      key: "NSMicrophoneUsageDescription",
+      hardcoded: [
+        "用于语音输入或语音互动功能。",
+        "Used for voice input and voice interactions.",
+      ],
+    },
+  ];
+
+  for (const { key, hardcoded } of localizedKeys) {
+    plist = ensurePlistStringValueIfHardcoded(plist, key, hardcoded, "");
+  }
+
+  plist = ensurePlistArmArchitecture(plist);
+  plist = ensureAppTransportSecurity(plist);
 
   plist = ensurePlistArrayContainsString(
     plist,
@@ -300,6 +444,7 @@ function ensureInfoPlistDefaults() {
   }
 }
 
+ensureCapacitorConfigIosScheme();
 ensureInfoPlistDefaults();
 ensureInfoPlistStrings();
 
