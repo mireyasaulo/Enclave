@@ -14,6 +14,7 @@ import { SocialModule } from './modules/social/social.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
 import { FeedModule } from './modules/feed/feed.module';
 import { GamesModule } from './modules/games/games.module';
+import { FarmModule } from './modules/games/farm/farm.module';
 import { OfficialAccountsModule } from './modules/official-accounts/official-accounts.module';
 import { WorldModule } from './modules/world/world.module';
 import { SchedulerModule } from './modules/scheduler/scheduler.module';
@@ -63,6 +64,9 @@ import { GameCatalogRevisionEntity } from './modules/games/game-catalog-revision
 import { GameCenterCurationEntity } from './modules/games/game-center-curation.entity';
 import { GameOwnerStateEntity } from './modules/games/game-owner-state.entity';
 import { GameSubmissionEntity } from './modules/games/game-submission.entity';
+import { FarmPlayerStateEntity } from './modules/games/farm/entities/farm-player-state.entity';
+import { FarmNpcStateEntity } from './modules/games/farm/entities/farm-npc-state.entity';
+import { FarmEventLogEntity } from './modules/games/farm/entities/farm-event-log.entity';
 import { WorldContextEntity } from './modules/world/world-context.entity';
 import { NarrativeArcEntity } from './modules/narrative/narrative-arc.entity';
 import { AIBehaviorLogEntity } from './modules/analytics/ai-behavior-log.entity';
@@ -157,6 +161,9 @@ import {
           GameCenterCurationEntity,
           GameOwnerStateEntity,
           GameSubmissionEntity,
+          FarmPlayerStateEntity,
+          FarmNpcStateEntity,
+          FarmEventLogEntity,
           WorldContextEntity,
           NarrativeArcEntity,
           AIBehaviorLogEntity,
@@ -215,6 +222,7 @@ import {
     ModerationModule,
     FeedModule,
     GamesModule,
+    FarmModule,
     OfficialAccountsModule,
     WorldModule,
     SchedulerModule,
