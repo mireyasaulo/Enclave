@@ -2,7 +2,10 @@ import type {
   WaitingSessionSyncTaskStatusFilter,
   WaitingSessionSyncTaskTypeFilter,
 } from "../lib/waiting-session-sync-helpers";
-import { useCloudConsoleText } from "../lib/cloud-console-i18n";
+import {
+  formatCloudConsolePageOfTotal,
+  useCloudConsoleText,
+} from "../lib/cloud-console-i18n";
 import { WaitingSessionSyncActionButton } from "./waiting-session-sync-fragments";
 
 const FIELD_LABEL_CLASS = "text-sm text-[color:var(--text-secondary)]";
@@ -36,7 +39,7 @@ export function WaitingSessionSyncFilterControls({
   return (
     <div className="grid gap-4 md:grid-cols-4">
       <label className={FIELD_LABEL_CLASS}>
-        <div className="mb-2">Status</div>
+        <div className="mb-2">{t("Status")}</div>
         <select
           aria-label={t("Waiting sync status")}
           value={status}
@@ -54,7 +57,7 @@ export function WaitingSessionSyncFilterControls({
       </label>
 
       <label className={FIELD_LABEL_CLASS}>
-        <div className="mb-2">Task type</div>
+        <div className="mb-2">{t("Task type")}</div>
         <select
           aria-label={t("Waiting sync task type")}
           value={taskType}
@@ -72,7 +75,7 @@ export function WaitingSessionSyncFilterControls({
       </label>
 
       <label className={`${FIELD_LABEL_CLASS} md:col-span-2`}>
-        <div className="mb-2">Search</div>
+        <div className="mb-2">{t("Search")}</div>
         <input
           aria-label={t("Waiting sync search")}
           value={query}
@@ -106,12 +109,12 @@ export function WaitingSessionSyncPaginationControls({
   return (
     <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--border-faint)] pt-4">
       <div className="text-sm text-[color:var(--text-secondary)]">
-        Page {page} of {totalPages}
+        {formatCloudConsolePageOfTotal(page, totalPages)}
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 text-sm text-[color:var(--text-secondary)]">
-          <span>Page size</span>
+          <span>{t("Page size")}</span>
           <select
             aria-label={t("Waiting sync page size")}
             value={pageSize}
@@ -134,7 +137,7 @@ export function WaitingSessionSyncPaginationControls({
           disabled={page <= 1}
           onClick={onPrevious}
         >
-          Previous
+          {t("Previous")}
         </WaitingSessionSyncActionButton>
         <WaitingSessionSyncActionButton
           tone="neutral"
@@ -142,7 +145,7 @@ export function WaitingSessionSyncPaginationControls({
           disabled={page >= totalPages}
           onClick={onNext}
         >
-          Next
+          {t("Next")}
         </WaitingSessionSyncActionButton>
       </div>
     </div>

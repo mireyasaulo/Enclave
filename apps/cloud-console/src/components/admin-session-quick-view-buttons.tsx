@@ -1,4 +1,5 @@
 import type { AdminSessionsRouteSearch } from "../lib/admin-sessions-route-search";
+import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
 export type AdminSessionQuickViewPreset = {
   id: string;
@@ -19,6 +20,7 @@ export function AdminSessionQuickViewButtons({
   onReset,
   className = "flex flex-wrap gap-2",
 }: AdminSessionQuickViewButtonsProps) {
+  const t = useCloudConsoleText();
   return (
     <div className={className}>
       {presets.map((preset) => (
@@ -36,7 +38,7 @@ export function AdminSessionQuickViewButtons({
         onClick={onReset}
         className="rounded-full border border-[color:var(--border-faint)] bg-transparent px-3 py-2 text-xs font-medium uppercase tracking-[0.16em] text-[color:var(--text-muted)] transition hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
       >
-        Reset
+        {t("Reset")}
       </button>
     </div>
   );

@@ -74,6 +74,7 @@ import {
   formatCloudConsoleVisibleSessionsRange,
   translateCloudConsoleCsvRow,
   translateCloudConsoleText,
+  translateCloudConsoleTextForActiveLocale,
   useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
 import {
@@ -88,7 +89,7 @@ const ADMIN_SESSION_ACTION_LINK_CLASS_NAME =
 
 function formatDateTime(value?: string | null) {
   if (!value) {
-    return "Not available";
+    return translateCloudConsoleTextForActiveLocale("Not available");
   }
 
   return formatLocaleDateTime(new Date(value), {
@@ -99,12 +100,12 @@ function formatDateTime(value?: string | null) {
 
 function formatDate(value?: string | null) {
   if (!value) {
-    return "Not available";
+    return translateCloudConsoleTextForActiveLocale("Not available");
   }
 
   const parsed = Date.parse(`${value}T00:00:00.000Z`);
   if (!Number.isFinite(parsed)) {
-    return "Not available";
+    return translateCloudConsoleTextForActiveLocale("Not available");
   }
 
   return formatLocaleDateTime(new Date(parsed), {
@@ -117,7 +118,7 @@ function formatDate(value?: string | null) {
 
 function formatDateRange(startValue?: string | null, endValue?: string | null) {
   if (!startValue || !endValue) {
-    return "Not available";
+    return translateCloudConsoleTextForActiveLocale("Not available");
   }
 
   if (startValue === endValue) {
@@ -130,7 +131,9 @@ function formatDateRange(startValue?: string | null, endValue?: string | null) {
 function renderSessionSource(ip?: string | null, userAgent?: string | null) {
   if (!ip && !userAgent) {
     return (
-      <span className="text-[color:var(--text-muted)]">Not available</span>
+      <span className="text-[color:var(--text-muted)]">
+        {translateCloudConsoleTextForActiveLocale("Not available")}
+      </span>
     );
   }
 
@@ -156,7 +159,9 @@ function renderRevocationDetails(session: CloudAdminSessionSummary) {
     !session.revokedBySessionId
   ) {
     return (
-      <span className="text-[color:var(--text-muted)]">Not available</span>
+      <span className="text-[color:var(--text-muted)]">
+        {translateCloudConsoleTextForActiveLocale("Not available")}
+      </span>
     );
   }
 

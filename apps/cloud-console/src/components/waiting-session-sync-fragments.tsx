@@ -8,6 +8,7 @@ import type {
   WaitingSessionSyncContextGroupArtifact,
   WaitingSessionSyncStatusSummary,
 } from "../lib/waiting-session-sync-helpers";
+import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
 const TASK_STATUS_BADGE_STYLES: Record<
   CloudWaitingSessionSyncTaskSummary["status"],
@@ -270,6 +271,7 @@ export function WaitingSessionSyncArtifactSummary({
   artifact: WaitingSessionSyncContextGroupArtifact;
   className?: string;
 }) {
+  const t = useCloudConsoleText();
   return (
     <div
       className={joinClasses(
@@ -278,7 +280,7 @@ export function WaitingSessionSyncArtifactSummary({
       )}
     >
       <div className="uppercase tracking-[0.18em] text-sky-700/80">
-        Artifact summary
+        {t("Artifact summary")}
       </div>
       <div className="mt-2 flex flex-wrap gap-2">
         <span className="rounded-full border border-sky-200/30 px-3 py-1">

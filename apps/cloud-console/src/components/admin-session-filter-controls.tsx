@@ -62,7 +62,7 @@ export function AdminSessionFilterControls({
   return (
     <div className={className}>
       <label className="flex min-w-0 flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Search
+        {t("Search")}
         <input
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
@@ -71,7 +71,7 @@ export function AdminSessionFilterControls({
         />
       </label>
       <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Status
+        {t("Status")}
         <select
           value={status}
           onChange={(event) =>
@@ -87,7 +87,7 @@ export function AdminSessionFilterControls({
         </select>
       </label>
       <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Revocation
+        {t("Revocation")}
         <select
           value={revocationReason}
           onChange={(event) =>
@@ -105,7 +105,7 @@ export function AdminSessionFilterControls({
         </select>
       </label>
       <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Scope
+        {t("Scope")}
         <select
           value={scope}
           onChange={(event) =>
@@ -121,7 +121,7 @@ export function AdminSessionFilterControls({
         </select>
       </label>
       <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Sort by
+        {t("Sort by")}
         <select
           value={sortBy}
           onChange={(event) =>
@@ -137,7 +137,7 @@ export function AdminSessionFilterControls({
         </select>
       </label>
       <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Direction
+        {t("Direction")}
         <select
           value={sortDirection}
           onChange={(event) =>
@@ -155,7 +155,7 @@ export function AdminSessionFilterControls({
         </select>
       </label>
       <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Page size
+        {t("Page size")}
         <select
           value={String(pageSize)}
           onChange={(event) =>
@@ -165,7 +165,7 @@ export function AdminSessionFilterControls({
         >
           {ADMIN_SESSION_PAGE_SIZE_OPTIONS.map((value) => (
             <option key={value} value={value}>
-              {value} per page
+              {t("{0} per page").replace("{0}", String(value))}
             </option>
           ))}
         </select>

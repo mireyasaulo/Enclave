@@ -728,7 +728,7 @@ export function WorldsPage() {
                 <th className="px-4 py-3">{t("Status")}</th>
                 <th className="px-4 py-3">{t("Attention")}</th>
                 <th className="px-4 py-3">{t("Health")}</th>
-                <th className="px-4 py-3">API</th>
+                <th className="px-4 py-3">{t("API")}</th>
                 <th className="px-4 py-3">{t("Last interactive")}</th>
                 <th className="px-4 py-3">{t("Updated")}</th>
               </tr>
