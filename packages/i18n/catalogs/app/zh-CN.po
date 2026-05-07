@@ -84,6 +84,20 @@ msgstr "[表情] {0}"
 msgid "{0} · {1}"
 msgstr "{0} · {1}"
 
+#. placeholder {0}: formatTimestamp(featuredLivePost.createdAt)
+#. placeholder {0}: formatTimestamp(post.createdAt)
+#. placeholder {1}: featuredLivePost.viewCount
+#. placeholder {1}: post.viewCount
+#: apps/app/src/routes/channel-author-page.tsx:474
+#: apps/app/src/routes/channel-author-page.tsx:731
+msgid "{0} · {1} 播放"
+msgstr "{0} · {1} 播放"
+
+#. placeholder {0}: formatTimestamp(post.createdAt)
+#: apps/app/src/routes/channel-author-page.tsx:763
+msgid "{0} · 内容更新"
+msgstr "{0} · 内容更新"
+
 #. placeholder {0}: getConversationThreadLabel(conversation)
 #. placeholder {1}: formatMessageTimestamp(conversation.lastActivityAt)
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:351
@@ -148,6 +162,11 @@ msgstr "{0} 位常联系好友"
 msgid "{0} 位联系人"
 msgstr "{0} 位联系人"
 
+#. placeholder {0}: Math.max(1, Math.round(post.durationMs / 60000))
+#: apps/app/src/routes/channel-author-page.tsx:778
+msgid "{0} 分钟回放"
+msgstr "{0} 分钟回放"
+
 #. placeholder {0}: request.characterName
 #. placeholder {1}: request.greeting ?? t(msg`对你产生了兴趣。`)
 #: apps/app/src/routes/discover-scene-page.tsx:130
@@ -195,7 +214,10 @@ msgstr "{0} 已结束，可在手机端继续做频道跟进。"
 msgid "{0} 接力"
 msgstr "{0} 接力"
 
+#. placeholder {0}: post.viewCount
 #. placeholder {0}: post.viewCount ?? 0
+#: apps/app/src/routes/channel-author-page.tsx:579
+#: apps/app/src/routes/channel-author-page.tsx:750
 #: apps/app/src/routes/channels-page.tsx:1970
 msgid "{0} 播放"
 msgstr "{0} 播放"
@@ -288,6 +310,17 @@ msgstr "{0} 的朋友圈"
 msgid "{0} 的视频号动态"
 msgstr "{0} 的视频号动态"
 
+#. placeholder {0}: Math.max(1, Math.round(post.durationMs / 1000))
+#. placeholder {1}: post.viewCount
+#: apps/app/src/routes/channel-author-page.tsx:748
+msgid "{0} 秒 · {1} 播放"
+msgstr "{0} 秒 · {1} 播放"
+
+#. placeholder {0}: Math.max(1, Math.round(post.durationMs / 1000))
+#: apps/app/src/routes/channel-author-page.tsx:792
+msgid "{0} 秒短片"
+msgstr "{0} 秒短片"
+
 #. placeholder {0}: group.name
 #: apps/app/src/routes/group-announcement-page.tsx:172
 msgid "{0} 群公告"
@@ -300,6 +333,7 @@ msgid "{0} 群聊"
 msgstr "{0} 群聊"
 
 #. placeholder {0}: post.commentCount
+#: apps/app/src/routes/channel-author-page.tsx:583
 #: apps/app/src/routes/channels-page.tsx:1650
 #: apps/app/src/routes/discover-feed-page.tsx:967
 msgid "{0} 评论"
@@ -359,6 +393,10 @@ msgstr "{0}撤回了一条消息"
 #: apps/app/src/routes/create-group-page.tsx:654
 msgid "{0}等{1}人"
 msgstr "{0}等{1}人"
+
+#: apps/app/src/routes/channel-author-page.tsx:595
+msgid "{activeCollectionLabel}分栏暂时没有内容"
+msgstr "{activeCollectionLabel}分栏暂时没有内容"
 
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:195
 msgid "{activeCount} 人"
@@ -619,6 +657,7 @@ msgid "+{0} 空位"
 msgstr "+{0} 空位"
 
 #: apps/app/src/i18n/static-dom-seed.ts:347
+#: apps/app/src/routes/channel-author-page.tsx:444
 #: apps/app/src/routes/channels-page.tsx:1590
 msgid "+关注"
 msgstr "+关注"
@@ -981,6 +1020,7 @@ msgstr "世界"
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:218
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:357
 #: apps/app/src/features/shell/desktop-shell.tsx:146
+#: apps/app/src/routes/channel-author-page.tsx:397
 #: apps/app/src/routes/desktop-feedback-page.tsx:115
 #: apps/app/src/routes/desktop-mobile-page.tsx:207
 #: apps/app/src/routes/desktop-mobile-page.tsx:1221
@@ -1546,8 +1586,21 @@ msgid "低"
 msgstr "低"
 
 #: apps/app/src/i18n/static-dom-seed.ts:350
+#: apps/app/src/routes/channel-author-page.tsx:281
 msgid "作者主页"
 msgstr "作者主页"
+
+#: apps/app/src/routes/channel-author-page.tsx:314
+msgid "作者主页暂时不可用"
+msgstr "作者主页暂时不可用"
+
+#: apps/app/src/routes/channel-author-page.tsx:344
+msgid "作者状态暂未更新"
+msgstr "作者状态暂未更新"
+
+#: apps/app/src/routes/channel-author-page.tsx:779
+msgid "作者直播内容"
+msgstr "作者直播内容"
 
 #: apps/app/src/i18n/static-dom-seed.ts:43
 msgid "你先发一条，或者等世界里的其他人先开口。"
@@ -2022,6 +2075,8 @@ msgstr "全球内容增长操盘手映射"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:336
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:949
 #: apps/app/src/i18n/static-dom-seed.ts:62
+#: apps/app/src/routes/channel-author-page.tsx:229
+#: apps/app/src/routes/channel-author-page.tsx:254
 msgid "全部"
 msgstr "全部"
 
@@ -2173,9 +2228,17 @@ msgstr "关注公众号"
 msgid "关注后可从消息页查看这类内容。"
 msgstr "关注后可从消息页查看这类内容。"
 
+#: apps/app/src/routes/channel-author-page.tsx:343
+msgid "关注失败"
+msgstr "关注失败"
+
 #: apps/app/src/i18n/static-dom-seed.ts:1019
 msgid "关注服务号后，通知和文章卡片会出现在这里。"
 msgstr "关注服务号后，通知和文章卡片会出现在这里。"
+
+#: apps/app/src/routes/channel-author-page.tsx:406
+msgid "关注者"
+msgstr "关注者"
 
 #: apps/app/src/routes/character-detail-page.tsx:314
 msgid "关系管理"
@@ -2384,6 +2447,8 @@ msgid "内容入口"
 msgstr "内容入口"
 
 #: apps/app/src/i18n/static-dom-seed.ts:643
+#: apps/app/src/routes/channel-author-page.tsx:764
+#: apps/app/src/routes/channel-author-page.tsx:799
 #: apps/app/src/routes/channels-page.tsx:1647
 msgid "内容卡片"
 msgstr "内容卡片"
@@ -2405,6 +2470,10 @@ msgstr "内容摘要已复制。"
 #: apps/app/src/i18n/static-dom-seed.ts:205
 msgid "内容整理"
 msgstr "内容整理"
+
+#: apps/app/src/routes/channel-author-page.tsx:806
+msgid "内容更新"
+msgstr "内容更新"
 
 #: apps/app/src/i18n/static-dom-seed.ts:335
 msgid "内容流"
@@ -2564,6 +2633,7 @@ msgid "最近公众号内容"
 msgstr "最近公众号内容"
 
 #: apps/app/src/i18n/static-dom-seed.ts:826
+#: apps/app/src/routes/channel-author-page.tsx:411
 msgid "最近内容"
 msgstr "最近内容"
 
@@ -2708,6 +2778,10 @@ msgstr "最近玩过、固定常玩、推荐位和活动位都放进一个工作
 #: apps/app/src/routes/desktop-mobile-page.tsx:1698
 msgid "最近直播"
 msgstr "最近直播"
+
+#: apps/app/src/routes/channel-author-page.tsx:466
+msgid "最近直播回放"
+msgstr "最近直播回放"
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:1656
 msgid "最近直播状态"
@@ -2896,6 +2970,10 @@ msgstr "切换为{paletteLabel}标注 ({0})"
 msgid "切换为完整日期显示"
 msgstr "切换为完整日期显示"
 
+#: apps/app/src/routes/channel-author-page.tsx:596
+msgid "切换其他分栏看看，或者等作者发布新的内容后再回来。"
+msgstr "切换其他分栏看看，或者等作者发布新的内容后再回来。"
+
 #. placeholder {0}: pageIndex + 1
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:471
 msgid "切换到第 {0} 页"
@@ -2922,6 +3000,10 @@ msgstr "切换桌面世界角色..."
 #: apps/app/src/routes/friend-requests-page.tsx:44
 msgid "切换桌面好友请求..."
 msgstr "切换桌面好友请求..."
+
+#: apps/app/src/routes/channel-author-page.tsx:267
+msgid "切换桌面视频号..."
+msgstr "切换桌面视频号..."
 
 #: apps/app/src/routes/profile-settings-page.tsx:669
 msgid "切换界面语言，好友回复也会跟随此设置使用对应语言。"
@@ -3162,6 +3244,9 @@ msgid "加载窗口"
 msgstr "加载窗口"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1052
+#: apps/app/src/routes/channel-author-page.tsx:231
+#: apps/app/src/routes/channel-author-page.tsx:758
+#: apps/app/src/routes/channel-author-page.tsx:798
 msgid "动态"
 msgstr "动态"
 
@@ -4059,6 +4144,7 @@ msgid "处理中"
 msgstr "处理中"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-confirm-dialog.tsx:32
+#: apps/app/src/routes/channel-author-page.tsx:441
 #: apps/app/src/routes/discover-feed-page.tsx:991
 #: apps/app/src/routes/discover-page.tsx:820
 #: apps/app/src/routes/friend-requests-page.tsx:326
@@ -4558,6 +4644,10 @@ msgstr "尚未加入我的小程序"
 msgid "居民"
 msgstr "居民"
 
+#: apps/app/src/routes/channel-author-page.tsx:396
+msgid "居民作者"
+msgstr "居民作者"
+
 #: apps/app/src/routes/discover-page.tsx:631
 #: apps/app/src/routes/discover-page.tsx:750
 msgid "居民公开"
@@ -4682,6 +4772,7 @@ msgid "已全部加载"
 msgstr "已全部加载"
 
 #: apps/app/src/i18n/static-dom-seed.ts:778
+#: apps/app/src/routes/channel-author-page.tsx:443
 #: apps/app/src/routes/channels-page.tsx:1589
 msgid "已关注"
 msgstr "已关注"
@@ -4694,6 +4785,7 @@ msgstr "已关注，可直接进入服务消息线程。"
 msgid "已关注，后续推送会汇总到订阅号消息。"
 msgstr "已关注，后续推送会汇总到订阅号消息。"
 
+#: apps/app/src/routes/channel-author-page.tsx:102
 #: apps/app/src/routes/channels-page.tsx:308
 msgid "已关注该视频号作者。"
 msgstr "已关注该视频号作者。"
@@ -4786,6 +4878,7 @@ msgstr "已发放"
 msgid "已取消保存。"
 msgstr "已取消保存。"
 
+#: apps/app/src/routes/channel-author-page.tsx:101
 #: apps/app/src/routes/channels-page.tsx:307
 msgid "已取消关注。"
 msgstr "已取消关注。"
@@ -5635,6 +5728,11 @@ msgstr "当前内容下的完整评论列表与回复输入区"
 #: apps/app/src/routes/group-qr-page.tsx:1835
 msgid "当前最值得优先补发"
 msgstr "当前最值得优先补发"
+
+#. placeholder {0}: visiblePosts.length
+#: apps/app/src/routes/channel-author-page.tsx:516
+msgid "当前分栏：{activeCollectionLabel}，共 {0} 条内容。"
+msgstr "当前分栏：{activeCollectionLabel}，共 {0} 条内容。"
 
 #. placeholder {0}: results.length
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:407
@@ -8531,6 +8629,10 @@ msgstr "查看世界角色目录"
 msgid "查看世界隐私政策和数据使用说明。"
 msgstr "查看世界隐私政策和数据使用说明。"
 
+#: apps/app/src/routes/channel-author-page.tsx:470
+msgid "查看作者最近一次直播回放"
+msgstr "查看作者最近一次直播回放"
+
 #: apps/app/src/i18n/static-dom-seed.ts:302
 msgid "查看入口"
 msgstr "查看入口"
@@ -8574,6 +8676,10 @@ msgstr "查看公众号资料"
 #: apps/app/src/i18n/static-dom-seed.ts:1056
 msgid "查看办理中事项"
 msgstr "查看办理中事项"
+
+#: apps/app/src/routes/channel-author-page.tsx:482
+msgid "查看回放"
+msgstr "查看回放"
 
 #: apps/app/src/routes/character-detail-page.tsx:284
 #: apps/app/src/routes/contacts-page.tsx:1119
@@ -8914,6 +9020,10 @@ msgstr "正在切换到桌面朋友圈..."
 msgid "正在切换到桌面标签"
 msgstr "正在切换到桌面标签"
 
+#: apps/app/src/routes/channel-author-page.tsx:265
+msgid "正在切换到桌面视频号"
+msgstr "正在切换到桌面视频号"
+
 #: apps/app/src/routes/group-announcement-page.tsx:35
 msgid "正在切换到桌面聊天工作区中的群公告编辑视图。"
 msgstr "正在切换到桌面聊天工作区中的群公告编辑视图。"
@@ -9117,6 +9227,10 @@ msgstr "正在打开桌面聊天记录"
 msgid "正在打开桌面通讯录"
 msgstr "正在打开桌面通讯录"
 
+#: apps/app/src/routes/channel-author-page.tsx:266
+msgid "正在把作者页收回桌面视频号工作区，并恢复当前内容上下文。"
+msgstr "正在把作者页收回桌面视频号工作区，并恢复当前内容上下文。"
+
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:249
 msgid "正在把最新成员状态同步到聊天消息流。"
 msgstr "正在把最新成员状态同步到聊天消息流。"
@@ -9231,6 +9345,10 @@ msgstr "正在读取世界角色"
 #: apps/app/src/routes/desktop-mobile-page.tsx:1263
 msgid "正在读取会话..."
 msgstr "正在读取会话..."
+
+#: apps/app/src/routes/channel-author-page.tsx:307
+msgid "正在读取作者主页..."
+msgstr "正在读取作者主页..."
 
 #: apps/app/src/i18n/static-dom-seed.ts:1013
 msgid "正在读取公众号"
@@ -10183,6 +10301,10 @@ msgid "直播协同"
 msgstr "直播协同"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1051
+#: apps/app/src/routes/channel-author-page.tsx:232
+#: apps/app/src/routes/channel-author-page.tsx:416
+#: apps/app/src/routes/channel-author-page.tsx:725
+#: apps/app/src/routes/channel-author-page.tsx:771
 msgid "直播回放"
 msgstr "直播回放"
 
@@ -10201,6 +10323,11 @@ msgstr "直播标题已准备"
 #: apps/app/src/i18n/static-dom-seed.ts:589
 msgid "直播模式"
 msgstr "直播模式"
+
+#: apps/app/src/routes/channel-author-page.tsx:733
+#: apps/app/src/routes/channel-author-page.tsx:772
+msgid "直播精选"
+msgstr "直播精选"
 
 #: apps/app/src/i18n/static-dom-seed.ts:606
 msgid "直播记录"
@@ -10245,6 +10372,7 @@ msgid "短片"
 msgstr "短片"
 
 #: apps/app/src/i18n/static-dom-seed.ts:645
+#: apps/app/src/routes/channel-author-page.tsx:786
 msgid "短片更新"
 msgstr "短片更新"
 
@@ -10348,6 +10476,9 @@ msgid "视图"
 msgstr "视图"
 
 #: apps/app/src/i18n/static-dom-seed.ts:862
+#: apps/app/src/routes/channel-author-page.tsx:230
+#: apps/app/src/routes/channel-author-page.tsx:741
+#: apps/app/src/routes/channel-author-page.tsx:785
 msgid "视频"
 msgstr "视频"
 
@@ -10378,6 +10509,10 @@ msgstr "视频号 / 直播"
 msgid "视频号互动已更新。"
 msgstr "视频号互动已更新。"
 
+#: apps/app/src/routes/channel-author-page.tsx:280
+msgid "视频号作者"
+msgstr "视频号作者"
+
 #: apps/app/src/routes/channels-page.tsx:252
 msgid "视频号回复已发送。"
 msgstr "视频号回复已发送。"
@@ -10397,6 +10532,8 @@ msgid "视频号直播伴侣"
 msgstr "视频号直播伴侣"
 
 #: apps/app/src/i18n/static-dom-seed.ts:644
+#: apps/app/src/routes/channel-author-page.tsx:751
+#: apps/app/src/routes/channel-author-page.tsx:793
 msgid "视频号短片"
 msgstr "视频号短片"
 
@@ -12161,6 +12298,7 @@ msgid "读取图片失败，请换一张再试。"
 msgstr "读取图片失败，请换一张再试。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:37
+#: apps/app/src/routes/channel-author-page.tsx:313
 #: apps/app/src/routes/channels-page.tsx:1119
 #: apps/app/src/routes/chat-background-page.tsx:355
 #: apps/app/src/routes/chat-background-page.tsx:387
@@ -12471,6 +12609,8 @@ msgstr "返回上一步"
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:563
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:261
 #: apps/app/src/i18n/static-dom-seed.ts:884
+#: apps/app/src/routes/channel-author-page.tsx:333
+#: apps/app/src/routes/channel-author-page.tsx:367
 #: apps/app/src/routes/channels-page.tsx:1108
 #: apps/app/src/routes/channels-page.tsx:1139
 #: apps/app/src/routes/channels-page.tsx:1170
@@ -12555,6 +12695,9 @@ msgstr "返回消息"
 msgid "返回消息列表"
 msgstr "返回消息列表"
 
+#: apps/app/src/routes/channel-author-page.tsx:333
+#: apps/app/src/routes/channel-author-page.tsx:367
+#: apps/app/src/routes/channel-author-page.tsx:452
 #: apps/app/src/routes/channels-page.tsx:1831
 msgid "返回视频号"
 msgstr "返回视频号"
@@ -12886,6 +13029,10 @@ msgstr "这个时间范围内没有匹配消息"
 msgid "这个时间范围内没有聊天记录"
 msgstr "这个时间范围内没有聊天记录"
 
+#: apps/app/src/routes/channel-author-page.tsx:224
+msgid "这个视频号作者暂时还没有填写简介。"
+msgstr "这个视频号作者暂时还没有填写简介。"
+
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:120
 msgid "这个群目前没有可移除的角色成员。"
 msgstr "这个群目前没有可移除的角色成员。"
@@ -12939,6 +13086,10 @@ msgstr "这些会话已经收到过这张群邀请，并按发送批次归组，
 #: apps/app/src/i18n/static-dom-seed.ts:617
 msgid "这些数据会去哪里"
 msgstr "这些数据会去哪里"
+
+#: apps/app/src/routes/channel-author-page.tsx:223
+msgid "这位居民暂时还没有填写视频号简介。"
+msgstr "这位居民暂时还没有填写视频号简介。"
 
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:186
 msgid "这位角色的朋友圈当前不可见"
@@ -13440,6 +13591,7 @@ msgid "重试保存邀请卡"
 msgstr "重试保存邀请卡"
 
 #: apps/app/src/i18n/static-dom-seed.ts:792
+#: apps/app/src/routes/channel-author-page.tsx:358
 msgid "重试关注"
 msgstr "重试关注"
 
@@ -13478,6 +13630,7 @@ msgid "重试发送评论"
 msgstr "重试发送评论"
 
 #: apps/app/src/i18n/static-dom-seed.ts:793
+#: apps/app/src/routes/channel-author-page.tsx:357
 msgid "重试取消关注"
 msgstr "重试取消关注"
 
@@ -13540,6 +13693,7 @@ msgstr "重试评论点赞"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:554
 #: apps/app/src/i18n/static-dom-seed.ts:39
+#: apps/app/src/routes/channel-author-page.tsx:325
 #: apps/app/src/routes/channels-page.tsx:1108
 #: apps/app/src/routes/channels-page.tsx:1131
 #: apps/app/src/routes/channels-page.tsx:1139
