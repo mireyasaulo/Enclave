@@ -955,7 +955,7 @@ function DiscoverMobileSection({
 }) {
   return (
     <section className="mt-1 overflow-hidden border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]">
-      <div className="px-4 py-1 text-[9px] font-medium tracking-[0.04em] text-[color:var(--text-muted)]">
+      <div className="px-4 py-1 text-[11px] font-medium tracking-[0.04em] text-[color:var(--text-muted)]">
         {title}
       </div>
       {items.map((item, index) => (
@@ -1034,7 +1034,7 @@ function DiscoverMobileEntryRow({
         <div className="truncate text-[13px] text-[color:var(--text-primary)]">
           {t(item.label)}
         </div>
-        <div className="shrink-0 rounded-full bg-[rgba(7,193,96,0.08)] px-1.5 py-0.5 text-[8px] font-medium tracking-[0.03em] text-[#15803d]">
+        <div className="shrink-0 rounded-full bg-[rgba(7,193,96,0.08)] px-1.5 py-0.5 text-[10px] font-medium tracking-[0.03em] text-[#15803d]">
           {t(item.badge)}
         </div>
       </div>

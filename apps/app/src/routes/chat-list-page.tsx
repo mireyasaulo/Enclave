@@ -1116,7 +1116,7 @@ function MobileChatListStatusCard({
     >
       <div
         className={cn(
-          "mx-auto inline-flex rounded-full px-2.5 py-1 text-[9px] font-medium tracking-[0.04em]",
+          "mx-auto inline-flex rounded-full px-2.5 py-1 text-[11px] font-medium tracking-[0.04em]",
           tone === "danger"
             ? "bg-[rgba(220,38,38,0.08)] text-[color:var(--state-danger-text)]"
             : "bg-[rgba(7,193,96,0.1)] text-[#07c160]",
@@ -1299,7 +1299,7 @@ function ConversationListItemLink({
               {conversation.sparkStreak ? (
                 <SparkBadge streak={conversation.sparkStreak} size="sm" />
               ) : null}
-              <div className="text-[9px] text-[color:var(--text-dim)]">
+              <div className="text-[11px] text-[color:var(--text-dim)]">
                 {formatConversationTimestamp(
                   visibleLastMessage?.createdAt ??
                     conversation.lastMessage?.createdAt ??
@@ -1324,7 +1324,7 @@ function ConversationListItemLink({
                 ) : (
                   <div
                     className={cn(
-                      "flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#fa5151] px-1 text-[9px] leading-none text-white shadow-[0_4px_12px_rgba(250,81,81,0.18)]",
+                      "flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#fa5151] px-1 text-[11px] leading-none text-white shadow-[0_4px_12px_rgba(250,81,81,0.18)]",
                       conversation.unreadCount > 9 ? "min-w-[22px]" : undefined,
                     )}
                   >
@@ -1402,7 +1402,7 @@ function ConversationListItemLink({
           onClick={onTogglePinned}
           className="flex w-[68px] items-center justify-center bg-[#c4c7cc] text-white active:brightness-[0.96]"
         >
-          <div className="flex flex-col items-center gap-0.5 text-[9px]">
+          <div className="flex flex-col items-center gap-0.5 text-[11px]">
             <Pin size={13} />
             <span>
               {conversation.isPinned ? t(msg`取消置顶`) : t(msg`置顶`)}
@@ -1417,7 +1417,7 @@ function ConversationListItemLink({
             muteActionClassName,
           )}
         >
-          <div className="flex flex-col items-center gap-0.5 text-[9px]">
+          <div className="flex flex-col items-center gap-0.5 text-[11px]">
             <BellOff size={13} />
             <span>
               {conversation.isMuted ? t(msg`取消免打扰`) : t(msg`免打扰`)}
@@ -1430,7 +1430,7 @@ function ConversationListItemLink({
             onClick={onToggleReadState}
             className="flex w-[68px] items-center justify-center bg-[#5b8efc] text-white active:brightness-[0.96]"
           >
-            <div className="flex flex-col items-center gap-0.5 text-[9px]">
+            <div className="flex flex-col items-center gap-0.5 text-[11px]">
               {conversation.unreadCount > 0 ? (
                 <CheckCheck size={13} />
               ) : (
@@ -1445,7 +1445,7 @@ function ConversationListItemLink({
           onClick={onHide}
           className="flex w-[68px] items-center justify-center bg-[#fa5151] text-white active:brightness-[0.96]"
         >
-          <div className="flex flex-col items-center gap-0.5 text-[9px]">
+          <div className="flex flex-col items-center gap-0.5 text-[11px]">
             <Trash2 size={13} />
             <span>{t(msg`删除`)}</span>
           </div>
