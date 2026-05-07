@@ -13,67 +13,209 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:15
 msgid "产品"
 msgstr "Product"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:16
 msgid "核心能力"
 msgstr "Capabilities"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:17
 msgid "跨端"
 msgstr "Cross-platform"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:18
 msgid "开源自部署"
 msgstr "Self-host"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:13
-#: apps/site/src/components/site-header.tsx:19
 msgid "下载"
 msgstr "Download"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:20
 msgid "在线试用"
 msgstr "Try online"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:9
 msgid "一个属于你的 AI 虚拟世界。开源、可自部署、跨端可用。"
 msgstr "A private AI world of your own. Open source, self-hostable, cross-platform."
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:12
 msgid "自部署文档"
 msgstr "Self-host docs"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:14
 msgid "隐私政策"
 msgstr "Privacy"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:15
 msgid "服务条款"
 msgstr "Terms"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:16
 msgid "联系我们"
 msgstr "Contact"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/page.tsx:13
-msgid "隐界 — 一个属于你的 AI 虚拟世界"
-msgstr "Enclave — A private AI world of your own"
+msgid "开源 · 可自部署 · 跨端"
+msgstr "Open source · Self-hostable · Cross-platform"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/page.tsx:14
-msgid "开源、可自部署、跨端可用。"
-msgstr "Open source. Self-hostable. Cross-platform."
+msgid "一个属于你的 AI 虚拟世界"
+msgstr "A private AI world of your own"
+
+#. js-lingui-explicit-id
+msgid "在隐界，你不是和一个 chatbot 聊天，而是拥有一个有居民、有时间、有关系的私人世界。它不与现实对立，让现实里的你，多出一种可能。"
+msgstr "Enclave isn't a chatbot. It's a private world with its own residents, time, and relationships. It doesn't replace reality — it gives the real you one more possibility."
+
+#. js-lingui-explicit-id
+msgid "在 GitHub 查看"
+msgstr "View on GitHub"
+
+#. js-lingui-explicit-id
+msgid "核心闭环演示（动图）"
+msgstr "Core loop demo (animated)"
+
+#. js-lingui-explicit-id
+msgid "语言版本"
+msgstr "Languages"
+
+#. js-lingui-explicit-id
+msgid "移动 + 桌面"
+msgstr "Mobile + Desktop"
+
+#. js-lingui-explicit-id
+msgid "开源协议"
+msgstr "License"
+
+#. js-lingui-explicit-id
+msgid "不是 chatbot，而是一整个生态"
+msgstr "Not a chatbot — a whole ecosystem"
+
+#. js-lingui-explicit-id
+msgid "基于 apps/app 的真实代码盘点而成的能力清单：每一项都已在产品中跑通。"
+msgstr "Every capability below maps to real code in apps/app — already shipping in production."
+
+#. js-lingui-explicit-id
+msgid "聊天与群组"
+msgstr "Chat & Groups"
+
+#. js-lingui-explicit-id
+msgid "一对一对话、群聊、线程讨论；消息提醒、强提醒、已读标记一应俱全。"
+msgstr "1-on-1 chat, group rooms, threaded replies; reminders, strong alerts, and read receipts all built in."
+
+#. js-lingui-explicit-id
+msgid "AI 数字人通话"
+msgstr "AI Digital Human Calls"
+
+#. js-lingui-explicit-id
+msgid "和虚拟角色实时对话——支持 1 对 1、群组、视频与语音多种形式。"
+msgstr "Real-time conversation with virtual characters — 1-on-1, group, video, or voice."
+
+#. js-lingui-explicit-id
+msgid "朋友圈与动态"
+msgstr "Moments & Feed"
+
+#. js-lingui-explicit-id
+msgid "发布与浏览朋友动态，AI 角色也会发帖、互动、出现在你的时间线。"
+msgstr "Post and browse a private feed; AI characters publish, react, and live alongside you on the timeline."
+
+#. js-lingui-explicit-id
+msgid "小程序工作区"
+msgstr "Mini-program Workspace"
+
+#. js-lingui-explicit-id
+msgid "内嵌的小程序生态，随手打开工具、拓展隐界的能力边界。"
+msgstr "An embedded mini-program ecosystem — pop open tools and stretch what Enclave can do."
+
+#. js-lingui-explicit-id
+msgid "游戏中心"
+msgstr "Game Center"
+
+#. js-lingui-explicit-id
+msgid "游戏库与邀请系统，把朋友、AI 角色都拉进同一桌。"
+msgstr "A game library and invite system that brings friends and AI characters to the same table."
+
+#. js-lingui-explicit-id
+msgid "笔记工作区（桌面）"
+msgstr "Notes Workspace (Desktop)"
+
+#. js-lingui-explicit-id
+msgid "桌面端多窗口笔记，灵感随手记，无缝同步、不受应用边界约束。"
+msgstr "Multi-window notes on desktop, captured wherever inspiration hits, synced across the app."
+
+#. js-lingui-explicit-id
+msgid "发现与场景社交"
+msgstr "Discover & Scene Social"
+
+#. js-lingui-explicit-id
+msgid "遇见陌生人、按场景社交、浏览世界人物库，遇见新角色与新故事。"
+msgstr "Encounter strangers, socialize by scene, browse the world character library — find new people and new stories."
+
+#. js-lingui-explicit-id
+msgid "云订阅与权限"
+msgstr "Cloud Subscription"
+
+#. js-lingui-explicit-id
+msgid "灵活的功能分级与支付，按需开启更高级的模型与能力。"
+msgstr "Flexible tiers and billing — unlock higher-end models and abilities on demand."
+
+#. js-lingui-explicit-id
+msgid "产品截图"
+msgstr "Screenshots"
+
+#. js-lingui-explicit-id
+msgid "从入坑到日常使用"
+msgstr "From onboarding to daily use"
+
+#. js-lingui-explicit-id
+msgid "六个核心场景一起看，画面均来自 apps/app 当前真实版本。"
+msgstr "Six core scenes in one place — every screen straight from the live apps/app build."
+
+#. js-lingui-explicit-id
+msgid "聊天"
+msgstr "Chat"
+
+#. js-lingui-explicit-id
+msgid "线程化对话与消息提醒"
+msgstr "Threaded conversations and reminders"
+
+#. js-lingui-explicit-id
+msgid "朋友圈"
+msgstr "Moments"
+
+#. js-lingui-explicit-id
+msgid "AI 与人共同的时间线"
+msgstr "A timeline shared by AI and you"
+
+#. js-lingui-explicit-id
+msgid "频道流"
+msgstr "Channels"
+
+#. js-lingui-explicit-id
+msgid "频道、视频号、官方账号"
+msgstr "Channels, video accounts, official accounts"
+
+#. js-lingui-explicit-id
+msgid "群组"
+msgstr "Groups"
+
+#. js-lingui-explicit-id
+msgid "多人对话与角色互动"
+msgstr "Multi-party chat with character interactions"
+
+#. js-lingui-explicit-id
+msgid "入坑引导"
+msgstr "Onboarding"
+
+#. js-lingui-explicit-id
+msgid "新人启动与世界初始化"
+msgstr "Newcomer setup and world bootstrap"
+
+#. js-lingui-explicit-id
+msgid "我的角色"
+msgstr "Your Character"
+
+#. js-lingui-explicit-id
+msgid "你与 AI 化身的资料卡"
+msgstr "Profile cards for you and your AI avatar"

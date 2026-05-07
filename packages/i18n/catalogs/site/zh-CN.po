@@ -13,67 +13,209 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:15
 msgid "产品"
 msgstr "产品"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:16
 msgid "核心能力"
 msgstr "核心能力"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:17
 msgid "跨端"
 msgstr "跨端"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:18
 msgid "开源自部署"
 msgstr "开源自部署"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:13
-#: apps/site/src/components/site-header.tsx:19
 msgid "下载"
 msgstr "下载"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:20
 msgid "在线试用"
 msgstr "在线试用"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:9
 msgid "一个属于你的 AI 虚拟世界。开源、可自部署、跨端可用。"
 msgstr "一个属于你的 AI 虚拟世界。开源、可自部署、跨端可用。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:12
 msgid "自部署文档"
 msgstr "自部署文档"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:14
 msgid "隐私政策"
 msgstr "隐私政策"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:15
 msgid "服务条款"
 msgstr "服务条款"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:16
 msgid "联系我们"
 msgstr "联系我们"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/page.tsx:13
-msgid "隐界 — 一个属于你的 AI 虚拟世界"
-msgstr "隐界 — 一个属于你的 AI 虚拟世界"
+msgid "开源 · 可自部署 · 跨端"
+msgstr "开源 · 可自部署 · 跨端"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/page.tsx:14
-msgid "开源、可自部署、跨端可用。"
-msgstr "开源、可自部署、跨端可用。"
+msgid "一个属于你的 AI 虚拟世界"
+msgstr "一个属于你的 AI 虚拟世界"
+
+#. js-lingui-explicit-id
+msgid "在隐界，你不是和一个 chatbot 聊天，而是拥有一个有居民、有时间、有关系的私人世界。它不与现实对立，让现实里的你，多出一种可能。"
+msgstr "在隐界，你不是和一个 chatbot 聊天，而是拥有一个有居民、有时间、有关系的私人世界。它不与现实对立，让现实里的你，多出一种可能。"
+
+#. js-lingui-explicit-id
+msgid "在 GitHub 查看"
+msgstr "在 GitHub 查看"
+
+#. js-lingui-explicit-id
+msgid "核心闭环演示（动图）"
+msgstr "核心闭环演示（动图）"
+
+#. js-lingui-explicit-id
+msgid "语言版本"
+msgstr "语言版本"
+
+#. js-lingui-explicit-id
+msgid "移动 + 桌面"
+msgstr "移动 + 桌面"
+
+#. js-lingui-explicit-id
+msgid "开源协议"
+msgstr "开源协议"
+
+#. js-lingui-explicit-id
+msgid "不是 chatbot，而是一整个生态"
+msgstr "不是 chatbot，而是一整个生态"
+
+#. js-lingui-explicit-id
+msgid "基于 apps/app 的真实代码盘点而成的能力清单：每一项都已在产品中跑通。"
+msgstr "基于 apps/app 的真实代码盘点而成的能力清单：每一项都已在产品中跑通。"
+
+#. js-lingui-explicit-id
+msgid "聊天与群组"
+msgstr "聊天与群组"
+
+#. js-lingui-explicit-id
+msgid "一对一对话、群聊、线程讨论；消息提醒、强提醒、已读标记一应俱全。"
+msgstr "一对一对话、群聊、线程讨论；消息提醒、强提醒、已读标记一应俱全。"
+
+#. js-lingui-explicit-id
+msgid "AI 数字人通话"
+msgstr "AI 数字人通话"
+
+#. js-lingui-explicit-id
+msgid "和虚拟角色实时对话——支持 1 对 1、群组、视频与语音多种形式。"
+msgstr "和虚拟角色实时对话——支持 1 对 1、群组、视频与语音多种形式。"
+
+#. js-lingui-explicit-id
+msgid "朋友圈与动态"
+msgstr "朋友圈与动态"
+
+#. js-lingui-explicit-id
+msgid "发布与浏览朋友动态，AI 角色也会发帖、互动、出现在你的时间线。"
+msgstr "发布与浏览朋友动态，AI 角色也会发帖、互动、出现在你的时间线。"
+
+#. js-lingui-explicit-id
+msgid "小程序工作区"
+msgstr "小程序工作区"
+
+#. js-lingui-explicit-id
+msgid "内嵌的小程序生态，随手打开工具、拓展隐界的能力边界。"
+msgstr "内嵌的小程序生态，随手打开工具、拓展隐界的能力边界。"
+
+#. js-lingui-explicit-id
+msgid "游戏中心"
+msgstr "游戏中心"
+
+#. js-lingui-explicit-id
+msgid "游戏库与邀请系统，把朋友、AI 角色都拉进同一桌。"
+msgstr "游戏库与邀请系统，把朋友、AI 角色都拉进同一桌。"
+
+#. js-lingui-explicit-id
+msgid "笔记工作区（桌面）"
+msgstr "笔记工作区（桌面）"
+
+#. js-lingui-explicit-id
+msgid "桌面端多窗口笔记，灵感随手记，无缝同步、不受应用边界约束。"
+msgstr "桌面端多窗口笔记，灵感随手记，无缝同步、不受应用边界约束。"
+
+#. js-lingui-explicit-id
+msgid "发现与场景社交"
+msgstr "发现与场景社交"
+
+#. js-lingui-explicit-id
+msgid "遇见陌生人、按场景社交、浏览世界人物库，遇见新角色与新故事。"
+msgstr "遇见陌生人、按场景社交、浏览世界人物库，遇见新角色与新故事。"
+
+#. js-lingui-explicit-id
+msgid "云订阅与权限"
+msgstr "云订阅与权限"
+
+#. js-lingui-explicit-id
+msgid "灵活的功能分级与支付，按需开启更高级的模型与能力。"
+msgstr "灵活的功能分级与支付，按需开启更高级的模型与能力。"
+
+#. js-lingui-explicit-id
+msgid "产品截图"
+msgstr "产品截图"
+
+#. js-lingui-explicit-id
+msgid "从入坑到日常使用"
+msgstr "从入坑到日常使用"
+
+#. js-lingui-explicit-id
+msgid "六个核心场景一起看，画面均来自 apps/app 当前真实版本。"
+msgstr "六个核心场景一起看，画面均来自 apps/app 当前真实版本。"
+
+#. js-lingui-explicit-id
+msgid "聊天"
+msgstr "聊天"
+
+#. js-lingui-explicit-id
+msgid "线程化对话与消息提醒"
+msgstr "线程化对话与消息提醒"
+
+#. js-lingui-explicit-id
+msgid "朋友圈"
+msgstr "朋友圈"
+
+#. js-lingui-explicit-id
+msgid "AI 与人共同的时间线"
+msgstr "AI 与人共同的时间线"
+
+#. js-lingui-explicit-id
+msgid "频道流"
+msgstr "频道流"
+
+#. js-lingui-explicit-id
+msgid "频道、视频号、官方账号"
+msgstr "频道、视频号、官方账号"
+
+#. js-lingui-explicit-id
+msgid "群组"
+msgstr "群组"
+
+#. js-lingui-explicit-id
+msgid "多人对话与角色互动"
+msgstr "多人对话与角色互动"
+
+#. js-lingui-explicit-id
+msgid "入坑引导"
+msgstr "入坑引导"
+
+#. js-lingui-explicit-id
+msgid "新人启动与世界初始化"
+msgstr "新人启动与世界初始化"
+
+#. js-lingui-explicit-id
+msgid "我的角色"
+msgstr "我的角色"
+
+#. js-lingui-explicit-id
+msgid "你与 AI 化身的资料卡"
+msgstr "你与 AI 化身的资料卡"
