@@ -2,14 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  CheckCircle2,
   ChevronRight,
   QrCode,
   Search,
-  Sparkles,
   UserPlus,
   Users,
-  type LucideIcon,
 } from "lucide-react";
 import {
   getBlockedCharacters,
@@ -535,29 +532,6 @@ export function DesktopAddFriendWorkspace() {
               <div className="mt-4 rounded-[8px] bg-[#f7f7f7] px-3 py-3 text-[12px] leading-6 text-[color:var(--text-secondary)]">
                 {ownerSignature?.trim() ||
                   "把自己的世界展示给别人，也可以通过隐界号被快速搜索到。"}
-              </div>
-            </div>
-
-            <div className="mt-4 overflow-hidden rounded-[10px] border border-[rgba(15,23,42,0.08)] bg-white">
-              <div className="border-b border-[rgba(15,23,42,0.06)] px-4 py-3 text-[12px] font-medium tracking-[0.08em] text-[color:var(--text-muted)]">
-                当前状态
-              </div>
-              <div className="px-4 py-2">
-                <StatusMetaRow
-                  icon={Sparkles}
-                  label="待处理好友申请"
-                  value={`${pendingRequestCount}`}
-                />
-                <StatusMetaRow
-                  icon={CheckCircle2}
-                  label="已在通讯录"
-                  value={`${friendsQuery.data?.length ?? 0}`}
-                />
-                <StatusMetaRow
-                  icon={Users}
-                  label="可搜索角色"
-                  value={`${charactersQuery.data?.length ?? 0}`}
-                />
               </div>
             </div>
           </div>
@@ -1239,28 +1213,3 @@ function FakeQrPanel() {
   );
 }
 
-function StatusMetaRow({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: LucideIcon;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="flex items-center gap-3 border-b border-[rgba(15,23,42,0.06)] py-3 last:border-b-0">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-[#f5f5f5] text-[#15803d]">
-        <Icon size={14} />
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="text-[12px] text-[color:var(--text-muted)]">
-          {label}
-        </div>
-        <div className="mt-0.5 text-[14px] font-medium text-[color:var(--text-primary)]">
-          {value}
-        </div>
-      </div>
-    </div>
-  );
-}
