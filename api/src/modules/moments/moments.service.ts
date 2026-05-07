@@ -3,13 +3,14 @@ import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, MoreThanOrEqual, Repository } from 'typeorm';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import type { AiMessagePart } from '../ai/ai.types';
 import { REMINDER_CHARACTER_ID } from '../characters/reminder-character';
@@ -20,6 +21,7 @@ import { MomentCommentEntity } from './moment-comment.entity';
 import { MomentLikeEntity } from './moment-like.entity';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { SocialService } from '../social/social.service';
+import { CharacterFriendshipService } from '../social/character-friendship.service';
 import { FeedService } from '../feed/feed.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { ReminderRuntimeService } from '../reminder-runtime/reminder-runtime.service';
@@ -54,6 +56,8 @@ export interface Moment {
   authorName: string;
   authorAvatar: string;
   authorType: string;
+  visibility: string;
+  canInteract: boolean;
   text: string;
   location?: string;
   contentType: MomentContentType;
@@ -71,6 +75,7 @@ type MomentAvatarContext = {
   ownerAvatar: string;
   ownerId: string;
   visibleCharacterIds: Set<string>;
+  ownerFriendCharacterIds: Set<string>;
   characterAvatarById: Map<string, string>;
 };
 
@@ -83,6 +88,7 @@ export class MomentsService implements OnModuleInit {
     private readonly characters: CharactersService,
     private readonly worldOwnerService: WorldOwnerService,
     private readonly socialService: SocialService,
+    private readonly characterFriendships: CharacterFriendshipService,
     private readonly feedService: FeedService,
     private readonly cyberAvatar: CyberAvatarService,
     private readonly reminderRuntime: ReminderRuntimeService,
@@ -143,7 +149,11 @@ export class MomentsService implements OnModuleInit {
     });
     const posts = await this.postRepo.find({ order: { postedAt: 'DESC' } });
     const visiblePosts = posts.filter((post) =>
-      this.canOwnerViewPost(post, avatarContext.visibleCharacterIds),
+      this.canOwnerViewPost(
+        post,
+        avatarContext.visibleCharacterIds,
+        avatarContext.ownerFriendCharacterIds,
+      ),
     );
     return Promise.all(
       visiblePosts.map((post) => this._enrichPost(post, avatarContext)),
@@ -159,7 +169,11 @@ export class MomentsService implements OnModuleInit {
     const post = await this.postRepo.findOneBy({ id: postId });
     if (
       !post ||
-      !this.canOwnerViewPost(post, avatarContext.visibleCharacterIds)
+      !this.canOwnerViewPost(
+        post,
+        avatarContext.visibleCharacterIds,
+        avatarContext.ownerFriendCharacterIds,
+      )
     )
       return null;
     return this._enrichPost(post, avatarContext);
@@ -307,6 +321,7 @@ export class MomentsService implements OnModuleInit {
         authorName: char.name,
         authorAvatar: char.avatar,
         authorType: 'character',
+        visibility: this.deriveDefaultVisibility(char.socialOpenness),
         text,
         contentType: 'text',
         mediaPayload: this.serializeMomentMedia([]),
@@ -434,12 +449,28 @@ export class MomentsService implements OnModuleInit {
         character.id !== post.authorId && visibleCharacterIds.has(character.id),
     );
 
+    const intimacyByCharId = new Map<string, number>();
+    if (post.authorType === 'character') {
+      await Promise.all(
+        allChars.map(async (char) => {
+          const intimacy = await this.characterFriendships.getIntimacy(
+            char.id,
+            post.authorId,
+          );
+          intimacyByCharId.set(char.id, intimacy);
+        }),
+      );
+    }
+
     allChars.forEach((char, i) => {
       const freq = char.activityFrequency ?? 'normal';
-      const interactChance = freq === 'high' ? 0.6 : freq === 'low' ? 0.2 : 0.4;
+      const baseChance = freq === 'high' ? 0.6 : freq === 'low' ? 0.2 : 0.4;
+      const intimacy = intimacyByCharId.get(char.id) ?? 0;
+      const intimacyMultiplier = 1 + intimacy / 50; // up to ~3x at intimacy=100
+      const interactChance = Math.min(0.95, baseChance * intimacyMultiplier);
       if (Math.random() > interactChance) return;
 
-      // Delay based on activity frequency
+      // Delay based on activity frequency; closer friends react sooner
       const baseDelay =
         freq === 'high'
           ? 2 * 60 * 1000 // 2 min
@@ -447,7 +478,9 @@ export class MomentsService implements OnModuleInit {
             ? 2 * 60 * 60 * 1000 // 2 hours
             : 15 * 60 * 1000; // 15 min
 
-      const delay = baseDelay + Math.random() * baseDelay + i * 3000;
+      const intimacySpeedup = Math.max(0.3, 1 - intimacy / 150);
+      const delay =
+        (baseDelay + Math.random() * baseDelay + i * 3000) * intimacySpeedup;
 
       setTimeout(() => {
         void (async () => {
@@ -512,6 +545,12 @@ export class MomentsService implements OnModuleInit {
                 reply.text,
                 'character',
               );
+              if (post.authorType === 'character') {
+                await this.characterFriendships.bumpInteraction(
+                  char.id,
+                  post.authorId,
+                );
+              }
               return;
             }
 
@@ -522,6 +561,12 @@ export class MomentsService implements OnModuleInit {
               char.avatar,
               'character',
             );
+            if (post.authorType === 'character') {
+              await this.characterFriendships.bumpInteraction(
+                char.id,
+                post.authorId,
+              );
+            }
           } catch {
             // ignore
           }
@@ -615,21 +660,56 @@ export class MomentsService implements OnModuleInit {
   private canOwnerViewPost(
     post: MomentPostEntity,
     visibleCharacterIds: Set<string>,
+    ownerFriendCharacterIds?: Set<string>,
   ): boolean {
-    return (
-      post.authorType !== 'character' || visibleCharacterIds.has(post.authorId)
-    );
+    if (post.authorType !== 'character') return true;
+    if (!visibleCharacterIds.has(post.authorId)) return false;
+    if (post.visibility === 'private') return false;
+    if (post.visibility === 'friends') {
+      return !!ownerFriendCharacterIds?.has(post.authorId);
+    }
+    return true;
+  }
+
+  private canOwnerInteractWithPost(
+    post: MomentPostEntity,
+    ownerFriendCharacterIds: Set<string>,
+    ownerId: string,
+  ): boolean {
+    if (post.authorType === 'user') {
+      return true;
+    }
+    if (post.authorType === 'character') {
+      return ownerFriendCharacterIds.has(post.authorId);
+    }
+    return post.authorId === ownerId;
   }
 
   private async assertOwnerCanInteractWithPost(
     postId: string,
   ): Promise<MomentPostEntity> {
-    const visibleCharacterIds = await this.getVisibleCharacterIdSet();
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const [visibleCharacterIds, ownerFriendCharacterIds] = await Promise.all([
+      this.getVisibleCharacterIdSet(),
+      this.characters.getActiveFriendCharacterIdSet(owner.id),
+    ]);
     const post = await this.postRepo.findOneBy({ id: postId });
-    if (!post || !this.canOwnerViewPost(post, visibleCharacterIds)) {
+    if (
+      !post ||
+      !this.canOwnerViewPost(post, visibleCharacterIds, ownerFriendCharacterIds)
+    ) {
       throw new NotFoundException('Moment not found');
     }
+    if (!this.canOwnerInteractWithPost(post, ownerFriendCharacterIds, owner.id)) {
+      throw new ForbiddenException('需先加为好友才能互动');
+    }
     return post;
+  }
+
+  private deriveDefaultVisibility(
+    socialOpenness: string | null | undefined,
+  ): 'public' | 'friends' {
+    return socialOpenness === 'private' ? 'friends' : 'public';
   }
 
   private async _enrichPost(
@@ -676,6 +756,12 @@ export class MomentsService implements OnModuleInit {
         resolvedAvatarContext,
       ),
       authorType: post.authorType,
+      visibility: post.visibility,
+      canInteract: this.canOwnerInteractWithPost(
+        post,
+        resolvedAvatarContext.ownerFriendCharacterIds,
+        resolvedAvatarContext.ownerId,
+      ),
       text: post.text,
       location: post.location,
       contentType: this.normalizeMomentContentType(post.contentType),
@@ -744,9 +830,10 @@ export class MomentsService implements OnModuleInit {
             id: input.ownerId,
             avatar: input.ownerAvatar ?? '',
           };
-    const visibleCharacters = await this.characters.findAllVisibleToOwner(
-      owner.id,
-    );
+    const [visibleCharacters, ownerFriendCharacterIds] = await Promise.all([
+      this.characters.findAllVisibleToOwner(owner.id),
+      this.characters.getActiveFriendCharacterIdSet(owner.id),
+    ]);
 
     return {
       ownerAvatar: owner.avatar?.trim() || '',
@@ -754,6 +841,7 @@ export class MomentsService implements OnModuleInit {
       visibleCharacterIds: new Set(
         visibleCharacters.map((character) => character.id),
       ),
+      ownerFriendCharacterIds,
       characterAvatarById: new Map(
         visibleCharacters.map((character) => [character.id, character.avatar]),
       ),
@@ -1152,5 +1240,175 @@ export class MomentsService implements OnModuleInit {
       process.env.PUBLIC_API_BASE_URL?.trim() ||
       `http://localhost:${process.env.PORT ?? 3000}`
     ).replace(/\/+$/, '');
+  }
+
+  /**
+   * NPC 自主巡查：让 manual_admin 角色主动浏览近期朋友圈、按 intimacy/兴趣点赞或评论。
+   * 与 scheduleCharacterInteractions（被动反应）互补，确保即使无新帖也有持续社交活动。
+   */
+  async runNpcAutonomyTick(): Promise<{
+    summary: string;
+    likeCount: number;
+    commentCount: number;
+  }> {
+    const MAX_LLM_CALLS_PER_TICK = 30;
+    const FREQ_MULTIPLIER: Record<string, number> = {
+      high: 1.5,
+      normal: 1.0,
+      low: 0.5,
+    };
+    const RECENT_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+    const now = new Date();
+    const recentSince = new Date(now.getTime() - RECENT_WINDOW_MS);
+    const hour = now.getHours();
+
+    const candidates = (await this.characters.findAll()).filter(
+      (char) => char.sourceType === 'manual_admin',
+    );
+
+    const activeCandidates = candidates.filter((char) => {
+      const start = char.activeHoursStart ?? 8;
+      const end = char.activeHoursEnd ?? 22;
+      return hour >= start && hour <= end;
+    });
+
+    let llmCallsRemaining = MAX_LLM_CALLS_PER_TICK;
+    let likeCount = 0;
+    let commentCount = 0;
+    let participantCount = 0;
+
+    const recentPosts = await this.postRepo.find({
+      where: { postedAt: MoreThanOrEqual(recentSince) },
+      order: { postedAt: 'DESC' },
+    });
+    if (recentPosts.length === 0) {
+      return {
+        summary: `npc_autonomy_tick: 最近 24h 无帖子可巡查（候选 ${activeCandidates.length} 个）`,
+        likeCount,
+        commentCount,
+      };
+    }
+
+    for (const char of activeCandidates) {
+      const baseChance =
+        char.proactiveBrowseChance ?? 0.3;
+      const freqMul =
+        FREQ_MULTIPLIER[char.activityFrequency ?? 'normal'] ?? 1.0;
+      const browseChance = Math.min(0.95, baseChance * freqMul);
+      if (Math.random() > browseChance) continue;
+
+      participantCount += 1;
+
+      const candidatePosts = recentPosts.filter(
+        (post) => post.authorId !== char.id,
+      );
+      if (candidatePosts.length === 0) continue;
+
+      // Skip posts already liked by this NPC
+      const alreadyLiked = await this.likeRepo.find({
+        where: {
+          authorId: char.id,
+          postId: In(candidatePosts.map((p) => p.id)),
+        },
+        select: ['postId'],
+      });
+      const likedIds = new Set(alreadyLiked.map((row) => row.postId));
+      const fresh = candidatePosts.filter((post) => !likedIds.has(post.id));
+      if (fresh.length === 0) continue;
+
+      const scored = await Promise.all(
+        fresh.map(async (post) => {
+          let intimacy = 0;
+          if (post.authorType === 'character') {
+            intimacy = await this.characterFriendships.getIntimacy(
+              char.id,
+              post.authorId,
+            );
+          }
+          const recencyScore = Math.max(
+            0,
+            1 - (now.getTime() - post.postedAt.getTime()) / RECENT_WINDOW_MS,
+          );
+          return {
+            post,
+            score: intimacy / 50 + recencyScore + Math.random() * 0.3,
+          };
+        }),
+      );
+      scored.sort((a, b) => b.score - a.score);
+      const TOP_K = 3;
+      const top = scored.slice(0, TOP_K);
+
+      for (const { post } of top) {
+        if (Math.random() < 0.5) {
+          try {
+            await this.toggleLike(
+              post.id,
+              char.id,
+              char.name,
+              char.avatar,
+              'character',
+            );
+            likeCount += 1;
+            if (post.authorType === 'character') {
+              await this.characterFriendships.bumpInteraction(
+                char.id,
+                post.authorId,
+              );
+            }
+          } catch {
+            // ignore
+          }
+        }
+
+        if (llmCallsRemaining > 0 && Math.random() < 0.2) {
+          try {
+            const profile = await this.characters.getProfile(char.id);
+            if (!profile) continue;
+            const observation = await this.buildMomentAiObservation(post);
+            const reply = await this.ai.generateReply({
+              profile,
+              conversationHistory: [],
+              userMessage: `${post.authorName}发了一条朋友圈：${observation.summary}。用一句话自然地评论一下，不超过20字。`,
+              userMessageParts: observation.parts,
+              usageContext: {
+                surface: 'app',
+                scene: 'moment_comment_generate',
+                scopeType: 'character',
+                scopeId: char.id,
+                scopeLabel: char.name,
+                characterId: char.id,
+                characterName: char.name,
+              },
+            });
+            llmCallsRemaining -= 1;
+            await this.addComment(
+              post.id,
+              char.id,
+              char.name,
+              char.avatar,
+              reply.text,
+              'character',
+            );
+            commentCount += 1;
+            if (post.authorType === 'character') {
+              await this.characterFriendships.bumpInteraction(
+                char.id,
+                post.authorId,
+              );
+            }
+          } catch {
+            // ignore
+          }
+        }
+      }
+    }
+
+    return {
+      summary: `npc_autonomy_tick: ${participantCount} 个 NPC 上线，点赞 ${likeCount} 次，评论 ${commentCount} 次（剩余 LLM 配额 ${llmCallsRemaining}）`,
+      likeCount,
+      commentCount,
+    };
   }
 }

@@ -108,6 +108,26 @@ export const gameCenterCategoryTabs: Array<{
 
 export const gameCenterGames: GameCenterGame[] = [
   {
+    id: "parking-war",
+    name: "抢车位",
+    slogan: "和世界里的熟人抢一个能停的位。",
+    description:
+      "经典停车场玩法在隐界重做：自家车位每分钟自动收钱，停到 NPC 的车场可以蹭收益，被人占了车位就贴条把对方钱吃下来。对手不是真人，是世界里的熟面孔。",
+    studio: "隐界游戏实验室",
+    badge: "首发主推",
+    heroLabel: "停车经营",
+    category: "competitive",
+    tone: "sunset",
+    playersLabel: "刚开张，世界里的人都在试",
+    friendsLabel: "6 位 NPC 在抢你的车位",
+    updateNote: "可玩版上线",
+    deckLabel: "竞技推荐",
+    estimatedDuration: "随时玩，离线也在赚",
+    rewardLabel: "停车收益 + 车型解锁",
+    sessionObjective: "先把自家 6 个车位填满，再去蹭一蹭别人的车场。",
+    tags: ["停车", "经营", "蹭收益"],
+  },
+  {
     id: "signal-squad",
     name: "信号小队",
     slogan: "三分钟一局，把反应和协作压到最紧。",
@@ -228,6 +248,27 @@ export const gameCenterGames: GameCenterGame[] = [
     tags: ["对打", "同屏", "组局"],
   },
   {
+    id: "yinjie-farm",
+    name: "隐界农场",
+    slogan: "世界角色和你一起种地，连偷菜的都是熟人。",
+    description:
+      "把 QQ 农场的小时级节奏搬进隐界世界。NPC 自治种植、自治串门、自治偷菜；好感度真的会变。每个角色都按自己的性格、专长在玩——你下线时也一样。",
+    studio: "隐界游戏实验室",
+    badge: "世界自治",
+    heroLabel: "小时级农场",
+    category: "strategy",
+    tone: "forest",
+    playersLabel: "世界自治",
+    friendsLabel: "全员 NPC",
+    updateNote: "首发 14 种作物 + 偷菜小道消息",
+    deckLabel: "世界经营",
+    estimatedDuration: "随时回收",
+    rewardLabel: "金币 + 经验 + 好感度",
+    sessionObjective:
+      "先种两块成熟作物，再去隔壁串个门——记得看看谁夜里来过你家。",
+    tags: ["农场", "偷菜", "NPC自治", "长线"],
+  },
+  {
     id: "cloud-farm",
     name: "云上农场",
     slogan: "种地、收菜、帮邻居浇水，节奏慢但黏性很强。",
@@ -270,6 +311,8 @@ export const gameCenterGames: GameCenterGame[] = [
 ];
 
 export const gameCenterFeaturedGameIds = [
+  "yinjie-farm",
+  "parking-war",
   "signal-squad",
   "night-market",
   "sky-rally",
@@ -292,7 +335,7 @@ export const gameCenterShelves: GameCenterShelf[] = [
     id: "easy-return",
     title: "适合碎片时间继续",
     description: "放可以随时返回、继续经营或推进的项目。",
-    gameIds: ["cloud-farm", "night-market", "cat-inn"],
+    gameIds: ["yinjie-farm", "cloud-farm", "night-market", "cat-inn"],
   },
 ];
 

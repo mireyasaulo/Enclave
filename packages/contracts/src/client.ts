@@ -67,6 +67,15 @@ import type {
   FeedSurface,
   FeedViewRequest,
 } from "./feed";
+import type {
+  FarmCropId,
+  FarmEventView,
+  FarmHarvestResult,
+  FarmNeighborDetail,
+  FarmNeighborSummary,
+  FarmPlayerStateView,
+  FarmStealResult,
+} from "./farm";
 import type { GameCenterHomeResponse, GameCenterOwnerState } from "./games";
 import type {
   CreateMessageFavoriteRequest,
@@ -226,6 +235,17 @@ let apiRequestErrorHandler:
   | ((error: ApiRequestError) => void)
   | null = null;
 
+export type ApiCallObservation = {
+  method: string;
+  path: string;
+  status: number;
+  durationMs: number;
+  ok: boolean;
+  errorCode?: string | null;
+};
+
+let apiCallObserver: ((observation: ApiCallObservation) => void) | null = null;
+
 type RequestErrorBody = {
   statusCode?: number;
   errorCode?: string;
@@ -325,6 +345,12 @@ export function setApiRequestErrorHandler(
   apiRequestErrorHandler = handler;
 }
 
+export function setApiCallObserver(
+  observer: ((observation: ApiCallObservation) => void) | null,
+) {
+  apiCallObserver = observer;
+}
+
 export function isApiRequestError(error: unknown): error is ApiRequestError {
   return error instanceof ApiRequestError;
 }
@@ -349,10 +375,28 @@ async function request<T>(
     }
   }
 
-  const response = await fetch(`${resolveCoreApiBaseUrl(baseUrl)}${path}`, {
-    ...init,
-    headers,
-  });
+  const method = (init?.method ?? "GET").toUpperCase();
+  const startedAt =
+    typeof performance !== "undefined" && typeof performance.now === "function"
+      ? performance.now()
+      : Date.now();
+  let response: Response;
+  try {
+    response = await fetch(`${resolveCoreApiBaseUrl(baseUrl)}${path}`, {
+      ...init,
+      headers,
+    });
+  } catch (networkError) {
+    notifyApiCallObserver({
+      method,
+      path,
+      status: 0,
+      durationMs: Math.round(currentTime() - startedAt),
+      ok: false,
+      errorCode: "network_error",
+    });
+    throw networkError;
+  }
 
   const rawBody = await response.text();
 
@@ -399,10 +443,43 @@ async function request<T>(
       }
     }
 
+    notifyApiCallObserver({
+      method,
+      path,
+      status: response.status,
+      durationMs: Math.round(currentTime() - startedAt),
+      ok: false,
+      errorCode: error.errorCode,
+    });
+
     throw error;
   }
 
+  notifyApiCallObserver({
+    method,
+    path,
+    status: response.status,
+    durationMs: Math.round(currentTime() - startedAt),
+    ok: true,
+    errorCode: null,
+  });
+
   return (rawBody ? (JSON.parse(rawBody) as T) : undefined) as T;
+}
+
+function currentTime(): number {
+  return typeof performance !== "undefined" && typeof performance.now === "function"
+    ? performance.now()
+    : Date.now();
+}
+
+function notifyApiCallObserver(observation: ApiCallObservation): void {
+  if (!apiCallObserver) return;
+  try {
+    apiCallObserver(observation);
+  } catch {
+    // Observer failures must never affect business code.
+  }
 }
 
 function resolveRequestErrorMessage(
@@ -2793,6 +2870,171 @@ export function dismissGameCenterActiveGame(baseUrl?: string) {
     {
       method: "DELETE",
     },
+    baseUrl,
+  );
+}
+
+export function getFarmState(baseUrl?: string) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/state",
+    undefined,
+    baseUrl,
+  );
+}
+
+export function getFarmNeighbors(
+  options?: { limit?: number },
+  baseUrl?: string,
+) {
+  const params = new URLSearchParams();
+  if (options?.limit != null) params.set("limit", String(options.limit));
+  const qs = params.toString();
+  return requestLegacyApi<FarmNeighborSummary[]>(
+    qs ? `/games/farm/neighbors?${qs}` : "/games/farm/neighbors",
+    undefined,
+    baseUrl,
+  );
+}
+
+export function getFarmNeighborDetail(characterId: string, baseUrl?: string) {
+  return requestLegacyApi<FarmNeighborDetail>(
+    `/games/farm/neighbors/${encodeURIComponent(characterId)}`,
+    undefined,
+    baseUrl,
+  );
+}
+
+export function plantFarmCrop(
+  input: { plotIndex: number; cropId: FarmCropId },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/plant",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function waterFarmPlot(
+  input: { plotIndex: number; characterId?: string },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/water",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function weedFarmPlot(
+  input: { plotIndex: number; characterId?: string },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/weed",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function debugFarmPlot(
+  input: { plotIndex: number; characterId?: string },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/debug",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function harvestFarmPlot(
+  input: { plotIndex: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmHarvestResult>(
+    "/games/farm/harvest",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function stealFromNeighbor(
+  input: { characterId: string; plotIndex: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmStealResult>(
+    "/games/farm/steal",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function buyFarmSeed(
+  input: { cropId: FarmCropId; quantity: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/buy-seed",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function sellFarmCrop(
+  input: { cropId: FarmCropId; quantity: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmPlayerStateView>(
+    "/games/farm/sell-crop",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function getFarmEvents(
+  options?: { since?: string; limit?: number },
+  baseUrl?: string,
+) {
+  const params = new URLSearchParams();
+  if (options?.since) params.set("since", options.since);
+  if (options?.limit != null) params.set("limit", String(options.limit));
+  const qs = params.toString();
+  return requestLegacyApi<FarmEventView[]>(
+    qs ? `/games/farm/events?${qs}` : "/games/farm/events",
+    undefined,
     baseUrl,
   );
 }

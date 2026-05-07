@@ -654,76 +654,14 @@ export function DesktopChatHistoryPanel({
                     <span>{t(msg`${section.items.length} 条`)}</span>
                   </div>
                   <div className="divide-y divide-[rgba(0,0,0,0.06)]">
-                    {section.items.map((item) => {
-                      const metaLabel = buildSearchResultMeta(item);
-                      const previewText = buildSearchPreview(
-                        item,
-                        debouncedKeyword,
-                      );
-
-                      return (
-                        <div
-                          key={item.messageId}
-                          className="group block w-full border-l-2 border-l-transparent px-4 py-3 transition-[background-color,border-color] duration-150 hover:border-l-[rgba(7,193,96,0.28)] hover:bg-[#fafcfb]"
-                        >
-                          <div className="flex gap-3">
-                            <span
-                              className={cn(
-                                "mt-0.5 flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-full text-[12px] font-medium",
-                                resolveSearchResultAvatarTone(item),
-                              )}
-                            >
-                              {resolveSenderAvatarLabel(item.senderName)}
-                            </span>
-
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between gap-3">
-                                <div className="flex min-w-0 items-center gap-2">
-                                  <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
-                                    {item.senderName || t(msg`消息`)}
-                                  </div>
-                                  <span
-                                    className={cn(
-                                      "shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-medium",
-                                      resolveSearchResultBadgeTone(item),
-                                    )}
-                                  >
-                                    {resolveSearchResultBadgeLabel(item)}
-                                  </span>
-                                </div>
-                                <div className="relative flex h-6 shrink-0 items-center">
-                                  <span className="whitespace-nowrap text-[10px] tabular-nums text-[color:var(--text-dim)] transition-opacity duration-100 group-hover:opacity-0">
-                                    {formatMessageTimestamp(item.createdAt)}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      onOpenMessage(item.messageId)
-                                    }
-                                    className="pointer-events-none absolute inset-y-0 right-0 flex items-center gap-1 whitespace-nowrap rounded-full bg-[rgba(7,193,96,0.1)] px-2.5 text-[11px] font-medium text-[color:var(--brand-primary)] opacity-0 transition-opacity duration-100 hover:bg-[rgba(7,193,96,0.18)] group-hover:pointer-events-auto group-hover:opacity-100"
-                                  >
-                                    {t(msg`定位到聊天位置`)}
-                                  </button>
-                                </div>
-                              </div>
-
-                              {metaLabel ? (
-                                <div className="mt-1 truncate text-[10px] leading-4 text-[color:var(--text-dim)]">
-                                  {metaLabel}
-                                </div>
-                              ) : null}
-
-                              <div className="mt-1 line-clamp-2 text-[12px] leading-[1.35rem] text-[color:var(--text-secondary)]">
-                                {renderHighlightedText(
-                                  previewText,
-                                  debouncedKeyword,
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {section.items.map((item) => (
+                      <DesktopSearchResultRow
+                        key={item.messageId}
+                        item={item}
+                        debouncedKeyword={debouncedKeyword}
+                        onOpenMessage={onOpenMessage}
+                      />
+                    ))}
                   </div>
                 </section>
               ))}
@@ -746,6 +684,85 @@ export function DesktopChatHistoryPanel({
           ) : null}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function DesktopSearchResultRow({
+  item,
+  debouncedKeyword,
+  onOpenMessage,
+}: {
+  item: ChatMessageSearchItem;
+  debouncedKeyword: string;
+  onOpenMessage: (messageId: string) => void;
+}) {
+  const [hovered, setHovered] = useState(false);
+  const metaLabel = buildSearchResultMeta(item);
+  const previewText = buildSearchPreview(item, debouncedKeyword);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={cn(
+        "block w-full border-l-2 px-4 py-3 transition-[background-color,border-color] duration-150",
+        hovered
+          ? "border-l-[rgba(7,193,96,0.28)] bg-[#f3f9f4]"
+          : "border-l-transparent",
+      )}
+    >
+      <div className="flex gap-3">
+        <span
+          className={cn(
+            "mt-0.5 flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-full text-[12px] font-medium",
+            resolveSearchResultAvatarTone(item),
+          )}
+        >
+          {resolveSenderAvatarLabel(item.senderName)}
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2">
+              <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
+                {item.senderName || t(msg`消息`)}
+              </div>
+              <span
+                className={cn(
+                  "shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-medium",
+                  resolveSearchResultBadgeTone(item),
+                )}
+              >
+                {resolveSearchResultBadgeLabel(item)}
+              </span>
+            </div>
+            {hovered ? (
+              <button
+                type="button"
+                onClick={() => onOpenMessage(item.messageId)}
+                className="flex h-6 shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[color:var(--brand-primary)] px-2.5 text-[11px] font-medium text-white shadow-[0_1px_2px_rgba(7,193,96,0.25)] transition hover:opacity-95"
+              >
+                {t(msg`定位到聊天位置`)}
+              </button>
+            ) : (
+              <div className="shrink-0 text-[10px] tabular-nums text-[color:var(--text-dim)]">
+                {formatMessageTimestamp(item.createdAt)}
+              </div>
+            )}
+          </div>
+
+          {metaLabel ? (
+            <div className="mt-1 truncate text-[10px] leading-4 text-[color:var(--text-dim)]">
+              {metaLabel}
+            </div>
+          ) : null}
+
+          <div className="mt-1 line-clamp-2 text-[12px] leading-[1.35rem] text-[color:var(--text-secondary)]">
+            {renderHighlightedText(previewText, debouncedKeyword)}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

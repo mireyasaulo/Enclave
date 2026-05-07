@@ -536,7 +536,7 @@ export class CharactersService implements OnModuleInit {
     );
   }
 
-  private async getActiveFriendCharacterIdSet(ownerId?: string) {
+  async getActiveFriendCharacterIdSet(ownerId?: string) {
     const resolvedOwnerId =
       ownerId ?? (await this.worldOwnerService.getOwnerOrThrow()).id;
     const friendships = await this.friendshipRepo.find({

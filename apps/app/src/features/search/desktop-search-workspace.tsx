@@ -1052,8 +1052,22 @@ export function DesktopSearchWorkspace({
       onFocusCapture={handleWorkspaceFocusCapture}
       onKeyDownCapture={handleWorkspaceKeyDownCapture}
     >
-      <header className="shrink-0 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.94)] backdrop-blur-xl">
-        <div className="mx-auto w-full max-w-[1160px] px-6 pt-3">
+      <header
+        className={cn(
+          "shrink-0 bg-[rgba(255,255,255,0.94)] backdrop-blur-xl transition-[padding,border-color]",
+          hasKeyword
+            ? "border-b border-[color:var(--border-faint)]"
+            : "border-b border-transparent",
+        )}
+      >
+        <div
+          className={cn(
+            "mx-auto w-full px-6 transition-[max-width,padding]",
+            hasKeyword
+              ? "max-w-[1160px] pt-3"
+              : "max-w-[560px] pt-[18vh] pb-2",
+          )}
+        >
           <form
             className="relative"
             onSubmit={(event) => {
@@ -1066,13 +1080,14 @@ export function DesktopSearchWorkspace({
               aria-label="执行搜索"
               title="执行搜索"
               className={cn(
-                "absolute left-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-[10px] transition",
+                "absolute left-3 top-1/2 flex -translate-y-1/2 items-center justify-center rounded-[10px] transition",
+                hasKeyword ? "h-7 w-7" : "h-8 w-8",
                 searchPending && trimmedInputKeyword
                   ? "bg-[rgba(7,193,96,0.12)] text-[color:var(--brand-primary)] hover:bg-[rgba(7,193,96,0.16)]"
                   : "text-[color:var(--text-dim)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]",
               )}
             >
-              <Search size={15} />
+              <Search size={hasKeyword ? 15 : 17} />
             </button>
             <input
               ref={inputRef}
@@ -1080,8 +1095,11 @@ export function DesktopSearchWorkspace({
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
               onKeyDown={handleSearchInputKeyDown}
-              placeholder="搜索聊天记录、联系人、公众号、收藏和小程序"
-              className="h-9 w-full rounded-[10px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] pl-10 pr-20 text-sm text-[color:var(--text-primary)] outline-none transition-[border-color,box-shadow] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.4)] focus:bg-white focus:shadow-[0_0_0_3px_rgba(7,193,96,0.08)]"
+              placeholder="搜索聊天记录、联系人、收藏和朋友圈"
+              className={cn(
+                "w-full rounded-[10px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] pr-20 text-[color:var(--text-primary)] outline-none transition-[border-color,box-shadow,height,font-size,padding] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.4)] focus:bg-white focus:shadow-[0_0_0_3px_rgba(7,193,96,0.08)]",
+                hasKeyword ? "h-9 pl-10 text-sm" : "h-11 pl-11 text-[15px]",
+              )}
             />
             {searchText ? (
               <DesktopSearchActionButton
@@ -1100,9 +1118,15 @@ export function DesktopSearchWorkspace({
               keyboardFocusRegion === "categories"
                 ? "rounded-[8px] bg-[rgba(7,193,96,0.04)]"
                 : null,
+              !hasKeyword ? "justify-center" : null,
             )}
           >
-            {searchCategoryLabels.map((item) => {
+            {searchCategoryLabels
+              .filter(
+                (item) =>
+                  item.id !== "miniPrograms" && item.id !== "officialAccounts",
+              )
+              .map((item) => {
               const countLabel = !hasKeyword
                 ? null
                 : item.id === "all"
@@ -1149,7 +1173,12 @@ export function DesktopSearchWorkspace({
       </header>
 
       <div ref={scrollViewportRef} className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto flex w-full max-w-[1160px] min-h-full flex-col px-6 py-3">
+        <div
+          className={cn(
+            "mx-auto flex w-full min-h-full flex-col px-6 py-3 transition-[max-width]",
+            hasKeyword ? "max-w-[1160px]" : "max-w-[720px]",
+          )}
+        >
           {loading ? (
             <DesktopSearchStatusCard
               badgeLabel="准备中"
@@ -1213,33 +1242,32 @@ export function DesktopSearchWorkspace({
 
           {!loading && !error && !hasKeyword ? (
             <div className="space-y-3">
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {landingScopeCards.map((item) => {
-                  const Icon = item.icon;
-                  const count = getDesktopSearchScopeCount(scopeCounts, item.id);
-                  const cardComingSoon =
-                    item.id === "miniPrograms" ||
-                    item.id === "officialAccounts";
-                  const card = (
-                    <DesktopSearchScopeCard
-                      category={item.id}
-                      count={count}
-                      icon={Icon}
-                      onClick={() =>
-                        handleSelectCategory(item.id, { focusInput: true })
-                      }
-                      title={item.title}
-                    />
-                  );
-                  return cardComingSoon ? (
-                    <div key={item.id} className="relative">
-                      {card}
-                      <DesktopSearchComingSoonOverlay />
-                    </div>
-                  ) : (
-                    <div key={item.id}>{card}</div>
-                  );
-                })}
+              <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+                {landingScopeCards
+                  .filter(
+                    (item) =>
+                      item.id !== "miniPrograms" &&
+                      item.id !== "officialAccounts",
+                  )
+                  .map((item) => {
+                    const Icon = item.icon;
+                    const count = getDesktopSearchScopeCount(
+                      scopeCounts,
+                      item.id,
+                    );
+                    return (
+                      <DesktopSearchScopeCard
+                        key={item.id}
+                        category={item.id}
+                        count={count}
+                        icon={Icon}
+                        onClick={() =>
+                          handleSelectCategory(item.id, { focusInput: true })
+                        }
+                        title={item.title}
+                      />
+                    );
+                  })}
               </div>
 
               <div className="grid gap-3 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
@@ -1275,23 +1303,12 @@ export function DesktopSearchWorkspace({
                   )}
                 </DesktopSearchLandingPanel>
 
-                <div className="space-y-3">
-                  <div className="relative">
-                    <DesktopQuickLinksPanel
-                      title="最近使用的小程序"
-                      emptyText="暂无最近使用"
-                      items={recentMiniPrograms}
-                      onOpen={onOpenQuickLink}
-                    />
-                    <DesktopSearchComingSoonOverlay />
-                  </div>
-                  <DesktopQuickLinksPanel
-                    title="最近收藏"
-                    emptyText="暂无最近收藏"
-                    items={recentFavorites}
-                    onOpen={onOpenQuickLink}
-                  />
-                </div>
+                <DesktopQuickLinksPanel
+                  title="最近收藏"
+                  emptyText="暂无最近收藏"
+                  items={recentFavorites}
+                  onOpen={onOpenQuickLink}
+                />
               </div>
             </div>
           ) : null}
@@ -1315,112 +1332,97 @@ export function DesktopSearchWorkspace({
           {!loading && !error && hasKeyword ? (
             activeCategory === "all" ? (
               <div className="space-y-6">
-                {allResultPreviewSections.map((entry) => {
-                  const { section } = entry;
-                  const isComingSoon =
-                    section.category === "miniPrograms" ||
-                    section.category === "officialAccounts";
-                  const panelNode = (
-                    <DesktopSearchResultsPanel
-                      key={section.category}
-                      action={
-                        entry.hasMore && !isComingSoon ? (
-                          <DesktopSearchActionButton
-                            onClick={() =>
-                              handleExpandAllResultsSection(section.category)
+                {allResultPreviewSections
+                  .filter(
+                    (entry) =>
+                      entry.section.category !== "miniPrograms" &&
+                      entry.section.category !== "officialAccounts",
+                  )
+                  .map((entry) => {
+                    const { section } = entry;
+                    return (
+                      <DesktopSearchResultsPanel
+                        key={section.category}
+                        action={
+                          entry.hasMore ? (
+                            <DesktopSearchActionButton
+                              onClick={() =>
+                                handleExpandAllResultsSection(section.category)
+                              }
+                              priority="secondary"
+                              tone="brand"
+                            >
+                              查看全部
+                            </DesktopSearchActionButton>
+                          ) : null
+                        }
+                        countLabel={`${section.results.length} 条命中`}
+                        description={getDesktopSearchSectionDescription(
+                          section.category,
+                        )}
+                        highlighted={spotlightPanelId === section.category}
+                        panelRef={(node) => {
+                          allResultSectionRefs.current[section.category] = node;
+                        }}
+                        title={section.label}
+                      >
+                        {section.category === "messages" ? (
+                          <DesktopSearchMessageResults
+                            conversationResults={
+                              entry.previewMessageConversations
                             }
-                            priority="secondary"
-                            tone="brand"
-                          >
-                            查看全部
-                          </DesktopSearchActionButton>
-                        ) : null
-                      }
-                      countLabel={`${section.results.length} 条命中`}
-                      description={getDesktopSearchSectionDescription(
-                        section.category,
-                      )}
-                      highlighted={spotlightPanelId === section.category}
-                      panelRef={(node) => {
-                        allResultSectionRefs.current[section.category] = node;
-                      }}
-                      title={section.label}
-                    >
-                      {section.category === "messages" ? (
-                        <DesktopSearchMessageResults
-                          conversationResults={entry.previewMessageConversations}
-                          keyword={normalizedKeyword}
-                          messageGroups={entry.previewMessageGroups}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : section.category === "officialAccounts" ? (
-                        <DesktopSearchOfficialAccountResults
-                          accountResults={entry.previewOfficialAccounts}
-                          keyword={normalizedKeyword}
-                          officialAccountGroups={entry.previewOfficialAccountGroups}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : isDesktopFeatureCardCategory(section.category) ? (
-                        <DesktopSearchFeatureResults
-                          category={section.category}
-                          items={entry.previewFeatureResults}
-                          keyword={normalizedKeyword}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : isDesktopContentCategory(section.category) ? (
-                        <DesktopSearchContentResults
-                          items={entry.previewContentResults}
-                          keyword={normalizedKeyword}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : (
-                        <DesktopSearchResultStack>
-                          {entry.previewResults.map((item) => (
-                            <DesktopSearchResultRow
-                              key={item.id}
-                              buttonRef={(node) => {
-                                resultButtonRefs.current[item.id] = node;
-                              }}
-                              item={item}
-                              keyword={normalizedKeyword}
-                              onOpen={onOpenResult}
-                              onSelect={handleSelectResult}
-                              selected={selectedResultId === item.id}
-                            />
-                          ))}
-                        </DesktopSearchResultStack>
-                      )}
-                    </DesktopSearchResultsPanel>
-                  );
-                  return isComingSoon ? (
-                    <div key={section.category} className="relative">
-                      {panelNode}
-                      <DesktopSearchComingSoonOverlay />
-                    </div>
-                  ) : (
-                    panelNode
-                  );
-                })}
+                            keyword={normalizedKeyword}
+                            messageGroups={entry.previewMessageGroups}
+                            onOpen={onOpenResult}
+                            onSelect={handleSelectResult}
+                            registerResultRef={(resultId, node) => {
+                              resultButtonRefs.current[resultId] = node;
+                            }}
+                            selectedResultId={selectedResultId}
+                          />
+                        ) : isDesktopFeatureCardCategory(section.category) ? (
+                          <DesktopSearchFeatureResults
+                            category={section.category}
+                            items={entry.previewFeatureResults}
+                            keyword={normalizedKeyword}
+                            onOpen={onOpenResult}
+                            onSelect={handleSelectResult}
+                            registerResultRef={(resultId, node) => {
+                              resultButtonRefs.current[resultId] = node;
+                            }}
+                            selectedResultId={selectedResultId}
+                          />
+                        ) : isDesktopContentCategory(section.category) ? (
+                          <DesktopSearchContentResults
+                            items={entry.previewContentResults}
+                            keyword={normalizedKeyword}
+                            onOpen={onOpenResult}
+                            onSelect={handleSelectResult}
+                            registerResultRef={(resultId, node) => {
+                              resultButtonRefs.current[resultId] = node;
+                            }}
+                            selectedResultId={selectedResultId}
+                          />
+                        ) : (
+                          <DesktopSearchResultStack>
+                            {entry.previewResults.map((item) => (
+                              <DesktopSearchResultRow
+                                key={item.id}
+                                buttonRef={(node) => {
+                                  resultButtonRefs.current[item.id] = node;
+                                }}
+                                item={item}
+                                keyword={normalizedKeyword}
+                                onOpen={onOpenResult}
+                                onSelect={handleSelectResult}
+                                selected={selectedResultId === item.id}
+                              />
+                            ))}
+                          </DesktopSearchResultStack>
+                        )}
+                      </DesktopSearchResultsPanel>
+                    );
+                  })}
               </div>
             ) : (
               <div className="space-y-4">
@@ -1430,92 +1432,65 @@ export function DesktopSearchWorkspace({
                   keyword={keywordLabel}
                   onBack={() => handleBackToAllResults(activeCategory)}
                 />
-                {(() => {
-                  const drilldownIsComingSoon =
-                    activeCategory === "miniPrograms" ||
-                    activeCategory === "officialAccounts";
-                  const drilldownPanel = (
-                    <DesktopSearchResultsPanel
-                      countLabel={`${visibleResults.length} 条命中`}
-                      description={`从全部结果展开，继续查看${searchCategoryTitles[activeCategory]}的完整命中。`}
-                      highlighted={spotlightPanelId === activeCategory}
-                      title={`${searchCategoryTitles[activeCategory]}全部结果`}
-                    >
-                      {activeCategory === "messages" ? (
-                        <DesktopSearchMessageResults
-                          conversationResults={messageConversationOnlyResults}
-                          keyword={normalizedKeyword}
-                          messageGroups={messageGroups}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : activeCategory === "officialAccounts" ? (
-                        <DesktopSearchOfficialAccountResults
-                          accountResults={officialAccountOnlyResults}
-                          keyword={normalizedKeyword}
-                          officialAccountGroups={officialAccountGroups}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : isDesktopFeatureCardCategory(activeCategory) ? (
-                        <DesktopSearchFeatureResults
-                          category={activeCategory}
-                          items={visibleResults}
-                          keyword={normalizedKeyword}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : isDesktopContentCategory(activeCategory) ? (
-                        <DesktopSearchContentResults
-                          items={visibleResults}
-                          keyword={normalizedKeyword}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : (
-                        <DesktopSearchResultStack>
-                          {visibleResults.map((item) => (
-                            <DesktopSearchResultRow
-                              key={item.id}
-                              buttonRef={(node) => {
-                                resultButtonRefs.current[item.id] = node;
-                              }}
-                              item={item}
-                              keyword={normalizedKeyword}
-                              onOpen={onOpenResult}
-                              onSelect={handleSelectResult}
-                              selected={selectedResultId === item.id}
-                            />
-                          ))}
-                        </DesktopSearchResultStack>
-                      )}
-                    </DesktopSearchResultsPanel>
-                  );
-                  return drilldownIsComingSoon ? (
-                    <div className="relative">
-                      {drilldownPanel}
-                      <DesktopSearchComingSoonOverlay />
-                    </div>
+                <DesktopSearchResultsPanel
+                  countLabel={`${visibleResults.length} 条命中`}
+                  description={`从全部结果展开，继续查看${searchCategoryTitles[activeCategory]}的完整命中。`}
+                  highlighted={spotlightPanelId === activeCategory}
+                  title={`${searchCategoryTitles[activeCategory]}全部结果`}
+                >
+                  {activeCategory === "messages" ? (
+                    <DesktopSearchMessageResults
+                      conversationResults={messageConversationOnlyResults}
+                      keyword={normalizedKeyword}
+                      messageGroups={messageGroups}
+                      onOpen={onOpenResult}
+                      onSelect={handleSelectResult}
+                      registerResultRef={(resultId, node) => {
+                        resultButtonRefs.current[resultId] = node;
+                      }}
+                      selectedResultId={selectedResultId}
+                    />
+                  ) : isDesktopFeatureCardCategory(activeCategory) ? (
+                    <DesktopSearchFeatureResults
+                      category={activeCategory}
+                      items={visibleResults}
+                      keyword={normalizedKeyword}
+                      onOpen={onOpenResult}
+                      onSelect={handleSelectResult}
+                      registerResultRef={(resultId, node) => {
+                        resultButtonRefs.current[resultId] = node;
+                      }}
+                      selectedResultId={selectedResultId}
+                    />
+                  ) : isDesktopContentCategory(activeCategory) ? (
+                    <DesktopSearchContentResults
+                      items={visibleResults}
+                      keyword={normalizedKeyword}
+                      onOpen={onOpenResult}
+                      onSelect={handleSelectResult}
+                      registerResultRef={(resultId, node) => {
+                        resultButtonRefs.current[resultId] = node;
+                      }}
+                      selectedResultId={selectedResultId}
+                    />
                   ) : (
-                    drilldownPanel
-                  );
-                })()}
+                    <DesktopSearchResultStack>
+                      {visibleResults.map((item) => (
+                        <DesktopSearchResultRow
+                          key={item.id}
+                          buttonRef={(node) => {
+                            resultButtonRefs.current[item.id] = node;
+                          }}
+                          item={item}
+                          keyword={normalizedKeyword}
+                          onOpen={onOpenResult}
+                          onSelect={handleSelectResult}
+                          selected={selectedResultId === item.id}
+                        />
+                      ))}
+                    </DesktopSearchResultStack>
+                  )}
+                </DesktopSearchResultsPanel>
               </div>
             )
           ) : null}
@@ -2863,17 +2838,3 @@ function getDesktopSearchScopeCount(
   return scopeCounts.feed;
 }
 
-function DesktopSearchComingSoonOverlay() {
-  return (
-    <div className="pointer-events-auto absolute inset-0 z-30 flex items-center justify-center rounded-[18px] bg-black/30 backdrop-blur-[3px]">
-      <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-6 py-5 text-center shadow-[var(--shadow-card)]">
-        <div className="text-base font-semibold text-[color:var(--text-primary)]">
-          功能开发中
-        </div>
-        <div className="mt-1.5 text-xs text-[color:var(--text-secondary)]">
-          敬请期待
-        </div>
-      </div>
-    </div>
-  );
-}

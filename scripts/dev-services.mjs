@@ -95,9 +95,9 @@ const services = {
   site: {
     cwd: path.join(rootDir, "apps", "site"),
     command: nodeBinary,
-    args: [path.join(rootDir, "apps", "site", "node_modules", "next", "dist", "bin", "next"), "dev", "-p", "5183"],
-    port: 5183,
-    url: "http://127.0.0.1:5183/",
+    args: [path.join(rootDir, "apps", "site", "node_modules", "next", "dist", "bin", "next"), "dev", "-p", "5185"],
+    port: 5185,
+    url: "http://127.0.0.1:5185/",
     prestart() {
       const result = spawnSync(nodeBinary, [path.join(rootDir, "apps", "site", "scripts", "sync-assets.mjs")], {
         cwd: path.join(rootDir, "apps", "site"),

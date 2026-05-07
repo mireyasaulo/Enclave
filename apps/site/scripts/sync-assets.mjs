@@ -2,7 +2,7 @@
 /**
  * 同步仓库现有资产到 apps/site/public：
  *   docs/screenshots/core-{key}{,.en,.ja,.ko}.png  → public/screenshots/{locale}/{key}.png
- *   docs/assets/yinjie-core-loop{,.en,.ja,.ko}.gif → public/animations/{locale}.gif
+ *   docs/assets/yinjie-core-loop{,.en,.ja,.ko}.gif → public/animations/{locale}.webp (动画 WebP，体积 ~80% 小于 GIF)
  *   apps/desktop/src-tauri/icons/icon.png          → public/favicon.png
  * 幂等：仅在源更新时复制。
  */
@@ -65,13 +65,42 @@ for (const [locale, suffix] of Object.entries(LOCALE_SUFFIX)) {
   }
 }
 
-// Animations
-for (const [locale, suffix] of Object.entries(LOCALE_SUFFIX)) {
-  const src = path.join(repoRoot, "docs", "assets", `yinjie-core-loop${suffix}.gif`);
-  const dst = path.join(siteRoot, "public", "animations", `${locale}.gif`);
-  if (copyIfChanged(src, dst)) copied++;
-  else skipped++;
+// Animations: only emit animated WebP (LCP optimization).
+// Sharp keeps animated WebP about 70-80% smaller than the source GIF, and
+// hero-section.tsx only references the .webp — shipping the GIF too just
+// bloats the public bundle.
+const ANIM_SOURCES = Object.entries(LOCALE_SUFFIX).map(([locale, suffix]) => ({
+  locale,
+  src: path.join(repoRoot, "docs", "assets", `yinjie-core-loop${suffix}.gif`),
+  webpDst: path.join(siteRoot, "public", "animations", `${locale}.webp`),
+}));
+
+async function emitAnimatedWebp() {
+  let sharp;
+  try {
+    sharp = (await import("sharp")).default;
+  } catch {
+    console.warn("[site:sync-assets] sharp unavailable, skipping animated WebP");
+    return 0;
+  }
+  let written = 0;
+  for (const { src, webpDst } of ANIM_SOURCES) {
+    if (!existsSync(src)) continue;
+    if (existsSync(webpDst)) {
+      const s = statSync(src).mtimeMs;
+      const d = statSync(webpDst).mtimeMs;
+      if (d >= s) continue;
+    }
+    await sharp(src, { animated: true })
+      .webp({ quality: 80, effort: 4 })
+      .toFile(webpDst);
+    written++;
+  }
+  return written;
 }
+
+const webpExtra = await emitAnimatedWebp();
+copied += webpExtra;
 
 // Favicon (Tauri icon as PNG source)
 const faviconSrc = path.join(repoRoot, "apps", "desktop", "src-tauri", "icons", "icon.png");

@@ -177,6 +177,29 @@
         </div>
       </div>
     </div>
+    <script>
+      // 浏览器（含内网穿透域名）首次访问时没有任何持久化配置或注入配置，
+      // runtime 启动会判定 worldAccessMode 缺失而停在 "请先回到 setup" 页面。
+      // 这里给纯 web 上下文一个默认值：apiBaseUrl 用当前 origin（nginx 已把
+      // /api/、/socket.io/、/cloud/ 反代到本机后端），worldAccessMode=local。
+      // Capacitor / Tauri 等原生壳启动后会通过 hydrateNativeRuntimeConfig
+      // 用真实的 apiBaseUrl 覆盖，所以这段注入不会干扰移动端和桌面壳。
+      (function () {
+        var w = window;
+        if (!w || !w.location) return;
+        var loc = w.location;
+        if (loc.protocol !== "http:" && loc.protocol !== "https:") return;
+        if (w.__YINJIE_RUNTIME_CONFIG__) return;
+        if (w.Capacitor || w.__TAURI__ || w.__TAURI_INTERNALS__) return;
+        w.__YINJIE_RUNTIME_CONFIG__ = {
+          apiBaseUrl: loc.origin,
+          socketBaseUrl: loc.origin,
+          worldAccessMode: "local",
+          configStatus: "configured",
+          bootstrapSource: "window",
+        };
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
   </html>

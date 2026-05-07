@@ -42,6 +42,8 @@ export interface FeedPost {
   authorName: string;
   authorAvatar: string;
   authorType: FeedAuthorType;
+  visibility: "public" | "friends" | "private";
+  canInteract: boolean;
   surface: FeedSurface;
   text: string;
   title?: string | null;

@@ -46,6 +46,7 @@ import { buildCharacterDetailRouteHash } from "../features/contacts/character-de
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { buildCreateGroupRouteHash } from "../lib/create-group-route-state";
 import { isDesktopOnlyPath } from "../lib/history-back";
+import { buildYinjieId } from "../lib/yinjie-id";
 import {
   openAppSettings,
   requestNotificationPermission,
@@ -296,7 +297,7 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
     : targetCharacter?.relationship?.trim() ||
       (isFriend ? t(msg`通讯录朋友`) : t(msg`世界联系人`));
   const contactIdentifier = targetCharacterId
-    ? t(msg`隐界号：yinjie_${targetCharacterId.slice(0, 8)}`)
+    ? t(msg`隐界号：${buildYinjieId(targetCharacterId)}`)
     : null;
   const contactSummary = useMemo(() => {
     if (!conversation) {
@@ -325,7 +326,7 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
         t(msg`${contactName} 的隐界名片`),
         relationship,
         targetCharacterId
-          ? t(msg`隐界号：yinjie_${targetCharacterId.slice(0, 8)}`)
+          ? t(msg`隐界号：${buildYinjieId(targetCharacterId)}`)
           : undefined,
         contactUrl,
       ]

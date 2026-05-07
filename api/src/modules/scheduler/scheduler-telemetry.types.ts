@@ -159,6 +159,14 @@ export const SCHEDULER_JOB_DEFINITIONS = [
     nextRunHint: '每 30 秒',
     enabled: true,
   },
+  {
+    id: 'npc_autonomy_tick',
+    name: 'NPC 自主社交巡查',
+    cadence: '*/15 * * * *',
+    description: '让世界角色主动浏览近期朋友圈、按 intimacy/兴趣点赞或评论。',
+    nextRunHint: '每 15 分钟',
+    enabled: true,
+  },
 ] as const;
 
 export type SchedulerJobId = (typeof SCHEDULER_JOB_DEFINITIONS)[number]['id'];

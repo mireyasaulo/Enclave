@@ -14,6 +14,7 @@ import { SocialModule } from './modules/social/social.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
 import { FeedModule } from './modules/feed/feed.module';
 import { GamesModule } from './modules/games/games.module';
+import { FarmModule } from './modules/games/farm/farm.module';
 import { OfficialAccountsModule } from './modules/official-accounts/official-accounts.module';
 import { WorldModule } from './modules/world/world.module';
 import { SchedulerModule } from './modules/scheduler/scheduler.module';
@@ -48,6 +49,7 @@ import { MomentLikeEntity } from './modules/moments/moment-like.entity';
 import { FriendshipEntity } from './modules/social/friendship.entity';
 import { FriendRequestEntity } from './modules/social/friend-request.entity';
 import { AIRelationshipEntity } from './modules/social/ai-relationship.entity';
+import { CharacterFriendshipEntity } from './modules/social/character-friendship.entity';
 import { GroupEntity } from './modules/chat/group.entity';
 import { GroupMemberEntity } from './modules/chat/group-member.entity';
 import { GroupMessageEntity } from './modules/chat/group-message.entity';
@@ -63,6 +65,9 @@ import { GameCatalogRevisionEntity } from './modules/games/game-catalog-revision
 import { GameCenterCurationEntity } from './modules/games/game-center-curation.entity';
 import { GameOwnerStateEntity } from './modules/games/game-owner-state.entity';
 import { GameSubmissionEntity } from './modules/games/game-submission.entity';
+import { FarmPlayerStateEntity } from './modules/games/farm/entities/farm-player-state.entity';
+import { FarmNpcStateEntity } from './modules/games/farm/entities/farm-npc-state.entity';
+import { FarmEventLogEntity } from './modules/games/farm/entities/farm-event-log.entity';
 import { WorldContextEntity } from './modules/world/world-context.entity';
 import { NarrativeArcEntity } from './modules/narrative/narrative-arc.entity';
 import { AIBehaviorLogEntity } from './modules/analytics/ai-behavior-log.entity';
@@ -142,6 +147,7 @@ import {
           FriendshipEntity,
           FriendRequestEntity,
           AIRelationshipEntity,
+          CharacterFriendshipEntity,
           GroupEntity,
           GroupMemberEntity,
           GroupMessageEntity,
@@ -157,6 +163,9 @@ import {
           GameCenterCurationEntity,
           GameOwnerStateEntity,
           GameSubmissionEntity,
+          FarmPlayerStateEntity,
+          FarmNpcStateEntity,
+          FarmEventLogEntity,
           WorldContextEntity,
           NarrativeArcEntity,
           AIBehaviorLogEntity,
@@ -215,6 +224,7 @@ import {
     ModerationModule,
     FeedModule,
     GamesModule,
+    FarmModule,
     OfficialAccountsModule,
     WorldModule,
     SchedulerModule,

@@ -74,6 +74,8 @@ export interface Moment {
   authorName: string;
   authorAvatar: string;
   authorType: "user" | "character";
+  visibility: "public" | "friends" | "private";
+  canInteract: boolean;
   text: string;
   location?: string;
   contentType: MomentContentType;

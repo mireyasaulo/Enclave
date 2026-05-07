@@ -909,6 +909,8 @@ export class SystemService {
       allowOwnerKeyOverride: true,
       modelRoutingNotes: '',
       activityMode: 'auto',
+      socialOpenness: 'normal',
+      proactiveBrowseChance: 0.3,
     } as CharacterEntity;
   }
 

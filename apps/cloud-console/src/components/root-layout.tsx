@@ -417,6 +417,25 @@ function RootLayoutContent() {
       ),
     },
     {
+      key: "telemetry",
+      label: "Telemetry",
+      hint: "Client analytics",
+      content: (
+        <Link
+          to="/telemetry"
+          className={
+            pathname.startsWith("/telemetry") ? NAV_LINK_ACTIVE : NAV_LINK
+          }
+          aria-current={pathname.startsWith("/telemetry") ? "page" : undefined}
+        >
+          <NavLinkContent
+            label={t("Telemetry")}
+            hint={t("Client analytics")}
+          />
+        </Link>
+      ),
+    },
+    {
       key: "revenue-sharing",
       label: "Revenue Sharing",
       hint: "Payees and ledgers",

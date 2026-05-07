@@ -1,0 +1,106 @@
+import type { FarmNeighborSummary } from "@yinjie/contracts";
+import { useFarmNeighbors } from "../use-farm-state";
+
+interface NeighborListPanelProps {
+  onSelectNeighbor: (characterId: string) => void;
+}
+
+export function NeighborListPanel({ onSelectNeighbor }: NeighborListPanelProps) {
+  const neighborsQuery = useFarmNeighbors({ limit: 30 });
+
+  return (
+    <section className="rounded-2xl bg-white p-3 shadow-sm">
+      <header className="mb-2 flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-stone-700">世界邻居</h2>
+        <span className="text-[11px] text-stone-400">
+          {neighborsQuery.data?.length ?? 0} 位
+        </span>
+      </header>
+      {neighborsQuery.isLoading && (
+        <p className="py-4 text-center text-xs text-stone-400">
+          正在打听邻居们的动向……
+        </p>
+      )}
+      {neighborsQuery.error && (
+        <p className="py-4 text-center text-xs text-rose-600">
+          邻居列表加载失败：{(neighborsQuery.error as Error).message}
+        </p>
+      )}
+      {neighborsQuery.data && neighborsQuery.data.length === 0 && (
+        <p className="py-4 text-center text-xs text-stone-400">
+          世界里还没有可串门的人。
+        </p>
+      )}
+      <ul className="max-h-72 overflow-y-auto">
+        {neighborsQuery.data?.map((neighbor) => (
+          <NeighborRow
+            key={neighbor.characterId}
+            neighbor={neighbor}
+            onClick={() => onSelectNeighbor(neighbor.characterId)}
+          />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function NeighborRow({
+  neighbor,
+  onClick,
+}: {
+  neighbor: FarmNeighborSummary;
+  onClick: () => void;
+}) {
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={onClick}
+        className="flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left hover:bg-emerald-50"
+      >
+        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full bg-stone-200">
+          {neighbor.characterAvatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={neighbor.characterAvatar}
+              alt={neighbor.characterName}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <span className="flex h-full w-full items-center justify-center text-sm text-stone-500">
+              {neighbor.characterName.slice(0, 1)}
+            </span>
+          )}
+          {neighbor.isOnline && (
+            <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border border-white bg-emerald-500" />
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-2">
+            <span className="truncate text-sm font-medium">
+              {neighbor.characterName}
+            </span>
+            <span className="text-[10px] text-stone-400">
+              Lv.{neighbor.level}
+            </span>
+          </div>
+          <div className="mt-0.5 flex items-center gap-2 text-[11px] text-stone-500">
+            {neighbor.ripePlotCount > 0 ? (
+              <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-amber-700">
+                ✨ {neighbor.ripePlotCount} 块成熟
+              </span>
+            ) : (
+              <span className="text-stone-400">
+                {neighbor.totalPlotCount} 块田，暂无成熟
+              </span>
+            )}
+            {neighbor.intimacyLevel > 0 && (
+              <span>♡ {neighbor.intimacyLevel}</span>
+            )}
+          </div>
+        </div>
+        <span className="text-stone-300">›</span>
+      </button>
+    </li>
+  );
+}

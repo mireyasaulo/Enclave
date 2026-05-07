@@ -57,7 +57,7 @@ export type DesktopContactsWorkspaceProps = {
   onOpenFriendChat: (characterId: string) => void;
   emptyState?: ReactNode;
   worldCharacterTitle: string;
-  worldCharacterItems: WorldCharacterDirectoryItem[];
+  worldCharacterSections: ContactSection<WorldCharacterDirectoryItem>[];
   activeWorldCharacterId?: string | null;
   onSelectWorldCharacter: (characterId: string) => void;
   detailContent: ReactNode;
@@ -87,7 +87,7 @@ export function DesktopContactsWorkspace({
   onOpenFriendChat,
   emptyState = null,
   worldCharacterTitle,
-  worldCharacterItems,
+  worldCharacterSections,
   activeWorldCharacterId = null,
   onSelectWorldCharacter,
   detailContent,
@@ -214,20 +214,34 @@ export function DesktopContactsWorkspace({
 
               {!loading && !friendSections.length ? emptyState : null}
 
-              {worldCharacterItems.length ? (
+              {worldCharacterSections.length ? (
                 <div
                   id="world-character-directory"
                   className="mt-3 overflow-hidden border-t border-[rgba(0,0,0,0.04)] pt-2"
                 >
                   <DesktopDirectoryTitle title={worldCharacterTitle} />
-                  {worldCharacterItems.map((item, index) => (
-                    <DesktopWorldCharacterRow
-                      key={item.character.id}
-                      item={item}
-                      index={index}
-                      active={activeWorldCharacterId === item.character.id}
-                      onClick={() => onSelectWorldCharacter(item.character.id)}
-                    />
+                  {worldCharacterSections.map((section, sectionIndex) => (
+                    <div
+                      key={section.key}
+                      className={cn(
+                        sectionIndex > 0
+                          ? "mt-2 border-t border-[rgba(0,0,0,0.04)] pt-2"
+                          : undefined,
+                      )}
+                    >
+                      <DesktopSectionHeader title={section.title} />
+                      {section.items.map((item, index) => (
+                        <DesktopWorldCharacterRow
+                          key={item.character.id}
+                          item={item}
+                          index={index}
+                          active={activeWorldCharacterId === item.character.id}
+                          onClick={() =>
+                            onSelectWorldCharacter(item.character.id)
+                          }
+                        />
+                      ))}
+                    </div>
                   ))}
                 </div>
               ) : null}

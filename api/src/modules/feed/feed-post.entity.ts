@@ -22,6 +22,9 @@ export class FeedPostEntity {
   @Column({ default: 'character' })
   authorType: string; // 'user' | 'character'
 
+  @Column({ default: 'public' })
+  visibility: string; // 'public' | 'friends' | 'private'
+
   @Column({ default: 'feed' })
   surface: string; // 'feed' | 'channels'
 

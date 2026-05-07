@@ -54,6 +54,7 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isPersistedGroupConversation } from "../lib/conversation-route";
 import { formatTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
+import { buildYinjieId } from "../lib/yinjie-id";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
@@ -724,7 +725,7 @@ export function CharacterDetailPage() {
     const profileSummary = [
       t(msg`${displayName} 的隐界名片`),
       character.relationship?.trim() || worldContactLabel,
-      t(msg`隐界号：yinjie_${character.id.slice(0, 8)}`),
+      t(msg`隐界号：${buildYinjieId(character.id)}`),
       profileUrl,
     ].join("\n");
 
@@ -1092,7 +1093,6 @@ export function CharacterDetailPage() {
               }}
               onOpenMoments={handleOpenMoments}
               onOpenProfile={() => {}}
-              showProfileEntry={false}
               onStartChat={() => {
                 setNotice(null);
                 startChatMutation.mutate();
@@ -1466,7 +1466,7 @@ export function CharacterDetailPage() {
                       isDesktopLayout ? "text-sm" : "text-[12px]",
                     )}
                   >
-                    {t(msg`隐界号：yinjie_${character.id.slice(0, 8)}`)}
+                    {t(msg`隐界号：${buildYinjieId(character.id)}`)}
                   </div>
                   <div
                     className={cn(

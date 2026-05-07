@@ -75,6 +75,11 @@ const FeedbacksPage = lazy(async () => {
   return { default: mod.FeedbacksPage };
 });
 
+const TelemetryPage = lazy(async () => {
+  const mod = await import("./routes/telemetry-page");
+  return { default: mod.TelemetryPage };
+});
+
 const rootRoute = createRootRoute({
   component: RootLayout,
 });
@@ -161,6 +166,12 @@ const feedbacksRoute = createRoute({
   component: FeedbacksPage,
 });
 
+const telemetryRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/telemetry",
+  component: TelemetryPage,
+});
+
 export const routeTree = rootRoute.addChildren([
   indexRoute,
   worldsRoute,
@@ -174,6 +185,7 @@ export const routeTree = rootRoute.addChildren([
   cloudConfigsRoute,
   inviteAuditRoute,
   feedbacksRoute,
+  telemetryRoute,
   revenueSharingRoute,
 ]);
 

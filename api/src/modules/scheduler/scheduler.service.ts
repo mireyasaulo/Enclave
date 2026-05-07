@@ -31,6 +31,7 @@ import { SchedulerTelemetryService } from './scheduler-telemetry.service';
 import type { SchedulerJobId } from './scheduler-telemetry.types';
 import { ReplyLogicRulesService } from '../ai/reply-logic-rules.service';
 import { CharactersService } from '../characters/characters.service';
+import { MomentsService } from '../moments/moments.service';
 import { NeedDiscoveryService } from '../need-discovery/need-discovery.service';
 import { AppEvents, EventBusService } from '../events/event-bus.service';
 import { RealWorldSyncService } from '../real-world-sync/real-world-sync.service';
@@ -115,6 +116,7 @@ export class SchedulerService {
     private readonly reminderRuntimeService: ReminderRuntimeService,
     private readonly cyberAvatar: CyberAvatarService,
     private readonly selfAgentService: SelfAgentService,
+    private readonly momentsService: MomentsService,
   ) {}
 
   @Cron('*/5 * * * *')
@@ -411,6 +413,20 @@ export class SchedulerService {
     };
   }
 
+  @Cron('*/15 * * * *')
+  async npcAutonomyTick() {
+    await this.runScheduledJob(
+      'npc_autonomy_tick',
+      () => this.handleNpcAutonomyTick(),
+      'Failed to run NPC autonomy tick',
+    );
+  }
+
+  private async handleNpcAutonomyTick(): Promise<TrackedJobResult> {
+    const result = await this.momentsService.runNpcAutonomyTick();
+    return { summary: result.summary };
+  }
+
   async runJobNow(jobId: string) {
     try {
       const summary = await this.executeManualJob(jobId as SchedulerJobId);
@@ -564,6 +580,12 @@ export class SchedulerService {
         return (
           await this.executeTrackedJob(jobId, () =>
             this.handleResetExpiredSparks(),
+          )
+        ).summary;
+      case 'npc_autonomy_tick':
+        return (
+          await this.executeTrackedJob(jobId, () =>
+            this.handleNpcAutonomyTick(),
           )
         ).summary;
       default:

@@ -17,6 +17,9 @@ export class MomentPostEntity {
   @Column({ default: 'character' })
   authorType: string; // 'user' | 'character'
 
+  @Column({ default: 'public' })
+  visibility: string; // 'public' | 'friends' | 'private'
+
   @Column('text')
   text: string;
 

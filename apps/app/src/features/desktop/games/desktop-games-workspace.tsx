@@ -26,6 +26,7 @@ import {
 } from "../../../lib/conversation-route";
 import { EmptyState } from "../../../components/empty-state";
 import { GameCenterSessionPanel } from "../../games/game-center-session-panel";
+import { ParkingWarGame } from "../../games/parking-war/parking-war-game";
 import {
   gameCenterCategoryTabs,
   gameCenterEvents,
@@ -497,19 +498,27 @@ export function DesktopGamesWorkspace({
             </div>
 
             <div className="space-y-5">
-              <GameCenterSessionPanel
-                game={selectedGame}
-                isActive={activeGameId === selectedGame.id}
-                launchCount={launchCountById[selectedGame.id] ?? 0}
-                lastOpenedAt={lastOpenedAtById[selectedGame.id]}
-                onCopyToMobile={onCopyGameToMobile}
-                onDismiss={
-                  activeGameId === selectedGame.id
-                    ? onDismissActiveGame
-                    : undefined
-                }
-                onLaunch={onLaunchGame}
-              />
+              {selectedGame.id === "parking-war" &&
+              activeGameId === "parking-war" ? (
+                <ParkingWarGame
+                  variant="embedded"
+                  onExit={onDismissActiveGame}
+                />
+              ) : (
+                <GameCenterSessionPanel
+                  game={selectedGame}
+                  isActive={activeGameId === selectedGame.id}
+                  launchCount={launchCountById[selectedGame.id] ?? 0}
+                  lastOpenedAt={lastOpenedAtById[selectedGame.id]}
+                  onCopyToMobile={onCopyGameToMobile}
+                  onDismiss={
+                    activeGameId === selectedGame.id
+                      ? onDismissActiveGame
+                      : undefined
+                  }
+                  onLaunch={onLaunchGame}
+                />
+              )}
 
               <section className="rounded-[22px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-card)]">
                 <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
@@ -744,16 +753,7 @@ export function DesktopGamesWorkspace({
           </div>
         </div>
       </section>
-      <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[3px]">
-        <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-8 py-6 text-center shadow-[var(--shadow-card)]">
-          <div className="text-lg font-semibold text-[color:var(--text-primary)]">
-            {t(msg`功能开发中`)}
-          </div>
-          <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-            {t(msg`敬请期待`)}
-          </div>
-        </div>
-      </div>
+      {/* 暂时隐藏「功能开发中」蒙板 */}
     </div>
   );
 }

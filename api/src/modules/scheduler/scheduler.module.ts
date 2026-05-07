@@ -23,6 +23,7 @@ import { FollowupRuntimeModule } from '../followup-runtime/followup-runtime.modu
 import { ReminderRuntimeModule } from '../reminder-runtime/reminder-runtime.module';
 import { CyberAvatarModule } from '../cyber-avatar/cyber-avatar.module';
 import { SelfAgentModule } from '../self-agent/self-agent.module';
+import { MomentsModule } from '../moments/moments.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { SelfAgentModule } from '../self-agent/self-agent.module';
     ReminderRuntimeModule,
     CyberAvatarModule,
     SelfAgentModule,
+    MomentsModule,
   ],
   providers: [SchedulerService, SchedulerTelemetryService],
   exports: [SchedulerService, SchedulerTelemetryService],

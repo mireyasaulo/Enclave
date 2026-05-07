@@ -79,9 +79,7 @@ export function shouldIncludeInWorldCharacterDirectory(
   character: Pick<Character, "id" | "sourceType">,
   friendIds: ReadonlySet<string>,
 ) {
-  return (
-    character.sourceType === "default_seed" || !friendIds.has(character.id)
-  );
+  return !friendIds.has(character.id);
 }
 
 export function buildContactSections<TItem extends { indexLabel: string }>(
