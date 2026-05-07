@@ -246,7 +246,7 @@ export function LiveCompanionPage() {
   }
 
   return (
-    <div className="relative h-full min-h-0">
+    <div className="relative isolate h-full min-h-0">
       <DesktopUtilityShell
         title="直播伴侣"
         subtitle="把开播前准备、状态检查和参考内容收在一起。"
