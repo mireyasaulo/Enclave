@@ -10,7 +10,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, MoreThanOrEqual, Repository } from 'typeorm';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import type { AiMessagePart } from '../ai/ai.types';
 import { REMINDER_CHARACTER_ID } from '../characters/reminder-character';
@@ -1240,5 +1240,175 @@ export class MomentsService implements OnModuleInit {
       process.env.PUBLIC_API_BASE_URL?.trim() ||
       `http://localhost:${process.env.PORT ?? 3000}`
     ).replace(/\/+$/, '');
+  }
+
+  /**
+   * NPC 自主巡查：让 manual_admin 角色主动浏览近期朋友圈、按 intimacy/兴趣点赞或评论。
+   * 与 scheduleCharacterInteractions（被动反应）互补，确保即使无新帖也有持续社交活动。
+   */
+  async runNpcAutonomyTick(): Promise<{
+    summary: string;
+    likeCount: number;
+    commentCount: number;
+  }> {
+    const MAX_LLM_CALLS_PER_TICK = 30;
+    const FREQ_MULTIPLIER: Record<string, number> = {
+      high: 1.5,
+      normal: 1.0,
+      low: 0.5,
+    };
+    const RECENT_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+    const now = new Date();
+    const recentSince = new Date(now.getTime() - RECENT_WINDOW_MS);
+    const hour = now.getHours();
+
+    const candidates = (await this.characters.findAll()).filter(
+      (char) => char.sourceType === 'manual_admin',
+    );
+
+    const activeCandidates = candidates.filter((char) => {
+      const start = char.activeHoursStart ?? 8;
+      const end = char.activeHoursEnd ?? 22;
+      return hour >= start && hour <= end;
+    });
+
+    let llmCallsRemaining = MAX_LLM_CALLS_PER_TICK;
+    let likeCount = 0;
+    let commentCount = 0;
+    let participantCount = 0;
+
+    const recentPosts = await this.postRepo.find({
+      where: { postedAt: MoreThanOrEqual(recentSince) },
+      order: { postedAt: 'DESC' },
+    });
+    if (recentPosts.length === 0) {
+      return {
+        summary: `npc_autonomy_tick: 最近 24h 无帖子可巡查（候选 ${activeCandidates.length} 个）`,
+        likeCount,
+        commentCount,
+      };
+    }
+
+    for (const char of activeCandidates) {
+      const baseChance =
+        char.proactiveBrowseChance ?? 0.3;
+      const freqMul =
+        FREQ_MULTIPLIER[char.activityFrequency ?? 'normal'] ?? 1.0;
+      const browseChance = Math.min(0.95, baseChance * freqMul);
+      if (Math.random() > browseChance) continue;
+
+      participantCount += 1;
+
+      const candidatePosts = recentPosts.filter(
+        (post) => post.authorId !== char.id,
+      );
+      if (candidatePosts.length === 0) continue;
+
+      // Skip posts already liked by this NPC
+      const alreadyLiked = await this.likeRepo.find({
+        where: {
+          authorId: char.id,
+          postId: In(candidatePosts.map((p) => p.id)),
+        },
+        select: ['postId'],
+      });
+      const likedIds = new Set(alreadyLiked.map((row) => row.postId));
+      const fresh = candidatePosts.filter((post) => !likedIds.has(post.id));
+      if (fresh.length === 0) continue;
+
+      const scored = await Promise.all(
+        fresh.map(async (post) => {
+          let intimacy = 0;
+          if (post.authorType === 'character') {
+            intimacy = await this.characterFriendships.getIntimacy(
+              char.id,
+              post.authorId,
+            );
+          }
+          const recencyScore = Math.max(
+            0,
+            1 - (now.getTime() - post.postedAt.getTime()) / RECENT_WINDOW_MS,
+          );
+          return {
+            post,
+            score: intimacy / 50 + recencyScore + Math.random() * 0.3,
+          };
+        }),
+      );
+      scored.sort((a, b) => b.score - a.score);
+      const TOP_K = 3;
+      const top = scored.slice(0, TOP_K);
+
+      for (const { post } of top) {
+        if (Math.random() < 0.5) {
+          try {
+            await this.toggleLike(
+              post.id,
+              char.id,
+              char.name,
+              char.avatar,
+              'character',
+            );
+            likeCount += 1;
+            if (post.authorType === 'character') {
+              await this.characterFriendships.bumpInteraction(
+                char.id,
+                post.authorId,
+              );
+            }
+          } catch {
+            // ignore
+          }
+        }
+
+        if (llmCallsRemaining > 0 && Math.random() < 0.2) {
+          try {
+            const profile = await this.characters.getProfile(char.id);
+            if (!profile) continue;
+            const observation = await this.buildMomentAiObservation(post);
+            const reply = await this.ai.generateReply({
+              profile,
+              conversationHistory: [],
+              userMessage: `${post.authorName}发了一条朋友圈：${observation.summary}。用一句话自然地评论一下，不超过20字。`,
+              userMessageParts: observation.parts,
+              usageContext: {
+                surface: 'app',
+                scene: 'moment_comment_generate',
+                scopeType: 'character',
+                scopeId: char.id,
+                scopeLabel: char.name,
+                characterId: char.id,
+                characterName: char.name,
+              },
+            });
+            llmCallsRemaining -= 1;
+            await this.addComment(
+              post.id,
+              char.id,
+              char.name,
+              char.avatar,
+              reply.text,
+              'character',
+            );
+            commentCount += 1;
+            if (post.authorType === 'character') {
+              await this.characterFriendships.bumpInteraction(
+                char.id,
+                post.authorId,
+              );
+            }
+          } catch {
+            // ignore
+          }
+        }
+      }
+    }
+
+    return {
+      summary: `npc_autonomy_tick: ${participantCount} 个 NPC 上线，点赞 ${likeCount} 次，评论 ${commentCount} 次（剩余 LLM 配额 ${llmCallsRemaining}）`,
+      likeCount,
+      commentCount,
+    };
   }
 }

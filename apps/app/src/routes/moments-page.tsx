@@ -1045,7 +1045,14 @@ export function MomentsPage() {
                         );
                       return (
                         <Button
-                          disabled={likeMutation.isPending}
+                          disabled={
+                            likeMutation.isPending || !moment.canInteract
+                          }
+                          title={
+                            !moment.canInteract
+                              ? "加为好友后才能互动"
+                              : undefined
+                          }
                           onClick={() => likeMutation.mutate(moment.id)}
                           variant="secondary"
                           size="sm"
@@ -1063,7 +1070,9 @@ export function MomentsPage() {
                             ? "处理中..."
                             : liked
                               ? "已赞"
-                              : "点赞"}
+                              : !moment.canInteract
+                                ? "需好友"
+                                : "点赞"}
                         </Button>
                       );
                     })()}
@@ -1188,27 +1197,33 @@ export function MomentsPage() {
                   })()
                 }
                 composer={
-                  <MomentCommentComposer
-                    value={commentDrafts[moment.id] ?? ""}
-                    onChange={(value) =>
-                      setCommentDrafts((current) => ({
-                        ...current,
-                        [moment.id]: value,
-                      }))
-                    }
-                    onSubmit={() => commentMutation.mutate(moment.id)}
-                    pending={pendingCommentMomentId === moment.id}
-                    disabled={commentMutation.isPending}
-                    placeholder={
-                      desktopReplyTarget?.postId === moment.id
-                        ? `回复 ${desktopReplyTarget.authorName}...`
-                        : "写评论..."
-                    }
-                    pendingLabel="发送中..."
-                    className="w-full"
-                    inputClassName="rounded-full py-1.5 text-[16px]"
-                    buttonClassName="h-8 px-3 text-[12px]"
-                  />
+                  moment.canInteract ? (
+                    <MomentCommentComposer
+                      value={commentDrafts[moment.id] ?? ""}
+                      onChange={(value) =>
+                        setCommentDrafts((current) => ({
+                          ...current,
+                          [moment.id]: value,
+                        }))
+                      }
+                      onSubmit={() => commentMutation.mutate(moment.id)}
+                      pending={pendingCommentMomentId === moment.id}
+                      disabled={commentMutation.isPending}
+                      placeholder={
+                        desktopReplyTarget?.postId === moment.id
+                          ? `回复 ${desktopReplyTarget.authorName}...`
+                          : "写评论..."
+                      }
+                      pendingLabel="发送中..."
+                      className="w-full"
+                      inputClassName="rounded-full py-1.5 text-[16px]"
+                      buttonClassName="h-8 px-3 text-[12px]"
+                    />
+                  ) : (
+                    <div className="w-full rounded-full bg-[color:var(--surface-soft)] px-4 py-1.5 text-[12px] text-[color:var(--text-muted)]">
+                      加为好友后才能评论。
+                    </div>
+                  )
                 }
               />
             );

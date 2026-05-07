@@ -971,7 +971,12 @@ export function DiscoverFeedPage() {
                 actions={
                   <div className="flex flex-wrap gap-2">
                     <Button
-                      disabled={likeMutation.isPending}
+                      disabled={likeMutation.isPending || !post.canInteract}
+                      title={
+                        !post.canInteract
+                          ? t(msg`加为好友后才能互动`)
+                          : undefined
+                      }
                       onClick={() => likeMutation.mutate(post.id)}
                       variant="secondary"
                       size="sm"
@@ -991,7 +996,9 @@ export function DiscoverFeedPage() {
                         ? t(msg`处理中...`)
                         : post.ownerState?.hasLiked
                           ? t(msg`已赞`)
-                          : t(msg`点赞`)}
+                          : !post.canInteract
+                            ? t(msg`需好友`)
+                            : t(msg`点赞`)}
                     </Button>
                     <Button
                       variant="secondary"

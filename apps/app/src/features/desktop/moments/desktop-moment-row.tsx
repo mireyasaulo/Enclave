@@ -202,7 +202,12 @@ export function DesktopMomentRow({
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                disabled={likeLoading}
+                disabled={likeLoading || !moment.canInteract}
+                title={
+                  !moment.canInteract
+                    ? t(msg`加为好友后才能互动`)
+                    : undefined
+                }
                 onClick={onLike}
                 className={cn(
                   "inline-flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-[12px] transition-[background-color,border-color,color] disabled:opacity-55",
@@ -353,19 +358,25 @@ export function DesktopMomentRow({
             ) : null}
 
             <div className="mt-3 border-t border-[color:var(--border-faint)] pt-3">
-              <MomentCommentComposer
-                value={commentDraft}
-                onChange={onCommentChange}
-                onSubmit={onCommentSubmit}
-                pending={commentLoading}
-                placeholder={
-                  activeReply
-                    ? t(msg`回复 ${activeReply.authorName}...`)
-                    : t(msg`写评论...`)
-                }
-                inputClassName="rounded-xl border-[color:var(--border-faint)] bg-white px-4 py-2 text-[13px] shadow-none hover:bg-white focus:border-[rgba(7,193,96,0.14)] focus:shadow-none"
-                buttonClassName="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
-              />
+              {moment.canInteract ? (
+                <MomentCommentComposer
+                  value={commentDraft}
+                  onChange={onCommentChange}
+                  onSubmit={onCommentSubmit}
+                  pending={commentLoading}
+                  placeholder={
+                    activeReply
+                      ? t(msg`回复 ${activeReply.authorName}...`)
+                      : t(msg`写评论...`)
+                  }
+                  inputClassName="rounded-xl border-[color:var(--border-faint)] bg-white px-4 py-2 text-[13px] shadow-none hover:bg-white focus:border-[rgba(7,193,96,0.14)] focus:shadow-none"
+                  buttonClassName="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
+                />
+              ) : (
+                <div className="rounded-xl border border-dashed border-[color:var(--border-faint)] bg-white px-4 py-2 text-[12px] text-[color:var(--text-muted)]">
+                  {t(msg`加为好友后才能评论。`)}
+                </div>
+              )}
             </div>
           </div>
         </div>
