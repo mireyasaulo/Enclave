@@ -230,6 +230,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
   const speechStatus = systemStatusQuery.data?.inferenceGateway;
   const digitalHumanGateway = systemStatusQuery.data?.digitalHumanGateway;
   const digitalHumanGatewayCopy = resolveDigitalHumanGatewayStatusCopy(
+    t,
     digitalHumanGateway,
   );
   const cameraPreviewMetaLabel = !cameraEnabled

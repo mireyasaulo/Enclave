@@ -37,7 +37,7 @@ msgstr " · {0} returned"
 msgid " · 已腾出 {customUploadResumedSlots} 个空位，可继续添加"
 msgstr " · {customUploadResumedSlots} slots freed, can add more"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1401
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1402
 msgid " {speechProviderSummary}。"
 msgstr " {speechProviderSummary}."
 
@@ -46,7 +46,7 @@ msgstr " {speechProviderSummary}."
 msgid " 当前已腾出 {customUploadResumedSlots} 个空位。"
 msgstr " {customUploadResumedSlots} slots are now free."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1380
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1381
 msgid " 当前链路：{speechProviderSummary}。"
 msgstr " Current route: {speechProviderSummary}."
 
@@ -791,7 +791,7 @@ msgstr "Last 7 days"
 msgid "AI 合成的玻璃温室散步片段，镜头从花墙缓慢推到中央光井。"
 msgstr "An AI-composed glasshouse walk, with the camera slowly moving from the flower wall to the central light well."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1691
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1692
 msgid "AI 回复中"
 msgstr ""
 
@@ -815,15 +815,15 @@ msgstr ""
 msgid "AI 数字人"
 msgstr "AI digital human"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1189
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1190
 msgid "AI 数字人视频通话"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:386
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:387
 msgid "AI 正在思考"
 msgstr ""
 
-#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:674
+#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:675
 msgid "AI 正在播报"
 msgstr "AI is speaking"
 
@@ -840,7 +840,7 @@ msgstr "AI settings are temporarily unavailable"
 msgid "AI 语音"
 msgstr "AI voice"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1190
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1191
 msgid "AI 语音通话"
 msgstr ""
 
@@ -942,11 +942,11 @@ msgstr "PgUp {previousSearchSectionLabel}"
 msgid "PgUp 上组"
 msgstr "PgUp previous group"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:910
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:911
 msgid "TA 正在说这一轮回复，等说完后可以继续下一句。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:919
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:920
 msgid "TA 的回复会在这里显示，并自动播报给你听。"
 msgstr ""
 
@@ -1009,7 +1009,7 @@ msgstr "Previous image"
 msgid "上一张图片"
 msgstr "Previous image"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:871
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:872
 msgid "上一轮没有顺利完成，准备好后可以重新录这一句。"
 msgstr ""
 
@@ -1092,7 +1092,7 @@ msgstr "Keep chat history"
 msgid "不到 1 分钟"
 msgstr "less than 1 minute"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:242
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:243
 msgid "不可用"
 msgstr "Unavailable"
 
@@ -1679,8 +1679,8 @@ msgstr ""
 msgid "会按照原消息顺序依次投递到目标会话。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:980
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1033
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:981
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1034
 #: apps/app/src/routes/chat-background-page.tsx:456
 #: apps/app/src/routes/chat-details-page.tsx:872
 #: apps/app/src/routes/group-qr-page.tsx:1604
@@ -2137,11 +2137,11 @@ msgstr "Prepare the live title, topic, cover hook, and desktop strategy first, s
 msgid "先把问题描述、复现步骤和期望结果写清楚，再决定后续如何跟进。"
 msgstr "Write the issue, reproduction steps, and expected result clearly before deciding how to follow up."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:506
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:507
 msgid "先按住底部按钮说第一句，数字人会听完再回应。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:505
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:506
 msgid "先按住底部按钮说第一句，数字人会听完再用语音和画面回应。"
 msgstr ""
 
@@ -2507,7 +2507,7 @@ msgstr "Close screenshot preview (Esc)"
 msgid "关闭提示"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1616
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1617
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:871
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:227
 msgid "关闭摄像头"
@@ -2751,7 +2751,7 @@ msgstr "Most recently opened mini program panel"
 msgid "最近一轮"
 msgstr "Latest round"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1406
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1407
 msgid "最近一轮："
 msgstr "Latest turn:"
 
@@ -3030,9 +3030,9 @@ msgstr "Cooldown remaining {0}. It will return to the priority slot when cooldow
 msgid "冷却暂缓"
 msgstr "Cooling down"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:394
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:417
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1697
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:395
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:418
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1698
 msgid "准备下一轮"
 msgstr ""
 
@@ -3137,7 +3137,7 @@ msgstr "Switch to featured stickers and browse the built-in picks first."
 msgid "切回手机端发现页，继续进入朋友圈与广场动态。"
 msgstr "Go back to Discover on mobile to continue into Moments and the feed."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1641
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1642
 msgid "切回聊天"
 msgstr ""
 
@@ -3205,7 +3205,7 @@ msgstr "just greeted you."
 msgid "刚刚捕捉到的世界画面"
 msgstr "A world scene just captured"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:879
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:880
 msgid "刚刚那句已经发出，正在等待这一轮回复。"
 msgstr ""
 
@@ -3537,7 +3537,7 @@ msgstr "Historic physicist mapping"
 msgid "原图 ⌘/Ctrl + Enter"
 msgstr "Original ⌘/Ctrl + Enter"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:261
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:262
 msgid "原生音频理解"
 msgstr "Native audio understanding"
 
@@ -3931,7 +3931,7 @@ msgstr "Unpin"
 msgid "取消锁定"
 msgstr "Cancel Lock"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1291
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1292
 msgid "取消静音播放"
 msgstr ""
 
@@ -4182,7 +4182,7 @@ msgstr "Return to compact preview"
 msgid "回到群聊页后，继续使用顶部通话按钮即可进入桌面群通话控制台。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1205
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1206
 msgid "回到聊天页后，继续使用顶部通话按钮即可进入桌面通话工作台。"
 msgstr ""
 
@@ -4202,7 +4202,7 @@ msgid "回复"
 msgstr "Reply"
 
 #. placeholder {0}: speechStatus.activeProvider ?? unconfiguredLabel
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:258
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:259
 msgid "回复 {0}"
 msgstr "Reply {0}"
 
@@ -4221,7 +4221,7 @@ msgstr ""
 msgid "回复 {senderName}"
 msgstr "Reply to {senderName}"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:469
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:470
 msgid "回复已生成，画面还在准备中。"
 msgstr ""
 
@@ -4322,7 +4322,7 @@ msgstr "Waiting for you to send over the thing you want handled."
 msgid "在约人打双人同屏，已经连胜 6 场。"
 msgstr "Inviting people for two-player same-screen; already won 6 in a row."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:374
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:375
 #: apps/app/src/routes/desktop-feedback-page.tsx:257
 #: apps/app/src/routes/desktop-feedback-page.tsx:428
 #: apps/app/src/routes/live-companion-page.tsx:600
@@ -4593,6 +4593,19 @@ msgstr ""
 msgid "复现步骤"
 msgstr "Reproduction steps"
 
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:25
+msgid "外部数字人 `playerUrlTemplate` 未配置。先到 Admin 的数字人 Provider 配置里补播放器模板，再回来联调视频通话。"
+msgstr ""
+
+#. placeholder {0}: gateway.paramsKeys.join(" / ")
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:81
+msgid "外部数字人 Provider 已接通，当前模板参数：{0}。"
+msgstr ""
+
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:68
+msgid "外部数字人已就绪"
+msgstr ""
+
 #: apps/app/src/i18n/static-dom-seed.ts:936
 msgid "多选"
 msgstr "Multi-select"
@@ -4705,11 +4718,11 @@ msgstr "Entertainment"
 msgid "字"
 msgstr "characters"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1745
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1746
 msgid "字幕失败"
 msgstr "Caption failed"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1743
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1744
 msgid "字幕补跑中"
 msgstr "Caption backfill in progress"
 
@@ -4829,7 +4842,7 @@ msgstr "The other person"
 msgid "对方撤回了一条消息"
 msgstr "The other side recalled a message"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1195
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1196
 msgid "对话对象"
 msgstr ""
 
@@ -5037,7 +5050,7 @@ msgstr "Followed; future pushes will be collected in Subscription Messages."
 msgid "已关注该视频号作者。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:236
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:237
 msgid "已关闭"
 msgstr "Closed"
 
@@ -5593,7 +5606,7 @@ msgstr ""
 msgid "已邀约"
 msgstr "Invited"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:255
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:256
 msgid "已配置"
 msgstr "Configured"
 
@@ -5601,7 +5614,7 @@ msgstr "Configured"
 msgid "已重新尝试发送。"
 msgstr "Retry sent."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1270
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1271
 msgid "已静音播放"
 msgstr ""
 
@@ -5835,6 +5848,10 @@ msgstr "Current"
 msgid "当前 {focusedManageStickerPosition}/{0}"
 msgstr "Current {focusedManageStickerPosition}/{0}"
 
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:47
+msgid "当前 provider 参数 JSON 解析失败，播放器模板虽然存在，但外部数字人实例参数没有成功注入。"
+msgstr ""
+
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:1105
 msgid "当前："
 msgstr "Current:"
@@ -5859,7 +5876,7 @@ msgstr ""
 msgid "当前上下文"
 msgstr "Current context"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1093
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1094
 msgid "当前不能发起视频通话"
 msgstr ""
 
@@ -5868,11 +5885,11 @@ msgstr ""
 msgid "当前不能发起群通话"
 msgstr "Group call cannot be started now"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1094
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1095
 msgid "当前不能发起语音通话"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1034
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1035
 #: apps/app/src/i18n/static-dom-seed.ts:994
 msgid "当前不能发起通话"
 msgstr "Call cannot be started now"
@@ -5893,11 +5910,11 @@ msgstr ""
 msgid "当前世界还没有\"我自己\"角色。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1702
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1703
 msgid "当前为半双工数字人视频通话"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1703
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1704
 msgid "当前为半双工语音通话"
 msgstr ""
 
@@ -5922,6 +5939,14 @@ msgstr "This only affects desktop and web keyboard chat input. Mobile still uses
 msgid "当前仍使用实例级 Provider 配置。"
 msgstr "Currently using instance-level Provider configuration."
 
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:103
+msgid "当前仍在内置数字人播放器模式，播放器壳已经接通，但尚未切到真实外部数字人 Provider。"
+msgstr ""
+
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:91
+msgid "当前仍在内置数字人舞台模式，回复链路可用，但还没有切到真实外部视频流。"
+msgstr ""
+
 #: apps/app/src/routes/group-qr-page.tsx:1672
 msgid "当前仍在等待回流的会话数"
 msgstr "Conversations still waiting for return"
@@ -5930,7 +5955,7 @@ msgstr "Conversations still waiting for return"
 msgid "当前仍是满库"
 msgstr "Still full"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1177
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1178
 #: apps/app/src/i18n/static-dom-seed.ts:498
 msgid "当前会话"
 msgstr "Current conversation"
@@ -6064,11 +6089,11 @@ msgstr "Current reference content"
 msgid "当前发布到朋友圈"
 msgstr "Currently posting to Moments"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1072
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1073
 msgid "当前只支持在单聊里发起 AI 数字人视频通话。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1073
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1074
 msgid "当前只支持在单聊里发起 AI 语音通话。"
 msgstr ""
 
@@ -6089,6 +6114,27 @@ msgstr "Current return source"
 #: apps/app/src/i18n/static-dom-seed.ts:988
 msgid "当前在线"
 msgstr "Currently online"
+
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:34
+msgid "当前外部播放器地址已经具备，但 provider 侧状态回写还没配齐，前端无法稳定拿到画面就绪结果。"
+msgstr ""
+
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:75
+msgid "当前外部数字人 Provider 已就绪，后续会优先展示 provider 画面和回调状态。"
+msgstr ""
+
+#. placeholder {0}: gateway.paramsCount
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:72
+msgid "当前外部数字人 Provider 已就绪，已注入 {0} 个上游参数，后续会优先展示 provider 画面。"
+msgstr ""
+
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:59
+msgid "当前外部数字人 Provider 还没进入可联调状态，视频页会先保持占位并等待上游配置完成。"
+msgstr ""
+
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:21
+msgid "当前外部数字人播放器模板还没配好，视频页只能停留在占位态或回退到内置链路。"
+msgstr ""
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:469
 msgid "当前套餐"
@@ -6276,7 +6322,7 @@ msgstr "Current status"
 msgid "当前独立路由主要保留给手机端通话流程。桌面端已经改为在群聊消息页内打开通话工作台，这样成员调度、聊天记录和侧栏信息会保持在同一窗口里。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1169
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1170
 msgid "当前独立路由主要保留给手机端通话流程。桌面端已经改为在聊天消息页内打开通话工作台，这样消息、侧栏信息和通话控制会保持在同一窗口里。"
 msgstr ""
 
@@ -6366,6 +6412,14 @@ msgstr "This video call is still using the built-in digital human player and has
 msgid "当前视频通话仍使用内置数字人模拟模式，画面会先以内置数字人舞台承载。"
 msgstr "This video call is still using built-in digital human mock mode, so the stage will use the built-in player first."
 
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:107
+msgid "当前视频通话使用内置数字人播放器协议，占位链路可用，但上游仍不是外部真实数字人服务。"
+msgstr ""
+
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:95
+msgid "当前视频通话使用内置数字人舞台承载，适合先验证会话、语音和状态链路。"
+msgstr ""
+
 #: apps/app/src/i18n/static-dom-seed.ts:1095
 msgid "当前筛选下没有附件"
 msgstr "No attachments match the current filter"
@@ -6446,7 +6500,7 @@ msgstr ""
 msgid "当前聊天已恢复跟随默认背景。"
 msgstr "This chat now follows the default background."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1018
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1019
 #: apps/app/src/i18n/static-dom-seed.ts:999
 msgid "当前聊天暂时不可用。"
 msgstr "This chat is temporarily unavailable."
@@ -6537,7 +6591,7 @@ msgstr "This device did not preview it directly. The system panel is open so you
 msgid "当前设备还没有配置远程世界地址，请先回到 setup 连接你的实例。"
 msgstr "This device has no remote world address configured. Return to setup to connect your instance first."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1399
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1400
 msgid "当前语音链路："
 msgstr "Current voice route:"
 
@@ -6628,7 +6682,7 @@ msgstr "Pending"
 msgid "待处理好友申请"
 msgstr "Pending friend requests"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:245
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:246
 msgid "待开启"
 msgstr "Not enabled"
 
@@ -6703,7 +6757,7 @@ msgid "性能问题"
 msgstr "Performance issue"
 
 #. placeholder {0}: formatCallLatency(turn.totalDurationMs)
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1751
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1752
 msgid "总耗时 {0}"
 msgstr "Total {0}"
 
@@ -6794,8 +6848,8 @@ msgstr ""
 #: apps/app/src/components/mobile-shell.tsx:35
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:551
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:989
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1323
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1586
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1324
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1587
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1324
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:811
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:818
@@ -7022,7 +7076,7 @@ msgstr "Failed to open the location, please try again later."
 msgid "打开搜一搜"
 msgstr "Open Search"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1612
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1613
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:871
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:227
 msgid "打开摄像头"
@@ -7383,11 +7437,11 @@ msgstr "Drag to select a text area, then enter content in the toolbar."
 msgid "拖拽框选裁剪范围，不框选时会按原图发送。"
 msgstr "Drag to select a crop range. Without a selection, the original image will be sent."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1717
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1718
 msgid "挂断"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1717
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1718
 msgid "挂断中..."
 msgstr ""
 
@@ -7413,19 +7467,19 @@ msgstr "Describe how to trigger the issue as 1. 2. 3."
 msgid "按会话聚合最近发送的图片和文件。"
 msgstr "Group recently sent images and files by conversation."
 
-#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:695
+#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:696
 msgid "按住下方按钮说话，远端数字人舞台会在这一轮回复时自动播报。"
 msgstr "Hold the button below to speak. The remote digital-human stage will auto-play the reply for this turn."
 
-#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:696
+#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:697
 msgid "按住左侧按钮说话，AI 会优先直接理解录音；若转写可用，会补显示字幕。"
 msgstr "Hold the button on the left to speak. AI will prioritize direct audio understanding; if transcription is available, captions will be added."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:894
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:895
 msgid "按住底部按钮，说出你想对 TA 说的话。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:891
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:892
 msgid "按住底部按钮说第一句，画面会保持在当前视频通话里。"
 msgstr ""
 
@@ -7436,8 +7490,8 @@ msgstr "Hold to record a voice message. Release to send it directly."
 
 #: apps/app/src/components/chat-composer.tsx:3240
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:54
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:432
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1698
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:433
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1699
 #: apps/app/src/i18n/static-dom-seed.ts:842
 msgid "按住说话"
 msgstr "Hold to talk"
@@ -7867,7 +7921,7 @@ msgstr "Search history"
 msgid "搜索隐界号或角色名"
 msgstr "Search Yinjie ID or character name"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1619
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1620
 msgid "摄像头不可用"
 msgstr ""
 
@@ -7906,8 +7960,8 @@ msgstr "Undo annotation (Cmd/Ctrl+Z)"
 
 #. placeholder {0}: formatCallLatency(turn.synthesisDurationMs)
 #. placeholder {0}: speechStatus.activeTtsProvider ?? unconfiguredLabel
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:259
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1750
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:260
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1751
 msgid "播报 {0}"
 msgstr "Audio {0}"
 
@@ -7915,7 +7969,7 @@ msgstr "Audio {0}"
 msgid "播放"
 msgstr "Play"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1695
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1696
 msgid "播放中"
 msgstr ""
 
@@ -8057,7 +8111,7 @@ msgstr "Collapse character directory"
 msgid "收起输入框"
 msgstr "Collapse input box"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1391
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1392
 msgid "收起链路详情"
 msgstr "Hide pipeline details"
 
@@ -8077,7 +8131,7 @@ msgstr "Change to next priority option"
 msgid "改发语音消息"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1552
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1553
 msgid "改用语音通话"
 msgstr ""
 
@@ -8106,55 +8160,87 @@ msgstr ""
 msgid "数字人"
 msgstr "Digital human"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1424
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:51
+msgid "数字人 Provider 参数 JSON 无效。先回 Admin 修正 `providerParams`，确认 JSON 合法后再重试外部数字人视频通话。"
+msgstr ""
+
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:38
+msgid "数字人 Provider 回调 token 未配置。建议先补 `callbackToken`，否则外部播放器很难把渲染状态稳定回写到当前会话。"
+msgstr ""
+
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:101
+msgid "数字人内置播放器"
+msgstr ""
+
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:45
+msgid "数字人参数无效"
+msgstr ""
+
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:32
+msgid "数字人回调未配置"
+msgstr ""
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1425
 msgid "数字人已接通。先按住底部按钮说第一句，松开后会自动回复。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:409
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:57
+msgid "数字人待配置"
+msgstr ""
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:410
 msgid "数字人排队中"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:902
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:903
 msgid "数字人接通后，会先在这里显示这一轮回复，再通过语音和画面回应你。"
 msgstr ""
 
-#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:661
+#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:662
 msgid "数字人播报文案、本地预览和本轮文本都会同步保存在当前聊天里。"
 msgstr "The digital-human speech copy, local preview, and this turn's text will all be saved to the current chat."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:386
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:387
 msgid "数字人整理回复中"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:453
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:454
 msgid "数字人暂时没接通，可以重试，或先切到语音。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:390
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:89
+msgid "数字人模拟模式"
+msgstr ""
+
+#: apps/app/src/features/chat/digital-human-gateway-copy.ts:19
+msgid "数字人模板未配置"
+msgstr ""
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:391
 msgid "数字人正在说话"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:405
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:406
 msgid "数字人渲染中"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:413
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:414
 msgid "数字人画面失败"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:918
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:919
 msgid "数字人的回复会先显示在这里，再通过语音自动播报。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:425
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:426
 msgid "数字人视频已接通"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:738
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:739
 msgid "数字人还没恢复，先重试或改用语音继续。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:382
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:383
 msgid "数字人连接失败"
 msgstr ""
 
@@ -8396,7 +8482,7 @@ msgstr "Show group member nicknames"
 msgid "晨光海岸"
 msgstr "Morning Coast"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1689
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1690
 msgid "暂不可用"
 msgstr ""
 
@@ -8776,7 +8862,7 @@ msgstr "No topic filled in"
 msgid "未填写直播主题"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:244
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:245
 msgid "未就绪"
 msgstr "Not ready"
 
@@ -8830,7 +8916,7 @@ msgstr "Unknown error"
 msgid "未设置"
 msgstr "Not set"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1747
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1748
 msgid "未转写"
 msgstr "Not transcribed"
 
@@ -8846,7 +8932,7 @@ msgstr "Disconnected"
 msgid "未选择"
 msgstr "None selected"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:254
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:255
 #: apps/app/src/routes/desktop-feedback-page.tsx:117
 msgid "未配置"
 msgstr "Unconfigured"
@@ -8879,7 +8965,7 @@ msgstr "Local World"
 msgid "本地世界地址"
 msgstr "Local world address"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:247
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:248
 msgid "本地摄像头已关闭"
 msgstr "Local camera is off"
 
@@ -8913,7 +8999,7 @@ msgstr "This group {0}/{1}"
 msgid "本组首项："
 msgstr "First in group:"
 
-#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:657
+#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:658
 msgid "本轮字幕与侧控"
 msgstr "Captions and controls"
 
@@ -8945,7 +9031,7 @@ msgstr "Pending this round"
 msgid "本轮批次"
 msgstr "This round of batches"
 
-#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:657
+#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:658
 msgid "本轮摘要"
 msgstr "Turn summary"
 
@@ -8965,27 +9051,27 @@ msgstr ""
 msgid "本轮群语音通话已结束。你可以继续在群里输入，也可以切回语音发送。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1775
-#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:937
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1776
+#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:938
 msgid "本轮语音已发出，AI 已按原始录音完成理解。"
 msgstr "This voice turn has been sent. AI has completed understanding from the original recording."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1772
-#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:934
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1773
+#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:935
 msgid "本轮语音已发出，字幕生成失败，AI 已按原始录音完成理解。"
 msgstr "This voice turn has been sent. Caption generation failed, but AI has completed understanding from the original recording."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1770
-#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:932
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1771
+#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:933
 msgid "本轮语音已发出，字幕补跑中，AI 已按原始录音完成理解。"
 msgstr "This voice turn has been sent. Caption backfill is still running, and AI has completed understanding from the original recording."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1589
-#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:692
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1590
+#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:693
 msgid "本轮语音已发出，正在整理..."
 msgstr "This voice turn has been sent. Processing..."
 
-#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:662
+#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:663
 msgid "本轮语音消息、可用字幕和 AI 回复都会同步保存在当前聊天里。"
 msgstr "This voice message, available captions, and the AI reply will all be saved to the current chat."
 
@@ -9050,7 +9136,7 @@ msgid "极光赛道带动本周冲榜热度。"
 msgstr "Aurora Track is driving this week's ranking push."
 
 #: apps/app/src/components/chat-composer.tsx:3237
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1693
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1694
 msgid "松开发送"
 msgstr "Release to send"
 
@@ -9058,7 +9144,7 @@ msgstr "Release to send"
 msgid "松开取消"
 msgstr "Release to cancel"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:496
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:497
 msgid "松开后会立刻发出这一句。"
 msgstr ""
 
@@ -9302,7 +9388,7 @@ msgstr "View group chats"
 msgid "查看群聊信息"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1232
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1233
 msgid "查看聊天信息"
 msgstr ""
 
@@ -9473,7 +9559,7 @@ msgstr ""
 msgid "桌面端的场景相遇入口已经收口到桌面发现工作区，先回到主发现页。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1165
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1166
 msgid "桌面端请从聊天页继续发起视频通话"
 msgstr ""
 
@@ -9485,11 +9571,11 @@ msgstr ""
 msgid "桌面端请从聊天页继续发起群语音"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1166
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1167
 msgid "桌面端请从聊天页继续发起语音通话"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1138
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1139
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:681
 msgid "桌面端通话入口已收口到聊天工作区顶部工具栏。"
 msgstr ""
@@ -9506,7 +9592,7 @@ msgstr ""
 msgid "桌面设置页"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1156
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1157
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:699
 msgid "桌面通话工作区"
 msgstr ""
@@ -9699,7 +9785,7 @@ msgstr "Publishing..."
 msgid "正在发送..."
 msgstr "Sending..."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:401
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:402
 msgid "正在听你说话"
 msgstr ""
 
@@ -9707,7 +9793,7 @@ msgstr ""
 msgid "正在听你说话，停止后会继续整理转写。"
 msgstr "Listening. Stop and transcription will continue."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:875
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:876
 msgid "正在听你这一句，松开后会立刻发出。"
 msgstr ""
 
@@ -9839,7 +9925,7 @@ msgstr ""
 msgid "正在接通..."
 msgstr "Connecting..."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:449
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:450
 msgid "正在接通数字人，接通后就能开始第一轮。"
 msgstr ""
 
@@ -9890,7 +9976,7 @@ msgstr "Gathering matching messages in the current chat."
 msgid "正在整理语音..."
 msgstr "Preparing voice..."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:906
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:907
 msgid "正在整理这一轮回复，马上就会回到这里。"
 msgstr ""
 
@@ -9936,11 +10022,11 @@ msgstr "Removing..."
 msgid "正在结束当前群通话并返回群聊，请稍候。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1465
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1466
 msgid "正在结束通话并返回聊天。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:401
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:402
 msgid "正在聆听"
 msgstr ""
 
@@ -9952,11 +10038,11 @@ msgstr "Resolving your world"
 msgid "正在解析你的云世界..."
 msgstr "Resolving your cloud world..."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:390
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:391
 msgid "正在说话"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1419
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1420
 msgid "正在请求麦克风权限，请在弹窗里点允许。"
 msgstr ""
 
@@ -10197,23 +10283,23 @@ msgstr ""
 msgid "正在连接{callTitle}..."
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:378
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:379
 msgid "正在连接数字人"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:957
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:958
 msgid "正在连接数字人视频通话"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:948
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:949
 msgid "正在连接数字人视频通话..."
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:958
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:959
 msgid "正在连接语音通话"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:949
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:950
 msgid "正在连接语音通话..."
 msgstr ""
 
@@ -10240,7 +10326,7 @@ msgstr "A daily edit of the public stories and life fragments in this world that
 msgid "每次摇一摇都会先生成一个新的相遇结果；当前页面会直接保留这次结果，并把对方加入你的通讯录。"
 msgstr "Each shake creates a new encounter result. This page keeps the result directly and adds the person to your contacts."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:507
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:508
 msgid "每次说一段，AI 会回一段语音。"
 msgstr ""
 
@@ -10715,7 +10801,7 @@ msgstr "Quick idea note"
 msgid "点一下就触发，不做多层确认，结果会直接回到好友申请里。"
 msgstr "Tap once to trigger. There is no multi-step confirmation; the result goes straight back to friend requests."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:252
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:253
 msgid "点下方按钮可重新接通本地画面"
 msgstr "Tap the button below to reconnect the local preview"
 
@@ -10903,11 +10989,11 @@ msgstr "Separate multiple tags with commas, for example: coworker, illustration,
 msgid "申请中"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:249
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:250
 msgid "申请摄像头权限中"
 msgstr "Requesting camera permission"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:473
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:474
 msgid "画面正在排队，语音会先继续。"
 msgstr ""
 
@@ -10936,11 +11022,11 @@ msgstr ""
 msgid "白石"
 msgstr "Baishi"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1098
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1099
 msgid "目前只支持在单聊里发起 AI 数字人视频通话。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1099
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1100
 msgid "目前只支持在单聊里发起 AI 语音通话。"
 msgstr ""
 
@@ -11307,7 +11393,7 @@ msgstr "No Channels content yet"
 msgid "视频封面"
 msgstr "Video cover"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:489
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:490
 msgid "视频已经就绪，会优先展示远端画面。"
 msgstr ""
 
@@ -11320,9 +11406,9 @@ msgstr "Video selection failed. Try again later."
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:111
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1072
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:369
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:764
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1132
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:370
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:765
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1133
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:85
 #: apps/app/src/routes/character-detail-page.tsx:920
 #: apps/app/src/routes/desktop-mobile-page.tsx:359
@@ -11456,7 +11542,7 @@ msgstr ""
 msgid "稍等一下，正在同步世界里的最新动态。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:960
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:961
 msgid "稍等一下，正在同步会话信息并准备当前通话链路。"
 msgstr ""
 
@@ -11636,7 +11722,7 @@ msgstr "#{focusedManageStickerPosition}/{0}"
 msgid "第一次使用时，系统可能会弹出麦克风授权。"
 msgstr "The system may ask for microphone permission the first time."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:461
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:462
 msgid "等 TA 说完，再开始下一句。"
 msgstr ""
 
@@ -11644,7 +11730,7 @@ msgstr ""
 msgid "等公众号有推送后，这里会直接出现可接力到手机的阅读入口。"
 msgstr "Once there are official account posts, reading entries you can hand off to mobile will appear here."
 
-#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:675
+#: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:676
 msgid "等待下一轮"
 msgstr "Waiting for next turn"
 
@@ -11670,7 +11756,7 @@ msgstr "Waiting for return visits"
 msgid "等待已经偏长，现在补更顺。"
 msgstr "It has been waiting long enough. Resending now is smoother."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1614
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1615
 msgid "等待摄像头授权"
 msgstr ""
 
@@ -12005,7 +12091,7 @@ msgstr "Continue editing"
 msgid "继续聊"
 msgstr "Continue chat"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:417
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:418
 msgid "继续说话"
 msgstr ""
 
@@ -12648,7 +12734,7 @@ msgstr "Action Assistant"
 msgid "补图片备注"
 msgstr "Add image note"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1526
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1527
 msgid "补播这一句"
 msgstr ""
 
@@ -13040,9 +13126,9 @@ msgstr "Voice input is temporarily unavailable"
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:155
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:51
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1066
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:369
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:764
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1132
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:370
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:765
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1133
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:73
 #: apps/app/src/routes/character-detail-page.tsx:282
 #: apps/app/src/routes/character-detail-page.tsx:911
@@ -13110,7 +13196,7 @@ msgstr ""
 msgid "请先验证邮箱，以解析你的云世界。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:240
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:241
 msgid "请求中"
 msgstr "Requesting"
 
@@ -13359,12 +13445,12 @@ msgstr "Identity: {0}"
 
 #. placeholder {0}: formatCallLatency(turn.transcriptionDurationMs)
 #. placeholder {0}: speechStatus.activeTranscriptionProvider ?? configuredLabel
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:264
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1740
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:265
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1741
 msgid "转写 {0}"
 msgstr "Transcription {0}"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:266
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:267
 msgid "转写未配置"
 msgstr "Transcription not configured"
 
@@ -13575,7 +13661,7 @@ msgstr "Back to previous step"
 msgid "返回上一页"
 msgstr "Back"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1641
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1642
 msgid "返回中..."
 msgstr ""
 
@@ -13677,15 +13763,15 @@ msgstr "Back to group chat and take a photo"
 msgid "返回群聊继续"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:634
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:998
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1028
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1049
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1085
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1107
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1126
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1149
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1252
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:635
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:999
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1029
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1050
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1086
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1108
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1127
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1150
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1253
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:188
 #: apps/app/src/i18n/static-dom-seed.ts:986
 #: apps/app/src/routes/create-group-page.tsx:273
@@ -13710,7 +13796,7 @@ msgstr "Back to chat and send voice"
 msgid "返回聊天拍摄"
 msgstr "Back to chat and take a photo"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1217
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1218
 msgid "返回聊天继续"
 msgstr ""
 
@@ -13962,15 +14048,15 @@ msgstr "This moment"
 msgid "这一刻的想法..."
 msgstr "Thoughts for this moment..."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:457
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:458
 msgid "这一句已收到，正在整理回复。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:744
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:745
 msgid "这一句没有自动播报，点一下继续听。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:745
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:746
 msgid "这一句没有自动播报，点一下补播。"
 msgstr ""
 
@@ -13978,15 +14064,15 @@ msgstr ""
 msgid "这一帧想留给你看"
 msgstr "A frame worth showing you"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:883
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:884
 msgid "这一轮先到这里，等 TA 说完后再继续。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:465
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:466
 msgid "这一轮刚结束，等播报收尾后再继续。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:914
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:915
 msgid "这一轮回复已经结束，下一轮内容也会继续显示在这里。"
 msgstr ""
 
@@ -13994,23 +14080,23 @@ msgstr ""
 msgid "这一轮已经发出但还没有从聊天线程回到邀请页的目标，会先避开刚补发过的会话；冷却结束后会自动回到优先位，再按最近活跃和发送先后优先补发。"
 msgstr "Targets sent in this round that have not come back from the chat thread yet will avoid conversations that were just resent. Once cooldown ends, they return to the priority slot automatically, then resend priority follows recent activity and send order."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:887
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:888
 msgid "这一轮已经完成，准备好后继续按住底部按钮说下一句。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:481
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:482
 msgid "这一轮已经结束，准备好后继续说下一句。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:477
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:478
 msgid "这一轮画面没出来，但语音还能继续。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:740
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:741
 msgid "这一轮画面没出来，当前已回到语音链路。"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:898
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:899
 msgid "这一轮的回复暂时没有顺利回来，恢复后会继续显示在这里。"
 msgstr ""
 
@@ -14178,7 +14264,7 @@ msgstr "This chat no longer exists"
 msgid "这段聊天暂时不可用，可以先重试读取，或返回消息列表后再试。"
 msgstr "This chat is temporarily unavailable. Try loading again, or go back to the message list and try later."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1035
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1036
 msgid "这段聊天暂时不可用，可以先重试读取，或返回聊天后再试。"
 msgstr ""
 
@@ -14312,8 +14398,8 @@ msgstr "Open account"
 msgid "远程模式下，相关数据会发送到世界实例的 Core API 与推理网关；自托管或特定部署模式下，数据会保存在对应实例的运行目录与数据库里。"
 msgstr "In remote mode, related data is sent to the world instance Core API and inference gateway. In self-hosted or specific deployments, it is stored in that instance's runtime directory and database."
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:954
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1687
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:955
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1688
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:522
 msgid "连接中"
 msgstr ""
@@ -14507,18 +14593,18 @@ msgstr ""
 msgid "通讯录里还没有可选成员"
 msgstr "There are no selectable contacts yet"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1090
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1091
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:64
 #: apps/app/src/i18n/static-dom-seed.ts:732
 msgid "通话"
 msgstr "Call"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:981
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:982
 #: apps/app/src/i18n/static-dom-seed.ts:996
 msgid "通话暂时不可用"
 msgstr "Call is temporarily unavailable"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1185
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1186
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:728
 msgid "通话类型"
 msgstr ""
@@ -14607,11 +14693,11 @@ msgstr "Redo annotation"
 msgid "重做标注 (Cmd/Ctrl+Shift+Z / Cmd/Ctrl+Y)"
 msgstr "Redo annotation (Cmd/Ctrl+Shift+Z / Cmd/Ctrl+Y)"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1631
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1632
 msgid "重播上一句"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1565
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1566
 msgid "重新录这一轮"
 msgstr ""
 
@@ -14744,7 +14830,7 @@ msgstr "Retry opening chat"
 msgid "重试拒绝"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1618
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1619
 msgid "重试摄像头"
 msgstr ""
 
@@ -14774,8 +14860,8 @@ msgstr ""
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:554
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:200
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:990
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1043
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:991
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1044
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:554
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:592
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:643
@@ -14824,7 +14910,7 @@ msgstr ""
 msgid "重试读取"
 msgstr "Retry loading"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:644
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:645
 msgid "重试读取角色资料"
 msgstr ""
 
@@ -14832,7 +14918,7 @@ msgstr ""
 msgid "重试读取评论"
 msgstr ""
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1541
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1542
 msgid "重试连接数字人"
 msgstr ""
 
@@ -14848,7 +14934,7 @@ msgstr ""
 msgid "链接"
 msgstr "Link"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1391
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1392
 msgid "链路详情"
 msgstr "Pipeline details"
 
@@ -15072,7 +15158,7 @@ msgstr "Lime"
 msgid "青蓝"
 msgstr "Cyan"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1291
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1292
 msgid "静音播放"
 msgstr ""
 
@@ -15098,7 +15184,7 @@ msgstr "items"
 msgid "项附件"
 msgstr "attachments"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:238
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:239
 msgid "预览中"
 msgstr "Previewing"
 
@@ -15132,7 +15218,7 @@ msgstr "Top"
 msgid "首推来自 {0}"
 msgstr "Top pick from {0}"
 
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1414
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1415
 msgid "首次使用请先允许麦克风权限。若自动播报被拦截，可直接补播这一句。"
 msgstr ""
 

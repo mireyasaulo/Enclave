@@ -140,6 +140,7 @@ export function DesktopDirectCallPanel({
   const speech = activeCall.speech;
   const speakerEnabled = !activeCall.audioMuted;
   const digitalHumanGatewayCopy = resolveDigitalHumanGatewayStatusCopy(
+    t,
     systemStatusQuery.data?.digitalHumanGateway,
   );
   const latestTurn = isVideoMode
