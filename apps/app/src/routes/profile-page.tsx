@@ -63,6 +63,11 @@ export function ProfilePage() {
     });
 
   useEffect(() => {
+    if (isDesktopLayout) {
+      void navigate({ to: "/desktop/settings", replace: true });
+      return;
+    }
+
     if (!desktopPathMismatch) {
       return;
     }
@@ -73,7 +78,18 @@ export function ProfilePage() {
       hash: hash || undefined,
       replace: true,
     });
-  }, [desktopPathMismatch, desktopProfilePath, hash, navigate, search]);
+  }, [
+    desktopPathMismatch,
+    desktopProfilePath,
+    hash,
+    isDesktopLayout,
+    navigate,
+    search,
+  ]);
+
+  if (isDesktopLayout) {
+    return null;
+  }
 
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
