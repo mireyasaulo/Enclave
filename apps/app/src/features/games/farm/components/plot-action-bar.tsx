@@ -137,10 +137,10 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
                 type="button"
                 onClick={() => handlePlant(cropId)}
                 disabled={isPending}
-                className="flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs shadow-sm hover:bg-emerald-100 disabled:opacity-60"
+                className="inline-flex min-h-[40px] items-center gap-1 rounded-full bg-white px-3.5 py-2 text-sm shadow-sm hover:bg-emerald-100 disabled:opacity-60"
               >
                 <span>{def.emoji}</span>
-                <span>{def.nameZh}</span>
+                <span className="truncate">{def.nameZh}</span>
                 <span className="text-stone-400">
                   {owned > 0 ? `×${owned}` : `🪙${def.seedCost}`}
                 </span>
@@ -178,7 +178,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
             type="button"
             onClick={handleHarvest}
             disabled={isPending}
-            className="rounded-full bg-amber-500 px-4 py-1.5 text-sm font-medium text-white shadow hover:bg-amber-600 disabled:opacity-60"
+            className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-amber-500 px-4 py-2 text-sm font-medium text-white shadow hover:bg-amber-600 disabled:opacity-60"
           >
             🪙 {t(msg`收获`)}
           </button>
@@ -198,7 +198,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
                 );
               }}
               disabled={isPending || plot.watered}
-              className="rounded-full bg-sky-500 px-3 py-1 text-xs text-white shadow-sm hover:bg-sky-600 disabled:opacity-60"
+              className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-sky-500 px-3.5 py-2 text-sm text-white shadow-sm hover:bg-sky-600 disabled:opacity-60"
             >
               💧 {t(msg`浇水`)}
             </button>
@@ -216,7 +216,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
                 );
               }}
               disabled={isPending || plot.weeds <= 0}
-              className="rounded-full bg-emerald-600 px-3 py-1 text-xs text-white shadow-sm hover:bg-emerald-700 disabled:opacity-60"
+              className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-emerald-600 px-3.5 py-2 text-sm text-white shadow-sm hover:bg-emerald-700 disabled:opacity-60"
             >
               🌿 {t(msg`除草`)}
             </button>
@@ -234,7 +234,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
                 );
               }}
               disabled={isPending || plot.bugs <= 0}
-              className="rounded-full bg-rose-500 px-3 py-1 text-xs text-white shadow-sm hover:bg-rose-600 disabled:opacity-60"
+              className="inline-flex min-h-[44px] items-center gap-1 rounded-full bg-rose-500 px-3.5 py-2 text-sm text-white shadow-sm hover:bg-rose-600 disabled:opacity-60"
             >
               🐛 {t(msg`除虫`)}
             </button>

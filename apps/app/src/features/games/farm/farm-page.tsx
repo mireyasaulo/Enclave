@@ -76,7 +76,7 @@ function FarmPageInner() {
 
   if (stateQuery.isLoading) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-stone-500">
+      <div className="flex min-h-[60vh] items-center justify-center text-sm text-stone-500">
         {t(msg`正在准备隐界农场……`)}
       </div>
     );
@@ -84,7 +84,7 @@ function FarmPageInner() {
 
   if (stateQuery.error) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-rose-600">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-2 text-sm text-rose-600">
         <span>{t(msg`农场加载失败`)}</span>
         <span className="text-xs text-stone-500">
           {(stateQuery.error as Error).message}
@@ -118,7 +118,10 @@ function FarmPageInner() {
 
   return (
     <FarmSky>
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 p-4 text-stone-800">
+      <div
+        className="mx-auto flex max-w-6xl flex-col gap-3 p-4 text-stone-800"
+        style={{ paddingTop: "max(1rem, calc(env(safe-area-inset-top, 0px) + 0.5rem))" }}
+      >
         <header className="flex items-center justify-between">
           <Link
             to="/tabs/games"
@@ -192,7 +195,15 @@ function FarmPageInner() {
       </div>
 
       {toast && (
-        <div className="pointer-events-none fixed bottom-20 left-1/2 z-50 -translate-x-1/2 rounded-full bg-emerald-700 px-4 py-2 text-sm text-white shadow-lg">
+        <div
+          role="status"
+          aria-live="polite"
+          className="pointer-events-none fixed left-1/2 z-50 -translate-x-1/2 rounded-full bg-emerald-700 px-4 py-2 text-sm text-white shadow-lg"
+          style={{
+            bottom:
+              "max(5rem, calc(1.25rem + env(safe-area-inset-bottom, 0px)))",
+          }}
+        >
           {t(msg`收获`)} {FARM_CROP_CATALOG[toast.cropId].nameZh} ×{toast.amount} ·
           🪙+{toast.coinsGained}
           {toast.leveledUp && ` · ${t(msg`升级！`)}`}

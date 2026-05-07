@@ -60,7 +60,6 @@ export function FarmIsoTile({
         isRipe && !isRotten && pulseRipe ? "is-ripe-pulse" : "",
         isRotten ? "is-rotten" : "",
       ].join(" ")}
-      style={{ transformStyle: "preserve-3d" }}
     >
       <span aria-hidden className="farm-iso-tile__dirt" />
       <span aria-hidden className="farm-iso-tile__edge" />

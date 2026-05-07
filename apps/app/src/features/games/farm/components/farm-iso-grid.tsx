@@ -53,7 +53,8 @@ export function FarmIsoGrid({ plots, selectedIndex, pulse, onSelect }: FarmIsoGr
       <style>{`
         .farm-iso-board {
           perspective: 1200px;
-          padding: 18px 0 28px;
+          padding: 24px 12px 32px;
+          overflow: visible;
         }
         .farm-iso-grid {
           display: grid;
@@ -175,6 +176,10 @@ export function FarmIsoGrid({ plots, selectedIndex, pulse, onSelect }: FarmIsoGr
           border-radius: 999px;
           backdrop-filter: blur(4px);
         }
+        @media (max-width: 380px) {
+          .farm-iso-tile__crop { font-size: 24px; }
+          .farm-iso-tile__caption { font-size: 9px; padding: 0 4px; }
+        }
         .farm-iso-tile__badges {
           position: absolute;
           top: 4px;
@@ -208,18 +213,18 @@ export function FarmIsoGrid({ plots, selectedIndex, pulse, onSelect }: FarmIsoGr
           filter: drop-shadow(0 2px 3px rgba(0,0,0,0.35));
         }
         .farm-iso-tile__pulse--water {
-          animation: farm-iso-pulse-water 1100ms ease-out forwards;
+          animation: farm-iso-pulse-water 1200ms ease-out forwards;
         }
         .farm-iso-tile__pulse--plant {
-          animation: farm-iso-pulse-plant 1100ms ease-out forwards;
+          animation: farm-iso-pulse-plant 1200ms ease-out forwards;
           font-size: 28px;
         }
         .farm-iso-tile__pulse--weed,
         .farm-iso-tile__pulse--debug {
-          animation: farm-iso-pulse-fade 1000ms ease-out forwards;
+          animation: farm-iso-pulse-fade 1200ms ease-out forwards;
         }
         .farm-iso-tile__pulse--harvest {
-          animation: farm-iso-pulse-coin 1300ms ease-out forwards;
+          animation: farm-iso-pulse-coin 1200ms ease-out forwards;
           font-size: 26px;
         }
         @keyframes farm-iso-pulse-water {
