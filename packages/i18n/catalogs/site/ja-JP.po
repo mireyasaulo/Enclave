@@ -11,3 +11,13 @@ msgstr ""
 "Last-Translator: \n"
 "Language-Team: \n"
 "Plural-Forms: \n"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/page.tsx:13
+msgid "隐界 — 一个属于你的 AI 虚拟世界"
+msgstr "エンクレイブ — あなただけの AI バーチャルワールド"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/page.tsx:14
+msgid "开源、可自部署、跨端可用。"
+msgstr "オープンソース、セルフホスト可能、クロスプラットフォーム。"
