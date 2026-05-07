@@ -142,13 +142,21 @@ msgstr "{0} 主页"
 msgid "{0} 人"
 msgstr "{0} 人"
 
+#. placeholder {0}: (membersQuery.data?.length ?? 0).toString()
 #. placeholder {0}: membersQuery.data.length
 #. placeholder {0}: membersQuery.data?.length ?? 0
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:627
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1043
 #: apps/app/src/routes/group-chat-details-page.tsx:542
 #: apps/app/src/routes/group-qr-page.tsx:241
 #: apps/app/src/routes/group-qr-page.tsx:1216
 msgid "{0} 人群聊"
 msgstr "{0} 人群聊"
+
+#. placeholder {0}: membersQuery.data.length
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:626
+msgid "{0} 人群聊 · 免打扰"
+msgstr "{0} 人群聊 · 免打扰"
 
 #. placeholder {0}: starredFriends.length
 #: apps/app/src/routes/contacts-page.tsx:1213
@@ -278,6 +286,16 @@ msgstr "{0} 条已通知"
 msgid "{0} 条待提醒"
 msgstr "{0} 条待提醒"
 
+#. placeholder {0}: entry.name
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:328
+msgid "{0} 正在回复..."
+msgstr "{0} 正在回复..."
+
+#. placeholder {0}: entry.name
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:327
+msgid "{0} 正在生成图片..."
+msgstr "{0} 正在生成图片..."
+
 #. placeholder {0}: activeLiveSession.title
 #: apps/app/src/routes/desktop-mobile-page.tsx:1661
 msgid "{0} 正在直播，可在手机端继续关注频道动线。"
@@ -320,6 +338,18 @@ msgstr "{0} 秒 · {1} 播放"
 #: apps/app/src/routes/channel-author-page.tsx:792
 msgid "{0} 秒短片"
 msgstr "{0} 秒短片"
+
+#. placeholder {0}: entries[0]?.name ?? t(msg`有人`)
+#. placeholder {1}: entries.length
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:342
+msgid "{0} 等 {1} 位角色正在回复..."
+msgstr "{0} 等 {1} 位角色正在回复..."
+
+#. placeholder {0}: entries[0]?.name ?? t(msg`有人`)
+#. placeholder {1}: entries.length
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:339
+msgid "{0} 等 {1} 位角色正在接力回复..."
+msgstr "{0} 等 {1} 位角色正在接力回复..."
 
 #. placeholder {0}: group.name
 #: apps/app/src/routes/group-announcement-page.tsx:172
@@ -372,6 +402,12 @@ msgstr "{0} 项"
 #: apps/app/src/routes/desktop-mobile-page.tsx:1619
 msgid "{0}，在手机上继续直播准备与内容导流。"
 msgstr "{0}，在手机上继续直播准备与内容导流。"
+
+#. placeholder {0}: entries[0]?.name ?? t(msg`有人`)
+#. placeholder {1}: entries[1]?.name ?? t(msg`有人`)
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:335
+msgid "{0}、{1} 正在回复..."
+msgstr "{0}、{1} 正在回复..."
 
 #. placeholder {0}: post.authorName
 #: apps/app/src/routes/discover-feed-page.tsx:521
@@ -2201,6 +2237,10 @@ msgstr "公众强者映射"
 msgid "公共知识分子映射"
 msgstr "公共知识分子映射"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1132
+msgid "公告页"
+msgstr "公告页"
+
 #: apps/app/src/routes/discover-page.tsx:74
 #: apps/app/src/routes/discover-scene-page.tsx:55
 msgid "公园"
@@ -2752,7 +2792,9 @@ msgstr "最近文章"
 msgid "最近更新"
 msgstr "最近更新"
 
+#. placeholder {0}: formatTimestamp(groupQuery.data?.updatedAt)
 #. placeholder {0}: formatTimestamp(latestMoment.postedAt)
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1106
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:309
 msgid "最近更新 {0}"
 msgstr "最近更新 {0}"
@@ -3436,6 +3478,10 @@ msgstr "发一条广场动态"
 msgid "发一条朋友圈"
 msgstr "发一条朋友圈"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1476
+msgid "发一条消息，让这个群先热起来。"
+msgstr "发一条消息，让这个群先热起来。"
+
 #: apps/app/src/routes/desktop-mobile-page.tsx:2130
 msgid "发主页到手机"
 msgstr "发主页到手机"
@@ -4052,6 +4098,10 @@ msgstr "图书馆"
 #: apps/app/src/runtime/file-runtime-i18n.ts:19
 msgid "图片"
 msgstr "图片"
+
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:712
+msgid "图片上传结果异常。"
+msgstr "图片上传结果异常。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:483
 msgid "图片与文件"
@@ -6089,6 +6139,7 @@ msgstr "当前结果"
 msgid "当前群视频页先承载移动工作台状态，本地摄像头开关只影响当前页面提示，不会上传真实画面。"
 msgstr "当前群视频页先承载移动工作台状态，本地摄像头开关只影响当前页面提示，不会上传真实画面。"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:508
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:720
 #: apps/app/src/routes/desktop-mobile-page.tsx:505
 #: apps/app/src/routes/group-chat-details-page.tsx:723
@@ -6457,6 +6508,7 @@ msgstr "成功邀请"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:506
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:697
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1363
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:582
 #: apps/app/src/routes/group-chat-details-page.tsx:599
 #: apps/app/src/routes/group-qr-page.tsx:1134
@@ -6495,6 +6547,8 @@ msgid "成员规模"
 msgstr "成员规模"
 
 #: apps/app/src/components/mobile-shell.tsx:35
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:551
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:989
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1324
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:811
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:818
@@ -6596,6 +6650,10 @@ msgstr "截图画布初始化失败。"
 #: apps/app/src/components/chat-composer.tsx:4485
 msgid "截图预览"
 msgstr "截图预览"
+
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:946
+msgid "所有人"
+msgstr "所有人"
 
 #: apps/app/src/features/shell/desktop-nav-matching.ts:118
 #: apps/app/src/features/shell/desktop-nav-matching.ts:119
@@ -6803,6 +6861,8 @@ msgstr "打开系统分享面板"
 msgid "打开结果"
 msgstr "打开结果"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1129
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1130
 #: apps/app/src/i18n/static-dom-seed.ts:1038
 msgid "打开群公告页"
 msgstr "打开群公告页"
@@ -7331,6 +7391,10 @@ msgstr "提醒 · {0}"
 msgid "提醒 {reminderCount} 条"
 msgstr "提醒 {reminderCount} 条"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:947
+msgid "提醒全部群成员"
+msgstr "提醒全部群成员"
+
 #: apps/app/src/features/chat/chat-reminder-entries.ts:209
 msgid "提醒时间 {label}"
 msgstr "提醒时间 {label}"
@@ -7776,6 +7840,10 @@ msgstr "数据库{0}"
 msgid "文件"
 msgstr "文件"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:731
+msgid "文件上传结果异常。"
+msgstr "文件上传结果异常。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:177
 msgid "文件工具"
 msgstr "文件工具"
@@ -7965,6 +8033,10 @@ msgstr "昵称：{0} · {1}"
 msgid "昵称：{rawName}"
 msgstr "昵称：{rawName}"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:972
+msgid "昵称：{rawName} · {roleLabel}"
+msgstr "昵称：{rawName} · {roleLabel}"
+
 #: apps/app/src/routes/profile-settings-page.tsx:297
 msgid "显示名称"
 msgstr "显示名称"
@@ -8017,6 +8089,10 @@ msgstr "暂无签名"
 #: apps/app/src/routes/world-characters-page.tsx:324
 msgid "暂无结果"
 msgstr "暂无结果"
+
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1102
+msgid "暂无群公告，点击填写本群说明。"
+msgstr "暂无群公告，点击填写本群说明。"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:866
 msgid "暂无聊天记录"
@@ -8184,6 +8260,14 @@ msgstr "更适合长期养成和资源经营。"
 #: apps/app/src/i18n/static-dom-seed.ts:703
 msgid "替你把真实世界动作往前推进的人"
 msgstr "替你把真实世界动作往前推进的人"
+
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:316
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:335
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:335
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:339
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:342
+msgid "有人"
+msgstr "有人"
 
 #: apps/app/src/routes/chat-list-page.tsx:1322
 msgid "有未读消息"
@@ -8667,6 +8751,7 @@ msgstr "查找记录"
 msgid "查理·芒格"
 msgstr "查理·芒格"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1159
 #: apps/app/src/i18n/static-dom-seed.ts:814
 msgid "查看"
 msgstr "查看"
@@ -9537,6 +9622,14 @@ msgstr "正在读取群成员..."
 msgid "正在读取群成员…"
 msgstr "正在读取群成员…"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1377
+msgid "正在读取群消息"
+msgstr "正在读取群消息"
+
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1373
+msgid "正在读取群消息..."
+msgstr "正在读取群消息..."
+
 #: apps/app/src/routes/group-chat-details-page.tsx:579
 msgid "正在读取群聊信息"
 msgstr "正在读取群聊信息"
@@ -9887,6 +9980,8 @@ msgstr "消"
 
 #: apps/app/src/components/mobile-shell.tsx:32
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:177
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1388
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1626
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:660
 #: apps/app/src/features/shell/desktop-nav-matching.ts:34
 #: apps/app/src/features/shell/desktop-nav-matching.ts:35
@@ -10690,11 +10785,16 @@ msgstr "视频选择失败，请稍后重试。"
 
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:111
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1072
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:85
 #: apps/app/src/routes/character-detail-page.tsx:920
 #: apps/app/src/routes/desktop-mobile-page.tsx:359
 msgid "视频通话"
 msgstr "视频通话"
+
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1558
+msgid "视频通话功能开发中"
+msgstr "视频通话功能开发中"
 
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:117
 msgid "视频通话功能开发中，敬请期待。"
@@ -10886,6 +10986,10 @@ msgstr "稍等一下，正在同步账号资料和最近文章。"
 msgid "稍等一下，正在同步这个联系人的资料和关系状态。"
 msgstr "稍等一下，正在同步这个联系人的资料和关系状态。"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1378
+msgid "稍等一下，正在同步这段群聊里的消息。"
+msgstr "稍等一下，正在同步这段群聊里的消息。"
+
 #: apps/app/src/routes/group-chat-background-page.tsx:335
 msgid "稍等一下，正在同步默认背景和当前群聊设置。"
 msgstr "稍等一下，正在同步默认背景和当前群聊设置。"
@@ -11055,6 +11159,7 @@ msgstr "管理专属 API Key 和兼容 Base URL。"
 msgid "管理中：点击表情右上角删除，删完会自动顺到下一张，按 Esc 可直接完成。"
 msgstr "管理中：点击表情右上角删除，删完会自动顺到下一张，按 Esc 可直接完成。"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:966
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:1007
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1313
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1317
@@ -11395,6 +11500,8 @@ msgstr "群二维码"
 msgid "群二维码、群邀请卡和群入口接力。"
 msgstr "群二维码、群邀请卡和群入口接力。"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1098
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1153
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1514
 #: apps/app/src/routes/group-announcement-page.tsx:265
 #: apps/app/src/routes/group-announcement-page.tsx:442
@@ -11423,6 +11530,9 @@ msgstr "群公告暂时不可用"
 msgid "群协作"
 msgstr "群协作"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:587
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:966
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:990
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:1008
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1313
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1318
@@ -11438,6 +11548,7 @@ msgstr "群协作"
 msgid "群成员"
 msgstr "群成员"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1364
 #: apps/app/src/routes/group-chat-details-page.tsx:600
 #: apps/app/src/routes/group-qr-page.tsx:1135
 msgid "群成员信息暂时不可用"
@@ -11450,6 +11561,14 @@ msgstr "群接"
 #: apps/app/src/i18n/static-dom-seed.ts:248
 msgid "群接龙"
 msgstr "群接龙"
+
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1107
+msgid "群接龙与群协作入口先收口到聊天信息侧栏"
+msgstr "群接龙与群协作入口先收口到聊天信息侧栏"
+
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1389
+msgid "群消息暂时不可用"
+msgstr "群消息暂时不可用"
 
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:89
 #: apps/app/src/routes/group-chat-details-page.tsx:839
@@ -11472,6 +11591,13 @@ msgstr "群管理"
 
 #: apps/app/src/features/chat/chat-reminder-entries.ts:70
 #: apps/app/src/features/chat/chat-reminder-entries.ts:95
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1038
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1059
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1252
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1291
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1347
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1419
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1474
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:178
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:544
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:633
@@ -11490,6 +11616,10 @@ msgstr "群管理"
 msgid "群聊"
 msgstr "群聊"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:631
+msgid "群聊 · 免打扰"
+msgstr "群聊 · 免打扰"
+
 #: apps/app/src/routes/group-announcement-page.tsx:414
 #: apps/app/src/routes/group-chat-background-page.tsx:441
 #: apps/app/src/routes/group-chat-background-page.tsx:447
@@ -11503,6 +11633,7 @@ msgstr "群聊不存在"
 msgid "群聊信息"
 msgstr "群聊信息"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1348
 #: apps/app/src/routes/group-chat-details-page.tsx:589
 msgid "群聊信息暂时不可用"
 msgstr "群聊信息暂时不可用"
@@ -11654,6 +11785,10 @@ msgstr "群邀请文案已复制。"
 #: apps/app/src/routes/group-qr-page.tsx:1101
 msgid "群邀请页暂时不可用"
 msgstr "群邀请页暂时不可用"
+
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1475
+msgid "群里还没有消息"
+msgstr "群里还没有消息"
 
 #: apps/app/src/routes/group-qr-page.tsx:231
 #: apps/app/src/routes/group-qr-page.tsx:294
@@ -12233,6 +12368,10 @@ msgstr "该世界当前已被运维停用。"
 msgid "该入口当前仅提供桌面布局"
 msgstr "该入口当前仅提供桌面布局"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1561
+msgid "该功能暂未开放，敬请期待。"
+msgstr "该功能暂未开放，敬请期待。"
+
 #: apps/app/src/routes/group-chat-details-page.tsx:498
 msgid "该群聊会先从消息列表中隐藏，收到新消息后会再次出现。"
 msgstr "该群聊会先从消息列表中隐藏，收到新消息后会再次出现。"
@@ -12275,6 +12414,10 @@ msgstr "语音"
 msgid "语音 {0}"
 msgstr "语音 {0}"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:753
+msgid "语音上传结果异常。"
+msgstr "语音上传结果异常。"
+
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:51
 #: apps/app/src/i18n/static-dom-seed.ts:739
 msgid "语音发送暂时不可用"
@@ -12316,12 +12459,17 @@ msgstr "语音输入暂时不可用"
 
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:155
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:51
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1066
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:73
 #: apps/app/src/routes/character-detail-page.tsx:282
 #: apps/app/src/routes/character-detail-page.tsx:911
 #: apps/app/src/routes/desktop-mobile-page.tsx:360
 msgid "语音通话"
 msgstr "语音通话"
+
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1559
+msgid "语音通话功能开发中"
+msgstr "语音通话功能开发中"
 
 #: apps/app/src/features/chat/chat-call-fallback-notice.tsx:47
 msgid "语音通话暂未开放"
@@ -12441,6 +12589,7 @@ msgid "请输入验证码（默认 123456 即可通过）"
 msgstr "请输入验证码（默认 123456 即可通过）"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:531
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1376
 #: apps/app/src/routes/channels-page.tsx:1147
 #: apps/app/src/routes/character-detail-page.tsx:275
 #: apps/app/src/routes/chat-background-page.tsx:342
@@ -12729,6 +12878,7 @@ msgstr "输入标注文字"
 msgid "输入桌面锁定口令"
 msgstr "输入桌面锁定口令"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1502
 #: apps/app/src/i18n/static-dom-seed.ts:736
 msgid "输入消息"
 msgstr "输入消息"
@@ -12777,6 +12927,9 @@ msgid "返回上一步"
 msgstr "返回上一步"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:563
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:184
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1466
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1507
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:261
 #: apps/app/src/i18n/static-dom-seed.ts:884
 #: apps/app/src/routes/channel-author-page.tsx:333
@@ -13317,6 +13470,10 @@ msgstr "这条就是刚回流的来源会话，可以直接接着补。"
 msgid "这条更适合做定向补发。"
 msgstr "这条更适合做定向补发。"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:828
+msgid "这条消息暂时无法重试发送。"
+msgstr "这条消息暂时无法重试发送。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:489
 msgid "这条消息没有额外正文。"
 msgstr "这条消息没有额外正文。"
@@ -13744,6 +13901,10 @@ msgstr "邮箱"
 msgid "部分加入"
 msgstr "部分加入"
 
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:934
+msgid "部分引用"
+msgstr "部分引用"
+
 #: apps/app/src/components/chat-composer.tsx:4669
 msgid "重做标注"
 msgstr "重做标注"
@@ -13898,6 +14059,7 @@ msgid "重试评论点赞"
 msgstr "重试评论点赞"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:554
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:200
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:554
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:592
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:643
