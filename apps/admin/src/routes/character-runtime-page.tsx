@@ -330,7 +330,9 @@ export function CharacterRuntimePage() {
 }
 
 function formatMode(value?: string | null) {
-  return value === "manual" ? "人工锁定" : "自动调度";
+  return translateRuntimeMessage(
+    value === "manual" ? msg`人工锁定` : msg`自动调度`,
+  );
 }
 
 function formatActivity(value?: string | null) {
@@ -340,13 +342,13 @@ function formatActivity(value?: string | null) {
 function formatGateMode(mode: string) {
   switch (mode) {
     case "sleep_hint_delay":
-      return "睡眠延迟";
+      return translateRuntimeMessage(msg`睡眠延迟`);
     case "busy_hint_delay":
-      return "忙碌延迟";
+      return translateRuntimeMessage(msg`忙碌延迟`);
     case "not_applied":
-      return "未应用";
+      return translateRuntimeMessage(msg`未应用`);
     default:
-      return "立即回复";
+      return translateRuntimeMessage(msg`立即回复`);
   }
 }
 
@@ -364,7 +366,7 @@ function formatDateTime(value?: string | null) {
 }
 
 function formatSchedulerRunStatus(value: "success" | "error") {
-  return value === "error" ? "失败" : "成功";
+  return translateRuntimeMessage(value === "error" ? msg`失败` : msg`成功`);
 }
 
 function formatLifeEventKind(
@@ -372,19 +374,19 @@ function formatLifeEventKind(
 ) {
   switch (value) {
     case "online_status_changed":
-      return "在线状态";
+      return translateRuntimeMessage(msg`在线状态`);
     case "activity_changed":
-      return "活动状态";
+      return translateRuntimeMessage(msg`活动状态`);
     case "moment_posted":
-      return "朋友圈";
+      return translateRuntimeMessage(msg`朋友圈`);
     case "channel_posted":
-      return "视频号";
+      return translateRuntimeMessage(msg`视频号`);
     case "scene_friend_request":
-      return "场景好友";
+      return translateRuntimeMessage(msg`场景好友`);
     case "proactive_message":
-      return "主动提醒";
+      return translateRuntimeMessage(msg`主动提醒`);
     case "relationship_updated":
-      return "AI 关系";
+      return translateRuntimeMessage(msg`AI 关系`);
     default:
       return value;
   }
