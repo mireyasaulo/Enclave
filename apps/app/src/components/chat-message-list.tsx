@@ -984,6 +984,7 @@ export function ChatMessageList({
   const addToStickerMutation = useMutation({
     mutationFn: async (message: ChatRenderableMessage) => {
       const source = resolveCustomStickerUploadSource(
+        t,
         message,
         resolveAttachmentUrl,
       );
@@ -4547,6 +4548,7 @@ function buildDirectForwardPayload(
 }
 
 function resolveCustomStickerUploadSource(
+  t: Translator,
   message: ChatRenderableMessage,
   resolveUrl: (url: string) => string,
 ) {
@@ -4559,7 +4561,7 @@ function resolveCustomStickerUploadSource(
       url: resolveUrl(message.attachment.url),
       fileName: message.attachment.fileName,
       mimeType: message.attachment.mimeType,
-      label: stripFileExtension(message.attachment.fileName) || "图片表情",
+      label: stripFileExtension(message.attachment.fileName) || t(msg`图片表情`),
     };
   }
 
@@ -4672,6 +4674,7 @@ function ReplyQuoteCard({
   onJump: (messageId: string) => void;
   disabled?: boolean;
 }) {
+  const t = useRuntimeTranslator();
   const isDesktop = variant === "desktop";
   return (
     <button
@@ -4697,7 +4700,7 @@ function ReplyQuoteCard({
             isDesktop ? "text-[11px]" : "text-[10px]"
           }`}
         >
-          回复 {senderName}
+          {t(msg`回复 ${senderName}`)}
         </div>
         {modeLabel ? (
           <div
@@ -4735,6 +4738,7 @@ function ImageMessage({
   maxSize: number;
   onOpen?: () => void;
 }) {
+  const t = useRuntimeTranslator();
   const isDesktop = variant === "desktop";
   const [loadFailed, setLoadFailed] = useState(false);
 
@@ -4751,7 +4755,7 @@ function ImageMessage({
             : "h-24 w-24 rounded-[16px] border border-[color:var(--border-subtle)] bg-white"
         }`}
       >
-        {label || "[图片]"}
+        {label || t(msg`[图片]`)}
       </div>
     );
   }
@@ -4780,7 +4784,7 @@ function ImageMessage({
       type="button"
       onClick={onOpen}
       className={`transition hover:opacity-95 ${isDesktop ? "cursor-zoom-in" : ""}`}
-      aria-label={`${isDesktop ? "预览图片" : "查看图片"} ${label}`}
+      aria-label={t(msg`${isDesktop ? t(msg`预览图片`) : t(msg`查看图片`)} ${label}`)}
     >
       {image}
     </button>
@@ -4794,6 +4798,7 @@ function SelectionToggle({
   checked: boolean;
   onClick: () => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <button
       type="button"
@@ -4806,7 +4811,7 @@ function SelectionToggle({
           ? "border-[rgba(7,193,96,0.2)] bg-[#07c160] text-white shadow-[0_4px_10px_rgba(7,193,96,0.16)]"
           : "border-[color:var(--border-subtle)] bg-white/92 text-transparent hover:border-[rgba(7,193,96,0.24)]"
       }`}
-      aria-label={checked ? "取消选择消息" : "选择消息"}
+      aria-label={checked ? t(msg`取消选择消息`) : t(msg`选择消息`)}
     >
       ✓
     </button>
@@ -4822,6 +4827,7 @@ function ContactCardMessage({
   variant: "mobile" | "desktop";
   onOpen?: () => void;
 }) {
+  const t = useRuntimeTranslator();
   const isDesktop = variant === "desktop";
   const recommendation = attachment.recommendationMetadata;
   const card = (
@@ -4838,7 +4844,7 @@ function ContactCardMessage({
             isDesktop ? "mb-2.5" : "mb-2"
           }`}
         >
-          {recommendation.badgeLabel || "继续聊"}
+          {recommendation.badgeLabel || t(msg`继续聊`)}
         </div>
       ) : null}
       <div className={`flex items-center ${isDesktop ? "gap-3" : "gap-2.5"}`}>
@@ -4860,7 +4866,7 @@ function ContactCardMessage({
               isDesktop ? "mt-0.5 text-xs" : "mt-px text-[11px]"
             }`}
           >
-            {attachment.relationship || "世界联系人"}
+            {attachment.relationship || t(msg`世界联系人`)}
           </div>
         </div>
       </div>
@@ -4881,7 +4887,7 @@ function ContactCardMessage({
         }`}
       >
         <ContactRound size={12} />
-        <span>{recommendation ? "推荐联系人" : "角色名片"}</span>
+        <span>{recommendation ? t(msg`推荐联系人`) : t(msg`角色名片`)}</span>
       </div>
     </div>
   );
@@ -4895,7 +4901,7 @@ function ContactCardMessage({
       type="button"
       onClick={onOpen}
       className="text-left transition hover:opacity-95"
-      aria-label={`查看名片 ${attachment.name}`}
+      aria-label={t(msg`查看名片 ${attachment.name}`)}
     >
       {card}
     </button>
@@ -4911,6 +4917,7 @@ function NoteCardMessage({
   variant: "mobile" | "desktop";
   onOpen?: () => void;
 }) {
+  const t = useRuntimeTranslator();
   const isDesktop = variant === "desktop";
   const previewImage = attachment.assets.find(
     (asset) => asset.kind === "image",
@@ -4947,7 +4954,7 @@ function NoteCardMessage({
                 : "px-2.5 py-1.5 text-[10px] tracking-[0.14em]"
             }`}
           >
-            收藏笔记
+            {t(msg`收藏笔记`)}
           </div>
         </div>
       )}
@@ -4968,7 +4975,7 @@ function NoteCardMessage({
             isDesktop ? "text-xs leading-5" : "text-[11px] leading-[18px]"
           }`}
         >
-          {attachment.excerpt || "点击查看完整笔记"}
+          {attachment.excerpt || t(msg`点击查看完整笔记`)}
         </div>
         <div className="flex items-center justify-between gap-3 border-t border-[rgba(15,23,42,0.06)] pt-2.5">
           <div className="flex min-w-0 flex-wrap gap-1.5">
@@ -4982,7 +4989,7 @@ function NoteCardMessage({
             ))}
           </div>
           <div className="shrink-0 text-[10px] tracking-[0.12em] text-[color:var(--text-dim)]">
-            {fileCount ? `${fileCount} 个文件` : "笔记"}
+            {fileCount ? t(msg`${fileCount} 个文件`) : t(msg`笔记`)}
           </div>
         </div>
       </div>
@@ -4998,7 +5005,7 @@ function NoteCardMessage({
       type="button"
       onClick={onOpen}
       className="text-left transition hover:opacity-95"
-      aria-label={`${variant === "desktop" ? "打开笔记" : "查看笔记摘要"} ${attachment.title}`}
+      aria-label={t(msg`${variant === "desktop" ? t(msg`打开笔记`) : t(msg`查看笔记摘要`)} ${attachment.title}`)}
     >
       {card}
     </button>
@@ -5014,6 +5021,7 @@ function FileAttachmentMessage({
   variant: "mobile" | "desktop";
   onOpen?: () => void;
 }) {
+  const t = useRuntimeTranslator();
   const isDesktop = variant === "desktop";
   const card = (
     <div
@@ -5055,7 +5063,7 @@ function FileAttachmentMessage({
           isDesktop ? "mt-3 text-[11px]" : "mt-2.5 text-[10px]"
         }`}
       >
-        文件
+        {t(msg`文件`)}
       </div>
     </div>
   );
@@ -5069,7 +5077,7 @@ function FileAttachmentMessage({
       type="button"
       onClick={onOpen}
       className="text-left transition hover:opacity-95"
-      aria-label={`打开文件 ${attachment.fileName}`}
+      aria-label={t(msg`打开文件 ${attachment.fileName}`)}
     >
       {card}
     </button>
@@ -5085,6 +5093,7 @@ function LocationCardMessage({
   variant: "mobile" | "desktop";
   onOpen?: () => void;
 }) {
+  const t = useRuntimeTranslator();
   const isDesktop = variant === "desktop";
   const card = (
     <div
@@ -5100,7 +5109,7 @@ function LocationCardMessage({
         }`}
       >
         <MapPin size={12} />
-        <span>位置</span>
+        <span>{t(msg`位置`)}</span>
       </div>
       <div
         className={`font-medium text-[color:var(--text-primary)] ${
@@ -5132,7 +5141,7 @@ function LocationCardMessage({
       type="button"
       onClick={onOpen}
       className="text-left transition hover:opacity-95"
-      aria-label={`查看位置 ${attachment.title}`}
+      aria-label={t(msg`查看位置 ${attachment.title}`)}
     >
       {card}
     </button>
@@ -5150,6 +5159,7 @@ function VoiceMessage({
   own: boolean;
   variant: "mobile" | "desktop";
 }) {
+  const t = useRuntimeTranslator();
   const isDesktop = variant === "desktop";
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -5213,7 +5223,7 @@ function VoiceMessage({
               ? "bg-[#f3f4f6]"
               : "bg-[color:var(--surface-console)]"
         }`}
-        aria-label={playing ? "暂停语音" : "播放语音"}
+        aria-label={playing ? t(msg`暂停语音`) : t(msg`播放语音`)}
       >
         {playing ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}
       </button>
@@ -5257,6 +5267,7 @@ function GroupRelaySummaryMessage({
   summary: ReturnType<typeof parseGroupRelaySummaryMessage>;
   onOpen?: () => void;
 }) {
+  const t = useRuntimeTranslator();
   if (!summary) {
     return null;
   }
@@ -5282,7 +5293,7 @@ function GroupRelaySummaryMessage({
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-dim)]">
-            群接龙
+            {t(msg`群接龙`)}
           </div>
           <div className="mt-1 text-sm font-medium text-[color:var(--text-primary)]">
             {summary.sourceGroupName}
@@ -5292,23 +5303,27 @@ function GroupRelaySummaryMessage({
           <ResultCardBadge
             tone={summary.publishedSource === "mobile" ? "info" : "warning"}
             label={
-              summary.publishedSource === "mobile" ? "手机回填" : "桌面回填"
+              summary.publishedSource === "mobile"
+                ? t(msg`手机回填`)
+                : t(msg`桌面回填`)
             }
           />
           {summary.launchSourceLabel ? (
             <ResultCardBadge
               tone="neutral"
               label={
-                summary.launchSource === "mobile" ? "手机发起" : "桌面发起"
+                summary.launchSource === "mobile"
+                  ? t(msg`手机发起`)
+                  : t(msg`桌面发起`)
               }
             />
           ) : null}
           {summary.statusLabel ? (
             <ResultCardBadge
               tone={
-                summary.statusLabel === "已回填"
+                summary.statusLabel === t(msg`已回填`)
                   ? "success"
-                  : summary.statusLabel === "已完成"
+                  : summary.statusLabel === t(msg`已完成`)
                     ? "info"
                     : "warning"
               }
@@ -5333,49 +5348,49 @@ function GroupRelaySummaryMessage({
       <div className={isDesktop ? "mt-3 space-y-2" : "mt-2.5 space-y-1.5"}>
         {summary.timestampLabel ? (
           <ResultCardMetric
-            label="时间"
+            label={t(msg`时间`)}
             value={summary.timestampLabel}
             variant={variant}
           />
         ) : null}
         {completionTimeLabel ? (
           <ResultCardMetric
-            label="完成时间"
+            label={t(msg`完成时间`)}
             value={completionTimeLabel}
             variant={variant}
           />
         ) : null}
         {typeof publishRangeLabel === "string" ? (
           <ResultCardMetric
-            label="起止时间"
+            label={t(msg`起止时间`)}
             value={publishRangeLabel}
             variant={variant}
           />
         ) : null}
         {summary.activeRelayCountLabel ? (
           <ResultCardMetric
-            label="进行中"
+            label={t(msg`进行中`)}
             value={summary.activeRelayCountLabel}
             variant={variant}
           />
         ) : null}
         {summary.pendingMemberCountLabel ? (
           <ResultCardMetric
-            label="待确认"
+            label={t(msg`待确认`)}
             value={summary.pendingMemberCountLabel}
             variant={variant}
           />
         ) : null}
         {summary.publishCountLabel ? (
           <ResultCardMetric
-            label="回填次数"
+            label={t(msg`回填次数`)}
             value={summary.publishCountLabel}
             variant={variant}
           />
         ) : null}
         {summary.resultSummaryLabel ? (
           <ResultCardMetric
-            label="结果摘要"
+            label={t(msg`结果摘要`)}
             value={summary.resultSummaryLabel}
             variant={variant}
           />
@@ -5556,6 +5571,7 @@ function GroupCallInviteMessage({
   invite: ReturnType<typeof parseGroupCallInviteMessage>;
   onOpen?: () => void;
 }) {
+  const t = useRuntimeTranslator();
   if (!invite) {
     return null;
   }
@@ -5581,7 +5597,7 @@ function GroupCallInviteMessage({
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-dim)]">
-            {invite.kind === "voice" ? "群语音通话" : "群视频通话"}
+            {invite.kind === "voice" ? t(msg`群语音通话`) : t(msg`群视频通话`)}
           </div>
           <div className="mt-1 text-sm font-medium text-[color:var(--text-primary)]">
             {invite.groupName}
@@ -5592,10 +5608,10 @@ function GroupCallInviteMessage({
             tone={invite.status === "ended" ? "danger" : "info"}
             label={
               invite.status === "ended"
-                ? "已结束"
+                ? t(msg`已结束`)
                 : invite.sourceLabel
-                  ? `${invite.sourceLabel}发起`
-                  : "桌面发起"
+                  ? t(msg`${invite.sourceLabel}发起`)
+                  : t(msg`桌面发起`)
             }
           />
           {completionBadge ? (
@@ -5609,20 +5625,20 @@ function GroupCallInviteMessage({
 
       <div className={isDesktop ? "mt-3 space-y-2" : "mt-2.5 space-y-1.5"}>
         <ResultCardMetric
-          label="当前状态"
+          label={t(msg`当前状态`)}
           value={formatGroupCallStatusLabel(invite.kind, invite.status)}
           variant={variant}
         />
         {invite.timestampLabel ? (
           <ResultCardMetric
-            label="时间"
+            label={t(msg`时间`)}
             value={invite.timestampLabel}
             variant={variant}
           />
         ) : null}
         {invite.status === "ended" && invite.startedAt && invite.recordedAt ? (
           <ResultCardMetric
-            label="起止时间"
+            label={t(msg`起止时间`)}
             value={formatGroupCallRangeSummary(
               invite.startedAt,
               invite.recordedAt,
@@ -5632,21 +5648,21 @@ function GroupCallInviteMessage({
         ) : null}
         {invite.durationLabel ? (
           <ResultCardMetric
-            label="本轮时长"
+            label={t(msg`本轮时长`)}
             value={invite.durationLabel}
             variant={variant}
           />
         ) : null}
         {invite.sourceLabel ? (
           <ResultCardMetric
-            label="发起端"
+            label={t(msg`发起端`)}
             value={invite.sourceLabel}
             variant={variant}
           />
         ) : null}
         {invite.snapshotLabel ? (
           <ResultCardMetric
-            label="人数快照"
+            label={t(msg`人数快照`)}
             value={invite.snapshotLabel}
             variant={variant}
           />
@@ -5658,13 +5674,13 @@ function GroupCallInviteMessage({
             }
           >
             <ResultCardMetric
-              label="当前在线"
+              label={t(msg`当前在线`)}
               value={`${invite.activeCount.current}/${invite.activeCount.total}`}
               variant={variant}
             />
             <ResultCardMetric
-              label="待加入"
-              value={`${invite.waitingCount ?? Math.max(invite.activeCount.total - invite.activeCount.current, 0)} 人`}
+              label={t(msg`待加入`)}
+              value={t(msg`${invite.waitingCount ?? Math.max(invite.activeCount.total - invite.activeCount.current, 0)} 人`)}
               variant={variant}
             />
           </div>
@@ -5770,6 +5786,7 @@ function DirectCallInviteMessage({
   invite: ReturnType<typeof parseDirectCallInviteMessage>;
   onOpen?: () => void;
 }) {
+  const t = useRuntimeTranslator();
   if (!invite) {
     return null;
   }
@@ -5794,7 +5811,7 @@ function DirectCallInviteMessage({
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-dim)]">
-            {invite.kind === "voice" ? "语音通话" : "视频通话"}
+            {invite.kind === "voice" ? t(msg`语音通话`) : t(msg`视频通话`)}
           </div>
           <div className="mt-1 text-sm font-medium text-[color:var(--text-primary)]">
             {invite.title}
@@ -5804,10 +5821,10 @@ function DirectCallInviteMessage({
           tone={invite.connectionStatus === "ended" ? "danger" : "info"}
           label={
             invite.connectionStatus === "ended"
-              ? "已结束"
+              ? t(msg`已结束`)
               : invite.sourceLabel
-                ? `${invite.sourceLabel}发起`
-                : "桌面发起"
+                ? t(msg`${invite.sourceLabel}发起`)
+                : t(msg`桌面发起`)
           }
         />
       </div>
@@ -5815,28 +5832,28 @@ function DirectCallInviteMessage({
       <div className={isDesktop ? "mt-3 space-y-2" : "mt-2.5 space-y-1.5"}>
         {invite.connectionStatus ? (
           <ResultCardMetric
-            label="当前状态"
+            label={t(msg`当前状态`)}
             value={resolveDirectCallStatusLabel(invite)}
             variant={variant}
           />
         ) : null}
         {invite.timestampLabel ? (
           <ResultCardMetric
-            label="时间"
+            label={t(msg`时间`)}
             value={invite.timestampLabel}
             variant={variant}
           />
         ) : null}
         {invite.durationLabel ? (
           <ResultCardMetric
-            label="最近一轮"
+            label={t(msg`最近一轮`)}
             value={invite.durationLabel}
             variant={variant}
           />
         ) : null}
         {invite.sourceLabel ? (
           <ResultCardMetric
-            label="发起端"
+            label={t(msg`发起端`)}
             value={invite.sourceLabel}
             variant={variant}
           />
@@ -5904,6 +5921,7 @@ function StickerMessage({
   label: string;
   maxSize: number;
 }) {
+  const t = useRuntimeTranslator();
   const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
@@ -5913,7 +5931,7 @@ function StickerMessage({
   if (loadFailed) {
     return (
       <div className="flex h-24 w-24 items-center justify-center rounded-[22px] border border-white/80 bg-white/90 px-3 text-center text-xs text-[color:var(--text-secondary)] shadow-[var(--shadow-soft)]">
-        {label || "[表情包]"}
+        {label || t(msg`[表情包]`)}
       </div>
     );
   }
@@ -5960,6 +5978,7 @@ function ImageViewerOverlay({
   onOpenInWindow?: () => void;
   onPrint?: () => void;
 }) {
+  const t = useRuntimeTranslator();
   const isDesktop = variant === "desktop";
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const touchDeltaXRef = useRef(0);
@@ -6004,7 +6023,7 @@ function ImageViewerOverlay({
         type="button"
         onClick={onClose}
         className="absolute inset-0 cursor-default"
-        aria-label="关闭图片查看器"
+        aria-label={t(msg`关闭图片查看器`)}
       />
 
       {isDesktop ? (
@@ -6020,22 +6039,22 @@ function ImageViewerOverlay({
             </div>
             <div className="flex items-center gap-2">
               {onOpenInWindow ? (
-                <ViewerActionButton label="新窗口打开" onClick={onOpenInWindow}>
+                <ViewerActionButton label={t(msg`新窗口打开`)} onClick={onOpenInWindow}>
                   <ExternalLink size={16} />
                 </ViewerActionButton>
               ) : null}
               {onPrint ? (
-                <ViewerActionButton label="打印图片" onClick={onPrint}>
+                <ViewerActionButton label={t(msg`打印图片`)} onClick={onPrint}>
                   <Printer size={16} />
                 </ViewerActionButton>
               ) : null}
-              <ViewerActionButton label="保存图片" onClick={onSave}>
+              <ViewerActionButton label={t(msg`保存图片`)} onClick={onSave}>
                 <Download size={16} />
               </ViewerActionButton>
-              <ViewerActionButton label="定位到聊天位置" onClick={onLocate}>
+              <ViewerActionButton label={t(msg`定位到聊天位置`)} onClick={onLocate}>
                 <LocateFixed size={16} />
               </ViewerActionButton>
-              <ViewerActionButton label="关闭图片查看器" onClick={onClose}>
+              <ViewerActionButton label={t(msg`关闭图片查看器`)} onClick={onClose}>
                 <X size={16} />
               </ViewerActionButton>
             </div>
@@ -6044,7 +6063,7 @@ function ImageViewerOverlay({
           {onPrevious ? (
             <ViewerNavButton
               side="left"
-              label="上一张图片"
+              label={t(msg`上一张图片`)}
               onClick={onPrevious}
             >
               <ChevronLeft size={22} />
