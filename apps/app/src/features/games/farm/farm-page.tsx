@@ -10,7 +10,7 @@ import { FarmMascot } from "./components/farm-mascot";
 import { FarmSky } from "./components/farm-sky";
 import { NeighborFarmModal } from "./components/neighbor-farm-modal";
 import { NeighborListPanel } from "./components/neighbor-list-panel";
-import { PlotActionBar } from "./components/plot-action-bar";
+import { PlotActionBar, type PlotPulseKind } from "./components/plot-action-bar";
 import { SeedShopSheet } from "./components/seed-shop-sheet";
 import { WarehouseSheet } from "./components/warehouse-sheet";
 
@@ -38,6 +38,20 @@ function FarmPageInner() {
   const [warehouseOpen, setWarehouseOpen] = useState(false);
   const [activeNeighborId, setActiveNeighborId] = useState<string | null>(null);
   const [toast, setToast] = useState<HarvestToast | null>(null);
+  const [pulse, setPulse] = useState<{
+    plotIndex: number;
+    kind: PlotPulseKind;
+    tick: number;
+  } | null>(null);
+
+  const triggerPulse = (plotIndex: number, kind: PlotPulseKind) => {
+    setPulse({ plotIndex, kind, tick: Date.now() });
+    window.setTimeout(() => {
+      setPulse((curr) =>
+        curr && curr.plotIndex === plotIndex && curr.kind === kind ? null : curr,
+      );
+    }, 1300);
+  };
 
   useEffect(() => {
     if (stateQuery.data?.serverNowMs) {
@@ -148,6 +162,7 @@ function FarmPageInner() {
               <FarmIsoGrid
                 plots={state.plots}
                 selectedIndex={selectedPlotIndex}
+                pulse={pulse}
                 onSelect={(i) =>
                   setSelectedPlotIndex((curr) => (curr === i ? null : i))
                 }
@@ -157,6 +172,7 @@ function FarmPageInner() {
               state={state}
               plotIndex={selectedPlotIndex}
               onHarvested={harvestHandler}
+              onPulse={triggerPulse}
             />
           </section>
 

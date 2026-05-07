@@ -11,6 +11,8 @@ import {
   useWeedFarmPlot,
 } from "../use-farm-state";
 
+export type PlotPulseKind = "plant" | "water" | "weed" | "debug" | "harvest";
+
 interface PlotActionBarProps {
   state: FarmPlayerStateView;
   plotIndex: number | null;
@@ -20,9 +22,10 @@ interface PlotActionBarProps {
     coinsGained: number;
     leveledUp: boolean;
   }) => void;
+  onPulse?: (plotIndex: number, kind: PlotPulseKind) => void;
 }
 
-export function PlotActionBar({ state, plotIndex, onHarvested }: PlotActionBarProps) {
+export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotActionBarProps) {
   const nowMs = useFarmAdjustedNow();
   const plantMutation = usePlantFarmCrop();
   const waterMutation = useWaterFarmPlot();
@@ -63,10 +66,12 @@ export function PlotActionBar({ state, plotIndex, onHarvested }: PlotActionBarPr
 
   function handleHarvest() {
     clearError();
+    const targetPlot = plotIndex!;
     harvestMutation.mutate(
-      { plotIndex: plotIndex! },
+      { plotIndex: targetPlot },
       {
         onSuccess: (result) => {
+          onPulse?.(targetPlot, "harvest");
           onHarvested?.({
             cropId: result.harvested.cropId,
             amount: result.harvested.amount,
@@ -81,9 +86,13 @@ export function PlotActionBar({ state, plotIndex, onHarvested }: PlotActionBarPr
 
   function handlePlant(cropId: FarmCropId) {
     clearError();
+    const targetPlot = plotIndex!;
     plantMutation.mutate(
-      { plotIndex: plotIndex!, cropId },
-      { onError: handleError },
+      { plotIndex: targetPlot, cropId },
+      {
+        onSuccess: () => onPulse?.(targetPlot, "plant"),
+        onError: handleError,
+      },
     );
   }
 
@@ -175,9 +184,13 @@ export function PlotActionBar({ state, plotIndex, onHarvested }: PlotActionBarPr
               type="button"
               onClick={() => {
                 clearError();
+                const targetPlot = plotIndex!;
                 waterMutation.mutate(
-                  { plotIndex: plotIndex! },
-                  { onError: handleError },
+                  { plotIndex: targetPlot },
+                  {
+                    onSuccess: () => onPulse?.(targetPlot, "water"),
+                    onError: handleError,
+                  },
                 );
               }}
               disabled={isPending || plot.watered}
@@ -189,9 +202,13 @@ export function PlotActionBar({ state, plotIndex, onHarvested }: PlotActionBarPr
               type="button"
               onClick={() => {
                 clearError();
+                const targetPlot = plotIndex!;
                 weedMutation.mutate(
-                  { plotIndex: plotIndex! },
-                  { onError: handleError },
+                  { plotIndex: targetPlot },
+                  {
+                    onSuccess: () => onPulse?.(targetPlot, "weed"),
+                    onError: handleError,
+                  },
                 );
               }}
               disabled={isPending || plot.weeds <= 0}
@@ -203,9 +220,13 @@ export function PlotActionBar({ state, plotIndex, onHarvested }: PlotActionBarPr
               type="button"
               onClick={() => {
                 clearError();
+                const targetPlot = plotIndex!;
                 debugMutation.mutate(
-                  { plotIndex: plotIndex! },
-                  { onError: handleError },
+                  { plotIndex: targetPlot },
+                  {
+                    onSuccess: () => onPulse?.(targetPlot, "debug"),
+                    onError: handleError,
+                  },
                 );
               }}
               disabled={isPending || plot.bugs <= 0}

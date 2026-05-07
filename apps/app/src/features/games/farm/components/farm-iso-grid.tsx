@@ -1,13 +1,15 @@
 import type { FarmPlot } from "@yinjie/contracts";
 import { FarmIsoTile } from "./farm-iso-tile";
+import type { PlotPulseKind } from "./plot-action-bar";
 
 interface FarmIsoGridProps {
   plots: FarmPlot[];
   selectedIndex: number | null;
+  pulse?: { plotIndex: number; kind: PlotPulseKind; tick: number } | null;
   onSelect: (plotIndex: number) => void;
 }
 
-export function FarmIsoGrid({ plots, selectedIndex, onSelect }: FarmIsoGridProps) {
+export function FarmIsoGrid({ plots, selectedIndex, pulse, onSelect }: FarmIsoGridProps) {
   const cols = plots.length <= 6 ? 3 : plots.length <= 9 ? 3 : 4;
 
   // Limit how many ripe pulses run simultaneously to keep frame rate sane on mobile.
@@ -38,6 +40,11 @@ export function FarmIsoGrid({ plots, selectedIndex, onSelect }: FarmIsoGridProps
             plot={plot}
             selected={selectedIndex === index}
             pulseRipe={ripeIndexesToPulse.has(index)}
+            pulse={
+              pulse && pulse.plotIndex === index
+                ? { kind: pulse.kind, tick: pulse.tick }
+                : null
+            }
             onClick={() => onSelect(index)}
           />
         ))}
@@ -190,10 +197,57 @@ export function FarmIsoGrid({ plots, selectedIndex, onSelect }: FarmIsoGridProps
           50% { opacity: 1; transform: rotate(15deg) scale(1.2); }
         }
 
+        .farm-iso-tile__pulse {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          font-size: 22px;
+          line-height: 1;
+          pointer-events: none;
+          will-change: transform, opacity;
+          filter: drop-shadow(0 2px 3px rgba(0,0,0,0.35));
+        }
+        .farm-iso-tile__pulse--water {
+          animation: farm-iso-pulse-water 1100ms ease-out forwards;
+        }
+        .farm-iso-tile__pulse--plant {
+          animation: farm-iso-pulse-plant 1100ms ease-out forwards;
+          font-size: 28px;
+        }
+        .farm-iso-tile__pulse--weed,
+        .farm-iso-tile__pulse--debug {
+          animation: farm-iso-pulse-fade 1000ms ease-out forwards;
+        }
+        .farm-iso-tile__pulse--harvest {
+          animation: farm-iso-pulse-coin 1300ms ease-out forwards;
+          font-size: 26px;
+        }
+        @keyframes farm-iso-pulse-water {
+          0%   { transform: translate(-50%, -120%) scale(0.6); opacity: 0; }
+          25%  { transform: translate(-50%, -110%) scale(1); opacity: 1; }
+          100% { transform: translate(-50%, 30%)   scale(0.9); opacity: 0; }
+        }
+        @keyframes farm-iso-pulse-plant {
+          0%   { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+          30%  { transform: translate(-50%, -90%) scale(1.1); opacity: 0.85; }
+          100% { transform: translate(-50%, -130%) scale(1.6); opacity: 0; }
+        }
+        @keyframes farm-iso-pulse-fade {
+          0%   { transform: translate(-50%, -60%) scale(0.6); opacity: 0; }
+          30%  { transform: translate(-50%, -90%) scale(1.2); opacity: 1; }
+          100% { transform: translate(-50%, -130%) scale(1.4); opacity: 0; }
+        }
+        @keyframes farm-iso-pulse-coin {
+          0%   { transform: translate(-50%, -40%) scale(0.6); opacity: 0; }
+          20%  { transform: translate(-50%, -90%) scale(1.2); opacity: 1; }
+          100% { transform: translate(-50%, -200%) scale(1); opacity: 0; }
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .farm-iso-tile,
           .farm-iso-grid,
           .farm-iso-tile__sparkle,
+          .farm-iso-tile__pulse,
           .farm-iso-tile.is-ripe-pulse .farm-iso-tile__dirt {
             transition: none;
             animation: none;

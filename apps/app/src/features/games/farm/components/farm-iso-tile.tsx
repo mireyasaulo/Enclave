@@ -1,18 +1,29 @@
 import type { FarmPlot } from "@yinjie/contracts";
 import { useFarmAdjustedNow } from "../farm-clock-context";
 import { formatRemainingMs, getStageEmoji } from "../crop-presentation";
+import type { PlotPulseKind } from "./plot-action-bar";
 
 export interface FarmIsoTileProps {
   plot: FarmPlot;
   selected?: boolean;
   pulseRipe?: boolean;
+  pulse?: { kind: PlotPulseKind; tick: number } | null;
   onClick?: () => void;
 }
+
+const PULSE_EMOJI: Record<PlotPulseKind, string> = {
+  plant: "🌫️",
+  water: "💧",
+  weed: "🌿",
+  debug: "🐛",
+  harvest: "🪙",
+};
 
 export function FarmIsoTile({
   plot,
   selected,
   pulseRipe,
+  pulse,
   onClick,
 }: FarmIsoTileProps) {
   const nowMs = useFarmAdjustedNow();
@@ -75,6 +86,16 @@ export function FarmIsoTile({
 
         {isRipe && !isRotten && (
           <span aria-hidden className="farm-iso-tile__sparkle">✨</span>
+        )}
+
+        {pulse && (
+          <span
+            key={`${pulse.kind}-${pulse.tick}`}
+            aria-hidden
+            className={`farm-iso-tile__pulse farm-iso-tile__pulse--${pulse.kind}`}
+          >
+            {PULSE_EMOJI[pulse.kind]}
+          </span>
         )}
       </span>
     </button>
