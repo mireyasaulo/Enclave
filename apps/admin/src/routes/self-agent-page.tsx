@@ -270,8 +270,18 @@ export function SelfAgentPage() {
   const rulesDirty =
     JSON.stringify(normalizedRulesDraft) !== JSON.stringify(overview.rules);
 
+  const mutationError =
+    saveDocumentMutation.error instanceof Error
+      ? saveDocumentMutation.error
+      : runHeartbeatMutation.error instanceof Error
+        ? runHeartbeatMutation.error
+        : saveRulesMutation.error instanceof Error
+          ? saveRulesMutation.error
+          : null;
+
   return (
     <div className="space-y-6">
+      {mutationError ? <ErrorBlock message={mutationError.message} /> : null}
       <AdminPageHero
         eyebrow="Self Agent"
         title="“我自己”主代理工作台"

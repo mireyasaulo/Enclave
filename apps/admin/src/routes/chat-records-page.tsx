@@ -5,7 +5,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import type {
   AdminChatRecordActivityWindow,
   AdminChatRecordConversationDetail,
@@ -116,7 +116,13 @@ function readInitialChatRecordsFocus() {
 export function ChatRecordsPage() {
   const baseUrl = resolveAdminCoreApiBaseUrl();
   const queryClient = useQueryClient();
-  const initialFocus = useMemo(() => readInitialChatRecordsFocus(), []);
+  const location = useLocation();
+  const locationSearch = location.searchStr ?? "";
+  const initialFocus = useMemo(
+    () => readInitialChatRecordsFocus(),
+    // re-run when URL search changes so back/forward or in-page links re-focus
+    [locationSearch],
+  );
   const [characterId, setCharacterId] = useState(initialFocus.characterId);
   const [includeHidden, setIncludeHidden] = useState(false);
   const [onlyReviewed, setOnlyReviewed] = useState(false);
@@ -154,6 +160,13 @@ export function ChatRecordsPage() {
     conversationId: string;
     includeClearedHistory: boolean;
   } | null>(null);
+
+  // Re-sync focus state when URL search changes (e.g. user clicks another
+  // /chat-records?... link without leaving the page).
+  useEffect(() => {
+    setCharacterId(initialFocus.characterId);
+    setSelectedConversationId(initialFocus.conversationId);
+  }, [initialFocus.characterId, initialFocus.conversationId]);
 
   const listQuery = useMemo(
     () => ({

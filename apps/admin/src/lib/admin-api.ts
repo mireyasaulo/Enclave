@@ -112,7 +112,8 @@ function getStorage() {
 
   try {
     return window.localStorage;
-  } catch {
+  } catch (error) {
+    console.warn("[admin] localStorage unavailable", error);
     return null;
   }
 }
