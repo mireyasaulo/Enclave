@@ -45,22 +45,30 @@ export function AdminReportsPage() {
         msg`社区举报的内容会先进入"未处理"状态。逐条审核后选择已处理或驳回。`,
       )}
       actions={
-        <div className="inline-flex rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-1 shadow-[var(--shadow-soft)]">
-          {tabs.map(([s, label]) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setStatus(s)}
-              aria-current={status === s ? "page" : undefined}
-              className={`rounded-full px-4 py-1.5 text-sm transition-colors ${
-                status === s
-                  ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)] shadow-[var(--shadow-soft)]"
-                  : "text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-card-hover)]"
-              }`}
-            >
-              {t(label)}
-            </button>
-          ))}
+        <div className="inline-flex items-center gap-2">
+          {reportsQ.isFetching && (
+            <span className="text-xs text-[color:var(--text-muted)]">
+              <Trans>载入中…</Trans>
+            </span>
+          )}
+          <div className="inline-flex rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-1 shadow-[var(--shadow-soft)]">
+            {tabs.map(([s, label]) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setStatus(s)}
+                disabled={reportsQ.isFetching && status !== s}
+                aria-current={status === s ? "page" : undefined}
+                className={`rounded-full px-4 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                  status === s
+                    ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)] shadow-[var(--shadow-soft)]"
+                    : "text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-card-hover)]"
+                }`}
+              >
+                {t(label)}
+              </button>
+            ))}
+          </div>
         </div>
       }
     >

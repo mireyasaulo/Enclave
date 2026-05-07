@@ -1,20 +1,28 @@
+import { useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
+  AppSection,
   Button,
+  Card,
   ErrorBlock,
+  InlineNotice,
   LoadingBlock,
   PanelEmpty,
   StatusPill,
+  TextAreaField,
+  TextField,
 } from "@yinjie/ui";
 import {
   wikiApi,
   type AbuseFilter,
   type AbuseFilterAction,
+  type AbuseFilterScope,
 } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
+import { FormRow } from "../components/form-row";
 
 export function AdminAbuseFiltersPage() {
   const t = translateRuntimeMessage;
@@ -38,6 +46,11 @@ export function AdminAbuseFiltersPage() {
     onSuccess: () =>
       qc.invalidateQueries({ queryKey: ["wiki", "abuse-filters"] }),
   });
+  const createMut = useMutation({
+    mutationFn: wikiApi.createAbuseFilter,
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: ["wiki", "abuse-filters"] }),
+  });
 
   return (
     <PageShell
@@ -47,6 +60,14 @@ export function AdminAbuseFiltersPage() {
         msg`每次 wiki 写入都会按规则匹配；命中后可触发记录、警告、强制人工审核或直接拦截。`,
       )}
     >
+      <CreateFilterForm
+        onCreate={(input) => createMut.mutate(input)}
+        loading={createMut.isPending}
+        error={
+          createMut.isError ? (createMut.error as Error).message : null
+        }
+      />
+
       {filtersQ.isLoading && <LoadingBlock />}
       {filtersQ.isError && (
         <ErrorBlock message={(filtersQ.error as Error).message} />
@@ -70,7 +91,7 @@ export function AdminAbuseFiltersPage() {
         {filtersQ.data?.length === 0 && (
           <PanelEmpty
             message={t(
-              msg`暂无过滤规则。模块启动会自动种入预置规则；如全部被删，可重启 API 重置。`,
+              msg`暂无过滤规则。可使用上方"+ 新建过滤器"快速添加一条；模块启动也会自动种入预置规则。`,
             )}
           />
         )}
@@ -224,5 +245,200 @@ function SeverityPill({
     <span className={`rounded-full px-2 py-0.5 text-xs ${tone}`}>
       {severity}
     </span>
+  );
+}
+
+const DEFAULT_PATTERN_JSON = JSON.stringify(
+  { type: "regex", regex: "spam|垃圾", flags: "i" },
+  null,
+  2,
+);
+
+type CreateFilterInput = Parameters<typeof wikiApi.createAbuseFilter>[0];
+
+function CreateFilterForm({
+  onCreate,
+  loading,
+  error,
+}: {
+  onCreate: (input: CreateFilterInput) => void;
+  loading: boolean;
+  error: string | null;
+}) {
+  const t = translateRuntimeMessage;
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [scope, setScope] = useState<AbuseFilterScope>("all");
+  const [action, setAction] = useState<AbuseFilterAction>("log");
+  const [severity, setSeverity] = useState<"low" | "medium" | "high">(
+    "medium",
+  );
+  const [enabled, setEnabled] = useState(true);
+  const [patternText, setPatternText] = useState(DEFAULT_PATTERN_JSON);
+
+  const patternError = useMemo(() => {
+    try {
+      const parsed = JSON.parse(patternText);
+      if (!parsed || typeof parsed !== "object" || !("type" in parsed)) {
+        return t(msg`pattern 必须是含有 type 字段的 JSON 对象`);
+      }
+      return null;
+    } catch (err) {
+      return (err as Error).message;
+    }
+  }, [patternText, t]);
+
+  function reset() {
+    setName("");
+    setDescription("");
+    setScope("all");
+    setAction("log");
+    setSeverity("medium");
+    setEnabled(true);
+    setPatternText(DEFAULT_PATTERN_JSON);
+  }
+
+  function submit() {
+    if (patternError) return;
+    if (!name.trim()) return;
+    onCreate({
+      name: name.trim(),
+      description: description.trim() || undefined,
+      enabled,
+      scope,
+      action,
+      severity,
+      pattern: JSON.parse(patternText) as CreateFilterInput["pattern"],
+    });
+    reset();
+    setOpen(false);
+  }
+
+  if (!open) {
+    return (
+      <Card className="flex items-center justify-between p-3">
+        <span className="text-sm text-[color:var(--text-muted)]">
+          <Trans>新建过滤规则：name + pattern + 命中后动作。</Trans>
+        </span>
+        <Button size="sm" variant="primary" onClick={() => setOpen(true)}>
+          <Trans>+ 新建过滤器</Trans>
+        </Button>
+      </Card>
+    );
+  }
+
+  return (
+    <AppSection className="space-y-4">
+      <div className="flex items-center gap-3">
+        <h2 className="text-base font-semibold">
+          <Trans>新建过滤器</Trans>
+        </h2>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="ml-auto"
+          onClick={() => {
+            reset();
+            setOpen(false);
+          }}
+        >
+          <Trans>关闭</Trans>
+        </Button>
+      </div>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <FormRow label={t(msg`规则名称`)} required>
+          <TextField
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={t(msg`例如：明显广告关键字`)}
+          />
+        </FormRow>
+        <FormRow label={t(msg`描述`)}>
+          <TextField
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder={t(msg`简短说明命中条件与目的`)}
+          />
+        </FormRow>
+        <FormRow label={t(msg`扫描范围 (scope)`)}>
+          <select
+            className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
+            value={scope}
+            onChange={(e) => setScope(e.target.value as AbuseFilterScope)}
+          >
+            <option value="all">{t(msg`全部 (all)`)}</option>
+            <option value="content">{t(msg`仅档案 (content)`)}</option>
+            <option value="recipe">{t(msg`仅角色逻辑 (recipe)`)}</option>
+          </select>
+        </FormRow>
+        <FormRow label={t(msg`命中后动作 (action)`)}>
+          <select
+            className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
+            value={action}
+            onChange={(e) =>
+              setAction(e.target.value as AbuseFilterAction)
+            }
+          >
+            <option value="log">{t(msg`记录 (log)`)}</option>
+            <option value="warn">{t(msg`警告 (warn)`)}</option>
+            <option value="tag_high_risk">
+              {t(msg`标高风险 (tag_high_risk)`)}
+            </option>
+            <option value="block">{t(msg`拦截 (block)`)}</option>
+          </select>
+        </FormRow>
+        <FormRow label={t(msg`严重等级`)}>
+          <select
+            className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
+            value={severity}
+            onChange={(e) =>
+              setSeverity(e.target.value as "low" | "medium" | "high")
+            }
+          >
+            <option value="low">{t(msg`低`)}</option>
+            <option value="medium">{t(msg`中`)}</option>
+            <option value="high">{t(msg`高`)}</option>
+          </select>
+        </FormRow>
+        <FormRow label={t(msg`启用`)}>
+          <label className="inline-flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={enabled}
+              onChange={(e) => setEnabled(e.target.checked)}
+            />
+            <Trans>创建后立即生效</Trans>
+          </label>
+        </FormRow>
+      </div>
+      <FormRow
+        label={t(msg`Pattern (JSON)`)}
+        hint={t(
+          msg`支持 regex / shrink / frequency / link_flood / keyword_list 等类型，必须含 type 字段`,
+        )}
+      >
+        <TextAreaField
+          rows={6}
+          value={patternText}
+          onChange={(e) => setPatternText(e.target.value)}
+        />
+        {patternError && (
+          <div className="mt-1 text-xs text-[color:var(--state-danger-text)]">
+            {patternError}
+          </div>
+        )}
+      </FormRow>
+      {error && <InlineNotice tone="danger">{error}</InlineNotice>}
+      <div className="flex flex-wrap items-center gap-3">
+        <Button
+          variant="primary"
+          disabled={loading || !name.trim() || patternError !== null}
+          onClick={submit}
+        >
+          {loading ? t(msg`提交中...`) : t(msg`提交并启用`)}
+        </Button>
+      </div>
+    </AppSection>
   );
 }

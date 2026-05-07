@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -43,6 +43,25 @@ export function AdminProtectionPage() {
     reason: string;
   }>({ level: "none", reviewPolicy: "open", expiresAt: "", reason: "" });
 
+  // 选中条目后用其当前保护设置预填表单，避免用户从空白开始重输。
+  // datetime-local 需要 "YYYY-MM-DDTHH:mm" 格式（无秒、无时区）。
+  useEffect(() => {
+    if (!pageQ.data) return;
+    const p = pageQ.data.page;
+    setForm({
+      level:
+        p.protectionLevel === "semi" || p.protectionLevel === "full"
+          ? p.protectionLevel
+          : "none",
+      reviewPolicy:
+        p.reviewPolicy === "pending_changes" ? "pending_changes" : "open",
+      expiresAt: p.protectionExpiresAt
+        ? new Date(p.protectionExpiresAt).toISOString().slice(0, 16)
+        : "",
+      reason: p.protectionReason ?? "",
+    });
+  }, [pageQ.data]);
+
   const setProtMut = useMutation({
     mutationFn: () =>
       wikiApi.setProtection(characterId, {
@@ -74,15 +93,7 @@ export function AdminProtectionPage() {
           <select
             className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
             value={characterId}
-            onChange={(e) => {
-              setCharacterId(e.target.value);
-              setForm({
-                level: "none",
-                reviewPolicy: "open",
-                expiresAt: "",
-                reason: "",
-              });
-            }}
+            onChange={(e) => setCharacterId(e.target.value)}
           >
             <option value="">{t(msg`— 选择 —`)}</option>
             {(charactersQ.data ?? []).map((c) => (
