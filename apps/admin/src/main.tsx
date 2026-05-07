@@ -10,6 +10,7 @@ import { queryClient } from "./lib/query-client";
 import { configureAdminContractsRuntime } from "./lib/core-api-base";
 import { initAdminDensity } from "./lib/use-density";
 import { router } from "./router";
+import { AdminBootstrapGate } from "./components/admin-bootstrap-gate";
 
 configureAdminContractsRuntime();
 initAdminDensity();
@@ -21,7 +22,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       fallback={<LoadingBlock className="m-6" />}
     >
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <AdminBootstrapGate>
+          <RouterProvider router={router} />
+        </AdminBootstrapGate>
       </QueryClientProvider>
     </AppLocaleProvider>
   </React.StrictMode>,

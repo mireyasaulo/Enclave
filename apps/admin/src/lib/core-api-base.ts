@@ -1,18 +1,41 @@
-import { setCoreApiBaseUrlProvider } from "@yinjie/contracts";
+import {
+  setCloudApiBaseUrlProvider,
+  setCoreApiBaseUrlProvider,
+} from "@yinjie/contracts";
+import { getAdminRuntime } from "../runtime/admin-runtime-store";
 
-export function resolveAdminCoreApiBaseUrl() {
-  const configuredBase = import.meta.env.VITE_CORE_API_BASE_URL?.trim();
-  if (configuredBase) {
-    return configuredBase.replace(/\/+$/, "");
-  }
+const FALLBACK_CLOUD_API_BASE_URL = "http://127.0.0.1:3001";
 
-  if (typeof window !== "undefined" && (window.location.protocol === "http:" || window.location.protocol === "https:")) {
-    return window.location.origin;
-  }
+function trim(value?: string | null) {
+  const normalized = value?.trim().replace(/\/+$/, "");
+  return normalized || undefined;
+}
 
-  return "http://localhost:3000";
+function envCloudApiBaseUrl() {
+  return trim(import.meta.env.VITE_CLOUD_API_BASE_URL);
+}
+
+function envCoreApiBaseUrl() {
+  return trim(import.meta.env.VITE_CORE_API_BASE_URL);
+}
+
+export function resolveAdminCoreApiBaseUrl(): string {
+  return (
+    trim(getAdminRuntime().apiBaseUrl) ??
+    envCoreApiBaseUrl() ??
+    ""
+  );
+}
+
+export function resolveAdminCloudApiBaseUrl(): string {
+  return (
+    trim(getAdminRuntime().cloudApiBaseUrl) ??
+    envCloudApiBaseUrl() ??
+    FALLBACK_CLOUD_API_BASE_URL
+  );
 }
 
 export function configureAdminContractsRuntime() {
-  setCoreApiBaseUrlProvider(() => resolveAdminCoreApiBaseUrl());
+  setCoreApiBaseUrlProvider(() => resolveAdminCoreApiBaseUrl() || undefined);
+  setCloudApiBaseUrlProvider(() => resolveAdminCloudApiBaseUrl() || undefined);
 }
