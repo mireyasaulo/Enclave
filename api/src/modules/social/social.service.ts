@@ -19,6 +19,7 @@ import { CharactersService } from '../characters/characters.service';
 import { AppEvents, EventBusService } from '../events/event-bus.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { WorldLanguageService } from '../config/world-language.service';
+import { addDays, formatLocalDate, getSparkTier } from './spark-utils';
 
 const ACTIVE_FRIENDSHIP_STATUSES = new Set(['friend', 'close', 'best']);
 export const DEFAULT_FRIENDSHIP_CHARACTER_IDS = [...DEFAULT_CHARACTER_IDS];
@@ -792,6 +793,83 @@ export class SocialService {
     );
     friendship.lastInteractedAt = new Date();
     await this.friendshipRepo.save(friendship);
+  }
+
+  async recordSparkInteraction(
+    characterId: string,
+  ): Promise<{ streak: number; tier: number; isNew: boolean }> {
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const friendship = await this.friendshipRepo.findOneBy({
+      ownerId: owner.id,
+      characterId,
+    });
+    if (!friendship) return { streak: 0, tier: 0, isNew: false };
+
+    const now = new Date();
+    const today = formatLocalDate(now);
+    const yesterday = formatLocalDate(addDays(now, -1));
+
+    if (friendship.sparkLastDay === today) {
+      return {
+        streak: friendship.sparkStreak,
+        tier: getSparkTier(friendship.sparkStreak),
+        isNew: false,
+      };
+    }
+
+    const prevStreak = friendship.sparkStreak ?? 0;
+    let nextStreak: number;
+    let startedAt: Date | null;
+    if (friendship.sparkLastDay === yesterday) {
+      nextStreak = prevStreak + 1;
+      startedAt = friendship.sparkStartedAt ?? now;
+    } else {
+      nextStreak = 1;
+      startedAt = now;
+    }
+
+    friendship.sparkStreak = nextStreak;
+    friendship.sparkStartedAt = startedAt;
+    friendship.sparkLastDay = today;
+    friendship.lastInteractedAt = now;
+    await this.friendshipRepo.save(friendship);
+
+    const prevTier = getSparkTier(prevStreak);
+    const currTier = getSparkTier(nextStreak);
+    if (currTier > prevTier) {
+      this.eventBus.emit(AppEvents.SPARK_UPGRADED, {
+        ownerId: owner.id,
+        characterId,
+        streak: nextStreak,
+        tier: currTier,
+      });
+    }
+
+    return { streak: nextStreak, tier: currTier, isNew: prevStreak < 3 && nextStreak >= 3 };
+  }
+
+  async resetExpiredSparks(): Promise<number> {
+    const now = new Date();
+    const today = formatLocalDate(now);
+    const yesterday = formatLocalDate(addDays(now, -1));
+    const stale = await this.friendshipRepo
+      .createQueryBuilder('f')
+      .where('f.sparkStreak > 0')
+      .getMany();
+
+    let resetCount = 0;
+    for (const f of stale) {
+      if (f.sparkLastDay === today || f.sparkLastDay === yesterday) continue;
+      f.sparkStreak = 0;
+      f.sparkStartedAt = null;
+      await this.friendshipRepo.save(f);
+      this.eventBus.emit(AppEvents.SPARK_RESET, {
+        ownerId: f.ownerId,
+        characterId: f.characterId,
+      });
+      resetCount++;
+    }
+    return resetCount;
   }
 
   private async activateFriendship(
