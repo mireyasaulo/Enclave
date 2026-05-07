@@ -1068,7 +1068,7 @@ export function ChannelsPage() {
               type="button"
               onClick={() => handleSectionChange(section.key)}
               className={cn(
-                "rounded-full px-2 py-0.5 text-[8px] transition",
+                "inline-flex h-9 items-center rounded-full px-3 text-[11px] transition",
                 activeSection === section.key
                   ? "bg-[rgba(7,193,96,0.12)] font-medium text-[#07c160]"
                   : "border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] text-[color:var(--text-muted)]",
@@ -1279,7 +1279,7 @@ function MobileChannelsStatusCard({
     >
       <div
         className={cn(
-          "mx-auto inline-flex rounded-full px-2 py-0.5 text-[8px] font-medium tracking-[0.04em]",
+          "mx-auto inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium tracking-[0.04em]",
           tone === "danger"
             ? "bg-[rgba(220,38,38,0.08)] text-[color:var(--state-danger-text)]"
             : "bg-[rgba(7,193,96,0.1)] text-[#07c160]",
@@ -1568,7 +1568,7 @@ function MobileChannelsCard({
                   <div className="truncate text-[12px] font-medium">
                     {post.authorName}
                   </div>
-                  <div className="mt-0.5 text-[9px] text-white/70">
+                  <div className="mt-0.5 text-[11px] text-white/70">
                     {t(
                       msg`${formatTimestamp(post.createdAt)} · 视频号动态`,
                     )}
