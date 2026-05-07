@@ -12,16 +12,11 @@ import {
 } from "@yinjie/contracts";
 import {
   AlertCircle,
-  CalendarDays,
   Check,
+  ChevronDown,
   ChevronLeft,
-  ChevronRight,
-  FileImage,
-  FileText,
-  Link2,
   LoaderCircle,
   Search,
-  Users,
   X,
 } from "lucide-react";
 import { cn } from "@yinjie/ui";
@@ -180,22 +175,13 @@ export function DesktopChatHistoryPanel({
   );
   const dateRange = resolveDateRange(quickDateFilter, customDate);
   const hasDateFilter = Boolean(dateRange.dateFrom) || Boolean(dateRange.dateTo);
-  const hasStructuredFilters =
-    activeCategory !== "all" || Boolean(senderId) || hasDateFilter;
-  const activeFilterLabels = buildActiveFilterLabels({
-    keyword: debouncedKeyword,
-    activeCategory,
-    selectedSenderLabel: selectedSender?.label,
-    quickDateFilter,
-    customDate,
-  });
   const hasSearchRequest =
     Boolean(debouncedKeyword) ||
     activeCategory !== "all" ||
     Boolean(senderId) ||
     Boolean(dateRange.dateFrom) ||
     Boolean(dateRange.dateTo);
-  const searchQueryEnabled = hasSearchRequest && selectorView === null;
+  const searchQueryEnabled = selectorView === null;
 
   const resultsQuery = useInfiniteQuery({
     queryKey: [
@@ -235,19 +221,8 @@ export function DesktopChatHistoryPanel({
   const resultSections = buildResultSections(resultItems);
   const totalResults = resultsQuery.data?.pages[0]?.total ?? resultItems.length;
 
-  const showSearchMainView = !hasSearchRequest && selectorView === null;
-  const showResultsView = hasSearchRequest && selectorView === null;
-  const showHeaderActionsRow = activeFilterLabels.length > 0;
+  const showResultsView = selectorView === null;
   const openedFromDetails = Boolean(onBackToDetails);
-  const resultSummary = buildResultSummary({
-    keyword: debouncedKeyword,
-    activeCategory,
-    selectedSenderLabel: selectedSender?.label,
-    quickDateFilter,
-    customDate,
-    conversationTitle: conversation.title,
-    openedFromDetails,
-  });
   const emptyStateCopy = buildEmptyStateCopy({
     keyword: debouncedKeyword,
     activeCategory,
@@ -282,83 +257,6 @@ export function DesktopChatHistoryPanel({
     }
   }
 
-  function clearSenderFilter(refocus = true) {
-    setSenderId("");
-    setMemberKeyword("");
-    if (refocus) {
-      focusSearchInput(true);
-    }
-  }
-
-  function clearDateFilter(refocus = true) {
-    setQuickDateFilter("all");
-    setCustomDate("");
-    if (refocus) {
-      focusSearchInput(true);
-    }
-  }
-
-  function clearStructuredFilters() {
-    clearCategoryFilter(false);
-    clearDateFilter(false);
-    clearSenderFilter(false);
-    setSelectorView(null);
-    focusSearchInput(true);
-  }
-
-  function clearAllFilters() {
-    setKeyword("");
-    setDebouncedKeyword("");
-    setActiveCategory("all");
-    setQuickDateFilter("all");
-    setCustomDate("");
-    setSenderId("");
-    setSelectorView(null);
-    setMemberKeyword("");
-    focusSearchInput();
-  }
-
-  const activeFilterChips = [
-    debouncedKeyword
-      ? {
-          key: "keyword",
-          label: t(msg`关键词 · ${debouncedKeyword}`),
-          onRemove: clearKeywordFilter,
-        }
-      : null,
-    activeCategory !== "all"
-      ? {
-          key: "category",
-          label: t(msg`分类 · ${resolveCategoryLabel(activeCategory)}`),
-          onRemove: clearCategoryFilter,
-        }
-      : null,
-    selectedSender?.label
-      ? {
-          key: "sender",
-          label: t(msg`成员 · ${selectedSender.label}`),
-          onRemove: clearSenderFilter,
-        }
-      : null,
-    customDate
-      ? {
-          key: "date-custom",
-          label: t(msg`日期 · ${customDate}`),
-          onRemove: clearDateFilter,
-        }
-      : quickDateFilter !== "all"
-        ? {
-            key: "date-quick",
-            label: t(msg`日期 · ${resolveQuickDateFilterLabel(quickDateFilter)}`),
-            onRemove: clearDateFilter,
-          }
-        : null,
-  ].filter(Boolean) as Array<{
-    key: string;
-    label: string;
-    onRemove: () => void;
-  }>;
-
   return (
     <div className="flex h-full min-h-0 flex-col bg-[#f7f7f7]">
       <div
@@ -372,23 +270,8 @@ export function DesktopChatHistoryPanel({
             isDialog ? "mx-auto w-full max-w-[680px]" : "",
           )}
         >
-        {showHeaderActionsRow ? (
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={clearAllFilters}
-              className="inline-flex h-6 items-center rounded-full bg-[#f6f6f6] px-2.5 text-[11px] text-[color:var(--text-secondary)] transition hover:bg-[#efefef] hover:text-[color:var(--text-primary)]"
-            >
-              {t(msg`清空`)}
-            </button>
-          </div>
-        ) : null}
-
         <label
-          className={cn(
-            "flex items-center gap-2 rounded-[10px] border border-[rgba(0,0,0,0.04)] bg-[#f4f4f4] px-3 py-2.5 transition-[border-color,background-color] focus-within:border-[rgba(7,193,96,0.2)] focus-within:bg-white",
-            showHeaderActionsRow ? "mt-2" : "",
-          )}
+          className="flex items-center gap-2 rounded-[10px] border border-[rgba(0,0,0,0.04)] bg-[#f4f4f4] px-3 py-2.5 transition-[border-color,background-color] focus-within:border-[rgba(7,193,96,0.2)] focus-within:bg-white"
         >
           <Search
             size={15}
@@ -433,21 +316,59 @@ export function DesktopChatHistoryPanel({
           </div>
         )}
 
-        {activeFilterChips.length ? (
-          <div className="mt-2.5 flex flex-wrap gap-1.5">
-            {activeFilterChips.map((chip) => (
-              <button
-                key={chip.key}
-                type="button"
-                onClick={chip.onRemove}
-                className="inline-flex items-center gap-1 rounded-full border border-[rgba(0,0,0,0.05)] bg-white px-2 py-1 text-[10px] text-[color:var(--text-secondary)] transition hover:border-[rgba(0,0,0,0.08)] hover:text-[color:var(--text-primary)]"
-              >
-                <span>{chip.label}</span>
-                <X size={10} />
-              </button>
-            ))}
-          </div>
-        ) : null}
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          "border-b border-[rgba(0,0,0,0.06)] bg-white",
+          isDialog ? "px-6" : "px-4",
+        )}
+      >
+        <div
+          className={cn(
+            "flex min-w-0 items-center gap-1 overflow-x-auto",
+            isDialog ? "mx-auto w-full max-w-[680px]" : "",
+          )}
+        >
+          <DesktopSearchTabButton
+            label={t(msg`全部`)}
+            active={activeCategory === "all"}
+            onClick={() => clearCategoryFilter(false)}
+          />
+          <DesktopSearchTabButton
+            label={t(msg`图片与视频`)}
+            active={activeCategory === "media"}
+            onClick={() => setActiveCategory("media")}
+          />
+          <DesktopSearchTabButton
+            label={t(msg`文件`)}
+            active={activeCategory === "files"}
+            onClick={() => setActiveCategory("files")}
+          />
+          <DesktopSearchTabButton
+            label={t(msg`链接`)}
+            active={activeCategory === "links"}
+            onClick={() => setActiveCategory("links")}
+          />
+          <DesktopSearchTabButton
+            label={
+              customDate ||
+              resolveQuickDateFilterLabel(quickDateFilter) ||
+              t(msg`日期`)
+            }
+            active={hasDateFilter}
+            withCaret
+            onClick={() => setSelectorView("date")}
+          />
+          {isGroupConversation ? (
+            <DesktopSearchTabButton
+              label={selectedSender?.label ?? t(msg`群成员`)}
+              active={Boolean(senderId)}
+              withCaret
+              onClick={() => setSelectorView("sender")}
+            />
+          ) : null}
         </div>
       </div>
 
@@ -628,103 +549,18 @@ export function DesktopChatHistoryPanel({
         </DesktopSearchPickerView>
       ) : null}
 
-      {showSearchMainView ? (
-        <div className="min-h-0 flex-1 overflow-auto">
-          <div
-            className={cn(
-              "pb-4 pt-3",
-              isDialog ? "mx-auto w-full max-w-[680px] px-6" : "px-3",
-            )}
-          >
-            <div className="px-1 text-[11px] tracking-[0.08em] text-[color:var(--text-dim)]">
-              {t(msg`按条件查找`)}
-            </div>
-            <div className="mt-2 overflow-hidden rounded-[12px] border border-[rgba(0,0,0,0.05)] bg-white">
-              <DesktopSearchEntryRow
-                icon={<CalendarDays size={16} />}
-                iconTone="calendar"
-                label={t(msg`日期`)}
-                value={
-                  customDate ||
-                  resolveQuickDateFilterLabel(quickDateFilter) ||
-                  t(msg`全部时间`)
-                }
-                onClick={() => setSelectorView("date")}
-              />
-              {isGroupConversation ? (
-                <DesktopSearchEntryRow
-                  icon={<Users size={16} />}
-                  iconTone="members"
-                  label={t(msg`群成员`)}
-                  value={selectedSender?.label ?? t(msg`全部成员`)}
-                  onClick={() => setSelectorView("sender")}
-                />
-              ) : null}
-            </div>
-
-            <div className="mt-4 px-1 text-[11px] tracking-[0.08em] text-[color:var(--text-dim)]">
-              {t(msg`按内容查找`)}
-            </div>
-            <div className="mt-2 overflow-hidden rounded-[12px] border border-[rgba(0,0,0,0.05)] bg-white">
-              <DesktopSearchEntryRow
-                icon={<FileImage size={16} />}
-                iconTone="media"
-                label={t(msg`图片与视频`)}
-                value={t(msg`查看媒体消息`)}
-                onClick={() => setActiveCategory("media")}
-              />
-              <DesktopSearchEntryRow
-                icon={<FileText size={16} />}
-                iconTone="files"
-                label={t(msg`文件`)}
-                value={t(msg`查看文件消息`)}
-                onClick={() => setActiveCategory("files")}
-              />
-              <DesktopSearchEntryRow
-                icon={<Link2 size={16} />}
-                iconTone="links"
-                label={t(msg`链接`)}
-                value={t(msg`查看链接消息`)}
-                onClick={() => setActiveCategory("links")}
-              />
-            </div>
-          </div>
-        </div>
-      ) : null}
-
       {showResultsView ? (
         <div className="min-h-0 flex-1 overflow-auto">
           <div className="sticky top-0 z-[2] border-b border-[rgba(0,0,0,0.06)] bg-[#f7f7f7]/95 backdrop-blur">
             <div className="bg-white">
-              <div className="flex items-center justify-between gap-3 px-4 py-3">
-                {hasStructuredFilters ? (
-                  <button
-                    type="button"
-                    onClick={clearStructuredFilters}
-                    className="inline-flex items-center gap-1 text-[12px] text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)]"
-                  >
-                    <ChevronLeft size={14} />
-                    {t(msg`返回筛选`)}
-                  </button>
-                ) : (
-                  <div className="text-[11px] tracking-[0.08em] text-[color:var(--text-dim)]">
-                    {t(msg`搜索结果`)}
-                  </div>
-                )}
-
+              <div className="flex items-center justify-between gap-3 px-5 py-2.5">
+                <div className="text-[11px] tracking-[0.08em] text-[color:var(--text-dim)]">
+                  {hasSearchRequest ? t(msg`搜索结果`) : t(msg`聊天记录`)}
+                </div>
                 <div className="rounded-full bg-[#f4f4f4] px-2 py-1 text-[11px] text-[color:var(--text-muted)]">
                   {resultsQuery.isLoading
                     ? t(msg`正在搜索...`)
                     : t(msg`共 ${totalResults} 条`)}
-                </div>
-              </div>
-
-              <div className="border-t border-[rgba(0,0,0,0.05)] px-4 pb-3 pt-2.5">
-                <div className="text-[13px] font-medium text-[color:var(--text-primary)]">
-                  {resultSummary.title}
-                </div>
-                <div className="mt-1 text-[11px] leading-5 text-[color:var(--text-muted)]">
-                  {resultSummary.description}
                 </div>
               </div>
             </div>
@@ -941,70 +777,37 @@ function DesktopSearchFeedbackState({
   );
 }
 
-function DesktopSearchEntryRow({
-  icon,
-  iconTone = "default",
+function DesktopSearchTabButton({
   label,
-  value,
+  active,
+  withCaret = false,
   onClick,
 }: {
-  icon: ReactNode;
-  iconTone?: "default" | "calendar" | "members" | "media" | "files" | "links";
   label: string;
-  value: string;
+  active: boolean;
+  withCaret?: boolean;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="flex min-h-[58px] w-full items-center gap-3 border-b border-[rgba(0,0,0,0.06)] px-4 py-3.5 text-left transition last:border-b-0 hover:bg-[#fafafa]"
+      className={cn(
+        "relative inline-flex shrink-0 items-center gap-1 px-3 py-2.5 text-[13px] transition-colors",
+        active
+          ? "text-[color:var(--brand-primary)]"
+          : "text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]",
+      )}
     >
-      <span
-        className={cn(
-          "flex h-9 w-9 items-center justify-center rounded-[10px]",
-          resolveSearchEntryIconTone(iconTone),
-        )}
-      >
-        {icon}
-      </span>
-      <div className="min-w-0 flex-1">
-        <div className="text-[13px] font-medium text-[color:var(--text-primary)]">
-          {label}
-        </div>
-        <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
-          {value}
-        </div>
-      </div>
-      <ChevronRight size={15} className="text-[color:var(--text-dim)]" />
+      <span className="max-w-[160px] truncate">{label}</span>
+      {withCaret ? (
+        <ChevronDown size={13} className="shrink-0 opacity-70" />
+      ) : null}
+      {active ? (
+        <span className="absolute inset-x-2 bottom-0 h-[2px] rounded-full bg-[color:var(--brand-primary)]" />
+      ) : null}
     </button>
   );
-}
-
-function resolveSearchEntryIconTone(
-  tone: "default" | "calendar" | "members" | "media" | "files" | "links",
-) {
-  if (tone === "calendar") {
-    return "bg-[rgba(7,193,96,0.1)] text-[color:var(--brand-primary)]";
-  }
-
-  if (tone === "members") {
-    return "bg-[rgba(59,130,246,0.1)] text-[#2563eb]";
-  }
-
-  if (tone === "media") {
-    return "bg-[rgba(14,165,233,0.1)] text-[#0284c7]";
-  }
-
-  if (tone === "files") {
-    return "bg-[rgba(249,115,22,0.1)] text-[#ea580c]";
-  }
-
-  if (tone === "links") {
-    return "bg-[rgba(168,85,247,0.1)] text-[#7c3aed]";
-  }
-
-  return "bg-[#f3f3f3] text-[color:var(--text-secondary)]";
 }
 
 function DesktopSearchOptionRow({
@@ -1072,91 +875,6 @@ function buildSenderOptions(members: GroupMember[]): SenderOption[] {
   }));
 }
 
-function buildActiveFilterLabels(input: {
-  keyword: string;
-  activeCategory: ChatMessageSearchCategory;
-  selectedSenderLabel?: string;
-  quickDateFilter: QuickDateFilter;
-  customDate: string;
-}) {
-  const labels: string[] = [];
-
-  if (input.keyword) {
-    labels.push(t(msg`关键词 · ${input.keyword}`));
-  }
-
-  if (input.activeCategory !== "all") {
-    labels.push(t(msg`分类 · ${resolveCategoryLabel(input.activeCategory)}`));
-  }
-
-  if (input.selectedSenderLabel) {
-    labels.push(t(msg`成员 · ${input.selectedSenderLabel}`));
-  }
-
-  if (input.customDate) {
-    labels.push(t(msg`日期 · ${input.customDate}`));
-  } else {
-    const quickDateLabel = resolveQuickDateFilterLabel(input.quickDateFilter);
-    if (quickDateLabel) {
-      labels.push(t(msg`日期 · ${quickDateLabel}`));
-    }
-  }
-
-  return labels;
-}
-
-function buildResultSummary(input: {
-  keyword: string;
-  activeCategory: ChatMessageSearchCategory;
-  selectedSenderLabel?: string;
-  quickDateFilter: QuickDateFilter;
-  customDate: string;
-  conversationTitle: string;
-  openedFromDetails: boolean;
-}) {
-  const scopeDescription = t(msg`当前聊天 · ${input.conversationTitle}`);
-  const sourceDescription = input.openedFromDetails
-    ? t(msg`来自聊天信息`)
-    : "";
-  const baseDescription = [scopeDescription, sourceDescription]
-    .filter(Boolean)
-    .join(" · ");
-
-  if (input.keyword && input.activeCategory === "all" && !input.selectedSenderLabel) {
-    return {
-      title: t(msg`关键词“${input.keyword}”`),
-      description: baseDescription,
-    };
-  }
-
-  if (!input.keyword && input.activeCategory !== "all") {
-    return {
-      title: resolveCategoryLabel(input.activeCategory),
-      description: baseDescription,
-    };
-  }
-
-  if (!input.keyword && input.selectedSenderLabel) {
-    return {
-      title: t(msg`群成员 · ${input.selectedSenderLabel}`),
-      description: baseDescription,
-    };
-  }
-
-  if (!input.keyword && (input.customDate || resolveQuickDateFilterLabel(input.quickDateFilter))) {
-    const label = input.customDate || resolveQuickDateFilterLabel(input.quickDateFilter);
-    return {
-      title: t(msg`日期 · ${label}`),
-      description: baseDescription,
-    };
-  }
-
-  return {
-    title: input.keyword ? t(msg`搜索“${input.keyword}”`) : t(msg`当前筛选结果`),
-    description: baseDescription,
-  };
-}
-
 function buildEmptyStateCopy(input: {
   keyword: string;
   activeCategory: ChatMessageSearchCategory;
@@ -1167,7 +885,7 @@ function buildEmptyStateCopy(input: {
   if (input.keyword && input.activeCategory !== "all") {
     return {
       title: t(msg`没有找到匹配的${resolveCategoryLabel(input.activeCategory)}`),
-      description: t(msg`试试换个关键词，或者返回筛选页改用其他分类。`),
+      description: t(msg`试试换个关键词，或者切换其他分类。`),
     };
   }
 
@@ -1181,27 +899,27 @@ function buildEmptyStateCopy(input: {
   if (input.activeCategory !== "all") {
     return {
       title: t(msg`当前会话里还没有${resolveCategoryLabel(input.activeCategory)}`),
-      description: t(msg`返回筛选页试试其他分类，或者直接搜索关键词。`),
+      description: t(msg`换个分类试试，或者输入关键词直接搜索。`),
     };
   }
 
   if (input.selectedSenderLabel) {
     return {
       title: t(msg`没有找到 ${input.selectedSenderLabel} 的聊天记录`),
-      description: t(msg`换个群成员试试，或者返回筛选页查看全部成员。`),
+      description: t(msg`点击「群成员」选择其他成员，或切回「全部成员」。`),
     };
   }
 
   if (input.customDate || resolveQuickDateFilterLabel(input.quickDateFilter)) {
     return {
       title: t(msg`这个时间范围内没有聊天记录`),
-      description: t(msg`换个日期试试，或者返回筛选页清空时间条件。`),
+      description: t(msg`点击「日期」换个范围，或切回「全部时间」。`),
     };
   }
 
   return {
-    title: t(msg`没有找到相关聊天记录`),
-    description: t(msg`试试换个筛选条件，或者稍后再来查看。`),
+    title: t(msg`暂无聊天记录`),
+    description: t(msg`这个会话目前还没有任何消息，过会儿再来看看。`),
   };
 }
 
