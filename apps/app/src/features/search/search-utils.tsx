@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import {
   emptySearchMatchCounts,
-  searchCategoryLabels,
+  searchCategoryLabelDescriptors,
   type SearchCategory,
   type SearchMatchCounts,
   type SearchResultItem,
@@ -90,11 +90,10 @@ export function sortSearchResults(
 }
 
 export function groupSearchResults(results: SearchResultItem[]) {
-  return searchCategoryLabels
+  return searchCategoryLabelDescriptors
     .filter((item) => item.id !== "all")
     .map((item) => ({
       category: item.id as SearchResultCategory,
-      label: item.label,
       results: results.filter((result) => result.category === item.id),
     }))
     .filter((section) => section.results.length > 0);

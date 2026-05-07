@@ -6,6 +6,8 @@ import {
   type ChangeEvent,
   type ReactNode,
 } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
 import {
@@ -41,6 +43,8 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { isMissingGroupError } from "../lib/group-route-fallback";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+
+const t = translateRuntimeMessage;
 
 type UploadTarget = "default" | "group";
 
@@ -149,21 +153,21 @@ export function GroupChatBackgroundPage() {
         setGroupMode("custom");
         setGroupDraft(result.background);
       }
-      setNotice("背景图已上传，记得保存当前设置。");
+      setNotice(t(msg`背景图已上传，记得保存当前设置。`));
     },
   });
 
   const saveDefaultMutation = useMutation({
     mutationFn: async () => {
       if (!defaultDraft) {
-        throw new Error("请先选择默认背景图。");
+        throw new Error(t(msg`请先选择默认背景图。`));
       }
 
       return setWorldOwnerChatBackground({ background: defaultDraft }, baseUrl);
     },
     onSuccess: async (owner) => {
       setDefaultDraft(owner.defaultChatBackground ?? null);
-      setNotice("默认背景图已保存。");
+      setNotice(t(msg`默认背景图已保存。`));
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["world-owner", baseUrl] }),
         queryClient.invalidateQueries({
@@ -177,7 +181,7 @@ export function GroupChatBackgroundPage() {
     mutationFn: () => clearWorldOwnerChatBackground(baseUrl),
     onSuccess: async () => {
       setDefaultDraft(null);
-      setNotice("默认背景图已恢复系统背景。");
+      setNotice(t(msg`默认背景图已恢复系统背景。`));
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["world-owner", baseUrl] }),
         queryClient.invalidateQueries({
@@ -198,7 +202,7 @@ export function GroupChatBackgroundPage() {
       }
 
       if (!groupDraft) {
-        throw new Error("请先为当前群聊选择背景图。");
+        throw new Error(t(msg`请先为当前群聊选择背景图。`));
       }
 
       return setGroupBackground(
@@ -212,8 +216,8 @@ export function GroupChatBackgroundPage() {
       setGroupDraft(settings.conversationBackground ?? null);
       setNotice(
         settings.mode === "custom"
-          ? "当前群聊背景已保存。"
-          : "当前群聊已恢复跟随默认背景。",
+          ? t(msg`当前群聊背景已保存。`)
+          : t(msg`当前群聊已恢复跟随默认背景。`),
       );
       await queryClient.invalidateQueries({
         queryKey: ["app-group-background", baseUrl, groupId],
@@ -226,7 +230,7 @@ export function GroupChatBackgroundPage() {
     onSuccess: async () => {
       setGroupMode("inherit");
       setGroupDraft(null);
-      setNotice("当前群聊已恢复跟随默认背景。");
+      setNotice(t(msg`当前群聊已恢复跟随默认背景。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-group-background", baseUrl, groupId],
       });
@@ -300,13 +304,13 @@ export function GroupChatBackgroundPage() {
   ) => {
     if (target === "default") {
       setDefaultDraft(background);
-      setNotice("默认背景图已切到新预览，保存后生效。");
+      setNotice(t(msg`默认背景图已切到新预览，保存后生效。`));
       return;
     }
 
     setGroupMode("custom");
     setGroupDraft(background);
-    setNotice("当前群聊背景已切到新预览，保存后生效。");
+    setNotice(t(msg`当前群聊背景已切到新预览，保存后生效。`));
   };
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -324,12 +328,12 @@ export function GroupChatBackgroundPage() {
     <>
       {groupQuery.isLoading || backgroundQuery.isLoading ? (
         isDesktopLayout ? (
-          <LoadingBlock label="正在读取群聊背景..." />
+          <LoadingBlock label={t(msg`正在读取群聊背景...`)} />
         ) : (
           <MobileGroupBackgroundStatusCard
-            badge="读取中"
-            title="正在读取群聊背景"
-            description="稍等一下，正在同步默认背景和当前群聊设置。"
+            badge={t(msg`读取中`)}
+            title={t(msg`正在读取群聊背景`)}
+            description={t(msg`稍等一下，正在同步默认背景和当前群聊设置。`)}
             tone="loading"
           />
         )
@@ -339,8 +343,8 @@ export function GroupChatBackgroundPage() {
           <ErrorBlock message={groupQuery.error.message} />
         ) : (
           <MobileGroupBackgroundStatusCard
-            badge="读取失败"
-            title="群聊背景暂时不可用"
+            badge={t(msg`读取失败`)}
+            title={t(msg`群聊背景暂时不可用`)}
             description={groupQuery.error.message}
             tone="danger"
             action={
@@ -351,7 +355,7 @@ export function GroupChatBackgroundPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                   onClick={handleRetryLoad}
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </Button>
                 <Button
                   variant="secondary"
@@ -359,7 +363,7 @@ export function GroupChatBackgroundPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                   onClick={handleErrorStateAction}
                 >
-                  {safeReturnPath ? "返回上一页" : "返回群聊信息"}
+                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`返回群聊信息`)}
                 </Button>
               </div>
             }
@@ -371,8 +375,8 @@ export function GroupChatBackgroundPage() {
           <ErrorBlock message={backgroundQuery.error.message} />
         ) : (
           <MobileGroupBackgroundStatusCard
-            badge="读取失败"
-            title="群聊背景暂时不可用"
+            badge={t(msg`读取失败`)}
+            title={t(msg`群聊背景暂时不可用`)}
             description={backgroundQuery.error.message}
             tone="danger"
             action={
@@ -383,7 +387,7 @@ export function GroupChatBackgroundPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                   onClick={handleRetryLoad}
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </Button>
                 <Button
                   variant="secondary"
@@ -391,7 +395,7 @@ export function GroupChatBackgroundPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                   onClick={handleErrorStateAction}
                 >
-                  {safeReturnPath ? "返回上一页" : "返回群聊信息"}
+                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`返回群聊信息`)}
                 </Button>
               </div>
             }
@@ -413,7 +417,7 @@ export function GroupChatBackgroundPage() {
                 onClick={handleErrorStateAction}
                 className="shrink-0 rounded-full border border-[rgba(220,38,38,0.14)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--state-danger-text)]"
               >
-                {safeReturnPath ? "返回上一页" : "返回群聊信息"}
+                {safeReturnPath ? t(msg`返回上一页`) : t(msg`返回群聊信息`)}
               </button>
             </div>
           </InlineNotice>
@@ -435,14 +439,14 @@ export function GroupChatBackgroundPage() {
       {!groupQuery.isLoading && !groupQuery.data ? (
         isDesktopLayout ? (
           <EmptyPanel
-            title="群聊不存在"
-            description="这个群聊暂时不可用，返回上一页后再试一次。"
+            title={t(msg`群聊不存在`)}
+            description={t(msg`这个群聊暂时不可用，返回上一页后再试一次。`)}
           />
         ) : (
           <MobileGroupBackgroundStatusCard
-            badge="群聊"
-            title="群聊不存在"
-            description="这个群聊暂时不可用，可以先重试读取，或返回上一页后再试。"
+            badge={t(msg`群聊`)}
+            title={t(msg`群聊不存在`)}
+            description={t(msg`这个群聊暂时不可用，可以先重试读取，或返回上一页后再试。`)}
             action={
               <div className="flex flex-wrap items-center justify-center gap-2">
                 <Button
@@ -451,7 +455,7 @@ export function GroupChatBackgroundPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                   onClick={handleRetryLoad}
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </Button>
                 <Button
                   variant="secondary"
@@ -459,7 +463,7 @@ export function GroupChatBackgroundPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                   onClick={handleMissingGroupAction}
                 >
-                  {safeReturnPath ? "返回上一页" : "返回消息列表"}
+                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`返回消息列表`)}
                 </Button>
               </div>
             }
@@ -475,16 +479,16 @@ export function GroupChatBackgroundPage() {
               title={groupQuery.data.name}
               subtitle={
                 groupMode === "custom"
-                  ? "当前群聊正在预览专属背景"
-                  : "当前群聊正在预览默认背景"
+                  ? t(msg`当前群聊正在预览专属背景`)
+                  : t(msg`当前群聊正在预览默认背景`)
               }
             />
           ) : null}
 
           <SectionCard
             compact={!isDesktopLayout}
-            title="默认背景图"
-            description="应用到所有未单独设置专属背景的聊天。"
+            title={t(msg`默认背景图`)}
+            description={t(msg`应用到所有未单独设置专属背景的聊天。`)}
             status={getChatBackgroundLabel(defaultDraft)}
           >
             <PresetGrid
@@ -501,7 +505,7 @@ export function GroupChatBackgroundPage() {
                 onClick={() => openPicker("default")}
                 className={!isDesktopLayout ? "min-h-11 rounded-full px-4" : undefined}
               >
-                上传图片
+                {t(msg`上传图片`)}
               </Button>
               <Button
                 variant="primary"
@@ -509,7 +513,7 @@ export function GroupChatBackgroundPage() {
                 onClick={() => saveDefaultMutation.mutate()}
                 className={!isDesktopLayout ? "min-h-11 rounded-full px-4" : undefined}
               >
-                保存默认背景
+                {t(msg`保存默认背景`)}
               </Button>
               <Button
                 variant="ghost"
@@ -517,19 +521,19 @@ export function GroupChatBackgroundPage() {
                 onClick={() => clearDefaultMutation.mutate()}
                 className={!isDesktopLayout ? "min-h-11 rounded-full px-4" : undefined}
               >
-                恢复系统背景
+                {t(msg`恢复系统背景`)}
               </Button>
             </div>
           </SectionCard>
 
           <SectionCard
             compact={!isDesktopLayout}
-            title="当前群聊背景"
-            description="群聊可设置专属背景，优先级高于默认背景图。"
+            title={t(msg`当前群聊背景`)}
+            description={t(msg`群聊可设置专属背景，优先级高于默认背景图。`)}
             status={
               groupMode === "custom"
                 ? getChatBackgroundLabel(groupDraft)
-                : "跟随默认背景"
+                : t(msg`跟随默认背景`)
             }
           >
             <div className="flex flex-wrap gap-2">
@@ -537,14 +541,14 @@ export function GroupChatBackgroundPage() {
                 active={groupMode === "inherit"}
                 compact={!isDesktopLayout}
                 disabled={busy}
-                label="跟随默认"
+                label={t(msg`跟随默认`)}
                 onClick={() => setGroupMode("inherit")}
               />
               <ModeChip
                 active={groupMode === "custom"}
                 compact={!isDesktopLayout}
                 disabled={busy}
-                label="单独设置"
+                label={t(msg`单独设置`)}
                 onClick={() => setGroupMode("custom")}
               />
             </div>
@@ -565,7 +569,7 @@ export function GroupChatBackgroundPage() {
                     onClick={() => openPicker("group")}
                     className={!isDesktopLayout ? "min-h-11 rounded-full px-4" : undefined}
                   >
-                    上传图片
+                    {t(msg`上传图片`)}
                   </Button>
                   <Button
                     variant="ghost"
@@ -573,7 +577,7 @@ export function GroupChatBackgroundPage() {
                     onClick={() => clearGroupMutation.mutate()}
                     className={!isDesktopLayout ? "min-h-11 rounded-full px-4" : undefined}
                   >
-                    跟随默认背景
+                    {t(msg`跟随默认背景`)}
                   </Button>
                 </div>
               </>
@@ -585,7 +589,7 @@ export function GroupChatBackgroundPage() {
                     : "rounded-[16px] border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas)] px-4 py-3 text-xs leading-6 text-[color:var(--text-secondary)]"
                 }
               >
-                当前群聊会直接沿用默认背景图。切换到“单独设置”后，可以挑选群聊专属背景。
+                {t(msg`当前群聊会直接沿用默认背景图。切换到“单独设置”后，可以挑选群聊专属背景。`)}
               </div>
             )}
 
@@ -596,7 +600,7 @@ export function GroupChatBackgroundPage() {
                 onClick={() => saveGroupMutation.mutate()}
                 className={!isDesktopLayout ? "min-h-11 rounded-full px-4" : undefined}
               >
-                {groupMode === "custom" ? "保存群聊背景" : "保存当前群聊设置"}
+                {groupMode === "custom" ? t(msg`保存群聊背景`) : t(msg`保存当前群聊设置`)}
               </Button>
             </div>
           </SectionCard>
@@ -620,10 +624,10 @@ export function GroupChatBackgroundPage() {
           <div className="flex items-center justify-between rounded-[16px] border border-[color:var(--border-faint)] bg-white/78 px-5 py-4 backdrop-blur-xl">
             <div>
               <div className="text-xs tracking-[0.12em] text-[color:var(--text-dim)]">
-                群聊背景
+                {t(msg`群聊背景`)}
               </div>
               <div className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">
-                {groupQuery.data?.name ?? "群聊背景"}
+                {groupQuery.data?.name ?? t(msg`群聊背景`)}
               </div>
             </div>
             <Button
@@ -643,7 +647,7 @@ export function GroupChatBackgroundPage() {
               }}
               className="rounded-[10px] border-[color:var(--border-faint)] bg-white shadow-none hover:bg-[color:var(--surface-console)]"
             >
-              返回群聊信息
+              {t(msg`返回群聊信息`)}
             </Button>
           </div>
           <div className="grid gap-5 xl:grid-cols-[400px_minmax(0,1fr)]">
@@ -652,7 +656,7 @@ export function GroupChatBackgroundPage() {
                 <ChatBackgroundPreview
                   background={effectivePreviewBackground}
                   title={groupQuery.data.name}
-                  subtitle="桌面端预览会同步展示在群聊工作区"
+                  subtitle={t(msg`桌面端预览会同步展示在群聊工作区`)}
                 />
               ) : null}
             </div>
@@ -665,8 +669,8 @@ export function GroupChatBackgroundPage() {
 
   return (
     <ChatDetailsShell
-      title={groupQuery.data?.name ?? "群聊背景"}
-      subtitle="默认背景和群聊专属背景"
+      title={groupQuery.data?.name ?? t(msg`群聊背景`)}
+      subtitle={t(msg`默认背景和群聊专属背景`)}
       onBack={() => {
         navigateBackOrFallback(() => {
           void navigate({
@@ -729,7 +733,7 @@ function SectionCard({
               : "mt-3 inline-flex rounded-[8px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 py-1 text-xs text-[color:var(--text-muted)]"
           }
         >
-          当前：{status}
+          {t(msg`当前：${status}`)}
         </div>
       </div>
       <div className="space-y-4">{children}</div>

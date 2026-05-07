@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
 import {
   ArrowLeft,
@@ -33,6 +35,8 @@ import type {
   Slot,
   VisitLogEntry,
 } from "./parking-war-types";
+
+const t = translateRuntimeMessage;
 
 type Variant = "embedded" | "fullscreen";
 
@@ -128,7 +132,7 @@ export function ParkingWarGame({
           <button
             type="button"
             onClick={onExit}
-            aria-label="退出游戏"
+            aria-label={t(msg`退出游戏`)}
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.25)]"
           >
             {variant === "fullscreen" ? <ArrowLeft size={15} /> : <X size={15} />}
@@ -136,16 +140,16 @@ export function ParkingWarGame({
         )}
         <div className="flex min-w-0 flex-1 items-center gap-1.5">
           <span className="text-[16px]">🅿️</span>
-          <span className="text-[14px] font-bold tracking-wide">抢车位</span>
+          <span className="text-[14px] font-bold tracking-wide">{t(msg`抢车位`)}</span>
         </div>
         {canClaimToday ? (
           <div className="flex items-center gap-1 rounded-full bg-[#f59e0b] px-2.5 py-0.5 text-[11px] font-bold text-white shadow-[0_1px_4px_rgba(0,0,0,0.20)]">
             <Star size={9} />
-            签到 +¥{DAILY_BONUS_AMOUNT}
+            {t(msg`签到`)} +¥{DAILY_BONUS_AMOUNT}
           </div>
         ) : (
           <div className="rounded-full bg-[rgba(255,255,255,0.14)] px-2.5 py-0.5 text-[11px] text-[rgba(255,255,255,0.55)]">
-            已签到
+            {t(msg`已签到`)}
           </div>
         )}
         <div className="flex shrink-0 items-center gap-1 rounded-full bg-[rgba(255,255,255,0.18)] px-3 py-1 text-[13px] font-bold">
@@ -154,7 +158,7 @@ export function ParkingWarGame({
         <button
           type="button"
           onClick={() => setSheetView("leaderboard")}
-          aria-label="更多"
+          aria-label={t(msg`更多`)}
           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[rgba(255,255,255,0.15)] hover:bg-[rgba(255,255,255,0.25)]"
         >
           <MoreHorizontal size={15} />
@@ -166,7 +170,7 @@ export function ParkingWarGame({
         {/* NPC sidebar (sm+) */}
         <aside className="hidden w-[160px] shrink-0 flex-col border-r border-[rgba(0,0,0,0.10)] bg-[#e8e0d8] sm:flex">
           <div className="border-b border-[rgba(0,0,0,0.08)] px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[#8a7e74]">
-            好友车场
+            {t(msg`好友车场`)}
           </div>
           {/* My lot */}
           <button
@@ -181,10 +185,10 @@ export function ParkingWarGame({
           >
             <span className="shrink-0 text-[18px]">🏠</span>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-[12px] font-semibold">我的车场</div>
+              <div className="truncate text-[12px] font-semibold">{t(msg`我的车场`)}</div>
               <div className="text-[10px] text-[#8a7e74]">
-                {state.playerLot.slots.filter((s) => !s.parked).length} 空
-                · {state.playerLot.slots.filter((s) => s.parked).length} 占
+                {state.playerLot.slots.filter((s) => !s.parked).length} {t(msg`空`)}
+                · {state.playerLot.slots.filter((s) => s.parked).length} {t(msg`占`)}
               </div>
             </div>
             {isHome && <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#2d5a27]" />}
@@ -216,7 +220,7 @@ export function ParkingWarGame({
                       <span className="truncate text-[12px] font-semibold">{npc.name}</span>
                       {myCarHere && <span className="text-[10px]">🚗</span>}
                     </div>
-                    <div className="text-[10px] text-[#8a7e74]">{emptyCount} 空位</div>
+                    <div className="text-[10px] text-[#8a7e74]">{emptyCount} {t(msg`空位`)}</div>
                   </div>
                   <ChevronRight size={12} className="shrink-0 text-[#b0a89e]" />
                 </button>
@@ -302,7 +306,7 @@ export function ParkingWarGame({
                 : "border border-[rgba(0,0,0,0.12)] bg-white text-[#4a4040]",
             )}
           >
-            🏠 我的
+            🏠 {t(msg`我的`)}
           </button>
           {NPC_OPPONENTS.map((npc) => {
             const myCarHere = playerCarsInNpcLots[npc.id];
@@ -368,10 +372,10 @@ function LotActionBar({
       {isHome ? (
         <>
           <div className="min-w-0 flex-1 text-[12px] text-[#6b5e52]">
-            <span className="text-[13px] font-bold text-[#2d5a27]">我的车场</span>
+            <span className="text-[13px] font-bold text-[#2d5a27]">{t(msg`我的车场`)}</span>
             {homeStats.mine > 0 && (
               <span className="ml-2">
-                待收{" "}
+                {t(msg`待收`)}{" "}
                 <span className="font-semibold text-[#15803d]">
                   ¥{homeStats.mine.toFixed(2)}
                 </span>
@@ -379,7 +383,7 @@ function LotActionBar({
             )}
             {homeStats.theirs > 0 && (
               <span className="ml-2">
-                外来{" "}
+                {t(msg`外来`)}{" "}
                 <span className="font-semibold text-[#c2410c]">
                   ¥{homeStats.theirs.toFixed(2)}
                 </span>
@@ -387,21 +391,21 @@ function LotActionBar({
             )}
           </div>
           <GameBtn color="green" onClick={onCollectAll} disabled={homeStats.mine <= 0}>
-            全部收钱
+            {t(msg`全部收钱`)}
           </GameBtn>
           <GameBtn color="orange" onClick={onFineAll} disabled={homeStats.theirs <= 0}>
-            全部贴条
+            {t(msg`全部贴条`)}
           </GameBtn>
         </>
       ) : (
         <>
           <div className="min-w-0 flex-1 text-[12px] text-[#6b5e52]">
             <span className="text-[13px] font-bold text-[#d65e2f]">
-              {activeNpc?.name ?? ""}的车场
+              {activeNpc?.name ?? ""}{t(msg`的车场`)}
             </span>
             {visitStats.myEarnings > 0 && (
               <span className="ml-2">
-                我的车{" "}
+                {t(msg`我的车`)}{" "}
                 <span className="font-semibold text-[#0284c7]">
                   ¥{visitStats.myEarnings.toFixed(2)}
                 </span>
@@ -409,7 +413,7 @@ function LotActionBar({
             )}
           </div>
           <GameBtn color="blue" onClick={onRecallAll} disabled={visitStats.myEarnings <= 0}>
-            全部开走
+            {t(msg`全部开走`)}
           </GameBtn>
         </>
       )}
@@ -482,7 +486,7 @@ function HomeParkingGrid({
       {idleCarIds.length > 0 && (
         <div className="rounded-xl border border-[rgba(0,0,0,0.10)] bg-[rgba(255,255,255,0.65)] px-3 py-2">
           <div className="mb-1.5 text-[11px] font-medium text-[#8a7e74]">
-            车库里还有空着的车
+            {t(msg`车库里还有空着的车`)}
           </div>
           <div className="flex flex-wrap gap-1.5">
             {idleCarIds.map((carId) => {
@@ -496,7 +500,7 @@ function HomeParkingGrid({
                   onClick={() => onParkHome(carId)}
                   className="rounded-lg border border-[rgba(45,90,39,0.30)] bg-[#f0fdf4] px-2.5 py-1 text-[12px] font-medium text-[#15803d] hover:bg-[#dcfce7]"
                 >
-                  {spec.emoji} 停 {spec.name}
+                  {spec.emoji} {t(msg`停`)} {spec.name}
                 </button>
               );
             })}
@@ -525,7 +529,7 @@ function HomeBay({
       <div className="flex min-h-[108px] flex-col rounded-xl border-2 border-dashed border-[#c8bdb2] bg-[#f9f5f0] p-2">
         <div className="font-mono text-[10px] text-[#b0a89e]">#{slot.index + 1}</div>
         <div className="flex flex-1 items-center justify-center text-[11px] text-[#c8bdb2]">
-          空位
+          {t(msg`空位`)}
         </div>
       </div>
     );
@@ -536,7 +540,7 @@ function HomeBay({
   const spec = isPlayer ? CAR_SPECS[inferTierFromCarId(source.carId)] : null;
   const npc = !isPlayer ? getNpcById(source.npcId) : null;
   const emoji = isPlayer ? (spec?.emoji ?? "🚗") : (npc?.carEmoji ?? "🚗");
-  const ownerLabel = isPlayer ? "我的" : (npc?.name ?? "陌生人");
+  const ownerLabel = isPlayer ? t(msg`我的`) : (npc?.name ?? t(msg`陌生人`));
 
   return (
     <div
@@ -566,7 +570,7 @@ function HomeBay({
             disabled={pendingEarnings <= 0}
             className="w-full rounded-lg bg-[#2d5a27] py-1 text-center text-[11px] font-bold text-white disabled:opacity-40"
           >
-            收钱
+            {t(msg`收钱`)}
           </button>
         ) : (
           <div className="flex gap-1">
@@ -575,14 +579,14 @@ function HomeBay({
               onClick={onFine}
               className="flex-1 rounded-lg bg-[#ea580c] py-1 text-center text-[11px] font-bold text-white"
             >
-              贴条
+              {t(msg`贴条`)}
             </button>
             <button
               type="button"
               onClick={onKick}
               className="flex-1 rounded-lg border border-[#d1c7bb] bg-white py-1 text-center text-[11px] font-medium text-[#6b5e52]"
             >
-              赶走
+              {t(msg`赶走`)}
             </button>
           </div>
         )}
@@ -615,12 +619,12 @@ function NpcParkingGrid({
       <div className="flex items-center gap-2.5 rounded-xl border border-[rgba(214,94,47,0.20)] bg-[rgba(255,247,238,0.85)] px-3 py-2">
         <span className="text-[24px]">{NPC_AVATAR_EMOJI[npc.id] ?? "👤"}</span>
         <div className="min-w-0 flex-1">
-          <div className="text-[13px] font-semibold text-[#d65e2f]">{npc.name}的车场</div>
+          <div className="text-[13px] font-semibold text-[#d65e2f]">{npc.name}{t(msg`的车场`)}</div>
           <div className="truncate text-[11px] italic text-[#8a7e74]">"{npc.welcomeQuote}"</div>
         </div>
         <div className="shrink-0 text-right text-[10px] text-[#8a7e74]">
-          <div>¥{npc.carRatePerMinute}/分钟</div>
-          <div>贴条 {(npc.fineRiskPerMinute * 100).toFixed(0)}%/分钟</div>
+          <div>¥{npc.carRatePerMinute}{t(msg`/分钟`)}</div>
+          <div>{t(msg`贴条`)} {(npc.fineRiskPerMinute * 100).toFixed(0)}{t(msg`%/分钟`)}</div>
         </div>
       </div>
 
@@ -662,7 +666,7 @@ function NpcBay({
         <div className="font-mono text-[10px] text-[#b0a89e]">#{slot.index + 1}</div>
         {idleCarIds.length === 0 ? (
           <div className="flex flex-1 items-center justify-center text-center text-[10px] text-[#c8bdb2]">
-            没空闲的车
+            {t(msg`没空闲的车`)}
           </div>
         ) : (
           <div className="flex flex-1 flex-col justify-end gap-1 pt-1">
@@ -677,7 +681,7 @@ function NpcBay({
                   onClick={() => onPark(carId)}
                   className="w-full rounded-lg bg-[#0284c7] py-1 text-center text-[11px] font-bold text-white hover:bg-[#0369a1]"
                 >
-                  {spec.emoji} 停进来
+                  {spec.emoji} {t(msg`停进来`)}
                 </button>
               );
             })}
@@ -696,7 +700,7 @@ function NpcBay({
         return car ? CAR_SPECS[car.tier].emoji : "🚗";
       })()
     : (npcOwner?.carEmoji ?? npc.carEmoji);
-  const ownerLabel = isPlayer ? "我的车" : (npcOwner?.name ?? npc.name);
+  const ownerLabel = isPlayer ? t(msg`我的车`) : (npcOwner?.name ?? npc.name);
 
   return (
     <div
@@ -715,7 +719,7 @@ function NpcBay({
             isPlayer ? "text-[#0284c7]" : "text-[#94a3b8]",
           )}
         >
-          {isPlayer ? `¥${pendingEarnings.toFixed(2)}` : "对方的车"}
+          {isPlayer ? `¥${pendingEarnings.toFixed(2)}` : t(msg`对方的车`)}
         </div>
       </div>
       {isPlayer && (
@@ -724,7 +728,7 @@ function NpcBay({
           onClick={onRecall}
           className="mt-1 w-full rounded-lg bg-[#0284c7] py-1 text-center text-[11px] font-bold text-white"
         >
-          开走收钱
+          {t(msg`开走收钱`)}
         </button>
       )}
     </div>
@@ -751,9 +755,9 @@ function MoreSheet({
   onReset: () => void;
 }) {
   const tabs: { key: NonNullable<SheetView>; label: string; icon: string }[] = [
-    { key: "leaderboard", label: "排行榜", icon: "🏆" },
-    { key: "log", label: "足迹", icon: "📋" },
-    { key: "garage", label: "车库", icon: "🔧" },
+    { key: "leaderboard", label: t(msg`排行榜`), icon: "🏆" },
+    { key: "log", label: t(msg`足迹`), icon: "📋" },
+    { key: "garage", label: t(msg`车库`), icon: "🔧" },
   ];
 
   return (
@@ -783,7 +787,7 @@ function MoreSheet({
           <button
             type="button"
             onClick={() => setSheetView(null)}
-            aria-label="关闭"
+            aria-label={t(msg`关闭`)}
             className="flex h-7 w-7 items-center justify-center rounded-full bg-[rgba(0,0,0,0.08)] hover:bg-[rgba(0,0,0,0.14)]"
           >
             <X size={14} />
@@ -811,7 +815,7 @@ function LeaderboardPanel({ rows }: { rows: LeaderboardEntry[] }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 text-[13px] font-medium text-[#6b5e52]">
-        <Trophy size={15} className="text-[#d65e2f]" /> 财富榜（NPC 含被动收益）
+        <Trophy size={15} className="text-[#d65e2f]" /> {t(msg`财富榜（NPC 含被动收益）`)}
       </div>
       <div className="space-y-1.5">
         {rows.map((row) => (
@@ -836,7 +840,7 @@ function LeaderboardPanel({ rows }: { rows: LeaderboardEntry[] }) {
               {row.name}
               {row.isPlayer && (
                 <span className="ml-2 rounded-full bg-[#2d5a27] px-1.5 py-0.5 text-[10px] font-medium text-white">
-                  你
+                  {t(msg`你`)}
                 </span>
               )}
             </div>
@@ -858,11 +862,11 @@ function VisitLogPanel({ entries }: { entries: VisitLogEntry[] }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 text-[13px] font-medium text-[#6b5e52]">
-        <History size={15} className="text-[#d65e2f]" /> 最近 {entries.length} 条动态
+        <History size={15} className="text-[#d65e2f]" /> {t(msg`最近`)} {entries.length} {t(msg`条动态`)}
       </div>
       {entries.length === 0 ? (
         <div className="rounded-xl border border-dashed border-[rgba(0,0,0,0.12)] px-3 py-8 text-center text-[12px] text-[#9ca3af]">
-          还没有动静，先停一辆车试试。
+          {t(msg`还没有动静，先停一辆车试试。`)}
         </div>
       ) : (
         <div className="space-y-1">
@@ -909,9 +913,9 @@ function GaragePanel({
   return (
     <div className="space-y-3">
       <div className="rounded-xl border border-[rgba(0,0,0,0.10)] bg-white px-3 py-2.5">
-        <div className="text-[13px] font-semibold">我的车</div>
+        <div className="text-[13px] font-semibold">{t(msg`我的车`)}</div>
         <div className="mt-0.5 text-[11px] text-[#9ca3af]">
-          最多同时拥有 {PLAYER_GARAGE_LIMIT} 辆，已拥有 {state.ownedCars.length} 辆
+          {t(msg`最多同时拥有`)} {PLAYER_GARAGE_LIMIT} {t(msg`辆，已拥有`)} {state.ownedCars.length} {t(msg`辆`)}
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
           {state.ownedCars.map((car) => {
@@ -919,16 +923,16 @@ function GaragePanel({
             const where = findPlayerCarLocation(state, car.carId);
             const whereLabel =
               where.kind === "home"
-                ? `自家位 #${where.slotIndex + 1}`
+                ? `${t(msg`自家位`)} #${where.slotIndex + 1}`
                 : where.kind === "npc"
-                  ? `${getNpcById(where.npcId)?.name ?? "对方"} 的车场`
-                  : "车库待命";
+                  ? `${getNpcById(where.npcId)?.name ?? t(msg`对方`)} ${t(msg`的车场`)}`
+                  : t(msg`车库待命`);
             return (
               <div
                 key={car.carId}
                 className="rounded-lg border border-[rgba(0,0,0,0.10)] bg-[#f9f5f1] px-2.5 py-1.5 text-[12px]"
               >
-                {spec.emoji} {spec.name} · ¥{spec.ratePerMinute}/分钟 ·{" "}
+                {spec.emoji} {spec.name} · ¥{spec.ratePerMinute}{t(msg`/分钟`)} ·{" "}
                 <span className="text-[#9ca3af]">{whereLabel}</span>
               </div>
             );
@@ -937,7 +941,7 @@ function GaragePanel({
       </div>
 
       <div className="space-y-2">
-        <div className="text-[12px] text-[#9ca3af]">买更高档的车，赚得更快</div>
+        <div className="text-[12px] text-[#9ca3af]">{t(msg`买更高档的车，赚得更快`)}</div>
         {CAR_TIER_ORDER.map((tier, idx) => {
           if (tier === "starter") return null;
           const spec = CAR_SPECS[tier];
@@ -957,7 +961,7 @@ function GaragePanel({
                   {spec.emoji} {spec.name}
                 </div>
                 <div className="text-[11px] text-[#9ca3af]">
-                  ¥{spec.ratePerMinute}/分钟 · 解锁 ¥{spec.unlockCost}
+                  ¥{spec.ratePerMinute}{t(msg`/分钟`)} · {t(msg`解锁`)} ¥{spec.unlockCost}
                 </div>
               </div>
               <button
@@ -973,7 +977,7 @@ function GaragePanel({
                       : "bg-[#2d5a27] text-white hover:bg-[#3d7a37]",
                 )}
               >
-                {owned ? "已拥有" : "提车"}
+                {owned ? t(msg`已拥有`) : t(msg`提车`)}
               </button>
             </div>
           );
@@ -981,15 +985,15 @@ function GaragePanel({
       </div>
 
       <div className="rounded-xl border border-dashed border-[rgba(0,0,0,0.12)] px-3 py-2.5">
-        <div className="text-[12px] font-medium text-[#9ca3af]">想从头来一遍？</div>
+        <div className="text-[12px] font-medium text-[#9ca3af]">{t(msg`想从头来一遍？`)}</div>
         <button
           type="button"
           onClick={() => {
-            if (window.confirm("确定要重置整个停车场吗？")) onReset();
+            if (window.confirm(t(msg`确定要重置整个停车场吗？`))) onReset();
           }}
           className="mt-1.5 flex items-center gap-1 rounded-lg border border-[rgba(0,0,0,0.12)] bg-white px-3 py-1.5 text-[12px] text-[#6b5e52] hover:bg-[#f9f5f1]"
         >
-          <RotateCcw size={12} /> 重置存档
+          <RotateCcw size={12} /> {t(msg`重置存档`)}
         </button>
       </div>
     </div>
@@ -1009,9 +1013,9 @@ function inferTierFromCarId(carId: string): CarTier {
 
 function formatRelative(ms: number): string {
   const diff = Date.now() - ms;
-  if (diff < 60_000) return "刚刚";
-  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)} 分钟前`;
-  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)} 小时前`;
+  if (diff < 60_000) return t(msg`刚刚`);
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)} ${t(msg`分钟前`)}`;
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)} ${t(msg`小时前`)}`;
   const d = new Date(ms);
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }

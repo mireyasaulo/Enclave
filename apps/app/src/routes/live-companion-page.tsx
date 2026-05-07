@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
@@ -7,6 +8,7 @@ import {
   getSystemStatus,
   type FeedPostListItem,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   BadgeCheck,
   Clapperboard,
@@ -48,6 +50,8 @@ import {
 import { formatTimestamp } from "../lib/format";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
+
+const t = translateRuntimeMessage;
 
 function areLiveDraftsEqual(left: LiveDraft, right: LiveDraft) {
   return JSON.stringify(left) === JSON.stringify(right);
@@ -178,19 +182,19 @@ export function LiveCompanionPage() {
   const preflightChecks = useMemo(
     () => [
       {
-        label: "世界实例在线",
+        label: t(msg`世界实例在线`),
         passed: Boolean(statusQuery.data?.coreApi.healthy),
       },
       {
-        label: "推理网关可用",
+        label: t(msg`推理网关可用`),
         passed: Boolean(statusQuery.data?.inferenceGateway.healthy),
       },
       {
-        label: "已有视频号内容参考",
+        label: t(msg`已有视频号内容参考`),
         passed: recentPosts.length > 0,
       },
       {
-        label: "直播标题已准备",
+        label: t(msg`直播标题已准备`),
         passed: draft.title.trim().length > 0,
       },
     ],
@@ -215,7 +219,7 @@ export function LiveCompanionPage() {
       !navigator.clipboard ||
       typeof navigator.clipboard.writeText !== "function"
     ) {
-      setError("当前环境暂不支持复制到手机。");
+      setError(t(msg`当前环境暂不支持复制到手机。`));
       return;
     }
 
@@ -228,18 +232,18 @@ export function LiveCompanionPage() {
         path,
       });
       setError(null);
-      setNotice(`${input.label} 已复制，可发到手机继续。`);
+      setNotice(t(msg`${input.label} 已复制，可发到手机继续。`));
     } catch {
-      setError("复制到手机失败，请稍后重试。");
+      setError(t(msg`复制到手机失败，请稍后重试。`));
     }
   }
 
   if (!isDesktopLayout) {
     return (
       <DesktopLayoutRequiredState
-        title="直播伴侣当前仅提供桌面布局"
-        description="直播伴侣工作区目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到视频号继续查看内容。"
-        actionLabel="前往视频号"
+        title={t(msg`直播伴侣当前仅提供桌面布局`)}
+        description={t(msg`直播伴侣工作区目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到视频号继续查看内容。`)}
+        actionLabel={t(msg`前往视频号`)}
         fallbackTo="/discover/channels"
       />
     );
@@ -248,11 +252,11 @@ export function LiveCompanionPage() {
   return (
     <div className="relative isolate h-full min-h-0">
       <DesktopUtilityShell
-        title="直播伴侣"
-        subtitle="把开播前准备、状态检查和参考内容收在一起。"
+        title={t(msg`直播伴侣`)}
+        subtitle={t(msg`把开播前准备、状态检查和参考内容收在一起。`)}
       toolbar={
         <div className="rounded-full border border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.07)] px-3 py-1 text-[11px] font-medium text-[color:var(--brand-primary)]">
-          {activeSession ? "直播中" : "待开播"}
+          {activeSession ? t(msg`直播中`) : t(msg`待开播`)}
         </div>
       }
       sidebarClassName="w-[300px]"
@@ -260,36 +264,36 @@ export function LiveCompanionPage() {
         <div className="flex h-full min-h-0 flex-col">
           <div className="border-b border-[color:var(--border-faint)] bg-white/74 px-4 py-4 backdrop-blur-xl">
             <div className="text-[15px] font-medium text-[color:var(--text-primary)]">
-              直播伴侣
+              {t(msg`直播伴侣`)}
             </div>
             <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-              先收口桌面直播准备、状态检查和本地历史。
+              {t(msg`先收口桌面直播准备、状态检查和本地历史。`)}
             </div>
           </div>
 
           <div className="min-h-0 flex-1 overflow-auto bg-[rgba(242,246,245,0.76)] px-4 py-4">
             <div className="space-y-3">
               <MetricCard
-                label="当前状态"
-                value={activeSession ? "直播中" : "待开播"}
+                label={t(msg`当前状态`)}
+                value={activeSession ? t(msg`直播中`) : t(msg`待开播`)}
               />
               <MetricCard
-                label="开播检查"
-                value={`${passedCheckCount} / ${preflightChecks.length} 项通过`}
+                label={t(msg`开播检查`)}
+                value={t(msg`${passedCheckCount} / ${preflightChecks.length} 项通过`)}
               />
               <MetricCard
-                label="最近直播"
+                label={t(msg`最近直播`)}
                 value={
                   liveHistory[0]?.startedAt
                     ? formatTimestamp(liveHistory[0].startedAt)
-                    : "暂无记录"
+                    : t(msg`暂无记录`)
                 }
               />
-              <MetricCard label="操作者" value={ownerName ?? "世界主人"} />
+              <MetricCard label={t(msg`操作者`)} value={ownerName ?? t(msg`世界主人`)} />
 
               <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-section)]">
                 <div className="text-xs font-medium text-[color:var(--text-muted)]">
-                  开播检查清单
+                  {t(msg`开播检查清单`)}
                 </div>
                 <div className="mt-3 space-y-2">
                   {preflightChecks.map((item) => (
@@ -308,7 +312,7 @@ export function LiveCompanionPage() {
                             : "bg-[rgba(239,68,68,0.10)] text-[color:var(--state-danger-text)]",
                         )}
                       >
-                        {item.passed ? "通过" : "待处理"}
+                        {item.passed ? t(msg`通过`) : t(msg`待处理`)}
                       </div>
                     </div>
                   ))}
@@ -351,17 +355,17 @@ export function LiveCompanionPage() {
                 size={16}
                 className="text-[color:var(--brand-primary)]"
               />
-              <span>开播准备</span>
+              <span>{t(msg`开播准备`)}</span>
             </div>
             <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-              先把直播标题、主题、封面钩子和桌面策略准备好，后面接真推流时这层不用再推倒。
+              {t(msg`先把直播标题、主题、封面钩子和桌面策略准备好，后面接真推流时这层不用再推倒。`)}
             </div>
 
             <div className="mt-4 space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
                   <div className="mb-2 text-xs font-medium text-[color:var(--text-muted)]">
-                    直播标题
+                    {t(msg`直播标题`)}
                   </div>
                   <TextField
                     value={draft.title}
@@ -371,12 +375,12 @@ export function LiveCompanionPage() {
                         title: event.target.value,
                       }))
                     }
-                    placeholder="例如：今晚一起看 AI 世界的视频号精选"
+                    placeholder={t(msg`例如：今晚一起看 AI 世界的视频号精选`)}
                   />
                 </div>
                 <div>
                   <div className="mb-2 text-xs font-medium text-[color:var(--text-muted)]">
-                    直播主题
+                    {t(msg`直播主题`)}
                   </div>
                   <TextField
                     value={draft.topic}
@@ -386,14 +390,14 @@ export function LiveCompanionPage() {
                         topic: event.target.value,
                       }))
                     }
-                    placeholder="例如：晚间内容共看 / AI 角色导览"
+                    placeholder={t(msg`例如：晚间内容共看 / AI 角色导览`)}
                   />
                 </div>
               </div>
 
               <div>
                 <div className="mb-2 text-xs font-medium text-[color:var(--text-muted)]">
-                  封面钩子
+                  {t(msg`封面钩子`)}
                 </div>
                 <TextField
                   value={draft.coverHook}
@@ -403,17 +407,17 @@ export function LiveCompanionPage() {
                       coverHook: event.target.value,
                     }))
                   }
-                  placeholder="例如：今晚只讲 3 条最值得扩写成直播的 AI 视频"
+                  placeholder={t(msg`例如：今晚只讲 3 条最值得扩写成直播的 AI 视频`)}
                 />
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
                 <SelectorCard
-                  label="直播模式"
+                  label={t(msg`直播模式`)}
                   options={[
-                    { id: "solo", label: "单人控台" },
-                    { id: "product", label: "产品讲解" },
-                    { id: "story", label: "剧情陪看" },
+                    { id: "solo", label: t(msg`单人控台`) },
+                    { id: "product", label: t(msg`产品讲解`) },
+                    { id: "story", label: t(msg`剧情陪看`) },
                   ]}
                   value={draft.mode}
                   onChange={(value) =>
@@ -424,11 +428,11 @@ export function LiveCompanionPage() {
                   }
                 />
                 <SelectorCard
-                  label="推流质量"
+                  label={t(msg`推流质量`)}
                   options={[
-                    { id: "standard", label: "标准" },
-                    { id: "hd", label: "高清" },
-                    { id: "ultra", label: "超清" },
+                    { id: "standard", label: t(msg`标准`) },
+                    { id: "hd", label: t(msg`高清`) },
+                    { id: "ultra", label: t(msg`超清`) },
                   ]}
                   value={draft.quality}
                   onChange={(value) =>
@@ -443,8 +447,8 @@ export function LiveCompanionPage() {
               <div className="grid gap-3 md:grid-cols-2">
                 <ToggleCard
                   checked={draft.syncComments}
-                  label="同步评论控台"
-                  description="保留后续承接弹幕、评论和通知的桌面右栏入口。"
+                  label={t(msg`同步评论控台`)}
+                  description={t(msg`保留后续承接弹幕、评论和通知的桌面右栏入口。`)}
                   onChange={(checked) =>
                     setDraft((current) => ({
                       ...current,
@@ -454,8 +458,8 @@ export function LiveCompanionPage() {
                 />
                 <ToggleCard
                   checked={draft.autoClip}
-                  label="自动标记切片"
-                  description="为后续回放与直播精彩片段整理预留标记位。"
+                  label={t(msg`自动标记切片`)}
+                  description={t(msg`为后续回放与直播精彩片段整理预留标记位。`)}
                   onChange={(checked) =>
                     setDraft((current) => ({
                       ...current,
@@ -470,7 +474,7 @@ export function LiveCompanionPage() {
                   type="button"
                   onClick={() => {
                     if (!draft.title.trim()) {
-                      setError("请先填写直播标题。");
+                      setError(t(msg`请先填写直播标题。`));
                       return;
                     }
 
@@ -480,32 +484,32 @@ export function LiveCompanionPage() {
                     });
                     setLiveHistory(nextHistory);
                     setError(null);
-                    setNotice("直播伴侣已切到直播中状态。");
+                    setNotice(t(msg`直播伴侣已切到直播中状态。`));
                   }}
                   disabled={Boolean(activeSession)}
                   className="rounded-xl"
                 >
                   <MonitorUp size={15} />
-                  {activeSession ? "直播进行中" : "开始本场直播"}
+                  {activeSession ? t(msg`直播进行中`) : t(msg`开始本场直播`)}
                 </Button>
                 <Button
                   type="button"
                   variant="secondary"
                   onClick={() => {
                     if (!activeSession) {
-                      setError("当前没有进行中的直播。");
+                      setError(t(msg`当前没有进行中的直播。`));
                       return;
                     }
 
                     const nextHistory = endLocalLiveSession(liveHistory);
                     setLiveHistory(nextHistory);
                     setError(null);
-                    setNotice("直播已结束，并记录到本地历史。");
+                    setNotice(t(msg`直播已结束，并记录到本地历史。`));
                   }}
                   className="rounded-xl"
                 >
                   <Clapperboard size={15} />
-                  结束直播
+                  {t(msg`结束直播`)}
                 </Button>
                 <Button
                   type="button"
@@ -513,13 +517,13 @@ export function LiveCompanionPage() {
                   onClick={() => {
                     setDraft({ ...defaultLiveDraft });
                     writeLiveDraft({ ...defaultLiveDraft });
-                    setNotice("直播准备草稿已清空。");
+                    setNotice(t(msg`直播准备草稿已清空。`));
                     setError(null);
                   }}
                   className="rounded-xl"
                 >
                   <RefreshCcw size={15} />
-                  清空准备
+                  {t(msg`清空准备`)}
                 </Button>
                 <Button
                   type="button"
@@ -529,14 +533,14 @@ export function LiveCompanionPage() {
                     void copyLiveToMobile({
                       description: draft.topic.trim()
                         ? `${draft.title} · ${draft.topic}`
-                        : `${draft.title}，切到手机继续处理视频号直播准备。`,
-                      label: draft.title.trim() || "直播准备",
+                        : t(msg`${draft.title}，切到手机继续处理视频号直播准备。`),
+                      label: draft.title.trim() || t(msg`直播准备`),
                     })
                   }
                   className="rounded-xl"
                 >
                   <Copy size={15} />
-                  发准备到手机
+                  {t(msg`发准备到手机`)}
                 </Button>
               </div>
             </div>
@@ -549,7 +553,7 @@ export function LiveCompanionPage() {
                   size={16}
                   className="text-[color:var(--brand-primary)]"
                 />
-                <span>开播检查</span>
+                <span>{t(msg`开播检查`)}</span>
               </div>
               <div className="mt-4 space-y-3">
                 {preflightChecks.map((item) => (
@@ -568,7 +572,7 @@ export function LiveCompanionPage() {
                           : "bg-[rgba(239,68,68,0.10)] text-[color:var(--state-danger-text)]",
                       )}
                     >
-                      {item.passed ? "通过" : "待处理"}
+                      {item.passed ? t(msg`通过`) : t(msg`待处理`)}
                     </div>
                   </div>
                 ))}
@@ -577,39 +581,39 @@ export function LiveCompanionPage() {
 
             <div className="rounded-[20px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-section)]">
               <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                当前实例状态
+                {t(msg`当前实例状态`)}
               </div>
               <div className="mt-4">
                 {statusQuery.isLoading ? (
-                  <LoadingBlock label="正在读取状态..." />
+                  <LoadingBlock label={t(msg`正在读取状态...`)} />
                 ) : (
                   <div className="space-y-3">
                     <StatusRow
                       label="Core API"
                       value={
-                        statusQuery.data?.coreApi.healthy ? "在线" : "异常"
+                        statusQuery.data?.coreApi.healthy ? t(msg`在线`) : t(msg`异常`)
                       }
                     />
                     <StatusRow
-                      label="推理网关"
+                      label={t(msg`推理网关`)}
                       value={
                         statusQuery.data?.inferenceGateway.healthy
-                          ? "可用"
-                          : "待恢复"
+                          ? t(msg`可用`)
+                          : t(msg`待恢复`)
                       }
                     />
                     <StatusRow
-                      label="世界模式"
-                      value={statusQuery.data?.appMode ?? "未知"}
+                      label={t(msg`世界模式`)}
+                      value={statusQuery.data?.appMode ?? t(msg`未知`)}
                     />
                     <StatusRow
-                      label="最近快照"
+                      label={t(msg`最近快照`)}
                       value={
                         statusQuery.data?.scheduler.lastWorldSnapshotAt
                           ? formatTimestamp(
                               statusQuery.data.scheduler.lastWorldSnapshotAt,
                             )
-                          : "暂无"
+                          : t(msg`暂无`)
                       }
                     />
                   </div>
@@ -624,23 +628,23 @@ export function LiveCompanionPage() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                  最近视频号内容
+                  {t(msg`最近视频号内容`)}
                 </div>
                 <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                  直接从现有视频号内容流里拿直播参考，不和主频道内容割裂。
+                  {t(msg`直接从现有视频号内容流里拿直播参考，不和主频道内容割裂。`)}
                 </div>
               </div>
               <Link
                 to="/tabs/channels"
                 className="inline-flex h-9 items-center justify-center rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 text-xs font-medium text-[color:var(--text-secondary)] transition hover:bg-white hover:text-[color:var(--text-primary)]"
               >
-                打开视频号
+                {t(msg`打开视频号`)}
               </Link>
             </div>
 
             <div className="mt-4 space-y-3">
               {channelsQuery.isLoading ? (
-                <LoadingBlock label="正在读取视频号内容..." />
+                <LoadingBlock label={t(msg`正在读取视频号内容...`)} />
               ) : recentPosts.length ? (
                 recentPosts.map((post) => (
                   <PostReferenceCard
@@ -650,7 +654,7 @@ export function LiveCompanionPage() {
                       setDraft((current) => ({
                         ...current,
                         title:
-                          current.title.trim() || `${post.authorName} 主题直播`,
+                          current.title.trim() || t(msg`${post.authorName} 主题直播`),
                         topic:
                           current.topic.trim() || createTopicFromPost(post),
                         coverHook:
@@ -659,15 +663,15 @@ export function LiveCompanionPage() {
                         referencePostAuthorName: post.authorName,
                         referencePostId: post.id,
                       }));
-                      setNotice("已把这条视频号内容带入直播准备草稿。");
+                      setNotice(t(msg`已把这条视频号内容带入直播准备草稿。`));
                       setError(null);
                     }}
                   />
                 ))
               ) : (
                 <EmptyState
-                  title="还没有视频号内容"
-                  description="先去视频号生成几条内容，这里才能作为直播参考池。"
+                  title={t(msg`还没有视频号内容`)}
+                  description={t(msg`先去视频号生成几条内容，这里才能作为直播参考池。`)}
                 />
               )}
             </div>
@@ -677,7 +681,7 @@ export function LiveCompanionPage() {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                  直播记录
+                  {t(msg`直播记录`)}
                 </div>
               </div>
               <Button
@@ -688,20 +692,20 @@ export function LiveCompanionPage() {
                   try {
                     await generateChannelPost(baseUrl);
                     await channelsQuery.refetch();
-                    setNotice("已生成一条新的视频号内容，可继续作为直播参考。");
+                    setNotice(t(msg`已生成一条新的视频号内容，可继续作为直播参考。`));
                     setError(null);
                   } catch (reason) {
                     setError(
                       reason instanceof Error
                         ? reason.message
-                        : "生成视频号内容失败。",
+                        : t(msg`生成视频号内容失败。`),
                     );
                   }
                 }}
                 className="rounded-xl"
               >
                 <Wand2 size={14} />
-                生成预热内容
+                {t(msg`生成预热内容`)}
               </Button>
             </div>
 
@@ -724,18 +728,18 @@ export function LiveCompanionPage() {
                             : "bg-[rgba(7,193,96,0.07)] text-[color:var(--brand-primary)]",
                         )}
                       >
-                        {item.status === "live" ? "直播中" : "已结束"}
+                        {item.status === "live" ? t(msg`直播中`) : t(msg`已结束`)}
                       </span>
                     </div>
                     <div className="mt-2 text-xs leading-5 text-[color:var(--text-secondary)]">
-                      {item.topic || "未填写直播主题"}
+                      {item.topic || t(msg`未填写直播主题`)}
                     </div>
                     <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-[color:var(--text-muted)]">
-                      <span>开播 {formatTimestamp(item.startedAt)}</span>
-                      <span>模式 {resolveModeLabel(item.mode)}</span>
-                      <span>质量 {resolveQualityLabel(item.quality)}</span>
+                      <span>{t(msg`开播 ${formatTimestamp(item.startedAt)}`)}</span>
+                      <span>{t(msg`模式 ${resolveModeLabel(item.mode)}`)}</span>
+                      <span>{t(msg`质量 ${resolveQualityLabel(item.quality)}`)}</span>
                       {item.endedAt ? (
-                        <span>下播 {formatTimestamp(item.endedAt)}</span>
+                        <span>{t(msg`下播 ${formatTimestamp(item.endedAt)}`)}</span>
                       ) : null}
                     </div>
                     <div className="mt-3">
@@ -747,22 +751,22 @@ export function LiveCompanionPage() {
                           void copyLiveToMobile({
                             description:
                               item.status === "live"
-                                ? `${item.title} 正在直播中，切到手机继续跟进频道表现。`
-                                : `${item.title} 已结束，切到手机继续跟进视频号内容。`,
+                                ? t(msg`${item.title} 正在直播中，切到手机继续跟进频道表现。`)
+                                : t(msg`${item.title} 已结束，切到手机继续跟进视频号内容。`),
                             label: item.title,
                           })
                         }
                         className="rounded-xl"
                       >
                         <Copy size={14} />
-                        发到手机继续
+                        {t(msg`发到手机继续`)}
                       </Button>
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="rounded-[18px] border border-dashed border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 text-sm leading-7 text-[color:var(--text-secondary)]">
-                  还没有直播记录。先准备一场直播并切到“直播中”，这里就会开始积累桌面伴侣历史。
+                  {t(msg`还没有直播记录。先准备一场直播并切到“直播中”，这里就会开始积累桌面伴侣历史。`)}
                 </div>
               )}
             </div>
@@ -773,10 +777,10 @@ export function LiveCompanionPage() {
       <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[3px]">
         <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-8 py-6 text-center shadow-[var(--shadow-card)]">
           <div className="text-lg font-semibold text-[color:var(--text-primary)]">
-            功能开发中
+            {t(msg`功能开发中`)}
           </div>
           <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-            敬请期待
+            {t(msg`敬请期待`)}
           </div>
         </div>
       </div>
@@ -855,7 +859,7 @@ function ToggleCard({
               : "bg-[rgba(15,23,42,0.06)] text-[color:var(--text-secondary)]",
           )}
         >
-          {checked ? "开启" : "关闭"}
+          {checked ? t(msg`开启`) : t(msg`关闭`)}
         </span>
       </div>
       <div className="mt-2 text-xs leading-5 text-[color:var(--text-secondary)]">
@@ -886,7 +890,7 @@ function PostReferenceCard({
           </div>
           <div className="mt-1 text-xs text-[color:var(--text-muted)]">
             {formatTimestamp(post.createdAt)} ·{" "}
-            {post.mediaType === "video" ? "短片" : "内容卡片"}
+            {post.mediaType === "video" ? t(msg`短片`) : t(msg`内容卡片`)}
           </div>
           <div className="mt-2 line-clamp-3 text-sm leading-6 text-[color:var(--text-secondary)]">
             {post.text}
@@ -894,10 +898,10 @@ function PostReferenceCard({
           <div className="mt-3 flex flex-wrap gap-2">
             <Button size="sm" onClick={onUse} className="rounded-xl">
               <Sparkles size={14} />
-              带入直播准备
+              {t(msg`带入直播准备`)}
             </Button>
             <span className="inline-flex items-center rounded-md border border-[color:var(--border-faint)] bg-white px-2.5 py-1 text-[11px] text-[color:var(--text-muted)]">
-              {post.commentCount} 评论 · {post.likeCount} 赞
+              {t(msg`${post.commentCount} 评论 · ${post.likeCount} 赞`)}
             </span>
           </div>
         </div>
@@ -929,33 +933,33 @@ function MetricCard({ label, value }: { label: string; value: string }) {
 }
 
 function createTopicFromPost(post: FeedPostListItem) {
-  return post.text.trim().slice(0, 24) || `${post.authorName} 的视频号内容`;
+  return post.text.trim().slice(0, 24) || t(msg`${post.authorName} 的视频号内容`);
 }
 
 function createCoverHookFromPost(post: FeedPostListItem) {
-  return `从「${post.authorName}」这条视频号内容展开今晚的直播节奏`;
+  return t(msg`从「${post.authorName}」这条视频号内容展开今晚的直播节奏`);
 }
 
 function resolveModeLabel(mode: LiveDraft["mode"]) {
   if (mode === "product") {
-    return "产品讲解";
+    return t(msg`产品讲解`);
   }
 
   if (mode === "story") {
-    return "剧情陪看";
+    return t(msg`剧情陪看`);
   }
 
-  return "单人控台";
+  return t(msg`单人控台`);
 }
 
 function resolveQualityLabel(quality: LiveDraft["quality"]) {
   if (quality === "standard") {
-    return "标准";
+    return t(msg`标准`);
   }
 
   if (quality === "ultra") {
-    return "超清";
+    return t(msg`超清`);
   }
 
-  return "高清";
+  return t(msg`高清`);
 }

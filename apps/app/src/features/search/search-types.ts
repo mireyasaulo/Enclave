@@ -29,7 +29,6 @@ export type SearchMatchCounts = Record<SearchResultCategory, number>;
 
 export type SearchResultSection = {
   category: SearchResultCategory;
-  label: string;
   results: SearchResultItem[];
 };
 
@@ -64,6 +63,11 @@ export type SearchHistoryItem = {
   usedAt: number;
 };
 
+import { msg } from "@lingui/macro";
+import type { MessageDescriptor } from "@lingui/core";
+import { useCallback } from "react";
+import { useRuntimeTranslator } from "@yinjie/i18n";
+
 export const searchCategoryLabels: Array<{
   id: SearchCategory;
   label: string;
@@ -87,6 +91,52 @@ export const searchCategoryTitles: Record<SearchResultCategory, string> = {
   moments: "朋友圈",
   feed: "广场动态",
 };
+
+export const searchCategoryLabelDescriptors: Array<{
+  id: SearchCategory;
+  label: MessageDescriptor;
+}> = [
+  { id: "all", label: msg`全部` },
+  { id: "messages", label: msg`聊天记录` },
+  { id: "contacts", label: msg`联系人` },
+  { id: "favorites", label: msg`收藏` },
+  { id: "officialAccounts", label: msg`公众号` },
+  { id: "miniPrograms", label: msg`小程序` },
+  { id: "moments", label: msg`朋友圈` },
+  { id: "feed", label: msg`广场动态` },
+];
+
+export const searchCategoryTitleDescriptors: Record<
+  SearchResultCategory,
+  MessageDescriptor
+> = {
+  messages: msg`聊天记录`,
+  contacts: msg`联系人`,
+  favorites: msg`收藏`,
+  officialAccounts: msg`公众号`,
+  miniPrograms: msg`小程序`,
+  moments: msg`朋友圈`,
+  feed: msg`广场动态`,
+};
+
+export function useSearchCategoryLabels(): Array<{
+  id: SearchCategory;
+  label: string;
+}> {
+  const t = useRuntimeTranslator();
+  return searchCategoryLabelDescriptors.map((entry) => ({
+    id: entry.id,
+    label: t(entry.label),
+  }));
+}
+
+export function useSearchCategoryTitle() {
+  const t = useRuntimeTranslator();
+  return useCallback(
+    (category: SearchResultCategory) => t(searchCategoryTitleDescriptors[category]),
+    [t],
+  );
+}
 
 export const emptySearchMatchCounts: SearchMatchCounts = {
   messages: 0,

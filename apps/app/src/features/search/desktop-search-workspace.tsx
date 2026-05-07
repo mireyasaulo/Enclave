@@ -10,6 +10,9 @@ import {
   type ReactNode,
   type SetStateAction,
 } from "react";
+import { msg } from "@lingui/macro";
+import type { MessageDescriptor } from "@lingui/core";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   ArrowUpRight,
   Blocks,
@@ -28,8 +31,9 @@ import { cn } from "@yinjie/ui";
 import { type SearchQuickLink as DesktopSearchQuickLink } from "./search-quick-links";
 import { renderHighlightedText } from "./search-utils";
 import {
-  searchCategoryLabels,
-  searchCategoryTitles,
+  searchCategoryLabelDescriptors,
+  searchCategoryTitleDescriptors,
+  useSearchCategoryTitle,
   type SearchCategory,
   type SearchHistoryItem,
   type SearchMatchCounts,
@@ -90,48 +94,60 @@ const desktopSearchSelectedRowClassName =
 
 type DesktopSearchFocusRegion = "input" | "categories" | "results";
 
-const landingScopeCards = [
+const landingScopeCards: Array<{
+  id:
+    | "messages"
+    | "contacts"
+    | "favorites"
+    | "officialAccounts"
+    | "miniPrograms"
+    | "moments"
+    | "feed";
+  icon: typeof MessageSquareText;
+  title: MessageDescriptor;
+  description: MessageDescriptor;
+}> = [
   {
-    id: "messages" as const,
+    id: "messages",
     icon: MessageSquareText,
-    title: "聊天记录",
-    description: "优先定位会话和消息片段。",
+    title: msg`聊天记录`,
+    description: msg`优先定位会话和消息片段。`,
   },
   {
-    id: "contacts" as const,
+    id: "contacts",
     icon: UsersRound,
-    title: "联系人",
-    description: "支持备注名、角色名和标签。",
+    title: msg`联系人`,
+    description: msg`支持备注名、角色名和标签。`,
   },
   {
-    id: "favorites" as const,
+    id: "favorites",
     icon: Bookmark,
-    title: "收藏",
-    description: "聚合消息、笔记和内容收藏。",
+    title: msg`收藏`,
+    description: msg`聚合消息、笔记和内容收藏。`,
   },
   {
-    id: "officialAccounts" as const,
+    id: "officialAccounts",
     icon: Newspaper,
-    title: "公众号",
-    description: "支持账号资料和文章命中。",
+    title: msg`公众号`,
+    description: msg`支持账号资料和文章命中。`,
   },
   {
-    id: "miniPrograms" as const,
+    id: "miniPrograms",
     icon: Blocks,
-    title: "小程序",
-    description: "覆盖最近使用和目录里的入口。",
+    title: msg`小程序`,
+    description: msg`覆盖最近使用和目录里的入口。`,
   },
   {
-    id: "moments" as const,
+    id: "moments",
     icon: Star,
-    title: "朋友圈",
-    description: "支持好友动态和评论命中。",
+    title: msg`朋友圈`,
+    description: msg`支持好友动态和评论命中。`,
   },
   {
-    id: "feed" as const,
+    id: "feed",
     icon: Blocks,
-    title: "内容流",
-    description: "继续承接广场动态结果。",
+    title: msg`内容流`,
+    description: msg`继续承接广场动态结果。`,
   },
 ];
 
@@ -164,6 +180,8 @@ export function DesktopSearchWorkspace({
   setSearchText,
   visibleResults,
 }: DesktopSearchWorkspaceProps) {
+  const t = useRuntimeTranslator();
+  const getCategoryTitle = useSearchCategoryTitle();
   const allResultSectionRefs = useRef<
     Partial<Record<SearchResultCategory, HTMLElement | null>>
   >({});
@@ -590,7 +608,7 @@ export function DesktopSearchWorkspace({
     );
   });
   const resolveCategoryHintTitle = (category: SearchCategory) =>
-    category === "all" ? "全部结果" : searchCategoryTitles[category];
+    category === "all" ? t(msg`全部结果`) : getCategoryTitle(category);
   const resolveSpotlightPanelId = (
     category: SearchCategory,
   ): SearchCategory | null => {
@@ -611,7 +629,7 @@ export function DesktopSearchWorkspace({
       scrollAllResultsSectionIntoView(category, "smooth");
       setActiveAllResultsSection(category);
       showPanelSpotlight(category);
-      showTransitionHint(`已定位到${searchCategoryTitles[category]}分区。`);
+      showTransitionHint(t(msg`已定位到${getCategoryTitle(category)}分区。`));
     },
   );
   const handleExpandAllResultsSection = useEffectEvent(
@@ -620,7 +638,7 @@ export function DesktopSearchWorkspace({
       scrollResultsToTop("smooth");
       focusSearchInput(Boolean(trimmedInputKeyword));
       showPanelSpotlight(category);
-      showTransitionHint(`已展开${searchCategoryTitles[category]}全部结果。`);
+      showTransitionHint(t(msg`已展开${getCategoryTitle(category)}全部结果。`));
     },
   );
   const handleSelectCategory = useEffectEvent(
@@ -632,8 +650,8 @@ export function DesktopSearchWorkspace({
         showPanelSpotlight(resolveSpotlightPanelId(category));
         showTransitionHint(
           hasKeyword
-            ? `已切换到${resolveCategoryHintTitle(category)}，结果已回到顶部。`
-            : `已切换到${resolveCategoryHintTitle(category)}，继续输入关键词开始搜索。`,
+            ? t(msg`已切换到${resolveCategoryHintTitle(category)}，结果已回到顶部。`)
+            : t(msg`已切换到${resolveCategoryHintTitle(category)}，继续输入关键词开始搜索。`),
         );
       }
       if (options?.focusInput) {
@@ -645,23 +663,23 @@ export function DesktopSearchWorkspace({
     onApplyHistory(keyword);
     scrollResultsToTop("smooth");
     focusSearchInput(true);
-    showTransitionHint(`已应用历史关键词“${keyword}”，结果已回到顶部。`);
+    showTransitionHint(t(msg`已应用历史关键词“${keyword}”，结果已回到顶部。`));
   });
   const handleClearKeyword = useEffectEvent(() => {
     onClearKeyword();
     scrollResultsToTop("smooth");
     focusSearchInput(false);
-    showTransitionHint("已清空关键词，回到搜索首页。");
+    showTransitionHint(t(msg`已清空关键词，回到搜索首页。`));
   });
 
   const keywordLabel = trimmedCommittedKeyword;
   const contextCategoryTitle =
-    activeCategory === "all" ? "全部结果" : searchCategoryTitles[activeCategory];
+    activeCategory === "all" ? t(msg`全部结果`) : getCategoryTitle(activeCategory);
   const handleScrollToTopContext = useEffectEvent(() => {
     scrollResultsToTop("smooth");
     focusSearchInput(Boolean(trimmedInputKeyword));
     showPanelSpotlight(resolveSpotlightPanelId(activeCategory));
-    showTransitionHint("已回到顶部，可继续调整关键词或切换分类。");
+    showTransitionHint(t(msg`已回到顶部，可继续调整关键词或切换分类。`));
   });
   const handleBackToAllResults = useEffectEvent(
     (category: SearchResultCategory) => {
@@ -669,7 +687,7 @@ export function DesktopSearchWorkspace({
       setActiveAllResultsSection(category);
       setActiveCategory("all");
       focusSearchInput(Boolean(trimmedInputKeyword));
-      showTransitionHint(`已回到全部结果，并定位到${searchCategoryTitles[category]}分区。`);
+      showTransitionHint(t(msg`已回到全部结果，并定位到${getCategoryTitle(category)}分区。`));
     },
   );
   const handleSelectResult = useEffectEvent((resultId: string) => {
@@ -737,16 +755,16 @@ export function DesktopSearchWorkspace({
   });
   const handleMoveCategoryChip = useEffectEvent(
     (category: SearchCategory, direction: -1 | 1) => {
-      const index = searchCategoryLabels.findIndex((item) => item.id === category);
+      const index = searchCategoryLabelDescriptors.findIndex((item) => item.id === category);
       if (index === -1) {
         return;
       }
 
       const nextIndex = Math.min(
         Math.max(index + direction, 0),
-        searchCategoryLabels.length - 1,
+        searchCategoryLabelDescriptors.length - 1,
       );
-      const nextCategory = searchCategoryLabels[nextIndex]?.id;
+      const nextCategory = searchCategoryLabelDescriptors[nextIndex]?.id;
       if (!nextCategory) {
         return;
       }
@@ -759,10 +777,10 @@ export function DesktopSearchWorkspace({
     focusSearchInput(true);
     showTransitionHint(
       selectedResultId
-        ? "已回到搜索框，再按 Esc 可取消预选结果。"
+        ? t(msg`已回到搜索框，再按 Esc 可取消预选结果。`)
         : trimmedInputKeyword
-          ? "已回到搜索框，再按 Esc 可清空关键词。"
-          : "已回到搜索框，可继续输入或切换分类。",
+          ? t(msg`已回到搜索框，再按 Esc 可清空关键词。`)
+          : t(msg`已回到搜索框，可继续输入或切换分类。`),
     );
   });
   const handleClearSelectedResult = useEffectEvent(() => {
@@ -770,8 +788,8 @@ export function DesktopSearchWorkspace({
     setSelectedResultId(null);
     showTransitionHint(
       trimmedInputKeyword
-        ? "已取消结果选择，再按 Esc 可清空关键词。"
-        : "已取消结果选择，可继续输入关键词。",
+        ? t(msg`已取消结果选择，再按 Esc 可清空关键词。`)
+        : t(msg`已取消结果选择，可继续输入关键词。`),
     );
   });
   const handleWorkspaceKeyDownCapture = useEffectEvent(
@@ -856,7 +874,7 @@ export function DesktopSearchWorkspace({
         if (event.key === "End") {
           event.preventDefault();
           const lastCategory =
-            searchCategoryLabels[searchCategoryLabels.length - 1]?.id;
+            searchCategoryLabelDescriptors[searchCategoryLabelDescriptors.length - 1]?.id;
           if (!lastCategory) {
             return;
           }
@@ -1077,8 +1095,8 @@ export function DesktopSearchWorkspace({
           >
             <button
               type="submit"
-              aria-label="执行搜索"
-              title="执行搜索"
+              aria-label={t(msg`执行搜索`)}
+              title={t(msg`执行搜索`)}
               className={cn(
                 "absolute left-3 top-1/2 flex -translate-y-1/2 items-center justify-center rounded-[10px] transition",
                 hasKeyword ? "h-7 w-7" : "h-8 w-8",
@@ -1095,7 +1113,7 @@ export function DesktopSearchWorkspace({
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
               onKeyDown={handleSearchInputKeyDown}
-              placeholder="搜索聊天记录、联系人、收藏和朋友圈"
+              placeholder={t(msg`搜索聊天记录、联系人、收藏和朋友圈`)}
               className={cn(
                 "w-full rounded-[10px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] pr-20 text-[color:var(--text-primary)] outline-none transition-[border-color,box-shadow,height,font-size,padding] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.4)] focus:bg-white focus:shadow-[0_0_0_3px_rgba(7,193,96,0.08)]",
                 hasKeyword ? "h-9 pl-10 text-sm" : "h-11 pl-11 text-[15px]",
@@ -1108,7 +1126,7 @@ export function DesktopSearchWorkspace({
                 priority="secondary"
                 tone="neutral"
               >
-                清空
+                {t(msg`清空`)}
               </DesktopSearchActionButton>
             ) : null}
           </form>
@@ -1121,7 +1139,7 @@ export function DesktopSearchWorkspace({
               !hasKeyword ? "justify-center" : null,
             )}
           >
-            {searchCategoryLabels
+            {searchCategoryLabelDescriptors
               .filter(
                 (item) =>
                   item.id !== "miniPrograms" && item.id !== "officialAccounts",
@@ -1152,7 +1170,7 @@ export function DesktopSearchWorkspace({
                       : "text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]",
                   )}
                 >
-                  <span>{item.label}</span>
+                  <span>{t(item.label)}</span>
                   {countLabel ? (
                     <span
                       className={cn(
@@ -1181,32 +1199,32 @@ export function DesktopSearchWorkspace({
         >
           {loading ? (
             <DesktopSearchStatusCard
-              badgeLabel="准备中"
-              description="正在准备桌面搜索索引，马上就能继续查看完整结果。"
+              badgeLabel={t(msg`准备中`)}
+              description={t(msg`正在准备桌面搜索索引，马上就能继续查看完整结果。`)}
               status="pending"
-              title="搜索准备"
+              title={t(msg`搜索准备`)}
             />
           ) : null}
           {error ? (
             <DesktopSearchStatusCard
               description={error}
               status="error"
-              title="搜索异常"
+              title={t(msg`搜索异常`)}
             />
           ) : null}
           {!loading && !error && transitionHint ? (
             <DesktopSearchStatusCard
               description={transitionHint}
               status="done"
-              title="搜索定位"
+              title={t(msg`搜索定位`)}
             />
           ) : null}
 
           {!loading && !error && hasKeyword && searchingMessages ? (
             <DesktopSearchStatusCard
-              description="聊天记录结果还在继续补全，稍后会自动刷新更多命中。"
+              description={t(msg`聊天记录结果还在继续补全，稍后会自动刷新更多命中。`)}
               status="pending"
-              title="搜索进度"
+              title={t(msg`搜索进度`)}
             />
           ) : null}
           {!loading && !error && hasKeyword ? (
@@ -1232,7 +1250,7 @@ export function DesktopSearchWorkspace({
                   ? groupedResults.map((section) => ({
                       category: section.category,
                       count: section.results.length,
-                      label: section.label,
+                      label: getCategoryTitle(section.category),
                     }))
                   : undefined
               }
@@ -1264,7 +1282,7 @@ export function DesktopSearchWorkspace({
                         onClick={() =>
                           handleSelectCategory(item.id, { focusInput: true })
                         }
-                        title={item.title}
+                        title={t(item.title)}
                       />
                     );
                   })}
@@ -1278,12 +1296,12 @@ export function DesktopSearchWorkspace({
                         onClick={onClearHistory}
                         tone="neutral"
                       >
-                        清空
+                        {t(msg`清空`)}
                       </DesktopSearchActionButton>
                     ) : null
                   }
                   countLabel={history.length ? `${history.length}` : undefined}
-                  title="最近搜索"
+                  title={t(msg`最近搜索`)}
                 >
                   {history.length ? (
                     <div className="space-y-0.5">
@@ -1298,14 +1316,14 @@ export function DesktopSearchWorkspace({
                     </div>
                   ) : (
                     <div className="px-2 py-1.5 text-xs text-[color:var(--text-muted)]">
-                      暂无记录
+                      {t(msg`暂无记录`)}
                     </div>
                   )}
                 </DesktopSearchLandingPanel>
 
                 <DesktopQuickLinksPanel
-                  title="最近收藏"
-                  emptyText="暂无最近收藏"
+                  title={t(msg`最近收藏`)}
+                  emptyText={t(msg`暂无最近收藏`)}
                   items={recentFavorites}
                   onOpen={onOpenQuickLink}
                 />
@@ -1320,12 +1338,12 @@ export function DesktopSearchWorkspace({
                   onClick={handleClearKeyword}
                   tone="neutral"
                 >
-                  清空关键词
+                  {t(msg`清空关键词`)}
                 </DesktopSearchActionButton>
               }
-              description="没有找到匹配内容，换个关键词试试，或者切到更具体的分类后继续找。"
+              description={t(msg`没有找到匹配内容，换个关键词试试，或者切到更具体的分类后继续找。`)}
               status="empty"
-              title="搜索结果"
+              title={t(msg`搜索结果`)}
             />
           ) : null}
 
@@ -1352,19 +1370,19 @@ export function DesktopSearchWorkspace({
                               priority="secondary"
                               tone="brand"
                             >
-                              查看全部
+                              {t(msg`查看全部`)}
                             </DesktopSearchActionButton>
                           ) : null
                         }
-                        countLabel={`${section.results.length} 条命中`}
-                        description={getDesktopSearchSectionDescription(
+                        countLabel={t(msg`${section.results.length} 条命中`)}
+                        description={t(getDesktopSearchSectionDescription(
                           section.category,
-                        )}
+                        ))}
                         highlighted={spotlightPanelId === section.category}
                         panelRef={(node) => {
                           allResultSectionRefs.current[section.category] = node;
                         }}
-                        title={section.label}
+                        title={getCategoryTitle(section.category)}
                       >
                         {section.category === "messages" ? (
                           <DesktopSearchMessageResults
@@ -1433,10 +1451,10 @@ export function DesktopSearchWorkspace({
                   onBack={() => handleBackToAllResults(activeCategory)}
                 />
                 <DesktopSearchResultsPanel
-                  countLabel={`${visibleResults.length} 条命中`}
-                  description={`从全部结果展开，继续查看${searchCategoryTitles[activeCategory]}的完整命中。`}
+                  countLabel={t(msg`${visibleResults.length} 条命中`)}
+                  description={t(msg`从全部结果展开，继续查看${getCategoryTitle(activeCategory)}的完整命中。`)}
                   highlighted={spotlightPanelId === activeCategory}
-                  title={`${searchCategoryTitles[activeCategory]}全部结果`}
+                  title={t(msg`${getCategoryTitle(activeCategory)}全部结果`)}
                 >
                   {activeCategory === "messages" ? (
                     <DesktopSearchMessageResults
@@ -1666,6 +1684,7 @@ function DesktopSearchStatusCard({
   status: "done" | "empty" | "error" | "pending";
   title: string;
 }) {
+  const t = useRuntimeTranslator();
   const toneClassName =
     status === "error"
       ? "border-[rgba(225,29,72,0.14)] bg-[rgba(225,29,72,0.06)]"
@@ -1682,12 +1701,12 @@ function DesktopSearchStatusCard({
         : "bg-white text-[color:var(--text-muted)]";
   const statusLabel =
     status === "error"
-      ? "异常"
+      ? t(msg`异常`)
       : status === "pending"
-        ? "补全中"
+        ? t(msg`补全中`)
         : status === "empty"
-          ? "无结果"
-          : "已完成";
+          ? t(msg`无结果`)
+          : t(msg`已完成`);
 
   return (
     <section
@@ -1723,6 +1742,7 @@ function DesktopSearchScopeCard({
   onClick: () => void;
   title: string;
 }) {
+  const t = useRuntimeTranslator();
   const iconToneClassName =
     category === "favorites"
       ? "bg-[rgba(180,132,23,0.12)] text-[#a16207]"
@@ -1756,7 +1776,7 @@ function DesktopSearchScopeCard({
           {title}
         </div>
         <div className="text-xs text-[color:var(--text-muted)]">
-          {count} 项
+          {t(msg`${count} 项`)}
         </div>
       </div>
     </button>
@@ -1790,8 +1810,10 @@ function DesktopSearchContextBar({
     label: string;
   }>;
 }) {
+  const t = useRuntimeTranslator();
+  const getCategoryTitle = useSearchCategoryTitle();
   const activeSectionTitle = activeSection
-    ? searchCategoryTitles[activeSection]
+    ? getCategoryTitle(activeSection)
     : null;
 
   return (
@@ -1807,16 +1829,16 @@ function DesktopSearchContextBar({
                 {categoryTitle}
               </span>
               <span className="mx-1.5 text-[color:var(--text-dim)]">·</span>
-              <span>{count} 条命中</span>
+              <span>{t(msg`${count} 条命中`)}</span>
               {activeCategory === "all" && activeSectionTitle ? (
                 <>
                   <span className="mx-1.5 text-[color:var(--text-dim)]">·</span>
-                  <span>位于 {activeSectionTitle}</span>
+                  <span>{t(msg`位于 ${activeSectionTitle}`)}</span>
                 </>
               ) : null}
             </span>
             <span className="truncate text-[color:var(--text-muted)]">
-              关键词“{keyword}”
+              {t(msg`关键词“${keyword}”`)}
             </span>
           </div>
           <div className="flex shrink-0 items-center gap-1">
@@ -1826,7 +1848,7 @@ function DesktopSearchContextBar({
                 priority="secondary"
                 tone="brand"
               >
-                回到全部
+                {t(msg`回到全部`)}
               </DesktopSearchActionButton>
             ) : null}
             <DesktopSearchActionButton
@@ -1834,14 +1856,14 @@ function DesktopSearchContextBar({
               priority="secondary"
               tone="neutral"
             >
-              回到顶部
+              {t(msg`回到顶部`)}
             </DesktopSearchActionButton>
             <DesktopSearchActionButton
               onClick={onClearKeyword}
               priority="secondary"
               tone="neutral"
             >
-              清空
+              {t(msg`清空`)}
             </DesktopSearchActionButton>
           </div>
         </div>
@@ -1891,22 +1913,25 @@ function DesktopSearchDrilldownBanner({
   keyword: string;
   onBack: () => void;
 }) {
+  const t = useRuntimeTranslator();
+  const getCategoryTitle = useSearchCategoryTitle();
+  const categoryTitle = getCategoryTitle(category);
   return (
     <section className="rounded-[18px] border border-[#dce9dd] bg-[linear-gradient(135deg,rgba(7,193,96,0.10),rgba(7,193,96,0.04)_40%,white)] p-4">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2 text-[11px] text-[color:var(--text-dim)]">
-            <span className="rounded-full bg-white px-2.5 py-1">全部结果</span>
+            <span className="rounded-full bg-white px-2.5 py-1">{t(msg`全部结果`)}</span>
             <ChevronRight size={12} />
             <span className="rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[color:var(--brand-primary)]">
-              {searchCategoryTitles[category]}
+              {categoryTitle}
             </span>
           </div>
           <div className="mt-3 text-sm font-medium text-[color:var(--text-primary)]">
-            已展开 {searchCategoryTitles[category]} 全部结果
+            {t(msg`已展开 ${categoryTitle} 全部结果`)}
           </div>
           <div className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">
-            当前仍保留关键词“{keyword}”，共 {count} 条命中；返回时会回到聚合页里的对应分区。
+            {t(msg`当前仍保留关键词“${keyword}”，共 ${count} 条命中；返回时会回到聚合页里的对应分区。`)}
           </div>
         </div>
         <DesktopSearchActionButton
@@ -1914,7 +1939,7 @@ function DesktopSearchDrilldownBanner({
           priority="secondary"
           tone="brand"
         >
-          回到全部结果
+          {t(msg`回到全部结果`)}
         </DesktopSearchActionButton>
       </div>
     </section>
@@ -1938,6 +1963,7 @@ function DesktopSearchResultsPanel({
   panelRef?: (node: HTMLElement | null) => void;
   title: string;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <section
       ref={panelRef}
@@ -1960,7 +1986,7 @@ function DesktopSearchResultsPanel({
         <div className="flex items-center gap-2">
           {highlighted ? (
             <div className="rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[10px] text-[color:var(--brand-primary)]">
-              刚刚定位
+              {t(msg`刚刚定位`)}
             </div>
           ) : null}
           <div className="rounded-full bg-white px-2.5 py-1 text-[10px] text-[color:var(--text-muted)]">
@@ -1999,6 +2025,7 @@ function DesktopSearchMessageResults({
   registerResultRef: (resultId: string, node: HTMLButtonElement | null) => void;
   selectedResultId: string | null;
 }) {
+  const t = useRuntimeTranslator();
   if (!messageGroups.length && !conversationResults.length) {
     return null;
   }
@@ -2018,7 +2045,7 @@ function DesktopSearchMessageResults({
       ))}
 
       {conversationResults.length ? (
-        <DesktopSearchSubsectionPanel title="会话命中">
+        <DesktopSearchSubsectionPanel title={t(msg`会话命中`)}>
           <div className="space-y-2">
             {conversationResults.map((item) => (
               <DesktopSearchResultRow
@@ -2057,6 +2084,7 @@ function DesktopSearchOfficialAccountResults({
   registerResultRef: (resultId: string, node: HTMLButtonElement | null) => void;
   selectedResultId: string | null;
 }) {
+  const t = useRuntimeTranslator();
   if (!officialAccountGroups.length && !accountResults.length) {
     return null;
   }
@@ -2076,7 +2104,7 @@ function DesktopSearchOfficialAccountResults({
       ))}
 
       {accountResults.length ? (
-        <DesktopSearchSubsectionPanel title="账号命中">
+        <DesktopSearchSubsectionPanel title={t(msg`账号命中`)}>
           <div className="space-y-2">
             {accountResults.map((item) => (
               <DesktopSearchResultRow
@@ -2214,6 +2242,7 @@ function DesktopSearchFeatureCard({
   onSelect: (resultId: string) => void;
   selected: boolean;
 }) {
+  const t = useRuntimeTranslator();
   const toneClassName =
     category === "contacts"
       ? "border-[#d9e7d9] bg-[linear-gradient(180deg,#f9fcfa,white)]"
@@ -2228,10 +2257,10 @@ function DesktopSearchFeatureCard({
         : "bg-[rgba(15,118,110,0.10)] text-[#226448]";
   const actionLabel =
     category === "contacts"
-      ? "查看资料与聊天入口"
+      ? t(msg`查看资料与聊天入口`)
       : category === "favorites"
-        ? "打开收藏内容"
-        : "打开小程序";
+        ? t(msg`打开收藏内容`)
+        : t(msg`打开小程序`);
 
   return (
     <button
@@ -2298,10 +2327,10 @@ function DesktopSearchFeatureCard({
       <DesktopSearchFooterAffordance
         ctaLabel={
           category === "contacts"
-            ? "进入资料"
+            ? t(msg`进入资料`)
             : category === "favorites"
-              ? "立即打开"
-              : "打开小程序"
+              ? t(msg`立即打开`)
+              : t(msg`打开小程序`)
         }
         label={actionLabel}
         tone={
@@ -2363,6 +2392,7 @@ function DesktopSearchHistoryRow({
   onApply: () => void;
   onRemove: () => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <div className="group/row flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-[color:var(--surface-console)]">
       <button
@@ -2381,7 +2411,7 @@ function DesktopSearchHistoryRow({
       <button
         type="button"
         onClick={onRemove}
-        aria-label="移除"
+        aria-label={t(msg`移除`)}
         className="shrink-0 rounded p-1 text-[color:var(--text-dim)] opacity-0 transition hover:bg-white hover:text-[#be123c] group-hover/row:opacity-100 focus:opacity-100"
       >
         <X size={14} />
@@ -2405,6 +2435,7 @@ function DesktopSearchMessageGroupCard({
   registerResultRef: (resultId: string, node: HTMLButtonElement | null) => void;
   selectedResultId: string | null;
 }) {
+  const t = useRuntimeTranslator();
   const isHeaderSelected = selectedResultId === group.header.id;
   const hasSelectedMessage = group.messages.some(
     (item) => item.id === selectedResultId,
@@ -2455,9 +2486,9 @@ function DesktopSearchMessageGroupCard({
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <div className="rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[10px] text-[color:var(--brand-primary)]">
-            {group.totalHits} 条相关记录
+            {t(msg`${group.totalHits} 条相关记录`)}
           </div>
-          <DesktopSearchOpenCue compact label="进入会话" tone="brand" />
+          <DesktopSearchOpenCue compact label={t(msg`进入会话`)} tone="brand" />
         </div>
       </button>
 
@@ -2492,7 +2523,7 @@ function DesktopSearchMessageGroupCard({
                   {renderHighlightedText(item.meta, keyword)}
                 </div>
               </div>
-              <DesktopSearchOpenCue compact label="直达消息" tone="brand" />
+              <DesktopSearchOpenCue compact label={t(msg`直达消息`)} tone="brand" />
             </button>
           ))}
         </div>
@@ -2516,6 +2547,7 @@ function DesktopSearchOfficialAccountGroupCard({
   registerResultRef: (resultId: string, node: HTMLButtonElement | null) => void;
   selectedResultId: string | null;
 }) {
+  const t = useRuntimeTranslator();
   const isHeaderSelected = selectedResultId === group.header.id;
   const hasSelectedArticle = group.articles.some(
     (item) => item.id === selectedResultId,
@@ -2569,9 +2601,9 @@ function DesktopSearchOfficialAccountGroupCard({
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <div className="rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[10px] text-[color:var(--brand-primary)]">
-            {group.totalHits} 篇相关文章
+            {t(msg`${group.totalHits} 篇相关文章`)}
           </div>
-          <DesktopSearchOpenCue compact label="进入账号" tone="brand" />
+          <DesktopSearchOpenCue compact label={t(msg`进入账号`)} tone="brand" />
         </div>
       </button>
 
@@ -2609,7 +2641,7 @@ function DesktopSearchOfficialAccountGroupCard({
                   {renderHighlightedText(item.meta, keyword)}
                 </div>
               </div>
-              <DesktopSearchOpenCue compact label="读文章" tone="brand" />
+              <DesktopSearchOpenCue compact label={t(msg`读文章`)} tone="brand" />
             </button>
           ))}
         </div>
@@ -2633,6 +2665,7 @@ function DesktopSearchContentCard({
   onSelect: (resultId: string) => void;
   selected: boolean;
 }) {
+  const t = useRuntimeTranslator();
   const toneClassName =
     item.category === "moments"
       ? "border-[#dce8d7] bg-[linear-gradient(180deg,#f9fcf7,white)]"
@@ -2642,7 +2675,7 @@ function DesktopSearchContentCard({
       ? "bg-[rgba(134,181,96,0.12)] text-[#587d38]"
       : "bg-[rgba(15,23,42,0.08)] text-[#3c6a53]";
   const actionLabel =
-    item.category === "moments" ? "打开朋友圈动态" : "打开广场动态";
+    item.category === "moments" ? t(msg`打开朋友圈动态`) : t(msg`打开广场动态`);
 
   return (
     <button
@@ -2693,7 +2726,7 @@ function DesktopSearchContentCard({
       </div>
 
       <DesktopSearchFooterAffordance
-        ctaLabel="查看原内容"
+        ctaLabel={t(msg`查看原内容`)}
         label={actionLabel}
         tone={item.category === "moments" ? "olive" : "brand"}
       />
@@ -2732,6 +2765,7 @@ function DesktopSearchResultRow({
   onSelect: (resultId: string) => void;
   selected: boolean;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <button
       ref={buttonRef}
@@ -2768,43 +2802,43 @@ function DesktopSearchResultRow({
           {renderHighlightedText(item.description, keyword)}
         </div>
       </div>
-      <DesktopSearchOpenCue compact label="打开结果" tone="brand" />
+      <DesktopSearchOpenCue compact label={t(msg`打开结果`)} tone="brand" />
     </button>
   );
 }
 
 function getDesktopSearchSectionDescription(
   category: SearchCategory | SearchResultCategory,
-) {
+): MessageDescriptor {
   if (category === "messages") {
-    return "优先展示会话分组和命中的消息片段。";
+    return msg`优先展示会话分组和命中的消息片段。`;
   }
 
   if (category === "officialAccounts") {
-    return "先看账号分组，再看文章和账号命中。";
+    return msg`先看账号分组，再看文章和账号命中。`;
   }
 
   if (category === "contacts") {
-    return "按资料卡查看联系人和角色入口。";
+    return msg`按资料卡查看联系人和角色入口。`;
   }
 
   if (category === "favorites") {
-    return "聚合消息、笔记和内容收藏结果。";
+    return msg`聚合消息、笔记和内容收藏结果。`;
   }
 
   if (category === "miniPrograms") {
-    return "优先展示可直接打开的小程序入口。";
+    return msg`优先展示可直接打开的小程序入口。`;
   }
 
   if (category === "moments") {
-    return "按内容卡查看朋友圈动态和评论命中。";
+    return msg`按内容卡查看朋友圈动态和评论命中。`;
   }
 
   if (category === "feed") {
-    return "按内容卡查看广场动态结果。";
+    return msg`按内容卡查看广场动态结果。`;
   }
 
-  return "按当前分类集中查看最相关的结果。";
+  return msg`按当前分类集中查看最相关的结果。`;
 }
 
 function getDesktopSearchScopeCount(

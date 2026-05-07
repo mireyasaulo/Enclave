@@ -1,5 +1,9 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { FarmPlot } from "@yinjie/contracts";
 import { useFarmAdjustedNow } from "../farm-clock-context";
+
+const t = translateRuntimeMessage;
 import { formatRemainingMs, getStageEmoji } from "../crop-presentation";
 import type { PlotPulseKind } from "./plot-action-bar";
 

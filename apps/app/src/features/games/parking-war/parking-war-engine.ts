@@ -1,3 +1,5 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   CAR_SPECS,
   CAR_TIER_ORDER,
@@ -24,6 +26,8 @@ import type {
   VisitLogEntry,
   VisitLogKind,
 } from "./parking-war-types";
+
+const t = translateRuntimeMessage;
 
 let counter = 0;
 
@@ -162,7 +166,7 @@ export function createInitialState(nowMs: number): ParkingWarState {
   logBoth(
     state,
     nowMs,
-    "停车场开张，去看看世界里的人都在抢什么。",
+    t(msg`停车场开张，去看看世界里的人都在抢什么。`),
     "info",
     "system",
   );
@@ -219,7 +223,7 @@ function applyDailyBonusIfNeeded(state: ParkingWarState, nowMs: number) {
   logBoth(
     state,
     nowMs,
-    `每日开张奖励 ¥${DAILY_BONUS_AMOUNT}，到账。`,
+    `${t(msg`每日开张奖励`)} ¥${DAILY_BONUS_AMOUNT}${t(msg`，到账。`)}`,
     "success",
     "daily_bonus",
     DAILY_BONUS_AMOUNT,
@@ -274,7 +278,7 @@ export function catchUpOffline(state: ParkingWarState, nowMs: number) {
         logBoth(
           state,
           parkedAt,
-          `${npc.name} 趁你不在停了一下：${npc.welcomeQuote}`,
+          `${npc.name} ${t(msg`趁你不在停了一下：`)}${npc.welcomeQuote}`,
           "warn",
           "npc_parked_player",
         );
@@ -294,7 +298,7 @@ export function catchUpOffline(state: ParkingWarState, nowMs: number) {
           logBoth(
             state,
             nowMs,
-            `${npc.name} 给你贴了张条，¥${stolen.toFixed(2)} 进了对方口袋。`,
+            `${npc.name} ${t(msg`给你贴了张条，`)}¥${stolen.toFixed(2)} ${t(msg`进了对方口袋。`)}`,
             "warn",
             "npc_fined_player",
             stolen,
@@ -338,7 +342,7 @@ export function tickOnline(state: ParkingWarState, nowMs: number) {
       logBoth(
         state,
         nowMs,
-        `${npc.name} 把车停到你这了：${npc.welcomeQuote}`,
+        `${npc.name} ${t(msg`把车停到你这了：`)}${npc.welcomeQuote}`,
         "warn",
         "npc_parked_player",
       );
@@ -359,7 +363,7 @@ export function tickOnline(state: ParkingWarState, nowMs: number) {
         logBoth(
           state,
           nowMs,
-          `${npc.name} 把你停他车场的车贴条了，¥${stolen.toFixed(2)} 没了。`,
+          `${npc.name} ${t(msg`把你停他车场的车贴条了，`)}¥${stolen.toFixed(2)} ${t(msg`没了。`)}`,
           "warn",
           "npc_fined_player",
           stolen,
@@ -385,7 +389,7 @@ export function collectFromOwnSlot(
   state.balance = round2(state.balance + gained);
   slot.parked.pendingEarnings = 0;
   slot.parked.parkedAtMs = nowMs;
-  logBoth(state, nowMs, `收车收到 ¥${gained.toFixed(2)}。`, "success", "self_collect", gained);
+  logBoth(state, nowMs, `${t(msg`收车收到`)} ¥${gained.toFixed(2)}${t(msg`。`)}`, "success", "self_collect", gained);
 }
 
 export function collectAllOwnSlots(state: ParkingWarState, nowMs: number) {
@@ -399,7 +403,7 @@ export function collectAllOwnSlots(state: ParkingWarState, nowMs: number) {
   }
   if (total <= 0) return;
   state.balance = round2(state.balance + total);
-  logBoth(state, nowMs, `一键收钱：¥${total.toFixed(2)}。`, "success", "self_collect", total);
+  logBoth(state, nowMs, `${t(msg`一键收钱：`)}¥${total.toFixed(2)}${t(msg`。`)}`, "success", "self_collect", total);
 }
 
 export function fineNpcOnPlayerSlot(
@@ -419,7 +423,7 @@ export function fineNpcOnPlayerSlot(
   logBoth(
     state,
     nowMs,
-    `给 ${npc?.name ?? "NPC"} 贴了张条，吃下 ¥${gained.toFixed(2)}。`,
+    `${t(msg`给`)} ${npc?.name ?? "NPC"} ${t(msg`贴了张条，吃下`)} ¥${gained.toFixed(2)}${t(msg`。`)}`,
     "success",
     "player_fined_npc",
     gained,
@@ -445,7 +449,7 @@ export function fineAllNpcsOnPlayerLot(state: ParkingWarState, nowMs: number) {
   logBoth(
     state,
     nowMs,
-    `全场贴条，一共吃下 ¥${total.toFixed(2)}。`,
+    `${t(msg`全场贴条，一共吃下`)} ¥${total.toFixed(2)}${t(msg`。`)}`,
     "success",
     "player_fined_npc",
     total,
@@ -463,7 +467,7 @@ export function kickNpcOffPlayerSlot(
   logBoth(
     state,
     nowMs,
-    `直接把 ${npc?.name ?? "NPC"} 的车赶走了。`,
+    `${t(msg`直接把`)} ${npc?.name ?? "NPC"} ${t(msg`的车赶走了。`)}`,
     "info",
     "player_kicked_npc",
   );
@@ -492,7 +496,7 @@ export function parkPlayerInNpcLot(
   logBoth(
     state,
     nowMs,
-    `把车停到 ${npc?.name ?? "对方"} 的车场了，能蹭多久看运气。`,
+    `${t(msg`把车停到`)} ${npc?.name ?? t(msg`对方`)} ${t(msg`的车场了，能蹭多久看运气。`)}`,
     "info",
     "player_parked_npc",
   );
@@ -516,7 +520,7 @@ export function recallPlayerFromNpcLot(
   logBoth(
     state,
     nowMs,
-    `把车开回来了，顺手收了 ¥${gained.toFixed(2)}。`,
+    `${t(msg`把车开回来了，顺手收了`)} ¥${gained.toFixed(2)}${t(msg`。`)}`,
     "success",
     "player_recalled_npc",
     gained,
@@ -538,7 +542,7 @@ export function parkOwnedCarHome(
     parkedAtMs: nowMs,
     pendingEarnings: 0,
   };
-  logBoth(state, nowMs, "把车开回了自己的车位。", "info", "system");
+  logBoth(state, nowMs, t(msg`把车开回了自己的车位。`), "info", "system");
 }
 
 export function buyCar(state: ParkingWarState, tier: CarTier, nowMs: number) {
@@ -557,7 +561,7 @@ export function buyCar(state: ParkingWarState, tier: CarTier, nowMs: number) {
   logBoth(
     state,
     nowMs,
-    `提了一台 ${spec.name}，每分钟 ¥${spec.ratePerMinute}。`,
+    `${t(msg`提了一台`)} ${spec.name}${t(msg`，每分钟`)} ¥${spec.ratePerMinute}${t(msg`。`)}`,
     "success",
     "buy_car",
     spec.unlockCost,
@@ -595,7 +599,7 @@ export type LeaderboardEntry = {
 export function buildLeaderboard(state: ParkingWarState): LeaderboardEntry[] {
   const rows = [
     {
-      name: "我",
+      name: t(msg`我`),
       isPlayer: true as const,
       balance: state.balance,
     },
