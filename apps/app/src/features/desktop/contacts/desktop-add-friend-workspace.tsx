@@ -25,6 +25,7 @@ import {
 import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { DesktopLayoutRequiredState } from "../../../components/desktop-layout-required-state";
+import { buildYinjieId } from "../../../lib/yinjie-id";
 import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../../../store/world-owner-store";
 import { buildCharacterDetailRouteHash } from "../../contacts/character-detail-route-state";
@@ -716,7 +717,7 @@ export function DesktopAddFriendWorkspace() {
 }
 
 function buildCharacterIdentifier(characterId: string) {
-  return `yinjie_${characterId.slice(0, 8)}`;
+  return buildYinjieId(characterId);
 }
 
 function DesktopAddFriendWelcomeState({

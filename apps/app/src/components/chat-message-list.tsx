@@ -100,6 +100,7 @@ import {
 } from "../lib/format";
 import { resolveMessageSemanticPreview } from "../lib/message-attachment-semantic";
 import { resolveConfiguredCoreApiBaseUrl } from "../lib/runtime-config";
+import { buildYinjieId } from "../lib/yinjie-id";
 import { emitChatMessage, joinConversationRoom } from "../lib/socket";
 import {
   openAppSettings,
@@ -6328,7 +6329,7 @@ function buildContactAttachmentSummary(
   return [
     `${attachment.name} 的隐界名片`,
     attachment.relationship?.trim() || "世界联系人",
-    `隐界号：yinjie_${attachment.characterId.slice(0, 8)}`,
+    `隐界号：${buildYinjieId(attachment.characterId)}`,
     profileUrl,
   ].join("\n");
 }

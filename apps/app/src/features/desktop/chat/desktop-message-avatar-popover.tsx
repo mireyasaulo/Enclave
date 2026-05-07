@@ -24,6 +24,7 @@ import { Button, ErrorBlock } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { isPersistedGroupConversation } from "../../../lib/conversation-route";
 import { formatTimestamp } from "../../../lib/format";
+import { buildYinjieId } from "../../../lib/yinjie-id";
 import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../../../store/world-owner-store";
 import { buildDesktopAddFriendRouteHash } from "../../contacts/add-friend-route-state";
@@ -194,9 +195,7 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
     : groupMember
       ? resolveGroupRoleLabel(groupMember.role, t)
       : character?.relationship?.trim() || (isFriend ? t(msg`联系人`) : t(msg`世界角色`));
-  const identifier = isOwner
-    ? "world_owner"
-    : `yinjie_${characterId.slice(0, 8)}`;
+  const identifier = isOwner ? "world_owner" : buildYinjieId(characterId);
   const subtitle = isOwner
     ? t(msg`世界主人`)
     : groupMember && character?.relationship?.trim()

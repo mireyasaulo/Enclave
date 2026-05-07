@@ -10,6 +10,7 @@ import {
 import { Button, ErrorBlock, InlineNotice } from "@yinjie/ui";
 import { SparkBadge } from "../../components/spark-badge";
 import { formatTimestamp } from "../../lib/format";
+import { buildYinjieId } from "../../lib/yinjie-id";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
 import { DesktopContactTextEditDialog } from "./desktop-contact-text-edit-dialog";
 import {
@@ -32,7 +33,6 @@ type ContactDetailPaneProps = {
   onOpenGroup?: (groupId: string) => void;
   onOpenMoments?: () => void;
   onOpenProfile: () => void;
-  showProfileEntry?: boolean;
   onStartChat?: () => void;
   chatPending?: boolean;
   isPinned?: boolean;
@@ -65,7 +65,6 @@ export function ContactDetailPane({
   onOpenGroup,
   onOpenMoments,
   onOpenProfile,
-  showProfileEntry = true,
   onStartChat,
   chatPending = false,
   isPinned = false,
@@ -128,7 +127,7 @@ export function ContactDetailPane({
   const isFriend = Boolean(friendship);
   const remarkName = friendship?.remarkName?.trim() || "";
   const displayName = remarkName || character.name;
-  const identifier = `yinjie_${character.id.slice(0, 8)}`;
+  const identifier = buildYinjieId(character.id);
   const relationshipSummary = remarkName
     ? `昵称：${character.name}`
     : isFriend
@@ -249,6 +248,12 @@ export function ContactDetailPane({
               onClick={() => setEditingField("tags")}
               valueMuted={!friendship?.tags?.length}
             />
+            <DesktopContactProfileRow
+              label="个性签名"
+              value={signature}
+              multiline
+              muted={!character.currentStatus?.trim() && !character.bio?.trim()}
+            />
           </>
         ) : (
           <>
@@ -258,6 +263,12 @@ export function ContactDetailPane({
               value={character.relationship || "世界角色"}
             />
             <DesktopContactProfileRow label="隐界号" value={identifier} />
+            <DesktopContactProfileRow
+              label="个性签名"
+              value={signature}
+              multiline
+              muted={!character.currentStatus?.trim() && !character.bio?.trim()}
+            />
           </>
         )}
       </DesktopContactProfileSection>
@@ -281,39 +292,34 @@ export function ContactDetailPane({
           disabled={!commonGroups.length || !onOpenGroup}
           valueMuted={!commonGroups.length}
         />
-        {showProfileEntry ? (
-          <DesktopContactProfileActionRow
-            label="详细资料"
-            value={isFriend ? "查看角色档案与扩展介绍" : "查看角色资料"}
-            onClick={onOpenProfile}
-          />
-        ) : null}
       </DesktopContactProfileSection>
 
-      <DesktopContactProfileSection title="更多信息">
-        <DesktopContactProfileRow label="个性签名" value={signature} multiline muted={!character.currentStatus?.trim() && !character.bio?.trim()} />
-        {isFriend ? (
+      {isFriend &&
+      (friendship?.lastInteractedAt ||
+        character.lastActiveAt ||
+        (friendship?.sparkStreak ?? 0) >= 3) ? (
+        <DesktopContactProfileSection title="更多信息">
           <DesktopContactProfileRow
             label="最近互动"
             value={formatTimestamp(
               friendship?.lastInteractedAt ?? character.lastActiveAt ?? null,
             )}
           />
-        ) : null}
-        {isFriend && (friendship?.sparkStreak ?? 0) >= 3 ? (
-          <DesktopContactProfileRow
-            label="火花"
-            value={
-              <span className="inline-flex items-center gap-2">
-                <SparkBadge streak={friendship?.sparkStreak} size="md" />
-                <span className="text-[12px] text-[color:var(--text-muted)]">
-                  已连续 {friendship?.sparkStreak} 天互动
+          {(friendship?.sparkStreak ?? 0) >= 3 ? (
+            <DesktopContactProfileRow
+              label="火花"
+              value={
+                <span className="inline-flex items-center gap-2">
+                  <SparkBadge streak={friendship?.sparkStreak} size="md" />
+                  <span className="text-[12px] text-[color:var(--text-muted)]">
+                    已连续 {friendship?.sparkStreak} 天互动
+                  </span>
                 </span>
-              </span>
-            }
-          />
-        ) : null}
-      </DesktopContactProfileSection>
+              }
+            />
+          ) : null}
+        </DesktopContactProfileSection>
+      ) : null}
 
       {isFriend ? (
         <>

@@ -78,6 +78,7 @@ import { isPersistedGroupConversation } from "../../../lib/conversation-route";
 import { buildCreateGroupRouteHash } from "../../../lib/create-group-route-state";
 import { formatTimestamp } from "../../../lib/format";
 import { buildGroupInviteReturnSearch } from "../../../lib/group-invite-delivery";
+import { buildYinjieId } from "../../../lib/yinjie-id";
 import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
 import { buildDesktopFriendMomentsRouteHash } from "../../moments/friend-moments-route-state";
 
@@ -274,7 +275,7 @@ function DirectChatDetailsPanel({
       ? t(msg`这个联系人还没有签名。`)
       : t(msg`这个角色还没有签名。`));
   const identifier = targetCharacterId
-    ? `yinjie_${targetCharacterId.slice(0, 8)}`
+    ? buildYinjieId(targetCharacterId)
     : undefined;
   const relationshipSummary = isFriend
     ? remarkName
