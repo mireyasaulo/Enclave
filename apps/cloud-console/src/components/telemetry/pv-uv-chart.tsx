@@ -18,11 +18,17 @@ export function TelemetryLineChart(props: {
   const groups = Array.from(new Set(props.points.map((p) => p.group))).sort();
   const dates = Array.from(new Set(props.points.map((p) => p.date))).sort();
 
+  // Index points once to avoid the O(D*G*N) cost of Array.find inside a
+  // double loop over dates × groups.
+  const pointIndex = new Map<string, number>();
+  for (const p of props.points) {
+    pointIndex.set(`${p.date}|${p.group}`, p.value);
+  }
+
   const data = dates.map((date) => {
     const row: Record<string, string | number> = { date };
     for (const g of groups) {
-      const point = props.points.find((p) => p.date === date && p.group === g);
-      row[g] = point?.value ?? 0;
+      row[g] = pointIndex.get(`${date}|${g}`) ?? 0;
     }
     return row;
   });

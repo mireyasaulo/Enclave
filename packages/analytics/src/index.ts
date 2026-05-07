@@ -191,7 +191,10 @@ export function trackPageView(
   const previousDuration = Date.now() - previousMountedAt;
 
   if (previousPath) {
-    trackInternal("page_view_end", "pv", {
+    // page_view_end carries time-on-page; it's a session-scoped measurement,
+    // not a fresh page view. Using eventType='session' keeps it out of
+    // pvCount (which would otherwise double-count every navigation).
+    trackInternal("page_view_end", "session", {
       pagePath: previousPath,
       durationMs: previousDuration,
     });

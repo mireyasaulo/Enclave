@@ -643,11 +643,14 @@ export function WelcomePage() {
     setEntryError("");
     setOwnerError("");
 
+    let verifyAttempted = false;
+    let verifySucceeded = false;
     try {
       let accessToken = cloudAccessToken;
       let verifiedPhone = phone.trim();
 
       if (!accessToken) {
+        verifyAttempted = true;
         const inviteCodePayload =
           authMode === "register" && inviteCode ? inviteCode : undefined;
         if (accountType === "email") {
@@ -671,6 +674,7 @@ export function WelcomePage() {
             phone: null,
             profile: null,
           });
+          verifySucceeded = true;
           track(
             authMode === "register" ? "register_success" : "login_success",
             { method: "email" },
@@ -696,6 +700,7 @@ export function WelcomePage() {
             phone: verifyResult.phone,
             profile: null,
           });
+          verifySucceeded = true;
           track(
             authMode === "register" ? "register_success" : "login_success",
             { method: "phone" },
@@ -743,11 +748,19 @@ export function WelcomePage() {
     } catch (error) {
       setReadyBaseUrl(null);
       setEntryError(describeRequestError(error, t(msg`解析云世界访问失败。`)));
-      track("login_fail", {
-        method: accountType,
-        authMode,
-        message: error instanceof Error ? error.message.slice(0, 200) : null,
-      });
+      const message = error instanceof Error ? error.message.slice(0, 200) : null;
+      // Only emit login_fail when the verify step itself failed (we never got
+      // an access token). Failures after verify succeeded are a different
+      // class — they belong to the cloud-world entry flow, not auth.
+      if (verifyAttempted && !verifySucceeded) {
+        track("login_fail", { method: accountType, authMode, message });
+      } else if (verifySucceeded) {
+        track("cloud_world_entry_fail", {
+          method: accountType,
+          authMode,
+          message,
+        });
+      }
     } finally {
       setIsContinuing(false);
     }
