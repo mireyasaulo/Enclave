@@ -12,9 +12,7 @@ import {
 } from "@yinjie/contracts";
 import {
   AlertCircle,
-  Check,
   ChevronDown,
-  ChevronLeft,
   LoaderCircle,
   Search,
   X,
@@ -181,7 +179,7 @@ export function DesktopChatHistoryPanel({
     Boolean(senderId) ||
     Boolean(dateRange.dateFrom) ||
     Boolean(dateRange.dateTo);
-  const searchQueryEnabled = selectorView === null;
+  const searchQueryEnabled = true;
 
   const resultsQuery = useInfiniteQuery({
     queryKey: [
@@ -221,7 +219,7 @@ export function DesktopChatHistoryPanel({
   const resultSections = buildResultSections(resultItems);
   const totalResults = resultsQuery.data?.pages[0]?.total ?? resultItems.length;
 
-  const showResultsView = selectorView === null;
+  const showResultsView = true;
   const openedFromDetails = Boolean(onBackToDetails);
   const emptyStateCopy = buildEmptyStateCopy({
     keyword: debouncedKeyword,
@@ -336,23 +334,35 @@ export function DesktopChatHistoryPanel({
         >
           <DesktopSearchTabButton
             label={t(msg`全部`)}
-            active={activeCategory === "all"}
-            onClick={() => clearCategoryFilter(false)}
+            active={activeCategory === "all" && selectorView === null}
+            onClick={() => {
+              setActiveCategory("all");
+              setSelectorView(null);
+            }}
           />
           <DesktopSearchTabButton
             label={t(msg`图片与视频`)}
-            active={activeCategory === "media"}
-            onClick={() => setActiveCategory("media")}
+            active={activeCategory === "media" && selectorView === null}
+            onClick={() => {
+              setActiveCategory("media");
+              setSelectorView(null);
+            }}
           />
           <DesktopSearchTabButton
             label={t(msg`文件`)}
-            active={activeCategory === "files"}
-            onClick={() => setActiveCategory("files")}
+            active={activeCategory === "files" && selectorView === null}
+            onClick={() => {
+              setActiveCategory("files");
+              setSelectorView(null);
+            }}
           />
           <DesktopSearchTabButton
             label={t(msg`链接`)}
-            active={activeCategory === "links"}
-            onClick={() => setActiveCategory("links")}
+            active={activeCategory === "links" && selectorView === null}
+            onClick={() => {
+              setActiveCategory("links");
+              setSelectorView(null);
+            }}
           />
           <DesktopSearchTabButton
             label={
@@ -360,125 +370,119 @@ export function DesktopChatHistoryPanel({
               resolveQuickDateFilterLabel(quickDateFilter) ||
               t(msg`日期`)
             }
-            active={hasDateFilter}
+            active={selectorView === "date" || hasDateFilter}
             withCaret
-            onClick={() => setSelectorView("date")}
+            onClick={() =>
+              setSelectorView(selectorView === "date" ? null : "date")
+            }
           />
           {isGroupConversation ? (
             <DesktopSearchTabButton
               label={selectedSender?.label ?? t(msg`群成员`)}
-              active={Boolean(senderId)}
+              active={selectorView === "sender" || Boolean(senderId)}
               withCaret
-              onClick={() => setSelectorView("sender")}
+              onClick={() =>
+                setSelectorView(selectorView === "sender" ? null : "sender")
+              }
             />
           ) : null}
         </div>
       </div>
 
       {selectorView === "date" ? (
-        <DesktopSearchPickerView
-          title={t(msg`按日期查找`)}
-          onBack={() => setSelectorView(null)}
+        <div
+          className={cn(
+            "border-b border-[rgba(0,0,0,0.06)] bg-white",
+            isDialog ? "px-6 py-2.5" : "px-4 py-2.5",
+          )}
         >
           <div
             className={cn(
-              "pb-4 pt-3",
-              isDialog ? "mx-auto w-full max-w-[680px] px-6" : "px-3",
+              isDialog ? "mx-auto w-full max-w-[680px]" : "",
             )}
           >
-            <div className="px-1 text-[11px] tracking-[0.08em] text-[color:var(--text-dim)]">
-              {t(msg`快速选择`)}
-            </div>
-            <div className="mt-2 overflow-hidden rounded-[12px] border border-[rgba(0,0,0,0.05)] bg-white">
-              <DesktopSearchOptionRow
-                label={t(msg`全部时间`)}
-                active={quickDateFilter === "all" && !customDate}
-                onClick={() => {
-                  setQuickDateFilter("all");
-                  setCustomDate("");
-                  setSelectorView(null);
-                }}
-              />
-              <DesktopSearchOptionRow
-                label={t(msg`今天`)}
-                active={quickDateFilter === "today" && !customDate}
-                onClick={() => {
-                  setQuickDateFilter("today");
-                  setCustomDate("");
-                  setSelectorView(null);
-                }}
-              />
-              <DesktopSearchOptionRow
-                label={t(msg`最近 7 天`)}
-                active={quickDateFilter === "7d" && !customDate}
-                onClick={() => {
-                  setQuickDateFilter("7d");
-                  setCustomDate("");
-                  setSelectorView(null);
-                }}
-              />
-              <DesktopSearchOptionRow
-                label={t(msg`最近 30 天`)}
-                active={quickDateFilter === "30d" && !customDate}
-                onClick={() => {
-                  setQuickDateFilter("30d");
-                  setCustomDate("");
-                  setSelectorView(null);
-                }}
-              />
-            </div>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {(
+                [
+                  { key: "all" as const, label: t(msg`全部时间`) },
+                  { key: "today" as const, label: t(msg`今天`) },
+                  { key: "7d" as const, label: t(msg`最近 7 天`) },
+                  { key: "30d" as const, label: t(msg`最近 30 天`) },
+                ]
+              ).map((option) => {
+                const active =
+                  !customDate && quickDateFilter === option.key;
+                return (
+                  <button
+                    key={option.key}
+                    type="button"
+                    onClick={() => {
+                      setQuickDateFilter(option.key);
+                      setCustomDate("");
+                      setSelectorView(null);
+                    }}
+                    className={cn(
+                      "h-7 rounded-full px-3 text-[12px] transition",
+                      active
+                        ? "bg-[rgba(7,193,96,0.12)] text-[color:var(--brand-primary)]"
+                        : "bg-[#f4f4f4] text-[color:var(--text-secondary)] hover:bg-[#ececec] hover:text-[color:var(--text-primary)]",
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
 
-            <div className="mt-4 px-1 text-[11px] tracking-[0.08em] text-[color:var(--text-dim)]">
-              {t(msg`指定日期`)}
-            </div>
-            <div className="mt-2 rounded-[12px] border border-[rgba(0,0,0,0.05)] bg-white px-4 py-4">
-              <input
-                type="date"
-                value={customDate}
-                onChange={(event) => {
-                  setQuickDateFilter("custom");
-                  setCustomDate(event.target.value);
-                  if (event.target.value) {
-                    setSelectorView(null);
-                  }
-                }}
-                className="h-10 w-full rounded-[10px] border border-[rgba(0,0,0,0.08)] bg-white px-3 text-[13px] text-[color:var(--text-primary)] outline-none transition focus:border-[rgba(7,193,96,0.38)]"
-              />
-              {customDate ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setQuickDateFilter("all");
-                    setCustomDate("");
+              <div className="ml-auto flex items-center gap-2">
+                <span className="text-[11px] text-[color:var(--text-dim)]">
+                  {t(msg`指定日期`)}
+                </span>
+                <input
+                  type="date"
+                  value={customDate}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setQuickDateFilter(value ? "custom" : "all");
+                    setCustomDate(value);
+                    if (value) {
+                      setSelectorView(null);
+                    }
                   }}
-                  className="mt-2 text-[12px] text-[color:var(--text-muted)] transition hover:text-[color:var(--text-primary)]"
-                >
-                  {t(msg`清除指定日期`)}
-                </button>
-              ) : (
-                <div className="mt-2 text-[12px] text-[color:var(--text-muted)]">
-                  {t(msg`选择某一天的聊天记录`)}
-                </div>
-              )}
+                  className="h-7 rounded-[8px] border border-[rgba(0,0,0,0.08)] bg-white px-2 text-[12px] text-[color:var(--text-primary)] outline-none transition focus:border-[rgba(7,193,96,0.38)]"
+                />
+                {customDate ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuickDateFilter("all");
+                      setCustomDate("");
+                    }}
+                    className="text-[11px] text-[color:var(--text-muted)] transition hover:text-[color:var(--text-primary)]"
+                  >
+                    {t(msg`清除`)}
+                  </button>
+                ) : null}
+              </div>
             </div>
           </div>
-        </DesktopSearchPickerView>
+        </div>
       ) : null}
 
       {selectorView === "sender" ? (
-        <DesktopSearchPickerView
-          title={t(msg`按群成员查找`)}
-          onBack={() => setSelectorView(null)}
+        <div
+          className={cn(
+            "border-b border-[rgba(0,0,0,0.06)] bg-white",
+            isDialog ? "px-6 py-2.5" : "px-4 py-2.5",
+          )}
         >
           <div
             className={cn(
-              "pb-4 pt-3",
-              isDialog ? "mx-auto w-full max-w-[680px] px-6" : "px-3",
+              isDialog ? "mx-auto w-full max-w-[680px]" : "",
             )}
           >
-            <label className="flex items-center gap-2 rounded-[10px] border border-[rgba(0,0,0,0.04)] bg-[#f4f4f4] px-3 py-2.5 transition-[border-color,background-color] focus-within:border-[rgba(7,193,96,0.2)] focus-within:bg-white">
+            <label className="flex h-8 items-center gap-2 rounded-[8px] border border-[rgba(0,0,0,0.06)] bg-[#f4f4f4] px-2.5 transition-[border-color,background-color] focus-within:border-[rgba(7,193,96,0.2)] focus-within:bg-white">
               <Search
-                size={14}
+                size={13}
                 className="shrink-0 text-[color:var(--text-muted)]"
               />
               <input
@@ -486,70 +490,81 @@ export function DesktopChatHistoryPanel({
                 value={memberKeyword}
                 onChange={(event) => setMemberKeyword(event.target.value)}
                 placeholder={t(msg`搜索群成员`)}
-                className="min-w-0 flex-1 bg-transparent text-[13px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
+                className="min-w-0 flex-1 bg-transparent text-[12px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
               />
             </label>
-            <div className="mt-3 px-1 text-[11px] tracking-[0.08em] text-[color:var(--text-dim)]">
-              {t(msg`群成员`)}
-            </div>
 
             {membersQuery.isLoading ? (
-              <DesktopSearchFeedbackState
-                className="mt-2"
-                icon={
-                  <LoaderCircle
-                    size={16}
-                    className="animate-spin text-[color:var(--brand-primary)]"
-                  />
-                }
-                title={t(msg`正在读取群成员`)}
-                description={t(msg`稍等一下，马上就好。`)}
-              />
+              <div className="mt-2 flex items-center gap-2 text-[12px] text-[color:var(--text-muted)]">
+                <LoaderCircle
+                  size={13}
+                  className="animate-spin text-[color:var(--brand-primary)]"
+                />
+                {t(msg`正在读取群成员…`)}
+              </div>
             ) : null}
             {membersQuery.isError && membersQuery.error instanceof Error ? (
-              <DesktopSearchFeedbackState
-                className="mt-2"
-                icon={<AlertCircle size={16} className="text-[#d74b45]" />}
-                title={t(msg`读取群成员失败`)}
-                description={membersQuery.error.message}
-                actionLabel={t(msg`重试`)}
-                onAction={() => {
-                  void membersQuery.refetch();
-                }}
-              />
+              <div className="mt-2 flex items-center gap-2 text-[12px] text-[#d74b45]">
+                <AlertCircle size={13} />
+                <span className="truncate">
+                  {membersQuery.error.message}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => void membersQuery.refetch()}
+                  className="ml-auto text-[11px] text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+                >
+                  {t(msg`重试`)}
+                </button>
+              </div>
             ) : null}
 
             {!membersQuery.isLoading && !membersQuery.isError ? (
-              <div className="mt-2 overflow-hidden rounded-[12px] border border-[rgba(0,0,0,0.05)] bg-white">
-                <DesktopSearchOptionRow
-                  label={t(msg`全部成员`)}
-                  active={!senderId}
-                  onClick={() => {
-                    setSenderId("");
-                    setSelectorView(null);
-                  }}
-                />
-                {visibleSenderOptions.map((option) => (
-                  <DesktopSearchOptionRow
-                    key={option.id}
-                    label={option.label}
-                    description={option.role}
-                    active={senderId === option.id}
+              <div className="mt-2 max-h-[180px] overflow-y-auto pr-0.5">
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
                     onClick={() => {
-                      setSenderId(option.id);
+                      setSenderId("");
                       setSelectorView(null);
                     }}
-                  />
-                ))}
-                {!visibleSenderOptions.length ? (
-                  <div className="px-4 py-10 text-center text-[13px] text-[color:var(--text-muted)]">
-                    {t(msg`没有找到匹配的群成员。`)}
-                  </div>
-                ) : null}
+                    className={cn(
+                      "h-7 rounded-full px-3 text-[12px] transition",
+                      !senderId
+                        ? "bg-[rgba(7,193,96,0.12)] text-[color:var(--brand-primary)]"
+                        : "bg-[#f4f4f4] text-[color:var(--text-secondary)] hover:bg-[#ececec] hover:text-[color:var(--text-primary)]",
+                    )}
+                  >
+                    {t(msg`全部成员`)}
+                  </button>
+                  {visibleSenderOptions.map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => {
+                        setSenderId(option.id);
+                        setSelectorView(null);
+                      }}
+                      className={cn(
+                        "h-7 max-w-[180px] truncate rounded-full px-3 text-[12px] transition",
+                        senderId === option.id
+                          ? "bg-[rgba(7,193,96,0.12)] text-[color:var(--brand-primary)]"
+                          : "bg-[#f4f4f4] text-[color:var(--text-secondary)] hover:bg-[#ececec] hover:text-[color:var(--text-primary)]",
+                      )}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                  {!visibleSenderOptions.length ? (
+                    <div className="px-2 py-1 text-[12px] text-[color:var(--text-muted)]">
+                      {t(msg`没有找到匹配的群成员`)}
+                    </div>
+                  ) : null}
+                </div>
               </div>
             ) : null}
           </div>
-        </DesktopSearchPickerView>
+        </div>
       ) : null}
 
       {showResultsView ? (
@@ -712,36 +727,6 @@ export function DesktopChatHistoryPanel({
   );
 }
 
-function DesktopSearchPickerView({
-  title,
-  onBack,
-  children,
-}: {
-  title: string;
-  onBack: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <div className="min-h-0 flex-1 overflow-auto bg-[#f7f7f7]">
-      <div className="sticky top-0 z-[1] grid grid-cols-[28px,1fr,28px] items-center gap-2 border-b border-[rgba(0,0,0,0.06)] bg-white px-4 py-3">
-        <button
-          type="button"
-          onClick={onBack}
-          className="flex h-7 w-7 items-center justify-center rounded-[8px] text-[color:var(--text-secondary)] transition hover:bg-[rgba(0,0,0,0.045)] hover:text-[color:var(--text-primary)]"
-          aria-label={t(msg`返回上一层`)}
-        >
-          <ChevronLeft size={15} />
-        </button>
-        <div className="text-center text-[14px] font-medium text-[color:var(--text-primary)]">
-          {title}
-        </div>
-        <div aria-hidden="true" className="h-7 w-7" />
-      </div>
-      {children}
-    </div>
-  );
-}
-
 function DesktopSearchFeedbackState({
   icon,
   title,
@@ -813,54 +798,6 @@ function DesktopSearchTabButton({
       ) : null}
       {active ? (
         <span className="absolute inset-x-1.5 bottom-0 h-[2px] rounded-full bg-[color:var(--brand-primary)]" />
-      ) : null}
-    </button>
-  );
-}
-
-function DesktopSearchOptionRow({
-  label,
-  description,
-  active = false,
-  onClick,
-}: {
-  label: string;
-  description?: string;
-  active?: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "flex min-h-[56px] w-full items-center justify-between gap-3 border-l-2 px-4 py-3.5 text-left transition",
-        active
-          ? "border-l-[color:var(--brand-primary)] bg-[#f6fbf7] pl-[14px]"
-          : "border-l-transparent hover:bg-[#fafafa]",
-      )}
-    >
-      <div className="min-w-0">
-        <div
-          className={cn(
-            "truncate text-[13px]",
-            active
-              ? "text-[color:var(--brand-primary)]"
-              : "text-[color:var(--text-primary)]",
-          )}
-        >
-          {label}
-        </div>
-        {description ? (
-          <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
-            {description}
-          </div>
-        ) : null}
-      </div>
-      {active ? (
-        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[rgba(7,193,96,0.12)] text-[color:var(--brand-primary)]">
-          <Check size={12} strokeWidth={2.5} />
-        </span>
       ) : null}
     </button>
   );
