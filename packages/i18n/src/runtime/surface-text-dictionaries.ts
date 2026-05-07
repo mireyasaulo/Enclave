@@ -2438,6 +2438,10 @@ const cloudConsoleChineseTextOverrides: Record<string, string> = {
   remaining: "剩余",
   expires: "到期",
   available: "可用",
+
+  // Jobs page worldInfo fallback values
+  absent: "无实例",
+  unknown: "未知",
 };
 
 const cloudConsoleJapaneseTextOverrides: Record<string, string> = {
