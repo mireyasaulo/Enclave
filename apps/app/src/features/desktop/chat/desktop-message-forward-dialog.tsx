@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
 import { Search, X } from "lucide-react";
 import { type ConversationListItem } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock, LoadingBlock, TextField, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
@@ -48,6 +50,7 @@ export function DesktopMessageForwardDialog({
   onClose,
   onForward,
 }: DesktopMessageForwardDialogProps) {
+  const t = useRuntimeTranslator();
   const [searchTerm, setSearchTerm] = useState("");
   const [forwardMode, setForwardMode] =
     useState<DesktopMessageForwardMode>("separate");
@@ -117,7 +120,7 @@ export function DesktopMessageForwardDialog({
       {!isMobile ? (
         <button
           type="button"
-          aria-label="关闭转发消息弹层"
+          aria-label={t(msg`关闭转发消息弹层`)}
           onClick={() => {
             if (!pending) {
               onClose();
@@ -154,17 +157,17 @@ export function DesktopMessageForwardDialog({
           {!isMobile ? (
             <div className="border-b border-[color:var(--border-faint)] bg-white/78 px-4 py-4 backdrop-blur-xl lg:px-5 lg:py-5">
               <div className="text-[18px] font-medium text-[color:var(--text-primary)]">
-                转发消息
+                {t(msg`转发消息`)}
               </div>
               <div className="mt-1 text-[12px] leading-6 text-[color:var(--text-muted)]">
                 {messages.length === 1
-                  ? "把这条消息转发到最近会话。"
-                  : `把选中的 ${messages.length} 条消息转发到最近会话。`}
+                  ? t(msg`把这条消息转发到最近会话。`)
+                  : t(msg`把选中的 ${messages.length} 条消息转发到最近会话。`)}
               </div>
             </div>
           ) : (
             <div className="px-3 pb-3 pt-2">
-              <div className="px-1 text-[12px] text-[#8c8c8c]">已选消息</div>
+              <div className="px-1 text-[12px] text-[#8c8c8c]">{t(msg`已选消息`)}</div>
             </div>
           )}
 
@@ -198,10 +201,10 @@ export function DesktopMessageForwardDialog({
             <div className="flex items-start justify-between gap-4 border-b border-[color:var(--border-faint)] bg-white/78 px-4 py-4 backdrop-blur-xl lg:px-6 lg:py-4">
               <div className="min-w-0">
                 <div className="text-[11px] tracking-[0.12em] text-[color:var(--text-dim)]">
-                  最近会话
+                  {t(msg`最近会话`)}
                 </div>
                 <div className="mt-2 text-[15px] font-medium text-[color:var(--text-primary)]">
-                  选择要接收转发消息的聊天
+                  {t(msg`选择要接收转发消息的聊天`)}
                 </div>
               </div>
               <button
@@ -209,14 +212,14 @@ export function DesktopMessageForwardDialog({
                 onClick={onClose}
                 disabled={pending}
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] border border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-60"
-                aria-label="关闭"
+                aria-label={t(msg`关闭`)}
               >
                 <X size={16} />
               </button>
             </div>
           ) : (
             <div className="px-3 pb-2 pt-3">
-              <div className="px-1 text-[12px] text-[#8c8c8c]">最近会话</div>
+              <div className="px-1 text-[12px] text-[#8c8c8c]">{t(msg`最近会话`)}</div>
             </div>
           )}
 
@@ -230,19 +233,19 @@ export function DesktopMessageForwardDialog({
               <ForwardModeButton
                 active={forwardMode === "separate"}
                 disabled={pending || !supportsSeparateMode}
-                label={isMobile ? "逐条" : "逐条转发"}
+                label={isMobile ? t(msg`逐条`) : t(msg`逐条转发`)}
                 description={
                   supportsSeparateMode
-                    ? "保持原消息结构依次投递"
-                    : "当前选择里包含仅支持合并转发的消息"
+                    ? t(msg`保持原消息结构依次投递`)
+                    : t(msg`当前选择里包含仅支持合并转发的消息`)
                 }
                 onClick={() => setForwardMode("separate")}
               />
               <ForwardModeButton
                 active={forwardMode === "merged"}
                 disabled={pending}
-                label={isMobile ? "合并" : "合并转发"}
-                description="汇总为一条聊天记录摘要"
+                label={isMobile ? t(msg`合并`) : t(msg`合并转发`)}
+                description={t(msg`汇总为一条聊天记录摘要`)}
                 onClick={() => setForwardMode("merged")}
               />
             </div>
@@ -262,7 +265,7 @@ export function DesktopMessageForwardDialog({
               <TextField
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="搜索最近会话"
+                placeholder={t(msg`搜索最近会话`)}
                 disabled={pending}
                 className={cn(
                   "pl-10",
@@ -280,12 +283,12 @@ export function DesktopMessageForwardDialog({
               isMobile ? "px-3 py-3" : "px-4 py-4 lg:px-6 lg:py-6",
             )}
           >
-            {loading ? <LoadingBlock label="正在读取最近会话..." /> : null}
+            {loading ? <LoadingBlock label={t(msg`正在读取最近会话...`)} /> : null}
             {error ? <ErrorBlock message={error} /> : null}
             {!loading && !error && !conversations.length ? (
               <EmptyState
-                title="还没有可转发的最近会话"
-                description="先去消息列表里建立一些聊天线程，再回来转发消息。"
+                title={t(msg`还没有可转发的最近会话`)}
+                description={t(msg`先去消息列表里建立一些聊天线程，再回来转发消息。`)}
               />
             ) : null}
             {!loading &&
@@ -300,7 +303,7 @@ export function DesktopMessageForwardDialog({
                     : "rounded-[12px] border border-dashed border-[color:var(--border-faint)] bg-white/84 px-4 py-5",
                 )}
               >
-                没有匹配的最近会话。
+                {t(msg`没有匹配的最近会话。`)}
               </div>
             ) : null}
 
@@ -345,8 +348,7 @@ export function DesktopMessageForwardDialog({
                           {conversation.title}
                         </div>
                         <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                          {getConversationThreadLabel(conversation)} · 最近活跃{" "}
-                          {formatMessageTimestamp(conversation.lastActivityAt)}
+                          {t(msg`${getConversationThreadLabel(conversation)} · 最近活跃 ${formatMessageTimestamp(conversation.lastActivityAt)}`)}
                         </div>
                       </div>
                     </div>
@@ -359,14 +361,14 @@ export function DesktopMessageForwardDialog({
                       )}
                     >
                       {pending
-                        ? "正在转发"
+                        ? t(msg`正在转发`)
                         : forwardMode === "merged"
                           ? isMobile
-                            ? "合并"
-                            : "合并转发"
+                            ? t(msg`合并`)
+                            : t(msg`合并转发`)
                           : isMobile
-                            ? "发送"
-                            : "转发"}
+                            ? t(msg`发送`)
+                            : t(msg`转发`)}
                     </span>
                   </button>
                 );
@@ -384,8 +386,8 @@ export function DesktopMessageForwardDialog({
           >
             <div>
               {forwardMode === "merged"
-                ? "会把选中的消息汇总成一条聊天摘要，再发送到目标会话。"
-                : "会按照原消息顺序依次投递到目标会话。"}
+                ? t(msg`会把选中的消息汇总成一条聊天摘要，再发送到目标会话。`)
+                : t(msg`会按照原消息顺序依次投递到目标会话。`)}
             </div>
             {!isMobile ? (
               <Button
@@ -395,7 +397,7 @@ export function DesktopMessageForwardDialog({
                 disabled={pending}
                 className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-6 shadow-none hover:bg-[color:var(--surface-console)]"
               >
-                取消
+                {t(msg`取消`)}
               </Button>
             ) : null}
           </div>
@@ -454,6 +456,7 @@ function MobileForwardHeader({
   pending: boolean;
   onClose: () => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <header className="border-b border-black/5 bg-[rgba(247,247,247,0.96)] px-3 pb-2 pt-[calc(env(safe-area-inset-top,0px)+0.5rem)] backdrop-blur-xl">
       <div className="relative flex min-h-11 items-center justify-between gap-3">
@@ -463,14 +466,14 @@ function MobileForwardHeader({
           disabled={pending}
           className="flex h-10 min-w-12 items-center justify-start rounded-[10px] px-1 text-[16px] text-[#111827] disabled:opacity-50"
         >
-          取消
+          {t(msg`取消`)}
         </button>
         <div className="pointer-events-none absolute inset-x-12 text-center">
           <div className="truncate text-[17px] font-medium text-[#111827]">
-            转发给
+            {t(msg`转发给`)}
           </div>
           <div className="mt-0.5 truncate text-[11px] text-[#8c8c8c]">
-            已选 {messageCount} 条消息
+            {t(msg`已选 ${messageCount} 条消息`)}
           </div>
         </div>
         <div className="h-10 min-w-12" aria-hidden="true" />

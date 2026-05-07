@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { msg } from "@lingui/macro";
 import type { GroupMember } from "@yinjie/contracts";
 import {
   Mic,
@@ -10,6 +11,7 @@ import {
   VideoOff,
   Volume2,
 } from "lucide-react";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, InlineNotice, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { GroupAvatarChip } from "../../../components/group-avatar-chip";
@@ -60,6 +62,7 @@ export function DesktopGroupCallPanel({
   onSendInviteNotice,
   onEndCall,
 }: DesktopGroupCallPanelProps) {
+  const t = useRuntimeTranslator();
   const [muted, setMuted] = useState(false);
   const [cameraEnabled, setCameraEnabled] = useState(kind === "video");
   const [speakerEnabled, setSpeakerEnabled] = useState(true);
@@ -83,7 +86,7 @@ export function DesktopGroupCallPanel({
     [joinedMemberIds, members],
   );
   const visibleMembers = useMemo(() => members.slice(0, 8), [members]);
-  const callKindLabel = kind === "voice" ? "群语音" : "群视频";
+  const callKindLabel = kind === "voice" ? t(msg`群语音`) : t(msg`群视频`);
   const activeCount = activeMembers.length;
   const waitingCount = Math.max(members.length - activeCount, 0);
   const hasSyncedStatus =
@@ -92,7 +95,7 @@ export function DesktopGroupCallPanel({
   const workspaceSummaryLines = buildGroupCallSummaryLines({
     kind,
     status: "ongoing",
-    sourceLabel: "桌面端",
+    sourceLabel: t(msg`桌面端`),
     counts: members.length
       ? {
           activeCount,
@@ -170,8 +173,7 @@ export function DesktopGroupCallPanel({
                   {groupName}
                 </div>
                 <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-                  已在桌面端发起 {callKindLabel}
-                  ，当前可直接管理成员状态和设备控制。
+                  {t(msg`已在桌面端发起 ${callKindLabel}，当前可直接管理成员状态和设备控制。`)}
                 </div>
               </div>
             </div>
@@ -183,25 +185,25 @@ export function DesktopGroupCallPanel({
             onClick={onClose}
             className="shrink-0 rounded-[10px] border-[color:var(--border-faint)] bg-[color:var(--surface-console)] text-[color:var(--text-secondary)] shadow-none hover:bg-white hover:text-[color:var(--text-primary)]"
           >
-            返回聊天
+            {t(msg`返回聊天`)}
           </Button>
         </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           <CallMetricCard
-            label="当前在线"
-            value={`${activeCount} 人`}
-            detail="已加入当前桌面通话工作台"
+            label={t(msg`当前在线`)}
+            value={t(msg`${activeCount} 人`)}
+            detail={t(msg`已加入当前桌面通话工作台`)}
           />
           <CallMetricCard
-            label="等待加入"
-            value={`${waitingCount} 人`}
-            detail="可继续邀请未入会成员"
+            label={t(msg`等待加入`)}
+            value={t(msg`${waitingCount} 人`)}
+            detail={t(msg`可继续邀请未入会成员`)}
           />
           <CallMetricCard
-            label="发起时间"
+            label={t(msg`发起时间`)}
             value={formatDetailedMessageTimestamp(startedAt)}
-            detail="群通话控制台已就绪"
+            detail={t(msg`群通话控制台已就绪`)}
           />
         </div>
 
@@ -209,20 +211,20 @@ export function DesktopGroupCallPanel({
           <div className="flex flex-wrap gap-3">
             <CallControlButton
               active={!muted}
-              label={muted ? "解除静音" : "静音麦克风"}
+              label={muted ? t(msg`解除静音`) : t(msg`静音麦克风`)}
               icon={muted ? <Mic size={16} /> : <MicOff size={16} />}
               onClick={() => setMuted((current) => !current)}
             />
             <CallControlButton
               active={speakerEnabled}
-              label={speakerEnabled ? "扬声器已开" : "开启扬声器"}
+              label={speakerEnabled ? t(msg`扬声器已开`) : t(msg`开启扬声器`)}
               icon={<Volume2 size={16} />}
               onClick={() => setSpeakerEnabled((current) => !current)}
             />
             {kind === "video" ? (
               <CallControlButton
                 active={cameraEnabled}
-                label={cameraEnabled ? "关闭摄像头" : "打开摄像头"}
+                label={cameraEnabled ? t(msg`关闭摄像头`) : t(msg`打开摄像头`)}
                 icon={
                   cameraEnabled ? <VideoOff size={16} /> : <Video size={16} />
                 }
@@ -244,8 +246,8 @@ export function DesktopGroupCallPanel({
             <div className="mt-3">
               <InlineNotice tone="warning">
                 {inviteNoticePending
-                  ? "正在把最新成员状态同步到聊天消息流。"
-                  : "成员状态刚刚有变化，系统会自动同步到聊天消息流。"}
+                  ? t(msg`正在把最新成员状态同步到聊天消息流。`)
+                  : t(msg`成员状态刚刚有变化，系统会自动同步到聊天消息流。`)}
               </InlineNotice>
             </div>
           ) : null}
@@ -266,10 +268,10 @@ export function DesktopGroupCallPanel({
           >
             <UserPlus size={16} />
             {inviteNoticePending
-              ? "同步中..."
+              ? t(msg`同步中...`)
               : hasSyncedStatus
-                ? "已同步群状态"
-                : "同步最新状态"}
+                ? t(msg`已同步群状态`)
+                : t(msg`同步最新状态`)}
           </Button>
           <Button
             type="button"
@@ -278,7 +280,7 @@ export function DesktopGroupCallPanel({
             className="rounded-[10px] border-[color:var(--border-faint)] bg-[color:var(--surface-console)] text-[color:var(--text-secondary)] shadow-none hover:bg-white hover:text-[color:var(--text-primary)]"
           >
             <Smartphone size={16} />
-            到手机继续
+            {t(msg`到手机继续`)}
           </Button>
           <Button
             type="button"
@@ -298,7 +300,7 @@ export function DesktopGroupCallPanel({
             className="rounded-[10px] border-[rgba(220,38,38,0.14)] bg-[rgba(254,242,242,0.92)] text-[#d74b45] shadow-none hover:border-[rgba(220,38,38,0.2)] hover:bg-[rgba(254,226,226,0.96)]"
           >
             <PhoneOff size={16} />
-            {endNoticePending ? "结束中..." : "结束通话"}
+            {endNoticePending ? t(msg`结束中...`) : t(msg`结束通话`)}
           </Button>
         </div>
       </div>
@@ -307,14 +309,14 @@ export function DesktopGroupCallPanel({
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-sm font-medium text-[color:var(--text-primary)]">
-              成员席位
+              {t(msg`成员席位`)}
             </div>
             <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-              点击角色成员可切换为已加入或待加入，快速模拟群通话调度。
+              {t(msg`点击角色成员可切换为已加入或待加入，快速模拟群通话调度。`)}
             </div>
           </div>
           <div className="rounded-full border border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.07)] px-3 py-1 text-[11px] font-medium text-[color:var(--brand-primary)]">
-            {activeCount}/{members.length} 已加入
+            {t(msg`${activeCount}/${members.length} 已加入`)}
           </div>
         </div>
 
@@ -323,10 +325,10 @@ export function DesktopGroupCallPanel({
             const joined = joinedMemberIds.includes(member.memberId);
             const roleLabel =
               member.role === "owner"
-                ? "群主"
+                ? t(msg`群主`)
                 : member.role === "admin"
-                  ? "管理员"
-                  : "群成员";
+                  ? t(msg`管理员`)
+                  : t(msg`群成员`);
 
             return (
               <button
@@ -361,10 +363,10 @@ export function DesktopGroupCallPanel({
                     </div>
                     <div className="mt-1 text-xs text-[color:var(--text-muted)]">
                       {member.memberType === "user"
-                        ? "世界主人始终保留在通话控制台"
+                        ? t(msg`世界主人始终保留在通话控制台`)
                         : joined
-                          ? "当前已加入群通话"
-                          : "点击后可切换为已加入"}
+                          ? t(msg`当前已加入群通话`)
+                          : t(msg`点击后可切换为已加入`)}
                     </div>
                   </div>
                 </div>
@@ -378,11 +380,11 @@ export function DesktopGroupCallPanel({
                         : "bg-[rgba(15,23,42,0.06)] text-[color:var(--text-muted)]",
                     )}
                   >
-                    {joined ? "已加入" : "待加入"}
+                    {joined ? t(msg`已加入`) : t(msg`待加入`)}
                   </span>
                   {member.memberType === "character" ? (
                     <span className="text-[11px] text-[color:var(--text-dim)]">
-                      {joined ? "点击设为待加入" : "点击邀请加入"}
+                      {joined ? t(msg`点击设为待加入`) : t(msg`点击邀请加入`)}
                     </span>
                   ) : null}
                 </div>
