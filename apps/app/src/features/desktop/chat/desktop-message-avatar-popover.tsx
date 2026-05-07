@@ -7,6 +7,7 @@ import {
   type CSSProperties,
 } from "react";
 import { createPortal } from "react-dom";
+import { msg } from "@lingui/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -18,6 +19,7 @@ import {
   getGroupMembers,
   getOrCreateConversation,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { isPersistedGroupConversation } from "../../../lib/conversation-route";
@@ -65,6 +67,7 @@ const CARD_GAP = 12;
 
 export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverProps) {
   const { anchorElement, onClose } = props;
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
@@ -83,7 +86,7 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
   const fallbackName =
     props.kind === "character"
       ? props.fallbackName
-      : ownerName?.trim() || "世界主人";
+      : ownerName?.trim() || t(msg`世界主人`);
   const fallbackAvatar =
     props.kind === "character" ? props.fallbackAvatar : ownerAvatar;
   const navigationContext =
@@ -138,7 +141,7 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
   const startChatMutation = useMutation({
     mutationFn: () => {
       if (!characterId) {
-        throw new Error("当前角色信息不可用。");
+        throw new Error(t(msg`当前角色信息不可用。`));
       }
 
       return getOrCreateConversation({ characterId }, baseUrl);
@@ -179,81 +182,81 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
     ).length;
   }, [characterId, conversationsQuery.data, isOwner]);
   const displayName = isOwner
-    ? ownerName?.trim() || "世界主人"
+    ? ownerName?.trim() || t(msg`世界主人`)
     : friendship?.remarkName?.trim() || character?.name?.trim() || fallbackName;
   const signature = isOwner
-    ? ownerSignature.trim() || "在现实之外，进入另一片世界。"
+    ? ownerSignature.trim() || t(msg`在现实之外，进入另一片世界。`)
     : character?.currentStatus?.trim() ||
       character?.bio?.trim() ||
-      (isFriend ? "这个联系人还没有签名。" : "这个角色还没有签名。");
+      (isFriend ? t(msg`这个联系人还没有签名。`) : t(msg`这个角色还没有签名。`));
   const relationshipSummary = isOwner
-    ? "当前世界实例的唯一主人"
+    ? t(msg`当前世界实例的唯一主人`)
     : groupMember
-      ? resolveGroupRoleLabel(groupMember.role)
-      : character?.relationship?.trim() || (isFriend ? "联系人" : "世界角色");
+      ? resolveGroupRoleLabel(groupMember.role, t)
+      : character?.relationship?.trim() || (isFriend ? t(msg`联系人`) : t(msg`世界角色`));
   const identifier = isOwner
     ? "world_owner"
     : `yinjie_${characterId.slice(0, 8)}`;
   const subtitle = isOwner
-    ? "世界主人"
+    ? t(msg`世界主人`)
     : groupMember && character?.relationship?.trim()
       ? `${character.relationship} · ${relationshipSummary}`
       : relationshipSummary;
   const secondaryLabel = isOwner
-    ? "我的资料"
+    ? t(msg`我的资料`)
     : isBlocked
-      ? "已加入黑名单"
+      ? t(msg`已加入黑名单`)
       : hasPendingFriendRequest
-        ? "好友申请待处理"
+        ? t(msg`好友申请待处理`)
         : isFriend
-          ? "联系人"
-          : "世界角色";
+          ? t(msg`联系人`)
+          : t(msg`世界角色`);
   const metaRows: Array<{ label: string; value: string }> = isOwner
     ? [
         {
-          label: "身份",
-          value: "世界主人",
+          label: t(msg`身份`),
+          value: t(msg`世界主人`),
         },
         {
-          label: "入口",
-          value: "桌面设置页",
+          label: t(msg`入口`),
+          value: t(msg`桌面设置页`),
         },
         {
-          label: "启用时间",
+          label: t(msg`启用时间`),
           value: formatTimestamp(ownerCreatedAt),
         },
       ]
     : [
         {
-          label: "隐界号",
+          label: t(msg`隐界号`),
           value: identifier,
         },
         friendship?.region?.trim()
           ? {
-              label: "地区",
+              label: t(msg`地区`),
               value: friendship.region.trim(),
             }
           : null,
         friendship?.source?.trim()
           ? {
-              label: "来源",
+              label: t(msg`来源`),
               value: friendship.source.trim(),
             }
           : null,
         groupMember
           ? {
-              label: "群身份",
+              label: t(msg`群身份`),
               value: relationshipSummary,
             }
           : null,
         commonGroupCount > 0
           ? {
-              label: "共同群聊",
-              value: `${commonGroupCount} 个`,
+              label: t(msg`共同群聊`),
+              value: t(msg`${commonGroupCount} 个`),
             }
           : null,
         {
-          label: "最近互动",
+          label: t(msg`最近互动`),
           value: formatTimestamp(
             friendship?.lastInteractedAt ?? character?.lastActiveAt ?? null,
           ),
@@ -351,7 +354,7 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
       >
         <div className="flex items-start gap-3 px-4 py-4">
           <AvatarChip
-            name={isOwner ? ownerName ?? "世界主人" : character?.name ?? fallbackName}
+            name={isOwner ? ownerName ?? t(msg`世界主人`) : character?.name ?? fallbackName}
             src={isOwner ? ownerAvatar : character?.avatar ?? fallbackAvatar}
             size="xl"
           />
@@ -410,7 +413,7 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
 
         {!isOwner && !characterQuery.isError && characterQuery.isLoading ? (
           <div className="rounded-[14px] bg-[rgba(247,247,247,0.9)] px-3 py-2 text-[12px] text-[color:var(--text-muted)]">
-            正在读取资料...
+            {t(msg`正在读取资料...`)}
           </div>
         ) : null}
 
@@ -451,7 +454,7 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
               });
             }}
           >
-            {isOwner ? "打开设置" : "查看资料"}
+            {isOwner ? t(msg`打开设置`) : t(msg`查看资料`)}
           </Button>
         {isOwner || !isFriend || hideMomentsAction ? null : (
           <Button
@@ -472,7 +475,7 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
               });
             }}
           >
-            朋友圈
+            {t(msg`朋友圈`)}
           </Button>
         )}
         {isOwner ? null : (
@@ -503,14 +506,14 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
             }}
           >
             {isBlocked
-              ? "已拉黑"
+              ? t(msg`已拉黑`)
               : !isFriend
                 ? hasPendingFriendRequest
-                  ? "申请中"
-                  : "添加到通讯录"
+                  ? t(msg`申请中`)
+                  : t(msg`添加到通讯录`)
                 : startChatMutation.isPending
-                  ? "打开中..."
-                  : "发消息"}
+                  ? t(msg`打开中...`)
+                  : t(msg`发消息`)}
           </Button>
         )}
       </div>
@@ -519,16 +522,19 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
   );
 }
 
-function resolveGroupRoleLabel(role: "owner" | "admin" | "member") {
+function resolveGroupRoleLabel(
+  role: "owner" | "admin" | "member",
+  t: ReturnType<typeof useRuntimeTranslator>,
+) {
   if (role === "owner") {
-    return "群主";
+    return t(msg`群主`);
   }
 
   if (role === "admin") {
-    return "管理员";
+    return t(msg`管理员`);
   }
 
-  return "群成员";
+  return t(msg`群成员`);
 }
 
 function updatePosition({
