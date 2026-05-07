@@ -1,33 +1,35 @@
 import { Lock, Database, Cpu, Heart, type LucideIcon } from "lucide-react";
+import { msg } from "@lingui/macro";
+import type { MessageDescriptor } from "@lingui/core";
 import { getServerI18n } from "@/i18n/server";
 import type { SupportedLocale } from "@/lib/locales";
 
 type Principle = {
   icon: LucideIcon;
-  titleZh: string;
-  bodyZh: string;
+  title: MessageDescriptor;
+  body: MessageDescriptor;
 };
 
 const PRINCIPLES: Principle[] = [
   {
     icon: Lock,
-    titleZh: "一人一世界",
-    bodyZh: "每位用户拥有完全独立的世界，互不打扰、互不可见。你的对话只属于你。",
+    title: msg`一人一世界`,
+    body: msg`每位用户拥有完全独立的世界，互不打扰、互不可见。你的对话只属于你。`,
   },
   {
     icon: Database,
-    titleZh: "数据自主",
-    bodyZh: "全部数据可一键导出，随时带走；不绑定平台，不锁定关系。",
+    title: msg`数据自主`,
+    body: msg`全部数据可一键导出，随时带走；不绑定平台，不锁定关系。`,
   },
   {
     icon: Cpu,
-    titleZh: "可信赖的 AI",
-    bodyZh: "代码完全开源、可审计；底层模型可选官方托管或自主接入，过程透明。",
+    title: msg`可信赖的 AI`,
+    body: msg`代码完全开源、可审计；底层模型可选官方托管或自主接入，过程透明。`,
   },
   {
     icon: Heart,
-    titleZh: "不取代现实",
-    bodyZh: "白天有同事、有老板，晚上回到隐界有心理咨询师；它补全你的情感维度，而不是替代真实关系。",
+    title: msg`不取代现实`,
+    body: msg`白天有同事、有老板，晚上回到隐界有心理咨询师；它补全你的情感维度，而不是替代真实关系。`,
   },
 ];
 
@@ -56,14 +58,14 @@ export async function OnePersonWorld({ locale }: { locale: SupportedLocale }) {
             const Icon = p.icon;
             return (
               <div
-                key={p.titleZh}
+                key={p.title.id ?? String(p.title.message)}
                 className="rounded-2xl border border-(--border-subtle) bg-(--surface-card) p-6 transition hover:border-(--brand-primary)"
               >
                 <div className="mb-4 grid size-11 place-items-center rounded-xl bg-(--brand-gradient) text-white shadow-(--shadow-soft)">
                   <Icon size={22} strokeWidth={2} />
                 </div>
-                <h3 className="text-lg font-semibold text-(--text-primary)">{i18n._(p.titleZh)}</h3>
-                <p className="mt-2 text-sm leading-7 text-(--text-secondary)">{i18n._(p.bodyZh)}</p>
+                <h3 className="text-lg font-semibold text-(--text-primary)">{i18n._(p.title)}</h3>
+                <p className="mt-2 text-sm leading-7 text-(--text-secondary)">{i18n._(p.body)}</p>
               </div>
             );
           })}

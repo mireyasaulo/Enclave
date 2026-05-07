@@ -17,12 +17,12 @@ export async function HomeJsonLd({ locale }: { locale: SupportedLocale }) {
     "私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用，免费开始你的隐界世界。",
   );
 
-  const featureList = CAPABILITIES.map((c) => i18n._(c.titleZh));
+  const featureList = CAPABILITIES.map((c) => i18n._(c.title));
 
   const screenshot = SCREENSHOT_KEYS.map((s) => ({
     "@type": "ImageObject",
     url: `${SITE_BASE_URL}/screenshots/${locale}/${s.key}.png`,
-    caption: i18n._(s.titleZh),
+    caption: i18n._(s.title),
   }));
 
   const data = {

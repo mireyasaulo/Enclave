@@ -38,17 +38,17 @@ export async function CapabilityGrid({ locale }: { locale: SupportedLocale }) {
             const Icon = item.icon;
             return (
               <li
-                key={item.titleZh}
+                key={item.title.id ?? String(item.title.message)}
                 className="group rounded-2xl border border-(--border-subtle) bg-(--surface-card) p-5 transition hover:border-(--brand-primary) hover:shadow-(--shadow-card)"
               >
                 <div className="mb-4 grid size-10 place-items-center rounded-xl bg-(--surface-soft) text-(--brand-primary) transition group-hover:bg-(--brand-primary) group-hover:text-white">
                   <Icon size={20} strokeWidth={2} />
                 </div>
                 <h3 className="text-base font-semibold text-(--text-primary)">
-                  {i18n._(item.titleZh)}
+                  {i18n._(item.title)}
                 </h3>
                 <p className="mt-2 text-sm leading-6 text-(--text-secondary)">
-                  {i18n._(item.descZh)}
+                  {i18n._(item.desc)}
                 </p>
               </li>
             );
