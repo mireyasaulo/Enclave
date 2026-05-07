@@ -1052,8 +1052,22 @@ export function DesktopSearchWorkspace({
       onFocusCapture={handleWorkspaceFocusCapture}
       onKeyDownCapture={handleWorkspaceKeyDownCapture}
     >
-      <header className="shrink-0 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.94)] backdrop-blur-xl">
-        <div className="mx-auto w-full max-w-[1160px] px-6 pt-3">
+      <header
+        className={cn(
+          "shrink-0 bg-[rgba(255,255,255,0.94)] backdrop-blur-xl transition-[padding,border-color]",
+          hasKeyword
+            ? "border-b border-[color:var(--border-faint)]"
+            : "border-b border-transparent",
+        )}
+      >
+        <div
+          className={cn(
+            "mx-auto w-full px-6 transition-[max-width,padding]",
+            hasKeyword
+              ? "max-w-[1160px] pt-3"
+              : "max-w-[560px] pt-[18vh] pb-2",
+          )}
+        >
           <form
             className="relative"
             onSubmit={(event) => {
@@ -1066,13 +1080,14 @@ export function DesktopSearchWorkspace({
               aria-label="执行搜索"
               title="执行搜索"
               className={cn(
-                "absolute left-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-[10px] transition",
+                "absolute left-3 top-1/2 flex -translate-y-1/2 items-center justify-center rounded-[10px] transition",
+                hasKeyword ? "h-7 w-7" : "h-8 w-8",
                 searchPending && trimmedInputKeyword
                   ? "bg-[rgba(7,193,96,0.12)] text-[color:var(--brand-primary)] hover:bg-[rgba(7,193,96,0.16)]"
                   : "text-[color:var(--text-dim)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]",
               )}
             >
-              <Search size={15} />
+              <Search size={hasKeyword ? 15 : 17} />
             </button>
             <input
               ref={inputRef}
@@ -1080,8 +1095,11 @@ export function DesktopSearchWorkspace({
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
               onKeyDown={handleSearchInputKeyDown}
-              placeholder="搜索聊天记录、联系人、公众号、收藏和小程序"
-              className="h-9 w-full rounded-[10px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] pl-10 pr-20 text-sm text-[color:var(--text-primary)] outline-none transition-[border-color,box-shadow] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.4)] focus:bg-white focus:shadow-[0_0_0_3px_rgba(7,193,96,0.08)]"
+              placeholder="搜索聊天记录、联系人、收藏和朋友圈"
+              className={cn(
+                "w-full rounded-[10px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] pr-20 text-[color:var(--text-primary)] outline-none transition-[border-color,box-shadow,height,font-size,padding] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.4)] focus:bg-white focus:shadow-[0_0_0_3px_rgba(7,193,96,0.08)]",
+                hasKeyword ? "h-9 pl-10 text-sm" : "h-11 pl-11 text-[15px]",
+              )}
             />
             {searchText ? (
               <DesktopSearchActionButton
@@ -1100,6 +1118,7 @@ export function DesktopSearchWorkspace({
               keyboardFocusRegion === "categories"
                 ? "rounded-[8px] bg-[rgba(7,193,96,0.04)]"
                 : null,
+              !hasKeyword ? "justify-center" : null,
             )}
           >
             {searchCategoryLabels
@@ -1154,7 +1173,12 @@ export function DesktopSearchWorkspace({
       </header>
 
       <div ref={scrollViewportRef} className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto flex w-full max-w-[1160px] min-h-full flex-col px-6 py-3">
+        <div
+          className={cn(
+            "mx-auto flex w-full min-h-full flex-col px-6 py-3 transition-[max-width]",
+            hasKeyword ? "max-w-[1160px]" : "max-w-[720px]",
+          )}
+        >
           {loading ? (
             <DesktopSearchStatusCard
               badgeLabel="准备中"
@@ -1218,7 +1242,7 @@ export function DesktopSearchWorkspace({
 
           {!loading && !error && !hasKeyword ? (
             <div className="space-y-3">
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
                 {landingScopeCards
                   .filter(
                     (item) =>
