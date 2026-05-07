@@ -19,6 +19,7 @@
     "@lingui/react": "5.9.5",
     "@tanstack/react-query": "^5.66.8",
     "@tanstack/react-router": "^1.109.2",
+    "@yinjie/analytics": "workspace:*",
     "@yinjie/contracts": "workspace:*",
     "@yinjie/i18n": "workspace:*",
     "@yinjie/ui": "workspace:*",

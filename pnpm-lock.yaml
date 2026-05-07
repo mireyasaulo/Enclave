@@ -517,6 +517,9 @@ importers:
       '@tanstack/react-router':
         specifier: ^1.109.2
         version: 1.168.10(react-dom@19.2.4)(react@19.2.4)
+      '@yinjie/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@yinjie/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
