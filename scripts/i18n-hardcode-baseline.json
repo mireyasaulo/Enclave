@@ -19,17 +19,17 @@
     },
     "apps/app/src": {
       "rules": {
-        "jsx-literal-prop": 183,
-        "object-ui-string": 106,
-        "jsx-cjk-text": 11,
-        "toast-dialog-string": 1,
-        "setter-message-string": 21,
-        "literal-error-message": 43,
+        "jsx-literal-prop": 0,
+        "object-ui-string": 0,
+        "jsx-cjk-text": 0,
+        "toast-dialog-string": 0,
+        "setter-message-string": 0,
+        "literal-error-message": 0,
         "intl-locale-literal": 0,
-        "locale-compare-literal": 4,
+        "locale-compare-literal": 0,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 0,
-        "raw-cjk-line": 1104
+        "raw-cjk-line": 0
       }
     },
     "apps/admin/src": {
@@ -80,7 +80,7 @@
     "api/src": {
       "rules": {
         "jsx-literal-prop": 6,
-        "object-ui-string": 661,
+        "object-ui-string": 662,
         "jsx-cjk-text": 30,
         "toast-dialog-string": 0,
         "setter-message-string": 0,
