@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -7,6 +8,7 @@ import {
   markOfficialAccountArticleRead,
   markOfficialAccountDeliveryRead,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Smartphone } from "lucide-react";
 import { Button, cn } from "@yinjie/ui";
 import { OfficialArticleViewer } from "../../../components/official-article-viewer";
@@ -27,6 +29,7 @@ export function DesktopSubscriptionWorkspace({
   onOpenAccount?: (accountId: string, articleId?: string) => void;
   onOpenArticle?: (articleId?: string) => void;
 }) {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const runtimeConfig = useAppRuntimeConfig();
@@ -95,7 +98,7 @@ export function DesktopSubscriptionWorkspace({
   const groupCount = inboxQuery.data?.groups.length ?? 0;
   const lastDeliveredLabel = inboxQuery.data?.summary?.lastDeliveredAt
     ? formatConversationTimestamp(inboxQuery.data.summary.lastDeliveredAt)
-    : "暂无更新";
+    : t(msg`暂无更新`);
 
   useEffect(() => {
     if (!selectedArticleId || currentFeedArticleIds.has(selectedArticleId)) {
@@ -247,10 +250,10 @@ export function DesktopSubscriptionWorkspace({
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="truncate text-[15px] font-medium text-[color:var(--text-primary)]">
-                订阅号消息
+                {t(msg`订阅号消息`)}
               </div>
               <div className="mt-0.5 truncate text-[10px] text-[color:var(--text-muted)]">
-                {unreadCount} 条未读 · {groupCount} 个号 · {lastDeliveredLabel} 更新
+                {t(msg`${unreadCount} 条未读 · ${groupCount} 个号 · ${lastDeliveredLabel} 更新`)}
               </div>
             </div>
             <Button
@@ -259,7 +262,7 @@ export function DesktopSubscriptionWorkspace({
               size="icon"
               onClick={handleOpenMobileHandoff}
               className="h-8 w-8 shrink-0 rounded-full text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
-              aria-label="到手机继续"
+              aria-label={t(msg`到手机继续`)}
             >
               <Smartphone size={15} />
             </Button>
@@ -269,15 +272,15 @@ export function DesktopSubscriptionWorkspace({
         <div className="min-h-0 flex-1 overflow-auto bg-white">
           {inboxQuery.isLoading ? (
             <SidebarStatusPane
-              title="正在读取订阅号消息"
-              description="稍等一下，正在同步最近的订阅推送。"
+              title={t(msg`正在读取订阅号消息`)}
+              description={t(msg`稍等一下，正在同步最近的订阅推送。`)}
               tone="loading"
               className="m-3"
             />
           ) : null}
           {inboxQuery.isError && inboxQuery.error instanceof Error ? (
             <SidebarStatusPane
-              title="订阅号消息暂时不可用"
+              title={t(msg`订阅号消息暂时不可用`)}
               description={inboxQuery.error.message}
               tone="danger"
               className="m-3"
@@ -325,7 +328,7 @@ export function DesktopSubscriptionWorkspace({
                       {!delivery.readAt ? (
                         <div
                           className="h-2 w-2 shrink-0 rounded-full bg-[#fa5151]"
-                          aria-label="未读"
+                          aria-label={t(msg`未读`)}
                         />
                       ) : null}
                       <div className="min-w-0 truncate text-[10px] text-[color:var(--text-muted)]">
@@ -341,7 +344,7 @@ export function DesktopSubscriptionWorkspace({
                     />
                   ) : (
                     <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[10px] border border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.72)] text-[10px] text-[color:var(--text-dim)]">
-                      文章
+                      {t(msg`文章`)}
                     </div>
                   )}
                 </button>
@@ -351,8 +354,8 @@ export function DesktopSubscriptionWorkspace({
 
           {!inboxQuery.isLoading && !feedItems.length ? (
             <SidebarStatusPane
-              title="还没有订阅号消息"
-              description="先关注一个订阅号，后续推送会汇总到这里。"
+              title={t(msg`还没有订阅号消息`)}
+              description={t(msg`先关注一个订阅号，后续推送会汇总到这里。`)}
               className="m-3"
             />
           ) : null}
@@ -384,43 +387,43 @@ export function DesktopSubscriptionWorkspace({
           </>
         ) : articleQuery.isLoading ? (
           <ReaderStatusPane
-            badge="读取中"
-            title="正在读取文章"
-            description="稍等一下，正在准备这篇订阅号文章。"
+            badge={t(msg`读取中`)}
+            title={t(msg`正在读取文章`)}
+            description={t(msg`稍等一下，正在准备这篇订阅号文章。`)}
             tone="loading"
           />
         ) : articleQuery.isError && articleQuery.error instanceof Error ? (
           <ReaderStatusPane
-            badge="读取失败"
-            title="文章暂时不可用"
+            badge={t(msg`读取失败`)}
+            title={t(msg`文章暂时不可用`)}
             description={articleQuery.error.message}
             tone="danger"
           />
         ) : inboxQuery.isLoading ? (
           <ReaderStatusPane
-            badge="准备中"
-            title="正在准备阅读区"
-            description="订阅号消息同步后，会在这里直接进入阅读。"
+            badge={t(msg`准备中`)}
+            title={t(msg`正在准备阅读区`)}
+            description={t(msg`订阅号消息同步后，会在这里直接进入阅读。`)}
             tone="loading"
           />
         ) : inboxQuery.isError && inboxQuery.error instanceof Error ? (
           <ReaderStatusPane
-            badge="读取失败"
-            title="订阅号消息暂时不可用"
+            badge={t(msg`读取失败`)}
+            title={t(msg`订阅号消息暂时不可用`)}
             description={inboxQuery.error.message}
             tone="danger"
           />
         ) : !feedItems.length ? (
           <ReaderStatusPane
-            badge="订阅号"
-            title="还没有订阅号消息"
-            description="先关注一个订阅号，后续推送会直接在这里阅读。"
+            badge={t(msg`订阅号`)}
+            title={t(msg`还没有订阅号消息`)}
+            description={t(msg`先关注一个订阅号，后续推送会直接在这里阅读。`)}
           />
         ) : (
           <ReaderStatusPane
-            badge="阅读区"
-            title="选择一篇推送开始阅读"
-            description="左侧列表会按微信式订阅号消息节奏展示最近投递的文章。"
+            badge={t(msg`阅读区`)}
+            title={t(msg`选择一篇推送开始阅读`)}
+            description={t(msg`左侧列表会按微信式订阅号消息节奏展示最近投递的文章。`)}
           />
         )}
       </section>
