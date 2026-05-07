@@ -636,6 +636,23 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Collapse stack": "スタックを折りたたむ",
     "Expand stack": "スタックを展開",
     Start: "起点",
+
+    Confirm: "確認",
+    Cancel: "キャンセル",
+    Close: "閉じる",
+    "Working...": "処理中…",
+    Unleased: "リース未取得",
+    "Delayed jobs in filter": "現在のフィルターで遅延中のジョブ",
+    "Inspect provisioning, resume, suspend, and reconcile work for the selected world.":
+      "選択したワールドのプロビジョニング・再開・一時停止・整合性確認を確認します。",
+    "Inspect provisioning, resume, suspend, and reconcile work across the managed world fleet.":
+      "管理対象ワールド全体のプロビジョニング・再開・一時停止・整合性確認を確認します。",
+    "Existing bootstrap packages and runtime env overlays will become stale until operators redeploy the updated token.":
+      "既存のブートストラップパッケージとランタイム環境のオーバーレイは、運用担当者が更新後のトークンを再デプロイするまで古い状態のままになります。",
+    "Rotate token": "トークンをローテーション",
+    "Rotating...": "ローテーション中…",
+    "System ready": "システム正常",
+    "System warning": "システム警告",
   },
   "ko-KR": {
     "CLOUD_ADMIN_SECRET is required.": "CLOUD_ADMIN_SECRET을 입력하세요.",
@@ -944,6 +961,23 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Collapse stack": "스택 접기",
     "Expand stack": "스택 펼치기",
     Start: "시작점",
+
+    Confirm: "확인",
+    Cancel: "취소",
+    Close: "닫기",
+    "Working...": "처리 중…",
+    Unleased: "리스 미보유",
+    "Delayed jobs in filter": "현재 필터에서 지연된 작업",
+    "Inspect provisioning, resume, suspend, and reconcile work for the selected world.":
+      "선택한 월드의 프로비저닝, 재개, 일시 중지 및 정합성 작업을 확인하세요.",
+    "Inspect provisioning, resume, suspend, and reconcile work across the managed world fleet.":
+      "관리되는 월드 플릿 전체의 프로비저닝, 재개, 일시 중지 및 정합성 작업을 확인하세요.",
+    "Existing bootstrap packages and runtime env overlays will become stale until operators redeploy the updated token.":
+      "기존 부트스트랩 패키지와 런타임 환경 오버레이는 운영자가 새 토큰을 다시 배포하기 전까지 오래된 상태로 남습니다.",
+    "Rotate token": "토큰 교체",
+    "Rotating...": "교체 중…",
+    "System ready": "시스템 정상",
+    "System warning": "시스템 경고",
   },
 };
 // i18n-ignore-end

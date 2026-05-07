@@ -1348,8 +1348,8 @@ export function WorldDetailPage() {
                       {t("Ops notes")}
                     </div>
                     <div className="mt-2 space-y-2 text-sm text-[color:var(--text-secondary)]">
-                      {bootstrapConfig.notes.map((note) => (
-                        <div key={note}>{note}</div>
+                      {bootstrapConfig.notes.map((note, index) => (
+                        <div key={`note-${index}`}>{note}</div>
                       ))}
                     </div>
                   </div>

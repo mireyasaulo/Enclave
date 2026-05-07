@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { TelemetryFunnelResponse } from "@yinjie/contracts";
+import { useAppLocale } from "@yinjie/i18n";
 import {
   Bar,
   BarChart,
@@ -10,6 +11,11 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import {
+  formatCloudConsoleFunnelFromPrev,
+  formatCloudConsoleFunnelOverall,
+  useCloudConsoleText,
+} from "../../lib/cloud-console-i18n";
 
 const PALETTE = ["#f97316", "#fb923c", "#fbbf24", "#34d399", "#10b981", "#0ea5e9", "#6366f1", "#a855f7"];
 
@@ -17,6 +23,7 @@ export function TelemetryFunnelEditor(props: {
   initialSteps?: string;
   onApply: (steps: string) => void;
 }) {
+  const t = useCloudConsoleText();
   const [draft, setDraft] = useState(
     props.initialSteps ?? "page_view,login_success,pay_checkout_success",
   );
@@ -26,7 +33,7 @@ export function TelemetryFunnelEditor(props: {
         type="text"
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
-        placeholder="逗号分隔的事件名（按顺序）"
+        placeholder={t("Comma-separated event names (in order)")}
         className="min-w-72 flex-1 rounded-lg border border-(--border-subtle) bg-(--surface-card) px-3 py-1.5 text-xs text-(--text-primary)"
       />
       <button
@@ -34,17 +41,19 @@ export function TelemetryFunnelEditor(props: {
         onClick={() => props.onApply(draft)}
         className="rounded-lg bg-(--brand-primary) px-3 py-1.5 text-xs font-semibold text-white hover:bg-(--brand-secondary)"
       >
-        应用漏斗
+        {t("Apply funnel")}
       </button>
     </div>
   );
 }
 
 export function TelemetryFunnelChart({ data }: { data: TelemetryFunnelResponse }) {
+  const t = useCloudConsoleText();
+  const { locale } = useAppLocale();
   if (data.steps.length === 0) {
     return (
       <div className="rounded-2xl border border-(--border-subtle) bg-(--surface-card) p-8 text-center text-sm text-(--text-muted)">
-        漏斗为空。请先输入步骤。
+        {t("Funnel is empty. Please enter steps first.")}
       </div>
     );
   }
@@ -85,9 +94,17 @@ export function TelemetryFunnelChart({ data }: { data: TelemetryFunnelResponse }
               · {step.count.toLocaleString()}
             </span>
             <span>
-              {i > 0 ? `从上一步 ${(step.conversionFromPrev * 100).toFixed(1)}%` : "起点"}
+              {i > 0
+                ? formatCloudConsoleFunnelFromPrev(
+                    (step.conversionFromPrev * 100).toFixed(1),
+                    locale,
+                  )
+                : t("Start")}
               {" · "}
-              整体 {(step.conversionFromStart * 100).toFixed(1)}%
+              {formatCloudConsoleFunnelOverall(
+                (step.conversionFromStart * 100).toFixed(1),
+                locale,
+              )}
             </span>
           </li>
         ))}

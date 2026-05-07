@@ -50,6 +50,7 @@ import {
   formatCloudConsoleJobLeaseAvailable,
   formatCloudConsoleJobLeaseExpires,
   formatCloudConsoleJobLeaseRemaining,
+  formatCloudConsoleJobsGroupCount,
   formatCloudConsolePageOfTotal,
   formatCloudConsolePageSize,
   formatCloudConsoleVisibleJobsRange,
@@ -86,7 +87,7 @@ function formatDateTime(value?: string | null) {
 }
 
 function formatLeaseOwner(value?: string | null) {
-  return value || "Unleased";
+  return value || translateCloudConsoleTextForActiveLocale("Unleased");
 }
 
 function formatDuration(value?: number | null) {

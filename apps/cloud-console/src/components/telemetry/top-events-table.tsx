@@ -1,10 +1,12 @@
 import type { TelemetryTopEventsResponse } from "@yinjie/contracts";
+import { useCloudConsoleText } from "../../lib/cloud-console-i18n";
 
 export function TelemetryTopEventsTable({ data }: { data: TelemetryTopEventsResponse }) {
+  const t = useCloudConsoleText();
   if (data.rows.length === 0) {
     return (
       <div className="rounded-2xl border border-(--border-subtle) bg-(--surface-card) p-8 text-center text-sm text-(--text-muted)">
-        当前范围内无事件。
+        {t("No events in the current range.")}
       </div>
     );
   }

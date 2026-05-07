@@ -1,11 +1,13 @@
 import { useState } from "react";
 import type { TelemetryErrorsResponse } from "@yinjie/contracts";
+import { useCloudConsoleText } from "../../lib/cloud-console-i18n";
 
 export function TelemetryErrorsList({ data }: { data: TelemetryErrorsResponse }) {
+  const t = useCloudConsoleText();
   if (data.rows.length === 0) {
     return (
       <div className="rounded-2xl border border-(--border-subtle) bg-(--surface-card) p-8 text-center text-sm text-(--text-muted)">
-        当前范围内无错误事件。
+        {t("No error events in the current range.")}
       </div>
     );
   }
@@ -19,6 +21,7 @@ export function TelemetryErrorsList({ data }: { data: TelemetryErrorsResponse })
 }
 
 function ErrorRow({ row }: { row: TelemetryErrorsResponse["rows"][number] }) {
+  const t = useCloudConsoleText();
   const [expanded, setExpanded] = useState(false);
   return (
     <li className="rounded-2xl border border-(--border-subtle) bg-(--surface-card) p-3">
@@ -43,7 +46,7 @@ function ErrorRow({ row }: { row: TelemetryErrorsResponse["rows"][number] }) {
           onClick={() => setExpanded((v) => !v)}
           className="mt-2 text-xs font-semibold text-(--brand-primary) hover:underline"
         >
-          {expanded ? "收起堆栈" : "展开堆栈"}
+          {expanded ? t("Collapse stack") : t("Expand stack")}
         </button>
       )}
       {expanded && row.stack && (

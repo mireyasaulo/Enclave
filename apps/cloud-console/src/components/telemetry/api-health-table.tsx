@@ -1,10 +1,12 @@
 import type { TelemetryApiHealthResponse } from "@yinjie/contracts";
+import { useCloudConsoleText } from "../../lib/cloud-console-i18n";
 
 export function TelemetryApiHealthTable({ data }: { data: TelemetryApiHealthResponse }) {
+  const t = useCloudConsoleText();
   if (data.rows.length === 0) {
     return (
       <div className="rounded-2xl border border-(--border-subtle) bg-(--surface-card) p-8 text-center text-sm text-(--text-muted)">
-        当前范围内无 API 调用埋点。
+        {t("No API telemetry in the current range.")}
       </div>
     );
   }
