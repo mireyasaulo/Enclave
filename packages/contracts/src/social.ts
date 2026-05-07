@@ -38,6 +38,9 @@ export interface Friendship {
   tags?: string[] | null;
   createdAt: string;
   lastInteractedAt?: string;
+  sparkStreak?: number;
+  sparkStartedAt?: string | null;
+  sparkLastDay?: string | null;
 }
 
 export interface FriendListItem {

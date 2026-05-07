@@ -27,6 +27,7 @@ import { ActionRuntimeService } from '../action-runtime/action-runtime.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { SELF_CHARACTER_ID } from '../characters/default-characters';
 import { SelfAgentService } from '../self-agent/self-agent.service';
+import { FriendshipEntity } from '../social/friendship.entity';
 import { ConversationEntity } from './conversation.entity';
 import {
   filterUserFacingConversations,
@@ -186,6 +187,8 @@ export class ChatService {
     private groupMemberRepo: Repository<GroupMemberEntity>,
     @InjectRepository(GroupMessageEntity)
     private groupMessageRepo: Repository<GroupMessageEntity>,
+    @InjectRepository(FriendshipEntity)
+    private friendshipRepo: Repository<FriendshipEntity>,
   ) {}
 
   async getOrCreateConversation(
@@ -258,6 +261,17 @@ export class ChatService {
       }),
     );
 
+    const friendships = await this.friendshipRepo.find({
+      where: { ownerId: owner.id },
+      select: ['characterId', 'sparkStreak'],
+    });
+    const sparkByCharacterId = new Map<string, number>();
+    for (const f of friendships) {
+      if ((f.sparkStreak ?? 0) > 0) {
+        sparkByCharacterId.set(f.characterId, f.sparkStreak);
+      }
+    }
+
     const result: (Conversation & {
       lastMessage?: Message;
       unreadCount: number;
@@ -281,8 +295,18 @@ export class ChatService {
         }),
       });
 
+      const serialized = await this.serializeConversation(conv);
+      const directCharacterId =
+        serialized.type === 'direct'
+          ? serialized.participants?.[0]
+          : undefined;
+      const sparkStreak = directCharacterId
+        ? sparkByCharacterId.get(directCharacterId)
+        : undefined;
+
       result.push({
-        ...(await this.serializeConversation(conv)),
+        ...serialized,
+        ...(sparkStreak ? { sparkStreak } : {}),
         lastMessage,
         unreadCount,
       });

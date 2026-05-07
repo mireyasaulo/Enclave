@@ -49,6 +49,7 @@ import { MediaInsightJobEntity } from './media-insight-job.entity';
 import { ChatCustomStickerEntity } from './custom-sticker.entity';
 import { CustomStickersService } from './custom-stickers.service';
 import { CharacterEntity } from '../characters/character.entity';
+import { FriendshipEntity } from '../social/friendship.entity';
 import { ReplyArtifactJobService } from './reply-artifact-job.service';
 import { MediaInsightJobService } from './media-insight-job.service';
 import { DocumentExtractionService } from './document-extraction.service';
@@ -77,6 +78,7 @@ import { EventsModule } from '../events/events.module';
       MediaInsightJobEntity,
       ChatCustomStickerEntity,
       CharacterEntity,
+      FriendshipEntity,
     ]),
   ],
   providers: [
