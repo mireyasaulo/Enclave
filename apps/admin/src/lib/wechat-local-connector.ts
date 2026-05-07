@@ -342,21 +342,3 @@ export function openWechatConnectorUpstreamService(
   );
 }
 
-function normalizeMessageMode(
-  value?: string | null,
-): WechatConnectorBundleMessageMode | null {
-  return value === "all" ? "all" : value === "recent" ? "recent" : null;
-}
-
-function normalizePositiveInteger(value: unknown, fallback: number) {
-  const normalized =
-    typeof value === "number"
-      ? value
-      : typeof value === "string"
-        ? Number(value)
-        : Number.NaN;
-  if (!Number.isFinite(normalized)) {
-    return fallback;
-  }
-  return Math.max(1, Math.trunc(normalized));
-}

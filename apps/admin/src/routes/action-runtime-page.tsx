@@ -2675,15 +2675,6 @@ function translateProviderType(
   return "Mock";
 }
 
-function createConnectorDrafts(connectors: ActionConnectorSummary[]) {
-  return Object.fromEntries(
-    connectors.map((connector) => [
-      connector.id,
-      createConnectorDraft(connector),
-    ]),
-  );
-}
-
 function createConnectorDraft(
   connector: ActionConnectorSummary,
 ): ConnectorDraft {
