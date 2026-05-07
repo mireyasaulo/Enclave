@@ -9,6 +9,8 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage, useRuntimeTranslator } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
@@ -165,7 +167,7 @@ type DesktopChatWorkspaceProps = {
 
 type DesktopQuickActionItem = {
   key: string;
-  label: string;
+  label: ReturnType<typeof msg>;
   icon: typeof Users;
 };
 
@@ -174,17 +176,17 @@ type DesktopConversationDangerAction = "hide" | "clear" | "delete" | "leave";
 const desktopQuickActionItems: DesktopQuickActionItem[] = [
   {
     key: "create-group",
-    label: "发起群聊",
+    label: msg`发起群聊`,
     icon: Users,
   },
   {
     key: "add-friend",
-    label: "添加朋友",
+    label: msg`添加朋友`,
     icon: UserPlus,
   },
   {
     key: "create-note",
-    label: "新建笔记",
+    label: msg`新建笔记`,
     icon: FileText,
   },
 ];
@@ -204,6 +206,7 @@ export function DesktopChatWorkspace({
   selectedSpecialView,
   standaloneWindow = false,
 }: DesktopChatWorkspaceProps) {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const ownerId = useWorldOwnerStore((state) => state.id);
@@ -990,7 +993,9 @@ export function DesktopChatWorkspace({
     onError: (error) => {
       setConversationContextMenu(null);
       setConversationDangerAction(null);
-      setNotice(error instanceof Error ? error.message : "会话操作失败。");
+      setNotice(
+        error instanceof Error ? error.message : t(msg`会话操作失败。`),
+      );
     },
   });
 
@@ -1003,44 +1008,50 @@ export function DesktopChatWorkspace({
 
     if (action === "hide") {
       return {
-        title: "隐藏聊天",
-        description: "确认将这段聊天从消息列表中隐藏吗？有新消息时会再次出现。",
-        confirmLabel: "隐藏聊天",
-        pendingLabel: "正在隐藏...",
+        title: t(msg`隐藏聊天`),
+        description: t(
+          msg`确认将这段聊天从消息列表中隐藏吗？有新消息时会再次出现。`,
+        ),
+        confirmLabel: t(msg`隐藏聊天`),
+        pendingLabel: t(msg`正在隐藏...`),
         danger: false,
       };
     }
 
     if (action === "clear") {
       return {
-        title: "清空聊天记录",
+        title: t(msg`清空聊天记录`),
         description: isPersistedGroupConversation(conversation)
-          ? "确认清空这个群聊的聊天记录吗？"
-          : "确认清空这段聊天记录吗？",
-        confirmLabel: "清空记录",
-        pendingLabel: "正在清空...",
+          ? t(msg`确认清空这个群聊的聊天记录吗？`)
+          : t(msg`确认清空这段聊天记录吗？`),
+        confirmLabel: t(msg`清空记录`),
+        pendingLabel: t(msg`正在清空...`),
         danger: true,
       };
     }
 
     if (action === "leave") {
       return {
-        title: "删除并退出",
-        description: "删除并退出后，该群聊会从当前世界中移除。确认继续吗？",
-        confirmLabel: "删除并退出",
-        pendingLabel: "正在退出...",
+        title: t(msg`删除并退出`),
+        description: t(
+          msg`删除并退出后，该群聊会从当前世界中移除。确认继续吗？`,
+        ),
+        confirmLabel: t(msg`删除并退出`),
+        pendingLabel: t(msg`正在退出...`),
         danger: true,
       };
     }
 
     return {
-      title: "删除聊天",
-      description: "删除后，这段聊天会从消息列表中移除；有新消息时会再次出现。",
-      confirmLabel: "删除聊天",
-      pendingLabel: "正在删除...",
+      title: t(msg`删除聊天`),
+      description: t(
+        msg`删除后，这段聊天会从消息列表中移除；有新消息时会再次出现。`,
+      ),
+      confirmLabel: t(msg`删除聊天`),
+      pendingLabel: t(msg`正在删除...`),
       danger: true,
     };
-  }, [conversationDangerAction]);
+  }, [conversationDangerAction, t]);
 
   const officialMessageActionMutation = useMutation({
     mutationFn: async (
@@ -1110,18 +1121,18 @@ export function DesktopChatWorkspace({
 
       setNotice(
         action.kind === "subscription-read"
-          ? "已将订阅号消息标为已读。"
+          ? t(msg`已将订阅号消息标为已读。`)
           : action.kind === "service-read"
-            ? `已将 ${action.conversation.account.name} 标为已读。`
+            ? t(msg`已将 ${action.conversation.account.name} 标为已读。`)
             : action.conversation.isMuted
-              ? `已关闭 ${action.conversation.account.name} 的消息免打扰。`
-              : `已开启 ${action.conversation.account.name} 的消息免打扰。`,
+              ? t(msg`已关闭 ${action.conversation.account.name} 的消息免打扰。`)
+              : t(msg`已开启 ${action.conversation.account.name} 的消息免打扰。`),
       );
     },
     onError: (error) => {
       setOfficialMessageContextMenu(null);
       setNotice(
-        error instanceof Error ? error.message : "公众号消息操作失败。",
+        error instanceof Error ? error.message : t(msg`公众号消息操作失败。`),
       );
     },
   });
@@ -1265,7 +1276,7 @@ export function DesktopChatWorkspace({
 
   function handleDesktopCallAction(kind: DesktopChatCallKind) {
     if (!activeConversation) {
-      setNotice("当前会话暂时不可用，请回到消息列表再试一次。");
+      setNotice(t(msg`当前会话暂时不可用，请回到消息列表再试一次。`));
       return;
     }
 
@@ -1388,8 +1399,8 @@ export function DesktopChatWorkspace({
     setConversationContextMenu(null);
     setNotice(
       opened
-        ? "已在独立窗口打开聊天。"
-        : "浏览器阻止了新窗口，请检查弹窗权限。",
+        ? t(msg`已在独立窗口打开聊天。`)
+        : t(msg`浏览器阻止了新窗口，请检查弹窗权限。`),
     );
   }
 
@@ -1432,7 +1443,7 @@ export function DesktopChatWorkspace({
                   onClick={() => desktopSearchLauncher.setIsOpen(true)}
                   onFocus={() => desktopSearchLauncher.setIsOpen(true)}
                   onKeyDown={handleSearchFieldKeyDown}
-                  placeholder="搜索"
+                  placeholder={t(msg`搜索`)}
                   className="flex-1 rounded-[12px] border-[color:var(--border-faint)] bg-[color:var(--surface-console)] py-2 pl-3.5 pr-11 text-[13px] shadow-none hover:bg-white focus:border-[color:var(--border-brand)] focus:bg-white focus:shadow-none"
                 />
                 <button
@@ -1441,15 +1452,15 @@ export function DesktopChatWorkspace({
                   className="absolute right-1 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-[8px] text-[color:var(--text-dim)] transition hover:bg-[color:var(--surface-card)] hover:text-[color:var(--text-primary)]"
                   aria-label={
                     desktopSearchLauncher.speechListening
-                      ? "结束语音输入"
-                      : "开始语音输入"
+                      ? t(msg`结束语音输入`)
+                      : t(msg`开始语音输入`)
                   }
                   title={
                     desktopSearchLauncher.speechSupported
                       ? desktopSearchLauncher.speechListening
-                        ? "结束语音输入"
-                        : "语音输入"
-                      : "当前浏览器不支持语音输入"
+                        ? t(msg`结束语音输入`)
+                        : t(msg`语音输入`)
+                      : t(msg`当前浏览器不支持语音输入`)
                   }
                   disabled={
                     desktopSearchLauncher.speechButtonDisabled ||
@@ -1484,7 +1495,7 @@ export function DesktopChatWorkspace({
                   type="button"
                   onClick={() => setIsQuickMenuOpen((current) => !current)}
                   className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-[color:var(--border-faint)] bg-white text-[color:var(--text-primary)] transition hover:bg-[color:var(--surface-console)]"
-                  aria-label="打开快捷菜单"
+                  aria-label={t(msg`打开快捷菜单`)}
                 >
                   <Plus size={17} strokeWidth={2.2} />
                 </button>
@@ -1504,7 +1515,7 @@ export function DesktopChatWorkspace({
                           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-[rgba(7,193,96,0.07)] text-[color:var(--brand-primary)]">
                             <Icon size={16} />
                           </div>
-                          <span>{item.label}</span>
+                          <span>{t(item.label)}</span>
                         </button>
                       );
                     })}
@@ -1524,7 +1535,7 @@ export function DesktopChatWorkspace({
 
           <div className="min-h-0 flex-1 overflow-auto px-2 py-2.5">
             {conversationsQuery.isLoading ? (
-              <LoadingBlock label="正在读取会话..." />
+              <LoadingBlock label={t(msg`正在读取会话...`)} />
             ) : null}
             {conversationsQuery.isError &&
             conversationsQuery.error instanceof Error ? (
@@ -1546,7 +1557,7 @@ export function DesktopChatWorkspace({
                       <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[rgba(7,193,96,0.07)] text-[color:var(--brand-primary)]">
                         <BellRing size={14} />
                       </div>
-                      <span>消息提醒</span>
+                      <span>{t(msg`消息提醒`)}</span>
                     </div>
                     <div className="text-[11px] text-[color:var(--text-dim)]">
                       <ChatReminderSummaryText
@@ -1612,8 +1623,8 @@ export function DesktopChatWorkspace({
                                     className="px-2.5 text-[10px] text-[color:var(--text-dim)]"
                                     aria-label={
                                       collapsed
-                                        ? "展开已通知提醒"
-                                        : "收起已通知提醒"
+                                        ? t(msg`展开已通知提醒`)
+                                        : t(msg`收起已通知提醒`)
                                     }
                                     aria-expanded={!collapsed}
                                     collapsed={collapsed}
@@ -1719,8 +1730,8 @@ export function DesktopChatWorkspace({
             searchTerm.trim() ? (
               <div className="px-2 pt-5">
                 <EmptyState
-                  title="没有匹配的会话"
-                  description="换个关键词试试。"
+                  title={t(msg`没有匹配的会话`)}
+                  description={t(msg`换个关键词试试。`)}
                 />
               </div>
             ) : null}
@@ -1930,8 +1941,8 @@ export function DesktopChatWorkspace({
           <div className="flex h-full items-center justify-center px-10">
             <div className="w-full max-w-md rounded-[18px] border border-[color:var(--border-faint)] bg-white px-8 py-10 shadow-[var(--shadow-section)]">
               <EmptyState
-                title="这段聊天已经不存在"
-                description="它可能已被隐藏、删除，或者当前上下文已经失效。"
+                title={t(msg`这段聊天已经不存在`)}
+                description={t(msg`它可能已被隐藏、删除，或者当前上下文已经失效。`)}
               />
             </div>
           </div>
@@ -1939,8 +1950,10 @@ export function DesktopChatWorkspace({
           <div className="flex h-full items-center justify-center px-10">
             <div className="w-full max-w-md rounded-[18px] border border-[color:var(--border-faint)] bg-white/86 px-8 py-10 shadow-[var(--shadow-soft)]">
               <EmptyState
-                title="选择一段聊天开始工作"
-                description="左侧会话列表用于切换聊天，右侧再按需展开聊天信息或记录。"
+                title={t(msg`选择一段聊天开始工作`)}
+                description={t(
+                  msg`左侧会话列表用于切换聊天，右侧再按需展开聊天信息或记录。`,
+                )}
               />
             </div>
           </div>
@@ -1952,7 +1965,7 @@ export function DesktopChatWorkspace({
           panelRef={sidePanelRef}
           mode={rightPanelMode}
           title={activeConversation.title}
-          subtitle="聊天信息"
+          subtitle={t(msg`聊天信息`)}
           detailsVariant={
             isPersistedGroupConversation(activeConversation)
               ? "wechat"
@@ -2062,7 +2075,7 @@ export function DesktopChatWorkspace({
               conversation: conversationContextMenu.conversation,
             })
           }
-          hideLabel="隐藏聊天"
+          hideLabel={t(msg`隐藏聊天`)}
           onHide={
             isPersistedGroupConversation(conversationContextMenu.conversation)
               ? () => {
@@ -2083,8 +2096,8 @@ export function DesktopChatWorkspace({
           }}
           deleteLabel={
             isPersistedGroupConversation(conversationContextMenu.conversation)
-              ? "删除并退出"
-              : "删除聊天"
+              ? t(msg`删除并退出`)
+              : t(msg`删除聊天`)
           }
           onDelete={() => {
             setConversationContextMenu(null);
@@ -2110,7 +2123,7 @@ export function DesktopChatWorkspace({
               ? ([
                   {
                     key: "open-subscription",
-                    label: "打开订阅号消息",
+                    label: t(msg`打开订阅号消息`),
                     icon: <BookOpenText size={15} />,
                     onClick: () => {
                       setOfficialMessageContextMenu(null);
@@ -2129,8 +2142,8 @@ export function DesktopChatWorkspace({
                     key: "open-directory",
                     label:
                       subscriptionInboxActive && selectedOfficialArticleId
-                        ? "在通讯录中打开当前文章"
-                        : "打开公众号目录",
+                        ? t(msg`在通讯录中打开当前文章`)
+                        : t(msg`打开公众号目录`),
                     icon: <ExternalLink size={15} />,
                     dividerBefore: true,
                     onClick: () => {
@@ -2161,7 +2174,7 @@ export function DesktopChatWorkspace({
                   officialMessageContextMenu.summary.unreadCount > 0
                     ? {
                         key: "subscription-read",
-                        label: "标记全部已读",
+                        label: t(msg`标记全部已读`),
                         icon: <CheckCheck size={15} />,
                         dividerBefore: true,
                         disabled: officialMessageActionMutation.isPending,
@@ -2176,7 +2189,7 @@ export function DesktopChatWorkspace({
               : ([
                   {
                     key: "open-service",
-                    label: "打开服务号消息",
+                    label: t(msg`打开服务号消息`),
                     icon: <BookOpenText size={15} />,
                     onClick: () => {
                       setOfficialMessageContextMenu(null);
@@ -2197,7 +2210,7 @@ export function DesktopChatWorkspace({
                   },
                   {
                     key: "open-account",
-                    label: "打开公众号主页",
+                    label: t(msg`打开公众号主页`),
                     icon: <ExternalLink size={15} />,
                     dividerBefore: true,
                     onClick: () => {
@@ -2220,7 +2233,7 @@ export function DesktopChatWorkspace({
                   officialMessageContextMenu.conversation.unreadCount > 0
                     ? {
                         key: "service-read",
-                        label: "标记已读",
+                        label: t(msg`标记已读`),
                         icon: <CheckCheck size={15} />,
                         dividerBefore: true,
                         disabled: officialMessageActionMutation.isPending,
@@ -2236,8 +2249,8 @@ export function DesktopChatWorkspace({
                   {
                     key: "service-mute",
                     label: officialMessageContextMenu.conversation.isMuted
-                      ? "关闭免打扰"
-                      : "消息免打扰",
+                      ? t(msg`关闭免打扰`)
+                      : t(msg`消息免打扰`),
                     icon: officialMessageContextMenu.conversation.isMuted ? (
                       <BellRing size={15} />
                     ) : (
@@ -2565,6 +2578,7 @@ function ConversationCardLink({
     conversation: ConversationListItem,
   ) => void;
 }) {
+  const t = useRuntimeTranslator();
   const className = active
     ? "flex items-center gap-3 rounded-[10px] border border-[rgba(7,193,96,0.14)] bg-white px-3 py-2.5 shadow-[0_8px_22px_rgba(15,23,42,0.04)]"
     : contextMenuOpen
@@ -2608,7 +2622,7 @@ function ConversationCardLink({
             </div>
             {isGroupConversation ? (
               <span className="shrink-0 rounded-full border border-[rgba(7,193,96,0.12)] bg-[rgba(7,193,96,0.06)] px-1.5 py-0.5 text-[10px] text-[color:var(--text-muted)]">
-                群聊
+                {t(msg`群聊`)}
               </span>
             ) : null}
           </div>
@@ -2637,21 +2651,21 @@ function ConversationCardLink({
           <div className="flex shrink-0 items-center gap-1.5">
             {hasMentionAllReminder ? (
               <span className="shrink-0 rounded-full border border-[#f3ddba] bg-[#fff8ec] px-2 py-0.5 text-[10px] font-medium text-[#ba740f]">
-                有人@所有人
+                {t(msg`有人@所有人`)}
               </span>
             ) : null}
             {conversation.isMuted ? (
               <BellOff
                 size={13}
                 className="text-[color:var(--text-dim)]"
-                aria-label="消息免打扰"
+                aria-label={t(msg`消息免打扰`)}
               />
             ) : null}
             {conversation.unreadCount > 0 ? (
               conversation.isMuted ? (
                 <div
                   className="h-2 w-2 rounded-full bg-[#fa5151]"
-                  aria-label={`${conversation.unreadCount} 条未读消息`}
+                  aria-label={t(msg`${conversation.unreadCount} 条未读消息`)}
                 />
               ) : (
                 <div className="min-w-5 rounded-full bg-[#fa5151] px-1.5 py-0.5 text-center text-[10px] text-white">
@@ -2712,25 +2726,29 @@ function buildConversationActionNotice(
 ) {
   switch (action) {
     case "pin":
-      return conversation.isPinned ? "已取消置顶聊天。" : "聊天已置顶。";
+      return conversation.isPinned
+        ? translateRuntimeMessage(msg`已取消置顶聊天。`)
+        : translateRuntimeMessage(msg`聊天已置顶。`);
     case "mute":
-      return conversation.isMuted ? "已关闭消息免打扰。" : "已开启消息免打扰。";
+      return conversation.isMuted
+        ? translateRuntimeMessage(msg`已关闭消息免打扰。`)
+        : translateRuntimeMessage(msg`已开启消息免打扰。`);
     case "read":
-      return "已标记为已读。";
+      return translateRuntimeMessage(msg`已标记为已读。`);
     case "unread":
-      return "已标记为未读。";
+      return translateRuntimeMessage(msg`已标记为未读。`);
     case "hide":
       return isPersistedGroupConversation(conversation)
-        ? "群聊已隐藏。"
-        : "聊天已隐藏。";
+        ? translateRuntimeMessage(msg`群聊已隐藏。`)
+        : translateRuntimeMessage(msg`聊天已隐藏。`);
     case "clear":
       return isPersistedGroupConversation(conversation)
-        ? "群聊记录已清空。"
-        : "聊天记录已清空。";
+        ? translateRuntimeMessage(msg`群聊记录已清空。`)
+        : translateRuntimeMessage(msg`聊天记录已清空。`);
     case "delete":
-      return "聊天已从列表移除。";
+      return translateRuntimeMessage(msg`聊天已从列表移除。`);
     case "leave":
-      return "已删除并退出群聊。";
+      return translateRuntimeMessage(msg`已删除并退出群聊。`);
   }
 }
 

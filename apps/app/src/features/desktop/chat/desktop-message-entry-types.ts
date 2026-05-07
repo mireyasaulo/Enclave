@@ -1,3 +1,5 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type {
   ConversationListItem,
   OfficialAccountServiceConversationSummary,
@@ -55,11 +57,11 @@ export function buildDesktopMessageEntries({
 
   if (
     matchesDesktopMessageEntryKeyword(normalizedKeyword, [
-      "公众号",
-      "公众号消息",
-      "公众号主页",
-      "订阅号",
-      "服务号",
+      translateRuntimeMessage(msg`公众号`),
+      translateRuntimeMessage(msg`公众号消息`),
+      translateRuntimeMessage(msg`公众号主页`),
+      translateRuntimeMessage(msg`订阅号`),
+      translateRuntimeMessage(msg`服务号`),
       officialAccountsSummary.preview,
     ])
   ) {
@@ -73,7 +75,7 @@ export function buildDesktopMessageEntries({
   if (
     subscriptionInboxSummary &&
     matchesDesktopMessageEntryKeyword(normalizedKeyword, [
-      "订阅号消息",
+      translateRuntimeMessage(msg`订阅号消息`),
       subscriptionInboxSummary.preview,
     ])
   ) {
@@ -171,13 +173,17 @@ function buildDesktopOfficialAccountsEntrySummary({
       return rightTimestamp - leftTimestamp;
     })[0];
 
-  let preview = "查看公众号主页、订阅号和服务号消息";
+  let preview = translateRuntimeMessage(
+    msg`查看公众号主页、订阅号和服务号消息`,
+  );
   if (serviceCount && subscriptionInboxSummary) {
-    preview = "服务号通知和订阅号文章都在这里查看";
+    preview = translateRuntimeMessage(
+      msg`服务号通知和订阅号文章都在这里查看`,
+    );
   } else if (serviceCount) {
-    preview = "查看服务号通知和公众号主页";
+    preview = translateRuntimeMessage(msg`查看服务号通知和公众号主页`);
   } else if (subscriptionInboxSummary) {
-    preview = "查看订阅号文章和公众号主页";
+    preview = translateRuntimeMessage(msg`查看订阅号文章和公众号主页`);
   }
 
   return {
