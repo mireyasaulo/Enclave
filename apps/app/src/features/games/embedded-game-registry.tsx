@@ -46,6 +46,11 @@ const CloudFarmGame = lazy(async () => {
   return { default: mod.CloudFarmGame };
 });
 
+const IslandConcertGame = lazy(async () => {
+  const mod = await import("./island-concert/island-concert-game");
+  return { default: mod.IslandConcertGame };
+});
+
 export type EmbeddedGameProps = {
   variant?: "embedded" | "fullscreen";
   onExit?: () => void;
@@ -63,6 +68,7 @@ const EMBEDDED_GAME_COMPONENTS: Record<
   "forest-train": ForestTrainGame,
   "pixel-arena": PixelArenaGame,
   "cloud-farm": CloudFarmGame,
+  "island-concert": IslandConcertGame,
 };
 
 export function hasEmbeddedGame(gameId: string | null | undefined): boolean {
