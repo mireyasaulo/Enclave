@@ -41,6 +41,11 @@ const PixelArenaGame = lazy(async () => {
   return { default: mod.PixelArenaGame };
 });
 
+const CloudFarmGame = lazy(async () => {
+  const mod = await import("./cloud-farm/cloud-farm-game");
+  return { default: mod.CloudFarmGame };
+});
+
 export type EmbeddedGameProps = {
   variant?: "embedded" | "fullscreen";
   onExit?: () => void;
@@ -57,6 +62,7 @@ const EMBEDDED_GAME_COMPONENTS: Record<
   "cat-inn": CatInnGame,
   "forest-train": ForestTrainGame,
   "pixel-arena": PixelArenaGame,
+  "cloud-farm": CloudFarmGame,
 };
 
 export function hasEmbeddedGame(gameId: string | null | undefined): boolean {
