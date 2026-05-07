@@ -9,7 +9,7 @@ import {
   type WikiSyncPreviewFilter,
   type WikiSyncPreviewItem,
 } from "@yinjie/contracts";
-import { Button, Card, SnapshotDiff, StatusPill } from "@yinjie/ui";
+import { Button, Card, ErrorBlock, SnapshotDiff, StatusPill } from "@yinjie/ui";
 import {
   AdminCallout,
   AdminEmptyState,
@@ -394,6 +394,17 @@ export function CharactersWikiSyncSection({
             }
             className="mt-4"
           />
+        ) : null}
+
+        {applyMutation.error instanceof Error ? (
+          <div className="mt-4">
+            <ErrorBlock message={applyMutation.error.message} />
+          </div>
+        ) : null}
+        {importMutation.error instanceof Error ? (
+          <div className="mt-4">
+            <ErrorBlock message={importMutation.error.message} />
+          </div>
         ) : null}
 
         {lastResults && lastResults.results.length > 0 ? (
