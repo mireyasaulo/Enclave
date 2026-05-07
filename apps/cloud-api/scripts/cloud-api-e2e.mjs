@@ -593,6 +593,7 @@ async function runScenario() {
 
   const adminHeaders = {
     Authorization: `Bearer ${adminSessionResponse.body.accessToken}`,
+    "Accept-Language": "en-US",
   };
 
   const adminTokenRejectedByClientResponse = await apiFetch(
