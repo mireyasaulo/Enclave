@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { FARM_CROP_CATALOG, type FarmCropId } from "@yinjie/contracts";
+
+const t = translateRuntimeMessage;
 import { FarmClockProvider, useFarmClock } from "./farm-clock-context";
 import { useFarmState } from "./use-farm-state";
 import { CoinDisplay } from "./components/coin-display";
@@ -73,7 +77,7 @@ function FarmPageInner() {
   if (stateQuery.isLoading) {
     return (
       <div className="flex h-full items-center justify-center text-sm text-stone-500">
-        正在准备隐界农场……
+        {t(msg`正在准备隐界农场……`)}
       </div>
     );
   }
@@ -81,7 +85,7 @@ function FarmPageInner() {
   if (stateQuery.error) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 text-sm text-rose-600">
-        <span>农场加载失败</span>
+        <span>{t(msg`农场加载失败`)}</span>
         <span className="text-xs text-stone-500">
           {(stateQuery.error as Error).message}
         </span>
@@ -120,10 +124,10 @@ function FarmPageInner() {
             to="/tabs/games"
             className="rounded-full px-2 py-1 text-xs text-stone-500 hover:bg-white/60"
           >
-            ← 返回
+            ← {t(msg`返回`)}
           </Link>
           <h1 className="flex-1 text-center text-lg font-semibold text-emerald-900">
-            隐界农场
+            {t(msg`隐界农场`)}
           </h1>
           <div className="w-12" />
         </header>
@@ -137,9 +141,9 @@ function FarmPageInner() {
               onClick={() => setSeedShopOpen(true)}
               className="rounded-2xl bg-white px-3 py-2 text-left text-xs shadow-sm hover:bg-emerald-50"
             >
-              <div className="font-medium text-emerald-700">🛒 种子店</div>
+              <div className="font-medium text-emerald-700">🛒 {t(msg`种子店`)}</div>
               <div className="mt-0.5 text-stone-500">
-                种子袋共 {seedBagTotal} 包
+                {t(msg`种子袋共`)} {seedBagTotal} {t(msg`包`)}
               </div>
             </button>
             <button
@@ -147,13 +151,13 @@ function FarmPageInner() {
               onClick={() => setWarehouseOpen(true)}
               className="rounded-2xl bg-white px-3 py-2 text-left text-xs shadow-sm hover:bg-emerald-50"
             >
-              <div className="font-medium text-amber-700">🏠 仓库</div>
+              <div className="font-medium text-amber-700">🏠 {t(msg`仓库`)}</div>
               <div className="mt-0.5 text-stone-500">
-                存货共 {warehouseTotal} 个
+                {t(msg`存货共`)} {warehouseTotal} {t(msg`个`)}
               </div>
             </button>
             <p className="hidden rounded-2xl bg-white/70 p-3 text-[11px] text-stone-500 shadow-sm lg:block">
-              作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活——回来时看到的状态是世界自治后的结果。
+              {t(msg`作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活——回来时看到的状态是世界自治后的结果。`)}
             </p>
           </aside>
 
@@ -183,15 +187,15 @@ function FarmPageInner() {
         </div>
 
         <p className="text-center text-[10px] text-stone-400 lg:hidden">
-          作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。
+          {t(msg`作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。`)}
         </p>
       </div>
 
       {toast && (
         <div className="pointer-events-none fixed bottom-20 left-1/2 z-50 -translate-x-1/2 rounded-full bg-emerald-700 px-4 py-2 text-sm text-white shadow-lg">
-          收获 {FARM_CROP_CATALOG[toast.cropId].nameZh} ×{toast.amount} ·
+          {t(msg`收获`)} {FARM_CROP_CATALOG[toast.cropId].nameZh} ×{toast.amount} ·
           🪙+{toast.coinsGained}
-          {toast.leveledUp && " · 升级！"}
+          {toast.leveledUp && ` · ${t(msg`升级！`)}`}
         </div>
       )}
 

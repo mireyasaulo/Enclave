@@ -1014,8 +1014,14 @@ function inferTierFromCarId(carId: string): CarTier {
 function formatRelative(ms: number): string {
   const diff = Date.now() - ms;
   if (diff < 60_000) return t(msg`刚刚`);
-  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)} ${t(msg`分钟前`)}`;
-  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)} ${t(msg`小时前`)}`;
+  if (diff < 3_600_000) {
+    const minutes = Math.floor(diff / 60_000);
+    return t(msg`${minutes} 分钟前`);
+  }
+  if (diff < 86_400_000) {
+    const hours = Math.floor(diff / 3_600_000);
+    return t(msg`${hours} 小时前`);
+  }
   const d = new Date(ms);
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }

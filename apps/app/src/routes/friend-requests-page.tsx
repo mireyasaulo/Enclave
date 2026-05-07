@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect, useState, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
+import { useLingui } from "@lingui/react";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
@@ -54,6 +55,8 @@ export function FriendRequestsPage() {
 
 function MobileFriendRequestsPage() {
   const navigate = useNavigate();
+  const { i18n } = useLingui();
+  const locale = i18n.locale;
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
@@ -299,7 +302,7 @@ function MobileFriendRequestsPage() {
                         </div>
                       </div>
                       <div className="shrink-0 text-[10px] text-[color:var(--text-dim)]">
-                        {formatFriendRequestDate(request.createdAt)}
+                        {formatFriendRequestDate(request.createdAt, locale)}
                       </div>
                     </div>
 
@@ -456,7 +459,7 @@ function getFriendRequestSourceLabel(triggerScene?: string) {
   return t(msg`来自 ${triggerScene}`);
 }
 
-function formatFriendRequestDate(createdAt: string) {
+function formatFriendRequestDate(createdAt: string, locale: string) {
   const date = new Date(createdAt);
   if (Number.isNaN(date.getTime())) {
     return "";
@@ -471,7 +474,7 @@ function formatFriendRequestDate(createdAt: string) {
     return t(msg`今天`);
   }
 
-  const formatter = new Intl.DateTimeFormat("zh-CN", {
+  const formatter = new Intl.DateTimeFormat(locale, {
     month: "2-digit",
     day: "2-digit",
   });

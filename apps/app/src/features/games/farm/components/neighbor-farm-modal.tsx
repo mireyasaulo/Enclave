@@ -1,5 +1,9 @@
 import { useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { FarmCropId, FarmPlot } from "@yinjie/contracts";
+
+const t = translateRuntimeMessage;
 import { FARM_CROP_CATALOG } from "@yinjie/contracts";
 import {
   useFarmNeighborDetail,
@@ -58,7 +62,7 @@ export function NeighborFarmModal({
       <div className="flex max-h-[85vh] w-full max-w-md flex-col rounded-t-3xl bg-white shadow-xl sm:rounded-3xl">
         {detailQuery.isLoading && (
           <div className="flex items-center justify-center py-12 text-sm text-stone-400">
-            正在串门……
+            {t(msg`正在串门……`)}
           </div>
         )}
         {detailQuery.error && (
@@ -86,10 +90,10 @@ export function NeighborFarmModal({
                 </div>
                 <div>
                   <div className="text-sm font-semibold">
-                    {detailQuery.data.characterName} 的农场
+                    {detailQuery.data.characterName} {t(msg`的农场`)}
                   </div>
                   <div className="text-[11px] text-stone-500">
-                    Lv.{detailQuery.data.level} · 好感 {detailQuery.data.intimacyLevel} ·{" "}
+                    Lv.{detailQuery.data.level} · {t(msg`好感`)} {detailQuery.data.intimacyLevel} ·{" "}
                     {detailQuery.data.expertDomains.slice(0, 2).join(" / ") || "—"}
                   </div>
                 </div>
@@ -99,7 +103,7 @@ export function NeighborFarmModal({
                 onClick={onClose}
                 className="rounded-full px-2 py-1 text-sm text-stone-500 hover:bg-stone-100"
               >
-                关闭
+                {t(msg`关闭`)}
               </button>
             </header>
 
@@ -154,13 +158,13 @@ export function NeighborFarmModal({
                       </span>
                       <span className="mt-0.5 text-[10px] text-stone-500">
                         {!plot.cropId
-                          ? "空"
+                          ? t(msg`空`)
                           : isRotten
-                            ? "腐烂"
+                            ? t(msg`腐烂`)
                             : isRipe
                               ? alreadyStolen
-                                ? "已偷过"
-                                : "可顺"
+                                ? t(msg`已偷过`)
+                                : t(msg`可顺`)
                               : plot.maturedAt
                                 ? formatRemainingMs(plot.maturedAt - nowMs)
                                 : ""}
@@ -175,13 +179,13 @@ export function NeighborFarmModal({
                 })}
               </div>
               <p className="text-center text-[11px] text-stone-400">
-                点击成熟（金边）田块即可顺走一份。每天最多 10 次，对方对你的好感度会降。
+                {t(msg`点击成熟（金边）田块即可顺走一份。每天最多 10 次，对方对你的好感度会降。`)}
               </p>
 
               {detailQuery.data.recentEvents.length > 0 && (
                 <section className="mt-4">
                   <h3 className="mb-1 text-xs font-medium text-stone-500">
-                    近期动向
+                    {t(msg`近期动向`)}
                   </h3>
                   <ul className="space-y-1 text-[11px] text-stone-500">
                     {detailQuery.data.recentEvents.slice(0, 5).map((event) => (
@@ -207,8 +211,8 @@ export function NeighborFarmModal({
 
       {toast && (
         <div className="pointer-events-none fixed bottom-20 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-amber-600 px-4 py-2 text-sm text-white shadow-lg">
-          顺走 {FARM_CROP_CATALOG[toast.cropId].nameZh} ×{toast.amount} ·
-          🪙+{toast.coinsGained} · {toast.characterName} 好感{toast.intimacyDelta}
+          {t(msg`顺走`)} {FARM_CROP_CATALOG[toast.cropId].nameZh} ×{toast.amount} ·
+          🪙+{toast.coinsGained} · {toast.characterName} {t(msg`好感`)}{toast.intimacyDelta}
         </div>
       )}
     </div>
@@ -226,25 +230,25 @@ function renderEventSummary(event: {
     : "";
   switch (event.kind) {
     case "plant":
-      return `${event.actorName} 种了 ${cropName}`;
+      return `${event.actorName} ${t(msg`种了`)} ${cropName}`;
     case "harvest":
-      return `${event.actorName} 收了 ${cropName || "作物"}`;
+      return `${event.actorName} ${t(msg`收了`)} ${cropName || t(msg`作物`)}`;
     case "steal":
-      return `${event.actorName} 顺走了 ${cropName || "作物"}`;
+      return `${event.actorName} ${t(msg`顺走了`)} ${cropName || t(msg`作物`)}`;
     case "water":
-      return `${event.actorName} 浇了水`;
+      return `${event.actorName} ${t(msg`浇了水`)}`;
     case "weed":
-      return `${event.actorName} 除了草`;
+      return `${event.actorName} ${t(msg`除了草`)}`;
     case "debug":
-      return `${event.actorName} 除了虫`;
+      return `${event.actorName} ${t(msg`除了虫`)}`;
     case "buy":
-      return `${event.actorName} 进了种子`;
+      return `${event.actorName} ${t(msg`进了种子`)}`;
     case "sell":
-      return `${event.actorName} 卖了 ${cropName || "作物"}`;
+      return `${event.actorName} ${t(msg`卖了`)} ${cropName || t(msg`作物`)}`;
     case "level_up":
-      return `${event.actorName} 升级了`;
+      return `${event.actorName} ${t(msg`升级了`)}`;
     case "intimacy_change":
-      return `好感度变化`;
+      return t(msg`好感度变化`);
     default:
       return event.kind;
   }

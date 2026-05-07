@@ -1,5 +1,9 @@
 import { useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { FarmCropId, FarmPlayerStateView, FarmPlot } from "@yinjie/contracts";
+
+const t = translateRuntimeMessage;
 import { FARM_CROP_CATALOG } from "@yinjie/contracts";
 import { useFarmAdjustedNow } from "../farm-clock-context";
 import { formatRemainingMs } from "../crop-presentation";
@@ -42,7 +46,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
   if (plotIndex == null || !plot) {
     return (
       <div className="rounded-2xl bg-stone-50 p-3 text-center text-xs text-stone-400">
-        点一块田看看能干啥
+        {t(msg`点一块田看看能干啥`)}
       </div>
     );
   }
@@ -106,10 +110,10 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
     return (
       <div className="flex flex-col gap-2 rounded-2xl bg-emerald-50 p-3">
         <div className="flex items-center justify-between text-xs text-emerald-900">
-          <span>第 {plotIndex + 1} 块田 · 选个种子下地</span>
+          <span>{t(msg`第`)} {plotIndex + 1} {t(msg`块田 · 选个种子下地`)}</span>
           {plot.stage === "rotten" && (
             <span className="rounded-full bg-rose-100 px-2 py-0.5 text-rose-600">
-              上一茬已腐烂
+              {t(msg`上一茬已腐烂`)}
             </span>
           )}
         </div>
@@ -121,7 +125,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
         <div className="flex flex-wrap gap-2">
           {eligibleCrops.length === 0 && (
             <span className="text-xs text-stone-500">
-              金币和种子都不够，先去仓库卖点东西
+              {t(msg`金币和种子都不够，先去仓库卖点东西`)}
             </span>
           )}
           {eligibleCrops.map((cropId) => {
@@ -157,10 +161,10 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
       <div className="flex items-center justify-between text-xs text-emerald-900">
         <span className="flex items-center gap-1">
           <span>{def.emoji}</span>
-          第 {plotIndex + 1} 块田 · {def.nameZh}
+          {t(msg`第`)} {plotIndex + 1} {t(msg`块田 ·`)} {def.nameZh}
         </span>
         <span className="text-stone-500">
-          {isRipe ? "已成熟" : `还差 ${formatRemainingMs(remainingMs)}`}
+          {isRipe ? t(msg`已成熟`) : `${t(msg`还差`)} ${formatRemainingMs(remainingMs)}`}
         </span>
       </div>
       {errorMsg && (
@@ -176,7 +180,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
             disabled={isPending}
             className="rounded-full bg-amber-500 px-4 py-1.5 text-sm font-medium text-white shadow hover:bg-amber-600 disabled:opacity-60"
           >
-            🪙 收获
+            🪙 {t(msg`收获`)}
           </button>
         ) : (
           <>
@@ -196,7 +200,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
               disabled={isPending || plot.watered}
               className="rounded-full bg-sky-500 px-3 py-1 text-xs text-white shadow-sm hover:bg-sky-600 disabled:opacity-60"
             >
-              💧 浇水
+              💧 {t(msg`浇水`)}
             </button>
             <button
               type="button"
@@ -214,7 +218,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
               disabled={isPending || plot.weeds <= 0}
               className="rounded-full bg-emerald-600 px-3 py-1 text-xs text-white shadow-sm hover:bg-emerald-700 disabled:opacity-60"
             >
-              🌿 除草
+              🌿 {t(msg`除草`)}
             </button>
             <button
               type="button"
@@ -232,7 +236,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
               disabled={isPending || plot.bugs <= 0}
               className="rounded-full bg-rose-500 px-3 py-1 text-xs text-white shadow-sm hover:bg-rose-600 disabled:opacity-60"
             >
-              🐛 除虫
+              🐛 {t(msg`除虫`)}
             </button>
           </>
         )}

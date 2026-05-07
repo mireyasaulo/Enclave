@@ -8,6 +8,7 @@ import {
   getMyCloudProfile,
   getMyCloudSubscription,
 } from "@yinjie/contracts";
+import { useLingui } from "@lingui/react";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { track } from "@yinjie/analytics";
 import {
@@ -30,7 +31,7 @@ function formatPrice(priceCents: number, currency: string) {
   return `${currency.toUpperCase()} ${amount}`;
 }
 
-function formatDateTime(value?: string | null) {
+function formatDateTime(value: string | null | undefined, locale: string) {
   if (!value) {
     return null;
   }
@@ -40,7 +41,7 @@ function formatDateTime(value?: string | null) {
     return value;
   }
 
-  return new Date(timestamp).toLocaleString();
+  return new Date(timestamp).toLocaleString(locale);
 }
 
 async function copyTextToClipboard(text: string): Promise<boolean> {
@@ -332,6 +333,8 @@ export function SubscriptionPanel({
   embedded = false,
 }: SubscriptionPanelProps) {
   const t = useRuntimeTranslator();
+  const { i18n } = useLingui();
+  const locale = i18n.locale;
   const accessToken = useCloudSessionStore((state) => state.accessToken);
   const phone = useCloudSessionStore((state) => state.phone);
   const setProfile = useCloudSessionStore((state) => state.setProfile);
@@ -457,7 +460,8 @@ export function SubscriptionPanel({
         ? t(msg`已过期`)
         : t(msg`未开通`);
   const fallbackNotSet = t(msg`未设置`);
-  const expiresLabel = formatDateTime(subscription.expiresAt) ?? fallbackNotSet;
+  const expiresLabel =
+    formatDateTime(subscription.expiresAt, locale) ?? fallbackNotSet;
 
   return (
     <div
@@ -581,7 +585,7 @@ export function SubscriptionPanel({
                     </div>
                     <div>
                       {t(msg`创建时间`)}:{" "}
-                      {formatDateTime(item.createdAt) ?? fallbackNotSet}
+                      {formatDateTime(item.createdAt, locale) ?? fallbackNotSet}
                     </div>
                     {item.rejectReason ? (
                       <div>

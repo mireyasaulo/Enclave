@@ -11,6 +11,8 @@ import {
   type ReactNode,
   type TouchEvent,
 } from "react";
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
@@ -331,6 +333,7 @@ export function ChatMessageList({
   errorActionLabel,
   onErrorAction = null,
 }: ChatMessageListProps) {
+  const t = useRuntimeTranslator();
   const isDesktop = variant === "desktop";
   const navigate = useNavigate();
   const pathname = useRouterState({
@@ -788,11 +791,11 @@ export function ChatMessageList({
         message:
           mode === "merged"
             ? count <= 1
-              ? `已合并转发到 ${conversationTitle}。`
-              : `已合并转发 ${count} 条消息到 ${conversationTitle}。`
+              ? t(msg`已合并转发到 ${conversationTitle}。`)
+              : t(msg`已合并转发 ${count} 条消息到 ${conversationTitle}。`)
             : count <= 1
-              ? `已转发到 ${conversationTitle}。`
-              : `已转发 ${count} 条消息到 ${conversationTitle}。`,
+              ? t(msg`已转发到 ${conversationTitle}。`)
+              : t(msg`已转发 ${count} 条消息到 ${conversationTitle}。`),
         tone: "success",
       });
 
@@ -805,9 +808,9 @@ export function ChatMessageList({
     onError: (error, input) => {
       setActionNotice({
         message:
-          error instanceof Error ? error.message : "转发失败，请稍后再试。",
+          error instanceof Error ? error.message : t(msg`转发失败，请稍后再试。`),
         tone: "danger",
-        actionLabel: "继续转发消息",
+        actionLabel: t(msg`继续转发消息`),
         onAction: () => {
           void forwardMutation.mutateAsync(input);
         },
@@ -820,7 +823,7 @@ export function ChatMessageList({
   const recallMutation = useMutation({
     mutationFn: async (message: ChatRenderableMessage) => {
       if (!threadContext) {
-        throw new Error("当前线程暂不支持撤回消息。");
+        throw new Error(t(msg`当前线程暂不支持撤回消息。`));
       }
 
       if (threadContext.type === "group") {
@@ -878,7 +881,7 @@ export function ChatMessageList({
         current === message.id ? null : current,
       );
       setActionNotice({
-        message: "已撤回这条消息。",
+        message: t(msg`已撤回这条消息。`),
         tone: "success",
       });
 
@@ -889,9 +892,9 @@ export function ChatMessageList({
     onError: (error, message) => {
       setActionNotice({
         message:
-          error instanceof Error ? error.message : "撤回失败，请稍后再试。",
+          error instanceof Error ? error.message : t(msg`撤回失败，请稍后再试。`),
         tone: "danger",
-        actionLabel: "继续撤回",
+        actionLabel: t(msg`继续撤回`),
         onAction: () => {
           recallMutation.mutate(message);
         },
@@ -904,7 +907,7 @@ export function ChatMessageList({
   const deleteMutation = useMutation({
     mutationFn: async (message: ChatRenderableMessage) => {
       if (!threadContext) {
-        throw new Error("当前线程暂不支持删除消息。");
+        throw new Error(t(msg`当前线程暂不支持删除消息。`));
       }
 
       if (threadContext.type === "group") {
@@ -948,7 +951,7 @@ export function ChatMessageList({
       }
 
       setActionNotice({
-        message: "已删除这条消息。",
+        message: t(msg`已删除这条消息。`),
         tone: "success",
       });
 
@@ -959,9 +962,9 @@ export function ChatMessageList({
     onError: (error, message) => {
       setActionNotice({
         message:
-          error instanceof Error ? error.message : "删除失败，请稍后再试。",
+          error instanceof Error ? error.message : t(msg`删除失败，请稍后再试。`),
         tone: "danger",
-        actionLabel: "继续删除",
+        actionLabel: t(msg`继续删除`),
         onAction: () => {
           deleteMutation.mutate(message);
         },
@@ -978,7 +981,7 @@ export function ChatMessageList({
         resolveAttachmentUrl,
       );
       if (!source) {
-        throw new Error("当前消息暂不支持添加到表情。");
+        throw new Error(t(msg`当前消息暂不支持添加到表情。`));
       }
 
       const prepared = await prepareRemoteCustomStickerUpload(source);
@@ -994,7 +997,7 @@ export function ChatMessageList({
     },
     onSuccess: async () => {
       setActionNotice({
-        message: "已添加到自定义表情。",
+        message: t(msg`已添加到自定义表情。`),
         tone: "success",
       });
       await queryClient.invalidateQueries({
@@ -1006,9 +1009,9 @@ export function ChatMessageList({
         message:
           error instanceof Error
             ? error.message
-            : "添加到表情失败，请稍后再试。",
+            : t(msg`添加到表情失败，请稍后再试。`),
         tone: "danger",
-        actionLabel: "继续添加到表情",
+        actionLabel: t(msg`继续添加到表情`),
         onAction: () => {
           addToStickerMutation.mutate(message);
         },
@@ -1025,7 +1028,7 @@ export function ChatMessageList({
       typeof navigator.clipboard.writeText !== "function"
     ) {
       setActionNotice({
-        message: "当前环境不支持剪贴板复制。",
+        message: t(msg`当前环境不支持剪贴板复制。`),
         tone: "danger",
       });
       return;
@@ -1039,9 +1042,9 @@ export function ChatMessageList({
       });
     } catch {
       setActionNotice({
-        message: "复制失败，请稍后再试。",
+        message: t(msg`复制失败，请稍后再试。`),
         tone: "danger",
-        actionLabel: "重试复制",
+        actionLabel: t(msg`重试复制`),
         onAction: () => {
           void copyToClipboard(text, successMessage);
         },
@@ -1056,7 +1059,7 @@ export function ChatMessageList({
   ) => {
     const summary = buildLocationAttachmentSummary(attachment);
     if (!isNativeMobileShareSurface()) {
-      await copyToClipboard(summary, "位置内容已复制。");
+      await copyToClipboard(summary, t(msg`位置内容已复制。`));
       return;
     }
 
@@ -1067,7 +1070,7 @@ export function ChatMessageList({
 
     if (shared) {
       setActionNotice({
-        message: "已打开系统分享面板。",
+        message: t(msg`已打开系统分享面板。`),
         tone: "success",
       });
       return;
@@ -1079,9 +1082,9 @@ export function ChatMessageList({
       typeof navigator.clipboard.writeText !== "function"
     ) {
       setActionNotice({
-        message: "当前设备暂时无法打开系统分享，请稍后重试。",
+        message: t(msg`当前设备暂时无法打开系统分享，请稍后重试。`),
         tone: "danger",
-        actionLabel: "重试分享",
+        actionLabel: t(msg`重试分享`),
         onAction: () => {
           void shareLocationSummary(attachment);
         },
@@ -1094,14 +1097,14 @@ export function ChatMessageList({
     try {
       await navigator.clipboard.writeText(summary);
       setActionNotice({
-        message: "系统分享暂时不可用，已复制位置内容。",
+        message: t(msg`系统分享暂时不可用，已复制位置内容。`),
         tone: "success",
       });
     } catch {
       setActionNotice({
-        message: "系统分享失败，请稍后重试。",
+        message: t(msg`系统分享失败，请稍后重试。`),
         tone: "danger",
-        actionLabel: "重试分享",
+        actionLabel: t(msg`重试分享`),
         onAction: () => {
           void shareLocationSummary(attachment);
         },

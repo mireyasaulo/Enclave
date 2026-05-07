@@ -69,21 +69,22 @@ function buildMessages(state: FarmPlayerStateView, nowMs: number): string[] {
   const hour = new Date(nowMs).getHours();
 
   if (ripeCount > 0) {
-    messages.push(`${t(msg`喵——有`)} ${ripeCount} ${t(msg`块田熟了，趁热收吧。`)}`);
+    messages.push(t(msg`喵——有 ${ripeCount} 块田熟了，趁热收吧。`));
   }
   if (rottenCount > 0) {
-    messages.push(`${t(msg`糟糕，`)}${rottenCount} ${t(msg`块田已经坏掉了，铲了重种？`)}`);
+    messages.push(t(msg`糟糕，${rottenCount} 块田已经坏掉了，铲了重种？`));
   }
-  if (weedCount > 0 || bugCount > 0) {
-    messages.push(
-      `${t(msg`田里`)}${weedCount > 0 ? ` ${weedCount} ${t(msg`处杂草`)}` : ""}${
-        weedCount > 0 && bugCount > 0 ? t(msg`、`) : ""
-      }${bugCount > 0 ? ` ${bugCount} ${t(msg`只虫子`)}` : ""}${t(msg`，记得清一下。`)}`,
-    );
+  if (weedCount > 0 && bugCount > 0) {
+    messages.push(t(msg`田里 ${weedCount} 处杂草、${bugCount} 只虫子，记得清一下。`));
+  } else if (weedCount > 0) {
+    messages.push(t(msg`田里 ${weedCount} 处杂草，记得清一下。`));
+  } else if (bugCount > 0) {
+    messages.push(t(msg`田里 ${bugCount} 只虫子，记得清一下。`));
   }
   if (stolenRecently.length > 0) {
     const first = stolenRecently[0]!;
-    messages.push(`${t(msg`提醒一下：`)}${first.thiefName} ${t(msg`今天来顺过你的菜。`)}`);
+    const thiefName = first.thiefName;
+    messages.push(t(msg`提醒一下：${thiefName} 今天来顺过你的菜。`));
   }
 
   // 时段补一句

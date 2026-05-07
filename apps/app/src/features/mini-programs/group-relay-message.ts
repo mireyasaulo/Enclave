@@ -1,3 +1,8 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
+
 const GROUP_RELAY_MESSAGE_PREFIX = "[群接龙]";
 
 export type GroupRelaySummaryStatus =
@@ -51,7 +56,7 @@ export function parseGroupRelaySummaryMessage(text: string) {
   }
 
   const sourceGroupName =
-    header.slice(GROUP_RELAY_MESSAGE_PREFIX.length).trim() || "当前群聊";
+    header.slice(GROUP_RELAY_MESSAGE_PREFIX.length).trim() || t(msg`当前群聊`);
   let cursor = 1;
 
   const statusLabel = parseGroupRelayStatusLabel(lines[cursor]);
@@ -251,17 +256,17 @@ function formatGroupRelayResultSummary(
 ) {
   if (status === "published") {
     if (parseGroupRelayPublishCount(pendingMemberCountLabel) === 0) {
-      return "结果已回填，当前已全部确认";
+      return t(msg`结果已回填，当前已全部确认`);
     }
 
-    return "结果已回填，可继续覆盖";
+    return t(msg`结果已回填，可继续覆盖`);
   }
 
   if (status === "completed") {
-    return "名单已整理，待回填";
+    return t(msg`名单已整理，待回填`);
   }
 
-  return "名单整理中，待继续";
+  return t(msg`名单整理中，待继续`);
 }
 
 function buildGroupRelaySummaryLines(
@@ -277,38 +282,38 @@ function buildGroupRelaySummaryLines(
   if (status === "published") {
     if (pendingCount === 0) {
       return [
-        `1. 已从${sourceLabel}群聊完成本轮群接龙结果回填。`,
-        "2. 当前名单已经全部确认，群里看到的是这一轮的最终完成结果。",
-        "3. 如后续有人补报或变更，再次打开群接龙并回填即可覆盖新的最终状态。",
+        t(msg`1. 已从${sourceLabel}群聊完成本轮群接龙结果回填。`),
+        t(msg`2. 当前名单已经全部确认，群里看到的是这一轮的最终完成结果。`),
+        t(msg`3. 如后续有人补报或变更，再次打开群接龙并回填即可覆盖新的最终状态。`),
       ];
     }
 
     if (publishCount !== null && publishCount > 1) {
       return [
-        `1. 已从${sourceLabel}群聊再次打开群接龙工作台。`,
-        "2. 当前统计结果已经再次回填到原群聊，正文说明和人数状态已按最新一轮覆盖。",
-        "3. 如需继续调整，后续回填会继续覆盖这轮结果，不再保留过期版本。",
+        t(msg`1. 已从${sourceLabel}群聊再次打开群接龙工作台。`),
+        t(msg`2. 当前统计结果已经再次回填到原群聊，正文说明和人数状态已按最新一轮覆盖。`),
+        t(msg`3. 如需继续调整，后续回填会继续覆盖这轮结果，不再保留过期版本。`),
       ];
     }
 
     return [
-      `1. 已从${sourceLabel}群聊打开群接龙工作台。`,
-      "2. 当前统计结果已经回填到原群聊，可继续在群里跟进补充名单。",
-      "3. 如需继续调整，重新打开群接龙后再次回填即可覆盖最新结果。",
+      t(msg`1. 已从${sourceLabel}群聊打开群接龙工作台。`),
+      t(msg`2. 当前统计结果已经回填到原群聊，可继续在群里跟进补充名单。`),
+      t(msg`3. 如需继续调整，重新打开群接龙后再次回填即可覆盖最新结果。`),
     ];
   }
 
   if (status === "completed") {
     return [
-      `1. 已从${sourceLabel}群聊打开群接龙工作台。`,
-      "2. 当前名单和未确认成员已经整理完成，随时可以回填到原群聊。",
-      "3. 请确认最终结果后再一键回填，避免群里出现过期统计。",
+      t(msg`1. 已从${sourceLabel}群聊打开群接龙工作台。`),
+      t(msg`2. 当前名单和未确认成员已经整理完成，随时可以回填到原群聊。`),
+      t(msg`3. 请确认最终结果后再一键回填，避免群里出现过期统计。`),
     ];
   }
 
   return [
-    `1. 已从${sourceLabel}群聊打开群接龙工作台。`,
-    "2. 当前正在整理接龙名单和未确认成员。",
-    "3. 请按顺序继续接龙，或直接在群里补充结果。",
+    t(msg`1. 已从${sourceLabel}群聊打开群接龙工作台。`),
+    t(msg`2. 当前正在整理接龙名单和未确认成员。`),
+    t(msg`3. 请按顺序继续接龙，或直接在群里补充结果。`),
   ];
 }

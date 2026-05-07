@@ -1,6 +1,10 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
 import { sendGroupMessage } from "@yinjie/contracts";
 import {
   featuredMiniProgramIds,

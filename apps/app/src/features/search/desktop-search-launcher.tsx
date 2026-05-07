@@ -1871,6 +1871,7 @@ function SearchLauncherHeroCard({
   onClick: () => void;
   onMouseEnter?: () => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <button
       type="button"
@@ -1890,7 +1891,7 @@ function SearchLauncherHeroCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-3">
             <div className="text-sm font-medium text-[color:var(--text-primary)]">
-              搜一搜
+              {t(msg`搜一搜`)}
             </div>
             <div className="shrink-0 rounded-full bg-white/90 px-2.5 py-1 text-[10px] text-[color:var(--text-muted)]">
               Enter
@@ -1898,8 +1899,8 @@ function SearchLauncherHeroCard({
           </div>
           <div className="mt-1 text-[11px] leading-5 text-[color:var(--text-secondary)]">
             {keyword
-              ? `执行搜索“${keyword}”，进入完整结果页继续查看。`
-              : "执行一次全局搜索，进入完整结果页后继续按分类查看。"}
+              ? t(msg`执行搜索"${keyword}"，进入完整结果页继续查看。`)
+              : t(msg`执行一次全局搜索，进入完整结果页后继续按分类查看。`)}
           </div>
         </div>
       </div>
@@ -1907,8 +1908,8 @@ function SearchLauncherHeroCard({
         <div className="flex items-center justify-between gap-3 text-[11px] text-[color:var(--text-muted)]">
           <span>
             {keyword
-              ? "Enter 执行搜索 · Tab 进入结果层"
-              : "Tab 进入结果层 · 支持聊天、联系人、公众号、收藏和小程序"}
+              ? t(msg`Enter 执行搜索 · Tab 进入结果层`)
+              : t(msg`Tab 进入结果层 · 支持聊天、联系人、公众号、收藏和小程序`)}
           </span>
           <CornerDownLeft size={14} className="shrink-0" />
         </div>
@@ -1928,6 +1929,7 @@ function SearchLauncherStatusCard({
   status: "done" | "empty" | "error" | "pending" | "recording";
   title: string;
 }) {
+  const t = useRuntimeTranslator();
   const toneClassName =
     status === "error"
       ? "border-[rgba(225,29,72,0.14)] bg-[rgba(225,29,72,0.06)]"
@@ -1946,14 +1948,14 @@ function SearchLauncherStatusCard({
           : "bg-white text-[color:var(--text-muted)]";
   const statusLabel =
     status === "error"
-      ? "异常"
+      ? t(msg`异常`)
       : status === "empty"
-        ? "无结果"
+        ? t(msg`无结果`)
         : status === "recording"
-          ? "录音中"
+          ? t(msg`录音中`)
           : status === "pending"
-            ? "处理中"
-            : "已完成";
+            ? t(msg`处理中`)
+            : t(msg`已完成`);
 
   return (
     <section className={cn("mt-2 rounded-[16px] border p-3.5", toneClassName)}>
@@ -2038,6 +2040,7 @@ function SearchLauncherConversationGroupCard({
   onSelectHeader: (item: DesktopSearchQuickLink) => void;
   onSelectMessage: (item: DesktopSearchQuickLink) => void;
 }) {
+  const t = useRuntimeTranslator();
   const headerActive = activeHeaderId === group.header.id;
 
   return (
@@ -2075,7 +2078,7 @@ function SearchLauncherConversationGroupCard({
           </div>
         </div>
         <div className="shrink-0 rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[10px] text-[color:var(--brand-primary)]">
-          {group.totalHits} 条相关记录
+          {t(msg`${group.totalHits} 条相关记录`)}
         </div>
       </button>
 
@@ -2445,9 +2448,12 @@ function SearchLauncherFeatureRow({
   );
 }
 
-function buildFriendSuggestionDescription(item: FriendDirectoryItem) {
+function buildFriendSuggestionDescription(
+  item: FriendDirectoryItem,
+  t: (descriptor: MessageDescriptor) => string,
+) {
   if (getFriendDisplayName(item) !== item.character.name) {
-    return `昵称：${item.character.name}`;
+    return t(msg`昵称：${item.character.name}`);
   }
 
   const tags = item.friendship.tags?.filter(Boolean).join("、");
@@ -2455,7 +2461,7 @@ function buildFriendSuggestionDescription(item: FriendDirectoryItem) {
     item.character.relationship?.trim() ||
     tags ||
     item.character.currentStatus?.trim() ||
-    "打开联系人资料"
+    t(msg`打开联系人资料`)
   );
 }
 
@@ -2471,14 +2477,15 @@ function matchesLauncherQuickLink(
 }
 
 function SearchLauncherComingSoonOverlay() {
+  const t = useRuntimeTranslator();
   return (
     <div className="pointer-events-auto absolute inset-0 z-30 flex items-center justify-center rounded-[16px] bg-black/30 backdrop-blur-[3px]">
       <div className="rounded-[14px] border border-[color:var(--border-faint)] bg-white/95 px-4 py-3 text-center shadow-[var(--shadow-card)]">
         <div className="text-[13px] font-semibold text-[color:var(--text-primary)]">
-          功能开发中
+          {t(msg`功能开发中`)}
         </div>
         <div className="mt-1 text-[11px] text-[color:var(--text-secondary)]">
-          敬请期待
+          {t(msg`敬请期待`)}
         </div>
       </div>
     </div>

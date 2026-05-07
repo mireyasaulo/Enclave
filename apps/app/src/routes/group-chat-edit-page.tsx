@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
 import {
@@ -19,6 +21,8 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isMissingGroupError } from "../lib/group-route-fallback";
 import { isDesktopOnlyPath } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+
+const t = translateRuntimeMessage;
 
 type GroupChatEditMode = "name" | "nickname";
 
@@ -47,14 +51,14 @@ function GroupChatEditPage({
         conversationId={groupId}
         panel="details"
         detailsAction={mode === "name" ? "group-name" : "group-nickname"}
-        title={mode === "name" ? "正在打开桌面群聊名称" : "正在打开桌面群昵称"}
+        title={mode === "name" ? t(msg`正在打开桌面群聊名称`) : t(msg`正在打开桌面群昵称`)}
         description={
           mode === "name"
-            ? "正在切换到桌面聊天工作区中的群聊名称编辑视图。"
-            : "正在切换到桌面聊天工作区中的群昵称编辑视图。"
+            ? t(msg`正在切换到桌面聊天工作区中的群聊名称编辑视图。`)
+            : t(msg`正在切换到桌面聊天工作区中的群昵称编辑视图。`)
         }
         loadingLabel={
-          mode === "name" ? "打开桌面群聊名称..." : "打开桌面群昵称..."
+          mode === "name" ? t(msg`打开桌面群聊名称...`) : t(msg`打开桌面群昵称...`)
         }
       />
     );
@@ -233,17 +237,17 @@ function MobileGroupChatEditPage({
 
   return (
     <ChatDetailsShell
-      title={mode === "name" ? "群聊名称" : "我在本群的昵称"}
-      subtitle={groupQuery.data?.name ?? "群聊信息"}
+      title={mode === "name" ? t(msg`群聊名称`) : t(msg`我在本群的昵称`)}
+      subtitle={groupQuery.data?.name ?? t(msg`群聊信息`)}
       onBack={openGroupDetails}
     >
       {groupQuery.isLoading ||
       (mode === "nickname" && membersQuery.isLoading) ? (
         <div className="px-4">
           <MobileGroupEditStatusCard
-            badge="读取中"
-            title="正在读取群聊信息"
-            description="稍等一下，正在同步群聊资料和当前昵称。"
+            badge={t(msg`读取中`)}
+            title={t(msg`正在读取群聊信息`)}
+            description={t(msg`稍等一下，正在同步群聊资料和当前昵称。`)}
             tone="loading"
           />
         </div>
@@ -251,8 +255,8 @@ function MobileGroupChatEditPage({
       {groupQuery.isError && groupQuery.error instanceof Error ? (
         <div className="px-4">
           <MobileGroupEditStatusCard
-            badge="读取失败"
-            title="群聊信息暂时不可用"
+            badge={t(msg`读取失败`)}
+            title={t(msg`群聊信息暂时不可用`)}
             description={groupQuery.error.message}
             action={
               <div className="flex flex-wrap items-center justify-center gap-2">
@@ -264,7 +268,7 @@ function MobileGroupChatEditPage({
                     void groupQuery.refetch();
                   }}
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </Button>
                 <Button
                   type="button"
@@ -272,7 +276,7 @@ function MobileGroupChatEditPage({
                   className="h-8 rounded-full px-3 text-[11px]"
                   onClick={openGroupDetails}
                 >
-                  返回群聊信息
+                  {t(msg`返回群聊信息`)}
                 </Button>
               </div>
             }
@@ -283,8 +287,8 @@ function MobileGroupChatEditPage({
       {membersQuery.isError && membersQuery.error instanceof Error ? (
         <div className="px-4">
           <MobileGroupEditStatusCard
-            badge="读取失败"
-            title="群成员信息暂时不可用"
+            badge={t(msg`读取失败`)}
+            title={t(msg`群成员信息暂时不可用`)}
             description={membersQuery.error.message}
             action={
               <div className="flex flex-wrap items-center justify-center gap-2">
@@ -296,7 +300,7 @@ function MobileGroupChatEditPage({
                     void membersQuery.refetch();
                   }}
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </Button>
                 <Button
                   type="button"
@@ -304,7 +308,7 @@ function MobileGroupChatEditPage({
                   className="h-8 rounded-full px-3 text-[11px]"
                   onClick={openGroupDetails}
                 >
-                  返回群聊信息
+                  {t(msg`返回群聊信息`)}
                 </Button>
               </div>
             }
@@ -326,14 +330,14 @@ function MobileGroupChatEditPage({
                   onClick={handleRetrySave}
                   className="rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
                 >
-                  重试保存
+                  {t(msg`重试保存`)}
                 </button>
                 <button
                   type="button"
                   onClick={openGroupDetails}
                   className="rounded-full border border-[rgba(220,38,38,0.14)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--state-danger-text)]"
                 >
-                  返回群聊信息
+                  {t(msg`返回群聊信息`)}
                 </button>
               </div>
             </div>
@@ -344,9 +348,9 @@ function MobileGroupChatEditPage({
       {!groupQuery.isLoading && !groupQuery.data ? (
         <div className="px-4">
           <MobileGroupEditStatusCard
-            badge="群聊"
-            title="群聊不存在"
-            description="这个群聊暂时不可用，可以先重试读取，或返回上一页后再试。"
+            badge={t(msg`群聊`)}
+            title={t(msg`群聊不存在`)}
+            description={t(msg`这个群聊暂时不可用，可以先重试读取，或返回上一页后再试。`)}
             action={
               <div className="flex flex-wrap items-center justify-center gap-2">
                 <Button
@@ -355,7 +359,7 @@ function MobileGroupChatEditPage({
                   className="h-8 rounded-full px-3 text-[11px]"
                   onClick={handleRetryLoad}
                 >
-                  重试读取
+                  {t(msg`重试读取`)}
                 </Button>
                 <Button
                   type="button"
@@ -363,7 +367,7 @@ function MobileGroupChatEditPage({
                   className="h-8 rounded-full px-3 text-[11px]"
                   onClick={handleMissingGroupBack}
                 >
-                  {safeReturnPath ? "返回上一页" : "返回消息列表"}
+                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`返回消息列表`)}
                 </Button>
               </div>
             }
@@ -374,7 +378,7 @@ function MobileGroupChatEditPage({
       {groupQuery.data ? (
         <>
           <ChatDetailsSection
-            title={mode === "name" ? "新的群聊名称" : "新的群昵称"}
+            title={mode === "name" ? t(msg`新的群聊名称`) : t(msg`新的群昵称`)}
             variant="wechat"
           >
             <div className="px-4 py-4">
@@ -382,20 +386,20 @@ function MobileGroupChatEditPage({
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 placeholder={
-                  mode === "name" ? "请输入群聊名称" : "请输入我在本群的昵称"
+                  mode === "name" ? t(msg`请输入群聊名称`) : t(msg`请输入我在本群的昵称`)
                 }
                 className="h-11 w-full rounded-[10px] border border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] px-3 text-[16px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.18)] focus:bg-white"
               />
               <div className="mt-2 flex items-center justify-between gap-3 text-[12px] leading-5 text-[color:var(--text-muted)]">
                 <span>
                   {mode === "name"
-                    ? "会同步显示在聊天顶部和消息列表。"
-                    : "只在当前群聊里显示。"}
+                    ? t(msg`会同步显示在聊天顶部和消息列表。`)
+                    : t(msg`只在当前群聊里显示。`)}
                 </span>
-                <span>{trimmedDraft.length} 字</span>
+                <span>{t(msg`${trimmedDraft.length} 字`)}</span>
               </div>
               <div className="mt-3 rounded-[10px] bg-[color:var(--surface-console)] px-3 py-2.5 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-                当前内容：{initialValue.trim() || "暂未设置"}
+                {t(msg`当前内容：${initialValue.trim() || t(msg`暂未设置`)}`)}
               </div>
             </div>
           </ChatDetailsSection>
@@ -416,7 +420,7 @@ function MobileGroupChatEditPage({
               }}
               className="h-10 w-full rounded-[10px] bg-[color:var(--brand-primary)] text-white hover:opacity-95"
             >
-              {saveMutation.isPending ? "正在保存..." : "保存"}
+              {saveMutation.isPending ? t(msg`正在保存...`) : t(msg`保存`)}
             </Button>
           </div>
         </>

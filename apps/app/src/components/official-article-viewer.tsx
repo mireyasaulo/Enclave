@@ -1,5 +1,8 @@
 import { useState, type MouseEvent } from "react";
+import { msg } from "@lingui/macro";
+import { useLingui } from "@lingui/react";
 import type { OfficialAccountArticleDetail } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Copy, Share2, Star } from "lucide-react";
 import { Button, InlineNotice, cn } from "@yinjie/ui";
 import { InlineNoticeActionButton } from "./inline-notice-action-button";
@@ -36,6 +39,8 @@ export function OfficialArticleViewer({
   ) => void;
   onToggleFavorite?: (article: OfficialAccountArticleDetail) => void;
 }) {
+  const t = useRuntimeTranslator();
+  const { i18n } = useLingui();
   const [shareNotice, setShareNotice] = useState<{
     message: string;
     tone: "success" | "info";
@@ -45,11 +50,16 @@ export function OfficialArticleViewer({
   const nativeMobileShareSupported = isNativeMobileShareSurface();
   const isDesktopReader = !mobile && desktopSurface === "reader";
   const accountMeta = [
-    article.account.accountType === "service" ? "服务号" : "订阅号",
-    article.account.isVerified ? "已认证" : null,
+    article.account.accountType === "service" ? t(msg`服务号`) : t(msg`订阅号`),
+    article.account.isVerified ? t(msg`已认证`) : null,
   ].filter(Boolean);
   const accountMetaLabel = accountMeta.join(" · ");
-  const publishedLabel = formatArticleDate(article.publishedAt, "full");
+  const publishedLabel = formatArticleDate(
+    article.publishedAt,
+    "full",
+    i18n.locale,
+    t,
+  );
 
   const articlePath = `/official-accounts/articles/${article.id}`;
   const articleUrl =
@@ -474,7 +484,7 @@ export function OfficialArticleViewer({
                           : "mt-2 text-[11px] text-[color:var(--text-muted)]"
                     }
                   >
-                    {formatArticleDate(relatedArticle.publishedAt, "short")}
+                    {formatArticleDate(relatedArticle.publishedAt, "short", i18n.locale, t)}
                   </div>
                 </div>
               </button>
@@ -492,18 +502,20 @@ export function OfficialArticleViewer({
               : "mt-8 text-xs text-[color:var(--text-muted)]"
         }
       >
-        文章来源于 {accountName ?? article.account.name}
+        {t(msg`文章来源于 ${accountName ?? article.account.name}`)}
       </footer>
     </article>
   );
 }
 
 function formatArticleDate(
-  value?: string | null,
-  mode: "full" | "short" = "full",
+  value: string | null | undefined,
+  mode: "full" | "short",
+  locale: string,
+  t: (descriptor: ReturnType<typeof msg>) => string,
 ) {
   if (!value) {
-    return mode === "full" ? "刚刚" : "今天";
+    return mode === "full" ? t(msg`刚刚`) : t(msg`今天`);
   }
 
   const timestamp = Date.parse(value);
@@ -513,7 +525,7 @@ function formatArticleDate(
 
   const date = new Date(timestamp);
   return new Intl.DateTimeFormat(
-    "zh-CN",
+    locale,
     mode === "full"
       ? {
           year: "numeric",

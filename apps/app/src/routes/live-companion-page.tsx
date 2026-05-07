@@ -51,6 +51,7 @@ import { formatTimestamp } from "../lib/format";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
+// Module-level translator used inside helpers that aren't React components.
 const t = translateRuntimeMessage;
 
 function areLiveDraftsEqual(left: LiveDraft, right: LiveDraft) {

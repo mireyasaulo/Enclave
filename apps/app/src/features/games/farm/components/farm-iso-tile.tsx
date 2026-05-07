@@ -72,19 +72,19 @@ export function FarmIsoTile({
 
         {plot.cropId && (
           <span className="farm-iso-tile__caption">
-            {isRotten ? "腐烂" : isRipe ? "成熟" : formatRemainingMs(remainingMs)}
+            {isRotten ? t(msg`腐烂`) : isRipe ? t(msg`成熟`) : formatRemainingMs(remainingMs)}
           </span>
         )}
         {!plot.cropId && (
-          <span className="farm-iso-tile__caption text-stone-400">空地</span>
+          <span className="farm-iso-tile__caption text-stone-400">{t(msg`空地`)}</span>
         )}
 
         <span className="farm-iso-tile__badges">
-          {plot.weeds > 0 && <span title="杂草">🌿</span>}
-          {plot.bugs > 0 && <span title="害虫">🐛</span>}
-          {plot.watered && !isRipe && <span title="已浇水">💧</span>}
+          {plot.weeds > 0 && <span title={t(msg`杂草`)}>🌿</span>}
+          {plot.bugs > 0 && <span title={t(msg`害虫`)}>🐛</span>}
+          {plot.watered && !isRipe && <span title={t(msg`已浇水`)}>💧</span>}
           {(plot.stolenBy?.length ?? 0) > 0 && (
-            <span title="被偷过" className="text-rose-500">⚠️</span>
+            <span title={t(msg`被偷过`)} className="text-rose-500">⚠️</span>
           )}
         </span>
 

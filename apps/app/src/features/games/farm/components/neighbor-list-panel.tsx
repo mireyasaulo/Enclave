@@ -1,5 +1,9 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { FarmNeighborSummary } from "@yinjie/contracts";
 import { useFarmNeighbors } from "../use-farm-state";
+
+const t = translateRuntimeMessage;
 
 interface NeighborListPanelProps {
   onSelectNeighbor: (characterId: string) => void;
@@ -11,24 +15,24 @@ export function NeighborListPanel({ onSelectNeighbor }: NeighborListPanelProps) 
   return (
     <section className="rounded-2xl bg-white p-3 shadow-sm">
       <header className="mb-2 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-stone-700">世界邻居</h2>
+        <h2 className="text-sm font-semibold text-stone-700">{t(msg`世界邻居`)}</h2>
         <span className="text-[11px] text-stone-400">
-          {neighborsQuery.data?.length ?? 0} 位
+          {neighborsQuery.data?.length ?? 0} {t(msg`位`)}
         </span>
       </header>
       {neighborsQuery.isLoading && (
         <p className="py-4 text-center text-xs text-stone-400">
-          正在打听邻居们的动向……
+          {t(msg`正在打听邻居们的动向……`)}
         </p>
       )}
       {neighborsQuery.error && (
         <p className="py-4 text-center text-xs text-rose-600">
-          邻居列表加载失败：{(neighborsQuery.error as Error).message}
+          {t(msg`邻居列表加载失败：`)}{(neighborsQuery.error as Error).message}
         </p>
       )}
       {neighborsQuery.data && neighborsQuery.data.length === 0 && (
         <p className="py-4 text-center text-xs text-stone-400">
-          世界里还没有可串门的人。
+          {t(msg`世界里还没有可串门的人。`)}
         </p>
       )}
       <ul className="max-h-72 overflow-y-auto">
@@ -87,11 +91,11 @@ function NeighborRow({
           <div className="mt-0.5 flex items-center gap-2 text-[11px] text-stone-500">
             {neighbor.ripePlotCount > 0 ? (
               <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-amber-700">
-                ✨ {neighbor.ripePlotCount} 块成熟
+                ✨ {neighbor.ripePlotCount} {t(msg`块成熟`)}
               </span>
             ) : (
               <span className="text-stone-400">
-                {neighbor.totalPlotCount} 块田，暂无成熟
+                {neighbor.totalPlotCount} {t(msg`块田，暂无成熟`)}
               </span>
             )}
             {neighbor.intimacyLevel > 0 && (
