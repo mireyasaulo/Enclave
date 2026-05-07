@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import { ArrowLeft, ChevronRight, Copy, Play, Share2 } from "lucide-react";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
+import { RouteRedirectState } from "../components/route-redirect-state";
 import {
   gameCenterFeaturedGameIds,
   gameCenterFriendActivities,
@@ -34,6 +35,11 @@ import {
   buildMobileGamesRouteSearch,
   parseMobileGamesRouteSearch,
 } from "../features/games/mobile-games-route-state";
+
+const DesktopGamesWorkspace = lazy(async () => {
+  const mod = await import("../features/desktop/games/desktop-games-workspace");
+  return { default: mod.DesktopGamesWorkspace };
+});
 
 function resolveGames(ids: string[]) {
   return ids
@@ -456,6 +462,36 @@ export function GamesPage() {
       <AppPage className="space-y-0 px-0 pb-0 pt-0">
         {/* 暂时隐藏「功能开发中」蒙板 */}
       </AppPage>
+    );
+  }
+
+  if (isDesktopLayout) {
+    return (
+      <Suspense
+        fallback={
+          <RouteRedirectState
+            title="正在打开游戏中心"
+            description="正在载入桌面端游戏中心。"
+            loadingLabel="载入桌面游戏中心..."
+          />
+        }
+      >
+        <DesktopGamesWorkspace
+          selectedGameId={selectedGame.id}
+          activeGameId={activeGameId}
+          recentGameIds={recentGameIds}
+          friendInviteStatusByActivityId={friendInviteStatusByActivityId}
+          successNotice={successNotice}
+          noticeTone={noticeTone}
+          noticeActionState={noticeActionState}
+          onSelectGame={setSelectedGameId}
+          onLaunchGame={handleLaunchGame}
+          onInviteFriend={handleInviteFriend}
+          onCopyGameToMobile={handleCopyGameToMobile}
+          onDismissActiveGame={dismissActiveGame}
+          nativeMobileShareSupported={nativeMobileShareSupported}
+        />
+      </Suspense>
     );
   }
 
