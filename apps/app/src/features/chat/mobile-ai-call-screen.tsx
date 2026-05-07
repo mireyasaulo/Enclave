@@ -1230,7 +1230,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
   return (
     <AppPage className="flex min-h-[100dvh] flex-col space-y-0 bg-[radial-gradient(circle_at_top,rgba(96,165,250,0.22),transparent_32%),linear-gradient(180deg,#111827_0%,#0f172a_42%,#020617_100%)] px-0 py-0 text-white">
       <audio ref={activeCall.audioRef} preload="auto" />
-      <header className="sticky top-0 z-20 border-b border-white/8 bg-[rgba(2,6,23,0.72)] px-3 py-3 backdrop-blur-xl">
+      <header className="sticky top-0 z-20 border-b border-white/8 bg-[rgba(2,6,23,0.72)] px-3 pb-3 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] backdrop-blur-xl">
         <div className="flex items-start gap-3">
           <button
             type="button"
