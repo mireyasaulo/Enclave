@@ -351,4 +351,130 @@ msgstr "What about languages beyond zh / en / ja / ko?"
 #. js-lingui-explicit-id
 msgid "界面目前支持简中 / English / 日本語 / 한국어。AI 角色对话本身不限语种，跟着模型能力走。"
 msgstr "The UI currently ships in zh-CN / English / 日本語 / 한국어. The AI conversation itself is language-agnostic — it goes wherever the model can."
+#. js-lingui-explicit-id
+msgid "挑一种最顺手的方式开始用隐界"
+msgstr "Pick the way that fits you best"
+#. js-lingui-explicit-id
+msgid "桌面端原生封装、网页版即开即用，自部署提供完整自主权。移动端与小程序在路上。"
+msgstr "Native desktop builds, an instant web preview, and full sovereignty via self-hosting. Mobile apps and a WeChat mini-program are on the way."
+#. js-lingui-explicit-id
+msgid "敬请期待"
+msgstr "Coming soon"
+#. js-lingui-explicit-id
+msgid "Windows 桌面端"
+msgstr "Windows Desktop"
+#. js-lingui-explicit-id
+msgid "Tauri 原生封装，附带托盘和锁屏"
+msgstr "Native Tauri build with tray + lock screen"
+#. js-lingui-explicit-id
+msgid "前往 GitHub Releases"
+msgstr "Open GitHub Releases"
+#. js-lingui-explicit-id
+msgid "macOS 桌面端"
+msgstr "macOS Desktop"
+#. js-lingui-explicit-id
+msgid "适配 Apple Silicon 与 Intel"
+msgstr "Apple Silicon and Intel builds"
+#. js-lingui-explicit-id
+msgid "网页版（在线试用）"
+msgstr "Web (try online)"
+#. js-lingui-explicit-id
+msgid "无需安装，直接在浏览器里体验"
+msgstr "No install — try it right in your browser"
+#. js-lingui-explicit-id
+msgid "打开网页版"
+msgstr "Open the web app"
+#. js-lingui-explicit-id
+msgid "iOS / Android"
+msgstr "iOS / Android"
+#. js-lingui-explicit-id
+msgid "Capacitor 移动壳，敬请期待"
+msgstr "Capacitor mobile shell — coming soon"
+#. js-lingui-explicit-id
+msgid "微信小程序"
+msgstr "WeChat Mini-program"
+#. js-lingui-explicit-id
+msgid "适配国内场景，敬请期待"
+msgstr "Tailored for the Chinese market — coming soon"
+#. js-lingui-explicit-id
+msgid "自部署（推荐）"
+msgstr "Self-host (recommended)"
+#. js-lingui-explicit-id
+msgid "克隆仓库、docker compose up，几分钟跑起来"
+msgstr "Clone the repo, docker compose up, running in minutes"
+#. js-lingui-explicit-id
+msgid "查看部署指南"
+msgstr "Read the deploy guide"
+#. js-lingui-explicit-id
+msgid "最近更新"
+msgstr "Last updated"
+#. js-lingui-explicit-id
+msgid "一、我们的隐私立场"
+msgstr "1. Our privacy stance"
+#. js-lingui-explicit-id
+msgid "隐界采用一人一世界的独立实例架构。除非你主动选择官方托管的云服务，否则你的数据保存在你自己部署的实例里，与任何中央服务器无关。"
+msgstr "Enclave runs on an instance-per-person architecture. Unless you opt into our managed cloud, your data lives on the instance you deploy yourself — completely independent of any central server."
+#. js-lingui-explicit-id
+msgid "二、自部署用户"
+msgstr "2. Self-hosted users"
+#. js-lingui-explicit-id
+msgid "你完全控制数据存放位置（本地数据库 / 自有服务器 / 云盘）。隐界不会向第三方发送任何用户数据，除非你显式连接外部模型供应商；此时仅相关对话内容根据你的配置发送给该供应商。"
+msgstr "You decide exactly where data is stored (local database, your own server, your own cloud). Enclave never forwards user data to any third party — except when you explicitly connect an external model provider, at which point only the relevant conversation is sent according to your config."
+#. js-lingui-explicit-id
+msgid "三、托管云服务用户"
+msgstr "3. Managed-cloud users"
+#. js-lingui-explicit-id
+msgid "如选择官方托管，我们仅采集运行所需的最少数据：账号标识、订阅状态、错误堆栈与请求日志。这些数据不会用于广告，也不会与第三方共享，仅用于服务运维与计费。"
+msgstr "If you choose our managed cloud, we collect only the minimum data needed to run the service: account identifier, subscription status, error stack traces, and request logs. We never use this for advertising or share it with third parties — only for ops and billing."
+#. js-lingui-explicit-id
+msgid "四、模型供应商"
+msgstr "4. Model providers"
+#. js-lingui-explicit-id
+msgid "AI 对话内容会按你的配置发送给所选模型供应商（OpenAI、Anthropic、Google、DeepSeek 等，或你自部署的本地模型）。具体数据处理方式请参考各供应商的隐私政策。"
+msgstr "AI conversations are sent — per your configuration — to the model provider you select (OpenAI, Anthropic, Google, DeepSeek, etc., or your self-hosted model). Refer to each provider's privacy policy for specifics."
+#. js-lingui-explicit-id
+msgid "五、你的权利"
+msgstr "5. Your rights"
+#. js-lingui-explicit-id
+msgid "你可以随时导出全部数据、迁移到其他实例、永久删除自己的世界。我们不会保留任何无法删除的数据副本。"
+msgstr "You can export all your data, migrate to another instance, or permanently delete your world at any time. We do not retain any copy you cannot delete."
+#. js-lingui-explicit-id
+msgid "六、联系我们"
+msgstr "6. Contact"
+#. js-lingui-explicit-id
+msgid "有任何隐私相关疑问，请发邮件至 yuanzui0728@gmail.com。"
+msgstr "For privacy questions, email yuanzui0728@gmail.com."
+#. js-lingui-explicit-id
+msgid "一、开源许可"
+msgstr "1. Open-source license"
+#. js-lingui-explicit-id
+msgid "隐界以 MIT 许可证发布。你可以自由使用、修改、分发本项目源代码与产物，包括商业用途，请遵循 MIT 协议中的署名要求。"
+msgstr "Enclave is released under the MIT License. You may freely use, modify, and redistribute the source and artifacts — including commercially — subject to the attribution clause of the MIT License."
+#. js-lingui-explicit-id
+msgid "二、合理使用"
+msgstr "2. Acceptable use"
+#. js-lingui-explicit-id
+msgid "请不要利用隐界从事违反所在国家或地区法律的活动；不要将其用于骚扰、欺诈、传播虚假信息或制造伤害。AI 角色生成的内容由用户负责审阅与判断，不视为隐界开发者的立场或建议。"
+msgstr "Don't use Enclave for activities that break the laws of your jurisdiction. Don't use it for harassment, fraud, disinformation, or to harm others. AI-generated content is the user's responsibility to review — it is not an opinion or recommendation of the Enclave maintainers."
+#. js-lingui-explicit-id
+msgid "三、订阅与计费"
+msgstr "3. Subscription & billing"
+#. js-lingui-explicit-id
+msgid "若你选择官方托管的云服务并购买订阅，账单与你接入的模型供应商绑定，按使用量结算。订阅可随时取消，未使用部分按月按比例退还。"
+msgstr "If you subscribe to our managed cloud, billing is tied to the model provider you connect and metered by usage. You can cancel anytime; unused portions are prorated monthly and refunded."
+#. js-lingui-explicit-id
+msgid "四、免责声明"
+msgstr "4. Disclaimer"
+#. js-lingui-explicit-id
+msgid "本软件按现状提供，不对适销性、特定用途适用性、不侵权或可用性作任何明示或暗示担保。在适用法律允许的最大范围内，作者与贡献者不承担因使用本软件而产生的任何损失。"
+msgstr "The software is provided 'as is' without any warranty of merchantability, fitness for a particular purpose, non-infringement, or availability. To the extent allowed by law, authors and contributors are not liable for any loss arising from use of the software."
+#. js-lingui-explicit-id
+msgid "五、变更"
+msgstr "5. Changes"
+#. js-lingui-explicit-id
+msgid "条款可能根据法律法规与产品演进调整，重大变更我们会在仓库与本页公告。"
+msgstr "These terms may evolve with the product and applicable laws; we will announce material changes both in the repo and on this page."
+#. js-lingui-explicit-id
+msgid "如对条款有任何疑问，请发邮件至 yuanzui0728@gmail.com。"
+msgstr "For terms questions, email yuanzui0728@gmail.com."
 

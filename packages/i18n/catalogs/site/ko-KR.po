@@ -351,4 +351,130 @@ msgstr "중·영·일·한 외 다른 언어도 지원하나요?"
 #. js-lingui-explicit-id
 msgid "界面目前支持简中 / English / 日本語 / 한국어。AI 角色对话本身不限语种，跟着模型能力走。"
 msgstr "UI 는 현재 zh-CN / English / 日本語 / 한국어 를 지원합니다. AI 대화 자체는 언어에 구애받지 않으며, 모델의 역량을 따릅니다."
+#. js-lingui-explicit-id
+msgid "挑一种最顺手的方式开始用隐界"
+msgstr "당신에게 가장 잘 맞는 방식으로 엔클레이브를 시작해 보세요"
+#. js-lingui-explicit-id
+msgid "桌面端原生封装、网页版即开即用，自部署提供完整自主权。移动端与小程序在路上。"
+msgstr "네이티브 데스크톱 빌드, 즉시 사용 가능한 웹 버전, 자체 호스팅을 통한 완전한 자율성. 모바일 앱과 WeChat 미니 프로그램은 준비 중입니다."
+#. js-lingui-explicit-id
+msgid "敬请期待"
+msgstr "출시 예정"
+#. js-lingui-explicit-id
+msgid "Windows 桌面端"
+msgstr "Windows 데스크톱"
+#. js-lingui-explicit-id
+msgid "Tauri 原生封装，附带托盘和锁屏"
+msgstr "Tauri 네이티브 빌드, 트레이와 잠금 화면 포함"
+#. js-lingui-explicit-id
+msgid "前往 GitHub Releases"
+msgstr "GitHub Releases 열기"
+#. js-lingui-explicit-id
+msgid "macOS 桌面端"
+msgstr "macOS 데스크톱"
+#. js-lingui-explicit-id
+msgid "适配 Apple Silicon 与 Intel"
+msgstr "Apple Silicon 과 Intel 모두 지원"
+#. js-lingui-explicit-id
+msgid "网页版（在线试用）"
+msgstr "웹 버전(온라인 체험)"
+#. js-lingui-explicit-id
+msgid "无需安装，直接在浏览器里体验"
+msgstr "설치 없이 브라우저에서 바로 체험"
+#. js-lingui-explicit-id
+msgid "打开网页版"
+msgstr "웹 앱 열기"
+#. js-lingui-explicit-id
+msgid "iOS / Android"
+msgstr "iOS / Android"
+#. js-lingui-explicit-id
+msgid "Capacitor 移动壳，敬请期待"
+msgstr "Capacitor 모바일 셸 — 출시 예정"
+#. js-lingui-explicit-id
+msgid "微信小程序"
+msgstr "WeChat 미니 프로그램"
+#. js-lingui-explicit-id
+msgid "适配国内场景，敬请期待"
+msgstr "중국 시장 맞춤 — 출시 예정"
+#. js-lingui-explicit-id
+msgid "自部署（推荐）"
+msgstr "자체 호스팅(권장)"
+#. js-lingui-explicit-id
+msgid "克隆仓库、docker compose up，几分钟跑起来"
+msgstr "리포지토리 클론, docker compose up, 수 분 내 실행"
+#. js-lingui-explicit-id
+msgid "查看部署指南"
+msgstr "배포 가이드 보기"
+#. js-lingui-explicit-id
+msgid "最近更新"
+msgstr "최근 업데이트"
+#. js-lingui-explicit-id
+msgid "一、我们的隐私立场"
+msgstr "1. 개인정보 보호 원칙"
+#. js-lingui-explicit-id
+msgid "隐界采用一人一世界的独立实例架构。除非你主动选择官方托管的云服务，否则你的数据保存在你自己部署的实例里，与任何中央服务器无关。"
+msgstr "엔클레이브는 한 사람당 하나의 인스턴스 구조로 동작합니다. 매니지드 클라우드를 선택하지 않는 한, 데이터는 직접 배포한 인스턴스에만 저장되며 어떤 중앙 서버와도 무관합니다."
+#. js-lingui-explicit-id
+msgid "二、自部署用户"
+msgstr "2. 자체 호스팅 사용자"
+#. js-lingui-explicit-id
+msgid "你完全控制数据存放位置（本地数据库 / 自有服务器 / 云盘）。隐界不会向第三方发送任何用户数据，除非你显式连接外部模型供应商；此时仅相关对话内容根据你的配置发送给该供应商。"
+msgstr "데이터 저장 위치(로컬 DB / 자체 서버 / 클라우드)는 사용자가 완전히 결정합니다. 외부 모델 제공자를 명시적으로 연결하지 않는 한, 엔클레이브는 어떠한 사용자 데이터도 제3자에게 전송하지 않습니다. 연결 시에는 설정에 따른 대화만 전송됩니다."
+#. js-lingui-explicit-id
+msgid "三、托管云服务用户"
+msgstr "3. 매니지드 클라우드 사용자"
+#. js-lingui-explicit-id
+msgid "如选择官方托管，我们仅采集运行所需的最少数据：账号标识、订阅状态、错误堆栈与请求日志。这些数据不会用于广告，也不会与第三方共享，仅用于服务运维与计费。"
+msgstr "매니지드 클라우드를 선택하실 경우, 서비스 운영에 필요한 최소한의 데이터(계정 식별자, 구독 상태, 오류 스택, 요청 로그)만 수집합니다. 광고 목적으로 사용하거나 제3자와 공유하지 않으며, 오직 운영과 결제에만 활용합니다."
+#. js-lingui-explicit-id
+msgid "四、模型供应商"
+msgstr "4. 모델 제공자"
+#. js-lingui-explicit-id
+msgid "AI 对话内容会按你的配置发送给所选模型供应商（OpenAI、Anthropic、Google、DeepSeek 等，或你自部署的本地模型）。具体数据处理方式请参考各供应商的隐私政策。"
+msgstr "AI 대화 내용은 설정에 따라 선택하신 모델 제공자(OpenAI, Anthropic, Google, DeepSeek 등 또는 자체 호스팅 모델)로 전송됩니다. 처리 방식은 각 제공자의 개인정보 처리방침을 참고하시기 바랍니다."
+#. js-lingui-explicit-id
+msgid "五、你的权利"
+msgstr "5. 사용자의 권리"
+#. js-lingui-explicit-id
+msgid "你可以随时导出全部数据、迁移到其他实例、永久删除自己的世界。我们不会保留任何无法删除的数据副本。"
+msgstr "언제든 모든 데이터를 내보내거나 다른 인스턴스로 이전, 또는 자신의 세계를 완전히 삭제할 수 있습니다. 사용자가 삭제할 수 없는 사본은 보관하지 않습니다."
+#. js-lingui-explicit-id
+msgid "六、联系我们"
+msgstr "6. 문의"
+#. js-lingui-explicit-id
+msgid "有任何隐私相关疑问，请发邮件至 yuanzui0728@gmail.com。"
+msgstr "개인정보 관련 문의는 yuanzui0728@gmail.com 으로 이메일을 보내주세요."
+#. js-lingui-explicit-id
+msgid "一、开源许可"
+msgstr "1. 오픈소스 라이선스"
+#. js-lingui-explicit-id
+msgid "隐界以 MIT 许可证发布。你可以自由使用、修改、分发本项目源代码与产物，包括商业用途，请遵循 MIT 协议中的署名要求。"
+msgstr "엔클레이브는 MIT 라이선스로 공개됩니다. MIT 라이선스의 출처 표시 의무를 준수하시는 한, 상용을 포함한 자유로운 사용·수정·재배포가 가능합니다."
+#. js-lingui-explicit-id
+msgid "二、合理使用"
+msgstr "2. 적절한 사용"
+#. js-lingui-explicit-id
+msgid "请不要利用隐界从事违反所在国家或地区法律的活动；不要将其用于骚扰、欺诈、传播虚假信息或制造伤害。AI 角色生成的内容由用户负责审阅与判断，不视为隐界开发者的立场或建议。"
+msgstr "거주 지역의 법률을 위반하는 활동, 괴롭힘, 사기, 허위 정보 유포, 타인에게 해를 끼치는 목적으로 엔클레이브를 사용하지 마십시오. AI 가 생성한 내용은 사용자가 직접 검토·판단해야 하며, 엔클레이브 개발자의 입장이나 권장 사항이 아닙니다."
+#. js-lingui-explicit-id
+msgid "三、订阅与计费"
+msgstr "3. 구독 및 결제"
+#. js-lingui-explicit-id
+msgid "若你选择官方托管的云服务并购买订阅，账单与你接入的模型供应商绑定，按使用量结算。订阅可随时取消，未使用部分按月按比例退还。"
+msgstr "매니지드 클라우드를 구독하실 경우, 결제는 연결한 모델 제공자에 종속되며 사용량 기준으로 산정됩니다. 언제든 해지할 수 있으며, 사용하지 않은 부분은 월 단위로 환불됩니다."
+#. js-lingui-explicit-id
+msgid "四、免责声明"
+msgstr "4. 면책 조항"
+#. js-lingui-explicit-id
+msgid "本软件按现状提供，不对适销性、特定用途适用性、不侵权或可用性作任何明示或暗示担保。在适用法律允许的最大范围内，作者与贡献者不承担因使用本软件而产生的任何损失。"
+msgstr "본 소프트웨어는 '있는 그대로' 제공되며, 상품성·특정 목적 적합성·비침해성·가용성에 대한 어떠한 명시적·묵시적 보증도 하지 않습니다. 적용 가능한 법률이 허용하는 최대 범위 내에서, 작성자와 기여자는 본 소프트웨어 사용으로 인해 발생하는 손해에 대해 책임지지 않습니다."
+#. js-lingui-explicit-id
+msgid "五、变更"
+msgstr "5. 변경"
+#. js-lingui-explicit-id
+msgid "条款可能根据法律法规与产品演进调整，重大变更我们会在仓库与本页公告。"
+msgstr "본 약관은 법령과 제품 발전에 따라 개정될 수 있습니다. 중대한 변경 사항은 리포지토리와 본 페이지에서 공지합니다."
+#. js-lingui-explicit-id
+msgid "如对条款有任何疑问，请发邮件至 yuanzui0728@gmail.com。"
+msgstr "약관 관련 문의는 yuanzui0728@gmail.com 으로 이메일을 보내주세요."
 
