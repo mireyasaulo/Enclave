@@ -1,4 +1,4 @@
-import { isInitialized } from "./index";
+import { _emitTyped, isInitialized } from "./index";
 
 let attached = false;
 
@@ -7,9 +7,7 @@ function emitInternal(
   eventType: "error" | "performance",
   props: Record<string, unknown>,
 ): void {
-  void import("./internal-emitter").then((m) => {
-    m.emitInternalEvent(eventName, eventType, props);
-  });
+  _emitTyped(eventName, eventType, props);
 }
 
 export function attachAutoCapture(): void {
@@ -63,7 +61,7 @@ export function attachAutoCapture(): void {
 
     const tryEmit = () => {
       if (emitted) return;
-      if (perf.fcp || perf.lcp || perf.ttfb) {
+      if (perf.fcp || perf.lcp || perf.ttfb || perf.dcl) {
         emitted = true;
         emitInternal("performance", "performance", { ...perf });
       }

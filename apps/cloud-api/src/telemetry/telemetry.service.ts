@@ -25,6 +25,9 @@ const MAX_PROPS_BYTES = 32 * 1024;
 const MAX_USER_AGENT_LEN = 500;
 const RATE_LIMIT_BUCKET_MAX = 200;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+// Defensive cap on rate-limit map. Each entry is tiny, but a misbehaving
+// client (or attacker rotating IPs) could otherwise grow it without bound.
+const RATE_LIMIT_MAX_BUCKETS = 10_000;
 
 type IngestContext = {
   ip: string | null;
@@ -144,6 +147,12 @@ export class TelemetryService {
     const now = Date.now();
     const bucket = this.buckets.get(key);
     if (!bucket || now > bucket.resetAt) {
+      // Evict the oldest entry (insertion-order in Map) before adding a new
+      // one once we hit the cap, so the map can never grow unbounded.
+      if (!bucket && this.buckets.size >= RATE_LIMIT_MAX_BUCKETS) {
+        const oldest = this.buckets.keys().next().value;
+        if (oldest) this.buckets.delete(oldest);
+      }
       this.buckets.set(key, { count: cost, resetAt: now + RATE_LIMIT_WINDOW_MS });
       return cost <= RATE_LIMIT_BUCKET_MAX;
     }

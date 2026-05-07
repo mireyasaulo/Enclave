@@ -13,11 +13,13 @@ import type { InitOptions, InternalState } from "./types";
 const DEFAULT_FLUSH_INTERVAL_MS = 5000;
 const DEFAULT_MAX_BATCH_SIZE = 30;
 const DEFAULT_API_CALL_SAMPLE_RATE = 1.0;
+// Hard upper bound for one beacon body (most browsers cap sendBeacon at 64KB).
+const BEACON_MAX_EVENTS = 200;
 
 let state: InternalState | null = null;
 let unloadHandlersInstalled = false;
 
-function defaultUserIdProvider(): string | null {
+function defaultProvider(): string | null {
   return null;
 }
 
@@ -31,7 +33,7 @@ function getCurrentReferrer(): string | null {
   return document.referrer || null;
 }
 
-function nowIsoSqliteSafe(): string {
+function nowIso(): string {
   return new Date().toISOString();
 }
 
@@ -39,6 +41,13 @@ export function init(options: InitOptions): void {
   if (state?.initialized) {
     if (options.debug) {
       console.warn("[analytics] init called twice; ignoring");
+    }
+    return;
+  }
+
+  if (!options.endpoint && !options.endpointProvider) {
+    if (options.debug) {
+      console.warn("[analytics] init requires endpoint or endpointProvider");
     }
     return;
   }
@@ -53,10 +62,25 @@ export function init(options: InitOptions): void {
     }
   };
 
+  const wrappedEndpointProvider: () => string | null = () => {
+    try {
+      if (options.endpointProvider) {
+        const v = options.endpointProvider();
+        if (typeof v === "string" && v.length > 0) return v;
+      }
+      if (options.endpoint && options.endpoint.length > 0) {
+        return options.endpoint;
+      }
+      return null;
+    } catch {
+      return options.endpoint ?? null;
+    }
+  };
+
   const merged: InternalState["options"] = {
     appId: options.appId,
-    endpoint: options.endpoint,
-    userIdProvider: options.userIdProvider ? wrappedUserIdProvider : defaultUserIdProvider,
+    endpointProvider: wrappedEndpointProvider,
+    userIdProvider: options.userIdProvider ? wrappedUserIdProvider : defaultProvider,
     release: options.release ?? null,
     flushIntervalMs: options.flushIntervalMs ?? DEFAULT_FLUSH_INTERVAL_MS,
     maxBatchSize: options.maxBatchSize ?? DEFAULT_MAX_BATCH_SIZE,
@@ -95,8 +119,6 @@ export function init(options: InitOptions): void {
     timerWithUnref.unref();
   }
 
-  // Lazily attach auto-capture and contracts bridge to avoid pulling them in
-  // when consumers have intentionally disabled them.
   if (merged.enableAutoCapture) {
     void import("./auto-capture").then((m) => m.attachAutoCapture()).catch(() => {});
   }
@@ -153,6 +175,12 @@ export function trackPageView(
   extra?: Record<string, unknown>,
 ): void {
   if (!state) return;
+  const nextPath = pagePath ?? getCurrentPagePath();
+
+  // Same-path dedup: TanStack/Next routers fire replaceState/popstate for
+  // search-param updates without changing the path. Skip those.
+  if (nextPath === state.currentPagePath) return;
+
   const previousPath = state.currentPagePath;
   const previousMountedAt = state.pageMountedAt;
   const previousDuration = Date.now() - previousMountedAt;
@@ -164,7 +192,7 @@ export function trackPageView(
     });
   }
 
-  state.currentPagePath = pagePath ?? getCurrentPagePath();
+  state.currentPagePath = nextPath;
   state.pageMountedAt = Date.now();
   trackInternal("page_view", "pv", { ...extra });
 }
@@ -188,7 +216,7 @@ export function getSessionId(): string | null {
 }
 
 export function getEndpoint(): string | null {
-  return state?.options.endpoint ?? null;
+  return state?.options.endpointProvider() ?? null;
 }
 
 export function getAppId(): string | null {
@@ -213,7 +241,7 @@ function trackInternal(
   const event: TelemetryEventInput = {
     eventName,
     eventType,
-    occurredAt: nowIsoSqliteSafe(),
+    occurredAt: nowIso(),
     sessionId: state.sessionId,
     anonId: state.anonId,
     userId,
@@ -244,22 +272,59 @@ function safeUserId(): string | null {
 
 async function flushInternal(useBeaconHint = false): Promise<void> {
   if (!state || state.flushing || state.queue.length === 0) return;
+
+  const endpoint = state.options.endpointProvider();
+  if (!endpoint) {
+    // No endpoint resolvable yet (e.g. user hasn't logged into cloud world);
+    // keep events queued for later.
+    return;
+  }
+
   state.flushing = true;
   const batch = state.queue.splice(0, state.options.maxBatchSize);
   const body = { appId: state.options.appId, events: batch };
   try {
     let ok = false;
     if (useBeaconHint) {
-      ok = sendBatchBeacon(state.options.endpoint, body);
+      ok = sendBatchBeacon(endpoint, body);
     }
     if (!ok) {
-      ok = await sendWithRetry(state.options.endpoint, body);
+      ok = await sendWithRetry(endpoint, body);
     }
     if (!ok) {
       persistPending(batch);
     }
   } finally {
     state.flushing = false;
+  }
+}
+
+/**
+ * Drain everything in the queue using sendBeacon (page is unloading).
+ * Splits into <= BEACON_MAX_EVENTS batches; persists any leftover that
+ * sendBeacon refused to take so the next session can replay them.
+ */
+function drainOnUnload(): void {
+  if (!state) return;
+  const endpoint = state.options.endpointProvider();
+  if (!endpoint || state.queue.length === 0) return;
+
+  const queue = state.queue.splice(0);
+  const dropped: TelemetryEventInput[] = [];
+
+  while (queue.length > 0) {
+    const batch = queue.splice(0, BEACON_MAX_EVENTS);
+    const ok = sendBatchBeacon(endpoint, {
+      appId: state.options.appId,
+      events: batch,
+    });
+    if (!ok) {
+      dropped.push(...batch);
+    }
+  }
+
+  if (dropped.length > 0) {
+    persistPending(dropped);
   }
 }
 
@@ -291,13 +356,13 @@ function installLifecycleHandlers(): void {
       durationMs: state.visibleAccumMs,
       wallClockMs: now - state.sessionStartedAt,
     });
-    void flushInternal(true);
+    drainOnUnload();
   };
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
       onHidden();
-      void flushInternal(true);
+      drainOnUnload();
     } else {
       onVisible();
     }

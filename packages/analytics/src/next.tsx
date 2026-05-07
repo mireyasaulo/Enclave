@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { init, isInitialized, trackPageView } from "./index";
+import { init, isInitialized } from "./index";
 import type { InitOptions } from "./types";
 
 export interface AnalyticsProviderProps extends InitOptions {
@@ -17,15 +17,10 @@ export function AnalyticsProvider({ children, ...options }: AnalyticsProviderPro
     if (!isInitialized()) {
       init(options);
     }
-
-    const onPopState = () => {
-      // SPA route change in Next App Router emits popstate after navigation.
-      queueMicrotask(() => trackPageView());
-    };
-    window.addEventListener("popstate", onPopState);
-    return () => {
-      window.removeEventListener("popstate", onPopState);
-    };
+    // No popstate listener here — auto-page-view (enabled by default)
+    // already patches history.{pushState,replaceState} and listens to
+    // popstate, so adding our own here would emit duplicate page_view
+    // events.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -148,6 +148,11 @@ export default defineConfig(({ command }) => ({
         target: "http://127.0.0.1:3001",
         changeOrigin: true,
       },
+      // 客户端埋点 SDK 上报到 cloud-api 的 telemetry 入口。
+      "/telemetry": {
+        target: "http://127.0.0.1:3001",
+        changeOrigin: true,
+      },
     },
   },
 }));

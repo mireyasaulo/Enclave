@@ -1,5 +1,9 @@
-import { getApiCallSampleRate, getEndpoint, isInitialized } from "./index";
-import { emitInternalEvent } from "./internal-emitter";
+import {
+  _emitTyped,
+  getApiCallSampleRate,
+  getEndpoint,
+  isInitialized,
+} from "./index";
 
 let attached = false;
 
@@ -28,7 +32,7 @@ export async function attachContractsBridge(): Promise<void> {
       }
       const sampleRate = getApiCallSampleRate();
       if (sampleRate < 1 && Math.random() > sampleRate) return;
-      emitInternalEvent("api_call", "api_call", {
+      _emitTyped("api_call", "api_call", {
         method: observation.method,
         path: observation.path,
         status: observation.status,
