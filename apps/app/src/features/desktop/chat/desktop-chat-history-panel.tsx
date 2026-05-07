@@ -261,8 +261,8 @@ export function DesktopChatHistoryPanel({
     <div className="flex h-full min-h-0 flex-col bg-[#f7f7f7]">
       <div
         className={cn(
-          "border-b border-[rgba(0,0,0,0.06)] bg-white",
-          isDialog ? "px-6 py-4" : "px-4 py-3",
+          "bg-white",
+          isDialog ? "px-6 pb-1.5 pt-2" : "border-b border-[rgba(0,0,0,0.06)] px-4 py-3",
         )}
       >
         <div
@@ -271,7 +271,10 @@ export function DesktopChatHistoryPanel({
           )}
         >
         <label
-          className="flex items-center gap-2 rounded-[10px] border border-[rgba(0,0,0,0.04)] bg-[#f4f4f4] px-3 py-2.5 transition-[border-color,background-color] focus-within:border-[rgba(7,193,96,0.2)] focus-within:bg-white"
+          className={cn(
+            "flex items-center gap-2 rounded-[10px] border border-[rgba(0,0,0,0.04)] bg-[#f4f4f4] transition-[border-color,background-color] focus-within:border-[rgba(7,193,96,0.2)] focus-within:bg-white",
+            isDialog ? "px-3 py-2" : "px-3 py-2.5",
+          )}
         >
           <Search
             size={15}
@@ -551,18 +554,14 @@ export function DesktopChatHistoryPanel({
 
       {showResultsView ? (
         <div className="min-h-0 flex-1 overflow-auto">
-          <div className="sticky top-0 z-[2] border-b border-[rgba(0,0,0,0.06)] bg-[#f7f7f7]/95 backdrop-blur">
-            <div className="bg-white">
-              <div className="flex items-center justify-between gap-3 px-5 py-2.5">
-                <div className="text-[11px] tracking-[0.08em] text-[color:var(--text-dim)]">
-                  {hasSearchRequest ? t(msg`搜索结果`) : t(msg`聊天记录`)}
-                </div>
-                <div className="rounded-full bg-[#f4f4f4] px-2 py-1 text-[11px] text-[color:var(--text-muted)]">
-                  {resultsQuery.isLoading
-                    ? t(msg`正在搜索...`)
-                    : t(msg`共 ${totalResults} 条`)}
-                </div>
-              </div>
+          <div className="sticky top-0 z-[2] flex items-center justify-between gap-3 border-b border-[rgba(0,0,0,0.06)] bg-white/96 px-5 py-1.5 backdrop-blur">
+            <div className="text-[11px] tracking-[0.08em] text-[color:var(--text-dim)]">
+              {hasSearchRequest ? t(msg`搜索结果`) : t(msg`聊天记录`)}
+            </div>
+            <div className="text-[11px] text-[color:var(--text-muted)]">
+              {resultsQuery.isLoading
+                ? t(msg`正在搜索...`)
+                : t(msg`共 ${totalResults} 条`)}
             </div>
           </div>
 
@@ -793,7 +792,7 @@ function DesktopSearchTabButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "relative inline-flex shrink-0 items-center gap-1 px-3 py-2.5 text-[13px] transition-colors",
+        "relative inline-flex shrink-0 items-center gap-1 px-2.5 py-2 text-[13px] transition-colors",
         active
           ? "text-[color:var(--brand-primary)]"
           : "text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)]",
@@ -804,7 +803,7 @@ function DesktopSearchTabButton({
         <ChevronDown size={13} className="shrink-0 opacity-70" />
       ) : null}
       {active ? (
-        <span className="absolute inset-x-2 bottom-0 h-[2px] rounded-full bg-[color:var(--brand-primary)]" />
+        <span className="absolute inset-x-1.5 bottom-0 h-[2px] rounded-full bg-[color:var(--brand-primary)]" />
       ) : null}
     </button>
   );

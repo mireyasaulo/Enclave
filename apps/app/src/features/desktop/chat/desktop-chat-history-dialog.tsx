@@ -70,36 +70,33 @@ export function DesktopChatHistoryDialog({
         aria-label={t(msg`查找聊天记录`)}
         className="relative flex h-[min(720px,86vh)] w-full max-w-[960px] flex-col overflow-hidden rounded-[20px] border border-[color:var(--border-faint)] bg-white shadow-[var(--shadow-overlay)]"
       >
-        <div className="grid grid-cols-[36px,1fr,36px] items-center gap-3 border-b border-[rgba(0,0,0,0.06)] bg-white px-5 py-3">
+        <div className="flex items-center gap-2 bg-white px-4 py-2">
           {canReturnToDetails && onBackToDetails ? (
             <button
               type="button"
               onClick={onBackToDetails}
               aria-label={t(msg`返回聊天信息`)}
-              className="flex h-8 w-8 items-center justify-center rounded-[10px] text-[color:var(--text-secondary)] transition hover:bg-[rgba(0,0,0,0.045)] hover:text-[color:var(--text-primary)]"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] text-[color:var(--text-secondary)] transition hover:bg-[rgba(0,0,0,0.045)] hover:text-[color:var(--text-primary)]"
             >
-              <ChevronLeft size={16} />
+              <ChevronLeft size={15} />
             </button>
-          ) : (
-            <div aria-hidden="true" className="h-8 w-8" />
-          )}
+          ) : null}
 
-          <div className="flex min-w-0 flex-col items-center text-center">
-            <div className="truncate text-[15px] font-medium text-[color:var(--text-primary)]">
+          <div className="min-w-0 flex-1 truncate text-[13px] text-[color:var(--text-secondary)]">
+            <span className="text-[color:var(--text-primary)]">
               {t(msg`查找聊天记录`)}
-            </div>
-            <div className="mt-0.5 truncate text-[12px] text-[color:var(--text-muted)]">
-              {conversation.title}
-            </div>
+            </span>
+            <span className="px-1.5 text-[color:var(--text-dim)]">·</span>
+            <span className="truncate">{conversation.title}</span>
           </div>
 
           <button
             type="button"
             onClick={onClose}
             aria-label={t(msg`关闭`)}
-            className="flex h-8 w-8 items-center justify-center rounded-[10px] text-[color:var(--text-secondary)] transition hover:bg-[rgba(0,0,0,0.045)] hover:text-[color:var(--text-primary)]"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] text-[color:var(--text-secondary)] transition hover:bg-[rgba(0,0,0,0.045)] hover:text-[color:var(--text-primary)]"
           >
-            <X size={16} />
+            <X size={15} />
           </button>
         </div>
 
