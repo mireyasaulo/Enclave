@@ -100,7 +100,13 @@ restart_cloud_api() {
 
 restart_app_full() {
   node scripts/dev-services.mjs stop app
-  pnpm --dir apps/app build
+  # 脚本顶部只设了 set -uo pipefail，没有 -e，build 退出非零不会终止函数；
+  # 但 build 产物 dist 是 nginx 静态服务的入口，build 失败 silent 吞掉会让
+  # 公网/本地继续 serve 旧（可能损坏的）dist。这里显式失败让 critical job 报错。
+  if ! pnpm --dir apps/app build; then
+    echo "[restart-app] ❌ app build 失败，跳过后续 nginx/wait 步骤" >&2
+    return 1
+  fi
   node scripts/ensure-local-web-nginx.mjs
   node scripts/wait-for-service-ready.mjs web http://127.0.0.1:5180/healthz 30000 1000
 }
