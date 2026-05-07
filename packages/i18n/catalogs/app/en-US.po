@@ -2180,7 +2180,7 @@ msgstr "No one to visit in the world yet."
 msgid "两次输入的口令不一致。"
 msgstr "The two passcodes do not match."
 
-#: apps/app/src/features/games/farm/farm-page.tsx:156
+#: apps/app/src/features/games/farm/farm-page.tsx:159
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:321
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:355
 #: apps/app/src/i18n/static-dom-seed.ts:257
@@ -2547,7 +2547,7 @@ msgid "从通讯录里选择要加入“{groupName}”的角色。"
 msgstr "Choose contacts from your list to add to “{groupName}”."
 
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:43
-#: apps/app/src/features/games/farm/farm-page.tsx:154
+#: apps/app/src/features/games/farm/farm-page.tsx:157
 msgid "仓库"
 msgstr "Warehouse"
 
@@ -2761,11 +2761,11 @@ msgstr "Low"
 msgid "作物"
 msgstr "Crops"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:160
+#: apps/app/src/features/games/farm/farm-page.tsx:163
 msgid "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活——回来时看到的状态是世界自治后的结果。"
 msgstr "Crops ripen by real-world hours. When you're offline, world characters keep working their own fields — what you see on return is the result of world autonomy."
 
-#: apps/app/src/features/games/farm/farm-page.tsx:190
+#: apps/app/src/features/games/farm/farm-page.tsx:193
 msgid "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。"
 msgstr "Crops ripen by real-world hours. When you're offline, world characters keep working their own fields."
 
@@ -5318,7 +5318,7 @@ msgstr "Posts"
 msgid "动态摘要已复制。"
 msgstr "Post summary copied."
 
-#: apps/app/src/features/games/farm/farm-page.tsx:146
+#: apps/app/src/features/games/farm/farm-page.tsx:149
 msgid "包"
 msgstr "pack"
 
@@ -5339,7 +5339,7 @@ msgstr "Up to Lv."
 msgid "升学与职业选择顾问映射"
 msgstr "Education and career-choice advisor mapping"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:198
+#: apps/app/src/features/games/farm/farm-page.tsx:209
 msgid "升级！"
 msgstr "Level up!"
 
@@ -7339,7 +7339,7 @@ msgstr "ByteDance founder mirror"
 msgid "存在未保存修改"
 msgstr "Unsaved changes"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:156
+#: apps/app/src/features/games/farm/farm-page.tsx:159
 msgid "存货共"
 msgstr "Stock total"
 
@@ -7469,7 +7469,7 @@ msgstr "Live Photo"
 msgid "实时通话"
 msgstr "Real-time calls"
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:84
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:83
 msgid "害虫"
 msgstr "Pests"
 
@@ -8538,7 +8538,7 @@ msgstr "Marked as read."
 msgid "已标记为未读。"
 msgstr "Marked as unread."
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:85
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:84
 msgid "已浇水"
 msgstr "Watered"
 
@@ -10568,7 +10568,7 @@ msgstr "Member status just changed; the group call card will refresh automatical
 msgid "成员规模"
 msgstr "Member size"
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:75
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:74
 msgid "成熟"
 msgstr "Ripe"
 
@@ -12436,7 +12436,7 @@ msgid "收拢未整理草稿"
 msgstr "Collapse untriaged drafts"
 
 #: apps/app/src/features/games/farm/components/plot-action-bar.tsx:183
-#: apps/app/src/features/games/farm/farm-page.tsx:196
+#: apps/app/src/features/games/farm/farm-page.tsx:207
 msgid "收获"
 msgstr "Harvest"
 
@@ -14164,7 +14164,7 @@ msgstr "This page handles only AI voice; no real-person RTC."
 msgid "本页承接 AI 数字人视频工作台，不接真人 RTC。"
 msgstr "This page hosts the AI avatar video workspace; no real-person RTC."
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:83
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:82
 msgid "杂草"
 msgstr "Weeds"
 
@@ -17768,11 +17768,11 @@ msgstr "Plant, harvest, help your neighbors water — slow-paced but very sticky
 msgid "种子商店"
 msgstr "Seed shop"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:144
+#: apps/app/src/features/games/farm/farm-page.tsx:147
 msgid "种子店"
 msgstr "Seed store"
 
-#: apps/app/src/features/games/farm/farm-page.tsx:146
+#: apps/app/src/features/games/farm/farm-page.tsx:149
 msgid "种子袋共"
 msgstr "Seed bags total"
 
@@ -18098,7 +18098,7 @@ msgstr "Sky rails and instant boosts drive the core fun, with strong viewing and
 msgid "空位"
 msgstr "Empty spot"
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:79
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:78
 msgid "空地"
 msgstr "Empty plot"
 
@@ -19595,7 +19595,7 @@ msgstr "A friend-like sleep doctor who listens and helps with stress and sleep i
 msgid "能随时倾听和接住你情绪的睡眠医生朋友"
 msgstr "A sleep-doctor friend who listens and holds your emotions"
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:75
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:74
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:163
 msgid "腐烂"
 msgstr "Rotted"
@@ -19737,7 +19737,7 @@ msgstr "The sticker library is full. Enter manage mode to delete before adding m
 msgid "表情消息"
 msgstr "Sticker message"
 
-#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:87
+#: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:86
 msgid "被偷过"
 msgstr "Has been stolen"
 
@@ -20989,7 +20989,7 @@ msgstr "Recent activity"
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:781
 #: apps/app/src/features/chat-details/chat-details-shell.tsx:45
 #: apps/app/src/features/chat/mobile-chat-thread-header.tsx:40
-#: apps/app/src/features/games/farm/farm-page.tsx:127
+#: apps/app/src/features/games/farm/farm-page.tsx:130
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:511
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:530
 #: apps/app/src/features/search/mobile-search-workspace.tsx:132
@@ -23100,7 +23100,7 @@ msgstr "Yinjie processes your profile and interaction data only as needed to run
 msgid "隐界会继续在后台恢复，你只需要稍候片刻。"
 msgstr "Yinjie will keep recovering in the background. Please wait a moment."
 
-#: apps/app/src/features/games/farm/farm-page.tsx:130
+#: apps/app/src/features/games/farm/farm-page.tsx:133
 #: apps/app/src/features/games/game-center-data.ts:250
 msgid "隐界农场"
 msgstr "Yinjie Farm"
