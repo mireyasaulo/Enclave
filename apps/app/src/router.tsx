@@ -3,6 +3,7 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  Navigate,
   redirect,
 } from "@tanstack/react-router";
 import { RootLayout } from "./features/shell/root-layout";
@@ -968,6 +969,10 @@ const routeTree = rootRoute.addChildren([
 export const router = createRouter({
   routeTree,
   defaultPreload: "intent",
+  // 用户从外部链接（含官网语言前缀 /zh-CN 等）误入 app 入口时，与其卡在
+  // tanstack-router 默认的 Not Found，不如把所有未匹配路径归到 splash，
+  // splash 会按 onboarding/world 状态决定后续目的地。
+  defaultNotFoundComponent: () => <Navigate to="/" replace />,
 });
 
 declare module "@tanstack/react-router" {
