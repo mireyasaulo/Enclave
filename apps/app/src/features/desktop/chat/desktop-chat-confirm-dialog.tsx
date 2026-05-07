@@ -1,5 +1,7 @@
 import { useEffect } from "react";
+import { msg } from "@lingui/macro";
 import { X } from "lucide-react";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button } from "@yinjie/ui";
 
 type DesktopChatConfirmDialogProps = {
@@ -18,13 +20,16 @@ export function DesktopChatConfirmDialog({
   open,
   title,
   description,
-  confirmLabel = "确认",
-  pendingLabel = "处理中...",
+  confirmLabel,
+  pendingLabel,
   danger = false,
   pending = false,
   onClose,
   onConfirm,
 }: DesktopChatConfirmDialogProps) {
+  const t = useRuntimeTranslator();
+  const resolvedConfirmLabel = confirmLabel ?? t(msg`确认`);
+  const resolvedPendingLabel = pendingLabel ?? t(msg`处理中...`);
   useEffect(() => {
     if (!open) {
       return;
@@ -51,7 +56,7 @@ export function DesktopChatConfirmDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(17,24,39,0.28)] p-6 backdrop-blur-[3px]">
       <button
         type="button"
-        aria-label={`关闭${title}弹层`}
+        aria-label={t(msg`关闭 ${title} 弹层`)}
         onClick={() => {
           if (!pending) {
             onClose();
@@ -75,7 +80,7 @@ export function DesktopChatConfirmDialog({
             onClick={onClose}
             disabled={pending}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] border border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)] disabled:cursor-not-allowed disabled:opacity-60"
-            aria-label="关闭"
+            aria-label={t(msg`关闭`)}
           >
             <X size={16} />
           </button>
@@ -89,7 +94,7 @@ export function DesktopChatConfirmDialog({
             disabled={pending}
             className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-6 shadow-none hover:bg-[color:var(--surface-console)]"
           >
-            取消
+            {t(msg`取消`)}
           </Button>
           <Button
             type="button"
@@ -102,7 +107,7 @@ export function DesktopChatConfirmDialog({
                 : "rounded-[10px] bg-[color:var(--brand-primary)] px-6 text-white hover:opacity-95"
             }
           >
-            {pending ? pendingLabel : confirmLabel}
+            {pending ? resolvedPendingLabel : resolvedConfirmLabel}
           </Button>
         </div>
       </div>
