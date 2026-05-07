@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, Repository } from 'typeorm';
+import { CharactersService } from '../../characters/characters.service';
 import { FarmEventLogEntity } from './entities/farm-event-log.entity';
 import {
   FarmActorType,
@@ -27,7 +28,39 @@ export class FarmEventService {
   constructor(
     @InjectRepository(FarmEventLogEntity)
     private readonly repo: Repository<FarmEventLogEntity>,
+    private readonly charactersService: CharactersService,
   ) {}
+
+  async applyIntimacyChange(
+    ownerId: string,
+    sourceCharacterId: string | null,
+    targetCharacterId: string,
+    delta: number,
+    actorType: FarmActorType = 'character',
+    actorName?: string,
+  ): Promise<number | null> {
+    if (!Number.isFinite(delta) || delta === 0) return null;
+    const target = await this.charactersService.findById(targetCharacterId);
+    if (!target) return null;
+    const oldLevel = target.intimacyLevel ?? 0;
+    const newLevel = Math.max(0, Math.min(100, oldLevel + delta));
+    if (newLevel === oldLevel) return oldLevel;
+    target.intimacyLevel = newLevel;
+    await this.charactersService.upsert(target);
+    await this.recordEvent({
+      ownerId,
+      kind: 'intimacy_change',
+      actorType,
+      actorId: sourceCharacterId ?? 'system',
+      actorName: actorName ?? '系统',
+      targetType: 'character',
+      targetId: targetCharacterId,
+      targetName: target.name,
+      intimacyDelta: newLevel - oldLevel,
+      payload: { oldLevel, newLevel },
+    });
+    return newLevel;
+  }
 
   async recordEvent(input: RecordEventInput): Promise<FarmEventLogEntity> {
     const entity = this.repo.create({

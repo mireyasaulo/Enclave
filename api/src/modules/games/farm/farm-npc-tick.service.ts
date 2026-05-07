@@ -8,9 +8,11 @@ import { FarmEventService } from './farm-event.service';
 import { FarmNpcService } from './farm-npc.service';
 import {
   ensurePlotsArray,
+  pruneStolenLog,
   refreshPlotStage,
 } from './farm-state.service';
 import { FarmNpcStateEntity } from './entities/farm-npc-state.entity';
+import { FarmPlayerStateEntity } from './entities/farm-player-state.entity';
 import {
   FARM_CROP_CATALOG,
   FARM_CROP_IDS,
@@ -20,8 +22,10 @@ import {
 } from './crop-catalog';
 import {
   FARM_NPC_TICK_CRON,
+  FARM_PLAYER_ACTOR_ID,
   FarmCropId,
   FarmPlot,
+  FarmStolenLogEntry,
   FarmTickSummary,
 } from './farm.types';
 
@@ -33,6 +37,8 @@ export class FarmNpcTickService {
   constructor(
     @InjectRepository(FarmNpcStateEntity)
     private readonly npcRepo: Repository<FarmNpcStateEntity>,
+    @InjectRepository(FarmPlayerStateEntity)
+    private readonly playerRepo: Repository<FarmPlayerStateEntity>,
     private readonly worldOwnerService: WorldOwnerService,
     private readonly npcService: FarmNpcService,
     private readonly eventService: FarmEventService,
@@ -69,8 +75,10 @@ export class FarmNpcTickService {
     let actedCount = 0;
     let plantCount = 0;
     let harvestCount = 0;
-    const stealCount = 0;
+    let stealCount = 0;
     const incidentBroadcastCount = 0;
+
+    const characterById = new Map(characters.map((c) => [c.id, c]));
 
     for (const character of characters) {
       const npc = await this.npcRepo.findOneBy({ characterId: character.id });
@@ -112,6 +120,20 @@ export class FarmNpcTickService {
       const maintained = this.maybeMaintainPlots(npc);
       if (maintained > 0) {
         mutated = true;
+      }
+
+      const stealChance = computeStealChance(character);
+      if (Math.random() < stealChance) {
+        const stolen = await this.attemptStealForCharacter(
+          owner.id,
+          character,
+          npc,
+          characterById,
+        );
+        if (stolen) {
+          stealCount += 1;
+          mutated = true;
+        }
       }
 
       if (mutated) {
@@ -203,6 +225,132 @@ export class FarmNpcTickService {
     return candidate;
   }
 
+  private async attemptStealForCharacter(
+    ownerId: string,
+    thief: CharacterEntity,
+    thiefNpc: FarmNpcStateEntity,
+    characterById: Map<string, CharacterEntity>,
+  ): Promise<boolean> {
+    const targetKind = Math.random() < 0.7 ? 'owner' : 'npc';
+
+    if (targetKind === 'owner') {
+      return this.stealFromOwner(ownerId, thief, thiefNpc);
+    }
+
+    const otherNpcs = await this.npcRepo
+      .createQueryBuilder('npc')
+      .where('npc.characterId != :id', { id: thief.id })
+      .getMany();
+    if (otherNpcs.length === 0) return false;
+    const candidates = otherNpcs.filter((row) => characterById.has(row.characterId));
+    if (candidates.length === 0) return false;
+    const targetNpc = candidates[Math.floor(Math.random() * candidates.length)]!;
+    const targetCharacter = characterById.get(targetNpc.characterId);
+    if (!targetCharacter) return false;
+    return this.stealFromNpcTarget(ownerId, thief, thiefNpc, targetNpc, targetCharacter);
+  }
+
+  private async stealFromOwner(
+    ownerId: string,
+    thief: CharacterEntity,
+    thiefNpc: FarmNpcStateEntity,
+  ): Promise<boolean> {
+    const player = await this.playerRepo.findOneBy({ ownerId });
+    if (!player) return false;
+    const plots = ensurePlotsArray(player.plotsPayload, player.plotCount).map((p) => ({ ...p }));
+    const ripe = findStealablePlot(plots, thief.id);
+    if (!ripe) return false;
+    const def = getCropDefinition(ripe.cropId!);
+    const amount = Math.max(1, Math.floor((ripe.yieldOverride ?? def.yieldRange[0]) / 2));
+    const coinsGained = amount * Math.max(1, Math.floor(def.sellPrice / 2));
+
+    plots[ripe.index] = {
+      ...ripe,
+      stolenBy: [...(ripe.stolenBy ?? []), thief.id],
+    };
+    player.plotsPayload = plots;
+
+    const log: FarmStolenLogEntry[] = pruneStolenLog(player.weeklyStolenLogPayload ?? []);
+    log.push({
+      thiefCharacterId: thief.id,
+      thiefName: thief.name,
+      cropId: ripe.cropId!,
+      amount,
+      atMs: Date.now(),
+    });
+    player.weeklyStolenLogPayload = log;
+    await this.playerRepo.save(player);
+
+    const thiefWarehouse = { ...(thiefNpc.warehousePayload ?? {}) };
+    thiefWarehouse[ripe.cropId!] = (thiefWarehouse[ripe.cropId!] ?? 0) + amount;
+    thiefNpc.warehousePayload = thiefWarehouse;
+    thiefNpc.coins += coinsGained;
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'steal',
+      actorType: 'character',
+      actorId: thief.id,
+      actorName: thief.name,
+      targetType: 'owner',
+      targetId: FARM_PLAYER_ACTOR_ID,
+      targetName: '我',
+      cropId: ripe.cropId,
+      intimacyDelta: -3,
+      payload: { plotIndex: ripe.index, amount, coinsGained },
+    });
+    await this.eventService.applyIntimacyChange(
+      ownerId,
+      thief.id,
+      thief.id,
+      -3,
+      'character',
+      thief.name,
+    );
+    return true;
+  }
+
+  private async stealFromNpcTarget(
+    ownerId: string,
+    thief: CharacterEntity,
+    thiefNpc: FarmNpcStateEntity,
+    targetNpc: FarmNpcStateEntity,
+    targetCharacter: CharacterEntity,
+  ): Promise<boolean> {
+    const plots = ensurePlotsArray(targetNpc.plotsPayload, targetNpc.plotCount).map((p) => ({ ...p }));
+    const ripe = findStealablePlot(plots, thief.id);
+    if (!ripe) return false;
+    const def = getCropDefinition(ripe.cropId!);
+    const amount = Math.max(1, Math.floor((ripe.yieldOverride ?? def.yieldRange[0]) / 2));
+    const coinsGained = amount * Math.max(1, Math.floor(def.sellPrice / 2));
+
+    plots[ripe.index] = {
+      ...ripe,
+      stolenBy: [...(ripe.stolenBy ?? []), thief.id],
+    };
+    targetNpc.plotsPayload = plots;
+    await this.npcRepo.save(targetNpc);
+
+    const thiefWarehouse = { ...(thiefNpc.warehousePayload ?? {}) };
+    thiefWarehouse[ripe.cropId!] = (thiefWarehouse[ripe.cropId!] ?? 0) + amount;
+    thiefNpc.warehousePayload = thiefWarehouse;
+    thiefNpc.coins += coinsGained;
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'steal',
+      actorType: 'character',
+      actorId: thief.id,
+      actorName: thief.name,
+      targetType: 'character',
+      targetId: targetCharacter.id,
+      targetName: targetCharacter.name,
+      cropId: ripe.cropId,
+      payload: { plotIndex: ripe.index, amount, coinsGained },
+    });
+    return true;
+  }
+
   private maybeMaintainPlots(npc: FarmNpcStateEntity): number {
     const diligence = (npc.moodPayload?.diligence ?? 50) / 100;
     const plots = ensurePlotsArray(npc.plotsPayload, npc.plotCount).map((p) => ({ ...p }));
@@ -229,6 +377,32 @@ export class FarmNpcTickService {
     npc.plotsPayload = plots;
     return mutated;
   }
+}
+
+function findStealablePlot(plots: FarmPlot[], thiefCharacterId: string): FarmPlot | null {
+  const now = Date.now();
+  const ripe = plots.filter(
+    (p) =>
+      p.cropId &&
+      p.maturedAt != null &&
+      now >= p.maturedAt &&
+      now < p.maturedAt + 24 * 3600 * 1000 &&
+      !(p.stolenBy ?? []).includes(thiefCharacterId),
+  );
+  if (ripe.length === 0) return null;
+  return ripe[Math.floor(Math.random() * ripe.length)]!;
+}
+
+export function computeStealChance(character: CharacterEntity): number {
+  const tags = (
+    (character.profile as { personalityTags?: string[] } | null)?.personalityTags ?? []
+  ).map((t) => String(t).toLowerCase());
+  const tagSet = new Set(tags);
+  let base = 0.05;
+  if (tagSet.has('playful') || tagSet.has('mischievous')) base += 0.1;
+  if ((character.expertDomains ?? []).includes('farming')) base += 0.05;
+  if ((character.intimacyLevel ?? 0) >= 80) base -= 0.1;
+  return Math.max(0.02, Math.min(0.3, base));
 }
 
 export function computeOnlineLikelihood(character: CharacterEntity): number {
