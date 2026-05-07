@@ -479,17 +479,15 @@ export function ProfileSettingsPage() {
           ) : null}
           {ownerQuery.data ? (
             desktopMode ? (
-              <InlineNotice
-                tone={ownerQuery.data.hasCustomApiKey ? "success" : "muted"}
-              >
-                {ownerQuery.data.hasCustomApiKey
-                  ? ownerQuery.data.customApiBase
+              ownerQuery.data.hasCustomApiKey ? (
+                <InlineNotice tone="success">
+                  {ownerQuery.data.customApiBase
                     ? t(
                         msg`当前使用专属 API Key，Base URL：${ownerQuery.data.customApiBase}。`,
                       )
-                    : t(msg`当前使用专属 API Key。`)
-                  : t(msg`当前使用实例级 Provider。`)}
-              </InlineNotice>
+                    : t(msg`当前使用专属 API Key。`)}
+                </InlineNotice>
+              ) : null
             ) : (
               <div className="rounded-[16px] border border-[color:var(--border-faint)] bg-[#f7f7f7] px-3.5 py-3">
                 <div className="flex items-center justify-between gap-3">
