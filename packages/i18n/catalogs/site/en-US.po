@@ -693,3 +693,11 @@ msgstr "Enclave onboarding: the first-time character setup and world bootstrap f
 msgid "隐界我的角色：你与 AI 化身的资料卡、个性、形象设定"
 msgstr "Enclave self character: profile cards, personality, and appearance for you and your AI avatar"
 
+#. js-lingui-explicit-id
+#: apps/site/src/app/not-found.tsx
+msgid "该页面不存在"
+msgstr "Page not found"
+#. js-lingui-explicit-id
+#: apps/site/src/app/not-found.tsx
+msgid "回到首页"
+msgstr "Back to home"

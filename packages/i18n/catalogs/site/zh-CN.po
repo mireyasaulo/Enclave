@@ -693,3 +693,11 @@ msgstr "隐界新人引导：首次进入虚拟世界的角色初始化与世界
 msgid "隐界我的角色：你与 AI 化身的资料卡、个性、形象设定"
 msgstr "隐界我的角色：你与 AI 化身的资料卡、个性、形象设定"
 
+#. js-lingui-explicit-id
+#: apps/site/src/app/not-found.tsx
+msgid "该页面不存在"
+msgstr "该页面不存在"
+#. js-lingui-explicit-id
+#: apps/site/src/app/not-found.tsx
+msgid "回到首页"
+msgstr "回到首页"

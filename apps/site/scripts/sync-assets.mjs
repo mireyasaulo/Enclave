@@ -2,7 +2,7 @@
 /**
  * 同步仓库现有资产到 apps/site/public：
  *   docs/screenshots/core-{key}{,.en,.ja,.ko}.png  → public/screenshots/{locale}/{key}.png
- *   docs/assets/yinjie-core-loop{,.en,.ja,.ko}.gif → public/animations/{locale}.gif
+ *   docs/assets/yinjie-core-loop{,.en,.ja,.ko}.gif → public/animations/{locale}.webp (动画 WebP，体积 ~80% 小于 GIF)
  *   apps/desktop/src-tauri/icons/icon.png          → public/favicon.png
  * 幂等：仅在源更新时复制。
  */
@@ -65,19 +65,15 @@ for (const [locale, suffix] of Object.entries(LOCALE_SUFFIX)) {
   }
 }
 
-// Animations: copy GIF + transcode to animated WebP (LCP optimization).
-// Sharp keeps animated WebP about 70-80% smaller than the source GIF.
+// Animations: only emit animated WebP (LCP optimization).
+// Sharp keeps animated WebP about 70-80% smaller than the source GIF, and
+// hero-section.tsx only references the .webp — shipping the GIF too just
+// bloats the public bundle.
 const ANIM_SOURCES = Object.entries(LOCALE_SUFFIX).map(([locale, suffix]) => ({
   locale,
   src: path.join(repoRoot, "docs", "assets", `yinjie-core-loop${suffix}.gif`),
-  gifDst: path.join(siteRoot, "public", "animations", `${locale}.gif`),
   webpDst: path.join(siteRoot, "public", "animations", `${locale}.webp`),
 }));
-
-for (const { src, gifDst } of ANIM_SOURCES) {
-  if (copyIfChanged(src, gifDst)) copied++;
-  else skipped++;
-}
 
 async function emitAnimatedWebp() {
   let sharp;
