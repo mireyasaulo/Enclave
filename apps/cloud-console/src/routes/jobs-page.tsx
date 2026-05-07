@@ -47,11 +47,16 @@ import {
 import { copyTextToClipboard } from "../lib/clipboard";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import {
+  formatCloudConsoleJobLeaseAvailable,
+  formatCloudConsoleJobLeaseExpires,
+  formatCloudConsoleJobLeaseRemaining,
+  formatCloudConsolePageOfTotal,
   formatCloudConsolePageSize,
   formatCloudConsoleVisibleJobsRange,
   translateCloudConsoleTextForActiveLocale,
   useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
+import { localizeProviderLabel } from "../lib/provider-i18n";
 import {
   createRequestScopedNotice,
   showRequestScopedNotice,
@@ -645,7 +650,7 @@ export function JobsPage() {
             {scopedWorldInfo?.name ?? worldId}
           </Link>
           <div className="text-sm text-[color:var(--text-secondary)]">
-            {scopedWorldInfo?.phone ?? "Phone unavailable"}
+            {scopedWorldInfo?.phone ?? t("Phone unavailable")}
           </div>
           <button
             type="button"
@@ -757,14 +762,22 @@ export function JobsPage() {
                         </Link>
                       </div>
                       <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                        {worldInfo?.phone ?? "Phone unavailable"} ·{" "}
-                        {worldInfo?.status ?? "unknown"}
+                        {worldInfo?.phone ?? t("Phone unavailable")} ·{" "}
+                        {worldInfo?.status ?? t("unknown")}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-[color:var(--text-secondary)]">
-                      <div>{worldInfo?.providerLabel ?? t("Unassigned")}</div>
+                      <div>
+                        {worldInfo?.providerLabel
+                          ? localizeProviderLabel(
+                              worldInfo.providerKey,
+                              worldInfo.providerLabel,
+                              locale,
+                            )
+                          : t("Unassigned")}
+                      </div>
                       <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                        power {worldInfo?.powerState ?? "absent"}
+                        {t("power")} {worldInfo?.powerState ?? t("absent")}
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -782,13 +795,22 @@ export function JobsPage() {
                     <td className="px-4 py-3 text-[color:var(--text-secondary)]">
                       <div>{formatLeaseOwner(job.leaseOwner)}</div>
                       <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                        remaining {formatDuration(job.leaseRemainingSeconds)}
+                        {formatCloudConsoleJobLeaseRemaining(
+                          formatDuration(job.leaseRemainingSeconds),
+                          locale,
+                        )}
                       </div>
                       <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                        expires {formatDateTime(job.leaseExpiresAt)}
+                        {formatCloudConsoleJobLeaseExpires(
+                          formatDateTime(job.leaseExpiresAt),
+                          locale,
+                        )}
                       </div>
                       <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                        available {formatDateTime(job.availableAt)}
+                        {formatCloudConsoleJobLeaseAvailable(
+                          formatDateTime(job.availableAt),
+                          locale,
+                        )}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-[color:var(--text-secondary)]">
@@ -868,7 +890,7 @@ export function JobsPage() {
             {t("Previous page")}
           </button>
           <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-            Page {page} / {totalPages}
+            {formatCloudConsolePageOfTotal(page, totalPages, locale)}
           </div>
           <button
             type="button"
