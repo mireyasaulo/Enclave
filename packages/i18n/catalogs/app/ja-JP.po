@@ -3711,6 +3711,7 @@ msgstr "タスクへ"
 msgid "去发现页摇一摇，或等待场景触发新的相遇。"
 msgstr ""
 
+#: apps/app/src/routes/friend-moments-page.tsx:462
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:441
 msgid "去朋友圈主页"
 msgstr "モーメントのトップへ"
@@ -4523,6 +4524,7 @@ msgstr ""
 
 #: apps/app/src/routes/discover-feed-page.tsx:470
 #: apps/app/src/routes/discover-page.tsx:445
+#: apps/app/src/routes/friend-moments-page.tsx:292
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:127
 #: apps/app/src/routes/moments-page.tsx:548
 msgid "图片选择失败，请稍后重试。"
@@ -8890,6 +8892,7 @@ msgstr "録音を開始できません。アプリのマイク権限を確認し
 msgid "无法启动录音，请检查浏览器麦克风权限。"
 msgstr "録音を開始できません。ブラウザのマイク権限を確認してください。"
 
+#: apps/app/src/routes/friend-moments-page.tsx:442
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:407
 msgid "无法打开这位角色的朋友圈"
 msgstr "このキャラクターのモーメントを開けません"
@@ -9293,6 +9296,7 @@ msgstr "友だち情報"
 #: apps/app/src/routes/character-detail-page.tsx:299
 #: apps/app/src/routes/discover-page.tsx:111
 #: apps/app/src/routes/discover-page.tsx:498
+#: apps/app/src/routes/friend-moments-page.tsx:590
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:283
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:309
 #: apps/app/src/routes/moments-page.tsx:790
@@ -9304,6 +9308,7 @@ msgid "朋友圈"
 msgstr "モーメンツ"
 
 #. placeholder {0}: formatTimestamp(moment.postedAt)
+#: apps/app/src/routes/friend-moments-page.tsx:585
 #: apps/app/src/routes/moments-page.tsx:788
 #: apps/app/src/routes/moments-page.tsx:1094
 msgid "朋友圈 · {0}"
@@ -9314,6 +9319,8 @@ msgid "朋友圈、相遇、视频号和小程序都从这里继续打开。"
 msgstr "モーメンツ、出会い、動画チャンネル、ミニプログラムはここから開けます。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1078
+#: apps/app/src/routes/friend-moments-page.tsx:144
+#: apps/app/src/routes/friend-moments-page.tsx:177
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:112
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:146
 #: apps/app/src/routes/moments-page.tsx:232
@@ -9334,6 +9341,7 @@ msgid "朋友圈图片预览"
 msgstr "モーメンツ画像プレビュー"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1079
+#: apps/app/src/routes/friend-moments-page.tsx:135
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:61
 #: apps/app/src/routes/moments-page.tsx:166
 msgid "朋友圈已发布。"
@@ -10277,6 +10285,10 @@ msgstr "保存中..."
 msgid "正在准备桌面搜索索引，马上就能继续查看完整结果。"
 msgstr "デスクトップ検索インデックスを準備中です。まもなく完全な結果を確認できます。"
 
+#: apps/app/src/routes/friend-moments-page.tsx:405
+msgid "正在切换到手机端角色朋友圈..."
+msgstr "モバイル版のキャラクターモーメントへ切り替え中..."
+
 #: apps/app/src/routes/world-characters-page.tsx:56
 msgid "正在切换到桌面世界角色"
 msgstr ""
@@ -10498,6 +10510,10 @@ msgstr "デスクトップの発見を開いています"
 #: apps/app/src/routes/create-group-page.tsx:294
 msgid "正在打开桌面发起群聊"
 msgstr ""
+
+#: apps/app/src/routes/friend-moments-page.tsx:474
+msgid "正在打开桌面好友朋友圈"
+msgstr "デスクトップ版の友だちモーメントを開いています"
 
 #: apps/app/src/routes/chat-room-page.tsx:265
 msgid "正在打开桌面对话"
@@ -10856,6 +10872,7 @@ msgid "正在读取联系人..."
 msgstr "連絡先を読み込み中..."
 
 #: apps/app/src/i18n/static-dom-seed.ts:1080
+#: apps/app/src/routes/friend-moments-page.tsx:430
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:396
 msgid "正在读取角色朋友圈..."
 msgstr "キャラクターのモーメンツを読み込み中..."
@@ -10897,6 +10914,10 @@ msgstr ""
 #: apps/app/src/routes/create-group-page.tsx:295
 msgid "正在载入桌面发起群聊对话框，马上恢复当前选择。"
 msgstr ""
+
+#: apps/app/src/routes/friend-moments-page.tsx:475
+msgid "正在载入桌面好友朋友圈工作区，马上显示角色动态详情。"
+msgstr "デスクトップ版の友だちモーメント作業エリアを読み込み中です。まもなくキャラクターの投稿を表示します。"
 
 #: apps/app/src/routes/moments-page.tsx:687
 msgid "正在载入桌面朋友圈工作区，马上显示动态和详情。"
@@ -12081,6 +12102,7 @@ msgstr ""
 
 #: apps/app/src/routes/discover-feed-page.tsx:482
 #: apps/app/src/routes/discover-page.tsx:457
+#: apps/app/src/routes/friend-moments-page.tsx:302
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:137
 #: apps/app/src/routes/moments-page.tsx:560
 msgid "视频选择失败，请稍后重试。"
@@ -13609,6 +13631,7 @@ msgid "角色成员 {characterCount} 人"
 msgstr "キャラクターメンバー {characterCount}人"
 
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:287
+#: apps/app/src/routes/friend-moments-page.tsx:197
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:169
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:509
 msgid "角色朋友圈"
@@ -13622,6 +13645,7 @@ msgstr "キャラクターの発信頻度は下がっていますが、長文内
 msgid "角色简介"
 msgstr "キャラクター紹介"
 
+#: apps/app/src/routes/friend-moments-page.tsx:445
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:410
 msgid "角色资料不存在，或者当前资料还没有同步完成。"
 msgstr "キャラクターのプロフィールが見つからないか、まだ同期が完了していません。"
@@ -13973,6 +13997,7 @@ msgstr "先に問題説明を追加してください。"
 
 #: apps/app/src/routes/channels-page.tsx:218
 #: apps/app/src/routes/discover-feed-page.tsx:233
+#: apps/app/src/routes/friend-moments-page.tsx:154
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:123
 #: apps/app/src/routes/moments-page.tsx:243
 msgid "请先输入评论内容。"
@@ -14310,6 +14335,10 @@ msgstr "デスクトップ発見ワークスペースを読み込み中..."
 msgid "载入桌面发起群聊..."
 msgstr ""
 
+#: apps/app/src/routes/friend-moments-page.tsx:476
+msgid "载入桌面好友朋友圈..."
+msgstr "デスクトップ版の友だちモーメントを読み込み中..."
+
 #: apps/app/src/routes/chat-room-page.tsx:267
 msgid "载入桌面对话..."
 msgstr ""
@@ -14448,6 +14477,7 @@ msgstr "前のステップに戻る"
 #: apps/app/src/routes/discover-feed-page.tsx:903
 #: apps/app/src/routes/discover-feed-page.tsx:1131
 #: apps/app/src/routes/discover-scene-page.tsx:254
+#: apps/app/src/routes/friend-moments-page.tsx:456
 #: apps/app/src/routes/friend-requests-page.tsx:258
 #: apps/app/src/routes/friend-requests-page.tsx:381
 #: apps/app/src/routes/friend-requests-page.tsx:419
@@ -14980,6 +15010,7 @@ msgid "这个联系人还没有签名。"
 msgstr "この連絡先にはまだシグネチャがありません。"
 
 #: apps/app/src/routes/character-detail-page.tsx:327
+#: apps/app/src/routes/friend-moments-page.tsx:201
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:173
 msgid "这个角色还没有个性签名。"
 msgstr "このキャラクターにはまだ署名がありません。"
