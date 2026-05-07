@@ -21,6 +21,7 @@ import {
   Search,
   Star,
   UsersRound,
+  X,
 } from "lucide-react";
 import { AvatarChip } from "../../components/avatar-chip";
 import { cn } from "@yinjie/ui";
@@ -1211,8 +1212,8 @@ export function DesktopSearchWorkspace({
           ) : null}
 
           {!loading && !error && !hasKeyword ? (
-            <div className="space-y-6">
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="space-y-3">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {landingScopeCards.map((item) => {
                   const Icon = item.icon;
                   const count = getDesktopSearchScopeCount(scopeCounts, item.id);
@@ -1223,7 +1224,6 @@ export function DesktopSearchWorkspace({
                     <DesktopSearchScopeCard
                       category={item.id}
                       count={count}
-                      description={item.description}
                       icon={Icon}
                       onClick={() =>
                         handleSelectCategory(item.id, { focusInput: true })
@@ -1242,7 +1242,7 @@ export function DesktopSearchWorkspace({
                 })}
               </div>
 
-              <div className="grid gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+              <div className="grid gap-3 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
                 <DesktopSearchLandingPanel
                   action={
                     history.length ? (
@@ -1250,17 +1250,15 @@ export function DesktopSearchWorkspace({
                         onClick={onClearHistory}
                         tone="neutral"
                       >
-                        清空记录
+                        清空
                       </DesktopSearchActionButton>
                     ) : null
                   }
-                  countLabel={history.length ? `${history.length} 条记录` : undefined}
-                  contextLabel="搜索记录"
-                  description="优先展示最近真正用过的关键词。"
+                  countLabel={history.length ? `${history.length}` : undefined}
                   title="最近搜索"
                 >
                   {history.length ? (
-                    <div className="space-y-2">
+                    <div className="space-y-0.5">
                       {history.map((item) => (
                         <DesktopSearchHistoryRow
                           key={item.keyword}
@@ -1271,22 +1269,17 @@ export function DesktopSearchWorkspace({
                       ))}
                     </div>
                   ) : (
-                    <DesktopSearchStatusCard
-                      badgeLabel="等待记录"
-                      className="mb-0 rounded-[16px] border-[color:var(--border-faint)] bg-white p-3.5"
-                      description="从聊天、通讯录或左侧导航进入搜一搜后，这里会开始积累关键词。"
-                      status="empty"
-                      title="最近搜索"
-                    />
+                    <div className="px-2 py-1.5 text-xs text-[color:var(--text-muted)]">
+                      暂无记录
+                    </div>
                   )}
                 </DesktopSearchLandingPanel>
 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div className="relative">
                     <DesktopQuickLinksPanel
                       title="最近使用的小程序"
-                      description="优先展示最近打开的小程序入口。"
-                      emptyText="打开过的小程序会先沉淀到这里。"
+                      emptyText="暂无最近使用"
                       items={recentMiniPrograms}
                       onOpen={onOpenQuickLink}
                     />
@@ -1294,8 +1287,7 @@ export function DesktopSearchWorkspace({
                   </div>
                   <DesktopQuickLinksPanel
                     title="最近收藏"
-                    description="优先展示高频回看的收藏入口。"
-                    emptyText="收藏过内容后，这里会出现最近回访入口。"
+                    emptyText="暂无最近收藏"
                     items={recentFavorites}
                     onOpen={onOpenQuickLink}
                   />
@@ -1534,15 +1526,11 @@ export function DesktopSearchWorkspace({
 }
 
 function DesktopQuickLinksPanel({
-  contextLabel = "快捷入口",
-  description,
   emptyText,
   items,
   onOpen,
   title,
 }: {
-  contextLabel?: string;
-  description: string;
   emptyText: string;
   items: DesktopSearchQuickLink[];
   onOpen: (item: DesktopSearchQuickLink) => void;
@@ -1550,26 +1538,20 @@ function DesktopQuickLinksPanel({
 }) {
   return (
     <DesktopSearchLandingPanel
-      countLabel={items.length ? `${items.length} 个入口` : undefined}
-      contextLabel={contextLabel}
-      description={description}
+      countLabel={items.length ? `${items.length}` : undefined}
       title={title}
     >
       {items.length ? (
-        <div className="space-y-2">
+        <div className="space-y-0.5">
           {items.map((item) => (
             <DesktopQuickLinkRow key={item.id} item={item} onOpen={onOpen} />
           ))}
         </div>
-      ) : emptyText ? (
-        <DesktopSearchStatusCard
-          badgeLabel="等待回访"
-          className="mb-0 rounded-[16px] border-[color:var(--border-faint)] bg-white p-3.5"
-          description={emptyText}
-          status="empty"
-          title={title}
-        />
-      ) : null}
+      ) : (
+        <div className="px-2 py-1.5 text-xs text-[color:var(--text-muted)]">
+          {emptyText}
+        </div>
+      )}
     </DesktopSearchLandingPanel>
   );
 }
@@ -1578,45 +1560,29 @@ function DesktopSearchLandingPanel({
   action,
   children,
   countLabel,
-  contextLabel = "首页入口",
-  description,
   title,
 }: {
   action?: ReactNode;
   children: ReactNode;
   countLabel?: string;
-  contextLabel?: string;
-  description: string;
   title: string;
 }) {
   return (
-    <section className="rounded-[20px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <div className="text-sm font-medium text-[color:var(--text-primary)]">
+    <section className="rounded-[14px] border border-[color:var(--border-faint)] bg-white p-3">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <div className="flex items-baseline gap-2">
+          <div className="text-[13px] font-medium text-[color:var(--text-primary)]">
             {title}
           </div>
-          {description ? (
-            <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-              {description}
-            </div>
-          ) : null}
-        </div>
-        <div className="flex items-center gap-2">
-          {contextLabel ? (
-            <div className="rounded-full bg-[rgba(7,193,96,0.08)] px-2.5 py-1 text-[10px] text-[color:var(--brand-primary)]">
-              {contextLabel}
-            </div>
-          ) : null}
           {countLabel ? (
-            <div className="rounded-full bg-white px-2.5 py-1 text-[10px] text-[color:var(--text-muted)]">
+            <div className="text-[11px] text-[color:var(--text-muted)]">
               {countLabel}
             </div>
           ) : null}
-          {action}
         </div>
+        {action}
       </div>
-      <div className="mt-4">{children}</div>
+      {children}
     </section>
   );
 }
@@ -1771,42 +1737,17 @@ function DesktopSearchStatusCard({
 function DesktopSearchScopeCard({
   category,
   count,
-  description,
   icon: Icon,
   onClick,
   title,
 }: {
   category: DesktopSearchScopeCardCategory;
   count: number;
-  description: string;
+  description?: string;
   icon: typeof MessageSquareText;
   onClick: () => void;
   title: string;
 }) {
-  const toneClassName =
-    category === "messages"
-      ? "border-[#dce9dd] bg-[linear-gradient(180deg,#f8fcf8,white)]"
-      : category === "contacts"
-        ? "border-[#d9e7d9] bg-[linear-gradient(180deg,#f9fcfa,white)]"
-        : category === "favorites"
-          ? "border-[#efe2bf] bg-[linear-gradient(180deg,#fffdf7,white)]"
-          : category === "officialAccounts"
-            ? "border-[#dfe7dd] bg-[linear-gradient(180deg,#fbfdfb,white)]"
-            : category === "miniPrograms"
-              ? "border-[#d8e7df] bg-[linear-gradient(180deg,#f7fbf9,white)]"
-              : category === "moments"
-                ? "border-[#dce8d7] bg-[linear-gradient(180deg,#f9fcf7,white)]"
-                : "border-[#dce5de] bg-[linear-gradient(180deg,#f6faf8,white)]";
-  const badgeClassName =
-    category === "favorites"
-      ? "bg-[rgba(180,132,23,0.10)] text-[#9a6b12]"
-      : category === "miniPrograms"
-        ? "bg-[rgba(15,118,110,0.10)] text-[#226448]"
-        : category === "moments"
-          ? "bg-[rgba(134,181,96,0.12)] text-[#587d38]"
-          : category === "feed"
-            ? "bg-[rgba(15,23,42,0.08)] text-[#3c6a53]"
-            : "bg-[rgba(7,193,96,0.10)] text-[#1d6a37]";
   const iconToneClassName =
     category === "favorites"
       ? "bg-[rgba(180,132,23,0.12)] text-[#a16207]"
@@ -1817,73 +1758,32 @@ function DesktopSearchScopeCard({
           : category === "feed"
             ? "bg-[rgba(15,23,42,0.08)] text-[#3c6a53]"
             : "bg-[rgba(7,193,96,0.10)] text-[#15803d]";
-  const actionLabel =
-    category === "messages"
-      ? "进入聊天记录"
-      : category === "contacts"
-        ? "进入联系人结果"
-        : category === "favorites"
-          ? "进入收藏结果"
-          : category === "officialAccounts"
-            ? "进入公众号结果"
-            : category === "miniPrograms"
-              ? "进入小程序结果"
-              : category === "moments"
-                ? "进入朋友圈结果"
-                : "进入内容流结果";
 
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "group overflow-hidden rounded-[20px] border p-5 text-left transition hover:-translate-y-0.5 hover:shadow-[0_18px_44px_rgba(15,23,42,0.08)]",
+        "group flex items-center gap-3 rounded-[12px] border border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-left transition hover:border-[rgba(7,193,96,0.20)] hover:bg-[rgba(7,193,96,0.04)]",
         desktopSearchCardFocusClassName,
-        toneClassName,
       )}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div
-          className={cn(
-            "flex h-10 w-10 items-center justify-center rounded-[12px]",
-            iconToneClassName,
-          )}
-        >
-          <Icon size={18} />
+      <div
+        className={cn(
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]",
+          iconToneClassName,
+        )}
+      >
+        <Icon size={16} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
+          {title}
         </div>
-        <div
-          className={cn(
-            "rounded-full px-2.5 py-1 text-[10px] font-medium",
-            badgeClassName,
-          )}
-        >
-          当前覆盖 {count} 项
+        <div className="text-xs text-[color:var(--text-muted)]">
+          {count} 项
         </div>
       </div>
-
-      <div className="mt-4 text-sm font-medium text-[color:var(--text-primary)]">
-        {title}
-      </div>
-
-      <div className="mt-3 rounded-[16px] bg-[rgba(255,255,255,0.76)] px-4 py-4">
-        <div className="text-xs leading-6 text-[color:var(--text-secondary)]">
-          {description}
-        </div>
-      </div>
-
-      <DesktopSearchFooterAffordance
-        ctaLabel="查看该分类"
-        label={actionLabel}
-        tone={
-          category === "favorites"
-            ? "gold"
-            : category === "miniPrograms"
-              ? "teal"
-              : category === "moments"
-                ? "olive"
-                : "brand"
-        }
-      />
     </button>
   );
 }
@@ -2448,15 +2348,12 @@ function DesktopQuickLinkRow({
   item: DesktopSearchQuickLink;
   onOpen: (item: DesktopSearchQuickLink) => void;
 }) {
-  const openLabel = getDesktopQuickLinkActionLabel(item);
-  const openTone = getDesktopQuickLinkActionTone(item);
-
   return (
     <button
       type="button"
       onClick={() => onOpen(item)}
       className={cn(
-        "group flex w-full items-center gap-3 rounded-[14px] bg-white px-3 py-3 text-left transition hover:bg-[rgba(7,193,96,0.04)]",
+        "group flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition hover:bg-[color:var(--surface-console)]",
         desktopSearchRowFocusClassName,
       )}
     >
@@ -2466,22 +2363,18 @@ function DesktopQuickLinkRow({
         size="sm"
       />
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
+        <div className="flex items-center gap-1.5">
+          <span className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
             {item.title}
-          </div>
-          <span className="rounded-full bg-[rgba(7,193,96,0.08)] px-2 py-0.5 text-[10px] text-[color:var(--brand-primary)]">
+          </span>
+          <span className="shrink-0 text-[10px] text-[color:var(--text-muted)]">
             {item.badge}
           </span>
         </div>
-        <div className="mt-1 truncate text-xs text-[color:var(--text-muted)]">
+        <div className="truncate text-[11px] text-[color:var(--text-muted)]">
           {item.meta}
         </div>
-        <div className="mt-1 truncate text-xs text-[color:var(--text-secondary)]">
-          {item.description}
-        </div>
       </div>
-      <DesktopSearchOpenCue compact label={openLabel} tone={openTone} />
     </button>
   );
 }
@@ -2496,63 +2389,30 @@ function DesktopSearchHistoryRow({
   onRemove: () => void;
 }) {
   return (
-    <div className="flex items-center gap-2 rounded-[14px] bg-white px-3 py-3">
+    <div className="group/row flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-[color:var(--surface-console)]">
       <button
         type="button"
         onClick={onApply}
         className={cn(
-          "group inline-flex min-w-0 flex-1 items-center gap-3 text-left",
+          "inline-flex min-w-0 flex-1 items-center gap-2 text-left",
           desktopSearchFocusRingClassName,
         )}
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-[color:var(--surface-console)] text-[color:var(--text-dim)]">
-          <Clock3 size={15} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
-            {keyword}
-          </div>
-          <div className="mt-1 text-xs text-[color:var(--text-secondary)]">
-            重新执行这条搜索，继续查看完整结果。
-          </div>
-        </div>
-        <DesktopSearchOpenCue compact label="重新搜索" tone="brand" />
+        <Clock3 size={13} className="shrink-0 text-[color:var(--text-dim)]" />
+        <span className="truncate text-[13px] text-[color:var(--text-primary)]">
+          {keyword}
+        </span>
       </button>
-      <DesktopSearchActionButton
+      <button
+        type="button"
         onClick={onRemove}
-        className="shrink-0"
-        tone="danger"
+        aria-label="移除"
+        className="shrink-0 rounded p-1 text-[color:var(--text-dim)] opacity-0 transition hover:bg-white hover:text-[#be123c] group-hover/row:opacity-100 focus:opacity-100"
       >
-        移除
-      </DesktopSearchActionButton>
+        <X size={14} />
+      </button>
     </div>
   );
-}
-
-function getDesktopQuickLinkActionLabel(item: DesktopSearchQuickLink) {
-  if (item.id.startsWith("favorite-")) {
-    return "打开收藏";
-  }
-
-  if (item.id.startsWith("mini-program-")) {
-    return "打开小程序";
-  }
-
-  return "立即打开";
-}
-
-function getDesktopQuickLinkActionTone(
-  item: DesktopSearchQuickLink,
-): "brand" | "gold" | "olive" | "teal" {
-  if (item.id.startsWith("favorite-")) {
-    return "gold";
-  }
-
-  if (item.id.startsWith("mini-program-")) {
-    return "teal";
-  }
-
-  return "brand";
 }
 
 function DesktopSearchMessageGroupCard({
