@@ -29,8 +29,14 @@ function resolveKeyboardInset(input: {
   platform: string | null;
 }) {
   const viewportInset = readKeyboardInset();
-  if (input.platform !== "android" || input.nativeKeyboardHeight <= 0) {
+  if (input.nativeKeyboardHeight <= 0) {
     return viewportInset;
+  }
+
+  if (input.platform === "ios") {
+    // iOS Capacitor 在 contentInset:"always" 下 WebView 不会收缩，
+    // visualViewport 通常已经反映键盘高度；此处插件值仅作为兜底（max 取较大者）。
+    return Math.max(viewportInset, input.nativeKeyboardHeight);
   }
 
   // Android WebView may overlay the IME without resizing the page.
@@ -145,7 +151,10 @@ export function useKeyboardInset() {
   }, [updateInset]);
 
   useEffect(() => {
-    if (!Capacitor.isNativePlatform() || nativePlatform !== "android") {
+    if (
+      !Capacitor.isNativePlatform() ||
+      (nativePlatform !== "android" && nativePlatform !== "ios")
+    ) {
       return;
     }
 

@@ -121,7 +121,7 @@ export function CharacterPage() {
             <div
               role="group"
               aria-label={t(msg`版本切换`)}
-              className="inline-flex overflow-hidden rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] text-xs shadow-[var(--shadow-soft)]"
+              className="ml-auto inline-flex shrink-0 overflow-hidden rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] text-xs shadow-[var(--shadow-soft)]"
             >
               <button
                 type="button"
@@ -308,7 +308,7 @@ function ReadView({ view }: { view: WikiPageView }) {
           <img
             src={c.avatar}
             alt={c.name}
-            className="w-20 h-20 rounded-full object-cover bg-[color:var(--surface-soft)]"
+            className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover bg-[color:var(--surface-soft)]"
           />
         )}
         <div className="flex-1">
@@ -1977,7 +1977,7 @@ function RevisionCard({
                 <summary className="cursor-pointer text-[var(--text-muted)]">
                   <Trans>查看角色逻辑快照</Trans>
                 </summary>
-                <pre className="mt-2 p-3 bg-[var(--bg-canvas)] rounded overflow-auto max-h-[60vh]">
+                <pre className="mt-2 p-3 bg-[var(--bg-canvas)] rounded overflow-auto max-h-[40vh] md:max-h-[60vh]">
                   {JSON.stringify(rev.recipeSnapshot, null, 2)}
                 </pre>
               </details>

@@ -26,6 +26,8 @@ const mobileBridgePluginPath = path.join(
 const projectPath = path.join(shellRoot, "ios", "App", "App.xcodeproj", "project.pbxproj");
 const entitlementsPath = path.join(iosAppRoot, "App.entitlements");
 const privacyManifestPath = path.join(iosAppRoot, "PrivacyInfo.xcprivacy");
+const capacitorConfigPath = path.join(shellRoot, "capacitor.config.ts");
+const webDistIndexPath = path.resolve(shellRoot, "..", "app", "dist", "index.html");
 const infoPlistStringLocalizations = ["zh-Hans", "en", "ja", "ko"];
 const requiredInfoPlistStringKeys = [
   "CFBundleDisplayName",
@@ -248,6 +250,40 @@ const checks = [
     detail: process.env.YINJIE_IOS_CORE_API_BASE_URL
       ? `YINJIE_IOS_CORE_API_BASE_URL=${process.env.YINJIE_IOS_CORE_API_BASE_URL}`
       : "YINJIE_IOS_CORE_API_BASE_URL is not set, `pnpm ios:sync` will fail",
+  },
+  {
+    label: "capacitor-config",
+    ok:
+      fs.existsSync(capacitorConfigPath) &&
+      !fileIncludes(capacitorConfigPath, "bundledWebRuntime") &&
+      fileIncludesAll(capacitorConfigPath, [
+        "SplashScreen",
+        "launchShowDuration",
+        "StatusBar",
+        "Keyboard",
+      ]),
+    detail: fs.existsSync(capacitorConfigPath)
+      ? fileIncludes(capacitorConfigPath, "bundledWebRuntime")
+        ? "capacitor.config.ts still defines `bundledWebRuntime` (deprecated since Capacitor 5)"
+        : "capacitor.config.ts declares SplashScreen/StatusBar/Keyboard plugin options"
+      : "capacitor.config.ts not found",
+  },
+  {
+    label: "web-dist-relative-base",
+    ok: (() => {
+      if (!fs.existsSync(webDistIndexPath)) {
+        // 构建产物缺失只是提示，不算失败 —— 用户可能尚未跑 pnpm ios:sync
+        return true;
+      }
+      const html = fs.readFileSync(webDistIndexPath, "utf8");
+      // 在 WKWebView 下加载 file:// 时，资源引用必须是相对路径（./assets/...），不能是绝对路径（/assets/...）
+      const hasAbsoluteAsset =
+        / src=\"\/(?!\/)/.test(html) || / href=\"\/(?!\/)/.test(html);
+      return !hasAbsoluteAsset;
+    })(),
+    detail: fs.existsSync(webDistIndexPath)
+      ? "apps/app/dist/index.html uses relative asset paths (WKWebView file:// safe)"
+      : "apps/app/dist not built yet; run `pnpm --filter @yinjie/ios-shell prepare:web`",
   },
 ];
 

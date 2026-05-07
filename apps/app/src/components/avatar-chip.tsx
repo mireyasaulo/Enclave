@@ -53,7 +53,8 @@ export function AvatarChip({
           setLoadFailed(true);
         }
       }}
-      className={`${classes} border border-white/80 object-cover shadow-[var(--shadow-soft)]`}
+      draggable={false}
+      className={`${classes} yj-no-callout border border-white/80 object-cover shadow-[var(--shadow-soft)]`}
     />
   );
 }

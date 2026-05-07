@@ -250,7 +250,7 @@ function ReviewCard({
           <summary className="cursor-pointer text-[color:var(--text-muted)]">
             <Trans>查看完整快照</Trans>
           </summary>
-          <pre className="mt-2 overflow-auto max-h-[60vh] rounded bg-[var(--bg-canvas)] p-3">
+          <pre className="mt-2 overflow-auto max-h-[40vh] md:max-h-[60vh] rounded bg-[var(--bg-canvas)] p-3">
             {JSON.stringify(rev.contentSnapshot, null, 2)}
           </pre>
         </details>
@@ -259,7 +259,7 @@ function ReviewCard({
             <summary className="cursor-pointer text-[color:var(--text-muted)]">
               <Trans>查看角色逻辑快照</Trans>
             </summary>
-            <pre className="mt-2 overflow-auto max-h-[60vh] rounded bg-[var(--bg-canvas)] p-3">
+            <pre className="mt-2 overflow-auto max-h-[40vh] md:max-h-[60vh] rounded bg-[var(--bg-canvas)] p-3">
               {JSON.stringify(rev.recipeSnapshot, null, 2)}
             </pre>
           </details>

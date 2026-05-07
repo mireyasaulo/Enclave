@@ -47,6 +47,7 @@ export function RecentChangesPage() {
           <label className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] px-3 py-2 text-sm shadow-[var(--shadow-soft)]">
             <input
               type="checkbox"
+              className="h-4 w-4"
               checked={onlyUnpatrolled}
               onChange={(e) => setOnlyUnpatrolled(e.target.checked)}
             />

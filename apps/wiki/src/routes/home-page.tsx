@@ -137,13 +137,13 @@ function Avatar({ name, url }: { name: string; url?: string }) {
         src={url}
         alt={name}
         onError={() => setBroken(true)}
-        className="h-12 w-12 shrink-0 rounded-2xl object-cover"
+        className="h-10 w-10 shrink-0 rounded-2xl object-cover md:h-12 md:w-12"
       />
     );
   }
   const initial = name?.[0] ?? "?";
   return (
-    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[image:var(--brand-gradient)] text-base font-semibold text-[color:var(--text-on-brand)]">
+    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[image:var(--brand-gradient)] text-base font-semibold text-[color:var(--text-on-brand)] md:h-12 md:w-12">
       {initial}
     </div>
   );

@@ -30,6 +30,10 @@ function detectBrowserPlatform(): AppPlatform {
   if (/(iphone|ipad|ipod)/.test(userAgent)) {
     return "ios";
   }
+  // iPadOS 13+ 默认使用桌面 UA（Macintosh），需要靠 maxTouchPoints 判别
+  if (/macintosh/.test(userAgent) && (navigator.maxTouchPoints ?? 0) > 1) {
+    return "ios";
+  }
   if (/android/.test(userAgent)) {
     return "android";
   }

@@ -156,7 +156,7 @@ export function MobileShell({ children }: PropsWithChildren) {
         </div>
         {showTabs ? (
           <nav
-            className="shrink-0 grid grid-cols-4 border-t border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-1.5 pt-1.5 backdrop-blur-xl"
+            className="yj-no-callout shrink-0 grid grid-cols-4 border-t border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-1.5 pt-1.5 backdrop-blur-xl"
             style={{
               paddingBottom: "max(0.375rem, var(--safe-area-inset-bottom))",
             }}
