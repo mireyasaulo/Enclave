@@ -1,4 +1,10 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import {
+  useEffect,
+  useEffectEvent,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 
 type ScrollBehaviorMode = "auto" | "smooth";
 
@@ -90,7 +96,7 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
     };
   }, [syncBottomState]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const previousItemCount = previousItemCountRef.current;
     previousItemCountRef.current = itemCount;
 
@@ -100,9 +106,7 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
       }
 
       initializedRef.current = true;
-      window.requestAnimationFrame(() => {
-        scrollToBottom("auto");
-      });
+      scrollToBottom("auto");
       return;
     }
 
@@ -113,9 +117,7 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
     const addedCount = itemCount - previousItemCount;
     const element = ref.current;
     if (!element || isAtBottomRef.current) {
-      window.requestAnimationFrame(() => {
-        scrollToBottom("auto");
-      });
+      scrollToBottom("auto");
       return;
     }
 
