@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import { DEFAULT_LOCALE, isSupportedLocale, type SupportedLocale } from "@/lib/locales";
 import { SITE_BASE_URL } from "@/lib/seo-metadata";
+import { SiteAnalyticsProvider } from "@/components/site-analytics-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -35,7 +36,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const locale = pickLocaleFromPath(h.get("x-pathname"));
   return (
     <html lang={locale}>
-      <body data-locale={locale}>{children}</body>
+      <body data-locale={locale}>
+        <SiteAnalyticsProvider>{children}</SiteAnalyticsProvider>
+      </body>
     </html>
   );
 }
