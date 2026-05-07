@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import {
   addGroupMember,
   getFriends,
@@ -8,6 +9,7 @@ import {
   getGroupMembers,
   removeGroupMember,
 } from "@yinjie/contracts";
+import { getActiveLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import { ArrowLeft, Check, Search, X } from "lucide-react";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import { AvatarChip } from "../components/avatar-chip";
@@ -55,6 +57,7 @@ function GroupMemberPickerPage({
   groupId: string;
   mode: GroupMemberPickerMode;
 }) {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
 
   if (isDesktopLayout) {
@@ -63,14 +66,20 @@ function GroupMemberPickerPage({
         conversationId={groupId}
         panel="details"
         detailsAction={mode === "add" ? "member-add" : "member-remove"}
-        title={mode === "add" ? "正在打开桌面添加成员" : "正在打开桌面移除成员"}
+        title={
+          mode === "add"
+            ? t(msg`正在打开桌面添加成员`)
+            : t(msg`正在打开桌面移除成员`)
+        }
         description={
           mode === "add"
-            ? "正在切换到桌面聊天工作区中的添加成员弹层。"
-            : "正在切换到桌面聊天工作区中的移除成员弹层。"
+            ? t(msg`正在切换到桌面聊天工作区中的添加成员弹层。`)
+            : t(msg`正在切换到桌面聊天工作区中的移除成员弹层。`)
         }
         loadingLabel={
-          mode === "add" ? "打开桌面添加成员..." : "打开桌面移除成员..."
+          mode === "add"
+            ? t(msg`打开桌面添加成员...`)
+            : t(msg`打开桌面移除成员...`)
         }
       />
     );
@@ -86,6 +95,7 @@ function MobileGroupMemberPickerPage({
   groupId: string;
   mode: GroupMemberPickerMode;
 }) {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const hash = useRouterState({ select: (state) => state.location.hash });
   const queryClient = useQueryClient();
@@ -173,8 +183,8 @@ function MobileGroupMemberPickerPage({
         name: getFriendDisplayName(item),
         subtitle:
           getFriendDisplayName(item) !== item.character.name
-            ? `昵称：${item.character.name}`
-            : item.character.relationship || "世界联系人",
+            ? t(msg`昵称：${item.character.name}`)
+            : item.character.relationship || t(msg`世界联系人`),
         avatar: item.character.avatar ?? undefined,
         indexLabel: item.indexLabel,
       }));
@@ -186,21 +196,24 @@ function MobileGroupMemberPickerPage({
         const rawName = item.memberName?.trim() || item.memberId;
         const friend = friendMap.get(item.memberId);
         const displayName = friend ? getFriendDisplayName(friend) : rawName;
-        const roleLabel = item.role === "admin" ? "管理员" : "群成员";
+        const roleLabel =
+          item.role === "admin" ? t(msg`管理员`) : t(msg`群成员`);
 
         return {
           id: item.memberId,
           name: displayName,
           subtitle:
             displayName !== rawName
-              ? `昵称：${rawName} · ${roleLabel}`
+              ? t(msg`昵称：${rawName} · ${roleLabel}`)
               : roleLabel,
           avatar: item.memberAvatar ?? undefined,
-          indexLabel: "群成员",
+          indexLabel: t(msg`群成员`),
         };
       })
-      .sort((left, right) => left.name.localeCompare(right.name, "zh-CN"));
-  }, [friendMap, friendsQuery.data, memberIds, membersQuery.data, mode]);
+      .sort((left, right) =>
+        left.name.localeCompare(right.name, getActiveLocale()),
+      );
+  }, [friendMap, friendsQuery.data, memberIds, membersQuery.data, mode, t]);
 
   const filteredCandidateItems = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
@@ -220,8 +233,8 @@ function MobileGroupMemberPickerPage({
         name: getFriendDisplayName(item),
         subtitle:
           getFriendDisplayName(item) !== item.character.name
-            ? `昵称：${item.character.name}`
-            : item.character.relationship || "世界联系人",
+            ? t(msg`昵称：${item.character.name}`)
+            : item.character.relationship || t(msg`世界联系人`),
         avatar: item.character.avatar ?? undefined,
         indexLabel: item.indexLabel,
       }));
@@ -232,7 +245,7 @@ function MobileGroupMemberPickerPage({
         value.toLowerCase().includes(normalizedKeyword),
       ),
     );
-  }, [allCandidateItems, friendsQuery.data, keyword, memberIds, mode]);
+  }, [allCandidateItems, friendsQuery.data, keyword, memberIds, mode, t]);
 
   const candidateSections = useMemo(() => {
     return buildContactSections(
@@ -308,15 +321,17 @@ function MobileGroupMemberPickerPage({
     },
   });
 
-  const pageTitle = mode === "add" ? "添加成员" : "移除成员";
+  const pageTitle = mode === "add" ? t(msg`添加成员`) : t(msg`移除成员`);
   const emptyStateTitle =
-    mode === "add" ? "没有可添加的联系人" : "当前没有可移除的群成员";
+    mode === "add"
+      ? t(msg`没有可添加的联系人`)
+      : t(msg`当前没有可移除的群成员`);
   const emptyStateDescription =
     mode === "add"
-      ? "通讯录里的联系人已经都在群里了。"
-      : "这个群目前没有可移除的角色成员。";
+      ? t(msg`通讯录里的联系人已经都在群里了。`)
+      : t(msg`这个群目前没有可移除的角色成员。`);
   const loadingLabel =
-    mode === "add" ? "正在读取联系人..." : "正在读取群成员...";
+    mode === "add" ? t(msg`正在读取联系人...`) : t(msg`正在读取群成员...`);
 
   function openGroupDetails() {
     void navigate({
@@ -347,7 +362,7 @@ function MobileGroupMemberPickerPage({
             size="icon"
             className="h-9 w-9 rounded-full text-[color:var(--text-primary)]"
             onClick={openGroupDetails}
-            aria-label="返回"
+            aria-label={t(msg`返回`)}
           >
             <ArrowLeft size={18} />
           </Button>
@@ -368,11 +383,11 @@ function MobileGroupMemberPickerPage({
           >
             {submitMutation.isPending
               ? mode === "add"
-                ? "添加中"
-                : "移除中"
+                ? t(msg`添加中`)
+                : t(msg`移除中`)
               : selectedIds.length
-                ? `确定(${selectedIds.length})`
-                : "确定"}
+                ? t(msg`确定(${selectedIds.length})`)
+                : t(msg`确定`)}
           </button>
         }
       >
@@ -380,10 +395,12 @@ function MobileGroupMemberPickerPage({
           <div className="-mx-4 border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] px-4 py-3">
             <div className="flex items-center justify-between gap-3">
               <div className="text-[13px] font-medium text-[color:var(--text-primary)]">
-                {mode === "add" ? "已选联系人" : "已选成员"}
+                {mode === "add" ? t(msg`已选联系人`) : t(msg`已选成员`)}
               </div>
               <div className="text-[12px] text-[color:var(--text-muted)]">
-                {selectedIds.length ? `${selectedIds.length} 人` : "未选择"}
+                {selectedIds.length
+                  ? t(msg`${selectedIds.length} 人`)
+                  : t(msg`未选择`)}
               </div>
             </div>
 
@@ -415,8 +432,8 @@ function MobileGroupMemberPickerPage({
             ) : (
               <div className="mt-3 text-[12px] leading-5 text-[color:var(--text-muted)]">
                 {mode === "add"
-                  ? "选择联系人后，就可以把他们加入当前群聊。"
-                  : "选择成员后，就可以把他们从当前群聊移除。"}
+                  ? t(msg`选择联系人后，就可以把他们加入当前群聊。`)
+                  : t(msg`选择成员后，就可以把他们从当前群聊移除。`)}
               </div>
             )}
           </div>
@@ -427,7 +444,9 @@ function MobileGroupMemberPickerPage({
               type="search"
               value={keyword}
               onChange={(event) => setKeyword(event.target.value)}
-              placeholder={mode === "add" ? "搜索联系人" : "搜索群成员"}
+              placeholder={
+                mode === "add" ? t(msg`搜索联系人`) : t(msg`搜索群成员`)
+              }
               className="min-w-0 flex-1 bg-transparent text-sm text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
             />
           </label>
@@ -440,12 +459,12 @@ function MobileGroupMemberPickerPage({
         (mode === "add" && friendsQuery.isLoading) ? (
           <div className="px-4 pt-4">
             <MobileGroupMemberPickerStatusCard
-              badge="读取中"
+              badge={t(msg`读取中`)}
               title={loadingLabel.replace("...", "")}
               description={
                 mode === "add"
-                  ? "稍等一下，正在同步可加入当前群聊的联系人。"
-                  : "稍等一下，正在同步当前可移除的群成员。"
+                  ? t(msg`稍等一下，正在同步可加入当前群聊的联系人。`)
+                  : t(msg`稍等一下，正在同步当前可移除的群成员。`)
               }
               tone="loading"
             />
@@ -454,8 +473,8 @@ function MobileGroupMemberPickerPage({
         {groupQuery.isError && groupQuery.error instanceof Error ? (
           <div className="px-4 pt-4">
             <MobileGroupMemberPickerStatusCard
-              badge="读取失败"
-              title="群聊信息暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`群聊信息暂时不可用`)}
               description={groupQuery.error.message}
               action={
                 <div className="flex flex-wrap items-center justify-center gap-2">
@@ -467,7 +486,7 @@ function MobileGroupMemberPickerPage({
                       void groupQuery.refetch();
                     }}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     type="button"
@@ -475,7 +494,7 @@ function MobileGroupMemberPickerPage({
                     className="h-8 rounded-full px-3 text-[11px]"
                     onClick={openGroupDetails}
                   >
-                    返回群聊信息
+                    {t(msg`返回群聊信息`)}
                   </Button>
                 </div>
               }
@@ -486,8 +505,8 @@ function MobileGroupMemberPickerPage({
         {membersQuery.isError && membersQuery.error instanceof Error ? (
           <div className="px-4 pt-4">
             <MobileGroupMemberPickerStatusCard
-              badge="读取失败"
-              title="群成员信息暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`群成员信息暂时不可用`)}
               description={membersQuery.error.message}
               action={
                 <div className="flex flex-wrap items-center justify-center gap-2">
@@ -499,7 +518,7 @@ function MobileGroupMemberPickerPage({
                       void membersQuery.refetch();
                     }}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     type="button"
@@ -507,7 +526,7 @@ function MobileGroupMemberPickerPage({
                     className="h-8 rounded-full px-3 text-[11px]"
                     onClick={openGroupDetails}
                   >
-                    返回群聊信息
+                    {t(msg`返回群聊信息`)}
                   </Button>
                 </div>
               }
@@ -518,8 +537,8 @@ function MobileGroupMemberPickerPage({
         {friendsQuery.isError && friendsQuery.error instanceof Error ? (
           <div className="px-4 pt-4">
             <MobileGroupMemberPickerStatusCard
-              badge="读取失败"
-              title="联系人列表暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`联系人列表暂时不可用`)}
               description={friendsQuery.error.message}
               action={
                 <div className="flex flex-wrap items-center justify-center gap-2">
@@ -531,7 +550,7 @@ function MobileGroupMemberPickerPage({
                       void friendsQuery.refetch();
                     }}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     type="button"
@@ -539,7 +558,7 @@ function MobileGroupMemberPickerPage({
                     className="h-8 rounded-full px-3 text-[11px]"
                     onClick={openGroupDetails}
                   >
-                    返回群聊信息
+                    {t(msg`返回群聊信息`)}
                   </Button>
                 </div>
               }
@@ -563,14 +582,14 @@ function MobileGroupMemberPickerPage({
                     onClick={handleRetrySubmit}
                     className="rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
                   >
-                    {mode === "add" ? "重试添加" : "重试移除"}
+                    {mode === "add" ? t(msg`重试添加`) : t(msg`重试移除`)}
                   </button>
                   <button
                     type="button"
                     onClick={openGroupDetails}
                     className="rounded-full border border-[rgba(220,38,38,0.14)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--state-danger-text)]"
                   >
-                    返回群聊信息
+                    {t(msg`返回群聊信息`)}
                   </button>
                 </div>
               </div>
@@ -585,7 +604,7 @@ function MobileGroupMemberPickerPage({
         !submitMutation.isPending ? (
           <div className="px-4 pt-6">
             <MobileGroupMemberPickerStatusCard
-              badge={mode === "add" ? "联系人" : "群成员"}
+              badge={mode === "add" ? t(msg`联系人`) : t(msg`群成员`)}
               title={emptyStateTitle}
               description={emptyStateDescription}
               action={
@@ -595,7 +614,7 @@ function MobileGroupMemberPickerPage({
                   className="h-8 rounded-full px-3 text-[11px]"
                   onClick={openGroupDetails}
                 >
-                  返回群聊信息
+                  {t(msg`返回群聊信息`)}
                 </Button>
               }
             />

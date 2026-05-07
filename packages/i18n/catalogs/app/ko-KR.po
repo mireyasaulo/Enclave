@@ -142,6 +142,7 @@ msgstr ""
 #. placeholder {0}: selectedIds.length
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1496
 #: apps/app/src/routes/create-group-page.tsx:365
+#: apps/app/src/routes/group-member-picker-page.tsx:402
 msgid "{0} 人"
 msgstr "{0}명"
 
@@ -1290,6 +1291,8 @@ msgstr "세계에 사용 가능한 API 주소가 없습니다."
 #: apps/app/src/routes/chat-details-page.tsx:297
 #: apps/app/src/routes/chat-details-page.tsx:320
 #: apps/app/src/routes/create-group-page.tsx:619
+#: apps/app/src/routes/group-member-picker-page.tsx:187
+#: apps/app/src/routes/group-member-picker-page.tsx:237
 msgid "世界联系人"
 msgstr "세계 연락처"
 
@@ -5542,6 +5545,7 @@ msgstr ""
 
 #: apps/app/src/features/desktop/chat/desktop-group-member-picker.tsx:214
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:151
+#: apps/app/src/routes/group-member-picker-page.tsx:398
 msgid "已选成员"
 msgstr "선택된 멤버"
 
@@ -5567,6 +5571,7 @@ msgstr "선택한 메시지"
 
 #: apps/app/src/i18n/static-dom-seed.ts:425
 #: apps/app/src/routes/create-group-page.tsx:361
+#: apps/app/src/routes/group-member-picker-page.tsx:398
 msgid "已选联系人"
 msgstr "선택한 연락처"
 
@@ -6210,6 +6215,10 @@ msgstr "현재 사용할 수 있는 스티커가 없습니다."
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:119
 msgid "当前没有可移除的成员"
 msgstr "현재 제거할 수 있는 멤버가 없습니다"
+
+#: apps/app/src/routes/group-member-picker-page.tsx:328
+msgid "当前没有可移除的群成员"
+msgstr ""
 
 #: apps/app/src/routes/group-qr-page.tsx:2787
 msgid "当前没有可预测结果。"
@@ -7047,6 +7056,14 @@ msgstr "서비스 계정 메시지 열기"
 msgid "打开服务号菜单"
 msgstr "서비스 계정 메뉴 열기"
 
+#: apps/app/src/routes/group-member-picker-page.tsx:81
+msgid "打开桌面添加成员..."
+msgstr ""
+
+#: apps/app/src/routes/group-member-picker-page.tsx:82
+msgid "打开桌面移除成员..."
+msgstr ""
+
 #: apps/app/src/routes/group-announcement-page.tsx:36
 msgid "打开桌面群公告..."
 msgstr ""
@@ -7800,6 +7817,7 @@ msgstr "검색 결과 · {count}개"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:492
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:109
+#: apps/app/src/routes/group-member-picker-page.tsx:448
 msgid "搜索群成员"
 msgstr "그룹 멤버 검색"
 
@@ -7816,6 +7834,7 @@ msgid "搜索聊天记录、联系人、公众号、收藏和小程序"
 msgstr "채팅 기록, 연락처, 공식 계정, 즐겨찾기, 미니 프로그램 검색"
 
 #: apps/app/src/features/desktop/chat/desktop-group-member-picker.tsx:129
+#: apps/app/src/routes/group-member-picker-page.tsx:448
 msgid "搜索联系人"
 msgstr "연락처 검색"
 
@@ -8344,6 +8363,8 @@ msgstr "닉네임"
 #: apps/app/src/routes/chat-details-page.tsx:295
 #: apps/app/src/routes/contacts-page.tsx:2068
 #: apps/app/src/routes/create-group-page.tsx:550
+#: apps/app/src/routes/group-member-picker-page.tsx:186
+#: apps/app/src/routes/group-member-picker-page.tsx:236
 msgid "昵称：{0}"
 msgstr "닉네임: {0}"
 
@@ -8358,6 +8379,7 @@ msgid "昵称：{rawName}"
 msgstr "닉네임: {rawName}"
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:972
+#: apps/app/src/routes/group-member-picker-page.tsx:207
 msgid "昵称：{rawName} · {roleLabel}"
 msgstr ""
 
@@ -8820,6 +8842,7 @@ msgstr "연결 안 됨"
 
 #: apps/app/src/i18n/static-dom-seed.ts:426
 #: apps/app/src/routes/create-group-page.tsx:366
+#: apps/app/src/routes/group-member-picker-page.tsx:403
 msgid "未选择"
 msgstr "선택 안 함"
 
@@ -9573,6 +9596,14 @@ msgstr ""
 msgid "正在切换到桌面视频号"
 msgstr ""
 
+#: apps/app/src/routes/group-member-picker-page.tsx:76
+msgid "正在切换到桌面聊天工作区中的添加成员弹层。"
+msgstr ""
+
+#: apps/app/src/routes/group-member-picker-page.tsx:77
+msgid "正在切换到桌面聊天工作区中的移除成员弹层。"
+msgstr ""
+
 #: apps/app/src/routes/group-announcement-page.tsx:35
 msgid "正在切换到桌面聊天工作区中的群公告编辑视图。"
 msgstr ""
@@ -9752,8 +9783,16 @@ msgstr ""
 msgid "正在打开桌面消息"
 msgstr "데스크톱 메시지를 여는 중"
 
+#: apps/app/src/routes/group-member-picker-page.tsx:71
+msgid "正在打开桌面添加成员"
+msgstr ""
+
 #: apps/app/src/routes/channels-page.tsx:948
 msgid "正在打开桌面视频号"
+msgstr ""
+
+#: apps/app/src/routes/group-member-picker-page.tsx:72
+msgid "正在打开桌面移除成员"
 msgstr ""
 
 #: apps/app/src/routes/group-announcement-page.tsx:34
@@ -10014,6 +10053,7 @@ msgid "正在读取群公告"
 msgstr ""
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1489
+#: apps/app/src/routes/group-member-picker-page.tsx:334
 msgid "正在读取群成员..."
 msgstr "그룹 멤버를 불러오는 중..."
 
@@ -10071,6 +10111,7 @@ msgstr ""
 
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:553
 #: apps/app/src/features/desktop/chat/desktop-group-member-picker.tsx:139
+#: apps/app/src/routes/group-member-picker-page.tsx:334
 msgid "正在读取联系人..."
 msgstr "연락처 불러오는 중..."
 
@@ -10225,6 +10266,10 @@ msgstr "일치하는 미니 프로그램이 없습니다"
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:127
 msgid "没有匹配的群成员。"
 msgstr "일치하는 그룹 멤버가 없습니다."
+
+#: apps/app/src/routes/group-member-picker-page.tsx:327
+msgid "没有可添加的联系人"
+msgstr ""
 
 #: apps/app/src/features/desktop/chat/desktop-group-member-picker.tsx:166
 msgid "没有可添加的联系人，或者他们已经都在群里了。"
@@ -10456,6 +10501,10 @@ msgstr "메시지 페이지를 잠시 사용할 수 없습니다"
 msgid "添加"
 msgstr "추가"
 
+#: apps/app/src/routes/group-member-picker-page.tsx:386
+msgid "添加中"
+msgstr ""
+
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:617
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:852
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:513
@@ -10474,6 +10523,7 @@ msgstr "자주 사용에 추가"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2322
 #: apps/app/src/routes/group-chat-details-page.tsx:981
+#: apps/app/src/routes/group-member-picker-page.tsx:324
 msgid "添加成员"
 msgstr "멤버 추가"
 
@@ -11088,11 +11138,13 @@ msgstr "실리콘밸리 창업자 매핑"
 
 #: apps/app/src/i18n/static-dom-seed.ts:424
 #: apps/app/src/routes/create-group-page.tsx:353
+#: apps/app/src/routes/group-member-picker-page.tsx:390
 msgid "确定"
 msgstr "확인"
 
 #. placeholder {0}: selectedIds.length
 #: apps/app/src/routes/create-group-page.tsx:352
+#: apps/app/src/routes/group-member-picker-page.tsx:389
 msgid "确定({0})"
 msgstr ""
 
@@ -11354,12 +11406,17 @@ msgstr "{0} 제거"
 msgid "移除 {displayName}"
 msgstr "{displayName} 제거"
 
+#: apps/app/src/routes/group-member-picker-page.tsx:387
+msgid "移除中"
+msgstr ""
+
 #: apps/app/src/i18n/static-dom-seed.ts:863
 msgid "移除当前视频"
 msgstr "현재 동영상 제거"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2313
 #: apps/app/src/routes/group-chat-details-page.tsx:994
+#: apps/app/src/routes/group-member-picker-page.tsx:324
 msgid "移除成员"
 msgstr "멤버 제거"
 
@@ -11415,6 +11472,10 @@ msgstr "최근 대화와 메시지 항목을 동기화하는 중입니다. 잠�
 msgid "稍等一下，正在同步最近的订阅推送。"
 msgstr "잠시만요. 최근 구독 발행을 동기화하고 있습니다."
 
+#: apps/app/src/routes/group-member-picker-page.tsx:466
+msgid "稍等一下，正在同步可加入当前群聊的联系人。"
+msgstr ""
+
 #: apps/app/src/routes/create-group-page.tsx:432
 msgid "稍等一下，正在同步可拉进群的联系人。"
 msgstr ""
@@ -11426,6 +11487,10 @@ msgstr "주민 공개 게시물과 상호작용 상태를 동기화 중입니다
 #: apps/app/src/routes/profile-settings-page.tsx:463
 msgid "稍等一下，正在同步当前世界主人的专属配置。"
 msgstr "현재 세계 주인의 전용 설정을 동기화 중입니다. 잠시만 기다려 주세요."
+
+#: apps/app/src/routes/group-member-picker-page.tsx:467
+msgid "稍等一下，正在同步当前可移除的群成员。"
+msgstr ""
 
 #: apps/app/src/routes/group-announcement-page.tsx:302
 msgid "稍等一下，正在同步当前群聊的公告内容。"
@@ -11666,6 +11731,7 @@ msgstr "관리 중: 스티커 오른쪽 위 삭제를 누르면 다음 항목으
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:816
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:330
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:534
+#: apps/app/src/routes/group-member-picker-page.tsx:200
 msgid "管理员"
 msgstr "관리자"
 
@@ -12047,11 +12113,15 @@ msgstr "그룹 협업"
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:537
 #: apps/app/src/lib/conversation-preview.ts:70
 #: apps/app/src/lib/conversation-preview.ts:106
+#: apps/app/src/routes/group-member-picker-page.tsx:200
+#: apps/app/src/routes/group-member-picker-page.tsx:210
+#: apps/app/src/routes/group-member-picker-page.tsx:607
 msgid "群成员"
 msgstr "그룹 멤버"
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1364
 #: apps/app/src/routes/group-chat-details-page.tsx:600
+#: apps/app/src/routes/group-member-picker-page.tsx:509
 #: apps/app/src/routes/group-qr-page.tsx:1135
 msgid "群成员信息暂时不可用"
 msgstr "그룹 멤버 정보를 지금 사용할 수 없습니다"
@@ -12137,6 +12207,7 @@ msgstr "그룹 정보"
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1348
 #: apps/app/src/routes/group-chat-details-page.tsx:589
+#: apps/app/src/routes/group-member-picker-page.tsx:477
 msgid "群聊信息暂时不可用"
 msgstr "그룹 정보를 지금 사용할 수 없습니다"
 
@@ -12439,11 +12510,13 @@ msgstr "채팅 속 이미지 / GIF도 스티커로 추가할 수 있습니다"
 #: apps/app/src/routes/character-detail-page.tsx:259
 #: apps/app/src/routes/chat-details-page.tsx:317
 #: apps/app/src/routes/create-group-page.tsx:494
+#: apps/app/src/routes/group-member-picker-page.tsx:607
 msgid "联系人"
 msgstr "연락처"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1033
 #: apps/app/src/routes/create-group-page.tsx:441
+#: apps/app/src/routes/group-member-picker-page.tsx:541
 msgid "联系人列表暂时不可用"
 msgstr "연락처 목록을 일시적으로 사용할 수 없습니다"
 
@@ -13116,6 +13189,7 @@ msgstr "인증 코드를 입력하세요 (기본값 123456으로 통과 가능)"
 #: apps/app/src/routes/group-announcement-page.tsx:300
 #: apps/app/src/routes/group-chat-background-page.tsx:333
 #: apps/app/src/routes/group-chat-details-page.tsx:578
+#: apps/app/src/routes/group-member-picker-page.tsx:462
 #: apps/app/src/routes/group-qr-page.tsx:1088
 #: apps/app/src/routes/moments-page.tsx:942
 #: apps/app/src/routes/profile-settings-page.tsx:461
@@ -13145,6 +13219,9 @@ msgstr "이미지를 읽지 못했습니다. 다른 이미지로 다시 시도�
 #: apps/app/src/routes/friend-requests-page.tsx:235
 #: apps/app/src/routes/group-chat-background-page.tsx:345
 #: apps/app/src/routes/group-chat-background-page.tsx:377
+#: apps/app/src/routes/group-member-picker-page.tsx:476
+#: apps/app/src/routes/group-member-picker-page.tsx:508
+#: apps/app/src/routes/group-member-picker-page.tsx:540
 #: apps/app/src/routes/moments-page.tsx:950
 #: apps/app/src/routes/profile-settings-page.tsx:473
 #: apps/app/src/routes/starred-friends-page.tsx:253
@@ -13436,6 +13513,7 @@ msgstr "최"
 #: apps/app/src/features/chat-details/chat-details-shell.tsx:45
 #: apps/app/src/routes/character-detail-page.tsx:272
 #: apps/app/src/routes/create-group-page.tsx:332
+#: apps/app/src/routes/group-member-picker-page.tsx:365
 #: apps/app/src/routes/welcome-page.tsx:1111
 msgid "返回"
 msgstr "뒤로"
@@ -13570,6 +13648,11 @@ msgstr "그룹 채팅으로 돌아가기"
 #: apps/app/src/routes/group-chat-background-page.tsx:397
 #: apps/app/src/routes/group-chat-background-page.tsx:419
 #: apps/app/src/routes/group-chat-background-page.tsx:651
+#: apps/app/src/routes/group-member-picker-page.tsx:497
+#: apps/app/src/routes/group-member-picker-page.tsx:529
+#: apps/app/src/routes/group-member-picker-page.tsx:561
+#: apps/app/src/routes/group-member-picker-page.tsx:592
+#: apps/app/src/routes/group-member-picker-page.tsx:617
 #: apps/app/src/routes/group-qr-page.tsx:726
 #: apps/app/src/routes/group-qr-page.tsx:1122
 #: apps/app/src/routes/group-qr-page.tsx:1156
@@ -13956,6 +14039,7 @@ msgid "这个视频号作者暂时还没有填写简介。"
 msgstr ""
 
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:120
+#: apps/app/src/routes/group-member-picker-page.tsx:332
 msgid "这个群目前没有可移除的角色成员。"
 msgstr "이 그룹에는 현재 제거할 수 있는 캐릭터 멤버가 없습니다."
 
@@ -14342,12 +14426,17 @@ msgstr ""
 msgid "选择名片"
 msgstr ""
 
+#: apps/app/src/routes/group-member-picker-page.tsx:436
+msgid "选择成员后，就可以把他们从当前群聊移除。"
+msgstr ""
+
 #: apps/app/src/features/contacts/desktop-contact-profile-blocks.tsx:18
 #: apps/app/src/routes/create-group-page.tsx:322
 msgid "选择联系人"
 msgstr "연락처 선택"
 
 #: apps/app/src/i18n/static-dom-seed.ts:775
+#: apps/app/src/routes/group-member-picker-page.tsx:435
 msgid "选择联系人后，就可以把他们加入当前群聊。"
 msgstr "연락처를 선택하면 현재 그룹 채팅에 추가할 수 있습니다."
 
@@ -14409,6 +14498,10 @@ msgstr "연락처 친구"
 #: apps/app/src/routes/contacts-page.tsx:1954
 msgid "通讯录还是空的"
 msgstr "연락처가 아직 비어 있습니다"
+
+#: apps/app/src/routes/group-member-picker-page.tsx:331
+msgid "通讯录里的联系人已经都在群里了。"
+msgstr ""
 
 #: apps/app/src/features/desktop/chat/desktop-group-member-picker.tsx:154
 msgid "通讯录里还没有可选成员"
@@ -14659,6 +14752,14 @@ msgstr ""
 msgid "重试摇一摇"
 msgstr ""
 
+#: apps/app/src/routes/group-member-picker-page.tsx:585
+msgid "重试添加"
+msgstr ""
+
+#: apps/app/src/routes/group-member-picker-page.tsx:585
+msgid "重试移除"
+msgstr ""
+
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:969
 msgid "重试结束通话"
 msgstr ""
@@ -14706,6 +14807,9 @@ msgstr ""
 #: apps/app/src/routes/group-chat-background-page.tsx:389
 #: apps/app/src/routes/group-chat-background-page.tsx:457
 #: apps/app/src/routes/group-chat-details-page.tsx:148
+#: apps/app/src/routes/group-member-picker-page.tsx:489
+#: apps/app/src/routes/group-member-picker-page.tsx:521
+#: apps/app/src/routes/group-member-picker-page.tsx:553
 #: apps/app/src/routes/group-qr-page.tsx:1114
 #: apps/app/src/routes/group-qr-page.tsx:1148
 #: apps/app/src/routes/group-qr-page.tsx:1635
