@@ -129,13 +129,13 @@ const ADMIN_SESSION_TONE_STYLES: Record<
   { badge: string }
 > = {
   success: {
-    badge: "border-emerald-300/50 bg-emerald-500/10 text-emerald-100",
+    badge: "border-emerald-300/70 bg-emerald-50 text-emerald-700",
   },
   warning: {
-    badge: "border-amber-300/50 bg-amber-500/10 text-amber-100",
+    badge: "border-amber-300/70 bg-amber-50 text-amber-700",
   },
   danger: {
-    badge: "border-rose-300/60 bg-rose-500/10 text-rose-200",
+    badge: "border-rose-300/70 bg-rose-50 text-rose-700",
   },
   neutral: {
     badge:

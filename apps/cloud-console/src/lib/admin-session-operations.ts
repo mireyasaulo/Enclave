@@ -264,11 +264,11 @@ export function formatHighlightedOperationReceiptLabel(
 export function getHighlightedOperationReceiptTone(tone: ConsoleNoticeTone) {
   switch (tone) {
     case "success":
-      return "border-emerald-300/40 bg-emerald-500/10 text-emerald-100";
+      return "border-emerald-300/40 bg-emerald-50 text-emerald-700";
     case "warning":
-      return "border-amber-300/40 bg-amber-500/10 text-amber-100";
+      return "border-amber-300/40 bg-amber-50 text-amber-700";
     case "danger":
-      return "border-rose-300/40 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/40 bg-rose-50 text-rose-700";
     case "info":
     default:
       return "border-[color:var(--border-brand)] bg-[color:var(--brand-soft)] text-[color:var(--brand-primary)]";

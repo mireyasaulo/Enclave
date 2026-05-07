@@ -63,7 +63,7 @@ const WORLD_STATUSES: CloudWorldLifecycleStatus[] = [
 const SECONDARY_ACTION_BUTTON =
   "rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-secondary)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:bg-[color:var(--surface-tertiary)] disabled:opacity-60";
 const JOB_AUDIT_BADGE_CLASS_NAME =
-  "rounded-full border border-amber-300/50 bg-amber-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-amber-100";
+  "rounded-full border border-amber-300/50 bg-amber-50 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-amber-700";
 
 function formatDateTime(value?: string | null) {
   if (!value) {
@@ -113,13 +113,13 @@ function formatOptional(value?: string | null) {
 function getJobStatusTone(status: WorldLifecycleJobStatus) {
   switch (status) {
     case "running":
-      return "border-sky-300/50 bg-sky-500/10 text-sky-100";
+      return "border-sky-300/50 bg-sky-50 text-sky-700";
     case "pending":
       return "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-primary)]";
     case "failed":
-      return "border-rose-300/60 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/60 bg-rose-50 text-rose-700";
     case "succeeded":
-      return "border-emerald-300/50 bg-emerald-500/10 text-emerald-100";
+      return "border-emerald-300/50 bg-emerald-50 text-emerald-700";
     case "cancelled":
     default:
       return "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]";
@@ -129,12 +129,12 @@ function getJobStatusTone(status: WorldLifecycleJobStatus) {
 function getAttentionTone(severity: CloudWorldAttentionItem["severity"]) {
   switch (severity) {
     case "critical":
-      return "border-rose-300/60 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/60 bg-rose-50 text-rose-700";
     case "warning":
-      return "border-amber-300/50 bg-amber-500/10 text-amber-100";
+      return "border-amber-300/50 bg-amber-50 text-amber-700";
     case "info":
     default:
-      return "border-sky-300/50 bg-sky-500/10 text-sky-100";
+      return "border-sky-300/50 bg-sky-50 text-sky-700";
   }
 }
 
@@ -641,10 +641,9 @@ export function WorldDetailPage() {
           </div>
 
           <div className="mt-3 text-xs leading-6 text-[color:var(--text-muted)]">
-            Resume is available for worlds that still need to move back toward
-            running, including sleeping, failed, queued, and stopping states.
-            Suspend is limited to worlds that are currently active. Retry is
-            reserved for failed or in-flight lifecycle states.
+            {t(
+              "Resume is available for worlds that still need to move back toward running, including sleeping, failed, queued, and stopping states. Suspend is limited to worlds that are currently active. Retry is reserved for failed or in-flight lifecycle states.",
+            )}
           </div>
 
           <div className="mt-5 grid gap-4">
@@ -731,29 +730,34 @@ export function WorldDetailPage() {
                   {selectedProvider.description}
                 </div>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                  <div>Deployment: {selectedProvider.deploymentMode}</div>
                   <div>
-                    Default region:{" "}
+                    {t("Deployment")}: {selectedProvider.deploymentMode}
+                  </div>
+                  <div>
+                    {t("Default region")}:{" "}
                     {formatOptional(selectedProvider.defaultRegion)}
                   </div>
                   <div>
-                    Default zone: {formatOptional(selectedProvider.defaultZone)}
+                    {t("Default zone")}:{" "}
+                    {formatOptional(selectedProvider.defaultZone)}
                   </div>
                   <div>
-                    Managed lifecycle:{" "}
+                    {t("Managed lifecycle")}:{" "}
                     {selectedProvider.capabilities.managedLifecycle
-                      ? "Yes"
-                      : "No"}
+                      ? t("Yes")
+                      : t("No")}
                   </div>
                   <div>
-                    Managed provisioning:{" "}
+                    {t("Managed provisioning")}:{" "}
                     {selectedProvider.capabilities.managedProvisioning
-                      ? "Yes"
-                      : "No"}
+                      ? t("Yes")
+                      : t("No")}
                   </div>
                   <div>
-                    Snapshots:{" "}
-                    {selectedProvider.capabilities.snapshots ? "Yes" : "No"}
+                    {t("Snapshots")}:{" "}
+                    {selectedProvider.capabilities.snapshots
+                      ? t("Yes")
+                      : t("No")}
                   </div>
                 </div>
               </div>

@@ -923,6 +923,76 @@ export function formatCloudConsolePageOfTotal(
   });
 }
 
+export function formatCloudConsoleVisibleSessionsRange(
+  start: number,
+  end: number,
+  total: number,
+  locale?: string | null,
+) {
+  if (total === 0 || end < start) {
+    return selectCloudConsoleText(locale, {
+      "en-US": "Showing 0 sessions",
+      "zh-CN": "暂无会话",
+      "ja-JP": "セッションなし",
+      "ko-KR": "세션 없음",
+    });
+  }
+  return selectCloudConsoleText(locale, {
+    "en-US": `Showing ${start}-${end} of ${total}`,
+    "zh-CN": `显示第 ${start}-${end} 条，共 ${total} 条`,
+    "ja-JP": `${start}-${end} / ${total} 件を表示`,
+    "ko-KR": `${start}-${end} / 총 ${total}건 표시`,
+  });
+}
+
+export function formatCloudConsoleVisibleGroupsRange(
+  start: number,
+  end: number,
+  total: number,
+  locale?: string | null,
+) {
+  if (total === 0 || end < start) {
+    return selectCloudConsoleText(locale, {
+      "en-US": "Showing 0 groups",
+      "zh-CN": "暂无分组",
+      "ja-JP": "グループなし",
+      "ko-KR": "그룹 없음",
+    });
+  }
+  return selectCloudConsoleText(locale, {
+    "en-US": `Showing ${start}-${end} of ${total} groups`,
+    "zh-CN": `显示第 ${start}-${end} 组，共 ${total} 组`,
+    "ja-JP": `${start}-${end} / ${total} グループを表示`,
+    "ko-KR": `${start}-${end} / 총 ${total}개 그룹 표시`,
+  });
+}
+
+export function formatCloudConsoleVisibleJobsRange(
+  start: number,
+  end: number,
+  total: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Showing ${start}-${end} of ${total} jobs.`,
+    "zh-CN": `显示第 ${start}-${end} 项，共 ${total} 项任务。`,
+    "ja-JP": `${start}-${end} / ${total} 件のジョブを表示`,
+    "ko-KR": `${start}-${end} / 총 ${total}개 작업 표시`,
+  });
+}
+
+export function formatCloudConsolePageSize(
+  size: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `page size: ${size}`,
+    "zh-CN": `每页 ${size} 条`,
+    "ja-JP": `1ページ ${size} 件`,
+    "ko-KR": `페이지당 ${size}건`,
+  });
+}
+
 export function formatCloudConsoleActiveVersion(
   version: number,
   locale?: string | null,

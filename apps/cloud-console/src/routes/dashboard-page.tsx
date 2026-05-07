@@ -58,7 +58,7 @@ function getMetricTone(value: number) {
 }
 
 const JOB_AUDIT_BADGE_CLASS_NAME =
-  "rounded-full border border-amber-300/50 bg-amber-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-amber-100";
+  "rounded-full border border-amber-300/50 bg-amber-50 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-amber-700";
 
 function formatDateTime(value?: string | null) {
   if (!value) {
@@ -74,25 +74,25 @@ function formatDateTime(value?: string | null) {
 function getAttentionTone(severity: CloudWorldAttentionItem["severity"]) {
   switch (severity) {
     case "critical":
-      return "border-rose-300/60 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/60 bg-rose-50 text-rose-700";
     case "warning":
-      return "border-amber-300/50 bg-amber-500/10 text-amber-100";
+      return "border-amber-300/50 bg-amber-50 text-amber-700";
     case "info":
     default:
-      return "border-sky-300/50 bg-sky-500/10 text-sky-100";
+      return "border-sky-300/50 bg-sky-50 text-sky-700";
   }
 }
 
 function getPowerStateTone(powerState: CloudInstancePowerState) {
   switch (powerState) {
     case "running":
-      return "border-emerald-300/50 bg-emerald-500/10 text-emerald-100";
+      return "border-emerald-300/50 bg-emerald-50 text-emerald-700";
     case "starting":
     case "provisioning":
     case "stopping":
-      return "border-sky-300/50 bg-sky-500/10 text-sky-100";
+      return "border-sky-300/50 bg-sky-50 text-sky-700";
     case "error":
-      return "border-rose-300/60 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/60 bg-rose-50 text-rose-700";
     case "stopped":
     case "absent":
     default:
@@ -147,13 +147,13 @@ function buildProviderLabelMap(providers: CloudComputeProviderSummary[] | undefi
 function getJobStatusTone(status: WorldLifecycleJobSummary["status"]) {
   switch (status) {
     case "running":
-      return "border-sky-300/50 bg-sky-500/10 text-sky-100";
+      return "border-sky-300/50 bg-sky-50 text-sky-700";
     case "pending":
       return "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-primary)]";
     case "failed":
-      return "border-rose-300/60 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/60 bg-rose-50 text-rose-700";
     case "succeeded":
-      return "border-emerald-300/50 bg-emerald-500/10 text-emerald-100";
+      return "border-emerald-300/50 bg-emerald-50 text-emerald-700";
     case "cancelled":
     default:
       return "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]";

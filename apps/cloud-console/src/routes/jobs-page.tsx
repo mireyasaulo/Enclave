@@ -9,6 +9,7 @@ import type {
 import {
   compareByLocale,
   formatDateTime as formatLocaleDateTime,
+  useAppLocale,
 } from "@yinjie/i18n";
 import {
   CloudAdminErrorBlock,
@@ -45,8 +46,12 @@ import {
 } from "../lib/job-route-search";
 import { copyTextToClipboard } from "../lib/clipboard";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
-import { translateCloudConsoleTextForActiveLocale,
-  useCloudConsoleText } from "../lib/cloud-console-i18n";
+import {
+  formatCloudConsolePageSize,
+  formatCloudConsoleVisibleJobsRange,
+  translateCloudConsoleTextForActiveLocale,
+  useCloudConsoleText,
+} from "../lib/cloud-console-i18n";
 import {
   createRequestScopedNotice,
   showRequestScopedNotice,
@@ -100,13 +105,13 @@ function formatDuration(value?: number | null) {
 function getStatusTone(status: WorldLifecycleJobSummary["status"]) {
   switch (status) {
     case "running":
-      return "border-sky-300/50 bg-sky-500/10 text-sky-100";
+      return "border-sky-300/50 bg-sky-50 text-sky-700";
     case "pending":
       return "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-primary)]";
     case "failed":
-      return "border-rose-300/60 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/60 bg-rose-50 text-rose-700";
     case "succeeded":
-      return "border-emerald-300/50 bg-emerald-500/10 text-emerald-100";
+      return "border-emerald-300/50 bg-emerald-50 text-emerald-700";
     case "cancelled":
     default:
       return "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]";
@@ -122,7 +127,7 @@ function buildProviderLabelMap(providers: CloudComputeProviderSummary[] | undefi
 }
 
 const JOB_AUDIT_BADGE_CLASS_NAME =
-  "rounded-full border border-amber-300/50 bg-amber-500/10 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-amber-100";
+  "rounded-full border border-amber-300/50 bg-amber-50 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-amber-700";
 
 type QuickActionConfirmState = {
   worldId: string;
@@ -132,6 +137,7 @@ type QuickActionConfirmState = {
 
 export function JobsPage() {
   const t = useCloudConsoleText();
+  const { locale } = useAppLocale();
   const navigate = useNavigate({ from: "/jobs" });
   const queryClient = useQueryClient();
   const { showNotice } = useConsoleNotice();
@@ -619,7 +625,7 @@ export function JobsPage() {
           >
             {JOB_PAGE_SIZE_OPTIONS.map((item) => (
               <option key={item} value={item}>
-                page size: {item}
+                {formatCloudConsolePageSize(item, locale)}
               </option>
             ))}
           </select>
@@ -709,10 +715,10 @@ export function JobsPage() {
                     <span
                       className={`rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.18em] ${group.state.tone}`}
                     >
-                      {group.state.label}
+                      {t(group.state.label)}
                     </span>
                     <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                      {group.jobs.length} jobs
+                      {t("{count} jobs").replace("{count}", String(group.jobs.length))}
                     </span>
                   </div>
                 </td>
@@ -850,9 +856,7 @@ export function JobsPage() {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-[color:var(--text-secondary)]">
-        <div>
-          Showing {pageStart}-{pageEnd} of {totalJobs} jobs.
-        </div>
+        <div>{formatCloudConsoleVisibleJobsRange(pageStart, pageEnd, totalJobs, locale)}</div>
 
         <div className="flex items-center gap-2">
           <button

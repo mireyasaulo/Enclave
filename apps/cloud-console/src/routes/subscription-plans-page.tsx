@@ -111,19 +111,19 @@ export function SubscriptionPlansPage() {
               <div className="mt-1 space-y-0.5 text-sm text-[color:var(--text-secondary)]">
                 <div>
                   <span className="text-[color:var(--text-tertiary)]">
-                    {t("code")}:
+                    {t("Code")}:
                   </span>{" "}
                   {plan.code}
                 </div>
                 <div>
                   <span className="text-[color:var(--text-tertiary)]">
-                    {t("durationDays")}:
+                    {t("Duration (days)")}:
                   </span>{" "}
                   {plan.durationDays}
                 </div>
                 <div>
                   <span className="text-[color:var(--text-tertiary)]">
-                    {t("priceCents")}:
+                    {t("Price (cents)")}:
                   </span>{" "}
                   {plan.priceCents} ({plan.currency.toUpperCase()})
                 </div>
@@ -135,49 +135,84 @@ export function SubscriptionPlansPage() {
 
       <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-section)]">
         <div className="grid gap-3 md:grid-cols-2">
-          <input
-            value={draft.code}
-            onChange={(event) => setDraft((current) => ({ ...current, code: event.target.value }))}
-            placeholder={t("code")}
-            className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
-          />
-          <input
-            value={draft.name}
-            onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))}
-            placeholder={t("name")}
-            className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
-          />
-          <input
-            value={draft.durationDays}
-            onChange={(event) => setDraft((current) => ({ ...current, durationDays: event.target.value }))}
-            placeholder={t("durationDays")}
-            className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
-          />
-          <input
-            value={draft.priceCents}
-            onChange={(event) => setDraft((current) => ({ ...current, priceCents: event.target.value }))}
-            placeholder={t("priceCents")}
-            className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
-          />
-          <input
-            value={draft.currency}
-            onChange={(event) => setDraft((current) => ({ ...current, currency: event.target.value }))}
-            placeholder={t("currency")}
-            className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
-          />
-          <input
-            value={draft.sortOrder}
-            onChange={(event) => setDraft((current) => ({ ...current, sortOrder: event.target.value }))}
-            placeholder={t("sortOrder")}
-            className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
-          />
+          <label className="block">
+            <span className="mb-1 block text-xs font-medium text-[color:var(--text-secondary)]">
+              {t("Plan code")}
+            </span>
+            <input
+              value={draft.code}
+              onChange={(event) => setDraft((current) => ({ ...current, code: event.target.value }))}
+              placeholder={t("e.g. trial")}
+              className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-xs font-medium text-[color:var(--text-secondary)]">
+              {t("Plan name")}
+            </span>
+            <input
+              value={draft.name}
+              onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))}
+              placeholder={t("e.g. New user trial")}
+              className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-xs font-medium text-[color:var(--text-secondary)]">
+              {t("Duration (days)")}
+            </span>
+            <input
+              value={draft.durationDays}
+              onChange={(event) => setDraft((current) => ({ ...current, durationDays: event.target.value }))}
+              placeholder="30"
+              className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-xs font-medium text-[color:var(--text-secondary)]">
+              {t("Price (cents)")}
+            </span>
+            <input
+              value={draft.priceCents}
+              onChange={(event) => setDraft((current) => ({ ...current, priceCents: event.target.value }))}
+              placeholder="0"
+              className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-xs font-medium text-[color:var(--text-secondary)]">
+              {t("Currency")}
+            </span>
+            <input
+              value={draft.currency}
+              onChange={(event) => setDraft((current) => ({ ...current, currency: event.target.value }))}
+              placeholder="cny"
+              className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-xs font-medium text-[color:var(--text-secondary)]">
+              {t("Sort order")}
+            </span>
+            <input
+              value={draft.sortOrder}
+              onChange={(event) => setDraft((current) => ({ ...current, sortOrder: event.target.value }))}
+              placeholder="0"
+              className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
+            />
+          </label>
         </div>
-        <textarea
-          value={draft.description}
-          onChange={(event) => setDraft((current) => ({ ...current, description: event.target.value }))}
-          placeholder={t("description")}
-          className="mt-3 min-h-28 w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
-        />
+        <label className="mt-3 block">
+          <span className="mb-1 block text-xs font-medium text-[color:var(--text-secondary)]">
+            {t("Description")}
+          </span>
+          <textarea
+            value={draft.description}
+            onChange={(event) => setDraft((current) => ({ ...current, description: event.target.value }))}
+            placeholder={t("Shown to users in the app subscription page.")}
+            className="min-h-28 w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
+          />
+        </label>
         <div className="mt-3 grid gap-2 sm:grid-cols-3">
           <label className="flex items-center gap-2 text-sm">
             <input
@@ -185,7 +220,7 @@ export function SubscriptionPlansPage() {
               checked={draft.isActive}
               onChange={(event) => setDraft((current) => ({ ...current, isActive: event.target.checked }))}
             />
-            {t("active")}
+            {t("Active")}
           </label>
           <label className="flex items-center gap-2 text-sm">
             <input
@@ -193,7 +228,7 @@ export function SubscriptionPlansPage() {
               checked={draft.isTrial}
               onChange={(event) => setDraft((current) => ({ ...current, isTrial: event.target.checked }))}
             />
-            {t("trial")}
+            {t("Trial")}
           </label>
           <label className="flex items-center gap-2 text-sm">
             <input
@@ -206,7 +241,7 @@ export function SubscriptionPlansPage() {
                 }))
               }
             />
-            {t("purchasable")}
+            {t("Publicly purchasable")}
           </label>
         </div>
         <div className="mt-4 flex gap-3">

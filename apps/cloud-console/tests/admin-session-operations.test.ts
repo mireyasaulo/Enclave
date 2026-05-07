@@ -123,13 +123,13 @@ describe("admin session operations", () => {
     ).toBe("Focused source snapshot");
 
     expect(getHighlightedOperationReceiptTone("success")).toBe(
-      "border-emerald-300/40 bg-emerald-500/10 text-emerald-100",
+      "border-emerald-300/40 bg-emerald-50 text-emerald-700",
     );
     expect(getHighlightedOperationReceiptTone("warning")).toBe(
-      "border-amber-300/40 bg-amber-500/10 text-amber-100",
+      "border-amber-300/40 bg-amber-50 text-amber-700",
     );
     expect(getHighlightedOperationReceiptTone("danger")).toBe(
-      "border-rose-300/40 bg-rose-500/10 text-rose-200",
+      "border-rose-300/40 bg-rose-50 text-rose-700",
     );
     expect(getHighlightedOperationReceiptTone("info")).toBe(
       "border-[color:var(--border-brand)] bg-[color:var(--brand-soft)] text-[color:var(--brand-primary)]",

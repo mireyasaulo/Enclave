@@ -15,7 +15,7 @@ type AdminSessionActionButtonProps = {
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const BASE_CLASS_NAME =
-  "rounded-lg border font-medium uppercase tracking-[0.18em] transition disabled:cursor-not-allowed disabled:opacity-60";
+  "rounded-lg border font-medium transition disabled:cursor-not-allowed disabled:opacity-60";
 
 const TONE_CLASS_NAMES: Record<AdminSessionActionButtonTone, string> = {
   neutral:
@@ -25,7 +25,7 @@ const TONE_CLASS_NAMES: Record<AdminSessionActionButtonTone, string> = {
   "brand-outline":
     "border-[color:var(--border-brand)] bg-[color:var(--surface-console)] text-[color:var(--brand-primary)] hover:border-[color:var(--border-strong)]",
   danger:
-    "border-rose-300/40 bg-rose-500/10 text-rose-100 hover:border-rose-200/60",
+    "border-rose-400/60 bg-rose-50 text-rose-700 hover:border-rose-500 hover:bg-rose-100",
 };
 
 const SIZE_CLASS_NAMES: Record<AdminSessionActionButtonSize, string> = {

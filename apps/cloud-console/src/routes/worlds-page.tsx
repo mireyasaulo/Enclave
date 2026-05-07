@@ -64,12 +64,12 @@ function formatDateTime(value?: string | null) {
 function getAttentionTone(severity: CloudWorldAttentionItem["severity"]) {
   switch (severity) {
     case "critical":
-      return "border-rose-300/60 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/60 bg-rose-50 text-rose-700";
     case "warning":
-      return "border-amber-300/50 bg-amber-500/10 text-amber-100";
+      return "border-amber-300/50 bg-amber-50 text-amber-700";
     case "info":
     default:
-      return "border-sky-300/50 bg-sky-500/10 text-sky-100";
+      return "border-sky-300/50 bg-sky-50 text-sky-700";
   }
 }
 
@@ -114,10 +114,10 @@ function getHealthBucket(status?: string | null): HealthFilter {
 function getHealthTone(status?: string | null) {
   const bucket = getHealthBucket(status);
   if (bucket === "healthy") {
-    return "border-emerald-300/50 bg-emerald-500/10 text-emerald-100";
+    return "border-emerald-300/50 bg-emerald-50 text-emerald-700";
   }
   if (bucket === "unhealthy") {
-    return "border-amber-300/50 bg-amber-500/10 text-amber-100";
+    return "border-amber-300/50 bg-amber-50 text-amber-700";
   }
   return "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]";
 }
@@ -145,13 +145,13 @@ function formatPowerStateLabel(value: CloudInstancePowerState) {
 function getPowerStateTone(value: CloudInstancePowerState) {
   switch (value) {
     case "running":
-      return "border-emerald-300/50 bg-emerald-500/10 text-emerald-100";
+      return "border-emerald-300/50 bg-emerald-50 text-emerald-700";
     case "starting":
     case "provisioning":
     case "stopping":
-      return "border-sky-300/50 bg-sky-500/10 text-sky-100";
+      return "border-sky-300/50 bg-sky-50 text-sky-700";
     case "error":
-      return "border-rose-300/60 bg-rose-500/10 text-rose-200";
+      return "border-rose-300/60 bg-rose-50 text-rose-700";
     case "stopped":
     case "absent":
     default:
@@ -621,7 +621,7 @@ export function WorldsPage() {
                         {getAttentionLabel(item)}
                       </span>
                       {item.escalated ? (
-                        <span className="rounded-full border border-rose-300/60 bg-rose-500/10 px-2 py-1 text-[11px] uppercase tracking-[0.18em] text-rose-200">
+                        <span className="rounded-full border border-rose-300/60 bg-rose-50 px-2 py-1 text-[11px] uppercase tracking-[0.18em] text-rose-700">
                           {t("Escalated")}
                         </span>
                       ) : null}
@@ -766,7 +766,7 @@ export function WorldsPage() {
                             {getAttentionLabel(attention)}
                           </div>
                           {attention.escalated ? (
-                            <div className="text-[11px] uppercase tracking-[0.18em] text-rose-200">
+                            <div className="text-[11px] uppercase tracking-[0.18em] text-rose-700">
                               {t("Escalated")}
                             </div>
                           ) : null}
