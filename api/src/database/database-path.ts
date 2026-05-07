@@ -124,17 +124,31 @@ export function prepareDatabasePath(configuredPath?: string | null) {
   const targetPath = resolveDatabasePath(configuredPath);
   fs.mkdirSync(path.dirname(targetPath), { recursive: true });
 
-  const candidatePaths = Array.from(
+  // Once the target database has any user data, it's the source of truth — never
+  // overwrite it. Previously this function compared the target against legacy
+  // single-tenant paths (`/data/database.sqlite`, `/api/database.sqlite`, ...)
+  // by mtime+row-count and would copy whichever scored highest into the target.
+  // In multi-tenant cloud mode that meant a per-account database (e.g.
+  // `/data/accounts/<phone>/database.sqlite`) could get clobbered by a stale
+  // legacy DB on every restart, wiping the user's comments / messages /
+  // conversations / friendships — anything held in SQL.
+  const targetCandidate = readDatabaseFileCandidate(targetPath);
+  if (targetCandidate && targetCandidate.contentScore > 0) {
+    return targetPath;
+  }
+
+  // Target is missing or schema-only (no rows) — fall back to legacy locations
+  // for one-time bootstrap so a fresh account dir can adopt existing data.
+  const legacyCandidatePaths = Array.from(
     new Set([
-      targetPath,
       resolveApiPath('database.sqlite'),
       resolveApiPath('data', 'database.sqlite'),
       path.resolve(REPO_ROOT, 'data', 'database.sqlite'),
     ]),
-  );
+  ).filter((candidatePath) => candidatePath !== targetPath);
 
-  const preferredDatabaseFile = findPreferredDatabaseFile(candidatePaths);
-  if (!preferredDatabaseFile || preferredDatabaseFile.path === targetPath) {
+  const preferredDatabaseFile = findPreferredDatabaseFile(legacyCandidatePaths);
+  if (!preferredDatabaseFile || preferredDatabaseFile.contentScore <= 0) {
     return targetPath;
   }
 
@@ -145,7 +159,7 @@ export function prepareDatabasePath(configuredPath?: string | null) {
 
   const sourceLabel = path.relative(REPO_ROOT, preferredDatabaseFile.path) || preferredDatabaseFile.path;
   const targetLabel = path.relative(REPO_ROOT, targetPath) || targetPath;
-  console.info(`[database] copied existing data from ${sourceLabel} to ${targetLabel}`);
+  console.info(`[database] bootstrapped empty target from ${sourceLabel} to ${targetLabel}`);
 
   return targetPath;
 }
