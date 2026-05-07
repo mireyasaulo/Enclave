@@ -6,6 +6,7 @@ import { useFarmState } from "./use-farm-state";
 import { CoinDisplay } from "./components/coin-display";
 import { EventLogPanel } from "./components/event-log-panel";
 import { FarmGrid } from "./components/farm-grid";
+import { FarmSky } from "./components/farm-sky";
 import { NeighborFarmModal } from "./components/neighbor-farm-modal";
 import { NeighborListPanel } from "./components/neighbor-list-panel";
 import { PlotActionBar } from "./components/plot-action-bar";
@@ -97,8 +98,8 @@ function FarmPageInner() {
   };
 
   return (
-    <div className="relative h-full overflow-y-auto bg-gradient-to-b from-emerald-50/40 to-amber-50/40 p-4 text-stone-800">
-      <div className="mx-auto flex max-w-6xl flex-col gap-3">
+    <FarmSky>
+      <div className="mx-auto flex max-w-6xl flex-col gap-3 p-4 text-stone-800">
         <header className="flex items-center justify-between">
           <Link
             to="/tabs/games"
@@ -191,6 +192,6 @@ function FarmPageInner() {
         characterId={activeNeighborId}
         onClose={() => setActiveNeighborId(null)}
       />
-    </div>
+    </FarmSky>
   );
 }
