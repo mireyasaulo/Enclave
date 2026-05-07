@@ -326,6 +326,11 @@ msgstr "{0} notified"
 msgid "{0} 条待提醒"
 msgstr "{0} pending reminders"
 
+#. placeholder {0}: friendMoments.length
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:370
+msgid "{0} 条朋友圈"
+msgstr "{0} Moments"
+
 #. placeholder {0}: entry.name
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:328
 msgid "{0} 正在回复..."
@@ -497,6 +502,11 @@ msgstr ""
 msgid "{0}撤回了一条消息"
 msgstr "{0} recalled a message"
 
+#. placeholder {0}: parsedDate.getMonth() + 1
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:832
+msgid "{0}月"
+msgstr "Month {0}"
+
 #. placeholder {0}: names.join("、")
 #. placeholder {1}: items.length
 #: apps/app/src/routes/create-group-page.tsx:654
@@ -576,6 +586,7 @@ msgid "{displayName} 的隐界名片"
 msgstr "{displayName}'s Yinjie card"
 
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:187
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:510
 msgid "{displayName} 还没有发表朋友圈"
 msgstr ""
 
@@ -1865,6 +1876,7 @@ msgid "你在隐界发布和互动的内容，需要遵守当前世界实例的�
 msgstr "Content you post and interact with in Yinjie must follow this world instance's service rules, legal requirements, and basic safety boundaries."
 
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:191
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:500
 msgid "你已经将这位角色加入黑名单，相关朋友圈内容会先隐藏。"
 msgstr ""
 
@@ -2234,6 +2246,10 @@ msgstr ""
 #: apps/app/src/routes/live-companion-page.tsx:366
 msgid "先把直播标题、主题、封面钩子和桌面策略准备好，后面接真推流时这层不用再推倒。"
 msgstr "Prepare the live title, topic, cover hook, and desktop strategy first, so real streaming can plug in later without rebuilding this layer."
+
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:511
+msgid "先把这页留着，等 TA 下次更新时再回来看看。"
+msgstr "Keep this page handy and check back when they post again."
 
 #: apps/app/src/i18n/static-dom-seed.ts:512
 #: apps/app/src/routes/desktop-feedback-page.tsx:507
@@ -2927,6 +2943,7 @@ msgstr "Recent Official Account Content"
 
 #: apps/app/src/i18n/static-dom-seed.ts:826
 #: apps/app/src/routes/channel-author-page.tsx:411
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:450
 msgid "最近内容"
 msgstr "Recent content"
 
@@ -3030,6 +3047,7 @@ msgstr "Recent updates"
 #. placeholder {0}: formatTimestamp(latestMoment.postedAt)
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1106
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:309
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:376
 msgid "最近更新 {0}"
 msgstr ""
 
@@ -3691,6 +3709,10 @@ msgstr "Do tasks"
 msgid "去发现页摇一摇，或等待场景触发新的相遇。"
 msgstr ""
 
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:441
+msgid "去朋友圈主页"
+msgstr "Go to Moments home"
+
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:847
 msgid "去清理"
 msgstr "Clean up"
@@ -3940,6 +3962,7 @@ msgstr "Sending"
 #: apps/app/src/routes/character-detail-page.tsx:285
 #: apps/app/src/routes/discover-feed-page.tsx:1067
 #: apps/app/src/routes/discover-page.tsx:866
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:682
 #: apps/app/src/routes/moments-page.tsx:1219
 #: apps/app/src/routes/welcome-page.tsx:917
 msgid "发送中..."
@@ -4044,6 +4067,7 @@ msgstr "Send code"
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:219
 #: apps/app/src/routes/channels-page.tsx:1933
 #: apps/app/src/routes/character-detail-page.tsx:293
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:758
 #: apps/app/src/routes/moments-page.tsx:1194
 msgid "取消"
 msgstr "Cancel"
@@ -4057,6 +4081,7 @@ msgid "取消关注"
 msgstr "Unfollow"
 
 #: apps/app/src/components/chat-composer.tsx:5401
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:755
 #: apps/app/src/routes/moments-page.tsx:1191
 msgid "取消回复"
 msgstr "Cancel reply"
@@ -4352,6 +4377,10 @@ msgstr "Back to source"
 msgid "回到来源会话"
 msgstr "Return to source session"
 
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:438
+msgid "回到来源页"
+msgstr "Back to source page"
+
 #: apps/app/src/routes/group-chat-details-page.tsx:968
 msgid "回到紧凑预览状态"
 msgstr "Return to compact preview"
@@ -4379,6 +4408,7 @@ msgstr ""
 
 #: apps/app/src/i18n/static-dom-seed.ts:935
 #: apps/app/src/routes/channels-page.tsx:1889
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:721
 #: apps/app/src/routes/moments-page.tsx:1162
 msgid "回复"
 msgstr "Reply"
@@ -4391,6 +4421,7 @@ msgstr "Reply {0}"
 #. placeholder {0}: desktopReplyTarget.authorName
 #. placeholder {0}: replyTarget.authorName
 #: apps/app/src/routes/channels-page.tsx:1945
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:771
 #: apps/app/src/routes/moments-page.tsx:1216
 msgid "回复 {0}..."
 msgstr ""
@@ -4407,6 +4438,10 @@ msgstr "Reply to {senderName}"
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:470
 msgid "回复已生成，画面还在准备中。"
 msgstr ""
+
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:65
+msgid "回朋友圈主页"
+msgstr "Back to Moments home"
 
 #. placeholder {0}: formatConversationTimestamp(record.reopenedAt)
 #: apps/app/src/routes/desktop-mobile-page.tsx:1841
@@ -4587,6 +4622,7 @@ msgstr ""
 #: apps/app/src/routes/discover-feed-page.tsx:991
 #: apps/app/src/routes/discover-page.tsx:820
 #: apps/app/src/routes/friend-requests-page.tsx:326
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:672
 #: apps/app/src/routes/moments-page.tsx:1075
 msgid "处理中..."
 msgstr "Processing..."
@@ -4850,6 +4886,10 @@ msgstr ""
 #: apps/app/src/i18n/static-dom-seed.ts:215
 msgid "天空竞速"
 msgstr "Sky Sprint"
+
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:284
+msgid "好友"
+msgstr "Friend"
 
 #: apps/app/src/i18n/static-dom-seed.ts:819
 msgid "好友入口"
@@ -5950,6 +5990,10 @@ msgstr "Configured"
 #: apps/app/src/i18n/static-dom-seed.ts:962
 msgid "已重新尝试发送。"
 msgstr "Retry sent."
+
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:498
+msgid "已隐藏"
+msgstr "Hidden"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1271
 msgid "已静音播放"
@@ -8826,6 +8870,10 @@ msgstr "Couldn't start recording. Check the app's microphone permission."
 msgid "无法启动录音，请检查浏览器麦克风权限。"
 msgstr "Couldn't start recording. Check the browser's microphone permission."
 
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:407
+msgid "无法打开这位角色的朋友圈"
+msgstr "Can't open this character's Moments"
+
 #: apps/app/src/routes/welcome-page.tsx:620
 msgid "无法连接到本地世界。"
 msgstr "Unable to connect to the local world."
@@ -9223,6 +9271,8 @@ msgstr "Friend info"
 #: apps/app/src/routes/character-detail-page.tsx:299
 #: apps/app/src/routes/discover-page.tsx:111
 #: apps/app/src/routes/discover-page.tsx:498
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:283
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:309
 #: apps/app/src/routes/moments-page.tsx:790
 #: apps/app/src/routes/moments-page.tsx:838
 #: apps/app/src/routes/moments-page.tsx:879
@@ -9242,6 +9292,8 @@ msgid "朋友圈、相遇、视频号和小程序都从这里继续打开。"
 msgstr "Moments, encounters, Channels, and Mini Programs continue from here."
 
 #: apps/app/src/i18n/static-dom-seed.ts:1078
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:112
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:146
 #: apps/app/src/routes/moments-page.tsx:232
 #: apps/app/src/routes/moments-page.tsx:269
 msgid "朋友圈互动已更新。"
@@ -9265,6 +9317,7 @@ msgid "朋友圈已发布。"
 msgstr "Moment published."
 
 #: apps/app/src/i18n/static-dom-seed.ts:38
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:464
 #: apps/app/src/routes/moments-page.tsx:951
 msgid "朋友圈暂时不可用"
 msgstr "Moments is temporarily unavailable"
@@ -9715,6 +9768,7 @@ msgstr ""
 
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:121
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:214
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:174
 msgid "查看 {displayName} 的资料"
 msgstr ""
 
@@ -9945,6 +9999,8 @@ msgstr "View the character profile and extended intro"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:305
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:717
 #: apps/app/src/routes/character-detail-page.tsx:276
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:64
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:440
 #: apps/app/src/routes/world-characters-page.tsx:390
 msgid "查看角色资料"
 msgstr "View character profile"
@@ -9961,6 +10017,7 @@ msgstr ""
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:197
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:215
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:318
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:388
 msgid "查看资料"
 msgstr ""
 
@@ -10293,6 +10350,10 @@ msgstr "Refreshing message list"
 msgid "正在刷新视频号内容"
 msgstr ""
 
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:456
+msgid "正在刷新这位角色的朋友圈"
+msgstr "Refreshing this character's Moments"
+
 #: apps/app/src/routes/contacts-page.tsx:1939
 msgid "正在刷新通讯录"
 msgstr "Refreshing contacts"
@@ -10369,6 +10430,7 @@ msgstr "Waking Yinjie..."
 #. placeholder {0}: activeReply.authorName
 #. placeholder {0}: replyTarget.authorName
 #: apps/app/src/routes/channels-page.tsx:1926
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:744
 #: apps/app/src/routes/moments-page.tsx:1180
 msgid "正在回复 {0}"
 msgstr ""
@@ -10571,6 +10633,10 @@ msgstr "Generating group invitation card"
 msgid "正在生成群邀请卡..."
 msgstr "Generating group invitation card..."
 
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:369
+msgid "正在确认可见范围..."
+msgstr "Checking visibility..."
+
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:236
 msgid "正在移除..."
 msgstr "Removing..."
@@ -10759,6 +10825,7 @@ msgid "正在读取联系人..."
 msgstr "Loading contacts..."
 
 #: apps/app/src/i18n/static-dom-seed.ts:1080
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:396
 msgid "正在读取角色朋友圈..."
 msgstr "Loading character Moments..."
 
@@ -12118,6 +12185,10 @@ msgstr "Resend later"
 msgid "稍等一下，正在准备最近常读和最新推送。"
 msgstr "One moment, preparing recent reads and latest pushes."
 
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:457
+msgid "稍等一下，正在同步 TA 最近发布的动态。"
+msgstr "Hang on, syncing their latest posts."
+
 #: apps/app/src/routes/world-characters-page.tsx:247
 msgid "稍等一下，正在同步世界角色目录。"
 msgstr ""
@@ -12209,6 +12280,10 @@ msgstr "One moment, syncing account profile and recent articles."
 #: apps/app/src/routes/character-detail-page.tsx:257
 msgid "稍等一下，正在同步这个联系人的资料和关系状态。"
 msgstr "Hold on. Syncing this contact's profile and relationship status."
+
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:374
+msgid "稍等一下，正在同步这位角色的动态。"
+msgstr "Hang on, syncing this character's posts."
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1378
 msgid "稍等一下，正在同步这段群聊里的消息。"
@@ -13499,6 +13574,8 @@ msgid "角色成员 {characterCount} 人"
 msgstr "Character members: {characterCount}"
 
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:287
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:169
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:509
 msgid "角色朋友圈"
 msgstr ""
 
@@ -13510,7 +13587,12 @@ msgstr "Character posting frequency is falling, but longer content and return vi
 msgid "角色简介"
 msgstr "Character bio"
 
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:410
+msgid "角色资料不存在，或者当前资料还没有同步完成。"
+msgstr "Character profile doesn't exist, or hasn't finished syncing."
+
 #: apps/app/src/i18n/static-dom-seed.ts:1082
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:299
 msgid "角色资料不存在，暂时无法打开朋友圈。"
 msgstr "Character profile does not exist, so Moments cannot be opened now."
 
@@ -13631,6 +13713,7 @@ msgstr "Evidence"
 
 #: apps/app/src/i18n/static-dom-seed.ts:318
 #: apps/app/src/routes/channels-page.tsx:1789
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:682
 msgid "评论"
 msgstr "Comment"
 
@@ -13829,6 +13912,7 @@ msgid "说明你希望它变成什么样。"
 msgstr "Explain what you expected it to be like."
 
 #: apps/app/src/routes/channels-page.tsx:1946
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:771
 msgid "说点什么..."
 msgstr ""
 
@@ -13854,6 +13938,7 @@ msgstr "Please add an issue description first."
 
 #: apps/app/src/routes/channels-page.tsx:218
 #: apps/app/src/routes/discover-feed-page.tsx:233
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:123
 #: apps/app/src/routes/moments-page.tsx:243
 msgid "请先输入评论内容。"
 msgstr "Enter a comment first."
@@ -13952,6 +14037,7 @@ msgstr "Enter the verification code (default 123456 works)"
 #: apps/app/src/routes/group-chat-details-page.tsx:578
 #: apps/app/src/routes/group-member-picker-page.tsx:462
 #: apps/app/src/routes/group-qr-page.tsx:1088
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:455
 #: apps/app/src/routes/moments-page.tsx:942
 #: apps/app/src/routes/profile-settings-page.tsx:461
 #: apps/app/src/routes/starred-friends-page.tsx:243
@@ -13983,6 +14069,7 @@ msgstr "Failed to read the image. Try another one."
 #: apps/app/src/routes/group-member-picker-page.tsx:476
 #: apps/app/src/routes/group-member-picker-page.tsx:508
 #: apps/app/src/routes/group-member-picker-page.tsx:540
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:463
 #: apps/app/src/routes/moments-page.tsx:950
 #: apps/app/src/routes/profile-settings-page.tsx:473
 #: apps/app/src/routes/starred-friends-page.tsx:253
@@ -13995,6 +14082,10 @@ msgstr "Load failed"
 #: apps/app/src/components/chat-composer.tsx:1377
 msgid "读取文件失败，请重新选择。"
 msgstr "Failed to read the file. Select it again."
+
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:468
+msgid "读取这位角色的朋友圈时出错了。"
+msgstr "Failed to load this character's Moments."
 
 #: apps/app/src/routes/profile-settings-page.tsx:457
 msgid "读取配置..."
@@ -14074,6 +14165,8 @@ msgid "赛季徽章 + 团队积分"
 msgstr "Season badge + team points"
 
 #: apps/app/src/i18n/static-dom-seed.ts:317
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:672
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:691
 msgid "赞"
 msgstr "Like"
 
@@ -14336,6 +14429,8 @@ msgstr "Back to previous step"
 #: apps/app/src/routes/group-qr-page.tsx:1122
 #: apps/app/src/routes/group-qr-page.tsx:1156
 #: apps/app/src/routes/group-qr-page.tsx:1644
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:62
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:421
 #: apps/app/src/routes/moments-page.tsx:310
 #: apps/app/src/routes/moments-page.tsx:970
 #: apps/app/src/routes/moments-page.tsx:1276
@@ -14840,6 +14935,7 @@ msgid "这个联系人还没有签名。"
 msgstr "This contact has no signature yet."
 
 #: apps/app/src/routes/character-detail-page.tsx:327
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:173
 msgid "这个角色还没有个性签名。"
 msgstr "This character does not have a signature yet."
 
@@ -14873,7 +14969,12 @@ msgstr "Where this data goes"
 msgid "这位居民暂时还没有填写视频号简介。"
 msgstr ""
 
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:377
+msgid "这位角色最近还没有发布新的朋友圈。"
+msgstr "This character hasn't posted any new Moments recently."
+
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:186
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:499
 msgid "这位角色的朋友圈当前不可见"
 msgstr ""
 
@@ -15632,6 +15733,7 @@ msgstr ""
 #: apps/app/src/routes/group-qr-page.tsx:1114
 #: apps/app/src/routes/group-qr-page.tsx:1148
 #: apps/app/src/routes/group-qr-page.tsx:1635
+#: apps/app/src/routes/mobile-friend-moments-page.tsx:479
 #: apps/app/src/routes/moments-page.tsx:311
 #: apps/app/src/routes/moments-page.tsx:962
 #: apps/app/src/routes/moments-page.tsx:970
