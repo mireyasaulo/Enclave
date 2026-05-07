@@ -653,8 +653,8 @@ export function DesktopChatHistoryPanel({
                                     {resolveSearchResultBadgeLabel(item)}
                                   </span>
                                 </div>
-                                <div className="relative shrink-0">
-                                  <span className="block text-[10px] tabular-nums text-[color:var(--text-dim)] group-hover:invisible">
+                                <div className="flex shrink-0 items-center">
+                                  <span className="block whitespace-nowrap text-[10px] tabular-nums text-[color:var(--text-dim)] group-hover:hidden">
                                     {formatMessageTimestamp(item.createdAt)}
                                   </span>
                                   <button
@@ -662,7 +662,7 @@ export function DesktopChatHistoryPanel({
                                     onClick={() =>
                                       onOpenMessage(item.messageId)
                                     }
-                                    className="invisible absolute inset-y-0 right-0 inline-flex items-center gap-1 rounded-full bg-[rgba(7,193,96,0.1)] px-2 text-[10px] font-medium text-[color:var(--brand-primary)] transition hover:bg-[rgba(7,193,96,0.16)] group-hover:visible"
+                                    className="hidden h-6 items-center gap-1 whitespace-nowrap rounded-full bg-[rgba(7,193,96,0.1)] px-2.5 text-[11px] font-medium text-[color:var(--brand-primary)] transition hover:bg-[rgba(7,193,96,0.18)] group-hover:inline-flex"
                                   >
                                     {t(msg`定位到聊天位置`)}
                                   </button>

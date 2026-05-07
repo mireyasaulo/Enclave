@@ -1,5 +1,10 @@
-import pkg from '/home/ps/claude/yinjie-app/node_modules/.pnpm/playwright@1.59.1/node_modules/playwright/index.js';
-const { chromium } = pkg;
+import { chromium } from '@playwright/test';
+import { mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+const OUT_DIR = process.env.SHOT_DIR || join(tmpdir(), 'cloud-console-vp');
+mkdirSync(OUT_DIR, { recursive: true });
 
 const BASE = 'http://127.0.0.1:5182';
 const ADMIN_SECRET = 'cloud-admin-secret';
@@ -16,8 +21,8 @@ page.on('console', m => { if (m.type()==='error') errs.push('[err] ' + m.text())
 
 await page.goto(`${BASE}/worlds/${WORLD_ID}`, { waitUntil: 'networkidle', timeout: 20000 }).catch(e => console.log('goto', e.message));
 await page.waitForTimeout(2000);
-await page.screenshot({ path: '/tmp/cloud-console-vp/world-detail.png', fullPage: false });
-await page.screenshot({ path: '/tmp/cloud-console-vp/world-detail-full.png', fullPage: true });
+await page.screenshot({ path: join(OUT_DIR, 'world-detail.png'), fullPage: false });
+await page.screenshot({ path: join(OUT_DIR, 'world-detail-full.png'), fullPage: true });
 
 // also user detail
 await page.goto(`${BASE}/users`, { waitUntil: 'networkidle', timeout: 20000 }).catch(e => console.log('goto', e.message));
@@ -29,8 +34,8 @@ const firstUserPhone = await page.evaluate(() => {
 if (firstUserPhone) {
   await page.goto(firstUserPhone, { waitUntil: 'networkidle', timeout: 20000 }).catch(e => console.log('goto-user', e.message));
   await page.waitForTimeout(1500);
-  await page.screenshot({ path: '/tmp/cloud-console-vp/user-detail.png', fullPage: false });
-  await page.screenshot({ path: '/tmp/cloud-console-vp/user-detail-full.png', fullPage: true });
+  await page.screenshot({ path: join(OUT_DIR, 'user-detail.png'), fullPage: false });
+  await page.screenshot({ path: join(OUT_DIR, 'user-detail-full.png'), fullPage: true });
 }
 
 console.log('errs:', errs.join('\n'));

@@ -1,8 +1,9 @@
-import pkg from '/home/ps/claude/yinjie-app/node_modules/.pnpm/playwright@1.59.1/node_modules/playwright/index.js';
-const { chromium } = pkg;
+import { chromium } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
-const OUT_DIR = process.env.SHOT_DIR || '/tmp/cloud-console-shots';
+const OUT_DIR = process.env.SHOT_DIR || join(tmpdir(), 'cloud-console-shots');
 mkdirSync(OUT_DIR, { recursive: true });
 
 const BASE = 'http://127.0.0.1:5182';
@@ -54,7 +55,7 @@ for (const vpName of VIEWPORTS) {
 
   for (const route of ROUTES) {
     const slug = route.replace(/\//g, '_').replace(/^_/, '') || 'index';
-    const file = `${OUT_DIR}/${vpName}_${slug}.png`;
+    const file = join(OUT_DIR, `${vpName}_${slug}.png`);
     try {
       await page.goto(`${BASE}${route}`, { waitUntil: 'networkidle', timeout: 20000 });
     } catch (e) {
