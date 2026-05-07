@@ -1872,7 +1872,7 @@ export function ContactsPage() {
                   }),
                 });
               }}
-              className="flex h-7.5 w-full items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] px-3 text-[12px] text-[color:var(--text-dim)]"
+              className="flex h-9 w-full items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] px-3 text-[12px] text-[color:var(--text-dim)]"
               aria-label={t(msg`打开搜一搜`)}
             >
               <Search size={14} className="shrink-0" />

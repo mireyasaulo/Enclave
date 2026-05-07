@@ -166,7 +166,7 @@ function MobileGroupContactsPage() {
         }
       >
         <div className="pt-1.5">
-          <label className="flex h-7.5 items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] px-3 text-[12px] text-[color:var(--text-dim)]">
+          <label className="flex h-9 items-center gap-2 rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] px-3 text-[12px] text-[color:var(--text-dim)]">
             <Search size={14} className="shrink-0" />
             <input
               type="search"
