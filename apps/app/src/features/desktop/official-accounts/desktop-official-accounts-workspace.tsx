@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -76,6 +78,7 @@ export function DesktopOfficialAccountsWorkspace({
   onOpenSubscriptionInbox?: (articleId?: string | null) => void;
 }) {
   const navigate = useNavigate();
+  const t = useRuntimeTranslator();
   const queryClient = useQueryClient();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
@@ -525,7 +528,7 @@ export function DesktopOfficialAccountsWorkspace({
   const followMutation = useMutation({
     mutationFn: () => {
       if (!account) {
-        throw new Error("当前公众号资料尚未加载完成。");
+        throw new Error(t(msg`当前公众号资料尚未加载完成。`));
       }
 
       return account.isFollowing
@@ -651,12 +654,15 @@ export function DesktopOfficialAccountsWorkspace({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-[16px] font-medium text-[color:var(--text-primary)]">
-              公众号
+              {t(msg`公众号`)}
             </div>
             <div className="mt-0.5 text-[11px] leading-5 text-[color:var(--text-muted)]">
-              已关注 {followingCount} · 订阅 {subscriptionCount} · 服务{" "}
-              {serviceCount}
-              {displayMode === "feed" ? ` · 未读 ${feedUnreadCount}` : ""}
+              {t(
+                msg`已关注 ${followingCount} · 订阅 ${subscriptionCount} · 服务 ${serviceCount}`,
+              )}
+              {displayMode === "feed"
+                ? t(msg` · 未读 ${feedUnreadCount}`)
+                : ""}
             </div>
           </div>
 
@@ -674,7 +680,7 @@ export function DesktopOfficialAccountsWorkspace({
               )}
             >
               <BookOpenText size={14} />
-              常看与文章
+              {t(msg`常看与文章`)}
             </Button>
             <Button
               type="button"
@@ -689,7 +695,7 @@ export function DesktopOfficialAccountsWorkspace({
               )}
             >
               <MessageSquareText size={14} />
-              按号查看
+              {t(msg`按号查看`)}
             </Button>
           </div>
         </div>
@@ -699,7 +705,9 @@ export function DesktopOfficialAccountsWorkspace({
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
             placeholder={
-              displayMode === "feed" ? "搜索常看公众号或文章" : "搜索公众号"
+              displayMode === "feed"
+                ? t(msg`搜索常看公众号或文章`)
+                : t(msg`搜索公众号`)
             }
             className="rounded-full border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.92)] px-4 py-2.5 text-[13px] shadow-none hover:bg-white focus:translate-y-0 focus:border-[rgba(7,193,96,0.14)] focus:bg-white focus:shadow-none"
           />
@@ -716,7 +724,7 @@ export function DesktopOfficialAccountsWorkspace({
                     : "rounded-full border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
                 }
               >
-                全部
+                {t(msg`全部`)}
               </Button>
               <Button
                 type="button"
@@ -729,7 +737,7 @@ export function DesktopOfficialAccountsWorkspace({
                     : "rounded-full border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
                 }
               >
-                已关注
+                {t(msg`已关注`)}
               </Button>
             </div>
           ) : null}
@@ -767,24 +775,26 @@ export function DesktopOfficialAccountsWorkspace({
           <section className="flex w-[320px] shrink-0 flex-col border-r border-[color:var(--border-faint)] bg-white">
             <div className="border-b border-[color:var(--border-faint)] px-4 py-3">
               <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
-                {accountFilter === "following" ? "已关注公众号" : "全部公众号"}
+                {accountFilter === "following"
+                  ? t(msg`已关注公众号`)
+                  : t(msg`全部公众号`)}
               </div>
               <div className="mt-0.5 text-[11px] text-[color:var(--text-muted)]">
-                {filteredAccounts.length} 个结果
+                {t(msg`${filteredAccounts.length} 个结果`)}
               </div>
             </div>
             <div className="min-h-0 flex-1 overflow-auto">
               {accountsQuery.isLoading ? (
                 <OfficialWorkspaceStatusPane
-                  title="正在读取公众号"
-                  description="稍等一下，正在同步账号目录。"
+                  title={t(msg`正在读取公众号`)}
+                  description={t(msg`稍等一下，正在同步账号目录。`)}
                   tone="loading"
                   className="m-4"
                 />
               ) : null}
               {accountsQuery.isError && accountsQuery.error instanceof Error ? (
                 <OfficialWorkspaceStatusPane
-                  title="公众号目录暂时不可用"
+                  title={t(msg`公众号目录暂时不可用`)}
                   description={accountsQuery.error.message}
                   tone="danger"
                   className="m-4"
@@ -805,11 +815,11 @@ export function DesktopOfficialAccountsWorkspace({
 
               {!accountsQuery.isLoading && !filteredAccounts.length ? (
                 <OfficialWorkspaceStatusPane
-                  title="没有匹配的公众号"
+                  title={t(msg`没有匹配的公众号`)}
                   description={
                     accountFilter === "following"
-                      ? "当前筛选下还没有已关注账号。"
-                      : "换个关键词试试。"
+                      ? t(msg`当前筛选下还没有已关注账号。`)
+                      : t(msg`换个关键词试试。`)
                   }
                   className="m-4"
                 />
@@ -820,8 +830,8 @@ export function DesktopOfficialAccountsWorkspace({
           <section className="min-h-0 min-w-0 flex-1 overflow-auto bg-white">
             {accountDetailQuery.isLoading ? (
               <OfficialWorkspaceStatusPane
-                title="正在读取公众号主页"
-                description="稍等一下，正在同步账号资料和最近文章。"
+                title={t(msg`正在读取公众号主页`)}
+                description={t(msg`稍等一下，正在同步账号资料和最近文章。`)}
                 tone="loading"
                 className="mx-auto mt-5 max-w-[820px]"
               />
@@ -829,7 +839,7 @@ export function DesktopOfficialAccountsWorkspace({
             {accountDetailQuery.isError &&
             accountDetailQuery.error instanceof Error ? (
               <OfficialWorkspaceStatusPane
-                title="公众号主页暂时不可用"
+                title={t(msg`公众号主页暂时不可用`)}
                 description={accountDetailQuery.error.message}
                 tone="danger"
                 className="mx-auto mt-5 max-w-[820px]"
@@ -859,26 +869,26 @@ export function DesktopOfficialAccountsWorkspace({
                       <div className="mt-1.5 flex flex-wrap gap-2 text-[11px]">
                         <span className="rounded-full border border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.07)] px-2.5 py-1 text-[color:var(--brand-primary)]">
                           {account.accountType === "service"
-                            ? "服务号"
-                            : "订阅号"}
+                            ? t(msg`服务号`)
+                            : t(msg`订阅号`)}
                         </span>
                         <span className="rounded-full border border-[color:var(--border-faint)] bg-white px-2.5 py-1 text-[color:var(--text-muted)]">
                           @{account.handle}
                         </span>
                         {account.isVerified ? (
                           <span className="rounded-full border border-[#d7e5fb] bg-[#f3f7ff] px-2.5 py-1 text-[#315b9a]">
-                            已认证
+                            {t(msg`已认证`)}
                           </span>
                         ) : null}
                         {account.isFollowing ? (
                           <span className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[color:var(--text-secondary)]">
-                            已关注
+                            {t(msg`已关注`)}
                           </span>
                         ) : null}
                         {account.accountType === "service" &&
                         account.isMuted ? (
                           <span className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[color:var(--text-secondary)]">
-                            已免打扰
+                            {t(msg`已免打扰`)}
                           </span>
                         ) : null}
                       </div>
@@ -903,7 +913,7 @@ export function DesktopOfficialAccountsWorkspace({
                         }
                       >
                         <MessageSquareText size={15} />
-                        发消息
+                        {t(msg`发消息`)}
                       </Button>
                     ) : null}
                     {account.accountType === "subscription" &&
@@ -917,7 +927,7 @@ export function DesktopOfficialAccountsWorkspace({
                         }
                       >
                         <BookOpenText size={15} />
-                        订阅号消息
+                        {t(msg`订阅号消息`)}
                       </Button>
                     ) : null}
                     <Button
@@ -932,10 +942,10 @@ export function DesktopOfficialAccountsWorkspace({
                       }
                     >
                       {followMutation.isPending
-                        ? "处理中..."
+                        ? t(msg`处理中...`)
                         : account.isFollowing
-                          ? "取消关注"
-                          : "关注公众号"}
+                          ? t(msg`取消关注`)
+                          : t(msg`关注公众号`)}
                     </Button>
                     <Button
                       type="button"
@@ -945,8 +955,8 @@ export function DesktopOfficialAccountsWorkspace({
                     >
                       {accountFavoriteSourceId &&
                       favoriteSourceIds.includes(accountFavoriteSourceId)
-                        ? "取消收藏"
-                        : "收藏主页"}
+                        ? t(msg`取消收藏`)
+                        : t(msg`收藏主页`)}
                     </Button>
                   </div>
                 </section>
@@ -963,7 +973,7 @@ export function DesktopOfficialAccountsWorkspace({
                             : "rounded-full border border-[color:var(--border-faint)] bg-white px-3 py-1.5 text-sm text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)]"
                         }
                       >
-                        消息
+                        {t(msg`消息`)}
                       </button>
                       <button
                         type="button"
@@ -974,7 +984,7 @@ export function DesktopOfficialAccountsWorkspace({
                             : "rounded-full border border-[color:var(--border-faint)] bg-white px-3 py-1.5 text-sm text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)]"
                         }
                       >
-                        资料
+                        {t(msg`资料`)}
                       </button>
                     </div>
                   </div>
@@ -985,22 +995,30 @@ export function DesktopOfficialAccountsWorkspace({
                         <DesktopOfficialEntryCard
                           title={
                             account.accountType === "service"
-                              ? "服务号消息"
-                              : "订阅号消息"
+                              ? t(msg`服务号消息`)
+                              : t(msg`订阅号消息`)
                           }
                           description={
                             account.accountType === "service"
                               ? account.isFollowing
-                                ? "这个服务号的通知、文章卡片和服务入口会出现在消息页。"
-                                : "先关注后，服务消息和文章卡片才会进入消息页。"
+                                ? t(
+                                    msg`这个服务号的通知、文章卡片和服务入口会出现在消息页。`,
+                                  )
+                                : t(
+                                    msg`先关注后，服务消息和文章卡片才会进入消息页。`,
+                                  )
                               : account.isFollowing
-                                ? "这个订阅号的新推送会进入“订阅号消息”聚合流。"
-                                : "先关注后，这个订阅号的推送才会进入聚合流。"
+                                ? t(
+                                    msg`这个订阅号的新推送会进入“订阅号消息”聚合流。`,
+                                  )
+                                : t(
+                                    msg`先关注后，这个订阅号的推送才会进入聚合流。`,
+                                  )
                           }
                           actionLabel={
                             account.accountType === "service"
-                              ? "打开消息"
-                              : "打开订阅号消息"
+                              ? t(msg`打开消息`)
+                              : t(msg`打开订阅号消息`)
                           }
                           actionDisabled={!account.isFollowing}
                           onAction={() => {
@@ -1018,7 +1036,7 @@ export function DesktopOfficialAccountsWorkspace({
 
                         <div className="overflow-hidden rounded-[18px] border border-[color:var(--border-faint)] bg-white">
                           <div className="border-b border-[color:var(--border-faint)] px-4 py-3 text-sm font-medium text-[color:var(--text-primary)]">
-                            最近文章
+                            {t(msg`最近文章`)}
                           </div>
                           {account.articles.length ? (
                             account.articles.map((article) => (
@@ -1046,8 +1064,8 @@ export function DesktopOfficialAccountsWorkspace({
                           ) : (
                             <div className="px-4 py-6">
                               <EmptyState
-                                title="这个公众号还没有公开文章"
-                                description="后续更新会直接出现在这里。"
+                                title={t(msg`这个公众号还没有公开文章`)}
+                                description={t(msg`后续更新会直接出现在这里。`)}
                               />
                             </div>
                           )}
@@ -1057,29 +1075,33 @@ export function DesktopOfficialAccountsWorkspace({
                       <div className="space-y-4">
                         <div className="overflow-hidden rounded-[18px] border border-[color:var(--border-faint)] bg-white">
                           <DesktopOfficialProfileRow
-                            label="账号类型"
+                            label={t(msg`账号类型`)}
                             value={
                               account.accountType === "service"
-                                ? "服务号"
-                                : "订阅号"
+                                ? t(msg`服务号`)
+                                : t(msg`订阅号`)
                             }
                           />
                           <DesktopOfficialProfileRow
-                            label="账号状态"
-                            value={account.isFollowing ? "已关注" : "未关注"}
+                            label={t(msg`账号状态`)}
+                            value={
+                              account.isFollowing
+                                ? t(msg`已关注`)
+                                : t(msg`未关注`)
+                            }
                           />
                           <DesktopOfficialProfileRow
-                            label="消息状态"
+                            label={t(msg`消息状态`)}
                             value={
                               account.accountType === "service"
                                 ? account.isMuted
-                                  ? "已开启消息免打扰"
-                                  : "正常接收消息"
-                                : "通过订阅号消息聚合浏览"
+                                  ? t(msg`已开启消息免打扰`)
+                                  : t(msg`正常接收消息`)
+                                : t(msg`通过订阅号消息聚合浏览`)
                             }
                           />
                           <DesktopOfficialProfileRow
-                            label="最近更新"
+                            label={t(msg`最近更新`)}
                             value={
                               account.articles[0]?.publishedAt
                                 ? new Date(
@@ -1088,18 +1110,18 @@ export function DesktopOfficialAccountsWorkspace({
                                     month: "numeric",
                                     day: "numeric",
                                   })
-                                : "暂无更新"
+                                : t(msg`暂无更新`)
                             }
                           />
                           <DesktopOfficialProfileRow
-                            label="文章数量"
-                            value={`${account.articles.length} 篇`}
+                            label={t(msg`文章数量`)}
+                            value={t(msg`${account.articles.length} 篇`)}
                             last
                           />
                         </div>
                         <section className="rounded-[18px] border border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.62)] p-4">
                           <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                            账号简介
+                            {t(msg`账号简介`)}
                           </div>
                           <div className="mt-2 text-sm leading-7 text-[color:var(--text-secondary)]">
                             {account.description}
@@ -1112,8 +1134,10 @@ export function DesktopOfficialAccountsWorkspace({
               </div>
             ) : !accountDetailQuery.isLoading ? (
               <OfficialWorkspaceStatusPane
-                title="还没有可浏览的公众号"
-                description="先从左侧选择一个公众号，或切回常看与文章模式查看精选流。"
+                title={t(msg`还没有可浏览的公众号`)}
+                description={t(
+                  msg`先从左侧选择一个公众号，或切回常看与文章模式查看精选流。`,
+                )}
                 className="mx-auto mt-5 max-w-[560px]"
               />
             ) : null}
@@ -1123,10 +1147,10 @@ export function DesktopOfficialAccountsWorkspace({
       <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[3px]">
         <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-8 py-6 text-center shadow-[var(--shadow-card)]">
           <div className="text-lg font-semibold text-[color:var(--text-primary)]">
-            功能开发中
+            {t(msg`功能开发中`)}
           </div>
           <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-            敬请期待
+            {t(msg`敬请期待`)}
           </div>
         </div>
       </div>
@@ -1155,6 +1179,7 @@ function DesktopOfficialFeedMode({
   onOpenArticle: (item: DesktopOfficialFeedItem) => void;
   onToggleFavorite: (item: DesktopOfficialFeedItem) => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <div className="min-h-0 flex-1 overflow-auto bg-white">
       <div className="mx-auto max-w-[820px]">
@@ -1162,29 +1187,29 @@ function DesktopOfficialFeedMode({
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-[11px] font-medium tracking-[0.08em] text-[color:var(--text-muted)]">
-                常看与文章
+                {t(msg`常看与文章`)}
               </div>
               <div className="mt-1 text-[18px] font-medium text-[color:var(--text-primary)]">
-                最近常读和最新推送
+                {t(msg`最近常读和最新推送`)}
               </div>
             </div>
             <div className="text-[11px] text-[color:var(--text-muted)]">
-              按最近推送排序
+              {t(msg`按最近推送排序`)}
             </div>
           </div>
         </section>
 
         {loading ? (
           <OfficialWorkspaceStatusPane
-            title="正在整理公众号内容"
-            description="稍等一下，正在准备最近常读和最新推送。"
+            title={t(msg`正在整理公众号内容`)}
+            description={t(msg`稍等一下，正在准备最近常读和最新推送。`)}
             tone="loading"
             className="mx-7 my-5"
           />
         ) : null}
         {errorMessage ? (
           <OfficialWorkspaceStatusPane
-            title="公众号内容暂时不可用"
+            title={t(msg`公众号内容暂时不可用`)}
             description={errorMessage}
             tone="danger"
             className="mx-7 my-5"
@@ -1196,10 +1221,10 @@ function DesktopOfficialFeedMode({
             <section className="border-b border-[color:var(--border-faint)] px-7 py-5">
               <div className="flex items-center justify-between gap-3">
                 <div className="text-[13px] font-medium text-[color:var(--text-primary)]">
-                  常看公众号
+                  {t(msg`常看公众号`)}
                 </div>
                 <div className="text-[11px] text-[color:var(--text-muted)]">
-                  {frequentAccounts.length} 个
+                  {t(msg`${frequentAccounts.length} 个`)}
                 </div>
               </div>
 
@@ -1223,8 +1248,8 @@ function DesktopOfficialFeedMode({
                         </div>
                         <div className="mt-0.5 text-[11px] text-[color:var(--text-muted)]">
                           {account.accountType === "service"
-                            ? "服务号"
-                            : "订阅号"}
+                            ? t(msg`服务号`)
+                            : t(msg`订阅号`)}
                         </div>
                       </div>
                     </button>
@@ -1233,10 +1258,10 @@ function DesktopOfficialFeedMode({
               ) : (
                 <div className="mt-4 rounded-[16px] border border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.62)] px-4 py-5 text-center">
                   <div className="text-[13px] font-medium text-[color:var(--text-primary)]">
-                    还没有常看的公众号
+                    {t(msg`还没有常看的公众号`)}
                   </div>
                   <p className="mx-auto mt-1.5 max-w-[22rem] text-[12px] leading-6 text-[color:var(--text-secondary)]">
-                    关注几个公众号后，这里会优先展示最近常看的号。
+                    {t(msg`关注几个公众号后，这里会优先展示最近常看的号。`)}
                   </p>
                 </div>
               )}
@@ -1245,7 +1270,7 @@ function DesktopOfficialFeedMode({
             <section className="pb-4">
               <div className="border-b border-[color:var(--border-faint)] px-7 py-3">
                 <div className="text-[13px] font-medium text-[color:var(--text-primary)]">
-                  最近内容
+                  {t(msg`最近内容`)}
                 </div>
               </div>
 
@@ -1267,8 +1292,8 @@ function DesktopOfficialFeedMode({
                 </div>
               ) : (
                 <OfficialWorkspaceStatusPane
-                  title="还没有可读文章"
-                  description="可以换个关键词试试，或先关注几个公众号。"
+                  title={t(msg`还没有可读文章`)}
+                  description={t(msg`可以换个关键词试试，或先关注几个公众号。`)}
                   className="mx-7 my-5"
                 />
               )}
@@ -1295,6 +1320,7 @@ function DesktopOfficialFeedArticleRow({
   onOpenArticle: () => void;
   onToggleFavorite: () => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <div
       className={cn(
@@ -1319,12 +1345,14 @@ function DesktopOfficialFeedArticleRow({
             </div>
             <div className="mt-0.5 flex items-center gap-2 text-[11px] text-[color:var(--text-muted)]">
               <span>
-                {item.account.accountType === "service" ? "服务号" : "订阅号"}
+                {item.account.accountType === "service"
+                  ? t(msg`服务号`)
+                  : t(msg`订阅号`)}
               </span>
               {item.source === "subscription" ? (
-                <span>订阅推送</span>
+                <span>{t(msg`订阅推送`)}</span>
               ) : (
-                <span>最近更新</span>
+                <span>{t(msg`最近更新`)}</span>
               )}
               {item.unread ? (
                 <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-[#fa5151]" />
@@ -1347,7 +1375,7 @@ function DesktopOfficialFeedArticleRow({
                 ? "border-[#d8d1a9] bg-[#fbf7e8] text-[#8a6b11]"
                 : "border-[color:var(--border-faint)] bg-white text-[color:var(--text-muted)] hover:bg-[rgba(247,250,250,0.92)] hover:text-[color:var(--text-primary)]",
             )}
-            aria-label={favorite ? "取消收藏文章" : "收藏文章"}
+            aria-label={favorite ? t(msg`取消收藏文章`) : t(msg`收藏文章`)}
           >
             <Star size={14} className={favorite ? "fill-current" : ""} />
           </button>
@@ -1368,7 +1396,7 @@ function DesktopOfficialFeedArticleRow({
           <div className="flex items-center gap-2 text-[10px] text-[color:var(--text-muted)]">
             {item.article.isPinned ? (
               <span className="rounded-full border border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.07)] px-1.5 py-0.5 text-[9px] text-[color:var(--brand-primary)]">
-                置顶
+                {t(msg`置顶`)}
               </span>
             ) : null}
             <span>{item.article.authorName}</span>
@@ -1388,7 +1416,7 @@ function DesktopOfficialFeedArticleRow({
           />
         ) : (
           <div className="flex h-[5.5rem] w-[5.5rem] shrink-0 items-center justify-center rounded-[12px] border border-[color:var(--border-faint)] bg-white text-[11px] text-[color:var(--text-dim)]">
-            文章
+            {t(msg`文章`)}
           </div>
         )}
       </button>

@@ -258,8 +258,13 @@ export function jsonResponse(route, body, status = 200) {
   });
 }
 
+// Match host-rooted /api/ only (e.g. http://host/api/foo).
+// The original "**/api/**" glob also matched Vite source paths like
+// /src/features/chat/api/transcriptions.ts, breaking dynamic imports.
+const apiUrlPattern = /^https?:\/\/[^/]+\/api\//;
+
 export async function installApiMocks(page, statusPayload) {
-  await page.route("**/api/**", async (route) => {
+  await page.route(apiUrlPattern, async (route) => {
     const url = new URL(route.request().url());
     const path = url.pathname;
 

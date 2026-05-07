@@ -38,6 +38,7 @@ let desktopFeedbackNativeWriteQueue: Promise<void> = Promise.resolve();
 export const defaultDesktopFeedbackDraft: DesktopFeedbackDraft = {
   category: "bug",
   priority: "medium",
+  // i18n-ignore-next-line: empty draft default, not a UI string
   title: "",
   detail: "",
   reproduction: "",
@@ -63,6 +64,7 @@ function normalizeDesktopFeedbackDraft(
     priority: isFeedbackPriority(draft?.priority)
       ? draft.priority
       : defaultDesktopFeedbackDraft.priority,
+    // i18n-ignore-next-line: empty fallback for normalized draft, not a UI string
     title: typeof draft?.title === "string" ? draft.title : "",
     detail: typeof draft?.detail === "string" ? draft.detail : "",
     reproduction:

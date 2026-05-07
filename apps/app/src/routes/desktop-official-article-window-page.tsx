@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { ArrowLeft, ExternalLink, X } from "lucide-react";
@@ -6,6 +7,7 @@ import {
   getOfficialAccountArticle,
   markOfficialAccountArticleRead,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, InlineNotice, cn } from "@yinjie/ui";
 import { OfficialArticleViewer } from "../components/official-article-viewer";
 import { buildOfficialArticleFavoriteRecord } from "../features/favorites/official-account-favorite-records";
@@ -36,6 +38,7 @@ import { openExternalUrl } from "../runtime/external-url";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 export function DesktopOfficialArticleWindowPage() {
+  const t = useRuntimeTranslator();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const nativeDesktopShell = runtimeConfig.appPlatform === "desktop";
@@ -242,7 +245,7 @@ export function DesktopOfficialArticleWindowPage() {
         ? `/official-accounts/articles/${article.id}`
         : `${window.location.origin}/official-accounts/articles/${article.id}`;
     const opened = await openExternalUrl(articleUrl);
-    setNotice(opened ? "已在默认浏览器打开文章。" : "打开浏览器失败。");
+    setNotice(opened ? t(msg`已在默认浏览器打开文章。`) : t(msg`打开浏览器失败。`));
   }
 
   function handleOpenAccount(accountId: string) {
@@ -301,8 +304,8 @@ export function DesktopOfficialArticleWindowPage() {
     return (
       <div className="flex h-full min-h-0 items-center justify-center bg-white p-6">
         <DesktopArticleWindowStatusPane
-          title="文章窗口缺少上下文"
-          description="这篇公众号文章的窗口参数已经失效，请回到公众号页重新打开。"
+          title={t(msg`文章窗口缺少上下文`)}
+          description={t(msg`这篇公众号文章的窗口参数已经失效，请回到公众号页重新打开。`)}
           action={
             <Button
               type="button"
@@ -311,7 +314,7 @@ export function DesktopOfficialArticleWindowPage() {
               }}
               className="h-9 rounded-full bg-[color:var(--brand-primary)] px-4 text-white hover:opacity-95"
             >
-              回到消息页
+              {t(msg`回到消息页`)}
             </Button>
           }
         />
@@ -324,24 +327,24 @@ export function DesktopOfficialArticleWindowPage() {
       <header className="flex shrink-0 items-center justify-between gap-4 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.92)] px-4 py-2.5 backdrop-blur-xl">
         <div className="flex min-w-0 items-center gap-3">
           <StandaloneActionButton
-            label="回到来源"
+            label={t(msg`回到来源`)}
             onClick={() => closeStandaloneWindow(fallbackPath)}
           >
             <ArrowLeft size={16} />
           </StandaloneActionButton>
           <div className="min-w-0">
             <div className="truncate text-[14px] font-medium text-[color:var(--text-primary)]">
-              {article?.account.name ?? "公众号文章"}
+              {article?.account.name ?? t(msg`公众号文章`)}
             </div>
             <div className="mt-0.5 truncate text-[12px] text-[color:var(--text-muted)]">
-              {article?.title ?? routeState.title ?? "正在读取文章"}
+              {article?.title ?? routeState.title ?? t(msg`正在读取文章`)}
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <StandaloneActionButton
-            label="默认浏览器打开"
+            label={t(msg`默认浏览器打开`)}
             onClick={() => {
               void handleOpenInBrowser();
             }}
@@ -349,7 +352,7 @@ export function DesktopOfficialArticleWindowPage() {
             <ExternalLink size={16} />
           </StandaloneActionButton>
           <StandaloneActionButton
-            label="关闭窗口"
+            label={t(msg`关闭窗口`)}
             onClick={() => closeStandaloneWindow(fallbackPath)}
           >
             <X size={16} />
@@ -364,15 +367,15 @@ export function DesktopOfficialArticleWindowPage() {
 
         {articleQuery.isLoading ? (
           <DesktopArticleWindowStatusPane
-            title="正在读取文章"
-            description="稍等一下，正在同步正文内容。"
+            title={t(msg`正在读取文章`)}
+            description={t(msg`稍等一下，正在同步正文内容。`)}
             tone="loading"
           />
         ) : null}
 
         {articleQuery.isError && articleQuery.error instanceof Error ? (
           <DesktopArticleWindowStatusPane
-            title="文章暂时不可用"
+            title={t(msg`文章暂时不可用`)}
             description={articleQuery.error.message}
             tone="danger"
           />

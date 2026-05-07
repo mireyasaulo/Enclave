@@ -1968,6 +1968,8 @@ const cloudConsoleChineseTextOverrides: Record<string, string> = {
   "Deployment mode:": "部署模式：",
   "Deployment state:": "部署状态：",
   "Deployment:": "部署：",
+  "Executor:": "执行模式：",
+  "Provider:": "供应方：",
   "Derived from session issue, expiry, and revoke events inside the focused source group under the current filters.":
     "基于当前筛选条件下聚焦来源分组内的会话签发、过期与吊销事件生成。",
   "Desired state": "期望状态",

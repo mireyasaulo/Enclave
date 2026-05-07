@@ -1,5 +1,7 @@
 import { useMemo, type MouseEvent as ReactMouseEvent } from "react";
+import { msg } from "@lingui/macro";
 import { type Moment, type MomentComment } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, cn } from "@yinjie/ui";
 import {
   Bot,
@@ -61,6 +63,7 @@ export function DesktopMomentRow({
   onAuthorAction,
   onSelectAuthor,
 }: DesktopMomentRowProps) {
+  const t = useRuntimeTranslator();
   const likedByOwner = Boolean(
     ownerId && moment.likes.some((like) => like.authorId === ownerId),
   );
@@ -114,7 +117,8 @@ export function DesktopMomentRow({
             onClick={(event) => onSelectAuthor?.(event)}
             className="shrink-0 rounded-[18px]"
             aria-label={
-              authorActionAriaLabel ?? `查看 ${moment.authorName} 的朋友圈`
+              authorActionAriaLabel ??
+              t(msg`查看 ${moment.authorName} 的朋友圈`)
             }
           >
             <AvatarChip
@@ -160,7 +164,7 @@ export function DesktopMomentRow({
                 ) : (
                   <UserRound size={11} />
                 )}
-                {moment.authorType === "character" ? "角色" : "我"}
+                {moment.authorType === "character" ? t(msg`角色`) : t(msg`我`)}
               </span>
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[color:var(--text-muted)]">
@@ -192,8 +196,8 @@ export function DesktopMomentRow({
           <div className="mt-3 flex items-center justify-between gap-4">
             <div className="text-[12px] text-[color:var(--text-muted)]">
               {moment.likeCount > 0 || moment.commentCount > 0
-                ? `${moment.likeCount} 赞 · ${moment.commentCount} 评论`
-                : "还没有互动"}
+                ? t(msg`${moment.likeCount} 赞 · ${moment.commentCount} 评论`)
+                : t(msg`还没有互动`)}
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -211,7 +215,11 @@ export function DesktopMomentRow({
                   size={14}
                   className={likedByOwner ? "fill-current" : ""}
                 />
-                {likeLoading ? "处理中..." : likedByOwner ? "已赞" : "赞"}
+                {likeLoading
+                  ? t(msg`处理中...`)
+                  : likedByOwner
+                    ? t(msg`已赞`)
+                    : t(msg`赞`)}
               </button>
               <button
                 type="button"
@@ -224,7 +232,7 @@ export function DesktopMomentRow({
                 )}
               >
                 <Star size={14} className={favorite ? "fill-current" : ""} />
-                {favorite ? "已收藏" : "收藏"}
+                {favorite ? t(msg`已收藏`) : t(msg`收藏`)}
               </button>
               {onAuthorAction ? (
                 <Button
@@ -233,7 +241,7 @@ export function DesktopMomentRow({
                   onClick={onAuthorAction}
                   className="border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] shadow-none hover:bg-[color:var(--surface-console)]"
                 >
-                  {authorActionLabel ?? "打开 TA 的朋友圈"}
+                  {authorActionLabel ?? t(msg`打开 TA 的朋友圈`)}
                 </Button>
               ) : null}
             </div>
@@ -257,10 +265,10 @@ export function DesktopMomentRow({
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-[12px] font-medium text-[color:var(--text-primary)]">
                 <MessageCircle size={13} />
-                评论
+                {t(msg`评论`)}
               </div>
               <span className="text-[11px] text-[color:var(--text-muted)]">
-                {moment.commentCount} 条
+                {t(msg`${moment.commentCount} 条`)}
               </span>
             </div>
 
@@ -295,7 +303,7 @@ export function DesktopMomentRow({
                           ? "bg-[rgba(7,193,96,0.12)]"
                           : "hover:bg-white",
                       )}
-                      title="回复这条评论"
+                      title={t(msg`回复这条评论`)}
                     >
                       <CommentLine
                         authorName={comment.authorName}
@@ -308,7 +316,7 @@ export function DesktopMomentRow({
               </div>
             ) : (
               <div className="mt-3 text-[12px] text-[color:var(--text-muted)]">
-                还没有评论，你可以成为第一个回应的人。
+                {t(msg`还没有评论，你可以成为第一个回应的人。`)}
               </div>
             )}
 
@@ -321,11 +329,11 @@ export function DesktopMomentRow({
                   <div className="mt-3 flex items-start justify-between gap-2 rounded-[10px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[12px] text-[color:var(--text-secondary)]">
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="truncate">
-                        正在回复 {activeReply.authorName}
+                        {t(msg`正在回复 ${activeReply.authorName}`)}
                       </div>
                       {replyTargetComment ? (
                         <div className="truncate text-[color:var(--text-muted)]">
-                          「{replyTargetComment.text}」
+                          {t(msg`「${replyTargetComment.text}」`)}
                         </div>
                       ) : null}
                     </div>
@@ -333,7 +341,7 @@ export function DesktopMomentRow({
                       <button
                         type="button"
                         onClick={onCancelCommentReply}
-                        aria-label="取消回复"
+                        aria-label={t(msg`取消回复`)}
                         className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[color:var(--text-muted)] hover:bg-white"
                       >
                         <X size={12} />
@@ -351,7 +359,9 @@ export function DesktopMomentRow({
                 onSubmit={onCommentSubmit}
                 pending={commentLoading}
                 placeholder={
-                  activeReply ? `回复 ${activeReply.authorName}...` : "写评论..."
+                  activeReply
+                    ? t(msg`回复 ${activeReply.authorName}...`)
+                    : t(msg`写评论...`)
                 }
                 inputClassName="rounded-xl border-[color:var(--border-faint)] bg-white px-4 py-2 text-[13px] shadow-none hover:bg-white focus:border-[rgba(7,193,96,0.14)] focus:shadow-none"
                 buttonClassName="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
@@ -373,16 +383,21 @@ function CommentLine({
   replyToName: string | null;
   text: string;
 }) {
+  const translate = useRuntimeTranslator();
   return (
     <span>
       <span className="font-medium text-[#07c160]">{authorName}</span>
       {replyToName ? (
         <>
-          <span className="text-[color:var(--text-secondary)]"> 回复 </span>
+          <span className="text-[color:var(--text-secondary)]">
+            {translate(msg` 回复 `)}
+          </span>
           <span className="font-medium text-[#07c160]">{replyToName}</span>
         </>
       ) : null}
-      <span className="text-[color:var(--text-secondary)]">：</span>
+      <span className="text-[color:var(--text-secondary)]">
+        {translate(msg`：`)}
+      </span>
       <span className="text-[color:var(--text-primary)]">{text}</span>
     </span>
   );

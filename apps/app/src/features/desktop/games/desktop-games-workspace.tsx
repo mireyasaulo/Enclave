@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import type { ConversationListItem } from "@yinjie/contracts";
 import { Button, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import {
@@ -110,6 +112,7 @@ export function DesktopGamesWorkspace({
   onSelectGame,
   onTogglePinnedGame,
 }: DesktopGamesWorkspaceProps) {
+  const t = useRuntimeTranslator();
   const localMessageActionState = useLocalChatMessageActionState();
   const selectedGame =
     getGameCenterGame(selectedGameId) ?? getGameCenterGame("signal-squad");
@@ -147,14 +150,14 @@ export function DesktopGamesWorkspace({
             Game Center
           </div>
           <div className="mt-2 text-[22px] font-semibold text-[color:var(--text-primary)]">
-            游戏中心
+            {t(msg`游戏中心`)}
           </div>
         </div>
 
         <div className="min-h-0 space-y-4 overflow-auto bg-[rgba(242,246,245,0.76)] px-4 py-4">
           <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-section)]">
             <div className="text-xs text-[color:var(--text-muted)]">
-              浏览频道
+              {t(msg`浏览频道`)}
             </div>
             <div className="mt-3 space-y-2">
               {gameCenterCategoryTabs.map((tab) => (
@@ -183,7 +186,7 @@ export function DesktopGamesWorkspace({
           <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-section)]">
             <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
               <Pin size={15} className="text-[color:var(--brand-primary)]" />
-              固定常玩
+              {t(msg`固定常玩`)}
             </div>
             <div className="mt-3 space-y-2">
               {pinnedGames.length ? (
@@ -216,7 +219,7 @@ export function DesktopGamesWorkspace({
                             tone.badgeClassName,
                           )}
                         >
-                          常玩
+                          {t(msg`常玩`)}
                         </div>
                       </div>
                     </button>
@@ -224,7 +227,7 @@ export function DesktopGamesWorkspace({
                 })
               ) : (
                 <div className="rounded-[16px] border border-dashed border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 py-4 text-xs leading-6 text-[color:var(--text-muted)]">
-                  从推荐区把常玩的游戏固定到这里，桌面工作区就能更像微信的常驻入口。
+                  {t(msg`从推荐区把常玩的游戏固定到这里，桌面工作区就能更像微信的常驻入口。`)}
                 </div>
               )}
             </div>
@@ -236,7 +239,7 @@ export function DesktopGamesWorkspace({
                 size={15}
                 className="text-[color:var(--brand-primary)]"
               />
-              最近玩过
+              {t(msg`最近玩过`)}
             </div>
             <div className="mt-3 space-y-2">
               {recentGames.map((game) => (
@@ -256,8 +259,10 @@ export function DesktopGamesWorkspace({
                   </div>
                   <div className="mt-1 text-xs text-[color:var(--text-muted)]">
                     {lastOpenedAtById[game.id]
-                      ? `上次打开 ${formatConversationTimestamp(lastOpenedAtById[game.id])}`
-                      : "尚未打开"}
+                      ? t(
+                          msg`上次打开 ${formatConversationTimestamp(lastOpenedAtById[game.id])}`,
+                        )
+                      : t(msg`尚未打开`)}
                   </div>
                 </button>
               ))}
@@ -271,7 +276,7 @@ export function DesktopGamesWorkspace({
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <div className="text-[20px] font-semibold text-[color:var(--text-primary)]">
-                游戏中心
+                {t(msg`游戏中心`)}
               </div>
             </div>
             {successNotice ? (
@@ -308,7 +313,7 @@ export function DesktopGamesWorkspace({
                     </div>
                     <div className="rounded-[24px] border border-white/18 bg-white/12 px-4 py-4 backdrop-blur-sm">
                       <div className="text-[11px] uppercase tracking-[0.18em] text-white/68">
-                        状态
+                        {t(msg`状态`)}
                       </div>
                       <div className="mt-2 text-lg font-semibold">
                         {selectedGame.badge}
@@ -321,14 +326,17 @@ export function DesktopGamesWorkspace({
 
                   <div className="mt-6 grid gap-3 md:grid-cols-3">
                     <DesktopMetric
-                      label="玩家热度"
+                      label={t(msg`玩家热度`)}
                       value={selectedGame.playersLabel}
                     />
                     <DesktopMetric
-                      label="社交热度"
+                      label={t(msg`社交热度`)}
                       value={selectedGame.friendsLabel}
                     />
-                    <DesktopMetric label="工作室" value={selectedGame.studio} />
+                    <DesktopMetric
+                      label={t(msg`工作室`)}
+                      value={selectedGame.studio}
+                    />
                   </div>
 
                   <div className="mt-6 flex flex-wrap gap-2">
@@ -350,7 +358,7 @@ export function DesktopGamesWorkspace({
                       className="border-white/18 bg-white text-[color:var(--text-primary)] hover:bg-white/92"
                     >
                       <Play size={16} />
-                      开始游戏
+                      {t(msg`开始游戏`)}
                     </Button>
                     <Button
                       variant="secondary"
@@ -359,7 +367,7 @@ export function DesktopGamesWorkspace({
                       className="border-white/18 bg-white/10 text-white hover:bg-white/18"
                     >
                       <Pin size={16} />
-                      {selectedPinned ? "取消固定" : "固定常玩"}
+                      {selectedPinned ? t(msg`取消固定`) : t(msg`固定常玩`)}
                     </Button>
                     <Button
                       variant="secondary"
@@ -367,7 +375,7 @@ export function DesktopGamesWorkspace({
                       onClick={() => onCopyGameToMobile(selectedGame.id)}
                       className="border-white/18 bg-white/10 text-white hover:bg-white/18"
                     >
-                      发到手机
+                      {t(msg`发到手机`)}
                     </Button>
                   </div>
                 </div>
@@ -377,16 +385,18 @@ export function DesktopGamesWorkspace({
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                      {activeCategory === "featured" ? "推荐位" : "当前频道"}
+                      {activeCategory === "featured"
+                        ? t(msg`推荐位`)
+                        : t(msg`当前频道`)}
                     </div>
                     <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
                       {activeCategory === "featured"
-                        ? "优先看编辑推荐、好友热玩和适合回流的项目。"
-                        : "按当前频道继续筛选，让桌面端浏览更接近微信的游戏中心。"}
+                        ? t(msg`优先看编辑推荐、好友热玩和适合回流的项目。`)
+                        : t(msg`按当前频道继续筛选，让桌面端浏览更接近微信的游戏中心。`)}
                     </div>
                   </div>
                   <div className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 py-1 text-[11px] font-medium text-[color:var(--text-secondary)]">
-                    {browseGames.length} 个入口
+                    {t(msg`${browseGames.length} 个入口`)}
                   </div>
                 </div>
 
@@ -435,7 +445,7 @@ export function DesktopGamesWorkspace({
                             onClick={() => onLaunchGame(game.id)}
                             className="shrink-0"
                           >
-                            秒开
+                            {t(msg`秒开`)}
                           </Button>
                         </div>
 
@@ -450,7 +460,7 @@ export function DesktopGamesWorkspace({
                           ))}
                           {pinned ? (
                             <span className="rounded-md bg-[rgba(7,193,96,0.07)] px-2.5 py-1 text-[11px] text-[color:var(--brand-primary)]">
-                              已固定
+                              {t(msg`已固定`)}
                             </span>
                           ) : null}
                         </div>
@@ -462,7 +472,7 @@ export function DesktopGamesWorkspace({
 
               <div className="grid gap-4 lg:grid-cols-2">
                 <DesktopRankingPanel
-                  title="热门榜"
+                  title={t(msg`热门榜`)}
                   icon={
                     <Flame
                       size={16}
@@ -473,7 +483,7 @@ export function DesktopGamesWorkspace({
                   onSelectGame={onSelectGame}
                 />
                 <DesktopRankingPanel
-                  title="新游榜"
+                  title={t(msg`新游榜`)}
                   icon={
                     <Sparkles
                       size={16}
@@ -507,7 +517,7 @@ export function DesktopGamesWorkspace({
                     size={16}
                     className="text-[color:var(--brand-primary)]"
                   />
-                  好友在玩
+                  {t(msg`好友在玩`)}
                 </div>
                 <div className="mt-4 space-y-3">
                   {gameCenterFriendActivities.map((activity) => {
@@ -536,11 +546,11 @@ export function DesktopGamesWorkspace({
                                 {activity.friendName}
                               </span>
                               <span className="text-xs text-[color:var(--text-muted)]">
-                                正在玩 {game.name}
+                                {t(msg`正在玩 ${game.name}`)}
                               </span>
                               {friendInviteStatusByActivityId[activity.id] ? (
                                 <span className="rounded-full border border-[rgba(7,193,96,0.12)] bg-[rgba(7,193,96,0.06)] px-2 py-1 text-[10px] text-[color:var(--brand-primary)]">
-                                  已邀约
+                                  {t(msg`已邀约`)}
                                 </span>
                               ) : null}
                             </div>
@@ -549,19 +559,18 @@ export function DesktopGamesWorkspace({
                             </div>
                             <div className="mt-1 text-[11px] text-[color:var(--text-dim)]">
                               {friendInviteSentAtByActivityId[activity.id]
-                                ? `上次邀约 ${formatConversationTimestamp(friendInviteSentAtByActivityId[activity.id])} · ${formatTimestamp(activity.updatedAt)}`
+                                ? t(
+                                    msg`上次邀约 ${formatConversationTimestamp(friendInviteSentAtByActivityId[activity.id])} · ${formatTimestamp(activity.updatedAt)}`,
+                                  )
                                 : formatTimestamp(activity.updatedAt)}
                             </div>
                             {lastInviteConversationTitleByActivityId[
                               activity.id
                             ] ? (
                               <div className="mt-1 text-[11px] text-[color:var(--text-dim)]">
-                                最近投递到{" "}
-                                {
-                                  lastInviteConversationTitleByActivityId[
-                                    activity.id
-                                  ]
-                                }
+                                {t(
+                                  msg`最近投递到 ${lastInviteConversationTitleByActivityId[activity.id]}`,
+                                )}
                               </div>
                             ) : null}
                           </div>
@@ -572,7 +581,7 @@ export function DesktopGamesWorkspace({
                           onClick={() => onOpenInviteToChat(activity.id)}
                           className="shrink-0 rounded-xl"
                         >
-                          发到聊天
+                          {t(msg`发到聊天`)}
                         </Button>
                         <Button
                           variant="secondary"
@@ -581,8 +590,8 @@ export function DesktopGamesWorkspace({
                           className="shrink-0 rounded-xl"
                         >
                           {friendInviteStatusByActivityId[activity.id]
-                            ? "再邀一次"
-                            : "邀请一起玩"}
+                            ? t(msg`再邀一次`)
+                            : t(msg`邀请一起玩`)}
                         </Button>
                         <Button
                           variant="secondary"
@@ -590,7 +599,7 @@ export function DesktopGamesWorkspace({
                           onClick={() => onCopyInviteToMobile(activity.id)}
                           className="shrink-0 rounded-xl"
                         >
-                          发到手机
+                          {t(msg`发到手机`)}
                         </Button>
                         {lastInviteConversationPathByActivityId[activity.id] ? (
                           <Button
@@ -601,7 +610,7 @@ export function DesktopGamesWorkspace({
                             }
                             className="shrink-0 rounded-xl"
                           >
-                            回到会话
+                            {t(msg`回到会话`)}
                           </Button>
                         ) : null}
                       </div>
@@ -616,35 +625,39 @@ export function DesktopGamesWorkspace({
                     size={16}
                     className="text-[color:var(--brand-secondary)]"
                   />
-                  投递到最近会话
+                  {t(msg`投递到最近会话`)}
                 </div>
                 <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
                   {activeInviteActivity
-                    ? `把 ${activeInviteActivity.friendName} 的组局邀约发回消息流，点哪条会话就投递到哪条。`
-                    : "先在上面选一条好友动态，再决定把组局邀约投递到哪条会话。"}
+                    ? t(
+                        msg`把 ${activeInviteActivity.friendName} 的组局邀约发回消息流，点哪条会话就投递到哪条。`,
+                      )
+                    : t(msg`先在上面选一条好友动态，再决定把组局邀约投递到哪条会话。`)}
                 </div>
 
                 {!activeInviteActivity ? (
                   <div className="mt-4">
                     <EmptyState
-                      title="还没有选中的组局邀约"
-                      description="从“好友在玩”里点“发到聊天”，这里就会出现最近会话投递面板。"
+                      title={t(msg`还没有选中的组局邀约`)}
+                      description={t(
+                        msg`从"好友在玩"里点"发到聊天"，这里就会出现最近会话投递面板。`,
+                      )}
                     />
                   </div>
                 ) : inviteConversationCandidatesLoading ? (
                   <div className="mt-4">
-                    <LoadingBlock label="正在读取最近会话..." />
+                    <LoadingBlock label={t(msg`正在读取最近会话...`)} />
                   </div>
                 ) : inviteConversationCandidates.length ? (
                   <div className="mt-4 space-y-3">
                     <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-4">
                       <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                        当前邀约
+                        {t(msg`当前邀约`)}
                       </div>
                       <div className="mt-2 text-xs leading-6 text-[color:var(--text-secondary)]">
-                        {activeInviteActivity.friendName} 正在玩{" "}
-                        {activeInviteGame?.name ?? "当前游戏"}，
-                        {activeInviteActivity.status}
+                        {t(
+                          msg`${activeInviteActivity.friendName} 正在玩 ${activeInviteGame?.name ?? t(msg`当前游戏`)}，${activeInviteActivity.status}`,
+                        )}
                       </div>
                     </div>
                     {inviteConversationCandidates.map((conversation) => (
@@ -660,8 +673,10 @@ export function DesktopGamesWorkspace({
                 ) : (
                   <div className="mt-4">
                     <EmptyState
-                      title="还没有最近会话"
-                      description="先回消息里产生一些会话，再把游戏邀约投递回来。"
+                      title={t(msg`还没有最近会话`)}
+                      description={t(
+                        msg`先回消息里产生一些会话，再把游戏邀约投递回来。`,
+                      )}
                     />
                   </div>
                 )}
@@ -673,7 +688,7 @@ export function DesktopGamesWorkspace({
                     size={16}
                     className="text-[color:var(--brand-primary)]"
                   />
-                  活动与福利
+                  {t(msg`活动与福利`)}
                 </div>
                 <div className="mt-4 space-y-3">
                   {gameCenterEvents.map((event) => {
@@ -732,10 +747,10 @@ export function DesktopGamesWorkspace({
       <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[3px]">
         <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-8 py-6 text-center shadow-[var(--shadow-card)]">
           <div className="text-lg font-semibold text-[color:var(--text-primary)]">
-            功能开发中
+            {t(msg`功能开发中`)}
           </div>
           <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-            敬请期待
+            {t(msg`敬请期待`)}
           </div>
         </div>
       </div>
@@ -757,6 +772,7 @@ function InviteConversationRow({
     conversationId: string,
   ) => void;
 }) {
+  const t = useRuntimeTranslator();
   const preview = getConversationPreviewParts(
     conversation,
     localMessageActionState,
@@ -795,7 +811,7 @@ function InviteConversationRow({
         }
         className="shrink-0 rounded-xl"
       >
-        发邀约
+        {t(msg`发邀约`)}
       </Button>
     </div>
   );

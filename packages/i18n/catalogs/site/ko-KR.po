@@ -11,3 +11,211 @@ msgstr ""
 "Last-Translator: \n"
 "Language-Team: \n"
 "Plural-Forms: \n"
+
+#. js-lingui-explicit-id
+msgid "产品"
+msgstr "제품"
+
+#. js-lingui-explicit-id
+msgid "核心能力"
+msgstr "핵심 기능"
+
+#. js-lingui-explicit-id
+msgid "跨端"
+msgstr "크로스 플랫폼"
+
+#. js-lingui-explicit-id
+msgid "开源自部署"
+msgstr "자체 호스팅"
+
+#. js-lingui-explicit-id
+msgid "下载"
+msgstr "다운로드"
+
+#. js-lingui-explicit-id
+msgid "在线试用"
+msgstr "온라인 체험"
+
+#. js-lingui-explicit-id
+msgid "一个属于你的 AI 虚拟世界。开源、可自部署、跨端可用。"
+msgstr "당신만의 AI 가상 세계. 오픈소스, 자체 호스팅 가능, 크로스 플랫폼."
+
+#. js-lingui-explicit-id
+msgid "自部署文档"
+msgstr "자체 호스팅 가이드"
+
+#. js-lingui-explicit-id
+msgid "隐私政策"
+msgstr "개인정보 처리방침"
+
+#. js-lingui-explicit-id
+msgid "服务条款"
+msgstr "서비스 약관"
+
+#. js-lingui-explicit-id
+msgid "联系我们"
+msgstr "문의하기"
+
+#. js-lingui-explicit-id
+msgid "开源 · 可自部署 · 跨端"
+msgstr "오픈소스 · 자체 호스팅 · 크로스 플랫폼"
+
+#. js-lingui-explicit-id
+msgid "一个属于你的 AI 虚拟世界"
+msgstr "당신만의 AI 가상 세계"
+
+#. js-lingui-explicit-id
+msgid "在隐界，你不是和一个 chatbot 聊天，而是拥有一个有居民、有时间、有关系的私人世界。它不与现实对立，让现实里的你，多出一种可能。"
+msgstr "엔클레이브에서는 챗봇과 대화하는 것이 아니라, 거주민과 시간, 관계를 가진 개인 세계를 가지게 됩니다. 현실과 대립하지 않고, 현실의 당신에게 또 하나의 가능성을 더해 줍니다."
+
+#. js-lingui-explicit-id
+msgid "在 GitHub 查看"
+msgstr "GitHub에서 보기"
+
+#. js-lingui-explicit-id
+msgid "核心闭环演示（动图）"
+msgstr "핵심 루프 데모(움짤)"
+
+#. js-lingui-explicit-id
+msgid "语言版本"
+msgstr "언어"
+
+#. js-lingui-explicit-id
+msgid "移动 + 桌面"
+msgstr "모바일 + 데스크톱"
+
+#. js-lingui-explicit-id
+msgid "开源协议"
+msgstr "라이선스"
+
+#. js-lingui-explicit-id
+msgid "不是 chatbot，而是一整个生态"
+msgstr "챗봇이 아닌, 하나의 생태계"
+
+#. js-lingui-explicit-id
+msgid "基于 apps/app 的真实代码盘点而成的能力清单：每一项都已在产品中跑通。"
+msgstr "아래의 모든 기능은 apps/app 실제 코드를 기반으로 하며, 모두 제품에 적용되어 있습니다."
+
+#. js-lingui-explicit-id
+msgid "聊天与群组"
+msgstr "채팅과 그룹"
+
+#. js-lingui-explicit-id
+msgid "一对一对话、群聊、线程讨论；消息提醒、强提醒、已读标记一应俱全。"
+msgstr "1:1, 그룹, 스레드 대화. 메시지 알림과 강력한 알림, 읽음 표시까지 모두 지원."
+
+#. js-lingui-explicit-id
+msgid "AI 数字人通话"
+msgstr "AI 디지털 휴먼 통화"
+
+#. js-lingui-explicit-id
+msgid "和虚拟角色实时对话——支持 1 对 1、群组、视频与语音多种形式。"
+msgstr "가상 캐릭터와 실시간 대화 — 1:1, 그룹, 영상, 음성을 모두 지원합니다."
+
+#. js-lingui-explicit-id
+msgid "朋友圈与动态"
+msgstr "모먼트와 피드"
+
+#. js-lingui-explicit-id
+msgid "发布与浏览朋友动态，AI 角色也会发帖、互动、出现在你的时间线。"
+msgstr "개인 피드에 글을 올리고 친구의 소식을 보세요. AI 캐릭터도 게시·반응하며 타임라인에 함께합니다."
+
+#. js-lingui-explicit-id
+msgid "小程序工作区"
+msgstr "미니 프로그램 워크스페이스"
+
+#. js-lingui-explicit-id
+msgid "内嵌的小程序生态，随手打开工具、拓展隐界的能力边界。"
+msgstr "내장된 미니 프로그램 생태계로 도구를 열고 엔클레이브의 기능을 확장하세요."
+
+#. js-lingui-explicit-id
+msgid "游戏中心"
+msgstr "게임 센터"
+
+#. js-lingui-explicit-id
+msgid "游戏库与邀请系统，把朋友、AI 角色都拉进同一桌。"
+msgstr "게임 라이브러리와 초대 시스템으로 친구와 AI 캐릭터를 한 자리에 모읍니다."
+
+#. js-lingui-explicit-id
+msgid "笔记工作区（桌面）"
+msgstr "노트 워크스페이스(데스크톱)"
+
+#. js-lingui-explicit-id
+msgid "桌面端多窗口笔记，灵感随手记，无缝同步、不受应用边界约束。"
+msgstr "데스크톱에서 멀티 윈도우 노트를 작성하고, 영감을 즉시 기록하며 끊김 없이 동기화합니다."
+
+#. js-lingui-explicit-id
+msgid "发现与场景社交"
+msgstr "발견과 상황별 소셜"
+
+#. js-lingui-explicit-id
+msgid "遇见陌生人、按场景社交、浏览世界人物库，遇见新角色与新故事。"
+msgstr "낯선 사람을 만나고, 상황별로 소셜하며, 월드 캐릭터 라이브러리에서 새로운 사람과 이야기를 만나세요."
+
+#. js-lingui-explicit-id
+msgid "云订阅与权限"
+msgstr "클라우드 구독"
+
+#. js-lingui-explicit-id
+msgid "灵活的功能分级与支付，按需开启更高级的模型与能力。"
+msgstr "유연한 등급과 결제 방식으로 필요할 때 상위 모델과 고급 기능을 활성화합니다."
+
+#. js-lingui-explicit-id
+msgid "产品截图"
+msgstr "스크린샷"
+
+#. js-lingui-explicit-id
+msgid "从入坑到日常使用"
+msgstr "온보딩부터 일상 사용까지"
+
+#. js-lingui-explicit-id
+msgid "六个核心场景一起看，画面均来自 apps/app 当前真实版本。"
+msgstr "6 가지 핵심 화면을 한자리에. 모든 화면은 apps/app 의 최신 빌드에서 캡처되었습니다."
+
+#. js-lingui-explicit-id
+msgid "聊天"
+msgstr "채팅"
+
+#. js-lingui-explicit-id
+msgid "线程化对话与消息提醒"
+msgstr "스레드 대화와 알림"
+
+#. js-lingui-explicit-id
+msgid "朋友圈"
+msgstr "모먼트"
+
+#. js-lingui-explicit-id
+msgid "AI 与人共同的时间线"
+msgstr "AI 와 사람이 함께 만드는 타임라인"
+
+#. js-lingui-explicit-id
+msgid "频道流"
+msgstr "채널"
+
+#. js-lingui-explicit-id
+msgid "频道、视频号、官方账号"
+msgstr "채널, 비디오 계정, 공식 계정"
+
+#. js-lingui-explicit-id
+msgid "群组"
+msgstr "그룹"
+
+#. js-lingui-explicit-id
+msgid "多人对话与角色互动"
+msgstr "다자 대화와 캐릭터 상호작용"
+
+#. js-lingui-explicit-id
+msgid "入坑引导"
+msgstr "온보딩"
+
+#. js-lingui-explicit-id
+msgid "新人启动与世界初始化"
+msgstr "신규 사용자 시작과 세계 초기 설정"
+
+#. js-lingui-explicit-id
+msgid "我的角色"
+msgstr "내 캐릭터"
+
+#. js-lingui-explicit-id
+msgid "你与 AI 化身的资料卡"
+msgstr "당신과 AI 아바타의 프로필 카드"

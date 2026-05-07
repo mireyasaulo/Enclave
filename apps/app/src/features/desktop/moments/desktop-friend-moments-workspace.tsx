@@ -306,7 +306,9 @@ export function DesktopFriendMomentsWorkspace({
                     <span className="inline-flex items-center gap-1 rounded-full border border-[color:var(--border-faint)] bg-white px-3 py-1">
                       <Clock3 size={13} />
                       {latestMoment
-                        ? t(msg`最近更新 ${formatTimestamp(latestMoment.postedAt)}`)
+                        ? t(
+                            msg`最近更新 ${formatTimestamp(latestMoment.postedAt)}`,
+                          )
                         : t(msg`暂未更新`)}
                     </span>
                   </div>

@@ -95,9 +95,22 @@ const services = {
   site: {
     cwd: path.join(rootDir, "apps", "site"),
     command: nodeBinary,
-    args: [path.join(rootDir, "apps", "site", "node_modules", "vite", "bin", "vite.js")],
+    args: [path.join(rootDir, "apps", "site", "node_modules", "next", "dist", "bin", "next"), "dev", "-p", "5183"],
     port: 5183,
     url: "http://127.0.0.1:5183/",
+    prestart() {
+      const result = spawnSync(nodeBinary, [path.join(rootDir, "apps", "site", "scripts", "sync-assets.mjs")], {
+        cwd: path.join(rootDir, "apps", "site"),
+        env: process.env,
+        shell: false,
+        stdio: "inherit",
+        windowsHide: true,
+      });
+      if (result.error) throw result.error;
+      if (result.status !== 0) {
+        throw new Error(`site asset sync failed with exit code ${result.status ?? "unknown"}.`);
+      }
+    },
   },
   "wechat-connector": {
     cwd: rootDir,

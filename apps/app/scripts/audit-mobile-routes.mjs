@@ -108,9 +108,21 @@ async function auditRoute(page, baseUrl, routePath, errors) {
   await page.goto(`${baseUrl}${routePath}`, { waitUntil: "domcontentloaded" });
   await page.waitForLoadState("networkidle", { timeout: routeIdleTimeoutMs })
     .catch(() => undefined);
+  await page
+    .waitForFunction(
+      () =>
+        (document.querySelector("#root")?.textContent || "").trim().length > 0,
+      null,
+      { timeout: 10_000 },
+    )
+    .catch(() => undefined);
   await page.waitForTimeout(routeSettleMs);
 
-  const bodyText = (await page.locator("body").innerText()).trim();
+  let bodyText = (await page.locator("body").innerText()).trim();
+  if (!bodyText) {
+    await page.waitForTimeout(2_000);
+    bodyText = (await page.locator("body").innerText()).trim();
+  }
   if (!bodyText) {
     errors.push("empty body text");
   }

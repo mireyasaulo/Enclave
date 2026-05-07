@@ -1,3 +1,5 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { isDesktopRuntimeAvailable } from "@yinjie/ui";
 import {
   buildDesktopStandaloneWindowLabel,
@@ -81,7 +83,7 @@ export async function openDesktopOfficialArticleWindow(
     await openDesktopStandaloneWindow({
       label: windowLabel,
       url: routePath,
-      title: input.title?.trim() || "公众号文章",
+      title: input.title?.trim() || translateRuntimeMessage(msg`公众号文章`),
       width,
       height,
       minWidth: 980,

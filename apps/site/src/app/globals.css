@@ -1,0 +1,65 @@
+@import "tailwindcss";
+@import "@yinjie/ui/tokens.css";
+
+@theme inline {
+  --color-brand: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-accent: var(--brand-accent);
+  --color-bg: var(--bg-canvas);
+  --color-surface: var(--surface-card);
+  --color-surface-soft: var(--surface-soft);
+  --color-text: var(--text-primary);
+  --color-text-muted: var(--text-secondary);
+  --color-text-dim: var(--text-muted);
+  --color-border: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+}
+
+html {
+  scroll-behavior: smooth;
+  background: linear-gradient(180deg, #fffdf7, #fff8ee);
+}
+
+body {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  background: var(--bg-accent);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(249, 115, 22, 0.16);
+  color: var(--text-primary);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.brand-gradient-text {
+  background: var(--brand-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

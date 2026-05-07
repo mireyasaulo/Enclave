@@ -838,10 +838,11 @@ function DesktopChannelAuthorPanel({
   onOpenPost: (postId: string, authorId: string) => void;
   onToggleFollow: (authorId: string, following: boolean) => void;
 }) {
+  const t = useRuntimeTranslator();
   const fallbackBio =
     profile?.authorType === "character"
-      ? "这位居民暂时还没有填写视频号简介。"
-      : "这个视频号作者暂时还没有填写简介。";
+      ? t(msg`这位居民暂时还没有填写视频号简介。`)
+      : t(msg`这个视频号作者暂时还没有填写简介。`);
   const recentPosts = profile?.recentPosts.slice(0, 5) ?? [];
   const liveClipCount = (profile?.recentPosts ?? []).filter(
     (post) => post.sourceKind === "live_clip",
@@ -852,17 +853,17 @@ function DesktopChannelAuthorPanel({
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-sm font-medium text-[color:var(--text-primary)]">
-            作者主页
+            {t(msg`作者主页`)}
           </div>
         </div>
         <Button variant="secondary" size="sm" onClick={onClose}>
-          回到内容
+          {t(msg`回到内容`)}
         </Button>
       </div>
 
       {isLoading ? (
         <div className="mt-4">
-          <LoadingBlock label="正在读取作者主页..." />
+          <LoadingBlock label={t(msg`正在读取作者主页...`)} />
         </div>
       ) : null}
 
@@ -875,8 +876,8 @@ function DesktopChannelAuthorPanel({
       {!isLoading && !errorMessage && !profile ? (
         <div className="mt-4">
           <EmptyState
-            title="作者主页暂时不可用"
-            description="这位作者的信息还没有准备好，稍后再试。"
+            title={t(msg`作者主页暂时不可用`)}
+            description={t(msg`这位作者的信息还没有准备好，稍后再试。`)}
           />
         </div>
       ) : null}
@@ -895,7 +896,9 @@ function DesktopChannelAuthorPanel({
                   {profile.authorName}
                 </div>
                 <span className="rounded-full bg-[rgba(15,23,42,0.06)] px-2 py-0.5 text-[10px] text-[color:var(--text-secondary)]">
-                  {profile.authorType === "character" ? "居民作者" : "世界主人"}
+                  {profile.authorType === "character"
+                    ? t(msg`居民作者`)
+                    : t(msg`世界主人`)}
                 </span>
               </div>
               <div className="mt-2 text-[12px] leading-6 text-[color:var(--text-secondary)]">
@@ -906,13 +909,13 @@ function DesktopChannelAuthorPanel({
 
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
-              {profile.followerCount} 关注者
+              {t(msg`${profile.followerCount} 关注者`)}
             </span>
             <span className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
-              {profile.recentPosts.length} 条内容
+              {t(msg`${profile.recentPosts.length} 条内容`)}
             </span>
             <span className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
-              {liveClipCount} 条直播回放
+              {t(msg`${liveClipCount} 条直播回放`)}
             </span>
           </div>
 
@@ -929,7 +932,7 @@ function DesktopChannelAuthorPanel({
                   : "bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
               }
             >
-              {profile.isFollowing ? "已关注" : "+关注"}
+              {profile.isFollowing ? t(msg`已关注`) : t(msg`+关注`)}
             </Button>
             <Button
               variant="secondary"
@@ -937,13 +940,13 @@ function DesktopChannelAuthorPanel({
               disabled={!selectedPostId}
               onClick={onClose}
             >
-              当前内容
+              {t(msg`当前内容`)}
             </Button>
           </div>
 
           <div className="mt-5">
             <div className="text-sm font-medium text-[color:var(--text-primary)]">
-              最近内容
+              {t(msg`最近内容`)}
             </div>
             <div className="mt-3 space-y-2">
               {recentPosts.length ? (
@@ -961,14 +964,14 @@ function DesktopChannelAuthorPanel({
                   >
                     <div className="flex items-center justify-between gap-3">
                       <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                        {post.title?.trim() || "查看这条内容"}
+                        {post.title?.trim() || t(msg`查看这条内容`)}
                       </div>
                       <span className="rounded-full border border-[color:var(--border-faint)] bg-white px-2 py-0.5 text-[10px] text-[color:var(--text-secondary)]">
                         {post.sourceKind === "live_clip"
-                          ? "直播回放"
+                          ? t(msg`直播回放`)
                           : post.mediaType === "video"
-                            ? "视频"
-                            : "动态"}
+                            ? t(msg`视频`)
+                            : t(msg`动态`)}
                       </span>
                     </div>
                     <div className="mt-2 line-clamp-2 text-xs leading-6 text-[color:var(--text-secondary)]">
@@ -982,7 +985,7 @@ function DesktopChannelAuthorPanel({
                         <>
                           <span>·</span>
                           <span className="font-medium text-[color:var(--brand-primary)]">
-                            当前内容
+                            {t(msg`当前内容`)}
                           </span>
                         </>
                       ) : null}
@@ -991,7 +994,7 @@ function DesktopChannelAuthorPanel({
                 ))
               ) : (
                 <div className="rounded-[16px] border border-dashed border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 py-4 text-xs leading-6 text-[color:var(--text-muted)]">
-                  这位作者暂时还没有可以展示的内容。
+                  {t(msg`这位作者暂时还没有可以展示的内容。`)}
                 </div>
               )}
             </div>
@@ -999,7 +1002,7 @@ function DesktopChannelAuthorPanel({
 
           {authorId && profile.authorId !== authorId ? (
             <div className="mt-4 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 py-3 text-xs leading-6 text-[color:var(--text-muted)]">
-              当前路由和作者数据还在同步，稍后会自动收敛到最新作者资料。
+              {t(msg`当前路由和作者数据还在同步，稍后会自动收敛到最新作者资料。`)}
             </div>
           ) : null}
         </>
@@ -1009,10 +1012,12 @@ function DesktopChannelAuthorPanel({
 }
 
 function formatChannelMeta(post: FeedPostListItem) {
-  const pieces = [`${post.viewCount ?? 0} 播放`];
+  const viewCount = post.viewCount ?? 0;
+  const pieces = [translateRuntimeMessage(msg`${viewCount} 播放`)];
 
   if (typeof post.durationMs === "number" && post.durationMs > 0) {
-    pieces.push(`${Math.max(1, Math.round(post.durationMs / 1000))} 秒`);
+    const seconds = Math.max(1, Math.round(post.durationMs / 1000));
+    pieces.push(translateRuntimeMessage(msg`${seconds} 秒`));
   }
 
   if (post.topicTags?.length) {
@@ -1054,6 +1059,7 @@ function DesktopChannelCommentsPanel({
   onReplyToComment: (comment: FeedComment) => void;
   onSubmit: () => void;
 }) {
+  const t = useRuntimeTranslator();
   const selectedPostId = selectedPost?.id ?? null;
   const commentAuthorNameMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -1200,31 +1206,33 @@ function DesktopChannelCommentsPanel({
     <div className="mt-3 space-y-3">
       {commentsLoading && !comments.length ? (
         <div className="rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-4 text-xs leading-6 text-[color:var(--text-muted)]">
-          正在读取评论...
+          {t(msg`正在读取评论...`)}
         </div>
       ) : null}
       {!commentsLoading && !comments.length ? (
         <div className="rounded-[14px] border border-dashed border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-4 text-xs leading-6 text-[color:var(--text-muted)]">
-          这条内容还没有评论，你可以先开口。
+          {t(msg`这条内容还没有评论，你可以先开口。`)}
         </div>
       ) : null}
       {threadIdsWithReplies.length ? (
         <div className="flex items-center justify-between rounded-[12px] border border-[color:var(--border-faint)] bg-white px-3 py-2 text-[11px] text-[color:var(--text-secondary)]">
-          <span>共 {threadIdsWithReplies.length} 个可折叠线程</span>
+          <span>
+            {t(msg`共 ${threadIdsWithReplies.length} 个可折叠线程`)}
+          </span>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => updateCollapsedThreadIds([])}
               className="rounded-full border border-[color:var(--border-faint)] px-2.5 py-1 transition hover:bg-[color:var(--surface-console)]"
             >
-              全部展开
+              {t(msg`全部展开`)}
             </button>
             <button
               type="button"
               onClick={() => updateCollapsedThreadIds(threadIdsWithReplies)}
               className="rounded-full border border-[color:var(--border-faint)] px-2.5 py-1 transition hover:bg-[color:var(--surface-console)]"
             >
-              全部收起
+              {t(msg`全部收起`)}
             </button>
           </div>
         </div>
@@ -1272,14 +1280,14 @@ function DesktopChannelCommentsPanel({
         {replyTarget ? (
           <div className="mb-3 flex items-center justify-between gap-3 rounded-[12px] bg-[rgba(7,193,96,0.08)] px-3 py-2 text-[11px] text-[color:var(--brand-primary)]">
             <div className="truncate">
-              正在回复 {replyTarget.authorName}
+              {t(msg`正在回复 ${replyTarget.authorName}`)}
             </div>
             <button
               type="button"
               onClick={onCancelReply}
               className="transition hover:opacity-75"
             >
-              取消
+              {t(msg`取消`)}
             </button>
           </div>
         ) : null}
@@ -1289,10 +1297,10 @@ function DesktopChannelCommentsPanel({
             onChange={(event) => onDraftChange(event.target.value)}
             placeholder={
               replyTarget
-                ? `回复 ${replyTarget.authorName}...`
+                ? t(msg`回复 ${replyTarget.authorName}...`)
                 : selectedPost
-                  ? "写下你对这条视频号内容的评论..."
-                  : "先选择一条内容"
+                  ? t(msg`写下你对这条视频号内容的评论...`)
+                  : t(msg`先选择一条内容`)
             }
             disabled={!selectedPost}
             className="min-w-0 flex-1 rounded-xl border-[color:var(--border-faint)] bg-white py-2.5 shadow-none hover:bg-white focus:border-[rgba(7,193,96,0.14)] focus:shadow-none"
@@ -1304,7 +1312,7 @@ function DesktopChannelCommentsPanel({
             onClick={onSubmit}
             className="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
           >
-            {submitPending ? "发送中..." : "发送"}
+            {submitPending ? t(msg`发送中...`) : t(msg`发送`)}
           </Button>
         </div>
       </div>
@@ -1336,6 +1344,7 @@ function DesktopCommentThreadReplies({
     postId: string;
   } | null;
 }) {
+  const t = useRuntimeTranslator();
   const latestReply = replies[replies.length - 1] ?? null;
 
   return (
@@ -1347,10 +1356,12 @@ function DesktopCommentThreadReplies({
       >
         <div className="flex items-center gap-2 text-[10px] font-medium text-[color:var(--text-muted)]">
           {collapsed ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
-          <span>楼中楼</span>
+          <span>{t(msg`楼中楼`)}</span>
         </div>
         <span className="text-[10px] text-[color:var(--text-muted)]">
-          {collapsed ? `展开 ${replies.length} 条跟帖` : `收起 ${replies.length} 条跟帖`}
+          {collapsed
+            ? t(msg`展开 ${replies.length} 条跟帖`)
+            : t(msg`收起 ${replies.length} 条跟帖`)}
         </span>
       </button>
       {collapsed ? (
@@ -1363,7 +1374,7 @@ function DesktopCommentThreadReplies({
               {`：${latestReply.text}`}
             </>
           ) : (
-            "这个线程里还有跟帖。"
+            t(msg`这个线程里还有跟帖。`)
           )}
         </div>
       ) : (
@@ -1403,6 +1414,7 @@ function DesktopThreadCommentCard({
   onLikeComment: (comment: FeedComment) => void;
   onReplyToComment: (comment: FeedComment) => void;
 }) {
+  const t = useRuntimeTranslator();
   const replyTargetName = comment.replyToCommentId
     ? commentAuthorNameMap.get(comment.replyToCommentId) ?? null
     : null;
@@ -1437,15 +1449,17 @@ function DesktopThreadCommentCard({
                   : "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)]",
               )}
             >
-              {comment.authorType === "character" ? "居民" : "世界主人"}
+              {comment.authorType === "character"
+                ? t(msg`居民`)
+                : t(msg`世界主人`)}
             </span>
             {compact ? (
               <span className="rounded-md bg-[rgba(15,23,42,0.06)] px-2 py-0.5 text-[10px] text-[color:var(--text-secondary)]">
-                回复层
+                {t(msg`回复层`)}
               </span>
             ) : (
               <span className="rounded-md bg-[rgba(15,23,42,0.06)] px-2 py-0.5 text-[10px] text-[color:var(--text-secondary)]">
-                主评论
+                {t(msg`主评论`)}
               </span>
             )}
             <span className="text-[color:var(--text-dim)]">
@@ -1455,7 +1469,7 @@ function DesktopThreadCommentCard({
           <div className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">
             {replyTargetName ? (
               <span className="text-[color:var(--text-muted)]">
-                回复 {replyTargetName}
+                {t(msg`回复 ${replyTargetName}`)}
                 {"："}
               </span>
             ) : null}
@@ -1467,7 +1481,7 @@ function DesktopThreadCommentCard({
               onClick={() => onReplyToComment(comment)}
               className="transition hover:text-[color:var(--text-primary)]"
             >
-              回复
+              {t(msg`回复`)}
             </button>
             <button
               type="button"
@@ -1485,10 +1499,10 @@ function DesktopThreadCommentCard({
             >
               <ThumbsUp size={12} />
               {likePendingCommentId === comment.id
-                ? "处理中"
+                ? t(msg`处理中`)
                 : comment.likedByOwner
-                  ? `已赞 ${comment.likeCount}`
-                  : `赞 ${comment.likeCount}`}
+                  ? t(msg`已赞 ${comment.likeCount}`)
+                  : t(msg`赞 ${comment.likeCount}`)}
             </button>
           </div>
         </div>

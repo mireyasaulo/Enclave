@@ -1,5 +1,7 @@
 import { useEffect, useMemo } from "react";
+import { msg } from "@lingui/macro";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button } from "@yinjie/ui";
 import { EmptyState } from "../components/empty-state";
 import { DesktopNotesWorkspace } from "../features/desktop/chat/desktop-notes-workspace";
@@ -17,6 +19,7 @@ import {
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 export function DesktopNoteWindowPage() {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const runtimeConfig = useAppRuntimeConfig();
   const nativeDesktopShell = runtimeConfig.appPlatform === "desktop";
@@ -95,11 +98,11 @@ export function DesktopNoteWindowPage() {
       <div className="flex h-full min-h-0 items-center justify-center bg-[color:var(--bg-app)] p-6">
         <div className="w-full max-w-lg rounded-[20px] border border-[color:var(--border-faint)] bg-white p-8 shadow-[var(--shadow-card)]">
           <div className="mb-5 inline-flex rounded-full border border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.07)] px-3 py-1 text-[11px] tracking-[0.12em] text-[color:var(--brand-primary)]">
-            独立笔记窗口
+            {t(msg`独立笔记窗口`)}
           </div>
           <EmptyState
-            title="这个笔记窗口缺少上下文"
-            description="主窗口重新打开一次新建笔记，或者回到收藏页选择已保存笔记。"
+            title={t(msg`这个笔记窗口缺少上下文`)}
+            description={t(msg`主窗口重新打开一次新建笔记，或者回到收藏页选择已保存笔记。`)}
           />
           <div className="mt-6 flex justify-center">
             <Button
@@ -107,7 +110,7 @@ export function DesktopNoteWindowPage() {
               onClick={() => closeStandaloneWindow("/tabs/favorites")}
               className="h-9 rounded-[10px] bg-[color:var(--brand-primary)] px-4 text-white hover:opacity-95"
             >
-              回到收藏
+              {t(msg`回到收藏`)}
             </Button>
           </div>
         </div>

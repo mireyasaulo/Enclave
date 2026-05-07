@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
 import { Search, Star } from "lucide-react";
 import type { FriendListItem } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
@@ -41,6 +43,7 @@ export function DesktopContactsStarredFriendsPane({
   onOpenProfile,
   onOpenMoments,
 }: DesktopContactsStarredFriendsPaneProps) {
+  const t = useRuntimeTranslator();
   const [searchText, setSearchText] = useState("");
   const normalizedSearchText = searchText.trim().toLowerCase();
   const filteredFriends = useMemo(() => {
@@ -73,10 +76,10 @@ export function DesktopContactsStarredFriendsPane({
       <section className="flex w-[320px] shrink-0 flex-col border-r border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.88)]">
         <div className="border-b border-[color:var(--border-faint)] bg-white/78 px-4 py-4 backdrop-blur-xl">
           <div className="text-base font-medium text-[color:var(--text-primary)]">
-            星标朋友
+            {t(msg`星标朋友`)}
           </div>
           <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-            {friends.length} 位联系人
+            {t(msg`${friends.length} 位联系人`)}
           </div>
 
           <label className="mt-3 flex items-center gap-2 rounded-[16px] border border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-sm text-[color:var(--text-dim)] shadow-none">
@@ -85,7 +88,7 @@ export function DesktopContactsStarredFriendsPane({
               type="search"
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
-              placeholder="搜索星标朋友"
+              placeholder={t(msg`搜索星标朋友`)}
               className="min-w-0 flex-1 bg-transparent text-sm text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
             />
           </label>
@@ -107,7 +110,7 @@ export function DesktopContactsStarredFriendsPane({
           {loading ? (
             <LoadingBlock
               className="px-4 py-6 text-left"
-              label="正在读取星标朋友..."
+              label={t(msg`正在读取星标朋友...`)}
             />
           ) : error ? (
             <div className="px-3 pt-3">
@@ -118,13 +121,13 @@ export function DesktopContactsStarredFriendsPane({
               <EmptyState
                 title={
                   normalizedSearchText
-                    ? "没有找到匹配的星标朋友"
-                    : "还没有星标朋友"
+                    ? t(msg`没有找到匹配的星标朋友`)
+                    : t(msg`还没有星标朋友`)
                 }
                 description={
                   normalizedSearchText
-                    ? "换个关键词再试试。"
-                    : "去联系人资料页把常联系的好友设为星标朋友。"
+                    ? t(msg`换个关键词再试试。`)
+                    : t(msg`去联系人资料页把常联系的好友设为星标朋友。`)
                 }
               />
             </div>
@@ -157,12 +160,12 @@ export function DesktopContactsStarredFriendsPane({
                     </div>
                     <div className="mt-0.5 truncate text-xs text-[color:var(--text-muted)]">
                       {startChatPendingId === item.character.id
-                        ? "正在打开会话..."
+                        ? t(msg`正在打开会话...`)
                         : getFriendDisplayName(item) !== item.character.name
-                          ? `昵称：${item.character.name}`
+                          ? t(msg`昵称：${item.character.name}`)
                           : item.character.currentStatus?.trim() ||
                             item.character.relationship ||
-                            "保持联系"}
+                            t(msg`保持联系`)}
                     </div>
                   </div>
                   <Star

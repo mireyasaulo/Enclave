@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
 import type { Group } from "@yinjie/contracts";
 import { MessageSquarePlus, Search } from "lucide-react";
 import { Button, ErrorBlock, LoadingBlock, cn } from "@yinjie/ui";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { EmptyState } from "../../../components/empty-state";
 import { GroupAvatarChip } from "../../../components/group-avatar-chip";
 import { formatConversationTimestamp } from "../../../lib/format";
@@ -27,6 +29,7 @@ export function DesktopContactsGroupsPane({
   onOpenGroup,
   onOpenGroupDetails,
 }: DesktopContactsGroupsPaneProps) {
+  const t = useRuntimeTranslator();
   const [searchText, setSearchText] = useState("");
   const normalizedSearchText = searchText.trim().toLowerCase();
   const filteredGroups = useMemo(() => {
@@ -65,10 +68,10 @@ export function DesktopContactsGroupsPane({
           <div className="flex items-start justify-between gap-3">
             <div>
               <div className="text-base font-medium text-[color:var(--text-primary)]">
-                群聊
+                {t(msg`群聊`)}
               </div>
               <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                {groups.length} 个群聊
+                {t(msg`${groups.length} 个群聊`)}
               </div>
             </div>
             <Button
@@ -79,7 +82,7 @@ export function DesktopContactsGroupsPane({
               className="rounded-[10px] border-[color:var(--border-faint)] bg-white shadow-none hover:bg-[color:var(--surface-console)]"
             >
               <MessageSquarePlus size={14} />
-              发起群聊
+              {t(msg`发起群聊`)}
             </Button>
           </div>
 
@@ -89,7 +92,7 @@ export function DesktopContactsGroupsPane({
               type="search"
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
-              placeholder="搜索群聊"
+              placeholder={t(msg`搜索群聊`)}
               className="min-w-0 flex-1 bg-transparent text-sm text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
             />
           </label>
@@ -98,7 +101,7 @@ export function DesktopContactsGroupsPane({
         <div className="min-h-0 flex-1 overflow-auto bg-[rgba(242,246,245,0.76)] pb-4">
           {loading ? (
             <div className="px-3 pt-3">
-              <LoadingBlock label="正在读取群聊..." />
+              <LoadingBlock label={t(msg`正在读取群聊...`)} />
             </div>
           ) : error ? (
             <div className="px-3 pt-3">
@@ -109,17 +112,17 @@ export function DesktopContactsGroupsPane({
               <EmptyState
                 title={
                   normalizedSearchText
-                    ? "没有找到匹配的群聊"
-                    : "还没有群聊"
+                    ? t(msg`没有找到匹配的群聊`)
+                    : t(msg`还没有群聊`)
                 }
                 description={
                   normalizedSearchText
-                    ? "换个关键词试试。"
-                    : "先创建新的群聊，建好后就会出现在这里。"
+                    ? t(msg`换个关键词试试。`)
+                    : t(msg`先创建新的群聊，建好后就会出现在这里。`)
                 }
                 action={
                   <Button variant="secondary" onClick={onCreateGroup}>
-                    发起群聊
+                    {t(msg`发起群聊`)}
                   </Button>
                 }
               />
@@ -158,7 +161,7 @@ export function DesktopContactsGroupsPane({
                           </div>
                         </div>
                         <div className="mt-1 truncate text-xs text-[color:var(--text-muted)]">
-                          {getGroupDescription(group)}
+                          {getGroupDescription(group, t)}
                         </div>
                       </div>
                     </button>
@@ -181,7 +184,7 @@ export function DesktopContactsGroupsPane({
                     {selectedGroup.name}
                   </div>
                   <div className="mt-1 text-sm text-[color:var(--text-muted)]">
-                    最近活跃
+                    {t(msg`最近活跃`)}
                     {formatConversationTimestamp(
                       selectedGroup.savedToContactsAt ??
                         selectedGroup.lastActivityAt,
@@ -191,7 +194,7 @@ export function DesktopContactsGroupsPane({
               </div>
 
               <div className="mt-6 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-5 py-4 text-sm leading-6 text-[color:var(--text-muted)]">
-                {getGroupDescription(selectedGroup)}
+                {getGroupDescription(selectedGroup, t)}
               </div>
 
               <div className="mt-6 flex gap-3">
@@ -200,7 +203,7 @@ export function DesktopContactsGroupsPane({
                   className="flex-1 rounded-[10px] bg-[color:var(--brand-primary)] text-white hover:opacity-95"
                   onClick={() => onOpenGroup(selectedGroup.id)}
                 >
-                  进入群聊
+                  {t(msg`进入群聊`)}
                 </Button>
                 <Button
                   type="button"
@@ -208,15 +211,15 @@ export function DesktopContactsGroupsPane({
                   className="flex-1 rounded-[10px] border-[color:var(--border-faint)] bg-white shadow-none hover:bg-[color:var(--surface-console)]"
                   onClick={() => onOpenGroupDetails(selectedGroup.id)}
                 >
-                  群聊信息
+                  {t(msg`群聊信息`)}
                 </Button>
               </div>
             </div>
           ) : (
             <div className="max-w-sm">
               <EmptyState
-                title="选择一个群聊"
-                description="左侧展示的是当前世界里的群聊，选中后可以直接进入会话或查看群信息。"
+                title={t(msg`选择一个群聊`)}
+                description={t(msg`左侧展示的是当前世界里的群聊，选中后可以直接进入会话或查看群信息。`)}
               />
             </div>
           )}
@@ -226,12 +229,19 @@ export function DesktopContactsGroupsPane({
   );
 }
 
-function getGroupDescription(group: Group) {
+function getGroupDescription(
+  group: Group,
+  t: (descriptor: import("@lingui/core").MessageDescriptor) => string,
+) {
   const announcement = group.announcement?.trim();
   if (announcement) {
     return announcement;
   }
 
-  const statusLabel = group.savedToContacts ? "已保存到通讯录" : "未保存到通讯录";
-  return group.isMuted ? `${statusLabel} · 已开启消息免打扰` : statusLabel;
+  const statusLabel = group.savedToContacts
+    ? t(msg`已保存到通讯录`)
+    : t(msg`未保存到通讯录`);
+  return group.isMuted
+    ? t(msg`${statusLabel} · 已开启消息免打扰`)
+    : statusLabel;
 }

@@ -1,3 +1,5 @@
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock, InlineNotice } from "@yinjie/ui";
 import { ArrowUp, PenSquare, RefreshCcw } from "lucide-react";
 
@@ -22,41 +24,42 @@ export function DesktopFeedToolbar({
   onOpenCompose,
   onRefresh,
 }: DesktopFeedToolbarProps) {
+  const t = useRuntimeTranslator();
   return (
     <div className="border-b border-[color:var(--border-faint)] bg-white/74 px-6 py-4 backdrop-blur-xl">
       <div className="mx-auto w-full max-w-[720px]">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="min-w-0">
             <div className="text-[11px] font-medium text-[color:var(--text-muted)]">
-              广场动态
+              {t(msg`广场动态`)}
             </div>
             <div className="mt-1 text-[18px] font-semibold text-[color:var(--text-primary)]">
-              世界公开流
+              {t(msg`世界公开流`)}
             </div>
             <div className="mt-1 text-[12px] leading-6 text-[color:var(--text-muted)]">
-              这里不只看朋友，世界主人和居民的公开发言都会进入这条流。
+              {t(msg`这里不只看朋友，世界主人和居民的公开发言都会进入这条流。`)}
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <Button variant="secondary" size="sm" onClick={onRefresh}>
               <RefreshCcw size={14} />
-              刷新
+              {t(msg`刷新`)}
             </Button>
             <Button variant="secondary" size="sm" onClick={onBackToTop}>
               <ArrowUp size={14} />
-              回到顶部
+              {t(msg`回到顶部`)}
             </Button>
             <Button variant="primary" size="sm" onClick={onOpenCompose}>
               <PenSquare size={14} />
-              发动态
+              {t(msg`发动态`)}
             </Button>
           </div>
         </div>
 
         <div className="mt-4 flex items-center justify-end">
           <div className="text-[12px] text-[color:var(--text-muted)]">
-            当前共 {totalCount} 条动态
+            {t(msg`当前共 ${totalCount} 条动态`)}
           </div>
         </div>
 

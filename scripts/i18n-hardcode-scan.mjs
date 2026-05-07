@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 const DEFAULT_SCOPES = [
+  "apps/app/src/features/desktop",
   "apps/app/src",
   "apps/admin/src",
   "apps/cloud-console/src",
