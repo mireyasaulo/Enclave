@@ -3,8 +3,10 @@ import {
   buyCar,
   catchUpOffline,
   cloneState,
+  collectAllOwnSlots,
   collectFromOwnSlot,
   createInitialState,
+  fineAllNpcsOnPlayerLot,
   fineNpcOnPlayerSlot,
   kickNpcOffPlayerSlot,
   parkOwnedCarHome,
@@ -22,7 +24,9 @@ import type { CarTier, ParkingWarState } from "./parking-war-types";
 type Action =
   | { type: "tick"; nowMs: number }
   | { type: "collect"; slotIndex: number; nowMs: number }
+  | { type: "collect-all"; nowMs: number }
   | { type: "fine"; slotIndex: number; nowMs: number }
+  | { type: "fine-all"; nowMs: number }
   | { type: "kick"; slotIndex: number; nowMs: number }
   | {
       type: "park-in-npc";
@@ -48,8 +52,14 @@ function reducer(state: ParkingWarState, action: Action): ParkingWarState {
     case "collect":
       collectFromOwnSlot(next, action.slotIndex, action.nowMs);
       break;
+    case "collect-all":
+      collectAllOwnSlots(next, action.nowMs);
+      break;
     case "fine":
       fineNpcOnPlayerSlot(next, action.slotIndex, action.nowMs);
+      break;
+    case "fine-all":
+      fineAllNpcsOnPlayerLot(next, action.nowMs);
       break;
     case "kick":
       kickNpcOffPlayerSlot(next, action.slotIndex, action.nowMs);
@@ -81,6 +91,7 @@ function init(): ParkingWarState {
   const stored = loadParkingWarState();
   if (!stored) {
     const fresh = createInitialState(now);
+    catchUpOffline(fresh, now);
     return fresh;
   }
   const next = cloneState(stored);
@@ -91,7 +102,6 @@ function init(): ParkingWarState {
 export function useParkingWarState() {
   const [state, dispatch] = useReducer(reducer, undefined, init);
 
-  // Throttled persist.
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (persistTimerRef.current) clearTimeout(persistTimerRef.current);
@@ -101,7 +111,6 @@ export function useParkingWarState() {
     };
   }, [state]);
 
-  // Persist on unmount.
   useEffect(() => {
     return () => {
       saveParkingWarState(state);
@@ -109,7 +118,6 @@ export function useParkingWarState() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 1s tick while game is mounted.
   useEffect(() => {
     const id = window.setInterval(() => {
       dispatch({ type: "tick", nowMs: Date.now() });
@@ -117,7 +125,6 @@ export function useParkingWarState() {
     return () => window.clearInterval(id);
   }, []);
 
-  // Catch up again when tab returns to focus.
   useEffect(() => {
     function onVisible() {
       if (document.visibilityState === "visible") {
@@ -133,8 +140,16 @@ export function useParkingWarState() {
       dispatch({ type: "collect", slotIndex, nowMs: Date.now() }),
     [],
   );
+  const collectAll = useCallback(
+    () => dispatch({ type: "collect-all", nowMs: Date.now() }),
+    [],
+  );
   const fine = useCallback(
     (slotIndex: number) => dispatch({ type: "fine", slotIndex, nowMs: Date.now() }),
+    [],
+  );
+  const fineAll = useCallback(
+    () => dispatch({ type: "fine-all", nowMs: Date.now() }),
     [],
   );
   const kick = useCallback(
@@ -166,6 +181,17 @@ export function useParkingWarState() {
 
   return {
     state,
-    actions: { collect, fine, kick, parkInNpc, recall, parkHome, buy, reset },
+    actions: {
+      collect,
+      collectAll,
+      fine,
+      fineAll,
+      kick,
+      parkInNpc,
+      recall,
+      parkHome,
+      buy,
+      reset,
+    },
   };
 }

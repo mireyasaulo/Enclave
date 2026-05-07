@@ -1,6 +1,15 @@
 import { useMemo, useState } from "react";
 import { Button, cn } from "@yinjie/ui";
-import { ArrowLeft, Coins, RotateCcw, Wallet, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Coins,
+  Gavel,
+  History,
+  RotateCcw,
+  Trophy,
+  Wallet,
+  X,
+} from "lucide-react";
 import {
   CAR_SPECS,
   CAR_TIER_ORDER,
@@ -8,7 +17,11 @@ import {
   PLAYER_GARAGE_LIMIT,
   getNpcById,
 } from "./parking-war-data";
-import { findPlayerCarLocation } from "./parking-war-engine";
+import {
+  buildLeaderboard,
+  findPlayerCarLocation,
+  type LeaderboardEntry,
+} from "./parking-war-engine";
 import { useParkingWarState } from "./use-parking-war-state";
 import type {
   CarTier,
@@ -17,6 +30,7 @@ import type {
   ParkedCar,
   ParkingWarState,
   Slot,
+  VisitLogEntry,
 } from "./parking-war-types";
 
 type Variant = "embedded" | "fullscreen";
@@ -26,7 +40,7 @@ type ParkingWarGameProps = {
   onExit?: () => void;
 };
 
-type Scene = "home" | "visit" | "garage";
+type Scene = "home" | "visit" | "leaderboard" | "log" | "garage";
 
 export function ParkingWarGame({
   variant = "fullscreen",
@@ -52,6 +66,18 @@ export function ParkingWarGame({
   }, [state]);
 
   const recentEvents = state.events.slice(-3).reverse();
+  const leaderboard = useMemo(() => buildLeaderboard(state), [state]);
+
+  const homeStats = useMemo(() => {
+    let mine = 0;
+    let theirs = 0;
+    for (const slot of state.playerLot.slots) {
+      if (!slot.parked) continue;
+      if (slot.parked.source.kind === "player") mine += slot.parked.pendingEarnings;
+      else theirs += slot.parked.pendingEarnings;
+    }
+    return { mine, theirs };
+  }, [state.playerLot]);
 
   return (
     <section
@@ -59,7 +85,7 @@ export function ParkingWarGame({
         "relative flex flex-col bg-[linear-gradient(180deg,rgba(255,247,238,0.96),rgba(255,255,255,0.98))] text-[color:var(--text-primary)]",
         variant === "fullscreen"
           ? "fixed inset-0 z-50"
-          : "h-full min-h-[520px] rounded-[24px] border border-[rgba(214,94,47,0.14)] shadow-[var(--shadow-card)]",
+          : "h-full min-h-[560px] rounded-[24px] border border-[rgba(214,94,47,0.14)] shadow-[var(--shadow-card)]",
       )}
     >
       <header
@@ -70,7 +96,7 @@ export function ParkingWarGame({
             : "border-b border-[rgba(214,94,47,0.10)]",
         )}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           {onExit ? (
             <Button
               variant="ghost"
@@ -85,9 +111,9 @@ export function ParkingWarGame({
               )}
             </Button>
           ) : null}
-          <div>
+          <div className="min-w-0">
             <div className="text-[15px] font-semibold">抢车位</div>
-            <div className="text-[11px] text-[color:var(--text-tertiary)]">
+            <div className="truncate text-[11px] text-[color:var(--text-tertiary)]">
               和世界里的人抢一个能停的位
             </div>
           </div>
@@ -97,18 +123,44 @@ export function ParkingWarGame({
         </div>
       </header>
 
-      <nav className="flex gap-1 border-b border-[rgba(214,94,47,0.08)] bg-[rgba(255,250,244,0.6)] px-3 py-2 text-[13px]">
-        <SceneTab label="我的车场" active={scene === "home"} onClick={() => setScene("home")} />
-        <SceneTab label="去蹭车位" active={scene === "visit"} onClick={() => setScene("visit")} />
-        <SceneTab label="车库" active={scene === "garage"} onClick={() => setScene("garage")} />
+      <nav className="flex gap-1 overflow-x-auto border-b border-[rgba(214,94,47,0.08)] bg-[rgba(255,250,244,0.6)] px-3 py-2 text-[13px]">
+        <SceneTab
+          label="我的车场"
+          active={scene === "home"}
+          onClick={() => setScene("home")}
+        />
+        <SceneTab
+          label="去蹭车位"
+          active={scene === "visit"}
+          onClick={() => setScene("visit")}
+        />
+        <SceneTab
+          label="排行榜"
+          active={scene === "leaderboard"}
+          onClick={() => setScene("leaderboard")}
+        />
+        <SceneTab
+          label="足迹"
+          active={scene === "log"}
+          onClick={() => setScene("log")}
+        />
+        <SceneTab
+          label="车库"
+          active={scene === "garage"}
+          onClick={() => setScene("garage")}
+        />
       </nav>
 
       <div className="flex-1 overflow-y-auto px-4 py-3">
         {scene === "home" ? (
           <HomeLotPanel
             state={state}
+            mine={homeStats.mine}
+            theirs={homeStats.theirs}
             onCollect={actions.collect}
+            onCollectAll={actions.collectAll}
             onFine={actions.fine}
+            onFineAll={actions.fineAll}
             onKick={actions.kick}
             onParkHome={actions.parkHome}
             idleCarIds={idleCarIds}
@@ -132,6 +184,10 @@ export function ParkingWarGame({
               actions.recall(activeNpcId, slotIndex);
             }}
           />
+        ) : scene === "leaderboard" ? (
+          <LeaderboardPanel rows={leaderboard} />
+        ) : scene === "log" ? (
+          <VisitLogPanel entries={state.visitLog} />
         ) : (
           <GaragePanel
             state={state}
@@ -176,7 +232,7 @@ function SceneTab({
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded-full px-3 py-1.5 transition-colors",
+        "shrink-0 rounded-full px-3 py-1.5 transition-colors",
         active
           ? "bg-[#d65e2f] text-white shadow-[0_2px_6px_rgba(214,94,47,0.25)]"
           : "text-[color:var(--text-secondary)] hover:bg-[rgba(214,94,47,0.08)]",
@@ -189,25 +245,43 @@ function SceneTab({
 
 function HomeLotPanel({
   state,
+  mine,
+  theirs,
   onCollect,
+  onCollectAll,
   onFine,
+  onFineAll,
   onKick,
   onParkHome,
   idleCarIds,
 }: {
   state: ParkingWarState;
+  mine: number;
+  theirs: number;
   onCollect: (slotIndex: number) => void;
+  onCollectAll: () => void;
   onFine: (slotIndex: number) => void;
+  onFineAll: () => void;
   onKick: (slotIndex: number) => void;
   onParkHome: (carId: string) => void;
   idleCarIds: string[];
 }) {
   return (
     <div className="space-y-3">
-      <div className="text-[12px] text-[color:var(--text-tertiary)]">
-        共 {state.playerLot.slots.length} 个车位 · 自家车每分钟收钱、外人车要么贴条要么赶走
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-[rgba(214,94,47,0.14)] bg-white px-3 py-2">
+        <div className="flex-1 text-[12px] text-[color:var(--text-secondary)]">
+          自家车待收 <span className="font-semibold text-[#15803d]">¥{mine.toFixed(2)}</span>
+          ，外来车囤了 <span className="font-semibold text-[#b45309]">¥{theirs.toFixed(2)}</span>
+        </div>
+        <Button size="sm" variant="primary" onClick={onCollectAll} disabled={mine <= 0}>
+          <Coins size={14} /> 全部收钱
+        </Button>
+        <Button size="sm" variant="secondary" onClick={onFineAll} disabled={theirs <= 0}>
+          <Gavel size={14} /> 全部贴条
+        </Button>
       </div>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {state.playerLot.slots.map((slot) => (
           <PlayerSlotCard
             key={slot.index}
@@ -218,6 +292,7 @@ function HomeLotPanel({
           />
         ))}
       </div>
+
       {idleCarIds.length > 0 ? (
         <div className="rounded-2xl border border-[rgba(214,94,47,0.14)] bg-white px-3 py-2.5">
           <div className="text-[12px] font-medium text-[color:var(--text-secondary)]">
@@ -269,7 +344,13 @@ function PlayerSlotCard({
       parked={slot.parked}
       footer={
         slot.parked.source.kind === "player" ? (
-          <Button size="sm" variant="primary" className="w-full" onClick={onCollect}>
+          <Button
+            size="sm"
+            variant="primary"
+            className="w-full"
+            onClick={onCollect}
+            disabled={slot.parked.pendingEarnings <= 0}
+          >
             <Coins size={14} /> 收钱
           </Button>
         ) : (
@@ -384,11 +465,14 @@ function VisitPanel({
         <div className="space-y-3">
           <div className="rounded-2xl border border-[rgba(214,94,47,0.12)] bg-white px-3 py-2.5">
             <div className="text-[13px] font-semibold">{activeNpc.name} 的车场</div>
-            <div className="text-[11px] text-[color:var(--text-tertiary)]">
-              {activeNpc.blurb}
+            <div className="mt-0.5 text-[12px] italic text-[color:var(--text-secondary)]">
+              "{activeNpc.welcomeQuote}"
+            </div>
+            <div className="mt-1 text-[11px] text-[color:var(--text-tertiary)]">
+              {activeNpc.blurb} · 每分钟可收 ¥{activeNpc.carRatePerMinute} · 贴条概率 {(activeNpc.fineRiskPerMinute * 100).toFixed(0)}%/分钟
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {activeNpcLot.slots.map((slot) => (
               <NpcSlotCard
                 key={slot.index}
@@ -469,6 +553,106 @@ function NpcSlotCard({
   );
 }
 
+function LeaderboardPanel({ rows }: { rows: LeaderboardEntry[] }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-[13px] font-medium text-[color:var(--text-secondary)]">
+        <Trophy size={15} className="text-[#d65e2f]" /> 财富榜（含 NPC 自家车场被动收益）
+      </div>
+      <div className="space-y-1.5">
+        {rows.map((row) => {
+          const tone =
+            row.rank === 1
+              ? "border-[rgba(214,94,47,0.30)] bg-[rgba(255,244,236,0.96)]"
+              : row.rank === 2
+                ? "border-[rgba(180,83,9,0.18)] bg-[rgba(255,250,240,0.96)]"
+                : row.rank === 3
+                  ? "border-[rgba(180,83,9,0.14)] bg-white"
+                  : "border-[rgba(214,94,47,0.10)] bg-white";
+          return (
+            <div
+              key={`${row.rank}-${row.name}`}
+              className={cn(
+                "flex items-center gap-3 rounded-2xl border px-3 py-2.5",
+                tone,
+                row.isPlayer && "ring-1 ring-[#d65e2f]",
+              )}
+            >
+              <div
+                className={cn(
+                  "w-7 shrink-0 text-center text-[15px] font-semibold",
+                  row.rank === 1
+                    ? "text-[#d65e2f]"
+                    : row.rank === 2
+                      ? "text-[#b45309]"
+                      : "text-[color:var(--text-tertiary)]",
+                )}
+              >
+                {row.rank === 1 ? "🥇" : row.rank === 2 ? "🥈" : row.rank === 3 ? "🥉" : `#${row.rank}`}
+              </div>
+              <div className="flex-1 text-[14px] font-medium">
+                {row.name}
+                {row.isPlayer ? (
+                  <span className="ml-2 rounded-full bg-[#d65e2f] px-1.5 py-0.5 text-[10px] font-medium text-white">
+                    你
+                  </span>
+                ) : null}
+              </div>
+              <div className="font-semibold text-[#15803d]">
+                ¥{row.balance.toFixed(2)}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function VisitLogPanel({ entries }: { entries: VisitLogEntry[] }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-[13px] font-medium text-[color:var(--text-secondary)]">
+        <History size={15} className="text-[#d65e2f]" /> 最近 {entries.length} 条停车场动态
+      </div>
+      {entries.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-[rgba(214,94,47,0.20)] bg-white px-3 py-6 text-center text-[12px] text-[color:var(--text-tertiary)]">
+          还没有动静，先停一辆车试试。
+        </div>
+      ) : (
+        <div className="space-y-1.5">
+          {entries.map((entry) => (
+            <div
+              key={entry.id}
+              className="rounded-xl border border-[rgba(214,94,47,0.10)] bg-white px-3 py-2 text-[12px]"
+            >
+              <div className="text-[color:var(--text-primary)]">{entry.text}</div>
+              <div className="mt-0.5 flex items-center justify-between text-[11px] text-[color:var(--text-tertiary)]">
+                <span>{formatRelative(entry.atMs)}</span>
+                {typeof entry.amount === "number" && entry.amount > 0 ? (
+                  <span className="font-medium text-[#b45309]">
+                    ¥{entry.amount.toFixed(2)}
+                  </span>
+                ) : null}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function formatRelative(ms: number): string {
+  const diff = Date.now() - ms;
+  if (diff < 0) return "刚刚";
+  if (diff < 60_000) return "刚刚";
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)} 分钟前`;
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)} 小时前`;
+  const d = new Date(ms);
+  return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
 function GaragePanel({
   state,
   onBuy,
@@ -522,12 +706,12 @@ function GaragePanel({
         {CAR_TIER_ORDER.map((tier, idx) => {
           const spec = CAR_SPECS[tier];
           const owned = state.ownedCars.some((car) => car.tier === tier);
+          if (tier === "starter") return null;
           const cantUpgrade =
             idx <= ownedTopTierIdx ||
             owned ||
             state.balance < spec.unlockCost ||
             state.ownedCars.length >= PLAYER_GARAGE_LIMIT;
-          if (tier === "starter") return null;
           return (
             <div
               key={tier}

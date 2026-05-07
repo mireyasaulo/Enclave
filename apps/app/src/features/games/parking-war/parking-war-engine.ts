@@ -1,6 +1,7 @@
 import {
   CAR_SPECS,
   CAR_TIER_ORDER,
+  DAILY_BONUS_AMOUNT,
   NPC_LOT_SIZE,
   NPC_OPPONENTS,
   OFFLINE_CATCHUP_CAP_MS,
@@ -9,6 +10,7 @@ import {
   PLAYER_LOT_ID,
   PLAYER_LOT_SIZE,
   STARTING_BALANCE,
+  VISIT_LOG_LIMIT,
   getNpcById,
 } from "./parking-war-data";
 import type {
@@ -19,13 +21,15 @@ import type {
   ParkingWarEvent,
   ParkingWarState,
   Slot,
+  VisitLogEntry,
+  VisitLogKind,
 } from "./parking-war-types";
 
-let eventCounter = 0;
+let counter = 0;
 
-function nextEventId(nowMs: number) {
-  eventCounter += 1;
-  return `pw-${nowMs.toString(36)}-${eventCounter.toString(36)}`;
+function nextId(prefix: string, nowMs: number) {
+  counter += 1;
+  return `${prefix}-${nowMs.toString(36)}-${counter.toString(36)}`;
 }
 
 function rng(seed: number) {
@@ -69,14 +73,51 @@ function cloneNpcLots(lots: Record<string, Lot>): Record<string, Lot> {
 
 export function cloneState(state: ParkingWarState): ParkingWarState {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     balance: state.balance,
     ownedCars: state.ownedCars.map((car) => ({ ...car })),
     playerLot: clonePlayerLot(state.playerLot),
     npcLots: cloneNpcLots(state.npcLots),
+    npcBalances: { ...state.npcBalances },
     lastTickAtMs: state.lastTickAtMs,
+    lastDailyBonusDateKey: state.lastDailyBonusDateKey,
     events: state.events.map((event) => ({ ...event })),
+    visitLog: state.visitLog.map((entry) => ({ ...entry })),
   };
+}
+
+function dateKey(nowMs: number) {
+  const d = new Date(nowMs);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function pushEvent(state: ParkingWarState, event: Omit<ParkingWarEvent, "id">) {
+  state.events = [
+    ...state.events,
+    { ...event, id: nextId("ev", event.atMs) },
+  ].slice(-12);
+}
+
+function pushVisitLog(
+  state: ParkingWarState,
+  entry: Omit<VisitLogEntry, "id">,
+) {
+  state.visitLog = [
+    { ...entry, id: nextId("vl", entry.atMs) },
+    ...state.visitLog,
+  ].slice(0, VISIT_LOG_LIMIT);
+}
+
+function logBoth(
+  state: ParkingWarState,
+  atMs: number,
+  text: string,
+  tone: ParkingWarEvent["tone"],
+  kind: VisitLogKind,
+  amount?: number,
+) {
+  pushEvent(state, { atMs, text, tone });
+  pushVisitLog(state, { atMs, text, kind, amount });
 }
 
 export function createInitialState(nowMs: number): ParkingWarState {
@@ -92,36 +133,40 @@ export function createInitialState(nowMs: number): ParkingWarState {
   };
 
   const npcLots: Record<string, Lot> = {};
+  const npcBalances: Record<string, number> = {};
   for (const npc of NPC_OPPONENTS) {
     npcLots[npc.id] = makeNpcLot(npc.id);
+    npcBalances[npc.id] = npc.startingBalance;
+    // NPC 自己车场默认放一辆自己的车（占位 + 自动赚钱）。
+    npcLots[npc.id]!.slots[0]!.parked = {
+      source: { kind: "npc", npcId: npc.id },
+      parkedAtMs: nowMs,
+      pendingEarnings: 0,
+    };
   }
 
   const ownedCars: OwnedCar[] = [{ carId: "car-starter-1", tier: "starter" }];
 
-  return {
-    schemaVersion: 1,
+  const state: ParkingWarState = {
+    schemaVersion: 2,
     balance: STARTING_BALANCE,
     ownedCars,
     playerLot,
     npcLots,
+    npcBalances,
     lastTickAtMs: nowMs,
-    events: [
-      {
-        id: nextEventId(nowMs),
-        atMs: nowMs,
-        text: "停车场开张了，和世界里的熟人抢一抢。",
-        tone: "info",
-      },
-    ],
+    lastDailyBonusDateKey: "",
+    events: [],
+    visitLog: [],
   };
-}
-
-function ratePerMinuteFor(parked: ParkedCar): number {
-  if (parked.source.kind === "player") {
-    return CAR_SPECS.starter.ratePerMinute;
-  }
-  const npc = getNpcById(parked.source.npcId);
-  return npc?.carRatePerMinute ?? 1;
+  logBoth(
+    state,
+    nowMs,
+    "停车场开张，去看看世界里的人都在抢什么。",
+    "info",
+    "system",
+  );
+  return state;
 }
 
 function ratePerMinuteForPlayerCar(state: ParkingWarState, carId: string) {
@@ -129,11 +174,17 @@ function ratePerMinuteForPlayerCar(state: ParkingWarState, carId: string) {
   return car ? CAR_SPECS[car.tier].ratePerMinute : CAR_SPECS.starter.ratePerMinute;
 }
 
+function ratePerMinuteForNpc(parked: ParkedCar) {
+  if (parked.source.kind !== "npc") return 1;
+  const npc = getNpcById(parked.source.npcId);
+  return npc?.carRatePerMinute ?? 1;
+}
+
 function isPlayerCarParkedAnywhere(state: ParkingWarState, carId: string) {
-  const inOwn = state.playerLot.slots.some(
+  const own = state.playerLot.slots.some(
     (slot) => slot.parked?.source.kind === "player" && slot.parked.source.carId === carId,
   );
-  if (inOwn) return true;
+  if (own) return true;
   return Object.values(state.npcLots).some((lot) =>
     lot.slots.some(
       (slot) => slot.parked?.source.kind === "player" && slot.parked.source.carId === carId,
@@ -141,17 +192,13 @@ function isPlayerCarParkedAnywhere(state: ParkingWarState, carId: string) {
   );
 }
 
-function accumulateOnSlot(
-  state: ParkingWarState,
-  slot: Slot,
-  elapsedMs: number,
-) {
+function accumulateOnSlot(state: ParkingWarState, slot: Slot, elapsedMs: number) {
   if (!slot.parked) return;
   const minutes = elapsedMs / 60_000;
   const rate =
     slot.parked.source.kind === "player"
       ? ratePerMinuteForPlayerCar(state, slot.parked.source.carId)
-      : ratePerMinuteFor(slot.parked);
+      : ratePerMinuteForNpc(slot.parked);
   slot.parked.pendingEarnings = round2(slot.parked.pendingEarnings + rate * minutes);
 }
 
@@ -159,87 +206,112 @@ function round2(value: number) {
   return Math.round(value * 100) / 100;
 }
 
-function pushEvent(
-  state: ParkingWarState,
-  event: Omit<ParkingWarEvent, "id">,
-) {
-  state.events = [
-    ...state.events,
-    { ...event, id: nextEventId(event.atMs) },
-  ].slice(-12);
-}
-
 function findEmptySlot(lot: Lot) {
   return lot.slots.find((slot) => !slot.parked) ?? null;
 }
 
-/**
- * Catch up on offline elapsed time: accumulate earnings on every parked slot,
- * roll dice for NPCs to park in player's empty slots, and roll dice for NPC
- * owners to fine the player's cars parked on their lots.
- */
+function applyDailyBonusIfNeeded(state: ParkingWarState, nowMs: number) {
+  const today = dateKey(nowMs);
+  if (state.lastDailyBonusDateKey === today) return;
+  // First-ever load also grants the bonus once (lastDailyBonusDateKey === "").
+  state.balance = round2(state.balance + DAILY_BONUS_AMOUNT);
+  state.lastDailyBonusDateKey = today;
+  logBoth(
+    state,
+    nowMs,
+    `每日开张奖励 ¥${DAILY_BONUS_AMOUNT}，到账。`,
+    "success",
+    "daily_bonus",
+    DAILY_BONUS_AMOUNT,
+  );
+}
+
+/** 把 NPC 自己车场内"NPC 车"的累积收益结算进 NPC 钱包；玩家被贴条时也走这里。 */
+function settleNpcOwnSlots(state: ParkingWarState) {
+  for (const [npcId, lot] of Object.entries(state.npcLots)) {
+    let gained = 0;
+    for (const slot of lot.slots) {
+      if (slot.parked && slot.parked.source.kind === "npc" && slot.parked.source.npcId === npcId) {
+        gained += slot.parked.pendingEarnings;
+        slot.parked.pendingEarnings = 0;
+        slot.parked.parkedAtMs = state.lastTickAtMs;
+      }
+    }
+    if (gained > 0) {
+      state.npcBalances[npcId] = round2((state.npcBalances[npcId] ?? 0) + gained);
+    }
+  }
+}
+
 export function catchUpOffline(state: ParkingWarState, nowMs: number) {
   const elapsedMs = Math.min(
     Math.max(0, nowMs - state.lastTickAtMs),
     OFFLINE_CATCHUP_CAP_MS,
   );
-  if (elapsedMs <= 0) {
-    state.lastTickAtMs = nowMs;
-    return;
-  }
 
-  // 1) Earnings on every parked slot.
-  for (const slot of state.playerLot.slots) accumulateOnSlot(state, slot, elapsedMs);
-  for (const lot of Object.values(state.npcLots)) {
-    for (const slot of lot.slots) accumulateOnSlot(state, slot, elapsedMs);
-  }
-
-  const random = rng(nowMs);
-
-  // 2) NPCs park into player empties (1 chance per NPC, weighted by elapsed time).
-  const elapsedMinutes = elapsedMs / 60_000;
-  for (const npc of NPC_OPPONENTS) {
-    const empty = findEmptySlot(state.playerLot);
-    if (!empty) break;
-    const probability = Math.min(0.85, elapsedMinutes * 0.18);
-    if (random() < probability) {
-      const parkedAt = nowMs - random() * elapsedMs * 0.7;
-      const minutesParked = (nowMs - parkedAt) / 60_000;
-      empty.parked = {
-        source: { kind: "npc", npcId: npc.id },
-        parkedAtMs: parkedAt,
-        pendingEarnings: round2(npc.carRatePerMinute * minutesParked),
-      };
-      pushEvent(state, {
-        atMs: parkedAt,
-        text: `${npc.name} 趁你不在停了一下。`,
-        tone: "warn",
-      });
+  if (elapsedMs > 0) {
+    for (const slot of state.playerLot.slots) accumulateOnSlot(state, slot, elapsedMs);
+    for (const lot of Object.values(state.npcLots)) {
+      for (const slot of lot.slots) accumulateOnSlot(state, slot, elapsedMs);
     }
-  }
 
-  // 3) NPC owners fine player cars parked in their lots.
-  for (const [npcId, lot] of Object.entries(state.npcLots)) {
-    const npc = getNpcById(npcId);
-    if (!npc) continue;
-    for (const slot of lot.slots) {
-      if (!slot.parked || slot.parked.source.kind !== "player") continue;
-      const fineProbability = 1 - Math.pow(1 - npc.fineRiskPerMinute, elapsedMinutes);
-      if (random() < fineProbability) {
-        pushEvent(state, {
-          atMs: nowMs,
-          text: `${npc.name} 给你贴了张条，¥${slot.parked.pendingEarnings.toFixed(2)} 没了。`,
-          tone: "warn",
-        });
-        slot.parked = null;
+    const random = rng(nowMs);
+    const minutes = elapsedMs / 60_000;
+
+    // NPC 离线期间过来停车（按各自的 aggressiveness 决定概率）
+    for (const npc of NPC_OPPONENTS) {
+      const empty = findEmptySlot(state.playerLot);
+      if (!empty) break;
+      const probability = Math.min(0.92, minutes * npc.parkAggressiveness);
+      if (random() < probability) {
+        const parkedAt = nowMs - random() * elapsedMs * 0.7;
+        const minutesParked = Math.max(0, (nowMs - parkedAt) / 60_000);
+        empty.parked = {
+          source: { kind: "npc", npcId: npc.id },
+          parkedAtMs: parkedAt,
+          pendingEarnings: round2(npc.carRatePerMinute * minutesParked),
+        };
+        logBoth(
+          state,
+          parkedAt,
+          `${npc.name} 趁你不在停了一下：${npc.welcomeQuote}`,
+          "warn",
+          "npc_parked_player",
+        );
       }
     }
+
+    // NPC 离线期间贴你停在他那的车
+    for (const [npcId, lot] of Object.entries(state.npcLots)) {
+      const npc = getNpcById(npcId);
+      if (!npc) continue;
+      for (const slot of lot.slots) {
+        if (!slot.parked || slot.parked.source.kind !== "player") continue;
+        const fineProb = 1 - Math.pow(1 - npc.fineRiskPerMinute, minutes);
+        if (random() < fineProb) {
+          const stolen = slot.parked.pendingEarnings;
+          state.npcBalances[npcId] = round2((state.npcBalances[npcId] ?? 0) + stolen);
+          logBoth(
+            state,
+            nowMs,
+            `${npc.name} 给你贴了张条，¥${stolen.toFixed(2)} 进了对方口袋。`,
+            "warn",
+            "npc_fined_player",
+            stolen,
+          );
+          slot.parked = null;
+        }
+      }
+    }
+
+    // 结算 NPC 自家车场的车的收益到 NPC 钱包（让排行榜活起来）
+    settleNpcOwnSlots(state);
   }
 
   state.lastTickAtMs = nowMs;
+  applyDailyBonusIfNeeded(state, nowMs);
 }
 
-/** Per-second tick while game is open. */
 export function tickOnline(state: ParkingWarState, nowMs: number) {
   const elapsedMs = Math.max(0, nowMs - state.lastTickAtMs);
   if (elapsedMs === 0) return;
@@ -250,54 +322,54 @@ export function tickOnline(state: ParkingWarState, nowMs: number) {
   }
 
   const random = rng(nowMs);
-  const elapsedMinutes = elapsedMs / 60_000;
+  const minutes = elapsedMs / 60_000;
 
-  // Rare chance NPC parks while playing (~1 NPC per 60s on average).
-  const npcParkProb = elapsedMinutes * 0.4;
-  if (random() < npcParkProb) {
+  // 在线期：偶尔有 NPC 来玩家车场停车
+  for (const npc of NPC_OPPONENTS) {
     const empty = findEmptySlot(state.playerLot);
-    if (empty) {
-      const candidates = NPC_OPPONENTS.filter((npc) => {
-        const lot = state.npcLots[npc.id];
-        if (!lot) return true;
-        return !lot.slots.some(
-          (slot) =>
-            slot.parked?.source.kind === "npc" && slot.parked.source.npcId === npc.id,
-        );
-      });
-      const pool = candidates.length > 0 ? candidates : NPC_OPPONENTS;
-      const npc = pool[Math.floor(random() * pool.length)]!;
+    if (!empty) break;
+    const prob = minutes * npc.parkAggressiveness * 0.5; // 在线期降一半，避免太密
+    if (random() < prob) {
       empty.parked = {
         source: { kind: "npc", npcId: npc.id },
         parkedAtMs: nowMs,
         pendingEarnings: 0,
       };
-      pushEvent(state, {
-        atMs: nowMs,
-        text: `${npc.name} 把车停到你这了。`,
-        tone: "warn",
-      });
+      logBoth(
+        state,
+        nowMs,
+        `${npc.name} 把车停到你这了：${npc.welcomeQuote}`,
+        "warn",
+        "npc_parked_player",
+      );
+      break; // 一次最多一个 NPC 停过来
     }
   }
 
-  // Player cars parked in NPC lots: per-NPC fine risk per minute.
+  // 玩家停在 NPC 车场的车，按 NPC 性格 + 全局基线决定贴条概率
   for (const [npcId, lot] of Object.entries(state.npcLots)) {
     const npc = getNpcById(npcId);
     if (!npc) continue;
     for (const slot of lot.slots) {
       if (!slot.parked || slot.parked.source.kind !== "player") continue;
-      const risk = (npc.fineRiskPerMinute + PLAYER_FINE_RISK_PER_MINUTE) * elapsedMinutes;
+      const risk = (npc.fineRiskPerMinute + PLAYER_FINE_RISK_PER_MINUTE) * minutes;
       if (random() < risk) {
-        pushEvent(state, {
-          atMs: nowMs,
-          text: `${npc.name} 把你停在他车场的车贴条了，¥${slot.parked.pendingEarnings.toFixed(2)} 没了。`,
-          tone: "warn",
-        });
+        const stolen = slot.parked.pendingEarnings;
+        state.npcBalances[npcId] = round2((state.npcBalances[npcId] ?? 0) + stolen);
+        logBoth(
+          state,
+          nowMs,
+          `${npc.name} 把你停他车场的车贴条了，¥${stolen.toFixed(2)} 没了。`,
+          "warn",
+          "npc_fined_player",
+          stolen,
+        );
         slot.parked = null;
       }
     }
   }
 
+  settleNpcOwnSlots(state);
   state.lastTickAtMs = nowMs;
 }
 
@@ -313,11 +385,21 @@ export function collectFromOwnSlot(
   state.balance = round2(state.balance + gained);
   slot.parked.pendingEarnings = 0;
   slot.parked.parkedAtMs = nowMs;
-  pushEvent(state, {
-    atMs: nowMs,
-    text: `收车收到 ¥${gained.toFixed(2)}。`,
-    tone: "success",
-  });
+  logBoth(state, nowMs, `收车收到 ¥${gained.toFixed(2)}。`, "success", "self_collect", gained);
+}
+
+export function collectAllOwnSlots(state: ParkingWarState, nowMs: number) {
+  let total = 0;
+  for (const slot of state.playerLot.slots) {
+    if (slot.parked && slot.parked.source.kind === "player") {
+      total += slot.parked.pendingEarnings;
+      slot.parked.pendingEarnings = 0;
+      slot.parked.parkedAtMs = nowMs;
+    }
+  }
+  if (total <= 0) return;
+  state.balance = round2(state.balance + total);
+  logBoth(state, nowMs, `一键收钱：¥${total.toFixed(2)}。`, "success", "self_collect", total);
 }
 
 export function fineNpcOnPlayerSlot(
@@ -327,15 +409,47 @@ export function fineNpcOnPlayerSlot(
 ) {
   const slot = state.playerLot.slots[slotIndex];
   if (!slot?.parked || slot.parked.source.kind !== "npc") return;
-  const npc = getNpcById(slot.parked.source.npcId);
+  const npcId = slot.parked.source.npcId;
+  const npc = getNpcById(npcId);
   const gained = slot.parked.pendingEarnings;
   state.balance = round2(state.balance + gained);
-  pushEvent(state, {
-    atMs: nowMs,
-    text: `给 ${npc?.name ?? "NPC"} 贴了张条，吃下 ¥${gained.toFixed(2)}。`,
-    tone: "success",
-  });
+  state.npcBalances[npcId] = round2(
+    Math.max(0, (state.npcBalances[npcId] ?? 0) - gained * 0.6),
+  );
+  logBoth(
+    state,
+    nowMs,
+    `给 ${npc?.name ?? "NPC"} 贴了张条，吃下 ¥${gained.toFixed(2)}。`,
+    "success",
+    "player_fined_npc",
+    gained,
+  );
   slot.parked = null;
+}
+
+export function fineAllNpcsOnPlayerLot(state: ParkingWarState, nowMs: number) {
+  let total = 0;
+  for (const slot of state.playerLot.slots) {
+    if (slot.parked && slot.parked.source.kind === "npc") {
+      const npcId = slot.parked.source.npcId;
+      const gained = slot.parked.pendingEarnings;
+      total += gained;
+      state.npcBalances[npcId] = round2(
+        Math.max(0, (state.npcBalances[npcId] ?? 0) - gained * 0.6),
+      );
+      slot.parked = null;
+    }
+  }
+  if (total <= 0) return;
+  state.balance = round2(state.balance + total);
+  logBoth(
+    state,
+    nowMs,
+    `全场贴条，一共吃下 ¥${total.toFixed(2)}。`,
+    "success",
+    "player_fined_npc",
+    total,
+  );
 }
 
 export function kickNpcOffPlayerSlot(
@@ -346,11 +460,13 @@ export function kickNpcOffPlayerSlot(
   const slot = state.playerLot.slots[slotIndex];
   if (!slot?.parked || slot.parked.source.kind !== "npc") return;
   const npc = getNpcById(slot.parked.source.npcId);
-  pushEvent(state, {
-    atMs: nowMs,
-    text: `直接把 ${npc?.name ?? "NPC"} 的车赶走了。`,
-    tone: "info",
-  });
+  logBoth(
+    state,
+    nowMs,
+    `直接把 ${npc?.name ?? "NPC"} 的车赶走了。`,
+    "info",
+    "player_kicked_npc",
+  );
   slot.parked = null;
 }
 
@@ -373,11 +489,13 @@ export function parkPlayerInNpcLot(
     pendingEarnings: 0,
   };
   const npc = getNpcById(npcId);
-  pushEvent(state, {
-    atMs: nowMs,
-    text: `把车停到 ${npc?.name ?? "对方"} 的车场了，能蹭多久看运气。`,
-    tone: "info",
-  });
+  logBoth(
+    state,
+    nowMs,
+    `把车停到 ${npc?.name ?? "对方"} 的车场了，能蹭多久看运气。`,
+    "info",
+    "player_parked_npc",
+  );
 }
 
 export function recallPlayerFromNpcLot(
@@ -392,11 +510,17 @@ export function recallPlayerFromNpcLot(
   if (!slot?.parked || slot.parked.source.kind !== "player") return;
   const gained = slot.parked.pendingEarnings;
   state.balance = round2(state.balance + gained);
-  pushEvent(state, {
-    atMs: nowMs,
-    text: `把车开回来了，顺手收了 ¥${gained.toFixed(2)}。`,
-    tone: "success",
-  });
+  state.npcBalances[npcId] = round2(
+    Math.max(0, (state.npcBalances[npcId] ?? 0) - gained * 0.4),
+  );
+  logBoth(
+    state,
+    nowMs,
+    `把车开回来了，顺手收了 ¥${gained.toFixed(2)}。`,
+    "success",
+    "player_recalled_npc",
+    gained,
+  );
   slot.parked = null;
 }
 
@@ -414,11 +538,7 @@ export function parkOwnedCarHome(
     parkedAtMs: nowMs,
     pendingEarnings: 0,
   };
-  pushEvent(state, {
-    atMs: nowMs,
-    text: "把车开回了自己的车位。",
-    tone: "info",
-  });
+  logBoth(state, nowMs, "把车开回了自己的车位。", "info", "system");
 }
 
 export function buyCar(state: ParkingWarState, tier: CarTier, nowMs: number) {
@@ -434,11 +554,14 @@ export function buyCar(state: ParkingWarState, tier: CarTier, nowMs: number) {
   state.balance = round2(state.balance - spec.unlockCost);
   const carId = `car-${tier}-${state.ownedCars.length + 1}`;
   state.ownedCars.push({ carId, tier });
-  pushEvent(state, {
-    atMs: nowMs,
-    text: `提了一台 ${spec.name}，每分钟 ¥${spec.ratePerMinute}。`,
-    tone: "success",
-  });
+  logBoth(
+    state,
+    nowMs,
+    `提了一台 ${spec.name}，每分钟 ¥${spec.ratePerMinute}。`,
+    "success",
+    "buy_car",
+    spec.unlockCost,
+  );
   parkOwnedCarHome(state, carId, nowMs);
 }
 
@@ -459,4 +582,35 @@ export function findPlayerCarLocation(state: ParkingWarState, carId: string):
     }
   }
   return { kind: "garage" };
+}
+
+export type LeaderboardEntry = {
+  rank: number;
+  name: string;
+  isPlayer: boolean;
+  balance: number;
+  parkedHere?: boolean;
+};
+
+export function buildLeaderboard(state: ParkingWarState): LeaderboardEntry[] {
+  const rows = [
+    {
+      name: "我",
+      isPlayer: true as const,
+      balance: state.balance,
+    },
+    ...NPC_OPPONENTS.map((npc) => ({
+      name: npc.name,
+      isPlayer: false as const,
+      balance: state.npcBalances[npc.id] ?? 0,
+      npcId: npc.id,
+    })),
+  ];
+  rows.sort((a, b) => b.balance - a.balance);
+  return rows.map((row, index) => ({
+    rank: index + 1,
+    name: row.name,
+    isPlayer: row.isPlayer,
+    balance: row.balance,
+  }));
 }
