@@ -61,7 +61,13 @@ export function RecentChangesPage() {
         <ErrorBlock message={(listQ.error as Error).message} />
       )}
       {listQ.data && listQ.data.length === 0 && (
-        <PanelEmpty message={t(msg`暂无变更。`)} />
+        <PanelEmpty
+          message={
+            onlyUnpatrolled
+              ? t(msg`所有变更都已巡查 ✅。取消勾选可看完整列表。`)
+              : t(msg`暂无变更。`)
+          }
+        />
       )}
       {listQ.data && listQ.data.length > 0 && (
         <ul className="space-y-2">

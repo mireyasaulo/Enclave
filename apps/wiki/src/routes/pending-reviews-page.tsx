@@ -125,7 +125,13 @@ export function PendingReviewsPage() {
         <ErrorBlock message={(pendingQ.error as Error).message} />
       )}
       {!pendingQ.isLoading && items.length === 0 && (
-        <PanelEmpty message={t(msg`待审队列为空，喘口气吧 ☕。`)} />
+        <PanelEmpty
+          message={
+            operation || riskLevel || revisionKind
+              ? t(msg`没有符合筛选条件的待审项。试试清空筛选。`)
+              : t(msg`待审队列为空，喘口气吧 ☕。`)
+          }
+        />
       )}
       <ul className="space-y-3">
         {items.map((item) => (
