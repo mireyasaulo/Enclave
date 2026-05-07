@@ -227,7 +227,7 @@ export function DesktopContactProfileActionRow({
 }: {
   label: ReactNode;
   value: ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
   danger?: boolean;
   disabled?: boolean;
   valueMuted?: boolean;
