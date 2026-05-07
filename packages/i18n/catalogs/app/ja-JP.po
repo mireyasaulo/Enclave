@@ -266,6 +266,11 @@ msgstr ""
 msgid "{0} 已复制，可发到手机继续。"
 msgstr ""
 
+#. placeholder {0}: task.title
+#: apps/app/src/features/chat/reminder-task-panel.tsx:93
+msgid "{0} 已往后顺 30 分钟。"
+msgstr "{0} を30分先に延ばしました。"
+
 #. placeholder {0}: liveHistory[0]?.title ?? t(msg`最近直播`)
 #: apps/app/src/routes/desktop-mobile-page.tsx:1693
 msgid "{0} 已结束，切到手机端继续跟进频道内容。"
@@ -280,6 +285,11 @@ msgstr ""
 #: apps/app/src/routes/desktop-mobile-page.tsx:1665
 msgid "{0} 已结束，可在手机端继续做频道跟进。"
 msgstr "{0} は終了しました。モバイルでチャンネルのフォローを続けられます。"
+
+#. placeholder {0}: task.title
+#: apps/app/src/features/chat/reminder-task-panel.tsx:112
+msgid "{0} 已顺到明天。"
+msgstr "{0} を明日に延ばしました。"
 
 #. placeholder {0}: activeMiniProgram.name
 #. placeholder {0}: miniProgram.name
@@ -888,6 +898,10 @@ msgstr "1ラウンド3分"
 msgid "3. 冷却后处理 {0}"
 msgstr "3. クールダウン後に {0} を処理"
 
+#: apps/app/src/features/chat/reminder-task-panel.tsx:270
+msgid "30分后"
+msgstr "30分後"
+
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:96
 msgid "30天内"
 msgstr "過去30日"
@@ -1093,6 +1107,10 @@ msgstr "問題を一文で説明してください。例：デスクトップシ
 msgid "一条赛道一口气冲到底，适合上头和围观。"
 msgstr "1本のコースを一気に走り抜け、盛り上がりや観戦に向いています。"
 
+#: apps/app/src/features/chat/reminder-task-panel.tsx:345
+msgid "一次"
+msgstr "一度きり"
+
 #: apps/app/src/routes/group-qr-page.tsx:2617
 #: apps/app/src/routes/group-qr-page.tsx:3061
 msgid "一段时间"
@@ -1174,6 +1192,11 @@ msgstr "次の画像"
 #: apps/app/src/routes/live-companion-page.tsx:752
 msgid "下播 {0}"
 msgstr ""
+
+#. placeholder {0}: formatMessageTimestamp(String(nextTimestamp))
+#: apps/app/src/features/chat/reminder-task-panel.tsx:355
+msgid "下次提醒 {0}"
+msgstr "次のリマインド {0}"
 
 #: apps/app/src/routes/character-detail-page.tsx:318
 msgid "不再接收对方互动"
@@ -3499,6 +3522,7 @@ msgstr "現在を削除するとスタンプ庫が空になり、さらに {next
 #: apps/app/src/components/chat-message-list.tsx:3213
 #: apps/app/src/components/chat-message-list.tsx:3341
 #: apps/app/src/components/chat-message-list.tsx:3506
+#: apps/app/src/features/chat/reminder-task-panel.tsx:284
 #: apps/app/src/features/search/mobile-search-workspace.tsx:253
 #: apps/app/src/routes/chat-list-page.tsx:1450
 msgid "删除"
@@ -3538,6 +3562,10 @@ msgstr "削除して退出すると、このグループチャットは現在の
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:870
 msgid "删除当前聊天内容"
 msgstr "現在のチャット内容を削除"
+
+#: apps/app/src/features/chat/reminder-task-panel.tsx:138
+msgid "删除提醒失败，请稍后再试。"
+msgstr "リマインダーの削除に失敗しました。あとで再度お試しください。"
 
 #: apps/app/src/components/chat-composer.tsx:4682
 msgid "删除标注"
@@ -5138,6 +5166,7 @@ msgid "安澜"
 msgstr "Anlan"
 
 #: apps/app/src/features/chat/chat-reminder-entries.ts:174
+#: apps/app/src/features/chat/reminder-task-panel.tsx:262
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:907
 msgid "完成"
 msgstr "完了"
@@ -5155,6 +5184,7 @@ msgid "完成周任务可解锁全队共享外观和回放徽章。"
 msgstr "週間タスクを完了するとチーム共有の外観とリプレイバッジを解除できます。"
 
 #: apps/app/src/features/chat/chat-reminder-entries.ts:190
+#: apps/app/src/features/chat/reminder-task-panel.tsx:83
 msgid "完成提醒失败，请稍后再试。"
 msgstr "リマインダーを完了できませんでした。しばらくしてから再試行してください。"
 
@@ -5283,6 +5313,11 @@ msgstr "Xiaoding"
 msgid "小盯替你记着"
 msgstr "小盯が覚えています"
 
+#. placeholder {0}: tasks.length
+#: apps/app/src/features/chat/reminder-task-panel.tsx:174
+msgid "小盯替你记着 {0} 件事"
+msgstr "あなたのために {0} 件のリマインダーを管理中"
+
 #: apps/app/src/features/search/mobile-search-workspace.tsx:321
 #: apps/app/src/features/shell/desktop-nav-matching.ts:109
 #: apps/app/src/features/shell/desktop-nav-matching.ts:110
@@ -5351,6 +5386,7 @@ msgid "屏蔽后的影响"
 msgstr "ブロック後の影響"
 
 #: apps/app/src/features/chat/chat-reminder-summary-text.tsx:138
+#: apps/app/src/features/chat/reminder-task-panel.tsx:186
 msgid "展开"
 msgstr "展開"
 
@@ -5513,6 +5549,11 @@ msgstr ""
 #: apps/app/src/components/chat-message-list.tsx:2394
 msgid "已删除 1 条消息。"
 msgstr ""
+
+#. placeholder {0}: task.title
+#: apps/app/src/features/chat/reminder-task-panel.tsx:130
+msgid "已删除：{0}"
+msgstr "削除しました：{0}"
 
 #: apps/app/src/components/chat-message-list.tsx:959
 #: apps/app/src/i18n/static-dom-seed.ts:947
@@ -5683,6 +5724,11 @@ msgstr ""
 msgid "已完成"
 msgstr "完了"
 
+#. placeholder {0}: task.title
+#: apps/app/src/features/chat/reminder-task-panel.tsx:74
+msgid "已完成：{0}"
+msgstr "完了しました：{0}"
+
 #: apps/app/src/features/chat/chat-reminder-entries.ts:182
 msgid "已完成消息提醒。"
 msgstr "メッセージリマインダーを完了しました。"
@@ -5695,6 +5741,11 @@ msgstr "全{totalMemberCount}人のグループメンバーを展開しました
 #: apps/app/src/i18n/static-dom-seed.ts:966
 msgid "已带入所选文字。"
 msgstr "選択したテキストを挿入しました。"
+
+#. placeholder {0}: formatMessageTimestamp(task.snoozedUntil)
+#: apps/app/src/features/chat/reminder-task-panel.tsx:350
+msgid "已延后到 {0}"
+msgstr "{0} まで延期しました"
 
 #: apps/app/src/i18n/static-dom-seed.ts:90
 msgid "已建立会话承接"
@@ -5985,6 +6036,11 @@ msgstr "解析済みワールドアドレス：{0}"
 msgid "已认证"
 msgstr "認証済み"
 
+#. placeholder {0}: task.title
+#: apps/app/src/features/chat/reminder-task-panel.tsx:75
+msgid "已记录这次完成：{0}"
+msgstr "今回の完了を記録しました：{0}"
+
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:324
 #: apps/app/src/routes/character-detail-page.tsx:557
 #: apps/app/src/routes/contacts-page.tsx:703
@@ -6270,6 +6326,11 @@ msgstr "広場にはまだ新しい投稿がありません"
 #: apps/app/src/routes/group-chat-background-page.tsx:490
 msgid "应用到所有未单独设置专属背景的聊天。"
 msgstr "専用背景を設定していないすべてのチャットに適用します。"
+
+#: apps/app/src/features/chat/reminder-task-panel.tsx:101
+#: apps/app/src/features/chat/reminder-task-panel.tsx:120
+msgid "延后提醒失败，请稍后再试。"
+msgstr "リマインダーの延期に失敗しました。あとで再度お試しください。"
 
 #: apps/app/src/routes/welcome-page.tsx:563
 msgid "开发模式：验证码已打印到服务端日志。"
@@ -8814,6 +8875,7 @@ msgid "收藏过内容后，这里会出现最近回访入口。"
 msgstr "コンテンツをお気に入りにすると、最近の再訪入口がここに表示されます。"
 
 #: apps/app/src/features/chat/chat-reminder-summary-text.tsx:138
+#: apps/app/src/features/chat/reminder-task-panel.tsx:186
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:1056
 #: apps/app/src/features/search/mobile-search-workspace.tsx:380
 #: apps/app/src/routes/desktop-mobile-page.tsx:999
@@ -9179,6 +9241,10 @@ msgstr "時間フィルター"
 #: apps/app/src/i18n/static-dom-seed.ts:158
 msgid "时间轴"
 msgstr "タイムライン"
+
+#: apps/app/src/features/chat/reminder-task-panel.tsx:277
+msgid "明天"
+msgstr "明日"
 
 #: apps/app/src/components/chat-message-list.tsx:4037
 msgid "明天 {timeLabel}"
@@ -10732,6 +10798,10 @@ msgstr "公開中..."
 msgid "正在发送..."
 msgstr "送信中..."
 
+#: apps/app/src/features/chat/reminder-task-panel.tsx:214
+msgid "正在同步提醒任务…"
+msgstr "リマインダーを同期中…"
+
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:402
 msgid "正在听你说话"
 msgstr ""
@@ -11923,6 +11993,7 @@ msgstr ""
 msgid "点击预览"
 msgstr "クリックしてプレビュー"
 
+#: apps/app/src/features/chat/reminder-task-panel.tsx:179
 #: apps/app/src/i18n/static-dom-seed.ts:754
 msgid "点按展开查看提醒。"
 msgstr "タップしてリマインダーを展開します。"
@@ -12118,6 +12189,10 @@ msgstr "現在のグループへの招待を最新の会話に直接配信し、
 msgid "直接点右上角删除"
 msgstr "右上の削除をタップ"
 
+#: apps/app/src/features/chat/reminder-task-panel.tsx:178
+msgid "直接点按就能完成、延后或删掉提醒。"
+msgstr "タップするだけで完了・延期・削除ができます。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:755
 msgid "直接说：明早8点提醒我吃药"
 msgstr "例：明日朝8時に薬を飲むようリマインドして"
@@ -12287,6 +12362,10 @@ msgstr "短編更新"
 #: apps/app/src/i18n/static-dom-seed.ts:709
 msgid "硅谷创业者映射"
 msgstr "シリコンバレー創業者写像"
+
+#: apps/app/src/features/chat/reminder-task-panel.tsx:345
+msgid "硬提醒"
+msgstr "強通知"
 
 #: apps/app/src/i18n/static-dom-seed.ts:424
 #: apps/app/src/routes/create-group-page.tsx:353
@@ -15278,6 +15357,10 @@ msgstr "集約できる会話はまだありません"
 msgid "还没有可转发的最近会话"
 msgstr "転送できる最近の会話はまだありません"
 
+#: apps/app/src/features/chat/reminder-task-panel.tsx:218
+msgid "还没有在替你记的事。直接发一句“明早8点提醒我吃药”或“每周五提醒我买猫粮”就行。"
+msgstr "まだリマインダーはありません。「明朝8時に薬を飲むのを思い出させて」や「毎週金曜日にキャットフードを買うのを思い出させて」のように送るだけでOKです。"
+
 #: apps/app/src/routes/desktop-mobile-page.tsx:1489
 msgid "还没有当前小程序"
 msgstr "現在のミニプログラムはまだありません"
@@ -16099,6 +16182,10 @@ msgstr "注釈をやり直す"
 msgid "重做标注 (Cmd/Ctrl+Shift+Z / Cmd/Ctrl+Y)"
 msgstr "注釈をやり直す (Cmd/Ctrl+Shift+Z / Cmd/Ctrl+Y)"
 
+#: apps/app/src/features/chat/reminder-task-panel.tsx:343
+msgid "重复"
+msgstr "繰り返し"
+
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1632
 msgid "重播上一句"
 msgstr ""
@@ -16414,6 +16501,10 @@ msgstr "長時間戻りなし"
 #: apps/app/src/routes/group-qr-page.tsx:2709
 msgid "长时间未回流，先补这条。"
 msgstr "長時間戻りがないため、まずこちらを再送します。"
+
+#: apps/app/src/features/chat/reminder-task-panel.tsx:340
+msgid "长期"
+msgstr "長期"
 
 #: apps/app/src/i18n/static-dom-seed.ts:704
 msgid "长期职业成长与产品路径的导师型朋友"
