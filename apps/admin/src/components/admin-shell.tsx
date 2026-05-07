@@ -45,7 +45,7 @@ export function AdminShell({
           maskImage: "linear-gradient(180deg, rgba(0,0,0,0.42), transparent 88%)",
         }}
       />
-      <div className="relative min-h-screen lg:grid lg:grid-cols-[280px_minmax(0,1fr)]">
+      <div className="relative min-h-screen lg:grid lg:grid-cols-[260px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)]">
         {/* Desktop sidebar */}
         <div className="hidden lg:sticky lg:top-0 lg:block lg:h-screen lg:overflow-hidden">
           {sidebar}
@@ -66,10 +66,10 @@ export function AdminShell({
         ) : null}
 
         <div className="min-w-0">
-          <div className="sticky top-0 z-20 px-4 pt-4 sm:px-6 lg:px-8 lg:pt-6">
+          <div className="sticky top-0 z-20 px-4 pt-4 sm:px-6 sm:pt-5 lg:px-8 lg:pt-6">
             {topbar}
           </div>
-          <div className="px-4 pb-6 pt-4 sm:px-6 lg:px-8 lg:pb-8">{children}</div>
+          <div className="px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">{children}</div>
         </div>
       </div>
     </div>
