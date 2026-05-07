@@ -1757,6 +1757,7 @@ msgid "会以当前会话作为来源，提交一次聊天场景投诉。"
 msgstr "Submit a chat-scene report using the current conversation as the source."
 
 #: apps/app/src/i18n/static-dom-seed.ts:435
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:218
 msgid "会同步到朋友圈时间线，适合发日常照片、短视频和临时心情。"
 msgstr "This syncs to the Moments timeline and works well for daily photos, short videos, and quick thoughts."
 
@@ -2635,6 +2636,7 @@ msgstr "Close screenshot preview"
 msgid "关闭截图预览 (Esc)"
 msgstr "Close screenshot preview (Esc)"
 
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:296
 #: apps/app/src/routes/profile-settings-page.tsx:897
 msgid "关闭提示"
 msgstr ""
@@ -3878,6 +3880,10 @@ msgstr "Send Article to Mobile"
 msgid "发朋友圈"
 msgstr "Post to Moments"
 
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:146
+msgid "发朋友圈在桌面布局里已经并入朋友圈工作区，这里会自动带你返回桌面入口。"
+msgstr "Posting to Moments is merged into the Moments workspace on desktop, taking you back there now."
+
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:206
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:516
 #: apps/app/src/features/shell/desktop-shell.tsx:1177
@@ -3909,10 +3915,16 @@ msgid "发直播状态到手机"
 msgstr "Send Live Status to Mobile"
 
 #: apps/app/src/i18n/static-dom-seed.ts:433
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:182
 msgid "发表"
 msgstr "Post"
 
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:182
+msgid "发表中"
+msgstr "Posting"
+
 #: apps/app/src/i18n/static-dom-seed.ts:432
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:155
 msgid "发表朋友圈"
 msgstr "Post to Moments"
 
@@ -4501,6 +4513,7 @@ msgid "图片与视频"
 msgstr "Images and videos"
 
 #: apps/app/src/i18n/static-dom-seed.ts:438
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:287
 msgid "图片最多 9 张，视频当前支持 1 条且不超过 5 分钟，暂不支持图片和视频混发。"
 msgstr "Up to 9 images are supported. Videos currently support 1 item under 5 minutes. Mixed image and video posts are not supported yet."
 
@@ -4510,6 +4523,7 @@ msgstr ""
 
 #: apps/app/src/routes/discover-feed-page.tsx:470
 #: apps/app/src/routes/discover-page.tsx:445
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:127
 #: apps/app/src/routes/moments-page.tsx:548
 msgid "图片选择失败，请稍后重试。"
 msgstr "Image selection failed. Try again later."
@@ -6467,6 +6481,7 @@ msgid "当前参考内容"
 msgstr "Current reference content"
 
 #: apps/app/src/i18n/static-dom-seed.ts:437
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:279
 msgid "当前发布到朋友圈"
 msgstr "Currently posting to Moments"
 
@@ -8639,6 +8654,7 @@ msgstr ""
 msgid "改用语音通话"
 msgstr ""
 
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:322
 #: apps/app/src/routes/profile-settings-page.tsx:923
 msgid "放弃"
 msgstr ""
@@ -8646,6 +8662,10 @@ msgstr ""
 #: apps/app/src/routes/profile-settings-page.tsx:904
 msgid "放弃修改"
 msgstr ""
+
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:303
+msgid "放弃发表"
+msgstr "Discard post"
 
 #: apps/app/src/i18n/static-dom-seed.ts:134
 msgid "故事感推荐"
@@ -9181,6 +9201,7 @@ msgstr "Emphasizes pace, ranking, and competition."
 
 #: apps/app/src/routes/discover-feed-page.tsx:807
 #: apps/app/src/routes/discover-page.tsx:692
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:266
 msgid "更换视频"
 msgstr "Replace video"
 
@@ -9253,6 +9274,7 @@ msgstr "Unread messages"
 #: apps/app/src/i18n/static-dom-seed.ts:51
 #: apps/app/src/routes/channels-page.tsx:426
 #: apps/app/src/routes/discover-page.tsx:112
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:283
 msgid "朋友"
 msgstr "Friends"
 
@@ -9312,6 +9334,7 @@ msgid "朋友圈图片预览"
 msgstr "Moment image preview"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1079
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:61
 #: apps/app/src/routes/moments-page.tsx:166
 msgid "朋友圈已发布。"
 msgstr "Moment published."
@@ -10427,6 +10450,10 @@ msgstr "Waking existing world."
 msgid "正在唤醒隐界..."
 msgstr "Waking Yinjie..."
 
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:145
+msgid "正在回到桌面朋友圈"
+msgstr "Returning to desktop Moments"
+
 #. placeholder {0}: activeReply.authorName
 #. placeholder {0}: replyTarget.authorName
 #: apps/app/src/routes/channels-page.tsx:1926
@@ -10455,6 +10482,10 @@ msgstr "Opening chat..."
 #: apps/app/src/routes/moments-page.tsx:665
 msgid "正在打开好友朋友圈"
 msgstr ""
+
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:147
+msgid "正在打开朋友圈..."
+msgstr "Opening Moments..."
 
 #: apps/app/src/i18n/static-dom-seed.ts:1020
 msgid "正在打开桌面公众号文章"
@@ -11245,6 +11276,7 @@ msgstr "Add to contacts"
 
 #: apps/app/src/routes/discover-feed-page.tsx:796
 #: apps/app/src/routes/discover-page.tsx:677
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:255
 msgid "添加图片"
 msgstr "Add image"
 
@@ -11264,6 +11296,7 @@ msgstr "Add Friend"
 
 #: apps/app/src/routes/discover-feed-page.tsx:807
 #: apps/app/src/routes/discover-page.tsx:693
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:266
 msgid "添加视频"
 msgstr "Add video"
 
@@ -12048,6 +12081,7 @@ msgstr ""
 
 #: apps/app/src/routes/discover-feed-page.tsx:482
 #: apps/app/src/routes/discover-page.tsx:457
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:137
 #: apps/app/src/routes/moments-page.tsx:560
 msgid "视频选择失败，请稍后重试。"
 msgstr "Video selection failed. Try again later."
@@ -12795,6 +12829,7 @@ msgid "继续管理"
 msgstr "Resume manage"
 
 #: apps/app/src/routes/discover-feed-page.tsx:337
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:315
 #: apps/app/src/routes/profile-settings-page.tsx:916
 msgid "继续编辑"
 msgstr "Continue editing"
@@ -14096,6 +14131,7 @@ msgid "读文章"
 msgstr "Read article"
 
 #: apps/app/src/i18n/static-dom-seed.ts:436
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:276
 msgid "谁可以看"
 msgstr "Who can view"
 
@@ -14431,6 +14467,7 @@ msgstr "Back to previous step"
 #: apps/app/src/routes/group-qr-page.tsx:1644
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:62
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:421
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:46
 #: apps/app/src/routes/moments-page.tsx:310
 #: apps/app/src/routes/moments-page.tsx:970
 #: apps/app/src/routes/moments-page.tsx:1276
@@ -14450,6 +14487,10 @@ msgstr ""
 msgid "返回会丢失刚刚修改的资料，确定不保存吗？"
 msgstr ""
 
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:306
+msgid "返回会丢失已编辑的文字与媒体，确定不发布吗？"
+msgstr "Going back will lose the text and media you've edited. Discard without posting?"
+
 #: apps/app/src/i18n/static-dom-seed.ts:794
 msgid "返回公众号列表"
 msgstr "Back to official account list"
@@ -14466,6 +14507,8 @@ msgstr ""
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:200
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:321
 #: apps/app/src/i18n/static-dom-seed.ts:439
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:46
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:165
 msgid "返回朋友圈"
 msgstr "Back to Moments"
 
@@ -14822,10 +14865,12 @@ msgid "还能再添加 {customSlotsRemaining} 个表情，请分批上传。"
 msgstr "You can only add {customSlotsRemaining} more stickers. Upload them in batches."
 
 #: apps/app/src/i18n/static-dom-seed.ts:434
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:215
 msgid "这一刻"
 msgstr "This moment"
 
 #: apps/app/src/i18n/static-dom-seed.ts:440
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:226
 msgid "这一刻的想法..."
 msgstr "Thoughts for this moment..."
 

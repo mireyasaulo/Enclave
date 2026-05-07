@@ -1757,6 +1757,7 @@ msgid "会以当前会话作为来源，提交一次聊天场景投诉。"
 msgstr "현재 대화를 근거로 채팅 상황 신고를 제출합니다."
 
 #: apps/app/src/i18n/static-dom-seed.ts:435
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:218
 msgid "会同步到朋友圈时间线，适合发日常照片、短视频和临时心情。"
 msgstr "모멘트 타임라인에 동기화되며 일상 사진, 짧은 영상, 순간적인 생각을 올리기에 적합합니다."
 
@@ -2635,6 +2636,7 @@ msgstr "스크린샷 미리보기 닫기"
 msgid "关闭截图预览 (Esc)"
 msgstr "스크린샷 미리보기 닫기 (Esc)"
 
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:296
 #: apps/app/src/routes/profile-settings-page.tsx:897
 msgid "关闭提示"
 msgstr ""
@@ -3878,6 +3880,10 @@ msgstr "글을 휴대로 보내기"
 msgid "发朋友圈"
 msgstr "모멘트에 게시"
 
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:146
+msgid "发朋友圈在桌面布局里已经并入朋友圈工作区，这里会自动带你返回桌面入口。"
+msgstr "데스크톱 레이아웃에서는 모먼트 작성이 모먼트 워크스페이스에 통합되어 있어 자동으로 그쪽으로 이동합니다."
+
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:206
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:516
 #: apps/app/src/features/shell/desktop-shell.tsx:1177
@@ -3909,10 +3915,16 @@ msgid "发直播状态到手机"
 msgstr "라이브 상태를 휴대로 보내기"
 
 #: apps/app/src/i18n/static-dom-seed.ts:433
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:182
 msgid "发表"
 msgstr "게시"
 
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:182
+msgid "发表中"
+msgstr "게시 중"
+
 #: apps/app/src/i18n/static-dom-seed.ts:432
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:155
 msgid "发表朋友圈"
 msgstr "모멘트 게시"
 
@@ -4501,6 +4513,7 @@ msgid "图片与视频"
 msgstr "이미지와 동영상"
 
 #: apps/app/src/i18n/static-dom-seed.ts:438
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:287
 msgid "图片最多 9 张，视频当前支持 1 条且不超过 5 分钟，暂不支持图片和视频混发。"
 msgstr "이미지는 최대 9장, 영상은 현재 5분 이하 1개까지 지원합니다. 이미지와 영상을 섞어 올리는 것은 아직 지원하지 않습니다."
 
@@ -4510,6 +4523,7 @@ msgstr ""
 
 #: apps/app/src/routes/discover-feed-page.tsx:470
 #: apps/app/src/routes/discover-page.tsx:445
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:127
 #: apps/app/src/routes/moments-page.tsx:548
 msgid "图片选择失败，请稍后重试。"
 msgstr "이미지 선택에 실패했습니다. 잠시 후 다시 시도하세요."
@@ -6467,6 +6481,7 @@ msgid "当前参考内容"
 msgstr "현재 참고 콘텐츠"
 
 #: apps/app/src/i18n/static-dom-seed.ts:437
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:279
 msgid "当前发布到朋友圈"
 msgstr "현재 모멘트에 게시"
 
@@ -8639,6 +8654,7 @@ msgstr ""
 msgid "改用语音通话"
 msgstr ""
 
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:322
 #: apps/app/src/routes/profile-settings-page.tsx:923
 msgid "放弃"
 msgstr ""
@@ -8646,6 +8662,10 @@ msgstr ""
 #: apps/app/src/routes/profile-settings-page.tsx:904
 msgid "放弃修改"
 msgstr ""
+
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:303
+msgid "放弃发表"
+msgstr "게시 취소"
 
 #: apps/app/src/i18n/static-dom-seed.ts:134
 msgid "故事感推荐"
@@ -9181,6 +9201,7 @@ msgstr "템포, 순위, 대결감을 더 강조합니다."
 
 #: apps/app/src/routes/discover-feed-page.tsx:807
 #: apps/app/src/routes/discover-page.tsx:692
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:266
 msgid "更换视频"
 msgstr "동영상 교체"
 
@@ -9253,6 +9274,7 @@ msgstr "읽지 않은 메시지 있음"
 #: apps/app/src/i18n/static-dom-seed.ts:51
 #: apps/app/src/routes/channels-page.tsx:426
 #: apps/app/src/routes/discover-page.tsx:112
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:283
 msgid "朋友"
 msgstr "친구"
 
@@ -9312,6 +9334,7 @@ msgid "朋友圈图片预览"
 msgstr "모멘트 이미지 미리보기"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1079
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:61
 #: apps/app/src/routes/moments-page.tsx:166
 msgid "朋友圈已发布。"
 msgstr "모멘트를 게시했습니다."
@@ -10427,6 +10450,10 @@ msgstr "기존 세계를 깨우는 중입니다."
 msgid "正在唤醒隐界..."
 msgstr "Yinjie를 깨우는 중..."
 
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:145
+msgid "正在回到桌面朋友圈"
+msgstr "데스크톱 모먼트로 돌아가는 중"
+
 #. placeholder {0}: activeReply.authorName
 #. placeholder {0}: replyTarget.authorName
 #: apps/app/src/routes/channels-page.tsx:1926
@@ -10455,6 +10482,10 @@ msgstr "대화를 여는 중..."
 #: apps/app/src/routes/moments-page.tsx:665
 msgid "正在打开好友朋友圈"
 msgstr ""
+
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:147
+msgid "正在打开朋友圈..."
+msgstr "모먼트를 여는 중..."
 
 #: apps/app/src/i18n/static-dom-seed.ts:1020
 msgid "正在打开桌面公众号文章"
@@ -11245,6 +11276,7 @@ msgstr "연락처에 추가"
 
 #: apps/app/src/routes/discover-feed-page.tsx:796
 #: apps/app/src/routes/discover-page.tsx:677
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:255
 msgid "添加图片"
 msgstr "이미지 추가"
 
@@ -11264,6 +11296,7 @@ msgstr "친구 추가"
 
 #: apps/app/src/routes/discover-feed-page.tsx:807
 #: apps/app/src/routes/discover-page.tsx:693
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:266
 msgid "添加视频"
 msgstr "동영상 추가"
 
@@ -12048,6 +12081,7 @@ msgstr ""
 
 #: apps/app/src/routes/discover-feed-page.tsx:482
 #: apps/app/src/routes/discover-page.tsx:457
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:137
 #: apps/app/src/routes/moments-page.tsx:560
 msgid "视频选择失败，请稍后重试。"
 msgstr "동영상 선택에 실패했습니다. 잠시 후 다시 시도하세요."
@@ -12795,6 +12829,7 @@ msgid "继续管理"
 msgstr "관리 계속"
 
 #: apps/app/src/routes/discover-feed-page.tsx:337
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:315
 #: apps/app/src/routes/profile-settings-page.tsx:916
 msgid "继续编辑"
 msgstr "계속 편집"
@@ -14096,6 +14131,7 @@ msgid "读文章"
 msgstr "글 읽기"
 
 #: apps/app/src/i18n/static-dom-seed.ts:436
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:276
 msgid "谁可以看"
 msgstr "볼 수 있는 사람"
 
@@ -14431,6 +14467,7 @@ msgstr "이전 단계로 돌아가기"
 #: apps/app/src/routes/group-qr-page.tsx:1644
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:62
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:421
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:46
 #: apps/app/src/routes/moments-page.tsx:310
 #: apps/app/src/routes/moments-page.tsx:970
 #: apps/app/src/routes/moments-page.tsx:1276
@@ -14450,6 +14487,10 @@ msgstr ""
 msgid "返回会丢失刚刚修改的资料，确定不保存吗？"
 msgstr ""
 
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:306
+msgid "返回会丢失已编辑的文字与媒体，确定不发布吗？"
+msgstr "돌아가면 작성한 글과 미디어가 사라집니다. 게시하지 않고 취소하시겠어요?"
+
 #: apps/app/src/i18n/static-dom-seed.ts:794
 msgid "返回公众号列表"
 msgstr "공식 계정 목록으로 돌아가기"
@@ -14466,6 +14507,8 @@ msgstr ""
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:200
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:321
 #: apps/app/src/i18n/static-dom-seed.ts:439
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:46
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:165
 msgid "返回朋友圈"
 msgstr "모멘트로 돌아가기"
 
@@ -14822,10 +14865,12 @@ msgid "还能再添加 {customSlotsRemaining} 个表情，请分批上传。"
 msgstr "스티커를 {customSlotsRemaining}개만 더 추가할 수 있습니다. 나눠서 업로드해 주세요."
 
 #: apps/app/src/i18n/static-dom-seed.ts:434
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:215
 msgid "这一刻"
 msgstr "이 순간"
 
 #: apps/app/src/i18n/static-dom-seed.ts:440
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:226
 msgid "这一刻的想法..."
 msgstr "이 순간의 생각..."
 
