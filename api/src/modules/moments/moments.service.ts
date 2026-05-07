@@ -21,6 +21,7 @@ import { MomentCommentEntity } from './moment-comment.entity';
 import { MomentLikeEntity } from './moment-like.entity';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { SocialService } from '../social/social.service';
+import { CharacterFriendshipService } from '../social/character-friendship.service';
 import { FeedService } from '../feed/feed.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { ReminderRuntimeService } from '../reminder-runtime/reminder-runtime.service';
@@ -87,6 +88,7 @@ export class MomentsService implements OnModuleInit {
     private readonly characters: CharactersService,
     private readonly worldOwnerService: WorldOwnerService,
     private readonly socialService: SocialService,
+    private readonly characterFriendships: CharacterFriendshipService,
     private readonly feedService: FeedService,
     private readonly cyberAvatar: CyberAvatarService,
     private readonly reminderRuntime: ReminderRuntimeService,
@@ -447,12 +449,28 @@ export class MomentsService implements OnModuleInit {
         character.id !== post.authorId && visibleCharacterIds.has(character.id),
     );
 
+    const intimacyByCharId = new Map<string, number>();
+    if (post.authorType === 'character') {
+      await Promise.all(
+        allChars.map(async (char) => {
+          const intimacy = await this.characterFriendships.getIntimacy(
+            char.id,
+            post.authorId,
+          );
+          intimacyByCharId.set(char.id, intimacy);
+        }),
+      );
+    }
+
     allChars.forEach((char, i) => {
       const freq = char.activityFrequency ?? 'normal';
-      const interactChance = freq === 'high' ? 0.6 : freq === 'low' ? 0.2 : 0.4;
+      const baseChance = freq === 'high' ? 0.6 : freq === 'low' ? 0.2 : 0.4;
+      const intimacy = intimacyByCharId.get(char.id) ?? 0;
+      const intimacyMultiplier = 1 + intimacy / 50; // up to ~3x at intimacy=100
+      const interactChance = Math.min(0.95, baseChance * intimacyMultiplier);
       if (Math.random() > interactChance) return;
 
-      // Delay based on activity frequency
+      // Delay based on activity frequency; closer friends react sooner
       const baseDelay =
         freq === 'high'
           ? 2 * 60 * 1000 // 2 min
@@ -460,7 +478,9 @@ export class MomentsService implements OnModuleInit {
             ? 2 * 60 * 60 * 1000 // 2 hours
             : 15 * 60 * 1000; // 15 min
 
-      const delay = baseDelay + Math.random() * baseDelay + i * 3000;
+      const intimacySpeedup = Math.max(0.3, 1 - intimacy / 150);
+      const delay =
+        (baseDelay + Math.random() * baseDelay + i * 3000) * intimacySpeedup;
 
       setTimeout(() => {
         void (async () => {
@@ -525,6 +545,12 @@ export class MomentsService implements OnModuleInit {
                 reply.text,
                 'character',
               );
+              if (post.authorType === 'character') {
+                await this.characterFriendships.bumpInteraction(
+                  char.id,
+                  post.authorId,
+                );
+              }
               return;
             }
 
@@ -535,6 +561,12 @@ export class MomentsService implements OnModuleInit {
               char.avatar,
               'character',
             );
+            if (post.authorType === 'character') {
+              await this.characterFriendships.bumpInteraction(
+                char.id,
+                post.authorId,
+              );
+            }
           } catch {
             // ignore
           }
