@@ -4,14 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "node ../../scripts/dev-services.mjs start site",
-    "dev:raw": "node scripts/sync-assets.mjs && next dev -p 5183",
+    "dev:raw": "node scripts/sync-assets.mjs && next dev -p 5185",
     "dev:stop": "node ../../scripts/dev-services.mjs stop site",
     "dev:restart": "node ../../scripts/dev-services.mjs restart site",
     "dev:status": "node ../../scripts/dev-services.mjs status site",
     "predev:raw": "node scripts/sync-assets.mjs",
     "prebuild": "node scripts/sync-assets.mjs",
     "build": "next build",
-    "start": "next start -p 5183",
+    "start": "next start -p 5185",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit"
   },

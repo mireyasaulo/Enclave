@@ -1,6 +1,6 @@
 #!/bin/bash
 # 并行重启脚本：可选指定服务、可选跳过构建。
-# 默认：cloud-api / app / wiki / admin / cloud-console 全部并行重启。
+# 默认：cloud-api / app / wiki / admin / cloud-console / site 全部并行重启。
 set -uo pipefail
 
 cd "$(dirname "$0")"
@@ -17,7 +17,7 @@ usage() {
 用法: $(basename "$0") [选项] [服务名...]
 
 可选服务 (不传则全部并行重启):
-  cloud-api  app  wiki  admin  cloud-console
+  cloud-api  app  wiki  admin  cloud-console  site
 
 选项:
   --no-build           跳过 main-api 与 app 的构建（仅重启服务进程）
@@ -29,6 +29,7 @@ usage() {
   $(basename "$0") wiki admin           # 只重启 wiki 与 admin
   $(basename "$0") --no-build cloud-api # 仅重启 cloud-api，跳过预构建
   $(basename "$0") cloud-console        # 只重启云世界控制台
+  $(basename "$0") site                 # 只重启官网（apps/site, 5185）
 EOF
 }
 
@@ -38,13 +39,13 @@ while (( $# > 0 )); do
     --skip-account-prep) SKIP_ACCOUNT_PREP=1; shift ;;
     -h|--help) usage; exit 0 ;;
     -*) echo "未知参数: $1" >&2; usage; exit 2 ;;
-    cloud-api|app|wiki|admin|cloud-console) SERVICES+=("$1"); shift ;;
+    cloud-api|app|wiki|admin|cloud-console|site) SERVICES+=("$1"); shift ;;
     *) echo "未知服务: $1" >&2; usage; exit 2 ;;
   esac
 done
 
 if (( ${#SERVICES[@]} == 0 )); then
-  SERVICES=(cloud-api app wiki admin cloud-console)
+  SERVICES=(cloud-api app wiki admin cloud-console site)
 fi
 
 want() {
@@ -124,6 +125,11 @@ restart_cloud_console() {
   node scripts/wait-for-service-ready.mjs cloud-console http://127.0.0.1:5182/ 30000 1000
 }
 
+restart_site() {
+  node scripts/dev-services.mjs restart site
+  node scripts/wait-for-service-ready.mjs site http://127.0.0.1:5185/ 60000 1000
+}
+
 # ---------- 启动并行任务 ----------
 # main-api 构建仅在需要 cloud-api 且未禁用构建时执行
 # (per-account 子进程依赖 api/dist)
@@ -143,10 +149,11 @@ if want app; then
   fi
 fi
 
-# wiki / admin / cloud-console 是 vite dev，失败不阻塞主链路
+# wiki / admin / cloud-console / site 是 vite/next dev，失败不阻塞主链路
 if want wiki;          then launch wiki          0 restart_wiki;          fi
 if want admin;         then launch admin         0 restart_admin;         fi
 if want cloud-console; then launch cloud-console 0 restart_cloud_console; fi
+if want site;          then launch site          0 restart_site;          fi
 
 # ---------- 等待并汇总结果 ----------
 FAILED=0
@@ -183,5 +190,6 @@ want app           && echo "  主 App:         http://127.0.0.1:5180"
 want wiki          && echo "  Wiki 角色平台:  http://127.0.0.1:5184"
 want admin         && echo "  管理后台:       http://127.0.0.1:5181"
 want cloud-console && echo "  云世界控制台:   http://127.0.0.1:5182"
+want site          && echo "  官网:           http://127.0.0.1:5185  (vicp.fun 1gw06751dd053 隧道指向此服务)"
 echo ""
 echo "日志: $LOG_DIR/*.${TS}.log    每账号子进程: logs/dev-services/api-{phone}.{out,err}.log"
