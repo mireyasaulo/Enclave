@@ -106,7 +106,7 @@ export const desktopPrimaryNavBindings: DesktopNavRouteBinding[] = [
     matches: ["/tabs/games", "/games", "/discover/games"],
   },
   {
-    label: msg`小程序面板`,
+    label: msg`小程序`,
     shortLabel: msg`小程序`,
     to: "/tabs/mini-programs",
     matches: ["/tabs/mini-programs", "/mini-programs", "/discover/mini-programs"],
