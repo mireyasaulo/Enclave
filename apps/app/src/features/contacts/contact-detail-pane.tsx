@@ -231,7 +231,12 @@ export function ContactDetailPane({
               valueMuted={!remarkName}
             />
             <DesktopContactProfileRow label="昵称" value={character.name} />
-            <DesktopContactProfileRow label="隐界号" value={identifier} />
+            <DesktopContactProfileRow
+              label="个性签名"
+              value={signature}
+              multiline
+              muted={!character.currentStatus?.trim() && !character.bio?.trim()}
+            />
             <DesktopContactProfileRow
               label="地区"
               value={friendship?.region?.trim() || "未设置"}
@@ -248,12 +253,7 @@ export function ContactDetailPane({
               onClick={() => setEditingField("tags")}
               valueMuted={!friendship?.tags?.length}
             />
-            <DesktopContactProfileRow
-              label="个性签名"
-              value={signature}
-              multiline
-              muted={!character.currentStatus?.trim() && !character.bio?.trim()}
-            />
+            <DesktopContactProfileRow label="隐界号" value={identifier} />
           </>
         ) : (
           <>
@@ -262,13 +262,13 @@ export function ContactDetailPane({
               label="身份"
               value={character.relationship || "世界角色"}
             />
-            <DesktopContactProfileRow label="隐界号" value={identifier} />
             <DesktopContactProfileRow
               label="个性签名"
               value={signature}
               multiline
               muted={!character.currentStatus?.trim() && !character.bio?.trim()}
             />
+            <DesktopContactProfileRow label="隐界号" value={identifier} />
           </>
         )}
       </DesktopContactProfileSection>
