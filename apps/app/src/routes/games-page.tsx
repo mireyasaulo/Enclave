@@ -1042,7 +1042,6 @@ export function GamesPage() {
                 <GameListRow
                   key={`hot-${entry.gameId}`}
                   game={game}
-                  rank={entry.rank}
                   onLaunch={() => handleSelectAndLaunch(game.id)}
                   onSelect={() => setSelectedGameId(game.id)}
                 />
@@ -1061,7 +1060,6 @@ export function GamesPage() {
                 <GameListRow
                   key={`new-${entry.gameId}`}
                   game={game}
-                  rank={entry.rank}
                   onLaunch={() => handleSelectAndLaunch(game.id)}
                   onSelect={() => setSelectedGameId(game.id)}
                 />
@@ -1199,30 +1197,16 @@ function GameListRow({
   game,
   onLaunch,
   onSelect,
-  rank,
   trailingLabel = "开始",
 }: {
   game: GameCenterGame;
   onLaunch: () => void;
   onSelect?: () => void;
-  rank?: number;
   trailingLabel?: string;
 }) {
   const visibleTags = game.tags.slice(0, 2);
   return (
     <li className="flex items-center gap-3 border-b border-[color:var(--border-faint)] px-4 py-3 last:border-b-0">
-      {typeof rank === "number" ? (
-        <span
-          className={cn(
-            "w-4 shrink-0 text-center text-[13px] font-semibold tabular-nums",
-            rank <= 3
-              ? "text-[#d65e2f]"
-              : "text-[color:var(--text-muted)]",
-          )}
-        >
-          {rank}
-        </span>
-      ) : null}
       <button
         type="button"
         onClick={onSelect ?? onLaunch}
