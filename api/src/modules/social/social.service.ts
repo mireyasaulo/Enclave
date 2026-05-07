@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Not, Repository } from 'typeorm';
 import { FriendshipEntity } from './friendship.entity';
@@ -793,6 +794,22 @@ export class SocialService {
     );
     friendship.lastInteractedAt = new Date();
     await this.friendshipRepo.save(friendship);
+  }
+
+  @OnEvent(AppEvents.USER_SENT_MESSAGE, { async: true })
+  async handleUserSentMessage(payload: {
+    ownerId: string;
+    characterId: string;
+    conversationId: string;
+  }): Promise<void> {
+    if (!payload?.characterId) return;
+    try {
+      await this.recordSparkInteraction(payload.characterId);
+    } catch (err) {
+      this.logger.warn(
+        `recordSparkInteraction failed for ${payload.characterId}: ${(err as Error).message}`,
+      );
+    }
   }
 
   async recordSparkInteraction(

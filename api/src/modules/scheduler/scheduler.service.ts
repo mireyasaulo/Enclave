@@ -385,6 +385,22 @@ export class SchedulerService {
     );
   }
 
+  @Cron('5 0 * * *')
+  async resetExpiredSparks() {
+    await this.runScheduledJob(
+      'reset_expired_sparks',
+      () => this.handleResetExpiredSparks(),
+      'Failed to reset expired sparks',
+    );
+  }
+
+  private async handleResetExpiredSparks(): Promise<TrackedJobResult> {
+    const resetCount = await this.socialService.resetExpiredSparks();
+    return {
+      summary: resetCount > 0 ? `已清算 ${resetCount} 条到期火花` : '无到期火花',
+    };
+  }
+
   async runJobNow(jobId: string) {
     try {
       const summary = await this.executeManualJob(jobId as SchedulerJobId);
@@ -526,6 +542,12 @@ export class SchedulerService {
         return (
           await this.executeTrackedJob(jobId, () =>
             this.handleUpdateCoreMemoryWeekly(),
+          )
+        ).summary;
+      case 'reset_expired_sparks':
+        return (
+          await this.executeTrackedJob(jobId, () =>
+            this.handleResetExpiredSparks(),
           )
         ).summary;
       default:

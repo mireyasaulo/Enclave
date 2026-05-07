@@ -52,6 +52,7 @@ import { CharacterEntity } from '../characters/character.entity';
 import { ReplyArtifactJobService } from './reply-artifact-job.service';
 import { MediaInsightJobService } from './media-insight-job.service';
 import { DocumentExtractionService } from './document-extraction.service';
+import { EventsModule } from '../events/events.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { DocumentExtractionService } from './document-extraction.service';
     forwardRef(() => CyberAvatarModule),
     ReminderRuntimeModule,
     SelfAgentModule,
+    EventsModule,
     TypeOrmModule.forFeature([
       ConversationEntity,
       MessageEntity,

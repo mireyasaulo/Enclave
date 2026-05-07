@@ -20,6 +20,7 @@ import { WorldOwnerService } from '../auth/world-owner.service';
 import { WorldLanguageService } from '../config/world-language.service';
 import { REMINDER_CHARACTER_ID } from '../characters/reminder-character';
 import { CharactersService } from '../characters/characters.service';
+import { AppEvents, EventBusService } from '../events/event-bus.service';
 import { NarrativeService } from '../narrative/narrative.service';
 import { ReminderRuntimeService } from '../reminder-runtime/reminder-runtime.service';
 import { ActionRuntimeService } from '../action-runtime/action-runtime.service';
@@ -171,6 +172,7 @@ export class ChatService {
     private readonly customStickersService: CustomStickersService,
     private readonly reminderRuntime: ReminderRuntimeService,
     private readonly worldLanguage: WorldLanguageService,
+    private readonly eventBus: EventBusService,
     @Inject(forwardRef(() => ReplyArtifactJobService))
     private readonly replyArtifactJobs: ReplyArtifactJobService,
     private readonly mediaInsightJobs: MediaInsightJobService,
@@ -837,6 +839,15 @@ export class ChatService {
       entity,
       userMsgEntity.createdAt ?? new Date(),
     );
+
+    const sparkCharacterId = entity.participants?.[0];
+    if (sparkCharacterId && entity.type === 'direct') {
+      this.eventBus.emit(AppEvents.USER_SENT_MESSAGE, {
+        ownerId: owner.id,
+        characterId: sparkCharacterId,
+        conversationId: convId,
+      });
+    }
 
     const enrichedAttachment = normalizedInput.attachment
       ? await this.mediaInsightJobs.ensureConversationMessageInsight({
