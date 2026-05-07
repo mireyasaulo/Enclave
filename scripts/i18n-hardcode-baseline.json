@@ -2,19 +2,34 @@
   "version": 1,
   "description": "Baseline for i18n hardcode ratchet. Counts may only decrease; new increases should be fixed or explicitly allowlisted with a reason.",
   "scopes": {
-    "apps/app/src": {
+    "apps/app/src/features/desktop": {
       "rules": {
-        "jsx-literal-prop": 955,
-        "object-ui-string": 530,
-        "jsx-cjk-text": 50,
-        "toast-dialog-string": 1,
-        "setter-message-string": 69,
-        "literal-error-message": 72,
-        "intl-locale-literal": 7,
-        "locale-compare-literal": 5,
+        "jsx-literal-prop": 0,
+        "object-ui-string": 0,
+        "jsx-cjk-text": 0,
+        "toast-dialog-string": 0,
+        "setter-message-string": 0,
+        "literal-error-message": 0,
+        "intl-locale-literal": 0,
+        "locale-compare-literal": 0,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 0,
-        "raw-cjk-line": 5252
+        "raw-cjk-line": 0
+      }
+    },
+    "apps/app/src": {
+      "rules": {
+        "jsx-literal-prop": 554,
+        "object-ui-string": 385,
+        "jsx-cjk-text": 21,
+        "toast-dialog-string": 1,
+        "setter-message-string": 48,
+        "literal-error-message": 60,
+        "intl-locale-literal": 2,
+        "locale-compare-literal": 4,
+        "speech-lang-literal": 0,
+        "prompt-locale-instruction": 0,
+        "raw-cjk-line": 3219
       }
     },
     "apps/admin/src": {
