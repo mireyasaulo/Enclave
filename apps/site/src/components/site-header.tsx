@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { getServerI18n } from "@/i18n/server";
 import type { SupportedLocale } from "@/lib/locales";
 import { buildLocalePath } from "@/lib/locale-routing";
@@ -12,12 +12,11 @@ export async function SiteHeader({ locale }: { locale: SupportedLocale }) {
   const home = buildLocalePath(locale, "/");
 
   const labels = {
-    product: i18n._("产品"),
     capabilities: i18n._("核心能力"),
     crossPlatform: i18n._("跨端"),
-    openSource: i18n._("开源自部署"),
+    faq: i18n._("FAQ"),
     download: i18n._("下载"),
-    tryNow: i18n._("在线试用"),
+    startNow: i18n._("免费开始"),
   };
 
   return (
@@ -40,8 +39,8 @@ export async function SiteHeader({ locale }: { locale: SupportedLocale }) {
           <a href={`${home}#cross-platform`} className="transition hover:text-(--brand-primary)">
             {labels.crossPlatform}
           </a>
-          <a href={`${home}#open-source`} className="transition hover:text-(--brand-primary)">
-            {labels.openSource}
+          <a href={`${home}#faq`} className="transition hover:text-(--brand-primary)">
+            {labels.faq}
           </a>
           <Link
             href={buildLocalePath(locale, "/download")}
@@ -59,8 +58,8 @@ export async function SiteHeader({ locale }: { locale: SupportedLocale }) {
             rel="noreferrer"
             className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-(--brand-primary) px-3 text-sm font-semibold text-white transition hover:bg-(--brand-secondary) shadow-(--shadow-soft) sm:px-4"
           >
-            <span className="hidden sm:inline">{labels.tryNow}</span>
-            <ArrowUpRight size={16} />
+            <span className="hidden sm:inline">{labels.startNow}</span>
+            <ArrowRight size={16} />
           </a>
         </div>
       </div>

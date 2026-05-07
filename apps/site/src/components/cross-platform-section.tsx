@@ -26,12 +26,12 @@ export async function CrossPlatformSection({ locale }: { locale: SupportedLocale
     eyebrow: i18n._("跨端"),
     title: i18n._("移动随手用，桌面深度用"),
     subtitle: i18n._(
-      "apps/app 是一份 React 19 + TypeScript 代码库，同时跑在 Web、iOS / Android Capacitor 壳、以及 Tauri 桌面壳上。",
+      "在浏览器、电脑、手机上都能用，对话和动态实时同步。一个账号，无缝接管。",
     ),
     mobile: i18n._("移动端"),
-    mobileDesc: i18n._("Web / iOS / Android"),
+    mobileDesc: i18n._("浏览器 / iOS / Android"),
     desktop: i18n._("桌面端"),
-    desktopDesc: i18n._("Tauri · Windows / macOS / Linux"),
+    desktopDesc: i18n._("Windows / macOS / Linux"),
   };
 
   return (

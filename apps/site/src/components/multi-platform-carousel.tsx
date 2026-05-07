@@ -16,7 +16,7 @@ export async function MultiPlatformCarousel({ locale }: { locale: SupportedLocal
   const titles = {
     eyebrow: i18n._("产品截图"),
     title: i18n._("从入坑到日常使用"),
-    subtitle: i18n._("六个核心场景一起看，画面均来自 apps/app 当前真实版本。"),
+    subtitle: i18n._("六个核心场景一起看，画面均来自当前线上版本。"),
   };
 
   return (

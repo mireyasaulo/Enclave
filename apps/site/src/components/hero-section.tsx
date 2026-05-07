@@ -1,22 +1,26 @@
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowRight, Github } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { getServerI18n } from "@/i18n/server";
 import type { SupportedLocale } from "@/lib/locales";
-import { buildLocalePath } from "@/lib/locale-routing";
 import { siteLinks } from "@/lib/site-links";
 
 export async function HeroSection({ locale }: { locale: SupportedLocale }) {
   const i18n = await getServerI18n(locale);
   const labels = {
-    eyebrow: i18n._("开源 · 可自部署 · 跨端"),
+    eyebrow: i18n._("AI 虚拟世界 · 一键开始"),
     title: i18n._("一个属于你的 AI 虚拟世界"),
     subtitle: i18n._(
       "在隐界，你不是和一个 chatbot 聊天，而是拥有一个有居民、有时间、有关系的私人世界。它不与现实对立，让现实里的你，多出一种可能。",
     ),
-    cta1: i18n._("在线试用"),
-    cta2: i18n._("在 GitHub 查看"),
+    cta1: i18n._("免费开始"),
+    cta2: i18n._("了解能做什么"),
     coreLoop: i18n._("核心闭环演示（动图）"),
+    statWorld: i18n._("私人世界"),
+    statWorldDesc: i18n._("一人一实例"),
+    statSync: i18n._("多端同步"),
+    statSyncDesc: i18n._("浏览器 / 桌面 / 手机"),
+    statFree: i18n._("免费开始"),
+    statFreeDesc: i18n._("注册即用，无需安装"),
   };
 
   return (
@@ -24,7 +28,7 @@ export async function HeroSection({ locale }: { locale: SupportedLocale }) {
       <div className="mx-auto grid max-w-7xl gap-10 px-4 pt-12 pb-16 sm:px-6 sm:pt-20 sm:pb-24 lg:grid-cols-12 lg:px-8 lg:gap-12">
         <div className="lg:col-span-6 lg:pt-6">
           <span className="inline-flex items-center gap-2 rounded-full border border-(--border-subtle) bg-(--surface-card) px-3 py-1 text-xs font-medium text-(--brand-primary)">
-            <span className="size-1.5 rounded-full bg-(--brand-primary)" />
+            <Sparkles size={12} />
             {labels.eyebrow}
           </span>
           <h1 className="mt-5 text-4xl font-bold leading-tight sm:text-5xl lg:text-[3.5rem] lg:leading-[1.1]">
@@ -44,27 +48,24 @@ export async function HeroSection({ locale }: { locale: SupportedLocale }) {
               <ArrowRight size={16} />
             </a>
             <a
-              href={siteLinks.github}
-              target="_blank"
-              rel="noreferrer"
+              href="#capabilities"
               className="inline-flex items-center gap-2 rounded-xl border border-(--border-subtle) bg-(--surface-card) px-5 py-3 text-sm font-semibold text-(--text-primary) transition hover:border-(--brand-primary)"
             >
-              <Github size={16} />
               {labels.cta2}
             </a>
           </div>
           <div className="mt-10 grid grid-cols-3 gap-4 max-w-md text-xs text-(--text-muted)">
             <div>
-              <div className="text-2xl font-bold text-(--text-primary)">4+</div>
-              <div className="mt-1">{i18n._("语言版本")}</div>
+              <div className="text-2xl font-bold text-(--text-primary)">{labels.statWorld}</div>
+              <div className="mt-1">{labels.statWorldDesc}</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-(--text-primary)">2 端</div>
-              <div className="mt-1">{i18n._("移动 + 桌面")}</div>
+              <div className="text-2xl font-bold text-(--text-primary)">{labels.statSync}</div>
+              <div className="mt-1">{labels.statSyncDesc}</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-(--text-primary)">MIT</div>
-              <div className="mt-1">{i18n._("开源协议")}</div>
+              <div className="text-2xl font-bold text-(--text-primary)">{labels.statFree}</div>
+              <div className="mt-1">{labels.statFreeDesc}</div>
             </div>
           </div>
         </div>

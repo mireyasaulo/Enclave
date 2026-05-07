@@ -4,7 +4,7 @@ import { CapabilityGrid } from "@/components/capability-grid";
 import { MultiPlatformCarousel } from "@/components/multi-platform-carousel";
 import { OnePersonWorld } from "@/components/one-person-world";
 import { CrossPlatformSection } from "@/components/cross-platform-section";
-import { SelfHostSection } from "@/components/self-host-section";
+import { GetStartedCta } from "@/components/get-started-cta";
 import { FaqAccordion } from "@/components/faq-accordion";
 
 export default async function HomePage({
@@ -22,7 +22,7 @@ export default async function HomePage({
       <MultiPlatformCarousel locale={safeLocale} />
       <OnePersonWorld locale={safeLocale} />
       <CrossPlatformSection locale={safeLocale} />
-      <SelfHostSection locale={safeLocale} />
+      <GetStartedCta locale={safeLocale} />
       <FaqAccordion locale={safeLocale} />
     </>
   );

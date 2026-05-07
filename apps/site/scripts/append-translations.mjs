@@ -96,6 +96,66 @@ const TRANSLATIONS = [
   ["五、变更", "5. Changes", "五、変更", "5. 변경"],
   ["条款可能根据法律法规与产品演进调整，重大变更我们会在仓库与本页公告。", "These terms may evolve with the product and applicable laws; we will announce material changes both in the repo and on this page.", "本規約は法令や製品の発展に応じて改定されることがあります。重要な変更はリポジトリおよび本ページにてお知らせします。", "본 약관은 법령과 제품 발전에 따라 개정될 수 있습니다. 중대한 변경 사항은 리포지토리와 본 페이지에서 공지합니다."],
   ["如对条款有任何疑问，请发邮件至 yuanzui0728@gmail.com。", "For terms questions, email yuanzui0728@gmail.com.", "規約に関するご質問は yuanzui0728@gmail.com までメールでお寄せください。", "약관 관련 문의는 yuanzui0728@gmail.com 으로 이메일을 보내주세요."],
+  // ===== SaaS pivot =====
+  // Hero
+  ["AI 虚拟世界 · 一键开始", "AI virtual world · one-click start", "AI バーチャルワールド · ワンクリックで開始", "AI 가상 세계 · 한 번에 시작"],
+  ["免费开始", "Start free", "無料で始める", "무료로 시작"],
+  ["了解能做什么", "See what you can do", "できることを見る", "할 수 있는 일 보기"],
+  ["私人世界", "Private world", "プライベートワールド", "프라이빗 월드"],
+  ["一人一实例", "One instance per person", "ひとりに一つのインスタンス", "한 사람당 하나의 인스턴스"],
+  ["多端同步", "Cross-device sync", "マルチデバイス同期", "멀티 디바이스 동기화"],
+  ["浏览器 / 桌面 / 手机", "Browser / Desktop / Mobile", "ブラウザ / デスクトップ / モバイル", "브라우저 / 데스크톱 / 모바일"],
+  ["注册即用，无需安装", "Sign up and use — no install required", "登録するだけ、インストール不要", "가입 즉시 사용, 설치 불필요"],
+  // Capability subtitle
+  ["为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。", "An AI-social experience designed for daily companionship and deep conversations — every capability already shipping.", "日常の寄り添いと深い対話のために設計された AI ソーシャル体験。すべて稼働中の機能です。", "일상의 동반과 깊은 대화를 위해 설계된 AI 소셜 경험. 모두 실제 제품에서 동작합니다."],
+  // Multi-platform carousel subtitle
+  ["六个核心场景一起看，画面均来自当前线上版本。", "Six core scenes together — every screen straight from the live build.", "6 つのコアシーンを一望。画面はすべて公開中のバージョンから。", "6 가지 핵심 화면을 한자리에. 모든 화면은 라이브 빌드에서 가져왔습니다."],
+  // Cross-platform
+  ["在浏览器、电脑、手机上都能用，对话和动态实时同步。一个账号，无缝接管。", "Works in your browser, on desktop, and on mobile — conversations and feeds sync in real time. One account, zero friction.", "ブラウザ・デスクトップ・モバイルで使え、会話とフィードはリアルタイム同期。ひとつのアカウントでシームレスに切り替え可能。", "브라우저, 데스크톱, 모바일에서 모두 사용 가능하며 대화와 피드가 실시간 동기화됩니다. 하나의 계정으로 자연스럽게 이어집니다."],
+  ["浏览器 / iOS / Android", "Browser / iOS / Android", "ブラウザ / iOS / Android", "브라우저 / iOS / Android"],
+  ["Windows / macOS / Linux", "Windows / macOS / Linux", "Windows / macOS / Linux", "Windows / macOS / Linux"],
+  // OnePersonWorld principle bodies
+  ["每位用户拥有完全独立的世界，互不打扰、互不可见。你的对话只属于你。", "Each user owns a fully independent world — no overlap, no leakage. Your conversations belong to you alone.", "ユーザーごとに完全に独立した世界を持ち、互いに見えず干渉しません。会話はあなただけのもの。", "사용자마다 완전히 독립된 세계를 갖습니다. 서로 간섭하지 않으며, 대화는 오로지 당신의 것입니다."],
+  ["全部数据可一键导出，随时带走；不绑定平台，不锁定关系。", "Export all your data with one click and take it with you — no platform lock-in, no relationship lock-in.", "全データをワンクリックでエクスポート可能。いつでも持ち出せて、プラットフォームにも関係にも縛られません。", "모든 데이터를 원클릭으로 내보낼 수 있고 언제든 가져갈 수 있습니다. 플랫폼이나 관계에 묶이지 않습니다."],
+  ["可信赖的 AI", "AI you can trust", "信頼できる AI", "신뢰할 수 있는 AI"],
+  ["代码完全开源、可审计；底层模型可选官方托管或自主接入，过程透明。", "Code is fully open source and auditable; choose the managed model or bring your own — it's all transparent.", "コードは完全オープンソースで監査可能。モデルはマネージド版を使うか、自分で接続するか自由に選べ、すべて透明です。", "코드는 완전 오픈소스로 누구나 감사할 수 있습니다. 모델은 매니지드 또는 직접 연결을 자유롭게 선택할 수 있으며, 과정이 모두 투명합니다."],
+  ["属于你的，就只属于你", "What's yours is only yours", "あなたのものは、あなただけのもの", "당신의 것은 오직 당신의 것"],
+  ["隐界为每个人单独搭建一个私人 AI 世界。你的居民、你的关系、你的故事——别人看不到，平台也不会拿去训练。", "Enclave gives each person a separate private AI world. Your residents, your relationships, your stories — no one else sees them, and we don't train any external model on them.", "エンクレイブはユーザーごとにプライベートな AI 世界を提供します。住人・関係性・物語は誰にも見られず、外部モデルの学習にも使いません。", "엔클레이브는 사용자마다 별도의 프라이빗 AI 세계를 제공합니다. 거주민, 관계, 이야기 모두 외부에 공개되지 않으며 외부 모델 학습에도 사용되지 않습니다."],
+  // GetStartedCta
+  ["立即开始", "Start now", "今すぐ開始", "지금 시작"],
+  ["几秒钟，开启你的隐界世界", "Open your Enclave world in seconds", "数秒であなたの隐界ワールドを開始", "몇 초 만에 당신의 엔클레이브 세계를 열어 보세요"],
+  ["打开浏览器即可使用，不需要安装；如果你愿意，也可以下载桌面端，或者自己部署一份。", "Open it right in your browser — no install. Prefer native? Grab the desktop build. Want full control? Self-host with one command.", "ブラウザを開くだけ、インストール不要。ネイティブが好きならデスクトップ版、完全にコントロールしたいならセルフホストも選べます。", "브라우저를 열기만 하면 됩니다. 네이티브가 더 좋다면 데스크톱 버전, 완전한 제어를 원한다면 자체 호스팅도 가능합니다."],
+  ["查看下载方式", "See download options", "ダウンロード方法を見る", "다운로드 방법 보기"],
+  ["数据自主", "Your data, your call", "データ主権", "데이터 자율"],
+  ["一人一实例，对话只属于你", "One instance per person — your conversations stay yours", "ひとりに一つのインスタンス、会話はあなたのもの", "한 사람당 하나의 인스턴스, 대화는 오직 당신의 것"],
+  ["跨端同步", "Cross-device sync", "クロスデバイス同期", "멀티 디바이스 동기화"],
+  ["浏览器 / 桌面 / 手机一致体验", "Same experience across browser, desktop, and mobile", "ブラウザ・デスクトップ・モバイルで同じ体験", "브라우저, 데스크톱, 모바일에서 일관된 경험"],
+  ["开源可审计", "Open source, auditable", "オープンソースで監査可能", "오픈소스, 감사 가능"],
+  ["MIT 协议，代码全部公开", "MIT-licensed, all code public", "MIT ライセンス、全コード公開", "MIT 라이선스, 전 코드 공개"],
+  // FAQ rewrite (new)
+  ["隐界是做什么的？", "What is Enclave?", "エンクレイブとは？", "엔클레이브는 무엇인가요?"],
+  ["隐界是一个 AI 社交世界。每个用户都有一个属于自己的私人世界，里面有 AI 角色、朋友圈、群聊、电话、笔记，可以和角色长期对话、发展关系，让 AI 真正成为日常的一部分。", "Enclave is an AI social world. Every user gets a private world of their own — populated with AI characters, a feed, group chats, calls and notes. You build long-term conversations and relationships, and AI becomes part of your daily life.", "エンクレイブは AI ソーシャルワールドです。ユーザーごとにプライベートな世界が用意され、AI キャラクター、フィード、グループチャット、通話、ノートが揃います。長期的な会話と関係を育み、AI を日常の一部にできます。", "엔클레이브는 AI 소셜 월드입니다. 사용자마다 자신만의 프라이빗 세계가 있으며, AI 캐릭터, 피드, 그룹 채팅, 통화, 노트가 모두 포함됩니다. 장기간 대화와 관계를 쌓아 AI 를 일상의 일부로 만들 수 있습니다."],
+  ["和普通的 AI 聊天工具有什么不同？", "How is this different from a regular AI chatbot?", "通常の AI チャットボットと何が違うのか？", "일반 AI 챗봇과 무엇이 다른가요?"],
+  ["普通的 chatbot 是问一句答一句；隐界是一个有居民、有时间、有关系的虚拟世界。AI 角色会主动发动态、给你打电话、记得过去聊过的事，更像是真实的人际关系。", "A regular chatbot replies one question at a time. Enclave is a virtual world with residents, time and relationships. AI characters post moments, call you, and remember earlier conversations — closer to a real human relationship.", "通常のチャットボットは一問一答ですが、エンクレイブは住人・時間・関係性のあるバーチャル世界です。AI キャラクターが自発的に投稿し、電話をかけ、過去の会話を覚えていて、現実の人間関係に近い感覚です。", "일반 챗봇은 질문에 한 번 대답하지만, 엔클레이브는 거주민, 시간, 관계가 있는 가상 세계입니다. AI 캐릭터가 자발적으로 모먼트를 올리고, 전화를 걸며, 이전 대화를 기억해 실제 인간관계에 가까운 느낌을 줍니다."],
+  ["免费注册即可开始使用，基础对话和功能完全免费。如果你需要更高级的模型、更多角色或更长记忆，可以选择按使用量付费的订阅。", "Sign up free and start right away — basic conversations and features are completely free. Want higher-end models, more characters, or longer memory? Opt into the pay-as-you-go subscription.", "無料登録ですぐに使え、基本的な会話と機能は完全無料です。上位モデル・キャラクター数・長期メモリーが必要な場合は従量課金のサブスクをご利用いただけます。", "무료로 가입하고 바로 시작할 수 있으며, 기본 대화와 기능은 모두 무료입니다. 더 높은 등급의 모델, 더 많은 캐릭터, 더 긴 기억이 필요하면 사용량 기반의 구독을 선택할 수 있습니다."],
+  ["我的隐私和数据安全吗？", "Is my privacy and data safe?", "プライバシーとデータは安全ですか？", "개인정보와 데이터는 안전한가요?"],
+  ["隐界采用一人一世界的私人实例：你的对话只属于你，别人看不到，平台也不会拿去训练任何对外的模型。你可以随时导出全部数据。", "Enclave runs an instance per person: your conversations are yours alone — no one else sees them, and we don't train any external model on them. You can export your full data at any time.", "エンクレイブはひとりにひとつのプライベートインスタンスです。会話は完全にあなただけのもので、他者には見えず、外部モデルの学習にも使いません。全データはいつでもエクスポート可能です。", "엔클레이브는 한 사람당 하나의 프라이빗 인스턴스를 운영합니다. 대화는 오직 당신의 것이며, 외부 모델 학습에 사용되지 않습니다. 전체 데이터를 언제든 내보낼 수 있습니다."],
+  ["我能信你不会偷偷用我的数据吗？", "How do I know you won't quietly use my data?", "勝手にデータが使われないと、どう信じればいい？", "데이터를 몰래 사용하지 않는다는 것을 어떻게 믿을 수 있나요?"],
+  ["整套代码完全开源（MIT 许可，github.com/yuanzui0728/yinjie-app），任何人都可以审计——包括你自己。如果你不放心托管版，也可以选择自己部署。", "The entire codebase is fully open source (MIT license, github.com/yuanzui0728/yinjie-app) — anyone can audit it, including you. If you'd rather not trust the managed cloud, self-host instead.", "コードは完全オープンソース（MIT ライセンス、github.com/yuanzui0728/yinjie-app）で、誰でも、もちろんあなた自身も監査できます。マネージドクラウドが不安なら、セルフホストも選べます。", "전체 코드는 완전 오픈소스(MIT 라이선스, github.com/yuanzui0728/yinjie-app)로, 누구든(당신 포함) 감사할 수 있습니다. 매니지드 클라우드가 불안하다면 자체 호스팅을 선택할 수도 있습니다."],
+  ["支持哪些设备？", "Which devices are supported?", "どのデバイスに対応していますか？", "어떤 기기를 지원하나요?"],
+  ["浏览器打开就能用，无需安装。同时提供 Windows / macOS 桌面端，iOS / Android 与微信小程序在路上，所有平台同账号同步。", "Open it in your browser — no install needed. Native Windows / macOS apps are available; iOS, Android, and a WeChat mini-program are coming. All platforms sync via the same account.", "ブラウザを開くだけで利用でき、インストールは不要。Windows / macOS のネイティブアプリも提供しており、iOS / Android と WeChat ミニプログラムは準備中。全プラットフォームで同じアカウントで同期します。", "브라우저에서 바로 사용 가능하며 설치가 필요 없습니다. Windows / macOS 네이티브 앱을 제공하며, iOS / Android 와 WeChat 미니 프로그램은 준비 중입니다. 모든 플랫폼이 같은 계정으로 동기화됩니다."],
+  // Download page
+  ["开始使用", "Get started", "はじめる", "시작하기"],
+  ["浏览器即开即用，桌面端体验更佳；移动端与小程序在路上。所有数据云端同步。", "Open it in your browser, or grab the desktop build for a deeper experience. Mobile and the mini-program are on the way. Everything syncs in the cloud.", "ブラウザですぐに利用でき、本格利用にはデスクトップ版がおすすめ。モバイルアプリとミニプログラムは準備中。すべてクラウドで同期します。", "브라우저에서 즉시 사용하고, 더 깊이 사용하고 싶다면 데스크톱 버전을 받으세요. 모바일과 미니 프로그램은 준비 중이며, 모든 데이터가 클라우드로 동기화됩니다."],
+  ["推荐", "Recommended", "おすすめ", "추천"],
+  ["网页版（推荐）", "Web (recommended)", "Web 版（おすすめ）", "웹 버전(추천)"],
+  ["打开浏览器即用，无需安装；最快开始体验隐界", "Open in your browser, no install — the fastest way to try Enclave", "ブラウザを開くだけ、インストール不要 — 最速でエンクレイブを体験", "브라우저만 열면 되고 설치가 필요 없습니다 — 가장 빠르게 엔클레이브를 체험하는 방법"],
+  ["原生体验，含托盘和锁屏，适合长期重度使用", "Native experience with tray and lock screen — best for daily heavy use", "トレイとロック画面付きのネイティブ体験。日常のヘビー利用に最適", "트레이와 잠금 화면을 갖춘 네이티브 경험. 매일 깊이 사용하는 분께 추천"],
+  ["原生移动端 App，敬请期待", "Native mobile app — coming soon", "ネイティブモバイルアプリ — 近日公開", "네이티브 모바일 앱 — 출시 예정"],
+  ["自部署（高级）", "Self-host (advanced)", "セルフホスト（上級）", "자체 호스팅(고급)"],
+  ["完全开源、MIT 协议；如果你想拥有 100% 自主权可以自己跑一份", "Fully open source under MIT — if you want 100% control, run your own copy", "完全オープンソース、MIT ライセンス。100% 自主権が欲しい方はご自身でデプロイできます", "MIT 라이선스의 완전 오픈소스 — 100% 자율성을 원한다면 직접 호스팅할 수 있습니다"],
+  // Footer
+  ["一个属于你的 AI 虚拟世界。私人居民、动态、群聊、电话——浏览器即开即用。", "A private AI world of your own. Private residents, moments, group chats and calls — open in your browser.", "あなただけの AI バーチャルワールド。プライベートな住人・モーメンツ・グループチャット・通話 — ブラウザで開くだけ。", "당신만의 AI 가상 세계. 프라이빗 거주민, 모먼트, 그룹 채팅, 통화 — 브라우저에서 바로."],
 ];
 
 const LOCALES = ["zh-CN", "en-US", "ja-JP", "ko-KR"];

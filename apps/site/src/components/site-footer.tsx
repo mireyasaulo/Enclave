@@ -6,11 +6,11 @@ import { siteLinks } from "@/lib/site-links";
 
 export async function SiteFooter({ locale }: { locale: SupportedLocale }) {
   const i18n = await getServerI18n(locale);
-  const tagline = i18n._("一个属于你的 AI 虚拟世界。开源、可自部署、跨端可用。");
+  const tagline = i18n._("一个属于你的 AI 虚拟世界。私人居民、动态、群聊、电话——浏览器即开即用。");
   const labels = {
-    github: "GitHub",
-    deploy: i18n._("自部署文档"),
+    startNow: i18n._("免费开始"),
     download: i18n._("下载"),
+    github: "GitHub",
     privacy: i18n._("隐私政策"),
     terms: i18n._("服务条款"),
     contact: i18n._("联系我们"),
@@ -31,11 +31,8 @@ export async function SiteFooter({ locale }: { locale: SupportedLocale }) {
           <p className="mt-4 text-xs text-(--text-dim)">© {year} Enclave · MIT License</p>
         </div>
         <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-(--text-secondary)">
-          <a href={siteLinks.github} target="_blank" rel="noreferrer" className="hover:text-(--brand-primary)">
-            {labels.github}
-          </a>
-          <a href={siteLinks.deploy} target="_blank" rel="noreferrer" className="hover:text-(--brand-primary)">
-            {labels.deploy}
+          <a href={siteLinks.app} target="_blank" rel="noreferrer" className="hover:text-(--brand-primary)">
+            {labels.startNow}
           </a>
           <Link href={buildLocalePath(locale, "/download")} className="hover:text-(--brand-primary)">
             {labels.download}
@@ -48,6 +45,9 @@ export async function SiteFooter({ locale }: { locale: SupportedLocale }) {
           </Link>
           <a href={siteLinks.contact} className="hover:text-(--brand-primary)">
             {labels.contact}
+          </a>
+          <a href={siteLinks.github} target="_blank" rel="noreferrer" className="text-(--text-dim) hover:text-(--brand-primary)">
+            {labels.github}
           </a>
         </nav>
       </div>

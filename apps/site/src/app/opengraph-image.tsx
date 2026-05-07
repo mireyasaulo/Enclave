@@ -75,7 +75,7 @@ export default function OpengraphImage() {
             lineHeight: 1.4,
           }}
         >
-          开源 · 可自部署 · 跨端 — 移动 + 桌面 + 网页
+          私人 AI 世界 · 浏览器即开即用 · 多端同步
         </div>
         <div style={{ flex: 1 }} />
         <div
@@ -86,8 +86,8 @@ export default function OpengraphImage() {
             fontSize: 22,
           }}
         >
-          <span>· github.com/yuanzui0728/yinjie-app</span>
-          <span>· MIT</span>
+          <span>· enclave · 私人 AI 虚拟世界</span>
+          <span>· 免费开始</span>
         </div>
       </div>
     ),

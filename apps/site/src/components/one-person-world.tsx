@@ -12,17 +12,17 @@ const PRINCIPLES: Principle[] = [
   {
     icon: Lock,
     titleZh: "一人一世界",
-    bodyZh: "独立实例架构，数据真正属于用户。隐私不靠承诺，靠架构层保障。",
+    bodyZh: "每位用户拥有完全独立的世界，互不打扰、互不可见。你的对话只属于你。",
   },
   {
     icon: Database,
     titleZh: "数据自主",
-    bodyZh: "全部数据可导入导出，可整包迁移；离开隐界，世界还是你的。",
+    bodyZh: "全部数据可一键导出，随时带走；不绑定平台，不锁定关系。",
   },
   {
     icon: Cpu,
-    titleZh: "AI 平权",
-    bodyZh: "高质量对话不应被少数平台垄断。隐界让任何人都能拥有自己的 AI 居民。",
+    titleZh: "可信赖的 AI",
+    bodyZh: "代码完全开源、可审计；底层模型可选官方托管或自主接入，过程透明。",
   },
   {
     icon: Heart,
@@ -35,9 +35,9 @@ export async function OnePersonWorld({ locale }: { locale: SupportedLocale }) {
   const i18n = await getServerI18n(locale);
   const titles = {
     eyebrow: i18n._("理念"),
-    title: i18n._("一个属于你的世界，从架构开始"),
+    title: i18n._("属于你的，就只属于你"),
     subtitle: i18n._(
-      "隐界不是一个共享的 chatbot 服务，而是一套可独立部署的 AI 社交基础设施。每个实例只为一个人存在。",
+      "隐界为每个人单独搭建一个私人 AI 世界。你的居民、你的关系、你的故事——别人看不到，平台也不会拿去训练。",
     ),
   };
 

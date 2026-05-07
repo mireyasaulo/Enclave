@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     default: "隐界 · Enclave",
     template: "%s · 隐界 Enclave",
   },
-  description: "一个属于你的 AI 虚拟世界。开源、可自部署、跨端可用。",
+  description: "一个属于你的 AI 虚拟世界。私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用，免费开始。",
   applicationName: "Enclave",
   icons: {
     icon: [
