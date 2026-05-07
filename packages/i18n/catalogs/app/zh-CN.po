@@ -200,6 +200,7 @@ msgstr "{0} 人"
 #. placeholder {0}: (membersQuery.data?.length ?? 0).toString()
 #. placeholder {0}: membersQuery.data.length
 #. placeholder {0}: membersQuery.data?.length ?? 0
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:202
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:627
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1043
 #: apps/app/src/routes/group-chat-details-page.tsx:542
@@ -1909,6 +1910,7 @@ msgstr "会把选中的消息汇总成一条聊天摘要，再发送到目标会
 msgid "会按照原消息顺序依次投递到目标会话。"
 msgstr "会按照原消息顺序依次投递到目标会话。"
 
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:666
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:981
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1034
 #: apps/app/src/features/search/mobile-search-workspace.tsx:311
@@ -1932,6 +1934,10 @@ msgstr "会话列表"
 #: apps/app/src/i18n/static-dom-seed.ts:1066
 msgid "会话命中"
 msgstr "会话命中"
+
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:667
+msgid "会话暂时不可用"
+msgstr "会话暂时不可用"
 
 #: apps/app/src/i18n/static-dom-seed.ts:490
 msgid "会话类型"
@@ -2323,6 +2329,10 @@ msgstr "先去通讯录建立一些关系，再回来把他们拉进群。"
 #: apps/app/src/routes/create-group-page.tsx:496
 msgid "先去通讯录里建立一些关系，再回来创建群聊。"
 msgstr "先去通讯录里建立一些关系，再回来创建群聊。"
+
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:740
+msgid "先发一句开场白，把这段对话真正聊起来。"
+msgstr "先发一句开场白，把这段对话真正聊起来。"
 
 #: apps/app/src/routes/group-contacts-page.tsx:238
 msgid "先发起一个新的群聊，建好后就会出现在这里。"
@@ -5401,6 +5411,7 @@ msgstr "对打"
 #: apps/app/src/components/chat-message-list.tsx:1284
 #: apps/app/src/components/chat-message-list.tsx:3898
 #: apps/app/src/components/chat-message-list.tsx:3968
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:304
 #: apps/app/src/routes/chat-details-page.tsx:293
 msgid "对方"
 msgstr "对方"
@@ -5408,6 +5419,14 @@ msgstr "对方"
 #: apps/app/src/lib/conversation-preview.ts:110
 msgid "对方撤回了一条消息"
 msgstr "对方撤回了一条消息"
+
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:206
+msgid "对方正在回复..."
+msgstr "对方正在回复..."
+
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:204
+msgid "对方正在生成图片..."
+msgstr "对方正在生成图片..."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1196
 msgid "对话对象"
@@ -7662,6 +7681,7 @@ msgstr "成员规模"
 #: apps/app/src/components/chat-message-list.tsx:3153
 #: apps/app/src/components/chat-message-list.tsx:4051
 #: apps/app/src/components/mobile-shell.tsx:35
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:303
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:551
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:989
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1324
@@ -11366,6 +11386,11 @@ msgstr "正在请求麦克风权限..."
 msgid "正在读取世界角色"
 msgstr "正在读取世界角色"
 
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:655
+msgid "正在读取会话"
+msgstr "正在读取会话"
+
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:651
 #: apps/app/src/routes/desktop-mobile-page.tsx:1263
 msgid "正在读取会话..."
 msgstr "正在读取会话..."
@@ -11914,6 +11939,7 @@ msgstr "消"
 #: apps/app/src/components/chat-message-list.tsx:4114
 #: apps/app/src/components/mobile-shell.tsx:32
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:177
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:928
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1388
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1626
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:660
@@ -12474,6 +12500,7 @@ msgstr "直接点右上角删除"
 msgid "直接点按就能完成、延后或删掉提醒。"
 msgstr "直接点按就能完成、延后或删掉提醒。"
 
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:776
 #: apps/app/src/i18n/static-dom-seed.ts:755
 msgid "直接说：明早8点提醒我吃药"
 msgstr "直接说：明早8点提醒我吃药"
@@ -12841,6 +12868,7 @@ msgstr "视频选择失败，请稍后重试。"
 #: apps/app/src/components/chat-message-list.tsx:5815
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:111
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:464
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1072
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:370
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:765
@@ -12851,6 +12879,7 @@ msgstr "视频选择失败，请稍后重试。"
 msgid "视频通话"
 msgstr "视频通话"
 
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:852
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1558
 msgid "视频通话功能开发中"
 msgstr "视频通话功能开发中"
@@ -13102,6 +13131,10 @@ msgstr "稍等一下，正在同步这位角色的动态。"
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1378
 msgid "稍等一下，正在同步这段群聊里的消息。"
 msgstr "稍等一下，正在同步这段群聊里的消息。"
+
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:656
+msgid "稍等一下，正在同步这段聊天里的消息。"
+msgstr "稍等一下，正在同步这段聊天里的消息。"
 
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:557
 msgid "稍等一下，正在同步通知和文章卡片。"
@@ -14071,6 +14104,7 @@ msgstr "群链接已复制。"
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:576
 #: apps/app/src/features/chat/chat-reminder-entries.ts:70
 #: apps/app/src/features/chat/chat-reminder-entries.ts:95
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:738
 msgid "聊天"
 msgstr "聊天"
 
@@ -14680,6 +14714,7 @@ msgstr "该世界当前已被运维停用。"
 msgid "该入口当前仅提供桌面布局"
 msgstr "该入口当前仅提供桌面布局"
 
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:855
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1561
 msgid "该功能暂未开放，敬请期待。"
 msgstr "该功能暂未开放，敬请期待。"
@@ -14781,6 +14816,7 @@ msgstr "语音输入暂时不可用"
 #: apps/app/src/components/chat-message-list.tsx:5815
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:155
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:51
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:458
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1066
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:370
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:765
@@ -14792,6 +14828,7 @@ msgstr "语音输入暂时不可用"
 msgid "语音通话"
 msgstr "语音通话"
 
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:853
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1559
 msgid "语音通话功能开发中"
 msgstr "语音通话功能开发中"
@@ -14926,6 +14963,7 @@ msgid "请输入验证码（默认 123456 即可通过）"
 msgstr "请输入验证码（默认 123456 即可通过）"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:531
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:654
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1376
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:649
 #: apps/app/src/features/search/mobile-search-workspace.tsx:182
@@ -15280,6 +15318,7 @@ msgstr "输入标注文字"
 msgid "输入桌面锁定口令"
 msgstr "输入桌面锁定口令"
 
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:777
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1502
 #: apps/app/src/i18n/static-dom-seed.ts:736
 msgid "输入消息"
@@ -15335,6 +15374,9 @@ msgid "返回上一步"
 msgstr "返回上一步"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:563
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:160
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:731
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:786
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:184
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1466
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1507
@@ -15768,6 +15810,10 @@ msgstr "还没有星标朋友"
 #: apps/app/src/i18n/static-dom-seed.ts:1018
 msgid "还没有服务消息"
 msgstr "还没有服务消息"
+
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:739
+msgid "还没有消息"
+msgstr "还没有消息"
 
 #: apps/app/src/i18n/static-dom-seed.ts:351
 msgid "还没有直播准备稿"
@@ -16537,6 +16583,7 @@ msgid "部分加入"
 msgstr "部分加入"
 
 #: apps/app/src/components/chat-message-list.tsx:2927
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:225
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:934
 msgid "部分引用"
 msgstr "部分引用"
@@ -16763,6 +16810,7 @@ msgid "重试评论点赞"
 msgstr "重试评论点赞"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:554
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:174
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:200
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:991
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1044

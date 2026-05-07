@@ -7,8 +7,10 @@ import {
   type Ref,
 } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { Phone, Users, Video } from "lucide-react";
 import { type StickerAttachment } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { ChatComposer } from "../../components/chat-composer";
 import { FeatureUnavailableDialog } from "../../components/feature-unavailable-dialog";
@@ -99,6 +101,7 @@ export function ConversationThreadPanel({
   routeMobileShortcutAction = null,
   onRouteMobileShortcutHandled,
 }: ConversationThreadPanelProps) {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const hash = useRouterState({ select: (state) => state.location.hash });
   const currentMobileRouteHash = useMemo(
@@ -154,7 +157,7 @@ export function ConversationThreadPanel({
         className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
         onClick={onBack}
       >
-        返回上一页
+        {t(msg`返回上一页`)}
       </Button>
     ) : null;
   const renderStatusRetryAction = () =>
@@ -168,7 +171,7 @@ export function ConversationThreadPanel({
           void messagesQuery.refetch();
         }}
       >
-        重试读取
+        {t(msg`重试读取`)}
       </Button>
     ) : null;
   const renderStatusActions = () =>
@@ -196,11 +199,11 @@ export function ConversationThreadPanel({
     conversationType === "direct" && participants[0] === REMINDER_CHARACTER_ID;
   const subtitle =
     conversationType === "group"
-      ? `${participants.length || 0} 人群聊`
+      ? t(msg`${participants.length || 0} 人群聊`)
       : typingState?.stage === "image_generation"
-        ? "对方正在生成图片..."
+        ? t(msg`对方正在生成图片...`)
         : typingState
-          ? "对方正在回复..."
+          ? t(msg`对方正在回复...`)
         : undefined;
 
   const hasHighlightedMessage = renderedMessages.some(
@@ -219,7 +222,7 @@ export function ConversationThreadPanel({
     ? {
         senderName: replyDraft.senderName,
         text: replyDraft.quotedText?.trim() || replyDraft.previewText,
-        modeLabel: replyDraft.quotedText ? "部分引用" : undefined,
+        modeLabel: replyDraft.quotedText ? t(msg`部分引用`) : undefined,
       }
     : null;
 
@@ -297,13 +300,13 @@ export function ConversationThreadPanel({
   ) => {
     const senderName =
       message.senderType === "user"
-        ? "我"
-        : message.senderName?.trim() || "对方";
+        ? t(msg`我`)
+        : message.senderName?.trim() || t(msg`对方`);
     const quotedText = options?.quotedText?.trim();
     setReplyDraft({
       messageId: message.id,
       senderName,
-      previewText: describeReplyPreview(message),
+      previewText: describeReplyPreview(t, message),
       quotedText: quotedText || undefined,
     });
   };
@@ -452,13 +455,13 @@ export function ConversationThreadPanel({
                   {
                     key: "voice-call",
                     icon: Phone,
-                    label: "语音通话",
+                    label: t(msg`语音通话`),
                     onClick: () => handleDesktopCallAction("voice"),
                   },
                   {
                     key: "video-call",
                     icon: Video,
-                    label: "视频通话",
+                    label: t(msg`视频通话`),
                     onClick: () => handleDesktopCallAction("video"),
                   },
                 ]
@@ -645,12 +648,12 @@ export function ConversationThreadPanel({
           >
             {messagesQuery.isLoading ? (
               isDesktop ? (
-                <LoadingBlock label="正在读取会话..." />
+                <LoadingBlock label={t(msg`正在读取会话...`)} />
               ) : (
                 <MobileThreadStatusCard
-                  badge="读取中"
-                  title="正在读取会话"
-                  description="稍等一下，正在同步这段聊天里的消息。"
+                  badge={t(msg`读取中`)}
+                  title={t(msg`正在读取会话`)}
+                  description={t(msg`稍等一下，正在同步这段聊天里的消息。`)}
                   tone="loading"
                 />
               )
@@ -660,8 +663,8 @@ export function ConversationThreadPanel({
                 <ErrorBlock message={messagesQuery.error.message} />
               ) : (
                 <MobileThreadStatusCard
-                  badge="会话"
-                  title="会话暂时不可用"
+                  badge={t(msg`会话`)}
+                  title={t(msg`会话暂时不可用`)}
                   description={messagesQuery.error.message}
                   tone="danger"
                   action={renderStatusActions()}
@@ -725,16 +728,16 @@ export function ConversationThreadPanel({
                 handleDesktopCallAction(input.kind);
               }}
               onSelectionModeChange={setSelectionModeActive}
-              errorActionLabel={!isDesktop && onBack ? "返回上一页" : undefined}
+              errorActionLabel={!isDesktop && onBack ? t(msg`返回上一页`) : undefined}
               onErrorAction={!isDesktop && onBack ? onBack : null}
               emptyState={
                 !isDesktop &&
                 !messagesQuery.isLoading &&
                 !messagesQuery.isError ? (
                   <MobileThreadStatusCard
-                    badge="聊天"
-                    title="还没有消息"
-                    description="先发一句开场白，把这段对话真正聊起来。"
+                    badge={t(msg`聊天`)}
+                    title={t(msg`还没有消息`)}
+                    description={t(msg`先发一句开场白，把这段对话真正聊起来。`)}
                   />
                 ) : null
               }
@@ -770,8 +773,8 @@ export function ConversationThreadPanel({
             value={text}
             placeholder={
               isReminderConversation
-                ? "直接说：明早8点提醒我吃药"
-                : "输入消息"
+                ? t(msg`直接说：明早8点提醒我吃药`)
+                : t(msg`输入消息`)
             }
             variant={isDesktop ? "desktop" : "mobile"}
             pending={sendMutation.isPending}
@@ -780,7 +783,7 @@ export function ConversationThreadPanel({
                 ? sendMutation.error.message
                 : null
             }
-            errorActionLabel={!isDesktop && onBack ? "返回上一页" : undefined}
+            errorActionLabel={!isDesktop && onBack ? t(msg`返回上一页`) : undefined}
             onErrorAction={!isDesktop && onBack ? onBack : null}
             speechInput={{
               baseUrl,
@@ -846,10 +849,10 @@ export function ConversationThreadPanel({
         open={callUnavailableKind !== null}
         title={
           callUnavailableKind === "video"
-            ? "视频通话功能开发中"
-            : "语音通话功能开发中"
+            ? t(msg`视频通话功能开发中`)
+            : t(msg`语音通话功能开发中`)
         }
-        description="该功能暂未开放，敬请期待。"
+        description={t(msg`该功能暂未开放，敬请期待。`)}
         onClose={() => setCallUnavailableKind(null)}
       />
     </div>
@@ -914,11 +917,14 @@ function escapeIdSelector(value: string) {
   return value;
 }
 
-function describeReplyPreview(message: ChatRenderableMessage) {
+function describeReplyPreview(
+  t: ReturnType<typeof useRuntimeTranslator>,
+  message: ChatRenderableMessage,
+) {
   return (
     resolveMessageSemanticPreview(message, {
       maxChars: 120,
       bracketedFallback: true,
-    }) || "消息"
+    }) || t(msg`消息`)
   );
 }
