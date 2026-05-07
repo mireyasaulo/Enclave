@@ -701,6 +701,10 @@ function ContentDiffPanel({
         before={before}
         after={after}
         changedFields={changed}
+        fieldLabels={FIELD_LABELS}
+        oldLabel="旧"
+        newLabel="新"
+        emptyLabel="未检测到字段变化。"
         renderRowLead={(field) => (
           <input
             type="checkbox"

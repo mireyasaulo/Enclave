@@ -14,6 +14,12 @@ type UseProviderSetupOptions = {
   enabled: boolean;
   queryKeyPrefix: string;
   invalidateOnSave?: QueryKey[];
+  /**
+   * Localized fallback shown when validation rejects the provider draft but the
+   * underlying issue carries no message. Surface apps should translate this in
+   * their locale layer; the English default keeps the package surface-agnostic.
+   */
+  invalidConfigMessage?: string;
 };
 
 export function useProviderSetup({
@@ -21,6 +27,7 @@ export function useProviderSetup({
   enabled,
   queryKeyPrefix,
   invalidateOnSave = [],
+  invalidConfigMessage = "Inference provider configuration is invalid.",
 }: UseProviderSetupOptions) {
   const queryClient = useQueryClient();
   const [providerDraft, setProviderDraft] = useState<ProviderConfig>(defaultProviderConfig);
@@ -86,7 +93,7 @@ export function useProviderSetup({
     const parsed = validateProviderConfig(providerDraft);
     if (!parsed.success) {
       const issue = parsed.error.issues[0];
-      setProviderValidationMessage(issue?.message ?? "推理服务配置无效。");
+      setProviderValidationMessage(issue?.message ?? invalidConfigMessage);
       return null;
     }
 
