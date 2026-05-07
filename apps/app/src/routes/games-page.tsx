@@ -887,7 +887,7 @@ export function GamesPage() {
   if (!selectedGame) {
     return (
       <AppPage className="space-y-0 px-0 pb-0 pt-0">
-        <MobileGamesComingSoonOverlay onBack={handleBack} />
+        {/* 暂时隐藏「功能开发中」蒙板 */}
       </AppPage>
     );
   }
@@ -897,7 +897,7 @@ export function GamesPage() {
 
   return (
     <AppPage className="space-y-0 px-0 pb-0 pt-0">
-      <MobileGamesComingSoonOverlay onBack={handleBack} />
+      {/* 暂时隐藏「功能开发中」蒙板 */}
       <TabPageTopBar
         title="游戏"
         subtitle="最近在玩与组局推荐"

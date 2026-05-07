@@ -753,16 +753,7 @@ export function DesktopGamesWorkspace({
           </div>
         </div>
       </section>
-      <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-[3px]">
-        <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-8 py-6 text-center shadow-[var(--shadow-card)]">
-          <div className="text-lg font-semibold text-[color:var(--text-primary)]">
-            {t(msg`功能开发中`)}
-          </div>
-          <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-            {t(msg`敬请期待`)}
-          </div>
-        </div>
-      </div>
+      {/* 暂时隐藏「功能开发中」蒙板 */}
     </div>
   );
 }
