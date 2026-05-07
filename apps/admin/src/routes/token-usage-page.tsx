@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "@tanstack/react-router";
 import type {
   Character,
   TokenPricingCatalog,
@@ -62,24 +63,16 @@ function monthStartInput() {
   return formatDateInput(date);
 }
 
-function readInitialTokenUsageFocus(): {
+function readInitialTokenUsageFocus(search?: string): {
   from: string;
   to: string;
   grain: "day" | "week" | "month";
   characterId: string;
   conversationId: string;
 } {
-  if (typeof window === "undefined") {
-    return {
-      from: shiftDate(-6),
-      to: formatDateInput(new Date()),
-      grain: "day" as const,
-      characterId: "",
-      conversationId: "",
-    };
-  }
-
-  const params = new URLSearchParams(window.location.search);
+  const raw =
+    search ?? (typeof window === "undefined" ? "" : window.location.search);
+  const params = new URLSearchParams(raw);
   const grain = params.get("grain");
 
   return {
@@ -173,7 +166,12 @@ type TokenUsageExceptionView = "blocked" | "downgraded" | "quality";
 
 export function TokenUsagePage() {
   const queryClient = useQueryClient();
-  const initialFocus = useMemo(() => readInitialTokenUsageFocus(), []);
+  const location = useLocation();
+  const locationSearch = location.searchStr ?? "";
+  const initialFocus = useMemo(
+    () => readInitialTokenUsageFocus(locationSearch),
+    [locationSearch],
+  );
   const [from, setFrom] = useState(() => initialFocus.from);
   const [to, setTo] = useState(() => initialFocus.to);
   const [grain, setGrain] = useState<"day" | "week" | "month">(
@@ -183,6 +181,22 @@ export function TokenUsagePage() {
   const [conversationId, setConversationId] = useState(
     initialFocus.conversationId,
   );
+
+  // Re-sync filters when URL search changes (e.g. user clicks a
+  // /token-usage?... link from chat-records or elsewhere mid-session).
+  useEffect(() => {
+    setFrom(initialFocus.from);
+    setTo(initialFocus.to);
+    setGrain(initialFocus.grain);
+    setCharacterId(initialFocus.characterId);
+    setConversationId(initialFocus.conversationId);
+  }, [
+    initialFocus.from,
+    initialFocus.to,
+    initialFocus.grain,
+    initialFocus.characterId,
+    initialFocus.conversationId,
+  ]);
   const [status, setStatus] = useState<"" | TokenUsageStatus>("");
   const [billingSource, setBillingSource] = useState<
     "" | TokenUsageBillingSource
