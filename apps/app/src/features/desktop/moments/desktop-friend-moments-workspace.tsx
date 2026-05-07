@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useRef } from "react";
+import { msg } from "@lingui/macro";
 import {
   type Character,
   type Moment,
   type MomentComment,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock } from "@yinjie/ui";
 import { ArrowLeft, Clock3, MessageCircle, Newspaper } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
@@ -114,8 +116,9 @@ export function DesktopFriendMomentsWorkspace({
   onToggleFavorite,
   onVideoFileSelected,
 }: DesktopFriendMomentsWorkspaceProps) {
+  const t = useRuntimeTranslator();
   const scrollViewportRef = useRef<HTMLDivElement | null>(null);
-  const profileActionAriaLabel = `查看 ${displayName} 的资料`;
+  const profileActionAriaLabel = t(msg`查看 ${displayName} 的资料`);
 
   const sortedMoments = useMemo(
     () =>
@@ -168,7 +171,7 @@ export function DesktopFriendMomentsWorkspace({
     if (isLoading) {
       return (
         <LoadingBlock
-          label="正在读取这位角色的朋友圈..."
+          label={t(msg`正在读取这位角色的朋友圈...`)}
           className="rounded-[20px] border-[color:var(--border-faint)] bg-white py-10 shadow-[var(--shadow-section)]"
         />
       );
@@ -180,21 +183,21 @@ export function DesktopFriendMomentsWorkspace({
           <EmptyState
             title={
               isBlocked
-                ? "这位角色的朋友圈当前不可见"
-                : `${displayName} 还没有发表朋友圈`
+                ? t(msg`这位角色的朋友圈当前不可见`)
+                : t(msg`${displayName} 还没有发表朋友圈`)
             }
             description={
               isBlocked
-                ? "你已经将这位角色加入黑名单，相关朋友圈内容会先隐藏。"
-                : "后续有新动态时，会直接显示在这个独立页面里。"
+                ? t(msg`你已经将这位角色加入黑名单，相关朋友圈内容会先隐藏。`)
+                : t(msg`后续有新动态时，会直接显示在这个独立页面里。`)
             }
             action={
               <div className="flex items-center justify-center gap-2">
                 <Button variant="secondary" onClick={onOpenProfile}>
-                  查看资料
+                  {t(msg`查看资料`)}
                 </Button>
                 <Button variant="primary" onClick={onOpenMomentsHome}>
-                  返回朋友圈
+                  {t(msg`返回朋友圈`)}
                 </Button>
               </div>
             }
@@ -208,8 +211,8 @@ export function DesktopFriendMomentsWorkspace({
         {sortedMoments.map((moment) => (
           <DesktopMomentRow
             key={moment.id}
-            authorActionAriaLabel={`查看 ${displayName} 的资料`}
-            authorActionLabel="查看资料"
+            authorActionAriaLabel={t(msg`查看 ${displayName} 的资料`)}
+            authorActionLabel={t(msg`查看资料`)}
             commentDraft={commentDrafts[moment.id] ?? ""}
             commentLoading={commentPendingMomentId === moment.id}
             commentReplyTarget={
@@ -255,7 +258,7 @@ export function DesktopFriendMomentsWorkspace({
                 <button
                   type="button"
                   onClick={onBack}
-                  aria-label="返回上一页"
+                  aria-label={t(msg`返回上一页`)}
                   className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-[color:var(--border-faint)] bg-white text-[color:var(--text-primary)] transition hover:bg-[color:var(--surface-console)]"
                 >
                   <ArrowLeft size={17} />
@@ -281,7 +284,7 @@ export function DesktopFriendMomentsWorkspace({
                       aria-label={profileActionAriaLabel}
                     >
                       <div className="text-[11px] font-medium tracking-[0.12em] text-[color:var(--text-muted)]">
-                        角色朋友圈
+                        {t(msg`角色朋友圈`)}
                       </div>
                       <div className="mt-1 truncate text-[20px] font-semibold text-[color:var(--text-primary)]">
                         {displayName}
@@ -294,17 +297,17 @@ export function DesktopFriendMomentsWorkspace({
                   <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px] text-[color:var(--text-muted)]">
                     <span className="inline-flex items-center gap-1 rounded-full border border-[color:var(--border-faint)] bg-white px-3 py-1">
                       <Newspaper size={13} />
-                      {sortedMoments.length} 条动态
+                      {t(msg`${sortedMoments.length} 条动态`)}
                     </span>
                     <span className="inline-flex items-center gap-1 rounded-full border border-[color:var(--border-faint)] bg-white px-3 py-1">
                       <MessageCircle size={13} />
-                      {totalCommentCount} 条评论
+                      {t(msg`${totalCommentCount} 条评论`)}
                     </span>
                     <span className="inline-flex items-center gap-1 rounded-full border border-[color:var(--border-faint)] bg-white px-3 py-1">
                       <Clock3 size={13} />
                       {latestMoment
-                        ? `最近更新 ${formatTimestamp(latestMoment.postedAt)}`
-                        : "暂未更新"}
+                        ? t(msg`最近更新 ${formatTimestamp(latestMoment.postedAt)}`)
+                        : t(msg`暂未更新`)}
                     </span>
                   </div>
                 </div>
@@ -312,13 +315,13 @@ export function DesktopFriendMomentsWorkspace({
 
               <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
                 <Button variant="secondary" size="sm" onClick={onOpenProfile}>
-                  查看资料
+                  {t(msg`查看资料`)}
                 </Button>
                 <Button variant="secondary" size="sm" onClick={onOpenMomentsHome}>
-                  返回朋友圈
+                  {t(msg`返回朋友圈`)}
                 </Button>
                 <Button variant="primary" size="sm" onClick={() => setShowCompose(true)}>
-                  发朋友圈
+                  {t(msg`发朋友圈`)}
                 </Button>
               </div>
             </div>
