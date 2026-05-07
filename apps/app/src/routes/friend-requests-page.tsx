@@ -1,13 +1,17 @@
 import { Suspense, lazy, useEffect, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { ArrowLeft, BookUser } from "lucide-react";
 import {
   acceptFriendRequest,
   declineFriendRequest,
   getFriendRequests,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
+
+type Translator = ReturnType<typeof useRuntimeTranslator>;
 import { AvatarChip } from "../components/avatar-chip";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
@@ -27,6 +31,7 @@ const DesktopContactsRouteRedirectShell = lazy(async () => {
 });
 
 export function FriendRequestsPage() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
 
   if (isDesktopLayout) {
@@ -34,9 +39,9 @@ export function FriendRequestsPage() {
       <Suspense
         fallback={
           <RouteRedirectState
-            title="正在切换到桌面新的朋友"
-            description="正在跳转到桌面通讯录工作区中的好友请求视图。"
-            loadingLabel="切换桌面好友请求..."
+            title={t(msg`正在切换到桌面新的朋友`)}
+            description={t(msg`正在跳转到桌面通讯录工作区中的好友请求视图。`)}
+            loadingLabel={t(msg`切换桌面好友请求...`)}
           />
         }
       >
@@ -49,6 +54,7 @@ export function FriendRequestsPage() {
 }
 
 function MobileFriendRequestsPage() {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
@@ -79,7 +85,7 @@ function MobileFriendRequestsPage() {
   const acceptMutation = useMutation({
     mutationFn: (requestId: string) => acceptFriendRequest(requestId, baseUrl),
     onSuccess: async () => {
-      setSuccessNotice("已通过好友申请。");
+      setSuccessNotice(t(msg`已通过好友申请。`));
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-friend-requests", baseUrl],
@@ -101,7 +107,7 @@ function MobileFriendRequestsPage() {
   const declineMutation = useMutation({
     mutationFn: (requestId: string) => declineFriendRequest(requestId, baseUrl),
     onSuccess: async () => {
-      setSuccessNotice("好友请求已处理。");
+      setSuccessNotice(t(msg`好友请求已处理。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-friend-requests", baseUrl],
       });
@@ -177,7 +183,7 @@ function MobileFriendRequestsPage() {
   return (
     <AppPage className="space-y-0 bg-[#f5f5f5] px-0 py-0">
       <TabPageTopBar
-        title="新的朋友"
+        title={t(msg`新的朋友`)}
         titleAlign="center"
         className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
         leftActions={
@@ -205,7 +211,7 @@ function MobileFriendRequestsPage() {
             size="icon"
             className="h-9 w-9 rounded-full text-[color:var(--text-secondary)] active:bg-black/[0.05]"
             onClick={openWorldCharacters}
-            aria-label="浏览世界角色"
+            aria-label={t(msg`浏览世界角色`)}
           >
             <BookUser size={17} />
           </Button>
@@ -216,9 +222,9 @@ function MobileFriendRequestsPage() {
         {requestsQuery.isLoading ? (
           <div className="px-4 pt-2.5">
             <MobileFriendRequestsStatusCard
-              badge="读取中"
-              title="正在读取好友请求"
-              description="稍等一下，正在同步新的好友申请。"
+              badge={t(msg`读取中`)}
+              title={t(msg`正在读取好友请求`)}
+              description={t(msg`稍等一下，正在同步新的好友申请。`)}
               tone="loading"
             />
           </div>
@@ -226,8 +232,8 @@ function MobileFriendRequestsPage() {
         {requestsQuery.isError && requestsQuery.error instanceof Error ? (
           <div className="px-4 pt-2.5">
             <MobileFriendRequestsStatusCard
-              badge="读取失败"
-              title="新的朋友暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`新的朋友暂时不可用`)}
               description={requestsQuery.error.message}
               tone="danger"
               action={
@@ -239,7 +245,7 @@ function MobileFriendRequestsPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleRetryRequests}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     type="button"
@@ -248,7 +254,9 @@ function MobileFriendRequestsPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? "返回上一页" : "浏览世界角色"}
+                    {safeReturnPath
+                      ? t(msg`返回上一页`)
+                      : t(msg`浏览世界角色`)}
                   </Button>
                 </div>
               }
@@ -291,16 +299,16 @@ function MobileFriendRequestsPage() {
                           {request.characterName}
                         </div>
                         <div className="mt-0.5 text-[11px] text-[color:var(--text-muted)]">
-                          {getFriendRequestSourceLabel(request.triggerScene)}
+                          {getFriendRequestSourceLabel(t, request.triggerScene)}
                         </div>
                       </div>
                       <div className="shrink-0 text-[10px] text-[color:var(--text-dim)]">
-                        {formatFriendRequestDate(request.createdAt)}
+                        {formatFriendRequestDate(t, request.createdAt)}
                       </div>
                     </div>
 
                     <div className="mt-2 rounded-[12px] bg-[color:var(--surface-card-hover)] px-3 py-2 text-[13px] leading-5 text-[color:var(--text-secondary)]">
-                      {request.greeting || "想认识你。"}
+                      {request.greeting || t(msg`想认识你。`)}
                     </div>
 
                     <div className="mt-2.5 flex items-center justify-end gap-2">
@@ -315,8 +323,8 @@ function MobileFriendRequestsPage() {
                       >
                         {declineMutation.isPending &&
                         declineMutation.variables === request.id
-                          ? "处理中..."
-                          : "拒绝"}
+                          ? t(msg`处理中...`)
+                          : t(msg`拒绝`)}
                       </Button>
                       <Button
                         disabled={
@@ -329,8 +337,8 @@ function MobileFriendRequestsPage() {
                       >
                         {acceptMutation.isPending &&
                         acceptMutation.variables === request.id
-                          ? "接受中..."
-                          : "接受"}
+                          ? t(msg`接受中...`)
+                          : t(msg`接受`)}
                       </Button>
                     </div>
                   </div>
@@ -359,7 +367,7 @@ function MobileFriendRequestsPage() {
                       className="h-7 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                       onClick={handleRetryAccept}
                     >
-                      重试通过
+                      {t(msg`重试通过`)}
                     </Button>
                   ) : null}
                   <Button
@@ -369,7 +377,9 @@ function MobileFriendRequestsPage() {
                     className="h-7 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? "返回上一页" : "浏览世界角色"}
+                    {safeReturnPath
+                      ? t(msg`返回上一页`)
+                      : t(msg`浏览世界角色`)}
                   </Button>
                 </div>
               </div>
@@ -395,7 +405,7 @@ function MobileFriendRequestsPage() {
                       className="h-7 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                       onClick={handleRetryDecline}
                     >
-                      重试拒绝
+                      {t(msg`重试拒绝`)}
                     </Button>
                   ) : null}
                   <Button
@@ -405,7 +415,9 @@ function MobileFriendRequestsPage() {
                     className="h-7 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? "返回上一页" : "浏览世界角色"}
+                    {safeReturnPath
+                      ? t(msg`返回上一页`)
+                      : t(msg`浏览世界角色`)}
                   </Button>
                 </div>
               </div>
@@ -418,9 +430,9 @@ function MobileFriendRequestsPage() {
         !requestsQuery.data?.length ? (
           <div className="px-4 pt-4">
             <MobileFriendRequestsStatusCard
-              badge="新的朋友"
-              title="暂时没有新的好友请求"
-              description="去发现页摇一摇，或等待场景触发新的相遇。"
+              badge={t(msg`新的朋友`)}
+              title={t(msg`暂时没有新的好友请求`)}
+              description={t(msg`去发现页摇一摇，或等待场景触发新的相遇。`)}
               action={
                 <Button
                   type="button"
@@ -429,7 +441,9 @@ function MobileFriendRequestsPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                   onClick={handleStatusBack}
                 >
-                  {safeReturnPath ? "返回上一页" : "浏览世界角色"}
+                  {safeReturnPath
+                    ? t(msg`返回上一页`)
+                    : t(msg`浏览世界角色`)}
                 </Button>
               }
             />
@@ -440,19 +454,19 @@ function MobileFriendRequestsPage() {
   );
 }
 
-function getFriendRequestSourceLabel(triggerScene?: string) {
+function getFriendRequestSourceLabel(t: Translator, triggerScene?: string) {
   if (!triggerScene) {
-    return "新的朋友";
+    return t(msg`新的朋友`);
   }
 
   if (triggerScene === "shake") {
-    return "来自摇一摇";
+    return t(msg`来自摇一摇`);
   }
 
-  return `来自 ${triggerScene}`;
+  return t(msg`来自 ${triggerScene}`);
 }
 
-function formatFriendRequestDate(createdAt: string) {
+function formatFriendRequestDate(t: Translator, createdAt: string) {
   const date = new Date(createdAt);
   if (Number.isNaN(date.getTime())) {
     return "";
@@ -464,7 +478,7 @@ function formatFriendRequestDate(createdAt: string) {
   const sameDay = sameMonth && date.getDate() === now.getDate();
 
   if (sameDay) {
-    return "今天";
+    return t(msg`今天`);
   }
 
   const formatter = new Intl.DateTimeFormat("zh-CN", {
