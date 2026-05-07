@@ -16,6 +16,7 @@ import {
 import { wikiApi } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
+import { formatDateTime } from "../lib/format";
 
 export function AdminProtectionPage() {
   const t = translateRuntimeMessage;
@@ -137,9 +138,7 @@ export function AdminProtectionPage() {
                     <span className="ml-3 text-xs text-[color:var(--text-muted)]">
                       <Trans>
                         到期：
-                        {new Date(
-                          pageQ.data.page.protectionExpiresAt,
-                        ).toLocaleString()}
+                        {formatDateTime(pageQ.data.page.protectionExpiresAt)}
                       </Trans>
                     </span>
                   )}
@@ -232,11 +231,11 @@ export function AdminProtectionPage() {
                   </div>
                   <div className="mt-1 text-xs text-[color:var(--text-muted)]">
                     <Trans>
-                      {new Date(row.createdAt).toLocaleString()} · 由{" "}
+                      {formatDateTime(row.createdAt)} · 由{" "}
                       {row.changedBy}
                     </Trans>
                     {row.expiresAt &&
-                      ` · ${t(msg`到期 ${new Date(row.expiresAt).toLocaleString()}`)}`}
+                      ` · ${t(msg`到期 ${formatDateTime(row.expiresAt)}`)}`}
                   </div>
                   {row.reason && (
                     <div className="mt-1 text-xs">{row.reason}</div>

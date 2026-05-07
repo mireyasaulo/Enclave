@@ -17,6 +17,7 @@ import { useAuth } from "../lib/use-auth";
 import { wikiApi, type WikiBlockRow } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
+import { formatDateTime } from "../lib/format";
 
 export function AdminBlocksPage() {
   const t = translateRuntimeMessage;
@@ -253,11 +254,11 @@ function BlockRow({
         </div>
         <div>{block.reason}</div>
         <div className="text-xs text-[color:var(--text-muted)]">
-          <Trans>创建于 {new Date(block.createdAt).toLocaleString()}</Trans>
+          <Trans>创建于 {formatDateTime(block.createdAt)}</Trans>
           {block.expiresAt &&
-            ` · ${t(msg`到期 ${new Date(block.expiresAt).toLocaleString()}`)}`}
+            ` · ${t(msg`到期 ${formatDateTime(block.expiresAt)}`)}`}
           {block.revokedAt &&
-            ` · ${t(msg`撤销于 ${new Date(block.revokedAt).toLocaleString()}`)}`}
+            ` · ${t(msg`撤销于 ${formatDateTime(block.revokedAt)}`)}`}
         </div>
       </div>
       {isActive && (

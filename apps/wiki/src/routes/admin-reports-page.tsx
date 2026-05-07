@@ -14,6 +14,7 @@ import {
 } from "@yinjie/ui";
 import { wikiApi, type ModerationReport } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
+import { formatDateTime } from "../lib/format";
 
 export function AdminReportsPage() {
   const t = translateRuntimeMessage;
@@ -112,7 +113,7 @@ function ReportCard({
         <span className="ml-auto text-xs text-[color:var(--text-muted)]">
           <Trans>
             举报人 {report.ownerId.slice(0, 8)} ·{" "}
-            {new Date(report.createdAt).toLocaleString()}
+            {formatDateTime(report.createdAt)}
           </Trans>
         </span>
       </div>

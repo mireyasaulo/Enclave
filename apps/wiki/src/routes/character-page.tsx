@@ -33,6 +33,7 @@ import { RiskBadge } from "../components/risk-badge";
 import { ScenePromptPreview } from "../components/scene-prompt-preview";
 import { WikiApiError } from "../lib/wiki-api";
 import { FormRow } from "../components/form-row";
+import { formatDateTime } from "../lib/format";
 
 type Tab = "read" | "edit" | "history" | "talk";
 
@@ -380,7 +381,7 @@ function ReadView({ view }: { view: WikiPageView }) {
         {view.viewMode === "current" ? t(msg`最新版`) : t(msg`稳定版`)}：
         {view.currentRevision
           ? t(
-              msg`v${view.currentRevision.version} · 由 ${view.currentRevision.editorUserId} 提交于 ${new Date(view.currentRevision.createdAt).toLocaleString()}`,
+              msg`v${view.currentRevision.version} · 由 ${view.currentRevision.editorUserId} 提交于 ${formatDateTime(view.currentRevision.createdAt)}`,
             )
           : t(msg`尚未有 wiki 版本（显示后台原始数据）`)}
         {view.stableRevision &&
@@ -1905,7 +1906,7 @@ function RevisionCard({
             {rev.editorRoleAtTime}
           </span>
           <span className="text-xs text-[var(--text-muted)]">
-            {new Date(rev.createdAt).toLocaleString()}
+            {formatDateTime(rev.createdAt)}
           </span>
           <StatusPill>{rev.status}</StatusPill>
           <StatusPill>{rev.operation}</StatusPill>

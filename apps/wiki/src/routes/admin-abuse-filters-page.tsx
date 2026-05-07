@@ -23,6 +23,7 @@ import {
 } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
+import { formatDateTime } from "../lib/format";
 
 export function AdminAbuseFiltersPage() {
   const t = translateRuntimeMessage;
@@ -115,7 +116,7 @@ export function AdminAbuseFiltersPage() {
                 <ActionPill action={h.actionTaken} />
                 <span className="font-mono text-xs">{h.userId}</span>
                 <span className="text-xs text-[color:var(--text-muted)]">
-                  {new Date(h.createdAt).toLocaleString()}
+                  {formatDateTime(h.createdAt)}
                 </span>
                 {h.characterId && (
                   <span className="text-xs">
@@ -172,7 +173,7 @@ function FilterCard({
         <span className="ml-auto text-xs text-[color:var(--text-muted)]">
           <Trans>命中 {filter.hitCount} 次</Trans>
           {filter.lastHitAt
-            ? ` · ${t(msg`最近 ${new Date(filter.lastHitAt).toLocaleString()}`)}`
+            ? ` · ${t(msg`最近 ${formatDateTime(filter.lastHitAt)}`)}`
             : ""}
         </span>
       </div>

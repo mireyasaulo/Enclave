@@ -12,6 +12,7 @@ import { roleLabel } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
 import { wikiApi } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
+import { formatDate } from "../lib/format";
 
 type WikiRole = "newcomer" | "autoconfirmed" | "patroller" | "admin";
 
@@ -107,7 +108,7 @@ export function AdminUsersPage() {
                       )}
                     </td>
                     <td className="hidden px-4 py-3 text-xs text-[color:var(--text-muted)] md:table-cell">
-                      {new Date(u.createdAt).toLocaleDateString()}
+                      {formatDate(u.createdAt)}
                     </td>
                     <td className="px-4 py-3">
                       <StatusPill>{roleLabel(u.role)}</StatusPill>

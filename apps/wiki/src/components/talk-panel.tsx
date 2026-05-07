@@ -19,6 +19,7 @@ import {
   type WikiTalkPost,
   type WikiTalkThread,
 } from "../lib/wiki-api";
+import { formatDateTime } from "../lib/format";
 
 export function TalkPanel({ characterId }: { characterId: string }) {
   const t = translateRuntimeMessage;
@@ -156,7 +157,7 @@ function ThreadCard({
           <Trans>
             {thread.postCount} 条 · 最近{" "}
             {thread.lastReplyAt
-              ? new Date(thread.lastReplyAt).toLocaleString()
+              ? formatDateTime(thread.lastReplyAt)
               : "—"}
           </Trans>
         </span>
@@ -315,7 +316,7 @@ function PostTree({
             <strong className="text-[var(--text-primary)]">
               {post.authorId.slice(0, 8)}
             </strong>
-            <span>{new Date(post.createdAt).toLocaleString()}</span>
+            <span>{formatDateTime(post.createdAt)}</span>
             {post.deletedAt && (
               <StatusPill>
                 <Trans>已删除</Trans>

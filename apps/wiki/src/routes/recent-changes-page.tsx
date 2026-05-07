@@ -15,6 +15,7 @@ import { hasRole } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
 import { wikiApi, type WikiRevisionSummary } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
+import { formatDateTime } from "../lib/format";
 
 export function RecentChangesPage() {
   const t = translateRuntimeMessage;
@@ -138,7 +139,7 @@ function ChangeRow({
         <div className="text-xs text-[color:var(--text-muted)]">
           <Trans>
             {rev.editorUserId}（{rev.editorRoleAtTime}） ·{" "}
-            {new Date(rev.createdAt).toLocaleString()}
+            {formatDateTime(rev.createdAt)}
           </Trans>
         </div>
         {rev.editSummary && (

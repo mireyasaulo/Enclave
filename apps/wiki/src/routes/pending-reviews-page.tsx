@@ -21,6 +21,7 @@ import { wikiApi, type PendingReviewItem } from "../lib/wiki-api";
 import { SnapshotDiff } from "../components/snapshot-diff";
 import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
+import { formatDateTime } from "../lib/format";
 
 export function PendingReviewsPage() {
   const t = translateRuntimeMessage;
@@ -227,7 +228,7 @@ function ReviewCard({
         <span className="ml-auto text-xs text-[color:var(--text-muted)]">
           <Trans>
             由 {rev.editorUserId}（{rev.editorRoleAtTime}）提交于{" "}
-            {new Date(rev.createdAt).toLocaleString()}
+            {formatDateTime(rev.createdAt)}
           </Trans>
         </span>
       </div>

@@ -13,6 +13,7 @@ import {
 import { useAuth } from "../lib/use-auth";
 import { wikiApi } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
+import { formatDate, formatDateTime } from "../lib/format";
 
 export function WatchlistPage() {
   const t = translateRuntimeMessage;
@@ -94,7 +95,7 @@ export function WatchlistPage() {
                   )}
                   <span className="ml-auto text-xs text-[color:var(--text-muted)]">
                     <Trans>
-                      自 {new Date(entry.addedAt).toLocaleDateString()}
+                      自 {formatDate(entry.addedAt)}
                     </Trans>
                   </span>
                 </div>
@@ -139,7 +140,7 @@ export function WatchlistPage() {
                       </Link>
                       <span className="ml-auto text-xs text-[color:var(--text-muted)]">
                         v{item.revision.version} ·{" "}
-                        {new Date(item.revision.createdAt).toLocaleString()}
+                        {formatDateTime(item.revision.createdAt)}
                       </span>
                     </div>
                     {item.revision.editSummary && (
@@ -163,7 +164,7 @@ export function WatchlistPage() {
                       </Link>
                       <span className="ml-auto text-xs text-[color:var(--text-muted)]">
                         {item.thread.lastReplyAt
-                          ? new Date(item.thread.lastReplyAt).toLocaleString()
+                          ? formatDateTime(item.thread.lastReplyAt)
                           : ""}
                       </span>
                     </div>
