@@ -3,6 +3,7 @@ import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -54,6 +55,8 @@ export interface Moment {
   authorName: string;
   authorAvatar: string;
   authorType: string;
+  visibility: string;
+  canInteract: boolean;
   text: string;
   location?: string;
   contentType: MomentContentType;
@@ -71,6 +74,7 @@ type MomentAvatarContext = {
   ownerAvatar: string;
   ownerId: string;
   visibleCharacterIds: Set<string>;
+  ownerFriendCharacterIds: Set<string>;
   characterAvatarById: Map<string, string>;
 };
 
@@ -143,7 +147,11 @@ export class MomentsService implements OnModuleInit {
     });
     const posts = await this.postRepo.find({ order: { postedAt: 'DESC' } });
     const visiblePosts = posts.filter((post) =>
-      this.canOwnerViewPost(post, avatarContext.visibleCharacterIds),
+      this.canOwnerViewPost(
+        post,
+        avatarContext.visibleCharacterIds,
+        avatarContext.ownerFriendCharacterIds,
+      ),
     );
     return Promise.all(
       visiblePosts.map((post) => this._enrichPost(post, avatarContext)),
@@ -159,7 +167,11 @@ export class MomentsService implements OnModuleInit {
     const post = await this.postRepo.findOneBy({ id: postId });
     if (
       !post ||
-      !this.canOwnerViewPost(post, avatarContext.visibleCharacterIds)
+      !this.canOwnerViewPost(
+        post,
+        avatarContext.visibleCharacterIds,
+        avatarContext.ownerFriendCharacterIds,
+      )
     )
       return null;
     return this._enrichPost(post, avatarContext);
@@ -307,6 +319,7 @@ export class MomentsService implements OnModuleInit {
         authorName: char.name,
         authorAvatar: char.avatar,
         authorType: 'character',
+        visibility: this.deriveDefaultVisibility(char.socialOpenness),
         text,
         contentType: 'text',
         mediaPayload: this.serializeMomentMedia([]),
@@ -615,21 +628,56 @@ export class MomentsService implements OnModuleInit {
   private canOwnerViewPost(
     post: MomentPostEntity,
     visibleCharacterIds: Set<string>,
+    ownerFriendCharacterIds?: Set<string>,
   ): boolean {
-    return (
-      post.authorType !== 'character' || visibleCharacterIds.has(post.authorId)
-    );
+    if (post.authorType !== 'character') return true;
+    if (!visibleCharacterIds.has(post.authorId)) return false;
+    if (post.visibility === 'private') return false;
+    if (post.visibility === 'friends') {
+      return !!ownerFriendCharacterIds?.has(post.authorId);
+    }
+    return true;
+  }
+
+  private canOwnerInteractWithPost(
+    post: MomentPostEntity,
+    ownerFriendCharacterIds: Set<string>,
+    ownerId: string,
+  ): boolean {
+    if (post.authorType === 'user') {
+      return true;
+    }
+    if (post.authorType === 'character') {
+      return ownerFriendCharacterIds.has(post.authorId);
+    }
+    return post.authorId === ownerId;
   }
 
   private async assertOwnerCanInteractWithPost(
     postId: string,
   ): Promise<MomentPostEntity> {
-    const visibleCharacterIds = await this.getVisibleCharacterIdSet();
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const [visibleCharacterIds, ownerFriendCharacterIds] = await Promise.all([
+      this.getVisibleCharacterIdSet(),
+      this.characters.getActiveFriendCharacterIdSet(owner.id),
+    ]);
     const post = await this.postRepo.findOneBy({ id: postId });
-    if (!post || !this.canOwnerViewPost(post, visibleCharacterIds)) {
+    if (
+      !post ||
+      !this.canOwnerViewPost(post, visibleCharacterIds, ownerFriendCharacterIds)
+    ) {
       throw new NotFoundException('Moment not found');
     }
+    if (!this.canOwnerInteractWithPost(post, ownerFriendCharacterIds, owner.id)) {
+      throw new ForbiddenException('需先加为好友才能互动');
+    }
     return post;
+  }
+
+  private deriveDefaultVisibility(
+    socialOpenness: string | null | undefined,
+  ): 'public' | 'friends' {
+    return socialOpenness === 'private' ? 'friends' : 'public';
   }
 
   private async _enrichPost(
@@ -676,6 +724,12 @@ export class MomentsService implements OnModuleInit {
         resolvedAvatarContext,
       ),
       authorType: post.authorType,
+      visibility: post.visibility,
+      canInteract: this.canOwnerInteractWithPost(
+        post,
+        resolvedAvatarContext.ownerFriendCharacterIds,
+        resolvedAvatarContext.ownerId,
+      ),
       text: post.text,
       location: post.location,
       contentType: this.normalizeMomentContentType(post.contentType),
@@ -744,9 +798,10 @@ export class MomentsService implements OnModuleInit {
             id: input.ownerId,
             avatar: input.ownerAvatar ?? '',
           };
-    const visibleCharacters = await this.characters.findAllVisibleToOwner(
-      owner.id,
-    );
+    const [visibleCharacters, ownerFriendCharacterIds] = await Promise.all([
+      this.characters.findAllVisibleToOwner(owner.id),
+      this.characters.getActiveFriendCharacterIdSet(owner.id),
+    ]);
 
     return {
       ownerAvatar: owner.avatar?.trim() || '',
@@ -754,6 +809,7 @@ export class MomentsService implements OnModuleInit {
       visibleCharacterIds: new Set(
         visibleCharacters.map((character) => character.id),
       ),
+      ownerFriendCharacterIds,
       characterAvatarById: new Map(
         visibleCharacters.map((character) => [character.id, character.avatar]),
       ),

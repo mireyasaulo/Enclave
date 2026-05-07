@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -50,6 +51,7 @@ type FeedAvatarContext = {
   ownerAvatar: string;
   ownerId: string;
   visibleCharacterIds: Set<string>;
+  ownerFriendCharacterIds: Set<string>;
   characterAvatarById: Map<string, string>;
 };
 
@@ -403,6 +405,7 @@ export class FeedService implements OnModuleInit {
     recommendationScore?: number;
     statsPayload?: Record<string, unknown> | null;
     surface?: FeedSurface;
+    visibility?: 'public' | 'friends' | 'private';
   }): Promise<FeedPostEntity> {
     const normalizedInput = this.normalizeCreatePostInput(input);
     const post = this.postRepo.create({
@@ -429,6 +432,7 @@ export class FeedService implements OnModuleInit {
       recommendationScore: input.recommendationScore ?? 0,
       statsPayload: input.statsPayload ?? null,
       surface: input.surface ?? 'feed',
+      visibility: input.visibility ?? 'public',
     });
     const saved = await this.postRepo.save(post);
     if (saved.authorType === 'user') {
@@ -487,6 +491,7 @@ export class FeedService implements OnModuleInit {
         syncedFrom: 'moments',
       },
       surface: 'feed',
+      visibility: (post.visibility as 'public' | 'friends' | 'private') ?? 'public',
     });
   }
 
@@ -494,6 +499,7 @@ export class FeedService implements OnModuleInit {
     postId: string,
     text: string,
   ): Promise<ReturnType<FeedService['serializeComment']>> {
+    await this.assertOwnerCanInteractWithPost(postId);
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const comment = await this.addComment({
       postId,
@@ -561,6 +567,8 @@ export class FeedService implements OnModuleInit {
       throw new NotFoundException('Comment not found');
     }
 
+    await this.assertOwnerCanInteractWithPost(parentComment.postId);
+
     const reply = await this.addComment({
       postId: parentComment.postId,
       authorId: owner.id,
@@ -577,6 +585,7 @@ export class FeedService implements OnModuleInit {
   }
 
   async likeOwnerPost(postId: string): Promise<void> {
+    await this.assertOwnerCanInteractWithPost(postId);
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     await this.createPostInteraction({
       ownerId: owner.id,
@@ -587,6 +596,7 @@ export class FeedService implements OnModuleInit {
   }
 
   async favoriteOwnerPost(postId: string): Promise<void> {
+    await this.assertOwnerCanInteractWithPost(postId);
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     await this.createPostInteraction({
       ownerId: owner.id,
@@ -734,6 +744,8 @@ export class FeedService implements OnModuleInit {
     if (!comment) {
       throw new NotFoundException('Comment not found');
     }
+
+    await this.assertOwnerCanInteractWithPost(comment.postId);
 
     const existing = await this.interactionRepo.find({
       where: {
@@ -1320,12 +1332,19 @@ export class FeedService implements OnModuleInit {
           ? { recommendationScore: 'DESC', createdAt: 'DESC' }
           : { createdAt: 'DESC' },
     });
-    const visibleCharacterIds = await this.getVisibleCharacterIdSet(ownerId);
-    return posts.filter(
-      (post) =>
-        post.authorType !== 'character' ||
-        visibleCharacterIds.has(post.authorId),
-    );
+    const [visibleCharacterIds, ownerFriendIds] = await Promise.all([
+      this.getVisibleCharacterIdSet(ownerId),
+      this.characters.getActiveFriendCharacterIdSet(ownerId),
+    ]);
+    return posts.filter((post) => {
+      if (post.authorType !== 'character') return true;
+      if (!visibleCharacterIds.has(post.authorId)) return false;
+      if (post.visibility === 'private') return false;
+      if (post.visibility === 'friends') {
+        return ownerFriendIds.has(post.authorId);
+      }
+      return true;
+    });
   }
 
   private async getVisibleChannelPosts(
@@ -1722,6 +1741,15 @@ export class FeedService implements OnModuleInit {
     return `${imageCount} 张图片`;
   }
 
+  private canOwnerInteractWithFeedPost(
+    post: FeedPostEntity,
+    avatarContext?: FeedAvatarContext,
+  ): boolean {
+    if (post.authorType !== 'character') return true;
+    if (!avatarContext) return false;
+    return avatarContext.ownerFriendCharacterIds.has(post.authorId);
+  }
+
   private serializePost(
     post: FeedPostEntity,
     ownerState?: FeedOwnerState,
@@ -1744,6 +1772,11 @@ export class FeedService implements OnModuleInit {
               avatarContext,
             ),
       authorType: post.authorType as 'user' | 'character',
+      visibility: (post.visibility ?? 'public') as
+        | 'public'
+        | 'friends'
+        | 'private',
+      canInteract: this.canOwnerInteractWithFeedPost(post, avatarContext),
       surface: post.surface as FeedSurface,
       text: post.text,
       title: post.title ?? null,
@@ -1841,9 +1874,10 @@ export class FeedService implements OnModuleInit {
             id: input.ownerId,
             avatar: input.ownerAvatar ?? '',
           };
-    const visibleCharacters = await this.characters.findAllVisibleToOwner(
-      owner.id,
-    );
+    const [visibleCharacters, ownerFriendCharacterIds] = await Promise.all([
+      this.characters.findAllVisibleToOwner(owner.id),
+      this.characters.getActiveFriendCharacterIdSet(owner.id),
+    ]);
 
     return {
       ownerAvatar: owner.avatar?.trim() || '',
@@ -1851,6 +1885,7 @@ export class FeedService implements OnModuleInit {
       visibleCharacterIds: new Set(
         visibleCharacters.map((character) => character.id),
       ),
+      ownerFriendCharacterIds,
       characterAvatarById: new Map(
         visibleCharacters.map((character) => [character.id, character.avatar]),
       ),
@@ -2001,6 +2036,19 @@ export class FeedService implements OnModuleInit {
     const post = await this.postRepo.findOneBy({ id: postId });
     if (!post || post.publishStatus === 'deleted') {
       throw new NotFoundException('Feed post not found');
+    }
+    return post;
+  }
+
+  private async assertOwnerCanInteractWithPost(postId: string) {
+    const post = await this.assertPostExists(postId);
+    if (post.authorType !== 'character') return post;
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const friendIds = await this.characters.getActiveFriendCharacterIdSet(
+      owner.id,
+    );
+    if (!friendIds.has(post.authorId)) {
+      throw new ForbiddenException('需先加为好友才能互动');
     }
     return post;
   }
