@@ -9,7 +9,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
-import { WelcomeMessageService } from './welcome-message.service';
 
 export type AuthUserPayload = {
   sub: string;
@@ -36,7 +35,6 @@ export class AuthService {
     private readonly userRepo: Repository<UserEntity>,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
-    private readonly welcomeMessageService: WelcomeMessageService,
   ) {}
 
   async register(username: string, password: string): Promise<AuthSession> {
@@ -65,7 +63,6 @@ export class AuthService {
       roleGrantedBy: bootstrapAsAdmin ? 'first_wiki_member_bootstrap' : null,
     });
     const saved = await this.userRepo.save(user);
-    await this.welcomeMessageService.sendWelcomeMessage();
     return this.buildSession(saved);
   }
 

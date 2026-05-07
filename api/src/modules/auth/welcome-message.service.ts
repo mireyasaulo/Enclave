@@ -8,7 +8,6 @@ import {
 } from '../characters/default-characters';
 import { ConversationEntity } from '../chat/conversation.entity';
 import { MessageEntity } from '../chat/message.entity';
-import { WorldOwnerService } from './world-owner.service';
 
 const WELCOME_MESSAGE_TEXT =
   '你来了。欢迎来到这个世界——慢慢看，慢慢说，我都在。';
@@ -24,15 +23,17 @@ export class WelcomeMessageService {
     private readonly conversationRepo: Repository<ConversationEntity>,
     @InjectRepository(MessageEntity)
     private readonly messageRepo: Repository<MessageEntity>,
-    private readonly worldOwnerService: WorldOwnerService,
   ) {}
 
-  async sendWelcomeMessage(): Promise<void> {
+  async sendWelcomeMessage(ownerId: string): Promise<void> {
+    if (!ownerId) {
+      return;
+    }
+
     try {
-      const owner = await this.worldOwnerService.getOwnerOrThrow();
       const selfCharacter = await this.ensureSelfCharacter();
       const conversationId = `direct_${SELF_CHARACTER_ID}`;
-      const welcomeMessageId = `msg_welcome_self_${owner.id}`;
+      const welcomeMessageId = `msg_welcome_self_${ownerId}`;
 
       const existingWelcome = await this.messageRepo.findOneBy({
         id: welcomeMessageId,
@@ -49,7 +50,7 @@ export class WelcomeMessageService {
         await this.conversationRepo.save(
           this.conversationRepo.create({
             id: conversationId,
-            ownerId: owner.id,
+            ownerId,
             type: 'direct',
             title: selfCharacter.name,
             participants: [SELF_CHARACTER_ID],

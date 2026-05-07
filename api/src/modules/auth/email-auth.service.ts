@@ -14,7 +14,6 @@ import { MailService } from '../mail/mail.service';
 import type { AuthSession, AuthUserPayload } from './auth.service';
 import { EmailVerificationSessionEntity } from './email-verification-session.entity';
 import { UserEntity } from './user.entity';
-import { WelcomeMessageService } from './welcome-message.service';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -34,7 +33,6 @@ export class EmailAuthService {
     private readonly mail: MailService,
     private readonly jwt: JwtService,
     private readonly config: ConfigService,
-    private readonly welcomeMessageService: WelcomeMessageService,
   ) {}
 
   async sendCode(email: string): Promise<SendEmailCodeResult> {
@@ -126,7 +124,6 @@ export class EmailAuthService {
       roleGrantedBy: bootstrapAsAdmin ? 'first_wiki_member_bootstrap' : null,
     });
     const saved = await this.userRepo.save(user);
-    await this.welcomeMessageService.sendWelcomeMessage();
     return saved;
   }
 
