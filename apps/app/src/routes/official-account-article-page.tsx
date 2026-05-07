@@ -9,11 +9,13 @@ import {
 } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { ArrowLeft, Copy, Share2 } from "lucide-react";
 import {
   getOfficialAccountArticle,
   markOfficialAccountArticleRead,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import { OfficialArticleViewer } from "../components/official-article-viewer";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -42,6 +44,7 @@ const DesktopOfficialArticleRouteShell = lazy(async () => {
 });
 
 export function OfficialAccountArticlePage() {
+  const t = useRuntimeTranslator();
   const { articleId } = useParams({
     from: "/official-accounts/articles/$articleId",
   });
@@ -52,9 +55,9 @@ export function OfficialAccountArticlePage() {
       <Suspense
         fallback={
           <RouteRedirectState
-            title="正在打开桌面公众号文章"
-            description="正在载入桌面文章阅读视图，马上显示当前内容。"
-            loadingLabel="载入桌面公众号文章..."
+            title={t(msg`正在打开桌面公众号文章`)}
+            description={t(msg`正在载入桌面文章阅读视图，马上显示当前内容。`)}
+            loadingLabel={t(msg`载入桌面公众号文章...`)}
           />
         }
       >
@@ -71,6 +74,7 @@ function MobileOfficialAccountArticlePage({
 }: {
   articleId: string;
 }) {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
@@ -201,10 +205,10 @@ function MobileOfficialAccountArticlePage({
   }
 
   const statusBackLabel = safeReturnPath
-    ? "返回上一页"
+    ? t(msg`返回上一页`)
     : article?.account.id
-      ? "返回公众号主页"
-      : "返回公众号列表";
+      ? t(msg`返回公众号主页`)
+      : t(msg`返回公众号列表`);
 
   function toggleArticleFavorite() {
     if (!article) {
@@ -227,10 +231,10 @@ function MobileOfficialAccountArticlePage({
     ) {
       setShareNotice({
         message: nativeMobileShareSupported
-          ? "当前设备暂时无法打开系统分享，请稍后重试。"
-          : "当前环境暂不支持复制文章链接。",
+          ? t(msg`当前设备暂时无法打开系统分享，请稍后重试。`)
+          : t(msg`当前环境暂不支持复制文章链接。`),
         tone: "info",
-        actionLabel: nativeMobileShareSupported ? "重试分享" : "重试复制",
+        actionLabel: nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
         onAction: () => {
           void handleShareArticle();
         },
@@ -242,17 +246,17 @@ function MobileOfficialAccountArticlePage({
       await navigator.clipboard.writeText(articleUrl);
       setShareNotice({
         message: nativeMobileShareSupported
-          ? "系统分享暂时不可用，已复制文章链接。"
-          : "文章链接已复制。",
+          ? t(msg`系统分享暂时不可用，已复制文章链接。`)
+          : t(msg`文章链接已复制。`),
         tone: "success",
       });
     } catch {
       setShareNotice({
         message: nativeMobileShareSupported
-          ? "系统分享失败，请稍后重试。"
-          : "复制文章链接失败，请稍后重试。",
+          ? t(msg`系统分享失败，请稍后重试。`)
+          : t(msg`复制文章链接失败，请稍后重试。`),
         tone: "info",
-        actionLabel: nativeMobileShareSupported ? "重试分享" : "重试复制",
+        actionLabel: nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
         onAction: () => {
           void handleShareArticle();
         },
@@ -278,7 +282,7 @@ function MobileOfficialAccountArticlePage({
 
     if (shared) {
       setShareNotice({
-        message: "已打开系统分享面板。",
+        message: t(msg`已打开系统分享面板。`),
         tone: "success",
       });
       return;
@@ -290,7 +294,7 @@ function MobileOfficialAccountArticlePage({
   return (
     <AppPage className="space-y-0 bg-white px-0 py-0">
       <TabPageTopBar
-        title={article?.account.name ?? "公众号文章"}
+        title={article?.account.name ?? t(msg`公众号文章`)}
         subtitle={
           article
             ? `${article.authorName} · ${formatConversationTimestamp(article.publishedAt)}`
@@ -333,7 +337,7 @@ function MobileOfficialAccountArticlePage({
               className="h-9 w-9 rounded-full text-[color:var(--text-primary)] active:bg-black/[0.05]"
               onClick={() => void handleShareArticle()}
               aria-label={
-                nativeMobileShareSupported ? "分享文章" : "复制文章链接"
+                nativeMobileShareSupported ? t(msg`分享文章`) : t(msg`复制文章链接`)
               }
             >
               {nativeMobileShareSupported ? (
@@ -350,9 +354,9 @@ function MobileOfficialAccountArticlePage({
         {articleQuery.isLoading ? (
           <div className="mx-auto max-w-[24rem] px-4 pt-2">
             <MobileOfficialArticleStatusCard
-              badge="读取中"
-              title="正在读取文章"
-              description="稍等一下，正在同步正文内容和阅读状态。"
+              badge={t(msg`读取中`)}
+              title={t(msg`正在读取文章`)}
+              description={t(msg`稍等一下，正在同步正文内容和阅读状态。`)}
               tone="loading"
             />
           </div>
@@ -360,8 +364,8 @@ function MobileOfficialAccountArticlePage({
         {articleQuery.isError && articleQuery.error instanceof Error ? (
           <div className="mx-auto max-w-[24rem] px-4 pt-2">
             <MobileOfficialArticleStatusCard
-              badge="读取失败"
-              title="文章暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`文章暂时不可用`)}
               description={articleQuery.error.message}
               tone="danger"
               action={
@@ -373,7 +377,7 @@ function MobileOfficialAccountArticlePage({
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleRetryArticle}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     type="button"
@@ -392,8 +396,8 @@ function MobileOfficialAccountArticlePage({
         {markReadMutation.isError && markReadMutation.error instanceof Error ? (
           <div className="mx-auto max-w-[24rem] px-4 pt-2">
             <MobileOfficialArticleStatusCard
-              badge="同步失败"
-              title="阅读状态暂未同步"
+              badge={t(msg`同步失败`)}
+              title={t(msg`阅读状态暂未同步`)}
               description={markReadMutation.error.message}
               tone="danger"
               action={
@@ -406,7 +410,7 @@ function MobileOfficialAccountArticlePage({
                       className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                       onClick={handleRetryMarkRead}
                     >
-                      重试同步
+                      {t(msg`重试同步`)}
                     </Button>
                   ) : null}
                   <Button
@@ -464,9 +468,9 @@ function MobileOfficialAccountArticlePage({
         {!articleQuery.isLoading && !articleQuery.isError && !article ? (
           <div className="mx-auto max-w-[24rem] px-4 pt-2">
             <MobileOfficialArticleStatusCard
-              badge="公众号文章"
-              title="这篇文章暂时不可用"
-              description="可以先重试读取，或返回上一页稍后再试。"
+              badge={t(msg`公众号文章`)}
+              title={t(msg`这篇文章暂时不可用`)}
+              description={t(msg`可以先重试读取，或返回上一页稍后再试。`)}
               action={
                 <div className="flex flex-wrap items-center justify-center gap-2">
                   <Button
@@ -476,7 +480,7 @@ function MobileOfficialAccountArticlePage({
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleRetryArticle}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     type="button"

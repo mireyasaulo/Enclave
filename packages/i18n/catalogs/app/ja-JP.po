@@ -2502,6 +2502,8 @@ msgid "公众号摘要已复制。"
 msgstr "公式アカウントの概要をコピーしました。"
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:592
+#: apps/app/src/routes/official-account-article-page.tsx:297
+#: apps/app/src/routes/official-account-article-page.tsx:471
 msgid "公众号文章"
 msgstr "公式アカウント記事"
 
@@ -3286,6 +3288,10 @@ msgstr "ツールを共有"
 #: apps/app/src/i18n/static-dom-seed.ts:886
 msgid "分享文档"
 msgstr "ドキュメントを共有"
+
+#: apps/app/src/routes/official-account-article-page.tsx:340
+msgid "分享文章"
+msgstr "記事をシェア"
 
 #: apps/app/src/routes/group-announcement-page.tsx:284
 msgid "分享群公告"
@@ -4245,6 +4251,7 @@ msgid "可以先添加成员，或者切换筛选查看特定角色。"
 msgstr "まずメンバーを追加するか、フィルターを切り替えて特定の役割を確認できます。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1022
+#: apps/app/src/routes/official-account-article-page.tsx:473
 #: apps/app/src/routes/official-account-detail-page.tsx:400
 msgid "可以先重试读取，或返回上一页稍后再试。"
 msgstr "読み込みを再試行するか、前のページに戻って後でもう一度お試しください。"
@@ -4351,6 +4358,10 @@ msgstr ""
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:274
 msgid "同步最新状态"
 msgstr ""
+
+#: apps/app/src/routes/official-account-article-page.tsx:399
+msgid "同步失败"
+msgstr "同期失敗"
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:1182
 msgid "同步概览"
@@ -4876,6 +4887,14 @@ msgstr "文書概要をコピー"
 #: apps/app/src/i18n/static-dom-seed.ts:891
 msgid "复制文档摘要失败，请稍后重试。"
 msgstr "ドキュメント概要のコピーに失敗しました。後でもう一度お試しください。"
+
+#: apps/app/src/routes/official-account-article-page.tsx:340
+msgid "复制文章链接"
+msgstr "記事リンクをコピー"
+
+#: apps/app/src/routes/official-account-article-page.tsx:257
+msgid "复制文章链接失败，请稍后重试。"
+msgstr "記事リンクのコピーに失敗しました。あとで再度お試しください。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:468
 msgid "复制游戏入口"
@@ -5726,6 +5745,7 @@ msgstr "ファイルを開きました。"
 #: apps/app/src/routes/group-qr-page.tsx:969
 #: apps/app/src/routes/group-qr-page.tsx:1001
 #: apps/app/src/routes/moments-page.tsx:610
+#: apps/app/src/routes/official-account-article-page.tsx:285
 #: apps/app/src/routes/official-account-detail-page.tsx:224
 msgid "已打开系统分享面板。"
 msgstr "システム共有シートを開きました。"
@@ -6889,6 +6909,10 @@ msgstr "現在の環境ではスマホ引き継ぎリンクのコピーに対応
 msgid "当前环境暂不支持复制文档摘要。"
 msgstr "現在の環境ではドキュメント概要のコピーにまだ対応していません。"
 
+#: apps/app/src/routes/official-account-article-page.tsx:235
+msgid "当前环境暂不支持复制文章链接。"
+msgstr "現在の環境では記事リンクのコピーに対応していません。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:1049
 msgid "当前环境暂不支持复制组局链接。"
 msgstr "この環境ではプレイ招待リンクのコピーにまだ対応していません。"
@@ -7103,6 +7127,7 @@ msgstr "この端末では現在カメラを開けません。先にアルバム
 #: apps/app/src/routes/group-qr-page.tsx:978
 #: apps/app/src/routes/group-qr-page.tsx:1010
 #: apps/app/src/routes/moments-page.tsx:629
+#: apps/app/src/routes/official-account-article-page.tsx:234
 #: apps/app/src/routes/official-account-detail-page.tsx:238
 msgid "当前设备暂时无法打开系统分享，请稍后重试。"
 msgstr "この端末では今システム共有を開けません。後でもう一度お試しください。"
@@ -8969,8 +8994,13 @@ msgid "文章"
 msgstr "記事"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1006
+#: apps/app/src/routes/official-account-article-page.tsx:368
 msgid "文章暂时不可用"
 msgstr "記事は一時的に利用できません"
+
+#: apps/app/src/routes/official-account-article-page.tsx:250
+msgid "文章链接已复制。"
+msgstr "記事リンクをコピーしました。"
 
 #: apps/app/src/routes/group-qr-page.tsx:2568
 msgid "新会话"
@@ -10676,6 +10706,7 @@ msgid "正在打开朋友圈..."
 msgstr "モーメントを開いています..."
 
 #: apps/app/src/i18n/static-dom-seed.ts:1020
+#: apps/app/src/routes/official-account-article-page.tsx:58
 msgid "正在打开桌面公众号文章"
 msgstr "デスクトップ公式アカウント記事を開いています"
 
@@ -10963,6 +10994,7 @@ msgid "正在读取收藏..."
 msgstr ""
 
 #: apps/app/src/i18n/static-dom-seed.ts:1007
+#: apps/app/src/routes/official-account-article-page.tsx:358
 msgid "正在读取文章"
 msgstr "記事を読み込み中"
 
@@ -11126,6 +11158,10 @@ msgstr ""
 #: apps/app/src/routes/friend-moments-page.tsx:475
 msgid "正在载入桌面好友朋友圈工作区，马上显示角色动态详情。"
 msgstr "デスクトップ版の友だちモーメント作業エリアを読み込み中です。まもなくキャラクターの投稿を表示します。"
+
+#: apps/app/src/routes/official-account-article-page.tsx:59
+msgid "正在载入桌面文章阅读视图，马上显示当前内容。"
+msgstr "デスクトップ版の記事ビューを読み込み中です。まもなく内容を表示します。"
 
 #: apps/app/src/routes/moments-page.tsx:687
 msgid "正在载入桌面朋友圈工作区，马上显示动态和详情。"
@@ -12535,6 +12571,10 @@ msgstr ""
 msgid "稍等一下，正在同步正文内容。"
 msgstr "少しお待ちください。本文を同期しています。"
 
+#: apps/app/src/routes/official-account-article-page.tsx:359
+msgid "稍等一下，正在同步正文内容和阅读状态。"
+msgstr "少々お待ちを、本文と既読状態を同期しています。"
+
 #: apps/app/src/routes/group-chat-details-page.tsx:580
 msgid "稍等一下，正在同步群成员、群资料和消息设置。"
 msgstr "しばらくお待ちください。グループメンバー、情報、メッセージ設定を同期しています。"
@@ -12838,6 +12878,7 @@ msgstr "システム共有"
 #: apps/app/src/routes/group-chat-details-page.tsx:441
 #: apps/app/src/routes/group-qr-page.tsx:941
 #: apps/app/src/routes/moments-page.tsx:655
+#: apps/app/src/routes/official-account-article-page.tsx:256
 #: apps/app/src/routes/official-account-detail-page.tsx:260
 msgid "系统分享失败，请稍后重试。"
 msgstr "システム共有に失敗しました。後でもう一度お試しください。"
@@ -12874,6 +12915,10 @@ msgstr "システム共有が使えないため、ツール概要をコピーし
 #: apps/app/src/i18n/static-dom-seed.ts:889
 msgid "系统分享暂时不可用，已复制文档摘要。"
 msgstr "システム共有が使えないため、ドキュメント概要をコピーしました。"
+
+#: apps/app/src/routes/official-account-article-page.tsx:249
+msgid "系统分享暂时不可用，已复制文章链接。"
+msgstr "システム共有が利用できないため、記事リンクをコピーしました。"
 
 #: apps/app/src/components/chat-message-list.tsx:1236
 #: apps/app/src/i18n/static-dom-seed.ts:954
@@ -14363,6 +14408,7 @@ msgstr "認証コードを入力（デフォルトの 123456 で通過可能）"
 #: apps/app/src/routes/group-qr-page.tsx:1088
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:455
 #: apps/app/src/routes/moments-page.tsx:942
+#: apps/app/src/routes/official-account-article-page.tsx:357
 #: apps/app/src/routes/official-account-detail-page.tsx:356
 #: apps/app/src/routes/official-accounts-page.tsx:226
 #: apps/app/src/routes/profile-settings-page.tsx:461
@@ -14401,6 +14447,7 @@ msgstr "画像の読み込みに失敗しました。別の画像で再試行し
 #: apps/app/src/routes/group-member-picker-page.tsx:540
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:463
 #: apps/app/src/routes/moments-page.tsx:950
+#: apps/app/src/routes/official-account-article-page.tsx:367
 #: apps/app/src/routes/official-account-detail-page.tsx:366
 #: apps/app/src/routes/official-accounts-page.tsx:236
 #: apps/app/src/routes/profile-settings-page.tsx:473
@@ -14600,6 +14647,10 @@ msgstr "癒やし"
 msgid "轻轻试一次，就可能遇到一段新的关系线索。"
 msgstr "軽く試すだけで、新しい関係の手がかりに出会えるかもしれません。"
 
+#: apps/app/src/routes/official-account-article-page.tsx:60
+msgid "载入桌面公众号文章..."
+msgstr "デスクトップ版の記事を読み込み中..."
+
 #: apps/app/src/routes/discover-feed-page.tsx:599
 msgid "载入桌面发现工作区..."
 msgstr "デスクトップ発見ワークスペースを読み込み中..."
@@ -14782,6 +14833,7 @@ msgstr "前のステップに戻る"
 #: apps/app/src/routes/moments-page.tsx:310
 #: apps/app/src/routes/moments-page.tsx:970
 #: apps/app/src/routes/moments-page.tsx:1276
+#: apps/app/src/routes/official-account-article-page.tsx:208
 #: apps/app/src/routes/official-account-detail-page.tsx:388
 #: apps/app/src/routes/official-account-detail-page.tsx:419
 #: apps/app/src/routes/official-account-detail-page.tsx:454
@@ -14811,7 +14863,12 @@ msgstr ""
 msgid "返回会丢失已编辑的文字与媒体，确定不发布吗？"
 msgstr "戻ると編集中のテキストとメディアが失われます。投稿せずに破棄しますか？"
 
+#: apps/app/src/routes/official-account-article-page.tsx:210
+msgid "返回公众号主页"
+msgstr "公式アカウントトップへ戻る"
+
 #: apps/app/src/i18n/static-dom-seed.ts:794
+#: apps/app/src/routes/official-account-article-page.tsx:211
 #: apps/app/src/routes/official-account-detail-page.tsx:388
 #: apps/app/src/routes/official-account-detail-page.tsx:419
 #: apps/app/src/routes/official-account-detail-page.tsx:454
@@ -15477,6 +15534,7 @@ msgid "这版预览先按聊天页真实气泡层级来做。"
 msgstr "このプレビューは実際のチャット画面の吹き出し階層に合わせています。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1021
+#: apps/app/src/routes/official-account-article-page.tsx:472
 msgid "这篇文章暂时不可用"
 msgstr "この記事は一時的に利用できません"
 
@@ -15979,6 +16037,8 @@ msgstr "フォローを再試行"
 #: apps/app/src/routes/group-qr-page.tsx:1006
 #: apps/app/src/routes/moments-page.tsx:622
 #: apps/app/src/routes/moments-page.tsx:648
+#: apps/app/src/routes/official-account-article-page.tsx:237
+#: apps/app/src/routes/official-account-article-page.tsx:259
 #: apps/app/src/routes/official-account-detail-page.tsx:240
 #: apps/app/src/routes/official-account-detail-page.tsx:262
 msgid "重试分享"
@@ -16007,6 +16067,7 @@ msgstr "フォロー解除を再試行"
 msgid "重试取消星标"
 msgstr "スター解除を再試行"
 
+#: apps/app/src/routes/official-account-article-page.tsx:413
 #: apps/app/src/routes/subscription-inbox-page.tsx:280
 msgid "重试同步"
 msgstr "同期を再試行"
@@ -16041,6 +16102,8 @@ msgstr ""
 #: apps/app/src/routes/group-qr-page.tsx:985
 #: apps/app/src/routes/moments-page.tsx:622
 #: apps/app/src/routes/moments-page.tsx:648
+#: apps/app/src/routes/official-account-article-page.tsx:237
+#: apps/app/src/routes/official-account-article-page.tsx:259
 #: apps/app/src/routes/official-account-detail-page.tsx:240
 #: apps/app/src/routes/official-account-detail-page.tsx:262
 msgid "重试复制"
@@ -16140,6 +16203,8 @@ msgstr ""
 #: apps/app/src/routes/moments-page.tsx:311
 #: apps/app/src/routes/moments-page.tsx:962
 #: apps/app/src/routes/moments-page.tsx:970
+#: apps/app/src/routes/official-account-article-page.tsx:380
+#: apps/app/src/routes/official-account-article-page.tsx:483
 #: apps/app/src/routes/official-account-detail-page.tsx:379
 #: apps/app/src/routes/official-account-detail-page.tsx:410
 #: apps/app/src/routes/official-accounts-page.tsx:248
@@ -16227,6 +16292,10 @@ msgstr "全文を読む"
 #: apps/app/src/i18n/static-dom-seed.ts:181
 msgid "阅读整理"
 msgstr "読書整理"
+
+#: apps/app/src/routes/official-account-article-page.tsx:400
+msgid "阅读状态暂未同步"
+msgstr "既読状態がまだ同期されていません"
 
 #: apps/app/src/i18n/static-dom-seed.ts:668
 msgid "阿澄"
