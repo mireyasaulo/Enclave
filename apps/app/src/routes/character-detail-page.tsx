@@ -1245,7 +1245,7 @@ export function CharacterDetailPage() {
               "space-y-2.5 px-3 pt-2",
               isDesktopLayout
                 ? "mx-auto w-full max-w-[720px] pb-8 pt-3"
-                : "pb-4",
+                : "pb-6",
             )}
           >
             {notice ? (
@@ -1843,7 +1843,7 @@ export function CharacterDetailPage() {
       </div>
 
       {!isDesktopLayout && character ? (
-        <div className="shrink-0 border-t border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.96)] px-4 pb-[calc(env(safe-area-inset-bottom,0px)+12px)] pt-3 backdrop-blur-xl">
+        <div className="shrink-0 border-t border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.96)] px-4 pb-3 pt-3 backdrop-blur-xl">
           <div
             className={cn(
               "grid gap-2",
