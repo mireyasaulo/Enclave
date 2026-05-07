@@ -37,6 +37,7 @@
     "@tanstack/react-router": "^1.109.2",
     "@tauri-apps/api": "^2.2.0",
     "@tauri-apps/plugin-opener": "^2.2.5",
+    "@yinjie/analytics": "workspace:*",
     "@yinjie/config": "workspace:*",
     "@yinjie/contracts": "workspace:*",
     "@yinjie/i18n": "workspace:*",

@@ -173,6 +173,9 @@ importers:
       '@tauri-apps/plugin-opener':
         specifier: ^2.2.5
         version: 2.2.5
+      '@yinjie/analytics':
+        specifier: workspace:*
+        version: link:../../packages/analytics
       '@yinjie/config':
         specifier: workspace:*
         version: link:../../packages/config

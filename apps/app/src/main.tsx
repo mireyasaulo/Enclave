@@ -13,6 +13,7 @@ import { getWorldLanguage, setWorldLanguage } from "@yinjie/contracts";
 import "@yinjie/ui/tokens.css";
 import "./index.css";
 import { BootstrapScreen } from "./components/bootstrap-screen";
+import { bootstrapAnalytics } from "./lib/analytics-bootstrap";
 import { queryClient } from "./lib/query-client";
 import { configureContractsRuntime } from "./lib/runtime-config";
 import {
@@ -89,6 +90,7 @@ async function bootstrap() {
   const nativeLocalePreference =
     androidLocalePreference ?? desktopLocalePreference;
   configureContractsRuntime();
+  bootstrapAnalytics();
   const preferredLocales = [
     ...(nativeLocalePreference?.preferredLocales ?? []),
     ...(runtimeConfig.preferredLocales ?? []),
