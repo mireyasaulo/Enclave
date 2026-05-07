@@ -818,7 +818,7 @@ msgstr "AI avatar video call"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:386
 msgid "AI 正在思考"
-msgstr ""
+msgstr "AI is thinking"
 
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:689
 msgid "AI 正在播报"
@@ -937,11 +937,11 @@ msgstr "PgUp previous group"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:912
 msgid "TA 正在说这一轮回复，等说完后可以继续下一句。"
-msgstr ""
+msgstr "They are speaking this turn's reply — wait until it finishes before saying the next line."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:921
 msgid "TA 的回复会在这里显示，并自动播报给你听。"
-msgstr ""
+msgstr "Their reply will appear here and will be read aloud to you automatically."
 
 #: apps/app/src/i18n/static-dom-seed.ts:428
 msgid "Ta 的朋友圈"
@@ -1013,7 +1013,7 @@ msgstr "Previous"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:873
 msgid "上一轮没有顺利完成，准备好后可以重新录这一句。"
-msgstr ""
+msgstr "The previous turn didn't finish cleanly. When you're ready, you can record this line again."
 
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:284
 msgid "上传表情失败，请稍后再试。"
@@ -2187,11 +2187,11 @@ msgstr "Write the issue, reproduction steps, and expected result clearly before 
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:508
 msgid "先按住底部按钮说第一句，数字人会听完再回应。"
-msgstr ""
+msgstr "Press and hold the bottom button to say your first line — the digital companion will listen, then reply."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:507
 msgid "先按住底部按钮说第一句，数字人会听完再用语音和画面回应。"
-msgstr ""
+msgstr "Press and hold the bottom button to say your first line — the digital companion will listen, then reply with voice and video."
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:1247
 msgid "先按最近活跃会话做接力，桌面和手机之间切换会更顺。"
@@ -3175,7 +3175,7 @@ msgstr "Cooling down"
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:394
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:417
 msgid "准备下一轮"
-msgstr ""
+msgstr "Prepare next turn"
 
 #: apps/app/src/features/desktop/official-accounts/desktop-subscription-workspace.tsx:404
 #: apps/app/src/i18n/static-dom-seed.ts:828
@@ -3222,7 +3222,7 @@ msgstr "Share tool"
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:109
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:226
 msgid "分享当前游戏"
-msgstr ""
+msgstr "Share this game"
 
 #: apps/app/src/i18n/static-dom-seed.ts:886
 msgid "分享文档"
@@ -3333,7 +3333,7 @@ msgstr "A world scene just captured"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:881
 msgid "刚刚那句已经发出，正在等待这一轮回复。"
-msgstr ""
+msgstr "That line has been sent; waiting for this turn's reply."
 
 #: apps/app/src/i18n/static-dom-seed.ts:367
 msgid "刚打完一局晋级赛，正在拉人补位。"
@@ -3530,11 +3530,11 @@ msgstr "Functional issue"
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:208
 #: apps/app/src/routes/discover-feed-page.tsx:977
 msgid "加为好友后才能互动"
-msgstr ""
+msgstr "Add as friend before interacting"
 
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:377
 msgid "加为好友后才能评论。"
-msgstr ""
+msgstr "Add as friend to leave a comment."
 
 #. placeholder {0}: formatTimestamp(member.joinedAt)
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2433
@@ -4460,7 +4460,7 @@ msgstr "Reply thread"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:471
 msgid "回复已生成，画面还在准备中。"
-msgstr ""
+msgstr "The reply is ready; the video is still being prepared."
 
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:311
 msgid "回复这条评论"
@@ -6269,7 +6269,7 @@ msgstr "Current context"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1087
 msgid "当前不能发起视频通话"
-msgstr ""
+msgstr "Video call isn't available right now"
 
 #: apps/app/src/i18n/static-dom-seed.ts:995
 msgid "当前不能发起群通话"
@@ -6277,7 +6277,7 @@ msgstr "Group call cannot be started now"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1087
 msgid "当前不能发起语音通话"
-msgstr ""
+msgstr "Voice call isn't available right now"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1030
 #: apps/app/src/i18n/static-dom-seed.ts:994
@@ -6497,11 +6497,11 @@ msgstr "Currently posting to Moments"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1068
 msgid "当前只支持在单聊里发起 AI 数字人视频通话。"
-msgstr ""
+msgstr "AI digital-human video calls can only be started from one-on-one chats right now."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1069
 msgid "当前只支持在单聊里发起 AI 语音通话。"
-msgstr ""
+msgstr "AI voice calls can only be started from one-on-one chats right now."
 
 #: apps/app/src/i18n/static-dom-seed.ts:824
 msgid "当前可搜索范围"
@@ -6871,7 +6871,7 @@ msgstr "This chat is temporarily unavailable."
 
 #: apps/app/src/routes/chat-background-page.tsx:492
 msgid "当前聊天正在预览专属背景"
-msgstr ""
+msgstr "This chat is previewing a custom background"
 
 #: apps/app/src/i18n/static-dom-seed.ts:758
 #: apps/app/src/routes/chat-background-page.tsx:493
@@ -6880,7 +6880,7 @@ msgstr "This chat is previewing the default background"
 
 #: apps/app/src/routes/chat-background-page.tsx:226
 msgid "当前聊天背景已保存。"
-msgstr ""
+msgstr "This chat's background has been saved."
 
 #: apps/app/src/i18n/static-dom-seed.ts:980
 #: apps/app/src/routes/chat-background-page.tsx:322
@@ -7256,7 +7256,7 @@ msgstr "My camera preview"
 
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:124
 msgid "我的游戏"
-msgstr ""
+msgstr "My games"
 
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:205
 msgid "我的资料"
@@ -7849,11 +7849,11 @@ msgstr "Hold the button on the left to speak. AI will prioritize direct audio un
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:896
 msgid "按住底部按钮，说出你想对 TA 说的话。"
-msgstr ""
+msgstr "Press and hold the bottom button, then say what you want to tell them."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:893
 msgid "按住底部按钮说第一句，画面会保持在当前视频通话里。"
-msgstr ""
+msgstr "Press and hold the bottom button to say your first line; the view stays in the current video call."
 
 #: apps/app/src/i18n/static-dom-seed.ts:853
 msgid "按住录一条语音，松开后就能直接发送。"
@@ -8586,7 +8586,7 @@ msgstr "AI avatar queued"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:904
 msgid "数字人接通后，会先在这里显示这一轮回复，再通过语音和画面回应你。"
-msgstr ""
+msgstr "Once the digital companion connects, this turn's reply will appear here first, then you'll get a voice and video response."
 
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:676
 msgid "数字人播报文案、本地预览和本轮文本都会同步保存在当前聊天里。"
@@ -8599,7 +8599,7 @@ msgstr "AI avatar preparing reply"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:453
 msgid "数字人暂时没接通，可以重试，或先切到语音。"
-msgstr ""
+msgstr "The digital companion isn't connected yet — try again, or switch to voice for now."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:390
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:166
@@ -8618,7 +8618,7 @@ msgstr "AI avatar render failed"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:920
 msgid "数字人的回复会先显示在这里，再通过语音自动播报。"
-msgstr ""
+msgstr "The digital companion's reply appears here first and is then read aloud automatically."
 
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:720
 msgid "数字人的回复会显示在这里，同时驱动当前舞台播报。"
@@ -8639,11 +8639,11 @@ msgstr "AI avatar video stream is queued; keep using voice for now."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:740
 msgid "数字人还没恢复，先重试或改用语音继续。"
-msgstr ""
+msgstr "The digital companion hasn't recovered yet — try again, or continue with voice instead."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:382
 msgid "数字人连接失败"
-msgstr ""
+msgstr "Couldn't connect the digital companion"
 
 #: apps/app/src/routes/desktop-feedback-page.tsx:433
 #: apps/app/src/routes/desktop-mobile-page.tsx:1205
@@ -9594,7 +9594,7 @@ msgstr "Release to cancel"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:498
 msgid "松开后会立刻发出这一句。"
-msgstr ""
+msgstr "Release to send this line right away."
 
 #: apps/app/src/i18n/static-dom-seed.ts:834
 msgid "松开手指，发送语音"
@@ -10211,7 +10211,7 @@ msgstr "Listening. Stop and transcription will continue."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:877
 msgid "正在听你这一句，松开后会立刻发出。"
-msgstr ""
+msgstr "Listening to this line — release to send it right away."
 
 #: apps/app/src/routes/welcome-page.tsx:218
 msgid "正在唤醒世界..."
@@ -10307,7 +10307,7 @@ msgstr "Connecting..."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:449
 msgid "正在接通数字人，接通后就能开始第一轮。"
-msgstr ""
+msgstr "Connecting to the digital companion — you can start the first turn once it's through."
 
 #: apps/app/src/routes/character-detail-page.tsx:278
 #: apps/app/src/routes/character-detail-page.tsx:920
@@ -10362,7 +10362,7 @@ msgstr "Preparing voice..."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:908
 msgid "正在整理这一轮回复，马上就会回到这里。"
-msgstr ""
+msgstr "Preparing this turn's reply — it'll be back here in a moment."
 
 #: apps/app/src/routes/character-detail-page.tsx:317
 msgid "正在更新..."
@@ -10389,12 +10389,12 @@ msgstr "Playing now"
 #. placeholder {0}: game.name
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:493
 msgid "正在玩 {0}"
-msgstr ""
+msgstr "Playing {0}"
 
 #. placeholder {0}: selectedGame.name
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:349
 msgid "正在玩 {0} 的好友"
-msgstr ""
+msgstr "Friends playing {0}"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:303
 msgid "正在生成…"
@@ -10427,7 +10427,7 @@ msgstr "Resolving your cloud world..."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:390
 msgid "正在说话"
-msgstr ""
+msgstr "Speaking"
 
 #: apps/app/src/components/chat-composer.tsx:2701
 #: apps/app/src/i18n/static-dom-seed.ts:836
@@ -10560,11 +10560,11 @@ msgstr "Loading chat details..."
 
 #: apps/app/src/routes/chat-background-page.tsx:344
 msgid "正在读取聊天背景"
-msgstr ""
+msgstr "Loading chat background"
 
 #: apps/app/src/routes/chat-background-page.tsx:340
 msgid "正在读取聊天背景..."
-msgstr ""
+msgstr "Loading chat background…"
 
 #: apps/app/src/routes/chat-message-search-page.tsx:114
 #: apps/app/src/routes/desktop-chat-history-page.tsx:433
@@ -10634,23 +10634,23 @@ msgstr "Loading stickers..."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:378
 msgid "正在连接数字人"
-msgstr ""
+msgstr "Connecting to digital companion"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:955
 msgid "正在连接数字人视频通话"
-msgstr ""
+msgstr "Connecting to digital-human video call"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:949
 msgid "正在连接数字人视频通话..."
-msgstr ""
+msgstr "Connecting to digital-human video call…"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:955
 msgid "正在连接语音通话"
-msgstr ""
+msgstr "Connecting to voice call"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:949
 msgid "正在连接语音通话..."
-msgstr ""
+msgstr "Connecting to voice call…"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1448
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1040
@@ -10685,7 +10685,7 @@ msgstr "Each shake creates a new encounter result. This page keeps the result di
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:509
 msgid "每次说一段，AI 会回一段语音。"
-msgstr ""
+msgstr "Speak one segment at a time and the AI will reply with a voice segment."
 
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:248
 #: apps/app/src/i18n/static-dom-seed.ts:944
@@ -11263,7 +11263,7 @@ msgstr "Popularity"
 
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:176
 msgid "热门小游戏"
-msgstr ""
+msgstr "Popular mini-games"
 
 #: apps/app/src/i18n/static-dom-seed.ts:100
 msgid "热门榜"
@@ -11394,7 +11394,7 @@ msgstr "Requesting camera permission"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:475
 msgid "画面正在排队，语音会先继续。"
-msgstr ""
+msgstr "The video is queueing up — voice will continue first."
 
 #: apps/app/src/i18n/static-dom-seed.ts:670
 msgid "界闻"
@@ -11423,11 +11423,11 @@ msgstr "Baishi"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1090
 msgid "目前只支持在单聊里发起 AI 数字人视频通话。"
-msgstr ""
+msgstr "AI digital-human video calls can only be started in one-on-one chats for now."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1091
 msgid "目前只支持在单聊里发起 AI 语音通话。"
-msgstr ""
+msgstr "AI voice calls can only be started in one-on-one chats for now."
 
 #: apps/app/src/i18n/static-dom-seed.ts:602
 msgid "直接从现有视频号内容流里拿直播参考，不和主频道内容割裂。"
@@ -11747,7 +11747,7 @@ msgstr "Video cover"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:491
 msgid "视频已经就绪，会优先展示远端画面。"
-msgstr ""
+msgstr "The video is ready — the remote view will be shown first."
 
 #: apps/app/src/routes/discover-feed-page.tsx:482
 #: apps/app/src/routes/discover-page.tsx:457
@@ -11874,7 +11874,7 @@ msgstr "Hold on — preparing this subscription article."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:956
 msgid "稍等一下，正在同步会话信息并准备当前通话链路。"
-msgstr ""
+msgstr "Hold on — syncing session info and preparing the current call link."
 
 #: apps/app/src/routes/chat-list-page.tsx:743
 msgid "稍等一下，正在同步最近会话和消息入口。"
@@ -11933,7 +11933,7 @@ msgstr "Hold on. Syncing this contact's profile and relationship status."
 
 #: apps/app/src/routes/chat-background-page.tsx:345
 msgid "稍等一下，正在同步默认背景和当前聊天设置。"
-msgstr ""
+msgstr "Hold on — syncing the default background and the current chat settings."
 
 #: apps/app/src/routes/group-qr-page.tsx:1607
 msgid "稍等一下，正在整理最近可投递的聊天入口。"
@@ -12041,7 +12041,7 @@ msgstr "The system may ask for microphone permission the first time."
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:462
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:463
 msgid "等 TA 说完，再开始下一句。"
-msgstr ""
+msgstr "Wait until they finish before starting the next line."
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:1385
 msgid "等公众号有推送后，这里会直接出现可接力到手机的阅读入口。"
@@ -12178,7 +12178,7 @@ msgstr "Featured"
 
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:161
 msgid "精选小游戏"
-msgstr ""
+msgstr "Featured mini-games"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:111
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1008
@@ -12392,7 +12392,7 @@ msgstr "Continue game"
 
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:85
 msgid "继续玩"
-msgstr ""
+msgstr "Keep playing"
 
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:903
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:1062
@@ -13456,7 +13456,7 @@ msgstr "Say something..."
 
 #: apps/app/src/routes/chat-background-page.tsx:212
 msgid "请先为当前聊天选择背景图。"
-msgstr ""
+msgstr "Please pick a background image for this chat first."
 
 #: apps/app/src/routes/desktop-feedback-page.tsx:704
 msgid "请先填写反馈标题。"
@@ -13477,7 +13477,7 @@ msgstr "Connect to a world first, then set the World Owner name."
 
 #: apps/app/src/routes/chat-background-page.tsx:170
 msgid "请先选择默认背景图。"
-msgstr ""
+msgstr "Please pick a default background image first."
 
 #: apps/app/src/routes/welcome-page.tsx:168
 msgid "请先验证邮箱，以解析你的云世界。"
@@ -14267,15 +14267,15 @@ msgstr "Thoughts for this moment..."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:457
 msgid "这一句已收到，正在整理回复。"
-msgstr ""
+msgstr "Got that line — preparing the reply."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:746
 msgid "这一句没有自动播报，点一下继续听。"
-msgstr ""
+msgstr "This line wasn't read aloud automatically — tap to keep listening."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:747
 msgid "这一句没有自动播报，点一下补播。"
-msgstr ""
+msgstr "This line wasn't read aloud automatically — tap to play it now."
 
 #: apps/app/src/i18n/static-dom-seed.ts:640
 msgid "这一帧想留给你看"
@@ -14283,15 +14283,15 @@ msgstr "A frame worth showing you"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:885
 msgid "这一轮先到这里，等 TA 说完后再继续。"
-msgstr ""
+msgstr "Pausing this turn here — continue once they finish speaking."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:467
 msgid "这一轮刚结束，等播报收尾后再继续。"
-msgstr ""
+msgstr "This turn just ended — continue after the playback finishes wrapping up."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:916
 msgid "这一轮回复已经结束，下一轮内容也会继续显示在这里。"
-msgstr ""
+msgstr "This turn's reply has finished; the next turn will continue to appear here."
 
 #: apps/app/src/routes/group-qr-page.tsx:1660
 msgid "这一轮已经发出但还没有从聊天线程回到邀请页的目标，会先避开刚补发过的会话；冷却结束后会自动回到优先位，再按最近活跃和发送先后优先补发。"
@@ -14299,23 +14299,23 @@ msgstr "Targets sent in this round that have not come back from the chat thread 
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:889
 msgid "这一轮已经完成，准备好后继续按住底部按钮说下一句。"
-msgstr ""
+msgstr "This turn is complete — when ready, press and hold the bottom button to say the next line."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:483
 msgid "这一轮已经结束，准备好后继续说下一句。"
-msgstr ""
+msgstr "This turn has ended — when ready, continue with the next line."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:479
 msgid "这一轮画面没出来，但语音还能继续。"
-msgstr ""
+msgstr "This turn's video didn't come through, but voice can keep going."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:742
 msgid "这一轮画面没出来，当前已回到语音链路。"
-msgstr ""
+msgstr "This turn's video didn't come through; we've fallen back to voice."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:900
 msgid "这一轮的回复暂时没有顺利回来，恢复后会继续显示在这里。"
-msgstr ""
+msgstr "This turn's reply didn't come back smoothly — once it recovers, it'll keep appearing here."
 
 #: apps/app/src/i18n/static-dom-seed.ts:471
 msgid "这个世界最近开始偏爱慢消息"
@@ -14515,15 +14515,15 @@ msgstr "This chat is temporarily unavailable. Try loading again, or go back to t
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1031
 msgid "这段聊天暂时不可用，可以先重试读取，或返回聊天后再试。"
-msgstr ""
+msgstr "This chat is unavailable for now — try reloading, or go back to the chat and try again."
 
 #: apps/app/src/routes/chat-background-page.tsx:459
 msgid "这段聊天暂时不可用，可以先重试读取，或返回聊天页后再试。"
-msgstr ""
+msgstr "This chat is unavailable for now — try reloading, or go back to the chat page and try again."
 
 #: apps/app/src/routes/chat-background-page.tsx:453
 msgid "这段聊天暂时不可用，返回聊天页后再试一次。"
-msgstr ""
+msgstr "This chat is unavailable for now — go back to the chat page and try again."
 
 #: apps/app/src/features/chat/use-speech-input.ts:561
 msgid "这段语音没有识别出有效文字，请再试一次。"
@@ -14662,7 +14662,7 @@ msgstr "The remote side is the AI avatar stage; the local camera is only for you
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:954
 msgid "连接中"
-msgstr ""
+msgstr "Connecting"
 
 #: apps/app/src/routes/welcome-page.tsx:198
 #: apps/app/src/routes/welcome-page.tsx:213
@@ -14710,7 +14710,7 @@ msgstr "After leaving, you will no longer receive messages from this group, and 
 
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:83
 msgid "退出游戏"
-msgstr ""
+msgstr "Quit game"
 
 #: apps/app/src/routes/profile-page.tsx:161
 #: apps/app/src/routes/profile-settings-page.tsx:782
@@ -14895,7 +14895,7 @@ msgstr "What to do when something goes wrong"
 
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:554
 msgid "邀请"
-msgstr ""
+msgstr "Invite"
 
 #: apps/app/src/i18n/static-dom-seed.ts:97
 msgid "邀请一起玩"
@@ -15103,7 +15103,7 @@ msgstr "Retry loading"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:646
 msgid "重试读取角色资料"
-msgstr ""
+msgstr "Retry loading character profile"
 
 #: apps/app/src/routes/channels-page.tsx:477
 msgid "重试读取评论"
@@ -15245,7 +15245,7 @@ msgstr "Yinjie ID"
 #: apps/app/src/routes/chat-details-page.tsx:300
 #: apps/app/src/routes/chat-details-page.tsx:329
 msgid "隐界号：{0}"
-msgstr ""
+msgstr "Yinjie ID: {0}"
 
 #: apps/app/src/features/contacts/desktop-contact-profile-blocks.tsx:112
 msgid "隐界号：{identifier}"
@@ -15336,7 +15336,7 @@ msgstr "Misty Lake Morning"
 
 #: apps/app/src/routes/discover-feed-page.tsx:1000
 msgid "需好友"
-msgstr ""
+msgstr "Friends only"
 
 #: apps/app/src/i18n/static-dom-seed.ts:765
 msgid "青庭微风"
