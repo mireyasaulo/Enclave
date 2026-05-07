@@ -1,6 +1,9 @@
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { getServerI18n } from "@/i18n/server";
 import type { SupportedLocale } from "@/lib/locales";
 import { CAPABILITIES } from "@/lib/capabilities-data";
+import { buildLocalePath } from "@/lib/locale-routing";
 
 export async function CapabilityGrid({ locale }: { locale: SupportedLocale }) {
   const i18n = await getServerI18n(locale);
@@ -8,17 +11,27 @@ export async function CapabilityGrid({ locale }: { locale: SupportedLocale }) {
     eyebrow: i18n._("核心能力"),
     title: i18n._("不是 chatbot，而是一整个生态"),
     subtitle: i18n._("为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。"),
+    seeUseCases: i18n._("查看用例"),
   };
 
   return (
     <section id="capabilities" className="relative scroll-mt-24 py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <header className="max-w-2xl">
-          <span className="text-sm font-semibold uppercase tracking-wider text-(--brand-primary)">
-            {titles.eyebrow}
-          </span>
-          <h2 className="mt-2 text-3xl font-bold sm:text-4xl">{titles.title}</h2>
-          <p className="mt-3 text-(--text-secondary)">{titles.subtitle}</p>
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div className="max-w-2xl">
+            <span className="text-sm font-semibold uppercase tracking-wider text-(--brand-primary)">
+              {titles.eyebrow}
+            </span>
+            <h2 className="mt-2 text-3xl font-bold sm:text-4xl">{titles.title}</h2>
+            <p className="mt-3 text-(--text-secondary)">{titles.subtitle}</p>
+          </div>
+          <Link
+            href={buildLocalePath(locale, "/use-cases")}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-(--brand-primary) hover:gap-2.5 transition-[gap]"
+          >
+            {titles.seeUseCases}
+            <ArrowRight size={14} />
+          </Link>
         </header>
         <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {CAPABILITIES.map((item) => {

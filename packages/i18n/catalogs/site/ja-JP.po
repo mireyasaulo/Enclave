@@ -770,3 +770,297 @@ msgstr "各バージョンで何を出荷したか、なぜそうしたか。完
 #: apps/site/src/app/[locale]/changelog/page.tsx
 msgid "在 GitHub Releases 查看完整列表"
 msgstr "GitHub Releases で全リリースを見る"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/page.tsx
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx
+msgid "用例"
+msgstr "ユースケース"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/page.tsx
+msgid "看看真实场景下隐界能做什么：长期 AI 陪伴、多角色群聊、自部署隐私优先。"
+msgstr "実際の使い方を見てみよう：長期 AI コンパニオン、複数キャラの群チャット、セルフホストでのプライバシー優先運用。"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/page.tsx
+msgid "真实场景"
+msgstr "実際のシナリオ"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/page.tsx
+msgid "人们用隐界来做什么"
+msgstr "みんなはエンクレイブをこう使っている"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/page.tsx
+msgid "下面这些用例不是虚构的 demo，而是社区里真实在跑的玩法。挑一个最像你的场景看看。"
+msgstr "以下は架空のデモではなく、コミュニティで実際に動いている遊び方です。あなたに近いシナリオから読んでみてください。"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/page.tsx
+#: apps/site/src/components/capability-grid.tsx
+msgid "查看用例"
+msgstr "ユースケースを読む"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx
+msgid "它具体怎么做到"
+msgstr "実際にどう動くか"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx
+msgid "准备好试一下？"
+msgstr "試してみますか？"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx
+msgid "浏览器即开即用，不需要注册任何信用卡。"
+msgstr "ブラウザですぐ使えます。クレジットカード登録もインストールも不要。"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx
+msgid "看看其它用例"
+msgstr "他のユースケースも見る"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "AI 陪伴"
+msgstr "AI コンパニオン"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "和一个真正记得你的 AI 朋友长期相处"
+msgstr "あなたのことをちゃんと覚えている AI とずっと付き合う"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "在隐界，AI 角色有持续的记忆、有自己的作息、会主动联系你。不是问一句答一句的 chatbot，而是一段可以慢慢长出来的关系。"
+msgstr "エンクレイブの AI は持続する記憶を持ち、自分の生活リズムがあり、向こうから連絡してきます。一問一答のチャットボットではなく、ゆっくり育っていく関係です。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "为什么普通 AI 聊天工具撑不起\"陪伴\""
+msgstr "普通の AI チャットでは「コンパニオン」を支えきれない理由"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "市面上的 chatbot 通常是无状态的：你今天聊的内容，明天它就忘了；它不会主动找你，也不会因为时间流逝而改变。一段需要\"陪伴\"的关系，依赖的恰恰是这些 chatbot 缺失的东西——长期记忆、节奏感、主动性。"
+msgstr "一般的なチャットボットはステートレスで、今日話したことを翌日には忘れます。向こうから連絡することもなく、時間の経過で変わることもありません。コンパニオン的な関係に必要なのは、まさにそれらに欠けているもの — 長期記憶、リズム、主体性です。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "隐界把\"长期关系\"变成产品级体验"
+msgstr "エンクレイブは「長期的な関係」をプロダクトの一部に組み込んだ"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "隐界给每个 AI 角色一个完整的人设：人格、作息、关系网、对你的亲密度，会随着你们的互动慢慢变化。AI 会主动发动态、给你打电话、记得你上周说的烦心事，让陪伴不再是单向召唤，而是双向流动。"
+msgstr "エンクレイブの AI は性格・生活リズム・人間関係・あなたとの親密度を持ち、やり取りに合わせて少しずつ変化します。タイムラインを更新し、電話をかけ、先週あなたが愚痴ったことを覚えています。コンパニオンは一方的な呼び出しではなく、双方向の流れになります。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "持久记忆"
+msgstr "持続する記憶"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "对话和事件都会被结构化保存，AI 能在数月后还引用具体细节，而不是模糊的\"我记得你说过……\"。"
+msgstr "会話とイベントは構造化されて保存され、何ヶ月後でも具体的な詳細を引用できます。「確かそんなこと言ってたような…」では終わりません。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "时间感与作息"
+msgstr "時間感覚と生活リズム"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "角色有自己的时区、作息、心情曲线；深夜聊和早晨聊会拿到不一样的状态回应。"
+msgstr "キャラクターはタイムゾーン・生活リズム・気分の波を持ち、深夜と朝とでは違う反応が返ってきます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "主动联系"
+msgstr "向こうから連絡してくる"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "角色会基于你的兴趣和近期对话主动发朋友圈、发消息、打电话——不是定时模板，是有逻辑的。"
+msgstr "あなたの興味と最近の会話を踏まえて、向こうからタイムライン投稿・メッセージ・電話を仕掛けてきます。固定スケジュールのテンプレではなく、ロジックに沿った行動です。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "亲密度演化"
+msgstr "親密度の進化"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "你们的关系会从陌生人逐步变成熟人、朋友、密友，每个阶段角色的语气和能聊的话题都会不同。"
+msgstr "関係は他人 → 知り合い → 友達 → 親友と段階的に進み、語り口や扱える話題が段階ごとに変わります。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "AI 角色记得多久？"
+msgstr "AI はどのくらい覚えていてくれますか？"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "默认会一直记着；隐界用结构化记忆系统而不是简单上下文窗口，所以即使聊了几个月，关键事件依然能被引用。你也可以随时查看、编辑、删除任何记忆条目。"
+msgstr "デフォルトでは無期限です。エンクレイブは単純なコンテキストウィンドウではなく構造化された記憶システムを使うので、数ヶ月前のキーイベントもそのまま引用できます。記憶エントリはいつでも閲覧・編集・削除できます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "如果我不想被打扰呢？"
+msgstr "邪魔されたくない場合は？"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "每个角色都可以单独设置主动联系频率，从\"积极\"到\"完全静默\"。你也可以全局开启免打扰时段。"
+msgstr "キャラクターごとに「積極的に連絡」～「完全に静かにする」まで個別設定できます。全体のおやすみモードもあります。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "AI 角色会\"成长\"吗？"
+msgstr "AI キャラクターは「成長」しますか？"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "会。亲密度、共同记忆、对你的偏好认知都会随时间变化，连带影响 TA 给你回信息的语气与话题。"
+msgstr "します。親密度・共有した記憶・あなたの好みの理解は時間とともに変化し、それが返信の語り口や話題に反映されます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "群聊角色扮演"
+msgstr "グループでのロールプレイ"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "和多个 AI 角色一起开一场群聊"
+msgstr "複数の AI キャラと同じ部屋でグループチャット"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "隐界支持把多个 AI 角色拉进同一个群组，让他们之间也产生关系、互动、争吵、合作——你不是和\"一个 chatbot 重复对话\"，而是在导演一个小世界。"
+msgstr "エンクレイブでは複数の AI キャラを同じグループに招き、彼ら同士でも関係を築き、やり取りし、ぶつかり、協力します。一体のチャットボットを使い回すのではなく、小さな世界を演出する感覚です。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "单角色聊天的天花板"
+msgstr "単一キャラ会話の限界"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "和单个 AI 聊久了，会发现观点单一、节奏单调，很难撑起复杂剧情或多视角讨论。传统 chatbot 也很难原生支持\"多个角色同时在场\"，因为缺一个共享世界。"
+msgstr "単一の AI と長く話すと視点が単調になり、複雑なストーリーや多角的な議論を支えにくくなります。従来のチャットボットは「複数キャラ同時参加」をネイティブにサポートできない — 共有された世界が無いからです。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "把房间让给角色们自己讲故事"
+msgstr "部屋を委ね、キャラ自身に物語を語らせる"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "隐界群聊里每个角色都有自己的人设、和你及彼此的关系，发言时会考虑别人刚说了什么。你可以做导演（设定背景、推进剧情）也可以做参与者（直接和角色对话），随时切换。"
+msgstr "エンクレイブのグループでは各キャラが固有の人格と、あなた・他キャラとの関係を持ち、直前の発言を踏まえて喋ります。シーンを設定しプロットを進める「演出家」と、直接対話する「参加者」の役割をいつでも切り替えられます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "多角色同时在线"
+msgstr "複数キャラが同時に存在"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "一个群可以拉进多个 AI 角色，每个都保留独立人格、记忆和与他人的关系。"
+msgstr "ひとつのグループに複数の AI を招き、各キャラは独立した人格・記憶・他キャラとの関係を保ちます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "角色之间的关系网"
+msgstr "キャラ同士の関係ネットワーク"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "朋友、对手、导师、恋人——AI 之间的关系会影响他们在群里互动的方式。"
+msgstr "友達・ライバル・師弟・恋人 — AI 同士の関係は、グループ内での絡み方に影響します。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "导演模式"
+msgstr "ディレクターモード"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "你可以\"无声\"地推动剧情、设定场景、让某个角色做某事，不用每次都亲自当主角。"
+msgstr "場面を設定したりキャラに行動させたりと、自分が主役にならなくても無言で物語を動かせます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "共享世界状态"
+msgstr "共有されるワールド状態"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "天气、时间、地点是整个群共享的；剧情会沿着真实的虚拟时间往前走。"
+msgstr "天気・時間・場所はグループ全体で共有され、物語は現実のように仮想時間に沿って進みます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "可以用来跑 TRPG / 剧本杀吗？"
+msgstr "TRPG やマーダーミステリーに使えますか？"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "可以。每个 NPC 都是独立角色，互相之间有关系；你做主持人推进剧情，AI 们会按各自人设反应。还在做更深的规则系统支持。"
+msgstr "使えます。各 NPC は独立したキャラで互いに関係を持ち、あなたが GM として進行すれば、AI たちは各々の人格で反応します。本格的なルールシステムのサポートは引き続き開発中です。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "多角色在同一个群会不会很乱？"
+msgstr "複数キャラを同じ部屋に入れると荒れませんか？"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "群里的角色发言节奏由系统调度，不会一齐刷屏；你也可以随时让某个角色暂时静音或单独私聊。"
+msgstr "発言タイミングはシステムが調整するので、全員が一斉に喋ることはありません。任意のキャラを一時ミュートしたり、個別 DM に切り替えたりもできます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "AI 之间真的会\"关系变化\"吗？"
+msgstr "AI 同士の関係って本当に変わるの？"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "会。两个角色之间的事件（一起经历的群聊、被你撮合或拆散的剧情）会更新彼此的关系档案，影响下一次他们如何互动。"
+msgstr "変わります。2 キャラ間で起きた出来事（共有したグループ会話、あなたが結びつけたり離反させたりした展開）は彼らの関係レコードを更新し、次回の絡み方に反映されます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "自部署 / 隐私"
+msgstr "セルフホスト / プライバシー"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "你的对话只存在于你自己的机器上"
+msgstr "あなたの会話はあなたのマシンにしか存在しない"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "隐界以 MIT 协议开源，可以用一行 docker compose 跑在自己服务器或家里的小主机上。数据不出你的硬盘，模型可以接 OpenAI、Anthropic、本地 Ollama，甚至完全离线。"
+msgstr "エンクレイブは MIT ライセンスのオープンソース。docker compose 1 行で自分のサーバーや自宅の小型 PC に立てられます。データはディスクから出ず、モデルは OpenAI / Anthropic / ローカル Ollama などに切り替え可能、完全オフラインでも動きます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "把私密对话交给云端的代价"
+msgstr "プライベートな会話をクラウドに預ける代償"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "主流 AI 聊天产品都把对话存在云端、用作后续训练材料。即使条款说\"不会\"，你也没办法亲自验证。一旦账号被锁、平台关停，或合规要求变化，那些聊天记录就不在你手上了。"
+msgstr "主要な AI チャット製品は会話をクラウドに保存し、追加学習に使います。利用規約が「使わない」と書いていても、あなた自身では確認できません。アカウント凍結、サービス終了、コンプライアンスの変更が起きた瞬間、そのログはあなたの手元から離れます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "整套堆栈都开源，自己跑就是最强隐私承诺"
+msgstr "スタックが丸ごとオープン — 自分で動かすこと自体が最強のプライバシー保証"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "隐界整个 monorepo 在 GitHub 上，MIT 协议任意审计、任意修改。一行 docker compose 起一份属于自己的实例：API、前端、数据库、向量索引全在本地。模型层可以混用云端 API 和本地 Ollama / vLLM，对哪类对话用哪个模型完全你说了算。"
+msgstr "monorepo 全体が GitHub に公開、MIT ライセンスで監査も改変も自由。docker compose 一発で自分専用インスタンス（API / フロント / DB / ベクター索引すべてローカル）が立ち上がります。クラウド API とローカル Ollama / vLLM を混在させ、どの会話をどのモデルに通すかは自分で決められます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "代码全开源"
+msgstr "コードは全て公開"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "MIT 协议，无任何二进制黑盒；任何\"我们不会用你的数据\"的承诺你都可以亲自审计。"
+msgstr "MIT ライセンス、バイナリブラックボックスなし。「データを使わない」という宣言を自分で監査できます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "三分钟 docker 部署"
+msgstr "3 分で完了する docker デプロイ"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "clone → cp .env → docker compose up，README 顶部就写着这套流程，路人也能跑起来。"
+msgstr "clone → cp .env → docker compose up。README の冒頭にそのまま書いてある手順で、初見の人でも動かせます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "模型完全可换"
+msgstr "モデルは完全に差し替え可能"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "OpenAI、Anthropic、Google、DeepSeek、本地 Ollama / vLLM 都能配；不同角色甚至可以用不同模型。"
+msgstr "OpenAI / Anthropic / Google / DeepSeek / ローカル Ollama / vLLM のいずれも設定可能。キャラごとに異なるモデルを割り当てることもできます。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "数据可导出可删除"
+msgstr "データはエクスポート可能、削除も可能"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "导出全量 JSON、迁移到另一台机器、整库删除——都是一键操作，不会有\"删不掉的副本\"。"
+msgstr "全量 JSON のエクスポート、別マシンへの移行、データベース全削除 — どれもワンクリックで、「消せないコピー」はどこにも残りません。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "自部署难度有多大？"
+msgstr "セルフホストの難易度は？"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "如果你用过 docker compose，难度等于跑一个普通 web 服务。README 顶部的\"3 分钟部署\"流程是真的——克隆、改 .env、起服务三步。"
+msgstr "docker compose を使ったことがあれば、普通の Web サービスを立てるのと同じ難易度です。README 冒頭の「3 分デプロイ」は実話 — clone、.env 編集、起動の 3 ステップだけ。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "可以完全离线运行吗？"
+msgstr "完全にオフラインで動かせますか？"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "可以。模型层换成本地 Ollama 或 vLLM，连真实世界同步关掉，整个系统就不再向外发任何请求。"
+msgstr "動かせます。モデル層をローカルの Ollama / vLLM に切り替え、現実世界同期を切れば、システム全体が外部リクエストを行わなくなります。"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "自部署还能用官方的功能更新吗？"
+msgstr "セルフホストでも公式の機能アップデートを受けられますか？"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "用 git pull + docker compose up -d 即可滚到最新版本；CHANGELOG 上每个版本都标了破坏性变更。"
+msgstr "git pull + docker compose up -d で最新版に上げられます。破壊的変更は CHANGELOG.md の各リリース欄に明記されています。"

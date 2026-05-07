@@ -770,3 +770,297 @@ msgstr "What each release shipped and why. Full release notes live on GitHub."
 #: apps/site/src/app/[locale]/changelog/page.tsx
 msgid "在 GitHub Releases 查看完整列表"
 msgstr "See the full list on GitHub Releases"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/page.tsx
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx
+msgid "用例"
+msgstr "Use cases"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/page.tsx
+msgid "看看真实场景下隐界能做什么：长期 AI 陪伴、多角色群聊、自部署隐私优先。"
+msgstr "See what people actually do with Enclave: long-running AI companions, multi-character group roleplay, and self-hosted, privacy-first setups."
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/page.tsx
+msgid "真实场景"
+msgstr "Real scenarios"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/page.tsx
+msgid "人们用隐界来做什么"
+msgstr "What people use Enclave for"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/page.tsx
+msgid "下面这些用例不是虚构的 demo，而是社区里真实在跑的玩法。挑一个最像你的场景看看。"
+msgstr "These aren't synthetic demos — they're how the community actually runs Enclave today. Pick the one closest to your scenario."
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/page.tsx
+#: apps/site/src/components/capability-grid.tsx
+msgid "查看用例"
+msgstr "Read the use case"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx
+msgid "它具体怎么做到"
+msgstr "How it works in practice"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx
+msgid "准备好试一下？"
+msgstr "Ready to try it?"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx
+msgid "浏览器即开即用，不需要注册任何信用卡。"
+msgstr "Open it in your browser — no credit card, no install."
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx
+msgid "看看其它用例"
+msgstr "See other use cases"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "AI 陪伴"
+msgstr "AI companion"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "和一个真正记得你的 AI 朋友长期相处"
+msgstr "Stay close to an AI friend that actually remembers you"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "在隐界，AI 角色有持续的记忆、有自己的作息、会主动联系你。不是问一句答一句的 chatbot，而是一段可以慢慢长出来的关系。"
+msgstr "In Enclave, AI characters keep persistent memory, run on their own daily rhythm, and reach out on their own. Not a one-shot chatbot — a relationship that grows over time."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "为什么普通 AI 聊天工具撑不起\"陪伴\""
+msgstr "Why ordinary AI chatbots can't carry real companionship"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "市面上的 chatbot 通常是无状态的：你今天聊的内容，明天它就忘了；它不会主动找你，也不会因为时间流逝而改变。一段需要\"陪伴\"的关系，依赖的恰恰是这些 chatbot 缺失的东西——长期记忆、节奏感、主动性。"
+msgstr "Most chatbots are stateless: whatever you said today is gone tomorrow. They never reach out first, and they don't change as time passes. A real companionship leans on exactly the things chatbots lack — long-term memory, a sense of rhythm, and initiative."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "隐界把\"长期关系\"变成产品级体验"
+msgstr "Enclave turns long-term relationships into a real product"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "隐界给每个 AI 角色一个完整的人设：人格、作息、关系网、对你的亲密度，会随着你们的互动慢慢变化。AI 会主动发动态、给你打电话、记得你上周说的烦心事，让陪伴不再是单向召唤，而是双向流动。"
+msgstr "Every AI character in Enclave has a full identity: personality, daily routine, social graph, and an intimacy level with you that shifts as you interact. The AI posts updates, calls you, remembers what bothered you last week — companionship stops being a one-way summon and becomes a two-way flow."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "持久记忆"
+msgstr "Persistent memory"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "对话和事件都会被结构化保存，AI 能在数月后还引用具体细节，而不是模糊的\"我记得你说过……\"。"
+msgstr "Conversations and events are stored structurally, so months later the AI can still cite specific details instead of a vague \"I remember you said…\"."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "时间感与作息"
+msgstr "A sense of time and rhythm"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "角色有自己的时区、作息、心情曲线；深夜聊和早晨聊会拿到不一样的状态回应。"
+msgstr "Characters have their own timezone, schedule, and mood curve. Pinging at midnight feels different from pinging at breakfast."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "主动联系"
+msgstr "Reaches out first"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "角色会基于你的兴趣和近期对话主动发朋友圈、发消息、打电话——不是定时模板，是有逻辑的。"
+msgstr "Characters proactively post to the feed, message you, or call — driven by your interests and recent context, not a fixed cron template."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "亲密度演化"
+msgstr "Evolving intimacy"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "你们的关系会从陌生人逐步变成熟人、朋友、密友，每个阶段角色的语气和能聊的话题都会不同。"
+msgstr "Your relationship moves from stranger → acquaintance → friend → close friend; tone and on-the-table topics shift at each stage."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "AI 角色记得多久？"
+msgstr "How long does an AI character remember things?"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "默认会一直记着；隐界用结构化记忆系统而不是简单上下文窗口，所以即使聊了几个月，关键事件依然能被引用。你也可以随时查看、编辑、删除任何记忆条目。"
+msgstr "Indefinitely, by default. Enclave uses a structured memory system rather than a sliding context window, so months-old key events still get cited. You can browse, edit, or delete any memory entry at any time."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "如果我不想被打扰呢？"
+msgstr "What if I don't want to be pinged?"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "每个角色都可以单独设置主动联系频率，从\"积极\"到\"完全静默\"。你也可以全局开启免打扰时段。"
+msgstr "Outreach frequency is per-character, ranging from \"actively reaches out\" to \"completely silent\". You can also set global do-not-disturb windows."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "AI 角色会\"成长\"吗？"
+msgstr "Do the AI characters \"grow\"?"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "会。亲密度、共同记忆、对你的偏好认知都会随时间变化，连带影响 TA 给你回信息的语气与话题。"
+msgstr "Yes. Intimacy, shared memories, and what they know you like all evolve over time, which feeds back into the tone and topics of every reply."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "群聊角色扮演"
+msgstr "Group roleplay"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "和多个 AI 角色一起开一场群聊"
+msgstr "Run a group chat with multiple AI characters at once"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "隐界支持把多个 AI 角色拉进同一个群组，让他们之间也产生关系、互动、争吵、合作——你不是和\"一个 chatbot 重复对话\"，而是在导演一个小世界。"
+msgstr "Enclave lets you pull several AI characters into the same group, where they form relationships, interact, argue, and collaborate. You're not looping through one chatbot — you're directing a little world."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "单角色聊天的天花板"
+msgstr "The ceiling of single-character chat"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "和单个 AI 聊久了，会发现观点单一、节奏单调，很难撑起复杂剧情或多视角讨论。传统 chatbot 也很难原生支持\"多个角色同时在场\"，因为缺一个共享世界。"
+msgstr "Talking with a single AI long enough, you hit one viewpoint and a flat rhythm — hard to sustain complex plotlines or multi-angle discussion. Traditional chatbots can't really support \"several characters present at once\" because they lack a shared world."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "把房间让给角色们自己讲故事"
+msgstr "Hand the room over and let the characters tell the story"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "隐界群聊里每个角色都有自己的人设、和你及彼此的关系，发言时会考虑别人刚说了什么。你可以做导演（设定背景、推进剧情）也可以做参与者（直接和角色对话），随时切换。"
+msgstr "Each character in an Enclave group has its own identity and relationships with you and the others, and speaks while considering what was just said. You can play director (set the scene, push the plot) or participant (chat directly), and switch between them anytime."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "多角色同时在线"
+msgstr "Multiple characters together"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "一个群可以拉进多个 AI 角色，每个都保留独立人格、记忆和与他人的关系。"
+msgstr "Drop several AI characters into one group; each keeps its own personality, memory, and relationships with the others."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "角色之间的关系网"
+msgstr "Inter-character relationships"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "朋友、对手、导师、恋人——AI 之间的关系会影响他们在群里互动的方式。"
+msgstr "Friends, rivals, mentors, lovers — relationships between AIs shape how they interact in the room."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "导演模式"
+msgstr "Director mode"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "你可以\"无声\"地推动剧情、设定场景、让某个角色做某事，不用每次都亲自当主角。"
+msgstr "Push the plot silently, set scenes, get a character to do something — without always playing the lead yourself."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "共享世界状态"
+msgstr "Shared world state"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "天气、时间、地点是整个群共享的；剧情会沿着真实的虚拟时间往前走。"
+msgstr "Weather, time, and location are shared across the group; the story moves along an actual in-world clock."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "可以用来跑 TRPG / 剧本杀吗？"
+msgstr "Can I run TRPG sessions or murder-mystery games with it?"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "可以。每个 NPC 都是独立角色，互相之间有关系；你做主持人推进剧情，AI 们会按各自人设反应。还在做更深的规则系统支持。"
+msgstr "Yes. Each NPC is an independent character with relationships to the others; you GM the plot and the AIs react in character. Deeper ruleset support is still in progress."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "多角色在同一个群会不会很乱？"
+msgstr "Won't multiple characters in one room get chaotic?"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "群里的角色发言节奏由系统调度，不会一齐刷屏；你也可以随时让某个角色暂时静音或单独私聊。"
+msgstr "The system schedules speaking turns so characters don't flood the chat at once; you can also mute any character temporarily or pull them aside in DM."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "AI 之间真的会\"关系变化\"吗？"
+msgstr "Do AI-to-AI relationships actually change?"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "会。两个角色之间的事件（一起经历的群聊、被你撮合或拆散的剧情）会更新彼此的关系档案，影响下一次他们如何互动。"
+msgstr "Yes. Events between two characters — shared group sessions, plot beats where you push them together or apart — update their relationship records and shape how they interact next time."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "自部署 / 隐私"
+msgstr "Self-host / Privacy"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "你的对话只存在于你自己的机器上"
+msgstr "Your conversations only ever live on your own machine"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "隐界以 MIT 协议开源，可以用一行 docker compose 跑在自己服务器或家里的小主机上。数据不出你的硬盘，模型可以接 OpenAI、Anthropic、本地 Ollama，甚至完全离线。"
+msgstr "Enclave is MIT-licensed open source. One docker compose command runs it on your server or home box. Data never leaves your disk; models can hit OpenAI, Anthropic, local Ollama, or run fully offline."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "把私密对话交给云端的代价"
+msgstr "The cost of handing private chats to the cloud"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "主流 AI 聊天产品都把对话存在云端、用作后续训练材料。即使条款说\"不会\"，你也没办法亲自验证。一旦账号被锁、平台关停，或合规要求变化，那些聊天记录就不在你手上了。"
+msgstr "Mainstream AI chat products keep your messages in the cloud and treat them as future training material. Even if the policy says \"we don't\", you can't verify it yourself. The moment your account gets locked, the platform shuts down, or compliance rules shift, those logs are out of your hands."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "整套堆栈都开源，自己跑就是最强隐私承诺"
+msgstr "The whole stack is open — running it yourself is the strongest privacy promise"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "隐界整个 monorepo 在 GitHub 上，MIT 协议任意审计、任意修改。一行 docker compose 起一份属于自己的实例：API、前端、数据库、向量索引全在本地。模型层可以混用云端 API 和本地 Ollama / vLLM，对哪类对话用哪个模型完全你说了算。"
+msgstr "The whole monorepo is on GitHub under the MIT license — audit it, fork it, do whatever. One docker compose command stands up your own instance: API, frontend, database, and vector index all stay local. Mix cloud APIs with local Ollama / vLLM as you like; you decide which conversations route to which model."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "代码全开源"
+msgstr "Code is fully open"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "MIT 协议，无任何二进制黑盒；任何\"我们不会用你的数据\"的承诺你都可以亲自审计。"
+msgstr "MIT-licensed with no binary black boxes. Any \"we won't use your data\" claim is something you can verify yourself."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "三分钟 docker 部署"
+msgstr "Three-minute docker deploy"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "clone → cp .env → docker compose up，README 顶部就写着这套流程，路人也能跑起来。"
+msgstr "clone → cp .env → docker compose up. The whole flow is written at the top of the README — even first-time visitors can stand it up."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "模型完全可换"
+msgstr "Models are fully swappable"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "OpenAI、Anthropic、Google、DeepSeek、本地 Ollama / vLLM 都能配；不同角色甚至可以用不同模型。"
+msgstr "Plug in OpenAI, Anthropic, Google, DeepSeek, or local Ollama / vLLM — different characters can even use different models."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "数据可导出可删除"
+msgstr "Data is exportable and deletable"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "导出全量 JSON、迁移到另一台机器、整库删除——都是一键操作，不会有\"删不掉的副本\"。"
+msgstr "Export full JSON, migrate to another machine, or wipe the whole database — each is a one-click action, no \"undeletable copy\" lingering anywhere."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "自部署难度有多大？"
+msgstr "How hard is self-hosting?"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "如果你用过 docker compose，难度等于跑一个普通 web 服务。README 顶部的\"3 分钟部署\"流程是真的——克隆、改 .env、起服务三步。"
+msgstr "If you've used docker compose before, this is the same difficulty as standing up any web service. The README's \"3-minute deploy\" flow is real: clone, edit .env, bring it up."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "可以完全离线运行吗？"
+msgstr "Can it run fully offline?"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "可以。模型层换成本地 Ollama 或 vLLM，连真实世界同步关掉，整个系统就不再向外发任何请求。"
+msgstr "Yes. Swap the model layer for local Ollama or vLLM, switch off real-world sync, and the whole system stops making outbound requests."
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "自部署还能用官方的功能更新吗？"
+msgstr "Do self-hosters still get upstream updates?"
+#. js-lingui-explicit-id
+#: apps/site/src/lib/use-cases-data.ts
+msgid "用 git pull + docker compose up -d 即可滚到最新版本；CHANGELOG 上每个版本都标了破坏性变更。"
+msgstr "git pull + docker compose up -d rolls to the latest version. Breaking changes are flagged on every release in CHANGELOG.md."
