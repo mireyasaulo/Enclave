@@ -2769,6 +2769,10 @@ msgstr "Crops ripen by real-world hours. When you're offline, world characters k
 msgid "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。"
 msgstr "Crops ripen by real-world hours. When you're offline, world characters keep working their own fields."
 
+#: apps/app/src/lib/error-translate.ts:70
+msgid "作物还没成熟。"
+msgstr "Crop is not ripe yet."
+
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:856
 #: apps/app/src/i18n/static-dom-seed.ts:350
 #: apps/app/src/routes/channel-author-page.tsx:277
@@ -6770,6 +6774,14 @@ msgstr "Map"
 #: apps/app/src/i18n/static-dom-seed.ts:179
 msgid "地图服务"
 msgstr "Map service"
+
+#: apps/app/src/lib/error-translate.ts:68
+msgid "地块上没有作物。"
+msgstr "No crop on this plot."
+
+#: apps/app/src/lib/error-translate.ts:44
+msgid "地块编号无效。"
+msgstr "Invalid plot number."
 
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:173
 #: apps/app/src/routes/discover-page.tsx:139
@@ -11887,6 +11899,10 @@ msgstr "Failed to submit activation request. Please try again later."
 msgid "提交投诉"
 msgstr "Submit report"
 
+#: apps/app/src/lib/error-translate.ts:72
+msgid "提交的数据无效，请检查后重试。"
+msgstr "Submitted data is invalid, please check and retry."
+
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:878
 msgid "提交聊天相关投诉"
 msgstr "Submit a chat-related report"
@@ -13826,6 +13842,10 @@ msgstr "View service notifications and subscription articles here"
 msgid "服务器暂时不可用，请稍后再试。"
 msgstr "The server is temporarily unavailable. Try again later."
 
+#: apps/app/src/lib/error-translate.ts:74
+msgid "服务暂时不可用，请稍后再试。"
+msgstr "Service temporarily unavailable, please try again later."
+
 #: apps/app/src/routes/legal-terms-page.tsx:10
 #: apps/app/src/routes/profile-page.tsx:180
 #: apps/app/src/routes/profile-settings-page.tsx:689
@@ -13890,6 +13910,11 @@ msgstr "Unmarked"
 #: apps/app/src/routes/live-companion-page.tsx:608
 msgid "未知"
 msgstr "Unknown"
+
+#. placeholder {0}: String(params.cropId ?? "")
+#: apps/app/src/lib/error-translate.ts:47
+msgid "未知作物：{0}"
+msgstr "Unknown crop: {0}"
 
 #: apps/app/src/routes/desktop-chat-files-page.tsx:919
 msgid "未知大小"
@@ -18279,6 +18304,12 @@ msgstr "Waiting for verification"
 msgid "等有消息后，这里会按关键词、图片、文件和链接帮你集中查找。"
 msgstr "Once messages arrive, you can search them here by keyword, images, files, and links."
 
+#. placeholder {0}: String(params.unlockLevel ?? "?")
+#. placeholder {1}: String(params.cropName ?? "")
+#: apps/app/src/lib/error-translate.ts:59
+msgid "等级不足：需 {0} 级才能种 {1}"
+msgstr "Level not enough: need level {0} to plant {1}"
+
 #: apps/app/src/routes/chat-list-page.tsx:1070
 msgid "等角色、群聊或服务号开始发消息后，这里会显示最近会话。"
 msgstr "Recent conversations will appear here once characters, group chats, or service accounts start sending messages."
@@ -19755,6 +19786,11 @@ msgstr "Character"
 msgid "角色不存在"
 msgstr "Character not found"
 
+#. placeholder {0}: String(params.characterId ?? "")
+#: apps/app/src/lib/error-translate.ts:53
+msgid "角色不存在：{0}"
+msgstr "Character does not exist: {0}"
+
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:218
 msgid "角色信息"
 msgstr "Character info"
@@ -20105,9 +20141,17 @@ msgstr "This group chat will be removed"
 msgid "该聊天会先从消息列表中隐藏，收到新消息后会再次出现。"
 msgstr "This chat will be hidden from the message list for now and will reappear when new messages arrive."
 
+#: apps/app/src/lib/error-translate.ts:50
+msgid "该角色不参与农场。"
+msgstr "This character doesn't participate in farming."
+
 #: apps/app/src/routes/chat-details-page.tsx:723
 msgid "该角色后续互动会被拦截"
 msgstr "Future interactions from this character will be blocked"
+
+#: apps/app/src/lib/error-translate.ts:56
+msgid "该角色当前不可见。"
+msgstr "This character is currently not visible."
 
 #: apps/app/src/features/games/game-center-session-panel.tsx:95
 msgid "详情页"
@@ -21740,6 +21784,10 @@ msgstr "This character's Moments aren't visible right now"
 msgid "这台桌面端正在承接你的世界。"
 msgstr "This desktop is currently carrying your world."
 
+#: apps/app/src/lib/error-translate.ts:66
+msgid "这块地现在不能种植。"
+msgstr "This plot can't be planted right now."
+
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:437
 msgid "这张图片已经失去上下文"
 msgstr "This image has lost its context"
@@ -22844,6 +22892,11 @@ msgstr "Coins + EXP + affinity"
 msgid "金币不足"
 msgstr "Not enough coins"
 
+#. placeholder {0}: String(params.required ?? "?")
+#: apps/app/src/lib/error-translate.ts:63
+msgid "金币不足：需 {0}"
+msgstr "Not enough coins: need {0}"
+
 #: apps/app/src/features/games/farm/components/plot-action-bar.tsx:128
 msgid "金币和种子都不够，先去仓库卖点东西"
 msgstr "Not enough coins or seeds — go sell something from the warehouse first"
@@ -23193,6 +23246,10 @@ msgstr "Misty Lake Morning"
 #: apps/app/src/routes/discover-feed-page.tsx:1000
 msgid "需好友"
 msgstr "Friends only"
+
+#: apps/app/src/lib/error-translate.ts:42
+msgid "需要先选择一个角色。"
+msgstr "Please select a character first."
 
 #: apps/app/src/features/chat/backgrounds/background-catalog.ts:9
 #: apps/app/src/i18n/static-dom-seed.ts:765

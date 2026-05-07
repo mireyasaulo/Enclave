@@ -2771,6 +2771,10 @@ msgstr "作物按真实小时数成熟。下线时世界角色仍在自己的田
 msgid "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。"
 msgstr "作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。"
 
+#: apps/app/src/lib/error-translate.ts:70
+msgid "作物还没成熟。"
+msgstr "作物还没成熟。"
+
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:856
 #: apps/app/src/i18n/static-dom-seed.ts:350
 #: apps/app/src/routes/channel-author-page.tsx:277
@@ -6772,6 +6776,14 @@ msgstr "地图"
 #: apps/app/src/i18n/static-dom-seed.ts:179
 msgid "地图服务"
 msgstr "地图服务"
+
+#: apps/app/src/lib/error-translate.ts:68
+msgid "地块上没有作物。"
+msgstr "地块上没有作物。"
+
+#: apps/app/src/lib/error-translate.ts:44
+msgid "地块编号无效。"
+msgstr "地块编号无效。"
 
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:173
 #: apps/app/src/routes/discover-page.tsx:139
@@ -11889,6 +11901,10 @@ msgstr "提交开通申请失败，请稍后重试。"
 msgid "提交投诉"
 msgstr "提交投诉"
 
+#: apps/app/src/lib/error-translate.ts:72
+msgid "提交的数据无效，请检查后重试。"
+msgstr "提交的数据无效，请检查后重试。"
+
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:878
 msgid "提交聊天相关投诉"
 msgstr "提交聊天相关投诉"
@@ -13828,6 +13844,10 @@ msgstr "服务号通知和订阅号文章都在这里查看"
 msgid "服务器暂时不可用，请稍后再试。"
 msgstr "服务器暂时不可用，请稍后再试。"
 
+#: apps/app/src/lib/error-translate.ts:74
+msgid "服务暂时不可用，请稍后再试。"
+msgstr "服务暂时不可用，请稍后再试。"
+
 #: apps/app/src/routes/legal-terms-page.tsx:10
 #: apps/app/src/routes/profile-page.tsx:180
 #: apps/app/src/routes/profile-settings-page.tsx:689
@@ -13892,6 +13912,11 @@ msgstr "未标记"
 #: apps/app/src/routes/live-companion-page.tsx:608
 msgid "未知"
 msgstr "未知"
+
+#. placeholder {0}: String(params.cropId ?? "")
+#: apps/app/src/lib/error-translate.ts:47
+msgid "未知作物：{0}"
+msgstr "未知作物：{0}"
 
 #: apps/app/src/routes/desktop-chat-files-page.tsx:919
 msgid "未知大小"
@@ -18281,6 +18306,12 @@ msgstr "等待验证"
 msgid "等有消息后，这里会按关键词、图片、文件和链接帮你集中查找。"
 msgstr "等有消息后，这里会按关键词、图片、文件和链接帮你集中查找。"
 
+#. placeholder {0}: String(params.unlockLevel ?? "?")
+#. placeholder {1}: String(params.cropName ?? "")
+#: apps/app/src/lib/error-translate.ts:59
+msgid "等级不足：需 {0} 级才能种 {1}"
+msgstr "等级不足：需 {0} 级才能种 {1}"
+
 #: apps/app/src/routes/chat-list-page.tsx:1070
 msgid "等角色、群聊或服务号开始发消息后，这里会显示最近会话。"
 msgstr "等角色、群聊或服务号开始发消息后，这里会显示最近会话。"
@@ -19757,6 +19788,11 @@ msgstr "角色"
 msgid "角色不存在"
 msgstr "角色不存在"
 
+#. placeholder {0}: String(params.characterId ?? "")
+#: apps/app/src/lib/error-translate.ts:53
+msgid "角色不存在：{0}"
+msgstr "角色不存在：{0}"
+
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:218
 msgid "角色信息"
 msgstr "角色信息"
@@ -20107,9 +20143,17 @@ msgstr "该群聊会被移除"
 msgid "该聊天会先从消息列表中隐藏，收到新消息后会再次出现。"
 msgstr "该聊天会先从消息列表中隐藏，收到新消息后会再次出现。"
 
+#: apps/app/src/lib/error-translate.ts:50
+msgid "该角色不参与农场。"
+msgstr "该角色不参与农场。"
+
 #: apps/app/src/routes/chat-details-page.tsx:723
 msgid "该角色后续互动会被拦截"
 msgstr "该角色后续互动会被拦截"
+
+#: apps/app/src/lib/error-translate.ts:56
+msgid "该角色当前不可见。"
+msgstr "该角色当前不可见。"
 
 #: apps/app/src/features/games/game-center-session-panel.tsx:95
 msgid "详情页"
@@ -21742,6 +21786,10 @@ msgstr "这位角色的朋友圈当前不可见"
 msgid "这台桌面端正在承接你的世界。"
 msgstr "这台桌面端正在承接你的世界。"
 
+#: apps/app/src/lib/error-translate.ts:66
+msgid "这块地现在不能种植。"
+msgstr "这块地现在不能种植。"
+
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:437
 msgid "这张图片已经失去上下文"
 msgstr "这张图片已经失去上下文"
@@ -22846,6 +22894,11 @@ msgstr "金币 + 经验 + 好感度"
 msgid "金币不足"
 msgstr "金币不足"
 
+#. placeholder {0}: String(params.required ?? "?")
+#: apps/app/src/lib/error-translate.ts:63
+msgid "金币不足：需 {0}"
+msgstr "金币不足：需 {0}"
+
 #: apps/app/src/features/games/farm/components/plot-action-bar.tsx:128
 msgid "金币和种子都不够，先去仓库卖点东西"
 msgstr "金币和种子都不够，先去仓库卖点东西"
@@ -23195,6 +23248,10 @@ msgstr "雾湖清晨"
 #: apps/app/src/routes/discover-feed-page.tsx:1000
 msgid "需好友"
 msgstr "需好友"
+
+#: apps/app/src/lib/error-translate.ts:42
+msgid "需要先选择一个角色。"
+msgstr "需要先选择一个角色。"
 
 #: apps/app/src/features/chat/backgrounds/background-catalog.ts:9
 #: apps/app/src/i18n/static-dom-seed.ts:765
