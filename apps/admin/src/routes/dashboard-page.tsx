@@ -12,7 +12,6 @@ import { useForm } from "react-hook-form";
 import {
   CHAT_EVENTS,
   CHAT_NAMESPACE,
-  createBackup,
   exportDiagnostics,
   getAiModel,
   getAvailableModels,
@@ -26,7 +25,6 @@ import {
   getSystemLogs,
   getSystemStatus,
   listCharacters,
-  restoreBackup,
   runInferencePreview,
   runSchedulerJob,
   WORLD_LANGUAGE_OPTIONS,
@@ -51,7 +49,6 @@ import {
   AdminCallout,
   AdminCompactStatusCard,
   AdminDetailPanel,
-  AdminDangerZone,
   AdminErrorState,
   AdminEyebrow,
   AdminJumpCard,
@@ -225,42 +222,6 @@ export function DashboardPage() {
     },
   });
 
-  const createBackupMutation = useMutation({
-    mutationFn: () => createBackup(baseUrl),
-    onSuccess: (result) => {
-      setSuccessNotice(result.message);
-    },
-  });
-
-  const restoreBackupMutation = useMutation({
-    mutationFn: () => restoreBackup(baseUrl),
-    onSuccess: async () => {
-      setSuccessNotice(t(msg`备份恢复已完成。`));
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["admin-provider-config", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["admin-system-status", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["admin-ai-model", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["admin-characters", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["admin-world-context", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["admin-scheduler-status", baseUrl],
-        }),
-        queryClient.invalidateQueries({ queryKey: ["admin-moments", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["admin-feed", baseUrl] }),
-      ]);
-    },
-  });
-
   const schedulerRunMutation = useMutation({
     mutationFn: (jobId: string) => runSchedulerJob(jobId, baseUrl),
     onSuccess: async () => {
@@ -320,10 +281,7 @@ export function DashboardPage() {
   const runningSchedulerJobId = schedulerRunMutation.isPending
     ? schedulerRunMutation.variables
     : null;
-  const operationsBusy =
-    exportDiagnosticsMutation.isPending ||
-    createBackupMutation.isPending ||
-    restoreBackupMutation.isPending;
+  const operationsBusy = exportDiagnosticsMutation.isPending;
   const providerConfigured = Boolean(providerConfigQuery.data?.model?.trim());
   const digitalHumanSummary = buildDigitalHumanAdminSummary(
     statusQuery.data?.digitalHumanGateway,
@@ -526,8 +484,6 @@ export function DashboardPage() {
     setSuccessNotice("");
     previewMutation.reset();
     exportDiagnosticsMutation.reset();
-    createBackupMutation.reset();
-    restoreBackupMutation.reset();
     schedulerRunMutation.reset();
     worldLanguageMutation.reset();
   };
@@ -1760,7 +1716,7 @@ export function DashboardPage() {
             <DashboardSectionLead
               eyebrow={t(msg`调试与运维`)}
               title={t(
-                msg`把模型调试、诊断导出、备份恢复和日志入口收敛到页面尾部。`,
+                msg`把模型调试、诊断导出和日志入口收敛到页面尾部。`,
               )}
               description={t(
                 msg`这些动作频率低于日常巡检，但必须保留清晰风险提示和执行反馈，方便值班人员临时处理。`,
@@ -1908,7 +1864,7 @@ export function DashboardPage() {
                     <AdminActionGroup
                       title={t(msg`日常维护`)}
                       description={t(
-                        msg`先导出诊断和创建备份，这两项更适合巡检和日常留档。`,
+                        msg`导出诊断包，便于巡检和日常留档。`,
                       )}
                     >
                       <div className="grid gap-3">
@@ -1923,38 +1879,8 @@ export function DashboardPage() {
                             ? t(msg`正在导出诊断包...`)
                             : t(msg`导出诊断包`)}
                         </Button>
-                        <Button
-                          variant="secondary"
-                          size="lg"
-                          className="justify-start rounded-2xl"
-                          disabled={operationsBusy}
-                          onClick={() => createBackupMutation.mutate()}
-                        >
-                          {createBackupMutation.isPending
-                            ? t(msg`正在创建备份...`)
-                            : t(msg`创建本地备份`)}
-                        </Button>
                       </div>
                     </AdminActionGroup>
-
-                    <AdminDangerZone
-                      title={t(msg`高风险恢复`)}
-                      description={t(
-                        msg`恢复备份会直接改写当前实例状态，只在确认需要回滚时执行。`,
-                      )}
-                    >
-                      <Button
-                        variant="secondary"
-                        size="lg"
-                        className="w-full justify-center rounded-2xl"
-                        disabled={operationsBusy}
-                        onClick={() => restoreBackupMutation.mutate()}
-                      >
-                        {restoreBackupMutation.isPending
-                          ? t(msg`正在恢复备份...`)
-                          : t(msg`恢复备份`)}
-                      </Button>
-                    </AdminDangerZone>
                   </div>
 
                   <div className="mt-4 space-y-3">
@@ -1973,22 +1899,7 @@ export function DashboardPage() {
                         message={exportDiagnosticsMutation.error.message}
                       />
                     ) : null}
-                    {createBackupMutation.isError &&
-                    createBackupMutation.error instanceof Error ? (
-                      <ErrorBlock
-                        message={createBackupMutation.error.message}
-                      />
-                    ) : null}
-                    {restoreBackupMutation.isError &&
-                    restoreBackupMutation.error instanceof Error ? (
-                      <ErrorBlock
-                        message={restoreBackupMutation.error.message}
-                      />
-                    ) : null}
-                    {!operationsBusy &&
-                    !exportDiagnosticsMutation.isError &&
-                    !createBackupMutation.isError &&
-                    !restoreBackupMutation.isError ? (
+                    {!operationsBusy && !exportDiagnosticsMutation.isError ? (
                       <InlineNotice tone="muted">
                         {t(
                           msg`当前系统运维操作已经接入类型化契约层，随时可以切换到真实运行时实现。`,
@@ -2126,7 +2037,7 @@ export function DashboardPage() {
                 },
                 {
                   label: t(msg`调试与运维`),
-                  detail: t(msg`做推理预览、导出诊断、备份恢复和日志查看。`),
+                  detail: t(msg`做推理预览、导出诊断和日志查看。`),
                   onClick: () => scrollToDashboardSection(operationsSectionRef),
                 },
               ]}

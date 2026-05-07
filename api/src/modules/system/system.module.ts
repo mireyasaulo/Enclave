@@ -5,8 +5,10 @@ import { UserEntity } from '../auth/user.entity';
 import { CharacterEntity } from '../characters/character.entity';
 import { NarrativeArcEntity } from '../narrative/narrative-arc.entity';
 import { AIBehaviorLogEntity } from '../analytics/ai-behavior-log.entity';
+import { AdminGuard } from '../admin/admin.guard';
 import { SystemConfigModule } from '../config/config.module';
 import { SystemController } from './system.controller';
+import { SystemEvalsController } from './system-evals.controller';
 import { SystemService } from './system.service';
 import { SchedulerModule } from '../scheduler/scheduler.module';
 import { InferenceModule } from '../inference/inference.module';
@@ -24,7 +26,7 @@ import { InferenceModule } from '../inference/inference.module';
       AIBehaviorLogEntity,
     ]),
   ],
-  controllers: [SystemController],
-  providers: [SystemService],
+  controllers: [SystemController, SystemEvalsController],
+  providers: [SystemService, AdminGuard],
 })
 export class SystemModule {}

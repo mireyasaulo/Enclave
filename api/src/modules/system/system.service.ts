@@ -3792,23 +3792,4 @@ export class SystemService {
     );
   }
 
-  createBackup() {
-    const sourcePath = this.resolveDatabasePath();
-    const backupDir = resolveRepoPath('runtime-data', 'backups');
-    fs.mkdirSync(backupDir, { recursive: true });
-    const backupPath = path.join(backupDir, `backup-${Date.now()}.sqlite`);
-
-    if (fs.existsSync(sourcePath)) {
-      fs.copyFileSync(sourcePath, backupPath);
-      return { success: true, message: `Backup created at ${backupPath}` };
-    }
-
-    return { success: true, message: 'Database file does not exist yet, so no backup was created.' };
-  }
-
-  restoreBackup() {
-    throw new NotImplementedException(
-      'Backup restore is not implemented in this remote-first build.',
-    );
-  }
 }
