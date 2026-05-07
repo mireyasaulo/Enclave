@@ -44,6 +44,7 @@ import {
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../components/avatar-chip";
+import { SparkBadge } from "../components/spark-badge";
 import { EmptyState } from "../components/empty-state";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
@@ -2071,6 +2072,7 @@ function FriendListRow({
           </div>
         ) : null}
       </div>
+      <SparkBadge streak={item.friendship.sparkStreak} size="sm" />
       {item.friendship.isStarred ? (
         <Star
           size={15}
