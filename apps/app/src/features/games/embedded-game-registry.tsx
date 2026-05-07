@@ -31,6 +31,11 @@ const CatInnGame = lazy(async () => {
   return { default: mod.CatInnGame };
 });
 
+const ForestTrainGame = lazy(async () => {
+  const mod = await import("./forest-train/forest-train-game");
+  return { default: mod.ForestTrainGame };
+});
+
 export type EmbeddedGameProps = {
   variant?: "embedded" | "fullscreen";
   onExit?: () => void;
@@ -45,6 +50,7 @@ const EMBEDDED_GAME_COMPONENTS: Record<
   "night-market": NightMarketGame,
   "sky-rally": SkyRallyGame,
   "cat-inn": CatInnGame,
+  "forest-train": ForestTrainGame,
 };
 
 export function hasEmbeddedGame(gameId: string | null | undefined): boolean {
