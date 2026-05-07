@@ -126,6 +126,16 @@ restart_cloud_console() {
 }
 
 restart_site() {
+  # apps/site 用 next dev 跑，但如果之前误跑过 next build / pnpm --dir apps/site build，
+  # .next 里会残留 standalone / BUILD_ID / prerender-manifest 等构建产物，与 dev 运行时
+  # 写入的 server/chunks 文件结构冲突，导致 webpack-runtime 找不到 chunk（症状：访问任意
+  # locale 路由 500，日志报 Cannot find module './933.js' 之类）。检测到污染就清掉。
+  if [ -d apps/site/.next/standalone ] \
+     || [ -f apps/site/.next/BUILD_ID ] \
+     || [ -f apps/site/.next/prerender-manifest.json ]; then
+    echo "[restart-app] apps/site/.next 含 build 产物残留，清理后重新启动 next dev"
+    rm -rf apps/site/.next
+  fi
   node scripts/dev-services.mjs restart site
   node scripts/wait-for-service-ready.mjs site http://127.0.0.1:5185/ 60000 1000
 }
