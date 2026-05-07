@@ -52,6 +52,7 @@ export function DesktopContactProfileHeader({
   displayName,
   subline,
   identifier,
+  tagline,
   action,
   compact = false,
 }: {
@@ -60,6 +61,7 @@ export function DesktopContactProfileHeader({
   displayName: string;
   subline?: string;
   identifier?: string;
+  tagline?: string;
   action?: ReactNode;
   compact?: boolean;
 }) {
@@ -101,7 +103,11 @@ export function DesktopContactProfileHeader({
                 {subline}
               </div>
             ) : null}
-            {identifier ? (
+            {tagline ? (
+              <div className="mt-2 line-clamp-2 text-[12px] text-[color:var(--text-dim)]">
+                {tagline}
+              </div>
+            ) : identifier ? (
               <div className="mt-2 truncate text-[12px] text-[color:var(--text-dim)]">
                 {t(msg`隐界号：${identifier}`)}
               </div>

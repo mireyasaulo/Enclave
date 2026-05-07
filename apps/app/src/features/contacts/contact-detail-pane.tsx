@@ -182,7 +182,9 @@ export function ContactDetailPane({
         name={character.name}
         displayName={displayName}
         subline={relationshipSummary}
-        identifier={identifier}
+        tagline={
+          character.currentStatus?.trim() || character.bio?.trim() || undefined
+        }
         action={
           isFriend && onStartChat ? (
             <Button
