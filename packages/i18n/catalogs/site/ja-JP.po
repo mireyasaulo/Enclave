@@ -638,4 +638,31 @@ msgstr "完全オープンソース、MIT ライセンス。100% 自主権が欲
 #. js-lingui-explicit-id
 msgid "一个属于你的 AI 虚拟世界。私人居民、动态、群聊、电话——浏览器即开即用。"
 msgstr "あなただけの AI バーチャルワールド。プライベートな住人・モーメンツ・グループチャット・通話 — ブラウザで開くだけ。"
+#. js-lingui-explicit-id
+msgid "隐界 · 一个属于你的 AI 虚拟世界"
+msgstr "隐界 · あなただけの AI バーチャルワールド"
+#. js-lingui-explicit-id
+msgid "%s · 隐界 Enclave"
+msgstr "%s · 隐界 Enclave"
+#. js-lingui-explicit-id
+msgid "私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用，免费开始你的隐界世界。"
+msgstr "プライベートな AI 住人、モーメンツ、グループチャット、通話 — ブラウザで開くだけ、エンクレイブの世界を無料で始めましょう。"
+#. js-lingui-explicit-id
+msgid "下载隐界 · 网页 / 桌面 / 移动 全平台"
+msgstr "隐界をダウンロード · Web · デスクトップ · モバイル"
+#. js-lingui-explicit-id
+msgid "挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。"
+msgstr "あなたに合った方法でエンクレイブを開始：Web 版はすぐに使え、デスクトップ版でさらに深く、セルフホストで完全な自由を。"
+#. js-lingui-explicit-id
+msgid "隐私政策 · 隐界 Enclave"
+msgstr "プライバシーポリシー · 隐界 Enclave"
+#. js-lingui-explicit-id
+msgid "隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。"
+msgstr "エンクレイブがあなたのデータを収集・保存・利用する方法。セルフホストとマネージドクラウドの両方をカバーします。"
+#. js-lingui-explicit-id
+msgid "服务条款 · 隐界 Enclave"
+msgstr "利用規約 · 隐界 Enclave"
+#. js-lingui-explicit-id
+msgid "隐界 Enclave 服务条款：开源协议、合理使用、订阅与计费、免责声明。"
+msgstr "エンクレイブ利用規約：オープンソースライセンス、適切な利用、サブスクと請求、免責事項。"
 

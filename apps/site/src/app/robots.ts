@@ -1,11 +1,9 @@
 import type { MetadataRoute } from "next";
-
-const BASE_URL =
-  (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.enclave.top").replace(/\/+$/, "");
+import { SITE_BASE_URL } from "@/lib/seo-metadata";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: { userAgent: "*", allow: "/" },
-    sitemap: `${BASE_URL}/sitemap.xml`,
+    sitemap: `${SITE_BASE_URL}/sitemap.xml`,
   };
 }

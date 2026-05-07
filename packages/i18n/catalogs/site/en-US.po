@@ -638,4 +638,31 @@ msgstr "Fully open source under MIT — if you want 100% control, run your own c
 #. js-lingui-explicit-id
 msgid "一个属于你的 AI 虚拟世界。私人居民、动态、群聊、电话——浏览器即开即用。"
 msgstr "A private AI world of your own. Private residents, moments, group chats and calls — open in your browser."
+#. js-lingui-explicit-id
+msgid "隐界 · 一个属于你的 AI 虚拟世界"
+msgstr "Enclave · A private AI world of your own"
+#. js-lingui-explicit-id
+msgid "%s · 隐界 Enclave"
+msgstr "%s · Enclave"
+#. js-lingui-explicit-id
+msgid "私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用，免费开始你的隐界世界。"
+msgstr "Private AI residents, moments, group chats and calls — open it in your browser and start your Enclave world for free."
+#. js-lingui-explicit-id
+msgid "下载隐界 · 网页 / 桌面 / 移动 全平台"
+msgstr "Download Enclave · Web · Desktop · Mobile"
+#. js-lingui-explicit-id
+msgid "挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。"
+msgstr "Pick the way that fits you best: open the web app instantly, install the desktop build for a deeper experience, or self-host for full control."
+#. js-lingui-explicit-id
+msgid "隐私政策 · 隐界 Enclave"
+msgstr "Privacy Policy · Enclave"
+#. js-lingui-explicit-id
+msgid "隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。"
+msgstr "How Enclave collects, stores, and uses your data — covering both self-hosted and managed-cloud users."
+#. js-lingui-explicit-id
+msgid "服务条款 · 隐界 Enclave"
+msgstr "Terms of Service · Enclave"
+#. js-lingui-explicit-id
+msgid "隐界 Enclave 服务条款：开源协议、合理使用、订阅与计费、免责声明。"
+msgstr "Enclave terms of service: open-source license, acceptable use, subscription & billing, and disclaimers."
 

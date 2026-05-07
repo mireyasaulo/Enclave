@@ -156,6 +156,16 @@ const TRANSLATIONS = [
   ["完全开源、MIT 协议；如果你想拥有 100% 自主权可以自己跑一份", "Fully open source under MIT — if you want 100% control, run your own copy", "完全オープンソース、MIT ライセンス。100% 自主権が欲しい方はご自身でデプロイできます", "MIT 라이선스의 완전 오픈소스 — 100% 자율성을 원한다면 직접 호스팅할 수 있습니다"],
   // Footer
   ["一个属于你的 AI 虚拟世界。私人居民、动态、群聊、电话——浏览器即开即用。", "A private AI world of your own. Private residents, moments, group chats and calls — open in your browser.", "あなただけの AI バーチャルワールド。プライベートな住人・モーメンツ・グループチャット・通話 — ブラウザで開くだけ。", "당신만의 AI 가상 세계. 프라이빗 거주민, 모먼트, 그룹 채팅, 통화 — 브라우저에서 바로."],
+  // ===== SEO: per-page titles & descriptions =====
+  ["隐界 · 一个属于你的 AI 虚拟世界", "Enclave · A private AI world of your own", "隐界 · あなただけの AI バーチャルワールド", "엔클레이브 · 당신만의 AI 가상 세계"],
+  ["%s · 隐界 Enclave", "%s · Enclave", "%s · 隐界 Enclave", "%s · Enclave"],
+  ["私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用，免费开始你的隐界世界。", "Private AI residents, moments, group chats and calls — open it in your browser and start your Enclave world for free.", "プライベートな AI 住人、モーメンツ、グループチャット、通話 — ブラウザで開くだけ、エンクレイブの世界を無料で始めましょう。", "프라이빗 AI 거주민, 모먼트, 그룹 채팅, 통화 — 브라우저에서 바로 열어 엔클레이브 세계를 무료로 시작하세요."],
+  ["下载隐界 · 网页 / 桌面 / 移动 全平台", "Download Enclave · Web · Desktop · Mobile", "隐界をダウンロード · Web · デスクトップ · モバイル", "엔클레이브 다운로드 · 웹 · 데스크톱 · 모바일"],
+  ["挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。", "Pick the way that fits you best: open the web app instantly, install the desktop build for a deeper experience, or self-host for full control.", "あなたに合った方法でエンクレイブを開始：Web 版はすぐに使え、デスクトップ版でさらに深く、セルフホストで完全な自由を。", "당신에게 가장 잘 맞는 방식으로 엔클레이브를 시작하세요. 웹은 즉시 사용 가능, 데스크톱은 더 깊은 경험, 자체 호스팅은 완전한 자율성."],
+  ["隐私政策 · 隐界 Enclave", "Privacy Policy · Enclave", "プライバシーポリシー · 隐界 Enclave", "개인정보 처리방침 · 엔클레이브"],
+  ["隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。", "How Enclave collects, stores, and uses your data — covering both self-hosted and managed-cloud users.", "エンクレイブがあなたのデータを収集・保存・利用する方法。セルフホストとマネージドクラウドの両方をカバーします。", "엔클레이브가 데이터를 수집·저장·이용하는 방식. 자체 호스팅과 매니지드 클라우드 사용자 모두를 다룹니다."],
+  ["服务条款 · 隐界 Enclave", "Terms of Service · Enclave", "利用規約 · 隐界 Enclave", "서비스 약관 · 엔클레이브"],
+  ["隐界 Enclave 服务条款：开源协议、合理使用、订阅与计费、免责声明。", "Enclave terms of service: open-source license, acceptable use, subscription & billing, and disclaimers.", "エンクレイブ利用規約：オープンソースライセンス、適切な利用、サブスクと請求、免責事項。", "엔클레이브 서비스 약관: 오픈소스 라이선스, 적절한 사용, 구독 및 결제, 면책 조항."],
 ];
 
 const LOCALES = ["zh-CN", "en-US", "ja-JP", "ko-KR"];

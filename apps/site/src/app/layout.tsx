@@ -1,17 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import { DEFAULT_LOCALE, isSupportedLocale, type SupportedLocale } from "@/lib/locales";
+import { SITE_BASE_URL } from "@/lib/seo-metadata";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.enclave.top",
-  ),
-  title: {
-    default: "隐界 · Enclave",
-    template: "%s · 隐界 Enclave",
-  },
-  description: "一个属于你的 AI 虚拟世界。私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用，免费开始。",
+  metadataBase: new URL(SITE_BASE_URL),
   applicationName: "Enclave",
   icons: {
     icon: [

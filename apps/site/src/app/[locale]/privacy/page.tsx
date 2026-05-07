@@ -1,5 +1,41 @@
+import type { Metadata } from "next";
 import { isSupportedLocale, type SupportedLocale } from "@/lib/locales";
 import { getServerI18n } from "@/i18n/server";
+import {
+  alternateLocales,
+  buildAlternates,
+  OG_LOCALE,
+  pageUrl,
+} from "@/lib/seo-metadata";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isSupportedLocale(locale)) return {};
+  const i18n = await getServerI18n(locale);
+  const title = i18n._("隐私政策");
+  const description = i18n._(
+    "隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。",
+  );
+  return {
+    title,
+    description,
+    alternates: buildAlternates(locale, "privacy"),
+    openGraph: {
+      type: "article",
+      url: pageUrl(locale, "privacy"),
+      title,
+      description,
+      siteName: "Enclave",
+      locale: OG_LOCALE[locale],
+      alternateLocale: alternateLocales(locale),
+    },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 export default async function PrivacyPage({
   params,

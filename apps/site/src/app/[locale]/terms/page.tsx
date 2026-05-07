@@ -1,5 +1,41 @@
+import type { Metadata } from "next";
 import { isSupportedLocale, type SupportedLocale } from "@/lib/locales";
 import { getServerI18n } from "@/i18n/server";
+import {
+  alternateLocales,
+  buildAlternates,
+  OG_LOCALE,
+  pageUrl,
+} from "@/lib/seo-metadata";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isSupportedLocale(locale)) return {};
+  const i18n = await getServerI18n(locale);
+  const title = i18n._("服务条款");
+  const description = i18n._(
+    "隐界 Enclave 服务条款：开源协议、合理使用、订阅与计费、免责声明。",
+  );
+  return {
+    title,
+    description,
+    alternates: buildAlternates(locale, "terms"),
+    openGraph: {
+      type: "article",
+      url: pageUrl(locale, "terms"),
+      title,
+      description,
+      siteName: "Enclave",
+      locale: OG_LOCALE[locale],
+      alternateLocale: alternateLocales(locale),
+    },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 export default async function TermsPage({
   params,

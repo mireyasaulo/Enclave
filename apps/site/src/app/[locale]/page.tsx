@@ -1,4 +1,12 @@
+import type { Metadata } from "next";
 import { isSupportedLocale, type SupportedLocale } from "@/lib/locales";
+import { getServerI18n } from "@/i18n/server";
+import {
+  alternateLocales,
+  buildAlternates,
+  OG_LOCALE,
+  pageUrl,
+} from "@/lib/seo-metadata";
 import { HeroSection } from "@/components/hero-section";
 import { CapabilityGrid } from "@/components/capability-grid";
 import { MultiPlatformCarousel } from "@/components/multi-platform-carousel";
@@ -6,6 +14,35 @@ import { OnePersonWorld } from "@/components/one-person-world";
 import { CrossPlatformSection } from "@/components/cross-platform-section";
 import { GetStartedCta } from "@/components/get-started-cta";
 import { FaqAccordion } from "@/components/faq-accordion";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isSupportedLocale(locale)) return {};
+  const i18n = await getServerI18n(locale);
+  const title = i18n._("隐界 · 一个属于你的 AI 虚拟世界");
+  const description = i18n._(
+    "私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用，免费开始你的隐界世界。",
+  );
+  return {
+    title,
+    description,
+    alternates: buildAlternates(locale, ""),
+    openGraph: {
+      type: "website",
+      url: pageUrl(locale, ""),
+      title,
+      description,
+      siteName: "Enclave",
+      locale: OG_LOCALE[locale],
+      alternateLocale: alternateLocales(locale),
+    },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 export default async function HomePage({
   params,
