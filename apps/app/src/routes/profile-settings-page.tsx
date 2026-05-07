@@ -627,27 +627,11 @@ export function ProfileSettingsPage() {
         <MobileSettingsSection
           desktop={desktopMode}
           title={desktopMode ? t(msg`界面语言`) : undefined}
-          description={
-            desktopMode
-              ? t(msg`切换桌面端、Web、Android、iOS 共用业务界面的显示语言。`)
-              : t(msg`切换当前设备的界面语言`)
-          }
+          description={t(
+            msg`切换界面语言，好友回复也会跟随此设置使用对应语言。`,
+          )}
         >
           <LanguageSwitcher />
-
-          {desktopMode ? (
-            <InlineNotice tone="muted">
-              {t(
-                msg`语言偏好按端保存；后续新增语言会自动出现在这里，不需要每个页面单独加入口。`,
-              )}
-            </InlineNotice>
-          ) : (
-            <MobileSettingsInlineNotice tone="muted">
-              {t(
-                msg`语言偏好会保存在当前设备；桌面端、管理后台和云控制台有各自的切换入口。`,
-              )}
-            </MobileSettingsInlineNotice>
-          )}
         </MobileSettingsSection>
       ) : null}
 
