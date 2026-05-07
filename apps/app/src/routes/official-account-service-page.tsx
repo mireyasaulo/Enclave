@@ -1,6 +1,10 @@
 import { Suspense, lazy, useMemo } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
 import { AppPage } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 import { RouteRedirectState } from "../components/route-redirect-state";
 import { OfficialAccountServiceThread } from "../features/official-accounts/service/official-account-service-thread";
 import { parseMobileOfficialRouteState } from "../features/official-accounts/mobile-official-route-state";
@@ -29,9 +33,9 @@ export function OfficialAccountServicePage() {
       <Suspense
         fallback={
           <RouteRedirectState
-            title="正在打开桌面服务号会话"
-            description="正在载入桌面消息工作区中的服务号会话。"
-            loadingLabel="载入桌面服务号会话..."
+            title={t(msg`正在打开桌面服务号会话`)}
+            description={t(msg`正在载入桌面消息工作区中的服务号会话。`)}
+            loadingLabel={t(msg`载入桌面服务号会话...`)}
           />
         }
       >

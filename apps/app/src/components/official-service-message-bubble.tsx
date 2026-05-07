@@ -1,7 +1,11 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { OfficialAccountServiceMessage } from "@yinjie/contracts";
 import { ArrowRight, FileText } from "lucide-react";
 import { cn } from "@yinjie/ui";
 import { formatMessageTimestamp } from "../lib/format";
+
+const t = translateRuntimeMessage;
 
 export function OfficialServiceMessageBubble({
   message,
@@ -102,7 +106,7 @@ export function OfficialServiceMessageBubble({
                       size={isDesktop ? 13 : 11}
                       className="text-[color:var(--text-dim)]"
                     />
-                    <span>服务号文章</span>
+                    <span>{t(msg`服务号文章`)}</span>
                   </div>
                   <div
                     className={cn(
@@ -160,7 +164,7 @@ export function OfficialServiceMessageBubble({
                       : "flex items-center justify-between border-t border-[color:var(--border-faint)] px-3 py-2 text-[9px] text-[color:var(--text-secondary)]"
                   }
                 >
-                  <span>阅读全文</span>
+                  <span>{t(msg`阅读全文`)}</span>
                   <ArrowRight
                     size={isDesktop ? 13 : 11}
                     className="shrink-0 text-[color:var(--text-dim)]"

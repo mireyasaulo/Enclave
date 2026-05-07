@@ -1,8 +1,12 @@
+import { msg } from "@lingui/macro";
 import {
   formatDateTime,
   getJustNowLabel,
   getYesterdayLabel,
+  translateRuntimeMessage,
 } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
 
 export function parseTimestamp(value?: string | null) {
   if (!value) {
@@ -160,7 +164,7 @@ export function formatDetailedMessageTimestamp(value?: string | null) {
 }
 
 export function initials(name?: string | null) {
-  return name?.trim().slice(0, 1) || "隐";
+  return name?.trim().slice(0, 1) || t(msg`隐`);
 }
 
 function parseDateValue(value?: string | null) {

@@ -1,8 +1,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { WorldOwner } from "@yinjie/contracts";
 import defaultOwnerAvatar from "../assets/default-owner-avatar.svg";
 import { createSessionStateStorage } from "../runtime/session-storage";
+
+const t = translateRuntimeMessage;
 
 type WorldOwnerState = {
   id: string | null;
@@ -32,7 +36,7 @@ type WorldOwnerState = {
 };
 
 const defaultAvatar = defaultOwnerAvatar;
-const defaultSignature = "在现实之外，进入另一片世界。";
+const defaultSignature = t(msg`在现实之外，进入另一片世界。`);
 
 function resolveOwnerAvatar(avatar?: string | null) {
   return avatar && avatar.trim() ? avatar : defaultAvatar;

@@ -1,7 +1,11 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { OfficialAccountSummary } from "@yinjie/contracts";
 import { BadgeCheck, ChevronRight, Radio } from "lucide-react";
 import { cn } from "@yinjie/ui";
 import { AvatarChip } from "./avatar-chip";
+
+const t = translateRuntimeMessage;
 
 export function OfficialAccountListItem({
   account,
@@ -60,7 +64,7 @@ export function OfficialAccountListItem({
           )}
         >
           <Radio size={dense ? 10 : 12} className="shrink-0" />
-          <span>{account.accountType === "service" ? "服务号" : "订阅号"}</span>
+          <span>{account.accountType === "service" ? t(msg`服务号`) : t(msg`订阅号`)}</span>
           {account.isFollowing ? (
             <span
               className={cn(
@@ -68,7 +72,7 @@ export function OfficialAccountListItem({
                 dense ? "px-1.5 py-0.5 text-[9px]" : "px-1.5 py-0.5 text-[10px]",
               )}
             >
-              已关注
+              {t(msg`已关注`)}
             </span>
           ) : null}
         </div>

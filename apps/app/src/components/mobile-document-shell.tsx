@@ -1,7 +1,11 @@
 import { useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Copy, Share2 } from "lucide-react";
 import { AppPage, Button, InlineNotice } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 import { navigateBackOrFallback } from "../lib/history-back";
 import {
   shareWithNativeShell,
@@ -57,7 +61,7 @@ export function MobileDocumentShell({
       if (shared) {
         setNotice({
           tone: "success",
-          message: "已打开系统分享面板。",
+          message: t(msg`已打开系统分享面板。`),
         });
         return;
       }
@@ -71,9 +75,9 @@ export function MobileDocumentShell({
       setNotice({
         tone: "info",
         message: nativeMobileShareSupported
-          ? "当前设备暂时无法打开系统分享，请稍后重试。"
-          : "当前环境暂不支持复制文档摘要。",
-        actionLabel: nativeMobileShareSupported ? "重试分享" : "重试复制",
+          ? t(msg`当前设备暂时无法打开系统分享，请稍后重试。`)
+          : t(msg`当前环境暂不支持复制文档摘要。`),
+        actionLabel: nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
         onAction: () => {
           void handleShareDocument();
         },
@@ -86,16 +90,16 @@ export function MobileDocumentShell({
       setNotice({
         tone: "success",
         message: nativeMobileShareSupported
-          ? "系统分享暂时不可用，已复制文档摘要。"
-          : "文档摘要已复制。",
+          ? t(msg`系统分享暂时不可用，已复制文档摘要。`)
+          : t(msg`文档摘要已复制。`),
       });
     } catch {
       setNotice({
         tone: "info",
         message: nativeMobileShareSupported
-          ? "系统分享失败，请稍后重试。"
-          : "复制文档摘要失败，请稍后重试。",
-        actionLabel: nativeMobileShareSupported ? "重试分享" : "重试复制",
+          ? t(msg`系统分享失败，请稍后重试。`)
+          : t(msg`复制文档摘要失败，请稍后重试。`),
+        actionLabel: nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
         onAction: () => {
           void handleShareDocument();
         },
@@ -120,7 +124,7 @@ export function MobileDocumentShell({
             variant="ghost"
             size="icon"
             className="h-10 w-10 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none hover:bg-black/4"
-            aria-label="返回设置"
+            aria-label={t(msg`返回设置`)}
           >
             <ArrowLeft size={18} />
           </Button>
@@ -132,7 +136,7 @@ export function MobileDocumentShell({
             variant="ghost"
             size="icon"
             className="h-10 w-10 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none hover:bg-black/4"
-            aria-label={nativeMobileShareSupported ? "分享文档" : "复制文档摘要"}
+            aria-label={nativeMobileShareSupported ? t(msg`分享文档`) : t(msg`复制文档摘要`)}
           >
             {nativeMobileShareSupported ? <Share2 size={18} /> : <Copy size={18} />}
           </Button>
@@ -169,7 +173,7 @@ export function MobileDocumentShell({
                       }
                       className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
                     >
-                      返回上一页
+                      {t(msg`返回上一页`)}
                     </button>
                   </div>
                 </div>

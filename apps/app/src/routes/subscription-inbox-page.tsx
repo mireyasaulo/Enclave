@@ -1,6 +1,10 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, type ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+
+const t = translateRuntimeMessage;
 import { ArrowLeft, BookOpenText } from "lucide-react";
 import {
   getOfficialAccountSubscriptionInbox,
@@ -36,9 +40,9 @@ export function SubscriptionInboxPage() {
       <Suspense
         fallback={
           <RouteRedirectState
-            title="正在打开桌面订阅号消息"
-            description="正在载入桌面消息工作区中的订阅号消息视图。"
-            loadingLabel="载入桌面订阅号消息..."
+            title={t(msg`正在打开桌面订阅号消息`)}
+            description={t(msg`正在载入桌面消息工作区中的订阅号消息视图。`)}
+            loadingLabel={t(msg`载入桌面订阅号消息...`)}
           />
         }
       >
@@ -107,10 +111,10 @@ function MobileSubscriptionInboxPage() {
   const groupCount = inboxQuery.data?.groups.length ?? 0;
   const lastDeliveredLabel = inboxQuery.data?.summary?.lastDeliveredAt
     ? formatConversationTimestamp(inboxQuery.data.summary.lastDeliveredAt)
-    : "暂无更新";
+    : t(msg`暂无更新`);
   const headerSubtitle = groupCount
-    ? `${groupCount}个号 · ${lastDeliveredLabel}${
-        unreadCount ? ` · ${unreadCount}条未读` : ""
+    ? `${t(msg`${groupCount}个号`)} · ${lastDeliveredLabel}${
+        unreadCount ? ` · ${t(msg`${unreadCount}条未读`)}` : ""
       }`
     : undefined;
   const safeReturnPath =
@@ -168,7 +172,7 @@ function MobileSubscriptionInboxPage() {
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
       <TabPageTopBar
-        title="订阅号消息"
+        title={t(msg`订阅号消息`)}
         subtitle={headerSubtitle}
         titleAlign="center"
         className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.96)] px-4 pb-2 pt-2 text-[color:var(--text-primary)] shadow-none"
@@ -205,7 +209,7 @@ function MobileSubscriptionInboxPage() {
                 }),
               });
             }}
-            aria-label="打开公众号列表"
+            aria-label={t(msg`打开公众号列表`)}
           >
             <BookOpenText size={17} />
           </Button>
@@ -216,9 +220,9 @@ function MobileSubscriptionInboxPage() {
         {inboxQuery.isLoading ? (
           <div className="mx-auto max-w-[24rem] px-3.5 pt-3">
             <MobileSubscriptionInboxStatusCard
-              badge="读取中"
-              title="正在读取订阅号消息"
-              description="稍等一下，正在同步最近的订阅推送。"
+              badge={t(msg`读取中`)}
+              title={t(msg`正在读取订阅号消息`)}
+              description={t(msg`稍等一下，正在同步最近的订阅推送。`)}
               tone="loading"
             />
           </div>
@@ -226,8 +230,8 @@ function MobileSubscriptionInboxPage() {
         {inboxQuery.isError && inboxQuery.error instanceof Error ? (
           <div className="mx-auto max-w-[24rem] px-3.5 pt-3">
             <MobileSubscriptionInboxStatusCard
-              badge="读取失败"
-              title="订阅号消息暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`订阅号消息暂时不可用`)}
               description={inboxQuery.error.message}
               tone="danger"
               action={
@@ -239,7 +243,7 @@ function MobileSubscriptionInboxPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleRetryInbox}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     type="button"
@@ -248,7 +252,7 @@ function MobileSubscriptionInboxPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? "返回上一页" : "打开公众号列表"}
+                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`打开公众号列表`)}
                   </Button>
                 </div>
               }
@@ -273,7 +277,7 @@ function MobileSubscriptionInboxPage() {
                     className="h-7 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[11px]"
                     onClick={handleRetryMarkRead}
                   >
-                    重试同步
+                    {t(msg`重试同步`)}
                   </Button>
                   <Button
                     type="button"
@@ -282,7 +286,7 @@ function MobileSubscriptionInboxPage() {
                     className="h-7 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[11px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? "返回上一页" : "打开公众号列表"}
+                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`打开公众号列表`)}
                   </Button>
                 </div>
               </div>
@@ -322,7 +326,7 @@ function MobileSubscriptionInboxPage() {
                   <div className="mt-0.5 text-[10px] leading-[1.125rem] text-[color:var(--text-muted)]">
                     {group.lastDeliveredAt
                       ? formatConversationTimestamp(group.lastDeliveredAt)
-                      : "最近推送"}
+                      : t(msg`最近推送`)}
                   </div>
                 </div>
                 {group.unreadCount > 0 ? (
@@ -353,9 +357,9 @@ function MobileSubscriptionInboxPage() {
         ) : !inboxQuery.isLoading ? (
           <div className="mx-auto max-w-[24rem] px-3.5 pt-4">
             <MobileSubscriptionInboxStatusCard
-              badge="暂时空白"
-              title="还没有订阅号消息"
-              description="先关注一个订阅号，后续推送会汇总到这里。"
+              badge={t(msg`暂时空白`)}
+              title={t(msg`还没有订阅号消息`)}
+              description={t(msg`先关注一个订阅号，后续推送会汇总到这里。`)}
               action={
                 <Button
                   type="button"
@@ -364,7 +368,7 @@ function MobileSubscriptionInboxPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                   onClick={handleStatusBack}
                 >
-                  {safeReturnPath ? "返回上一页" : "打开公众号列表"}
+                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`打开公众号列表`)}
                 </Button>
               }
             />
@@ -398,7 +402,7 @@ function MobileSubscriptionArticleRow({
         <div className="flex items-center gap-2 text-[10px] text-[color:var(--text-muted)]">
           {delivery.article.isPinned ? (
             <span className="rounded-full border border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.07)] px-1.5 py-0.5 text-[9px] text-[color:var(--brand-primary)]">
-              置顶
+              {t(msg`置顶`)}
             </span>
           ) : null}
           <span>{publishedLabel}</span>
@@ -418,7 +422,7 @@ function MobileSubscriptionArticleRow({
         />
       ) : (
         <div className="flex h-[4.5rem] w-[4.5rem] shrink-0 items-center justify-center rounded-[10px] border border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.72)] text-[10px] text-[color:var(--text-dim)]">
-          文章
+          {t(msg`文章`)}
         </div>
       )}
     </button>

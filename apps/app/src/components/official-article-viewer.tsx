@@ -1,9 +1,11 @@
 import { useState, type MouseEvent } from "react";
 import { msg } from "@lingui/macro";
 import { useLingui } from "@lingui/react";
+import { translateRuntimeMessage, useRuntimeTranslator } from "@yinjie/i18n";
 import type { OfficialAccountArticleDetail } from "@yinjie/contracts";
-import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Copy, Share2, Star } from "lucide-react";
+
+const t = translateRuntimeMessage;
 import { Button, InlineNotice, cn } from "@yinjie/ui";
 import { InlineNoticeActionButton } from "./inline-notice-action-button";
 import { openExternalUrl } from "../runtime/external-url";
@@ -69,7 +71,7 @@ export function OfficialArticleViewer({
 
   function retryCopyLink() {
     void handleCopyLink({
-      retryLabel: "重试复制",
+      retryLabel: t(msg`重试复制`),
       onRetry: retryCopyLink,
     });
   }
@@ -89,11 +91,11 @@ export function OfficialArticleViewer({
     ) {
       setShareNotice({
         message: nativeMobileShareSupported
-          ? "当前设备暂时无法打开系统分享，请稍后重试。"
-          : "当前环境暂不支持复制链接。",
+          ? t(msg`当前设备暂时无法打开系统分享，请稍后重试。`)
+          : t(msg`当前环境暂不支持复制链接。`),
         tone: "info",
         actionLabel:
-          options?.retryLabel ?? (nativeMobileShareSupported ? "重试分享" : "重试复制"),
+          options?.retryLabel ?? (nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`)),
         onAction:
           options?.onRetry ?? (nativeMobileShareSupported ? retryShareArticle : retryCopyLink),
       });
@@ -104,8 +106,8 @@ export function OfficialArticleViewer({
       await navigator.clipboard.writeText(articleUrl);
       setShareNotice({
         message: nativeMobileShareSupported
-          ? "系统分享暂时不可用，已复制文章链接。"
-          : "文章链接已复制。",
+          ? t(msg`系统分享暂时不可用，已复制文章链接。`)
+          : t(msg`文章链接已复制。`),
         tone: "success",
         actionLabel: undefined,
         onAction: undefined,
@@ -113,11 +115,11 @@ export function OfficialArticleViewer({
     } catch {
       setShareNotice({
         message: nativeMobileShareSupported
-          ? "系统分享失败，请稍后重试。"
-          : "复制失败，请稍后重试。",
+          ? t(msg`系统分享失败，请稍后重试。`)
+          : t(msg`复制失败，请稍后重试。`),
         tone: "info",
         actionLabel:
-          options?.retryLabel ?? (nativeMobileShareSupported ? "重试分享" : "重试复制"),
+          options?.retryLabel ?? (nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`)),
         onAction:
           options?.onRetry ?? (nativeMobileShareSupported ? retryShareArticle : retryCopyLink),
       });
@@ -138,14 +140,14 @@ export function OfficialArticleViewer({
 
     if (shared) {
       setShareNotice({
-        message: "已打开系统分享面板。",
+        message: t(msg`已打开系统分享面板。`),
         tone: "success",
       });
       return;
     }
 
     await handleCopyLink({
-      retryLabel: "重试分享",
+      retryLabel: t(msg`重试分享`),
       onRetry: retryShareArticle,
     });
   }
@@ -157,9 +159,9 @@ export function OfficialArticleViewer({
     }
 
     setShareNotice({
-      message: "打开链接失败，请稍后重试。",
+      message: t(msg`打开链接失败，请稍后重试。`),
       tone: "info",
-      actionLabel: "重试打开",
+      actionLabel: t(msg`重试打开`),
       onAction: () => {
         void openArticleContentLink(href);
       },
@@ -257,7 +259,7 @@ export function OfficialArticleViewer({
               className={mobile ? "h-7 rounded-[10px] px-2.5 text-[12px]" : "rounded-xl"}
             >
               <Star size={14} className={favorite ? "fill-current" : ""} />
-              {favorite ? "已收藏" : "收藏"}
+              {favorite ? t(msg`已收藏`) : t(msg`收藏`)}
             </Button>
           ) : null}
           {showShareAction ? (
@@ -273,7 +275,7 @@ export function OfficialArticleViewer({
               ) : (
                 <Copy size={14} />
               )}
-              {nativeMobileShareSupported ? "系统分享" : "复制链接"}
+              {nativeMobileShareSupported ? t(msg`系统分享`) : t(msg`复制链接`)}
             </Button>
           ) : null}
         </div>
@@ -299,7 +301,7 @@ export function OfficialArticleViewer({
       >
         <span className="font-medium text-[#576b95]">{article.authorName}</span>
         <span>{publishedLabel}</span>
-        <span>{article.readCount} 阅读</span>
+        <span>{article.readCount} {t(msg`阅读`)}</span>
       </div>
 
       {isDesktopReader &&
@@ -315,7 +317,7 @@ export function OfficialArticleViewer({
               )}
             >
               <Star size={15} className={favorite ? "fill-current" : ""} />
-              <span>{favorite ? "已收藏" : "收藏"}</span>
+              <span>{favorite ? t(msg`已收藏`) : t(msg`收藏`)}</span>
             </button>
           ) : null}
           {showShareAction ? (
@@ -329,7 +331,7 @@ export function OfficialArticleViewer({
               ) : (
                 <Copy size={15} />
               )}
-              <span>{nativeMobileShareSupported ? "分享" : "复制链接"}</span>
+              <span>{nativeMobileShareSupported ? t(msg`分享`) : t(msg`复制链接`)}</span>
             </button>
           ) : null}
         </div>
@@ -422,7 +424,7 @@ export function OfficialArticleViewer({
               isDesktopReader ? "text-[15px]" : undefined,
             )}
           >
-            更多内容
+            {t(msg`更多内容`)}
           </div>
 
           <div

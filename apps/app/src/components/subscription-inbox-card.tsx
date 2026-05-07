@@ -1,9 +1,13 @@
 import { type MouseEvent as ReactMouseEvent } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { OfficialAccountSubscriptionInboxSummary } from "@yinjie/contracts";
 import { Newspaper } from "lucide-react";
 import { cn } from "@yinjie/ui";
 import { OfficialMessageEntryRow } from "./official-message-entry-row";
 import { formatConversationTimestamp } from "../lib/format";
+
+const t = translateRuntimeMessage;
 
 export function SubscriptionInboxCard({
   summary,
@@ -27,8 +31,8 @@ export function SubscriptionInboxCard({
       variant={variant}
       active={active}
       contextMenuOpen={contextMenuOpen}
-      title="订阅号消息"
-      preview={summary.preview ?? "查看已关注订阅号的最近推送"}
+      title={t(msg`订阅号消息`)}
+      preview={summary.preview ?? t(msg`查看已关注订阅号的最近推送`)}
       timestampLabel={formatConversationTimestamp(summary.lastDeliveredAt)}
       unreadCount={summary.unreadCount}
       leading={
