@@ -8,8 +8,6 @@ import {
   type UpdateFriendProfileRequest,
 } from "@yinjie/contracts";
 import { Button, ErrorBlock, InlineNotice } from "@yinjie/ui";
-import { SparkBadge } from "../../components/spark-badge";
-import { formatTimestamp } from "../../lib/format";
 import { buildYinjieId } from "../../lib/yinjie-id";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
 import { DesktopContactTextEditDialog } from "./desktop-contact-text-edit-dialog";
@@ -293,33 +291,6 @@ export function ContactDetailPane({
           valueMuted={!commonGroups.length}
         />
       </DesktopContactProfileSection>
-
-      {isFriend &&
-      (friendship?.lastInteractedAt ||
-        character.lastActiveAt ||
-        (friendship?.sparkStreak ?? 0) >= 3) ? (
-        <DesktopContactProfileSection title="更多信息">
-          <DesktopContactProfileRow
-            label="最近互动"
-            value={formatTimestamp(
-              friendship?.lastInteractedAt ?? character.lastActiveAt ?? null,
-            )}
-          />
-          {(friendship?.sparkStreak ?? 0) >= 3 ? (
-            <DesktopContactProfileRow
-              label="火花"
-              value={
-                <span className="inline-flex items-center gap-2">
-                  <SparkBadge streak={friendship?.sparkStreak} size="md" />
-                  <span className="text-[12px] text-[color:var(--text-muted)]">
-                    已连续 {friendship?.sparkStreak} 天互动
-                  </span>
-                </span>
-              }
-            />
-          ) : null}
-        </DesktopContactProfileSection>
-      ) : null}
 
       {isFriend ? (
         <>
