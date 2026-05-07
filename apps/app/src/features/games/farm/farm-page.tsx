@@ -83,79 +83,91 @@ function FarmPageInner() {
     0,
   );
 
+  const harvestHandler = (info: {
+    cropId: FarmCropId;
+    amount: number;
+    coinsGained: number;
+    leveledUp: boolean;
+  }) => {
+    setToast({
+      ...info,
+      expiresAt: Date.now() + 3500,
+    });
+    setSelectedPlotIndex(null);
+  };
+
   return (
-    <div className="relative flex h-full flex-col gap-3 bg-gradient-to-b from-emerald-50/40 to-amber-50/40 p-4 text-stone-800">
-      <header className="flex items-center justify-between">
-        <Link
-          to="/tabs/games"
-          className="rounded-full px-2 py-1 text-xs text-stone-500 hover:bg-white/60"
-        >
-          ← 返回
-        </Link>
-        <h1 className="flex-1 text-center text-lg font-semibold text-emerald-900">
-          隐界农场
-        </h1>
-        <div className="w-12" />
-      </header>
+    <div className="relative h-full overflow-y-auto bg-gradient-to-b from-emerald-50/40 to-amber-50/40 p-4 text-stone-800">
+      <div className="mx-auto flex max-w-6xl flex-col gap-3">
+        <header className="flex items-center justify-between">
+          <Link
+            to="/tabs/games"
+            className="rounded-full px-2 py-1 text-xs text-stone-500 hover:bg-white/60"
+          >
+            ← 返回
+          </Link>
+          <h1 className="flex-1 text-center text-lg font-semibold text-emerald-900">
+            隐界农场
+          </h1>
+          <div className="w-12" />
+        </header>
 
-      <CoinDisplay state={state} />
+        <CoinDisplay state={state} />
 
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => setSeedShopOpen(true)}
-          className="flex-1 rounded-2xl bg-white px-3 py-2 text-left text-xs shadow-sm hover:bg-emerald-50"
-        >
-          <div className="font-medium text-emerald-700">🛒 种子店</div>
-          <div className="mt-0.5 text-stone-500">
-            种子袋共 {seedBagTotal} 包
-          </div>
-        </button>
-        <button
-          type="button"
-          onClick={() => setWarehouseOpen(true)}
-          className="flex-1 rounded-2xl bg-white px-3 py-2 text-left text-xs shadow-sm hover:bg-emerald-50"
-        >
-          <div className="font-medium text-amber-700">🏠 仓库</div>
-          <div className="mt-0.5 text-stone-500">
-            存货共 {warehouseTotal} 个
-          </div>
-        </button>
+        <div className="grid gap-3 lg:grid-cols-3">
+          <aside className="flex flex-col gap-3 lg:order-1">
+            <button
+              type="button"
+              onClick={() => setSeedShopOpen(true)}
+              className="rounded-2xl bg-white px-3 py-2 text-left text-xs shadow-sm hover:bg-emerald-50"
+            >
+              <div className="font-medium text-emerald-700">🛒 种子店</div>
+              <div className="mt-0.5 text-stone-500">
+                种子袋共 {seedBagTotal} 包
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setWarehouseOpen(true)}
+              className="rounded-2xl bg-white px-3 py-2 text-left text-xs shadow-sm hover:bg-emerald-50"
+            >
+              <div className="font-medium text-amber-700">🏠 仓库</div>
+              <div className="mt-0.5 text-stone-500">
+                存货共 {warehouseTotal} 个
+              </div>
+            </button>
+            <p className="hidden rounded-2xl bg-white/70 p-3 text-[11px] text-stone-500 shadow-sm lg:block">
+              作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活——回来时看到的状态是世界自治后的结果。
+            </p>
+          </aside>
+
+          <section className="flex flex-col gap-3 lg:order-2 lg:col-span-1">
+            <div className="rounded-2xl bg-white p-3 shadow-sm">
+              <FarmGrid
+                plots={state.plots}
+                selectedIndex={selectedPlotIndex}
+                onSelect={(i) =>
+                  setSelectedPlotIndex((curr) => (curr === i ? null : i))
+                }
+              />
+            </div>
+            <PlotActionBar
+              state={state}
+              plotIndex={selectedPlotIndex}
+              onHarvested={harvestHandler}
+            />
+          </section>
+
+          <aside className="flex flex-col gap-3 lg:order-3">
+            <NeighborListPanel onSelectNeighbor={setActiveNeighborId} />
+            <EventLogPanel />
+          </aside>
+        </div>
+
+        <p className="text-center text-[10px] text-stone-400 lg:hidden">
+          作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。
+        </p>
       </div>
-
-      <section className="rounded-2xl bg-white p-3 shadow-sm">
-        <FarmGrid
-          plots={state.plots}
-          selectedIndex={selectedPlotIndex}
-          onSelect={(i) =>
-            setSelectedPlotIndex((curr) => (curr === i ? null : i))
-          }
-        />
-      </section>
-
-      <PlotActionBar
-        state={state}
-        plotIndex={selectedPlotIndex}
-        onHarvested={(info) => {
-          const def = FARM_CROP_CATALOG[info.cropId];
-          setToast({
-            ...info,
-            expiresAt: Date.now() + 3500,
-          });
-          setSelectedPlotIndex(null);
-          // 防止 lint 抱怨 def 未使用 — toast 仍展示
-          void def;
-        }}
-      />
-
-      <div className="grid gap-3 lg:grid-cols-2">
-        <NeighborListPanel onSelectNeighbor={setActiveNeighborId} />
-        <EventLogPanel />
-      </div>
-
-      <p className="text-center text-[10px] text-stone-400">
-        作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。
-      </p>
 
       {toast && (
         <div className="pointer-events-none fixed bottom-20 left-1/2 z-50 -translate-x-1/2 rounded-full bg-emerald-700 px-4 py-2 text-sm text-white shadow-lg">
