@@ -24,6 +24,7 @@ import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { DesktopChatConfirmDialog } from "../features/desktop/chat/desktop-chat-confirm-dialog";
 import { DesktopUtilityShell } from "../features/shell/desktop-utility-shell";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+import { SubscriptionPanel } from "../features/subscription/subscription-panel";
 import {
   clearCloudRuntimeSession,
   shouldShowCloudAccountControls,
@@ -36,18 +37,31 @@ import {
 } from "../store/chat-preferences-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
-type SettingsTab = "profile" | "chat" | "ai" | "language" | "legal";
+type SettingsTab =
+  | "profile"
+  | "chat"
+  | "ai"
+  | "language"
+  | "legal"
+  | "subscription";
 type LegalTab = "privacy" | "terms" | "community";
 type ProfileSettingsMessage = ReturnType<typeof msg>;
 
-const settingsTabs: Array<{ id: SettingsTab; label: ProfileSettingsMessage }> =
-  [
-    { id: "profile", label: msg`个人资料` },
-    { id: "chat", label: msg`聊天` },
-    { id: "ai", label: msg`AI 设置` },
-    { id: "language", label: msg`语言` },
-    { id: "legal", label: msg`协议与规范` },
-  ];
+const baseSettingsTabs: Array<{
+  id: SettingsTab;
+  label: ProfileSettingsMessage;
+}> = [
+  { id: "profile", label: msg`个人资料` },
+  { id: "chat", label: msg`聊天` },
+  { id: "ai", label: msg`AI 设置` },
+  { id: "language", label: msg`语言` },
+  { id: "legal", label: msg`协议与规范` },
+];
+
+const subscriptionTab = {
+  id: "subscription",
+  label: msg`会员中心`,
+} satisfies { id: SettingsTab; label: ProfileSettingsMessage };
 
 const legalTabs: Array<{ id: LegalTab; label: ProfileSettingsMessage }> = [
   { id: "privacy", label: msg`隐私政策` },
@@ -112,6 +126,10 @@ export function ProfileSettingsPage() {
     sessionPhone: cloudPhone,
     worldOwnerId: ownerId,
   });
+
+  const settingsTabs = showCloudAccountEntries
+    ? [...baseSettingsTabs, subscriptionTab]
+    : baseSettingsTabs;
 
   useEffect(() => {
     setDraftName(username ?? "");
@@ -211,10 +229,6 @@ export function ProfileSettingsPage() {
     setLogoutConfirmOpen(false);
     clearCloudRuntimeSession();
     void navigate({ to: "/welcome", replace: true });
-  }
-
-  function handleOpenSubscription() {
-    void navigate({ to: "/profile/subscription" });
   }
 
   function handleRetryOwnerLoad() {
@@ -720,27 +734,31 @@ export function ProfileSettingsPage() {
           ) : null}
         </>
       ) : null}
+      {showCloudAccountEntries && activeTab === "subscription" ? (
+        <MobileSettingsSection
+          desktop={desktopMode}
+          title={desktopMode ? t(msg`会员中心`) : undefined}
+          description={
+            desktopMode
+              ? t(msg`查看当前云账号订阅状态、可购套餐与邀请奖励。`)
+              : undefined
+          }
+        >
+          <SubscriptionPanel embedded />
+        </MobileSettingsSection>
+      ) : null}
       {showCloudAccountEntries && !desktopMode ? (
         <MobileSettingsSection
           title={undefined}
-          description={t(msg`管理会员与当前云账号登录状态`)}
+          description={t(msg`退出后会回到世界入口，下次需要重新登录云账号。`)}
         >
-          <div className="space-y-2">
-            <Button
-              variant="secondary"
-              className="h-9 w-full rounded-[10px] border-[color:var(--border-faint)] bg-white text-[12px] shadow-none hover:bg-[#f5f7f7]"
-              onClick={handleOpenSubscription}
-            >
-              {t(msg`会员中心`)}
-            </Button>
-            <Button
-              variant="secondary"
-              className="h-9 w-full rounded-[10px] border-[rgba(220,38,38,0.14)] bg-white text-[12px] text-[#b42318] shadow-none hover:bg-[#fff5f5]"
-              onClick={() => setLogoutConfirmOpen(true)}
-            >
-              {t(msg`退出登录`)}
-            </Button>
-          </div>
+          <Button
+            variant="secondary"
+            className="h-9 w-full rounded-[10px] border-[rgba(220,38,38,0.14)] bg-white text-[12px] text-[#b42318] shadow-none hover:bg-[#fff5f5]"
+            onClick={() => setLogoutConfirmOpen(true)}
+          >
+            {t(msg`退出登录`)}
+          </Button>
         </MobileSettingsSection>
       ) : null}
       <DesktopChatConfirmDialog
@@ -770,7 +788,9 @@ export function ProfileSettingsPage() {
                 ? t(msg`管理专属 API Key 和兼容 Base URL。`)
                 : activeTab === "language"
                   ? t(msg`切换当前端的界面语言和本地化格式。`)
-                  : t(msg`查看当前世界相关的协议和社区规范。`)
+                  : activeTab === "subscription"
+                    ? t(msg`查看当前云账号订阅状态、可购套餐与邀请奖励。`)
+                    : t(msg`查看当前世界相关的协议和社区规范。`)
         }
         toolbar={
           <Button
@@ -812,14 +832,7 @@ export function ProfileSettingsPage() {
               </div>
             </div>
             {showCloudAccountEntries ? (
-              <div className="space-y-1 border-t border-[color:var(--border-faint)] p-3">
-                <button
-                  type="button"
-                  onClick={handleOpenSubscription}
-                  className="flex w-full items-center justify-between rounded-[12px] px-3 py-2.5 text-left text-sm text-[color:var(--text-secondary)] transition hover:bg-white/80 hover:text-[color:var(--text-primary)]"
-                >
-                  <span>{t(msg`会员中心`)}</span>
-                </button>
+              <div className="border-t border-[color:var(--border-faint)] p-3">
                 <button
                   type="button"
                   onClick={() => setLogoutConfirmOpen(true)}
