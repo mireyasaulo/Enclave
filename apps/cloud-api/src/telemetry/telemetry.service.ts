@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import type {
   TelemetryApiHealthResponse,
@@ -57,7 +57,12 @@ export class TelemetryService {
     const ipHash = this.hashIp(ctx.ip);
     const bucketKey = `${appId}:${ipHash ?? "noip"}`;
     if (!this.allowBucket(bucketKey, inputs.length)) {
-      return { accepted: 0, rejected: inputs.length };
+      // Signal "back off" so the SDK retries / persists rather than
+      // silently dropping the batch on a 200 response.
+      throw new HttpException(
+        { message: "Telemetry rate limit exceeded.", retryAfterSeconds: 60 },
+        HttpStatus.TOO_MANY_REQUESTS,
+      );
     }
 
     const userAgent = ctx.userAgent ? ctx.userAgent.slice(0, MAX_USER_AGENT_LEN) : null;
@@ -347,9 +352,29 @@ export class TelemetryService {
         stepAnons = new Set([...stepAnons].filter((a) => prevAnons!.has(a)));
       }
       const count = stepAnons.size;
-      const conversionFromPrev =
-        prevAnons && prevAnons.size > 0 ? count / prevAnons.size : 1;
-      const conversionFromStart = firstCount > 0 ? count / firstCount : 1;
+
+      let conversionFromPrev: number;
+      if (i === 0) {
+        // Step 0 is the funnel entry — by convention it has 100% conversion
+        // from itself (there is no previous step).
+        conversionFromPrev = 1;
+      } else if (prevAnons && prevAnons.size > 0) {
+        conversionFromPrev = count / prevAnons.size;
+      } else {
+        // Previous step had 0 anons — no one to convert. Report 0 instead
+        // of misleading 100%.
+        conversionFromPrev = 0;
+      }
+
+      let conversionFromStart: number;
+      if (i === 0) {
+        conversionFromStart = 1;
+      } else if (firstCount > 0) {
+        conversionFromStart = count / firstCount;
+      } else {
+        conversionFromStart = 0;
+      }
+
       if (i === 0) firstCount = count;
       stepCounts.push({
         eventName: stepName,

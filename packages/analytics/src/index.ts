@@ -15,6 +15,11 @@ const DEFAULT_MAX_BATCH_SIZE = 30;
 const DEFAULT_API_CALL_SAMPLE_RATE = 1.0;
 // Hard upper bound for one beacon body (most browsers cap sendBeacon at 64KB).
 const BEACON_MAX_EVENTS = 200;
+// Defensive cap on the in-memory queue. If the endpoint never resolves
+// (e.g. user stays on a pre-login screen for hours) or the network is
+// permanently down, drop the oldest events so memory can never grow
+// unbounded.
+const MAX_QUEUE_SIZE = 1000;
 
 let state: InternalState | null = null;
 let unloadHandlersInstalled = false;
@@ -238,6 +243,10 @@ function trackInternal(
 ): void {
   if (!state) return;
   const userId = safeUserId();
+  // Shallow-clone props so callers can mutate or recycle the object after
+  // calling track() without corrupting the queued event.
+  const clonedProps =
+    props && Object.keys(props).length > 0 ? { ...props } : undefined;
   const event: TelemetryEventInput = {
     eventName,
     eventType,
@@ -248,10 +257,15 @@ function trackInternal(
     pagePath: state.currentPagePath || null,
     referrer: getCurrentReferrer(),
     release: state.options.release,
-    props: props && Object.keys(props).length > 0 ? props : undefined,
+    props: clonedProps,
   };
 
   state.queue.push(event);
+  // Cap queue size — drop the oldest events first if we somehow run away
+  // (endpoint never resolves, network down for hours, etc.).
+  if (state.queue.length > MAX_QUEUE_SIZE) {
+    state.queue.splice(0, state.queue.length - MAX_QUEUE_SIZE);
+  }
   if (state.options.debug) {
     console.debug("[analytics] track", event);
   }
