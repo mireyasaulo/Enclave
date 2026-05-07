@@ -59,6 +59,14 @@ import type {
   RevokeCloudAdminSessionsByIdResponse,
   SubscriptionPlanSummary,
   SubscriptionRecordSummary,
+  TelemetryApiHealthResponse,
+  TelemetryAppId,
+  TelemetryErrorsResponse,
+  TelemetryFunnelResponse,
+  TelemetryOverviewResponse,
+  TelemetryRange,
+  TelemetryTimeseriesResponse,
+  TelemetryTopEventsResponse,
   UpdateRevenueSharingPolicyRequest,
   UpsertCloudConfigRequest,
   UpsertRevenuePayeeRequest,
@@ -1350,4 +1358,43 @@ export const cloudAdminApi = {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
+
+  getTelemetryOverview: (range: TelemetryRange, appId?: TelemetryAppId) =>
+    adminFetch<TelemetryOverviewResponse>(
+      `/telemetry/overview${buildQueryString({ range, appId })}`,
+    ),
+
+  getTelemetryTimeseries: (params: {
+    eventName: string;
+    range: TelemetryRange;
+    groupBy?: "appId" | "none";
+    appId?: TelemetryAppId;
+  }) =>
+    adminFetch<TelemetryTimeseriesResponse>(
+      `/telemetry/timeseries${buildQueryString(params)}`,
+    ),
+
+  getTelemetryTopEvents: (range: TelemetryRange, appId?: TelemetryAppId) =>
+    adminFetch<TelemetryTopEventsResponse>(
+      `/telemetry/top-events${buildQueryString({ range, appId })}`,
+    ),
+
+  getTelemetryFunnel: (params: {
+    steps: string;
+    range: TelemetryRange;
+    appId?: TelemetryAppId;
+  }) =>
+    adminFetch<TelemetryFunnelResponse>(
+      `/telemetry/funnel${buildQueryString(params)}`,
+    ),
+
+  getTelemetryApiHealth: (range: TelemetryRange, appId?: TelemetryAppId) =>
+    adminFetch<TelemetryApiHealthResponse>(
+      `/telemetry/api-health${buildQueryString({ range, appId })}`,
+    ),
+
+  getTelemetryErrors: (range: TelemetryRange, appId?: TelemetryAppId) =>
+    adminFetch<TelemetryErrorsResponse>(
+      `/telemetry/errors${buildQueryString({ range, appId })}`,
+    ),
 };
