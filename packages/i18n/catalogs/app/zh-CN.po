@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: \n"
 
 #: apps/app/src/routes/discover-feed-page.tsx:968
-#: apps/app/src/routes/discover-page.tsx:795
+#: apps/app/src/routes/discover-page.tsx:797
 msgid " · AI 已参与回应"
 msgstr " · AI 已参与回应"
 
@@ -64,11 +64,14 @@ msgstr "（无回复）"
 msgid "[表情] {0}"
 msgstr "[表情] {0}"
 
+#. placeholder {0}: formatTimestamp(post.createdAt)
 #. placeholder {0}: liveDraft.title
 #. placeholder {1}: liveDraft.topic
 #. placeholder {1}: liveDraft.topic || t(msg`未填写主题`)
+#. placeholder {1}: post.authorType === "user" ? t(msg`世界主人`) : t(msg`居民动态`)
 #: apps/app/src/routes/desktop-mobile-page.tsx:1597
 #: apps/app/src/routes/desktop-mobile-page.tsx:1617
+#: apps/app/src/routes/discover-page.tsx:775
 msgid "{0} · {1}"
 msgstr "{0} · {1}"
 
@@ -99,6 +102,7 @@ msgid "{0} 个世界角色"
 msgstr "{0} 个世界角色"
 
 #. placeholder {0}: commonGroups.length
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:290
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:695
 msgid "{0} 个共同群聊"
 msgstr "{0} 个共同群聊"
@@ -296,7 +300,7 @@ msgstr "{0} 赞"
 #. placeholder {0}: post.likeCount
 #. placeholder {1}: post.commentCount
 #. placeholder {2}: post.aiReacted ? t(msg` · AI 已参与回应`) : ""
-#: apps/app/src/routes/discover-page.tsx:795
+#: apps/app/src/routes/discover-page.tsx:797
 msgid "{0} 赞 · {1} 评论{2}"
 msgstr "{0} 赞 · {1} 评论{2}"
 
@@ -887,6 +891,7 @@ msgstr "不再接收该角色互动"
 msgid "不再接收该角色后续互动"
 msgstr "不再接收该角色后续互动"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:374
 #: apps/app/src/i18n/static-dom-seed.ts:731
 msgid "不再接收这个联系人的互动"
 msgstr "不再接收这个联系人的互动"
@@ -959,6 +964,7 @@ msgstr "世界"
 #: apps/app/src/routes/desktop-mobile-page.tsx:207
 #: apps/app/src/routes/desktop-mobile-page.tsx:1221
 #: apps/app/src/routes/discover-feed-page.tsx:924
+#: apps/app/src/routes/discover-page.tsx:775
 #: apps/app/src/routes/profile-page.tsx:119
 #: apps/app/src/routes/profile-page.tsx:126
 #: apps/app/src/routes/profile-page.tsx:129
@@ -1097,6 +1103,8 @@ msgstr "世界缺少可用的 API 地址。"
 msgid "世界联系人"
 msgstr "世界联系人"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:139
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:267
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:283
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:674
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:196
@@ -1156,6 +1164,7 @@ msgstr "个人资料"
 msgid "个入口"
 msgstr "个入口"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:314
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:742
 msgid "个性签名"
 msgstr "个性签名"
@@ -1381,6 +1390,7 @@ msgstr "从聊天线程点了“回到群邀请”后，会把最近回流入口
 msgid "从这里开始第一句问候"
 msgstr "从这里开始第一句问候"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:385
 #: apps/app/src/routes/character-detail-page.tsx:321
 msgid "从通讯录移除"
 msgstr "从通讯录移除"
@@ -1521,7 +1531,7 @@ msgid "你先发一条，或者等世界里的其他人先开口。"
 msgstr "你先发一条，或者等世界里的其他人先开口。"
 
 #: apps/app/src/routes/discover-feed-page.tsx:1122
-#: apps/app/src/routes/discover-page.tsx:888
+#: apps/app/src/routes/discover-page.tsx:890
 msgid "你先发一条居民公开可见的动态，或者等世界里的居民先开口。"
 msgstr "你先发一条居民公开可见的动态，或者等世界里的居民先开口。"
 
@@ -2116,6 +2126,7 @@ msgstr "公开流"
 msgid "共 {totalResults} 条"
 msgstr "共 {totalResults} 条"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:287
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:692
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:254
 #: apps/app/src/routes/character-detail-page.tsx:306
@@ -2337,7 +2348,7 @@ msgstr "内容"
 msgid "内容不能为空"
 msgstr "内容不能为空"
 
-#: apps/app/src/routes/discover-page.tsx:941
+#: apps/app/src/routes/discover-page.tsx:943
 msgid "内容与服务"
 msgstr "内容与服务"
 
@@ -2475,6 +2486,7 @@ msgstr "最近一轮"
 msgid "最近一轮："
 msgstr "最近一轮："
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:321
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:259
 #: apps/app/src/routes/character-detail-page.tsx:305
 msgid "最近互动"
@@ -2713,7 +2725,7 @@ msgstr "写点想让世界居民都能看到的内容..."
 
 #: apps/app/src/i18n/static-dom-seed.ts:431
 #: apps/app/src/routes/discover-feed-page.tsx:1053
-#: apps/app/src/routes/discover-page.tsx:851
+#: apps/app/src/routes/discover-page.tsx:853
 msgid "写评论..."
 msgstr "写评论..."
 
@@ -2980,6 +2992,8 @@ msgstr "删除管理已暂停"
 msgid "删除聊天"
 msgstr "删除聊天"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:383
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:393
 #: apps/app/src/routes/character-detail-page.tsx:319
 #: apps/app/src/routes/character-detail-page.tsx:948
 #: apps/app/src/routes/character-detail-page.tsx:953
@@ -3076,6 +3090,7 @@ msgstr "加入我的小程序"
 msgid "加入群聊"
 msgstr "加入群聊"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:368
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:559
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:562
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:839
@@ -3366,6 +3381,7 @@ msgstr "发文章到手机"
 msgid "发朋友圈"
 msgstr "发朋友圈"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:206
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:516
 #: apps/app/src/features/shell/desktop-shell.tsx:1177
 #: apps/app/src/routes/character-detail-page.tsx:281
@@ -3375,7 +3391,7 @@ msgstr "发消息"
 #: apps/app/src/components/mobile-shell.tsx:34
 #: apps/app/src/routes/desktop-mobile-page.tsx:179
 #: apps/app/src/routes/discover-page.tsx:466
-#: apps/app/src/routes/discover-page.tsx:924
+#: apps/app/src/routes/discover-page.tsx:926
 msgid "发现"
 msgstr "发现"
 
@@ -3431,7 +3447,7 @@ msgstr "发起群聊"
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:202
 #: apps/app/src/routes/channels-page.tsx:1957
 #: apps/app/src/routes/discover-feed-page.tsx:1068
-#: apps/app/src/routes/discover-page.tsx:865
+#: apps/app/src/routes/discover-page.tsx:867
 msgid "发送"
 msgstr "发送"
 
@@ -3445,7 +3461,7 @@ msgstr "发送中"
 #: apps/app/src/routes/channels-page.tsx:1957
 #: apps/app/src/routes/character-detail-page.tsx:285
 #: apps/app/src/routes/discover-feed-page.tsx:1067
-#: apps/app/src/routes/discover-page.tsx:864
+#: apps/app/src/routes/discover-page.tsx:866
 #: apps/app/src/routes/welcome-page.tsx:917
 msgid "发送中..."
 msgstr "发送中..."
@@ -3942,6 +3958,7 @@ msgstr "在约人打双人同屏，已经连胜 6 场。"
 msgid "在线"
 msgstr "在线"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:246
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:650
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:236
 #: apps/app/src/routes/character-detail-page.tsx:296
@@ -3998,7 +4015,7 @@ msgstr "处理中"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-confirm-dialog.tsx:32
 #: apps/app/src/routes/discover-feed-page.tsx:991
-#: apps/app/src/routes/discover-page.tsx:818
+#: apps/app/src/routes/discover-page.tsx:820
 #: apps/app/src/routes/friend-requests-page.tsx:326
 msgid "处理中..."
 msgstr "处理中..."
@@ -4016,10 +4033,15 @@ msgstr "处理未读队列"
 msgid "处理顺序"
 msgstr "处理顺序"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:238
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:635
 #: apps/app/src/routes/character-detail-page.tsx:289
 msgid "备注"
 msgstr "备注"
+
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:153
+msgid "备注名会优先显示在桌面联系人信息页和聊天信息里。"
+msgstr "备注名会优先显示在桌面联系人信息页和聊天信息里。"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:472
 msgid "备注名会优先显示在聊天信息和通讯录里。"
@@ -4494,7 +4516,7 @@ msgid "居民公开"
 msgstr "居民公开"
 
 #: apps/app/src/routes/discover-feed-page.tsx:951
-#: apps/app/src/routes/discover-page.tsx:779
+#: apps/app/src/routes/discover-page.tsx:781
 msgid "居民公开可见"
 msgstr "居民公开可见"
 
@@ -4504,6 +4526,7 @@ msgstr "居民办事"
 
 #: apps/app/src/routes/discover-feed-page.tsx:925
 #: apps/app/src/routes/discover-page.tsx:550
+#: apps/app/src/routes/discover-page.tsx:775
 msgid "居民动态"
 msgstr "居民动态"
 
@@ -5060,7 +5083,7 @@ msgstr "已设为星标朋友。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:366
 #: apps/app/src/routes/discover-feed-page.tsx:993
-#: apps/app/src/routes/discover-page.tsx:820
+#: apps/app/src/routes/discover-page.tsx:822
 msgid "已赞"
 msgstr "已赞"
 
@@ -5096,6 +5119,11 @@ msgstr "已连接到本地世界。"
 #: apps/app/src/routes/character-detail-page.tsx:1712
 msgid "已连续 {0} 天"
 msgstr "已连续 {0} 天"
+
+#. placeholder {0}: friendship?.sparkStreak ?? 0
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:334
+msgid "已连续 {0} 天互动"
+msgstr "已连续 {0} 天互动"
 
 #. placeholder {0}: imagePreviews.length
 #: apps/app/src/components/mobile-chat-attachment-preview.tsx:68
@@ -5264,7 +5292,7 @@ msgstr "广场回复已发送。"
 msgid "广场概览"
 msgstr "广场概览"
 
-#: apps/app/src/routes/discover-page.tsx:886
+#: apps/app/src/routes/discover-page.tsx:888
 msgid "广场还没有新动态"
 msgstr "广场还没有新动态"
 
@@ -6383,6 +6411,7 @@ msgstr "打开"
 msgid "打开世界主人快捷卡片"
 msgstr "打开世界主人快捷卡片"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:206
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:515
 #: apps/app/src/features/shell/desktop-shell.tsx:1177
 msgid "打开中..."
@@ -7641,6 +7670,7 @@ msgstr "时间轴"
 msgid "星标"
 msgstr "星标"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:346
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:812
 #: apps/app/src/routes/contacts-page.tsx:1210
 #: apps/app/src/routes/starred-friends-page.tsx:189
@@ -7667,6 +7697,8 @@ msgstr "昨天"
 msgid "是"
 msgstr "是"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:243
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:264
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:641
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:669
 msgid "昵称"
@@ -7675,6 +7707,7 @@ msgstr "昵称"
 #. placeholder {0}: character.name
 #. placeholder {0}: item.character.name
 #. placeholder {0}: targetCharacter?.name ?? conversation.title
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:136
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:281
 #: apps/app/src/features/desktop/chat/desktop-group-member-picker.tsx:175
 #: apps/app/src/features/desktop/chat/desktop-group-member-picker.tsx:245
@@ -7765,6 +7798,7 @@ msgstr "暂无邀请记录。"
 msgid "暂时无法进入隐界"
 msgstr "暂时无法进入隐界"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:291
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:696
 msgid "暂时没有共同群聊"
 msgstr "暂时没有共同群聊"
@@ -7792,6 +7826,7 @@ msgstr "暂时空白"
 
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:37
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:38
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:394
 #: apps/app/src/routes/chat-list-page.tsx:121
 #: apps/app/src/routes/chat-list-page.tsx:128
 #: apps/app/src/routes/contacts-page.tsx:266
@@ -7827,6 +7862,7 @@ msgstr "暖沙晨光"
 msgid "更多"
 msgstr "更多"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:312
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:740
 msgid "更多信息"
 msgstr "更多信息"
@@ -7922,10 +7958,12 @@ msgstr "有未读消息"
 msgid "朋友"
 msgstr "朋友"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:222
 #: apps/app/src/routes/character-detail-page.tsx:252
 msgid "朋友信息"
 msgstr "朋友信息"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:276
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:687
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:478
 #: apps/app/src/features/shell/desktop-nav-matching.ts:71
@@ -7938,7 +7976,7 @@ msgstr "朋友信息"
 msgid "朋友圈"
 msgstr "朋友圈"
 
-#: apps/app/src/routes/discover-page.tsx:932
+#: apps/app/src/routes/discover-page.tsx:934
 msgid "朋友圈、相遇、视频号和小程序都从这里继续打开。"
 msgstr "朋友圈、相遇、视频号和小程序都从这里继续打开。"
 
@@ -8081,6 +8119,10 @@ msgid "未知错误"
 msgstr "未知错误"
 
 #: apps/app/src/features/chat/backgrounds/chat-background-helpers.ts:26
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:148
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:239
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:247
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:252
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:289
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:636
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:646
@@ -8276,6 +8318,7 @@ msgstr "条动态 ·"
 msgid "条评论"
 msgstr "条评论"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:251
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:655
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:242
 #: apps/app/src/routes/character-detail-page.tsx:297
@@ -8547,10 +8590,13 @@ msgstr "查看群聊"
 msgid "查看联系人标签"
 msgstr "查看联系人标签"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:305
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:716
 msgid "查看角色档案与扩展介绍"
 msgstr "查看角色档案与扩展介绍"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:280
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:305
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:717
 #: apps/app/src/routes/character-detail-page.tsx:276
 #: apps/app/src/routes/world-characters-page.tsx:390
@@ -8561,6 +8607,10 @@ msgstr "查看角色资料"
 msgid "查看该分类"
 msgstr "查看该分类"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:215
+msgid "查看详细资料"
+msgstr "查看详细资料"
+
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:457
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:197
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:215
@@ -8568,6 +8618,7 @@ msgstr "查看该分类"
 msgid "查看资料"
 msgstr "查看资料"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:279
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:688
 #: apps/app/src/routes/character-detail-page.tsx:300
 msgid "查看这位角色最近的朋友圈"
@@ -8603,6 +8654,7 @@ msgstr "标未读"
 msgid "标注 {0} 条"
 msgstr "标注 {0} 条"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:256
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:660
 #: apps/app/src/routes/character-detail-page.tsx:291
 #: apps/app/src/routes/contacts-page.tsx:1231
@@ -8807,6 +8859,7 @@ msgstr "正在创建世界..."
 msgid "正在创建全新的世界。"
 msgstr "正在创建全新的世界。"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:385
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:526
 #: apps/app/src/routes/character-detail-page.tsx:320
 msgid "正在删除..."
@@ -9022,6 +9075,7 @@ msgstr "正在整理当前聊天里的匹配消息。"
 msgid "正在整理语音..."
 msgstr "正在整理语音..."
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:371
 #: apps/app/src/routes/character-detail-page.tsx:316
 msgid "正在更新..."
 msgstr "正在更新..."
@@ -9503,6 +9557,7 @@ msgstr "消息"
 msgid "消息、笔记与联系人"
 msgstr "消息、笔记与联系人"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:358
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:826
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1560
 #: apps/app/src/features/desktop/chat/desktop-conversation-context-menu.tsx:119
@@ -9725,6 +9780,7 @@ msgstr "游戏中心、组局邀约和继续游玩入口。"
 msgid "漫游"
 msgstr "漫游"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:329
 #: apps/app/src/routes/character-detail-page.tsx:1704
 msgid "火花"
 msgstr "火花"
@@ -9799,7 +9855,7 @@ msgid "点按展开查看提醒。"
 msgstr "点按展开查看提醒。"
 
 #: apps/app/src/routes/discover-feed-page.tsx:994
-#: apps/app/src/routes/discover-page.tsx:821
+#: apps/app/src/routes/discover-page.tsx:823
 msgid "点赞"
 msgstr "点赞"
 
@@ -9911,6 +9967,7 @@ msgstr "用户协议"
 msgid "用逗号分隔，例如：同事，策展"
 msgstr "用逗号分隔，例如：同事，策展"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:166
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:485
 msgid "用逗号分隔多个标签，例如：同事，插画，策展。"
 msgstr "用逗号分隔多个标签，例如：同事，插画，策展。"
@@ -10157,11 +10214,12 @@ msgstr "礼序"
 msgid "社交"
 msgstr "社交"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:274
 #: apps/app/src/i18n/static-dom-seed.ts:729
 msgid "社交与内容"
 msgstr "社交与内容"
 
-#: apps/app/src/routes/discover-page.tsx:937
+#: apps/app/src/routes/discover-page.tsx:939
 msgid "社交与动态"
 msgstr "社交与动态"
 
@@ -10302,6 +10360,7 @@ msgstr "移出我的小程序"
 msgid "移出群聊"
 msgstr "移出群聊"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:373
 #: apps/app/src/routes/character-detail-page.tsx:929
 #: apps/app/src/routes/character-detail-page.tsx:936
 #: apps/app/src/routes/character-detail-page.tsx:1832
@@ -10602,6 +10661,7 @@ msgid "简衡律师"
 msgstr "简衡律师"
 
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:908
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:365
 msgid "管理"
 msgstr "管理"
 
@@ -10810,6 +10870,7 @@ msgstr "给客人留灯，也给猫留一个能窝着的角落。"
 msgid "给朋友设置备注名"
 msgstr "给朋友设置备注名"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:154
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:473
 msgid "给联系人设置备注名"
 msgstr "给联系人设置备注名"
@@ -10898,6 +10959,7 @@ msgstr "网页链接"
 msgid "置顶"
 msgstr "置顶"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:352
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:820
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1598
 #: apps/app/src/features/desktop/chat/desktop-conversation-context-menu.tsx:113
@@ -11193,6 +11255,7 @@ msgstr "群链接已复制。"
 msgid "聊天"
 msgstr "聊天"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:344
 #: apps/app/src/i18n/static-dom-seed.ts:730
 msgid "聊天与提醒"
 msgstr "聊天与提醒"
@@ -11316,6 +11379,7 @@ msgstr "聊天设置"
 msgid "聊天里的图片 / GIF 也能添加为表情"
 msgstr "聊天里的图片 / GIF 也能添加为表情"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:138
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:282
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:196
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:212
@@ -11347,6 +11411,7 @@ msgstr "联系人管理"
 msgid "联系人读取失败"
 msgstr "联系人读取失败"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:122
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:340
 msgid "联系人资料已更新。"
 msgstr "联系人资料已更新。"
@@ -11525,6 +11590,10 @@ msgstr "角色"
 msgid "角色不存在"
 msgstr "角色不存在"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:222
+msgid "角色信息"
+msgstr "角色信息"
+
 #: apps/app/src/i18n/static-dom-seed.ts:556
 msgid "角色名"
 msgstr "角色名"
@@ -11636,6 +11705,7 @@ msgstr "设置分类"
 msgid "设置口令并锁定"
 msgstr "设置口令并锁定"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:152
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:471
 msgid "设置备注"
 msgstr "设置备注"
@@ -11652,6 +11722,7 @@ msgstr "设置当前聊天背景"
 msgid "设置提醒失败，请稍后再试。"
 msgstr "设置提醒失败，请稍后再试。"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:165
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:484
 msgid "设置标签"
 msgstr "设置标签"
@@ -11762,6 +11833,7 @@ msgstr "该聊天会先从消息列表中隐藏，收到新消息后会再次出
 msgid "该角色后续互动会被拦截"
 msgstr "该角色后续互动会被拦截"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:303
 #: apps/app/src/routes/character-detail-page.tsx:253
 #: apps/app/src/routes/chat-details-page.tsx:885
 msgid "详细资料"
@@ -12110,6 +12182,7 @@ msgstr "跟随默认"
 msgid "跟随默认背景"
 msgstr "跟随默认背景"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:266
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:673
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:217
 msgid "身份"
@@ -12240,6 +12313,7 @@ msgstr "输入消息"
 msgid "输入群公告"
 msgstr "输入群公告"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:167
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:486
 msgid "输入联系人标签"
 msgstr "输入联系人标签"
@@ -12710,6 +12784,7 @@ msgstr "这个群聊暂时不可用，可以先重试读取，或返回消息列
 msgid "这个群聊暂时不可用，返回上一页后再试一次。"
 msgstr "这个群聊暂时不可用，返回上一页后再试一次。"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:144
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:274
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:191
 msgid "这个联系人还没有签名。"
@@ -12719,6 +12794,7 @@ msgstr "这个联系人还没有签名。"
 msgid "这个角色还没有个性签名。"
 msgstr "这个角色还没有个性签名。"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:145
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:275
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:191
 msgid "这个角色还没有签名。"
@@ -13498,6 +13574,8 @@ msgstr "隐界会在维持世界运行、会话同步和安全审计所需的范
 msgid "隐界会继续在后台恢复，你只需要稍候片刻。"
 msgstr "隐界会继续在后台恢复，你只需要稍候片刻。"
 
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:244
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:269
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:645
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:677
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:231
@@ -13725,6 +13803,10 @@ msgstr "麦克风权限被拒绝，请先允许应用访问麦克风。"
 #: apps/app/src/features/chat/use-speech-input.ts:760
 msgid "麦克风权限被拒绝，请先允许浏览器访问麦克风。"
 msgstr "麦克风权限被拒绝，请先允许浏览器访问麦克风。"
+
+#: apps/app/src/features/contacts/contact-detail-pane.tsx:368
+msgid "黑名单"
+msgstr "黑名单"
 
 #: apps/app/src/routes/chat-details-page.tsx:800
 msgid "黑名单状态暂时不可用"
