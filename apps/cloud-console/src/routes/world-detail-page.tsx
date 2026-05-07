@@ -617,7 +617,7 @@ export function WorldDetailPage() {
 
   return (
     <section className="grid gap-6">
-      <div className="grid gap-6 xl:grid-cols-[1.2fr,0.8fr]">
+      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>

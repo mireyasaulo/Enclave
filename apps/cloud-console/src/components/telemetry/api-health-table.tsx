@@ -16,19 +16,19 @@ export function TelemetryApiHealthTable({ data }: { data: TelemetryApiHealthResp
         <thead className="bg-(--surface-soft)">
           <tr>
             <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
-              Path
+              {t("Path")}
             </th>
             <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
-              Calls
+              {t("Calls")}
             </th>
             <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
-              Success
+              {t("Success")}
             </th>
             <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
-              p50
+              {t("p50")}
             </th>
             <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
-              p95
+              {t("p95")}
             </th>
           </tr>
         </thead>
