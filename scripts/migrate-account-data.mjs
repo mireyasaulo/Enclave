@@ -23,6 +23,9 @@ const ITEMS = [
   "database.sqlite-journal",
   "chat-attachments",
   "moments-media",
+  "chat-stickers",
+  "chat-backgrounds",
+  "ai-speech",
   "self-agent-workspace",
 ];
 

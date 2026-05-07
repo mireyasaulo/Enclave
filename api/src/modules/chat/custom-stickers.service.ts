@@ -9,7 +9,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { resolveRepoPath } from '../../database/database-path';
+import {
+  resolveApiPath,
+  resolveDataPath,
+  resolveRepoPath,
+} from '../../database/database-path';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import {
   resolveReadableChatAttachmentPath,
@@ -213,6 +217,15 @@ export class CustomStickersService {
 
   getCustomStickerStorageDir() {
     return this.resolveCustomStickerStorageDir();
+  }
+
+  resolveReadableCustomStickerPath(fileName: string) {
+    const normalized = this.normalizeCustomStickerFileName(fileName);
+    const candidates = [
+      path.join(this.resolveCustomStickerStorageDir(), normalized),
+      path.join(this.resolveLegacyCustomStickerStorageDir(), normalized),
+    ];
+    return candidates.find((candidatePath) => existsSync(candidatePath)) ?? candidates[0];
   }
 
   normalizeCustomStickerFileName(fileName: string) {
@@ -477,14 +490,12 @@ export class CustomStickersService {
     }
 
     if (pathname.startsWith(CUSTOM_STICKER_ASSET_ROUTE)) {
-      const fileName = this.normalizeCustomStickerFileName(
-        pathname.slice(CUSTOM_STICKER_ASSET_ROUTE.length),
+      const fileName = pathname.slice(CUSTOM_STICKER_ASSET_ROUTE.length);
+      return readFile(this.resolveReadableCustomStickerPath(fileName)).catch(
+        () => {
+          throw new NotFoundException('自定义表情资源不存在。');
+        },
       );
-      return readFile(
-        path.join(this.resolveCustomStickerStorageDir(), fileName),
-      ).catch(() => {
-        throw new NotFoundException('自定义表情资源不存在。');
-      });
     }
 
     if (pathname.startsWith(CHAT_ATTACHMENT_ROUTE)) {
@@ -551,15 +562,11 @@ export class CustomStickersService {
   }
 
   private resolveCustomStickerStorageDir(): string {
-    return path.join(this.resolveApiRoot(), 'storage', 'chat-stickers');
+    return resolveDataPath('chat-stickers');
   }
 
-  private resolveApiRoot(): string {
-    const cwd = process.cwd();
-    return existsSync(path.join(cwd, 'src')) &&
-      existsSync(path.join(cwd, 'package.json'))
-      ? cwd
-      : path.join(cwd, 'api');
+  private resolveLegacyCustomStickerStorageDir(): string {
+    return resolveApiPath('storage', 'chat-stickers');
   }
 
   private resolvePublicApiBaseUrl(): string {

@@ -1,7 +1,12 @@
 import { randomUUID } from 'crypto';
+import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  resolveApiPath,
+  resolveDataPath,
+} from '../../database/database-path';
 
 @Injectable()
 export class AiSpeechAssetsService {
@@ -13,7 +18,7 @@ export class AiSpeechAssetsService {
       baseName?: string;
     },
   ) {
-    const storageDir = this.resolveStorageDir();
+    const storageDir = this.resolvePrimaryStorageDir();
     const safeBaseName = sanitizeSpeechAssetBaseName(options.baseName);
     const extension = normalizeSpeechExtension(options.fileExtension);
     const fileName = `${Date.now()}-${randomUUID().slice(0, 8)}-${safeBaseName}.${extension}`;
@@ -29,7 +34,16 @@ export class AiSpeechAssetsService {
   }
 
   getStorageDir() {
-    return this.resolveStorageDir();
+    return this.resolvePrimaryStorageDir();
+  }
+
+  resolveReadablePath(fileName: string) {
+    const normalized = this.normalizeFileName(fileName);
+    const candidates = [
+      path.join(this.resolvePrimaryStorageDir(), normalized),
+      path.join(this.resolveLegacyStorageDir(), normalized),
+    ];
+    return candidates.find((candidatePath) => existsSync(candidatePath)) ?? candidates[0];
   }
 
   normalizeFileName(fileName: string) {
@@ -41,9 +55,12 @@ export class AiSpeechAssetsService {
     return normalized;
   }
 
-  private resolveStorageDir() {
-    const apiRoot = path.resolve(__dirname, '../../..');
-    return path.join(apiRoot, 'storage', 'ai-speech');
+  private resolvePrimaryStorageDir() {
+    return resolveDataPath('ai-speech');
+  }
+
+  private resolveLegacyStorageDir() {
+    return resolveApiPath('storage', 'ai-speech');
   }
 
   private resolvePublicApiBaseUrl() {

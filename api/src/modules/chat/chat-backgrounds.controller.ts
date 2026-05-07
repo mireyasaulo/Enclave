@@ -114,10 +114,7 @@ export class ChatBackgroundAssetsController {
     @Res() response: Response,
   ) {
     return response.sendFile(
-      this.chatBackgroundsService.normalizeBackgroundFileName(fileName),
-      {
-        root: this.chatBackgroundsService.getBackgroundStorageDir(),
-      },
+      this.chatBackgroundsService.resolveReadableBackgroundPath(fileName),
     );
   }
 }
