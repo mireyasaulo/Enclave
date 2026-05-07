@@ -37,7 +37,13 @@
       "signingIdentity": null,
       "providerShortName": null,
       "frameworks": [],
-      "exceptionDomain": ""
+      "exceptionDomain": "",
+      "resources": [
+        "zh-Hans.lproj/InfoPlist.strings",
+        "en.lproj/InfoPlist.strings",
+        "ja.lproj/InfoPlist.strings",
+        "ko.lproj/InfoPlist.strings"
+      ]
     }
   },
   "plugins": {

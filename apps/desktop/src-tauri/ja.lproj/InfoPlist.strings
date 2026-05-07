@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "Yinjie はプロフィール写真の撮影、チャット添付、ビデオ通話のためにカメラを使用します。";
+"NSMicrophoneUsageDescription" = "Yinjie は音声メッセージの録音と音声通話のためにマイクを使用します。";
+"NSPhotoLibraryUsageDescription" = "Yinjie はプロフィール写真、チャット添付、モーメンツ画像を選ぶためにフォトライブラリにアクセスします。";

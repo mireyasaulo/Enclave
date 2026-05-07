@@ -3,22 +3,24 @@
 <plist version="1.0">
 <dict>
     <key>NSCameraUsageDescription</key>
-    <string>隐界 需要使用相机以拍摄头像、聊天附件与视频通话画面。Yinjie needs camera access to capture avatars, chat attachments, and video calls.</string>
+    <string>隐界 需要使用相机以拍摄头像、聊天附件与视频通话画面。</string>
     <key>NSMicrophoneUsageDescription</key>
-    <string>隐界 需要使用麦克风以录入语音消息与进行语音通话。Yinjie needs microphone access for voice messages and voice calls.</string>
+    <string>隐界 需要使用麦克风以录入语音消息与进行语音通话。</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>隐界 需要访问图库以选择头像、聊天附件与朋友圈图片。Yinjie needs photo library access to pick avatars, chat attachments, and moments images.</string>
+    <string>隐界 需要访问图库以选择头像、聊天附件与朋友圈图片。</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.social-networking</string>
     <key>LSMinimumSystemVersion</key>
     <string>11.0</string>
     <key>CFBundleLocalizations</key>
     <array>
-        <string>zh_CN</string>
+        <string>zh-Hans</string>
         <string>en</string>
         <string>ja</string>
         <string>ko</string>
     </array>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>zh-Hans</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>

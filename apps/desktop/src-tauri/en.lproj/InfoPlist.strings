@@ -1,0 +1,3 @@
+"NSCameraUsageDescription" = "Yinjie needs camera access to capture avatars, chat attachments, and video calls.";
+"NSMicrophoneUsageDescription" = "Yinjie needs microphone access for voice messages and voice calls.";
+"NSPhotoLibraryUsageDescription" = "Yinjie needs photo library access to pick avatars, chat attachments, and moments images.";
