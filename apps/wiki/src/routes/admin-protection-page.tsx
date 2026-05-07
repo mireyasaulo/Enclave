@@ -48,7 +48,9 @@ export function AdminProtectionPage() {
       wikiApi.setProtection(characterId, {
         level: form.level,
         reviewPolicy: form.reviewPolicy,
-        expiresAt: form.expiresAt.trim() || null,
+        expiresAt: form.expiresAt
+          ? new Date(form.expiresAt).toISOString()
+          : null,
         reason: form.reason.trim() || undefined,
       }),
     onSuccess: () => {
@@ -164,13 +166,14 @@ export function AdminProtectionPage() {
                     <option value="pending_changes">{t(msg`待审变更`)}</option>
                   </select>
                 </FormRow>
-                <FormRow label={t(msg`到期时间`)} hint={t(msg`可选 ISO，留空 = 永久`)}>
-                  <TextField
+                <FormRow label={t(msg`到期时间`)} hint={t(msg`可选；留空 = 永久`)}>
+                  <input
+                    type="datetime-local"
+                    className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
                     value={form.expiresAt}
                     onChange={(e) =>
                       setForm({ ...form, expiresAt: e.target.value })
                     }
-                    placeholder="2026-06-01T00:00:00Z"
                   />
                 </FormRow>
                 <FormRow label={t(msg`原因`)}>

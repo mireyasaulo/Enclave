@@ -46,10 +46,13 @@ export function ScenePromptPreview({
   });
 
   const runBoth = async () => {
-    await previewMut.mutateAsync({ recipe, scene });
+    const tasks: Promise<unknown>[] = [
+      previewMut.mutateAsync({ recipe, scene }),
+    ];
     if (baselineRecipe) {
-      await baselineMut.mutateAsync({ recipe: baselineRecipe, scene });
+      tasks.push(baselineMut.mutateAsync({ recipe: baselineRecipe, scene }));
     }
+    await Promise.allSettled(tasks);
   };
 
   return (
@@ -103,9 +106,10 @@ export function ScenePromptPreview({
           </pre>
         </div>
       </div>
-      {previewMut.isError && (
+      {(previewMut.isError || baselineMut.isError) && (
         <p className="text-xs text-[var(--state-danger-text)]">
-          {(previewMut.error as Error).message}
+          {(previewMut.error as Error | null)?.message ??
+            (baselineMut.error as Error | null)?.message}
         </p>
       )}
     </div>

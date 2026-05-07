@@ -308,7 +308,7 @@ function PostTree({
         <li
           key={post.id}
           className="text-sm border-l-2 border-[var(--border-subtle)] pl-3"
-          style={{ marginLeft: depth * 16 }}
+          style={{ marginLeft: Math.min(depth, 6) * 16 }}
         >
           <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
             <strong className="text-[var(--text-primary)]">

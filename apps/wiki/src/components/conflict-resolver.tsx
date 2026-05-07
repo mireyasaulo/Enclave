@@ -82,7 +82,7 @@ export function ConflictResolver({
         {fields.map((f) => (
           <div
             key={f}
-            className="grid grid-cols-[7rem_1fr_1fr] gap-2 text-xs items-start"
+            className="grid grid-cols-1 gap-2 text-xs items-start sm:grid-cols-[7rem_1fr_1fr]"
           >
             <div className="font-medium text-[var(--text-muted)] pt-2">
               {FIELD_LABELS[f] ? t(FIELD_LABELS[f]) : f}

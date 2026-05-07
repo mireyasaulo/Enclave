@@ -66,9 +66,11 @@ export function HomePage() {
       )}
       {charactersQ.data && charactersQ.data.length === 0 && (
         <PanelEmpty
-          message={t(
-            msg`还没有任何角色词条。登录后点右上方"创建角色"开始第一个。`,
-          )}
+          message={
+            user
+              ? t(msg`还没有任何角色词条。点右上方"✨ 创建角色"开始第一个。`)
+              : t(msg`还没有任何角色词条。登录后即可创建第一个。`)
+          }
         />
       )}
       {charactersQ.data && charactersQ.data.length > 0 && (

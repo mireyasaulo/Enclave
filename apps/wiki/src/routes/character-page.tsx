@@ -282,7 +282,7 @@ function ProtectionInfo({ level }: { level: string }) {
   const t = translateRuntimeMessage;
   if (level === "none") return null;
   return (
-    <StatusPill className="ml-auto">
+    <StatusPill>
       {level === "semi" ? t(msg`半保护`) : t(msg`完全保护`)}
     </StatusPill>
   );
@@ -681,6 +681,9 @@ function EditView({
           placeholder={t(msg`例如：补充了职业信息`)}
           maxLength={500}
         />
+        <div className="mt-1 text-xs text-[color:var(--text-muted)]">
+          {summary.trim().length}/500
+        </div>
       </FormRow>
       <label className="flex items-center gap-2 text-sm">
         <input
@@ -708,16 +711,39 @@ function EditView({
           onCancel={() => setConflict(null)}
         />
       )}
-      <div className="flex gap-3">
-        <Button
-          type="button"
-          variant="primary"
-          disabled={submitMut.isPending || !!conflict}
-          onClick={() => submitMut.mutate(undefined)}
-        >
-          {submitMut.isPending ? t(msg`提交中...`) : t(msg`提交编辑`)}
-        </Button>
-      </div>
+      {(() => {
+        const personalityChanged =
+          (draft.personality ?? "") !== (initial.personality ?? "");
+        const recipeChanged = recipeDraft
+          ? JSON.stringify(recipeDraft) !== JSON.stringify(initialRecipe)
+          : false;
+        const requiresLongSummary = personalityChanged || recipeChanged;
+        const summaryTooShort =
+          requiresLongSummary && summary.trim().length < 10;
+        return (
+          <div className="flex flex-col gap-2">
+            {summaryTooShort && (
+              <div className="text-xs text-[color:var(--state-warning-text)]">
+                <Trans>
+                  你修改了高风险字段（人格 / 角色逻辑），修改摘要至少 10 字。
+                </Trans>
+              </div>
+            )}
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="primary"
+                disabled={
+                  submitMut.isPending || !!conflict || summaryTooShort
+                }
+                onClick={() => submitMut.mutate(undefined)}
+              >
+                {submitMut.isPending ? t(msg`提交中...`) : t(msg`提交编辑`)}
+              </Button>
+            </div>
+          </div>
+        );
+      })()}
     </Card>
   );
 }
@@ -1928,7 +1954,7 @@ function RevisionCard({
                 <summary className="cursor-pointer text-[var(--text-muted)]">
                   <Trans>查看角色逻辑快照</Trans>
                 </summary>
-                <pre className="mt-2 p-3 bg-[var(--bg-canvas)] rounded overflow-x-auto">
+                <pre className="mt-2 p-3 bg-[var(--bg-canvas)] rounded overflow-auto max-h-[60vh]">
                   {JSON.stringify(rev.recipeSnapshot, null, 2)}
                 </pre>
               </details>

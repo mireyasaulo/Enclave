@@ -193,6 +193,14 @@ export function CreateCharacterPage() {
               onChange={(event) => setSummary(event.target.value)}
               maxLength={500}
             />
+            <div className="mt-1 text-xs text-[color:var(--text-muted)]">
+              {summary.trim().length}/500
+              {summary.trim().length > 0 && summary.trim().length < 10 && (
+                <span className="ml-2 text-[color:var(--state-warning-text)]">
+                  <Trans>至少需要 10 字</Trans>
+                </span>
+              )}
+            </div>
           </FormRow>
         </AppSection>
 
@@ -233,6 +241,7 @@ export function CreateCharacterPage() {
             disabled={
               createMut.isPending ||
               name.trim().length === 0 ||
+              summary.trim().length < 10 ||
               recipeJsonError !== null
             }
           >

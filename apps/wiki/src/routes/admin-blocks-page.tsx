@@ -122,15 +122,16 @@ export function AdminBlocksPage() {
           </FormRow>
           <FormRow
             label={t(msg`到期时间`)}
-            hint={t(msg`可选 ISO 时间，留空 = 永久`)}
+            hint={t(msg`可选；留空 = 永久`)}
             className="md:col-span-2"
           >
-            <TextField
+            <input
+              type="datetime-local"
+              className="w-full rounded-xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm shadow-[var(--shadow-soft)] focus:border-[color:var(--brand-primary)] focus:outline-none"
               value={form.expiresAt}
               onChange={(e) =>
                 setForm({ ...form, expiresAt: e.target.value })
               }
-              placeholder="2026-06-01T00:00:00Z"
             />
           </FormRow>
         </div>
@@ -152,7 +153,9 @@ export function AdminBlocksPage() {
                     ? form.targetCharacterId.trim()
                     : undefined,
                 reason: form.reason.trim(),
-                expiresAt: form.expiresAt.trim() || null,
+                expiresAt: form.expiresAt
+                  ? new Date(form.expiresAt).toISOString()
+                  : null,
               })
             }
           >
