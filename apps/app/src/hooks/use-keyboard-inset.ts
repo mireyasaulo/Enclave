@@ -129,6 +129,9 @@ export function useKeyboardInset() {
     window.addEventListener("resize", handleViewportChange);
     window.addEventListener("focusin", handleFocusChange);
     window.addEventListener("focusout", handleFocusChange);
+    // BFCache 恢复 / 后台切前台时，iOS Safari 不一定触发 visualViewport.resize
+    window.addEventListener("pageshow", handleViewportChange);
+    document.addEventListener("visibilitychange", handleViewportChange);
 
     return () => {
       viewport?.removeEventListener("resize", handleViewportChange);
@@ -136,6 +139,8 @@ export function useKeyboardInset() {
       window.removeEventListener("resize", handleViewportChange);
       window.removeEventListener("focusin", handleFocusChange);
       window.removeEventListener("focusout", handleFocusChange);
+      window.removeEventListener("pageshow", handleViewportChange);
+      document.removeEventListener("visibilitychange", handleViewportChange);
     };
   }, [updateInset]);
 
