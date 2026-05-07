@@ -98,15 +98,10 @@ type ReviewDraft = {
   note: string;
 };
 
-function readInitialChatRecordsFocus() {
-  if (typeof window === "undefined") {
-    return {
-      characterId: "",
-      conversationId: "",
-    };
-  }
-
-  const params = new URLSearchParams(window.location.search);
+function readInitialChatRecordsFocus(search?: string) {
+  const raw =
+    search ?? (typeof window === "undefined" ? "" : window.location.search);
+  const params = new URLSearchParams(raw);
   return {
     characterId: params.get("characterId")?.trim() || "",
     conversationId: params.get("conversationId")?.trim() || "",
@@ -119,8 +114,7 @@ export function ChatRecordsPage() {
   const location = useLocation();
   const locationSearch = location.searchStr ?? "";
   const initialFocus = useMemo(
-    () => readInitialChatRecordsFocus(),
-    // re-run when URL search changes so back/forward or in-page links re-focus
+    () => readInitialChatRecordsFocus(locationSearch),
     [locationSearch],
   );
   const [characterId, setCharacterId] = useState(initialFocus.characterId);
