@@ -69,6 +69,7 @@ import {
 } from "../lib/cloud-admin-api";
 import { copyTextToClipboard } from "../lib/clipboard";
 import {
+  formatCloudConsolePageOfTotal,
   formatCloudConsoleVisibleGroupsRange,
   formatCloudConsoleVisibleSessionsRange,
   translateCloudConsoleCsvRow,
@@ -2393,13 +2394,17 @@ export function AdminSessionsPage() {
             <div>{sourceGroupSummary}</div>
             <div className="flex items-center gap-3">
               <span>
-                Page {filters.sourcePage} of {sourceGroupTotalPages}
+                {formatCloudConsolePageOfTotal(
+                  filters.sourcePage,
+                  sourceGroupTotalPages,
+                  locale,
+                )}
               </span>
               <AdminSessionActionButton
                 disabled={filters.sourcePage <= 1 || sourceGroupsQuery.isLoading}
                 onClick={() => updateFilters({ sourcePage: filters.sourcePage - 1 })}
               >
-                Previous groups
+                {t("Previous groups")}
               </AdminSessionActionButton>
               <AdminSessionActionButton
                 disabled={
@@ -2409,7 +2414,7 @@ export function AdminSessionsPage() {
                 }
                 onClick={() => updateFilters({ sourcePage: filters.sourcePage + 1 })}
               >
-                Next groups
+                {t("Next groups")}
               </AdminSessionActionButton>
             </div>
           </div>
@@ -2778,15 +2783,15 @@ export function AdminSessionsPage() {
                   className="h-4 w-4 rounded border-[color:var(--border-faint)] bg-[color:var(--surface-input)]"
                 />
               </th>
-              <th className="px-4 py-3">Session</th>
-              <th className="px-4 py-3">Status</th>
-              <th className="px-4 py-3">Issued from</th>
-              <th className="px-4 py-3">Last client</th>
-              <th className="px-4 py-3">Created</th>
-              <th className="px-4 py-3">Last used</th>
-              <th className="px-4 py-3">Refresh expiry</th>
-              <th className="px-4 py-3">Revocation</th>
-              <th className="px-4 py-3 text-right">Action</th>
+              <th className="px-4 py-3">{t("Session")}</th>
+              <th className="px-4 py-3">{t("Status")}</th>
+              <th className="px-4 py-3">{t("Issued from")}</th>
+              <th className="px-4 py-3">{t("Last client")}</th>
+              <th className="px-4 py-3">{t("Created")}</th>
+              <th className="px-4 py-3">{t("Last used")}</th>
+              <th className="px-4 py-3">{t("Refresh expiry")}</th>
+              <th className="px-4 py-3">{t("Revocation")}</th>
+              <th className="px-4 py-3 text-right">{t("Action")}</th>
             </tr>
           </thead>
           <tbody>
