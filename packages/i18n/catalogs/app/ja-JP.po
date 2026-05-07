@@ -4349,6 +4349,10 @@ msgstr "同画面"
 msgid "同步下午安排"
 msgstr "午後の予定を同期"
 
+#: apps/app/src/routes/splash-page.tsx:163
+msgid "同步世界主人"
+msgstr "世界の主人を同期"
+
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:1084
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:271
 msgid "同步中..."
@@ -7289,6 +7293,10 @@ msgstr "WeChat風デスクトップ作業区"
 #: apps/app/src/i18n/static-dom-seed.ts:116
 msgid "微信式桌面节奏"
 msgstr "WeChat風デスクトップの流れ"
+
+#: apps/app/src/routes/notes-page.tsx:41
+msgid "微信式笔记编辑器目前只在 Web 端桌面布局和桌面壳内启用，移动端先回到消息页继续使用。"
+msgstr "ノートエディターは現在、Web のデスクトップレイアウトとデスクトップ版でのみ利用できます。モバイルでは先にメッセージへお戻りください。"
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:149
 msgid "快捷入口"
@@ -10460,6 +10468,10 @@ msgstr "WeChatで最近開いたミニプログラムのショートカットを
 msgid "次优先备选"
 msgstr "2 番目に優先される代替案"
 
+#: apps/app/src/routes/splash-page.tsx:143
+msgid "欢迎回到你的世界"
+msgstr "あなたの世界へおかえりなさい"
+
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:148
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:169
 #: apps/app/src/routes/group-announcement-page.tsx:472
@@ -10474,6 +10486,10 @@ msgstr "デスクトップ検索インデックスを準備中です。まもな
 #: apps/app/src/routes/friend-moments-page.tsx:405
 msgid "正在切换到手机端角色朋友圈..."
 msgstr "モバイル版のキャラクターモーメントへ切り替え中..."
+
+#: apps/app/src/routes/notes-page.tsx:60
+msgid "正在切换到收藏"
+msgstr "お気に入りへ切り替え中"
 
 #: apps/app/src/routes/world-characters-page.tsx:56
 msgid "正在切换到桌面世界角色"
@@ -10701,6 +10717,10 @@ msgstr "会話を開いています..."
 msgid "正在打开好友朋友圈"
 msgstr ""
 
+#: apps/app/src/routes/notes-page.tsx:66
+msgid "正在打开收藏笔记..."
+msgstr "お気に入りのノートを開いています..."
+
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:147
 msgid "正在打开朋友圈..."
 msgstr "モーメントを開いています..."
@@ -10864,6 +10884,10 @@ msgstr "音声を準備中..."
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:907
 msgid "正在整理这一轮回复，马上就会回到这里。"
 msgstr ""
+
+#: apps/app/src/routes/splash-page.tsx:177
+msgid "正在整理这次进入世界的路径，马上带你回到上次停留的地方。"
+msgstr "今回の世界への入口を整えています。すぐ前回いた場所に戻ります。"
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:371
 #: apps/app/src/routes/character-detail-page.tsx:316
@@ -12202,6 +12226,10 @@ msgstr ""
 msgid "确认今天待办"
 msgstr "今日のタスクを確認"
 
+#: apps/app/src/routes/splash-page.tsx:155
+msgid "确认入口"
+msgstr "入口を確認"
+
 #: apps/app/src/routes/character-detail-page.tsx:809
 msgid "确认删除这个联系人吗？"
 msgstr "この連絡先を削除しますか？"
@@ -12692,6 +12720,14 @@ msgstr "メモ"
 msgid "笔记已保存到收藏。"
 msgstr "ノートをお気に入りに保存しました。"
 
+#: apps/app/src/routes/notes-page.tsx:63
+msgid "笔记已经并入收藏，这个兼容入口会自动带你回到收藏里的笔记视图。"
+msgstr "ノートはお気に入りに統合されました。この互換入口からお気に入り内のノート表示へ戻ります。"
+
+#: apps/app/src/routes/notes-page.tsx:38
+msgid "笔记当前仅提供桌面布局"
+msgstr "ノートは現在デスクトップ専用です"
+
 #: apps/app/src/components/chat-message-list.tsx:6302
 #: apps/app/src/i18n/static-dom-seed.ts:750
 msgid "笔记摘要"
@@ -13063,6 +13099,10 @@ msgstr ""
 #: apps/app/src/components/chat-message-list.tsx:1679
 msgid "继续取消收藏"
 msgstr ""
+
+#: apps/app/src/routes/splash-page.tsx:171
+msgid "继续开启对话"
+msgstr "会話を続ける"
 
 #: apps/app/src/routes/chat-room-page.tsx:236
 #: apps/app/src/routes/group-chat-page.tsx:202
@@ -14894,6 +14934,7 @@ msgid "返回朋友圈"
 msgstr "モーメンツに戻る"
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:876
+#: apps/app/src/routes/notes-page.tsx:49
 #: apps/app/src/routes/profile-settings-page.tsx:213
 #: apps/app/src/routes/profile-settings-page.tsx:216
 msgid "返回消息"
@@ -15554,6 +15595,10 @@ msgstr "ここでは友だちだけでなく、世界の住民が何を話して
 #: apps/app/src/routes/desktop-mobile-page.tsx:1186
 msgid "这里不新造设备接口，先用当前世界的真实运行状态来判断手机接力是否值得继续。"
 msgstr "ここでは新しいデバイス用インターフェースを作らず、現在の世界の実行状態を使ってスマホ引き継ぎを続ける価値があるか判断します。"
+
+#: apps/app/src/routes/splash-page.tsx:146
+msgid "这里不是一串账号信息，而是一整片会继续生长、继续回应你的个人世界。"
+msgstr "ここは単なるアカウント情報の羅列ではなく、成長し続けあなたに応え続けるあなた個人の世界です。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:36
 #: apps/app/src/routes/moments-page.tsx:904
@@ -16338,6 +16383,10 @@ msgstr "3日間限定"
 #: apps/app/src/features/shell/desktop-shell.tsx:148
 msgid "隐"
 msgstr "Y"
+
+#: apps/app/src/routes/splash-page.tsx:140
+msgid "隐界"
+msgstr "Enclave"
 
 #: apps/app/src/i18n/static-dom-seed.ts:615
 msgid "隐界会保存你的账号资料、聊天行为、动态内容和必要的运行日志，用于维持世界状态、消息同步和基础安全审计。"

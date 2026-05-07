@@ -4349,6 +4349,10 @@ msgstr "Same screen"
 msgid "同步下午安排"
 msgstr "Sync afternoon plans"
 
+#: apps/app/src/routes/splash-page.tsx:163
+msgid "同步世界主人"
+msgstr "Sync world owner"
+
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:1084
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:271
 msgid "同步中..."
@@ -7289,6 +7293,10 @@ msgstr "WeChat-style desktop workspace"
 #: apps/app/src/i18n/static-dom-seed.ts:116
 msgid "微信式桌面节奏"
 msgstr "WeChat-style desktop rhythm"
+
+#: apps/app/src/routes/notes-page.tsx:41
+msgid "微信式笔记编辑器目前只在 Web 端桌面布局和桌面壳内启用，移动端先回到消息页继续使用。"
+msgstr "The note editor is currently available only in the desktop web layout and desktop shell — go back to messages on mobile."
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:149
 msgid "快捷入口"
@@ -10460,6 +10468,10 @@ msgstr "Simulates quick entries for recently opened WeChat mini programs."
 msgid "次优先备选"
 msgstr "Second priority alternative"
 
+#: apps/app/src/routes/splash-page.tsx:143
+msgid "欢迎回到你的世界"
+msgstr "Welcome back to your world"
+
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:148
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:169
 #: apps/app/src/routes/group-announcement-page.tsx:472
@@ -10474,6 +10486,10 @@ msgstr "Preparing the desktop search index. Full results will be available short
 #: apps/app/src/routes/friend-moments-page.tsx:405
 msgid "正在切换到手机端角色朋友圈..."
 msgstr "Switching to mobile character Moments..."
+
+#: apps/app/src/routes/notes-page.tsx:60
+msgid "正在切换到收藏"
+msgstr "Switching to favorites"
 
 #: apps/app/src/routes/world-characters-page.tsx:56
 msgid "正在切换到桌面世界角色"
@@ -10701,6 +10717,10 @@ msgstr "Opening chat..."
 msgid "正在打开好友朋友圈"
 msgstr ""
 
+#: apps/app/src/routes/notes-page.tsx:66
+msgid "正在打开收藏笔记..."
+msgstr "Opening favorite notes..."
+
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:147
 msgid "正在打开朋友圈..."
 msgstr "Opening Moments..."
@@ -10864,6 +10884,10 @@ msgstr "Preparing voice..."
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:907
 msgid "正在整理这一轮回复，马上就会回到这里。"
 msgstr ""
+
+#: apps/app/src/routes/splash-page.tsx:177
+msgid "正在整理这次进入世界的路径，马上带你回到上次停留的地方。"
+msgstr "Sorting out this entry into your world — you'll be back where you left off shortly."
 
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:371
 #: apps/app/src/routes/character-detail-page.tsx:316
@@ -12202,6 +12226,10 @@ msgstr ""
 msgid "确认今天待办"
 msgstr "Confirm today's tasks"
 
+#: apps/app/src/routes/splash-page.tsx:155
+msgid "确认入口"
+msgstr "Confirm entry"
+
 #: apps/app/src/routes/character-detail-page.tsx:809
 msgid "确认删除这个联系人吗？"
 msgstr "Delete this contact?"
@@ -12692,6 +12720,14 @@ msgstr "Note"
 msgid "笔记已保存到收藏。"
 msgstr "Note saved to Favorites."
 
+#: apps/app/src/routes/notes-page.tsx:63
+msgid "笔记已经并入收藏，这个兼容入口会自动带你回到收藏里的笔记视图。"
+msgstr "Notes have moved into favorites; this compatibility entry will redirect you to the notes view in favorites."
+
+#: apps/app/src/routes/notes-page.tsx:38
+msgid "笔记当前仅提供桌面布局"
+msgstr "Notes are desktop-only for now"
+
 #: apps/app/src/components/chat-message-list.tsx:6302
 #: apps/app/src/i18n/static-dom-seed.ts:750
 msgid "笔记摘要"
@@ -13063,6 +13099,10 @@ msgstr ""
 #: apps/app/src/components/chat-message-list.tsx:1679
 msgid "继续取消收藏"
 msgstr ""
+
+#: apps/app/src/routes/splash-page.tsx:171
+msgid "继续开启对话"
+msgstr "Resume the conversation"
 
 #: apps/app/src/routes/chat-room-page.tsx:236
 #: apps/app/src/routes/group-chat-page.tsx:202
@@ -14894,6 +14934,7 @@ msgid "返回朋友圈"
 msgstr "Back to Moments"
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:876
+#: apps/app/src/routes/notes-page.tsx:49
 #: apps/app/src/routes/profile-settings-page.tsx:213
 #: apps/app/src/routes/profile-settings-page.tsx:216
 msgid "返回消息"
@@ -15554,6 +15595,10 @@ msgstr "This shows not just friends, but what residents in the world are saying.
 #: apps/app/src/routes/desktop-mobile-page.tsx:1186
 msgid "这里不新造设备接口，先用当前世界的真实运行状态来判断手机接力是否值得继续。"
 msgstr "Instead of inventing a new device interface here, use the current world's real runtime state to decide whether mobile handoff is worth continuing."
+
+#: apps/app/src/routes/splash-page.tsx:146
+msgid "这里不是一串账号信息，而是一整片会继续生长、继续回应你的个人世界。"
+msgstr "This isn't a string of account data — it's an entire personal world that keeps growing and keeps answering you."
 
 #: apps/app/src/i18n/static-dom-seed.ts:36
 #: apps/app/src/routes/moments-page.tsx:904
@@ -16338,6 +16383,10 @@ msgstr "Limited for 3 days"
 #: apps/app/src/features/shell/desktop-shell.tsx:148
 msgid "隐"
 msgstr "Y"
+
+#: apps/app/src/routes/splash-page.tsx:140
+msgid "隐界"
+msgstr "Enclave"
 
 #: apps/app/src/i18n/static-dom-seed.ts:615
 msgid "隐界会保存你的账号资料、聊天行为、动态内容和必要的运行日志，用于维持世界状态、消息同步和基础安全审计。"
