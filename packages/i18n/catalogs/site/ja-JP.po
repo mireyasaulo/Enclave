@@ -13,6 +13,62 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:15
+msgid "产品"
+msgstr "プロダクト"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:16
+msgid "核心能力"
+msgstr "コア機能"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:17
+msgid "跨端"
+msgstr "クロスプラットフォーム"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:18
+msgid "开源自部署"
+msgstr "セルフホスト"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:13
+#: apps/site/src/components/site-header.tsx:19
+msgid "下载"
+msgstr "ダウンロード"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:20
+msgid "在线试用"
+msgstr "オンライン試用"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:9
+msgid "一个属于你的 AI 虚拟世界。开源、可自部署、跨端可用。"
+msgstr "あなただけの AI バーチャルワールド。オープンソース、セルフホスト可能、クロスプラットフォーム。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:12
+msgid "自部署文档"
+msgstr "セルフホストガイド"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:14
+msgid "隐私政策"
+msgstr "プライバシーポリシー"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:15
+msgid "服务条款"
+msgstr "利用規約"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:16
+msgid "联系我们"
+msgstr "お問い合わせ"
+
+#. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/page.tsx:13
 msgid "隐界 — 一个属于你的 AI 虚拟世界"
 msgstr "エンクレイブ — あなただけの AI バーチャルワールド"

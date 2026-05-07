@@ -13,6 +13,62 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:15
+msgid "产品"
+msgstr "产品"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:16
+msgid "核心能力"
+msgstr "核心能力"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:17
+msgid "跨端"
+msgstr "跨端"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:18
+msgid "开源自部署"
+msgstr "开源自部署"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:13
+#: apps/site/src/components/site-header.tsx:19
+msgid "下载"
+msgstr "下载"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:20
+msgid "在线试用"
+msgstr "在线试用"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:9
+msgid "一个属于你的 AI 虚拟世界。开源、可自部署、跨端可用。"
+msgstr "一个属于你的 AI 虚拟世界。开源、可自部署、跨端可用。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:12
+msgid "自部署文档"
+msgstr "自部署文档"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:14
+msgid "隐私政策"
+msgstr "隐私政策"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:15
+msgid "服务条款"
+msgstr "服务条款"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:16
+msgid "联系我们"
+msgstr "联系我们"
+
+#. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/page.tsx:13
 msgid "隐界 — 一个属于你的 AI 虚拟世界"
 msgstr "隐界 — 一个属于你的 AI 虚拟世界"
