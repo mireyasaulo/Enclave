@@ -36,6 +36,12 @@ function trimNullableString({ value }: { value: unknown }) {
 
 export class TelemetryEventInputDto {
   @Transform(trimString)
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  id?: string;
+
+  @Transform(trimString)
   @IsString()
   @MinLength(1)
   @MaxLength(120)

@@ -9,6 +9,13 @@ export type TelemetryEventType =
   | "session";
 
 export interface TelemetryEventInput {
+  /**
+   * Stable client-generated event id. If provided, the server uses it as
+   * the row primary key and silently ignores duplicate inserts (i.e. idempotency
+   * on retries / localStorage replay). If omitted, the server falls back to
+   * generating one — duplicates are then possible.
+   */
+  id?: string;
   eventName: string;
   eventType: TelemetryEventType;
   occurredAt: string;

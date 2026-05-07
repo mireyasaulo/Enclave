@@ -80,7 +80,17 @@ export class TelemetryService {
     try {
       const chunkSize = 50;
       for (let i = 0; i < rows.length; i += chunkSize) {
-        await this.events.insert(rows.slice(i, i + chunkSize));
+        // INSERT OR IGNORE — duplicates by client-supplied id (which is also
+        // the primary key) are dropped silently. This makes the public
+        // ingestion endpoint idempotent against SDK retries / localStorage
+        // replays where the same event might be POSTed twice.
+        await this.events
+          .createQueryBuilder()
+          .insert()
+          .into(ClientTelemetryEventEntity)
+          .values(rows.slice(i, i + chunkSize))
+          .orIgnore()
+          .execute();
       }
       return { accepted: rows.length, rejected };
     } catch (error) {
@@ -113,11 +123,24 @@ export class TelemetryService {
     const occurredAt = new Date(input.occurredAt);
     if (Number.isNaN(occurredAt.getTime())) return null;
 
+    // Server-side normalization for older SDK clients that emitted
+    // `page_view_end` with eventType='pv' before the SDK fix landed.
+    // page_view_end is a time-on-page measurement, not a fresh PV — keeping
+    // it under eventType='session' prevents the daily pvCount rollup from
+    // double-counting every navigation.
+    const normalizedEventType =
+      input.eventName === "page_view_end" && input.eventType === "pv"
+        ? "session"
+        : input.eventType;
+
     const row = this.events.create({
-      id: randomUUID(),
+      // Prefer the client-supplied id so retries / localStorage replays are
+      // idempotent (the unique PK + INSERT OR IGNORE drops duplicates). Fall
+      // back to a server-generated UUID for older clients that don't send one.
+      id: input.id?.trim() || randomUUID(),
       appId,
       eventName: input.eventName,
-      eventType: input.eventType,
+      eventType: normalizedEventType,
       anonId: input.anonId,
       userId: input.userId ?? null,
       sessionId: input.sessionId,

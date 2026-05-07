@@ -239,6 +239,19 @@ export function isInitialized(): boolean {
   return Boolean(state?.initialized);
 }
 
+function newEventId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    try {
+      return crypto.randomUUID();
+    } catch {
+      // fall through
+    }
+  }
+  // Non-cryptographic fallback for non-secure contexts. Collision is extremely
+  // unlikely in the analytics setting and a duplicate just gets dedup'd later.
+  return `e-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
 function trackInternal(
   eventName: string,
   eventType: TelemetryEventType,
@@ -251,6 +264,11 @@ function trackInternal(
   const clonedProps =
     props && Object.keys(props).length > 0 ? { ...props } : undefined;
   const event: TelemetryEventInput = {
+    // Client-generated id makes the request idempotent: if a fetch is aborted
+    // mid-flight (server received but response lost) and we retry — or if a
+    // localStorage replay re-sends events from the previous session — the
+    // server's INSERT OR IGNORE drops the duplicate by primary key.
+    id: newEventId(),
     eventName,
     eventType,
     occurredAt: nowIso(),
