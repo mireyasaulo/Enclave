@@ -1,3 +1,7 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
 export type SearchResultCategory =
   | "messages"
   | "contacts"
@@ -72,24 +76,24 @@ export const searchCategoryLabels: Array<{
   id: SearchCategory;
   label: string;
 }> = [
-  { id: "all", label: "全部" },
-  { id: "messages", label: "聊天记录" },
-  { id: "contacts", label: "联系人" },
-  { id: "favorites", label: "收藏" },
-  { id: "officialAccounts", label: "公众号" },
-  { id: "miniPrograms", label: "小程序" },
-  { id: "moments", label: "朋友圈" },
-  { id: "feed", label: "广场动态" },
+  { id: "all", label: t(msg`全部`) },
+  { id: "messages", label: t(msg`聊天记录`) },
+  { id: "contacts", label: t(msg`联系人`) },
+  { id: "favorites", label: t(msg`收藏`) },
+  { id: "officialAccounts", label: t(msg`公众号`) },
+  { id: "miniPrograms", label: t(msg`小程序`) },
+  { id: "moments", label: t(msg`朋友圈`) },
+  { id: "feed", label: t(msg`广场动态`) },
 ];
 
 export const searchCategoryTitles: Record<SearchResultCategory, string> = {
-  messages: "聊天记录",
-  contacts: "联系人",
-  favorites: "收藏",
-  officialAccounts: "公众号",
-  miniPrograms: "小程序",
-  moments: "朋友圈",
-  feed: "广场动态",
+  messages: t(msg`聊天记录`),
+  contacts: t(msg`联系人`),
+  favorites: t(msg`收藏`),
+  officialAccounts: t(msg`公众号`),
+  miniPrograms: t(msg`小程序`),
+  moments: t(msg`朋友圈`),
+  feed: t(msg`广场动态`),
 };
 
 export const searchCategoryLabelDescriptors: Array<{

@@ -29,6 +29,10 @@ import {
   type SearchResultSection,
   type SearchScopeCounts,
 } from "./search-types";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
 
 type MobileSearchWorkspaceProps = {
   activeCategory: SearchCategory;
@@ -63,22 +67,22 @@ const quickScopeCards: Array<{
 }> = [
   {
     key: "messages",
-    title: msg`聊天记录`,
-    description: msg`搜会话、群聊和历史消息`,
+    title: t(msg`聊天记录`),
+    description: t(msg`搜会话、群聊和历史消息`),
     icon: Search,
     iconClassName: "bg-[rgba(7,193,96,0.12)] text-[#07c160]",
   },
   {
     key: "contacts",
-    title: msg`联系人`,
-    description: msg`搜好友、备注和世界角色`,
+    title: t(msg`联系人`),
+    description: t(msg`搜好友、备注和世界角色`),
     icon: UsersRound,
     iconClassName: "bg-[rgba(59,130,246,0.12)] text-[#2563eb]",
   },
   {
     key: "feed",
-    title: msg`内容流`,
-    description: msg`搜朋友圈、广场动态和公众号`,
+    title: t(msg`内容流`),
+    description: t(msg`搜朋友圈、广场动态和公众号`),
     icon: Newspaper,
     iconClassName: "bg-[rgba(15,23,42,0.08)] text-[color:var(--text-primary)]",
   },
@@ -409,10 +413,8 @@ export function MobileSearchWorkspace({
           ) : (
             <div className="space-y-2.5">
               <div className="text-[14px] font-medium text-[color:var(--text-primary)]">
-                {activeCategory === "all"
-                  ? t(msg`全部结果`)
-                  : getCategoryTitle(activeCategory)}{" "}
-                · {t(msg`${visibleResults.length} 条`)}
+                {searchCategoryTitles[activeCategory]} · {visibleResults.length}{" "}
+                {t(msg`条`)}
               </div>
               <div className="relative space-y-1.5">
                 {visibleResults.map((item) => (

@@ -49,6 +49,10 @@ import {
   sortSearchResults,
   normalizeSearchKeyword,
 } from "./search-utils";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
 
 type SearchMessageRow = {
   conversationId: string;
@@ -181,7 +185,7 @@ export function useSearchIndex(
             conversationSource: conversation.source,
             messageId: message.messageId,
             senderName: message.senderName,
-            text: message.previewText || "这条消息没有可展示文本。",
+            text: message.previewText || t(msg`这条消息没有可展示文本。`),
             createdAt: message.createdAt,
           }));
         }),
@@ -276,11 +280,11 @@ export function useSearchIndex(
         id: `message-${message.messageId}`,
         category: "messages",
         title: message.conversationTitle,
-        description: `${message.senderName}：${buildSearchPreview(
-          message.text || "这条消息没有可展示文本。",
+        description: t(msg`${message.senderName}：${buildSearchPreview(
+          message.text || t(msg`这条消息没有可展示文本。`),
           normalizedSearchText,
-        )}`,
-        meta: `聊天记录 · ${formatMessageTimestamp(message.createdAt)}`,
+        )}`),
+        meta: t(msg`聊天记录 · ${formatMessageTimestamp(message.createdAt)}`),
         keywords: [message.conversationTitle, message.senderName, message.text]
           .filter(Boolean)
           .join(" ")
@@ -301,8 +305,8 @@ export function useSearchIndex(
             type: message.conversationType,
             source: message.conversationSource,
           }) === "group"
-            ? "群聊记录"
-            : "单聊记录",
+            ? t(msg`群聊记录`)
+            : t(msg`单聊记录`),
         avatarName: message.conversationTitle,
         sortTime: parseTimestamp(message.createdAt) ?? 0,
       }));
@@ -322,14 +326,14 @@ export function useSearchIndex(
           title: displayName,
           description:
             displayName !== character.name
-              ? `昵称：${character.name}`
+              ? t(msg`昵称：${character.name}`)
               : character.bio ||
                 character.currentActivity ||
                 character.relationship ||
-                "查看联系人资料与聊天入口。",
+                t(msg`查看联系人资料与聊天入口。`),
           meta: friend
-            ? `通讯录联系人 · ${character.relationship}`
-            : `世界角色 · ${character.relationship}`,
+            ? t(msg`通讯录联系人 · ${character.relationship}`)
+            : t(msg`世界角色 · ${character.relationship}`),
           keywords: [
             displayName,
             character.name,
@@ -346,7 +350,7 @@ export function useSearchIndex(
             .join(" ")
             .toLowerCase(),
           to: `/character/${character.id}`,
-          badge: friend ? "联系人" : "角色",
+          badge: friend ? t(msg`联系人`) : t(msg`角色`),
           avatarName: displayName,
           avatarSrc: character.avatar,
           sortTime: friend ? 2 : 1,
@@ -362,8 +366,8 @@ export function useSearchIndex(
         description:
           account.recentArticle?.title ||
           account.description ||
-          "查看公众号资料与最近文章。",
-        meta: `${account.accountType === "service" ? "服务号" : "订阅号"} · @${
+          t(msg`查看公众号资料与最近文章。`),
+        meta: `${account.accountType === "service" ? t(msg`服务号`) : t(msg`订阅号`)} · @${
           account.handle
         }`,
         keywords: [
@@ -379,7 +383,7 @@ export function useSearchIndex(
         to: isDesktopLayout
           ? buildDesktopOfficialAccountSearchPath(account.id)
           : `/official-accounts/${account.id}`,
-        badge: account.accountType === "service" ? "服务号" : "订阅号",
+        badge: account.accountType === "service" ? t(msg`服务号`) : t(msg`订阅号`),
         avatarName: account.name,
         avatarSrc: account.avatar,
         sortTime: parseTimestamp(account.lastPublishedAt) ?? 0,
@@ -391,8 +395,8 @@ export function useSearchIndex(
       id: `official-article:${account.id}:${article.id}`,
       category: "officialAccounts",
       title: article.title,
-      description: article.summary || `来自 ${account.name} 的公众号文章`,
-      meta: `公众号文章 · ${account.name} · ${formatTimestamp(article.publishedAt)}`,
+      description: article.summary || t(msg`来自 ${account.name} 的公众号文章`),
+      meta: t(msg`公众号文章 · ${account.name} · ${formatTimestamp(article.publishedAt)}`),
       keywords: [
         account.name,
         account.handle,
@@ -406,7 +410,7 @@ export function useSearchIndex(
       to: isDesktopLayout
         ? buildDesktopOfficialAccountSearchPath(account.id, article.id)
         : `/official-accounts/articles/${article.id}`,
-      badge: "公众号文章",
+      badge: t(msg`公众号文章`),
       avatarName: account.name,
       avatarSrc: account.avatar,
       sortTime: parseTimestamp(article.publishedAt) ?? 0,
@@ -418,7 +422,7 @@ export function useSearchIndex(
         category: "moments",
         title: moment.authorName,
         description: moment.text,
-        meta: `朋友圈 · ${formatTimestamp(moment.postedAt)}`,
+        meta: t(msg`朋友圈 · ${formatTimestamp(moment.postedAt)}`),
         keywords: [
           moment.authorName,
           moment.text,
@@ -430,7 +434,7 @@ export function useSearchIndex(
           .toLowerCase(),
         to: isDesktopLayout ? "/tabs/moments" : "/discover/moments",
         hash: buildSearchMomentHash(moment.id),
-        badge: "朋友圈",
+        badge: t(msg`朋友圈`),
         avatarName: moment.authorName,
         avatarSrc: moment.authorAvatar,
         sortTime: parseTimestamp(moment.postedAt) ?? 0,
@@ -443,7 +447,7 @@ export function useSearchIndex(
         category: "feed",
         title: post.authorName,
         description: post.text,
-        meta: `广场动态 · ${formatTimestamp(post.createdAt)}`,
+        meta: t(msg`广场动态 · ${formatTimestamp(post.createdAt)}`),
         keywords: [
           post.authorName,
           post.text,
@@ -456,7 +460,7 @@ export function useSearchIndex(
           .toLowerCase(),
         to: isDesktopLayout ? "/tabs/feed" : "/discover/feed",
         hash: buildSearchFeedHash(post.id),
-        badge: "广场动态",
+        badge: t(msg`广场动态`),
         avatarName: post.authorName,
         avatarSrc: post.authorAvatar,
         sortTime: parseTimestamp(post.createdAt) ?? 0,
