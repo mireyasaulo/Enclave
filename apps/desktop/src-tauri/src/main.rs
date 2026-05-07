@@ -46,6 +46,8 @@ enum DesktopTextKey {
     CloseDialogBody,
     CloseDialogHide,
     CloseDialogExit,
+    UnsupportedLocaleError,
+    MissingFileUrlError,
 }
 
 struct DesktopWindowState {
@@ -439,6 +441,16 @@ fn desktop_text(locale: &str, key: DesktopTextKey) -> &'static str {
         ("ja-JP", DesktopTextKey::MenuWindow) => "ウインドウ",
         ("ko-KR", DesktopTextKey::MenuWindow) => "윈도우",
         (_, DesktopTextKey::MenuWindow) => "窗口",
+
+        ("en-US", DesktopTextKey::UnsupportedLocaleError) => "Unsupported desktop locale.",
+        ("ja-JP", DesktopTextKey::UnsupportedLocaleError) => "サポートされていないデスクトップ言語です。",
+        ("ko-KR", DesktopTextKey::UnsupportedLocaleError) => "지원되지 않는 데스크톱 언어입니다.",
+        (_, DesktopTextKey::UnsupportedLocaleError) => "暂不支持该桌面语言。",
+
+        ("en-US", DesktopTextKey::MissingFileUrlError) => "Missing file URL.",
+        ("ja-JP", DesktopTextKey::MissingFileUrlError) => "ファイル URL が指定されていません。",
+        ("ko-KR", DesktopTextKey::MissingFileUrlError) => "파일 URL이 누락되었습니다.",
+        (_, DesktopTextKey::MissingFileUrlError) => "缺少文件下载地址。",
 
         (_, DesktopTextKey::RemoteResponded)
         | (_, DesktopTextKey::RemoteUnreachable)
@@ -953,8 +965,10 @@ fn desktop_set_locale(
     app: tauri::AppHandle,
     input: DesktopSetLocaleInput,
 ) -> Result<DesktopOperationResult, String> {
-    let locale = resolve_supported_locale(&input.locale)
-        .ok_or_else(|| "Unsupported desktop locale.".to_string())?;
+    let current_locale = resolve_desktop_locale(&app).locale;
+    let locale = resolve_supported_locale(&input.locale).ok_or_else(|| {
+        desktop_text(current_locale, DesktopTextKey::UnsupportedLocaleError).to_string()
+    })?;
     write_desktop_locale(&app, locale)?;
     apply_desktop_locale(&app, locale)?;
 
@@ -993,7 +1007,7 @@ async fn desktop_save_remote_file(
         let locale = resolve_desktop_locale(&app).locale;
         let url = input.url.trim().to_string();
         if url.is_empty() {
-            return Err("Missing file URL.".to_string());
+            return Err(desktop_text(locale, DesktopTextKey::MissingFileUrlError).to_string());
         }
 
         let Some(target_file_path) =
