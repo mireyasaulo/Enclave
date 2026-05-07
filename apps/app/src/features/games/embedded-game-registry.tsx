@@ -36,6 +36,11 @@ const ForestTrainGame = lazy(async () => {
   return { default: mod.ForestTrainGame };
 });
 
+const PixelArenaGame = lazy(async () => {
+  const mod = await import("./pixel-arena/pixel-arena-game");
+  return { default: mod.PixelArenaGame };
+});
+
 export type EmbeddedGameProps = {
   variant?: "embedded" | "fullscreen";
   onExit?: () => void;
@@ -51,6 +56,7 @@ const EMBEDDED_GAME_COMPONENTS: Record<
   "sky-rally": SkyRallyGame,
   "cat-inn": CatInnGame,
   "forest-train": ForestTrainGame,
+  "pixel-arena": PixelArenaGame,
 };
 
 export function hasEmbeddedGame(gameId: string | null | undefined): boolean {
