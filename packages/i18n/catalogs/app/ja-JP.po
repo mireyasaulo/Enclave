@@ -218,9 +218,11 @@ msgstr "{0} が{translatedSceneLabel}であなたに気づきました：{greeti
 
 #. placeholder {0}: draft.trim().length
 #. placeholder {0}: normalizedDraft.length
+#. placeholder {0}: trimmedDraft.length
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:129
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:150
 #: apps/app/src/routes/group-announcement-page.tsx:453
+#: apps/app/src/routes/group-chat-edit-page.tsx:399
 msgid "{0} 字"
 msgstr "{0} 文字"
 
@@ -1761,6 +1763,10 @@ msgstr "現在の会話を元に、チャット場面の通報を送信します
 msgid "会同步到朋友圈时间线，适合发日常照片、短视频和临时心情。"
 msgstr "モーメンツのタイムラインに同期され、日常写真、短い動画、その時の気持ちに向いています。"
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:396
+msgid "会同步显示在聊天顶部和消息列表。"
+msgstr "チャット上部とメッセージ一覧に同期表示されます。"
+
 #: apps/app/src/features/subscription/subscription-panel.tsx:462
 #: apps/app/src/routes/profile-page.tsx:153
 #: apps/app/src/routes/profile-settings-page.tsx:57
@@ -1915,6 +1921,7 @@ msgstr "サイドパネル"
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:68
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:75
 #: apps/app/src/routes/character-detail-page.tsx:295
+#: apps/app/src/routes/group-chat-edit-page.tsx:423
 msgid "保存"
 msgstr "保存"
 
@@ -4156,6 +4163,10 @@ msgstr ""
 #: apps/app/src/components/chat-message-list.tsx:4171
 msgid "另存文件"
 msgstr ""
+
+#: apps/app/src/routes/group-chat-edit-page.tsx:397
+msgid "只在当前群聊里显示。"
+msgstr "このグループチャット内でのみ表示されます。"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2115
 msgid "可以先添加成员，或者切换筛选查看特定角色。"
@@ -6452,6 +6463,11 @@ msgstr "合計"
 msgid "当前共 {totalMemberCount} 人"
 msgstr "現在 {totalMemberCount} 人"
 
+#. placeholder {0}: initialValue.trim() || t(msg`暂未设置`)
+#: apps/app/src/routes/group-chat-edit-page.tsx:402
+msgid "当前内容：{0}"
+msgstr "現在の内容：{0}"
+
 #: apps/app/src/i18n/static-dom-seed.ts:356
 msgid "当前内容下的完整评论列表与回复输入区"
 msgstr "現在の内容のコメント一覧と返信入力欄"
@@ -7314,6 +7330,7 @@ msgstr ""
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1612
 #: apps/app/src/routes/group-chat-details-page.tsx:812
+#: apps/app/src/routes/group-chat-edit-page.tsx:240
 msgid "我在本群的昵称"
 msgstr "このグループでの自分のニックネーム"
 
@@ -7590,9 +7607,17 @@ msgstr ""
 msgid "打开桌面群公告..."
 msgstr ""
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:60
+msgid "打开桌面群昵称..."
+msgstr "デスクトップ版のグループニックネームを開いています..."
+
 #: apps/app/src/routes/group-chat-details-page.tsx:51
 msgid "打开桌面群聊信息..."
 msgstr "デスクトップのグループチャット情報を開いています..."
+
+#: apps/app/src/routes/group-chat-edit-page.tsx:60
+msgid "打开桌面群聊名称..."
+msgstr "デスクトップ版のグループ名を開いています..."
 
 #: apps/app/src/routes/group-message-search-page.tsx:30
 msgid "打开桌面群聊记录..."
@@ -8869,6 +8894,14 @@ msgstr "新しい友だち"
 msgid "新的朋友暂时不可用"
 msgstr ""
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:381
+msgid "新的群昵称"
+msgstr "新しいグループニックネーム"
+
+#: apps/app/src/routes/group-chat-edit-page.tsx:381
+msgid "新的群聊名称"
+msgstr "新しいグループ名"
+
 #: apps/app/src/components/chat-message-list.tsx:6043
 #: apps/app/src/i18n/static-dom-seed.ts:925
 msgid "新窗口打开"
@@ -9151,6 +9184,7 @@ msgstr "まだトリミングしていません"
 
 #: apps/app/src/i18n/static-dom-seed.ts:771
 #: apps/app/src/routes/group-announcement-page.tsx:457
+#: apps/app/src/routes/group-chat-edit-page.tsx:402
 msgid "暂未设置"
 msgstr "未設定"
 
@@ -10278,6 +10312,7 @@ msgstr "2 番目に優先される代替案"
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:148
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:169
 #: apps/app/src/routes/group-announcement-page.tsx:472
+#: apps/app/src/routes/group-chat-edit-page.tsx:423
 msgid "正在保存..."
 msgstr "保存中..."
 
@@ -10339,9 +10374,17 @@ msgstr ""
 msgid "正在切换到桌面聊天工作区中的群公告编辑视图。"
 msgstr ""
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:57
+msgid "正在切换到桌面聊天工作区中的群昵称编辑视图。"
+msgstr "デスクトップ版チャット作業エリアのグループニックネーム編集画面へ切り替えています。"
+
 #: apps/app/src/routes/group-chat-details-page.tsx:50
 msgid "正在切换到桌面聊天工作区中的群聊信息侧栏。"
 msgstr "デスクトップチャットワークスペースのグループ情報サイドバーに切り替えています。"
+
+#: apps/app/src/routes/group-chat-edit-page.tsx:56
+msgid "正在切换到桌面聊天工作区中的群聊名称编辑视图。"
+msgstr "デスクトップ版チャット作業エリアのグループ名編集画面へ切り替えています。"
 
 #: apps/app/src/routes/group-message-search-page.tsx:29
 msgid "正在切换到桌面聊天工作区中的群聊记录搜索侧栏。"
@@ -10551,6 +10594,10 @@ msgstr ""
 msgid "正在打开桌面群公告"
 msgstr ""
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:53
+msgid "正在打开桌面群昵称"
+msgstr "デスクトップ版のグループニックネームを開いています"
+
 #: apps/app/src/routes/group-chat-page.tsx:231
 msgid "正在打开桌面群聊"
 msgstr ""
@@ -10558,6 +10605,10 @@ msgstr ""
 #: apps/app/src/routes/group-chat-details-page.tsx:49
 msgid "正在打开桌面群聊信息"
 msgstr "デスクトップのグループチャット情報を開いています"
+
+#: apps/app/src/routes/group-chat-edit-page.tsx:53
+msgid "正在打开桌面群聊名称"
+msgstr "デスクトップ版のグループ名を開いています"
 
 #: apps/app/src/routes/group-message-search-page.tsx:28
 msgid "正在打开桌面群聊记录"
@@ -10826,6 +10877,7 @@ msgid "正在读取群消息..."
 msgstr ""
 
 #: apps/app/src/routes/group-chat-details-page.tsx:579
+#: apps/app/src/routes/group-chat-edit-page.tsx:249
 msgid "正在读取群聊信息"
 msgstr "グループチャット情報を読み込み中"
 
@@ -12309,6 +12361,10 @@ msgstr "少しお待ちください。本文を同期しています。"
 msgid "稍等一下，正在同步群成员、群资料和消息设置。"
 msgstr "しばらくお待ちください。グループメンバー、情報、メッセージ設定を同期しています。"
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:250
+msgid "稍等一下，正在同步群聊资料和当前昵称。"
+msgstr "少々お待ちを、グループ情報と現在のニックネームを同期中です。"
+
 #: apps/app/src/routes/group-qr-page.tsx:1090
 msgid "稍等一下，正在同步群资料和成员信息。"
 msgstr "グループ情報とメンバー情報を同期中です。しばらくお待ちください。"
@@ -12990,6 +13046,7 @@ msgstr "グループメンバー"
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1364
 #: apps/app/src/routes/group-chat-details-page.tsx:600
+#: apps/app/src/routes/group-chat-edit-page.tsx:291
 #: apps/app/src/routes/group-member-picker-page.tsx:509
 #: apps/app/src/routes/group-qr-page.tsx:1135
 msgid "群成员信息暂时不可用"
@@ -13052,6 +13109,7 @@ msgstr "グループ管理"
 #: apps/app/src/routes/group-chat-background-page.tsx:446
 #: apps/app/src/routes/group-chat-details-page.tsx:588
 #: apps/app/src/routes/group-chat-details-page.tsx:636
+#: apps/app/src/routes/group-chat-edit-page.tsx:351
 #: apps/app/src/routes/group-message-search-page.tsx:96
 #: apps/app/src/routes/group-qr-page.tsx:189
 #: apps/app/src/routes/group-qr-page.tsx:1100
@@ -13067,17 +13125,20 @@ msgstr ""
 #: apps/app/src/routes/group-chat-background-page.tsx:441
 #: apps/app/src/routes/group-chat-background-page.tsx:447
 #: apps/app/src/routes/group-chat-details-page.tsx:637
+#: apps/app/src/routes/group-chat-edit-page.tsx:352
 msgid "群聊不存在"
 msgstr "グループチャットが見つかりません"
 
 #: apps/app/src/routes/group-announcement-page.tsx:266
 #: apps/app/src/routes/group-chat-details-page.tsx:539
 #: apps/app/src/routes/group-chat-details-page.tsx:543
+#: apps/app/src/routes/group-chat-edit-page.tsx:241
 msgid "群聊信息"
 msgstr "グループチャット情報"
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1348
 #: apps/app/src/routes/group-chat-details-page.tsx:589
+#: apps/app/src/routes/group-chat-edit-page.tsx:259
 #: apps/app/src/routes/group-member-picker-page.tsx:477
 msgid "群聊信息暂时不可用"
 msgstr "グループチャット情報は一時的に利用できません"
@@ -13096,6 +13157,7 @@ msgstr ""
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1508
 #: apps/app/src/routes/group-chat-details-page.tsx:690
+#: apps/app/src/routes/group-chat-edit-page.tsx:240
 msgid "群聊名称"
 msgstr "グループ名"
 
@@ -14045,6 +14107,10 @@ msgstr "4〜6桁の数字パスコードを設定してください。"
 msgid "请输入世界主人的名字。"
 msgstr "ワールドオーナーの名前を入力してください。"
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:389
+msgid "请输入我在本群的昵称"
+msgstr "このグループでのニックネームを入力してください"
+
 #: apps/app/src/routes/welcome-page.tsx:854
 msgid "请输入手机号"
 msgstr "電話番号を入力"
@@ -14062,6 +14128,7 @@ msgid "请输入群昵称"
 msgstr "グループ内ニックネームを入力"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1391
+#: apps/app/src/routes/group-chat-edit-page.tsx:389
 msgid "请输入群聊名称"
 msgstr "グループチャット名を入力"
 
@@ -14095,6 +14162,7 @@ msgstr "認証コードを入力（デフォルトの 123456 で通過可能）"
 #: apps/app/src/routes/group-announcement-page.tsx:300
 #: apps/app/src/routes/group-chat-background-page.tsx:333
 #: apps/app/src/routes/group-chat-details-page.tsx:578
+#: apps/app/src/routes/group-chat-edit-page.tsx:248
 #: apps/app/src/routes/group-member-picker-page.tsx:462
 #: apps/app/src/routes/group-qr-page.tsx:1088
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:455
@@ -14126,6 +14194,8 @@ msgstr "画像の読み込みに失敗しました。別の画像で再試行し
 #: apps/app/src/routes/friend-requests-page.tsx:235
 #: apps/app/src/routes/group-chat-background-page.tsx:345
 #: apps/app/src/routes/group-chat-background-page.tsx:377
+#: apps/app/src/routes/group-chat-edit-page.tsx:258
+#: apps/app/src/routes/group-chat-edit-page.tsx:290
 #: apps/app/src/routes/group-member-picker-page.tsx:476
 #: apps/app/src/routes/group-member-picker-page.tsx:508
 #: apps/app/src/routes/group-member-picker-page.tsx:540
@@ -14491,6 +14561,7 @@ msgstr "前のステップに戻る"
 #: apps/app/src/routes/group-chat-background-page.tsx:465
 #: apps/app/src/routes/group-chat-details-page.tsx:134
 #: apps/app/src/routes/group-chat-details-page.tsx:167
+#: apps/app/src/routes/group-chat-edit-page.tsx:370
 #: apps/app/src/routes/group-qr-page.tsx:725
 #: apps/app/src/routes/group-qr-page.tsx:1122
 #: apps/app/src/routes/group-qr-page.tsx:1156
@@ -14555,6 +14626,7 @@ msgstr "メッセージに戻る"
 #: apps/app/src/routes/group-chat-background-page.tsx:465
 #: apps/app/src/routes/group-chat-details-page.tsx:134
 #: apps/app/src/routes/group-chat-details-page.tsx:167
+#: apps/app/src/routes/group-chat-edit-page.tsx:370
 msgid "返回消息列表"
 msgstr "メッセージ一覧に戻る"
 
@@ -14588,6 +14660,9 @@ msgstr "グループチャットへ戻る"
 #: apps/app/src/routes/group-chat-background-page.tsx:397
 #: apps/app/src/routes/group-chat-background-page.tsx:419
 #: apps/app/src/routes/group-chat-background-page.tsx:651
+#: apps/app/src/routes/group-chat-edit-page.tsx:279
+#: apps/app/src/routes/group-chat-edit-page.tsx:311
+#: apps/app/src/routes/group-chat-edit-page.tsx:340
 #: apps/app/src/routes/group-member-picker-page.tsx:497
 #: apps/app/src/routes/group-member-picker-page.tsx:529
 #: apps/app/src/routes/group-member-picker-page.tsx:561
@@ -14988,6 +15063,7 @@ msgstr "このグループには現在削除できるキャラクターメンバ
 #: apps/app/src/i18n/static-dom-seed.ts:1037
 #: apps/app/src/routes/group-announcement-page.tsx:415
 #: apps/app/src/routes/group-chat-background-page.tsx:448
+#: apps/app/src/routes/group-chat-edit-page.tsx:353
 msgid "这个群聊暂时不可用，可以先重试读取，或返回上一页后再试。"
 msgstr "このグループチャットは一時的に利用できません。読み込みを再試行するか、前のページに戻って後でお試しください。"
 
@@ -15620,6 +15696,7 @@ msgid "重试"
 msgstr "再試行"
 
 #: apps/app/src/routes/group-announcement-page.tsx:389
+#: apps/app/src/routes/group-chat-edit-page.tsx:333
 msgid "重试保存"
 msgstr ""
 
@@ -15803,6 +15880,9 @@ msgstr ""
 #: apps/app/src/routes/group-chat-background-page.tsx:389
 #: apps/app/src/routes/group-chat-background-page.tsx:457
 #: apps/app/src/routes/group-chat-details-page.tsx:148
+#: apps/app/src/routes/group-chat-edit-page.tsx:271
+#: apps/app/src/routes/group-chat-edit-page.tsx:303
+#: apps/app/src/routes/group-chat-edit-page.tsx:362
 #: apps/app/src/routes/group-member-picker-page.tsx:489
 #: apps/app/src/routes/group-member-picker-page.tsx:521
 #: apps/app/src/routes/group-member-picker-page.tsx:553

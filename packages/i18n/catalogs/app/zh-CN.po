@@ -220,9 +220,11 @@ msgstr "{0} 在{translatedSceneLabel}里注意到了你：{greeting}"
 
 #. placeholder {0}: draft.trim().length
 #. placeholder {0}: normalizedDraft.length
+#. placeholder {0}: trimmedDraft.length
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:129
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:150
 #: apps/app/src/routes/group-announcement-page.tsx:453
+#: apps/app/src/routes/group-chat-edit-page.tsx:399
 msgid "{0} 字"
 msgstr "{0} 字"
 
@@ -1763,6 +1765,10 @@ msgstr "会以当前会话作为来源，提交一次聊天场景投诉。"
 msgid "会同步到朋友圈时间线，适合发日常照片、短视频和临时心情。"
 msgstr "会同步到朋友圈时间线，适合发日常照片、短视频和临时心情。"
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:396
+msgid "会同步显示在聊天顶部和消息列表。"
+msgstr "会同步显示在聊天顶部和消息列表。"
+
 #: apps/app/src/features/subscription/subscription-panel.tsx:462
 #: apps/app/src/routes/profile-page.tsx:153
 #: apps/app/src/routes/profile-settings-page.tsx:57
@@ -1917,6 +1923,7 @@ msgstr "侧栏面板"
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:68
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:75
 #: apps/app/src/routes/character-detail-page.tsx:295
+#: apps/app/src/routes/group-chat-edit-page.tsx:423
 msgid "保存"
 msgstr "保存"
 
@@ -4158,6 +4165,10 @@ msgstr "另存图片"
 #: apps/app/src/components/chat-message-list.tsx:4171
 msgid "另存文件"
 msgstr "另存文件"
+
+#: apps/app/src/routes/group-chat-edit-page.tsx:397
+msgid "只在当前群聊里显示。"
+msgstr "只在当前群聊里显示。"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2115
 msgid "可以先添加成员，或者切换筛选查看特定角色。"
@@ -6454,6 +6465,11 @@ msgstr "当前共"
 msgid "当前共 {totalMemberCount} 人"
 msgstr "当前共 {totalMemberCount} 人"
 
+#. placeholder {0}: initialValue.trim() || t(msg`暂未设置`)
+#: apps/app/src/routes/group-chat-edit-page.tsx:402
+msgid "当前内容：{0}"
+msgstr "当前内容：{0}"
+
 #: apps/app/src/i18n/static-dom-seed.ts:356
 msgid "当前内容下的完整评论列表与回复输入区"
 msgstr "当前内容下的完整评论列表与回复输入区"
@@ -7316,6 +7332,7 @@ msgstr "我们正在判断是为这个邮箱创建新世界，还是唤醒它已
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1612
 #: apps/app/src/routes/group-chat-details-page.tsx:812
+#: apps/app/src/routes/group-chat-edit-page.tsx:240
 msgid "我在本群的昵称"
 msgstr "我在本群的昵称"
 
@@ -7592,9 +7609,17 @@ msgstr "打开桌面移除成员..."
 msgid "打开桌面群公告..."
 msgstr "打开桌面群公告..."
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:60
+msgid "打开桌面群昵称..."
+msgstr "打开桌面群昵称..."
+
 #: apps/app/src/routes/group-chat-details-page.tsx:51
 msgid "打开桌面群聊信息..."
 msgstr "打开桌面群聊信息..."
+
+#: apps/app/src/routes/group-chat-edit-page.tsx:60
+msgid "打开桌面群聊名称..."
+msgstr "打开桌面群聊名称..."
 
 #: apps/app/src/routes/group-message-search-page.tsx:30
 msgid "打开桌面群聊记录..."
@@ -8871,6 +8896,14 @@ msgstr "新的朋友"
 msgid "新的朋友暂时不可用"
 msgstr "新的朋友暂时不可用"
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:381
+msgid "新的群昵称"
+msgstr "新的群昵称"
+
+#: apps/app/src/routes/group-chat-edit-page.tsx:381
+msgid "新的群聊名称"
+msgstr "新的群聊名称"
+
 #: apps/app/src/components/chat-message-list.tsx:6043
 #: apps/app/src/i18n/static-dom-seed.ts:925
 msgid "新窗口打开"
@@ -9153,6 +9186,7 @@ msgstr "暂未裁剪"
 
 #: apps/app/src/i18n/static-dom-seed.ts:771
 #: apps/app/src/routes/group-announcement-page.tsx:457
+#: apps/app/src/routes/group-chat-edit-page.tsx:402
 msgid "暂未设置"
 msgstr "暂未设置"
 
@@ -10280,6 +10314,7 @@ msgstr "次优先备选"
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:148
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:169
 #: apps/app/src/routes/group-announcement-page.tsx:472
+#: apps/app/src/routes/group-chat-edit-page.tsx:423
 msgid "正在保存..."
 msgstr "正在保存..."
 
@@ -10341,9 +10376,17 @@ msgstr "正在切换到桌面聊天工作区中的移除成员弹层。"
 msgid "正在切换到桌面聊天工作区中的群公告编辑视图。"
 msgstr "正在切换到桌面聊天工作区中的群公告编辑视图。"
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:57
+msgid "正在切换到桌面聊天工作区中的群昵称编辑视图。"
+msgstr "正在切换到桌面聊天工作区中的群昵称编辑视图。"
+
 #: apps/app/src/routes/group-chat-details-page.tsx:50
 msgid "正在切换到桌面聊天工作区中的群聊信息侧栏。"
 msgstr "正在切换到桌面聊天工作区中的群聊信息侧栏。"
+
+#: apps/app/src/routes/group-chat-edit-page.tsx:56
+msgid "正在切换到桌面聊天工作区中的群聊名称编辑视图。"
+msgstr "正在切换到桌面聊天工作区中的群聊名称编辑视图。"
 
 #: apps/app/src/routes/group-message-search-page.tsx:29
 msgid "正在切换到桌面聊天工作区中的群聊记录搜索侧栏。"
@@ -10553,6 +10596,10 @@ msgstr "正在打开桌面移除成员"
 msgid "正在打开桌面群公告"
 msgstr "正在打开桌面群公告"
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:53
+msgid "正在打开桌面群昵称"
+msgstr "正在打开桌面群昵称"
+
 #: apps/app/src/routes/group-chat-page.tsx:231
 msgid "正在打开桌面群聊"
 msgstr "正在打开桌面群聊"
@@ -10560,6 +10607,10 @@ msgstr "正在打开桌面群聊"
 #: apps/app/src/routes/group-chat-details-page.tsx:49
 msgid "正在打开桌面群聊信息"
 msgstr "正在打开桌面群聊信息"
+
+#: apps/app/src/routes/group-chat-edit-page.tsx:53
+msgid "正在打开桌面群聊名称"
+msgstr "正在打开桌面群聊名称"
 
 #: apps/app/src/routes/group-message-search-page.tsx:28
 msgid "正在打开桌面群聊记录"
@@ -10828,6 +10879,7 @@ msgid "正在读取群消息..."
 msgstr "正在读取群消息..."
 
 #: apps/app/src/routes/group-chat-details-page.tsx:579
+#: apps/app/src/routes/group-chat-edit-page.tsx:249
 msgid "正在读取群聊信息"
 msgstr "正在读取群聊信息"
 
@@ -12311,6 +12363,10 @@ msgstr "稍等一下，正在同步正文内容。"
 msgid "稍等一下，正在同步群成员、群资料和消息设置。"
 msgstr "稍等一下，正在同步群成员、群资料和消息设置。"
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:250
+msgid "稍等一下，正在同步群聊资料和当前昵称。"
+msgstr "稍等一下，正在同步群聊资料和当前昵称。"
+
 #: apps/app/src/routes/group-qr-page.tsx:1090
 msgid "稍等一下，正在同步群资料和成员信息。"
 msgstr "稍等一下，正在同步群资料和成员信息。"
@@ -12992,6 +13048,7 @@ msgstr "群成员"
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1364
 #: apps/app/src/routes/group-chat-details-page.tsx:600
+#: apps/app/src/routes/group-chat-edit-page.tsx:291
 #: apps/app/src/routes/group-member-picker-page.tsx:509
 #: apps/app/src/routes/group-qr-page.tsx:1135
 msgid "群成员信息暂时不可用"
@@ -13054,6 +13111,7 @@ msgstr "群管理"
 #: apps/app/src/routes/group-chat-background-page.tsx:446
 #: apps/app/src/routes/group-chat-details-page.tsx:588
 #: apps/app/src/routes/group-chat-details-page.tsx:636
+#: apps/app/src/routes/group-chat-edit-page.tsx:351
 #: apps/app/src/routes/group-message-search-page.tsx:96
 #: apps/app/src/routes/group-qr-page.tsx:189
 #: apps/app/src/routes/group-qr-page.tsx:1100
@@ -13069,17 +13127,20 @@ msgstr "群聊 · 免打扰"
 #: apps/app/src/routes/group-chat-background-page.tsx:441
 #: apps/app/src/routes/group-chat-background-page.tsx:447
 #: apps/app/src/routes/group-chat-details-page.tsx:637
+#: apps/app/src/routes/group-chat-edit-page.tsx:352
 msgid "群聊不存在"
 msgstr "群聊不存在"
 
 #: apps/app/src/routes/group-announcement-page.tsx:266
 #: apps/app/src/routes/group-chat-details-page.tsx:539
 #: apps/app/src/routes/group-chat-details-page.tsx:543
+#: apps/app/src/routes/group-chat-edit-page.tsx:241
 msgid "群聊信息"
 msgstr "群聊信息"
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1348
 #: apps/app/src/routes/group-chat-details-page.tsx:589
+#: apps/app/src/routes/group-chat-edit-page.tsx:259
 #: apps/app/src/routes/group-member-picker-page.tsx:477
 msgid "群聊信息暂时不可用"
 msgstr "群聊信息暂时不可用"
@@ -13098,6 +13159,7 @@ msgstr "群聊可设置专属背景，优先级高于默认背景图。"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1508
 #: apps/app/src/routes/group-chat-details-page.tsx:690
+#: apps/app/src/routes/group-chat-edit-page.tsx:240
 msgid "群聊名称"
 msgstr "群聊名称"
 
@@ -14047,6 +14109,10 @@ msgstr "请设置 4 到 6 位数字口令。"
 msgid "请输入世界主人的名字。"
 msgstr "请输入世界主人的名字。"
 
+#: apps/app/src/routes/group-chat-edit-page.tsx:389
+msgid "请输入我在本群的昵称"
+msgstr "请输入我在本群的昵称"
+
 #: apps/app/src/routes/welcome-page.tsx:854
 msgid "请输入手机号"
 msgstr "请输入手机号"
@@ -14064,6 +14130,7 @@ msgid "请输入群昵称"
 msgstr "请输入群昵称"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1391
+#: apps/app/src/routes/group-chat-edit-page.tsx:389
 msgid "请输入群聊名称"
 msgstr "请输入群聊名称"
 
@@ -14097,6 +14164,7 @@ msgstr "请输入验证码（默认 123456 即可通过）"
 #: apps/app/src/routes/group-announcement-page.tsx:300
 #: apps/app/src/routes/group-chat-background-page.tsx:333
 #: apps/app/src/routes/group-chat-details-page.tsx:578
+#: apps/app/src/routes/group-chat-edit-page.tsx:248
 #: apps/app/src/routes/group-member-picker-page.tsx:462
 #: apps/app/src/routes/group-qr-page.tsx:1088
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:455
@@ -14128,6 +14196,8 @@ msgstr "读取图片失败，请换一张再试。"
 #: apps/app/src/routes/friend-requests-page.tsx:235
 #: apps/app/src/routes/group-chat-background-page.tsx:345
 #: apps/app/src/routes/group-chat-background-page.tsx:377
+#: apps/app/src/routes/group-chat-edit-page.tsx:258
+#: apps/app/src/routes/group-chat-edit-page.tsx:290
 #: apps/app/src/routes/group-member-picker-page.tsx:476
 #: apps/app/src/routes/group-member-picker-page.tsx:508
 #: apps/app/src/routes/group-member-picker-page.tsx:540
@@ -14493,6 +14563,7 @@ msgstr "返回上一步"
 #: apps/app/src/routes/group-chat-background-page.tsx:465
 #: apps/app/src/routes/group-chat-details-page.tsx:134
 #: apps/app/src/routes/group-chat-details-page.tsx:167
+#: apps/app/src/routes/group-chat-edit-page.tsx:370
 #: apps/app/src/routes/group-qr-page.tsx:725
 #: apps/app/src/routes/group-qr-page.tsx:1122
 #: apps/app/src/routes/group-qr-page.tsx:1156
@@ -14557,6 +14628,7 @@ msgstr "返回消息"
 #: apps/app/src/routes/group-chat-background-page.tsx:465
 #: apps/app/src/routes/group-chat-details-page.tsx:134
 #: apps/app/src/routes/group-chat-details-page.tsx:167
+#: apps/app/src/routes/group-chat-edit-page.tsx:370
 msgid "返回消息列表"
 msgstr "返回消息列表"
 
@@ -14590,6 +14662,9 @@ msgstr "返回群聊"
 #: apps/app/src/routes/group-chat-background-page.tsx:397
 #: apps/app/src/routes/group-chat-background-page.tsx:419
 #: apps/app/src/routes/group-chat-background-page.tsx:651
+#: apps/app/src/routes/group-chat-edit-page.tsx:279
+#: apps/app/src/routes/group-chat-edit-page.tsx:311
+#: apps/app/src/routes/group-chat-edit-page.tsx:340
 #: apps/app/src/routes/group-member-picker-page.tsx:497
 #: apps/app/src/routes/group-member-picker-page.tsx:529
 #: apps/app/src/routes/group-member-picker-page.tsx:561
@@ -14990,6 +15065,7 @@ msgstr "这个群目前没有可移除的角色成员。"
 #: apps/app/src/i18n/static-dom-seed.ts:1037
 #: apps/app/src/routes/group-announcement-page.tsx:415
 #: apps/app/src/routes/group-chat-background-page.tsx:448
+#: apps/app/src/routes/group-chat-edit-page.tsx:353
 msgid "这个群聊暂时不可用，可以先重试读取，或返回上一页后再试。"
 msgstr "这个群聊暂时不可用，可以先重试读取，或返回上一页后再试。"
 
@@ -15622,6 +15698,7 @@ msgid "重试"
 msgstr "重试"
 
 #: apps/app/src/routes/group-announcement-page.tsx:389
+#: apps/app/src/routes/group-chat-edit-page.tsx:333
 msgid "重试保存"
 msgstr "重试保存"
 
@@ -15805,6 +15882,9 @@ msgstr "重试评论点赞"
 #: apps/app/src/routes/group-chat-background-page.tsx:389
 #: apps/app/src/routes/group-chat-background-page.tsx:457
 #: apps/app/src/routes/group-chat-details-page.tsx:148
+#: apps/app/src/routes/group-chat-edit-page.tsx:271
+#: apps/app/src/routes/group-chat-edit-page.tsx:303
+#: apps/app/src/routes/group-chat-edit-page.tsx:362
 #: apps/app/src/routes/group-member-picker-page.tsx:489
 #: apps/app/src/routes/group-member-picker-page.tsx:521
 #: apps/app/src/routes/group-member-picker-page.tsx:553
