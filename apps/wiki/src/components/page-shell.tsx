@@ -27,7 +27,7 @@ export function PageShell({
     <div
       className={
         narrow
-          ? "mx-auto w-full max-w-md space-y-5"
+          ? "mx-auto w-full max-w-md space-y-5 px-4 sm:px-0"
           : "mx-auto w-full space-y-6"
       }
     >

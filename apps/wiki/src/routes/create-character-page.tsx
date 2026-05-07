@@ -5,7 +5,7 @@ import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CharacterBlueprintRecipe } from "@yinjie/contracts";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppSection,
   Button,
@@ -28,14 +28,17 @@ function splitList(value: string): string[] {
 }
 
 export function CreateCharacterPage() {
-  const t = translateRuntimeMessage;
+  const t = useRuntimeTranslator();
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [characterId, setCharacterId] = useState("");
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState("");
-  const [relationship, setRelationship] = useState(t(msg`世界角色`));
+  // 默认值仅在用户未填写时生效；切换语言时依然展示首次渲染时的字面量。
+  const [relationship, setRelationship] = useState(() =>
+    t(msg`世界角色`),
+  );
   const [relationshipType, setRelationshipType] = useState("custom");
   const [bio, setBio] = useState("");
   const [personality, setPersonality] = useState("");
@@ -254,11 +257,12 @@ export function CreateCharacterPage() {
 }
 
 function buildDefaultRecipe(): CharacterBlueprintRecipe {
-  const t = translateRuntimeMessage;
+  // identity.name / relationship 这里给空串占位；提交前 mergeContentIntoRecipe
+  // 会用表单中的实际值覆盖，所以默认值不会被用户看到，无需国际化。
   return {
     identity: {
-      name: t(msg`未命名角色`),
-      relationship: t(msg`世界角色`),
+      name: "",
+      relationship: "",
       relationshipType: "custom",
       avatar: "",
       bio: "",

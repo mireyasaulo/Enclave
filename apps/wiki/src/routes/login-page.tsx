@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   AppSection,
@@ -19,7 +19,16 @@ type Mode = "password" | "email";
 export function LoginPage() {
   const t = translateRuntimeMessage;
   const navigate = useNavigate();
+  const { redirect } = useSearch({ from: "/login" }) as { redirect?: string };
   const [mode, setMode] = useState<Mode>("password");
+
+  function gotoTarget() {
+    if (redirect && redirect.startsWith("/")) {
+      window.location.href = redirect;
+    } else {
+      void navigate({ to: "/" });
+    }
+  }
 
   return (
     <PageShell narrow eyebrow={t(msg`账号`)} title={t(msg`登录`)}>
@@ -44,9 +53,9 @@ export function LoginPage() {
         </div>
 
         {mode === "password" ? (
-          <PasswordForm onSuccess={() => void navigate({ to: "/" })} />
+          <PasswordForm onSuccess={gotoTarget} />
         ) : (
-          <EmailCodeForm onSuccess={() => void navigate({ to: "/" })} />
+          <EmailCodeForm onSuccess={gotoTarget} />
         )}
 
         <div className="mt-4 text-center text-sm text-[color:var(--text-muted)]">

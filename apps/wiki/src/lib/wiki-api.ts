@@ -40,7 +40,18 @@ async function request<T>(
     }
   }
   if (!res.ok) {
-    if (res.status === 401) clearSession();
+    if (res.status === 401) {
+      clearSession();
+      // 不在登录/注册流程上的页面，直接跳登录页避免假死。
+      if (
+        typeof window !== "undefined" &&
+        !window.location.pathname.startsWith("/login") &&
+        !window.location.pathname.startsWith("/register")
+      ) {
+        const redirect = window.location.pathname + window.location.search;
+        window.location.href = `/login?redirect=${encodeURIComponent(redirect)}`;
+      }
+    }
     const message =
       (payload && typeof payload === "object" && "message" in payload
         ? String((payload as { message: unknown }).message)

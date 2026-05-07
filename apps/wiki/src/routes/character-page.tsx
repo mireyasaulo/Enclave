@@ -93,64 +93,67 @@ export function CharacterPage() {
           </TabButton>
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          {pageQ.data && (
-            <ProtectionInfo level={pageQ.data.page.protectionLevel} />
-          )}
-          {isDeleted && (
-            <StatusPill>
-              <Trans>已删除</Trans>
-            </StatusPill>
-          )}
-          {isPendingCreate && (
-            <StatusPill>
-              <Trans>待创建</Trans>
-            </StatusPill>
-          )}
-          {pageQ.data?.pendingRevision && (
-            <StatusPill>
-              <Trans>有待审版本</Trans>
-            </StatusPill>
-          )}
-          {viewerCanSeeCurrent &&
-            pageQ.data?.latestRevision?.id !==
-              pageQ.data?.stableRevision?.id && (
-              <div className="inline-flex overflow-hidden rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] text-xs shadow-[var(--shadow-soft)]">
-                <button
-                  type="button"
-                  className={`px-3 py-1.5 ${
-                    viewMode === "stable"
-                      ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
-                      : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
-                  }`}
-                  onClick={() => setViewMode("stable")}
-                >
-                  <Trans>稳定版</Trans>
-                </button>
-                <button
-                  type="button"
-                  className={`px-3 py-1.5 ${
-                    viewMode === "current"
-                      ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
-                      : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
-                  }`}
-                  onClick={() => setViewMode("current")}
-                >
-                  <Trans>最新版</Trans>
-                </button>
-              </div>
-            )}
           <WatchToggle characterId={characterId} />
-          {user && pageQ.data && (
-            <Button
-              size="sm"
-              variant={isDeleted ? "primary" : "danger"}
-              disabled={softDeleteMut.isPending}
-              onClick={() => setShowLifecycleForm((value) => !value)}
-            >
-              {isDeleted ? t(msg`申请恢复`) : t(msg`申请删除`)}
-            </Button>
-          )}
         </div>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        {pageQ.data && (
+          <ProtectionInfo level={pageQ.data.page.protectionLevel} />
+        )}
+        {isDeleted && (
+          <StatusPill>
+            <Trans>已删除</Trans>
+          </StatusPill>
+        )}
+        {isPendingCreate && (
+          <StatusPill>
+            <Trans>待创建</Trans>
+          </StatusPill>
+        )}
+        {pageQ.data?.pendingRevision && (
+          <StatusPill>
+            <Trans>有待审版本</Trans>
+          </StatusPill>
+        )}
+        {viewerCanSeeCurrent &&
+          pageQ.data?.latestRevision?.id !==
+            pageQ.data?.stableRevision?.id && (
+            <div className="inline-flex overflow-hidden rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] text-xs shadow-[var(--shadow-soft)]">
+              <button
+                type="button"
+                className={`px-3 py-1.5 ${
+                  viewMode === "stable"
+                    ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
+                    : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+                }`}
+                onClick={() => setViewMode("stable")}
+              >
+                <Trans>稳定版</Trans>
+              </button>
+              <button
+                type="button"
+                className={`px-3 py-1.5 ${
+                  viewMode === "current"
+                    ? "bg-[image:var(--brand-gradient)] text-[color:var(--text-on-brand)]"
+                    : "text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+                }`}
+                onClick={() => setViewMode("current")}
+              >
+                <Trans>最新版</Trans>
+              </button>
+            </div>
+          )}
+        {user && pageQ.data && (
+          <Button
+            size="sm"
+            variant={isDeleted ? "primary" : "danger"}
+            className="ml-auto"
+            disabled={softDeleteMut.isPending}
+            onClick={() => setShowLifecycleForm((value) => !value)}
+          >
+            {isDeleted ? t(msg`申请恢复`) : t(msg`申请删除`)}
+          </Button>
+        )}
       </div>
 
       {showLifecycleForm && (
@@ -299,7 +302,7 @@ function ReadView({ view }: { view: WikiPageView }) {
           <img
             src={c.avatar}
             alt={c.name}
-            className="w-20 h-20 rounded-full object-cover bg-gray-100"
+            className="w-20 h-20 rounded-full object-cover bg-[color:var(--surface-soft)]"
           />
         )}
         <div className="flex-1">

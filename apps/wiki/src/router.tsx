@@ -102,6 +102,12 @@ const indexRoute = createRoute({
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { redirect?: string } =>
+    typeof search.redirect === "string" && search.redirect.length > 0
+      ? { redirect: search.redirect }
+      : {},
   component: LoginPage,
 });
 

@@ -19,11 +19,19 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const passwordMismatch =
+    confirmPassword.length > 0 && confirmPassword !== password;
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setError(t(msg`两次输入的密码不一致`));
+      return;
+    }
     setError(null);
     setLoading(true);
     try {
@@ -66,11 +74,27 @@ export function RegisterPage() {
               minLength={6}
             />
           </FormRow>
+          <FormRow
+            label={t(msg`确认密码`)}
+            hint={
+              passwordMismatch
+                ? t(msg`两次输入不一致`)
+                : t(msg`再输一次以确认`)
+            }
+          >
+            <TextField
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              minLength={6}
+            />
+          </FormRow>
           {error && <InlineNotice tone="danger">{error}</InlineNotice>}
           <Button
             type="submit"
             variant="primary"
-            disabled={loading}
+            disabled={loading || passwordMismatch || confirmPassword.length === 0}
             className="w-full"
           >
             {loading ? t(msg`注册中...`) : t(msg`注册`)}
