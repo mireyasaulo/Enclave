@@ -5,15 +5,16 @@ import { getServerI18n } from "@/i18n/server";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-export function generateImageMetadata({
+export async function generateImageMetadata({
   params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
   return [
     {
       id: "default",
-      alt: `Enclave OG (${params.locale})`,
+      alt: `Enclave OG (${locale})`,
       size,
       contentType,
     },
