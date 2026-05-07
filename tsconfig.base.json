@@ -15,6 +15,12 @@
       "@yinjie/contracts": [
         "packages/contracts/src/index.ts"
       ],
+      "@yinjie/analytics": [
+        "packages/analytics/src/index.ts"
+      ],
+      "@yinjie/analytics/next": [
+        "packages/analytics/src/next.tsx"
+      ],
       "@yinjie/config": [
         "packages/config/src/index.ts"
       ],

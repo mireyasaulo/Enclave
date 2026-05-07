@@ -555,6 +555,22 @@ importers:
         specifier: ^6.1.0
         version: 6.4.1
 
+  packages/analytics:
+    dependencies:
+      '@yinjie/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      react:
+        specifier: ^19.0.0
+        version: 19.2.4
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.4(react@19.2.4)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.10
+        version: 19.2.14
+
   packages/config:
     dependencies:
       zod:
