@@ -265,10 +265,10 @@ export function ContactDetailPane({
       <DesktopContactProfileSection title="社交与内容">
         <DesktopContactProfileActionRow
           label="朋友圈"
-          value={onOpenMoments ? "查看这位角色最近的朋友圈" : "查看角色资料"}
-          onClick={onOpenMoments ?? onOpenProfile}
-          disabled={!onOpenMoments && !onOpenProfile}
-          valueMuted={!onOpenMoments && !onOpenProfile}
+          value={onOpenMoments ? "查看这位角色最近的朋友圈" : "暂时没有朋友圈"}
+          onClick={onOpenMoments}
+          disabled={!onOpenMoments}
+          valueMuted={!onOpenMoments}
         />
         <DesktopContactProfileActionRow
           label="共同群聊"
