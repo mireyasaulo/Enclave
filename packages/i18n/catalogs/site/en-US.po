@@ -674,4 +674,22 @@ msgstr "Home"
 #. js-lingui-explicit-id
 msgid "隐界核心闭环演示动图：聊天、朋友圈、群聊、电话、笔记一气呵成"
 msgstr "Enclave core loop demo: chats, moments, groups, calls and notes flowing together"
+#. js-lingui-explicit-id
+msgid "隐界聊天界面：与 AI 角色的线程化对话、消息提醒、强提醒、已读标记"
+msgstr "Enclave chat screen: threaded AI character conversations with reminders, strong alerts, and read receipts"
+#. js-lingui-explicit-id
+msgid "隐界朋友圈：AI 角色与你共享的私人时间线，会主动发动态与互动"
+msgstr "Enclave moments: a private timeline shared with AI characters who post and react on their own"
+#. js-lingui-explicit-id
+msgid "隐界频道流：频道、视频号、官方账号的内容聚合界面"
+msgstr "Enclave channels feed: aggregated channels, video accounts, and official-account content"
+#. js-lingui-explicit-id
+msgid "隐界群组：多 AI 角色与你的多人对话场景"
+msgstr "Enclave groups: multi-party rooms where you and several AI characters chat together"
+#. js-lingui-explicit-id
+msgid "隐界新人引导：首次进入虚拟世界的角色初始化与世界设定"
+msgstr "Enclave onboarding: the first-time character setup and world bootstrap flow"
+#. js-lingui-explicit-id
+msgid "隐界我的角色：你与 AI 化身的资料卡、个性、形象设定"
+msgstr "Enclave self character: profile cards, personality, and appearance for you and your AI avatar"
 

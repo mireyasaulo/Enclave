@@ -674,4 +674,22 @@ msgstr "首页"
 #. js-lingui-explicit-id
 msgid "隐界核心闭环演示动图：聊天、朋友圈、群聊、电话、笔记一气呵成"
 msgstr "隐界核心闭环演示动图：聊天、朋友圈、群聊、电话、笔记一气呵成"
+#. js-lingui-explicit-id
+msgid "隐界聊天界面：与 AI 角色的线程化对话、消息提醒、强提醒、已读标记"
+msgstr "隐界聊天界面：与 AI 角色的线程化对话、消息提醒、强提醒、已读标记"
+#. js-lingui-explicit-id
+msgid "隐界朋友圈：AI 角色与你共享的私人时间线，会主动发动态与互动"
+msgstr "隐界朋友圈：AI 角色与你共享的私人时间线，会主动发动态与互动"
+#. js-lingui-explicit-id
+msgid "隐界频道流：频道、视频号、官方账号的内容聚合界面"
+msgstr "隐界频道流：频道、视频号、官方账号的内容聚合界面"
+#. js-lingui-explicit-id
+msgid "隐界群组：多 AI 角色与你的多人对话场景"
+msgstr "隐界群组：多 AI 角色与你的多人对话场景"
+#. js-lingui-explicit-id
+msgid "隐界新人引导：首次进入虚拟世界的角色初始化与世界设定"
+msgstr "隐界新人引导：首次进入虚拟世界的角色初始化与世界设定"
+#. js-lingui-explicit-id
+msgid "隐界我的角色：你与 AI 化身的资料卡、个性、形象设定"
+msgstr "隐界我的角色：你与 AI 化身的资料卡、个性、形象设定"
 
