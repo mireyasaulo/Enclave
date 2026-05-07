@@ -1,10 +1,28 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
+import { Inter, Noto_Sans_SC } from "next/font/google";
 import { DEFAULT_LOCALE, isSupportedLocale, type SupportedLocale } from "@/lib/locales";
 import { SITE_BASE_URL } from "@/lib/seo-metadata";
 import { siteLinks } from "@/lib/site-links";
 import { SiteAnalyticsProvider } from "@/components/site-analytics-provider";
 import "./globals.css";
+
+// Self-host fonts via next/font: avoids fonts.gstatic.com round-trip,
+// gets font-display: swap for free, and Next preloads the latin face.
+// Noto Sans SC is heavy (CJK) — preload disabled, browser fetches on use.
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-sans-latin",
+});
+
+const notoSansSC = Noto_Sans_SC({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-sans-cjk",
+  preload: false,
+});
 
 // Origin for preconnect/dns-prefetch — strip path/query, keep scheme + host + port.
 const SAAS_ORIGIN = (() => {
@@ -76,7 +94,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const h = await headers();
   const locale = pickLocaleFromPath(h.get("x-pathname"));
   return (
-    <html lang={locale}>
+    <html lang={locale} className={`${inter.variable} ${notoSansSC.variable}`}>
       <head>
         {SAAS_ORIGIN ? (
           <>
