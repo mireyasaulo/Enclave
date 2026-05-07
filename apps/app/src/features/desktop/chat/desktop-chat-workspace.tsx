@@ -61,6 +61,7 @@ import { EmptyState } from "../../../components/empty-state";
 import { GroupAvatarChip } from "../../../components/group-avatar-chip";
 import { OfficialAccountsEntryCard } from "../../../components/official-accounts-entry-card";
 import { OfficialServiceConversationCard } from "../../../components/official-service-conversation-card";
+import { SparkBadge } from "../../../components/spark-badge";
 import { SubscriptionInboxCard } from "../../../components/subscription-inbox-card";
 import { DesktopOfficialAccountsWorkspace } from "../official-accounts/desktop-official-accounts-workspace";
 import { DesktopSubscriptionWorkspace } from "../official-accounts/desktop-subscription-workspace";
@@ -2628,12 +2629,17 @@ function ConversationCardLink({
               </span>
             ) : null}
           </div>
-          <div className="shrink-0 text-[11px] text-[color:var(--text-muted)]">
-            {formatConversationTimestamp(
-              visibleLastMessage?.createdAt ??
-                conversation.lastMessage?.createdAt ??
-                conversation.updatedAt,
-            )}
+          <div className="flex shrink-0 items-center gap-1.5 text-[11px] text-[color:var(--text-muted)]">
+            {conversation.sparkStreak ? (
+              <SparkBadge streak={conversation.sparkStreak} size="sm" />
+            ) : null}
+            <span>
+              {formatConversationTimestamp(
+                visibleLastMessage?.createdAt ??
+                  conversation.lastMessage?.createdAt ??
+                  conversation.updatedAt,
+              )}
+            </span>
           </div>
         </div>
         <div className="mt-1 flex items-center justify-between gap-3">

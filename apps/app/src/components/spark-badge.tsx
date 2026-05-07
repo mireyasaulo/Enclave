@@ -14,7 +14,7 @@ const TIER_TEXT_COLOR: Record<1 | 2 | 3 | 4 | 5, string> = {
   2: "text-[#e8423d]",
   3: "text-[#3578e5]",
   4: "text-[#c81d39]",
-  5: "text-[#b8460f]",
+  5: "text-[#d97706]",
 };
 
 const SIZE_PRESETS = {
@@ -39,7 +39,7 @@ export function SparkBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center font-semibold leading-none tabular-nums",
+        "inline-flex shrink-0 items-center font-semibold leading-none tabular-nums",
         preset.gap,
         preset.text,
         TIER_TEXT_COLOR[tier],

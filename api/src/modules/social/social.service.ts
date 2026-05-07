@@ -869,24 +869,37 @@ export class SocialService {
     const now = new Date();
     const today = formatLocalDate(now);
     const yesterday = formatLocalDate(addDays(now, -1));
+
     const stale = await this.friendshipRepo
       .createQueryBuilder('f')
       .where('f.sparkStreak > 0')
+      .andWhere(
+        '(f.sparkLastDay IS NULL OR (f.sparkLastDay <> :today AND f.sparkLastDay <> :yesterday))',
+        { today, yesterday },
+      )
+      .select(['f.id', 'f.ownerId', 'f.characterId'])
       .getMany();
 
-    let resetCount = 0;
+    if (stale.length === 0) return 0;
+
+    await this.friendshipRepo
+      .createQueryBuilder()
+      .update(FriendshipEntity)
+      .set({ sparkStreak: 0, sparkStartedAt: null })
+      .whereInIds(stale.map((f) => f.id))
+      .andWhere(
+        '(sparkLastDay IS NULL OR (sparkLastDay <> :today AND sparkLastDay <> :yesterday))',
+        { today, yesterday },
+      )
+      .execute();
+
     for (const f of stale) {
-      if (f.sparkLastDay === today || f.sparkLastDay === yesterday) continue;
-      f.sparkStreak = 0;
-      f.sparkStartedAt = null;
-      await this.friendshipRepo.save(f);
       this.eventBus.emit(AppEvents.SPARK_RESET, {
         ownerId: f.ownerId,
         characterId: f.characterId,
       });
-      resetCount++;
     }
-    return resetCount;
+    return stale.length;
   }
 
   private async activateFriendship(
