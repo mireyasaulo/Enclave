@@ -26,6 +26,7 @@ import {
 } from "@yinjie/contracts";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { ChatComposer } from "../../components/chat-composer";
+import { FeatureUnavailableDialog } from "../../components/feature-unavailable-dialog";
 import { ChatMessageList } from "../../components/chat-message-list";
 import {
   encodeChatReplyText,
@@ -991,9 +992,10 @@ export function GroupChatThreadPanel({
     });
   };
 
+  const [callUnavailableKind, setCallUnavailableKind] =
+    useState<DesktopChatCallKind | null>(null);
   const handleDesktopCallAction = (kind: DesktopChatCallKind) => {
-    const label = kind === "video" ? "视频通话" : "语音通话";
-    window.alert(`${label}功能开发中，敬请期待`);
+    setCallUnavailableKind(kind);
   };
 
   useEffect(() => {
@@ -1538,6 +1540,17 @@ export function GroupChatThreadPanel({
           onSubmit={() => void handleSubmit()}
         />
       ) : null}
+
+      <FeatureUnavailableDialog
+        open={callUnavailableKind !== null}
+        title={
+          callUnavailableKind === "video"
+            ? "视频通话功能开发中"
+            : "语音通话功能开发中"
+        }
+        description="该功能暂未开放，敬请期待。"
+        onClose={() => setCallUnavailableKind(null)}
+      />
     </div>
   );
 }
