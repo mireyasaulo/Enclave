@@ -157,6 +157,11 @@ msgid "{0} {label}"
 msgstr "{0} {label}"
 
 #. placeholder {0}: commonGroups.length
+#. placeholder {0}: pinnedMiniPrograms.length
+#. placeholder {0}: recentMiniPrograms.length
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:320
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:354
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:450
 #: apps/app/src/routes/character-detail-page.tsx:1722
 msgid "{0} 个"
 msgstr "{0} 个"
@@ -1176,10 +1181,17 @@ msgstr "上传表情失败，请稍后再试。"
 msgid "上次发送于 {0}"
 msgstr "上次发送于 {0}"
 
+#. placeholder {0}: formatConversationTimestamp( lastOpenedAtById[miniProgram.id], )
 #. placeholder {0}: formatConversationTimestamp(lastOpenedAt)
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:332
 #: apps/app/src/routes/desktop-mobile-page.tsx:2192
 msgid "上次打开 {0}"
 msgstr "上次打开 {0}"
+
+#. placeholder {0}: formatConversationTimestamp(lastOpenedAt)
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:683
+msgid "上次打开 {0} · 已打开 {launchCount} 次"
+msgstr "上次打开 {0} · 已打开 {launchCount} 次"
 
 #: apps/app/src/i18n/static-dom-seed.ts:370
 msgid "上次邀约 4/10 · 04/10, 07:22 PM"
@@ -1684,6 +1696,7 @@ msgstr "今天这张背景，像不像我们刚刚路过的天气？"
 msgid "今日安排"
 msgstr "今日安排"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:402
 #: apps/app/src/i18n/static-dom-seed.ts:182
 msgid "今日推荐"
 msgstr "今日推荐"
@@ -2383,6 +2396,10 @@ msgstr "先生成临时候选，你决定要不要把他留下。"
 msgid "先看完整列表，再继续加人、减人或跳转资料。"
 msgstr "先看完整列表，再继续加人、减人或跳转资料。"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:393
+msgid "先看看当前推荐"
+msgstr "先看看当前推荐"
+
 #: apps/app/src/i18n/static-dom-seed.ts:109
 msgid "先看编辑推荐、活动位和最近玩过。"
 msgstr "先看编辑推荐、活动位和最近玩过。"
@@ -2479,6 +2496,7 @@ msgstr "全部会话"
 msgid "全部公众号"
 msgstr "全部公众号"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:441
 #: apps/app/src/i18n/static-dom-seed.ts:379
 msgid "全部小程序"
 msgstr "全部小程序"
@@ -3037,6 +3055,7 @@ msgstr "最近会话暂时不可用"
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:559
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:2638
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:3384
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:313
 #: apps/app/src/i18n/static-dom-seed.ts:170
 msgid "最近使用"
 msgstr "最近使用"
@@ -3045,6 +3064,7 @@ msgstr "最近使用"
 msgid "最近使用、我的小程序、专题推荐和打开态都放进一个工作区"
 msgstr "最近使用、我的小程序、专题推荐和打开态都放进一个工作区"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:118
 #: apps/app/src/i18n/static-dom-seed.ts:146
 msgid "最近使用与常用入口"
 msgstr "最近使用与常用入口"
@@ -3214,6 +3234,7 @@ msgstr "最近消息 · {count} 条"
 msgid "最近添加"
 msgstr "最近添加"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:245
 #: apps/app/src/i18n/static-dom-seed.ts:154
 msgid "最近状态"
 msgstr "最近状态"
@@ -3698,6 +3719,7 @@ msgstr "剩余 {customSlotsRemaining}"
 msgid "功能和预期不一致、页面报错、数据错乱。"
 msgstr "功能和预期不一致、页面报错、数据错乱。"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:518
 #: apps/app/src/features/search/mobile-search-workspace.tsx:485
 #: apps/app/src/routes/live-companion-page.tsx:790
 #: apps/app/src/routes/official-accounts-page.tsx:361
@@ -3718,6 +3740,8 @@ msgstr "功能异常"
 msgid "加入于 {0}"
 msgstr "加入于 {0}"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:277
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:712
 #: apps/app/src/i18n/static-dom-seed.ts:197
 msgid "加入常用"
 msgstr "加入常用"
@@ -4728,6 +4752,10 @@ msgstr "在吧台边，先帮你把今晚这杯点明白。"
 msgid "在手机端继续查看联系人、星标朋友和公众号入口。"
 msgstr "在手机端继续查看联系人、星标朋友和公众号入口。"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:378
+msgid "在推荐卡片或列表里点“加入常用”，这里就会像微信一样沉淀你的固定入口。"
+msgstr "在推荐卡片或列表里点“加入常用”，这里就会像微信一样沉淀你的固定入口。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:727
 msgid "在替你记着那些容易被忙乱吞掉的事。"
 msgstr "在替你记着那些容易被忙乱吞掉的事。"
@@ -4866,6 +4894,7 @@ msgstr "复制"
 msgid "复制位置"
 msgstr "复制位置"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:303
 #: apps/app/src/i18n/static-dom-seed.ts:77
 msgid "复制入口"
 msgstr "复制入口"
@@ -5359,6 +5388,7 @@ msgstr "小盯替你记着"
 msgid "小盯替你记着 {0} 件事"
 msgstr "小盯替你记着 {0} 件事"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:117
 #: apps/app/src/features/search/mobile-search-workspace.tsx:321
 #: apps/app/src/features/shell/desktop-nav-matching.ts:109
 #: apps/app/src/features/shell/desktop-nav-matching.ts:110
@@ -5616,6 +5646,7 @@ msgstr "已刷新直播接力内容。"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:1057
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:383
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:276
 #: apps/app/src/i18n/static-dom-seed.ts:160
 msgid "已加入"
 msgstr "已加入"
@@ -6290,6 +6321,10 @@ msgstr "帮你盯新闻的人"
 msgid "常玩"
 msgstr "常玩"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:376
+msgid "常用"
+msgstr "常用"
+
 #: apps/app/src/routes/desktop-mobile-page.tsx:1133
 msgid "常用手机端入口先固定在这里，点击即可复制深链接，发到手机后继续浏览。"
 msgstr "常用手机端入口先固定在这里，点击即可复制深链接，发到手机后继续浏览。"
@@ -6661,11 +6696,13 @@ msgstr "当前先由游戏中心工作区承接会话，后续再接真实小游
 msgid "当前先由轻工作台承接上下文，也可以直接发到手机继续处理。"
 msgstr "当前先由轻工作台承接上下文，也可以直接发到手机继续处理。"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:298
 #: apps/app/src/i18n/static-dom-seed.ts:377
 #: apps/app/src/i18n/static-dom-seed.ts:893
 msgid "当前先由轻工作台承接上下文，也可以直接复制入口链接继续使用。"
 msgstr "当前先由轻工作台承接上下文，也可以直接复制入口链接继续使用。"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:297
 #: apps/app/src/i18n/static-dom-seed.ts:892
 msgid "当前先由轻工作台承接上下文，也可以直接通过系统分享发给联系人或其他应用。"
 msgstr "当前先由轻工作台承接上下文，也可以直接通过系统分享发给联系人或其他应用。"
@@ -7600,6 +7637,7 @@ msgstr "我的动态"
 msgid "我的发言"
 msgstr "我的发言"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:347
 #: apps/app/src/i18n/static-dom-seed.ts:164
 #: apps/app/src/i18n/static-dom-seed.ts:361
 #: apps/app/src/i18n/static-dom-seed.ts:901
@@ -7720,6 +7758,7 @@ msgstr "手机端当前提供笔记摘要预览；完整编辑与详情工作区
 msgid "打印图片"
 msgstr "打印图片"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:701
 #: apps/app/src/i18n/static-dom-seed.ts:258
 msgid "打开"
 msgstr "打开"
@@ -7782,6 +7821,7 @@ msgstr "打开后会同步更新最近使用、打开次数和当前承接面板
 msgid "打开后先承接一组本地待办，让这个面板不只是一次“已打开”的记录。"
 msgstr "打开后先承接一组本地待办，让这个面板不只是一次“已打开”的记录。"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:267
 #: apps/app/src/i18n/static-dom-seed.ts:159
 #: apps/app/src/i18n/static-dom-seed.ts:911
 msgid "打开小程序"
@@ -8268,6 +8308,7 @@ msgstr "按住说话，松开发送"
 msgid "按最近推送排序"
 msgstr "按最近推送排序"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:446
 #: apps/app/src/i18n/static-dom-seed.ts:380
 msgid "按分类浏览当前可用的小程序目录。"
 msgstr "按分类浏览当前可用的小程序目录。"
@@ -8331,6 +8372,7 @@ msgstr "换一批"
 msgid "换个关键词，或者切到别的分类试试。"
 msgstr "换个关键词，或者切到别的分类试试。"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:474
 #: apps/app/src/i18n/static-dom-seed.ts:1045
 msgid "换个关键词，或者切回“全部”分类继续浏览。"
 msgstr "换个关键词，或者切回“全部”分类继续浏览。"
@@ -8560,6 +8602,7 @@ msgstr "搜朋友圈、广场动态和公众号"
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:673
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:597
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:289
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:472
 #: apps/app/src/features/shell/desktop-nav-matching.ts:98
 #: apps/app/src/features/shell/desktop-shell.tsx:851
 #: apps/app/src/routes/chat-list-page.tsx:668
@@ -8568,6 +8611,12 @@ msgstr "搜朋友圈、广场动态和公众号"
 #: apps/app/src/routes/create-group-page.tsx:419
 msgid "搜索"
 msgstr "搜索"
+
+#. placeholder {0}: searchText.trim()
+#. placeholder {1}: visibleMiniPrograms.length
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:445
+msgid "搜索“{0}”命中 {1} 个结果。"
+msgstr "搜索“{0}”命中 {1} 个结果。"
 
 #. placeholder {0}: searchText.trim()
 #. placeholder {1}: filteredFavorites.length
@@ -8623,6 +8672,7 @@ msgstr "搜索定位"
 msgid "搜索小程序、服务和场景"
 msgstr "搜索小程序、服务和场景"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:142
 #: apps/app/src/i18n/static-dom-seed.ts:470
 msgid "搜索小程序、服务或场景"
 msgstr "搜索小程序、服务或场景"
@@ -9030,6 +9080,7 @@ msgstr "故事感推荐"
 msgid "效率"
 msgstr "效率"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:521
 #: apps/app/src/features/search/mobile-search-workspace.tsx:488
 #: apps/app/src/routes/channels-page.tsx:1493
 #: apps/app/src/routes/live-companion-page.tsx:793
@@ -9609,6 +9660,7 @@ msgstr "更强调节奏、排名和对抗感。"
 msgid "更换视频"
 msgstr "更换视频"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:246
 #: apps/app/src/i18n/static-dom-seed.ts:155
 msgid "更新"
 msgstr "更新"
@@ -10682,6 +10734,7 @@ msgstr "榜单"
 msgid "模式 {0}"
 msgstr "模式 {0}"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:316
 #: apps/app/src/i18n/static-dom-seed.ts:171
 msgid "模拟微信里最近打开的小程序快捷入口。"
 msgstr "模拟微信里最近打开的小程序快捷入口。"
@@ -11536,6 +11589,7 @@ msgstr "没有匹配的{0}"
 msgid "没有匹配的最近会话。"
 msgstr "没有匹配的最近会话。"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:473
 #: apps/app/src/i18n/static-dom-seed.ts:1040
 msgid "没有匹配的小程序"
 msgstr "没有匹配的小程序"
@@ -11892,6 +11946,7 @@ msgid "清理提醒失败，请稍后再试。"
 msgstr "清理提醒失败，请稍后再试。"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:431
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:151
 #: apps/app/src/features/search/mobile-search-workspace.tsx:151
 #: apps/app/src/features/search/mobile-search-workspace.tsx:228
 msgid "清空"
@@ -11941,6 +11996,10 @@ msgstr "清空时间筛选"
 #: apps/app/src/components/chat-composer.tsx:4692
 msgid "清空标注"
 msgstr "清空标注"
+
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:490
+msgid "清空筛选"
+msgstr "清空筛选"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:534
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:869
@@ -12702,6 +12761,7 @@ msgstr "秒开"
 msgid "移出后将恢复正常联系与互动。"
 msgstr "移出后将恢复正常联系与互动。"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:712
 #: apps/app/src/i18n/static-dom-seed.ts:195
 msgid "移出常用"
 msgstr "移出常用"
@@ -13174,6 +13234,7 @@ msgstr "系统"
 #: apps/app/src/components/chat-message-list.tsx:4162
 #: apps/app/src/components/chat-message-list.tsx:6245
 #: apps/app/src/components/chat-message-list.tsx:6380
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:303
 #: apps/app/src/features/subscription/subscription-panel.tsx:276
 #: apps/app/src/i18n/static-dom-seed.ts:895
 #: apps/app/src/routes/group-qr-page.tsx:1353
@@ -15097,6 +15158,8 @@ msgstr "近"
 
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:790
 #: apps/app/src/features/chat-details/chat-details-shell.tsx:45
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:511
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:530
 #: apps/app/src/features/search/mobile-search-workspace.tsx:121
 #: apps/app/src/routes/character-detail-page.tsx:272
 #: apps/app/src/routes/create-group-page.tsx:332
@@ -15432,6 +15495,7 @@ msgstr "还没有最近小程序"
 msgid "还没有最近文章"
 msgstr "还没有最近文章"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:377
 #: apps/app/src/i18n/static-dom-seed.ts:1044
 msgid "还没有加入我的小程序"
 msgstr "还没有加入我的小程序"
@@ -15490,6 +15554,7 @@ msgstr "还没有形成稳定的手机接力记录。"
 msgid "还没有手机接力记录"
 msgstr "还没有手机接力记录"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:335
 #: apps/app/src/routes/desktop-mobile-page.tsx:2193
 msgid "还没有打开过"
 msgstr "还没有打开过"
@@ -15497,6 +15562,14 @@ msgstr "还没有打开过"
 #: apps/app/src/i18n/static-dom-seed.ts:381
 msgid "还没有打开过 · 已加入 目录"
 msgstr "还没有打开过 · 已加入 目录"
+
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:685
+msgid "还没有打开过 · 已加入我的小程序"
+msgstr "还没有打开过 · 已加入我的小程序"
+
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:686
+msgid "还没有打开过 · 已加入目录"
+msgstr "还没有打开过 · 已加入目录"
 
 #: apps/app/src/i18n/static-dom-seed.ts:310
 msgid "还没有打开过 · 当前仅在目录中"
@@ -15920,6 +15993,7 @@ msgstr "这里会显示摘要、来源和操作入口。"
 msgid "这里会连续展示整个世界的公开动态，不区分是否已经是好友。"
 msgstr "这里会连续展示整个世界的公开动态，不区分是否已经是好友。"
 
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:350
 #: apps/app/src/i18n/static-dom-seed.ts:175
 msgid "这里承接微信式固定常用入口。"
 msgstr "这里承接微信式固定常用入口。"
