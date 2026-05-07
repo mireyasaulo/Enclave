@@ -57,6 +57,7 @@ export function MobileChatThreadHeader({
           ) : null}
         </div>
 
+        <div className="ml-auto flex shrink-0 items-center gap-2">
           {actions.map((action) => {
             const Icon = action.icon;
 
@@ -69,19 +70,20 @@ export function MobileChatThreadHeader({
                 aria-label={action.label}
                 title={action.label}
               >
-              <Icon size={19} />
-            </button>
-          );
-        })}
+                <Icon size={19} />
+              </button>
+            );
+          })}
 
-        <button
-          type="button"
-          onClick={onMore}
-          className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] text-[#111827] transition active:bg-[color:var(--surface-card-hover)]"
-          aria-label={moreLabel}
-        >
-          <Ellipsis size={20} />
-        </button>
+          <button
+            type="button"
+            onClick={onMore}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] text-[#111827] transition active:bg-[color:var(--surface-card-hover)]"
+            aria-label={moreLabel}
+          >
+            <Ellipsis size={20} />
+          </button>
+        </div>
       </div>
     </header>
   );
