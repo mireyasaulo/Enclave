@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
 import { useNavigate } from "@tanstack/react-router";
@@ -46,6 +46,16 @@ export function CreateCharacterPage() {
   const [recipeDraft, setRecipeDraft] = useState<CharacterBlueprintRecipe>(() =>
     buildDefaultRecipe(),
   );
+
+  const recipeJsonError = useMemo(() => {
+    if (!recipeText.trim()) return null;
+    try {
+      JSON.parse(recipeText);
+      return null;
+    } catch (err) {
+      return (err as Error).message;
+    }
+  }, [recipeText]);
 
   const createMut = useMutation({
     mutationFn: () => {
@@ -203,6 +213,12 @@ export function CreateCharacterPage() {
             onChange={(event) => setRecipeText(event.target.value)}
             placeholder={t(msg`留空则按上方档案字段生成默认角色逻辑`)}
           />
+          {recipeJsonError && (
+            <InlineNotice tone="danger">
+              <Trans>高级 recipe JSON 格式无效：</Trans>{" "}
+              <span className="font-mono text-xs">{recipeJsonError}</span>
+            </InlineNotice>
+          )}
         </AppSection>
 
         {createMut.isError && (
@@ -214,7 +230,11 @@ export function CreateCharacterPage() {
           <Button
             type="submit"
             variant="primary"
-            disabled={createMut.isPending || name.trim().length === 0}
+            disabled={
+              createMut.isPending ||
+              name.trim().length === 0 ||
+              recipeJsonError !== null
+            }
           >
             {createMut.isPending ? t(msg`提交中...`) : t(msg`✨ 提交创建`)}
           </Button>

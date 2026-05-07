@@ -115,9 +115,13 @@ export function WatchlistPage() {
             <PanelEmpty message={t(msg`观察的词条暂无更新。`)} />
           )}
           <ul className="space-y-2">
-            {feedQ.data?.map((item, i) => (
+            {feedQ.data?.map((item) => (
               <li
-                key={i}
+                key={
+                  item.kind === "revision"
+                    ? `r:${item.revision.id}`
+                    : `t:${item.thread.id}`
+                }
                 className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-3 text-sm shadow-[var(--shadow-soft)] transition-colors hover:bg-[color:var(--surface-card-hover)]"
               >
                 {item.kind === "revision" ? (

@@ -135,7 +135,12 @@ function ThreadCard({
 }) {
   return (
     <Card className="p-3">
-      <div className="flex items-center gap-2 cursor-pointer" onClick={onToggle}>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        className="flex w-full items-center gap-2 text-left"
+      >
         <span className="font-medium">{thread.title}</span>
         {thread.isLocked && (
           <StatusPill>
@@ -155,7 +160,7 @@ function ThreadCard({
               : "—"}
           </Trans>
         </span>
-      </div>
+      </button>
       {isOpen && <ThreadDetail threadId={thread.id} thread={thread} />}
     </Card>
   );
@@ -234,7 +239,11 @@ function ThreadDetail({
       <PostTree
         posts={postsQ.data ?? []}
         onReply={(postId) => setReplyTo(postId)}
-        onDelete={(postId) => deleteMut.mutate(postId)}
+        onDelete={(postId) => {
+          if (window.confirm(t(msg`确认删除这条回复？删除后会标记为「已删除」。`))) {
+            deleteMut.mutate(postId);
+          }
+        }}
         canDelete={(post) =>
           (user?.id === post.authorId || isPatroller) && !post.deletedAt
         }

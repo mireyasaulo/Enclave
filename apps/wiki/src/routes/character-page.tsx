@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Trans } from "@lingui/react/macro";
 import { Link, useParams } from "@tanstack/react-router";
@@ -435,9 +435,54 @@ function EditView({
     serverCurrent: WikiContentSnapshot;
     newBaseRevisionId: string;
   } | null>(null);
+  // Track whether the user has touched the form. Without this, a background
+  // refetch (e.g. after a sibling mutation invalidates the page query) wipes
+  // their in-progress edits.
+  const dirtyRef = useRef(false);
+  const submitTimerRef = useRef<number | null>(null);
+  const [serverChangedWhileEditing, setServerChangedWhileEditing] =
+    useState(false);
 
-  useEffect(() => setDraft(initial), [initial]);
-  useEffect(() => setRecipeDraft(initialRecipe), [initialRecipe]);
+  useEffect(
+    () => () => {
+      if (submitTimerRef.current !== null) {
+        window.clearTimeout(submitTimerRef.current);
+        submitTimerRef.current = null;
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!dirtyRef.current) {
+      setDraft(initial);
+    } else {
+      setServerChangedWhileEditing(true);
+    }
+  }, [initial]);
+  useEffect(() => {
+    if (!dirtyRef.current) {
+      setRecipeDraft(initialRecipe);
+    } else {
+      setServerChangedWhileEditing(true);
+    }
+  }, [initialRecipe]);
+
+  const setDraftDirty = (next: WikiContentSnapshot) => {
+    dirtyRef.current = true;
+    setDraft(next);
+  };
+  const setRecipeDraftDirty = (next: CharacterBlueprintRecipe) => {
+    dirtyRef.current = true;
+    setRecipeDraft(next);
+  };
+
+  function loadLatestFromServer() {
+    setDraft(initial);
+    setRecipeDraft(initialRecipe);
+    dirtyRef.current = false;
+    setServerChangedWhileEditing(false);
+  }
 
   const submitMut = useMutation({
     mutationFn: (override?: {
@@ -457,12 +502,15 @@ function EditView({
     onSuccess: (res) => {
       setError(null);
       setConflict(null);
+      dirtyRef.current = false;
+      setServerChangedWhileEditing(false);
       setInfo(
         res.appliedToCharacter
           ? t(msg`修改已直接生效（自动确认/巡查员/管理员）`)
           : t(msg`修改已提交，等待巡查员审核`),
       );
-      setTimeout(onSubmitted, 800);
+      const handle = window.setTimeout(onSubmitted, 800);
+      submitTimerRef.current = handle;
     },
     onError: (err: Error) => {
       setInfo(null);
@@ -524,23 +572,39 @@ function EditView({
           </Trans>
         </InlineNotice>
       )}
+      {serverChangedWhileEditing && (
+        <InlineNotice tone="info">
+          <Trans>
+            服务器上的版本已经发生变化，但你正在编辑的草稿已保留。
+          </Trans>{" "}
+          <button
+            type="button"
+            className="ml-1 underline"
+            onClick={loadLatestFromServer}
+          >
+            <Trans>加载最新覆盖草稿</Trans>
+          </button>
+        </InlineNotice>
+      )}
       <FormRow label={t(msg`名称`)}>
         <TextField
           value={draft.name}
-          onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+          onChange={(e) => setDraftDirty({ ...draft, name: e.target.value })}
         />
       </FormRow>
       <FormRow label={t(msg`头像 URL`)}>
         <TextField
           value={draft.avatar}
-          onChange={(e) => setDraft({ ...draft, avatar: e.target.value })}
+          onChange={(e) =>
+            setDraftDirty({ ...draft, avatar: e.target.value })
+          }
         />
       </FormRow>
       <FormRow label={t(msg`关系描述`)}>
         <TextField
           value={draft.relationship}
           onChange={(e) =>
-            setDraft({ ...draft, relationship: e.target.value })
+            setDraftDirty({ ...draft, relationship: e.target.value })
           }
         />
       </FormRow>
@@ -548,7 +612,7 @@ function EditView({
         <TextField
           value={draft.relationshipType}
           onChange={(e) =>
-            setDraft({ ...draft, relationshipType: e.target.value })
+            setDraftDirty({ ...draft, relationshipType: e.target.value })
           }
         />
       </FormRow>
@@ -556,7 +620,7 @@ function EditView({
         <TextAreaField
           rows={4}
           value={draft.bio}
-          onChange={(e) => setDraft({ ...draft, bio: e.target.value })}
+          onChange={(e) => setDraftDirty({ ...draft, bio: e.target.value })}
         />
       </FormRow>
       <FormRow label={t(msg`性格 ⚠ 影响 AI 行为`)}>
@@ -564,7 +628,7 @@ function EditView({
           rows={3}
           value={draft.personality ?? ""}
           onChange={(e) =>
-            setDraft({ ...draft, personality: e.target.value })
+            setDraftDirty({ ...draft, personality: e.target.value })
           }
         />
       </FormRow>
@@ -572,7 +636,7 @@ function EditView({
         <TextField
           value={draft.expertDomains.join(", ")}
           onChange={(e) =>
-            setDraft({
+            setDraftDirty({
               ...draft,
               expertDomains: e.target.value
                 .split(",")
@@ -586,7 +650,7 @@ function EditView({
         <TextField
           value={(draft.triggerScenes ?? []).join(", ")}
           onChange={(e) =>
-            setDraft({
+            setDraftDirty({
               ...draft,
               triggerScenes: e.target.value
                 .split(",")
@@ -599,7 +663,7 @@ function EditView({
       {recipeDraft && (
         <LogicEditor
           recipe={recipeDraft}
-          onChange={(next) => setRecipeDraft(next)}
+          onChange={(next) => setRecipeDraftDirty(next)}
           characterId={characterId}
           currentRole={user?.role}
           baselineRecipe={view.recipe}
