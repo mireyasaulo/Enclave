@@ -15,9 +15,40 @@ const SAAS_ORIGIN = (() => {
   }
 })();
 
+// Verification codes are env-driven — set the env in production and they
+// emit; leave unset and the meta tags are simply omitted.
+const verificationOther: Record<string, string> = {};
+if (process.env.NEXT_PUBLIC_VERIFY_BAIDU) {
+  verificationOther["baidu-site-verification"] = process.env.NEXT_PUBLIC_VERIFY_BAIDU;
+}
+if (process.env.NEXT_PUBLIC_VERIFY_BING) {
+  verificationOther["msvalidate.01"] = process.env.NEXT_PUBLIC_VERIFY_BING;
+}
+if (process.env.NEXT_PUBLIC_VERIFY_360) {
+  verificationOther["360-site-verification"] = process.env.NEXT_PUBLIC_VERIFY_360;
+}
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_BASE_URL),
   applicationName: "Enclave",
+  appleWebApp: {
+    capable: true,
+    title: "Enclave",
+    statusBarStyle: "default",
+  },
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_VERIFY_GOOGLE,
+    yandex: process.env.NEXT_PUBLIC_VERIFY_YANDEX,
+    other: Object.keys(verificationOther).length ? verificationOther : undefined,
+  },
+  other: {
+    "msapplication-TileColor": "#f97316",
+  },
   icons: {
     icon: [
       { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
