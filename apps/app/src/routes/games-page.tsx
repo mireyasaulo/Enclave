@@ -1,32 +1,20 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import {
-  getConversations,
-  sendGroupMessage,
-  type ConversationListItem,
-} from "@yinjie/contracts";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import { ArrowLeft, ChevronRight, Copy, Play, Share2 } from "lucide-react";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
-import { RouteRedirectState } from "../components/route-redirect-state";
 import {
-  gameCenterEvents,
   gameCenterFeaturedGameIds,
   gameCenterFriendActivities,
   gameCenterGames,
   gameCenterHotRankings,
   gameCenterNewRankings,
   getGameCenterGame,
-  getGameCenterEventStatusLabel,
   getGameCenterToneStyle,
-  type GameCenterCategoryId,
   type GameCenterGame,
 } from "../features/games/game-center-data";
 import { ParkingWarGame } from "../features/games/parking-war/parking-war-game";
 import { useGameCenterState } from "../features/games/use-game-center-state";
-import { emitChatMessage, joinConversationRoom } from "../lib/socket";
-import { isPersistedGroupConversation } from "../lib/conversation-route";
 import {
   pushMobileHandoffRecord,
   resolveMobileHandoffLink,
@@ -34,7 +22,6 @@ import {
 import { buildGameInvitePath } from "../features/games/game-invite-route";
 import { AvatarChip } from "../components/avatar-chip";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
-import { parseTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { normalizePathname } from "../lib/normalize-pathname";
 import { searchStringToObject } from "../lib/route-search";
@@ -43,17 +30,10 @@ import {
   isMobileWebShareSurface,
   isNativeMobileShareSurface,
 } from "../runtime/mobile-share-surface";
-import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
-import { useWorldOwnerStore } from "../store/world-owner-store";
 import {
   buildMobileGamesRouteSearch,
   parseMobileGamesRouteSearch,
 } from "../features/games/mobile-games-route-state";
-
-const DesktopGamesWorkspace = lazy(async () => {
-  const mod = await import("../features/desktop/games/desktop-games-workspace");
-  return { default: mod.DesktopGamesWorkspace };
-});
 
 function resolveGames(ids: string[]) {
   return ids
@@ -67,7 +47,6 @@ function resolveDefaultGameSelection() {
 
 export function GamesPage() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const isDesktopLayout = useDesktopLayout();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
@@ -78,9 +57,6 @@ export function GamesPage() {
   const mobileWebCopyFallback = isMobileWebShareSurface({
     isDesktopLayout,
   });
-  const runtimeConfig = useAppRuntimeConfig();
-  const baseUrl = runtimeConfig.apiBaseUrl;
-  const ownerId = useWorldOwnerStore((state) => state.id);
   const locationSearch = useRouterState({
     select: (state) => state.location.searchStr,
   });
@@ -90,24 +66,12 @@ export function GamesPage() {
   );
   const {
     activeGameId,
-    eventActionStatusById,
-    lastInviteConversationPathByActivityId,
-    lastInviteConversationTitleByActivityId,
-    friendInviteSentAtByActivityId,
     friendInviteStatusByActivityId,
-    launchCountById,
-    lastOpenedAtById,
-    pinnedGameIds,
     recentGameIds,
     dismissActiveGame,
-    applyEventAction,
     applyFriendInvite,
-    markInviteDelivered,
     launchGame,
-    togglePinned,
   } = useGameCenterState();
-  const [activeCategory, setActiveCategory] =
-    useState<GameCenterCategoryId>("featured");
   const selectedGameFromSearch = routeState.gameId ?? null;
   const inviteActivityFromSearch = useMemo(
     () =>
@@ -157,12 +121,6 @@ export function GamesPage() {
         : null,
     [activeInviteActivityId],
   );
-
-  const conversationsQuery = useQuery({
-    queryKey: ["app-conversations", baseUrl],
-    queryFn: () => getConversations(baseUrl),
-    enabled: Boolean(ownerId),
-  });
 
   useEffect(() => {
     if (!getGameCenterGame(selectedGameId)) {
@@ -311,33 +269,6 @@ export function GamesPage() {
     recentGames.length > 0 ? recentGames : featuredGames.slice(0, 6);
   const bannerGame = featuredGames[0] ?? selectedGame;
   const featuredRest = featuredGames.slice(1);
-  const inviteConversationCandidates = useMemo(
-    () =>
-      [...(conversationsQuery.data ?? [])]
-        .sort(
-          (left, right) =>
-            (parseTimestamp(right.lastActivityAt) ?? 0) -
-            (parseTimestamp(left.lastActivityAt) ?? 0),
-        )
-        .slice(0, 5),
-    [conversationsQuery.data],
-  );
-
-  const sendGroupInviteMutation = useMutation({
-    mutationFn: (input: { conversationId: string; text: string }) =>
-      sendGroupMessage(
-        input.conversationId,
-        {
-          text: input.text,
-        },
-        baseUrl,
-      ),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["app-conversations", baseUrl],
-      });
-    },
-  });
 
   function handleLaunchGame(gameId: string) {
     const game = getGameCenterGame(gameId);
@@ -350,37 +281,6 @@ export function GamesPage() {
     setNoticeTone("success");
     setSuccessNotice(
       `${game?.name ?? "该游戏"} 已加入最近玩过。首期先以游戏中心内容工作区承接，后续再接小游戏容器。`,
-    );
-  }
-
-  function handleTogglePinnedGame(gameId: string) {
-    const game = getGameCenterGame(gameId);
-    const pinned = pinnedGameIds.includes(gameId);
-    togglePinned(gameId);
-    setNoticeTone("success");
-    setSuccessNotice(
-      `${game?.name ?? "该游戏"} 已${pinned ? "取消固定常玩" : "固定到常玩"}。`,
-    );
-  }
-
-  function handleCompleteEventAction(eventId: string) {
-    const event = gameCenterEvents.find((item) => item.id === eventId);
-    if (!event) {
-      return;
-    }
-
-    const nextStatus =
-      event.actionKind === "reminder"
-        ? "reminder_set"
-        : event.actionKind === "join"
-          ? "joined"
-          : "task_started";
-
-    applyEventAction(eventId, nextStatus);
-    setSelectedGameId(event.relatedGameId);
-    setNoticeTone("success");
-    setSuccessNotice(
-      `${event.title} 已标记为${getGameCenterEventStatusLabel(event)}。`,
     );
   }
 
@@ -402,267 +302,6 @@ export function GamesPage() {
         ? `已再次邀请 ${activity.friendName} 一起玩${game?.name ?? "当前游戏"}。`
         : `已向 ${activity.friendName} 发出一起玩${game?.name ?? "当前游戏"} 的邀约。`,
     );
-  }
-
-  function handleOpenInviteToChat(activityId: string) {
-    const activity = gameCenterFriendActivities.find(
-      (item) => item.id === activityId,
-    );
-    if (!activity) {
-      return;
-    }
-
-    setSelectedGameId(activity.gameId);
-    setActiveInviteActivityId((current) =>
-      current === activityId ? null : activityId,
-    );
-  }
-
-  function buildInviteMessage(
-    activity: (typeof gameCenterFriendActivities)[number],
-    game: GameCenterGame | null,
-  ) {
-    return [
-      "【组局邀约】",
-      `${activity.friendName} 正在玩《${game?.name ?? "当前游戏"}》`,
-      activity.status,
-      "要不要一起上？",
-    ].join(" ");
-  }
-
-  function resolveConversationPath(conversation: ConversationListItem) {
-    return isPersistedGroupConversation(conversation)
-      ? `/group/${conversation.id}`
-      : `/chat/${conversation.id}`;
-  }
-
-  async function handleSendInviteToConversation(
-    activityId: string,
-    conversationId: string,
-  ) {
-    const activity = gameCenterFriendActivities.find(
-      (item) => item.id === activityId,
-    );
-    const conversation = inviteConversationCandidates.find(
-      (item) => item.id === conversationId,
-    );
-
-    if (!activity || !conversation) {
-      return;
-    }
-
-    const game = getGameCenterGame(activity.gameId);
-    const text = buildInviteMessage(activity, game);
-    const conversationPath = buildGameInvitePath(
-      resolveConversationPath(conversation),
-      {
-        gameId: activity.gameId,
-        inviteId: activity.id,
-        returnPath: safeReturnPath,
-        returnHash: safeReturnHash,
-      },
-    );
-
-    if (isPersistedGroupConversation(conversation)) {
-      await sendGroupInviteMutation.mutateAsync({
-        conversationId: conversation.id,
-        text,
-      });
-    } else {
-      const characterId = conversation.participants[0];
-      if (!characterId) {
-        setNoticeTone("info");
-        setSuccessNotice("这条单聊还没有可用的角色目标，暂时无法投递邀约。");
-        return;
-      }
-
-      joinConversationRoom({ conversationId: conversation.id });
-      emitChatMessage({
-        conversationId: conversation.id,
-        characterId,
-        text,
-      });
-      window.setTimeout(() => {
-        void queryClient.invalidateQueries({
-          queryKey: ["app-conversations", baseUrl],
-        });
-      }, 500);
-    }
-
-    markInviteDelivered(
-      activityId,
-      conversation.id,
-      conversationPath,
-      conversation.title,
-    );
-    setSelectedGameId(activity.gameId);
-    setActiveInviteActivityId(null);
-    setNoticeTone("success");
-    setSuccessNotice(
-      `已把 ${activity.friendName} 的组局邀约发到 ${conversation.title}。`,
-    );
-  }
-
-  function handleOpenDeliveredConversation(activityId: string) {
-    const path = lastInviteConversationPathByActivityId[activityId];
-    const title = lastInviteConversationTitleByActivityId[activityId];
-    if (!path) {
-      setNoticeTone("info");
-      setSuccessNotice("这条组局邀约还没有可回跳的会话。");
-      return;
-    }
-
-    void navigate({ to: path });
-    setNoticeTone("success");
-    setSuccessNotice(
-      title ? `正在回到 ${title}。` : "正在回到最近投递的会话。",
-    );
-  }
-
-  async function handleCopyInviteToMobile(activityId: string) {
-    const activity = gameCenterFriendActivities.find(
-      (item) => item.id === activityId,
-    );
-    if (!activity) {
-      return;
-    }
-
-    const game = getGameCenterGame(activity.gameId);
-    const path = `/discover/games?game=${activity.gameId}&invite=${activity.id}`;
-    const link = resolveMobileHandoffLink(path);
-
-    if (nativeMobileShareSupported) {
-      const shared = await shareWithNativeShell({
-        title: `${activity.friendName} 的组局邀约`,
-        text: `${activity.friendName} 正在玩 ${game?.name ?? "当前游戏"}，邀请你一起玩。\n${link}`,
-        url: link,
-      });
-
-      if (shared) {
-        setNoticeTone("success");
-        setNoticeActionState(null);
-        setSuccessNotice("已打开系统分享面板。");
-        return;
-      }
-
-      if (
-        typeof navigator === "undefined" ||
-        !navigator.clipboard ||
-        typeof navigator.clipboard.writeText !== "function"
-      ) {
-        setNoticeTone("info");
-        setNoticeActionState({
-          label: "重试分享",
-          message: "当前设备暂时无法打开系统分享，请稍后重试。",
-          onAction: () => {
-            void handleCopyInviteToMobile(activityId);
-          },
-        });
-        setSuccessNotice("当前设备暂时无法打开系统分享，请稍后重试。");
-        return;
-      }
-
-      try {
-        await navigator.clipboard.writeText(link);
-        applyFriendInvite(activityId, "invited");
-        setSelectedGameId(activity.gameId);
-        setNoticeTone("success");
-        setNoticeActionState(null);
-        setSuccessNotice("系统分享暂时不可用，已复制组局链接。");
-      } catch {
-        setNoticeActionState({
-          label: "重试分享",
-          message: "系统分享失败，请稍后重试。",
-          onAction: () => {
-            void handleCopyInviteToMobile(activityId);
-          },
-        });
-        setNoticeTone("info");
-        setSuccessNotice("系统分享失败，请稍后重试。");
-      }
-      return;
-    }
-
-    if (mobileWebCopyFallback) {
-      if (
-        typeof navigator === "undefined" ||
-        !navigator.clipboard ||
-        typeof navigator.clipboard.writeText !== "function"
-      ) {
-        setNoticeTone("info");
-        setNoticeActionState({
-          label: "重试复制",
-          message: "当前环境暂不支持复制组局链接。",
-          onAction: () => {
-            void handleCopyInviteToMobile(activityId);
-          },
-        });
-        setSuccessNotice("当前环境暂不支持复制组局链接。");
-        return;
-      }
-
-      try {
-        await navigator.clipboard.writeText(link);
-        applyFriendInvite(activityId, "invited");
-        setSelectedGameId(activity.gameId);
-        setNoticeTone("success");
-        setNoticeActionState(null);
-        setSuccessNotice("组局链接已复制。");
-      } catch {
-        setNoticeActionState({
-          label: "重试复制",
-          message: "复制组局链接失败，请稍后重试。",
-          onAction: () => {
-            void handleCopyInviteToMobile(activityId);
-          },
-        });
-        setNoticeTone("info");
-        setSuccessNotice("复制组局链接失败，请稍后重试。");
-      }
-      return;
-    }
-
-    if (
-      typeof navigator === "undefined" ||
-      !navigator.clipboard ||
-      typeof navigator.clipboard.writeText !== "function"
-    ) {
-      setNoticeTone("info");
-      setNoticeActionState({
-        label: "重试复制到手机",
-        message: "当前环境暂不支持复制到手机。",
-        onAction: () => {
-          void handleCopyInviteToMobile(activityId);
-        },
-      });
-      setSuccessNotice("当前环境暂不支持复制到手机。");
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(link);
-      applyFriendInvite(activityId, "invited");
-      setSelectedGameId(activity.gameId);
-      pushMobileHandoffRecord({
-        category: "games",
-        description: `${activity.friendName} 正在玩 ${game?.name ?? "当前游戏"}，把这条组局邀约发到手机继续跟进。`,
-        label: `${activity.friendName} 组局邀约`,
-        path,
-      });
-      setNoticeTone("success");
-      setNoticeActionState(null);
-      setSuccessNotice(`已把 ${activity.friendName} 的组局邀约复制到手机。`);
-    } catch {
-      setNoticeActionState({
-        label: "重试复制到手机",
-        message: "复制到手机失败，请稍后重试。",
-        onAction: () => {
-          void handleCopyInviteToMobile(activityId);
-        },
-      });
-      setNoticeTone("info");
-      setSuccessNotice("复制到手机失败，请稍后重试。");
-    }
   }
 
   async function handleCopyGameToMobile(gameId: string) {
@@ -810,56 +449,6 @@ export function GamesPage() {
 
       void navigate({ to: "/tabs/discover" });
     });
-  }
-
-  if (isDesktopLayout) {
-    return (
-      <Suspense
-        fallback={
-          <RouteRedirectState
-            title="正在打开桌面游戏"
-            description="正在载入桌面游戏工作区，马上显示当前游戏中心内容。"
-            loadingLabel="载入桌面游戏中心..."
-          />
-        }
-      >
-        <DesktopGamesWorkspace
-          activeCategory={activeCategory}
-          activeGameId={activeGameId}
-          activeInviteActivityId={activeInviteActivityId}
-          eventActionStatusById={eventActionStatusById}
-          friendInviteSentAtByActivityId={friendInviteSentAtByActivityId}
-          friendInviteStatusByActivityId={friendInviteStatusByActivityId}
-          lastInviteConversationPathByActivityId={
-            lastInviteConversationPathByActivityId
-          }
-          lastInviteConversationTitleByActivityId={
-            lastInviteConversationTitleByActivityId
-          }
-          inviteConversationCandidates={inviteConversationCandidates}
-          inviteConversationCandidatesLoading={conversationsQuery.isLoading}
-          launchCountById={launchCountById}
-          pinnedGameIds={pinnedGameIds}
-          recentGameIds={recentGameIds}
-          selectedGameId={selectedGameId}
-          lastOpenedAtById={lastOpenedAtById}
-          successNotice={successNotice}
-          noticeTone={noticeTone}
-          onCategoryChange={setActiveCategory}
-          onCompleteEventAction={handleCompleteEventAction}
-          onCopyInviteToMobile={handleCopyInviteToMobile}
-          onOpenInviteToChat={handleOpenInviteToChat}
-          onOpenDeliveredConversation={handleOpenDeliveredConversation}
-          onSendInviteToConversation={handleSendInviteToConversation}
-          onInviteFriend={handleInviteFriend}
-          onCopyGameToMobile={handleCopyGameToMobile}
-          onDismissActiveGame={dismissActiveGame}
-          onLaunchGame={handleLaunchGame}
-          onSelectGame={setSelectedGameId}
-          onTogglePinnedGame={handleTogglePinnedGame}
-        />
-      </Suspense>
-    );
   }
 
   if (!selectedGame) {
