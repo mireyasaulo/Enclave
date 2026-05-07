@@ -472,7 +472,7 @@ export function GamesPage() {
   if (!selectedGame) {
     return (
       <AppPage className="space-y-0 px-0 pb-0 pt-0">
-        {/* 暂时隐藏「功能开发中」蒙板 */}
+        {/* 暂时隐藏「功能开发中」蒙板 */} // i18n-ignore-line
       </AppPage>
     );
   }

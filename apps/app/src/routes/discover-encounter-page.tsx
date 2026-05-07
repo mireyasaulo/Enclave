@@ -90,7 +90,7 @@ function MobileDiscoverEncounterPage() {
   });
 
   useEffect(() => {
-    setMessage("");
+    setMessage(""); // i18n-ignore-line
   }, [baseUrl]);
 
   function navigateToRouteStateReturn() {

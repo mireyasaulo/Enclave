@@ -214,7 +214,7 @@ export function useSearchQuickLinks(
           return rightScore - leftScore;
         }
 
-        return left.name.localeCompare(right.name, "zh-CN");
+        return left.name.localeCompare(right.name, "zh-CN"); // i18n-ignore-line
       })
       .slice(0, 4)
       .map((item) =>

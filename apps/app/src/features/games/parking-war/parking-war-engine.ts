@@ -332,7 +332,7 @@ export function tickOnline(state: ParkingWarState, nowMs: number) {
   for (const npc of NPC_OPPONENTS) {
     const empty = findEmptySlot(state.playerLot);
     if (!empty) break;
-    const prob = minutes * npc.parkAggressiveness * 0.5; // 在线期降一半，避免太密
+    const prob = minutes * npc.parkAggressiveness * 0.5; // i18n-ignore-line — 在线期降一半，避免太密
     if (random() < prob) {
       empty.parked = {
         source: { kind: "npc", npcId: npc.id },
@@ -346,7 +346,7 @@ export function tickOnline(state: ParkingWarState, nowMs: number) {
         "warn",
         "npc_parked_player",
       );
-      break; // 一次最多一个 NPC 停过来
+      break; // i18n-ignore-line — 一次最多一个 NPC 停过来
     }
   }
 

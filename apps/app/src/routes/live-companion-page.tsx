@@ -590,7 +590,7 @@ export function LiveCompanionPage() {
                 ) : (
                   <div className="space-y-3">
                     <StatusRow
-                      label="Core API"
+                      label="Core API" // i18n-ignore-line
                       value={
                         statusQuery.data?.coreApi.healthy ? t(msg`在线`) : t(msg`异常`)
                       }

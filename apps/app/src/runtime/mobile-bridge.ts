@@ -175,7 +175,7 @@ export async function shareFileWithNativeShell(
   } catch (error) {
     return {
       shared: false,
-      error: error instanceof Error ? error.message : "failed to share file",
+      error: error instanceof Error ? error.message : "failed to share file", // i18n-ignore-line
     };
   }
 }
@@ -213,7 +213,7 @@ export async function openFileWithNativeShell(
   } catch (error) {
     return {
       opened: false,
-      error: error instanceof Error ? error.message : "failed to open file",
+      error: error instanceof Error ? error.message : "failed to open file", // i18n-ignore-line
     };
   }
 }
@@ -248,7 +248,7 @@ export async function pickFileWithNativeShell(): Promise<MobileBridgeFilePickRes
   } catch (error) {
     return {
       asset: null,
-      error: error instanceof Error ? error.message : "failed to pick file",
+      error: error instanceof Error ? error.message : "failed to pick file", // i18n-ignore-line
     };
   }
 }
@@ -270,7 +270,7 @@ export async function captureImageWithNativeShell(): Promise<MobileBridgeImageCa
   } catch (error) {
     return {
       asset: null,
-      error: error instanceof Error ? error.message : "failed to capture image",
+      error: error instanceof Error ? error.message : "failed to capture image", // i18n-ignore-line
     };
   }
 }
@@ -286,7 +286,7 @@ async function encodeBlobAsBase64(blob: Blob) {
   }
 
   if (typeof btoa !== "function") {
-    throw new Error("base64 encoder is unavailable");
+    throw new Error("base64 encoder is unavailable"); // i18n-ignore-line
   }
 
   return btoa(binary);

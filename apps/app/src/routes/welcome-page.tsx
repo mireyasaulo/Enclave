@@ -356,7 +356,7 @@ export function WelcomePage() {
       return;
     }
 
-    const timer = window.setTimeout(() => setNotice(""), 3200);
+    const timer = window.setTimeout(() => setNotice(""), 3200); // i18n-ignore-line
     return () => window.clearTimeout(timer);
   }, [notice]);
 
@@ -575,7 +575,7 @@ export function WelcomePage() {
     setMode(nextMode);
     setEntryError("");
     setOwnerError("");
-    setNotice("");
+    setNotice(""); // i18n-ignore-line
   }
 
   async function continueWithLocalWorld() {
@@ -802,7 +802,7 @@ export function WelcomePage() {
     setReadyBaseUrl(null);
     setOwnerError("");
     setEntryError("");
-    setNotice("");
+    setNotice(""); // i18n-ignore-line
   }
 
   function handleRetryEntryStep() {
@@ -1049,7 +1049,7 @@ export function WelcomePage() {
               setLocalApiBaseUrl(event.target.value);
               setEntryError("");
             }}
-            placeholder="http://127.0.0.1:3000"
+            placeholder="http:// i18n-ignore-line —127.0.0.1:3000"
           />
         </label>
 

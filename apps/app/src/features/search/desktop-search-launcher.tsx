@@ -448,7 +448,7 @@ export function DesktopSearchDropdownPanel({
       const quickLink: DesktopSearchQuickLink = {
         id: `conversation-${conversation.id}`,
         title: conversation.title,
-        description: `${preview.prefix}${preview.text}`,
+        description: `${preview.prefix}${preview.text}`, // i18n-ignore-line
         meta: t(msg`${getConversationThreadLabel(conversation)} · ${conversation.participants.length} 位参与者`),
         badge: getConversationThreadLabel(conversation),
         to: buildDesktopChatThreadPath({

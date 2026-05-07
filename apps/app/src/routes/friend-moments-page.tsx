@@ -222,7 +222,7 @@ export function FriendMomentsPage() {
     resetComposeDraft();
     setCommentDrafts({});
     setShowCompose(false);
-    setNotice("");
+    setNotice(""); // i18n-ignore-line
   }, [baseUrl, characterId, resetComposeDraft]);
 
   useEffect(() => {
@@ -281,7 +281,7 @@ export function FriendMomentsPage() {
       return;
     }
 
-    const timer = window.setTimeout(() => setNotice(""), 2400);
+    const timer = window.setTimeout(() => setNotice(""), 2400); // i18n-ignore-line
     return () => window.clearTimeout(timer);
   }, [notice]);
 

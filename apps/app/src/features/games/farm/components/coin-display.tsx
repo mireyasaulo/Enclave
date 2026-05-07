@@ -1,5 +1,9 @@
+import { msg } from "@lingui/macro";
 import type { FarmPlayerStateView } from "@yinjie/contracts";
 import { FARM_LEVEL_EXPERIENCE_THRESHOLDS } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
 
 interface CoinDisplayProps {
   state: FarmPlayerStateView;
@@ -33,9 +37,11 @@ export function CoinDisplay({ state }: CoinDisplayProps) {
       </div>
       <div className="flex items-center justify-between text-xs text-stone-600">
         <span>
-          经验 {state.experience - currentLevelXp} / {nextLevelXp - currentLevelXp}
+          {t(
+            msg`经验 ${state.experience - currentLevelXp} / ${nextLevelXp - currentLevelXp}`,
+          )}
         </span>
-        <span>田块 {state.plotCount}</span>
+        <span>{t(msg`田块 ${state.plotCount}`)}</span>
       </div>
       <div className="relative h-1.5 overflow-hidden rounded-full bg-stone-200/80">
         <div

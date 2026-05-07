@@ -86,7 +86,7 @@ export function sortSearchResults(
     return right.sortTime - left.sortTime;
   }
 
-  return left.title.localeCompare(right.title, "zh-CN");
+  return left.title.localeCompare(right.title, "zh-CN"); // i18n-ignore-line
 }
 
 export function groupSearchResults(results: SearchResultItem[]) {

@@ -78,7 +78,7 @@ async function saveRemoteFileWithNativeShell(
       credentials: "include",
     });
     if (!response.ok) {
-      throw new Error("failed to fetch file");
+      throw new Error("failed to fetch file"); // i18n-ignore-line
     }
 
     const blob = await response.blob();

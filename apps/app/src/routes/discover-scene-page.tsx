@@ -121,7 +121,7 @@ function MobileDiscoverScenePage() {
   });
 
   useEffect(() => {
-    setMessage("");
+    setMessage(""); // i18n-ignore-line
   }, [baseUrl]);
 
   function navigateToRouteStateReturn() {

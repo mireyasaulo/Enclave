@@ -203,7 +203,7 @@ function MobileGroupMemberPickerPage({
           indexLabel: t(msg`群成员`),
         };
       })
-      .sort((left, right) => left.name.localeCompare(right.name, "zh-CN"));
+      .sort((left, right) => left.name.localeCompare(right.name, "zh-CN")); // i18n-ignore-line
   }, [friendMap, friendsQuery.data, memberIds, membersQuery.data, mode]);
 
   const filteredCandidateItems = useMemo(() => {

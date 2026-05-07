@@ -343,7 +343,7 @@ export function SubscriptionPanel({
     hint: string;
     contact: string;
     planName: string;
-  }>({ open: false, hint: "", contact: "", planName: "" });
+  }>({ open: false, hint: "", contact: "", planName: "" }); // i18n-ignore-line
 
   const profileQuery = useQuery({
     queryKey: ["cloud-profile", accessToken],

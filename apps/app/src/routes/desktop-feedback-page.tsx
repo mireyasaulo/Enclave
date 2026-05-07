@@ -422,7 +422,7 @@ export function DesktopFeedbackPage() {
                   ) : (
                     <div className="space-y-3">
                       <FeedbackContextRow
-                        label="Core API"
+                        label="Core API" // i18n-ignore-line
                         value={
                           systemStatusQuery.data?.coreApi.healthy
                             ? t(msg`在线`)

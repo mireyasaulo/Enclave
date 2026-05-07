@@ -18,7 +18,7 @@ type SubscriptionExpiredDialogState = {
 export const useSubscriptionExpiredDialogStore =
   create<SubscriptionExpiredDialogState>((set) => ({
     open: false,
-    message: "",
+    message: "", // i18n-ignore-line
     meta: null,
     openDialog: (input) =>
       set({
@@ -29,7 +29,7 @@ export const useSubscriptionExpiredDialogStore =
     closeDialog: () =>
       set({
         open: false,
-        message: "",
+        message: "", // i18n-ignore-line
         meta: null,
       }),
   }));

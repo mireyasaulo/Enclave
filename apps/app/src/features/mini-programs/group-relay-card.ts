@@ -14,11 +14,11 @@ type GroupRelaySummary = NonNullable<
 >;
 
 export function resolveGroupRelayCompletionTime(summary: GroupRelaySummary) {
-  if (summary.statusLabel === "已回填") {
+  if (summary.statusLabel === "已回填") { // i18n-ignore-line
     return summary.publishedAtLabel ?? summary.timestampLabel ?? null;
   }
 
-  if (summary.statusLabel === "已完成") {
+  if (summary.statusLabel === "已完成") { // i18n-ignore-line
     return summary.timestampLabel ?? null;
   }
 

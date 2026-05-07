@@ -110,7 +110,7 @@ export const useWorldOwnerStore = create<WorldOwnerState>()(
         }),
     }),
     {
-      name: "yinjie-app-world-owner",
+      name: "yinjie-app-world-owner", // i18n-ignore-line
       storage: createSessionStateStorage(),
     },
   ),

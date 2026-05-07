@@ -1194,7 +1194,7 @@ export function DesktopMobilePage() {
             ) : (
               <div className="mt-4 space-y-3">
                 <StatusRow
-                  label="Core API"
+                  label="Core API" // i18n-ignore-line
                   value={
                     systemStatusQuery.data?.coreApi.healthy
                       ? t(msg`世界在线`)
@@ -1267,7 +1267,7 @@ export function DesktopMobilePage() {
                     item,
                     localMessageActionState,
                   );
-                  const description = `${preview.prefix}${preview.text}`;
+                  const description = `${preview.prefix}${preview.text}`; // i18n-ignore-line
 
                   return (
                     <RecentConversationRow
@@ -2451,7 +2451,7 @@ async function handleCopyHandoff({
 function isOfficialAccountArticleMissingError(error: unknown) {
   return (
     error instanceof Error &&
-    /文章不存在。?|official account article not found|article not found/i.test(
+    /文章不存在。?|official account article not found|article not found/i.test( // i18n-ignore-line
       error.message.trim(),
     )
   );

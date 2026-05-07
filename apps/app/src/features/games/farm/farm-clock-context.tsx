@@ -55,7 +55,7 @@ export function FarmClockProvider({ children }: { children: ReactNode }) {
 export function useFarmClock(): FarmClock {
   const ctx = useContext(FarmClockContext);
   if (!ctx) {
-    throw new Error("useFarmClock must be used inside FarmClockProvider");
+    throw new Error("useFarmClock must be used inside FarmClockProvider"); // i18n-ignore-line
   }
   return ctx;
 }

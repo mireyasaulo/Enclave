@@ -938,7 +938,7 @@ function MobileOfficialStatusCard({
 function isOfficialAccountArticleMissingError(error: unknown) {
   return (
     error instanceof Error &&
-    /文章不存在。?|official account article not found|article not found/i.test(
+    /文章不存在。?|official account article not found|article not found/i.test( // i18n-ignore-line
       error.message.trim(),
     )
   );

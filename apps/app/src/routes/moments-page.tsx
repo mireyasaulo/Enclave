@@ -379,7 +379,7 @@ export function MomentsPage() {
 
     setNoticeActionLabel(null);
     setNoticeAction(null);
-    setNotice("");
+    setNotice(""); // i18n-ignore-line
   }, [baseUrl, resetComposeDraft]);
 
   useEffect(() => {
@@ -435,7 +435,7 @@ export function MomentsPage() {
     }
 
     const timer = window.setTimeout(() => {
-      setNotice("");
+      setNotice(""); // i18n-ignore-line
       setNoticeActionLabel(null);
       setNoticeAction(null);
     }, 2400);
@@ -1054,7 +1054,7 @@ export function MomentsPage() {
                           }
                           title={
                             !moment.canInteract
-                              ? "加为好友后才能互动"
+                              ? t(msg`加为好友后才能互动`)
                               : undefined
                           }
                           onClick={() => likeMutation.mutate(moment.id)}
