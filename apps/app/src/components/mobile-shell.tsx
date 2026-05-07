@@ -1,6 +1,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type PropsWithChildren,
   type ReactNode,
@@ -50,10 +51,16 @@ export function MobileShell({ children }: PropsWithChildren) {
   const activeKeepAlivePath = KEEP_ALIVE_TAB_PATHS.has(pathname)
     ? pathname
     : null;
+  // 同一 Tab 内 search/hash 切换时，强制刷新缓存的 React 子树
+  const activeKeepAliveCacheKey = activeKeepAlivePath
+    ? `${activeKeepAlivePath}${search}${hash}`
+    : null;
   const runtimeConfig = useAppRuntimeConfig();
   const { reminders } = useMessageReminders();
   const [cachedTabPages, setCachedTabPages] = useState<
-    Partial<Record<(typeof tabs)[number]["to"], ReactNode>>
+    Partial<
+      Record<(typeof tabs)[number]["to"], { cacheKey: string; node: ReactNode }>
+    >
   >({});
 
   const { data: conversations } = useQuery({
@@ -78,12 +85,17 @@ export function MobileShell({ children }: PropsWithChildren) {
     conversations: conversationList,
   });
 
+  const lastPersistedPathRef = useRef<string | null>(null);
   useEffect(() => {
     if (!isMobileWebRuntime(runtimeConfig.appPlatform)) {
       return;
     }
 
     const currentPath = `${pathname}${search}${hash}`;
+    if (lastPersistedPathRef.current === currentPath) {
+      return;
+    }
+    lastPersistedPathRef.current = currentPath;
     recordAppNavigation(currentPath);
     persistMobileWebRoute(currentPath);
   }, [hash, pathname, runtimeConfig.appPlatform, search]);
@@ -99,21 +111,25 @@ export function MobileShell({ children }: PropsWithChildren) {
   }, []);
 
   useEffect(() => {
-    if (!activeKeepAlivePath) {
+    if (!activeKeepAlivePath || !activeKeepAliveCacheKey) {
       return;
     }
 
     setCachedTabPages((current) => {
-      if (current[activeKeepAlivePath]) {
+      const existing = current[activeKeepAlivePath];
+      if (existing && existing.cacheKey === activeKeepAliveCacheKey) {
         return current;
       }
 
       return {
         ...current,
-        [activeKeepAlivePath]: children,
+        [activeKeepAlivePath]: {
+          cacheKey: activeKeepAliveCacheKey,
+          node: children,
+        },
       };
     });
-  }, [activeKeepAlivePath, children]);
+  }, [activeKeepAlivePath, activeKeepAliveCacheKey, children]);
 
   return (
     <div className="yj-mobile-shell relative h-dvh min-h-dvh overflow-hidden bg-[color:var(--bg-canvas)] text-[color:var(--text-primary)]">
@@ -121,17 +137,15 @@ export function MobileShell({ children }: PropsWithChildren) {
       <div className="flex h-full min-h-0 flex-col">
         <div className="relative min-h-0 flex-1">
           {tabs.map(({ to }) => {
-            const page = activeKeepAlivePath === to
-              ? cachedTabPages[to] ?? children
-              : cachedTabPages[to];
+            const cached = cachedTabPages[to];
+            const isActive = activeKeepAlivePath === to;
+            const page = isActive ? cached?.node ?? children : cached?.node;
             if (!page) {
               return null;
             }
 
-            const active = activeKeepAlivePath === to;
-
             return (
-              <MobileViewportPane key={to} active={active}>
+              <MobileViewportPane key={to} active={isActive}>
                 {page}
               </MobileViewportPane>
             );
