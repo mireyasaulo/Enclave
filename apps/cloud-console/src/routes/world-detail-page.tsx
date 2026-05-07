@@ -28,6 +28,9 @@ import {
 import { buildCompactJobsRouteSearch } from "../lib/job-route-search";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import {
+  formatCloudConsoleJobLeaseAvailable,
+  formatCloudConsoleJobLeaseExpires,
+  formatCloudConsoleJobLeaseRemaining,
   formatCloudConsoleJobsGroupCount,
   translateCloudConsoleTextForActiveLocale,
   useCloudConsoleText,
@@ -1490,13 +1493,22 @@ export function WorldDetailPage() {
                       <td className="px-4 py-3 text-[color:var(--text-secondary)]">
                         <div>{formatLeaseOwner(job.leaseOwner)}</div>
                         <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                          remaining {formatDuration(job.leaseRemainingSeconds)}
+                          {formatCloudConsoleJobLeaseRemaining(
+                            formatDuration(job.leaseRemainingSeconds),
+                            locale,
+                          )}
                         </div>
                         <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                          expires {formatDateTime(job.leaseExpiresAt)}
+                          {formatCloudConsoleJobLeaseExpires(
+                            formatDateTime(job.leaseExpiresAt),
+                            locale,
+                          )}
                         </div>
                         <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                          available {formatDateTime(job.availableAt)}
+                          {formatCloudConsoleJobLeaseAvailable(
+                            formatDateTime(job.availableAt),
+                            locale,
+                          )}
                         </div>
                       </td>
                       <td className="px-4 py-3 text-[color:var(--text-secondary)]">
