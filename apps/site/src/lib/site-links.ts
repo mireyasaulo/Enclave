@@ -5,16 +5,20 @@ function readEnvUrl(value: string | undefined, fallback: string) {
 
 export const siteLinks = {
   app: readEnvUrl(
-    import.meta.env.VITE_SITE_APP_URL,
+    process.env.NEXT_PUBLIC_SITE_APP_URL,
     "https://www.enclave.top/",
   ),
   deploy: readEnvUrl(
-    import.meta.env.VITE_SITE_DEPLOY_URL,
+    process.env.NEXT_PUBLIC_SITE_DEPLOY_URL,
     "https://github.com/yuanzui0728/yinjie-app/blob/main/DEPLOY.md",
   ),
   github: readEnvUrl(
-    import.meta.env.VITE_SITE_GITHUB_URL,
+    process.env.NEXT_PUBLIC_SITE_GITHUB_URL,
     "https://github.com/yuanzui0728/yinjie-app",
+  ),
+  releases: readEnvUrl(
+    process.env.NEXT_PUBLIC_SITE_RELEASES_URL,
+    "https://github.com/yuanzui0728/yinjie-app/releases",
   ),
   contact: "mailto:yuanzui0728@gmail.com",
 };

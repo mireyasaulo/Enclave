@@ -1,0 +1,34 @@
+@import "tailwindcss";
+@import "@yinjie/ui/tokens.css";
+
+@theme inline {
+  --color-brand: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-accent: var(--brand-accent);
+  --color-bg: var(--bg-canvas);
+  --color-surface: var(--surface-card);
+  --color-text: var(--text-primary);
+  --color-text-muted: var(--text-secondary);
+  --color-text-dim: var(--text-muted);
+  --color-border: var(--border-subtle);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
