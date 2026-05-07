@@ -212,6 +212,7 @@ function EmailCodeForm({ onSuccess }: { onSuccess: () => void }) {
           onChange={(e) => setEmail(e.target.value)}
           required
           autoFocus
+          autoComplete="email"
           placeholder="you@example.com"
         />
       </FormRow>
@@ -224,6 +225,7 @@ function EmailCodeForm({ onSuccess }: { onSuccess: () => void }) {
             inputMode="numeric"
             pattern="[0-9]{6}"
             maxLength={6}
+            autoComplete="one-time-code"
           />
           <Button
             type="button"

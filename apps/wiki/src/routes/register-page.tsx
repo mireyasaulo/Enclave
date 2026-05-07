@@ -63,6 +63,7 @@ export function RegisterPage() {
               required
               minLength={2}
               autoFocus
+              autoComplete="username"
             />
           </FormRow>
           <FormRow label={t(msg`密码`)} hint={t(msg`≥ 6 位`)}>
@@ -72,6 +73,7 @@ export function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
+              autoComplete="new-password"
             />
           </FormRow>
           <FormRow
@@ -88,6 +90,7 @@ export function RegisterPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               minLength={6}
+              autoComplete="new-password"
             />
           </FormRow>
           {error && <InlineNotice tone="danger">{error}</InlineNotice>}
