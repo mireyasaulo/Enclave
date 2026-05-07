@@ -443,6 +443,12 @@ function EditView({
   // their in-progress edits.
   const dirtyRef = useRef(false);
   const submitTimerRef = useRef<number | null>(null);
+  // 保留上次见到的服务器值序列化，用于区分"react-query 给了新引用但内容相同"
+  // 与"内容真的变了"两种情况，避免在前者下误弹"服务器有新版本"。
+  const lastInitialSigRef = useRef<string>(JSON.stringify(initial));
+  const lastInitialRecipeSigRef = useRef<string>(
+    JSON.stringify(initialRecipe),
+  );
   const [serverChangedWhileEditing, setServerChangedWhileEditing] =
     useState(false);
 
@@ -457,16 +463,22 @@ function EditView({
   );
 
   useEffect(() => {
+    const sig = JSON.stringify(initial);
+    const changed = sig !== lastInitialSigRef.current;
+    lastInitialSigRef.current = sig;
     if (!dirtyRef.current) {
       setDraft(initial);
-    } else {
+    } else if (changed) {
       setServerChangedWhileEditing(true);
     }
   }, [initial]);
   useEffect(() => {
+    const sig = JSON.stringify(initialRecipe);
+    const changed = sig !== lastInitialRecipeSigRef.current;
+    lastInitialRecipeSigRef.current = sig;
     if (!dirtyRef.current) {
       setRecipeDraft(initialRecipe);
-    } else {
+    } else if (changed) {
       setServerChangedWhileEditing(true);
     }
   }, [initialRecipe]);
@@ -483,6 +495,8 @@ function EditView({
   function loadLatestFromServer() {
     setDraft(initial);
     setRecipeDraft(initialRecipe);
+    lastInitialSigRef.current = JSON.stringify(initial);
+    lastInitialRecipeSigRef.current = JSON.stringify(initialRecipe);
     dirtyRef.current = false;
     setServerChangedWhileEditing(false);
   }

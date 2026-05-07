@@ -23,7 +23,14 @@ export function LoginPage() {
   const [mode, setMode] = useState<Mode>("password");
 
   function gotoTarget() {
-    if (redirect && redirect.startsWith("/")) {
+    // 防开放跳转：只接受站内绝对路径，且要排除 // 和 /\ 这类 protocol-relative
+    // 形式（浏览器会把它当外站）。任何非 / 开头或带 \\ / // 前缀的值都丢弃。
+    const safe =
+      redirect &&
+      redirect.startsWith("/") &&
+      !redirect.startsWith("//") &&
+      !redirect.startsWith("/\\");
+    if (safe) {
       window.location.href = redirect;
     } else {
       void navigate({ to: "/" });
