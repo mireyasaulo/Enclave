@@ -6,6 +6,7 @@ import { useFarmState } from "./use-farm-state";
 import { CoinDisplay } from "./components/coin-display";
 import { EventLogPanel } from "./components/event-log-panel";
 import { FarmIsoGrid } from "./components/farm-iso-grid";
+import { FarmMascot } from "./components/farm-mascot";
 import { FarmSky } from "./components/farm-sky";
 import { NeighborFarmModal } from "./components/neighbor-farm-modal";
 import { NeighborListPanel } from "./components/neighbor-list-panel";
@@ -192,6 +193,7 @@ function FarmPageInner() {
         characterId={activeNeighborId}
         onClose={() => setActiveNeighborId(null)}
       />
+      <FarmMascot state={state} />
     </FarmSky>
   );
 }
