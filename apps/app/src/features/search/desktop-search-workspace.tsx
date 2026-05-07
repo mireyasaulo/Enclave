@@ -89,15 +89,6 @@ const desktopSearchSelectedRowClassName =
 
 type DesktopSearchFocusRegion = "input" | "categories" | "results";
 
-const desktopSearchFocusRegionLabels: Record<
-  DesktopSearchFocusRegion,
-  string
-> = {
-  input: "搜索框",
-  categories: "分类条",
-  results: "结果区",
-};
-
 const landingScopeCards = [
   {
     id: "messages" as const,
@@ -662,78 +653,9 @@ export function DesktopSearchWorkspace({
     showTransitionHint("已清空关键词，回到搜索首页。");
   });
 
-  const categorySummary = useMemo(() => {
-    if (searchPending) {
-      return trimmedInputKeyword
-        ? `已输入“${trimmedInputKeyword}”，点搜索图标或按 Enter 执行搜索。`
-        : "输入已清空，点搜索图标或按 Enter 回到搜索首页。";
-    }
-
-    if (!hasKeyword) {
-      return "从聊天、联系人、公众号、收藏和小程序里继续找。";
-    }
-
-    if (activeCategory === "all") {
-      return `关键词“${trimmedCommittedKeyword}”命中 ${visibleResults.length} 条结果，可继续按分类收窄。`;
-    }
-
-    return `当前查看 ${searchCategoryTitles[activeCategory]}，共 ${visibleResults.length} 条结果。`;
-  }, [
-    activeCategory,
-    hasKeyword,
-    searchPending,
-    trimmedCommittedKeyword,
-    trimmedInputKeyword,
-    visibleResults.length,
-  ]);
-  const headerTitle = searchPending
-    ? trimmedInputKeyword
-      ? trimmedCommittedKeyword
-        ? `等待搜索“${trimmedInputKeyword}”`
-        : `准备搜索“${trimmedInputKeyword}”`
-      : "等待清空当前搜索"
-    : hasKeyword
-      ? `搜索“${trimmedCommittedKeyword}”`
-      : "搜索聊天、联系人与内容";
-  const headerBadge = searchPending
-    ? "待执行"
-    : !hasKeyword
-      ? "桌面全局搜索"
-      : activeCategory === "all"
-        ? `${visibleResults.length} 条结果`
-        : `${searchCategoryTitles[activeCategory]} · ${visibleResults.length}`;
   const keywordLabel = trimmedCommittedKeyword;
   const contextCategoryTitle =
     activeCategory === "all" ? "全部结果" : searchCategoryTitles[activeCategory];
-  const contextKeyboardHint = useMemo(() => {
-    if (searchPending) {
-      return trimmedInputKeyword
-        ? "Enter 执行搜索 · Esc 清空关键词"
-        : "Enter 回到搜索首页";
-    }
-
-    if (keyboardFocusRegion === "results" && keyboardNavigableResults.length) {
-      return "↑ ↓ 切换当前项 · Enter 打开当前项 · Esc 回搜索框 · Home 回顶部";
-    }
-
-    if (keyboardFocusRegion === "categories") {
-      return "← → 切分类 · Home / End 跳转 · Esc 回搜索框";
-    }
-
-    if (keyboardNavigableResults.length) {
-      return selectedResultId
-        ? "Tab 进入结果层 · ↑ ↓ 切换当前项 · Enter 执行搜索 · Esc 取消预选"
-        : "Tab 进入结果层 · ↑ ↓ 预选当前项 · Enter 执行搜索 · Esc 清空关键词";
-    }
-
-    return "Enter 执行搜索 · Esc 清空关键词";
-  }, [
-    keyboardFocusRegion,
-    keyboardNavigableResults.length,
-    searchPending,
-    selectedResultId,
-    trimmedInputKeyword,
-  ]);
   const handleScrollToTopContext = useEffectEvent(() => {
     scrollResultsToTop("smooth");
     focusSearchInput(Boolean(trimmedInputKeyword));
@@ -1129,129 +1051,98 @@ export function DesktopSearchWorkspace({
       onFocusCapture={handleWorkspaceFocusCapture}
       onKeyDownCapture={handleWorkspaceKeyDownCapture}
     >
-      <header className="shrink-0 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.92)] backdrop-blur-xl">
-        <div className="mx-auto w-full max-w-[1160px] px-6 py-2">
-          <div className="overflow-hidden rounded-[18px] border border-[#dce9dd] bg-[linear-gradient(135deg,rgba(7,193,96,0.14),rgba(7,193,96,0.05)_40%,white)]">
-            <div className="px-4 py-2.5">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-white text-[color:var(--brand-primary)] shadow-[0_10px_24px_rgba(7,193,96,0.10)]">
-                  <Search size={16} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex min-w-0 items-baseline gap-2">
-                      <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-[color:var(--text-dim)]">
-                        搜一搜
-                      </div>
-                      <div className="min-w-0 truncate text-sm font-medium text-[color:var(--text-primary)]">
-                        {headerTitle}
-                      </div>
-                      <div className="min-w-0 truncate text-xs text-[color:var(--text-secondary)]">
-                        {categorySummary}
-                      </div>
-                    </div>
-                    <div className="shrink-0 rounded-full bg-white/90 px-2.5 py-1 text-[11px] text-[color:var(--text-muted)] shadow-[0_8px_18px_rgba(15,23,42,0.04)]">
-                      {headerBadge}
-                    </div>
-                  </div>
-
-                  <form
-                    className="relative mt-2"
-                    onSubmit={(event) => {
-                      event.preventDefault();
-                      onCommitSearch(searchText);
-                    }}
-                  >
-                    <button
-                      type="submit"
-                      aria-label="执行搜索"
-                      title="执行搜索"
-                      className={cn(
-                        "absolute left-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-[10px] transition",
-                        searchPending && trimmedInputKeyword
-                          ? "bg-[rgba(7,193,96,0.12)] text-[color:var(--brand-primary)] hover:bg-[rgba(7,193,96,0.16)]"
-                          : "text-[color:var(--text-dim)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]",
-                      )}
-                    >
-                      <Search size={15} />
-                    </button>
-                    <input
-                      ref={inputRef}
-                      type="search"
-                      value={searchText}
-                      onChange={(event) => setSearchText(event.target.value)}
-                      onKeyDown={handleSearchInputKeyDown}
-                      placeholder="搜索聊天记录、联系人、公众号、收藏和小程序"
-                      className="h-9 w-full rounded-[12px] border border-white/80 bg-white/96 pl-10 pr-20 text-sm text-[color:var(--text-primary)] outline-none transition-[border-color,box-shadow] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.4)] focus:shadow-[0_0_0_4px_rgba(7,193,96,0.08)]"
-                    />
-                    {searchText ? (
-                      <DesktopSearchActionButton
-                        className="absolute right-3 top-1/2 -translate-y-1/2"
-                        onClick={handleClearKeyword}
-                        priority="secondary"
-                        tone="neutral"
-                      >
-                        清空
-                      </DesktopSearchActionButton>
-                    ) : null}
-                  </form>
-                </div>
-              </div>
-            </div>
-
-            <div
+      <header className="shrink-0 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.94)] backdrop-blur-xl">
+        <div className="mx-auto w-full max-w-[1160px] px-6 pt-3">
+          <form
+            className="relative"
+            onSubmit={(event) => {
+              event.preventDefault();
+              onCommitSearch(searchText);
+            }}
+          >
+            <button
+              type="submit"
+              aria-label="执行搜索"
+              title="执行搜索"
               className={cn(
-                "border-t border-white/80 px-4 py-1.5 transition-[background-color,box-shadow]",
-                keyboardFocusRegion === "categories"
-                  ? "bg-[rgba(255,255,255,0.42)] shadow-[inset_0_1px_0_rgba(255,255,255,0.65),inset_0_0_0_1px_rgba(7,193,96,0.08)]"
-                  : null,
+                "absolute left-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-[10px] transition",
+                searchPending && trimmedInputKeyword
+                  ? "bg-[rgba(7,193,96,0.12)] text-[color:var(--brand-primary)] hover:bg-[rgba(7,193,96,0.16)]"
+                  : "text-[color:var(--text-dim)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]",
               )}
             >
-              <div className="flex gap-1.5 overflow-x-auto">
-                {searchCategoryLabels.map((item) => {
-                  const countLabel = !hasKeyword
-                    ? null
-                    : item.id === "all"
-                      ? `${visibleResults.length}`
-                      : `${matchedCounts[item.id]}`;
+              <Search size={15} />
+            </button>
+            <input
+              ref={inputRef}
+              type="search"
+              value={searchText}
+              onChange={(event) => setSearchText(event.target.value)}
+              onKeyDown={handleSearchInputKeyDown}
+              placeholder="搜索聊天记录、联系人、公众号、收藏和小程序"
+              className="h-9 w-full rounded-[10px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] pl-10 pr-20 text-sm text-[color:var(--text-primary)] outline-none transition-[border-color,box-shadow] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.4)] focus:bg-white focus:shadow-[0_0_0_3px_rgba(7,193,96,0.08)]"
+            />
+            {searchText ? (
+              <DesktopSearchActionButton
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+                onClick={handleClearKeyword}
+                priority="secondary"
+                tone="neutral"
+              >
+                清空
+              </DesktopSearchActionButton>
+            ) : null}
+          </form>
+          <div
+            className={cn(
+              "-mx-1 mt-2 flex gap-0.5 overflow-x-auto px-1 pb-1 transition-[background-color]",
+              keyboardFocusRegion === "categories"
+                ? "rounded-[8px] bg-[rgba(7,193,96,0.04)]"
+                : null,
+            )}
+          >
+            {searchCategoryLabels.map((item) => {
+              const countLabel = !hasKeyword
+                ? null
+                : item.id === "all"
+                  ? `${visibleResults.length}`
+                  : `${matchedCounts[item.id]}`;
 
-                  return (
-                    <button
-                      data-search-category-chip={item.id}
-                      key={item.id}
-                      ref={(node) => {
-                        categoryTabRefs.current[item.id] = node;
-                      }}
-                      type="button"
-                      onClick={() =>
-                        handleSelectCategory(item.id, { focusInput: true })
-                      }
+              return (
+                <button
+                  data-search-category-chip={item.id}
+                  key={item.id}
+                  ref={(node) => {
+                    categoryTabRefs.current[item.id] = node;
+                  }}
+                  type="button"
+                  onClick={() =>
+                    handleSelectCategory(item.id, { focusInput: true })
+                  }
+                  className={cn(
+                    "inline-flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1 text-[13px] transition",
+                    desktopSearchChipFocusClassName,
+                    activeCategory === item.id
+                      ? "bg-[rgba(7,193,96,0.10)] font-medium text-[color:var(--brand-primary)]"
+                      : "text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]",
+                  )}
+                >
+                  <span>{item.label}</span>
+                  {countLabel ? (
+                    <span
                       className={cn(
-                        "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition",
-                        desktopSearchChipFocusClassName,
+                        "text-[11px]",
                         activeCategory === item.id
-                          ? "border-[rgba(7,193,96,0.16)] bg-white text-[color:var(--text-primary)] shadow-[0_8px_18px_rgba(15,23,42,0.04)]"
-                          : "border-white/70 bg-white/70 text-[color:var(--text-secondary)] hover:bg-white hover:text-[color:var(--text-primary)]",
+                          ? "text-[color:var(--brand-primary)]"
+                          : "text-[color:var(--text-muted)]",
                       )}
                     >
-                      <span>{item.label}</span>
-                      {countLabel ? (
-                        <span
-                          className={cn(
-                            "rounded-full px-2 py-0.5 text-[11px]",
-                            activeCategory === item.id
-                              ? "bg-[rgba(7,193,96,0.08)] text-[color:var(--brand-primary)]"
-                              : "bg-white text-[color:var(--text-muted)]",
-                          )}
-                        >
-                          {countLabel}
-                        </span>
-                      ) : null}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+                      {countLabel}
+                    </span>
+                  ) : null}
+                </button>
+              );
+            })}
           </div>
         </div>
       </header>
@@ -1294,8 +1185,6 @@ export function DesktopSearchWorkspace({
               categoryTitle={contextCategoryTitle}
               count={visibleResults.length}
               keyword={keywordLabel}
-              keyboardHint={contextKeyboardHint}
-              focusRegion={keyboardFocusRegion}
               onBackToAll={
                 activeCategory === "all"
                   ? undefined
@@ -2004,8 +1893,6 @@ function DesktopSearchContextBar({
   activeSection,
   categoryTitle,
   count,
-  focusRegion,
-  keyboardHint,
   keyword,
   onBackToAll,
   onClearKeyword,
@@ -2017,8 +1904,6 @@ function DesktopSearchContextBar({
   activeSection?: SearchResultCategory | null;
   categoryTitle: string;
   count: number;
-  focusRegion: DesktopSearchFocusRegion;
-  keyboardHint?: string;
   keyword: string;
   onBackToAll?: () => void;
   onClearKeyword: () => void;
@@ -2030,67 +1915,43 @@ function DesktopSearchContextBar({
     label: string;
   }>;
 }) {
-  const contextDescription =
-    activeCategory === "all"
-      ? "当前正在查看聚合结果，继续滚动时这条上下文会一直保留。"
-      : `当前结果已收窄到${categoryTitle}，需要扩展范围时可随时回到全部结果。`;
   const activeSectionTitle = activeSection
     ? searchCategoryTitles[activeSection]
     : null;
-  const focusRegionLabel = desktopSearchFocusRegionLabels[focusRegion];
-  const focusRegionToneClassName =
-    focusRegion === "input"
-      ? "bg-[rgba(7,193,96,0.10)] text-[color:var(--brand-primary)]"
-      : focusRegion === "categories"
-        ? "bg-[rgba(15,118,110,0.10)] text-[#226448]"
-        : "bg-[rgba(59,130,246,0.10)] text-[#1d4ed8]";
 
   return (
     <div className="sticky top-0 z-10 mb-2">
       <section
         data-search-context-bar=""
-        className="rounded-[14px] border border-[rgba(7,193,96,0.14)] bg-[rgba(255,255,255,0.94)] px-3 py-2 shadow-[0_18px_42px_rgba(15,23,42,0.06)] backdrop-blur-xl"
+        className="rounded-[10px] border border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.94)] px-3 py-1.5 shadow-[0_4px_12px_rgba(15,23,42,0.04)] backdrop-blur"
       >
-        <div className="flex items-center justify-between gap-3">
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="rounded-full bg-[rgba(7,193,96,0.10)] px-2 py-0.5 text-[10px] font-medium text-[color:var(--brand-primary)]">
+        <div className="flex items-center gap-3">
+          <div className="flex min-w-0 flex-1 items-center gap-2 text-xs text-[color:var(--text-secondary)]">
+            <span className="truncate">
+              <span className="font-medium text-[color:var(--text-primary)]">
                 {categoryTitle}
               </span>
-              <span className="rounded-full bg-[color:var(--surface-console)] px-2 py-0.5 text-[10px] text-[color:var(--text-muted)]">
-                {count} 条命中
-              </span>
+              <span className="mx-1.5 text-[color:var(--text-dim)]">·</span>
+              <span>{count} 条命中</span>
               {activeCategory === "all" && activeSectionTitle ? (
-                <span className="rounded-full bg-[rgba(7,193,96,0.08)] px-2 py-0.5 text-[10px] text-[color:var(--brand-primary)]">
-                  位于 {activeSectionTitle}
-                </span>
+                <>
+                  <span className="mx-1.5 text-[color:var(--text-dim)]">·</span>
+                  <span>位于 {activeSectionTitle}</span>
+                </>
               ) : null}
-              <span className="truncate text-xs font-medium text-[color:var(--text-primary)]">
-                关键词“{keyword}”
-              </span>
-              <span
-                className={cn(
-                  "rounded-full px-2 py-0.5 text-[10px] font-medium",
-                  focusRegionToneClassName,
-                )}
-              >
-                {focusRegionLabel}
-              </span>
-            </div>
-            {keyboardHint ? (
-              <div className="mt-1 truncate text-[10px] text-[color:var(--text-muted)]">
-                {keyboardHint}
-              </div>
-            ) : null}
+            </span>
+            <span className="truncate text-[color:var(--text-muted)]">
+              关键词“{keyword}”
+            </span>
           </div>
-          <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+          <div className="flex shrink-0 items-center gap-1">
             {onBackToAll ? (
               <DesktopSearchActionButton
                 onClick={onBackToAll}
                 priority="secondary"
                 tone="brand"
               >
-                回到全部结果
+                回到全部
               </DesktopSearchActionButton>
             ) : null}
             <DesktopSearchActionButton
@@ -2105,40 +1966,38 @@ function DesktopSearchContextBar({
               priority="secondary"
               tone="neutral"
             >
-              清空关键词
+              清空
             </DesktopSearchActionButton>
           </div>
         </div>
         {sectionItems?.length ? (
-          <div className="mt-2 border-t border-[rgba(15,23,42,0.06)] pt-2">
-            <div className="flex gap-1.5 overflow-x-auto">
-              {sectionItems.map((item) => (
-                <button
-                  key={item.category}
-                  type="button"
-                  onClick={() => onSelectSection?.(item.category)}
+          <div className="mt-1.5 flex gap-0.5 overflow-x-auto border-t border-[color:var(--border-faint)] pt-1.5">
+            {sectionItems.map((item) => (
+              <button
+                key={item.category}
+                type="button"
+                onClick={() => onSelectSection?.(item.category)}
+                className={cn(
+                  "inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-0.5 text-[11px] transition",
+                  desktopSearchChipFocusClassName,
+                  activeSection === item.category
+                    ? "bg-[rgba(7,193,96,0.10)] font-medium text-[color:var(--brand-primary)]"
+                    : "text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]",
+                )}
+              >
+                <span>{item.label}</span>
+                <span
                   className={cn(
-                    "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] transition",
-                    desktopSearchChipFocusClassName,
+                    "text-[10px]",
                     activeSection === item.category
-                      ? "border-[rgba(7,193,96,0.16)] bg-[rgba(7,193,96,0.08)] text-[color:var(--brand-primary)]"
-                      : "border-[rgba(15,23,42,0.06)] bg-white text-[color:var(--text-secondary)] hover:bg-[rgba(7,193,96,0.04)] hover:text-[color:var(--text-primary)]",
+                      ? "text-[color:var(--brand-primary)]"
+                      : "text-[color:var(--text-muted)]",
                   )}
                 >
-                  <span>{item.label}</span>
-                  <span
-                    className={cn(
-                      "rounded-full px-2 py-0.5 text-[10px]",
-                      activeSection === item.category
-                        ? "bg-white text-[color:var(--brand-primary)]"
-                        : "bg-[color:var(--surface-console)] text-[color:var(--text-muted)]",
-                    )}
-                  >
-                    {item.count}
-                  </span>
-                </button>
-              ))}
-            </div>
+                  {item.count}
+                </span>
+              </button>
+            ))}
           </div>
         ) : null}
       </section>
