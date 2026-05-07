@@ -65,7 +65,7 @@ export class AuthService {
       roleGrantedBy: bootstrapAsAdmin ? 'first_wiki_member_bootstrap' : null,
     });
     const saved = await this.userRepo.save(user);
-    await this.welcomeMessageService.sendWelcomeMessage(saved.id);
+    await this.welcomeMessageService.sendWelcomeMessage();
     return this.buildSession(saved);
   }
 
