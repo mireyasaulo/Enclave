@@ -1,8 +1,9 @@
-import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
-
-const t = translateRuntimeMessage;
-
+// i18n-ignore-start: Builds and parses group-relay message text that is stored
+// verbatim in the message `text` field and round-tripped between sender and
+// receiver. The literal Chinese tokens are protocol markers used by both the
+// encoder below and the regex/string-prefix parsers in parseGroupRelaySummaryMessage;
+// translating them would break round-trip compatibility across locales. UI
+// presentation translates separately via the parsed structures.
 const GROUP_RELAY_MESSAGE_PREFIX = "[群接龙]";
 
 export type GroupRelaySummaryStatus =

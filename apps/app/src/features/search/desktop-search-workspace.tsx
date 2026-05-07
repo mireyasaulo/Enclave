@@ -44,10 +44,6 @@ import {
   type SearchResultSection,
   type SearchScopeCounts,
 } from "./search-types";
-import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
-
-const t = translateRuntimeMessage;
 
 type DesktopSearchWorkspaceProps = {
   activeCategory: SearchCategory;
@@ -114,44 +110,44 @@ const landingScopeCards: Array<{
   {
     id: "messages",
     icon: MessageSquareText,
-    title: t(msg`聊天记录`),
-    description: t(msg`优先定位会话和消息片段。`),
+    title: msg`聊天记录`,
+    description: msg`优先定位会话和消息片段。`,
   },
   {
     id: "contacts",
     icon: UsersRound,
-    title: t(msg`联系人`),
-    description: t(msg`支持备注名、角色名和标签。`),
+    title: msg`联系人`,
+    description: msg`支持备注名、角色名和标签。`,
   },
   {
     id: "favorites",
     icon: Bookmark,
-    title: t(msg`收藏`),
-    description: t(msg`聚合消息、笔记和内容收藏。`),
+    title: msg`收藏`,
+    description: msg`聚合消息、笔记和内容收藏。`,
   },
   {
     id: "officialAccounts",
     icon: Newspaper,
-    title: t(msg`公众号`),
-    description: t(msg`支持账号资料和文章命中。`),
+    title: msg`公众号`,
+    description: msg`支持账号资料和文章命中。`,
   },
   {
     id: "miniPrograms",
     icon: Blocks,
-    title: t(msg`小程序`),
-    description: t(msg`覆盖最近使用和目录里的入口。`),
+    title: msg`小程序`,
+    description: msg`覆盖最近使用和目录里的入口。`,
   },
   {
     id: "moments",
     icon: Star,
-    title: t(msg`朋友圈`),
-    description: t(msg`支持好友动态和评论命中。`),
+    title: msg`朋友圈`,
+    description: msg`支持好友动态和评论命中。`,
   },
   {
     id: "feed",
     icon: Blocks,
-    title: t(msg`内容流`),
-    description: t(msg`继续承接广场动态结果。`),
+    title: msg`内容流`,
+    description: msg`继续承接广场动态结果。`,
   },
 ];
 
@@ -612,7 +608,7 @@ export function DesktopSearchWorkspace({
     );
   });
   const resolveCategoryHintTitle = (category: SearchCategory) =>
-    category === "all" ? t(msg`全部结果`) : searchCategoryTitles[category];
+    category === "all" ? t(msg`全部结果`) : getCategoryTitle(category);
   const resolveSpotlightPanelId = (
     category: SearchCategory,
   ): SearchCategory | null => {
@@ -633,7 +629,7 @@ export function DesktopSearchWorkspace({
       scrollAllResultsSectionIntoView(category, "smooth");
       setActiveAllResultsSection(category);
       showPanelSpotlight(category);
-      showTransitionHint(t(msg`已定位到${searchCategoryTitles[category]}分区。`));
+      showTransitionHint(t(msg`已定位到${getCategoryTitle(category)}分区。`));
     },
   );
   const handleExpandAllResultsSection = useEffectEvent(
@@ -642,7 +638,7 @@ export function DesktopSearchWorkspace({
       scrollResultsToTop("smooth");
       focusSearchInput(Boolean(trimmedInputKeyword));
       showPanelSpotlight(category);
-      showTransitionHint(t(msg`已展开${searchCategoryTitles[category]}全部结果。`));
+      showTransitionHint(t(msg`已展开${getCategoryTitle(category)}全部结果。`));
     },
   );
   const handleSelectCategory = useEffectEvent(
@@ -678,7 +674,7 @@ export function DesktopSearchWorkspace({
 
   const keywordLabel = trimmedCommittedKeyword;
   const contextCategoryTitle =
-    activeCategory === "all" ? t(msg`全部结果`) : searchCategoryTitles[activeCategory];
+    activeCategory === "all" ? t(msg`全部结果`) : getCategoryTitle(activeCategory);
   const handleScrollToTopContext = useEffectEvent(() => {
     scrollResultsToTop("smooth");
     focusSearchInput(Boolean(trimmedInputKeyword));
@@ -691,7 +687,7 @@ export function DesktopSearchWorkspace({
       setActiveAllResultsSection(category);
       setActiveCategory("all");
       focusSearchInput(Boolean(trimmedInputKeyword));
-      showTransitionHint(t(msg`已回到全部结果，并定位到${searchCategoryTitles[category]}分区。`));
+      showTransitionHint(t(msg`已回到全部结果，并定位到${getCategoryTitle(category)}分区。`));
     },
   );
   const handleSelectResult = useEffectEvent((resultId: string) => {
@@ -1117,8 +1113,11 @@ export function DesktopSearchWorkspace({
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
               onKeyDown={handleSearchInputKeyDown}
-              placeholder={t(msg`搜索聊天记录、联系人、公众号、收藏和小程序`)}
-              className="h-9 w-full rounded-[10px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] pl-10 pr-20 text-sm text-[color:var(--text-primary)] outline-none transition-[border-color,box-shadow] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.4)] focus:bg-white focus:shadow-[0_0_0_3px_rgba(7,193,96,0.08)]"
+              placeholder={t(msg`搜索聊天记录、联系人、收藏和朋友圈`)}
+              className={cn(
+                "w-full rounded-[10px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] pr-20 text-[color:var(--text-primary)] outline-none transition-[border-color,box-shadow,height,font-size,padding] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.4)] focus:bg-white focus:shadow-[0_0_0_3px_rgba(7,193,96,0.08)]",
+                hasKeyword ? "h-9 pl-10 text-sm" : "h-11 pl-11 text-[15px]",
+              )}
             />
             {searchText ? (
               <DesktopSearchActionButton
@@ -1297,13 +1296,11 @@ export function DesktopSearchWorkspace({
                         onClick={onClearHistory}
                         tone="neutral"
                       >
-                        {t(msg`清空记录`)}
+                        {t(msg`清空`)}
                       </DesktopSearchActionButton>
                     ) : null
                   }
-                  countLabel={history.length ? t(msg`${history.length} 条记录`) : undefined}
-                  contextLabel={t(msg`搜索记录`)}
-                  description={t(msg`优先展示最近真正用过的关键词。`)}
+                  countLabel={history.length ? `${history.length}` : undefined}
                   title={t(msg`最近搜索`)}
                 >
                   {history.length ? (
@@ -1318,35 +1315,18 @@ export function DesktopSearchWorkspace({
                       ))}
                     </div>
                   ) : (
-                    <DesktopSearchStatusCard
-                      badgeLabel={t(msg`等待记录`)}
-                      className="mb-0 rounded-[16px] border-[color:var(--border-faint)] bg-white p-3.5"
-                      description={t(msg`从聊天、通讯录或左侧导航进入搜一搜后，这里会开始积累关键词。`)}
-                      status="empty"
-                      title={t(msg`最近搜索`)}
-                    />
+                    <div className="px-2 py-1.5 text-xs text-[color:var(--text-muted)]">
+                      {t(msg`暂无记录`)}
+                    </div>
                   )}
                 </DesktopSearchLandingPanel>
 
-                <div className="space-y-4">
-                  <div className="relative">
-                    <DesktopQuickLinksPanel
-                      title={t(msg`最近使用的小程序`)}
-                      description={t(msg`优先展示最近打开的小程序入口。`)}
-                      emptyText={t(msg`打开过的小程序会先沉淀到这里。`)}
-                      items={recentMiniPrograms}
-                      onOpen={onOpenQuickLink}
-                    />
-                    <DesktopSearchComingSoonOverlay />
-                  </div>
-                  <DesktopQuickLinksPanel
-                    title={t(msg`最近收藏`)}
-                    description={t(msg`优先展示高频回看的收藏入口。`)}
-                    emptyText={t(msg`收藏过内容后，这里会出现最近回访入口。`)}
-                    items={recentFavorites}
-                    onOpen={onOpenQuickLink}
-                  />
-                </div>
+                <DesktopQuickLinksPanel
+                  title={t(msg`最近收藏`)}
+                  emptyText={t(msg`暂无最近收藏`)}
+                  items={recentFavorites}
+                  onOpen={onOpenQuickLink}
+                />
               </div>
             </div>
           ) : null}
@@ -1409,98 +1389,58 @@ export function DesktopSearchWorkspace({
                             conversationResults={
                               entry.previewMessageConversations
                             }
-                            priority="secondary"
-                            tone="brand"
-                          >
-                            {t(msg`查看全部`)}
-                          </DesktopSearchActionButton>
-                        ) : null
-                      }
-                      countLabel={t(msg`${section.results.length} 条命中`)}
-                      description={getDesktopSearchSectionDescription(
-                        section.category,
-                      )}
-                      highlighted={spotlightPanelId === section.category}
-                      panelRef={(node) => {
-                        allResultSectionRefs.current[section.category] = node;
-                      }}
-                      title={section.label}
-                    >
-                      {section.category === "messages" ? (
-                        <DesktopSearchMessageResults
-                          conversationResults={entry.previewMessageConversations}
-                          keyword={normalizedKeyword}
-                          messageGroups={entry.previewMessageGroups}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : section.category === "officialAccounts" ? (
-                        <DesktopSearchOfficialAccountResults
-                          accountResults={entry.previewOfficialAccounts}
-                          keyword={normalizedKeyword}
-                          officialAccountGroups={entry.previewOfficialAccountGroups}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : isDesktopFeatureCardCategory(section.category) ? (
-                        <DesktopSearchFeatureResults
-                          category={section.category}
-                          items={entry.previewFeatureResults}
-                          keyword={normalizedKeyword}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : isDesktopContentCategory(section.category) ? (
-                        <DesktopSearchContentResults
-                          items={entry.previewContentResults}
-                          keyword={normalizedKeyword}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : (
-                        <DesktopSearchResultStack>
-                          {entry.previewResults.map((item) => (
-                            <DesktopSearchResultRow
-                              key={item.id}
-                              buttonRef={(node) => {
-                                resultButtonRefs.current[item.id] = node;
-                              }}
-                              item={item}
-                              keyword={normalizedKeyword}
-                              onOpen={onOpenResult}
-                              onSelect={handleSelectResult}
-                              selected={selectedResultId === item.id}
-                            />
-                          ))}
-                        </DesktopSearchResultStack>
-                      )}
-                    </DesktopSearchResultsPanel>
-                  );
-                  return isComingSoon ? (
-                    <div key={section.category} className="relative">
-                      {panelNode}
-                      <DesktopSearchComingSoonOverlay />
-                    </div>
-                  ) : (
-                    panelNode
-                  );
-                })}
+                            keyword={normalizedKeyword}
+                            messageGroups={entry.previewMessageGroups}
+                            onOpen={onOpenResult}
+                            onSelect={handleSelectResult}
+                            registerResultRef={(resultId, node) => {
+                              resultButtonRefs.current[resultId] = node;
+                            }}
+                            selectedResultId={selectedResultId}
+                          />
+                        ) : isDesktopFeatureCardCategory(section.category) ? (
+                          <DesktopSearchFeatureResults
+                            category={section.category}
+                            items={entry.previewFeatureResults}
+                            keyword={normalizedKeyword}
+                            onOpen={onOpenResult}
+                            onSelect={handleSelectResult}
+                            registerResultRef={(resultId, node) => {
+                              resultButtonRefs.current[resultId] = node;
+                            }}
+                            selectedResultId={selectedResultId}
+                          />
+                        ) : isDesktopContentCategory(section.category) ? (
+                          <DesktopSearchContentResults
+                            items={entry.previewContentResults}
+                            keyword={normalizedKeyword}
+                            onOpen={onOpenResult}
+                            onSelect={handleSelectResult}
+                            registerResultRef={(resultId, node) => {
+                              resultButtonRefs.current[resultId] = node;
+                            }}
+                            selectedResultId={selectedResultId}
+                          />
+                        ) : (
+                          <DesktopSearchResultStack>
+                            {entry.previewResults.map((item) => (
+                              <DesktopSearchResultRow
+                                key={item.id}
+                                buttonRef={(node) => {
+                                  resultButtonRefs.current[item.id] = node;
+                                }}
+                                item={item}
+                                keyword={normalizedKeyword}
+                                onOpen={onOpenResult}
+                                onSelect={handleSelectResult}
+                                selected={selectedResultId === item.id}
+                              />
+                            ))}
+                          </DesktopSearchResultStack>
+                        )}
+                      </DesktopSearchResultsPanel>
+                    );
+                  })}
               </div>
             ) : (
               <div className="space-y-4">
@@ -1510,88 +1450,47 @@ export function DesktopSearchWorkspace({
                   keyword={keywordLabel}
                   onBack={() => handleBackToAllResults(activeCategory)}
                 />
-                {(() => {
-                  const drilldownIsComingSoon =
-                    activeCategory === "miniPrograms" ||
-                    activeCategory === "officialAccounts";
-                  const drilldownPanel = (
-                    <DesktopSearchResultsPanel
-                      countLabel={t(msg`${visibleResults.length} 条命中`)}
-                      description={t(msg`从全部结果展开，继续查看${searchCategoryTitles[activeCategory]}的完整命中。`)}
-                      highlighted={spotlightPanelId === activeCategory}
-                      title={t(msg`${searchCategoryTitles[activeCategory]}全部结果`)}
-                    >
-                      {activeCategory === "messages" ? (
-                        <DesktopSearchMessageResults
-                          conversationResults={messageConversationOnlyResults}
-                          keyword={normalizedKeyword}
-                          messageGroups={messageGroups}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : activeCategory === "officialAccounts" ? (
-                        <DesktopSearchOfficialAccountResults
-                          accountResults={officialAccountOnlyResults}
-                          keyword={normalizedKeyword}
-                          officialAccountGroups={officialAccountGroups}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : isDesktopFeatureCardCategory(activeCategory) ? (
-                        <DesktopSearchFeatureResults
-                          category={activeCategory}
-                          items={visibleResults}
-                          keyword={normalizedKeyword}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : isDesktopContentCategory(activeCategory) ? (
-                        <DesktopSearchContentResults
-                          items={visibleResults}
-                          keyword={normalizedKeyword}
-                          onOpen={onOpenResult}
-                          onSelect={handleSelectResult}
-                          registerResultRef={(resultId, node) => {
-                            resultButtonRefs.current[resultId] = node;
-                          }}
-                          selectedResultId={selectedResultId}
-                        />
-                      ) : (
-                        <DesktopSearchResultStack>
-                          {visibleResults.map((item) => (
-                            <DesktopSearchResultRow
-                              key={item.id}
-                              buttonRef={(node) => {
-                                resultButtonRefs.current[item.id] = node;
-                              }}
-                              item={item}
-                              keyword={normalizedKeyword}
-                              onOpen={onOpenResult}
-                              onSelect={handleSelectResult}
-                              selected={selectedResultId === item.id}
-                            />
-                          ))}
-                        </DesktopSearchResultStack>
-                      )}
-                    </DesktopSearchResultsPanel>
-                  );
-                  return drilldownIsComingSoon ? (
-                    <div className="relative">
-                      {drilldownPanel}
-                      <DesktopSearchComingSoonOverlay />
-                    </div>
+                <DesktopSearchResultsPanel
+                  countLabel={t(msg`${visibleResults.length} 条命中`)}
+                  description={t(msg`从全部结果展开，继续查看${getCategoryTitle(activeCategory)}的完整命中。`)}
+                  highlighted={spotlightPanelId === activeCategory}
+                  title={t(msg`${getCategoryTitle(activeCategory)}全部结果`)}
+                >
+                  {activeCategory === "messages" ? (
+                    <DesktopSearchMessageResults
+                      conversationResults={messageConversationOnlyResults}
+                      keyword={normalizedKeyword}
+                      messageGroups={messageGroups}
+                      onOpen={onOpenResult}
+                      onSelect={handleSelectResult}
+                      registerResultRef={(resultId, node) => {
+                        resultButtonRefs.current[resultId] = node;
+                      }}
+                      selectedResultId={selectedResultId}
+                    />
+                  ) : isDesktopFeatureCardCategory(activeCategory) ? (
+                    <DesktopSearchFeatureResults
+                      category={activeCategory}
+                      items={visibleResults}
+                      keyword={normalizedKeyword}
+                      onOpen={onOpenResult}
+                      onSelect={handleSelectResult}
+                      registerResultRef={(resultId, node) => {
+                        resultButtonRefs.current[resultId] = node;
+                      }}
+                      selectedResultId={selectedResultId}
+                    />
+                  ) : isDesktopContentCategory(activeCategory) ? (
+                    <DesktopSearchContentResults
+                      items={visibleResults}
+                      keyword={normalizedKeyword}
+                      onOpen={onOpenResult}
+                      onSelect={handleSelectResult}
+                      registerResultRef={(resultId, node) => {
+                        resultButtonRefs.current[resultId] = node;
+                      }}
+                      selectedResultId={selectedResultId}
+                    />
                   ) : (
                     <DesktopSearchResultStack>
                       {visibleResults.map((item) => (
@@ -1620,8 +1519,6 @@ export function DesktopSearchWorkspace({
 }
 
 function DesktopQuickLinksPanel({
-  contextLabel = t(msg`快捷入口`),
-  description,
   emptyText,
   items,
   onOpen,
@@ -1634,9 +1531,7 @@ function DesktopQuickLinksPanel({
 }) {
   return (
     <DesktopSearchLandingPanel
-      countLabel={items.length ? t(msg`${items.length} 个入口`) : undefined}
-      contextLabel={contextLabel}
-      description={description}
+      countLabel={items.length ? `${items.length}` : undefined}
       title={title}
     >
       {items.length ? (
@@ -1645,15 +1540,11 @@ function DesktopQuickLinksPanel({
             <DesktopQuickLinkRow key={item.id} item={item} onOpen={onOpen} />
           ))}
         </div>
-      ) : emptyText ? (
-        <DesktopSearchStatusCard
-          badgeLabel={t(msg`等待回访`)}
-          className="mb-0 rounded-[16px] border-[color:var(--border-faint)] bg-white p-3.5"
-          description={emptyText}
-          status="empty"
-          title={title}
-        />
-      ) : null}
+      ) : (
+        <div className="px-2 py-1.5 text-xs text-[color:var(--text-muted)]">
+          {emptyText}
+        </div>
+      )}
     </DesktopSearchLandingPanel>
   );
 }
@@ -1662,8 +1553,6 @@ function DesktopSearchLandingPanel({
   action,
   children,
   countLabel,
-  contextLabel = t(msg`首页入口`),
-  description,
   title,
 }: {
   action?: ReactNode;
@@ -1864,20 +1753,6 @@ function DesktopSearchScopeCard({
           : category === "feed"
             ? "bg-[rgba(15,23,42,0.08)] text-[#3c6a53]"
             : "bg-[rgba(7,193,96,0.10)] text-[#15803d]";
-  const actionLabel =
-    category === "messages"
-      ? t(msg`进入聊天记录`)
-      : category === "contacts"
-        ? t(msg`进入联系人结果`)
-        : category === "favorites"
-          ? t(msg`进入收藏结果`)
-          : category === "officialAccounts"
-            ? t(msg`进入公众号结果`)
-            : category === "miniPrograms"
-              ? t(msg`进入小程序结果`)
-              : category === "moments"
-                ? t(msg`进入朋友圈结果`)
-                : t(msg`进入内容流结果`);
 
   return (
     <button
@@ -1900,39 +1775,10 @@ function DesktopSearchScopeCard({
         <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
           {title}
         </div>
-        <div
-          className={cn(
-            "rounded-full px-2.5 py-1 text-[10px] font-medium",
-            badgeClassName,
-          )}
-        >
-          {t(msg`当前覆盖`)} {count} {t(msg`项`)}
+        <div className="text-xs text-[color:var(--text-muted)]">
+          {t(msg`${count} 项`)}
         </div>
       </div>
-
-      <div className="mt-4 text-sm font-medium text-[color:var(--text-primary)]">
-        {title}
-      </div>
-
-      <div className="mt-3 rounded-[16px] bg-[rgba(255,255,255,0.76)] px-4 py-4">
-        <div className="text-xs leading-6 text-[color:var(--text-secondary)]">
-          {description}
-        </div>
-      </div>
-
-      <DesktopSearchFooterAffordance
-        ctaLabel={t(msg`查看该分类`)}
-        label={actionLabel}
-        tone={
-          category === "favorites"
-            ? "gold"
-            : category === "miniPrograms"
-              ? "teal"
-              : category === "moments"
-                ? "olive"
-                : "brand"
-        }
-      />
     </button>
   );
 }
@@ -1983,16 +1829,16 @@ function DesktopSearchContextBar({
                 {categoryTitle}
               </span>
               <span className="mx-1.5 text-[color:var(--text-dim)]">·</span>
-              <span>{count} {t(msg`条命中`)}</span>
+              <span>{t(msg`${count} 条命中`)}</span>
               {activeCategory === "all" && activeSectionTitle ? (
                 <>
                   <span className="mx-1.5 text-[color:var(--text-dim)]">·</span>
-                  <span>{t(msg`位于`)} {activeSectionTitle}</span>
+                  <span>{t(msg`位于 ${activeSectionTitle}`)}</span>
                 </>
               ) : null}
             </span>
             <span className="truncate text-[color:var(--text-muted)]">
-              {t(msg`关键词“`)}{keyword}”
+              {t(msg`关键词“${keyword}”`)}
             </span>
           </div>
           <div className="flex shrink-0 items-center gap-1">
@@ -2082,10 +1928,10 @@ function DesktopSearchDrilldownBanner({
             </span>
           </div>
           <div className="mt-3 text-sm font-medium text-[color:var(--text-primary)]">
-            {t(msg`已展开`)} {searchCategoryTitles[category]} {t(msg`全部结果`)}
+            {t(msg`已展开 ${categoryTitle} 全部结果`)}
           </div>
           <div className="mt-1 text-xs leading-6 text-[color:var(--text-secondary)]">
-            {t(msg`当前仍保留关键词“`)}{keyword}{t(msg`”，共`)} {count} {t(msg`条命中；返回时会回到聚合页里的对应分区。`)}
+            {t(msg`当前仍保留关键词“${keyword}”，共 ${count} 条命中；返回时会回到聚合页里的对应分区。`)}
           </div>
         </div>
         <DesktopSearchActionButton
@@ -2557,18 +2403,10 @@ function DesktopSearchHistoryRow({
           desktopSearchFocusRingClassName,
         )}
       >
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-[color:var(--surface-console)] text-[color:var(--text-dim)]">
-          <Clock3 size={15} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
-            {keyword}
-          </div>
-          <div className="mt-1 text-xs text-[color:var(--text-secondary)]">
-            {t(msg`重新执行这条搜索，继续查看完整结果。`)}
-          </div>
-        </div>
-        <DesktopSearchOpenCue compact label={t(msg`重新搜索`)} tone="brand" />
+        <Clock3 size={13} className="shrink-0 text-[color:var(--text-dim)]" />
+        <span className="truncate text-[13px] text-[color:var(--text-primary)]">
+          {keyword}
+        </span>
       </button>
       <button
         type="button"
@@ -2576,36 +2414,10 @@ function DesktopSearchHistoryRow({
         aria-label={t(msg`移除`)}
         className="shrink-0 rounded p-1 text-[color:var(--text-dim)] opacity-0 transition hover:bg-white hover:text-[#be123c] group-hover/row:opacity-100 focus:opacity-100"
       >
-        {t(msg`移除`)}
-      </DesktopSearchActionButton>
+        <X size={14} />
+      </button>
     </div>
   );
-}
-
-function getDesktopQuickLinkActionLabel(item: DesktopSearchQuickLink) {
-  if (item.id.startsWith("favorite-")) {
-    return t(msg`打开收藏`);
-  }
-
-  if (item.id.startsWith("mini-program-")) {
-    return t(msg`打开小程序`);
-  }
-
-  return t(msg`立即打开`);
-}
-
-function getDesktopQuickLinkActionTone(
-  item: DesktopSearchQuickLink,
-): "brand" | "gold" | "olive" | "teal" {
-  if (item.id.startsWith("favorite-")) {
-    return "gold";
-  }
-
-  if (item.id.startsWith("mini-program-")) {
-    return "teal";
-  }
-
-  return "brand";
 }
 
 function DesktopSearchMessageGroupCard({
@@ -2674,7 +2486,7 @@ function DesktopSearchMessageGroupCard({
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <div className="rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[10px] text-[color:var(--brand-primary)]">
-            {group.totalHits} {t(msg`条相关记录`)}
+            {t(msg`${group.totalHits} 条相关记录`)}
           </div>
           <DesktopSearchOpenCue compact label={t(msg`进入会话`)} tone="brand" />
         </div>
@@ -2789,7 +2601,7 @@ function DesktopSearchOfficialAccountGroupCard({
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <div className="rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[10px] text-[color:var(--brand-primary)]">
-            {group.totalHits} {t(msg`篇相关文章`)}
+            {t(msg`${group.totalHits} 篇相关文章`)}
           </div>
           <DesktopSearchOpenCue compact label={t(msg`进入账号`)} tone="brand" />
         </div>
@@ -2999,34 +2811,34 @@ function getDesktopSearchSectionDescription(
   category: SearchCategory | SearchResultCategory,
 ): MessageDescriptor {
   if (category === "messages") {
-    return t(msg`优先展示会话分组和命中的消息片段。`);
+    return msg`优先展示会话分组和命中的消息片段。`;
   }
 
   if (category === "officialAccounts") {
-    return t(msg`先看账号分组，再看文章和账号命中。`);
+    return msg`先看账号分组，再看文章和账号命中。`;
   }
 
   if (category === "contacts") {
-    return t(msg`按资料卡查看联系人和角色入口。`);
+    return msg`按资料卡查看联系人和角色入口。`;
   }
 
   if (category === "favorites") {
-    return t(msg`聚合消息、笔记和内容收藏结果。`);
+    return msg`聚合消息、笔记和内容收藏结果。`;
   }
 
   if (category === "miniPrograms") {
-    return t(msg`优先展示可直接打开的小程序入口。`);
+    return msg`优先展示可直接打开的小程序入口。`;
   }
 
   if (category === "moments") {
-    return t(msg`按内容卡查看朋友圈动态和评论命中。`);
+    return msg`按内容卡查看朋友圈动态和评论命中。`;
   }
 
   if (category === "feed") {
-    return t(msg`按内容卡查看广场动态结果。`);
+    return msg`按内容卡查看广场动态结果。`;
   }
 
-  return t(msg`按当前分类集中查看最相关的结果。`);
+  return msg`按当前分类集中查看最相关的结果。`;
 }
 
 function getDesktopSearchScopeCount(
@@ -3060,17 +2872,3 @@ function getDesktopSearchScopeCount(
   return scopeCounts.feed;
 }
 
-function DesktopSearchComingSoonOverlay() {
-  return (
-    <div className="pointer-events-auto absolute inset-0 z-30 flex items-center justify-center rounded-[18px] bg-black/30 backdrop-blur-[3px]">
-      <div className="rounded-2xl border border-[color:var(--border-faint)] bg-white/95 px-6 py-5 text-center shadow-[var(--shadow-card)]">
-        <div className="text-base font-semibold text-[color:var(--text-primary)]">
-          {t(msg`功能开发中`)}
-        </div>
-        <div className="mt-1.5 text-xs text-[color:var(--text-secondary)]">
-          {t(msg`敬请期待`)}
-        </div>
-      </div>
-    </div>
-  );
-}

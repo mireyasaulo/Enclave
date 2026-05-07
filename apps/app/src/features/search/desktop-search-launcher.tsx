@@ -78,10 +78,6 @@ import {
   type SearchQuickLink as DesktopSearchQuickLink,
   useSearchQuickLinks,
 } from "./search-quick-links";
-import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
-
-const t = translateRuntimeMessage;
 
 type UseDesktopSearchLauncherOptions = {
   keyword: string;
@@ -155,10 +151,10 @@ const searchLauncherFocusRegionLabels: Record<
   SearchLauncherFocusRegion,
   MessageDescriptor
 > = {
-  input: t(msg`搜索框`),
-  suggestions: t(msg`建议区`),
-  quickAccess: t(msg`快捷访问`),
-  history: t(msg`历史搜索`),
+  input: msg`搜索框`,
+  suggestions: msg`建议区`,
+  quickAccess: msg`快捷访问`,
+  history: msg`历史搜索`,
 };
 
 function buildSearchLauncherHistoryActionId(keyword: string) {
@@ -578,11 +574,11 @@ export function DesktopSearchDropdownPanel({
         messages: sortedMessages.slice(0, 3).map((message) => ({
           avatarName: header.avatarName,
           avatarSrc: header.avatarSrc,
-          badge: header.badge === t(msg`群聊`) ? t(msg`群聊记录`) : t(msg`单聊记录`),
-          description: t(msg`${message.senderName}：${buildSearchPreview(
+          badge: isGroupConversation ? t(msg`群聊记录`) : t(msg`单聊记录`),
+          description: `${message.senderName}：${buildSearchPreview(
             message.text,
             normalizedKeyword,
-          )}`),
+          )}`,
           id: `conversation-message-${message.messageId}`,
           meta: t(msg`聊天记录 · ${formatMessageTimestamp(message.createdAt)}`),
           title: header.title,
@@ -648,10 +644,8 @@ export function DesktopSearchDropdownPanel({
           account.description ||
           account.recentArticle?.summary ||
           t(msg`打开公众号主页与最近文章。`),
-        meta: `${account.accountType === "service" ? t(msg`服务号`) : t(msg`订阅号`)} · @${
-          account.handle
-        }`,
-        badge: account.accountType === "service" ? t(msg`服务号`) : t(msg`订阅号`),
+        meta: `${accountTypeLabel} · @${account.handle}`,
+        badge: accountTypeLabel,
         to: buildDesktopOfficialAccountSearchPath(account.id),
         avatarName: account.name,
         avatarSrc: account.avatar,
@@ -945,7 +939,7 @@ export function DesktopSearchDropdownPanel({
     if (navigationLayer === "input") {
       return {
         panelId: null as SearchLauncherFocusPanelId,
-        panelTitle: t(msg`搜一搜主入口`),
+        panelTitle: msg`搜一搜主入口`,
         region: "input" as SearchLauncherFocusRegion,
       };
     }
@@ -956,7 +950,7 @@ export function DesktopSearchDropdownPanel({
     if (historyIds.has(activeActionId)) {
       return {
         panelId: "history" as SearchLauncherFocusPanelId,
-        panelTitle: t(msg`最近搜索`),
+        panelTitle: msg`最近搜索`,
         region: "history" as SearchLauncherFocusRegion,
       };
     }
@@ -975,7 +969,7 @@ export function DesktopSearchDropdownPanel({
       if (chatSuggestionIds.has(activeActionId)) {
         return {
           panelId: "chatSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: t(msg`聊天`),
+          panelTitle: msg`聊天`,
           region: "suggestions" as SearchLauncherFocusRegion,
         };
       }
@@ -990,7 +984,7 @@ export function DesktopSearchDropdownPanel({
       if (officialSuggestionIds.has(activeActionId)) {
         return {
           panelId: "officialSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: t(msg`公众号`),
+          panelTitle: msg`公众号`,
           region: "suggestions" as SearchLauncherFocusRegion,
         };
       }
@@ -1001,7 +995,7 @@ export function DesktopSearchDropdownPanel({
       if (contactSuggestionIds.has(activeActionId)) {
         return {
           panelId: "contactSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: t(msg`联系人`),
+          panelTitle: msg`联系人`,
           region: "suggestions" as SearchLauncherFocusRegion,
         };
       }
@@ -1014,7 +1008,7 @@ export function DesktopSearchDropdownPanel({
       if (worldCharacterSuggestionIds.has(activeActionId)) {
         return {
           panelId: "worldCharacterSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: t(msg`世界角色`),
+          panelTitle: msg`世界角色`,
           region: "suggestions" as SearchLauncherFocusRegion,
         };
       }
@@ -1025,7 +1019,7 @@ export function DesktopSearchDropdownPanel({
       if (favoriteSuggestionIds.has(activeActionId)) {
         return {
           panelId: "favoriteSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: t(msg`收藏`),
+          panelTitle: msg`收藏`,
           region: "suggestions" as SearchLauncherFocusRegion,
         };
       }
@@ -1036,14 +1030,14 @@ export function DesktopSearchDropdownPanel({
       if (miniProgramSuggestionIds.has(activeActionId)) {
         return {
           panelId: "miniProgramSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: t(msg`小程序`),
+          panelTitle: msg`小程序`,
           region: "suggestions" as SearchLauncherFocusRegion,
         };
       }
 
       return {
         panelId: null as SearchLauncherFocusPanelId,
-        panelTitle: t(msg`搜索建议`),
+        panelTitle: msg`搜索建议`,
         region: "suggestions" as SearchLauncherFocusRegion,
       };
     }
@@ -1051,7 +1045,7 @@ export function DesktopSearchDropdownPanel({
     if (recentConversations.some((item) => item.id === activeActionId)) {
       return {
         panelId: "recentConversations" as SearchLauncherFocusPanelId,
-        panelTitle: t(msg`最近聊天`),
+        panelTitle: msg`最近聊天`,
         region: "quickAccess" as SearchLauncherFocusRegion,
       };
     }
@@ -1066,7 +1060,7 @@ export function DesktopSearchDropdownPanel({
     if (recentOfficialIds.has(activeActionId)) {
       return {
         panelId: "recentOfficials" as SearchLauncherFocusPanelId,
-        panelTitle: t(msg`最近公众号`),
+        panelTitle: msg`最近公众号`,
         region: "quickAccess" as SearchLauncherFocusRegion,
       };
     }
@@ -1074,7 +1068,7 @@ export function DesktopSearchDropdownPanel({
     if (recentMiniPrograms.some((item) => item.id === activeActionId)) {
       return {
         panelId: "recentMiniPrograms" as SearchLauncherFocusPanelId,
-        panelTitle: t(msg`最近使用的小程序`),
+        panelTitle: msg`最近使用的小程序`,
         region: "quickAccess" as SearchLauncherFocusRegion,
       };
     }
@@ -1082,14 +1076,14 @@ export function DesktopSearchDropdownPanel({
     if (recentFavorites.some((item) => item.id === activeActionId)) {
       return {
         panelId: "recentFavorites" as SearchLauncherFocusPanelId,
-        panelTitle: t(msg`最近收藏`),
+        panelTitle: msg`最近收藏`,
         region: "quickAccess" as SearchLauncherFocusRegion,
       };
     }
 
     return {
       panelId: null as SearchLauncherFocusPanelId,
-      panelTitle: t(msg`快捷访问`),
+      panelTitle: msg`快捷访问`,
       region: "quickAccess" as SearchLauncherFocusRegion,
     };
   }, [
@@ -1456,7 +1450,7 @@ export function DesktopSearchDropdownPanel({
                         avatarName={getFriendDisplayName(item)}
                         avatarSrc={item.character.avatar}
                         badge={t(msg`联系人`)}
-                        description={buildFriendSuggestionDescription(item)}
+                        description={buildFriendSuggestionDescription(item, t)}
                         keyword={trimmedKeyword}
                         title={getFriendDisplayName(item)}
                         variant="contact"
@@ -1585,7 +1579,7 @@ export function DesktopSearchDropdownPanel({
                       {t(msg`去添加朋友`)}
                     </Button>
                   }
-                  description={t(msg`没有直接命中的聊天、联系人、公众号、收藏或小程序，可以继续用搜一搜，或去“添加朋友”里找。`)}
+                  description={t(msg`没有直接命中的聊天、联系人、公众号、收藏或小程序，可以继续用搜一搜，或去"添加朋友"里找。`)}
                   status="empty"
                   title={t(msg`搜索结果`)}
                 />
@@ -1828,7 +1822,7 @@ function SearchLauncherFocusStrip({
   const description =
     layer === "input"
       ? keyword
-        ? t(msg`当前位于搜索框，按 Tab 进入结果层，按 Enter 执行搜索“${keyword}”，按 Esc 关闭下拉。`)
+        ? t(msg`当前位于搜索框，按 Tab 进入结果层，按 Enter 执行搜索"${keyword}"，按 Esc 关闭下拉。`)
         : t(msg`当前位于搜索框，继续输入关键词，或按 Tab 进入结果层；按 Enter 执行搜索，按 Esc 关闭下拉。`)
       : region === "history"
         ? t(msg`当前位于最近搜索，按 Tab / ↑ ↓ 切换当前项，按 Enter 打开当前项，按 Shift+Tab 或 Esc 回搜索框。`)
@@ -1905,7 +1899,7 @@ function SearchLauncherHeroCard({
           </div>
           <div className="mt-1 text-[11px] leading-5 text-[color:var(--text-secondary)]">
             {keyword
-              ? t(msg`执行搜索“${keyword}”，进入完整结果页继续查看。`)
+              ? t(msg`执行搜索"${keyword}"，进入完整结果页继续查看。`)
               : t(msg`执行一次全局搜索，进入完整结果页后继续按分类查看。`)}
           </div>
         </div>
@@ -2084,7 +2078,7 @@ function SearchLauncherConversationGroupCard({
           </div>
         </div>
         <div className="shrink-0 rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[10px] text-[color:var(--brand-primary)]">
-          {group.totalHits} {t(msg`条相关记录`)}
+          {t(msg`${group.totalHits} 条相关记录`)}
         </div>
       </button>
 
@@ -2462,7 +2456,7 @@ function buildFriendSuggestionDescription(
     return t(msg`昵称：${item.character.name}`);
   }
 
-  const tags = item.friendship.tags?.filter(Boolean).join(t(msg`、`));
+  const tags = item.friendship.tags?.filter(Boolean).join("、");
   return (
     item.character.relationship?.trim() ||
     tags ||

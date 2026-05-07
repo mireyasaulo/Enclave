@@ -29,7 +29,6 @@ import {
   type SearchResultSection,
   type SearchScopeCounts,
 } from "./search-types";
-import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 
 const t = translateRuntimeMessage;

@@ -374,9 +374,9 @@ export function MobileMiniProgramsWorkspace({
             </div>
           ) : (
             <MobileMiniProgramsStatusCard
-              badge="常用"
-              title="还没有加入我的小程序"
-              description="在推荐卡片或列表里点“加入常用”，这里就会像微信一样沉淀你的固定入口。"
+              badge={t(msg`常用`)}
+              title={t(msg`还没有加入我的小程序`)}
+              description={t(msg`在推荐卡片或列表里点“加入常用”，这里就会像微信一样沉淀你的固定入口。`)}
               action={
                 <Button
                   variant="secondary"
@@ -391,7 +391,7 @@ export function MobileMiniProgramsWorkspace({
                     onSelectMiniProgram(selectedMiniProgram.id);
                   }}
                 >
-                  {statusBackLabel ?? "先看看当前推荐"}
+                  {statusBackLabel ?? t(msg`先看看当前推荐`)}
                 </Button>
               }
             />
@@ -400,7 +400,7 @@ export function MobileMiniProgramsWorkspace({
 
         <AppSection className="space-y-2 border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] shadow-none">
           <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
-            今日推荐
+            {t(msg`今日推荐`)}
           </div>
           <div className="space-y-2">
             {miniProgramCampaigns.slice(0, 2).map((campaign) => {
@@ -439,16 +439,16 @@ export function MobileMiniProgramsWorkspace({
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
-                全部小程序
+                {t(msg`全部小程序`)}
               </div>
               <div className="mt-0.5 text-[11px] leading-4 text-[color:var(--text-muted)]">
                 {searchText
-                  ? `搜索“${searchText.trim()}”命中 ${visibleMiniPrograms.length} 个结果。`
-                  : "按分类浏览当前可用的小程序目录。"}
+                  ? t(msg`搜索“${searchText.trim()}”命中 ${visibleMiniPrograms.length} 个结果。`)
+                  : t(msg`按分类浏览当前可用的小程序目录。`)}
               </div>
             </div>
             <div className="text-[10px] text-[color:var(--text-muted)]">
-              {visibleMiniPrograms.length} 个
+              {t(msg`${visibleMiniPrograms.length} 个`)}
             </div>
           </div>
 
@@ -470,9 +470,9 @@ export function MobileMiniProgramsWorkspace({
             </div>
           ) : (
             <MobileMiniProgramsStatusCard
-              badge="搜索"
-              title="没有匹配的小程序"
-              description="换个关键词，或者切回“全部”分类继续浏览。"
+              badge={t(msg`搜索`)}
+              title={t(msg`没有匹配的小程序`)}
+              description={t(msg`换个关键词，或者切回“全部”分类继续浏览。`)}
               action={
                 <Button
                   variant="secondary"
@@ -488,7 +488,7 @@ export function MobileMiniProgramsWorkspace({
                     onCategoryChange("all");
                   }}
                 >
-                  {statusBackLabel ?? "清空筛选"}
+                  {statusBackLabel ?? t(msg`清空筛选`)}
                 </Button>
               }
             />
@@ -508,17 +508,17 @@ function MobileFeatureComingSoonOverlay({ onBack }: { onBack: () => void }) {
         onClick={onBack}
         variant="ghost"
         size="icon"
-        aria-label="返回"
+        aria-label={t(msg`返回`)}
         className="absolute left-3 top-3 h-10 w-10 rounded-full bg-white/90 text-[color:var(--text-primary)] shadow-[var(--shadow-card)] active:bg-white"
       >
         <ArrowLeft size={18} />
       </Button>
       <div className="mx-6 max-w-[280px] rounded-2xl border border-[color:var(--border-faint)] bg-white/98 px-6 py-6 text-center shadow-[var(--shadow-card)]">
         <div className="text-[17px] font-semibold text-[color:var(--text-primary)]">
-          功能开发中
+          {t(msg`功能开发中`)}
         </div>
         <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-          敬请期待
+          {t(msg`敬请期待`)}
         </div>
         <Button
           type="button"
@@ -527,7 +527,7 @@ function MobileFeatureComingSoonOverlay({ onBack }: { onBack: () => void }) {
           size="md"
           className="mt-5 h-10 w-full rounded-full bg-[color:var(--brand-primary)] text-white"
         >
-          返回
+          {t(msg`返回`)}
         </Button>
       </div>
     </div>
@@ -679,8 +679,10 @@ function MiniProgramListCard({
           </div>
           <div className="mt-1 text-[10px] leading-4 text-[color:var(--text-dim)]">
             {lastOpenedAt
-              ? `上次打开 ${formatConversationTimestamp(lastOpenedAt)} · 已打开 ${launchCount} 次`
-              : `还没有打开过 · 已加入 ${pinned ? "我的小程序" : "目录"}`}
+              ? t(msg`上次打开 ${formatConversationTimestamp(lastOpenedAt)} · 已打开 ${launchCount} 次`)
+              : pinned
+                ? t(msg`还没有打开过 · 已加入我的小程序`)
+                : t(msg`还没有打开过 · 已加入目录`)}
           </div>
         </div>
       </div>
@@ -695,7 +697,7 @@ function MiniProgramListCard({
           }}
           className="h-7.5 rounded-full bg-[#07c160] px-3 text-[10px] text-white hover:bg-[#06ad56]"
         >
-          打开
+          {t(msg`打开`)}
         </Button>
         <Button
           variant="secondary"
@@ -706,7 +708,7 @@ function MiniProgramListCard({
           }}
           className="h-7.5 rounded-full border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas)] px-3 text-[10px] text-[color:var(--text-secondary)]"
         >
-          {pinned ? "移出常用" : "加入常用"}
+          {pinned ? t(msg`移出常用`) : t(msg`加入常用`)}
         </Button>
       </div>
     </div>

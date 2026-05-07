@@ -67,7 +67,6 @@ export type SearchHistoryItem = {
   usedAt: number;
 };
 
-import { msg } from "@lingui/macro";
 import type { MessageDescriptor } from "@lingui/core";
 import { useCallback } from "react";
 import { useRuntimeTranslator } from "@yinjie/i18n";
