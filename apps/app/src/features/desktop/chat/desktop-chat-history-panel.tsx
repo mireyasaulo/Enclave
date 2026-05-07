@@ -624,11 +624,9 @@ export function DesktopChatHistoryPanel({
                       );
 
                       return (
-                        <button
+                        <div
                           key={item.messageId}
-                          type="button"
-                          onClick={() => onOpenMessage(item.messageId)}
-                          className="group block w-full border-l-2 border-l-transparent px-4 py-3 text-left transition-[background-color,border-color] duration-150 hover:border-l-[rgba(7,193,96,0.28)] hover:bg-[#fafcfb] active:bg-[#f3f7f4]"
+                          className="group block w-full border-l-2 border-l-transparent px-4 py-3 transition-[background-color,border-color] duration-150 hover:border-l-[rgba(7,193,96,0.28)] hover:bg-[#fafcfb]"
                         >
                           <div className="flex gap-3">
                             <span
@@ -643,7 +641,7 @@ export function DesktopChatHistoryPanel({
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center justify-between gap-3">
                                 <div className="flex min-w-0 items-center gap-2">
-                                  <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)] transition-colors group-hover:text-[#2f3a33]">
+                                  <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
                                     {item.senderName || t(msg`消息`)}
                                   </div>
                                   <span
@@ -655,8 +653,19 @@ export function DesktopChatHistoryPanel({
                                     {resolveSearchResultBadgeLabel(item)}
                                   </span>
                                 </div>
-                                <div className="shrink-0 text-[10px] tabular-nums text-[color:var(--text-dim)]">
-                                  {formatMessageTimestamp(item.createdAt)}
+                                <div className="relative shrink-0">
+                                  <span className="block text-[10px] tabular-nums text-[color:var(--text-dim)] group-hover:invisible">
+                                    {formatMessageTimestamp(item.createdAt)}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      onOpenMessage(item.messageId)
+                                    }
+                                    className="invisible absolute inset-y-0 right-0 inline-flex items-center gap-1 rounded-full bg-[rgba(7,193,96,0.1)] px-2 text-[10px] font-medium text-[color:var(--brand-primary)] transition hover:bg-[rgba(7,193,96,0.16)] group-hover:visible"
+                                  >
+                                    {t(msg`定位到聊天位置`)}
+                                  </button>
                                 </div>
                               </div>
 
@@ -674,7 +683,7 @@ export function DesktopChatHistoryPanel({
                               </div>
                             </div>
                           </div>
-                        </button>
+                        </div>
                       );
                     })}
                   </div>
