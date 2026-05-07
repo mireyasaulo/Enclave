@@ -603,10 +603,11 @@ export function WorldDetailPage() {
   } else if (confirmAction === "rotate-callback-token") {
     activeConfirm = {
       title: t("Rotate the callback token?"),
-      description:
+      description: t(
         "Existing bootstrap packages and runtime env overlays will become stale until operators redeploy the updated token.",
-      confirmLabel: "Rotate token",
-      pendingLabel: "Rotating...",
+      ),
+      confirmLabel: t("Rotate token"),
+      pendingLabel: t("Rotating..."),
       danger: true,
       pending: rotateCallbackTokenMutation.isPending,
       onConfirm: () => rotateCallbackTokenMutation.mutate(),

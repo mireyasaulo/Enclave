@@ -393,7 +393,7 @@ export function JobsPage() {
       label:
         queueStateFilter === "all"
           ? t("Delayed jobs")
-          : "Delayed jobs in filter",
+          : t("Delayed jobs in filter"),
       count:
         jobSummary?.queueState.delayed ?? jobSummaryFallback.queueState.delayed,
     },
@@ -461,8 +461,12 @@ export function JobsPage() {
           </div>
           <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
             {worldId
-              ? "Inspect provisioning, resume, suspend, and reconcile work for the selected world."
-              : "Inspect provisioning, resume, suspend, and reconcile work across the managed world fleet."}
+              ? t(
+                  "Inspect provisioning, resume, suspend, and reconcile work for the selected world.",
+                )
+              : t(
+                  "Inspect provisioning, resume, suspend, and reconcile work across the managed world fleet.",
+                )}
           </div>
         </div>
 

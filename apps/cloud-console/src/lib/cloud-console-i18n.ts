@@ -307,6 +307,23 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Collapse stack": "收起堆栈",
     "Expand stack": "展开堆栈",
     Start: "起点",
+
+    Confirm: "确认",
+    Cancel: "取消",
+    Close: "关闭",
+    "Working...": "处理中…",
+    Unleased: "未持有租约",
+    "Delayed jobs in filter": "当前筛选的延期任务",
+    "Inspect provisioning, resume, suspend, and reconcile work for the selected world.":
+      "查看所选世界的开通、恢复、暂停与对账工作。",
+    "Inspect provisioning, resume, suspend, and reconcile work across the managed world fleet.":
+      "查看托管世界全队的开通、恢复、暂停与对账工作。",
+    "Existing bootstrap packages and runtime env overlays will become stale until operators redeploy the updated token.":
+      "已有的引导包与运行时环境覆盖层会失效，需要运维重新下发新令牌后才会同步。",
+    "Rotate token": "轮换令牌",
+    "Rotating...": "轮换中…",
+    "System ready": "系统正常",
+    "System warning": "系统告警",
   },
   "ja-JP": {
     "CLOUD_ADMIN_SECRET is required.": "CLOUD_ADMIN_SECRET を入力してください。",
