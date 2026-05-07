@@ -1,0 +1,49 @@
+import { lazy, Suspense, type ComponentType } from "react";
+
+// 内嵌小游戏统一注册表：把 gameId 映射到一个支持 onExit 的 React 组件。
+// games-page.tsx 与 desktop-games-workspace.tsx 都从这里查表渲染，
+// 避免每加一款游戏都要在两处各 if-else 一遍。
+//
+// 注意：yinjie-farm 走独立路由（/tabs/games/yinjie-farm），不在这里注册。
+
+const ParkingWarGame = lazy(async () => {
+  const mod = await import("./parking-war/parking-war-game");
+  return { default: mod.ParkingWarGame };
+});
+
+export type EmbeddedGameProps = {
+  variant?: "embedded" | "fullscreen";
+  onExit?: () => void;
+};
+
+const EMBEDDED_GAME_COMPONENTS: Record<
+  string,
+  ComponentType<EmbeddedGameProps>
+> = {
+  "parking-war": ParkingWarGame,
+};
+
+export function hasEmbeddedGame(gameId: string | null | undefined): boolean {
+  if (!gameId) return false;
+  return gameId in EMBEDDED_GAME_COMPONENTS;
+}
+
+type EmbeddedGameSlotProps = {
+  gameId: string;
+  onExit: () => void;
+  fallback?: React.ReactNode;
+};
+
+export function EmbeddedGameSlot({
+  gameId,
+  onExit,
+  fallback = null,
+}: EmbeddedGameSlotProps) {
+  const Game = EMBEDDED_GAME_COMPONENTS[gameId];
+  if (!Game) return null;
+  return (
+    <Suspense fallback={fallback}>
+      <Game variant="embedded" onExit={onExit} />
+    </Suspense>
+  );
+}

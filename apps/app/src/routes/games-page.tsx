@@ -18,7 +18,10 @@ import {
   getGameCenterToneStyle,
   type GameCenterGame,
 } from "../features/games/game-center-data";
-import { ParkingWarGame } from "../features/games/parking-war/parking-war-game";
+import {
+  EmbeddedGameSlot,
+  hasEmbeddedGame,
+} from "../features/games/embedded-game-registry";
 import { useGameCenterState } from "../features/games/use-game-center-state";
 import {
   pushMobileHandoffRecord,
@@ -291,6 +294,10 @@ export function GamesPage() {
       void navigate({ to: "/tabs/games/yinjie-farm" });
       return;
     }
+    if (hasEmbeddedGame(gameId)) {
+      // 内嵌小游戏：launchGame 已写入 activeGameId，渲染处会自动出 embedded UI，无需 toast
+      return;
+    }
     setNoticeTone("success");
     const launchedName = game?.name ?? t(msg`该游戏`);
     setSuccessNotice(
@@ -508,8 +515,8 @@ export function GamesPage() {
   }
 
   const statusBackLabel = safeReturnPath ? t(msg`返回上一页`) : null;
-  const isParkingActive =
-    selectedGame.id === "parking-war" && activeGameId === "parking-war";
+  const isEmbeddedActive =
+    activeGameId === selectedGame.id && hasEmbeddedGame(activeGameId);
   const friendActivities = gameCenterFriendActivities.filter((activity) =>
     Boolean(getGameCenterGame(activity.gameId)),
   );
@@ -621,10 +628,13 @@ export function GamesPage() {
           </div>
         ) : null}
 
-        {isParkingActive ? (
+        {isEmbeddedActive && activeGameId ? (
           <div className="border-b border-[color:var(--border-faint)] bg-white px-4 py-3">
             <div className="overflow-hidden rounded-[16px] border border-[color:var(--border-subtle)]">
-              <ParkingWarGame variant="embedded" onExit={dismissActiveGame} />
+              <EmbeddedGameSlot
+                gameId={activeGameId}
+                onExit={dismissActiveGame}
+              />
             </div>
           </div>
         ) : null}

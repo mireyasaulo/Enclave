@@ -3,7 +3,10 @@ import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, InlineNotice, cn } from "@yinjie/ui";
 import { Copy, Play, Share2 } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
-import { ParkingWarGame } from "../../games/parking-war/parking-war-game";
+import {
+  EmbeddedGameSlot,
+  hasEmbeddedGame,
+} from "../../games/embedded-game-registry";
 import {
   gameCenterFeaturedGameIds,
   gameCenterFriendActivities,
@@ -74,18 +77,18 @@ export function DesktopGamesWorkspace({
   const detailFriends = gameCenterFriendActivities.filter(
     (activity) => activity.gameId === selectedGame.id,
   );
-  const isParkingActive =
-    selectedGame.id === "parking-war" && activeGameId === "parking-war";
+  const isEmbeddedActive =
+    activeGameId === selectedGame.id && hasEmbeddedGame(activeGameId);
   const isActive = activeGameId === selectedGame.id;
   const tone = getGameCenterToneStyle(selectedGame.tone);
 
-  const launchLabel = isParkingActive
+  const launchLabel = isEmbeddedActive
     ? t(msg`退出游戏`)
     : isActive
       ? t(msg`继续玩`)
       : t(msg`开始游戏`);
   const handleLaunchClick = () => {
-    if (isParkingActive) {
+    if (isEmbeddedActive) {
       onDismissActiveGame();
       return;
     }
@@ -290,13 +293,13 @@ export function DesktopGamesWorkspace({
               />
             </div>
 
-            {!isParkingActive ? (
+            {!isEmbeddedActive ? (
               <p className="text-[14px] leading-[1.65rem] text-[color:var(--text-secondary)]">
                 {selectedGame.description}
               </p>
             ) : null}
 
-            {!isParkingActive ? (
+            {!isEmbeddedActive ? (
               <div>
                 <Button
                   type="button"
@@ -334,10 +337,10 @@ export function DesktopGamesWorkspace({
               </InlineNotice>
             ) : null}
 
-            {isParkingActive ? (
+            {isEmbeddedActive && activeGameId ? (
               <div className="overflow-hidden rounded-[16px] border border-[color:var(--border-subtle)] bg-white">
-                <ParkingWarGame
-                  variant="embedded"
+                <EmbeddedGameSlot
+                  gameId={activeGameId}
                   onExit={onDismissActiveGame}
                 />
               </div>
