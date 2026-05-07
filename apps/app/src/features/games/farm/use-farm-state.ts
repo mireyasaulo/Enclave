@@ -9,6 +9,7 @@ import {
   harvestFarmPlot,
   plantFarmCrop,
   sellFarmCrop,
+  stealFromNeighbor,
   waterFarmPlot,
   weedFarmPlot,
   type FarmCropId,
@@ -17,6 +18,7 @@ import {
   type FarmNeighborDetail,
   type FarmNeighborSummary,
   type FarmPlayerStateView,
+  type FarmStealResult,
 } from "@yinjie/contracts";
 
 const STATE_KEY = ["farm", "state"] as const;
@@ -121,6 +123,14 @@ export function useSellFarmCrop() {
   return useMutation({
     mutationFn: (input: { cropId: FarmCropId; quantity: number }) =>
       sellFarmCrop(input),
+    onSuccess: () => invalidate(),
+  });
+}
+
+export function useStealFromNeighbor() {
+  const invalidate = useInvalidateFarm();
+  return useMutation<FarmStealResult, Error, { characterId: string; plotIndex: number }>({
+    mutationFn: (input) => stealFromNeighbor(input),
     onSuccess: () => invalidate(),
   });
 }

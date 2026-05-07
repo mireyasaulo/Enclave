@@ -74,6 +74,7 @@ import type {
   FarmNeighborDetail,
   FarmNeighborSummary,
   FarmPlayerStateView,
+  FarmStealResult,
 } from "./farm";
 import type { GameCenterHomeResponse, GameCenterOwnerState } from "./games";
 import type {
@@ -2969,6 +2970,21 @@ export function harvestFarmPlot(
 ) {
   return requestLegacyApi<FarmHarvestResult>(
     "/games/farm/harvest",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    },
+    baseUrl,
+  );
+}
+
+export function stealFromNeighbor(
+  input: { characterId: string; plotIndex: number },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FarmStealResult>(
+    "/games/farm/steal",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

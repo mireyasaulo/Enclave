@@ -4,7 +4,10 @@ import { FARM_CROP_CATALOG, type FarmCropId } from "@yinjie/contracts";
 import { FarmClockProvider, useFarmClock } from "./farm-clock-context";
 import { useFarmState } from "./use-farm-state";
 import { CoinDisplay } from "./components/coin-display";
+import { EventLogPanel } from "./components/event-log-panel";
 import { FarmGrid } from "./components/farm-grid";
+import { NeighborFarmModal } from "./components/neighbor-farm-modal";
+import { NeighborListPanel } from "./components/neighbor-list-panel";
 import { PlotActionBar } from "./components/plot-action-bar";
 import { SeedShopSheet } from "./components/seed-shop-sheet";
 import { WarehouseSheet } from "./components/warehouse-sheet";
@@ -31,6 +34,7 @@ function FarmPageInner() {
   const [selectedPlotIndex, setSelectedPlotIndex] = useState<number | null>(null);
   const [seedShopOpen, setSeedShopOpen] = useState(false);
   const [warehouseOpen, setWarehouseOpen] = useState(false);
+  const [activeNeighborId, setActiveNeighborId] = useState<string | null>(null);
   const [toast, setToast] = useState<HarvestToast | null>(null);
 
   useEffect(() => {
@@ -144,6 +148,11 @@ function FarmPageInner() {
         }}
       />
 
+      <div className="grid gap-3 lg:grid-cols-2">
+        <NeighborListPanel onSelectNeighbor={setActiveNeighborId} />
+        <EventLogPanel />
+      </div>
+
       <p className="text-center text-[10px] text-stone-400">
         作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活。
       </p>
@@ -165,6 +174,10 @@ function FarmPageInner() {
         state={state}
         open={warehouseOpen}
         onClose={() => setWarehouseOpen(false)}
+      />
+      <NeighborFarmModal
+        characterId={activeNeighborId}
+        onClose={() => setActiveNeighborId(null)}
       />
     </div>
   );

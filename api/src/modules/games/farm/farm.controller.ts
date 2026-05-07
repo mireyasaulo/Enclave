@@ -18,6 +18,7 @@ import {
   FarmNeighborDetail,
   FarmNeighborSummary,
   FarmPlayerStateView,
+  FarmStealResult,
 } from './farm.types';
 
 interface PlantBody {
@@ -112,6 +113,18 @@ export class FarmController {
     const ownerId = await this.stateService.resolveOwnerId();
     const plotIndex = parsePlotIndex(body.plotIndex);
     return this.stateService.harvest(ownerId, plotIndex);
+  }
+
+  @Post('steal')
+  async steal(
+    @Body() body: { characterId: string; plotIndex: number },
+  ): Promise<FarmStealResult> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const plotIndex = parsePlotIndex(body.plotIndex);
+    if (typeof body.characterId !== 'string' || body.characterId.length === 0) {
+      throw new BadRequestException('characterId 必填');
+    }
+    return this.stateService.stealFromNpc(ownerId, body.characterId, plotIndex);
   }
 
   @Post('buy-seed')

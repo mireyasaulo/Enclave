@@ -6,8 +6,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CharactersService } from '../../characters/characters.service';
 import { WorldOwnerService } from '../../auth/world-owner.service';
 import { FarmEventService } from './farm-event.service';
+import { FarmNpcStateEntity } from './entities/farm-npc-state.entity';
 import { FarmPlayerStateEntity } from './entities/farm-player-state.entity';
 import {
   FARM_CROP_CATALOG,
@@ -26,8 +28,10 @@ import {
   FARM_PLAYER_DAILY_STEAL_LIMIT,
   FarmCropId,
   FarmHarvestResult,
+  FarmNeighborSummary,
   FarmPlayerStateView,
   FarmPlot,
+  FarmStealResult,
   FarmStolenLogEntry,
 } from './farm.types';
 
@@ -44,8 +48,11 @@ export class FarmStateService {
   constructor(
     @InjectRepository(FarmPlayerStateEntity)
     private readonly playerRepo: Repository<FarmPlayerStateEntity>,
+    @InjectRepository(FarmNpcStateEntity)
+    private readonly npcRepo: Repository<FarmNpcStateEntity>,
     private readonly worldOwnerService: WorldOwnerService,
     private readonly eventService: FarmEventService,
+    private readonly charactersService: CharactersService,
   ) {}
 
   async getOrCreatePlayerState(
@@ -359,13 +366,129 @@ export class FarmStateService {
   async assertDailyStealQuota(state: FarmPlayerStateEntity): Promise<void> {
     const cutoff = Date.now() - 24 * 3600 * 1000;
     const recent = (state.weeklyStolenLogPayload ?? []).filter(
-      (entry) => entry.atMs >= cutoff,
+      (entry) => entry.atMs >= cutoff && entry.thiefCharacterId === FARM_PLAYER_ACTOR_ID,
     );
     if (recent.length >= FARM_PLAYER_DAILY_STEAL_LIMIT) {
       throw new ForbiddenException(
         `今日偷菜次数已达上限（${FARM_PLAYER_DAILY_STEAL_LIMIT}/天）`,
       );
     }
+  }
+
+  async stealFromNpc(
+    ownerId: string,
+    characterId: string,
+    plotIndex: number,
+  ): Promise<FarmStealResult> {
+    const character = await this.charactersService.findById(characterId);
+    if (!character) {
+      throw new NotFoundException(`角色不存在：${characterId}`);
+    }
+    const isVisible = await this.charactersService.isVisibleToOwner(
+      characterId,
+      ownerId,
+    );
+    if (!isVisible) {
+      throw new NotFoundException('该角色当前不可见');
+    }
+    const npc = await this.npcRepo.findOneBy({ characterId });
+    if (!npc) {
+      throw new NotFoundException('该角色还没有农场');
+    }
+    const npcPlots = ensurePlotsArray(npc.plotsPayload, npc.plotCount).map((p) => ({ ...p }));
+    const plot = npcPlots[plotIndex];
+    if (!plot) throw new NotFoundException('田块不存在');
+    if (
+      !plot.cropId ||
+      plot.maturedAt == null ||
+      Date.now() < plot.maturedAt
+    ) {
+      throw new BadRequestException('该作物还没成熟');
+    }
+    if ((plot.stolenBy ?? []).includes(FARM_PLAYER_ACTOR_ID)) {
+      throw new BadRequestException('你已经偷过这块田了');
+    }
+
+    const player = await this.getOrCreatePlayerState(ownerId);
+    await this.assertDailyStealQuota(player);
+
+    const def = getCropDefinition(plot.cropId);
+    const stolenAmount = Math.max(1, Math.floor((plot.yieldOverride ?? def.yieldRange[0]) / 2));
+    const coinsGained = stolenAmount * Math.max(1, Math.floor(def.sellPrice / 2));
+
+    plot.stolenBy = [...(plot.stolenBy ?? []), FARM_PLAYER_ACTOR_ID];
+    npcPlots[plotIndex] = plot;
+    npc.plotsPayload = npcPlots;
+    await this.npcRepo.save(npc);
+
+    const playerWarehouse = { ...(player.warehousePayload ?? {}) };
+    playerWarehouse[plot.cropId] = (playerWarehouse[plot.cropId] ?? 0) + stolenAmount;
+    player.warehousePayload = playerWarehouse;
+    player.coins += coinsGained;
+    const stolenLog = pruneStolenLog(player.weeklyStolenLogPayload ?? []);
+    stolenLog.push({
+      thiefCharacterId: FARM_PLAYER_ACTOR_ID,
+      thiefName: '我',
+      cropId: plot.cropId,
+      amount: stolenAmount,
+      atMs: Date.now(),
+    });
+    player.weeklyStolenLogPayload = stolenLog;
+    const savedPlayer = await this.playerRepo.save(player);
+
+    const intimacyDelta = -3;
+    const newIntimacy = Math.max(0, Math.min(100, (character.intimacyLevel ?? 0) + intimacyDelta));
+    if (newIntimacy !== character.intimacyLevel) {
+      character.intimacyLevel = newIntimacy;
+      await this.charactersService.upsert(character);
+    }
+
+    await this.eventService.recordEvent({
+      ownerId,
+      kind: 'steal',
+      actorType: 'owner',
+      actorId: FARM_PLAYER_ACTOR_ID,
+      actorName: '我',
+      targetType: 'character',
+      targetId: characterId,
+      targetName: character.name,
+      cropId: plot.cropId,
+      intimacyDelta,
+      payload: { plotIndex, stolenAmount, coinsGained },
+    });
+
+    const target: FarmNeighborSummary = {
+      characterId,
+      characterName: character.name,
+      characterAvatar: character.avatar ?? null,
+      intimacyLevel: newIntimacy,
+      isOnline: character.isOnline ?? false,
+      ripePlotCount: npcPlots.filter(
+        (p) => p.cropId && p.maturedAt != null && Date.now() >= p.maturedAt,
+      ).length,
+      totalPlotCount: npc.plotCount,
+      level: npc.level,
+      coins: npc.coins,
+      lastActedAt:
+        npc.lastActedAt instanceof Date
+          ? npc.lastActedAt.toISOString()
+          : npc.lastActedAt
+            ? new Date(npc.lastActedAt).toISOString()
+            : null,
+      expertDomains: character.expertDomains ?? [],
+      relationship: character.relationship ?? null,
+    };
+
+    return {
+      player: this.toPlayerView(savedPlayer),
+      target,
+      stolen: {
+        cropId: plot.cropId,
+        amount: stolenAmount,
+        coinsGained,
+        intimacyDelta,
+      },
+    };
   }
 
   toPlayerView(state: FarmPlayerStateEntity): FarmPlayerStateView {
