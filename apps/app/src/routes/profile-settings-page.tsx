@@ -116,6 +116,7 @@ export function ProfileSettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
   const [activeLegalTab, setActiveLegalTab] = useState<LegalTab>("privacy");
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
+  const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
 
   const [draftName, setDraftName] = useState(username ?? "");
   const [draftSignature, setDraftSignature] = useState(signature);
@@ -225,8 +226,27 @@ export function ProfileSettingsPage() {
     });
   }, [desktopPathMismatch, desktopSettingsPath, navigate]);
 
-  function handleMobileBack() {
+  const profileDirty =
+    draftName.trim() !== (username ?? "").trim() ||
+    draftSignature.trim() !== signature.trim();
+
+  function performMobileBack() {
     void navigate({ to: backTo });
+  }
+
+  function handleMobileBack() {
+    if (profileDirty && !saveProfileMutation.isPending) {
+      setDiscardConfirmOpen(true);
+      return;
+    }
+    performMobileBack();
+  }
+
+  function handleConfirmDiscardProfile() {
+    setDiscardConfirmOpen(false);
+    setDraftName(username ?? "");
+    setDraftSignature(signature);
+    performMobileBack();
   }
 
   function handleCloudLogout() {
@@ -870,6 +890,42 @@ export function ProfileSettingsPage() {
         }
       />
       <div className="space-y-1 pb-8">{content}</div>
+      {discardConfirmOpen ? (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]">
+          <button
+            type="button"
+            aria-label={t(msg`关闭提示`)}
+            onClick={() => setDiscardConfirmOpen(false)}
+            className="absolute inset-0"
+          />
+          <div className="relative w-full max-w-[320px] overflow-hidden rounded-[18px] bg-white shadow-[var(--shadow-overlay)]">
+            <div className="px-6 pb-3 pt-6 text-center">
+              <div className="text-[16px] font-medium text-[color:var(--text-primary)]">
+                {t(msg`放弃修改`)}
+              </div>
+              <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-muted)]">
+                {t(msg`返回会丢失刚刚修改的资料，确定不保存吗？`)}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 border-t border-[color:var(--border-faint)]">
+              <button
+                type="button"
+                onClick={() => setDiscardConfirmOpen(false)}
+                className="border-r border-[color:var(--border-faint)] py-3 text-[15px] text-[color:var(--text-secondary)] active:bg-black/[0.04]"
+              >
+                {t(msg`继续编辑`)}
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDiscardProfile}
+                className="py-3 text-[15px] font-medium text-[#fa5151] active:bg-black/[0.04]"
+              >
+                {t(msg`放弃`)}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </AppPage>
   );
 }
