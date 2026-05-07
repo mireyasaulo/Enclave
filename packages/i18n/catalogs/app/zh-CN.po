@@ -398,6 +398,7 @@ msgstr "{0}等{1}人"
 msgid "{activeCollectionLabel}分栏暂时没有内容"
 msgstr "{activeCollectionLabel}分栏暂时没有内容"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:831
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:195
 msgid "{activeCount} 人"
 msgstr "{activeCount} 人"
@@ -406,6 +407,10 @@ msgstr "{activeCount} 人"
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:319
 msgid "{activeCount}/{0} 已加入"
 msgstr "{activeCount}/{0} 已加入"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:996
+msgid "{activeCount}/{totalCount} 已加入"
+msgstr "{activeCount}/{totalCount} 已加入"
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:982
 msgid "{callHandoffKindLabel}接力"
@@ -595,6 +600,10 @@ msgstr "{tagGroupCount} 个标签分组"
 msgid "{totalCommentCount} 条评论"
 msgstr "{totalCommentCount} 条评论"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:741
+msgid "{totalCount} 位成员"
+msgstr "{totalCount} 位成员"
+
 #: apps/app/src/routes/group-chat-details-page.tsx:667
 msgid "{totalMemberCount} 人"
 msgstr "{totalMemberCount} 人"
@@ -620,6 +629,7 @@ msgstr "{translatedSceneLabel} 里暂时没有新的相遇。"
 msgid "{typeLabel}消息"
 msgstr "{typeLabel}消息"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:836
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:200
 msgid "{waitingCount} 人"
 msgstr "{waitingCount} 人"
@@ -1040,6 +1050,10 @@ msgstr "世界主人 {0}/1"
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:217
 msgid "世界主人不会出现在移除列表里。"
 msgstr "世界主人不会出现在移除列表里。"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1044
+msgid "世界主人始终保留在当前群通话工作台"
+msgstr "世界主人始终保留在当前群通话工作台"
 
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:366
 msgid "世界主人始终保留在通话控制台"
@@ -2342,6 +2356,7 @@ msgstr "关闭截图预览 (Esc)"
 msgid "关闭提示"
 msgstr "关闭提示"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:871
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:227
 msgid "关闭摄像头"
 msgstr "关闭摄像头"
@@ -2424,6 +2439,11 @@ msgstr "关闭部分引用面板"
 #: apps/app/src/routes/desktop-mobile-page.tsx:154
 msgid "其他"
 msgstr "其他"
+
+#. placeholder {0}: members.length - visibleMembers.length
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1067
+msgid "其余 {0} 位成员先收口到聊天详情页管理。"
+msgstr "其余 {0} 位成员先收口到聊天详情页管理。"
 
 #: apps/app/src/routes/profile-settings-page.tsx:559
 msgid "兼容 Base URL"
@@ -3546,6 +3566,7 @@ msgstr "发表朋友圈"
 msgid "发语音继续"
 msgstr "发语音继续"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:840
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:204
 #: apps/app/src/i18n/static-dom-seed.ts:990
 msgid "发起时间"
@@ -3765,6 +3786,10 @@ msgstr "可留空保存"
 msgid "可立即补发"
 msgstr "可立即补发"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:837
+msgid "可继续同步群状态"
+msgstr "可继续同步群状态"
+
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:201
 msgid "可继续邀请未入会成员"
 msgstr "可继续邀请未入会成员"
@@ -3824,10 +3849,12 @@ msgstr "同屏"
 msgid "同步下午安排"
 msgstr "同步下午安排"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1084
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:271
 msgid "同步中..."
 msgstr "同步中..."
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1087
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:274
 msgid "同步最新状态"
 msgstr "同步最新状态"
@@ -3954,6 +3981,10 @@ msgstr "回到来源会话"
 #: apps/app/src/routes/group-chat-details-page.tsx:968
 msgid "回到紧凑预览状态"
 msgstr "回到紧凑预览状态"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:748
+msgid "回到群聊页后，继续使用顶部通话按钮即可进入桌面群通话控制台。"
+msgstr "回到群聊页后，继续使用顶部通话按钮即可进入桌面群通话控制台。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:16
 msgid "回到顶部"
@@ -4839,6 +4870,7 @@ msgstr "已刷新小程序接力内容。"
 msgid "已刷新直播接力内容。"
 msgstr "已刷新直播接力内容。"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1057
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:383
 #: apps/app/src/i18n/static-dom-seed.ts:160
 msgid "已加入"
@@ -4852,6 +4884,10 @@ msgstr "已加入常用入口"
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:196
 msgid "已加入当前桌面通话工作台"
 msgstr "已加入当前桌面通话工作台"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:832
+msgid "已加入本轮群通话"
+msgstr "已加入本轮群通话"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:842
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:208
@@ -4913,6 +4949,7 @@ msgstr "已同步"
 msgid "已同步今天下午的聊天安排"
 msgstr "已同步今天下午的聊天安排"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1086
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:273
 msgid "已同步群状态"
 msgstr "已同步群状态"
@@ -5468,6 +5505,7 @@ msgstr "开启了 @所有人 通知。"
 msgid "开启了群公告通知。"
 msgstr "开启了群公告通知。"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:860
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:220
 msgid "开启扬声器"
 msgstr "开启扬声器"
@@ -5573,6 +5611,7 @@ msgstr "当前：跟随默认背景"
 msgid "当前上下文"
 msgstr "当前上下文"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:634
 #: apps/app/src/i18n/static-dom-seed.ts:995
 msgid "当前不能发起群通话"
 msgstr "当前不能发起群通话"
@@ -5596,6 +5635,10 @@ msgstr "当前世界实例的唯一主人"
 #: apps/app/src/features/shell/desktop-shell.tsx:567
 msgid "当前世界还没有\"我自己\"角色。"
 msgstr "当前世界还没有\"我自己\"角色。"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:842
+msgid "当前为移动群通话工作台"
+msgstr "当前为移动群通话工作台"
 
 #: apps/app/src/routes/group-qr-page.tsx:585
 msgid "当前主推荐本身就在冷却中，结构不会立刻变化，先等它恢复优先位。"
@@ -5767,6 +5810,7 @@ msgstr "当前可搜索范围"
 msgid "当前回流来源"
 msgstr "当前回流来源"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:830
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:194
 #: apps/app/src/i18n/static-dom-seed.ts:988
 msgid "当前在线"
@@ -5793,6 +5837,10 @@ msgstr "当前小程序工作台"
 #: apps/app/src/i18n/static-dom-seed.ts:906
 msgid "当前工作台"
 msgstr "当前工作台"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1046
+msgid "当前已加入本轮群通话"
+msgstr "当前已加入本轮群通话"
 
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:368
 msgid "当前已加入群通话"
@@ -5901,6 +5949,10 @@ msgstr "当前没有可预测结果。"
 msgid "当前没有次优先备选。"
 msgstr "当前没有次优先备选。"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:892
+msgid "当前沿用了上一端的群通话快照，可继续调整在线成员后再同步到群聊。"
+msgstr "当前沿用了上一端的群通话快照，可继续调整在线成员后再同步到群聊。"
+
 #: apps/app/src/components/chat-composer.tsx:2261
 msgid "当前浏览器不支持复制截图到剪贴板。"
 msgstr "当前浏览器不支持复制截图到剪贴板。"
@@ -5935,6 +5987,10 @@ msgstr "当前消息暂不支持部分引用。"
 #: apps/app/src/routes/profile-settings-page.tsx:515
 msgid "当前状态"
 msgstr "当前状态"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:712
+msgid "当前独立路由主要保留给手机端通话流程。桌面端已经改为在群聊消息页内打开通话工作台，这样成员调度、聊天记录和侧栏信息会保持在同一窗口里。"
+msgstr "当前独立路由主要保留给手机端通话流程。桌面端已经改为在群聊消息页内打开通话工作台，这样成员调度、聊天记录和侧栏信息会保持在同一窗口里。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:950
 msgid "当前环境不支持剪贴板复制。"
@@ -6029,6 +6085,11 @@ msgstr "当前筛选下没有附件"
 msgid "当前结果"
 msgstr "当前结果"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:906
+msgid "当前群视频页先承载移动工作台状态，本地摄像头开关只影响当前页面提示，不会上传真实画面。"
+msgstr "当前群视频页先承载移动工作台状态，本地摄像头开关只影响当前页面提示，不会上传真实画面。"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:720
 #: apps/app/src/routes/desktop-mobile-page.tsx:505
 #: apps/app/src/routes/group-chat-details-page.tsx:723
 #: apps/app/src/routes/group-chat-details-page.tsx:1029
@@ -6036,6 +6097,7 @@ msgstr "当前结果"
 msgid "当前群聊"
 msgstr "当前群聊"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:618
 #: apps/app/src/i18n/static-dom-seed.ts:1000
 msgid "当前群聊不存在，暂时无法发起群通话。"
 msgstr "当前群聊不存在，暂时无法发起群通话。"
@@ -6244,6 +6306,7 @@ msgstr "待办"
 msgid "待办 {completedTaskCount}/{totalTaskCount}"
 msgstr "待办 {completedTaskCount}/{totalTaskCount}"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1057
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:383
 msgid "待加入"
 msgstr "待加入"
@@ -6394,6 +6457,7 @@ msgstr "成功邀请"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:506
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:697
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:582
 #: apps/app/src/routes/group-chat-details-page.tsx:599
 #: apps/app/src/routes/group-qr-page.tsx:1134
 msgid "成员"
@@ -6407,10 +6471,12 @@ msgstr "成员 · {senderFilterDisplayLabel}"
 msgid "成员与资料"
 msgstr "成员与资料"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:583
 #: apps/app/src/i18n/static-dom-seed.ts:998
 msgid "成员信息暂时不可用"
 msgstr "成员信息暂时不可用"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:990
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:312
 #: apps/app/src/i18n/static-dom-seed.ts:813
 msgid "成员席位"
@@ -6419,6 +6485,14 @@ msgstr "成员席位"
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:250
 msgid "成员状态刚刚有变化，系统会自动同步到聊天消息流。"
 msgstr "成员状态刚刚有变化，系统会自动同步到聊天消息流。"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:913
+msgid "成员状态刚有变化，系统会自动刷新群通话卡片。"
+msgstr "成员状态刚有变化，系统会自动刷新群通话卡片。"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:738
+msgid "成员规模"
+msgstr "成员规模"
 
 #: apps/app/src/components/mobile-shell.tsx:35
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1324
@@ -6550,6 +6624,14 @@ msgstr "手机接力当前仅提供桌面布局"
 msgid "手机接力面板目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到消息页继续处理会话。"
 msgstr "手机接力面板目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到消息页继续处理会话。"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:73
+msgid "手机端"
+msgstr "手机端"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:807
+msgid "手机端发起"
+msgstr "手机端发起"
+
 #: apps/app/src/i18n/static-dom-seed.ts:924
 msgid "打印图片"
 msgstr "打印图片"
@@ -6635,6 +6717,7 @@ msgstr "打开所在位置失败，请稍后再试。"
 msgid "打开搜一搜"
 msgstr "打开搜一搜"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:871
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:227
 msgid "打开摄像头"
 msgstr "打开摄像头"
@@ -6785,6 +6868,7 @@ msgstr "扫一扫上面的二维码图案，加我为朋友"
 msgid "扫码加入"
 msgstr "扫码加入"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:860
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:220
 msgid "扬声器已开"
 msgstr "扬声器已开"
@@ -8765,6 +8849,10 @@ msgstr "查看群二维码"
 msgid "查看群聊"
 msgstr "查看群聊"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:775
+msgid "查看群聊信息"
+msgstr "查看群聊信息"
+
 #: apps/app/src/i18n/static-dom-seed.ts:405
 #: apps/app/src/routes/starred-friends-page.tsx:184
 #: apps/app/src/routes/starred-friends-page.tsx:219
@@ -8905,6 +8993,7 @@ msgstr "桌面打开聊天"
 msgid "桌面直播伴侣里的准备稿和最近直播记录，会优先从这里发到手机继续跟进。"
 msgstr "桌面直播伴侣里的准备稿和最近直播记录，会优先从这里发到手机继续跟进。"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:73
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:98
 msgid "桌面端"
 msgstr "桌面端"
@@ -8929,6 +9018,18 @@ msgstr "桌面端的发现入口已经收口到桌面发现工作区，先回到
 msgid "桌面端的场景相遇入口已经收口到桌面发现工作区，先回到主发现页。"
 msgstr "桌面端的场景相遇入口已经收口到桌面发现工作区，先回到主发现页。"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:708
+msgid "桌面端请从聊天页继续发起群视频"
+msgstr "桌面端请从聊天页继续发起群视频"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:709
+msgid "桌面端请从聊天页继续发起群语音"
+msgstr "桌面端请从聊天页继续发起群语音"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:681
+msgid "桌面端通话入口已收口到聊天工作区顶部工具栏。"
+msgstr "桌面端通话入口已收口到聊天工作区顶部工具栏。"
+
 #: apps/app/src/routes/group-chat-background-page.tsx:660
 msgid "桌面端预览会同步展示在群聊工作区"
 msgstr "桌面端预览会同步展示在群聊工作区"
@@ -8940,6 +9041,10 @@ msgstr "桌面端预览会同步展示在聊天工作区"
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:222
 msgid "桌面设置页"
 msgstr "桌面设置页"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:699
+msgid "桌面通话工作区"
+msgstr "桌面通话工作区"
 
 #: apps/app/src/features/shell/desktop-shell.tsx:541
 msgid "桌面锁定口令已设置，请输入口令解锁。"
@@ -9231,6 +9336,10 @@ msgstr "正在打开桌面通讯录"
 msgid "正在把作者页收回桌面视频号工作区，并恢复当前内容上下文。"
 msgstr "正在把作者页收回桌面视频号工作区，并恢复当前内容上下文。"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:912
+msgid "正在把最新在线人数同步到群聊。"
+msgstr "正在把最新在线人数同步到群聊。"
+
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:249
 msgid "正在把最新成员状态同步到聊天消息流。"
 msgstr "正在把最新成员状态同步到聊天消息流。"
@@ -9323,6 +9432,10 @@ msgstr "正在生成群邀请卡..."
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:236
 msgid "正在移除..."
 msgstr "正在移除..."
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:982
+msgid "正在结束当前群通话并返回群聊，请稍候。"
+msgstr "正在结束当前群通话并返回群聊，请稍候。"
 
 #: apps/app/src/routes/welcome-page.tsx:958
 msgid "正在解析你的世界"
@@ -9543,6 +9656,14 @@ msgstr "正在载入桌面通讯录工作区，马上显示联系人和详情。
 msgid "正在载入表情..."
 msgstr "正在载入表情..."
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:523
+msgid "正在连接{callTitle}"
+msgstr "正在连接{callTitle}"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:519
+msgid "正在连接{callTitle}..."
+msgstr "正在连接{callTitle}..."
+
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1447
 msgid "正在退出..."
 msgstr "正在退出..."
@@ -9669,6 +9790,10 @@ msgstr "治愈感和布置玩法带动收藏率。"
 #: apps/app/src/i18n/static-dom-seed.ts:565
 msgid "治愈系"
 msgstr "治愈系"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:806
+msgid "沿用桌面来源"
+msgstr "沿用桌面来源"
 
 #: apps/app/src/i18n/static-dom-seed.ts:419
 msgid "法律"
@@ -10049,9 +10174,17 @@ msgstr "点击后写入最近使用和打开态"
 msgid "点击后可切换为已加入"
 msgstr "点击后可切换为已加入"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1047
+msgid "点击后可加入本轮群通话"
+msgstr "点击后可加入本轮群通话"
+
 #: apps/app/src/i18n/static-dom-seed.ts:1043
 msgid "点击推荐区的“加入我的小程序”，这里就会形成固定常用入口。"
 msgstr "点击推荐区的“加入我的小程序”，这里就会形成固定常用入口。"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:992
+msgid "点击角色成员可切换为已加入或待加入，快速同步这一轮群通话状态。"
+msgstr "点击角色成员可切换为已加入或待加入，快速同步这一轮群通话状态。"
 
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:315
 msgid "点击角色成员可切换为已加入或待加入，快速模拟群通话调度。"
@@ -10729,6 +10862,10 @@ msgstr "稍等一下，正在同步群成员、群资料和消息设置。"
 msgid "稍等一下，正在同步群资料和成员信息。"
 msgstr "稍等一下，正在同步群资料和成员信息。"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:524
+msgid "稍等一下，正在同步群资料和成员状态。"
+msgstr "稍等一下，正在同步群资料和成员状态。"
+
 #: apps/app/src/routes/chat-details-page.tsx:751
 msgid "稍等一下，正在同步聊天资料和设置。"
 msgstr "稍等一下，正在同步聊天资料和设置。"
@@ -10853,6 +10990,7 @@ msgstr "等待下一轮"
 msgid "等待世界里的相遇事件触发新的申请。"
 msgstr "等待世界里的相遇事件触发新的申请。"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:835
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:199
 #: apps/app/src/i18n/static-dom-seed.ts:989
 msgid "等待加入"
@@ -10917,6 +11055,7 @@ msgstr "管理专属 API Key 和兼容 Base URL。"
 msgid "管理中：点击表情右上角删除，删完会自动顺到下一张，按 Esc 可直接完成。"
 msgstr "管理中：点击表情右上角删除，删完会自动顺到下一张，按 Esc 可直接完成。"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1007
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1313
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1317
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2062
@@ -11075,6 +11214,7 @@ msgstr "经营"
 msgid "经营精选"
 msgstr "经营精选"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1099
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:303
 msgid "结束中..."
 msgstr "结束中..."
@@ -11091,10 +11231,15 @@ msgstr "结束删除管理并回到自定义列表。"
 msgid "结束直播"
 msgstr "结束直播"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:959
+msgid "结束群通话失败了，但当前工作台还在。你可以重试结束，或者先继续保留这一轮状态。"
+msgstr "结束群通话失败了，但当前工作台还在。你可以重试结束，或者先继续保留这一轮状态。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:735
 msgid "结束语音输入"
 msgstr "结束语音输入"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1100
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:303
 msgid "结束通话"
 msgstr "结束通话"
@@ -11129,6 +11274,10 @@ msgstr "继续使用"
 #: apps/app/src/i18n/static-dom-seed.ts:477
 msgid "继续使用会回到最近那个接龙，优先展示未确认成员。"
 msgstr "继续使用会回到最近那个接龙，优先展示未确认成员。"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:976
+msgid "继续保留当前状态"
+msgstr "继续保留当前状态"
 
 #: apps/app/src/routes/chat-room-page.tsx:236
 #: apps/app/src/routes/group-chat-page.tsx:202
@@ -11187,6 +11336,10 @@ msgstr "继续编辑"
 msgid "继续聊"
 msgstr "继续聊"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:944
+msgid "继续调整成员"
+msgstr "继续调整成员"
+
 #: apps/app/src/routes/desktop-mobile-page.tsx:1372
 msgid "继续阅读这篇公众号文章。"
 msgstr "继续阅读这篇公众号文章。"
@@ -11215,6 +11368,7 @@ msgstr "置顶"
 msgid "置顶聊天"
 msgstr "置顶聊天"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1005
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2061
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2091
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2338
@@ -11269,6 +11423,7 @@ msgstr "群公告暂时不可用"
 msgid "群协作"
 msgstr "群协作"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:1008
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1313
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1318
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2094
@@ -11301,6 +11456,11 @@ msgstr "群接龙"
 msgid "群视频"
 msgstr "群视频"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:180
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:732
+msgid "群视频通话"
+msgstr "群视频通话"
+
 #: apps/app/src/features/chat/chat-call-fallback-notice.tsx:45
 msgid "群视频通话暂未开放"
 msgstr "群视频通话暂未开放"
@@ -11312,6 +11472,9 @@ msgstr "群管理"
 
 #: apps/app/src/features/chat/chat-reminder-entries.ts:70
 #: apps/app/src/features/chat/chat-reminder-entries.ts:95
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:178
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:544
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:633
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:307
 #: apps/app/src/lib/conversation-route.ts:27
 #: apps/app/src/routes/contacts-page.tsx:1141
@@ -11445,6 +11608,11 @@ msgstr "群聊邀请接力"
 msgid "群语音"
 msgstr "群语音"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:180
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:733
+msgid "群语音通话"
+msgstr "群语音通话"
+
 #: apps/app/src/features/chat/chat-call-fallback-notice.tsx:44
 msgid "群语音通话暂未开放"
 msgstr "群语音通话暂未开放"
@@ -11457,6 +11625,7 @@ msgstr "群身份"
 msgid "群通话控制台已就绪"
 msgstr "群通话控制台已就绪"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:545
 #: apps/app/src/i18n/static-dom-seed.ts:997
 msgid "群通话暂时不可用"
 msgstr "群通话暂时不可用"
@@ -11884,6 +12053,7 @@ msgstr "解析云世界访问失败。"
 msgid "解锁继续使用"
 msgstr "解锁继续使用"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:850
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:214
 msgid "解除静音"
 msgstr "解除静音"
@@ -12706,6 +12876,14 @@ msgstr "返回视频号"
 msgid "返回继续使用"
 msgstr "返回继续使用"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:426
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:560
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:598
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:628
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:649
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:669
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:692
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:794
 #: apps/app/src/i18n/static-dom-seed.ts:987
 msgid "返回群聊"
 msgstr "返回群聊"
@@ -12736,6 +12914,10 @@ msgstr "返回群聊发语音"
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:93
 msgid "返回群聊拍摄"
 msgstr "返回群聊拍摄"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:760
+msgid "返回群聊继续"
+msgstr "返回群聊继续"
 
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:188
 #: apps/app/src/i18n/static-dom-seed.ts:986
@@ -13047,6 +13229,10 @@ msgstr "这个群聊暂时不可用，可以先重试读取，或返回上一页
 msgid "这个群聊暂时不可用，可以先重试读取，或返回消息列表后再试。"
 msgstr "这个群聊暂时不可用，可以先重试读取，或返回消息列表后再试。"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:635
+msgid "这个群聊暂时不可用，可以先重试读取，或返回群聊后再试。"
+msgstr "这个群聊暂时不可用，可以先重试读取，或返回群聊后再试。"
+
 #: apps/app/src/routes/group-chat-background-page.tsx:442
 msgid "这个群聊暂时不可用，返回上一页后再试一次。"
 msgstr "这个群聊暂时不可用，返回上一页后再试一次。"
@@ -13146,6 +13332,10 @@ msgstr "这条群邀请还没有投递到聊天会话。去群二维码页发到
 #: apps/app/src/routes/group-qr-page.tsx:1245
 msgid "这次是从聊天线程直接回到群邀请页，可继续转发或回到原会话。"
 msgstr "这次是从聊天线程直接回到群邀请页，可继续转发或回到原会话。"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:927
+msgid "这次群状态没有回写成功。你可以继续调整成员席位，确认后再手动重试同步。"
+msgstr "这次群状态没有回写成功。你可以继续调整成员席位，确认后再手动重试同步。"
 
 #: apps/app/src/features/chat/use-speech-input.ts:496
 #: apps/app/src/features/chat/use-speech-input.ts:512
@@ -13289,6 +13479,10 @@ msgstr "进入账号"
 #: apps/app/src/i18n/static-dom-seed.ts:618
 msgid "远程模式下，相关数据会发送到世界实例的 Core API 与推理网关；自托管或特定部署模式下，数据会保存在对应实例的运行目录与数据库里。"
 msgstr "远程模式下，相关数据会发送到世界实例的 Core API 与推理网关；自托管或特定部署模式下，数据会保存在对应实例的运行目录与数据库里。"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:522
+msgid "连接中"
+msgstr "连接中"
 
 #: apps/app/src/routes/welcome-page.tsx:197
 #: apps/app/src/routes/welcome-page.tsx:212
@@ -13479,6 +13673,10 @@ msgstr "通话"
 msgid "通话暂时不可用"
 msgstr "通话暂时不可用"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:728
+msgid "通话类型"
+msgstr "通话类型"
+
 #: apps/app/src/routes/welcome-page.tsx:1147
 msgid "通过邮箱登录。新用户会获得一个全新的世界，老用户会唤醒自己已有的世界。"
 msgstr "通过邮箱登录。新用户会获得一个全新的世界，老用户会唤醒自己已有的世界。"
@@ -13638,6 +13836,10 @@ msgstr "重试取消关注"
 msgid "重试取消星标"
 msgstr "重试取消星标"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:937
+msgid "重试同步状态"
+msgstr "重试同步状态"
+
 #: apps/app/src/routes/channels-page.tsx:497
 msgid "重试回复评论"
 msgstr "重试回复评论"
@@ -13683,6 +13885,10 @@ msgstr "重试拒绝"
 msgid "重试摇一摇"
 msgstr "重试摇一摇"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:969
+msgid "重试结束通话"
+msgstr "重试结束通话"
+
 #: apps/app/src/routes/contacts-page.tsx:1326
 msgid "重试设为星标"
 msgstr "重试设为星标"
@@ -13692,6 +13898,9 @@ msgid "重试评论点赞"
 msgstr "重试评论点赞"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:554
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:554
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:592
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:643
 #: apps/app/src/i18n/static-dom-seed.ts:39
 #: apps/app/src/routes/channel-author-page.tsx:325
 #: apps/app/src/routes/channels-page.tsx:1108
@@ -13974,6 +14183,7 @@ msgstr "青柠"
 msgid "青蓝"
 msgstr "青蓝"
 
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:850
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:214
 msgid "静音麦克风"
 msgstr "静音麦克风"
@@ -14028,6 +14238,10 @@ msgstr "首推"
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:1121
 msgid "首推来自 {0}"
 msgstr "首推来自 {0}"
+
+#: apps/app/src/features/chat/mobile-group-call-screen.tsx:887
+msgid "首次进入可先点下方成员席位切换\"已加入/待加入\"，再点\"同步最新状态\"把在线人数回写到群聊卡片。"
+msgstr "首次进入可先点下方成员席位切换\"已加入/待加入\"，再点\"同步最新状态\"把在线人数回写到群聊卡片。"
 
 #: apps/app/src/features/shell/desktop-shell.tsx:913
 msgid "首次锁定需要先设置本机口令"
