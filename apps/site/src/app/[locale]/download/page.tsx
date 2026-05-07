@@ -8,6 +8,7 @@ import {
   pageUrl,
 } from "@/lib/seo-metadata";
 import { DownloadCards } from "@/components/download-cards";
+import { BreadcrumbsJsonLd } from "@/components/seo/breadcrumbs-json-ld";
 
 export async function generateMetadata({
   params,
@@ -49,6 +50,10 @@ export default async function DownloadPage({
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <BreadcrumbsJsonLd
+        locale={safeLocale}
+        trail={[{ titleZh: "下载", segment: "download" }]}
+      />
       <header className="max-w-2xl">
         <span className="text-sm font-semibold uppercase tracking-wider text-(--brand-primary)">
           {i18n._("开始使用")}

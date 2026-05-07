@@ -7,6 +7,7 @@ import {
   OG_LOCALE,
   pageUrl,
 } from "@/lib/seo-metadata";
+import { BreadcrumbsJsonLd } from "@/components/seo/breadcrumbs-json-ld";
 
 export async function generateMetadata({
   params,
@@ -48,6 +49,10 @@ export default async function PrivacyPage({
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+      <BreadcrumbsJsonLd
+        locale={safeLocale}
+        trail={[{ titleZh: "隐私政策", segment: "privacy" }]}
+      />
       <header>
         <h1 className="text-3xl font-bold sm:text-4xl">{i18n._("隐私政策")}</h1>
         <p className="mt-3 text-sm text-(--text-muted)">

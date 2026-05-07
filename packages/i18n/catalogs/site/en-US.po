@@ -665,4 +665,10 @@ msgstr "Terms of Service · Enclave"
 #. js-lingui-explicit-id
 msgid "隐界 Enclave 服务条款：开源协议、合理使用、订阅与计费、免责声明。"
 msgstr "Enclave terms of service: open-source license, acceptable use, subscription & billing, and disclaimers."
+#. js-lingui-explicit-id
+msgid "隐界 Enclave"
+msgstr "Enclave"
+#. js-lingui-explicit-id
+msgid "首页"
+msgstr "Home"
 

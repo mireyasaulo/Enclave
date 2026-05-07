@@ -6,6 +6,7 @@ import { getServerI18n } from "@/i18n/server";
 import { SiteI18nClientProvider } from "@/i18n/client-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { SiteJsonLd } from "@/components/seo/site-json-ld";
 import {
   alternateLocales,
   buildAlternates,
@@ -62,6 +63,7 @@ export default async function LocaleLayout({
 
   return (
     <SiteI18nClientProvider locale={safeLocale} messages={messages}>
+      <SiteJsonLd locale={safeLocale} />
       <SiteHeader locale={safeLocale} />
       {children}
       <SiteFooter locale={safeLocale} />

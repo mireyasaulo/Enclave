@@ -166,6 +166,9 @@ const TRANSLATIONS = [
   ["隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。", "How Enclave collects, stores, and uses your data — covering both self-hosted and managed-cloud users.", "エンクレイブがあなたのデータを収集・保存・利用する方法。セルフホストとマネージドクラウドの両方をカバーします。", "엔클레이브가 데이터를 수집·저장·이용하는 방식. 자체 호스팅과 매니지드 클라우드 사용자 모두를 다룹니다."],
   ["服务条款 · 隐界 Enclave", "Terms of Service · Enclave", "利用規約 · 隐界 Enclave", "서비스 약관 · 엔클레이브"],
   ["隐界 Enclave 服务条款：开源协议、合理使用、订阅与计费、免责声明。", "Enclave terms of service: open-source license, acceptable use, subscription & billing, and disclaimers.", "エンクレイブ利用規約：オープンソースライセンス、適切な利用、サブスクと請求、免責事項。", "엔클레이브 서비스 약관: 오픈소스 라이선스, 적절한 사용, 구독 및 결제, 면책 조항."],
+  // ===== JSON-LD =====
+  ["隐界 Enclave", "Enclave", "隐界 Enclave", "엔클레이브 Enclave"],
+  ["首页", "Home", "ホーム", "홈"],
 ];
 
 const LOCALES = ["zh-CN", "en-US", "ja-JP", "ko-KR"];

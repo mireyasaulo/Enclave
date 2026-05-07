@@ -14,6 +14,7 @@ import { OnePersonWorld } from "@/components/one-person-world";
 import { CrossPlatformSection } from "@/components/cross-platform-section";
 import { GetStartedCta } from "@/components/get-started-cta";
 import { FaqAccordion } from "@/components/faq-accordion";
+import { HomeJsonLd } from "@/components/seo/home-json-ld";
 
 export async function generateMetadata({
   params,
@@ -54,6 +55,7 @@ export default async function HomePage({
 
   return (
     <>
+      <HomeJsonLd locale={safeLocale} />
       <HeroSection locale={safeLocale} />
       <CapabilityGrid locale={safeLocale} />
       <MultiPlatformCarousel locale={safeLocale} />

@@ -665,4 +665,10 @@ msgstr "利用規約 · 隐界 Enclave"
 #. js-lingui-explicit-id
 msgid "隐界 Enclave 服务条款：开源协议、合理使用、订阅与计费、免责声明。"
 msgstr "エンクレイブ利用規約：オープンソースライセンス、適切な利用、サブスクと請求、免責事項。"
+#. js-lingui-explicit-id
+msgid "隐界 Enclave"
+msgstr "隐界 Enclave"
+#. js-lingui-explicit-id
+msgid "首页"
+msgstr "ホーム"
 

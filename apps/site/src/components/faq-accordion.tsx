@@ -1,6 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import { getServerI18n } from "@/i18n/server";
 import type { SupportedLocale } from "@/lib/locales";
+import { JsonLd } from "./seo/json-ld";
 
 const FAQS: Array<{ qZh: string; aZh: string }> = [
   {
@@ -37,8 +38,22 @@ export async function FaqAccordion({ locale }: { locale: SupportedLocale }) {
     subtitle: i18n._("没找到你的问题？欢迎邮件联系我们。"),
   };
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQS.map((f) => ({
+      "@type": "Question",
+      name: i18n._(f.qZh),
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: i18n._(f.aZh),
+      },
+    })),
+  };
+
   return (
     <section id="faq" className="relative scroll-mt-24 bg-(--surface-shell) py-16 sm:py-24">
+      <JsonLd data={faqJsonLd} />
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         <header className="text-center">
           <span className="text-sm font-semibold uppercase tracking-wider text-(--brand-primary)">
