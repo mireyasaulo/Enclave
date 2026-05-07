@@ -169,6 +169,7 @@ const TRANSLATIONS = [
   // ===== JSON-LD =====
   ["隐界 Enclave", "Enclave", "隐界 Enclave", "엔클레이브 Enclave"],
   ["首页", "Home", "ホーム", "홈"],
+  ["隐界核心闭环演示动图：聊天、朋友圈、群聊、电话、笔记一气呵成", "Enclave core loop demo: chats, moments, groups, calls and notes flowing together", "エンクレイブのコアループ：チャット、モーメンツ、グループ、通話、ノートが一連の流れに", "엔클레이브 핵심 루프 데모: 채팅, 모먼트, 그룹, 통화, 노트가 자연스럽게 이어집니다"],
 ];
 
 const LOCALES = ["zh-CN", "en-US", "ja-JP", "ko-KR"];

@@ -15,6 +15,7 @@ export async function HeroSection({ locale }: { locale: SupportedLocale }) {
     cta1: i18n._("免费开始"),
     cta2: i18n._("了解能做什么"),
     coreLoop: i18n._("核心闭环演示（动图）"),
+    gifAlt: i18n._("隐界核心闭环演示动图：聊天、朋友圈、群聊、电话、笔记一气呵成"),
     statWorld: i18n._("私人世界"),
     statWorldDesc: i18n._("一人一实例"),
     statSync: i18n._("多端同步"),
@@ -80,7 +81,7 @@ export async function HeroSection({ locale }: { locale: SupportedLocale }) {
             </div>
             <Image
               src={`/animations/${locale}.gif`}
-              alt="Enclave core loop"
+              alt={labels.gifAlt}
               width={1200}
               height={750}
               unoptimized

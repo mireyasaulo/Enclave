@@ -671,4 +671,7 @@ msgstr "Enclave"
 #. js-lingui-explicit-id
 msgid "首页"
 msgstr "Home"
+#. js-lingui-explicit-id
+msgid "隐界核心闭环演示动图：聊天、朋友圈、群聊、电话、笔记一气呵成"
+msgstr "Enclave core loop demo: chats, moments, groups, calls and notes flowing together"
 
