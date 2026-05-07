@@ -75,6 +75,13 @@ export class CharacterEntity {
   @Column({ type: 'datetime', nullable: true })
   lastActiveAt?: Date;
 
+  // Social autonomy
+  @Column({ default: 'normal' })
+  socialOpenness: string; // 'open' | 'normal' | 'private'
+
+  @Column({ type: 'float', default: 0.3 })
+  proactiveBrowseChance: number; // 0-1, base probability of proactive browsing per autonomy tick
+
   // AI relationship network
   @Column('simple-json', { nullable: true })
   aiRelationships?: { characterId: string; relationshipType: string; strength: number }[];

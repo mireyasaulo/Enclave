@@ -7,6 +7,8 @@ import { ShakeDiscoveryService } from './shake-discovery.service';
 import { FriendshipEntity } from './friendship.entity';
 import { FriendRequestEntity } from './friend-request.entity';
 import { AIRelationshipEntity } from './ai-relationship.entity';
+import { CharacterFriendshipEntity } from './character-friendship.entity';
+import { CharacterFriendshipService } from './character-friendship.service';
 import { CharacterEntity } from '../characters/character.entity';
 import { AiModule } from '../ai/ai.module';
 import { NarrativeModule } from '../narrative/narrative.module';
@@ -33,6 +35,7 @@ import { MomentLikeEntity } from '../moments/moment-like.entity';
       FriendshipEntity,
       FriendRequestEntity,
       AIRelationshipEntity,
+      CharacterFriendshipEntity,
       CharacterEntity,
       ConversationEntity,
       MessageEntity,
@@ -55,8 +58,8 @@ import { MomentLikeEntity } from '../moments/moment-like.entity';
     SystemConfigModule,
     forwardRef(() => CyberAvatarModule),
   ],
-  providers: [SocialService, ShakeDiscoveryService],
+  providers: [SocialService, ShakeDiscoveryService, CharacterFriendshipService],
   controllers: [SocialController],
-  exports: [SocialService],
+  exports: [SocialService, CharacterFriendshipService],
 })
 export class SocialModule {}

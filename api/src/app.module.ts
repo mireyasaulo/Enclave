@@ -49,6 +49,7 @@ import { MomentLikeEntity } from './modules/moments/moment-like.entity';
 import { FriendshipEntity } from './modules/social/friendship.entity';
 import { FriendRequestEntity } from './modules/social/friend-request.entity';
 import { AIRelationshipEntity } from './modules/social/ai-relationship.entity';
+import { CharacterFriendshipEntity } from './modules/social/character-friendship.entity';
 import { GroupEntity } from './modules/chat/group.entity';
 import { GroupMemberEntity } from './modules/chat/group-member.entity';
 import { GroupMessageEntity } from './modules/chat/group-message.entity';
@@ -146,6 +147,7 @@ import {
           FriendshipEntity,
           FriendRequestEntity,
           AIRelationshipEntity,
+          CharacterFriendshipEntity,
           GroupEntity,
           GroupMemberEntity,
           GroupMessageEntity,

@@ -773,6 +773,8 @@ export class WechatSyncAdminService {
       allowOwnerKeyOverride: true,
       modelRoutingNotes: '',
       activityMode: 'auto',
+      socialOpenness: 'normal',
+      proactiveBrowseChance: 0.3,
     };
   }
 
