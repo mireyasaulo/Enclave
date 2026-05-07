@@ -16,6 +16,11 @@ import {
   ShieldCheck,
   X,
 } from "lucide-react";
+import {
+  SELF_CHARACTER_SOURCE_KEY,
+  getOrCreateConversation,
+  listCharacters,
+} from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, TextField, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../components/avatar-chip";
@@ -30,6 +35,7 @@ import {
 import { useWorldOwnerStore } from "../../store/world-owner-store";
 import { formatTimestamp } from "../../lib/format";
 import { hydrateDesktopFavoritesFromNative } from "../desktop/favorites/desktop-favorites-storage";
+import { buildDesktopChatThreadPath } from "../desktop/chat/desktop-chat-route-state";
 import {
   desktopBottomNavItems,
   desktopMoreMenuItems,
@@ -128,6 +134,7 @@ export function DesktopShell({ children }: PropsWithChildren) {
   const standaloneDesktopRoute = isStandaloneDesktopRoute(pathname);
   const profileRouteActive = isDesktopProfileRoute(pathname);
   const runtimeConfig = useAppRuntimeConfig();
+  const ownerId = useWorldOwnerStore((state) => state.id);
   const ownerName = useWorldOwnerStore((state) => state.username);
   const ownerAvatar = useWorldOwnerStore((state) => state.avatar);
   const ownerSignature = useWorldOwnerStore((state) => state.signature);
@@ -138,11 +145,13 @@ export function DesktopShell({ children }: PropsWithChildren) {
   const ownerFallbackName = t(msg`世界主人`);
   const ownerDisplayName = ownerName?.trim() || ownerFallbackName;
   const brandInitial = t(msg`隐`);
+  const baseUrl = runtimeConfig.apiBaseUrl;
   const nativeDesktopShell = runtimeConfig.appPlatform === "desktop";
   const [desktopWindow, setDesktopWindow] =
     useState<DesktopWindowHandle | null>(null);
   const [isMaximized, setIsMaximized] = useState(false);
   const [isOwnerCardOpen, setIsOwnerCardOpen] = useState(false);
+  const [isOpeningSelfChat, setIsOpeningSelfChat] = useState(false);
   const [ownerCardNotice, setOwnerCardNotice] = useState<string | null>(null);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [isLocked, setIsLocked] = useState(
@@ -537,10 +546,46 @@ export function DesktopShell({ children }: PropsWithChildren) {
     navigateDesktopShellTo("/tabs/moments");
   };
 
-  const openSelfChatShortcut = () => {
+  const openSelfChatShortcut = async () => {
+    if (!ownerId || isOpeningSelfChat) {
+      return;
+    }
+
     setOwnerCardNotice(null);
-    setIsOwnerCardOpen(false);
-    navigateDesktopShellTo("/tabs/chat");
+    setIsOpeningSelfChat(true);
+
+    try {
+      const characters = await listCharacters(baseUrl);
+      const selfCharacter = characters.find(
+        (item) =>
+          item.relationshipType === "self" ||
+          item.sourceKey?.trim() === SELF_CHARACTER_SOURCE_KEY,
+      );
+
+      if (!selfCharacter) {
+        throw new Error(t(msg`当前世界还没有"我自己"角色。`));
+      }
+
+      const conversation = await getOrCreateConversation(
+        { characterId: selfCharacter.id },
+        baseUrl,
+      );
+
+      setIsOwnerCardOpen(false);
+      navigateDesktopShellTo(
+        buildDesktopChatThreadPath({
+          conversationId: conversation.id,
+        }),
+      );
+    } catch (error) {
+      setOwnerCardNotice(
+        error instanceof Error
+          ? error.message
+          : t(msg`打开会话失败，请稍后再试。`),
+      );
+    } finally {
+      setIsOpeningSelfChat(false);
+    }
   };
 
   if (nativeDesktopShell && (!lockStoreReady || !favoritesStoreReady)) {
@@ -715,8 +760,11 @@ export function DesktopShell({ children }: PropsWithChildren) {
                     ownerAvatar={ownerAvatar}
                     ownerSignature={ownerSignature}
                     notice={ownerCardNotice}
+                    isOpeningSelfChat={isOpeningSelfChat}
                     onOpenMoments={openMomentsShortcut}
-                    onOpenSelfChat={openSelfChatShortcut}
+                    onOpenSelfChat={() => {
+                      void openSelfChatShortcut();
+                    }}
                   />
                 ) : null}
               </div>
@@ -1068,6 +1116,7 @@ function DesktopOwnerQuickCard({
   ownerAvatar,
   ownerSignature,
   notice,
+  isOpeningSelfChat,
   onOpenMoments,
   onOpenSelfChat,
 }: {
@@ -1075,37 +1124,42 @@ function DesktopOwnerQuickCard({
   ownerAvatar: string;
   ownerSignature: string;
   notice: string | null;
+  isOpeningSelfChat: boolean;
   onOpenMoments: () => void;
   onOpenSelfChat: () => void;
 }) {
   const t = useRuntimeTranslator();
   const ownerDisplayName = ownerName?.trim() || "";
   const trimmedSignature = ownerSignature.trim();
+  const signaturePlaceholder = t(msg`还没有签名，去个人资料写一句吧`);
 
   return (
-    <div className="absolute left-[calc(100%+0.75rem)] top-0 z-30 w-[286px] rounded-[22px] border border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.98)] p-3 shadow-[var(--shadow-overlay)] backdrop-blur-xl">
-      <div className="rounded-[18px] bg-[linear-gradient(180deg,rgba(7,193,96,0.12),rgba(255,255,255,0.92))] p-3.5">
-        <div className="flex items-start gap-3">
+    <div className="absolute left-[calc(100%+0.75rem)] top-0 z-30 w-[300px] rounded-[22px] border border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.98)] p-3 shadow-[var(--shadow-overlay)] backdrop-blur-xl">
+      <div className="rounded-[18px] bg-[linear-gradient(180deg,rgba(7,193,96,0.12),rgba(255,255,255,0.92))] px-4 py-4">
+        <div className="flex items-center gap-3">
           <AvatarChip name={ownerDisplayName} src={ownerAvatar} size="lg" />
           <div className="min-w-0 flex-1">
             {ownerDisplayName ? (
-              <div className="truncate text-[17px] font-semibold text-[color:var(--text-primary)]">
+              <div className="truncate text-[17px] font-semibold leading-tight text-[color:var(--text-primary)]">
                 {ownerDisplayName}
               </div>
             ) : null}
             <div
               className={cn(
-                "line-clamp-2 text-[12px] leading-5 text-[color:var(--text-secondary)]",
-                ownerDisplayName ? "mt-2" : "",
+                "line-clamp-2 text-[12px] leading-5",
+                ownerDisplayName ? "mt-1.5" : "",
+                trimmedSignature
+                  ? "text-[color:var(--text-secondary)]"
+                  : "text-[color:var(--text-muted)]",
               )}
             >
-              {trimmedSignature}
+              {trimmedSignature || signaturePlaceholder}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-1 gap-2">
+      <div className="mt-2 flex flex-col gap-1">
         <DesktopOwnerShortcutButton
           icon={Camera}
           label={t(msg`朋友圈`)}
@@ -1114,14 +1168,17 @@ function DesktopOwnerQuickCard({
         />
         <DesktopOwnerShortcutButton
           icon={MessageSquareText}
-          label={t(msg`发消息`)}
-          description={t(msg`进入我的聊天`)}
+          label={
+            isOpeningSelfChat ? t(msg`打开中...`) : t(msg`发消息`)
+          }
+          description={t(msg`和"我自己"对话`)}
           onClick={onOpenSelfChat}
+          disabled={isOpeningSelfChat}
         />
       </div>
 
       {notice ? (
-        <div className="mt-3 rounded-[14px] border border-[rgba(255,159,10,0.24)] bg-[rgba(255,244,223,0.92)] px-3 py-2 text-[12px] leading-5 text-[#9a6700]">
+        <div className="mt-2 rounded-[12px] border border-[rgba(255,159,10,0.24)] bg-[rgba(255,244,223,0.92)] px-3 py-2 text-[12px] leading-5 text-[#9a6700]">
           {notice}
         </div>
       ) : null}
@@ -1148,25 +1205,29 @@ function DesktopOwnerShortcutButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "flex min-h-[92px] flex-col items-start rounded-[16px] border bg-transparent px-3 py-3 text-left appearance-none transition-[transform,background-color,border-color,box-shadow] duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
+        "flex w-full items-center gap-3 rounded-[14px] border bg-transparent px-3 py-2.5 text-left appearance-none transition-[transform,background-color,border-color,box-shadow] duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
         disabled
           ? "cursor-wait border-[color:var(--border-faint)] bg-[rgba(148,163,184,0.08)] text-[color:var(--text-muted)]"
-          : "border-[color:var(--border-faint)] bg-[color:var(--surface-card)] text-[color:var(--text-primary)] hover:-translate-y-[1px] hover:border-[rgba(7,193,96,0.2)] hover:bg-[rgba(7,193,96,0.08)] hover:shadow-[0_12px_24px_rgba(15,23,42,0.08)]",
+          : "border-transparent bg-transparent text-[color:var(--text-primary)] hover:border-[rgba(7,193,96,0.2)] hover:bg-[rgba(7,193,96,0.08)]",
       )}
     >
       <div
         className={cn(
-          "flex h-10 w-10 items-center justify-center rounded-[12px]",
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]",
           disabled
             ? "bg-[rgba(148,163,184,0.16)]"
             : "bg-[rgba(7,193,96,0.12)] text-[#15803d]",
         )}
       >
-        <Icon size={18} />
+        <Icon size={17} />
       </div>
-      <div className="mt-3 text-[14px] font-medium">{label}</div>
-      <div className="mt-1 text-[12px] leading-5 text-[color:var(--text-secondary)]">
-        {description}
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-[14px] font-medium leading-tight">
+          {label}
+        </div>
+        <div className="mt-0.5 truncate text-[12px] leading-5 text-[color:var(--text-secondary)]">
+          {description}
+        </div>
       </div>
     </button>
   );
