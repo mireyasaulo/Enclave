@@ -69,7 +69,7 @@ export function MobileMessageActionSheet({
         aria-label="关闭消息操作菜单"
         onClick={onClose}
       />
-      <div className="absolute inset-x-0 bottom-0 overflow-hidden rounded-t-[20px] border-t border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] pt-2 shadow-[0_-14px_28px_rgba(15,23,42,0.10)]">
+      <div className="absolute inset-x-0 bottom-0 flex max-h-[85dvh] flex-col rounded-t-[20px] border-t border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] pt-2 shadow-[0_-14px_28px_rgba(15,23,42,0.10)]">
         <div className="flex justify-center pb-1.5">
           <div className="h-1 w-10 rounded-full bg-[rgba(148,163,184,0.45)]" />
         </div>
@@ -98,7 +98,7 @@ export function MobileMessageActionSheet({
             </div>
           </div>
         ) : null}
-        <div className="overflow-hidden rounded-[14px] border border-[color:var(--border-subtle)] bg-white">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-[14px] border border-[color:var(--border-subtle)] bg-white">
           {onReply ? <ActionButton label="回复" onClick={onReply} /> : null}
           {onQuoteSelection ? (
             <ActionButton
