@@ -183,6 +183,21 @@ function ensureWindowsDesktopDependencies() {
     );
     process.exit(1);
   }
+
+  // Cargo + MSVC link.exe occasionally fail on Windows when CARGO_TARGET_DIR
+  // contains non-ASCII characters (e.g. user names with Chinese characters).
+  // Surface a hint up front rather than failing deep inside link.exe.
+  const targetDir = env.CARGO_TARGET_DIR ?? "";
+  if (/[^\x00-\x7f]/u.test(targetDir)) {
+    console.warn(
+      [
+        `CARGO_TARGET_DIR contains non-ASCII characters: ${targetDir}.`,
+        "Some MSVC link.exe versions fail on such paths.",
+        "If the build fails, set CARGO_TARGET_DIR to an ASCII-only path",
+        "(e.g. `set CARGO_TARGET_DIR=C:\\yinjie-build`) before rerunning.",
+      ].join(" "),
+    );
+  }
 }
 
 if (!hasCommand("rustc") || !hasCommand("cargo")) {
@@ -235,6 +250,15 @@ for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
   console.error(
     `Detected transient Windows desktop build failure (attempt ${attempt}/${maxAttempts}). Retrying with serialized cargo jobs...`,
   );
+  if (attempt >= 3) {
+    console.error(
+      [
+        "If the build keeps failing with `os error 5` or WiX light/candle errors,",
+        "add `%CARGO_TARGET_DIR%` and `apps\\desktop\\src-tauri\\target\\` to Windows Defender exclusions,",
+        "and close any IDE/Explorer window indexing those folders.",
+      ].join(" "),
+    );
+  }
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 3000);
 }
 
@@ -333,8 +357,15 @@ function resolveWindowsVcVarsPath() {
   }
 
   const fallbacks = [
+    "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat",
     "C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Auxiliary\\Build\\vcvars64.bat",
+    "C:\\Program Files\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat",
+    "C:\\Program Files\\Microsoft Visual Studio\\2022\\Preview\\VC\\Auxiliary\\Build\\vcvars64.bat",
     "C:\\Program Files\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat",
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat",
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\Build\\vcvars64.bat",
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Auxiliary\\Build\\vcvars64.bat",
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat",
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat",
   ];
 
