@@ -26,6 +26,22 @@ msgstr " · 日志={0}"
 msgid " · 端口占用中"
 msgstr " · 端口占用中"
 
+#: apps/admin/src/components/game-release-workbench.tsx:266
+msgid " 尚未发生"
+msgstr ""
+
+#. placeholder {0}: game.name
+#. placeholder {1}: game.publishedVersion
+#: apps/admin/src/components/game-release-workbench.tsx:119
+msgid "{0} 已发布为目录版本 v{1}。"
+msgstr ""
+
+#. placeholder {0}: game.name
+#. placeholder {1}: variables.revisionSequence
+#: apps/admin/src/components/game-release-workbench.tsx:147
+msgid "{0} 已恢复到修订 #{1}。"
+msgstr ""
+
 #. placeholder {0}: previewLogs.length
 #: apps/admin/src/routes/dashboard-page.tsx:1926
 msgid "{0} 条"
@@ -47,6 +63,8 @@ msgid "{0} 赞 / {1} 评论"
 msgstr "{0} 赞 / {1} 评论"
 
 #. placeholder {0}: dutyIssues.length
+#. placeholder {0}: snapshotDiffs.length
+#: apps/admin/src/components/game-release-workbench.tsx:420
 #: apps/admin/src/routes/dashboard-page.tsx:748
 msgid "{0} 项"
 msgstr "{0} 项"
@@ -80,6 +98,10 @@ msgstr "{ownerCount} 个"
 #: apps/admin/src/routes/dashboard-page.tsx:350
 msgid "{watchItemCount} 个关注项"
 msgstr "{watchItemCount} 个关注项"
+
+#: apps/admin/src/components/game-release-workbench.tsx:738
+msgid "AI 亮点"
+msgstr ""
 
 #: apps/admin/src/routes/character-runtime-page.tsx:389
 msgid "AI 关系"
@@ -147,6 +169,10 @@ msgstr "Trace {0}"
 #: apps/admin/src/routes/dashboard-page.tsx:2407
 msgid "WorldContext 快照已更新。"
 msgstr "WorldContext 快照已更新。"
+
+#: apps/admin/src/components/game-release-workbench.tsx:653
+msgid "一句话卖点"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:811
 msgid "一屏巡检"
@@ -252,6 +278,15 @@ msgstr "主动提醒调度"
 msgid "主动跟进"
 msgstr "能動フォローアップ"
 
+#: apps/admin/src/components/game-release-workbench.tsx:303
+#: apps/admin/src/components/game-release-workbench.tsx:817
+msgid "主推可见"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:664
+msgid "主视觉标签"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1704
 msgid "事件契约"
 msgstr "事件契约"
@@ -298,6 +333,15 @@ msgstr "优先进入设置页检查桌面托管状态和运行路径。"
 msgid "低频高风险"
 msgstr "低频高风险"
 
+#. placeholder {0}: comparedRevision.revisionSequence
+#: apps/admin/src/components/game-release-workbench.tsx:438
+msgid "例如：回滚到修订 #{0}，撤回最近一轮目录改动。"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:317
+msgid "例如：开放到正式发布，补齐首期活动位和新手奖励。"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:953
 msgid "保存世界语言"
 msgstr "世界の言語を保存"
@@ -318,6 +362,29 @@ msgstr "保留最近日志入口，方便做故障留痕和快速定位，不再
 msgid "修改"
 msgstr "変更"
 
+#. placeholder {0}: revision.revisionSequence
+#: apps/admin/src/components/game-release-workbench.tsx:505
+msgid "修订 #{0}"
+msgstr ""
+
+#. placeholder {0}: revision.revisionSequence
+#. placeholder {1}: formatRevisionChangeSource( revision.changeSource, )
+#: apps/admin/src/components/game-release-workbench.tsx:402
+msgid "修订 #{0} · {1}"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:349
+msgid "修订历史"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:425
+msgid "修订来源"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:237
+msgid "修订记录"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2019
 msgid "值班总览"
 msgstr "当番概要"
@@ -334,6 +401,10 @@ msgstr "正常"
 #: apps/admin/src/routes/dashboard-page.tsx:2507
 msgid "健康探测失败"
 msgstr "健康探测失败"
+
+#: apps/admin/src/components/game-release-workbench.tsx:188
+msgid "先从目录中选中一款游戏，再执行发布。"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:360
 msgid "先处理运行阻塞，再进入具体运营工作区。"
@@ -367,6 +438,14 @@ msgstr "先看角色和内容有没有稳定产出，再决定是否深入到具
 msgid "先确认模型、队列和数字人链路可用，再进入内容抽查或回复排障，避免把环境问题误判成业务问题。"
 msgstr "先确认模型、队列和数字人链路可用，再进入内容抽查或回复排障，避免把环境问题误判成业务问题。"
 
+#: apps/admin/src/components/game-release-workbench.tsx:249
+msgid "先选择一个游戏"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:212
+msgid "先选择一个游戏，再执行修订恢复。"
+msgstr ""
+
 #: apps/admin/src/components/admin-workbench.tsx:676
 msgid "入口"
 msgstr "入口"
@@ -391,6 +470,11 @@ msgstr "关注"
 msgid "关注项"
 msgstr "关注项"
 
+#. placeholder {0}: selectedGame.originSubmissionId
+#: apps/admin/src/components/game-release-workbench.tsx:331
+msgid "关联投稿 {0}"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:693
 msgid "内容产出"
 msgstr "コンテンツ出力"
@@ -411,9 +495,22 @@ msgstr "内置 sidecar 缺失"
 msgid "内置舞台"
 msgstr "内蔵ステージ"
 
+#: apps/admin/src/components/game-release-workbench.tsx:305
+#: apps/admin/src/components/game-release-workbench.tsx:823
+msgid "内部可见"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:802
+msgid "内部种子"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:539
 msgid "最新世界快照暂不可用。"
 msgstr "最新世界快照暂不可用。"
+
+#: apps/admin/src/components/game-release-workbench.tsx:281
+msgid "最新修订"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1272
 msgid "最新动态已纳入抽查范围"
@@ -483,6 +580,10 @@ msgstr "最近运行 {0}"
 msgid "最近错误"
 msgstr "最近错误"
 
+#: apps/admin/src/components/game-release-workbench.tsx:668
+msgid "分类"
+msgstr ""
+
 #: apps/admin/src/components/world-language-switcher.tsx:53
 msgid "切换聊天、朋友圈和世界内容生成语言"
 msgstr "チャット、モーメンツ、世界コンテンツ生成の言語を切り替えます"
@@ -512,6 +613,19 @@ msgstr "単一世界"
 #: apps/admin/src/components/admin-sidebar.tsx:124
 msgid "单世界实例必须且只能有一个世界主人。"
 msgstr "単一世界インスタンスには、世界の主人が必ず 1 人だけ必要です。"
+
+#: apps/admin/src/components/game-release-workbench.tsx:672
+msgid "卡片标签"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:304
+#: apps/admin/src/components/game-release-workbench.tsx:821
+msgid "即将上线"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:595
+msgid "历史回填"
+msgstr ""
 
 #: apps/admin/src/routes/inference-page.tsx:171
 #: apps/admin/src/routes/inference-page.tsx:181
@@ -544,9 +658,49 @@ msgstr "去运行设置"
 msgid "参数无效"
 msgstr "パラメータ無効"
 
+#. placeholder {0}: selectedGame.name
+#: apps/admin/src/components/game-release-workbench.tsx:259
+msgid "发布 {0}"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:327
+msgid "发布中..."
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:327
+msgid "发布为正式版本"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:292
+msgid "发布后可见性"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:285
+#: apps/admin/src/components/game-release-workbench.tsx:311
+msgid "发布摘要"
+msgstr ""
+
+#. placeholder {0}: revision.publishedVersion
+#: apps/admin/src/components/game-release-workbench.tsx:512
+msgid "发布版 v{0}"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:203
+msgid "发布版本失败，请稍后重试。"
+msgstr ""
+
+#. placeholder {0}: formatTime(selectedGame.lastPublishedAt)
+#: apps/admin/src/components/game-release-workbench.tsx:265
+msgid "发生在 {0}"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1048
 msgid "受管地址"
 msgstr "受管地址"
+
+#: apps/admin/src/components/game-release-workbench.tsx:417
+msgid "变化字段"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1076
 msgid "可在调试与运维区查看"
@@ -563,6 +717,11 @@ msgstr "可继续运营"
 #: apps/admin/src/lib/digital-human-admin-summary.ts:27
 msgid "可联调"
 msgstr "連携テスト可能"
+
+#: apps/admin/src/components/game-release-workbench.tsx:530
+#: apps/admin/src/components/game-release-workbench.tsx:720
+msgid "可见性"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1139
 msgid "可验证"
@@ -723,6 +882,18 @@ msgstr "失败"
 msgid "失败运行"
 msgstr "失败运行"
 
+#: apps/admin/src/components/game-release-workbench.tsx:684
+msgid "奖励标签"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:762
+msgid "好友状态"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:488
+msgid "如果只是想补一条回滚记录，也可以直接执行恢复。"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:810
 msgid "实例体征摘要"
 msgstr "实例体征摘要"
@@ -763,6 +934,14 @@ msgstr "インスタンス状態の確認が必要です"
 msgid "实时连接与契约"
 msgstr "实时连接与契约"
 
+#: apps/admin/src/components/game-release-workbench.tsx:526
+msgid "审核"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:714
+msgid "审核状态"
+msgstr ""
+
 #: apps/admin/src/components/admin-topbar.tsx:74
 msgid "宽松"
 msgstr "寛容"
@@ -774,6 +953,27 @@ msgstr "キー設定済み"
 #: apps/admin/src/components/admin-sidebar.tsx:291
 msgid "密钥未配置"
 msgstr "キー未設定"
+
+#: apps/admin/src/components/game-release-workbench.tsx:551
+msgid "对比中"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:413
+msgid "对比修订"
+msgstr ""
+
+#. placeholder {0}: comparedRevision.revisionSequence
+#: apps/admin/src/components/game-release-workbench.tsx:385
+msgid "对比修订 #{0}"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:551
+msgid "对比此修订"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:394
+msgid "对比目标"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1880
 msgid "导出诊断包"
@@ -796,14 +996,35 @@ msgstr "尚未执行"
 msgid "尚未配置"
 msgstr "尚未配置"
 
+#: apps/admin/src/components/game-release-workbench.tsx:834
+msgid "嵌入式 Web"
+msgstr ""
+
 #: apps/admin/src/routes/character-factory-page.tsx:47
 #: apps/admin/src/routes/character-runtime-page.tsx:28
 msgid "工作中"
 msgstr "作業中"
 
+#: apps/admin/src/components/game-release-workbench.tsx:830
+msgid "工作区占位"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:660
+msgid "工作室"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:238
+msgid "已发布次数"
+msgstr ""
+
 #: apps/admin/src/components/admin-workbench.tsx:597
+#: apps/admin/src/components/game-release-workbench.tsx:337
 msgid "已同步"
 msgstr "已同步"
+
+#: apps/admin/src/components/game-release-workbench.tsx:278
+msgid "已同步正式版本"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1510
 msgid "已启用"
@@ -818,6 +1039,14 @@ msgstr "已处理 {0} 条待执行广场互动。"
 #: apps/admin/src/routes/dashboard-page.tsx:1019
 msgid "已就绪"
 msgstr "準備完了"
+
+#: apps/admin/src/components/game-release-workbench.tsx:808
+msgid "已拒绝"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:810
+msgid "已暂停"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1735
 msgid "已生成预览"
@@ -843,6 +1072,10 @@ msgstr "已过期 {0} 条好友请求。"
 #: apps/admin/src/routes/dashboard-page.tsx:1644
 msgid "已连接客户端"
 msgstr "已连接客户端"
+
+#: apps/admin/src/components/game-release-workbench.tsx:806
+msgid "已通过"
+msgstr ""
 
 #: apps/admin/src/lib/digital-human-admin-summary.ts:88
 #: apps/admin/src/routes/dashboard-page.tsx:629
@@ -902,6 +1135,10 @@ msgstr "現在は内蔵デジタルヒューマンステージモードです。
 msgid "当前值班摘要"
 msgstr "当前值班摘要"
 
+#: apps/admin/src/components/game-release-workbench.tsx:273
+msgid "当前可见性"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1096
 msgid "当前处于远程连接模式，Core API 健康，可继续做后台操作。"
 msgstr "当前处于远程连接模式，Core API 健康，可继续做后台操作。"
@@ -913,6 +1150,12 @@ msgstr "当前存在待处理项。"
 #: apps/admin/src/routes/dashboard-page.tsx:422
 msgid "当前实例不满足单世界主人约束，需要先确认数据状态，再继续做运营操作。"
 msgstr "当前实例不满足单世界主人约束，需要先确认数据状态，再继续做运营操作。"
+
+#. placeholder {0}: formatReviewStatus(selectedGame.reviewStatus)
+#. placeholder {1}: selectedGame.lastPublishedAt ? t(msg`发生在 ${formatTime(selectedGame.lastPublishedAt)}`) : t(msg` 尚未发生`)
+#: apps/admin/src/components/game-release-workbench.tsx:263
+msgid "当前审核状态为 {0}，最近一次发布{1}。"
+msgstr ""
 
 #. placeholder {0}: proactiveHour[1]
 #. placeholder {1}: proactiveHour[2]
@@ -1006,6 +1249,10 @@ msgstr "当前没有高优先级阻塞，可以继续做内容抽查和运营操
 msgid "当前没有高优先级阻塞，建议下一步进入评测页验证最新生成链，或抽查角色与内容样本。"
 msgstr "当前没有高优先级阻塞，建议下一步进入评测页验证最新生成链，或抽查角色与内容样本。"
 
+#: apps/admin/src/components/game-release-workbench.tsx:236
+msgid "当前版本号"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:919
 msgid "当前生效"
 msgstr "現在有効"
@@ -1013,6 +1260,22 @@ msgstr "現在有効"
 #: apps/admin/src/routes/dashboard-page.tsx:1905
 msgid "当前系统运维操作已经接入类型化契约层，随时可以切换到真实运行时实现。"
 msgstr "当前系统运维操作已经接入类型化契约层，随时可以切换到真实运行时实现。"
+
+#: apps/admin/src/components/game-release-workbench.tsx:466
+msgid "当前草稿"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:487
+msgid "当前草稿与所选修订一致"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:388
+msgid "当前草稿和所选修订的差异会列在下面，确认后可以直接把目录草稿恢复到这个快照。"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:421
+msgid "当前草稿已一致"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1698
 msgid "当前还没有实时事件。"
@@ -1042,6 +1305,10 @@ msgstr "影響範囲"
 msgid "待初始化"
 msgstr "待初始化"
 
+#: apps/admin/src/components/game-release-workbench.tsx:337
+msgid "待发布草稿"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:665
 msgid "待处理"
 msgstr "待处理"
@@ -1053,6 +1320,10 @@ msgstr "待处理事项"
 #: apps/admin/src/routes/dashboard-page.tsx:742
 msgid "待处理队列"
 msgstr "待处理队列"
+
+#: apps/admin/src/components/game-release-workbench.tsx:804
+msgid "待审核"
+msgstr "レビュー待ち"
 
 #: apps/admin/src/routes/dashboard-page.tsx:623
 #: apps/admin/src/routes/dashboard-page.tsx:1020
@@ -1097,6 +1368,10 @@ msgstr "待迁移"
 msgid "待配置"
 msgstr "設定待ち"
 
+#: apps/admin/src/components/game-release-workbench.tsx:661
+msgid "徽标"
+msgstr ""
+
 #: apps/admin/src/routes/character-runtime-page.tsx:347
 msgid "忙碌延迟"
 msgstr "多忙時の遅延"
@@ -1120,6 +1395,31 @@ msgstr "总角色 {totalCharacters}"
 msgid "总运行 {0} 次，trace {1} 条"
 msgstr "总运行 {0} 次，trace {1} 条"
 
+#: apps/admin/src/components/game-release-workbench.tsx:448
+#: apps/admin/src/components/game-release-workbench.tsx:558
+msgid "恢复中..."
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:591
+msgid "恢复修订"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:228
+msgid "恢复修订失败，请稍后重试。"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:448
+msgid "恢复到所选修订"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:558
+msgid "恢复到此修订"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:450
+msgid "恢复后会生成一条新的草稿修订"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2052
 msgid "恢复实例、补齐 Provider、检查数字人参数。"
 msgstr "恢复实例、补齐 Provider、检查数字人参数。"
@@ -1127,6 +1427,10 @@ msgstr "恢复实例、补齐 Provider、检查数字人参数。"
 #: apps/admin/src/routes/dashboard-page.tsx:964
 msgid "恢复当前值"
 msgstr "現在値に戻す"
+
+#: apps/admin/src/components/game-release-workbench.tsx:432
+msgid "恢复摘要"
+msgstr ""
 
 #: apps/admin/src/routes/character-runtime-page.tsx:369
 #: apps/admin/src/routes/dashboard-page.tsx:1597
@@ -1140,6 +1444,10 @@ msgstr "自分自身による未完了事項の回収"
 #: apps/admin/src/lib/route-breadcrumb.ts:89
 msgid "我自己的 workspace 与 heartbeat"
 msgstr "自分自身の workspace と heartbeat"
+
+#: apps/admin/src/components/game-release-workbench.tsx:474
+msgid "所选修订"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:2063
 msgid "打开回复逻辑"
@@ -1250,6 +1558,10 @@ msgstr "把自动运行风险和前端实时链路放在同一个排障平面。
 msgid "把运行链路、模型接入和数字人可用性放在同一个工作区。"
 msgstr "把运行链路、模型接入和数字人可用性放在同一个工作区。"
 
+#: apps/admin/src/components/game-release-workbench.tsx:593
+msgid "投稿入库"
+msgstr "投稿取り込み"
+
 #: apps/admin/src/routes/dashboard-page.tsx:1261
 msgid "抽查入口"
 msgstr "抽查入口"
@@ -1289,6 +1601,11 @@ msgstr "基本情報、人格設定、行動制約をモジュールごとに整
 #: apps/admin/src/routes/dashboard-page.tsx:2234
 msgid "按频率生成视频号内容，并补足基础内容池。"
 msgstr "按频率生成视频号内容，并补足基础内容池。"
+
+#: apps/admin/src/components/game-release-workbench.tsx:538
+#: apps/admin/src/components/game-release-workbench.tsx:768
+msgid "排序权重"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:2035
 msgid "排查 job 失败、活跃房间和实时事件。"
@@ -1407,6 +1724,10 @@ msgstr "数据集"
 msgid "整理配方、比对发布差异，并把草稿发布到运行时。"
 msgstr "レシピを整理し、公開差分を比較して、下書きをランタイムへ公開します。"
 
+#: apps/admin/src/components/game-release-workbench.tsx:585
+msgid "新建草稿"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1407
 msgid "新核心接口进程启动后，广场兼容路由即可正常使用。"
 msgstr "新核心接口进程启动后，广场兼容路由即可正常使用。"
@@ -1425,6 +1746,10 @@ msgstr "新核心接口进程启动后，角色增删改查兼容路由即可正
 msgid "无"
 msgstr "无"
 
+#: apps/admin/src/components/game-release-workbench.tsx:520
+msgid "无摘要"
+msgstr ""
+
 #: apps/admin/src/lib/digital-human-admin-summary.ts:103
 msgid "无效"
 msgstr "無効"
@@ -1440,6 +1765,10 @@ msgstr "日志数量"
 #: apps/admin/src/routes/dashboard-page.tsx:1914
 msgid "日志索引"
 msgstr "日志索引"
+
+#: apps/admin/src/components/game-release-workbench.tsx:678
+msgid "时长"
+msgstr ""
 
 #: apps/admin/src/components/admin-topbar.tsx:134
 msgid "显示密度"
@@ -1459,6 +1788,10 @@ msgstr "智能回复"
 msgid "暂无"
 msgstr "なし"
 
+#: apps/admin/src/components/game-release-workbench.tsx:286
+msgid "暂无发布摘要"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1929
 msgid "暂无日志"
 msgstr "暂无日志"
@@ -1472,9 +1805,21 @@ msgstr "暂无正文"
 msgid "暂无连接"
 msgstr "暂无连接"
 
+#: apps/admin/src/components/game-release-workbench.tsx:587
+msgid "更新草稿"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:750
+msgid "更新说明"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1460
 msgid "有异常"
 msgstr "有异常"
+
+#: apps/admin/src/components/game-release-workbench.tsx:278
+msgid "有未发布修改"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1631
 msgid "有活跃连接"
@@ -1508,6 +1853,10 @@ msgstr "未保存"
 #: apps/admin/src/lib/format.ts:16
 msgid "未发生"
 msgstr "未発生"
+
+#: apps/admin/src/components/game-release-workbench.tsx:792
+msgid "未填写"
+msgstr ""
 
 #: apps/admin/src/routes/character-runtime-page.tsx:349
 msgid "未应用"
@@ -1559,9 +1908,25 @@ msgstr "未設定"
 msgid "未配置可用 TTS 探针，当前无法做真实的原生音频语义校验。"
 msgstr "利用可能なTTSプローブが設定されていないため、現在は実際のネイティブ音声セマンティック検証を行えません。"
 
+#: apps/admin/src/components/game-release-workbench.tsx:690
+msgid "本局目标"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:657
 msgid "本班结论"
 msgstr "当番結論"
+
+#: apps/admin/src/components/game-release-workbench.tsx:696
+msgid "来源"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:726
+msgid "来源角色 ID"
+msgstr ""
+
+#: apps/admin/src/components/game-release-workbench.tsx:732
+msgid "来源角色名"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:512
 msgid "杭州"
@@ -1646,6 +2011,10 @@ msgstr "查角色状态、打开工厂或运行逻辑台。"
 #: apps/admin/src/components/admin-topbar.tsx:73
 msgid "标准"
 msgstr "標準"
+
+#: apps/admin/src/components/game-release-workbench.tsx:744
+msgid "标签"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1035
 msgid "核心接口"
@@ -1792,6 +2161,10 @@ msgstr "正在加载已保存的推理服务配置..."
 msgid "正在加载本地运行时日志..."
 msgstr "正在加载本地运行时日志..."
 
+#: apps/admin/src/components/game-release-workbench.tsx:359
+msgid "正在加载版本历史..."
+msgstr ""
+
 #: apps/admin/src/components/root-layout.tsx:65
 msgid "正在同步远程 API、推理网关和世界表面状态。"
 msgstr "リモート API、推論ゲートウェイ、世界サーフェス状態を同期しています。"
@@ -1815,6 +2188,12 @@ msgstr "正在读取桌面运行时诊断..."
 #: apps/admin/src/routes/dashboard-page.tsx:637
 msgid "正常"
 msgstr "正常"
+
+#: apps/admin/src/components/game-release-workbench.tsx:302
+#: apps/admin/src/components/game-release-workbench.tsx:589
+#: apps/admin/src/components/game-release-workbench.tsx:819
+msgid "正式发布"
+msgstr ""
 
 #: apps/admin/src/components/admin-workbench.tsx:125
 msgid "段落导航"
@@ -1900,10 +2279,18 @@ msgstr "消息总数"
 msgid "清理当天过期的待处理好友请求。"
 msgstr "清理当天过期的待处理好友请求。"
 
+#: apps/admin/src/components/game-release-workbench.tsx:652
+msgid "游戏名"
+msgstr ""
+
 #: apps/admin/src/components/root-layout.tsx:202
 #: apps/admin/src/lib/route-breadcrumb.ts:58
 msgid "游戏目录"
 msgstr "ゲームカタログ"
+
+#: apps/admin/src/components/game-release-workbench.tsx:656
+msgid "游戏说明"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:860
 msgid "版本"
@@ -1912,6 +2299,10 @@ msgstr "版本"
 #: apps/admin/src/routes/dashboard-page.tsx:1190
 msgid "状态"
 msgstr "状態"
+
+#: apps/admin/src/components/game-release-workbench.tsx:756
+msgid "玩家状态"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:2530
 msgid "环境变量覆盖"
@@ -1926,6 +2317,10 @@ msgstr "现在还有 {0} 个候选没处理，这轮先不继续生新角色。"
 #: apps/admin/src/lib/route-breadcrumb.ts:187
 msgid "现实联动"
 msgstr "現実連動"
+
+#: apps/admin/src/components/game-release-workbench.tsx:702
+msgid "生产方式"
+msgstr ""
 
 #: apps/admin/src/components/admin-workbench.tsx:925
 msgid "生效中"
@@ -1947,6 +2342,10 @@ msgstr "由桌面壳托管{0}"
 #: apps/admin/src/routes/dashboard-page.tsx:2179
 msgid "界闻简报调度"
 msgstr "界闻简报调度"
+
+#: apps/admin/src/components/game-release-workbench.tsx:242
+msgid "目录草稿已经具备版本发布流"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:907
 msgid "目标世界语言"
@@ -2007,6 +2406,10 @@ msgstr "今すぐ設定"
 #: apps/admin/src/routes/dashboard-page.tsx:2501
 msgid "端口已占用"
 msgstr "端口已占用"
+
+#: apps/admin/src/components/game-release-workbench.tsx:372
+msgid "第一次保存或发布后，这里会开始沉淀版本轨迹。"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:393
 msgid "等待健康探测"
@@ -2094,6 +2497,10 @@ msgstr "网关：{0}"
 msgid "耗时"
 msgstr "耗时"
 
+#: apps/admin/src/components/game-release-workbench.tsx:832
+msgid "聊天式 AI 游戏"
+msgstr ""
+
 #: apps/admin/src/components/root-layout.tsx:207
 #: apps/admin/src/lib/route-breadcrumb.ts:137
 msgid "聊天记录"
@@ -2106,6 +2513,10 @@ msgstr "自動スケジュール"
 #: apps/admin/src/components/admin-workbench.tsx:596
 msgid "草稿未保存"
 msgstr "草稿未保存"
+
+#: apps/admin/src/components/game-release-workbench.tsx:277
+msgid "草稿状态"
+msgstr ""
 
 #: apps/admin/src/lib/route-breadcrumb.ts:168
 msgid "行动助理动作运行时"
@@ -2190,6 +2601,10 @@ msgstr "キャラクター実行ロジック台"
 #: apps/admin/src/routes/dashboard-page.tsx:1670
 msgid "订阅数"
 msgstr "订阅数"
+
+#: apps/admin/src/components/game-release-workbench.tsx:352
+msgid "记录每次创建、编辑、投稿入库、恢复和正式发布的快照。"
+msgstr ""
 
 #: apps/admin/src/components/root-layout.tsx:185
 #: apps/admin/src/lib/route-breadcrumb.ts:197
@@ -2331,6 +2746,11 @@ msgstr "実行概要"
 msgid "运行数据"
 msgstr "运行数据"
 
+#: apps/admin/src/components/game-release-workbench.tsx:534
+#: apps/admin/src/components/game-release-workbench.tsx:708
+msgid "运行方式"
+msgstr ""
+
 #: apps/admin/src/components/root-layout.tsx:253
 msgid "运行时"
 msgstr "ランタイム"
@@ -2375,6 +2795,10 @@ msgstr "近期摘要日更：检查 {0} 个角色，更新 {1} 个，跳过 {2} 
 msgid "近期无互动记录，跳过记忆更新。"
 msgstr "近期无互动记录，跳过记忆更新。"
 
+#: apps/admin/src/components/game-release-workbench.tsx:371
+msgid "还没有修订历史"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1254
 msgid "这一块服务抽查而不是全面管理，所以只保留关键摘要和最新样本，减少视觉噪音。"
 msgstr "这一块服务抽查而不是全面管理，所以只保留关键摘要和最新样本，减少视觉噪音。"
@@ -2394,6 +2818,10 @@ msgstr "ここで切り替えるのは世界の実行言語であり、管理画
 #: apps/admin/src/routes/dashboard-page.tsx:1742
 msgid "这里只是直连当前 provider 的原始调试入口，不走角色运行时，也不是角色 system prompt 的编辑入口。"
 msgstr "这里只是直连当前 provider 的原始调试入口，不走角色运行时，也不是角色 system prompt 的编辑入口。"
+
+#: apps/admin/src/components/game-release-workbench.tsx:243
+msgid "这里管理每个游戏的版本历史、发布摘要和最近一次正式发布状态。更新目录资料后会形成新的草稿修订，点击发布才会形成正式版本。"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:2053
 #: apps/admin/src/routes/dashboard-page.tsx:2059
@@ -2422,6 +2850,10 @@ msgstr "进入调度区查看最近失败详情。"
 msgid "远程 API 离线"
 msgstr "リモート API オフライン"
 
+#: apps/admin/src/components/game-release-workbench.tsx:836
+msgid "远程会话"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1062
 msgid "远程实例"
 msgstr "远程实例"
@@ -2437,6 +2869,10 @@ msgstr "リモート接続"
 #: apps/admin/src/routes/dashboard-page.tsx:2175
 msgid "追问推荐调度"
 msgstr "追问推荐调度"
+
+#: apps/admin/src/components/game-release-workbench.tsx:250
+msgid "选中目录中的具体游戏后，这里会显示版本历史、修订轨迹和发布操作。"
+msgstr ""
 
 #: apps/admin/src/routes/character-factory-page.tsx:50
 #: apps/admin/src/routes/character-runtime-page.tsx:31
