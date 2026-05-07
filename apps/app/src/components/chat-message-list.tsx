@@ -3078,24 +3078,17 @@ export function ChatMessageList({
                       {formatReminderSummary(reminderRecord.remindAt)}
                     </div>
                   ) : null}
-                  {isUser && !selectionMode && message.localStatus ? (
+                  {isUser && !selectionMode && message.localStatus === "failed" ? (
                     <div
                       className={cn(
-                        "flex items-center gap-1.5 px-1",
+                        "flex items-center gap-1.5 px-1 text-[#d74b45]",
                         isDesktop
                           ? "mt-1 text-[11px]"
                           : "mt-px px-0.5 text-[10px]",
-                        message.localStatus === "failed"
-                          ? "text-[#d74b45]"
-                          : "text-[#8c8c8c]",
                       )}
                     >
-                      <span>
-                        {message.localStatus === "failed"
-                          ? "发送失败"
-                          : "发送中..."}
-                      </span>
-                      {message.localStatus === "failed" && onRetryMessage ? (
+                      <span>发送失败</span>
+                      {onRetryMessage ? (
                         <button
                           type="button"
                           onClick={(event) => {

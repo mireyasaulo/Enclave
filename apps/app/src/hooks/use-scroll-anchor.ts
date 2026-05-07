@@ -7,6 +7,7 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
   const previousItemCountRef = useRef(itemCount);
   const initializedRef = useRef(false);
   const suppressNextPendingCountRef = useRef(false);
+  const isAtBottomRef = useRef(true);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
 
@@ -17,6 +18,7 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
     }
 
     const nextIsAtBottom = isScrolledNearBottom(element);
+    isAtBottomRef.current = nextIsAtBottom;
     setIsAtBottom(nextIsAtBottom);
     if (nextIsAtBottom) {
       setPendingCount(0);
@@ -39,6 +41,7 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
         });
       }
 
+      isAtBottomRef.current = true;
       setIsAtBottom(true);
       setPendingCount(0);
     },
@@ -88,7 +91,7 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
 
     const addedCount = itemCount - previousItemCount;
     const element = ref.current;
-    if (!element || isScrolledNearBottom(element)) {
+    if (!element || isAtBottomRef.current) {
       window.requestAnimationFrame(() => {
         scrollToBottom("auto");
       });

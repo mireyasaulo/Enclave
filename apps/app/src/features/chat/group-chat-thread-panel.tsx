@@ -1487,10 +1487,12 @@ export function GroupChatThreadPanel({
             />
           </div>
         )}
-        {!isDesktop &&
-        !selectionModeActive &&
-        (!isAtBottom || pendingCount > 0) ? (
-          <div className="pointer-events-none absolute right-2.5 bottom-3 z-10">
+        {!selectionModeActive && (!isAtBottom || pendingCount > 0) ? (
+          <div
+            className={`pointer-events-none absolute z-10 ${
+              isDesktop ? "right-5 bottom-5" : "right-2.5 bottom-3"
+            }`}
+          >
             <div className="pointer-events-auto">
               <MobileChatScrollBottomButton
                 pendingCount={pendingCount}
