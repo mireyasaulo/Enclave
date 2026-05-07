@@ -1,8 +1,10 @@
 import { Suspense, lazy, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { ArrowLeft, MessageSquarePlus, Search } from "lucide-react";
 import { getGroups, type Group } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, cn } from "@yinjie/ui";
 import { GroupAvatarChip } from "../components/group-avatar-chip";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -25,6 +27,7 @@ const DesktopContactsRouteRedirectShell = lazy(async () => {
 });
 
 export function GroupContactsPage() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
   const hash = useRouterState({ select: (state) => state.location.hash });
   const desktopPaneState = useMemo(() => {
@@ -37,9 +40,9 @@ export function GroupContactsPage() {
       <Suspense
         fallback={
           <RouteRedirectState
-            title="正在切换到桌面群聊"
-            description="正在跳转到桌面通讯录工作区中的群聊视图。"
-            loadingLabel="切换桌面群聊视图..."
+            title={t(msg`正在切换到桌面群聊`)}
+            description={t(msg`正在跳转到桌面通讯录工作区中的群聊视图。`)}
+            loadingLabel={t(msg`切换桌面群聊视图...`)}
           />
         }
       >
@@ -55,6 +58,7 @@ export function GroupContactsPage() {
 }
 
 function MobileGroupContactsPage() {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
@@ -120,7 +124,7 @@ function MobileGroupContactsPage() {
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
       <TabPageTopBar
-        title="群聊"
+        title={t(msg`群聊`)}
         titleAlign="center"
         className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
         leftActions={
@@ -138,7 +142,7 @@ function MobileGroupContactsPage() {
                 void navigate({ to: "/tabs/contacts" });
               })
             }
-            aria-label="返回通讯录"
+            aria-label={t(msg`返回通讯录`)}
           >
             <ArrowLeft size={18} />
           </Button>
@@ -159,7 +163,7 @@ function MobileGroupContactsPage() {
                 }),
               });
             }}
-            aria-label="发起群聊"
+            aria-label={t(msg`发起群聊`)}
           >
             <MessageSquarePlus size={17} />
           </Button>
@@ -172,7 +176,7 @@ function MobileGroupContactsPage() {
               type="search"
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
-              placeholder="搜索群聊"
+              placeholder={t(msg`搜索群聊`)}
               className="min-w-0 flex-1 bg-transparent text-[12px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
             />
           </label>
@@ -183,9 +187,9 @@ function MobileGroupContactsPage() {
         {groupsQuery.isLoading ? (
           <div className="px-4 pt-2.5">
             <MobileGroupContactsStatusCard
-              badge="读取中"
-              title="正在读取群聊"
-              description="稍等一下，正在同步当前世界里的群聊列表。"
+              badge={t(msg`读取中`)}
+              title={t(msg`正在读取群聊`)}
+              description={t(msg`稍等一下，正在同步当前世界里的群聊列表。`)}
               tone="loading"
             />
           </div>
@@ -193,8 +197,8 @@ function MobileGroupContactsPage() {
         {groupsQuery.isError && groupsQuery.error instanceof Error ? (
           <div className="px-4 pt-2.5">
             <MobileGroupContactsStatusCard
-              badge="读取失败"
-              title="群聊列表暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`群聊列表暂时不可用`)}
               description={groupsQuery.error.message}
               tone="danger"
               action={
@@ -205,7 +209,7 @@ function MobileGroupContactsPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleRetryGroups}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     variant="secondary"
@@ -213,7 +217,7 @@ function MobileGroupContactsPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? "返回上一页" : "返回通讯录"}
+                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`返回通讯录`)}
                   </Button>
                 </div>
               }
@@ -226,12 +230,12 @@ function MobileGroupContactsPage() {
         !filteredGroups.length ? (
           <div className="px-4 pt-4">
             <MobileGroupContactsStatusCard
-              badge={hasSearchText ? "暂无结果" : "群聊"}
-              title={hasSearchText ? "没有找到匹配的群聊" : "还没有群聊"}
+              badge={hasSearchText ? t(msg`暂无结果`) : t(msg`群聊`)}
+              title={hasSearchText ? t(msg`没有找到匹配的群聊`) : t(msg`还没有群聊`)}
               description={
                 hasSearchText
-                  ? "换个群名称或公告关键词试试。"
-                  : "先发起一个新的群聊，建好后就会出现在这里。"
+                  ? t(msg`换个群名称或公告关键词试试。`)
+                  : t(msg`先发起一个新的群聊，建好后就会出现在这里。`)
               }
               action={
                 <Button
@@ -249,7 +253,7 @@ function MobileGroupContactsPage() {
                     });
                   }}
                 >
-                  发起群聊
+                  {t(msg`发起群聊`)}
                 </Button>
               }
             />

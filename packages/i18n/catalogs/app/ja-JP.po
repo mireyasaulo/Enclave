@@ -2189,6 +2189,10 @@ msgstr "先に連絡先で関係を作ってから、戻ってグループに追
 msgid "先去通讯录里建立一些关系，再回来创建群聊。"
 msgstr "先に連絡先で関係を作ってから、グループチャットを作成してください。"
 
+#: apps/app/src/routes/group-contacts-page.tsx:238
+msgid "先发起一个新的群聊，建好后就会出现在这里。"
+msgstr "まず新しいグループチャットを作成すると、ここに表示されます。"
+
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:79
 msgid "先回到群聊继续，先拍一张图或发送图片消息，会更接近当前能替代视频通话的体验。"
 msgstr "いったんグループチャットに戻り、写真を撮るか画像メッセージを送るほうが、今の代替手段としてはビデオ通話に近い体験です。"
@@ -3349,6 +3353,10 @@ msgstr ""
 msgid "切换桌面视频号..."
 msgstr ""
 
+#: apps/app/src/routes/group-contacts-page.tsx:45
+msgid "切换桌面群聊视图..."
+msgstr "デスクトップ版のグループ表示へ切り替え中..."
+
 #: apps/app/src/routes/profile-settings-page.tsx:669
 msgid "切换界面语言，好友回复也会跟随此设置使用对应语言。"
 msgstr ""
@@ -3957,6 +3965,8 @@ msgstr "開始元"
 #: apps/app/src/routes/chat-details-page.tsx:671
 #: apps/app/src/routes/chat-list-page.tsx:106
 #: apps/app/src/routes/contacts-page.tsx:257
+#: apps/app/src/routes/group-contacts-page.tsx:166
+#: apps/app/src/routes/group-contacts-page.tsx:256
 msgid "发起群聊"
 msgstr "グループチャットを始める"
 
@@ -8118,6 +8128,10 @@ msgstr ""
 msgid "换个消息类型试试，或者切回全部类型继续浏览。"
 msgstr "別のメッセージ種別を試すか、すべての種類に戻して閲覧を続けてください。"
 
+#: apps/app/src/routes/group-contacts-page.tsx:237
+msgid "换个群名称或公告关键词试试。"
+msgstr "別のグループ名やお知らせのキーワードで試してみてください。"
+
 #: apps/app/src/routes/discover-page.tsx:540
 msgid "探索区"
 msgstr "探索エリア"
@@ -8383,6 +8397,7 @@ msgid "搜索群成员"
 msgstr "グループメンバーを検索"
 
 #: apps/app/src/i18n/static-dom-seed.ts:408
+#: apps/app/src/routes/group-contacts-page.tsx:179
 msgid "搜索群聊"
 msgstr "グループチャットを検索"
 
@@ -9110,6 +9125,7 @@ msgid "暂无签名"
 msgstr "署名はまだありません"
 
 #: apps/app/src/routes/create-group-page.tsx:517
+#: apps/app/src/routes/group-contacts-page.tsx:233
 #: apps/app/src/routes/starred-friends-page.tsx:286
 #: apps/app/src/routes/tags-page.tsx:271
 #: apps/app/src/routes/world-characters-page.tsx:324
@@ -10362,6 +10378,10 @@ msgstr ""
 msgid "正在切换到桌面视频号"
 msgstr ""
 
+#: apps/app/src/routes/group-contacts-page.tsx:43
+msgid "正在切换到桌面群聊"
+msgstr "デスクトップ版のグループへ切り替え中"
+
 #: apps/app/src/routes/group-member-picker-page.tsx:76
 msgid "正在切换到桌面聊天工作区中的添加成员弹层。"
 msgstr ""
@@ -10876,6 +10896,10 @@ msgstr ""
 msgid "正在读取群消息..."
 msgstr ""
 
+#: apps/app/src/routes/group-contacts-page.tsx:191
+msgid "正在读取群聊"
+msgstr "グループチャットを読み込み中"
+
 #: apps/app/src/routes/group-chat-details-page.tsx:579
 #: apps/app/src/routes/group-chat-edit-page.tsx:249
 msgid "正在读取群聊信息"
@@ -10952,6 +10976,10 @@ msgstr ""
 #: apps/app/src/routes/friend-requests-page.tsx:43
 msgid "正在跳转到桌面通讯录工作区中的好友请求视图。"
 msgstr ""
+
+#: apps/app/src/routes/group-contacts-page.tsx:44
+msgid "正在跳转到桌面通讯录工作区中的群聊视图。"
+msgstr "デスクトップ連絡先の作業エリア内のグループ表示へ遷移しています。"
 
 #: apps/app/src/components/chat-composer.tsx:2721
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:46
@@ -11131,6 +11159,10 @@ msgstr ""
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:560
 msgid "没有找到匹配的群成员"
 msgstr ""
+
+#: apps/app/src/routes/group-contacts-page.tsx:234
+msgid "没有找到匹配的群聊"
+msgstr "一致するグループチャットは見つかりません"
 
 #: apps/app/src/routes/contacts-page.tsx:1408
 #: apps/app/src/routes/contacts-page.tsx:1953
@@ -12337,6 +12369,10 @@ msgstr "住民の公開投稿とリアクション状態を同期しています
 msgid "稍等一下，正在同步当前世界主人的专属配置。"
 msgstr "現在の世界主人の専用設定を同期しています。しばらくお待ちください。"
 
+#: apps/app/src/routes/group-contacts-page.tsx:192
+msgid "稍等一下，正在同步当前世界里的群聊列表。"
+msgstr "少々お待ちを、現在の世界のグループ一覧を同期しています。"
+
 #: apps/app/src/routes/group-member-picker-page.tsx:467
 msgid "稍等一下，正在同步当前可移除的群成员。"
 msgstr ""
@@ -13110,6 +13146,8 @@ msgstr "グループ管理"
 #: apps/app/src/routes/group-chat-details-page.tsx:588
 #: apps/app/src/routes/group-chat-details-page.tsx:636
 #: apps/app/src/routes/group-chat-edit-page.tsx:351
+#: apps/app/src/routes/group-contacts-page.tsx:127
+#: apps/app/src/routes/group-contacts-page.tsx:233
 #: apps/app/src/routes/group-message-search-page.tsx:96
 #: apps/app/src/routes/group-qr-page.tsx:189
 #: apps/app/src/routes/group-qr-page.tsx:1100
@@ -13146,6 +13184,10 @@ msgstr "グループチャット情報は一時的に利用できません"
 #: apps/app/src/routes/contacts-page.tsx:1295
 msgid "群聊入口暂时没有刷新成功。"
 msgstr "グループチャット入口を更新できませんでした。"
+
+#: apps/app/src/routes/group-contacts-page.tsx:201
+msgid "群聊列表暂时不可用"
+msgstr "グループ一覧は一時的に利用できません"
 
 #: apps/app/src/i18n/static-dom-seed.ts:200
 msgid "群聊协作"
@@ -14163,6 +14205,7 @@ msgstr "認証コードを入力（デフォルトの 123456 で通過可能）"
 #: apps/app/src/routes/group-chat-background-page.tsx:333
 #: apps/app/src/routes/group-chat-details-page.tsx:578
 #: apps/app/src/routes/group-chat-edit-page.tsx:248
+#: apps/app/src/routes/group-contacts-page.tsx:190
 #: apps/app/src/routes/group-member-picker-page.tsx:462
 #: apps/app/src/routes/group-qr-page.tsx:1088
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:455
@@ -14196,6 +14239,7 @@ msgstr "画像の読み込みに失敗しました。別の画像で再試行し
 #: apps/app/src/routes/group-chat-background-page.tsx:377
 #: apps/app/src/routes/group-chat-edit-page.tsx:258
 #: apps/app/src/routes/group-chat-edit-page.tsx:290
+#: apps/app/src/routes/group-contacts-page.tsx:200
 #: apps/app/src/routes/group-member-picker-page.tsx:476
 #: apps/app/src/routes/group-member-picker-page.tsx:508
 #: apps/app/src/routes/group-member-picker-page.tsx:540
@@ -14562,6 +14606,7 @@ msgstr "前のステップに戻る"
 #: apps/app/src/routes/group-chat-details-page.tsx:134
 #: apps/app/src/routes/group-chat-details-page.tsx:167
 #: apps/app/src/routes/group-chat-edit-page.tsx:370
+#: apps/app/src/routes/group-contacts-page.tsx:220
 #: apps/app/src/routes/group-qr-page.tsx:725
 #: apps/app/src/routes/group-qr-page.tsx:1122
 #: apps/app/src/routes/group-qr-page.tsx:1156
@@ -14744,6 +14789,8 @@ msgid "返回资料页"
 msgstr "プロフィールページへ戻る"
 
 #: apps/app/src/routes/character-detail-page.tsx:274
+#: apps/app/src/routes/group-contacts-page.tsx:145
+#: apps/app/src/routes/group-contacts-page.tsx:220
 #: apps/app/src/routes/starred-friends-page.tsx:207
 #: apps/app/src/routes/tags-page.tsx:192
 #: apps/app/src/routes/world-characters-page.tsx:209
@@ -14927,6 +14974,10 @@ msgstr ""
 #: apps/app/src/features/shell/desktop-shell.tsx:1139
 msgid "还没有签名，去个人资料写一句吧"
 msgstr ""
+
+#: apps/app/src/routes/group-contacts-page.tsx:234
+msgid "还没有群聊"
+msgstr "まだグループチャットはありません"
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:1921
 msgid "还没有群聊邀请接力"
@@ -15883,6 +15934,7 @@ msgstr ""
 #: apps/app/src/routes/group-chat-edit-page.tsx:271
 #: apps/app/src/routes/group-chat-edit-page.tsx:303
 #: apps/app/src/routes/group-chat-edit-page.tsx:362
+#: apps/app/src/routes/group-contacts-page.tsx:212
 #: apps/app/src/routes/group-member-picker-page.tsx:489
 #: apps/app/src/routes/group-member-picker-page.tsx:521
 #: apps/app/src/routes/group-member-picker-page.tsx:553
