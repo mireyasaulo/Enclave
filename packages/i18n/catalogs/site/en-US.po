@@ -18,9 +18,44 @@ msgid "404"
 msgstr "404"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:9
-msgid "一个属于你的 AI 虚拟世界。私人居民、动态、群聊、电话——浏览器即开即用。"
-msgstr "A private AI world of your own. Private residents, moments, group chats and calls — open in your browser."
+#: apps/site/src/components/one-person-world.tsx:37
+msgid "理念"
+msgstr "Philosophy"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/one-person-world.tsx:38
+msgid "属于你的，就只属于你"
+msgstr "What's yours is only yours"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/one-person-world.tsx:39
+msgid "隐界为每个人单独搭建一个私人 AI 世界。你的居民、你的关系、你的故事——别人看不到，平台也不会拿去训练。"
+msgstr "Enclave gives each person a separate private AI world. Your residents, your relationships, your stories — no one else sees them, and we don't train any external model on them."
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/capability-grid.tsx:11
+#: apps/site/src/components/site-header.tsx:16
+msgid "核心能力"
+msgstr "Capabilities"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/cross-platform-section.tsx:26
+#: apps/site/src/components/site-header.tsx:17
+msgid "跨端"
+msgstr "Cross-platform"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/faq-accordion.tsx:37
+#: apps/site/src/components/site-header.tsx:18
+msgid "FAQ"
+msgstr "FAQ"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/download/page.tsx:23
+#: apps/site/src/components/site-footer.tsx:12
+#: apps/site/src/components/site-header.tsx:19
+msgid "下载"
+msgstr "Download"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/opengraph-image.tsx:35
@@ -34,11 +69,19 @@ msgid "免费开始"
 msgstr "Start free"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/download/page.tsx:23
-#: apps/site/src/components/site-footer.tsx:12
-#: apps/site/src/components/site-header.tsx:19
-msgid "下载"
-msgstr "Download"
+#: apps/site/src/components/site-header.tsx:21
+msgid "打开菜单"
+msgstr "Open menu"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:22
+msgid "关闭菜单"
+msgstr "Close menu"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:9
+msgid "一个属于你的 AI 虚拟世界。私人居民、动态、群聊、电话——浏览器即开即用。"
+msgstr "A private AI world of your own. Private residents, moments, group chats and calls — open in your browser."
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/changelog/page.tsx:26
@@ -65,87 +108,6 @@ msgstr "Terms"
 #: apps/site/src/components/site-footer.tsx:17
 msgid "联系我们"
 msgstr "Contact"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/one-person-world.tsx:37
-msgid "理念"
-msgstr "Philosophy"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/one-person-world.tsx:38
-msgid "属于你的，就只属于你"
-msgstr "What's yours is only yours"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/one-person-world.tsx:39
-msgid "隐界为每个人单独搭建一个私人 AI 世界。你的居民、你的关系、你的故事——别人看不到，平台也不会拿去训练。"
-msgstr "Enclave gives each person a separate private AI world. Your residents, your relationships, your stories — no one else sees them, and we don't train any external model on them."
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:47
-msgid "产品截图"
-msgstr "Screenshots"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:48
-msgid "从入坑到日常使用"
-msgstr "From onboarding to daily use"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:49
-msgid "六个核心场景一起看，画面均来自当前线上版本。"
-msgstr "Six core scenes together — every screen straight from the live build."
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:11
-msgid "立即开始"
-msgstr "Start now"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:12
-msgid "几秒钟，开启你的隐界世界"
-msgstr "Open your Enclave world in seconds"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:13
-msgid "打开浏览器即可使用，不需要安装；如果你愿意，也可以下载桌面端，或者自己部署一份。"
-msgstr "Open it right in your browser — no install. Prefer native? Grab the desktop build. Want full control? Self-host with one command."
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:219
-#: apps/site/src/components/get-started-cta.tsx:15
-msgid "查看下载方式"
-msgstr "See download options"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:16
-msgid "数据自主"
-msgstr "Data sovereignty"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:17
-msgid "一人一实例，对话只属于你"
-msgstr "One instance per person — your conversations stay yours"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:18
-msgid "跨端同步"
-msgstr "Cross-device sync"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:19
-msgid "浏览器 / 桌面 / 手机一致体验"
-msgstr "Same experience across browser, desktop, and mobile"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:20
-msgid "开源可审计"
-msgstr "Open source, auditable"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:21
-msgid "MIT 协议，代码全部公开"
-msgstr "MIT-licensed, all code public"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/hero-section.tsx:10
@@ -204,15 +166,75 @@ msgid "注册即用，无需安装"
 msgstr "Sign up and use — no install required"
 
 #. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:11
+msgid "立即开始"
+msgstr "Start now"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:12
+msgid "几秒钟，开启你的隐界世界"
+msgstr "Open your Enclave world in seconds"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:13
+msgid "打开浏览器即可使用，不需要安装；如果你愿意，也可以下载桌面端，或者自己部署一份。"
+msgstr "Open it right in your browser — no install. Prefer native? Grab the desktop build. Want full control? Self-host with one command."
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:219
+#: apps/site/src/components/get-started-cta.tsx:15
+msgid "查看下载方式"
+msgstr "See download options"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:16
+msgid "数据自主"
+msgstr "Data sovereignty"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:17
+msgid "一人一实例，对话只属于你"
+msgstr "One instance per person — your conversations stay yours"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:18
+msgid "跨端同步"
+msgstr "Cross-device sync"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:19
+msgid "浏览器 / 桌面 / 手机一致体验"
+msgstr "Same experience across browser, desktop, and mobile"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:20
+msgid "开源可审计"
+msgstr "Open source, auditable"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:21
+msgid "MIT 协议，代码全部公开"
+msgstr "MIT-licensed, all code public"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/multi-platform-carousel.tsx:47
+msgid "产品截图"
+msgstr "Screenshots"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/multi-platform-carousel.tsx:48
+msgid "从入坑到日常使用"
+msgstr "From onboarding to daily use"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/multi-platform-carousel.tsx:49
+msgid "六个核心场景一起看，画面均来自当前线上版本。"
+msgstr "Six core scenes together — every screen straight from the live build."
+
+#. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:171
 #: apps/site/src/components/faq-accordion.tsx:36
 msgid "常见问题"
-msgstr "FAQ"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/faq-accordion.tsx:37
-#: apps/site/src/components/site-header.tsx:18
-msgid "FAQ"
 msgstr "FAQ"
 
 #. js-lingui-explicit-id
@@ -231,12 +253,6 @@ msgid "敬请期待"
 msgstr "Coming soon"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/capability-grid.tsx:11
-#: apps/site/src/components/site-header.tsx:16
-msgid "核心能力"
-msgstr "Capabilities"
-
-#. js-lingui-explicit-id
 #: apps/site/src/components/capability-grid.tsx:12
 msgid "不是 chatbot，而是一整个生态"
 msgstr "Not a chatbot — a whole ecosystem"
@@ -253,10 +269,10 @@ msgid "查看用例"
 msgstr "Read the use case"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:26
-#: apps/site/src/components/site-header.tsx:17
-msgid "跨端"
-msgstr "Cross-platform"
+#: apps/site/src/components/breadcrumb-nav.tsx:20
+#: apps/site/src/components/seo/breadcrumbs-json-ld.tsx:19
+msgid "首页"
+msgstr "Home"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/cross-platform-section.tsx:27
@@ -287,6 +303,46 @@ msgstr "Desktop"
 #: apps/site/src/components/cross-platform-section.tsx:34
 msgid "Windows / macOS / Linux"
 msgstr "Windows / macOS / Linux"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/opengraph-image.tsx:78
+#: apps/site/src/components/seo/home-json-ld.tsx:15
+#: apps/site/src/components/seo/site-json-ld.tsx:9
+msgid "隐界 Enclave"
+msgstr "Enclave"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/layout.tsx:29
+#: apps/site/src/app/[locale]/page.tsx:28
+#: apps/site/src/components/seo/home-json-ld.tsx:16
+#: apps/site/src/components/seo/site-json-ld.tsx:10
+msgid "私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用，免费开始你的隐界世界。"
+msgstr "Private AI residents, moments, group chats and calls — open it in your browser and start your Enclave world for free."
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx:25
+msgid "AI 虚拟世界"
+msgstr "AI virtual world"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx:26
+msgid "AI 角色社交"
+msgstr "AI character social"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx:27
+msgid "AI 朋友圈"
+msgstr "AI social feed"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx:28
+msgid "自部署 AI 应用"
+msgstr "Self-hosted AI app"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/home-json-ld.tsx:36
+msgid "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
+msgstr "Modern browser (Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+)"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/seo/howto-json-ld.tsx:13
@@ -329,52 +385,6 @@ msgid "克隆仓库按部署文档跑一份属于自己的实例，数据 100% �
 msgstr "Clone the repo and follow the deploy guide to run your own instance — your data stays 100% on your machine. MIT licensed."
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/opengraph-image.tsx:78
-#: apps/site/src/components/seo/home-json-ld.tsx:15
-#: apps/site/src/components/seo/site-json-ld.tsx:9
-msgid "隐界 Enclave"
-msgstr "Enclave"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/layout.tsx:29
-#: apps/site/src/app/[locale]/page.tsx:28
-#: apps/site/src/components/seo/home-json-ld.tsx:16
-#: apps/site/src/components/seo/site-json-ld.tsx:10
-msgid "私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用，免费开始你的隐界世界。"
-msgstr "Private AI residents, moments, group chats and calls — open it in your browser and start your Enclave world for free."
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/site-json-ld.tsx:25
-msgid "AI 虚拟世界"
-msgstr "AI virtual world"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/site-json-ld.tsx:26
-msgid "AI 角色社交"
-msgstr "AI character social"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/site-json-ld.tsx:27
-msgid "AI 朋友圈"
-msgstr "AI social feed"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/site-json-ld.tsx:28
-msgid "自部署 AI 应用"
-msgstr "Self-hosted AI app"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/breadcrumb-nav.tsx:20
-#: apps/site/src/components/seo/breadcrumbs-json-ld.tsx:19
-msgid "首页"
-msgstr "Home"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/home-json-ld.tsx:36
-msgid "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
-msgstr "Modern browser (Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+)"
-
-#. js-lingui-explicit-id
 #: apps/site/src/app/not-found.tsx:20
 msgid "该页面不存在"
 msgstr "Page not found"
@@ -383,16 +393,6 @@ msgstr "Page not found"
 #: apps/site/src/app/not-found.tsx:21
 msgid "回到首页"
 msgstr "Back to home"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:21
-msgid "打开菜单"
-msgstr "Open menu"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:22
-msgid "关闭菜单"
-msgstr "Close menu"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/layout.tsx:34
@@ -440,26 +440,6 @@ msgstr "What people use Enclave for"
 #: apps/site/src/app/[locale]/use-cases/page.tsx:90
 msgid "下面这些用例不是虚构的 demo，而是社区里真实在跑的玩法。挑一个最像你的场景看看。"
 msgstr "These aren't synthetic demos — they're how the community actually runs Enclave today. Pick the one closest to your scenario."
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:150
-msgid "它具体怎么做到"
-msgstr "How it works in practice"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:198
-msgid "准备好试一下？"
-msgstr "Ready to try it?"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:201
-msgid "浏览器即开即用，不需要注册任何信用卡。"
-msgstr "Open it in your browser — no credit card, no install."
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:226
-msgid "看看其它用例"
-msgstr "See other use cases"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/terms/page.tsx:26
@@ -528,6 +508,26 @@ msgid "如对条款有任何疑问，请发邮件至 yuanzui0728@gmail.com。"
 msgstr "For terms questions, email yuanzui0728@gmail.com."
 
 #. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/download/page.tsx:24
+msgid "挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。"
+msgstr "Pick the way that fits you best: open the web app instantly, install the desktop build for a deeper experience, or self-host for full control."
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/download/page.tsx:66
+msgid "开始使用"
+msgstr "Get started"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/download/page.tsx:69
+msgid "挑一种最顺手的方式开始用隐界"
+msgstr "Pick the way that fits you best"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/download/page.tsx:72
+msgid "浏览器即开即用，桌面端体验更佳；移动端与小程序在路上。所有数据云端同步。"
+msgstr "Open it in your browser, or grab the desktop build for a deeper experience. Mobile and the mini-program are on the way. Everything syncs in the cloud."
+
+#. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/privacy/page.tsx:26
 msgid "隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。"
 msgstr "How Enclave collects, stores, and uses your data — covering both self-hosted and managed-cloud users."
@@ -588,24 +588,24 @@ msgid "有任何隐私相关疑问，请发邮件至 yuanzui0728@gmail.com。"
 msgstr "For privacy questions, email yuanzui0728@gmail.com."
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/download/page.tsx:24
-msgid "挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。"
-msgstr "Pick the way that fits you best: open the web app instantly, install the desktop build for a deeper experience, or self-host for full control."
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:150
+msgid "它具体怎么做到"
+msgstr "How it works in practice"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/download/page.tsx:66
-msgid "开始使用"
-msgstr "Get started"
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:198
+msgid "准备好试一下？"
+msgstr "Ready to try it?"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/download/page.tsx:69
-msgid "挑一种最顺手的方式开始用隐界"
-msgstr "Pick the way that fits you best"
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:201
+msgid "浏览器即开即用，不需要注册任何信用卡。"
+msgstr "Open it in your browser — no credit card, no install."
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/download/page.tsx:72
-msgid "浏览器即开即用，桌面端体验更佳；移动端与小程序在路上。所有数据云端同步。"
-msgstr "Open it in your browser, or grab the desktop build for a deeper experience. Mobile and the mini-program are on the way. Everything syncs in the cloud."
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:226
+msgid "看看其它用例"
+msgstr "See other use cases"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/changelog/page.tsx:27
