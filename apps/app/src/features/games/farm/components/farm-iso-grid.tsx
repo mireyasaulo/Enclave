@@ -1,0 +1,205 @@
+import type { FarmPlot } from "@yinjie/contracts";
+import { FarmIsoTile } from "./farm-iso-tile";
+
+interface FarmIsoGridProps {
+  plots: FarmPlot[];
+  selectedIndex: number | null;
+  onSelect: (plotIndex: number) => void;
+}
+
+export function FarmIsoGrid({ plots, selectedIndex, onSelect }: FarmIsoGridProps) {
+  const cols = plots.length <= 6 ? 3 : plots.length <= 9 ? 3 : 4;
+
+  // Limit how many ripe pulses run simultaneously to keep frame rate sane on mobile.
+  const ripeIndexesToPulse = new Set<number>();
+  let pulseBudget = 3;
+  for (let i = 0; i < plots.length && pulseBudget > 0; i += 1) {
+    const plot = plots[i]!;
+    if (
+      plot.cropId &&
+      plot.maturedAt != null &&
+      Date.now() >= plot.maturedAt &&
+      Date.now() < plot.maturedAt + 24 * 3600 * 1000
+    ) {
+      ripeIndexesToPulse.add(i);
+      pulseBudget -= 1;
+    }
+  }
+
+  return (
+    <div className="farm-iso-board">
+      <div
+        className="farm-iso-grid"
+        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+      >
+        {plots.map((plot, index) => (
+          <FarmIsoTile
+            key={plot.index ?? index}
+            plot={plot}
+            selected={selectedIndex === index}
+            pulseRipe={ripeIndexesToPulse.has(index)}
+            onClick={() => onSelect(index)}
+          />
+        ))}
+      </div>
+
+      <style>{`
+        .farm-iso-board {
+          perspective: 1200px;
+          padding: 18px 0 28px;
+        }
+        .farm-iso-grid {
+          display: grid;
+          gap: 14px;
+          margin: 0 auto;
+          max-width: 480px;
+          transform: rotateX(46deg) rotate(-32deg);
+          transform-origin: center;
+          transform-style: preserve-3d;
+          transition: transform 240ms ease;
+        }
+        @media (max-width: 640px) {
+          .farm-iso-grid {
+            transform: rotateX(34deg) rotate(-16deg);
+            max-width: 92vw;
+            gap: 10px;
+          }
+        }
+
+        .farm-iso-tile {
+          position: relative;
+          border-radius: 14px;
+          background: transparent;
+          border: 0;
+          padding: 0;
+          cursor: pointer;
+          transition: transform 180ms ease, filter 220ms ease;
+          transform-style: preserve-3d;
+          outline: none;
+        }
+        .farm-iso-tile:hover { transform: translateZ(2px) scale(1.02); }
+        .farm-iso-tile.is-selected { transform: translateZ(8px) scale(1.06); }
+        .farm-iso-tile.is-rotten { filter: grayscale(0.5) brightness(0.85); }
+
+        .farm-iso-tile__dirt {
+          position: absolute;
+          inset: 0;
+          border-radius: 12px;
+          background:
+            radial-gradient(ellipse at 30% 20%, rgba(255,225,180,0.55), transparent 60%),
+            linear-gradient(140deg, #b07939 0%, #8a5a2a 55%, #6a3f17 100%);
+          box-shadow:
+            inset 0 -3px 0 rgba(0,0,0,0.18),
+            inset 0 2px 0 rgba(255,255,255,0.18),
+            0 6px 10px rgba(60,30,5,0.30);
+        }
+        .farm-iso-tile.is-selected .farm-iso-tile__dirt {
+          box-shadow:
+            inset 0 -3px 0 rgba(0,0,0,0.18),
+            inset 0 2px 0 rgba(255,255,255,0.22),
+            0 0 0 3px rgba(16,185,129,0.85),
+            0 0 0 6px rgba(16,185,129,0.25),
+            0 8px 14px rgba(0,0,0,0.32);
+        }
+        .farm-iso-tile.is-ripe .farm-iso-tile__dirt {
+          box-shadow:
+            inset 0 -3px 0 rgba(0,0,0,0.18),
+            inset 0 2px 0 rgba(255,255,255,0.22),
+            0 0 0 2px rgba(252,211,77,0.85),
+            0 6px 12px rgba(120,80,10,0.45);
+        }
+        .farm-iso-tile.is-ripe-pulse .farm-iso-tile__dirt {
+          animation: farm-iso-ripe-pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes farm-iso-ripe-pulse {
+          0%, 100% { box-shadow:
+            inset 0 -3px 0 rgba(0,0,0,0.18),
+            inset 0 2px 0 rgba(255,255,255,0.22),
+            0 0 0 2px rgba(252,211,77,0.85),
+            0 6px 12px rgba(120,80,10,0.45);
+          }
+          50% { box-shadow:
+            inset 0 -3px 0 rgba(0,0,0,0.18),
+            inset 0 2px 0 rgba(255,255,255,0.22),
+            0 0 0 4px rgba(252,211,77,1),
+            0 0 18px rgba(252,211,77,0.5),
+            0 6px 12px rgba(120,80,10,0.45);
+          }
+        }
+
+        .farm-iso-tile__edge {
+          position: absolute;
+          inset: auto 0 -8px 0;
+          height: 8px;
+          border-radius: 0 0 12px 12px;
+          background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(0,0,0,0));
+          transform: translateZ(-4px);
+        }
+
+        .farm-iso-tile__content {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 2px;
+          /* Counter-transform so the upright layer stays upright relative to viewer. */
+          transform: rotate(32deg) rotateX(-46deg) translateZ(14px);
+          transform-origin: center;
+          transform-style: preserve-3d;
+        }
+        @media (max-width: 640px) {
+          .farm-iso-tile__content {
+            transform: rotate(16deg) rotateX(-34deg) translateZ(12px);
+          }
+        }
+
+        .farm-iso-tile__crop {
+          font-size: 30px;
+          line-height: 1;
+          filter: drop-shadow(0 3px 4px rgba(0,0,0,0.3));
+        }
+        .farm-iso-tile__caption {
+          font-size: 10px;
+          color: rgba(255,255,255,0.92);
+          background: rgba(0,0,0,0.35);
+          padding: 1px 6px;
+          border-radius: 999px;
+          backdrop-filter: blur(4px);
+        }
+        .farm-iso-tile__badges {
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          font-size: 11px;
+          line-height: 1;
+        }
+        .farm-iso-tile__sparkle {
+          position: absolute;
+          top: -10px;
+          right: -10px;
+          font-size: 16px;
+          animation: farm-iso-sparkle 1.4s ease-in-out infinite;
+        }
+        @keyframes farm-iso-sparkle {
+          0%, 100% { opacity: 0.6; transform: rotate(0deg) scale(1); }
+          50% { opacity: 1; transform: rotate(15deg) scale(1.2); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .farm-iso-tile,
+          .farm-iso-grid,
+          .farm-iso-tile__sparkle,
+          .farm-iso-tile.is-ripe-pulse .farm-iso-tile__dirt {
+            transition: none;
+            animation: none;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}

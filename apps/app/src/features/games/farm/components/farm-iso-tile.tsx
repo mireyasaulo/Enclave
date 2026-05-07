@@ -1,0 +1,82 @@
+import type { FarmPlot } from "@yinjie/contracts";
+import { useFarmAdjustedNow } from "../farm-clock-context";
+import { formatRemainingMs, getStageEmoji } from "../crop-presentation";
+
+export interface FarmIsoTileProps {
+  plot: FarmPlot;
+  selected?: boolean;
+  pulseRipe?: boolean;
+  onClick?: () => void;
+}
+
+export function FarmIsoTile({
+  plot,
+  selected,
+  pulseRipe,
+  onClick,
+}: FarmIsoTileProps) {
+  const nowMs = useFarmAdjustedNow();
+  const isRipe =
+    plot.cropId != null && plot.maturedAt != null && nowMs >= plot.maturedAt;
+  const isRotten =
+    plot.cropId != null &&
+    plot.plantedAt != null &&
+    plot.maturedAt != null &&
+    nowMs >= plot.maturedAt + 24 * 3600 * 1000;
+  const remainingMs =
+    plot.maturedAt != null && plot.cropId ? plot.maturedAt - nowMs : 0;
+
+  const stage = plot.cropId
+    ? isRotten
+      ? "rotten"
+      : isRipe
+        ? "ripe"
+        : plot.stage
+    : "empty";
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={[
+        "farm-iso-tile group relative aspect-square select-none",
+        selected ? "is-selected" : "",
+        isRipe && !isRotten ? "is-ripe" : "",
+        isRipe && !isRotten && pulseRipe ? "is-ripe-pulse" : "",
+        isRotten ? "is-rotten" : "",
+      ].join(" ")}
+      style={{ transformStyle: "preserve-3d" }}
+    >
+      <span aria-hidden className="farm-iso-tile__dirt" />
+      <span aria-hidden className="farm-iso-tile__edge" />
+
+      <span className="farm-iso-tile__content">
+        <span className="farm-iso-tile__crop">
+          {getStageEmoji(stage, plot.cropId)}
+        </span>
+
+        {plot.cropId && (
+          <span className="farm-iso-tile__caption">
+            {isRotten ? "腐烂" : isRipe ? "成熟" : formatRemainingMs(remainingMs)}
+          </span>
+        )}
+        {!plot.cropId && (
+          <span className="farm-iso-tile__caption text-stone-400">空地</span>
+        )}
+
+        <span className="farm-iso-tile__badges">
+          {plot.weeds > 0 && <span title="杂草">🌿</span>}
+          {plot.bugs > 0 && <span title="害虫">🐛</span>}
+          {plot.watered && !isRipe && <span title="已浇水">💧</span>}
+          {(plot.stolenBy?.length ?? 0) > 0 && (
+            <span title="被偷过" className="text-rose-500">⚠️</span>
+          )}
+        </span>
+
+        {isRipe && !isRotten && (
+          <span aria-hidden className="farm-iso-tile__sparkle">✨</span>
+        )}
+      </span>
+    </button>
+  );
+}

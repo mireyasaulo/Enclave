@@ -5,7 +5,7 @@ import { FarmClockProvider, useFarmClock } from "./farm-clock-context";
 import { useFarmState } from "./use-farm-state";
 import { CoinDisplay } from "./components/coin-display";
 import { EventLogPanel } from "./components/event-log-panel";
-import { FarmGrid } from "./components/farm-grid";
+import { FarmIsoGrid } from "./components/farm-iso-grid";
 import { FarmSky } from "./components/farm-sky";
 import { NeighborFarmModal } from "./components/neighbor-farm-modal";
 import { NeighborListPanel } from "./components/neighbor-list-panel";
@@ -143,8 +143,8 @@ function FarmPageInner() {
           </aside>
 
           <section className="flex flex-col gap-3 lg:order-2 lg:col-span-1">
-            <div className="rounded-2xl bg-white p-3 shadow-sm">
-              <FarmGrid
+            <div className="rounded-2xl bg-white/70 p-2 shadow-sm backdrop-blur-sm">
+              <FarmIsoGrid
                 plots={state.plots}
                 selectedIndex={selectedPlotIndex}
                 onSelect={(i) =>
