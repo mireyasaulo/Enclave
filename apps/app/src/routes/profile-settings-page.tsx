@@ -30,7 +30,6 @@ import {
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useCloudSessionStore } from "../store/cloud-session-store";
 import {
-  formatChatSendShortcutLabel,
   type ChatSendShortcut,
   useChatPreferencesStore,
 } from "../store/chat-preferences-store";
@@ -867,55 +866,6 @@ export function ProfileSettingsPage() {
             ) : null}
           </div>
         }
-        aside={
-          <div className="flex h-full min-h-0 flex-col">
-            <div className="border-b border-[color:var(--border-faint)] px-5 py-4">
-              <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                {t(msg`当前状态`)}
-              </div>
-              <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                {t(msg`右侧显示世界主人信息和当前配置摘要。`)}
-              </div>
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-auto p-5">
-              <div className="space-y-3">
-                <DesktopStatCard
-                  label={t(msg`当前世界主人`)}
-                  value={username ?? t(msg`世界主人`)}
-                />
-                <DesktopStatCard
-                  label={t(msg`签名`)}
-                  value={signature?.trim() || t(msg`暂无签名`)}
-                />
-                <DesktopStatCard
-                  label={t(msg`配置状态`)}
-                  value={
-                    ownerQuery.data?.hasCustomApiKey
-                      ? t(msg`已配置专属 API Key`)
-                      : t(msg`使用实例级 Provider`)
-                  }
-                />
-                <DesktopStatCard
-                  label={t(msg`发送快捷键`)}
-                  value={formatChatSendShortcutLabel(sendMessageShortcut)}
-                />
-                {activeTab === "legal" ? (
-                  <DesktopStatCard
-                    label={t(msg`当前文档`)}
-                    value={
-                      activeLegalTab === "privacy"
-                        ? t(msg`隐私政策`)
-                        : activeLegalTab === "terms"
-                          ? t(msg`用户协议`)
-                          : t(msg`社区规范`)
-                    }
-                  />
-                ) : null}
-              </div>
-            </div>
-          </div>
-        }
       >
         <div className="p-5">{content}</div>
       </DesktopUtilityShell>
@@ -941,17 +891,6 @@ export function ProfileSettingsPage() {
       />
       <div className="space-y-1 pb-8">{content}</div>
     </AppPage>
-  );
-}
-
-function DesktopStatCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[14px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-soft)]">
-      <div className="text-xs text-[color:var(--text-muted)]">{label}</div>
-      <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
-        {value}
-      </div>
-    </div>
   );
 }
 
