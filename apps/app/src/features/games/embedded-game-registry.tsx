@@ -21,6 +21,11 @@ const NightMarketGame = lazy(async () => {
   return { default: mod.NightMarketGame };
 });
 
+const SkyRallyGame = lazy(async () => {
+  const mod = await import("./sky-rally/sky-rally-game");
+  return { default: mod.SkyRallyGame };
+});
+
 export type EmbeddedGameProps = {
   variant?: "embedded" | "fullscreen";
   onExit?: () => void;
@@ -33,6 +38,7 @@ const EMBEDDED_GAME_COMPONENTS: Record<
   "parking-war": ParkingWarGame,
   "signal-squad": SignalSquadGame,
   "night-market": NightMarketGame,
+  "sky-rally": SkyRallyGame,
 };
 
 export function hasEmbeddedGame(gameId: string | null | undefined): boolean {

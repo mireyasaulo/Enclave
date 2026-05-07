@@ -1,0 +1,128 @@
+import { useCallback, useEffect, useReducer, useRef } from "react";
+import {
+  abandonRace,
+  backToIdle,
+  cloneState,
+  createInitialState,
+  selectTrack,
+  startRace,
+  tapBoost,
+  tick,
+} from "./sky-rally-engine";
+import {
+  loadSkyRallyState,
+  resetSkyRallyState,
+  saveSkyRallyState,
+} from "./sky-rally-storage";
+import type { SkyRallyState } from "./sky-rally-types";
+
+type Action =
+  | { type: "tick"; nowMs: number }
+  | { type: "select-track"; trackId: string; nowMs: number }
+  | { type: "start"; nowMs: number }
+  | { type: "tap-boost"; nowMs: number }
+  | { type: "abandon"; nowMs: number }
+  | { type: "back-idle" }
+  | { type: "reset"; nowMs: number };
+
+function reducer(state: SkyRallyState, action: Action): SkyRallyState {
+  if (action.type === "reset") return createInitialState(action.nowMs);
+  const next = cloneState(state);
+  switch (action.type) {
+    case "tick":
+      return tick(next, action.nowMs);
+    case "select-track":
+      return selectTrack(next, action.trackId, action.nowMs);
+    case "start":
+      return startRace(next, action.nowMs);
+    case "tap-boost":
+      return tapBoost(next, action.nowMs);
+    case "abandon":
+      return abandonRace(next, action.nowMs);
+    case "back-idle":
+      return backToIdle(next);
+  }
+  return next;
+}
+
+function init(): SkyRallyState {
+  const now = Date.now();
+  const stored = loadSkyRallyState();
+  if (!stored) return createInitialState(now);
+  if (stored.status === "racing") {
+    // 重新进入：放弃上一局，但保留星章 / 喷漆 / 最佳圈速
+    return {
+      ...stored,
+      status: "idle",
+      startedAtMs: null,
+      endedAtMs: null,
+      outcome: null,
+      trackProgress: 0,
+      upcomingGateIndex: 0,
+      lastTickAtMs: now,
+    };
+  }
+  return { ...stored, lastTickAtMs: now };
+}
+
+export function useSkyRallyState() {
+  const [state, dispatch] = useReducer(reducer, undefined, init);
+
+  const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (persistTimerRef.current) clearTimeout(persistTimerRef.current);
+    persistTimerRef.current = setTimeout(() => saveSkyRallyState(state), 500);
+    return () => {
+      if (persistTimerRef.current) clearTimeout(persistTimerRef.current);
+    };
+  }, [state]);
+
+  useEffect(() => {
+    return () => {
+      saveSkyRallyState(state);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      dispatch({ type: "tick", nowMs: Date.now() });
+    }, 60);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const selectTrackAction = useCallback(
+    (trackId: string) =>
+      dispatch({ type: "select-track", trackId, nowMs: Date.now() }),
+    [],
+  );
+  const start = useCallback(
+    () => dispatch({ type: "start", nowMs: Date.now() }),
+    [],
+  );
+  const tapBoostAction = useCallback(
+    () => dispatch({ type: "tap-boost", nowMs: Date.now() }),
+    [],
+  );
+  const abandon = useCallback(
+    () => dispatch({ type: "abandon", nowMs: Date.now() }),
+    [],
+  );
+  const backIdle = useCallback(() => dispatch({ type: "back-idle" }), []);
+  const reset = useCallback(() => {
+    resetSkyRallyState();
+    dispatch({ type: "reset", nowMs: Date.now() });
+  }, []);
+
+  return {
+    state,
+    actions: {
+      selectTrack: selectTrackAction,
+      start,
+      tapBoost: tapBoostAction,
+      abandon,
+      backIdle,
+      reset,
+    },
+  };
+}
