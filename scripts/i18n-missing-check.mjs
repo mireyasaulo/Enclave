@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 
-const SURFACES = ["shared", "app", "admin", "cloud-console"];
+const SURFACES = ["shared", "app", "admin", "cloud-console", "wiki", "site"];
 const LOCALES = ["zh-CN", "en-US", "ja-JP", "ko-KR"];
 const SOURCE_LOCALE = "zh-CN";
 const CATALOG_ROOT = "packages/i18n/catalogs";
