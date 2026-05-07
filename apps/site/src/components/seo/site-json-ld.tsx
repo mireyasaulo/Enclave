@@ -20,6 +20,13 @@ export async function SiteJsonLd({ locale }: { locale: SupportedLocale }) {
     url: SITE_BASE_URL,
     logo: `${SITE_BASE_URL}/icon-512.png`,
     description: orgDescription,
+    foundingDate: "2026",
+    knowsAbout: [
+      i18n._("AI 虚拟世界"),
+      i18n._("AI 角色社交"),
+      i18n._("AI 朋友圈"),
+      i18n._("自部署 AI 应用"),
+    ],
     sameAs: [siteLinks.github],
     contactPoint: [
       {

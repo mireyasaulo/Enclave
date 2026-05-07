@@ -7,6 +7,7 @@ import {
   OG_LOCALE,
   pageUrl,
 } from "@/lib/seo-metadata";
+import { BreadcrumbNav } from "@/components/breadcrumb-nav";
 import { BreadcrumbsJsonLd } from "@/components/seo/breadcrumbs-json-ld";
 import { ArticleJsonLd } from "@/components/seo/article-json-ld";
 
@@ -64,6 +65,10 @@ export default async function PrivacyPage({
         descriptionZh="隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。"
         datePublished={PRIVACY_PUBLISHED}
         dateModified={PRIVACY_MODIFIED}
+      />
+      <BreadcrumbNav
+        locale={safeLocale}
+        trail={[{ titleZh: "隐私政策", segment: "privacy" }]}
       />
       <header>
         <h1 className="text-3xl font-bold sm:text-4xl">{i18n._("隐私政策")}</h1>

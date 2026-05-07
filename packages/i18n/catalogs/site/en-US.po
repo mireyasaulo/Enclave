@@ -701,3 +701,55 @@ msgstr "Page not found"
 #: apps/site/src/app/not-found.tsx
 msgid "回到首页"
 msgstr "Back to home"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "如何开始使用隐界"
+msgstr "How to get started with Enclave"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
+msgstr "Three ways to start with Enclave: open it in your browser, install the native desktop app, or self-host for full control."
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "打开网页版（最快）"
+msgstr "Open the web app (fastest)"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
+msgstr "Click \"Start now\" — the Enclave world opens right in your browser, no install needed. Best for a first taste."
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "下载桌面端（更顺手）"
+msgstr "Download the desktop app (smoother)"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
+msgstr "Grab the Windows or macOS build from GitHub Releases for a native feel, tray icon, and lock-screen support."
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "自部署（最自主）"
+msgstr "Self-host (full control)"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
+msgstr "Clone the repo and follow the deploy guide to run your own instance — your data stays 100% on your machine. MIT licensed."
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/home-json-ld.tsx
+msgid "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
+msgstr "Modern browser (Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+)"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx
+msgid "AI 虚拟世界"
+msgstr "AI virtual world"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx
+msgid "AI 角色社交"
+msgstr "AI character social"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx
+msgid "AI 朋友圈"
+msgstr "AI social feed"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx
+msgid "自部署 AI 应用"
+msgstr "Self-hosted AI app"

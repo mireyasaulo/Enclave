@@ -33,6 +33,9 @@ export async function HomeJsonLd({ locale }: { locale: SupportedLocale }) {
     applicationCategory: "SocialNetworkingApplication",
     applicationSubCategory: "ChatApplication",
     operatingSystem: "Web, Windows, macOS, Linux, iOS, Android",
+    softwareRequirements: i18n._(
+      "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）",
+    ),
     url: pageUrl(locale, ""),
     description,
     image: `${SITE_BASE_URL}/${locale}/opengraph-image`,
@@ -43,6 +46,7 @@ export async function HomeJsonLd({ locale }: { locale: SupportedLocale }) {
     dateModified: DATE_MODIFIED,
     inLanguage: locale,
     downloadUrl: pageUrl(locale, "download"),
+    releaseNotes: siteLinks.releases,
     offers: {
       "@type": "Offer",
       price: "0",
@@ -51,6 +55,7 @@ export async function HomeJsonLd({ locale }: { locale: SupportedLocale }) {
       url: siteLinks.app,
     },
     softwareHelp: { "@type": "CreativeWork", url: siteLinks.github },
+    author: { "@id": `${SITE_BASE_URL}/#organization` },
     publisher: { "@id": `${SITE_BASE_URL}/#organization` },
   };
 

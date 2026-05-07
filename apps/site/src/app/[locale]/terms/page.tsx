@@ -7,6 +7,7 @@ import {
   OG_LOCALE,
   pageUrl,
 } from "@/lib/seo-metadata";
+import { BreadcrumbNav } from "@/components/breadcrumb-nav";
 import { BreadcrumbsJsonLd } from "@/components/seo/breadcrumbs-json-ld";
 import { ArticleJsonLd } from "@/components/seo/article-json-ld";
 
@@ -64,6 +65,10 @@ export default async function TermsPage({
         descriptionZh="隐界 Enclave 服务条款：开源协议、合理使用、订阅与计费、免责声明。"
         datePublished={TERMS_PUBLISHED}
         dateModified={TERMS_MODIFIED}
+      />
+      <BreadcrumbNav
+        locale={safeLocale}
+        trail={[{ titleZh: "服务条款", segment: "terms" }]}
       />
       <header>
         <h1 className="text-3xl font-bold sm:text-4xl">{i18n._("服务条款")}</h1>

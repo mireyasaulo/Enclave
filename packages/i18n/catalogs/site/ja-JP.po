@@ -701,3 +701,55 @@ msgstr "ページが見つかりません"
 #: apps/site/src/app/not-found.tsx
 msgid "回到首页"
 msgstr "ホームに戻る"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "如何开始使用隐界"
+msgstr "エンクレイブの始め方"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
+msgstr "エンクレイブを始める3つの方法：ブラウザですぐ使う、デスクトップアプリでネイティブ体験、セルフホストで完全に自分のものにする。"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "打开网页版（最快）"
+msgstr "ウェブ版を開く（最短）"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
+msgstr "「今すぐ始める」をクリックすれば、インストール不要でブラウザ上にエンクレイブの世界が開きます。初めての方におすすめ。"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "下载桌面端（更顺手）"
+msgstr "デスクトップ版をダウンロード（より快適に）"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
+msgstr "GitHub Releases から Windows または macOS インストーラーを入手すると、ネイティブ動作・トレイ常駐・ロック画面通知が使えます。"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "自部署（最自主）"
+msgstr "セルフホスト（完全に自分のもの）"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx
+msgid "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
+msgstr "リポジトリをクローンしてデプロイ手順に従い、自分専用のインスタンスを立ち上げましょう。データは 100% 自分のマシンに残り、ライセンスは MIT です。"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/home-json-ld.tsx
+msgid "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
+msgstr "モダンブラウザ（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx
+msgid "AI 虚拟世界"
+msgstr "AI バーチャル世界"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx
+msgid "AI 角色社交"
+msgstr "AI キャラクターとのソーシャル"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx
+msgid "AI 朋友圈"
+msgstr "AI のタイムライン"
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx
+msgid "自部署 AI 应用"
+msgstr "セルフホスト型 AI アプリ"
