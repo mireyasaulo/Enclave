@@ -3,9 +3,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
+import { sendGroupMessage } from "@yinjie/contracts";
 
 const t = translateRuntimeMessage;
-import { sendGroupMessage } from "@yinjie/contracts";
 import {
   featuredMiniProgramIds,
   getMiniProgramEntry,
@@ -95,7 +95,7 @@ export function MiniProgramsPage() {
       routeState.sourceGroupId
         ? {
             sourceGroupId: routeState.sourceGroupId,
-            sourceGroupName: routeState.sourceGroupName || "当前群聊",
+            sourceGroupName: routeState.sourceGroupName || t(msg`当前群聊`),
           }
         : null,
     [routeState.sourceGroupId, routeState.sourceGroupName],
@@ -156,9 +156,9 @@ export function MiniProgramsPage() {
         relaySummaryPublishedAt,
         isDesktopLayout ? "desktop" : "mobile",
         isDesktopLayout ? "desktop" : "mobile",
-        resolveGroupRelayMetricValue(groupRelayEntry?.usersLabel, "接龙进行中"),
-        resolveGroupRelayMetricValue(groupRelayEntry?.serviceLabel, "待确认"),
-        `第 ${relayPublishCount} 次`,
+        resolveGroupRelayMetricValue(groupRelayEntry?.usersLabel, t(msg`接龙进行中`)),
+        resolveGroupRelayMetricValue(groupRelayEntry?.serviceLabel, t(msg`待确认`)),
+        t(msg`第 ${relayPublishCount} 次`),
       )
     : "";
 
@@ -334,7 +334,7 @@ export function MiniProgramsPage() {
     setNoticeTone("success");
     setNoticeActionState(null);
     setSuccessNotice(
-      `${miniProgram?.name ?? "该小程序"} 已加入最近使用，当前已进入小程序工作台。`,
+      `${miniProgram?.name ?? t(msg`该小程序`)} ${t(msg`已加入最近使用，当前已进入小程序工作台。`)}`,
     );
   }
 
@@ -345,7 +345,7 @@ export function MiniProgramsPage() {
     setNoticeTone("success");
     setNoticeActionState(null);
     setSuccessNotice(
-      `${miniProgram?.name ?? "该小程序"} 已${pinned ? "移出" : "加入"}我的小程序。`,
+      `${miniProgram?.name ?? t(msg`该小程序`)} ${t(msg`已`)}${pinned ? t(msg`移出`) : t(msg`加入`)}${t(msg`我的小程序。`)}`,
     );
   }
 
@@ -361,7 +361,7 @@ export function MiniProgramsPage() {
     setNoticeTone("success");
     setNoticeActionState(null);
     setSuccessNotice(
-      `${miniProgram?.name ?? "该小程序"} 已${completed ? "恢复" : "完成"}“${task?.title ?? "当前待办"}”。`,
+      `${miniProgram?.name ?? t(msg`该小程序`)} ${t(msg`已`)}${completed ? t(msg`恢复`) : t(msg`完成`)}"${task?.title ?? t(msg`当前待办`)}"${t(msg`。`)}`,
     );
   }
 
@@ -379,15 +379,15 @@ export function MiniProgramsPage() {
 
     if (nativeMobileShareSupported) {
       const shared = await shareWithNativeShell({
-        title: `${miniProgram?.name ?? "小程序"} 入口`,
-        text: `${miniProgram?.name ?? "小程序"}\n${link}`,
+        title: `${miniProgram?.name ?? t(msg`小程序`)} ${t(msg`入口`)}`,
+        text: `${miniProgram?.name ?? t(msg`小程序`)}\n${link}`,
         url: link,
       });
 
       if (shared) {
         setNoticeTone("success");
         setNoticeActionState(null);
-        setSuccessNotice("已打开系统分享面板。");
+        setSuccessNotice(t(msg`已打开系统分享面板。`));
         return;
       }
 
@@ -400,15 +400,15 @@ export function MiniProgramsPage() {
         setNoticeActionState(
           nativeMobileShareSupported
             ? {
-                label: "重试分享",
-                message: "当前设备暂时无法打开系统分享，请稍后重试。",
+                label: t(msg`重试分享`),
+                message: t(msg`当前设备暂时无法打开系统分享，请稍后重试。`),
                 onAction: () => {
                   void handleCopyMiniProgramToMobile(miniProgramId);
                 },
               }
             : null,
         );
-        setSuccessNotice("当前设备暂时无法打开系统分享，请稍后重试。");
+        setSuccessNotice(t(msg`当前设备暂时无法打开系统分享，请稍后重试。`));
         return;
       }
 
@@ -416,17 +416,17 @@ export function MiniProgramsPage() {
         await navigator.clipboard.writeText(link);
         setNoticeTone("success");
         setNoticeActionState(null);
-        setSuccessNotice("系统分享暂时不可用，已复制入口链接。");
+        setSuccessNotice(t(msg`系统分享暂时不可用，已复制入口链接。`));
       } catch {
         setNoticeActionState({
-          label: "重试分享",
-          message: "系统分享失败，请稍后重试。",
+          label: t(msg`重试分享`),
+          message: t(msg`系统分享失败，请稍后重试。`),
           onAction: () => {
             void handleCopyMiniProgramToMobile(miniProgramId);
           },
         });
         setNoticeTone("info");
-        setSuccessNotice("系统分享失败，请稍后重试。");
+        setSuccessNotice(t(msg`系统分享失败，请稍后重试。`));
       }
       return;
     }
@@ -439,13 +439,13 @@ export function MiniProgramsPage() {
       ) {
         setNoticeTone("info");
         setNoticeActionState({
-          label: "重试复制",
-          message: "当前环境暂不支持复制入口链接。",
+          label: t(msg`重试复制`),
+          message: t(msg`当前环境暂不支持复制入口链接。`),
           onAction: () => {
             void handleCopyMiniProgramToMobile(miniProgramId);
           },
         });
-        setSuccessNotice("当前环境暂不支持复制入口链接。");
+        setSuccessNotice(t(msg`当前环境暂不支持复制入口链接。`));
         return;
       }
 
@@ -453,17 +453,17 @@ export function MiniProgramsPage() {
         await navigator.clipboard.writeText(link);
         setNoticeTone("success");
         setNoticeActionState(null);
-        setSuccessNotice("入口链接已复制。");
+        setSuccessNotice(t(msg`入口链接已复制。`));
       } catch {
         setNoticeActionState({
-          label: "重试复制",
-          message: "复制入口链接失败，请稍后重试。",
+          label: t(msg`重试复制`),
+          message: t(msg`复制入口链接失败，请稍后重试。`),
           onAction: () => {
             void handleCopyMiniProgramToMobile(miniProgramId);
           },
         });
         setNoticeTone("info");
-        setSuccessNotice("复制入口链接失败，请稍后重试。");
+        setSuccessNotice(t(msg`复制入口链接失败，请稍后重试。`));
       }
       return;
     }
@@ -475,13 +475,13 @@ export function MiniProgramsPage() {
     ) {
       setNoticeTone("info");
       setNoticeActionState({
-        label: "重试复制到手机",
-        message: "当前环境暂不支持复制到手机。",
+        label: t(msg`重试复制到手机`),
+        message: t(msg`当前环境暂不支持复制到手机。`),
         onAction: () => {
           void handleCopyMiniProgramToMobile(miniProgramId);
         },
       });
-      setSuccessNotice("当前环境暂不支持复制到手机。");
+      setSuccessNotice(t(msg`当前环境暂不支持复制到手机。`));
       return;
     }
 
@@ -489,25 +489,25 @@ export function MiniProgramsPage() {
       await navigator.clipboard.writeText(link);
       pushMobileHandoffRecord({
         category: "mini_program",
-        description: `把 ${miniProgram?.name ?? "小程序"} 的当前工作台发到手机继续，保留最近使用和本地待办上下文。`,
-        label: `${miniProgram?.name ?? "小程序"} 接力`,
+        description: `${t(msg`把`)} ${miniProgram?.name ?? t(msg`小程序`)} ${t(msg`的当前工作台发到手机继续，保留最近使用和本地待办上下文。`)}`,
+        label: `${miniProgram?.name ?? t(msg`小程序`)} ${t(msg`接力`)}`,
         path,
       });
       setNoticeTone("success");
       setNoticeActionState(null);
       setSuccessNotice(
-        `${miniProgram?.name ?? "该小程序"} 已复制到手机接力链接。`,
+        `${miniProgram?.name ?? t(msg`该小程序`)} ${t(msg`已复制到手机接力链接。`)}`,
       );
     } catch {
       setNoticeActionState({
-        label: "重试复制到手机",
-        message: "复制到手机失败，请稍后重试。",
+        label: t(msg`重试复制到手机`),
+        message: t(msg`复制到手机失败，请稍后重试。`),
         onAction: () => {
           void handleCopyMiniProgramToMobile(miniProgramId);
         },
       });
       setNoticeTone("info");
-      setSuccessNotice("复制到手机失败，请稍后重试。");
+      setSuccessNotice(t(msg`复制到手机失败，请稍后重试。`));
     }
   }
 
@@ -534,9 +534,9 @@ export function MiniProgramsPage() {
   }
 
   const statusBackLabel = activeLaunchContext
-    ? "返回群聊"
+    ? t(msg`返回群聊`)
     : safeReturnPath
-      ? "返回上一页"
+      ? t(msg`返回上一页`)
       : null;
 
   const sendRelaySummaryMutation = useMutation({
@@ -570,7 +570,7 @@ export function MiniProgramsPage() {
       setNoticeTone("success");
       setNoticeActionState(null);
       setSuccessNotice(
-        `群接龙结果已回填到“${groupRelayLaunchContext.sourceGroupName}”。`,
+        `${t(msg`群接龙结果已回填到"`)}${groupRelayLaunchContext.sourceGroupName}${t(msg`"。`)}`,
       );
       await Promise.all([
         queryClient.invalidateQueries({
@@ -587,7 +587,7 @@ export function MiniProgramsPage() {
     },
     onError: () => {
       setNoticeTone("info");
-      setSuccessNotice("群接龙结果回填失败，请稍后重试。");
+      setSuccessNotice(t(msg`群接龙结果回填失败，请稍后重试。`));
     },
   });
 
@@ -596,9 +596,9 @@ export function MiniProgramsPage() {
       <Suspense
         fallback={
           <RouteRedirectState
-            title="正在打开桌面小程序"
-            description="正在载入桌面小程序工作区，马上恢复当前小程序上下文。"
-            loadingLabel="载入桌面小程序..."
+            title={t(msg`正在打开桌面小程序`)}
+            description={t(msg`正在载入桌面小程序工作区，马上恢复当前小程序上下文。`)}
+            loadingLabel={t(msg`载入桌面小程序...`)}
           />
         }
       >

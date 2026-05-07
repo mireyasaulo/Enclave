@@ -1,7 +1,11 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import { ArrowLeft, ChevronRight, Copy, Play, Share2 } from "lucide-react";
+
+const t = translateRuntimeMessage;
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import {
@@ -180,8 +184,11 @@ export function GamesPage() {
   useEffect(() => {
     if (inviteActivityFromSearch) {
       setNoticeTone("info");
+      const inviteFriendName = inviteActivityFromSearch.friendName;
+      const inviteGameName =
+        getGameCenterGame(inviteActivityFromSearch.gameId)?.name ?? t(msg`当前游戏`);
       setSuccessNotice(
-        `已带上 ${inviteActivityFromSearch.friendName} 的组局邀约，可继续查看 ${getGameCenterGame(inviteActivityFromSearch.gameId)?.name ?? "当前游戏"}。`,
+        t(msg`已带上 ${inviteFriendName} 的组局邀约，可继续查看 ${inviteGameName}。`),
       );
     }
   }, [inviteActivityFromSearch]);
@@ -285,8 +292,9 @@ export function GamesPage() {
       return;
     }
     setNoticeTone("success");
+    const launchedName = game?.name ?? t(msg`该游戏`);
     setSuccessNotice(
-      `${game?.name ?? "该游戏"} 已加入最近玩过。首期先以游戏中心内容工作区承接，后续再接小游戏容器。`,
+      t(msg`${launchedName} 已加入最近玩过。首期先以游戏中心内容工作区承接，后续再接小游戏容器。`),
     );
   }
 
@@ -303,10 +311,12 @@ export function GamesPage() {
     applyFriendInvite(activityId, "invited");
     setSelectedGameId(activity.gameId);
     setNoticeTone("success");
+    const inviteFriendName = activity.friendName;
+    const inviteGameName = game?.name ?? t(msg`当前游戏`);
     setSuccessNotice(
       alreadyInvited
-        ? `已再次邀请 ${activity.friendName} 一起玩${game?.name ?? "当前游戏"}。`
-        : `已向 ${activity.friendName} 发出一起玩${game?.name ?? "当前游戏"} 的邀约。`,
+        ? t(msg`已再次邀请 ${inviteFriendName} 一起玩${inviteGameName}。`)
+        : t(msg`已向 ${inviteFriendName} 发出一起玩${inviteGameName} 的邀约。`),
     );
   }
 
@@ -317,15 +327,15 @@ export function GamesPage() {
 
     if (nativeMobileShareSupported) {
       const shared = await shareWithNativeShell({
-        title: `${game?.name ?? "游戏中心"} 入口`,
-        text: `${game?.name ?? "游戏中心"}\n${link}`,
+        title: `${game?.name ?? t(msg`游戏中心`)} ${t(msg`入口`)}`,
+        text: `${game?.name ?? t(msg`游戏中心`)}\n${link}`,
         url: link,
       });
 
       if (shared) {
         setNoticeTone("success");
         setNoticeActionState(null);
-        setSuccessNotice("已打开系统分享面板。");
+        setSuccessNotice(t(msg`已打开系统分享面板。`));
         return;
       }
 
@@ -336,13 +346,13 @@ export function GamesPage() {
       ) {
         setNoticeTone("info");
         setNoticeActionState({
-          label: "重试分享",
-          message: "当前设备暂时无法打开系统分享，请稍后重试。",
+          label: t(msg`重试分享`),
+          message: t(msg`当前设备暂时无法打开系统分享，请稍后重试。`),
           onAction: () => {
             void handleCopyGameToMobile(gameId);
           },
         });
-        setSuccessNotice("当前设备暂时无法打开系统分享，请稍后重试。");
+        setSuccessNotice(t(msg`当前设备暂时无法打开系统分享，请稍后重试。`));
         return;
       }
 
@@ -350,17 +360,17 @@ export function GamesPage() {
         await navigator.clipboard.writeText(link);
         setNoticeTone("success");
         setNoticeActionState(null);
-        setSuccessNotice("系统分享暂时不可用，已复制入口链接。");
+        setSuccessNotice(t(msg`系统分享暂时不可用，已复制入口链接。`));
       } catch {
         setNoticeActionState({
-          label: "重试分享",
-          message: "系统分享失败，请稍后重试。",
+          label: t(msg`重试分享`),
+          message: t(msg`系统分享失败，请稍后重试。`),
           onAction: () => {
             void handleCopyGameToMobile(gameId);
           },
         });
         setNoticeTone("info");
-        setSuccessNotice("系统分享失败，请稍后重试。");
+        setSuccessNotice(t(msg`系统分享失败，请稍后重试。`));
       }
       return;
     }
@@ -373,13 +383,13 @@ export function GamesPage() {
       ) {
         setNoticeTone("info");
         setNoticeActionState({
-          label: "重试复制",
-          message: "当前环境暂不支持复制入口链接。",
+          label: t(msg`重试复制`),
+          message: t(msg`当前环境暂不支持复制入口链接。`),
           onAction: () => {
             void handleCopyGameToMobile(gameId);
           },
         });
-        setSuccessNotice("当前环境暂不支持复制入口链接。");
+        setSuccessNotice(t(msg`当前环境暂不支持复制入口链接。`));
         return;
       }
 
@@ -387,17 +397,17 @@ export function GamesPage() {
         await navigator.clipboard.writeText(link);
         setNoticeTone("success");
         setNoticeActionState(null);
-        setSuccessNotice("入口链接已复制。");
+        setSuccessNotice(t(msg`入口链接已复制。`));
       } catch {
         setNoticeActionState({
-          label: "重试复制",
-          message: "复制入口链接失败，请稍后重试。",
+          label: t(msg`重试复制`),
+          message: t(msg`复制入口链接失败，请稍后重试。`),
           onAction: () => {
             void handleCopyGameToMobile(gameId);
           },
         });
         setNoticeTone("info");
-        setSuccessNotice("复制入口链接失败，请稍后重试。");
+        setSuccessNotice(t(msg`复制入口链接失败，请稍后重试。`));
       }
       return;
     }
@@ -409,37 +419,39 @@ export function GamesPage() {
     ) {
       setNoticeTone("info");
       setNoticeActionState({
-        label: "重试复制到手机",
-        message: "当前环境暂不支持复制到手机。",
+        label: t(msg`重试复制到手机`),
+        message: t(msg`当前环境暂不支持复制到手机。`),
         onAction: () => {
           void handleCopyGameToMobile(gameId);
         },
       });
-      setSuccessNotice("当前环境暂不支持复制到手机。");
+      setSuccessNotice(t(msg`当前环境暂不支持复制到手机。`));
       return;
     }
 
     try {
       await navigator.clipboard.writeText(link);
+      const handoffName = game?.name ?? t(msg`游戏中心`);
       pushMobileHandoffRecord({
         category: "games",
-        description: `把 ${game?.name ?? "游戏中心"} 的入口发到手机继续，保留最近玩过和活动状态。`,
-        label: `${game?.name ?? "游戏中心"} 接力`,
+        description: t(msg`把 ${handoffName} 的入口发到手机继续，保留最近玩过和活动状态。`),
+        label: `${handoffName} ${t(msg`接力`)}`,
         path,
       });
       setNoticeTone("success");
       setNoticeActionState(null);
-      setSuccessNotice(`${game?.name ?? "该游戏"} 已复制到手机接力链接。`);
+      const copiedName = game?.name ?? t(msg`该游戏`);
+      setSuccessNotice(t(msg`${copiedName} 已复制到手机接力链接。`));
     } catch {
       setNoticeActionState({
-        label: "重试复制到手机",
-        message: "复制到手机失败，请稍后重试。",
+        label: t(msg`重试复制到手机`),
+        message: t(msg`复制到手机失败，请稍后重试。`),
         onAction: () => {
           void handleCopyGameToMobile(gameId);
         },
       });
       setNoticeTone("info");
-      setSuccessNotice("复制到手机失败，请稍后重试。");
+      setSuccessNotice(t(msg`复制到手机失败，请稍后重试。`));
     }
   }
 
@@ -470,9 +482,9 @@ export function GamesPage() {
       <Suspense
         fallback={
           <RouteRedirectState
-            title="正在打开游戏中心"
-            description="正在载入桌面端游戏中心。"
-            loadingLabel="载入桌面游戏中心..."
+            title={t(msg`正在打开游戏中心`)}
+            description={t(msg`正在载入桌面端游戏中心。`)}
+            loadingLabel={t(msg`载入桌面游戏中心...`)}
           />
         }
       >
@@ -495,7 +507,7 @@ export function GamesPage() {
     );
   }
 
-  const statusBackLabel = safeReturnPath ? "返回上一页" : null;
+  const statusBackLabel = safeReturnPath ? t(msg`返回上一页`) : null;
   const isParkingActive =
     selectedGame.id === "parking-war" && activeGameId === "parking-war";
   const friendActivities = gameCenterFriendActivities.filter((activity) =>
@@ -510,7 +522,7 @@ export function GamesPage() {
   return (
     <AppPage className="space-y-0 bg-white px-0 pb-0 pt-0">
       <TabPageTopBar
-        title="游戏"
+        title={t(msg`游戏`)}
         titleAlign="center"
         className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-white px-4 pb-2 pt-2 text-[color:var(--text-primary)] shadow-none"
         leftActions={
@@ -531,7 +543,7 @@ export function GamesPage() {
             className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-black/[0.05]"
             onClick={() => void handleCopyGameToMobile(selectedGame.id)}
             aria-label={
-              nativeMobileShareSupported ? "分享当前游戏" : "复制游戏入口"
+              nativeMobileShareSupported ? t(msg`分享当前游戏`) : t(msg`复制游戏入口`)
             }
           >
             {nativeMobileShareSupported ? (
@@ -546,7 +558,7 @@ export function GamesPage() {
       <div className="bg-white pb-[calc(env(safe-area-inset-bottom,0px)+1rem)]">
         {myGames.length > 0 ? (
           <div className="border-b border-[color:var(--border-faint)] bg-white">
-            <SectionHeader title="我的游戏" />
+            <SectionHeader title={t(msg`我的游戏`)} />
             <div className="flex gap-4 overflow-x-auto px-4 pb-3 pt-1">
               {myGames.map((game) => (
                 <GameIconTile
@@ -619,7 +631,7 @@ export function GamesPage() {
 
         {friendActivities.length > 0 ? (
           <div className="border-b border-[color:var(--border-faint)] bg-white">
-            <SectionHeader title="好友在玩" />
+            <SectionHeader title={t(msg`好友在玩`)} />
             <ul className="bg-white">
               {friendActivities.map((activity) => {
                 const game = getGameCenterGame(activity.gameId);
@@ -643,7 +655,7 @@ export function GamesPage() {
 
         {featuredRest.length > 0 ? (
           <div className="border-b border-[color:var(--border-faint)] bg-white">
-            <SectionHeader title="精选小游戏" trailing="更多" />
+            <SectionHeader title={t(msg`精选小游戏`)} trailing={t(msg`更多`)} />
             <ul className="bg-white">
               {featuredRest.map((game) => (
                 <GameListRow
@@ -658,7 +670,7 @@ export function GamesPage() {
         ) : null}
 
         <div className="border-b border-[color:var(--border-faint)] bg-white">
-          <SectionHeader title="热门小游戏" trailing="更多" />
+          <SectionHeader title={t(msg`热门小游戏`)} trailing={t(msg`更多`)} />
           <ul className="bg-white">
             {gameCenterHotRankings.map((entry) => {
               const game = getGameCenterGame(entry.gameId);
@@ -676,7 +688,7 @@ export function GamesPage() {
         </div>
 
         <div className="bg-white">
-          <SectionHeader title="新游榜" trailing="更多" />
+          <SectionHeader title={t(msg`新游榜`)} trailing={t(msg`更多`)} />
           <ul className="bg-white">
             {gameCenterNewRankings.map((entry) => {
               const game = getGameCenterGame(entry.gameId);
@@ -810,7 +822,7 @@ function BannerCard({
           <span className="text-[11px] text-white/72">{game.playersLabel}</span>
           <span className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-[12px] font-medium text-[color:var(--text-primary)]">
             <Play size={13} />
-            开始
+            {t(msg`开始`)}
           </span>
         </div>
       </div>
@@ -822,13 +834,14 @@ function GameListRow({
   game,
   onLaunch,
   onSelect,
-  trailingLabel = "开始",
+  trailingLabel,
 }: {
   game: GameCenterGame;
   onLaunch: () => void;
   onSelect?: () => void;
   trailingLabel?: string;
 }) {
+  const resolvedTrailingLabel = trailingLabel ?? t(msg`开始`);
   const visibleTags = game.tags.slice(0, 2);
   return (
     <li className="flex items-center gap-3 border-b border-[color:var(--border-faint)] px-4 py-3 last:border-b-0">
@@ -864,7 +877,7 @@ function GameListRow({
         onClick={onLaunch}
         className="h-7 shrink-0 rounded-full bg-[#07C160] px-4 text-[12px] font-medium text-white active:bg-[#06ad57]"
       >
-        {trailingLabel}
+        {resolvedTrailingLabel}
       </button>
     </li>
   );
@@ -899,7 +912,7 @@ function FriendActivityRow({
             {activity.friendName}
           </div>
           <div className="mt-0.5 line-clamp-1 text-[12px] text-[color:var(--text-muted)]">
-            正在玩 {game.name} · {activity.status}
+            {t(msg`正在玩`)} {game.name} · {activity.status}
           </div>
         </div>
       </button>
@@ -913,7 +926,7 @@ function FriendActivityRow({
             : "bg-[#07C160] text-white active:bg-[#06ad57]",
         )}
       >
-        {invited ? "已邀约" : "邀请"}
+        {invited ? t(msg`已邀约`) : t(msg`邀请`)}
       </button>
     </li>
   );
