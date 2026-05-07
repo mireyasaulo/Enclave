@@ -20,6 +20,7 @@ export async function SiteHeader({ locale }: { locale: SupportedLocale }) {
     startNow: i18n._("免费开始"),
     menuOpen: i18n._("打开菜单"),
     menuClose: i18n._("关闭菜单"),
+    brand: i18n._("隐界"),
   };
 
   return (
@@ -33,7 +34,7 @@ export async function SiteHeader({ locale }: { locale: SupportedLocale }) {
             <Image src="/favicon.png" alt="" aria-hidden="true" width={28} height={28} className="rounded-lg" />
           </span>
           <span className="min-w-0">
-            <span className="block text-sm font-semibold text-(--text-primary)">隐界</span>
+            <span className="block text-sm font-semibold text-(--text-primary)">{labels.brand}</span>
             <span className="hidden text-[11px] tracking-wide text-(--text-muted) sm:block">Enclave</span>
           </span>
         </Link>

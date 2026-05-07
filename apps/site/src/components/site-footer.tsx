@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { getServerI18n } from "@/i18n/server";
 import type { SupportedLocale } from "@/lib/locales";
@@ -15,6 +16,7 @@ export async function SiteFooter({ locale }: { locale: SupportedLocale }) {
     privacy: i18n._("隐私政策"),
     terms: i18n._("服务条款"),
     contact: i18n._("联系我们"),
+    brand: i18n._("隐界 · Enclave"),
   };
   const year = new Date().getFullYear();
 
@@ -25,11 +27,11 @@ export async function SiteFooter({ locale }: { locale: SupportedLocale }) {
           <div className="flex items-center gap-2 text-sm font-semibold text-(--text-primary)">
             <span
               aria-hidden="true"
-              className="grid h-6 w-6 place-items-center rounded-md bg-(--brand-gradient) text-[11px] text-white"
+              className="grid h-6 w-6 place-items-center rounded-md bg-(--brand-gradient) shadow-(--shadow-soft)"
             >
-              隐
+              <Image src="/favicon.png" alt="" aria-hidden="true" width={18} height={18} className="rounded-[5px]" />
             </span>
-            <span>隐界 · Enclave</span>
+            <span>{labels.brand}</span>
           </div>
           <p className="mt-3 text-sm leading-6 text-(--text-secondary)">{tagline}</p>
           <p className="mt-4 text-xs text-(--text-dim)">© {year} Enclave · MIT License</p>
