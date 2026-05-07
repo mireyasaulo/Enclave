@@ -45,6 +45,7 @@ import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import { AvatarChip } from "../components/avatar-chip";
 import { OfficialServiceConversationCard } from "../components/official-service-conversation-card";
 import { RouteRedirectState } from "../components/route-redirect-state";
+import { SparkBadge } from "../components/spark-badge";
 import { SubscriptionInboxCard } from "../components/subscription-inbox-card";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useLocalChatMessageActionState } from "../features/chat/local-chat-message-actions";
@@ -1294,12 +1295,17 @@ function ConversationListItemLink({
             </div>
           </div>
           <div className="flex shrink-0 flex-col items-end gap-0.5">
-            <div className="text-[9px] text-[color:var(--text-dim)]">
-              {formatConversationTimestamp(
-                visibleLastMessage?.createdAt ??
-                  conversation.lastMessage?.createdAt ??
-                  conversation.updatedAt,
-              )}
+            <div className="flex items-center gap-1.5">
+              {conversation.sparkStreak ? (
+                <SparkBadge streak={conversation.sparkStreak} size="sm" />
+              ) : null}
+              <div className="text-[9px] text-[color:var(--text-dim)]">
+                {formatConversationTimestamp(
+                  visibleLastMessage?.createdAt ??
+                    conversation.lastMessage?.createdAt ??
+                    conversation.updatedAt,
+                )}
+              </div>
             </div>
             <div className="flex min-h-[18px] items-center gap-1">
               {conversation.isMuted ? (

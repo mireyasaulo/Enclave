@@ -33,6 +33,7 @@ import {
 import { AvatarChip } from "../components/avatar-chip";
 import { EmptyState } from "../components/empty-state";
 import { InlineNoticeActionButton } from "../components/inline-notice-action-button";
+import { SparkBadge } from "../components/spark-badge";
 import { DigitalHumanEntryNotice } from "../features/chat/digital-human-entry-notice";
 import { buildMobileChatRouteHash } from "../features/chat/mobile-chat-route-state";
 import { useDigitalHumanEntryGuard } from "../features/chat/use-digital-human-entry-guard";
@@ -1697,6 +1698,23 @@ export function CharacterDetailPage() {
                   compact={!isDesktopLayout}
                 />
               ) : null}
+              {isFriend && (friendship?.sparkStreak ?? 0) >= 3 ? (
+                <ProfileRow
+                  label={t(msg`火花`)}
+                  value={
+                    <span className="inline-flex items-center justify-end gap-1.5">
+                      <SparkBadge
+                        streak={friendship?.sparkStreak}
+                        size={isDesktopLayout ? "md" : "sm"}
+                      />
+                      <span className="text-[12px] text-[color:var(--text-muted)]">
+                        {t(msg`已连续 ${friendship?.sparkStreak} 天`)}
+                      </span>
+                    </span>
+                  }
+                  compact={!isDesktopLayout}
+                />
+              ) : null}
               {commonGroups.length ? (
                 <ProfileRow
                   label={commonGroupsLabel}
@@ -2073,7 +2091,7 @@ function ProfileRow({
   compact = false,
 }: {
   label: string;
-  value: string;
+  value: ReactNode;
   onClick?: () => void;
   danger?: boolean;
   disabled?: boolean;
