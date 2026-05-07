@@ -26,6 +26,7 @@ import {
 } from "../../../lib/conversation-route";
 import { EmptyState } from "../../../components/empty-state";
 import { GameCenterSessionPanel } from "../../games/game-center-session-panel";
+import { ParkingWarGame } from "../../games/parking-war/parking-war-game";
 import {
   gameCenterCategoryTabs,
   gameCenterEvents,
@@ -497,19 +498,27 @@ export function DesktopGamesWorkspace({
             </div>
 
             <div className="space-y-5">
-              <GameCenterSessionPanel
-                game={selectedGame}
-                isActive={activeGameId === selectedGame.id}
-                launchCount={launchCountById[selectedGame.id] ?? 0}
-                lastOpenedAt={lastOpenedAtById[selectedGame.id]}
-                onCopyToMobile={onCopyGameToMobile}
-                onDismiss={
-                  activeGameId === selectedGame.id
-                    ? onDismissActiveGame
-                    : undefined
-                }
-                onLaunch={onLaunchGame}
-              />
+              {selectedGame.id === "parking-war" &&
+              activeGameId === "parking-war" ? (
+                <ParkingWarGame
+                  variant="embedded"
+                  onExit={onDismissActiveGame}
+                />
+              ) : (
+                <GameCenterSessionPanel
+                  game={selectedGame}
+                  isActive={activeGameId === selectedGame.id}
+                  launchCount={launchCountById[selectedGame.id] ?? 0}
+                  lastOpenedAt={lastOpenedAtById[selectedGame.id]}
+                  onCopyToMobile={onCopyGameToMobile}
+                  onDismiss={
+                    activeGameId === selectedGame.id
+                      ? onDismissActiveGame
+                      : undefined
+                  }
+                  onLaunch={onLaunchGame}
+                />
+              )}
 
               <section className="rounded-[22px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-card)]">
                 <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">

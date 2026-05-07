@@ -108,6 +108,26 @@ export const gameCenterCategoryTabs: Array<{
 
 export const gameCenterGames: GameCenterGame[] = [
   {
+    id: "parking-war",
+    name: "抢车位",
+    slogan: "和世界里的熟人抢一个能停的位。",
+    description:
+      "经典停车场玩法在隐界重做：自家车位每分钟自动收钱，停到 NPC 的车场可以蹭收益，被人占了车位就贴条把对方钱吃下来。对手不是真人，是世界里的熟面孔。",
+    studio: "隐界游戏实验室",
+    badge: "首发主推",
+    heroLabel: "停车经营",
+    category: "competitive",
+    tone: "sunset",
+    playersLabel: "刚开张，世界里的人都在试",
+    friendsLabel: "6 位 NPC 在抢你的车位",
+    updateNote: "可玩版上线",
+    deckLabel: "竞技推荐",
+    estimatedDuration: "随时玩，离线也在赚",
+    rewardLabel: "停车收益 + 车型解锁",
+    sessionObjective: "先把自家 6 个车位填满，再去蹭一蹭别人的车场。",
+    tags: ["停车", "经营", "蹭收益"],
+  },
+  {
     id: "signal-squad",
     name: "信号小队",
     slogan: "三分钟一局，把反应和协作压到最紧。",
@@ -270,6 +290,7 @@ export const gameCenterGames: GameCenterGame[] = [
 ];
 
 export const gameCenterFeaturedGameIds = [
+  "parking-war",
   "signal-squad",
   "night-market",
   "sky-rally",

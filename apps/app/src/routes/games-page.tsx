@@ -45,6 +45,7 @@ import {
   type GameCenterGame,
 } from "../features/games/game-center-data";
 import { GameCenterSessionPanel } from "../features/games/game-center-session-panel";
+import { ParkingWarGame } from "../features/games/parking-war/parking-war-game";
 import { useGameCenterState } from "../features/games/use-game-center-state";
 import { emitChatMessage, joinConversationRoom } from "../lib/socket";
 import { isPersistedGroupConversation } from "../lib/conversation-route";
@@ -1065,26 +1066,35 @@ export function GamesPage() {
           </InlineNotice>
         ) : null}
 
-        <GameCenterSessionPanel
-          game={selectedGame}
-          isActive={activeGameId === selectedGame.id}
-          launchCount={launchCountById[selectedGame.id] ?? 0}
-          lastOpenedAt={lastOpenedAtById[selectedGame.id]}
-          compact
-          onDismiss={
-            activeGameId === selectedGame.id ? dismissActiveGame : undefined
-          }
-          onCopyToMobile={handleCopyGameToMobile}
-          copyActionIcon={
-            nativeMobileShareSupported ? (
-              <Share2 size={16} />
-            ) : (
-              <Copy size={16} />
-            )
-          }
-          copyActionLabel={nativeMobileShareSupported ? "系统分享" : "复制入口"}
-          onLaunch={handleLaunchGame}
-        />
+        {selectedGame.id === "parking-war" &&
+        activeGameId === "parking-war" ? (
+          <div className="overflow-hidden rounded-[18px] border border-[rgba(214,94,47,0.14)] shadow-[var(--shadow-card)]">
+            <ParkingWarGame variant="embedded" onExit={dismissActiveGame} />
+          </div>
+        ) : (
+          <GameCenterSessionPanel
+            game={selectedGame}
+            isActive={activeGameId === selectedGame.id}
+            launchCount={launchCountById[selectedGame.id] ?? 0}
+            lastOpenedAt={lastOpenedAtById[selectedGame.id]}
+            compact
+            onDismiss={
+              activeGameId === selectedGame.id ? dismissActiveGame : undefined
+            }
+            onCopyToMobile={handleCopyGameToMobile}
+            copyActionIcon={
+              nativeMobileShareSupported ? (
+                <Share2 size={16} />
+              ) : (
+                <Copy size={16} />
+              )
+            }
+            copyActionLabel={
+              nativeMobileShareSupported ? "系统分享" : "复制入口"
+            }
+            onLaunch={handleLaunchGame}
+          />
+        )}
 
         <AppSection className="space-y-3 border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] shadow-none">
           <div className="flex items-center gap-2 text-[13px] font-medium text-[color:var(--text-primary)]">
