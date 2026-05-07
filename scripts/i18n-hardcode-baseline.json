@@ -19,42 +19,42 @@
     },
     "apps/app/src": {
       "rules": {
-        "jsx-literal-prop": 554,
-        "object-ui-string": 385,
-        "jsx-cjk-text": 21,
+        "jsx-literal-prop": 183,
+        "object-ui-string": 106,
+        "jsx-cjk-text": 11,
         "toast-dialog-string": 1,
-        "setter-message-string": 48,
-        "literal-error-message": 60,
-        "intl-locale-literal": 2,
+        "setter-message-string": 21,
+        "literal-error-message": 43,
+        "intl-locale-literal": 0,
         "locale-compare-literal": 4,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 0,
-        "raw-cjk-line": 3219
+        "raw-cjk-line": 1104
       }
     },
     "apps/admin/src": {
       "rules": {
-        "jsx-literal-prop": 1921,
-        "object-ui-string": 812,
-        "jsx-cjk-text": 265,
+        "jsx-literal-prop": 2050,
+        "object-ui-string": 818,
+        "jsx-cjk-text": 272,
         "toast-dialog-string": 2,
-        "setter-message-string": 9,
-        "literal-error-message": 24,
+        "setter-message-string": 12,
+        "literal-error-message": 17,
         "intl-locale-literal": 0,
         "locale-compare-literal": 0,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 0,
-        "raw-cjk-line": 5947
+        "raw-cjk-line": 6189
       }
     },
     "apps/cloud-console/src": {
       "rules": {
-        "jsx-literal-prop": 51,
-        "object-ui-string": 52,
+        "jsx-literal-prop": 0,
+        "object-ui-string": 0,
         "jsx-cjk-text": 0,
         "toast-dialog-string": 0,
         "setter-message-string": 0,
-        "literal-error-message": 6,
+        "literal-error-message": 0,
         "intl-locale-literal": 0,
         "locale-compare-literal": 0,
         "speech-lang-literal": 0,
@@ -69,42 +69,42 @@
         "jsx-cjk-text": 0,
         "toast-dialog-string": 0,
         "setter-message-string": 0,
-        "literal-error-message": 1,
+        "literal-error-message": 0,
         "intl-locale-literal": 0,
         "locale-compare-literal": 0,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 0,
-        "raw-cjk-line": 1
+        "raw-cjk-line": 0
       }
     },
     "api/src": {
       "rules": {
-        "jsx-literal-prop": 5,
-        "object-ui-string": 562,
-        "jsx-cjk-text": 28,
+        "jsx-literal-prop": 6,
+        "object-ui-string": 661,
+        "jsx-cjk-text": 30,
         "toast-dialog-string": 0,
         "setter-message-string": 0,
-        "literal-error-message": 239,
-        "intl-locale-literal": 4,
-        "locale-compare-literal": 10,
+        "literal-error-message": 369,
+        "intl-locale-literal": 2,
+        "locale-compare-literal": 11,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 1,
-        "raw-cjk-line": 8838
+        "raw-cjk-line": 10776
       }
     },
     "apps/cloud-api/src": {
       "rules": {
-        "jsx-literal-prop": 8,
-        "object-ui-string": 150,
-        "jsx-cjk-text": 0,
+        "jsx-literal-prop": 17,
+        "object-ui-string": 397,
+        "jsx-cjk-text": 2,
         "toast-dialog-string": 0,
         "setter-message-string": 0,
-        "literal-error-message": 57,
+        "literal-error-message": 116,
         "intl-locale-literal": 0,
         "locale-compare-literal": 0,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 0,
-        "raw-cjk-line": 231
+        "raw-cjk-line": 554
       }
     }
   }
