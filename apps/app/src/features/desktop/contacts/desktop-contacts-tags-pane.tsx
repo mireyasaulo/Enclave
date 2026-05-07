@@ -14,8 +14,10 @@ import {
   unblockCharacter,
   type ConversationListItem,
 } from "@yinjie/contracts";
+import { msg } from "@lingui/macro";
 import { Search, Tag } from "lucide-react";
 import { ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
 import { buildCharacterDetailRouteHash } from "../../contacts/character-detail-route-state";
@@ -32,6 +34,7 @@ import { isPersistedGroupConversation } from "../../../lib/conversation-route";
 import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
 
 export function DesktopContactsTagsPane() {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const hash = useRouterState({ select: (state) => state.location.hash });
   const queryClient = useQueryClient();
@@ -84,7 +87,11 @@ export function DesktopContactsTagsPane() {
       starred: boolean;
     }) => setFriendStarred(characterId, { starred }, baseUrl),
     onSuccess: async (_, variables) => {
-      setNotice(variables.starred ? "已设为星标朋友。" : "已取消星标朋友。");
+      setNotice(
+        variables.starred
+          ? t(msg`已设为星标朋友。`)
+          : t(msg`已取消星标朋友。`),
+      );
       await queryClient.invalidateQueries({
         queryKey: ["app-friends", baseUrl],
       });
@@ -109,7 +116,9 @@ export function DesktopContactsTagsPane() {
       return setConversationPinned(conversationId, { pinned }, baseUrl);
     },
     onSuccess: async (_, variables) => {
-      setNotice(variables.pinned ? "聊天已置顶。" : "聊天已取消置顶。");
+      setNotice(
+        variables.pinned ? t(msg`聊天已置顶。`) : t(msg`聊天已取消置顶。`),
+      );
       await queryClient.invalidateQueries({
         queryKey: ["app-conversations", baseUrl],
       });
@@ -134,7 +143,11 @@ export function DesktopContactsTagsPane() {
       return setConversationMuted(conversationId, { muted }, baseUrl);
     },
     onSuccess: async (_, variables) => {
-      setNotice(variables.muted ? "已开启消息免打扰。" : "已关闭消息免打扰。");
+      setNotice(
+        variables.muted
+          ? t(msg`已开启消息免打扰。`)
+          : t(msg`已关闭消息免打扰。`),
+      );
       await queryClient.invalidateQueries({
         queryKey: ["app-conversations", baseUrl],
       });
@@ -155,13 +168,15 @@ export function DesktopContactsTagsPane() {
       return blockCharacter(
         {
           characterId,
-          reason: "来自标签页加入黑名单",
+          reason: t(msg`来自标签页加入黑名单`),
         },
         baseUrl,
       );
     },
     onSuccess: async (_, variables) => {
-      setNotice(variables.blocked ? "已移出黑名单。" : "已加入黑名单。");
+      setNotice(
+        variables.blocked ? t(msg`已移出黑名单。`) : t(msg`已加入黑名单。`),
+      );
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-contacts-blocked", baseUrl],
@@ -181,7 +196,7 @@ export function DesktopContactsTagsPane() {
   const deleteFriendMutation = useMutation({
     mutationFn: (characterId: string) => deleteFriend(characterId, baseUrl),
     onSuccess: async (_, characterId) => {
-      setNotice("已从通讯录删除联系人。");
+      setNotice(t(msg`已从通讯录删除联系人。`));
       setSelectedCharacterId((current) =>
         current === characterId ? null : current,
       );
@@ -362,10 +377,10 @@ export function DesktopContactsTagsPane() {
       <section className="flex w-[360px] shrink-0 flex-col border-r border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.88)]">
         <div className="border-b border-[color:var(--border-faint)] bg-white/78 px-4 py-4 backdrop-blur-xl">
           <div className="text-base font-medium text-[color:var(--text-primary)]">
-            标签
+            {t(msg`标签`)}
           </div>
           <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-            {tagGroups.length} 个标签 · {taggedFriendCount} 位联系人
+            {t(msg`${tagGroups.length} 个标签 · ${taggedFriendCount} 位联系人`)}
           </div>
 
           <label className="mt-3 flex items-center gap-2 rounded-[16px] border border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-sm text-[color:var(--text-dim)] shadow-none">
@@ -374,7 +389,7 @@ export function DesktopContactsTagsPane() {
               type="search"
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
-              placeholder="搜索标签或联系人"
+              placeholder={t(msg`搜索标签或联系人`)}
               className="min-w-0 flex-1 bg-transparent text-sm text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
             />
           </label>
@@ -393,7 +408,7 @@ export function DesktopContactsTagsPane() {
           ) : null}
           {friendsQuery.isLoading ? (
             <div className="px-3 pt-3">
-              <LoadingBlock label="正在读取标签..." />
+              <LoadingBlock label={t(msg`正在读取标签...`)} />
             </div>
           ) : null}
           {friendsQuery.isError && friendsQuery.error instanceof Error ? (
@@ -419,12 +434,14 @@ export function DesktopContactsTagsPane() {
             <div className="px-3 pt-6">
               <EmptyState
                 title={
-                  searchText.trim() ? "没有找到匹配的标签" : "还没有联系人标签"
+                  searchText.trim()
+                    ? t(msg`没有找到匹配的标签`)
+                    : t(msg`还没有联系人标签`)
                 }
                 description={
                   searchText.trim()
-                    ? "换个标签名或联系人名称试试。"
-                    : "先在联系人资料里给好友补上标签，标签页会自动聚合。"
+                    ? t(msg`换个标签名或联系人名称试试。`)
+                    : t(msg`先在联系人资料里给好友补上标签，标签页会自动聚合。`)
                 }
               />
             </div>
@@ -459,7 +476,7 @@ export function DesktopContactsTagsPane() {
                         {group.tag}
                       </div>
                       <div className="mt-0.5 truncate text-xs text-[color:var(--text-muted)]">
-                        {group.items.length} 位联系人
+                        {t(msg`${group.items.length} 位联系人`)}
                       </div>
                     </div>
                   </button>
@@ -473,7 +490,7 @@ export function DesktopContactsTagsPane() {
                       {selectedGroup.tag}
                     </div>
                     <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                      {selectedGroup.items.length} 位联系人
+                      {t(msg`${selectedGroup.items.length} 位联系人`)}
                     </div>
                   </div>
 
