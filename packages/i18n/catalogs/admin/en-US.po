@@ -81,6 +81,10 @@ msgstr "{ownerCount}"
 msgid "{watchItemCount} 个关注项"
 msgstr "{watchItemCount} watch items"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:389
+msgid "AI 关系"
+msgstr ""
+
 #: apps/admin/src/lib/route-breadcrumb.ts:148
 msgid "AI 成本与请求账本"
 msgstr "AI Cost and Request Ledger"
@@ -235,6 +239,10 @@ msgstr "Self Agent"
 msgid "主代理巡检调度"
 msgstr "Self-agent Heartbeat Schedule"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:387
+msgid "主动提醒"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2191
 msgid "主动提醒调度"
 msgstr "Proactive Reminder Schedule"
@@ -248,6 +256,10 @@ msgstr "Proactive Follow-up"
 msgid "事件契约"
 msgstr "Event Contract"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:334
+msgid "人工锁定"
+msgstr ""
+
 #. placeholder {0}: followupLimit[1]
 #: apps/admin/src/routes/dashboard-page.tsx:2385
 msgid "今天已经发出 {0} 条主动跟进推荐，这轮先收住。"
@@ -256,6 +268,11 @@ msgstr "{0} proactive follow-up recommendations have already been sent today; st
 #: apps/admin/src/routes/dashboard-page.tsx:1848
 msgid "令牌数"
 msgstr "Tokens"
+
+#: apps/admin/src/routes/character-factory-page.tsx:49
+#: apps/admin/src/routes/character-runtime-page.tsx:30
+msgid "休息中"
+msgstr ""
 
 #: apps/admin/src/components/admin-workbench.tsx:676
 msgid "优先"
@@ -551,6 +568,11 @@ msgstr "Ready to test"
 msgid "可验证"
 msgstr "Ready to Verify"
 
+#: apps/admin/src/routes/character-factory-page.tsx:48
+#: apps/admin/src/routes/character-runtime-page.tsx:29
+msgid "吃饭中"
+msgstr ""
+
 #: apps/admin/src/lib/route-breadcrumb.ts:215
 msgid "后台"
 msgstr ""
@@ -632,6 +654,10 @@ msgstr "Online"
 msgid "在线 {onlineCharacterCount}"
 msgstr "Online {onlineCharacterCount}"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:377
+msgid "在线状态"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2173
 msgid "在线状态调度"
 msgstr "Online Status Schedule"
@@ -648,6 +674,10 @@ msgstr "Scene friend-request probability gate did not trigger this round."
 #: apps/admin/src/routes/dashboard-page.tsx:2183
 msgid "场景加好友调度"
 msgstr "Scene Friend Request Schedule"
+
+#: apps/admin/src/routes/character-runtime-page.tsx:385
+msgid "场景好友"
+msgstr ""
 
 #. placeholder {0}: statusQuery.data?.inferenceGateway.inFlightRequests ?? 0
 #. placeholder {1}: statusQuery.data?.inferenceGateway.maxConcurrency ?? 0
@@ -684,6 +714,7 @@ msgstr "The external digital human player template is not configured yet, so the
 msgid "多模型账户与角色路由"
 msgstr "Multi-Model Accounts and Character Routing"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:369
 #: apps/admin/src/routes/dashboard-page.tsx:1597
 msgid "失败"
 msgstr "Failed"
@@ -764,6 +795,11 @@ msgstr "Not Run Yet"
 #: apps/admin/src/routes/dashboard-page.tsx:1752
 msgid "尚未配置"
 msgstr "Not Configured"
+
+#: apps/admin/src/routes/character-factory-page.tsx:47
+#: apps/admin/src/routes/character-runtime-page.tsx:28
+msgid "工作中"
+msgstr ""
 
 #: apps/admin/src/components/admin-workbench.tsx:597
 msgid "已同步"
@@ -1061,6 +1097,10 @@ msgstr "Pending Migration"
 msgid "待配置"
 msgstr "Pending setup"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:347
+msgid "忙碌延迟"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2047
 msgid "快捷动作"
 msgstr "Quick Actions"
@@ -1088,6 +1128,7 @@ msgstr "Recover the instance, complete Provider setup, and check digital-human p
 msgid "恢复当前值"
 msgstr "Restore Current Value"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:369
 #: apps/admin/src/routes/dashboard-page.tsx:1597
 msgid "成功"
 msgstr "Succeeded"
@@ -1439,6 +1480,7 @@ msgstr "Has Issues"
 msgid "有活跃连接"
 msgstr "Active Connections"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:381
 #: apps/admin/src/routes/dashboard-page.tsx:847
 msgid "朋友圈"
 msgstr "Moments"
@@ -1466,6 +1508,10 @@ msgstr "Unsaved"
 #: apps/admin/src/lib/format.ts:16
 msgid "未发生"
 msgstr "Not occurred"
+
+#: apps/admin/src/routes/character-runtime-page.tsx:349
+msgid "未应用"
+msgstr ""
 
 #: apps/admin/src/lib/format.ts:15
 msgid "未执行"
@@ -1495,6 +1541,8 @@ msgstr "Not recorded"
 #: apps/admin/src/lib/digital-human-admin-summary.ts:97
 #: apps/admin/src/lib/digital-human-admin-summary.ts:123
 #: apps/admin/src/lib/format.ts:13
+#: apps/admin/src/routes/character-factory-page.tsx:45
+#: apps/admin/src/routes/character-runtime-page.tsx:26
 msgid "未设置"
 msgstr "Not set"
 
@@ -1828,6 +1876,10 @@ msgstr "Daily 23:59"
 msgid "每日从近7天互动记录中自动提取并更新近期摘要。"
 msgstr "Daily, extract and update recent summaries from the last 7 days of interactions."
 
+#: apps/admin/src/routes/character-runtime-page.tsx:379
+msgid "活动状态"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2189
 msgid "活动状态调度"
 msgstr "Activity Status Schedule"
@@ -1905,9 +1957,22 @@ msgstr "Target World Language"
 msgid "真实世界动作"
 msgstr "Real-World Actions"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:345
+msgid "睡眠延迟"
+msgstr ""
+
+#: apps/admin/src/routes/character-factory-page.tsx:51
+#: apps/admin/src/routes/character-runtime-page.tsx:32
+msgid "睡觉中"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2216
 msgid "短周期扫描新的人物需求，并生成候选角色。"
 msgstr "Short-cycle scan for new character needs and generate candidates."
+
+#: apps/admin/src/routes/character-runtime-page.tsx:383
+msgid "视频号"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:2187
 msgid "视频号调度"
@@ -1921,6 +1986,15 @@ msgstr "Offline"
 #: apps/admin/src/routes/dashboard-page.tsx:1460
 msgid "稳定"
 msgstr "Stable"
+
+#: apps/admin/src/routes/character-factory-page.tsx:46
+#: apps/admin/src/routes/character-runtime-page.tsx:27
+msgid "空闲"
+msgstr ""
+
+#: apps/admin/src/routes/character-runtime-page.tsx:351
+msgid "立即回复"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1525
 msgid "立即执行"
@@ -2024,6 +2098,10 @@ msgstr "Duration"
 #: apps/admin/src/lib/route-breadcrumb.ts:137
 msgid "聊天记录"
 msgstr "Chat Records"
+
+#: apps/admin/src/routes/character-runtime-page.tsx:334
+msgid "自动调度"
+msgstr ""
 
 #: apps/admin/src/components/admin-workbench.tsx:596
 msgid "草稿未保存"
@@ -2359,6 +2437,11 @@ msgstr ""
 #: apps/admin/src/routes/dashboard-page.tsx:2175
 msgid "追问推荐调度"
 msgstr "Follow-up Recommendation Schedule"
+
+#: apps/admin/src/routes/character-factory-page.tsx:50
+#: apps/admin/src/routes/character-runtime-page.tsx:31
+msgid "通勤中"
+msgstr ""
 
 #: apps/admin/src/lib/route-breadcrumb.ts:81
 msgid "配置 open loop 提取、推荐候选打分、我自己主动消息文案，并查看推荐后的打开、加好友和开聊动作。"

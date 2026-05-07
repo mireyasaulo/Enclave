@@ -81,6 +81,10 @@ msgstr "{ownerCount} 个"
 msgid "{watchItemCount} 个关注项"
 msgstr "{watchItemCount} 个关注项"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:389
+msgid "AI 关系"
+msgstr ""
+
 #: apps/admin/src/lib/route-breadcrumb.ts:148
 msgid "AI 成本与请求账本"
 msgstr "AI コストとリクエスト台帳"
@@ -235,6 +239,10 @@ msgstr "メインエージェント"
 msgid "主代理巡检调度"
 msgstr "主代理巡检调度"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:387
+msgid "主动提醒"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2191
 msgid "主动提醒调度"
 msgstr "主动提醒调度"
@@ -248,6 +256,10 @@ msgstr "能動フォローアップ"
 msgid "事件契约"
 msgstr "事件契约"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:334
+msgid "人工锁定"
+msgstr ""
+
 #. placeholder {0}: followupLimit[1]
 #: apps/admin/src/routes/dashboard-page.tsx:2385
 msgid "今天已经发出 {0} 条主动跟进推荐，这轮先收住。"
@@ -256,6 +268,11 @@ msgstr "今天已经发出 {0} 条主动跟进推荐，这轮先收住。"
 #: apps/admin/src/routes/dashboard-page.tsx:1848
 msgid "令牌数"
 msgstr "令牌数"
+
+#: apps/admin/src/routes/character-factory-page.tsx:49
+#: apps/admin/src/routes/character-runtime-page.tsx:30
+msgid "休息中"
+msgstr ""
 
 #: apps/admin/src/components/admin-workbench.tsx:676
 msgid "优先"
@@ -551,6 +568,11 @@ msgstr "連携テスト可能"
 msgid "可验证"
 msgstr "可验证"
 
+#: apps/admin/src/routes/character-factory-page.tsx:48
+#: apps/admin/src/routes/character-runtime-page.tsx:29
+msgid "吃饭中"
+msgstr ""
+
 #: apps/admin/src/lib/route-breadcrumb.ts:215
 msgid "后台"
 msgstr ""
@@ -632,6 +654,10 @@ msgstr "在线"
 msgid "在线 {onlineCharacterCount}"
 msgstr "在线 {onlineCharacterCount}"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:377
+msgid "在线状态"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2173
 msgid "在线状态调度"
 msgstr "在线状态调度"
@@ -648,6 +674,10 @@ msgstr "场景加好友命中概率门控，本轮未触发。"
 #: apps/admin/src/routes/dashboard-page.tsx:2183
 msgid "场景加好友调度"
 msgstr "场景加好友调度"
+
+#: apps/admin/src/routes/character-runtime-page.tsx:385
+msgid "场景好友"
+msgstr ""
 
 #. placeholder {0}: statusQuery.data?.inferenceGateway.inFlightRequests ?? 0
 #. placeholder {1}: statusQuery.data?.inferenceGateway.maxConcurrency ?? 0
@@ -684,6 +714,7 @@ msgstr "外部デジタルヒューマンのプレイヤーテンプレートが
 msgid "多模型账户与角色路由"
 msgstr "複数モデルアカウントとキャラクタールーティング"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:369
 #: apps/admin/src/routes/dashboard-page.tsx:1597
 msgid "失败"
 msgstr "失败"
@@ -764,6 +795,11 @@ msgstr "尚未执行"
 #: apps/admin/src/routes/dashboard-page.tsx:1752
 msgid "尚未配置"
 msgstr "尚未配置"
+
+#: apps/admin/src/routes/character-factory-page.tsx:47
+#: apps/admin/src/routes/character-runtime-page.tsx:28
+msgid "工作中"
+msgstr ""
 
 #: apps/admin/src/components/admin-workbench.tsx:597
 msgid "已同步"
@@ -1061,6 +1097,10 @@ msgstr "待迁移"
 msgid "待配置"
 msgstr "設定待ち"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:347
+msgid "忙碌延迟"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2047
 msgid "快捷动作"
 msgstr "クイックアクション"
@@ -1088,6 +1128,7 @@ msgstr "恢复实例、补齐 Provider、检查数字人参数。"
 msgid "恢复当前值"
 msgstr "現在値に戻す"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:369
 #: apps/admin/src/routes/dashboard-page.tsx:1597
 msgid "成功"
 msgstr "成功"
@@ -1439,6 +1480,7 @@ msgstr "有异常"
 msgid "有活跃连接"
 msgstr "有活跃连接"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:381
 #: apps/admin/src/routes/dashboard-page.tsx:847
 msgid "朋友圈"
 msgstr "朋友圈"
@@ -1466,6 +1508,10 @@ msgstr "未保存"
 #: apps/admin/src/lib/format.ts:16
 msgid "未发生"
 msgstr "未発生"
+
+#: apps/admin/src/routes/character-runtime-page.tsx:349
+msgid "未应用"
+msgstr ""
 
 #: apps/admin/src/lib/format.ts:15
 msgid "未执行"
@@ -1495,6 +1541,8 @@ msgstr "未記録"
 #: apps/admin/src/lib/digital-human-admin-summary.ts:97
 #: apps/admin/src/lib/digital-human-admin-summary.ts:123
 #: apps/admin/src/lib/format.ts:13
+#: apps/admin/src/routes/character-factory-page.tsx:45
+#: apps/admin/src/routes/character-runtime-page.tsx:26
 msgid "未设置"
 msgstr "未設定"
 
@@ -1828,6 +1876,10 @@ msgstr "每日 23:59"
 msgid "每日从近7天互动记录中自动提取并更新近期摘要。"
 msgstr "每日从近7天互动记录中自动提取并更新近期摘要。"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:379
+msgid "活动状态"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2189
 msgid "活动状态调度"
 msgstr "活动状态调度"
@@ -1905,9 +1957,22 @@ msgstr "対象の世界言語"
 msgid "真实世界动作"
 msgstr "現実世界アクション"
 
+#: apps/admin/src/routes/character-runtime-page.tsx:345
+msgid "睡眠延迟"
+msgstr ""
+
+#: apps/admin/src/routes/character-factory-page.tsx:51
+#: apps/admin/src/routes/character-runtime-page.tsx:32
+msgid "睡觉中"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2216
 msgid "短周期扫描新的人物需求，并生成候选角色。"
 msgstr "短周期扫描新的人物需求，并生成候选角色。"
+
+#: apps/admin/src/routes/character-runtime-page.tsx:383
+msgid "视频号"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:2187
 msgid "视频号调度"
@@ -1921,6 +1986,15 @@ msgstr "离线"
 #: apps/admin/src/routes/dashboard-page.tsx:1460
 msgid "稳定"
 msgstr "稳定"
+
+#: apps/admin/src/routes/character-factory-page.tsx:46
+#: apps/admin/src/routes/character-runtime-page.tsx:27
+msgid "空闲"
+msgstr ""
+
+#: apps/admin/src/routes/character-runtime-page.tsx:351
+msgid "立即回复"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1525
 msgid "立即执行"
@@ -2024,6 +2098,10 @@ msgstr "耗时"
 #: apps/admin/src/lib/route-breadcrumb.ts:137
 msgid "聊天记录"
 msgstr "チャット記録"
+
+#: apps/admin/src/routes/character-runtime-page.tsx:334
+msgid "自动调度"
+msgstr ""
 
 #: apps/admin/src/components/admin-workbench.tsx:596
 msgid "草稿未保存"
@@ -2359,6 +2437,11 @@ msgstr ""
 #: apps/admin/src/routes/dashboard-page.tsx:2175
 msgid "追问推荐调度"
 msgstr "追问推荐调度"
+
+#: apps/admin/src/routes/character-factory-page.tsx:50
+#: apps/admin/src/routes/character-runtime-page.tsx:31
+msgid "通勤中"
+msgstr ""
 
 #: apps/admin/src/lib/route-breadcrumb.ts:81
 msgid "配置 open loop 提取、推荐候选打分、我自己主动消息文案，并查看推荐后的打开、加好友和开聊动作。"

@@ -374,7 +374,7 @@ export function DesktopContactsTagsPane() {
 
   return (
     <div className="flex h-full min-h-0">
-      <section className="flex w-[360px] shrink-0 flex-col border-r border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.88)]">
+      <section className="flex w-[320px] shrink-0 flex-col border-r border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.88)]">
         <div className="border-b border-[color:var(--border-faint)] bg-white/78 px-4 py-4 backdrop-blur-xl">
           <div className="text-base font-medium text-[color:var(--text-primary)]">
             {t(msg`标签`)}
