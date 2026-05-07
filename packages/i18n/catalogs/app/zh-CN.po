@@ -816,6 +816,10 @@ msgstr "AI 数字人"
 msgid "AI 数字人视频通话"
 msgstr "AI 数字人视频通话"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:386
+msgid "AI 正在思考"
+msgstr "AI 正在思考"
+
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:689
 msgid "AI 正在播报"
 msgstr "AI 正在播报"
@@ -931,6 +935,14 @@ msgstr "PgUp {previousSearchSectionLabel}"
 msgid "PgUp 上组"
 msgstr "PgUp 上组"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:912
+msgid "TA 正在说这一轮回复，等说完后可以继续下一句。"
+msgstr "TA 正在说这一轮回复，等说完后可以继续下一句。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:921
+msgid "TA 的回复会在这里显示，并自动播报给你听。"
+msgstr "TA 的回复会在这里显示，并自动播报给你听。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:428
 msgid "Ta 的朋友圈"
 msgstr "Ta 的朋友圈"
@@ -998,6 +1010,10 @@ msgstr "上一张图片"
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:802
 msgid "上一条"
 msgstr "上一条"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:873
+msgid "上一轮没有顺利完成，准备好后可以重新录这一句。"
+msgstr "上一轮没有顺利完成，准备好后可以重新录这一句。"
 
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:284
 msgid "上传表情失败，请稍后再试。"
@@ -1669,12 +1685,17 @@ msgstr "会把选中的消息汇总成一条聊天摘要，再发送到目标会
 msgid "会按照原消息顺序依次投递到目标会话。"
 msgstr "会按照原消息顺序依次投递到目标会话。"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:976
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1029
+#: apps/app/src/routes/chat-background-page.tsx:457
 #: apps/app/src/routes/chat-details-page.tsx:873
 #: apps/app/src/routes/group-qr-page.tsx:1604
 #: apps/app/src/routes/group-qr-page.tsx:1621
 msgid "会话"
 msgstr "会话"
 
+#: apps/app/src/routes/chat-background-page.tsx:452
+#: apps/app/src/routes/chat-background-page.tsx:458
 #: apps/app/src/routes/chat-details-page.tsx:874
 msgid "会话不存在"
 msgstr "会话不存在"
@@ -2164,6 +2185,14 @@ msgstr "先把直播标题、主题、封面钩子和桌面策略准备好，后
 msgid "先把问题描述、复现步骤和期望结果写清楚，再决定后续如何跟进。"
 msgstr "先把问题描述、复现步骤和期望结果写清楚，再决定后续如何跟进。"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:508
+msgid "先按住底部按钮说第一句，数字人会听完再回应。"
+msgstr "先按住底部按钮说第一句，数字人会听完再回应。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:507
+msgid "先按住底部按钮说第一句，数字人会听完再用语音和画面回应。"
+msgstr "先按住底部按钮说第一句，数字人会听完再用语音和画面回应。"
+
 #: apps/app/src/routes/desktop-mobile-page.tsx:1247
 msgid "先按最近活跃会话做接力，桌面和手机之间切换会更顺。"
 msgstr "先按最近活跃会话做接力，桌面和手机之间切换会更顺。"
@@ -2268,6 +2297,7 @@ msgstr "全选"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:337
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:989
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:727
+#: apps/app/src/features/search/search-types.ts:99
 #: apps/app/src/i18n/static-dom-seed.ts:62
 #: apps/app/src/routes/desktop-chat-files-page.tsx:498
 #: apps/app/src/routes/desktop-chat-files-page.tsx:524
@@ -2340,6 +2370,8 @@ msgstr "全部聊天文件"
 
 #: apps/app/src/features/desktop/chat/desktop-message-entry-types.ts:60
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:657
+#: apps/app/src/features/search/search-types.ts:103
+#: apps/app/src/features/search/search-types.ts:116
 #: apps/app/src/i18n/static-dom-seed.ts:917
 #: apps/app/src/routes/contacts-page.tsx:1169
 #: apps/app/src/routes/desktop-mobile-page.tsx:129
@@ -3140,6 +3172,11 @@ msgstr "冷却剩余 {0}，结束后会自动回到优先位。"
 msgid "冷却暂缓"
 msgstr "冷却暂缓"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:394
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:417
+msgid "准备下一轮"
+msgstr "准备下一轮"
+
 #: apps/app/src/features/desktop/official-accounts/desktop-subscription-workspace.tsx:404
 #: apps/app/src/i18n/static-dom-seed.ts:828
 msgid "准备中"
@@ -3181,6 +3218,11 @@ msgstr "分享公众号"
 #: apps/app/src/i18n/static-dom-seed.ts:873
 msgid "分享工具"
 msgstr "分享工具"
+
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:109
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:226
+msgid "分享当前游戏"
+msgstr "分享当前游戏"
 
 #: apps/app/src/i18n/static-dom-seed.ts:886
 msgid "分享文档"
@@ -3288,6 +3330,10 @@ msgstr "刚刚和你打了招呼。"
 #: apps/app/src/i18n/static-dom-seed.ts:641
 msgid "刚刚捕捉到的世界画面"
 msgstr "刚刚捕捉到的世界画面"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:881
+msgid "刚刚那句已经发出，正在等待这一轮回复。"
+msgstr "刚刚那句已经发出，正在等待这一轮回复。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:367
 msgid "刚打完一局晋级赛，正在拉人补位。"
@@ -4412,6 +4458,10 @@ msgstr "回复 {senderName}"
 msgid "回复层"
 msgstr "回复层"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:471
+msgid "回复已生成，画面还在准备中。"
+msgstr "回复已生成，画面还在准备中。"
+
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:311
 msgid "回复这条评论"
 msgstr "回复这条评论"
@@ -4533,6 +4583,7 @@ msgstr "在等你把想办的那件事直接丢过来。"
 msgid "在约人打双人同屏，已经连胜 6 场。"
 msgstr "在约人打双人同屏，已经连胜 6 场。"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:374
 #: apps/app/src/routes/desktop-feedback-page.tsx:257
 #: apps/app/src/routes/desktop-feedback-page.tsx:428
 msgid "在线"
@@ -4654,6 +4705,7 @@ msgstr "备注名精确匹配"
 msgid "复制"
 msgstr "复制"
 
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:235
 #: apps/app/src/i18n/static-dom-seed.ts:77
 msgid "复制入口"
 msgstr "复制入口"
@@ -4753,6 +4805,8 @@ msgstr "复制文档摘要"
 msgid "复制文档摘要失败，请稍后重试。"
 msgstr "复制文档摘要失败，请稍后重试。"
 
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:110
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:227
 #: apps/app/src/i18n/static-dom-seed.ts:468
 msgid "复制游戏入口"
 msgstr "复制游戏入口"
@@ -4857,6 +4911,8 @@ msgstr "好友入口"
 msgid "好友功能"
 msgstr "好友功能"
 
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:140
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:284
 #: apps/app/src/i18n/static-dom-seed.ts:80
 msgid "好友在玩"
 msgstr "好友在玩"
@@ -5092,6 +5148,8 @@ msgstr "小盯"
 msgid "小盯替你记着"
 msgstr "小盯替你记着"
 
+#: apps/app/src/features/search/search-types.ts:104
+#: apps/app/src/features/search/search-types.ts:117
 #: apps/app/src/features/shell/desktop-nav-matching.ts:109
 #: apps/app/src/features/shell/desktop-nav-matching.ts:110
 #: apps/app/src/i18n/static-dom-seed.ts:66
@@ -5949,6 +6007,7 @@ msgstr "已通过好友申请。"
 msgid "已通过邀请链接自动填入，可手动修改。"
 msgstr "已通过邀请链接自动填入，可手动修改。"
 
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:554
 #: apps/app/src/i18n/static-dom-seed.ts:98
 msgid "已邀约"
 msgstr "已邀约"
@@ -6039,6 +6098,8 @@ msgid "广场会把很多并非好友关系的世界人公开发言一起放进�
 msgstr "广场会把很多并非好友关系的世界人公开发言一起放进时间流。"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-toolbar.tsx:34
+#: apps/app/src/features/search/search-types.ts:106
+#: apps/app/src/features/search/search-types.ts:119
 #: apps/app/src/features/shell/desktop-nav-matching.ts:85
 #: apps/app/src/i18n/static-dom-seed.ts:67
 #: apps/app/src/routes/discover-feed-page.tsx:694
@@ -6123,6 +6184,7 @@ msgstr "开始搜索"
 msgid "开始本场直播"
 msgstr "开始本场直播"
 
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:86
 #: apps/app/src/i18n/static-dom-seed.ts:84
 msgid "开始游戏"
 msgstr "开始游戏"
@@ -6205,10 +6267,19 @@ msgstr "当前："
 msgid "当前上下文"
 msgstr "当前上下文"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1087
+msgid "当前不能发起视频通话"
+msgstr "当前不能发起视频通话"
+
 #: apps/app/src/i18n/static-dom-seed.ts:995
 msgid "当前不能发起群通话"
 msgstr "当前不能发起群通话"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1087
+msgid "当前不能发起语音通话"
+msgstr "当前不能发起语音通话"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1030
 #: apps/app/src/i18n/static-dom-seed.ts:994
 msgid "当前不能发起通话"
 msgstr "当前不能发起通话"
@@ -6423,6 +6494,14 @@ msgstr "当前参考内容"
 #: apps/app/src/i18n/static-dom-seed.ts:437
 msgid "当前发布到朋友圈"
 msgstr "当前发布到朋友圈"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1068
+msgid "当前只支持在单聊里发起 AI 数字人视频通话。"
+msgstr "当前只支持在单聊里发起 AI 数字人视频通话。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1069
+msgid "当前只支持在单聊里发起 AI 语音通话。"
+msgstr "当前只支持在单聊里发起 AI 语音通话。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:824
 msgid "当前可搜索范围"
@@ -6780,18 +6859,31 @@ msgid "当前聊天"
 msgstr "当前聊天"
 
 #: apps/app/src/i18n/static-dom-seed.ts:978
+#: apps/app/src/routes/chat-background-page.tsx:227
+#: apps/app/src/routes/chat-background-page.tsx:240
 msgid "当前聊天已恢复跟随默认背景。"
 msgstr "当前聊天已恢复跟随默认背景。"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1014
 #: apps/app/src/i18n/static-dom-seed.ts:999
 msgid "当前聊天暂时不可用。"
 msgstr "当前聊天暂时不可用。"
 
+#: apps/app/src/routes/chat-background-page.tsx:492
+msgid "当前聊天正在预览专属背景"
+msgstr "当前聊天正在预览专属背景"
+
 #: apps/app/src/i18n/static-dom-seed.ts:758
+#: apps/app/src/routes/chat-background-page.tsx:493
 msgid "当前聊天正在预览默认背景"
 msgstr "当前聊天正在预览默认背景"
 
+#: apps/app/src/routes/chat-background-page.tsx:226
+msgid "当前聊天背景已保存。"
+msgstr "当前聊天背景已保存。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:980
+#: apps/app/src/routes/chat-background-page.tsx:322
 msgid "当前聊天背景已切到新预览，保存后生效。"
 msgstr "当前聊天背景已切到新预览，保存后生效。"
 
@@ -7161,6 +7253,10 @@ msgstr "我的小程序"
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:863
 msgid "我的摄像头预览"
 msgstr "我的摄像头预览"
+
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:124
+msgid "我的游戏"
+msgstr "我的游戏"
 
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:205
 msgid "我的资料"
@@ -7751,6 +7847,14 @@ msgstr "按住下方按钮说话，远端数字人舞台会在这一轮回复时
 msgid "按住左侧按钮说话，AI 会优先直接理解录音；若转写可用，会补显示字幕。"
 msgstr "按住左侧按钮说话，AI 会优先直接理解录音；若转写可用，会补显示字幕。"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:896
+msgid "按住底部按钮，说出你想对 TA 说的话。"
+msgstr "按住底部按钮，说出你想对 TA 说的话。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:893
+msgid "按住底部按钮说第一句，画面会保持在当前视频通话里。"
+msgstr "按住底部按钮说第一句，画面会保持在当前视频通话里。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:853
 msgid "按住录一条语音，松开后就能直接发送。"
 msgstr "按住录一条语音，松开后就能直接发送。"
@@ -7760,6 +7864,7 @@ msgid "按住说一段，AI 会写入聊天并自动语音回复。"
 msgstr "按住说一段，AI 会写入聊天并自动语音回复。"
 
 #: apps/app/src/components/chat-composer.tsx:3240
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:432
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:204
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:326
 #: apps/app/src/i18n/static-dom-seed.ts:842
@@ -8350,6 +8455,8 @@ msgstr "收付款"
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:647
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:174
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:240
+#: apps/app/src/features/search/search-types.ts:102
+#: apps/app/src/features/search/search-types.ts:115
 #: apps/app/src/features/shell/desktop-nav-matching.ts:65
 #: apps/app/src/features/shell/desktop-nav-matching.ts:66
 #: apps/app/src/i18n/static-dom-seed.ts:65
@@ -8472,34 +8579,52 @@ msgstr "数字人"
 msgid "数字人回复中"
 msgstr "数字人回复中"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:409
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:181
 msgid "数字人排队中"
 msgstr "数字人排队中"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:904
+msgid "数字人接通后，会先在这里显示这一轮回复，再通过语音和画面回应你。"
+msgstr "数字人接通后，会先在这里显示这一轮回复，再通过语音和画面回应你。"
 
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:676
 msgid "数字人播报文案、本地预览和本轮文本都会同步保存在当前聊天里。"
 msgstr "数字人播报文案、本地预览和本轮文本都会同步保存在当前聊天里。"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:386
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:162
 msgid "数字人整理回复中"
 msgstr "数字人整理回复中"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:453
+msgid "数字人暂时没接通，可以重试，或先切到语音。"
+msgstr "数字人暂时没接通，可以重试，或先切到语音。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:390
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:166
 msgid "数字人正在说话"
 msgstr "数字人正在说话"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:405
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:177
 msgid "数字人渲染中"
 msgstr "数字人渲染中"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:413
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:185
 msgid "数字人画面失败"
 msgstr "数字人画面失败"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:920
+msgid "数字人的回复会先显示在这里，再通过语音自动播报。"
+msgstr "数字人的回复会先显示在这里，再通过语音自动播报。"
 
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:720
 msgid "数字人的回复会显示在这里，同时驱动当前舞台播报。"
 msgstr "数字人的回复会显示在这里，同时驱动当前舞台播报。"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:425
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:193
 msgid "数字人视频已接通"
 msgstr "数字人视频已接通"
@@ -8511,6 +8636,14 @@ msgstr "数字人视频流已经就绪，桌面端会优先展示 provider 侧�
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:255
 msgid "数字人视频流已进入排队，可以先保持语音通话。"
 msgstr "数字人视频流已进入排队，可以先保持语音通话。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:740
+msgid "数字人还没恢复，先重试或改用语音继续。"
+msgstr "数字人还没恢复，先重试或改用语音继续。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:382
+msgid "数字人连接失败"
+msgstr "数字人连接失败"
 
 #: apps/app/src/routes/desktop-feedback-page.tsx:433
 #: apps/app/src/routes/desktop-mobile-page.tsx:1205
@@ -8607,6 +8740,7 @@ msgstr "新会话"
 msgid "新建笔记"
 msgstr "新建笔记"
 
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:194
 #: apps/app/src/i18n/static-dom-seed.ts:101
 msgid "新游榜"
 msgstr "新游榜"
@@ -8938,6 +9072,7 @@ msgstr "更新"
 msgid "更新于 {0}"
 msgstr "更新于 {0}"
 
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:288
 #: apps/app/src/i18n/static-dom-seed.ts:81
 msgid "更新状态"
 msgstr "更新状态"
@@ -8999,6 +9134,8 @@ msgstr "朋友信息"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:688
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:477
 #: apps/app/src/features/desktop/moments/desktop-moments-toolbar.tsx:34
+#: apps/app/src/features/search/search-types.ts:105
+#: apps/app/src/features/search/search-types.ts:118
 #: apps/app/src/features/shell/desktop-nav-matching.ts:71
 #: apps/app/src/features/shell/desktop-nav-matching.ts:72
 #: apps/app/src/features/shell/desktop-shell.tsx:956
@@ -9454,6 +9591,10 @@ msgstr "松开发送"
 #: apps/app/src/components/chat-composer.tsx:3236
 msgid "松开取消"
 msgstr "松开取消"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:498
+msgid "松开后会立刻发出这一句。"
+msgstr "松开后会立刻发出这一句。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:834
 msgid "松开手指，发送语音"
@@ -10059,6 +10200,7 @@ msgstr "正在发布..."
 msgid "正在发送..."
 msgstr "正在发送..."
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:401
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:173
 msgid "正在听你说话"
 msgstr "正在听你说话"
@@ -10066,6 +10208,10 @@ msgstr "正在听你说话"
 #: apps/app/src/components/chat-composer.tsx:2710
 msgid "正在听你说话，停止后会继续整理转写。"
 msgstr "正在听你说话，停止后会继续整理转写。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:877
+msgid "正在听你这一句，松开后会立刻发出。"
+msgstr "正在听你这一句，松开后会立刻发出。"
 
 #: apps/app/src/routes/welcome-page.tsx:218
 msgid "正在唤醒世界..."
@@ -10159,6 +10305,10 @@ msgstr "正在把最新成员状态同步到聊天消息流。"
 msgid "正在接通..."
 msgstr "正在接通..."
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:449
+msgid "正在接通数字人，接通后就能开始第一轮。"
+msgstr "正在接通数字人，接通后就能开始第一轮。"
+
 #: apps/app/src/routes/character-detail-page.tsx:278
 #: apps/app/src/routes/character-detail-page.tsx:920
 msgid "正在接通视频..."
@@ -10210,6 +10360,10 @@ msgstr "正在整理当前聊天里的匹配消息。"
 msgid "正在整理语音..."
 msgstr "正在整理语音..."
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:908
+msgid "正在整理这一轮回复，马上就会回到这里。"
+msgstr "正在整理这一轮回复，马上就会回到这里。"
+
 #: apps/app/src/routes/character-detail-page.tsx:317
 msgid "正在更新..."
 msgstr "正在更新..."
@@ -10232,6 +10386,16 @@ msgstr "正在清空..."
 msgid "正在玩"
 msgstr "正在玩"
 
+#. placeholder {0}: game.name
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:493
+msgid "正在玩 {0}"
+msgstr "正在玩 {0}"
+
+#. placeholder {0}: selectedGame.name
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:349
+msgid "正在玩 {0} 的好友"
+msgstr "正在玩 {0} 的好友"
+
 #: apps/app/src/features/subscription/subscription-panel.tsx:303
 msgid "正在生成…"
 msgstr "正在生成…"
@@ -10248,6 +10412,7 @@ msgstr "正在生成群邀请卡..."
 msgid "正在移除..."
 msgstr "正在移除..."
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:401
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:173
 msgid "正在聆听"
 msgstr "正在聆听"
@@ -10259,6 +10424,10 @@ msgstr "正在解析你的世界"
 #: apps/app/src/routes/welcome-page.tsx:980
 msgid "正在解析你的云世界..."
 msgstr "正在解析你的云世界..."
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:390
+msgid "正在说话"
+msgstr "正在说话"
 
 #: apps/app/src/components/chat-composer.tsx:2701
 #: apps/app/src/i18n/static-dom-seed.ts:836
@@ -10389,6 +10558,14 @@ msgstr "正在读取聊天信息"
 msgid "正在读取聊天信息..."
 msgstr "正在读取聊天信息..."
 
+#: apps/app/src/routes/chat-background-page.tsx:344
+msgid "正在读取聊天背景"
+msgstr "正在读取聊天背景"
+
+#: apps/app/src/routes/chat-background-page.tsx:340
+msgid "正在读取聊天背景..."
+msgstr "正在读取聊天背景..."
+
 #: apps/app/src/routes/chat-message-search-page.tsx:114
 #: apps/app/src/routes/desktop-chat-history-page.tsx:433
 msgid "正在读取聊天记录..."
@@ -10455,6 +10632,26 @@ msgstr "正在载入桌面通讯录工作区，马上显示联系人和详情。
 msgid "正在载入表情..."
 msgstr "正在载入表情..."
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:378
+msgid "正在连接数字人"
+msgstr "正在连接数字人"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:955
+msgid "正在连接数字人视频通话"
+msgstr "正在连接数字人视频通话"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:949
+msgid "正在连接数字人视频通话..."
+msgstr "正在连接数字人视频通话..."
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:955
+msgid "正在连接语音通话"
+msgstr "正在连接语音通话"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:949
+msgid "正在连接语音通话..."
+msgstr "正在连接语音通话..."
+
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1448
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1040
 msgid "正在退出..."
@@ -10485,6 +10682,10 @@ msgstr "每天整理这个世界里最值得你停下来读一会儿的公共叙
 #: apps/app/src/i18n/static-dom-seed.ts:444
 msgid "每次摇一摇都会先生成一个新的相遇结果；当前页面会直接保留这次结果，并把对方加入你的通讯录。"
 msgstr "每次摇一摇都会先生成一个新的相遇结果；当前页面会直接保留这次结果，并把对方加入你的通讯录。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:509
+msgid "每次说一段，AI 会回一段语音。"
+msgstr "每次说一段，AI 会回一段语音。"
 
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:248
 #: apps/app/src/i18n/static-dom-seed.ts:944
@@ -10955,6 +11156,7 @@ msgstr "清除中..."
 msgid "温室"
 msgstr "温室"
 
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:101
 #: apps/app/src/features/shell/desktop-nav-matching.ts:104
 #: apps/app/src/i18n/static-dom-seed.ts:74
 #: apps/app/src/routes/desktop-mobile-page.tsx:139
@@ -11059,6 +11261,10 @@ msgstr "点赞"
 msgid "热度"
 msgstr "热度"
 
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:176
+msgid "热门小游戏"
+msgstr "热门小游戏"
+
 #: apps/app/src/i18n/static-dom-seed.ts:100
 msgid "热门榜"
 msgstr "热门榜"
@@ -11098,6 +11304,7 @@ msgstr "猫咖旅馆"
 msgid "猫咪"
 msgstr "猫咪"
 
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:280
 #: apps/app/src/i18n/static-dom-seed.ts:122
 msgid "玩家热度"
 msgstr "玩家热度"
@@ -11185,6 +11392,10 @@ msgstr "申请中"
 msgid "申请摄像头权限中"
 msgstr "申请摄像头权限中"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:475
+msgid "画面正在排队，语音会先继续。"
+msgstr "画面正在排队，语音会先继续。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:670
 msgid "界闻"
 msgstr "界闻"
@@ -11209,6 +11420,14 @@ msgstr "登录并进入"
 #: apps/app/src/i18n/static-dom-seed.ts:689
 msgid "白石"
 msgstr "白石"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1090
+msgid "目前只支持在单聊里发起 AI 数字人视频通话。"
+msgstr "目前只支持在单聊里发起 AI 数字人视频通话。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1091
+msgid "目前只支持在单聊里发起 AI 语音通话。"
+msgstr "目前只支持在单聊里发起 AI 语音通话。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:602
 msgid "直接从现有视频号内容流里拿直播参考，不和主频道内容割裂。"
@@ -11526,12 +11745,18 @@ msgstr "视频号还没有内容"
 msgid "视频封面"
 msgstr "视频封面"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:491
+msgid "视频已经就绪，会优先展示远端画面。"
+msgstr "视频已经就绪，会优先展示远端画面。"
+
 #: apps/app/src/routes/discover-feed-page.tsx:482
 #: apps/app/src/routes/discover-page.tsx:457
 msgid "视频选择失败，请稍后重试。"
 msgstr "视频选择失败，请稍后重试。"
 
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:369
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:766
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:85
 #: apps/app/src/routes/character-detail-page.tsx:921
 #: apps/app/src/routes/desktop-mobile-page.tsx:359
@@ -11647,6 +11872,10 @@ msgstr "稍等一下，正在准备最近常读和最新推送。"
 msgid "稍等一下，正在准备这篇订阅号文章。"
 msgstr "稍等一下，正在准备这篇订阅号文章。"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:956
+msgid "稍等一下，正在同步会话信息并准备当前通话链路。"
+msgstr "稍等一下，正在同步会话信息并准备当前通话链路。"
+
 #: apps/app/src/routes/chat-list-page.tsx:743
 msgid "稍等一下，正在同步最近会话和消息入口。"
 msgstr "稍等一下，正在同步最近会话和消息入口。"
@@ -11701,6 +11930,10 @@ msgstr "稍等一下，正在同步账号资料和最近文章。"
 #: apps/app/src/routes/character-detail-page.tsx:258
 msgid "稍等一下，正在同步这个联系人的资料和关系状态。"
 msgstr "稍等一下，正在同步这个联系人的资料和关系状态。"
+
+#: apps/app/src/routes/chat-background-page.tsx:345
+msgid "稍等一下，正在同步默认背景和当前聊天设置。"
+msgstr "稍等一下，正在同步默认背景和当前聊天设置。"
 
 #: apps/app/src/routes/group-qr-page.tsx:1607
 msgid "稍等一下，正在整理最近可投递的聊天入口。"
@@ -11804,6 +12037,11 @@ msgstr "第 {focusedManageStickerPosition}/{0} 张"
 #: apps/app/src/i18n/static-dom-seed.ts:846
 msgid "第一次使用时，系统可能会弹出麦克风授权。"
 msgstr "第一次使用时，系统可能会弹出麦克风授权。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:462
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:463
+msgid "等 TA 说完，再开始下一句。"
+msgstr "等 TA 说完，再开始下一句。"
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:1385
 msgid "等公众号有推送后，这里会直接出现可接力到手机的阅读入口。"
@@ -11938,6 +12176,10 @@ msgstr "粗体"
 msgid "精选"
 msgstr "精选"
 
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:161
+msgid "精选小游戏"
+msgstr "精选小游戏"
+
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:111
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1008
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1093
@@ -11950,6 +12192,7 @@ msgstr "系统"
 msgid "系统事件触发的角色主动相遇请求。"
 msgstr "系统事件触发的角色主动相遇请求。"
 
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:235
 #: apps/app/src/features/subscription/subscription-panel.tsx:277
 #: apps/app/src/i18n/static-dom-seed.ts:895
 #: apps/app/src/routes/group-qr-page.tsx:1353
@@ -12147,6 +12390,10 @@ msgstr "继续添加表情"
 msgid "继续游戏"
 msgstr "继续游戏"
 
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:85
+msgid "继续玩"
+msgstr "继续玩"
+
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:903
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:1062
 msgid "继续管理"
@@ -12161,6 +12408,7 @@ msgstr "继续编辑"
 msgid "继续聊"
 msgstr "继续聊"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:417
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:201
 msgid "继续说话"
 msgstr "继续说话"
@@ -12568,11 +12816,15 @@ msgid "聊天背景"
 msgstr "聊天背景"
 
 #: apps/app/src/i18n/static-dom-seed.ts:984
+#: apps/app/src/routes/chat-background-page.tsx:357
+#: apps/app/src/routes/chat-background-page.tsx:389
 msgid "聊天背景暂时不可用"
 msgstr "聊天背景暂时不可用"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:597
 #: apps/app/src/features/desktop/chat/desktop-chat-side-panel.tsx:87
+#: apps/app/src/features/search/search-types.ts:100
+#: apps/app/src/features/search/search-types.ts:113
 #: apps/app/src/features/shell/desktop-nav-config.ts:103
 #: apps/app/src/i18n/static-dom-seed.ts:63
 #: apps/app/src/routes/chat-details-page.tsx:948
@@ -12625,6 +12877,8 @@ msgstr "聊天里的图片 / GIF 也能添加为表情"
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:197
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:211
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:185
+#: apps/app/src/features/search/search-types.ts:101
+#: apps/app/src/features/search/search-types.ts:114
 #: apps/app/src/i18n/static-dom-seed.ts:64
 #: apps/app/src/routes/character-detail-page.tsx:260
 #: apps/app/src/routes/chat-details-page.tsx:318
@@ -12674,6 +12928,7 @@ msgid "聚合消息、笔记和内容收藏。"
 msgstr "聚合消息、笔记和内容收藏。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:974
+#: apps/app/src/routes/chat-background-page.tsx:163
 msgid "背景图已上传，记得保存当前设置。"
 msgstr "背景图已上传，记得保存当前设置。"
 
@@ -13177,6 +13432,8 @@ msgid "语音输入暂时不可用"
 msgstr "语音输入暂时不可用"
 
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:51
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:369
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:766
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:73
 #: apps/app/src/routes/character-detail-page.tsx:283
 #: apps/app/src/routes/character-detail-page.tsx:912
@@ -13197,6 +13454,10 @@ msgstr "说明你希望它变成什么样。"
 msgid "说点什么..."
 msgstr "说点什么..."
 
+#: apps/app/src/routes/chat-background-page.tsx:212
+msgid "请先为当前聊天选择背景图。"
+msgstr "请先为当前聊天选择背景图。"
+
 #: apps/app/src/routes/desktop-feedback-page.tsx:704
 msgid "请先填写反馈标题。"
 msgstr "请先填写反馈标题。"
@@ -13213,6 +13474,10 @@ msgstr "请先输入评论内容。"
 #: apps/app/src/routes/welcome-page.tsx:777
 msgid "请先连接世界，再设置世界主人名称。"
 msgstr "请先连接世界，再设置世界主人名称。"
+
+#: apps/app/src/routes/chat-background-page.tsx:170
+msgid "请先选择默认背景图。"
+msgstr "请先选择默认背景图。"
 
 #: apps/app/src/routes/welcome-page.tsx:168
 msgid "请先验证邮箱，以解析你的云世界。"
@@ -13299,6 +13564,7 @@ msgstr "请输入验证码（默认 123456 即可通过）"
 #: apps/app/src/features/desktop/official-accounts/desktop-subscription-workspace.tsx:390
 #: apps/app/src/routes/channels-page.tsx:1147
 #: apps/app/src/routes/character-detail-page.tsx:276
+#: apps/app/src/routes/chat-background-page.tsx:343
 #: apps/app/src/routes/chat-details-page.tsx:750
 #: apps/app/src/routes/chat-list-page.tsx:741
 #: apps/app/src/routes/contacts-page.tsx:1942
@@ -13318,6 +13584,8 @@ msgstr "读取图片失败，请换一张再试。"
 #: apps/app/src/features/desktop/official-accounts/desktop-subscription-workspace.tsx:411
 #: apps/app/src/i18n/static-dom-seed.ts:37
 #: apps/app/src/routes/channels-page.tsx:1119
+#: apps/app/src/routes/chat-background-page.tsx:356
+#: apps/app/src/routes/chat-background-page.tsx:388
 #: apps/app/src/routes/chat-details-page.tsx:761
 #: apps/app/src/routes/chat-details-page.tsx:774
 #: apps/app/src/routes/chat-details-page.tsx:787
@@ -13622,6 +13890,10 @@ msgstr "返回上一步"
 #: apps/app/src/routes/channels-page.tsx:1139
 #: apps/app/src/routes/channels-page.tsx:1170
 #: apps/app/src/routes/character-detail-page.tsx:274
+#: apps/app/src/routes/chat-background-page.tsx:376
+#: apps/app/src/routes/chat-background-page.tsx:408
+#: apps/app/src/routes/chat-background-page.tsx:430
+#: apps/app/src/routes/chat-background-page.tsx:476
 #: apps/app/src/routes/chat-details-page.tsx:190
 #: apps/app/src/routes/discover-feed-page.tsx:333
 #: apps/app/src/routes/discover-feed-page.tsx:336
@@ -13665,6 +13937,7 @@ msgstr "返回朋友圈"
 msgid "返回消息"
 msgstr "返回消息"
 
+#: apps/app/src/routes/chat-background-page.tsx:476
 #: apps/app/src/routes/chat-details-page.tsx:191
 #: apps/app/src/routes/group-chat-details-page.tsx:134
 #: apps/app/src/routes/group-chat-details-page.tsx:167
@@ -13700,6 +13973,12 @@ msgstr "返回群聊发语音"
 msgid "返回群聊拍摄"
 msgstr "返回群聊拍摄"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:636
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:994
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1024
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1045
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1081
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1099
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:449
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:188
 #: apps/app/src/i18n/static-dom-seed.ts:986
@@ -13708,6 +13987,9 @@ msgstr "返回聊天"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-history-dialog.tsx:78
 #: apps/app/src/features/desktop/chat/desktop-chat-side-panel.tsx:67
+#: apps/app/src/routes/chat-background-page.tsx:376
+#: apps/app/src/routes/chat-background-page.tsx:408
+#: apps/app/src/routes/chat-background-page.tsx:430
 msgid "返回聊天信息"
 msgstr "返回聊天信息"
 
@@ -13983,13 +14265,57 @@ msgstr "这一刻"
 msgid "这一刻的想法..."
 msgstr "这一刻的想法..."
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:457
+msgid "这一句已收到，正在整理回复。"
+msgstr "这一句已收到，正在整理回复。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:746
+msgid "这一句没有自动播报，点一下继续听。"
+msgstr "这一句没有自动播报，点一下继续听。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:747
+msgid "这一句没有自动播报，点一下补播。"
+msgstr "这一句没有自动播报，点一下补播。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:640
 msgid "这一帧想留给你看"
 msgstr "这一帧想留给你看"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:885
+msgid "这一轮先到这里，等 TA 说完后再继续。"
+msgstr "这一轮先到这里，等 TA 说完后再继续。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:467
+msgid "这一轮刚结束，等播报收尾后再继续。"
+msgstr "这一轮刚结束，等播报收尾后再继续。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:916
+msgid "这一轮回复已经结束，下一轮内容也会继续显示在这里。"
+msgstr "这一轮回复已经结束，下一轮内容也会继续显示在这里。"
+
 #: apps/app/src/routes/group-qr-page.tsx:1660
 msgid "这一轮已经发出但还没有从聊天线程回到邀请页的目标，会先避开刚补发过的会话；冷却结束后会自动回到优先位，再按最近活跃和发送先后优先补发。"
 msgstr "这一轮已经发出但还没有从聊天线程回到邀请页的目标，会先避开刚补发过的会话；冷却结束后会自动回到优先位，再按最近活跃和发送先后优先补发。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:889
+msgid "这一轮已经完成，准备好后继续按住底部按钮说下一句。"
+msgstr "这一轮已经完成，准备好后继续按住底部按钮说下一句。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:483
+msgid "这一轮已经结束，准备好后继续说下一句。"
+msgstr "这一轮已经结束，准备好后继续说下一句。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:479
+msgid "这一轮画面没出来，但语音还能继续。"
+msgstr "这一轮画面没出来，但语音还能继续。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:742
+msgid "这一轮画面没出来，当前已回到语音链路。"
+msgstr "这一轮画面没出来，当前已回到语音链路。"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:900
+msgid "这一轮的回复暂时没有顺利回来，恢复后会继续显示在这里。"
+msgstr "这一轮的回复暂时没有顺利回来，恢复后会继续显示在这里。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:471
 msgid "这个世界最近开始偏爱慢消息"
@@ -14187,6 +14513,18 @@ msgstr "这段聊天已经失去上下文"
 msgid "这段聊天暂时不可用，可以先重试读取，或返回消息列表后再试。"
 msgstr "这段聊天暂时不可用，可以先重试读取，或返回消息列表后再试。"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1031
+msgid "这段聊天暂时不可用，可以先重试读取，或返回聊天后再试。"
+msgstr "这段聊天暂时不可用，可以先重试读取，或返回聊天后再试。"
+
+#: apps/app/src/routes/chat-background-page.tsx:459
+msgid "这段聊天暂时不可用，可以先重试读取，或返回聊天页后再试。"
+msgstr "这段聊天暂时不可用，可以先重试读取，或返回聊天页后再试。"
+
+#: apps/app/src/routes/chat-background-page.tsx:453
+msgid "这段聊天暂时不可用，返回聊天页后再试一次。"
+msgstr "这段聊天暂时不可用，返回聊天页后再试一次。"
+
 #: apps/app/src/features/chat/use-speech-input.ts:561
 msgid "这段语音没有识别出有效文字，请再试一次。"
 msgstr "这段语音没有识别出有效文字，请再试一次。"
@@ -14322,6 +14660,10 @@ msgstr "远程模式下，相关数据会发送到世界实例的 Core API 与�
 msgid "远端是 AI 数字人舞台，本地摄像头只用于你的桌面预览，不影响 AI 回复链路。"
 msgstr "远端是 AI 数字人舞台，本地摄像头只用于你的桌面预览，不影响 AI 回复链路。"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:954
+msgid "连接中"
+msgstr "连接中"
+
 #: apps/app/src/routes/welcome-page.tsx:198
 #: apps/app/src/routes/welcome-page.tsx:213
 #: apps/app/src/routes/welcome-page.tsx:1075
@@ -14365,6 +14707,10 @@ msgstr "退出后会回到世界入口，下次需要重新登录云账号。"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1446
 msgid "退出后你将不再收到这个群的消息，当前会话也会从桌面端列表中移除。"
 msgstr "退出后你将不再收到这个群的消息，当前会话也会从桌面端列表中移除。"
+
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:83
+msgid "退出游戏"
+msgstr "退出游戏"
 
 #: apps/app/src/routes/profile-page.tsx:161
 #: apps/app/src/routes/profile-settings-page.tsx:782
@@ -14514,11 +14860,13 @@ msgstr "通讯录还是空的"
 msgid "通讯录里还没有可选成员"
 msgstr "通讯录里还没有可选成员"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1086
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:64
 #: apps/app/src/i18n/static-dom-seed.ts:732
 msgid "通话"
 msgstr "通话"
 
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:977
 #: apps/app/src/i18n/static-dom-seed.ts:996
 msgid "通话暂时不可用"
 msgstr "通话暂时不可用"
@@ -14544,6 +14892,10 @@ msgstr "通过隐界号或角色名搜索"
 #: apps/app/src/i18n/static-dom-seed.ts:630
 msgid "遇到问题时怎么办"
 msgstr "遇到问题时怎么办"
+
+#: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:554
+msgid "邀请"
+msgstr "邀请"
 
 #: apps/app/src/i18n/static-dom-seed.ts:97
 msgid "邀请一起玩"
@@ -14720,11 +15072,16 @@ msgid "重试评论点赞"
 msgstr "重试评论点赞"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:554
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:986
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1039
 #: apps/app/src/i18n/static-dom-seed.ts:39
 #: apps/app/src/routes/channels-page.tsx:1108
 #: apps/app/src/routes/channels-page.tsx:1131
 #: apps/app/src/routes/channels-page.tsx:1139
 #: apps/app/src/routes/character-detail-page.tsx:272
+#: apps/app/src/routes/chat-background-page.tsx:368
+#: apps/app/src/routes/chat-background-page.tsx:400
+#: apps/app/src/routes/chat-background-page.tsx:468
 #: apps/app/src/routes/chat-details-page.tsx:210
 #: apps/app/src/routes/chat-list-page.tsx:731
 #: apps/app/src/routes/chat-list-page.tsx:766
@@ -14743,6 +15100,10 @@ msgstr "重试评论点赞"
 #: apps/app/src/routes/profile-settings-page.tsx:485
 msgid "重试读取"
 msgstr "重试读取"
+
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:646
+msgid "重试读取角色资料"
+msgstr "重试读取角色资料"
 
 #: apps/app/src/routes/channels-page.tsx:477
 msgid "重试读取评论"
@@ -15165,13 +15526,16 @@ msgid "默认背景图"
 msgstr "默认背景图"
 
 #: apps/app/src/i18n/static-dom-seed.ts:975
+#: apps/app/src/routes/chat-background-page.tsx:177
 msgid "默认背景图已保存。"
 msgstr "默认背景图已保存。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:977
+#: apps/app/src/routes/chat-background-page.tsx:316
 msgid "默认背景图已切到新预览，保存后生效。"
 msgstr "默认背景图已切到新预览，保存后生效。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:976
+#: apps/app/src/routes/chat-background-page.tsx:191
 msgid "默认背景图已恢复系统背景。"
 msgstr "默认背景图已恢复系统背景。"

@@ -6,6 +6,7 @@ import type { SupportedLocale } from "@/lib/locales";
 import { buildLocalePath } from "@/lib/locale-routing";
 import { siteLinks } from "@/lib/site-links";
 import { LanguageSwitcherLink } from "./language-switcher-link";
+import { SiteMobileMenu } from "./site-mobile-menu";
 
 export async function SiteHeader({ locale }: { locale: SupportedLocale }) {
   const i18n = await getServerI18n(locale);
@@ -17,6 +18,8 @@ export async function SiteHeader({ locale }: { locale: SupportedLocale }) {
     faq: i18n._("FAQ"),
     download: i18n._("下载"),
     startNow: i18n._("免费开始"),
+    menuOpen: i18n._("打开菜单"),
+    menuClose: i18n._("关闭菜单"),
   };
 
   return (
@@ -27,11 +30,11 @@ export async function SiteHeader({ locale }: { locale: SupportedLocale }) {
             aria-hidden="true"
             className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-(--brand-gradient) text-base font-semibold text-white shadow-(--shadow-soft)"
           >
-            <Image src="/favicon.png" alt="" aria-hidden="true" width={28} height={28} priority className="rounded-lg" />
+            <Image src="/favicon.png" alt="" aria-hidden="true" width={28} height={28} className="rounded-lg" />
           </span>
           <span className="min-w-0">
             <span className="block text-sm font-semibold text-(--text-primary)">隐界</span>
-            <span className="block text-[11px] tracking-wide text-(--text-muted)">Enclave</span>
+            <span className="hidden text-[11px] tracking-wide text-(--text-muted) sm:block">Enclave</span>
           </span>
         </Link>
 
@@ -59,11 +62,14 @@ export async function SiteHeader({ locale }: { locale: SupportedLocale }) {
             href={siteLinks.app}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-(--brand-primary) px-3 text-sm font-semibold text-white transition hover:bg-(--brand-secondary) shadow-(--shadow-soft) sm:px-4"
+            data-cta="signup"
+            data-cta-location="header"
+            className="hidden min-h-9 items-center justify-center gap-1.5 rounded-lg bg-(--brand-primary) px-4 text-sm font-semibold text-white transition hover:bg-(--brand-secondary) shadow-(--shadow-soft) sm:inline-flex"
           >
-            <span className="hidden sm:inline">{labels.startNow}</span>
+            <span>{labels.startNow}</span>
             <ArrowRight size={16} />
           </a>
+          <SiteMobileMenu locale={locale} labels={labels} />
         </div>
       </div>
     </header>
