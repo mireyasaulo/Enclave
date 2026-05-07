@@ -1135,9 +1135,9 @@ export function CharacterDetailPage() {
     <AppPage
       className={cn(
         "min-h-full space-y-0 bg-[#ededed] px-0 py-0 text-[color:var(--text-primary)]",
-        !isDesktopLayout
-          ? "flex h-full min-h-0 flex-col overflow-hidden"
-          : undefined,
+        isDesktopLayout
+          ? "h-full overflow-y-auto"
+          : "flex h-full min-h-0 flex-col overflow-hidden",
       )}
     >
       <header
