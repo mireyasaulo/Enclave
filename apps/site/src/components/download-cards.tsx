@@ -14,6 +14,7 @@ import type { SupportedLocale } from "@/lib/locales";
 import { siteLinks } from "@/lib/site-links";
 
 type DownloadCard = {
+  slug: "web" | "windows" | "macos" | "ios-android" | "wechat" | "self-hosted";
   icon: LucideIcon;
   titleZh: string;
   hintZh: string;
@@ -29,6 +30,7 @@ export async function DownloadCards({ locale }: { locale: SupportedLocale }) {
 
   const cards: DownloadCard[] = [
     {
+      slug: "web",
       icon: Globe,
       titleZh: "网页版（推荐）",
       hintZh: "打开浏览器即用，无需安装；最快开始体验隐界",
@@ -39,6 +41,7 @@ export async function DownloadCards({ locale }: { locale: SupportedLocale }) {
       highlight: true,
     },
     {
+      slug: "windows",
       icon: AppWindow,
       titleZh: "Windows 桌面端",
       hintZh: "原生体验，含托盘和锁屏，适合长期重度使用",
@@ -48,6 +51,7 @@ export async function DownloadCards({ locale }: { locale: SupportedLocale }) {
       available: true,
     },
     {
+      slug: "macos",
       icon: Apple,
       titleZh: "macOS 桌面端",
       hintZh: "适配 Apple Silicon 与 Intel",
@@ -57,6 +61,7 @@ export async function DownloadCards({ locale }: { locale: SupportedLocale }) {
       available: true,
     },
     {
+      slug: "ios-android",
       icon: Smartphone,
       titleZh: "iOS / Android",
       hintZh: "原生移动端 App，敬请期待",
@@ -66,6 +71,7 @@ export async function DownloadCards({ locale }: { locale: SupportedLocale }) {
       available: false,
     },
     {
+      slug: "wechat",
       icon: MessageCircle,
       titleZh: "微信小程序",
       hintZh: "适配国内场景，敬请期待",
@@ -75,6 +81,7 @@ export async function DownloadCards({ locale }: { locale: SupportedLocale }) {
       available: false,
     },
     {
+      slug: "self-hosted",
       icon: Github,
       titleZh: "自部署（高级）",
       hintZh: "完全开源、MIT 协议；如果你想拥有 100% 自主权可以自己跑一份",
@@ -122,7 +129,7 @@ export async function DownloadCards({ locale }: { locale: SupportedLocale }) {
                 target={card.external ? "_blank" : undefined}
                 rel={card.external ? "noreferrer" : undefined}
                 data-cta="download"
-                data-cta-location={`download_card_${card.titleZh}`}
+                data-cta-location={`download_card_${card.slug}`}
                 className={
                   card.highlight
                     ? "inline-flex items-center justify-center gap-1.5 rounded-lg bg-(--brand-primary) px-3 py-2 text-sm font-semibold text-white transition hover:bg-(--brand-secondary)"

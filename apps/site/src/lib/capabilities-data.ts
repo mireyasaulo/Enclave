@@ -50,7 +50,7 @@ export const CAPABILITIES: Capability[] = [
   },
   {
     icon: StickyNote,
-    titleZh: "笔记工作区（桌面）",
+    titleZh: "笔记工作区（多窗口）",
     descZh: "桌面端多窗口笔记，灵感随手记，无缝同步、不受应用边界约束。",
   },
   {
