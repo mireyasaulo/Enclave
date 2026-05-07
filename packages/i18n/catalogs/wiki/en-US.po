@@ -1148,7 +1148,7 @@ msgstr "After (current edit)"
 
 #: apps/wiki/src/components/snapshot-diff.tsx:27
 msgid "新"
-msgstr ""
+msgstr "New"
 
 #: apps/wiki/src/components/risk-badge.tsx:28
 #: apps/wiki/src/lib/auth-store.ts:82
@@ -1203,7 +1203,7 @@ msgstr "Daily creation/review counts, top reverted users, and 7-day filter hit v
 
 #: apps/wiki/src/components/snapshot-diff.tsx:26
 msgid "旧"
-msgstr ""
+msgstr "Old"
 
 #: apps/wiki/src/routes/character-diff-page.tsx:63
 msgid "旧角色逻辑"
@@ -1260,7 +1260,7 @@ msgstr "Open"
 
 #: apps/wiki/src/components/snapshot-diff.tsx:28
 msgid "未检测到字段变化。"
-msgstr ""
+msgstr "No field changes detected."
 
 #: apps/wiki/src/routes/admin-stats-page.tsx:68
 msgid "本周新晋自动确认"

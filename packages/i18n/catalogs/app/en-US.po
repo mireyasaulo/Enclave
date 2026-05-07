@@ -5219,6 +5219,7 @@ msgstr "Functional issue"
 
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:208
 #: apps/app/src/routes/discover-feed-page.tsx:977
+#: apps/app/src/routes/moments-page.tsx:1057
 msgid "加为好友后才能互动"
 msgstr "Add as friend before interacting"
 
