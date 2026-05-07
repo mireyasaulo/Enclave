@@ -9,6 +9,7 @@ import {
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Phone, Users, Video } from "lucide-react";
 import { type StickerAttachment } from "@yinjie/contracts";
+import { track } from "@yinjie/analytics";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { ChatComposer } from "../../components/chat-composer";
 import { FeatureUnavailableDialog } from "../../components/feature-unavailable-dialog";
@@ -312,6 +313,12 @@ export function ConversationThreadPanel({
     await sendTextMessage(
       replyDraft ? encodeChatReplyText(text, replyDraft) : undefined,
     );
+    track("chat_message_sent", {
+      conversationKind: "direct",
+      kind: "text",
+      hasReply: Boolean(replyDraft),
+      textLength: text.length,
+    });
     scrollToBottom("smooth");
     setReplyDraft(null);
   };
@@ -320,6 +327,11 @@ export function ConversationThreadPanel({
     await sendTextMessage(
       replyDraft ? encodeChatReplyText(presetText, replyDraft) : presetText,
     );
+    track("chat_message_sent", {
+      conversationKind: "direct",
+      kind: "preset",
+      hasReply: Boolean(replyDraft),
+    });
     scrollToBottom("smooth");
     setReplyDraft(null);
   };
@@ -329,6 +341,11 @@ export function ConversationThreadPanel({
       sticker,
       replyDraft ? encodeChatReplyText("", replyDraft) : undefined,
     );
+    track("chat_message_sent", {
+      conversationKind: "direct",
+      kind: "sticker",
+      hasReply: Boolean(replyDraft),
+    });
     scrollToBottom("smooth");
     setReplyDraft(null);
   };
@@ -340,6 +357,12 @@ export function ConversationThreadPanel({
       payload,
       replyDraft ? encodeChatReplyText("", replyDraft) : undefined,
     );
+    track("chat_message_sent", {
+      conversationKind: "direct",
+      kind: "attachment",
+      attachmentType: payload?.type ?? null,
+      hasReply: Boolean(replyDraft),
+    });
     scrollToBottom("smooth");
     setReplyDraft(null);
   };

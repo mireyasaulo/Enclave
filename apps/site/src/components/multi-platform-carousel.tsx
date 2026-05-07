@@ -2,13 +2,43 @@ import Image from "next/image";
 import { getServerI18n } from "@/i18n/server";
 import type { SupportedLocale } from "@/lib/locales";
 
-const SHOTS: Array<{ key: string; titleZh: string; descZh: string }> = [
-  { key: "chat", titleZh: "聊天", descZh: "线程化对话与消息提醒" },
-  { key: "moments", titleZh: "朋友圈", descZh: "AI 与人共同的时间线" },
-  { key: "feed", titleZh: "频道流", descZh: "频道、视频号、官方账号" },
-  { key: "group", titleZh: "群组", descZh: "多人对话与角色互动" },
-  { key: "onboarding", titleZh: "入坑引导", descZh: "新人启动与世界初始化" },
-  { key: "self-character", titleZh: "我的角色", descZh: "你与 AI 化身的资料卡" },
+const SHOTS: Array<{ key: string; titleZh: string; descZh: string; altZh: string }> = [
+  {
+    key: "chat",
+    titleZh: "聊天",
+    descZh: "线程化对话与消息提醒",
+    altZh: "隐界聊天界面：与 AI 角色的线程化对话、消息提醒、强提醒、已读标记",
+  },
+  {
+    key: "moments",
+    titleZh: "朋友圈",
+    descZh: "AI 与人共同的时间线",
+    altZh: "隐界朋友圈：AI 角色与你共享的私人时间线，会主动发动态与互动",
+  },
+  {
+    key: "feed",
+    titleZh: "频道流",
+    descZh: "频道、视频号、官方账号",
+    altZh: "隐界频道流：频道、视频号、官方账号的内容聚合界面",
+  },
+  {
+    key: "group",
+    titleZh: "群组",
+    descZh: "多人对话与角色互动",
+    altZh: "隐界群组：多 AI 角色与你的多人对话场景",
+  },
+  {
+    key: "onboarding",
+    titleZh: "入坑引导",
+    descZh: "新人启动与世界初始化",
+    altZh: "隐界新人引导：首次进入虚拟世界的角色初始化与世界设定",
+  },
+  {
+    key: "self-character",
+    titleZh: "我的角色",
+    descZh: "你与 AI 化身的资料卡",
+    altZh: "隐界我的角色：你与 AI 化身的资料卡、个性、形象设定",
+  },
 ];
 
 export async function MultiPlatformCarousel({ locale }: { locale: SupportedLocale }) {
@@ -38,7 +68,7 @@ export async function MultiPlatformCarousel({ locale }: { locale: SupportedLocal
               <div className="relative aspect-[3/4] bg-(--surface-soft)">
                 <Image
                   src={`/screenshots/${locale}/${shot.key}.png`}
-                  alt={i18n._(shot.titleZh)}
+                  alt={i18n._(shot.altZh)}
                   fill
                   sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 100vw"
                   className="object-cover object-top transition group-hover:scale-[1.01]"

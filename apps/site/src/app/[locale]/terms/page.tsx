@@ -8,6 +8,10 @@ import {
   pageUrl,
 } from "@/lib/seo-metadata";
 import { BreadcrumbsJsonLd } from "@/components/seo/breadcrumbs-json-ld";
+import { ArticleJsonLd } from "@/components/seo/article-json-ld";
+
+const TERMS_PUBLISHED = "2026-05-07";
+const TERMS_MODIFIED = "2026-05-07";
 
 export async function generateMetadata({
   params,
@@ -52,6 +56,14 @@ export default async function TermsPage({
       <BreadcrumbsJsonLd
         locale={safeLocale}
         trail={[{ titleZh: "服务条款", segment: "terms" }]}
+      />
+      <ArticleJsonLd
+        locale={safeLocale}
+        segment="terms"
+        headlineZh="服务条款"
+        descriptionZh="隐界 Enclave 服务条款：开源协议、合理使用、订阅与计费、免责声明。"
+        datePublished={TERMS_PUBLISHED}
+        dateModified={TERMS_MODIFIED}
       />
       <header>
         <h1 className="text-3xl font-bold sm:text-4xl">{i18n._("服务条款")}</h1>

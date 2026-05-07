@@ -8,6 +8,10 @@ import {
   pageUrl,
 } from "@/lib/seo-metadata";
 import { BreadcrumbsJsonLd } from "@/components/seo/breadcrumbs-json-ld";
+import { ArticleJsonLd } from "@/components/seo/article-json-ld";
+
+const PRIVACY_PUBLISHED = "2026-05-07";
+const PRIVACY_MODIFIED = "2026-05-07";
 
 export async function generateMetadata({
   params,
@@ -52,6 +56,14 @@ export default async function PrivacyPage({
       <BreadcrumbsJsonLd
         locale={safeLocale}
         trail={[{ titleZh: "隐私政策", segment: "privacy" }]}
+      />
+      <ArticleJsonLd
+        locale={safeLocale}
+        segment="privacy"
+        headlineZh="隐私政策"
+        descriptionZh="隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。"
+        datePublished={PRIVACY_PUBLISHED}
+        dateModified={PRIVACY_MODIFIED}
       />
       <header>
         <h1 className="text-3xl font-bold sm:text-4xl">{i18n._("隐私政策")}</h1>

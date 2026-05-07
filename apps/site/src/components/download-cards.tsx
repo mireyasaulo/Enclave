@@ -121,6 +121,8 @@ export async function DownloadCards({ locale }: { locale: SupportedLocale }) {
                 href={card.href}
                 target={card.external ? "_blank" : undefined}
                 rel={card.external ? "noreferrer" : undefined}
+                data-cta="download"
+                data-cta-location={`download_card_${card.titleZh}`}
                 className={
                   card.highlight
                     ? "inline-flex items-center justify-center gap-1.5 rounded-lg bg-(--brand-primary) px-3 py-2 text-sm font-semibold text-white transition hover:bg-(--brand-secondary)"

@@ -170,6 +170,13 @@ const TRANSLATIONS = [
   ["隐界 Enclave", "Enclave", "隐界 Enclave", "엔클레이브 Enclave"],
   ["首页", "Home", "ホーム", "홈"],
   ["隐界核心闭环演示动图：聊天、朋友圈、群聊、电话、笔记一气呵成", "Enclave core loop demo: chats, moments, groups, calls and notes flowing together", "エンクレイブのコアループ：チャット、モーメンツ、グループ、通話、ノートが一連の流れに", "엔클레이브 핵심 루프 데모: 채팅, 모먼트, 그룹, 통화, 노트가 자연스럽게 이어집니다"],
+  // ===== Image SEO: descriptive screenshot alts =====
+  ["隐界聊天界面：与 AI 角色的线程化对话、消息提醒、强提醒、已读标记", "Enclave chat screen: threaded AI character conversations with reminders, strong alerts, and read receipts", "エンクレイブのチャット画面：AI キャラクターとのスレッド会話、リマインダー、強通知、既読表示", "엔클레이브 채팅 화면: AI 캐릭터와의 스레드 대화, 알림, 강력한 알림, 읽음 표시"],
+  ["隐界朋友圈：AI 角色与你共享的私人时间线，会主动发动态与互动", "Enclave moments: a private timeline shared with AI characters who post and react on their own", "エンクレイブのモーメンツ：AI キャラクターと共有するプライベートタイムライン、自発的に投稿・反応", "엔클레이브 모먼트: AI 캐릭터와 공유하는 프라이빗 타임라인, 자발적으로 게시하고 반응합니다"],
+  ["隐界频道流：频道、视频号、官方账号的内容聚合界面", "Enclave channels feed: aggregated channels, video accounts, and official-account content", "エンクレイブのチャンネル：チャンネル、ビデオアカウント、公式アカウントを集約した画面", "엔클레이브 채널 피드: 채널, 비디오 계정, 공식 계정을 집약한 화면"],
+  ["隐界群组：多 AI 角色与你的多人对话场景", "Enclave groups: multi-party rooms where you and several AI characters chat together", "エンクレイブのグループ：複数の AI キャラクターとあなたが集まる多人数チャット", "엔클레이브 그룹: 여러 AI 캐릭터와 함께하는 다자 대화 방"],
+  ["隐界新人引导：首次进入虚拟世界的角色初始化与世界设定", "Enclave onboarding: the first-time character setup and world bootstrap flow", "エンクレイブのオンボーディング：初回のキャラクター設定と世界の立ち上げ", "엔클레이브 온보딩: 첫 진입 시 캐릭터 설정과 세계 초기화 화면"],
+  ["隐界我的角色：你与 AI 化身的资料卡、个性、形象设定", "Enclave self character: profile cards, personality, and appearance for you and your AI avatar", "エンクレイブの「マイキャラ」：あなたと AI 分身のプロフィール、性格、ビジュアル設定", "엔클레이브 내 캐릭터: 당신과 AI 아바타의 프로필, 성격, 비주얼 설정"],
 ];
 
 const LOCALES = ["zh-CN", "en-US", "ja-JP", "ko-KR"];

@@ -9,6 +9,7 @@ import {
   getMyCloudSubscription,
 } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
+import { track } from "@yinjie/analytics";
 import {
   AppSection,
   Button,
@@ -373,6 +374,12 @@ export function SubscriptionPanel({
   const checkoutMutation = useMutation({
     mutationFn: ({ planCode }: { planCode: string; planName: string }) =>
       createCheckout({ planCode }, accessToken ?? ""),
+    onMutate: (variables) => {
+      track("pay_checkout_initiated", {
+        planCode: variables.planCode,
+        planName: variables.planName,
+      });
+    },
     onSuccess: (result, variables) => {
       setCheckoutError("");
       const hint =
@@ -383,12 +390,20 @@ export function SubscriptionPanel({
         contact: result.contact ?? "",
         planName: variables.planName,
       });
+      track("pay_checkout_success", {
+        planCode: variables.planCode,
+        planName: variables.planName,
+      });
     },
-    onError: (error) => {
+    onError: (error, variables) => {
       setContactDialog((prev) => ({ ...prev, open: false }));
       setCheckoutError(
         describeRequestError(error, t(msg`提交开通申请失败，请稍后重试。`)),
       );
+      track("pay_checkout_fail", {
+        planCode: variables.planCode,
+        message: error instanceof Error ? error.message.slice(0, 200) : null,
+      });
     },
   });
 

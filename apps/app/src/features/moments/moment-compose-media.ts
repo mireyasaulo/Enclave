@@ -11,6 +11,7 @@ import {
   type MomentImageAsset,
   type MomentVideoAsset,
 } from "@yinjie/contracts";
+import { track } from "@yinjie/analytics";
 
 const MAX_IMAGE_COUNT = 9;
 const MAX_VIDEO_DURATION_MS = 5 * 60 * 1000;
@@ -160,7 +161,14 @@ export async function publishMomentComposeDraft(input: {
   baseUrl?: string;
 }): Promise<Moment> {
   const payload = await buildMomentCreateRequest(input);
-  return createUserMoment(payload, input.baseUrl);
+  const moment = await createUserMoment(payload, input.baseUrl);
+  track("moment_published", {
+    imageCount: input.imageDrafts.length,
+    hasVideo: Boolean(input.videoDraft),
+    hasLocation: Boolean(input.location?.trim()),
+    textLength: input.text.length,
+  });
+  return moment;
 }
 
 export async function publishFeedComposeDraft(input: {
@@ -173,7 +181,14 @@ export async function publishFeedComposeDraft(input: {
   baseUrl?: string;
 }): Promise<FeedPost> {
   const payload = await buildFeedCreateRequest(input);
-  return createFeedPost(payload, input.baseUrl);
+  const post = await createFeedPost(payload, input.baseUrl);
+  track("feed_post_published", {
+    surface: input.surface ?? null,
+    imageCount: input.imageDrafts.length,
+    hasVideo: Boolean(input.videoDraft),
+    topicTagCount: input.topicTags?.length ?? 0,
+  });
+  return post;
 }
 
 export function formatMomentDurationLabel(durationMs?: number) {

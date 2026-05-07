@@ -43,6 +43,8 @@ export async function HeroSection({ locale }: { locale: SupportedLocale }) {
               href={siteLinks.app}
               target="_blank"
               rel="noreferrer"
+              data-cta="signup"
+              data-cta-location="hero"
               className="inline-flex items-center gap-2 rounded-xl bg-(--brand-primary) px-5 py-3 text-sm font-semibold text-white shadow-(--shadow-soft) transition hover:bg-(--brand-secondary)"
             >
               {labels.cta1}
@@ -50,6 +52,8 @@ export async function HeroSection({ locale }: { locale: SupportedLocale }) {
             </a>
             <a
               href="#capabilities"
+              data-cta="explore"
+              data-cta-location="hero"
               className="inline-flex items-center gap-2 rounded-xl border border-(--border-subtle) bg-(--surface-card) px-5 py-3 text-sm font-semibold text-(--text-primary) transition hover:border-(--brand-primary)"
             >
               {labels.cta2}

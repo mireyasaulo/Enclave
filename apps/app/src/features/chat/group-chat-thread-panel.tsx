@@ -25,6 +25,7 @@ import {
   uploadChatAttachment,
 } from "@yinjie/contracts";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
+import { track } from "@yinjie/analytics";
 import { ChatComposer } from "../../components/chat-composer";
 import { FeatureUnavailableDialog } from "../../components/feature-unavailable-dialog";
 import { ChatMessageList } from "../../components/chat-message-list";
@@ -802,10 +803,18 @@ export function GroupChatThreadPanel({
   };
 
   const handleSubmit = async () => {
+    const submittedText = text;
+    const hadReply = Boolean(replyDraft);
     setText("");
     setReplyDraft(null);
     await submitOutgoingGroupMessage({
-      text: replyDraft ? encodeChatReplyText(text, replyDraft) : text.trim(),
+      text: replyDraft ? encodeChatReplyText(submittedText, replyDraft) : submittedText.trim(),
+    });
+    track("chat_message_sent", {
+      conversationKind: "group",
+      kind: "text",
+      hasReply: hadReply,
+      textLength: submittedText.length,
     });
     scrollToBottom("smooth");
   };

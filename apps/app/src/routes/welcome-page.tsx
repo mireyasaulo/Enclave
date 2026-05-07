@@ -22,6 +22,7 @@ import {
   type WorldAccessSessionSummary,
 } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
+import { track } from "@yinjie/analytics";
 import { AppPage, AppSection, Button, ErrorBlock, InlineNotice, LoadingBlock, TextField } from "@yinjie/ui";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { getDeviceFingerprint } from "../lib/device-fingerprint";
@@ -670,6 +671,10 @@ export function WelcomePage() {
             phone: null,
             profile: null,
           });
+          track(
+            authMode === "register" ? "register_success" : "login_success",
+            { method: "email" },
+          );
         } else {
           const verifyResult = await verifyCloudPhoneCode(
             {
@@ -691,6 +696,10 @@ export function WelcomePage() {
             phone: verifyResult.phone,
             profile: null,
           });
+          track(
+            authMode === "register" ? "register_success" : "login_success",
+            { method: "phone" },
+          );
         }
       }
 
@@ -734,6 +743,11 @@ export function WelcomePage() {
     } catch (error) {
       setReadyBaseUrl(null);
       setEntryError(describeRequestError(error, t(msg`解析云世界访问失败。`)));
+      track("login_fail", {
+        method: accountType,
+        authMode,
+        message: error instanceof Error ? error.message.slice(0, 200) : null,
+      });
     } finally {
       setIsContinuing(false);
     }

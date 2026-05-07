@@ -42,6 +42,8 @@ export async function GetStartedCta({ locale }: { locale: SupportedLocale }) {
                 href={siteLinks.app}
                 target="_blank"
                 rel="noreferrer"
+                data-cta="signup"
+                data-cta-location="get_started"
                 className="inline-flex items-center gap-2 rounded-xl bg-(--brand-primary) px-6 py-3 text-sm font-semibold text-white shadow-(--shadow-soft) transition hover:bg-(--brand-secondary)"
               >
                 {labels.cta1}
@@ -49,6 +51,8 @@ export async function GetStartedCta({ locale }: { locale: SupportedLocale }) {
               </a>
               <a
                 href="#cross-platform"
+                data-cta="download"
+                data-cta-location="get_started"
                 className="inline-flex items-center gap-2 rounded-xl border border-(--border-subtle) bg-(--surface-card) px-6 py-3 text-sm font-semibold text-(--text-primary) transition hover:border-(--brand-primary)"
               >
                 {labels.cta2}
