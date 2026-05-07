@@ -1,5 +1,7 @@
 import type { TypeOrmModuleOptions } from "@nestjs/typeorm";
 import type { DataSourceOptions } from "typeorm";
+import { ClientTelemetryDailyEntity } from "../entities/client-telemetry-daily.entity";
+import { ClientTelemetryEventEntity } from "../entities/client-telemetry-event.entity";
 import { CloudAdminSessionEntity } from "../entities/cloud-admin-session.entity";
 import { CloudConfigEntity } from "../entities/cloud-config.entity";
 import { CloudFeedbackEntity } from "../entities/cloud-feedback.entity";
@@ -37,6 +39,7 @@ import { AddEmailAuth1776653400000 } from "./migrations/1776653400000-add-email-
 import { CreateCloudFeedbackTable1776654000000 } from "./migrations/1776654000000-create-cloud-feedback-table";
 import { MakeCloudUsersPhoneNullable1776654600000 } from "./migrations/1776654600000-make-cloud-users-phone-nullable";
 import { UpdateAppPublicBaseUrl1776655200000 } from "./migrations/1776655200000-update-app-public-base-url";
+import { CreateTelemetryTables1776655800000 } from "./migrations/1776655800000-create-telemetry-tables";
 import { resolveCloudDatabasePath } from "../config/cloud-runtime-config";
 
 type ConfigReader = {
@@ -66,6 +69,8 @@ export const cloudEntities = [
   RevenueAllocationLedgerEntity,
   RevenueSettlementBatchEntity,
   CloudFeedbackEntity,
+  ClientTelemetryEventEntity,
+  ClientTelemetryDailyEntity,
 ] as const;
 
 export const cloudMigrations = [
@@ -84,6 +89,7 @@ export const cloudMigrations = [
   CreateCloudFeedbackTable1776654000000,
   MakeCloudUsersPhoneNullable1776654600000,
   UpdateAppPublicBaseUrl1776655200000,
+  CreateTelemetryTables1776655800000,
 ];
 
 export function buildCloudDataSourceOptions(config: ConfigReader): DataSourceOptions {
