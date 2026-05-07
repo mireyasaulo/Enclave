@@ -221,7 +221,7 @@ export function MobileMiniProgramsWorkspace({
           <div className="relative">
             <div className="flex items-start justify-between gap-3.5">
               <div className="min-w-0">
-                <div className="inline-flex rounded-full border border-white/18 bg-white/12 px-2 py-0.5 text-[9px] font-medium tracking-[0.12em] text-white/82">
+                <div className="inline-flex rounded-full border border-white/18 bg-white/12 px-2 py-0.5 text-[11px] font-medium tracking-[0.12em] text-white/82">
                   {selectedMiniProgram.badge}
                 </div>
                 <div className="mt-2.5 text-[22px] font-semibold leading-tight text-white">
@@ -247,7 +247,7 @@ export function MobileMiniProgramsWorkspace({
               {selectedMiniProgram.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full border border-white/18 bg-white/10 px-2 py-0.5 text-[9px] text-white/82"
+                  className="rounded-full border border-white/18 bg-white/10 px-2 py-0.5 text-[11px] text-white/82"
                 >
                   {tag}
                 </span>
@@ -309,7 +309,7 @@ export function MobileMiniProgramsWorkspace({
               <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
                 最近使用
               </div>
-              <div className="mt-0.5 text-[9px] leading-4 text-[color:var(--text-muted)]">
+              <div className="mt-0.5 text-[11px] leading-4 text-[color:var(--text-muted)]">
                 模拟微信里最近打开的小程序快捷入口。
               </div>
             </div>
@@ -343,7 +343,7 @@ export function MobileMiniProgramsWorkspace({
               <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
                 我的小程序
               </div>
-              <div className="mt-0.5 text-[9px] leading-4 text-[color:var(--text-muted)]">
+              <div className="mt-0.5 text-[11px] leading-4 text-[color:var(--text-muted)]">
                 这里承接微信式固定常用入口。
               </div>
             </div>
@@ -415,7 +415,7 @@ export function MobileMiniProgramsWorkspace({
                     </div>
                     <div
                       className={cn(
-                        "rounded-full border px-2 py-0.5 text-[9px] font-medium",
+                        "rounded-full border px-2 py-0.5 text-[11px] font-medium",
                         tone.badgeClassName,
                       )}
                     >
@@ -437,7 +437,7 @@ export function MobileMiniProgramsWorkspace({
               <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
                 全部小程序
               </div>
-              <div className="mt-0.5 text-[9px] leading-4 text-[color:var(--text-muted)]">
+              <div className="mt-0.5 text-[11px] leading-4 text-[color:var(--text-muted)]">
                 {searchText
                   ? `搜索“${searchText.trim()}”命中 ${visibleMiniPrograms.length} 个结果。`
                   : "按分类浏览当前可用的小程序目录。"}
@@ -533,7 +533,7 @@ function MobileFeatureComingSoonOverlay({ onBack }: { onBack: () => void }) {
 function MobileMetric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-[15px] border border-white/18 bg-white/12 px-2.5 py-2.25 backdrop-blur-sm">
-      <div className="text-[9px] uppercase tracking-[0.12em] text-white/68">
+      <div className="text-[11px] uppercase tracking-[0.12em] text-white/68">
         {label}
       </div>
       <div className="mt-1 text-[12px] font-medium leading-5 text-white">
@@ -556,7 +556,7 @@ function MobileMiniProgramsStatusCard({
 }) {
   return (
     <section className="rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] px-3.5 py-4 text-center shadow-none">
-      <div className="mx-auto inline-flex rounded-full bg-[rgba(7,193,96,0.1)] px-2 py-0.5 text-[8px] font-medium tracking-[0.04em] text-[#07c160]">
+      <div className="mx-auto inline-flex rounded-full bg-[rgba(7,193,96,0.1)] px-2 py-0.5 text-[10px] font-medium tracking-[0.04em] text-[#07c160]">
         {badge}
       </div>
       <div className="mt-2.5 text-[14px] font-medium text-[color:var(--text-primary)]">
@@ -663,7 +663,7 @@ function MiniProgramListCard({
             </div>
             <div
               className={cn(
-                "rounded-full border px-2 py-0.5 text-[9px] font-medium",
+                "rounded-full border px-2 py-0.5 text-[11px] font-medium",
                 tone.badgeClassName,
               )}
             >

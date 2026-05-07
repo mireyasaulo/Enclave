@@ -1156,7 +1156,7 @@ export function GamesPage() {
                           正在玩 {game.name}
                         </span>
                         {friendInviteStatusByActivityId[activity.id] ? (
-                          <span className="rounded-full bg-[rgba(47,122,63,0.1)] px-2 py-0.5 text-[9px] text-[#2f7a3f]">
+                          <span className="rounded-full bg-[rgba(47,122,63,0.1)] px-2 py-0.5 text-[11px] text-[#2f7a3f]">
                             已邀约
                           </span>
                         ) : null}
@@ -1228,14 +1228,14 @@ export function GamesPage() {
                       <div className="flex items-center gap-2">
                         <div
                           className={cn(
-                            "rounded-full border px-2 py-0.5 text-[9px] font-medium",
+                            "rounded-full border px-2 py-0.5 text-[11px] font-medium",
                             tone.badgeClassName,
                           )}
                         >
                           {game.deckLabel}
                         </div>
                         {pinned ? (
-                          <div className="rounded-full bg-[rgba(47,122,63,0.1)] px-2 py-0.5 text-[9px] text-[#2f7a3f]">
+                          <div className="rounded-full bg-[rgba(47,122,63,0.1)] px-2 py-0.5 text-[11px] text-[#2f7a3f]">
                             常玩
                           </div>
                         ) : null}
@@ -1296,7 +1296,7 @@ export function GamesPage() {
                           {event.title}
                         </div>
                         {engaged ? (
-                          <div className="rounded-full bg-white/84 px-2 py-0.5 text-[9px] text-[color:var(--text-muted)]">
+                          <div className="rounded-full bg-white/84 px-2 py-0.5 text-[11px] text-[color:var(--text-muted)]">
                             {getGameCenterEventStatusLabel(event)}
                           </div>
                         ) : null}

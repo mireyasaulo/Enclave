@@ -107,14 +107,14 @@ export function MiniProgramOpenPanel({
               <div
                 className={cn(
                   compact
-                    ? "rounded-full border px-2 py-0.5 text-[9px] font-medium"
+                    ? "rounded-full border px-2 py-0.5 text-[11px] font-medium"
                     : "rounded-full border px-2.5 py-1 text-[10px] font-medium",
                   tone.badgeClassName,
                 )}
               >
                 {isActive ? "已打开" : "待打开"}
               </div>
-              <div className={cn("text-[color:var(--text-muted)]", compact ? "text-[9px]" : "text-[11px]")}>
+              <div className={cn("text-[color:var(--text-muted)]", compact ? "text-[11px]" : "text-[11px]")}>
                 {isActive ? "最近一次打开的小程序面板" : "点击后写入最近使用和打开态"}
               </div>
             </div>
@@ -245,7 +245,7 @@ export function MiniProgramOpenPanel({
                         <span
                           className={cn(
                             "rounded-full bg-[rgba(47,122,63,0.1)] text-[#2f7a3f]",
-                            compact ? "px-1.5 py-0.5 text-[8px]" : "px-2.5 py-1 text-[10px]",
+                            compact ? "px-1.5 py-0.5 text-[10px]" : "px-2.5 py-1 text-[10px]",
                           )}
                         >
                           已完成
@@ -351,7 +351,7 @@ function PanelMetric({
       <div
         className={cn(
           "flex items-center gap-2 uppercase text-[color:var(--text-muted)]",
-          compact ? "text-[9px] tracking-[0.12em]" : "text-[11px] tracking-[0.14em]",
+          compact ? "text-[11px] tracking-[0.12em]" : "text-[11px] tracking-[0.14em]",
         )}
       >
         {icon}
@@ -369,7 +369,7 @@ function PanelMetric({
         <div
           className={cn(
             "text-[color:var(--text-dim)]",
-            compact ? "mt-0.5 text-[9px] leading-4" : "mt-1 text-[11px] leading-5",
+            compact ? "mt-0.5 text-[11px] leading-4" : "mt-1 text-[11px] leading-5",
           )}
         >
           {detail}
