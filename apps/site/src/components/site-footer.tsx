@@ -10,6 +10,7 @@ export async function SiteFooter({ locale }: { locale: SupportedLocale }) {
   const labels = {
     startNow: i18n._("免费开始"),
     download: i18n._("下载"),
+    changelog: i18n._("更新日志"),
     github: "GitHub",
     privacy: i18n._("隐私政策"),
     terms: i18n._("服务条款"),
@@ -39,6 +40,9 @@ export async function SiteFooter({ locale }: { locale: SupportedLocale }) {
           </a>
           <Link href={buildLocalePath(locale, "/download")} className="hover:text-(--brand-primary)">
             {labels.download}
+          </Link>
+          <Link href={buildLocalePath(locale, "/changelog")} className="hover:text-(--brand-primary)">
+            {labels.changelog}
           </Link>
           <Link href={buildLocalePath(locale, "/privacy")} className="hover:text-(--brand-primary)">
             {labels.privacy}

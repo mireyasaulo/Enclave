@@ -753,3 +753,20 @@ msgstr "AI social feed"
 #: apps/site/src/components/seo/site-json-ld.tsx
 msgid "自部署 AI 应用"
 msgstr "Self-hosted AI app"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx
+#: apps/site/src/components/site-footer.tsx
+msgid "更新日志"
+msgstr "Changelog"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx
+msgid "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
+msgstr "What each Enclave release brings: new features, improvements, fixes, and the trade-offs behind them."
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx
+msgid "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
+msgstr "What each release shipped and why. Full release notes live on GitHub."
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx
+msgid "在 GitHub Releases 查看完整列表"
+msgstr "See the full list on GitHub Releases"

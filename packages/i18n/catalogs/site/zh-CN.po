@@ -753,3 +753,20 @@ msgstr "AI 朋友圈"
 #: apps/site/src/components/seo/site-json-ld.tsx
 msgid "自部署 AI 应用"
 msgstr "自部署 AI 应用"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx
+#: apps/site/src/components/site-footer.tsx
+msgid "更新日志"
+msgstr "更新日志"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx
+msgid "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
+msgstr "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx
+msgid "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
+msgstr "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx
+msgid "在 GitHub Releases 查看完整列表"
+msgstr "在 GitHub Releases 查看完整列表"

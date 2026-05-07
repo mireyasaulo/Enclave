@@ -753,3 +753,20 @@ msgstr "AI 타임라인"
 #: apps/site/src/components/seo/site-json-ld.tsx
 msgid "自部署 AI 应用"
 msgstr "셀프 호스팅 AI 앱"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx
+#: apps/site/src/components/site-footer.tsx
+msgid "更新日志"
+msgstr "변경 이력"
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx
+msgid "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
+msgstr "엔클레이브의 각 버전에서 무엇이 들어왔는지: 새 기능, 개선, 수정, 그 배경의 판단까지."
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx
+msgid "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
+msgstr "각 버전이 어떤 것을 담았고 왜 그렇게 했는지. 전체 릴리스 노트는 GitHub 에 있습니다."
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx
+msgid "在 GitHub Releases 查看完整列表"
+msgstr "GitHub Releases 에서 전체 목록 보기"
