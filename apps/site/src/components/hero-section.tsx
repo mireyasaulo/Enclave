@@ -77,7 +77,7 @@ export async function HeroSection({ locale }: { locale: SupportedLocale }) {
 
         <div className="relative lg:col-span-6">
           <div className="relative overflow-hidden rounded-3xl border border-(--border-subtle) bg-(--surface-card) shadow-(--shadow-shell)">
-            <div className="flex items-center gap-1.5 border-b border-(--border-faint) px-4 py-2.5">
+            <div className="flex items-center gap-1.5 border-b border-(--border-faint) px-4 py-2.5" aria-hidden="true">
               <span className="size-2.5 rounded-full bg-rose-300/80" />
               <span className="size-2.5 rounded-full bg-amber-300/80" />
               <span className="size-2.5 rounded-full bg-emerald-300/80" />

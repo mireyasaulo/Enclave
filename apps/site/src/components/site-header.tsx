@@ -23,8 +23,11 @@ export async function SiteHeader({ locale }: { locale: SupportedLocale }) {
     <header className="sticky top-0 z-40 border-b border-(--border-subtle) bg-(--surface-shell) backdrop-blur-xl">
       <div className="mx-auto flex min-h-[64px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <Link href={home} className="flex min-w-0 items-center gap-2.5" aria-label="Enclave home">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-(--brand-gradient) text-base font-semibold text-white shadow-(--shadow-soft)">
-            <Image src="/favicon.png" alt="" width={28} height={28} className="rounded-lg" />
+          <span
+            aria-hidden="true"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-(--brand-gradient) text-base font-semibold text-white shadow-(--shadow-soft)"
+          >
+            <Image src="/favicon.png" alt="" aria-hidden="true" width={28} height={28} priority className="rounded-lg" />
           </span>
           <span className="min-w-0">
             <span className="block text-sm font-semibold text-(--text-primary)">隐界</span>
