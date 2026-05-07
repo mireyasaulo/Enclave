@@ -8,6 +8,7 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
   const initializedRef = useRef(false);
   const suppressNextPendingCountRef = useRef(false);
   const isAtBottomRef = useRef(true);
+  const programmaticScrollUntilRef = useRef(0);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [pendingCount, setPendingCount] = useState(0);
 
@@ -44,6 +45,11 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
       isAtBottomRef.current = true;
       setIsAtBottom(true);
       setPendingCount(0);
+      programmaticScrollUntilRef.current =
+        performance.now() +
+        (behavior === "smooth"
+          ? PROGRAMMATIC_SCROLL_LOCK_SMOOTH_MS
+          : PROGRAMMATIC_SCROLL_LOCK_AUTO_MS);
     },
   );
 
@@ -60,12 +66,27 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
     syncBottomState();
 
     const handleScroll = () => {
+      if (performance.now() < programmaticScrollUntilRef.current) {
+        return;
+      }
       syncBottomState();
     };
 
+    const releaseProgrammaticLock = () => {
+      programmaticScrollUntilRef.current = 0;
+    };
+
     element.addEventListener("scroll", handleScroll, { passive: true });
+    element.addEventListener("wheel", releaseProgrammaticLock, {
+      passive: true,
+    });
+    element.addEventListener("touchmove", releaseProgrammaticLock, {
+      passive: true,
+    });
     return () => {
       element.removeEventListener("scroll", handleScroll);
+      element.removeEventListener("wheel", releaseProgrammaticLock);
+      element.removeEventListener("touchmove", releaseProgrammaticLock);
     };
   }, [syncBottomState]);
 
@@ -124,3 +145,5 @@ function isScrolledNearBottom(element: HTMLElement) {
 }
 
 const SCROLL_BOTTOM_THRESHOLD = 72;
+const PROGRAMMATIC_SCROLL_LOCK_AUTO_MS = 200;
+const PROGRAMMATIC_SCROLL_LOCK_SMOOTH_MS = 800;
