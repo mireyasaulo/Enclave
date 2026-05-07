@@ -180,6 +180,15 @@
 - 窗口拖拽、最小化、最大化、关闭/恢复可用
 - 不包含本地 Core API 托管语义
 
+### macOS 专项
+
+- 标题栏左上角呈现系统原生红/黄/绿三按钮，且双击标题栏可切换最大化
+- `Cmd+Q` 退出、`Cmd+W` 关窗、`Cmd+M` 最小化、`Cmd+H` 隐藏均工作
+- 编辑框内 `Cmd+C / V / X / A / Z / Shift+Z` 全部生效（来自系统 Edit 菜单）
+- 第一次进入聊天录音 / 视频通话页时，系统弹出麦克风/相机授权对话框，文案来自 `Info.plist` 中的 `NSMicrophoneUsageDescription` / `NSCameraUsageDescription`
+- 在 `系统设置 → 隐私与安全性` 拒绝授权后，前端给出可读失败提示（沿用 `use-self-camera-preview` 已有错误分支）
+- `codesign -dv --verbose=4 Yinjie.app`：未配置 `APPLE_SIGNING_IDENTITY` 时签名为 ad-hoc；配置后期望出现 `Developer ID Application: ...`
+
 ## 常见失败点
 
 ### Windows
