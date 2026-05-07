@@ -7,6 +7,7 @@ import {
   Search,
   UserPlus,
   Users,
+  type LucideIcon,
 } from "lucide-react";
 import {
   getBlockedCharacters,
