@@ -106,6 +106,18 @@ msgstr "{0} · {1}"
 msgid "{0} · {1} 播放"
 msgstr "{0} · {1} 播放"
 
+#. placeholder {0}: account.accountType === "service" ? t(msg`服务号`) : t(msg`订阅号`)
+#. placeholder {1}: account.handle
+#: apps/app/src/routes/official-account-detail-page.tsx:161
+msgid "{0} · @{1}"
+msgstr "{0} · @{1}"
+
+#. placeholder {0}: account.accountType === "service" ? t(msg`服务号`) : t(msg`订阅号`)
+#. placeholder {1}: account.handle
+#: apps/app/src/routes/official-account-detail-page.tsx:160
+msgid "{0} · @{1} · 已认证"
+msgstr "{0} · @{1} · 已认证"
+
 #. placeholder {0}: formatTimestamp(post.createdAt)
 #: apps/app/src/routes/channel-author-page.tsx:763
 msgid "{0} · 内容更新"
@@ -201,6 +213,12 @@ msgstr "{0} 位常联系好友"
 #: apps/app/src/routes/tags-page.tsx:309
 msgid "{0} 位联系人"
 msgstr "{0} 位联系人"
+
+#. placeholder {0}: account.name
+#: apps/app/src/routes/official-account-detail-page.tsx:208
+#: apps/app/src/routes/official-account-detail-page.tsx:216
+msgid "{0} 公众号"
+msgstr "{0} 公众号"
 
 #. placeholder {0}: Math.max(1, Math.round(post.durationMs / 60000))
 #: apps/app/src/routes/channel-author-page.tsx:778
@@ -415,6 +433,11 @@ msgstr "{0} 等 {1} 位角色正在回复..."
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:339
 msgid "{0} 等 {1} 位角色正在接力回复..."
 msgstr "{0} 等 {1} 位角色正在接力回复..."
+
+#. placeholder {0}: account.articles.length
+#: apps/app/src/routes/official-account-detail-page.tsx:623
+msgid "{0} 篇最近推送"
+msgstr "{0} 篇最近推送"
 
 #. placeholder {0}: group.name
 #: apps/app/src/routes/group-announcement-page.tsx:172
@@ -2446,10 +2469,12 @@ msgstr "全部聊天文件"
 #: apps/app/src/routes/contacts-page.tsx:1165
 #: apps/app/src/routes/desktop-mobile-page.tsx:129
 #: apps/app/src/routes/desktop-mobile-page.tsx:590
+#: apps/app/src/routes/official-account-detail-page.tsx:398
 msgid "公众号"
 msgstr "公众号"
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:599
+#: apps/app/src/routes/official-account-detail-page.tsx:308
 msgid "公众号主页"
 msgstr "公众号主页"
 
@@ -2458,6 +2483,7 @@ msgid "公众号主页和文章阅读入口。"
 msgstr "公众号主页和文章阅读入口。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1012
+#: apps/app/src/routes/official-account-detail-page.tsx:367
 msgid "公众号主页暂时不可用"
 msgstr "公众号主页暂时不可用"
 
@@ -2470,6 +2496,7 @@ msgid "公众号列表暂时不可用"
 msgstr "公众号列表暂时不可用"
 
 #: apps/app/src/i18n/static-dom-seed.ts:803
+#: apps/app/src/routes/official-account-detail-page.tsx:254
 msgid "公众号摘要已复制。"
 msgstr "公众号摘要已复制。"
 
@@ -2535,10 +2562,12 @@ msgid "关注"
 msgstr "关注"
 
 #: apps/app/src/i18n/static-dom-seed.ts:790
+#: apps/app/src/routes/official-account-detail-page.tsx:512
 msgid "关注公众号"
 msgstr "关注公众号"
 
 #: apps/app/src/i18n/static-dom-seed.ts:796
+#: apps/app/src/routes/official-account-detail-page.tsx:604
 msgid "关注后可从消息页查看这类内容。"
 msgstr "关注后可从消息页查看这类内容。"
 
@@ -3064,6 +3093,7 @@ msgid "最近收藏"
 msgstr "最近收藏"
 
 #: apps/app/src/i18n/static-dom-seed.ts:806
+#: apps/app/src/routes/official-account-detail-page.tsx:619
 msgid "最近文章"
 msgstr "最近文章"
 
@@ -3240,6 +3270,7 @@ msgid "分享了笔记 {0}。"
 msgstr "分享了笔记 {0}。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:800
+#: apps/app/src/routes/official-account-detail-page.tsx:339
 msgid "分享公众号"
 msgstr "分享公众号"
 
@@ -3359,6 +3390,10 @@ msgstr "切换当前端的界面语言和本地化格式。"
 #: apps/app/src/routes/world-characters-page.tsx:58
 msgid "切换桌面世界角色..."
 msgstr "切换桌面世界角色..."
+
+#: apps/app/src/routes/official-account-detail-page.tsx:68
+msgid "切换桌面公众号详情..."
+msgstr "切换桌面公众号详情..."
 
 #: apps/app/src/routes/friend-requests-page.tsx:44
 msgid "切换桌面好友请求..."
@@ -4122,6 +4157,7 @@ msgid "取消免打扰"
 msgstr "取消免打扰"
 
 #: apps/app/src/i18n/static-dom-seed.ts:779
+#: apps/app/src/routes/official-account-detail-page.tsx:511
 msgid "取消关注"
 msgstr "取消关注"
 
@@ -4149,6 +4185,7 @@ msgstr "取消提醒失败，请稍后再试。"
 #: apps/app/src/components/chat-message-list.tsx:3435
 #: apps/app/src/routes/discover-feed-page.tsx:1022
 #: apps/app/src/routes/moments-page.tsx:1106
+#: apps/app/src/routes/official-account-detail-page.tsx:522
 msgid "取消收藏"
 msgstr "取消收藏"
 
@@ -4198,6 +4235,7 @@ msgid "可以先添加成员，或者切换筛选查看特定角色。"
 msgstr "可以先添加成员，或者切换筛选查看特定角色。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1022
+#: apps/app/src/routes/official-account-detail-page.tsx:400
 msgid "可以先重试读取，或返回上一页稍后再试。"
 msgstr "可以先重试读取，或返回上一页稍后再试。"
 
@@ -4676,6 +4714,7 @@ msgstr "处理中"
 #: apps/app/src/routes/friend-requests-page.tsx:326
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:672
 #: apps/app/src/routes/moments-page.tsx:1075
+#: apps/app/src/routes/official-account-detail-page.tsx:509
 msgid "处理中..."
 msgstr "处理中..."
 
@@ -4729,10 +4768,12 @@ msgid "复制全部"
 msgstr "复制全部"
 
 #: apps/app/src/i18n/static-dom-seed.ts:801
+#: apps/app/src/routes/official-account-detail-page.tsx:339
 msgid "复制公众号摘要"
 msgstr "复制公众号摘要"
 
 #: apps/app/src/i18n/static-dom-seed.ts:805
+#: apps/app/src/routes/official-account-detail-page.tsx:261
 msgid "复制公众号摘要失败，请稍后重试。"
 msgstr "复制公众号摘要失败，请稍后重试。"
 
@@ -5355,14 +5396,17 @@ msgstr "已全部加载"
 #: apps/app/src/i18n/static-dom-seed.ts:778
 #: apps/app/src/routes/channel-author-page.tsx:443
 #: apps/app/src/routes/channels-page.tsx:1589
+#: apps/app/src/routes/official-account-detail-page.tsx:491
 msgid "已关注"
 msgstr "已关注"
 
 #: apps/app/src/i18n/static-dom-seed.ts:797
+#: apps/app/src/routes/official-account-detail-page.tsx:602
 msgid "已关注，可直接进入服务消息线程。"
 msgstr "已关注，可直接进入服务消息线程。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:798
+#: apps/app/src/routes/official-account-detail-page.tsx:603
 msgid "已关注，后续推送会汇总到订阅号消息。"
 msgstr "已关注，后续推送会汇总到订阅号消息。"
 
@@ -5672,6 +5716,7 @@ msgstr "已打开文件。"
 #: apps/app/src/routes/group-qr-page.tsx:969
 #: apps/app/src/routes/group-qr-page.tsx:1001
 #: apps/app/src/routes/moments-page.tsx:610
+#: apps/app/src/routes/official-account-detail-page.tsx:224
 msgid "已打开系统分享面板。"
 msgstr "已打开系统分享面板。"
 
@@ -5877,6 +5922,7 @@ msgid "已解析到世界地址：{0}"
 msgstr "已解析到世界地址：{0}"
 
 #: apps/app/src/i18n/static-dom-seed.ts:785
+#: apps/app/src/routes/official-account-detail-page.tsx:486
 msgid "已认证"
 msgstr "已认证"
 
@@ -6799,6 +6845,7 @@ msgid "当前环境暂不支持复制入口链接。"
 msgstr "当前环境暂不支持复制入口链接。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:802
+#: apps/app/src/routes/official-account-detail-page.tsx:239
 msgid "当前环境暂不支持复制公众号摘要。"
 msgstr "当前环境暂不支持复制公众号摘要。"
 
@@ -7046,6 +7093,7 @@ msgstr "当前设备暂时无法打开相机，请先改用相册选图。"
 #: apps/app/src/routes/group-qr-page.tsx:978
 #: apps/app/src/routes/group-qr-page.tsx:1010
 #: apps/app/src/routes/moments-page.tsx:629
+#: apps/app/src/routes/official-account-detail-page.tsx:238
 msgid "当前设备暂时无法打开系统分享，请稍后重试。"
 msgstr "当前设备暂时无法打开系统分享，请稍后重试。"
 
@@ -8625,6 +8673,7 @@ msgid "收藏中..."
 msgstr "收藏中..."
 
 #: apps/app/src/i18n/static-dom-seed.ts:791
+#: apps/app/src/routes/official-account-detail-page.tsx:523
 msgid "收藏主页"
 msgstr "收藏主页"
 
@@ -9464,6 +9513,10 @@ msgid "服务入口"
 msgstr "服务入口"
 
 #: apps/app/src/i18n/static-dom-seed.ts:415
+#: apps/app/src/routes/official-account-detail-page.tsx:160
+#: apps/app/src/routes/official-account-detail-page.tsx:161
+#: apps/app/src/routes/official-account-detail-page.tsx:209
+#: apps/app/src/routes/official-account-detail-page.tsx:482
 msgid "服务号"
 msgstr "服务号"
 
@@ -9477,6 +9530,7 @@ msgstr "服务号文章"
 
 #: apps/app/src/i18n/static-dom-seed.ts:788
 #: apps/app/src/routes/desktop-mobile-page.tsx:594
+#: apps/app/src/routes/official-account-detail-page.tsx:596
 msgid "服务号消息"
 msgstr "服务号消息"
 
@@ -10372,6 +10426,10 @@ msgstr "正在切换到手机端角色朋友圈..."
 msgid "正在切换到桌面世界角色"
 msgstr "正在切换到桌面世界角色"
 
+#: apps/app/src/routes/official-account-detail-page.tsx:66
+msgid "正在切换到桌面公众号详情"
+msgstr "正在切换到桌面公众号详情"
+
 #: apps/app/src/routes/discover-encounter-page.tsx:42
 #: apps/app/src/routes/discover-scene-page.tsx:84
 msgid "正在切换到桌面发现页"
@@ -10838,6 +10896,7 @@ msgid "正在读取作者主页..."
 msgstr "正在读取作者主页..."
 
 #: apps/app/src/i18n/static-dom-seed.ts:1013
+#: apps/app/src/routes/official-account-detail-page.tsx:357
 msgid "正在读取公众号"
 msgstr "正在读取公众号"
 
@@ -11005,6 +11064,10 @@ msgstr "正在读取这位角色的朋友圈..."
 #: apps/app/src/routes/world-characters-page.tsx:57
 msgid "正在跳转到桌面通讯录工作区中的世界角色视图。"
 msgstr "正在跳转到桌面通讯录工作区中的世界角色视图。"
+
+#: apps/app/src/routes/official-account-detail-page.tsx:67
+msgid "正在跳转到桌面通讯录工作区中的公众号详情。"
+msgstr "正在跳转到桌面通讯录工作区中的公众号详情。"
 
 #: apps/app/src/routes/friend-requests-page.tsx:43
 msgid "正在跳转到桌面通讯录工作区中的好友请求视图。"
@@ -12460,6 +12523,7 @@ msgid "稍等一下，正在同步联系人标签和分组。"
 msgstr "稍等一下，正在同步联系人标签和分组。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1024
+#: apps/app/src/routes/official-account-detail-page.tsx:358
 msgid "稍等一下，正在同步账号资料和最近文章。"
 msgstr "稍等一下，正在同步账号资料和最近文章。"
 
@@ -12733,6 +12797,7 @@ msgstr "系统分享"
 #: apps/app/src/routes/group-chat-details-page.tsx:441
 #: apps/app/src/routes/group-qr-page.tsx:941
 #: apps/app/src/routes/moments-page.tsx:655
+#: apps/app/src/routes/official-account-detail-page.tsx:260
 msgid "系统分享失败，请稍后重试。"
 msgstr "系统分享失败，请稍后重试。"
 
@@ -12742,6 +12807,7 @@ msgid "系统分享暂时不可用，已复制位置内容。"
 msgstr "系统分享暂时不可用，已复制位置内容。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:804
+#: apps/app/src/routes/official-account-detail-page.tsx:253
 msgid "系统分享暂时不可用，已复制公众号摘要。"
 msgstr "系统分享暂时不可用，已复制公众号摘要。"
 
@@ -13824,6 +13890,10 @@ msgid "订阅"
 msgstr "订阅"
 
 #: apps/app/src/i18n/static-dom-seed.ts:412
+#: apps/app/src/routes/official-account-detail-page.tsx:160
+#: apps/app/src/routes/official-account-detail-page.tsx:161
+#: apps/app/src/routes/official-account-detail-page.tsx:209
+#: apps/app/src/routes/official-account-detail-page.tsx:482
 msgid "订阅号"
 msgstr "订阅号"
 
@@ -13833,6 +13903,7 @@ msgstr "订阅号与服务号入口暂时没有刷新成功。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:789
 #: apps/app/src/routes/desktop-mobile-page.tsx:596
+#: apps/app/src/routes/official-account-detail-page.tsx:597
 #: apps/app/src/routes/subscription-inbox-page.tsx:175
 msgid "订阅号消息"
 msgstr "订阅号消息"
@@ -14251,6 +14322,7 @@ msgstr "请输入验证码（默认 123456 即可通过）"
 #: apps/app/src/routes/group-qr-page.tsx:1088
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:455
 #: apps/app/src/routes/moments-page.tsx:942
+#: apps/app/src/routes/official-account-detail-page.tsx:356
 #: apps/app/src/routes/profile-settings-page.tsx:461
 #: apps/app/src/routes/starred-friends-page.tsx:243
 #: apps/app/src/routes/subscription-inbox-page.tsx:223
@@ -14287,6 +14359,7 @@ msgstr "读取图片失败，请换一张再试。"
 #: apps/app/src/routes/group-member-picker-page.tsx:540
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:463
 #: apps/app/src/routes/moments-page.tsx:950
+#: apps/app/src/routes/official-account-detail-page.tsx:366
 #: apps/app/src/routes/profile-settings-page.tsx:473
 #: apps/app/src/routes/starred-friends-page.tsx:253
 #: apps/app/src/routes/subscription-inbox-page.tsx:233
@@ -14664,6 +14737,10 @@ msgstr "返回上一步"
 #: apps/app/src/routes/moments-page.tsx:310
 #: apps/app/src/routes/moments-page.tsx:970
 #: apps/app/src/routes/moments-page.tsx:1276
+#: apps/app/src/routes/official-account-detail-page.tsx:388
+#: apps/app/src/routes/official-account-detail-page.tsx:419
+#: apps/app/src/routes/official-account-detail-page.tsx:454
+#: apps/app/src/routes/official-account-detail-page.tsx:557
 #: apps/app/src/routes/starred-friends-page.tsx:183
 #: apps/app/src/routes/subscription-inbox-page.tsx:255
 #: apps/app/src/routes/subscription-inbox-page.tsx:289
@@ -14688,6 +14765,10 @@ msgid "返回会丢失已编辑的文字与媒体，确定不发布吗？"
 msgstr "返回会丢失已编辑的文字与媒体，确定不发布吗？"
 
 #: apps/app/src/i18n/static-dom-seed.ts:794
+#: apps/app/src/routes/official-account-detail-page.tsx:388
+#: apps/app/src/routes/official-account-detail-page.tsx:419
+#: apps/app/src/routes/official-account-detail-page.tsx:454
+#: apps/app/src/routes/official-account-detail-page.tsx:557
 msgid "返回公众号列表"
 msgstr "返回公众号列表"
 
@@ -15141,7 +15222,12 @@ msgstr "这个世界最近开始偏爱慢消息"
 msgid "这个会话目前还没有任何消息，过会儿再来看看。"
 msgstr "这个会话目前还没有任何消息，过会儿再来看看。"
 
+#: apps/app/src/routes/official-account-detail-page.tsx:399
+msgid "这个公众号暂时不可用"
+msgstr "这个公众号暂时不可用"
+
 #: apps/app/src/i18n/static-dom-seed.ts:799
+#: apps/app/src/routes/official-account-detail-page.tsx:624
 msgid "这个公众号还没有公开文章。"
 msgstr "这个公众号还没有公开文章。"
 
@@ -15816,6 +15902,7 @@ msgstr "重试保存邀请卡"
 
 #: apps/app/src/i18n/static-dom-seed.ts:792
 #: apps/app/src/routes/channel-author-page.tsx:358
+#: apps/app/src/routes/official-account-detail-page.tsx:547
 msgid "重试关注"
 msgstr "重试关注"
 
@@ -15844,6 +15931,8 @@ msgstr "重试关注"
 #: apps/app/src/routes/group-qr-page.tsx:1006
 #: apps/app/src/routes/moments-page.tsx:622
 #: apps/app/src/routes/moments-page.tsx:648
+#: apps/app/src/routes/official-account-detail-page.tsx:240
+#: apps/app/src/routes/official-account-detail-page.tsx:262
 msgid "重试分享"
 msgstr "重试分享"
 
@@ -15862,6 +15951,7 @@ msgstr "重试发送评论"
 
 #: apps/app/src/i18n/static-dom-seed.ts:793
 #: apps/app/src/routes/channel-author-page.tsx:357
+#: apps/app/src/routes/official-account-detail-page.tsx:547
 msgid "重试取消关注"
 msgstr "重试取消关注"
 
@@ -15903,6 +15993,8 @@ msgstr "重试场景相遇"
 #: apps/app/src/routes/group-qr-page.tsx:985
 #: apps/app/src/routes/moments-page.tsx:622
 #: apps/app/src/routes/moments-page.tsx:648
+#: apps/app/src/routes/official-account-detail-page.tsx:240
+#: apps/app/src/routes/official-account-detail-page.tsx:262
 msgid "重试复制"
 msgstr "重试复制"
 
@@ -16000,6 +16092,8 @@ msgstr "重试评论点赞"
 #: apps/app/src/routes/moments-page.tsx:311
 #: apps/app/src/routes/moments-page.tsx:962
 #: apps/app/src/routes/moments-page.tsx:970
+#: apps/app/src/routes/official-account-detail-page.tsx:379
+#: apps/app/src/routes/official-account-detail-page.tsx:410
 #: apps/app/src/routes/profile-settings-page.tsx:485
 #: apps/app/src/routes/starred-friends-page.tsx:264
 #: apps/app/src/routes/subscription-inbox-page.tsx:246
