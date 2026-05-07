@@ -55,7 +55,7 @@ import {
   type SendMessagePayload,
   uploadCustomSticker,
 } from "@yinjie/contracts";
-import { useRuntimeTranslator } from "@yinjie/i18n";
+import { getActiveLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, InlineNotice, cn } from "@yinjie/ui";
 import { AvatarChip } from "./avatar-chip";
 import { InlineNoticeActionButton } from "./inline-notice-action-button";
@@ -756,6 +756,7 @@ export function ChatMessageList({
 
       if (mode === "merged") {
         await forwardMergedMessagesToConversation({
+          t,
           baseUrl,
           conversation,
           messages: messageQueue,
@@ -770,6 +771,7 @@ export function ChatMessageList({
 
       for (const message of messageQueue) {
         await forwardMessageToConversation({
+          t,
           baseUrl,
           conversation,
           message,
@@ -1414,7 +1416,7 @@ export function ChatMessageList({
       const isSystem =
         message.type === "system" || message.senderType === "system";
       if (isSystem) {
-        const summary = parseSharedHistorySummaryMessage(
+        const summary = parseSharedHistorySummaryMessage(t,
           sanitizeDisplayedChatText(message.text),
         );
         pendingImportCount = summary?.count ?? 0;
@@ -1659,7 +1661,7 @@ export function ChatMessageList({
       }
 
       const nextFavorites = upsertDesktopFavorite(
-        buildMessageFavoriteRecord(message, groupMode),
+        buildMessageFavoriteRecord(t, message, groupMode),
       );
       setFavoriteSourceIds(nextFavorites.map((item) => item.sourceId));
       setActionNotice({
@@ -1984,7 +1986,7 @@ export function ChatMessageList({
     }
   };
 
-  const reminderOptions = buildReminderOptions(new Date());
+  const reminderOptions = buildReminderOptions(t, new Date());
 
   const handleSetReminder = (message: ChatRenderableMessage) => {
     setReminderTargetMessage(message);
@@ -2054,7 +2056,7 @@ export function ChatMessageList({
           threadId: threadContext?.id ?? "",
           threadType: threadContext?.type ?? "direct",
           threadTitle: threadContext?.title,
-          previewText: buildClipboardText(reminderTargetMessage),
+          previewText: buildClipboardText(t, reminderTargetMessage),
         },
       );
       setReminderTargetMessage(null);
@@ -2077,7 +2079,7 @@ export function ChatMessageList({
 
     void requestNotificationPermission().then((permissionState) => {
       const nativeMobileShareSupported = isNativeMobileShareSurface();
-      const summary = formatReminderSummary(option.remindAt);
+      const summary = formatReminderSummary(t, option.remindAt);
       if (permissionState === "granted") {
         setActionNotice({
           message: t(msg`已设为消息提醒 · ${summary}，系统通知已开启。`),
@@ -2134,8 +2136,8 @@ export function ChatMessageList({
     () =>
       (forwardMessages ?? []).map((message) => ({
         id: message.id,
-        senderName: buildClipboardSender(message),
-        previewText: buildForwardPreviewText(message),
+        senderName: buildClipboardSender(t, message),
+        previewText: buildForwardPreviewText(t, message),
         typeLabel: resolveForwardTypeLabel(t, message),
       })),
     [forwardMessages],
@@ -2272,7 +2274,7 @@ export function ChatMessageList({
         let nextFavorites = readDesktopFavorites();
         for (const message of messagesToFavorite) {
           nextFavorites = upsertDesktopFavorite(
-            buildMessageFavoriteRecord(message, groupMode),
+            buildMessageFavoriteRecord(t, message, groupMode),
           );
         }
 
@@ -2719,7 +2721,7 @@ export function ChatMessageList({
         const groupCallInvite = parseGroupCallInviteMessage(displayText);
         const groupRelaySummary = parseGroupRelaySummaryMessage(displayText);
         const sharedHistorySummary =
-          parseSharedHistorySummaryMessage(displayText);
+          parseSharedHistorySummaryMessage(t, displayText);
         const timestampLabel = detailedTimestampMode
           ? formatDetailedMessageTimestamp(message.createdAt)
           : isDesktop
@@ -2767,7 +2769,7 @@ export function ChatMessageList({
                   tone="muted"
                 >
                   {isRecalled
-                    ? buildRecalledMessageNotice(message)
+                    ? buildRecalledMessageNotice(t, message)
                     : displayText}
                 </InlineNotice>
               )}
@@ -3103,7 +3105,7 @@ export function ChatMessageList({
                           : "mt-px px-0.5 text-[10px]"
                       }`}
                     >
-                      {t(msg`已设提醒 · ${formatReminderSummary(reminderRecord.remindAt)}`)}
+                      {t(msg`已设提醒 · ${formatReminderSummary(t, reminderRecord.remindAt)}`)}
                     </div>
                   ) : null}
                   {isUser && !selectionMode && message.localStatus === "failed" ? (
@@ -3265,7 +3267,7 @@ export function ChatMessageList({
           }
           onCopyText={() => {
             void copyToClipboard(
-              buildClipboardText(contextMenuState.message),
+              buildClipboardText(t, contextMenuState.message),
               t(msg`消息内容已复制。`),
             );
             setContextMenuState(null);
@@ -3317,7 +3319,7 @@ export function ChatMessageList({
           )}
           onCopySender={() => {
             void copyToClipboard(
-              buildClipboardSender(contextMenuState.message),
+              buildClipboardSender(t, contextMenuState.message),
               t(msg`发送者名称已复制。`),
             );
             setContextMenuState(null);
@@ -3351,9 +3353,9 @@ export function ChatMessageList({
             ? {
                 senderName:
                   groupMode && mobileActionMessage.senderType !== "user"
-                    ? buildClipboardSender(mobileActionMessage)
+                    ? buildClipboardSender(t, mobileActionMessage)
                     : undefined,
-                text: buildClipboardText(mobileActionMessage),
+                text: buildClipboardText(t, mobileActionMessage),
                 own: mobileActionMessage.senderType === "user",
               }
             : undefined
@@ -3438,7 +3440,7 @@ export function ChatMessageList({
           }
 
           void copyToClipboard(
-            buildClipboardText(mobileActionMessage),
+            buildClipboardText(t, mobileActionMessage),
             t(msg`消息内容已复制。`),
           );
           setMobileActionMessage(null);
@@ -3449,7 +3451,7 @@ export function ChatMessageList({
           mobileActionMessage.senderType !== "user"
             ? () => {
                 void copyToClipboard(
-                  buildClipboardSender(mobileActionMessage),
+                  buildClipboardSender(t, mobileActionMessage),
                   t(msg`发送者名称已复制。`),
                 );
                 setMobileActionMessage(null);
@@ -3506,7 +3508,7 @@ export function ChatMessageList({
         open={Boolean(reminderTargetMessage)}
         previewText={
           reminderTargetMessage
-            ? buildClipboardText(reminderTargetMessage)
+            ? buildClipboardText(t, reminderTargetMessage)
             : undefined
         }
         options={reminderOptions}
@@ -3518,7 +3520,7 @@ export function ChatMessageList({
         variant={variant}
         senderName={
           quoteSelectionMessage
-            ? buildClipboardSender(quoteSelectionMessage)
+            ? buildClipboardSender(t, quoteSelectionMessage)
             : t(msg`消息`)
         }
         messageText={
@@ -3562,7 +3564,7 @@ export function ChatMessageList({
               ? () => {
                   void openDesktopChatImageViewerWindowOnDemand({
                     imageUrl: activeImage.url,
-                    title: activeImage.fileName || activeImage.label || "图片",
+                    title: activeImage.fileName || activeImage.label || t(msg`图片`),
                     meta: activeImage.meta,
                     returnTo: activeImage.returnTo,
                     items: standaloneViewerItems,
@@ -3570,14 +3572,14 @@ export function ChatMessageList({
                   }).then((opened) => {
                     if (opened) {
                       setActionNotice({
-                        message: "已在独立窗口打开图片。",
+                        message: t(msg`已在独立窗口打开图片。`),
                         tone: "success",
                       });
                       return;
                     }
 
                     setActionNotice({
-                      message: "浏览器阻止了新窗口，请检查弹窗权限。",
+                      message: t(msg`浏览器阻止了新窗口，请检查弹窗权限。`),
                       tone: "danger",
                     });
                   });
@@ -3589,7 +3591,7 @@ export function ChatMessageList({
               ? () => {
                   void openDesktopChatImageViewerWindowOnDemand({
                     imageUrl: activeImage.url,
-                    title: activeImage.fileName || activeImage.label || "图片",
+                    title: activeImage.fileName || activeImage.label || t(msg`图片`),
                     meta: activeImage.meta,
                     returnTo: activeImage.returnTo,
                     items: standaloneViewerItems,
@@ -3598,14 +3600,14 @@ export function ChatMessageList({
                   }).then((opened) => {
                     if (opened) {
                       setActionNotice({
-                        message: "已打开图片打印视图。",
+                        message: t(msg`已打开图片打印视图。`),
                         tone: "success",
                       });
                       return;
                     }
 
                     setActionNotice({
-                      message: "浏览器阻止了打印窗口，请检查弹窗权限。",
+                      message: t(msg`浏览器阻止了打印窗口，请检查弹窗权限。`),
                       tone: "danger",
                     });
                   });
@@ -3777,6 +3779,7 @@ function MessageTimestampDivider({
   detailedTimestampMode: boolean;
   onToggle: () => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <div
       className={isDesktop ? "pb-2 pt-1 text-center" : "pb-2 pt-1 text-center"}
@@ -3790,7 +3793,9 @@ function MessageTimestampDivider({
             : "inline-flex rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-2.5 py-0.5 text-[10px] text-[color:var(--text-muted)] transition active:bg-[color:var(--surface-card-hover)]"
         }
         aria-label={
-          detailedTimestampMode ? "切换为简略时间显示" : "切换为完整日期显示"
+          detailedTimestampMode
+        ? t(msg`切换为简略时间显示`)
+        : t(msg`切换为完整日期显示`)
         }
       >
         {label}
@@ -3880,7 +3885,7 @@ function filterStableMessageList(
   return next;
 }
 
-function parseSharedHistorySummaryMessage(text: string) {
+function parseSharedHistorySummaryMessage(t: Translator, text: string) {
   const normalized = text.trim();
   const match = normalized.match(/^已分享你和(.+?)的(\d+)条聊天记录$/);
   if (!match) {
@@ -3888,7 +3893,7 @@ function parseSharedHistorySummaryMessage(text: string) {
   }
 
   return {
-    participantName: match[1]?.trim() || "对方",
+    participantName: match[1]?.trim() || t(msg`对方`),
     count: Number(match[2]) || 0,
   };
 }
@@ -3907,6 +3912,7 @@ function SharedHistorySummaryNotice({
   isDesktop: boolean;
   highlighted: boolean;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <div
       id={id}
@@ -3934,7 +3940,7 @@ function SharedHistorySummaryNotice({
         >
           <FileText size={13} />
         </span>
-        <span>聊天记录已导入当前群聊</span>
+        <span>{t(msg`聊天记录已导入当前群聊`)}</span>
       </div>
       <div
         className={cn(
@@ -3944,19 +3950,27 @@ function SharedHistorySummaryNotice({
             : "mt-1 text-[10px] leading-[18px]",
         )}
       >
-        来自你和 {summary.participantName} 的 {summary.count} 条消息
+        {t(msg`来自你和 ${summary.participantName} 的 ${summary.count} 条消息`)}
       </div>
     </div>
   );
 }
 
-function buildRecalledMessageNotice(message: ChatRenderableMessage) {
+function buildRecalledMessageNotice(
+  t: Translator,
+  message: ChatRenderableMessage,
+) {
   const actor =
-    message.senderType === "user" ? "你" : message.senderName?.trim() || "对方";
-  return `${actor}撤回了一条消息`;
+    message.senderType === "user"
+      ? t(msg`你`)
+      : message.senderName?.trim() || t(msg`对方`);
+  return t(msg`${actor}撤回了一条消息`);
 }
 
-function buildReminderOptions(now: Date): MobileMessageReminderOption[] {
+function buildReminderOptions(
+  t: Translator,
+  now: Date,
+): MobileMessageReminderOption[] {
   const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
   const tonight = new Date(now);
   tonight.setHours(20, 0, 0, 0);
@@ -3971,29 +3985,29 @@ function buildReminderOptions(now: Date): MobileMessageReminderOption[] {
   return [
     {
       id: "one-hour",
-      label: "1 小时后",
-      detail: formatReminderSummary(oneHourLater.toISOString()),
+      label: t(msg`1 小时后`),
+      detail: formatReminderSummary(t, oneHourLater.toISOString()),
       remindAt: oneHourLater.toISOString(),
     },
     {
       id: "tonight",
-      label: "今晚 20:00",
-      detail: formatReminderSummary(tonight.toISOString()),
+      label: t(msg`今晚 20:00`),
+      detail: formatReminderSummary(t, tonight.toISOString()),
       remindAt: tonight.toISOString(),
     },
     {
       id: "tomorrow-morning",
-      label: "明天上午 09:00",
-      detail: formatReminderSummary(tomorrowMorning.toISOString()),
+      label: t(msg`明天上午 09:00`),
+      detail: formatReminderSummary(t, tomorrowMorning.toISOString()),
       remindAt: tomorrowMorning.toISOString(),
     },
   ];
 }
 
-function formatReminderSummary(remindAt: string) {
+function formatReminderSummary(t: Translator, remindAt: string) {
   const date = new Date(remindAt);
   if (Number.isNaN(date.getTime())) {
-    return "稍后";
+    return t(msg`稍后`);
   }
 
   const now = new Date();
@@ -4007,37 +4021,38 @@ function formatReminderSummary(remindAt: string) {
     tomorrow.getMonth() === date.getMonth() &&
     tomorrow.getDate() === date.getDate();
 
-  const timeLabel = date.toLocaleTimeString("zh-CN", {
+  const timeLabel = date.toLocaleTimeString(getActiveLocale(), {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
   });
 
   if (sameYear && sameMonth && sameDate) {
-    return `今天 ${timeLabel}`;
+    return t(msg`今天 ${timeLabel}`);
   }
 
   if (isTomorrow) {
-    return `明天 ${timeLabel}`;
+    return t(msg`明天 ${timeLabel}`);
   }
 
-  return `${date.toLocaleDateString("zh-CN", {
+  const dateLabel = date.toLocaleDateString(getActiveLocale(), {
     month: "numeric",
     day: "numeric",
-  })} ${timeLabel}`;
+  });
+  return `${dateLabel} ${timeLabel}`;
 }
 
 type Translator = ReturnType<typeof useRuntimeTranslator>;
 
-function buildClipboardSender(message: ChatRenderableMessage) {
+function buildClipboardSender(t: Translator, message: ChatRenderableMessage) {
   if (message.senderType === "user") {
-    return "我";
+    return t(msg`我`);
   }
 
-  return message.senderName?.trim() || "群成员";
+  return message.senderName?.trim() || t(msg`群成员`);
 }
 
-function buildClipboardText(message: ChatRenderableMessage) {
+function buildClipboardText(t: Translator, message: ChatRenderableMessage) {
   const replyContent = extractChatReplyMetadata(message.text);
   const displayedText =
     message.senderType === "user"
@@ -4052,17 +4067,17 @@ function buildClipboardText(message: ChatRenderableMessage) {
     resolveMessageSemanticPreview(message, {
       maxChars: 400,
       bracketedFallback: true,
-    }) || "消息"
+    }) || t(msg`消息`)
   );
 }
 
-function buildForwardPreviewText(message: ChatRenderableMessage) {
+function buildForwardPreviewText(t: Translator, message: ChatRenderableMessage) {
   const forwardedText = getForwardMessageText(message);
   if (forwardedText) {
     return forwardedText;
   }
 
-  return buildClipboardText(message);
+  return buildClipboardText(t, message);
 }
 
 function resolveForwardTypeLabel(t: Translator, message: ChatRenderableMessage) {
@@ -4172,11 +4187,12 @@ function buildFavoriteSourceId(messageId: string) {
 }
 
 function buildMessageFavoriteRecord(
+  t: Translator,
   message: ChatRenderableMessage,
   groupMode: boolean,
 ) {
-  const senderName = buildClipboardSender(message);
-  const description = buildClipboardText(message);
+  const senderName = buildClipboardSender(t, message);
+  const description = buildClipboardText(t, message);
   const currentPath =
     typeof window === "undefined"
       ? "/tabs/chat"
@@ -4190,7 +4206,7 @@ function buildMessageFavoriteRecord(
     description,
     meta: formatMessageTimestamp(message.createdAt),
     to: currentPath,
-    badge: groupMode ? "群聊消息" : "聊天消息",
+    badge: groupMode ? t(msg`群聊消息`) : t(msg`聊天消息`),
     avatarName: senderName,
   };
 }
@@ -4303,23 +4319,28 @@ function isLocalOnlyMessage(message: ChatRenderableMessage) {
 }
 
 async function forwardMessageToConversation(input: {
+  t: Translator;
   baseUrl?: string;
   conversation: ConversationListItem;
   message: ChatRenderableMessage;
 }) {
   if (isPersistedGroupConversation(input.conversation)) {
-    const payload = buildGroupForwardPayload(input.message);
+    const payload = buildGroupForwardPayload(input.t, input.message);
     if (!payload) {
-      throw new Error("当前消息暂不支持转发到群聊。");
+      throw new Error(input.t(msg`当前消息暂不支持转发到群聊。`));
     }
 
     await sendGroupMessage(input.conversation.id, payload, input.baseUrl);
     return;
   }
 
-  const payload = buildDirectForwardPayload(input.conversation, input.message);
+  const payload = buildDirectForwardPayload(
+    input.t,
+    input.conversation,
+    input.message,
+  );
   if (!payload) {
-    throw new Error("这条单聊暂时没有可用的角色目标，无法完成转发。");
+    throw new Error(input.t(msg`这条单聊暂时没有可用的角色目标，无法完成转发。`));
   }
 
   joinConversationRoom({ conversationId: input.conversation.id });
@@ -4327,13 +4348,14 @@ async function forwardMessageToConversation(input: {
 }
 
 async function forwardMergedMessagesToConversation(input: {
+  t: Translator;
   baseUrl?: string;
   conversation: ConversationListItem;
   messages: ChatRenderableMessage[];
 }) {
-  const mergedText = buildMergedForwardText(input.messages);
+  const mergedText = buildMergedForwardText(input.t, input.messages);
   if (!mergedText) {
-    throw new Error("当前没有可合并转发的消息内容。");
+    throw new Error(input.t(msg`当前没有可合并转发的消息内容。`));
   }
 
   if (isPersistedGroupConversation(input.conversation)) {
@@ -4349,7 +4371,7 @@ async function forwardMergedMessagesToConversation(input: {
 
   const characterId = input.conversation.participants[0];
   if (!characterId) {
-    throw new Error("这条单聊暂时没有可用的角色目标，无法完成转发。");
+    throw new Error(input.t(msg`这条单聊暂时没有可用的角色目标，无法完成转发。`));
   }
 
   joinConversationRoom({ conversationId: input.conversation.id });
@@ -4361,6 +4383,7 @@ async function forwardMergedMessagesToConversation(input: {
 }
 
 function buildGroupForwardPayload(
+  t: Translator,
   message: ChatRenderableMessage,
 ): SendGroupMessageRequest | null {
   const text = getForwardMessageText(message);
@@ -4427,11 +4450,12 @@ function buildGroupForwardPayload(
   }
 
   return {
-    text: text ?? buildClipboardText(message),
+    text: text ?? buildClipboardText(t, message),
   };
 }
 
 function buildDirectForwardPayload(
+  t: Translator,
   conversation: ConversationListItem,
   message: ChatRenderableMessage,
 ): SendMessagePayload | null {
@@ -4518,7 +4542,7 @@ function buildDirectForwardPayload(
   return {
     conversationId: conversation.id,
     characterId,
-    text: text ?? buildClipboardText(message),
+    text: text ?? buildClipboardText(t, message),
   };
 }
 
@@ -4583,11 +4607,11 @@ function guessMessageAttachmentExtension(mimeType?: string) {
   }
 }
 
-function buildMergedForwardText(messages: ChatRenderableMessage[]) {
+function buildMergedForwardText(t: Translator, messages: ChatRenderableMessage[]) {
   const sections = messages
     .map((message) => {
-      const sender = buildClipboardSender(message);
-      const body = buildClipboardText(message).trim();
+      const sender = buildClipboardSender(t, message);
+      const body = buildClipboardText(t, message).trim();
       if (!body) {
         return null;
       }
@@ -4600,7 +4624,7 @@ function buildMergedForwardText(messages: ChatRenderableMessage[]) {
     return "";
   }
 
-  return ["[聊天记录]", ...sections].join("\n");
+  return [t(msg`[聊天记录]`), ...sections].join("\n");
 }
 
 function renderTextWithMentions(text: string): ReactNode {
