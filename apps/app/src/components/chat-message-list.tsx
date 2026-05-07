@@ -1446,7 +1446,7 @@ export function ChatMessageList({
       const label =
         message.attachment.fileName ||
         sanitizeDisplayedChatText(message.text) ||
-        "[图片]";
+        t(msg`[图片]`);
       const returnTo =
         buildMessageReturnTo?.(message.id) ??
         (threadContext
@@ -1474,7 +1474,7 @@ export function ChatMessageList({
         (image): DesktopChatImageViewerSessionItem => ({
           id: image.id,
           imageUrl: image.url,
-          title: image.fileName || image.label || "图片",
+          title: image.fileName || image.label || t(msg`图片`),
           meta: image.meta,
           returnTo: image.returnTo,
         }),
@@ -1485,8 +1485,8 @@ export function ChatMessageList({
   const resolvedUnreadMarkerLabel =
     unreadMarkerLabel ??
     (unreadMarkerCount > 0
-      ? `以下是 ${unreadMarkerCount} 条新消息`
-      : "以下是新消息");
+      ? t(msg`以下是 ${unreadMarkerCount} 条新消息`)
+      : t(msg`以下是新消息`));
   const activeImageIndex = viewerMessageId
     ? imageMessages.findIndex((message) => message.id === viewerMessageId)
     : -1;
@@ -1543,7 +1543,7 @@ export function ChatMessageList({
 
     void openDesktopChatImageViewerWindowOnDemand({
       imageUrl: target.url,
-      title: target.fileName || target.label || "图片",
+      title: target.fileName || target.label || t(msg`图片`),
       meta: target.meta,
       returnTo: target.returnTo,
       items: standaloneViewerItems,
@@ -1622,7 +1622,7 @@ export function ChatMessageList({
           });
           syncFavoriteSourceIds(nextRemoteFavorites);
           setActionNotice({
-            message: "已取消收藏消息。",
+            message: t(msg`已取消收藏消息。`),
             tone: "success",
           });
           return;
@@ -1642,7 +1642,7 @@ export function ChatMessageList({
         });
         syncFavoriteSourceIds(nextRemoteFavorites);
         setActionNotice({
-          message: "消息已加入收藏。",
+          message: t(msg`消息已加入收藏。`),
           tone: "success",
         });
         return;
@@ -1652,7 +1652,7 @@ export function ChatMessageList({
         const nextFavorites = removeDesktopFavorite(sourceId);
         setFavoriteSourceIds(nextFavorites.map((item) => item.sourceId));
         setActionNotice({
-          message: "已取消收藏消息。",
+          message: t(msg`已取消收藏消息。`),
           tone: "success",
         });
         return;
@@ -1863,8 +1863,8 @@ export function ChatMessageList({
                   void revealSavedFile(savedPath).then((revealed) => {
                     setActionNotice({
                       message: revealed
-                        ? "已打开所在位置。"
-                        : "打开所在位置失败，请稍后再试。",
+                        ? t(msg`已打开所在位置。`)
+                        : t(msg`打开所在位置失败，请稍后再试。`),
                       tone: revealed ? "success" : "danger",
                     });
                   });
@@ -1951,7 +1951,7 @@ export function ChatMessageList({
     const nextState = hideLocalChatMessage(message.id);
     applyLocalMessageActionState(nextState, message.id);
     setActionNotice({
-      message: "已从当前设备删除这条消息。",
+      message: t(msg`已从当前设备删除这条消息。`),
       tone: "success",
     });
   };
@@ -1996,7 +1996,7 @@ export function ChatMessageList({
       current?.id === messageId ? null : current,
     );
     setActionNotice({
-      message: "已取消这条消息的提醒。",
+      message: t(msg`已取消这条消息的提醒。`),
       tone: "success",
     });
   };
@@ -2030,7 +2030,7 @@ export function ChatMessageList({
     onReplyMessage(quoteSelectionMessage, { quotedText: selectedText });
     setQuoteSelectionMessage(null);
     setActionNotice({
-      message: "已带入所选文字。",
+      message: t(msg`已带入所选文字。`),
       tone: "success",
     });
   };
@@ -2080,7 +2080,7 @@ export function ChatMessageList({
       const summary = formatReminderSummary(option.remindAt);
       if (permissionState === "granted") {
         setActionNotice({
-          message: `已设为消息提醒 · ${summary}，系统通知已开启。`,
+          message: t(msg`已设为消息提醒 · ${summary}，系统通知已开启。`),
           tone: "success",
         });
         return;
@@ -2089,10 +2089,10 @@ export function ChatMessageList({
       if (permissionState === "denied") {
         setActionNotice({
           message: nativeMobileShareSupported
-            ? `已设为消息提醒 · ${summary}，系统通知未开启。可前往系统设置继续打开通知。`
-            : `已设为消息提醒 · ${summary}，系统通知未开启。`,
+            ? t(msg`已设为消息提醒 · ${summary}，系统通知未开启。可前往系统设置继续打开通知。`)
+            : t(msg`已设为消息提醒 · ${summary}，系统通知未开启。`),
           tone: "warning",
-          actionLabel: nativeMobileShareSupported ? "去设置" : undefined,
+          actionLabel: nativeMobileShareSupported ? t(msg`去设置`) : undefined,
           onAction: nativeMobileShareSupported
             ? () => {
                 void openAppSettings();
@@ -2225,7 +2225,7 @@ export function ChatMessageList({
 
     setSelectedMessageIds(nextSelectedMessageIds);
     setActionNotice({
-      message: `已选择到这里，共 ${nextSelectedMessageIds.length} 条消息。`,
+      message: t(msg`已选择到这里，共 ${nextSelectedMessageIds.length} 条消息。`),
       tone: "success",
     });
   };
@@ -2282,16 +2282,18 @@ export function ChatMessageList({
       setActionNotice({
         message:
           messagesToFavorite.length === 1
-            ? "已收藏 1 条消息。"
-            : `已收藏 ${messagesToFavorite.length} 条消息。`,
+            ? t(msg`已收藏 1 条消息。`)
+            : t(msg`已收藏 ${messagesToFavorite.length} 条消息。`),
         tone: "success",
       });
     } catch (error) {
       setActionNotice({
         message:
-          error instanceof Error ? error.message : "收藏失败，请稍后再试。",
+          error instanceof Error
+            ? error.message
+            : t(msg`收藏失败，请稍后再试。`),
         tone: "danger",
-        actionLabel: "继续收藏所选消息",
+        actionLabel: t(msg`继续收藏所选消息`),
         onAction: () => {
           void handleFavoriteSelectedMessages();
         },
@@ -2386,16 +2388,18 @@ export function ChatMessageList({
       setActionNotice({
         message:
           messagesToDelete.length === 1
-            ? "已删除 1 条消息。"
-            : `已删除 ${messagesToDelete.length} 条消息。`,
+            ? t(msg`已删除 1 条消息。`)
+            : t(msg`已删除 ${messagesToDelete.length} 条消息。`),
         tone: "success",
       });
     } catch (error) {
       setActionNotice({
         message:
-          error instanceof Error ? error.message : "批量删除失败，请稍后再试。",
+          error instanceof Error
+            ? error.message
+            : t(msg`批量删除失败，请稍后再试。`),
         tone: "danger",
-        actionLabel: "继续删除所选消息",
+        actionLabel: t(msg`继续删除所选消息`),
         onAction: () => {
           void handleDeleteSelectedMessages();
         },
@@ -2459,10 +2463,10 @@ export function ChatMessageList({
       setActionNotice({
         message:
           skippedCount > 0
-            ? `已撤回 ${messagesToRecall.length} 条消息，另有 ${skippedCount} 条不支持撤回。`
+            ? t(msg`已撤回 ${messagesToRecall.length} 条消息，另有 ${skippedCount} 条不支持撤回。`)
             : messagesToRecall.length === 1
-              ? "已撤回 1 条消息。"
-              : `已撤回 ${messagesToRecall.length} 条消息。`,
+              ? t(msg`已撤回 1 条消息。`)
+              : t(msg`已撤回 ${messagesToRecall.length} 条消息。`),
         tone: "success",
       });
 
@@ -2472,9 +2476,11 @@ export function ChatMessageList({
     } catch (error) {
       setActionNotice({
         message:
-          error instanceof Error ? error.message : "批量撤回失败，请稍后再试。",
+          error instanceof Error
+            ? error.message
+            : t(msg`批量撤回失败，请稍后再试。`),
         tone: "danger",
-        actionLabel: "继续撤回所选消息",
+        actionLabel: t(msg`继续撤回所选消息`),
         onAction: () => {
           void handleRecallSelectedMessages();
         },
@@ -2554,7 +2560,7 @@ export function ChatMessageList({
                 : "inline-flex min-h-8 items-center justify-center rounded-full border border-[color:var(--border-subtle)] bg-white/92 px-3.5 text-[12px] text-[color:var(--text-secondary)] shadow-[0_4px_12px_rgba(15,23,42,0.08)] transition active:bg-[color:var(--surface-card-hover)] disabled:opacity-60"
             }
           >
-            {loadingOlderMessages ? "正在加载更早消息..." : "查看更多消息"}
+            {loadingOlderMessages ? t(msg`正在加载更早消息...`) : t(msg`查看更多消息`)}
           </button>
         </div>
       ) : null}
@@ -2563,10 +2569,10 @@ export function ChatMessageList({
           <div className="sticky top-0 z-20 flex items-center justify-between gap-3 rounded-[12px] border border-black/6 bg-[#f7f7f7] px-4 py-3 backdrop-blur">
             <div>
               <div className="text-sm text-[color:var(--text-primary)]">
-                已选择 {selectedMessageIds.length} 条消息
+                {t(msg`已选择 ${selectedMessageIds.length} 条消息`)}
               </div>
               <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                `Shift + 点击` 可连续选择消息
+                {t(msg`\`Shift + 点击\` 可连续选择消息`)}
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -2577,7 +2583,7 @@ export function ChatMessageList({
                 onClick={resetSelectionMode}
                 className="rounded-full"
               >
-                取消
+                {t(msg`取消`)}
               </Button>
               <Button
                 type="button"
@@ -2589,7 +2595,9 @@ export function ChatMessageList({
                 onClick={handleFavoriteSelectedMessages}
                 className="rounded-full"
               >
-                {selectionActionPending === "favorite" ? "收藏中..." : "收藏"}
+                {selectionActionPending === "favorite"
+                  ? t(msg`收藏中...`)
+                  : t(msg`收藏`)}
               </Button>
               <Button
                 type="button"
@@ -2600,7 +2608,7 @@ export function ChatMessageList({
                 onClick={() => setForwardMessages(selectedMessages)}
                 className="rounded-full"
               >
-                转发
+                {t(msg`转发`)}
               </Button>
               <Button
                 type="button"
@@ -2615,7 +2623,9 @@ export function ChatMessageList({
                 }}
                 className="rounded-full"
               >
-                {selectionActionPending === "recall" ? "撤回中..." : "撤回"}
+                {selectionActionPending === "recall"
+                  ? t(msg`撤回中...`)
+                  : t(msg`撤回`)}
               </Button>
               <Button
                 type="button"
@@ -2629,7 +2639,9 @@ export function ChatMessageList({
                 }}
                 className="rounded-full text-[#d74b45]"
               >
-                {selectionActionPending === "delete" ? "删除中..." : "删除"}
+                {selectionActionPending === "delete"
+                  ? t(msg`删除中...`)
+                  : t(msg`删除`)}
               </Button>
             </div>
           </div>
@@ -2640,10 +2652,10 @@ export function ChatMessageList({
               onClick={resetSelectionMode}
               className="flex h-9 min-w-14 items-center justify-start rounded-[10px] px-2.5 text-[15px] text-[color:var(--text-secondary)] transition active:bg-white/80"
             >
-              取消
+              {t(msg`取消`)}
             </button>
             <div className="text-[15px] font-medium text-[#111827]">
-              已选 {selectedMessageIds.length} 条
+              {t(msg`已选 ${selectedMessageIds.length} 条`)}
             </div>
             <button
               type="button"
@@ -2653,7 +2665,7 @@ export function ChatMessageList({
               onClick={handleToggleSelectAllMessages}
               className="flex h-9 min-w-16 items-center justify-end rounded-[10px] px-2.5 text-[15px] font-medium text-[#07c160] transition active:bg-white/80 disabled:text-[#b8b8b8]"
             >
-              {allVisibleSelected ? "全不选" : "全选"}
+              {allVisibleSelected ? t(msg`全不选`) : t(msg`全选`)}
             </button>
           </div>
         )
