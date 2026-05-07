@@ -15,11 +15,13 @@ export default async function HomePage({
 
   return (
     <main className="min-h-screen grid place-items-center text-center px-6">
-      <div>
-        <h1 className="text-4xl font-bold mb-4 text-(--brand-primary)">{heroTitle}</h1>
-        <p className="text-lg opacity-70">{heroSub}</p>
-        <p className="mt-6 text-sm opacity-50">
-          locale = <code>{safeLocale}</code>
+      <div className="max-w-3xl">
+        <h1 className="text-4xl sm:text-5xl font-bold mb-4 brand-gradient-text">
+          {heroTitle}
+        </h1>
+        <p className="text-lg sm:text-xl text-(--text-secondary)">{heroSub}</p>
+        <p className="mt-8 text-sm text-(--text-dim)">
+          locale = <code className="px-1.5 py-0.5 rounded bg-(--surface-soft) text-(--brand-primary)">{safeLocale}</code>
         </p>
       </div>
     </main>
