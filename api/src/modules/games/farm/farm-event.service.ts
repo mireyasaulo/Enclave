@@ -14,6 +14,10 @@ import {
   FarmEventView,
 } from './farm.types';
 
+// i18n-content: zh-only — actorName 字段当前作为内容写入事件日志，前端按 actorType=='system' 在
+// UI 层映射到本地化文案；这里保留中文作为 legacy 回退，后续如改成纯 actorType+code 形式可去掉。
+export const SYSTEM_ACTOR_NAME = '系统';
+
 export interface RecordEventInput {
   ownerId: string;
   kind: FarmEventKind;
@@ -110,7 +114,7 @@ export class FarmEventService {
       kind: 'intimacy_change',
       actorType,
       actorId: sourceCharacterId ?? 'system',
-      actorName: actorName ?? '系统',
+      actorName: actorName ?? SYSTEM_ACTOR_NAME,
       targetType: 'character',
       targetId: targetCharacterId,
       targetName: target.name,
