@@ -728,7 +728,7 @@ export function JobsPage() {
                       {t(group.state.label)}
                     </span>
                     <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                      {t("{count} jobs").replace("{count}", String(group.jobs.length))}
+                      {formatCloudConsoleJobsGroupCount(group.jobs.length, locale)}
                     </span>
                   </div>
                 </td>

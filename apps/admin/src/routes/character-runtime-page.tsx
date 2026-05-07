@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import type { ReplyLogicCharacterSnapshot } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   Button,
   Card,
@@ -20,15 +22,21 @@ import { resolveAdminCoreApiBaseUrl } from "../lib/core-api-base";
 import { formatAdminDateTime as formatLocalizedDateTime } from "../lib/format";
 import { CharacterWorkspaceNav } from "../components/character-workspace-nav";
 
-const ACTIVITY_OPTIONS = [
-  { value: "", label: "未设置" },
-  { value: "free", label: "空闲" },
-  { value: "working", label: "工作中" },
-  { value: "eating", label: "吃饭中" },
-  { value: "resting", label: "休息中" },
-  { value: "commuting", label: "通勤中" },
-  { value: "sleeping", label: "睡觉中" },
-];
+const ACTIVITY_LABEL_MESSAGES: Record<string, ReturnType<typeof msg>> = {
+  "": msg`未设置`,
+  free: msg`空闲`,
+  working: msg`工作中`,
+  eating: msg`吃饭中`,
+  resting: msg`休息中`,
+  commuting: msg`通勤中`,
+  sleeping: msg`睡觉中`,
+};
+
+function getActivityLabel(value?: string | null): string {
+  const key = value ?? "";
+  const message = ACTIVITY_LABEL_MESSAGES[key] ?? ACTIVITY_LABEL_MESSAGES[""];
+  return translateRuntimeMessage(message);
+}
 
 export function CharacterRuntimePage() {
   const { characterId } = useParams({ from: "/characters/$characterId/runtime" });
@@ -326,7 +334,7 @@ function formatMode(value?: string | null) {
 }
 
 function formatActivity(value?: string | null) {
-  return ACTIVITY_OPTIONS.find((item) => item.value === (value ?? ""))?.label ?? "未设置";
+  return getActivityLabel(value);
 }
 
 function formatGateMode(mode: string) {
