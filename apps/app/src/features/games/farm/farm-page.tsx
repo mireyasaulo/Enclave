@@ -139,7 +139,7 @@ function FarmPageInner() {
             <button
               type="button"
               onClick={() => setSeedShopOpen(true)}
-              className="rounded-2xl bg-white px-3 py-2 text-left text-xs shadow-sm hover:bg-emerald-50"
+              className="rounded-2xl border border-white/60 bg-white/75 px-3 py-2 text-left text-xs shadow-md backdrop-blur-md transition hover:bg-emerald-50/85"
             >
               <div className="font-medium text-emerald-700">🛒 {t(msg`种子店`)}</div>
               <div className="mt-0.5 text-stone-500">
@@ -149,14 +149,14 @@ function FarmPageInner() {
             <button
               type="button"
               onClick={() => setWarehouseOpen(true)}
-              className="rounded-2xl bg-white px-3 py-2 text-left text-xs shadow-sm hover:bg-emerald-50"
+              className="rounded-2xl border border-white/60 bg-white/75 px-3 py-2 text-left text-xs shadow-md backdrop-blur-md transition hover:bg-amber-50/85"
             >
               <div className="font-medium text-amber-700">🏠 {t(msg`仓库`)}</div>
               <div className="mt-0.5 text-stone-500">
                 {t(msg`存货共`)} {warehouseTotal} {t(msg`个`)}
               </div>
             </button>
-            <p className="hidden rounded-2xl bg-white/70 p-3 text-[11px] text-stone-500 shadow-sm lg:block">
+            <p className="hidden rounded-2xl border border-white/60 bg-white/55 p-3 text-[11px] leading-relaxed text-stone-600 shadow-sm backdrop-blur-md lg:block">
               {t(msg`作物按真实小时数成熟。下线时世界角色仍在自己的田里忙活——回来时看到的状态是世界自治后的结果。`)}
             </p>
           </aside>

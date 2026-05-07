@@ -45,7 +45,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
 
   if (plotIndex == null || !plot) {
     return (
-      <div className="rounded-2xl bg-stone-50 p-3 text-center text-xs text-stone-400">
+      <div className="rounded-2xl border border-white/60 bg-white/55 p-3 text-center text-xs text-stone-500 shadow-sm backdrop-blur-md">
         {t(msg`点一块田看看能干啥`)}
       </div>
     );
@@ -108,7 +108,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
           state.coins >= FARM_CROP_CATALOG[id].seedCost),
     );
     return (
-      <div className="flex flex-col gap-2 rounded-2xl bg-emerald-50 p-3">
+      <div className="flex flex-col gap-2 rounded-2xl border border-emerald-200/70 bg-emerald-50/85 p-3 shadow-sm backdrop-blur-md">
         <div className="flex items-center justify-between text-xs text-emerald-900">
           <span>{t(msg`第`)} {plotIndex + 1} {t(msg`块田 · 选个种子下地`)}</span>
           {plot.stage === "rotten" && (
@@ -157,7 +157,7 @@ export function PlotActionBar({ state, plotIndex, onHarvested, onPulse }: PlotAc
     plot.maturedAt != null ? plot.maturedAt - nowMs : 0;
 
   return (
-    <div className="flex flex-col gap-2 rounded-2xl bg-emerald-50 p-3">
+    <div className="flex flex-col gap-2 rounded-2xl border border-emerald-200/70 bg-emerald-50/85 p-3 shadow-sm backdrop-blur-md">
       <div className="flex items-center justify-between text-xs text-emerald-900">
         <span className="flex items-center gap-1">
           <span>{def.emoji}</span>

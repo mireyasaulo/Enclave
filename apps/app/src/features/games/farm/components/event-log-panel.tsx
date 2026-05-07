@@ -14,7 +14,7 @@ export function EventLogPanel({ limit = 20 }: EventLogPanelProps) {
   const eventsQuery = useFarmEvents({ limit });
 
   return (
-    <section className="rounded-2xl bg-white p-3 shadow-sm">
+    <section className="rounded-2xl border border-white/60 bg-white/75 p-3 shadow-md backdrop-blur-md">
       <header className="mb-2 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-stone-700">{t(msg`事件流`)}</h2>
         <span className="text-[11px] text-stone-400">
