@@ -141,9 +141,10 @@ export function MiniProgramOpenPanel({
             variant="ghost"
             size="icon"
             onClick={onDismiss}
+            aria-label="关闭"
             className={cn(
               "shrink-0 border border-white/80 bg-white/72",
-              compact ? "h-8 w-8 rounded-full" : "rounded-2xl",
+              compact ? "h-9 w-9 rounded-full" : "rounded-2xl",
             )}
           >
             <X size={16} />

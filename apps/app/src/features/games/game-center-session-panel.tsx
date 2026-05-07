@@ -116,10 +116,11 @@ export function GameCenterSessionPanel({
             variant="ghost"
             size="icon"
             onClick={onDismiss}
+            aria-label="关闭"
             className={cn(
               "shrink-0 border",
               compact
-                ? "h-8 w-8 rounded-full border-white/80 bg-white/72"
+                ? "h-9 w-9 rounded-full border-white/80 bg-white/72"
                 : "rounded-[14px] border-[color:var(--border-faint)] bg-white/86 text-[color:var(--text-secondary)] shadow-none hover:bg-white hover:text-[color:var(--text-primary)]",
             )}
           >
