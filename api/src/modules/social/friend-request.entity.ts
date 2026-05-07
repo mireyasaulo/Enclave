@@ -31,4 +31,7 @@ export class FriendRequestEntity {
 
   @Column({ type: 'datetime', nullable: true })
   expiresAt?: Date | null; // daily expiry
+
+  @Column({ name: 'accept_at', type: 'datetime', nullable: true })
+  acceptAt?: Date | null;
 }

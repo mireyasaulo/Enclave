@@ -151,6 +151,14 @@ export const SCHEDULER_JOB_DEFINITIONS = [
     nextRunHint: '每日 00:05',
     enabled: true,
   },
+  {
+    id: 'auto_accept_friend_requests',
+    name: '世界角色自动通过',
+    cadence: '*/30 * * * * *',
+    description: '扫描到点的待处理好友请求，由世界角色自动通过。',
+    nextRunHint: '每 30 秒',
+    enabled: true,
+  },
 ] as const;
 
 export type SchedulerJobId = (typeof SCHEDULER_JOB_DEFINITIONS)[number]['id'];

@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   Between,
   LessThan,
+  LessThanOrEqual,
   MoreThanOrEqual,
   MoreThan,
   Repository,
@@ -149,6 +150,15 @@ export class SchedulerService {
       'expire_friend_requests',
       () => this.handleExpireFriendRequests(),
       'Failed to expire friend requests',
+    );
+  }
+
+  @Cron('*/30 * * * * *')
+  async autoAcceptDueFriendRequests() {
+    await this.runScheduledJob(
+      'auto_accept_friend_requests',
+      () => this.handleAutoAcceptDueFriendRequests(),
+      'Failed to auto-accept due friend requests',
     );
   }
 
@@ -460,6 +470,12 @@ export class SchedulerService {
             this.handleExpireFriendRequests(),
           )
         ).summary;
+      case 'auto_accept_friend_requests':
+        return (
+          await this.executeTrackedJob(jobId, () =>
+            this.handleAutoAcceptDueFriendRequests(),
+          )
+        ).summary;
       case 'discover_need_characters_short_interval':
         return (
           await this.executeTrackedJob(jobId, () =>
@@ -685,6 +701,40 @@ export class SchedulerService {
         runtimeRules.schedulerTextTemplates.jobSummaryExpiredFriendRequests,
         { count: expiringRequests.length },
       ),
+    };
+  }
+
+  private async handleAutoAcceptDueFriendRequests(): Promise<TrackedJobResult> {
+    const now = new Date();
+    const dueRequests = await this.friendRequestRepo.find({
+      where: {
+        status: 'pending',
+        acceptAt: LessThanOrEqual(now),
+      },
+      order: { acceptAt: 'ASC', createdAt: 'ASC' },
+      take: 50,
+    });
+    let acceptedCount = 0;
+    for (const req of dueRequests) {
+      try {
+        await this.socialService.acceptRequest(req.id, {
+          acceptedBy: 'character',
+          ownerId: req.ownerId,
+        });
+        acceptedCount += 1;
+      } catch (error) {
+        this.logger.error(
+          `auto-accept failed for ${req.id}: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+    }
+    return {
+      summary:
+        acceptedCount > 0
+          ? `本轮共 ${acceptedCount} 位世界角色通过了用户的好友请求。`
+          : '当前没有到点的好友请求。',
     };
   }
 
