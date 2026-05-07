@@ -166,8 +166,14 @@ function NavLinkContent({ label, hint }: { label: string; hint: string }) {
 }
 
 function StatusDot({ tone }: { tone: "ready" | "warning" }) {
+  const label = translateCloudConsoleTextForActiveLocale(
+    tone === "ready" ? "System ready" : "System warning",
+  );
   return (
     <span
+      role="status"
+      aria-label={label}
+      title={label}
       className={
         tone === "ready"
           ? "inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500"

@@ -1515,7 +1515,7 @@ export function WorldDetailPage() {
                       <td className="px-4 py-3 text-[color:var(--text-secondary)]">
                         {formatDateTime(job.updatedAt)}
                       </td>
-                      <td className="max-w-[18rem] px-4 py-3 text-[color:var(--text-secondary)]">
+                      <td className="max-w-[18rem] break-words px-4 py-3 align-top text-[color:var(--text-secondary)]">
                         {auditBadgeLabel ? (
                           <div className="mb-2">
                             <span className={JOB_AUDIT_BADGE_CLASS_NAME}>
@@ -1523,7 +1523,9 @@ export function WorldDetailPage() {
                             </span>
                           </div>
                         ) : null}
-                        <div>{describeJobResult(job)}</div>
+                        <div className="whitespace-pre-wrap break-words">
+                          {describeJobResult(job)}
+                        </div>
                       </td>
                     </tr>
                   );

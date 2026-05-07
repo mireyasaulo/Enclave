@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 import { translateCloudConsoleTextForActiveLocale } from "../lib/cloud-console-i18n";
 
 type ConsoleConfirmDialogProps = {
@@ -30,6 +30,9 @@ export function ConsoleConfirmDialog({
     pendingLabel ?? translateCloudConsoleTextForActiveLocale("Working...");
   const cancelLabel = translateCloudConsoleTextForActiveLocale("Cancel");
   const closeLabel = translateCloudConsoleTextForActiveLocale("Close");
+  const reactId = useId();
+  const titleId = `console-dialog-title-${reactId}`;
+  const descriptionId = `console-dialog-description-${reactId}`;
   useEffect(() => {
     if (!open) {
       return;
@@ -65,14 +68,26 @@ export function ConsoleConfirmDialog({
         }}
       />
 
-      <div className="relative w-full max-w-[520px] overflow-hidden rounded-[24px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] shadow-[var(--shadow-overlay)]">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
+        className="relative w-full max-w-[520px] overflow-hidden rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] shadow-[var(--shadow-overlay)]"
+      >
         <div className="border-b border-[color:var(--border-faint)] px-6 py-5">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className="text-lg font-semibold text-[color:var(--text-primary)]">
+              <div
+                id={titleId}
+                className="text-lg font-semibold text-[color:var(--text-primary)]"
+              >
                 {title}
               </div>
-              <div className="mt-2 text-sm leading-7 text-[color:var(--text-secondary)]">
+              <div
+                id={descriptionId}
+                className="mt-2 text-sm leading-7 text-[color:var(--text-secondary)]"
+              >
                 {description}
               </div>
             </div>
