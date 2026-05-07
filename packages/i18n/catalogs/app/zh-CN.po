@@ -169,6 +169,16 @@ msgstr "{0} 接力"
 msgid "{0} 播放"
 msgstr "{0} 播放"
 
+#. placeholder {0}: t(unavailableAction.label)
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:492
+msgid "{0} 暂未接入"
+msgstr "{0} 暂未接入"
+
+#. placeholder {0}: t(item.label)
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:363
+msgid "{0} 暂未接入。"
+msgstr "{0} 暂未接入。"
+
 #. placeholder {0}: group.items.length
 #. placeholder {0}: post.commentCount
 #. placeholder {0}: section.items.length
@@ -1017,6 +1027,7 @@ msgstr "世界相册"
 msgid "世界缺少可用的 API 地址。"
 msgstr "世界缺少可用的 API 地址。"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:602
 #: apps/app/src/routes/character-detail-page.tsx:250
 #: apps/app/src/routes/chat-details-page.tsx:297
 #: apps/app/src/routes/chat-details-page.tsx:320
@@ -1407,6 +1418,7 @@ msgstr "会话类型"
 msgid "位"
 msgstr "位"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:149
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:109
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:996
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1108
@@ -2710,12 +2722,18 @@ msgstr "切换为{paletteLabel}标注 ({0})"
 msgid "切换为完整日期显示"
 msgstr "切换为完整日期显示"
 
+#. placeholder {0}: pageIndex + 1
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:471
+msgid "切换到第 {0} 页"
+msgstr "切换到第 {0} 页"
+
 #: apps/app/src/components/chat-composer.tsx:3195
 msgid "切换到语音输入"
 msgstr "切换到语音输入"
 
 #: apps/app/src/components/chat-composer.tsx:3194
 #: apps/app/src/components/chat-composer.tsx:3279
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:801
 msgid "切换到键盘输入"
 msgstr "切换到键盘输入"
 
@@ -2890,6 +2908,10 @@ msgstr "剩余 {customSlotsRemaining}"
 #: apps/app/src/routes/desktop-feedback-page.tsx:53
 msgid "功能和预期不一致、页面报错、数据错乱。"
 msgstr "功能和预期不一致、页面报错、数据错乱。"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:497
+msgid "功能开发中，敬请期待。"
+msgstr "功能开发中，敬请期待。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:514
 #: apps/app/src/routes/desktop-feedback-page.tsx:52
@@ -3227,6 +3249,11 @@ msgstr "发表"
 msgid "发表朋友圈"
 msgstr "发表朋友圈"
 
+#: apps/app/src/routes/chat-room-page.tsx:215
+#: apps/app/src/routes/group-chat-page.tsx:181
+msgid "发语音继续"
+msgstr "发语音继续"
+
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:204
 #: apps/app/src/i18n/static-dom-seed.ts:990
 msgid "发起时间"
@@ -3318,6 +3345,7 @@ msgid "发送好友申请"
 msgstr "发送好友申请"
 
 #: apps/app/src/components/chat-composer.tsx:3477
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:621
 msgid "发送收藏"
 msgstr "发送收藏"
 
@@ -3524,6 +3552,7 @@ msgstr "同类单聊"
 msgid "同类群聊"
 msgstr "同类群聊"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:143
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:108
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:992
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1104
@@ -3537,6 +3566,10 @@ msgstr "名片摘要已复制。"
 #: apps/app/src/routes/character-detail-page.tsx:939
 msgid "后续互动会被拦截"
 msgstr "后续互动会被拦截"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:139
+msgid "后续会补金额确认、到账反馈和会话内转账记录，这一版先保留入口。"
+msgstr "后续会补金额确认、到账反馈和会话内转账记录，这一版先保留入口。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:292
 msgid "后续再补小游戏运行容器、好友组局邀请和真实活动编排，避免这次直接把范围做成平台级工程。"
@@ -5315,6 +5348,10 @@ msgstr "当前参考内容"
 msgid "当前发布到朋友圈"
 msgstr "当前发布到朋友圈"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:161
+msgid "当前可以先用按住说话发送语音消息，实时语音通话会在后续单独接入。"
+msgstr "当前可以先用按住说话发送语音消息，实时语音通话会在后续单独接入。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:824
 msgid "当前可搜索范围"
 msgstr "当前可搜索范围"
@@ -5782,6 +5819,13 @@ msgstr "待恢复"
 #: apps/app/src/i18n/static-dom-seed.ts:897
 msgid "待打开"
 msgstr "待打开"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:115
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:127
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:137
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:159
+msgid "待接入"
+msgstr "待接入"
 
 #: apps/app/src/features/chat/chat-reminder-entries.ts:166
 #: apps/app/src/features/chat/chat-reminder-entries.ts:359
@@ -6408,6 +6452,10 @@ msgstr "投诉后可继续查看聊天"
 msgid "投递到最近会话"
 msgstr "投递到最近会话"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:105
+msgid "拍摄"
+msgstr "拍摄"
+
 #: apps/app/src/i18n/static-dom-seed.ts:776
 msgid "拒绝"
 msgstr "拒绝"
@@ -6942,6 +6990,10 @@ msgstr "擅长领域"
 msgid "操作者"
 msgstr "操作者"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:129
+msgid "支付与到账链路还没接入，这里先保留和微信一致的能力入口。"
+msgstr "支付与到账链路还没接入，这里先保留和微信一致的能力入口。"
+
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:960
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:2432
 msgid "支持上传图片 / GIF，也能把聊天里的图片、动图添加到表情。"
@@ -6997,6 +7049,7 @@ msgid "收付款"
 msgstr "收付款"
 
 #: apps/app/src/components/chat-composer.tsx:3068
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:173
 #: apps/app/src/features/shell/desktop-nav-matching.ts:65
 #: apps/app/src/features/shell/desktop-nav-matching.ts:66
 #: apps/app/src/i18n/static-dom-seed.ts:65
@@ -7020,6 +7073,10 @@ msgstr "收藏笔记"
 #: apps/app/src/i18n/static-dom-seed.ts:393
 msgid "收藏详情"
 msgstr "收藏详情"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:633
+msgid "收藏读取失败"
+msgstr "收藏读取失败"
 
 #: apps/app/src/i18n/static-dom-seed.ts:365
 msgid "收藏过内容后，这里会出现最近回访入口。"
@@ -7065,9 +7122,17 @@ msgstr "收起链路详情"
 msgid "收集"
 msgstr "收集"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:118
+msgid "改为拍摄"
+msgstr "改为拍摄"
+
 #: apps/app/src/routes/group-qr-page.tsx:1779
 msgid "改做次优先备选"
 msgstr "改做次优先备选"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:162
+msgid "改发语音消息"
+msgstr "改发语音消息"
 
 #: apps/app/src/routes/profile-settings-page.tsx:923
 msgid "放弃"
@@ -7108,6 +7173,7 @@ msgid "数据库{0}"
 msgstr "数据库{0}"
 
 #: apps/app/src/components/chat-composer.tsx:3099
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:167
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:105
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:133
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:134
@@ -7363,6 +7429,14 @@ msgstr "暂时没有新的好友请求"
 msgid "暂时没有更多介绍。"
 msgstr "暂时没有更多介绍。"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:634
+msgid "暂时没能读取收藏内容，请检查网络后重试。"
+msgstr "暂时没能读取收藏内容，请检查网络后重试。"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:559
+msgid "暂时没能读取联系人名片，请检查网络后重试。"
+msgstr "暂时没能读取联系人名片，请检查网络后重试。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:398
 msgid "暂时空白"
 msgstr "暂时空白"
@@ -7404,6 +7478,7 @@ msgid "更多信息"
 msgstr "更多信息"
 
 #: apps/app/src/components/chat-composer.tsx:3310
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:309
 #: apps/app/src/features/shell/desktop-shell.tsx:832
 msgid "更多功能"
 msgstr "更多功能"
@@ -7785,6 +7860,18 @@ msgstr "本轮摘要"
 msgid "本轮时长"
 msgstr "本轮时长"
 
+#: apps/app/src/routes/chat-room-page.tsx:222
+msgid "本轮视频通话已结束。你可以直接继续输入，也可以切回语音发送。"
+msgstr "本轮视频通话已结束。你可以直接继续输入，也可以切回语音发送。"
+
+#: apps/app/src/routes/group-chat-page.tsx:188
+msgid "本轮群视频通话已结束。你可以继续在群里输入，也可以切回语音发送。"
+msgstr "本轮群视频通话已结束。你可以继续在群里输入，也可以切回语音发送。"
+
+#: apps/app/src/routes/group-chat-page.tsx:185
+msgid "本轮群语音通话已结束。你可以继续在群里输入，也可以切回语音发送。"
+msgstr "本轮群语音通话已结束。你可以继续在群里输入，也可以切回语音发送。"
+
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1761
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:937
 msgid "本轮语音已发出，AI 已按原始录音完成理解。"
@@ -7807,6 +7894,10 @@ msgstr "本轮语音已发出，正在整理..."
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:662
 msgid "本轮语音消息、可用字幕和 AI 回复都会同步保存在当前聊天里。"
 msgstr "本轮语音消息、可用字幕和 AI 回复都会同步保存在当前聊天里。"
+
+#: apps/app/src/routes/chat-room-page.tsx:219
+msgid "本轮语音通话已结束。你可以直接继续输入，也可以切回语音发送。"
+msgstr "本轮语音通话已结束。你可以直接继续输入，也可以切回语音发送。"
 
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:634
 msgid "条"
@@ -8380,6 +8471,10 @@ msgstr "正在打开桌面公众号文章"
 msgid "正在打开桌面发现"
 msgstr "正在打开桌面发现"
 
+#: apps/app/src/routes/chat-room-page.tsx:265
+msgid "正在打开桌面对话"
+msgstr "正在打开桌面对话"
+
 #: apps/app/src/routes/chat-list-page.tsx:176
 msgid "正在打开桌面消息"
 msgstr "正在打开桌面消息"
@@ -8387,6 +8482,10 @@ msgstr "正在打开桌面消息"
 #: apps/app/src/routes/channels-page.tsx:948
 msgid "正在打开桌面视频号"
 msgstr "正在打开桌面视频号"
+
+#: apps/app/src/routes/group-chat-page.tsx:231
+msgid "正在打开桌面群聊"
+msgstr "正在打开桌面群聊"
 
 #: apps/app/src/routes/group-chat-details-page.tsx:49
 msgid "正在打开桌面群聊信息"
@@ -8548,6 +8647,10 @@ msgstr "正在读取实例状态..."
 msgid "正在读取广场动态..."
 msgstr "正在读取广场动态..."
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:628
+msgid "正在读取收藏..."
+msgstr "正在读取收藏..."
+
 #: apps/app/src/i18n/static-dom-seed.ts:1007
 msgid "正在读取文章"
 msgstr "正在读取文章"
@@ -8592,6 +8695,7 @@ msgstr "正在读取聊天信息..."
 msgid "正在读取聊天记录..."
 msgstr "正在读取聊天记录..."
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:553
 #: apps/app/src/features/desktop/chat/desktop-group-member-picker.tsx:139
 msgid "正在读取联系人..."
 msgstr "正在读取联系人..."
@@ -8629,6 +8733,14 @@ msgstr "正在载入桌面看一看工作区，马上显示当前动态内容。
 #: apps/app/src/routes/channels-page.tsx:950
 msgid "正在载入桌面视频号工作区，马上显示当前频道内容。"
 msgstr "正在载入桌面视频号工作区，马上显示当前频道内容。"
+
+#: apps/app/src/routes/chat-room-page.tsx:266
+msgid "正在载入桌面聊天工作区，马上恢复当前会话。"
+msgstr "正在载入桌面聊天工作区，马上恢复当前会话。"
+
+#: apps/app/src/routes/group-chat-page.tsx:232
+msgid "正在载入桌面聊天工作区，马上恢复当前群聊。"
+msgstr "正在载入桌面聊天工作区，马上恢复当前群聊。"
 
 #: apps/app/src/routes/contacts-page.tsx:1363
 msgid "正在载入桌面通讯录工作区，马上显示联系人和详情。"
@@ -9385,6 +9497,10 @@ msgstr "直播模式"
 msgid "直播记录"
 msgstr "直播记录"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:99
+msgid "相册"
+msgstr "相册"
+
 #: apps/app/src/i18n/static-dom-seed.ts:254
 msgid "相册工具"
 msgstr "相册工具"
@@ -9405,6 +9521,7 @@ msgstr "看精选"
 msgid "看自定义"
 msgstr "看自定义"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:534
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:98
 msgid "知道了"
 msgstr "知道了"
@@ -9584,6 +9701,7 @@ msgstr "视频封面"
 msgid "视频选择失败，请稍后重试。"
 msgstr "视频选择失败，请稍后重试。"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:111
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:85
 #: apps/app/src/routes/character-detail-page.tsx:920
@@ -9591,9 +9709,17 @@ msgstr "视频选择失败，请稍后重试。"
 msgid "视频通话"
 msgstr "视频通话"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:117
+msgid "视频通话功能开发中，敬请期待。"
+msgstr "视频通话功能开发中，敬请期待。"
+
 #: apps/app/src/features/chat/chat-call-fallback-notice.tsx:48
 msgid "视频通话暂未开放"
 msgstr "视频通话暂未开放"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:116
+msgid "视频通话暂未接入"
+msgstr "视频通话暂未接入"
 
 #: apps/app/src/i18n/static-dom-seed.ts:376
 msgid "福利活动"
@@ -10013,6 +10139,14 @@ msgstr "系统分享暂时不可用，已复制群链接。"
 msgid "系统分享暂时不可用，已复制联系人摘要。"
 msgstr "系统分享暂时不可用，已复制联系人摘要。"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:123
+msgid "红包"
+msgstr "红包"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:128
+msgid "红包暂未接入"
+msgstr "红包暂未接入"
+
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:284
 msgid "纯文本笔记"
 msgstr "纯文本笔记"
@@ -10093,6 +10227,11 @@ msgstr "继续使用"
 #: apps/app/src/i18n/static-dom-seed.ts:477
 msgid "继续使用会回到最近那个接龙，优先展示未确认成员。"
 msgstr "继续使用会回到最近那个接龙，优先展示未确认成员。"
+
+#: apps/app/src/routes/chat-room-page.tsx:236
+#: apps/app/src/routes/group-chat-page.tsx:202
+msgid "继续打字"
+msgstr "继续打字"
 
 #: apps/app/src/i18n/static-dom-seed.ts:336
 msgid "继续承接广场动态结果。"
@@ -10561,6 +10700,10 @@ msgstr "联系人摘要已复制。"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:835
 msgid "联系人管理"
 msgstr "联系人管理"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:558
+msgid "联系人读取失败"
+msgstr "联系人读取失败"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:340
 msgid "联系人资料已更新。"
@@ -11035,6 +11178,7 @@ msgstr "语音输入已完成。"
 msgid "语音输入暂时不可用"
 msgstr "语音输入暂时不可用"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:155
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:51
 #: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:73
 #: apps/app/src/routes/character-detail-page.tsx:282
@@ -11046,6 +11190,10 @@ msgstr "语音通话"
 #: apps/app/src/features/chat/chat-call-fallback-notice.tsx:47
 msgid "语音通话暂未开放"
 msgstr "语音通话暂未开放"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:160
+msgid "语音通话暂未接入"
+msgstr "语音通话暂未接入"
 
 #: apps/app/src/i18n/static-dom-seed.ts:549
 #: apps/app/src/routes/desktop-feedback-page.tsx:633
@@ -11313,6 +11461,14 @@ msgstr "转发消息"
 msgid "转发给"
 msgstr "转发给"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:133
+msgid "转账"
+msgstr "转账"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:138
+msgid "转账暂未接入"
+msgstr "转账暂未接入"
+
 #: apps/app/src/i18n/static-dom-seed.ts:374
 msgid "轻布置 + 轻剧情的休闲经营玩法，视觉柔和，适合放在移动端推荐流和近期回访位。"
 msgstr "轻布置 + 轻剧情的休闲经营玩法，视觉柔和，适合放在移动端推荐流和近期回访位。"
@@ -11329,6 +11485,10 @@ msgstr "轻轻试一次，就可能遇到一段新的关系线索。"
 msgid "载入桌面发现工作区..."
 msgstr "载入桌面发现工作区..."
 
+#: apps/app/src/routes/chat-room-page.tsx:267
+msgid "载入桌面对话..."
+msgstr "载入桌面对话..."
+
 #: apps/app/src/routes/chat-list-page.tsx:178
 msgid "载入桌面消息工作区..."
 msgstr "载入桌面消息工作区..."
@@ -11336,6 +11496,10 @@ msgstr "载入桌面消息工作区..."
 #: apps/app/src/routes/channels-page.tsx:952
 msgid "载入桌面视频号..."
 msgstr "载入桌面视频号..."
+
+#: apps/app/src/routes/group-chat-page.tsx:233
+msgid "载入桌面群聊..."
+msgstr "载入桌面群聊..."
 
 #: apps/app/src/routes/contacts-page.tsx:1365
 msgid "载入桌面通讯录..."
@@ -11415,6 +11579,7 @@ msgstr "运行平台"
 msgid "近"
 msgstr "近"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:790
 #: apps/app/src/features/chat-details/chat-details-shell.tsx:45
 #: apps/app/src/routes/character-detail-page.tsx:272
 #: apps/app/src/routes/welcome-page.tsx:1111
@@ -11461,6 +11626,11 @@ msgstr "返回公众号列表"
 #: apps/app/src/i18n/static-dom-seed.ts:1073
 msgid "返回收藏"
 msgstr "返回收藏"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:564
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:639
+msgid "返回更多功能"
+msgstr "返回更多功能"
 
 #: apps/app/src/i18n/static-dom-seed.ts:439
 msgid "返回朋友圈"
@@ -11616,9 +11786,17 @@ msgstr "还没有加入我的小程序"
 msgid "还没有发送记录"
 msgstr "还没有发送记录"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:611
+msgid "还没有可以分享的联系人名片。"
+msgstr "还没有可以分享的联系人名片。"
+
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:152
 msgid "还没有可发送的最近会话"
 msgstr "还没有可发送的最近会话"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:686
+msgid "还没有可发送的收藏内容，先在聊天或内容页里把消息加入收藏。"
+msgstr "还没有可发送的收藏内容，先在聊天或内容页里把消息加入收藏。"
 
 #: apps/app/src/components/chat-composer.tsx:3520
 msgid "还没有可发送的收藏内容，先把消息或内容加入收藏。"
@@ -12098,6 +12276,14 @@ msgstr "选择一个会话后再查看历史消息。"
 msgid "选择一个地点"
 msgstr "选择一个地点"
 
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:696
+msgid "选择位置"
+msgstr "选择位置"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:546
+msgid "选择名片"
+msgstr "选择名片"
+
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:460
 msgid "选择某一天的聊天记录"
 msgstr "选择某一天的聊天记录"
@@ -12265,6 +12451,11 @@ msgstr "重新拖拽可修改裁剪区域。"
 #: apps/app/src/routes/welcome-page.tsx:1259
 msgid "重新解析"
 msgstr "重新解析"
+
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:560
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:635
+msgid "重新读取"
+msgstr "重新读取"
 
 #: apps/app/src/routes/welcome-page.tsx:1213
 msgid "重新连接"
