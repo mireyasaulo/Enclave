@@ -3,16 +3,20 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Query,
 } from '@nestjs/common';
 import { FarmEventService } from './farm-event.service';
+import { FarmNpcService } from './farm-npc.service';
 import { FarmStateService } from './farm-state.service';
 import { isFarmCropId } from './crop-catalog';
 import {
   FarmCropId,
   FarmEventView,
   FarmHarvestResult,
+  FarmNeighborDetail,
+  FarmNeighborSummary,
   FarmPlayerStateView,
 } from './farm.types';
 
@@ -36,12 +40,30 @@ export class FarmController {
   constructor(
     private readonly stateService: FarmStateService,
     private readonly eventService: FarmEventService,
+    private readonly npcService: FarmNpcService,
   ) {}
 
   @Get('state')
   async getState(): Promise<FarmPlayerStateView> {
     const ownerId = await this.stateService.resolveOwnerId();
     return this.stateService.getPlayerStateView(ownerId);
+  }
+
+  @Get('neighbors')
+  async listNeighbors(
+    @Query('limit') limit?: string,
+  ): Promise<FarmNeighborSummary[]> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    const limitN = limit ? Math.max(1, Math.min(200, Number(limit))) : undefined;
+    return this.npcService.listNeighbors(ownerId, { limit: limitN });
+  }
+
+  @Get('neighbors/:characterId')
+  async getNeighbor(
+    @Param('characterId') characterId: string,
+  ): Promise<FarmNeighborDetail> {
+    const ownerId = await this.stateService.resolveOwnerId();
+    return this.npcService.getNeighborDetail(ownerId, characterId);
   }
 
   @Post('plant')
