@@ -6,12 +6,10 @@ import {
   AlertCircle,
   Bug,
   ClipboardList,
-  Download,
   Gauge,
   Lightbulb,
   MessageSquareText,
   Send,
-  Sparkles,
 } from "lucide-react";
 import {
   Button,
@@ -39,8 +37,6 @@ import {
 } from "../features/desktop/feedback/desktop-feedback-storage";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { formatTimestamp } from "../lib/format";
-import { revealSavedFile } from "../runtime/reveal-saved-file";
-import { saveGeneratedFile } from "../runtime/save-generated-file";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 import { translateRuntimeMessage, useAppLocale } from "@yinjie/i18n";
@@ -678,24 +674,6 @@ export function DesktopFeedbackPage() {
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => void handleCopyFeedbackPackage()}
-                className="rounded-[10px] border-[color:var(--border-faint)] bg-white shadow-none hover:bg-[color:var(--surface-console)]"
-              >
-                <Sparkles size={15} />
-                {t(msg`复制反馈包`)}
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => void handleSaveFeedbackPackage()}
-                className="rounded-[10px] border-[color:var(--border-faint)] bg-white shadow-none hover:bg-[color:var(--surface-console)]"
-              >
-                <Download size={15} />
-                {t(msg`保存反馈包`)}
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
                 onClick={() => {
                   setDraft({ ...defaultDesktopFeedbackDraft });
                   clearDesktopFeedbackDraft();
@@ -795,95 +773,6 @@ export function DesktopFeedbackPage() {
     }
   }
 
-  function buildFeedbackPackage() {
-    return [
-      t(
-        msg`反馈分类：${resolveCategoryLabel(draft.category, categoryOptions, t)}`,
-      ),
-      t(
-        msg`优先级：${resolvePriorityLabel(draft.priority, priorityOptions, t)}`,
-      ),
-      t(msg`标题：${draft.title.trim() || t(msg`未填写`)}`),
-      t(msg`问题描述：${draft.detail.trim() || t(msg`未填写`)}`),
-      t(msg`复现步骤：${draft.reproduction.trim() || t(msg`未填写`)}`),
-      t(msg`期望结果：${draft.expected.trim() || t(msg`未填写`)}`),
-      t(msg`实例地址：${baseUrl || notConfiguredLabel}`),
-      t(msg`运行平台：${runtimeConfig.appPlatform || "web"}`),
-      t(msg`世界主人：${ownerName || worldOwnerLabel}`),
-      t(msg`诊断摘要：${diagnosticSummary}`),
-    ].join("\n");
-  }
-
-  function buildFeedbackPackageFileName() {
-    const normalizedTitle =
-      draft.title
-        .trim()
-        .replace(/[\\/:*?"<>|]/g, "-")
-        .replace(/\s+/g, "-") || "desktop-feedback";
-    const date = new Date().toISOString().slice(0, 10);
-    return `${normalizedTitle}-${date}.txt`;
-  }
-
-  async function handleCopyFeedbackPackage() {
-    const feedbackPackage = buildFeedbackPackage();
-
-    if (
-      typeof navigator === "undefined" ||
-      !navigator.clipboard ||
-      typeof navigator.clipboard.writeText !== "function"
-    ) {
-      setError(t(msg`当前环境暂不支持复制反馈包。`));
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(feedbackPackage);
-      setError(null);
-      setNotice({
-        message: t(msg`反馈包已复制，可直接发给产品或开发继续跟进。`),
-        tone: "success",
-      });
-    } catch {
-      setError(t(msg`复制反馈包失败，请稍后重试。`));
-    }
-  }
-
-  async function handleSaveFeedbackPackage() {
-    const result = await saveGeneratedFile({
-      contents: buildFeedbackPackage(),
-      fileName: buildFeedbackPackageFileName(),
-      mimeType: "text/plain;charset=utf-8",
-      dialogTitle: t(msg`保存反馈包`),
-      kindLabel: t(msg`反馈包`),
-    });
-
-    if (result.status === "cancelled") {
-      return;
-    }
-
-    const canRevealSavedFile =
-      result.status === "saved" && Boolean(result.savedPath?.trim());
-    const savedPath = canRevealSavedFile ? result.savedPath!.trim() : null;
-
-    setNotice({
-      message: result.message,
-      tone: result.status === "failed" ? "danger" : "success",
-      actionLabel: canRevealSavedFile ? t(msg`打开位置`) : undefined,
-      onAction: savedPath
-        ? () => {
-            void revealSavedFile(savedPath).then((revealed) => {
-              setNotice({
-                message: revealed
-                  ? t(msg`已打开反馈包所在位置。`)
-                  : t(msg`打开所在位置失败，请稍后再试。`),
-                tone: revealed ? "success" : "danger",
-              });
-            });
-          }
-        : undefined,
-    });
-    setError(null);
-  }
 }
 
 function FeedbackTextarea({
