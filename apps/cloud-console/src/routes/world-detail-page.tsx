@@ -829,7 +829,7 @@ export function WorldDetailPage() {
               onClick={() => updateMutation.mutate()}
               className="rounded-xl bg-[color:var(--surface-secondary)] px-4 py-3 text-[color:var(--text-primary)] hover:bg-[color:var(--surface-tertiary)] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {updateMutation.isPending ? "Saving..." : "Save world"}
+              {updateMutation.isPending ? t("Saving...") : t("Save world")}
             </button>
 
             {validationMessage ? (
@@ -875,17 +875,32 @@ export function WorldDetailPage() {
             </div>
 
             <div className="mt-4 space-y-2 text-sm text-[color:var(--text-secondary)]">
-              <div>Health message: {formatOptional(world.healthMessage)}</div>
-              <div>Failure message: {formatOptional(world.failureMessage)}</div>
-              <div>API: {formatOptional(world.apiBaseUrl)}</div>
-              <div>Admin: {formatOptional(world.adminUrl)}</div>
-              <div>Last accessed: {formatDateTime(world.lastAccessedAt)}</div>
               <div>
-                Last interactive: {formatDateTime(world.lastInteractiveAt)}
+                {t("Health message")}: {formatOptional(world.healthMessage)}
               </div>
-              <div>Last booted: {formatDateTime(world.lastBootedAt)}</div>
-              <div>Last heartbeat: {formatDateTime(world.lastHeartbeatAt)}</div>
-              <div>Last suspended: {formatDateTime(world.lastSuspendedAt)}</div>
+              <div>
+                {t("Failure message")}: {formatOptional(world.failureMessage)}
+              </div>
+              <div>API: {formatOptional(world.apiBaseUrl)}</div>
+              <div>
+                {t("Admin")}: {formatOptional(world.adminUrl)}
+              </div>
+              <div>
+                {t("Last accessed")}: {formatDateTime(world.lastAccessedAt)}
+              </div>
+              <div>
+                {t("Last interactive")}:{" "}
+                {formatDateTime(world.lastInteractiveAt)}
+              </div>
+              <div>
+                {t("Last booted")}: {formatDateTime(world.lastBootedAt)}
+              </div>
+              <div>
+                {t("Last heartbeat")}: {formatDateTime(world.lastHeartbeatAt)}
+              </div>
+              <div>
+                {t("Last suspended")}: {formatDateTime(world.lastSuspendedAt)}
+              </div>
             </div>
           </div>
 
@@ -896,8 +911,9 @@ export function WorldDetailPage() {
                   {t("Alert status")}
                 </div>
                 <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
-                  Current alert severity after applying retry and
-                  stale-heartbeat thresholds.
+                  {t(
+                    "Current alert severity after applying retry and stale-heartbeat thresholds.",
+                  )}
                 </div>
               </div>
 
@@ -967,42 +983,67 @@ export function WorldDetailPage() {
 
             {instance ? (
               <div className="mt-4 space-y-2 text-sm text-[color:var(--text-secondary)]">
-                <div>Name: {instance.name}</div>
-                <div>Power state: {instance.powerState}</div>
                 <div>
-                  Provider instance:{" "}
+                  {t("Name")}: {instance.name}
+                </div>
+                <div>
+                  {t("Power state")}: {instance.powerState}
+                </div>
+                <div>
+                  {t("Provider instance")}:{" "}
                   {formatOptional(instance.providerInstanceId)}
                 </div>
                 <div>
-                  Provider volume: {formatOptional(instance.providerVolumeId)}
+                  {t("Provider volume")}:{" "}
+                  {formatOptional(instance.providerVolumeId)}
                 </div>
                 <div>
-                  Provider snapshot:{" "}
+                  {t("Provider snapshot")}:{" "}
                   {formatOptional(instance.providerSnapshotId)}
                 </div>
-                <div>Private IP: {formatOptional(instance.privateIp)}</div>
-                <div>Public IP: {formatOptional(instance.publicIp)}</div>
-                <div>Region: {formatOptional(instance.region)}</div>
-                <div>Zone: {formatOptional(instance.zone)}</div>
-                <div>Image: {formatOptional(instance.imageId)}</div>
-                <div>Flavor: {formatOptional(instance.flavor)}</div>
-                <div>Disk: {instance.diskSizeGb ?? t("Not set")} GB</div>
                 <div>
-                  Bootstrapped: {formatDateTime(instance.bootstrappedAt)}
+                  {t("Private IP")}: {formatOptional(instance.privateIp)}
                 </div>
                 <div>
-                  Last heartbeat: {formatDateTime(instance.lastHeartbeatAt)}
+                  {t("Public IP")}: {formatOptional(instance.publicIp)}
                 </div>
                 <div>
-                  Last operation: {formatDateTime(instance.lastOperationAt)}
+                  {t("Region")}: {formatOptional(instance.region)}
                 </div>
-                <div>Created: {formatDateTime(instance.createdAt)}</div>
-                <div>Updated: {formatDateTime(instance.updatedAt)}</div>
+                <div>
+                  {t("Zone")}: {formatOptional(instance.zone)}
+                </div>
+                <div>
+                  {t("Image")}: {formatOptional(instance.imageId)}
+                </div>
+                <div>
+                  {t("Flavor")}: {formatOptional(instance.flavor)}
+                </div>
+                <div>
+                  {t("Disk")}: {instance.diskSizeGb ?? t("Not set")} GB
+                </div>
+                <div>
+                  {t("Bootstrapped")}:{" "}
+                  {formatDateTime(instance.bootstrappedAt)}
+                </div>
+                <div>
+                  {t("Last heartbeat")}:{" "}
+                  {formatDateTime(instance.lastHeartbeatAt)}
+                </div>
+                <div>
+                  {t("Last operation")}:{" "}
+                  {formatDateTime(instance.lastOperationAt)}
+                </div>
+                <div>
+                  {t("Created")}: {formatDateTime(instance.createdAt)}
+                </div>
+                <div>
+                  {t("Updated")}: {formatDateTime(instance.updatedAt)}
+                </div>
               </div>
             ) : (
               <div className="mt-4 text-sm text-[color:var(--text-muted)]">
-                No instance record exists yet. Provisioning will create one
-                automatically.
+                {t("No instance record exists yet. Provisioning will create one automatically.")}
               </div>
             )}
 
@@ -1030,8 +1071,9 @@ export function WorldDetailPage() {
                   {t("Runtime observation")}
                 </div>
                 <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
-                  Provider-side deployment status observed from the current
-                  compute adapter.
+                  {t(
+                    "Provider-side deployment status observed from the current compute adapter.",
+                  )}
                 </div>
               </div>
 
@@ -1042,8 +1084,8 @@ export function WorldDetailPage() {
                 className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-secondary)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:bg-[color:var(--surface-tertiary)] disabled:opacity-60"
               >
                 {runtimeStatusQuery.isFetching
-                  ? "Refreshing..."
-                  : "Refresh status"}
+                  ? t("Refreshing...")
+                  : t("Refresh status")}
               </button>
             </div>
 
@@ -1056,30 +1098,39 @@ export function WorldDetailPage() {
 
             {runtimeStatus ? (
               <div className="mt-4 space-y-2 text-sm text-[color:var(--text-secondary)]">
-                <div>Deployment state: {runtimeStatus.deploymentState}</div>
                 <div>
-                  Deployment mode:{" "}
+                  {t("Deployment state")}: {runtimeStatus.deploymentState}
+                </div>
+                <div>
+                  {t("Deployment mode")}:{" "}
                   {formatOptional(runtimeStatus.deploymentMode)}
                 </div>
                 <div>
-                  Executor mode: {formatOptional(runtimeStatus.executorMode)}
+                  {t("Executor mode")}:{" "}
+                  {formatOptional(runtimeStatus.executorMode)}
                 </div>
                 <div>
-                  Remote host: {formatOptional(runtimeStatus.remoteHost)}
+                  {t("Remote host")}: {formatOptional(runtimeStatus.remoteHost)}
                 </div>
                 <div>
-                  Remote path: {formatOptional(runtimeStatus.remoteDeployPath)}
-                </div>
-                <div>Project: {formatOptional(runtimeStatus.projectName)}</div>
-                <div>
-                  Container: {formatOptional(runtimeStatus.containerName)}
-                </div>
-                <div>Raw status: {formatOptional(runtimeStatus.rawStatus)}</div>
-                <div>
-                  Observed at: {formatDateTime(runtimeStatus.observedAt)}
+                  {t("Remote path")}:{" "}
+                  {formatOptional(runtimeStatus.remoteDeployPath)}
                 </div>
                 <div>
-                  Provider message:{" "}
+                  {t("Project")}: {formatOptional(runtimeStatus.projectName)}
+                </div>
+                <div>
+                  {t("Container")}:{" "}
+                  {formatOptional(runtimeStatus.containerName)}
+                </div>
+                <div>
+                  {t("Raw status")}: {formatOptional(runtimeStatus.rawStatus)}
+                </div>
+                <div>
+                  {t("Observed at")}: {formatDateTime(runtimeStatus.observedAt)}
+                </div>
+                <div>
+                  {t("Provider message")}:{" "}
                   {formatOptional(runtimeStatus.providerMessage)}
                 </div>
               </div>
@@ -1097,8 +1148,9 @@ export function WorldDetailPage() {
                   {t("Bootstrap package")}
                 </div>
                 <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
-                  Use this env overlay when deploying the user's dedicated world
-                  runtime.
+                  {t(
+                    "Use this env overlay when deploying the user's dedicated world runtime.",
+                  )}
                 </div>
               </div>
 
@@ -1301,8 +1353,9 @@ export function WorldDetailPage() {
           {t("Recent lifecycle jobs")}
         </div>
         <div className="mt-1 text-xs leading-6 text-[color:var(--text-muted)]">
-          Jobs show how this world moved through provision, resume, and suspend
-          work.
+          {t(
+            "Jobs show how this world moved through provision, resume, and suspend work.",
+          )}
         </div>
 
         {jobsQuery.isError && jobsQuery.error instanceof Error ? (

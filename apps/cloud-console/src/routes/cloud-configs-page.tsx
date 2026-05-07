@@ -104,23 +104,38 @@ export function CloudConfigsPage() {
 
       <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-white p-5 shadow-[var(--shadow-section)]">
         <div className="grid gap-3">
-          <input
-            value={draftKey}
-            onChange={(event) => setDraftKey(event.target.value)}
-            placeholder={t("config key")}
-            className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
-          />
-          <input
-            value={draftDescription}
-            onChange={(event) => setDraftDescription(event.target.value)}
-            placeholder={t("description")}
-            className="rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
-          />
-          <textarea
-            value={draftValue}
-            onChange={(event) => setDraftValue(event.target.value)}
-            className="min-h-64 rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 font-mono text-sm"
-          />
+          <label className="block">
+            <span className="mb-1 block text-xs font-medium text-[color:var(--text-secondary)]">
+              {t("Config key")}
+            </span>
+            <input
+              value={draftKey}
+              onChange={(event) => setDraftKey(event.target.value)}
+              placeholder="app.publicBaseUrl"
+              className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-xs font-medium text-[color:var(--text-secondary)]">
+              {t("Description")}
+            </span>
+            <input
+              value={draftDescription}
+              onChange={(event) => setDraftDescription(event.target.value)}
+              placeholder={t("Internal note shown next to the key.")}
+              className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-xs font-medium text-[color:var(--text-secondary)]">
+              {t("Value (JSON)")}
+            </span>
+            <textarea
+              value={draftValue}
+              onChange={(event) => setDraftValue(event.target.value)}
+              className="min-h-64 w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 font-mono text-sm"
+            />
+          </label>
         </div>
         <div className="mt-4 flex gap-3">
           <Button
