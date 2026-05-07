@@ -433,6 +433,10 @@ export function ContactsPage() {
     () => buildDesktopFriendSections(filteredFriendItems),
     [filteredFriendItems],
   );
+  const worldCharacterSections = useMemo(
+    () => buildContactSections(filteredWorldCharacterItems),
+    [filteredWorldCharacterItems],
+  );
   const mobileIndexItems = useMemo(
     () =>
       friendSections.map((section) => ({
@@ -1439,7 +1443,7 @@ export function ContactsPage() {
               ? t(msg`世界角色搜索结果`)
               : t(msg`世界角色目录`)
           }
-          worldCharacterItems={filteredWorldCharacterItems}
+          worldCharacterSections={worldCharacterSections}
           activeWorldCharacterId={
             desktopSelection?.kind === "world-character"
               ? desktopSelection.id
