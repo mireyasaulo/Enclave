@@ -300,6 +300,7 @@ function PostTree({
   parentId?: string | null;
   depth?: number;
 }) {
+  if (depth > 12) return null;
   const children = posts.filter((p) => (p.parentPostId ?? null) === parentId);
   if (children.length === 0) return null;
   return (

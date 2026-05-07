@@ -107,10 +107,22 @@ export function ScenePromptPreview({
         </div>
       </div>
       {(previewMut.isError || baselineMut.isError) && (
-        <p className="text-xs text-[var(--state-danger-text)]">
-          {(previewMut.error as Error | null)?.message ??
-            (baselineMut.error as Error | null)?.message}
-        </p>
+        <ul className="text-xs text-[var(--state-danger-text)] space-y-0.5">
+          {previewMut.isError && (
+            <li>
+              <Trans>改后</Trans>
+              {": "}
+              {(previewMut.error as Error).message}
+            </li>
+          )}
+          {baselineMut.isError && (
+            <li>
+              <Trans>改前</Trans>
+              {": "}
+              {(baselineMut.error as Error).message}
+            </li>
+          )}
+        </ul>
       )}
     </div>
   );

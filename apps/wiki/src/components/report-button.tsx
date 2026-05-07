@@ -36,13 +36,21 @@ export function ReportButton({
     },
   });
 
+  const submitReport = () => {
+    if (reportMut.isPending || !reason.trim()) return;
+    reportMut.mutate();
+  };
+
   if (!user) return null;
   if (!open) {
     return (
       <button
         type="button"
         className={`underline text-xs hover:text-[var(--state-danger-text)] ${className ?? ""}`}
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          reportMut.reset();
+          setOpen(true);
+        }}
       >
         <Trans>举报</Trans>
       </button>
@@ -75,7 +83,7 @@ export function ReportButton({
           size="sm"
           variant="danger"
           disabled={!reason.trim() || reportMut.isPending}
-          onClick={() => reportMut.mutate()}
+          onClick={submitReport}
         >
           {reportMut.isPending ? t(msg`提交中...`) : t(msg`提交举报`)}
         </Button>
