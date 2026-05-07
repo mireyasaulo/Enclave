@@ -8,7 +8,7 @@ import type {
   CloudWorldLifecycleStatus,
   WorldLifecycleJobStatus,
 } from "@yinjie/contracts";
-import { formatDateTime as formatLocaleDateTime } from "@yinjie/i18n";
+import { formatDateTime as formatLocaleDateTime, useAppLocale } from "@yinjie/i18n";
 import { ErrorBlock } from "@yinjie/ui";
 import {
   CloudAdminErrorBlock,
@@ -28,9 +28,14 @@ import {
 import { buildCompactJobsRouteSearch } from "../lib/job-route-search";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import {
+  formatCloudConsoleJobsGroupCount,
   translateCloudConsoleTextForActiveLocale,
   useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
+import {
+  localizeProviderDescription,
+  localizeProviderLabel,
+} from "../lib/provider-i18n";
 import { describeJobResult, getJobAuditBadgeLabel } from "../lib/job-result";
 import {
   createRequestScopedNotice,
@@ -243,6 +248,7 @@ type WorldConfirmAction =
 
 export function WorldDetailPage() {
   const t = useCloudConsoleText();
+  const { locale } = useAppLocale();
   const { worldId } = useParams({ from: "/worlds/$worldId" });
   const queryClient = useQueryClient();
   const { showNotice } = useConsoleNotice();
@@ -708,7 +714,7 @@ export function WorldDetailPage() {
                 ) : null}
                 {providerOptions.map((provider) => (
                   <option key={provider.key} value={provider.key}>
-                    {provider.label} ({provider.key})
+                    {localizeProviderLabel(provider.key, provider.label, locale)} ({provider.key})
                   </option>
                 ))}
               </select>
@@ -724,10 +730,10 @@ export function WorldDetailPage() {
                   {t("Provider profile")}
                 </div>
                 <div className="mt-2 font-medium text-[color:var(--text-primary)]">
-                  {selectedProvider.label}
+                  {localizeProviderLabel(selectedProvider.key, selectedProvider.label, locale)}
                 </div>
                 <div className="mt-1 leading-6">
-                  {selectedProvider.description}
+                  {localizeProviderDescription(selectedProvider.key, selectedProvider.description, locale)}
                 </div>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   <div>
@@ -936,28 +942,30 @@ export function WorldDetailPage() {
             {currentAlert ? (
               <div className="mt-4 space-y-3 text-sm text-[color:var(--text-secondary)]">
                 <div>{currentAlert.message}</div>
-                <div>Reason: {currentAlert.reason}</div>
-                <div>Escalated: {currentAlert.escalated ? "Yes" : "No"}</div>
+                <div>{t("Reason:")} {currentAlert.reason}</div>
                 <div>
-                  Escalation reason:{" "}
+                  {t("Escalated:")} {currentAlert.escalated ? t("Yes") : t("No")}
+                </div>
+                <div>
+                  {t("Escalation reason:")}{" "}
                   {getEscalationLabel(currentAlert.escalationReason)}
                 </div>
-                <div>Retry count: {currentAlert.retryCount}</div>
+                <div>{t("Retry count:")} {currentAlert.retryCount}</div>
                 <div>
-                  Stale heartbeat seconds:{" "}
+                  {t("Stale heartbeat seconds:")}{" "}
                   {typeof currentAlert.staleHeartbeatSeconds === "number"
                     ? currentAlert.staleHeartbeatSeconds
-                    : "Not stale"}
+                    : t("Not stale")}
                 </div>
                 <div>
-                  Retry threshold:{" "}
+                  {t("Retry threshold:")}{" "}
                   {alertSummary?.thresholds.retryCount ?? t("Not set")}
                 </div>
                 <div>
-                  Critical stale threshold:{" "}
+                  {t("Critical stale threshold:")}{" "}
                   {alertSummary?.thresholds.criticalHeartbeatStaleSeconds
                     ? `${alertSummary.thresholds.criticalHeartbeatStaleSeconds}s`
-                    : "Disabled"}
+                    : t("Disabled")}
                 </div>
               </div>
             ) : alertSummaryQuery.isLoading ? (
@@ -1178,8 +1186,8 @@ export function WorldDetailPage() {
                   className={SECONDARY_ACTION_BUTTON}
                 >
                   {rotateCallbackTokenMutation.isPending
-                    ? "Rotating..."
-                    : "Rotate callback token"}
+                    ? t("Rotating...")
+                    : t("Rotate callback token")}
                 </button>
               </div>
             </div>
@@ -1195,46 +1203,50 @@ export function WorldDetailPage() {
               <div className="mt-4 grid gap-4">
                 <div className="space-y-2 text-sm text-[color:var(--text-secondary)]">
                   <div>
-                    Provider:{" "}
+                    {t("Provider:")}{" "}
                     {formatOptional(
-                      bootstrapConfig.providerLabel ??
+                      localizeProviderLabel(
                         bootstrapConfig.providerKey,
+                        bootstrapConfig.providerLabel ??
+                          bootstrapConfig.providerKey,
+                        locale,
+                      ),
                     )}
                   </div>
                   <div>
-                    Deployment: {formatOptional(bootstrapConfig.deploymentMode)}
+                    {t("Deployment:")} {formatOptional(bootstrapConfig.deploymentMode)}
                   </div>
                   <div>
-                    Executor: {formatOptional(bootstrapConfig.executorMode)}
+                    {t("Executor:")} {formatOptional(bootstrapConfig.executorMode)}
                   </div>
                   <div>
-                    Cloud platform: {bootstrapConfig.cloudPlatformBaseUrl}
+                    {t("Cloud platform:")} {bootstrapConfig.cloudPlatformBaseUrl}
                   </div>
                   <div>
-                    Suggested API:{" "}
+                    {t("Suggested API:")}{" "}
                     {formatOptional(bootstrapConfig.suggestedApiBaseUrl)}
                   </div>
                   <div>
-                    Suggested admin:{" "}
+                    {t("Suggested admin:")}{" "}
                     {formatOptional(bootstrapConfig.suggestedAdminUrl)}
                   </div>
-                  <div>Image: {formatOptional(bootstrapConfig.image)}</div>
+                  <div>{t("Image:")} {formatOptional(bootstrapConfig.image)}</div>
                   <div>
-                    Container: {formatOptional(bootstrapConfig.containerName)}
+                    {t("Container:")} {formatOptional(bootstrapConfig.containerName)}
                   </div>
                   <div>
-                    Volume: {formatOptional(bootstrapConfig.volumeName)}
+                    {t("Volume:")} {formatOptional(bootstrapConfig.volumeName)}
                   </div>
                   <div>
-                    Project: {formatOptional(bootstrapConfig.projectName)}
+                    {t("Project:")} {formatOptional(bootstrapConfig.projectName)}
                   </div>
                   <div>
-                    Remote path:{" "}
+                    {t("Remote path:")}{" "}
                     {formatOptional(bootstrapConfig.remoteDeployPath)}
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <span>
-                      Callback token:{" "}
+                      {t("Callback token:")}{" "}
                       {bootstrapConfig.callbackToken || t("Not set")}
                     </span>
                     {bootstrapConfig.callbackToken ? (
@@ -1257,22 +1269,22 @@ export function WorldDetailPage() {
 
                 <div className="grid gap-3 text-sm text-[color:var(--text-secondary)]">
                   <div>
-                    Bootstrap endpoint:{" "}
+                    {t("Bootstrap endpoint:")}{" "}
                     {bootstrapConfig.callbackEndpoints.bootstrap}
                   </div>
                   <div>
-                    Heartbeat endpoint:{" "}
+                    {t("Heartbeat endpoint:")}{" "}
                     {bootstrapConfig.callbackEndpoints.heartbeat}
                   </div>
                   <div>
-                    Activity endpoint:{" "}
+                    {t("Activity endpoint:")}{" "}
                     {bootstrapConfig.callbackEndpoints.activity}
                   </div>
                   <div>
-                    Health endpoint: {bootstrapConfig.callbackEndpoints.health}
+                    {t("Health endpoint:")} {bootstrapConfig.callbackEndpoints.health}
                   </div>
                   <div>
-                    Fail endpoint: {bootstrapConfig.callbackEndpoints.fail}
+                    {t("Fail endpoint:")} {bootstrapConfig.callbackEndpoints.fail}
                   </div>
                 </div>
 
@@ -1413,8 +1425,9 @@ export function WorldDetailPage() {
         </div>
 
         <div className="mt-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-          Queue totals reflect all jobs for this world, not just the recent 20
-          jobs below.
+          {t(
+            "Queue totals reflect all jobs for this world, not just the recent 20 jobs below.",
+          )}
         </div>
 
         <div className="mt-4 overflow-x-auto rounded-2xl border border-[color:var(--border-faint)]">
@@ -1443,7 +1456,7 @@ export function WorldDetailPage() {
                         {group.state.label}
                       </span>
                       <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                        {group.jobs.length} jobs
+                        {formatCloudConsoleJobsGroupCount(group.jobs.length, locale)}
                       </span>
                     </div>
                   </td>

@@ -2129,6 +2129,29 @@ const cloudConsoleChineseTextOverrides: Record<string, string> = {
   "No visible contexts on this page yet.": "当前页还没有可见上下文。",
   "Loading waiting sync tasks...": "正在加载等待同步任务...",
   "页 1 of 1": "第 1 页 / 共 1 页",
+
+  // Bootstrap config / alert / jobs queue / pagination labels missing from
+  // the rest of the dict.
+  "Fail endpoint:": "失败端点：",
+  "Escalated:": "已升级：",
+  "Escalation reason:": "升级原因：",
+  "Not stale": "未陈旧",
+  "Queue totals reflect all jobs for this world, not just the recent 20 jobs below.":
+    "队列汇总反映该世界的全部任务，下方只展示最近 20 项。",
+  "Rotating...": "轮换中…",
+  "Rotate callback token": "轮换回调令牌",
+  "Phone unavailable": "无手机号",
+  "No tasks match this filter.": "没有任务匹配当前筛选。",
+  "Previous groups": "上一页分组",
+  "Next groups": "下一页分组",
+  "Event view": "事件视图",
+  "Current snapshot": "当前快照",
+  "Session issued": "会话签发",
+  "Session expired": "会话过期",
+  "Session revoked": "会话吊销",
+  "Unknown client": "未知客户端",
+  "Revoke session": "吊销该会话",
+  "Open user": "打开用户",
 };
 
 const surfaceDictionaries: Partial<Record<I18nAppSurface, LocaleDictionary>> = {

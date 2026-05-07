@@ -8,7 +8,10 @@
     "dev:raw": "vite",
     "build": "tsc -p tsconfig.app.json && vite build",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "screenshot:wiki": "node screenshot-wiki.mjs",
+    "screenshot:vp": "node screenshot-viewport.mjs",
+    "screenshot:detail": "node screenshot-detail.mjs"
   },
   "dependencies": {
     "@lingui/core": "5.9.5",

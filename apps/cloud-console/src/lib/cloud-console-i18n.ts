@@ -1053,4 +1053,150 @@ export function formatCloudConsoleSettlementGenerated(
     "ko-KR": `정산 ${batchId}을(를) 금액 ${amount}(으)로 생성했습니다.`,
   });
 }
+
+export function formatCloudConsoleJobLeaseRemaining(
+  duration: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `remaining ${duration}`,
+    "zh-CN": `剩余 ${duration}`,
+    "ja-JP": `残り ${duration}`,
+    "ko-KR": `남은 시간 ${duration}`,
+  });
+}
+
+export function formatCloudConsoleJobLeaseExpires(
+  date: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `expires ${date}`,
+    "zh-CN": `到期 ${date}`,
+    "ja-JP": `期限 ${date}`,
+    "ko-KR": `만료 ${date}`,
+  });
+}
+
+export function formatCloudConsoleJobLeaseAvailable(
+  date: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `available ${date}`,
+    "zh-CN": `可执行 ${date}`,
+    "ja-JP": `実行可能 ${date}`,
+    "ko-KR": `실행 가능 ${date}`,
+  });
+}
+
+export function formatCloudConsoleProviderWorldsCount(
+  count: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `${count} worlds`,
+    "zh-CN": `${count} 个世界`,
+    "ja-JP": `${count} ワールド`,
+    "ko-KR": `${count}개 월드`,
+  });
+}
+
+export function formatCloudConsoleProviderRunningError(
+  running: number,
+  errorCount: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Running ${running} · Error ${errorCount}`,
+    "zh-CN": `运行中 ${running} · 错误 ${errorCount}`,
+    "ja-JP": `実行中 ${running} · エラー ${errorCount}`,
+    "ko-KR": `실행 중 ${running} · 오류 ${errorCount}`,
+  });
+}
+
+export function formatCloudConsoleLastGeneratedAt(
+  date: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Last generated ${date}`,
+    "zh-CN": `最近生成于 ${date}`,
+    "ja-JP": `最終生成 ${date}`,
+    "ko-KR": `최근 생성 ${date}`,
+  });
+}
+
+export function formatCloudConsoleJobsGroupCount(
+  count: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `${count} jobs`,
+    "zh-CN": `${count} 项任务`,
+    "ja-JP": `${count} 件のジョブ`,
+    "ko-KR": `${count}개 작업`,
+  });
+}
+
+export function formatCloudConsoleProviderLeaseLabel(
+  owner: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Lease ${owner}`,
+    "zh-CN": `租约 ${owner}`,
+    "ja-JP": `リース ${owner}`,
+    "ko-KR": `리스 ${owner}`,
+  });
+}
+
+export function formatCloudConsoleAvailableAtLine(
+  date: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Available: ${date}`,
+    "zh-CN": `可执行时间：${date}`,
+    "ja-JP": `実行可能：${date}`,
+    "ko-KR": `실행 가능: ${date}`,
+  });
+}
+
+export function formatCloudConsoleUpdatedAtLine(
+  date: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Updated: ${date}`,
+    "zh-CN": `更新时间：${date}`,
+    "ja-JP": `更新：${date}`,
+    "ko-KR": `업데이트: ${date}`,
+  });
+}
+
+export function formatCloudConsoleFinishedAtLine(
+  date: string,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Finished: ${date}`,
+    "zh-CN": `完成时间：${date}`,
+    "ja-JP": `完了：${date}`,
+    "ko-KR": `완료: ${date}`,
+  });
+}
+
+export function formatCloudConsoleReceiptCountSummary(
+  visible: number,
+  limit: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Showing the latest ${visible} of up to ${limit} receipt(s) for this review task.`,
+    "zh-CN": `正在显示该复核任务的最近 ${visible} / 共 ${limit} 条回执。`,
+    "ja-JP": `このレビュータスクの最新 ${visible} / 最大 ${limit} 件の受領を表示中。`,
+    "ko-KR": `이 검토 작업에 대해 최신 ${visible} / 최대 ${limit}개 영수증을 표시 중.`,
+  });
+}
 // i18n-ignore-end
