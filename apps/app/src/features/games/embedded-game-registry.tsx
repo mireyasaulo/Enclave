@@ -11,6 +11,11 @@ const ParkingWarGame = lazy(async () => {
   return { default: mod.ParkingWarGame };
 });
 
+const SignalSquadGame = lazy(async () => {
+  const mod = await import("./signal-squad/signal-squad-game");
+  return { default: mod.SignalSquadGame };
+});
+
 export type EmbeddedGameProps = {
   variant?: "embedded" | "fullscreen";
   onExit?: () => void;
@@ -21,6 +26,7 @@ const EMBEDDED_GAME_COMPONENTS: Record<
   ComponentType<EmbeddedGameProps>
 > = {
   "parking-war": ParkingWarGame,
+  "signal-squad": SignalSquadGame,
 };
 
 export function hasEmbeddedGame(gameId: string | null | undefined): boolean {
