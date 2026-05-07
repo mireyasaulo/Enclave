@@ -1,7 +1,9 @@
 import { useEffect, useMemo } from "react";
+import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
 import { useRouterState } from "@tanstack/react-router";
 import { getConversations, type Message } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { normalizePathname } from "../../lib/normalize-pathname";
 import { joinConversationRoom, onChatMessage } from "../../lib/socket";
 import { showLocalNotification } from "../../runtime/mobile-bridge";
@@ -15,6 +17,8 @@ import {
   isConversationStrongReminderActive,
 } from "../chat/conversation-strong-reminder";
 import { useDesktopLayout } from "./use-desktop-layout";
+
+const t = translateRuntimeMessage;
 
 export function ConversationStrongReminderHost() {
   const isDesktopLayout = useDesktopLayout();
@@ -87,7 +91,7 @@ export function ConversationStrongReminderHost() {
       const message = payload as Message;
       void showLocalNotification({
         id: `strong-reminder-${conversation.id}-${message.id}`,
-        title: `强提醒 · ${conversation.title}`,
+        title: t(msg`强提醒 · ${conversation.title}`),
         body: describeStrongReminderMessage(message),
         route: isDesktopLayout
           ? buildDesktopChatThreadPath({

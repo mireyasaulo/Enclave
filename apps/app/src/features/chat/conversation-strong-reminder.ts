@@ -1,6 +1,10 @@
+import { msg } from "@lingui/macro";
 import type { Message } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { parseTimestamp } from "../../lib/format";
 import { resolveMessageSemanticPreview } from "../../lib/message-attachment-semantic";
+
+const t = translateRuntimeMessage;
 
 export const CONVERSATION_STRONG_REMINDER_DURATION_HOURS = 3;
 
@@ -33,14 +37,14 @@ export function formatConversationStrongReminderRemaining(
   const minutes = remainingMinutes % 60;
 
   if (hours > 0 && minutes > 0) {
-    return `剩余 ${hours}小时${minutes}分`;
+    return t(msg`剩余 ${hours}小时${minutes}分`);
   }
 
   if (hours > 0) {
-    return `剩余 ${hours}小时`;
+    return t(msg`剩余 ${hours}小时`);
   }
 
-  return `剩余 ${remainingMinutes}分`;
+  return t(msg`剩余 ${remainingMinutes}分`);
 }
 
 export function describeStrongReminderMessage(message: Message) {
@@ -48,6 +52,6 @@ export function describeStrongReminderMessage(message: Message) {
     resolveMessageSemanticPreview(message, {
       maxChars: 120,
       bracketedFallback: true,
-    }) || "发来了一条新消息"
+    }) || t(msg`发来了一条新消息`)
   );
 }

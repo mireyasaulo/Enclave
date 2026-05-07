@@ -132,6 +132,7 @@ export function splitChatTextSegments(text: string): ChatTextSegment[] {
     segments.push({
       kind: "mention",
       text: token,
+      // i18n-ignore-next-line: mention token identifier used for matching, not UI label
       tone: token === "@所有人" ? "all" : "member",
     });
     lastIndex = rawIndex + token.length;
@@ -164,6 +165,7 @@ export function summarizeChatMentions(text: string): ChatMentionSummary {
     .map((segment) => segment.text);
 
   return {
+    // i18n-ignore-next-line: mention token identifier, not UI label
     hasMentionAll: mentions.includes("@所有人"),
     mentions,
   };

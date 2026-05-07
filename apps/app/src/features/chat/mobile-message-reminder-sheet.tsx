@@ -1,3 +1,8 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
+
 export type MobileMessageReminderOption = {
   id: string;
   label: string;
@@ -16,7 +21,7 @@ type MobileMessageReminderSheetProps = {
 
 export function MobileMessageReminderSheet({
   open,
-  title = "提醒这条消息",
+  title = t(msg`提醒这条消息`),
   previewText,
   options,
   onClose,
@@ -31,7 +36,7 @@ export function MobileMessageReminderSheet({
       <button
         type="button"
         className="absolute inset-0"
-        aria-label="关闭消息提醒面板"
+        aria-label={t(msg`关闭消息提醒面板`)}
         onClick={onClose}
       />
       <div className="absolute inset-x-0 bottom-0 overflow-hidden rounded-t-[20px] border-t border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] pt-2 shadow-[0_-14px_28px_rgba(15,23,42,0.10)]">
@@ -61,7 +66,7 @@ export function MobileMessageReminderSheet({
                 </div>
               </div>
               <div className="shrink-0 text-[11px] text-[#07c160]">
-                设为提醒
+                {t(msg`设为提醒`)}
               </div>
             </button>
           ))}
@@ -71,7 +76,7 @@ export function MobileMessageReminderSheet({
           onClick={onClose}
           className="mt-2.5 flex h-11 w-full items-center justify-center rounded-[14px] border border-[color:var(--border-subtle)] bg-white text-[15px] font-medium text-[#111827] transition active:bg-[color:var(--surface-card-hover)]"
         >
-          取消
+          {t(msg`取消`)}
         </button>
       </div>
     </div>

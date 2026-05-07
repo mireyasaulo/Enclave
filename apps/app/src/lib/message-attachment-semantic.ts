@@ -1,5 +1,9 @@
+import { msg } from "@lingui/macro";
 import type { GroupMessage, Message, MessageAttachment } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { sanitizeDisplayedChatText } from "./chat-text";
+
+const t = translateRuntimeMessage;
 
 const DEFAULT_MESSAGE_PREVIEW_CHARS = 180;
 const DEFAULT_ATTACHMENT_DETAIL_CHARS = 200;
@@ -148,25 +152,27 @@ export function resolveAttachmentSemanticText(
     return truncateSemanticText(
       [
         attachment.name,
-        attachment.relationship ? `关系：${attachment.relationship}` : "",
-        attachment.bio ? `简介：${attachment.bio}` : "",
+        attachment.relationship
+          ? t(msg`关系：${attachment.relationship}`)
+          : "",
+        attachment.bio ? t(msg`简介：${attachment.bio}`) : "",
       ]
         .filter(Boolean)
-        .join("，"),
+        .join(t(msg`，`)),
       maxChars,
     );
   }
 
   if (attachment.kind === "location_card") {
     return truncateSemanticText(
-      [attachment.title, attachment.subtitle ?? ""].filter(Boolean).join("，"),
+      [attachment.title, attachment.subtitle ?? ""].filter(Boolean).join(t(msg`，`)),
       maxChars,
     );
   }
 
   if (attachment.kind === "note_card") {
     return truncateSemanticText(
-      [attachment.title, attachment.excerpt].filter(Boolean).join("，"),
+      [attachment.title, attachment.excerpt].filter(Boolean).join(t(msg`，`)),
       maxChars,
     );
   }
@@ -191,7 +197,7 @@ function buildAttachmentFallbackLabel(
   }
 
   if (attachment.kind === "image") {
-    return buildNamedFallbackLabel("图片", attachment.fileName, bracketed);
+    return buildNamedFallbackLabel(t(msg`图片`), attachment.fileName, bracketed);
   }
 
   if (attachment.kind === "file") {
@@ -199,29 +205,33 @@ function buildAttachmentFallbackLabel(
       attachment.extractedText?.trim() || attachment.documentInsight?.previewText?.trim(),
     );
     return buildNamedFallbackLabel(
-      hasDocumentText ? "文档" : "文件",
+      hasDocumentText ? t(msg`文档`) : t(msg`文件`),
       attachment.fileName,
       bracketed,
     );
   }
 
   if (attachment.kind === "voice") {
-    return buildNamedFallbackLabel("语音", attachment.fileName, bracketed);
+    return buildNamedFallbackLabel(t(msg`语音`), attachment.fileName, bracketed);
   }
 
   if (attachment.kind === "contact_card") {
-    return buildNamedFallbackLabel("名片", attachment.name, bracketed);
+    return buildNamedFallbackLabel(t(msg`名片`), attachment.name, bracketed);
   }
 
   if (attachment.kind === "location_card") {
-    return buildNamedFallbackLabel("位置", attachment.title, bracketed);
+    return buildNamedFallbackLabel(t(msg`位置`), attachment.title, bracketed);
   }
 
   if (attachment.kind === "note_card") {
-    return buildNamedFallbackLabel("笔记", attachment.title, bracketed);
+    return buildNamedFallbackLabel(t(msg`笔记`), attachment.title, bracketed);
   }
 
-  return buildNamedFallbackLabel("表情", attachment.label ?? attachment.stickerId, bracketed);
+  return buildNamedFallbackLabel(
+    t(msg`表情`),
+    attachment.label ?? attachment.stickerId,
+    bracketed,
+  );
 }
 
 function buildNamedFallbackLabel(label: string, detail?: string, bracketed = false) {

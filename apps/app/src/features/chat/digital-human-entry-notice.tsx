@@ -1,4 +1,8 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Button, InlineNotice } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 
 export function DigitalHumanEntryNotice({
   tone,
@@ -6,9 +10,9 @@ export function DigitalHumanEntryNotice({
   onContinue,
   onDismiss,
   onSwitchToVoice,
-  continueLabel = "继续视频通话",
-  dismissLabel = "先继续聊天",
-  voiceLabel = "改用语音通话",
+  continueLabel = t(msg`继续视频通话`),
+  dismissLabel = t(msg`先继续聊天`),
+  voiceLabel = t(msg`改用语音通话`),
   compact = false,
 }: {
   tone: "info" | "warning";

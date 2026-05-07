@@ -1,3 +1,8 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
+
 export type DirectChatDetailPreferences = {
   muted: boolean;
   strongReminder: boolean;
@@ -10,22 +15,22 @@ export type GroupChatDetailPreferences = {
   backgroundLabel: string;
 };
 
-const directDefaults: DirectChatDetailPreferences = {
+const buildDirectDefaults = (): DirectChatDetailPreferences => ({
   muted: false,
   strongReminder: false,
-  backgroundLabel: "默认",
-};
+  backgroundLabel: t(msg`默认`),
+});
 
-const groupDefaults: GroupChatDetailPreferences = {
+const buildGroupDefaults = (): GroupChatDetailPreferences => ({
   muted: false,
   showMemberNicknames: true,
-  backgroundLabel: "默认",
-};
+  backgroundLabel: t(msg`默认`),
+});
 
 export function readDirectChatDetailPreferences(conversationId: string) {
   return readPreferences(
     `yinjie.direct-chat-details.${conversationId}`,
-    directDefaults,
+    buildDirectDefaults(),
   );
 }
 
@@ -37,7 +42,10 @@ export function writeDirectChatDetailPreferences(
 }
 
 export function readGroupChatDetailPreferences(groupId: string) {
-  return readPreferences(`yinjie.group-chat-details.${groupId}`, groupDefaults);
+  return readPreferences(
+    `yinjie.group-chat-details.${groupId}`,
+    buildGroupDefaults(),
+  );
 }
 
 export function writeGroupChatDetailPreferences(

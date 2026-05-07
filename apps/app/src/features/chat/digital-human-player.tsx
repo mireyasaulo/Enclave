@@ -1,6 +1,10 @@
+import { msg } from "@lingui/macro";
 import type { DigitalHumanSession } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { InlineNotice, cn } from "@yinjie/ui";
 import { DigitalHumanStage } from "./digital-human-stage";
+
+const t = translateRuntimeMessage;
 
 type DigitalHumanPlayerProps = {
   variant: "mobile" | "desktop";
@@ -27,8 +31,8 @@ export function DigitalHumanPlayer({
 }: DigitalHumanPlayerProps) {
   const providerLabel =
     session?.presentationMode === "provider_stream"
-      ? "数字人视频流"
-      : "内置数字人舞台";
+      ? t(msg`数字人视频流`)
+      : t(msg`内置数字人舞台`);
   const renderStatus = session?.renderStatus;
   const playerUrl =
     session?.presentationMode === "provider_stream"
@@ -54,7 +58,7 @@ export function DigitalHumanPlayer({
       onClick={onRetryRender}
       className="inline-flex h-10 items-center justify-center rounded-full border border-white/12 bg-white/8 px-4 text-sm text-white transition hover:bg-white/12"
     >
-      重试连接数字人
+      {t(msg`重试连接数字人`)}
     </button>
   ) : null;
 
@@ -78,7 +82,7 @@ export function DigitalHumanPlayer({
           <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 rounded-t-[22px] bg-[linear-gradient(180deg,rgba(2,6,23,0),rgba(2,6,23,0.78))] px-4 pb-4 pt-10">
             <div className="rounded-[18px] border border-white/10 bg-[rgba(2,6,23,0.44)] px-4 py-3 backdrop-blur">
               <div className="text-[11px] uppercase tracking-[0.18em] text-white/42">
-                通话提示
+                {t(msg`通话提示`)}
               </div>
               <div className="mt-1 text-[13px] leading-6 text-white/78">
                 {statusHint}
@@ -91,7 +95,7 @@ export function DigitalHumanPlayer({
               <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-white/52">
                 <span>{providerLabel}</span>
                 {renderStatusLabel ? (
-                  <span>渲染状态: {renderStatusLabel}</span>
+                  <span>{t(msg`渲染状态: ${renderStatusLabel}`)}</span>
                 ) : null}
               </div>
               {retryRenderAction ? (
@@ -142,7 +146,7 @@ export function DigitalHumanPlayer({
       <div className="relative z-10 flex h-full flex-col justify-between bg-[linear-gradient(180deg,rgba(2,6,23,0.18),rgba(2,6,23,0.54))] p-4">
         <div className="max-w-[196px] rounded-[18px] border border-white/10 bg-[rgba(2,6,23,0.44)] px-3 py-2 backdrop-blur">
           <div className="text-[11px] uppercase tracking-[0.18em] text-white/42">
-            状态
+            {t(msg`状态`)}
           </div>
           <div className="mt-1 text-sm font-medium text-[#bbf7d0]">
             {statusLabel}
@@ -151,16 +155,16 @@ export function DigitalHumanPlayer({
         <div className="space-y-3">
           <InlineNotice tone={renderTone}>
             {renderStatus === "failed"
-              ? "数字人视频流渲染失败，当前已回退到文字加语音通话链路。可稍后重试连接数字人。"
+              ? t(msg`数字人视频流渲染失败，当前已回退到文字加语音通话链路。可稍后重试连接数字人。`)
               : renderStatus === "rendering"
-                ? "数字人视频流正在渲染，当前会优先保持播放器连接并继续刷新状态。"
+                ? t(msg`数字人视频流正在渲染，当前会优先保持播放器连接并继续刷新状态。`)
                 : renderStatus === "queued"
-                  ? "数字人视频流已进入队列，当前会先保持会话连接，渲染完成后自动切到视频流。"
-                  : "当前已切到数字人视频流播放器；若流不可用会自动回退到内置舞台。"}
+                  ? t(msg`数字人视频流已进入队列，当前会先保持会话连接，渲染完成后自动切到视频流。`)
+                  : t(msg`当前已切到数字人视频流播放器；若流不可用会自动回退到内置舞台。`)}
           </InlineNotice>
           <div className="rounded-[22px] border border-white/10 bg-[rgba(2,6,23,0.44)] px-4 py-3 backdrop-blur">
             <div className="text-[11px] uppercase tracking-[0.18em] text-white/42">
-              通话提示
+              {t(msg`通话提示`)}
             </div>
             <div className="mt-1 text-[13px] leading-6 text-white/78">
               {statusHint}
@@ -173,7 +177,7 @@ export function DigitalHumanPlayer({
             <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-white/52">
               <span>{providerLabel}</span>
               {renderStatusLabel ? (
-                <span>渲染状态: {renderStatusLabel}</span>
+                <span>{t(msg`渲染状态: ${renderStatusLabel}`)}</span>
               ) : null}
             </div>
             {retryRenderAction ? (
@@ -189,13 +193,13 @@ export function DigitalHumanPlayer({
 function resolveRenderStatusLabel(renderStatus?: DigitalHumanSession["renderStatus"]) {
   switch (renderStatus) {
     case "queued":
-      return "排队中";
+      return t(msg`排队中`);
     case "rendering":
-      return "渲染中";
+      return t(msg`渲染中`);
     case "ready":
-      return "视频流就绪";
+      return t(msg`视频流就绪`);
     case "failed":
-      return "渲染失败";
+      return t(msg`渲染失败`);
     default:
       return null;
   }
@@ -204,13 +208,13 @@ function resolveRenderStatusLabel(renderStatus?: DigitalHumanSession["renderStat
 function resolveRenderStatusHint(renderStatus?: DigitalHumanSession["renderStatus"]) {
   switch (renderStatus) {
     case "queued":
-      return "正在排队准备数字人画面。";
+      return t(msg`正在排队准备数字人画面。`);
     case "rendering":
-      return "数字人画面生成中，请稍候。";
+      return t(msg`数字人画面生成中，请稍候。`);
     case "ready":
-      return "数字人视频流已就绪。";
+      return t(msg`数字人视频流已就绪。`);
     case "failed":
-      return "本轮视频流没有成功生成，但语音回复链路仍然可继续使用。";
+      return t(msg`本轮视频流没有成功生成，但语音回复链路仍然可继续使用。`);
     default:
       return null;
   }

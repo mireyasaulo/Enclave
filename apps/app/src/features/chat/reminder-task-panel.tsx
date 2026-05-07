@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   BellRing,
   CheckCheck,
@@ -12,6 +14,8 @@ import { Button, InlineNotice, TagBadge, cn } from "@yinjie/ui";
 import { type ReminderTaskRecord } from "@yinjie/contracts";
 import { formatMessageTimestamp, parseTimestamp } from "../../lib/format";
 import { useReminderRuntimeTasks } from "./use-reminder-runtime-tasks";
+
+const t = translateRuntimeMessage;
 
 type ReminderTaskPanelProps = {
   conversationId: string;
@@ -66,8 +70,8 @@ export function ReminderTaskPanel({
         tone: "success",
         message:
           task.kind === "one_time"
-            ? `已完成：${task.title}`
-            : `已记录这次完成：${task.title}`,
+            ? t(msg`已完成：${task.title}`)
+            : t(msg`已记录这次完成：${task.title}`),
       });
     } catch (taskError) {
       setNotice({
@@ -75,7 +79,7 @@ export function ReminderTaskPanel({
         message:
           taskError instanceof Error
             ? taskError.message
-            : "完成提醒失败，请稍后再试。",
+            : t(msg`完成提醒失败，请稍后再试。`),
       });
     }
   };
@@ -85,7 +89,7 @@ export function ReminderTaskPanel({
       await snoozeTask(task.id, { minutes: 30 });
       setNotice({
         tone: "success",
-        message: `${task.title} 已往后顺 30 分钟。`,
+        message: t(msg`${task.title} 已往后顺 30 分钟。`),
       });
     } catch (taskError) {
       setNotice({
@@ -93,7 +97,7 @@ export function ReminderTaskPanel({
         message:
           taskError instanceof Error
             ? taskError.message
-            : "延后提醒失败，请稍后再试。",
+            : t(msg`延后提醒失败，请稍后再试。`),
       });
     }
   };
@@ -104,7 +108,7 @@ export function ReminderTaskPanel({
       await snoozeTask(task.id, { until });
       setNotice({
         tone: "success",
-        message: `${task.title} 已顺到明天。`,
+        message: t(msg`${task.title} 已顺到明天。`),
       });
     } catch (taskError) {
       setNotice({
@@ -112,7 +116,7 @@ export function ReminderTaskPanel({
         message:
           taskError instanceof Error
             ? taskError.message
-            : "延后提醒失败，请稍后再试。",
+            : t(msg`延后提醒失败，请稍后再试。`),
       });
     }
   };
@@ -122,7 +126,7 @@ export function ReminderTaskPanel({
       await cancelTask(task.id);
       setNotice({
         tone: "success",
-        message: `已删除：${task.title}`,
+        message: t(msg`已删除：${task.title}`),
       });
     } catch (taskError) {
       setNotice({
@@ -130,7 +134,7 @@ export function ReminderTaskPanel({
         message:
           taskError instanceof Error
             ? taskError.message
-            : "删除提醒失败，请稍后再试。",
+            : t(msg`删除提醒失败，请稍后再试。`),
       });
     }
   };
@@ -166,19 +170,19 @@ export function ReminderTaskPanel({
               </span>
               <div className="min-w-0">
                 <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
-                  小盯替你记着 {tasks.length} 件事
+                  {t(msg`小盯替你记着 ${tasks.length} 件事`)}
                 </div>
                 <div className="mt-0.5 text-[11px] text-[color:var(--text-secondary)]">
                   {expanded
-                    ? "直接点按就能完成、延后或删掉提醒。"
-                    : "点按展开查看提醒。"}
+                    ? t(msg`直接点按就能完成、延后或删掉提醒。`)
+                    : t(msg`点按展开查看提醒。`)}
                 </div>
               </div>
             </div>
           </div>
 
           <span className="mt-0.5 flex shrink-0 items-center gap-1 text-[11px] text-[color:var(--text-secondary)]">
-            {expanded ? "收起" : "展开"}
+            {expanded ? t(msg`收起`) : t(msg`展开`)}
             {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </span>
         </button>
@@ -206,11 +210,11 @@ export function ReminderTaskPanel({
             {isLoading ? (
               <div className="mt-3 flex items-center gap-2 text-[11px] text-[color:var(--text-secondary)]">
                 <LoaderCircle size={14} className="animate-spin" />
-                正在同步提醒任务…
+                {t(msg`正在同步提醒任务…`)}
               </div>
             ) : tasks.length === 0 ? (
               <div className="mt-3 rounded-[16px] border border-dashed border-[rgba(15,23,42,0.1)] bg-[rgba(255,255,255,0.86)] px-3 py-3 text-[11px] leading-5 text-[color:var(--text-secondary)]">
-                还没有在替你记的事。直接发一句“明早8点提醒我吃药”或“每周五提醒我买猫粮”就行。
+                {t(msg`还没有在替你记的事。直接发一句“明早8点提醒我吃药”或“每周五提醒我买猫粮”就行。`)}
               </div>
             ) : (
               <div className="mt-3 space-y-2.5">
@@ -254,7 +258,7 @@ export function ReminderTaskPanel({
 
                       <div className="mt-3 flex flex-wrap gap-2">
                         <ActionButton
-                          label="完成"
+                          label={t(msg`完成`)}
                           icon={<CheckCheck size={13} />}
                           disabled={taskPending}
                           onClick={() => {
@@ -262,21 +266,21 @@ export function ReminderTaskPanel({
                           }}
                         />
                         <ActionButton
-                          label="30分后"
+                          label={t(msg`30分后`)}
                           disabled={taskPending}
                           onClick={() => {
                             void handleSnooze30Minutes(task);
                           }}
                         />
                         <ActionButton
-                          label="明天"
+                          label={t(msg`明天`)}
                           disabled={taskPending}
                           onClick={() => {
                             void handleSnoozeTomorrow(task);
                           }}
                         />
                         <ActionButton
-                          label="删除"
+                          label={t(msg`删除`)}
                           icon={<Trash2 size={12} />}
                           tone="danger"
                           disabled={taskPending}
@@ -332,22 +336,24 @@ function ActionButton({
 
 function getReminderTaskBadgeLabel(task: ReminderTaskRecord) {
   if (task.kind === "habit") {
-    return "长期";
+    return t(msg`长期`);
   }
   if (task.kind === "recurring") {
-    return "重复";
+    return t(msg`重复`);
   }
-  return task.priority === "hard" ? "硬提醒" : "一次";
+  return task.priority === "hard" ? t(msg`硬提醒`) : t(msg`一次`);
 }
 
 function buildReminderTaskMeta(task: ReminderTaskRecord) {
   if (task.snoozedUntil) {
-    return `已延后到 ${formatMessageTimestamp(task.snoozedUntil)}`;
+    const snoozedTimestamp = formatMessageTimestamp(task.snoozedUntil);
+    return t(msg`已延后到 ${snoozedTimestamp}`);
   }
 
   const nextTimestamp = parseTimestamp(task.nextTriggerAt ?? task.dueAt);
   if (nextTimestamp != null) {
-    return `下次提醒 ${formatMessageTimestamp(String(nextTimestamp))}`;
+    const nextLabel = formatMessageTimestamp(String(nextTimestamp));
+    return t(msg`下次提醒 ${nextLabel}`);
   }
 
   return task.scheduleText;

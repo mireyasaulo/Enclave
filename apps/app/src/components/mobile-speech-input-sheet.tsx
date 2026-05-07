@@ -1,6 +1,10 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Mic, Square, WandSparkles, X } from "lucide-react";
 import { cn } from "@yinjie/ui";
 import type { SpeechInputStatus } from "../features/chat/speech-input-types";
+
+const t = translateRuntimeMessage;
 
 type MobileSpeechInputSheetProps = {
   open: boolean;
@@ -24,25 +28,29 @@ function resolveStatusTitle(
 ) {
   if (holding) {
     return cancelIntent
-      ? "松开手指，取消发送"
+      ? t(msg`松开手指，取消发送`)
       : mode === "voice"
-        ? "松开手指，发送语音"
-        : "松开手指，转成文字";
+        ? t(msg`松开手指，发送语音`)
+        : t(msg`松开手指，转成文字`);
   }
 
   switch (status) {
     case "requesting-permission":
-      return "正在请求麦克风权限...";
+      return t(msg`正在请求麦克风权限...`);
     case "listening":
-      return "继续按住说话";
+      return t(msg`继续按住说话`);
     case "processing":
-      return mode === "voice" ? "正在整理语音..." : "正在转写语音...";
+      return mode === "voice"
+        ? t(msg`正在整理语音...`)
+        : t(msg`正在转写语音...`);
     case "ready":
-      return mode === "voice" ? "语音已准备发送" : "识别完成";
+      return mode === "voice" ? t(msg`语音已准备发送`) : t(msg`识别完成`);
     case "error":
-      return mode === "voice" ? "语音发送暂时不可用" : "语音输入暂时不可用";
+      return mode === "voice"
+        ? t(msg`语音发送暂时不可用`)
+        : t(msg`语音输入暂时不可用`);
     default:
-      return "按住说话";
+      return t(msg`按住说话`);
   }
 }
 
@@ -54,31 +62,31 @@ function resolveStatusHint(
 ) {
   if (holding) {
     return cancelIntent
-      ? "向下移回按钮区域，可以继续保留本次语音。"
+      ? t(msg`向下移回按钮区域，可以继续保留本次语音。`)
       : mode === "voice"
-        ? "上滑取消，松开后会直接发送这条语音。"
-        : "上滑取消，松开后只会转成文字，不会直接发送。";
+        ? t(msg`上滑取消，松开后会直接发送这条语音。`)
+        : t(msg`上滑取消，松开后只会转成文字，不会直接发送。`);
   }
 
   switch (status) {
     case "requesting-permission":
-      return "第一次使用时，系统可能会弹出麦克风授权。";
+      return t(msg`第一次使用时，系统可能会弹出麦克风授权。`);
     case "listening":
-      return "继续按住说话，松开后结束本次输入。";
+      return t(msg`继续按住说话，松开后结束本次输入。`);
     case "processing":
       return mode === "voice"
-        ? "录音已经结束，正在整理语音文件。"
-        : "录音已经结束，正在把语音整理成文字。";
+        ? t(msg`录音已经结束，正在整理语音文件。`)
+        : t(msg`录音已经结束，正在把语音整理成文字。`);
     case "ready":
       return mode === "voice"
-        ? "确认后会直接发到当前会话。"
-        : "确认后插入输入框，你还可以继续修改。";
+        ? t(msg`确认后会直接发到当前会话。`)
+        : t(msg`确认后插入输入框，你还可以继续修改。`);
     case "error":
-      return "可以关闭后重试，或直接切回键盘输入。";
+      return t(msg`可以关闭后重试，或直接切回键盘输入。`);
     default:
       return mode === "voice"
-        ? "按住录一条语音，松开后就能直接发送。"
-        : "识别结果会先停留在这里，等待你决定是否插入。";
+        ? t(msg`按住录一条语音，松开后就能直接发送。`)
+        : t(msg`识别结果会先停留在这里，等待你决定是否插入。`);
   }
 }
 
@@ -110,7 +118,7 @@ export function MobileSpeechInputSheet({
       <button
         type="button"
         className="pointer-events-auto absolute inset-0 bg-transparent"
-        aria-label="关闭语音输入面板"
+        aria-label={t(msg`关闭语音输入面板`)}
         onClick={onClose}
         disabled={holding}
       />
@@ -136,7 +144,7 @@ export function MobileSpeechInputSheet({
               )}
               onClick={onClose}
               disabled={holding}
-              aria-label="关闭"
+              aria-label={t(msg`关闭`)}
             >
               <X size={16} />
             </button>
@@ -181,8 +189,8 @@ export function MobileSpeechInputSheet({
           >
             {text ||
               (mode === "voice"
-                ? "录音时长会显示在这里。"
-                : "识别结果会显示在这里。")}
+                ? t(msg`录音时长会显示在这里。`)
+                : t(msg`识别结果会显示在这里。`))}
           </div>
 
           {error ? (
@@ -198,7 +206,7 @@ export function MobileSpeechInputSheet({
                 onClick={onCancel}
                 className="flex h-10 items-center justify-center rounded-[14px] border border-black/6 bg-white text-[14px] font-medium text-[#606266] transition active:bg-[#f1f1f1]"
               >
-                取消
+                {t(msg`取消`)}
               </button>
               <button
                 type="button"
@@ -208,7 +216,7 @@ export function MobileSpeechInputSheet({
               >
                 <span className="inline-flex items-center gap-1.5">
                   <WandSparkles size={15} />
-                  {mode === "voice" ? "立即发送" : "插入输入框"}
+                  {mode === "voice" ? t(msg`立即发送`) : t(msg`插入输入框`)}
                 </span>
               </button>
             </div>

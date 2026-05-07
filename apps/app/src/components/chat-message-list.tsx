@@ -12,11 +12,9 @@ import {
   type TouchEvent,
 } from "react";
 import { msg } from "@lingui/macro";
-import { translateRuntimeMessage, useRuntimeTranslator } from "@yinjie/i18n";
-
-const tRuntime = translateRuntimeMessage;
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   RotateCcw,
   ChevronLeft,
@@ -150,6 +148,8 @@ import {
 } from "../features/mini-programs/group-relay-card";
 import { parseGroupRelaySummaryMessage } from "../features/mini-programs/group-relay-message";
 import { type ChatLocalMessageStatus } from "../features/chat/chat-message-delivery";
+
+const t = translateRuntimeMessage;
 
 export type ChatRenderableMessage = {
   id: string;
@@ -2214,7 +2214,7 @@ export function ChatMessageList({
 
     setSelectedMessageIds(nextSelectedMessageIds);
     setActionNotice({
-      message: `已选择到这里，共 ${nextSelectedMessageIds.length} 条消息。`,
+      message: t(msg`已选择到这里，共 ${nextSelectedMessageIds.length} 条消息。`),
       tone: "success",
     });
   };
@@ -3080,8 +3080,7 @@ export function ChatMessageList({
                           : "mt-px px-0.5 text-[10px]"
                       }`}
                     >
-                      {t(msg`已设提醒 ·`)}{" "}
-                      {formatReminderSummary(reminderRecord.remindAt)}
+                      {t(msg`已设提醒 · ${formatReminderSummary(reminderRecord.remindAt)}`)}
                     </div>
                   ) : null}
                   {isUser && !selectionMode && message.localStatus === "failed" ? (
@@ -3845,13 +3844,14 @@ function filterStableMessageList(
 
 function parseSharedHistorySummaryMessage(text: string) {
   const normalized = text.trim();
+  // i18n-ignore-next-line: protocol marker for shared chat history summary text
   const match = normalized.match(/^已分享你和(.+?)的(\d+)条聊天记录$/);
   if (!match) {
     return null;
   }
 
   return {
-    participantName: match[1]?.trim() || tRuntime(msg`对方`),
+    participantName: match[1]?.trim() || t(msg`对方`),
     count: Number(match[2]) || 0,
   };
 }
@@ -3916,10 +3916,8 @@ function SharedHistorySummaryNotice({
 
 function buildRecalledMessageNotice(message: ChatRenderableMessage) {
   const actor =
-    message.senderType === "user"
-      ? tRuntime(msg`你`)
-      : message.senderName?.trim() || tRuntime(msg`对方`);
-  return tRuntime(msg`${actor}撤回了一条消息`);
+    message.senderType === "user" ? t(msg`你`) : message.senderName?.trim() || t(msg`对方`);
+  return t(msg`${actor}撤回了一条消息`);
 }
 
 function buildReminderOptions(now: Date): MobileMessageReminderOption[] {
@@ -3937,19 +3935,19 @@ function buildReminderOptions(now: Date): MobileMessageReminderOption[] {
   return [
     {
       id: "one-hour",
-      label: tRuntime(msg`1 小时后`),
+      label: t(msg`1 小时后`),
       detail: formatReminderSummary(oneHourLater.toISOString()),
       remindAt: oneHourLater.toISOString(),
     },
     {
       id: "tonight",
-      label: tRuntime(msg`今晚 20:00`),
+      label: t(msg`今晚 20:00`),
       detail: formatReminderSummary(tonight.toISOString()),
       remindAt: tonight.toISOString(),
     },
     {
       id: "tomorrow-morning",
-      label: tRuntime(msg`明天上午 09:00`),
+      label: t(msg`明天上午 09:00`),
       detail: formatReminderSummary(tomorrowMorning.toISOString()),
       remindAt: tomorrowMorning.toISOString(),
     },
@@ -3959,7 +3957,7 @@ function buildReminderOptions(now: Date): MobileMessageReminderOption[] {
 function formatReminderSummary(remindAt: string) {
   const date = new Date(remindAt);
   if (Number.isNaN(date.getTime())) {
-    return tRuntime(msg`稍后`);
+    return t(msg`稍后`);
   }
 
   const now = new Date();
@@ -3980,11 +3978,11 @@ function formatReminderSummary(remindAt: string) {
   });
 
   if (sameYear && sameMonth && sameDate) {
-    return tRuntime(msg`今天 ${timeLabel}`);
+    return t(msg`今天 ${timeLabel}`);
   }
 
   if (isTomorrow) {
-    return tRuntime(msg`明天 ${timeLabel}`);
+    return t(msg`明天 ${timeLabel}`);
   }
 
   return `${date.toLocaleDateString("zh-CN", {
@@ -3995,10 +3993,10 @@ function formatReminderSummary(remindAt: string) {
 
 function buildClipboardSender(message: ChatRenderableMessage) {
   if (message.senderType === "user") {
-    return tRuntime(msg`我`);
+    return t(msg`我`);
   }
 
-  return message.senderName?.trim() || tRuntime(msg`群成员`);
+  return message.senderName?.trim() || t(msg`群成员`);
 }
 
 function buildClipboardText(message: ChatRenderableMessage) {
@@ -4016,7 +4014,7 @@ function buildClipboardText(message: ChatRenderableMessage) {
     resolveMessageSemanticPreview(message, {
       maxChars: 400,
       bracketedFallback: true,
-    }) || tRuntime(msg`消息`)
+    }) || t(msg`消息`)
   );
 }
 
@@ -4031,34 +4029,34 @@ function buildForwardPreviewText(message: ChatRenderableMessage) {
 
 function resolveForwardTypeLabel(message: ChatRenderableMessage) {
   if (message.type === "image") {
-    return tRuntime(msg`图片`);
+    return t(msg`图片`);
   }
 
   if (message.type === "file") {
-    return tRuntime(msg`文件`);
+    return t(msg`文件`);
   }
 
   if (message.type === "voice") {
-    return tRuntime(msg`语音`);
+    return t(msg`语音`);
   }
 
   if (message.type === "contact_card") {
-    return tRuntime(msg`名片`);
+    return t(msg`名片`);
   }
 
   if (message.type === "location_card") {
-    return tRuntime(msg`位置`);
+    return t(msg`位置`);
   }
 
   if (message.type === "note_card") {
-    return tRuntime(msg`笔记`);
+    return t(msg`笔记`);
   }
 
   if (message.type === "sticker") {
-    return tRuntime(msg`表情`);
+    return t(msg`表情`);
   }
 
-  return tRuntime(msg`消息`);
+  return t(msg`消息`);
 }
 
 function resolveOpenAttachmentLabel(
@@ -4066,26 +4064,26 @@ function resolveOpenAttachmentLabel(
   variant: "mobile" | "desktop",
 ) {
   if (message.type === "image") {
-    return variant === "desktop" ? tRuntime(msg`预览图片`) : tRuntime(msg`查看图片`);
+    return variant === "desktop" ? t(msg`预览图片`) : t(msg`查看图片`);
   }
 
   if (message.type === "file") {
-    return tRuntime(msg`打开文件`);
+    return t(msg`打开文件`);
   }
 
   if (message.type === "contact_card") {
-    return tRuntime(msg`查看名片`);
+    return t(msg`查看名片`);
   }
 
   if (message.type === "location_card") {
-    return tRuntime(msg`查看位置`);
+    return t(msg`查看位置`);
   }
 
   if (message.type === "note_card") {
-    return variant === "desktop" ? tRuntime(msg`打开笔记`) : tRuntime(msg`查看笔记摘要`);
+    return variant === "desktop" ? t(msg`打开笔记`) : t(msg`查看笔记摘要`);
   }
 
-  return tRuntime(msg`打开附件`);
+  return t(msg`打开附件`);
 }
 
 function resolveSaveAttachmentLabel(
@@ -4096,27 +4094,27 @@ function resolveSaveAttachmentLabel(
     return isNativeMobileShareSurface({
       isDesktopLayout: variant === "desktop",
     })
-      ? tRuntime(msg`系统分享`)
-      : tRuntime(msg`复制名片`);
+      ? t(msg`系统分享`)
+      : t(msg`复制名片`);
   }
 
   if (message.type === "location_card") {
     return isNativeMobileShareSurface({
       isDesktopLayout: variant === "desktop",
     })
-      ? tRuntime(msg`系统分享`)
-      : tRuntime(msg`复制位置`);
+      ? t(msg`系统分享`)
+      : t(msg`复制位置`);
   }
 
   if (message.type === "image") {
-    return variant === "mobile" ? tRuntime(msg`保存图片`) : tRuntime(msg`另存图片`);
+    return variant === "mobile" ? t(msg`保存图片`) : t(msg`另存图片`);
   }
 
   if (message.type === "file") {
-    return variant === "mobile" ? tRuntime(msg`保存文件`) : tRuntime(msg`另存文件`);
+    return variant === "mobile" ? t(msg`保存文件`) : t(msg`另存文件`);
   }
 
-  return variant === "mobile" ? tRuntime(msg`保存附件`) : tRuntime(msg`另存为`);
+  return variant === "mobile" ? t(msg`保存附件`) : t(msg`另存为`);
 }
 
 function getForwardMessageText(message: ChatRenderableMessage) {
@@ -4152,7 +4150,7 @@ function buildMessageFavoriteRecord(
     description,
     meta: formatMessageTimestamp(message.createdAt),
     to: currentPath,
-    badge: groupMode ? tRuntime(msg`群聊消息`) : tRuntime(msg`聊天消息`),
+    badge: groupMode ? t(msg`群聊消息`) : t(msg`聊天消息`),
     avatarName: senderName,
   };
 }
@@ -4272,7 +4270,7 @@ async function forwardMessageToConversation(input: {
   if (isPersistedGroupConversation(input.conversation)) {
     const payload = buildGroupForwardPayload(input.message);
     if (!payload) {
-      throw new Error(tRuntime(msg`当前消息暂不支持转发到群聊。`));
+      throw new Error(t(msg`当前消息暂不支持转发到群聊。`));
     }
 
     await sendGroupMessage(input.conversation.id, payload, input.baseUrl);
@@ -4281,7 +4279,7 @@ async function forwardMessageToConversation(input: {
 
   const payload = buildDirectForwardPayload(input.conversation, input.message);
   if (!payload) {
-    throw new Error(tRuntime(msg`这条单聊暂时没有可用的角色目标，无法完成转发。`));
+    throw new Error(t(msg`这条单聊暂时没有可用的角色目标，无法完成转发。`));
   }
 
   joinConversationRoom({ conversationId: input.conversation.id });
@@ -4295,7 +4293,7 @@ async function forwardMergedMessagesToConversation(input: {
 }) {
   const mergedText = buildMergedForwardText(input.messages);
   if (!mergedText) {
-    throw new Error(tRuntime(msg`当前没有可合并转发的消息内容。`));
+    throw new Error(t(msg`当前没有可合并转发的消息内容。`));
   }
 
   if (isPersistedGroupConversation(input.conversation)) {
@@ -4311,7 +4309,7 @@ async function forwardMergedMessagesToConversation(input: {
 
   const characterId = input.conversation.participants[0];
   if (!characterId) {
-    throw new Error(tRuntime(msg`这条单聊暂时没有可用的角色目标，无法完成转发。`));
+    throw new Error(t(msg`这条单聊暂时没有可用的角色目标，无法完成转发。`));
   }
 
   joinConversationRoom({ conversationId: input.conversation.id });
@@ -4497,7 +4495,7 @@ function resolveCustomStickerUploadSource(
       url: resolveUrl(message.attachment.url),
       fileName: message.attachment.fileName,
       mimeType: message.attachment.mimeType,
-      label: stripFileExtension(message.attachment.fileName) || "图片表情",
+      label: stripFileExtension(message.attachment.fileName) || t(msg`图片表情`),
     };
   }
 
@@ -4562,7 +4560,7 @@ function buildMergedForwardText(messages: ChatRenderableMessage[]) {
     return "";
   }
 
-  return ["[聊天记录]", ...sections].join("\n");
+  return [t(msg`[聊天记录]`), ...sections].join("\n");
 }
 
 function renderTextWithMentions(text: string): ReactNode {
@@ -4635,7 +4633,7 @@ function ReplyQuoteCard({
             isDesktop ? "text-[11px]" : "text-[10px]"
           }`}
         >
-          回复 {senderName}
+          {t(msg`回复 ${senderName}`)}
         </div>
         {modeLabel ? (
           <div
@@ -4689,7 +4687,7 @@ function ImageMessage({
             : "h-24 w-24 rounded-[16px] border border-[color:var(--border-subtle)] bg-white"
         }`}
       >
-        {label || "[图片]"}
+        {label || t(msg`[图片]`)}
       </div>
     );
   }
@@ -4718,7 +4716,7 @@ function ImageMessage({
       type="button"
       onClick={onOpen}
       className={`transition hover:opacity-95 ${isDesktop ? "cursor-zoom-in" : ""}`}
-      aria-label={`${isDesktop ? "预览图片" : "查看图片"} ${label}`}
+      aria-label={t(msg`${isDesktop ? t(msg`预览图片`) : t(msg`查看图片`)} ${label}`)}
     >
       {image}
     </button>
@@ -4744,7 +4742,7 @@ function SelectionToggle({
           ? "border-[rgba(7,193,96,0.2)] bg-[#07c160] text-white shadow-[0_4px_10px_rgba(7,193,96,0.16)]"
           : "border-[color:var(--border-subtle)] bg-white/92 text-transparent hover:border-[rgba(7,193,96,0.24)]"
       }`}
-      aria-label={checked ? "取消选择消息" : "选择消息"}
+      aria-label={checked ? t(msg`取消选择消息`) : t(msg`选择消息`)}
     >
       ✓
     </button>
@@ -4776,7 +4774,7 @@ function ContactCardMessage({
             isDesktop ? "mb-2.5" : "mb-2"
           }`}
         >
-          {recommendation.badgeLabel || "继续聊"}
+          {recommendation.badgeLabel || t(msg`继续聊`)}
         </div>
       ) : null}
       <div className={`flex items-center ${isDesktop ? "gap-3" : "gap-2.5"}`}>
@@ -4798,7 +4796,7 @@ function ContactCardMessage({
               isDesktop ? "mt-0.5 text-xs" : "mt-px text-[11px]"
             }`}
           >
-            {attachment.relationship || "世界联系人"}
+            {attachment.relationship || t(msg`世界联系人`)}
           </div>
         </div>
       </div>
@@ -4819,7 +4817,7 @@ function ContactCardMessage({
         }`}
       >
         <ContactRound size={12} />
-        <span>{recommendation ? "推荐联系人" : "角色名片"}</span>
+        <span>{recommendation ? t(msg`推荐联系人`) : t(msg`角色名片`)}</span>
       </div>
     </div>
   );
@@ -4833,7 +4831,7 @@ function ContactCardMessage({
       type="button"
       onClick={onOpen}
       className="text-left transition hover:opacity-95"
-      aria-label={`查看名片 ${attachment.name}`}
+      aria-label={t(msg`查看名片 ${attachment.name}`)}
     >
       {card}
     </button>
@@ -4885,7 +4883,7 @@ function NoteCardMessage({
                 : "px-2.5 py-1.5 text-[10px] tracking-[0.14em]"
             }`}
           >
-            收藏笔记
+            {t(msg`收藏笔记`)}
           </div>
         </div>
       )}
@@ -4906,7 +4904,7 @@ function NoteCardMessage({
             isDesktop ? "text-xs leading-5" : "text-[11px] leading-[18px]"
           }`}
         >
-          {attachment.excerpt || "点击查看完整笔记"}
+          {attachment.excerpt || t(msg`点击查看完整笔记`)}
         </div>
         <div className="flex items-center justify-between gap-3 border-t border-[rgba(15,23,42,0.06)] pt-2.5">
           <div className="flex min-w-0 flex-wrap gap-1.5">
@@ -4920,7 +4918,7 @@ function NoteCardMessage({
             ))}
           </div>
           <div className="shrink-0 text-[10px] tracking-[0.12em] text-[color:var(--text-dim)]">
-            {fileCount ? `${fileCount} 个文件` : "笔记"}
+            {fileCount ? t(msg`${fileCount} 个文件`) : t(msg`笔记`)}
           </div>
         </div>
       </div>
@@ -4936,7 +4934,7 @@ function NoteCardMessage({
       type="button"
       onClick={onOpen}
       className="text-left transition hover:opacity-95"
-      aria-label={`${variant === "desktop" ? "打开笔记" : "查看笔记摘要"} ${attachment.title}`}
+      aria-label={t(msg`${variant === "desktop" ? t(msg`打开笔记`) : t(msg`查看笔记摘要`)} ${attachment.title}`)}
     >
       {card}
     </button>
@@ -4993,7 +4991,7 @@ function FileAttachmentMessage({
           isDesktop ? "mt-3 text-[11px]" : "mt-2.5 text-[10px]"
         }`}
       >
-        文件
+        {t(msg`文件`)}
       </div>
     </div>
   );
@@ -5007,7 +5005,7 @@ function FileAttachmentMessage({
       type="button"
       onClick={onOpen}
       className="text-left transition hover:opacity-95"
-      aria-label={`打开文件 ${attachment.fileName}`}
+      aria-label={t(msg`打开文件 ${attachment.fileName}`)}
     >
       {card}
     </button>
@@ -5038,7 +5036,7 @@ function LocationCardMessage({
         }`}
       >
         <MapPin size={12} />
-        <span>位置</span>
+        <span>{t(msg`位置`)}</span>
       </div>
       <div
         className={`font-medium text-[color:var(--text-primary)] ${
@@ -5070,7 +5068,7 @@ function LocationCardMessage({
       type="button"
       onClick={onOpen}
       className="text-left transition hover:opacity-95"
-      aria-label={`查看位置 ${attachment.title}`}
+      aria-label={t(msg`查看位置 ${attachment.title}`)}
     >
       {card}
     </button>
@@ -5151,7 +5149,7 @@ function VoiceMessage({
               ? "bg-[#f3f4f6]"
               : "bg-[color:var(--surface-console)]"
         }`}
-        aria-label={playing ? "暂停语音" : "播放语音"}
+        aria-label={playing ? t(msg`暂停语音`) : t(msg`播放语音`)}
       >
         {playing ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}
       </button>
@@ -5220,7 +5218,7 @@ function GroupRelaySummaryMessage({
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-dim)]">
-            群接龙
+            {t(msg`群接龙`)}
           </div>
           <div className="mt-1 text-sm font-medium text-[color:var(--text-primary)]">
             {summary.sourceGroupName}
@@ -5230,23 +5228,23 @@ function GroupRelaySummaryMessage({
           <ResultCardBadge
             tone={summary.publishedSource === "mobile" ? "info" : "warning"}
             label={
-              summary.publishedSource === "mobile" ? "手机回填" : "桌面回填"
+              summary.publishedSource === "mobile" ? t(msg`手机回填`) : t(msg`桌面回填`)
             }
           />
           {summary.launchSourceLabel ? (
             <ResultCardBadge
               tone="neutral"
               label={
-                summary.launchSource === "mobile" ? "手机发起" : "桌面发起"
+                summary.launchSource === "mobile" ? t(msg`手机发起`) : t(msg`桌面发起`)
               }
             />
           ) : null}
           {summary.statusLabel ? (
             <ResultCardBadge
               tone={
-                summary.statusLabel === "已回填"
+                summary.statusLabel === t(msg`已回填`)
                   ? "success"
-                  : summary.statusLabel === "已完成"
+                  : summary.statusLabel === t(msg`已完成`)
                     ? "info"
                     : "warning"
               }
@@ -5271,49 +5269,49 @@ function GroupRelaySummaryMessage({
       <div className={isDesktop ? "mt-3 space-y-2" : "mt-2.5 space-y-1.5"}>
         {summary.timestampLabel ? (
           <ResultCardMetric
-            label="时间"
+            label={t(msg`时间`)}
             value={summary.timestampLabel}
             variant={variant}
           />
         ) : null}
         {completionTimeLabel ? (
           <ResultCardMetric
-            label="完成时间"
+            label={t(msg`完成时间`)}
             value={completionTimeLabel}
             variant={variant}
           />
         ) : null}
         {typeof publishRangeLabel === "string" ? (
           <ResultCardMetric
-            label="起止时间"
+            label={t(msg`起止时间`)}
             value={publishRangeLabel}
             variant={variant}
           />
         ) : null}
         {summary.activeRelayCountLabel ? (
           <ResultCardMetric
-            label="进行中"
+            label={t(msg`进行中`)}
             value={summary.activeRelayCountLabel}
             variant={variant}
           />
         ) : null}
         {summary.pendingMemberCountLabel ? (
           <ResultCardMetric
-            label="待确认"
+            label={t(msg`待确认`)}
             value={summary.pendingMemberCountLabel}
             variant={variant}
           />
         ) : null}
         {summary.publishCountLabel ? (
           <ResultCardMetric
-            label="回填次数"
+            label={t(msg`回填次数`)}
             value={summary.publishCountLabel}
             variant={variant}
           />
         ) : null}
         {summary.resultSummaryLabel ? (
           <ResultCardMetric
-            label="结果摘要"
+            label={t(msg`结果摘要`)}
             value={summary.resultSummaryLabel}
             variant={variant}
           />
@@ -5519,7 +5517,7 @@ function GroupCallInviteMessage({
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-dim)]">
-            {invite.kind === "voice" ? "群语音通话" : "群视频通话"}
+            {invite.kind === "voice" ? t(msg`群语音通话`) : t(msg`群视频通话`)}
           </div>
           <div className="mt-1 text-sm font-medium text-[color:var(--text-primary)]">
             {invite.groupName}
@@ -5530,10 +5528,10 @@ function GroupCallInviteMessage({
             tone={invite.status === "ended" ? "danger" : "info"}
             label={
               invite.status === "ended"
-                ? "已结束"
+                ? t(msg`已结束`)
                 : invite.sourceLabel
-                  ? `${invite.sourceLabel}发起`
-                  : "桌面发起"
+                  ? t(msg`${invite.sourceLabel}发起`)
+                  : t(msg`桌面发起`)
             }
           />
           {completionBadge ? (
@@ -5547,20 +5545,20 @@ function GroupCallInviteMessage({
 
       <div className={isDesktop ? "mt-3 space-y-2" : "mt-2.5 space-y-1.5"}>
         <ResultCardMetric
-          label="当前状态"
+          label={t(msg`当前状态`)}
           value={formatGroupCallStatusLabel(invite.kind, invite.status)}
           variant={variant}
         />
         {invite.timestampLabel ? (
           <ResultCardMetric
-            label="时间"
+            label={t(msg`时间`)}
             value={invite.timestampLabel}
             variant={variant}
           />
         ) : null}
         {invite.status === "ended" && invite.startedAt && invite.recordedAt ? (
           <ResultCardMetric
-            label="起止时间"
+            label={t(msg`起止时间`)}
             value={formatGroupCallRangeSummary(
               invite.startedAt,
               invite.recordedAt,
@@ -5570,21 +5568,21 @@ function GroupCallInviteMessage({
         ) : null}
         {invite.durationLabel ? (
           <ResultCardMetric
-            label="本轮时长"
+            label={t(msg`本轮时长`)}
             value={invite.durationLabel}
             variant={variant}
           />
         ) : null}
         {invite.sourceLabel ? (
           <ResultCardMetric
-            label="发起端"
+            label={t(msg`发起端`)}
             value={invite.sourceLabel}
             variant={variant}
           />
         ) : null}
         {invite.snapshotLabel ? (
           <ResultCardMetric
-            label="人数快照"
+            label={t(msg`人数快照`)}
             value={invite.snapshotLabel}
             variant={variant}
           />
@@ -5596,13 +5594,13 @@ function GroupCallInviteMessage({
             }
           >
             <ResultCardMetric
-              label="当前在线"
+              label={t(msg`当前在线`)}
               value={`${invite.activeCount.current}/${invite.activeCount.total}`}
               variant={variant}
             />
             <ResultCardMetric
-              label="待加入"
-              value={`${invite.waitingCount ?? Math.max(invite.activeCount.total - invite.activeCount.current, 0)} 人`}
+              label={t(msg`待加入`)}
+              value={t(msg`${invite.waitingCount ?? Math.max(invite.activeCount.total - invite.activeCount.current, 0)} 人`)}
               variant={variant}
             />
           </div>
@@ -5732,7 +5730,7 @@ function DirectCallInviteMessage({
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="text-[11px] uppercase tracking-[0.16em] text-[color:var(--text-dim)]">
-            {invite.kind === "voice" ? "语音通话" : "视频通话"}
+            {invite.kind === "voice" ? t(msg`语音通话`) : t(msg`视频通话`)}
           </div>
           <div className="mt-1 text-sm font-medium text-[color:var(--text-primary)]">
             {invite.title}
@@ -5742,10 +5740,10 @@ function DirectCallInviteMessage({
           tone={invite.connectionStatus === "ended" ? "danger" : "info"}
           label={
             invite.connectionStatus === "ended"
-              ? "已结束"
+              ? t(msg`已结束`)
               : invite.sourceLabel
-                ? `${invite.sourceLabel}发起`
-                : "桌面发起"
+                ? t(msg`${invite.sourceLabel}发起`)
+                : t(msg`桌面发起`)
           }
         />
       </div>
@@ -5753,28 +5751,28 @@ function DirectCallInviteMessage({
       <div className={isDesktop ? "mt-3 space-y-2" : "mt-2.5 space-y-1.5"}>
         {invite.connectionStatus ? (
           <ResultCardMetric
-            label="当前状态"
+            label={t(msg`当前状态`)}
             value={resolveDirectCallStatusLabel(invite)}
             variant={variant}
           />
         ) : null}
         {invite.timestampLabel ? (
           <ResultCardMetric
-            label="时间"
+            label={t(msg`时间`)}
             value={invite.timestampLabel}
             variant={variant}
           />
         ) : null}
         {invite.durationLabel ? (
           <ResultCardMetric
-            label="最近一轮"
+            label={t(msg`最近一轮`)}
             value={invite.durationLabel}
             variant={variant}
           />
         ) : null}
         {invite.sourceLabel ? (
           <ResultCardMetric
-            label="发起端"
+            label={t(msg`发起端`)}
             value={invite.sourceLabel}
             variant={variant}
           />
@@ -5851,7 +5849,7 @@ function StickerMessage({
   if (loadFailed) {
     return (
       <div className="flex h-24 w-24 items-center justify-center rounded-[22px] border border-white/80 bg-white/90 px-3 text-center text-xs text-[color:var(--text-secondary)] shadow-[var(--shadow-soft)]">
-        {label || "[表情包]"}
+        {label || t(msg`[表情包]`)}
       </div>
     );
   }
@@ -5942,7 +5940,7 @@ function ImageViewerOverlay({
         type="button"
         onClick={onClose}
         className="absolute inset-0 cursor-default"
-        aria-label="关闭图片查看器"
+        aria-label={t(msg`关闭图片查看器`)}
       />
 
       {isDesktop ? (
@@ -5958,22 +5956,22 @@ function ImageViewerOverlay({
             </div>
             <div className="flex items-center gap-2">
               {onOpenInWindow ? (
-                <ViewerActionButton label="新窗口打开" onClick={onOpenInWindow}>
+                <ViewerActionButton label={t(msg`新窗口打开`)} onClick={onOpenInWindow}>
                   <ExternalLink size={16} />
                 </ViewerActionButton>
               ) : null}
               {onPrint ? (
-                <ViewerActionButton label="打印图片" onClick={onPrint}>
+                <ViewerActionButton label={t(msg`打印图片`)} onClick={onPrint}>
                   <Printer size={16} />
                 </ViewerActionButton>
               ) : null}
-              <ViewerActionButton label="保存图片" onClick={onSave}>
+              <ViewerActionButton label={t(msg`保存图片`)} onClick={onSave}>
                 <Download size={16} />
               </ViewerActionButton>
-              <ViewerActionButton label="定位到聊天位置" onClick={onLocate}>
+              <ViewerActionButton label={t(msg`定位到聊天位置`)} onClick={onLocate}>
                 <LocateFixed size={16} />
               </ViewerActionButton>
-              <ViewerActionButton label="关闭图片查看器" onClick={onClose}>
+              <ViewerActionButton label={t(msg`关闭图片查看器`)} onClick={onClose}>
                 <X size={16} />
               </ViewerActionButton>
             </div>
@@ -5982,14 +5980,14 @@ function ImageViewerOverlay({
           {onPrevious ? (
             <ViewerNavButton
               side="left"
-              label="上一张图片"
+              label={t(msg`上一张图片`)}
               onClick={onPrevious}
             >
               <ChevronLeft size={22} />
             </ViewerNavButton>
           ) : null}
           {onNext ? (
-            <ViewerNavButton side="right" label="下一张图片" onClick={onNext}>
+            <ViewerNavButton side="right" label={t(msg`下一张图片`)} onClick={onNext}>
               <ChevronRight size={22} />
             </ViewerNavButton>
           ) : null}
@@ -5999,7 +5997,7 @@ function ImageViewerOverlay({
           <div className="absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+0.5rem)] z-10 flex items-start justify-between gap-3 px-3 text-white">
             <ViewerActionButton
               compact
-              label="关闭图片查看器"
+              label={t(msg`关闭图片查看器`)}
               onClick={onClose}
             >
               <X size={16} />
@@ -6012,14 +6010,14 @@ function ImageViewerOverlay({
                 {activeIndex + 1} / {total}
               </div>
             </div>
-            <ViewerActionButton compact label="保存图片" onClick={onSave}>
+            <ViewerActionButton compact label={t(msg`保存图片`)} onClick={onSave}>
               <Download size={16} />
             </ViewerActionButton>
           </div>
 
           {total > 1 ? (
             <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+5.5rem)] z-10 px-6 text-center text-xs text-white/70">
-              左右滑动切换图片
+              {t(msg`左右滑动切换图片`)}
             </div>
           ) : null}
 
@@ -6027,7 +6025,7 @@ function ImageViewerOverlay({
             <div className="flex items-center justify-center gap-3">
               <ViewerActionButton
                 compact
-                label="定位到聊天位置"
+                label={t(msg`定位到聊天位置`)}
                 onClick={onLocate}
               >
                 <LocateFixed size={16} />
@@ -6035,14 +6033,14 @@ function ImageViewerOverlay({
               {onPrevious ? (
                 <ViewerActionButton
                   compact
-                  label="上一张图片"
+                  label={t(msg`上一张图片`)}
                   onClick={onPrevious}
                 >
                   <ChevronLeft size={18} />
                 </ViewerActionButton>
               ) : null}
               {onNext ? (
-                <ViewerActionButton compact label="下一张图片" onClick={onNext}>
+                <ViewerActionButton compact label={t(msg`下一张图片`)} onClick={onNext}>
                   <ChevronRight size={18} />
                 </ViewerActionButton>
               ) : null}
@@ -6095,20 +6093,20 @@ function LocationViewerOverlay({
         type="button"
         onClick={onClose}
         className="absolute inset-0 cursor-default"
-        aria-label="关闭位置查看器"
+        aria-label={t(msg`关闭位置查看器`)}
       />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(74,222,128,0.22),transparent_34%),linear-gradient(180deg,rgba(15,23,42,0.12),rgba(15,23,42,0.72))]" />
       <div className="relative flex h-full flex-col">
         <div className="flex items-center justify-between px-4 pb-3 pt-[max(env(safe-area-inset-top,0px),1rem)] text-white">
           <div>
             <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">
-              聊天位置
+              {t(msg`聊天位置`)}
             </div>
             <div className="mt-1 text-[18px] font-medium">
               {attachment.title}
             </div>
           </div>
-          <ViewerActionButton compact label="关闭位置查看器" onClick={onClose}>
+          <ViewerActionButton compact label={t(msg`关闭位置查看器`)} onClick={onClose}>
             <X size={18} />
           </ViewerActionButton>
         </div>
@@ -6126,7 +6124,7 @@ function LocationViewerOverlay({
 
             <div className="relative flex h-full flex-col justify-between p-5">
               <div className="self-start rounded-full border border-white/12 bg-white/10 px-3 py-1 text-[11px] tracking-[0.12em] text-white/72">
-                来自聊天中的位置卡片
+                {t(msg`来自聊天中的位置卡片`)}
               </div>
 
               <div className="flex flex-1 items-center justify-center">
@@ -6147,7 +6145,7 @@ function LocationViewerOverlay({
                     </div>
                     <div className="mt-1 text-[13px] leading-6 text-white/72">
                       {attachment.subtitle?.trim() ||
-                        "这条位置消息来自当前聊天场景，可继续回到消息定位。"}
+                        t(msg`这条位置消息来自当前聊天场景，可继续回到消息定位。`)}
                     </div>
                   </div>
                 </div>
@@ -6158,7 +6156,7 @@ function LocationViewerOverlay({
 
         <div className="flex flex-wrap items-center justify-center gap-3 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] pt-2">
           <ViewerActionButton
-            label={nativeMobileShareSupported ? "系统分享" : "复制位置"}
+            label={nativeMobileShareSupported ? t(msg`系统分享`) : t(msg`复制位置`)}
             onClick={onShareOrCopy}
           >
             {nativeMobileShareSupported ? (
@@ -6167,7 +6165,7 @@ function LocationViewerOverlay({
               <Copy size={16} />
             )}
           </ViewerActionButton>
-          <ViewerActionButton label="定位消息" onClick={onLocate}>
+          <ViewerActionButton label={t(msg`定位消息`)} onClick={onLocate}>
             <LocateFixed size={16} />
           </ViewerActionButton>
         </div>
@@ -6204,18 +6202,18 @@ function NoteViewerOverlay({
         type="button"
         onClick={onClose}
         className="absolute inset-0 cursor-default"
-        aria-label="关闭笔记预览"
+        aria-label={t(msg`关闭笔记预览`)}
       />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(7,193,96,0.18),transparent_34%),linear-gradient(180deg,rgba(15,23,42,0.12),rgba(15,23,42,0.74))]" />
       <div className="relative flex h-full flex-col">
         <div className="flex items-center justify-between px-4 pb-3 pt-[max(env(safe-area-inset-top,0px),1rem)] text-white">
           <div>
             <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">
-              聊天笔记
+              {t(msg`聊天笔记`)}
             </div>
-            <div className="mt-1 text-[18px] font-medium">笔记摘要</div>
+            <div className="mt-1 text-[18px] font-medium">{t(msg`笔记摘要`)}</div>
           </div>
-          <ViewerActionButton compact label="关闭笔记预览" onClick={onClose}>
+          <ViewerActionButton compact label={t(msg`关闭笔记预览`)} onClick={onClose}>
             <X size={18} />
           </ViewerActionButton>
         </div>
@@ -6234,7 +6232,7 @@ function NoteViewerOverlay({
             ) : (
               <div className="flex h-40 items-end border-b border-white/10 bg-[linear-gradient(160deg,rgba(243,246,245,0.2),rgba(221,230,227,0.1))] px-5 py-5">
                 <div className="rounded-[16px] border border-white/12 bg-white/10 px-4 py-2 text-[12px] tracking-[0.18em] text-white/72">
-                  收藏笔记
+                  {t(msg`收藏笔记`)}
                 </div>
               </div>
             )}
@@ -6244,11 +6242,11 @@ function NoteViewerOverlay({
                 {attachment.title}
               </div>
               <div className="mt-2 text-[12px] text-white/62">
-                最近更新于 {updatedAtLabel}
+                {t(msg`最近更新于 ${updatedAtLabel}`)}
               </div>
 
               <div className="mt-4 rounded-[20px] border border-white/10 bg-white/6 px-4 py-4 text-[14px] leading-7 text-white/82">
-                {attachment.excerpt?.trim() || "这条笔记暂时没有可展示的摘要内容。"}
+                {attachment.excerpt?.trim() || t(msg`这条笔记暂时没有可展示的摘要内容。`)}
               </div>
 
               {attachment.tags.length ? (
@@ -6266,21 +6264,21 @@ function NoteViewerOverlay({
 
               <div className="mt-5 grid grid-cols-3 gap-2.5">
                 <NoteViewerMetric
-                  label="图片"
-                  value={imageCount > 0 ? `${imageCount} 张` : "无"}
+                  label={t(msg`图片`)}
+                  value={imageCount > 0 ? t(msg`${imageCount} 张`) : t(msg`无`)}
                 />
                 <NoteViewerMetric
-                  label="文件"
-                  value={fileCount > 0 ? `${fileCount} 个` : "无"}
+                  label={t(msg`文件`)}
+                  value={fileCount > 0 ? t(msg`${fileCount} 个`) : t(msg`无`)}
                 />
                 <NoteViewerMetric
-                  label="内容"
-                  value={attachment.excerpt?.trim() ? "有摘要" : "待补充"}
+                  label={t(msg`内容`)}
+                  value={attachment.excerpt?.trim() ? t(msg`有摘要`) : t(msg`待补充`)}
                 />
               </div>
 
               <div className="mt-5 rounded-[18px] border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] px-4 py-3 text-[12px] leading-6 text-white/70">
-                手机端当前提供笔记摘要预览；完整编辑与详情工作区仍需在桌面布局中打开。
+                {t(msg`手机端当前提供笔记摘要预览；完整编辑与详情工作区仍需在桌面布局中打开。`)}
               </div>
             </div>
           </div>
@@ -6288,7 +6286,7 @@ function NoteViewerOverlay({
 
         <div className="flex flex-wrap items-center justify-center gap-3 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] pt-2">
           <ViewerActionButton
-            label={nativeMobileShareSupported ? "系统分享" : "复制摘要"}
+            label={nativeMobileShareSupported ? t(msg`系统分享`) : t(msg`复制摘要`)}
             onClick={onShareOrCopy}
           >
             {nativeMobileShareSupported ? (
@@ -6297,7 +6295,7 @@ function NoteViewerOverlay({
               <Copy size={16} />
             )}
           </ViewerActionButton>
-          <ViewerActionButton label="定位消息" onClick={onLocate}>
+          <ViewerActionButton label={t(msg`定位消息`)} onClick={onLocate}>
             <FileText size={16} />
           </ViewerActionButton>
         </div>
@@ -6336,9 +6334,9 @@ function buildContactAttachmentSummary(
   profileUrl: string,
 ) {
   return [
-    `${attachment.name} 的隐界名片`,
-    attachment.relationship?.trim() || "世界联系人",
-    `隐界号：${buildYinjieId(attachment.characterId)}`,
+    t(msg`${attachment.name} 的隐界名片`),
+    attachment.relationship?.trim() || t(msg`世界联系人`),
+    t(msg`隐界号：yinjie_${attachment.characterId.slice(0, 8)}`),
     profileUrl,
   ].join("\n");
 }
@@ -6355,13 +6353,13 @@ function buildNoteAttachmentSummary(
 
   return [
     `${attachment.title}`,
-    attachment.excerpt?.trim() || "这是一条来自聊天中的收藏笔记。",
+    attachment.excerpt?.trim() || t(msg`这是一条来自聊天中的收藏笔记。`),
     attachment.tags.length
-      ? `标签：${attachment.tags.map((tag) => `#${tag}`).join(" ")}`
+      ? t(msg`标签：${attachment.tags.map((tag) => `#${tag}`).join(" ")}`)
       : null,
-    imageCount > 0 ? `图片：${imageCount} 张` : null,
-    fileCount > 0 ? `文件：${fileCount} 个` : null,
-    `更新于 ${formatMessageTimestamp(attachment.updatedAt)}`,
+    imageCount > 0 ? t(msg`图片：${imageCount} 张`) : null,
+    fileCount > 0 ? t(msg`文件：${fileCount} 个`) : null,
+    t(msg`更新于 ${formatMessageTimestamp(attachment.updatedAt)}`),
   ]
     .filter(Boolean)
     .join("\n");

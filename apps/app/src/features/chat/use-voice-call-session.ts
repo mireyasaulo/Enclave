@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createVoiceCallTurn,
   type VoiceCallTurnResult,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { isNativeMobileRuntime } from "../../runtime/native-runtime";
 import { useSpeechInput } from "./use-speech-input";
+
+const t = translateRuntimeMessage;
 
 type UseVoiceCallSessionOptions = {
   baseUrl?: string;
@@ -76,7 +80,7 @@ export function useVoiceCallSession({
   const turnMutation = useMutation({
     mutationFn: async () => {
       if (!speech.recordedAudio) {
-        throw new Error("请先录一段语音再试。");
+        throw new Error(t(msg`请先录一段语音再试。`));
       }
 
       const formData = new FormData();
@@ -279,12 +283,12 @@ export function useVoiceCallSession({
 
 function resolveAutoplayBlockedCopy() {
   return isNativeMobileRuntime()
-    ? "系统拦截了自动播报，点“重播上一句”即可播放。"
-    : "浏览器拦截了自动播报，点“重播上一句”即可播放。";
+    ? t(msg`系统拦截了自动播报，点“重播上一句”即可播放。`)
+    : t(msg`浏览器拦截了自动播报，点“重播上一句”即可播放。`);
 }
 
 function resolveVoicePlaybackFailedCopy() {
   return isNativeMobileRuntime()
-    ? "语音已生成，但当前设备没有成功播放。可以点“重播上一句”再试。"
-    : "语音已生成，但浏览器没有成功播放。可以点“重播上一句”再试。";
+    ? t(msg`语音已生成，但当前设备没有成功播放。可以点“重播上一句”再试。`)
+    : t(msg`语音已生成，但浏览器没有成功播放。可以点“重播上一句”再试。`);
 }

@@ -1,9 +1,13 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { isDesktopRuntimeAvailable } from "@yinjie/ui";
 import {
   buildDesktopStandaloneWindowLabel,
   openBrowserStandaloneWindow,
   openDesktopStandaloneWindow,
 } from "../../runtime/desktop-windowing";
+
+const t = translateRuntimeMessage;
 
 const DESKTOP_CHAT_IMAGE_VIEWER_PATH = "/desktop/chat-image-viewer";
 const STORAGE_KEY = "yinjie-desktop-chat-image-viewer-sessions";
@@ -35,7 +39,7 @@ export function buildDesktopChatImageViewerRouteHash(
 ) {
   const params = new URLSearchParams();
   params.set("imageUrl", input.imageUrl);
-  params.set("title", input.title.trim() || "图片");
+  params.set("title", input.title.trim() || t(msg`图片`));
 
   if (input.meta?.trim()) {
     params.set("meta", input.meta.trim());
@@ -198,7 +202,7 @@ export async function openDesktopChatImageViewerWindow(
     await openDesktopStandaloneWindow({
       label: windowLabel,
       url: routePath,
-      title: input.title.trim() || "图片",
+      title: input.title.trim() || t(msg`图片`),
       width,
       height,
       minWidth: 1120,

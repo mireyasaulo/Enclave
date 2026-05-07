@@ -7,6 +7,7 @@ import {
   useState,
   type Ref,
 } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Phone, Video } from "lucide-react";
@@ -24,6 +25,7 @@ import {
   type TypingPayload,
   uploadChatAttachment,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { track } from "@yinjie/analytics";
 import { ChatComposer } from "../../components/chat-composer";
@@ -87,6 +89,8 @@ import {
   buildDesktopChatRouteHash,
   type DesktopChatCallAction,
 } from "../desktop/chat/desktop-chat-route-state";
+
+const t = translateRuntimeMessage;
 
 type GroupChatThreadPanelProps = {
   groupId: string;
@@ -179,7 +183,7 @@ export function GroupChatThreadPanel({
         className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
         onClick={onBack}
       >
-        返回上一页
+        {t(msg`返回上一页`)}
       </Button>
     ) : null;
   const renderStatusRetryAction = (
@@ -195,7 +199,7 @@ export function GroupChatThreadPanel({
           void query.refetch();
         }}
       >
-        重试读取
+        {t(msg`重试读取`)}
       </Button>
     ) : null;
   const renderStatusActions = (query: { refetch: () => Promise<unknown> }) =>
@@ -311,7 +315,7 @@ export function GroupChatThreadPanel({
         return {
           characterId,
           stage,
-          name: memberName?.trim() || messageName?.trim() || "有人",
+          name: memberName?.trim() || messageName?.trim() || t(msg`有人`),
         };
       })
       .filter((entry) => Boolean(entry.characterId));
@@ -322,22 +326,22 @@ export function GroupChatThreadPanel({
     if (entries.length === 1) {
       const [entry] = entries;
       return entry.stage === "image_generation"
-        ? `${entry.name} 正在生成图片...`
-        : `${entry.name} 正在回复...`;
+        ? t(msg`${entry.name} 正在生成图片...`)
+        : t(msg`${entry.name} 正在回复...`);
     }
 
     const hasImageStage = entries.some(
       (entry) => entry.stage === "image_generation",
     );
     if (entries.length === 2 && !hasImageStage) {
-      return `${entries[0]?.name ?? "有人"}、${entries[1]?.name ?? "有人"} 正在回复...`;
+      return t(msg`${entries[0]?.name ?? t(msg`有人`)}、${entries[1]?.name ?? t(msg`有人`)} 正在回复...`);
     }
 
     if (hasImageStage) {
-      return `${entries[0]?.name ?? "有人"} 等 ${entries.length} 位角色正在接力回复...`;
+      return t(msg`${entries[0]?.name ?? t(msg`有人`)} 等 ${entries.length} 位角色正在接力回复...`);
     }
 
-    return `${entries[0]?.name ?? "有人"} 等 ${entries.length} 位角色正在回复...`;
+    return t(msg`${entries[0]?.name ?? t(msg`有人`)} 等 ${entries.length} 位角色正在回复...`);
   }, [membersQuery.data, messages, typingStates]);
 
   useEffect(() => {
@@ -503,7 +507,7 @@ export function GroupChatThreadPanel({
         {
           text: buildGroupCallInviteMessage(
             input.kind,
-            groupQuery.data?.name ?? "当前群聊",
+            groupQuery.data?.name ?? t(msg`当前群聊`),
             {
               activeCount: input.activeCount,
               totalCount: input.totalCount,
@@ -546,7 +550,7 @@ export function GroupChatThreadPanel({
         payload,
         groupId,
         ownerId,
-        senderName: ownerName?.trim() || "我",
+        senderName: ownerName?.trim() || t(msg`我`),
         senderAvatar: ownerAvatar,
       });
       setMessages((current) =>
@@ -582,7 +586,7 @@ export function GroupChatThreadPanel({
         }
       }
 
-      return fallbackName?.trim() || "群成员";
+      return fallbackName?.trim() || t(msg`群成员`);
     },
     [friendMap],
   );
@@ -617,16 +621,15 @@ export function GroupChatThreadPanel({
     sendMutation.error instanceof Error ? sendMutation.error.message : null;
   const effectiveBackground = backgroundQuery.data?.effectiveBackground ?? null;
   const announcement = groupQuery.data?.announcement?.trim() ?? "";
+  const muteSuffix = groupQuery.data?.isMuted ? t(msg` · 免打扰`) : "";
   const mobileSubtitle = membersQuery.data
     ? typingSummary
       ? typingSummary
-      : `${membersQuery.data.length} 人群聊${
-          groupQuery.data?.isMuted ? " · 免打扰" : ""
-        }`
+      : t(msg`${membersQuery.data.length} 人群聊${muteSuffix}`)
     : typingSummary
       ? typingSummary
       : groupQuery.data?.isMuted
-        ? "群聊 · 免打扰"
+        ? t(msg`群聊 · 免打扰`)
         : undefined;
 
   useThreadEntryScrollToBottom({
@@ -707,7 +710,7 @@ export function GroupChatThreadPanel({
       const result = await uploadChatAttachment(formData, baseUrl);
 
       if (result.attachment.kind !== "image") {
-        throw new Error("图片上传结果异常。");
+        throw new Error(t(msg`图片上传结果异常。`));
       }
 
       setReplyDraft(null);
@@ -726,7 +729,7 @@ export function GroupChatThreadPanel({
       const result = await uploadChatAttachment(formData, baseUrl);
 
       if (result.attachment.kind !== "file") {
-        throw new Error("文件上传结果异常。");
+        throw new Error(t(msg`文件上传结果异常。`));
       }
 
       setReplyDraft(null);
@@ -748,7 +751,7 @@ export function GroupChatThreadPanel({
       const result = await uploadChatAttachment(formData, baseUrl);
 
       if (result.attachment.kind !== "voice") {
-        throw new Error("语音上传结果异常。");
+        throw new Error(t(msg`语音上传结果异常。`));
       }
 
       setReplyDraft(null);
@@ -831,7 +834,7 @@ export function GroupChatThreadPanel({
 
       const payload = buildGroupRetryPayload(failedMessage);
       if (!payload) {
-        throw new Error("这条消息暂时无法重试发送。");
+        throw new Error(t(msg`这条消息暂时无法重试发送。`));
       }
 
       setMessages((current) => markThreadMessageSending(current, messageId));
@@ -937,7 +940,7 @@ export function GroupChatThreadPanel({
     ? {
         senderName: replyDraft.senderName,
         text: replyDraft.quotedText?.trim() || replyDraft.previewText,
-        modeLabel: replyDraft.quotedText ? "部分引用" : undefined,
+        modeLabel: replyDraft.quotedText ? t(msg`部分引用`) : undefined,
       }
     : null;
   const mentionCandidates = useMemo(() => {
@@ -949,8 +952,8 @@ export function GroupChatThreadPanel({
     }> = [
       {
         id: "mention-all",
-        name: "所有人",
-        subtitle: "提醒全部群成员",
+        name: t(msg`所有人`),
+        subtitle: t(msg`提醒全部群成员`),
         avatar: null,
       },
     ];
@@ -968,12 +971,12 @@ export function GroupChatThreadPanel({
       seenIds.add(member.memberId);
       const rawName = member.memberName?.trim() || member.memberId;
       const displayName = resolveCharacterDisplayName(member.memberId, rawName);
-      const roleLabel = member.role === "admin" ? "管理员" : "群成员";
+      const roleLabel = member.role === "admin" ? t(msg`管理员`) : t(msg`群成员`);
       candidates.push({
         id: member.memberId,
         name: displayName,
         subtitle:
-          displayName !== rawName ? `昵称：${rawName} · ${roleLabel}` : roleLabel,
+          displayName !== rawName ? t(msg`昵称：${rawName} · ${roleLabel}`) : roleLabel,
         avatar: member.memberAvatar,
       });
     }
@@ -989,8 +992,8 @@ export function GroupChatThreadPanel({
   ) => {
     const senderName =
       message.senderType === "user"
-        ? "我"
-        : message.senderName?.trim() || "群成员";
+        ? t(msg`我`)
+        : message.senderName?.trim() || t(msg`群成员`);
     const previewText = describeReplyPreview(message);
     const quotedText = options?.quotedText?.trim();
     setReplyDraft({
@@ -1038,12 +1041,12 @@ export function GroupChatThreadPanel({
         <header className="relative z-20 flex items-center gap-3 border-b border-[rgba(0,0,0,0.06)] bg-white px-6 py-3">
           <div className="min-w-0 flex-1 px-1 py-1">
             <div className="truncate text-[16px] font-medium text-[color:var(--text-primary)]">
-              {groupQuery.data?.name ?? "群聊"}
+              {groupQuery.data?.name ?? t(msg`群聊`)}
             </div>
             <div className="mt-1 text-[11px] text-[color:var(--text-muted)]">
               {typingSummary
                 ? typingSummary
-                : `${(membersQuery.data?.length ?? 0).toString()} 人群聊`}
+                : t(msg`${(membersQuery.data?.length ?? 0).toString()} 人群聊`)}
             </div>
           </div>
 
@@ -1059,20 +1062,20 @@ export function GroupChatThreadPanel({
         </header>
       ) : (
         <MobileChatThreadHeader
-          title={groupQuery.data?.name ?? "群聊"}
+          title={groupQuery.data?.name ?? t(msg`群聊`)}
           subtitle={mobileSubtitle}
           onBack={onBack}
           actions={[
             {
               key: "voice-call",
               icon: Phone,
-              label: "语音通话",
+              label: t(msg`语音通话`),
               onClick: () => handleDesktopCallAction("voice"),
             },
             {
               key: "video-call",
               icon: Video,
-              label: "视频通话",
+              label: t(msg`视频通话`),
               onClick: () => handleDesktopCallAction("video"),
             },
           ]}
@@ -1098,16 +1101,16 @@ export function GroupChatThreadPanel({
             className="flex min-w-0 flex-1 items-start gap-3 text-left transition hover:opacity-90"
           >
             <span className="mt-0.5 shrink-0 rounded-full bg-[rgba(7,193,96,0.08)] px-2.5 py-1 text-[10px] font-medium tracking-[0.08em] text-[color:var(--brand-primary)]">
-              群公告
+              {t(msg`群公告`)}
             </span>
             <div className="min-w-0 flex-1">
               <div className="truncate text-[13px] text-[color:var(--text-primary)]">
-                {announcement || "暂无群公告，点击填写本群说明。"}
+                {announcement || t(msg`暂无群公告，点击填写本群说明。`)}
               </div>
               <div className="mt-1 text-[11px] text-[color:var(--text-muted)]">
                 {announcement
-                  ? `最近更新 ${formatTimestamp(groupQuery.data?.updatedAt)}`
-                  : "群接龙与群协作入口先收口到聊天信息侧栏"}
+                  ? t(msg`最近更新 ${formatTimestamp(groupQuery.data?.updatedAt)}`)
+                  : t(msg`群接龙与群协作入口先收口到聊天信息侧栏`)}
               </div>
             </div>
           </button>
@@ -1129,10 +1132,10 @@ export function GroupChatThreadPanel({
               });
             }}
             className="shrink-0 rounded-full border border-[color:var(--border-faint)] bg-white px-3 py-1.5 text-[12px] text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
-            aria-label="打开群公告页"
-            title="打开群公告页"
+            aria-label={t(msg`打开群公告页`)}
+            title={t(msg`打开群公告页`)}
           >
-            公告页
+            {t(msg`公告页`)}
           </button>
         </div>
       ) : null}
@@ -1153,13 +1156,13 @@ export function GroupChatThreadPanel({
             className="flex w-full items-center gap-2 rounded-[12px] border border-[rgba(7,193,96,0.12)] bg-[rgba(247,251,248,0.96)] px-2.5 py-1.5 text-left active:bg-white"
           >
             <span className="shrink-0 rounded-full bg-[rgba(7,193,96,0.1)] px-2 py-0.5 text-[10px] font-medium text-[#15803d]">
-              群公告
+              {t(msg`群公告`)}
             </span>
             <span className="min-w-0 flex-1 truncate text-[11px] text-[color:var(--text-primary)]">
               {announcement}
             </span>
             <span className="shrink-0 text-[10px] text-[color:var(--text-muted)]">
-              查看
+              {t(msg`查看`)}
             </span>
           </button>
         </div>
@@ -1252,7 +1255,7 @@ export function GroupChatThreadPanel({
             <DesktopGroupCallPanel
               kind={desktopCallPanelState.kind}
               groupId={groupId}
-              groupName={groupQuery.data?.name ?? "群聊"}
+              groupName={groupQuery.data?.name ?? t(msg`群聊`)}
               members={membersQuery.data ?? []}
               lastSyncedCounts={
                 lastPublishedCallCounts?.kind === desktopCallPanelState.kind &&
@@ -1291,7 +1294,7 @@ export function GroupChatThreadPanel({
                     kind: desktopCallPanelState.kind,
                     conversationId: groupId,
                     conversationType: "group",
-                    title: groupQuery.data?.name ?? "群聊",
+                    title: groupQuery.data?.name ?? t(msg`群聊`),
                   }),
                 });
               }}
@@ -1347,8 +1350,8 @@ export function GroupChatThreadPanel({
                 />
               ) : (
                 <MobileGroupThreadStatusCard
-                  badge="群聊"
-                  title="群聊信息暂时不可用"
+                  badge={t(msg`群聊`)}
+                  title={t(msg`群聊信息暂时不可用`)}
                   description={groupQuery.error.message}
                   tone="danger"
                   action={renderStatusActions(groupQuery)}
@@ -1363,8 +1366,8 @@ export function GroupChatThreadPanel({
                 />
               ) : (
                 <MobileGroupThreadStatusCard
-                  badge="成员"
-                  title="群成员信息暂时不可用"
+                  badge={t(msg`成员`)}
+                  title={t(msg`群成员信息暂时不可用`)}
                   description={membersQuery.error.message}
                   tone="danger"
                   action={renderStatusActions(membersQuery)}
@@ -1373,12 +1376,12 @@ export function GroupChatThreadPanel({
             ) : null}
             {messagesQuery.isLoading ? (
               isDesktop ? (
-                <LoadingBlock label="正在读取群消息..." />
+                <LoadingBlock label={t(msg`正在读取群消息...`)} />
               ) : (
                 <MobileGroupThreadStatusCard
-                  badge="读取中"
-                  title="正在读取群消息"
-                  description="稍等一下，正在同步这段群聊里的消息。"
+                  badge={t(msg`读取中`)}
+                  title={t(msg`正在读取群消息`)}
+                  description={t(msg`稍等一下，正在同步这段群聊里的消息。`)}
                   tone="loading"
                 />
               )
@@ -1388,8 +1391,8 @@ export function GroupChatThreadPanel({
                 <ErrorBlock message={messagesQuery.error.message} />
               ) : (
                 <MobileGroupThreadStatusCard
-                  badge="消息"
-                  title="群消息暂时不可用"
+                  badge={t(msg`消息`)}
+                  title={t(msg`群消息暂时不可用`)}
                   description={messagesQuery.error.message}
                   tone="danger"
                   action={renderStatusActions(messagesQuery)}
@@ -1419,7 +1422,7 @@ export function GroupChatThreadPanel({
               threadContext={{
                 id: groupId,
                 type: "group",
-                title: groupQuery.data?.name ?? "群聊",
+                title: groupQuery.data?.name ?? t(msg`群聊`),
               }}
               buildMessageReturnTo={buildMessageReturnTo}
               groupMode
@@ -1465,16 +1468,16 @@ export function GroupChatThreadPanel({
                 });
               }}
               onSelectionModeChange={setSelectionModeActive}
-              errorActionLabel={!isDesktop && onBack ? "返回上一页" : undefined}
+              errorActionLabel={!isDesktop && onBack ? t(msg`返回上一页`) : undefined}
               onErrorAction={!isDesktop && onBack ? onBack : null}
               emptyState={
                 !isDesktop &&
                 !messagesQuery.isLoading &&
                 !messagesQuery.isError ? (
                   <MobileGroupThreadStatusCard
-                    badge="群聊"
-                    title="群里还没有消息"
-                    description="发一条消息，让这个群先热起来。"
+                    badge={t(msg`群聊`)}
+                    title={t(msg`群里还没有消息`)}
+                    description={t(msg`发一条消息，让这个群先热起来。`)}
                   />
                 ) : null
               }
@@ -1500,11 +1503,11 @@ export function GroupChatThreadPanel({
       {!selectionModeActive && !(isDesktop && desktopCallPanelState) ? (
         <ChatComposer
           value={text}
-          placeholder="输入消息"
+          placeholder={t(msg`输入消息`)}
           variant={isDesktop ? "desktop" : "mobile"}
           pending={sendMutation.isPending}
           error={sendError}
-          errorActionLabel={!isDesktop && onBack ? "返回上一页" : undefined}
+          errorActionLabel={!isDesktop && onBack ? t(msg`返回上一页`) : undefined}
           onErrorAction={!isDesktop && onBack ? onBack : null}
           speechInput={{
             baseUrl,
@@ -1554,10 +1557,10 @@ export function GroupChatThreadPanel({
         open={callUnavailableKind !== null}
         title={
           callUnavailableKind === "video"
-            ? "视频通话功能开发中"
-            : "语音通话功能开发中"
+            ? t(msg`视频通话功能开发中`)
+            : t(msg`语音通话功能开发中`)
         }
-        description="该功能暂未开放，敬请期待。"
+        description={t(msg`该功能暂未开放，敬请期待。`)}
         onClose={() => setCallUnavailableKind(null)}
       />
     </div>
@@ -1619,7 +1622,7 @@ function describeReplyPreview(message: ChatRenderableMessage) {
     resolveMessageSemanticPreview(message, {
       maxChars: 120,
       bracketedFallback: true,
-    }) || "消息"
+    }) || t(msg`消息`)
   );
 }
 
