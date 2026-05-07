@@ -1,5 +1,5 @@
-import { HttpException, HttpStatus } from "@nestjs/common";
-import type { AppErrorCode, AppErrorParams } from "@yinjie/contracts";
+import { HttpException, HttpStatus } from '@nestjs/common';
+import type { AppErrorCode, AppErrorParams } from './app-error.types';
 
 export interface AppErrorOptions {
   status?: HttpStatus;

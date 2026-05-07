@@ -5,9 +5,9 @@ import {
   HttpException,
   HttpStatus,
   Logger,
-} from "@nestjs/common";
-import type { Response } from "express";
-import type { AppErrorBody } from "@yinjie/contracts";
+} from '@nestjs/common';
+import type { Response } from 'express';
+import type { AppErrorBody } from './app-error.types';
 
 /**
  * 全局异常过滤器：保证所有错误响应都符合 AppErrorBody 形状。
