@@ -12,6 +12,7 @@ import { TelemetryOverviewCards } from "../components/telemetry/overview-cards";
 import { TelemetryLineChart } from "../components/telemetry/pv-uv-chart";
 import { TelemetryRangePicker } from "../components/telemetry/range-picker";
 import { TelemetryTopEventsTable } from "../components/telemetry/top-events-table";
+import { TelemetryTopWorldsTable } from "../components/telemetry/top-worlds-table";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
@@ -22,9 +23,17 @@ export function TelemetryPage() {
   const [tab, setTab] = useState<TabKey>("overview");
   const [range, setRange] = useState<TelemetryRange>("7d");
   const [appId, setAppId] = useState<TelemetryAppId | undefined>(undefined);
+  const [worldId, setWorldId] = useState<string | undefined>(undefined);
   const [funnelSteps, setFunnelSteps] = useState(
     "page_view,login_success,pay_checkout_success",
   );
+
+  // 拉一份当前 range 内有事件的世界列表，给 range-picker 的下拉填选项；
+  // overview tab 顶部的 Top 世界排行也复用同一份数据来源（但走 top-worlds 接口）。
+  const worldsForFilter = useQuery({
+    queryKey: ["telemetry", "worlds-filter", range],
+    queryFn: () => cloudAdminApi.listTelemetryWorlds(range),
+  });
 
   const tabs = useMemo<Array<{ key: TabKey; label: string }>>(
     () => [
@@ -49,8 +58,11 @@ export function TelemetryPage() {
         <TelemetryRangePicker
           range={range}
           appId={appId}
+          worldId={worldId}
           onRangeChange={setRange}
           onAppIdChange={setAppId}
+          onWorldIdChange={setWorldId}
+          worldOptions={worldsForFilter.data ?? []}
         />
       </header>
 
@@ -71,18 +83,27 @@ export function TelemetryPage() {
         ))}
       </nav>
 
-      {tab === "overview" && <OverviewTab range={range} appId={appId} />}
-      {tab === "events" && <EventsTab range={range} appId={appId} />}
+      {tab === "overview" && (
+        <OverviewTab range={range} appId={appId} worldId={worldId} />
+      )}
+      {tab === "events" && (
+        <EventsTab range={range} appId={appId} worldId={worldId} />
+      )}
       {tab === "funnel" && (
         <FunnelTab
           range={range}
           appId={appId}
+          worldId={worldId}
           steps={funnelSteps}
           onStepsChange={setFunnelSteps}
         />
       )}
-      {tab === "api" && <ApiHealthTab range={range} appId={appId} />}
-      {tab === "errors" && <ErrorsTab range={range} appId={appId} />}
+      {tab === "api" && (
+        <ApiHealthTab range={range} appId={appId} worldId={worldId} />
+      )}
+      {tab === "errors" && (
+        <ErrorsTab range={range} appId={appId} worldId={worldId} />
+      )}
     </div>
   );
 }
@@ -90,24 +111,40 @@ export function TelemetryPage() {
 function OverviewTab({
   range,
   appId,
+  worldId,
 }: {
   range: TelemetryRange;
   appId: TelemetryAppId | undefined;
+  worldId: string | undefined;
 }) {
   const t = useCloudConsoleText();
   const overview = useQuery({
-    queryKey: ["telemetry", "overview", range, appId ?? "all"],
-    queryFn: () => cloudAdminApi.getTelemetryOverview(range, appId),
+    queryKey: ["telemetry", "overview", range, appId ?? "all", worldId ?? "all"],
+    queryFn: () => cloudAdminApi.getTelemetryOverview(range, appId, worldId),
   });
   const pvSeries = useQuery({
-    queryKey: ["telemetry", "timeseries", "page_view", range, appId ?? "all"],
+    queryKey: [
+      "telemetry",
+      "timeseries",
+      "page_view",
+      range,
+      appId ?? "all",
+      worldId ?? "all",
+    ],
     queryFn: () =>
       cloudAdminApi.getTelemetryTimeseries({
         eventName: "page_view",
         range,
         groupBy: "appId",
         appId,
+        worldId,
       }),
+  });
+  // Top 世界排行在 worldId 未选时才显示——选了具体世界就只剩它一行没意义。
+  const topWorlds = useQuery({
+    queryKey: ["telemetry", "top-worlds", range],
+    queryFn: () => cloudAdminApi.getTelemetryTopWorlds(range),
+    enabled: !worldId,
   });
 
   return (
@@ -118,6 +155,18 @@ function OverviewTab({
         <ErrorBlock title={t("Failed to load overview")} message={String(overview.error)} />
       ) : overview.data ? (
         <TelemetryOverviewCards data={overview.data} />
+      ) : null}
+      {!worldId ? (
+        topWorlds.isLoading ? (
+          <LoadingBlock />
+        ) : topWorlds.error ? (
+          <ErrorBlock
+            title={t("Failed to load world ranking")}
+            message={String(topWorlds.error)}
+          />
+        ) : topWorlds.data ? (
+          <TelemetryTopWorldsTable data={topWorlds.data} />
+        ) : null
       ) : null}
       {pvSeries.isLoading ? (
         <LoadingBlock />
@@ -136,14 +185,16 @@ function OverviewTab({
 function EventsTab({
   range,
   appId,
+  worldId,
 }: {
   range: TelemetryRange;
   appId: TelemetryAppId | undefined;
+  worldId: string | undefined;
 }) {
   const t = useCloudConsoleText();
   const top = useQuery({
-    queryKey: ["telemetry", "top-events", range, appId ?? "all"],
-    queryFn: () => cloudAdminApi.getTelemetryTopEvents(range, appId),
+    queryKey: ["telemetry", "top-events", range, appId ?? "all", worldId ?? "all"],
+    queryFn: () => cloudAdminApi.getTelemetryTopEvents(range, appId, worldId),
   });
   if (top.isLoading) return <LoadingBlock />;
   if (top.error)
@@ -155,19 +206,21 @@ function EventsTab({
 function FunnelTab({
   range,
   appId,
+  worldId,
   steps,
   onStepsChange,
 }: {
   range: TelemetryRange;
   appId: TelemetryAppId | undefined;
+  worldId: string | undefined;
   steps: string;
   onStepsChange: (s: string) => void;
 }) {
   const t = useCloudConsoleText();
   const funnel = useQuery({
-    queryKey: ["telemetry", "funnel", steps, range, appId ?? "all"],
+    queryKey: ["telemetry", "funnel", steps, range, appId ?? "all", worldId ?? "all"],
     queryFn: () =>
-      cloudAdminApi.getTelemetryFunnel({ steps, range, appId }),
+      cloudAdminApi.getTelemetryFunnel({ steps, range, appId, worldId }),
     enabled: steps.trim().length > 0,
   });
   return (
@@ -187,14 +240,16 @@ function FunnelTab({
 function ApiHealthTab({
   range,
   appId,
+  worldId,
 }: {
   range: TelemetryRange;
   appId: TelemetryAppId | undefined;
+  worldId: string | undefined;
 }) {
   const t = useCloudConsoleText();
   const apiHealth = useQuery({
-    queryKey: ["telemetry", "api-health", range, appId ?? "all"],
-    queryFn: () => cloudAdminApi.getTelemetryApiHealth(range, appId),
+    queryKey: ["telemetry", "api-health", range, appId ?? "all", worldId ?? "all"],
+    queryFn: () => cloudAdminApi.getTelemetryApiHealth(range, appId, worldId),
   });
   if (apiHealth.isLoading) return <LoadingBlock />;
   if (apiHealth.error)
@@ -206,14 +261,16 @@ function ApiHealthTab({
 function ErrorsTab({
   range,
   appId,
+  worldId,
 }: {
   range: TelemetryRange;
   appId: TelemetryAppId | undefined;
+  worldId: string | undefined;
 }) {
   const t = useCloudConsoleText();
   const errors = useQuery({
-    queryKey: ["telemetry", "errors", range, appId ?? "all"],
-    queryFn: () => cloudAdminApi.getTelemetryErrors(range, appId),
+    queryKey: ["telemetry", "errors", range, appId ?? "all", worldId ?? "all"],
+    queryFn: () => cloudAdminApi.getTelemetryErrors(range, appId, worldId),
   });
   if (errors.isLoading) return <LoadingBlock />;
   if (errors.error)

@@ -17,6 +17,7 @@ import {
 import { ConsoleConfirmDialog } from "../components/console-confirm-dialog";
 import { JobsPermalinkLink } from "../components/jobs-permalink-link";
 import { useConsoleNotice } from "../components/console-notice";
+import { WorldTelemetrySection } from "../components/telemetry/world-telemetry-section";
 import { WorldLifecycleActionButtons } from "../components/world-lifecycle-action-buttons";
 import { copyTextToClipboard } from "../lib/clipboard";
 import {
@@ -923,6 +924,8 @@ export function WorldDetailPage() {
               </div>
             </div>
           </div>
+
+          <WorldTelemetrySection worldId={worldId} />
 
           <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
             <div className="flex flex-wrap items-start justify-between gap-3">

@@ -318,6 +318,16 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     Count: "数量",
     "Unique users": "独立用户",
     "Unique anons": "独立匿名",
+    World: "世界",
+    "All worlds": "全部世界",
+    "Active users": "活跃用户",
+    "Recent activity": "最近活动",
+    "Top worlds by activity": "世界活跃度排行",
+    "Page views (this world)": "页面浏览（本世界）",
+    "Failed to load world ranking": "加载世界排行失败",
+    "No world activity in the current range.": "当前范围内无世界活动。",
+    "Page views, active users and top operations captured for this world by client telemetry.":
+      "客户端埋点采集到的本世界页面浏览、活跃用户与高频操作。",
 
     Confirm: "确认",
     Cancel: "取消",
@@ -717,6 +727,17 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     Count: "件数",
     "Unique users": "ユニークユーザー",
     "Unique anons": "ユニーク匿名",
+    World: "ワールド",
+    "All worlds": "すべてのワールド",
+    "Active users": "アクティブユーザー",
+    "Recent activity": "最近のアクティビティ",
+    "Top worlds by activity": "アクティビティ別ワールドランキング",
+    "Page views (this world)": "ページビュー（このワールド）",
+    "Failed to load world ranking": "ワールドランキングの読み込みに失敗しました",
+    "No world activity in the current range.":
+      "現在の期間にワールド活動はありません。",
+    "Page views, active users and top operations captured for this world by client telemetry.":
+      "クライアント計測で取得したこのワールドのページビュー、アクティブユーザー、上位操作。",
 
     Confirm: "確認",
     Cancel: "キャンセル",
@@ -1117,6 +1138,17 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     Count: "건수",
     "Unique users": "순 사용자",
     "Unique anons": "순 익명",
+    World: "월드",
+    "All worlds": "모든 월드",
+    "Active users": "활성 사용자",
+    "Recent activity": "최근 활동",
+    "Top worlds by activity": "활동량 상위 월드",
+    "Page views (this world)": "페이지 뷰(이 월드)",
+    "Failed to load world ranking": "월드 순위 로드 실패",
+    "No world activity in the current range.":
+      "현재 범위에 월드 활동이 없습니다.",
+    "Page views, active users and top operations captured for this world by client telemetry.":
+      "클라이언트 텔레메트리로 수집한 이 월드의 페이지 뷰, 활성 사용자, 상위 작업.",
 
     Confirm: "확인",
     Cancel: "취소",
