@@ -1,0 +1,16 @@
+import { Body, Controller, Headers, Post } from "@nestjs/common";
+import { CloudTokenUsageDailyPushDto } from "./token-usage.dto";
+import { TokenUsageService } from "./token-usage.service";
+
+@Controller("internal/cloud/token-usage")
+export class TokenUsageRuntimeController {
+  constructor(private readonly tokenUsage: TokenUsageService) {}
+
+  @Post("daily")
+  pushDaily(
+    @Headers("x-world-callback-token") callbackToken: string | undefined,
+    @Body() body: CloudTokenUsageDailyPushDto,
+  ) {
+    return this.tokenUsage.ingestDaily(body, callbackToken);
+  }
+}

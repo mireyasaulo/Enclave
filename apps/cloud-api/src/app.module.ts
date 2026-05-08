@@ -29,6 +29,7 @@ import { WorldRuntimeService } from "./runtime-callbacks/world-runtime.service";
 import { RevenueSharingModule } from "./revenue-sharing/revenue-sharing.module";
 import { SubscriptionModule } from "./subscription/subscription.module";
 import { TelemetryModule } from "./telemetry/telemetry.module";
+import { TokenUsageModule } from "./token-usage/token-usage.module";
 import { UsersModule } from "./users/users.module";
 import { WorldAccessController } from "./world-access/world-access.controller";
 import { WorldAccessService } from "./world-access/world-access.service";
@@ -60,6 +61,7 @@ import { WaitingSessionSyncService } from "./world-access/waiting-session-sync.s
     RevenueSharingModule,
     FeedbackModule,
     TelemetryModule,
+    TokenUsageModule,
   ],
   controllers: [
     AdminAuthController,

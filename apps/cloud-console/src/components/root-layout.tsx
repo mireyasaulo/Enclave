@@ -142,6 +142,24 @@ function getRouteMeta(pathname: string): RouteMeta {
     };
   }
 
+  if (pathname.startsWith("/token-usage/")) {
+    return {
+      eyebrow: "Cloud monetization",
+      title: "Token Usage Detail",
+      detail:
+        "Drill into one world's LLM token consumption by character, model, scene, and conversation.",
+    };
+  }
+
+  if (pathname.startsWith("/token-usage")) {
+    return {
+      eyebrow: "Cloud monetization",
+      title: "Token Usage",
+      detail:
+        "Track LLM token consumption and cost across worlds, with platform-level budgets and pricing.",
+    };
+  }
+
   return {
     eyebrow: "Cloud operations",
     title: "Dashboard",
@@ -382,6 +400,23 @@ function RootLayoutContent() {
           <NavLinkContent
             label={t("Revenue Sharing")}
             hint={t("Payees and ledgers")}
+          />
+        </Link>
+      ),
+    },
+    {
+      key: "token-usage",
+      content: (
+        <Link
+          to="/token-usage"
+          className={
+            pathname.startsWith("/token-usage") ? NAV_LINK_ACTIVE : NAV_LINK
+          }
+          aria-current={pathname.startsWith("/token-usage") ? "page" : undefined}
+        >
+          <NavLinkContent
+            label={t("Token Usage")}
+            hint={t("LLM consumption and cost")}
           />
         </Link>
       ),

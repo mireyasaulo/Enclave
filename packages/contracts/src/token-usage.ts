@@ -263,6 +263,104 @@ export interface TokenUsageDowngradeCharacterQualityItem {
   pendingOutcomeSamples: TokenUsageDowngradeReviewSample[];
 }
 
+export interface CloudTokenUsageWorldRow {
+  worldId: string;
+  worldSlug?: string | null;
+  worldName?: string | null;
+  currency: "CNY" | "USD";
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  estimatedCost: number;
+  requestCount: number;
+  successCount: number;
+  failedCount: number;
+  activeCharacterCount: number;
+  failureRate: number | null;
+  lastSyncedAt?: string | null;
+}
+
+export interface CloudTokenUsageWorldListResponse {
+  items: CloudTokenUsageWorldRow[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface CloudTokenUsageOverviewResponse extends TokenUsageOverview {
+  activeWorldCount: number;
+}
+
+export interface CloudTokenUsageBreakdownPushItem {
+  dimension:
+    | "character"
+    | "conversation"
+    | "scene"
+    | "model"
+    | "billingSource";
+  key: string;
+  label?: string | null;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+  estimatedCost: number;
+  requestCount: number;
+  successCount: number;
+  failedCount: number;
+}
+
+export interface CloudTokenUsageDailyPushPayload {
+  worldId: string;
+  bucketDate: string;
+  callbackToken?: string | null;
+  overview: TokenUsageOverview;
+  breakdowns: CloudTokenUsageBreakdownPushItem[];
+}
+
+export interface CloudTokenUsageBudgetItem extends TokenUsageBudgetRule {
+  worldId: string | null;
+  note?: string | null;
+  updatedAt: string;
+}
+
+export interface CloudTokenUsageBudgetResponse {
+  global: CloudTokenUsageBudgetItem | null;
+  worlds: CloudTokenUsageBudgetItem[];
+}
+
+export interface UpdateCloudTokenUsageBudgetRequest {
+  worldId: string | null;
+  rule: TokenUsageBudgetRule & { note?: string | null };
+}
+
+export interface DeleteCloudTokenUsageBudgetRequest {
+  worldId: string;
+}
+
+export interface CloudTokenPricingItem extends TokenPricingCatalogItem {
+  id: string;
+  currency: "CNY" | "USD";
+  updatedAt: string;
+}
+
+export interface CloudTokenPricingCatalogResponse {
+  items: CloudTokenPricingItem[];
+}
+
+export interface UpsertCloudTokenPricingRequest {
+  currency: "CNY" | "USD";
+  model: string;
+  inputPer1kTokens: number;
+  outputPer1kTokens: number;
+  enabled: boolean;
+  note?: string | null;
+}
+
+export interface DeleteCloudTokenPricingRequest {
+  currency: "CNY" | "USD";
+  model: string;
+}
+
 export interface TokenUsageDowngradeQualityInsights {
   generatedAt: string;
   requestCount: number;
