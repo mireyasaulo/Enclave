@@ -1057,7 +1057,14 @@ export function MomentsPage() {
                         );
                       return (
                         <Button
-                          disabled={likeMutation.isPending}
+                          disabled={
+                            likeMutation.isPending || !moment.canInteract
+                          }
+                          title={
+                            !moment.canInteract
+                              ? t(msg`加为好友后才能互动`)
+                              : undefined
+                          }
                           onClick={() => likeMutation.mutate(moment.id)}
                           variant="secondary"
                           size="sm"
@@ -1075,7 +1082,9 @@ export function MomentsPage() {
                             ? t(msg`处理中...`)
                             : liked
                               ? t(msg`已赞`)
-                              : t(msg`点赞`)}
+                              : !moment.canInteract
+                                ? t(msg`需好友`)
+                                : t(msg`点赞`)}
                         </Button>
                       );
                     })()}
@@ -1200,27 +1209,33 @@ export function MomentsPage() {
                   })()
                 }
                 composer={
-                  <MomentCommentComposer
-                    value={commentDrafts[moment.id] ?? ""}
-                    onChange={(value) =>
-                      setCommentDrafts((current) => ({
-                        ...current,
-                        [moment.id]: value,
-                      }))
-                    }
-                    onSubmit={() => commentMutation.mutate(moment.id)}
-                    pending={pendingCommentMomentId === moment.id}
-                    disabled={commentMutation.isPending}
-                    placeholder={
-                      desktopReplyTarget?.postId === moment.id
-                        ? t(msg`回复 ${desktopReplyTarget.authorName}...`)
-                        : t(msg`写评论...`)
-                    }
-                    pendingLabel={t(msg`发送中...`)}
-                    className="w-full"
-                    inputClassName="rounded-full py-1.5 text-[16px]"
-                    buttonClassName="h-8 px-3 text-[12px]"
-                  />
+                  moment.canInteract ? (
+                    <MomentCommentComposer
+                      value={commentDrafts[moment.id] ?? ""}
+                      onChange={(value) =>
+                        setCommentDrafts((current) => ({
+                          ...current,
+                          [moment.id]: value,
+                        }))
+                      }
+                      onSubmit={() => commentMutation.mutate(moment.id)}
+                      pending={pendingCommentMomentId === moment.id}
+                      disabled={commentMutation.isPending}
+                      placeholder={
+                        desktopReplyTarget?.postId === moment.id
+                          ? t(msg`回复 ${desktopReplyTarget.authorName}...`)
+                          : t(msg`写评论...`)
+                      }
+                      pendingLabel={t(msg`发送中...`)}
+                      className="w-full"
+                      inputClassName="rounded-full py-1.5 text-[16px]"
+                      buttonClassName="h-8 px-3 text-[12px]"
+                    />
+                  ) : (
+                    <div className="w-full rounded-full bg-[color:var(--surface-soft)] px-4 py-1.5 text-[12px] text-[color:var(--text-muted)]">
+                      {t(msg`加为好友后才能评论。`)}
+                    </div>
+                  )
                 }
               />
             );

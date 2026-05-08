@@ -13,6 +13,7 @@ import { Button, ErrorBlock, InlineNotice } from "@yinjie/ui";
 import { SparkBadge } from "../../components/spark-badge";
 import { translateCharacterBio } from "../../lib/character-i18n";
 import { formatTimestamp } from "../../lib/format";
+import { buildYinjieId } from "../../lib/yinjie-id";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
 import { DesktopContactTextEditDialog } from "./desktop-contact-text-edit-dialog";
 import {
@@ -132,7 +133,7 @@ export function ContactDetailPane({
   const isFriend = Boolean(friendship);
   const remarkName = friendship?.remarkName?.trim() || "";
   const displayName = remarkName || character.name;
-  const identifier = `yinjie_${character.id.slice(0, 8)}`;
+  const identifier = buildYinjieId(character.id);
   const relationshipSummary = remarkName
     ? t(msg`昵称：${character.name}`)
     : isFriend

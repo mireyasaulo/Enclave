@@ -922,7 +922,7 @@ function FeedbackContextRow({
   return (
     <div className="rounded-[12px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3">
       <div className="text-xs text-[color:var(--text-muted)]">{label}</div>
-      <div className="mt-1 text-sm leading-6 text-[color:var(--text-primary)]">
+      <div className="mt-1 break-all text-sm leading-6 text-[color:var(--text-primary)]">
         {value}
       </div>
     </div>
