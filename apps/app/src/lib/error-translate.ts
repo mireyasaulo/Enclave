@@ -134,6 +134,58 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`until 不是有效时间。`);
     case "REMINDER_DEFER_INVALID":
       return translateRuntimeMessage(msg`请提供有效的延后时间。`);
+    case "CHARACTER_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`角色不存在：${String(params.id ?? params.characterId ?? "")}`,
+      );
+    case "CHARACTER_ALREADY_EXISTS":
+      return translateRuntimeMessage(
+        msg`角色已存在：${String(params.id ?? "")}`,
+      );
+    case "CHARACTER_DEFAULT_NOT_DELETABLE":
+      return translateRuntimeMessage(msg`默认保底角色不可删除。`);
+    case "PRESET_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`预设角色不存在：${String(params.presetKey ?? "")}`,
+      );
+    case "PRESET_AT_LEAST_ONE":
+      return translateRuntimeMessage(msg`至少选择一个预设角色。`);
+    case "BLUEPRINT_CHAT_SAMPLE_REQUIRED":
+      return translateRuntimeMessage(msg`需要提供聊天样本。`);
+    case "BLUEPRINT_REVISION_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`角色蓝图版本不存在：${String(params.revisionId ?? "")}`,
+      );
+    case "SHAKE_DISABLED":
+      return translateRuntimeMessage(msg`摇一摇当前已在后台停用。`);
+    case "SHAKE_COOLDOWN":
+      return translateRuntimeMessage(
+        msg`请至少间隔 ${String(params.cooldownMinutes ?? "?")} 分钟再摇一次。`,
+      );
+    case "SHAKE_DAILY_LIMIT":
+      return translateRuntimeMessage(msg`今日摇一摇次数已达到上限。`);
+    case "SHAKE_CYBER_AVATAR_NO_SIGNAL":
+      return translateRuntimeMessage(
+        msg`当前赛博分身信号不足，暂时还不能生成新的摇一摇角色。`,
+      );
+    case "SHAKE_SESSION_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`摇一摇会话不存在：${String(params.sessionId ?? "")}`,
+      );
+    case "SHAKE_NOT_DISCARDABLE":
+      return translateRuntimeMessage(msg`当前摇一摇结果已经不可再放弃。`);
+    case "SHAKE_KEPT_CHARACTER_MISSING":
+      return translateRuntimeMessage(
+        msg`当前摇一摇结果已保留，但角色记录不存在。`,
+      );
+    case "SHAKE_NOT_KEEPABLE":
+      return translateRuntimeMessage(msg`当前摇一摇结果已经不能再保留。`);
+    case "SHAKE_DRAFT_MISSING":
+      return translateRuntimeMessage(msg`当前摇一摇结果缺少角色草稿。`);
+    case "SHAKE_CHARACTER_CREATE_FAILED":
+      return translateRuntimeMessage(msg`当前摇一摇结果无法创建对应角色。`);
+    case "SHAKE_NO_DIRECTIONS":
+      return translateRuntimeMessage(msg`没有可用的摇一摇方向。`);
     case "VALIDATION_FAILED":
       return translateRuntimeMessage(msg`提交的数据无效，请检查后重试。`);
     case "INTERNAL_ERROR":

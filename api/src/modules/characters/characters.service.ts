@@ -1,9 +1,5 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
+import { HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { CharacterEntity } from './character.entity';
@@ -198,7 +194,11 @@ export class CharactersService implements OnModuleInit {
   async installCelebrityPreset(presetKey: string): Promise<CharacterEntity> {
     const preset = getBuiltInCharacterPreset(presetKey);
     if (!preset) {
-      throw new NotFoundException(`Preset ${presetKey} not found`);
+      throw new AppError('PRESET_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { presetKey },
+        legacyMessage: `Preset ${presetKey} not found`,
+      });
     }
 
     return this.materializePresetCharacter(preset);
@@ -241,16 +241,20 @@ export class CharactersService implements OnModuleInit {
       ),
     );
     if (normalizedPresetKeys.length === 0) {
-      throw new BadRequestException('至少选择一个预设角色。');
+      throw new AppError('PRESET_AT_LEAST_ONE', {
+        legacyMessage: '至少选择一个预设角色。',
+      });
     }
 
     const missingPresetKeys = normalizedPresetKeys.filter(
       (presetKey) => !getBuiltInCharacterPreset(presetKey),
     );
     if (missingPresetKeys.length > 0) {
-      throw new NotFoundException(
-        `Preset ${missingPresetKeys.join(', ')} not found`,
-      );
+      throw new AppError('PRESET_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { presetKey: missingPresetKeys.join(', ') },
+        legacyMessage: `Preset ${missingPresetKeys.join(', ')} not found`,
+      });
     }
 
     const installedCharacters = await Promise.all(
@@ -276,7 +280,9 @@ export class CharactersService implements OnModuleInit {
       character.deletionPolicy === 'protected' ||
       (DEFAULT_CHARACTER_IDS as readonly string[]).includes(id)
     ) {
-      throw new BadRequestException('默认保底角色不可删除。');
+      throw new AppError('CHARACTER_DEFAULT_NOT_DELETABLE', {
+        legacyMessage: '默认保底角色不可删除。',
+      });
     }
 
     await this.dataSource.transaction(async (manager) => {
