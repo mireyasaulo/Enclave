@@ -1,6 +1,7 @@
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const t = translateRuntimeMessage;
 
 // 星野列车 — MVP：选线路出发，每站冒出一位乘客，5s 内点击拾取故事碎片。
@@ -164,3 +165,4 @@ export const ROUTES: Route[] = [
 export function getRoute(id: string): Route | undefined {
   return ROUTES.find((r) => r.id === id);
 }
+// i18n-ignore-end

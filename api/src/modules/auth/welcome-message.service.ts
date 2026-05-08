@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CharacterEntity } from '../characters/character.entity';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   buildDefaultCharacters,
   SELF_CHARACTER_ID,
 } from '../characters/default-characters';
@@ -99,3 +100,4 @@ export class WelcomeMessageService {
     return this.characterRepo.save(this.characterRepo.create(seed));
   }
 }
+// i18n-ignore-end

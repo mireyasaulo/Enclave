@@ -4,6 +4,7 @@ import * as nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 import { SocksClient } from 'socks';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type SendVerificationCodeResult = {
   delivered: boolean;
   debugCode: string | null;
@@ -86,3 +87,4 @@ export class MailService {
     return this.transporter;
   }
 }
+// i18n-ignore-end

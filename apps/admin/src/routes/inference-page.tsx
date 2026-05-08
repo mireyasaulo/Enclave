@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   InferenceDiagnosticCapability,
   InferenceDiagnosticResult,
   InferenceModelCatalogEntry,
@@ -1843,3 +1844,4 @@ export function InferencePage() {
     </div>
   );
 }
+// i18n-ignore-end

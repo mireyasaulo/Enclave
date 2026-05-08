@@ -4,6 +4,7 @@ import { DEFAULT_REAL_WORLD_SYNC_RULES } from './real-world-sync.constants';
 import { RealWorldSyncService } from './real-world-sync.service';
 import type { RealityLinkConfigValue } from './real-world-sync.types';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 function createService() {
   return new RealWorldSyncService(
     {} as never,
@@ -58,3 +59,4 @@ describe('RealWorldSyncService world news desk search', () => {
     );
   });
 });
+// i18n-ignore-end

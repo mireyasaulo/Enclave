@@ -2,6 +2,7 @@ import type { CharacterEntity } from './character.entity';
 import { DEFAULT_CHARACTER_BIOS } from './character-bios';
 import { getCharacterAvatarBySourceKey } from './character-avatar-assets';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const WEDDING_DRESS_EXPERT_CHARACTER_ID =
   'char-default-wedding-dress-expert';
 export const WEDDING_DRESS_EXPERT_SOURCE_KEY = 'wedding_dress_expert';
@@ -343,3 +344,4 @@ export function buildWeddingDressExpertCharacter(): Partial<CharacterEntity> {
     currentStatus: '在看版型和试纱记录，先帮你把上身效果判断清楚。',
   };
 }
+// i18n-ignore-end

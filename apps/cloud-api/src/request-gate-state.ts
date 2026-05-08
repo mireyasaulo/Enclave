@@ -1,4 +1,5 @@
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CloudWorldRequestStatus,
   WorldAccessPhase,
   WorldAccessSessionStatus,
@@ -82,3 +83,4 @@ export function isRequestGateFailureCode(
 ): value is RequestGateFailureCode {
   return value ? REQUEST_GATE_FAILURE_CODES.includes(value as RequestGateFailureCode) : false;
 }
+// i18n-ignore-end

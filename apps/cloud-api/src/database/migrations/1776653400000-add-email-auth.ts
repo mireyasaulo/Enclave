@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const UP_QUERIES = [
   `ALTER TABLE "cloud_users" ADD COLUMN "email" text`,
   `ALTER TABLE "cloud_users" ADD COLUMN "emailVerifiedAt" datetime`,
@@ -44,3 +45,4 @@ export class AddEmailAuth1776653400000 implements MigrationInterface {
     }
   }
 }
+// i18n-ignore-end

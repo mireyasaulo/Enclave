@@ -1,6 +1,7 @@
 import type { CharacterBlueprintRecipeValue } from './character-blueprint.types';
 import { WORLD_NEWS_DESK_SOURCE_KEY } from './world-news-desk-character';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type CharacterRecipePatch = Partial<CharacterBlueprintRecipeValue>;
 
 const BUILT_IN_CHARACTER_BLUEPRINT_PATCHES: Record<
@@ -54,3 +55,4 @@ export function getBuiltInCharacterBlueprintPatch(sourceKey?: string | null) {
 
   return JSON.parse(JSON.stringify(patch)) as CharacterRecipePatch;
 }
+// i18n-ignore-end

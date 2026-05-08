@@ -6,6 +6,7 @@ import { UserFeedInteractionEntity } from '../analytics/user-feed-interaction.en
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   type CharacterBlueprintRecipeValue,
   type CharacterBlueprintSourceTypeValue,
 } from '../characters/character-blueprint.types';
@@ -1731,3 +1732,4 @@ function sha1(value: string) {
     .digest('hex')
     .slice(0, 12);
 }
+// i18n-ignore-end

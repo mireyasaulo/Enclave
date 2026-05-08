@@ -1,5 +1,6 @@
 import { ACTION_OPERATOR_SOURCE_KEY } from '../characters/action-operator-character';
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   ActionConnectorOperationValue,
   ActionConnectorSeedValue,
   ActionRuntimePolicyValue,
@@ -318,3 +319,4 @@ export function normalizeActionRuntimeRules(
     },
   };
 }
+// i18n-ignore-end

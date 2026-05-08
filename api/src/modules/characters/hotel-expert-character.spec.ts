@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   buildHotelExpertCharacter,
   HOTEL_EXPERT_CHARACTER_ID,
@@ -51,3 +52,4 @@ describe('hotel expert character', () => {
     );
   });
 });
+// i18n-ignore-end

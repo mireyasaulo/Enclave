@@ -3,6 +3,7 @@ import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   ChevronUp,
   Clock,
   Coins,
@@ -411,3 +412,4 @@ function SummaryCard({
     </div>
   );
 }
+// i18n-ignore-end

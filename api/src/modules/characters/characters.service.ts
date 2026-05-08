@@ -29,6 +29,7 @@ import { WorldOwnerService } from '../auth/world-owner.service';
 import { NeedDiscoveryCandidateEntity } from '../need-discovery/need-discovery-candidate.entity';
 import { RealWorldRuntimeProfileService } from '../real-world-sync/real-world-runtime-profile.service';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   buildDefaultCharacters,
   DEFAULT_CHARACTER_IDS,
 } from './default-characters';
@@ -556,3 +557,4 @@ export class CharactersService implements OnModuleInit {
     return new Set(friendships.map((item) => item.characterId));
   }
 }
+// i18n-ignore-end

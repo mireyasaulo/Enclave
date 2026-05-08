@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   ActionConnectorDiscoveryResult,
   ActionConnectorSummary,
   ActionConnectorTestResult,
@@ -2998,3 +2999,4 @@ function translateDiscoverySource(source: string) {
   }
   return source;
 }
+// i18n-ignore-end

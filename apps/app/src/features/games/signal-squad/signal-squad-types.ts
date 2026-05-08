@@ -2,6 +2,7 @@
 // 玩家带 3 人小队（玩家 + 2 NPC），3 分钟内压制信号塔。
 // 每隔几秒触发一次"信号事件"，玩家点击对应队员响应。
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type Skill = "scout" | "sniper" | "medic";
 
 export type Squadmate = {
@@ -75,3 +76,4 @@ export type SignalSquadState = {
   lastTickAtMs: number;
   rngSeed: number;
 };
+// i18n-ignore-end

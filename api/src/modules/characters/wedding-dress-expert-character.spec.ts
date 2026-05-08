@@ -1,5 +1,6 @@
 import { buildWeddingDressExpertCharacter } from './wedding-dress-expert-character';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 describe('wedding dress expert character', () => {
   it('keeps a grounded default runtime presence', () => {
     const character = buildWeddingDressExpertCharacter();
@@ -56,3 +57,4 @@ describe('wedding dress expert character', () => {
     expect(character.profile?.traits?.topicsOfInterest).toContain('改衣节点');
   });
 });
+// i18n-ignore-end

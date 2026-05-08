@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const UP_QUERIES = [
   `CREATE TABLE IF NOT EXISTS "client_telemetry_events" (
     "id" varchar PRIMARY KEY NOT NULL,
@@ -65,3 +66,4 @@ export class CreateTelemetryTables1776655800000 implements MigrationInterface {
     }
   }
 }
+// i18n-ignore-end

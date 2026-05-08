@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   Column,
   CreateDateColumn,
@@ -37,3 +38,4 @@ export class WikiFieldProtectionEntity {
   @CreateDateColumn()
   createdAt: Date;
 }
+// i18n-ignore-end

@@ -1,6 +1,7 @@
-import { BadRequestException } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import type { ChatBackgroundAsset } from './chat-background.types';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export function normalizeChatBackgroundAsset(
   input: ChatBackgroundAsset,
 ): ChatBackgroundAsset {
@@ -8,7 +9,9 @@ export function normalizeChatBackgroundAsset(
   const url = input.url?.trim();
 
   if (!assetId || !url) {
-    throw new BadRequestException('请先选择一张聊天背景。');
+    throw new AppError('CHAT_BACKGROUND_NOT_SELECTED', {
+      legacyMessage: '请先选择一张聊天背景。',
+    });
   }
 
   return {
@@ -57,3 +60,4 @@ function normalizeOptionalDimension(value?: number) {
 
   return Math.round(value);
 }
+// i18n-ignore-end

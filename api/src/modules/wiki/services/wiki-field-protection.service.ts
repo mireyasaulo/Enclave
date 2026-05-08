@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   ForbiddenException,
   Injectable,
@@ -139,3 +140,4 @@ function matchProtectedPath(
   }
   return best ? { protectedPath: best.protectedPath, minRole: best.minRole } : null;
 }
+// i18n-ignore-end

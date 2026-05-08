@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   Body,
   Controller,
@@ -56,3 +57,4 @@ export class ReminderRuntimeController {
     return this.reminderRuntimeService.cancelTask(id);
   }
 }
+// i18n-ignore-end

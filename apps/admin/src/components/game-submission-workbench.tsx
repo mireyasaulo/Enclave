@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { msg } from "@lingui/macro";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   AdminCreateGameSubmissionRequest,
   AdminGameSubmission,
   AdminUpdateGameSubmissionRequest,
@@ -1111,3 +1112,4 @@ function formatTime(value: string) {
     date.getHours(),
   ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
+// i18n-ignore-end

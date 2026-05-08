@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   Body,
   Controller,
@@ -107,3 +108,4 @@ export class AiController {
     return response.sendFile(this.speechAssets.resolveReadablePath(fileName));
   }
 }
+// i18n-ignore-end

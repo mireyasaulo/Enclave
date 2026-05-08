@@ -3,6 +3,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { SystemService } from './system.service';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const EVAL_RUNTIME_ENV_KEY = 'YINJIE_EVAL_RUNTIME_DIR';
 
 function createSystemService() {
@@ -165,3 +166,4 @@ describe('SystemService eval runtime execution', () => {
     expect(updated.notes[updated.notes.length - 1]).toBe('先继续扩样。');
   });
 });
+// i18n-ignore-end

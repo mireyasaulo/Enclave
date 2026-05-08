@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { Transform } from "class-transformer";
 import {
   IsBoolean,
@@ -208,3 +209,4 @@ export const CLOUD_FEEDBACK_CATEGORIES = FEEDBACK_CATEGORIES;
 export const CLOUD_FEEDBACK_PRIORITIES = FEEDBACK_PRIORITIES;
 export const CLOUD_FEEDBACK_SOURCES = FEEDBACK_SOURCES;
 export const CLOUD_FEEDBACK_STATUSES = FEEDBACK_STATUSES;
+// i18n-ignore-end

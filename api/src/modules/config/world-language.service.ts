@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { SystemConfigService } from './config.service';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type WorldLanguageCode = 'zh-CN' | 'en-US' | 'ja-JP' | 'ko-KR';
 
 export type WorldLanguageOption = {
@@ -586,3 +587,4 @@ const WEATHER_LABELS: Record<number, WeatherLabel> = {
     },
   },
 };
+// i18n-ignore-end

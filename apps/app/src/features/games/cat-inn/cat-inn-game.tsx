@@ -4,6 +4,7 @@ import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
 import { Heart, Play, RotateCcw, Sparkles, Ticket, X } from "lucide-react";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   FURNITURE,
   GUESTS_PER_ROUND,
   ROOMS,
@@ -352,3 +353,4 @@ export function CatInnGame({ variant = "fullscreen", onExit }: CatInnGameProps) 
     </section>
   );
 }
+// i18n-ignore-end

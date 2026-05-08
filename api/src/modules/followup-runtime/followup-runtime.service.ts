@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { createHash } from 'crypto';
 import {
   BadRequestException,
@@ -1693,3 +1694,4 @@ function relationshipPriority(
       return 0;
   }
 }
+// i18n-ignore-end

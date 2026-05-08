@@ -1,6 +1,7 @@
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const t = translateRuntimeMessage;
 
 // 岛屿演唱会 — MVP：选 1 件乐器 + 2 件舞台道具 + 编 3 首曲目，演出阶段做节奏 tap
@@ -153,3 +154,4 @@ export function getStageProp(id: string): StageProp | undefined {
 export function getSong(id: string): Song | undefined {
   return SONGS.find((s) => s.id === id);
 }
+// i18n-ignore-end

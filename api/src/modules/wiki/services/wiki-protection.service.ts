@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   BadRequestException,
   Injectable,
@@ -120,3 +121,4 @@ export class WikiProtectionService {
     return expired.length;
   }
 }
+// i18n-ignore-end

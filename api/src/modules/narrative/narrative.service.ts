@@ -5,6 +5,7 @@ import { NarrativeArcEntity } from './narrative-arc.entity';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { ReplyLogicRulesService } from '../ai/reply-logic-rules.service';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type RecordConversationTurnInput = {
   characterId: string;
   characterName?: string;
@@ -126,3 +127,4 @@ export class NarrativeService {
     return next;
   }
 }
+// i18n-ignore-end

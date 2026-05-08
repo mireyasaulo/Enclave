@@ -1,5 +1,6 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type StoredApiKeyEnvelope = {
   v: 1;
   iv: string;
@@ -75,3 +76,4 @@ export function decryptUserApiKey(value: string | null | undefined) {
 
   return decrypted.toString('utf8');
 }
+// i18n-ignore-end

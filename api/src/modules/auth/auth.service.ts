@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type AuthUserPayload = {
   sub: string;
   username: string;
@@ -140,3 +141,4 @@ export class AuthService {
     };
   }
 }
+// i18n-ignore-end

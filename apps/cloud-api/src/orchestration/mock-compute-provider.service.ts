@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 import { CloudInstanceEntity } from "../entities/cloud-instance.entity";
 import { CloudWorldEntity } from "../entities/cloud-world.entity";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   InspectWorldInstanceResult,
   ProvisionWorldInstanceResult,
   WorldComputeProvider,
@@ -126,3 +127,4 @@ export class MockComputeProviderService implements WorldComputeProvider {
     }
   }
 }
+// i18n-ignore-end

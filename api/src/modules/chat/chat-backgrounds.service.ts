@@ -3,10 +3,11 @@ import { existsSync } from 'fs';
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
 import {
-  BadRequestException,
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
+  HttpStatus,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -74,7 +75,9 @@ export class ChatBackgroundsService {
     const conversation = await this.requireOwnedConversation(conversationId);
 
     if (input.mode === 'custom' && !input.background) {
-      throw new BadRequestException('请先选择当前聊天的背景图。');
+      throw new AppError('CHAT_BACKGROUND_NOT_SELECTED', {
+        legacyMessage: '请先选择当前聊天的背景图。',
+      });
     }
 
     conversation.chatBackgroundMode = input.mode;
@@ -129,7 +132,9 @@ export class ChatBackgroundsService {
     const group = await this.requireOwnedGroup(groupId);
 
     if (input.mode === 'custom' && !input.background) {
-      throw new BadRequestException('请先选择当前聊天的背景图。');
+      throw new AppError('CHAT_BACKGROUND_NOT_SELECTED', {
+        legacyMessage: '请先选择当前聊天的背景图。',
+      });
     }
 
     group.chatBackgroundMode = input.mode;
@@ -157,7 +162,10 @@ export class ChatBackgroundsService {
     metadata: { width?: number; height?: number },
   ): Promise<ChatBackgroundAsset> {
     if (!file.mimetype.startsWith('image/')) {
-      throw new NotFoundException('当前只支持上传图片作为聊天背景。');
+      throw new AppError('CHAT_BACKGROUND_IMAGE_ONLY', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '当前只支持上传图片作为聊天背景。',
+      });
     }
 
     const originalName = sanitizeFileName(
@@ -202,7 +210,10 @@ export class ChatBackgroundsService {
   normalizeBackgroundFileName(fileName: string) {
     const normalized = path.basename(fileName).trim();
     if (!normalized) {
-      throw new NotFoundException('Chat background not found');
+      throw new AppError('CHAT_BACKGROUND_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Chat background not found',
+      });
     }
 
     return normalized;
@@ -216,7 +227,11 @@ export class ChatBackgroundsService {
     });
 
     if (!conversation) {
-      throw new NotFoundException(`Conversation ${conversationId} not found`);
+      throw new AppError('CHAT_CONVERSATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { conversationId },
+        legacyMessage: `Conversation ${conversationId} not found`,
+      });
     }
 
     return conversation;
@@ -231,7 +246,11 @@ export class ChatBackgroundsService {
     });
 
     if (!group) {
-      throw new NotFoundException(`Group ${groupId} not found`);
+      throw new AppError('CHAT_GROUP_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { groupId },
+        legacyMessage: `Group ${groupId} not found`,
+      });
     }
 
     return group;
@@ -285,3 +304,4 @@ function normalizeOptionalDimension(value?: number) {
 
   return Math.round(value);
 }
+// i18n-ignore-end

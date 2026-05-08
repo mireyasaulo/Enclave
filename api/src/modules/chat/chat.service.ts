@@ -2,6 +2,7 @@ import { mkdir, writeFile } from 'fs/promises';
 import { randomUUID } from 'crypto';
 import path from 'path';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   BadRequestException,
   Inject,
   Injectable,
@@ -2246,3 +2247,4 @@ function normalizeOptionalDimension(value?: number) {
 
   return Math.round(value);
 }
+// i18n-ignore-end

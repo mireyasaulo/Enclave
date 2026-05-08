@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const UP_QUERIES = [
   `ALTER TABLE "waiting_session_sync_tasks" ADD COLUMN "status" varchar NOT NULL DEFAULT ('pending')`,
   `ALTER TABLE "waiting_session_sync_tasks" ADD COLUMN "finishedAt" datetime`,
@@ -29,3 +30,4 @@ export class AddWaitingSessionSyncTaskStatusColumns1776649800000
     }
   }
 }
+// i18n-ignore-end

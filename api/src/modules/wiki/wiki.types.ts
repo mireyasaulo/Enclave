@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import type { WikiContentSnapshot } from './entities/character-revision.entity';
 import type { CharacterBlueprintRecipeValue } from '../characters/character-blueprint.types';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const WIKI_CONTENT_SCHEMA_VERSION = 2 as const;
 
 export const WIKI_CONTENT_FIELDS = [
@@ -620,3 +621,4 @@ function emojiUsage(
     ? value
     : fallback;
 }
+// i18n-ignore-end

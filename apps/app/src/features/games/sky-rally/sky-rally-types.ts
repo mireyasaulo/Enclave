@@ -1,6 +1,7 @@
 // 天空竞速 — 类型定义
 // 一条赛道 8-12 个加速门，2 分钟冲线。节奏式点击：加速门进入窗口时点 boost。
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type Track = {
   id: string;
   name: string;
@@ -55,3 +56,4 @@ export type SkyRallyState = {
   log: SkyRallyLogEntry[];
   lastTickAtMs: number;
 };
+// i18n-ignore-end

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   compareEvalRuns,
   getGenerationTrace,
   getEvalDataset,
@@ -3113,3 +3114,4 @@ function setQueryParam(params: URLSearchParams, key: string, value: string | nul
   }
   params.set(key, value);
 }
+// i18n-ignore-end

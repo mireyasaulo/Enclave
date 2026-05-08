@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 @Entity('friendships')
 export class FriendshipEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -50,3 +51,4 @@ export class FriendshipEntity {
   @Column({ type: 'varchar', length: 10, nullable: true })
   sparkLastDay?: string | null;
 }
+// i18n-ignore-end

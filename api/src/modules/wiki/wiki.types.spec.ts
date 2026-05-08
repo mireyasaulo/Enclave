@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { BadRequestException } from '@nestjs/common';
 import {
   WIKI_CONTENT_SCHEMA_VERSION,
@@ -250,3 +251,4 @@ describe('snapshotFromRecipe', () => {
     expect(snap.name).toBe('R');
   });
 });
+// i18n-ignore-end

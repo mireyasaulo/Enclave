@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   Body,
   Controller,
@@ -129,3 +130,4 @@ export class MomentsController {
     return this.momentsService.toggleOwnerLike(postId);
   }
 }
+// i18n-ignore-end

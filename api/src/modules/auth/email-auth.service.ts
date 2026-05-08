@@ -10,6 +10,7 @@ import type { AuthSession, AuthUserPayload } from './auth.service';
 import { EmailVerificationSessionEntity } from './email-verification-session.entity';
 import { UserEntity } from './user.entity';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export type SendEmailCodeResult = {
@@ -253,3 +254,4 @@ export class EmailAuthService {
     return Math.floor(parsed);
   }
 }
+// i18n-ignore-end

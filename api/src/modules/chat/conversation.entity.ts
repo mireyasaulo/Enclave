@@ -1,5 +1,6 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 @Entity('conversations')
 export class ConversationEntity {
   @PrimaryColumn()
@@ -62,3 +63,4 @@ export class ConversationEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+// i18n-ignore-end

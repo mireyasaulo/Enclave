@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   BadRequestException,
   ForbiddenException,
@@ -2191,3 +2192,4 @@ function paginate<T>(items: T[], page: number, limit: number) {
   const start = (normalizedPage - 1) * normalizedLimit;
   return items.slice(start, start + normalizedLimit);
 }
+// i18n-ignore-end

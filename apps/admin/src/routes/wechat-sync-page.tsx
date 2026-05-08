@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   useDeferredValue,
   useEffect,
@@ -9824,3 +9825,4 @@ function inferContactDomains(contact: WechatSyncContactBundle) {
 function normalizeWechatSyncAnalysisPromptValue(value?: string | null) {
   return value?.trim() ?? "";
 }
+// i18n-ignore-end

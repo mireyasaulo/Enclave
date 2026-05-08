@@ -6,6 +6,7 @@ import { getBuiltInCharacterBlueprintPatch } from '../characters/built-in-charac
 import { CharacterEntity } from '../characters/character.entity';
 import { CharacterBlueprintEntity } from '../characters/character-blueprint.entity';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   WORLD_NEWS_BULLETIN_GENERATION_KIND,
   WORLD_NEWS_DESK_SOURCE_KEY,
 } from '../characters/world-news-desk-character';
@@ -2297,3 +2298,4 @@ export class RealWorldSyncService {
     };
   }
 }
+// i18n-ignore-end

@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type BarExpertChatBaseline = {
   id: string;
   caseId: string;
@@ -379,3 +380,4 @@ export const BAR_EXPERT_CHAT_BASELINES: BarExpertChatBaseline[] = [
     text: '先别让她再喝，也别让她一个人待着。把那杯留着，立刻叫店员或安保过来，找一个清醒朋友一起把她带到明亮安全的地方；如果已经站不稳、意识发飘、异常困倦，直接打急救或马上送医。现在先保人和证据，别继续纠结那杯到底是什么。',
   },
 ];
+// i18n-ignore-end

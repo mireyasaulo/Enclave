@@ -2,6 +2,7 @@ import type { CharacterEntity } from './character.entity';
 import { PRESET_CHARACTER_BIOS } from './character-bios';
 import { getCharacterAvatarBySourceKey } from './character-avatar-assets';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type CelebrityCharacterPresetGroupKey =
   | 'technology_and_product'
   | 'science_and_reasoning'
@@ -5665,3 +5666,4 @@ export function getCelebrityCharacterPreset(presetKey: string) {
     (preset) => preset.presetKey === presetKey,
   );
 }
+// i18n-ignore-end

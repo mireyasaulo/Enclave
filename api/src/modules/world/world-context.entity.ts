@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 @Entity('world_contexts')
 export class WorldContextEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -26,3 +27,4 @@ export class WorldContextEntity {
   @CreateDateColumn()
   timestamp: Date;
 }
+// i18n-ignore-end

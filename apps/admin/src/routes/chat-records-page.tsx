@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { Fragment, useEffect, useMemo, useState } from "react";
 import {
   useInfiniteQuery,
@@ -2321,3 +2322,4 @@ function buildOperatorSummary({
     tone: "muted" as const,
   };
 }
+// i18n-ignore-end

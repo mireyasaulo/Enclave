@@ -1,5 +1,6 @@
 import type { WechatSyncContactBundle } from "@yinjie/contracts";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const DEFAULT_WECHAT_CONNECTOR_BASE_URL = "http://127.0.0.1:17364";
 const WECHAT_CONNECTOR_STORAGE_KEY = "yinjie_wechat_connector_settings";
 
@@ -341,4 +342,4 @@ export function openWechatConnectorUpstreamService(
     },
   );
 }
-
+// i18n-ignore-end

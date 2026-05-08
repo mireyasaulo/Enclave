@@ -13,6 +13,7 @@ import { ChatGateway } from './chat.gateway';
 import { GroupEntity } from './group.entity';
 import { GroupMessageEntity } from './group-message.entity';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   GroupReplyTaskEntity,
   type GroupReplyTaskStatus,
 } from './group-reply-task.entity';
@@ -834,3 +835,4 @@ export class GroupReplyTaskService {
     await this.groupRepo.save(group);
   }
 }
+// i18n-ignore-end

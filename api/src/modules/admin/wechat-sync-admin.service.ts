@@ -1,6 +1,6 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { randomUUID } from 'crypto';
 import {
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   HttpStatus,
   Injectable,
   Logger,

@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SystemConfigService } from '../config/config.service';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   WorldLanguageService,
   type WorldLanguageCode,
 } from '../config/world-language.service';
@@ -1045,3 +1046,4 @@ export class WorldService {
     );
   }
 }
+// i18n-ignore-end

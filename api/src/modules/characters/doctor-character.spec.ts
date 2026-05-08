@@ -1,5 +1,6 @@
 import { buildDoctorCharacter } from './doctor-character';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 describe('doctor character', () => {
   it('keeps a grounded default runtime presence', () => {
     const character = buildDoctorCharacter();
@@ -43,3 +44,4 @@ describe('doctor character', () => {
     expect(character.profile?.traits?.topicsOfInterest).toContain('用药边界');
   });
 });
+// i18n-ignore-end

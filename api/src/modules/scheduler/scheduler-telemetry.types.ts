@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const SCHEDULER_JOB_DEFINITIONS = [
   {
     id: 'trigger_due_reminder_tasks',
@@ -216,3 +217,4 @@ export interface SchedulerCharacterEventValue {
   characterId: string;
   characterName: string;
 }
+// i18n-ignore-end

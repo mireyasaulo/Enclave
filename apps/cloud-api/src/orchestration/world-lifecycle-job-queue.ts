@@ -1,6 +1,7 @@
 import { In, QueryFailedError, Repository } from "typeorm";
 import { WorldLifecycleJobEntity } from "../entities/world-lifecycle-job.entity";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const ACTIVE_WORLD_LIFECYCLE_JOB_STATUSES = [
   "pending",
   "running",
@@ -190,3 +191,4 @@ export async function ensureUniqueActiveLifecycleJob(
     throw error;
   }
 }
+// i18n-ignore-end

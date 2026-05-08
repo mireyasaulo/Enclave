@@ -2,6 +2,7 @@ import type { CharacterEntity } from './character.entity';
 import { DEFAULT_CHARACTER_BIOS } from './character-bios';
 import { getCharacterAvatarBySourceKey } from './character-avatar-assets';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const WEDDING_PLANNER_CHARACTER_ID = 'char-default-wedding-planner';
 export const WEDDING_PLANNER_SOURCE_KEY = 'wedding_planner';
 
@@ -325,3 +326,4 @@ export function buildWeddingPlannerCharacter(): Partial<CharacterEntity> {
     currentActivity: 'working',
   };
 }
+// i18n-ignore-end

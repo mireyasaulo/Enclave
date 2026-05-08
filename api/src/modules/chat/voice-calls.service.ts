@@ -5,6 +5,7 @@ import { CharactersService } from '../characters/characters.service';
 import { ChatService } from './chat.service';
 import type { Message, VoiceAttachment } from './chat.types';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type VoiceCallTranscriptStatus = 'completed' | 'pending' | 'failed' | 'skipped';
 
 const VOICE_CALL_INPUT_ATTACHMENT_MISSING =
@@ -259,3 +260,4 @@ function buildSpeechInstructions(characterName: string) {
   const normalizedName = characterName.trim() || VOICE_CALL_CURRENT_CHARACTER;
   return `${VOICE_CALL_TTS_INSTRUCTIONS_PREFIX}${normalizedName}${VOICE_CALL_TTS_INSTRUCTIONS_SUFFIX}`;
 }
+// i18n-ignore-end

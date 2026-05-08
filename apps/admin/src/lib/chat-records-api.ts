@@ -1,4 +1,5 @@
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   AdminChatRecordConversationDetail,
   AdminChatRecordConversationExportQuery,
   AdminChatRecordConversationExportResponse,
@@ -160,3 +161,4 @@ export const chatRecordsAdminApi = {
       method: "DELETE",
     }),
 };
+// i18n-ignore-end

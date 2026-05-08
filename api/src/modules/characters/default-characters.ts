@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import type { CharacterEntity } from './character.entity';
 import {
   ACTION_OPERATOR_CHARACTER_ID,
@@ -251,3 +252,4 @@ export function buildDefaultCharacters(): Partial<CharacterEntity>[] {
     buildWorldNewsDeskCharacter(),
   ];
 }
+// i18n-ignore-end

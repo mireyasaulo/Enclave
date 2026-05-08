@@ -5,6 +5,7 @@ import { validateGeneratedSceneOutput } from '../ai/moment-output-validator';
 import { buildBarExpertCharacter } from './bar-expert-character';
 import { BAR_EXPERT_CHAT_BASELINES } from './bar-expert-chat-baselines';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type EvalDatasetManifestFixture = {
   id: string;
   caseIds: string[];
@@ -711,3 +712,4 @@ describe('bar expert chat baselines', () => {
     expect(safetyBaseline?.text).not.toMatch(/再观察一会|继续喝完|应该只是酒量差/u);
   });
 });
+// i18n-ignore-end

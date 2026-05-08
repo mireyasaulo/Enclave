@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   BadRequestException,
   Injectable,
   NotFoundException,
@@ -774,3 +775,4 @@ function formatStickerFileSize(bytes: number) {
 
   return `${Math.round(bytes / 1024)}KB`;
 }
+// i18n-ignore-end

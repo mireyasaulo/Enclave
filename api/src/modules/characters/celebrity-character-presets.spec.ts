@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { getPresetCharacterBio } from './character-bios';
 import {
   getCelebrityCharacterPreset,
@@ -345,3 +346,4 @@ describe('celebrity character presets', () => {
     expect(INTELLIGENCE_COUNCIL_CORE_CHARACTER_IDS).toContain(shenJu?.id);
   });
 });
+// i18n-ignore-end

@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const UP_QUERIES = [
   `CREATE TABLE IF NOT EXISTS "phone_verification_sessions" (
     "id" varchar PRIMARY KEY NOT NULL,
@@ -157,3 +158,4 @@ export class CreateCloudPlatformSchema1776645000000 implements MigrationInterfac
     }
   }
 }
+// i18n-ignore-end

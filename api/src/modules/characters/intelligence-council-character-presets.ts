@@ -1,4 +1,5 @@
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CelebrityCharacterPreset,
   CelebrityCharacterPresetGroupKey,
 } from './celebrity-character-presets';
@@ -1244,3 +1245,4 @@ export const INTELLIGENCE_COUNCIL_CORE_CHARACTER_IDS =
       definition.presetKey,
     ),
   ).map((definition) => definition.id);
+// i18n-ignore-end

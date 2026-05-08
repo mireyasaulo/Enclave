@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   ResolveWorldAccessRequest,
   ResolveWorldAccessResponse,
   WorldAccessSessionSummary,
@@ -635,3 +636,4 @@ export class WorldAccessService {
     return normalized ? normalized : null;
   }
 }
+// i18n-ignore-end

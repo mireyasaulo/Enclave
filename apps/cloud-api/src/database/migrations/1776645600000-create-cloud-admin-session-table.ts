@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const UP_QUERIES = [
   `CREATE TABLE IF NOT EXISTS "cloud_admin_sessions" (
     "id" varchar PRIMARY KEY NOT NULL,
@@ -36,3 +37,4 @@ export class CreateCloudAdminSessionTable1776645600000 implements MigrationInter
     }
   }
 }
+// i18n-ignore-end

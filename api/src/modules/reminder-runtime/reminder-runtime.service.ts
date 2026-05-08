@@ -6,6 +6,7 @@ import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { MessageEntity } from '../chat/message.entity';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   REMINDER_CHARACTER_ID,
   REMINDER_CHARACTER_SOURCE_KEY,
 } from '../characters/reminder-character';
@@ -3378,3 +3379,4 @@ export class ReminderRuntimeService {
     };
   }
 }
+// i18n-ignore-end

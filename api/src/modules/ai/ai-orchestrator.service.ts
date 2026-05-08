@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   BadGatewayException,
   BadRequestException,
@@ -3201,3 +3202,4 @@ export class AiOrchestratorService {
     throw this.toSpeechSynthesisException(lastError);
   }
 }
+// i18n-ignore-end

@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CharacterBlueprintRecipe,
   CharacterBlueprintRevision,
   CharacterFactorySnapshot,
@@ -1557,3 +1558,4 @@ function formatDateTime(value?: string | null) {
     "notSet",
   );
 }
+// i18n-ignore-end

@@ -1,5 +1,6 @@
 import { Controller, Get, Query, UseGuards } from "@nestjs/common";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   TelemetryApiHealthResponse,
   TelemetryAppId,
   TelemetryErrorsResponse,
@@ -115,3 +116,4 @@ export class TelemetryAdminController {
     );
   }
 }
+// i18n-ignore-end

@@ -4,6 +4,7 @@ import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import { type ChatMessage } from '../ai/ai.types';
 import { WorldLanguageService } from '../config/world-language.service';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   buildReplyModalityPromptSections,
   extractRequestedImagePrompt,
   resolveAssistantReplyText,
@@ -256,3 +257,4 @@ export class GroupReplyOrchestratorService {
     });
   }
 }
+// i18n-ignore-end

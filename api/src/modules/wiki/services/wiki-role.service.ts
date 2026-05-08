@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   BadRequestException,
   ForbiddenException,
@@ -204,3 +205,4 @@ export class WikiRoleService {
     return degraded;
   }
 }
+// i18n-ignore-end

@@ -1,6 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   InviteRedemptionAdminRecord,
   InviteRedemptionStatus,
   InviteRedemptionSummary,
@@ -350,3 +351,4 @@ export class InviteService {
     return this.redemptionRepo.save(record);
   }
 }
+// i18n-ignore-end

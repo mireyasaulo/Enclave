@@ -2,6 +2,7 @@ import type { CharacterEntity } from './character.entity';
 import { DEFAULT_CHARACTER_BIOS } from './character-bios';
 import { getCharacterAvatarBySourceKey } from './character-avatar-assets';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const DOCTOR_CHARACTER_ID = 'char-default-doctor';
 export const DOCTOR_SOURCE_KEY = 'doctor';
 
@@ -340,3 +341,4 @@ export function buildDoctorCharacter(): Partial<CharacterEntity> {
     currentActivity: 'working',
   };
 }
+// i18n-ignore-end

@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   ForbiddenException,
   Injectable,
@@ -384,3 +385,4 @@ function collectAllText(input: AbuseFilterCheckInput): string {
   }
   return parts.filter((p) => typeof p === 'string').join('\n');
 }
+// i18n-ignore-end

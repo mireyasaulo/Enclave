@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type DigitalHumanPlayerPageSessionSnapshot = {
   posterUrl?: string;
   renderStatus: 'queued' | 'rendering' | 'ready' | 'failed';
@@ -332,3 +333,4 @@ function escapeHtml(value: string) {
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
 }
+// i18n-ignore-end

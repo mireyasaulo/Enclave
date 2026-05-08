@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const UP_QUERIES = [
   `CREATE TABLE IF NOT EXISTS "invite_codes" (
     "id" varchar PRIMARY KEY NOT NULL,
@@ -73,3 +74,4 @@ export class CreateInviteAndConfigTables1776651600000
     }
   }
 }
+// i18n-ignore-end

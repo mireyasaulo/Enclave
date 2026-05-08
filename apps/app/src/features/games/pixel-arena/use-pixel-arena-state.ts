@@ -2,6 +2,7 @@ import { useCallback, useEffect, useReducer, useRef } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   FIGHTERS,
   LOG_LIMIT,
   ROUND_COUNT,
@@ -369,3 +370,4 @@ export function usePixelArenaState() {
     actions: { selectPlayer, start, play, backIdle, reset },
   };
 }
+// i18n-ignore-end

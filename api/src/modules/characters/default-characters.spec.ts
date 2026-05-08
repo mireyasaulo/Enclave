@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   ACTION_OPERATOR_CHARACTER_ID,
   ACTION_OPERATOR_SOURCE_KEY,
@@ -260,3 +261,4 @@ describe('default characters', () => {
     );
   });
 });
+// i18n-ignore-end

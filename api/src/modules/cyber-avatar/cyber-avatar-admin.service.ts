@@ -3,6 +3,7 @@ import { NeedDiscoveryService } from '../need-discovery/need-discovery.service';
 import { CyberAvatarRealWorldService } from './cyber-avatar-real-world.service';
 import { CyberAvatarService } from './cyber-avatar.service';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 @Injectable()
 export class CyberAvatarAdminService {
   constructor(
@@ -86,3 +87,4 @@ export class CyberAvatarAdminService {
     return this.realWorld.runSync({ trigger: 'manual' });
   }
 }
+// i18n-ignore-end

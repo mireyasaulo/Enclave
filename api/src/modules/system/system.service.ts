@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   BadRequestException,
   Injectable,
@@ -3795,3 +3796,4 @@ export class SystemService {
   }
 
 }
+// i18n-ignore-end

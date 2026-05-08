@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const CHARACTER_AVATAR_ASSET_ROUTE = '/api/character-assets';
 
 const CHARACTER_AVATAR_FILE_BY_SOURCE_KEY = {
@@ -69,3 +70,4 @@ export function maybeGetCharacterAvatarBySourceKey(sourceKey?: string | null) {
 
   return getCharacterAvatarBySourceKey(sourceKey as CharacterAvatarSourceKey);
 }
+// i18n-ignore-end

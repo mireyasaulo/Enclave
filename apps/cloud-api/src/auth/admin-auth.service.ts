@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { randomUUID } from "node:crypto";
 import {
   BadRequestException,
@@ -1392,3 +1393,4 @@ export class AdminAuthService {
     return value.toISOString().replace("T", " ").replace("Z", "");
   }
 }
+// i18n-ignore-end

@@ -1,6 +1,7 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
 // SQLite 不支持直接 ALTER COLUMN 改 NOT NULL，因此走 "新建表 -> copy -> drop -> rename" 流程。
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const UP_QUERIES = [
   `CREATE TABLE "cloud_users_new" (
     "id" varchar PRIMARY KEY NOT NULL,
@@ -92,3 +93,4 @@ export class MakeCloudUsersPhoneNullable1776654600000
     }
   }
 }
+// i18n-ignore-end

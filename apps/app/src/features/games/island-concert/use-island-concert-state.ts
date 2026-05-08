@@ -2,6 +2,7 @@ import { useCallback, useEffect, useReducer, useRef } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   INSTRUMENTS,
   LOG_LIMIT,
   POSTER_THRESHOLD,
@@ -502,3 +503,4 @@ export function useIslandConcertState() {
     },
   };
 }
+// i18n-ignore-end

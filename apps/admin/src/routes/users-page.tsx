@@ -6,6 +6,7 @@ import { AdminCallout } from "../components/admin-workbench";
 import { resolveAdminCoreApiBaseUrl } from "../lib/core-api-base";
 import { buildDigitalHumanAdminSummary } from "../lib/digital-human-admin-summary";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export function UsersPage() {
   const baseUrl = resolveAdminCoreApiBaseUrl();
   const systemStatusQuery = useQuery({
@@ -51,3 +52,4 @@ export function UsersPage() {
     </div>
   );
 }
+// i18n-ignore-end

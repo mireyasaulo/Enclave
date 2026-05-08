@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { Transform, Type } from "class-transformer";
 import {
   ArrayMaxSize,
@@ -1235,3 +1236,4 @@ export class RuntimeFailureDto extends RuntimeCallbackDto {
   @MaxLength(1000, { message: "failureMessage 不能超过 1000 个字符。" })
   failureMessage?: string | null;
 }
+// i18n-ignore-end

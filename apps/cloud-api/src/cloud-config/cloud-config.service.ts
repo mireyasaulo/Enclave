@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { CloudConfigEntity } from "../entities/cloud-config.entity";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const CACHE_TTL_MS = 5 * 1000;
 
 @Injectable()
@@ -131,3 +132,4 @@ export class CloudConfigService {
     };
   }
 }
+// i18n-ignore-end

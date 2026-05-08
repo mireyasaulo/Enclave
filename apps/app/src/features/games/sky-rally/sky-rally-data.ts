@@ -2,6 +2,7 @@ import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { Track } from "./sky-rally-types";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const t = translateRuntimeMessage;
 
 export const ROUND_DURATION_MS = 2 * 60 * 1000;
@@ -59,3 +60,4 @@ export const TRACKS: Track[] = [
 export function getTrack(id: string): Track | undefined {
   return TRACKS.find((track) => track.id === id);
 }
+// i18n-ignore-end

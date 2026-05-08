@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const UP_QUERIES = [
   `CREATE TABLE IF NOT EXISTS "waiting_session_sync_tasks" (
     "id" varchar PRIMARY KEY NOT NULL,
@@ -43,3 +44,4 @@ export class CreateWaitingSessionSyncTaskTable1776648600000
     }
   }
 }
+// i18n-ignore-end

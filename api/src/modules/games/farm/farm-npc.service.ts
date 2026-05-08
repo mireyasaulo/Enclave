@@ -7,6 +7,7 @@ import { CharacterEntity } from '../../characters/character.entity';
 import { FarmEventService } from './farm-event.service';
 import { FarmNpcStateEntity } from './entities/farm-npc-state.entity';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   ensurePlotsArray,
   refreshPlotStage,
 } from './farm-state.service';
@@ -248,3 +249,4 @@ function createEmptyNpcPlots(count: number): FarmPlot[] {
 function clamp(value: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, value));
 }
+// i18n-ignore-end

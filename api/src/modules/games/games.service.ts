@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { randomUUID } from 'crypto';
 import {
   BadRequestException,
@@ -1940,3 +1941,4 @@ export class GamesService {
     return (latest[0]?.sortOrder ?? 0) + 1;
   }
 }
+// i18n-ignore-end

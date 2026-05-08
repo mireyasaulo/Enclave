@@ -2,6 +2,7 @@ import { useCallback, useEffect, useReducer, useRef } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   LOG_LIMIT,
   PASSENGER_VISIBLE_MS,
   ROUND_DURATION_MS,
@@ -405,3 +406,4 @@ export function useForestTrainState() {
     actions: { selectRoute, start, collect, skip, backIdle, reset },
   };
 }
+// i18n-ignore-end

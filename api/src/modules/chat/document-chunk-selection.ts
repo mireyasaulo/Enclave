@@ -1,5 +1,6 @@
 import type { FileAttachment } from './chat.types';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const DEFAULT_DOCUMENT_PROMPT_CHARS = 1800;
 const DOCUMENT_CHUNK_TARGET_CHARS = 720;
 const DOCUMENT_CHUNK_OVERLAP_CHARS = 120;
@@ -201,3 +202,4 @@ function truncateText(text: string, maxChars: number) {
 
   return `${text.slice(0, maxChars).trim()}…`;
 }
+// i18n-ignore-end

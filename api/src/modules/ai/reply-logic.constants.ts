@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type ReplyLogicPromptTemplates = {
   identityFallback: string;
   chainOfThoughtInstruction: string;
@@ -1968,3 +1969,4 @@ export function calculateHistoryWindow(
     rules.historyWindow.base + (normalized / 100) * rules.historyWindow.range,
   );
 }
+// i18n-ignore-end

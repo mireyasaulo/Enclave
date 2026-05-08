@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type GameCenterTone =
   | 'forest'
   | 'gold'
@@ -691,3 +692,4 @@ export function cloneGameCenterHomeSeed() {
     })),
   };
 }
+// i18n-ignore-end

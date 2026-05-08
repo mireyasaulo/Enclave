@@ -5,6 +5,7 @@ import { ConversationEntity } from '../chat/conversation.entity';
 import { MessageEntity } from '../chat/message.entity';
 import { WorldService } from '../world/world.service';
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   GenerateMomentOptions,
   MomentGenerationContext,
 } from './ai.types';
@@ -213,3 +214,4 @@ export class MomentGenerationContextService {
     };
   }
 }
+// i18n-ignore-end

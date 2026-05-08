@@ -8,6 +8,7 @@ import { OfficialAccountDeliveryEntity } from './official-account-delivery.entit
 import { OfficialAccountFollowEntity } from './official-account-follow.entity';
 import { OfficialAccountServiceMessageEntity } from './official-account-service-message.entity';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type SeedArticle = {
   title: string;
   summary: string;
@@ -948,3 +949,4 @@ export class OfficialAccountsService {
     }
   }
 }
+// i18n-ignore-end

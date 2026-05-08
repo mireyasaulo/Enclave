@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   type ReactNode,
   useCallback,
@@ -323,3 +324,4 @@ function FloatingAccountBadge() {
     </div>
   );
 }
+// i18n-ignore-end

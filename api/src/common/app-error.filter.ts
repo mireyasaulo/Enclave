@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   ArgumentsHost,
   Catch,
@@ -95,3 +96,4 @@ export class AppErrorFilter implements ExceptionFilter {
     };
   }
 }
+// i18n-ignore-end

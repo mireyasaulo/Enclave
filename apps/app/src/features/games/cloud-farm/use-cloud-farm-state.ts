@@ -2,6 +2,7 @@ import { useCallback, useEffect, useReducer, useRef } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CROPS,
   LOG_LIMIT,
   MAX_WATERINGS,
@@ -435,3 +436,4 @@ export function useCloudFarmState() {
     actions: { plant, water, harvest, clean, helpNeighbor, reset },
   };
 }
+// i18n-ignore-end

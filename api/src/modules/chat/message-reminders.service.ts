@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   BadRequestException,
   Injectable,
@@ -396,3 +397,4 @@ function isMessageReminderRecord(value: unknown): value is MessageReminderRecord
     typeof item.createdAt === 'string'
   );
 }
+// i18n-ignore-end

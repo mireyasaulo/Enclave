@@ -3,6 +3,7 @@ import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   Coins,
   Droplet,
   RotateCcw,
@@ -374,3 +375,4 @@ function PlotCard({
     </button>
   );
 }
+// i18n-ignore-end

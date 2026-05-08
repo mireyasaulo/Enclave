@@ -324,6 +324,72 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`好友关系补建失败。`);
     case "ADMIN_WECHAT_ROLLBACK_ONLY_CONTACT":
       return translateRuntimeMessage(msg`只支持回滚联系人导入角色。`);
+    case "CHAT_BACKGROUND_NOT_SELECTED":
+      return translateRuntimeMessage(msg`请先选择一张聊天背景。`);
+    case "CHAT_BACKGROUND_NOT_FOUND":
+      return translateRuntimeMessage(msg`聊天背景不存在。`);
+    case "CHAT_BACKGROUND_IMAGE_ONLY":
+      return translateRuntimeMessage(msg`当前只支持上传图片作为聊天背景。`);
+    case "CHAT_FAVORITE_PARAMS_REQUIRED":
+      return translateRuntimeMessage(msg`收藏消息缺少必要参数。`);
+    case "CHAT_FAVORITE_ID_REQUIRED":
+      return translateRuntimeMessage(msg`收藏标识不能为空。`);
+    case "CHAT_NOTE_ID_REQUIRED":
+      return translateRuntimeMessage(msg`笔记标识不能为空。`);
+    case "CHAT_NOTE_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`笔记不存在：${String(params.noteId ?? "")}`,
+      );
+    case "CHAT_REMINDER_PARAMS_REQUIRED":
+      return translateRuntimeMessage(msg`提醒消息缺少必要参数。`);
+    case "CHAT_REMINDER_TIME_INVALID":
+      return translateRuntimeMessage(msg`提醒时间格式无效。`);
+    case "CHAT_REMINDER_ID_REQUIRED":
+      return translateRuntimeMessage(msg`提醒标识不能为空。`);
+    case "CHAT_REMINDER_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`提醒不存在：${String(params.reminderId ?? "")}`,
+      );
+    case "CHAT_GROUP_MESSAGE_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`群消息不存在：${String(params.messageId ?? "")}`,
+      );
+    case "CHAT_CONVERSATION_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`聊天会话不存在：${String(params.conversationId ?? params.threadId ?? "")}`,
+      );
+    case "CHAT_MESSAGE_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`消息不存在：${String(params.messageId ?? "")}`,
+      );
+    case "CHAT_GROUP_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`群聊不存在：${String(params.groupId ?? params.threadId ?? "")}`,
+      );
+    case "CHAT_SEARCH_QUERY_REQUIRED":
+      return translateRuntimeMessage(msg`搜索词不能为空。`);
+    case "CHAT_STICKER_NOT_FOUND":
+      return translateRuntimeMessage(msg`自定义表情不存在。`);
+    case "CHAT_STICKER_ASSET_NOT_FOUND":
+      return translateRuntimeMessage(msg`自定义表情资源不存在。`);
+    case "CHAT_STICKER_BUILTIN_NOT_FOUND":
+      return translateRuntimeMessage(msg`内置表情资源不存在。`);
+    case "CHAT_STICKER_IMAGE_NOT_FOUND":
+      return translateRuntimeMessage(msg`图片资源不存在。`);
+    case "CHAT_STICKER_MESSAGE_NO_IMPORTABLE":
+      return translateRuntimeMessage(msg`这条消息没有可导入的表情内容。`);
+    case "CHAT_STICKER_MESSAGE_NOT_SUPPORTED":
+      return translateRuntimeMessage(msg`当前消息暂不支持添加到表情。`);
+    case "CHAT_STICKER_RESOURCE_NOT_SUPPORTED":
+      return translateRuntimeMessage(msg`当前资源暂不支持添加到表情。`);
+    case "CHAT_STICKER_UPLOAD_IMAGE_ONLY":
+      return translateRuntimeMessage(msg`只能上传图片或动图作为表情。`);
+    case "CHAT_STICKER_UPLOAD_INVALID":
+      return translateRuntimeMessage(msg`上传的表情资源无效，请重新选择。`);
+    case "CHAT_ASSET_NOT_FOUND":
+      return translateRuntimeMessage(msg`资源不存在。`);
+    case "CHAT_ATTACHMENT_REQUIRED":
+      return translateRuntimeMessage(msg`请先选择一个附件。`);
     case "VALIDATION_FAILED":
       return translateRuntimeMessage(msg`提交的数据无效，请检查后重试。`);
     case "INTERNAL_ERROR":

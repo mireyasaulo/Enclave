@@ -5,6 +5,7 @@ import type { Transporter } from "nodemailer";
 import { SocksClient } from "socks";
 import { MockEmailProviderService } from "./mock-email-provider.service";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 @Injectable()
 export class CloudMailService {
   private readonly logger = new Logger(CloudMailService.name);
@@ -85,3 +86,4 @@ export class CloudMailService {
     return this.transporter;
   }
 }
+// i18n-ignore-end

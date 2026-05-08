@@ -20,6 +20,7 @@ import { FeedService } from '../feed/feed.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { ReminderRuntimeService } from '../reminder-runtime/reminder-runtime.service';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   normalizeMomentMediaDisplayName,
   normalizeOptionalPositiveNumber,
   sanitizeMomentMediaFileName,
@@ -1430,3 +1431,4 @@ export class MomentsService implements OnModuleInit {
     };
   }
 }
+// i18n-ignore-end

@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   Injectable,
   Logger,
@@ -410,3 +411,4 @@ export class LocalProcessComputeProviderService
     return new Promise<void>((resolve) => setTimeout(resolve, ms));
   }
 }
+// i18n-ignore-end

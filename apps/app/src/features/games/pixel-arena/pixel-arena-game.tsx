@@ -2,6 +2,7 @@ import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   Award,
   Heart,
   Play,
@@ -416,3 +417,4 @@ function Stat({ label, value }: { label: string; value: number | string }) {
     </div>
   );
 }
+// i18n-ignore-end

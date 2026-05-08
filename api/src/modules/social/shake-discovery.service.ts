@@ -27,6 +27,7 @@ import { MomentPostEntity } from '../moments/moment-post.entity';
 import { FriendshipEntity } from './friendship.entity';
 import { SocialService } from './social.service';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   DEFAULT_SHAKE_DISCOVERY_CONFIG,
   MAX_SHAKE_DISCOVERY_SESSIONS,
   SHAKE_DISCOVERY_CONFIG_KEY,
@@ -1814,3 +1815,4 @@ function normalizeInteractionType(type: string) {
       return type;
   }
 }
+// i18n-ignore-end

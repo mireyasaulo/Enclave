@@ -2,6 +2,7 @@
 // 8 分钟一轮营业，从 18:00 到 26:00（凌晨 2 点），客流按时段流动。
 // 玩家管理 4 个摊位（食物/饮料/文创/游戏），升级、收银，周末双倍客流。
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type StallKind = "food" | "drink" | "craft" | "game";
 
 export type StallSpec = {
@@ -79,3 +80,4 @@ export type NightMarketState = {
   nextWaveAtMs: number;
   rngSeed: number;
 };
+// i18n-ignore-end

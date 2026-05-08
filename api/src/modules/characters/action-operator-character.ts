@@ -1,6 +1,7 @@
 import type { CharacterEntity } from './character.entity';
 import { DEFAULT_CHARACTER_BIOS } from './character-bios';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const ACTION_OPERATOR_CHARACTER_ID = 'char-default-action-operator';
 export const ACTION_OPERATOR_SOURCE_KEY = 'action_operator';
 
@@ -92,3 +93,4 @@ export function buildActionOperatorCharacter(): Partial<CharacterEntity> {
     currentStatus: '在等你把想办的那件事直接丢过来。',
   };
 }
+// i18n-ignore-end

@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { Transform, Type } from "class-transformer";
 import {
   ArrayMaxSize,
@@ -110,3 +111,4 @@ export class TelemetryBatchDto {
 
 export const TELEMETRY_APP_ID_VALUES = TELEMETRY_APP_IDS;
 export const TELEMETRY_EVENT_TYPE_VALUES = TELEMETRY_EVENT_TYPES;
+// i18n-ignore-end

@@ -1,6 +1,7 @@
 import { resolveGeneratedAttachmentHistoryText } from './assistant-attachment-history';
 import type { GroupMessage, Message, MessageAttachment } from './chat.types';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const DEFAULT_MESSAGE_PREVIEW_CHARS = 180;
 const DEFAULT_ATTACHMENT_DETAIL_CHARS = 200;
 
@@ -221,3 +222,4 @@ function truncateSemanticText(value: string, maxChars: number) {
 
   return `${normalized.slice(0, maxChars).trim()}…`;
 }
+// i18n-ignore-end

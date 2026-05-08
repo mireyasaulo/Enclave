@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   Between,
   LessThan,
   LessThanOrEqual,
@@ -1866,3 +1867,4 @@ export class SchedulerService {
     };
   }
 }
+// i18n-ignore-end

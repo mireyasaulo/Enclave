@@ -3,6 +3,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CharacterBlueprintAiGenerationTraceValue,
   CharacterBlueprintRecipeValue,
   CharacterBlueprintSourceTypeValue,
@@ -1515,3 +1516,4 @@ export class CharacterBlueprintService {
     };
   }
 }
+// i18n-ignore-end

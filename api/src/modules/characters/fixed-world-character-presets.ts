@@ -2,6 +2,7 @@ import type { CelebrityCharacterPreset } from './celebrity-character-presets';
 import type { CharacterEntity } from './character.entity';
 import { getCharacterAvatarBySourceKey } from './character-avatar-assets';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const LIN_CHEN_SOURCE_KEY = 'lin_chen_sleep_support';
 const LIN_MIAN_SOURCE_KEY = 'lin_mian_sleep_support';
 const XU_ZHE_SOURCE_KEY = 'xu_zhe_career_growth';
@@ -917,3 +918,4 @@ export const FIXED_WORLD_CHARACTER_PRESETS: CelebrityCharacterPreset[] = [
     character: ZHOU_RAN_CHARACTER,
   },
 ];
+// i18n-ignore-end

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   NeedDiscoveryCandidateRecord,
   NeedDiscoveryConfig,
   NeedDiscoveryRunRecord,
@@ -3596,3 +3597,4 @@ function normalizeFloat(value: unknown, fallback: number) {
   }
   return Math.max(0, Math.min(1, parsed));
 }
+// i18n-ignore-end

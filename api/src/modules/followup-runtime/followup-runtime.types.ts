@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type FollowupRunTriggerTypeValue = 'scheduler' | 'manual' | 'event';
 export type FollowupRunStatusValue = 'success' | 'skipped' | 'failed';
 export type FollowupRuntimeExecutionModeValue = 'dry_run' | 'emit_messages';
@@ -580,3 +581,4 @@ function sanitizeTemplate(value: unknown, fallback: string) {
   const normalized = typeof value === 'string' ? value.trim() : '';
   return normalized || fallback;
 }
+// i18n-ignore-end

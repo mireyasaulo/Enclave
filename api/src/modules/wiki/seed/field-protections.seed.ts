@@ -6,6 +6,7 @@ import { WikiFieldProtectionEntity } from '../entities/wiki-field-protection.ent
  * isHighRiskRecipeChange 决定"该字段需 patroller 审核才能发布"，
  * 字段级保护决定"newcomer 根本不能改这个字段（连 pending 都不允许）"。
  */
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const WIKI_FIELD_PROTECTION_SEEDS: Array<
   DeepPartial<WikiFieldProtectionEntity>
 > = [
@@ -38,3 +39,4 @@ export const WIKI_FIELD_PROTECTION_SEEDS: Array<
     createdBy: 'system_seed',
   },
 ];
+// i18n-ignore-end

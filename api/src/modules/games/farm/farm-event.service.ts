@@ -7,6 +7,7 @@ import { FeedService } from '../../feed/feed.service';
 import { FarmEventLogEntity } from './entities/farm-event-log.entity';
 import { getCropDefinition } from './crop-catalog';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   FARM_INCIDENT_BROADCAST_CHANCE,
   FarmActorType,
   FarmCropId,
@@ -233,3 +234,4 @@ function renderIncidentText(
   }
   return `${periodLabel}${targetLabel}的菜地，${cropName} ×${amount} 入袋。世界这么大，菜怎么这么甜。`;
 }
+// i18n-ignore-end

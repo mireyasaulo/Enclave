@@ -1,4 +1,5 @@
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   ActionConnectorDiscoveryResult,
   ActionConnectorSummary,
   ActionConnectorTestResult,
@@ -758,3 +759,4 @@ export const adminApi = {
       body: JSON.stringify(payload),
     }),
 };
+// i18n-ignore-end

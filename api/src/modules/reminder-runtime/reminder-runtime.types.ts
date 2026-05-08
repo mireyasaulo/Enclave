@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const REMINDER_RUNTIME_RULES_CONFIG_KEY = 'reminder_runtime_rules';
 
 export type ReminderTaskKind = 'one_time' | 'recurring' | 'habit';
@@ -710,3 +711,4 @@ export function normalizeReminderRuntimeRules(
     },
   };
 }
+// i18n-ignore-end

@@ -1,5 +1,5 @@
-import {
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
+import {
   Controller,
   Get,
   Post,

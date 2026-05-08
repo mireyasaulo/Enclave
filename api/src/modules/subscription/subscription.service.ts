@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { Injectable, Logger } from '@nestjs/common';
 import {
   CloudSubscriptionClient,
@@ -85,3 +86,4 @@ export class SubscriptionService {
     this.cached = null;
   }
 }
+// i18n-ignore-end

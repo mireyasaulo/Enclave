@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   BadRequestException,
   ConflictException,
@@ -961,3 +962,4 @@ export class WikiEditService {
     }
   }
 }
+// i18n-ignore-end

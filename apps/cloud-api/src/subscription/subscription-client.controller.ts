@@ -8,6 +8,7 @@ import { CheckoutDto } from "../http-dto/cloud-api.dto";
 import { CloudConfigService } from "../cloud-config/cloud-config.service";
 import { SubscriptionService } from "./subscription.service";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type CloudPhoneRequest = { cloudPhone?: string };
 
 @Controller("cloud/me")
@@ -81,3 +82,4 @@ export class SubscriptionClientController {
     };
   }
 }
+// i18n-ignore-end

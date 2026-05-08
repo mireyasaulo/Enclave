@@ -1,6 +1,7 @@
 import type { CharacterEntity } from './character.entity';
 import { DEFAULT_CHARACTER_BIOS } from './character-bios';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const REMINDER_CHARACTER_ID = 'char-default-reminder';
 export const REMINDER_CHARACTER_SOURCE_KEY = 'reminder_keeper';
 
@@ -135,3 +136,4 @@ export function buildReminderCharacter(): Partial<CharacterEntity> {
     currentStatus: '在替你记着那些容易被忙乱吞掉的事。',
   };
 }
+// i18n-ignore-end

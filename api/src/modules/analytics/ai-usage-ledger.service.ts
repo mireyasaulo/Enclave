@@ -9,6 +9,7 @@ import { GroupEntity } from '../chat/group.entity';
 import { MessageEntity } from '../chat/message.entity';
 import { AdminConversationReviewEntity } from '../admin/admin-conversation-review.entity';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type PricingCurrency = 'CNY' | 'USD';
 type LedgerStatus = 'success' | 'failed';
 type LedgerSurface = 'app' | 'admin' | 'scheduler' | 'system';
@@ -2576,3 +2577,4 @@ export class AiUsageLedgerService {
     );
   }
 }
+// i18n-ignore-end

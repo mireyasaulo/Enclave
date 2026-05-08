@@ -14,6 +14,7 @@ import { SelfAgentRulesService } from './self-agent-rules.service';
 import { SelfAgentRunEntity } from './self-agent-run.entity';
 import { SelfAgentWorkspaceService } from './self-agent-workspace.service';
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   SelfAgentRulesValue,
   SelfAgentRunPolicyDecisionValue,
   SelfAgentRunRouteKeyValue,
@@ -700,3 +701,4 @@ export class SelfAgentService {
       .join('');
   }
 }
+// i18n-ignore-end

@@ -1,6 +1,7 @@
 import type { MessageAttachment } from './chat.types';
 import type { WorldLanguageCode } from '../config/world-language.service';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type AssistantReplyTargetMessage = {
   type:
     | 'text'
@@ -255,3 +256,4 @@ export function buildAssistantSpeechInstructions(characterName: string) {
   const normalizedName = characterName.trim() || '助手';
   return `Keep the delivery conversational and in character as ${normalizedName}. Do not add stage directions.`;
 }
+// i18n-ignore-end

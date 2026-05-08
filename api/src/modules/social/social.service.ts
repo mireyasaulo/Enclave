@@ -10,6 +10,7 @@ import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import { NarrativeService } from '../narrative/narrative.service';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   DEFAULT_CHARACTER_IDS,
   SELF_CHARACTER_ID,
 } from '../characters/default-characters';
@@ -1099,3 +1100,4 @@ function normalizeTags(tags?: string[] | null) {
   ];
   return normalized.length ? normalized : null;
 }
+// i18n-ignore-end

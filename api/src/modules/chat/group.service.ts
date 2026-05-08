@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   BadRequestException,
   Injectable,
@@ -1573,3 +1574,4 @@ function formatGroupAttachmentDuration(durationMs: number) {
     ? `${minutes}:${String(seconds).padStart(2, '0')}`
     : `${seconds}"`;
 }
+// i18n-ignore-end

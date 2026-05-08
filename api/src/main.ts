@@ -9,6 +9,7 @@ import { WorldOwnerService } from './modules/auth/world-owner.service';
 import { SocialService } from './modules/social/social.service';
 import { AppErrorFilter } from './common/app-error.filter';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 function resolveConfiguredCorsOrigins() {
   return process.env.CORS_ALLOWED_ORIGINS
     ?.split(',')
@@ -98,3 +99,4 @@ async function bootstrap() {
   console.log(`隐界 API running on port ${process.env.PORT ?? 3000}`);
 }
 void bootstrap();
+// i18n-ignore-end

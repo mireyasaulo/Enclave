@@ -423,6 +423,7 @@ export function DashboardPage() {
       ),
       statusLabel: t(msg`关注`),
       tone: "warning",
+      // i18n-ignore-next-line: developer/ops debug meta.
       meta: `当前 ownerCount = ${ownerCount}`,
       actionLabel: t(msg`查看运行体征`),
       onAction: () => scrollToDashboardSection(runtimeSectionRef),
@@ -553,6 +554,7 @@ export function DashboardPage() {
     <div className="space-y-6">
       {adminStatsQuery.isError && adminStatsQuery.error instanceof Error ? (
         <AdminErrorState
+          // i18n-ignore-next-line: admin error toast (Chinese only).
           title="角色统计加载失败"
           detail={adminStatsQuery.error.message}
           onRetry={() => adminStatsQuery.refetch()}
@@ -560,6 +562,7 @@ export function DashboardPage() {
       ) : null}
       {adminSystemQuery.isError && adminSystemQuery.error instanceof Error ? (
         <AdminErrorState
+          // i18n-ignore-next-line: admin error toast (Chinese only).
           title="后台运行状态加载失败"
           detail={adminSystemQuery.error.message}
           onRetry={() => adminSystemQuery.refetch()}
@@ -567,6 +570,7 @@ export function DashboardPage() {
       ) : null}
       {statusQuery.isError && statusQuery.error instanceof Error ? (
         <AdminErrorState
+          // i18n-ignore-next-line: admin error toast (Chinese only).
           title="实例状态读取失败"
           detail={statusQuery.error.message}
           onRetry={() => statusQuery.refetch()}
@@ -911,6 +915,7 @@ export function DashboardPage() {
                     }
                     options={worldLanguageOptions.map((item) => ({
                       value: item.code,
+                      // i18n-ignore-next-line: nativeLabel is the language's own name (e.g. 中文/English).
                       label: `${item.nativeLabel} / ${item.label}`,
                     }))}
                   />

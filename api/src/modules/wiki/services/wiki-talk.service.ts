@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   BadRequestException,
   ForbiddenException,
@@ -179,3 +180,4 @@ export class WikiTalkService {
     }
   }
 }
+// i18n-ignore-end

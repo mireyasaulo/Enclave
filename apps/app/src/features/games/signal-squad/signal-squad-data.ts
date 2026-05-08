@@ -2,6 +2,7 @@ import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { Squadmate } from "./signal-squad-types";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const t = translateRuntimeMessage;
 
 export const ROUND_DURATION_MS = 3 * 60 * 1000; // 3 分钟
@@ -104,3 +105,4 @@ export const SKILL_EMOJI: Record<string, string> = {
 export function getSquadmate(id: string): Squadmate | undefined {
   return SQUADMATE_POOL.find((mate) => mate.id === id);
 }
+// i18n-ignore-end

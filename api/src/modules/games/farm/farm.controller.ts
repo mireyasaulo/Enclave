@@ -5,6 +5,7 @@ import { FarmNpcService } from './farm-npc.service';
 import { FarmStateService } from './farm-state.service';
 import { isFarmCropId } from './crop-catalog';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   FarmCropId,
   FarmEventView,
   FarmHarvestResult,
@@ -171,3 +172,4 @@ function parseCropId(raw: unknown): FarmCropId {
   }
   return raw;
 }
+// i18n-ignore-end

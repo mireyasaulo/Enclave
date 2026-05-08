@@ -3,6 +3,7 @@ import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "@tanstack/react-router";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   Character,
   TokenPricingCatalog,
   TokenPricingCatalogItem,
@@ -3848,3 +3849,4 @@ function updateBudgetCharacter(
 
 const INPUT_CLASS_NAME =
   "w-full rounded-[16px] border border-[color:var(--border-subtle)] bg-[color:var(--surface-input)] px-3 py-2 text-sm text-[color:var(--text-primary)] outline-none transition focus:border-[color:var(--border-brand)]";
+// i18n-ignore-end

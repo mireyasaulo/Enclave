@@ -7,6 +7,7 @@ import { WorldOwnerService } from '../../auth/world-owner.service';
 import { FarmEventService } from './farm-event.service';
 import { FarmNpcService } from './farm-npc.service';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   ensurePlotsArray,
   pruneStolenLog,
   refreshPlotStage,
@@ -488,3 +489,4 @@ function rollYield([lo, hi]: [number, number]): number {
   if (lo >= hi) return lo;
   return lo + Math.floor(Math.random() * (hi - lo + 1));
 }
+// i18n-ignore-end

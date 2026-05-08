@@ -1,5 +1,6 @@
 import { AbuseFilterService } from './abuse-filter.service';
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   AbuseFilterPattern,
 } from '../entities/abuse-filter.entity';
 import type { AbuseFilterCheckInput } from './abuse-filter.service';
@@ -155,3 +156,4 @@ describe('AbuseFilterService pattern evaluator', () => {
     });
   });
 });
+// i18n-ignore-end

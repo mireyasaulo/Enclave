@@ -8,6 +8,7 @@ import { FarmEventService } from './farm-event.service';
 import { FarmNpcStateEntity } from './entities/farm-npc-state.entity';
 import { FarmPlayerStateEntity } from './entities/farm-player-state.entity';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   FARM_CROP_CATALOG,
   computeLevelFromExperience,
   computeMaturedAtMs,
@@ -715,3 +716,4 @@ function rollYield([lo, hi]: [number, number]): number {
   if (lo >= hi) return lo;
   return lo + Math.floor(Math.random() * (hi - lo + 1));
 }
+// i18n-ignore-end

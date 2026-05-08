@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const UP_QUERIES = [
   `CREATE TABLE IF NOT EXISTS "cloud_users" (
     "id" varchar PRIMARY KEY NOT NULL,
@@ -92,3 +93,4 @@ export class CreateCloudUserAndSubscriptionTables1776651000000
     }
   }
 }
+// i18n-ignore-end

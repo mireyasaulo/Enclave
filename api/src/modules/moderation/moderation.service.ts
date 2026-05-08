@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { ModerationReportEntity } from './moderation-report.entity';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const MODERATION_TARGET_TYPES = new Set([
   'character',
   'message',
@@ -103,3 +104,4 @@ export class ModerationService {
     };
   }
 }
+// i18n-ignore-end

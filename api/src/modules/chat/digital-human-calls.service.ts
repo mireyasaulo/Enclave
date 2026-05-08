@@ -5,6 +5,7 @@ import { ChatService } from './chat.service';
 import { MockDigitalHumanProviderAdapter } from './digital-human-provider';
 import { VoiceCallsService } from './voice-calls.service';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type UploadedAudioFile = {
   buffer: Buffer;
   mimetype: string;
@@ -307,3 +308,4 @@ export class DigitalHumanCallsService {
     }
   }
 }
+// i18n-ignore-end

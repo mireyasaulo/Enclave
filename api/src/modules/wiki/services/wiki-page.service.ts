@@ -7,6 +7,7 @@ import type { CharacterBlueprintRecipeValue } from '../../characters/character-b
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
 import { CharacterPageEntity } from '../entities/character-page.entity';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CharacterRevisionEntity,
   type WikiContentSnapshot,
 } from '../entities/character-revision.entity';
@@ -402,3 +403,4 @@ export class WikiPageService {
     return (await this.pageRepo.findOne({ where: { characterId } }))!;
   }
 }
+// i18n-ignore-end

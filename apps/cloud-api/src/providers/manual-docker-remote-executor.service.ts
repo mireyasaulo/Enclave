@@ -7,6 +7,7 @@ import { spawn } from "node:child_process";
 import type { CloudWorldBootstrapConfig } from "@yinjie/contracts";
 import type { CloudWorldEntity } from "../entities/cloud-world.entity";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   resolveDeploymentMode,
   resolveWorldComposeProjectName,
   resolveWorldContainerName,
@@ -287,3 +288,4 @@ function mapDockerStatusToDeploymentState(rawStatus: string): InspectWorldInstan
       return "unknown";
   }
 }
+// i18n-ignore-end

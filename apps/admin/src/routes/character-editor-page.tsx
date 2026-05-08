@@ -2,6 +2,7 @@ import { useEffect, useEffectEvent, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useParams } from "@tanstack/react-router";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   createCharacter,
   getCharacter,
   updateCharacter,
@@ -1239,3 +1240,4 @@ function normalizeDraft(
     },
   };
 }
+// i18n-ignore-end

@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   CanActivate,
   ExecutionContext,
@@ -40,3 +41,4 @@ export class WikiRoleGuard implements CanActivate {
     return true;
   }
 }
+// i18n-ignore-end

@@ -3,6 +3,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { SystemService } from './system.service';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 function createSystemService(runtimeDir?: string) {
   if (runtimeDir) {
     process.env.YINJIE_EVAL_RUNTIME_DIR = runtimeDir;
@@ -344,3 +345,4 @@ describe('SystemService eval dataset loading', () => {
     expect(evaluation.ruleViolations).toEqual([]);
   });
 });
+// i18n-ignore-end

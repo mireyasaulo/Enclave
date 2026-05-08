@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const PLACEHOLDER = '"https://app.example.com"';
 const REAL = '"https://1gw06751dd053.vicp.fun"';
 
@@ -22,3 +23,4 @@ export class UpdateAppPublicBaseUrl1776655200000 implements MigrationInterface {
     );
   }
 }
+// i18n-ignore-end

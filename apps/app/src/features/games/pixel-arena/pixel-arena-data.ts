@@ -1,6 +1,7 @@
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const t = translateRuntimeMessage;
 
 // 像素擂台 — MVP：5 回合像素对打，攻 / 防 / 杀 三选一，回合制结算。
@@ -186,3 +187,4 @@ export function pickNpcMove(
   if (playerLastMove === "attack" && r < 0.45) return "defend";
   return r < 0.4 ? "attack" : r < 0.7 ? "defend" : "special";
 }
+// i18n-ignore-end
