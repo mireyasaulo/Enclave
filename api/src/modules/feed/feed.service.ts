@@ -1,12 +1,6 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, MoreThanOrEqual, Repository } from 'typeorm';
 import { FeedPostEntity } from './feed-post.entity';
@@ -263,7 +257,10 @@ export class FeedService implements OnModuleInit {
       }));
 
     if (!latestPost) {
-      throw new NotFoundException('Channel author not found');
+      throw new AppError('FEED_CHANNEL_AUTHOR_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Channel author not found',
+      });
     }
 
     const [ownerStateMap, commentsPreviewMap, followerCount, isFollowing, bio] =
@@ -565,7 +562,10 @@ export class FeedService implements OnModuleInit {
     const parentComment = await this.commentRepo.findOneBy({ id: commentId });
 
     if (!parentComment) {
-      throw new NotFoundException('Comment not found');
+      throw new AppError('FEED_COMMENT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Comment not found',
+      });
     }
 
     await this.assertOwnerCanInteractWithPost(parentComment.postId);
@@ -743,7 +743,10 @@ export class FeedService implements OnModuleInit {
     const comment = await this.commentRepo.findOneBy({ id: commentId });
 
     if (!comment) {
-      throw new NotFoundException('Comment not found');
+      throw new AppError('FEED_COMMENT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Comment not found',
+      });
     }
 
     await this.assertOwnerCanInteractWithPost(comment.postId);
@@ -1448,7 +1451,10 @@ export class FeedService implements OnModuleInit {
       };
     }
 
-    throw new NotFoundException('Channel author not found');
+    throw new AppError('FEED_CHANNEL_AUTHOR_NOT_FOUND', {
+      status: HttpStatus.NOT_FOUND,
+      legacyMessage: 'Channel author not found',
+    });
   }
 
   private async resolveAuthorBio(authorId: string, authorType: string) {
@@ -1484,7 +1490,9 @@ export class FeedService implements OnModuleInit {
     const mediaType = this.inferFeedMediaType(media, input.mediaType);
 
     if (!text && media.length === 0) {
-      throw new BadRequestException('动态内容和媒体不能同时为空。');
+      throw new AppError('FEED_EMPTY', {
+        legacyMessage: '动态内容和媒体不能同时为空。',
+      });
     }
 
     this.assertFeedMediaMatchesMediaType(mediaType, media);
@@ -1596,31 +1604,40 @@ export class FeedService implements OnModuleInit {
   ) {
     if (mediaType === 'text') {
       if (media.length > 0) {
-        throw new BadRequestException('纯文本动态不能附带图片或视频。');
+        throw new AppError('FEED_TEXT_NO_MEDIA', {
+          legacyMessage: '纯文本动态不能附带图片或视频。',
+        });
       }
       return;
     }
 
     if (mediaType === 'video') {
       if (media.length !== 1 || media[0]?.kind !== 'video') {
-        throw new BadRequestException('视频动态必须且只能包含 1 条视频。');
+        throw new AppError('FEED_VIDEO_SINGLE', {
+          legacyMessage: '视频动态必须且只能包含 1 条视频。',
+        });
       }
 
       const video = media[0] as MomentVideoAsset;
       if (video.durationMs && video.durationMs > MAX_FEED_VIDEO_DURATION_MS) {
-        throw new BadRequestException('视频时长不能超过 5 分钟。');
+        throw new AppError('FEED_VIDEO_TOO_LONG', {
+          legacyMessage: '视频时长不能超过 5 分钟。',
+        });
       }
       return;
     }
 
     if (media.length < 1 || media.length > MAX_FEED_IMAGE_COUNT) {
-      throw new BadRequestException(
-        `图片动态最多支持 ${MAX_FEED_IMAGE_COUNT} 张图片。`,
-      );
+      throw new AppError('FEED_IMAGES_MAX', {
+        params: { max: MAX_FEED_IMAGE_COUNT },
+        legacyMessage: `图片动态最多支持 ${MAX_FEED_IMAGE_COUNT} 张图片。`,
+      });
     }
 
     if (media.some((asset) => asset.kind !== 'image')) {
-      throw new BadRequestException('图片动态当前只支持图片资源。');
+      throw new AppError('FEED_IMAGES_TYPE_ONLY', {
+        legacyMessage: '图片动态当前只支持图片资源。',
+      });
     }
   }
 
@@ -2036,7 +2053,10 @@ export class FeedService implements OnModuleInit {
   private async assertPostExists(postId: string) {
     const post = await this.postRepo.findOneBy({ id: postId });
     if (!post || post.publishStatus === 'deleted') {
-      throw new NotFoundException('Feed post not found');
+      throw new AppError('FEED_POST_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Feed post not found',
+      });
     }
     return post;
   }
@@ -2049,7 +2069,10 @@ export class FeedService implements OnModuleInit {
       owner.id,
     );
     if (!friendIds.has(post.authorId)) {
-      throw new ForbiddenException('需先加为好友才能互动');
+      throw new AppError('FEED_NOT_FRIEND', {
+        status: HttpStatus.FORBIDDEN,
+        legacyMessage: '需先加为好友才能互动',
+      });
     }
     return post;
   }

@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { SystemConfigService } from './config.service';
 
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
@@ -287,9 +288,9 @@ export class WorldLanguageService {
     if (fallback) {
       return fallback;
     }
-    throw new BadRequestException(
-      'Unsupported world language. Use zh-CN, en-US, ja-JP, or ko-KR.',
-    );
+    throw new AppError('WORLD_LANGUAGE_INVALID', {
+      legacyMessage: 'Unsupported world language. Use zh-CN, en-US, ja-JP, or ko-KR.',
+    });
   }
 
   private renderSpeakerInstruction(

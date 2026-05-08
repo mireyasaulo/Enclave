@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, IsNull, Repository } from 'typeorm';
 import { WorldOwnerService } from '../auth/world-owner.service';
@@ -340,7 +341,10 @@ export class OfficialAccountsService {
     });
 
     if (!follow) {
-      throw new NotFoundException('公众号关注关系不存在。');
+      throw new AppError('OFFICIAL_ACCOUNT_FOLLOW_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '公众号关注关系不存在。',
+      });
     }
 
     if (payload.isMuted !== undefined) {
@@ -361,7 +365,10 @@ export class OfficialAccountsService {
     });
 
     if (!delivery) {
-      throw new NotFoundException('推送记录不存在。');
+      throw new AppError('OFFICIAL_ACCOUNT_PUSH_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '推送记录不存在。',
+      });
     }
 
     if (!delivery.readAt) {
@@ -800,7 +807,10 @@ export class OfficialAccountsService {
   private async getAccountEntityOrThrow(id: string) {
     const account = await this.accountRepo.findOneBy({ id, isEnabled: true });
     if (!account) {
-      throw new NotFoundException('公众号不存在。');
+      throw new AppError('OFFICIAL_ACCOUNT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '公众号不存在。',
+      });
     }
 
     return account;
@@ -809,7 +819,10 @@ export class OfficialAccountsService {
   private async getServiceAccountEntityOrThrow(id: string) {
     const account = await this.getAccountEntityOrThrow(id);
     if (account.accountType !== 'service') {
-      throw new NotFoundException('服务号不存在。');
+      throw new AppError('OFFICIAL_SERVICE_ACCOUNT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '服务号不存在。',
+      });
     }
 
     return account;
@@ -818,7 +831,10 @@ export class OfficialAccountsService {
   private async getArticleEntityOrThrow(articleId: string) {
     const article = await this.articleRepo.findOneBy({ id: articleId });
     if (!article) {
-      throw new NotFoundException('文章不存在。');
+      throw new AppError('OFFICIAL_ACCOUNT_ARTICLE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '文章不存在。',
+      });
     }
 
     return article;

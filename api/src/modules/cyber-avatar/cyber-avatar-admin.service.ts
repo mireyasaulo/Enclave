@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { NeedDiscoveryService } from '../need-discovery/need-discovery.service';
 import { CyberAvatarRealWorldService } from './cyber-avatar-real-world.service';
 import { CyberAvatarService } from './cyber-avatar.service';
@@ -53,7 +54,11 @@ export class CyberAvatarAdminService {
   async getRunDetail(runId: string) {
     const detail = await this.cyberAvatar.getRunDetail(runId);
     if (!detail) {
-      throw new NotFoundException(`Cyber avatar run ${runId} not found`);
+      throw new AppError('CYBER_AVATAR_RUN_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { runId },
+        legacyMessage: `Cyber avatar run ${runId} not found`,
+      });
     }
 
     return detail;

@@ -1,10 +1,6 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  NotImplementedException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import OpenAI, { toFile } from 'openai';
@@ -664,7 +660,11 @@ export class SystemService {
   private loadEvalCaseById(caseId: string) {
     const casePath = this.resolveEvalDirectory('cases', `${caseId}.json`);
     if (!fs.existsSync(casePath)) {
-      throw new NotFoundException(`Eval case ${caseId} not found.`);
+      throw new AppError('EVAL_CASE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { caseId },
+        legacyMessage: `Eval case ${caseId} not found.`,
+      });
     }
 
     return readJsonFile<EvalCaseRecordValue>(casePath);
@@ -3127,7 +3127,9 @@ export class SystemService {
     candidateRun: EvalRunRecordValue,
   ) {
     if (baselineRun.datasetId !== candidateRun.datasetId) {
-      throw new BadRequestException('Pairwise compare requires the same dataset.');
+      throw new AppError('EVAL_PAIRWISE_DATASET_MISMATCH', {
+        legacyMessage: 'Pairwise compare requires the same dataset.',
+      });
     }
 
     const manifest = this.loadEvalDatasetManifests().find(
@@ -3427,7 +3429,10 @@ export class SystemService {
       (record) => record.id === id,
     );
     if (!manifest) {
-      throw new NotFoundException('Eval dataset not found.');
+      throw new AppError('EVAL_DATASET_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Eval dataset not found.',
+      });
     }
 
     return {
@@ -3441,7 +3446,10 @@ export class SystemService {
       (record) => record.id === id,
     );
     if (!preset) {
-      throw new NotFoundException('Eval experiment preset not found.');
+      throw new AppError('EVAL_EXPERIMENT_PRESET_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Eval experiment preset not found.',
+      });
     }
 
     if (preset.mode === 'pairwise') {
@@ -3516,9 +3524,9 @@ export class SystemService {
     memoryPolicyVariant?: string;
   }) {
     if (payload.mode === 'pairwise') {
-      throw new BadRequestException(
-        'Use /system/evals/compare/run for pairwise execution.',
-      );
+      throw new AppError('EVAL_OPERATION_INVALID', {
+        legacyMessage: 'Use /system/evals/compare/run for pairwise execution.',
+      });
     }
 
     return this.runSingleEvalDataset({
@@ -3578,7 +3586,10 @@ export class SystemService {
   getEvalRun(id: string) {
     const run = this.readEvalRuns().find((record) => record.id === id);
     if (!run) {
-      throw new NotFoundException('Eval run not found.');
+      throw new AppError('EVAL_RUN_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Eval run not found.',
+      });
     }
 
     return run;
@@ -3600,9 +3611,10 @@ export class SystemService {
     const baselineRun = this.getEvalRun(payload.baselineRunId);
     const candidateRun = this.getEvalRun(payload.candidateRunId);
     if (baselineRun.datasetId !== candidateRun.datasetId) {
-      throw new BadRequestException(
-        'Eval comparison requires baseline and candidate runs from the same dataset.',
-      );
+      throw new AppError('EVAL_PAIRWISE_DATASET_MISMATCH', {
+        legacyMessage:
+          'Eval comparison requires baseline and candidate runs from the same dataset.',
+      });
     }
 
     const comparison = this.buildEvalComparison(baselineRun, candidateRun);
@@ -3750,7 +3762,10 @@ export class SystemService {
   getGenerationTrace(id: string) {
     const trace = this.readEvalTraces().find((record) => record.id === id);
     if (!trace) {
-      throw new NotFoundException('Generation trace not found.');
+      throw new AppError('EVAL_GENERATION_TRACE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Generation trace not found.',
+      });
     }
 
     return trace;
@@ -3768,7 +3783,10 @@ export class SystemService {
     const reports = this.readEvalReports();
     const reportIndex = reports.findIndex((report) => report.id === id);
     if (reportIndex < 0) {
-      throw new NotFoundException('Eval report not found.');
+      throw new AppError('EVAL_REPORT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Eval report not found.',
+      });
     }
 
     const current = reports[reportIndex];
@@ -3790,9 +3808,11 @@ export class SystemService {
   }
 
   exportDiagnostics() {
-    throw new NotImplementedException(
-      'Diagnostics export is not implemented in this remote-first build.',
-    );
+    throw new AppError('EVAL_FEATURE_NOT_IMPLEMENTED', {
+      status: HttpStatus.NOT_IMPLEMENTED,
+      legacyMessage:
+        'Diagnostics export is not implemented in this remote-first build.',
+    });
   }
 
 }

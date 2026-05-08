@@ -458,6 +458,98 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`回复任务不存在。`);
     case "CHAT_REPLY_TASK_INVALID_STATE":
       return translateRuntimeMessage(msg`回复任务当前状态不允许此操作。`);
+    case "EVAL_CASE_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`Eval 用例不存在：${String(params.caseId ?? "")}`,
+      );
+    case "EVAL_PAIRWISE_DATASET_MISMATCH":
+      return translateRuntimeMessage(
+        msg`两两对比需要相同的数据集。`,
+      );
+    case "EVAL_DATASET_NOT_FOUND":
+      return translateRuntimeMessage(msg`Eval 数据集不存在。`);
+    case "EVAL_EXPERIMENT_PRESET_NOT_FOUND":
+      return translateRuntimeMessage(msg`Eval 实验预设不存在。`);
+    case "EVAL_OPERATION_INVALID":
+      return translateRuntimeMessage(msg`Eval 操作不合法。`);
+    case "EVAL_RUN_NOT_FOUND":
+      return translateRuntimeMessage(msg`Eval 运行记录不存在。`);
+    case "EVAL_GENERATION_TRACE_NOT_FOUND":
+      return translateRuntimeMessage(msg`生成轨迹不存在。`);
+    case "EVAL_REPORT_NOT_FOUND":
+      return translateRuntimeMessage(msg`Eval 报告不存在。`);
+    case "EVAL_FEATURE_NOT_IMPLEMENTED":
+      return translateRuntimeMessage(msg`该 Eval 功能尚未实现。`);
+    case "SELF_AGENT_DEFAULT_NOT_INITIALIZED":
+      return translateRuntimeMessage(msg`默认 self 角色尚未落库。`);
+    case "WORLD_OWNER_NOT_FOUND":
+      return translateRuntimeMessage(msg`世界主人不存在。`);
+    case "OFFICIAL_ACCOUNT_FOLLOW_NOT_FOUND":
+      return translateRuntimeMessage(msg`公众号关注关系不存在。`);
+    case "OFFICIAL_ACCOUNT_PUSH_NOT_FOUND":
+      return translateRuntimeMessage(msg`推送记录不存在。`);
+    case "OFFICIAL_ACCOUNT_NOT_FOUND":
+      return translateRuntimeMessage(msg`公众号不存在。`);
+    case "OFFICIAL_SERVICE_ACCOUNT_NOT_FOUND":
+      return translateRuntimeMessage(msg`服务号不存在。`);
+    case "OFFICIAL_ACCOUNT_ARTICLE_NOT_FOUND":
+      return translateRuntimeMessage(msg`文章不存在。`);
+    case "MODERATION_TARGET_TYPE_INVALID":
+      return translateRuntimeMessage(msg`不支持的举报对象类型。`);
+    case "MODERATION_TARGET_ID_REQUIRED":
+      return translateRuntimeMessage(msg`请提供举报对象的 ID。`);
+    case "MODERATION_REASON_REQUIRED":
+      return translateRuntimeMessage(msg`请提供举报理由。`);
+    case "MODERATION_STATUS_INVALID":
+      return translateRuntimeMessage(msg`不支持的处理状态。`);
+    case "MODERATION_REPORT_NOT_FOUND":
+      return translateRuntimeMessage(msg`举报记录不存在。`);
+    case "MAIL_CODE_SEND_FAILED":
+      return translateRuntimeMessage(msg`邮件验证码发送失败，请稍后重试。`);
+    case "FEED_CHANNEL_AUTHOR_NOT_FOUND":
+      return translateRuntimeMessage(msg`视频号作者不存在。`);
+    case "FEED_COMMENT_NOT_FOUND":
+      return translateRuntimeMessage(msg`评论不存在。`);
+    case "FEED_EMPTY":
+      return translateRuntimeMessage(msg`动态内容和媒体不能同时为空。`);
+    case "FEED_TEXT_NO_MEDIA":
+      return translateRuntimeMessage(msg`纯文本动态不能附带图片或视频。`);
+    case "FEED_VIDEO_SINGLE":
+      return translateRuntimeMessage(msg`视频动态必须且只能包含 1 条视频。`);
+    case "FEED_VIDEO_TOO_LONG":
+      return translateRuntimeMessage(msg`视频时长不能超过 5 分钟。`);
+    case "FEED_IMAGES_MAX":
+      return translateRuntimeMessage(
+        msg`图片动态最多支持 ${String(params.max ?? 9)} 张图片。`,
+      );
+    case "FEED_IMAGES_TYPE_ONLY":
+      return translateRuntimeMessage(msg`图片动态当前只支持图片资源。`);
+    case "FEED_POST_NOT_FOUND":
+      return translateRuntimeMessage(msg`动态不存在。`);
+    case "FEED_NOT_FRIEND":
+      return translateRuntimeMessage(msg`需先加为好友才能互动。`);
+    case "CYBER_AVATAR_RUN_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`赛博分身运行记录不存在：${String(params.runId ?? "")}`,
+      );
+    case "WORLD_LANGUAGE_INVALID":
+      return translateRuntimeMessage(msg`不支持的世界语言。`);
+    case "ACTION_CONNECTOR_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`Connector 不存在：${String(params.id ?? "")}`,
+      );
+    case "ACTION_OPERATION_INVALID":
+      return translateRuntimeMessage(msg`Action 操作不合法。`);
+    case "ACTION_RUN_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`Action 运行记录不存在：${String(params.id ?? "")}`,
+      );
+    case "ACTION_RUN_NO_PLAN_SNAPSHOT":
+      return translateRuntimeMessage(msg`该动作缺少 plan 快照，当前无法重试。`);
+    case "FOLLOWUP_FRIEND_REQUEST_REQUIRED":
+      return translateRuntimeMessage(msg`friendRequestId 必填。`);
+    case "FOLLOWUP_NOT_FOUND":
+      return translateRuntimeMessage(msg`Follow-up 不存在。`);
     case "VALIDATION_FAILED":
       return translateRuntimeMessage(msg`提交的数据无效，请检查后重试。`);
     case "INTERNAL_ERROR":
