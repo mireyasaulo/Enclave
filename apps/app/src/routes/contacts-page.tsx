@@ -1243,10 +1243,17 @@ export function ContactsPage() {
       return;
     }
 
-    document.getElementById(anchorId)?.scrollIntoView({
-      behavior,
-      block: "start",
-    });
+    const target = document.getElementById(anchorId);
+    const container = desktopDirectoryScrollRef.current;
+    if (!target || !container) {
+      return;
+    }
+
+    const containerRect = container.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const offsetTop =
+      targetRect.top - containerRect.top + container.scrollTop;
+    container.scrollTo({ top: offsetTop, behavior });
   }
   const shortcutItems: ContactShortcutListItem[] = [
     {
