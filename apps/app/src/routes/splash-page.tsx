@@ -91,7 +91,15 @@ export function SplashPage() {
       }
 
       try {
-        const owner = await getWorldOwner(runtimeConfig.apiBaseUrl);
+        const owner = await Promise.race([
+          getWorldOwner(runtimeConfig.apiBaseUrl),
+          new Promise<never>((_, reject) =>
+            window.setTimeout(
+              () => reject(new Error("splash-bootstrap-timeout")),
+              8000,
+            ),
+          ),
+        ]);
         if (!cancelled) {
           hydrateOwner(owner);
           const restoredRoute =
