@@ -225,7 +225,7 @@ export function MobileMomentsPublishPage() {
               value={composeDraft.text}
               onChange={(event) => composeDraft.setText(event.target.value)}
               placeholder={t(msg`这一刻的想法...`)}
-              className="min-h-[11rem] resize-none rounded-[18px] border-0 bg-[color:var(--surface-console)] px-4 py-3.5 text-[15px] leading-7 shadow-none"
+              className="min-h-[11rem] resize-none rounded-[18px] border-0 bg-[color:var(--surface-console)] px-4 py-3.5 text-[16px] leading-7 shadow-none"
               autoFocus
             />
 
@@ -298,7 +298,7 @@ export function MobileMomentsPublishPage() {
             onClick={() => setDiscardConfirmOpen(false)}
             className="absolute inset-0"
           />
-          <div className="relative w-full max-w-[320px] overflow-hidden rounded-[18px] bg-white shadow-[var(--shadow-overlay)]">
+          <div className="relative w-[min(320px,calc(100vw-2rem))] overflow-hidden rounded-[18px] bg-white shadow-[var(--shadow-overlay)]">
             <div className="px-6 pb-3 pt-6 text-center">
               <div className="text-[16px] font-medium text-[color:var(--text-primary)]">
                 {t(msg`放弃发表`)}
