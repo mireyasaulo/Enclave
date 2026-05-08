@@ -37,25 +37,35 @@ export function WeChatMomentsCover({
       }
     : { backgroundImage: DEFAULT_COVER_GRADIENT };
 
+  // 微信样式：头像下沉 28px (translate-y-7) 让一部分悬挂到封面下方。
+  // 封面背景 260px，section 总高 276px：底部 16px 留给头像悬挂区，
+  // 这块区域不画封面背景，让头像在白底（下方内容区背景）上正确显示。
   return (
     <section
-      className={cn(
-        "relative h-[260px] w-full overflow-hidden bg-[#9aaec4]",
-        className,
-      )}
-      style={coverStyle}
+      className={cn("relative w-full bg-white", className)}
+      style={{ height: 276 }}
     >
-      {!coverUrl ? (
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_28%,rgba(255,255,255,0.35),transparent_55%),radial-gradient(circle_at_82%_82%,rgba(15,23,42,0.22),transparent_50%)]" />
-      ) : null}
+      {/* 封面背景层：仅在前 260px 区域内绘制并裁切 */}
+      <div
+        className="absolute inset-x-0 top-0 overflow-hidden bg-[#9aaec4]"
+        style={{ height: 260, ...coverStyle }}
+      >
+        {!coverUrl ? (
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_22%_28%,rgba(255,255,255,0.35),transparent_55%),radial-gradient(circle_at_82%_82%,rgba(15,23,42,0.22),transparent_50%)]" />
+        ) : null}
 
-      {showCoverEditHint ? (
-        <div className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/30 px-2.5 py-1 text-[11px] text-white/85 backdrop-blur-sm">
-          <Camera size={13} />
-        </div>
-      ) : null}
+        {showCoverEditHint ? (
+          <div className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/30 px-2.5 py-1 text-[11px] text-white/85 backdrop-blur-sm">
+            <Camera size={13} />
+          </div>
+        ) : null}
+      </div>
 
-      <div className="absolute bottom-3 right-4 flex items-end gap-3">
+      {/* 头像 + 昵称：群组的 bottom 位于离 section.bottom 28px 处，
+          与原始 (cover 260px + bottom-3 12px) 视觉位置一致；头像组件
+          沿用 translate-y-7 (28px) 让其底部贴在 section.bottom，
+          完整露出 64px 头像。 */}
+      <div className="absolute bottom-7 right-4 flex items-end gap-3">
         <div
           className="max-w-[60vw] truncate text-right text-[17px] font-semibold leading-[22px] text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.32)]"
           aria-label={safeNickname}
