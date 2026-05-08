@@ -44,6 +44,7 @@ export function GroupAvatarChip({
           src={source}
           alt=""
           loading="lazy"
+          decoding="async"
           draggable={false}
           className={`${cellClassName} h-full w-full object-cover`}
         />

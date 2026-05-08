@@ -125,6 +125,8 @@ export function MomentMediaGallery({
               <img
                 src={video.posterUrl}
                 alt={video.fileName || t(msg`朋友圈视频`)}
+                loading="lazy"
+                decoding="async"
                 className="w-full bg-black object-cover"
                 style={{
                   aspectRatio:
@@ -224,6 +226,7 @@ export function MomentMediaGallery({
               alt={asset.fileName || t(msg`朋友圈图片`)}
               className="h-full w-full object-cover transition duration-200 hover:scale-[1.015]"
               loading="lazy"
+              decoding="async"
             />
             {asset.livePhoto?.enabled ? (
               <div className="pointer-events-none absolute left-2 top-2 rounded-full bg-black/58 px-2.5 py-1 text-[10px] font-medium text-white">
