@@ -456,15 +456,14 @@ export class MomentsService implements OnModuleInit {
         character.id !== post.authorId && visibleCharacterIds.has(character.id),
     );
 
-    // 用户发的「friends」朋友圈：只有已加好友的角色能进入互动队列。
-    if (post.authorType === 'user' && post.visibility === 'friends') {
-      const owner = await this.worldOwnerService.getOwnerOrThrow();
-      const friendCharacterIds =
-        await this.characters.getActiveFriendCharacterIdSet(owner.id);
-      allChars = allChars.filter((character) =>
-        friendCharacterIds.has(character.id),
-      );
-    }
+    // 朋友圈是「好友圈」语义：所有帖子的点赞/评论候选都只从已加好友的角色里挑，
+    // 与 canOwnerViewPost / _enrichPost 的展示门控保持一致。
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const friendCharacterIds =
+      await this.characters.getActiveFriendCharacterIdSet(owner.id);
+    allChars = allChars.filter((character) =>
+      friendCharacterIds.has(character.id),
+    );
 
     const intimacyByCharId = new Map<string, number>();
     if (post.authorType === 'character') {
@@ -756,15 +755,19 @@ export class MomentsService implements OnModuleInit {
         order: { createdAt: 'ASC' },
       }),
     ]);
+    // 朋友圈是「好友圈」语义：非好友角色的点赞/评论不在这里露出，
+    // 与 canOwnerViewPost 处的门控（lines 685-687）保持一致。
     const visibleLikes = likes.filter(
       (like) =>
         like.authorType !== 'character' ||
-        resolvedAvatarContext.visibleCharacterIds.has(like.authorId),
+        (resolvedAvatarContext.visibleCharacterIds.has(like.authorId) &&
+          resolvedAvatarContext.ownerFriendCharacterIds.has(like.authorId)),
     );
     const visibleComments = comments.filter(
       (comment) =>
         comment.authorType !== 'character' ||
-        resolvedAvatarContext.visibleCharacterIds.has(comment.authorId),
+        (resolvedAvatarContext.visibleCharacterIds.has(comment.authorId) &&
+          resolvedAvatarContext.ownerFriendCharacterIds.has(comment.authorId)),
     );
     const serializedLikes = visibleLikes.map((like) =>
       this.serializeMomentLike(like, resolvedAvatarContext),
@@ -1397,6 +1400,9 @@ export class MomentsService implements OnModuleInit {
       await this.characters.getActiveFriendCharacterIdSet(owner.id);
 
     for (const char of activeCandidates) {
+      // 朋友圈是「好友圈」语义：非好友角色不会主动到任何朋友圈里露脸。
+      if (!ownerFriendCharacterIds.has(char.id)) continue;
+
       const baseChance =
         char.proactiveBrowseChance ?? 0.3;
       const freqMul =
@@ -1406,18 +1412,9 @@ export class MomentsService implements OnModuleInit {
 
       participantCount += 1;
 
-      const candidatePosts = recentPosts.filter((post) => {
-        if (post.authorId === char.id) return false;
-        // 用户「friends」朋友圈只让已加好友的角色巡查到。
-        if (
-          post.authorType === 'user' &&
-          post.visibility === 'friends' &&
-          !ownerFriendCharacterIds.has(char.id)
-        ) {
-          return false;
-        }
-        return true;
-      });
+      const candidatePosts = recentPosts.filter(
+        (post) => post.authorId !== char.id,
+      );
       if (candidatePosts.length === 0) continue;
 
       // Skip posts already liked by this NPC
