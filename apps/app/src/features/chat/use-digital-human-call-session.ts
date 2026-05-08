@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { msg } from "@lingui/macro";
 import {
   LEGACY_API_PREFIX,
   closeDigitalHumanSession,
@@ -12,6 +13,7 @@ import {
   type VoiceCallTurnResult,
   resolveCoreApiBaseUrl,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { isNativeMobileRuntime } from "../../runtime/native-runtime";
 import { useSpeechInput } from "./use-speech-input";
 
@@ -103,11 +105,11 @@ export function useDigitalHumanCallSession({
   const turnMutation = useMutation({
     mutationFn: async () => {
       if (!sessionRef.current) {
-        throw new Error("数字人通话尚未建立，请稍后再试。");
+        throw new Error(translateRuntimeMessage(msg`数字人通话尚未建立，请稍后再试。`));
       }
 
       if (!speech.recordedAudio) {
-        throw new Error("请先录一段语音再试。");
+        throw new Error(translateRuntimeMessage(msg`请先录一段语音再试。`));
       }
 
       const formData = new FormData();
@@ -140,7 +142,9 @@ export function useDigitalHumanCallSession({
     onError: (error) => {
       setSessionState("error");
       setSessionError(
-        error instanceof Error ? error.message : "数字人通话失败，请稍后再试。",
+        error instanceof Error
+          ? error.message
+          : translateRuntimeMessage(msg`数字人通话失败，请稍后再试。`),
       );
     },
   });
@@ -272,7 +276,7 @@ export function useDigitalHumanCallSession({
         setSessionError(
           error instanceof Error
             ? error.message
-            : "连接数字人失败，请稍后再试。",
+            : translateRuntimeMessage(msg`连接数字人失败，请稍后再试。`),
         );
       }
     })();
@@ -516,12 +520,12 @@ function buildDigitalHumanSessionEventsUrl(sessionId: string, baseUrl?: string) 
 
 function resolveAutoplayBlockedCopy() {
   return isNativeMobileRuntime()
-    ? "系统拦截了自动播报，点“重播上一句”即可播放。"
-    : "浏览器拦截了自动播报，点“重播上一句”即可播放。";
+    ? translateRuntimeMessage(msg`系统拦截了自动播报，点“重播上一句”即可播放。`)
+    : translateRuntimeMessage(msg`浏览器拦截了自动播报，点“重播上一句”即可播放。`);
 }
 
 function resolveDigitalHumanPlaybackFailedCopy() {
   return isNativeMobileRuntime()
-    ? "数字人语音已生成，但当前设备没有成功播放。可以点“重播上一句”再试。"
-    : "数字人语音已生成，但浏览器没有成功播放。可以点“重播上一句”再试。";
+    ? translateRuntimeMessage(msg`数字人语音已生成，但当前设备没有成功播放。可以点“重播上一句”再试。`)
+    : translateRuntimeMessage(msg`数字人语音已生成，但浏览器没有成功播放。可以点“重播上一句”再试。`);
 }

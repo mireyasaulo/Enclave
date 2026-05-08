@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getSystemStatus } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { resolveDigitalHumanEntryGuardCopy } from "./digital-human-entry-guard";
 
 type DigitalHumanEntryNotice = ReturnType<
@@ -14,6 +15,7 @@ export function useDigitalHumanEntryGuard({
   baseUrl?: string;
   enabled?: boolean;
 }) {
+  const t = useRuntimeTranslator();
   const [entryNotice, setEntryNotice] = useState<DigitalHumanEntryNotice>(null);
   const [videoGuardKey, setVideoGuardKey] = useState<string | null>(
     null,
@@ -37,6 +39,7 @@ export function useDigitalHumanEntryGuard({
     setEntryNotice(null);
 
     const guardCopy = resolveDigitalHumanEntryGuardCopy(
+      t,
       systemStatusQuery.data?.digitalHumanGateway,
     );
 
@@ -48,7 +51,7 @@ export function useDigitalHumanEntryGuard({
 
     setVideoGuardKey(null);
     return true;
-  }, [systemStatusQuery.data?.digitalHumanGateway, videoGuardKey]);
+  }, [systemStatusQuery.data?.digitalHumanGateway, t, videoGuardKey]);
 
   return {
     entryNotice,

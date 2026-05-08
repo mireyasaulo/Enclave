@@ -712,10 +712,10 @@ export function MobileChatPlusPanel({
                 className="block w-full px-4 py-2.5 text-left transition-colors active:bg-[color:var(--surface-card-hover)] disabled:opacity-60"
               >
                 <div className="text-[13px] font-medium text-[color:var(--text-primary)]">
-                  {scene.title}
+                  {t(scene.title)}
                 </div>
                 <div className="mt-0.5 text-[11px] leading-[18px] text-[color:var(--text-muted)]">
-                  {scene.subtitle}
+                  {t(scene.subtitle)}
                 </div>
               </button>
             ))}

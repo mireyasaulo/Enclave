@@ -1105,6 +1105,15 @@ msgstr "Esc clear"
 msgid "Esc 继续管理"
 msgstr "Esc resume manage"
 
+#. placeholder {0}: formatFileSize(MAX_GIF_SIZE_BYTES)
+#: apps/app/src/features/chat/stickers/prepare-custom-sticker-upload.ts:56
+msgid "GIF 表情不能超过 {0}，请先压缩后再试。"
+msgstr "GIF stickers cannot exceed {0}. Please compress and try again."
+
+#: apps/app/src/features/chat/stickers/prepare-custom-sticker-upload.ts:48
+msgid "GIF 表情最大边长不能超过 {MAX_GIF_STICKER_EDGE}px，请先压缩后再试。"
+msgstr "GIF stickers cannot have edges longer than {MAX_GIF_STICKER_EDGE}px. Please compress and try again."
+
 #. placeholder {0}: firstSearchResultItem?.sticker.label ?? firstSearchResultItem?.sticker.stickerId ?? t(msg`回默认`)
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:763
 msgid "Home {0}"
@@ -1772,6 +1781,10 @@ msgstr "Introduce yourself, or write your current status"
 msgid "仍有待确认"
 msgstr "Pending confirmation"
 
+#: apps/app/src/features/chat/digital-human-entry-guard.ts:21
+msgid "仍然进入视频通话"
+msgstr "Enter video call anyway"
+
 #: apps/app/src/i18n/static-dom-seed.ts:243
 msgid "从“好友在玩”里点“发到聊天”，这里就会出现最近会话投递面板。"
 msgstr "Tap “Send to chat” from Friends Playing and the recent conversation delivery panel will appear here."
@@ -1976,6 +1989,7 @@ msgstr "people"
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:996
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1045
 #: apps/app/src/i18n/static-dom-seed.ts:751
+#: apps/app/src/lib/message-attachment-semantic.ts:238
 msgid "位置"
 msgstr "Location"
 
@@ -2266,6 +2280,7 @@ msgstr "Stop"
 msgid "停止语音输入"
 msgstr "Stop voice input"
 
+#: apps/app/src/features/chat/chat-location-scenes.ts:27
 #: apps/app/src/routes/discover-page.tsx:72
 #: apps/app/src/routes/discover-scene-page.tsx:43
 msgid "健身房"
@@ -2456,6 +2471,10 @@ msgstr "Browse image messages first"
 #: apps/app/src/routes/live-companion-page.tsx:272
 msgid "先收口桌面直播准备、状态检查和本地历史。"
 msgstr "Centralize desktop live prep, status checks, and local history first."
+
+#: apps/app/src/features/chat/digital-human-entry-guard.ts:22
+msgid "先改用语音通话"
+msgstr "Switch to voice call"
 
 #: apps/app/src/routes/discover-page.tsx:575
 msgid "先生成临时候选，你决定要不要把他留下。"
@@ -2691,6 +2710,7 @@ msgstr "Public intellectual mapping"
 msgid "公告页"
 msgstr ""
 
+#: apps/app/src/features/chat/chat-location-scenes.ts:22
 #: apps/app/src/routes/discover-page.tsx:74
 #: apps/app/src/routes/discover-scene-page.tsx:55
 msgid "公园"
@@ -2747,6 +2767,11 @@ msgstr "After following the service account, notifications and article cards wil
 #: apps/app/src/routes/channel-author-page.tsx:406
 msgid "关注者"
 msgstr ""
+
+#. placeholder {0}: attachment.relationship
+#: apps/app/src/lib/message-attachment-semantic.ts:154
+msgid "关系：{0}"
+msgstr "Relationship: {0}"
 
 #: apps/app/src/routes/character-detail-page.tsx:314
 msgid "关系管理"
@@ -2950,6 +2975,7 @@ msgstr "Close voice input panel"
 msgid "关闭转发消息弹层"
 msgstr "Close forward message dialog"
 
+#: apps/app/src/features/chat/message-quote-selection-sheet.tsx:61
 #: apps/app/src/i18n/static-dom-seed.ts:941
 msgid "关闭部分引用面板"
 msgstr "Close partial quote panel"
@@ -4007,6 +4033,10 @@ msgstr "Historic physicist mapping"
 msgid "原图 ⌘/Ctrl + Enter"
 msgstr "Original ⌘/Ctrl + Enter"
 
+#: apps/app/src/features/chat/message-quote-selection-sheet.tsx:105
+msgid "原消息"
+msgstr "Original message"
+
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:262
 msgid "原生音频理解"
 msgstr "Native audio understanding"
@@ -4385,6 +4415,7 @@ msgstr "Send code"
 #: apps/app/src/components/mobile-chat-attachment-preview.tsx:99
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:212
 #: apps/app/src/features/chat-details/mobile-details-action-sheet.tsx:91
+#: apps/app/src/features/chat/message-quote-selection-sheet.tsx:152
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:167
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:140
 #: apps/app/src/features/desktop/chat/desktop-chat-confirm-dialog.tsx:97
@@ -4480,6 +4511,10 @@ msgstr ""
 #: apps/app/src/routes/group-chat-edit-page.tsx:397
 msgid "只在当前群聊里显示。"
 msgstr "Visible only in this group chat."
+
+#: apps/app/src/features/chat/stickers/prepare-custom-sticker-upload.ts:36
+msgid "只能上传图片或动图作为表情。"
+msgstr "Only images or animations can be uploaded as stickers."
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2115
 msgid "可以先添加成员，或者切换筛选查看特定角色。"
@@ -4630,6 +4665,7 @@ msgstr "group chat"
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:108
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:992
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1041
+#: apps/app/src/lib/message-attachment-semantic.ts:230
 msgid "名片"
 msgstr "Contact card"
 
@@ -4696,10 +4732,15 @@ msgstr ""
 msgid "和对方创建新群"
 msgstr "Create a new group with this contact"
 
+#: apps/app/src/features/chat/chat-location-scenes.ts:12
 #: apps/app/src/routes/discover-page.tsx:71
 #: apps/app/src/routes/discover-scene-page.tsx:37
 msgid "咖啡馆"
 msgstr "Coffee shop"
+
+#: apps/app/src/features/chat/chat-location-scenes.ts:28
+msgid "器械区和跑步机旁都有人来来往往。"
+msgstr "People come and go around the equipment area and treadmills."
 
 #. placeholder {0}: invite.title
 #: apps/app/src/features/chat/direct-call-card.ts:61
@@ -4837,6 +4878,7 @@ msgstr "Back to default"
 msgid "固定常玩"
 msgstr "Pinned favorites"
 
+#: apps/app/src/features/chat/chat-location-scenes.ts:17
 #: apps/app/src/routes/discover-page.tsx:73
 #: apps/app/src/routes/discover-scene-page.tsx:49
 msgid "图书馆"
@@ -4852,6 +4894,7 @@ msgstr "Library"
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:104
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:980
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1029
+#: apps/app/src/lib/message-attachment-semantic.ts:201
 #: apps/app/src/runtime/file-runtime-i18n.ts:19
 msgid "图片"
 msgstr "Image"
@@ -4925,6 +4968,10 @@ msgstr "Image selection failed. Try again later."
 #: apps/app/src/i18n/static-dom-seed.ts:955
 msgid "图片预览打开失败，已改为当前页预览。"
 msgstr "Image preview failed to open, so it is now shown on this page."
+
+#: apps/app/src/features/chat/message-quote-selection-sheet.tsx:136
+msgid "在上方拖动选择要引用的文字。"
+msgstr "Drag above to select the text to quote."
 
 #: apps/app/src/i18n/static-dom-seed.ts:725
 msgid "在吧台边，先帮你把今晚这杯点明白。"
@@ -5048,6 +5095,10 @@ msgstr "After handling {0}, one fewer conversation will be ready for immediate r
 #: apps/app/src/i18n/static-dom-seed.ts:1060
 msgid "处理未读队列"
 msgstr "Process unread queue"
+
+#: apps/app/src/features/chat/stickers/prepare-custom-sticker-upload.ts:154
+msgid "处理表情失败，请换一张再试。"
+msgstr "Failed to process sticker. Please try a different one."
 
 #: apps/app/src/routes/group-qr-page.tsx:1700
 msgid "处理顺序"
@@ -5441,6 +5492,10 @@ msgstr "Plans and reminders"
 msgid "安澜"
 msgstr "Anlan"
 
+#: apps/app/src/features/chat/chat-location-scenes.ts:18
+msgid "安静的阅读区里，翻页声比说话声更清楚。"
+msgstr "In the quiet reading area, the sound of turning pages is clearer than speech."
+
 #: apps/app/src/features/chat/chat-reminder-entries.ts:174
 #: apps/app/src/features/chat/reminder-task-panel.tsx:262
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:907
@@ -5586,6 +5641,10 @@ msgstr "Cover hook"
 #: apps/app/src/features/chat/chat-reminder-entries.ts:209
 msgid "将在 {label} 提醒"
 msgstr "Will remind at {label}"
+
+#: apps/app/src/features/chat/message-quote-selection-sheet.tsx:135
+msgid "将引用：{selectedText}"
+msgstr "Will quote: {selectedText}"
 
 #: apps/app/src/components/mobile-chat-attachment-preview.tsx:73
 msgid "将按顺序逐张发送图片。"
@@ -6778,6 +6837,10 @@ msgstr ""
 msgid "异常"
 msgstr "Error"
 
+#: apps/app/src/features/chat/message-quote-selection-sheet.tsx:168
+msgid "引用所选文字"
+msgstr "Quote selected text"
+
 #: apps/app/src/i18n/static-dom-seed.ts:663
 msgid "张一鸣"
 msgstr "Zhang Yiming"
@@ -7197,6 +7260,11 @@ msgstr "Now playing"
 msgid "当前播放："
 msgstr "Now playing:"
 
+#. placeholder {0}: gateway.message
+#: apps/app/src/features/chat/digital-human-entry-guard.ts:20
+msgid "当前数字人 Provider 未就绪。{0}"
+msgstr "The digital human provider isn't ready. {0}"
+
 #: apps/app/src/lib/request-error.ts:28
 msgid "当前无法连接到隐界实例，请先检查世界地址和网络连接。"
 msgstr "Cannot connect to the Yinjie instance right now. Check the world address and network connection first."
@@ -7311,6 +7379,10 @@ msgstr "This browser does not support voice input. Use keyboard input instead."
 #: apps/app/src/components/chat-composer.tsx:6530
 msgid "当前浏览器暂不支持图片处理，请先裁剪后再发送。"
 msgstr "This browser doesn't support image processing. Crop it before sending."
+
+#: apps/app/src/features/chat/stickers/prepare-custom-sticker-upload.ts:82
+msgid "当前浏览器暂不支持表情压缩。"
+msgstr "This browser doesn't support sticker compression."
 
 #: apps/app/src/features/chat/direct-call-card.ts:66
 msgid "当前消息已转成单聊视频通话卡片，方便快速识别状态。"
@@ -7454,10 +7526,12 @@ msgstr "Copying links isn't supported in this environment."
 msgid "当前直播准备"
 msgstr "Current Live Prep"
 
+#: apps/app/src/features/chat/digital-human-entry-guard.ts:40
 #: apps/app/src/i18n/static-dom-seed.ts:1002
 msgid "当前视频通话仍使用内置数字人播放器模式，暂未切到真实外部数字人 Provider。"
 msgstr "This video call is still using the built-in digital human player and has not switched to a real external provider."
 
+#: apps/app/src/features/chat/digital-human-entry-guard.ts:30
 #: apps/app/src/i18n/static-dom-seed.ts:1001
 msgid "当前视频通话仍使用内置数字人模拟模式，画面会先以内置数字人舞台承载。"
 msgstr "This video call is still using built-in digital human mock mode, so the stage will use the built-in player first."
@@ -9520,6 +9594,8 @@ msgstr ""
 msgid "改用相册"
 msgstr "Use album"
 
+#: apps/app/src/features/chat/digital-human-entry-guard.ts:32
+#: apps/app/src/features/chat/digital-human-entry-guard.ts:42
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1553
 msgid "改用语音通话"
 msgstr ""
@@ -9657,6 +9733,14 @@ msgstr "The stream is rendering; the player connection is being kept open and st
 msgid "数字人视频流渲染失败，当前已回退到文字加语音通话链路。可稍后重试连接数字人。"
 msgstr "Stream render failed — falling back to text + voice. You can retry connecting the digital human later."
 
+#: apps/app/src/features/chat/use-digital-human-call-session.ts:529
+msgid "数字人语音已生成，但当前设备没有成功播放。可以点“重播上一句”再试。"
+msgstr "The digital human voice was generated, but this device couldn't play it. Tap "Replay last" to try again."
+
+#: apps/app/src/features/chat/use-digital-human-call-session.ts:530
+msgid "数字人语音已生成，但浏览器没有成功播放。可以点“重播上一句”再试。"
+msgstr "The digital human voice was generated, but the browser couldn't play it. Tap "Replay last" to try again."
+
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:739
 msgid "数字人还没恢复，先重试或改用语音继续。"
 msgstr ""
@@ -9664,6 +9748,14 @@ msgstr ""
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:383
 msgid "数字人连接失败"
 msgstr ""
+
+#: apps/app/src/features/chat/use-digital-human-call-session.ts:147
+msgid "数字人通话失败，请稍后再试。"
+msgstr "Digital human call failed. Please try again later."
+
+#: apps/app/src/features/chat/use-digital-human-call-session.ts:108
+msgid "数字人通话尚未建立，请稍后再试。"
+msgstr "The digital human call hasn't connected yet. Please try again later."
 
 #: apps/app/src/routes/desktop-feedback-page.tsx:433
 #: apps/app/src/routes/desktop-mobile-page.tsx:1205
@@ -9688,6 +9780,7 @@ msgstr "Database {0}"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:942
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1033
 #: apps/app/src/i18n/static-dom-seed.ts:174
+#: apps/app/src/lib/message-attachment-semantic.ts:214
 #: apps/app/src/runtime/file-runtime-i18n.ts:14
 #: apps/app/src/runtime/file-runtime-i18n.ts:20
 msgid "文件"
@@ -9732,6 +9825,10 @@ msgstr "Text"
 #: apps/app/src/routes/desktop-feedback-page.tsx:71
 msgid "文案、频道定义、桌面与微信对齐口径存在偏差。"
 msgstr "Copy, channel definitions, or desktop and WeChat alignment wording are inconsistent."
+
+#: apps/app/src/lib/message-attachment-semantic.ts:213
+msgid "文档"
+msgstr "Document"
 
 #: apps/app/src/components/mobile-document-shell.tsx:93
 #: apps/app/src/i18n/static-dom-seed.ts:890
@@ -11194,6 +11291,10 @@ msgstr "Mark live highlight"
 msgid "标题"
 msgstr "Title"
 
+#: apps/app/src/features/chat/chat-location-scenes.ts:23
+msgid "树荫、长椅和慢下来的傍晚风。"
+msgstr "Tree shade, benches, and a slow evening breeze."
+
 #: apps/app/src/routes/character-detail-page.tsx:310
 msgid "核心理念"
 msgstr "Core principle"
@@ -12379,6 +12480,10 @@ msgstr "Active group spread"
 #: apps/app/src/routes/friend-requests-page.tsx:446
 msgid "浏览世界角色"
 msgstr "Browse world characters"
+
+#: apps/app/src/features/chat/use-digital-human-call-session.ts:524
+msgid "浏览器拦截了自动播报，点“重播上一句”即可播放。"
+msgstr "The browser blocked autoplay. Tap "Replay last" to play."
 
 #: apps/app/src/features/chat/use-speech-input.ts:201
 msgid "浏览器语音识别网络异常，已可改用录音转写。"
@@ -13774,6 +13879,10 @@ msgstr "Space is running low. Clean up recently added temporary stickers first."
 msgid "空间不多了，建议先清理不常用表情。"
 msgstr "Space is running low. Clean up less-used stickers first."
 
+#: apps/app/src/features/chat/chat-location-scenes.ts:13
+msgid "窗边有热咖啡和低声播放的爵士乐。"
+msgstr "Hot coffee by the window with soft jazz playing."
+
 #: apps/app/src/i18n/static-dom-seed.ts:289
 msgid "立即参加"
 msgstr "Join now"
@@ -13804,6 +13913,7 @@ msgstr "Port occupied: {portOccupiedLabel}"
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:110
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1000
 #: apps/app/src/features/search/search-quick-links.ts:51
+#: apps/app/src/lib/message-attachment-semantic.ts:246
 #: apps/app/src/routes/favorites-page.tsx:68
 msgid "笔记"
 msgstr "Note"
@@ -13919,6 +14029,11 @@ msgstr "Filter scope"
 #: apps/app/src/routes/profile-settings-page.tsx:305
 msgid "签名"
 msgstr "Signature"
+
+#. placeholder {0}: attachment.bio
+#: apps/app/src/lib/message-attachment-semantic.ts:157
+msgid "简介：{0}"
+msgstr "Bio: {0}"
 
 #: apps/app/src/i18n/static-dom-seed.ts:680
 msgid "简宁"
@@ -14102,6 +14217,10 @@ msgstr "System sharing is temporarily unavailable and the group link has been co
 #: apps/app/src/routes/chat-details-page.tsx:402
 msgid "系统分享暂时不可用，已复制联系人摘要。"
 msgstr "System sharing is unavailable for now. The contact summary has been copied."
+
+#: apps/app/src/features/chat/use-digital-human-call-session.ts:523
+msgid "系统拦截了自动播报，点“重播上一句”即可播放。"
+msgstr "The system blocked autoplay. Tap "Replay last" to play."
 
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:123
 msgid "红包"
@@ -15051,6 +15170,7 @@ msgstr ""
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:621
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:1055
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1049
+#: apps/app/src/lib/message-attachment-semantic.ts:253
 msgid "表情"
 msgstr "Sticker"
 
@@ -15419,6 +15539,7 @@ msgstr "Language"
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:988
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1037
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1251
+#: apps/app/src/lib/message-attachment-semantic.ts:222
 msgid "语音"
 msgstr "Voice"
 
@@ -15528,6 +15649,10 @@ msgstr "Please fill in a feedback title first."
 #: apps/app/src/routes/live-companion-page.tsx:482
 msgid "请先填写直播标题。"
 msgstr ""
+
+#: apps/app/src/features/chat/use-digital-human-call-session.ts:112
+msgid "请先录一段语音再试。"
+msgstr "Please record a voice clip first."
 
 #: apps/app/src/routes/desktop-feedback-page.tsx:709
 msgid "请先补充问题描述。"
@@ -15714,6 +15839,14 @@ msgstr "Load failed"
 #: apps/app/src/components/chat-composer.tsx:5522
 msgid "读取文件失败，请重新选择。"
 msgstr "Failed to read the file. Select it again."
+
+#: apps/app/src/features/chat/stickers/prepare-custom-sticker-upload.ts:142
+msgid "读取表情图片失败，请换一张再试。"
+msgstr "Failed to read sticker image. Please try another one."
+
+#: apps/app/src/features/chat/stickers/prepare-custom-sticker-upload.ts:111
+msgid "读取表情资源失败，请稍后再试。"
+msgstr "Failed to read sticker resource. Please try again later."
 
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:468
 msgid "读取这位角色的朋友圈时出错了。"
@@ -16949,6 +17082,10 @@ msgstr "Open official account results"
 msgid "进入内容流结果"
 msgstr "Open content feed results"
 
+#: apps/app/src/features/chat/digital-human-entry-guard.ts:41
+msgid "进入内置播放器"
+msgstr "Use built-in player"
+
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:934
 msgid "进入删除管理，优先清理不常用表情。"
 msgstr "Enter delete mode to clean up less-used stickers first."
@@ -16972,6 +17109,10 @@ msgstr "Open favorites results"
 #: apps/app/src/i18n/static-dom-seed.ts:334
 msgid "进入朋友圈结果"
 msgstr "Open Moments results"
+
+#: apps/app/src/features/chat/digital-human-entry-guard.ts:31
+msgid "进入模拟视频通话"
+msgstr "Enter simulated video call"
 
 #: apps/app/src/routes/character-detail-page.tsx:921
 msgid "进入视频通话"
@@ -17022,6 +17163,10 @@ msgstr "Connect your world"
 #: apps/app/src/routes/desktop-mobile-page.tsx:1201
 msgid "连接异常"
 msgstr "Connection Issue"
+
+#: apps/app/src/features/chat/use-digital-human-call-session.ts:279
+msgid "连接数字人失败，请稍后再试。"
+msgstr "Failed to connect digital human. Please try again later."
 
 #: apps/app/src/routes/welcome-page.tsx:1048
 msgid "连接本地世界"
@@ -17123,6 +17268,10 @@ msgstr ""
 #: apps/app/src/routes/group-member-picker-page.tsx:436
 msgid "选择成员后，就可以把他们从当前群聊移除。"
 msgstr ""
+
+#: apps/app/src/features/chat/message-quote-selection-sheet.tsx:87
+msgid "选择来自 {senderName} 的文字，确认后带入回复。"
+msgstr "Select text from {senderName}, then confirm to bring it into the reply."
 
 #: apps/app/src/components/chat-message-list.tsx:4815
 msgid "选择消息"
@@ -17309,6 +17458,7 @@ msgstr "Partially joined"
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:225
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:934
 #: apps/app/src/features/chat/group-message-context-menu.tsx:77
+#: apps/app/src/features/chat/message-quote-selection-sheet.tsx:80
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:69
 msgid "部分引用"
 msgstr ""
