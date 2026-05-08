@@ -7,7 +7,6 @@ export function TelemetryOverviewCards({ data }: { data: TelemetryOverviewRespon
     { label: t("Page views PV"), value: data.pvCount },
     { label: t("Unique visitors UV"), value: data.uvCount },
     { label: t("Sessions"), value: data.sessionCount },
-    { label: t("Frontend errors"), value: data.errorCount, tone: "error" as const },
     {
       label: t("Average session duration"),
       value: formatDuration(data.avgSessionDurationMs),
@@ -15,7 +14,7 @@ export function TelemetryOverviewCards({ data }: { data: TelemetryOverviewRespon
   ];
 
   return (
-    <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {cards.map((c) => (
         <li
           key={c.label}
@@ -24,13 +23,7 @@ export function TelemetryOverviewCards({ data }: { data: TelemetryOverviewRespon
           <div className="text-xs font-medium uppercase tracking-wider text-(--text-muted)">
             {c.label}
           </div>
-          <div
-            className={
-              "tone" in c && c.tone === "error"
-                ? "mt-1.5 text-2xl font-bold text-rose-600"
-                : "mt-1.5 text-2xl font-bold text-(--text-primary)"
-            }
-          >
+          <div className="mt-1.5 text-2xl font-bold text-(--text-primary)">
             {c.value}
           </div>
         </li>

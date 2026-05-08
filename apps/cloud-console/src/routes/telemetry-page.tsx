@@ -16,7 +16,7 @@ import { TelemetryTopWorldsTable } from "../components/telemetry/top-worlds-tabl
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
-type TabKey = "overview" | "events" | "funnel" | "api" | "errors";
+type TabKey = "overview" | "funnel" | "api" | "errors";
 
 export function TelemetryPage() {
   const t = useCloudConsoleText();
@@ -38,7 +38,6 @@ export function TelemetryPage() {
   const tabs = useMemo<Array<{ key: TabKey; label: string }>>(
     () => [
       { key: "overview", label: t("Overview") },
-      { key: "events", label: t("Events") },
       { key: "funnel", label: t("Funnel") },
       { key: "api", label: t("API health") },
       { key: "errors", label: t("Errors") },
@@ -85,9 +84,6 @@ export function TelemetryPage() {
 
       {tab === "overview" && (
         <OverviewTab range={range} appId={appId} worldId={worldId} />
-      )}
-      {tab === "events" && (
-        <EventsTab range={range} appId={appId} worldId={worldId} />
       )}
       {tab === "funnel" && (
         <FunnelTab
@@ -146,6 +142,10 @@ function OverviewTab({
     queryFn: () => cloudAdminApi.getTelemetryTopWorlds(range),
     enabled: !worldId,
   });
+  const topEvents = useQuery({
+    queryKey: ["telemetry", "top-events", range, appId ?? "all", worldId ?? "all"],
+    queryFn: () => cloudAdminApi.getTelemetryTopEvents(range, appId, worldId),
+  });
 
   return (
     <div className="space-y-4">
@@ -155,18 +155,6 @@ function OverviewTab({
         <ErrorBlock title={t("Failed to load overview")} message={String(overview.error)} />
       ) : overview.data ? (
         <TelemetryOverviewCards data={overview.data} />
-      ) : null}
-      {!worldId ? (
-        topWorlds.isLoading ? (
-          <LoadingBlock />
-        ) : topWorlds.error ? (
-          <ErrorBlock
-            title={t("Failed to load world ranking")}
-            message={String(topWorlds.error)}
-          />
-        ) : topWorlds.data ? (
-          <TelemetryTopWorldsTable data={topWorlds.data} />
-        ) : null
       ) : null}
       {pvSeries.isLoading ? (
         <LoadingBlock />
@@ -178,29 +166,33 @@ function OverviewTab({
           points={pvSeries.data.points}
         />
       ) : null}
+      <div className="grid gap-4 xl:grid-cols-2">
+        {!worldId ? (
+          <div>
+            {topWorlds.isLoading ? (
+              <LoadingBlock />
+            ) : topWorlds.error ? (
+              <ErrorBlock
+                title={t("Failed to load world ranking")}
+                message={String(topWorlds.error)}
+              />
+            ) : topWorlds.data ? (
+              <TelemetryTopWorldsTable data={topWorlds.data} />
+            ) : null}
+          </div>
+        ) : null}
+        <div className={worldId ? "xl:col-span-2" : undefined}>
+          {topEvents.isLoading ? (
+            <LoadingBlock />
+          ) : topEvents.error ? (
+            <ErrorBlock title={t("Failed to load events")} message={String(topEvents.error)} />
+          ) : topEvents.data ? (
+            <TelemetryTopEventsTable data={topEvents.data} />
+          ) : null}
+        </div>
+      </div>
     </div>
   );
-}
-
-function EventsTab({
-  range,
-  appId,
-  worldId,
-}: {
-  range: TelemetryRange;
-  appId: TelemetryAppId | undefined;
-  worldId: string | undefined;
-}) {
-  const t = useCloudConsoleText();
-  const top = useQuery({
-    queryKey: ["telemetry", "top-events", range, appId ?? "all", worldId ?? "all"],
-    queryFn: () => cloudAdminApi.getTelemetryTopEvents(range, appId, worldId),
-  });
-  if (top.isLoading) return <LoadingBlock />;
-  if (top.error)
-    return <ErrorBlock title={t("Failed to load events")} message={String(top.error)} />;
-  if (!top.data) return null;
-  return <TelemetryTopEventsTable data={top.data} />;
 }
 
 function FunnelTab({
