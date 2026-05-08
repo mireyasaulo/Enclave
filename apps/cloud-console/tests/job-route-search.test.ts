@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { QUEUE_STATE_FILTERS } from "../src/lib/job-queue-state";
+import { QUEUE_STATE_FILTER_VALUES } from "../src/lib/job-queue-state";
 import {
   buildJobsPermalink,
   JOB_AUDIT_FILTERS,
@@ -35,7 +35,7 @@ describe("job route search", () => {
       },
       {
         description: "queue state filter values stay aligned with the queue-state helper",
-        actual: QUEUE_STATE_FILTERS.map((item) => item.value),
+        actual: QUEUE_STATE_FILTER_VALUES,
         expected: ["all", "running_now", "lease_expired", "delayed"],
       },
       {
