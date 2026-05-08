@@ -758,6 +758,7 @@ msgstr "{kindLabel}开始下载。"
 msgid "{label} 已复制到剪贴板，可发送到手机继续。"
 msgstr "{label} 已复制到剪贴板，可发送到手机继续。"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:152
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:179
 #: apps/app/src/routes/desktop-mobile-page.tsx:2180
 msgid "{launchCount} 次"
@@ -1228,6 +1229,7 @@ msgstr "上次发送于 {0}"
 
 #. placeholder {0}: formatConversationTimestamp( lastOpenedAtById[miniProgram.id], )
 #. placeholder {0}: formatConversationTimestamp(lastOpenedAt)
+#: apps/app/src/features/games/game-center-session-panel.tsx:155
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:182
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:332
 #: apps/app/src/routes/desktop-mobile-page.tsx:2192
@@ -2754,6 +2756,7 @@ msgstr "关系管理"
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:166
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:215
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:125
+#: apps/app/src/features/games/game-center-session-panel.tsx:122
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:147
 #: apps/app/src/features/shell/desktop-shell.tsx:676
 #: apps/app/src/i18n/static-dom-seed.ts:855
@@ -3967,6 +3970,7 @@ msgstr "单聊还活跃，可以趁热补发。"
 msgid "危险操作"
 msgstr "危险操作"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:94
 #: apps/app/src/i18n/static-dom-seed.ts:89
 msgid "即玩中"
 msgstr "即玩中"
@@ -4102,6 +4106,7 @@ msgstr "发到最近会话"
 msgid "发到广场后，世界里的居民都可能看到、点赞，甚至继续接话。"
 msgstr "发到广场后，世界里的居民都可能看到、点赞，甚至继续接话。"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:72
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:94
 #: apps/app/src/i18n/static-dom-seed.ts:127
 #: apps/app/src/routes/group-qr-page.tsx:1354
@@ -5052,6 +5057,7 @@ msgstr "复制"
 msgid "复制位置"
 msgstr "复制位置"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:71
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:93
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:303
 #: apps/app/src/i18n/static-dom-seed.ts:77
@@ -6009,6 +6015,7 @@ msgstr "已带入所选文字。"
 msgid "已延后到 {0}"
 msgstr "已延后到 {0}"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:97
 #: apps/app/src/i18n/static-dom-seed.ts:90
 msgid "已建立会话承接"
 msgstr "已建立会话承接"
@@ -6662,6 +6669,10 @@ msgstr "开启扬声器"
 msgid "开始于 {startedAt} · 结束于 {endedAt}"
 msgstr "开始于 {startedAt} · 结束于 {endedAt}"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:217
+msgid "开始后会写入当前会话、最近玩过和开局次数。"
+msgstr "开始后会写入当前会话、最近玩过和开局次数。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:566
 msgid "开始搜索"
 msgstr "开始搜索"
@@ -6671,6 +6682,7 @@ msgstr "开始搜索"
 msgid "开始本场直播"
 msgstr "开始本场直播"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:193
 #: apps/app/src/i18n/static-dom-seed.ts:84
 msgid "开始游戏"
 msgstr "开始游戏"
@@ -6679,6 +6691,7 @@ msgstr "开始游戏"
 msgid "开始语音输入"
 msgstr "开始语音输入"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:151
 #: apps/app/src/i18n/static-dom-seed.ts:93
 msgid "开局次数"
 msgstr "开局次数"
@@ -6911,6 +6924,7 @@ msgstr "当前先以轻工作台承接最近任务，并支持把指定小程序
 msgid "当前先保留桌面本地历史，后面接真直播接口时继续沿用这块时间线。"
 msgstr "当前先保留桌面本地历史，后面接真直播接口时继续沿用这块时间线。"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:216
 #: apps/app/src/i18n/static-dom-seed.ts:95
 msgid "当前先由游戏中心工作区承接会话，后续再接真实小游戏容器。"
 msgstr "当前先由游戏中心工作区承接会话，后续再接真实小游戏容器。"
@@ -10436,6 +10450,7 @@ msgstr "本地摄像头已关闭"
 msgid "本地端口似乎已经被占用，桌面壳正在尝试重新接管入口。"
 msgstr "本地端口似乎已经被占用，桌面壳正在尝试重新接管入口。"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:145
 #: apps/app/src/i18n/static-dom-seed.ts:92
 msgid "本局奖励"
 msgstr "本局奖励"
@@ -12681,6 +12696,10 @@ msgstr "点击后可切换为已加入"
 msgid "点击后可加入本轮群通话"
 msgstr "点击后可加入本轮群通话"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:97
+msgid "点击开始后进入会话承接"
+msgstr "点击开始后进入会话承接"
+
 #: apps/app/src/i18n/static-dom-seed.ts:1043
 msgid "点击推荐区的“加入我的小程序”，这里就会形成固定常用入口。"
 msgstr "点击推荐区的“加入我的小程序”，这里就会形成固定常用入口。"
@@ -13848,6 +13867,7 @@ msgstr "系统"
 #: apps/app/src/components/chat-message-list.tsx:6246
 #: apps/app/src/components/chat-message-list.tsx:6381
 #: apps/app/src/components/official-article-viewer.tsx:269
+#: apps/app/src/features/games/game-center-session-panel.tsx:69
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:91
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:303
 #: apps/app/src/features/subscription/subscription-panel.tsx:276
@@ -14037,6 +14057,11 @@ msgstr "给朋友设置备注名"
 msgid "给联系人设置备注名"
 msgstr "给联系人设置备注名"
 
+#. placeholder {0}: game.name
+#: apps/app/src/features/games/game-center-session-panel.tsx:106
+msgid "继续 {0}"
+msgstr "继续 {0}"
+
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:292
 #: apps/app/src/i18n/static-dom-seed.ts:168
 #: apps/app/src/i18n/static-dom-seed.ts:910
@@ -14131,6 +14156,7 @@ msgstr "继续添加到表情"
 msgid "继续添加表情"
 msgstr "继续添加表情"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:193
 #: apps/app/src/i18n/static-dom-seed.ts:94
 msgid "继续游戏"
 msgstr "继续游戏"
@@ -15220,6 +15246,10 @@ msgstr "该聊天会先从消息列表中隐藏，收到新消息后会再次出
 msgid "该角色后续互动会被拦截"
 msgstr "该角色后续互动会被拦截"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:94
+msgid "详情页"
+msgstr "详情页"
+
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:303
 #: apps/app/src/routes/character-detail-page.tsx:253
 #: apps/app/src/routes/chat-details-page.tsx:885
@@ -16253,6 +16283,7 @@ msgstr "还没有形成稳定的手机接力记录。"
 msgid "还没有手机接力记录"
 msgstr "还没有手机接力记录"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:156
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:335
 #: apps/app/src/routes/desktop-mobile-page.tsx:2193
 msgid "还没有打开过"
@@ -17755,6 +17786,7 @@ msgstr "预览图片 {0}"
 msgid "预计处理后"
 msgstr "预计处理后"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:139
 #: apps/app/src/i18n/static-dom-seed.ts:91
 msgid "预计节奏"
 msgstr "预计节奏"

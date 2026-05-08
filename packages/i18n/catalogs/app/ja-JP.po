@@ -756,6 +756,7 @@ msgstr "{kindLabel}のダウンロードを開始しました。"
 msgid "{label} 已复制到剪贴板，可发送到手机继续。"
 msgstr "{label} をクリップボードにコピーしました。スマホに送って続けられます。"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:152
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:179
 #: apps/app/src/routes/desktop-mobile-page.tsx:2180
 msgid "{launchCount} 次"
@@ -1226,6 +1227,7 @@ msgstr "最終送信者: {0}"
 
 #. placeholder {0}: formatConversationTimestamp( lastOpenedAtById[miniProgram.id], )
 #. placeholder {0}: formatConversationTimestamp(lastOpenedAt)
+#: apps/app/src/features/games/game-center-session-panel.tsx:155
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:182
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:332
 #: apps/app/src/routes/desktop-mobile-page.tsx:2192
@@ -2752,6 +2754,7 @@ msgstr "関係管理"
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:166
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:215
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:125
+#: apps/app/src/features/games/game-center-session-panel.tsx:122
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:147
 #: apps/app/src/features/shell/desktop-shell.tsx:676
 #: apps/app/src/i18n/static-dom-seed.ts:855
@@ -3965,6 +3968,7 @@ msgstr "プライベートチャットはまだアクティブなので、ホッ
 msgid "危险操作"
 msgstr "危険な操作"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:94
 #: apps/app/src/i18n/static-dom-seed.ts:89
 msgid "即玩中"
 msgstr "すぐプレイ可能"
@@ -4100,6 +4104,7 @@ msgstr "最近の会話に送信する"
 msgid "发到广场后，世界里的居民都可能看到、点赞，甚至继续接话。"
 msgstr "広場に投稿すると、世界の住民が見たり、いいねしたり、会話を続けたりできます。"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:72
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:94
 #: apps/app/src/i18n/static-dom-seed.ts:127
 #: apps/app/src/routes/group-qr-page.tsx:1354
@@ -5050,6 +5055,7 @@ msgstr "コピー"
 msgid "复制位置"
 msgstr ""
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:71
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:93
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:303
 #: apps/app/src/i18n/static-dom-seed.ts:77
@@ -6007,6 +6013,7 @@ msgstr "選択したテキストを挿入しました。"
 msgid "已延后到 {0}"
 msgstr "{0} まで延期しました"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:97
 #: apps/app/src/i18n/static-dom-seed.ts:90
 msgid "已建立会话承接"
 msgstr "セッション引き継ぎ作成済み"
@@ -6660,6 +6667,10 @@ msgstr ""
 msgid "开始于 {startedAt} · 结束于 {endedAt}"
 msgstr "開始 {startedAt} · 終了 {endedAt}"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:217
+msgid "开始后会写入当前会话、最近玩过和开局次数。"
+msgstr "開始するとセッション、最近プレイした履歴、起動回数が記録されます。"
+
 #: apps/app/src/i18n/static-dom-seed.ts:566
 msgid "开始搜索"
 msgstr "検索を開始"
@@ -6669,6 +6680,7 @@ msgstr "検索を開始"
 msgid "开始本场直播"
 msgstr "このライブを開始"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:193
 #: apps/app/src/i18n/static-dom-seed.ts:84
 msgid "开始游戏"
 msgstr "ゲーム開始"
@@ -6677,6 +6689,7 @@ msgstr "ゲーム開始"
 msgid "开始语音输入"
 msgstr "音声入力を開始"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:151
 #: apps/app/src/i18n/static-dom-seed.ts:93
 msgid "开局次数"
 msgstr "開始回数"
@@ -6909,6 +6922,7 @@ msgstr "現在は軽量ワークスペースで最近のタスクを受け、指
 msgid "当前先保留桌面本地历史，后面接真直播接口时继续沿用这块时间线。"
 msgstr "今はデスクトップのローカル履歴を残し、実ライブAPI接続後もこのタイムラインをそのまま使います。"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:216
 #: apps/app/src/i18n/static-dom-seed.ts:95
 msgid "当前先由游戏中心工作区承接会话，后续再接真实小游戏容器。"
 msgstr "現在はゲームセンター作業区でセッションを受け、後で実際のミニゲーム容器を接続します。"
@@ -10434,6 +10448,7 @@ msgstr "ローカルカメラはオフです"
 msgid "本地端口似乎已经被占用，桌面壳正在尝试重新接管入口。"
 msgstr "ローカルポートが使用中のようです。デスクトップシェルが入口を再取得しています。"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:145
 #: apps/app/src/i18n/static-dom-seed.ts:92
 msgid "本局奖励"
 msgstr "今回の報酬"
@@ -12679,6 +12694,10 @@ msgstr ""
 msgid "点击后可加入本轮群通话"
 msgstr ""
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:97
+msgid "点击开始后进入会话承接"
+msgstr "開始をタップしてセッションに入る"
+
 #: apps/app/src/i18n/static-dom-seed.ts:1043
 msgid "点击推荐区的“加入我的小程序”，这里就会形成固定常用入口。"
 msgstr "おすすめ欄の「マイミニプログラムに追加」を押すと、ここに固定入口が作られます。"
@@ -13846,6 +13865,7 @@ msgstr "システム"
 #: apps/app/src/components/chat-message-list.tsx:6246
 #: apps/app/src/components/chat-message-list.tsx:6381
 #: apps/app/src/components/official-article-viewer.tsx:269
+#: apps/app/src/features/games/game-center-session-panel.tsx:69
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:91
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:303
 #: apps/app/src/features/subscription/subscription-panel.tsx:276
@@ -14035,6 +14055,11 @@ msgstr "友だちの備考名を設定"
 msgid "给联系人设置备注名"
 msgstr "連絡先の備考名を設定"
 
+#. placeholder {0}: game.name
+#: apps/app/src/features/games/game-center-session-panel.tsx:106
+msgid "继续 {0}"
+msgstr "{0} を続ける"
+
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:292
 #: apps/app/src/i18n/static-dom-seed.ts:168
 #: apps/app/src/i18n/static-dom-seed.ts:910
@@ -14129,6 +14154,7 @@ msgstr ""
 msgid "继续添加表情"
 msgstr "スタンプ追加を続ける"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:193
 #: apps/app/src/i18n/static-dom-seed.ts:94
 msgid "继续游戏"
 msgstr "ゲームを続ける"
@@ -15218,6 +15244,10 @@ msgstr "このチャットは一旦メッセージ一覧から非表示になり
 msgid "该角色后续互动会被拦截"
 msgstr "このキャラクターからの今後のやり取りは遮断されます"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:94
+msgid "详情页"
+msgstr "詳細ページ"
+
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:303
 #: apps/app/src/routes/character-detail-page.tsx:253
 #: apps/app/src/routes/chat-details-page.tsx:885
@@ -16251,6 +16281,7 @@ msgstr "安定したスマホ引き継ぎ履歴はまだありません。"
 msgid "还没有手机接力记录"
 msgstr "スマホ引き継ぎ履歴はまだありません"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:156
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:335
 #: apps/app/src/routes/desktop-mobile-page.tsx:2193
 msgid "还没有打开过"
@@ -17753,6 +17784,7 @@ msgstr "画像 {0} をプレビュー"
 msgid "预计处理后"
 msgstr "処理されることが予想されます"
 
+#: apps/app/src/features/games/game-center-session-panel.tsx:139
 #: apps/app/src/i18n/static-dom-seed.ts:91
 msgid "预计节奏"
 msgstr "想定テンポ"

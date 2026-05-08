@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, cn } from "@yinjie/ui";
 import { Clock3, Copy, Flag, Play, Share2, Smartphone, Sparkles, X } from "lucide-react";
 import { formatConversationTimestamp } from "../../lib/format";
@@ -37,6 +39,7 @@ export function GameCenterSessionPanel({
   copyActionLabel,
   onLaunch,
 }: GameCenterSessionPanelProps) {
+  const t = useRuntimeTranslator();
   const tone = getGameCenterToneStyle(game.tone);
   const isDesktopLayout = useDesktopLayout();
   const nativeMobileShareSupported = isNativeMobileShareSurface({
@@ -63,10 +66,10 @@ export function GameCenterSessionPanel({
   const resolvedCopyActionLabel = copyActionLabel
     ? copyActionLabel
     : nativeMobileShareSupported
-      ? "系统分享"
+      ? t(msg`系统分享`)
       : mobileWebCopyFallback
-        ? "复制入口"
-        : "发到手机";
+        ? t(msg`复制入口`)
+        : t(msg`发到手机`);
 
   return (
     <section
@@ -88,10 +91,10 @@ export function GameCenterSessionPanel({
                 tone.badgeClassName,
               )}
             >
-              {isActive ? "即玩中" : "详情页"}
+              {isActive ? t(msg`即玩中`) : t(msg`详情页`)}
             </div>
             <div className={cn("text-[color:var(--text-muted)]", compact ? "text-[10px]" : "text-[11px]")}>
-              {isActive ? "已建立会话承接" : "点击开始后进入会话承接"}
+              {isActive ? t(msg`已建立会话承接`) : t(msg`点击开始后进入会话承接`)}
             </div>
           </div>
           <div
@@ -100,7 +103,7 @@ export function GameCenterSessionPanel({
               compact ? "mt-2 text-[15px]" : "mt-3 text-lg",
             )}
           >
-            {isActive ? `继续 ${game.name}` : game.name}
+            {isActive ? t(msg`继续 ${game.name}`) : game.name}
           </div>
           <div
             className={cn(
@@ -116,7 +119,7 @@ export function GameCenterSessionPanel({
             variant="ghost"
             size="icon"
             onClick={onDismiss}
-            aria-label="关闭"
+            aria-label={t(msg`关闭`)}
             className={cn(
               "shrink-0 border",
               compact
@@ -133,24 +136,24 @@ export function GameCenterSessionPanel({
         <SessionMetric
           compact={compact}
           icon={<Clock3 size={15} className={metricAccentClass} />}
-          label="预计节奏"
+          label={t(msg`预计节奏`)}
           value={game.estimatedDuration}
         />
         <SessionMetric
           compact={compact}
           icon={<Sparkles size={15} className={rewardAccentClass} />}
-          label="本局奖励"
+          label={t(msg`本局奖励`)}
           value={game.rewardLabel}
         />
         <SessionMetric
           compact={compact}
           icon={<Flag size={15} className={metricAccentClass} />}
-          label="开局次数"
-          value={`${launchCount} 次`}
+          label={t(msg`开局次数`)}
+          value={t(msg`${launchCount} 次`)}
           detail={
             lastOpenedAt
-              ? `上次打开 ${formatConversationTimestamp(lastOpenedAt)}`
-              : "还没有打开过"
+              ? t(msg`上次打开 ${formatConversationTimestamp(lastOpenedAt)}`)
+              : t(msg`还没有打开过`)
           }
         />
       </div>
@@ -187,7 +190,7 @@ export function GameCenterSessionPanel({
           }
         >
           <Play size={16} />
-          {isActive ? "继续游戏" : "开始游戏"}
+          {isActive ? t(msg`继续游戏`) : t(msg`开始游戏`)}
         </Button>
         {onCopyToMobile ? (
           <Button
@@ -210,8 +213,8 @@ export function GameCenterSessionPanel({
           )}
         >
           {isActive
-            ? "当前先由游戏中心工作区承接会话，后续再接真实小游戏容器。"
-            : "开始后会写入当前会话、最近玩过和开局次数。"}
+            ? t(msg`当前先由游戏中心工作区承接会话，后续再接真实小游戏容器。`)
+            : t(msg`开始后会写入当前会话、最近玩过和开局次数。`)}
         </div>
       </div>
     </section>
