@@ -4,8 +4,8 @@
   "scopes": {
     "apps/app/src": {
       "rules": {
-        "jsx-literal-prop": 338,
-        "object-ui-string": 201,
+        "jsx-literal-prop": 337,
+        "object-ui-string": 199,
         "jsx-cjk-text": 17,
         "toast-dialog-string": 1,
         "setter-message-string": 18,
@@ -14,7 +14,7 @@
         "locale-compare-literal": 1,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 0,
-        "raw-cjk-line": 2093
+        "raw-cjk-line": 2069
       }
     },
     "apps/admin/src": {

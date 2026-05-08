@@ -3471,10 +3471,12 @@ msgstr "分享了笔记 {0}。"
 msgid "分享公众号"
 msgstr "分享公众号"
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:151
 #: apps/app/src/i18n/static-dom-seed.ts:873
 msgid "分享工具"
 msgstr "分享工具"
 
+#: apps/app/src/components/mobile-document-shell.tsx:138
 #: apps/app/src/i18n/static-dom-seed.ts:886
 msgid "分享文档"
 msgstr "分享文档"
@@ -4200,6 +4202,7 @@ msgstr "发消息"
 msgid "发现"
 msgstr "发现"
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:44
 #: apps/app/src/i18n/static-dom-seed.ts:442
 msgid "发现工具"
 msgstr "发现工具"
@@ -5147,11 +5150,13 @@ msgstr "复制失败，请稍后再试。"
 msgid "复制失败，请稍后重试。"
 msgstr "复制失败，请稍后重试。"
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:151
 #: apps/app/src/i18n/static-dom-seed.ts:450
 #: apps/app/src/i18n/static-dom-seed.ts:874
 msgid "复制工具摘要"
 msgstr "复制工具摘要"
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:117
 #: apps/app/src/i18n/static-dom-seed.ts:883
 msgid "复制工具摘要失败，请稍后重试。"
 msgstr "复制工具摘要失败，请稍后重试。"
@@ -5172,11 +5177,13 @@ msgstr "复制截图失败，请稍后再试。"
 msgid "复制摘要"
 msgstr "复制摘要"
 
+#: apps/app/src/components/mobile-document-shell.tsx:138
 #: apps/app/src/i18n/static-dom-seed.ts:621
 #: apps/app/src/i18n/static-dom-seed.ts:887
 msgid "复制文档摘要"
 msgstr "复制文档摘要"
 
+#: apps/app/src/components/mobile-document-shell.tsx:100
 #: apps/app/src/i18n/static-dom-seed.ts:891
 msgid "复制文档摘要失败，请稍后重试。"
 msgstr "复制文档摘要失败，请稍后重试。"
@@ -5687,6 +5694,7 @@ msgstr "工作室"
 msgid "工具"
 msgstr "工具"
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:110
 #: apps/app/src/i18n/static-dom-seed.ts:881
 msgid "工具摘要已复制。"
 msgstr "工具摘要已复制。"
@@ -6091,6 +6099,8 @@ msgstr "已打开文件。"
 #: apps/app/src/components/chat-message-list.tsx:1081
 #: apps/app/src/components/chat-message-list.tsx:1148
 #: apps/app/src/components/chat-message-list.tsx:1209
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:80
+#: apps/app/src/components/mobile-document-shell.tsx:63
 #: apps/app/src/components/official-article-viewer.tsx:134
 #: apps/app/src/i18n/static-dom-seed.ts:875
 #: apps/app/src/routes/channels-page.tsx:733
@@ -7355,6 +7365,7 @@ msgstr "当前环境暂不支持复制动态摘要。"
 msgid "当前环境暂不支持复制名片。"
 msgstr "当前环境暂不支持复制名片。"
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:95
 #: apps/app/src/i18n/static-dom-seed.ts:877
 msgid "当前环境暂不支持复制工具摘要。"
 msgstr "当前环境暂不支持复制工具摘要。"
@@ -7363,6 +7374,7 @@ msgstr "当前环境暂不支持复制工具摘要。"
 msgid "当前环境暂不支持复制手机接力链接。"
 msgstr "当前环境暂不支持复制手机接力链接。"
 
+#: apps/app/src/components/mobile-document-shell.tsx:78
 #: apps/app/src/i18n/static-dom-seed.ts:888
 msgid "当前环境暂不支持复制文档摘要。"
 msgstr "当前环境暂不支持复制文档摘要。"
@@ -7581,6 +7593,8 @@ msgstr "当前设备暂时无法打开相机，请先改用相册选图。"
 #: apps/app/src/components/chat-message-list.tsx:1093
 #: apps/app/src/components/chat-message-list.tsx:1160
 #: apps/app/src/components/chat-message-list.tsx:1221
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:94
+#: apps/app/src/components/mobile-document-shell.tsx:77
 #: apps/app/src/components/official-article-viewer.tsx:85
 #: apps/app/src/i18n/static-dom-seed.ts:876
 #: apps/app/src/routes/channels-page.tsx:752
@@ -9655,6 +9669,7 @@ msgstr "文本"
 msgid "文案、频道定义、桌面与微信对齐口径存在偏差。"
 msgstr "文案、频道定义、桌面与微信对齐口径存在偏差。"
 
+#: apps/app/src/components/mobile-document-shell.tsx:93
 #: apps/app/src/i18n/static-dom-seed.ts:890
 msgid "文档摘要已复制。"
 msgstr "文档摘要已复制。"
@@ -13885,6 +13900,8 @@ msgstr "系统分享"
 #: apps/app/src/components/chat-message-list.tsx:1113
 #: apps/app/src/components/chat-message-list.tsx:1180
 #: apps/app/src/components/chat-message-list.tsx:1241
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:116
+#: apps/app/src/components/mobile-document-shell.tsx:99
 #: apps/app/src/components/official-article-viewer.tsx:109
 #: apps/app/src/i18n/static-dom-seed.ts:882
 #: apps/app/src/routes/channels-page.tsx:779
@@ -13931,10 +13948,12 @@ msgstr "系统分享暂时不可用，已复制动态摘要。"
 msgid "系统分享暂时不可用，已复制名片摘要。"
 msgstr "系统分享暂时不可用，已复制名片摘要。"
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:109
 #: apps/app/src/i18n/static-dom-seed.ts:880
 msgid "系统分享暂时不可用，已复制工具摘要。"
 msgstr "系统分享暂时不可用，已复制工具摘要。"
 
+#: apps/app/src/components/mobile-document-shell.tsx:92
 #: apps/app/src/i18n/static-dom-seed.ts:889
 msgid "系统分享暂时不可用，已复制文档摘要。"
 msgstr "系统分享暂时不可用，已复制文档摘要。"
@@ -15901,6 +15920,8 @@ msgstr "返回"
 msgid "返回上一步"
 msgstr "返回上一步"
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:183
+#: apps/app/src/components/mobile-document-shell.tsx:175
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:563
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:160
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:731
@@ -16140,6 +16161,7 @@ msgstr "返回聊天拍摄"
 msgid "返回聊天继续"
 msgstr "返回聊天继续"
 
+#: apps/app/src/components/mobile-document-shell.tsx:126
 #: apps/app/src/i18n/static-dom-seed.ts:620
 #: apps/app/src/i18n/static-dom-seed.ts:885
 #: apps/app/src/routes/profile-subscription-page.tsx:57
@@ -17249,6 +17271,10 @@ msgstr "重试关注"
 #: apps/app/src/components/chat-message-list.tsx:1182
 #: apps/app/src/components/chat-message-list.tsx:1223
 #: apps/app/src/components/chat-message-list.tsx:1243
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:96
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:118
+#: apps/app/src/components/mobile-document-shell.tsx:79
+#: apps/app/src/components/mobile-document-shell.tsx:101
 #: apps/app/src/components/official-article-viewer.tsx:89
 #: apps/app/src/components/official-article-viewer.tsx:113
 #: apps/app/src/components/official-article-viewer.tsx:141
@@ -17322,6 +17348,10 @@ msgid "重试场景相遇"
 msgstr "重试场景相遇"
 
 #: apps/app/src/components/chat-message-list.tsx:1055
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:96
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:118
+#: apps/app/src/components/mobile-document-shell.tsx:79
+#: apps/app/src/components/mobile-document-shell.tsx:101
 #: apps/app/src/components/official-article-viewer.tsx:65
 #: apps/app/src/components/official-article-viewer.tsx:89
 #: apps/app/src/components/official-article-viewer.tsx:113

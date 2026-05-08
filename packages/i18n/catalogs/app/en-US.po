@@ -3469,10 +3469,12 @@ msgstr "Shared a note: {0}."
 msgid "分享公众号"
 msgstr "Share official account"
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:151
 #: apps/app/src/i18n/static-dom-seed.ts:873
 msgid "分享工具"
 msgstr "Share tool"
 
+#: apps/app/src/components/mobile-document-shell.tsx:138
 #: apps/app/src/i18n/static-dom-seed.ts:886
 msgid "分享文档"
 msgstr "Share document"
@@ -4198,6 +4200,7 @@ msgstr "Message"
 msgid "发现"
 msgstr "Discover"
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:44
 #: apps/app/src/i18n/static-dom-seed.ts:442
 msgid "发现工具"
 msgstr "Discovery tool"
@@ -5145,11 +5148,13 @@ msgstr "Copy failed. Try again later."
 msgid "复制失败，请稍后重试。"
 msgstr "Copy failed, please try again later."
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:151
 #: apps/app/src/i18n/static-dom-seed.ts:450
 #: apps/app/src/i18n/static-dom-seed.ts:874
 msgid "复制工具摘要"
 msgstr "Copy tool summary"
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:117
 #: apps/app/src/i18n/static-dom-seed.ts:883
 msgid "复制工具摘要失败，请稍后重试。"
 msgstr "Failed to copy tool summary. Please try again later."
@@ -5170,11 +5175,13 @@ msgstr "Failed to copy screenshot. Try again later."
 msgid "复制摘要"
 msgstr ""
 
+#: apps/app/src/components/mobile-document-shell.tsx:138
 #: apps/app/src/i18n/static-dom-seed.ts:621
 #: apps/app/src/i18n/static-dom-seed.ts:887
 msgid "复制文档摘要"
 msgstr "Copy document summary"
 
+#: apps/app/src/components/mobile-document-shell.tsx:100
 #: apps/app/src/i18n/static-dom-seed.ts:891
 msgid "复制文档摘要失败，请稍后重试。"
 msgstr "Failed to copy document summary. Please try again later."
@@ -5685,6 +5692,7 @@ msgstr "Studio"
 msgid "工具"
 msgstr "Tools"
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:110
 #: apps/app/src/i18n/static-dom-seed.ts:881
 msgid "工具摘要已复制。"
 msgstr "Tool summary copied."
@@ -6089,6 +6097,8 @@ msgstr "File opened."
 #: apps/app/src/components/chat-message-list.tsx:1081
 #: apps/app/src/components/chat-message-list.tsx:1148
 #: apps/app/src/components/chat-message-list.tsx:1209
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:80
+#: apps/app/src/components/mobile-document-shell.tsx:63
 #: apps/app/src/components/official-article-viewer.tsx:134
 #: apps/app/src/i18n/static-dom-seed.ts:875
 #: apps/app/src/routes/channels-page.tsx:733
@@ -7353,6 +7363,7 @@ msgstr "This environment does not support copying post summaries."
 msgid "当前环境暂不支持复制名片。"
 msgstr "This environment does not support copying the card yet."
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:95
 #: apps/app/src/i18n/static-dom-seed.ts:877
 msgid "当前环境暂不支持复制工具摘要。"
 msgstr "This environment does not support copying the tool summary yet."
@@ -7361,6 +7372,7 @@ msgstr "This environment does not support copying the tool summary yet."
 msgid "当前环境暂不支持复制手机接力链接。"
 msgstr "This environment does not support copying mobile handoff links yet."
 
+#: apps/app/src/components/mobile-document-shell.tsx:78
 #: apps/app/src/i18n/static-dom-seed.ts:888
 msgid "当前环境暂不支持复制文档摘要。"
 msgstr "This environment does not support copying the document summary yet."
@@ -7579,6 +7591,8 @@ msgstr "This device cannot open the camera right now. Use the album instead."
 #: apps/app/src/components/chat-message-list.tsx:1093
 #: apps/app/src/components/chat-message-list.tsx:1160
 #: apps/app/src/components/chat-message-list.tsx:1221
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:94
+#: apps/app/src/components/mobile-document-shell.tsx:77
 #: apps/app/src/components/official-article-viewer.tsx:85
 #: apps/app/src/i18n/static-dom-seed.ts:876
 #: apps/app/src/routes/channels-page.tsx:752
@@ -9653,6 +9667,7 @@ msgstr "Text"
 msgid "文案、频道定义、桌面与微信对齐口径存在偏差。"
 msgstr "Copy, channel definitions, or desktop and WeChat alignment wording are inconsistent."
 
+#: apps/app/src/components/mobile-document-shell.tsx:93
 #: apps/app/src/i18n/static-dom-seed.ts:890
 msgid "文档摘要已复制。"
 msgstr "Document summary copied."
@@ -13883,6 +13898,8 @@ msgstr "System sharing"
 #: apps/app/src/components/chat-message-list.tsx:1113
 #: apps/app/src/components/chat-message-list.tsx:1180
 #: apps/app/src/components/chat-message-list.tsx:1241
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:116
+#: apps/app/src/components/mobile-document-shell.tsx:99
 #: apps/app/src/components/official-article-viewer.tsx:109
 #: apps/app/src/i18n/static-dom-seed.ts:882
 #: apps/app/src/routes/channels-page.tsx:779
@@ -13929,10 +13946,12 @@ msgstr "System share is unavailable; post summary copied."
 msgid "系统分享暂时不可用，已复制名片摘要。"
 msgstr "System share is unavailable for now. The card summary has been copied."
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:109
 #: apps/app/src/i18n/static-dom-seed.ts:880
 msgid "系统分享暂时不可用，已复制工具摘要。"
 msgstr "System share is unavailable, so the tool summary was copied."
 
+#: apps/app/src/components/mobile-document-shell.tsx:92
 #: apps/app/src/i18n/static-dom-seed.ts:889
 msgid "系统分享暂时不可用，已复制文档摘要。"
 msgstr "System share is unavailable, so the document summary was copied."
@@ -15899,6 +15918,8 @@ msgstr "Back"
 msgid "返回上一步"
 msgstr "Back to previous step"
 
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:183
+#: apps/app/src/components/mobile-document-shell.tsx:175
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:563
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:160
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:731
@@ -16138,6 +16159,7 @@ msgstr "Back to chat and take a photo"
 msgid "返回聊天继续"
 msgstr ""
 
+#: apps/app/src/components/mobile-document-shell.tsx:126
 #: apps/app/src/i18n/static-dom-seed.ts:620
 #: apps/app/src/i18n/static-dom-seed.ts:885
 #: apps/app/src/routes/profile-subscription-page.tsx:57
@@ -17247,6 +17269,10 @@ msgstr "Retry follow"
 #: apps/app/src/components/chat-message-list.tsx:1182
 #: apps/app/src/components/chat-message-list.tsx:1223
 #: apps/app/src/components/chat-message-list.tsx:1243
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:96
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:118
+#: apps/app/src/components/mobile-document-shell.tsx:79
+#: apps/app/src/components/mobile-document-shell.tsx:101
 #: apps/app/src/components/official-article-viewer.tsx:89
 #: apps/app/src/components/official-article-viewer.tsx:113
 #: apps/app/src/components/official-article-viewer.tsx:141
@@ -17320,6 +17346,10 @@ msgid "重试场景相遇"
 msgstr ""
 
 #: apps/app/src/components/chat-message-list.tsx:1055
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:96
+#: apps/app/src/components/mobile-discover-tool-shell.tsx:118
+#: apps/app/src/components/mobile-document-shell.tsx:79
+#: apps/app/src/components/mobile-document-shell.tsx:101
 #: apps/app/src/components/official-article-viewer.tsx:65
 #: apps/app/src/components/official-article-viewer.tsx:89
 #: apps/app/src/components/official-article-viewer.tsx:113

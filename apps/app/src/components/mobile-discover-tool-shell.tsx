@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from "react";
+import { msg } from "@lingui/macro";
 import { ArrowLeft, Copy, Share2 } from "lucide-react";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import {
   shareWithNativeShell,
@@ -26,7 +28,7 @@ type MobileDiscoverToolShellProps = {
 export function MobileDiscoverToolShell({
   title,
   subtitle,
-  heroBadge = "发现工具",
+  heroBadge,
   heroTitle,
   heroDescription,
   heroVisual,
@@ -38,6 +40,8 @@ export function MobileDiscoverToolShell({
   shareTitle,
   shareSummary,
 }: MobileDiscoverToolShellProps) {
+  const t = useRuntimeTranslator();
+  const resolvedHeroBadge = heroBadge ?? t(msg`发现工具`);
   const nativeMobileShareSupported = isNativeMobileShareSurface();
   const [shareNotice, setShareNotice] = useState<{
     tone: "success" | "info";
@@ -73,7 +77,7 @@ export function MobileDiscoverToolShell({
       if (shared) {
         setShareNotice({
           tone: "success",
-          message: "已打开系统分享面板。",
+          message: t(msg`已打开系统分享面板。`),
         });
         return;
       }
@@ -87,9 +91,9 @@ export function MobileDiscoverToolShell({
       setShareNotice({
         tone: "info",
         message: nativeMobileShareSupported
-          ? "当前设备暂时无法打开系统分享，请稍后重试。"
-          : "当前环境暂不支持复制工具摘要。",
-        actionLabel: nativeMobileShareSupported ? "重试分享" : "重试复制",
+          ? t(msg`当前设备暂时无法打开系统分享，请稍后重试。`)
+          : t(msg`当前环境暂不支持复制工具摘要。`),
+        actionLabel: nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
         onAction: () => {
           void handleShare();
         },
@@ -102,16 +106,16 @@ export function MobileDiscoverToolShell({
       setShareNotice({
         tone: "success",
         message: nativeMobileShareSupported
-          ? "系统分享暂时不可用，已复制工具摘要。"
-          : "工具摘要已复制。",
+          ? t(msg`系统分享暂时不可用，已复制工具摘要。`)
+          : t(msg`工具摘要已复制。`),
       });
     } catch {
       setShareNotice({
         tone: "info",
         message: nativeMobileShareSupported
-          ? "系统分享失败，请稍后重试。"
-          : "复制工具摘要失败，请稍后重试。",
-        actionLabel: nativeMobileShareSupported ? "重试分享" : "重试复制",
+          ? t(msg`系统分享失败，请稍后重试。`)
+          : t(msg`复制工具摘要失败，请稍后重试。`),
+        actionLabel: nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
         onAction: () => {
           void handleShare();
         },
@@ -144,7 +148,7 @@ export function MobileDiscoverToolShell({
               variant="ghost"
               size="icon"
               className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] hover:bg-black/5"
-              aria-label={nativeMobileShareSupported ? "分享工具" : "复制工具摘要"}
+              aria-label={nativeMobileShareSupported ? t(msg`分享工具`) : t(msg`复制工具摘要`)}
             >
               {nativeMobileShareSupported ? <Share2 size={18} /> : <Copy size={18} />}
             </Button>
@@ -176,7 +180,7 @@ export function MobileDiscoverToolShell({
                     onClick={onBack}
                     className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
                   >
-                    返回上一页
+                    {t(msg`返回上一页`)}
                   </button>
                 </div>
               </div>
@@ -190,7 +194,7 @@ export function MobileDiscoverToolShell({
           <div className="relative flex items-start gap-4">
             <div className="min-w-0 flex-1">
               <div className="inline-flex rounded-full bg-[rgba(7,193,96,0.12)] px-3 py-1 text-[11px] font-medium text-[#07c160]">
-                {heroBadge}
+                {resolvedHeroBadge}
               </div>
               <div className="mt-3 text-[22px] font-semibold leading-tight text-[#111827]">
                 {heroTitle}
