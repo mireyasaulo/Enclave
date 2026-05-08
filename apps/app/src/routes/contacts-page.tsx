@@ -436,13 +436,36 @@ export function ContactsPage() {
     () => buildContactSections(filteredWorldCharacterItems),
     [filteredWorldCharacterItems],
   );
+  const mobileShortcutIndexItems = useMemo(
+    () => [
+      {
+        key: "contacts-shortcut-new-friends",
+        indexLabel: t(msg`新`),
+      },
+      {
+        key: "contacts-shortcut-group-chat",
+        indexLabel: t(msg`群`),
+      },
+      {
+        key: "contacts-shortcut-official-accounts",
+        indexLabel: t(msg`公`),
+      },
+      {
+        key: "contacts-shortcut-world-characters",
+        indexLabel: t(msg`世`),
+      },
+    ],
+    [t],
+  );
   const mobileIndexItems = useMemo(
-    () =>
-      friendSections.map((section) => ({
+    () => [
+      ...mobileShortcutIndexItems,
+      ...friendSections.map((section) => ({
         key: section.anchorId,
         indexLabel: section.indexLabel,
       })),
-    [friendSections],
+    ],
+    [mobileShortcutIndexItems, friendSections],
   );
 
   const pendingRequestCount = useMemo(
@@ -793,14 +816,14 @@ export function ContactsPage() {
     setActiveMobileIndexKey((current) => {
       if (
         current &&
-        friendSections.some((section) => section.anchorId === current)
+        mobileIndexItems.some((item) => item.key === current)
       ) {
         return current;
       }
 
-      return friendSections[0]?.anchorId ?? null;
+      return mobileIndexItems[0]?.key ?? null;
     });
-  }, [friendSections, normalizedSearchText]);
+  }, [mobileIndexItems, friendSections, normalizedSearchText]);
 
   useEffect(() => {
     if (isDesktopLayout || normalizedSearchText || !friendSections.length) {
@@ -819,18 +842,18 @@ export function ContactsPage() {
 
       const containerRect = scrollContainer.getBoundingClientRect();
       const stickyOffset = 104;
-      let nextActiveKey = friendSections[0]?.anchorId ?? null;
+      let nextActiveKey = mobileIndexItems[0]?.key ?? null;
 
-      for (const section of friendSections) {
-        const sectionElement = document.getElementById(section.anchorId);
-        if (!sectionElement) {
+      for (const item of mobileIndexItems) {
+        const anchorElement = document.getElementById(item.key);
+        if (!anchorElement) {
           continue;
         }
 
         const topOffset =
-          sectionElement.getBoundingClientRect().top - containerRect.top;
+          anchorElement.getBoundingClientRect().top - containerRect.top;
         if (topOffset <= stickyOffset) {
-          nextActiveKey = section.anchorId;
+          nextActiveKey = item.key;
         } else {
           break;
         }
@@ -849,7 +872,7 @@ export function ContactsPage() {
     return () => {
       scrollContainer.removeEventListener("scroll", syncActiveMobileIndexKey);
     };
-  }, [friendSections, isDesktopLayout, normalizedSearchText]);
+  }, [mobileIndexItems, friendSections, isDesktopLayout, normalizedSearchText]);
 
   useEffect(() => {
     if (!isDesktopLayout) {
@@ -1115,6 +1138,7 @@ export function ContactsPage() {
   const shortcutItems: ContactShortcutListItem[] = [
     {
       key: "new-friends",
+      anchorId: "contacts-shortcut-new-friends",
       label: t(msg`新的朋友`),
       subtitle:
         pendingRequestCount > 0
@@ -1141,6 +1165,7 @@ export function ContactsPage() {
     },
     {
       key: "group-chat",
+      anchorId: "contacts-shortcut-group-chat",
       label: t(msg`群聊`),
       subtitle:
         groupCount > 0 ? t(msg`${groupCount} 个群聊`) : t(msg`查看全部群聊`),
@@ -1165,6 +1190,7 @@ export function ContactsPage() {
     },
     {
       key: "official-accounts",
+      anchorId: "contacts-shortcut-official-accounts",
       label: t(msg`公众号`),
       subtitle: t(msg`查看已上线的内容账号`),
       active: desktopSelection?.kind === "official-accounts",
@@ -1186,6 +1212,7 @@ export function ContactsPage() {
     },
     {
       key: "world-characters",
+      anchorId: "contacts-shortcut-world-characters",
       label: t(msg`世界角色`),
       subtitle: isDesktopLayout
         ? showWorldCharacters
