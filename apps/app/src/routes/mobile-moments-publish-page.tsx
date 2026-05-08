@@ -2,20 +2,17 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { ArrowLeft, ImagePlus, Video } from "lucide-react";
+import { ChevronRight, Play, Plus, X } from "lucide-react";
 import { translateRuntimeMessage } from "@yinjie/i18n";
-import { AppPage, Button, InlineNotice, TextAreaField, cn } from "@yinjie/ui";
-import { MomentComposeMediaPreview } from "../components/moment-compose-media-preview";
-import { RouteRedirectState } from "../components/route-redirect-state";
+import { AppPage, InlineNotice, cn } from "@yinjie/ui";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
+import { RouteRedirectState } from "../components/route-redirect-state";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { storeMomentPublishFlash } from "../features/moments/moment-publish-flash";
 import {
   buildDesktopMomentsRouteHash,
 } from "../features/moments/moments-route-state";
-import {
-  parseMobileMomentsPublishRouteState,
-} from "../features/moments/mobile-moments-publish-route-state";
+import { parseMobileMomentsPublishRouteState } from "../features/moments/mobile-moments-publish-route-state";
 import {
   publishMomentComposeDraft,
   useMomentComposeDraft,
@@ -44,11 +41,12 @@ export function MobileMomentsPublishPage() {
       ? routeState.returnPath
       : undefined;
   const safeReturnHash = safeReturnPath ? routeState.returnHash : undefined;
-  const statusBackLabel = safeReturnPath ? t(msg`返回上一页`) : t(msg`返回朋友圈`);
   const resetComposeDraft = composeDraft.reset;
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
   const [discardConfirmOpen, setDiscardConfirmOpen] = useState(false);
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+  const [toast, setToast] = useState<string>("");
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -77,10 +75,7 @@ export function MobileMomentsPublishPage() {
   }, [baseUrl, resetComposeDraft]);
 
   useEffect(() => {
-    if (!isDesktopLayout) {
-      return;
-    }
-
+    if (!isDesktopLayout) return;
     void navigate({
       to: "/tabs/moments",
       hash:
@@ -92,6 +87,12 @@ export function MobileMomentsPublishPage() {
     });
   }, [isDesktopLayout, navigate, safeReturnHash, safeReturnPath]);
 
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(""), 1600);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
   function performBack() {
     navigateBackOrFallback(() => {
       if (safeReturnPath) {
@@ -101,7 +102,6 @@ export function MobileMomentsPublishPage() {
         });
         return;
       }
-
       void navigate({ to: "/discover/moments" });
     });
   }
@@ -150,34 +150,43 @@ export function MobileMomentsPublishPage() {
     );
   }
 
+  const canSubmit = composeDraft.hasContent && !createMutation.isPending;
+  const errorMessage =
+    composeDraft.mediaError ??
+    (createMutation.isError && createMutation.error instanceof Error
+      ? createMutation.error.message
+      : null);
+
+  const imageCount = composeDraft.imageDrafts.length;
+  const showAddTile =
+    !composeDraft.videoDraft && imageCount < 9 && composeDraft.canAddImages;
+  const showVideoSlot = Boolean(composeDraft.videoDraft);
+  const showImageGrid = imageCount > 0;
+
   return (
-    <AppPage className="space-y-0 bg-[#f2f2f2] px-0 py-0">
+    <AppPage className="space-y-0 bg-[#F7F7F7] px-0 py-0">
       <TabPageTopBar
-        title={t(msg`发表朋友圈`)}
-        titleAlign="center"
-        className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.96)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
+        title=""
+        className="mx-0 mb-0 mt-0 border-b border-[#ECECEC] bg-[#F7F7F7] px-3 pb-1.5 pt-1.5 text-[#1A1A1A] shadow-none"
         leftActions={
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-black/[0.05]"
             onClick={handleBack}
-            aria-label={t(msg`返回朋友圈`)}
+            className="h-9 px-2 text-[15px] text-[#1A1A1A] active:opacity-70"
           >
-            <ArrowLeft size={17} />
-          </Button>
+            {t(msg`取消`)}
+          </button>
         }
         rightActions={
           <button
             type="button"
             onClick={() => createMutation.mutate()}
-            disabled={!composeDraft.hasContent || createMutation.isPending}
+            disabled={!canSubmit}
             className={cn(
-              "h-9 rounded-full px-3 text-[15px] font-medium transition",
-              composeDraft.hasContent && !createMutation.isPending
-                ? "bg-[#07c160] text-white active:opacity-90"
-                : "text-[color:var(--text-dim)]",
+              "h-7 rounded-[3px] px-3 text-[14px] font-medium transition",
+              canSubmit
+                ? "bg-[#07C160] text-white active:bg-[#06AD56]"
+                : "bg-[#9DD9B0] text-white",
             )}
           >
             {createMutation.isPending ? t(msg`发表中`) : t(msg`发表`)}
@@ -185,110 +194,175 @@ export function MobileMomentsPublishPage() {
         }
       />
 
-      <div className="space-y-3 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+1.25rem)] pt-3">
-        {composeDraft.mediaError ||
-        (createMutation.isError && createMutation.error instanceof Error) ? (
-          <InlineNotice
-            tone="info"
-            className="rounded-[16px] border border-[color:var(--border-faint)] bg-white px-3 py-2 text-[12px] shadow-none"
-          >
-            <div className="flex items-center justify-between gap-2">
-              <span className="min-w-0 flex-1">
-                {composeDraft.mediaError ??
-                  (createMutation.error instanceof Error
-                    ? createMutation.error.message
-                    : "")}
-              </span>
-              <button
-                type="button"
-                onClick={handleBack}
-                className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
-              >
-                {statusBackLabel}
-              </button>
-            </div>
-          </InlineNotice>
+      <div className="flex-1 overflow-y-auto">
+        {errorMessage ? (
+          <div className="px-4 pt-3">
+            <InlineNotice
+              tone="info"
+              className="rounded-[8px] border border-[#ECECEC] bg-white px-3 py-2 text-[12px] shadow-none"
+            >
+              {errorMessage}
+            </InlineNotice>
+          </div>
         ) : null}
 
-        <section className="overflow-hidden rounded-[24px] border border-[rgba(0,0,0,0.05)] bg-white shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
-          <div className="border-b border-[rgba(15,23,42,0.06)] px-4 py-3">
-            <div className="text-[14px] font-medium text-[color:var(--text-primary)]">
-              {t(msg`这一刻`)}
+        <section className="bg-white px-4 pt-4">
+          <textarea
+            value={composeDraft.text}
+            onChange={(event) => composeDraft.setText(event.target.value)}
+            placeholder={t(msg`这一刻的想法...`)}
+            rows={4}
+            className="block w-full resize-none border-0 bg-transparent text-[17px] leading-[26px] text-[#1A1A1A] outline-none placeholder:text-[#B0B0B0]"
+            autoFocus
+          />
+
+          {showImageGrid || showVideoSlot || showAddTile ? (
+            <div
+              className="mt-3 grid"
+              style={{
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: "4px",
+              }}
+            >
+              {composeDraft.imageDrafts.map((draft) => (
+                <div
+                  key={draft.id}
+                  className="relative overflow-hidden bg-[#EAEAEA]"
+                  style={{ aspectRatio: "1 / 1" }}
+                >
+                  <img
+                    src={draft.previewUrl}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => composeDraft.removeImageDraft(draft.id)}
+                    aria-label={t(msg`移除图片`)}
+                    className="absolute right-1 top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-black/45 text-white"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+
+              {showVideoSlot && composeDraft.videoDraft ? (
+                <div
+                  className="relative overflow-hidden bg-black"
+                  style={{ aspectRatio: "1 / 1" }}
+                >
+                  {composeDraft.videoDraft.posterPreviewUrl ? (
+                    <img
+                      src={composeDraft.videoDraft.posterPreviewUrl}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <video
+                      src={composeDraft.videoDraft.previewUrl}
+                      muted
+                      playsInline
+                      className="h-full w-full object-cover"
+                    />
+                  )}
+                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white">
+                      <Play size={16} className="translate-x-[1px] fill-current" />
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => composeDraft.clearVideoDraft()}
+                    aria-label={t(msg`移除视频`)}
+                    className="absolute right-1 top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-black/45 text-white"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ) : null}
+
+              {showAddTile && !showVideoSlot ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (imageCount === 0) {
+                      setMediaPickerOpen(true);
+                    } else {
+                      imageInputRef.current?.click();
+                    }
+                  }}
+                  className="flex items-center justify-center bg-[#F7F7F7] text-[#B0B0B0] active:bg-[#EFEFEF]"
+                  style={{ aspectRatio: "1 / 1" }}
+                  aria-label={t(msg`添加图片`)}
+                >
+                  <Plus size={28} strokeWidth={1.4} />
+                </button>
+              ) : null}
             </div>
-            <div className="mt-1 text-[11px] leading-5 text-[color:var(--text-muted)]">
-              {t(msg`会同步到朋友圈时间线，适合发日常照片、短视频和临时心情。`)}
-            </div>
-          </div>
-
-          <div className="px-4 pb-4 pt-3">
-            <TextAreaField
-              value={composeDraft.text}
-              onChange={(event) => composeDraft.setText(event.target.value)}
-              placeholder={t(msg`这一刻的想法...`)}
-              className="min-h-[11rem] resize-none rounded-[18px] border-0 bg-[color:var(--surface-console)] px-4 py-3.5 text-[16px] leading-7 shadow-none"
-              autoFocus
-            />
-
-            {composeDraft.imageDrafts.length > 0 || composeDraft.videoDraft ? (
-              <div className="mt-3">
-                <MomentComposeMediaPreview
-                  imageDrafts={composeDraft.imageDrafts}
-                  videoDraft={composeDraft.videoDraft}
-                  onRemoveImage={(id) => composeDraft.removeImageDraft(id)}
-                  onRemoveVideo={() => composeDraft.clearVideoDraft()}
-                  variant="mobile"
-                />
-              </div>
-            ) : null}
-
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <Button
+          ) : (
+            <div className="mt-3">
+              <button
                 type="button"
-                variant="secondary"
-                size="sm"
-                disabled={
-                  !composeDraft.canAddImages || createMutation.isPending
-                }
-                className="h-9 rounded-full border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 text-[11px]"
-                onClick={() => imageInputRef.current?.click()}
+                onClick={() => setMediaPickerOpen(true)}
+                className="flex h-[110px] w-[110px] items-center justify-center bg-[#F2F2F2] text-[#B0B0B0] active:bg-[#EAEAEA]"
+                aria-label={t(msg`添加图片`)}
               >
-                <ImagePlus size={14} className="mr-1" />
-                {t(msg`添加图片`)}
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                disabled={!composeDraft.canAddVideo || createMutation.isPending}
-                className="h-9 rounded-full border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 text-[11px]"
-                onClick={() => videoInputRef.current?.click()}
-              >
-                <Video size={14} className="mr-1" />
-                {composeDraft.videoDraft ? t(msg`更换视频`) : t(msg`添加视频`)}
-              </Button>
+                <Plus size={32} strokeWidth={1.4} />
+              </button>
             </div>
-          </div>
+          )}
+
+          <div className="h-3" />
         </section>
 
-        <section className="overflow-hidden rounded-[24px] border border-[rgba(0,0,0,0.05)] bg-white shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
-          <div className="flex items-center justify-between px-4 py-3">
-            <div>
-              <div className="text-[13px] font-medium text-[color:var(--text-primary)]">
-                {t(msg`谁可以看`)}
-              </div>
-              <div className="mt-1 text-[11px] text-[color:var(--text-muted)]">
-                {t(msg`当前发布到朋友圈`)}
-              </div>
-            </div>
-            <span className="rounded-full bg-[rgba(47,122,63,0.12)] px-3 py-1 text-[11px] font-medium text-[#2f7a3f]">
-              {t(msg`朋友`)}
-            </span>
-          </div>
-          <div className="border-t border-[rgba(15,23,42,0.06)] px-4 py-3 text-[11px] leading-5 text-[color:var(--text-muted)]">
-            {t(msg`图片最多 9 张，视频当前支持 1 条且不超过 5 分钟，暂不支持图片和视频混发。`)}
-          </div>
+        <section className="mt-2 bg-white">
+          <SettingRow
+            label={t(msg`所在位置`)}
+            value={t(msg`不显示位置`)}
+            onTap={() => setToast(t(msg`敬请期待`))}
+          />
+          <SettingRow
+            label={t(msg`提醒谁看`)}
+            value=""
+            onTap={() => setToast(t(msg`敬请期待`))}
+          />
+          <SettingRow
+            label={t(msg`谁可以看`)}
+            value={t(msg`公开`)}
+            onTap={() => setToast(t(msg`敬请期待`))}
+            isLast
+          />
         </section>
+
+        <div className="px-4 pt-3 text-[11px] leading-5 text-[#9A9A9A]">
+          {t(msg`图片最多 9 张，视频当前支持 1 条且不超过 5 分钟，暂不支持图片和视频混发。`)}
+        </div>
+
+        <div className="h-[calc(env(safe-area-inset-bottom,0px)+24px)]" />
       </div>
+
+      {mediaPickerOpen ? (
+        <MediaPickerSheet
+          onPickImages={() => {
+            setMediaPickerOpen(false);
+            imageInputRef.current?.click();
+          }}
+          onPickVideo={() => {
+            setMediaPickerOpen(false);
+            videoInputRef.current?.click();
+          }}
+          onClose={() => setMediaPickerOpen(false)}
+          videoDisabled={!composeDraft.canAddVideo}
+        />
+      ) : null}
+
+      {toast ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+96px)] z-[1100] flex justify-center">
+          <div className="rounded-[6px] bg-black/72 px-3 py-1.5 text-[13px] text-white">
+            {toast}
+          </div>
+        </div>
+      ) : null}
 
       {discardConfirmOpen ? (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]">
@@ -298,27 +372,27 @@ export function MobileMomentsPublishPage() {
             onClick={() => setDiscardConfirmOpen(false)}
             className="absolute inset-0"
           />
-          <div className="relative w-[min(320px,calc(100vw-2rem))] overflow-hidden rounded-[18px] bg-white shadow-[var(--shadow-overlay)]">
+          <div className="relative w-[min(320px,calc(100vw-2rem))] overflow-hidden rounded-[12px] bg-white shadow-[var(--shadow-overlay)]">
             <div className="px-6 pb-3 pt-6 text-center">
-              <div className="text-[16px] font-medium text-[color:var(--text-primary)]">
+              <div className="text-[16px] font-medium text-[#1A1A1A]">
                 {t(msg`放弃发表`)}
               </div>
-              <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-muted)]">
+              <div className="mt-2 text-[13px] leading-6 text-[#9A9A9A]">
                 {t(msg`返回会丢失已编辑的文字与媒体，确定不发布吗？`)}
               </div>
             </div>
-            <div className="grid grid-cols-2 border-t border-[color:var(--border-faint)]">
+            <div className="grid grid-cols-2 border-t border-[#ECECEC]">
               <button
                 type="button"
                 onClick={() => setDiscardConfirmOpen(false)}
-                className="border-r border-[color:var(--border-faint)] py-3 text-[15px] text-[color:var(--text-secondary)] active:bg-black/[0.04]"
+                className="border-r border-[#ECECEC] py-3 text-[15px] text-[#576B95] active:bg-black/[0.04]"
               >
                 {t(msg`继续编辑`)}
               </button>
               <button
                 type="button"
                 onClick={handleConfirmDiscard}
-                className="py-3 text-[15px] font-medium text-[#fa5151] active:bg-black/[0.04]"
+                className="py-3 text-[15px] font-medium text-[#FA5151] active:bg-black/[0.04]"
               >
                 {t(msg`放弃`)}
               </button>
@@ -349,5 +423,84 @@ export function MobileMomentsPublishPage() {
         }}
       />
     </AppPage>
+  );
+}
+
+function SettingRow({
+  label,
+  value,
+  onTap,
+  isLast,
+}: {
+  label: string;
+  value: string;
+  onTap: () => void;
+  isLast?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onTap}
+      className={cn(
+        "flex w-full items-center justify-between gap-3 px-4 py-3 text-left active:bg-[#F2F2F2]",
+        isLast ? "" : "border-b border-[#ECECEC]",
+      )}
+    >
+      <span className="text-[15px] text-[#1A1A1A]">{label}</span>
+      <span className="flex items-center gap-1 text-[14px] text-[#9A9A9A]">
+        {value ? <span>{value}</span> : null}
+        <ChevronRight size={16} className="text-[#C5C5C5]" />
+      </span>
+    </button>
+  );
+}
+
+function MediaPickerSheet({
+  onPickImages,
+  onPickVideo,
+  onClose,
+  videoDisabled,
+}: {
+  onPickImages: () => void;
+  onPickVideo: () => void;
+  onClose: () => void;
+  videoDisabled?: boolean;
+}) {
+  return (
+    <div className="fixed inset-0 z-[1200] flex items-end justify-center bg-black/40">
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute inset-0"
+        aria-label={t(msg`关闭`)}
+      />
+      <div className="relative w-full max-w-[480px] rounded-t-[12px] bg-white pb-[calc(env(safe-area-inset-bottom,0px)+8px)]">
+        <button
+          type="button"
+          onClick={onPickImages}
+          className="block w-full border-b border-[#ECECEC] py-3.5 text-center text-[16px] text-[#1A1A1A] active:bg-[#F2F2F2]"
+        >
+          {t(msg`从相册选择图片`)}
+        </button>
+        <button
+          type="button"
+          onClick={onPickVideo}
+          disabled={videoDisabled}
+          className={cn(
+            "block w-full border-b border-[#ECECEC] py-3.5 text-center text-[16px] active:bg-[#F2F2F2]",
+            videoDisabled ? "text-[#B0B0B0]" : "text-[#1A1A1A]",
+          )}
+        >
+          {t(msg`选择视频`)}
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-2 block w-full bg-[#F7F7F7] py-3.5 text-center text-[16px] text-[#1A1A1A] active:bg-[#EFEFEF]"
+        >
+          {t(msg`取消`)}
+        </button>
+      </div>
+    </div>
   );
 }
