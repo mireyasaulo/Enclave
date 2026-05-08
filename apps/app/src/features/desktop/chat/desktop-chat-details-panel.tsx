@@ -658,8 +658,15 @@ function DirectChatDetailsPanel({
                 />
                 <DesktopContactProfileRow
                   label={t(msg`地区`)}
-                  value={friendship?.region?.trim() || t(msg`未设置`)}
-                  muted={!friendship?.region?.trim()}
+                  value={
+                    friendship?.region?.trim() ||
+                    targetCharacter?.region?.trim() ||
+                    t(msg`未设置`)
+                  }
+                  muted={
+                    !friendship?.region?.trim() &&
+                    !targetCharacter?.region?.trim()
+                  }
                 />
                 <DesktopContactProfileRow
                   label={t(msg`来源`)}

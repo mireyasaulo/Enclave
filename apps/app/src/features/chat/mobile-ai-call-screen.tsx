@@ -18,6 +18,7 @@ import {
   type VoiceCallTurnResult,
 } from "@yinjie/contracts";
 import { translateRuntimeMessage } from "@yinjie/i18n";
+import { translateCharacterActivity } from "../../lib/character-i18n";
 import {
   AppPage,
   Button,
@@ -371,7 +372,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
   const characterAvatar = characterQuery.data?.avatar || undefined;
   const characterStatus =
     characterQuery.data?.currentStatus?.trim() ||
-    characterQuery.data?.currentActivity?.trim() ||
+    translateCharacterActivity(t, characterQuery.data?.currentActivity) ||
     t(msg`在线`);
   const busy = activeCall.busy;
   const statusLabel = useMemo(() => {

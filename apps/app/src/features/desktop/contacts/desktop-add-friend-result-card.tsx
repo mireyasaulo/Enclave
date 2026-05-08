@@ -10,6 +10,11 @@ import type { Character, FriendListItem, FriendRequest } from "@yinjie/contracts
 import { Button, cn } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../../../components/avatar-chip";
+import {
+  translateCharacterActivity,
+  translateCharacterBio,
+  translateExpertDomains,
+} from "../../../lib/character-i18n";
 import { getFriendDisplayName } from "../../contacts/contact-utils";
 
 export type DesktopAddFriendRelationshipState =
@@ -47,13 +52,18 @@ export function DesktopAddFriendResultCard({
     : character.name;
   const signature =
     character.currentStatus?.trim() ||
-    character.bio?.trim() ||
+    translateCharacterBio(t, character.bio) ||
     t(msg`这个角色还没有签名。`);
   const relationshipSummary =
     displayName !== character.name
       ? t(msg`昵称：${character.name}`)
       : character.relationship?.trim() || t(msg`世界角色`);
   const expertDomains = character.expertDomains.slice(0, 4);
+  const translatedExpertDomains = translateExpertDomains(
+    t,
+    expertDomains,
+    "slash",
+  );
   const statusMetaDescriptor: {
     badge: MessageDescriptor;
     badgeClassName: string;
@@ -159,13 +169,14 @@ export function DesktopAddFriendResultCard({
         />
         <DesktopAddFriendDetailRow
           label={t(msg`当前活动`)}
-          value={character.currentActivity?.trim() || t(msg`暂无活动`)}
+          value={
+            translateCharacterActivity(t, character.currentActivity) ||
+            t(msg`暂无活动`)
+          }
         />
         <DesktopAddFriendDetailRow
           label={t(msg`擅长领域`)}
-          value={
-            expertDomains.length ? expertDomains.join(" / ") : t(msg`未设置`)
-          }
+          value={translatedExpertDomains || t(msg`未设置`)}
         />
         {friendship ? (
           <>

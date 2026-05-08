@@ -38,6 +38,7 @@ import {
   publishMomentComposeDraft,
   useMomentComposeDraft,
 } from "../features/moments/moment-compose-media";
+import { translateCharacterBio } from "../lib/character-i18n";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { formatTimestamp } from "../lib/format";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
@@ -198,7 +199,7 @@ export function FriendMomentsPage() {
     : character?.name || t(msg`角色朋友圈`);
   const signature =
     character?.currentStatus?.trim() ||
-    character?.bio?.trim() ||
+    translateCharacterBio(t, character?.bio) ||
     t(msg`这个角色还没有个性签名。`);
   const pendingLikeMomentId = likeMutation.isPending
     ? likeMutation.variables

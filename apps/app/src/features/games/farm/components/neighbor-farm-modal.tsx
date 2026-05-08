@@ -5,6 +5,7 @@ import type { FarmCropId, FarmPlot } from "@yinjie/contracts";
 
 const t = translateRuntimeMessage;
 import { FARM_CROP_CATALOG } from "@yinjie/contracts";
+import { translateExpertDomains } from "../../../../lib/character-i18n";
 import {
   useFarmNeighborDetail,
   useStealFromNeighbor,
@@ -94,7 +95,11 @@ export function NeighborFarmModal({
                   </div>
                   <div className="text-[11px] text-stone-500">
                     Lv.{detailQuery.data.level} · {t(msg`好感`)} {detailQuery.data.intimacyLevel} ·{" "}
-                    {detailQuery.data.expertDomains.slice(0, 2).join(" / ") || "—"}
+                    {translateExpertDomains(
+                      t,
+                      detailQuery.data.expertDomains.slice(0, 2),
+                      "slash",
+                    ) || "—"}
                   </div>
                 </div>
               </div>
