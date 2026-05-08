@@ -19,6 +19,7 @@ import {
 } from "../lib/cloud-console-i18n";
 import { ConsoleNoticeProvider, useConsoleNotice } from "./console-notice";
 import { ConsoleNoticeToast } from "./ui/console-notice-toast";
+import { NavSection } from "./ui/nav-section";
 
 const NAV_LINK =
   "block rounded-[20px] border border-transparent px-3.5 py-2.5 text-sm text-[color:var(--text-secondary)] transition-[background-color,border-color,color] duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:border-[color:var(--border-subtle)] hover:bg-[color:var(--surface-card)] hover:text-[color:var(--text-primary)]";
@@ -26,6 +27,42 @@ const NAV_LINK_ACTIVE =
   "block rounded-[20px] border border-[color:var(--border-brand)] bg-[color:var(--surface-card)] px-3.5 py-2.5 text-sm font-semibold text-[color:var(--text-primary)] shadow-[var(--shadow-soft)]";
 const SECRET_INPUT =
   "w-full rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-input)] px-3 py-2 text-sm text-[color:var(--text-primary)] placeholder-[color:var(--text-muted)] outline-none transition focus:border-[color:var(--border-brand)]";
+
+// i18n-ignore-start: section titles re-use the route-meta eyebrows already routed through `t(...)`.
+const NAV_GROUPS = [
+  {
+    key: "cloud",
+    title: "Cloud operations",
+    keys: ["dashboard", "worlds", "sessions"] as const,
+    collapsible: false,
+  },
+  {
+    key: "saas",
+    title: "SaaS operations",
+    keys: [
+      "users",
+      "plans",
+      "configs",
+      "invite-audit",
+      "feedbacks",
+      "telemetry",
+    ] as const,
+    collapsible: false,
+  },
+  {
+    key: "monetization",
+    title: "Cloud monetization",
+    keys: ["revenue-sharing"] as const,
+    collapsible: false,
+  },
+  {
+    key: "tools",
+    title: "Operational tools",
+    keys: ["jobs", "waiting-sync"] as const,
+    collapsible: true,
+  },
+] as const;
+// i18n-ignore-end
 
 type RouteMeta = {
   eyebrow: string;
@@ -512,16 +549,35 @@ function RootLayoutContent() {
           </div>
 
           <nav className="mt-4 flex-1 space-y-5 overflow-y-auto pr-1">
-            <section>
-              <div className="px-1 text-[10px] uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
-                {t("Navigation")}
-              </div>
-              <div className="mt-2 space-y-1">
-                {navItems.map((item) => (
-                  <div key={item.key}>{item.content}</div>
-                ))}
-              </div>
-            </section>
+            {NAV_GROUPS.map((group) => {
+              const groupItems = navItems.filter((item) =>
+                group.keys.includes(item.key),
+              );
+              if (!groupItems.length) {
+                return null;
+              }
+              return (
+                <NavSection
+                  key={group.key}
+                  title={t(group.title)}
+                  collapsible={group.collapsible}
+                  defaultOpen={
+                    group.collapsible
+                      ? groupItems.some(
+                          (item) =>
+                            (item.key === "jobs" && pathname === "/jobs") ||
+                            (item.key === "waiting-sync" &&
+                              pathname === "/waiting-sync"),
+                        )
+                      : true
+                  }
+                >
+                  {groupItems.map((item) => (
+                    <div key={item.key}>{item.content}</div>
+                  ))}
+                </NavSection>
+              );
+            })}
           </nav>
 
           <div className="mt-4 border-t border-[color:var(--border-faint)] pt-4">
