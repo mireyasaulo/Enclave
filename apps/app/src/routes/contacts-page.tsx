@@ -1582,6 +1582,11 @@ export function ContactsPage() {
                     to: "/group/new",
                     hash: buildCreateGroupRouteHash({
                       source: "group-contacts",
+                      returnPath: pathname,
+                      returnHash: buildDesktopContactsRouteHash({
+                        pane: "groups",
+                        showWorldCharacters,
+                      }),
                     }),
                   });
                 }}

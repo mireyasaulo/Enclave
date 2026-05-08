@@ -1,8 +1,15 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { AppError } from '../../common/app-error.exception';
-import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, In, MoreThan, Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import {
+  DataSource,
+  EntityManager,
+  FindOptionsWhere,
+  In,
+  MoreThan,
+  Repository,
+} from 'typeorm';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import { ConversationEntity } from './conversation.entity';
 import { GroupEntity } from './group.entity';
@@ -135,6 +142,8 @@ export class GroupService {
 
   constructor(
     private readonly ai: AiOrchestratorService,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
     @InjectRepository(ConversationEntity)
     private conversationRepo: Repository<ConversationEntity>,
     @InjectRepository(MessageEntity)
@@ -160,44 +169,72 @@ export class GroupService {
 
   async createGroup(dto: CreateGroupDto): Promise<Group> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
-    const group = this.groupRepo.create({
-      name: dto.name,
-      creatorId: owner.id,
-      creatorType: 'user',
-      isHidden: false,
-      lastReadAt: new Date(),
-      lastActivityAt: new Date(),
-    });
-    await this.groupRepo.save(group);
+    const memberIds = dedupeIds(dto.memberIds);
 
-    const ownerMember = this.memberRepo.create({
-      groupId: group.id,
-      memberId: owner.id,
-      memberType: 'user',
-      memberName: owner.username?.trim() || 'You',
-      memberAvatar: owner.avatar ?? undefined,
-      role: 'owner',
-    });
-    await this.memberRepo.save(ownerMember);
+    const characterProfiles = await Promise.all(
+      memberIds.map(async (memberId) => {
+        const character = await this.characters.findById(memberId);
+        if (!character) {
+          throw new AppError('CHARACTER_NOT_FOUND', {
+            status: HttpStatus.NOT_FOUND,
+            params: { id: memberId },
+            legacyMessage: `Character ${memberId} not found`,
+          });
+        }
+        return { memberId, character };
+      }),
+    );
 
-    for (const memberId of dto.memberIds) {
-      const member = this.memberRepo.create({
-        groupId: group.id,
-        memberId,
-        memberType: 'character',
-        role: 'member',
-      });
-      await this.memberRepo.save(member);
-    }
+    const { group, sharedMessageCount } = await this.dataSource.transaction(
+      async (manager) => {
+        const groupRepo = manager.getRepository(GroupEntity);
+        const memberRepo = manager.getRepository(GroupMemberEntity);
 
-    const sharedMessageCount = await this.copySharedConversationMessages(
-      group,
-      owner,
-      dto,
+        const groupEntity = groupRepo.create({
+          name: dto.name,
+          creatorId: owner.id,
+          creatorType: 'user',
+          isHidden: false,
+          lastReadAt: new Date(),
+          lastActivityAt: new Date(),
+        });
+        await groupRepo.save(groupEntity);
+
+        const memberEntities: GroupMemberEntity[] = [
+          memberRepo.create({
+            groupId: groupEntity.id,
+            memberId: owner.id,
+            memberType: 'user',
+            memberName: owner.username?.trim() || 'You',
+            memberAvatar: owner.avatar ?? undefined,
+            role: 'owner',
+          }),
+          ...characterProfiles.map(({ memberId, character }) =>
+            memberRepo.create({
+              groupId: groupEntity.id,
+              memberId,
+              memberType: 'character',
+              memberName: character.name,
+              memberAvatar: character.avatar ?? undefined,
+              role: 'member',
+            }),
+          ),
+        ];
+        await memberRepo.save(memberEntities);
+
+        const copied = await this.copySharedConversationMessages(
+          groupEntity,
+          owner,
+          dto,
+          manager,
+        );
+
+        return { group: groupEntity, sharedMessageCount: copied };
+      },
     );
 
     this.logger.log(
-      `Created group ${group.id} with ${dto.memberIds.length + 1} members and ${sharedMessageCount} shared messages`,
+      `Created group ${group.id} with ${memberIds.length + 1} members and ${sharedMessageCount} shared messages`,
     );
     return this.toGroup(group);
   }
@@ -1381,6 +1418,7 @@ export class GroupService {
       avatar?: string | null;
     },
     dto: CreateGroupDto,
+    manager?: EntityManager,
   ) {
     const sourceConversationId = dto.sourceConversationId?.trim();
     const sharedMessageIds = dedupeIds(dto.sharedMessageIds ?? []);
@@ -1388,7 +1426,20 @@ export class GroupService {
       return 0;
     }
 
-    const conversation = await this.conversationRepo.findOne({
+    const conversationRepo = manager
+      ? manager.getRepository(ConversationEntity)
+      : this.conversationRepo;
+    const conversationMessageRepo = manager
+      ? manager.getRepository(MessageEntity)
+      : this.conversationMessageRepo;
+    const messageRepo = manager
+      ? manager.getRepository(GroupMessageEntity)
+      : this.messageRepo;
+    const groupRepo = manager
+      ? manager.getRepository(GroupEntity)
+      : this.groupRepo;
+
+    const conversation = await conversationRepo.findOne({
       where: {
         id: sourceConversationId,
         ownerId: owner.id,
@@ -1403,7 +1454,7 @@ export class GroupService {
       });
     }
 
-    const sourceMessages = await this.conversationMessageRepo.find({
+    const sourceMessages = await conversationMessageRepo.find({
       where: {
         conversationId: sourceConversationId,
         id: In(sharedMessageIds),
@@ -1426,8 +1477,8 @@ export class GroupService {
       (await this.characters.findById(conversation.participants[0] ?? ''))
         ?.name ?? conversation.title;
 
-    await this.messageRepo.save(
-      this.messageRepo.create({
+    const messagesToSave: GroupMessageEntity[] = [
+      messageRepo.create({
         groupId: group.id,
         senderId: 'system',
         senderType: 'system',
@@ -1438,11 +1489,8 @@ export class GroupService {
           selectedMessages.length,
         ),
       }),
-    );
-
-    for (const sourceMessage of selectedMessages) {
-      await this.messageRepo.save(
-        this.messageRepo.create({
+      ...selectedMessages.map((sourceMessage) =>
+        messageRepo.create({
           groupId: group.id,
           senderId: sourceMessage.senderId,
           senderType: sourceMessage.senderType,
@@ -1452,11 +1500,13 @@ export class GroupService {
           attachmentKind: sourceMessage.attachmentKind ?? null,
           attachmentPayload: sourceMessage.attachmentPayload ?? null,
         }),
-      );
-    }
+      ),
+    ];
+
+    await messageRepo.save(messagesToSave);
 
     group.lastActivityAt = new Date();
-    await this.groupRepo.save(group);
+    await groupRepo.save(group);
     await this.emitGroupConversationUpdated(group.id);
     return selectedMessages.length;
   }
