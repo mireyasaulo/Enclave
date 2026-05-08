@@ -202,9 +202,29 @@ export function AppLocaleProvider({
 
     // 其它 locale catalog 主要用于即时语言切换。这一发预下载在公网慢网环境
     // 下有 ~330KB gzipped 的额外带宽（zh-CN / en-US / ja-JP / ko-KR 三个），
-    // 直接跟用户首屏后立刻发起的交互请求抢带宽。改 requestIdleCallback +
-    // 长超时（30s）：浏览器空闲且没在跟用户交互时再开始下，没空闲就放弃，
-    // 真正用户切换语言时仍会即时拉，最多多等一次 catalog 下载。
+    // 直接跟用户首屏后立刻发起的交互请求抢带宽。多重防线：
+    //   1) Network Information API 报 slow-2g/2g/3g 或 saveData=true → 完全跳过
+    //   2) 否则 requestIdleCallback({ timeout: 30s }) 等浏览器空闲再发
+    //   3) 都没有就 fallback 5s 后开始
+    type ConnectionInfo = {
+      effectiveType?: "slow-2g" | "2g" | "3g" | "4g";
+      saveData?: boolean;
+    };
+    type NavigatorWithConnection = Navigator & { connection?: ConnectionInfo };
+    if (typeof navigator !== "undefined") {
+      const conn = (navigator as NavigatorWithConnection).connection;
+      if (conn?.saveData === true) {
+        return; // Save-Data 用户明确要省流量
+      }
+      if (
+        conn?.effectiveType === "slow-2g" ||
+        conn?.effectiveType === "2g" ||
+        conn?.effectiveType === "3g"
+      ) {
+        return; // 慢网下不预热
+      }
+    }
+
     type IdleScheduler = {
       requestIdleCallback: (
         cb: () => void,
