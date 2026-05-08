@@ -390,6 +390,32 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`资源不存在。`);
     case "CHAT_ATTACHMENT_REQUIRED":
       return translateRuntimeMessage(msg`请先选择一个附件。`);
+    case "CHAT_STICKER_FILE_REQUIRED":
+      return translateRuntimeMessage(msg`请先选择一个表情文件。`);
+    case "CHAT_THREAD_TYPE_INVALID":
+      return translateRuntimeMessage(msg`缺少合法的 threadType。`);
+    case "CHAT_THREAD_OR_MESSAGE_REQUIRED":
+      return translateRuntimeMessage(msg`缺少 threadId 或 messageId。`);
+    case "CHAT_CONVERSATION_ID_REQUIRED":
+      return translateRuntimeMessage(msg`缺少 conversationId。`);
+    case "CHAT_RENDER_STATUS_INVALID":
+      return translateRuntimeMessage(msg`缺少合法的 renderStatus。`);
+    case "CHAT_STATUS_INVALID":
+      return translateRuntimeMessage(msg`status 非法。`);
+    case "CHAT_DIGITAL_HUMAN_AUTH_FAILED":
+      return translateRuntimeMessage(msg`数字人 provider 回调鉴权失败。`);
+    case "CHAT_REVOKE_OWN_ONLY":
+      return translateRuntimeMessage(msg`只能撤回自己发送的消息。`);
+    case "CHAT_ATTACHMENT_NOT_FOUND":
+      return translateRuntimeMessage(msg`附件不存在。`);
+    case "CHAT_PROFILE_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`角色档案不存在：${String(params.characterId ?? "")}`,
+      );
+    case "CHAT_ATTACHMENT_PAYLOAD_INVALID":
+      return translateRuntimeMessage(msg`附件 payload 无效。`);
+    case "CHAT_MESSAGE_TEXT_REQUIRED":
+      return translateRuntimeMessage(msg`消息文本不能为空。`);
     case "VALIDATION_FAILED":
       return translateRuntimeMessage(msg`提交的数据无效，请检查后重试。`);
     case "INTERNAL_ERROR":
