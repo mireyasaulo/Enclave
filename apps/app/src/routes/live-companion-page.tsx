@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import {
   generateChannelPost,
   getFeed,
   getSystemStatus,
   type FeedPostListItem,
 } from "@yinjie/contracts";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   BadgeCheck,
   Clapperboard,
@@ -27,6 +27,8 @@ import {
   TextField,
   cn,
 } from "@yinjie/ui";
+
+type Translator = ReturnType<typeof useRuntimeTranslator>;
 import { AvatarChip } from "../components/avatar-chip";
 import { DesktopLayoutRequiredState } from "../components/desktop-layout-required-state";
 import { EmptyState } from "../components/empty-state";
@@ -51,9 +53,6 @@ import { formatTimestamp } from "../lib/format";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
-// Module-level translator used inside helpers that aren't React components.
-const t = translateRuntimeMessage;
-
 function areLiveDraftsEqual(left: LiveDraft, right: LiveDraft) {
   return JSON.stringify(left) === JSON.stringify(right);
 }
@@ -66,6 +65,7 @@ function areLiveHistoriesEqual(
 }
 
 export function LiveCompanionPage() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
@@ -200,6 +200,7 @@ export function LiveCompanionPage() {
       },
     ],
     [
+      t,
       draft.title,
       recentPosts.length,
       statusQuery.data?.coreApi.healthy,
@@ -290,7 +291,10 @@ export function LiveCompanionPage() {
                     : t(msg`暂无记录`)
                 }
               />
-              <MetricCard label={t(msg`操作者`)} value={ownerName ?? t(msg`世界主人`)} />
+              <MetricCard
+                label={t(msg`操作者`)}
+                value={ownerName ?? t(msg`世界主人`)}
+              />
 
               <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-section)]">
                 <div className="text-xs font-medium text-[color:var(--text-muted)]">
@@ -590,9 +594,11 @@ export function LiveCompanionPage() {
                 ) : (
                   <div className="space-y-3">
                     <StatusRow
-                      label="Core API" // i18n-ignore-line
+                      label={t(msg`Core API`)}
                       value={
-                        statusQuery.data?.coreApi.healthy ? t(msg`在线`) : t(msg`异常`)
+                        statusQuery.data?.coreApi.healthy
+                          ? t(msg`在线`)
+                          : t(msg`异常`)
                       }
                     />
                     <StatusRow
@@ -655,12 +661,13 @@ export function LiveCompanionPage() {
                       setDraft((current) => ({
                         ...current,
                         title:
-                          current.title.trim() || t(msg`${post.authorName} 主题直播`),
+                          current.title.trim() ||
+                          t(msg`${post.authorName} 主题直播`),
                         topic:
-                          current.topic.trim() || createTopicFromPost(post),
+                          current.topic.trim() || createTopicFromPost(t, post),
                         coverHook:
                           current.coverHook.trim() ||
-                          createCoverHookFromPost(post),
+                          createCoverHookFromPost(t, post),
                         referencePostAuthorName: post.authorName,
                         referencePostId: post.id,
                       }));
@@ -729,7 +736,9 @@ export function LiveCompanionPage() {
                             : "bg-[rgba(7,193,96,0.07)] text-[color:var(--brand-primary)]",
                         )}
                       >
-                        {item.status === "live" ? t(msg`直播中`) : t(msg`已结束`)}
+                        {item.status === "live"
+                          ? t(msg`直播中`)
+                          : t(msg`已结束`)}
                       </span>
                     </div>
                     <div className="mt-2 text-xs leading-5 text-[color:var(--text-secondary)]">
@@ -737,8 +746,8 @@ export function LiveCompanionPage() {
                     </div>
                     <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-[color:var(--text-muted)]">
                       <span>{t(msg`开播 ${formatTimestamp(item.startedAt)}`)}</span>
-                      <span>{t(msg`模式 ${resolveModeLabel(item.mode)}`)}</span>
-                      <span>{t(msg`质量 ${resolveQualityLabel(item.quality)}`)}</span>
+                      <span>{t(msg`模式 ${resolveModeLabel(t, item.mode)}`)}</span>
+                      <span>{t(msg`质量 ${resolveQualityLabel(t, item.quality)}`)}</span>
                       {item.endedAt ? (
                         <span>{t(msg`下播 ${formatTimestamp(item.endedAt)}`)}</span>
                       ) : null}
@@ -767,7 +776,7 @@ export function LiveCompanionPage() {
                 ))
               ) : (
                 <div className="rounded-[18px] border border-dashed border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 text-sm leading-7 text-[color:var(--text-secondary)]">
-                  {t(msg`还没有直播记录。先准备一场直播并切到“直播中”，这里就会开始积累桌面伴侣历史。`)}
+                  {t(msg`还没有直播记录。先准备一场直播并切到"直播中"，这里就会开始积累桌面伴侣历史。`)}
                 </div>
               )}
             </div>
@@ -837,6 +846,7 @@ function ToggleCard({
   label: string;
   onChange: (checked: boolean) => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <button
       type="button"
@@ -877,6 +887,7 @@ function PostReferenceCard({
   onUse: () => void;
   post: FeedPostListItem;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-4">
       <div className="flex items-start gap-3">
@@ -933,15 +944,17 @@ function MetricCard({ label, value }: { label: string; value: string }) {
   );
 }
 
-function createTopicFromPost(post: FeedPostListItem) {
-  return post.text.trim().slice(0, 24) || t(msg`${post.authorName} 的视频号内容`);
+function createTopicFromPost(t: Translator, post: FeedPostListItem) {
+  return (
+    post.text.trim().slice(0, 24) || t(msg`${post.authorName} 的视频号内容`)
+  );
 }
 
-function createCoverHookFromPost(post: FeedPostListItem) {
+function createCoverHookFromPost(t: Translator, post: FeedPostListItem) {
   return t(msg`从「${post.authorName}」这条视频号内容展开今晚的直播节奏`);
 }
 
-function resolveModeLabel(mode: LiveDraft["mode"]) {
+function resolveModeLabel(t: Translator, mode: LiveDraft["mode"]) {
   if (mode === "product") {
     return t(msg`产品讲解`);
   }
@@ -953,7 +966,7 @@ function resolveModeLabel(mode: LiveDraft["mode"]) {
   return t(msg`单人控台`);
 }
 
-function resolveQualityLabel(quality: LiveDraft["quality"]) {
+function resolveQualityLabel(t: Translator, quality: LiveDraft["quality"]) {
   if (quality === "standard") {
     return t(msg`标准`);
   }

@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { ArrowLeft, Search, Star, Tag } from "lucide-react";
 import { getFriends, type FriendListItem } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, cn } from "@yinjie/ui";
 import { AvatarChip } from "../components/avatar-chip";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -26,9 +26,8 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
-const t = translateRuntimeMessage;
-
 export function StarredFriendsPage() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
   const navigate = useNavigate();
   const hash = useRouterState({
@@ -72,6 +71,7 @@ export function StarredFriendsPage() {
 }
 
 function MobileStarredFriendsPage() {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
@@ -179,7 +179,9 @@ function MobileStarredFriendsPage() {
     void friendsQuery.refetch();
   }
 
-  const statusBackLabel = safeReturnPath ? t(msg`返回上一页`) : t(msg`查看联系人标签`);
+  const statusBackLabel = safeReturnPath
+    ? t(msg`返回上一页`)
+    : t(msg`查看联系人标签`);
 
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">

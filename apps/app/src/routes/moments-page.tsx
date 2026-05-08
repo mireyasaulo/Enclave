@@ -6,9 +6,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { ArrowLeft, Copy, Heart, PenSquare, Share2 } from "lucide-react";
 import {
   addMomentComment,
@@ -17,7 +17,7 @@ import {
   toggleMomentLike,
   type Moment,
 } from "@yinjie/contracts";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import { MomentMediaGallery } from "../components/moment-media-gallery";
 import { MomentCommentComposer } from "../components/moment-comment-composer";
@@ -52,8 +52,6 @@ import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
-const t = translateRuntimeMessage;
-
 const DesktopMomentsWorkspace = lazy(async () => {
   const mod =
     await import("../features/desktop/moments/desktop-moments-workspace");
@@ -66,6 +64,7 @@ const DesktopMessageAvatarPopover = lazy(async () => {
 });
 
 export function MomentsPage() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
   const navigate = useNavigate();
   const pathname = useRouterState({
@@ -307,7 +306,9 @@ export function MomentsPage() {
     normalizedPathname === desktopMomentsPath ||
     normalizedPathname === "/moments" ||
     normalizedPathname === "/discover/moments";
-  const interactionActionLabel = safeReturnPath ? t(msg`返回上一页`) : t(msg`重试读取`);
+  const interactionActionLabel = safeReturnPath
+    ? t(msg`返回上一页`)
+    : t(msg`重试读取`);
 
   function openMobileMomentsPublishPage() {
     void navigate({
@@ -379,7 +380,7 @@ export function MomentsPage() {
 
     setNoticeActionLabel(null);
     setNoticeAction(null);
-    setNotice(""); // i18n-ignore-line
+    setNotice("");
   }, [baseUrl, resetComposeDraft]);
 
   useEffect(() => {
@@ -435,7 +436,7 @@ export function MomentsPage() {
     }
 
     const timer = window.setTimeout(() => {
-      setNotice(""); // i18n-ignore-line
+      setNotice("");
       setNoticeActionLabel(null);
       setNoticeAction(null);
     }, 2400);
@@ -542,7 +543,9 @@ export function MomentsPage() {
       await composeDraft.addImageFiles(files);
     } catch (error) {
       composeDraft.setMediaError(
-        error instanceof Error ? error.message : t(msg`图片选择失败，请稍后重试。`),
+        error instanceof Error
+          ? error.message
+          : t(msg`图片选择失败，请稍后重试。`),
       );
     }
   }
@@ -552,7 +555,9 @@ export function MomentsPage() {
       await composeDraft.replaceVideoFile(file);
     } catch (error) {
       composeDraft.setMediaError(
-        error instanceof Error ? error.message : t(msg`视频选择失败，请稍后重试。`),
+        error instanceof Error
+          ? error.message
+          : t(msg`视频选择失败，请稍后重试。`),
       );
     }
   }
@@ -586,16 +591,15 @@ export function MomentsPage() {
       typeof window === "undefined"
         ? sharePath
         : `${window.location.origin}${sharePath}`;
-    const summaryText = `${moment.authorName}：${summaryBody}${
-      moment.location ? t(msg`\n位置：${moment.location}`) : ""
-    }\n${shareUrl}`;
+    const locationLine = moment.location
+      ? t(msg`\n位置：${moment.location}`)
+      : "";
+    const summaryText = `${moment.authorName}：${summaryBody}${locationLine}\n${shareUrl}`;
 
     if (nativeMobileShareSupported) {
       const shared = await shareWithNativeShell({
         title: t(msg`${moment.authorName} 的朋友圈`),
-        text: `${moment.authorName}：${summaryBody}${
-          moment.location ? t(msg`\n位置：${moment.location}`) : ""
-        }`,
+        text: `${moment.authorName}：${summaryBody}${locationLine}`,
         url: shareUrl,
       });
 
@@ -614,7 +618,9 @@ export function MomentsPage() {
       typeof navigator.clipboard.writeText !== "function"
     ) {
       setNoticeTone("info");
-      setNoticeActionLabel(nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`));
+      setNoticeActionLabel(
+        nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
+      );
       setNoticeAction(() => () => {
         void handleShareMoment(moment);
       });
@@ -638,7 +644,9 @@ export function MomentsPage() {
       );
     } catch {
       setNoticeTone("info");
-      setNoticeActionLabel(nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`));
+      setNoticeActionLabel(
+        nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
+      );
       setNoticeAction(() => () => {
         void handleShareMoment(moment);
       });
@@ -1049,14 +1057,7 @@ export function MomentsPage() {
                         );
                       return (
                         <Button
-                          disabled={
-                            likeMutation.isPending || !moment.canInteract
-                          }
-                          title={
-                            !moment.canInteract
-                              ? t(msg`加为好友后才能互动`)
-                              : undefined
-                          }
+                          disabled={likeMutation.isPending}
                           onClick={() => likeMutation.mutate(moment.id)}
                           variant="secondary"
                           size="sm"
@@ -1158,14 +1159,14 @@ export function MomentsPage() {
                                   {replyToName ? (
                                     <>
                                       <span className="text-[color:var(--text-secondary)]">
-                                        {t(msg` 回复 `)}
+                                        {" "}{t(msg`回复`)}{" "}
                                       </span>
                                       <span className="font-medium text-[#07c160]">
                                         {replyToName}
                                       </span>
                                     </>
                                   ) : null}
-                                  <span className="text-[color:var(--text-secondary)]">{t(msg`：`)}</span>
+                                  <span className="text-[color:var(--text-secondary)]">：</span>
                                   <span className="text-[color:var(--text-primary)]">{comment.text}</span>
                                 </button>
                               );
@@ -1180,7 +1181,7 @@ export function MomentsPage() {
                               </div>
                               {replyTargetComment ? (
                                 <div className="truncate text-[color:var(--text-muted)]">
-                                  {t(msg`「${replyTargetComment.text}」`)}
+                                  「{replyTargetComment.text}」
                                 </div>
                               ) : null}
                             </div>

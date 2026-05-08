@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
-
-const t = translateRuntimeMessage;
+import { msg } from "@lingui/macro";
 import {
   ArrowLeft,
   Clapperboard,
@@ -19,6 +16,7 @@ import {
   unfollowChannelAuthor,
   type FeedPostListItem,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppPage,
   Button,
@@ -26,6 +24,8 @@ import {
   LoadingBlock,
   cn,
 } from "@yinjie/ui";
+
+type Translator = ReturnType<typeof useRuntimeTranslator>;
 import { AvatarChip } from "../components/avatar-chip";
 import { EmptyState } from "../components/empty-state";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -44,6 +44,7 @@ const CHANNEL_AUTHOR_COLLECTION_STORAGE_KEY =
   "yinjie:channels:author-collections";
 
 export function ChannelAuthorPage() {
+  const t = useRuntimeTranslator();
   const { authorId } = useParams({ from: "/channels/authors/$authorId" });
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -96,7 +97,9 @@ export function ChannelAuthorPage() {
         : followChannelAuthor(authorId, baseUrl),
     onSuccess: async () => {
       setNotice({
-        message: profileQuery.data?.isFollowing ? t(msg`已取消关注。`) : t(msg`已关注该视频号作者。`),
+        message: profileQuery.data?.isFollowing
+          ? t(msg`已取消关注。`)
+          : t(msg`已关注该视频号作者。`),
         tone: "success",
       });
       await Promise.all([
@@ -237,7 +240,7 @@ export function ChannelAuthorPage() {
           matchesChannelAuthorCollection(post, tab.key),
         ).length,
       })),
-    [profile?.recentPosts],
+    [profile?.recentPosts, t],
   );
   const visiblePosts = useMemo(
     () =>
@@ -247,7 +250,8 @@ export function ChannelAuthorPage() {
     [activeCollection, profile?.recentPosts],
   );
   const activeCollectionLabel =
-    collectionTabs.find((tab) => tab.key === activeCollection)?.label ?? t(msg`全部`);
+    collectionTabs.find((tab) => tab.key === activeCollection)?.label ??
+    t(msg`全部`);
   const featuredLivePost = useMemo(
     () =>
       (profile?.recentPosts ?? []).find((post) => post.sourceKind === "live_clip") ??
@@ -349,7 +353,9 @@ export function ChannelAuthorPage() {
                       className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                       onClick={handleRetryFollow}
                     >
-                      {profileQuery.data.isFollowing ? t(msg`重试取消关注`) : t(msg`重试关注`)}
+                      {profileQuery.data.isFollowing
+                        ? t(msg`重试取消关注`)
+                        : t(msg`重试关注`)}
                     </Button>
                   ) : null}
                   <Button
@@ -386,7 +392,9 @@ export function ChannelAuthorPage() {
                       {profile.authorName}
                     </div>
                     <span className="rounded-full bg-[rgba(15,23,42,0.06)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
-                      {profile.authorType === "character" ? t(msg`居民作者`) : t(msg`世界主人`)}
+                      {profile.authorType === "character"
+                        ? t(msg`居民作者`)
+                        : t(msg`世界主人`)}
                     </span>
                   </div>
                   <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
@@ -458,10 +466,13 @@ export function ChannelAuthorPage() {
                     {t(msg`最近直播回放`)}
                   </div>
                   <div className="mt-3 line-clamp-1 text-[16px] font-semibold text-[color:var(--text-primary)]">
-                    {featuredLivePost.title?.trim() || t(msg`查看作者最近一次直播回放`)}
+                    {featuredLivePost.title?.trim() ||
+                      t(msg`查看作者最近一次直播回放`)}
                   </div>
                   <div className="mt-1 text-[12px] text-[color:var(--text-muted)]">
-                    {formatTimestamp(featuredLivePost.createdAt)} · {featuredLivePost.viewCount} {t(msg`播放`)}
+                    {t(
+                      msg`${formatTimestamp(featuredLivePost.createdAt)} · ${featuredLivePost.viewCount} 播放`,
+                    )}
                   </div>
                   <div className="mt-2 line-clamp-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
                     {featuredLivePost.text}
@@ -501,13 +512,15 @@ export function ChannelAuthorPage() {
               </div>
 
               <div className="bg-[color:var(--surface-console)] px-4 py-3 text-[12px] text-[color:var(--text-secondary)]">
-                {t(msg`当前分栏：`)}{activeCollectionLabel}{t(msg`，共 ${visiblePosts.length} 条内容。`)}
+                {t(
+                  msg`当前分栏：${activeCollectionLabel}，共 ${visiblePosts.length} 条内容。`,
+                )}
               </div>
 
               {visiblePosts.length ? (
                 <div className="divide-y divide-[color:var(--border-faint)] bg-white">
                   {visiblePosts.map((post) => {
-                    const postStatus = resolveChannelPostCardStatus(post);
+                    const postStatus = resolveChannelPostCardStatus(t, post);
 
                     return (
                       <button
@@ -563,11 +576,11 @@ export function ChannelAuthorPage() {
                           <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px] text-[color:var(--text-muted)]">
                             <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--surface-console)] px-2.5 py-1">
                               <PlaySquare size={12} />
-                              {post.viewCount} {t(msg`播放`)}
+                              {t(msg`${post.viewCount} 播放`)}
                             </span>
                             <span className="inline-flex items-center gap-1 rounded-full bg-[color:var(--surface-console)] px-2.5 py-1">
                               <MessageCircleMore size={12} />
-                              {post.commentCount} {t(msg`评论`)}
+                              {t(msg`${post.commentCount} 评论`)}
                             </span>
                           </div>
                         </div>
@@ -617,7 +630,8 @@ function ChannelAuthorHeaderStat({
 }
 
 function ChannelPostCover({ post }: { post: FeedPostListItem }) {
-  const coverPresentation = resolveChannelPostCoverPresentation(post);
+  const t = useRuntimeTranslator();
+  const coverPresentation = resolveChannelPostCoverPresentation(t, post);
 
   if (post.coverUrl?.trim()) {
     return (
@@ -703,7 +717,7 @@ function matchesChannelAuthorCollection(
   return post.mediaType !== "video";
 }
 
-function resolveChannelPostCoverPresentation(post: FeedPostListItem) {
+function resolveChannelPostCoverPresentation(t: Translator, post: FeedPostListItem) {
   if (post.sourceKind === "live_clip") {
     return {
       badgeClassName: "bg-[rgba(255,255,255,0.14)] text-white",
@@ -713,7 +727,9 @@ function resolveChannelPostCoverPresentation(post: FeedPostListItem) {
         "bg-[linear-gradient(180deg,rgba(120,24,24,0.82),rgba(120,24,24,0))]",
       panelClassName:
         "bg-[linear-gradient(180deg,#7f1d1d,#451a03)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
-      secondaryLabel: `${formatTimestamp(post.createdAt)} · ${post.viewCount} ${t(msg`播放`)}`,
+      secondaryLabel: t(
+        msg`${formatTimestamp(post.createdAt)} · ${post.viewCount} 播放`,
+      ),
       title: t(msg`直播精选`),
     };
   }
@@ -728,7 +744,9 @@ function resolveChannelPostCoverPresentation(post: FeedPostListItem) {
       panelClassName:
         "bg-[linear-gradient(180deg,#1f2937,#0f172a)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
       secondaryLabel: post.durationMs
-        ? t(msg`${Math.max(1, Math.round(post.durationMs / 1000))} 秒 · ${post.viewCount} 播放`)
+        ? t(
+            msg`${Math.max(1, Math.round(post.durationMs / 1000))} 秒 · ${post.viewCount} 播放`,
+          )
         : t(msg`${post.viewCount} 播放`),
       title: t(msg`视频号短片`),
     };
@@ -742,12 +760,12 @@ function resolveChannelPostCoverPresentation(post: FeedPostListItem) {
       "bg-[linear-gradient(180deg,rgba(22,101,52,0.72),rgba(22,101,52,0))]",
     panelClassName:
       "bg-[linear-gradient(180deg,#166534,#14532d)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]",
-    secondaryLabel: `${formatTimestamp(post.createdAt)} · ${t(msg`内容更新`)}`,
+    secondaryLabel: t(msg`${formatTimestamp(post.createdAt)} · 内容更新`),
     title: t(msg`内容卡片`),
   };
 }
 
-function resolveChannelPostCardStatus(post: FeedPostListItem) {
+function resolveChannelPostCardStatus(t: Translator, post: FeedPostListItem) {
   if (post.sourceKind === "live_clip") {
     return {
       label: t(msg`直播回放`),

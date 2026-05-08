@@ -7,9 +7,9 @@ import {
   useState,
   type Ref,
 } from "react";
-import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { Phone, Video } from "lucide-react";
 import {
   getConversations,
@@ -25,7 +25,7 @@ import {
   type TypingPayload,
   uploadChatAttachment,
 } from "@yinjie/contracts";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { track } from "@yinjie/analytics";
 import { ChatComposer } from "../../components/chat-composer";
@@ -90,8 +90,6 @@ import {
   type DesktopChatCallAction,
 } from "../desktop/chat/desktop-chat-route-state";
 
-const t = translateRuntimeMessage;
-
 type GroupChatThreadPanelProps = {
   groupId: string;
   variant?: "mobile" | "desktop";
@@ -133,6 +131,7 @@ export function GroupChatThreadPanel({
   routeMobileShortcutAction = null,
   onRouteMobileShortcutHandled,
 }: GroupChatThreadPanelProps) {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const hash = useRouterState({ select: (state) => state.location.hash });
   const queryClient = useQueryClient();
@@ -342,7 +341,7 @@ export function GroupChatThreadPanel({
     }
 
     return t(msg`${entries[0]?.name ?? t(msg`有人`)} 等 ${entries.length} 位角色正在回复...`);
-  }, [membersQuery.data, messages, typingStates]);
+  }, [membersQuery.data, messages, typingStates, t]);
 
   useEffect(() => {
     if (unreadSnapshotReady || !conversationsQuery.isFetched) {
@@ -588,7 +587,7 @@ export function GroupChatThreadPanel({
 
       return fallbackName?.trim() || t(msg`群成员`);
     },
-    [friendMap],
+    [friendMap, t],
   );
   const renderableMessages = useMemo(
     () =>
@@ -621,11 +620,12 @@ export function GroupChatThreadPanel({
     sendMutation.error instanceof Error ? sendMutation.error.message : null;
   const effectiveBackground = backgroundQuery.data?.effectiveBackground ?? null;
   const announcement = groupQuery.data?.announcement?.trim() ?? "";
-  const muteSuffix = groupQuery.data?.isMuted ? t(msg` · 免打扰`) : "";
   const mobileSubtitle = membersQuery.data
     ? typingSummary
       ? typingSummary
-      : t(msg`${membersQuery.data.length} 人群聊${muteSuffix}`)
+      : groupQuery.data?.isMuted
+        ? t(msg`${membersQuery.data.length} 人群聊 · 免打扰`)
+        : t(msg`${membersQuery.data.length} 人群聊`)
     : typingSummary
       ? typingSummary
       : groupQuery.data?.isMuted
@@ -971,18 +971,21 @@ export function GroupChatThreadPanel({
       seenIds.add(member.memberId);
       const rawName = member.memberName?.trim() || member.memberId;
       const displayName = resolveCharacterDisplayName(member.memberId, rawName);
-      const roleLabel = member.role === "admin" ? t(msg`管理员`) : t(msg`群成员`);
+      const roleLabel =
+        member.role === "admin" ? t(msg`管理员`) : t(msg`群成员`);
       candidates.push({
         id: member.memberId,
         name: displayName,
         subtitle:
-          displayName !== rawName ? t(msg`昵称：${rawName} · ${roleLabel}`) : roleLabel,
+          displayName !== rawName
+            ? t(msg`昵称：${rawName} · ${roleLabel}`)
+            : roleLabel,
         avatar: member.memberAvatar,
       });
     }
 
     return candidates;
-  }, [membersQuery.data, resolveCharacterDisplayName]);
+  }, [membersQuery.data, resolveCharacterDisplayName, t]);
 
   const handleReplyMessage = (
     message: ChatRenderableMessage,
@@ -994,7 +997,7 @@ export function GroupChatThreadPanel({
       message.senderType === "user"
         ? t(msg`我`)
         : message.senderName?.trim() || t(msg`群成员`);
-    const previewText = describeReplyPreview(message);
+    const previewText = describeReplyPreview(t, message);
     const quotedText = options?.quotedText?.trim();
     setReplyDraft({
       messageId: message.id,
@@ -1468,7 +1471,9 @@ export function GroupChatThreadPanel({
                 });
               }}
               onSelectionModeChange={setSelectionModeActive}
-              errorActionLabel={!isDesktop && onBack ? t(msg`返回上一页`) : undefined}
+              errorActionLabel={
+                !isDesktop && onBack ? t(msg`返回上一页`) : undefined
+              }
               onErrorAction={!isDesktop && onBack ? onBack : null}
               emptyState={
                 !isDesktop &&
@@ -1507,7 +1512,9 @@ export function GroupChatThreadPanel({
           variant={isDesktop ? "desktop" : "mobile"}
           pending={sendMutation.isPending}
           error={sendError}
-          errorActionLabel={!isDesktop && onBack ? t(msg`返回上一页`) : undefined}
+          errorActionLabel={
+            !isDesktop && onBack ? t(msg`返回上一页`) : undefined
+          }
           onErrorAction={!isDesktop && onBack ? onBack : null}
           speechInput={{
             baseUrl,
@@ -1617,7 +1624,10 @@ function MobileGroupThreadStatusCard({
   );
 }
 
-function describeReplyPreview(message: ChatRenderableMessage) {
+function describeReplyPreview(
+  t: ReturnType<typeof useRuntimeTranslator>,
+  message: ChatRenderableMessage,
+) {
   return (
     resolveMessageSemanticPreview(message, {
       maxChars: 120,

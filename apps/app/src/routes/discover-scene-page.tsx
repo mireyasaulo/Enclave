@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import {
   BookOpen,
   Coffee,
@@ -10,11 +10,13 @@ import {
   Trees,
 } from "lucide-react";
 import { triggerSceneFriendRequest } from "@yinjie/contracts";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   InlineNotice,
   cn,
 } from "@yinjie/ui";
+
+type MessageDescriptor = Parameters<ReturnType<typeof useRuntimeTranslator>>[0];
 import { MobileDiscoverToolShell } from "../components/mobile-discover-tool-shell";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import { parseMobileDiscoverToolRouteState } from "../features/discover/mobile-discover-tool-route-state";
@@ -22,36 +24,42 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
-const t = translateRuntimeMessage;
+type Scene = {
+  id: string;
+  label: MessageDescriptor;
+  description: MessageDescriptor;
+  icon: typeof Coffee;
+};
 
-const scenes = [
+const scenes: Scene[] = [
   {
     id: "coffee_shop",
-    label: t(msg`咖啡馆`),
-    description: t(msg`适合轻松开场和日常寒暄。`),
+    label: msg`咖啡馆`,
+    description: msg`适合轻松开场和日常寒暄。`,
     icon: Coffee,
   },
   {
     id: "gym",
-    label: t(msg`健身房`),
-    description: t(msg`更容易遇到直接一点的搭话。`),
+    label: msg`健身房`,
+    description: msg`更容易遇到直接一点的搭话。`,
     icon: Dumbbell,
   },
   {
     id: "library",
-    label: t(msg`图书馆`),
-    description: t(msg`偏安静，也更像慢热型相遇。`),
+    label: msg`图书馆`,
+    description: msg`偏安静，也更像慢热型相遇。`,
     icon: BookOpen,
   },
   {
     id: "park",
-    label: t(msg`公园`),
-    description: t(msg`随机性更强，气氛也更开放。`),
+    label: msg`公园`,
+    description: msg`随机性更强，气氛也更开放。`,
     icon: Trees,
   },
 ];
 
 export function DiscoverScenePage() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
   const navigate = useNavigate();
   const hash = useRouterState({
@@ -84,6 +92,7 @@ export function DiscoverScenePage() {
 }
 
 function MobileDiscoverScenePage() {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const hash = useRouterState({
     select: (state) => state.location.hash,
@@ -108,20 +117,25 @@ function MobileDiscoverScenePage() {
       return { request: result, scene };
     },
     onSuccess: ({ request, scene }) => {
-      const sceneLabel = scenes.find((item) => item.id === scene)?.label ?? scene;
+      const sceneEntry = scenes.find((item) => item.id === scene);
+      const sceneLabel = sceneEntry ? t(sceneEntry.label) : scene;
 
       if (!request) {
         setMessage(t(msg`${sceneLabel} 里暂时没有新的相遇。`));
         return;
       }
 
-      setMessage(t(msg`${request.characterName} 在${sceneLabel}里注意到了你：${request.greeting ?? t(msg`对你产生了兴趣。`)}`));
+      setMessage(
+        t(
+          msg`${request.characterName} 在${sceneLabel}里注意到了你：${request.greeting ?? t(msg`对你产生了兴趣。`)}`,
+        ),
+      );
       void queryClient.invalidateQueries({ queryKey: ["app-friend-requests", baseUrl] });
     },
   });
 
   useEffect(() => {
-    setMessage(""); // i18n-ignore-line
+    setMessage("");
   }, [baseUrl]);
 
   function navigateToRouteStateReturn() {
@@ -198,10 +212,12 @@ function MobileDiscoverScenePage() {
                   <Icon size={18} />
                 </div>
                 <div className="mt-3 text-[15px] font-medium text-[#111827]">
-                  {busy ? t(msg`正在前往${scene.label}...`) : scene.label}
+                  {busy
+                    ? t(msg`正在前往${t(scene.label)}...`)
+                    : t(scene.label)}
                 </div>
                 <div className="mt-1 text-[12px] leading-5 text-[#8c8c8c]">
-                  {scene.description}
+                  {t(scene.description)}
                 </div>
               </button>
             );

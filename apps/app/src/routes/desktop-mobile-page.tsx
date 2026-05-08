@@ -880,7 +880,7 @@ export function DesktopMobilePage() {
   }
 
   return (
-    <div className="relative isolate flex h-full min-h-0 flex-1">
+    <div className="relative flex h-full min-h-0 flex-1">
     <DesktopUtilityShell
       title={t(msg`手机接力`)}
       subtitle={t(msg`把桌面内容带到移动端继续处理。`)}

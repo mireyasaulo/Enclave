@@ -7,11 +7,11 @@ import {
   type ComponentProps,
   type ReactNode,
 } from "react";
-import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { getGroup, getGroupMembers, sendGroupMessage } from "@yinjie/contracts";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import {
   ArrowLeft,
@@ -45,13 +45,12 @@ import {
 import { parseMobileGroupCallRouteHash } from "./mobile-group-call-route-state";
 import { buildChatCallReturnSearch } from "./chat-compose-shortcut-route";
 
-const t = translateRuntimeMessage;
-
 type MobileGroupCallScreenProps = {
   mode: "voice" | "video";
 };
 
 export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
+  const t = useRuntimeTranslator();
   const { groupId } = useParams({
     strict: false,
   }) as {
@@ -70,7 +69,8 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
     [hash],
   );
   const effectiveSource = routeState?.source ?? "mobile";
-  const sourceLabel = effectiveSource === "desktop" ? t(msg`桌面端`) : t(msg`手机端`);
+  const sourceLabel =
+    effectiveSource === "desktop" ? t(msg`桌面端`) : t(msg`手机端`);
   const desktopThreadPath = useMemo(
     () =>
       buildDesktopChatThreadPath({
@@ -176,7 +176,8 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
   const totalCount = members.length;
   const waitingCount = Math.max(totalCount - activeCount, 0);
   const groupName = groupQuery.data?.name ?? t(msg`群聊`);
-  const callTitle = mode === "voice" ? t(msg`群语音通话`) : t(msg`群视频通话`);
+  const callTitle =
+    mode === "voice" ? t(msg`群语音通话`) : t(msg`群视频通话`);
   const statusTitle = formatGroupCallStatusLabel(mode, "ongoing");
   const hasSyncedStatus =
     lastPublishedCounts?.activeCount === activeCount &&
@@ -703,7 +704,9 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-[20px] font-medium text-[color:var(--text-primary)]">
-                    {mode === "video" ? t(msg`桌面端请从聊天页继续发起群视频`) : t(msg`桌面端请从聊天页继续发起群语音`)}
+                    {mode === "video"
+                      ? t(msg`桌面端请从聊天页继续发起群视频`)
+                      : t(msg`桌面端请从聊天页继续发起群语音`)}
                   </div>
                   <div className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
                     {t(msg`当前独立路由主要保留给手机端通话流程。桌面端已经改为在群聊消息页内打开通话工作台，这样成员调度、聊天记录和侧栏信息会保持在同一窗口里。`)}
@@ -725,7 +728,9 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
                     {t(msg`通话类型`)}
                   </div>
                   <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
-                    {mode === "video" ? t(msg`群视频通话`) : t(msg`群语音通话`)}
+                    {mode === "video"
+                      ? t(msg`群视频通话`)
+                      : t(msg`群语音通话`)}
                   </div>
                 </div>
                 <div className="rounded-[12px] border border-black/6 bg-[#fafafa] px-4 py-4">
@@ -797,7 +802,9 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
             </div>
           </div>
           <MobileCallMetaChip tone="success">
-            {effectiveSource === "desktop" ? t(msg`沿用桌面来源`) : t(msg`手机端发起`)}
+            {effectiveSource === "desktop"
+              ? t(msg`沿用桌面来源`)
+              : t(msg`手机端发起`)}
           </MobileCallMetaChip>
         </div>
       </header>
@@ -877,7 +884,7 @@ export function MobileGroupCallScreen({ mode }: MobileGroupCallScreenProps) {
         <div className="mt-3.5 space-y-2.5">
           {showWorkspacePrimer ? (
             <MobileCallNotice tone="info">
-              {t(msg`首次进入可先点下方成员席位切换“已加入/待加入”，再点“同步最新状态”把在线人数回写到群聊卡片。`)}
+              {t(msg`首次进入可先点下方成员席位切换"已加入/待加入"，再点"同步最新状态"把在线人数回写到群聊卡片。`)}
             </MobileCallNotice>
           ) : null}
           {showResumeHint ? (

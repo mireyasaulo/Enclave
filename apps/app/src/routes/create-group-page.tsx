@@ -7,17 +7,19 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { ArrowLeft, Check, Search, X } from "lucide-react";
 import {
   createGroup,
   getFriends,
   type FriendListItem,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
+
+type Translator = ReturnType<typeof useRuntimeTranslator>;
 import { AvatarChip } from "../components/avatar-chip";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import {
@@ -39,8 +41,6 @@ import { parseCreateGroupRouteHash } from "../lib/create-group-route-state";
 import { isDesktopOnlyPath } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
-const t = translateRuntimeMessage;
-
 const DesktopCreateGroupDialog = lazy(async () => {
   const mod =
     await import("../features/desktop/chat/desktop-create-group-dialog");
@@ -48,6 +48,7 @@ const DesktopCreateGroupDialog = lazy(async () => {
 });
 
 export function CreateGroupPage() {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const isDesktopLayout = useDesktopLayout();
   const hash = useRouterState({ select: (state) => state.location.hash });
@@ -97,8 +98,8 @@ export function CreateGroupPage() {
     [selectedFriendMap, selectedIds],
   );
   const defaultGroupName = useMemo(
-    () => buildDefaultGroupName(selectedFriends),
-    [selectedFriends],
+    () => buildDefaultGroupName(t, selectedFriends),
+    [t, selectedFriends],
   );
 
   const createMutation = useMutation({
@@ -360,7 +361,9 @@ export function CreateGroupPage() {
                 {t(msg`已选联系人`)}
               </div>
               <div className="text-[12px] text-[color:var(--text-muted)]">
-                {selectedIds.length ? t(msg`${selectedIds.length} 人`) : t(msg`未选择`)}
+                {selectedIds.length
+                  ? t(msg`${selectedIds.length} 人`)
+                  : t(msg`未选择`)}
               </div>
             </div>
 
@@ -581,6 +584,7 @@ function FriendSelectionRow({
   withDivider?: boolean;
   onClick: () => void;
 }) {
+  const t = useRuntimeTranslator();
   const isDesktop = variant === "desktop";
 
   return (
@@ -634,6 +638,7 @@ function FriendSelectionRow({
 }
 
 function buildDefaultGroupName(
+  t: Translator,
   items: Array<Pick<FriendListItem, "friendship" | "character">>,
 ) {
   const names = items

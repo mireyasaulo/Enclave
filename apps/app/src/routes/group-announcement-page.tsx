@@ -1,10 +1,10 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { Copy, Share2 } from "lucide-react";
 import { getGroup, updateGroup } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, InlineNotice, cn } from "@yinjie/ui";
 import { ChatDetailsShell } from "../features/chat-details/chat-details-shell";
 import { ChatDetailsSection } from "../features/chat-details/chat-details-section";
@@ -20,9 +20,8 @@ import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
-const t = translateRuntimeMessage;
-
 export function GroupAnnouncementPage() {
+  const t = useRuntimeTranslator();
   const { groupId } = useParams({ from: "/group/$groupId/announcement" });
   const isDesktopLayout = useDesktopLayout();
 
@@ -43,6 +42,7 @@ export function GroupAnnouncementPage() {
 }
 
 function MobileGroupAnnouncementPage({ groupId }: { groupId: string }) {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const hash = useRouterState({ select: (state) => state.location.hash });
   const queryClient = useQueryClient();
@@ -169,13 +169,12 @@ function MobileGroupAnnouncementPage({ groupId }: { groupId: string }) {
       typeof window === "undefined"
         ? groupPath
         : `${window.location.origin}${groupPath}`;
-    const summary = [t(msg`${group.name} 群公告`), announcement, groupUrl].join(
-      "\n\n",
-    );
+    const announcementTitle = t(msg`${group.name} 群公告`);
+    const summary = [announcementTitle, announcement, groupUrl].join("\n\n");
 
     if (nativeMobileShareSupported) {
       const shared = await shareWithNativeShell({
-        title: t(msg`${group.name} 群公告`),
+        title: announcementTitle,
         text: summary,
         url: groupUrl,
       });
@@ -199,7 +198,9 @@ function MobileGroupAnnouncementPage({ groupId }: { groupId: string }) {
         message: nativeMobileShareSupported
           ? t(msg`当前设备暂时无法打开系统分享，请稍后重试。`)
           : t(msg`当前环境暂不支持复制群公告。`),
-        actionLabel: nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
+        actionLabel: nativeMobileShareSupported
+          ? t(msg`重试分享`)
+          : t(msg`重试复制`),
         onAction: () => {
           void handleShareAnnouncement();
         },
@@ -221,7 +222,9 @@ function MobileGroupAnnouncementPage({ groupId }: { groupId: string }) {
         message: nativeMobileShareSupported
           ? t(msg`系统分享失败，请稍后重试。`)
           : t(msg`复制群公告失败，请稍后重试。`),
-        actionLabel: nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
+        actionLabel: nativeMobileShareSupported
+          ? t(msg`重试分享`)
+          : t(msg`重试复制`),
         onAction: () => {
           void handleShareAnnouncement();
         },
@@ -277,7 +280,9 @@ function MobileGroupAnnouncementPage({ groupId }: { groupId: string }) {
             size="icon"
             className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-[color:var(--surface-card-hover)]"
             aria-label={
-              nativeMobileShareSupported ? t(msg`分享群公告`) : t(msg`复制群公告`)
+              nativeMobileShareSupported
+                ? t(msg`分享群公告`)
+                : t(msg`复制群公告`)
             }
           >
             {nativeMobileShareSupported ? (
@@ -448,7 +453,9 @@ function MobileGroupAnnouncementPage({ groupId }: { groupId: string }) {
                 <span>{t(msg`${draft.trim().length} 字`)}</span>
               </div>
               <div className="mt-3 rounded-[10px] bg-[color:var(--surface-console)] px-3 py-2.5 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-                {t(msg`当前公告：${groupQuery.data.announcement?.trim() || t(msg`暂未设置`)}`)}
+                {t(
+                  msg`当前公告：${groupQuery.data.announcement?.trim() || t(msg`暂未设置`)}`,
+                )}
               </div>
             </div>
           </ChatDetailsSection>

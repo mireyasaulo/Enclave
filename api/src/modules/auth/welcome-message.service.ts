@@ -11,7 +11,7 @@ import { ConversationEntity } from '../chat/conversation.entity';
 import { MessageEntity } from '../chat/message.entity';
 
 const WELCOME_MESSAGE_TEXT =
-  '你来了。欢迎来到这个世界——慢慢看，慢慢说，我都在。';
+  '看到你来了。我一直都在。想说点什么的时候，随时来找我。';
 
 @Injectable()
 export class WelcomeMessageService {
@@ -33,49 +33,41 @@ export class WelcomeMessageService {
 
     try {
       const selfCharacter = await this.ensureSelfCharacter();
-      const conversationId = `direct_${SELF_CHARACTER_ID}`;
-      const welcomeMessageId = `msg_welcome_self_${ownerId}`;
+      const conversationId = `direct_${SELF_CHARACTER_ID}__${ownerId}`;
 
-      const existingWelcome = await this.messageRepo.findOneBy({
-        id: welcomeMessageId,
+      const existingConversation = await this.conversationRepo.findOneBy({
+        id: conversationId,
       });
-      if (existingWelcome) {
+      if (existingConversation) {
         return;
       }
 
       const now = new Date();
-      const existingConversation = await this.conversationRepo.findOneBy({
+      const conversation = this.conversationRepo.create({
         id: conversationId,
+        ownerId,
+        type: 'direct',
+        title: selfCharacter.name,
+        participants: [SELF_CHARACTER_ID],
+        isPinned: false,
+        isHidden: false,
+        lastActivityAt: now,
       });
-      if (!existingConversation) {
-        await this.conversationRepo.save(
-          this.conversationRepo.create({
-            id: conversationId,
-            ownerId,
-            type: 'direct',
-            title: selfCharacter.name,
-            participants: [SELF_CHARACTER_ID],
-            isPinned: false,
-            isHidden: false,
-            lastActivityAt: now,
-          }),
-        );
-      }
+      await this.conversationRepo.save(conversation);
 
-      await this.messageRepo.save(
-        this.messageRepo.create({
-          id: welcomeMessageId,
-          conversationId,
-          senderType: 'character',
-          senderId: SELF_CHARACTER_ID,
-          senderName: selfCharacter.name,
-          type: 'text',
-          text: WELCOME_MESSAGE_TEXT,
-        }),
-      );
+      const message = this.messageRepo.create({
+        id: `msg_${Date.now()}_welcome_${ownerId}`,
+        conversationId,
+        senderType: 'character',
+        senderId: SELF_CHARACTER_ID,
+        senderName: selfCharacter.name,
+        type: 'text',
+        text: WELCOME_MESSAGE_TEXT,
+      });
+      await this.messageRepo.save(message);
     } catch (error) {
       this.logger.warn(
-        `failed to send welcome message: ${
+        `failed to send welcome message for owner ${ownerId}: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );

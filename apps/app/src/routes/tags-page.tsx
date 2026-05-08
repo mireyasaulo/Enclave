@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { ArrowLeft, Search, Star, Tag } from "lucide-react";
 import { getFriends } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, cn } from "@yinjie/ui";
 import { AvatarChip } from "../components/avatar-chip";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -24,9 +24,8 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
-const t = translateRuntimeMessage;
-
 export function TagsPage() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
   const navigate = useNavigate();
   const hash = useRouterState({
@@ -69,6 +68,7 @@ export function TagsPage() {
 }
 
 function MobileTagsPage() {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
@@ -164,7 +164,9 @@ function MobileTagsPage() {
     void friendsQuery.refetch();
   }
 
-  const statusBackLabel = safeReturnPath ? t(msg`返回上一页`) : t(msg`查看星标朋友`);
+  const statusBackLabel = safeReturnPath
+    ? t(msg`返回上一页`)
+    : t(msg`查看星标朋友`);
 
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
@@ -267,7 +269,11 @@ function MobileTagsPage() {
           <div className="px-4 pt-4">
             <MobileTagStatusCard
               badge={hasSearchText ? t(msg`暂无结果`) : t(msg`标签`)}
-              title={hasSearchText ? t(msg`没有找到匹配的标签`) : t(msg`还没有联系人标签`)}
+              title={
+                hasSearchText
+                  ? t(msg`没有找到匹配的标签`)
+                  : t(msg`还没有联系人标签`)
+              }
               description={
                 hasSearchText
                   ? t(msg`换个标签名或联系人名称试试。`)

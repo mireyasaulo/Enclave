@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { Compass, Sparkles } from "lucide-react";
 import { keepShakeSession, shake } from "@yinjie/contracts";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   Button,
   InlineNotice,
@@ -16,9 +16,8 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
-const t = translateRuntimeMessage;
-
 export function DiscoverEncounterPage() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
   const navigate = useNavigate();
   const hash = useRouterState({
@@ -51,6 +50,7 @@ export function DiscoverEncounterPage() {
 }
 
 function MobileDiscoverEncounterPage() {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const hash = useRouterState({
     select: (state) => state.location.hash,
@@ -94,7 +94,7 @@ function MobileDiscoverEncounterPage() {
   });
 
   useEffect(() => {
-    setMessage(""); // i18n-ignore-line
+    setMessage("");
   }, [baseUrl]);
 
   function navigateToRouteStateReturn() {
@@ -144,8 +144,7 @@ function MobileDiscoverEncounterPage() {
         message ? (
           <InlineNotice
             className="rounded-[11px] px-2.5 py-1.5 text-[11px] leading-[1.35rem] shadow-none"
-            // i18n-ignore-next-line: substring detection on message content (not user-facing copy)
-            tone={message.includes("好友申请") ? "success" : "info"}
+            tone={message.includes(t(msg`好友申请`)) ? "success" : "info"}
           >
             {message}
           </InlineNotice>

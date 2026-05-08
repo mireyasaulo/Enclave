@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { msg } from "@lingui/macro";
 import { MessageCircleMore } from "lucide-react";
 import {
   updateFriendProfile,
@@ -9,9 +8,10 @@ import {
   type FriendListItem,
   type UpdateFriendProfileRequest,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock, InlineNotice } from "@yinjie/ui";
 import { SparkBadge } from "../../components/spark-badge";
-import { buildYinjieId } from "../../lib/yinjie-id";
+import { formatTimestamp } from "../../lib/format";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
 import { DesktopContactTextEditDialog } from "./desktop-contact-text-edit-dialog";
 import {
@@ -24,8 +24,6 @@ import {
   DesktopContactProfileToggleRow,
 } from "./desktop-contact-profile-blocks";
 
-const t = translateRuntimeMessage;
-
 type ContactDetailPaneProps = {
   character?: Character | null;
   friendship?: FriendListItem["friendship"] | null;
@@ -36,6 +34,7 @@ type ContactDetailPaneProps = {
   onOpenGroup?: (groupId: string) => void;
   onOpenMoments?: () => void;
   onOpenProfile: () => void;
+  showProfileEntry?: boolean;
   onStartChat?: () => void;
   chatPending?: boolean;
   isPinned?: boolean;
@@ -68,6 +67,7 @@ export function ContactDetailPane({
   onOpenGroup,
   onOpenMoments,
   onOpenProfile,
+  showProfileEntry = true,
   onStartChat,
   chatPending = false,
   isPinned = false,
@@ -85,6 +85,7 @@ export function ContactDetailPane({
   deletePending = false,
   onDeleteFriend,
 }: ContactDetailPaneProps) {
+  const t = useRuntimeTranslator();
   const queryClient = useQueryClient();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
@@ -112,7 +113,7 @@ export function ContactDetailPane({
   const updateProfileMutation = useMutation({
     mutationFn: async (payload: UpdateFriendProfileRequest) => {
       if (!character || !friendship) {
-        throw new Error("Friend not found"); // i18n-ignore-line
+        throw new Error("Friend not found");
       }
 
       return updateFriendProfile(character.id, payload, baseUrl);
@@ -130,7 +131,7 @@ export function ContactDetailPane({
   const isFriend = Boolean(friendship);
   const remarkName = friendship?.remarkName?.trim() || "";
   const displayName = remarkName || character.name;
-  const identifier = buildYinjieId(character.id);
+  const identifier = `yinjie_${character.id.slice(0, 8)}`;
   const relationshipSummary = remarkName
     ? t(msg`昵称：${character.name}`)
     : isFriend
@@ -139,8 +140,12 @@ export function ContactDetailPane({
   const signature =
     character.currentStatus?.trim() ||
     character.bio?.trim() ||
-    (isFriend ? t(msg`这个联系人还没有签名。`) : t(msg`这个角色还没有签名。`));
-  const tagValue = friendship?.tags?.length ? friendship.tags.join("、") : t(msg`未设置`);
+    (isFriend
+      ? t(msg`这个联系人还没有签名。`)
+      : t(msg`这个角色还没有签名。`));
+  const tagValue = friendship?.tags?.length
+    ? friendship.tags.join("、")
+    : t(msg`未设置`);
   const currentEditDialog =
     editingField === "remarkName"
       ? {
@@ -187,9 +192,7 @@ export function ContactDetailPane({
         name={character.name}
         displayName={displayName}
         subline={relationshipSummary}
-        tagline={
-          character.currentStatus?.trim() || character.bio?.trim() || undefined
-        }
+        identifier={identifier}
         action={
           isFriend && onStartChat ? (
             <Button
@@ -215,7 +218,9 @@ export function ContactDetailPane({
         }
       />
 
-      <DesktopContactProfileSection title={isFriend ? t(msg`朋友信息`) : t(msg`角色信息`)}>
+      <DesktopContactProfileSection
+        title={isFriend ? t(msg`朋友信息`) : t(msg`角色信息`)}
+      >
         {profileNotice ? (
           <div className="px-6 pb-2">
             <InlineNotice tone="success">{profileNotice}</InlineNotice>
@@ -236,12 +241,7 @@ export function ContactDetailPane({
               valueMuted={!remarkName}
             />
             <DesktopContactProfileRow label={t(msg`昵称`)} value={character.name} />
-            <DesktopContactProfileRow
-              label={t(msg`个性签名`)}
-              value={signature}
-              multiline
-              muted={!character.currentStatus?.trim() && !character.bio?.trim()}
-            />
+            <DesktopContactProfileRow label={t(msg`隐界号`)} value={identifier} />
             <DesktopContactProfileRow
               label={t(msg`地区`)}
               value={friendship?.region?.trim() || t(msg`未设置`)}
@@ -258,20 +258,6 @@ export function ContactDetailPane({
               onClick={() => setEditingField("tags")}
               valueMuted={!friendship?.tags?.length}
             />
-            {(friendship?.sparkStreak ?? 0) >= 3 ? (
-              <DesktopContactProfileRow
-                label={t(msg`火花`)}
-                value={
-                  <span className="inline-flex items-center gap-2">
-                    <SparkBadge streak={friendship?.sparkStreak} size="md" />
-                    <span className="text-[12px] text-[color:var(--text-muted)]">
-                      {t(msg`已连续 ${friendship?.sparkStreak ?? 0} 天互动`)}
-                    </span>
-                  </span>
-                }
-              />
-            ) : null}
-            <DesktopContactProfileRow label={t(msg`隐界号`)} value={identifier} />
           </>
         ) : (
           <>
@@ -279,12 +265,6 @@ export function ContactDetailPane({
             <DesktopContactProfileRow
               label={t(msg`身份`)}
               value={character.relationship || t(msg`世界角色`)}
-            />
-            <DesktopContactProfileRow
-              label={t(msg`个性签名`)}
-              value={signature}
-              multiline
-              muted={!character.currentStatus?.trim() && !character.bio?.trim()}
             />
             <DesktopContactProfileRow label={t(msg`隐界号`)} value={identifier} />
           </>
@@ -294,14 +274,22 @@ export function ContactDetailPane({
       <DesktopContactProfileSection title={t(msg`社交与内容`)}>
         <DesktopContactProfileActionRow
           label={t(msg`朋友圈`)}
-          value={onOpenMoments ? t(msg`查看这位角色最近的朋友圈`) : t(msg`暂时没有朋友圈`)}
-          onClick={onOpenMoments}
-          disabled={!onOpenMoments}
-          valueMuted={!onOpenMoments}
+          value={
+            onOpenMoments
+              ? t(msg`查看这位角色最近的朋友圈`)
+              : t(msg`查看角色资料`)
+          }
+          onClick={onOpenMoments ?? onOpenProfile}
+          disabled={!onOpenMoments && !onOpenProfile}
+          valueMuted={!onOpenMoments && !onOpenProfile}
         />
         <DesktopContactProfileActionRow
           label={t(msg`共同群聊`)}
-          value={commonGroups.length ? t(msg`${commonGroups.length} 个共同群聊`) : t(msg`暂时没有共同群聊`)}
+          value={
+            commonGroups.length
+              ? t(msg`${commonGroups.length} 个共同群聊`)
+              : t(msg`暂时没有共同群聊`)
+          }
           onClick={() => {
             if (commonGroups[0] && onOpenGroup) {
               onOpenGroup(commonGroups[0].id);
@@ -310,6 +298,45 @@ export function ContactDetailPane({
           disabled={!commonGroups.length || !onOpenGroup}
           valueMuted={!commonGroups.length}
         />
+        {showProfileEntry ? (
+          <DesktopContactProfileActionRow
+            label={t(msg`详细资料`)}
+            value={
+              isFriend ? t(msg`查看角色档案与扩展介绍`) : t(msg`查看角色资料`)
+            }
+            onClick={onOpenProfile}
+          />
+        ) : null}
+      </DesktopContactProfileSection>
+
+      <DesktopContactProfileSection title={t(msg`更多信息`)}>
+        <DesktopContactProfileRow
+          label={t(msg`个性签名`)}
+          value={signature}
+          multiline
+          muted={!character.currentStatus?.trim() && !character.bio?.trim()}
+        />
+        {isFriend ? (
+          <DesktopContactProfileRow
+            label={t(msg`最近互动`)}
+            value={formatTimestamp(
+              friendship?.lastInteractedAt ?? character.lastActiveAt ?? null,
+            )}
+          />
+        ) : null}
+        {isFriend && (friendship?.sparkStreak ?? 0) >= 3 ? (
+          <DesktopContactProfileRow
+            label={t(msg`火花`)}
+            value={
+              <span className="inline-flex items-center gap-2">
+                <SparkBadge streak={friendship?.sparkStreak} size="md" />
+                <span className="text-[12px] text-[color:var(--text-muted)]">
+                  {t(msg`已连续 ${friendship?.sparkStreak ?? 0} 天互动`)}
+                </span>
+              </span>
+            }
+          />
+        ) : null}
       </DesktopContactProfileSection>
 
       {isFriend ? (
@@ -354,13 +381,19 @@ export function ContactDetailPane({
             {onDeleteFriend ? (
               <DesktopContactProfileActionRow
                 label={t(msg`删除联系人`)}
-                value={deletePending ? t(msg`正在删除...`) : t(msg`从通讯录移除`)}
+                value={
+                  deletePending ? t(msg`正在删除...`) : t(msg`从通讯录移除`)
+                }
                 onClick={onDeleteFriend}
                 danger
                 disabled={deletePending}
               />
             ) : (
-              <DesktopContactProfileRow label={t(msg`删除联系人`)} value={t(msg`暂未开放`)} muted />
+              <DesktopContactProfileRow
+                label={t(msg`删除联系人`)}
+                value={t(msg`暂未开放`)}
+                muted
+              />
             )}
           </DesktopContactProfileSection>
         </>

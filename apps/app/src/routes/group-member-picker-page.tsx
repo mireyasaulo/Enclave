@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import {
   addGroupMember,
   getFriends,
@@ -10,6 +9,7 @@ import {
   getGroupMembers,
   removeGroupMember,
 } from "@yinjie/contracts";
+import { getActiveLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import { ArrowLeft, Check, Search, X } from "lucide-react";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 import { AvatarChip } from "../components/avatar-chip";
@@ -29,8 +29,6 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isMissingGroupError } from "../lib/group-route-fallback";
 import { isDesktopOnlyPath } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
-
-const t = translateRuntimeMessage;
 
 type GroupMemberPickerMode = "add" | "remove";
 
@@ -59,6 +57,7 @@ function GroupMemberPickerPage({
   groupId: string;
   mode: GroupMemberPickerMode;
 }) {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
 
   if (isDesktopLayout) {
@@ -67,14 +66,20 @@ function GroupMemberPickerPage({
         conversationId={groupId}
         panel="details"
         detailsAction={mode === "add" ? "member-add" : "member-remove"}
-        title={mode === "add" ? t(msg`正在打开桌面添加成员`) : t(msg`正在打开桌面移除成员`)}
+        title={
+          mode === "add"
+            ? t(msg`正在打开桌面添加成员`)
+            : t(msg`正在打开桌面移除成员`)
+        }
         description={
           mode === "add"
             ? t(msg`正在切换到桌面聊天工作区中的添加成员弹层。`)
             : t(msg`正在切换到桌面聊天工作区中的移除成员弹层。`)
         }
         loadingLabel={
-          mode === "add" ? t(msg`打开桌面添加成员...`) : t(msg`打开桌面移除成员...`)
+          mode === "add"
+            ? t(msg`打开桌面添加成员...`)
+            : t(msg`打开桌面移除成员...`)
         }
       />
     );
@@ -90,6 +95,7 @@ function MobileGroupMemberPickerPage({
   groupId: string;
   mode: GroupMemberPickerMode;
 }) {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const hash = useRouterState({ select: (state) => state.location.hash });
   const queryClient = useQueryClient();
@@ -190,7 +196,8 @@ function MobileGroupMemberPickerPage({
         const rawName = item.memberName?.trim() || item.memberId;
         const friend = friendMap.get(item.memberId);
         const displayName = friend ? getFriendDisplayName(friend) : rawName;
-        const roleLabel = item.role === "admin" ? t(msg`管理员`) : t(msg`群成员`);
+        const roleLabel =
+          item.role === "admin" ? t(msg`管理员`) : t(msg`群成员`);
 
         return {
           id: item.memberId,
@@ -203,8 +210,10 @@ function MobileGroupMemberPickerPage({
           indexLabel: t(msg`群成员`),
         };
       })
-      .sort((left, right) => left.name.localeCompare(right.name, "zh-CN")); // i18n-ignore-line
-  }, [friendMap, friendsQuery.data, memberIds, membersQuery.data, mode]);
+      .sort((left, right) =>
+        left.name.localeCompare(right.name, getActiveLocale()),
+      );
+  }, [friendMap, friendsQuery.data, memberIds, membersQuery.data, mode, t]);
 
   const filteredCandidateItems = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
@@ -236,7 +245,7 @@ function MobileGroupMemberPickerPage({
         value.toLowerCase().includes(normalizedKeyword),
       ),
     );
-  }, [allCandidateItems, friendsQuery.data, keyword, memberIds, mode]);
+  }, [allCandidateItems, friendsQuery.data, keyword, memberIds, mode, t]);
 
   const candidateSections = useMemo(() => {
     return buildContactSections(
@@ -314,7 +323,9 @@ function MobileGroupMemberPickerPage({
 
   const pageTitle = mode === "add" ? t(msg`添加成员`) : t(msg`移除成员`);
   const emptyStateTitle =
-    mode === "add" ? t(msg`没有可添加的联系人`) : t(msg`当前没有可移除的群成员`);
+    mode === "add"
+      ? t(msg`没有可添加的联系人`)
+      : t(msg`当前没有可移除的群成员`);
   const emptyStateDescription =
     mode === "add"
       ? t(msg`通讯录里的联系人已经都在群里了。`)
@@ -387,7 +398,9 @@ function MobileGroupMemberPickerPage({
                 {mode === "add" ? t(msg`已选联系人`) : t(msg`已选成员`)}
               </div>
               <div className="text-[12px] text-[color:var(--text-muted)]">
-                {selectedIds.length ? t(msg`${selectedIds.length} 人`) : t(msg`未选择`)}
+                {selectedIds.length
+                  ? t(msg`${selectedIds.length} 人`)
+                  : t(msg`未选择`)}
               </div>
             </div>
 
@@ -431,7 +444,9 @@ function MobileGroupMemberPickerPage({
               type="search"
               value={keyword}
               onChange={(event) => setKeyword(event.target.value)}
-              placeholder={mode === "add" ? t(msg`搜索联系人`) : t(msg`搜索群成员`)}
+              placeholder={
+                mode === "add" ? t(msg`搜索联系人`) : t(msg`搜索群成员`)
+              }
               className="min-w-0 flex-1 bg-transparent text-sm text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-dim)]"
             />
           </label>

@@ -7,11 +7,14 @@ import {
   type ReactNode,
 } from "react";
 import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { ArrowLeft, Search, UserPlus } from "lucide-react";
 import { getFriends, listCharacters } from "@yinjie/contracts";
+import {
+  translateRuntimeMessage,
+  useRuntimeTranslator,
+} from "@yinjie/i18n";
 import { AppPage, Button, cn } from "@yinjie/ui";
 import { AvatarChip } from "../components/avatar-chip";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -42,6 +45,7 @@ const DesktopContactsRouteRedirectShell = lazy(async () => {
 });
 
 export function WorldCharactersPage() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
   const hash = useRouterState({ select: (state) => state.location.hash });
   const desktopPaneState = useMemo(() => {
@@ -73,6 +77,7 @@ export function WorldCharactersPage() {
 }
 
 function MobileWorldCharactersPage() {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;

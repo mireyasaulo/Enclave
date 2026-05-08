@@ -230,6 +230,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
   const speechStatus = systemStatusQuery.data?.inferenceGateway;
   const digitalHumanGateway = systemStatusQuery.data?.digitalHumanGateway;
   const digitalHumanGatewayCopy = resolveDigitalHumanGatewayStatusCopy(
+    t,
     digitalHumanGateway,
   );
   const cameraPreviewMetaLabel = !cameraEnabled
@@ -458,9 +459,7 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
     }
 
     if (activeCall.playbackState === "playing") {
-      return isVideoMode
-        ? t(msg`等 TA 说完，再开始下一句。`)
-        : t(msg`等 TA 说完，再开始下一句。`);
+      return t(msg`等 TA 说完，再开始下一句。`);
     }
 
     if (isVideoMode && playbackSettling) {
@@ -946,13 +945,19 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
         {isDesktopLayout ? (
           <LoadingBlock
             label={
-              isVideoMode ? t(msg`正在连接数字人视频通话...`) : t(msg`正在连接语音通话...`)
+              isVideoMode
+                ? t(msg`正在连接数字人视频通话...`)
+                : t(msg`正在连接语音通话...`)
             }
           />
         ) : (
           <MobileCallStatusCard
             badge={t(msg`连接中`)}
-            title={isVideoMode ? t(msg`正在连接数字人视频通话`) : t(msg`正在连接语音通话`)}
+            title={
+              isVideoMode
+                ? t(msg`正在连接数字人视频通话`)
+                : t(msg`正在连接语音通话`)
+            }
             description={t(msg`稍等一下，正在同步会话信息并准备当前通话链路。`)}
             tone="loading"
           />
@@ -1084,7 +1089,11 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
         ) : (
           <MobileCallStatusCard
             badge={t(msg`通话`)}
-            title={isVideoMode ? t(msg`当前不能发起视频通话`) : t(msg`当前不能发起语音通话`)}
+            title={
+              isVideoMode
+                ? t(msg`当前不能发起视频通话`)
+                : t(msg`当前不能发起语音通话`)
+            }
             description={
               isVideoMode
                 ? t(msg`目前只支持在单聊里发起 AI 数字人视频通话。`)
@@ -1153,7 +1162,9 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-[20px] font-medium text-[color:var(--text-primary)]">
-                    {isVideoMode ? t(msg`桌面端请从聊天页继续发起视频通话`) : t(msg`桌面端请从聊天页继续发起语音通话`)}
+                    {isVideoMode
+                      ? t(msg`桌面端请从聊天页继续发起视频通话`)
+                      : t(msg`桌面端请从聊天页继续发起语音通话`)}
                   </div>
                   <div className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
                     {t(msg`当前独立路由主要保留给手机端通话流程。桌面端已经改为在聊天消息页内打开通话工作台，这样消息、侧栏信息和通话控制会保持在同一窗口里。`)}
@@ -1175,7 +1186,9 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                     {t(msg`通话类型`)}
                   </div>
                   <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
-                    {isVideoMode ? t(msg`AI 数字人视频通话`) : t(msg`AI 语音通话`)}
+                    {isVideoMode
+                      ? t(msg`AI 数字人视频通话`)
+                      : t(msg`AI 语音通话`)}
                   </div>
                 </div>
                 <div className="rounded-[12px] border border-black/6 bg-[#fafafa] px-4 py-4">
@@ -1275,7 +1288,9 @@ export function MobileAiCallScreen({ mode }: MobileAiCallScreenProps) {
                     : "default",
               ),
             )}
-            aria-label={activeCall.audioMuted ? t(msg`取消静音播放`) : t(msg`静音播放`)}
+            aria-label={
+              activeCall.audioMuted ? t(msg`取消静音播放`) : t(msg`静音播放`)
+            }
           >
             {activeCall.audioMuted ? (
               <VolumeX size={18} />

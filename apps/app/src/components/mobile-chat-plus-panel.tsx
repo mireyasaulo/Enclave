@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { msg } from "@lingui/macro";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { msg } from "@lingui/macro";
 import {
   getFavorites,
   getFriends,
   type ContactCardAttachment,
   type LocationCardAttachment,
 } from "@yinjie/contracts";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { useRuntimeTranslator } from "@yinjie/i18n";
+
+type MessageDescriptor = Parameters<ReturnType<typeof useRuntimeTranslator>>[0];
 import {
   Camera,
   ChevronLeft,
@@ -23,6 +25,8 @@ import {
   WalletCards,
 } from "lucide-react";
 import { LoadingBlock, cn } from "@yinjie/ui";
+
+type Translator = ReturnType<typeof useRuntimeTranslator>;
 import {
   CHAT_LOCATION_SCENES,
   buildLocationCardAttachment,
@@ -35,8 +39,6 @@ import {
 } from "../features/favorites/favorites-storage";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { AvatarChip } from "./avatar-chip";
-
-const t = translateRuntimeMessage;
 
 type MobileChatPlusPanelProps = {
   open: boolean;
@@ -78,103 +80,101 @@ type RootAction = {
     | "voice-call"
     | "file"
     | "favorite";
-  label: string;
+  label: MessageDescriptor;
   icon: typeof ImagePlus;
   iconClassName: string;
   disabled?: boolean;
-  disabledLabel?: string;
-  unavailableTitle?: string;
-  unavailableDescription?: string;
-  fallbackLabel?: string;
+  disabledLabel?: MessageDescriptor;
+  unavailableTitle?: MessageDescriptor;
+  unavailableDescription?: MessageDescriptor;
+  fallbackLabel?: MessageDescriptor;
   fallbackAction?: RootActionFallbackAction;
 };
 
 type RootActionFallbackAction = "voice-message" | "camera" | "album";
 
-function buildRootActions(): Record<RootAction["key"], RootAction> {
-  return {
-    album: {
-      key: "album",
-      label: t(msg`相册`),
-      icon: ImagePlus,
-      iconClassName: "bg-[#5bbd72]",
-    },
-    camera: {
-      key: "camera",
-      label: t(msg`拍摄`),
-      icon: Camera,
-      iconClassName: "bg-[#54a7ff]",
-    },
-    "video-call": {
-      key: "video-call",
-      label: t(msg`视频通话`),
-      icon: Video,
-      iconClassName: "bg-[#07c160]",
-      disabled: true,
-      disabledLabel: t(msg`待接入`),
-      unavailableTitle: t(msg`视频通话暂未接入`),
-      unavailableDescription: t(msg`视频通话功能开发中，敬请期待。`),
-      fallbackLabel: t(msg`改为拍摄`),
-      fallbackAction: "camera",
-    },
-    "red-packet": {
-      key: "red-packet",
-      label: t(msg`红包`),
-      icon: Gift,
-      iconClassName: "bg-[#ef6a62]",
-      disabled: true,
-      disabledLabel: t(msg`待接入`),
-      unavailableTitle: t(msg`红包暂未接入`),
-      unavailableDescription: t(msg`支付与到账链路还没接入，这里先保留和微信一致的能力入口。`),
-    },
-    transfer: {
-      key: "transfer",
-      label: t(msg`转账`),
-      icon: WalletCards,
-      iconClassName: "bg-[#1fc86a]",
-      disabled: true,
-      disabledLabel: t(msg`待接入`),
-      unavailableTitle: t(msg`转账暂未接入`),
-      unavailableDescription: t(msg`后续会补金额确认、到账反馈和会话内转账记录，这一版先保留入口。`),
-    },
-    contact: {
-      key: "contact",
-      label: t(msg`名片`),
-      icon: ContactRound,
-      iconClassName: "bg-[#4cb5f5]",
-    },
-    location: {
-      key: "location",
-      label: t(msg`位置`),
-      icon: MapPin,
-      iconClassName: "bg-[#4cb5f5]",
-    },
-    "voice-call": {
-      key: "voice-call",
-      label: t(msg`语音通话`),
-      icon: Phone,
-      iconClassName: "bg-[#38b36b]",
-      disabled: true,
-      disabledLabel: t(msg`待接入`),
-      unavailableTitle: t(msg`语音通话暂未接入`),
-      unavailableDescription: t(msg`当前可以先用按住说话发送语音消息，实时语音通话会在后续单独接入。`),
-      fallbackLabel: t(msg`改发语音消息`),
-      fallbackAction: "voice-message",
-    },
-    file: {
-      key: "file",
-      label: t(msg`文件`),
-      icon: FileText,
-      iconClassName: "bg-[#5cc8c9]",
-    },
-    favorite: {
-      key: "favorite",
-      label: t(msg`收藏`),
-      icon: Star,
-      iconClassName: "bg-[#f3c64e]",
-    },
-  };
-}
+const rootActions: Record<RootAction["key"], RootAction> = {
+  album: {
+    key: "album",
+    label: msg`相册`,
+    icon: ImagePlus,
+    iconClassName: "bg-[#5bbd72]",
+  },
+  camera: {
+    key: "camera",
+    label: msg`拍摄`,
+    icon: Camera,
+    iconClassName: "bg-[#54a7ff]",
+  },
+  "video-call": {
+    key: "video-call",
+    label: msg`视频通话`,
+    icon: Video,
+    iconClassName: "bg-[#07c160]",
+    disabled: true,
+    disabledLabel: msg`待接入`,
+    unavailableTitle: msg`视频通话暂未接入`,
+    unavailableDescription: msg`视频通话功能开发中，敬请期待。`,
+    fallbackLabel: msg`改为拍摄`,
+    fallbackAction: "camera",
+  },
+  "red-packet": {
+    key: "red-packet",
+    label: msg`红包`,
+    icon: Gift,
+    iconClassName: "bg-[#ef6a62]",
+    disabled: true,
+    disabledLabel: msg`待接入`,
+    unavailableTitle: msg`红包暂未接入`,
+    unavailableDescription: msg`支付与到账链路还没接入，这里先保留和微信一致的能力入口。`,
+  },
+  transfer: {
+    key: "transfer",
+    label: msg`转账`,
+    icon: WalletCards,
+    iconClassName: "bg-[#1fc86a]",
+    disabled: true,
+    disabledLabel: msg`待接入`,
+    unavailableTitle: msg`转账暂未接入`,
+    unavailableDescription: msg`后续会补金额确认、到账反馈和会话内转账记录，这一版先保留入口。`,
+  },
+  contact: {
+    key: "contact",
+    label: msg`名片`,
+    icon: ContactRound,
+    iconClassName: "bg-[#4cb5f5]",
+  },
+  location: {
+    key: "location",
+    label: msg`位置`,
+    icon: MapPin,
+    iconClassName: "bg-[#4cb5f5]",
+  },
+  "voice-call": {
+    key: "voice-call",
+    label: msg`语音通话`,
+    icon: Phone,
+    iconClassName: "bg-[#38b36b]",
+    disabled: true,
+    disabledLabel: msg`待接入`,
+    unavailableTitle: msg`语音通话暂未接入`,
+    unavailableDescription: msg`当前可以先用按住说话发送语音消息，实时语音通话会在后续单独接入。`,
+    fallbackLabel: msg`改发语音消息`,
+    fallbackAction: "voice-message",
+  },
+  file: {
+    key: "file",
+    label: msg`文件`,
+    icon: FileText,
+    iconClassName: "bg-[#5cc8c9]",
+  },
+  favorite: {
+    key: "favorite",
+    label: msg`收藏`,
+    icon: Star,
+    iconClassName: "bg-[#f3c64e]",
+  },
+};
 
 const PRIMARY_ROOT_ACTION_ORDER: RootAction["key"][] = [
   "album",
@@ -209,6 +209,7 @@ export function MobileChatPlusPanel({
   onUnavailableBack,
   onUnavailableFallback,
 }: MobileChatPlusPanelProps) {
+  const t = useRuntimeTranslator();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const [activeView, setActiveView] = useState<PanelView>("root");
@@ -305,7 +306,7 @@ export function MobileChatPlusPanel({
     <div className="mt-1.5 min-h-[232px] overflow-hidden rounded-[18px] border border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] shadow-none">
       {activeView === "root" ? (
         <div className="pb-4 pt-3">
-          <PanelHeader title={t(msg`更多功能`)} onClose={onClose} />
+          <PanelHeader t={t} title={t(msg`更多功能`)} onClose={onClose} />
           <div
             ref={rootPagerRef}
             className="relative flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -357,8 +358,9 @@ export function MobileChatPlusPanel({
                       ? () => {
                           setUnavailableAction(item);
                           onUnavailableAction?.(
-                            item.unavailableDescription ??
-                              t(msg`${item.label} 暂未接入。`),
+                            item.unavailableDescription
+                              ? t(item.unavailableDescription)
+                              : t(msg`${t(item.label)} 暂未接入。`),
                           );
                         }
                       : item.key === "album"
@@ -431,11 +433,11 @@ export function MobileChatPlusPanel({
                         </div>
                         <div className="min-h-[2rem] text-center">
                           <div className="text-[11px] text-[#5f5f5f]">
-                            {item.label}
+                            {t(item.label)}
                           </div>
                           {itemDisabledLabel ? (
                             <div className="mt-0.5 text-[9px] text-[#a0a0a0]">
-                              {itemDisabledLabel}
+                              {t(itemDisabledLabel)}
                             </div>
                           ) : null}
                         </div>
@@ -485,12 +487,14 @@ export function MobileChatPlusPanel({
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-[12px] font-medium text-[#111827]">
-                    {unavailableAction.unavailableTitle ??
-                      t(msg`${unavailableAction.label} 暂未接入`)}
+                    {unavailableAction.unavailableTitle
+                      ? t(unavailableAction.unavailableTitle)
+                      : t(msg`${t(unavailableAction.label)} 暂未接入`)}
                   </div>
                   <div className="mt-1 text-[11px] leading-[18px] text-[#7a7a7a]">
-                    {unavailableAction.unavailableDescription ??
-                      t(msg`功能开发中，敬请期待。`)}
+                    {unavailableAction.unavailableDescription
+                      ? t(unavailableAction.unavailableDescription)
+                      : t(msg`功能开发中，敬请期待。`)}
                   </div>
                 </div>
               </div>
@@ -507,7 +511,7 @@ export function MobileChatPlusPanel({
                     }}
                     className="mr-2 rounded-full bg-[#07c160] px-3 py-1.5 text-[11px] font-medium text-white transition active:opacity-90"
                   >
-                    {unavailableFallbackLabel}
+                    {t(unavailableFallbackLabel)}
                   </button>
                 ) : null}
                 {unavailableBackActionLabel && onUnavailableBack ? (
@@ -538,6 +542,7 @@ export function MobileChatPlusPanel({
       {activeView === "contacts" ? (
         <div className="pb-3.5">
           <PanelHeader
+            t={t}
             title={t(msg`选择名片`)}
             onBack={() => setActiveView("root")}
             onClose={onClose}
@@ -612,6 +617,7 @@ export function MobileChatPlusPanel({
       {activeView === "favorites" ? (
         <div className="pb-3.5">
           <PanelHeader
+            t={t}
             title={t(msg`发送收藏`)}
             onBack={() => setActiveView("root")}
             onClose={onClose}
@@ -686,6 +692,7 @@ export function MobileChatPlusPanel({
       {activeView === "locations" ? (
         <div className="pb-3.5">
           <PanelHeader
+            t={t}
             title={t(msg`选择位置`)}
             onBack={() => setActiveView("root")}
             onClose={onClose}
@@ -763,10 +770,12 @@ function PanelStatusBlock({
 }
 
 function PanelHeader({
+  t,
   title,
   onBack,
   onClose,
 }: {
+  t: Translator;
   title: string;
   onBack?: () => void;
   onClose?: () => void;
@@ -808,10 +817,7 @@ function chunkRootActions<T>(items: readonly T[], size: number) {
   return result.slice(0, size);
 }
 
-function buildRootActionPage(
-  rootActions: Record<RootAction["key"], RootAction>,
-  keys: readonly RootAction["key"][],
-) {
+function buildRootActionPage(keys: readonly RootAction["key"][]) {
   return chunkRootActions(
     keys.map((key) => rootActions[key]),
     ROOT_ACTIONS_PER_PAGE,
@@ -822,12 +828,11 @@ function buildRootActionPages(input: {
   hasVoiceCall: boolean;
   hasVideoCall: boolean;
 }) {
-  const rootActions = buildRootActions();
   const enabledPrimaryKeys = PRIMARY_ROOT_ACTION_ORDER.filter((key) =>
-    isRootActionEnabled(rootActions, key, input),
+    isRootActionEnabled(key, input),
   );
   const disabledPrimaryKeys = PRIMARY_ROOT_ACTION_ORDER.filter(
-    (key) => !isRootActionEnabled(rootActions, key, input),
+    (key) => !isRootActionEnabled(key, input),
   );
   const orderedKeys = [
     ...enabledPrimaryKeys,
@@ -840,11 +845,10 @@ function buildRootActionPages(input: {
     pages.push(orderedKeys.slice(index, index + ROOT_ACTIONS_PER_PAGE));
   }
 
-  return pages.map((page) => buildRootActionPage(rootActions, page));
+  return pages.map((page) => buildRootActionPage(page));
 }
 
 function isRootActionEnabled(
-  rootActions: Record<RootAction["key"], RootAction>,
   key: RootAction["key"],
   input: {
     hasVoiceCall: boolean;

@@ -42,6 +42,7 @@ import { Brackets, EntityManager, In, Repository } from "typeorm";
 import { PhoneAuthService } from "../auth/phone-auth.service";
 import { createCloudWorldSlug } from "../cloud-world-slug";
 import { CloudInstanceEntity } from "../entities/cloud-instance.entity";
+import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { CloudWorldEntity } from "../entities/cloud-world.entity";
 import { CloudWorldRequestEntity } from "../entities/cloud-world-request.entity";
 import { WaitingSessionSyncTaskEntity } from "../entities/waiting-session-sync-task.entity";
@@ -101,6 +102,8 @@ export class CloudService {
     private readonly jobRepo: Repository<WorldLifecycleJobEntity>,
     @InjectRepository(WaitingSessionSyncTaskEntity)
     private readonly waitingSessionSyncTaskRepo: Repository<WaitingSessionSyncTaskEntity>,
+    @InjectRepository(CloudUserEntity)
+    private readonly userRepo: Repository<CloudUserEntity>,
     private readonly configService: ConfigService,
     private readonly phoneAuthService: PhoneAuthService,
     private readonly computeProviderRegistry: ComputeProviderRegistryService,
@@ -325,7 +328,12 @@ export class CloudService {
       where,
       order: { updatedAt: "DESC" },
     }));
-    return items.map((item) => this.serializeWorld(item));
+    const usersByPhone = await this.loadUsersByPhone(
+      items.map((item) => item.phone),
+    );
+    return items.map((item) =>
+      this.serializeWorld(item, usersByPhone.get(item.phone)),
+    );
   }
 
   async listWorldInstances(
@@ -346,9 +354,12 @@ export class CloudService {
     const instanceByWorldId = new Map(
       instances.map((instance) => [instance.worldId, instance] as const),
     );
+    const usersByPhone = await this.loadUsersByPhone(
+      worlds.map((world) => world.phone),
+    );
 
     return worlds.map((world) => ({
-      world: this.serializeWorld(world),
+      world: this.serializeWorld(world, usersByPhone.get(world.phone)),
       instance: instanceByWorldId.get(world.id)
         ? this.serializeInstance(instanceByWorldId.get(world.id)!)
         : null,
@@ -357,7 +368,10 @@ export class CloudService {
 
   async getWorldById(id: string) {
     const world = await this.requireWorld(id);
-    return this.serializeWorld(world);
+    const user = world.phone
+      ? await this.userRepo.findOne({ where: { phone: world.phone } })
+      : null;
+    return this.serializeWorld(world, user ?? undefined);
   }
 
   async getWorldDriftSummary(): Promise<CloudWorldDriftSummary> {
@@ -1248,10 +1262,15 @@ export class CloudService {
     await repos.worldRepo.save(world);
   }
 
-  private serializeWorld(world: CloudWorldEntity): CloudWorldSummary {
+  private serializeWorld(
+    world: CloudWorldEntity,
+    user?: CloudUserEntity | null,
+  ): CloudWorldSummary {
     return {
       id: world.id,
       phone: world.phone,
+      email: user?.email ?? null,
+      ownerDisplayName: user?.displayName ?? null,
       name: world.name,
       status: this.toWorldStatus(world.status),
       desiredState: world.desiredState === "sleeping" ? "sleeping" : "running",
@@ -1718,6 +1737,28 @@ export class CloudService {
 
     return new Map(
       this.filterVisibleWorlds(worlds).map((world) => [world.phone, world]),
+    );
+  }
+
+  private async loadUsersByPhone(phones: (string | null | undefined)[]) {
+    const uniquePhones = [
+      ...new Set(phones.filter((value): value is string => Boolean(value))),
+    ];
+    if (!uniquePhones.length) {
+      return new Map<string, CloudUserEntity>();
+    }
+
+    const users = await this.userRepo
+      .createQueryBuilder("user")
+      .where("user.phone IN (:...phones)", { phones: uniquePhones })
+      .getMany();
+
+    return new Map(
+      users
+        .filter((user): user is CloudUserEntity & { phone: string } =>
+          Boolean(user.phone),
+        )
+        .map((user) => [user.phone, user] as const),
     );
   }
 

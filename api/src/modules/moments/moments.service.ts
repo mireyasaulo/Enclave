@@ -323,6 +323,8 @@ export class MomentsService implements OnModuleInit {
         text,
         contentType: 'text',
         mediaPayload: this.serializeMomentMedia([]),
+        // 把时间戳推到过去 0-15 分钟随机点，避免 cron tick 把分钟卡在 00/15/30/45。
+        postedAt: this.jitterPastTimestamp(15 * 60 * 1000),
         generationKind: profile.realWorldContext?.realityMomentBrief
           ? 'reality_linked_ai'
           : 'routine_ai',
@@ -337,8 +339,10 @@ export class MomentsService implements OnModuleInit {
           : null,
       });
       await this.postRepo.save(post);
+      // 镜像到广场时保留 moment 的抖动 postedAt，让两边时间一致。
       await this.feedService.syncMomentPostToFeed(post, {
         sourceKind: 'character_generated',
+        preserveTimestamp: true,
       });
 
       // Schedule interactions from other characters (async, non-blocking)
@@ -728,6 +732,12 @@ export class MomentsService implements OnModuleInit {
     socialOpenness: string | null | undefined,
   ): 'public' | 'friends' {
     return socialOpenness === 'private' ? 'friends' : 'public';
+  }
+
+  /** 返回过去 [now - maxMs, now] 之间的一个随机时间戳，用于让 cron 触发的写入看起来更自然。 */
+  private jitterPastTimestamp(maxMs: number): Date {
+    const offset = Math.floor(Math.random() * Math.max(0, maxMs));
+    return new Date(Date.now() - offset);
   }
 
   private async _enrichPost(
@@ -1355,9 +1365,9 @@ export class MomentsService implements OnModuleInit {
     const recentSince = new Date(now.getTime() - RECENT_WINDOW_MS);
     const hour = now.getHours();
 
-    const candidates = (await this.characters.findAll()).filter(
-      (char) => char.sourceType === 'manual_admin',
-    );
+    // 候选池放开到所有可见角色（preset / model_persona / default_seed 等）。
+    // 之前只看 manual_admin，但 DB 里很少有这个 sourceType，导致 NPC 之间从不互动。
+    const candidates = await this.characters.findAllVisibleToOwner();
 
     const activeCandidates = candidates.filter((char) => {
       const start = char.activeHoursStart ?? 8;
@@ -1455,6 +1465,11 @@ export class MomentsService implements OnModuleInit {
               char.avatar,
               'character',
             );
+            // 把点赞时间打散到过去 0-60 秒，避免一拨点赞全卡 cron tick 整点。
+            await this.likeRepo.update(
+              { postId: post.id, authorId: char.id },
+              { createdAt: this.jitterPastTimestamp(60_000) },
+            );
             likeCount += 1;
             if (post.authorType === 'character') {
               await this.characterFriendships.bumpInteraction(
@@ -1488,7 +1503,7 @@ export class MomentsService implements OnModuleInit {
               },
             });
             llmCallsRemaining -= 1;
-            await this.addComment(
+            const savedComment = await this.addComment(
               post.id,
               char.id,
               char.name,
@@ -1496,6 +1511,10 @@ export class MomentsService implements OnModuleInit {
               reply.text,
               'character',
             );
+            // 同样把评论时间散开到过去 0-60 秒。
+            await this.commentRepo.update(savedComment.id, {
+              createdAt: this.jitterPastTimestamp(60_000),
+            });
             commentCount += 1;
             if (post.authorType === 'character') {
               await this.characterFriendships.bumpInteraction(

@@ -1,16 +1,17 @@
 import { Suspense, lazy, useEffect, useState, type ReactNode } from "react";
-import { msg } from "@lingui/macro";
-import { useLingui } from "@lingui/react";
-import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import { ArrowLeft, BookUser } from "lucide-react";
 import {
   acceptFriendRequest,
   declineFriendRequest,
   getFriendRequests,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
+
+type Translator = ReturnType<typeof useRuntimeTranslator>;
 import { AvatarChip } from "../components/avatar-chip";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
@@ -23,8 +24,6 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
-const t = translateRuntimeMessage;
-
 const DesktopContactsRouteRedirectShell = lazy(async () => {
   const mod =
     await import("../features/contacts/contacts-route-redirect-shell");
@@ -32,6 +31,7 @@ const DesktopContactsRouteRedirectShell = lazy(async () => {
 });
 
 export function FriendRequestsPage() {
+  const t = useRuntimeTranslator();
   const isDesktopLayout = useDesktopLayout();
 
   if (isDesktopLayout) {
@@ -54,9 +54,8 @@ export function FriendRequestsPage() {
 }
 
 function MobileFriendRequestsPage() {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
-  const { i18n } = useLingui();
-  const locale = i18n.locale;
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
@@ -255,7 +254,9 @@ function MobileFriendRequestsPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`浏览世界角色`)}
+                    {safeReturnPath
+                      ? t(msg`返回上一页`)
+                      : t(msg`浏览世界角色`)}
                   </Button>
                 </div>
               }
@@ -298,11 +299,11 @@ function MobileFriendRequestsPage() {
                           {request.characterName}
                         </div>
                         <div className="mt-0.5 text-[11px] text-[color:var(--text-muted)]">
-                          {getFriendRequestSourceLabel(request.triggerScene)}
+                          {getFriendRequestSourceLabel(t, request.triggerScene)}
                         </div>
                       </div>
                       <div className="shrink-0 text-[10px] text-[color:var(--text-dim)]">
-                        {formatFriendRequestDate(request.createdAt, locale)}
+                        {formatFriendRequestDate(t, request.createdAt)}
                       </div>
                     </div>
 
@@ -376,7 +377,9 @@ function MobileFriendRequestsPage() {
                     className="h-7 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`浏览世界角色`)}
+                    {safeReturnPath
+                      ? t(msg`返回上一页`)
+                      : t(msg`浏览世界角色`)}
                   </Button>
                 </div>
               </div>
@@ -412,7 +415,9 @@ function MobileFriendRequestsPage() {
                     className="h-7 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[10px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`浏览世界角色`)}
+                    {safeReturnPath
+                      ? t(msg`返回上一页`)
+                      : t(msg`浏览世界角色`)}
                   </Button>
                 </div>
               </div>
@@ -436,7 +441,9 @@ function MobileFriendRequestsPage() {
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                   onClick={handleStatusBack}
                 >
-                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`浏览世界角色`)}
+                  {safeReturnPath
+                    ? t(msg`返回上一页`)
+                    : t(msg`浏览世界角色`)}
                 </Button>
               }
             />
@@ -447,7 +454,7 @@ function MobileFriendRequestsPage() {
   );
 }
 
-function getFriendRequestSourceLabel(triggerScene?: string) {
+function getFriendRequestSourceLabel(t: Translator, triggerScene?: string) {
   if (!triggerScene) {
     return t(msg`新的朋友`);
   }
@@ -459,7 +466,7 @@ function getFriendRequestSourceLabel(triggerScene?: string) {
   return t(msg`来自 ${triggerScene}`);
 }
 
-function formatFriendRequestDate(createdAt: string, locale: string) {
+function formatFriendRequestDate(t: Translator, createdAt: string) {
   const date = new Date(createdAt);
   if (Number.isNaN(date.getTime())) {
     return "";
@@ -474,7 +481,7 @@ function formatFriendRequestDate(createdAt: string, locale: string) {
     return t(msg`今天`);
   }
 
-  const formatter = new Intl.DateTimeFormat(locale, {
+  const formatter = new Intl.DateTimeFormat("zh-CN", {
     month: "2-digit",
     day: "2-digit",
   });

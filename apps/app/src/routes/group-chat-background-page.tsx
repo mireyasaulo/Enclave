@@ -6,10 +6,9 @@ import {
   type ChangeEvent,
   type ReactNode,
 } from "react";
-import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import {
   clearGroupBackground,
   clearWorldOwnerChatBackground,
@@ -20,6 +19,7 @@ import {
   type ChatBackgroundAsset,
   type ConversationBackgroundMode,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppPage,
   Button,
@@ -44,11 +44,10 @@ import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { isMissingGroupError } from "../lib/group-route-fallback";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
-const t = translateRuntimeMessage;
-
 type UploadTarget = "default" | "group";
 
 export function GroupChatBackgroundPage() {
+  const t = useRuntimeTranslator();
   const { groupId } = useParams({
     from: "/group/$groupId/background",
   });
@@ -489,7 +488,7 @@ export function GroupChatBackgroundPage() {
             compact={!isDesktopLayout}
             title={t(msg`默认背景图`)}
             description={t(msg`应用到所有未单独设置专属背景的聊天。`)}
-            status={getChatBackgroundLabel(defaultDraft)}
+            status={t(msg`当前：${getChatBackgroundLabel(defaultDraft)}`)}
           >
             <PresetGrid
               compact={!isDesktopLayout}
@@ -532,8 +531,8 @@ export function GroupChatBackgroundPage() {
             description={t(msg`群聊可设置专属背景，优先级高于默认背景图。`)}
             status={
               groupMode === "custom"
-                ? getChatBackgroundLabel(groupDraft)
-                : t(msg`跟随默认背景`)
+                ? t(msg`当前：${getChatBackgroundLabel(groupDraft)}`)
+                : t(msg`当前：跟随默认背景`)
             }
           >
             <div className="flex flex-wrap gap-2">
@@ -569,7 +568,7 @@ export function GroupChatBackgroundPage() {
                     onClick={() => openPicker("group")}
                     className={!isDesktopLayout ? "min-h-11 rounded-full px-4" : undefined}
                   >
-                    {t(msg`上传图片`)}
+                    上传图片
                   </Button>
                   <Button
                     variant="ghost"
@@ -589,7 +588,7 @@ export function GroupChatBackgroundPage() {
                     : "rounded-[16px] border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas)] px-4 py-3 text-xs leading-6 text-[color:var(--text-secondary)]"
                 }
               >
-                {t(msg`当前群聊会直接沿用默认背景图。切换到“单独设置”后，可以挑选群聊专属背景。`)}
+                {t(msg`当前群聊会直接沿用默认背景图。切换到"单独设置"后，可以挑选群聊专属背景。`)}
               </div>
             )}
 
@@ -600,7 +599,9 @@ export function GroupChatBackgroundPage() {
                 onClick={() => saveGroupMutation.mutate()}
                 className={!isDesktopLayout ? "min-h-11 rounded-full px-4" : undefined}
               >
-                {groupMode === "custom" ? t(msg`保存群聊背景`) : t(msg`保存当前群聊设置`)}
+                {groupMode === "custom"
+                  ? t(msg`保存群聊背景`)
+                  : t(msg`保存当前群聊设置`)}
               </Button>
             </div>
           </SectionCard>
@@ -733,7 +734,7 @@ function SectionCard({
               : "mt-3 inline-flex rounded-[8px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 py-1 text-xs text-[color:var(--text-muted)]"
           }
         >
-          {t(msg`当前：${status}`)}
+          {status}
         </div>
       </div>
       <div className="space-y-4">{children}</div>

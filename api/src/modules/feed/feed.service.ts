@@ -838,7 +838,7 @@ export class FeedService implements OnModuleInit {
         },
       });
       if (!text) return null;
-      return this.createPost({
+      const created = await this.createPost({
         authorAvatar: char.avatar,
         authorId: char.id,
         authorName: char.name,
@@ -847,6 +847,13 @@ export class FeedService implements OnModuleInit {
         surface: 'feed',
         text,
       });
+      // 把广场动态的时间戳推到过去 0-15 分钟随机点，避免 cron tick 集中。
+      const jittered = new Date(
+        Date.now() - Math.floor(Math.random() * 15 * 60 * 1000),
+      );
+      await this.postRepo.update(created.id, { createdAt: jittered });
+      created.createdAt = jittered;
+      return created;
     } catch (err) {
       this.logger.error(`Failed to generate feed post for ${characterId}`, err);
       return null;
@@ -997,13 +1004,20 @@ export class FeedService implements OnModuleInit {
             characterName: char.name,
           },
         });
-        await this.addComment({
+        const savedComment = await this.addComment({
           postId: post.id,
           authorId: char.id,
           authorName: char.name,
           authorAvatar: char.avatar,
           authorType: 'character',
           text: reply.text,
+        });
+        // 把广场 AI 评论时间打散到过去 0-60 秒，避免一拨评论卡 cron tick 整点。
+        const jittered = new Date(
+          Date.now() - Math.floor(Math.random() * 60_000),
+        );
+        await this.commentRepo.update(savedComment.id, {
+          createdAt: jittered,
         });
       } catch {
         // ignore

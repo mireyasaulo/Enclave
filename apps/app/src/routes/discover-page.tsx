@@ -771,7 +771,9 @@ export function DiscoverPage() {
                   key={post.id}
                   authorName={post.authorName}
                   authorAvatar={post.authorAvatar}
-                  meta={t(msg`${formatTimestamp(post.createdAt)} · ${post.authorType === "user" ? t(msg`世界主人`) : t(msg`居民动态`)}`)}
+                  meta={t(
+                    msg`${formatTimestamp(post.createdAt)} · ${post.authorType === "user" ? t(msg`世界主人`) : t(msg`居民动态`)}`,
+                  )}
                   body={
                     <div className="space-y-3">
                       {post.authorType === "user" ? (

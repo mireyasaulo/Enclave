@@ -1,7 +1,7 @@
 import { Suspense, lazy, useCallback, useEffect, useState } from "react";
-import { msg } from "@lingui/macro";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage } from "@yinjie/ui";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import {
@@ -31,9 +31,8 @@ const DesktopChatWorkspace = lazy(async () => {
   return { default: mod.DesktopChatWorkspace };
 });
 
-const t = translateRuntimeMessage;
-
 export function GroupChatPage() {
+  const t = useRuntimeTranslator();
   const { groupId } = useParams({ from: "/group/$groupId" });
   const navigate = useNavigate();
   const isDesktopLayout = useDesktopLayout();
@@ -180,9 +179,14 @@ export function GroupChatPage() {
       ? null
       : {
           actionLabel: t(msg`发语音继续`),
-          description: routeCallReturnKind === "voice"
-            ? t(msg`本轮群语音通话已结束。你可以继续在群里输入，也可以切回语音发送。`)
-            : t(msg`本轮群视频通话已结束。你可以继续在群里输入，也可以切回语音发送。`),
+          description:
+            routeCallReturnKind === "voice"
+              ? t(
+                  msg`本轮群语音通话已结束。你可以继续在群里输入，也可以切回语音发送。`,
+                )
+              : t(
+                  msg`本轮群视频通话已结束。你可以继续在群里输入，也可以切回语音发送。`,
+                ),
           onAction: () => {
             setRouteCallReturnKind(null);
             void navigate({

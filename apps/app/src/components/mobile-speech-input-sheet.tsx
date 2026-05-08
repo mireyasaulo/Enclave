@@ -1,10 +1,10 @@
-import { msg } from "@lingui/macro";
-import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Mic, Square, WandSparkles, X } from "lucide-react";
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
 import type { SpeechInputStatus } from "../features/chat/speech-input-types";
 
-const t = translateRuntimeMessage;
+type Translator = ReturnType<typeof useRuntimeTranslator>;
 
 type MobileSpeechInputSheetProps = {
   open: boolean;
@@ -21,6 +21,7 @@ type MobileSpeechInputSheetProps = {
 };
 
 function resolveStatusTitle(
+  t: Translator,
   mode: "dictation" | "voice",
   status: SpeechInputStatus,
   holding: boolean,
@@ -55,6 +56,7 @@ function resolveStatusTitle(
 }
 
 function resolveStatusHint(
+  t: Translator,
   mode: "dictation" | "voice",
   status: SpeechInputStatus,
   holding: boolean,
@@ -103,6 +105,7 @@ export function MobileSpeechInputSheet({
   onCommit,
   canCommit,
 }: MobileSpeechInputSheetProps) {
+  const t = useRuntimeTranslator();
   if (!open) {
     return null;
   }
@@ -110,8 +113,8 @@ export function MobileSpeechInputSheet({
   const listening = status === "listening";
   const processing =
     status === "processing" || status === "requesting-permission";
-  const title = resolveStatusTitle(mode, status, holding, cancelIntent);
-  const hint = resolveStatusHint(mode, status, holding, cancelIntent);
+  const title = resolveStatusTitle(t, mode, status, holding, cancelIntent);
+  const hint = resolveStatusHint(t, mode, status, holding, cancelIntent);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+88px)] pointer-events-none">
