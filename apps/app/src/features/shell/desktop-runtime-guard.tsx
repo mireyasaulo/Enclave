@@ -52,7 +52,10 @@ export function DesktopRuntimeGuard() {
       !hasDesktopRuntimeControl &&
       !needsRemoteConfiguration,
     retry: false,
-    refetchInterval: 5_000,
+    // 5s 探活在公网隧道下没必要：用户重新聚焦窗口时再校一次就够了，
+    // 加 30s 兜底防止后台切回时仍是旧 cache。
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
   });
 
   useEffect(() => {
