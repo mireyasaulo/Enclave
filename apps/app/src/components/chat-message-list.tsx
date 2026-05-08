@@ -5276,9 +5276,9 @@ function GroupRelaySummaryMessage({
   const isDesktop = variant === "desktop";
   const completionTimeLabel = resolveGroupRelayCompletionTime(summary);
   const publishRangeLabel = resolveGroupRelayPublishRangeLabel(summary);
-  const publishStageBadge = resolveGroupRelayPublishStageBadge(summary);
-  const completionBadge = resolveGroupRelayCompletionBadge(summary);
-  const ctaCopy = resolveGroupRelayCtaCopy(summary);
+  const publishStageBadge = resolveGroupRelayPublishStageBadge(t, summary);
+  const completionBadge = resolveGroupRelayCompletionBadge(t, summary);
+  const ctaCopy = resolveGroupRelayCtaCopy(t, summary);
   const card = (
     <div
       className={`border shadow-none ${

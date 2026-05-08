@@ -1768,6 +1768,10 @@ msgstr ""
 msgid "介绍一下你自己，或者写一句当前状态"
 msgstr "Introduce yourself, or write your current status"
 
+#: apps/app/src/features/mini-programs/group-relay-card.ts:99
+msgid "仍有待确认"
+msgstr "Pending confirmation"
+
 #: apps/app/src/i18n/static-dom-seed.ts:243
 msgid "从“好友在玩”里点“发到聊天”，这里就会出现最近会话投递面板。"
 msgstr "Tap “Send to chat” from Friends Playing and the recent conversation delivery panel will appear here."
@@ -4880,6 +4884,10 @@ msgstr "Images and videos"
 msgid "图片最多 9 张，视频当前支持 1 条且不超过 5 分钟，暂不支持图片和视频混发。"
 msgstr "Up to 9 images are supported. Videos currently support 1 item under 5 minutes. Mixed image and video posts are not supported yet."
 
+#: apps/app/src/features/moments/moment-compose-media.ts:110
+msgid "图片动态最多支持 {MAX_IMAGE_COUNT} 张图片。"
+msgstr "An image post supports up to {MAX_IMAGE_COUNT} images."
+
 #: apps/app/src/components/chat-composer.tsx:2610
 msgid "图片发送失败，请稍后再试。"
 msgstr "Failed to send image. Please try again later."
@@ -4888,11 +4896,16 @@ msgstr "Failed to send image. Please try again later."
 msgid "图片处理失败，请先裁剪后再发送。"
 msgstr "Failed to process image. Crop it before sending."
 
+#: apps/app/src/features/moments/moment-compose-media.ts:560
+msgid "图片处理失败，请稍后重试。"
+msgstr "Failed to process image. Please try again later."
+
 #: apps/app/src/components/chat-message-list.tsx:4565
 msgid "图片表情"
 msgstr ""
 
 #: apps/app/src/components/chat-composer.tsx:5874
+#: apps/app/src/features/moments/moment-compose-media.ts:425
 msgid "图片解析失败，请换一张再试。"
 msgstr "Couldn't read the image. Please try a different one."
 
@@ -5281,6 +5294,10 @@ msgstr ""
 #: apps/app/src/features/chat/digital-human-gateway-copy.ts:68
 msgid "外部数字人已就绪"
 msgstr ""
+
+#: apps/app/src/features/mini-programs/group-relay-card.ts:77
+msgid "多次回填"
+msgstr "Multiple backfills"
 
 #: apps/app/src/features/chat/group-message-context-menu.tsx:163
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:125
@@ -5767,6 +5784,10 @@ msgstr "Muted"
 #: apps/app/src/i18n/static-dom-seed.ts:504
 msgid "已全部加载"
 msgstr "All loaded"
+
+#: apps/app/src/features/mini-programs/group-relay-card.ts:93
+msgid "已全部确认"
+msgstr "All confirmed"
 
 #: apps/app/src/i18n/static-dom-seed.ts:778
 #: apps/app/src/routes/channel-author-page.tsx:443
@@ -6811,6 +6832,11 @@ msgstr ""
 msgid "当前上下文"
 msgstr "Current context"
 
+#: apps/app/src/features/moments/moment-compose-media.ts:105
+#: apps/app/src/features/moments/moment-compose-media.ts:128
+msgid "当前不支持图片和视频混发。"
+msgstr "Mixing images and video isn't supported here."
+
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1094
 msgid "当前不能发起视频通话"
 msgstr ""
@@ -7159,6 +7185,10 @@ msgstr "Search has paused delete mode. Press Esc or clear search to resume."
 msgid "当前搜索已暂停删除管理，并且已经腾出空位，可按 Esc 继续管理或直接继续添加。"
 msgstr "Search has paused delete mode and already freed slots. Press Esc to resume, or add more directly."
 
+#: apps/app/src/features/chat/use-self-camera-preview.ts:169
+msgid "当前摄像头参数不可用，请重试。"
+msgstr "Current camera parameters aren't available. Please retry."
+
 #: apps/app/src/i18n/static-dom-seed.ts:459
 msgid "当前播放"
 msgstr "Now playing"
@@ -7257,6 +7287,10 @@ msgstr "This browser does not support copying screenshots to the clipboard."
 #: apps/app/src/features/chat/use-speech-input.ts:754
 msgid "当前浏览器不支持录音转写。"
 msgstr "This browser doesn't support speech transcription."
+
+#: apps/app/src/features/chat/use-self-camera-preview.ts:185
+msgid "当前浏览器不支持摄像头预览。"
+msgstr "This browser doesn't support camera preview."
 
 #: apps/app/src/components/chat-composer.tsx:1392
 msgid "当前浏览器不支持桌面截图，请改用图片或文件发送。"
@@ -7569,6 +7603,10 @@ msgstr ""
 msgid "当前设备不支持录音转写。"
 msgstr "This device doesn't support speech transcription."
 
+#: apps/app/src/features/chat/use-self-camera-preview.ts:184
+msgid "当前设备不支持摄像头预览。"
+msgstr "This device doesn't support camera preview."
+
 #: apps/app/src/components/chat-composer.tsx:426
 msgid "当前设备不支持语音发送，请改用键盘输入。"
 msgstr "This device does not support voice messages. Use keyboard input instead."
@@ -7623,6 +7661,10 @@ msgstr "This device cannot open the system share sheet right now. Please try aga
 #: apps/app/src/runtime/file-runtime-i18n.ts:71
 msgid "当前设备未直接预览，已打开系统面板，可继续在其他应用中打开。"
 msgstr "This device did not preview it directly. The system panel is open so you can open it in another app."
+
+#: apps/app/src/features/chat/use-self-camera-preview.ts:164
+msgid "当前设备没有可用的摄像头。"
+msgstr "No camera is available on this device."
 
 #: apps/app/src/features/shell/desktop-runtime-guard.tsx:181
 msgid "当前设备还没有配置远程世界地址，请先回到 setup 连接你的实例。"
@@ -9159,6 +9201,22 @@ msgstr "Search Yinjie ID or character name"
 msgid "摄像头不可用"
 msgstr ""
 
+#: apps/app/src/features/chat/use-self-camera-preview.ts:167
+msgid "摄像头可能正被其他应用占用，请关闭后重试。"
+msgstr "The camera may be in use by another app. Close it and retry."
+
+#: apps/app/src/features/chat/use-self-camera-preview.ts:159
+msgid "摄像头启动被中断了，请再试一次。"
+msgstr "Camera startup was interrupted. Please try again."
+
+#: apps/app/src/features/chat/use-self-camera-preview.ts:190
+msgid "摄像头权限被拒绝，请先允许应用访问摄像头。"
+msgstr "Camera permission was denied. Please allow the app to access the camera."
+
+#: apps/app/src/features/chat/use-self-camera-preview.ts:191
+msgid "摄像头权限被拒绝，请先允许浏览器访问摄像头。"
+msgstr "Camera permission was denied. Please allow the browser to access the camera."
+
 #: apps/app/src/i18n/static-dom-seed.ts:136
 msgid "摆摊"
 msgstr "Stalls"
@@ -9763,6 +9821,14 @@ msgstr "Couldn't start recording. Check the app's microphone permission."
 #: apps/app/src/features/chat/use-speech-input.ts:766
 msgid "无法启动录音，请检查浏览器麦克风权限。"
 msgstr "Couldn't start recording. Check the browser's microphone permission."
+
+#: apps/app/src/features/chat/use-self-camera-preview.ts:196
+msgid "无法打开摄像头，请检查应用权限。"
+msgstr "Couldn't open the camera. Please check the app's permissions."
+
+#: apps/app/src/features/chat/use-self-camera-preview.ts:197
+msgid "无法打开摄像头，请检查浏览器权限。"
+msgstr "Couldn't open the camera. Please check the browser's permissions."
 
 #: apps/app/src/routes/friend-moments-page.tsx:442
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:407
@@ -10596,6 +10662,10 @@ msgstr "This voice message, available captions, and the AI reply will all be sav
 msgid "本轮语音通话已结束。你可以直接继续输入，也可以切回语音发送。"
 msgstr ""
 
+#: apps/app/src/features/chat/use-self-camera-preview.ts:147
+msgid "权限被拒绝"
+msgstr "Permission denied"
+
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:634
 msgid "条"
 msgstr "items"
@@ -10776,6 +10846,11 @@ msgstr ""
 #: apps/app/src/i18n/static-dom-seed.ts:747
 msgid "查看 1 条新消息"
 msgstr "View 1 new message"
+
+#. placeholder {0}: summary.sourceGroupName
+#: apps/app/src/features/mini-programs/group-relay-card.ts:114
+msgid "查看{0}的群接龙结果"
+msgstr "View {0}'s relay result"
 
 #. placeholder {0}: message.senderName?.trim() || t(msg`联系人`)
 #. placeholder {0}: ownerName?.trim() || t(msg`我的`)
@@ -10981,6 +11056,10 @@ msgstr "View hotspots"
 #: apps/app/src/components/chat-message-list.tsx:5009
 msgid "查看笔记摘要"
 msgstr ""
+
+#: apps/app/src/features/mini-programs/group-relay-card.ts:112
+msgid "查看结果"
+msgstr "View result"
 
 #: apps/app/src/routes/group-chat-details-page.tsx:1020
 msgid "查看群二维码"
@@ -12738,9 +12817,17 @@ msgstr "Tap start to enter session pickup"
 msgid "点击推荐区的“加入我的小程序”，这里就会形成固定常用入口。"
 msgstr "Tap Add to My Mini Programs in recommendations to create a fixed common entry here."
 
+#: apps/app/src/features/mini-programs/group-relay-card.ts:111
+msgid "点击查看最终结果，必要时再覆盖新的完成状态"
+msgstr "Tap to view the final result; you can overwrite the completed status if needed."
+
 #: apps/app/src/components/chat-message-list.tsx:4979
 msgid "点击查看完整笔记"
 msgstr ""
+
+#: apps/app/src/features/mini-programs/group-relay-card.ts:119
+msgid "点击继续查看和回填接龙"
+msgstr "Tap to keep viewing and backfilling the relay"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:992
 msgid "点击角色成员可切换为已加入或待加入，快速同步这一轮群通话状态。"
@@ -13336,13 +13423,26 @@ msgstr "No Channels content yet"
 msgid "视频封面"
 msgstr "Video cover"
 
+#: apps/app/src/features/moments/moment-compose-media.ts:494
+#: apps/app/src/features/moments/moment-compose-media.ts:541
+msgid "视频封面生成失败，请稍后重试。"
+msgstr "Failed to generate video cover. Please try again later."
+
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:490
 msgid "视频已经就绪，会优先展示远端画面。"
 msgstr ""
 
+#: apps/app/src/features/moments/moment-compose-media.ts:383
+msgid "视频时长不能超过 5 分钟。"
+msgstr "Video duration cannot exceed 5 minutes."
+
 #: apps/app/src/features/chat/digital-human-player.tsx:204
 msgid "视频流就绪"
 msgstr "Stream ready"
+
+#: apps/app/src/features/moments/moment-compose-media.ts:467
+msgid "视频解析失败，请换一个文件再试。"
+msgstr "Couldn't parse the video. Please try a different file."
 
 #: apps/app/src/routes/discover-feed-page.tsx:482
 #: apps/app/src/routes/discover-page.tsx:457
@@ -14158,6 +14258,15 @@ msgstr "Keep holding to speak"
 #: apps/app/src/i18n/static-dom-seed.ts:847
 msgid "继续按住说话，松开后结束本次输入。"
 msgstr "Keep holding to speak. Release to finish this input."
+
+#: apps/app/src/features/mini-programs/group-relay-card.ts:120
+msgid "继续接龙"
+msgstr "Continue relay"
+
+#. placeholder {0}: summary.sourceGroupName
+#: apps/app/src/features/mini-programs/group-relay-card.ts:122
+msgid "继续接龙{0}的群接龙结果"
+msgstr "Continue {0}'s relay"
 
 #: apps/app/src/components/chat-message-list.tsx:902
 msgid "继续撤回"
@@ -15515,6 +15624,14 @@ msgstr "Enter verification code."
 msgid "请输入验证码（默认 123456 即可通过）"
 msgstr "Enter the verification code (default 123456 works)"
 
+#: apps/app/src/features/moments/moment-compose-media.ts:351
+msgid "请选择图片文件。"
+msgstr "Please choose an image file."
+
+#: apps/app/src/features/moments/moment-compose-media.ts:374
+msgid "请选择视频文件。"
+msgstr "Please choose a video file."
+
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:531
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:654
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1376
@@ -16204,6 +16321,10 @@ msgstr "Back to contacts"
 #: apps/app/src/features/shell/desktop-shell.tsx:659
 msgid "还原"
 msgstr "Reset"
+
+#: apps/app/src/features/moments/moment-compose-media.ts:114
+msgid "还可以继续添加 {remainingSlots} 张图片。"
+msgstr "You can add {remainingSlots} more images."
 
 #. placeholder {0}: conversation.title
 #: apps/app/src/routes/group-qr-page.tsx:2823
@@ -17864,6 +17985,10 @@ msgstr "Top pick from {0}"
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1415
 msgid "首次使用请先允许麦克风权限。若自动播报被拦截，可直接补播这一句。"
 msgstr ""
+
+#: apps/app/src/features/mini-programs/group-relay-card.ts:71
+msgid "首次回填"
+msgstr "First backfill"
 
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:887
 msgid "首次进入可先点下方成员席位切换\"已加入/待加入\"，再点\"同步最新状态\"把在线人数回写到群聊卡片。"

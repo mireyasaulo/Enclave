@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
 import {
   createFeedPost,
   createUserMoment,
@@ -11,6 +12,7 @@ import {
   type MomentImageAsset,
   type MomentVideoAsset,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 
 const MAX_IMAGE_COUNT = 9;
 const MAX_VIDEO_DURATION_MS = 5 * 60 * 1000;
@@ -100,16 +102,16 @@ export function useMomentComposeDraft() {
       setMediaError(null);
 
       if (videoDraftRef.current) {
-        throw new Error("当前不支持图片和视频混发。");
+        throw new Error(translateRuntimeMessage(msg`当前不支持图片和视频混发。`));
       }
 
       const remainingSlots = MAX_IMAGE_COUNT - imageDraftsRef.current.length;
       if (remainingSlots <= 0) {
-        throw new Error(`图片动态最多支持 ${MAX_IMAGE_COUNT} 张图片。`);
+        throw new Error(translateRuntimeMessage(msg`图片动态最多支持 ${MAX_IMAGE_COUNT} 张图片。`));
       }
 
       if (pickedFiles.length > remainingSlots) {
-        throw new Error(`还可以继续添加 ${remainingSlots} 张图片。`);
+        throw new Error(translateRuntimeMessage(msg`还可以继续添加 ${remainingSlots} 张图片。`));
       }
 
       const nextDrafts = await createMomentImageDrafts(pickedFiles);
@@ -123,7 +125,7 @@ export function useMomentComposeDraft() {
       setMediaError(null);
 
       if (imageDraftsRef.current.length > 0) {
-        throw new Error("当前不支持图片和视频混发。");
+        throw new Error(translateRuntimeMessage(msg`当前不支持图片和视频混发。`));
       }
 
       const nextDraft = await createMomentVideoDraft(file);
@@ -346,7 +348,7 @@ async function createMomentImageDrafts(files: File[]) {
 
 async function createMomentImageDraft(file: File): Promise<MomentImageDraft> {
   if (!file.type.startsWith("image/")) {
-    throw new Error("请选择图片文件。");
+    throw new Error(translateRuntimeMessage(msg`请选择图片文件。`));
   }
 
   const previewUrl = URL.createObjectURL(file);
@@ -369,7 +371,7 @@ async function createMomentImageDraft(file: File): Promise<MomentImageDraft> {
 
 async function createMomentVideoDraft(file: File): Promise<MomentVideoDraft> {
   if (!file.type.startsWith("video/")) {
-    throw new Error("请选择视频文件。");
+    throw new Error(translateRuntimeMessage(msg`请选择视频文件。`));
   }
 
   const previewUrl = URL.createObjectURL(file);
@@ -378,7 +380,7 @@ async function createMomentVideoDraft(file: File): Promise<MomentVideoDraft> {
   try {
     const metadata = await readVideoMetadata(previewUrl);
     if (metadata.durationMs > MAX_VIDEO_DURATION_MS) {
-      throw new Error("视频时长不能超过 5 分钟。");
+      throw new Error(translateRuntimeMessage(msg`视频时长不能超过 5 分钟。`));
     }
 
     const posterFile = await buildMomentVideoPoster(
@@ -420,7 +422,7 @@ function readImageDimensions(url: string) {
         height: image.naturalHeight,
       });
     };
-    image.onerror = () => reject(new Error("图片解析失败，请换一张再试。"));
+    image.onerror = () => reject(new Error(translateRuntimeMessage(msg`图片解析失败，请换一张再试。`)));
     image.src = url;
   });
 }
@@ -462,7 +464,7 @@ function readVideoMetadata(url: string) {
     };
     video.onerror = () => {
       cleanup();
-      reject(new Error("视频解析失败，请换一个文件再试。"));
+      reject(new Error(translateRuntimeMessage(msg`视频解析失败，请换一个文件再试。`)));
     };
     video.src = url;
   });
@@ -489,7 +491,7 @@ async function buildMomentVideoPoster(
     const blob = await canvasToBlob(canvas, {
       mimeType: "image/jpeg",
       quality: 0.88,
-      errorMessage: "视频封面生成失败，请稍后重试。",
+      errorMessage: translateRuntimeMessage(msg`视频封面生成失败，请稍后重试。`),
     });
     const nextFileName = replaceFileExtension(
       fileName || "moment-video",
@@ -536,7 +538,7 @@ function createPosterCaptureVideo(url: string, durationMs: number) {
     };
     video.onerror = () => {
       cleanup();
-      reject(new Error("视频封面生成失败，请稍后重试。"));
+      reject(new Error(translateRuntimeMessage(msg`视频封面生成失败，请稍后重试。`)));
     };
     video.src = url;
   });
@@ -555,7 +557,7 @@ function canvasToBlob(
       (blob) => {
         if (!blob) {
           reject(
-            new Error(options?.errorMessage ?? "图片处理失败，请稍后重试。"),
+            new Error(options?.errorMessage ?? translateRuntimeMessage(msg`图片处理失败，请稍后重试。`)),
           );
           return;
         }

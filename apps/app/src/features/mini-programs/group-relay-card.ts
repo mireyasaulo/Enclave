@@ -1,3 +1,5 @@
+import { msg } from "@lingui/macro";
+import { getActiveLocale, type useRuntimeTranslator } from "@yinjie/i18n";
 import {
   formatMessageTimestamp,
   parseTimestamp,
@@ -8,12 +10,15 @@ import { parseGroupRelaySummaryMessage } from "./group-relay-message";
 type GroupRelaySummary = NonNullable<
   ReturnType<typeof parseGroupRelaySummaryMessage>
 >;
+type Translator = ReturnType<typeof useRuntimeTranslator>;
 
 export function resolveGroupRelayCompletionTime(summary: GroupRelaySummary) {
+  // i18n-ignore-next-line: 协议层 statusLabel 来自 wire-format 解析，保留中文比较
   if (summary.statusLabel === "已回填") {
     return summary.publishedAtLabel ?? summary.timestampLabel ?? null;
   }
 
+  // i18n-ignore-next-line: 协议层 statusLabel 来自 wire-format 解析，保留中文比较
   if (summary.statusLabel === "已完成") {
     return summary.timestampLabel ?? null;
   }
@@ -41,7 +46,7 @@ export function resolveGroupRelayPublishRangeLabel(summary: GroupRelaySummary) {
 
   if (sameDay) {
     return `${formatMessageTimestamp(summary.timestampLabel)} - ${new Intl.DateTimeFormat(
-      "zh-CN",
+      getActiveLocale(),
       {
         hour: "2-digit",
         minute: "2-digit",
@@ -52,7 +57,10 @@ export function resolveGroupRelayPublishRangeLabel(summary: GroupRelaySummary) {
   return `${formatMessageTimestamp(summary.timestampLabel)} - ${formatMessageTimestamp(summary.publishedAtLabel)}`;
 }
 
-export function resolveGroupRelayPublishStageBadge(summary: GroupRelaySummary) {
+export function resolveGroupRelayPublishStageBadge(
+  t: Translator,
+  summary: GroupRelaySummary,
+) {
   const publishCount = parseGroupRelayCount(summary.publishCountLabel);
   if (publishCount === null) {
     return null;
@@ -60,18 +68,21 @@ export function resolveGroupRelayPublishStageBadge(summary: GroupRelaySummary) {
 
   if (publishCount <= 1) {
     return {
-      label: "首次回填",
+      label: t(msg`首次回填`),
       tone: "info" as const,
     };
   }
 
   return {
-    label: "多次回填",
+    label: t(msg`多次回填`),
     tone: "success" as const,
   };
 }
 
-export function resolveGroupRelayCompletionBadge(summary: GroupRelaySummary) {
+export function resolveGroupRelayCompletionBadge(
+  t: Translator,
+  summary: GroupRelaySummary,
+) {
   const pendingCount = parseGroupRelayCount(summary.pendingMemberCountLabel);
   if (pendingCount === null) {
     return null;
@@ -79,35 +90,36 @@ export function resolveGroupRelayCompletionBadge(summary: GroupRelaySummary) {
 
   if (pendingCount === 0) {
     return {
-      label: "已全部确认",
+      label: t(msg`已全部确认`),
       tone: "success" as const,
     };
   }
 
   return {
-    label: "仍有待确认",
+    label: t(msg`仍有待确认`),
     tone: "warning" as const,
   };
 }
 
 export function resolveGroupRelayCtaCopy(
+  t: Translator,
   summary: GroupRelaySummary,
 ): ResultCardFooterCopy {
   const pendingCount = parseGroupRelayCount(summary.pendingMemberCountLabel);
   if (pendingCount === 0) {
     return {
-      description: "点击查看最终结果，必要时再覆盖新的完成状态",
-      actionLabel: "查看结果",
+      description: t(msg`点击查看最终结果，必要时再覆盖新的完成状态`),
+      actionLabel: t(msg`查看结果`),
       tone: "success" as const,
-      ariaLabel: `查看${summary.sourceGroupName}的群接龙结果`,
+      ariaLabel: t(msg`查看${summary.sourceGroupName}的群接龙结果`),
     };
   }
 
   return {
-    description: "点击继续查看和回填接龙",
-    actionLabel: "继续接龙",
+    description: t(msg`点击继续查看和回填接龙`),
+    actionLabel: t(msg`继续接龙`),
     tone: "warning" as const,
-    ariaLabel: `继续接龙${summary.sourceGroupName}的群接龙结果`,
+    ariaLabel: t(msg`继续接龙${summary.sourceGroupName}的群接龙结果`),
   };
 }
 
