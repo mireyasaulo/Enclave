@@ -6,6 +6,7 @@ import { cloudAdminApi } from "./cloud-admin-api";
 import {
   formatCloudConsoleSuspendWorldTitle,
   formatCloudConsoleRetryWorldRecoveryTitle,
+  translateCloudConsoleTextForActiveLocale,
 } from "./cloud-console-i18n";
 
 export type WorldLifecycleAction =
@@ -171,20 +172,27 @@ export function createWorldActionConfirmationCopy(
     case "suspend":
       return {
         title: formatCloudConsoleSuspendWorldTitle(world.name),
-        description:
+        description: translateCloudConsoleTextForActiveLocale(
           "The world will move toward sleeping state and active sessions may need to reconnect after it wakes again.",
-        confirmLabel: "Suspend world",
-        pendingLabel: createWorldActionPendingLabel(action),
+        ),
+        confirmLabel: translateCloudConsoleTextForActiveLocale("Suspend world"),
+        pendingLabel: translateCloudConsoleTextForActiveLocale(
+          createWorldActionPendingLabel(action),
+        ),
         danger: true,
       };
     case "retry":
     default:
       return {
         title: formatCloudConsoleRetryWorldRecoveryTitle(world.name),
-        description:
+        description: translateCloudConsoleTextForActiveLocale(
           "This will queue a new recovery action and clear the current failure state for the world.",
-        confirmLabel: "Retry recovery",
-        pendingLabel: createWorldActionPendingLabel(action),
+        ),
+        confirmLabel:
+          translateCloudConsoleTextForActiveLocale("Retry recovery"),
+        pendingLabel: translateCloudConsoleTextForActiveLocale(
+          createWorldActionPendingLabel(action),
+        ),
         danger: true,
       };
   }
