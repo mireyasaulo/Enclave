@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
@@ -32,6 +32,7 @@ import {
   buildMobileFriendMomentsRouteHash,
   parseMobileFriendMomentsRouteState,
 } from "../features/moments/mobile-friend-moments-route-state";
+import { translateCharacterBio } from "../lib/character-i18n";
 import { formatTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
@@ -170,7 +171,7 @@ export function MobileFriendMomentsPage() {
     : character?.name || t(msg`角色朋友圈`);
   const signature =
     character?.currentStatus?.trim() ||
-    character?.bio?.trim() ||
+    translateCharacterBio(t, character?.bio) ||
     t(msg`这个角色还没有个性签名。`);
   const profileActionAriaLabel = t(msg`查看 ${displayName} 的资料`);
   const blockedCharacterIds = useMemo(
@@ -626,6 +627,12 @@ function MobileFriendMomentCard({
 }) {
   const dateLabel = formatTimelineDate(moment.postedAt);
   const hasText = Boolean(moment.text.trim());
+  const composerInputRef = useRef<HTMLTextAreaElement>(null);
+  const focusComposer = () => {
+    requestAnimationFrame(() => {
+      composerInputRef.current?.focus();
+    });
+  };
 
   return (
     <article className="flex items-start gap-3">
@@ -704,7 +711,10 @@ function MobileFriendMomentCard({
                 <button
                   key={comment.id}
                   type="button"
-                  onClick={() => onStartReply(comment)}
+                  onClick={() => {
+                    onStartReply(comment);
+                    focusComposer();
+                  }}
                   className={cn(
                     "block w-full rounded-[8px] px-1.5 py-0.5 text-left text-[12px] leading-6 transition-colors",
                     isActiveTarget
@@ -767,6 +777,7 @@ function MobileFriendMomentCard({
             onChange={onCommentChange}
             onSubmit={onCommentSubmit}
             pending={commentPending}
+            inputRef={composerInputRef}
             placeholder={
               replyTarget ? t(msg`回复 ${replyTarget.authorName}...`) : t(msg`说点什么...`)
             }

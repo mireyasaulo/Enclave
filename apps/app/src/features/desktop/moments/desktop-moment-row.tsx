@@ -1,4 +1,4 @@
-import { useMemo, type MouseEvent as ReactMouseEvent } from "react";
+import { useMemo, useRef, type MouseEvent as ReactMouseEvent } from "react";
 import { msg } from "@lingui/macro";
 import { type Moment, type MomentComment } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
@@ -64,6 +64,12 @@ export function DesktopMomentRow({
   onSelectAuthor,
 }: DesktopMomentRowProps) {
   const t = useRuntimeTranslator();
+  const composerInputRef = useRef<HTMLTextAreaElement>(null);
+  const focusComposer = () => {
+    requestAnimationFrame(() => {
+      composerInputRef.current?.focus();
+    });
+  };
   const likedByOwner = Boolean(
     ownerId && moment.likes.some((like) => like.authorId === ownerId),
   );
@@ -301,7 +307,10 @@ export function DesktopMomentRow({
                     <button
                       key={comment.id}
                       type="button"
-                      onClick={() => onStartCommentReply?.(comment)}
+                      onClick={() => {
+                        onStartCommentReply?.(comment);
+                        focusComposer();
+                      }}
                       className={cn(
                         "block w-full rounded-[10px] px-2 py-1.5 text-left text-[13px] leading-6 transition-colors",
                         isActiveReply
@@ -364,6 +373,7 @@ export function DesktopMomentRow({
                   onChange={onCommentChange}
                   onSubmit={onCommentSubmit}
                   pending={commentLoading}
+                  inputRef={composerInputRef}
                   placeholder={
                     activeReply
                       ? t(msg`回复 ${activeReply.authorName}...`)
