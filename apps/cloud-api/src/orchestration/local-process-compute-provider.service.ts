@@ -169,6 +169,16 @@ export class LocalProcessComputeProviderService
     const entries = Array.from(this.running.entries());
     this.running.clear();
     for (const [worldId, state] of entries) {
+      // 我们 spawn 的 child（state.child != null）在 cloud-api 退出时 SIGTERM
+      // 干净停掉；reattach 来的孤儿（state.child == null）保留运行，让 cloud-api
+      // 下次重启 onModuleInit 通过 port-health probe 把它认领回去。这样短重启
+      // 不会切断用户活跃 socket.io 连接 / 强制 sqlite checkpoint。
+      if (!state.child) {
+        this.logger.log(
+          `leaving reattached local api child running for world=${worldId} pid=${state.pid} port=${state.port}`,
+        );
+        continue;
+      }
       this.logger.log(
         `terminating local api child for world=${worldId} pid=${state.pid}`,
       );

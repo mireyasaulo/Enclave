@@ -81,6 +81,22 @@ export function getChatSocket() {
     ...(token ? { auth: { token }, query: { token } } : {}),
   });
 
+  // socket.io-client 重连用初始 query；cloud token 续期或重登后 query 会过期
+  // → upgrade 401 死循环。每次重连前重抓最新 token 写回 query/auth，让反代层
+  // 重新校验通过。
+  if (token) {
+    const baseUrlForReconnect = nextSocketBaseUrl;
+    socket.io.on("reconnect_attempt", () => {
+      const latest = resolveSocketAuthToken(baseUrlForReconnect);
+      if (!latest) return;
+      const opts = socket?.io.opts as { query?: Record<string, string>; auth?: Record<string, unknown> } | undefined;
+      if (opts) {
+        opts.query = { ...(opts.query ?? {}), token: latest };
+        opts.auth = { ...(opts.auth ?? {}), token: latest };
+      }
+    });
+  }
+
   return socket;
 }
 
