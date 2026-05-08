@@ -22,6 +22,7 @@ import {
 } from "./runtime/native-locale";
 import { NativeLocaleSync } from "./runtime/native-locale-sync";
 import { BackendLocaleSync } from "./runtime/backend-locale-sync";
+import { registerAppServiceWorker } from "./runtime/register-service-worker";
 import { bootstrapAndroid } from "./runtime/adapters/android";
 import { bootstrapIos } from "./runtime/adapters/ios";
 import { router } from "./router";
@@ -135,6 +136,9 @@ async function bootstrap() {
       </AppLocaleProvider>
     </React.StrictMode>,
   );
+
+  // SW 注册放在 React 挂载之后再触发（内部 idleCallback），不抢首屏带宽。
+  registerAppServiceWorker();
 }
 
 void bootstrap();

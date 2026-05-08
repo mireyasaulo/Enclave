@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import viteCompression from "vite-plugin-compression";
+import { VitePWA } from "vite-plugin-pwa";
 
 function resolveManualChunk(id: string) {
   const normalizedId = id.replace(/\\/g, "/");
@@ -102,6 +103,79 @@ export default defineConfig(({ command }) => ({
       ext: ".gz",
       threshold: 1024,
       deleteOriginFile: false,
+    }),
+    // 公网隧道下重复访问让浏览器吃 SW cache，不再走 50KB/s 的隧道。
+    // - precache 全部 immutable hashed assets（JS/CSS/字体/图片）。
+    // - index.html 走 NetworkFirst（与 nginx no-store 对齐）：拿不到时回退缓存。
+    // - /api、/socket.io、/cloud、/admin/cloud、/telemetry、/runtime-config.json
+    //   走 NetworkOnly，不缓存。
+    // - 仅 web 端生效：main.tsx 注册时检查 detectAppPlatform()。
+    VitePWA({
+      registerType: "autoUpdate",
+      injectRegister: null, // 我们手动在 main.tsx 注册，方便 platform guard
+      filename: "sw.js",
+      manifest: false, // 不引入 manifest，纯 SW 缓存策略
+      workbox: {
+        // dist/assets 已经全是 hash + immutable，可放心 precache。
+        globPatterns: [
+          "assets/**/*.{js,css,woff,woff2,ttf,otf}",
+        ],
+        // index.html 不进 precache，由 navigation 路由按 NetworkFirst 兜底。
+        navigateFallback: "/index.html",
+        navigateFallbackDenylist: [
+          /^\/api\//,
+          /^\/health\b/,
+          /^\/socket\.io\//,
+          /^\/cloud\//,
+          /^\/admin\/cloud\//,
+          /^\/telemetry\//,
+          /^\/runtime-config\.json$/,
+        ],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) =>
+              url.pathname === "/" || url.pathname === "/index.html",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "yinjie-app-html",
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 4, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
+          },
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith("/assets/"),
+            handler: "CacheFirst",
+            options: {
+              cacheName: "yinjie-app-assets",
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 60 * 60 * 24 * 60, // 60 天
+              },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            urlPattern: ({ request }) => request.destination === "image",
+            handler: "CacheFirst",
+            options: {
+              cacheName: "yinjie-app-images",
+              expiration: {
+                maxEntries: 80,
+                maxAgeSeconds: 60 * 60 * 24 * 14,
+              },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
+        // /api/* 等动态接口完全不进 SW；directoryIndex 不要给 sw.js 兜底。
+        navigationPreload: true,
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
+      },
+      devOptions: {
+        enabled: false, // 开发期不注册 SW，避免缓存影响调试
+      },
     }),
   ],
   build: {
