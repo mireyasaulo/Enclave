@@ -92,6 +92,7 @@ import { isPersistedGroupConversation } from "../lib/conversation-route";
 import { buildCreateGroupRouteHash } from "../lib/create-group-route-state";
 import { formatConversationTimestamp } from "../lib/format";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+import { onChatMessage, onConversationUpdated } from "../lib/socket";
 
 type QuickActionItem = {
   key: string;
@@ -249,15 +250,24 @@ function MobileChatListPage() {
     [officialRouteState.returnHash, officialRouteState.returnPath],
   );
 
+  // 后端 conversation_updated/new_message 事件是房间级 emit（user 必须先
+  // join_conversation 才会收到），chat-list 默认不在任何 room；所以这里把
+  // refetchInterval 从 3s 拉长到 60s 当兜底，并通过 onConversationUpdated
+  // 监听 + window focus 触发即时刷新——用户已经进过的会话仍能立即同步，
+  // 公网隧道下空闲时网络请求量降一个数量级。
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
-    refetchInterval: isActiveTab ? 3_000 : false,
+    refetchInterval: isActiveTab ? 60_000 : false,
+    refetchOnWindowFocus: true,
+    staleTime: 15_000,
   });
   const messageEntriesQuery = useQuery({
     queryKey: ["app-official-message-entries", baseUrl],
     queryFn: () => getOfficialAccountMessageEntries(baseUrl),
-    refetchInterval: isActiveTab ? 3_000 : false,
+    refetchInterval: isActiveTab ? 60_000 : false,
+    refetchOnWindowFocus: true,
+    staleTime: 15_000,
   });
 
   const conversations = useMemo(
@@ -491,6 +501,26 @@ function MobileChatListPage() {
           queryKey: ["app-conversations", baseUrl],
         });
       });
+    };
+  }, [baseUrl, queryClient]);
+
+  // socket onConversationUpdated / onChatMessage 是房间级事件——chat-list 自身
+  // 不在任何房间，但 socket 是全局复用的：用户曾打开过的聊天室仍然 join 着，
+  // 那些会话变更可以即刻反映到列表上，不必等下一次 60s 兜底轮询。
+  useEffect(() => {
+    const offUpdated = onConversationUpdated(() => {
+      void queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
+    });
+    const offMessage = onChatMessage(() => {
+      void queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
+    });
+    return () => {
+      offUpdated();
+      offMessage();
     };
   }, [baseUrl, queryClient]);
 

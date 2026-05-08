@@ -112,6 +112,7 @@ import {
 } from "../../../lib/conversation-route";
 import { formatConversationTimestamp } from "../../../lib/format";
 import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
+import { onChatMessage, onConversationUpdated } from "../../../lib/socket";
 import { getCurrentWindowTargetPath } from "../../../runtime/desktop-windowing";
 import { useWorldOwnerStore } from "../../../store/world-owner-store";
 import {
@@ -294,17 +295,23 @@ export function DesktopChatWorkspace({
     setDetailsActionRequest(null);
   }, []);
 
+  // 与移动端 chat-list 同样：3s 轮询 → 60s 兜底 + onWindowFocus + 接 socket
+  // onConversationUpdated/onChatMessage 即时 invalidate。
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
     enabled: Boolean(ownerId),
-    refetchInterval: 3_000,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+    staleTime: 15_000,
   });
   const messageEntriesQuery = useQuery({
     queryKey: ["app-official-message-entries", baseUrl],
     queryFn: () => getOfficialAccountMessageEntries(baseUrl),
     enabled: Boolean(ownerId),
-    refetchInterval: 3_000,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+    staleTime: 15_000,
   });
 
   const blockedQuery = useQuery({
@@ -312,6 +319,23 @@ export function DesktopChatWorkspace({
     queryFn: () => getBlockedCharacters(baseUrl),
     enabled: Boolean(ownerId),
   });
+
+  useEffect(() => {
+    const offUpdated = onConversationUpdated(() => {
+      void queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
+    });
+    const offMessage = onChatMessage(() => {
+      void queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
+    });
+    return () => {
+      offUpdated();
+      offMessage();
+    };
+  }, [baseUrl, queryClient]);
 
   const blockedCharacterIds = useMemo(
     () => new Set((blockedQuery.data ?? []).map((item) => item.characterId)),

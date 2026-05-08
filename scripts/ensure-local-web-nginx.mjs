@@ -77,14 +77,14 @@ http {
   keepalive_timeout 65s;
 
   # 公网隧道带宽受限，所有可压缩文本类资源都走 gzip。
-  # vite 构建时由 vite-plugin-compression 生成 *.gz / *.br 同名兄弟文件，
+  # vite 构建时由 vite-plugin-compression 生成 *.gz 同名兄弟文件，
   # gzip_static on 让 nginx 直接吐预压缩文件，不再现压。
   gzip on;
   gzip_static on;
   gzip_vary on;
   gzip_proxied any;
   gzip_min_length 1024;
-  gzip_comp_level 5;
+  gzip_comp_level 6;
   gzip_types
     text/plain
     text/css
@@ -92,9 +92,16 @@ http {
     application/javascript
     application/json
     application/manifest+json
+    application/xml
+    application/xhtml+xml
+    application/rss+xml
+    application/atom+xml
     application/wasm
+    text/xml
     image/svg+xml
-    font/woff2;
+    font/woff2
+    font/ttf
+    font/otf;
 
   access_log ${path.join(logsDir, "access.log")};
   error_log ${path.join(logsDir, "error.log")};
