@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useParams, useRouterState } from "@tanstack/react-router";
@@ -9,7 +9,6 @@ import {
   getFriends,
   getMoments,
   toggleMomentLike,
-  type Moment,
   type MomentComment,
 } from "@yinjie/contracts";
 import { translateRuntimeMessage } from "@yinjie/i18n";
@@ -19,21 +18,23 @@ import {
   ErrorBlock,
   InlineNotice,
   LoadingBlock,
-  cn,
 } from "@yinjie/ui";
-import { ArrowLeft, Heart, MapPin, MessageCircle } from "lucide-react";
-import { AvatarChip } from "../components/avatar-chip";
-import { MomentCommentComposer } from "../components/moment-comment-composer";
-import { MomentMediaGallery } from "../components/moment-media-gallery";
+import { ArrowLeft } from "lucide-react";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
+import { WeChatActionBubble } from "../components/wechat-action-bubble";
+import {
+  WeChatCommentBar,
+  type WeChatCommentBarReplyTarget,
+} from "../components/wechat-comment-bar";
+import { WeChatMomentCard } from "../components/wechat-moment-card";
+import { WeChatMomentsCover } from "../components/wechat-moments-cover";
 import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
 import { getFriendDisplayName } from "../features/contacts/contact-utils";
 import {
   buildMobileFriendMomentsRouteHash,
   parseMobileFriendMomentsRouteState,
 } from "../features/moments/mobile-friend-moments-route-state";
-import { translateCharacterBio } from "../lib/character-i18n";
-import { formatTimestamp } from "../lib/format";
+import { usePullToRefresh } from "../features/moments/use-pull-to-refresh";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
@@ -76,11 +77,13 @@ export function MobileFriendMomentsPage() {
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>(
     {},
   );
-  const [replyTarget, setReplyTarget] = useState<{
-    authorId: string;
-    authorName: string;
-    commentId: string;
-    postId: string;
+  const [actionBubble, setActionBubble] = useState<{
+    momentId: string;
+    anchorRect: DOMRect;
+  } | null>(null);
+  const [commentBarTarget, setCommentBarTarget] = useState<{
+    momentId: string;
+    replyTo: WeChatCommentBarReplyTarget | null;
   } | null>(null);
   const [notice, setNotice] = useState<{
     tone: "success" | "info";
@@ -125,24 +128,24 @@ export function MobileFriendMomentsPage() {
         throw new Error(t(msg`请先输入评论内容。`));
       }
 
-      const replyTo =
-        replyTarget && replyTarget.postId === momentId ? replyTarget : null;
+      const target =
+        commentBarTarget?.momentId === momentId
+          ? commentBarTarget.replyTo
+          : null;
 
       return addMomentComment(
         momentId,
         {
           text,
-          replyToCommentId: replyTo?.commentId,
-          replyToAuthorId: replyTo?.authorId,
+          replyToCommentId: target?.commentId,
+          replyToAuthorId: target?.authorId,
         },
         baseUrl,
       );
     },
     onSuccess: async (_, momentId) => {
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
-      setReplyTarget((current) =>
-        current?.postId === momentId ? null : current,
-      );
+      setCommentBarTarget(null);
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
@@ -169,11 +172,6 @@ export function MobileFriendMomentsPage() {
   const displayName = friendItem
     ? getFriendDisplayName(friendItem)
     : character?.name || t(msg`角色朋友圈`);
-  const signature =
-    character?.currentStatus?.trim() ||
-    translateCharacterBio(t, character?.bio) ||
-    t(msg`这个角色还没有个性签名。`);
-  const profileActionAriaLabel = t(msg`查看 ${displayName} 的资料`);
   const blockedCharacterIds = useMemo(
     () => new Set((blockedQuery.data ?? []).map((item) => item.characterId)),
     [blockedQuery.data],
@@ -193,12 +191,8 @@ export function MobileFriendMomentsPage() {
         ),
     [blockedCharacterIds, momentsQuery.data, resolvedCharacterId],
   );
-  const latestMoment = friendMoments[0] ?? null;
   const relationshipLoading = friendsQuery.isLoading || blockedQuery.isLoading;
   const timelineLoading = momentsQuery.isLoading || relationshipLoading;
-  const pendingLikeMomentId = likeMutation.isPending
-    ? likeMutation.variables
-    : null;
   const pendingCommentMomentId = commentMutation.isPending
     ? commentMutation.variables
     : null;
@@ -220,6 +214,8 @@ export function MobileFriendMomentsPage() {
   useEffect(() => {
     setCommentDrafts({});
     setNotice(null);
+    setCommentBarTarget(null);
+    setActionBubble(null);
   }, [baseUrl, resolvedCharacterId]);
 
   useEffect(() => {
@@ -278,6 +274,18 @@ export function MobileFriendMomentsPage() {
     void blockedQuery.refetch();
   }
 
+  const { containerRef, state: pullState } = usePullToRefresh({
+    onRefresh: async () => {
+      await Promise.all([
+        momentsQuery.refetch(),
+        blockedQuery.refetch(),
+        friendsQuery.refetch(),
+        characterQuery.refetch(),
+      ]);
+    },
+    enabled: Boolean(resolvedCharacterId),
+  });
+
   if (!resolvedCharacterId) {
     return (
       <AppPage className="space-y-0 px-0 py-0">
@@ -285,13 +293,13 @@ export function MobileFriendMomentsPage() {
           title={t(msg`朋友圈`)}
           subtitle={t(msg`好友`)}
           titleAlign="center"
-          className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
+          className="mx-0 mb-0 mt-0 border-b border-[#ECECEC] bg-white px-4 pb-1.5 pt-1.5 text-[#1A1A1A] shadow-none"
           leftActions={
             <Button
               onClick={handleBack}
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-black/[0.05]"
+              className="h-9 w-9 rounded-full border-0 bg-transparent text-[#1A1A1A] active:bg-black/[0.05]"
             >
               <ArrowLeft size={17} />
             </Button>
@@ -304,543 +312,301 @@ export function MobileFriendMomentsPage() {
     );
   }
 
+  const activeMoment = actionBubble
+    ? friendMoments.find((moment) => moment.id === actionBubble.momentId) ??
+      null
+    : null;
+  const liked = Boolean(
+    activeMoment?.likes.some((like) => like.authorType === "user"),
+  );
+
+  const onCommentTap = (momentId: string, comment: MomentComment | null) => {
+    setCommentBarTarget({
+      momentId,
+      replyTo: comment
+        ? {
+            authorId: comment.authorId,
+            authorName: comment.authorName,
+            commentId: comment.id,
+          }
+        : null,
+    });
+  };
+
   return (
-    <AppPage className="space-y-0 bg-[#f2f2f2] px-0 pb-0 pt-0">
+    <AppPage className="relative space-y-0 bg-white px-0 pb-0 pt-0">
       <TabPageTopBar
         title={displayName}
-        subtitle={t(msg`朋友圈`)}
         titleAlign="center"
-        className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
+        className="mx-0 mb-0 mt-0 border-b border-[#ECECEC] bg-white px-4 pb-1.5 pt-1.5 text-[#1A1A1A] shadow-none"
         leftActions={
           <Button
             onClick={handleBack}
             variant="ghost"
             size="icon"
-            className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-black/[0.05]"
+            className="h-9 w-9 rounded-full border-0 bg-transparent text-[#1A1A1A] active:bg-black/[0.05]"
           >
             <ArrowLeft size={17} />
           </Button>
         }
       />
 
-      <div className="space-y-3 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] pt-3">
-        {notice ? (
-          <InlineNotice
-            tone={notice.tone}
-            className="rounded-[14px] border border-[color:var(--border-faint)] bg-white px-3 py-2 text-[12px] shadow-none"
+      <div
+        ref={containerRef}
+        className="relative flex-1 overflow-y-auto overscroll-contain bg-white"
+        style={{ overflowAnchor: "none" }}
+      >
+        {pullState.offset || pullState.refreshing ? (
+          <div
+            className="pointer-events-none absolute left-0 right-0 z-10 flex items-center justify-center text-[12px] text-[#9A9A9A]"
+            style={{ top: 0, height: `${pullState.offset || 60}px` }}
           >
-            {notice.message}
-          </InlineNotice>
+            <span>
+              {pullState.refreshing
+                ? t(msg`正在刷新...`)
+                : pullState.offset >= 64
+                  ? t(msg`松手刷新`)
+                  : t(msg`下拉刷新`)}
+            </span>
+          </div>
         ) : null}
 
-        <section className="overflow-hidden rounded-[26px] border border-[rgba(0,0,0,0.05)] bg-white shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
-          <div className="relative h-44 overflow-hidden bg-[linear-gradient(135deg,#778f7c_0%,#a8b9a1_46%,#d6c8b1_100%)]">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.28),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(20,83,45,0.18),transparent_42%)]" />
-            <button
-              type="button"
-              onClick={() => {
-                openCharacterDetail();
-              }}
-              className="absolute bottom-6 right-[5.9rem] left-4 text-right focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-              aria-label={profileActionAriaLabel}
-            >
-              <div className="truncate text-[22px] font-semibold tracking-[0.01em] text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.18)]">
-                {displayName}
-              </div>
-              <div className="mt-1 line-clamp-2 text-[12px] leading-5 text-white/85 [text-shadow:0_2px_12px_rgba(0,0,0,0.16)]">
-                {signature}
-              </div>
-            </button>
-            <div className="absolute bottom-4 right-4">
-              <button
-                type="button"
-                onClick={() => {
-                  openCharacterDetail();
-                }}
-                className="rounded-full transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-                aria-label={profileActionAriaLabel}
+        <div
+          style={{
+            transform: `translateY(${pullState.offset}px)`,
+            transition: pullState.pulling ? "none" : "transform 220ms ease-out",
+          }}
+        >
+          <WeChatMomentsCover
+            nickname={displayName}
+            avatarUrl={character?.avatar}
+            onAvatarTap={(event) => {
+              event.stopPropagation();
+              openCharacterDetail();
+            }}
+          />
+
+          {notice ? (
+            <div className="px-4 pt-3">
+              <InlineNotice
+                tone={notice.tone}
+                className="rounded-[8px] border border-[#ECECEC] bg-white px-3 py-2 text-[12px] shadow-none"
               >
-                <AvatarChip name={displayName} src={character?.avatar} size="xl" />
-              </button>
+                {notice.message}
+              </InlineNotice>
             </div>
-          </div>
-          <div className="flex items-center justify-between gap-3 px-4 py-3.5 text-[12px] text-[color:var(--text-secondary)]">
-            <div className="min-w-0">
-              <div className="font-medium text-[color:var(--text-primary)]">
-                {relationshipLoading
-                  ? t(msg`正在确认可见范围...`)
-                  : t(msg`${friendMoments.length} 条朋友圈`)}
+          ) : null}
+
+          {!character && (characterQuery.isLoading || friendsQuery.isLoading) ? (
+            <div className="px-4 pt-10">
+              <LoadingBlock
+                label={t(msg`正在读取角色朋友圈...`)}
+                className="border-0 bg-transparent py-2 shadow-none"
+              />
+            </div>
+          ) : null}
+
+          {!character &&
+          !characterQuery.isLoading &&
+          !friendsQuery.isLoading ? (
+            <section className="mx-4 mt-4 rounded-[12px] border border-[#ECECEC] bg-white px-4 py-5">
+              <div className="text-[16px] font-semibold text-[#1A1A1A]">
+                {t(msg`无法打开这位角色的朋友圈`)}
               </div>
-              <div className="mt-1 truncate text-[11px] text-[color:var(--text-muted)]">
-                {relationshipLoading
-                  ? t(msg`稍等一下，正在同步这位角色的动态。`)
-                  : latestMoment
-                  ? t(msg`最近更新 ${formatTimestamp(latestMoment.postedAt)}`)
-                  : t(msg`这位角色最近还没有发布新的朋友圈。`)}
+              <div className="mt-2 text-[13px] leading-6 text-[#9A9A9A]">
+                {t(msg`角色资料不存在，或者当前资料还没有同步完成。`)}
+              </div>
+              {errors.length > 0 ? (
+                <div className="mt-4 space-y-3">
+                  {errors.map((message, index) => (
+                    <ErrorBlock key={`${message}-${index}`} message={message} />
+                  ))}
+                </div>
+              ) : null}
+              <div className="mt-5 flex gap-2">
+                <Button variant="secondary" onClick={handleBack}>
+                  {t(msg`返回上一页`)}
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    if (navigateToRouteStateReturn()) return;
+                    if (openCharacterDetail()) return;
+                    void navigate({ to: "/discover/moments" });
+                  }}
+                >
+                  {safeReturnPath
+                    ? t(msg`回到来源页`)
+                    : resolvedCharacterId
+                      ? t(msg`查看角色资料`)
+                      : t(msg`去朋友圈主页`)}
+                </Button>
+              </div>
+            </section>
+          ) : null}
+
+          {character && timelineLoading && !friendMoments.length ? (
+            <div className="px-4 pt-10 pb-12 text-center text-[12px] text-[#9A9A9A]">
+              {t(msg`正在刷新这位角色的朋友圈`)}
+            </div>
+          ) : null}
+
+          {character && !timelineLoading && momentsQuery.isError ? (
+            <div className="px-4 pt-10 pb-12 text-center">
+              <div className="text-[14px] font-medium text-[#1A1A1A]">
+                {t(msg`朋友圈暂时不可用`)}
+              </div>
+              <div className="mt-2 text-[12px] text-[#9A9A9A]">
+                {momentsQuery.error instanceof Error
+                  ? momentsQuery.error.message
+                  : t(msg`读取这位角色的朋友圈时出错了。`)}
+              </div>
+              <div className="mt-4 flex justify-center gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="h-8 rounded-full border-[#E5E5E5] bg-white px-3.5 text-[11px]"
+                  onClick={handleRetryLoad}
+                >
+                  {t(msg`重试读取`)}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="h-8 rounded-full border-[#E5E5E5] bg-white px-3.5 text-[11px]"
+                  onClick={handleBack}
+                >
+                  {statusBackLabel}
+                </Button>
               </div>
             </div>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="h-8 rounded-full border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 text-[11px]"
-              onClick={() => {
-                openCharacterDetail();
-              }}
-            >
-              {t(msg`查看资料`)}
-            </Button>
-          </div>
-        </section>
+          ) : null}
 
-        {!character && (characterQuery.isLoading || friendsQuery.isLoading) ? (
-          <div className="rounded-[24px] border border-[color:var(--border-faint)] bg-white px-4 py-8">
-            <LoadingBlock
-              label={t(msg`正在读取角色朋友圈...`)}
-              className="border-0 bg-transparent py-2 shadow-none"
-            />
-          </div>
-        ) : null}
-
-        {!character &&
-        !characterQuery.isLoading &&
-        !friendsQuery.isLoading ? (
-          <section className="rounded-[24px] border border-[color:var(--border-faint)] bg-white px-4 py-5">
-            <div className="text-[18px] font-semibold text-[color:var(--text-primary)]">
-              {t(msg`无法打开这位角色的朋友圈`)}
-            </div>
-            <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-              {t(msg`角色资料不存在，或者当前资料还没有同步完成。`)}
-            </div>
-            {errors.length > 0 ? (
-              <div className="mt-4 space-y-3">
-                {errors.map((message, index) => (
-                  <ErrorBlock key={`${message}-${index}`} message={message} />
-                ))}
+          {character && !timelineLoading && !momentsQuery.isError && isBlocked ? (
+            <div className="px-4 pt-10 pb-12 text-center">
+              <div className="text-[14px] font-medium text-[#1A1A1A]">
+                {t(msg`这位角色的朋友圈当前不可见`)}
               </div>
-            ) : null}
-            <div className="mt-5 flex gap-2">
-              <Button variant="secondary" onClick={handleBack}>
-                {t(msg`返回上一页`)}
-              </Button>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  if (navigateToRouteStateReturn()) {
-                    return;
-                  }
-
-                  if (openCharacterDetail()) {
-                    return;
-                  }
-
-                  void navigate({ to: "/discover/moments" });
-                }}
-              >
-                {safeReturnPath
-                  ? t(msg`回到来源页`)
-                  : resolvedCharacterId
-                    ? t(msg`查看角色资料`)
-                    : t(msg`去朋友圈主页`)}
-              </Button>
+              <div className="mt-2 text-[12px] text-[#9A9A9A]">
+                {t(msg`你已经将这位角色加入黑名单，相关朋友圈内容会先隐藏。`)}
+              </div>
             </div>
-          </section>
-        ) : null}
+          ) : null}
 
-        {character ? (
-          <section className="space-y-3">
-            <div className="px-1">
-              <div className="text-[11px] text-[color:var(--text-muted)]">{t(msg`最近内容`)}</div>
+          {character &&
+          !timelineLoading &&
+          !momentsQuery.isError &&
+          !isBlocked &&
+          !friendMoments.length ? (
+            <div className="px-4 pt-12 pb-16 text-center">
+              <div className="text-[14px] font-medium text-[#1A1A1A]">
+                {t(msg`${displayName} 还没有发表朋友圈`)}
+              </div>
+              <div className="mt-2 text-[12px] text-[#9A9A9A]">
+                {t(msg`先把这页留着，等 TA 下次更新时再回来看看。`)}
+              </div>
             </div>
+          ) : null}
 
-            {timelineLoading ? (
-              <MobileFriendMomentsStateCard
-                badge={t(msg`读取中`)}
-                title={t(msg`正在刷新这位角色的朋友圈`)}
-                description={t(msg`稍等一下，正在同步 TA 最近发布的动态。`)}
-              />
-            ) : null}
-
-            {!timelineLoading && momentsQuery.isError ? (
-              <MobileFriendMomentsStateCard
-                badge={t(msg`读取失败`)}
-                title={t(msg`朋友圈暂时不可用`)}
-                description={
-                  momentsQuery.error instanceof Error
-                    ? momentsQuery.error.message
-                    : t(msg`读取这位角色的朋友圈时出错了。`)
-                }
-                tone="danger"
-                action={
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
-                      onClick={handleRetryLoad}
-                    >
-                      {t(msg`重试读取`)}
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
-                      onClick={handleBack}
-                    >
-                      {statusBackLabel}
-                    </Button>
-                  </div>
-                }
-              />
-            ) : null}
-
-            {!timelineLoading &&
-            !momentsQuery.isError &&
-            isBlocked ? (
-              <MobileFriendMomentsStateCard
-                badge={t(msg`已隐藏`)}
-                title={t(msg`这位角色的朋友圈当前不可见`)}
-                description={t(msg`你已经将这位角色加入黑名单，相关朋友圈内容会先隐藏。`)}
-              />
-            ) : null}
-
-            {!timelineLoading &&
-            !momentsQuery.isError &&
-            !isBlocked &&
-            !friendMoments.length ? (
-              <MobileFriendMomentsStateCard
-                badge={t(msg`角色朋友圈`)}
-                title={t(msg`${displayName} 还没有发表朋友圈`)}
-                description={t(msg`先把这页留着，等 TA 下次更新时再回来看看。`)}
-              />
-            ) : null}
-
-            {!timelineLoading &&
-            !momentsQuery.isError &&
-            !isBlocked &&
-            friendMoments.length ? (
-              <div className="space-y-3">
-                {friendMoments.map((moment) => (
-                  <MobileFriendMomentCard
-                    key={moment.id}
+          {character &&
+          !timelineLoading &&
+          !momentsQuery.isError &&
+          !isBlocked &&
+          friendMoments.length
+            ? friendMoments.map((moment, index) => (
+                <div
+                  key={moment.id}
+                  className={index === 0 ? "" : "border-t border-[#ECECEC]"}
+                >
+                  <WeChatMomentCard
+                    cardId={`moment-post-${moment.id}`}
                     moment={moment}
-                    commentDraft={commentDrafts[moment.id] ?? ""}
-                    commentPending={pendingCommentMomentId === moment.id}
-                    likePending={pendingLikeMomentId === moment.id}
-                    replyTarget={
-                      replyTarget?.postId === moment.id ? replyTarget : null
+                    ownerId={null}
+                    liked={moment.likes.some(
+                      (like) => like.authorType === "user",
+                    )}
+                    onAuthorTap={openCharacterDetail}
+                    onOpenActionMenu={(rect) =>
+                      setActionBubble({ momentId: moment.id, anchorRect: rect })
                     }
-                    onCancelReply={() => setReplyTarget(null)}
-                    onCommentChange={(value) =>
-                      setCommentDrafts((current) => ({
-                        ...current,
-                        [moment.id]: value,
-                      }))
-                    }
-                    onCommentSubmit={() => commentMutation.mutate(moment.id)}
-                    onLike={() => likeMutation.mutate(moment.id)}
-                    onStartReply={(comment) =>
-                      setReplyTarget({
-                        authorId: comment.authorId,
-                        authorName: comment.authorName,
-                        commentId: comment.id,
-                        postId: moment.id,
-                      })
-                    }
+                    onDoubleTapLike={() => likeMutation.mutate(moment.id)}
+                    onCommentTap={(comment) => onCommentTap(moment.id, comment)}
                   />
-                ))}
-              </div>
-            ) : null}
+                </div>
+              ))
+            : null}
 
-            {likeMutation.isError && likeMutation.error instanceof Error ? (
+          {likeMutation.isError && likeMutation.error instanceof Error ? (
+            <div className="px-4 pt-3">
               <InlineNotice
                 tone="info"
-                className="rounded-[14px] border border-[color:var(--border-faint)] bg-white px-3 py-2 text-[12px] shadow-none"
+                className="rounded-[8px] border border-[#ECECEC] bg-white px-3 py-2 text-[12px] shadow-none"
               >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="min-w-0 flex-1">
-                    {likeMutation.error.message}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleBack}
-                    className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
-                  >
-                    {statusBackLabel}
-                  </button>
-                </div>
+                {likeMutation.error.message}
               </InlineNotice>
-            ) : null}
+            </div>
+          ) : null}
 
-            {commentMutation.isError && commentMutation.error instanceof Error ? (
+          {commentMutation.isError && commentMutation.error instanceof Error ? (
+            <div className="px-4 pt-3">
               <InlineNotice
                 tone="info"
-                className="rounded-[14px] border border-[color:var(--border-faint)] bg-white px-3 py-2 text-[12px] shadow-none"
+                className="rounded-[8px] border border-[#ECECEC] bg-white px-3 py-2 text-[12px] shadow-none"
               >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="min-w-0 flex-1">
-                    {commentMutation.error.message}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleBack}
-                    className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
-                  >
-                    {statusBackLabel}
-                  </button>
-                </div>
+                {commentMutation.error.message}
               </InlineNotice>
-            ) : null}
-          </section>
-        ) : null}
+            </div>
+          ) : null}
+
+          <div className="h-[calc(env(safe-area-inset-bottom,0px)+24px)]" />
+        </div>
       </div>
+
+      <WeChatActionBubble
+        open={Boolean(actionBubble)}
+        anchorRect={actionBubble?.anchorRect ?? null}
+        liked={liked}
+        onLike={() => {
+          if (actionBubble) {
+            likeMutation.mutate(actionBubble.momentId);
+          }
+        }}
+        onComment={() => {
+          if (actionBubble) {
+            onCommentTap(actionBubble.momentId, null);
+          }
+        }}
+        onClose={() => setActionBubble(null)}
+      />
+
+      <WeChatCommentBar
+        open={Boolean(commentBarTarget)}
+        replyTo={commentBarTarget?.replyTo ?? null}
+        value={
+          commentBarTarget
+            ? commentDrafts[commentBarTarget.momentId] ?? ""
+            : ""
+        }
+        onChange={(value) => {
+          if (commentBarTarget) {
+            setCommentDrafts((current) => ({
+              ...current,
+              [commentBarTarget.momentId]: value,
+            }));
+          }
+        }}
+        pending={
+          commentBarTarget
+            ? pendingCommentMomentId === commentBarTarget.momentId
+            : false
+        }
+        onSubmit={() => {
+          if (commentBarTarget) {
+            commentMutation.mutate(commentBarTarget.momentId);
+          }
+        }}
+        onClose={() => setCommentBarTarget(null)}
+      />
     </AppPage>
   );
-}
-
-function MobileFriendMomentCard({
-  moment,
-  commentDraft,
-  commentPending,
-  likePending,
-  replyTarget,
-  onCancelReply,
-  onCommentChange,
-  onCommentSubmit,
-  onLike,
-  onStartReply,
-}: {
-  moment: Moment;
-  commentDraft: string;
-  commentPending: boolean;
-  likePending: boolean;
-  replyTarget: {
-    authorId: string;
-    authorName: string;
-    commentId: string;
-    postId: string;
-  } | null;
-  onCancelReply: () => void;
-  onCommentChange: (value: string) => void;
-  onCommentSubmit: () => void;
-  onLike: () => void;
-  onStartReply: (comment: MomentComment) => void;
-}) {
-  const dateLabel = formatTimelineDate(moment.postedAt);
-  const hasText = Boolean(moment.text.trim());
-  const composerInputRef = useRef<HTMLTextAreaElement>(null);
-  const focusComposer = () => {
-    requestAnimationFrame(() => {
-      composerInputRef.current?.focus();
-    });
-  };
-
-  return (
-    <article className="flex items-start gap-3">
-      <div className="w-10 shrink-0 pt-1 text-center">
-        <div className="text-[22px] font-semibold leading-none text-[color:var(--text-primary)]">
-          {dateLabel.day}
-        </div>
-        <div className="mt-1 text-[10px] tracking-[0.08em] text-[color:var(--text-muted)]">
-          {dateLabel.month}
-        </div>
-      </div>
-      <div className="min-w-0 flex-1 overflow-hidden rounded-[22px] border border-[rgba(0,0,0,0.05)] bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.05)]">
-        {hasText ? (
-          <div className="text-[15px] leading-7 text-[color:var(--text-primary)]">
-            {moment.text}
-          </div>
-        ) : null}
-        {moment.media.length > 0 ? (
-          <div className={hasText ? "mt-3" : ""}>
-            <MomentMediaGallery
-              contentType={moment.contentType}
-              media={moment.media}
-              variant="mobile"
-            />
-          </div>
-        ) : null}
-        {moment.location ? (
-          <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-[rgba(15,23,42,0.04)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
-            <MapPin size={12} />
-            <span>{moment.location}</span>
-          </div>
-        ) : null}
-        <div className="mt-3 flex items-center justify-between gap-3 text-[11px] text-[color:var(--text-muted)]">
-          <span>{formatTimestamp(moment.postedAt)}</span>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="h-8 rounded-full border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 text-[11px]"
-              onClick={onLike}
-              disabled={likePending}
-            >
-              <Heart size={14} className="mr-1" />
-              {likePending ? t(msg`处理中...`) : t(msg`赞`)}
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="h-8 rounded-full border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 text-[11px]"
-              onClick={onCommentSubmit}
-              disabled={!commentDraft.trim() || commentPending}
-            >
-              <MessageCircle size={14} className="mr-1" />
-              {commentPending ? t(msg`发送中...`) : t(msg`评论`)}
-            </Button>
-          </div>
-        </div>
-        {moment.likes.length > 0 || moment.comments.length > 0 ? (
-          <div className="mt-3 space-y-2 rounded-[18px] bg-[rgba(15,23,42,0.035)] px-3 py-3">
-            {moment.likes.length > 0 ? (
-              <div className="text-[12px] leading-6 text-[color:var(--text-secondary)]">
-                <span className="font-medium text-[color:var(--text-primary)]">
-                  {t(msg`赞`)}
-                </span>
-                {t(msg` · ${moment.likes.map((item) => item.authorName).join("，")}`)}
-              </div>
-            ) : null}
-            {moment.comments.map((comment) => {
-              const replyToName = comment.replyToCommentId
-                ? (moment.comments.find(
-                    (item) => item.id === comment.replyToCommentId,
-                  )?.authorName ?? null)
-                : null;
-              const isActiveTarget = replyTarget?.commentId === comment.id;
-              return (
-                <button
-                  key={comment.id}
-                  type="button"
-                  onClick={() => {
-                    onStartReply(comment);
-                    focusComposer();
-                  }}
-                  className={cn(
-                    "block w-full rounded-[8px] px-1.5 py-0.5 text-left text-[12px] leading-6 transition-colors",
-                    isActiveTarget
-                      ? "bg-[rgba(7,193,96,0.12)]"
-                      : "hover:bg-white",
-                  )}
-                >
-                  <span className="font-medium text-[#07c160]">
-                    {comment.authorName}
-                  </span>
-                  {replyToName ? (
-                    <>
-                      <span className="text-[color:var(--text-secondary)]">
-                        {t(msg` 回复 `)}
-                      </span>
-                      <span className="font-medium text-[#07c160]">
-                        {replyToName}
-                      </span>
-                    </>
-                  ) : null}
-                  <span className="text-[color:var(--text-secondary)]">{t(msg`：`)}</span>
-                  <span className="text-[color:var(--text-primary)]">{comment.text}</span>
-                </button>
-              );
-            })}
-          </div>
-        ) : null}
-        {replyTarget ? (
-          (() => {
-            const replyTargetComment = moment.comments.find(
-              (item) => item.id === replyTarget.commentId,
-            );
-            return (
-              <div className="mt-2 flex items-start justify-between gap-2 rounded-[12px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[12px] text-[color:var(--text-secondary)]">
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="truncate">
-                    {t(msg`正在回复 ${replyTarget.authorName}`)}
-                  </div>
-                  {replyTargetComment ? (
-                    <div className="truncate text-[color:var(--text-muted)]">
-                      {t(msg`「${replyTargetComment.text}」`)}
-                    </div>
-                  ) : null}
-                </div>
-                <button
-                  type="button"
-                  onClick={onCancelReply}
-                  aria-label={t(msg`取消回复`)}
-                  className="shrink-0 rounded-full px-2 py-0.5 text-[11px] text-[color:var(--text-muted)] hover:bg-white"
-                >
-                  {t(msg`取消`)}
-                </button>
-              </div>
-            );
-          })()
-        ) : null}
-        <div className="mt-3 flex items-center gap-2">
-          <MomentCommentComposer
-            value={commentDraft}
-            onChange={onCommentChange}
-            onSubmit={onCommentSubmit}
-            pending={commentPending}
-            inputRef={composerInputRef}
-            placeholder={
-              replyTarget ? t(msg`回复 ${replyTarget.authorName}...`) : t(msg`说点什么...`)
-            }
-            inputClassName="rounded-full py-1.5 text-[16px]"
-            buttonClassName="h-8 px-3 text-[12px]"
-          />
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function MobileFriendMomentsStateCard({
-  badge,
-  title,
-  description,
-  action,
-  tone = "default",
-}: {
-  badge: string;
-  title: string;
-  description: string;
-  action?: ReactNode;
-  tone?: "default" | "danger";
-}) {
-  return (
-    <section
-      className={cn(
-        "rounded-[24px] border bg-white px-4 py-5 shadow-[0_8px_24px_rgba(15,23,42,0.05)]",
-        tone === "danger"
-          ? "border-[rgba(220,38,38,0.14)]"
-          : "border-[color:var(--border-faint)]",
-      )}
-    >
-      <div
-        className={cn(
-          "inline-flex rounded-full px-2.5 py-1 text-[10px] font-medium",
-          tone === "danger"
-            ? "bg-[rgba(220,38,38,0.08)] text-[#b42318]"
-            : "bg-[rgba(15,23,42,0.06)] text-[color:var(--text-secondary)]",
-        )}
-      >
-        {badge}
-      </div>
-      <div className="mt-3 text-[17px] font-semibold text-[color:var(--text-primary)]">
-        {title}
-      </div>
-      <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-        {description}
-      </div>
-      {action ? <div className="mt-4">{action}</div> : null}
-    </section>
-  );
-}
-
-function formatTimelineDate(value: string) {
-  const parsedDate = new Date(value);
-  if (Number.isNaN(parsedDate.getTime())) {
-    return { month: "--", day: "--" };
-  }
-
-  return {
-    month: t(msg`${parsedDate.getMonth() + 1}月`),
-    day: `${parsedDate.getDate()}`.padStart(2, "0"),
-  };
 }
