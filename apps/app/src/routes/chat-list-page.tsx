@@ -1461,7 +1461,10 @@ function ConversationListItemLink({
 
   return (
     <div
-      className={cn("relative overflow-hidden bg-[#c4c7cc]", className)}
+      className={cn(
+        "yj-list-item-virtual relative overflow-hidden bg-[#c4c7cc]",
+        className,
+      )}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

@@ -143,13 +143,21 @@ function MobileWorldCharactersPage() {
     () => buildContactSections(filteredItems),
     [filteredItems],
   );
-  const mobileIndexItems = useMemo(
+  const sectionsWithAnchors = useMemo(
     () =>
       sections.map((section) => ({
-        key: section.anchorId,
-        indexLabel: section.indexLabel,
+        ...section,
+        scopedAnchorId: `world-character-${section.anchorId}`,
       })),
     [sections],
+  );
+  const mobileIndexItems = useMemo(
+    () =>
+      sectionsWithAnchors.map((section) => ({
+        key: section.scopedAnchorId,
+        indexLabel: section.indexLabel,
+      })),
+    [sectionsWithAnchors],
   );
 
   useEffect(() => {
@@ -450,10 +458,10 @@ function MobileWorldCharactersPage() {
           </div>
         ) : null}
 
-        {sections.length ? (
+        {sectionsWithAnchors.length ? (
           <section className="mt-1 overflow-hidden border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]">
-            {sections.map((section) => (
-              <div key={section.key} id={section.anchorId}>
+            {sectionsWithAnchors.map((section) => (
+              <div key={section.key} id={section.scopedAnchorId}>
                 <div className="bg-[rgba(247,247,247,0.94)] px-4 py-1 text-[11px] font-medium tracking-[0.06em] text-[color:var(--text-muted)]">
                   {section.title}
                 </div>
@@ -472,7 +480,7 @@ function MobileWorldCharactersPage() {
                       });
                     }}
                     className={cn(
-                      "flex w-full items-center gap-3 bg-[color:var(--bg-canvas-elevated)] px-4 py-2.5 text-left transition-colors hover:bg-[color:var(--surface-card-hover)]",
+                      "yj-list-item-virtual flex w-full items-center gap-3 bg-[color:var(--bg-canvas-elevated)] px-4 py-2.5 text-left transition-colors hover:bg-[color:var(--surface-card-hover)]",
                       index > 0
                         ? "border-t border-[color:var(--border-faint)]"
                         : undefined,

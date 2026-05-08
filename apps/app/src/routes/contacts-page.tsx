@@ -2317,7 +2317,7 @@ function FriendListRow({
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       className={cn(
-        "flex w-full items-center gap-3 bg-[color:var(--bg-canvas-elevated)] text-left transition-colors",
+        "yj-list-item-virtual flex w-full items-center gap-3 bg-[color:var(--bg-canvas-elevated)] text-left transition-colors",
         desktop
           ? "px-4 py-3.5 hover:bg-[color:var(--surface-console)]"
           : "py-2.5 pl-4 pr-7 hover:bg-[color:var(--surface-card-hover)]",

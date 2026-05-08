@@ -301,6 +301,15 @@ body.yj-mobile::after {
   user-select: none;
 }
 
+/* 长列表项启用 content-visibility: auto，让浏览器跳过屏外项的渲染/布局。
+ * 公网隧道下首屏与滚动期间能少做大量 layout/paint 工作。
+ * contain-intrinsic-size 给浏览器一个估算高度，避免初始 layout 跳动。
+ * 不能加在带 sticky position / 需要测量整体高度的容器上。 */
+.yj-list-item-virtual {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 64px;
+}
+
 /* iOS Safari 在 input/textarea 字号小于 16px 时聚焦会自动放大且不复原。
  * 当前 mobile-web 没有任何文本输入显式声明 ≥16px，所以直接强制 16px 即可。
  * 排除非文本类型 (checkbox/radio/file 等) 不会渲染文本。 */
