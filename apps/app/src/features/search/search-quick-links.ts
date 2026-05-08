@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { msg } from "@lingui/macro";
 import { getFavorites, type FavoriteRecord } from "@yinjie/contracts";
+import { getActiveLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import { formatTimestamp, parseTimestamp } from "../../lib/format";
+
+type Translator = ReturnType<typeof useRuntimeTranslator>;
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
 import {
   hydrateDesktopFavoritesFromNative,
@@ -36,20 +40,35 @@ type MiniProgramSearchStateSnapshot = {
   lastOpenedAtById: Record<string, string>;
 };
 
-const FAVORITE_CATEGORY_LABELS: Record<FavoriteRecord["category"], string> = {
-  messages: "收藏消息",
-  notes: "笔记",
-  contacts: "收藏联系人",
-  officialAccounts: "收藏公众号",
-  moments: "收藏朋友圈",
-  feed: "收藏广场动态",
-  channels: "收藏视频号",
-};
+function resolveFavoriteCategoryLabel(
+  t: Translator,
+  category: FavoriteRecord["category"],
+) {
+  switch (category) {
+    case "messages":
+      return t(msg`收藏消息`);
+    case "notes":
+      return t(msg`笔记`);
+    case "contacts":
+      return t(msg`收藏联系人`);
+    case "officialAccounts":
+      return t(msg`收藏公众号`);
+    case "moments":
+      return t(msg`收藏朋友圈`);
+    case "feed":
+      return t(msg`收藏广场动态`);
+    case "channels":
+      return t(msg`收藏视频号`);
+    default:
+      return "";
+  }
+}
 
 export function useSearchQuickLinks(
   keyword: string,
   isDesktopLayout = true,
 ) {
+  const t = useRuntimeTranslator();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const isNativeDesktop = runtimeConfig.appPlatform === "desktop";
@@ -128,13 +147,13 @@ export function useSearchQuickLinks(
     [favoritesQuery.data, localFavorites],
   );
   const favoriteSearchResults = useMemo(
-    () => mergedFavorites.map(buildFavoriteSearchResult),
-    [mergedFavorites],
+    () => mergedFavorites.map((item) => buildFavoriteSearchResult(t, item)),
+    [mergedFavorites, t],
   );
 
   const recentFavorites = useMemo(
-    () => mergedFavorites.slice(0, 4).map(buildFavoriteQuickLink),
-    [mergedFavorites],
+    () => mergedFavorites.slice(0, 4).map((item) => buildFavoriteQuickLink(t, item)),
+    [mergedFavorites, t],
   );
 
   const favoriteMatches = useMemo(() => {
@@ -143,20 +162,21 @@ export function useSearchQuickLinks(
     }
 
     return mergedFavorites
-      .filter((item) => matchesFavoriteKeyword(item, normalizedKeyword))
+      .filter((item) => matchesFavoriteKeyword(t, item, normalizedKeyword))
       .slice(0, 4)
-      .map(buildFavoriteQuickLink);
-  }, [mergedFavorites, normalizedKeyword]);
+      .map((item) => buildFavoriteQuickLink(t, item));
+  }, [mergedFavorites, normalizedKeyword, t]);
   const miniProgramSearchResults = useMemo(
     () =>
       miniProgramEntries.map((item) =>
         buildMiniProgramSearchResult(
+          t,
           item,
           miniProgramSearchState,
           isDesktopLayout,
         ),
       ),
-    [isDesktopLayout, miniProgramSearchState],
+    [isDesktopLayout, miniProgramSearchState, t],
   );
 
   const recentMiniPrograms = useMemo(() => {
@@ -181,6 +201,7 @@ export function useSearchQuickLinks(
         return entry
           ? [
               buildMiniProgramQuickLink(
+                t,
                 entry,
                 miniProgramSearchState,
                 isDesktopLayout,
@@ -188,7 +209,7 @@ export function useSearchQuickLinks(
             ]
           : [];
       });
-  }, [isDesktopLayout, miniProgramSearchState]);
+  }, [isDesktopLayout, miniProgramSearchState, t]);
 
   const miniProgramMatches = useMemo(() => {
     if (!normalizedKeyword) {
@@ -210,13 +231,13 @@ export function useSearchQuickLinks(
           return rightScore - leftScore;
         }
 
-        return left.name.localeCompare(right.name, "zh-CN");
+        return left.name.localeCompare(right.name, getActiveLocale());
       })
       .slice(0, 4)
       .map((item) =>
-        buildMiniProgramQuickLink(item, miniProgramSearchState, isDesktopLayout),
+        buildMiniProgramQuickLink(t, item, miniProgramSearchState, isDesktopLayout),
       );
-  }, [isDesktopLayout, miniProgramSearchState, normalizedKeyword]);
+  }, [isDesktopLayout, miniProgramSearchState, normalizedKeyword, t]);
 
   return {
     favoriteMatches,
@@ -234,33 +255,35 @@ export function useSearchQuickLinks(
   };
 }
 
-function buildFavoriteQuickLink(favorite: FavoriteRecord): SearchQuickLink {
+function buildFavoriteQuickLink(t: Translator, favorite: FavoriteRecord): SearchQuickLink {
+  const categoryLabel = resolveFavoriteCategoryLabel(t, favorite.category);
   return {
     id: `favorite-${favorite.sourceId}`,
     title: favorite.title,
-    description: favorite.description || "打开这条收藏内容。",
+    description: favorite.description || t(msg`打开这条收藏内容。`),
     meta:
       favorite.meta.trim() ||
-      `${FAVORITE_CATEGORY_LABELS[favorite.category]} · ${formatTimestamp(favorite.collectedAt)}`,
-    badge: FAVORITE_CATEGORY_LABELS[favorite.category],
+      `${categoryLabel} · ${formatTimestamp(favorite.collectedAt)}`,
+    badge: categoryLabel,
     to: favorite.to,
     avatarName: favorite.avatarName ?? favorite.title,
     avatarSrc: favorite.avatarSrc,
   };
 }
 
-function buildFavoriteSearchResult(favorite: FavoriteRecord): SearchResultItem {
+function buildFavoriteSearchResult(t: Translator, favorite: FavoriteRecord): SearchResultItem {
   const collectedAtLabel = formatTimestamp(favorite.collectedAt);
-  const favoriteLabel = FAVORITE_CATEGORY_LABELS[favorite.category];
+  const favoriteLabel = resolveFavoriteCategoryLabel(t, favorite.category);
+  const favoritePrefix = t(msg`收藏`);
 
   return {
     id: `favorite-result-${favorite.sourceId}`,
     category: "favorites",
     title: favorite.title,
-    description: favorite.description || "打开这条收藏内容。",
+    description: favorite.description || t(msg`打开这条收藏内容。`),
     meta: favorite.meta.trim()
-      ? `收藏 · ${favorite.meta}`
-      : `收藏 · ${collectedAtLabel}`,
+      ? `${favoritePrefix} · ${favorite.meta}`
+      : `${favoritePrefix} · ${collectedAtLabel}`,
     keywords: [
       favorite.title,
       favorite.description,
@@ -280,13 +303,13 @@ function buildFavoriteSearchResult(favorite: FavoriteRecord): SearchResultItem {
   };
 }
 
-function matchesFavoriteKeyword(favorite: FavoriteRecord, keyword: string) {
+function matchesFavoriteKeyword(t: Translator, favorite: FavoriteRecord, keyword: string) {
   return [
     favorite.title,
     favorite.description,
     favorite.meta,
     favorite.badge,
-    FAVORITE_CATEGORY_LABELS[favorite.category],
+    resolveFavoriteCategoryLabel(t, favorite.category),
   ]
     .filter(Boolean)
     .join(" ")
@@ -295,6 +318,7 @@ function matchesFavoriteKeyword(favorite: FavoriteRecord, keyword: string) {
 }
 
 function buildMiniProgramQuickLink(
+  t: Translator,
   miniProgram: MiniProgramEntry,
   state: MiniProgramSearchStateSnapshot,
   isDesktopLayout: boolean,
@@ -307,14 +331,18 @@ function buildMiniProgramQuickLink(
     isDesktopLayout,
   );
 
+  const myMini = t(msg`我的小程序`);
+  const recentLabel = t(msg`最近使用`);
+  const miniLabel = t(msg`小程序`);
+
   return {
     id: `mini-program-${miniProgram.id}`,
     title: miniProgram.name,
     description: miniProgram.slogan,
     meta: lastOpenedAt
-      ? `${pinned ? "我的小程序" : "最近使用"} · ${formatTimestamp(lastOpenedAt)}`
-      : `${pinned ? "我的小程序" : "小程序"} · ${miniProgram.developer}`,
-    badge: launchCount > 0 ? `已打开 ${launchCount} 次` : "打开小程序",
+      ? `${pinned ? myMini : recentLabel} · ${formatTimestamp(lastOpenedAt)}`
+      : `${pinned ? myMini : miniLabel} · ${miniProgram.developer}`,
+    badge: launchCount > 0 ? t(msg`已打开 ${launchCount} 次`) : t(msg`打开小程序`),
     to: target.to,
     search: target.search,
     avatarName: miniProgram.name,
@@ -322,6 +350,7 @@ function buildMiniProgramQuickLink(
 }
 
 function buildMiniProgramSearchResult(
+  t: Translator,
   miniProgram: MiniProgramEntry,
   state: MiniProgramSearchStateSnapshot,
   isDesktopLayout: boolean,
@@ -333,14 +362,18 @@ function buildMiniProgramSearchResult(
     isDesktopLayout,
   );
 
+  const myMini = t(msg`我的小程序`);
+  const recentLabel = t(msg`最近使用`);
+  const miniLabel = t(msg`小程序`);
+
   return {
     id: `mini-program-result-${miniProgram.id}`,
     category: "miniPrograms",
     title: miniProgram.name,
     description: miniProgram.description || miniProgram.slogan,
     meta: lastOpenedAt
-      ? `${pinned ? "我的小程序" : "最近使用"} · ${formatTimestamp(lastOpenedAt)}`
-      : `小程序 · ${miniProgram.developer}`,
+      ? `${pinned ? myMini : recentLabel} · ${formatTimestamp(lastOpenedAt)}`
+      : `${miniLabel} · ${miniProgram.developer}`,
     keywords: [
       miniProgram.name,
       miniProgram.slogan,
@@ -355,7 +388,7 @@ function buildMiniProgramSearchResult(
       .toLowerCase(),
     to: target.to,
     search: target.search,
-    badge: "小程序",
+    badge: miniLabel,
     avatarName: miniProgram.name,
     sortTime: getMiniProgramMatchScore(miniProgram, state),
   };

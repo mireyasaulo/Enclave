@@ -11,10 +11,10 @@
         "setter-message-string": 18,
         "literal-error-message": 38,
         "intl-locale-literal": 7,
-        "locale-compare-literal": 3,
+        "locale-compare-literal": 2,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 0,
-        "raw-cjk-line": 2154
+        "raw-cjk-line": 2117
       }
     },
     "apps/admin/src": {
