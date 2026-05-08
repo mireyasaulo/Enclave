@@ -534,6 +534,11 @@ msgstr "{0} 赞 · {1} 评论{2}"
 msgid "{0} 邀请"
 msgstr "{0} 邀请"
 
+#. placeholder {0}: article.readCount
+#: apps/app/src/components/official-article-viewer.tsx:295
+msgid "{0} 阅读"
+msgstr "{0} 阅读"
+
 #. placeholder {0}: counts.messages + counts.notes + counts.contacts
 #. placeholder {0}: counts.moments + counts.feed + counts.channels
 #. placeholder {0}: counts.officialAccounts
@@ -1706,6 +1711,7 @@ msgstr "仅清空当前聊天历史消息，对方资料和会话入口会继续
 msgid "仅清空这段聊天，不影响联系人关系"
 msgstr "仅清空这段聊天，不影响联系人关系"
 
+#: apps/app/src/components/official-article-viewer.tsx:510
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:94
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1185
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:408
@@ -3401,6 +3407,7 @@ msgstr "准备中"
 msgid "减少推荐"
 msgstr "减少推荐"
 
+#: apps/app/src/components/official-article-viewer.tsx:325
 #: apps/app/src/i18n/static-dom-seed.ts:460
 #: apps/app/src/routes/channels-page.tsx:1542
 msgid "分享"
@@ -3578,6 +3585,10 @@ msgstr "切换桌面群聊视图..."
 #: apps/app/src/routes/profile-settings-page.tsx:669
 msgid "切换界面语言，好友回复也会跟随此设置使用对应语言。"
 msgstr "切换界面语言，好友回复也会跟随此设置使用对应语言。"
+
+#: apps/app/src/components/official-article-viewer.tsx:510
+msgid "刚刚"
+msgstr "刚刚"
 
 #: apps/app/src/routes/discover-page.tsx:277
 msgid "刚刚和你打了招呼。"
@@ -5058,6 +5069,7 @@ msgstr "复制失败，请手动选中复制。"
 msgid "复制失败，请稍后再试。"
 msgstr "复制失败，请稍后再试。"
 
+#: apps/app/src/components/official-article-viewer.tsx:110
 #: apps/app/src/routes/desktop-mobile-page.tsx:2447
 #: apps/app/src/routes/group-qr-page.tsx:813
 #: apps/app/src/routes/group-qr-page.tsx:820
@@ -5164,6 +5176,8 @@ msgstr "复制邀请文案"
 msgid "复制邀请码"
 msgstr "复制邀请码"
 
+#: apps/app/src/components/official-article-viewer.tsx:269
+#: apps/app/src/components/official-article-viewer.tsx:325
 #: apps/app/src/features/subscription/subscription-panel.tsx:256
 msgid "复制链接"
 msgstr "复制链接"
@@ -5996,6 +6010,7 @@ msgstr "已打开文件。"
 #: apps/app/src/components/chat-message-list.tsx:1081
 #: apps/app/src/components/chat-message-list.tsx:1148
 #: apps/app/src/components/chat-message-list.tsx:1209
+#: apps/app/src/components/official-article-viewer.tsx:134
 #: apps/app/src/i18n/static-dom-seed.ts:875
 #: apps/app/src/routes/channels-page.tsx:733
 #: apps/app/src/routes/character-detail-page.tsx:741
@@ -6079,6 +6094,8 @@ msgstr "已撤回这条消息。"
 msgid "已撤销删除。"
 msgstr "已撤销删除。"
 
+#: apps/app/src/components/official-article-viewer.tsx:253
+#: apps/app/src/components/official-article-viewer.tsx:311
 #: apps/app/src/i18n/static-dom-seed.ts:920
 #: apps/app/src/routes/channels-page.tsx:1533
 msgid "已收藏"
@@ -6214,6 +6231,7 @@ msgstr "已腾出 {customUploadResumedSlots} 个空位，可直接添加"
 msgid "已解析到世界地址：{0}"
 msgstr "已解析到世界地址：{0}"
 
+#: apps/app/src/components/official-article-viewer.tsx:52
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:240
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:246
 #: apps/app/src/i18n/static-dom-seed.ts:785
@@ -7246,6 +7264,10 @@ msgstr "当前环境暂不支持复制群链接。"
 msgid "当前环境暂不支持复制联系人摘要。"
 msgstr "当前环境暂不支持复制联系人摘要。"
 
+#: apps/app/src/components/official-article-viewer.tsx:86
+msgid "当前环境暂不支持复制链接。"
+msgstr "当前环境暂不支持复制链接。"
+
 #: apps/app/src/routes/desktop-mobile-page.tsx:1592
 msgid "当前直播准备"
 msgstr "当前直播准备"
@@ -7428,6 +7450,7 @@ msgstr "当前设备暂时无法打开相机，请先改用相册选图。"
 #: apps/app/src/components/chat-message-list.tsx:1093
 #: apps/app/src/components/chat-message-list.tsx:1160
 #: apps/app/src/components/chat-message-list.tsx:1221
+#: apps/app/src/components/official-article-viewer.tsx:85
 #: apps/app/src/i18n/static-dom-seed.ts:876
 #: apps/app/src/routes/channels-page.tsx:752
 #: apps/app/src/routes/character-detail-page.tsx:755
@@ -8186,6 +8209,10 @@ msgstr "打开这个{0}查看最近聊天记录。"
 #: apps/app/src/routes/group-chat-details-page.tsx:1021
 msgid "打开邀请卡与分享入口"
 msgstr "打开邀请卡与分享入口"
+
+#: apps/app/src/components/official-article-viewer.tsx:153
+msgid "打开链接失败，请稍后重试。"
+msgstr "打开链接失败，请稍后重试。"
 
 #: apps/app/src/components/chat-message-list.tsx:3473
 #: apps/app/src/components/chat-message-list.tsx:4142
@@ -9106,6 +9133,8 @@ msgstr "收付款"
 #: apps/app/src/components/chat-message-list.tsx:3178
 #: apps/app/src/components/chat-message-list.tsx:3436
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:173
+#: apps/app/src/components/official-article-viewer.tsx:253
+#: apps/app/src/components/official-article-viewer.tsx:311
 #: apps/app/src/features/search/mobile-search-workspace.tsx:315
 #: apps/app/src/features/shell/desktop-nav-matching.ts:65
 #: apps/app/src/features/shell/desktop-nav-matching.ts:66
@@ -9440,6 +9469,12 @@ msgstr "文章"
 msgid "文章暂时不可用"
 msgstr "文章暂时不可用"
 
+#. placeholder {0}: accountName ?? article.account.name
+#: apps/app/src/components/official-article-viewer.tsx:498
+msgid "文章来源于 {0}"
+msgstr "文章来源于 {0}"
+
+#: apps/app/src/components/official-article-viewer.tsx:101
 #: apps/app/src/routes/official-account-article-page.tsx:250
 msgid "文章链接已复制。"
 msgstr "文章链接已复制。"
@@ -9810,6 +9845,10 @@ msgstr "更多信息"
 msgid "更多公众号"
 msgstr "更多公众号"
 
+#: apps/app/src/components/official-article-viewer.tsx:418
+msgid "更多内容"
+msgstr "更多内容"
+
 #: apps/app/src/components/chat-composer.tsx:3310
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:309
 #: apps/app/src/features/shell/desktop-shell.tsx:837
@@ -10024,6 +10063,7 @@ msgstr "朋友资料已更新。"
 msgid "服务入口"
 msgstr "服务入口"
 
+#: apps/app/src/components/official-article-viewer.tsx:51
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:245
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:735
 #: apps/app/src/i18n/static-dom-seed.ts:415
@@ -13484,6 +13524,7 @@ msgstr "系统"
 #: apps/app/src/components/chat-message-list.tsx:4162
 #: apps/app/src/components/chat-message-list.tsx:6245
 #: apps/app/src/components/chat-message-list.tsx:6380
+#: apps/app/src/components/official-article-viewer.tsx:269
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:91
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:303
 #: apps/app/src/features/subscription/subscription-panel.tsx:276
@@ -13495,6 +13536,7 @@ msgstr "系统分享"
 #: apps/app/src/components/chat-message-list.tsx:1113
 #: apps/app/src/components/chat-message-list.tsx:1180
 #: apps/app/src/components/chat-message-list.tsx:1241
+#: apps/app/src/components/official-article-viewer.tsx:109
 #: apps/app/src/i18n/static-dom-seed.ts:882
 #: apps/app/src/routes/channels-page.tsx:779
 #: apps/app/src/routes/character-detail-page.tsx:779
@@ -13548,6 +13590,7 @@ msgstr "系统分享暂时不可用，已复制工具摘要。"
 msgid "系统分享暂时不可用，已复制文档摘要。"
 msgstr "系统分享暂时不可用，已复制文档摘要。"
 
+#: apps/app/src/components/official-article-viewer.tsx:100
 #: apps/app/src/routes/official-account-article-page.tsx:249
 msgid "系统分享暂时不可用，已复制文章链接。"
 msgstr "系统分享暂时不可用，已复制文章链接。"
@@ -14631,6 +14674,7 @@ msgstr "言初"
 msgid "订阅"
 msgstr "订阅"
 
+#: apps/app/src/components/official-article-viewer.tsx:51
 #: apps/app/src/i18n/static-dom-seed.ts:412
 #: apps/app/src/routes/official-account-detail-page.tsx:160
 #: apps/app/src/routes/official-account-detail-page.tsx:161
@@ -16766,6 +16810,9 @@ msgstr "重试关注"
 #: apps/app/src/components/chat-message-list.tsx:1182
 #: apps/app/src/components/chat-message-list.tsx:1223
 #: apps/app/src/components/chat-message-list.tsx:1243
+#: apps/app/src/components/official-article-viewer.tsx:89
+#: apps/app/src/components/official-article-viewer.tsx:113
+#: apps/app/src/components/official-article-viewer.tsx:141
 #: apps/app/src/i18n/static-dom-seed.ts:878
 #: apps/app/src/routes/channels-page.tsx:745
 #: apps/app/src/routes/channels-page.tsx:772
@@ -16836,6 +16883,9 @@ msgid "重试场景相遇"
 msgstr "重试场景相遇"
 
 #: apps/app/src/components/chat-message-list.tsx:1055
+#: apps/app/src/components/official-article-viewer.tsx:65
+#: apps/app/src/components/official-article-viewer.tsx:89
+#: apps/app/src/components/official-article-viewer.tsx:113
 #: apps/app/src/i18n/static-dom-seed.ts:879
 #: apps/app/src/routes/channels-page.tsx:745
 #: apps/app/src/routes/channels-page.tsx:772
@@ -16868,6 +16918,10 @@ msgstr "重试复制"
 #: apps/app/src/routes/mini-programs-page.tsx:510
 msgid "重试复制到手机"
 msgstr "重试复制到手机"
+
+#: apps/app/src/components/official-article-viewer.tsx:155
+msgid "重试打开"
+msgstr "重试打开"
 
 #: apps/app/src/components/chat-composer.tsx:5782
 #: apps/app/src/components/chat-composer.tsx:5791

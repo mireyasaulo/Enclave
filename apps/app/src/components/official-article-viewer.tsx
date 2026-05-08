@@ -1,6 +1,8 @@
 import { useState, type MouseEvent } from "react";
+import { msg } from "@lingui/macro";
 import type { OfficialAccountArticleDetail } from "@yinjie/contracts";
 import { Copy, Share2, Star } from "lucide-react";
+import { getActiveLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, InlineNotice, cn } from "@yinjie/ui";
 import { InlineNoticeActionButton } from "./inline-notice-action-button";
 import { openExternalUrl } from "../runtime/external-url";
@@ -36,6 +38,7 @@ export function OfficialArticleViewer({
   ) => void;
   onToggleFavorite?: (article: OfficialAccountArticleDetail) => void;
 }) {
+  const t = useRuntimeTranslator();
   const [shareNotice, setShareNotice] = useState<{
     message: string;
     tone: "success" | "info";
@@ -45,11 +48,11 @@ export function OfficialArticleViewer({
   const nativeMobileShareSupported = isNativeMobileShareSurface();
   const isDesktopReader = !mobile && desktopSurface === "reader";
   const accountMeta = [
-    article.account.accountType === "service" ? "服务号" : "订阅号",
-    article.account.isVerified ? "已认证" : null,
+    article.account.accountType === "service" ? t(msg`服务号`) : t(msg`订阅号`),
+    article.account.isVerified ? t(msg`已认证`) : null,
   ].filter(Boolean);
   const accountMetaLabel = accountMeta.join(" · ");
-  const publishedLabel = formatArticleDate(article.publishedAt, "full");
+  const publishedLabel = formatArticleDate(t, article.publishedAt, "full");
 
   const articlePath = `/official-accounts/articles/${article.id}`;
   const articleUrl =
@@ -59,7 +62,7 @@ export function OfficialArticleViewer({
 
   function retryCopyLink() {
     void handleCopyLink({
-      retryLabel: "重试复制",
+      retryLabel: t(msg`重试复制`),
       onRetry: retryCopyLink,
     });
   }
@@ -79,11 +82,11 @@ export function OfficialArticleViewer({
     ) {
       setShareNotice({
         message: nativeMobileShareSupported
-          ? "当前设备暂时无法打开系统分享，请稍后重试。"
-          : "当前环境暂不支持复制链接。",
+          ? t(msg`当前设备暂时无法打开系统分享，请稍后重试。`)
+          : t(msg`当前环境暂不支持复制链接。`),
         tone: "info",
         actionLabel:
-          options?.retryLabel ?? (nativeMobileShareSupported ? "重试分享" : "重试复制"),
+          options?.retryLabel ?? (nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`)),
         onAction:
           options?.onRetry ?? (nativeMobileShareSupported ? retryShareArticle : retryCopyLink),
       });
@@ -94,8 +97,8 @@ export function OfficialArticleViewer({
       await navigator.clipboard.writeText(articleUrl);
       setShareNotice({
         message: nativeMobileShareSupported
-          ? "系统分享暂时不可用，已复制文章链接。"
-          : "文章链接已复制。",
+          ? t(msg`系统分享暂时不可用，已复制文章链接。`)
+          : t(msg`文章链接已复制。`),
         tone: "success",
         actionLabel: undefined,
         onAction: undefined,
@@ -103,11 +106,11 @@ export function OfficialArticleViewer({
     } catch {
       setShareNotice({
         message: nativeMobileShareSupported
-          ? "系统分享失败，请稍后重试。"
-          : "复制失败，请稍后重试。",
+          ? t(msg`系统分享失败，请稍后重试。`)
+          : t(msg`复制失败，请稍后重试。`),
         tone: "info",
         actionLabel:
-          options?.retryLabel ?? (nativeMobileShareSupported ? "重试分享" : "重试复制"),
+          options?.retryLabel ?? (nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`)),
         onAction:
           options?.onRetry ?? (nativeMobileShareSupported ? retryShareArticle : retryCopyLink),
       });
@@ -128,14 +131,14 @@ export function OfficialArticleViewer({
 
     if (shared) {
       setShareNotice({
-        message: "已打开系统分享面板。",
+        message: t(msg`已打开系统分享面板。`),
         tone: "success",
       });
       return;
     }
 
     await handleCopyLink({
-      retryLabel: "重试分享",
+      retryLabel: t(msg`重试分享`),
       onRetry: retryShareArticle,
     });
   }
@@ -147,9 +150,9 @@ export function OfficialArticleViewer({
     }
 
     setShareNotice({
-      message: "打开链接失败，请稍后重试。",
+      message: t(msg`打开链接失败，请稍后重试。`),
       tone: "info",
-      actionLabel: "重试打开",
+      actionLabel: t(msg`重试打开`),
       onAction: () => {
         void openArticleContentLink(href);
       },
@@ -247,7 +250,7 @@ export function OfficialArticleViewer({
               className={mobile ? "h-7 rounded-[10px] px-2.5 text-[12px]" : "rounded-xl"}
             >
               <Star size={14} className={favorite ? "fill-current" : ""} />
-              {favorite ? "已收藏" : "收藏"}
+              {favorite ? t(msg`已收藏`) : t(msg`收藏`)}
             </Button>
           ) : null}
           {showShareAction ? (
@@ -263,7 +266,7 @@ export function OfficialArticleViewer({
               ) : (
                 <Copy size={14} />
               )}
-              {nativeMobileShareSupported ? "系统分享" : "复制链接"}
+              {nativeMobileShareSupported ? t(msg`系统分享`) : t(msg`复制链接`)}
             </Button>
           ) : null}
         </div>
@@ -289,7 +292,7 @@ export function OfficialArticleViewer({
       >
         <span className="font-medium text-[#576b95]">{article.authorName}</span>
         <span>{publishedLabel}</span>
-        <span>{article.readCount} 阅读</span>
+        <span>{t(msg`${article.readCount} 阅读`)}</span>
       </div>
 
       {isDesktopReader &&
@@ -305,7 +308,7 @@ export function OfficialArticleViewer({
               )}
             >
               <Star size={15} className={favorite ? "fill-current" : ""} />
-              <span>{favorite ? "已收藏" : "收藏"}</span>
+              <span>{favorite ? t(msg`已收藏`) : t(msg`收藏`)}</span>
             </button>
           ) : null}
           {showShareAction ? (
@@ -319,7 +322,7 @@ export function OfficialArticleViewer({
               ) : (
                 <Copy size={15} />
               )}
-              <span>{nativeMobileShareSupported ? "分享" : "复制链接"}</span>
+              <span>{nativeMobileShareSupported ? t(msg`分享`) : t(msg`复制链接`)}</span>
             </button>
           ) : null}
         </div>
@@ -412,7 +415,7 @@ export function OfficialArticleViewer({
               isDesktopReader ? "text-[15px]" : undefined,
             )}
           >
-            更多内容
+            {t(msg`更多内容`)}
           </div>
 
           <div
@@ -474,7 +477,7 @@ export function OfficialArticleViewer({
                           : "mt-2 text-[11px] text-[color:var(--text-muted)]"
                     }
                   >
-                    {formatArticleDate(relatedArticle.publishedAt, "short")}
+                    {formatArticleDate(t, relatedArticle.publishedAt, "short")}
                   </div>
                 </div>
               </button>
@@ -492,18 +495,19 @@ export function OfficialArticleViewer({
               : "mt-8 text-xs text-[color:var(--text-muted)]"
         }
       >
-        文章来源于 {accountName ?? article.account.name}
+        {t(msg`文章来源于 ${accountName ?? article.account.name}`)}
       </footer>
     </article>
   );
 }
 
 function formatArticleDate(
+  t: ReturnType<typeof useRuntimeTranslator>,
   value?: string | null,
   mode: "full" | "short" = "full",
 ) {
   if (!value) {
-    return mode === "full" ? "刚刚" : "今天";
+    return mode === "full" ? t(msg`刚刚`) : t(msg`今天`);
   }
 
   const timestamp = Date.parse(value);
@@ -513,7 +517,7 @@ function formatArticleDate(
 
   const date = new Date(timestamp);
   return new Intl.DateTimeFormat(
-    "zh-CN",
+    getActiveLocale(),
     mode === "full"
       ? {
           year: "numeric",
