@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Not, Repository } from 'typeorm';
+import { In, IsNull, Not, Repository } from 'typeorm';
 import { FriendshipEntity } from './friendship.entity';
 import { FriendRequestEntity } from './friend-request.entity';
 import { AIRelationshipEntity } from './ai-relationship.entity';
@@ -50,9 +50,11 @@ export class SocialService {
   ) {}
 
   async getPendingRequests(): Promise<FriendRequestEntity[]> {
+    // 仅返回 acceptAt 为空的 inbound 申请（世界角色主动加用户、需要用户审批）。
+    // acceptAt 非空的 outbound 申请由 scheduler 让世界角色自动通过，不在此列表展示。
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     return this.friendRequestRepo.find({
-      where: { ownerId: owner.id, status: 'pending' },
+      where: { ownerId: owner.id, status: 'pending', acceptAt: IsNull() },
       order: { createdAt: 'DESC' },
     });
   }
@@ -559,7 +561,7 @@ export class SocialService {
     tomorrow.setHours(23, 59, 59, 999);
 
     let acceptAt: Date | null = null;
-    if (!options?.autoAccept && initiator === 'user') {
+    if (!options?.autoAccept && initiator !== 'character') {
       const delaySeconds = await this.decideCharacterAcceptDelay(
         char,
         greeting,
@@ -725,18 +727,20 @@ ${personaSummary || '（暂无更多信息）'}
   }
 
   private delayCategoryToSeconds(category: string): number {
+    // 所有类别封顶 5 分钟，让用户可感知地等到世界角色通过；medium / long 仅保留性格差异
+    // （更"高冷"的角色等待区间更靠后），避免出现长达数小时的延迟让用户误以为系统不处理。
     const jitter = (min: number, max: number) =>
       min + Math.floor(Math.random() * Math.max(1, max - min));
     switch (category) {
       case 'immediate':
         return jitter(0, 16);
       case 'medium':
-        return jitter(1800, 7200);
+        return jitter(120, 240);
       case 'long':
-        return jitter(14400, 43200);
+        return jitter(180, 300);
       case 'short':
       default:
-        return jitter(60, 300);
+        return jitter(60, 180);
     }
   }
 
