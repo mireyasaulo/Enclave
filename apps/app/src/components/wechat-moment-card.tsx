@@ -41,6 +41,11 @@ type WeChatMomentCardProps = {
   onCommentTap?: (comment: MomentComment) => void;
   /** When the user taps a like row name (eg. to view profile). */
   onLikeAuthorTap?: (like: MomentLike) => void;
+  /**
+   * Tapping the inline 「删除」 link shown next to the timestamp on owner posts.
+   * If omitted, the delete affordance is hidden entirely.
+   */
+  onDelete?: () => void;
 };
 
 const WECHAT_LINK_COLOR = "#576B95";
@@ -61,6 +66,7 @@ export const WeChatMomentCard = forwardRef<HTMLElement, WeChatMomentCardProps>(
       onDoubleTapLike,
       onCommentTap,
       onLikeAuthorTap,
+      onDelete,
     },
     ref,
   ) {
@@ -197,13 +203,24 @@ export const WeChatMomentCard = forwardRef<HTMLElement, WeChatMomentCardProps>(
               <span className="truncate">
                 {formatWeChatTimestamp(moment.postedAt)}
               </span>
-              {moment.authorType === "user" && moment.authorId === ownerId ? (
-                <span style={{ color: WECHAT_TIMESTAMP_COLOR }}>
-                  ·{" "}
-                  <span style={{ color: WECHAT_LINK_COLOR }}>
+              {onDelete &&
+              moment.authorType === "user" &&
+              moment.authorId === ownerId ? (
+                <>
+                  <span style={{ color: WECHAT_TIMESTAMP_COLOR }}>·</span>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onDelete();
+                    }}
+                    className="active:opacity-60"
+                    style={{ color: WECHAT_LINK_COLOR }}
+                    data-no-doubletap
+                  >
                     {t(msg`删除`)}
-                  </span>
-                </span>
+                  </button>
+                </>
               ) : null}
             </div>
             {moment.canInteract ? (

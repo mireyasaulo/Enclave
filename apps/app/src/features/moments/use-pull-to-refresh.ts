@@ -116,6 +116,10 @@ export function usePullToRefresh({
     startYRef.current = null;
 
     setState((prev) => {
+      if (prev.refreshing) {
+        // Already refreshing — pulling down again should not fire another refresh.
+        return prev;
+      }
       if (prev.offset >= TRIGGER_DISTANCE) {
         const result = onRefresh();
         Promise.resolve(result).finally(() => {

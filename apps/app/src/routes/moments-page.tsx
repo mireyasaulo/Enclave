@@ -12,6 +12,7 @@ import { msg } from "@lingui/macro";
 import { ArrowLeft, Camera } from "lucide-react";
 import {
   addMomentComment,
+  deleteMoment,
   getBlockedCharacters,
   getMoments,
   toggleMomentLike,
@@ -254,17 +255,27 @@ export function MomentsPage() {
         throw new Error(t(msg`请先输入评论内容。`));
       }
 
-      const replyTo =
+      const desktopTarget =
         desktopReplyTarget && desktopReplyTarget.postId === momentId
           ? desktopReplyTarget
           : null;
+      const mobileTarget =
+        commentBarTarget?.momentId === momentId
+          ? commentBarTarget.replyTo
+          : null;
+      const target = desktopTarget
+        ? {
+            commentId: desktopTarget.commentId,
+            authorId: desktopTarget.authorId,
+          }
+        : mobileTarget;
 
       return addMomentComment(
         momentId,
         {
           text,
-          replyToCommentId: replyTo?.commentId,
-          replyToAuthorId: replyTo?.authorId,
+          replyToCommentId: target?.commentId,
+          replyToAuthorId: target?.authorId,
         },
         baseUrl,
       );
@@ -274,10 +285,44 @@ export function MomentsPage() {
       setDesktopReplyTarget((current) =>
         current?.postId === momentId ? null : current,
       );
+      setCommentBarTarget((current) =>
+        current?.momentId === momentId ? null : current,
+      );
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`朋友圈互动已更新。`));
+      await queryClient.invalidateQueries({
+        queryKey: ["app-moments", baseUrl],
+      });
+    },
+  });
+  const deleteMutation = useMutation({
+    mutationFn: (momentId: string) => deleteMoment(momentId, baseUrl),
+    onMutate: async (momentId) => {
+      await queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] });
+      const snapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments", baseUrl],
+      });
+      snapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(
+          key,
+          data.filter((item) => item.id !== momentId),
+        );
+      });
+      return { snapshots };
+    },
+    onError: (_error, _momentId, context) => {
+      context?.snapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+    },
+    onSuccess: async () => {
+      setNoticeTone("success");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(t(msg`已删除这条朋友圈。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
       });
@@ -809,6 +854,16 @@ export function MomentsPage() {
         }
       }}
       onLikeMoment={(momentId) => likeMutation.mutate(momentId)}
+      onDeleteMoment={(momentId) => {
+        if (deleteMutation.isPending) return;
+        if (
+          typeof window !== "undefined" &&
+          !window.confirm(t(msg`确定删除这条朋友圈吗？`))
+        ) {
+          return;
+        }
+        deleteMutation.mutate(momentId);
+      }}
       onOpenActionMenu={(momentId, anchorRect) =>
         setActionBubble({ momentId, anchorRect })
       }
@@ -832,25 +887,7 @@ export function MomentsPage() {
           [momentId]: value,
         }))
       }
-      onCommentSubmit={(momentId) => {
-        const target =
-          commentBarTarget?.momentId === momentId
-            ? commentBarTarget
-            : null;
-        setDesktopReplyTarget(
-          target?.replyTo
-            ? {
-                authorId: target.replyTo.authorId,
-                authorName: target.replyTo.authorName,
-                commentId: target.replyTo.commentId,
-                postId: momentId,
-              }
-            : null,
-        );
-        commentMutation.mutate(momentId, {
-          onSuccess: () => setCommentBarTarget(null),
-        });
-      }}
+      onCommentSubmit={(momentId) => commentMutation.mutate(momentId)}
       onRefresh={async () => {
         await Promise.all([
           momentsQuery.refetch(),
@@ -900,6 +937,7 @@ type MobileMomentsViewProps = {
   onCompose: () => void;
   onAuthorTap: (moment: Moment) => void;
   onLikeMoment: (momentId: string) => void;
+  onDeleteMoment: (momentId: string) => void;
   onOpenActionMenu: (momentId: string, anchorRect: DOMRect) => void;
   onCloseActionMenu: () => void;
   onCommentTap: (momentId: string, comment: MomentComment | null) => void;
@@ -937,6 +975,7 @@ function MobileMomentsView({
   onCompose,
   onAuthorTap,
   onLikeMoment,
+  onDeleteMoment,
   onOpenActionMenu,
   onCloseActionMenu,
   onCommentTap,
@@ -1109,6 +1148,13 @@ function MobileMomentsView({
                 onOpenActionMenu={(rect) => onOpenActionMenu(moment.id, rect)}
                 onDoubleTapLike={() => onLikeMoment(moment.id)}
                 onCommentTap={(comment) => onCommentTap(moment.id, comment)}
+                onDelete={
+                  ownerId &&
+                  moment.authorType === "user" &&
+                  moment.authorId === ownerId
+                    ? () => onDeleteMoment(moment.id)
+                    : undefined
+                }
               />
             </div>
           ))}
