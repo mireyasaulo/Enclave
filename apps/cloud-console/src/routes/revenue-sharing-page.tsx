@@ -601,41 +601,40 @@ export function RevenueSharingPage() {
 
         <div className="mt-5 overflow-x-auto rounded-2xl border border-[color:var(--border-faint)]">
           <table className="min-w-full text-left text-sm">
-              <thead className="bg-[color:var(--surface-soft)] text-xs uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
-                <tr>
-                  <th className="px-4 py-3 font-medium">{t("Payee")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Participant")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Status")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Amount")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Created")}</th>
+            <thead className="bg-[color:var(--surface-soft)] text-xs uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
+              <tr>
+                <th className="px-4 py-3 font-medium">{t("Payee")}</th>
+                <th className="px-4 py-3 font-medium">{t("Participant")}</th>
+                <th className="px-4 py-3 font-medium">{t("Status")}</th>
+                <th className="px-4 py-3 font-medium">{t("Amount")}</th>
+                <th className="px-4 py-3 font-medium">{t("Created")}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[color:var(--border-faint)]">
+              {(ledgerQuery.data?.items ?? []).map((item) => (
+                <tr key={item.id}>
+                  <td className="px-4 py-3">
+                    {item.payeeDisplayName ?? t("Unassigned")}
+                  </td>
+                  <td className="px-4 py-3">{t(item.participantType)}</td>
+                  <td className="px-4 py-3">{t(item.status)}</td>
+                  <td className="px-4 py-3 font-semibold">
+                    {formatMoney(item.amountCents, item.currency)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatDateTime(item.createdAt, locale)}
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-[color:var(--border-faint)]">
-                {(ledgerQuery.data?.items ?? []).map((item) => (
-                  <tr key={item.id}>
-                    <td className="px-4 py-3">
-                      {item.payeeDisplayName ?? t("Unassigned")}
-                    </td>
-                    <td className="px-4 py-3">{t(item.participantType)}</td>
-                    <td className="px-4 py-3">{t(item.status)}</td>
-                    <td className="px-4 py-3 font-semibold">
-                      {formatMoney(item.amountCents, item.currency)}
-                    </td>
-                    <td className="px-4 py-3">
-                      {formatDateTime(item.createdAt, locale)}
-                    </td>
-                  </tr>
-                ))}
-                {ledgerQuery.data?.items.length === 0 ? (
-                  <tr>
-                    <td className="px-4 py-6 text-[color:var(--text-muted)]" colSpan={5}>
-                      {t("No allocations.")}
-                    </td>
-                  </tr>
-                ) : null}
-              </tbody>
-            </table>
-          </div>
+              ))}
+              {ledgerQuery.data?.items.length === 0 ? (
+                <tr>
+                  <td className="px-4 py-6 text-[color:var(--text-muted)]" colSpan={5}>
+                    {t("No allocations.")}
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
         </div>
       </section>
 
