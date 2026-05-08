@@ -144,11 +144,6 @@ describe("cloud-console live api smoke", () => {
     );
     expect(jobSummaryResponse.status).toBe(200);
     expect(
-      await screen.findByText((_, element) => {
-        return element?.textContent === "Total fleet: 1";
-      }),
-    ).toBeTruthy();
-    expect(
       await screen.findByText(
         `Open failed jobs (${jobSummaryResponse.body.failedJobs})`,
       ),

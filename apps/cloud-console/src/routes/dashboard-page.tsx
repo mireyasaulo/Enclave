@@ -405,14 +405,6 @@ export function DashboardPage() {
     jobSummaryQuery.data?.failedJobs ?? jobSummaryFallback.failedJobs;
   const supersededJobCount =
     jobSummaryQuery.data?.supersededJobs ?? jobSummaryFallback.supersededJobs;
-  const supersededJobs = useMemo(
-    () =>
-      (jobsQuery.data?.items ?? [])
-        .filter((job) => getJobAuditBadgeLabel(job) !== null)
-        .sort((left, right) => compareNewest(left.updatedAt, right.updatedAt))
-        .slice(0, 4),
-    [jobsQuery.data],
-  );
   const failedJobs = useMemo(
     () =>
       (jobsQuery.data?.items ?? [])
@@ -540,9 +532,9 @@ export function DashboardPage() {
               )}`}
             >
               {driftSummary?.readyWorlds ?? 0}
-            </div>
-            <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-              Total fleet: {driftSummary?.totalWorlds ?? 0}
+              <span className="ml-1 text-base font-normal text-[color:var(--text-muted)]">
+                / {driftSummary?.totalWorlds ?? 0}
+              </span>
             </div>
           </WorldsPermalinkLink>
 
@@ -561,42 +553,41 @@ export function DashboardPage() {
             >
               {driftSummary?.criticalAttentionWorlds ?? 0}
             </div>
-            <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-              Warning: {driftSummary?.warningAttentionWorlds ?? 0}
-            </div>
           </WorldsPermalinkLink>
 
-          <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
+          <JobsPermalinkLink
+            search={buildCompactJobsRouteSearch({ queueState: "running_now" })}
+            aria-label={t("Inspect active jobs")}
+            className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 transition hover:border-[color:var(--border-strong)]"
+          >
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              {t("Recovery queued")}
+              {t("Active jobs")}
             </div>
             <div
               className={`mt-3 text-3xl font-semibold ${getMetricTone(
-                driftSummary?.recoveryQueuedWorlds ?? 0,
+                jobSummaryQuery.data?.activeJobs ?? 0,
               )}`}
             >
-              {driftSummary?.recoveryQueuedWorlds ?? 0}
+              {jobSummaryQuery.data?.activeJobs ?? 0}
             </div>
-            <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-              Heartbeat stale: {driftSummary?.heartbeatStaleWorlds ?? 0}
-            </div>
-          </div>
+          </JobsPermalinkLink>
 
-          <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
+          <JobsPermalinkLink
+            search={buildCompactJobsRouteSearch({ status: "failed" })}
+            aria-label={t("Inspect failed jobs")}
+            className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 transition hover:border-[color:var(--border-strong)]"
+          >
             <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              {t("Provider drift")}
+              {t("Failed jobs")}
             </div>
             <div
               className={`mt-3 text-3xl font-semibold ${getMetricTone(
-                driftSummary?.providerDriftWorlds ?? 0,
+                failedJobCount,
               )}`}
             >
-              {driftSummary?.providerDriftWorlds ?? 0}
+              {failedJobCount}
             </div>
-            <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-              Failed: {driftSummary?.failedWorlds ?? 0}
-            </div>
-          </div>
+          </JobsPermalinkLink>
         </div>
 
         <div className="mt-5 grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
@@ -1006,110 +997,6 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <div className="text-lg font-semibold text-[color:var(--text-primary)]">
-                  {t("Superseded Queue")}
-                </div>
-                <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-                  {t("Latest lifecycle jobs that were replaced by newer work.")}
-                </div>
-              </div>
-
-              <JobsPermalinkLink
-                search={buildCompactJobsRouteSearch({ audit: "superseded" })}
-                className="text-sm text-[color:var(--text-secondary)] underline decoration-[color:var(--border-strong)] underline-offset-4 hover:text-[color:var(--text-primary)]"
-              >
-                Open superseded queue ({supersededJobCount})
-              </JobsPermalinkLink>
-            </div>
-
-            <div className="mt-4 space-y-3">
-              {supersededJobs.map((job) => {
-                const worldMeta = fleetMetaByWorldId.get(job.worldId);
-                const auditBadgeLabel =
-                  getJobAuditBadgeLabel(job) ?? "Superseded";
-                const worldLabel = worldMeta?.worldName ?? job.worldId;
-
-                return (
-                  <div
-                    key={job.id}
-                    className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4"
-                  >
-                    <Link
-                      to="/worlds/$worldId"
-                      params={{ worldId: job.worldId }}
-                      className="block transition hover:opacity-90"
-                    >
-                      <div className="flex flex-wrap items-center gap-3">
-                        <span
-                          className={`rounded-full border px-3 py-1 text-[11px] uppercase tracking-[0.18em] ${getJobStatusTone(
-                            job.status,
-                          )}`}
-                        >
-                          {job.status}
-                        </span>
-                        <span className="text-sm text-[color:var(--text-primary)]">
-                          {job.jobType}
-                        </span>
-                        <span className={JOB_AUDIT_BADGE_CLASS_NAME}>
-                          {auditBadgeLabel}
-                        </span>
-                      </div>
-                      <div className="mt-3 text-sm text-[color:var(--text-secondary)]">
-                        {worldLabel}
-                        {worldMeta?.phone ? ` · ${worldMeta.phone}` : ""}
-                      </div>
-                      <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-                        {describeJobResult(job)}
-                      </div>
-                      <div className="mt-3 flex flex-wrap gap-2 text-xs">
-                        <span className="rounded-full border border-[color:var(--border-faint)] px-3 py-1 text-[color:var(--text-secondary)]">
-                          {worldMeta?.providerLabel ?? t("Unassigned")}
-                        </span>
-                        <span
-                          className={`rounded-full border px-3 py-1 uppercase tracking-[0.18em] ${getPowerStateTone(
-                            worldMeta?.powerState ?? "absent",
-                          )}`}
-                        >
-                          {formatPowerState(worldMeta?.powerState ?? "absent")}
-                        </span>
-                      </div>
-                      <div className="mt-2 text-xs text-[color:var(--text-muted)]">
-                        Updated {formatDateTime(job.updatedAt)}
-                      </div>
-                    </Link>
-
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <JobsPermalinkLink
-                        search={buildCompactJobsRouteSearch({
-                          audit: "superseded",
-                          worldId: job.worldId,
-                        })}
-                        aria-label={`Open superseded jobs for ${worldLabel}`}
-                        className="rounded-lg border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--text-primary)] transition hover:border-[color:var(--border-strong)]"
-                      >
-                        {t("World superseded jobs")}
-                      </JobsPermalinkLink>
-                    </div>
-                  </div>
-                );
-              })}
-
-              {!jobsQuery.isLoading && supersededJobs.length === 0 ? (
-                <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 text-sm text-[color:var(--text-secondary)]">
-                  {t("No recent superseded jobs.")}
-                </div>
-              ) : null}
-
-              {jobsQuery.isLoading ? (
-                <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 text-sm text-[color:var(--text-muted)]">
-                  {t("Loading superseded lifecycle jobs...")}
-                </div>
-              ) : null}
-            </div>
-          </div>
         </div>
       </div>
 

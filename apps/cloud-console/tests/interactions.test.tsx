@@ -3818,61 +3818,6 @@ describe("cloud-console interactions", () => {
     expect(await screen.findByText("No jobs match this filter.")).toBeTruthy();
   });
 
-  it("shows recent superseded lifecycle jobs on the dashboard", async () => {
-    installCloudAdminApiMock({
-      job: {
-        status: "cancelled",
-        failureCode: "superseded_by_new_job",
-        resultPayload: {
-          action: "superseded_by_new_job",
-          supersededByJobType: "resume",
-        },
-        supersededByJobType: "resume",
-      },
-    });
-    renderRoute("/");
-
-    expect(await screen.findByText("Superseded Queue")).toBeTruthy();
-    expect(await screen.findByText("Superseded by resume")).toBeTruthy();
-    expect(
-      await screen.findByText("Superseded by newer resume request."),
-    ).toBeTruthy();
-    expect(
-      await screen.findByRole("link", { name: /Open superseded queue/i }),
-    ).toBeTruthy();
-  });
-
-  it("opens world-scoped superseded jobs from the dashboard queue", async () => {
-    installCloudAdminApiMock({
-      job: {
-        status: "cancelled",
-        failureCode: "superseded_by_new_job",
-        resultPayload: {
-          action: "superseded_by_new_job",
-          supersededByJobType: "resume",
-        },
-        supersededByJobType: "resume",
-      },
-    });
-    renderRoute("/");
-
-    expect(await screen.findByText("Superseded Queue")).toBeTruthy();
-
-    fireEvent.click(
-      await screen.findByRole("link", {
-        name: "Open superseded jobs for Mock World",
-      }),
-    );
-
-    expect(await screen.findByText("Lifecycle jobs")).toBeTruthy();
-    expect(await screen.findByText("World scope")).toBeTruthy();
-    expect(screen.getByDisplayValue("audit: superseded")).toBeTruthy();
-    expect(
-      (await screen.findAllByRole("link", { name: "Mock World" })).length,
-    ).toBeGreaterThan(0);
-    expect(await screen.findByText("Superseded by resume")).toBeTruthy();
-  });
-
   it("opens world-scoped failed jobs from the dashboard queue", async () => {
     const { requests } = installCloudAdminApiMock({
       job: {

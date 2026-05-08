@@ -48,7 +48,6 @@ describe("dashboard job summary", () => {
     expect(await screen.findByText("Fleet Dashboard")).toBeTruthy();
     expect(await screen.findByText("Open failed jobs (7)")).toBeTruthy();
     expect(await screen.findByText("Open superseded jobs (5)")).toBeTruthy();
-    expect(await screen.findByText("Open superseded queue (5)")).toBeTruthy();
     expect(await screen.findByText("Running jobs 3")).toBeTruthy();
     expect(await screen.findByText("Lease expired jobs 2")).toBeTruthy();
     expect(await screen.findByText("Delayed jobs 4")).toBeTruthy();
@@ -67,54 +66,7 @@ describe("dashboard job summary", () => {
         await screen.findByRole("link", { name: "Open failed jobs (7)" })
       ).getAttribute("href"),
     ).toBe("/jobs?status=failed");
-    expect(
-      (
-        await screen.findByRole("link", { name: "Open superseded queue (5)" })
-      ).getAttribute("href"),
-    ).toBe("/jobs?audit=superseded");
     expect(hasJobSummaryRequest(requests)).toBe(true);
-  });
-
-  it("links superseded queue world shortcuts to scoped jobs routes", async () => {
-    installCloudAdminApiMock({
-      jobs: [
-        {
-          id: "job-superseded-preview",
-          worldId: "world-1",
-          jobType: "suspend",
-          status: "cancelled",
-          supersededByJobType: "resume",
-          supersededByPayload: { source: "dashboard-test" },
-          resultPayload: {
-            action: "superseded_by_new_job",
-            supersededByJobType: "resume",
-          },
-          updatedAt: "2026-04-20T00:40:00.000Z",
-          finishedAt: "2026-04-20T00:40:00.000Z",
-        },
-      ],
-      jobSummary: {
-        totalJobs: 1,
-        activeJobs: 0,
-        failedJobs: 0,
-        supersededJobs: 1,
-        queueState: {
-          runningNow: 0,
-          leaseExpired: 0,
-          delayed: 0,
-        },
-      },
-    });
-
-    renderRoute("/");
-
-    expect(await screen.findByText("Superseded Queue")).toBeTruthy();
-    const worldScopedLink = await screen.findByRole("link", {
-      name: "Open superseded jobs for Mock World",
-    });
-    expect(worldScopedLink.getAttribute("href")).toBe(
-      "/jobs?worldId=world-1&audit=superseded",
-    );
   });
 
   it("links recent failure world shortcuts to scoped failed jobs routes", async () => {
