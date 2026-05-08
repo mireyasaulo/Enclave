@@ -460,9 +460,11 @@ export function DashboardPage() {
     jobsQuery.error,
   ].filter((error): error is Error => error instanceof Error);
   const activeConfirm = confirmAction
-    ? createWorldActionConfirmationCopy(confirmAction.action, {
-        name: confirmAction.worldName,
-      })
+    ? createWorldActionConfirmationCopy(
+        confirmAction.action,
+        { name: confirmAction.worldName },
+        locale,
+      )
     : null;
 
   function handleQuickAction(

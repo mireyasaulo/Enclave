@@ -581,7 +581,7 @@ export function WorldDetailPage() {
       : null;
   const sharedConfirmCopy =
     confirmLifecycleAction
-      ? createWorldActionConfirmationCopy(confirmLifecycleAction, world)
+      ? createWorldActionConfirmationCopy(confirmLifecycleAction, world, locale)
       : null;
   let activeConfirm: {
     title: string;

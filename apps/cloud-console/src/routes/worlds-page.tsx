@@ -9,6 +9,7 @@ import type {
 import {
   compareByLocale,
   formatDateTime as formatLocaleDateTime,
+  useAppLocale,
 } from "@yinjie/i18n";
 import {
   CloudAdminErrorBlock,
@@ -281,6 +282,7 @@ type QuickActionConfirmState = {
 
 export function WorldsPage() {
   const t = useCloudConsoleText();
+  const { locale } = useAppLocale();
   const navigate = useNavigate({ from: "/worlds" });
   const filters = useSearch({ from: "/worlds" });
   const queryClient = useQueryClient();
@@ -488,9 +490,11 @@ export function WorldsPage() {
     },
   });
   const activeConfirm = confirmAction
-    ? createWorldActionConfirmationCopy(confirmAction.action, {
-        name: confirmAction.worldName,
-      })
+    ? createWorldActionConfirmationCopy(
+        confirmAction.action,
+        { name: confirmAction.worldName },
+        locale,
+      )
     : null;
 
   return (
