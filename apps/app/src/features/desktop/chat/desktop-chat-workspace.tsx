@@ -2782,6 +2782,18 @@ function renderConversationPreviewText(text: string): ReactNode {
       return <span key={`text-${index}`}>{segment.text}</span>;
     }
 
+    if (segment.kind === "sticker") {
+      return (
+        <img
+          key={`sticker-${index}-${segment.packId}-${segment.stickerId}`}
+          src={segment.src}
+          alt={segment.label}
+          draggable={false}
+          className="inline-block h-5 w-5 align-[-0.35em] object-contain"
+        />
+      );
+    }
+
     return (
       <span
         key={`mention-${index}-${segment.text}`}

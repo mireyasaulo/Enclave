@@ -216,6 +216,7 @@ type ChatMessageListProps = {
   onSelectionModeChange?: (active: boolean) => void;
   errorActionLabel?: string;
   onErrorAction?: (() => void) | null;
+  onMediaReady?: () => void;
 };
 
 const DesktopMessageForwardDialog = lazy(async () => {
@@ -332,6 +333,7 @@ export function ChatMessageList({
   onSelectionModeChange,
   errorActionLabel,
   onErrorAction = null,
+  onMediaReady,
 }: ChatMessageListProps) {
   const t = useRuntimeTranslator();
   const isDesktop = variant === "desktop";
@@ -2956,6 +2958,7 @@ export function ChatMessageList({
                       url={message.attachment.url}
                       label={message.attachment.label ?? displayText}
                       maxSize={isDesktop ? 160 : 124}
+                      onMediaReady={onMediaReady}
                     />
                   ) : message.type === "image" &&
                     message.attachment?.kind === "image" ? (
@@ -2969,6 +2972,7 @@ export function ChatMessageList({
                           ? undefined
                           : () => openImagePreview(message.id)
                       }
+                      onMediaReady={onMediaReady}
                     />
                   ) : message.type === "file" &&
                     message.attachment?.kind === "file" ? (
@@ -4657,6 +4661,18 @@ function renderTextWithMentions(text: string): ReactNode {
       return <span key={`text-${index}`}>{segment.text}</span>;
     }
 
+    if (segment.kind === "sticker") {
+      return (
+        <img
+          key={`sticker-${index}-${segment.packId}-${segment.stickerId}`}
+          src={segment.src}
+          alt={segment.label}
+          draggable={false}
+          className="inline-block h-7 w-7 align-[-0.45em] object-contain"
+        />
+      );
+    }
+
     return (
       <span
         key={`mention-${index}-${segment.text}`}
@@ -4747,12 +4763,14 @@ function ImageMessage({
   variant,
   maxSize,
   onOpen,
+  onMediaReady,
 }: {
   url: string;
   label: string;
   variant: "mobile" | "desktop";
   maxSize: number;
   onOpen?: () => void;
+  onMediaReady?: () => void;
 }) {
   const isDesktop = variant === "desktop";
   const [loadFailed, setLoadFailed] = useState(false);
@@ -4780,6 +4798,7 @@ function ImageMessage({
       src={url}
       alt={label}
       onError={() => setLoadFailed(true)}
+      onLoad={onMediaReady}
       className={`bg-white object-cover shadow-none ${
         isDesktop
           ? "rounded-[16px] border border-black/6"
@@ -5918,10 +5937,12 @@ function StickerMessage({
   url,
   label,
   maxSize,
+  onMediaReady,
 }: {
   url: string;
   label: string;
   maxSize: number;
+  onMediaReady?: () => void;
 }) {
   const [loadFailed, setLoadFailed] = useState(false);
 
@@ -5942,6 +5963,7 @@ function StickerMessage({
       src={url}
       alt={label}
       onError={() => setLoadFailed(true)}
+      onLoad={onMediaReady}
       className="rounded-[18px] bg-white/70 object-contain shadow-none"
       style={{ maxWidth: `${maxSize}px`, maxHeight: `${maxSize}px` }}
       loading="lazy"

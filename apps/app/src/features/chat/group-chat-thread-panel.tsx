@@ -249,10 +249,16 @@ export function GroupChatThreadPanel({
   const {
     ref: scrollAnchorRef,
     isAtBottom,
+    isAtBottomRef,
     pendingCount,
     suppressNextPendingCount,
     scrollToBottom,
   } = useScrollAnchor<HTMLDivElement>(messages.length);
+  const handleMessageMediaReady = useCallback(() => {
+    if (isAtBottomRef.current) {
+      scrollToBottom("auto");
+    }
+  }, [isAtBottomRef, scrollToBottom]);
   const handleDismissRouteContextNotice = () => {
     routeContextNotice?.onDismiss?.();
   };
@@ -1475,6 +1481,7 @@ export function GroupChatThreadPanel({
                 !isDesktop && onBack ? t(msg`返回上一页`) : undefined
               }
               onErrorAction={!isDesktop && onBack ? onBack : null}
+              onMediaReady={handleMessageMediaReady}
               emptyState={
                 !isDesktop &&
                 !messagesQuery.isLoading &&

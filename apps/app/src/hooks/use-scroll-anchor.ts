@@ -53,6 +53,18 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
       setPendingCount(0);
       // Treat the upcoming scroll events as ours, not user-driven.
       lastUserGestureAtRef.current = 0;
+
+      // After the next paint, scrollHeight may have grown (e.g. message bubble
+      // finished laying out). Re-pin to bottom so we don't end up just short.
+      if (typeof window !== "undefined") {
+        window.requestAnimationFrame(() => {
+          const current = ref.current;
+          if (!current) {
+            return;
+          }
+          current.scrollTop = current.scrollHeight;
+        });
+      }
     },
   );
 
@@ -136,6 +148,7 @@ export function useScrollAnchor<T extends HTMLElement>(itemCount: number) {
   return {
     ref,
     isAtBottom,
+    isAtBottomRef,
     pendingCount,
     suppressNextPendingCount,
     scrollToBottom,

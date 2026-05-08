@@ -268,6 +268,43 @@ export function getStickerPack(packId: string) {
   return STICKER_PACKS.find((item) => item.id === packId);
 }
 
+export interface BuiltinStickerLookup {
+  packId: string;
+  stickerId: string;
+  src: string;
+  width: number;
+  height: number;
+  label: string;
+  mimeType: string;
+}
+
+const BUILTIN_STICKER_BY_LABEL: Map<string, BuiltinStickerLookup> = (() => {
+  const map = new Map<string, BuiltinStickerLookup>();
+  for (const pack of STICKER_PACKS) {
+    for (const sticker of pack.stickers) {
+      if (map.has(sticker.label)) {
+        continue;
+      }
+      map.set(sticker.label, {
+        packId: pack.id,
+        stickerId: sticker.id,
+        src: sticker.src,
+        width: sticker.width,
+        height: sticker.height,
+        label: sticker.label,
+        mimeType: sticker.mimeType ?? inferStickerMimeType(sticker.src),
+      });
+    }
+  }
+  return map;
+})();
+
+export function getBuiltinStickerByLabel(
+  label: string,
+): BuiltinStickerLookup | null {
+  return BUILTIN_STICKER_BY_LABEL.get(label) ?? null;
+}
+
 export function getStickerAttachment(
   packId: string,
   stickerId: string,
