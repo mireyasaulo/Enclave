@@ -61,6 +61,11 @@ export class EmailAuthService {
     const normalized = this.normalizeEmail(email);
     await this.enforceSendCodeRateLimit(normalized);
 
+    const existing = await this.userRepo.findOne({
+      where: { email: normalized },
+    });
+    const isNewUser = !existing;
+
     const code = this.generateCode();
     const expiresAt = new Date(Date.now() + this.getCodeTtlSeconds() * 1000);
 
@@ -74,7 +79,11 @@ export class EmailAuthService {
 
     let result: Awaited<ReturnType<CloudMailService["sendVerificationCode"]>>;
     try {
-      result = await this.mailService.sendVerificationCode(normalized, code);
+      result = await this.mailService.sendVerificationCode(
+        normalized,
+        code,
+        isNewUser,
+      );
     } catch (error) {
       await this.sessionRepo.delete({ id: session.id });
       if (error instanceof ServiceUnavailableException) throw error;
