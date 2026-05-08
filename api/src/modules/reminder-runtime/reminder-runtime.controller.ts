@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,6 +7,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { ReminderRuntimeService } from './reminder-runtime.service';
 
 @Controller('reminder-runtime')
@@ -30,7 +30,9 @@ export class ReminderRuntimeController {
       parsedLimit != null &&
       (!Number.isFinite(parsedLimit) || parsedLimit <= 0)
     ) {
-      throw new BadRequestException('limit 必须是正整数。');
+      throw new AppError('REMINDER_LIMIT_INVALID', {
+        legacyMessage: 'limit 必须是正整数。',
+      });
     }
 
     return this.reminderRuntimeService.getUpcomingTasks(parsedLimit);

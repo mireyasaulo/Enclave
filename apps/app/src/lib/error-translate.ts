@@ -98,6 +98,42 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(
         msg`今日偷菜次数已达上限（${String(params.limit ?? "?")}/天）。`,
       );
+    case "MOMENTS_MEDIA_REQUIRED":
+      return translateRuntimeMessage(msg`请先选择一个朋友圈媒体文件。`);
+    case "MOMENTS_INVALID_MEDIA_TYPE":
+      return translateRuntimeMessage(msg`朋友圈当前仅支持图片或视频。`);
+    case "MOMENTS_MEDIA_NOT_FOUND":
+      return translateRuntimeMessage(msg`朋友圈媒体不存在。`);
+    case "MOMENTS_NOT_FOUND":
+      return translateRuntimeMessage(msg`朋友圈不存在。`);
+    case "MOMENTS_NOT_FRIEND":
+      return translateRuntimeMessage(msg`需先加为好友才能互动。`);
+    case "MOMENTS_EMPTY":
+      return translateRuntimeMessage(msg`朋友圈内容和媒体不能同时为空。`);
+    case "MOMENTS_TEXT_NO_MEDIA":
+      return translateRuntimeMessage(msg`纯文本朋友圈不能附带图片或视频。`);
+    case "MOMENTS_VIDEO_SINGLE":
+      return translateRuntimeMessage(msg`视频朋友圈必须且只能包含 1 条视频。`);
+    case "MOMENTS_VIDEO_TOO_LONG":
+      return translateRuntimeMessage(msg`朋友圈视频时长不能超过 5 分钟。`);
+    case "MOMENTS_IMAGES_MAX":
+      return translateRuntimeMessage(
+        msg`图片朋友圈最多支持 ${String(params.max ?? 9)} 张图片。`,
+      );
+    case "MOMENTS_IMAGES_TYPE_ONLY":
+      return translateRuntimeMessage(msg`图片朋友圈当前只支持图片资源。`);
+    case "REMINDER_LIMIT_INVALID":
+      return translateRuntimeMessage(msg`limit 必须是正整数。`);
+    case "REMINDER_ONLY_ACTIVE_COMPLETE":
+      return translateRuntimeMessage(msg`只有激活中的提醒可以完成。`);
+    case "REMINDER_ONLY_ACTIVE_DEFER":
+      return translateRuntimeMessage(msg`只有激活中的提醒可以延后。`);
+    case "REMINDER_NOT_FOUND":
+      return translateRuntimeMessage(msg`提醒不存在。`);
+    case "REMINDER_UNTIL_INVALID":
+      return translateRuntimeMessage(msg`until 不是有效时间。`);
+    case "REMINDER_DEFER_INVALID":
+      return translateRuntimeMessage(msg`请提供有效的延后时间。`);
     case "VALIDATION_FAILED":
       return translateRuntimeMessage(msg`提交的数据无效，请检查后重试。`);
     case "INTERNAL_ERROR":

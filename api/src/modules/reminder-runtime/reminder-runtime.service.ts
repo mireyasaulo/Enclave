@@ -1,8 +1,5 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThanOrEqual, Repository } from 'typeorm';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
@@ -787,7 +784,9 @@ export class ReminderRuntimeService {
     const now = new Date();
 
     if (task.status !== 'active') {
-      throw new BadRequestException('只有激活中的提醒可以完成。');
+      throw new AppError('REMINDER_ONLY_ACTIVE_COMPLETE', {
+        legacyMessage: '只有激活中的提醒可以完成。',
+      });
     }
 
     task.lastCompletedAt = now;
@@ -813,7 +812,9 @@ export class ReminderRuntimeService {
   ) {
     const task = await this.requireOwnedTask(id);
     if (task.status !== 'active') {
-      throw new BadRequestException('只有激活中的提醒可以延后。');
+      throw new AppError('REMINDER_ONLY_ACTIVE_DEFER', {
+        legacyMessage: '只有激活中的提醒可以延后。',
+      });
     }
 
     const until = this.resolveSnoozeUntil(input, new Date());
@@ -1956,7 +1957,10 @@ export class ReminderRuntimeService {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const task = await this.taskRepo.findOneBy({ id, ownerId: owner.id });
     if (!task) {
-      throw new NotFoundException('提醒不存在。');
+      throw new AppError('REMINDER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '提醒不存在。',
+      });
     }
     return task;
   }
@@ -3296,7 +3300,9 @@ export class ReminderRuntimeService {
     if (input.until) {
       const parsed = new Date(input.until);
       if (Number.isNaN(parsed.getTime())) {
-        throw new BadRequestException('until 不是有效时间。');
+        throw new AppError('REMINDER_UNTIL_INVALID', {
+          legacyMessage: 'until 不是有效时间。',
+        });
       }
       return parsed;
     }
@@ -3305,7 +3311,9 @@ export class ReminderRuntimeService {
     const hours = Number.isFinite(input.hours) ? Number(input.hours) : 0;
     const totalMinutes = Math.trunc(minutes + hours * 60);
     if (totalMinutes <= 0) {
-      throw new BadRequestException('请提供有效的延后时间。');
+      throw new AppError('REMINDER_DEFER_INVALID', {
+        legacyMessage: '请提供有效的延后时间。',
+      });
     }
 
     const until = new Date(now);

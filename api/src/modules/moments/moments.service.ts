@@ -1,14 +1,8 @@
 import { randomUUID } from 'crypto';
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, MoreThanOrEqual, Repository } from 'typeorm';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
@@ -376,7 +370,9 @@ export class MomentsService implements OnModuleInit {
     const isVideo = file.mimetype.startsWith('video/');
 
     if (!isImage && !isVideo) {
-      throw new BadRequestException('朋友圈当前仅支持图片或视频。');
+      throw new AppError('MOMENTS_INVALID_MEDIA_TYPE', {
+        legacyMessage: '朋友圈当前仅支持图片或视频。',
+      });
     }
 
     const displayName = normalizeMomentMediaDisplayName(
@@ -429,7 +425,10 @@ export class MomentsService implements OnModuleInit {
   normalizeMomentMediaFileName(fileName: string): string {
     const normalized = path.basename(fileName).trim();
     if (!normalized) {
-      throw new NotFoundException('Moment media not found');
+      throw new AppError('MOMENTS_MEDIA_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Moment media not found',
+      });
     }
 
     return normalized;
@@ -698,10 +697,16 @@ export class MomentsService implements OnModuleInit {
       !post ||
       !this.canOwnerViewPost(post, visibleCharacterIds, ownerFriendCharacterIds)
     ) {
-      throw new NotFoundException('Moment not found');
+      throw new AppError('MOMENTS_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Moment not found',
+      });
     }
     if (!this.canOwnerInteractWithPost(post, ownerFriendCharacterIds, owner.id)) {
-      throw new ForbiddenException('需先加为好友才能互动');
+      throw new AppError('MOMENTS_NOT_FRIEND', {
+        status: HttpStatus.FORBIDDEN,
+        legacyMessage: '需先加为好友才能互动',
+      });
     }
     return post;
   }
@@ -966,7 +971,9 @@ export class MomentsService implements OnModuleInit {
     );
 
     if (!text && media.length === 0) {
-      throw new BadRequestException('朋友圈内容和媒体不能同时为空。');
+      throw new AppError('MOMENTS_EMPTY', {
+        legacyMessage: '朋友圈内容和媒体不能同时为空。',
+      });
     }
 
     this.assertMomentMediaMatchesContentType(contentType, media);
@@ -1060,31 +1067,42 @@ export class MomentsService implements OnModuleInit {
   ) {
     if (contentType === 'text') {
       if (media.length > 0) {
-        throw new BadRequestException('纯文本朋友圈不能附带图片或视频。');
+        throw new AppError('MOMENTS_TEXT_NO_MEDIA', {
+          legacyMessage: '纯文本朋友圈不能附带图片或视频。',
+        });
       }
       return;
     }
 
     if (contentType === 'video') {
       if (media.length !== 1 || media[0]?.kind !== 'video') {
-        throw new BadRequestException('视频朋友圈必须且只能包含 1 条视频。');
+        throw new AppError('MOMENTS_VIDEO_SINGLE', {
+          legacyMessage: '视频朋友圈必须且只能包含 1 条视频。',
+        });
       }
 
       if (
         (media[0] as MomentVideoAsset).durationMs &&
         (media[0] as MomentVideoAsset).durationMs! > 300000
       ) {
-        throw new BadRequestException('朋友圈视频时长不能超过 5 分钟。');
+        throw new AppError('MOMENTS_VIDEO_TOO_LONG', {
+          legacyMessage: '朋友圈视频时长不能超过 5 分钟。',
+        });
       }
       return;
     }
 
     if (media.length < 1 || media.length > 9) {
-      throw new BadRequestException('图片朋友圈最多支持 9 张图片。');
+      throw new AppError('MOMENTS_IMAGES_MAX', {
+        params: { max: 9 },
+        legacyMessage: '图片朋友圈最多支持 9 张图片。',
+      });
     }
 
     if (media.some((asset) => asset.kind !== 'image')) {
-      throw new BadRequestException('图片朋友圈当前只支持图片资源。');
+      throw new AppError('MOMENTS_IMAGES_TYPE_ONLY', {
+        legacyMessage: '图片朋友圈当前只支持图片资源。',
+      });
     }
   }
 

@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -9,6 +8,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { MomentsService } from './moments.service';
@@ -48,7 +48,9 @@ export class MomentsController {
     @Body() body: { width?: string; height?: string; durationMs?: string },
   ) {
     if (!file) {
-      throw new BadRequestException('请先选择一个朋友圈媒体文件。');
+      throw new AppError('MOMENTS_MEDIA_REQUIRED', {
+        legacyMessage: '请先选择一个朋友圈媒体文件。',
+      });
     }
 
     return {
