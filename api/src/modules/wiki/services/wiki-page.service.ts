@@ -363,7 +363,7 @@ export class WikiPageService {
       )
       .where('(p.isDeleted = 0 OR p.isDeleted IS NULL)')
       .andWhere(
-        '(c.name LIKE :like ESCAPE \'\\\\\' OR c.bio LIKE :like ESCAPE \'\\\\\' OR c.personality LIKE :like ESCAPE \'\\\\\' OR c.expertDomains LIKE :like ESCAPE \'\\\\\')',
+        '(c.name LIKE :like ESCAPE \'\\\' OR c.bio LIKE :like ESCAPE \'\\\' OR c.personality LIKE :like ESCAPE \'\\\' OR c.expertDomains LIKE :like ESCAPE \'\\\')',
         { like },
       )
       .select([
