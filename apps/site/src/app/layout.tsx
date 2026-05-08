@@ -5,6 +5,7 @@ import { DEFAULT_LOCALE, isSupportedLocale, type SupportedLocale } from "@/lib/l
 import { SITE_BASE_URL } from "@/lib/seo-metadata";
 import { siteLinks } from "@/lib/site-links";
 import { SiteAnalyticsProvider } from "@/components/site-analytics-provider";
+import { SwRegister } from "@/components/sw-register";
 import "./globals.css";
 
 // Self-host fonts via next/font: avoids fonts.gstatic.com round-trip,
@@ -68,12 +69,9 @@ export const metadata: Metadata = {
     "msapplication-TileColor": "#f97316",
   },
   icons: {
-    icon: [
-      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
-    ],
+    // 浏览器 favicon 只用一个，多列只是徒增首屏 link 标签 + 潜在预拉。
+    // PWA 模式下大尺寸 icon 仍由 manifest.webmanifest 提供，不需要在这里列。
+    icon: [{ url: "/favicon-32.png", sizes: "32x32", type: "image/png" }],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
 };
@@ -105,6 +103,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body data-locale={locale}>
         <SiteAnalyticsProvider>{children}</SiteAnalyticsProvider>
+        <SwRegister />
       </body>
     </html>
   );

@@ -63,6 +63,15 @@ export default async function LocaleLayout({
 
   return (
     <SiteI18nClientProvider locale={safeLocale} messages={messages}>
+      {/* Hero 动画是 LCP 候选；React 19 会把 <link> 提升到 <head>，让浏览器
+          解析 HTML 时就并行抓取，省 ~300-500ms。 */}
+      <link
+        rel="preload"
+        href={`/animations/${safeLocale}.webp`}
+        as="image"
+        type="image/webp"
+        fetchPriority="high"
+      />
       <SiteJsonLd locale={safeLocale} />
       <SiteHeader locale={safeLocale} />
       {children}
