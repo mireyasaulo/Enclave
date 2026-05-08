@@ -18,6 +18,7 @@ import {
   type Moment,
   type MomentComment,
 } from "@yinjie/contracts";
+import type { MessageDescriptor } from "@lingui/core";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice } from "@yinjie/ui";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -978,7 +979,7 @@ type MobileMomentsViewProps = {
     replyTo: WeChatCommentBarReplyTarget | null;
   } | null;
   commentDrafts: Record<string, string>;
-  tx: (descriptor: { id: string; message: string }) => string;
+  tx: (descriptor: MessageDescriptor) => string;
   onBack: () => void;
   onCompose: () => void;
   onAuthorTap: (moment: Moment) => void;
@@ -1288,7 +1289,7 @@ function PullToRefreshIndicator({
   t,
 }: {
   state: { offset: number; refreshing: boolean; pulling: boolean };
-  t: (descriptor: { id: string; message: string }) => string;
+  t: (descriptor: MessageDescriptor) => string;
 }) {
   if (!state.offset && !state.refreshing) return null;
   const label = state.refreshing
