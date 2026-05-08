@@ -179,14 +179,210 @@ export function MomentMediaGallery({
     );
   }
 
+  const activeImage =
+    viewerState?.kind === "image" ? images[viewerState.index] ?? null : null;
+  const isMobileVariant = variant === "mobile";
+
+  // WeChat 九宫格规则（1:1 视觉克隆）：
+  // 1 张：单图按原比例自适应（最大 ~210px 宽）
+  // 4 张：2×2，宽度 = 2 × 单格 + 1 × gap
+  // 其他：3 列方格
+  const cellSize = 105; // px，单方格边长（mobile）
+  const cellSizeNonMobile = 110;
+  const gridGapPx = 4;
+  const cellPx = isMobileVariant ? cellSize : cellSizeNonMobile;
+
+  if (isMobileVariant && images.length === 1) {
+    const single = images[0]!;
+    return (
+      <>
+        <div onClick={handleRootClick}>
+          <button
+            key={single.id}
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              setViewerState({ kind: "image", index: 0 });
+            }}
+            className="relative block overflow-hidden rounded-[3px] bg-[#EAEAEA] text-left"
+            style={computeWeChatSingleImageStyle(single)}
+          >
+            <img
+              src={single.thumbnailUrl || single.url}
+              alt={single.fileName || t(msg`朋友圈图片`)}
+              className="h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+            {single.livePhoto?.enabled ? (
+              <div className="pointer-events-none absolute left-1.5 top-1.5 rounded-[2px] bg-black/58 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                {t(msg`实况`)}
+              </div>
+            ) : null}
+          </button>
+        </div>
+
+        {activeImage ? (
+          <MomentImageViewerOverlay
+            image={activeImage}
+            activeIndex={viewerState?.kind === "image" ? viewerState.index : 0}
+            total={images.length}
+            onClose={() => setViewerState(null)}
+            onPrevious={undefined}
+            onNext={undefined}
+            variant={variant}
+          />
+        ) : null}
+      </>
+    );
+  }
+
+  if (isMobileVariant && images.length === 4) {
+    const totalWidth = cellPx * 2 + gridGapPx;
+    return (
+      <>
+        <div onClick={handleRootClick}>
+          <div
+            className="grid grid-cols-2"
+            style={{
+              gap: `${gridGapPx}px`,
+              width: `${totalWidth}px`,
+            }}
+          >
+            {images.map((asset, index) => (
+              <WeChatGridCell
+                key={asset.id}
+                asset={asset}
+                size={cellPx}
+                onOpen={() =>
+                  setViewerState({ kind: "image", index })
+                }
+              />
+            ))}
+          </div>
+        </div>
+
+        {activeImage ? (
+          <MomentImageViewerOverlay
+            image={activeImage}
+            activeIndex={viewerState?.kind === "image" ? viewerState.index : 0}
+            total={images.length}
+            onClose={() => setViewerState(null)}
+            onPrevious={
+              viewerState?.kind === "image" && viewerState.index > 0
+                ? () =>
+                    setViewerState((current) =>
+                      current?.kind === "image"
+                        ? {
+                            kind: "image",
+                            index: Math.max(current.index - 1, 0),
+                          }
+                        : current,
+                    )
+                : undefined
+            }
+            onNext={
+              viewerState?.kind === "image" &&
+              viewerState.index < images.length - 1
+                ? () =>
+                    setViewerState((current) =>
+                      current?.kind === "image"
+                        ? {
+                            kind: "image",
+                            index: Math.min(
+                              current.index + 1,
+                              images.length - 1,
+                            ),
+                          }
+                        : current,
+                    )
+                : undefined
+            }
+            variant={variant}
+          />
+        ) : null}
+      </>
+    );
+  }
+
+  if (isMobileVariant) {
+    // 2-3 张：单行；5-9 张：3 列方格
+    const columns = Math.min(images.length === 2 ? 2 : 3, images.length);
+    const totalWidth = cellPx * columns + gridGapPx * (columns - 1);
+    return (
+      <>
+        <div onClick={handleRootClick}>
+          <div
+            className="grid"
+            style={{
+              gridTemplateColumns: `repeat(${columns}, ${cellPx}px)`,
+              gap: `${gridGapPx}px`,
+              width: `${totalWidth}px`,
+            }}
+          >
+            {images.map((asset, index) => (
+              <WeChatGridCell
+                key={asset.id}
+                asset={asset}
+                size={cellPx}
+                onOpen={() =>
+                  setViewerState({ kind: "image", index })
+                }
+              />
+            ))}
+          </div>
+        </div>
+
+        {activeImage ? (
+          <MomentImageViewerOverlay
+            image={activeImage}
+            activeIndex={viewerState?.kind === "image" ? viewerState.index : 0}
+            total={images.length}
+            onClose={() => setViewerState(null)}
+            onPrevious={
+              viewerState?.kind === "image" && viewerState.index > 0
+                ? () =>
+                    setViewerState((current) =>
+                      current?.kind === "image"
+                        ? {
+                            kind: "image",
+                            index: Math.max(current.index - 1, 0),
+                          }
+                        : current,
+                    )
+                : undefined
+            }
+            onNext={
+              viewerState?.kind === "image" &&
+              viewerState.index < images.length - 1
+                ? () =>
+                    setViewerState((current) =>
+                      current?.kind === "image"
+                        ? {
+                            kind: "image",
+                            index: Math.min(
+                              current.index + 1,
+                              images.length - 1,
+                            ),
+                          }
+                        : current,
+                    )
+                : undefined
+            }
+            variant={variant}
+          />
+        ) : null}
+      </>
+    );
+  }
+
+  // Desktop / detail variants 保持原有 grid 布局
   const columnClassName =
     images.length === 1
       ? "grid-cols-1"
       : images.length === 2 || images.length === 4
         ? "grid-cols-2"
         : "grid-cols-3";
-  const activeImage =
-    viewerState?.kind === "image" ? images[viewerState.index] ?? null : null;
 
   return (
     <>
@@ -194,11 +390,7 @@ export function MomentMediaGallery({
         className={cn(
           "grid gap-2.5",
           columnClassName,
-          variant === "detail"
-            ? "max-w-full"
-            : variant === "mobile"
-              ? "max-w-[320px]"
-              : "max-w-[360px]",
+          variant === "detail" ? "max-w-full" : "max-w-[360px]",
         )}
         onClick={handleRootClick}
       >
@@ -405,6 +597,67 @@ function MomentVideoViewerOverlay({
       </div>
     </div>
   );
+}
+
+function WeChatGridCell({
+  asset,
+  size,
+  onOpen,
+}: {
+  asset: MomentImageAsset;
+  size: number;
+  onOpen: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={(event) => {
+        event.stopPropagation();
+        onOpen();
+      }}
+      className="relative overflow-hidden rounded-[3px] bg-[#EAEAEA] text-left"
+      style={{ width: `${size}px`, height: `${size}px` }}
+    >
+      <img
+        src={asset.thumbnailUrl || asset.url}
+        alt={asset.fileName || t(msg`朋友圈图片`)}
+        className="h-full w-full object-cover"
+        loading="lazy"
+        decoding="async"
+      />
+      {asset.livePhoto?.enabled ? (
+        <div className="pointer-events-none absolute left-1.5 top-1.5 rounded-[2px] bg-black/58 px-1.5 py-0.5 text-[10px] font-medium text-white">
+          {t(msg`实况`)}
+        </div>
+      ) : null}
+    </button>
+  );
+}
+
+function computeWeChatSingleImageStyle(
+  asset: MomentImageAsset,
+): { width: string; height: string } {
+  const SQUARE = 165; // 正方形上限
+  const LONG = 220; // 长边
+  const SHORT = 145; // 短边
+  const w = asset.width ?? 0;
+  const h = asset.height ?? 0;
+
+  if (!w || !h) {
+    return { width: `${SQUARE}px`, height: `${SQUARE}px` };
+  }
+
+  const ratio = w / h;
+  if (ratio >= 1.18) {
+    // 横图
+    return { width: `${LONG}px`, height: `${SHORT}px` };
+  }
+  if (ratio <= 0.84) {
+    // 竖图
+    return { width: `${SHORT}px`, height: `${LONG}px` };
+  }
+  // 接近方形
+  return { width: `${SQUARE}px`, height: `${SQUARE}px` };
 }
 
 function ViewerNavButton({
