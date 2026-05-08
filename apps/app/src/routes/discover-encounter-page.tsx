@@ -94,6 +94,7 @@ function MobileDiscoverEncounterPage() {
   });
 
   useEffect(() => {
+    // i18n-ignore-next-line: clears local notice state, not user-visible copy
     setMessage("");
   }, [baseUrl]);
 

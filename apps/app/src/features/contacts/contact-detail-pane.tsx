@@ -113,6 +113,7 @@ export function ContactDetailPane({
   const updateProfileMutation = useMutation({
     mutationFn: async (payload: UpdateFriendProfileRequest) => {
       if (!character || !friendship) {
+        // i18n-ignore-next-line: internal mutation guard, never user-visible (component returns earlier)
         throw new Error("Friend not found");
       }
 

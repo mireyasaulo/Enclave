@@ -380,6 +380,7 @@ export function MomentsPage() {
 
     setNoticeActionLabel(null);
     setNoticeAction(null);
+    // i18n-ignore-next-line: clears notice state, not user-visible copy
     setNotice("");
   }, [baseUrl, resetComposeDraft]);
 
@@ -436,6 +437,7 @@ export function MomentsPage() {
     }
 
     const timer = window.setTimeout(() => {
+      // i18n-ignore-next-line: clears notice state, not user-visible copy
       setNotice("");
       setNoticeActionLabel(null);
       setNoticeAction(null);
