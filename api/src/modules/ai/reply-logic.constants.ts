@@ -884,6 +884,14 @@ function sanitizeMessages(value: string[] | undefined, fallback: string[]) {
   return normalized.length ? normalized : fallback;
 }
 
+// 旧版 baseRules 默认带「用中文回复，语气自然」，与 world_language 冲突。
+// 即便我们改了默认值，存量实例 system_config 里仍可能持久化了旧值。这里
+// 在加载侧把这条硬锁中文的规则剥掉；语言由 <world_language> 段统一管控。
+const LEGACY_LANGUAGE_LOCK_RULE_PATTERN = /用中文(回复|输出|表达)/;
+function stripLegacyLanguageLockRules(rules: string[]): string[] {
+  return rules.filter((rule) => !LEGACY_LANGUAGE_LOCK_RULE_PATTERN.test(rule));
+}
+
 function sanitizeTemplate(value: string | undefined, fallback: string) {
   const normalized = value?.trim();
   return normalized ? normalized : fallback;
@@ -1666,7 +1674,9 @@ function normalizePromptTemplates(
       value?.groupChatInstruction,
       defaults.groupChatInstruction,
     ),
-    baseRules: sanitizeMessages(value?.baseRules, defaults.baseRules),
+    baseRules: stripLegacyLanguageLockRules(
+      sanitizeMessages(value?.baseRules, defaults.baseRules),
+    ),
     momentPrompt: sanitizeTemplate(value?.momentPrompt, defaults.momentPrompt),
     personalityExtractionPrompt: sanitizeTemplate(
       value?.personalityExtractionPrompt,
