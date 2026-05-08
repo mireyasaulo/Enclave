@@ -130,12 +130,15 @@ import type {
 import type {
   BlockCharacterRequest,
   BlockedCharacter,
+  BulkFriendshipRequest,
+  BulkFriendshipResponse,
   FriendListItem,
   FriendRequest,
   SendFriendRequestRequest,
   SetFriendStarredRequest,
   TriggerSceneRequest,
   UnblockCharacterRequest,
+  UpdateFriendPermissionsRequest,
   UpdateFriendProfileRequest,
 } from "./social";
 import type {
@@ -2672,6 +2675,35 @@ export function unblockCharacter(
 ) {
   return requestLegacyApi<SuccessResponse>(
     "/social/unblock",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
+export function updateFriendPermissions(
+  characterId: string,
+  payload: UpdateFriendPermissionsRequest,
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FriendListItem["friendship"]>(
+    `/social/friends/${characterId}/permissions`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
+export function bulkFriendshipAction(
+  payload: BulkFriendshipRequest,
+  baseUrl?: string,
+) {
+  return requestLegacyApi<BulkFriendshipResponse>(
+    "/social/friends/bulk",
     {
       method: "POST",
       body: JSON.stringify(payload),
