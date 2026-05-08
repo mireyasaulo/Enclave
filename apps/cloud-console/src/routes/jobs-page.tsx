@@ -72,6 +72,7 @@ import {
   performWorldLifecycleActionWithMeta,
   type WorldLifecycleAction,
 } from "../lib/world-lifecycle-actions";
+import { SurfaceCard } from "../components/ui";
 
 const UNASSIGNED_PROVIDER_FILTER = "__unassigned__";
 
@@ -454,7 +455,7 @@ export function JobsPage() {
   ].filter((error): error is Error => error instanceof Error);
 
   return (
-    <section className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
+    <SurfaceCard>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="text-xl font-semibold text-[color:var(--text-primary)]">
@@ -933,6 +934,6 @@ export function JobsPage() {
           });
         }}
       />
-    </section>
+    </SurfaceCard>
   );
 }

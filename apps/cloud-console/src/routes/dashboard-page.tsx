@@ -38,6 +38,7 @@ import {
   createRequestScopedNotice,
   showRequestScopedNotice,
 } from "../lib/request-scoped-notice";
+import { PageHeader, SurfaceCard } from "../components/ui";
 import {
   DASHBOARD_ACTIVE_JOB_ACTIONS,
   DASHBOARD_ATTENTION_ACTIONS,
@@ -487,33 +488,27 @@ export function DashboardPage() {
 
   return (
     <section className="space-y-6">
-      <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="text-xl font-semibold text-[color:var(--text-primary)]">
-              {t("Fleet Dashboard")}
-            </div>
-            <div className="mt-1 max-w-3xl text-sm text-[color:var(--text-secondary)]">
-              Quick view of world availability, queued recovery, and the most
-              urgent runtime drift signals across the cloud fleet.
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-3 text-sm">
-            <WorldsPermalinkLink
-              search={buildCompactWorldsRouteSearch()}
-              className="rounded-full border border-[color:var(--border-faint)] px-4 py-2 text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
-            >
-              {t("Open worlds")}
-            </WorldsPermalinkLink>
-            <JobsPermalinkLink
-              search={buildCompactJobsRouteSearch()}
-              className="rounded-full border border-[color:var(--border-faint)] px-4 py-2 text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
-            >
-              {t("Inspect jobs")}
-            </JobsPermalinkLink>
-          </div>
-        </div>
+      <SurfaceCard>
+        <PageHeader
+          title={t("Fleet Dashboard")}
+          subtitle="Quick view of world availability, queued recovery, and the most urgent runtime drift signals across the cloud fleet."
+          actions={
+            <>
+              <WorldsPermalinkLink
+                search={buildCompactWorldsRouteSearch()}
+                className="rounded-full border border-[color:var(--border-faint)] px-4 py-2 text-sm text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
+              >
+                {t("Open worlds")}
+              </WorldsPermalinkLink>
+              <JobsPermalinkLink
+                search={buildCompactJobsRouteSearch()}
+                className="rounded-full border border-[color:var(--border-faint)] px-4 py-2 text-sm text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
+              >
+                {t("Inspect jobs")}
+              </JobsPermalinkLink>
+            </>
+          }
+        />
 
         {pageErrors.length ? (
           <div className="mt-4 space-y-3">
@@ -727,7 +722,7 @@ export function DashboardPage() {
             locale,
           )}
         </div>
-      </div>
+      </SurfaceCard>
 
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
