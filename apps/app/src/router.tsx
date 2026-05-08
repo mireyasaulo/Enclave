@@ -209,6 +209,16 @@ const ProfileSubscriptionPage = lazy(async () => {
   return { default: mod.ProfileSubscriptionPage };
 });
 
+const ProfileFavoritesPage = lazy(async () => {
+  const mod = await import("./routes/profile-favorites-page");
+  return { default: mod.ProfileFavoritesPage };
+});
+
+const ProfileMomentsPage = lazy(async () => {
+  const mod = await import("./routes/profile-moments-page");
+  return { default: mod.ProfileMomentsPage };
+});
+
 const DesktopMobilePage = lazy(async () => {
   const mod = await import("./routes/desktop-mobile-page");
   return { default: mod.DesktopMobilePage };
@@ -894,6 +904,20 @@ const profileSubscriptionRoute = createRoute({
   component: ProfileSubscriptionPage,
 });
 
+const profileFavoritesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/favorites",
+  beforeLoad: requireWorldReady,
+  component: ProfileFavoritesPage,
+});
+
+const profileMomentsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/moments",
+  beforeLoad: requireWorldReady,
+  component: ProfileMomentsPage,
+});
+
 const desktopMobileRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/desktop/mobile",
@@ -1059,6 +1083,8 @@ const routeTree = rootRoute.addChildren([
   profileInfoQrRoute,
   profileInfoMoreRoute,
   profileSubscriptionRoute,
+  profileFavoritesRoute,
+  profileMomentsRoute,
   desktopMobileRoute,
   mobileFriendMomentsRoute,
   desktopFriendMomentsRoute,

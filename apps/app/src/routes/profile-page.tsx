@@ -3,12 +3,14 @@ import { msg } from "@lingui/macro";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   BookText,
+  Camera,
   ChevronRight,
   CreditCard,
   FileText,
   LogOut,
   Settings,
   ShieldCheck,
+  Star,
 } from "lucide-react";
 import { AppPage, cn } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
@@ -145,6 +147,24 @@ export function ProfilePage() {
             iconClassName="bg-[rgba(7,193,96,0.10)] text-[#15803d]"
             label={t(msg`设置`)}
             to={settingsPath}
+          />
+        </ProfileEntryGroup>
+
+        <ProfileEntryGroup className="mt-3">
+          <ProfileEntry
+            icon={Star}
+            iconClassName="bg-[rgba(250,173,20,0.12)] text-[#d48806]"
+            label={t(msg`收藏`)}
+            to="/profile/favorites"
+          />
+        </ProfileEntryGroup>
+
+        <ProfileEntryGroup className="mt-3">
+          <ProfileEntry
+            icon={Camera}
+            iconClassName="bg-[rgba(168,85,247,0.12)] text-[#7e22ce]"
+            label={t(msg`朋友圈`)}
+            to="/profile/moments"
           />
         </ProfileEntryGroup>
 
