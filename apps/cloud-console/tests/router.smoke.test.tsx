@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
 import { getSurfaceTextDictionary } from "@yinjie/i18n";
+// 测试也要先触发 cloud-console 字典 side-effect 注册，否则 registry 是空的。
+import "@yinjie/i18n/runtime/surface-text-dictionaries-cloud-console";
 import { installCloudAdminApiMock, renderRoute } from "./test-helpers";
 import { resolveCloudAdminApiBaseFromLocation } from "../src/lib/cloud-admin-api";
 

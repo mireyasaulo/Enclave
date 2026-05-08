@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./catalogs/*": "./catalogs/*"
+    "./catalogs/*": "./catalogs/*",
+    "./runtime/surface-text-dictionaries-cloud-console": "./src/runtime/surface-text-dictionaries-cloud-console.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --declaration --emitDeclarationOnly --outDir dist",
