@@ -5579,8 +5579,8 @@ function GroupCallInviteMessage({
 
   const isDesktop = variant === "desktop";
   const canReopenCall = Boolean(onOpen);
-  const footerCopy = resolveGroupCallFooterCopy(invite, canReopenCall);
-  const completionBadge = resolveGroupCallCompletionBadge(invite);
+  const footerCopy = resolveGroupCallFooterCopy(t, invite, canReopenCall);
+  const completionBadge = resolveGroupCallCompletionBadge(t, invite);
 
   const card = (
     <div
@@ -5641,6 +5641,7 @@ function GroupCallInviteMessage({
           <ResultCardMetric
             label={t(msg`起止时间`)}
             value={formatGroupCallRangeSummary(
+              t,
               invite.startedAt,
               invite.recordedAt,
             )}
@@ -5794,7 +5795,7 @@ function DirectCallInviteMessage({
 
   const isDesktop = variant === "desktop";
   const canReopenCall = Boolean(onOpen);
-  const footerCopy = resolveDirectCallFooterCopy(invite, canReopenCall);
+  const footerCopy = resolveDirectCallFooterCopy(t, invite, canReopenCall);
 
   const card = (
     <div
@@ -5834,7 +5835,7 @@ function DirectCallInviteMessage({
         {invite.connectionStatus ? (
           <ResultCardMetric
             label={t(msg`当前状态`)}
-            value={resolveDirectCallStatusLabel(invite)}
+            value={resolveDirectCallStatusLabel(t, invite)}
             variant={variant}
           />
         ) : null}
