@@ -1275,7 +1275,7 @@ export function DesktopSearchDropdownPanel({
   return (
     <div
       className={cn(
-        "absolute left-0 right-0 top-[calc(100%+0.45rem)] z-30 overflow-hidden rounded-[16px] border border-[color:var(--border-faint)] bg-white/98 p-2.5 shadow-[var(--shadow-overlay)] backdrop-blur-xl",
+        "absolute left-0 right-0 top-[calc(100%+0.45rem)] z-30 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain rounded-[16px] border border-[color:var(--border-faint)] bg-white/98 p-2.5 shadow-[var(--shadow-overlay)] backdrop-blur-xl",
         className,
       )}
     >

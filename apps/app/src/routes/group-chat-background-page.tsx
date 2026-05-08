@@ -568,7 +568,7 @@ export function GroupChatBackgroundPage() {
                     onClick={() => openPicker("group")}
                     className={!isDesktopLayout ? "min-h-11 rounded-full px-4" : undefined}
                   >
-                    上传图片
+                    {t(msg`上传图片`)}
                   </Button>
                   <Button
                     variant="ghost"

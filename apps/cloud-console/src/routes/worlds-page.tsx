@@ -22,6 +22,12 @@ import { cloudAdminApi } from "../lib/cloud-admin-api";
 import { translateCloudConsoleTextForActiveLocale,
   useCloudConsoleText } from "../lib/cloud-console-i18n";
 import {
+  MetricCard,
+  MetricCardGrid,
+  PageHeader,
+  SurfaceCard,
+} from "../components/ui";
+import {
   createRequestScopedNotice,
   showRequestScopedNotice,
 } from "../lib/request-scoped-notice";
@@ -495,110 +501,68 @@ export function WorldsPage() {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="text-xl font-semibold text-[color:var(--text-primary)]">
-              {t("World drift summary")}
-            </div>
-            <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              This panel folds together runtime heartbeat freshness,
-              provider-observed drift, and queued recovery jobs.
-            </div>
-          </div>
+      <SurfaceCard>
+        <PageHeader
+          title={t("World drift summary")}
+          subtitle="This panel folds together runtime heartbeat freshness, provider-observed drift, and queued recovery jobs."
+          meta={`Updated ${formatDateTime(driftSummaryQuery.data?.generatedAt)}`}
+        />
 
-          <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-            Updated {formatDateTime(driftSummaryQuery.data?.generatedAt)}
-          </div>
-        </div>
+        <MetricCardGrid cols={4}>
+          <MetricCard
+            label={t("Attention worlds")}
+            value={driftSummaryQuery.data?.attentionWorlds ?? 0}
+            description={t("Worlds that currently need operator attention.")}
+            valueClassName={getMetricTone(
+              driftSummaryQuery.data?.attentionWorlds ?? 0,
+            )}
+          />
+          <MetricCard
+            label={t("Critical alerts")}
+            value={driftSummaryQuery.data?.criticalAttentionWorlds ?? 0}
+            description="Worlds already in critical state, including failed and escalated alerts."
+            valueClassName={getMetricTone(
+              driftSummaryQuery.data?.criticalAttentionWorlds ?? 0,
+            )}
+          />
+          <MetricCard
+            label={t("Escalated worlds")}
+            value={driftSummaryQuery.data?.escalatedWorlds ?? 0}
+            description="Alerts upgraded because retry or stale-heartbeat thresholds were crossed."
+            valueClassName={getMetricTone(
+              driftSummaryQuery.data?.escalatedWorlds ?? 0,
+            )}
+          />
+          <MetricCard
+            label={t("Recovery queued")}
+            value={driftSummaryQuery.data?.recoveryQueuedWorlds ?? 0}
+            description="Worlds that already have active `resume` or `provision` work in flight."
+            valueClassName={getMetricTone(
+              driftSummaryQuery.data?.recoveryQueuedWorlds ?? 0,
+            )}
+          />
+        </MetricCardGrid>
 
-        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-            <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              {t("Attention worlds")}
-            </div>
-            <div
-              className={`mt-2 text-3xl font-semibold ${getMetricTone(driftSummaryQuery.data?.attentionWorlds ?? 0)}`}
-            >
-              {driftSummaryQuery.data?.attentionWorlds ?? 0}
-            </div>
-            <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              {t("Worlds that currently need operator attention.")}
-            </div>
-          </div>
-          <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-            <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              {t("Critical alerts")}
-            </div>
-            <div
-              className={`mt-2 text-3xl font-semibold ${getMetricTone(driftSummaryQuery.data?.criticalAttentionWorlds ?? 0)}`}
-            >
-              {driftSummaryQuery.data?.criticalAttentionWorlds ?? 0}
-            </div>
-            <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              Worlds already in critical state, including failed and escalated
-              alerts.
-            </div>
-          </div>
-          <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-            <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              {t("Escalated worlds")}
-            </div>
-            <div
-              className={`mt-2 text-3xl font-semibold ${getMetricTone(driftSummaryQuery.data?.escalatedWorlds ?? 0)}`}
-            >
-              {driftSummaryQuery.data?.escalatedWorlds ?? 0}
-            </div>
-            <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              Alerts upgraded because retry or stale-heartbeat thresholds were
-              crossed.
-            </div>
-          </div>
-          <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-            <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              {t("Recovery queued")}
-            </div>
-            <div
-              className={`mt-2 text-3xl font-semibold ${getMetricTone(driftSummaryQuery.data?.recoveryQueuedWorlds ?? 0)}`}
-            >
-              {driftSummaryQuery.data?.recoveryQueuedWorlds ?? 0}
-            </div>
-            <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              Worlds that already have active `resume` or `provision` work in
-              flight.
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-3 grid gap-3 md:grid-cols-2">
-          <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-            <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              {t("Heartbeat stale")}
-            </div>
-            <div
-              className={`mt-2 text-3xl font-semibold ${getMetricTone(driftSummaryQuery.data?.heartbeatStaleWorlds ?? 0)}`}
-            >
-              {driftSummaryQuery.data?.heartbeatStaleWorlds ?? 0}
-            </div>
-            <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              {t("Runtime is not checking in within the configured stale window.")}
-            </div>
-          </div>
-          <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-            <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              {t("Provider drift")}
-            </div>
-            <div
-              className={`mt-2 text-3xl font-semibold ${getMetricTone(driftSummaryQuery.data?.providerDriftWorlds ?? 0)}`}
-            >
-              {driftSummaryQuery.data?.providerDriftWorlds ?? 0}
-            </div>
-            <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              Provider reports power state that disagrees with desired world
-              state.
-            </div>
-          </div>
-        </div>
+        <MetricCardGrid cols={2} className="mt-3" compact>
+          <MetricCard
+            label={t("Heartbeat stale")}
+            value={driftSummaryQuery.data?.heartbeatStaleWorlds ?? 0}
+            description={t(
+              "Runtime is not checking in within the configured stale window.",
+            )}
+            valueClassName={getMetricTone(
+              driftSummaryQuery.data?.heartbeatStaleWorlds ?? 0,
+            )}
+          />
+          <MetricCard
+            label={t("Provider drift")}
+            value={driftSummaryQuery.data?.providerDriftWorlds ?? 0}
+            description="Provider reports power state that disagrees with desired world state."
+            valueClassName={getMetricTone(
+              driftSummaryQuery.data?.providerDriftWorlds ?? 0,
+            )}
+          />
+        </MetricCardGrid>
 
         <div className="mt-5 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
           <div className="text-sm font-medium text-[color:var(--text-primary)]">
@@ -671,9 +635,9 @@ export function WorldsPage() {
             ) : null}
           </div>
         </div>
-      </section>
+      </SurfaceCard>
 
-      <section className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
+      <SurfaceCard>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-xl font-semibold text-[color:var(--text-primary)]">
@@ -835,9 +799,9 @@ export function WorldsPage() {
             </div>
           ) : null}
         </div>
-      </section>
+      </SurfaceCard>
 
-      <section className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
+      <SurfaceCard>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="text-xl font-semibold text-[color:var(--text-primary)]">
@@ -1124,7 +1088,7 @@ export function WorldsPage() {
             </div>
           ) : null}
         </div>
-      </section>
+      </SurfaceCard>
 
       <ConsoleConfirmDialog
         open={Boolean(activeConfirm && confirmAction)}

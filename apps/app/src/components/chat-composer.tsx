@@ -2999,7 +2999,7 @@ export function ChatComposer({
           ref={isDesktop ? desktopStickerRef : undefined}
           className={`relative ${
             isDesktop
-              ? "overflow-hidden rounded-[16px] border border-black/8 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.06)]"
+              ? "rounded-[16px] border border-black/8 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.06)]"
               : "space-y-1.5"
           }`}
         >
@@ -3063,7 +3063,7 @@ export function ChatComposer({
                 />
               </div>
 
-              <div className="flex items-center justify-between gap-3 border-t border-black/6 bg-[#fafafa] px-3.5 py-2.5">
+              <div className="flex items-center justify-between gap-3 rounded-b-[16px] border-t border-black/6 bg-[#fafafa] px-3.5 py-2.5">
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                   <DesktopToolbarGroup>
                     <DesktopToolbarButton

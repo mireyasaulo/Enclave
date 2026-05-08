@@ -9,6 +9,7 @@ import {
   formatCloudConsolePageOfTotal,
   useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
+import { SurfaceCard } from "../components/ui";
 
 function formatExpiresAt(value?: string | null) {
   if (!value) return "-";
@@ -16,6 +17,9 @@ function formatExpiresAt(value?: string | null) {
   if (Number.isNaN(date.getTime())) return value;
   return formatDateTime(date, { dateStyle: "medium", timeStyle: "short" });
 }
+
+const FILTER_CONTROL_CLASS =
+  "rounded-2xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm";
 
 export function UsersPage() {
   const t = useCloudConsoleText();
@@ -39,7 +43,7 @@ export function UsersPage() {
   });
 
   return (
-    <section className="space-y-4 rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
+    <SurfaceCard className="space-y-4">
       <div className="grid gap-3 md:grid-cols-4">
         <input
           value={query}
@@ -48,7 +52,7 @@ export function UsersPage() {
             setPage(1);
           }}
           placeholder={t("Search phone")}
-          className="rounded-2xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm"
+          className={FILTER_CONTROL_CLASS}
         />
         <select
           value={status}
@@ -56,7 +60,7 @@ export function UsersPage() {
             setStatus(event.target.value as CloudUserStatus | "");
             setPage(1);
           }}
-          className="rounded-2xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm"
+          className={FILTER_CONTROL_CLASS}
         >
           <option value="">{t("All account states")}</option>
           <option value="active">{t("active")}</option>
@@ -69,7 +73,7 @@ export function UsersPage() {
             setSubscriptionStatus(event.target.value as SubscriptionStatus | "");
             setPage(1);
           }}
-          className="rounded-2xl border border-[color:var(--border-subtle)] bg-white px-3 py-2 text-sm"
+          className={FILTER_CONTROL_CLASS}
         >
           <option value="">{t("All subscription states")}</option>
           <option value="active">{t("active")}</option>
@@ -165,6 +169,6 @@ export function UsersPage() {
           {t("Next")}
         </button>
       </div>
-    </section>
+    </SurfaceCard>
   );
 }
