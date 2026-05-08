@@ -440,75 +440,21 @@ export function ContactsPage() {
     () => buildContactSections(filteredWorldCharacterItems),
     [filteredWorldCharacterItems],
   );
-  const mobileShortcutIndexItems = useMemo(
-    () => [
-      {
-        key: "contacts-shortcut-new-friends",
-        indexLabel: t(msg`新`),
-      },
-      {
-        key: "contacts-shortcut-group-chat",
-        indexLabel: t(msg`群`),
-      },
-      {
-        key: "contacts-shortcut-official-accounts",
-        indexLabel: t(msg`公`),
-      },
-      {
-        key: "contacts-shortcut-world-characters",
-        indexLabel: t(msg`世`),
-      },
-    ],
-    [t],
-  );
   const mobileIndexItems = useMemo(
-    () => [
-      ...mobileShortcutIndexItems,
-      ...friendSections.map((section) => ({
+    () =>
+      friendSections.map((section) => ({
         key: section.anchorId,
         indexLabel: section.indexLabel,
       })),
-    ],
-    [mobileShortcutIndexItems, friendSections],
-  );
-  const desktopShortcutIndexItems = useMemo(
-    () => [
-      {
-        key: "contacts-shortcut-new-friends",
-        indexLabel: t(msg`新`),
-      },
-      {
-        key: "contacts-shortcut-starred-friends",
-        indexLabel: "★",
-      },
-      {
-        key: "contacts-shortcut-tags",
-        indexLabel: t(msg`签`),
-      },
-      {
-        key: "contacts-shortcut-group-chat",
-        indexLabel: t(msg`群`),
-      },
-      {
-        key: "contacts-shortcut-official-accounts",
-        indexLabel: t(msg`公`),
-      },
-      {
-        key: "contacts-shortcut-world-characters",
-        indexLabel: t(msg`世`),
-      },
-    ],
-    [t],
+    [friendSections],
   );
   const desktopIndexItems = useMemo(
-    () => [
-      ...desktopShortcutIndexItems,
-      ...desktopFriendSections.map((section) => ({
+    () =>
+      desktopFriendSections.map((section) => ({
         key: section.anchorId,
         indexLabel: section.indexLabel,
       })),
-    ],
-    [desktopShortcutIndexItems, desktopFriendSections],
+    [desktopFriendSections],
   );
 
   const pendingRequestCount = useMemo(
@@ -1264,7 +1210,6 @@ export function ContactsPage() {
   const shortcutItems: ContactShortcutListItem[] = [
     {
       key: "new-friends",
-      anchorId: "contacts-shortcut-new-friends",
       label: t(msg`新的朋友`),
       subtitle:
         pendingRequestCount > 0
@@ -1291,7 +1236,6 @@ export function ContactsPage() {
     },
     {
       key: "group-chat",
-      anchorId: "contacts-shortcut-group-chat",
       label: t(msg`群聊`),
       subtitle:
         groupCount > 0 ? t(msg`${groupCount} 个群聊`) : t(msg`查看全部群聊`),
@@ -1316,7 +1260,6 @@ export function ContactsPage() {
     },
     {
       key: "official-accounts",
-      anchorId: "contacts-shortcut-official-accounts",
       label: t(msg`公众号`),
       subtitle: t(msg`查看已上线的内容账号`),
       active: desktopSelection?.kind === "official-accounts",
@@ -1338,7 +1281,6 @@ export function ContactsPage() {
     },
     {
       key: "world-characters",
-      anchorId: "contacts-shortcut-world-characters",
       label: t(msg`世界角色`),
       subtitle: isDesktopLayout
         ? showWorldCharacters
@@ -1363,7 +1305,6 @@ export function ContactsPage() {
     shortcutItems[0],
     {
       key: "starred-friends",
-      anchorId: "contacts-shortcut-starred-friends",
       label: t(msg`星标朋友`),
       subtitle:
         starredFriends.length > 0
@@ -1385,7 +1326,6 @@ export function ContactsPage() {
     },
     {
       key: "tags",
-      anchorId: "contacts-shortcut-tags",
       label: t(msg`标签`),
       subtitle:
         tagGroupCount > 0

@@ -5,7 +5,6 @@ import { cn } from "@yinjie/ui";
 
 export type ContactShortcutListItem = {
   key: string;
-  anchorId?: string;
   label: ReactNode;
   subtitle?: ReactNode;
   badgeCount?: number;
@@ -46,7 +45,6 @@ export function ContactShortcutList({
         return (
           <button
             key={item.key}
-            id={item.anchorId}
             type="button"
             disabled={item.disabled}
             onClick={item.onClick}
