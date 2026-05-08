@@ -44,6 +44,17 @@ const OUTPUT_LANGUAGE_INSTRUCTIONS: Record<WorldLanguageCode, string> = {
     'Target output language: Korean. All user-facing, character-facing, or world-facing natural-language output must be natural Korean. Do not answer in Chinese, English, or Japanese unless the user explicitly asks for translation or a source-language quote. Keep fixed JSON keys, XML tags, and internal identifiers unchanged, but write readable text values in Korean.',
 };
 
+const FINAL_LANGUAGE_REMINDERS: Record<WorldLanguageCode, string> = {
+  'zh-CN':
+    '<language_reminder>\n请用简体中文回复下一条用户消息。无论之前的对话使用了哪种语言（英文/日文/韩文等），都不要继续使用其他语言；除非用户明确要求翻译或引用原文，否则始终使用自然、地道的简体中文输出。\n</language_reminder>',
+  'en-US':
+    '<language_reminder>\nReply to the next user message in natural, idiomatic English. Regardless of which language the previous conversation used (Chinese, Japanese, Korean, etc.), do NOT continue replying in those languages. Only switch away from English if the user explicitly asks for translation or a source-language quote.\n</language_reminder>',
+  'ja-JP':
+    '<language_reminder>\n次のユーザーメッセージには自然な日本語で返信してください。これまでの会話がどの言語（中国語・英語・韓国語など）で行われていたとしても、他の言語で返信を続けてはいけません。ユーザーが明示的に翻訳や原文の引用を求めない限り、必ず自然で違和感のない日本語で出力してください。\n</language_reminder>',
+  'ko-KR':
+    '<language_reminder>\n다음 사용자 메시지에는 자연스러운 한국어로 답해 주세요. 이전 대화가 어떤 언어(중국어, 영어, 일본어 등)로 진행되었든, 그 언어로 계속 답변해서는 안 됩니다. 사용자가 명시적으로 번역이나 원문 인용을 요청하지 않는 한, 항상 자연스럽고 매끄러운 한국어로 출력하세요.\n</language_reminder>',
+};
+
 const TRANSCRIPTION_PROMPTS: Record<WorldLanguageCode, string> = {
   'zh-CN': '这是聊天输入语音转文字，请输出自然、简洁的中文口语内容。',
   'en-US':
@@ -114,6 +125,15 @@ export class WorldLanguageService {
 
   async buildPromptLanguageSection(): Promise<string> {
     return `<world_language>\n${await this.getOutputLanguageInstruction()}\n</world_language>`;
+  }
+
+  /**
+   * 紧贴在历史消息之后、当前用户消息之前注入的"最后语言提醒"。
+   * 用于在历史消息语言与当前 world_language 不一致时（例如用户切了语言但
+   * 历史里还都是中文），用最强的近因位置盖过历史的语言惯性。
+   */
+  async buildFinalReminder(): Promise<string> {
+    return FINAL_LANGUAGE_REMINDERS[await this.getLanguage()];
   }
 
   async prependTaskLanguageInstruction(prompt: string): Promise<string> {
