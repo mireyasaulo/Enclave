@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -9,6 +8,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { AiOrchestratorService } from './ai-orchestrator.service';
@@ -42,11 +42,15 @@ export class AiController {
     body: { conversationId?: string; characterId?: string; mode?: string },
   ) {
     if (!file) {
-      throw new BadRequestException('请先录一段语音再试。');
+      throw new AppError('AI_AUDIO_REQUIRED', {
+        legacyMessage: '请先录一段语音再试。',
+      });
     }
 
     if (body.mode && body.mode !== 'dictation' && body.mode !== 'voice_call') {
-      throw new BadRequestException('当前语音模式暂不支持。');
+      throw new AppError('AI_AUDIO_MODE_UNSUPPORTED', {
+        legacyMessage: '当前语音模式暂不支持。',
+      });
     }
 
     return this.ai.transcribeAudio(file, {
@@ -68,7 +72,9 @@ export class AiController {
   ) {
     const text = body.text?.trim();
     if (!text) {
-      throw new BadRequestException('请先提供要播报的文本。');
+      throw new AppError('AI_TTS_TEXT_REQUIRED', {
+        legacyMessage: '请先提供要播报的文本。',
+      });
     }
 
     const synthesized = await this.ai.synthesizeSpeech({

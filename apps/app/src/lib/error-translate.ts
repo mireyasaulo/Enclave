@@ -224,6 +224,42 @@ export function translateAppErrorCode(
       );
     case "AUTH_CODE_TOO_MANY":
       return translateRuntimeMessage(msg`该邮箱验证码请求次数过多，请稍后再试。`);
+    case "AI_AUDIO_REQUIRED":
+      return translateRuntimeMessage(msg`请先录一段语音再试。`);
+    case "AI_AUDIO_MODE_UNSUPPORTED":
+      return translateRuntimeMessage(msg`当前语音模式暂不支持。`);
+    case "AI_TTS_TEXT_REQUIRED":
+      return translateRuntimeMessage(msg`请先提供要播报的文本。`);
+    case "AI_TTS_EMPTY":
+      return translateRuntimeMessage(msg`语音生成结果为空，请稍后再试。`);
+    case "AI_AUDIO_RETRY_FAILED":
+      return translateRuntimeMessage(msg`语音请求重试失败。`);
+    case "AI_RATE_LIMIT":
+      return translateRuntimeMessage(
+        typeof params.message === "string"
+          ? msg`请求过于频繁：${String(params.message)}`
+          : msg`请求过于频繁，请稍后再试。`,
+      );
+    case "AI_PROVIDER_UNAVAILABLE":
+      return translateRuntimeMessage(msg`当前 AI 服务不可用，请稍后再试。`);
+    case "AI_IMAGE_PROMPT_REQUIRED":
+      return translateRuntimeMessage(msg`请先提供图片生成描述。`);
+    case "AI_IMAGE_EMPTY":
+      return translateRuntimeMessage(msg`图片生成结果为空，请稍后再试。`);
+    case "AI_IMAGE_PROVIDER_UNAVAILABLE":
+      return translateRuntimeMessage(msg`图片生成服务不可用，请稍后再试。`);
+    case "AI_TRANSCRIBE_AUDIO_REQUIRED":
+      return translateRuntimeMessage(msg`没有收到可转写的音频内容。`);
+    case "AI_TRANSCRIBE_TOO_LARGE":
+      return translateRuntimeMessage(msg`录音文件过大，请缩短单次语音输入时长。`);
+    case "AI_TRANSCRIBE_FORMAT_INVALID":
+      return translateRuntimeMessage(msg`录音文件格式不受支持，请重试。`);
+    case "AI_TRANSCRIBE_PROVIDER_UNAVAILABLE":
+      return translateRuntimeMessage(msg`语音转写服务不可用，请稍后再试。`);
+    case "AI_TRANSCRIBE_GATEWAY_FAILED":
+      return translateRuntimeMessage(msg`语音转写失败，请稍后再试。`);
+    case "AI_SPEECH_ASSET_NOT_FOUND":
+      return translateRuntimeMessage(msg`语音资源不存在。`);
     case "VALIDATION_FAILED":
       return translateRuntimeMessage(msg`提交的数据无效，请检查后重试。`);
     case "INTERNAL_ERROR":

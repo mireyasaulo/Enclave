@@ -2,7 +2,8 @@ import { randomUUID } from 'crypto';
 import { existsSync } from 'node:fs';
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import {
   resolveApiPath,
   resolveDataPath,
@@ -49,7 +50,10 @@ export class AiSpeechAssetsService {
   normalizeFileName(fileName: string) {
     const normalized = path.basename(fileName).trim();
     if (!normalized) {
-      throw new NotFoundException('Speech asset not found');
+      throw new AppError('AI_SPEECH_ASSET_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Speech asset not found',
+      });
     }
 
     return normalized;
