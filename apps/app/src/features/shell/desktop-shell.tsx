@@ -409,7 +409,7 @@ export function DesktopShell({ children }: PropsWithChildren) {
   const openMomentsShortcut = () => {
     setOwnerCardNotice(null);
     setIsOwnerCardOpen(false);
-    navigateDesktopShellTo("/tabs/moments");
+    navigateDesktopShellTo("/profile/moments");
   };
 
   const openEditSignatureShortcut = () => {
