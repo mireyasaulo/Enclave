@@ -200,15 +200,36 @@ export function AppLocaleProvider({
       return;
     }
 
-    const timeoutId = window.setTimeout(() => {
+    // 其它 locale catalog 主要用于即时语言切换。这一发预下载在公网慢网环境
+    // 下有 ~330KB gzipped 的额外带宽（zh-CN / en-US / ja-JP / ko-KR 三个），
+    // 直接跟用户首屏后立刻发起的交互请求抢带宽。改 requestIdleCallback +
+    // 长超时（30s）：浏览器空闲且没在跟用户交互时再开始下，没空闲就放弃，
+    // 真正用户切换语言时仍会即时拉，最多多等一次 catalog 下载。
+    type IdleScheduler = {
+      requestIdleCallback: (
+        cb: () => void,
+        opts?: { timeout: number },
+      ) => number;
+      cancelIdleCallback: (handle: number) => void;
+    };
+    const idle = globalThis as Partial<IdleScheduler>;
+    const fire = () =>
       prefetchMessagesForSurface(
         surface,
         SUPPORTED_LOCALES.filter(
           (availableLocale) => availableLocale !== locale,
         ),
       );
-    }, 200);
 
+    if (
+      typeof idle.requestIdleCallback === "function" &&
+      typeof idle.cancelIdleCallback === "function"
+    ) {
+      const handle = idle.requestIdleCallback(fire, { timeout: 30_000 });
+      return () => idle.cancelIdleCallback?.(handle);
+    }
+
+    const timeoutId = window.setTimeout(fire, 5_000);
     return () => window.clearTimeout(timeoutId);
   }, [isReady, locale, surface]);
 
