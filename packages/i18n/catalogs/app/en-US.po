@@ -150,7 +150,7 @@ msgstr "[Note] {0}"
 msgid "[系统消息]"
 msgstr "[System message]"
 
-#: apps/app/src/components/chat-message-list.tsx:4628
+#: apps/app/src/components/chat-message-list.tsx:4646
 msgid "[聊天记录]"
 msgstr "[Chat history]"
 
@@ -448,7 +448,7 @@ msgid "{0} 已从列表移除，5 秒内可撤销。"
 msgstr "{0} was removed from the list. You can undo within 5 seconds."
 
 #. placeholder {0}: item.title
-#: apps/app/src/routes/favorites-page.tsx:271
+#: apps/app/src/routes/favorites-page.tsx:272
 msgid "{0} 已从收藏中移除。"
 msgstr "{0} removed from Favorites."
 
@@ -846,14 +846,14 @@ msgstr "{0} 非常满意：+1 春季家具票 / +6 好感。"
 #. placeholder {0}: counts.moments + counts.feed + counts.channels
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:2726
 #: apps/app/src/routes/desktop-chat-files-page.tsx:595
-#: apps/app/src/routes/favorites-page.tsx:477
-#: apps/app/src/routes/favorites-page.tsx:481
-#: apps/app/src/routes/favorites-page.tsx:485
+#: apps/app/src/routes/favorites-page.tsx:478
+#: apps/app/src/routes/favorites-page.tsx:482
+#: apps/app/src/routes/favorites-page.tsx:486
 msgid "{0} 项"
 msgstr "{0} items"
 
 #. placeholder {0}: counts.all
-#: apps/app/src/routes/favorites-page.tsx:424
+#: apps/app/src/routes/favorites-page.tsx:425
 msgid "{0} 项内容已收进桌面收藏"
 msgstr "{0} items added to desktop Favorites"
 
@@ -935,7 +935,7 @@ msgstr "{activeCount}/{0} joined"
 msgid "{activeCount}/{totalCount} 已加入"
 msgstr "{activeCount}/{totalCount} joined"
 
-#: apps/app/src/components/chat-message-list.tsx:3968
+#: apps/app/src/components/chat-message-list.tsx:3986
 msgid "{actor}撤回了一条消息"
 msgstr "{actor} recalled a message"
 
@@ -1297,7 +1297,7 @@ msgstr "/min"
 msgid "%/分钟"
 msgstr "%/min"
 
-#: apps/app/src/components/chat-message-list.tsx:2578
+#: apps/app/src/components/chat-message-list.tsx:2596
 msgid "`Shift + 点击` 可连续选择消息"
 msgstr "`Shift + click` to select messages consecutively"
 
@@ -1346,7 +1346,7 @@ msgstr "⌘/Ctrl + wheel / double-click"
 msgid "0 项内容已收进桌面收藏"
 msgstr "0 items saved to desktop Favorites"
 
-#: apps/app/src/components/chat-message-list.tsx:3989
+#: apps/app/src/components/chat-message-list.tsx:4007
 msgid "1 小时后"
 msgstr "In 1 hour"
 
@@ -2853,7 +2853,7 @@ msgstr "今夜营业结算"
 msgid "今天"
 msgstr "Today"
 
-#: apps/app/src/components/chat-message-list.tsx:4032
+#: apps/app/src/components/chat-message-list.tsx:4050
 msgid "今天 {timeLabel}"
 msgstr "Today {timeLabel}"
 
@@ -2903,7 +2903,7 @@ msgstr "今日摇一摇次数已达到上限。"
 msgid "今日相遇"
 msgstr "Today's encounters"
 
-#: apps/app/src/components/chat-message-list.tsx:3995
+#: apps/app/src/components/chat-message-list.tsx:4013
 msgid "今晚 20:00"
 msgstr "Tonight 20:00"
 
@@ -3239,7 +3239,7 @@ msgstr "people"
 msgid "位于 {activeSectionTitle}"
 msgstr "In {activeSectionTitle}"
 
-#: apps/app/src/components/chat-message-list.tsx:4102
+#: apps/app/src/components/chat-message-list.tsx:4120
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:149
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:109
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:996
@@ -3302,7 +3302,7 @@ msgstr "Author status not updated yet"
 msgid "作者直播内容"
 msgstr "Author livestream content"
 
-#: apps/app/src/components/chat-message-list.tsx:3966
+#: apps/app/src/components/chat-message-list.tsx:3984
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:63
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:846
 msgid "你"
@@ -3468,8 +3468,8 @@ msgstr "After saving, this chat will switch to the background immediately."
 msgid "保存后会进入收藏；如果直接关闭，当前草稿改动会被丢弃。"
 msgstr "Saving moves it to Favorites; closing directly discards the current draft."
 
-#: apps/app/src/components/chat-message-list.tsx:1840
-#: apps/app/src/components/chat-message-list.tsx:4166
+#: apps/app/src/components/chat-message-list.tsx:1857
+#: apps/app/src/components/chat-message-list.tsx:4184
 #: apps/app/src/i18n/static-dom-seed.ts:923
 #: apps/app/src/routes/desktop-chat-files-page.tsx:375
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1049
@@ -3508,8 +3508,8 @@ msgstr "Save the current invitation card SVG and forward it later."
 msgid "保存截图"
 msgstr "Save screenshot"
 
-#: apps/app/src/components/chat-message-list.tsx:1840
-#: apps/app/src/components/chat-message-list.tsx:4170
+#: apps/app/src/components/chat-message-list.tsx:1857
+#: apps/app/src/components/chat-message-list.tsx:4188
 #: apps/app/src/routes/desktop-chat-files-page.tsx:375
 #: apps/app/src/runtime/file-runtime-i18n.ts:35
 msgid "保存文件"
@@ -3544,8 +3544,8 @@ msgstr "Save profile"
 msgid "保存邀请卡"
 msgstr "Save invite card"
 
-#: apps/app/src/components/chat-message-list.tsx:3486
-#: apps/app/src/components/chat-message-list.tsx:4173
+#: apps/app/src/components/chat-message-list.tsx:3504
+#: apps/app/src/components/chat-message-list.tsx:4191
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:59
 #: apps/app/src/i18n/static-dom-seed.ts:485
 #: apps/app/src/routes/desktop-chat-files-page.tsx:717
@@ -3719,7 +3719,7 @@ msgid "先从上面的入口或最近内容复制一个深链接，这里就会�
 msgstr "Copy a deep link from the entries or recent content above, and records will start appearing here."
 
 #: apps/app/src/i18n/static-dom-seed.ts:395
-#: apps/app/src/routes/favorites-page.tsx:622
+#: apps/app/src/routes/favorites-page.tsx:623
 msgid "先从中间选择一条收藏"
 msgstr "Select a favorite from the middle first"
 
@@ -3771,7 +3771,7 @@ msgid "先创建新的群聊，建好后就会出现在这里。"
 msgstr "Create a new group chat first; it'll show up here once it's created."
 
 #: apps/app/src/i18n/static-dom-seed.ts:391
-#: apps/app/src/routes/favorites-page.tsx:691
+#: apps/app/src/routes/favorites-page.tsx:692
 msgid "先到聊天、内容流或公众号里把重要内容加入收藏。"
 msgstr "Save important content from chats, feeds, or official accounts first."
 
@@ -4075,7 +4075,7 @@ msgstr "Entry link copied."
 msgid "入夜啦，记得防一下夜里来串门的人。"
 msgstr "Night has fallen — watch out for nighttime visitors."
 
-#: apps/app/src/components/chat-message-list.tsx:2671
+#: apps/app/src/components/chat-message-list.tsx:2689
 msgid "全不选"
 msgstr "Deselect all"
 
@@ -4100,7 +4100,7 @@ msgstr "Ticketed everyone, total taken"
 msgid "全球内容增长操盘手映射"
 msgstr "Global content growth strategist mapping"
 
-#: apps/app/src/components/chat-message-list.tsx:2671
+#: apps/app/src/components/chat-message-list.tsx:2689
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:962
 msgid "全选"
 msgstr "Select all"
@@ -4220,7 +4220,7 @@ msgstr "Ticket all"
 #: apps/app/src/routes/desktop-mobile-page.tsx:129
 #: apps/app/src/routes/desktop-mobile-page.tsx:590
 #: apps/app/src/routes/favorites-page.tsx:71
-#: apps/app/src/routes/favorites-page.tsx:484
+#: apps/app/src/routes/favorites-page.tsx:485
 #: apps/app/src/routes/official-account-detail-page.tsx:398
 #: apps/app/src/routes/official-accounts-page.tsx:173
 msgid "公众号"
@@ -4720,7 +4720,7 @@ msgstr "Content engine team"
 msgid "内容推荐与视频动态"
 msgstr "Recommended content and video updates"
 
-#: apps/app/src/routes/favorites-page.tsx:537
+#: apps/app/src/routes/favorites-page.tsx:538
 msgid "内容摘要"
 msgstr "Content summary"
 
@@ -4740,7 +4740,7 @@ msgstr "Content update"
 #: apps/app/src/features/search/desktop-search-workspace.tsx:149
 #: apps/app/src/features/search/mobile-search-workspace.tsx:83
 #: apps/app/src/i18n/static-dom-seed.ts:335
-#: apps/app/src/routes/favorites-page.tsx:476
+#: apps/app/src/routes/favorites-page.tsx:477
 msgid "内容流"
 msgstr "Content feed"
 
@@ -4978,7 +4978,7 @@ msgstr "Recently Used Mini Programs"
 msgid "最近使用的小程序"
 msgstr "Recently used mini programs"
 
-#: apps/app/src/routes/favorites-page.tsx:562
+#: apps/app/src/routes/favorites-page.tsx:563
 msgid "最近修改"
 msgstr "Recently modified"
 
@@ -5426,7 +5426,7 @@ msgstr "Share this Moment"
 msgid "分享邀请文案"
 msgstr "Share invitation copy"
 
-#: apps/app/src/routes/favorites-page.tsx:551
+#: apps/app/src/routes/favorites-page.tsx:552
 msgid "分类"
 msgstr "Category"
 
@@ -5480,12 +5480,12 @@ msgstr "Switch to {paletteLabel} annotation"
 msgid "切换为{paletteLabel}标注 ({0})"
 msgstr "Switch to {paletteLabel} annotation ({0})"
 
-#: apps/app/src/components/chat-message-list.tsx:3799
+#: apps/app/src/components/chat-message-list.tsx:3817
 #: apps/app/src/i18n/static-dom-seed.ts:733
 msgid "切换为完整日期显示"
 msgstr "Switch to full date display"
 
-#: apps/app/src/components/chat-message-list.tsx:3798
+#: apps/app/src/components/chat-message-list.tsx:3816
 msgid "切换为简略时间显示"
 msgstr "Switch to brief time display"
 
@@ -5658,10 +5658,10 @@ msgstr "After deleting current: {0} left, and {nextSlotsAvailable} more can be a
 msgid "删当前后会清空表情库，可继续添加 {nextSlotsAvailable} 张。"
 msgstr "Deleting current will empty the sticker library, and {nextSlotsAvailable} more can be added."
 
-#: apps/app/src/components/chat-message-list.tsx:2647
-#: apps/app/src/components/chat-message-list.tsx:3213
-#: apps/app/src/components/chat-message-list.tsx:3341
-#: apps/app/src/components/chat-message-list.tsx:3506
+#: apps/app/src/components/chat-message-list.tsx:2665
+#: apps/app/src/components/chat-message-list.tsx:3231
+#: apps/app/src/components/chat-message-list.tsx:3359
+#: apps/app/src/components/chat-message-list.tsx:3524
 #: apps/app/src/features/chat/group-message-context-menu.tsx:76
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:63
 #: apps/app/src/features/chat/reminder-task-panel.tsx:283
@@ -5672,11 +5672,11 @@ msgstr "Deleting current will empty the sticker library, and {nextSlotsAvailable
 msgid "删除"
 msgstr "Delete"
 
-#: apps/app/src/components/chat-message-list.tsx:3212
+#: apps/app/src/components/chat-message-list.tsx:3230
 msgid "删除中"
 msgstr "Deleting"
 
-#: apps/app/src/components/chat-message-list.tsx:2646
+#: apps/app/src/components/chat-message-list.tsx:2664
 msgid "删除中..."
 msgstr "Deleting..."
 
@@ -6260,7 +6260,7 @@ msgstr "Open a contact's details and mark frequent friends as starred."
 
 #: apps/app/src/components/chat-composer.tsx:2764
 #: apps/app/src/components/chat-composer.tsx:5745
-#: apps/app/src/components/chat-message-list.tsx:2098
+#: apps/app/src/components/chat-message-list.tsx:2115
 #: apps/app/src/components/inline-notice-action-button.tsx:24
 #: apps/app/src/routes/chat-details-page.tsx:484
 msgid "去设置"
@@ -6627,7 +6627,7 @@ msgstr "After sending, the target conversation will show an openable note card."
 msgid "发送图片"
 msgstr "Send images"
 
-#: apps/app/src/components/chat-message-list.tsx:3121
+#: apps/app/src/components/chat-message-list.tsx:3139
 msgid "发送失败"
 msgstr "Send failed"
 
@@ -6658,8 +6658,8 @@ msgstr "Send friend request"
 msgid "发送笔记"
 msgstr "Send note"
 
-#: apps/app/src/components/chat-message-list.tsx:3324
-#: apps/app/src/components/chat-message-list.tsx:3456
+#: apps/app/src/components/chat-message-list.tsx:3342
+#: apps/app/src/components/chat-message-list.tsx:3474
 msgid "发送者名称已复制。"
 msgstr "Sender name copied."
 
@@ -6685,8 +6685,8 @@ msgstr "Send code"
 #: apps/app/src/components/chat-composer.tsx:2745
 #: apps/app/src/components/chat-composer.tsx:3765
 #: apps/app/src/components/chat-composer.tsx:5309
-#: apps/app/src/components/chat-message-list.tsx:2589
-#: apps/app/src/components/chat-message-list.tsx:2658
+#: apps/app/src/components/chat-message-list.tsx:2607
+#: apps/app/src/components/chat-message-list.tsx:2676
 #: apps/app/src/components/mobile-chat-attachment-preview.tsx:99
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:212
 #: apps/app/src/features/chat-details/mobile-details-action-sheet.tsx:91
@@ -6739,8 +6739,8 @@ msgstr "Cancel reply"
 msgid "取消固定"
 msgstr "Unpin"
 
-#: apps/app/src/components/chat-message-list.tsx:3266
-#: apps/app/src/components/chat-message-list.tsx:3419
+#: apps/app/src/components/chat-message-list.tsx:3284
+#: apps/app/src/components/chat-message-list.tsx:3437
 #: apps/app/src/features/chat/chat-reminder-entries.ts:173
 msgid "取消提醒"
 msgstr "Cancel reminder"
@@ -6749,12 +6749,12 @@ msgstr "Cancel reminder"
 msgid "取消提醒失败，请稍后再试。"
 msgstr "Failed to cancel the reminder. Try again later."
 
-#: apps/app/src/components/chat-message-list.tsx:3284
-#: apps/app/src/components/chat-message-list.tsx:3435
+#: apps/app/src/components/chat-message-list.tsx:3302
+#: apps/app/src/components/chat-message-list.tsx:3453
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:958
 #: apps/app/src/routes/desktop-chat-files-page.tsx:757
 #: apps/app/src/routes/discover-feed-page.tsx:1029
-#: apps/app/src/routes/favorites-page.tsx:615
+#: apps/app/src/routes/favorites-page.tsx:616
 #: apps/app/src/routes/moments-page.tsx:1106
 #: apps/app/src/routes/official-account-detail-page.tsx:522
 msgid "取消收藏"
@@ -6790,16 +6790,16 @@ msgstr "Incorrect passcode. Please try again."
 msgid "口令仅保存在当前浏览器或桌面客户端本地，用来阻止离开座位时工作区继续暴露。"
 msgstr "The passcode is saved only in this browser or desktop client, and keeps the workspace covered when you step away."
 
-#: apps/app/src/components/chat-message-list.tsx:4173
+#: apps/app/src/components/chat-message-list.tsx:4191
 #: apps/app/src/features/chat/group-message-context-menu.tsx:72
 msgid "另存为"
 msgstr "Save as"
 
-#: apps/app/src/components/chat-message-list.tsx:4166
+#: apps/app/src/components/chat-message-list.tsx:4184
 msgid "另存图片"
 msgstr "Save image as"
 
-#: apps/app/src/components/chat-message-list.tsx:4170
+#: apps/app/src/components/chat-message-list.tsx:4188
 msgid "另存文件"
 msgstr "Save file as"
 
@@ -6964,7 +6964,7 @@ msgid "右侧承接当前实例、诊断摘要和系统状态。"
 msgstr "The right side holds the current instance, diagnostic summary, and system status."
 
 #: apps/app/src/i18n/static-dom-seed.ts:394
-#: apps/app/src/routes/favorites-page.tsx:500
+#: apps/app/src/routes/favorites-page.tsx:501
 msgid "右侧预览当前选中的收藏条目。"
 msgstr "Preview the selected favorite on the right."
 
@@ -7044,7 +7044,7 @@ msgstr "名单已整理，待回填"
 msgid "名单整理中，待继续"
 msgstr "名单整理中，待继续"
 
-#: apps/app/src/components/chat-message-list.tsx:4098
+#: apps/app/src/components/chat-message-list.tsx:4116
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:143
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:108
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:992
@@ -7486,9 +7486,9 @@ msgstr "Both image-text posts and single videos can be sent to Moments directly"
 #: apps/app/src/components/chat-composer.tsx:3106
 #: apps/app/src/components/chat-message-list.tsx:1480
 #: apps/app/src/components/chat-message-list.tsx:1549
-#: apps/app/src/components/chat-message-list.tsx:3568
-#: apps/app/src/components/chat-message-list.tsx:3595
-#: apps/app/src/components/chat-message-list.tsx:4086
+#: apps/app/src/components/chat-message-list.tsx:3586
+#: apps/app/src/components/chat-message-list.tsx:3613
+#: apps/app/src/components/chat-message-list.tsx:4104
 #: apps/app/src/features/chat/chat-image-viewer-route-state.ts:42
 #: apps/app/src/features/chat/chat-image-viewer-route-state.ts:205
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:104
@@ -7505,7 +7505,7 @@ msgstr "Both image-text posts and single videos can be sent to Moments directly"
 msgid "图片"
 msgstr "Image"
 
-#: apps/app/src/routes/favorites-page.tsx:793
+#: apps/app/src/routes/favorites-page.tsx:794
 msgid "图片 {imageCount}"
 msgstr "Images {imageCount}"
 
@@ -7849,7 +7849,7 @@ msgstr "Note name exact match"
 msgid "复制"
 msgstr "Copy"
 
-#: apps/app/src/components/chat-message-list.tsx:4162
+#: apps/app/src/components/chat-message-list.tsx:4180
 msgid "复制位置"
 msgstr "Copy location"
 
@@ -7926,7 +7926,7 @@ msgstr "Failed to copy feedback bundle. Please retry later."
 msgid "复制发送者"
 msgstr "Copy sender"
 
-#: apps/app/src/components/chat-message-list.tsx:4154
+#: apps/app/src/components/chat-message-list.tsx:4172
 msgid "复制名片"
 msgstr "Copy card"
 
@@ -8533,8 +8533,8 @@ msgid "对打"
 msgstr "Duel"
 
 #: apps/app/src/components/chat-message-list.tsx:1284
-#: apps/app/src/components/chat-message-list.tsx:3897
-#: apps/app/src/components/chat-message-list.tsx:3967
+#: apps/app/src/components/chat-message-list.tsx:3915
+#: apps/app/src/components/chat-message-list.tsx:3985
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:306
 #: apps/app/src/features/games/parking-war/parking-war-engine.ts:499
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:931
@@ -8825,8 +8825,8 @@ msgstr "Done"
 msgid "已于 {0} 通知"
 msgstr "Notified at {0}"
 
-#: apps/app/src/components/chat-message-list.tsx:1943
-#: apps/app/src/components/chat-message-list.tsx:1957
+#: apps/app/src/components/chat-message-list.tsx:1960
+#: apps/app/src/components/chat-message-list.tsx:1974
 #: apps/app/src/i18n/static-dom-seed.ts:961
 msgid "已从当前设备删除这条消息。"
 msgstr "This message was deleted from the current device."
@@ -8998,11 +8998,11 @@ msgid "已删除 {0} 张，现在还能再加 {1} 张。"
 msgstr "Deleted {0}. You can add {1} more now."
 
 #. placeholder {0}: messagesToDelete.length
-#: apps/app/src/components/chat-message-list.tsx:2395
+#: apps/app/src/components/chat-message-list.tsx:2413
 msgid "已删除 {0} 条消息。"
 msgstr "Deleted {0} messages."
 
-#: apps/app/src/components/chat-message-list.tsx:2394
+#: apps/app/src/components/chat-message-list.tsx:2412
 msgid "已删除 1 条消息。"
 msgstr "Deleted 1 message."
 
@@ -9108,8 +9108,8 @@ msgstr "Unfollowed."
 msgid "已取消收藏。"
 msgstr "Unfavorited."
 
-#: apps/app/src/components/chat-message-list.tsx:1628
-#: apps/app/src/components/chat-message-list.tsx:1658
+#: apps/app/src/components/chat-message-list.tsx:1637
+#: apps/app/src/components/chat-message-list.tsx:1668
 #: apps/app/src/i18n/static-dom-seed.ts:957
 msgid "已取消收藏消息。"
 msgstr "Message removed from Favorites."
@@ -9137,7 +9137,7 @@ msgstr "Result selection cancelled. Keep typing keywords."
 msgid "已取消置顶聊天。"
 msgstr "Unpinned this chat."
 
-#: apps/app/src/components/chat-message-list.tsx:2002
+#: apps/app/src/components/chat-message-list.tsx:2019
 #: apps/app/src/i18n/static-dom-seed.ts:964
 msgid "已取消这条消息的提醒。"
 msgstr "Reminder for this message was canceled."
@@ -9212,7 +9212,7 @@ msgstr "Pinned"
 msgid "已在桌面端发起 {callKindLabel}，当前可直接管理成员状态和设备控制。"
 msgstr "Started {callKindLabel} on desktop. You can now manage member status and device controls directly."
 
-#: apps/app/src/components/chat-message-list.tsx:3576
+#: apps/app/src/components/chat-message-list.tsx:3594
 #: apps/app/src/i18n/static-dom-seed.ts:970
 #: apps/app/src/routes/desktop-chat-files-page.tsx:435
 msgid "已在独立窗口打开图片。"
@@ -9330,7 +9330,7 @@ msgstr "Expanded all {totalMemberCount} group members."
 msgid "已带上 {inviteFriendName} 的组局邀约，可继续查看 {inviteGameName}。"
 msgstr "Brought {inviteFriendName}'s group invite. You can continue viewing {inviteGameName}."
 
-#: apps/app/src/components/chat-message-list.tsx:2036
+#: apps/app/src/components/chat-message-list.tsx:2053
 #: apps/app/src/i18n/static-dom-seed.ts:966
 msgid "已带入所选文字。"
 msgstr "Selected text inserted."
@@ -9425,7 +9425,7 @@ msgstr "Opened the feedback bundle location."
 msgid "已打开图片。"
 msgstr "Image opened."
 
-#: apps/app/src/components/chat-message-list.tsx:3604
+#: apps/app/src/components/chat-message-list.tsx:3622
 #: apps/app/src/i18n/static-dom-seed.ts:972
 msgid "已打开图片打印视图。"
 msgstr "Image print view opened."
@@ -9434,7 +9434,7 @@ msgstr "Image print view opened."
 msgid "已打开截图所在位置。"
 msgstr "Opened screenshot location."
 
-#: apps/app/src/components/chat-message-list.tsx:1869
+#: apps/app/src/components/chat-message-list.tsx:1886
 #: apps/app/src/routes/desktop-chat-files-page.tsx:394
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:217
 msgid "已打开所在位置。"
@@ -9527,16 +9527,16 @@ msgid "已提交投诉。"
 msgstr "Report submitted."
 
 #. placeholder {0}: messagesToRecall.length
-#: apps/app/src/components/chat-message-list.tsx:2469
+#: apps/app/src/components/chat-message-list.tsx:2487
 msgid "已撤回 {0} 条消息，另有 {skippedCount} 条不支持撤回。"
 msgstr "Recalled {0} messages; {skippedCount} couldn't be recalled."
 
 #. placeholder {0}: messagesToRecall.length
-#: apps/app/src/components/chat-message-list.tsx:2472
+#: apps/app/src/components/chat-message-list.tsx:2490
 msgid "已撤回 {0} 条消息。"
 msgstr "Recalled {0} messages."
 
-#: apps/app/src/components/chat-message-list.tsx:2471
+#: apps/app/src/components/chat-message-list.tsx:2489
 msgid "已撤回 1 条消息。"
 msgstr "Recalled 1 message."
 
@@ -9565,11 +9565,11 @@ msgid "已收藏"
 msgstr "Saved"
 
 #. placeholder {0}: messagesToFavorite.length
-#: apps/app/src/components/chat-message-list.tsx:2289
+#: apps/app/src/components/chat-message-list.tsx:2307
 msgid "已收藏 {0} 条消息。"
 msgstr "Saved {0} messages to Favorites."
 
-#: apps/app/src/components/chat-message-list.tsx:2288
+#: apps/app/src/components/chat-message-list.tsx:2306
 msgid "已收藏 1 条消息。"
 msgstr "Saved 1 message to Favorites."
 
@@ -9778,24 +9778,24 @@ msgstr "Logged this completion: {0}"
 msgid "已设为星标朋友。"
 msgstr "Added to starred friends."
 
-#: apps/app/src/components/chat-message-list.tsx:2086
+#: apps/app/src/components/chat-message-list.tsx:2103
 msgid "已设为消息提醒 · {summary}，系统通知已开启。"
 msgstr "Set as message reminder · {summary}. System notifications are on."
 
-#: apps/app/src/components/chat-message-list.tsx:2096
+#: apps/app/src/components/chat-message-list.tsx:2113
 msgid "已设为消息提醒 · {summary}，系统通知未开启。"
 msgstr "Set as message reminder · {summary}. System notifications are off."
 
-#: apps/app/src/components/chat-message-list.tsx:2095
+#: apps/app/src/components/chat-message-list.tsx:2112
 msgid "已设为消息提醒 · {summary}，系统通知未开启。可前往系统设置继续打开通知。"
 msgstr "Set as message reminder · {summary}. System notifications are off. Open System Settings to enable them."
 
-#: apps/app/src/components/chat-message-list.tsx:2111
+#: apps/app/src/components/chat-message-list.tsx:2128
 msgid "已设为消息提醒 · {summary}。"
 msgstr "Set as message reminder · {summary}."
 
 #. placeholder {0}: formatReminderSummary(t, reminderRecord.remindAt)
-#: apps/app/src/components/chat-message-list.tsx:3109
+#: apps/app/src/components/chat-message-list.tsx:3127
 msgid "已设提醒 · {0}"
 msgstr "Reminder set · {0}"
 
@@ -9869,7 +9869,7 @@ msgid "已选 {0} 张图片"
 msgstr "{0} images selected"
 
 #. placeholder {0}: selectedMessageIds.length
-#: apps/app/src/components/chat-message-list.tsx:2661
+#: apps/app/src/components/chat-message-list.tsx:2679
 msgid "已选 {0} 条"
 msgstr "{0} selected"
 
@@ -9908,12 +9908,12 @@ msgid "已选择 {0} 张图片"
 msgstr "{0} images selected"
 
 #. placeholder {0}: selectedMessageIds.length
-#: apps/app/src/components/chat-message-list.tsx:2575
+#: apps/app/src/components/chat-message-list.tsx:2593
 msgid "已选择 {0} 条消息"
 msgstr "Selected {0} messages"
 
 #. placeholder {0}: nextSelectedMessageIds.length
-#: apps/app/src/components/chat-message-list.tsx:2231
+#: apps/app/src/components/chat-message-list.tsx:2248
 msgid "已选择到这里，共 {0} 条消息。"
 msgstr "Selected up to here, {0} messages total."
 
@@ -9961,7 +9961,7 @@ msgstr "Invited"
 msgid "已配置"
 msgstr "Configured"
 
-#: apps/app/src/components/chat-message-list.tsx:1970
+#: apps/app/src/components/chat-message-list.tsx:1987
 #: apps/app/src/i18n/static-dom-seed.ts:962
 msgid "已重新尝试发送。"
 msgstr "Retry sent."
@@ -10921,7 +10921,7 @@ msgstr "No matching members right now"
 msgid "当前没有可发送的笔记。"
 msgstr "No note available to send right now."
 
-#: apps/app/src/components/chat-message-list.tsx:4359
+#: apps/app/src/components/chat-message-list.tsx:4377
 msgid "当前没有可合并转发的消息内容。"
 msgstr "There are no messages to forward as a single bundle right now."
 
@@ -11047,11 +11047,11 @@ msgstr "This message is now a group voice call card so members can quickly see t
 msgid "当前消息暂不支持添加到表情。"
 msgstr "This message can't be added to stickers right now."
 
-#: apps/app/src/components/chat-message-list.tsx:4331
+#: apps/app/src/components/chat-message-list.tsx:4349
 msgid "当前消息暂不支持转发到群聊。"
 msgstr "This message can't be forwarded to a group chat right now."
 
-#: apps/app/src/components/chat-message-list.tsx:2019
+#: apps/app/src/components/chat-message-list.tsx:2036
 #: apps/app/src/i18n/static-dom-seed.ts:965
 msgid "当前消息暂不支持部分引用。"
 msgstr "This message does not support partial quote yet."
@@ -11833,9 +11833,9 @@ msgstr "Member size"
 msgid "成熟"
 msgstr "Ripe"
 
-#: apps/app/src/components/chat-message-list.tsx:3146
-#: apps/app/src/components/chat-message-list.tsx:3153
-#: apps/app/src/components/chat-message-list.tsx:4050
+#: apps/app/src/components/chat-message-list.tsx:3164
+#: apps/app/src/components/chat-message-list.tsx:3171
+#: apps/app/src/components/chat-message-list.tsx:4068
 #: apps/app/src/components/mobile-shell.tsx:35
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:305
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:552
@@ -11900,7 +11900,7 @@ msgstr "Just closed up and was passing by — your spot's nice."
 msgid "我把车放这小睡一会儿，别叫我。"
 msgstr "Leaving the car here for a quick nap — don't wake me."
 
-#: apps/app/src/components/chat-message-list.tsx:3143
+#: apps/app/src/components/chat-message-list.tsx:3161
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:312
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:546
 msgid "我的"
@@ -11935,7 +11935,7 @@ msgstr "My Mini Programs."
 msgid "我的摄像头预览"
 msgstr "My camera preview"
 
-#: apps/app/src/components/chat-message-list.tsx:3349
+#: apps/app/src/components/chat-message-list.tsx:3367
 msgid "我的消息"
 msgstr "My messages"
 
@@ -12116,7 +12116,7 @@ msgid "打开伴侣"
 msgstr "Open companion"
 
 #: apps/app/src/components/chat-composer.tsx:2343
-#: apps/app/src/components/chat-message-list.tsx:1857
+#: apps/app/src/components/chat-message-list.tsx:1874
 #: apps/app/src/routes/desktop-chat-files-page.tsx:388
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:210
 #: apps/app/src/routes/desktop-feedback-page.tsx:871
@@ -12144,7 +12144,7 @@ msgstr "Open official account list"
 msgid "打开公众号目录"
 msgstr "Open Official Accounts directory"
 
-#: apps/app/src/routes/favorites-page.tsx:598
+#: apps/app/src/routes/favorites-page.tsx:599
 msgid "打开内容"
 msgstr "Open content"
 
@@ -12215,7 +12215,7 @@ msgid "打开快捷菜单"
 msgstr "Open quick menu"
 
 #: apps/app/src/components/chat-composer.tsx:2352
-#: apps/app/src/components/chat-message-list.tsx:1870
+#: apps/app/src/components/chat-message-list.tsx:1887
 #: apps/app/src/routes/desktop-chat-files-page.tsx:395
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:218
 #: apps/app/src/routes/desktop-feedback-page.tsx:878
@@ -12238,8 +12238,8 @@ msgstr "Turn on camera"
 msgid "打开收藏内容"
 msgstr "Open favorited content"
 
-#: apps/app/src/components/chat-message-list.tsx:1805
-#: apps/app/src/components/chat-message-list.tsx:4126
+#: apps/app/src/components/chat-message-list.tsx:1822
+#: apps/app/src/components/chat-message-list.tsx:4144
 #: apps/app/src/runtime/file-runtime-i18n.ts:31
 msgid "打开文件"
 msgstr "Open File"
@@ -12324,7 +12324,7 @@ msgstr "Failed to open browser."
 msgid "打开消息"
 msgstr "Open messages"
 
-#: apps/app/src/components/chat-message-list.tsx:1747
+#: apps/app/src/components/chat-message-list.tsx:1764
 #: apps/app/src/i18n/static-dom-seed.ts:959
 msgid "打开添加朋友页失败，请稍后重试。"
 msgstr "Failed to open Add Friend. Try again later."
@@ -12349,12 +12349,12 @@ msgstr "Open Channels"
 msgid "打开视频预览"
 msgstr "Open video preview"
 
-#: apps/app/src/components/chat-message-list.tsx:4138
-#: apps/app/src/routes/favorites-page.tsx:589
+#: apps/app/src/components/chat-message-list.tsx:4156
+#: apps/app/src/routes/favorites-page.tsx:590
 msgid "打开笔记"
 msgstr "Open note"
 
-#: apps/app/src/components/chat-message-list.tsx:1788
+#: apps/app/src/components/chat-message-list.tsx:1805
 #: apps/app/src/i18n/static-dom-seed.ts:960
 msgid "打开笔记失败，请稍后重试。"
 msgstr "Failed to open note. Try again later."
@@ -12438,8 +12438,8 @@ msgstr "Open the invite card and sharing entry"
 msgid "打开链接失败，请稍后重试。"
 msgstr "Failed to open link. Please try again later."
 
-#: apps/app/src/components/chat-message-list.tsx:3473
-#: apps/app/src/components/chat-message-list.tsx:4141
+#: apps/app/src/components/chat-message-list.tsx:3491
+#: apps/app/src/components/chat-message-list.tsx:4159
 #: apps/app/src/features/chat/group-message-context-menu.tsx:70
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:57
 #: apps/app/src/i18n/static-dom-seed.ts:484
@@ -12481,12 +12481,12 @@ msgstr "Scan to join"
 msgid "扬声器已开"
 msgstr "Speaker on"
 
-#: apps/app/src/components/chat-message-list.tsx:2403
+#: apps/app/src/components/chat-message-list.tsx:2421
 #: apps/app/src/i18n/static-dom-seed.ts:968
 msgid "批量删除失败，请稍后再试。"
 msgstr "Batch delete failed. Try again later."
 
-#: apps/app/src/components/chat-message-list.tsx:2484
+#: apps/app/src/components/chat-message-list.tsx:2502
 #: apps/app/src/i18n/static-dom-seed.ts:969
 msgid "批量撤回失败，请稍后再试。"
 msgstr "Batch recall failed. Try again later."
@@ -12985,7 +12985,7 @@ msgstr "Try another keyword, or switch back to All to keep browsing."
 msgid "换个关键词，或者切回全部分类继续浏览。"
 msgstr "Try another keyword, or switch back to all categories."
 
-#: apps/app/src/routes/favorites-page.tsx:688
+#: apps/app/src/routes/favorites-page.tsx:689
 msgid "换个关键词，或者切回其他分类继续查看。"
 msgstr "Try a different keyword, or switch back to another category."
 
@@ -13199,8 +13199,8 @@ msgstr "提前收摊"
 msgid "提车"
 msgstr "Pick up car"
 
-#: apps/app/src/components/chat-message-list.tsx:3267
-#: apps/app/src/components/chat-message-list.tsx:3420
+#: apps/app/src/components/chat-message-list.tsx:3285
+#: apps/app/src/components/chat-message-list.tsx:3438
 #: apps/app/src/features/chat/group-message-context-menu.tsx:62
 #: apps/app/src/features/chat/group-message-context-menu.tsx:79
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:51
@@ -13327,7 +13327,7 @@ msgstr "Search \"{0}\" returned {1} results."
 
 #. placeholder {0}: searchText.trim()
 #. placeholder {1}: filteredFavorites.length
-#: apps/app/src/routes/favorites-page.tsx:423
+#: apps/app/src/routes/favorites-page.tsx:424
 msgid "搜索“{0}”命中 {1} 项"
 msgstr "Search \"{0}\" returned {1} items"
 
@@ -13397,7 +13397,7 @@ msgid "搜索小程序、服务或场景"
 msgstr "Search mini programs, services, or scenarios"
 
 #: apps/app/src/i18n/static-dom-seed.ts:397
-#: apps/app/src/routes/favorites-page.tsx:443
+#: apps/app/src/routes/favorites-page.tsx:444
 msgid "搜索已收藏内容"
 msgstr "Search saved items"
 
@@ -13593,20 +13593,20 @@ msgstr "摇一摇会话不存在：{0}"
 msgid "摇一摇当前已在后台停用。"
 msgstr "摇一摇当前已在后台停用。"
 
-#: apps/app/src/components/chat-message-list.tsx:2631
-#: apps/app/src/components/chat-message-list.tsx:3198
-#: apps/app/src/components/chat-message-list.tsx:3336
-#: apps/app/src/components/chat-message-list.tsx:3497
+#: apps/app/src/components/chat-message-list.tsx:2649
+#: apps/app/src/components/chat-message-list.tsx:3216
+#: apps/app/src/components/chat-message-list.tsx:3354
+#: apps/app/src/components/chat-message-list.tsx:3515
 #: apps/app/src/features/chat/group-message-context-menu.tsx:74
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:61
 msgid "撤回"
 msgstr "Recall"
 
-#: apps/app/src/components/chat-message-list.tsx:3197
+#: apps/app/src/components/chat-message-list.tsx:3215
 msgid "撤回中"
 msgstr "Recalling"
 
-#: apps/app/src/components/chat-message-list.tsx:2630
+#: apps/app/src/components/chat-message-list.tsx:2648
 msgid "撤回中..."
 msgstr "Recalling..."
 
@@ -13782,9 +13782,9 @@ msgid "收获"
 msgstr "Harvest"
 
 #: apps/app/src/components/chat-composer.tsx:3080
-#: apps/app/src/components/chat-message-list.tsx:2603
-#: apps/app/src/components/chat-message-list.tsx:3178
-#: apps/app/src/components/chat-message-list.tsx:3436
+#: apps/app/src/components/chat-message-list.tsx:2621
+#: apps/app/src/components/chat-message-list.tsx:3196
+#: apps/app/src/components/chat-message-list.tsx:3454
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:173
 #: apps/app/src/components/official-article-card.tsx:123
 #: apps/app/src/components/official-article-viewer.tsx:262
@@ -13810,7 +13810,7 @@ msgstr "Harvest"
 #: apps/app/src/routes/channels-page.tsx:1533
 #: apps/app/src/routes/desktop-chat-files-page.tsx:757
 #: apps/app/src/routes/discover-feed-page.tsx:1029
-#: apps/app/src/routes/favorites-page.tsx:416
+#: apps/app/src/routes/favorites-page.tsx:417
 #: apps/app/src/routes/moments-page.tsx:1106
 msgid "收藏"
 msgstr "Favorites"
@@ -13824,11 +13824,11 @@ msgstr "Favorites · {0}"
 msgid "收藏 · {collectedAtLabel}"
 msgstr "Favorites · {collectedAtLabel}"
 
-#: apps/app/src/components/chat-message-list.tsx:3177
+#: apps/app/src/components/chat-message-list.tsx:3195
 msgid "收藏中"
 msgstr "Adding to Favorites"
 
-#: apps/app/src/components/chat-message-list.tsx:2602
+#: apps/app/src/components/chat-message-list.tsx:2620
 msgid "收藏中..."
 msgstr "Adding to Favorites..."
 
@@ -13838,7 +13838,7 @@ msgstr "Adding to Favorites..."
 msgid "收藏主页"
 msgstr "Save homepage"
 
-#: apps/app/src/routes/favorites-page.tsx:547
+#: apps/app/src/routes/favorites-page.tsx:548
 msgid "收藏信息"
 msgstr "Favorites info"
 
@@ -13850,12 +13850,12 @@ msgstr "Save Official Account"
 msgid "收藏列表暂时读取失败，可以直接进入搜一搜继续搜索。"
 msgstr "Failed to load Favorites for now. You can go to Search instead."
 
-#: apps/app/src/components/chat-message-list.tsx:1677
-#: apps/app/src/components/chat-message-list.tsx:2297
+#: apps/app/src/components/chat-message-list.tsx:1694
+#: apps/app/src/components/chat-message-list.tsx:2315
 msgid "收藏失败，请稍后再试。"
 msgstr "Failed to save to Favorites. Please try again later."
 
-#: apps/app/src/routes/favorites-page.tsx:377
+#: apps/app/src/routes/favorites-page.tsx:378
 msgid "收藏工作区目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到消息页继续浏览和发送收藏内容。"
 msgstr "The Favorites workspace is only enabled in the web desktop layout and desktop shell. On mobile, return to the messages page to keep browsing and sending Favorites."
 
@@ -13863,7 +13863,7 @@ msgstr "The Favorites workspace is only enabled in the web desktop layout and de
 msgid "收藏广场动态"
 msgstr "Save Plaza post"
 
-#: apps/app/src/routes/favorites-page.tsx:376
+#: apps/app/src/routes/favorites-page.tsx:377
 msgid "收藏当前仅提供桌面布局"
 msgstr "Favorites is currently desktop-only"
 
@@ -13871,7 +13871,7 @@ msgstr "Favorites is currently desktop-only"
 msgid "收藏文章"
 msgstr "Favorite article"
 
-#: apps/app/src/routes/favorites-page.tsx:557
+#: apps/app/src/routes/favorites-page.tsx:558
 msgid "收藏时间"
 msgstr "Favorited at"
 
@@ -13884,11 +13884,11 @@ msgid "收藏标识不能为空。"
 msgstr "Favorite identifier cannot be empty."
 
 #: apps/app/src/i18n/static-dom-seed.ts:386
-#: apps/app/src/routes/favorites-page.tsx:472
+#: apps/app/src/routes/favorites-page.tsx:473
 msgid "收藏概览"
 msgstr "Favorites overview"
 
-#: apps/app/src/components/chat-message-list.tsx:3285
+#: apps/app/src/components/chat-message-list.tsx:3303
 #: apps/app/src/features/chat/group-message-context-menu.tsx:81
 #: apps/app/src/features/search/search-quick-links.ts:44
 msgid "收藏消息"
@@ -13912,7 +13912,7 @@ msgid "收藏联系人"
 msgstr "Save contact"
 
 #: apps/app/src/i18n/static-dom-seed.ts:393
-#: apps/app/src/routes/favorites-page.tsx:497
+#: apps/app/src/routes/favorites-page.tsx:498
 msgid "收藏详情"
 msgstr "Favorite details"
 
@@ -14308,7 +14308,7 @@ msgid "整理片段摘要"
 msgstr "Organize clip summaries"
 
 #: apps/app/src/components/chat-composer.tsx:3111
-#: apps/app/src/components/chat-message-list.tsx:4090
+#: apps/app/src/components/chat-message-list.tsx:4108
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:167
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:105
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:133
@@ -14329,7 +14329,7 @@ msgstr "Organize clip summaries"
 msgid "文件"
 msgstr "File"
 
-#: apps/app/src/routes/favorites-page.tsx:798
+#: apps/app/src/routes/favorites-page.tsx:799
 msgid "文件 {fileCount}"
 msgstr "Files {fileCount}"
 
@@ -14483,11 +14483,11 @@ msgstr "Added long-press to convert to group announcement"
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:189
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:903
 #: apps/app/src/i18n/static-dom-seed.ts:389
-#: apps/app/src/routes/favorites-page.tsx:434
+#: apps/app/src/routes/favorites-page.tsx:435
 msgid "新建笔记"
 msgstr "New note"
 
-#: apps/app/src/routes/favorites-page.tsx:421
+#: apps/app/src/routes/favorites-page.tsx:422
 msgid "新建笔记会直接作为收藏内容保存。"
 msgstr "New notes are saved directly as favorited content."
 
@@ -14671,11 +14671,11 @@ msgstr "Timeline"
 msgid "明天"
 msgstr "Tomorrow"
 
-#: apps/app/src/components/chat-message-list.tsx:4036
+#: apps/app/src/components/chat-message-list.tsx:4054
 msgid "明天 {timeLabel}"
 msgstr "Tomorrow {timeLabel}"
 
-#: apps/app/src/components/chat-message-list.tsx:4001
+#: apps/app/src/components/chat-message-list.tsx:4019
 msgid "明天上午 09:00"
 msgstr "Tomorrow 09:00 AM"
 
@@ -15409,7 +15409,7 @@ msgid "未关注"
 msgstr "Not following"
 
 #: apps/app/src/routes/desktop-feedback-page.tsx:962
-#: apps/app/src/routes/favorites-page.tsx:809
+#: apps/app/src/routes/favorites-page.tsx:810
 msgid "未分类"
 msgstr "Uncategorized"
 
@@ -15860,7 +15860,7 @@ msgstr "From {triggerScene}"
 
 #. placeholder {0}: summary.participantName
 #. placeholder {1}: summary.count
-#: apps/app/src/components/chat-message-list.tsx:3954
+#: apps/app/src/components/chat-message-list.tsx:3972
 msgid "来自你和 {0} 的 {1} 条消息"
 msgstr "{1} messages between you and {0}"
 
@@ -16081,8 +16081,8 @@ msgstr "View {0}'s group sign-up results"
 
 #. placeholder {0}: message.senderName?.trim() || t(msg`联系人`)
 #. placeholder {0}: ownerName?.trim() || t(msg`我的`)
-#: apps/app/src/components/chat-message-list.tsx:2874
-#: apps/app/src/components/chat-message-list.tsx:3143
+#: apps/app/src/components/chat-message-list.tsx:2892
+#: apps/app/src/components/chat-message-list.tsx:3161
 msgid "查看{0}资料"
 msgstr "View {0}'s profile"
 
@@ -16115,7 +16115,7 @@ msgstr "View world character directory"
 msgid "查看世界隐私政策和数据使用说明。"
 msgstr "View the world privacy policy and data usage notes."
 
-#: apps/app/src/components/chat-message-list.tsx:4134
+#: apps/app/src/components/chat-message-list.tsx:4152
 msgid "查看位置"
 msgstr "View location"
 
@@ -16193,7 +16193,7 @@ msgstr "View in-progress items"
 msgid "查看原内容"
 msgstr "View original content"
 
-#: apps/app/src/components/chat-message-list.tsx:4130
+#: apps/app/src/components/chat-message-list.tsx:4148
 msgid "查看名片"
 msgstr "View card"
 
@@ -16201,7 +16201,7 @@ msgstr "View card"
 msgid "查看回放"
 msgstr "View replay"
 
-#: apps/app/src/components/chat-message-list.tsx:4122
+#: apps/app/src/components/chat-message-list.tsx:4140
 msgid "查看图片"
 msgstr "View image"
 
@@ -16274,7 +16274,7 @@ msgstr "View starred friends"
 msgid "查看更多 {0}"
 msgstr "View more {0}"
 
-#: apps/app/src/components/chat-message-list.tsx:2566
+#: apps/app/src/components/chat-message-list.tsx:2584
 #: apps/app/src/i18n/static-dom-seed.ts:718
 msgid "查看更多消息"
 msgstr "View more messages"
@@ -16309,7 +16309,7 @@ msgstr "View attachments in this chat"
 msgid "查看热点区域"
 msgstr "View hotspots"
 
-#: apps/app/src/components/chat-message-list.tsx:4138
+#: apps/app/src/components/chat-message-list.tsx:4156
 msgid "查看笔记摘要"
 msgstr "View note summary"
 
@@ -16913,7 +16913,7 @@ msgstr "Loading world owner..."
 msgid "正在加载会员信息…"
 msgstr "Loading membership information…"
 
-#: apps/app/src/components/chat-message-list.tsx:2566
+#: apps/app/src/components/chat-message-list.tsx:2584
 #: apps/app/src/routes/desktop-chat-history-page.tsx:522
 msgid "正在加载更早消息..."
 msgstr "Loading earlier messages..."
@@ -17095,7 +17095,7 @@ msgstr "Opening desktop Channels"
 msgid "正在打开桌面移除成员"
 msgstr "Opening desktop remove members"
 
-#: apps/app/src/routes/favorites-page.tsx:639
+#: apps/app/src/routes/favorites-page.tsx:640
 msgid "正在打开桌面笔记"
 msgstr "Opening desktop notes"
 
@@ -17408,7 +17408,7 @@ msgid "正在读取广场动态..."
 msgstr "Loading feed posts..."
 
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:628
-#: apps/app/src/routes/favorites-page.tsx:677
+#: apps/app/src/routes/favorites-page.tsx:678
 msgid "正在读取收藏..."
 msgstr "Loading Favorites..."
 
@@ -17654,7 +17654,7 @@ msgstr "Loading the desktop Channels workspace; current channel content will app
 msgid "正在载入桌面端游戏中心。"
 msgstr "Loading the desktop Game Center."
 
-#: apps/app/src/routes/favorites-page.tsx:640
+#: apps/app/src/routes/favorites-page.tsx:641
 msgid "正在载入桌面笔记工作区，马上恢复当前笔记内容。"
 msgstr "Loading the desktop notes workspace; the current note will be restored shortly."
 
@@ -17798,7 +17798,7 @@ msgstr "No matching recent conversations."
 msgid "没有匹配的小程序"
 msgstr "No matching mini programs"
 
-#: apps/app/src/routes/favorites-page.tsx:684
+#: apps/app/src/routes/favorites-page.tsx:685
 msgid "没有匹配的收藏"
 msgstr "No matching favorites"
 
@@ -18054,7 +18054,7 @@ msgstr "The browser blocked autoplay. Tap \"Replay last line\" to play it."
 msgid "浏览器语音识别网络异常，已可改用录音转写。"
 msgstr "Browser speech recognition hit a network error. You can switch to recorded transcription."
 
-#: apps/app/src/components/chat-message-list.tsx:3611
+#: apps/app/src/components/chat-message-list.tsx:3629
 #: apps/app/src/i18n/static-dom-seed.ts:973
 msgid "浏览器阻止了打印窗口，请检查弹窗权限。"
 msgstr "The browser blocked the print window. Check popup permissions."
@@ -18064,7 +18064,7 @@ msgstr "The browser blocked the print window. Check popup permissions."
 msgid "浏览器阻止了新窗口，已改为当前页预览。"
 msgstr "The browser blocked the new window, so preview moved to this page."
 
-#: apps/app/src/components/chat-message-list.tsx:3583
+#: apps/app/src/components/chat-message-list.tsx:3601
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1403
 #: apps/app/src/i18n/static-dom-seed.ts:971
 #: apps/app/src/routes/desktop-chat-files-page.tsx:436
@@ -18122,9 +18122,9 @@ msgstr "海风返场"
 msgid "消"
 msgstr "M"
 
-#: apps/app/src/components/chat-message-list.tsx:3525
-#: apps/app/src/components/chat-message-list.tsx:4071
-#: apps/app/src/components/chat-message-list.tsx:4113
+#: apps/app/src/components/chat-message-list.tsx:3543
+#: apps/app/src/components/chat-message-list.tsx:4089
+#: apps/app/src/components/chat-message-list.tsx:4131
 #: apps/app/src/components/mobile-shell.tsx:32
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:177
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:951
@@ -18143,7 +18143,7 @@ msgid "消息"
 msgstr "Message"
 
 #: apps/app/src/i18n/static-dom-seed.ts:387
-#: apps/app/src/routes/favorites-page.tsx:480
+#: apps/app/src/routes/favorites-page.tsx:481
 msgid "消息、笔记与联系人"
 msgstr "Messages, notes, and contacts"
 
@@ -18172,13 +18172,13 @@ msgstr "Mute notifications"
 msgid "消息内容"
 msgstr "Message content"
 
-#: apps/app/src/components/chat-message-list.tsx:3272
-#: apps/app/src/components/chat-message-list.tsx:3445
+#: apps/app/src/components/chat-message-list.tsx:3290
+#: apps/app/src/components/chat-message-list.tsx:3463
 msgid "消息内容已复制。"
 msgstr "Message content copied."
 
-#: apps/app/src/components/chat-message-list.tsx:1648
-#: apps/app/src/components/chat-message-list.tsx:1669
+#: apps/app/src/components/chat-message-list.tsx:1658
+#: apps/app/src/components/chat-message-list.tsx:1679
 #: apps/app/src/i18n/static-dom-seed.ts:958
 msgid "消息已加入收藏。"
 msgstr "Message added to Favorites."
@@ -18189,7 +18189,7 @@ msgstr "Message added to Favorites."
 msgid "消息提醒"
 msgstr "Message reminders"
 
-#: apps/app/src/components/chat-message-list.tsx:3350
+#: apps/app/src/components/chat-message-list.tsx:3368
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:41
 msgid "消息操作"
 msgstr "Message actions"
@@ -18662,7 +18662,7 @@ msgid "点击可重新发起当前单聊语音通话。"
 msgstr "Tap to restart the current 1-on-1 voice call."
 
 #: apps/app/src/i18n/static-dom-seed.ts:392
-#: apps/app/src/routes/favorites-page.tsx:690
+#: apps/app/src/routes/favorites-page.tsx:691
 msgid "点击右上角“新建笔记”，把第一条收藏笔记写下来。"
 msgstr "Click New note in the upper right and write your first favorite note."
 
@@ -19729,7 +19729,7 @@ msgstr "Remove {displayName}"
 msgid "移除中"
 msgstr "Removing"
 
-#: apps/app/src/routes/favorites-page.tsx:614
+#: apps/app/src/routes/favorites-page.tsx:615
 msgid "移除中..."
 msgstr "Removing..."
 
@@ -19757,7 +19757,7 @@ msgstr "Remove tag {tag}"
 msgid "移除群成员"
 msgstr "Remove group members"
 
-#: apps/app/src/components/chat-message-list.tsx:4011
+#: apps/app/src/components/chat-message-list.tsx:4029
 #: apps/app/src/i18n/static-dom-seed.ts:180
 msgid "稍后"
 msgstr "Later"
@@ -20057,7 +20057,7 @@ msgstr "Racing"
 msgid "端口占用：{portOccupiedLabel}"
 msgstr "Port occupied: {portOccupiedLabel}"
 
-#: apps/app/src/components/chat-message-list.tsx:4106
+#: apps/app/src/components/chat-message-list.tsx:4124
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:110
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1000
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1148
@@ -20110,7 +20110,7 @@ msgid "笔记还没有保存成功，请稍后再试。"
 msgstr "The note has not been saved yet. Try again later."
 
 #: apps/app/src/i18n/static-dom-seed.ts:825
-#: apps/app/src/routes/favorites-page.tsx:768
+#: apps/app/src/routes/favorites-page.tsx:769
 msgid "笔记预览"
 msgstr "Note preview"
 
@@ -20461,8 +20461,8 @@ msgstr "System"
 msgid "系统事件触发的角色主动相遇请求。"
 msgstr "Character-initiated encounter requests triggered by system events."
 
-#: apps/app/src/components/chat-message-list.tsx:4153
-#: apps/app/src/components/chat-message-list.tsx:4161
+#: apps/app/src/components/chat-message-list.tsx:4171
+#: apps/app/src/components/chat-message-list.tsx:4179
 #: apps/app/src/components/official-article-viewer.tsx:278
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:238
 #: apps/app/src/features/games/game-center-session-panel.tsx:70
@@ -20787,7 +20787,7 @@ msgstr "Keep the current state"
 msgid "继续删除"
 msgstr "Continue deleting"
 
-#: apps/app/src/components/chat-message-list.tsx:2405
+#: apps/app/src/components/chat-message-list.tsx:2423
 msgid "继续删除所选消息"
 msgstr "Continue deleting selected messages"
 
@@ -20795,7 +20795,7 @@ msgstr "Continue deleting selected messages"
 msgid "继续加载更早消息"
 msgstr "Keep loading earlier messages"
 
-#: apps/app/src/components/chat-message-list.tsx:1679
+#: apps/app/src/components/chat-message-list.tsx:1696
 msgid "继续取消收藏"
 msgstr "Continue removing from Favorites"
 
@@ -20840,15 +20840,15 @@ msgstr "Continue {0}'s group sign-up chain"
 msgid "继续撤回"
 msgstr "Continue recalling"
 
-#: apps/app/src/components/chat-message-list.tsx:2486
+#: apps/app/src/components/chat-message-list.tsx:2504
 msgid "继续撤回所选消息"
 msgstr "Continue recalling selected messages"
 
-#: apps/app/src/components/chat-message-list.tsx:1679
+#: apps/app/src/components/chat-message-list.tsx:1696
 msgid "继续收藏"
 msgstr "Continue saving to Favorites"
 
-#: apps/app/src/components/chat-message-list.tsx:2299
+#: apps/app/src/components/chat-message-list.tsx:2317
 msgid "继续收藏所选消息"
 msgstr "Continue saving selected messages to Favorites"
 
@@ -20904,7 +20904,7 @@ msgstr "Continue editing"
 msgid "继续聊"
 msgstr "Continue chat"
 
-#: apps/app/src/components/chat-message-list.tsx:2071
+#: apps/app/src/components/chat-message-list.tsx:2088
 msgid "继续设置提醒"
 msgstr "Continue setting reminder"
 
@@ -20925,7 +20925,7 @@ msgstr "Continue forwarding message"
 msgid "继续通话"
 msgstr "Continue call"
 
-#: apps/app/src/components/chat-message-list.tsx:1980
+#: apps/app/src/components/chat-message-list.tsx:1997
 msgid "继续重试发送"
 msgstr "Continue retrying send"
 
@@ -21059,7 +21059,7 @@ msgstr "Group collaboration"
 msgid "群工具"
 msgstr "Group tools"
 
-#: apps/app/src/components/chat-message-list.tsx:4053
+#: apps/app/src/components/chat-message-list.tsx:4071
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:588
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:975
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:999
@@ -21269,7 +21269,7 @@ msgstr "Prefer group spread"
 msgid "群聊摘要已复制。"
 msgstr "Group summary copied."
 
-#: apps/app/src/components/chat-message-list.tsx:4210
+#: apps/app/src/components/chat-message-list.tsx:4228
 msgid "群聊消息"
 msgstr "Group chat messages"
 
@@ -21502,7 +21502,7 @@ msgstr "The Chat Files workspace is only enabled in the web desktop layout and d
 msgid "聊天文件当前仅提供桌面布局"
 msgstr "Chat Files is currently desktop-only"
 
-#: apps/app/src/components/chat-message-list.tsx:4210
+#: apps/app/src/components/chat-message-list.tsx:4228
 #: apps/app/src/features/chat/chat-reminder-entries.ts:72
 #: apps/app/src/features/chat/use-message-reminders.ts:36
 msgid "聊天消息"
@@ -21541,7 +21541,7 @@ msgstr "Chat background not found."
 msgid "聊天背景暂时不可用"
 msgstr "Chat background is temporarily unavailable"
 
-#: apps/app/src/components/chat-message-list.tsx:2904
+#: apps/app/src/components/chat-message-list.tsx:2922
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:597
 #: apps/app/src/features/desktop/chat/desktop-chat-side-panel.tsx:87
 #: apps/app/src/features/search/desktop-search-workspace.tsx:113
@@ -21568,7 +21568,7 @@ msgstr "Chat history · {0}"
 msgid "聊天记录工作区目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到消息页继续查看会话。"
 msgstr "The Chat History workspace is only enabled in the web desktop layout and desktop shell. On mobile, return to Messages to continue viewing chats."
 
-#: apps/app/src/components/chat-message-list.tsx:3944
+#: apps/app/src/components/chat-message-list.tsx:3962
 #: apps/app/src/i18n/static-dom-seed.ts:749
 msgid "聊天记录已导入当前群聊"
 msgstr "Chat history has been imported into the current group chat"
@@ -21609,7 +21609,7 @@ msgstr "Chat settings"
 msgid "聊天里的图片 / GIF 也能添加为表情"
 msgstr "Images or GIFs from chat can also be added as stickers"
 
-#: apps/app/src/components/chat-message-list.tsx:2874
+#: apps/app/src/components/chat-message-list.tsx:2892
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:138
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:283
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:197
@@ -21939,7 +21939,7 @@ msgstr "补给落空，等下一次。"
 
 #: apps/app/src/components/chat-composer.tsx:3070
 #: apps/app/src/components/chat-composer.tsx:3292
-#: apps/app/src/components/chat-message-list.tsx:4110
+#: apps/app/src/components/chat-message-list.tsx:4128
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:107
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1004
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:621
@@ -22255,7 +22255,7 @@ msgstr "Set remark and tags"
 msgid "设置当前聊天背景"
 msgstr "Set current chat background"
 
-#: apps/app/src/components/chat-message-list.tsx:2069
+#: apps/app/src/components/chat-message-list.tsx:2086
 #: apps/app/src/i18n/static-dom-seed.ts:967
 msgid "设置提醒失败，请稍后再试。"
 msgstr "Failed to set reminder. Try again later."
@@ -22483,7 +22483,7 @@ msgstr "Tone style"
 msgid "语言"
 msgstr "Language"
 
-#: apps/app/src/components/chat-message-list.tsx:4094
+#: apps/app/src/components/chat-message-list.tsx:4112
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:106
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:988
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1077
@@ -23217,8 +23217,8 @@ msgstr "Transcription {0}"
 msgid "转写未配置"
 msgstr "Transcription not configured"
 
-#: apps/app/src/components/chat-message-list.tsx:2614
-#: apps/app/src/components/chat-message-list.tsx:3187
+#: apps/app/src/components/chat-message-list.tsx:2632
+#: apps/app/src/components/chat-message-list.tsx:3205
 #: apps/app/src/features/chat/group-message-context-menu.tsx:143
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:114
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:641
@@ -23321,7 +23321,7 @@ msgstr "Loading desktop Game Center..."
 msgid "载入桌面视频号..."
 msgstr "Loading desktop Channels..."
 
-#: apps/app/src/routes/favorites-page.tsx:641
+#: apps/app/src/routes/favorites-page.tsx:642
 msgid "载入桌面笔记工作区..."
 msgstr "Loading desktop notes workspace..."
 
@@ -23596,7 +23596,7 @@ msgstr "Back to Moments"
 #: apps/app/src/routes/desktop-chat-files-page.tsx:447
 #: apps/app/src/routes/desktop-chat-history-page.tsx:260
 #: apps/app/src/routes/desktop-mobile-page.tsx:876
-#: apps/app/src/routes/favorites-page.tsx:378
+#: apps/app/src/routes/favorites-page.tsx:379
 #: apps/app/src/routes/notes-page.tsx:49
 #: apps/app/src/routes/profile-settings-page.tsx:213
 #: apps/app/src/routes/profile-settings-page.tsx:216
@@ -23941,7 +23941,7 @@ msgid "还没有搜索记录，输入关键词后会保存在这里。"
 msgstr "No search history yet. Keywords you type will be saved here."
 
 #: apps/app/src/i18n/static-dom-seed.ts:390
-#: apps/app/src/routes/favorites-page.tsx:684
+#: apps/app/src/routes/favorites-page.tsx:685
 msgid "还没有收藏内容"
 msgstr "No favorites yet"
 
@@ -24320,8 +24320,8 @@ msgstr "This one was just resent. It will return to the priority slot after cool
 msgid "这条单聊暂时没有可用的角色目标，无法发送群邀请。"
 msgstr "There are currently no available character targets for this private chat, and group invitations cannot be sent."
 
-#: apps/app/src/components/chat-message-list.tsx:4344
-#: apps/app/src/components/chat-message-list.tsx:4375
+#: apps/app/src/components/chat-message-list.tsx:4362
+#: apps/app/src/components/chat-message-list.tsx:4393
 msgid "这条单聊暂时没有可用的角色目标，无法完成转发。"
 msgstr "This 1-on-1 chat has no available character target — forwarding can't complete."
 
@@ -24366,11 +24366,11 @@ msgid "这条笔记还没有保存"
 msgstr "This note hasn't been saved"
 
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:265
-#: apps/app/src/routes/favorites-page.tsx:775
+#: apps/app/src/routes/favorites-page.tsx:776
 msgid "这条笔记还没有正文摘要。"
 msgstr "This note does not have a content summary yet."
 
-#: apps/app/src/routes/favorites-page.tsx:420
+#: apps/app/src/routes/favorites-page.tsx:421
 msgid "这条笔记默认属于收藏，保存后会继续留在收藏列表里。"
 msgstr "This note belongs to Favorites by default and will stay in the Favorites list after saving."
 
@@ -24484,7 +24484,7 @@ msgid "这里会展示世界里的角色和你最近发布的朋友圈内容。"
 msgstr "This shows world character updates and the Moments you posted recently."
 
 #: apps/app/src/i18n/static-dom-seed.ts:396
-#: apps/app/src/routes/favorites-page.tsx:623
+#: apps/app/src/routes/favorites-page.tsx:624
 msgid "这里会显示摘要、来源和操作入口。"
 msgstr "Summary, source, and action entries appear here."
 
@@ -25057,7 +25057,7 @@ msgstr "Failed to load neighbor list:"
 msgid "部分加入"
 msgstr "Partially joined"
 
-#: apps/app/src/components/chat-message-list.tsx:2927
+#: apps/app/src/components/chat-message-list.tsx:2945
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:227
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:943
 #: apps/app/src/features/chat/group-message-context-menu.tsx:58
@@ -25164,7 +25164,7 @@ msgstr "Reset save"
 msgid "重置进度"
 msgstr "重置进度"
 
-#: apps/app/src/components/chat-message-list.tsx:3131
+#: apps/app/src/components/chat-message-list.tsx:3149
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:540
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:626
 #: apps/app/src/routes/contacts-page.tsx:1923
@@ -25176,11 +25176,11 @@ msgstr "Retry"
 msgid "重试保存"
 msgstr "Retry save"
 
-#: apps/app/src/components/chat-message-list.tsx:1833
+#: apps/app/src/components/chat-message-list.tsx:1850
 msgid "重试保存图片"
 msgstr "Retry saving image"
 
-#: apps/app/src/components/chat-message-list.tsx:1833
+#: apps/app/src/components/chat-message-list.tsx:1850
 msgid "重试保存文件"
 msgstr "Retry saving file"
 
@@ -25241,7 +25241,7 @@ msgstr "Retry sharing"
 msgid "重试发送"
 msgstr "Retry sending"
 
-#: apps/app/src/components/chat-message-list.tsx:1978
+#: apps/app/src/components/chat-message-list.tsx:1995
 #: apps/app/src/i18n/static-dom-seed.ts:963
 msgid "重试发送失败，请稍后再试。"
 msgstr "Retry send failed. Try again later."
@@ -25329,7 +25329,7 @@ msgstr "Retry open"
 
 #: apps/app/src/components/chat-composer.tsx:5799
 #: apps/app/src/components/chat-composer.tsx:5810
-#: apps/app/src/components/chat-message-list.tsx:1812
+#: apps/app/src/components/chat-message-list.tsx:1829
 msgid "重试打开文件"
 msgstr "Retry opening file"
 
@@ -25621,7 +25621,7 @@ msgid "附件"
 msgstr "Attachment"
 
 #. placeholder {0}: summary.assets.length
-#: apps/app/src/routes/favorites-page.tsx:871
+#: apps/app/src/routes/favorites-page.tsx:872
 msgid "附件 {0}"
 msgstr "Attachment {0}"
 
@@ -25979,7 +25979,7 @@ msgstr "Schedule reminder"
 msgid "预览中"
 msgstr "Previewing"
 
-#: apps/app/src/components/chat-message-list.tsx:4122
+#: apps/app/src/components/chat-message-list.tsx:4140
 #: apps/app/src/i18n/static-dom-seed.ts:488
 #: apps/app/src/routes/desktop-chat-files-page.tsx:684
 msgid "预览图片"
