@@ -23,5 +23,6 @@ import { CloudTokenUsageSyncService } from './cloud-token-usage-sync.service';
     ]),
   ],
   providers: [CloudRuntimeReportingService, CloudTokenUsageSyncService],
+  exports: [CloudTokenUsageSyncService],
 })
 export class CloudRuntimeModule {}

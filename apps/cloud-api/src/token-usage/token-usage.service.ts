@@ -259,6 +259,7 @@ export class TokenUsageService {
     const aggregated = await this.daily
       .createQueryBuilder("d")
       .select("d.worldId", "worldId")
+      .addSelect("MAX(d.currency)", "currency")
       .addSelect("SUM(d.promptTokens)", "promptTokens")
       .addSelect("SUM(d.completionTokens)", "completionTokens")
       .addSelect("SUM(d.totalTokens)", "totalTokens")
@@ -272,6 +273,7 @@ export class TokenUsageService {
       .groupBy("d.worldId")
       .getRawMany<{
         worldId: string;
+        currency: string | null;
         promptTokens: string | number;
         completionTokens: string | number;
         totalTokens: string | number;
@@ -299,11 +301,13 @@ export class TokenUsageService {
       const world = worldsById.get(row.worldId);
       const requestCount = toInt(row.requestCount);
       const failedCount = toInt(row.failedCount);
+      const currency: "CNY" | "USD" =
+        row.currency === "USD" ? "USD" : "CNY";
       return {
         worldId: row.worldId,
         worldSlug: world?.slug ?? null,
         worldName: world?.name ?? world?.slug ?? null,
-        currency: "CNY",
+        currency,
         promptTokens: toInt(row.promptTokens),
         completionTokens: toInt(row.completionTokens),
         totalTokens: toInt(row.totalTokens),
