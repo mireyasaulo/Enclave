@@ -323,6 +323,17 @@ export interface CloudTokenUsageBudgetItem extends TokenUsageBudgetRule {
   updatedAt: string;
 }
 
+export interface CloudTokenUsageWorldConfigResponse {
+  worldId: string;
+  budget: {
+    global: CloudTokenUsageBudgetItem | null;
+    world: CloudTokenUsageBudgetItem | null;
+    resolved: CloudTokenUsageBudgetItem | null;
+  };
+  pricing: TokenPricingCatalog | null;
+  generatedAt: string;
+}
+
 export interface CloudTokenUsageBudgetResponse {
   global: CloudTokenUsageBudgetItem | null;
   worlds: CloudTokenUsageBudgetItem[];

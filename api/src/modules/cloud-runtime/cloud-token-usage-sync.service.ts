@@ -6,6 +6,44 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AiUsageLedgerService } from '../analytics/ai-usage-ledger.service';
+import { SystemConfigService } from '../config/config.service';
+
+const PLATFORM_DEFAULTS_CONFIG_KEY = 'token_usage_platform_defaults';
+
+export type TokenUsagePlatformDefaultsSnapshot = {
+  worldId: string;
+  fetchedAt: string;
+  budget: {
+    global: PlatformBudgetItem | null;
+    world: PlatformBudgetItem | null;
+    resolved: PlatformBudgetItem | null;
+  };
+  pricing: PlatformPricingCatalog | null;
+};
+
+type PlatformBudgetItem = {
+  worldId: string | null;
+  enabled: boolean;
+  metric: 'tokens' | 'cost';
+  enforcement: 'monitor' | 'downgrade' | 'block';
+  downgradeModel: string | null;
+  dailyLimit: number | null;
+  monthlyLimit: number | null;
+  warningRatio: number;
+  note: string | null;
+  updatedAt: string;
+};
+
+type PlatformPricingCatalog = {
+  currency: 'CNY' | 'USD';
+  items: Array<{
+    model: string;
+    inputPer1kTokens: number;
+    outputPer1kTokens: number;
+    enabled: boolean;
+    note?: string;
+  }>;
+};
 
 type LedgerOverview = {
   currency: 'CNY' | 'USD';
@@ -83,7 +121,10 @@ export class CloudTokenUsageSyncService implements OnModuleInit, OnModuleDestroy
   constructor(
     private readonly configService: ConfigService,
     private readonly usageLedger: AiUsageLedgerService,
+    private readonly systemConfig: SystemConfigService,
   ) {}
+
+  static readonly PLATFORM_DEFAULTS_CONFIG_KEY = PLATFORM_DEFAULTS_CONFIG_KEY;
 
   onModuleInit() {
     const config = this.getConfig();
@@ -118,11 +159,105 @@ export class CloudTokenUsageSyncService implements OnModuleInit, OnModuleDestroy
       const yesterday = isoDate(new Date(Date.now() - 24 * 60 * 60 * 1000));
       await this.syncBucket(config, yesterday);
       await this.syncBucket(config, today);
+      await this.pullPlatformDefaults(config);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.logger.warn(`Token usage cloud sync failed: ${message}`);
     } finally {
       this.syncing = false;
+    }
+  }
+
+  async getPlatformDefaultsSnapshot(): Promise<TokenUsagePlatformDefaultsSnapshot | null> {
+    const raw = await this.systemConfig.getConfig(PLATFORM_DEFAULTS_CONFIG_KEY);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as TokenUsagePlatformDefaultsSnapshot;
+    } catch {
+      return null;
+    }
+  }
+
+  async applyPlatformDefaults(): Promise<{
+    appliedBudget: boolean;
+    appliedPricing: boolean;
+  }> {
+    const snapshot = await this.getPlatformDefaultsSnapshot();
+    if (!snapshot) {
+      return { appliedBudget: false, appliedPricing: false };
+    }
+
+    let appliedBudget = false;
+    let appliedPricing = false;
+
+    if (snapshot.budget.resolved) {
+      const rule = snapshot.budget.resolved;
+      await this.usageLedger.setBudgetConfig({
+        overall: {
+          enabled: rule.enabled,
+          metric: rule.metric,
+          enforcement: rule.enforcement,
+          downgradeModel: rule.downgradeModel,
+          dailyLimit: rule.dailyLimit,
+          monthlyLimit: rule.monthlyLimit,
+          warningRatio: rule.warningRatio,
+        },
+        characters: [],
+      });
+      appliedBudget = true;
+    }
+
+    if (snapshot.pricing && snapshot.pricing.items.length > 0) {
+      await this.usageLedger.setPricingCatalog(snapshot.pricing);
+      appliedPricing = true;
+    }
+
+    return { appliedBudget, appliedPricing };
+  }
+
+  private async pullPlatformDefaults(config: SyncConfig) {
+    try {
+      const url = `${config.cloudPlatformBaseUrl}/internal/cloud/token-usage/config?worldId=${encodeURIComponent(config.worldId)}`;
+      const response = await fetch(url, {
+        headers: {
+          'x-world-callback-token': config.callbackToken,
+        },
+      }).catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        this.logger.warn(`Token usage config pull request error: ${message}`);
+        return null;
+      });
+
+      if (!response || !response.ok) {
+        if (response) {
+          const body = await response.text().catch(() => '');
+          this.logger.warn(
+            `Token usage config pull rejected with ${response.status}: ${body || 'no body'}`,
+          );
+        }
+        return;
+      }
+
+      const body = (await response.json()) as {
+        worldId: string;
+        budget: TokenUsagePlatformDefaultsSnapshot['budget'];
+        pricing: TokenUsagePlatformDefaultsSnapshot['pricing'];
+        generatedAt: string;
+      };
+
+      const snapshot: TokenUsagePlatformDefaultsSnapshot = {
+        worldId: body.worldId,
+        fetchedAt: new Date().toISOString(),
+        budget: body.budget,
+        pricing: body.pricing,
+      };
+      await this.systemConfig.setConfig(
+        PLATFORM_DEFAULTS_CONFIG_KEY,
+        JSON.stringify(snapshot),
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Token usage config persist failed: ${message}`);
     }
   }
 

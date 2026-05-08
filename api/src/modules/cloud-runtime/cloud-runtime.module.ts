@@ -7,6 +7,7 @@ import { GroupEntity } from '../chat/group.entity';
 import { CharacterRevisionEntity } from '../wiki/entities/character-revision.entity';
 import { EditSubmissionEntity } from '../wiki/entities/edit-submission.entity';
 import { AiModule } from '../ai/ai.module';
+import { SystemConfigModule } from '../config/config.module';
 import { CloudRuntimeReportingService } from './cloud-runtime-reporting.service';
 import { CloudTokenUsageSyncService } from './cloud-token-usage-sync.service';
 
@@ -14,6 +15,7 @@ import { CloudTokenUsageSyncService } from './cloud-token-usage-sync.service';
   imports: [
     ConfigModule,
     AiModule,
+    SystemConfigModule,
     TypeOrmModule.forFeature([
       AiUsageLedgerEntity,
       ConversationEntity,

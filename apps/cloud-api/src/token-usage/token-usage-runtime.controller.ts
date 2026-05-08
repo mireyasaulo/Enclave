@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Post } from "@nestjs/common";
+import { Body, Controller, Get, Headers, Post, Query } from "@nestjs/common";
 import { CloudTokenUsageDailyPushDto } from "./token-usage.dto";
 import { TokenUsageService } from "./token-usage.service";
 
@@ -12,5 +12,13 @@ export class TokenUsageRuntimeController {
     @Body() body: CloudTokenUsageDailyPushDto,
   ) {
     return this.tokenUsage.ingestDaily(body, callbackToken);
+  }
+
+  @Get("config")
+  getWorldConfig(
+    @Headers("x-world-callback-token") callbackToken: string | undefined,
+    @Query("worldId") worldId: string,
+  ) {
+    return this.tokenUsage.getWorldConfigSnapshot(worldId, callbackToken);
   }
 }

@@ -447,6 +447,17 @@ export class AdminController {
     return { ok: true };
   }
 
+  @Get('token-usage/platform-defaults')
+  async getTokenUsagePlatformDefaults() {
+    const snapshot = await this.cloudTokenUsageSync.getPlatformDefaultsSnapshot();
+    return { snapshot };
+  }
+
+  @Post('token-usage/platform-defaults/apply')
+  async applyTokenUsagePlatformDefaults() {
+    return this.cloudTokenUsageSync.applyPlatformDefaults();
+  }
+
   @Get('token-usage/budgets')
   getTokenUsageBudgets() {
     return this.usageLedger.getBudgetSnapshot();

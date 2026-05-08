@@ -15,8 +15,10 @@ import type {
   CloudTokenUsageBudgetResponse,
   CloudTokenUsageDailyPushPayload,
   CloudTokenUsageOverviewResponse,
+  CloudTokenUsageWorldConfigResponse,
   CloudTokenUsageWorldListResponse,
   CloudTokenUsageWorldRow,
+  TokenPricingCatalog,
   TokenUsageBreakdownItem,
   TokenUsageBreakdownResponse,
   TokenUsageBudgetEnforcement,
@@ -439,6 +441,57 @@ export class TokenUsageService {
       activeCharacterCount: row.activeCharacterCount,
       syncedAt: row.syncedAt.toISOString(),
     }));
+  }
+
+  // -------- World config snapshot (for runtime pull) --------
+
+  async getWorldConfigSnapshot(
+    worldId: string,
+    headerToken: string | undefined,
+  ): Promise<CloudTokenUsageWorldConfigResponse> {
+    const trimmed = (worldId ?? "").trim();
+    if (!trimmed) {
+      throw new BadRequestException("worldId is required.");
+    }
+    const world = await this.worlds.findOne({ where: { id: trimmed } });
+    if (!world || isRequestGatePlaceholderWorld(world)) {
+      throw new NotFoundException("World not found.");
+    }
+    this.assertCallbackToken(world, headerToken, null);
+
+    const [globalRow, worldRow] = await Promise.all([
+      this.budgets.findOne({ where: { worldId: IsNull() } }),
+      this.budgets.findOne({ where: { worldId: trimmed } }),
+    ]);
+    const global = globalRow ? this.toBudgetItem(globalRow) : null;
+    const worldItem = worldRow ? this.toBudgetItem(worldRow) : null;
+    const resolved = worldItem ?? global;
+
+    const pricingRows = await this.pricing.find({
+      where: { enabled: true },
+      order: { currency: "ASC", model: "ASC" },
+    });
+    const pricing: TokenPricingCatalog | null =
+      pricingRows.length === 0
+        ? null
+        : {
+            currency:
+              (pricingRows[0]?.currency as "CNY" | "USD" | undefined) ?? "CNY",
+            items: pricingRows.map((row) => ({
+              model: row.model,
+              inputPer1kTokens: row.inputPer1kMillicents / 1000,
+              outputPer1kTokens: row.outputPer1kMillicents / 1000,
+              enabled: Boolean(row.enabled),
+              note: row.note ?? undefined,
+            })),
+          };
+
+    return {
+      worldId: trimmed,
+      budget: { global, world: worldItem, resolved },
+      pricing,
+      generatedAt: new Date().toISOString(),
+    };
   }
 
   // -------- Budget --------
