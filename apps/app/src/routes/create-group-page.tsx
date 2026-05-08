@@ -73,7 +73,10 @@ export function CreateGroupPage() {
   });
 
   const friendItems = useMemo(
-    () => friendsQuery.data ?? [],
+    () =>
+      (friendsQuery.data ?? []).filter(
+        (item) => item.friendship.status !== "removed",
+      ),
     [friendsQuery.data],
   );
   const sortedFriendItems = useMemo(
@@ -139,6 +142,9 @@ export function CreateGroupPage() {
     },
   });
 
+  const createMutationResetRef = useRef(createMutation.reset);
+  createMutationResetRef.current = createMutation.reset;
+
   useEffect(() => {
     if (previousBaseUrlRef.current === baseUrl) {
       return;
@@ -149,8 +155,8 @@ export function CreateGroupPage() {
     setName("");
     setSelectedIds([]);
     setSearchTerm("");
-    createMutation.reset();
-  }, [baseUrl, createMutation]);
+    createMutationResetRef.current();
+  }, [baseUrl]);
 
   useEffect(() => {
     const seedKey = `${baseUrl}:${routeState.seedMemberIds.join(",")}`;
@@ -163,10 +169,7 @@ export function CreateGroupPage() {
       return;
     }
 
-    if (!sortedFriendItems.length) {
-      if (!friendsQuery.isLoading) {
-        seededSelectionRef.current = seedKey;
-      }
+    if (friendsQuery.isLoading) {
       return;
     }
 

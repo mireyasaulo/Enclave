@@ -801,6 +801,11 @@ function DirectChatDetailsPanel({
                     source: "desktop-chat",
                     conversationId: conversation.id,
                     seedMemberIds: targetCharacterId ? [targetCharacterId] : [],
+                    returnPath: "/tabs/chat",
+                    returnHash: buildDesktopChatRouteHash({
+                      conversationId: conversation.id,
+                      panel: "details",
+                    }),
                   }),
                 });
               }}

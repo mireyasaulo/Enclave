@@ -240,6 +240,9 @@ export function DesktopCreateGroupDialog({
     },
   });
 
+  const createMutationResetRef = useRef(createMutation.reset);
+  createMutationResetRef.current = createMutation.reset;
+
   useEffect(() => {
     if (!open) {
       return;
@@ -253,8 +256,8 @@ export function DesktopCreateGroupDialog({
     setFocusedFriendIndex(0);
     setFocusedMessageIndex(0);
     seededSelectionRef.current = "";
-    createMutation.reset();
-  }, [createMutation, open]);
+    createMutationResetRef.current();
+  }, [open]);
 
   useEffect(() => {
     if (!open) {
@@ -358,10 +361,7 @@ export function DesktopCreateGroupDialog({
       return;
     }
 
-    if (!sortedFriendItems.length) {
-      if (!friendsQuery.isLoading) {
-        seededSelectionRef.current = seedKey;
-      }
+    if (friendsQuery.isLoading) {
       return;
     }
 
