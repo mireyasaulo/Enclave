@@ -186,6 +186,44 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`当前摇一摇结果无法创建对应角色。`);
     case "SHAKE_NO_DIRECTIONS":
       return translateRuntimeMessage(msg`没有可用的摇一摇方向。`);
+    case "AUTH_USERNAME_PASSWORD_REQUIRED":
+      return translateRuntimeMessage(msg`用户名与密码不能为空。`);
+    case "AUTH_USERNAME_TAKEN":
+      return translateRuntimeMessage(msg`用户名已被占用。`);
+    case "AUTH_INVALID_CREDENTIALS":
+      return translateRuntimeMessage(msg`账号或密码错误。`);
+    case "AUTH_EMAIL_LOGIN_ONLY":
+      return translateRuntimeMessage(
+        msg`该账号通过邮箱验证码注册，请使用邮箱验证码登录。`,
+      );
+    case "AUTH_JWT_SECRET_MISSING":
+      return translateRuntimeMessage(msg`服务器未配置 JWT_SECRET。`);
+    case "AUTH_CODE_REQUIRED":
+      return translateRuntimeMessage(msg`验证码不能为空。`);
+    case "AUTH_CODE_INVALID":
+      return translateRuntimeMessage(msg`验证码错误。`);
+    case "AUTH_CODE_USED":
+      return translateRuntimeMessage(msg`该验证码已使用。`);
+    case "AUTH_CODE_EXPIRED":
+      return translateRuntimeMessage(msg`验证码已过期。`);
+    case "AUTH_EMAIL_INVALID":
+      return translateRuntimeMessage(msg`邮箱格式不正确。`);
+    case "AUTH_TOKEN_MISSING":
+      return translateRuntimeMessage(msg`缺少访问令牌。`);
+    case "AUTH_TOKEN_INVALID":
+      return translateRuntimeMessage(msg`访问令牌无效或已过期。`);
+    case "AUTH_USER_NOT_FOUND":
+      return translateRuntimeMessage(msg`用户不存在。`);
+    case "AUTH_EMAIL_BIND_FAILED":
+      return translateRuntimeMessage(msg`邮箱绑定失败，请稍后重试。`);
+    case "AUTH_EMAIL_SEND_FAILED":
+      return translateRuntimeMessage(msg`验证码发送失败，请稍后重试。`);
+    case "AUTH_CODE_RESEND_TOO_FAST":
+      return translateRuntimeMessage(
+        msg`验证码发送过于频繁，请在 ${String(params.retryAfter ?? "?")} 秒后重试。`,
+      );
+    case "AUTH_CODE_TOO_MANY":
+      return translateRuntimeMessage(msg`该邮箱验证码请求次数过多，请稍后再试。`);
     case "VALIDATION_FAILED":
       return translateRuntimeMessage(msg`提交的数据无效，请检查后重试。`);
     case "INTERNAL_ERROR":
