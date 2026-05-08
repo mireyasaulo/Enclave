@@ -157,13 +157,13 @@ export function DesktopContactsWorkspace({
               </div>
             </div>
 
-            <div className="px-2 py-2">{shortcutList}</div>
-
             <div className="relative min-h-0 flex-1">
               <div
                 ref={directoryScrollRef}
                 className="h-full overflow-auto bg-[#f7f7f7] pb-5"
               >
+                <div className="px-2 py-2">{shortcutList}</div>
+
                 {notice ? (
                   <div className="px-3 pb-2">
                     <InlineNotice
