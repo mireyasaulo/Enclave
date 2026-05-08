@@ -550,6 +550,62 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`friendRequestId 必填。`);
     case "FOLLOWUP_NOT_FOUND":
       return translateRuntimeMessage(msg`Follow-up 不存在。`);
+    case "WIKI_PAGE_NOT_FOUND":
+      return translateRuntimeMessage(msg`词条不存在。`);
+    case "WIKI_PAGE_DELETED":
+      return translateRuntimeMessage(msg`该词条已被删除，无法编辑。`);
+    case "WIKI_REVISION_CONFLICT":
+      return translateRuntimeMessage(msg`存在编辑冲突，请基于最新版本重新提交。`);
+    case "WIKI_VALIDATION_FAILED":
+      return translateRuntimeMessage(
+        typeof params.detail === "string" && params.detail.length > 0
+          ? msg`Wiki 校验失败：${String(params.detail)}`
+          : msg`Wiki 校验失败。`,
+      );
+    case "WIKI_FORBIDDEN":
+      return translateRuntimeMessage(
+        typeof params.reason === "string" && params.reason.length > 0
+          ? msg`Wiki 操作被拒绝：${String(params.reason)}`
+          : msg`Wiki 操作被拒绝。`,
+      );
+    case "WIKI_CONFLICT":
+      return translateRuntimeMessage(
+        typeof params.detail === "string" && params.detail.length > 0
+          ? msg`Wiki 冲突：${String(params.detail)}`
+          : msg`Wiki 冲突。`,
+      );
+    case "WIKI_RATE_LIMITED":
+      return translateRuntimeMessage(msg`Wiki 操作过于频繁，请稍后再试。`);
+    case "WIKI_ABUSE_FILTER_TRIGGERED":
+      return translateRuntimeMessage(msg`Wiki 内容触发过滤规则。`);
+    case "WIKI_REVIEW_NOT_FOUND":
+      return translateRuntimeMessage(msg`Wiki 审核记录不存在。`);
+    case "WIKI_REVIEW_INVALID_STATE":
+      return translateRuntimeMessage(msg`Wiki 审核当前状态不允许此操作。`);
+    case "WIKI_TALK_NOT_FOUND":
+      return translateRuntimeMessage(msg`Wiki 讨论不存在。`);
+    case "WIKI_TALK_INVALID_STATE":
+      return translateRuntimeMessage(msg`Wiki 讨论当前状态不允许此操作。`);
+    case "WIKI_BLOCK_NOT_FOUND":
+      return translateRuntimeMessage(msg`Wiki 封禁记录不存在。`);
+    case "WIKI_BLOCK_INVALID_STATE":
+      return translateRuntimeMessage(msg`Wiki 封禁当前状态不允许此操作。`);
+    case "WIKI_REPORT_NOT_FOUND":
+      return translateRuntimeMessage(msg`Wiki 举报不存在。`);
+    case "WIKI_REPORT_INVALID_STATE":
+      return translateRuntimeMessage(msg`Wiki 举报当前状态不允许此操作。`);
+    case "GAME_NOT_FOUND":
+      return translateRuntimeMessage(msg`游戏不存在。`);
+    case "GAME_REVISION_NOT_FOUND":
+      return translateRuntimeMessage(msg`游戏修订不存在。`);
+    case "GAME_SUBMISSION_NOT_FOUND":
+      return translateRuntimeMessage(msg`游戏投稿不存在。`);
+    case "GAME_VALIDATION_FAILED":
+      return translateRuntimeMessage(
+        typeof params.detail === "string" && params.detail.length > 0
+          ? msg`游戏校验失败：${String(params.detail)}`
+          : msg`游戏校验失败。`,
+      );
     case "VALIDATION_FAILED":
       return translateRuntimeMessage(msg`提交的数据无效，请检查后重试。`);
     case "INTERNAL_ERROR":

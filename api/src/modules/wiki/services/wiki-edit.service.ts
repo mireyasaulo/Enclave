@@ -1,10 +1,6 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
-import {
-  BadRequestException,
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { randomUUID } from 'crypto';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, EntityManager, Repository } from 'typeorm';
@@ -94,14 +90,21 @@ export class WikiEditService {
     await this.blocks.assertCanEdit(user, characterId);
     const page = await this.pages.getOrInitPage(characterId);
     if (page.isDeleted) {
-      throw new ForbiddenException('该词条已被删除，无法编辑');
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: '该词条已被删除，无法编辑' },
+        legacyMessage: '该词条已被删除，无法编辑',
+      });
     }
     this.assertProtection(page.protectionLevel, user.role);
 
     const character = await this.characterRepo.findOne({
       where: { id: characterId },
     });
-    if (!character) throw new BadRequestException('角色不存在');
+    if (!character) throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: '角色不存在' },
+        legacyMessage: '角色不存在',
+      });
 
     const before: WikiContentSnapshot = page.currentRevisionId
       ? (await this.revisionRepo.findOne({
@@ -117,13 +120,21 @@ export class WikiEditService {
         ? input.contentSnapshot
         : null;
     if (!rawPatch) {
-      throw new BadRequestException('contentSnapshot 必须为对象');
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: 'contentSnapshot 必须为对象' },
+        legacyMessage: 'contentSnapshot 必须为对象',
+      });
     }
     const presentKeys = WIKI_CONTENT_FIELDS.filter((field) => field in rawPatch);
     if (presentKeys.length === 0) {
-      throw new BadRequestException(
-        'contentSnapshot 至少需提交一个内容字段（name/avatar/bio/personality/expertDomains/triggerScenes/relationship/relationshipType）',
-      );
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: {
+          detail:
+            'contentSnapshot 至少需提交一个内容字段（name/avatar/bio/personality/expertDomains/triggerScenes/relationship/relationshipType）',
+        },
+        legacyMessage:
+          'contentSnapshot 至少需提交一个内容字段（name/avatar/bio/personality/expertDomains/triggerScenes/relationship/relationshipType）',
+      });
     }
     const submittedPick = pickWikiContent(rawPatch);
     const submitted: WikiContentSnapshot = {
@@ -136,7 +147,10 @@ export class WikiEditService {
       )[field];
     }
     if (!submitted.name.trim()) {
-      throw new BadRequestException('name 不能为空');
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: 'name 不能为空' },
+        legacyMessage: 'name 不能为空',
+      });
     }
     let after = submitted;
     let changed = diffFields(before, after);
@@ -151,17 +165,22 @@ export class WikiEditService {
         where: { id: input.baseRevisionId },
       });
       if (!baseRev) {
-        throw new BadRequestException('基线版本无效');
+        throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: '基线版本无效' },
+        legacyMessage: '基线版本无效',
+      });
       }
       const userChanged = diffFields(baseRev.contentSnapshot, submitted);
       const concurrentChanged = diffFields(baseRev.contentSnapshot, before);
       const overlap = userChanged.filter((f) => concurrentChanged.includes(f));
       if (overlap.length > 0) {
-        throw new ConflictException({
-          message: '存在编辑冲突，请基于最新版本重新提交',
-          conflictingFields: overlap,
-          currentRevisionId: page.currentRevisionId,
-          currentSnapshot: before,
+        throw new AppError('WIKI_REVISION_CONFLICT', {
+          status: HttpStatus.CONFLICT,
+          params: {
+            conflictingFields: overlap.join(','),
+            currentRevisionId: page.currentRevisionId ?? '',
+          },
+          legacyMessage: '存在编辑冲突，请基于最新版本重新提交',
         });
       }
       after = mergeContentSnapshot(before, submitted, userChanged);
@@ -170,7 +189,10 @@ export class WikiEditService {
     }
 
     if (changed.length === 0) {
-      throw new BadRequestException('未检测到变更');
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: '未检测到变更' },
+        legacyMessage: '未检测到变更',
+      });
     }
 
     this.assertEditSummary({
@@ -305,15 +327,21 @@ export class WikiEditService {
     await this.blocks.assertCanEdit(user, characterId);
     const existing = await this.characterRepo.findOne({ where: { id: characterId } });
     if (existing) {
-      throw new BadRequestException('角色 ID 已存在');
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: '角色 ID 已存在' },
+        legacyMessage: '角色 ID 已存在',
+      });
     }
     const existingPage = await this.pageRepo.findOne({ where: { characterId } });
     if (existingPage) {
-      throw new BadRequestException(
+      const detail =
         existingPage.lifecycleStatus === 'pending_create'
           ? '该角色已有待审创建请求'
-          : '词条已存在',
-      );
+          : '词条已存在';
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail },
+        legacyMessage: detail,
+      });
     }
 
     const seedInput =
@@ -447,7 +475,10 @@ export class WikiEditService {
       operation,
     });
     const character = await this.characterRepo.findOne({ where: { id: characterId } });
-    if (!character) throw new BadRequestException('角色不存在');
+    if (!character) throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: '角色不存在' },
+        legacyMessage: '角色不存在',
+      });
     const currentRevision = page.currentRevisionId
       ? await this.revisionRepo.findOne({ where: { id: page.currentRevisionId } })
       : null;
@@ -531,13 +562,20 @@ export class WikiEditService {
     actor: AuthenticatedUser,
   ): Promise<SubmitEditResult> {
     if (rankOf(actor.role) < rankOf('patroller')) {
-      throw new ForbiddenException('仅巡查员及以上可触发漂移同步');
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: '仅巡查员及以上可触发漂移同步' },
+        legacyMessage: '仅巡查员及以上可触发漂移同步',
+      });
     }
     const page = await this.pages.getOrInitPage(characterId);
     const character = await this.characterRepo.findOne({
       where: { id: characterId },
     });
-    if (!character) throw new BadRequestException('角色不存在');
+    if (!character) throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: '角色不存在' },
+        legacyMessage: '角色不存在',
+      });
     const liveContent = snapshotFromCharacter(
       character as unknown as Record<string, unknown>,
     );
@@ -597,7 +635,10 @@ export class WikiEditService {
     const latestRevisionId = await this.resolveLatestRevisionId(revision);
     if (revision.operation === 'create') {
       if (!revision.recipeSnapshot) {
-        throw new BadRequestException('创建角色缺少 recipeSnapshot');
+        throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: '创建角色缺少 recipeSnapshot' },
+        legacyMessage: '创建角色缺少 recipeSnapshot',
+      });
       }
       const existing = await this.characterRepo.findOne({
         where: { id: revision.characterId },
@@ -703,11 +744,18 @@ export class WikiEditService {
     await this.blocks.assertCanEdit(user, characterId);
     const page = await this.pages.getOrInitPage(characterId);
     if (page.isDeleted) {
-      throw new ForbiddenException('该词条已被删除，无法编辑');
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: '该词条已被删除，无法编辑' },
+        legacyMessage: '该词条已被删除，无法编辑',
+      });
     }
     this.assertProtection(page.protectionLevel, user.role);
     const character = await this.characterRepo.findOne({ where: { id: characterId } });
-    if (!character) throw new BadRequestException('角色不存在');
+    if (!character) throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: '角色不存在' },
+        legacyMessage: '角色不存在',
+      });
     const currentRevision = page.currentRevisionId
       ? await this.revisionRepo.findOne({ where: { id: page.currentRevisionId } })
       : null;
@@ -732,7 +780,10 @@ export class WikiEditService {
         where: { id: input.baseRevisionId },
       });
       if (!baseRev?.recipeSnapshot) {
-        throw new BadRequestException('基线版本无效');
+        throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: '基线版本无效' },
+        legacyMessage: '基线版本无效',
+      });
       }
       const submittedRecipe = normalizeWikiRecipe(
         input.recipeSnapshot ?? {},
@@ -744,12 +795,13 @@ export class WikiEditService {
         hasPathOverlap([path], concurrentChanged),
       );
       if (overlap.length > 0) {
-        throw new ConflictException({
-          message: '存在编辑冲突，请基于最新版本重新提交',
-          conflictingFields: overlap,
-          currentRevisionId: page.currentRevisionId,
-          currentSnapshot: beforeContent,
-          currentRecipeSnapshot: beforeRecipe,
+        throw new AppError('WIKI_REVISION_CONFLICT', {
+          status: HttpStatus.CONFLICT,
+          params: {
+            conflictingFields: overlap.join(','),
+            currentRevisionId: page.currentRevisionId ?? '',
+          },
+          legacyMessage: '存在编辑冲突，请基于最新版本重新提交',
         });
       }
       afterRecipe = mergeValueByPaths(beforeRecipe, submittedRecipe, userChanged);
@@ -758,7 +810,10 @@ export class WikiEditService {
     }
 
     if (changed.length === 0) {
-      throw new BadRequestException('未检测到变更');
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: '未检测到变更' },
+        legacyMessage: '未检测到变更',
+      });
     }
     await this.fieldProtection.assertCanEditPaths(user, characterId, changed);
     const afterContent = snapshotFromRecipe(afterRecipe);
@@ -955,10 +1010,18 @@ export class WikiEditService {
 
   private assertProtection(level: string, role: string): void {
     if (level === 'full' && rankOf(role) < rankOf('admin')) {
-      throw new ForbiddenException('此页面被完全保护，仅管理员可编辑');
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: '此页面被完全保护，仅管理员可编辑' },
+        legacyMessage: '此页面被完全保护，仅管理员可编辑',
+      });
     }
     if (level === 'semi' && rankOf(role) < rankOf('autoconfirmed')) {
-      throw new ForbiddenException('此页面被半保护，仅自动确认用户及以上可编辑');
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: '此页面被半保护，仅自动确认用户及以上可编辑' },
+        legacyMessage: '此页面被半保护，仅自动确认用户及以上可编辑',
+      });
     }
   }
 }

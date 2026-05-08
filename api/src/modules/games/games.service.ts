@@ -1,10 +1,7 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { randomUUID } from 'crypto';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { WorldOwnerService } from '../auth/world-owner.service';
@@ -364,7 +361,10 @@ export class GamesService {
     ]);
 
     if (!knownGameIds.has(gameId)) {
-      throw new NotFoundException('游戏不存在');
+      throw new AppError('GAME_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '游戏不存在',
+      });
     }
 
     const current = this.serializeOwnerState(entity, knownGameIds);
@@ -400,7 +400,10 @@ export class GamesService {
     ]);
 
     if (!knownGameIds.has(gameId)) {
-      throw new NotFoundException('游戏不存在');
+      throw new AppError('GAME_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '游戏不存在',
+      });
     }
 
     const current = this.serializeOwnerState(entity, knownGameIds);
@@ -495,7 +498,10 @@ export class GamesService {
     const name = this.normalizeRequiredText(input.name, 'name', '游戏名称');
     const existing = await this.catalogRepo.findOne({ where: { id } });
     if (existing) {
-      throw new BadRequestException('游戏 ID 已存在');
+      throw new AppError('GAME_VALIDATION_FAILED', {
+        params: { detail: '游戏 ID 已存在' },
+        legacyMessage: '游戏 ID 已存在',
+      });
     }
 
     const sortOrder =
@@ -866,7 +872,10 @@ export class GamesService {
     const submission = await this.getSubmissionOrThrow(id);
 
     if (submission.status === 'rejected') {
-      throw new BadRequestException('已拒绝的投稿不能导入目录草稿');
+      throw new AppError('GAME_VALIDATION_FAILED', {
+        params: { detail: '已拒绝的投稿不能导入目录草稿' },
+        legacyMessage: '已拒绝的投稿不能导入目录草稿',
+      });
     }
 
     if (submission.linkedCatalogGameId) {
@@ -888,7 +897,10 @@ export class GamesService {
     );
     const existing = await this.catalogRepo.findOne({ where: { id: gameId } });
     if (existing) {
-      throw new BadRequestException('目标游戏 ID 已存在');
+      throw new AppError('GAME_VALIDATION_FAILED', {
+        params: { detail: '目标游戏 ID 已存在' },
+        legacyMessage: '目标游戏 ID 已存在',
+      });
     }
 
     const sortOrder =
@@ -1034,7 +1046,10 @@ export class GamesService {
     });
 
     if (!entry) {
-      throw new NotFoundException('游戏不存在');
+      throw new AppError('GAME_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '游戏不存在',
+      });
     }
 
     await this.ensureCatalogRevisions([entry]);
@@ -1050,7 +1065,10 @@ export class GamesService {
     });
 
     if (!revision) {
-      throw new NotFoundException('修订不存在');
+      throw new AppError('GAME_REVISION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '修订不存在',
+      });
     }
 
     return revision;
@@ -1251,7 +1269,10 @@ export class GamesService {
     await this.ensureSubmissionSeeded();
     const entry = await this.submissionRepo.findOne({ where: { id } });
     if (!entry) {
-      throw new NotFoundException('投稿不存在');
+      throw new AppError('GAME_SUBMISSION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '投稿不存在',
+      });
     }
 
     return entry;
@@ -1296,7 +1317,10 @@ export class GamesService {
   ) {
     const nextValue = typeof value === 'string' ? value.trim() : '';
     if (!nextValue) {
-      throw new BadRequestException(`${label}不能为空 (${field})`);
+      throw new AppError('GAME_VALIDATION_FAILED', {
+        params: { detail: `${label}不能为空 (${field})`, field },
+        legacyMessage: `${label}不能为空 (${field})`,
+      });
     }
 
     return nextValue;
@@ -1326,7 +1350,10 @@ export class GamesService {
         : '';
 
     if (!nextValue) {
-      throw new BadRequestException('游戏 ID 不能为空');
+      throw new AppError('GAME_VALIDATION_FAILED', {
+        params: { detail: '游戏 ID 不能为空' },
+        legacyMessage: '游戏 ID 不能为空',
+      });
     }
 
     return nextValue;
@@ -1349,9 +1376,10 @@ export class GamesService {
   ) {
     const missingIds = ids.filter((id) => !knownGameIds.has(id));
     if (missingIds.length > 0) {
-      throw new BadRequestException(
-        `${label} 包含不存在的游戏 ID：${missingIds.join(', ')}`,
-      );
+      throw new AppError('GAME_VALIDATION_FAILED', {
+        params: { detail: `${label} 包含不存在的游戏 ID：${missingIds.join(', ')}` },
+        legacyMessage: `${label} 包含不存在的游戏 ID：${missingIds.join(', ')}`,
+      });
     }
   }
 

@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CharacterEntity } from '../../characters/character.entity';
@@ -62,7 +63,10 @@ export class WikiPageService {
       where: { id: characterId },
     });
     if (!character) {
-      throw new NotFoundException(`角色 ${characterId} 不存在`);
+      throw new AppError('WIKI_PAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: `角色 ${characterId} 不存在`,
+      });
     }
     page = this.pageRepo.create({
       characterId,
@@ -89,7 +93,10 @@ export class WikiPageService {
     });
     const existingPage = await this.pageRepo.findOne({ where: { characterId } });
     if (!character && !existingPage) {
-      throw new NotFoundException(`角色 ${characterId} 不存在`);
+      throw new AppError('WIKI_PAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: `角色 ${characterId} 不存在`,
+      });
     }
     const page = character ? await this.getOrInitPage(characterId) : existingPage!;
     let stableRevision: CharacterRevisionEntity | null = null;
@@ -134,7 +141,10 @@ export class WikiPageService {
         ? snapshotFromCharacter(character as unknown as Record<string, unknown>)
         : pendingRevision?.contentSnapshot;
     if (!content) {
-      throw new NotFoundException(`角色 ${characterId} 不存在`);
+      throw new AppError('WIKI_PAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: `角色 ${characterId} 不存在`,
+      });
     }
     const drift = await this.computeDrift(
       character,
@@ -266,7 +276,10 @@ export class WikiPageService {
 
   async getRevisionOrThrow(id: string): Promise<CharacterRevisionEntity> {
     const rev = await this.revisionRepo.findOne({ where: { id } });
-    if (!rev) throw new NotFoundException(`版本 ${id} 不存在`);
+    if (!rev) throw new AppError('WIKI_PAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: `版本 ${id} 不存在`,
+      });
     return rev;
   }
 
@@ -315,10 +328,16 @@ export class WikiPageService {
       this.getRevisionOrThrow(toId),
     ]);
     if (from.characterId !== to.characterId) {
-      throw new NotFoundException('版本不属于同一词条');
+      throw new AppError('WIKI_PAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '版本不属于同一词条',
+      });
     }
     if (characterId !== '_' && to.characterId !== characterId) {
-      throw new NotFoundException('版本不属于当前词条');
+      throw new AppError('WIKI_PAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '版本不属于当前词条',
+      });
     }
     return { from, to };
   }

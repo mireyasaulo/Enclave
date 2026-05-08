@@ -1,9 +1,6 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, LessThan, Not, Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
@@ -37,13 +34,19 @@ export class WikiProtectionService {
     },
   ): Promise<CharacterPageEntity> {
     if (!VALID_LEVELS.has(input.level)) {
-      throw new BadRequestException('level 必须是 none / semi / full');
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: 'level 必须是 none / semi / full' },
+        legacyMessage: 'level 必须是 none / semi / full',
+      });
     }
     if (
       input.reviewPolicy !== undefined &&
       !VALID_REVIEW_POLICIES.has(input.reviewPolicy)
     ) {
-      throw new BadRequestException('reviewPolicy 必须是 open / pending_changes');
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: 'reviewPolicy 必须是 open / pending_changes' },
+        legacyMessage: 'reviewPolicy 必须是 open / pending_changes',
+      });
     }
     const page = await this.pages.getOrInitPage(characterId);
     const oldLevel = page.protectionLevel;

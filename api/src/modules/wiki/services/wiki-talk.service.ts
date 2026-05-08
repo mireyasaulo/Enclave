@@ -1,10 +1,6 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
@@ -35,7 +31,10 @@ export class WikiTalkService {
 
   async getThreadOrThrow(threadId: string): Promise<WikiTalkThreadEntity> {
     const t = await this.threadRepo.findOne({ where: { id: threadId } });
-    if (!t) throw new NotFoundException('讨论串不存在');
+    if (!t) throw new AppError('WIKI_TALK_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '讨论串不存在',
+      });
     return t;
   }
 
@@ -55,10 +54,19 @@ export class WikiTalkService {
     await this.assertCanTalk(user, characterId);
     const title = (input.title ?? '').trim();
     const body = (input.body ?? '').trim();
-    if (!title) throw new BadRequestException('标题不能为空');
-    if (!body) throw new BadRequestException('内容不能为空');
+    if (!title) throw new AppError('WIKI_TALK_INVALID_STATE', {
+        params: { detail: '标题不能为空' },
+        legacyMessage: '标题不能为空',
+      });
+    if (!body) throw new AppError('WIKI_TALK_INVALID_STATE', {
+        params: { detail: '内容不能为空' },
+        legacyMessage: '内容不能为空',
+      });
     if (title.length > 200) {
-      throw new BadRequestException('标题最长 200 字');
+      throw new AppError('WIKI_TALK_INVALID_STATE', {
+        params: { detail: '标题最长 200 字' },
+        legacyMessage: '标题最长 200 字',
+      });
     }
 
     return this.dataSource.transaction(async (manager) => {
@@ -90,17 +98,27 @@ export class WikiTalkService {
   ): Promise<WikiTalkPostEntity> {
     const thread = await this.getThreadOrThrow(threadId);
     if (thread.isLocked) {
-      throw new ForbiddenException('讨论串已锁定');
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: '讨论串已锁定' },
+        legacyMessage: '讨论串已锁定',
+      });
     }
     await this.assertCanTalk(user, thread.characterId);
     const body = (input.body ?? '').trim();
-    if (!body) throw new BadRequestException('回复内容不能为空');
+    if (!body) throw new AppError('WIKI_TALK_INVALID_STATE', {
+        params: { detail: '回复内容不能为空' },
+        legacyMessage: '回复内容不能为空',
+      });
     if (input.parentPostId) {
       const parent = await this.postRepo.findOne({
         where: { id: input.parentPostId },
       });
       if (!parent || parent.threadId !== threadId) {
-        throw new BadRequestException('parentPostId 无效');
+        throw new AppError('WIKI_TALK_INVALID_STATE', {
+        params: { detail: 'parentPostId 无效' },
+        legacyMessage: 'parentPostId 无效',
+      });
       }
     }
     return this.dataSource.transaction(async (manager) => {
@@ -129,7 +147,11 @@ export class WikiTalkService {
     input: { isLocked?: boolean; isResolved?: boolean },
   ): Promise<WikiTalkThreadEntity> {
     if (rankOf(actor.role) < rankOf('patroller')) {
-      throw new ForbiddenException('需要巡查员及以上权限');
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: '需要巡查员及以上权限' },
+        legacyMessage: '需要巡查员及以上权限',
+      });
     }
     const thread = await this.getThreadOrThrow(threadId);
     const patch: Partial<WikiTalkThreadEntity> = {};
@@ -146,11 +168,18 @@ export class WikiTalkService {
     actor: AuthenticatedUser,
   ): Promise<WikiTalkPostEntity> {
     const post = await this.postRepo.findOne({ where: { id: postId } });
-    if (!post) throw new NotFoundException('回复不存在');
+    if (!post) throw new AppError('WIKI_TALK_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '回复不存在',
+      });
     if (post.deletedAt) return post;
     const isOwner = post.authorId === actor.id;
     if (!isOwner && rankOf(actor.role) < rankOf('patroller')) {
-      throw new ForbiddenException('只能删除自己的回复（巡查员及以上可删除任意）');
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: '只能删除自己的回复（巡查员及以上可删除任意）' },
+        legacyMessage: '只能删除自己的回复（巡查员及以上可删除任意）',
+      });
     }
     await this.postRepo.update(
       { id: postId },
@@ -166,16 +195,28 @@ export class WikiTalkService {
     const blocks = await this.blocks.list({ active: true, userId: user.id });
     for (const b of blocks) {
       if (b.scope === 'global') {
-        throw new ForbiddenException(`你已被全站封禁：${b.reason}`);
+        throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: `你已被全站封禁：${b.reason}` },
+        legacyMessage: `你已被全站封禁：${b.reason}`,
+      });
       }
       if (b.scope === 'talk' && !b.targetCharacterId) {
-        throw new ForbiddenException(`你已被禁言：${b.reason}`);
+        throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: `你已被禁言：${b.reason}` },
+        legacyMessage: `你已被禁言：${b.reason}`,
+      });
       }
       if (
         b.scope === 'page' &&
         b.targetCharacterId === characterId
       ) {
-        throw new ForbiddenException(`你被禁止参与此词条：${b.reason}`);
+        throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: `你被禁止参与此词条：${b.reason}` },
+        legacyMessage: `你被禁止参与此词条：${b.reason}`,
+      });
       }
     }
   }

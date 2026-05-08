@@ -1,11 +1,6 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { ConfigService } from '@nestjs/config';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -90,17 +85,31 @@ export class WikiRoleService {
     input: { role: WikiRole; reason?: string },
   ): Promise<UserEntity> {
     if (!ROLES.includes(input.role)) {
-      throw new BadRequestException('role 必须是 newcomer / autoconfirmed / patroller / admin');
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: 'role 必须是 newcomer / autoconfirmed / patroller / admin' },
+        legacyMessage: 'role 必须是 newcomer / autoconfirmed / patroller / admin',
+      });
     }
     const user = await this.userRepo.findOne({ where: { id: targetUserId } });
-    if (!user) throw new NotFoundException('用户不存在');
+    if (!user) throw new AppError('WIKI_PAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '用户不存在',
+      });
     if (user.userType !== 'wiki_member' && input.role !== 'admin') {
-      throw new ForbiddenException('该用户非 wiki 成员，仅可保留为 admin 角色');
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: '该用户非 wiki 成员，仅可保留为 admin 角色' },
+        legacyMessage: '该用户非 wiki 成员，仅可保留为 admin 角色',
+      });
     }
     if (user.role === 'admin' && input.role !== 'admin') {
       const adminCount = await this.userRepo.count({ where: { role: 'admin' } });
       if (adminCount <= 1) {
-        throw new ForbiddenException('至少需要保留一名 wiki admin');
+        throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: '至少需要保留一名 wiki admin' },
+        legacyMessage: '至少需要保留一名 wiki admin',
+      });
       }
     }
     user.role = input.role;

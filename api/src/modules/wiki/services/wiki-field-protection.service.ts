@@ -1,11 +1,6 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
-import {
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
@@ -83,9 +78,13 @@ export class WikiFieldProtectionService implements OnModuleInit {
       if (!violated) continue;
       const minRank = rankOf(violated.minRole);
       if (userRank < minRank) {
-        throw new ForbiddenException(
-          `字段 ${violated.protectedPath} 受保护，至少需要 ${violated.minRole} 权限`,
-        );
+        throw new AppError('WIKI_FORBIDDEN', {
+          status: HttpStatus.FORBIDDEN,
+          params: {
+            reason: `字段 ${violated.protectedPath} 受保护，至少需要 ${violated.minRole} 权限`,
+          },
+          legacyMessage: `字段 ${violated.protectedPath} 受保护，至少需要 ${violated.minRole} 权限`,
+        });
       }
     }
   }
@@ -105,7 +104,10 @@ export class WikiFieldProtectionService implements OnModuleInit {
   ): Promise<WikiFieldProtectionEntity> {
     await this.repo.update({ id }, patch);
     const next = await this.repo.findOne({ where: { id } });
-    if (!next) throw new NotFoundException('字段保护策略不存在');
+    if (!next) throw new AppError('WIKI_PAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '字段保护策略不存在',
+      });
     return next;
   }
 
