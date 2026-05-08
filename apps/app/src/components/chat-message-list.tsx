@@ -1614,6 +1614,14 @@ export function ChatMessageList({
     const sourceId = buildFavoriteSourceId(message.id);
     const collected = favoriteSourceIds.includes(sourceId);
 
+    setFavoriteSourceIds((current) =>
+      collected
+        ? current.filter((id) => id !== sourceId)
+        : current.includes(sourceId)
+          ? current
+          : [sourceId, ...current],
+    );
+
     try {
       if (threadContext) {
         if (collected) {
@@ -1622,6 +1630,7 @@ export function ChatMessageList({
           const nextRemoteFavorites = await queryClient.fetchQuery({
             queryKey: ["app-favorites", baseUrl],
             queryFn: () => getFavorites(baseUrl),
+            staleTime: 0,
           });
           syncFavoriteSourceIds(nextRemoteFavorites);
           setActionNotice({
@@ -1642,6 +1651,7 @@ export function ChatMessageList({
         const nextRemoteFavorites = await queryClient.fetchQuery({
           queryKey: ["app-favorites", baseUrl],
           queryFn: () => getFavorites(baseUrl),
+          staleTime: 0,
         });
         syncFavoriteSourceIds(nextRemoteFavorites);
         setActionNotice({
@@ -1670,6 +1680,13 @@ export function ChatMessageList({
         tone: "success",
       });
     } catch (error) {
+      setFavoriteSourceIds((current) =>
+        collected
+          ? current.includes(sourceId)
+            ? current
+            : [sourceId, ...current]
+          : current.filter((id) => id !== sourceId),
+      );
       setActionNotice({
         message:
           error instanceof Error
@@ -2269,6 +2286,7 @@ export function ChatMessageList({
         const nextRemoteFavorites = await queryClient.fetchQuery({
           queryKey: ["app-favorites", baseUrl],
           queryFn: () => getFavorites(baseUrl),
+          staleTime: 0,
         });
         syncFavoriteSourceIds(nextRemoteFavorites);
       } else {
