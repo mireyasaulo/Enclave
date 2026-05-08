@@ -49,6 +49,18 @@ type AppLocaleProviderProps = {
   onLocaleChange?: (locale: SupportedLocale) => unknown | Promise<unknown>;
   preferredLocales?: readonly string[];
   surface: I18nAppSurface;
+  /**
+   * 渲染策略：
+   * - false（默认）：catalog 加载完之前显示 fallback，children 不渲染。
+   *   适合 admin / cloud-console / wiki 这种内部端，对首屏字数没要求。
+   * - true：立即渲染 children；catalog 还没到位时 lingui 会回落到源文 ID
+   *   （隐界 app 源文是 zh-CN 中文，所以 zh-CN 用户视觉上无差别；en/ja/ko
+   *   用户首屏会看到 0.3-1s 的中文 flash 然后切换到目标语言）。
+   *   好处是公网隧道下首屏不再被 100KB+ catalog 下载阻塞。
+   *   appI18n 在 i18n-instance.ts 已经做过 setupI18n + activate(DEFAULT_LOCALE,
+   *   {})，所以 i18n._() 在 catalog 到位前调用是安全的（返回源 ID）。
+   */
+  renderBeforeReady?: boolean;
 };
 
 const AppLocaleContext = createContext<AppLocaleContextValue | null>(null);
@@ -60,6 +72,7 @@ export function AppLocaleProvider({
   onLocaleChange,
   preferredLocales,
   surface,
+  renderBeforeReady = false,
 }: AppLocaleProviderProps) {
   const initialLocale = useMemo(() => {
     const queryLocale = readQueryLocale();
@@ -226,10 +239,16 @@ export function AppLocaleProvider({
     ],
   );
 
+  // renderBeforeReady=true 时让 children 立即出来；catalog 到位后 React 会
+  // 因为 activationVersion 增加 + locale state 更新自动重渲染，把源 ID 替换
+  // 成目标 locale。textDictionary 此时是空 Map，DomTextLocalizer 在空表上
+  // 是 no-op，安全。
+  const shouldRenderChildren = isReady || renderBeforeReady;
+
   return (
     <AppLocaleContext.Provider value={contextValue}>
       <I18nProvider i18n={appI18n}>
-        {isReady ? (
+        {shouldRenderChildren ? (
           <>
             <DomTextLocalizer
               dictionary={textDictionary}

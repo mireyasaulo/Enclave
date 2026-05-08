@@ -121,6 +121,12 @@ async function bootstrap() {
         initialLocale={initialLocale ?? null}
         onLocaleChange={handleLocaleChange}
         preferredLocales={preferredLocales}
+        // 公网隧道下 i18n 主 catalog ~106KB gzipped、过隧道 0.3-1s。原本 catalog
+        // 没回来时整棵 React 树都被 fallback=<BootstrapScreen /> 卡住。renderBe
+        // foreReady=true 让 children 立即渲染，catalog 到位再无缝替换：源 ID
+        // 是中文，zh-CN 用户视觉无差别；en/ja/ko 用户首屏看到 ~0.3-1s 中文
+        // flash 然后切回目标语言，是可接受的代价。
+        renderBeforeReady
       >
         <NativeLocaleSync
           syncDesktopLocaleOnMount={Boolean(explicitWebLocalePreference)}
