@@ -4110,21 +4110,6 @@ describe("cloud-console interactions", () => {
     expect(screen.queryByText("Dashboard retry failed.")).toBeNull();
   });
 
-  it("opens worlds views from dashboard fleet cards", async () => {
-    renderRoute("/");
-
-    expect(await screen.findByText("Instance pool")).toBeTruthy();
-
-    fireEvent.click(
-      await screen.findByRole("link", {
-        name: "Filter worlds by running instances",
-      }),
-    );
-
-    expect(await screen.findByText("Managed worlds")).toBeTruthy();
-    expect(screen.getByDisplayValue("power: running")).toBeTruthy();
-  });
-
   it("opens filtered worlds from attention queue shortcuts", async () => {
     renderRoute("/");
 

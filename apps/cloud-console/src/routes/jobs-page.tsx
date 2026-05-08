@@ -72,7 +72,13 @@ import {
   performWorldLifecycleActionWithMeta,
   type WorldLifecycleAction,
 } from "../lib/world-lifecycle-actions";
-import { SurfaceCard } from "../components/ui";
+import {
+  FilterAdvanced,
+  FilterBar,
+  FilterSearch,
+  FilterSelect,
+  SurfaceCard,
+} from "../components/ui";
 
 const UNASSIGNED_PROVIDER_FILTER = "__unassigned__";
 
@@ -472,25 +478,16 @@ export function JobsPage() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => void copyJobsPermalink()}
-            className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:bg-[color:var(--surface-soft)]"
-          >
-            {t("Copy jobs permalink")}
-          </button>
-
-          <input
+        <FilterBar>
+          <FilterSearch
             value={query}
             onChange={(event) =>
               updateFilters({ query: event.target.value, page: 1 })
             }
             placeholder={t("Search world, phone, job, lease...")}
-            className="min-w-[16rem] rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)] placeholder:text-[color:var(--text-muted)]"
           />
 
-          <select
+          <FilterSelect
             value={status}
             onChange={(event) =>
               updateFilters({
@@ -498,16 +495,15 @@ export function JobsPage() {
                 page: 1,
               })
             }
-            className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)]"
           >
             {JOB_STATUS_FILTERS.map((item) => (
               <option key={item} value={item}>
                 status: {item}
               </option>
             ))}
-          </select>
+          </FilterSelect>
 
-          <select
+          <FilterSelect
             value={jobType}
             onChange={(event) =>
               updateFilters({
@@ -515,31 +511,15 @@ export function JobsPage() {
                 page: 1,
               })
             }
-            className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)]"
           >
             {JOB_TYPE_FILTERS.map((item) => (
               <option key={item} value={item}>
                 type: {item}
               </option>
-              ))}
-          </select>
-
-          <select
-            value={providerFilter}
-            onChange={(event) =>
-              updateFilters({ provider: event.target.value, page: 1 })
-            }
-            className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)]"
-          >
-            <option value="all">provider: all</option>
-            {providerOptions.map((provider) => (
-              <option key={provider.key} value={provider.key}>
-                provider: {provider.label}
-              </option>
             ))}
-          </select>
+          </FilterSelect>
 
-          <select
+          <FilterSelect
             value={queueStateFilter}
             onChange={(event) =>
               updateFilters({
@@ -547,100 +527,118 @@ export function JobsPage() {
                 page: 1,
               })
             }
-            className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)]"
+          >
+            {getQueueStateFilters().map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
+          </FilterSelect>
+
+          <FilterAdvanced summary={t("More filters")}>
+            <button
+              type="button"
+              onClick={() => void copyJobsPermalink()}
+              className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)] hover:bg-[color:var(--surface-soft)]"
             >
-              {getQueueStateFilters().map((item) => (
-                <option key={item.value} value={item.value}>
-                  {item.label}
+              {t("Copy jobs permalink")}
+            </button>
+
+            <FilterSelect
+              value={providerFilter}
+              onChange={(event) =>
+                updateFilters({ provider: event.target.value, page: 1 })
+              }
+            >
+              <option value="all">provider: all</option>
+              {providerOptions.map((provider) => (
+                <option key={provider.key} value={provider.key}>
+                  provider: {provider.label}
                 </option>
               ))}
-          </select>
+            </FilterSelect>
 
-          <select
-            value={auditFilter}
-            onChange={(event) =>
-              updateFilters({
-                audit: event.target.value as JobAuditFilter,
-                page: 1,
-              })
-            }
-            className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)]"
-          >
-            {JOB_AUDIT_FILTERS.map((item) => (
-              <option key={item} value={item}>
-                audit: {item}
-              </option>
-            ))}
-          </select>
+            <FilterSelect
+              value={auditFilter}
+              onChange={(event) =>
+                updateFilters({
+                  audit: event.target.value as JobAuditFilter,
+                  page: 1,
+                })
+              }
+            >
+              {JOB_AUDIT_FILTERS.map((item) => (
+                <option key={item} value={item}>
+                  audit: {item}
+                </option>
+              ))}
+            </FilterSelect>
 
-          <select
-            value={supersededByFilter}
-            onChange={(event) =>
-              updateFilters({
-                supersededBy: event.target.value as JobSupersededByFilter,
-                page: 1,
-              })
-            }
-            className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)]"
-          >
-            {JOB_SUPERSEDED_BY_FILTERS.map((item) => (
-              <option key={item} value={item}>
-                superseded by: {item}
-              </option>
-            ))}
-          </select>
+            <FilterSelect
+              value={supersededByFilter}
+              onChange={(event) =>
+                updateFilters({
+                  supersededBy: event.target.value as JobSupersededByFilter,
+                  page: 1,
+                })
+              }
+            >
+              {JOB_SUPERSEDED_BY_FILTERS.map((item) => (
+                <option key={item} value={item}>
+                  superseded by: {item}
+                </option>
+              ))}
+            </FilterSelect>
 
-          <select
-            value={sortBy}
-            onChange={(event) =>
-              updateFilters({
-                sortBy: event.target.value as JobSortFieldFilter,
-                page: 1,
-              })
-            }
-            className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)]"
-          >
-            {JOB_SORT_FIELDS.map((item) => (
-              <option key={item} value={item}>
-                sort by: {item}
-              </option>
-            ))}
-          </select>
+            <FilterSelect
+              value={sortBy}
+              onChange={(event) =>
+                updateFilters({
+                  sortBy: event.target.value as JobSortFieldFilter,
+                  page: 1,
+                })
+              }
+            >
+              {JOB_SORT_FIELDS.map((item) => (
+                <option key={item} value={item}>
+                  sort by: {item}
+                </option>
+              ))}
+            </FilterSelect>
 
-          <select
-            value={sortDirection}
-            onChange={(event) =>
-              updateFilters({
-                sortDirection: event.target.value as JobSortDirectionFilter,
-                page: 1,
-              })
-            }
-            className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)]"
-          >
-            {JOB_SORT_DIRECTIONS.map((item) => (
-              <option key={item} value={item}>
-                direction: {item}
-              </option>
-            ))}
-          </select>
+            <FilterSelect
+              value={sortDirection}
+              onChange={(event) =>
+                updateFilters({
+                  sortDirection: event.target.value as JobSortDirectionFilter,
+                  page: 1,
+                })
+              }
+            >
+              {JOB_SORT_DIRECTIONS.map((item) => (
+                <option key={item} value={item}>
+                  direction: {item}
+                </option>
+              ))}
+            </FilterSelect>
 
-          <select
-            value={String(pageSize)}
-            onChange={(event) =>
-              updateFilters({
-                page: 1,
-                pageSize: Number(event.target.value),
-              })
-            }
-            className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)]"
-          >
-            {JOB_PAGE_SIZE_OPTIONS.map((item) => (
-              <option key={item} value={item}>
-                {formatCloudConsolePageSize(item, locale)}
-              </option>
-            ))}
-          </select>
-        </div>
+            <FilterSelect
+              value={String(pageSize)}
+              onChange={(event) =>
+                updateFilters({
+                  page: 1,
+                  pageSize: Number(event.target.value),
+                })
+              }
+            >
+              {JOB_PAGE_SIZE_OPTIONS.map((item) => (
+                <option key={item} value={item}>
+                  {formatCloudConsolePageSize(item, locale)}
+                </option>
+              ))}
+            </FilterSelect>
+          </FilterAdvanced>
+        </FilterBar>
       </div>
 
       {worldId ? (

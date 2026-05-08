@@ -9,7 +9,6 @@ import type {
   WorldLifecycleJobSummary,
 } from "@yinjie/contracts";
 import {
-  compareByLocale,
   formatDateTime as formatLocaleDateTime,
   useAppLocale,
 } from "@yinjie/i18n";
@@ -25,12 +24,9 @@ import { WorldLifecycleActionButtons } from "../components/world-lifecycle-actio
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import {
   formatCloudConsoleLastGeneratedAt,
-  formatCloudConsoleProviderRunningError,
-  formatCloudConsoleProviderWorldsCount,
   translateCloudConsoleTextForActiveLocale,
   useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
-import { localizeProviderLabel } from "../lib/provider-i18n";
 import { resolveQueueState } from "../lib/job-queue-state";
 import { describeJobResult, getJobAuditBadgeLabel } from "../lib/job-result";
 import { buildCompactJobsRouteSearch } from "../lib/job-route-search";
@@ -54,7 +50,6 @@ import {
 import {
   buildCompactWorldsRouteSearch,
   buildWorldsRouteSearch,
-  UNASSIGNED_PROVIDER_FILTER,
 } from "../lib/world-route-search";
 
 function getMetricTone(value: number) {
@@ -242,83 +237,6 @@ export function DashboardPage() {
     () => buildProviderLabelMap(providersQuery.data),
     [providersQuery.data],
   );
-  const fleetSummary = useMemo(() => {
-    const summary = {
-      running: 0,
-      stopped: 0,
-      error: 0,
-      absent: 0,
-      assignedProviders: new Set<string>(),
-      unassignedWorlds: 0,
-    };
-
-    for (const item of fleetItems) {
-      const powerState = resolvePowerState(item);
-      if (powerState === "running") {
-        summary.running += 1;
-      } else if (powerState === "stopped") {
-        summary.stopped += 1;
-      } else if (powerState === "error") {
-        summary.error += 1;
-      } else if (powerState === "absent") {
-        summary.absent += 1;
-      }
-
-      const providerKey = resolveProviderKey(item);
-      if (providerKey) {
-        summary.assignedProviders.add(providerKey);
-      } else {
-        summary.unassignedWorlds += 1;
-      }
-    }
-
-    return summary;
-  }, [fleetItems]);
-  const providerSummary = useMemo(() => {
-    const summaryByProvider = new Map<
-      string,
-      {
-        key: string;
-        label: string;
-        worlds: number;
-        running: number;
-        error: number;
-      }
-    >();
-
-    for (const item of fleetItems) {
-      const providerKey = resolveProviderKey(item) || "__unassigned__";
-      const label =
-        providerKey === "__unassigned__"
-          ? t("Unassigned")
-          : (providerLabelByKey.get(providerKey) ?? providerKey);
-      const powerState = resolvePowerState(item);
-      const entry = summaryByProvider.get(providerKey) ?? {
-        key: providerKey,
-        label,
-        worlds: 0,
-        running: 0,
-        error: 0,
-      };
-
-      entry.worlds += 1;
-      if (powerState === "running") {
-        entry.running += 1;
-      }
-      if (powerState === "error") {
-        entry.error += 1;
-      }
-
-      summaryByProvider.set(providerKey, entry);
-    }
-
-    return [...summaryByProvider.values()]
-      .sort(
-        (left, right) =>
-          right.worlds - left.worlds || compareByLocale(left.label, right.label),
-      )
-      .slice(0, 4);
-  }, [fleetItems, providerLabelByKey]);
   const fleetMetaByWorldId = useMemo(
     () =>
       new Map(
@@ -517,204 +435,6 @@ export function DashboardPage() {
             ))}
           </div>
         ) : null}
-
-        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <WorldsPermalinkLink
-            search={buildCompactWorldsRouteSearch({ status: "ready" })}
-            aria-label={t("Filter worlds by ready status")}
-            className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 transition hover:border-[color:var(--border-strong)]"
-          >
-            <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              {t("Ready worlds")}
-            </div>
-            <div
-              className={`mt-3 text-3xl font-semibold ${getMetricTone(
-                driftSummary?.readyWorlds ?? 0,
-              )}`}
-            >
-              {driftSummary?.readyWorlds ?? 0}
-            </div>
-            <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-              Total fleet: {driftSummary?.totalWorlds ?? 0}
-            </div>
-          </WorldsPermalinkLink>
-
-          <WorldsPermalinkLink
-            search={buildCompactWorldsRouteSearch({ attention: "critical" })}
-            aria-label={t("Filter worlds by critical attention")}
-            className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 transition hover:border-[color:var(--border-strong)]"
-          >
-            <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              {t("Critical attention")}
-            </div>
-            <div
-              className={`mt-3 text-3xl font-semibold ${getMetricTone(
-                driftSummary?.criticalAttentionWorlds ?? 0,
-              )}`}
-            >
-              {driftSummary?.criticalAttentionWorlds ?? 0}
-            </div>
-            <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-              Warning: {driftSummary?.warningAttentionWorlds ?? 0}
-            </div>
-          </WorldsPermalinkLink>
-
-          <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-            <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              {t("Recovery queued")}
-            </div>
-            <div
-              className={`mt-3 text-3xl font-semibold ${getMetricTone(
-                driftSummary?.recoveryQueuedWorlds ?? 0,
-              )}`}
-            >
-              {driftSummary?.recoveryQueuedWorlds ?? 0}
-            </div>
-            <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-              Heartbeat stale: {driftSummary?.heartbeatStaleWorlds ?? 0}
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-            <div className="text-xs uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
-              {t("Provider drift")}
-            </div>
-            <div
-              className={`mt-3 text-3xl font-semibold ${getMetricTone(
-                driftSummary?.providerDriftWorlds ?? 0,
-              )}`}
-            >
-              {driftSummary?.providerDriftWorlds ?? 0}
-            </div>
-            <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-              Failed: {driftSummary?.failedWorlds ?? 0}
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-5 grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                {t("Instance pool")}
-              </div>
-              <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                {fleetItems.length} worlds
-              </div>
-            </div>
-
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <WorldsPermalinkLink
-                search={buildCompactWorldsRouteSearch({ powerState: "running" })}
-                aria-label={t("Filter worlds by running instances")}
-                className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 transition hover:border-[color:var(--border-strong)]"
-              >
-                <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                  {t("Running")}
-                </div>
-                <div className={`mt-2 text-2xl font-semibold ${getMetricTone(fleetSummary.running)}`}>
-                  {fleetSummary.running}
-                </div>
-              </WorldsPermalinkLink>
-              <WorldsPermalinkLink
-                search={buildCompactWorldsRouteSearch({ powerState: "stopped" })}
-                aria-label={t("Filter worlds by stopped instances")}
-                className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 transition hover:border-[color:var(--border-strong)]"
-              >
-                <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                  {t("Stopped")}
-                </div>
-                <div className={`mt-2 text-2xl font-semibold ${getMetricTone(fleetSummary.stopped)}`}>
-                  {fleetSummary.stopped}
-                </div>
-              </WorldsPermalinkLink>
-              <WorldsPermalinkLink
-                search={buildCompactWorldsRouteSearch({ powerState: "error" })}
-                aria-label={t("Filter worlds by error instances")}
-                className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 transition hover:border-[color:var(--border-strong)]"
-              >
-                <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                  {t("Error")}
-                </div>
-                <div className={`mt-2 text-2xl font-semibold ${getMetricTone(fleetSummary.error)}`}>
-                  {fleetSummary.error}
-                </div>
-              </WorldsPermalinkLink>
-              <WorldsPermalinkLink
-                search={buildCompactWorldsRouteSearch({
-                  provider: UNASSIGNED_PROVIDER_FILTER,
-                })}
-                aria-label={t("Filter worlds by unassigned provider")}
-                className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 transition hover:border-[color:var(--border-strong)]"
-              >
-                <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                  {t("Unassigned")}
-                </div>
-                <div
-                  className={`mt-2 text-2xl font-semibold ${getMetricTone(fleetSummary.unassignedWorlds)}`}
-                >
-                  {fleetSummary.unassignedWorlds}
-                </div>
-              </WorldsPermalinkLink>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                {t("Provider spread")}
-              </div>
-              <div className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                {fleetSummary.assignedProviders.size} active providers
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-3">
-              {providerSummary.map((provider) => {
-                const localizedProviderLabel = localizeProviderLabel(
-                  provider.key,
-                  provider.label,
-                  locale,
-                );
-                return (
-                  <WorldsPermalinkLink
-                    key={provider.key}
-                    search={buildCompactWorldsRouteSearch({
-                      provider: provider.key,
-                    })}
-                    aria-label={`${t("Filter worlds by provider")} ${localizedProviderLabel}`}
-                    className="block rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 transition hover:border-[color:var(--border-strong)]"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="text-sm text-[color:var(--text-primary)]">
-                        {localizedProviderLabel}
-                      </div>
-                      <div className="text-xs text-[color:var(--text-muted)]">
-                        {formatCloudConsoleProviderWorldsCount(
-                          provider.worlds,
-                          locale,
-                        )}
-                      </div>
-                    </div>
-                    <div className="mt-2 text-xs text-[color:var(--text-secondary)]">
-                      {formatCloudConsoleProviderRunningError(
-                        provider.running,
-                        provider.error,
-                        locale,
-                      )}
-                    </div>
-                  </WorldsPermalinkLink>
-                );
-              })}
-
-              {!instanceFleetQuery.isLoading && providerSummary.length === 0 ? (
-                <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 text-sm text-[color:var(--text-muted)]">
-                  {t("No provider allocation data yet.")}
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </div>
 
         <div className="mt-4 text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
           {formatCloudConsoleLastGeneratedAt(
