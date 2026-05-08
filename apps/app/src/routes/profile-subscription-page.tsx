@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import QRCode from "qrcode";
 import {
   createCheckout,
@@ -18,6 +19,7 @@ import {
   InlineNotice,
   LoadingBlock,
 } from "@yinjie/ui";
+import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { CheckoutContactDialog } from "../features/subscription/checkout-contact-dialog";
 import { clearCloudRuntimeSession } from "../lib/cloud-session";
@@ -417,10 +419,10 @@ export function ProfileSubscriptionPage() {
   const error =
     profileQuery.error ?? subscriptionQuery.error ?? inviteQuery.error ?? null;
 
-  function handleCloudLogout() {
-    clearCloudRuntimeSession();
-    void navigate({ to: "/welcome", replace: true });
-  }
+  const goBackToSettings = () =>
+    void navigate({
+      to: isDesktopLayout ? "/desktop/settings" : "/profile/settings",
+    });
 
   if (!accessToken) {
     return null;
@@ -470,6 +472,23 @@ export function ProfileSubscriptionPage() {
         paddingBottom: "max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 1.5rem))",
       }}
     >
+      {!isDesktopLayout ? (
+        <TabPageTopBar
+          title={t(msg`会员中心`)}
+          titleAlign="center"
+          leftActions={
+            <Button
+              onClick={goBackToSettings}
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none active:bg-black/[0.05]"
+              aria-label={t(msg`返回设置`)}
+            >
+              <ArrowLeft size={17} />
+            </Button>
+          }
+        />
+      ) : null}
       <div className="mx-auto flex max-w-4xl flex-col gap-4">
         <AppSection className="overflow-hidden rounded-[28px] border-black/5 bg-[linear-gradient(135deg,#f7fff8,#ffffff)] px-6 py-6 shadow-none">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -491,28 +510,17 @@ export function ProfileSubscriptionPage() {
                 {t(msg`到期时间`)}: {expiresLabel}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="secondary"
-                className="rounded-2xl border-[color:var(--border-faint)] bg-white shadow-none"
-                onClick={() =>
-                  void navigate({
-                    to: isDesktopLayout
-                      ? "/desktop/settings"
-                      : "/profile/settings",
-                  })
-                }
-              >
-                {t(msg`返回设置`)}
-              </Button>
-              <Button
-                variant="secondary"
-                className="rounded-2xl border-[rgba(220,38,38,0.14)] bg-white text-[#b42318] shadow-none hover:bg-[#fff5f5]"
-                onClick={handleCloudLogout}
-              >
-                {t(msg`退出登录`)}
-              </Button>
-            </div>
+            {isDesktopLayout ? (
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="secondary"
+                  className="rounded-2xl border-[color:var(--border-faint)] bg-white shadow-none"
+                  onClick={goBackToSettings}
+                >
+                  {t(msg`返回设置`)}
+                </Button>
+              </div>
+            ) : null}
           </div>
           {subscription.copy.welcomePromoBanner ? (
             <InlineNotice className="mt-4" tone="success">
