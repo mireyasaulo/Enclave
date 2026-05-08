@@ -1857,6 +1857,7 @@ export class AiOrchestratorService {
       profile.memory?.forgettingCurve,
     );
     const includedHistory = conversationHistory.slice(-historyWindow);
+    const finalLanguageReminder = await this.worldLanguage.buildFinalReminder();
     const requestMessages: Array<{
       role: 'system' | 'user' | 'assistant';
       content: string;
@@ -1874,6 +1875,10 @@ export class AiOrchestratorService {
           ? `[${message.characterId}]: ${message.content}`
           : message.content,
       })),
+      {
+        role: 'system',
+        content: finalLanguageReminder,
+      },
       {
         role: 'user',
         content: userMessage,
