@@ -750,6 +750,7 @@ msgstr "{kindLabel}のダウンロードを開始しました。"
 msgid "{label} 已复制到剪贴板，可发送到手机继续。"
 msgstr "{label} をクリップボードにコピーしました。スマホに送って続けられます。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:179
 #: apps/app/src/routes/desktop-mobile-page.tsx:2180
 msgid "{launchCount} 次"
 msgstr "{launchCount} 回"
@@ -1218,6 +1219,7 @@ msgstr "最終送信者: {0}"
 
 #. placeholder {0}: formatConversationTimestamp( lastOpenedAtById[miniProgram.id], )
 #. placeholder {0}: formatConversationTimestamp(lastOpenedAt)
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:182
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:332
 #: apps/app/src/routes/desktop-mobile-page.tsx:2192
 msgid "上次打开 {0}"
@@ -2727,6 +2729,7 @@ msgstr "関係管理"
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:166
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:215
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:125
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:147
 #: apps/app/src/features/shell/desktop-shell.tsx:676
 #: apps/app/src/i18n/static-dom-seed.ts:855
 #: apps/app/src/routes/live-companion-page.tsx:873
@@ -3068,6 +3071,7 @@ msgstr "過去7日"
 msgid "最近{categoryLabel} · {count} 条"
 msgstr "最近の{categoryLabel} · {count}件"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:121
 #: apps/app/src/i18n/static-dom-seed.ts:162
 #: apps/app/src/i18n/static-dom-seed.ts:898
 msgid "最近一次打开的小程序面板"
@@ -3800,6 +3804,7 @@ msgstr "{0} に参加"
 msgid "加入常用"
 msgstr "よく使うに追加"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:315
 #: apps/app/src/i18n/static-dom-seed.ts:913
 msgid "加入我的小程序"
 msgstr "マイミニプログラムに追加"
@@ -4049,6 +4054,7 @@ msgstr "最近の会話に送信する"
 msgid "发到广场后，世界里的居民都可能看到、点赞，甚至继续接话。"
 msgstr "広場に投稿すると、世界の住民が見たり、いいねしたり、会話を続けたりできます。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:94
 #: apps/app/src/i18n/static-dom-seed.ts:127
 #: apps/app/src/routes/group-qr-page.tsx:1354
 msgid "发到手机"
@@ -4972,6 +4978,7 @@ msgstr "コピー"
 msgid "复制位置"
 msgstr ""
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:93
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:303
 #: apps/app/src/i18n/static-dom-seed.ts:77
 msgid "复制入口"
@@ -5506,6 +5513,7 @@ msgstr "ミニプログラムパネル"
 msgid "小程序面板里还没有可同步到手机的最近使用。"
 msgstr "ミニプログラムパネルには、まだスマホへ同期できる最近の利用がありません。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:173
 #: apps/app/src/i18n/static-dom-seed.ts:903
 msgid "尚未加入我的小程序"
 msgstr "まだマイミニプログラムに追加されていません"
@@ -5748,6 +5756,7 @@ msgstr "ライブ引き継ぎ内容を更新しました。"
 msgid "已加入"
 msgstr "追加済み"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:173
 #: apps/app/src/i18n/static-dom-seed.ts:165
 #: apps/app/src/i18n/static-dom-seed.ts:902
 msgid "已加入常用入口"
@@ -5888,6 +5897,7 @@ msgid "已复制邮箱"
 msgstr ""
 
 #: apps/app/src/components/chat-message-list.tsx:5327
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:254
 #: apps/app/src/i18n/static-dom-seed.ts:272
 #: apps/app/src/i18n/static-dom-seed.ts:908
 msgid "已完成"
@@ -5958,6 +5968,7 @@ msgstr "グループ通知をサイレントにしました。"
 msgid "已录制"
 msgstr "録音済み"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:118
 #: apps/app/src/i18n/static-dom-seed.ts:161
 #: apps/app/src/i18n/static-dom-seed.ts:896
 msgid "已打开"
@@ -6791,22 +6802,26 @@ msgstr "今はデスクトップのローカル履歴を残し、実ライブAPI
 msgid "当前先由游戏中心工作区承接会话，后续再接真实小游戏容器。"
 msgstr "現在はゲームセンター作業区でセッションを受け、後で実際のミニゲーム容器を接続します。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:78
 #: apps/app/src/i18n/static-dom-seed.ts:277
 #: apps/app/src/i18n/static-dom-seed.ts:894
 msgid "当前先由轻工作台承接上下文，也可以直接发到手机继续处理。"
 msgstr "現在は軽量作業台で文脈を受け、スマホに送って続けられます。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:77
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:298
 #: apps/app/src/i18n/static-dom-seed.ts:377
 #: apps/app/src/i18n/static-dom-seed.ts:893
 msgid "当前先由轻工作台承接上下文，也可以直接复制入口链接继续使用。"
 msgstr "現在は軽量作業台で文脈を受け、入口リンクをコピーして続けられます。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:75
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:297
 #: apps/app/src/i18n/static-dom-seed.ts:892
 msgid "当前先由轻工作台承接上下文，也可以直接通过系统分享发给联系人或其他应用。"
 msgstr "現在はライトワークスペースで文脈を引き継ぎます。システム共有で連絡先や他のアプリへ送ることもできます。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:326
 #: apps/app/src/i18n/static-dom-seed.ts:914
 msgid "当前先由轻工作台承接上下文。"
 msgstr "現在はライトワークスペースで文脈を引き継ぎます。"
@@ -6948,6 +6963,7 @@ msgstr "現在のインスタンス状態"
 msgid "当前小程序工作台"
 msgstr "現在のミニプログラムワークスペース"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:216
 #: apps/app/src/i18n/static-dom-seed.ts:167
 #: apps/app/src/i18n/static-dom-seed.ts:906
 msgid "当前工作台"
@@ -7127,6 +7143,7 @@ msgstr "このメッセージはまだ部分引用に対応していません。
 
 #: apps/app/src/components/chat-message-list.tsx:5629
 #: apps/app/src/components/chat-message-list.tsx:5836
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:166
 #: apps/app/src/i18n/static-dom-seed.ts:163
 #: apps/app/src/i18n/static-dom-seed.ts:900
 #: apps/app/src/routes/character-detail-page.tsx:307
@@ -7545,6 +7562,7 @@ msgstr "配信待ち"
 msgid "待恢复"
 msgstr "復旧待ち"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:118
 #: apps/app/src/i18n/static-dom-seed.ts:897
 msgid "待打开"
 msgstr "未オープン"
@@ -7761,6 +7779,7 @@ msgstr "自分の投稿"
 msgid "我的发言"
 msgstr "自分の投稿"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:172
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:347
 #: apps/app/src/i18n/static-dom-seed.ts:164
 #: apps/app/src/i18n/static-dom-seed.ts:361
@@ -7953,15 +7972,18 @@ msgstr "開くとまず処理中の事項と最新の受領確認を表示しま
 msgid "打开后会先落在今日时间轴，方便继续处理刚才没做完的事。"
 msgstr "開くと今日のタイムラインに入り、未完了の作業を続けやすくします。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:327
 #: apps/app/src/i18n/static-dom-seed.ts:915
 msgid "打开后会同步更新最近使用、打开次数和当前承接面板。"
 msgstr "開くと最近使用、起動回数、現在の引き継ぎパネルが更新されます。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:224
 #: apps/app/src/i18n/static-dom-seed.ts:270
 #: apps/app/src/i18n/static-dom-seed.ts:907
 msgid "打开后先承接一组本地待办，让这个面板不只是一次“已打开”的记录。"
 msgstr "開くとローカルタスクを受け、単なる開封記録にしません。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:292
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:267
 #: apps/app/src/i18n/static-dom-seed.ts:159
 #: apps/app/src/i18n/static-dom-seed.ts:911
@@ -8130,6 +8152,7 @@ msgstr "グループチャットを開いて最近のメッセージを表示し
 msgid "打开订阅号消息"
 msgstr "購読アカウントメッセージを開く"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:178
 #: apps/app/src/i18n/static-dom-seed.ts:166
 #: apps/app/src/i18n/static-dom-seed.ts:904
 msgid "打开记录"
@@ -8971,6 +8994,7 @@ msgstr ""
 msgid "撤回失败，请稍后再试。"
 msgstr "取り消しに失敗しました。後でもう一度お試しください。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:277
 #: apps/app/src/i18n/static-dom-seed.ts:909
 #: apps/app/src/routes/chat-list-page.tsx:691
 msgid "撤销"
@@ -12310,6 +12334,7 @@ msgstr ""
 msgid "点击右上角“新建笔记”，把第一条收藏笔记写下来。"
 msgstr "右上の「新規ノート」をクリックして、最初のお気に入りノートを書いてください。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:121
 #: apps/app/src/i18n/static-dom-seed.ts:899
 msgid "点击后写入最近使用和打开态"
 msgstr "クリックすると最近使用とオープン状態を更新します"
@@ -12971,6 +12996,7 @@ msgstr "解除すると通常の連絡とやり取りに戻ります。"
 msgid "移出常用"
 msgstr "よく使うから削除"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:315
 #: apps/app/src/i18n/static-dom-seed.ts:169
 #: apps/app/src/i18n/static-dom-seed.ts:912
 msgid "移出我的小程序"
@@ -13456,6 +13482,7 @@ msgstr "システム"
 #: apps/app/src/components/chat-message-list.tsx:4162
 #: apps/app/src/components/chat-message-list.tsx:6245
 #: apps/app/src/components/chat-message-list.tsx:6380
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:91
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:303
 #: apps/app/src/features/subscription/subscription-panel.tsx:276
 #: apps/app/src/i18n/static-dom-seed.ts:895
@@ -13642,10 +13669,16 @@ msgstr "友だちの備考名を設定"
 msgid "给联系人设置备注名"
 msgstr "連絡先の備考名を設定"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:292
 #: apps/app/src/i18n/static-dom-seed.ts:168
 #: apps/app/src/i18n/static-dom-seed.ts:910
 msgid "继续使用"
 msgstr "続けて使う"
+
+#. placeholder {0}: miniProgram.name
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:130
+msgid "继续使用 {0}"
+msgstr "{0} を続けて使う"
 
 #: apps/app/src/i18n/static-dom-seed.ts:477
 msgid "继续使用会回到最近那个接龙，优先展示未确认成员。"
@@ -15734,6 +15767,7 @@ msgstr "まだ {0} はありません"
 msgid "还没有互动"
 msgstr "まだ反応はありません"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:183
 #: apps/app/src/i18n/static-dom-seed.ts:905
 msgid "还没有使用过"
 msgstr "まだ使用していません"

@@ -752,6 +752,7 @@ msgstr "{kindLabel}开始下载。"
 msgid "{label} 已复制到剪贴板，可发送到手机继续。"
 msgstr "{label} 已复制到剪贴板，可发送到手机继续。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:179
 #: apps/app/src/routes/desktop-mobile-page.tsx:2180
 msgid "{launchCount} 次"
 msgstr "{launchCount} 次"
@@ -1220,6 +1221,7 @@ msgstr "上次发送于 {0}"
 
 #. placeholder {0}: formatConversationTimestamp( lastOpenedAtById[miniProgram.id], )
 #. placeholder {0}: formatConversationTimestamp(lastOpenedAt)
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:182
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:332
 #: apps/app/src/routes/desktop-mobile-page.tsx:2192
 msgid "上次打开 {0}"
@@ -2729,6 +2731,7 @@ msgstr "关系管理"
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:166
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:215
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:125
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:147
 #: apps/app/src/features/shell/desktop-shell.tsx:676
 #: apps/app/src/i18n/static-dom-seed.ts:855
 #: apps/app/src/routes/live-companion-page.tsx:873
@@ -3070,6 +3073,7 @@ msgstr "最近 7 天"
 msgid "最近{categoryLabel} · {count} 条"
 msgstr "最近{categoryLabel} · {count} 条"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:121
 #: apps/app/src/i18n/static-dom-seed.ts:162
 #: apps/app/src/i18n/static-dom-seed.ts:898
 msgid "最近一次打开的小程序面板"
@@ -3802,6 +3806,7 @@ msgstr "加入于 {0}"
 msgid "加入常用"
 msgstr "加入常用"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:315
 #: apps/app/src/i18n/static-dom-seed.ts:913
 msgid "加入我的小程序"
 msgstr "加入我的小程序"
@@ -4051,6 +4056,7 @@ msgstr "发到最近会话"
 msgid "发到广场后，世界里的居民都可能看到、点赞，甚至继续接话。"
 msgstr "发到广场后，世界里的居民都可能看到、点赞，甚至继续接话。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:94
 #: apps/app/src/i18n/static-dom-seed.ts:127
 #: apps/app/src/routes/group-qr-page.tsx:1354
 msgid "发到手机"
@@ -4974,6 +4980,7 @@ msgstr "复制"
 msgid "复制位置"
 msgstr "复制位置"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:93
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:303
 #: apps/app/src/i18n/static-dom-seed.ts:77
 msgid "复制入口"
@@ -5508,6 +5515,7 @@ msgstr "小程序面板"
 msgid "小程序面板里还没有可同步到手机的最近使用。"
 msgstr "小程序面板里还没有可同步到手机的最近使用。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:173
 #: apps/app/src/i18n/static-dom-seed.ts:903
 msgid "尚未加入我的小程序"
 msgstr "尚未加入我的小程序"
@@ -5750,6 +5758,7 @@ msgstr "已刷新直播接力内容。"
 msgid "已加入"
 msgstr "已加入"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:173
 #: apps/app/src/i18n/static-dom-seed.ts:165
 #: apps/app/src/i18n/static-dom-seed.ts:902
 msgid "已加入常用入口"
@@ -5890,6 +5899,7 @@ msgid "已复制邮箱"
 msgstr "已复制邮箱"
 
 #: apps/app/src/components/chat-message-list.tsx:5327
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:254
 #: apps/app/src/i18n/static-dom-seed.ts:272
 #: apps/app/src/i18n/static-dom-seed.ts:908
 msgid "已完成"
@@ -5960,6 +5970,7 @@ msgstr "已开启群消息免打扰。"
 msgid "已录制"
 msgstr "已录制"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:118
 #: apps/app/src/i18n/static-dom-seed.ts:161
 #: apps/app/src/i18n/static-dom-seed.ts:896
 msgid "已打开"
@@ -6793,22 +6804,26 @@ msgstr "当前先保留桌面本地历史，后面接真直播接口时继续沿
 msgid "当前先由游戏中心工作区承接会话，后续再接真实小游戏容器。"
 msgstr "当前先由游戏中心工作区承接会话，后续再接真实小游戏容器。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:78
 #: apps/app/src/i18n/static-dom-seed.ts:277
 #: apps/app/src/i18n/static-dom-seed.ts:894
 msgid "当前先由轻工作台承接上下文，也可以直接发到手机继续处理。"
 msgstr "当前先由轻工作台承接上下文，也可以直接发到手机继续处理。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:77
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:298
 #: apps/app/src/i18n/static-dom-seed.ts:377
 #: apps/app/src/i18n/static-dom-seed.ts:893
 msgid "当前先由轻工作台承接上下文，也可以直接复制入口链接继续使用。"
 msgstr "当前先由轻工作台承接上下文，也可以直接复制入口链接继续使用。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:75
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:297
 #: apps/app/src/i18n/static-dom-seed.ts:892
 msgid "当前先由轻工作台承接上下文，也可以直接通过系统分享发给联系人或其他应用。"
 msgstr "当前先由轻工作台承接上下文，也可以直接通过系统分享发给联系人或其他应用。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:326
 #: apps/app/src/i18n/static-dom-seed.ts:914
 msgid "当前先由轻工作台承接上下文。"
 msgstr "当前先由轻工作台承接上下文。"
@@ -6950,6 +6965,7 @@ msgstr "当前实例状态"
 msgid "当前小程序工作台"
 msgstr "当前小程序工作台"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:216
 #: apps/app/src/i18n/static-dom-seed.ts:167
 #: apps/app/src/i18n/static-dom-seed.ts:906
 msgid "当前工作台"
@@ -7129,6 +7145,7 @@ msgstr "当前消息暂不支持部分引用。"
 
 #: apps/app/src/components/chat-message-list.tsx:5629
 #: apps/app/src/components/chat-message-list.tsx:5836
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:166
 #: apps/app/src/i18n/static-dom-seed.ts:163
 #: apps/app/src/i18n/static-dom-seed.ts:900
 #: apps/app/src/routes/character-detail-page.tsx:307
@@ -7547,6 +7564,7 @@ msgstr "待开播"
 msgid "待恢复"
 msgstr "待恢复"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:118
 #: apps/app/src/i18n/static-dom-seed.ts:897
 msgid "待打开"
 msgstr "待打开"
@@ -7763,6 +7781,7 @@ msgstr "我的动态"
 msgid "我的发言"
 msgstr "我的发言"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:172
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:347
 #: apps/app/src/i18n/static-dom-seed.ts:164
 #: apps/app/src/i18n/static-dom-seed.ts:361
@@ -7955,15 +7974,18 @@ msgstr "打开后会先显示办理中的事项和最新回执。"
 msgid "打开后会先落在今日时间轴，方便继续处理刚才没做完的事。"
 msgstr "打开后会先落在今日时间轴，方便继续处理刚才没做完的事。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:327
 #: apps/app/src/i18n/static-dom-seed.ts:915
 msgid "打开后会同步更新最近使用、打开次数和当前承接面板。"
 msgstr "打开后会同步更新最近使用、打开次数和当前承接面板。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:224
 #: apps/app/src/i18n/static-dom-seed.ts:270
 #: apps/app/src/i18n/static-dom-seed.ts:907
 msgid "打开后先承接一组本地待办，让这个面板不只是一次“已打开”的记录。"
 msgstr "打开后先承接一组本地待办，让这个面板不只是一次“已打开”的记录。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:292
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:267
 #: apps/app/src/i18n/static-dom-seed.ts:159
 #: apps/app/src/i18n/static-dom-seed.ts:911
@@ -8132,6 +8154,7 @@ msgstr "打开群聊查看最近消息。"
 msgid "打开订阅号消息"
 msgstr "打开订阅号消息"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:178
 #: apps/app/src/i18n/static-dom-seed.ts:166
 #: apps/app/src/i18n/static-dom-seed.ts:904
 msgid "打开记录"
@@ -8973,6 +8996,7 @@ msgstr "撤回中..."
 msgid "撤回失败，请稍后再试。"
 msgstr "撤回失败，请稍后再试。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:277
 #: apps/app/src/i18n/static-dom-seed.ts:909
 #: apps/app/src/routes/chat-list-page.tsx:691
 msgid "撤销"
@@ -12312,6 +12336,7 @@ msgstr "点击「群成员」选择其他成员，或切回「全部成员」。
 msgid "点击右上角“新建笔记”，把第一条收藏笔记写下来。"
 msgstr "点击右上角“新建笔记”，把第一条收藏笔记写下来。"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:121
 #: apps/app/src/i18n/static-dom-seed.ts:899
 msgid "点击后写入最近使用和打开态"
 msgstr "点击后写入最近使用和打开态"
@@ -12973,6 +12998,7 @@ msgstr "移出后将恢复正常联系与互动。"
 msgid "移出常用"
 msgstr "移出常用"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:315
 #: apps/app/src/i18n/static-dom-seed.ts:169
 #: apps/app/src/i18n/static-dom-seed.ts:912
 msgid "移出我的小程序"
@@ -13458,6 +13484,7 @@ msgstr "系统"
 #: apps/app/src/components/chat-message-list.tsx:4162
 #: apps/app/src/components/chat-message-list.tsx:6245
 #: apps/app/src/components/chat-message-list.tsx:6380
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:91
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:303
 #: apps/app/src/features/subscription/subscription-panel.tsx:276
 #: apps/app/src/i18n/static-dom-seed.ts:895
@@ -13644,10 +13671,16 @@ msgstr "给朋友设置备注名"
 msgid "给联系人设置备注名"
 msgstr "给联系人设置备注名"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:292
 #: apps/app/src/i18n/static-dom-seed.ts:168
 #: apps/app/src/i18n/static-dom-seed.ts:910
 msgid "继续使用"
 msgstr "继续使用"
+
+#. placeholder {0}: miniProgram.name
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:130
+msgid "继续使用 {0}"
+msgstr "继续使用 {0}"
 
 #: apps/app/src/i18n/static-dom-seed.ts:477
 msgid "继续使用会回到最近那个接龙，优先展示未确认成员。"
@@ -15736,6 +15769,7 @@ msgstr "还没有{0}"
 msgid "还没有互动"
 msgstr "还没有互动"
 
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:183
 #: apps/app/src/i18n/static-dom-seed.ts:905
 msgid "还没有使用过"
 msgstr "还没有使用过"

@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import { msg } from "@lingui/macro";
 import { Button, cn } from "@yinjie/ui";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   CheckCircle2,
   Clock3,
@@ -58,6 +60,7 @@ export function MiniProgramOpenPanel({
   onToggleTask,
   onTogglePinned,
 }: MiniProgramOpenPanelProps) {
+  const t = useRuntimeTranslator();
   const tone = getMiniProgramToneStyle(miniProgram.tone);
   const isDesktopLayout = useDesktopLayout();
   const nativeMobileShareSupported = isNativeMobileShareSurface({
@@ -69,10 +72,10 @@ export function MiniProgramOpenPanel({
   const resolvedCopyActionHint =
     copyActionHint ??
     (nativeMobileShareSupported
-      ? "当前先由轻工作台承接上下文，也可以直接通过系统分享发给联系人或其他应用。"
+      ? t(msg`当前先由轻工作台承接上下文，也可以直接通过系统分享发给联系人或其他应用。`)
       : mobileWebCopyFallback
-        ? "当前先由轻工作台承接上下文，也可以直接复制入口链接继续使用。"
-        : "当前先由轻工作台承接上下文，也可以直接发到手机继续处理。");
+        ? t(msg`当前先由轻工作台承接上下文，也可以直接复制入口链接继续使用。`)
+        : t(msg`当前先由轻工作台承接上下文，也可以直接发到手机继续处理。`));
   const resolvedCopyActionIcon =
     copyActionIcon ??
     (nativeMobileShareSupported ? (
@@ -85,10 +88,10 @@ export function MiniProgramOpenPanel({
   const resolvedCopyActionLabel = copyActionLabel
     ? copyActionLabel
     : nativeMobileShareSupported
-      ? "系统分享"
+      ? t(msg`系统分享`)
       : mobileWebCopyFallback
-        ? "复制入口"
-        : "发到手机";
+        ? t(msg`复制入口`)
+        : t(msg`发到手机`);
 
   return (
     <section
@@ -112,10 +115,10 @@ export function MiniProgramOpenPanel({
                   tone.badgeClassName,
                 )}
               >
-                {isActive ? "已打开" : "待打开"}
+                {isActive ? t(msg`已打开`) : t(msg`待打开`)}
               </div>
               <div className={cn("text-[color:var(--text-muted)]", compact ? "text-[11px]" : "text-[11px]")}>
-                {isActive ? "最近一次打开的小程序面板" : "点击后写入最近使用和打开态"}
+                {isActive ? t(msg`最近一次打开的小程序面板`) : t(msg`点击后写入最近使用和打开态`)}
               </div>
             </div>
             <div
@@ -124,7 +127,7 @@ export function MiniProgramOpenPanel({
                 compact ? "mt-1.5 text-[14px]" : "mt-3 text-lg",
               )}
             >
-              {isActive ? `继续使用 ${miniProgram.name}` : miniProgram.name}
+              {isActive ? t(msg`继续使用 ${miniProgram.name}`) : miniProgram.name}
             </div>
             <div
               className={cn(
@@ -141,7 +144,7 @@ export function MiniProgramOpenPanel({
             variant="ghost"
             size="icon"
             onClick={onDismiss}
-            aria-label="关闭"
+            aria-label={t(msg`关闭`)}
             className={cn(
               "shrink-0 border border-white/80 bg-white/72",
               compact ? "h-9 w-9 rounded-full" : "rounded-2xl",
@@ -160,24 +163,24 @@ export function MiniProgramOpenPanel({
       >
         <PanelMetric
           icon={<Sparkles size={15} className={tone.softTextClassName} />}
-          label="当前状态"
+          label={t(msg`当前状态`)}
           value={miniProgram.serviceLabel}
           compact={compact}
         />
         <PanelMetric
           icon={<Pin size={15} className={tone.softTextClassName} />}
-          label="我的小程序"
-          value={isPinned ? "已加入常用入口" : "尚未加入我的小程序"}
+          label={t(msg`我的小程序`)}
+          value={isPinned ? t(msg`已加入常用入口`) : t(msg`尚未加入我的小程序`)}
           compact={compact}
         />
         <PanelMetric
           icon={<Clock3 size={15} className={tone.softTextClassName} />}
-          label="打开记录"
-          value={`${launchCount} 次`}
+          label={t(msg`打开记录`)}
+          value={t(msg`${launchCount} 次`)}
           detail={
             lastOpenedAt
-              ? `上次打开 ${formatConversationTimestamp(lastOpenedAt)}`
-              : "还没有使用过"
+              ? t(msg`上次打开 ${formatConversationTimestamp(lastOpenedAt)}`)
+              : t(msg`还没有使用过`)
           }
           compact={compact}
         />
@@ -210,7 +213,7 @@ export function MiniProgramOpenPanel({
               compact ? "text-[13px]" : "text-sm",
             )}
           >
-            当前工作台
+            {t(msg`当前工作台`)}
           </div>
           <div
             className={cn(
@@ -218,7 +221,7 @@ export function MiniProgramOpenPanel({
               compact ? "text-[10px] leading-[1.35rem]" : "text-xs leading-5",
             )}
           >
-            打开后先承接一组本地待办，让这个面板不只是一次“已打开”的记录。
+            {t(msg`打开后先承接一组本地待办，让这个面板不只是一次“已打开”的记录。`)}
           </div>
 
           <div className={cn("mt-3.5", compact ? "space-y-2" : "space-y-3")}>
@@ -248,7 +251,7 @@ export function MiniProgramOpenPanel({
                             compact ? "px-1.5 py-0.5 text-[10px]" : "px-2.5 py-1 text-[10px]",
                           )}
                         >
-                          已完成
+                          {t(msg`已完成`)}
                         </span>
                       ) : null}
                     </div>
@@ -271,7 +274,7 @@ export function MiniProgramOpenPanel({
                     )}
                   >
                     <CheckCircle2 size={14} />
-                    {task.completed ? "撤销" : task.actionLabel}
+                    {task.completed ? t(msg`撤销`) : task.actionLabel}
                   </Button>
                 </div>
               </div>
@@ -286,7 +289,7 @@ export function MiniProgramOpenPanel({
           onClick={() => onOpen(miniProgram.id)}
           className={compact ? "h-8 rounded-full px-3.5 text-[11px]" : undefined}
         >
-          {isActive ? "继续使用" : "打开小程序"}
+          {isActive ? t(msg`继续使用`) : t(msg`打开小程序`)}
         </Button>
         {onCopyToMobile ? (
           <Button
@@ -309,7 +312,7 @@ export function MiniProgramOpenPanel({
             compact && "h-8 rounded-full px-3.5 text-[11px]",
           )}
         >
-          {isPinned ? "移出我的小程序" : "加入我的小程序"}
+          {isPinned ? t(msg`移出我的小程序`) : t(msg`加入我的小程序`)}
         </Button>
         <div
           className={cn(
@@ -320,8 +323,8 @@ export function MiniProgramOpenPanel({
           {isActive
             ? onCopyToMobile
               ? resolvedCopyActionHint
-              : "当前先由轻工作台承接上下文。"
-            : "打开后会同步更新最近使用、打开次数和当前承接面板。"}
+              : t(msg`当前先由轻工作台承接上下文。`)
+            : t(msg`打开后会同步更新最近使用、打开次数和当前承接面板。`)}
         </div>
       </div>
     </section>
