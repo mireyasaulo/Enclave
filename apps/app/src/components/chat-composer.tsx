@@ -2824,7 +2824,7 @@ export function ChatComposer({
       <div
         className={
           isDesktop
-            ? "relative border-t border-black/6 bg-[#ededed] px-3.5 py-3"
+            ? "relative isolate z-30 border-t border-black/6 bg-[#ededed] px-3.5 py-3"
             : "border-t border-black/6 bg-[#f7f7f7] px-2 pb-2 pt-1"
         }
         style={{
@@ -3000,7 +3000,7 @@ export function ChatComposer({
           ref={isDesktop ? desktopStickerRef : undefined}
           className={`relative ${
             isDesktop
-              ? "overflow-hidden rounded-[16px] border border-black/8 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.06)]"
+              ? "rounded-[16px] border border-black/8 bg-white shadow-[0_10px_26px_rgba(15,23,42,0.06)]"
               : "space-y-1.5"
           }`}
         >
@@ -3064,7 +3064,7 @@ export function ChatComposer({
                 />
               </div>
 
-              <div className="flex items-center justify-between gap-3 border-t border-black/6 bg-[#fafafa] px-3.5 py-2.5">
+              <div className="flex items-center justify-between gap-3 rounded-b-[16px] border-t border-black/6 bg-[#fafafa] px-3.5 py-2.5">
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                   <DesktopToolbarGroup>
                     <div className="relative">
@@ -3107,7 +3107,7 @@ export function ChatComposer({
                         />
                         {desktopPlusMenuOpen &&
                         desktopPlusMenuView === "favorites" ? (
-                          <div className="absolute bottom-[calc(100%+0.55rem)] left-0 z-30 w-80 overflow-hidden rounded-[12px] border border-black/8 bg-white shadow-[0_12px_28px_rgba(15,23,42,0.14)]">
+                          <div className="absolute bottom-[calc(100%+0.55rem)] left-0 z-50 w-80 overflow-hidden rounded-[12px] border border-black/8 bg-white shadow-[0_12px_28px_rgba(15,23,42,0.14)]">
                             <DesktopFavoritePicker
                               favorites={desktopFavoriteRecords}
                               busy={composerPending}
