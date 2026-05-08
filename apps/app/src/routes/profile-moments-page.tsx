@@ -30,12 +30,19 @@ import {
 import { WeChatMomentCard } from "../components/wechat-moment-card";
 import { WeChatMomentsCover } from "../components/wechat-moments-cover";
 import {
+  readDesktopFavorites,
+  removeDesktopFavorite,
+  upsertDesktopFavorite,
+} from "../features/favorites/favorites-storage";
+import { getMomentSummaryText } from "../features/moments/moment-content";
+import {
   publishMomentComposeDraft,
   useMomentComposeDraft,
 } from "../features/moments/moment-compose-media";
 import { buildMobileMomentsPublishRouteHash } from "../features/moments/mobile-moments-publish-route-state";
 import { usePullToRefresh } from "../features/moments/use-pull-to-refresh";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+import { formatTimestamp } from "../lib/format";
 import { navigateBackOrFallback } from "../lib/history-back";
 import { describeRequestError } from "../lib/request-error";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
@@ -80,6 +87,7 @@ export function ProfileMomentsPage() {
     postId: string;
   } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
+  const [favoriteSourceIds, setFavoriteSourceIds] = useState<string[]>([]);
   const [notice, setNotice] = useState<{
     tone: "success" | "info";
     message: string;
@@ -230,6 +238,13 @@ export function ProfileMomentsPage() {
     return () => window.clearTimeout(timer);
   }, [notice]);
 
+  useEffect(() => {
+    if (!isDesktopLayout) return;
+    setFavoriteSourceIds(
+      readDesktopFavorites().map((item) => item.sourceId),
+    );
+  }, [isDesktopLayout]);
+
   const { containerRef, state: pullState } = usePullToRefresh({
     onRefresh: async () => {
       await momentsQuery.refetch();
@@ -329,7 +344,9 @@ export function ProfileMomentsPage() {
           successNotice={notice?.message}
           text={composeDraft.text}
           videoDraft={composeDraft.videoDraft}
-          isMomentFavorite={() => false}
+          isMomentFavorite={(momentId) =>
+            favoriteSourceIds.includes(`moment-${momentId}`)
+          }
           setShowCompose={setShowCompose}
           onBack={goBack}
           onCancelCommentReply={() => setDesktopReplyTarget(null)}
@@ -357,8 +374,30 @@ export function ProfileMomentsPage() {
             })
           }
           onTextChange={composeDraft.setText}
-          onToggleFavorite={() => {
-            // 个人朋友圈页暂不支持收藏自己动态
+          onToggleFavorite={(momentId) => {
+            const moment = ownMoments.find((item) => item.id === momentId);
+            if (!moment) return;
+            const sourceId = `moment-${moment.id}`;
+            const collected = favoriteSourceIds.includes(sourceId);
+            const nextFavorites = collected
+              ? removeDesktopFavorite(sourceId)
+              : upsertDesktopFavorite({
+                  id: `favorite-${sourceId}`,
+                  sourceId,
+                  category: "moments",
+                  title: moment.authorName,
+                  description: getMomentSummaryText(moment),
+                  meta: t(
+                    msg`朋友圈 · ${formatTimestamp(moment.postedAt)}`,
+                  ),
+                  to: "/profile/moments",
+                  badge: t(msg`朋友圈`),
+                  avatarName: moment.authorName,
+                  avatarSrc: moment.authorAvatar,
+                });
+            setFavoriteSourceIds(
+              nextFavorites.map((favorite) => favorite.sourceId),
+            );
           }}
           onVideoFileSelected={(file) => {
             void handleDesktopVideoFileSelected(file);

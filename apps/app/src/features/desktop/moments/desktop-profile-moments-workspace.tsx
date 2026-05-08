@@ -211,15 +211,23 @@ export function DesktopProfileMomentsWorkspace({
             ref={scrollViewportRef}
             className="min-h-0 flex-1 overflow-auto"
           >
-            <section className="relative h-[260px] w-full overflow-hidden bg-[linear-gradient(135deg,#34a853_0%,#0f8b3a_55%,#085c25_100%)]">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.32),transparent_60%)]" />
-              <div className="absolute bottom-6 right-8 flex items-end gap-4">
+            <section
+              className="relative w-full bg-[rgba(245,248,247,0.96)]"
+              style={{ height: 290 }}
+            >
+              <div
+                className="absolute inset-x-0 top-0 overflow-hidden bg-[linear-gradient(135deg,#34a853_0%,#0f8b3a_55%,#085c25_100%)]"
+                style={{ height: 260 }}
+              >
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,rgba(255,255,255,0.32),transparent_60%)]" />
+              </div>
+              <div className="absolute bottom-7 right-8 flex items-end gap-4">
                 <div className="text-right text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.28)]">
                   <div className="text-[18px] font-medium leading-tight">
                     {displayName}
                   </div>
                 </div>
-                <div className="translate-y-10">
+                <div className="translate-y-7">
                   <AvatarChip name={displayName} src={ownerAvatar} size="lg" />
                 </div>
               </div>
