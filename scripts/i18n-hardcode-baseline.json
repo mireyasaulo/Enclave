@@ -34,9 +34,9 @@
     },
     "apps/admin/src": {
       "rules": {
-        "jsx-literal-prop": 2026,
-        "object-ui-string": 812,
-        "jsx-cjk-text": 267,
+        "jsx-literal-prop": 1877,
+        "object-ui-string": 767,
+        "jsx-cjk-text": 234,
         "toast-dialog-string": 2,
         "setter-message-string": 12,
         "literal-error-message": 17,
@@ -44,7 +44,7 @@
         "locale-compare-literal": 0,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 0,
-        "raw-cjk-line": 6081
+        "raw-cjk-line": 5687
       }
     },
     "apps/cloud-console/src": {

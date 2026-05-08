@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { msg } from "@lingui/macro";
 import {
   WIKI_SYNC_CONTENT_FIELDS,
   type WikiSyncApplyItemRequest,
@@ -9,6 +10,7 @@ import {
   type WikiSyncPreviewFilter,
   type WikiSyncPreviewItem,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Button, Card, ErrorBlock, SnapshotDiff, StatusPill } from "@yinjie/ui";
 import {
   AdminCallout,
@@ -29,23 +31,29 @@ type SelectionState = {
 
 type SelectionMap = Record<string, SelectionState>;
 
-const FIELD_LABELS: Record<WikiSyncContentField, string> = {
-  name: "名称",
-  avatar: "头像",
-  bio: "简介",
-  personality: "性格",
-  expertDomains: "专长领域",
-  triggerScenes: "触发场景",
-  relationship: "关系描述",
-  relationshipType: "关系类型",
+const FIELD_LABEL_MESSAGES: Record<WikiSyncContentField, ReturnType<typeof msg>> = {
+  name: msg`名称`,
+  avatar: msg`头像`,
+  bio: msg`简介`,
+  personality: msg`性格`,
+  expertDomains: msg`专长领域`,
+  triggerScenes: msg`触发场景`,
+  relationship: msg`关系描述`,
+  relationshipType: msg`关系类型`,
 };
 
-const STATUS_LABEL: Record<WikiSyncPreviewItem["status"], string> = {
-  in_sync: "已同步",
-  drift: "有更新",
-  wiki_only: "仅 Wiki",
-  live_only: "仅本地",
-  no_stable_revision: "无稳定版本",
+function getFieldLabels(): Record<WikiSyncContentField, string> {
+  return Object.fromEntries(
+    Object.entries(FIELD_LABEL_MESSAGES).map(([k, v]) => [k, translateRuntimeMessage(v)]),
+  ) as Record<WikiSyncContentField, string>;
+}
+
+const STATUS_LABEL_MESSAGES: Record<WikiSyncPreviewItem["status"], ReturnType<typeof msg>> = {
+  in_sync: msg`已同步`,
+  drift: msg`有更新`,
+  wiki_only: msg`仅 Wiki`,
+  live_only: msg`仅本地`,
+  no_stable_revision: msg`无稳定版本`,
 };
 
 const STATUS_TONE: Record<
@@ -59,13 +67,13 @@ const STATUS_TONE: Record<
   no_stable_revision: "muted",
 };
 
-const APPLY_RESULT_LABEL: Record<WikiSyncApplyItemResult["status"], string> = {
-  applied: "已应用",
-  no_changes: "无变化",
-  stale_revision: "版本已更新，请刷新对比",
-  live_missing: "本地角色不存在",
-  no_stable_revision: "无可同步版本",
-  error: "应用失败",
+const APPLY_RESULT_LABEL_MESSAGES: Record<WikiSyncApplyItemResult["status"], ReturnType<typeof msg>> = {
+  applied: msg`已应用`,
+  no_changes: msg`无变化`,
+  stale_revision: msg`版本已更新，请刷新对比`,
+  live_missing: msg`本地角色不存在`,
+  no_stable_revision: msg`无可同步版本`,
+  error: msg`应用失败`,
 };
 
 function emptySelection(): SelectionState {
@@ -89,6 +97,7 @@ export function CharactersWikiSyncSection({
   initialCharacterId?: string;
   onClearInitialCharacter?: () => void;
 }) {
+  const t = translateRuntimeMessage;
   const baseUrl = resolveAdminCoreApiBaseUrl();
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState<WikiSyncPreviewFilter>("drift");
@@ -301,33 +310,33 @@ export function CharactersWikiSyncSection({
     <div className="space-y-6">
       <Card className="bg-[color:var(--surface-console)]">
         <AdminSectionHeader
-          title="Wiki ↔ 角色 同步"
+          title={t(msg`Wiki ↔ 角色 同步`)}
           actions={
             <div className="flex flex-wrap items-center gap-2">
               <AdminPillSelectField
                 value={filter}
                 onChange={(v) => setFilter(v as WikiSyncPreviewFilter)}
               >
-                <option value="drift">仅有更新</option>
-                <option value="wiki_only">仅本地缺失</option>
-                <option value="all">全部</option>
+                <option value="drift">{t(msg`仅有更新`)}</option>
+                <option value="wiki_only">{t(msg`仅本地缺失`)}</option>
+                <option value="all">{t(msg`全部`)}</option>
               </AdminPillSelectField>
               <Button
                 variant="secondary"
                 onClick={() => previewQuery.refetch()}
                 disabled={previewQuery.isFetching}
               >
-                {previewQuery.isFetching ? "刷新中…" : "刷新对比"}
+                {previewQuery.isFetching ? t(msg`刷新中…`) : t(msg`刷新对比`)}
               </Button>
             </div>
           }
         />
         <div className="mt-3 text-sm text-[color:var(--text-secondary)]">
-          展示 wiki 稳定版本与线上角色之间的差异。每条字段都需要勾选后才会被覆盖到线上。
+          {t(msg`展示 wiki 稳定版本与线上角色之间的差异。每条字段都需要勾选后才会被覆盖到线上。`)}
         </div>
         {showCharacterFilter ? (
           <div className="mt-3 flex items-center gap-2">
-            <StatusPill tone="muted">仅查看 {characterIdFilter}</StatusPill>
+            <StatusPill tone="muted">{t(msg`仅查看 ${characterIdFilter}`)}</StatusPill>
             <Button
               variant="ghost"
               onClick={() => {
@@ -335,7 +344,7 @@ export function CharactersWikiSyncSection({
                 onClearInitialCharacter?.();
               }}
             >
-              清除筛选
+              {t(msg`清除筛选`)}
             </Button>
           </div>
         ) : null}
@@ -346,25 +355,25 @@ export function CharactersWikiSyncSection({
             onClick={selectAllDrift}
             disabled={items.filter((it) => it.status === "drift").length === 0}
           >
-            一键勾选所有有更新角色
+            {t(msg`一键勾选所有有更新角色`)}
           </Button>
           <Button
             variant="ghost"
             onClick={clearAllSelection}
             disabled={totalSelectedFields === 0}
           >
-            清空所选
+            {t(msg`清空所选`)}
           </Button>
           <div className="ml-auto flex items-center gap-2">
             <span className="text-xs text-[color:var(--text-muted)]">
-              已选 {totalSelectedRows} 个角色 · {totalSelectedFields} 项字段
+              {t(msg`已选 ${totalSelectedRows} 个角色 · ${totalSelectedFields} 项字段`)}
             </span>
             <Button
               variant="primary"
               onClick={() => setConfirmOpen(true)}
               disabled={totalSelectedFields === 0 || applyMutation.isPending}
             >
-              应用所选
+              {t(msg`应用所选`)}
             </Button>
           </div>
         </div>
@@ -372,8 +381,8 @@ export function CharactersWikiSyncSection({
         {confirmOpen ? (
           <AdminCallout
             tone="warning"
-            title="确认将所选差异写入线上"
-            description={`即将更新 ${totalSelectedRows} 个角色，共 ${totalSelectedFields} 个字段。每个角色会写一条 wiki 审计修订（changeSource=admin_sync_from_wiki）。`}
+            title={t(msg`确认将所选差异写入线上`)}
+            description={t(msg`即将更新 ${totalSelectedRows} 个角色，共 ${totalSelectedFields} 个字段。每个角色会写一条 wiki 审计修订（changeSource=admin_sync_from_wiki）。`)}
             actions={
               <>
                 <Button
@@ -381,14 +390,14 @@ export function CharactersWikiSyncSection({
                   onClick={applyAllSelected}
                   disabled={applyMutation.isPending}
                 >
-                  {applyMutation.isPending ? "应用中…" : "确认应用"}
+                  {applyMutation.isPending ? t(msg`应用中…`) : t(msg`确认应用`)}
                 </Button>
                 <Button
                   variant="ghost"
                   onClick={() => setConfirmOpen(false)}
                   disabled={applyMutation.isPending}
                 >
-                  取消
+                  {t(msg`取消`)}
                 </Button>
               </>
             }
@@ -410,7 +419,7 @@ export function CharactersWikiSyncSection({
         {lastResults && lastResults.results.length > 0 ? (
           <div className="mt-4 rounded-[18px] border border-[color:var(--border-faint)] bg-white/85 px-4 py-3 text-xs">
             <div className="mb-2 font-medium text-[color:var(--text-primary)]">
-              上次操作结果
+              {t(msg`上次操作结果`)}
             </div>
             <ul className="space-y-1">
               {lastResults.results.map((r) => (
@@ -427,12 +436,11 @@ export function CharactersWikiSyncSection({
                           : "text-amber-700"
                     }
                   >
-                    {APPLY_RESULT_LABEL[r.status]}
+                    {translateRuntimeMessage(APPLY_RESULT_LABEL_MESSAGES[r.status])}
                   </span>
                   {r.appliedFields.length || r.appliedRecipePaths.length ? (
                     <span className="text-[color:var(--text-secondary)]">
-                      内容 {r.appliedFields.length} / recipe{" "}
-                      {r.appliedRecipePaths.length}
+                      {t(msg`内容 ${r.appliedFields.length} / recipe ${r.appliedRecipePaths.length}`)}
                     </span>
                   ) : null}
                   {r.errorMessage ? (
@@ -449,14 +457,14 @@ export function CharactersWikiSyncSection({
         <AdminSkeletonCard rows={6} />
       ) : previewQuery.error ? (
         <AdminErrorState
-          title="加载差异失败"
+          title={t(msg`加载差异失败`)}
           detail={(previewQuery.error as Error).message}
           onRetry={() => previewQuery.refetch()}
         />
       ) : items.length === 0 ? (
         <AdminEmptyState
-          title="目前没有需要同步的差异"
-          description="所有角色都与 wiki 稳定版一致，或当前筛选下没有匹配的条目。"
+          title={t(msg`目前没有需要同步的差异`)}
+          description={t(msg`所有角色都与 wiki 稳定版一致，或当前筛选下没有匹配的条目。`)}
         />
       ) : (
         <div className="space-y-3">
@@ -465,8 +473,8 @@ export function CharactersWikiSyncSection({
           ) ? (
             <AdminCallout
               tone="info"
-              title="当前没有可同步的角色"
-              description="下方列表显示的角色要么已与 wiki 一致，要么尚无 wiki 稳定版本。展开任意一行查看具体说明。如需同步，先到 wiki 提交一次能自动通过审核的修订。"
+              title={t(msg`当前没有可同步的角色`)}
+              description={t(msg`下方列表显示的角色要么已与 wiki 一致，要么尚无 wiki 稳定版本。展开任意一行查看具体说明。如需同步，先到 wiki 提交一次能自动通过审核的修订。`)}
             />
           ) : null}
           {items.map((item) => (
@@ -521,6 +529,7 @@ function WikiSyncRow({
   applyPending: boolean;
   importPending: boolean;
 }) {
+  const t = translateRuntimeMessage;
   const totalDiffs = item.contentDiff.length + item.recipeDiff.length;
   const totalSelected = selection.contentFields.size + selection.recipePaths.size;
   const allSelected = totalDiffs > 0 && totalSelected === totalDiffs;
@@ -532,7 +541,7 @@ function WikiSyncRow({
           type="button"
           onClick={onToggleExpand}
           className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-primary)] text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
-          aria-label={expanded ? "收起" : "展开"}
+          aria-label={expanded ? t(msg`收起`) : t(msg`展开`)}
         >
           <span
             className={
@@ -562,12 +571,11 @@ function WikiSyncRow({
               {item.name}
             </div>
             <StatusPill tone={STATUS_TONE[item.status]}>
-              {STATUS_LABEL[item.status]}
+              {translateRuntimeMessage(STATUS_LABEL_MESSAGES[item.status])}
             </StatusPill>
             {item.status === "drift" ? (
               <span className="text-xs text-[color:var(--text-muted)]">
-                内容差 {item.contentDiff.length} / recipe 差{" "}
-                {item.recipeDiff.length}
+                {t(msg`内容差 ${item.contentDiff.length} / recipe 差 ${item.recipeDiff.length}`)}
               </span>
             ) : null}
           </div>
@@ -594,7 +602,7 @@ function WikiSyncRow({
               onClick={onImport}
               disabled={importPending || !item.stableRevisionId}
             >
-              {importPending ? "导入中…" : "导入到本地"}
+              {importPending ? t(msg`导入中…`) : t(msg`导入到本地`)}
             </Button>
           ) : item.status === "drift" ? (
             <Button
@@ -602,7 +610,7 @@ function WikiSyncRow({
               onClick={onApply}
               disabled={applyPending || totalSelected === 0}
             >
-              应用此项 ({totalSelected})
+              {t(msg`应用此项 (${totalSelected})`)}
             </Button>
           ) : null}
         </div>
@@ -618,10 +626,10 @@ function WikiSyncRow({
                   onClick={() => onSelectAllForRow(!allSelected)}
                   className="rounded-full border border-[color:var(--border-subtle)] px-3 py-1 hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
                 >
-                  {allSelected ? "本行全不选" : "本行全选"}
+                  {allSelected ? t(msg`本行全不选`) : t(msg`本行全选`)}
                 </button>
                 <span className="text-[color:var(--text-muted)]">
-                  共 {totalDiffs} 项差异，已勾选 {totalSelected} 项
+                  {t(msg`共 ${totalDiffs} 项差异，已勾选 ${totalSelected} 项`)}
                 </span>
               </div>
 
@@ -650,16 +658,17 @@ function WikiSyncRow({
 }
 
 function RowEmptyHint({ status }: { status: WikiSyncPreviewItem["status"] }) {
+  const t = translateRuntimeMessage;
   const tip = (() => {
     switch (status) {
       case "in_sync":
-        return "线上角色与 wiki 稳定版本一致，无需同步。";
+        return t(msg`线上角色与 wiki 稳定版本一致，无需同步。`);
       case "no_stable_revision":
-        return "wiki 词条已存在，但还没有审核通过的稳定版本。需要先到 wiki 提交一次能够自动通过审核的修订（patroller+ 用户提交即可），稳定版本生成后这里才会出现差异。";
+        return t(msg`wiki 词条已存在，但还没有审核通过的稳定版本。需要先到 wiki 提交一次能够自动通过审核的修订（patroller+ 用户提交即可），稳定版本生成后这里才会出现差异。`);
       case "live_only":
-        return "线上有这个角色，但 wiki 还没有对应的词条。可以到 wiki 创建一个词条；提交后再回来同步。";
+        return t(msg`线上有这个角色，但 wiki 还没有对应的词条。可以到 wiki 创建一个词条；提交后再回来同步。`);
       case "wiki_only":
-        return "wiki 有词条但本地没有对应角色。点击右上角「导入到本地」即可基于 wiki 稳定版本新建角色。";
+        return t(msg`wiki 有词条但本地没有对应角色。点击右上角「导入到本地」即可基于 wiki 稳定版本新建角色。`);
       case "drift":
         return "";
     }
@@ -681,6 +690,8 @@ function ContentDiffPanel({
   selectedFields: Set<WikiSyncContentField>;
   onToggle: (field: WikiSyncContentField) => void;
 }) {
+  const t = translateRuntimeMessage;
+  const FIELD_LABELS = useMemo(() => getFieldLabels(), []);
   const before = useMemo(() => {
     const obj: Record<string, unknown> = {};
     for (const e of entries) obj[e.field] = e.liveValue;
@@ -695,22 +706,22 @@ function ContentDiffPanel({
   return (
     <div>
       <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        内容字段 ({entries.length})
+        {t(msg`内容字段 (${entries.length})`)}
       </div>
       <SnapshotDiff
         before={before}
         after={after}
         changedFields={changed}
         fieldLabels={FIELD_LABELS}
-        oldLabel="旧"
-        newLabel="新"
-        emptyLabel="未检测到字段变化。"
+        oldLabel={t(msg`旧`)}
+        newLabel={t(msg`新`)}
+        emptyLabel={t(msg`未检测到字段变化。`)}
         renderRowLead={(field) => (
           <input
             type="checkbox"
             checked={selectedFields.has(field as WikiSyncContentField)}
             onChange={() => onToggle(field as WikiSyncContentField)}
-            aria-label={`选择字段 ${FIELD_LABELS[field as WikiSyncContentField] ?? field}`}
+            aria-label={t(msg`选择字段 ${FIELD_LABELS[field as WikiSyncContentField] ?? field}`)}
           />
         )}
       />
@@ -727,10 +738,11 @@ function RecipeDiffPanel({
   selectedPaths: Set<string>;
   onToggle: (path: string) => void;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <div>
       <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Recipe 路径 ({entries.length})
+        {t(msg`Recipe 路径 (${entries.length})`)}
       </div>
       <div className="space-y-2">
         {entries.map((e) => (
@@ -743,7 +755,7 @@ function RecipeDiffPanel({
                 type="checkbox"
                 checked={selectedPaths.has(e.path)}
                 onChange={() => onToggle(e.path)}
-                aria-label={`选择 recipe 路径 ${e.path}`}
+                aria-label={t(msg`选择 recipe 路径 ${e.path}`)}
               />
             </div>
             <div className="font-mono text-[color:var(--text-muted)] pt-1 break-all">
@@ -754,7 +766,7 @@ function RecipeDiffPanel({
               title={fmtValue(e.liveValue)}
             >
               <span className="text-[10px] uppercase text-[var(--text-muted)] mr-1">
-                旧
+                {t(msg`旧`)}
               </span>
               {fmtValue(e.liveValue).slice(0, 200)}
             </div>
@@ -763,7 +775,7 @@ function RecipeDiffPanel({
               title={fmtValue(e.wikiValue)}
             >
               <span className="text-[10px] uppercase text-[var(--text-muted)] mr-1">
-                新
+                {t(msg`新`)}
               </span>
               {fmtValue(e.wikiValue).slice(0, 200)}
             </div>
