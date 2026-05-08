@@ -1275,13 +1275,6 @@ export function DesktopSearchDropdownPanel({
         />
       ) : null}
 
-      <SearchLauncherFocusStrip
-        keyword={trimmedKeyword}
-        layer={navigationLayer}
-        panelTitle={t(activeFocusContext.panelTitle)}
-        region={activeFocusContext.region}
-      />
-
       {trimmedKeyword ? (
         <SearchLauncherSection
           title={t(msg`搜索建议`)}
@@ -1632,68 +1625,6 @@ function SearchLauncherSection({
         ) : null}
       </div>
       {children}
-    </section>
-  );
-}
-
-function SearchLauncherFocusStrip({
-  keyword,
-  layer,
-  panelTitle,
-  region,
-}: {
-  keyword: string;
-  layer: SearchLauncherNavigationLayer;
-  panelTitle: string;
-  region: SearchLauncherFocusRegion;
-}) {
-  const t = useRuntimeTranslator();
-  const regionLabel = t(searchLauncherFocusRegionLabels[region]);
-  const toneClassName =
-    region === "input"
-      ? "bg-[rgba(7,193,96,0.10)] text-[color:var(--brand-primary)]"
-      : region === "suggestions"
-        ? "bg-[rgba(59,130,246,0.10)] text-[#1d4ed8]"
-        : region === "quickAccess"
-          ? "bg-[rgba(15,118,110,0.10)] text-[#226448]"
-          : "bg-[rgba(180,132,23,0.10)] text-[#9a6b12]";
-  const description =
-    layer === "input"
-      ? keyword
-        ? t(msg`当前位于搜索框，按 Tab 进入结果层，按 Enter 执行搜索"${keyword}"，按 Esc 关闭下拉。`)
-        : t(msg`当前位于搜索框，继续输入关键词，或按 Tab 进入结果层；按 Enter 执行搜索，按 Esc 关闭下拉。`)
-      : region === "history"
-        ? t(msg`当前位于最近搜索，按 Tab / ↑ ↓ 切换当前项，按 Enter 打开当前项，按 Shift+Tab 或 Esc 回搜索框。`)
-        : t(msg`当前位于${panelTitle}，按 Tab / ↑ ↓ 切换当前项，按 Enter 打开当前项，按 Shift+Tab 或 Esc 回搜索框。`);
-  const keyboardHint =
-    layer === "input"
-      ? t(msg`Tab 进入结果层 · Enter 执行搜索 · Esc 关闭`)
-      : t(msg`Tab / ↑ ↓ 切换当前项 · Enter 打开当前项 · Shift+Tab / Esc 回搜索框`);
-
-  return (
-    <section className="mt-2 rounded-[16px] border border-[rgba(7,193,96,0.14)] bg-[rgba(247,250,250,0.94)] px-3.5 py-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[10px] font-medium text-[color:var(--brand-primary)]">
-          {t(msg`搜索上下文`)}
-        </span>
-        <span
-          className={cn(
-            "rounded-full px-2.5 py-1 text-[10px] font-medium",
-            toneClassName,
-          )}
-        >
-          {regionLabel}
-        </span>
-        <span className="rounded-full bg-white px-2.5 py-1 text-[10px] text-[color:var(--text-muted)]">
-          {panelTitle}
-        </span>
-      </div>
-      <div className="mt-2 text-[11px] leading-5 text-[color:var(--text-secondary)]">
-        {description}
-      </div>
-      <div className="mt-2 inline-flex items-center rounded-full bg-white px-2.5 py-1 text-[10px] text-[color:var(--text-muted)]">
-        {keyboardHint}
-      </div>
     </section>
   );
 }
