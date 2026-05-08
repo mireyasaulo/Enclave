@@ -841,42 +841,6 @@ export function DesktopSearchDropdownPanel({
         });
       });
     } else {
-      recentConversations.forEach((item) => {
-        items.push({
-          id: item.id,
-          onSelect: () => handleOpenQuickLink(item),
-        });
-      });
-
-      recentOfficials.forEach((group) => {
-        items.push({
-          id: group.header.id,
-          onSelect: () => handleOpenQuickLink(group.header),
-        });
-
-        const article = group.article;
-        if (article) {
-          items.push({
-            id: article.id,
-            onSelect: () => handleOpenQuickLink(article),
-          });
-        }
-      });
-
-      recentMiniPrograms.forEach((item) => {
-        items.push({
-          id: item.id,
-          onSelect: () => handleOpenQuickLink(item),
-        });
-      });
-
-      recentFavorites.forEach((item) => {
-        items.push({
-          id: item.id,
-          onSelect: () => handleOpenQuickLink(item),
-        });
-      });
-
       history.forEach((item) => {
         items.push({
           id: buildSearchLauncherHistoryActionId(item.keyword),
@@ -898,10 +862,6 @@ export function DesktopSearchDropdownPanel({
     miniProgramMatches,
     onOpenSearch,
     officialMatches,
-    recentConversations,
-    recentFavorites,
-    recentOfficials,
-    recentMiniPrograms,
     trimmedKeyword,
     worldCharacterMatches,
   ]);
@@ -1586,128 +1546,6 @@ export function DesktopSearchDropdownPanel({
               ) : null}
             </div>
           ) : null}
-        </SearchLauncherSection>
-      ) : null}
-
-      {!trimmedKeyword ? (
-        <SearchLauncherSection
-          title={t(msg`快捷访问`)}
-          className="mt-3"
-          highlighted={activeFocusContext.region === "quickAccess"}
-        >
-          <div className="space-y-3">
-            {recentConversations.length ? (
-              <SearchLauncherCollectionCard
-                countLabel={t(msg`${recentConversations.length} 个会话`)}
-                highlighted={
-                  activeFocusContext.panelId === "recentConversations"
-                }
-                title={t(msg`最近聊天`)}
-              >
-                <div className="space-y-2">
-                  {recentConversations.map((item) => (
-                    <SearchLauncherConversationThreadCard
-                      key={item.id}
-                      active={activeActionId === item.id}
-                      item={item}
-                      keyword=""
-                      onMouseEnter={() => activatePanelAction(item.id)}
-                      onClick={() => handleOpenQuickLink(item)}
-                    />
-                  ))}
-                </div>
-              </SearchLauncherCollectionCard>
-            ) : null}
-
-            {recentOfficials.length ? (
-              <div className="relative">
-                <SearchLauncherCollectionCard
-                  countLabel={t(msg`${recentOfficials.length} 个入口`)}
-                  highlighted={activeFocusContext.panelId === "recentOfficials"}
-                  title={t(msg`最近公众号`)}
-                >
-                  <div className="space-y-1.5">
-                    {recentOfficials.map((group) => (
-                      <SearchLauncherOfficialGroupCard
-                        key={group.id}
-                        activeArticleId={activeActionId}
-                        activeHeaderId={activeActionId}
-                        group={group}
-                        keyword=""
-                        onOpenArticle={(item) => handleOpenQuickLink(item)}
-                        onOpenHeader={(item) => handleOpenQuickLink(item)}
-                        onSelectArticle={(item) =>
-                          activatePanelAction(item.id)
-                        }
-                        onSelectHeader={(item) => activatePanelAction(item.id)}
-                      />
-                    ))}
-                  </div>
-                </SearchLauncherCollectionCard>
-                <SearchLauncherComingSoonOverlay />
-              </div>
-            ) : null}
-
-            {recentMiniPrograms.length ? (
-              <div className="relative">
-                <SearchLauncherCollectionCard
-                  countLabel={t(msg`${recentMiniPrograms.length} 个入口`)}
-                  highlighted={
-                    activeFocusContext.panelId === "recentMiniPrograms"
-                  }
-                  title={t(msg`最近使用的小程序`)}
-                >
-                  <div className="space-y-1.5">
-                    {recentMiniPrograms.map((item) => (
-                      <SearchLauncherFeatureRow
-                        key={item.id}
-                        active={activeActionId === item.id}
-                        item={item}
-                        keyword=""
-                        variant="miniPrograms"
-                        onMouseEnter={() => activatePanelAction(item.id)}
-                        onClick={() => handleOpenQuickLink(item)}
-                      />
-                    ))}
-                  </div>
-                </SearchLauncherCollectionCard>
-                <SearchLauncherComingSoonOverlay />
-              </div>
-            ) : null}
-
-            {favoritesLoading ? (
-              <SearchLauncherCollectionCard
-                highlighted={activeFocusContext.panelId === "recentFavorites"}
-                title={t(msg`最近收藏`)}
-              >
-                <div className="rounded-[12px] bg-white px-3 py-3 text-xs leading-6 text-[color:var(--text-muted)]">
-                  {t(msg`正在同步最近收藏...`)}
-                </div>
-              </SearchLauncherCollectionCard>
-            ) : null}
-
-            {!favoritesLoading && recentFavorites.length ? (
-              <SearchLauncherCollectionCard
-                countLabel={t(msg`${recentFavorites.length} 条收藏`)}
-                highlighted={activeFocusContext.panelId === "recentFavorites"}
-                title={t(msg`最近收藏`)}
-              >
-                <div className="space-y-1.5">
-                  {recentFavorites.map((item) => (
-                    <SearchLauncherFeatureRow
-                      key={item.id}
-                      active={activeActionId === item.id}
-                      item={item}
-                      keyword=""
-                      variant="favorites"
-                      onMouseEnter={() => activatePanelAction(item.id)}
-                      onClick={() => handleOpenQuickLink(item)}
-                    />
-                  ))}
-                </div>
-              </SearchLauncherCollectionCard>
-            ) : null}
-          </div>
         </SearchLauncherSection>
       ) : null}
 
