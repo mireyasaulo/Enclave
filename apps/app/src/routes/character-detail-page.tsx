@@ -1642,9 +1642,10 @@ export function CharacterDetailPage() {
               <ProfileRow
                 label={regionLabel}
                 value={
-                  isFriend
-                    ? friendship?.region?.trim() || unsetLabel
-                    : character.relationship || worldRoleLabel
+                  (isFriend
+                    ? friendship?.region?.trim() ||
+                      character.region?.trim()
+                    : character.region?.trim()) || unsetLabel
                 }
                 compact={!isDesktopLayout}
               />
