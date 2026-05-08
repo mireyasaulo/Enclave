@@ -11,6 +11,7 @@ import {
 } from "@yinjie/contracts";
 import { resolveAppSocketBaseUrl } from "./runtime-config";
 import { APP_RUNTIME_SOCKET_CONFIG_CHANGE_EVENT } from "../runtime/runtime-config-events";
+import { isCloudSessionExpired, useCloudSessionStore } from "../store/cloud-session-store";
 
 let socket: Socket | null = null;
 let activeSocketBaseUrl: string | null = null;
@@ -18,6 +19,36 @@ let runtimeConfigListenerAttached = false;
 
 function socketBaseUrl() {
   return resolveAppSocketBaseUrl();
+}
+
+// baseUrl 形如 http://host/cloud/world-api 时（多租户公网反代），engine 路径
+// 必须在前缀下接 /socket.io 才能被 nginx + cloud-api ws upgrade 识别；本地直连
+// (无路径) 保持默认 /socket.io。
+function buildSocketConnectArgs(baseUrl: string) {
+  let origin = baseUrl;
+  let pathname = "";
+  try {
+    const url = new URL(baseUrl);
+    origin = url.origin;
+    pathname = url.pathname.replace(/\/+$/, "");
+  } catch {
+    // baseUrl 不合法时退化为整段当 origin
+  }
+  const enginePath = pathname ? `${pathname}/socket.io` : "/socket.io";
+  return { namespaceUrl: `${origin}${CHAT_NAMESPACE}`, enginePath };
+}
+
+// 多租户场景把 cloud token 通过 query 透给反代层，让 ws 'upgrade' handler
+// 在尚未握手时就拿到 phone 路由到对应 child；本地直连不需要带 token。
+function resolveSocketAuthToken(baseUrl: string): string | null {
+  if (!baseUrl.includes("/cloud/world-api")) {
+    return null;
+  }
+  const session = useCloudSessionStore.getState();
+  if (!session.accessToken || isCloudSessionExpired(session.expiresAt)) {
+    return null;
+  }
+  return session.accessToken;
 }
 
 function ensureRuntimeConfigListener() {
@@ -42,9 +73,12 @@ export function getChatSocket() {
 
   disconnectChatSocket();
   activeSocketBaseUrl = nextSocketBaseUrl;
-  socket = io(`${nextSocketBaseUrl}${CHAT_NAMESPACE}`, {
-    path: "/socket.io",
+  const { namespaceUrl, enginePath } = buildSocketConnectArgs(nextSocketBaseUrl);
+  const token = resolveSocketAuthToken(nextSocketBaseUrl);
+  socket = io(namespaceUrl, {
+    path: enginePath,
     transports: ["websocket", "polling"],
+    ...(token ? { auth: { token }, query: { token } } : {}),
   });
 
   return socket;

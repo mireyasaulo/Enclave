@@ -328,8 +328,11 @@ export class LocalProcessComputeProviderService
       if (state.child.exitCode !== null) return false;
       return this.isPidAlive(state.child.pid);
     }
-    if (!state.pid) return false;
-    return this.isPidAlive(state.pid);
+    // reattach 来的 state.pid 是从 launchConfig 拿到的，可能是上一次失败 spawn
+    // 留下的死 pid（端口实际被原孤儿占着，但我们没法分辨真实 listen pid）。
+    // 这里信 in-memory 登记本身，让 inspectInstance 的 pingHealth 在每次反代
+    // 请求前再判端口活否；spawn 失败时 child.on('exit') 会自己清掉登记。
+    return true;
   }
 
   private async spawnChild(
