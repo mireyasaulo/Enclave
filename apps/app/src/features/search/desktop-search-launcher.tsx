@@ -1239,13 +1239,6 @@ export function DesktopSearchDropdownPanel({
         className,
       )}
     >
-      <SearchLauncherHeroCard
-        active={navigationLayer === "input"}
-        keyword={trimmedKeyword}
-        onClick={() => onOpenSearch(keyword)}
-        onMouseEnter={activateLauncherSearch}
-      />
-
       {speechStatus !== "idle" || speechError ? (
         <SearchLauncherStatusCard
           description={
@@ -1626,64 +1619,6 @@ function SearchLauncherSection({
       </div>
       {children}
     </section>
-  );
-}
-
-function SearchLauncherHeroCard({
-  active,
-  keyword,
-  onClick,
-  onMouseEnter,
-}: {
-  active: boolean;
-  keyword: string;
-  onClick: () => void;
-  onMouseEnter?: () => void;
-}) {
-  const t = useRuntimeTranslator();
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      className={cn(
-        "w-full overflow-hidden rounded-[18px] border text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
-        active
-          ? "border-[#cfe4d2] bg-[linear-gradient(135deg,rgba(7,193,96,0.18),rgba(7,193,96,0.08)_45%,white)]"
-          : "border-[#dce9dd] bg-[linear-gradient(135deg,rgba(7,193,96,0.14),rgba(7,193,96,0.05)_45%,white)] hover:border-[#cfe4d2] hover:bg-[linear-gradient(135deg,rgba(7,193,96,0.18),rgba(7,193,96,0.08)_45%,white)]",
-      )}
-    >
-      <div className="flex items-start gap-3 px-4 py-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-white text-[color:var(--brand-primary)] shadow-[0_8px_18px_rgba(7,193,96,0.10)]">
-          <Search size={17} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-medium text-[color:var(--text-primary)]">
-              {t(msg`搜一搜`)}
-            </div>
-            <div className="shrink-0 rounded-full bg-white/90 px-2.5 py-1 text-[10px] text-[color:var(--text-muted)]">
-              Enter
-            </div>
-          </div>
-          <div className="mt-1 text-[11px] leading-5 text-[color:var(--text-secondary)]">
-            {keyword
-              ? t(msg`执行搜索"${keyword}"，进入完整结果页继续查看。`)
-              : t(msg`执行一次全局搜索，进入完整结果页后继续按分类查看。`)}
-          </div>
-        </div>
-      </div>
-      <div className="border-t border-white/80 px-4 py-2.5">
-        <div className="flex items-center justify-between gap-3 text-[11px] text-[color:var(--text-muted)]">
-          <span>
-            {keyword
-              ? t(msg`Enter 执行搜索 · Tab 进入结果层`)
-              : t(msg`Tab 进入结果层 · 支持聊天、联系人、公众号、收藏和小程序`)}
-          </span>
-          <CornerDownLeft size={14} className="shrink-0" />
-        </div>
-      </div>
-    </button>
   );
 }
 
