@@ -604,7 +604,6 @@ function DirectChatDetailsPanel({
         name={targetCharacter?.name ?? conversation.title}
         displayName={displayName}
         subline={relationshipSummary}
-        identifier={identifier}
         compact
         action={
           !isFriend ? (
@@ -652,6 +651,11 @@ function DirectChatDetailsPanel({
                   }
                 />
                 <DesktopContactProfileRow
+                  label={t(msg`隐界号`)}
+                  value={identifier ?? t(msg`未设置`)}
+                  muted={!identifier}
+                />
+                <DesktopContactProfileRow
                   label={t(msg`地区`)}
                   value={friendship?.region?.trim() || t(msg`未设置`)}
                   muted={!friendship?.region?.trim()}
@@ -686,6 +690,11 @@ function DirectChatDetailsPanel({
                     !targetCharacter?.currentStatus?.trim() &&
                     !targetCharacter?.bio?.trim()
                   }
+                />
+                <DesktopContactProfileRow
+                  label={t(msg`隐界号`)}
+                  value={identifier ?? t(msg`未设置`)}
+                  muted={!identifier}
                 />
               </>
             )}
