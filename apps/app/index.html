@@ -204,6 +204,30 @@
         };
       })();
     </script>
+    <script>
+      // 公网隧道带宽 ~50KB/s，首屏 React 链下载 + 解析 + AppLocaleProvider catalog
+      // 加载至少 3-5s。getWorldOwner 是 splash 必发的 API（~500ms RTT），早一点
+      // 启动就能省掉 splash mount 后那一段等待 —— 让浏览器在解析 HTML 时就把这
+      // 个请求发出去，与所有 JS 下载并行。SplashPage 直接 await 这个 in-flight
+      // Promise，不再重复发 fetch。
+      // 仅 worldAccessMode=local（即纯 web）下做：cloud / 原生壳走另一套 baseUrl，
+      // 不能假设 origin 就是 api 入口。
+      (function () {
+        var w = window;
+        if (!w || !w.fetch) return;
+        if (w.Capacitor || w.__TAURI__ || w.__TAURI_INTERNALS__) return;
+        var cfg = w.__YINJIE_RUNTIME_CONFIG__;
+        if (!cfg || cfg.worldAccessMode !== "local") return;
+        try {
+          w.__YINJIE_BOOT_OWNER_FETCH__ = w.fetch("/api/world/owner", {
+            credentials: "same-origin",
+            headers: { "Accept": "application/json" },
+          });
+        } catch (_e) {
+          // 网络/CORS 异常等下让 splash 自己 fallback 走完整链路。
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
   </html>

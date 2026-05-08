@@ -1516,6 +1516,29 @@ export function exportDiagnostics(baseUrl?: string) {
 }
 
 export function getWorldOwner(baseUrl?: string) {
+  // 公网隧道下首屏会被 splash 的这一发 RTT 卡住 ~500ms。app 的 index.html 在
+  // worldAccessMode=local 时会用 inline 脚本提前 fire 同一个 fetch，并把
+  // Promise 挂到 window.__YINJIE_BOOT_OWNER_FETCH__。这里命中一次就消耗掉，
+  // 任何异常都回退到走完整 requestLegacyApi 流程，保证降级安全。
+  if (typeof window !== "undefined") {
+    const carrier = window as unknown as {
+      __YINJIE_BOOT_OWNER_FETCH__?: Promise<Response>;
+    };
+    const inflight = carrier.__YINJIE_BOOT_OWNER_FETCH__;
+    if (inflight) {
+      carrier.__YINJIE_BOOT_OWNER_FETCH__ = undefined;
+      return inflight
+        .then(async (response) => {
+          if (!response.ok) {
+            throw new Error(`world-owner-prewarm-${response.status}`);
+          }
+          return (await response.json()) as WorldOwner;
+        })
+        .catch(() =>
+          requestLegacyApi<WorldOwner>("/world/owner", undefined, baseUrl),
+        );
+    }
+  }
   return requestLegacyApi<WorldOwner>("/world/owner", undefined, baseUrl);
 }
 
