@@ -412,6 +412,12 @@ export function DesktopShell({ children }: PropsWithChildren) {
     navigateDesktopShellTo("/tabs/moments");
   };
 
+  const openEditSignatureShortcut = () => {
+    setOwnerCardNotice(null);
+    setIsOwnerCardOpen(false);
+    navigateDesktopShellTo("/desktop/settings");
+  };
+
   const openSelfChatShortcut = async () => {
     if (!ownerId || isOpeningSelfChat) {
       return;
@@ -556,6 +562,7 @@ export function DesktopShell({ children }: PropsWithChildren) {
                     onOpenSelfChat={() => {
                       void openSelfChatShortcut();
                     }}
+                    onEditSignature={openEditSignatureShortcut}
                   />
                 ) : null}
               </div>
@@ -910,6 +917,7 @@ function DesktopOwnerQuickCard({
   isOpeningSelfChat,
   onOpenMoments,
   onOpenSelfChat,
+  onEditSignature,
 }: {
   ownerName: string | null;
   ownerAvatar: string;
@@ -918,6 +926,7 @@ function DesktopOwnerQuickCard({
   isOpeningSelfChat: boolean;
   onOpenMoments: () => void;
   onOpenSelfChat: () => void;
+  onEditSignature: () => void;
 }) {
   const t = useRuntimeTranslator();
   const ownerDisplayName = ownerName?.trim() || "";
@@ -935,17 +944,29 @@ function DesktopOwnerQuickCard({
                 {ownerDisplayName}
               </div>
             ) : null}
-            <div
-              className={cn(
-                "line-clamp-2 text-[12px] leading-5",
-                ownerDisplayName ? "mt-1.5" : "",
-                trimmedSignature
-                  ? "text-[color:var(--text-secondary)]"
-                  : "text-[color:var(--text-muted)]",
-              )}
-            >
-              {trimmedSignature || signaturePlaceholder}
-            </div>
+            {trimmedSignature ? (
+              <div
+                className={cn(
+                  "line-clamp-2 text-[12px] leading-5 text-[color:var(--text-secondary)]",
+                  ownerDisplayName ? "mt-1.5" : "",
+                )}
+              >
+                {trimmedSignature}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={onEditSignature}
+                className={cn(
+                  "block w-full rounded-[8px] border-0 bg-transparent p-0 text-left text-[12px] leading-5 text-[color:var(--text-muted)] appearance-none transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:text-[color:var(--brand-primary)]",
+                  ownerDisplayName ? "mt-1.5" : "",
+                )}
+              >
+                <span className="line-clamp-2 underline decoration-dotted decoration-[color:var(--text-muted)] underline-offset-2 hover:decoration-[color:var(--brand-primary)]">
+                  {signaturePlaceholder}
+                </span>
+              </button>
+            )}
           </div>
         </div>
       </div>
