@@ -30,7 +30,7 @@ import {
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { buildGroupInviteReturnSearch } from "../lib/group-invite-delivery";
 import { isMissingGroupError } from "../lib/group-route-fallback";
-import { isDesktopOnlyPath } from "../lib/history-back";
+import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
@@ -543,10 +543,12 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
           : t(msg`群聊信息`)
       }
       onBack={() => {
-        void navigate({
-          to: "/group/$groupId",
-          params: { groupId },
-          ...(groupRouteHash ? { hash: groupRouteHash } : {}),
+        navigateBackOrFallback(() => {
+          void navigate({
+            to: "/group/$groupId",
+            params: { groupId },
+            ...(groupRouteHash ? { hash: groupRouteHash } : {}),
+          });
         });
       }}
       rightActions={

@@ -45,7 +45,7 @@ import {
 import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { buildCreateGroupRouteHash } from "../lib/create-group-route-state";
-import { isDesktopOnlyPath } from "../lib/history-back";
+import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { buildYinjieId } from "../lib/yinjie-id";
 import {
   openAppSettings,
@@ -737,10 +737,12 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
     <ChatDetailsShell
       title={conversation?.title ?? t(msg`聊天信息`)}
       onBack={() => {
-        void navigate({
-          to: "/chat/$conversationId",
-          params: { conversationId },
-          ...(chatRouteHash ? { hash: chatRouteHash } : {}),
+        navigateBackOrFallback(() => {
+          void navigate({
+            to: "/chat/$conversationId",
+            params: { conversationId },
+            ...(chatRouteHash ? { hash: chatRouteHash } : {}),
+          });
         });
       }}
     >
