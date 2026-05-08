@@ -3,6 +3,7 @@ import {
   lazy,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -20,6 +21,7 @@ import { AvatarChip } from "../components/avatar-chip";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
+import { ContactIndexList } from "../features/contacts/contact-index-list";
 import { parseDesktopContactsRouteState } from "../features/contacts/contacts-route-state";
 import { buildMobileFriendRequestsRouteHash } from "../features/contacts/mobile-friend-requests-route-state";
 import {
@@ -84,6 +86,10 @@ function MobileWorldCharactersPage() {
   const hash = useRouterState({ select: (state) => state.location.hash });
   const routeState = parseWorldCharactersRouteState(hash);
   const [searchText, setSearchText] = useState(routeState.keyword);
+  const pageRef = useRef<HTMLDivElement | null>(null);
+  const [activeMobileIndexKey, setActiveMobileIndexKey] = useState<
+    string | null
+  >(null);
   const normalizedHash = hash.startsWith("#") ? hash.slice(1) : hash;
   const safeReturnPath =
     routeState.returnPath && !isDesktopOnlyPath(routeState.returnPath)
@@ -137,12 +143,103 @@ function MobileWorldCharactersPage() {
     () => buildContactSections(filteredItems),
     [filteredItems],
   );
+  const mobileIndexItems = useMemo(
+    () =>
+      sections.map((section) => ({
+        key: section.anchorId,
+        indexLabel: section.indexLabel,
+      })),
+    [sections],
+  );
 
   useEffect(() => {
     if (searchText !== routeState.keyword) {
       setSearchText(routeState.keyword);
     }
   }, [routeState.keyword, searchText]);
+
+  useEffect(() => {
+    if (normalizedSearchText || !sections.length) {
+      setActiveMobileIndexKey(null);
+      return;
+    }
+
+    setActiveMobileIndexKey((current) => {
+      if (
+        current &&
+        mobileIndexItems.some((item) => item.key === current)
+      ) {
+        return current;
+      }
+
+      return mobileIndexItems[0]?.key ?? null;
+    });
+  }, [mobileIndexItems, normalizedSearchText, sections]);
+
+  useEffect(() => {
+    if (normalizedSearchText || !sections.length) {
+      return;
+    }
+
+    const scrollContainer = pageRef.current?.parentElement;
+    if (!scrollContainer) {
+      return;
+    }
+
+    const syncActiveMobileIndexKey = () => {
+      if (typeof document === "undefined") {
+        return;
+      }
+
+      const containerRect = scrollContainer.getBoundingClientRect();
+      const stickyOffset = 104;
+      let nextActiveKey = mobileIndexItems[0]?.key ?? null;
+
+      for (const item of mobileIndexItems) {
+        const anchorElement = document.getElementById(item.key);
+        if (!anchorElement) {
+          continue;
+        }
+
+        const topOffset =
+          anchorElement.getBoundingClientRect().top - containerRect.top;
+        if (topOffset <= stickyOffset) {
+          nextActiveKey = item.key;
+        } else {
+          break;
+        }
+      }
+
+      setActiveMobileIndexKey((current) =>
+        current === nextActiveKey ? current : nextActiveKey,
+      );
+    };
+
+    syncActiveMobileIndexKey();
+    scrollContainer.addEventListener("scroll", syncActiveMobileIndexKey, {
+      passive: true,
+    });
+
+    return () => {
+      scrollContainer.removeEventListener("scroll", syncActiveMobileIndexKey);
+    };
+  }, [mobileIndexItems, normalizedSearchText, sections]);
+
+  function handleIndexJump(
+    anchorId: string,
+    behavior: ScrollBehavior = "smooth",
+  ) {
+    setActiveMobileIndexKey(anchorId);
+
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    document.getElementById(anchorId)?.scrollIntoView({
+      behavior,
+      block: "start",
+    });
+  }
 
   useEffect(() => {
     if (normalizedHash === (currentRouteHash ?? "")) {
@@ -191,6 +288,7 @@ function MobileWorldCharactersPage() {
   }
 
   return (
+    <div ref={pageRef}>
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
       <TabPageTopBar
         title={t(msg`世界角色`)}
@@ -355,7 +453,7 @@ function MobileWorldCharactersPage() {
         {sections.length ? (
           <section className="mt-1 overflow-hidden border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)]">
             {sections.map((section) => (
-              <div key={section.key}>
+              <div key={section.key} id={section.anchorId}>
                 <div className="bg-[rgba(247,247,247,0.94)] px-4 py-1 text-[11px] font-medium tracking-[0.06em] text-[color:var(--text-muted)]">
                   {section.title}
                 </div>
@@ -402,7 +500,18 @@ function MobileWorldCharactersPage() {
           </section>
         ) : null}
       </div>
+
+      {!normalizedSearchText && sections.length ? (
+        <ContactIndexList
+          items={mobileIndexItems}
+          activeKey={activeMobileIndexKey}
+          compact
+          className="fixed right-0.5 top-[55%] z-30 -translate-y-1/2"
+          onSelect={handleIndexJump}
+        />
+      ) : null}
     </AppPage>
+    </div>
   );
 }
 
