@@ -289,6 +289,11 @@ const FriendRequestsPage = lazy(async () => {
   return { default: mod.FriendRequestsPage };
 });
 
+const MobileAddFriendPage = lazy(async () => {
+  const mod = await import("./routes/mobile-add-friend-page");
+  return { default: mod.MobileAddFriendPage };
+});
+
 const GroupChatPage = lazy(async () => {
   const mod = await import("./routes/group-chat-page");
   return { default: mod.GroupChatPage };
@@ -565,6 +570,13 @@ const friendRequestsRoute = createRoute({
   path: "/friend-requests",
   beforeLoad: requireWorldReady,
   component: FriendRequestsPage,
+});
+
+const mobileAddFriendRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/add-friend",
+  beforeLoad: requireWorldReady,
+  component: MobileAddFriendPage,
 });
 
 const starredFriendsRoute = createRoute({
@@ -959,6 +971,7 @@ const routeTree = rootRoute.addChildren([
   desktopNoteWindowRoute,
   desktopFeedbackRoute,
   desktopAddFriendRoute,
+  mobileAddFriendRoute,
   desktopSettingsRoute,
   liveCompanionRoute,
   legalPrivacyRoute,

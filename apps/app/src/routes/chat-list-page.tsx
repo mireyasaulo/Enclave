@@ -73,6 +73,7 @@ import {
   buildMobileOfficialRouteHash,
   parseMobileOfficialRouteState,
 } from "../features/official-accounts/mobile-official-route-state";
+import { buildMobileAddFriendRouteHash } from "../features/contacts/mobile-add-friend-route-state";
 import { buildMobileFriendRequestsRouteHash } from "../features/contacts/mobile-friend-requests-route-state";
 import { buildSearchRouteHash } from "../features/search/search-route-state";
 import { useMessageReminders } from "../features/chat/use-message-reminders";
@@ -93,7 +94,7 @@ type QuickActionItem = {
   key: string;
   label: ChatListMessage;
   icon: typeof Users;
-  to?: "/group/new" | "/friend-requests";
+  to?: "/group/new" | "/friend-requests" | "/add-friend";
   disabled?: boolean;
   disabledLabel?: ChatListMessage;
 };
@@ -111,7 +112,7 @@ const quickActionItems: QuickActionItem[] = [
     key: "add-friend",
     label: msg`添加朋友`,
     icon: UserPlus,
-    to: "/friend-requests",
+    to: "/add-friend",
   },
   {
     key: "scan",
@@ -473,7 +474,9 @@ function MobileChatListPage() {
     };
   }, [baseUrl, queryClient]);
 
-  function handleNavigate(to: "/group/new" | "/friend-requests") {
+  function handleNavigate(
+    to: "/group/new" | "/friend-requests" | "/add-friend",
+  ) {
     setIsQuickMenuOpen(false);
     setNotice(null);
     const nextHash =
@@ -481,9 +484,13 @@ function MobileChatListPage() {
         ? buildCreateGroupRouteHash({
             returnPath: pathname,
           })
-        : buildMobileFriendRequestsRouteHash({
-            returnPath: pathname,
-          });
+        : to === "/add-friend"
+          ? buildMobileAddFriendRouteHash({
+              returnPath: pathname,
+            })
+          : buildMobileFriendRequestsRouteHash({
+              returnPath: pathname,
+            });
     void navigate({
       to,
       ...(nextHash ? { hash: nextHash } : {}),
