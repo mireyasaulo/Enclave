@@ -262,6 +262,7 @@ export function FavoritesPage() {
           ? await queryClient.fetchQuery({
               queryKey: ["app-favorites", baseUrl],
               queryFn: () => getFavorites(baseUrl),
+              staleTime: 0,
             })
           : (favoritesQuery.data ?? []);
 
