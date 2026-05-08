@@ -160,11 +160,13 @@ export function ProfilePage() {
         </ProfileEntryGroup>
 
         <ProfileEntryGroup className="mt-3">
-          <ProfileEntry
+          <ProfileActionEntry
             icon={Camera}
             iconClassName="bg-[rgba(168,85,247,0.12)] text-[#7e22ce]"
             label={t(msg`朋友圈`)}
-            to="/profile/moments"
+            onClick={() => {
+              void navigate({ to: "/profile/moments" });
+            }}
           />
         </ProfileEntryGroup>
 
