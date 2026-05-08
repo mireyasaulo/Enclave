@@ -18,6 +18,7 @@ import {
   Plus,
   QrCode,
   Search,
+  Settings,
   Star,
   Tag,
   UserPlus,
@@ -50,6 +51,8 @@ import { RouteRedirectState } from "../components/route-redirect-state";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { ContactDetailPane } from "../features/contacts/contact-detail-pane";
 import { ContactIndexList } from "../features/contacts/contact-index-list";
+import { ContactsBulkActionBar } from "../features/contacts/management/contacts-bulk-action-bar";
+import { ContactsManagementModal } from "../features/contacts/management/contacts-management-modal";
 import {
   ContactShortcutList,
   type ContactShortcutListItem,
@@ -294,6 +297,26 @@ export function ContactsPage() {
     routeState.showWorldCharacters,
   );
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
+  const [managementOpen, setManagementOpen] = useState(false);
+  const [bulkMode, setBulkMode] = useState(false);
+  const [bulkSelectedIds, setBulkSelectedIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const exitBulkMode = useCallback(() => {
+    setBulkMode(false);
+    setBulkSelectedIds(new Set());
+  }, []);
+  const toggleBulkSelection = useCallback((characterId: string) => {
+    setBulkSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(characterId)) {
+        next.delete(characterId);
+      } else {
+        next.add(characterId);
+      }
+      return next;
+    });
+  }, []);
   const [desktopSelection, setDesktopSelection] = useState<DesktopSelection>(
     () => buildDesktopSelectionFromRouteState(hash),
   );
@@ -1500,7 +1523,37 @@ export function ContactsPage() {
             desktopSelection?.kind === "friend" ? desktopSelection.id : null
           }
           pendingCharacterId={pendingCharacterId}
+          bulkMode={bulkMode}
+          bulkSelectedIds={bulkSelectedIds}
+          onOpenManagement={() => setManagementOpen(true)}
+          bulkActionBar={
+            bulkMode ? (
+              <ContactsBulkActionBar
+                desktop
+                selectedIds={Array.from(bulkSelectedIds)}
+                totalIds={desktopFriendSections.flatMap((section) =>
+                  section.items.map((item) => item.character.id),
+                )}
+                onSelectAll={() =>
+                  setBulkSelectedIds(
+                    new Set(
+                      desktopFriendSections.flatMap((section) =>
+                        section.items.map((item) => item.character.id),
+                      ),
+                    ),
+                  )
+                }
+                onClearSelection={() => setBulkSelectedIds(new Set())}
+                onDone={exitBulkMode}
+                setNotice={setNotice}
+              />
+            ) : null
+          }
           onSelectFriend={(characterId) => {
+            if (bulkMode) {
+              toggleBulkSelection(characterId);
+              return;
+            }
             const nextSelection = {
               kind: "friend",
               id: characterId,
@@ -1508,7 +1561,13 @@ export function ContactsPage() {
             setDesktopSelection(nextSelection);
             commitDesktopRouteState(nextSelection, showWorldCharacters);
           }}
-          onOpenFriendChat={handleStartChat}
+          onOpenFriendChat={(characterId) => {
+            if (bulkMode) {
+              toggleBulkSelection(characterId);
+              return;
+            }
+            handleStartChat(characterId);
+          }}
           emptyState={
             !friendsQuery.isError ? (
               <div className="px-3">
@@ -1883,6 +1942,19 @@ export function ContactsPage() {
             )
           }
         />
+        <ContactsManagementModal
+          open={managementOpen}
+          onClose={() => setManagementOpen(false)}
+          onEnterBulkMode={() => {
+            setManagementOpen(false);
+            setBulkSelectedIds(new Set());
+            setBulkMode(true);
+          }}
+          onOpenTags={() => {
+            setManagementOpen(false);
+            void navigate({ to: "/contacts/tags" });
+          }}
+        />
       </Suspense>
     );
   }
@@ -1904,7 +1976,28 @@ export function ContactsPage() {
           titleAlign="center"
           className="z-40 mx-0 mt-0 mb-0 overflow-visible border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
           rightActions={
-            <div className="relative">
+            bulkMode ? (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={exitBulkMode}
+                className="h-9 rounded-full bg-transparent px-3 text-[13px] text-[color:var(--text-primary)] shadow-none hover:bg-black/4 active:bg-black/[0.05]"
+                aria-label={t(msg`取消`)}
+              >
+                {t(msg`取消`)}
+              </Button>
+            ) : (
+            <div className="relative flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => setManagementOpen(true)}
+                className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none hover:bg-black/4 active:bg-black/[0.05]"
+                aria-label={t(msg`通讯录管理`)}
+              >
+                <Settings size={15} />
+              </Button>
               <Button
                 type="button"
                 variant="ghost"
@@ -1916,7 +2009,7 @@ export function ContactsPage() {
                 <Plus size={15} strokeWidth={2.4} />
               </Button>
 
-              {isQuickMenuOpen ? (
+              {isQuickMenuOpen && !bulkMode ? (
                 <div className="absolute right-0 top-[calc(100%+0.3rem)] z-40 w-[10rem] overflow-hidden rounded-[11px] bg-[rgba(44,44,44,0.96)] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.2)]">
                   {mobileQuickActionItems.map((item) => {
                     const Icon = item.icon;
@@ -1972,6 +2065,7 @@ export function ContactsPage() {
                 </div>
               ) : null}
             </div>
+            )
           }
         >
           <div className="pt-1.5">
@@ -2104,7 +2198,15 @@ export function ContactsPage() {
                     key={item.character.id}
                     item={item}
                     index={index}
-                    onClick={() => handleOpenProfile(item.character.id)}
+                    bulkMode={bulkMode}
+                    selected={bulkSelectedIds.has(item.character.id)}
+                    onClick={() => {
+                      if (bulkMode) {
+                        toggleBulkSelection(item.character.id);
+                        return;
+                      }
+                      handleOpenProfile(item.character.id);
+                    }}
                   />
                 ))}
               </div>
@@ -2112,7 +2214,7 @@ export function ContactsPage() {
           </section>
         </div>
 
-        {!normalizedSearchText && friendSections.length ? (
+        {!normalizedSearchText && friendSections.length && !bulkMode ? (
           <ContactIndexList
             items={mobileIndexItems}
             activeKey={activeMobileIndexKey}
@@ -2121,6 +2223,41 @@ export function ContactsPage() {
             onSelect={handleIndexJumpWithBehavior}
           />
         ) : null}
+
+        {bulkMode ? (
+          <ContactsBulkActionBar
+            selectedIds={Array.from(bulkSelectedIds)}
+            totalIds={friendSections.flatMap((section) =>
+              section.items.map((item) => item.character.id),
+            )}
+            onSelectAll={() =>
+              setBulkSelectedIds(
+                new Set(
+                  friendSections.flatMap((section) =>
+                    section.items.map((item) => item.character.id),
+                  ),
+                ),
+              )
+            }
+            onClearSelection={() => setBulkSelectedIds(new Set())}
+            onDone={exitBulkMode}
+            setNotice={setNotice}
+          />
+        ) : null}
+
+        <ContactsManagementModal
+          open={managementOpen}
+          onClose={() => setManagementOpen(false)}
+          onEnterBulkMode={() => {
+            setManagementOpen(false);
+            setBulkSelectedIds(new Set());
+            setBulkMode(true);
+          }}
+          onOpenTags={() => {
+            setManagementOpen(false);
+            void navigate({ to: "/contacts/tags" });
+          }}
+        />
       </AppPage>
     </div>
   );
@@ -2132,6 +2269,8 @@ function FriendListRow({
   pendingCharacterId,
   desktop = false,
   active = false,
+  bulkMode = false,
+  selected = false,
   onClick,
   onDoubleClick,
 }: {
@@ -2140,6 +2279,8 @@ function FriendListRow({
   pendingCharacterId?: string | null;
   desktop?: boolean;
   active?: boolean;
+  bulkMode?: boolean;
+  selected?: boolean;
   onClick: () => void;
   onDoubleClick?: () => void;
 }) {
@@ -2161,6 +2302,31 @@ function FriendListRow({
           : undefined,
       )}
     >
+      {bulkMode ? (
+        <span
+          className={cn(
+            "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors",
+            selected
+              ? "border-[#07c160] bg-[#07c160] text-white"
+              : "border-[color:var(--border-subtle)] bg-white",
+          )}
+        >
+          {selected ? (
+            <svg
+              viewBox="0 0 16 16"
+              width="11"
+              height="11"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="3 8.5 6.5 12 13 5" />
+            </svg>
+          ) : null}
+        </span>
+      ) : null}
       <AvatarChip
         name={item.character.name}
         src={item.character.avatar}

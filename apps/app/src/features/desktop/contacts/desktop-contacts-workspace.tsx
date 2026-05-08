@@ -4,6 +4,7 @@ import {
   LoaderCircle,
   Mic,
   Search,
+  Settings,
   Square,
   type LucideIcon,
 } from "lucide-react";
@@ -57,12 +58,16 @@ export type DesktopContactsWorkspaceProps = {
   pendingCharacterId?: string | null;
   onSelectFriend: (characterId: string) => void;
   onOpenFriendChat: (characterId: string) => void;
+  bulkMode?: boolean;
+  bulkSelectedIds?: ReadonlySet<string>;
   emptyState?: ReactNode;
   worldCharacterTitle: string;
   worldCharacterSections: ContactSection<WorldCharacterDirectoryItem>[];
   activeWorldCharacterId?: string | null;
   onSelectWorldCharacter: (characterId: string) => void;
   detailContent: ReactNode;
+  onOpenManagement?: () => void;
+  bulkActionBar?: ReactNode;
 };
 
 export function DesktopContactsWorkspace({
@@ -89,12 +94,16 @@ export function DesktopContactsWorkspace({
   pendingCharacterId = null,
   onSelectFriend,
   onOpenFriendChat,
+  bulkMode = false,
+  bulkSelectedIds,
   emptyState = null,
   worldCharacterTitle,
   worldCharacterSections,
   activeWorldCharacterId = null,
   onSelectWorldCharacter,
   detailContent,
+  onOpenManagement,
+  bulkActionBar = null,
 }: DesktopContactsWorkspaceProps) {
   const t = useRuntimeTranslator();
   return (
@@ -103,12 +112,25 @@ export function DesktopContactsWorkspace({
         <div className="flex h-full min-h-0">
           <section className="flex w-[320px] shrink-0 flex-col border-r border-[rgba(0,0,0,0.06)] bg-[#f7f7f7]">
             <div className="border-b border-[rgba(0,0,0,0.06)] bg-[#f7f7f7] px-4 py-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <div className="text-[15px] font-medium text-[color:var(--text-primary)]">
                   {t(msg`通讯录`)}
                 </div>
-                <div className="text-[11px] text-[color:var(--text-muted)]">
-                  {directoryCountLabel}
+                <div className="flex items-center gap-2">
+                  <div className="text-[11px] text-[color:var(--text-muted)]">
+                    {directoryCountLabel}
+                  </div>
+                  {onOpenManagement ? (
+                    <button
+                      type="button"
+                      onClick={onOpenManagement}
+                      className="flex h-7 w-7 items-center justify-center rounded-[8px] text-[color:var(--text-secondary)] transition-colors hover:bg-black/5 hover:text-[color:var(--text-primary)]"
+                      aria-label={t(msg`通讯录管理`)}
+                      title={t(msg`通讯录管理`)}
+                    >
+                      <Settings size={15} />
+                    </button>
+                  ) : null}
                 </div>
               </div>
 
@@ -209,6 +231,10 @@ export function DesktopContactsWorkspace({
                             index={index}
                             pendingCharacterId={pendingCharacterId}
                             active={activeFriendId === item.character.id}
+                            bulkMode={bulkMode}
+                            selected={
+                              bulkSelectedIds?.has(item.character.id) ?? false
+                            }
                             onClick={() => onSelectFriend(item.character.id)}
                             onDoubleClick={() =>
                               onOpenFriendChat(item.character.id)
@@ -256,6 +282,7 @@ export function DesktopContactsWorkspace({
               </div>
               {indexList}
             </div>
+            {bulkActionBar}
           </section>
 
           <section className="min-w-0 flex-1 bg-[#f5f5f5]">
@@ -280,6 +307,8 @@ function DesktopFriendListRow({
   index,
   pendingCharacterId,
   active,
+  bulkMode = false,
+  selected = false,
   onClick,
   onDoubleClick,
 }: {
@@ -287,6 +316,8 @@ function DesktopFriendListRow({
   index: number;
   pendingCharacterId?: string | null;
   active?: boolean;
+  bulkMode?: boolean;
+  selected?: boolean;
   onClick: () => void;
   onDoubleClick?: () => void;
 }) {
@@ -304,6 +335,31 @@ function DesktopFriendListRow({
           : undefined,
       )}
     >
+      {bulkMode ? (
+        <span
+          className={cn(
+            "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors",
+            selected
+              ? "border-[#07c160] bg-[#07c160] text-white"
+              : "border-[color:var(--border-subtle)] bg-white",
+          )}
+        >
+          {selected ? (
+            <svg
+              viewBox="0 0 16 16"
+              width="11"
+              height="11"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="3 8.5 6.5 12 13 5" />
+            </svg>
+          ) : null}
+        </span>
+      ) : null}
       <AvatarChip
         name={item.character.name}
         src={item.character.avatar}
