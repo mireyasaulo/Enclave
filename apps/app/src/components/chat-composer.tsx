@@ -1226,6 +1226,7 @@ export function ChatComposer({
       return;
     }
 
+    setStickerPanelOpen(false);
     setDesktopFavoriteRecords(
       mergeDesktopFavoriteRecords(
         favoritesQuery.data ?? [],
@@ -3066,12 +3067,31 @@ export function ChatComposer({
               <div className="flex items-center justify-between gap-3 border-t border-black/6 bg-[#fafafa] px-3.5 py-2.5">
                 <div className="flex min-w-0 flex-1 items-center gap-2">
                   <DesktopToolbarGroup>
-                    <DesktopToolbarButton
-                      label={t(msg`表情`)}
-                      icon={<Smile size={16} />}
-                      active={stickerPanelOpen}
-                      onClick={toggleStickerPanel}
-                    />
+                    <div className="relative">
+                      <DesktopToolbarButton
+                        label={t(msg`表情`)}
+                        icon={<Smile size={16} />}
+                        active={stickerPanelOpen}
+                        onClick={toggleStickerPanel}
+                      />
+                      {stickerPanelOpen && onSendSticker ? (
+                        <StickerPanel
+                          baseUrl={baseUrl}
+                          variant={variant}
+                          activePackId={activeStickerPackId}
+                          recentItems={recentStickers}
+                          onClose={() => setStickerPanelOpen(false)}
+                          onPackChange={setActiveStickerPackId}
+                          onRecentItemsChange={(items) =>
+                            setRecentStickers(items)
+                          }
+                          onError={setAttachmentError}
+                          onSelect={(sticker) =>
+                            void handleSendSticker(sticker)
+                          }
+                        />
+                      ) : null}
+                    </div>
                   </DesktopToolbarGroup>
                   {onSendAttachment ? (
                     <DesktopToolbarGroup>
@@ -3327,18 +3347,13 @@ export function ChatComposer({
             </div>
           )}
 
-          {stickerPanelOpen && onSendSticker ? (
+          {!isDesktop && stickerPanelOpen && onSendSticker ? (
             <StickerPanel
               baseUrl={baseUrl}
               variant={variant}
               activePackId={activeStickerPackId}
               recentItems={recentStickers}
               onClose={() => {
-                if (isDesktop) {
-                  setStickerPanelOpen(false);
-                  return;
-                }
-
                 returnMobileComposerToText({ focusInput: true });
               }}
               onPackChange={setActiveStickerPackId}
