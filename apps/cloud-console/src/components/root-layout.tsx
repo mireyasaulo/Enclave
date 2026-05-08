@@ -18,6 +18,7 @@ import {
   useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
 import { ConsoleNoticeProvider, useConsoleNotice } from "./console-notice";
+import { ConsoleNoticeToast } from "./ui/console-notice-toast";
 
 const NAV_LINK =
   "block rounded-[20px] border border-transparent px-3.5 py-2.5 text-sm text-[color:var(--text-secondary)] transition-[background-color,border-color,color] duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:border-[color:var(--border-subtle)] hover:bg-[color:var(--surface-card)] hover:text-[color:var(--text-primary)]";
@@ -186,7 +187,7 @@ function StatusDot({ tone }: { tone: "ready" | "warning" }) {
 function RootLayoutContent() {
   const t = useCloudConsoleText();
   const queryClient = useQueryClient();
-  const { notice, showNotice } = useConsoleNotice();
+  const { showNotice } = useConsoleNotice();
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
@@ -465,6 +466,7 @@ function RootLayoutContent() {
 
   return (
     <div className="relative min-h-screen text-[color:var(--text-primary)]">
+      <ConsoleNoticeToast />
       <div
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 opacity-45"
@@ -593,24 +595,6 @@ function RootLayoutContent() {
           </header>
 
           <div className="px-4 pb-6 pt-4 sm:px-6 lg:px-8 lg:pb-8">
-            {notice ? (
-              <div className="mb-6">
-                <InlineNotice tone={notice.tone}>
-                  <div>{notice.message}</div>
-                  {notice.requestId ? (
-                    <div className="mt-3 border-t border-current/15 pt-3 text-xs leading-5 text-current/90">
-                      <div className="uppercase tracking-[0.12em] opacity-80">
-                        {t("Request id")}
-                      </div>
-                      <div className="mt-1 break-all font-mono">
-                        {notice.requestId}
-                      </div>
-                    </div>
-                  ) : null}
-                </InlineNotice>
-              </div>
-            ) : null}
-
             {hasSecret ? (
               <Outlet />
             ) : (
