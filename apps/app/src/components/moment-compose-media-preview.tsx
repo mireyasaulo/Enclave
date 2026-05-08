@@ -1,5 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { msg } from "@lingui/macro";
 import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
 import {
   formatMomentDurationLabel,
@@ -22,6 +24,7 @@ export function MomentComposeMediaPreview({
   onRemoveVideo,
   variant = "desktop",
 }: MomentComposeMediaPreviewProps) {
+  const t = useRuntimeTranslator();
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   const [showVideoViewer, setShowVideoViewer] = useState(false);
 
@@ -67,12 +70,12 @@ export function MomentComposeMediaPreview({
               type="button"
               onClick={() => setShowVideoViewer(true)}
               className="group relative block w-full text-left"
-              aria-label="打开视频预览"
+              aria-label={t(msg`打开视频预览`)}
             >
               {videoDraft.posterPreviewUrl ? (
                 <img
                   src={videoDraft.posterPreviewUrl}
-                  alt={videoDraft.file.name || "视频封面"}
+                  alt={videoDraft.file.name || t(msg`视频封面`)}
                   className={cn(
                     "w-full object-cover",
                     variant === "mobile" ? "max-h-[220px]" : "max-h-[260px]",
@@ -112,7 +115,7 @@ export function MomentComposeMediaPreview({
               <div className="pointer-events-none absolute inset-x-3 bottom-3 flex items-center justify-between gap-3">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-black/58 px-3 py-1 text-[11px] font-medium text-white">
                   <Play size={12} className="fill-current" />
-                  视频
+                  {t(msg`视频`)}
                 </span>
                 <span className="rounded-full bg-black/58 px-3 py-1 text-[11px] font-medium text-white">
                   {formatMomentDurationLabel(videoDraft.durationMs)}
@@ -120,12 +123,12 @@ export function MomentComposeMediaPreview({
               </div>
             </button>
             <RemoveDraftButton
-              ariaLabel="移除当前视频"
+              ariaLabel={t(msg`移除当前视频`)}
               onClick={onRemoveVideo}
             />
           </div>
           <div className="text-[12px] text-[color:var(--text-muted)]">
-            已生成视频封面，发布后会按视频卡片展示。
+            {t(msg`已生成视频封面，发布后会按视频卡片展示。`)}
           </div>
         </div>
         {showVideoViewer ? (
@@ -172,11 +175,11 @@ export function MomentComposeMediaPreview({
                 type="button"
                 onClick={() => setViewerIndex(index)}
                 className="block w-full text-left"
-                aria-label={`预览图片 ${draft.file.name || index + 1}`}
+                aria-label={t(msg`预览图片 ${draft.file.name || index + 1}`)}
               >
                 <img
                   src={draft.previewUrl}
-                  alt={draft.file.name || "朋友圈图片预览"}
+                  alt={draft.file.name || t(msg`朋友圈图片预览`)}
                   className={cn(
                     imageDrafts.length === 1
                       ? `mx-auto w-auto max-w-full object-contain ${singlePreviewHeightClassName}`
@@ -188,15 +191,16 @@ export function MomentComposeMediaPreview({
                 </div>
               </button>
               <RemoveDraftButton
-                ariaLabel={`移除图片 ${draft.file.name || ""}`}
+                ariaLabel={t(msg`移除图片 ${draft.file.name || ""}`)}
                 onClick={() => onRemoveImage(draft.id)}
               />
             </div>
           ))}
         </div>
         <div className="text-[12px] text-[color:var(--text-muted)]">
-          已选择 {imageDrafts.length} 张图片
-          {remainingCount > 0 ? `，还可以继续添加 ${remainingCount} 张。` : "。"}
+          {remainingCount > 0
+            ? t(msg`已选择 ${imageDrafts.length} 张图片，还可以继续添加 ${remainingCount} 张。`)
+            : t(msg`已选择 ${imageDrafts.length} 张图片。`)}
         </div>
       </div>
       {viewerIndex !== null ? (
@@ -256,6 +260,7 @@ function ComposeImageViewer({
   onPrevious?: () => void;
   onNext?: () => void;
 }) {
+  const t = useRuntimeTranslator();
   if (!draft) {
     return null;
   }
@@ -266,15 +271,15 @@ function ComposeImageViewer({
         type="button"
         onClick={onClose}
         className="absolute inset-0"
-        aria-label="关闭图片预览"
+        aria-label={t(msg`关闭图片预览`)}
       />
       <div className="absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+0.75rem)] z-10 flex items-center justify-between gap-3 px-4 text-white">
-        <IconOverlayButton label="关闭图片预览" onClick={onClose}>
+        <IconOverlayButton label={t(msg`关闭图片预览`)} onClick={onClose}>
           <X size={18} />
         </IconOverlayButton>
         <div className="min-w-0 flex-1 text-center">
           <div className="truncate text-sm font-medium">
-            {draft.file.name || "朋友圈图片"}
+            {draft.file.name || t(msg`朋友圈图片`)}
           </div>
           <div className="mt-1 text-xs text-white/70">
             {activeIndex + 1} / {total}
@@ -286,14 +291,14 @@ function ComposeImageViewer({
       <div className="absolute inset-0 flex items-center justify-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+4.5rem)] pt-[calc(env(safe-area-inset-top,0px)+4.5rem)]">
         <img
           src={draft.previewUrl}
-          alt={draft.file.name || "朋友圈图片"}
+          alt={draft.file.name || t(msg`朋友圈图片`)}
           className="max-h-full max-w-full object-contain"
         />
       </div>
 
       {onPrevious ? (
         <IconOverlayButton
-          label="上一张"
+          label={t(msg`上一张`)}
           onClick={onPrevious}
           className="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)] left-5"
         >
@@ -302,7 +307,7 @@ function ComposeImageViewer({
       ) : null}
       {onNext ? (
         <IconOverlayButton
-          label="下一张"
+          label={t(msg`下一张`)}
           onClick={onNext}
           className="absolute bottom-[calc(env(safe-area-inset-bottom,0px)+1rem)] right-5"
         >
@@ -320,24 +325,25 @@ function ComposeVideoViewer({
   draft: MomentVideoDraft;
   onClose: () => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <div className="fixed inset-0 z-50 bg-[rgba(15,23,42,0.94)] backdrop-blur-sm">
       <button
         type="button"
         onClick={onClose}
         className="absolute inset-0"
-        aria-label="关闭视频预览"
+        aria-label={t(msg`关闭视频预览`)}
       />
       <div className="absolute inset-x-0 top-[calc(env(safe-area-inset-top,0px)+0.75rem)] z-10 flex items-center justify-between gap-3 px-4 text-white">
         <div className="min-w-0">
           <div className="truncate text-sm font-medium">
-            {draft.file.name || "朋友圈视频"}
+            {draft.file.name || t(msg`朋友圈视频`)}
           </div>
           <div className="mt-1 text-xs text-white/70">
-            时长 {formatMomentDurationLabel(draft.durationMs)}
+            {t(msg`时长 ${formatMomentDurationLabel(draft.durationMs)}`)}
           </div>
         </div>
-        <IconOverlayButton label="关闭视频预览" onClick={onClose}>
+        <IconOverlayButton label={t(msg`关闭视频预览`)} onClick={onClose}>
           <X size={18} />
         </IconOverlayButton>
       </div>

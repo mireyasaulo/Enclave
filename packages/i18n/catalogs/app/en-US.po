@@ -1191,6 +1191,7 @@ msgstr "Three-minute rounds that compress reaction and teamwork."
 msgid "三种适合长期保存的世界资料"
 msgstr "Three kinds of world records worth keeping long term"
 
+#: apps/app/src/components/moment-compose-media-preview.tsx:301
 #: apps/app/src/i18n/static-dom-seed.ts:868
 msgid "上一张"
 msgstr "Previous image"
@@ -1249,6 +1250,7 @@ msgstr "Swipe up to cancel. Release to send this voice message directly."
 msgid "上滑取消，松开后只会转成文字，不会直接发送。"
 msgstr "Swipe up to cancel. Release to convert to text only, without sending."
 
+#: apps/app/src/components/moment-compose-media-preview.tsx:310
 #: apps/app/src/i18n/static-dom-seed.ts:869
 msgid "下一张"
 msgstr "Next image"
@@ -2801,6 +2803,8 @@ msgstr "Close send note dialog"
 msgid "关闭图片查看器"
 msgstr "Close image viewer"
 
+#: apps/app/src/components/moment-compose-media-preview.tsx:274
+#: apps/app/src/components/moment-compose-media-preview.tsx:277
 #: apps/app/src/i18n/static-dom-seed.ts:866
 msgid "关闭图片预览"
 msgstr "Close image preview"
@@ -2872,6 +2876,8 @@ msgstr "Close message menu"
 msgid "关闭添加群成员弹层"
 msgstr "Close add members dialog"
 
+#: apps/app/src/components/moment-compose-media-preview.tsx:335
+#: apps/app/src/components/moment-compose-media-preview.tsx:346
 #: apps/app/src/i18n/static-dom-seed.ts:870
 msgid "关闭视频预览"
 msgstr "Close video preview"
@@ -6185,6 +6191,7 @@ msgstr ""
 msgid "已生成一条新的视频号内容，可继续作为直播参考。"
 msgstr ""
 
+#: apps/app/src/components/moment-compose-media-preview.tsx:131
 #: apps/app/src/i18n/static-dom-seed.ts:864
 msgid "已生成视频封面，发布后会按视频卡片展示。"
 msgstr "Video cover generated. It will appear as a video card after publishing."
@@ -6360,6 +6367,16 @@ msgstr "{0} contacts selected"
 #: apps/app/src/components/chat-composer.tsx:3726
 msgid "已选择 {0} 张图片"
 msgstr "{0} images selected"
+
+#. placeholder {0}: imageDrafts.length
+#: apps/app/src/components/moment-compose-media-preview.tsx:202
+msgid "已选择 {0} 张图片，还可以继续添加 {remainingCount} 张。"
+msgstr "{0} images selected, you can add {remainingCount} more."
+
+#. placeholder {0}: imageDrafts.length
+#: apps/app/src/components/moment-compose-media-preview.tsx:203
+msgid "已选择 {0} 张图片。"
+msgstr "{0} images selected."
 
 #. placeholder {0}: selectedMessageIds.length
 #: apps/app/src/components/chat-message-list.tsx:2575
@@ -8143,6 +8160,7 @@ msgstr "Failed to open camera. Try again later."
 msgid "打开视频号"
 msgstr "Open Channels"
 
+#: apps/app/src/components/moment-compose-media-preview.tsx:73
 #: apps/app/src/i18n/static-dom-seed.ts:860
 msgid "打开视频预览"
 msgstr "Open video preview"
@@ -9605,6 +9623,11 @@ msgstr "Schedule"
 msgid "日程管家"
 msgstr "Schedule Keeper"
 
+#. placeholder {0}: formatMomentDurationLabel(draft.durationMs)
+#: apps/app/src/components/moment-compose-media-preview.tsx:343
+msgid "时长 {0}"
+msgstr "Duration {0}"
+
 #. placeholder {0}: plan.durationDays
 #: apps/app/src/features/subscription/subscription-panel.tsx:509
 msgid "时长 {0} 天"
@@ -10044,10 +10067,13 @@ msgstr "Moments interaction updated."
 msgid "朋友圈和广场动态共用同一套发现入口，但可见范围完全不同。"
 msgstr ""
 
+#: apps/app/src/components/moment-compose-media-preview.tsx:282
+#: apps/app/src/components/moment-compose-media-preview.tsx:294
 #: apps/app/src/i18n/static-dom-seed.ts:867
 msgid "朋友圈图片"
 msgstr "Moment image"
 
+#: apps/app/src/components/moment-compose-media-preview.tsx:182
 #: apps/app/src/i18n/static-dom-seed.ts:865
 msgid "朋友圈图片预览"
 msgstr "Moment image preview"
@@ -10069,6 +10095,7 @@ msgstr "Moments is temporarily unavailable"
 msgid "朋友圈概览"
 msgstr "Moments overview"
 
+#: apps/app/src/components/moment-compose-media-preview.tsx:340
 #: apps/app/src/i18n/static-dom-seed.ts:871
 msgid "朋友圈视频"
 msgstr "Moment video"
@@ -12959,6 +12986,7 @@ msgstr "Community guidelines are not meant to add burden; they keep your world e
 msgid "视图"
 msgstr "View"
 
+#: apps/app/src/components/moment-compose-media-preview.tsx:118
 #: apps/app/src/i18n/static-dom-seed.ts:862
 #: apps/app/src/routes/channel-author-page.tsx:230
 #: apps/app/src/routes/channel-author-page.tsx:741
@@ -13030,6 +13058,7 @@ msgstr ""
 msgid "视频号还没有内容"
 msgstr "No Channels content yet"
 
+#: apps/app/src/components/moment-compose-media-preview.tsx:78
 #: apps/app/src/i18n/static-dom-seed.ts:861
 msgid "视频封面"
 msgstr "Video cover"
@@ -13152,6 +13181,12 @@ msgstr ""
 msgid "移除中..."
 msgstr "Removing..."
 
+#. placeholder {0}: draft.file.name || ""
+#: apps/app/src/components/moment-compose-media-preview.tsx:194
+msgid "移除图片 {0}"
+msgstr "Remove image {0}"
+
+#: apps/app/src/components/moment-compose-media-preview.tsx:126
 #: apps/app/src/i18n/static-dom-seed.ts:863
 msgid "移除当前视频"
 msgstr "Remove current video"
@@ -17410,6 +17445,11 @@ msgstr "Previewing"
 #: apps/app/src/i18n/static-dom-seed.ts:488
 msgid "预览图片"
 msgstr "Preview image"
+
+#. placeholder {0}: draft.file.name || index + 1
+#: apps/app/src/components/moment-compose-media-preview.tsx:178
+msgid "预览图片 {0}"
+msgstr "Preview image {0}"
 
 #: apps/app/src/routes/group-qr-page.tsx:1743
 msgid "预计处理后"
