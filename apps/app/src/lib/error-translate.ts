@@ -282,6 +282,48 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`至少选择一个可安装的模型目录项。`);
     case "PROVIDER_CATALOG_AT_LEAST_ONE_REGISTERED":
       return translateRuntimeMessage(msg`至少选择一个已登记的模型目录项。`);
+    case "ADMIN_ACCESS_NOT_CONFIGURED":
+      return translateRuntimeMessage(msg`管理后台尚未配置访问密钥。`);
+    case "ADMIN_INVALID_SECRET":
+      return translateRuntimeMessage(msg`管理后台访问密钥无效。`);
+    case "ADMIN_WIKI_ITEMS_REQUIRED":
+      return translateRuntimeMessage(msg`items 必填。`);
+    case "ADMIN_WIKI_CHARACTER_REVISION_REQUIRED":
+      return translateRuntimeMessage(
+        msg`characterId 与 expectedStableRevisionId 必填。`,
+      );
+    case "ADMIN_CONVERSATION_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`对话不存在：${String(params.conversationId ?? "")}`,
+      );
+    case "ADMIN_CONVERSATION_NO_CHARACTER_PARTICIPANTS":
+      return translateRuntimeMessage(
+        msg`对话 ${String(params.conversationId ?? "")} 没有角色参与者。`,
+      );
+    case "ADMIN_MESSAGE_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`消息不存在：${String(params.messageId ?? "")}`,
+      );
+    case "ADMIN_WORLD_OWNER_NOT_FOUND":
+      return translateRuntimeMessage(msg`World owner 不存在。`);
+    case "ADMIN_SELFAGENT_DOC_UNKNOWN":
+      return translateRuntimeMessage(msg`未知的 self-agent workspace 文档名。`);
+    case "ADMIN_WECHAT_CONTACTS_AT_LEAST_ONE":
+      return translateRuntimeMessage(msg`至少选择一个联系人。`);
+    case "ADMIN_WECHAT_PREVIEW_LIMIT":
+      return translateRuntimeMessage(msg`单次最多预览 20 个联系人。`);
+    case "ADMIN_WECHAT_PREVIEWED_AT_LEAST_ONE":
+      return translateRuntimeMessage(msg`至少选择一个预览通过的联系人。`);
+    case "ADMIN_WECHAT_IMPORT_LIMIT":
+      return translateRuntimeMessage(msg`单次最多导入 20 个联系人。`);
+    case "ADMIN_WECHAT_CONTACT_NOT_FOUND":
+      return translateRuntimeMessage(msg`联系人导入角色不存在。`);
+    case "ADMIN_WECHAT_FRIENDSHIP_ONLY_CONTACT":
+      return translateRuntimeMessage(msg`只支持补建联系人导入角色的好友关系。`);
+    case "ADMIN_WECHAT_FRIENDSHIP_FAILED":
+      return translateRuntimeMessage(msg`好友关系补建失败。`);
+    case "ADMIN_WECHAT_ROLLBACK_ONLY_CONTACT":
+      return translateRuntimeMessage(msg`只支持回滚联系人导入角色。`);
     case "VALIDATION_FAILED":
       return translateRuntimeMessage(msg`提交的数据无效，请检查后重试。`);
     case "INTERNAL_ERROR":

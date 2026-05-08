@@ -11,6 +11,7 @@ import { resolveDatabasePath } from '../../database/database-path';
 import { CharactersService } from '../characters/characters.service';
 import { FriendshipEntity } from '../social/friendship.entity';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 @Injectable()
 export class AdminService {
   private readonly startTime = new Date();
@@ -117,3 +118,4 @@ export class AdminService {
     return { success: true };
   }
 }
+// i18n-ignore-end

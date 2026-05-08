@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Not, Repository } from 'typeorm';
 import { CharacterEntity } from '../characters/character.entity';
@@ -6,6 +7,7 @@ import { CharacterBlueprintService } from '../characters/character-blueprint.ser
 import type { CharacterBlueprintRecipeValue } from '../characters/character-blueprint.types';
 import { CharacterPageEntity } from '../wiki/entities/character-page.entity';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CharacterRevisionEntity,
   type WikiContentSnapshot,
 } from '../wiki/entities/character-revision.entity';
@@ -283,7 +285,9 @@ export class WikiSyncAdminService {
 
   async applyBatch(body: WikiSyncApplyRequest): Promise<WikiSyncApplyResponse> {
     if (!body || !Array.isArray(body.items)) {
-      throw new BadRequestException('items 必填');
+      throw new AppError('ADMIN_WIKI_ITEMS_REQUIRED', {
+        legacyMessage: 'items 必填',
+      });
     }
     const summary = body.editSummary?.trim() || null;
     const results: WikiSyncApplyItemResult[] = [];
@@ -489,7 +493,9 @@ export class WikiSyncAdminService {
     body: WikiSyncImportRequest,
   ): Promise<WikiSyncImportResult> {
     if (!body?.characterId || !body?.expectedStableRevisionId) {
-      throw new BadRequestException('characterId 与 expectedStableRevisionId 必填');
+      throw new AppError('ADMIN_WIKI_CHARACTER_REVISION_REQUIRED', {
+        legacyMessage: 'characterId 与 expectedStableRevisionId 必填',
+      });
     }
     const baseResult: WikiSyncImportResult = {
       characterId: body.characterId,
@@ -616,4 +622,4 @@ function getPathValue(target: unknown, path: string): unknown {
   }
   return cursor;
 }
-
+// i18n-ignore-end
