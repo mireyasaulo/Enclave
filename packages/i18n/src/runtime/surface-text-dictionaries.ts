@@ -273,6 +273,8 @@ const cloudConsoleText: LocaleDictionary = {
       "申请 ID、手机号、世界名或状态详情",
     "world id, phone, name, provider, or endpoint":
       "世界 ID、手机号、名称、供应方或端点",
+    "world id, phone, email, name, provider, or endpoint":
+      "世界 ID、手机号、邮箱、名称、供应方或端点",
 
     "Copy callback token": "复制回调令牌",
     "Copy runtime env overlay": "复制运行时环境覆盖",
@@ -778,6 +780,8 @@ const cloudConsoleText: LocaleDictionary = {
       "申請 ID、電話番号、世界名、ステータス詳細",
     "world id, phone, name, provider, or endpoint":
       "世界 ID、電話番号、名前、Provider、エンドポイント",
+    "world id, phone, email, name, provider, or endpoint":
+      "世界 ID、電話番号、メール、名前、Provider、エンドポイント",
 
     "Copy callback token": "コールバックトークンをコピー",
     "Copy runtime env overlay": "ランタイム環境オーバーレイをコピー",
@@ -1440,6 +1444,8 @@ const cloudConsoleText: LocaleDictionary = {
       "요청 ID, 전화번호, 월드 이름 또는 상태 세부 정보",
     "world id, phone, name, provider, or endpoint":
       "월드 ID, 전화번호, 이름, Provider 또는 엔드포인트",
+    "world id, phone, email, name, provider, or endpoint":
+      "월드 ID, 전화번호, 이메일, 이름, Provider 또는 엔드포인트",
 
     "Copy callback token": "콜백 토큰 복사",
     "Copy runtime env overlay": "런타임 환경 오버레이 복사",

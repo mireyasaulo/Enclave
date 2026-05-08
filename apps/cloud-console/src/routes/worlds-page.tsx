@@ -453,9 +453,8 @@ export function WorldsPage() {
               {t("Managed worlds")}
             </div>
             <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              Each phone owns exactly one world. Provider placement, power
-              state, heartbeat freshness, and quick lifecycle actions are all
-              shown together below.
+              Each phone owns exactly one world. New users provision a fresh
+              instance, while returning users wake their previous one.
             </div>
           </div>
 
