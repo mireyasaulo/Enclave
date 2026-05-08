@@ -193,7 +193,7 @@ function RootLayoutContent() {
   const [secret, setSecret] = useState(getCloudAdminSecret);
   const [editingSecret, setEditingSecret] = useState(!getCloudAdminSecret());
   const [draft, setDraft] = useState(getCloudAdminSecret);
-  const moreSectionPaths = ["/jobs", "/waiting-sync", "/sessions"];
+  const moreSectionPaths = ["/jobs", "/waiting-sync", "/sessions", "/configs"];
   const moreSectionActive = moreSectionPaths.some((p) => pathname.startsWith(p));
   const [moreExpanded, setMoreExpanded] = useState(moreSectionActive);
   const hasSecret = Boolean(secret.trim());
@@ -317,23 +317,6 @@ function RootLayoutContent() {
       ),
     },
     {
-      key: "configs",
-      content: (
-        <Link
-          to="/configs"
-          className={
-            pathname.startsWith("/configs") ? NAV_LINK_ACTIVE : NAV_LINK
-          }
-          aria-current={pathname.startsWith("/configs") ? "page" : undefined}
-        >
-          <NavLinkContent
-            label={t("Configs")}
-            hint={t("Trial and copy")}
-          />
-        </Link>
-      ),
-    },
-    {
       key: "invite-audit",
       content: (
         <Link
@@ -406,6 +389,23 @@ function RootLayoutContent() {
   ] as const;
 
   const moreNavItems = [
+    {
+      key: "configs",
+      content: (
+        <Link
+          to="/configs"
+          className={
+            pathname.startsWith("/configs") ? NAV_LINK_ACTIVE : NAV_LINK
+          }
+          aria-current={pathname.startsWith("/configs") ? "page" : undefined}
+        >
+          <NavLinkContent
+            label={t("Configs")}
+            hint={t("Trial and copy")}
+          />
+        </Link>
+      ),
+    },
     {
       key: "jobs",
       content: (
