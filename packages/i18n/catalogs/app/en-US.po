@@ -2179,6 +2179,7 @@ msgstr "Save invite card"
 
 #: apps/app/src/components/chat-message-list.tsx:3486
 #: apps/app/src/components/chat-message-list.tsx:4174
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:74
 #: apps/app/src/i18n/static-dom-seed.ts:485
 #: apps/app/src/runtime/file-runtime-i18n.ts:37
 msgid "保存附件"
@@ -2865,10 +2866,12 @@ msgstr ""
 msgid "关闭浮层"
 msgstr "Close overlay"
 
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:83
 #: apps/app/src/i18n/static-dom-seed.ts:940
 msgid "关闭消息操作菜单"
 msgstr "Close message action menu"
 
+#: apps/app/src/features/chat/group-message-context-menu.tsx:131
 #: apps/app/src/i18n/static-dom-seed.ts:939
 msgid "关闭消息菜单"
 msgstr "Close message menu"
@@ -3657,6 +3660,8 @@ msgstr "Deleting current will empty the sticker library, and {nextSlotsAvailable
 #: apps/app/src/components/chat-message-list.tsx:3213
 #: apps/app/src/components/chat-message-list.tsx:3341
 #: apps/app/src/components/chat-message-list.tsx:3506
+#: apps/app/src/features/chat/group-message-context-menu.tsx:82
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:76
 #: apps/app/src/features/chat/reminder-task-panel.tsx:284
 #: apps/app/src/features/search/mobile-search-workspace.tsx:253
 #: apps/app/src/routes/chat-list-page.tsx:1450
@@ -4341,6 +4346,7 @@ msgstr "Send code"
 #: apps/app/src/components/mobile-chat-attachment-preview.tsx:99
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:212
 #: apps/app/src/features/chat-details/mobile-details-action-sheet.tsx:91
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:167
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:140
 #: apps/app/src/features/desktop/chat/desktop-chat-confirm-dialog.tsx:97
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:161
@@ -4420,6 +4426,7 @@ msgid "口令仅保存在当前浏览器或桌面客户端本地，用来阻止�
 msgstr "The passcode is saved only in this browser or desktop client, and keeps the workspace covered when you step away."
 
 #: apps/app/src/components/chat-message-list.tsx:4174
+#: apps/app/src/features/chat/group-message-context-menu.tsx:80
 msgid "另存为"
 msgstr ""
 
@@ -4733,6 +4740,8 @@ msgstr ""
 msgid "回填次数"
 msgstr ""
 
+#: apps/app/src/features/chat/group-message-context-menu.tsx:142
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:116
 #: apps/app/src/i18n/static-dom-seed.ts:935
 #: apps/app/src/routes/channels-page.tsx:1889
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:721
@@ -5010,6 +5019,8 @@ msgstr ""
 msgid "备注名会优先显示在聊天信息和通讯录里。"
 msgstr "The remark name will be shown first in chat details and contacts."
 
+#: apps/app/src/features/chat/group-message-context-menu.tsx:169
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:139
 #: apps/app/src/features/subscription/checkout-contact-dialog.tsx:188
 #: apps/app/src/i18n/static-dom-seed.ts:937
 msgid "复制"
@@ -5076,6 +5087,8 @@ msgstr "Copy original"
 msgid "复制反馈包"
 msgstr "Copy feedback package"
 
+#: apps/app/src/features/chat/group-message-context-menu.tsx:175
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:153
 #: apps/app/src/i18n/static-dom-seed.ts:938
 msgid "复制发送者"
 msgstr "Copy sender"
@@ -5229,6 +5242,8 @@ msgstr ""
 msgid "外部数字人已就绪"
 msgstr ""
 
+#: apps/app/src/features/chat/group-message-context-menu.tsx:163
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:125
 #: apps/app/src/i18n/static-dom-seed.ts:936
 msgid "多选"
 msgstr "Multi-select"
@@ -8286,6 +8301,8 @@ msgstr "Failed to open link. Please try again later."
 
 #: apps/app/src/components/chat-message-list.tsx:3473
 #: apps/app/src/components/chat-message-list.tsx:4142
+#: apps/app/src/features/chat/group-message-context-menu.tsx:79
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:73
 #: apps/app/src/i18n/static-dom-seed.ts:484
 msgid "打开附件"
 msgstr "Open attachment"
@@ -8814,6 +8831,8 @@ msgstr "Suggest the real workspace or interaction capability that should be prio
 
 #: apps/app/src/components/chat-message-list.tsx:3267
 #: apps/app/src/components/chat-message-list.tsx:3420
+#: apps/app/src/features/chat/group-message-context-menu.tsx:83
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:71
 #: apps/app/src/i18n/static-dom-seed.ts:157
 msgid "提醒"
 msgstr "Reminders"
@@ -9081,6 +9100,8 @@ msgstr "Shake"
 #: apps/app/src/components/chat-message-list.tsx:3198
 #: apps/app/src/components/chat-message-list.tsx:3336
 #: apps/app/src/components/chat-message-list.tsx:3497
+#: apps/app/src/features/chat/group-message-context-menu.tsx:81
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:75
 msgid "撤回"
 msgstr ""
 
@@ -9209,6 +9230,8 @@ msgstr "Pay/Collect"
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:173
 #: apps/app/src/components/official-article-viewer.tsx:253
 #: apps/app/src/components/official-article-viewer.tsx:311
+#: apps/app/src/features/chat/group-message-context-menu.tsx:90
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:72
 #: apps/app/src/features/search/mobile-search-workspace.tsx:315
 #: apps/app/src/features/shell/desktop-nav-matching.ts:65
 #: apps/app/src/features/shell/desktop-nav-matching.ts:66
@@ -9260,6 +9283,7 @@ msgid "收藏概览"
 msgstr "Favorites overview"
 
 #: apps/app/src/components/chat-message-list.tsx:3285
+#: apps/app/src/features/chat/group-message-context-menu.tsx:89
 msgid "收藏消息"
 msgstr ""
 
@@ -12247,6 +12271,7 @@ msgid "消息提醒"
 msgstr "Message reminders"
 
 #: apps/app/src/components/chat-message-list.tsx:3350
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:68
 msgid "消息操作"
 msgstr ""
 
@@ -12271,6 +12296,10 @@ msgstr "Add"
 #: apps/app/src/routes/group-member-picker-page.tsx:386
 msgid "添加中"
 msgstr ""
+
+#: apps/app/src/features/chat/group-message-context-menu.tsx:78
+msgid "添加到表情"
+msgstr "Add to stickers"
 
 #: apps/app/src/components/chat-message-list.tsx:1020
 msgid "添加到表情失败，请稍后再试。"
@@ -14927,6 +14956,10 @@ msgstr "Subscription push"
 msgid "许哲"
 msgstr "Xu Zhe"
 
+#: apps/app/src/features/chat/group-message-context-menu.tsx:84
+msgid "设为提醒"
+msgstr "Set reminder"
+
 #: apps/app/src/routes/character-detail-page.tsx:315
 msgid "设为星标朋友"
 msgstr "Star this friend"
@@ -15550,6 +15583,8 @@ msgstr "Transcription not configured"
 
 #: apps/app/src/components/chat-message-list.tsx:2614
 #: apps/app/src/components/chat-message-list.tsx:3187
+#: apps/app/src/features/chat/group-message-context-menu.tsx:156
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:123
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:371
 #: apps/app/src/i18n/static-dom-seed.ts:934
 msgid "转发"
@@ -16785,6 +16820,10 @@ msgstr ""
 msgid "选择位置"
 msgstr ""
 
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:70
+msgid "选择到这里"
+msgstr "Select to here"
+
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:546
 msgid "选择名片"
 msgstr ""
@@ -16972,6 +17011,8 @@ msgstr "Partially joined"
 #: apps/app/src/components/chat-message-list.tsx:2927
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:225
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:934
+#: apps/app/src/features/chat/group-message-context-menu.tsx:77
+#: apps/app/src/features/chat/mobile-message-action-sheet.tsx:69
 msgid "部分引用"
 msgstr ""
 

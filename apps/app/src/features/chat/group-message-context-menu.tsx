@@ -1,4 +1,6 @@
 import { type ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   BellRing,
   CheckSquare,
@@ -51,30 +53,45 @@ export function GroupMessageContextMenu({
   onClose,
   onReply,
   onQuoteSelection,
-  quoteSelectionLabel = "部分引用",
+  quoteSelectionLabel,
   onForward,
   onMultiSelect,
   onSetReminder,
-  reminderLabel = "提醒",
+  reminderLabel,
   onCopyText,
   onCopySender,
   onToggleFavorite,
-  favoriteLabel = "收藏",
+  favoriteLabel,
   onAddToStickers,
-  addToStickersLabel = "添加到表情",
+  addToStickersLabel,
   onOpenAttachment,
-  openAttachmentLabel = "打开附件",
+  openAttachmentLabel,
   onSaveAttachment,
-  saveAttachmentLabel = "另存为",
+  saveAttachmentLabel,
   onRecall,
-  recallLabel = "撤回",
+  recallLabel,
   onDelete,
-  deleteLabel = "删除",
+  deleteLabel,
 }: GroupMessageContextMenuProps) {
+  const t = useRuntimeTranslator();
+  const resolvedQuoteSelectionLabel = quoteSelectionLabel ?? t(msg`部分引用`);
+  const resolvedAddToStickersLabel = addToStickersLabel ?? t(msg`添加到表情`);
+  const resolvedOpenAttachmentLabel = openAttachmentLabel ?? t(msg`打开附件`);
+  const resolvedSaveAttachmentLabel = saveAttachmentLabel ?? t(msg`另存为`);
+  const resolvedRecallLabel = recallLabel ?? t(msg`撤回`);
+  const resolvedDeleteLabel = deleteLabel ?? t(msg`删除`);
+  const defaultReminderLabel = t(msg`提醒`);
+  const setReminderLabel = t(msg`设为提醒`);
   const normalizedReminderLabel =
-    reminderLabel === "提醒" ? "设为提醒" : reminderLabel;
+    !reminderLabel || reminderLabel === defaultReminderLabel
+      ? setReminderLabel
+      : reminderLabel;
+  const defaultFavoriteLabel = t(msg`收藏消息`);
+  const fallbackFavoriteLabel = t(msg`收藏`);
   const normalizedFavoriteLabel =
-    favoriteLabel === "收藏消息" ? "收藏" : favoriteLabel;
+    !favoriteLabel || favoriteLabel === defaultFavoriteLabel
+      ? fallbackFavoriteLabel
+      : favoriteLabel;
   const actionCount =
     1 +
     Number(Boolean(onReply)) +
@@ -111,7 +128,7 @@ export function GroupMessageContextMenu({
       <button
         type="button"
         onClick={onClose}
-        aria-label="关闭消息菜单"
+        aria-label={t(msg`关闭消息菜单`)}
         className="absolute inset-0 cursor-default bg-transparent"
       />
 
@@ -122,40 +139,40 @@ export function GroupMessageContextMenu({
       >
         {onReply ? (
           <ContextMenuButton
-            label="回复"
+            label={t(msg`回复`)}
             icon={<CornerUpLeft size={15} />}
             onClick={onReply}
           />
         ) : null}
         {onQuoteSelection ? (
           <ContextMenuButton
-            label={quoteSelectionLabel}
+            label={resolvedQuoteSelectionLabel}
             icon={<FileText size={15} />}
             onClick={onQuoteSelection}
           />
         ) : null}
         {onForward ? (
           <ContextMenuButton
-            label="转发"
+            label={t(msg`转发`)}
             icon={<Forward size={15} />}
             onClick={onForward}
           />
         ) : null}
         {onMultiSelect ? (
           <ContextMenuButton
-            label="多选"
+            label={t(msg`多选`)}
             icon={<CheckSquare size={15} />}
             onClick={onMultiSelect}
           />
         ) : null}
         <ContextMenuButton
-          label="复制"
+          label={t(msg`复制`)}
           icon={<Copy size={15} />}
           onClick={onCopyText}
         />
         {onCopySender ? (
           <ContextMenuButton
-            label="复制发送者"
+            label={t(msg`复制发送者`)}
             icon={<UserRound size={15} />}
             onClick={onCopySender}
           />
@@ -179,21 +196,21 @@ export function GroupMessageContextMenu({
         ) : null}
         {onAddToStickers ? (
           <ContextMenuButton
-            label={addToStickersLabel}
+            label={resolvedAddToStickersLabel}
             icon={<Smile size={15} />}
             onClick={onAddToStickers}
           />
         ) : null}
         {onOpenAttachment ? (
           <ContextMenuButton
-            label={openAttachmentLabel}
+            label={resolvedOpenAttachmentLabel}
             icon={<ExternalLink size={15} />}
             onClick={onOpenAttachment}
           />
         ) : null}
         {onSaveAttachment ? (
           <ContextMenuButton
-            label={saveAttachmentLabel}
+            label={resolvedSaveAttachmentLabel}
             icon={<Download size={15} />}
             onClick={onSaveAttachment}
           />
@@ -208,7 +225,7 @@ export function GroupMessageContextMenu({
         {onRecall ? (
           <ContextMenuButton
             danger
-            label={recallLabel}
+            label={resolvedRecallLabel}
             icon={<RotateCcw size={15} />}
             onClick={onRecall}
           />
@@ -216,7 +233,7 @@ export function GroupMessageContextMenu({
         {onDelete ? (
           <ContextMenuButton
             danger
-            label={deleteLabel}
+            label={resolvedDeleteLabel}
             icon={<Trash2 size={15} />}
             onClick={onDelete}
           />
