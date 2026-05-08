@@ -2546,6 +2546,7 @@ msgstr "全选"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2106
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:336
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:949
+#: apps/app/src/features/search/search-types.ts:73
 #: apps/app/src/i18n/static-dom-seed.ts:62
 #: apps/app/src/routes/channel-author-page.tsx:229
 #: apps/app/src/routes/channel-author-page.tsx:254
@@ -2608,6 +2609,7 @@ msgid "全部聊天文件"
 msgstr "全部聊天文件"
 
 #: apps/app/src/features/search/mobile-search-workspace.tsx:317
+#: apps/app/src/features/search/search-types.ts:77
 #: apps/app/src/i18n/static-dom-seed.ts:917
 #: apps/app/src/routes/contacts-page.tsx:1166
 #: apps/app/src/routes/desktop-mobile-page.tsx:129
@@ -5577,6 +5579,7 @@ msgstr "小盯替你记着 {0} 件事"
 #: apps/app/src/features/search/mobile-search-workspace.tsx:321
 #: apps/app/src/features/search/search-quick-links.ts:336
 #: apps/app/src/features/search/search-quick-links.ts:367
+#: apps/app/src/features/search/search-types.ts:78
 #: apps/app/src/features/shell/desktop-nav-matching.ts:109
 #: apps/app/src/features/shell/desktop-nav-matching.ts:110
 #: apps/app/src/i18n/static-dom-seed.ts:66
@@ -6580,6 +6583,7 @@ msgid "广场会把很多并非好友关系的世界人公开发言一起放进�
 msgstr "广场会把很多并非好友关系的世界人公开发言一起放进时间流。"
 
 #: apps/app/src/features/search/mobile-search-workspace.tsx:325
+#: apps/app/src/features/search/search-types.ts:80
 #: apps/app/src/features/search/use-search-index.ts:460
 #: apps/app/src/features/shell/desktop-nav-matching.ts:85
 #: apps/app/src/i18n/static-dom-seed.ts:67
@@ -9285,6 +9289,7 @@ msgstr "收付款"
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:72
 #: apps/app/src/features/search/mobile-search-workspace.tsx:315
 #: apps/app/src/features/search/search-quick-links.ts:277
+#: apps/app/src/features/search/search-types.ts:76
 #: apps/app/src/features/shell/desktop-nav-matching.ts:65
 #: apps/app/src/features/shell/desktop-nav-matching.ts:66
 #: apps/app/src/i18n/static-dom-seed.ts:65
@@ -10168,6 +10173,7 @@ msgstr "朋友信息"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:687
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:478
 #: apps/app/src/features/search/mobile-search-workspace.tsx:324
+#: apps/app/src/features/search/search-types.ts:79
 #: apps/app/src/features/search/use-search-index.ts:434
 #: apps/app/src/features/shell/desktop-nav-matching.ts:71
 #: apps/app/src/features/shell/desktop-nav-matching.ts:72
@@ -14698,6 +14704,7 @@ msgstr "聊天背景暂时不可用"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:574
 #: apps/app/src/features/desktop/chat/desktop-chat-side-panel.tsx:87
 #: apps/app/src/features/search/mobile-search-workspace.tsx:59
+#: apps/app/src/features/search/search-types.ts:74
 #: apps/app/src/features/shell/desktop-nav-config.ts:103
 #: apps/app/src/i18n/static-dom-seed.ts:63
 #: apps/app/src/routes/chat-details-page.tsx:947
@@ -14745,6 +14752,7 @@ msgstr "聊天里的图片 / GIF 也能添加为表情"
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:212
 #: apps/app/src/features/search/mobile-search-workspace.tsx:66
 #: apps/app/src/features/search/mobile-search-workspace.tsx:314
+#: apps/app/src/features/search/search-types.ts:75
 #: apps/app/src/features/search/use-search-index.ts:352
 #: apps/app/src/i18n/static-dom-seed.ts:64
 #: apps/app/src/routes/character-detail-page.tsx:259

@@ -22,6 +22,7 @@ import {
   Star,
   UsersRound,
 } from "lucide-react";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../../components/avatar-chip";
 import { cn } from "@yinjie/ui";
 import { type SearchQuickLink as DesktopSearchQuickLink } from "./search-quick-links";
@@ -166,6 +167,7 @@ export function DesktopSearchWorkspace({
   const allResultSectionRefs = useRef<
     Partial<Record<SearchResultCategory, HTMLElement | null>>
   >({});
+  const t = useRuntimeTranslator();
   const autoSelectResultRef = useRef(false);
   const pendingAllResultsJumpRef = useRef<SearchResultCategory | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -1127,7 +1129,7 @@ export function DesktopSearchWorkspace({
                       : "text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]",
                   )}
                 >
-                  <span>{item.label}</span>
+                  <span>{t(item.label)}</span>
                   {countLabel ? (
                     <span
                       className={cn(
@@ -1202,7 +1204,7 @@ export function DesktopSearchWorkspace({
                   ? groupedResults.map((section) => ({
                       category: section.category,
                       count: section.results.length,
-                      label: section.label,
+                      label: t(section.label),
                     }))
                   : undefined
               }
@@ -1352,7 +1354,7 @@ export function DesktopSearchWorkspace({
                       panelRef={(node) => {
                         allResultSectionRefs.current[section.category] = node;
                       }}
-                      title={section.label}
+                      title={t(section.label)}
                     >
                       {section.category === "messages" ? (
                         <DesktopSearchMessageResults

@@ -167,7 +167,7 @@ export function MobileSearchWorkspace({
                   : "border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] text-[color:var(--text-secondary)]",
               )}
             >
-              {item.label}
+              {t(item.label)}
               {item.id !== "all" && hasKeyword
                 ? ` ${matchedCounts[item.id]}`
                 : ""}
@@ -363,7 +363,7 @@ export function MobileSearchWorkspace({
                   <section key={section.category} className="space-y-2.5">
                     <div className="flex items-center justify-between gap-3">
                       <div className="text-[14px] font-medium text-[color:var(--text-primary)]">
-                        {section.label}
+                        {t(section.label)}
                       </div>
                       {section.results.length > 3 && !comingSoon ? (
                         <button

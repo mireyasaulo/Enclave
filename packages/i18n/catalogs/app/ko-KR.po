@@ -2544,6 +2544,7 @@ msgstr ""
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2106
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:336
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:949
+#: apps/app/src/features/search/search-types.ts:73
 #: apps/app/src/i18n/static-dom-seed.ts:62
 #: apps/app/src/routes/channel-author-page.tsx:229
 #: apps/app/src/routes/channel-author-page.tsx:254
@@ -2606,6 +2607,7 @@ msgid "全部聊天文件"
 msgstr "전체 채팅 파일"
 
 #: apps/app/src/features/search/mobile-search-workspace.tsx:317
+#: apps/app/src/features/search/search-types.ts:77
 #: apps/app/src/i18n/static-dom-seed.ts:917
 #: apps/app/src/routes/contacts-page.tsx:1166
 #: apps/app/src/routes/desktop-mobile-page.tsx:129
@@ -5575,6 +5577,7 @@ msgstr "당신을 위해 {0}개의 알림을 관리 중"
 #: apps/app/src/features/search/mobile-search-workspace.tsx:321
 #: apps/app/src/features/search/search-quick-links.ts:336
 #: apps/app/src/features/search/search-quick-links.ts:367
+#: apps/app/src/features/search/search-types.ts:78
 #: apps/app/src/features/shell/desktop-nav-matching.ts:109
 #: apps/app/src/features/shell/desktop-nav-matching.ts:110
 #: apps/app/src/i18n/static-dom-seed.ts:66
@@ -6578,6 +6581,7 @@ msgid "广场会把很多并非好友关系的世界人公开发言一起放进�
 msgstr "피드는 친구가 아닌 세계 인물의 공개 게시물도 하나의 타임라인에 모읍니다."
 
 #: apps/app/src/features/search/mobile-search-workspace.tsx:325
+#: apps/app/src/features/search/search-types.ts:80
 #: apps/app/src/features/search/use-search-index.ts:460
 #: apps/app/src/features/shell/desktop-nav-matching.ts:85
 #: apps/app/src/i18n/static-dom-seed.ts:67
@@ -9283,6 +9287,7 @@ msgstr "결제/수금"
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:72
 #: apps/app/src/features/search/mobile-search-workspace.tsx:315
 #: apps/app/src/features/search/search-quick-links.ts:277
+#: apps/app/src/features/search/search-types.ts:76
 #: apps/app/src/features/shell/desktop-nav-matching.ts:65
 #: apps/app/src/features/shell/desktop-nav-matching.ts:66
 #: apps/app/src/i18n/static-dom-seed.ts:65
@@ -10166,6 +10171,7 @@ msgstr "친구 정보"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:687
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:478
 #: apps/app/src/features/search/mobile-search-workspace.tsx:324
+#: apps/app/src/features/search/search-types.ts:79
 #: apps/app/src/features/search/use-search-index.ts:434
 #: apps/app/src/features/shell/desktop-nav-matching.ts:71
 #: apps/app/src/features/shell/desktop-nav-matching.ts:72
@@ -14696,6 +14702,7 @@ msgstr "채팅 배경을 일시적으로 사용할 수 없습니다"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:574
 #: apps/app/src/features/desktop/chat/desktop-chat-side-panel.tsx:87
 #: apps/app/src/features/search/mobile-search-workspace.tsx:59
+#: apps/app/src/features/search/search-types.ts:74
 #: apps/app/src/features/shell/desktop-nav-config.ts:103
 #: apps/app/src/i18n/static-dom-seed.ts:63
 #: apps/app/src/routes/chat-details-page.tsx:947
@@ -14743,6 +14750,7 @@ msgstr "채팅 속 이미지 / GIF도 스티커로 추가할 수 있습니다"
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:212
 #: apps/app/src/features/search/mobile-search-workspace.tsx:66
 #: apps/app/src/features/search/mobile-search-workspace.tsx:314
+#: apps/app/src/features/search/search-types.ts:75
 #: apps/app/src/features/search/use-search-index.ts:352
 #: apps/app/src/i18n/static-dom-seed.ts:64
 #: apps/app/src/routes/character-detail-page.tsx:259

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { getActiveLocale } from "@yinjie/i18n";
 import {
   emptySearchMatchCounts,
   searchCategoryLabels,
@@ -86,7 +87,7 @@ export function sortSearchResults(
     return right.sortTime - left.sortTime;
   }
 
-  return left.title.localeCompare(right.title, "zh-CN");
+  return left.title.localeCompare(right.title, getActiveLocale());
 }
 
 export function groupSearchResults(results: SearchResultItem[]) {

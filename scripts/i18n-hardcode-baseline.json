@@ -5,16 +5,16 @@
     "apps/app/src": {
       "rules": {
         "jsx-literal-prop": 338,
-        "object-ui-string": 209,
+        "object-ui-string": 201,
         "jsx-cjk-text": 17,
         "toast-dialog-string": 1,
         "setter-message-string": 18,
         "literal-error-message": 38,
         "intl-locale-literal": 7,
-        "locale-compare-literal": 2,
+        "locale-compare-literal": 1,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 0,
-        "raw-cjk-line": 2101
+        "raw-cjk-line": 2093
       }
     },
     "apps/admin/src": {

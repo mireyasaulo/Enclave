@@ -1,3 +1,5 @@
+import { msg } from "@lingui/macro";
+
 export type SearchResultCategory =
   | "messages"
   | "contacts"
@@ -29,7 +31,7 @@ export type SearchMatchCounts = Record<SearchResultCategory, number>;
 
 export type SearchResultSection = {
   category: SearchResultCategory;
-  label: string;
+  label: ReturnType<typeof msg>;
   results: SearchResultItem[];
 };
 
@@ -66,18 +68,20 @@ export type SearchHistoryItem = {
 
 export const searchCategoryLabels: Array<{
   id: SearchCategory;
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { id: "all", label: "全部" },
-  { id: "messages", label: "聊天记录" },
-  { id: "contacts", label: "联系人" },
-  { id: "favorites", label: "收藏" },
-  { id: "officialAccounts", label: "公众号" },
-  { id: "miniPrograms", label: "小程序" },
-  { id: "moments", label: "朋友圈" },
-  { id: "feed", label: "广场动态" },
+  { id: "all", label: msg`全部` },
+  { id: "messages", label: msg`聊天记录` },
+  { id: "contacts", label: msg`联系人` },
+  { id: "favorites", label: msg`收藏` },
+  { id: "officialAccounts", label: msg`公众号` },
+  { id: "miniPrograms", label: msg`小程序` },
+  { id: "moments", label: msg`朋友圈` },
+  { id: "feed", label: msg`广场动态` },
 ];
 
+// NOTE: searchCategoryTitles 仍是字符串表，desktop 暂未做 i18n。
+// 桌面侧迁移完成后改为 Record<SearchResultCategory, ReturnType<typeof msg>>。
 export const searchCategoryTitles: Record<SearchResultCategory, string> = {
   messages: "聊天记录",
   contacts: "联系人",
