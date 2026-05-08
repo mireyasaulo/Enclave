@@ -973,7 +973,7 @@ async function renderAdminSessionsPage() {
 }
 
 async function expectAdminSessionsSummary(summary: string) {
-  expect(await screen.findAllByText(summary)).toHaveLength(2);
+  expect(await screen.findAllByText(summary)).toHaveLength(1);
 }
 
 function expectAdminSessionsFirstDataRowContains(text: string) {
@@ -2251,7 +2251,7 @@ describe("cloud-console interactions", () => {
 
     await setAdminSessionsSearch("Mobile Safari");
 
-    expect(await screen.findAllByText("Showing 1-1 of 1")).toHaveLength(2);
+    expect(await screen.findAllByText("Showing 1-1 of 1")).toHaveLength(1);
 
     await revokeAdminSessionsFilteredAndAssert({
       requests,
@@ -2528,7 +2528,7 @@ describe("cloud-console interactions", () => {
     await renderAdminSessionsPage();
 
     await setAdminSessionsSearch("Mobile Safari");
-    expect(await screen.findAllByText("Showing 1-1 of 1")).toHaveLength(2);
+    expect(await screen.findAllByText("Showing 1-1 of 1")).toHaveLength(1);
 
     await revokeAdminSessionsFilteredAndAssert({
       requests,
