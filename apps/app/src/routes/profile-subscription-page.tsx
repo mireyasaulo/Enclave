@@ -19,6 +19,7 @@ import {
   LoadingBlock,
 } from "@yinjie/ui";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+import { CheckoutContactDialog } from "../features/subscription/checkout-contact-dialog";
 import { clearCloudRuntimeSession } from "../lib/cloud-session";
 import { describeRequestError } from "../lib/request-error";
 import {
@@ -332,7 +333,12 @@ export function ProfileSubscriptionPage() {
   const accessToken = useCloudSessionStore((state) => state.accessToken);
   const phone = useCloudSessionStore((state) => state.phone);
   const setProfile = useCloudSessionStore((state) => state.setProfile);
-  const [checkoutNotice, setCheckoutNotice] = useState("");
+  const [contactDialog, setContactDialog] = useState<{
+    open: boolean;
+    hint: string;
+    contact: string;
+    planName: string;
+  }>({ open: false, hint: "", contact: "", planName: "" }); // i18n-ignore-line
 
   useEffect(() => {
     if (accessToken) {
@@ -375,17 +381,21 @@ export function ProfileSubscriptionPage() {
 
   const [checkoutError, setCheckoutError] = useState("");
   const checkoutMutation = useMutation({
-    mutationFn: (planCode: string) =>
+    mutationFn: ({ planCode }: { planCode: string; planName: string }) =>
       createCheckout({ planCode }, accessToken ?? ""),
-    onSuccess: (result) => {
+    onSuccess: (result, variables) => {
       setCheckoutError("");
-      setCheckoutNotice(
-        [result.hint, result.contact].filter(Boolean).join(" ") ||
-          t(msg`已提交开通申请，请联系运营完成支付。`),
-      );
+      const hint =
+        result.hint || t(msg`已提交开通申请，请联系运营完成支付。`);
+      setContactDialog({
+        open: true,
+        hint,
+        contact: result.contact ?? "",
+        planName: variables.planName,
+      });
     },
     onError: (error) => {
-      setCheckoutNotice("");
+      setContactDialog((prev) => ({ ...prev, open: false }));
       setCheckoutError(
         describeRequestError(error, t(msg`提交开通申请失败，请稍后重试。`)),
       );
@@ -516,11 +526,6 @@ export function ProfileSubscriptionPage() {
             <div className="text-sm font-semibold text-[color:var(--text-primary)]">
               {t(msg`可购套餐`)}
             </div>
-            {checkoutNotice ? (
-              <InlineNotice className="mt-4" tone="info">
-                {checkoutNotice}
-              </InlineNotice>
-            ) : null}
             {checkoutError ? (
               <InlineNotice className="mt-4" tone="danger">
                 {checkoutError}
@@ -550,7 +555,12 @@ export function ProfileSubscriptionPage() {
                         variant="primary"
                         className="mt-3 rounded-2xl bg-[#07c160] text-white shadow-none hover:bg-[#06ad56]"
                         disabled={checkoutMutation.isPending}
-                        onClick={() => checkoutMutation.mutate(plan.code)}
+                        onClick={() =>
+                          checkoutMutation.mutate({
+                            planCode: plan.code,
+                            planName: plan.name,
+                          })
+                        }
                       >
                         {checkoutMutation.isPending
                           ? t(msg`提交中…`)
@@ -614,6 +624,16 @@ export function ProfileSubscriptionPage() {
           </div>
         </div>
       </div>
+
+      <CheckoutContactDialog
+        open={contactDialog.open}
+        hint={contactDialog.hint}
+        contact={contactDialog.contact}
+        planName={contactDialog.planName}
+        onClose={() =>
+          setContactDialog((prev) => ({ ...prev, open: false }))
+        }
+      />
     </AppPage>
   );
 }
