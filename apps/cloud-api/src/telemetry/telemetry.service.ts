@@ -16,9 +16,12 @@ import type {
   TelemetryTimeseriesPoint,
   TelemetryTimeseriesResponse,
   TelemetryTopEventsResponse,
+  TelemetryTopWorldsResponse,
+  TelemetryWorldRow,
 } from "@yinjie/contracts";
 import { createHash, randomUUID } from "crypto";
 import { Repository } from "typeorm";
+import { CloudWorldEntity } from "../entities/cloud-world.entity";
 import { ClientTelemetryDailyEntity } from "../entities/client-telemetry-daily.entity";
 import { ClientTelemetryEventEntity } from "../entities/client-telemetry-event.entity";
 
@@ -48,6 +51,8 @@ export class TelemetryService {
     private readonly events: Repository<ClientTelemetryEventEntity>,
     @InjectRepository(ClientTelemetryDailyEntity)
     private readonly daily: Repository<ClientTelemetryDailyEntity>,
+    @InjectRepository(CloudWorldEntity)
+    private readonly worlds: Repository<CloudWorldEntity>,
   ) {}
 
   async ingestBatch(
@@ -144,6 +149,7 @@ export class TelemetryService {
       eventType: normalizedEventType,
       anonId: input.anonId,
       userId: input.userId ?? null,
+      worldId: input.worldId ?? null,
       sessionId: input.sessionId,
       pagePath: input.pagePath ?? null,
       referrer: input.referrer ?? null,
@@ -195,12 +201,14 @@ export class TelemetryService {
   async overview(
     range: TelemetryRange,
     appId?: TelemetryAppId,
+    worldId?: string,
   ): Promise<TelemetryOverviewResponse> {
     const startIso = startOfRange(range);
     const eventsQb = this.events
       .createQueryBuilder("e")
       .where("e.occurredAt >= :start", { start: startIso });
     if (appId) eventsQb.andWhere("e.appId = :appId", { appId });
+    if (worldId) eventsQb.andWhere("e.worldId = :worldId", { worldId });
 
     const [totals] = await eventsQb
       .select(
@@ -226,6 +234,7 @@ export class TelemetryService {
       .where("e.eventName = 'session_end'")
       .andWhere("e.occurredAt >= :start", { start: startIso });
     if (appId) sessionDurationsQb.andWhere("e.appId = :appId", { appId });
+    if (worldId) sessionDurationsQb.andWhere("e.worldId = :worldId", { worldId });
     const durationRows = await sessionDurationsQb.getRawMany<{
       propsJson: string | null;
     }>();
@@ -251,6 +260,7 @@ export class TelemetryService {
       .where("e.eventType = 'pv'")
       .andWhere("e.occurredAt >= :start", { start: startIso });
     if (appId) sparklineQb.andWhere("e.appId = :appId", { appId });
+    if (worldId) sparklineQb.andWhere("e.worldId = :worldId", { worldId });
     const sparkRows = await sparklineQb
       .groupBy("substr(e.occurredAt, 1, 10)")
       .orderBy("date", "ASC")
@@ -276,6 +286,7 @@ export class TelemetryService {
     range: TelemetryRange,
     groupBy: "appId" | "none",
     appId?: TelemetryAppId,
+    worldId?: string,
   ): Promise<TelemetryTimeseriesResponse> {
     const startIso = startOfRange(range);
     const qb = this.events
@@ -285,6 +296,7 @@ export class TelemetryService {
       .where("e.eventName = :eventName", { eventName })
       .andWhere("e.occurredAt >= :start", { start: startIso });
     if (appId) qb.andWhere("e.appId = :appId", { appId });
+    if (worldId) qb.andWhere("e.worldId = :worldId", { worldId });
     if (groupBy === "appId") {
       qb.addSelect("e.appId", "group");
       qb.groupBy("substr(e.occurredAt, 1, 10)").addGroupBy("e.appId");
@@ -311,6 +323,7 @@ export class TelemetryService {
   async topEvents(
     range: TelemetryRange,
     appId?: TelemetryAppId,
+    worldId?: string,
     limit = 30,
   ): Promise<TelemetryTopEventsResponse> {
     const startIso = startOfRange(range);
@@ -324,6 +337,7 @@ export class TelemetryService {
       .addSelect("COUNT(DISTINCT e.anonId)", "uniqueAnons")
       .where("e.occurredAt >= :start", { start: startIso });
     if (appId) qb.andWhere("e.appId = :appId", { appId });
+    if (worldId) qb.andWhere("e.worldId = :worldId", { worldId });
     const rows = await qb
       .groupBy("e.appId")
       .addGroupBy("e.eventName")
@@ -356,6 +370,7 @@ export class TelemetryService {
     steps: string[],
     range: TelemetryRange,
     appId?: TelemetryAppId,
+    worldId?: string,
   ): Promise<TelemetryFunnelResponse> {
     const startIso = startOfRange(range);
     const stepCounts: TelemetryFunnelStep[] = [];
@@ -370,6 +385,7 @@ export class TelemetryService {
         .where("e.eventName = :name", { name: stepName })
         .andWhere("e.occurredAt >= :start", { start: startIso });
       if (appId) qb.andWhere("e.appId = :appId", { appId });
+      if (worldId) qb.andWhere("e.worldId = :worldId", { worldId });
       const rows = await qb.getRawMany<{ anonId: string }>();
       let stepAnons = new Set(rows.map((r) => r.anonId));
       if (prevAnons) {
@@ -415,6 +431,7 @@ export class TelemetryService {
   async apiHealth(
     range: TelemetryRange,
     appId?: TelemetryAppId,
+    worldId?: string,
     limit = 30,
   ): Promise<TelemetryApiHealthResponse> {
     const startIso = startOfRange(range);
@@ -424,6 +441,7 @@ export class TelemetryService {
       .where("e.eventName = 'api_call'")
       .andWhere("e.occurredAt >= :start", { start: startIso });
     if (appId) qb.andWhere("e.appId = :appId", { appId });
+    if (worldId) qb.andWhere("e.worldId = :worldId", { worldId });
     const rows = await qb.getRawMany<{ propsJson: string | null }>();
 
     const buckets = new Map<
@@ -469,6 +487,7 @@ export class TelemetryService {
   async errors(
     range: TelemetryRange,
     appId?: TelemetryAppId,
+    worldId?: string,
     limit = 100,
   ): Promise<TelemetryErrorsResponse> {
     const startIso = startOfRange(range);
@@ -477,6 +496,7 @@ export class TelemetryService {
       .where("e.eventType = 'error'")
       .andWhere("e.occurredAt >= :start", { start: startIso });
     if (appId) qb.andWhere("e.appId = :appId", { appId });
+    if (worldId) qb.andWhere("e.worldId = :worldId", { worldId });
     const rows = await qb
       .orderBy("e.occurredAt", "DESC")
       .limit(limit)
@@ -511,6 +531,66 @@ export class TelemetryService {
       };
     });
     return { range, rows: result };
+  }
+
+  async topWorlds(
+    range: TelemetryRange,
+    limit = 10,
+  ): Promise<TelemetryTopWorldsResponse> {
+    const startIso = startOfRange(range);
+    const rows = await this.events
+      .createQueryBuilder("e")
+      .select("e.worldId", "worldId")
+      .addSelect("COUNT(*)", "eventCount")
+      .addSelect("COUNT(DISTINCT e.userId)", "uniqueUsers")
+      .addSelect(
+        "SUM(CASE WHEN e.eventType = 'error' THEN 1 ELSE 0 END)",
+        "errorCount",
+      )
+      .where("e.worldId IS NOT NULL")
+      .andWhere("e.occurredAt >= :start", { start: startIso })
+      .groupBy("e.worldId")
+      .orderBy("eventCount", "DESC")
+      .limit(limit)
+      .getRawMany<{
+        worldId: string;
+        eventCount: string;
+        uniqueUsers: string;
+        errorCount: string;
+      }>();
+
+    if (rows.length === 0) {
+      return { range, rows: [] };
+    }
+
+    // 名字翻译：单独查一次世界表，不在 events QB 上 JOIN，避免在 GROUP BY 后
+    // 引入笛卡尔积 / SQLite 的 ONLY_FULL_GROUP_BY 行为差异。
+    const worldIds = rows.map((r) => r.worldId);
+    const nameRows = await this.worlds
+      .createQueryBuilder("w")
+      .select("w.id", "id")
+      .addSelect("w.name", "name")
+      .where("w.id IN (:...ids)", { ids: worldIds })
+      .getRawMany<{ id: string; name: string | null }>();
+    const nameMap = new Map(nameRows.map((r) => [r.id, r.name ?? null]));
+
+    const result: TelemetryWorldRow[] = rows.map((r) => ({
+      worldId: r.worldId,
+      worldName: nameMap.get(r.worldId) ?? null,
+      eventCount: toInt(r.eventCount),
+      uniqueUsers: toInt(r.uniqueUsers),
+      errorCount: toInt(r.errorCount),
+    }));
+    return { range, rows: result };
+  }
+
+  async listWorldsForFilter(
+    range: TelemetryRange,
+  ): Promise<TelemetryWorldRow[]> {
+    // 给 cloud-console 下拉填选项：返回当前 range 内有事件的世界（含名字）。
+    // 数据形状跟 topWorlds 一致，但默认拉到 100 条以保证下拉覆盖。
+    const resp = await this.topWorlds(range, 100);
+    return resp.rows;
   }
 }
 

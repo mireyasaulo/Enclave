@@ -22,6 +22,11 @@ export interface TelemetryEventInput {
   sessionId: string;
   anonId: string;
   userId?: string | null;
+  /**
+   * 当前用户所在的云世界 id（CloudWorldEntity.id）。app 端进入世界后填，
+   * site/wiki 与世界无关恒为 null。用于 cloud-console 按世界切片分析。
+   */
+  worldId?: string | null;
   pagePath?: string | null;
   referrer?: string | null;
   release?: string | null;
@@ -117,4 +122,17 @@ export interface TelemetryErrorRow {
 export interface TelemetryErrorsResponse {
   range: TelemetryRange;
   rows: TelemetryErrorRow[];
+}
+
+export interface TelemetryWorldRow {
+  worldId: string;
+  worldName: string | null;
+  eventCount: number;
+  uniqueUsers: number;
+  errorCount: number;
+}
+
+export interface TelemetryTopWorldsResponse {
+  range: TelemetryRange;
+  rows: TelemetryWorldRow[];
 }

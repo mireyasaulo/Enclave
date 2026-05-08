@@ -67,6 +67,16 @@ export function init(options: InitOptions): void {
     }
   };
 
+  const wrappedWorldIdProvider: () => string | null = () => {
+    if (!options.worldIdProvider) return null;
+    try {
+      const v = options.worldIdProvider();
+      return typeof v === "string" && v.length > 0 ? v : null;
+    } catch {
+      return null;
+    }
+  };
+
   const wrappedEndpointProvider: () => string | null = () => {
     try {
       if (options.endpointProvider) {
@@ -86,6 +96,9 @@ export function init(options: InitOptions): void {
     appId: options.appId,
     endpointProvider: wrappedEndpointProvider,
     userIdProvider: options.userIdProvider ? wrappedUserIdProvider : defaultProvider,
+    worldIdProvider: options.worldIdProvider
+      ? wrappedWorldIdProvider
+      : defaultProvider,
     release: options.release ?? null,
     flushIntervalMs: options.flushIntervalMs ?? DEFAULT_FLUSH_INTERVAL_MS,
     maxBatchSize: options.maxBatchSize ?? DEFAULT_MAX_BATCH_SIZE,
@@ -259,6 +272,7 @@ function trackInternal(
 ): void {
   if (!state) return;
   const userId = safeUserId();
+  const worldId = safeWorldId();
   // Shallow-clone props so callers can mutate or recycle the object after
   // calling track() without corrupting the queued event.
   const clonedProps =
@@ -275,6 +289,7 @@ function trackInternal(
     sessionId: state.sessionId,
     anonId: state.anonId,
     userId,
+    worldId,
     pagePath: state.currentPagePath || null,
     referrer: getCurrentReferrer(),
     release: state.options.release,
@@ -299,6 +314,16 @@ function safeUserId(): string | null {
   if (!state) return null;
   try {
     const v = state.options.userIdProvider();
+    return typeof v === "string" && v.length > 0 ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+function safeWorldId(): string | null {
+  if (!state) return null;
+  try {
+    const v = state.options.worldIdProvider();
     return typeof v === "string" && v.length > 0 ? v : null;
   } catch {
     return null;
