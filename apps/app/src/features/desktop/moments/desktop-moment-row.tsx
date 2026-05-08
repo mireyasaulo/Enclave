@@ -1,4 +1,10 @@
-import { useMemo, useRef, type MouseEvent as ReactMouseEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+} from "react";
 import { msg } from "@lingui/macro";
 import { type Moment, type MomentComment } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
@@ -8,7 +14,9 @@ import {
   Heart,
   MapPin,
   MessageCircle,
+  MoreHorizontal,
   Star,
+  Trash2,
   UserRound,
   X,
 } from "lucide-react";
@@ -30,6 +38,7 @@ type DesktopMomentRowProps = {
   commentDraft: string;
   commentLoading: boolean;
   commentReplyTarget?: MomentCommentReplyTarget | null;
+  deleteLoading?: boolean;
   likeLoading: boolean;
   moment: Moment;
   ownerId?: string | null;
@@ -37,6 +46,7 @@ type DesktopMomentRowProps = {
   onCancelCommentReply?: () => void;
   onCommentChange: (value: string) => void;
   onCommentSubmit: () => void;
+  onDelete?: () => void;
   onLike: () => void;
   onStartCommentReply?: (comment: MomentComment) => void;
   onToggleFavorite: () => void;
@@ -50,6 +60,7 @@ export function DesktopMomentRow({
   commentDraft,
   commentLoading,
   commentReplyTarget = null,
+  deleteLoading = false,
   likeLoading,
   moment,
   ownerId,
@@ -57,6 +68,7 @@ export function DesktopMomentRow({
   onCancelCommentReply,
   onCommentChange,
   onCommentSubmit,
+  onDelete,
   onLike,
   onStartCommentReply,
   onToggleFavorite,
@@ -65,11 +77,53 @@ export function DesktopMomentRow({
 }: DesktopMomentRowProps) {
   const t = useRuntimeTranslator();
   const composerInputRef = useRef<HTMLTextAreaElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const focusComposer = () => {
     requestAnimationFrame(() => {
       composerInputRef.current?.focus();
     });
   };
+
+  useEffect(() => {
+    if (!menuOpen) {
+      return;
+    }
+    function handleDocumentClick(event: MouseEvent) {
+      if (
+        menuRef.current &&
+        event.target instanceof Node &&
+        !menuRef.current.contains(event.target)
+      ) {
+        setMenuOpen(false);
+      }
+    }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleDocumentClick);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleDocumentClick);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [menuOpen]);
+
+  function handleDeleteClick() {
+    if (!onDelete) {
+      return;
+    }
+    setMenuOpen(false);
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm(t(msg`确定要删除这条朋友圈吗？此操作无法撤销。`))
+    ) {
+      return;
+    }
+    onDelete();
+  }
   const likedByOwner = Boolean(
     ownerId && moment.likes.some((like) => like.authorId === ownerId),
   );
@@ -114,8 +168,41 @@ export function DesktopMomentRow({
   return (
     <article
       id={`desktop-moment-post-${moment.id}`}
-      className="rounded-[16px] border border-[color:var(--border-faint)] bg-white px-4 py-4 shadow-[var(--shadow-section)]"
+      className="relative rounded-[16px] border border-[color:var(--border-faint)] bg-white px-4 py-4 shadow-[var(--shadow-section)]"
     >
+      {onDelete ? (
+        <div ref={menuRef} className="absolute right-3 top-3">
+          <button
+            type="button"
+            onClick={() => setMenuOpen((value) => !value)}
+            disabled={deleteLoading}
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+            aria-label={t(msg`更多操作`)}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--text-muted)] transition-colors hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)] disabled:opacity-55"
+          >
+            <MoreHorizontal size={16} />
+          </button>
+          {menuOpen ? (
+            <div
+              role="menu"
+              className="absolute right-0 top-9 z-10 min-w-[140px] overflow-hidden rounded-[12px] border border-[color:var(--border-faint)] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
+            >
+              <button
+                type="button"
+                role="menuitem"
+                onClick={handleDeleteClick}
+                disabled={deleteLoading}
+                className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] text-[#d23535] transition-colors hover:bg-[rgba(210,53,53,0.06)] disabled:opacity-55"
+              >
+                <Trash2 size={14} />
+                {deleteLoading ? t(msg`删除中...`) : t(msg`删除朋友圈`)}
+              </button>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
       <div className="flex items-start gap-3">
         {canSelectAuthor ? (
           <button

@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Camera } from "lucide-react";
 import {
   addMomentComment,
+  deleteMoment,
   getMoments,
   toggleMomentLike,
+  type Moment,
   type MomentComment,
 } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
@@ -18,6 +20,7 @@ import {
   LoadingBlock,
 } from "@yinjie/ui";
 import { EmptyState } from "../components/empty-state";
+import { RouteRedirectState } from "../components/route-redirect-state";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { WeChatActionBubble } from "../components/wechat-action-bubble";
 import {
@@ -26,6 +29,10 @@ import {
 } from "../components/wechat-comment-bar";
 import { WeChatMomentCard } from "../components/wechat-moment-card";
 import { WeChatMomentsCover } from "../components/wechat-moments-cover";
+import {
+  publishMomentComposeDraft,
+  useMomentComposeDraft,
+} from "../features/moments/moment-compose-media";
 import { buildMobileMomentsPublishRouteHash } from "../features/moments/mobile-moments-publish-route-state";
 import { usePullToRefresh } from "../features/moments/use-pull-to-refresh";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
@@ -33,6 +40,13 @@ import { navigateBackOrFallback } from "../lib/history-back";
 import { describeRequestError } from "../lib/request-error";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
+
+const DesktopProfileMomentsWorkspace = lazy(async () => {
+  const mod = await import(
+    "../features/desktop/moments/desktop-profile-moments-workspace"
+  );
+  return { default: mod.DesktopProfileMomentsWorkspace };
+});
 
 const PUBLISH_RETURN_HASH = buildMobileMomentsPublishRouteHash({
   returnPath: "/profile/moments",
@@ -59,16 +73,18 @@ export function ProfileMomentsPage() {
     momentId: string;
     replyTo: WeChatCommentBarReplyTarget | null;
   } | null>(null);
+  const [desktopReplyTarget, setDesktopReplyTarget] = useState<{
+    authorId: string;
+    authorName: string;
+    commentId: string;
+    postId: string;
+  } | null>(null);
+  const [showCompose, setShowCompose] = useState(false);
   const [notice, setNotice] = useState<{
     tone: "success" | "info";
     message: string;
   } | null>(null);
-
-  useEffect(() => {
-    if (isDesktopLayout) {
-      void navigate({ to: "/tabs/moments", replace: true });
-    }
-  }, [isDesktopLayout, navigate]);
+  const composeDraft = useMomentComposeDraft();
 
   const momentsQuery = useQuery({
     queryKey: ["app-moments", baseUrl],
@@ -104,10 +120,18 @@ export function ProfileMomentsPage() {
         throw new Error(t(msg`请先输入评论内容。`));
       }
 
-      const target =
+      const desktopTarget =
+        desktopReplyTarget?.postId === momentId ? desktopReplyTarget : null;
+      const mobileTarget =
         commentBarTarget?.momentId === momentId
           ? commentBarTarget.replyTo
           : null;
+      const target = desktopTarget
+        ? {
+            commentId: desktopTarget.commentId,
+            authorId: desktopTarget.authorId,
+          }
+        : mobileTarget;
 
       return addMomentComment(
         momentId,
@@ -122,6 +146,9 @@ export function ProfileMomentsPage() {
     onSuccess: async (_, momentId) => {
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
       setCommentBarTarget(null);
+      setDesktopReplyTarget((current) =>
+        current?.postId === momentId ? null : current,
+      );
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
@@ -132,8 +159,69 @@ export function ProfileMomentsPage() {
     },
   });
 
+  const createMutation = useMutation({
+    mutationFn: () =>
+      publishMomentComposeDraft({
+        text: composeDraft.text,
+        imageDrafts: composeDraft.imageDrafts,
+        videoDraft: composeDraft.videoDraft,
+        baseUrl,
+      }),
+    onSuccess: async () => {
+      composeDraft.reset();
+      setShowCompose(false);
+      setNotice({
+        tone: "success",
+        message: t(msg`朋友圈已发布。`),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["app-moments", baseUrl],
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (momentId: string) => deleteMoment(momentId, baseUrl),
+    onMutate: async (momentId) => {
+      await queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] });
+      const snapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments", baseUrl],
+      });
+      snapshots.forEach(([key, data]) => {
+        if (!data) {
+          return;
+        }
+        queryClient.setQueryData<Moment[]>(
+          key,
+          data.filter((item) => item.id !== momentId),
+        );
+      });
+      return { snapshots };
+    },
+    onError: (_error, _momentId, context) => {
+      context?.snapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+    },
+    onSuccess: async () => {
+      setNotice({
+        tone: "success",
+        message: t(msg`已删除这条朋友圈。`),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["app-moments", baseUrl],
+      });
+    },
+  });
+
   const pendingCommentMomentId = commentMutation.isPending
     ? commentMutation.variables
+    : null;
+  const pendingLikeMomentId = likeMutation.isPending
+    ? likeMutation.variables
+    : null;
+  const pendingDeleteMomentId = deleteMutation.isPending
+    ? deleteMutation.variables
     : null;
 
   useEffect(() => {
@@ -149,10 +237,6 @@ export function ProfileMomentsPage() {
     enabled: !isDesktopLayout,
   });
 
-  if (isDesktopLayout) {
-    return null;
-  }
-
   const goBack = () =>
     navigateBackOrFallback(() =>
       navigate({ to: "/tabs/profile", replace: true }),
@@ -165,6 +249,124 @@ export function ProfileMomentsPage() {
     });
 
   const displayName = ownerName?.trim() || t(msg`世界主人`);
+
+  if (isDesktopLayout) {
+    const desktopErrors: string[] = [];
+    if (momentsQuery.isError && momentsQuery.error instanceof Error) {
+      desktopErrors.push(momentsQuery.error.message);
+    }
+
+    async function handleDesktopImageFilesSelected(files: FileList | null) {
+      try {
+        await composeDraft.addImageFiles(files);
+      } catch (error) {
+        composeDraft.setMediaError(
+          error instanceof Error
+            ? error.message
+            : t(msg`图片选择失败，请稍后重试。`),
+        );
+      }
+    }
+
+    async function handleDesktopVideoFileSelected(file: File | null) {
+      try {
+        await composeDraft.replaceVideoFile(file);
+      } catch (error) {
+        composeDraft.setMediaError(
+          error instanceof Error
+            ? error.message
+            : t(msg`视频选择失败，请稍后重试。`),
+        );
+      }
+    }
+
+    return (
+      <Suspense
+        fallback={
+          <RouteRedirectState
+            title={t(msg`正在打开桌面我的朋友圈`)}
+            description={t(msg`正在载入桌面端我的朋友圈工作区。`)}
+            loadingLabel={t(msg`载入桌面我的朋友圈...`)}
+          />
+        }
+      >
+        <DesktopProfileMomentsWorkspace
+          commentDrafts={commentDrafts}
+          commentErrorMessage={
+            commentMutation.isError && commentMutation.error instanceof Error
+              ? commentMutation.error.message
+              : null
+          }
+          commentPendingMomentId={pendingCommentMomentId}
+          commentReplyTarget={desktopReplyTarget}
+          composeErrorMessage={
+            composeDraft.mediaError ??
+            (createMutation.isError && createMutation.error instanceof Error
+              ? createMutation.error.message
+              : null)
+          }
+          createPending={createMutation.isPending}
+          deletePendingMomentId={pendingDeleteMomentId}
+          deleteErrorMessage={
+            deleteMutation.isError && deleteMutation.error instanceof Error
+              ? deleteMutation.error.message
+              : null
+          }
+          errors={desktopErrors}
+          imageDrafts={composeDraft.imageDrafts}
+          isLoading={momentsQuery.isLoading}
+          likeErrorMessage={
+            likeMutation.isError && likeMutation.error instanceof Error
+              ? likeMutation.error.message
+              : null
+          }
+          likePendingMomentId={pendingLikeMomentId}
+          moments={ownMoments}
+          ownerAvatar={ownerAvatar}
+          ownerId={ownerId ?? null}
+          ownerName={displayName}
+          showCompose={showCompose}
+          successNotice={notice?.message}
+          text={composeDraft.text}
+          videoDraft={composeDraft.videoDraft}
+          isMomentFavorite={() => false}
+          setShowCompose={setShowCompose}
+          onBack={goBack}
+          onCancelCommentReply={() => setDesktopReplyTarget(null)}
+          onCommentChange={(momentId, value) =>
+            setCommentDrafts((current) => ({
+              ...current,
+              [momentId]: value,
+            }))
+          }
+          onCommentSubmit={(momentId) => commentMutation.mutate(momentId)}
+          onCreate={() => createMutation.mutate()}
+          onDelete={(momentId) => deleteMutation.mutate(momentId)}
+          onImageFilesSelected={(files) => {
+            void handleDesktopImageFilesSelected(files);
+          }}
+          onLike={(momentId) => likeMutation.mutate(momentId)}
+          onRemoveImage={(id) => composeDraft.removeImageDraft(id)}
+          onRemoveVideo={() => composeDraft.clearVideoDraft()}
+          onStartCommentReply={({ momentId, comment }) =>
+            setDesktopReplyTarget({
+              authorId: comment.authorId,
+              authorName: comment.authorName,
+              commentId: comment.id,
+              postId: momentId,
+            })
+          }
+          onTextChange={composeDraft.setText}
+          onToggleFavorite={() => {
+            // 个人朋友圈页暂不支持收藏自己动态
+          }}
+          onVideoFileSelected={(file) => {
+            void handleDesktopVideoFileSelected(file);
+          }}
+        />
+      </Suspense>
+    );
+  }
 
   const onCommentTap = (momentId: string, comment: MomentComment | null) => {
     setCommentBarTarget({
@@ -298,6 +500,16 @@ export function ProfileMomentsPage() {
                 }
                 onDoubleTapLike={() => likeMutation.mutate(moment.id)}
                 onCommentTap={(comment) => onCommentTap(moment.id, comment)}
+                onDelete={() => {
+                  if (deleteMutation.isPending) return;
+                  if (
+                    typeof window !== "undefined" &&
+                    !window.confirm(t(msg`确定删除这条朋友圈吗？`))
+                  ) {
+                    return;
+                  }
+                  deleteMutation.mutate(moment.id);
+                }}
               />
             </div>
           ))}
@@ -361,12 +573,14 @@ function PersonalAlbumRow({
   onOpenActionMenu,
   onDoubleTapLike,
   onCommentTap,
+  onDelete,
 }: {
-  moment: import("@yinjie/contracts").Moment;
+  moment: Moment;
   ownerId: string | null;
   onOpenActionMenu: (rect: DOMRect) => void;
   onDoubleTapLike: () => void;
   onCommentTap: (comment: MomentComment | null) => void;
+  onDelete?: () => void;
 }) {
   const date = new Date(moment.postedAt);
   const day = Number.isNaN(date.getTime())
@@ -399,6 +613,7 @@ function PersonalAlbumRow({
           onOpenActionMenu={onOpenActionMenu}
           onDoubleTapLike={onDoubleTapLike}
           onCommentTap={onCommentTap}
+          onDelete={onDelete}
         />
       </div>
     </div>

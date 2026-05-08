@@ -280,6 +280,27 @@ export class MomentsService implements OnModuleInit {
     return { liked: true };
   }
 
+  async deleteOwnerPost(postId: string): Promise<{ success: true; id: string }> {
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const post = await this.postRepo.findOneBy({ id: postId });
+    if (!post) {
+      throw new AppError('MOMENT_NOT_FOUND', {
+        legacyMessage: '该朋友圈不存在或已被删除。',
+        status: HttpStatus.NOT_FOUND,
+      });
+    }
+    if (post.authorType !== 'user' || post.authorId !== owner.id) {
+      throw new AppError('MOMENT_DELETE_FORBIDDEN', {
+        legacyMessage: '只能删除自己发布的朋友圈。',
+        status: HttpStatus.FORBIDDEN,
+      });
+    }
+    await this.commentRepo.delete({ postId });
+    await this.likeRepo.delete({ postId });
+    await this.postRepo.delete(postId);
+    return { success: true, id: postId };
+  }
+
   async generateMomentForCharacter(
     characterId: string,
   ): Promise<Moment | null> {

@@ -2,6 +2,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -131,6 +132,11 @@ export class MomentsController {
   @Post(':id/like')
   toggleLike(@Param('id') postId: string) {
     return this.momentsService.toggleOwnerLike(postId);
+  }
+
+  @Delete(':id')
+  deletePost(@Param('id') postId: string) {
+    return this.momentsService.deleteOwnerPost(postId);
   }
 }
 // i18n-ignore-end

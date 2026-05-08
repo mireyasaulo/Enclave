@@ -2770,6 +2770,14 @@ export function createUserMoment(
   ).then((moment) => normalizeMoment(moment, resolvedBaseUrl));
 }
 
+export function deleteMoment(id: string, baseUrl?: string) {
+  return requestLegacyApi<{ success: boolean; id: string }>(
+    `/moments/${id}`,
+    { method: "DELETE" },
+    baseUrl,
+  );
+}
+
 export function uploadMomentMedia(payload: FormData, baseUrl?: string) {
   const resolvedBaseUrl = resolveCoreApiBaseUrl(baseUrl, {
     allowDefault: false,
