@@ -625,8 +625,13 @@ export function WorldDetailPage() {
                 {world.name}
               </div>
               <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-                {world.phone}
+                {world.email ?? world.phone}
               </div>
+              {world.email ? (
+                <div className="text-xs text-[color:var(--text-muted)]">
+                  {world.phone}
+                </div>
+              ) : null}
               <div className="mt-1 text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
                 {world.status}
               </div>
