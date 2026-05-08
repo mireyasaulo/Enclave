@@ -5962,11 +5962,17 @@ function StickerMessage({
     <img
       src={url}
       alt={label}
+      width={maxSize}
+      height={maxSize}
       onError={() => setLoadFailed(true)}
       onLoad={onMediaReady}
       className="rounded-[18px] bg-white/70 object-contain shadow-none"
-      style={{ maxWidth: `${maxSize}px`, maxHeight: `${maxSize}px` }}
-      loading="lazy"
+      style={{
+        width: `${maxSize}px`,
+        height: `${maxSize}px`,
+        maxWidth: `${maxSize}px`,
+        maxHeight: `${maxSize}px`,
+      }}
     />
   );
 }
