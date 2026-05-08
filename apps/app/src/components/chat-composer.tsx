@@ -168,31 +168,31 @@ type ScreenshotShortcutHelpGroupId = "send" | "view" | "draw" | "history";
 const SCREENSHOT_ANNOTATION_PALETTE = [
   {
     id: "amber",
-    label: "琥珀",
+    label: msg`琥珀`,
     stroke: "#f59e0b",
     fill: "rgba(245,158,11,0.12)",
   },
   {
     id: "cyan",
-    label: "青蓝",
+    label: msg`青蓝`,
     stroke: "#38bdf8",
     fill: "rgba(56,189,248,0.14)",
   },
   {
     id: "rose",
-    label: "玫红",
+    label: msg`玫红`,
     stroke: "#fb7185",
     fill: "rgba(251,113,133,0.14)",
   },
   {
     id: "lime",
-    label: "青柠",
+    label: msg`青柠`,
     stroke: "#84cc16",
     fill: "rgba(132,204,22,0.14)",
   },
 ] satisfies Array<{
   id: ScreenshotAnnotationColor;
-  label: string;
+  label: ReturnType<typeof msg>;
   stroke: string;
   fill: string;
 }>;
@@ -1282,7 +1282,7 @@ export function ChatComposer({
     if (!result.asset) {
       if (result.error) {
         setMobilePlusNotice(
-          resolveNativeCameraCaptureNotice(result.error, {
+          resolveNativeCameraCaptureNotice(t, result.error, {
             nativeBridgeAvailable: nativeMobileShellSupported,
             onOpenSettings: () => {
               void openAppSettings();
@@ -1298,7 +1298,7 @@ export function ChatComposer({
     }
 
     try {
-      const file = await readNativeBridgeImageAssetFile(result.asset, 0);
+      const file = await readNativeBridgeImageAssetFile(t, result.asset, 0);
       await applyImageDraftFiles([file]);
     } catch (fileError) {
       setAttachmentError(
@@ -1319,7 +1319,7 @@ export function ChatComposer({
       const files = await Promise.all(
         assets
           .slice(0, MAX_ALBUM_IMAGE_COUNT)
-          .map((asset, index) => readNativeBridgeImageAssetFile(asset, index)),
+          .map((asset, index) => readNativeBridgeImageAssetFile(t, asset, index)),
       );
       await applyImageDraftFiles(files);
     } catch (fileError) {
@@ -1354,7 +1354,7 @@ export function ChatComposer({
       if (result.error) {
         setAttachmentError(null);
         setMobilePlusNotice(
-          resolveNativeFilePickNotice(result.error, {
+          resolveNativeFilePickNotice(t, result.error, {
             onRetry: pickFile,
             secondaryActionLabel: errorActionLabel ?? undefined,
             onSecondaryAction: onErrorAction ?? undefined,
@@ -1365,7 +1365,7 @@ export function ChatComposer({
     }
 
     try {
-      const file = await readNativeBridgeFileAsset(result.asset, {
+      const file = await readNativeBridgeFileAsset(t, result.asset, {
         fallbackBaseName: "file",
         fallbackMimeType: "application/octet-stream",
       });
@@ -1416,7 +1416,7 @@ export function ChatComposer({
       video.muted = true;
       video.playsInline = true;
 
-      await waitForCaptureVideo(video);
+      await waitForCaptureVideo(t, video);
 
       const width = video.videoWidth;
       const height = video.videoHeight;
@@ -1433,11 +1433,11 @@ export function ChatComposer({
       }
 
       context.drawImage(video, 0, 0, width, height);
-      const blob = await canvasToBlob(canvas);
+      const blob = await canvasToBlob(t, canvas);
       const file = new File([blob], buildDesktopScreenshotFileName(), {
         type: "image/png",
       });
-      const screenshotDraft = await createImageDraft(file);
+      const screenshotDraft = await createImageDraft(t, file);
 
       video.pause();
       video.srcObject = null;
@@ -1551,7 +1551,7 @@ export function ChatComposer({
   const applyImageDraftFiles = async (files: File[]) => {
     try {
       const draftItems = await Promise.all(
-        files.map((file) => createImageDraft(file)),
+        files.map((file) => createImageDraft(t, file)),
       );
       releaseAttachmentDraft(attachmentDraft);
       setAttachmentError(null);
@@ -1566,7 +1566,7 @@ export function ChatComposer({
       setAttachmentError(
         fileError instanceof Error
           ? fileError.message
-          : "读取图片失败，请换一张再试。",
+          : t(msg`读取图片失败，请换一张再试。`),
       );
     }
   };
@@ -2203,7 +2203,7 @@ export function ChatComposer({
       desktopScreenshotAnnotations.length ||
       (mode === "cropped" && desktopScreenshotCrop)
     ) {
-      return createEditedScreenshotPayload(desktopScreenshotDraft, {
+      return createEditedScreenshotPayload(t, desktopScreenshotDraft, {
         crop: mode === "cropped" ? desktopScreenshotCrop : null,
         annotations: desktopScreenshotAnnotations,
       });
@@ -2552,7 +2552,7 @@ export function ChatComposer({
 
     try {
       const uploadReadyPayload =
-        await prepareAttachmentPayloadForUpload(payload);
+        await prepareAttachmentPayloadForUpload(t, payload);
       await onSendAttachment(uploadReadyPayload);
       if (!isDesktop) {
         returnMobileComposerToText();
@@ -2564,7 +2564,7 @@ export function ChatComposer({
       setAttachmentError(
         attachmentActionError instanceof Error
           ? attachmentActionError.message
-          : "附件发送失败，请稍后再试。",
+          : t(msg`附件发送失败，请稍后再试。`),
       );
       return false;
     } finally {
@@ -2585,7 +2585,7 @@ export function ChatComposer({
 
       try {
         for (const item of currentDraft.items) {
-          const uploadReadyPayload = await prepareAttachmentPayloadForUpload({
+          const uploadReadyPayload = await prepareAttachmentPayloadForUpload(t, {
             type: "image",
             file: item.file,
             fileName: item.fileName,
@@ -2607,7 +2607,7 @@ export function ChatComposer({
         setAttachmentError(
           attachmentActionError instanceof Error
             ? attachmentActionError.message
-            : "图片发送失败，请稍后再试。",
+            : t(msg`图片发送失败，请稍后再试。`),
         );
       } finally {
         setAttachmentBusy(false);
@@ -2655,7 +2655,7 @@ export function ChatComposer({
       setAttachmentError(
         presetTextError instanceof Error
           ? presetTextError.message
-          : "发送失败，请稍后再试。",
+          : t(msg`发送失败，请稍后再试。`),
       );
       return false;
     } finally {
@@ -4556,14 +4556,7 @@ function DesktopScreenshotEditor({
                 {tool !== "crop" ? (
                   <div className="ml-1 flex items-center gap-2 rounded-full bg-white/6 px-2 py-1">
                     {SCREENSHOT_ANNOTATION_PALETTE.map((palette, index) => {
-                      const paletteLabel =
-                        palette.id === "amber"
-                          ? t(msg`琥珀`)
-                          : palette.id === "cyan"
-                            ? t(msg`青蓝`)
-                            : palette.id === "rose"
-                              ? t(msg`玫红`)
-                              : t(msg`青柠`);
+                      const paletteLabel = t(palette.label);
 
                       return (
                         <button
@@ -4995,7 +4988,7 @@ function DesktopScreenshotEditor({
                               stroke="rgba(255,255,255,0.12)"
                               strokeWidth="0.003"
                             />
-                            {buildScreenshotTextPreviewLines(annotation).map(
+                            {buildScreenshotTextPreviewLines(t, annotation).map(
                               (line, index) => (
                                 <text
                                   key={`${annotation.id}-${index}`}
@@ -5469,15 +5462,18 @@ function DesktopMentionPicker({
   );
 }
 
-async function createImageDraft(file: File): Promise<ImageDraft> {
+async function createImageDraft(
+  t: ReturnType<typeof useRuntimeTranslator>,
+  file: File,
+): Promise<ImageDraft> {
   if (!file.type.startsWith("image/")) {
-    throw new Error("当前只支持图片附件。");
+    throw new Error(t(msg`当前只支持图片附件。`));
   }
 
   const previewUrl = URL.createObjectURL(file);
 
   try {
-    const size = await readImageDimensions(previewUrl);
+    const size = await readImageDimensions(t, previewUrl);
     return {
       file,
       fileName: file.name || "image",
@@ -5492,22 +5488,24 @@ async function createImageDraft(file: File): Promise<ImageDraft> {
 }
 
 async function readNativeBridgeImageAssetFile(
+  t: ReturnType<typeof useRuntimeTranslator>,
   asset: MobileBridgeImageAsset,
   index: number,
 ) {
-  const file = await readNativeBridgeFileAsset(asset, {
+  const file = await readNativeBridgeFileAsset(t, asset, {
     fallbackBaseName: `image-${index + 1}`,
     fallbackMimeType: "image/jpeg",
   });
 
   if (!file.type.startsWith("image/")) {
-    throw new Error("当前只支持图片附件。");
+    throw new Error(t(msg`当前只支持图片附件。`));
   }
 
   return file;
 }
 
 async function readNativeBridgeFileAsset(
+  t: ReturnType<typeof useRuntimeTranslator>,
   asset: MobileBridgeFileAsset,
   options?: {
     fallbackBaseName?: string;
@@ -5516,12 +5514,12 @@ async function readNativeBridgeFileAsset(
 ) {
   const source = resolveNativeBridgeFileAssetSource(asset);
   if (!source) {
-    throw new Error("读取文件失败，请重新选择。");
+    throw new Error(t(msg`读取文件失败，请重新选择。`));
   }
 
   const response = await fetch(source);
   if (!response.ok) {
-    throw new Error("读取文件失败，请重新选择。");
+    throw new Error(t(msg`读取文件失败，请重新选择。`));
   }
 
   const blob = await response.blob();
@@ -5711,6 +5709,7 @@ function normalizeAssetValue(value: string | undefined | null) {
 }
 
 function resolveNativeCameraCaptureNotice(
+  t: ReturnType<typeof useRuntimeTranslator>,
   errorMessage: string,
   options?: {
     nativeBridgeAvailable?: boolean;
@@ -5726,11 +5725,11 @@ function resolveNativeCameraCaptureNotice(
   if (normalizedMessage.includes("permission")) {
     return {
       message: options?.nativeBridgeAvailable
-        ? "相机权限未开启，请到系统设置里允许隐界访问相机后再试。"
-        : "相机权限未开启，请检查当前设备的相机权限后再试。",
+        ? t(msg`相机权限未开启，请到系统设置里允许隐界访问相机后再试。`)
+        : t(msg`相机权限未开启，请检查当前设备的相机权限后再试。`),
       actionLabel:
         options?.nativeBridgeAvailable && options.onOpenSettings
-          ? "去设置"
+          ? t(msg`去设置`)
           : undefined,
       onAction:
         options?.nativeBridgeAvailable && options.onOpenSettings
@@ -5749,8 +5748,8 @@ function resolveNativeCameraCaptureNotice(
 
   if (normalizedMessage.includes("unavailable")) {
     return {
-      message: "当前设备暂时无法打开相机，请先改用相册选图。",
-      actionLabel: options?.onPickAlbum ? "改用相册" : undefined,
+      message: t(msg`当前设备暂时无法打开相机，请先改用相册选图。`),
+      actionLabel: options?.onPickAlbum ? t(msg`改用相册`) : undefined,
       onAction: options?.onPickAlbum,
       secondaryActionLabel: options?.secondaryActionLabel,
       onSecondaryAction: options?.onSecondaryAction,
@@ -5758,8 +5757,8 @@ function resolveNativeCameraCaptureNotice(
   }
 
   return {
-    message: "打开相机失败，请稍后再试。",
-    actionLabel: options?.onRetry ? "重试打开相机" : undefined,
+    message: t(msg`打开相机失败，请稍后再试。`),
+    actionLabel: options?.onRetry ? t(msg`重试打开相机`) : undefined,
     onAction: options?.onRetry,
     secondaryActionLabel: options?.secondaryActionLabel,
     onSecondaryAction: options?.onSecondaryAction,
@@ -5767,6 +5766,7 @@ function resolveNativeCameraCaptureNotice(
 }
 
 function resolveNativeFilePickNotice(
+  t: ReturnType<typeof useRuntimeTranslator>,
   errorMessage: string,
   options?: {
     onRetry?: () => void;
@@ -5778,8 +5778,8 @@ function resolveNativeFilePickNotice(
 
   if (normalizedMessage.includes("unavailable")) {
     return {
-      message: "当前设备暂时无法打开文件选择器，请稍后再试。",
-      actionLabel: options?.onRetry ? "重试打开文件" : undefined,
+      message: t(msg`当前设备暂时无法打开文件选择器，请稍后再试。`),
+      actionLabel: options?.onRetry ? t(msg`重试打开文件`) : undefined,
       onAction: options?.onRetry,
       secondaryActionLabel: options?.secondaryActionLabel,
       onSecondaryAction: options?.onSecondaryAction,
@@ -5787,15 +5787,18 @@ function resolveNativeFilePickNotice(
   }
 
   return {
-    message: "打开文件失败，请稍后再试。",
-    actionLabel: options?.onRetry ? "重试打开文件" : undefined,
+    message: t(msg`打开文件失败，请稍后再试。`),
+    actionLabel: options?.onRetry ? t(msg`重试打开文件`) : undefined,
     onAction: options?.onRetry,
     secondaryActionLabel: options?.secondaryActionLabel,
     onSecondaryAction: options?.onSecondaryAction,
   };
 }
 
-function waitForCaptureVideo(video: HTMLVideoElement) {
+function waitForCaptureVideo(
+  t: ReturnType<typeof useRuntimeTranslator>,
+  video: HTMLVideoElement,
+) {
   return new Promise<void>((resolve, reject) => {
     const cleanup = () => {
       video.onloadedmetadata = null;
@@ -5811,12 +5814,13 @@ function waitForCaptureVideo(video: HTMLVideoElement) {
     };
     video.onerror = () => {
       cleanup();
-      reject(new Error("截图视频流初始化失败。"));
+      reject(new Error(t(msg`截图视频流初始化失败。`)));
     };
   });
 }
 
 function canvasToBlob(
+  t: ReturnType<typeof useRuntimeTranslator>,
   canvas: HTMLCanvasElement,
   options?: {
     mimeType?: string;
@@ -5832,7 +5836,7 @@ function canvasToBlob(
           return;
         }
 
-        reject(new Error(options?.errorMessage ?? "截图生成失败，请重试。"));
+        reject(new Error(options?.errorMessage ?? t(msg`截图生成失败，请重试。`)));
       },
       options?.mimeType ?? "image/png",
       options?.quality,
@@ -5855,7 +5859,10 @@ function buildDesktopScreenshotFileName() {
   return `screenshot-${stamp}.png`;
 }
 
-function readImageDimensions(url: string) {
+function readImageDimensions(
+  t: ReturnType<typeof useRuntimeTranslator>,
+  url: string,
+) {
   return new Promise<{ width: number; height: number }>((resolve, reject) => {
     const image = new Image();
     image.onload = () => {
@@ -5864,7 +5871,7 @@ function readImageDimensions(url: string) {
         height: image.naturalHeight,
       });
     };
-    image.onerror = () => reject(new Error("图片解析失败，请换一张再试。"));
+    image.onerror = () => reject(new Error(t(msg`图片解析失败，请换一张再试。`)));
     image.src = url;
   });
 }
@@ -6038,6 +6045,7 @@ function getSelectionArrowPreview(selection: ScreenshotSelectionDraft) {
 }
 
 async function createEditedScreenshotPayload(
+  t: ReturnType<typeof useRuntimeTranslator>,
   draft: ImageDraft,
   input: {
     crop: NormalizedCropRect | null;
@@ -6047,7 +6055,7 @@ async function createEditedScreenshotPayload(
   const width = draft.width ?? 0;
   const height = draft.height ?? 0;
   if (!width || !height) {
-    throw new Error("截图尺寸异常，请重新截图。");
+    throw new Error(t(msg`截图尺寸异常，请重新截图。`));
   }
 
   const crop = input.crop;
@@ -6059,13 +6067,13 @@ async function createEditedScreenshotPayload(
   const sourceHeight = crop
     ? Math.max(1, Math.round(crop.height * height))
     : height;
-  const image = await loadImageElement(draft.previewUrl);
+  const image = await loadImageElement(t, draft.previewUrl);
   const canvas = document.createElement("canvas");
   canvas.width = sourceWidth;
   canvas.height = sourceHeight;
   const context = canvas.getContext("2d");
   if (!context) {
-    throw new Error("截图画布初始化失败。");
+    throw new Error(t(msg`截图画布初始化失败。`));
   }
 
   context.drawImage(
@@ -6079,13 +6087,13 @@ async function createEditedScreenshotPayload(
     sourceWidth,
     sourceHeight,
   );
-  drawScreenshotAnnotations(context, input.annotations, {
+  drawScreenshotAnnotations(t, context, input.annotations, {
     crop,
     width: sourceWidth,
     height: sourceHeight,
   });
 
-  const blob = await canvasToBlob(canvas);
+  const blob = await canvasToBlob(t, canvas);
   const nextFileName = buildEditedScreenshotFileName(draft.fileName, {
     cropped: Boolean(crop),
     annotated: input.annotations.length > 0,
@@ -6102,6 +6110,7 @@ async function createEditedScreenshotPayload(
 }
 
 function drawScreenshotAnnotations(
+  t: ReturnType<typeof useRuntimeTranslator>,
   context: CanvasRenderingContext2D,
   annotations: ScreenshotAnnotation[],
   options: {
@@ -6134,7 +6143,7 @@ function drawScreenshotAnnotations(
         continue;
       }
 
-      const lines = buildScreenshotTextCanvasLines(annotation, rect.width);
+      const lines = buildScreenshotTextCanvasLines(t, annotation, rect.width);
       const fontSize = resolveScreenshotTextCanvasFontSize(rect);
       const lineHeight = fontSize * 1.35;
       const paddingX = Math.max(10, fontSize * 0.45);
@@ -6225,7 +6234,10 @@ function areScreenshotAnnotationsEqual(
   );
 }
 
-function buildScreenshotTextPreviewLines(annotation: ScreenshotAnnotation) {
+function buildScreenshotTextPreviewLines(
+  t: ReturnType<typeof useRuntimeTranslator>,
+  annotation: ScreenshotAnnotation,
+) {
   const rect = getScreenshotAnnotationRect(annotation);
   const fontSize = resolveScreenshotTextPreviewFontSize(rect);
   const paddingX = Math.max(0.012, fontSize * 0.42);
@@ -6236,7 +6248,7 @@ function buildScreenshotTextPreviewLines(annotation: ScreenshotAnnotation) {
     Math.floor((rect.height - paddingY * 2) / (fontSize * 1.32)),
   );
 
-  return buildWrappedScreenshotText(annotation.text ?? "输入文字", maxWidth, {
+  return buildWrappedScreenshotText(t, annotation.text ?? t(msg`输入文字`), maxWidth, {
     averageCharWidth: fontSize * 0.62,
     maxLines,
   }).map((line, index) => ({
@@ -6248,6 +6260,7 @@ function buildScreenshotTextPreviewLines(annotation: ScreenshotAnnotation) {
 }
 
 function buildScreenshotTextCanvasLines(
+  t: ReturnType<typeof useRuntimeTranslator>,
   annotation: ScreenshotAnnotation,
   width: number,
 ) {
@@ -6264,13 +6277,14 @@ function buildScreenshotTextCanvasLines(
     ),
   );
 
-  return buildWrappedScreenshotText(annotation.text ?? "输入文字", maxWidth, {
+  return buildWrappedScreenshotText(t, annotation.text ?? t(msg`输入文字`), maxWidth, {
     averageCharWidth: fontSize * 0.62,
     maxLines,
   });
 }
 
 function buildWrappedScreenshotText(
+  t: ReturnType<typeof useRuntimeTranslator>,
   value: string,
   maxWidth: number,
   options: {
@@ -6278,7 +6292,7 @@ function buildWrappedScreenshotText(
     maxLines: number;
   },
 ) {
-  const source = value.trim() || "输入文字";
+  const source = value.trim() || t(msg`输入文字`);
   const maxCharsPerLine = Math.max(
     1,
     Math.floor(maxWidth / Math.max(1, options.averageCharWidth)),
@@ -6461,16 +6475,20 @@ function buildEditedScreenshotFileName(
   return `${normalized.slice(0, extensionIndex)}${suffix || "-edited"}.png`;
 }
 
-function loadImageElement(url: string) {
+function loadImageElement(
+  t: ReturnType<typeof useRuntimeTranslator>,
+  url: string,
+) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error("截图解析失败，请重新截图。"));
+    image.onerror = () => reject(new Error(t(msg`截图解析失败，请重新截图。`)));
     image.src = url;
   });
 }
 
 async function prepareAttachmentPayloadForUpload(
+  t: ReturnType<typeof useRuntimeTranslator>,
   payload: ChatComposerAttachmentPayload,
 ): Promise<ChatComposerAttachmentPayload> {
   if (payload.type !== "image") {
@@ -6481,18 +6499,19 @@ async function prepareAttachmentPayloadForUpload(
     return payload;
   }
 
-  const optimized = await optimizeImageAttachmentForUpload(payload);
+  const optimized = await optimizeImageAttachmentForUpload(t, payload);
   if (optimized.file.size > CHAT_ATTACHMENT_IMAGE_UPLOAD_LIMIT_BYTES) {
-    throw new Error("图片过大，请先裁剪后再发送。");
+    throw new Error(t(msg`图片过大，请先裁剪后再发送。`));
   }
 
   return optimized;
 }
 
 async function optimizeImageAttachmentForUpload(
+  t: ReturnType<typeof useRuntimeTranslator>,
   payload: Extract<ChatComposerAttachmentPayload, { type: "image" }>,
 ): Promise<Extract<ChatComposerAttachmentPayload, { type: "image" }>> {
-  const image = await loadImageElementFromFile(payload.file);
+  const image = await loadImageElementFromFile(t, payload.file);
   let smallestResult: {
     file: File;
     width: number;
@@ -6508,16 +6527,16 @@ async function optimizeImageAttachmentForUpload(
 
     const context = canvas.getContext("2d");
     if (!context) {
-      throw new Error("当前浏览器暂不支持图片处理，请先裁剪后再发送。");
+      throw new Error(t(msg`当前浏览器暂不支持图片处理，请先裁剪后再发送。`));
     }
 
     context.drawImage(image, 0, 0, width, height);
 
     for (const candidate of CHAT_ATTACHMENT_IMAGE_EXPORT_CANDIDATES) {
-      const blob = await canvasToBlob(canvas, {
+      const blob = await canvasToBlob(t, canvas, {
         mimeType: candidate.mimeType,
         quality: candidate.quality,
-        errorMessage: "图片处理失败，请先裁剪后再发送。",
+        errorMessage: t(msg`图片处理失败，请先裁剪后再发送。`),
       });
       const mimeType = blob.type || candidate.mimeType;
       const nextExtension =
@@ -6565,11 +6584,14 @@ async function optimizeImageAttachmentForUpload(
   return payload;
 }
 
-async function loadImageElementFromFile(file: File) {
+async function loadImageElementFromFile(
+  t: ReturnType<typeof useRuntimeTranslator>,
+  file: File,
+) {
   const url = URL.createObjectURL(file);
 
   try {
-    return await loadImageElement(url);
+    return await loadImageElement(t, url);
   } finally {
     URL.revokeObjectURL(url);
   }
