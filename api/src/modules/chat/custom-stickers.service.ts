@@ -4,10 +4,10 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import {
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
-  BadRequestException,
+  HttpStatus,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -184,7 +184,10 @@ export class CustomStickersService {
     });
 
     if (!sticker) {
-      throw new NotFoundException('自定义表情不存在。');
+      throw new AppError('CHAT_STICKER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '自定义表情不存在。',
+      });
     }
 
     await this.customStickerRepo.remove(sticker);
@@ -232,7 +235,10 @@ export class CustomStickersService {
   normalizeCustomStickerFileName(fileName: string) {
     const normalized = path.basename(fileName).trim();
     if (!normalized) {
-      throw new NotFoundException('Custom sticker not found');
+      throw new AppError('CHAT_STICKER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Custom sticker not found',
+      });
     }
 
     return normalized;
@@ -286,9 +292,10 @@ export class CustomStickersService {
       },
     });
     if (count >= MAX_CUSTOM_STICKERS) {
-      throw new BadRequestException(
-        `自定义表情最多只能保存 ${MAX_CUSTOM_STICKERS} 个。`,
-      );
+      throw new AppError('CHAT_STICKER_LIMIT_REACHED', {
+        params: { max: MAX_CUSTOM_STICKERS },
+        legacyMessage: `自定义表情最多只能保存 ${MAX_CUSTOM_STICKERS} 个。`,
+      });
     }
 
     const displayName = normalizeDisplayStickerName(
@@ -345,7 +352,10 @@ export class CustomStickersService {
         },
       });
       if (!conversation) {
-        throw new NotFoundException('会话不存在。');
+        throw new AppError('CHAT_CONVERSATION_NOT_FOUND', {
+          status: HttpStatus.NOT_FOUND,
+          legacyMessage: '会话不存在。',
+        });
       }
 
       const message = await this.messageRepo.findOne({
@@ -355,7 +365,10 @@ export class CustomStickersService {
         },
       });
       if (!message) {
-        throw new NotFoundException('消息不存在。');
+        throw new AppError('CHAT_MESSAGE_NOT_FOUND', {
+          status: HttpStatus.NOT_FOUND,
+          legacyMessage: '消息不存在。',
+        });
       }
 
       const attachment = this.parseAttachment(
@@ -376,7 +389,10 @@ export class CustomStickersService {
       },
     });
     if (!group) {
-      throw new NotFoundException('群聊不存在。');
+      throw new AppError('CHAT_GROUP_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '群聊不存在。',
+      });
     }
 
     const membership = await this.groupMemberRepo.findOne({
@@ -386,7 +402,10 @@ export class CustomStickersService {
       },
     });
     if (!membership) {
-      throw new NotFoundException('群聊不存在。');
+      throw new AppError('CHAT_GROUP_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '群聊不存在。',
+      });
     }
 
     const message = await this.groupMessageRepo.findOne({
@@ -396,7 +415,10 @@ export class CustomStickersService {
       },
     });
     if (!message) {
-      throw new NotFoundException('消息不存在。');
+      throw new AppError('CHAT_MESSAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '消息不存在。',
+      });
     }
 
     const attachment = this.parseAttachment(
@@ -418,7 +440,9 @@ export class CustomStickersService {
     messageId: string;
   }): Promise<ResolvedMessageStickerSource> {
     if (!input.attachment) {
-      throw new BadRequestException('这条消息没有可导入的表情内容。');
+      throw new AppError('CHAT_STICKER_MESSAGE_NO_IMPORTABLE', {
+        legacyMessage: '这条消息没有可导入的表情内容。',
+      });
     }
 
     if (input.attachment.kind === 'image') {
@@ -459,7 +483,9 @@ export class CustomStickersService {
       };
     }
 
-    throw new BadRequestException('当前消息暂不支持添加到表情。');
+    throw new AppError('CHAT_STICKER_MESSAGE_NOT_SUPPORTED', {
+      legacyMessage: '当前消息暂不支持添加到表情。',
+    });
   }
 
   private parseAttachment(
@@ -487,14 +513,19 @@ export class CustomStickersService {
   ) {
     const pathname = extractAssetPathname(attachment.url);
     if (!pathname) {
-      throw new BadRequestException('当前资源无法添加到表情。');
+      throw new AppError('CHAT_STICKER_RESOURCE_INVALID', {
+        legacyMessage: '当前资源无法添加到表情。',
+      });
     }
 
     if (pathname.startsWith(CUSTOM_STICKER_ASSET_ROUTE)) {
       const fileName = pathname.slice(CUSTOM_STICKER_ASSET_ROUTE.length);
       return readFile(this.resolveReadableCustomStickerPath(fileName)).catch(
         () => {
-          throw new NotFoundException('自定义表情资源不存在。');
+          throw new AppError('CHAT_STICKER_ASSET_NOT_FOUND', {
+            status: HttpStatus.NOT_FOUND,
+            legacyMessage: '自定义表情资源不存在。',
+          });
         },
       );
     }
@@ -504,7 +535,10 @@ export class CustomStickersService {
         pathname.slice(CHAT_ATTACHMENT_ROUTE.length),
       );
       return readFile(resolveReadableChatAttachmentPath(fileName)).catch(() => {
-        throw new NotFoundException('图片资源不存在。');
+        throw new AppError('CHAT_STICKER_IMAGE_NOT_FOUND', {
+          status: HttpStatus.NOT_FOUND,
+          legacyMessage: '图片资源不存在。',
+        });
       });
     }
 
@@ -514,11 +548,16 @@ export class CustomStickersService {
         pathname.replace(/^\/+/, ''),
       );
       return readFile(targetPath).catch(() => {
-        throw new NotFoundException('内置表情资源不存在。');
+        throw new AppError('CHAT_STICKER_BUILTIN_NOT_FOUND', {
+          status: HttpStatus.NOT_FOUND,
+          legacyMessage: '内置表情资源不存在。',
+        });
       });
     }
 
-    throw new BadRequestException('当前资源暂不支持添加到表情。');
+    throw new AppError('CHAT_STICKER_RESOURCE_NOT_SUPPORTED', {
+      legacyMessage: '当前资源暂不支持添加到表情。',
+    });
   }
 
   private async findCustomStickerAttachment(
@@ -580,7 +619,9 @@ export class CustomStickersService {
   private assertUploadableStickerMimeType(mimeType: string) {
     const normalized = normalizeStickerMimeType(mimeType);
     if (!normalized.startsWith('image/')) {
-      throw new BadRequestException('只能上传图片或动图作为表情。');
+      throw new AppError('CHAT_STICKER_UPLOAD_IMAGE_ONLY', {
+        legacyMessage: '只能上传图片或动图作为表情。',
+      });
     }
   }
 
@@ -596,18 +637,20 @@ export class CustomStickersService {
     const largestEdge = Math.max(width ?? 0, height ?? 0);
 
     if (largestEdge > MAX_CUSTOM_STICKER_EDGE) {
-      throw new BadRequestException(
-        `表情最大边长不能超过 ${MAX_CUSTOM_STICKER_EDGE}px，请先压缩后再试。`,
-      );
+      throw new AppError('CHAT_STICKER_EDGE_TOO_LARGE', {
+        params: { maxEdge: MAX_CUSTOM_STICKER_EDGE },
+        legacyMessage: `表情最大边长不能超过 ${MAX_CUSTOM_STICKER_EDGE}px，请先压缩后再试。`,
+      });
     }
 
     if (
       input.mimeType === 'image/gif' &&
       input.sizeBytes > MAX_CUSTOM_GIF_BYTES
     ) {
-      throw new BadRequestException(
-        `GIF 表情不能超过 ${formatStickerFileSize(MAX_CUSTOM_GIF_BYTES)}，请先压缩后再试。`,
-      );
+      throw new AppError('CHAT_STICKER_GIF_TOO_LARGE', {
+        params: { maxBytesText: formatStickerFileSize(MAX_CUSTOM_GIF_BYTES) },
+        legacyMessage: `GIF 表情不能超过 ${formatStickerFileSize(MAX_CUSTOM_GIF_BYTES)}，请先压缩后再试。`,
+      });
     }
   }
 }
@@ -696,7 +739,10 @@ function sanitizeFileName(value: string) {
 function normalizeStoredAssetFileName(value: string) {
   const normalized = path.basename(value).trim();
   if (!normalized) {
-    throw new NotFoundException('Asset not found');
+    throw new AppError('CHAT_ASSET_NOT_FOUND', {
+      status: HttpStatus.NOT_FOUND,
+      legacyMessage: 'Asset not found',
+    });
   }
 
   return normalized;

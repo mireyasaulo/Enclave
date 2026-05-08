@@ -416,6 +416,48 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`附件 payload 无效。`);
     case "CHAT_MESSAGE_TEXT_REQUIRED":
       return translateRuntimeMessage(msg`消息文本不能为空。`);
+    case "CHAT_STICKER_LIMIT_REACHED":
+      return translateRuntimeMessage(
+        msg`自定义表情最多只能保存 ${String(params.max ?? "?")} 个。`,
+      );
+    case "CHAT_STICKER_EDGE_TOO_LARGE":
+      return translateRuntimeMessage(
+        msg`表情最大边长不能超过 ${String(params.maxEdge ?? "?")}px，请先压缩后再试。`,
+      );
+    case "CHAT_STICKER_GIF_TOO_LARGE":
+      return translateRuntimeMessage(
+        msg`GIF 表情不能超过 ${String(params.maxBytesText ?? "?")}，请先压缩后再试。`,
+      );
+    case "CHAT_STICKER_RESOURCE_INVALID":
+      return translateRuntimeMessage(msg`当前资源无法添加到表情。`);
+    case "CHAT_GROUP_OWNER_MEMBER_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`群主成员记录不存在：${String(params.groupId ?? "")}`,
+      );
+    case "CHAT_GROUP_MEMBER_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`群成员不存在：${String(params.memberId ?? "")}`,
+      );
+    case "CHAT_GROUP_ONLY_OWNER_AS_USER":
+      return translateRuntimeMessage(msg`只有世界主人可以加为用户成员。`);
+    case "CHAT_VOICE_CALL_NOT_FOUND":
+      return translateRuntimeMessage(msg`语音通话记录不存在。`);
+    case "CHAT_VOICE_CALL_INVALID_STATE":
+      return translateRuntimeMessage(msg`语音通话当前状态不允许此操作。`);
+    case "CHAT_VOICE_CALL_NOT_OWNED":
+      return translateRuntimeMessage(msg`你不是这通通话的发起方。`);
+    case "CHAT_VOICE_CALL_AUDIO_REQUIRED":
+      return translateRuntimeMessage(msg`请先录一段语音再继续。`);
+    case "CHAT_DIGITAL_HUMAN_NOT_AVAILABLE":
+      return translateRuntimeMessage(msg`数字人通道当前不可用。`);
+    case "CHAT_DIGITAL_HUMAN_TASK_NOT_FOUND":
+      return translateRuntimeMessage(msg`数字人任务不存在。`);
+    case "CHAT_DIGITAL_HUMAN_TASK_INVALID":
+      return translateRuntimeMessage(msg`数字人任务参数无效。`);
+    case "CHAT_REPLY_TASK_NOT_FOUND":
+      return translateRuntimeMessage(msg`回复任务不存在。`);
+    case "CHAT_REPLY_TASK_INVALID_STATE":
+      return translateRuntimeMessage(msg`回复任务当前状态不允许此操作。`);
     case "VALIDATION_FAILED":
       return translateRuntimeMessage(msg`提交的数据无效，请检查后重试。`);
     case "INTERNAL_ERROR":

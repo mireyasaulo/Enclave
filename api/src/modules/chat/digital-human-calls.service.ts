@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { randomUUID } from 'node:crypto';
 import { CharactersService } from '../characters/characters.service';
 import { ChatService } from './chat.service';
@@ -65,23 +66,35 @@ export class DigitalHumanCallsService {
       input.conversationId,
     );
     if (!conversation) {
-      throw new NotFoundException(
-        `Conversation ${input.conversationId} not found`,
-      );
+      throw new AppError('CHAT_CONVERSATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { conversationId: input.conversationId },
+        legacyMessage: `Conversation ${input.conversationId} not found`,
+      });
     }
 
     if (conversation.type !== 'direct') {
-      throw new NotFoundException('当前只支持单聊 AI 数字人视频通话。');
+      throw new AppError('CHAT_DIGITAL_HUMAN_TASK_INVALID', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '当前只支持单聊 AI 数字人视频通话。',
+      });
     }
 
     const characterId = conversation.participants[0];
     if (input.characterId && input.characterId !== characterId) {
-      throw new NotFoundException('当前会话与目标角色不匹配。');
+      throw new AppError('CHAT_DIGITAL_HUMAN_TASK_INVALID', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '当前会话与目标角色不匹配。',
+      });
     }
 
     const character = await this.charactersService.findById(characterId);
     if (!character) {
-      throw new NotFoundException(`Character ${characterId} not found`);
+      throw new AppError('CHARACTER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id: characterId },
+        legacyMessage: `Character ${characterId} not found`,
+      });
     }
 
     const now = new Date().toISOString();
@@ -180,7 +193,10 @@ export class DigitalHumanCallsService {
   ) {
     const session = this.requireSession(sessionId);
     if (session.status === 'ended') {
-      throw new NotFoundException('当前数字人通话已结束，请重新发起。');
+      throw new AppError('CHAT_DIGITAL_HUMAN_NOT_AVAILABLE', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '当前数字人通话已结束，请重新发起。',
+      });
     }
 
     session.status = 'playing';
@@ -258,7 +274,11 @@ export class DigitalHumanCallsService {
   private requireSession(sessionId: string) {
     const session = this.sessions.get(sessionId);
     if (!session) {
-      throw new NotFoundException(`Digital human session ${sessionId} not found`);
+      throw new AppError('CHAT_DIGITAL_HUMAN_TASK_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { sessionId },
+        legacyMessage: `Digital human session ${sessionId} not found`,
+      });
     }
 
     return session;
