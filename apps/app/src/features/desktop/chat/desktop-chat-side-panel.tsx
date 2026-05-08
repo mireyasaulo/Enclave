@@ -36,7 +36,7 @@ export function DesktopChatSidePanel({
     <aside
       ref={panelRef}
       className={cn(
-        "absolute bottom-0 right-0 top-[64px] z-20 hidden w-[352px] border-l border-[rgba(0,0,0,0.06)] transition-[background-color] duration-150 xl:flex xl:flex-col",
+        "absolute bottom-0 right-0 top-[64px] z-30 hidden w-[352px] border-l border-[rgba(0,0,0,0.06)] transition-[background-color] duration-150 xl:flex xl:flex-col",
         historyMode
           ? "bg-[#f7f7f7]"
           : wechatDetails
