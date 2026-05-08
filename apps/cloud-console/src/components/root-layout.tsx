@@ -193,6 +193,17 @@ function RootLayoutContent() {
   const [secret, setSecret] = useState(getCloudAdminSecret);
   const [editingSecret, setEditingSecret] = useState(!getCloudAdminSecret());
   const [draft, setDraft] = useState(getCloudAdminSecret);
+  const moreSectionPaths = [
+    "/users",
+    "/subscription-plans",
+    "/configs",
+    "/invite-audit",
+    "/feedbacks",
+    "/telemetry",
+    "/revenue-sharing",
+  ];
+  const moreSectionActive = moreSectionPaths.some((p) => pathname.startsWith(p));
+  const [moreExpanded, setMoreExpanded] = useState(moreSectionActive);
   const hasSecret = Boolean(secret.trim());
   const rawRouteMeta = getRouteMeta(pathname);
   const routeMeta = {
@@ -200,6 +211,12 @@ function RootLayoutContent() {
     title: t(rawRouteMeta.title),
     detail: t(rawRouteMeta.detail),
   };
+
+  useEffect(() => {
+    if (moreSectionActive) {
+      setMoreExpanded(true);
+    }
+  }, [moreSectionActive]);
 
   useEffect(
     () =>
@@ -239,11 +256,9 @@ function RootLayoutContent() {
   }
 
   // i18n-ignore-start: Cloud console navigation copy is localized by the surface text dictionary.
-  const navItems = [
+  const primaryNavItems = [
     {
       key: "dashboard",
-      label: "Dashboard",
-      hint: "Availability and drift",
       content: (
         <Link
           to="/"
@@ -259,8 +274,6 @@ function RootLayoutContent() {
     },
     {
       key: "worlds",
-      label: "Worlds",
-      hint: "Instances and health",
       content: (
         <WorldsPermalinkLink
           className={
@@ -275,10 +288,39 @@ function RootLayoutContent() {
         </WorldsPermalinkLink>
       ),
     },
+  ] as const;
+
+  const operationsNavItems = [
+    {
+      key: "jobs",
+      content: (
+        <JobsPermalinkLink
+          className={pathname === "/jobs" ? NAV_LINK_ACTIVE : NAV_LINK}
+          aria-current={pathname === "/jobs" ? "page" : undefined}
+        >
+          <NavLinkContent
+            label={t("Jobs")}
+            hint={t("Queue and leases")}
+          />
+        </JobsPermalinkLink>
+      ),
+    },
+    {
+      key: "waiting-sync",
+      content: (
+        <WaitingSyncPermalinkLink
+          className={pathname === "/waiting-sync" ? NAV_LINK_ACTIVE : NAV_LINK}
+          aria-current={pathname === "/waiting-sync" ? "page" : undefined}
+        >
+          <NavLinkContent
+            label={t("Waiting Sync")}
+            hint={t("Durable tasks")}
+          />
+        </WaitingSyncPermalinkLink>
+      ),
+    },
     {
       key: "sessions",
-      label: "Sessions",
-      hint: "Access audit",
       content: (
         <SessionsPermalinkLink
           className={pathname === "/sessions" ? NAV_LINK_ACTIVE : NAV_LINK}
@@ -291,10 +333,11 @@ function RootLayoutContent() {
         </SessionsPermalinkLink>
       ),
     },
+  ] as const;
+
+  const moreNavItems = [
     {
       key: "users",
-      label: "Users",
-      hint: "Accounts and expiry",
       content: (
         <Link
           to="/users"
@@ -310,8 +353,6 @@ function RootLayoutContent() {
     },
     {
       key: "plans",
-      label: "Plans",
-      hint: "Pricing and access",
       content: (
         <Link
           to="/subscription-plans"
@@ -333,8 +374,6 @@ function RootLayoutContent() {
     },
     {
       key: "configs",
-      label: "Configs",
-      hint: "Trial and copy",
       content: (
         <Link
           to="/configs"
@@ -352,8 +391,6 @@ function RootLayoutContent() {
     },
     {
       key: "invite-audit",
-      label: "Invite Audit",
-      hint: "Rewards and risk",
       content: (
         <Link
           to="/invite-audit"
@@ -373,8 +410,6 @@ function RootLayoutContent() {
     },
     {
       key: "feedbacks",
-      label: "Feedbacks",
-      hint: "User-submitted reports",
       content: (
         <Link
           to="/feedbacks"
@@ -392,8 +427,6 @@ function RootLayoutContent() {
     },
     {
       key: "telemetry",
-      label: "Telemetry",
-      hint: "Client analytics",
       content: (
         <Link
           to="/telemetry"
@@ -411,8 +444,6 @@ function RootLayoutContent() {
     },
     {
       key: "revenue-sharing",
-      label: "Revenue Sharing",
-      hint: "Payees and ledgers",
       content: (
         <Link
           to="/revenue-sharing"
@@ -426,38 +457,6 @@ function RootLayoutContent() {
             hint={t("Payees and ledgers")}
           />
         </Link>
-      ),
-    },
-    {
-      key: "jobs",
-      label: "Jobs",
-      hint: "Queue and leases",
-      content: (
-        <JobsPermalinkLink
-          className={pathname === "/jobs" ? NAV_LINK_ACTIVE : NAV_LINK}
-          aria-current={pathname === "/jobs" ? "page" : undefined}
-        >
-          <NavLinkContent
-            label={t("Jobs")}
-            hint={t("Queue and leases")}
-          />
-        </JobsPermalinkLink>
-      ),
-    },
-    {
-      key: "waiting-sync",
-      label: "Waiting Sync",
-      hint: "Durable tasks",
-      content: (
-        <WaitingSyncPermalinkLink
-          className={pathname === "/waiting-sync" ? NAV_LINK_ACTIVE : NAV_LINK}
-          aria-current={pathname === "/waiting-sync" ? "page" : undefined}
-        >
-          <NavLinkContent
-            label={t("Waiting Sync")}
-            hint={t("Durable tasks")}
-          />
-        </WaitingSyncPermalinkLink>
       ),
     },
   ] as const;
@@ -515,10 +514,40 @@ function RootLayoutContent() {
                 {t("Navigation")}
               </div>
               <div className="mt-2 space-y-1">
-                {navItems.map((item) => (
+                {primaryNavItems.map((item) => (
                   <div key={item.key}>{item.content}</div>
                 ))}
               </div>
+            </section>
+
+            <section>
+              <div className="px-1 text-[10px] uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+                {t("Cloud operations")}
+              </div>
+              <div className="mt-2 space-y-1">
+                {operationsNavItems.map((item) => (
+                  <div key={item.key}>{item.content}</div>
+                ))}
+              </div>
+            </section>
+
+            <section>
+              <button
+                type="button"
+                onClick={() => setMoreExpanded((value) => !value)}
+                aria-expanded={moreExpanded}
+                className="flex w-full items-center justify-between px-1 text-[10px] uppercase tracking-[0.24em] text-[color:var(--text-muted)] transition hover:text-[color:var(--text-secondary)]"
+              >
+                <span>{t("More")}</span>
+                <span aria-hidden="true">{moreExpanded ? "−" : "+"}</span>
+              </button>
+              {moreExpanded ? (
+                <div className="mt-2 space-y-1">
+                  {moreNavItems.map((item) => (
+                    <div key={item.key}>{item.content}</div>
+                  ))}
+                </div>
+              ) : null}
             </section>
           </nav>
 

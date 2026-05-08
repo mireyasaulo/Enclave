@@ -48,6 +48,9 @@ describe("cloud-console router smoke", () => {
     expect(await screen.findByText("舰队仪表盘")).toBeTruthy();
     expect(await screen.findByText("关注队列")).toBeTruthy();
     expect(await screen.findByText("就绪世界")).toBeTruthy();
+
+    fireEvent.click(await screen.findByRole("button", { name: /更多/ }));
+
     expect(
       (await screen.findByRole("link", { name: "用户" })).getAttribute("href"),
     ).toBe("/users");
