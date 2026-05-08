@@ -301,8 +301,7 @@ export function ContactsPage() {
   >(null);
   const previousBaseUrlRef = useRef(baseUrl);
   const startChatResetRef = useRef<() => void>(() => {});
-  const effectiveSearchText = isDesktopLayout ? searchText : "";
-  const deferredSearchText = useDeferredValue(effectiveSearchText);
+  const deferredSearchText = useDeferredValue("");
   const desktopContactsPath = "/tabs/contacts";
   const initialPathnameRef = useRef(pathname);
   const initialHashRef = useRef(hash);

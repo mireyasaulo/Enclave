@@ -335,7 +335,7 @@ export function DesktopChatWorkspace({
   } = useChatReminderEntries({
     reminders,
     conversations,
-    keyword: searchTerm,
+    keyword: "",
   });
   const hasNotifiedReminderGroup = useMemo(
     () => filteredReminderGroups.some((group) => group.status === "notified"),
@@ -363,7 +363,7 @@ export function DesktopChatWorkspace({
         conversations,
         subscriptionInboxSummary,
         serviceConversations,
-        searchTerm,
+        searchTerm: "",
         getConversationPreviewText: (conversation) =>
           getConversationPreviewParts(conversation, localMessageActionState)
             .text,
@@ -371,7 +371,6 @@ export function DesktopChatWorkspace({
     [
       conversations,
       localMessageActionState,
-      searchTerm,
       serviceConversations,
       subscriptionInboxSummary,
     ],
@@ -1724,17 +1723,6 @@ export function DesktopChatWorkspace({
               ))}
             </div>
 
-            {!conversationsQuery.isLoading &&
-            !filteredReminderEntries.length &&
-            !desktopMessageEntries.length &&
-            searchTerm.trim() ? (
-              <div className="px-2 pt-5">
-                <EmptyState
-                  title={t(msg`没有匹配的会话`)}
-                  description={t(msg`换个关键词试试。`)}
-                />
-              </div>
-            ) : null}
           </div>
         </section>
       )}
