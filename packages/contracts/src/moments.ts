@@ -88,11 +88,14 @@ export interface Moment {
   interactions: MomentInteraction[];
 }
 
+export type MomentVisibility = "public" | "friends" | "private";
+
 export interface CreateUserMomentRequest {
   text?: string;
   location?: string;
   contentType?: MomentContentType;
   media?: MomentMediaAsset[];
+  visibility?: MomentVisibility;
 }
 
 export interface CreateMomentCommentRequest {

@@ -460,6 +460,7 @@ export class FeedService implements OnModuleInit {
     options?: {
       sourceKind?: FeedSourceKind;
       recommendationScore?: number;
+      preserveTimestamp?: boolean;
     },
   ): Promise<FeedPostEntity | null> {
     if (post.authorType !== 'character') {
@@ -473,7 +474,7 @@ export class FeedService implements OnModuleInit {
 
     const character = await this.characters.findById(post.authorId);
 
-    return this.createPost({
+    const created = await this.createPost({
       authorAvatar: character?.avatar ?? post.authorAvatar,
       authorId: post.authorId,
       authorName: post.authorName,
@@ -491,6 +492,14 @@ export class FeedService implements OnModuleInit {
       surface: 'feed',
       visibility: (post.visibility as 'public' | 'friends' | 'private') ?? 'public',
     });
+
+    if (options?.preserveTimestamp && post.postedAt) {
+      // 回填历史动态时保留原始时间戳，避免广场顺序混乱。
+      await this.postRepo.update(created.id, { createdAt: post.postedAt });
+      created.createdAt = post.postedAt;
+    }
+
+    return created;
   }
 
   async addOwnerComment(
@@ -1344,6 +1353,11 @@ export class FeedService implements OnModuleInit {
       if (post.authorType !== 'character') return true;
       if (!visibleCharacterIds.has(post.authorId)) return false;
       if (post.visibility === 'private') return false;
+      // 广场（surface='feed'）公开可见：所有非屏蔽角色都展示，无论是否好友；
+      // 视频号（surface='channels'）保留 friends 仅好友可见的语义。
+      if (surface === 'feed') {
+        return true;
+      }
       if (post.visibility === 'friends') {
         return ownerFriendIds.has(post.authorId);
       }
@@ -1764,6 +1778,8 @@ export class FeedService implements OnModuleInit {
     avatarContext?: FeedAvatarContext,
   ): boolean {
     if (post.authorType !== 'character') return true;
+    // 广场（surface='feed'）所有人都能互动；视频号仍保留好友限制。
+    if (post.surface === 'feed') return true;
     if (!avatarContext) return false;
     return avatarContext.ownerFriendCharacterIds.has(post.authorId);
   }
@@ -2064,6 +2080,8 @@ export class FeedService implements OnModuleInit {
   private async assertOwnerCanInteractWithPost(postId: string) {
     const post = await this.assertPostExists(postId);
     if (post.authorType !== 'character') return post;
+    // 广场（surface='feed'）开放给所有人评论 / 点赞，不再要求加好友。
+    if (post.surface === 'feed') return post;
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const friendIds = await this.characters.getActiveFriendCharacterIdSet(
       owner.id,
@@ -2075,6 +2093,11 @@ export class FeedService implements OnModuleInit {
       });
     }
     return post;
+  }
+
+  async hasFeedPostSyncedFromMoment(momentPostId: string): Promise<boolean> {
+    const existing = await this.findFeedPostSyncedFromMoment(momentPostId);
+    return Boolean(existing);
   }
 
   private async findFeedPostSyncedFromMoment(momentPostId: string) {

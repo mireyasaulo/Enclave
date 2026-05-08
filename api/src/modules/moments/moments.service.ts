@@ -99,6 +99,8 @@ export class MomentsService implements OnModuleInit {
 
   async onModuleInit() {
     await this.backfillMomentAuthorAvatars();
+    await this.backfillUserMomentVisibilityToFriends();
+    await this.backfillCharacterMomentsToFeed();
   }
 
   async createUserMoment(input: CreateMomentInput): Promise<Moment> {
@@ -109,6 +111,7 @@ export class MomentsService implements OnModuleInit {
       authorName: owner.username?.trim() || 'You',
       authorAvatar: owner.avatar ?? '',
       authorType: 'user',
+      visibility: normalizedInput.visibility,
       text: normalizedInput.text,
       location: normalizedInput.location,
       contentType: normalizedInput.contentType,
@@ -444,10 +447,20 @@ export class MomentsService implements OnModuleInit {
       return;
     }
 
-    const allChars = (await this.characters.findAllVisibleToOwner()).filter(
+    let allChars = (await this.characters.findAllVisibleToOwner()).filter(
       (character) =>
         character.id !== post.authorId && visibleCharacterIds.has(character.id),
     );
+
+    // 用户发的「friends」朋友圈：只有已加好友的角色能进入互动队列。
+    if (post.authorType === 'user' && post.visibility === 'friends') {
+      const owner = await this.worldOwnerService.getOwnerOrThrow();
+      const friendCharacterIds =
+        await this.characters.getActiveFriendCharacterIdSet(owner.id);
+      allChars = allChars.filter((character) =>
+        friendCharacterIds.has(character.id),
+      );
+    }
 
     const intimacyByCharId = new Map<string, number>();
     if (post.authorType === 'character') {
@@ -665,10 +678,9 @@ export class MomentsService implements OnModuleInit {
     if (post.authorType !== 'character') return true;
     if (!visibleCharacterIds.has(post.authorId)) return false;
     if (post.visibility === 'private') return false;
-    if (post.visibility === 'friends') {
-      return !!ownerFriendCharacterIds?.has(post.authorId);
-    }
-    return true;
+    // 朋友圈是「好友圈」语义：未加好友的角色无论是 public 还是 friends 都不在这里露出。
+    // （想看所有角色的动态请去广场页面，那里走 feed.service 的查询，不受这个门控约束。）
+    return !!ownerFriendCharacterIds?.has(post.authorId);
   }
 
   private canOwnerInteractWithPost(
@@ -877,6 +889,56 @@ export class MomentsService implements OnModuleInit {
     return currentAvatar ?? '';
   }
 
+  private async backfillCharacterMomentsToFeed() {
+    // 一次性回填：历史的角色朋友圈如果还没同步进 feed_posts，
+    // 就把它们镜像到广场，让广场可以看到所有角色的动态。
+    const characterPosts = await this.postRepo.find({
+      where: { authorType: 'character' },
+      order: { postedAt: 'ASC' },
+    });
+    if (characterPosts.length === 0) return;
+    let created = 0;
+    for (const post of characterPosts) {
+      try {
+        const before = await this.feedService.hasFeedPostSyncedFromMoment(
+          post.id,
+        );
+        if (before) continue;
+        const result = await this.feedService.syncMomentPostToFeed(post, {
+          sourceKind: 'character_generated',
+          preserveTimestamp: true,
+        });
+        if (result) created += 1;
+      } catch (err) {
+        this.logger.warn(
+          `Failed to backfill moment ${post.id} → feed: ${err instanceof Error ? err.message : err}`,
+        );
+      }
+    }
+    if (created > 0) {
+      this.logger.log(
+        `Backfilled ${created} character moment(s) into the plaza feed`,
+      );
+    }
+  }
+
+  private async backfillUserMomentVisibilityToFriends() {
+    // 一次性迁移：历史用户朋友圈默认 public，与「朋友圈仅好友可见」语义不符。
+    // 全量改成 'friends'，确保非好友角色不再可以看到 / 互动。
+    const result = await this.postRepo
+      .createQueryBuilder()
+      .update(MomentPostEntity)
+      .set({ visibility: 'friends' })
+      .where('authorType = :authorType', { authorType: 'user' })
+      .andWhere('visibility = :visibility', { visibility: 'public' })
+      .execute();
+    if (result.affected && result.affected > 0) {
+      this.logger.log(
+        `Backfilled ${result.affected} user moment(s) visibility public → friends`,
+      );
+    }
+  }
+
   private async backfillMomentAuthorAvatars() {
     const [owner, characters, posts, comments, likes] = await Promise.all([
       this.worldOwnerService.getOwnerOrThrow(),
@@ -970,6 +1032,7 @@ export class MomentsService implements OnModuleInit {
     const contentType = this.normalizeMomentContentType(
       input.contentType ?? inferredContentType,
     );
+    const visibility = this.normalizeUserMomentVisibility(input.visibility);
 
     if (!text && media.length === 0) {
       throw new AppError('MOMENTS_EMPTY', {
@@ -984,7 +1047,17 @@ export class MomentsService implements OnModuleInit {
       location,
       contentType,
       media,
+      visibility,
     };
+  }
+
+  private normalizeUserMomentVisibility(
+    value: string | null | undefined,
+  ): 'public' | 'friends' | 'private' {
+    if (value === 'public' || value === 'private') {
+      return value;
+    }
+    return 'friends';
   }
 
   private normalizeMomentMediaInput(input: MomentMediaAsset[] | undefined) {
@@ -1309,6 +1382,10 @@ export class MomentsService implements OnModuleInit {
       };
     }
 
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const ownerFriendCharacterIds =
+      await this.characters.getActiveFriendCharacterIdSet(owner.id);
+
     for (const char of activeCandidates) {
       const baseChance =
         char.proactiveBrowseChance ?? 0.3;
@@ -1319,9 +1396,18 @@ export class MomentsService implements OnModuleInit {
 
       participantCount += 1;
 
-      const candidatePosts = recentPosts.filter(
-        (post) => post.authorId !== char.id,
-      );
+      const candidatePosts = recentPosts.filter((post) => {
+        if (post.authorId === char.id) return false;
+        // 用户「friends」朋友圈只让已加好友的角色巡查到。
+        if (
+          post.authorType === 'user' &&
+          post.visibility === 'friends' &&
+          !ownerFriendCharacterIds.has(char.id)
+        ) {
+          return false;
+        }
+        return true;
+      });
       if (candidatePosts.length === 0) continue;
 
       // Skip posts already liked by this NPC

@@ -17,6 +17,7 @@ import {
   type CreateMomentInput,
   type MomentContentType,
   type MomentMediaAsset,
+  type MomentVisibility,
 } from './moment-media.types';
 
 @Controller('moments')
@@ -83,6 +84,7 @@ export class MomentsController {
       location?: string;
       contentType?: MomentContentType;
       media?: MomentMediaAsset[];
+      visibility?: MomentVisibility;
     },
   ) {
     const input: CreateMomentInput = {
@@ -90,6 +92,7 @@ export class MomentsController {
       location: body.location,
       contentType: body.contentType,
       media: Array.isArray(body.media) ? body.media : undefined,
+      visibility: body.visibility,
     };
     return this.momentsService.createUserMoment(input);
   }
