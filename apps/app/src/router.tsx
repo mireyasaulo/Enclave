@@ -349,6 +349,11 @@ const NotesPage = lazy(async () => {
   return { default: mod.NotesPage };
 });
 
+const MobileNoteEditorPage = lazy(async () => {
+  const mod = await import("./routes/mobile-note-editor-page");
+  return { default: mod.MobileNoteEditorPage };
+});
+
 const LegalPrivacyPage = lazy(async () => {
   const mod = await import("./routes/legal-privacy-page");
   return { default: mod.LegalPrivacyPage };
@@ -733,6 +738,13 @@ const notesRoute = createRoute({
   component: NotesPage,
 });
 
+const mobileNoteEditorRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/notes/new",
+  beforeLoad: requireWorldReady,
+  component: MobileNoteEditorPage,
+});
+
 const discoverMomentsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/discover/moments",
@@ -950,6 +962,7 @@ const routeTree = rootRoute.addChildren([
   groupMemberRemoveRoute,
   createGroupRoute,
   notesRoute,
+  mobileNoteEditorRoute,
   discoverMomentsRoute,
   discoverMomentsPublishRoute,
   discoverEncounterRoute,

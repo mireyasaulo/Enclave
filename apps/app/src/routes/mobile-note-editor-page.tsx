@@ -1,4 +1,6 @@
 import {
+  Suspense,
+  lazy,
   useCallback,
   useEffect,
   useMemo,
@@ -7,8 +9,22 @@ import {
   type ReactNode,
 } from "react";
 import { msg } from "@lingui/macro";
-import { translateRuntimeMessage, useRuntimeTranslator } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
+import {
+  ArrowLeft,
+  Bold,
+  FolderUp,
+  Italic,
+  List,
+  ListTodo,
+  Save,
+  Send,
+  Tag,
+  Trash2,
+  Underline,
+  X,
+} from "lucide-react";
 import {
   createFavoriteNote,
   getConversations,
@@ -23,6 +39,18 @@ import {
   type FavoriteNoteSummary,
   type FavoriteRecord,
 } from "@yinjie/contracts";
+import { useRuntimeTranslator, translateRuntimeMessage } from "@yinjie/i18n";
+import {
+  AppPage,
+  Button,
+  ErrorBlock,
+  InlineNotice,
+  LoadingBlock,
+  cn,
+} from "@yinjie/ui";
+
+import { RouteRedirectState } from "../components/route-redirect-state";
+import { TabPageTopBar } from "../components/tab-page-top-bar";
 import {
   EMPTY_NOTE_EDITOR_STATE,
   buildEditorStateFromDocument,
@@ -45,76 +73,106 @@ import {
   upsertFavoriteNoteRecord,
   upsertFavoriteNoteSummary,
   type NoteEditorState,
-} from "../../favorites/note-editor-helpers";
-import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
-import {
-  ArrowLeft,
-  Bold,
-  FolderUp,
-  Italic,
-  List,
-  ListTodo,
-  Save,
-  Send,
-  Tag,
-  Trash2,
-  Underline,
-  X,
-} from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
-import { isPersistedGroupConversation } from "../../../lib/conversation-route";
-import { resolveDesktopWindowReturnTarget } from "../../../lib/desktop-window-return-target";
-import { emitChatMessage, joinConversationRoom } from "../../../lib/socket";
-import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
-import {
-  closeCurrentDesktopWindow,
-  focusMainDesktopWindow,
-  focusStandaloneDesktopWindow,
-} from "../../../runtime/desktop-windowing";
+  type NoteSendDialogNote,
+} from "../features/favorites/note-editor-helpers";
 import {
   clearDesktopNoteDraft,
   createDesktopNoteDraft,
   readDesktopNoteDraft,
   readDesktopNoteDraftByNoteId,
   saveDesktopNoteDraft,
-} from "./desktop-notes-storage";
-import { DesktopChatConfirmDialog } from "./desktop-chat-confirm-dialog";
+} from "../features/favorites/note-drafts-storage";
 import {
-  DesktopNoteSendDialog,
-  type DesktopNoteSendDialogNote,
-} from "./desktop-note-send-dialog";
+  buildMobileNoteEditorRouteHash,
+  parseMobileNoteEditorRouteHash,
+} from "../features/notes/mobile-note-editor-route-state";
+import { MobileNoteSendSheet } from "../features/notes/mobile-note-send-sheet";
+import { isPersistedGroupConversation } from "../lib/conversation-route";
+import {
+  isDesktopOnlyPath,
+  navigateBackOrFallback,
+} from "../lib/history-back";
+import { emitChatMessage, joinConversationRoom } from "../lib/socket";
+import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 
-type DesktopNotesWorkspaceProps = {
-  selectedNoteId?: string;
-  draftId?: string;
-  standaloneWindow?: boolean;
-  returnTo?: string;
-  onSavedNote?: (noteId: string, draftId: string) => void;
-};
+const DesktopNotesWorkspace = lazy(async () => {
+  const mod = await import(
+    "../features/desktop/chat/desktop-notes-workspace"
+  );
+  return { default: mod.DesktopNotesWorkspace };
+});
 
 type NoteNotice = {
   tone: "success" | "danger";
   message: string;
 };
 
-export function DesktopNotesWorkspace({
-  selectedNoteId,
-  draftId,
-  standaloneWindow = false,
-  returnTo,
-  onSavedNote,
-}: DesktopNotesWorkspaceProps) {
+export function MobileNoteEditorPage() {
+  const t = useRuntimeTranslator();
+  const isDesktopLayout = useDesktopLayout();
+  const hash = useRouterState({ select: (state) => state.location.hash });
+  const routeState = useMemo(
+    () => parseMobileNoteEditorRouteHash(hash),
+    [hash],
+  );
+
+  if (isDesktopLayout) {
+    return (
+      <Suspense
+        fallback={
+          <RouteRedirectState
+            title={t(msg`正在打开桌面笔记`)}
+            description={t(msg`正在跳转到桌面笔记编辑器。`)}
+            loadingLabel={t(msg`切换桌面笔记...`)}
+          />
+        }
+      >
+        <DesktopNotesWorkspace
+          draftId={routeState?.draftId}
+          selectedNoteId={routeState?.noteId}
+          returnTo={
+            routeState?.returnPath
+              ? `${routeState.returnPath}${
+                  routeState.returnHash ? `#${routeState.returnHash}` : ""
+                }`
+              : undefined
+          }
+        />
+      </Suspense>
+    );
+  }
+
+  return <MobileNoteEditor routeState={routeState} />;
+}
+
+function MobileNoteEditor({
+  routeState,
+}: {
+  routeState: ReturnType<typeof parseMobileNoteEditorRouteHash>;
+}) {
   const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
+
   const editorRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const initializedSessionKeyRef = useRef("");
+
+  const draftIdParam = routeState?.draftId;
+  const selectedNoteId = routeState?.noteId;
+  const returnPath = routeState?.returnPath;
+  const returnHash = routeState?.returnHash;
+
+  const safeReturnPath =
+    returnPath && !isDesktopOnlyPath(returnPath) ? returnPath : undefined;
+  const safeReturnHash = safeReturnPath ? returnHash : undefined;
+
   const [noteId, setNoteId] = useState(selectedNoteId);
   const [activeDraftId, setActiveDraftId] = useState(
-    () => draftId?.trim() || selectedNoteId?.trim() || "",
+    () => draftIdParam?.trim() || selectedNoteId?.trim() || "",
   );
   const [editorState, setEditorState] = useState<NoteEditorState>(
     EMPTY_NOTE_EDITOR_STATE,
@@ -125,11 +183,11 @@ export function DesktopNotesWorkspace({
   const [notice, setNotice] = useState<NoteNotice | null>(null);
   const [tagInput, setTagInput] = useState("");
   const [tagEditorOpen, setTagEditorOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [closeDialogOpen, setCloseDialogOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [closeConfirmOpen, setCloseConfirmOpen] = useState(false);
   const [attachmentPending, setAttachmentPending] = useState(false);
   const [sendDialogNote, setSendDialogNote] =
-    useState<DesktopNoteSendDialogNote | null>(null);
+    useState<NoteSendDialogNote | null>(null);
 
   const noteQuery = useQuery({
     queryKey: ["favorite-note", baseUrl, selectedNoteId],
@@ -137,12 +195,12 @@ export function DesktopNotesWorkspace({
     enabled: Boolean(selectedNoteId),
   });
   const recentConversationsQuery = useQuery({
-    queryKey: ["desktop-note-send-conversations", baseUrl],
+    queryKey: ["mobile-note-send-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
     enabled: Boolean(sendDialogNote),
   });
 
-  const sessionKey = `${selectedNoteId ?? "new"}:${draftId ?? ""}`;
+  const sessionKey = `${selectedNoteId ?? "new"}:${draftIdParam ?? ""}`;
   const missingSelectedNote =
     selectedNoteId && isFavoriteNoteMissingError(noteQuery.error);
 
@@ -164,7 +222,7 @@ export function DesktopNotesWorkspace({
         : createFavoriteNote(payload, baseUrl);
     },
     onSuccess: async (savedNote) => {
-      const nextDraftId = activeDraftId || draftId?.trim() || savedNote.id;
+      const nextDraftId = activeDraftId || draftIdParam?.trim() || savedNote.id;
       const nextState = buildEditorStateFromDocument(savedNote);
       const nextSnapshot = buildNoteSnapshot(nextState);
 
@@ -211,13 +269,29 @@ export function DesktopNotesWorkspace({
         }),
       ]);
 
-      onSavedNote?.(savedNote.id, nextDraftId);
+      if (typeof window !== "undefined") {
+        const nextHash = buildMobileNoteEditorRouteHash({
+          draftId: nextDraftId,
+          noteId: savedNote.id,
+          returnPath: safeReturnPath,
+          returnHash: safeReturnHash,
+        });
+        if (nextHash && nextHash !== hashWithoutLeading(window.location.hash)) {
+          void navigate({
+            to: "/notes/new",
+            hash: nextHash,
+            replace: true,
+          });
+        }
+      }
     },
     onError: (error) => {
       setNotice({
         tone: "danger",
         message:
-          error instanceof Error ? error.message : t(msg`保存失败，请稍后再试。`),
+          error instanceof Error
+            ? error.message
+            : t(msg`保存失败，请稍后再试。`),
       });
     },
   });
@@ -227,14 +301,12 @@ export function DesktopNotesWorkspace({
       if (!noteId) {
         return { success: true as const };
       }
-
       return removeFavoriteNote(noteId, baseUrl);
     },
     onSuccess: async () => {
       if (activeDraftId) {
         clearDesktopNoteDraft(activeDraftId);
       }
-
       setSendDialogNote(null);
 
       if (noteId) {
@@ -263,16 +335,19 @@ export function DesktopNotesWorkspace({
         });
       }
 
-      void handleClose();
+      void leaveEditor();
     },
     onError: (error) => {
       setNotice({
         tone: "danger",
         message:
-          error instanceof Error ? error.message : t(msg`删除失败，请稍后再试。`),
+          error instanceof Error
+            ? error.message
+            : t(msg`删除失败，请稍后再试。`),
       });
     },
   });
+
   const sendMutation = useMutation({
     mutationFn: async (conversation: ConversationListItem) => {
       const note = sendDialogNote;
@@ -299,7 +374,6 @@ export function DesktopNotesWorkspace({
         if (!characterId) {
           throw new Error("NOTE_SEND_NO_TARGET");
         }
-
         joinConversationRoom({ conversationId: conversation.id });
         emitChatMessage({
           conversationId: conversation.id,
@@ -345,17 +419,16 @@ export function DesktopNotesWorkspace({
     if (activeDraftId) {
       return;
     }
-
     const draft = createDesktopNoteDraft({
-      draftId,
+      draftId: draftIdParam,
       noteId: selectedNoteId,
     });
     setActiveDraftId(draft.draftId);
-  }, [activeDraftId, draftId, selectedNoteId]);
+  }, [activeDraftId, draftIdParam, selectedNoteId]);
 
   useEffect(() => {
     const nextDraftId =
-      activeDraftId || draftId?.trim() || selectedNoteId?.trim() || "";
+      activeDraftId || draftIdParam?.trim() || selectedNoteId?.trim() || "";
     if (!nextDraftId) {
       return;
     }
@@ -374,7 +447,9 @@ export function DesktopNotesWorkspace({
           draftId: localDraft.draftId,
           noteId: treatLocalDraftAsNewNote ? undefined : selectedNoteId,
           state: buildEditorStateFromDraft(localDraft),
-          savedSource: treatLocalDraftAsNewNote ? null : (noteQuery.data ?? null),
+          savedSource: treatLocalDraftAsNewNote
+            ? null
+            : (noteQuery.data ?? null),
         });
         if (treatLocalDraftAsNewNote) {
           setNotice({
@@ -422,19 +497,19 @@ export function DesktopNotesWorkspace({
     initializedSessionKeyRef.current = sessionKey;
   }, [
     activeDraftId,
-    draftId,
+    draftIdParam,
     missingSelectedNote,
     noteQuery.data,
     noteQuery.isLoading,
     selectedNoteId,
     sessionKey,
+    t,
   ]);
 
   useEffect(() => {
     if (!selectedNoteId || !noteQuery.data) {
       return;
     }
-
     setSavedSnapshot(
       buildNoteSnapshot(buildEditorStateFromDocument(noteQuery.data)),
     );
@@ -444,7 +519,6 @@ export function DesktopNotesWorkspace({
     if (!activeDraftId) {
       return;
     }
-
     const timer = window.setTimeout(() => {
       saveDesktopNoteDraft({
         draftId: activeDraftId,
@@ -452,8 +526,7 @@ export function DesktopNotesWorkspace({
         ...editorState,
         updatedAt: new Date().toISOString(),
       });
-    }, 180);
-
+    }, 220);
     return () => window.clearTimeout(timer);
   }, [activeDraftId, editorState, noteId]);
 
@@ -461,31 +534,9 @@ export function DesktopNotesWorkspace({
     if (!notice) {
       return;
     }
-
-    const timer = window.setTimeout(() => setNotice(null), 2600);
+    const timer = window.setTimeout(() => setNotice(null), 2400);
     return () => window.clearTimeout(timer);
   }, [notice]);
-
-  useEffect(() => {
-    const title = isDirty
-      ? t(msg`${noteTitle} · 未保存`)
-      : noteTitle;
-    document.title = title;
-  }, [isDirty, noteTitle, t]);
-
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (!isDirty) {
-        return;
-      }
-
-      event.preventDefault();
-      event.returnValue = "";
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [isDirty]);
 
   function applyNoteSource(input: {
     draftId: string;
@@ -503,7 +554,6 @@ export function DesktopNotesWorkspace({
           : EMPTY_NOTE_EDITOR_STATE,
       ),
     );
-
     if (editorRef.current) {
       editorRef.current.innerHTML = input.state.contentHtml;
     }
@@ -514,7 +564,6 @@ export function DesktopNotesWorkspace({
     if (!editor) {
       return;
     }
-
     const nextHtml = normalizeEditorHtml(editor.innerHTML);
     const nextAssets = filterAssetsByHtml(nextHtml, editorState.assets);
     setEditorState({
@@ -530,13 +579,11 @@ export function DesktopNotesWorkspace({
     if (!editor) {
       return;
     }
-
     editor.focus();
     const selection = window.getSelection();
     if (!selection) {
       return;
     }
-
     const range = document.createRange();
     range.selectNodeContents(editor);
     range.collapse(false);
@@ -599,9 +646,7 @@ export function DesktopNotesWorkspace({
             false,
             `<p><img data-note-image="true" data-note-asset-id="${assetId}" src="${escapeHtmlAttribute(
               attachment.url,
-            )}" alt="${escapeHtmlAttribute(
-              attachment.fileName,
-            )}" /></p><p><br></p>`,
+            )}" alt="${escapeHtmlAttribute(attachment.fileName)}" /></p><p><br></p>`,
           );
           continue;
         }
@@ -664,12 +709,10 @@ export function DesktopNotesWorkspace({
     if (!(target instanceof HTMLElement)) {
       return;
     }
-
     const checkbox = target.closest("[data-note-checkbox]");
     if (!(checkbox instanceof HTMLElement)) {
       return;
     }
-
     const checked = checkbox.dataset.noteCheckbox === "true";
     checkbox.dataset.noteCheckbox = checked ? "false" : "true";
     checkbox.textContent = checked ? "☐" : "☑";
@@ -682,12 +725,10 @@ export function DesktopNotesWorkspace({
       setTagInput("");
       return;
     }
-
     if (editorState.tags.includes(normalizedTag)) {
       setTagInput("");
       return;
     }
-
     setEditorState((current) => ({
       ...current,
       tags: [...current.tags, normalizedTag].slice(0, 8),
@@ -711,87 +752,43 @@ export function DesktopNotesWorkspace({
     }
   }, [saveMutation]);
 
-  const handleClose = useCallback(async () => {
-    const fallbackPath = returnTo || "/tabs/favorites";
-    if (standaloneWindow) {
-      const closed = await closeCurrentDesktopWindow();
-      if (closed) {
+  const leaveEditor = useCallback(async () => {
+    navigateBackOrFallback(() => {
+      if (safeReturnPath) {
+        void navigate({
+          to: safeReturnPath,
+          ...(safeReturnHash ? { hash: safeReturnHash } : {}),
+        });
         return;
       }
+      void navigate({ to: "/tabs/chat" });
+    });
+  }, [navigate, safeReturnHash, safeReturnPath]);
 
-      closeCurrentWindow(() => {
-        void focusReturnTargetWindow(fallbackPath);
-      });
+  const requestClose = useCallback(() => {
+    if (isDirty) {
+      setCloseConfirmOpen(true);
       return;
     }
-
-    void navigate({ to: fallbackPath });
-  }, [navigate, returnTo, standaloneWindow]);
+    void leaveEditor();
+  }, [isDirty, leaveEditor]);
 
   async function handleSaveAndClose() {
     const savedNote = await handleSave();
     if (!savedNote) {
       return;
     }
-
-    setCloseDialogOpen(false);
-    await handleClose();
+    setCloseConfirmOpen(false);
+    await leaveEditor();
   }
 
   async function handleDiscardAndClose() {
     if (activeDraftId) {
       clearDesktopNoteDraft(activeDraftId);
     }
-
-    setCloseDialogOpen(false);
-    await handleClose();
+    setCloseConfirmOpen(false);
+    await leaveEditor();
   }
-
-  const requestClose = useCallback(() => {
-    if (isDirty) {
-      setCloseDialogOpen(true);
-      return;
-    }
-
-    void handleClose();
-  }, [handleClose, isDirty]);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const withCommand = event.metaKey || event.ctrlKey;
-      if (withCommand && event.key.toLowerCase() === "s") {
-        event.preventDefault();
-        void handleSave();
-        return;
-      }
-
-      if (event.key !== "Escape") {
-        return;
-      }
-
-      if (tagEditorOpen) {
-        event.preventDefault();
-        setTagEditorOpen(false);
-        setTagInput("");
-        return;
-      }
-
-      if (standaloneWindow && !deleteDialogOpen && !closeDialogOpen) {
-        event.preventDefault();
-        requestClose();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [
-    closeDialogOpen,
-    deleteDialogOpen,
-    handleSave,
-    requestClose,
-    standaloneWindow,
-    tagEditorOpen,
-  ]);
 
   async function requestSend() {
     const hasSendableContent =
@@ -838,9 +835,9 @@ export function DesktopNotesWorkspace({
     !initializedSessionKeyRef.current
   ) {
     return (
-      <div className="flex h-full items-center justify-center bg-[color:var(--bg-canvas)]">
+      <AppPage className="flex h-full items-center justify-center bg-[color:var(--bg-app)] px-5">
         <LoadingBlock label={t(msg`正在读取笔记...`)} />
-      </div>
+      </AppPage>
     );
   }
 
@@ -850,8 +847,8 @@ export function DesktopNotesWorkspace({
     !readDesktopNoteDraftByNoteId(selectedNoteId)
   ) {
     return (
-      <div className="flex h-full items-center justify-center bg-[color:var(--bg-canvas)] p-6">
-        <div className="w-full max-w-xl rounded-[20px] border border-[color:var(--border-faint)] bg-white p-6 shadow-[var(--shadow-card)]">
+      <AppPage className="flex h-full items-center justify-center bg-[color:var(--bg-app)] px-5">
+        <div className="w-full max-w-md rounded-[18px] border border-[color:var(--border-faint)] bg-white p-6 shadow-[var(--shadow-card)]">
           <ErrorBlock
             message={
               noteQuery.error instanceof Error
@@ -862,99 +859,180 @@ export function DesktopNotesWorkspace({
           <div className="mt-5 flex justify-end">
             <Button
               variant="secondary"
-              onClick={() => void handleClose()}
+              onClick={() => void leaveEditor()}
               className="rounded-[10px] border-[color:var(--border-faint)] bg-white shadow-none"
             >
               {t(msg`回到来源`)}
             </Button>
           </div>
         </div>
-      </div>
+      </AppPage>
     );
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-[linear-gradient(180deg,#f7f8f8_0%,#eef1f0_100%)]">
+    <AppPage className="space-y-0 bg-[#ededed] px-0 py-0">
       <input
         ref={fileInputRef}
         type="file"
         multiple
         className="hidden"
-        onChange={(event) => void handleAttachmentSelection(event.target.files)}
+        onChange={(event) =>
+          void handleAttachmentSelection(event.target.files)
+        }
       />
 
-      <header className="flex shrink-0 items-center justify-between gap-4 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.9)] px-5 py-4 backdrop-blur-xl">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            {!standaloneWindow ? (
+      <TabPageTopBar
+        title={noteTitle}
+        titleAlign="center"
+        className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
+        titleClassName="text-[16px] font-medium tracking-normal"
+        leftActions={
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={requestClose}
+            className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none hover:bg-black/4 active:bg-black/[0.05]"
+            aria-label={t(msg`返回`)}
+          >
+            <ArrowLeft size={18} />
+          </Button>
+        }
+        rightActions={
+          <div className="flex items-center gap-1">
+            {noteId ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => setDeleteConfirmOpen(true)}
+                disabled={deleteMutation.isPending}
+                className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-secondary)] shadow-none hover:bg-black/4 active:bg-black/[0.05]"
+                aria-label={t(msg`删除笔记`)}
+              >
+                <Trash2 size={16} />
+              </Button>
+            ) : null}
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => void requestSend()}
+              disabled={saveMutation.isPending || sendMutation.isPending}
+              className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-secondary)] shadow-none hover:bg-black/4 active:bg-black/[0.05]"
+              aria-label={t(msg`发送`)}
+            >
+              <Send size={16} />
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              onClick={() => void handleSave()}
+              disabled={saveMutation.isPending}
+              className="h-8 rounded-[10px] bg-[color:var(--brand-primary)] px-3 text-white hover:opacity-95"
+            >
+              <Save size={14} />
+              <span className="ml-1 text-[12px]">
+                {saveMutation.isPending ? t(msg`保存中`) : t(msg`保存`)}
+              </span>
+            </Button>
+          </div>
+        }
+      >
+        <div className="text-[11px] text-[color:var(--text-muted)]">
+          {saveMutation.isPending
+            ? t(msg`正在保存到收藏...`)
+            : isDirty
+              ? t(msg`存在未保存修改`)
+              : noteId
+                ? t(msg`已保存到收藏`)
+                : t(msg`新建笔记`)}
+        </div>
+      </TabPageTopBar>
+
+      {notice ? (
+        <div className="px-4 pt-3">
+          <InlineNotice tone={notice.tone}>{notice.message}</InlineNotice>
+        </div>
+      ) : null}
+
+      {tagEditorOpen || editorState.tags.length ? (
+        <div className="flex flex-wrap items-center gap-2 border-b border-[color:var(--border-faint)] bg-white/85 px-4 py-3">
+          {editorState.tags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1 rounded-full bg-[rgba(7,193,96,0.08)] px-3 py-1 text-[12px] text-[color:var(--brand-primary)]"
+            >
+              <span>#{tag}</span>
               <button
                 type="button"
-                onClick={() => void handleClose()}
-                className="flex h-8 w-8 items-center justify-center rounded-[10px] text-[color:var(--text-secondary)] transition hover:bg-white hover:text-[color:var(--text-primary)]"
-                aria-label={t(msg`返回收藏`)}
+                onClick={() => handleRemoveTag(tag)}
+                className="flex h-4 w-4 items-center justify-center rounded-full text-[color:var(--brand-primary)] transition active:bg-[rgba(7,193,96,0.16)]"
+                aria-label={t(msg`移除标签 ${tag}`)}
               >
-                <ArrowLeft size={16} />
+                <X size={12} />
               </button>
-            ) : null}
-            <div className="truncate text-[16px] font-medium text-[color:var(--text-primary)]">
-              {noteTitle}
+            </span>
+          ))}
+          {tagEditorOpen ? (
+            <div className="flex items-center gap-2">
+              <input
+                value={tagInput}
+                onChange={(event) => setTagInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key !== "Enter") {
+                    return;
+                  }
+                  event.preventDefault();
+                  handleTagCommit();
+                }}
+                placeholder={t(msg`输入标签后回车`)}
+                className="h-9 w-[160px] rounded-[10px] border border-[color:var(--border-faint)] bg-white px-3 text-[13px] text-[color:var(--text-primary)] outline-none transition focus:border-[color:var(--brand-primary)]"
+              />
+              <Button
+                variant="secondary"
+                onClick={handleTagCommit}
+                className="h-9 rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 shadow-none"
+              >
+                {t(msg`添加`)}
+              </Button>
             </div>
-          </div>
-          <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-            {saveMutation.isPending
-              ? t(msg`正在保存到收藏...`)
-              : isDirty
-                ? t(msg`存在未保存修改`)
-                : noteId
-                  ? t(msg`已保存到收藏`)
-                  : t(msg`新建笔记`)}
-          </div>
-        </div>
-
-        <div className="flex shrink-0 items-center gap-2">
-          {noteId ? (
-            <button
-              type="button"
-              onClick={() => setDeleteDialogOpen(true)}
-              disabled={deleteMutation.isPending}
-              className="inline-flex h-9 items-center gap-2 rounded-[10px] border border-[color:var(--border-faint)] bg-white px-3 text-[13px] text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)] hover:text-[color:var(--state-danger-text)] disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <Trash2 size={15} />
-              {t(msg`删除`)}
-            </button>
-          ) : null}
-          <Button
-            variant="secondary"
-            onClick={() => void requestSend()}
-            disabled={saveMutation.isPending || sendMutation.isPending}
-            className="h-9 rounded-[10px] border-[color:var(--border-faint)] bg-white px-4 shadow-none hover:bg-[color:var(--surface-console)]"
-          >
-            <Send size={15} />
-            {sendMutation.isPending ? t(msg`发送中...`) : t(msg`发送`)}
-          </Button>
-          <Button
-            variant="primary"
-            onClick={() => void handleSave()}
-            disabled={saveMutation.isPending}
-            className="h-9 rounded-[10px] bg-[color:var(--brand-primary)] px-4 text-white hover:opacity-95"
-          >
-            <Save size={15} />
-            {saveMutation.isPending ? t(msg`保存中...`) : t(msg`保存`)}
-          </Button>
-          {standaloneWindow ? (
-            <button
-              type="button"
-              onClick={requestClose}
-              className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] transition hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
-              aria-label={t(msg`关闭笔记窗口`)}
-            >
-              <X size={16} />
-            </button>
           ) : null}
         </div>
-      </header>
+      ) : null}
 
-      <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.78)] px-5 py-3 backdrop-blur-xl">
+      <div className="min-h-0 flex-1 overflow-auto bg-white px-4 py-4">
+        <div className="relative">
+          {!editorState.contentText.trim() ? (
+            <div className="pointer-events-none absolute left-0 top-0 text-[15px] leading-7 text-[color:var(--text-dim)]">
+              {t(msg`写点什么。支持富文本、待办、图片和文件。`)}
+            </div>
+          ) : null}
+          <div
+            ref={editorRef}
+            contentEditable
+            suppressContentEditableWarning
+            onInput={syncEditorStateFromDom}
+            onClick={handleEditorClick}
+            className={cn(
+              "min-h-[60vh] outline-none",
+              "text-[15px] leading-7 text-[color:var(--text-primary)]",
+              "[&_a[data-note-file='true']]:inline-flex [&_a[data-note-file='true']]:items-center [&_a[data-note-file='true']]:rounded-[12px] [&_a[data-note-file='true']]:border [&_a[data-note-file='true']]:border-[rgba(15,23,42,0.08)] [&_a[data-note-file='true']]:bg-[rgba(243,244,246,0.82)] [&_a[data-note-file='true']]:px-3 [&_a[data-note-file='true']]:py-2 [&_a[data-note-file='true']]:text-[13px] [&_a[data-note-file='true']]:text-[color:var(--text-primary)] [&_a[data-note-file='true']]:no-underline",
+              "[&_img[data-note-image='true']]:my-2 [&_img[data-note-image='true']]:max-h-[60vw] [&_img[data-note-image='true']]:max-w-full [&_img[data-note-image='true']]:rounded-[14px] [&_img[data-note-image='true']]:border [&_img[data-note-image='true']]:border-[rgba(15,23,42,0.08)]",
+              "[&_[data-note-checkbox='false']]:cursor-pointer [&_[data-note-checkbox='true']]:cursor-pointer [&_[data-note-checkbox='true']]:text-[color:var(--brand-primary)]",
+            )}
+          />
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          "sticky bottom-0 flex shrink-0 flex-wrap items-center gap-1.5 border-t border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.96)] px-2.5 py-2 backdrop-blur-xl",
+          "pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)]",
+        )}
+      >
         <ToolbarButton
           label={t(msg`附件`)}
           onClick={() => fileInputRef.current?.click()}
@@ -997,116 +1075,32 @@ export function DesktopNotesWorkspace({
         </ToolbarButton>
         {attachmentPending ? (
           <span className="rounded-full bg-[rgba(7,193,96,0.08)] px-2.5 py-1 text-[11px] text-[color:var(--brand-primary)]">
-            {t(msg`正在上传附件...`)}
+            {t(msg`附件上传中...`)}
           </span>
         ) : null}
       </div>
 
-      {tagEditorOpen || editorState.tags.length ? (
-        <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.72)] px-5 py-3">
-          {editorState.tags.map((tag) => (
-            <span
-              key={tag}
-              className="inline-flex items-center gap-1 rounded-full bg-[rgba(7,193,96,0.08)] px-3 py-1 text-[12px] text-[color:var(--brand-primary)]"
-            >
-              <span>#{tag}</span>
-              <button
-                type="button"
-                onClick={() => handleRemoveTag(tag)}
-                className="flex h-4 w-4 items-center justify-center rounded-full text-[color:var(--brand-primary)] transition hover:bg-[rgba(7,193,96,0.12)]"
-                aria-label={t(msg`移除标签 ${tag}`)}
-              >
-                <X size={12} />
-              </button>
-            </span>
-          ))}
-          {tagEditorOpen ? (
-            <div className="flex items-center gap-2">
-              <input
-                value={tagInput}
-                onChange={(event) => setTagInput(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key !== "Enter") {
-                    return;
-                  }
-
-                  event.preventDefault();
-                  handleTagCommit();
-                }}
-                placeholder={t(msg`输入标签后回车`)}
-                className="h-9 w-[180px] rounded-[10px] border border-[color:var(--border-faint)] bg-white px-3 text-[13px] text-[color:var(--text-primary)] outline-none transition focus:border-[color:var(--brand-primary)]"
-              />
-              <Button
-                variant="secondary"
-                onClick={handleTagCommit}
-                className="h-9 rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 shadow-none"
-              >
-                {t(msg`添加`)}
-              </Button>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-
-      <div className="min-h-0 flex-1 overflow-auto px-6 py-6">
-        {notice ? (
-          <div className="mx-auto mb-4 w-full max-w-[840px]">
-            <InlineNotice tone={notice.tone}>{notice.message}</InlineNotice>
-          </div>
-        ) : null}
-
-        <div className="mx-auto flex w-full max-w-[840px] flex-col rounded-[24px] border border-[rgba(15,23,42,0.08)] bg-white px-10 py-8 shadow-[0_24px_60px_rgba(15,23,42,0.08)]">
-          <div className="mb-4 flex items-center gap-2 text-[11px] tracking-[0.12em] text-[color:var(--text-dim)]">
-            <span className="rounded-full border border-[rgba(15,23,42,0.08)] px-2 py-1">
-              {t(msg`收藏笔记`)}
-            </span>
-            <span>{noteId ? t(msg`已保存文稿`) : t(msg`未保存草稿`)}</span>
-          </div>
-          <div className="relative">
-            {!editorState.contentText.trim() ? (
-              <div className="pointer-events-none absolute left-0 top-0 text-[15px] leading-8 text-[color:var(--text-dim)]">
-                {t(msg`写点什么。支持富文本、待办、图片和文件。`)}
-              </div>
-            ) : null}
-            <div
-              ref={editorRef}
-              contentEditable
-              suppressContentEditableWarning
-              onInput={syncEditorStateFromDom}
-              onClick={handleEditorClick}
-              className={cn(
-                "min-h-[560px] outline-none",
-                "text-[15px] leading-8 text-[color:var(--text-primary)]",
-                "[&_a[data-note-file='true']]:inline-flex [&_a[data-note-file='true']]:items-center [&_a[data-note-file='true']]:rounded-[12px] [&_a[data-note-file='true']]:border [&_a[data-note-file='true']]:border-[rgba(15,23,42,0.08)] [&_a[data-note-file='true']]:bg-[rgba(243,244,246,0.82)] [&_a[data-note-file='true']]:px-3 [&_a[data-note-file='true']]:py-2 [&_a[data-note-file='true']]:text-[13px] [&_a[data-note-file='true']]:text-[color:var(--text-primary)] [&_a[data-note-file='true']]:no-underline",
-                "[&_img[data-note-image='true']]:my-3 [&_img[data-note-image='true']]:max-h-[420px] [&_img[data-note-image='true']]:max-w-full [&_img[data-note-image='true']]:rounded-[18px] [&_img[data-note-image='true']]:border [&_img[data-note-image='true']]:border-[rgba(15,23,42,0.08)]",
-                "[&_[data-note-checkbox='false']]:cursor-pointer [&_[data-note-checkbox='true']]:cursor-pointer [&_[data-note-checkbox='true']]:text-[color:var(--brand-primary)]",
-              )}
-            />
-          </div>
-        </div>
-      </div>
-
-      <DesktopChatConfirmDialog
-        open={deleteDialogOpen}
-        title={t(msg`删除笔记`)}
-        description={t(msg`删除后，这条收藏笔记会从收藏列表中移除。`)}
+      <ConfirmSheet
+        open={deleteConfirmOpen}
+        title={t(msg`删除这条笔记？`)}
+        description={t(msg`删除后会从收藏的笔记列表中移除，无法恢复。`)}
         confirmLabel={t(msg`删除`)}
-        pendingLabel={t(msg`正在删除...`)}
+        pendingLabel={t(msg`删除中...`)}
         danger
         pending={deleteMutation.isPending}
-        onClose={() => setDeleteDialogOpen(false)}
+        onClose={() => setDeleteConfirmOpen(false)}
         onConfirm={() => void deleteMutation.mutateAsync()}
       />
 
-      <DesktopNoteUnsavedDialog
-        open={closeDialogOpen}
+      <UnsavedSheet
+        open={closeConfirmOpen}
         pending={saveMutation.isPending}
-        onClose={() => setCloseDialogOpen(false)}
+        onClose={() => setCloseConfirmOpen(false)}
         onDiscard={() => void handleDiscardAndClose()}
         onSave={() => void handleSaveAndClose()}
       />
 
-      <DesktopNoteSendDialog
+      <MobileNoteSendSheet
         open={Boolean(sendDialogNote)}
         note={sendDialogNote}
         conversations={recentConversationsQuery.data ?? []}
@@ -1126,7 +1120,7 @@ export function DesktopNotesWorkspace({
           void sendMutation.mutateAsync(conversation);
         }}
       />
-    </div>
+    </AppPage>
   );
 }
 
@@ -1147,10 +1141,10 @@ function ToolbarButton({
       onMouseDown={(event) => event.preventDefault()}
       onClick={onClick}
       className={cn(
-        "inline-flex h-9 items-center gap-2 rounded-[10px] border px-3 text-[13px] transition",
+        "inline-flex h-9 items-center gap-1.5 rounded-[10px] border px-2.5 text-[12px] transition",
         active
           ? "border-[rgba(7,193,96,0.16)] bg-[rgba(7,193,96,0.08)] text-[color:var(--brand-primary)]"
-          : "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]",
+          : "border-transparent bg-white text-[color:var(--text-secondary)] active:bg-black/5",
       )}
       aria-label={label}
       title={label}
@@ -1161,7 +1155,73 @@ function ToolbarButton({
   );
 }
 
-function DesktopNoteUnsavedDialog({
+function ConfirmSheet({
+  open,
+  title,
+  description,
+  confirmLabel,
+  pendingLabel,
+  danger = false,
+  pending,
+  onClose,
+  onConfirm,
+}: {
+  open: boolean;
+  title: string;
+  description: string;
+  confirmLabel: string;
+  pendingLabel: string;
+  danger?: boolean;
+  pending: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const t = useRuntimeTranslator();
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col justify-end bg-[rgba(17,24,39,0.42)]">
+      <button
+        type="button"
+        aria-label={t(msg`关闭确认弹层`)}
+        onClick={onClose}
+        className="absolute inset-0"
+      />
+      <div className="relative rounded-t-[22px] bg-white pb-[calc(env(safe-area-inset-bottom,0px))] shadow-[0_-12px_32px_rgba(15,23,42,0.16)]">
+        <div className="px-5 pb-5 pt-6">
+          <div className="text-[16px] font-medium text-[color:var(--text-primary)]">
+            {title}
+          </div>
+          <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-muted)]">
+            {description}
+          </div>
+        </div>
+        <div className="flex flex-col gap-2 border-t border-[color:var(--border-faint)] px-5 py-4">
+          <Button
+            variant={danger ? "danger" : "primary"}
+            onClick={onConfirm}
+            disabled={pending}
+            className="h-11 rounded-[12px] text-[15px]"
+          >
+            {pending ? pendingLabel : confirmLabel}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={onClose}
+            disabled={pending}
+            className="h-11 rounded-[12px] border-[color:var(--border-faint)] bg-white text-[15px] shadow-none"
+          >
+            {t(msg`取消`)}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function UnsavedSheet({
   open,
   pending,
   onClose,
@@ -1180,47 +1240,46 @@ function DesktopNoteUnsavedDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(17,24,39,0.28)] p-6 backdrop-blur-[3px]">
+    <div className="fixed inset-0 z-50 flex flex-col justify-end bg-[rgba(17,24,39,0.42)]">
       <button
         type="button"
         aria-label={t(msg`关闭未保存提示`)}
         onClick={onClose}
         className="absolute inset-0"
       />
-
-      <div className="relative w-full max-w-[560px] overflow-hidden rounded-[20px] border border-[color:var(--border-faint)] bg-white/96 shadow-[var(--shadow-overlay)]">
-        <div className="border-b border-[color:var(--border-faint)] px-6 py-5">
-          <div className="text-[18px] font-medium text-[color:var(--text-primary)]">
+      <div className="relative rounded-t-[22px] bg-white pb-[calc(env(safe-area-inset-bottom,0px))] shadow-[0_-12px_32px_rgba(15,23,42,0.16)]">
+        <div className="px-5 pb-5 pt-6">
+          <div className="text-[16px] font-medium text-[color:var(--text-primary)]">
             {t(msg`这条笔记还没有保存`)}
           </div>
-          <div className="mt-2 text-[13px] leading-7 text-[color:var(--text-muted)]">
+          <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-muted)]">
             {t(msg`保存后会进入收藏；如果直接关闭，当前草稿改动会被丢弃。`)}
           </div>
         </div>
-        <div className="flex flex-wrap items-center justify-end gap-3 px-6 py-4">
+        <div className="flex flex-col gap-2 border-t border-[color:var(--border-faint)] px-5 py-4">
           <Button
-            variant="secondary"
-            onClick={onClose}
+            variant="primary"
+            onClick={onSave}
             disabled={pending}
-            className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-5 shadow-none"
+            className="h-11 rounded-[12px] bg-[color:var(--brand-primary)] text-[15px] text-white hover:opacity-95"
           >
-            {t(msg`取消`)}
+            {pending ? t(msg`保存中...`) : t(msg`保存并关闭`)}
           </Button>
           <Button
             variant="danger"
             onClick={onDiscard}
             disabled={pending}
-            className="rounded-[10px] px-5"
+            className="h-11 rounded-[12px] text-[15px]"
           >
             {t(msg`不保存`)}
           </Button>
           <Button
-            variant="primary"
-            onClick={onSave}
+            variant="secondary"
+            onClick={onClose}
             disabled={pending}
-            className="rounded-[10px] bg-[color:var(--brand-primary)] px-5 text-white hover:opacity-95"
+            className="h-11 rounded-[12px] border-[color:var(--border-faint)] bg-white text-[15px] shadow-none"
           >
-            {pending ? t(msg`保存中...`) : t(msg`保存并关闭`)}
+            {t(msg`继续编辑`)}
           </Button>
         </div>
       </div>
@@ -1228,57 +1287,6 @@ function DesktopNoteUnsavedDialog({
   );
 }
 
-
-async function focusReturnTargetWindow(targetPath: string) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  const resolvedTarget = resolveDesktopWindowReturnTarget(targetPath);
-  if (resolvedTarget.standaloneWindowLabel) {
-    const focusedStandalone = await focusStandaloneDesktopWindow(
-      resolvedTarget.standaloneWindowLabel,
-      targetPath,
-    );
-    if (focusedStandalone) {
-      void closeCurrentDesktopWindow();
-      return;
-    }
-  }
-
-  const nextMainWindowPath = resolvedTarget.mainWindowPath || targetPath;
-
-  void focusMainDesktopWindow(nextMainWindowPath).then((focused) => {
-    if (focused) {
-      void closeCurrentDesktopWindow();
-      return;
-    }
-
-    try {
-      if (window.opener && !window.opener.closed) {
-        window.opener.location.assign(nextMainWindowPath);
-        window.opener.focus?.();
-        closeCurrentWindow();
-        return;
-      }
-    } catch {
-      // Ignore opener access failures and fall back to local navigation.
-    }
-
-    window.location.assign(nextMainWindowPath);
-  });
-}
-
-function closeCurrentWindow(onBlocked?: () => void) {
-  window.close();
-
-  if (!onBlocked) {
-    return;
-  }
-
-  window.setTimeout(() => {
-    if (!window.closed) {
-      onBlocked();
-    }
-  }, 120);
+function hashWithoutLeading(value: string) {
+  return value.startsWith("#") ? value.slice(1) : value;
 }

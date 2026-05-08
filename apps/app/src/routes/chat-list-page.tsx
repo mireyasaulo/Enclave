@@ -30,6 +30,7 @@ import {
   BellRing,
   CheckCheck,
   Circle,
+  FileText,
   Plus,
   Pin,
   QrCode,
@@ -75,6 +76,8 @@ import {
 } from "../features/official-accounts/mobile-official-route-state";
 import { buildMobileAddFriendRouteHash } from "../features/contacts/mobile-add-friend-route-state";
 import { buildMobileFriendRequestsRouteHash } from "../features/contacts/mobile-friend-requests-route-state";
+import { createDesktopNoteDraft } from "../features/favorites/note-drafts-storage";
+import { buildMobileNoteEditorRouteHash } from "../features/notes/mobile-note-editor-route-state";
 import { buildSearchRouteHash } from "../features/search/search-route-state";
 import { useMessageReminders } from "../features/chat/use-message-reminders";
 import { useChatReminderActions } from "../features/chat/use-chat-reminder-actions";
@@ -94,7 +97,7 @@ type QuickActionItem = {
   key: string;
   label: ChatListMessage;
   icon: typeof Users;
-  to?: "/group/new" | "/friend-requests" | "/add-friend";
+  to?: "/group/new" | "/friend-requests" | "/add-friend" | "/notes/new";
   disabled?: boolean;
   disabledLabel?: ChatListMessage;
 };
@@ -113,6 +116,12 @@ const quickActionItems: QuickActionItem[] = [
     label: msg`添加朋友`,
     icon: UserPlus,
     to: "/add-friend",
+  },
+  {
+    key: "create-note",
+    label: msg`新建笔记`,
+    icon: FileText,
+    to: "/notes/new",
   },
   {
     key: "scan",
@@ -486,10 +495,24 @@ function MobileChatListPage() {
   }, [baseUrl, queryClient]);
 
   function handleNavigate(
-    to: "/group/new" | "/friend-requests" | "/add-friend",
+    to: "/group/new" | "/friend-requests" | "/add-friend" | "/notes/new",
   ) {
     setIsQuickMenuOpen(false);
     setNotice(null);
+
+    if (to === "/notes/new") {
+      const draft = createDesktopNoteDraft();
+      const nextHash = buildMobileNoteEditorRouteHash({
+        draftId: draft.draftId,
+        returnPath: pathname,
+      });
+      void navigate({
+        to,
+        ...(nextHash ? { hash: nextHash } : {}),
+      });
+      return;
+    }
+
     const nextHash =
       to === "/group/new"
         ? buildCreateGroupRouteHash({
