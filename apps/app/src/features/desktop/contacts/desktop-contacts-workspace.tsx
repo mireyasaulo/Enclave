@@ -47,6 +47,8 @@ export type DesktopContactsWorkspaceProps = {
   speechButtonDisabled: boolean;
   onSpeechButtonClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   shortcutList: ReactNode;
+  indexList?: ReactNode;
+  directoryScrollRef?: RefObject<HTMLDivElement | null>;
   notice?: string | null;
   errors?: string[];
   loading: boolean;
@@ -77,6 +79,8 @@ export function DesktopContactsWorkspace({
   speechButtonDisabled,
   onSpeechButtonClick,
   shortcutList,
+  indexList = null,
+  directoryScrollRef,
   notice = null,
   errors = [],
   loading,
@@ -153,98 +157,104 @@ export function DesktopContactsWorkspace({
               </div>
             </div>
 
-            <div className="px-2 py-2">{shortcutList}</div>
+            <div className="relative min-h-0 flex-1">
+              <div
+                ref={directoryScrollRef}
+                className="h-full overflow-auto bg-[#f7f7f7] pb-5"
+              >
+                <div className="px-2 py-2">{shortcutList}</div>
 
-            <div className="min-h-0 flex-1 overflow-auto bg-[#f7f7f7] pb-5">
-              {notice ? (
-                <div className="px-3 pb-2">
-                  <InlineNotice
-                    tone="info"
-                    className="border-[rgba(0,0,0,0.06)] bg-white text-xs"
+                {notice ? (
+                  <div className="px-3 pb-2">
+                    <InlineNotice
+                      tone="info"
+                      className="border-[rgba(0,0,0,0.06)] bg-white text-xs"
+                    >
+                      {notice}
+                    </InlineNotice>
+                  </div>
+                ) : null}
+
+                {errors.map((message) => (
+                  <div key={message} className="px-3 pb-2">
+                    <ErrorBlock message={message} />
+                  </div>
+                ))}
+
+                {loading ? (
+                  <LoadingBlock
+                    className="px-4 py-6 text-left"
+                    label={t(msg`正在读取联系人...`)}
+                  />
+                ) : null}
+
+                {!loading && friendSections.length ? (
+                  <div className="overflow-hidden">
+                    <DesktopDirectoryTitle title={t(msg`联系人`)} />
+                    {friendSections.map((section, sectionIndex) => (
+                      <div
+                        key={section.key}
+                        id={section.anchorId}
+                        className={cn(
+                          sectionIndex > 0
+                            ? "mt-2 border-t border-[rgba(0,0,0,0.04)] pt-2"
+                            : undefined,
+                        )}
+                      >
+                        <DesktopSectionHeader title={section.title} />
+                        {section.items.map((item, index) => (
+                          <DesktopFriendListRow
+                            key={item.character.id}
+                            item={item}
+                            index={index}
+                            pendingCharacterId={pendingCharacterId}
+                            active={activeFriendId === item.character.id}
+                            onClick={() => onSelectFriend(item.character.id)}
+                            onDoubleClick={() =>
+                              onOpenFriendChat(item.character.id)
+                            }
+                          />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+
+                {!loading && !friendSections.length ? emptyState : null}
+
+                {worldCharacterSections.length ? (
+                  <div
+                    id="world-character-directory"
+                    className="mt-3 overflow-hidden border-t border-[rgba(0,0,0,0.04)] pt-2"
                   >
-                    {notice}
-                  </InlineNotice>
-                </div>
-              ) : null}
-
-              {errors.map((message) => (
-                <div key={message} className="px-3 pb-2">
-                  <ErrorBlock message={message} />
-                </div>
-              ))}
-
-              {loading ? (
-                <LoadingBlock
-                  className="px-4 py-6 text-left"
-                  label={t(msg`正在读取联系人...`)}
-                />
-              ) : null}
-
-              {!loading && friendSections.length ? (
-                <div className="overflow-hidden">
-                  <DesktopDirectoryTitle title={t(msg`联系人`)} />
-                  {friendSections.map((section, sectionIndex) => (
-                    <div
-                      key={section.key}
-                      id={section.anchorId}
-                      className={cn(
-                        sectionIndex > 0
-                          ? "mt-2 border-t border-[rgba(0,0,0,0.04)] pt-2"
-                          : undefined,
-                      )}
-                    >
-                      <DesktopSectionHeader title={section.title} />
-                      {section.items.map((item, index) => (
-                        <DesktopFriendListRow
-                          key={item.character.id}
-                          item={item}
-                          index={index}
-                          pendingCharacterId={pendingCharacterId}
-                          active={activeFriendId === item.character.id}
-                          onClick={() => onSelectFriend(item.character.id)}
-                          onDoubleClick={() =>
-                            onOpenFriendChat(item.character.id)
-                          }
-                        />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-
-              {!loading && !friendSections.length ? emptyState : null}
-
-              {worldCharacterSections.length ? (
-                <div
-                  id="world-character-directory"
-                  className="mt-3 overflow-hidden border-t border-[rgba(0,0,0,0.04)] pt-2"
-                >
-                  <DesktopDirectoryTitle title={worldCharacterTitle} />
-                  {worldCharacterSections.map((section, sectionIndex) => (
-                    <div
-                      key={section.key}
-                      className={cn(
-                        sectionIndex > 0
-                          ? "mt-2 border-t border-[rgba(0,0,0,0.04)] pt-2"
-                          : undefined,
-                      )}
-                    >
-                      <DesktopSectionHeader title={section.title} />
-                      {section.items.map((item, index) => (
-                        <DesktopWorldCharacterRow
-                          key={item.character.id}
-                          item={item}
-                          index={index}
-                          active={activeWorldCharacterId === item.character.id}
-                          onClick={() =>
-                            onSelectWorldCharacter(item.character.id)
-                          }
-                        />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
+                    <DesktopDirectoryTitle title={worldCharacterTitle} />
+                    {worldCharacterSections.map((section, sectionIndex) => (
+                      <div
+                        key={section.key}
+                        className={cn(
+                          sectionIndex > 0
+                            ? "mt-2 border-t border-[rgba(0,0,0,0.04)] pt-2"
+                            : undefined,
+                        )}
+                      >
+                        <DesktopSectionHeader title={section.title} />
+                        {section.items.map((item, index) => (
+                          <DesktopWorldCharacterRow
+                            key={item.character.id}
+                            item={item}
+                            index={index}
+                            active={activeWorldCharacterId === item.character.id}
+                            onClick={() =>
+                              onSelectWorldCharacter(item.character.id)
+                            }
+                          />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+              {indexList}
             </div>
           </section>
 

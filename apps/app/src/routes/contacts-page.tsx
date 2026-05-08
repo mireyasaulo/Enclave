@@ -277,6 +277,7 @@ const mobileQuickActionItems: MobileQuickActionItem[] = [
 export function ContactsPage() {
   const t = useRuntimeTranslator();
   const pageRef = useRef<HTMLDivElement | null>(null);
+  const desktopDirectoryScrollRef = useRef<HTMLDivElement | null>(null);
   const isDesktopLayout = useDesktopLayout();
   const navigate = useNavigate();
   const pathname = useRouterState({
@@ -297,6 +298,9 @@ export function ContactsPage() {
     () => buildDesktopSelectionFromRouteState(hash),
   );
   const [activeMobileIndexKey, setActiveMobileIndexKey] = useState<
+    string | null
+  >(null);
+  const [activeDesktopIndexKey, setActiveDesktopIndexKey] = useState<
     string | null
   >(null);
   const previousBaseUrlRef = useRef(baseUrl);
@@ -466,6 +470,45 @@ export function ContactsPage() {
       })),
     ],
     [mobileShortcutIndexItems, friendSections],
+  );
+  const desktopShortcutIndexItems = useMemo(
+    () => [
+      {
+        key: "contacts-shortcut-new-friends",
+        indexLabel: t(msg`新`),
+      },
+      {
+        key: "contacts-shortcut-starred-friends",
+        indexLabel: "★",
+      },
+      {
+        key: "contacts-shortcut-tags",
+        indexLabel: t(msg`签`),
+      },
+      {
+        key: "contacts-shortcut-group-chat",
+        indexLabel: t(msg`群`),
+      },
+      {
+        key: "contacts-shortcut-official-accounts",
+        indexLabel: t(msg`公`),
+      },
+      {
+        key: "contacts-shortcut-world-characters",
+        indexLabel: t(msg`世`),
+      },
+    ],
+    [t],
+  );
+  const desktopIndexItems = useMemo(
+    () => [
+      ...desktopShortcutIndexItems,
+      ...desktopFriendSections.map((section) => ({
+        key: section.anchorId,
+        indexLabel: section.indexLabel,
+      })),
+    ],
+    [desktopShortcutIndexItems, desktopFriendSections],
   );
 
   const pendingRequestCount = useMemo(
@@ -876,6 +919,73 @@ export function ContactsPage() {
 
   useEffect(() => {
     if (!isDesktopLayout) {
+      setActiveDesktopIndexKey(null);
+      return;
+    }
+
+    setActiveDesktopIndexKey((current) => {
+      if (
+        current &&
+        desktopIndexItems.some((item) => item.key === current)
+      ) {
+        return current;
+      }
+
+      return desktopIndexItems[0]?.key ?? null;
+    });
+  }, [desktopIndexItems, isDesktopLayout]);
+
+  useEffect(() => {
+    if (!isDesktopLayout) {
+      return;
+    }
+
+    const scrollContainer = desktopDirectoryScrollRef.current;
+    if (!scrollContainer) {
+      return;
+    }
+
+    const syncActiveDesktopIndexKey = () => {
+      if (typeof document === "undefined") {
+        return;
+      }
+
+      const containerRect = scrollContainer.getBoundingClientRect();
+      const stickyOffset = 8;
+      let nextActiveKey = desktopIndexItems[0]?.key ?? null;
+
+      for (const item of desktopIndexItems) {
+        const anchorElement = document.getElementById(item.key);
+        if (!anchorElement) {
+          continue;
+        }
+
+        const topOffset =
+          anchorElement.getBoundingClientRect().top - containerRect.top;
+        if (topOffset <= stickyOffset) {
+          nextActiveKey = item.key;
+        } else {
+          break;
+        }
+      }
+
+      setActiveDesktopIndexKey((current) =>
+        current === nextActiveKey ? current : nextActiveKey,
+      );
+    };
+
+    syncActiveDesktopIndexKey();
+    scrollContainer.addEventListener("scroll", syncActiveDesktopIndexKey, {
+      passive: true,
+    });
+
+    return () => {
+      scrollContainer.removeEventListener("scroll", syncActiveDesktopIndexKey);
+    };
+  }, [desktopIndexItems, isDesktopLayout]);
+
+  useEffect(() => {
+    if (!isDesktopLayout) {
       return;
     }
 
@@ -1135,6 +1245,22 @@ export function ContactsPage() {
       block: "start",
     });
   }
+
+  function handleDesktopIndexJump(
+    anchorId: string,
+    behavior: ScrollBehavior = "smooth",
+  ) {
+    setActiveDesktopIndexKey(anchorId);
+
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    document.getElementById(anchorId)?.scrollIntoView({
+      behavior,
+      block: "start",
+    });
+  }
   const shortcutItems: ContactShortcutListItem[] = [
     {
       key: "new-friends",
@@ -1237,6 +1363,7 @@ export function ContactsPage() {
     shortcutItems[0],
     {
       key: "starred-friends",
+      anchorId: "contacts-shortcut-starred-friends",
       label: t(msg`星标朋友`),
       subtitle:
         starredFriends.length > 0
@@ -1258,6 +1385,7 @@ export function ContactsPage() {
     },
     {
       key: "tags",
+      anchorId: "contacts-shortcut-tags",
       label: t(msg`标签`),
       subtitle:
         tagGroupCount > 0
@@ -1412,6 +1540,18 @@ export function ContactsPage() {
               variant="desktop-flat"
             />
           }
+          indexList={
+            desktopIndexItems.length ? (
+              <ContactIndexList
+                items={desktopIndexItems}
+                activeKey={activeDesktopIndexKey}
+                compact
+                className="absolute right-1 top-1/2 z-10 -translate-y-1/2"
+                onSelect={handleDesktopIndexJump}
+              />
+            ) : null
+          }
+          directoryScrollRef={desktopDirectoryScrollRef}
           notice={notice}
           errors={desktopErrors}
           loading={friendsQuery.isLoading}
