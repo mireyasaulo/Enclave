@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import type { ReplyLogicCharacterSnapshot } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   Button,
   Card,
@@ -20,15 +22,21 @@ import { resolveAdminCoreApiBaseUrl } from "../lib/core-api-base";
 import { formatAdminDateTime as formatLocalizedDateTime } from "../lib/format";
 import { CharacterWorkspaceNav } from "../components/character-workspace-nav";
 
-const ACTIVITY_OPTIONS = [
-  { value: "", label: "未设置" },
-  { value: "free", label: "空闲" },
-  { value: "working", label: "工作中" },
-  { value: "eating", label: "吃饭中" },
-  { value: "resting", label: "休息中" },
-  { value: "commuting", label: "通勤中" },
-  { value: "sleeping", label: "睡觉中" },
-];
+const ACTIVITY_LABEL_MESSAGES: Record<string, ReturnType<typeof msg>> = {
+  "": msg`未设置`,
+  free: msg`空闲`,
+  working: msg`工作中`,
+  eating: msg`吃饭中`,
+  resting: msg`休息中`,
+  commuting: msg`通勤中`,
+  sleeping: msg`睡觉中`,
+};
+
+function getActivityLabel(value?: string | null): string {
+  const key = value ?? "";
+  const message = ACTIVITY_LABEL_MESSAGES[key] ?? ACTIVITY_LABEL_MESSAGES[""];
+  return translateRuntimeMessage(message);
+}
 
 export function CharacterRuntimePage() {
   const { characterId } = useParams({ from: "/characters/$characterId/runtime" });
@@ -44,10 +52,12 @@ export function CharacterRuntimePage() {
     return <AdminSkeletonCard rows={5} showAction />;
   }
 
+  const t = translateRuntimeMessage;
+
   if (snapshotQuery.isError && snapshotQuery.error instanceof Error) {
     return (
       <AdminErrorState
-        title="角色运行逻辑加载失败"
+        title={t(msg`角色运行逻辑加载失败`)}
         detail={snapshotQuery.error.message}
         onRetry={() => snapshotQuery.refetch()}
       />
@@ -57,8 +67,8 @@ export function CharacterRuntimePage() {
   if (!snapshotQuery.data) {
     return (
       <AdminErrorState
-        title="角色运行逻辑暂不可用"
-        detail="未能从远程获取到 reply-logic 快照。"
+        title={t(msg`角色运行逻辑暂不可用`)}
+        detail={t(msg`未能从远程获取到 reply-logic 快照。`)}
         onRetry={() => snapshotQuery.refetch()}
       />
     );
@@ -72,19 +82,19 @@ export function CharacterRuntimePage() {
       <CharacterWorkspaceNav characterId={characterId} />
 
       <AdminPageHero
-        eyebrow="角色运行台"
+        eyebrow={t(msg`角色运行台`)}
         title={character.name}
-        description="查看这个角色当前的运行状态、生活信息与调度记录。"
+        description={t(msg`查看这个角色当前的运行状态、生活信息与调度记录。`)}
         actions={
           <>
             <Link to="/characters">
-              <Button variant="secondary" size="lg">返回角色中心</Button>
+              <Button variant="secondary" size="lg">{t(msg`返回角色中心`)}</Button>
             </Link>
             <Link to="/characters/$characterId/factory" params={{ characterId }}>
-              <Button variant="secondary" size="lg">前往工厂</Button>
+              <Button variant="secondary" size="lg">{t(msg`前往工厂`)}</Button>
             </Link>
             <Link to="/reply-logic">
-              <Button variant="secondary" size="lg">世界级调试台</Button>
+              <Button variant="secondary" size="lg">{t(msg`世界级调试台`)}</Button>
             </Link>
           </>
         }
@@ -93,44 +103,44 @@ export function CharacterRuntimePage() {
 
       <div className="space-y-6">
         <Card className="bg-[color:var(--surface-console)]">
-          <SectionHeading>生活状态</SectionHeading>
+          <SectionHeading>{t(msg`生活状态`)}</SectionHeading>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <MetricCard label="在线模式" value={formatMode(character.onlineMode)} />
-            <MetricCard label="活动模式" value={formatMode(character.activityMode)} />
-            <MetricCard label="当前活动" value={formatActivity(character.currentActivity)} />
-            <MetricCard label="当前在线" value={character.isOnline ? "在线" : "离线"} />
-            <MetricCard label="活动频率" value={character.activityFrequency || "未设置"} />
-            <MetricCard label="朋友圈频率" value={`${character.momentsFrequency} 次/天`} />
-            <MetricCard label="视频号频率" value={`${character.feedFrequency} 次/周`} />
+            <MetricCard label={t(msg`在线模式`)} value={formatMode(character.onlineMode)} />
+            <MetricCard label={t(msg`活动模式`)} value={formatMode(character.activityMode)} />
+            <MetricCard label={t(msg`当前活动`)} value={formatActivity(character.currentActivity)} />
+            <MetricCard label={t(msg`当前在线`)} value={character.isOnline ? t(msg`在线`) : t(msg`离线`)} />
+            <MetricCard label={t(msg`活动频率`)} value={character.activityFrequency || t(msg`未设置`)} />
+            <MetricCard label={t(msg`朋友圈频率`)} value={t(msg`${character.momentsFrequency} 次/天`)} />
+            <MetricCard label={t(msg`视频号频率`)} value={t(msg`${character.feedFrequency} 次/周`)} />
             <MetricCard
-              label="活跃时段"
+              label={t(msg`活跃时段`)}
               value={
                 character.activeHoursStart != null && character.activeHoursEnd != null
                   ? `${character.activeHoursStart}:00 – ${character.activeHoursEnd}:00`
-                  : "未设置"
+                  : t(msg`未设置`)
               }
             />
             <MetricCard
-              label="触发场景"
-              value={character.triggerScenes?.length ? character.triggerScenes.join("、") : "无"}
+              label={t(msg`触发场景`)}
+              value={character.triggerScenes?.length ? character.triggerScenes.join("、") : t(msg`无`)}
             />
           </div>
         </Card>
 
         <Card className="bg-[color:var(--surface-console)]">
-          <SectionHeading>记忆与状态</SectionHeading>
-          <p className="mt-2 text-sm text-[color:var(--text-muted)]">核心记忆每周一自动更新，近期摘要每日自动更新。</p>
+          <SectionHeading>{t(msg`记忆与状态`)}</SectionHeading>
+          <p className="mt-2 text-sm text-[color:var(--text-muted)]">{t(msg`核心记忆每周一自动更新，近期摘要每日自动更新。`)}</p>
           <div className="mt-4 space-y-4">
             <div>
-              <p className="mb-1 text-xs font-medium text-[color:var(--text-secondary)]">核心记忆</p>
+              <p className="mb-1 text-xs font-medium text-[color:var(--text-secondary)]">{t(msg`核心记忆`)}</p>
               <pre className="whitespace-pre-wrap rounded-md bg-[color:var(--surface-inset)] p-3 text-sm text-[color:var(--text-primary)]">
-                {character.profile.memory?.coreMemory || "（尚未生成）"}
+                {character.profile.memory?.coreMemory || t(msg`（尚未生成）`)}
               </pre>
             </div>
             <div>
-              <p className="mb-1 text-xs font-medium text-[color:var(--text-secondary)]">近期摘要</p>
+              <p className="mb-1 text-xs font-medium text-[color:var(--text-secondary)]">{t(msg`近期摘要`)}</p>
               <pre className="whitespace-pre-wrap rounded-md bg-[color:var(--surface-inset)] p-3 text-sm text-[color:var(--text-primary)]">
-                {character.profile.memory?.recentSummary || "（尚未生成）"}
+                {character.profile.memory?.recentSummary || t(msg`（尚未生成）`)}
               </pre>
             </div>
           </div>
@@ -138,12 +148,12 @@ export function CharacterRuntimePage() {
 
         <div className="grid gap-6 xl:grid-cols-2">
           <Card className="bg-[color:var(--surface-console)]">
-            <SectionHeading>回复链路快照</SectionHeading>
+            <SectionHeading>{t(msg`回复链路快照`)}</SectionHeading>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <MetricCard label="状态门模式" value={formatGateMode(snapshot.actor.stateGate.mode)} />
-              <MetricCard label="最近聊天时间" value={formatDateTime(snapshot.actor.lastChatAt)} />
-              <MetricCard label="历史窗口" value={snapshot.actor.historyWindow} />
-              <MetricCard label="可见消息数" value={snapshot.actor.visibleHistoryCount} />
+              <MetricCard label={t(msg`状态门模式`)} value={formatGateMode(snapshot.actor.stateGate.mode)} />
+              <MetricCard label={t(msg`最近聊天时间`)} value={formatDateTime(snapshot.actor.lastChatAt)} />
+              <MetricCard label={t(msg`历史窗口`)} value={snapshot.actor.historyWindow} />
+              <MetricCard label={t(msg`可见消息数`)} value={snapshot.actor.visibleHistoryCount} />
             </div>
             {snapshot.notes.length ? (
               <div className="mt-4 space-y-2">
@@ -155,31 +165,31 @@ export function CharacterRuntimePage() {
           </Card>
 
           <Card className="bg-[color:var(--surface-console)]">
-            <SectionHeading>生活逻辑观测</SectionHeading>
+            <SectionHeading>{t(msg`生活逻辑观测`)}</SectionHeading>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <MetricCard
-                label="当前小时"
+                label={t(msg`当前小时`)}
                 value={`${snapshot.observability.activeWindow.currentHour}:00`}
               />
               <MetricCard
-                label="是否在活跃窗"
-                value={snapshot.observability.activeWindow.isWithinWindow ? "是" : "否"}
+                label={t(msg`是否在活跃窗`)}
+                value={snapshot.observability.activeWindow.isWithinWindow ? t(msg`是`) : t(msg`否`)}
               />
               <MetricCard
-                label="今日朋友圈"
+                label={t(msg`今日朋友圈`)}
                 value={`${snapshot.observability.contentCadence.todayMoments} / ${snapshot.observability.contentCadence.momentsTarget}`}
               />
               <MetricCard
-                label="近 7 天视频号"
+                label={t(msg`近 7 天视频号`)}
                 value={`${snapshot.observability.contentCadence.weeklyChannels} / ${snapshot.observability.contentCadence.channelsTarget}`}
               />
               <MetricCard
-                label="触发场景数"
-                value={snapshot.observability.triggerScenes.length || "无"}
+                label={t(msg`触发场景数`)}
+                value={snapshot.observability.triggerScenes.length || t(msg`无`)}
               />
               <MetricCard
-                label="主动提醒"
-                value={snapshot.observability.memoryProactive.enabled ? "已启用" : "未启用"}
+                label={t(msg`主动提醒`)}
+                value={snapshot.observability.memoryProactive.enabled ? t(msg`已启用`) : t(msg`未启用`)}
               />
             </div>
             {snapshot.observability.notes.length ? (
@@ -193,7 +203,7 @@ export function CharacterRuntimePage() {
         </div>
 
         <Card className="bg-[color:var(--surface-console)]">
-          <SectionHeading>Scheduler 最近执行结果</SectionHeading>
+          <SectionHeading>{t(msg`Scheduler 最近执行结果`)}</SectionHeading>
           <div className="mt-4 space-y-3">
             {snapshot.observability.relevantJobs.map((job) => (
               <AdminRecordCard
@@ -201,16 +211,16 @@ export function CharacterRuntimePage() {
                 title={job.name}
                 badges={
                   <StatusPill tone={job.running ? "warning" : "healthy"}>
-                    {job.running ? "运行中" : "空闲"}
+                    {job.running ? t(msg`运行中`) : t(msg`空闲`)}
                   </StatusPill>
                 }
                 meta={`${job.cadence} / ${job.nextRunHint}`}
-                description={job.lastResult || "当前还没有执行结果。"}
+                description={job.lastResult || t(msg`当前还没有执行结果。`)}
                 details={
                   <div className="grid gap-3 md:grid-cols-3">
-                    <ValueCard label="运行次数" value={job.runCount} />
-                    <ValueCard label="最近执行" value={formatDateTime(job.lastRunAt)} />
-                    <ValueCard label="耗时" value={job.lastDurationMs ? `${job.lastDurationMs} ms` : "暂无"} />
+                    <ValueCard label={t(msg`运行次数`)} value={job.runCount} />
+                    <ValueCard label={t(msg`最近执行`)} value={formatDateTime(job.lastRunAt)} />
+                    <ValueCard label={t(msg`耗时`)} value={job.lastDurationMs ? `${job.lastDurationMs} ms` : t(msg`暂无`)} />
                   </div>
                 }
               />
@@ -236,13 +246,13 @@ export function CharacterRuntimePage() {
               />
             ))}
             {snapshot.observability.recentRuns.length === 0 ? (
-              <p className="text-sm text-[color:var(--text-muted)]">当前还没有可展示的调度执行记录。</p>
+              <p className="text-sm text-[color:var(--text-muted)]">{t(msg`当前还没有可展示的调度执行记录。`)}</p>
             ) : null}
           </div>
         </Card>
 
         <Card className="bg-[color:var(--surface-console)]">
-          <SectionHeading>最近生活事件</SectionHeading>
+          <SectionHeading>{t(msg`最近生活事件`)}</SectionHeading>
           <div className="mt-4 space-y-3">
             {snapshot.observability.lifeEvents.map((event) => (
               <AdminRecordCard
@@ -258,13 +268,13 @@ export function CharacterRuntimePage() {
               />
             ))}
             {snapshot.observability.lifeEvents.length === 0 ? (
-              <p className="text-sm text-[color:var(--text-muted)]">当前还没有记录到该角色的生活事件。</p>
+              <p className="text-sm text-[color:var(--text-muted)]">{t(msg`当前还没有记录到该角色的生活事件。`)}</p>
             ) : null}
           </div>
         </Card>
 
         <Card className="bg-[color:var(--surface-console)]">
-          <SectionHeading>上下文窗口</SectionHeading>
+          <SectionHeading>{t(msg`上下文窗口`)}</SectionHeading>
           <div className="mt-4 space-y-3">
             {snapshot.actor.windowMessages.map((item) => (
               <AdminRecordCard
@@ -273,7 +283,7 @@ export function CharacterRuntimePage() {
                 badges={
                   <>
                     <StatusPill tone={item.includedInWindow ? "healthy" : "muted"}>
-                      {item.includedInWindow ? "进入窗口" : "仅可见"}
+                      {item.includedInWindow ? t(msg`进入窗口`) : t(msg`仅可见`)}
                     </StatusPill>
                     <StatusPill tone="muted">{item.type}</StatusPill>
                   </>
@@ -283,13 +293,13 @@ export function CharacterRuntimePage() {
               />
             ))}
             {snapshot.actor.windowMessages.length === 0 ? (
-              <p className="text-sm text-[color:var(--text-muted)]">当前没有上下文窗口消息。</p>
+              <p className="text-sm text-[color:var(--text-muted)]">{t(msg`当前没有上下文窗口消息。`)}</p>
             ) : null}
           </div>
         </Card>
 
         <Card className="bg-[color:var(--surface-console)]">
-          <SectionHeading>叙事弧线</SectionHeading>
+          <SectionHeading>{t(msg`叙事弧线`)}</SectionHeading>
           {snapshot.narrativeArc ? (
             <AdminRecordCard
               className="mt-4"
@@ -313,7 +323,7 @@ export function CharacterRuntimePage() {
               }
             />
           ) : (
-            <p className="mt-4 text-sm text-[color:var(--text-muted)]">当前还没有叙事弧线记录。</p>
+            <p className="mt-4 text-sm text-[color:var(--text-muted)]">{t(msg`当前还没有叙事弧线记录。`)}</p>
           )}
         </Card>
       </div>
@@ -322,23 +332,25 @@ export function CharacterRuntimePage() {
 }
 
 function formatMode(value?: string | null) {
-  return value === "manual" ? "人工锁定" : "自动调度";
+  return translateRuntimeMessage(
+    value === "manual" ? msg`人工锁定` : msg`自动调度`,
+  );
 }
 
 function formatActivity(value?: string | null) {
-  return ACTIVITY_OPTIONS.find((item) => item.value === (value ?? ""))?.label ?? "未设置";
+  return getActivityLabel(value);
 }
 
 function formatGateMode(mode: string) {
   switch (mode) {
     case "sleep_hint_delay":
-      return "睡眠延迟";
+      return translateRuntimeMessage(msg`睡眠延迟`);
     case "busy_hint_delay":
-      return "忙碌延迟";
+      return translateRuntimeMessage(msg`忙碌延迟`);
     case "not_applied":
-      return "未应用";
+      return translateRuntimeMessage(msg`未应用`);
     default:
-      return "立即回复";
+      return translateRuntimeMessage(msg`立即回复`);
   }
 }
 
@@ -356,7 +368,7 @@ function formatDateTime(value?: string | null) {
 }
 
 function formatSchedulerRunStatus(value: "success" | "error") {
-  return value === "error" ? "失败" : "成功";
+  return translateRuntimeMessage(value === "error" ? msg`失败` : msg`成功`);
 }
 
 function formatLifeEventKind(
@@ -364,19 +376,19 @@ function formatLifeEventKind(
 ) {
   switch (value) {
     case "online_status_changed":
-      return "在线状态";
+      return translateRuntimeMessage(msg`在线状态`);
     case "activity_changed":
-      return "活动状态";
+      return translateRuntimeMessage(msg`活动状态`);
     case "moment_posted":
-      return "朋友圈";
+      return translateRuntimeMessage(msg`朋友圈`);
     case "channel_posted":
-      return "视频号";
+      return translateRuntimeMessage(msg`视频号`);
     case "scene_friend_request":
-      return "场景好友";
+      return translateRuntimeMessage(msg`场景好友`);
     case "proactive_message":
-      return "主动提醒";
+      return translateRuntimeMessage(msg`主动提醒`);
     case "relationship_updated":
-      return "AI 关系";
+      return translateRuntimeMessage(msg`AI 关系`);
     default:
       return value;
   }

@@ -48,5 +48,5 @@ export function buildContactTagGroups(
         matchesFriendSearch(item, normalizedSearchText),
       );
     })
-    .sort((left, right) => left.tag.localeCompare(right.tag, "zh-CN"));
+    .sort((left, right) => left.tag.localeCompare(right.tag, "zh-CN")); // i18n-ignore-line
 }

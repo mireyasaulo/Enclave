@@ -1,9 +1,5 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CharactersService } from '../../characters/characters.service';
@@ -12,6 +8,7 @@ import { FarmEventService } from './farm-event.service';
 import { FarmNpcStateEntity } from './entities/farm-npc-state.entity';
 import { FarmPlayerStateEntity } from './entities/farm-player-state.entity';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   FARM_CROP_CATALOG,
   computeLevelFromExperience,
   computeMaturedAtMs,
@@ -123,18 +120,32 @@ export class FarmStateService {
     cropId: FarmCropId,
   ): Promise<FarmPlayerStateView> {
     if (!isFarmCropId(cropId)) {
-      throw new BadRequestException(`未知作物：${cropId}`);
+      throw new AppError('FARM_UNKNOWN_CROP', {
+        params: { cropId: String(cropId) },
+        legacyMessage: `未知作物：${cropId}`,
+      });
     }
     const def = getCropDefinition(cropId);
     const state = await this.getOrCreatePlayerState(ownerId);
     if (state.level < def.unlockLevel) {
-      throw new ForbiddenException(`等级不足：需 ${def.unlockLevel} 级才能种 ${def.nameZh}`);
+      throw new AppError('FARM_LEVEL_TOO_LOW', {
+        status: HttpStatus.FORBIDDEN,
+        params: { unlockLevel: def.unlockLevel, cropName: def.nameZh },
+        legacyMessage: `等级不足：需 ${def.unlockLevel} 级才能种 ${def.nameZh}`,
+      });
     }
     const plots = ensurePlotsArray(state.plotsPayload, state.plotCount).map((p) => ({ ...p }));
     const plot = plots[plotIndex];
-    if (!plot) throw new NotFoundException('田块不存在');
+    if (!plot) {
+      throw new AppError('FARM_PLOT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '田块不存在',
+      });
+    }
     if (plot.stage !== 'empty' && plot.stage !== 'rotten') {
-      throw new BadRequestException('该田块当前不能种植');
+      throw new AppError('FARM_PLOT_NOT_PLANTABLE', {
+        legacyMessage: '该田块当前不能种植',
+      });
     }
 
     const seedBag = { ...(state.seedBagPayload ?? {}) };
@@ -143,7 +154,10 @@ export class FarmStateService {
       seedBag[cropId] = (seedBag[cropId] ?? 0) - 1;
     } else {
       if (state.coins < def.seedCost) {
-        throw new BadRequestException(`金币不足：需 ${def.seedCost}`);
+        throw new AppError('FARM_INSUFFICIENT_COINS', {
+          params: { required: def.seedCost },
+          legacyMessage: `金币不足：需 ${def.seedCost}`,
+        });
       }
       state.coins -= def.seedCost;
     }
@@ -183,13 +197,22 @@ export class FarmStateService {
     const state = await this.getOrCreatePlayerState(ownerId);
     const plots = ensurePlotsArray(state.plotsPayload, state.plotCount).map((p) => ({ ...p }));
     const plot = plots[plotIndex];
-    if (!plot) throw new NotFoundException('田块不存在');
+    if (!plot) {
+      throw new AppError('FARM_PLOT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '田块不存在',
+      });
+    }
     if (!plot.cropId || plot.maturedAt == null) {
-      throw new BadRequestException('该田块没有作物');
+      throw new AppError('FARM_PLOT_EMPTY', {
+        legacyMessage: '该田块没有作物',
+      });
     }
     const now = Date.now();
     if (now < plot.maturedAt) {
-      throw new BadRequestException('作物还没成熟');
+      throw new AppError('FARM_CROP_NOT_RIPE', {
+        legacyMessage: '作物还没成熟',
+      });
     }
     const def = getCropDefinition(plot.cropId);
     const isRotten = now >= computeRottenAtMs(plot.cropId, plot.plantedAt!);
@@ -262,7 +285,10 @@ export class FarmStateService {
     target: MaintenanceTarget,
   ): Promise<FarmPlayerStateView> {
     if (target.kind === 'npc') {
-      throw new BadRequestException('对 NPC 浇水将在邻居模块开放');
+      throw new AppError('FARM_NPC_OPERATION_NOT_OPEN', {
+        params: { op: 'water' },
+        legacyMessage: '对 NPC 浇水将在邻居模块开放',
+      });
     }
     return this.maintainSelfPlot(ownerId, target.plotIndex, 'water');
   }
@@ -272,7 +298,10 @@ export class FarmStateService {
     target: MaintenanceTarget,
   ): Promise<FarmPlayerStateView> {
     if (target.kind === 'npc') {
-      throw new BadRequestException('对 NPC 除草将在邻居模块开放');
+      throw new AppError('FARM_NPC_OPERATION_NOT_OPEN', {
+        params: { op: 'weed' },
+        legacyMessage: '对 NPC 除草将在邻居模块开放',
+      });
     }
     return this.maintainSelfPlot(ownerId, target.plotIndex, 'weed');
   }
@@ -282,7 +311,10 @@ export class FarmStateService {
     target: MaintenanceTarget,
   ): Promise<FarmPlayerStateView> {
     if (target.kind === 'npc') {
-      throw new BadRequestException('对 NPC 除虫将在邻居模块开放');
+      throw new AppError('FARM_NPC_OPERATION_NOT_OPEN', {
+        params: { op: 'debug' },
+        legacyMessage: '对 NPC 除虫将在邻居模块开放',
+      });
     }
     return this.maintainSelfPlot(ownerId, target.plotIndex, 'debug');
   }
@@ -293,19 +325,31 @@ export class FarmStateService {
     quantity: number,
   ): Promise<FarmPlayerStateView> {
     if (!isFarmCropId(cropId)) {
-      throw new BadRequestException(`未知作物：${cropId}`);
+      throw new AppError('FARM_UNKNOWN_CROP', {
+        params: { cropId: String(cropId) },
+        legacyMessage: `未知作物：${cropId}`,
+      });
     }
     if (!Number.isFinite(quantity) || quantity <= 0 || !Number.isInteger(quantity)) {
-      throw new BadRequestException('数量必须为正整数');
+      throw new AppError('FARM_QUANTITY_INVALID', {
+        legacyMessage: '数量必须为正整数',
+      });
     }
     const def = getCropDefinition(cropId);
     const state = await this.getOrCreatePlayerState(ownerId);
     if (state.level < def.unlockLevel) {
-      throw new ForbiddenException(`等级不足：需 ${def.unlockLevel} 级才能购买 ${def.nameZh} 种子`);
+      throw new AppError('FARM_BUY_LEVEL_TOO_LOW', {
+        status: HttpStatus.FORBIDDEN,
+        params: { unlockLevel: def.unlockLevel, cropName: def.nameZh },
+        legacyMessage: `等级不足：需 ${def.unlockLevel} 级才能购买 ${def.nameZh} 种子`,
+      });
     }
     const totalCost = def.seedCost * quantity;
     if (state.coins < totalCost) {
-      throw new BadRequestException(`金币不足：需 ${totalCost}`);
+      throw new AppError('FARM_INSUFFICIENT_COINS', {
+        params: { required: totalCost },
+        legacyMessage: `金币不足：需 ${totalCost}`,
+      });
     }
     state.coins -= totalCost;
     const seedBag = { ...(state.seedBagPayload ?? {}) };
@@ -332,17 +376,25 @@ export class FarmStateService {
     quantity: number,
   ): Promise<FarmPlayerStateView> {
     if (!isFarmCropId(cropId)) {
-      throw new BadRequestException(`未知作物：${cropId}`);
+      throw new AppError('FARM_UNKNOWN_CROP', {
+        params: { cropId: String(cropId) },
+        legacyMessage: `未知作物：${cropId}`,
+      });
     }
     if (!Number.isFinite(quantity) || quantity <= 0 || !Number.isInteger(quantity)) {
-      throw new BadRequestException('数量必须为正整数');
+      throw new AppError('FARM_QUANTITY_INVALID', {
+        legacyMessage: '数量必须为正整数',
+      });
     }
     const def = getCropDefinition(cropId);
     const state = await this.getOrCreatePlayerState(ownerId);
     const warehouse = { ...(state.warehousePayload ?? {}) };
     const have = warehouse[cropId] ?? 0;
     if (have < quantity) {
-      throw new BadRequestException(`仓库中 ${def.nameZh} 不足`);
+      throw new AppError('FARM_WAREHOUSE_INSUFFICIENT', {
+        params: { cropName: def.nameZh },
+        legacyMessage: `仓库中 ${def.nameZh} 不足`,
+      });
     }
     warehouse[cropId] = have - quantity;
     state.warehousePayload = warehouse;
@@ -369,9 +421,11 @@ export class FarmStateService {
       (entry) => entry.atMs >= cutoff && entry.thiefCharacterId === FARM_PLAYER_ACTOR_ID,
     );
     if (recent.length >= FARM_PLAYER_DAILY_STEAL_LIMIT) {
-      throw new ForbiddenException(
-        `今日偷菜次数已达上限（${FARM_PLAYER_DAILY_STEAL_LIMIT}/天）`,
-      );
+      throw new AppError('FARM_DAILY_STEAL_LIMIT', {
+        status: HttpStatus.FORBIDDEN,
+        params: { limit: FARM_PLAYER_DAILY_STEAL_LIMIT },
+        legacyMessage: `今日偷菜次数已达上限（${FARM_PLAYER_DAILY_STEAL_LIMIT}/天）`,
+      });
     }
   }
 
@@ -382,31 +436,50 @@ export class FarmStateService {
   ): Promise<FarmStealResult> {
     const character = await this.charactersService.findById(characterId);
     if (!character) {
-      throw new NotFoundException(`角色不存在：${characterId}`);
+      throw new AppError('FARM_CHARACTER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { characterId },
+        legacyMessage: `角色不存在：${characterId}`,
+      });
     }
     const isVisible = await this.charactersService.isVisibleToOwner(
       characterId,
       ownerId,
     );
     if (!isVisible) {
-      throw new NotFoundException('该角色当前不可见');
+      throw new AppError('FARM_CHARACTER_NOT_VISIBLE', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '该角色当前不可见',
+      });
     }
     const npc = await this.npcRepo.findOneBy({ characterId });
     if (!npc) {
-      throw new NotFoundException('该角色还没有农场');
+      throw new AppError('FARM_NPC_NO_FARM', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '该角色还没有农场',
+      });
     }
     const npcPlots = ensurePlotsArray(npc.plotsPayload, npc.plotCount).map((p) => ({ ...p }));
     const plot = npcPlots[plotIndex];
-    if (!plot) throw new NotFoundException('田块不存在');
+    if (!plot) {
+      throw new AppError('FARM_PLOT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '田块不存在',
+      });
+    }
     if (
       !plot.cropId ||
       plot.maturedAt == null ||
       Date.now() < plot.maturedAt
     ) {
-      throw new BadRequestException('该作物还没成熟');
+      throw new AppError('FARM_CROP_NOT_RIPE', {
+        legacyMessage: '该作物还没成熟',
+      });
     }
     if ((plot.stolenBy ?? []).includes(FARM_PLAYER_ACTOR_ID)) {
-      throw new BadRequestException('你已经偷过这块田了');
+      throw new AppError('FARM_ALREADY_STOLEN', {
+        legacyMessage: '你已经偷过这块田了',
+      });
     }
 
     const player = await this.getOrCreatePlayerState(ownerId);
@@ -520,17 +593,38 @@ export class FarmStateService {
     const state = await this.getOrCreatePlayerState(ownerId);
     const plots = ensurePlotsArray(state.plotsPayload, state.plotCount).map((p) => ({ ...p }));
     const plot = plots[plotIndex];
-    if (!plot) throw new NotFoundException('田块不存在');
-    if (!plot.cropId) throw new BadRequestException('该田块没有作物');
+    if (!plot) {
+      throw new AppError('FARM_PLOT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '田块不存在',
+      });
+    }
+    if (!plot.cropId) {
+      throw new AppError('FARM_PLOT_EMPTY', {
+        legacyMessage: '该田块没有作物',
+      });
+    }
 
     if (action === 'water') {
-      if (plot.watered) throw new BadRequestException('该田块今日已浇过水');
+      if (plot.watered) {
+        throw new AppError('FARM_ALREADY_WATERED', {
+          legacyMessage: '该田块今日已浇过水',
+        });
+      }
       plot.watered = true;
     } else if (action === 'weed') {
-      if (plot.weeds <= 0) throw new BadRequestException('该田块没有杂草');
+      if (plot.weeds <= 0) {
+        throw new AppError('FARM_NO_WEEDS', {
+          legacyMessage: '该田块没有杂草',
+        });
+      }
       plot.weeds = 0;
     } else if (action === 'debug') {
-      if (plot.bugs <= 0) throw new BadRequestException('该田块没有害虫');
+      if (plot.bugs <= 0) {
+        throw new AppError('FARM_NO_BUGS', {
+          legacyMessage: '该田块没有害虫',
+        });
+      }
       plot.bugs = 0;
     }
 
@@ -622,3 +716,4 @@ function rollYield([lo, hi]: [number, number]): number {
   if (lo >= hi) return lo;
   return lo + Math.floor(Math.random() * (hi - lo + 1));
 }
+// i18n-ignore-end

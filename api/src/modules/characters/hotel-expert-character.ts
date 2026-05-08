@@ -2,6 +2,7 @@ import type { CharacterEntity } from './character.entity';
 import { DEFAULT_CHARACTER_BIOS } from './character-bios';
 import { getCharacterAvatarBySourceKey } from './character-avatar-assets';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const HOTEL_EXPERT_CHARACTER_ID = 'char-default-hotel-expert';
 export const HOTEL_EXPERT_SOURCE_KEY = 'hotel_expert';
 
@@ -341,3 +342,4 @@ export function buildHotelExpertCharacter(): Partial<CharacterEntity> {
     currentStatus: '在前厅值班，先帮你把这家酒店看明白。',
   };
 }
+// i18n-ignore-end

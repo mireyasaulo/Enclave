@@ -1,6 +1,10 @@
 import { type ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Video } from "lucide-react";
 import { cn } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 
 type DigitalHumanStageProps = {
   variant: "mobile" | "desktop";
@@ -55,7 +59,7 @@ export function DigitalHumanStage({
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-[#34d399]/20 bg-[#34d399]/10 px-3 py-1 text-[11px] font-medium tracking-[0.12em] text-[#bbf7d0]">
               <Video size={13} />
-              数字人舞台
+              {t(msg`数字人舞台`)}
             </div>
             <div
               className={cn(
@@ -73,7 +77,7 @@ export function DigitalHumanStage({
             )}
           >
             <div className="text-[11px] uppercase tracking-[0.18em] text-white/38">
-              状态
+              {t(msg`状态`)}
             </div>
             <div className="mt-1 text-sm font-medium text-[#bbf7d0]">
               {statusLabel}
@@ -125,7 +129,11 @@ export function DigitalHumanStage({
                 ))}
               </div>
               <span className="text-sm text-white/76">
-                {talking ? "数字人播报中" : thinking ? "数字人整理中" : "数字人在线"}
+                {talking
+                  ? t(msg`数字人播报中`)
+                  : thinking
+                    ? t(msg`数字人整理中`)
+                    : t(msg`数字人在线`)}
               </span>
               {providerLabel ? (
                 <span className="rounded-full border border-white/10 bg-white/6 px-2 py-0.5 text-[11px] text-white/56">
@@ -138,7 +146,7 @@ export function DigitalHumanStage({
 
         <div className="rounded-[22px] border border-white/8 bg-white/6 px-4 py-3">
           <div className="text-[11px] uppercase tracking-[0.18em] text-white/38">
-            通话提示
+            {t(msg`通话提示`)}
           </div>
           <div className="mt-1 text-[13px] leading-6 text-white/72">
             {statusHint}

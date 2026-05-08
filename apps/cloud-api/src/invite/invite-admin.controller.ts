@@ -2,6 +2,7 @@ import { Body, Controller, Get, NotFoundException, Param, Post, Query, Req, UseG
 import type { InviteRedemptionListResponse } from "@yinjie/contracts";
 import { AdminGuard, type AdminRequest } from "../auth/admin.guard";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   ListInviteRedemptionsDto,
   RejectInviteRedemptionDto,
 } from "../http-dto/cloud-api.dto";
@@ -38,3 +39,4 @@ export class InviteAdminController {
     return { success: true as const };
   }
 }
+// i18n-ignore-end

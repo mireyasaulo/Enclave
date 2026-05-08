@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   type Dispatch,
   type SetStateAction,
@@ -12,12 +13,14 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import { msg } from "@lingui/macro";
 import type {
   AdminCreateGameCatalogRequest,
   AdminGameCatalogDetail,
   AdminGameCatalogItem,
   AdminUpdateGameCatalogRequest,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   Button,
   Card,
@@ -74,15 +77,15 @@ type GameWorkbenchDraft = {
   sortOrder: string;
 };
 
-const CATEGORY_OPTIONS: Array<{
+const CATEGORY_OPTION_MESSAGES: Array<{
   value: AdminGameCatalogItem["category"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "featured", label: "推荐" },
-  { value: "party", label: "聚会" },
-  { value: "competitive", label: "竞技" },
-  { value: "relax", label: "休闲" },
-  { value: "strategy", label: "经营" },
+  { value: "featured", label: msg`推荐` },
+  { value: "party", label: msg`聚会` },
+  { value: "competitive", label: msg`竞技` },
+  { value: "relax", label: msg`休闲` },
+  { value: "strategy", label: msg`经营` },
 ];
 
 const TONE_OPTIONS: Array<{
@@ -97,54 +100,54 @@ const TONE_OPTIONS: Array<{
   { value: "mint", label: "Mint" },
 ];
 
-const PUBLISHER_OPTIONS: Array<{
+const PUBLISHER_OPTION_MESSAGES: Array<{
   value: AdminGameCatalogItem["publisherKind"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "platform_official", label: "官方出品" },
-  { value: "third_party", label: "第三方上传" },
-  { value: "character_creator", label: "角色出品" },
+  { value: "platform_official", label: msg`官方出品` },
+  { value: "third_party", label: msg`第三方上传` },
+  { value: "character_creator", label: msg`角色出品` },
 ];
 
-const PRODUCTION_OPTIONS: Array<{
+const PRODUCTION_OPTION_MESSAGES: Array<{
   value: AdminGameCatalogItem["productionKind"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "human_authored", label: "人工制作" },
-  { value: "ai_assisted", label: "AI 辅助" },
-  { value: "ai_generated", label: "AI 生成" },
-  { value: "character_generated", label: "角色生成" },
+  { value: "human_authored", label: msg`人工制作` },
+  { value: "ai_assisted", label: msg`AI 辅助` },
+  { value: "ai_generated", label: msg`AI 生成` },
+  { value: "character_generated", label: msg`角色生成` },
 ];
 
-const RUNTIME_OPTIONS: Array<{
+const RUNTIME_OPTION_MESSAGES: Array<{
   value: AdminGameCatalogItem["runtimeMode"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "workspace_mock", label: "工作区占位" },
-  { value: "chat_native", label: "聊天式 AI 游戏" },
-  { value: "embedded_web", label: "嵌入式 Web" },
-  { value: "remote_session", label: "远程会话" },
+  { value: "workspace_mock", label: msg`工作区占位` },
+  { value: "chat_native", label: msg`聊天式 AI 游戏` },
+  { value: "embedded_web", label: msg`嵌入式 Web` },
+  { value: "remote_session", label: msg`远程会话` },
 ];
 
-const REVIEW_OPTIONS: Array<{
+const REVIEW_OPTION_MESSAGES: Array<{
   value: AdminGameCatalogItem["reviewStatus"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "internal_seed", label: "内部种子" },
-  { value: "pending_review", label: "待审核" },
-  { value: "approved", label: "已通过" },
-  { value: "rejected", label: "已拒绝" },
-  { value: "suspended", label: "已暂停" },
+  { value: "internal_seed", label: msg`内部种子` },
+  { value: "pending_review", label: msg`待审核` },
+  { value: "approved", label: msg`已通过` },
+  { value: "rejected", label: msg`已拒绝` },
+  { value: "suspended", label: msg`已暂停` },
 ];
 
-const VISIBILITY_OPTIONS: Array<{
+const VISIBILITY_OPTION_MESSAGES: Array<{
   value: AdminGameCatalogItem["visibilityScope"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "featured", label: "主推可见" },
-  { value: "published", label: "正式发布" },
-  { value: "coming_soon", label: "即将上线" },
-  { value: "internal", label: "内部可见" },
+  { value: "featured", label: msg`主推可见` },
+  { value: "published", label: msg`正式发布` },
+  { value: "coming_soon", label: msg`即将上线` },
+  { value: "internal", label: msg`内部可见` },
 ];
 
 function createEmptyDraft(indexHint = 1): GameWorkbenchDraft {
@@ -287,6 +290,7 @@ type QuickViewFilter =
   | "character";
 
 export function GamesPage() {
+  const t = translateRuntimeMessage;
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [sourceFilter, setSourceFilter] = useState<
@@ -423,16 +427,16 @@ export function GamesPage() {
   const activeSummary = useMemo(() => {
     if (isCreating) {
       return {
-        title: draft.name.trim() || "未命名新草稿",
+        title: draft.name.trim() || t(msg`未命名新草稿`),
         description:
-          "先补齐最小目录资料，再切到发布版本或策展区安排前台曝光。",
+          t(msg`先补齐最小目录资料，再切到发布版本或策展区安排前台曝光。`),
       };
     }
 
     if (!selectedGame) {
       return {
-        title: "尚未选中目录项",
-        description: "从左侧选择一个游戏后，这里会展示编辑、发布和运营摘要。",
+        title: t(msg`尚未选中目录项`),
+        description: t(msg`从左侧选择一个游戏后，这里会展示编辑、发布和运营摘要。`),
       };
     }
 
@@ -458,7 +462,7 @@ export function GamesPage() {
       setBaselineDraft(nextDraft);
       setFeedback({
         tone: "success",
-        message: `${game.name} 已加入 AI 游戏目录。`,
+        message: t(msg`${game.name} 已加入 AI 游戏目录。`),
       });
     },
   });
@@ -476,7 +480,7 @@ export function GamesPage() {
       setBaselineDraft(nextDraft);
       setFeedback({
         tone: "success",
-        message: `${game.name} 的目录资料已更新。`,
+        message: t(msg`${game.name} 的目录资料已更新。`),
       });
     },
   });
@@ -505,7 +509,7 @@ export function GamesPage() {
       if (!selectedGameId) {
         setFeedback({
           tone: "info",
-          message: "请先选择一款游戏，或新建一个目录草稿。",
+          message: t(msg`请先选择一款游戏，或新建一个目录草稿。`),
         });
         return;
       }
@@ -518,7 +522,7 @@ export function GamesPage() {
       setFeedback({
         tone: "info",
         message:
-          error instanceof Error ? error.message : "保存游戏目录失败，请稍后重试。",
+          error instanceof Error ? error.message : t(msg`保存游戏目录失败，请稍后重试。`),
       });
     }
   }
@@ -531,35 +535,35 @@ export function GamesPage() {
     label: string;
     count: number;
   }> = [
-    { key: "all", label: "全部目录", count: metrics.total },
+    { key: "all", label: t(msg`全部目录`), count: metrics.total },
     {
       key: "action_required",
-      label: "待处理",
+      label: t(msg`待处理`),
       count: (gamesQuery.data ?? []).filter(isGameActionRequired).length,
     },
-    { key: "pending_review", label: "待审核", count: metrics.pending },
-    { key: "unpublished", label: "待发布", count: metrics.unpublished },
-    { key: "official", label: "官方出品", count: metrics.official },
-    { key: "character", label: "角色出品", count: metrics.character },
+    { key: "pending_review", label: t(msg`待审核`), count: metrics.pending },
+    { key: "unpublished", label: t(msg`待发布`), count: metrics.unpublished },
+    { key: "official", label: t(msg`官方出品`), count: metrics.official },
+    { key: "character", label: t(msg`角色出品`), count: metrics.character },
   ];
 
   return (
     <div className="space-y-6">
-      {gamesQuery.isLoading ? <LoadingBlock label="正在加载 AI 游戏目录..." /> : null}
+      {gamesQuery.isLoading ? <LoadingBlock label={t(msg`正在加载 AI 游戏目录...`)} /> : null}
       {gamesQuery.isError && gamesQuery.error instanceof Error ? (
         <ErrorBlock message={gamesQuery.error.message} />
       ) : null}
 
       <AdminPageHero
         eyebrow="Game Catalog Ops"
-        title="AI 游戏目录工作台"
-        description="先看目录盘面，再处理待审核、待发布和前台编排。目录编辑、版本发布、首页策展和投稿入库拆成独立工作区，方便运营连续处理。"
+        title={t(msg`AI 游戏目录工作台`)}
+        description={t(msg`先看目录盘面，再处理待审核、待发布和前台编排。目录编辑、版本发布、首页策展和投稿入库拆成独立工作区，方便运营连续处理。`)}
         badges={[
-          `${filteredMetrics.visible}/${metrics.total} 条目录已进入当前视图`,
-          metrics.pending > 0 ? `${metrics.pending} 款待审核` : "审核队列已清空",
+          t(msg`${filteredMetrics.visible}/${metrics.total} 条目录已进入当前视图`),
+          metrics.pending > 0 ? t(msg`${metrics.pending} 款待审核`) : t(msg`审核队列已清空`),
           metrics.unpublished > 0
-            ? `${metrics.unpublished} 款有未发布修改`
-            : "当前目录已基本同步正式版本",
+            ? t(msg`${metrics.unpublished} 款有未发布修改`)
+            : t(msg`当前目录已基本同步正式版本`),
           activeSummary.title,
         ]}
         actions={
@@ -568,18 +572,18 @@ export function GamesPage() {
               variant="secondary"
               onClick={() => setWorkspaceTab("submissions")}
             >
-              去投稿入库
+              {t(msg`去投稿入库`)}
             </Button>
             <Button variant="primary" onClick={handleStartCreate}>
-              新建游戏草稿
+              {t(msg`新建游戏草稿`)}
             </Button>
           </>
         }
         metrics={[
-          { label: "目录总数", value: String(metrics.total) },
-          { label: "待审核", value: String(metrics.pending) },
-          { label: "待发布修改", value: String(metrics.unpublished) },
-          { label: "正式可见", value: String(metrics.published) },
+          { label: t(msg`目录总数`), value: String(metrics.total) },
+          { label: t(msg`待审核`), value: String(metrics.pending) },
+          { label: t(msg`待发布修改`), value: String(metrics.unpublished) },
+          { label: t(msg`正式可见`), value: String(metrics.published) },
         ]}
       />
 
@@ -587,10 +591,10 @@ export function GamesPage() {
 
       <AdminTabs
         tabs={[
-          { key: "catalog", label: "目录管理" },
-          { key: "release", label: "发布版本" },
-          { key: "curation", label: "首页策展" },
-          { key: "submissions", label: "投稿入库" },
+          { key: "catalog", label: t(msg`目录管理`) },
+          { key: "release", label: t(msg`发布版本`) },
+          { key: "curation", label: t(msg`首页策展`) },
+          { key: "submissions", label: t(msg`投稿入库`) },
         ]}
         activeKey={workspaceTab}
         onChange={(key) => setWorkspaceTab(key as GamesWorkspaceTab)}
@@ -606,16 +610,16 @@ export function GamesPage() {
                     Queue View
                   </div>
                   <div className="mt-2 text-xl font-semibold text-[color:var(--text-primary)]">
-                    运营目录队列
+                    {t(msg`运营目录队列`)}
                   </div>
                   <div className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
-                    先筛出待处理目录，再进入右侧编辑或发布工作区。列表按待审核、待发布和更新时间排序。
+                    {t(msg`先筛出待处理目录，再进入右侧编辑或发布工作区。列表按待审核、待发布和更新时间排序。`)}
                   </div>
                 </div>
                 <StatusPill tone={filteredMetrics.actionRequired > 0 ? "warning" : "healthy"}>
                   {filteredMetrics.actionRequired > 0
-                    ? `${filteredMetrics.actionRequired} 项待处理`
-                    : "当前无阻塞项"}
+                    ? t(msg`${filteredMetrics.actionRequired} 项待处理`)
+                    : t(msg`当前无阻塞项`)}
                 </StatusPill>
               </div>
 
@@ -623,7 +627,7 @@ export function GamesPage() {
                 <TextField
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="搜索游戏名、工作室、角色出品人或 AI 标签"
+                  placeholder={t(msg`搜索游戏名、工作室、角色出品人或 AI 标签`)}
                 />
                 <div className="grid gap-3 md:grid-cols-2">
                   <SelectField
@@ -636,10 +640,10 @@ export function GamesPage() {
                       )
                     }
                   >
-                    <option value="all">全部来源</option>
-                    {PUBLISHER_OPTIONS.map((option) => (
+                    <option value="all">{t(msg`全部来源`)}</option>
+                    {PUBLISHER_OPTION_MESSAGES.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {t(option.label)}
                       </option>
                     ))}
                   </SelectField>
@@ -653,10 +657,10 @@ export function GamesPage() {
                       )
                     }
                   >
-                    <option value="all">全部审核</option>
-                    {REVIEW_OPTIONS.map((option) => (
+                    <option value="all">{t(msg`全部审核`)}</option>
+                    {REVIEW_OPTION_MESSAGES.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {t(option.label)}
                       </option>
                     ))}
                   </SelectField>
@@ -677,7 +681,7 @@ export function GamesPage() {
                         {filter.label}
                       </div>
                       <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                        {filter.count} 项
+                        {t(msg`${filter.count} 项`)}
                       </div>
                     </button>
                   ))}
@@ -686,11 +690,11 @@ export function GamesPage() {
             </Card>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <MetricCard label="当前视图" value={String(filteredMetrics.visible)} />
-              <MetricCard label="待审核" value={String(filteredMetrics.pending)} />
-              <MetricCard label="待发布" value={String(filteredMetrics.unpublished)} />
+              <MetricCard label={t(msg`当前视图`)} value={String(filteredMetrics.visible)} />
+              <MetricCard label={t(msg`待审核`)} value={String(filteredMetrics.pending)} />
+              <MetricCard label={t(msg`待发布`)} value={String(filteredMetrics.unpublished)} />
               <MetricCard
-                label="需关注"
+                label={t(msg`需关注`)}
                 value={String(filteredMetrics.actionRequired)}
               />
             </div>
@@ -699,13 +703,13 @@ export function GamesPage() {
               tone={filteredMetrics.actionRequired > 0 ? "warning" : "success"}
               title={
                 filteredMetrics.actionRequired > 0
-                  ? "目录队列里还有待推进事项"
-                  : "当前视图内的目录状态比较稳定"
+                  ? t(msg`目录队列里还有待推进事项`)
+                  : t(msg`当前视图内的目录状态比较稳定`)
               }
               description={
                 filteredMetrics.actionRequired > 0
-                  ? `优先处理 ${filteredMetrics.pending} 个待审核目录，再发布 ${filteredMetrics.unpublished} 个未同步正式版本的修改。`
-                  : "可以继续做新建草稿、版本发布，或切到策展区安排前台曝光。"
+                  ? t(msg`优先处理 ${filteredMetrics.pending} 个待审核目录，再发布 ${filteredMetrics.unpublished} 个未同步正式版本的修改。`)
+                  : t(msg`可以继续做新建草稿、版本发布，或切到策展区安排前台曝光。`)
               }
               actions={
                 <>
@@ -713,13 +717,13 @@ export function GamesPage() {
                     variant="secondary"
                     onClick={() => setQuickFilter("pending_review")}
                   >
-                    查看待审核
+                    {t(msg`查看待审核`)}
                   </Button>
                   <Button
                     variant="secondary"
                     onClick={() => setQuickFilter("unpublished")}
                   >
-                    查看待发布
+                    {t(msg`查看待发布`)}
                   </Button>
                 </>
               }
@@ -727,8 +731,8 @@ export function GamesPage() {
 
             {!gamesQuery.isLoading && !filteredGames.length ? (
               <AdminEmptyState
-                title="当前筛选下没有游戏"
-                description="调整关键词、来源、审核状态或快捷视图后，再继续查看目录。"
+                title={t(msg`当前筛选下没有游戏`)}
+                description={t(msg`调整关键词、来源、审核状态或快捷视图后，再继续查看目录。`)}
               />
             ) : (
               <div className="max-h-[calc(100vh-15rem)] space-y-3 overflow-y-auto pr-1">
@@ -765,7 +769,7 @@ export function GamesPage() {
                     <AdminDraftStatusPill
                       ready={isCreating || Boolean(selectedGame)}
                       dirty={isCreating || Boolean(selectedGame) ? isDraftDirty : false}
-                      loadingLabel="等待选择"
+                      loadingLabel={t(msg`等待选择`)}
                     />
                     {selectedGame ? (
                       <>
@@ -776,11 +780,11 @@ export function GamesPage() {
                           {formatReviewStatus(selectedGame.reviewStatus)}
                         </StatusPill>
                         {selectedGame.hasUnpublishedChanges ? (
-                          <StatusPill tone="warning">待发布</StatusPill>
+                          <StatusPill tone="warning">{t(msg`待发布`)}</StatusPill>
                         ) : null}
                       </>
                     ) : null}
-                    {isCreating ? <StatusPill tone="muted">新草稿</StatusPill> : null}
+                    {isCreating ? <StatusPill tone="muted">{t(msg`新草稿`)}</StatusPill> : null}
                   </div>
                   <div className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
                     {activeSummary.description}
@@ -792,7 +796,7 @@ export function GamesPage() {
                       variant="secondary"
                       onClick={() => setWorkspaceTab("release")}
                     >
-                      去版本发布
+                      {t(msg`去版本发布`)}
                     </Button>
                   ) : null}
                   {workspaceTab === "release" ? (
@@ -800,12 +804,12 @@ export function GamesPage() {
                       variant="secondary"
                       onClick={() => setWorkspaceTab("catalog")}
                     >
-                      返回目录编辑
+                      {t(msg`返回目录编辑`)}
                     </Button>
                   ) : null}
                   {!isCreating ? (
                     <Button variant="secondary" onClick={handleStartCreate}>
-                      新开草稿
+                      {t(msg`新开草稿`)}
                     </Button>
                   ) : null}
                   {workspaceTab === "catalog" ? (
@@ -815,10 +819,10 @@ export function GamesPage() {
                       disabled={editorBusy}
                     >
                       {createMutation.isPending || updateMutation.isPending
-                        ? "保存中..."
+                        ? t(msg`保存中...`)
                         : isCreating
-                          ? "创建草稿"
-                          : "保存修改"}
+                          ? t(msg`创建草稿`)
+                          : t(msg`保存修改`)}
                     </Button>
                   ) : null}
                 </div>
@@ -938,6 +942,7 @@ function CatalogEditorWorkspace({
   draftReady: boolean;
   isDraftDirty: boolean;
 }) {
+  const t = translateRuntimeMessage;
   if (selectedGameQuery.isError && selectedGameQuery.error instanceof Error) {
     return <ErrorBlock message={selectedGameQuery.error.message} />;
   }
@@ -1050,7 +1055,10 @@ function CatalogEditorWorkspace({
                   category: value as AdminGameCatalogItem["category"],
                 }))
               }
-              options={CATEGORY_OPTIONS}
+              options={CATEGORY_OPTION_MESSAGES.map((opt) => ({
+                value: opt.value,
+                label: translateRuntimeMessage(opt.label),
+              }))}
             />
             <EditorSelect
               label="Tone"
@@ -1130,7 +1138,10 @@ function CatalogEditorWorkspace({
                   publisherKind: value as AdminGameCatalogItem["publisherKind"],
                 }))
               }
-              options={PUBLISHER_OPTIONS}
+              options={PUBLISHER_OPTION_MESSAGES.map((opt) => ({
+                value: opt.value,
+                label: translateRuntimeMessage(opt.label),
+              }))}
             />
             <EditorSelect
               label="生产方式"
@@ -1141,7 +1152,10 @@ function CatalogEditorWorkspace({
                   productionKind: value as AdminGameCatalogItem["productionKind"],
                 }))
               }
-              options={PRODUCTION_OPTIONS}
+              options={PRODUCTION_OPTION_MESSAGES.map((opt) => ({
+                value: opt.value,
+                label: translateRuntimeMessage(opt.label),
+              }))}
             />
             <EditorSelect
               label="运行方式"
@@ -1152,7 +1166,10 @@ function CatalogEditorWorkspace({
                   runtimeMode: value as AdminGameCatalogItem["runtimeMode"],
                 }))
               }
-              options={RUNTIME_OPTIONS}
+              options={RUNTIME_OPTION_MESSAGES.map((opt) => ({
+                value: opt.value,
+                label: t(opt.label),
+              }))}
             />
             <EditorSelect
               label="审核状态"
@@ -1163,7 +1180,10 @@ function CatalogEditorWorkspace({
                   reviewStatus: value as AdminGameCatalogItem["reviewStatus"],
                 }))
               }
-              options={REVIEW_OPTIONS}
+              options={REVIEW_OPTION_MESSAGES.map((opt) => ({
+                value: opt.value,
+                label: translateRuntimeMessage(opt.label),
+              }))}
             />
             <EditorSelect
               label="可见性"
@@ -1174,7 +1194,10 @@ function CatalogEditorWorkspace({
                   visibilityScope: value as AdminGameCatalogItem["visibilityScope"],
                 }))
               }
-              options={VISIBILITY_OPTIONS}
+              options={VISIBILITY_OPTION_MESSAGES.map((opt) => ({
+                value: opt.value,
+                label: t(opt.label),
+              }))}
             />
             <EditorField
               label="排序权重"
@@ -1669,3 +1692,4 @@ function formatTime(value: string) {
     date.getHours(),
   ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
+// i18n-ignore-end

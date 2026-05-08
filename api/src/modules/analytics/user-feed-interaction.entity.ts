@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 @Entity('user_feed_interactions')
 export class UserFeedInteractionEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -23,3 +24,4 @@ export class UserFeedInteractionEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+// i18n-ignore-end

@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+
+const t = translateRuntimeMessage;
 import {
   getOfficialAccount,
   getOfficialAccountArticle,
@@ -234,14 +238,14 @@ export function OfficialAccountServiceThread({
       ? markArticleReadMutation.error.message
       : null);
   const desktopHeaderMeta = [
-    accountQuery.data?.isVerified ? "已认证" : null,
-    accountQuery.data?.isMuted ? "已免打扰" : null,
+    accountQuery.data?.isVerified ? t(msg`已认证`) : null,
+    accountQuery.data?.isMuted ? t(msg`已免打扰`) : null,
     accountQuery.data?.handle ? `@${accountQuery.data.handle}` : null,
   ].filter(Boolean);
   const mobileHeaderMeta = [
-    "服务号",
-    accountQuery.data?.isVerified ? "已认证" : null,
-    accountQuery.data?.isMuted ? "已免打扰" : null,
+    t(msg`服务号`),
+    accountQuery.data?.isVerified ? t(msg`已认证`) : null,
+    accountQuery.data?.isMuted ? t(msg`已免打扰`) : null,
   ].filter(Boolean);
 
   function handleOpenAccount(nextAccountId: string, articleId?: string) {
@@ -402,7 +406,7 @@ export function OfficialAccountServiceThread({
         {isDesktopMenuOpen ? (
           <button
             type="button"
-            aria-label="关闭服务号菜单"
+            aria-label={t(msg`关闭服务号菜单`)}
             onClick={() => setIsDesktopMenuOpen(false)}
             className="absolute inset-0 z-10 bg-transparent"
           />
@@ -417,14 +421,14 @@ export function OfficialAccountServiceThread({
                   size="icon"
                   className="h-8 w-8 shrink-0 rounded-full text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
                   onClick={handleCloseDesktopArticle}
-                  aria-label="返回消息"
+                  aria-label={t(msg`返回消息`)}
                 >
                   <ArrowLeft size={15} />
                 </Button>
               ) : null}
               <div className="min-w-0 flex-1">
                 <div className="truncate text-[15px] font-medium text-[color:var(--text-primary)]">
-                  {accountQuery.data?.name ?? "服务号消息"}
+                  {accountQuery.data?.name ?? t(msg`服务号消息`)}
                 </div>
                 {desktopHeaderMeta.length ? (
                   <div className="mt-0.5 truncate text-[10px] text-[color:var(--text-muted)]">
@@ -440,7 +444,7 @@ export function OfficialAccountServiceThread({
                 size="icon"
                 className="h-8 w-8 rounded-full text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
                 onClick={() => setIsDesktopMenuOpen((current) => !current)}
-                aria-label="打开服务号菜单"
+                aria-label={t(msg`打开服务号菜单`)}
               >
                 <MoreHorizontal size={16} />
               </Button>
@@ -455,7 +459,7 @@ export function OfficialAccountServiceThread({
                     className="flex w-full items-center gap-2 rounded-[12px] px-3 py-2 text-left text-[13px] text-[color:var(--text-primary)] transition hover:bg-[color:var(--surface-console)]"
                   >
                     <BookOpenText size={15} className="text-[color:var(--text-secondary)]" />
-                    <span>公众号主页</span>
+                    <span>{t(msg`公众号主页`)}</span>
                   </button>
                   <button
                     type="button"
@@ -463,7 +467,7 @@ export function OfficialAccountServiceThread({
                     className="flex w-full items-center gap-2 rounded-[12px] px-3 py-2 text-left text-[13px] text-[color:var(--text-primary)] transition hover:bg-[color:var(--surface-console)]"
                   >
                     <Smartphone size={15} className="text-[color:var(--text-secondary)]" />
-                    <span>到手机继续</span>
+                    <span>{t(msg`到手机继续`)}</span>
                   </button>
                   <button
                     type="button"
@@ -490,10 +494,10 @@ export function OfficialAccountServiceThread({
                     )}
                     <span>
                       {muteMutation.isPending
-                        ? "处理中..."
+                        ? t(msg`处理中...`)
                         : accountQuery.data?.isMuted
-                          ? "关闭免打扰"
-                          : "消息免打扰"}
+                          ? t(msg`关闭免打扰`)
+                          : t(msg`消息免打扰`)}
                     </span>
                   </button>
                 </div>
@@ -513,8 +517,8 @@ export function OfficialAccountServiceThread({
             <div className="min-h-full bg-white">
               {articleQuery.isLoading ? (
                 <ServiceDesktopStatusPane
-                  title="正在读取文章"
-                  description="稍等一下，正在同步正文内容。"
+                  title={t(msg`正在读取文章`)}
+                  description={t(msg`稍等一下，正在同步正文内容。`)}
                   tone="loading"
                 />
               ) : null}
@@ -522,7 +526,7 @@ export function OfficialAccountServiceThread({
               articleQuery.error instanceof Error &&
               !missingSelectedArticle ? (
                 <ServiceDesktopStatusPane
-                  title="文章暂时不可用"
+                  title={t(msg`文章暂时不可用`)}
                   description={articleQuery.error.message}
                   tone="danger"
                 />
@@ -541,8 +545,8 @@ export function OfficialAccountServiceThread({
                 />
               ) : !articleQuery.isLoading && !articleQuery.isError ? (
                 <ServiceDesktopStatusPane
-                  title="这篇文章暂时不可用"
-                  description="可以先返回服务号消息，稍后再试。"
+                  title={t(msg`这篇文章暂时不可用`)}
+                  description={t(msg`可以先返回服务号消息，稍后再试。`)}
                 />
               ) : null}
             </div>
@@ -550,14 +554,14 @@ export function OfficialAccountServiceThread({
             <div className="mx-auto flex min-h-full w-full max-w-[760px] flex-col px-4 py-8 sm:px-6 sm:py-10">
               {accountQuery.isLoading || messagesQuery.isLoading ? (
                 <ServiceThreadStatusPane
-                  title="正在读取服务号消息"
-                  description="稍等一下，正在同步通知和文章卡片。"
+                  title={t(msg`正在读取服务号消息`)}
+                  description={t(msg`稍等一下，正在同步通知和文章卡片。`)}
                   tone="loading"
                 />
               ) : null}
               {pageErrorMessage ? (
                 <ServiceThreadStatusPane
-                  title="服务号消息暂时不可用"
+                  title={t(msg`服务号消息暂时不可用`)}
                   description={pageErrorMessage}
                   tone="danger"
                 />
@@ -580,8 +584,8 @@ export function OfficialAccountServiceThread({
                 </div>
               ) : !messagesQuery.isLoading ? (
                 <ServiceThreadStatusPane
-                  title="还没有服务消息"
-                  description="关注服务号后，通知和文章卡片会出现在这里。"
+                  title={t(msg`还没有服务消息`)}
+                  description={t(msg`关注服务号后，通知和文章卡片会出现在这里。`)}
                 />
               ) : null}
             </div>
@@ -616,7 +620,7 @@ export function OfficialAccountServiceThread({
           </Button>
           <div className="min-w-0 flex-1">
             <div className="truncate text-[16px] font-medium text-[color:var(--text-primary)]">
-              {accountQuery.data?.name ?? "服务号消息"}
+              {accountQuery.data?.name ?? t(msg`服务号消息`)}
             </div>
             {mobileHeaderMeta.length ? (
               <div className="mt-0.5 truncate text-[10px] leading-[1rem] text-[color:var(--text-muted)]">
@@ -632,7 +636,7 @@ export function OfficialAccountServiceThread({
             onClick={() => {
               handleOpenAccount(accountId);
             }}
-            aria-label="查看公众号资料"
+            aria-label={t(msg`查看公众号资料`)}
           >
             <MoreHorizontal size={16} />
           </Button>
@@ -643,9 +647,9 @@ export function OfficialAccountServiceThread({
         {accountQuery.isLoading || messagesQuery.isLoading ? (
           <div className="mx-auto max-w-[24rem] px-3.5">
             <MobileOfficialStatusCard
-              badge="读取中"
-              title="正在读取服务号消息"
-              description="稍等一下，正在同步服务通知和文章入口。"
+              badge={t(msg`读取中`)}
+              title={t(msg`正在读取服务号消息`)}
+              description={t(msg`稍等一下，正在同步服务通知和文章入口。`)}
               tone="loading"
             />
           </div>
@@ -653,8 +657,8 @@ export function OfficialAccountServiceThread({
         {pageErrorMessage ? (
           <div className="mx-auto max-w-[24rem] px-3.5">
             <MobileOfficialStatusCard
-              badge="读取失败"
-              title="服务号消息暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`服务号消息暂时不可用`)}
               description={pageErrorMessage}
               tone="danger"
               action={
@@ -666,7 +670,7 @@ export function OfficialAccountServiceThread({
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleRetryPageData}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     type="button"
@@ -675,7 +679,7 @@ export function OfficialAccountServiceThread({
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? "返回上一页" : "查看公众号主页"}
+                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`查看公众号主页`)}
                   </Button>
                 </div>
               }
@@ -685,8 +689,8 @@ export function OfficialAccountServiceThread({
         {actionErrorMessage ? (
           <div className="mx-auto max-w-[24rem] px-3.5">
             <MobileOfficialStatusCard
-              badge="同步失败"
-              title="消息状态暂未同步"
+              badge={t(msg`同步失败`)}
+              title={t(msg`消息状态暂未同步`)}
               description={actionErrorMessage}
               tone="danger"
               action={
@@ -698,7 +702,7 @@ export function OfficialAccountServiceThread({
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleRetryActionSync}
                   >
-                    重试同步
+                    {t(msg`重试同步`)}
                   </Button>
                   <Button
                     type="button"
@@ -707,7 +711,7 @@ export function OfficialAccountServiceThread({
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? "返回上一页" : "查看公众号主页"}
+                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`查看公众号主页`)}
                   </Button>
                 </div>
               }
@@ -729,9 +733,9 @@ export function OfficialAccountServiceThread({
         ) : !messagesQuery.isLoading ? (
           <div className="mx-auto max-w-[24rem] px-3.5">
             <MobileOfficialStatusCard
-              badge="服务号"
-              title="还没有服务消息"
-              description="关注服务号后，通知和文章卡片会出现在这里。"
+              badge={t(msg`服务号`)}
+              title={t(msg`还没有服务消息`)}
+              description={t(msg`关注服务号后，通知和文章卡片会出现在这里。`)}
               action={
                 <Button
                   type="button"
@@ -740,7 +744,7 @@ export function OfficialAccountServiceThread({
                   className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                   onClick={handleStatusBack}
                 >
-                  {safeReturnPath ? "返回上一页" : "查看公众号主页"}
+                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`查看公众号主页`)}
                 </Button>
               }
             />
@@ -934,7 +938,7 @@ function MobileOfficialStatusCard({
 function isOfficialAccountArticleMissingError(error: unknown) {
   return (
     error instanceof Error &&
-    /文章不存在。?|official account article not found|article not found/i.test(
+    /文章不存在。?|official account article not found|article not found/i.test( // i18n-ignore-line
       error.message.trim(),
     )
   );

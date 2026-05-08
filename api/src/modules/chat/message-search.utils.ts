@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import type { GroupMessage, Message, MessageAttachment } from './chat.types';
 import {
   resolveAttachmentSearchableText,
@@ -281,3 +282,4 @@ function isMessageSearchCategory(
     value === 'links'
   );
 }
+// i18n-ignore-end

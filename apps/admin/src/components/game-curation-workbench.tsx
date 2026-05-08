@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { msg } from "@lingui/macro";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   AdminGameCatalogItem,
   AdminGameCenterCuration,
   AdminUpdateGameCenterCurationRequest,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   Button,
   Card,
@@ -82,23 +85,23 @@ const TONE_OPTIONS: Array<{
   { value: "mint", label: "Mint" },
 ];
 
-const EVENT_ACTION_OPTIONS: Array<{
+const EVENT_ACTION_OPTION_MESSAGES: Array<{
   value: EventDraft["actionKind"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "mission", label: "任务" },
-  { value: "reminder", label: "提醒" },
-  { value: "join", label: "召回" },
+  { value: "mission", label: msg`任务` },
+  { value: "reminder", label: msg`提醒` },
+  { value: "join", label: msg`召回` },
 ];
 
-const STORY_KIND_OPTIONS: Array<{
+const STORY_KIND_OPTION_MESSAGES: Array<{
   value: StoryDraft["kind"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "spotlight", label: "主推专题" },
-  { value: "guide", label: "攻略指南" },
-  { value: "update", label: "版本更新" },
-  { value: "behind_the_scenes", label: "幕后内容" },
+  { value: "spotlight", label: msg`主推专题` },
+  { value: "guide", label: msg`攻略指南` },
+  { value: "update", label: msg`版本更新` },
+  { value: "behind_the_scenes", label: msg`幕后内容` },
 ];
 
 function splitCommaLikeText(value: string) {
@@ -182,7 +185,7 @@ function createEmptyEventDraft(
     title: "",
     description: "",
     meta: "",
-    ctaLabel: "立即查看",
+    ctaLabel: translateRuntimeMessage(msg`立即查看`),
     relatedGameId: defaultGameId,
     actionKind: "mission",
     tone: "forest",
@@ -197,9 +200,9 @@ function createEmptyStoryDraft(
     id: `story-${indexHint}`,
     title: "",
     description: "",
-    eyebrow: "编辑精选",
-    authorName: "隐界编辑部",
-    ctaLabel: "查看内容",
+    eyebrow: translateRuntimeMessage(msg`编辑精选`),
+    authorName: translateRuntimeMessage(msg`隐界编辑部`),
+    ctaLabel: translateRuntimeMessage(msg`查看内容`),
     publishedAt: new Date().toISOString(),
     kind: "spotlight",
     tone: "forest",
@@ -311,11 +314,12 @@ function toCurationPayload(
 }
 
 function GameIdHints({ games }: { games: AdminGameCatalogItem[] }) {
+  const t = translateRuntimeMessage;
   if (!games.length) {
     return (
       <AdminEmptyState
-        title="目录还没有可引用的游戏"
-        description="先在上面的目录工作台里创建游戏，策展配置才能引用这些游戏 ID。"
+        title={t(msg`目录还没有可引用的游戏`)}
+        description={t(msg`先在上面的目录工作台里创建游戏，策展配置才能引用这些游戏 ID。`)}
       />
     );
   }
@@ -326,7 +330,7 @@ function GameIdHints({ games }: { games: AdminGameCatalogItem[] }) {
         Catalog Index
       </div>
       <div className="mt-2 text-base font-semibold text-[color:var(--text-primary)]">
-        当前可引用的游戏目录
+        {t(msg`当前可引用的游戏目录`)}
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         {games.map((game) => (
@@ -436,6 +440,7 @@ export function GameCurationWorkbench({
   games: AdminGameCatalogItem[];
   onFeedback: (feedback: FeedbackPayload) => void;
 }) {
+  const t = translateRuntimeMessage;
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState<CurationDraft>(() => createEmptyCurationDraft());
 
@@ -462,7 +467,7 @@ export function GameCurationWorkbench({
       setDraft(curationDraftFromResponse(curation));
       onFeedback({
         tone: "success",
-        message: "游戏中心首页策展配置已保存。",
+        message: t(msg`游戏中心首页策展配置已保存。`),
       });
     },
   });
@@ -480,7 +485,7 @@ export function GameCurationWorkbench({
     if (!games.length) {
       onFeedback({
         tone: "info",
-        message: "目录里还没有游戏，无法保存策展配置。",
+        message: t(msg`目录里还没有游戏，无法保存策展配置。`),
       });
       return;
     }
@@ -491,7 +496,7 @@ export function GameCurationWorkbench({
       onFeedback({
         tone: "info",
         message:
-          error instanceof Error ? error.message : "保存策展配置失败，请稍后重试。",
+          error instanceof Error ? error.message : t(msg`保存策展配置失败，请稍后重试。`),
       });
     }
   }
@@ -504,22 +509,22 @@ export function GameCurationWorkbench({
     setDraft(curationDraftFromResponse(curationQuery.data));
     onFeedback({
       tone: "info",
-      message: "策展草稿已恢复到当前线上配置。",
+      message: t(msg`策展草稿已恢复到当前线上配置。`),
     });
   }
 
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="主推位" value={String(metrics.featured)} />
-        <MetricCard label="发现货架" value={String(metrics.shelves)} />
-        <MetricCard label="活动卡" value={String(metrics.events)} />
-        <MetricCard label="内容卡" value={String(metrics.stories)} />
+        <MetricCard label={t(msg`主推位`)} value={String(metrics.featured)} />
+        <MetricCard label={t(msg`发现货架`)} value={String(metrics.shelves)} />
+        <MetricCard label={t(msg`活动卡`)} value={String(metrics.events)} />
+        <MetricCard label={t(msg`内容卡`)} value={String(metrics.stories)} />
       </div>
 
       <AdminCallout
-        title="首页运营位、榜单和内容卡已经收口到服务端策展配置"
-        description="这里维护的是游戏中心首页真实货架。前台首页、榜单、看内容会直接读取这份配置，不再写死在种子数据里。"
+        title={t(msg`首页运营位、榜单和内容卡已经收口到服务端策展配置`)}
+        description={t(msg`这里维护的是游戏中心首页真实货架。前台首页、榜单、看内容会直接读取这份配置，不再写死在种子数据里。`)}
         tone="info"
         actions={
           <div className="flex gap-2">
@@ -528,14 +533,14 @@ export function GameCurationWorkbench({
               onClick={handleReset}
               disabled={!curationQuery.data || saveMutation.isPending}
             >
-              恢复线上
+              {t(msg`恢复线上`)}
             </Button>
             <Button
               variant="primary"
               onClick={handleSave}
               disabled={saveMutation.isPending || curationQuery.isLoading}
             >
-              {saveMutation.isPending ? "保存中..." : "保存策展"}
+              {saveMutation.isPending ? t(msg`保存中...`) : t(msg`保存策展`)}
             </Button>
           </div>
         }
@@ -543,7 +548,7 @@ export function GameCurationWorkbench({
 
       <GameIdHints games={games} />
 
-      {curationQuery.isLoading ? <LoadingBlock label="正在加载游戏策展配置..." /> : null}
+      {curationQuery.isLoading ? <LoadingBlock label={t(msg`正在加载游戏策展配置...`)} /> : null}
       {curationQuery.isError && curationQuery.error instanceof Error ? (
         <ErrorBlock message={curationQuery.error.message} />
       ) : null}
@@ -552,12 +557,12 @@ export function GameCurationWorkbench({
         <div className="space-y-6">
           <Card className="bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(249,251,250,0.98))]">
             <SectionHeader
-              title="首页主推位"
-              description="按顺序填写首页首屏主推游戏 ID。使用换行或逗号分隔，保存后前台首屏和主推荐区都会同步更新。"
+              title={t(msg`首页主推位`)}
+              description={t(msg`按顺序填写首页首屏主推游戏 ID。使用换行或逗号分隔，保存后前台首屏和主推荐区都会同步更新。`)}
             />
             <div className="mt-5">
               <InlineEditorTextArea
-                label="主推游戏 ID 列表"
+                label={t(msg`主推游戏 ID 列表`)}
                 value={draft.featuredGameIdsText}
                 onChange={(value) =>
                   setDraft((current) => ({ ...current, featuredGameIdsText: value }))
@@ -571,8 +576,8 @@ export function GameCurationWorkbench({
           <div className="grid gap-6 xl:grid-cols-2">
             <Card className="bg-[color:var(--surface-console)]">
               <SectionHeader
-                title="发现货架"
-                description="定义首页和找游戏页里的主题货架，每个货架都可以承载一组游戏。"
+                title={t(msg`发现货架`)}
+                description={t(msg`定义首页和找游戏页里的主题货架，每个货架都可以承载一组游戏。`)}
                 action={
                   <Button
                     variant="secondary"
@@ -586,15 +591,15 @@ export function GameCurationWorkbench({
                       }))
                     }
                   >
-                    新增货架
+                    {t(msg`新增货架`)}
                   </Button>
                 }
               />
               <div className="mt-5 space-y-4">
                 {!draft.shelves.length ? (
                   <AdminEmptyState
-                    title="还没有货架"
-                    description="至少配置一组货架，找游戏页才会有可运营的主题模块。"
+                    title={t(msg`还没有货架`)}
+                    description={t(msg`至少配置一组货架，找游戏页才会有可运营的主题模块。`)}
                   />
                 ) : null}
 
@@ -605,7 +610,7 @@ export function GameCurationWorkbench({
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                        货架 {index + 1}
+                        {t(msg`货架 ${index + 1}`)}
                       </div>
                       <Button
                         variant="secondary"
@@ -616,13 +621,13 @@ export function GameCurationWorkbench({
                           }))
                         }
                       >
-                        删除
+                        {t(msg`删除`)}
                       </Button>
                     </div>
 
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <InlineEditorField
-                        label="货架 ID"
+                        label={t(msg`货架 ID`)}
                         value={shelf.id}
                         onChange={(value) =>
                           setDraft((current) => ({
@@ -635,7 +640,7 @@ export function GameCurationWorkbench({
                         }
                       />
                       <InlineEditorField
-                        label="货架标题"
+                        label={t(msg`货架标题`)}
                         value={shelf.title}
                         onChange={(value) =>
                           setDraft((current) => ({
@@ -651,7 +656,7 @@ export function GameCurationWorkbench({
 
                     <div className="mt-4">
                       <InlineEditorField
-                        label="货架描述"
+                        label={t(msg`货架描述`)}
                         value={shelf.description}
                         onChange={(value) =>
                           setDraft((current) => ({
@@ -667,7 +672,7 @@ export function GameCurationWorkbench({
 
                     <div className="mt-4">
                       <InlineEditorTextArea
-                        label="游戏 ID 列表"
+                        label={t(msg`游戏 ID 列表`)}
                         value={shelf.gameIdsText}
                         onChange={(value) =>
                           setDraft((current) => ({
@@ -688,8 +693,8 @@ export function GameCurationWorkbench({
 
             <Card className="bg-[color:var(--surface-console)]">
               <SectionHeader
-                title="热门榜"
-                description="配置榜单顺序、说明文案和每个排名对应的游戏。"
+                title={t(msg`热门榜`)}
+                description={t(msg`配置榜单顺序、说明文案和每个排名对应的游戏。`)}
                 action={
                   <Button
                     variant="secondary"
@@ -706,15 +711,15 @@ export function GameCurationWorkbench({
                       }))
                     }
                   >
-                    新增榜单项
+                    {t(msg`新增榜单项`)}
                   </Button>
                 }
               />
               <div className="mt-5 space-y-4">
                 {!draft.hotRankings.length ? (
                   <AdminEmptyState
-                    title="热门榜还没有内容"
-                    description="至少配置一条热门榜，前台榜单页才有主榜输出。"
+                    title={t(msg`热门榜还没有内容`)}
+                    description={t(msg`至少配置一条热门榜，前台榜单页才有主榜输出。`)}
                   />
                 ) : null}
 
@@ -725,7 +730,7 @@ export function GameCurationWorkbench({
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                        热门榜 #{index + 1}
+                        {t(msg`热门榜 #${index + 1}`)}
                       </div>
                       <Button
                         variant="secondary"
@@ -736,13 +741,13 @@ export function GameCurationWorkbench({
                           }))
                         }
                       >
-                        删除
+                        {t(msg`删除`)}
                       </Button>
                     </div>
 
                     <div className="mt-4 grid gap-4 md:grid-cols-[120px_1fr]">
                       <InlineEditorField
-                        label="排名"
+                        label={t(msg`排名`)}
                         value={entry.rank}
                         onChange={(value) =>
                           setDraft((current) => ({
@@ -760,7 +765,7 @@ export function GameCurationWorkbench({
                         type="number"
                       />
                       <label className="block">
-                        <FieldLabel>关联游戏</FieldLabel>
+                        <FieldLabel>{t(msg`关联游戏`)}</FieldLabel>
                         <SelectField
                           value={entry.gameId}
                           onChange={(event) =>
@@ -777,7 +782,7 @@ export function GameCurationWorkbench({
                             }))
                           }
                         >
-                          <option value="">请选择游戏</option>
+                          <option value="">{t(msg`请选择游戏`)}</option>
                           {games.map((game) => (
                             <option key={`hot-${game.id}`} value={game.id}>
                               {game.name} ({game.id})
@@ -789,7 +794,7 @@ export function GameCurationWorkbench({
 
                     <div className="mt-4">
                       <InlineEditorField
-                        label="榜单说明"
+                        label={t(msg`榜单说明`)}
                         value={entry.note}
                         onChange={(value) =>
                           setDraft((current) => ({
@@ -813,8 +818,8 @@ export function GameCurationWorkbench({
 
             <Card className="bg-[color:var(--surface-console)]">
               <SectionHeader
-                title="新游榜"
-                description="单独维护新游推荐顺位和话术，不和热门榜共享。"
+                title={t(msg`新游榜`)}
+                description={t(msg`单独维护新游推荐顺位和话术，不和热门榜共享。`)}
                 action={
                   <Button
                     variant="secondary"
@@ -831,15 +836,15 @@ export function GameCurationWorkbench({
                       }))
                     }
                   >
-                    新增榜单项
+                    {t(msg`新增榜单项`)}
                   </Button>
                 }
               />
               <div className="mt-5 space-y-4">
                 {!draft.newRankings.length ? (
                   <AdminEmptyState
-                    title="新游榜还没有内容"
-                    description="新游榜建议单独突出最近上线或正在试运营的 AI 游戏。"
+                    title={t(msg`新游榜还没有内容`)}
+                    description={t(msg`新游榜建议单独突出最近上线或正在试运营的 AI 游戏。`)}
                   />
                 ) : null}
 
@@ -850,7 +855,7 @@ export function GameCurationWorkbench({
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                        新游榜 #{index + 1}
+                        {t(msg`新游榜 #${index + 1}`)}
                       </div>
                       <Button
                         variant="secondary"
@@ -861,13 +866,13 @@ export function GameCurationWorkbench({
                           }))
                         }
                       >
-                        删除
+                        {t(msg`删除`)}
                       </Button>
                     </div>
 
                     <div className="mt-4 grid gap-4 md:grid-cols-[120px_1fr]">
                       <InlineEditorField
-                        label="排名"
+                        label={t(msg`排名`)}
                         value={entry.rank}
                         onChange={(value) =>
                           setDraft((current) => ({
@@ -885,7 +890,7 @@ export function GameCurationWorkbench({
                         type="number"
                       />
                       <label className="block">
-                        <FieldLabel>关联游戏</FieldLabel>
+                        <FieldLabel>{t(msg`关联游戏`)}</FieldLabel>
                         <SelectField
                           value={entry.gameId}
                           onChange={(event) =>
@@ -902,7 +907,7 @@ export function GameCurationWorkbench({
                             }))
                           }
                         >
-                          <option value="">请选择游戏</option>
+                          <option value="">{t(msg`请选择游戏`)}</option>
                           {games.map((game) => (
                             <option key={`new-${game.id}`} value={game.id}>
                               {game.name} ({game.id})
@@ -914,7 +919,7 @@ export function GameCurationWorkbench({
 
                     <div className="mt-4">
                       <InlineEditorField
-                        label="榜单说明"
+                        label={t(msg`榜单说明`)}
                         value={entry.note}
                         onChange={(value) =>
                           setDraft((current) => ({
@@ -938,8 +943,8 @@ export function GameCurationWorkbench({
 
             <Card className="bg-[color:var(--surface-console)]">
               <SectionHeader
-                title="活动卡"
-                description="用于首页活动位、任务召回和专题入口。"
+                title={t(msg`活动卡`)}
+                description={t(msg`用于首页活动位、任务召回和专题入口。`)}
                 action={
                   <Button
                     variant="secondary"
@@ -953,15 +958,15 @@ export function GameCurationWorkbench({
                       }))
                     }
                   >
-                    新增活动卡
+                    {t(msg`新增活动卡`)}
                   </Button>
                 }
               />
               <div className="mt-5 space-y-4">
                 {!draft.events.length ? (
                   <AdminEmptyState
-                    title="还没有活动卡"
-                    description="活动卡适合承接限时任务、活动提醒和回流召回。"
+                    title={t(msg`还没有活动卡`)}
+                    description={t(msg`活动卡适合承接限时任务、活动提醒和回流召回。`)}
                   />
                 ) : null}
 
@@ -972,7 +977,7 @@ export function GameCurationWorkbench({
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                        活动卡 {index + 1}
+                        {t(msg`活动卡 ${index + 1}`)}
                       </div>
                       <Button
                         variant="secondary"
@@ -983,13 +988,13 @@ export function GameCurationWorkbench({
                           }))
                         }
                       >
-                        删除
+                        {t(msg`删除`)}
                       </Button>
                     </div>
 
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <InlineEditorField
-                        label="活动 ID"
+                        label={t(msg`活动 ID`)}
                         value={event.id}
                         onChange={(value) =>
                           setDraft((current) => ({
@@ -1002,7 +1007,7 @@ export function GameCurationWorkbench({
                         }
                       />
                       <InlineEditorField
-                        label="活动标题"
+                        label={t(msg`活动标题`)}
                         value={event.title}
                         onChange={(value) =>
                           setDraft((current) => ({
@@ -1018,7 +1023,7 @@ export function GameCurationWorkbench({
 
                     <div className="mt-4">
                       <InlineEditorTextArea
-                        label="活动描述"
+                        label={t(msg`活动描述`)}
                         value={event.description}
                         onChange={(value) =>
                           setDraft((current) => ({
@@ -1034,7 +1039,7 @@ export function GameCurationWorkbench({
 
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <InlineEditorField
-                        label="Meta 文案"
+                        label={t(msg`Meta 文案`)}
                         value={event.meta}
                         onChange={(value) =>
                           setDraft((current) => ({
@@ -1063,7 +1068,7 @@ export function GameCurationWorkbench({
 
                     <div className="mt-4 grid gap-4 md:grid-cols-3">
                       <label className="block">
-                        <FieldLabel>关联游戏</FieldLabel>
+                        <FieldLabel>{t(msg`关联游戏`)}</FieldLabel>
                         <SelectField
                           value={event.relatedGameId}
                           onChange={(eventValue) =>
@@ -1076,7 +1081,7 @@ export function GameCurationWorkbench({
                             }))
                           }
                         >
-                          <option value="">请选择游戏</option>
+                          <option value="">{t(msg`请选择游戏`)}</option>
                           {games.map((game) => (
                             <option key={`event-${game.id}`} value={game.id}>
                               {game.name} ({game.id})
@@ -1085,7 +1090,7 @@ export function GameCurationWorkbench({
                         </SelectField>
                       </label>
                       <label className="block">
-                        <FieldLabel>动作类型</FieldLabel>
+                        <FieldLabel>{t(msg`动作类型`)}</FieldLabel>
                         <SelectField
                           value={event.actionKind}
                           onChange={(eventValue) =>
@@ -1099,9 +1104,9 @@ export function GameCurationWorkbench({
                             }))
                           }
                         >
-                          {EVENT_ACTION_OPTIONS.map((option) => (
+                          {EVENT_ACTION_OPTION_MESSAGES.map((option) => (
                             <option key={option.value} value={option.value}>
-                              {option.label}
+                              {t(option.label)}
                             </option>
                           ))}
                         </SelectField>
@@ -1137,8 +1142,8 @@ export function GameCurationWorkbench({
 
           <Card className="bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(249,250,252,0.98))]">
             <SectionHeader
-              title="内容卡"
-              description="维护“看内容”分栏里的攻略、更新、幕后专题等内容卡。"
+              title={t(msg`内容卡`)}
+              description={t(msg`维护"看内容"分栏里的攻略、更新、幕后专题等内容卡。`)}
               action={
                 <Button
                   variant="secondary"
@@ -1152,15 +1157,15 @@ export function GameCurationWorkbench({
                     }))
                   }
                 >
-                  新增内容卡
+                  {t(msg`新增内容卡`)}
                 </Button>
               }
             />
             <div className="mt-5 space-y-4">
               {!draft.stories.length ? (
                 <AdminEmptyState
-                  title="还没有内容卡"
-                  description="攻略、版本更新和幕后内容都可以通过这里进入游戏中心。"
+                  title={t(msg`还没有内容卡`)}
+                  description={t(msg`攻略、版本更新和幕后内容都可以通过这里进入游戏中心。`)}
                 />
               ) : null}
 
@@ -1171,7 +1176,7 @@ export function GameCurationWorkbench({
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                      内容卡 {index + 1}
+                      {t(msg`内容卡 ${index + 1}`)}
                     </div>
                     <Button
                       variant="secondary"
@@ -1182,13 +1187,13 @@ export function GameCurationWorkbench({
                         }))
                       }
                     >
-                      删除
+                      {t(msg`删除`)}
                     </Button>
                   </div>
 
                   <div className="mt-4 grid gap-4 md:grid-cols-2">
                     <InlineEditorField
-                      label="内容 ID"
+                      label={t(msg`内容 ID`)}
                       value={story.id}
                       onChange={(value) =>
                         setDraft((current) => ({
@@ -1201,7 +1206,7 @@ export function GameCurationWorkbench({
                       }
                     />
                     <InlineEditorField
-                      label="标题"
+                      label={t(msg`标题`)}
                       value={story.title}
                       onChange={(value) =>
                         setDraft((current) => ({
@@ -1217,7 +1222,7 @@ export function GameCurationWorkbench({
 
                   <div className="mt-4">
                     <InlineEditorTextArea
-                      label="摘要"
+                      label={t(msg`摘要`)}
                       value={story.description}
                       onChange={(value) =>
                         setDraft((current) => ({
@@ -1246,7 +1251,7 @@ export function GameCurationWorkbench({
                       }
                     />
                     <InlineEditorField
-                      label="作者"
+                      label={t(msg`作者`)}
                       value={story.authorName}
                       onChange={(value) =>
                         setDraft((current) => ({
@@ -1275,7 +1280,7 @@ export function GameCurationWorkbench({
 
                   <div className="mt-4 grid gap-4 md:grid-cols-4">
                     <label className="block">
-                      <FieldLabel>内容类型</FieldLabel>
+                      <FieldLabel>{t(msg`内容类型`)}</FieldLabel>
                       <SelectField
                         value={story.kind}
                         onChange={(event) =>
@@ -1288,9 +1293,9 @@ export function GameCurationWorkbench({
                           }))
                         }
                       >
-                        {STORY_KIND_OPTIONS.map((option) => (
+                        {STORY_KIND_OPTION_MESSAGES.map((option) => (
                           <option key={option.value} value={option.value}>
-                            {option.label}
+                            {t(option.label)}
                           </option>
                         ))}
                       </SelectField>
@@ -1318,7 +1323,7 @@ export function GameCurationWorkbench({
                       </SelectField>
                     </label>
                     <label className="block">
-                      <FieldLabel>发布时间</FieldLabel>
+                      <FieldLabel>{t(msg`发布时间`)}</FieldLabel>
                       <TextField
                         type="datetime-local"
                         value={toDateTimeLocalValue(story.publishedAt)}
@@ -1334,7 +1339,7 @@ export function GameCurationWorkbench({
                       />
                     </label>
                     <label className="block">
-                      <FieldLabel>关联游戏</FieldLabel>
+                      <FieldLabel>{t(msg`关联游戏`)}</FieldLabel>
                       <SelectField
                         value={story.relatedGameId}
                         onChange={(event) =>
@@ -1347,7 +1352,7 @@ export function GameCurationWorkbench({
                           }))
                         }
                       >
-                        <option value="">不关联具体游戏</option>
+                        <option value="">{t(msg`不关联具体游戏`)}</option>
                         {games.map((game) => (
                           <option key={`story-${game.id}`} value={game.id}>
                             {game.name} ({game.id})
@@ -1365,3 +1370,4 @@ export function GameCurationWorkbench({
     </div>
   );
 }
+// i18n-ignore-end

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type PlanSeed = {
   code: string;
   name: string;
@@ -137,3 +138,4 @@ export class SeedDefaultSubscriptionPlansAndConfigs1776652200000
     }
   }
 }
+// i18n-ignore-end

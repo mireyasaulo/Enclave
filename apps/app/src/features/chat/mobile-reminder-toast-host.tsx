@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { getConversations } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { BellRing, Check, ChevronRight, X } from "lucide-react";
 import { normalizePathname } from "../../lib/normalize-pathname";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
@@ -22,6 +24,8 @@ import {
 import { useMessageReminders } from "./use-message-reminders";
 import { useChatReminderEntries } from "./use-chat-reminder-entries";
 import { showLocalNotification } from "../../runtime/mobile-bridge";
+
+const t = translateRuntimeMessage;
 
 const EMPTY_CONVERSATIONS = Object.freeze([]);
 
@@ -212,7 +216,7 @@ export function MobileReminderToastHost() {
               type="button"
               onClick={clearLocalNotice}
               className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[#8c8c8c]"
-              aria-label="关闭提醒结果提示"
+              aria-label={t(msg`关闭提醒结果提示`)}
             >
               <X size={14} />
             </button>
@@ -229,11 +233,11 @@ export function MobileReminderToastHost() {
               <div className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2">
                   <div className="truncate text-[14px] font-medium text-[#111827]">
-                    消息提醒
+                    {t(msg`消息提醒`)}
                   </div>
                   {remainingCount > 0 ? (
                     <div className="shrink-0 rounded-full bg-[rgba(0,0,0,0.06)] px-2 py-0.5 text-[11px] text-[#5f6368]">
-                      还有 {remainingCount} 条
+                      {t(msg`还有 ${remainingCount} 条`)}
                     </div>
                   ) : null}
                 </div>
@@ -241,7 +245,7 @@ export function MobileReminderToastHost() {
                   type="button"
                   onClick={handleDismiss}
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[#8c8c8c]"
-                  aria-label="暂时关闭提醒浮条"
+                  aria-label={t(msg`暂时关闭提醒浮条`)}
                 >
                   <X size={15} />
                 </button>
@@ -283,7 +287,7 @@ export function MobileReminderToastHost() {
                     onClick={handleOpen}
                     className="inline-flex items-center gap-1 rounded-full bg-[#07c160] px-3 py-1.5 text-[12px] font-medium text-white"
                   >
-                    <span>查看</span>
+                    <span>{t(msg`查看`)}</span>
                     <ChevronRight size={13} />
                   </button>
                 </div>

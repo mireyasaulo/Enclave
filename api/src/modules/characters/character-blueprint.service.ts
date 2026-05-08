@@ -1,11 +1,9 @@
 import { randomUUID } from 'crypto';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CharacterBlueprintAiGenerationTraceValue,
   CharacterBlueprintRecipeValue,
   CharacterBlueprintSourceTypeValue,
@@ -738,7 +736,9 @@ export class CharacterBlueprintService {
     const character = await this.getCharacterOrThrow(characterId);
     const chatSample = input.chatSample?.trim();
     if (!chatSample) {
-      throw new BadRequestException('Chat sample is required');
+      throw new AppError('BLUEPRINT_CHAT_SAMPLE_REQUIRED', {
+        legacyMessage: 'Chat sample is required',
+      });
     }
 
     const personName =
@@ -873,7 +873,11 @@ export class CharacterBlueprintService {
       blueprintId: blueprint.id,
     });
     if (!revision) {
-      throw new NotFoundException(`Blueprint revision ${revisionId} not found`);
+      throw new AppError('BLUEPRINT_REVISION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { revisionId },
+        legacyMessage: `Blueprint revision ${revisionId} not found`,
+      });
     }
 
     blueprint.draftRecipe = cloneRecipe(revision.recipe);
@@ -896,7 +900,10 @@ export class CharacterBlueprintService {
   ): Promise<CharacterEntity> {
     const existingById = await this.characterRepo.findOneBy({ id: input.id });
     if (existingById) {
-      throw new BadRequestException(`Character ${input.id} already exists`);
+      throw new AppError('CHARACTER_ALREADY_EXISTS', {
+        params: { id: input.id },
+        legacyMessage: `Character ${input.id} already exists`,
+      });
     }
 
     if (input.sourceKey?.trim()) {
@@ -1032,7 +1039,11 @@ export class CharacterBlueprintService {
   private async getCharacterOrThrow(characterId: string) {
     const character = await this.characterRepo.findOneBy({ id: characterId });
     if (!character) {
-      throw new NotFoundException(`Character ${characterId} not found`);
+      throw new AppError('CHARACTER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id: characterId },
+        legacyMessage: `Character ${characterId} not found`,
+      });
     }
 
     return character;
@@ -1505,3 +1516,4 @@ export class CharacterBlueprintService {
     };
   }
 }
+// i18n-ignore-end

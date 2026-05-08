@@ -565,7 +565,7 @@ export function ChannelsPage() {
       setCommentDrafts({});
       setNoticeActionLabel(null);
       setNoticeAction(null);
-      setNotice("");
+      setNotice(""); // i18n-ignore-line
     }
 
     setDesktopSelectedPostId(routeSelectedPostId);
@@ -699,7 +699,7 @@ export function ChannelsPage() {
     }
 
     const timer = window.setTimeout(() => {
-      setNotice("");
+      setNotice(""); // i18n-ignore-line
       setNoticeActionLabel(null);
       setNoticeAction(null);
     }, 2400);

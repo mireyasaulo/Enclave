@@ -8,6 +8,7 @@ import { CyberAvatarProfileEntity } from './cyber-avatar-profile.entity';
 import { CyberAvatarSignalEntity } from './cyber-avatar-signal.entity';
 import { CyberAvatarRunEntity } from './cyber-avatar-run.entity';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CYBER_AVATAR_DEEP_REFRESH_CRON,
   CYBER_AVATAR_INCREMENTAL_SCAN_CRON,
   createEmptyCyberAvatarAggregation,
@@ -1331,3 +1332,4 @@ export class CyberAvatarService {
     return value.length > 0 ? value : fallback;
   }
 }
+// i18n-ignore-end

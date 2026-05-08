@@ -1,5 +1,5 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -11,6 +11,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import type { ChatBackgroundAsset } from './chat-background.types';
@@ -94,7 +95,9 @@ export class ChatBackgroundAssetsController {
     @Body() body: { width?: string; height?: string },
   ) {
     if (!file) {
-      throw new BadRequestException('请先选择一张背景图。');
+      throw new AppError('CHAT_BACKGROUND_NOT_SELECTED', {
+        legacyMessage: '请先选择一张背景图。',
+      });
     }
 
     return {
@@ -118,3 +121,4 @@ export class ChatBackgroundAssetsController {
     );
   }
 }
+// i18n-ignore-end

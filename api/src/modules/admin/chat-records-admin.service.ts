@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, In, MoreThanOrEqual, Repository } from 'typeorm';
 import { sanitizeAiText } from '../ai/ai-text-sanitizer';
@@ -7,6 +8,7 @@ import { AiUsageLedgerEntity } from '../analytics/ai-usage-ledger.entity';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { CharacterEntity } from '../characters/character.entity';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   describeAttachmentForDisplay,
   resolveMessageSemanticPreview,
 } from '../chat/attachment-semantic-text';
@@ -553,9 +555,11 @@ export class ChatRecordsAdminService {
       },
     );
     if (!conversationItems[0]) {
-      throw new NotFoundException(
-        `Conversation ${conversationId} could not be built`,
-      );
+      throw new AppError('ADMIN_CONVERSATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { conversationId },
+        legacyMessage: `Conversation ${conversationId} could not be built`,
+      });
     }
     return {
       conversation: conversationItems[0],
@@ -596,7 +600,11 @@ export class ChatRecordsAdminService {
         this.normalizeNonNegativeInteger(query.after, 24),
       );
       if (!aroundItems) {
-        throw new NotFoundException(`Message ${aroundMessageId} not found`);
+        throw new AppError('ADMIN_MESSAGE_NOT_FOUND', {
+          status: HttpStatus.NOT_FOUND,
+          params: { messageId: aroundMessageId },
+          legacyMessage: `Message ${aroundMessageId} not found`,
+        });
       }
 
       return {
@@ -891,7 +899,11 @@ export class ChatRecordsAdminService {
     });
 
     if (!conversation) {
-      throw new NotFoundException(`Conversation ${conversationId} not found`);
+      throw new AppError('ADMIN_CONVERSATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { conversationId },
+        legacyMessage: `Conversation ${conversationId} not found`,
+      });
     }
 
     return conversation;
@@ -1748,3 +1760,4 @@ export class ChatRecordsAdminService {
     return new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   }
 }
+// i18n-ignore-end

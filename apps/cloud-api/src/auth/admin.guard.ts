@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   resolveCloudAdminJwtAudience,
   resolveCloudAdminSecret,
   resolveCloudJwtIssuer,
@@ -85,3 +86,4 @@ export class AdminGuard implements CanActivate {
     return true;
   }
 }
+// i18n-ignore-end

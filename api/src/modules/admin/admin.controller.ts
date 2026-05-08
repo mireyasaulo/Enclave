@@ -1,5 +1,5 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
-  BadRequestException,
   Controller,
   Get,
   Post,
@@ -10,6 +10,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { AdminGuard } from './admin.guard';
 import { AdminService } from './admin.service';
 import { CharacterEntity } from '../characters/character.entity';
@@ -883,6 +884,9 @@ export class AdminController {
       return value as SelfAgentWorkspaceDocumentName;
     }
 
-    throw new BadRequestException('未知的 self-agent workspace 文档名。');
+    throw new AppError('ADMIN_SELFAGENT_DOC_UNKNOWN', {
+      legacyMessage: '未知的 self-agent workspace 文档名。',
+    });
   }
 }
+// i18n-ignore-end

@@ -31,7 +31,7 @@ async function copyTextToClipboard(text: string): Promise<boolean> {
 }
 
 const EMAIL_REGEX = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g;
-const WECHAT_REGEX = /(?:微信号|微信|wechat|WeChat|WECHAT)\s*[:：]?\s*([A-Za-z][A-Za-z0-9_-]{4,29})/g;
+const WECHAT_REGEX = /(?:微信号|微信|wechat|WeChat|WECHAT)\s*[:：]?\s*([A-Za-z][A-Za-z0-9_-]{4,29})/g; // i18n-ignore-line
 
 type ContactItem = {
   label: string;

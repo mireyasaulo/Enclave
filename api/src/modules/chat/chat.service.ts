@@ -2,13 +2,14 @@ import { mkdir, writeFile } from 'fs/promises';
 import { randomUUID } from 'crypto';
 import path from 'path';
 import {
-  BadRequestException,
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
+  HttpStatus,
   Inject,
   Injectable,
   Logger,
-  NotFoundException,
   forwardRef,
 } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, In, MoreThan, Repository } from 'typeorm';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
@@ -428,11 +429,17 @@ export class ChatService {
     });
 
     if (!message) {
-      throw new NotFoundException(`Message ${messageId} not found`);
+      throw new AppError('CHAT_MESSAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { messageId },
+        legacyMessage: `Message ${messageId} not found`,
+      });
     }
 
     if (message.senderType !== 'user' || message.senderId !== owner.id) {
-      throw new BadRequestException('只能撤回自己发送的消息。');
+      throw new AppError('CHAT_REVOKE_OWN_ONLY', {
+        legacyMessage: '只能撤回自己发送的消息。',
+      });
     }
 
     const recalled = await this.msgRepo.save({
@@ -471,7 +478,11 @@ export class ChatService {
     });
 
     if (!message) {
-      throw new NotFoundException(`Message ${messageId} not found`);
+      throw new AppError('CHAT_MESSAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { messageId },
+        legacyMessage: `Message ${messageId} not found`,
+      });
     }
 
     await this.msgRepo.delete({ id: message.id });
@@ -591,7 +602,11 @@ export class ChatService {
         options.after,
       );
       if (!window) {
-        throw new NotFoundException(`Message ${aroundMessageId} not found`);
+        throw new AppError('CHAT_MESSAGE_NOT_FOUND', {
+          status: HttpStatus.NOT_FOUND,
+          params: { messageId: aroundMessageId },
+          legacyMessage: `Message ${aroundMessageId} not found`,
+        });
       }
 
       return this.serializeMessages(window);
@@ -699,7 +714,10 @@ export class ChatService {
   normalizeAttachmentFileName(fileName: string): string {
     const normalized = path.basename(fileName).trim();
     if (!normalized) {
-      throw new NotFoundException('Attachment not found');
+      throw new AppError('CHAT_ATTACHMENT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Attachment not found',
+      });
     }
 
     return normalized;
@@ -912,7 +930,11 @@ export class ChatService {
     const charId = entity.participants[0];
     const profile = await this.characters.getProfile(charId);
     if (!profile) {
-      throw new Error(`Profile not found for ${charId}`);
+      throw new AppError('CHAT_PROFILE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { characterId: charId },
+        legacyMessage: `Profile not found for ${charId}`,
+      });
     }
     void this.cyberAvatar.captureSignal({
       ownerId: owner.id,
@@ -1439,7 +1461,11 @@ export class ChatService {
       ownerId: owner.id,
     });
     if (!entity) {
-      throw new NotFoundException(`Conversation ${convId} not found`);
+      throw new AppError('CHAT_CONVERSATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { conversationId: convId },
+        legacyMessage: `Conversation ${convId} not found`,
+      });
     }
 
     return this.normalizeLegacyConversationEntity(entity);
@@ -1868,7 +1894,10 @@ export class ChatService {
           stickerId: input.sticker.stickerId,
         });
       if (!attachment) {
-        throw new NotFoundException('Sticker not found');
+        throw new AppError('CHAT_STICKER_NOT_FOUND', {
+          status: HttpStatus.NOT_FOUND,
+          legacyMessage: 'Sticker not found',
+        });
       }
 
       const fallbackText =
@@ -1892,7 +1921,10 @@ export class ChatService {
       input.type === 'note_card'
     ) {
       if (!input.attachment || input.attachment.kind !== input.type) {
-        throw new NotFoundException('Attachment payload is invalid');
+        throw new AppError('CHAT_ATTACHMENT_PAYLOAD_INVALID', {
+          status: HttpStatus.NOT_FOUND,
+          legacyMessage: 'Attachment payload is invalid',
+        });
       }
       const attachment = input.attachment;
 
@@ -1910,7 +1942,10 @@ export class ChatService {
 
     const text = input.text.trim();
     if (!text) {
-      throw new NotFoundException('Message text is required');
+      throw new AppError('CHAT_MESSAGE_TEXT_REQUIRED', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Message text is required',
+      });
     }
 
     return {
@@ -2246,3 +2281,4 @@ function normalizeOptionalDimension(value?: number) {
 
   return Math.round(value);
 }
+// i18n-ignore-end

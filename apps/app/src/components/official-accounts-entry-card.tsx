@@ -1,6 +1,10 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { BookOpenText } from "lucide-react";
 import { OfficialMessageEntryRow } from "./official-message-entry-row";
 import { formatConversationTimestamp } from "../lib/format";
+
+const t = translateRuntimeMessage;
 
 export function OfficialAccountsEntryCard({
   unreadCount,
@@ -19,7 +23,7 @@ export function OfficialAccountsEntryCard({
     <OfficialMessageEntryRow
       variant="desktop"
       active={active}
-      title="公众号"
+      title={t(msg`公众号`)}
       preview={preview}
       timestampLabel={formatConversationTimestamp(lastActivityAt)}
       unreadCount={unreadCount}

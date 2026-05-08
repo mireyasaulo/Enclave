@@ -16,6 +16,7 @@ import { WaitingSessionSyncService } from "../world-access/waiting-session-sync.
 import { ensureUniqueActiveLifecycleJob } from "./world-lifecycle-job-queue";
 import { resolveSuggestedWorldAdminUrl, resolveSuggestedWorldApiBaseUrl } from "./world-bootstrap-config";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 @Injectable()
 export class WorldLifecycleWorkerService implements OnModuleInit, OnModuleDestroy {
   private static readonly DEFAULT_JOB_LEASE_SECONDS = 10 * 60;
@@ -1114,3 +1115,4 @@ export class WorldLifecycleWorkerService implements OnModuleInit, OnModuleDestro
     }
   }
 }
+// i18n-ignore-end

@@ -1,4 +1,5 @@
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CyberAvatarAggregationPayload,
   CyberAvatarInteractionPromptTemplates,
   CyberAvatarInteractionRules,
@@ -362,3 +363,4 @@ export function createEmptyCyberAvatarAggregation(): CyberAvatarAggregationPaylo
     earliestOccurredAt: null,
   };
 }
+// i18n-ignore-end

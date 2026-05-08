@@ -1118,7 +1118,7 @@ export function WaitingSessionSyncPage() {
 
           {focusedContextGroup ? (
             <div className="rounded-2xl border border-sky-300/40 bg-sky-50 px-4 py-3 text-sm text-sky-700">
-              <div className="font-medium">Focused context</div>
+              <div className="font-medium">{t("Focused context")}</div>
               <div className="mt-1 break-all font-mono text-xs">
                 {focusedContextGroup.context}
               </div>
@@ -1151,7 +1151,7 @@ export function WaitingSessionSyncPage() {
 
           {focusedTarget ? (
             <div className="rounded-2xl border border-emerald-300/40 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-              <div className="font-medium">Focused target</div>
+              <div className="font-medium">{t("Focused target")}</div>
               <div className="mt-1 break-all font-mono text-xs">
                 {focusedTarget.targetValue}
               </div>
@@ -1197,7 +1197,7 @@ export function WaitingSessionSyncPage() {
           <>
             {showReviewedContextSection ? (
               <section
-                aria-label="Context task review"
+                aria-label={t("Context task review")}
                 className="mt-5 rounded-[26px] border border-sky-300/30 bg-sky-50 p-5"
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -1353,7 +1353,7 @@ export function WaitingSessionSyncPage() {
                     {visibleHighlightedTaskReceipts.length > 0 ? (
                       <div
                         role="region"
-                        aria-label="Recent task receipts"
+                        aria-label={t("Recent task receipts")}
                         className="mt-4 rounded-2xl border border-sky-200/20 bg-[color:var(--surface-console)]/40 p-4"
                       >
                         <div className="flex flex-wrap items-start justify-between gap-3">

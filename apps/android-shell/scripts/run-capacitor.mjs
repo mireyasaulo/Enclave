@@ -604,15 +604,16 @@ function validateReleaseShellConfig(config) {
 }
 
 function updateCapacitorConfig(config) {
+  const previousConfig = readJson(capacitorConfigPath);
   const nextConfig = {
-    ...readJson(capacitorConfigPath),
+    ...previousConfig,
     appId: config.appId,
     appName: config.appName,
-    server: {
-      ...readJson(capacitorConfigPath).server,
-      androidScheme: config.allowCleartextTraffic ? "http" : "https",
-    },
   };
+
+  // androidScheme stays at the tracked value ("https"). Cleartext traffic for
+  // local dev is handled by the debug buildType via manifestPlaceholders, not
+  // by mutating tracked capacitor.config.json — see build.gradle.
 
   return writeTextFile(
     capacitorConfigPath,
@@ -660,9 +661,6 @@ function updateAndroidProjectConfig(config) {
   const namespace = config.appId;
   const xmlAppName = escapeXml(config.appName);
   const xmlAppId = escapeXml(config.appId);
-  const xmlAllowCleartextTraffic = config.allowCleartextTraffic
-    ? "true"
-    : "false";
 
   let buildGradle = readFileSync(androidBuildGradlePath, "utf8");
   buildGradle = replaceRequired(
@@ -690,25 +688,11 @@ function updateAndroidProjectConfig(config) {
     "android versionName",
   );
 
-  let manifest = readFileSync(androidManifestPath, "utf8");
-  if (/android:usesCleartextTraffic=".*?"/.test(manifest)) {
-    manifest = replaceRequired(
-      /android:usesCleartextTraffic=".*?"/,
-      `android:usesCleartextTraffic="${xmlAllowCleartextTraffic}"`,
-      manifest,
-      "android manifest usesCleartextTraffic",
-    );
-  } else {
-    manifest = replaceRequired(
-      /(<application[\s\S]*?android:allowBackup=".*?"\n)/,
-      `$1        android:usesCleartextTraffic="${xmlAllowCleartextTraffic}"\n`,
-      manifest,
-      "android manifest insert usesCleartextTraffic",
-    );
-  }
-  let changed =
-    writeTextFile(androidBuildGradlePath, buildGradle) ||
-    writeTextFile(androidManifestPath, manifest);
+  // Manifest cleartext is now controlled by manifestPlaceholders per buildType
+  // in build.gradle (debug=true, release=false). Tracked AndroidManifest.xml
+  // uses ${yinjieUsesCleartextTraffic}; configure no longer rewrites it.
+
+  let changed = writeTextFile(androidBuildGradlePath, buildGradle);
 
   for (const stringsPath of androidLocalizedStringsPaths) {
     if (!existsSync(stringsPath)) {
@@ -755,11 +739,7 @@ function configureAndroidShell(options = {}) {
   }
 
   if (updateAndroidProjectConfig(config)) {
-    changedPaths.push(
-      androidBuildGradlePath,
-      androidManifestPath,
-      ...androidLocalizedStringsPaths,
-    );
+    changedPaths.push(androidBuildGradlePath, ...androidLocalizedStringsPaths);
   }
 
   return { config, changedPaths };
@@ -822,6 +802,7 @@ if (command === "doctor") {
     ? readJavaMajorVersion(cachedLocalJdkEnv)
     : null;
   const androidManifest = readTextFileIfExists(androidManifestPath);
+  const androidBuildGradle = readTextFileIfExists(androidBuildGradlePath);
   const androidRuntimePlugin = readTextFileIfExists(androidRuntimePluginPath);
   const capacitorConfig = existsSync(capacitorConfigPath)
     ? readJson(capacitorConfigPath)
@@ -964,6 +945,54 @@ if (command === "doctor") {
         androidManifest.includes(`android:name="${permission}"`),
       ]);
     }
+
+    // Hardening: manifest cleartext must be a build-variant placeholder, not
+    // a hardcoded literal that can drift in tracked git history.
+    checks.push([
+      "manifest cleartext placeholder",
+      androidManifest.includes(
+        'android:usesCleartextTraffic="${yinjieUsesCleartextTraffic}"',
+      ),
+    ]);
+    checks.push([
+      "manifest no literal cleartext=true",
+      !/android:usesCleartextTraffic="true"/.test(androidManifest),
+    ]);
+
+    // Hardening: tracked manifest must not embed dev/loopback API endpoints.
+    // Runtime config is sourced from assets/public/runtime-config.json.
+    const devEndpointPattern =
+      /http:\/\/(?:10\.0\.2\.2|127\.0\.0\.1|localhost|192\.168\.|10\.|172\.(?:1[6-9]|2\d|3[01])\.)/i;
+    checks.push([
+      "manifest no dev endpoints",
+      !devEndpointPattern.test(androidManifest),
+    ]);
+  }
+
+  if (capacitorConfig) {
+    // Hardening: tracked capacitor.config.json must default to https. Local
+    // dev should use capacitor.config.local.json or build-variant overrides.
+    checks.push([
+      "capacitor androidScheme https",
+      capacitorConfig.server?.androidScheme === "https",
+    ]);
+  }
+
+  if (androidBuildGradle) {
+    // Hardening: manifestPlaceholders must define the cleartext flag for both
+    // buildTypes so the manifest placeholder always resolves at build time.
+    const debugPlaceholders =
+      /buildTypes\s*\{[\s\S]*?debug\s*\{[\s\S]*?manifestPlaceholders\s*=\s*\[[^\]]*yinjieUsesCleartextTraffic\s*:\s*"true"/m;
+    const releasePlaceholders =
+      /buildTypes\s*\{[\s\S]*?release\s*\{[\s\S]*?manifestPlaceholders\s*=\s*\[[^\]]*yinjieUsesCleartextTraffic\s*:\s*"false"/m;
+    checks.push([
+      "build.gradle debug cleartext=true placeholder",
+      debugPlaceholders.test(androidBuildGradle),
+    ]);
+    checks.push([
+      "build.gradle release cleartext=false placeholder",
+      releasePlaceholders.test(androidBuildGradle),
+    ]);
   }
 
   for (const localeResource of androidLocaleResourceChecks) {

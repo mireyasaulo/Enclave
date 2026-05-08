@@ -2,7 +2,10 @@ import type { ComponentProps } from "react";
 import { ErrorBlock } from "@yinjie/ui";
 import type { ShowConsoleNotice } from "./console-notice";
 import { getCloudAdminApiErrorRequestId } from "../lib/cloud-admin-api";
-import { translateCloudConsoleTextForActiveLocale } from "../lib/cloud-console-i18n";
+import {
+  translateCloudConsoleTextForActiveLocale,
+  useCloudConsoleText,
+} from "../lib/cloud-console-i18n";
 import {
   createRequestScopedNotice,
   showRequestScopedNotice,
@@ -44,13 +47,14 @@ export function CloudAdminErrorBlock({
   ...props
 }: CloudAdminErrorBlockProps) {
   const requestId = getCloudAdminApiErrorRequestId(error);
+  const t = useCloudConsoleText();
 
   return (
     <ErrorBlock message={getCloudAdminErrorMessage(error)} {...props}>
       {requestId ? (
         <div className="mt-3 border-t border-current/15 pt-3 text-xs leading-5 text-current/90">
           <div className="uppercase tracking-[0.12em] opacity-80">
-            Request id
+            {t("Request id")}
           </div>
           <div className="mt-1 break-all font-mono">{requestId}</div>
         </div>

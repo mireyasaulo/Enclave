@@ -1,5 +1,5 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -9,6 +9,7 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { MomentsService } from './moments.service';
@@ -16,6 +17,7 @@ import {
   type CreateMomentInput,
   type MomentContentType,
   type MomentMediaAsset,
+  type MomentVisibility,
 } from './moment-media.types';
 
 @Controller('moments')
@@ -48,7 +50,9 @@ export class MomentsController {
     @Body() body: { width?: string; height?: string; durationMs?: string },
   ) {
     if (!file) {
-      throw new BadRequestException('请先选择一个朋友圈媒体文件。');
+      throw new AppError('MOMENTS_MEDIA_REQUIRED', {
+        legacyMessage: '请先选择一个朋友圈媒体文件。',
+      });
     }
 
     return {
@@ -80,6 +84,7 @@ export class MomentsController {
       location?: string;
       contentType?: MomentContentType;
       media?: MomentMediaAsset[];
+      visibility?: MomentVisibility;
     },
   ) {
     const input: CreateMomentInput = {
@@ -87,6 +92,7 @@ export class MomentsController {
       location: body.location,
       contentType: body.contentType,
       media: Array.isArray(body.media) ? body.media : undefined,
+      visibility: body.visibility,
     };
     return this.momentsService.createUserMoment(input);
   }
@@ -127,3 +133,4 @@ export class MomentsController {
     return this.momentsService.toggleOwnerLike(postId);
   }
 }
+// i18n-ignore-end

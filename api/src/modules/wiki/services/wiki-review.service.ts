@@ -1,9 +1,6 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, MoreThan, Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
@@ -112,19 +109,31 @@ export class WikiReviewService {
     input: ReviewDecisionInput,
   ): Promise<{ status: string; pageId: string }> {
     if (!['approve', 'reject', 'request_changes'].includes(input.decision)) {
-      throw new BadRequestException('无效的审核结果');
+      throw new AppError('WIKI_REVIEW_INVALID_STATE', {
+        params: { detail: '无效的审核结果' },
+        legacyMessage: '无效的审核结果',
+      });
     }
     const revision = await this.revisionRepo.findOne({
       where: { id: revisionId },
     });
-    if (!revision) throw new NotFoundException('版本不存在');
+    if (!revision) throw new AppError('WIKI_REVIEW_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '版本不存在',
+      });
     if (revision.status !== 'pending') {
-      throw new BadRequestException('该版本已被处理');
+      throw new AppError('WIKI_REVIEW_INVALID_STATE', {
+        params: { detail: '该版本已被处理' },
+        legacyMessage: '该版本已被处理',
+      });
     }
     const submission = await this.submissionRepo.findOne({
       where: { revisionId },
     });
-    if (!submission) throw new NotFoundException('待审记录不存在');
+    if (!submission) throw new AppError('WIKI_REVIEW_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '待审记录不存在',
+      });
 
     const isApprove = input.decision === 'approve';
     const finalStatus = isApprove ? 'approved' : 'rejected';
@@ -279,9 +288,15 @@ export class WikiReviewService {
     const revision = await this.revisionRepo.findOne({
       where: { id: revisionId },
     });
-    if (!revision) throw new NotFoundException('版本不存在');
+    if (!revision) throw new AppError('WIKI_REVIEW_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '版本不存在',
+      });
     if (revision.status !== 'approved') {
-      throw new BadRequestException('仅 approved 状态的版本可被巡查');
+      throw new AppError('WIKI_REVIEW_INVALID_STATE', {
+        params: { detail: '仅 approved 状态的版本可被巡查' },
+        legacyMessage: '仅 approved 状态的版本可被巡查',
+      });
     }
     if (revision.isPatrolled) {
       return { revisionId, isPatrolled: true };
@@ -319,28 +334,50 @@ export class WikiReviewService {
     input: { toRevisionId: string; reason: string },
   ): Promise<{ revisionId: string; version: number }> {
     if (!input.toRevisionId) {
-      throw new BadRequestException('缺少 toRevisionId');
+      throw new AppError('WIKI_REVIEW_INVALID_STATE', {
+        params: { detail: '缺少 toRevisionId' },
+        legacyMessage: '缺少 toRevisionId',
+      });
     }
     await this.assert3RR(characterId, reviewer);
     const target = await this.revisionRepo.findOne({
       where: { id: input.toRevisionId },
     });
     if (!target || target.characterId !== characterId) {
-      throw new NotFoundException('目标版本不存在或不属于该词条');
+      throw new AppError('WIKI_REVIEW_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '目标版本不存在或不属于该词条',
+      });
     }
     if (target.status !== 'approved') {
-      throw new BadRequestException('只能回滚到 approved 版本');
+      throw new AppError('WIKI_REVIEW_INVALID_STATE', {
+        params: { detail: '只能回滚到 approved 版本' },
+        legacyMessage: '只能回滚到 approved 版本',
+      });
     }
     if (target.revisionKind === 'lifecycle') {
-      throw new BadRequestException('生命周期版本请通过删除 / 恢复申请处理，不支持直接回滚');
+      throw new AppError('WIKI_REVIEW_INVALID_STATE', {
+        params: { detail: '生命周期版本请通过删除 / 恢复申请处理，不支持直接回滚' },
+        legacyMessage: '生命周期版本请通过删除 / 恢复申请处理，不支持直接回滚',
+      });
     }
     const page = await this.pageRepo.findOne({ where: { characterId } });
-    if (!page) throw new NotFoundException('词条不存在');
+    if (!page) throw new AppError('WIKI_REVIEW_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '词条不存在',
+      });
     if (page.currentRevisionId === target.id) {
-      throw new BadRequestException('目标版本已是当前版本');
+      throw new AppError('WIKI_REVIEW_INVALID_STATE', {
+        params: { detail: '目标版本已是当前版本' },
+        legacyMessage: '目标版本已是当前版本',
+      });
     }
     if (page.protectionLevel === 'full' && reviewer.role !== 'admin') {
-      throw new ForbiddenException('该页面被完全保护，仅管理员可回滚');
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: '该页面被完全保护，仅管理员可回滚' },
+        legacyMessage: '该页面被完全保护，仅管理员可回滚',
+      });
     }
 
     const lastVersion = await this.revisionRepo
@@ -474,9 +511,15 @@ export class WikiReviewService {
       },
     });
     if (count >= 3) {
-      throw new ForbiddenException(
-        '24 小时内已对该词条回退 3 次（3RR）。请改为讨论页协商或申请管理员介入',
-      );
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: {
+          reason:
+            '24 小时内已对该词条回退 3 次（3RR）。请改为讨论页协商或申请管理员介入',
+        },
+        legacyMessage:
+          '24 小时内已对该词条回退 3 次（3RR）。请改为讨论页协商或申请管理员介入',
+      });
     }
   }
 
@@ -512,3 +555,4 @@ export class WikiReviewService {
     }
   }
 }
+// i18n-ignore-end

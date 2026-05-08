@@ -54,7 +54,7 @@ msgstr "表示言語"
 
 #: packages/i18n/src/runtime/language-switcher.tsx:29
 msgid "语言偏好保存在当前设备并立即生效，同时决定好友回复使用的语言。"
-msgstr ""
+msgstr "言語の設定は現在のデバイスに保存され、すぐに反映されます。フレンドの返信に使われる言語も同時に決まります。"
 
 #: packages/ui/src/components/provider-setup-form.tsx:237
 msgid "转写 API 密钥"

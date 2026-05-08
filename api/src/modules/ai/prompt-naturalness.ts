@@ -1,5 +1,6 @@
 import type { PersonalityProfile, SceneKey } from './ai.types';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const NATURAL_DIALOGUE_EXCLUDED_CHARACTER_IDS = new Set([
   'char-celebrity-elon-musk',
 ]);
@@ -136,3 +137,4 @@ export function applyPersistentNaturalDialogueProfile(
     scenePrompts: nextScenePrompts,
   };
 }
+// i18n-ignore-end

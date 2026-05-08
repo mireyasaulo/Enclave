@@ -5,6 +5,7 @@ import { WorldOwnerService } from '../auth/world-owner.service';
 import { CharacterEntity } from '../characters/character.entity';
 import { resolveDataPath } from '../../database/database-path';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type SelfAgentWorkspaceFileName =
   | 'AGENTS.md'
   | 'SOUL.md'
@@ -324,3 +325,4 @@ export class SelfAgentWorkspaceService {
     );
   }
 }
+// i18n-ignore-end

@@ -1,10 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import { AiSpeechAssetsService } from '../ai/ai-speech-assets.service';
 import { CharactersService } from '../characters/characters.service';
 import { ChatService } from './chat.service';
 import type { Message, VoiceAttachment } from './chat.types';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type VoiceCallTranscriptStatus = 'completed' | 'pending' | 'failed' | 'skipped';
 
 const VOICE_CALL_INPUT_ATTACHMENT_MISSING =
@@ -51,23 +53,35 @@ export class VoiceCallsService {
       input.conversationId,
     );
     if (!conversation) {
-      throw new NotFoundException(
-        `Conversation ${input.conversationId} not found`,
-      );
+      throw new AppError('CHAT_CONVERSATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { conversationId: input.conversationId },
+        legacyMessage: `Conversation ${input.conversationId} not found`,
+      });
     }
 
     if (conversation.type !== 'direct') {
-      throw new NotFoundException(VOICE_CALL_DIRECT_ONLY);
+      throw new AppError('CHAT_VOICE_CALL_INVALID_STATE', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: VOICE_CALL_DIRECT_ONLY,
+      });
     }
 
     const characterId = conversation.participants[0];
     if (input.characterId && input.characterId !== characterId) {
-      throw new NotFoundException(VOICE_CALL_CHARACTER_MISMATCH);
+      throw new AppError('CHAT_VOICE_CALL_INVALID_STATE', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: VOICE_CALL_CHARACTER_MISMATCH,
+      });
     }
 
     const character = await this.characters.findById(characterId);
     if (!character) {
-      throw new NotFoundException(`Character ${characterId} not found`);
+      throw new AppError('CHARACTER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id: characterId },
+        legacyMessage: `Character ${characterId} not found`,
+      });
     }
 
     const capabilityProfile = await this.ai.resolveRuntimeCapabilityProfile({
@@ -78,7 +92,10 @@ export class VoiceCallsService {
       input.durationMs !== undefined ? { durationMs: input.durationMs } : {},
     );
     if (attachment.kind !== 'voice') {
-      throw new NotFoundException(VOICE_CALL_INPUT_ATTACHMENT_MISSING);
+      throw new AppError('CHAT_VOICE_CALL_AUDIO_REQUIRED', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: VOICE_CALL_INPUT_ATTACHMENT_MISSING,
+      });
     }
 
     const messageResult = await this.chatService.sendMessageDetailed(
@@ -111,7 +128,10 @@ export class VoiceCallsService {
     );
 
     if (!userMessage || !assistantTextMessage) {
-      throw new NotFoundException(VOICE_CALL_INCOMPLETE_TURN);
+      throw new AppError('CHAT_VOICE_CALL_INVALID_STATE', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: VOICE_CALL_INCOMPLETE_TURN,
+      });
     }
 
     let synthesizedProvider: string | undefined;
@@ -133,7 +153,10 @@ export class VoiceCallsService {
       assistantVoiceMessage,
     );
     if (!assistantVoiceAttachment) {
-      throw new NotFoundException(VOICE_CALL_ASSISTANT_VOICE_REPLY_MISSING);
+      throw new AppError('CHAT_VOICE_CALL_INVALID_STATE', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: VOICE_CALL_ASSISTANT_VOICE_REPLY_MISSING,
+      });
     }
 
     const transcriptState = this.resolveTranscriptState(
@@ -259,3 +282,4 @@ function buildSpeechInstructions(characterName: string) {
   const normalizedName = characterName.trim() || VOICE_CALL_CURRENT_CHARACTER;
   return `${VOICE_CALL_TTS_INSTRUCTIONS_PREFIX}${normalizedName}${VOICE_CALL_TTS_INSTRUCTIONS_SUFFIX}`;
 }
+// i18n-ignore-end

@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   Body,
   Controller,
@@ -87,3 +88,4 @@ export class UsersAdminController {
     return { success: true as const };
   }
 }
+// i18n-ignore-end

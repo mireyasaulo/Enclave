@@ -11,16 +11,24 @@ export type SnapshotDiffShape = {
   relationshipType?: string | null;
 };
 
-const FIELD_LABELS: Record<keyof SnapshotDiffShape, string> = {
-  name: "名称",
-  avatar: "头像",
-  bio: "简介",
-  personality: "性格",
-  expertDomains: "专长领域",
-  triggerScenes: "触发场景",
-  relationship: "关系描述",
-  relationshipType: "关系类型",
+// English defaults keep this UI primitive surface-agnostic; surface apps pass
+// `fieldLabels`, `oldLabel`, `newLabel`, `emptyLabel` via their own i18n layer.
+// i18n-ignore-start: source-of-truth English defaults; surface apps override.
+const DEFAULT_FIELD_LABELS: Record<keyof SnapshotDiffShape, string> = {
+  name: "Name",
+  avatar: "Avatar",
+  bio: "Bio",
+  personality: "Personality",
+  expertDomains: "Expert domains",
+  triggerScenes: "Trigger scenes",
+  relationship: "Relationship",
+  relationshipType: "Relationship type",
 };
+// i18n-ignore-end
+
+const DEFAULT_OLD_LABEL = "Old";
+const DEFAULT_NEW_LABEL = "New";
+const DEFAULT_EMPTY_LABEL = "No field changes detected.";
 
 function fmt(value: unknown): string {
   if (value === null || value === undefined) return "—";
@@ -35,6 +43,9 @@ export type SnapshotDiffProps = {
   /** When provided, render a leading control cell per row. */
   renderRowLead?: (field: keyof SnapshotDiffShape) => ReactNode;
   emptyLabel?: ReactNode;
+  fieldLabels?: Partial<Record<keyof SnapshotDiffShape, string>>;
+  oldLabel?: string;
+  newLabel?: string;
 };
 
 export function SnapshotDiff({
@@ -43,10 +54,14 @@ export function SnapshotDiff({
   changedFields,
   renderRowLead,
   emptyLabel,
+  fieldLabels,
+  oldLabel = DEFAULT_OLD_LABEL,
+  newLabel = DEFAULT_NEW_LABEL,
 }: SnapshotDiffProps) {
+  const resolvedFieldLabels = { ...DEFAULT_FIELD_LABELS, ...(fieldLabels ?? {}) };
   const keys = (Object.keys(after) as (keyof SnapshotDiffShape)[]).filter(
     (k) => {
-      if (k === "avatar" || !FIELD_LABELS[k]) {
+      if (k === "avatar" || !resolvedFieldLabels[k]) {
         // hide unknown keys but keep avatar — let the predicate below decide
       }
       if (changedFields && changedFields.length > 0) {
@@ -66,7 +81,7 @@ export function SnapshotDiff({
   if (keys.length === 0) {
     return (
       <div className="text-xs text-[var(--text-muted)]">
-        {emptyLabel ?? "未检测到字段变化。"}
+        {emptyLabel ?? DEFAULT_EMPTY_LABEL}
       </div>
     );
   }
@@ -82,17 +97,17 @@ export function SnapshotDiff({
               <div className="flex items-start pt-1">{renderRowLead(k)}</div>
             ) : null}
             <div className="font-medium text-[var(--text-muted)] pt-1">
-              {FIELD_LABELS[k] ?? k}
+              {resolvedFieldLabels[k] ?? k}
             </div>
             <div className="rounded border border-[var(--border-subtle)] bg-[rgba(254,226,226,0.35)] px-2 py-1 whitespace-pre-wrap break-words">
               <span className="text-[10px] uppercase text-[var(--text-muted)] mr-1">
-                旧
+                {oldLabel}
               </span>
               {beforeVal}
             </div>
             <div className="rounded border border-[var(--border-subtle)] bg-[rgba(220,252,231,0.45)] px-2 py-1 whitespace-pre-wrap break-words">
               <span className="text-[10px] uppercase text-[var(--text-muted)] mr-1">
-                新
+                {newLabel}
               </span>
               {afterVal}
             </div>

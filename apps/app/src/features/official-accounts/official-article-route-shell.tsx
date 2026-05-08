@@ -1,6 +1,10 @@
 import { useEffect, useMemo } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { RouteRedirectState } from "../../components/route-redirect-state";
+
+const t = translateRuntimeMessage;
 import {
   buildDesktopContactsRouteHash,
   parseDesktopContactsRouteState,
@@ -47,9 +51,9 @@ export function OfficialArticleRouteShell({
 
   return (
     <RouteRedirectState
-      title="正在打开桌面公众号文章"
-      description="正在同步桌面文章窗口的路由状态，马上显示当前内容。"
-      loadingLabel="切换桌面公众号文章..."
+      title={t(msg`正在打开桌面公众号文章`)}
+      description={t(msg`正在同步桌面文章窗口的路由状态，马上显示当前内容。`)}
+      loadingLabel={t(msg`切换桌面公众号文章...`)}
     />
   );
 }

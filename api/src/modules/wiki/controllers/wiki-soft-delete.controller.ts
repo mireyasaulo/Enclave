@@ -1,6 +1,7 @@
 import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { CurrentUser } from '../../auth/current-user.decorator';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   JwtAuthGuard,
   type AuthenticatedUser,
 } from '../../auth/jwt-auth.guard';
@@ -64,3 +65,4 @@ export class WikiSoftDeleteController {
     );
   }
 }
+// i18n-ignore-end

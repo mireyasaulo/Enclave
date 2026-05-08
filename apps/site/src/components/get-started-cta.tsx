@@ -1,6 +1,8 @@
+import Link from "next/link";
 import { ArrowRight, Lock, Github, Smartphone } from "lucide-react";
 import { getServerI18n } from "@/i18n/server";
 import type { SupportedLocale } from "@/lib/locales";
+import { buildLocalePath } from "@/lib/locale-routing";
 import { siteLinks } from "@/lib/site-links";
 
 export async function GetStartedCta({ locale }: { locale: SupportedLocale }) {
@@ -49,14 +51,14 @@ export async function GetStartedCta({ locale }: { locale: SupportedLocale }) {
                 {labels.cta1}
                 <ArrowRight size={16} />
               </a>
-              <a
-                href="#cross-platform"
+              <Link
+                href={buildLocalePath(locale, "/download")}
                 data-cta="download"
                 data-cta-location="get_started"
                 className="inline-flex items-center gap-2 rounded-xl border border-(--border-subtle) bg-(--surface-card) px-6 py-3 text-sm font-semibold text-(--text-primary) transition hover:border-(--brand-primary)"
               >
                 {labels.cta2}
-              </a>
+              </Link>
             </div>
           </div>
           <ul className="mt-12 grid gap-4 sm:grid-cols-3">

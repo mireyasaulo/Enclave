@@ -10,19 +10,10 @@ import {
   formatAdminSessionSourceGroupSortDirectionLabel,
   formatAdminSessionSourceGroupSortFieldLabel,
 } from "../lib/admin-session-helpers";
+import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
 const SELECT_CLASS_NAME =
   "rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-3 py-2 text-sm normal-case tracking-normal text-[color:var(--text-primary)] outline-none focus:border-[color:var(--border-strong)]";
-
-const RISK_PRESET_LABELS: Record<
-  AdminSessionsRouteSearch["sourceRiskLevel"],
-  string
-> = {
-  all: "All risk",
-  critical: "Critical risk",
-  watch: "Watch risk",
-  normal: "Normal risk",
-};
 
 type AdminSessionSourceGroupFilterControlsProps = {
   sourceSortBy: AdminSessionsRouteSearch["sourceSortBy"];
@@ -55,11 +46,21 @@ export function AdminSessionSourceGroupFilterControls({
   className = "grid gap-3 md:grid-cols-4",
   presetClassName = "mt-4 flex flex-wrap gap-2",
 }: AdminSessionSourceGroupFilterControlsProps) {
+  const t = useCloudConsoleText();
+  const riskPresetLabels: Record<
+    AdminSessionsRouteSearch["sourceRiskLevel"],
+    string
+  > = {
+    all: t("All risk"),
+    critical: t("Critical risk"),
+    watch: t("Watch risk"),
+    normal: t("Normal risk"),
+  };
   return (
     <>
       <div className={className}>
         <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-          Source sort
+          {t("Source sort")}
           <select
             value={sourceSortBy}
             onChange={(event) =>
@@ -77,7 +78,7 @@ export function AdminSessionSourceGroupFilterControls({
           </select>
         </label>
         <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-          Source direction
+          {t("Source direction")}
           <select
             value={sourceSortDirection}
             onChange={(event) =>
@@ -95,7 +96,7 @@ export function AdminSessionSourceGroupFilterControls({
           </select>
         </label>
         <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-          Source risk
+          {t("Source risk")}
           <select
             value={sourceRiskLevel}
             onChange={(event) =>
@@ -113,7 +114,7 @@ export function AdminSessionSourceGroupFilterControls({
           </select>
         </label>
         <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-          Source page size
+          {t("Source page size")}
           <select
             value={String(sourcePageSize)}
             onChange={(event) =>
@@ -123,7 +124,7 @@ export function AdminSessionSourceGroupFilterControls({
           >
             {ADMIN_SESSION_SOURCE_GROUP_PAGE_SIZE_OPTIONS.map((value) => (
               <option key={value} value={value}>
-                {value} per page
+                {t("{0} per page").replace("{0}", String(value))}
               </option>
             ))}
           </select>
@@ -142,7 +143,7 @@ export function AdminSessionSourceGroupFilterControls({
                 : "border-[color:var(--border-faint)] bg-[color:var(--surface-input)] text-[color:var(--text-primary)] hover:border-[color:var(--border-strong)]"
             }`}
           >
-            {RISK_PRESET_LABELS[value]}
+            {riskPresetLabels[value]}
           </button>
         ))}
       </div>

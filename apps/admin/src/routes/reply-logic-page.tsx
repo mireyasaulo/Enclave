@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   updateCharacter,
   type Character,
   type MemoryLayers,
@@ -5597,3 +5598,4 @@ function formatDateTime(value?: string | null) {
     "notSet",
   );
 }
+// i18n-ignore-end

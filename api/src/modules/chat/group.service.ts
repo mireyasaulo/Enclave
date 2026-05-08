@@ -1,9 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, In, MoreThan, Repository } from 'typeorm';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
@@ -333,7 +330,11 @@ export class GroupService {
         options.after,
       );
       if (!window) {
-        throw new NotFoundException(`Message ${aroundMessageId} not found`);
+        throw new AppError('CHAT_MESSAGE_NOT_FOUND', {
+          status: HttpStatus.NOT_FOUND,
+          params: { messageId: aroundMessageId },
+          legacyMessage: `Message ${aroundMessageId} not found`,
+        });
       }
 
       return window.map((item) => this.toGroupMessage(item));
@@ -507,11 +508,17 @@ export class GroupService {
     });
 
     if (!message) {
-      throw new NotFoundException(`Group message ${messageId} not found`);
+      throw new AppError('CHAT_GROUP_MESSAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { messageId },
+        legacyMessage: `Group message ${messageId} not found`,
+      });
     }
 
     if (message.senderType !== 'user' || message.senderId !== owner.id) {
-      throw new BadRequestException('只能撤回自己发送的消息。');
+      throw new AppError('CHAT_REVOKE_OWN_ONLY', {
+        legacyMessage: '只能撤回自己发送的消息。',
+      });
     }
 
     const recalled = await this.messageRepo.save({
@@ -554,7 +561,11 @@ export class GroupService {
     });
 
     if (!message) {
-      throw new NotFoundException(`Group message ${messageId} not found`);
+      throw new AppError('CHAT_GROUP_MESSAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { messageId },
+        legacyMessage: `Group message ${messageId} not found`,
+      });
     }
 
     await this.messageRepo.delete({ id: message.id });
@@ -602,9 +613,11 @@ export class GroupService {
     });
 
     if (!member) {
-      throw new NotFoundException(
-        `Owner member for group ${groupId} not found`,
-      );
+      throw new AppError('CHAT_GROUP_OWNER_MEMBER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { groupId },
+        legacyMessage: `Owner member for group ${groupId} not found`,
+      });
     }
 
     return this.memberRepo.save({
@@ -634,7 +647,11 @@ export class GroupService {
     });
 
     if (!member) {
-      throw new NotFoundException(`Member ${memberId} not found in group`);
+      throw new AppError('CHAT_GROUP_MEMBER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { memberId },
+        legacyMessage: `Member ${memberId} not found in group`,
+      });
     }
 
     await this.memberRepo.delete({ id: member.id });
@@ -824,7 +841,10 @@ export class GroupService {
           stickerId: input.attachment.stickerId,
         });
       if (!attachment) {
-        throw new NotFoundException('Sticker not found');
+        throw new AppError('CHAT_STICKER_NOT_FOUND', {
+          status: HttpStatus.NOT_FOUND,
+          legacyMessage: 'Sticker not found',
+        });
       }
 
       const fallbackText =
@@ -849,7 +869,9 @@ export class GroupService {
       input.type === 'note_card'
     ) {
       if (!input.attachment || input.attachment.kind !== input.type) {
-        throw new Error('Attachment payload is invalid');
+        throw new AppError('CHAT_ATTACHMENT_PAYLOAD_INVALID', {
+          legacyMessage: 'Attachment payload is invalid',
+        });
       }
       const attachment = input.attachment;
 
@@ -868,7 +890,9 @@ export class GroupService {
 
     const text = input.text.trim();
     if (!text) {
-      throw new Error('Message text is required');
+      throw new AppError('CHAT_MESSAGE_TEXT_REQUIRED', {
+        legacyMessage: 'Message text is required',
+      });
     }
 
     return {
@@ -1288,7 +1312,11 @@ export class GroupService {
   private async requireAccessibleGroup(groupId: string): Promise<GroupEntity> {
     const group = await this.findAccessibleGroup(groupId);
     if (!group) {
-      throw new NotFoundException(`Group ${groupId} not found`);
+      throw new AppError('CHAT_GROUP_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { groupId },
+        legacyMessage: `Group ${groupId} not found`,
+      });
     }
 
     return group;
@@ -1305,7 +1333,11 @@ export class GroupService {
     });
 
     if (!group) {
-      throw new NotFoundException(`Group ${groupId} not found`);
+      throw new AppError('CHAT_GROUP_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { groupId },
+        legacyMessage: `Group ${groupId} not found`,
+      });
     }
 
     return group;
@@ -1315,7 +1347,11 @@ export class GroupService {
     if (dto.memberType === 'character') {
       const character = await this.characters.findById(dto.memberId);
       if (!character) {
-        throw new NotFoundException(`Character ${dto.memberId} not found`);
+        throw new AppError('CHARACTER_NOT_FOUND', {
+          status: HttpStatus.NOT_FOUND,
+          params: { id: dto.memberId },
+          legacyMessage: `Character ${dto.memberId} not found`,
+        });
       }
 
       return {
@@ -1326,9 +1362,9 @@ export class GroupService {
 
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     if (dto.memberId !== owner.id) {
-      throw new BadRequestException(
-        'Only the world owner can be added as user',
-      );
+      throw new AppError('CHAT_GROUP_ONLY_OWNER_AS_USER', {
+        legacyMessage: 'Only the world owner can be added as user',
+      });
     }
 
     return {
@@ -1360,9 +1396,11 @@ export class GroupService {
       },
     });
     if (!conversation) {
-      throw new NotFoundException(
-        `Conversation ${sourceConversationId} not found`,
-      );
+      throw new AppError('CHAT_CONVERSATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { conversationId: sourceConversationId },
+        legacyMessage: `Conversation ${sourceConversationId} not found`,
+      });
     }
 
     const sourceMessages = await this.conversationMessageRepo.find({
@@ -1573,3 +1611,4 @@ function formatGroupAttachmentDuration(durationMs: number) {
     ? `${minutes}:${String(seconds).padStart(2, '0')}`
     : `${seconds}"`;
 }
+// i18n-ignore-end

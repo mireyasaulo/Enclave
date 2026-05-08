@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CYBER_AVATAR_REAL_WORLD_SYNC_CRON,
 } from './cyber-avatar.constants';
 import { CyberAvatarRealWorldBriefEntity } from './cyber-avatar-real-world-brief.entity';
@@ -1135,3 +1136,4 @@ export class CyberAvatarRealWorldService {
     };
   }
 }
+// i18n-ignore-end

@@ -1,6 +1,7 @@
 import type { CelebrityCharacterPreset } from './celebrity-character-presets';
 import { PRESET_CHARACTER_BIOS } from './character-bios';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   getCharacterAvatarBySourceKey,
   type CharacterAvatarSourceKey,
 } from './character-avatar-assets';
@@ -757,3 +758,4 @@ function buildTeacherPreset(
 
 export const TEACHER_CHARACTER_PRESETS: CelebrityCharacterPreset[] =
   TEACHER_CHARACTER_DEFINITIONS.map(buildTeacherPreset);
+// i18n-ignore-end

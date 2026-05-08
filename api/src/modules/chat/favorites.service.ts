@@ -1,8 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { randomUUID } from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -143,7 +141,9 @@ export class FavoritesService {
     input: CreateMessageFavoriteInput,
   ): Promise<FavoriteRecord> {
     if (!input.threadId.trim() || !input.messageId.trim()) {
-      throw new BadRequestException('收藏消息缺少必要参数。');
+      throw new AppError('CHAT_FAVORITE_PARAMS_REQUIRED', {
+        legacyMessage: '收藏消息缺少必要参数。',
+      });
     }
 
     const favorite =
@@ -177,7 +177,9 @@ export class FavoritesService {
   async removeFavorite(sourceId: string): Promise<{ success: true }> {
     const normalizedSourceId = decodeURIComponent(sourceId).trim();
     if (!normalizedSourceId) {
-      throw new BadRequestException('收藏标识不能为空。');
+      throw new AppError('CHAT_FAVORITE_ID_REQUIRED', {
+        legacyMessage: '收藏标识不能为空。',
+      });
     }
 
     const noteId = parseFavoriteNoteId(normalizedSourceId);
@@ -246,7 +248,9 @@ export class FavoritesService {
   ): Promise<FavoriteNoteDocument> {
     const normalizedId = id.trim();
     if (!normalizedId) {
-      throw new BadRequestException('笔记标识不能为空。');
+      throw new AppError('CHAT_NOTE_ID_REQUIRED', {
+        legacyMessage: '笔记标识不能为空。',
+      });
     }
 
     const existing = await this.getFavoriteNoteOrThrow(normalizedId);
@@ -282,7 +286,9 @@ export class FavoritesService {
   async removeFavoriteNote(id: string): Promise<{ success: true }> {
     const normalizedId = id.trim();
     if (!normalizedId) {
-      throw new BadRequestException('笔记标识不能为空。');
+      throw new AppError('CHAT_NOTE_ID_REQUIRED', {
+        legacyMessage: '笔记标识不能为空。',
+      });
     }
 
     const current = await this.readFavoriteNoteDocuments();
@@ -322,7 +328,11 @@ export class FavoritesService {
     });
 
     if (!conversation || conversation.type !== 'direct') {
-      throw new NotFoundException(`Conversation ${input.threadId} not found`);
+      throw new AppError('CHAT_CONVERSATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { threadId: input.threadId },
+        legacyMessage: `Conversation ${input.threadId} not found`,
+      });
     }
 
     const message = await this.messageRepo.findOneBy({
@@ -331,7 +341,11 @@ export class FavoritesService {
     });
 
     if (!message) {
-      throw new NotFoundException(`Message ${input.messageId} not found`);
+      throw new AppError('CHAT_MESSAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { messageId: input.messageId },
+        legacyMessage: `Message ${input.messageId} not found`,
+      });
     }
 
     return this.buildFavoriteRecord({
@@ -364,12 +378,20 @@ export class FavoritesService {
     });
 
     if (!membership) {
-      throw new NotFoundException(`Group ${input.threadId} not found`);
+      throw new AppError('CHAT_GROUP_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { threadId: input.threadId },
+        legacyMessage: `Group ${input.threadId} not found`,
+      });
     }
 
     const group = await this.groupRepo.findOneBy({ id: input.threadId });
     if (!group) {
-      throw new NotFoundException(`Group ${input.threadId} not found`);
+      throw new AppError('CHAT_GROUP_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { threadId: input.threadId },
+        legacyMessage: `Group ${input.threadId} not found`,
+      });
     }
 
     const message = await this.groupMessageRepo.findOneBy({
@@ -378,7 +400,11 @@ export class FavoritesService {
     });
 
     if (!message) {
-      throw new NotFoundException(`Group message ${input.messageId} not found`);
+      throw new AppError('CHAT_GROUP_MESSAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { messageId: input.messageId },
+        legacyMessage: `Group message ${input.messageId} not found`,
+      });
     }
 
     return this.buildFavoriteRecord({
@@ -496,7 +522,9 @@ export class FavoritesService {
   private async getFavoriteNoteOrThrow(id: string) {
     const normalizedId = id.trim();
     if (!normalizedId) {
-      throw new BadRequestException('笔记标识不能为空。');
+      throw new AppError('CHAT_NOTE_ID_REQUIRED', {
+        legacyMessage: '笔记标识不能为空。',
+      });
     }
 
     const note = (await this.readFavoriteNoteDocuments()).find(
@@ -504,7 +532,11 @@ export class FavoritesService {
     );
 
     if (!note) {
-      throw new NotFoundException(`Favorite note ${normalizedId} not found`);
+      throw new AppError('CHAT_NOTE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { noteId: normalizedId },
+        legacyMessage: `Favorite note ${normalizedId} not found`,
+      });
     }
 
     return note;
@@ -841,3 +873,4 @@ function isFavoriteNoteAsset(value: unknown): value is FavoriteNoteAsset {
     typeof item.url === 'string'
   );
 }
+// i18n-ignore-end

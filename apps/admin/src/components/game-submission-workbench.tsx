@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { msg } from "@lingui/macro";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   AdminCreateGameSubmissionRequest,
   AdminGameSubmission,
   AdminUpdateGameSubmissionRequest,
   Character,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   Button,
   Card,
@@ -47,24 +50,24 @@ type SubmissionDraft = {
   tagsText: string;
 };
 
-const SOURCE_OPTIONS: Array<{
+const SOURCE_OPTION_MESSAGES: Array<{
   value: AdminGameSubmission["sourceKind"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "platform_official", label: "官方出品" },
-  { value: "third_party", label: "第三方上传" },
-  { value: "character_creator", label: "角色出品" },
+  { value: "platform_official", label: msg`官方出品` },
+  { value: "third_party", label: msg`第三方上传` },
+  { value: "character_creator", label: msg`角色出品` },
 ];
 
-const CATEGORY_OPTIONS: Array<{
+const CATEGORY_OPTION_MESSAGES: Array<{
   value: AdminGameSubmission["category"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "featured", label: "推荐" },
-  { value: "party", label: "聚会" },
-  { value: "competitive", label: "竞技" },
-  { value: "relax", label: "休闲" },
-  { value: "strategy", label: "经营" },
+  { value: "featured", label: msg`推荐` },
+  { value: "party", label: msg`聚会` },
+  { value: "competitive", label: msg`竞技` },
+  { value: "relax", label: msg`休闲` },
+  { value: "strategy", label: msg`经营` },
 ];
 
 const TONE_OPTIONS: Array<{
@@ -79,34 +82,34 @@ const TONE_OPTIONS: Array<{
   { value: "mint", label: "Mint" },
 ];
 
-const RUNTIME_OPTIONS: Array<{
+const RUNTIME_OPTION_MESSAGES: Array<{
   value: AdminGameSubmission["runtimeMode"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "workspace_mock", label: "工作区占位" },
-  { value: "chat_native", label: "聊天式 AI 游戏" },
-  { value: "embedded_web", label: "嵌入式 Web" },
-  { value: "remote_session", label: "远程会话" },
+  { value: "workspace_mock", label: msg`工作区占位` },
+  { value: "chat_native", label: msg`聊天式 AI 游戏` },
+  { value: "embedded_web", label: msg`嵌入式 Web` },
+  { value: "remote_session", label: msg`远程会话` },
 ];
 
-const PRODUCTION_OPTIONS: Array<{
+const PRODUCTION_OPTION_MESSAGES: Array<{
   value: AdminGameSubmission["productionKind"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "human_authored", label: "人工制作" },
-  { value: "ai_assisted", label: "AI 辅助" },
-  { value: "ai_generated", label: "AI 生成" },
-  { value: "character_generated", label: "角色生成" },
+  { value: "human_authored", label: msg`人工制作` },
+  { value: "ai_assisted", label: msg`AI 辅助` },
+  { value: "ai_generated", label: msg`AI 生成` },
+  { value: "character_generated", label: msg`角色生成` },
 ];
 
-const STATUS_OPTIONS: Array<{
+const STATUS_OPTION_MESSAGES: Array<{
   value: AdminGameSubmission["status"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "pending_review", label: "待审核" },
-  { value: "draft_imported", label: "已入库草稿" },
-  { value: "approved", label: "已通过" },
-  { value: "rejected", label: "已拒绝" },
+  { value: "pending_review", label: msg`待审核` },
+  { value: "draft_imported", label: msg`已入库草稿` },
+  { value: "approved", label: msg`已通过` },
+  { value: "rejected", label: msg`已拒绝` },
 ];
 
 function splitCommaLikeText(value: string) {
@@ -144,6 +147,7 @@ function applyCharacterToDraft(
   draft: SubmissionDraft,
   character: Character,
 ): SubmissionDraft {
+  const t = translateRuntimeMessage;
   const expertDomains = character.expertDomains.filter(Boolean);
 
   return {
@@ -153,14 +157,14 @@ function applyCharacterToDraft(
     runtimeMode:
       draft.runtimeMode === "workspace_mock" ? "chat_native" : draft.runtimeMode,
     proposedGameId: draft.proposedGameId.trim() || `character-${character.id}`,
-    proposedName: draft.proposedName.trim() || `${character.name} 出品新作`,
+    proposedName: draft.proposedName.trim() || t(msg`${character.name} 出品新作`),
     slogan:
-      draft.slogan.trim() || `由 ${character.name} 主持推进的 AI 互动游戏提案。`,
+      draft.slogan.trim() || t(msg`由 ${character.name} 主持推进的 AI 互动游戏提案。`),
     description:
       draft.description.trim() ||
       character.bio.trim() ||
-      `${character.name} 发起的角色出品游戏，待补充完整玩法说明。`,
-    studio: draft.studio.trim() || "角色工坊",
+      t(msg`${character.name} 发起的角色出品游戏，待补充完整玩法说明。`),
+    studio: draft.studio.trim() || t(msg`角色工坊`),
     sourceCharacterId: character.id,
     sourceCharacterName: character.name,
     submitterName: draft.submitterName.trim() || character.name,
@@ -168,7 +172,7 @@ function applyCharacterToDraft(
       draft.submitterContact.trim() || `world://${character.id}`,
     submissionNote:
       draft.submissionNote.trim() ||
-      `${character.name} 以角色身份提交的游戏提案，建议重点评估可持续更新能力与角色运营空间。`,
+      t(msg`${character.name} 以角色身份提交的游戏提案，建议重点评估可持续更新能力与角色运营空间。`),
     aiHighlightsText:
       draft.aiHighlightsText.trim() || expertDomains.join("，"),
     tagsText:
@@ -253,6 +257,7 @@ export function GameSubmissionWorkbench({
   onFeedback: (feedback: FeedbackPayload) => void;
   onImportedGame: (gameId: string) => void;
 }) {
+  const t = translateRuntimeMessage;
   const queryClient = useQueryClient();
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -342,7 +347,7 @@ export function GameSubmissionWorkbench({
       setDraft(draftFromSubmission(submission));
       onFeedback({
         tone: "success",
-        message: `${submission.proposedName} 已进入投稿池。`,
+        message: t(msg`${submission.proposedName} 已进入投稿池。`),
       });
     },
   });
@@ -357,7 +362,7 @@ export function GameSubmissionWorkbench({
       setDraft(draftFromSubmission(submission));
       onFeedback({
         tone: "success",
-        message: `${submission.proposedName} 的投稿资料已更新。`,
+        message: t(msg`${submission.proposedName} 的投稿资料已更新。`),
       });
     },
   });
@@ -384,7 +389,7 @@ export function GameSubmissionWorkbench({
       onImportedGame(result.game.id);
       onFeedback({
         tone: "success",
-        message: `${result.submission.proposedName} 已导入目录草稿 ${result.game.name}。`,
+        message: t(msg`${result.submission.proposedName} 已导入目录草稿 ${result.game.name}。`),
       });
     },
   });
@@ -404,7 +409,7 @@ export function GameSubmissionWorkbench({
     if (!selectedCharacter) {
       onFeedback({
         tone: "info",
-        message: "先选择一个角色，再带入角色资料。",
+        message: t(msg`先选择一个角色，再带入角色资料。`),
       });
       return;
     }
@@ -412,7 +417,7 @@ export function GameSubmissionWorkbench({
     setDraft((current) => applyCharacterToDraft(current, selectedCharacter));
     onFeedback({
       tone: "success",
-      message: `已把角色 ${selectedCharacter.name} 的资料带入投稿草稿。`,
+      message: t(msg`已把角色 ${selectedCharacter.name} 的资料带入投稿草稿。`),
     });
   }
 
@@ -426,7 +431,7 @@ export function GameSubmissionWorkbench({
       if (!selectedSubmissionId) {
         onFeedback({
           tone: "info",
-          message: "先选中一个投稿，或者新建一条投稿草稿。",
+          message: t(msg`先选中一个投稿，或者新建一条投稿草稿。`),
         });
         return;
       }
@@ -439,7 +444,7 @@ export function GameSubmissionWorkbench({
       onFeedback({
         tone: "info",
         message:
-          error instanceof Error ? error.message : "保存投稿失败，请稍后重试。",
+          error instanceof Error ? error.message : t(msg`保存投稿失败，请稍后重试。`),
       });
     }
   }
@@ -448,7 +453,7 @@ export function GameSubmissionWorkbench({
     if (isCreating || !selectedSubmissionId) {
       onFeedback({
         tone: "info",
-        message: "先保存投稿，再执行入库。",
+        message: t(msg`先保存投稿，再执行入库。`),
       });
       return;
     }
@@ -459,7 +464,7 @@ export function GameSubmissionWorkbench({
       onFeedback({
         tone: "info",
         message:
-          error instanceof Error ? error.message : "投稿入库失败，请稍后重试。",
+          error instanceof Error ? error.message : t(msg`投稿入库失败，请稍后重试。`),
       });
     }
   }
@@ -470,25 +475,25 @@ export function GameSubmissionWorkbench({
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="投稿总数" value={String(metrics.total)} />
-        <MetricCard label="待审核" value={String(metrics.pending)} />
-        <MetricCard label="已入库草稿" value={String(metrics.imported)} />
-        <MetricCard label="已通过" value={String(metrics.approved)} />
+        <MetricCard label={t(msg`投稿总数`)} value={String(metrics.total)} />
+        <MetricCard label={t(msg`待审核`)} value={String(metrics.pending)} />
+        <MetricCard label={t(msg`已入库草稿`)} value={String(metrics.imported)} />
+        <MetricCard label={t(msg`已通过`)} value={String(metrics.approved)} />
       </div>
 
       <AdminCallout
-        title="投稿池已经承接第三方、角色和平台内稿件"
-        description="这里沉淀未来的游戏供给入口。稿件可以先审核，再一键导入为目录草稿，后续继续沿发布流走向正式上线。"
+        title={t(msg`投稿池已经承接第三方、角色和平台内稿件`)}
+        description={t(msg`这里沉淀未来的游戏供给入口。稿件可以先审核，再一键导入为目录草稿，后续继续沿发布流走向正式上线。`)}
         tone="info"
         actions={
           <Button variant="primary" onClick={handleStartCreate}>
-            新建投稿
+            {t(msg`新建投稿`)}
           </Button>
         }
       />
 
       {submissionsQuery.isLoading ? (
-        <LoadingBlock label="正在加载投稿池..." />
+        <LoadingBlock label={t(msg`正在加载投稿池...`)} />
       ) : null}
       {submissionsQuery.isError && submissionsQuery.error instanceof Error ? (
         <ErrorBlock message={submissionsQuery.error.message} />
@@ -498,8 +503,8 @@ export function GameSubmissionWorkbench({
         <div className="space-y-3">
           {!submissionsQuery.isLoading && !(submissionsQuery.data?.length ?? 0) ? (
             <AdminEmptyState
-              title="投稿池还没有内容"
-              description="新建一条投稿，或者等待第三方和角色产游稿件入库。"
+              title={t(msg`投稿池还没有内容`)}
+              description={t(msg`新建一条投稿，或者等待第三方和角色产游稿件入库。`)}
             />
           ) : null}
 
@@ -536,7 +541,7 @@ export function GameSubmissionWorkbench({
                       <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
                         {submission.studio} · {submission.submitterName}
                         {submission.sourceCharacterName
-                          ? ` · 角色 ${submission.sourceCharacterName}`
+                          ? t(msg` · 角色 ${submission.sourceCharacterName}`)
                           : ""}
                       </div>
                       <div className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
@@ -546,19 +551,19 @@ export function GameSubmissionWorkbench({
 
                     <div className="grid gap-2 sm:grid-cols-2 lg:w-[300px]">
                       <SummaryField
-                        label="拟入库 ID"
+                        label={t(msg`拟入库 ID`)}
                         value={submission.proposedGameId}
                       />
                       <SummaryField
-                        label="运行方式"
+                        label={t(msg`运行方式`)}
                         value={formatRuntimeMode(submission.runtimeMode)}
                       />
                       <SummaryField
-                        label="状态"
+                        label={t(msg`状态`)}
                         value={formatSubmissionStatus(submission.status)}
                       />
                       <SummaryField
-                        label="更新时间"
+                        label={t(msg`更新时间`)}
                         value={formatTime(submission.updatedAt)}
                       />
                     </div>
@@ -577,19 +582,19 @@ export function GameSubmissionWorkbench({
               </div>
               <div className="mt-2 text-xl font-semibold text-[color:var(--text-primary)]">
                 {isCreating
-                  ? "新建投稿"
-                  : draft.proposedName || "投稿详情编辑器"}
+                  ? t(msg`新建投稿`)
+                  : draft.proposedName || t(msg`投稿详情编辑器`)}
               </div>
               <div className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
                 {isCreating
-                  ? "先把第三方、角色或平台内稿件登记进投稿池。"
-                  : "在这里补齐投稿资料、审核备注，并一键导入为游戏目录草稿。"}
+                  ? t(msg`先把第三方、角色或平台内稿件登记进投稿池。`)
+                  : t(msg`在这里补齐投稿资料、审核备注，并一键导入为游戏目录草稿。`)}
               </div>
             </div>
             <div className="flex shrink-0 gap-2">
               {!isCreating ? (
                 <Button variant="secondary" onClick={handleStartCreate}>
-                  新建投稿
+                  {t(msg`新建投稿`)}
                 </Button>
               ) : null}
               <Button
@@ -598,10 +603,10 @@ export function GameSubmissionWorkbench({
                 disabled={editorBusy}
               >
                 {createMutation.isPending || updateMutation.isPending
-                  ? "保存中..."
+                  ? t(msg`保存中...`)
                   : isCreating
-                    ? "创建投稿"
-                    : "保存修改"}
+                    ? t(msg`创建投稿`)
+                    : t(msg`保存修改`)}
               </Button>
             </div>
           </div>
@@ -609,8 +614,8 @@ export function GameSubmissionWorkbench({
           {!isCreating && !selectedSubmission ? (
             <div className="mt-6">
               <AdminEmptyState
-                title="先选择一条投稿"
-                description="左侧选中一条投稿后，这里会展示完整投稿资料与入库动作。"
+                title={t(msg`先选择一条投稿`)}
+                description={t(msg`左侧选中一条投稿后，这里会展示完整投稿资料与入库动作。`)}
               />
             </div>
           ) : null}
@@ -620,7 +625,7 @@ export function GameSubmissionWorkbench({
               <div className="grid gap-4 md:grid-cols-2">
                 <label>
                   <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                    来源
+                    {t(msg`来源`)}
                   </div>
                   <SelectField
                     value={draft.sourceKind}
@@ -632,16 +637,16 @@ export function GameSubmissionWorkbench({
                       }))
                     }
                   >
-                    {SOURCE_OPTIONS.map((option) => (
+                    {SOURCE_OPTION_MESSAGES.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {t(option.label)}
                       </option>
                     ))}
                   </SelectField>
                 </label>
                 <label>
                   <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                    投稿状态
+                    {t(msg`投稿状态`)}
                   </div>
                   <SelectField
                     value={draft.status}
@@ -653,30 +658,30 @@ export function GameSubmissionWorkbench({
                     }
                     disabled={isCreating}
                   >
-                    {STATUS_OPTIONS.map((option) => (
+                    {STATUS_OPTION_MESSAGES.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {t(option.label)}
                       </option>
                     ))}
                   </SelectField>
                 </label>
                 <EditorField
-                  label="拟入库游戏 ID"
+                  label={t(msg`拟入库游戏 ID`)}
                   value={draft.proposedGameId}
                   onChange={(value) =>
                     setDraft((current) => ({ ...current, proposedGameId: value }))
                   }
-                  placeholder="例如 orbit-theatre"
+                  placeholder={t(msg`例如 orbit-theatre`)}
                 />
                 <EditorField
-                  label="投稿游戏名"
+                  label={t(msg`投稿游戏名`)}
                   value={draft.proposedName}
                   onChange={(value) =>
                     setDraft((current) => ({ ...current, proposedName: value }))
                   }
                 />
                 <EditorField
-                  label="一句话卖点"
+                  label={t(msg`一句话卖点`)}
                   value={draft.slogan}
                   onChange={(value) =>
                     setDraft((current) => ({ ...current, slogan: value }))
@@ -693,10 +698,10 @@ export function GameSubmissionWorkbench({
                         Character Intake
                       </div>
                       <div className="mt-2 text-lg font-semibold text-[color:var(--text-primary)]">
-                        角色资料快速带入
+                        {t(msg`角色资料快速带入`)}
                       </div>
                       <div className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
-                        选一个现有世界角色，把身份、简介、擅长领域和联系方式直接带进投稿草稿。
+                        {t(msg`选一个现有世界角色，把身份、简介、擅长领域和联系方式直接带进投稿草稿。`)}
                       </div>
                     </div>
 
@@ -705,13 +710,13 @@ export function GameSubmissionWorkbench({
                       onClick={handleApplyCharacter}
                       disabled={editorBusy || !selectedCharacter}
                     >
-                      带入角色资料
+                      {t(msg`带入角色资料`)}
                     </Button>
                   </div>
 
                   {charactersQuery.isLoading ? (
                     <div className="mt-4">
-                      <LoadingBlock label="正在加载角色列表..." />
+                      <LoadingBlock label={t(msg`正在加载角色列表...`)} />
                     </div>
                   ) : null}
                   {charactersQuery.isError && charactersQuery.error instanceof Error ? (
@@ -724,8 +729,8 @@ export function GameSubmissionWorkbench({
                   !(charactersQuery.data?.length ?? 0) ? (
                     <div className="mt-4">
                       <AdminEmptyState
-                        title="当前还没有可用角色"
-                        description="先在角色页创建或导入角色，再把角色产游稿件带进投稿池。"
+                        title={t(msg`当前还没有可用角色`)}
+                        description={t(msg`先在角色页创建或导入角色，再把角色产游稿件带进投稿池。`)}
                       />
                     </div>
                   ) : null}
@@ -734,7 +739,7 @@ export function GameSubmissionWorkbench({
                     <div className="mt-4 space-y-4">
                       <label className="block">
                         <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                          选择角色
+                          {t(msg`选择角色`)}
                         </div>
                         <SelectField
                           value={selectedCharacterId}
@@ -752,17 +757,17 @@ export function GameSubmissionWorkbench({
 
                       {selectedCharacter ? (
                         <div className="grid gap-3 md:grid-cols-3">
-                          <SummaryField label="角色名" value={selectedCharacter.name} />
+                          <SummaryField label={t(msg`角色名`)} value={selectedCharacter.name} />
                           <SummaryField
-                            label="关系"
+                            label={t(msg`关系`)}
                             value={selectedCharacter.relationship}
                           />
                           <SummaryField
-                            label="擅长领域"
+                            label={t(msg`擅长领域`)}
                             value={
                               selectedCharacter.expertDomains.length > 0
                                 ? selectedCharacter.expertDomains.join(" / ")
-                                : "未填写"
+                                : t(msg`未填写`)
                             }
                           />
                         </div>
@@ -773,7 +778,7 @@ export function GameSubmissionWorkbench({
               ) : null}
 
               <EditorTextArea
-                label="游戏说明"
+                label={t(msg`游戏说明`)}
                 value={draft.description}
                 onChange={(value) =>
                   setDraft((current) => ({ ...current, description: value }))
@@ -782,21 +787,21 @@ export function GameSubmissionWorkbench({
 
               <div className="grid gap-4 md:grid-cols-2">
                 <EditorField
-                  label="工作室 / 团队"
+                  label={t(msg`工作室 / 团队`)}
                   value={draft.studio}
                   onChange={(value) =>
                     setDraft((current) => ({ ...current, studio: value }))
                   }
                 />
                 <EditorField
-                  label="提交人"
+                  label={t(msg`提交人`)}
                   value={draft.submitterName}
                   onChange={(value) =>
                     setDraft((current) => ({ ...current, submitterName: value }))
                   }
                 />
                 <EditorField
-                  label="联系信息"
+                  label={t(msg`联系信息`)}
                   value={draft.submitterContact}
                   onChange={(value) =>
                     setDraft((current) => ({
@@ -807,7 +812,7 @@ export function GameSubmissionWorkbench({
                 />
                 <label>
                   <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                    分类
+                    {t(msg`分类`)}
                   </div>
                   <SelectField
                     value={draft.category}
@@ -819,9 +824,9 @@ export function GameSubmissionWorkbench({
                       }))
                     }
                   >
-                    {CATEGORY_OPTIONS.map((option) => (
+                    {CATEGORY_OPTION_MESSAGES.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {t(option.label)}
                       </option>
                     ))}
                   </SelectField>
@@ -848,7 +853,7 @@ export function GameSubmissionWorkbench({
                 </label>
                 <label>
                   <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                    运行方式
+                    {t(msg`运行方式`)}
                   </div>
                   <SelectField
                     value={draft.runtimeMode}
@@ -860,16 +865,16 @@ export function GameSubmissionWorkbench({
                       }))
                     }
                   >
-                    {RUNTIME_OPTIONS.map((option) => (
+                    {RUNTIME_OPTION_MESSAGES.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {t(option.label)}
                       </option>
                     ))}
                   </SelectField>
                 </label>
                 <label>
                   <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                    生产方式
+                    {t(msg`生产方式`)}
                   </div>
                   <SelectField
                     value={draft.productionKind}
@@ -881,9 +886,9 @@ export function GameSubmissionWorkbench({
                       }))
                     }
                   >
-                    {PRODUCTION_OPTIONS.map((option) => (
+                    {PRODUCTION_OPTION_MESSAGES.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {t(option.label)}
                       </option>
                     ))}
                   </SelectField>
@@ -892,7 +897,7 @@ export function GameSubmissionWorkbench({
 
               <div className="grid gap-4 md:grid-cols-2">
                 <EditorField
-                  label="来源角色 ID"
+                  label={t(msg`来源角色 ID`)}
                   value={draft.sourceCharacterId}
                   onChange={(value) =>
                     setDraft((current) => ({
@@ -902,7 +907,7 @@ export function GameSubmissionWorkbench({
                   }
                 />
                 <EditorField
-                  label="来源角色名"
+                  label={t(msg`来源角色名`)}
                   value={draft.sourceCharacterName}
                   onChange={(value) =>
                     setDraft((current) => ({
@@ -914,7 +919,7 @@ export function GameSubmissionWorkbench({
               </div>
 
               <EditorTextArea
-                label="投稿说明"
+                label={t(msg`投稿说明`)}
                 value={draft.submissionNote}
                 onChange={(value) =>
                   setDraft((current) => ({ ...current, submissionNote: value }))
@@ -922,16 +927,16 @@ export function GameSubmissionWorkbench({
               />
 
               <EditorTextArea
-                label="审核备注"
+                label={t(msg`审核备注`)}
                 value={draft.reviewNote}
                 onChange={(value) =>
                   setDraft((current) => ({ ...current, reviewNote: value }))
                 }
-                placeholder="内部审核意见、运营建议或拒绝理由"
+                placeholder={t(msg`内部审核意见、运营建议或拒绝理由`)}
               />
 
               <EditorTextArea
-                label="AI 亮点"
+                label={t(msg`AI 亮点`)}
                 value={draft.aiHighlightsText}
                 onChange={(value) =>
                   setDraft((current) => ({ ...current, aiHighlightsText: value }))
@@ -939,7 +944,7 @@ export function GameSubmissionWorkbench({
               />
 
               <EditorTextArea
-                label="标签"
+                label={t(msg`标签`)}
                 value={draft.tagsText}
                 onChange={(value) =>
                   setDraft((current) => ({ ...current, tagsText: value }))
@@ -953,7 +958,7 @@ export function GameSubmissionWorkbench({
                     onClick={handleImportSubmission}
                     disabled={editorBusy || !selectedSubmissionId}
                   >
-                    {importMutation.isPending ? "入库中..." : "导入为目录草稿"}
+                    {importMutation.isPending ? t(msg`入库中...`) : t(msg`导入为目录草稿`)}
                   </Button>
                   {selectedSubmission?.linkedCatalogGameId ? (
                     <Button
@@ -962,7 +967,7 @@ export function GameSubmissionWorkbench({
                         onImportedGame(selectedSubmission.linkedCatalogGameId!)
                       }
                     >
-                      打开关联目录
+                      {t(msg`打开关联目录`)}
                     </Button>
                   ) : null}
                 </div>
@@ -1040,37 +1045,37 @@ function SummaryField({ label, value }: { label: string; value: string }) {
 function formatSourceKind(value: AdminGameSubmission["sourceKind"]) {
   switch (value) {
     case "platform_official":
-      return "官方出品";
+      return translateRuntimeMessage(msg`官方出品`);
     case "third_party":
-      return "第三方上传";
+      return translateRuntimeMessage(msg`第三方上传`);
     case "character_creator":
-      return "角色出品";
+      return translateRuntimeMessage(msg`角色出品`);
   }
 }
 
 function formatSubmissionStatus(value: AdminGameSubmission["status"]) {
   switch (value) {
     case "pending_review":
-      return "待审核";
+      return translateRuntimeMessage(msg`待审核`);
     case "draft_imported":
-      return "已入库草稿";
+      return translateRuntimeMessage(msg`已入库草稿`);
     case "approved":
-      return "已通过";
+      return translateRuntimeMessage(msg`已通过`);
     case "rejected":
-      return "已拒绝";
+      return translateRuntimeMessage(msg`已拒绝`);
   }
 }
 
 function formatRuntimeMode(value: AdminGameSubmission["runtimeMode"]) {
   switch (value) {
     case "workspace_mock":
-      return "工作区占位";
+      return translateRuntimeMessage(msg`工作区占位`);
     case "chat_native":
-      return "聊天式 AI 游戏";
+      return translateRuntimeMessage(msg`聊天式 AI 游戏`);
     case "embedded_web":
-      return "嵌入式 Web";
+      return translateRuntimeMessage(msg`嵌入式 Web`);
     case "remote_session":
-      return "远程会话";
+      return translateRuntimeMessage(msg`远程会话`);
   }
 }
 
@@ -1107,3 +1112,4 @@ function formatTime(value: string) {
     date.getHours(),
   ).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
+// i18n-ignore-end

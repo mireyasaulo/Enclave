@@ -111,6 +111,7 @@ export function CloudConfigsPage() {
             <input
               value={draftKey}
               onChange={(event) => setDraftKey(event.target.value)}
+              // i18n-ignore-next-line: example config-key value, not translatable copy.
               placeholder="app.publicBaseUrl"
               className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
             />

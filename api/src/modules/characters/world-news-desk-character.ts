@@ -2,6 +2,7 @@ import type { CharacterEntity } from './character.entity';
 import { DEFAULT_CHARACTER_BIOS } from './character-bios';
 import { getCharacterAvatarBySourceKey } from './character-avatar-assets';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const WORLD_NEWS_DESK_CHARACTER_ID = 'char-default-world-news-desk';
 export const WORLD_NEWS_DESK_SOURCE_KEY = 'world_news_desk';
 export const WORLD_NEWS_BULLETIN_GENERATION_KIND = 'reality_news_bulletin';
@@ -207,3 +208,4 @@ export function buildWorldNewsDeskCharacter(): Partial<CharacterEntity> {
     currentActivity: 'working',
   };
 }
+// i18n-ignore-end

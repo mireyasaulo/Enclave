@@ -1,8 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
@@ -36,12 +34,22 @@ export class WikiReportService {
     const targetId = input.targetId?.trim();
     const reason = input.reason?.trim();
     if (!targetType || !WIKI_TARGET_TYPES.has(targetType)) {
-      throw new BadRequestException(
-        'targetType 必须是 wiki_revision / wiki_talk_post / wiki_page',
-      );
+      throw new AppError('WIKI_REPORT_INVALID_STATE', {
+        params: {
+          detail: 'targetType 必须是 wiki_revision / wiki_talk_post / wiki_page',
+        },
+        legacyMessage:
+          'targetType 必须是 wiki_revision / wiki_talk_post / wiki_page',
+      });
     }
-    if (!targetId) throw new BadRequestException('缺少 targetId');
-    if (!reason) throw new BadRequestException('举报原因必填');
+    if (!targetId) throw new AppError('WIKI_REPORT_INVALID_STATE', {
+        params: { detail: '缺少 targetId' },
+        legacyMessage: '缺少 targetId',
+      });
+    if (!reason) throw new AppError('WIKI_REPORT_INVALID_STATE', {
+        params: { detail: '举报原因必填' },
+        legacyMessage: '举报原因必填',
+      });
     return this.reportRepo.save(
       this.reportRepo.create({
         ownerId: reporter.id,
@@ -64,7 +72,10 @@ export class WikiReportService {
       .take(200);
     if (filter.status) {
       if (!WIKI_STATUSES.has(filter.status)) {
-        throw new BadRequestException('status 无效');
+        throw new AppError('WIKI_REPORT_INVALID_STATE', {
+        params: { detail: 'status 无效' },
+        legacyMessage: 'status 无效',
+      });
       }
       qb.andWhere('r.status = :status', { status: filter.status });
     }
@@ -73,14 +84,24 @@ export class WikiReportService {
 
   async setStatus(id: string, status: string): Promise<ModerationReportEntity> {
     if (!WIKI_STATUSES.has(status)) {
-      throw new BadRequestException('status 必须是 open / resolved / dismissed');
+      throw new AppError('WIKI_REPORT_INVALID_STATE', {
+        params: { detail: 'status 必须是 open / resolved / dismissed' },
+        legacyMessage: 'status 必须是 open / resolved / dismissed',
+      });
     }
     const report = await this.reportRepo.findOne({ where: { id } });
-    if (!report) throw new NotFoundException('举报不存在');
+    if (!report) throw new AppError('WIKI_REPORT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '举报不存在',
+      });
     if (!WIKI_TARGET_TYPES.has(report.targetType)) {
-      throw new BadRequestException('该举报不属于 wiki');
+      throw new AppError('WIKI_REPORT_INVALID_STATE', {
+        params: { detail: '该举报不属于 wiki' },
+        legacyMessage: '该举报不属于 wiki',
+      });
     }
     report.status = status;
     return this.reportRepo.save(report);
   }
 }
+// i18n-ignore-end

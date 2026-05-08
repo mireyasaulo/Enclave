@@ -1,7 +1,11 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   gameCenterFriendActivities,
   getGameCenterGame,
 } from "./game-center-data";
+
+const t = translateRuntimeMessage;
 import { isDesktopOnlyPath } from "../../lib/history-back";
 import { normalizePathname } from "../../lib/normalize-pathname";
 import { parseMobileGamesRouteSearch } from "./mobile-games-route-state";
@@ -110,8 +114,8 @@ export function resolveGameInviteRouteContext(
 
   if (activity) {
     return {
-      actionLabel: "回到组局",
-      description: `这条会话来自 ${activity.friendName} 的《${game.name}》组局邀约。`,
+      actionLabel: t(msg`回到组局`),
+      description: `${t(msg`这条会话来自`)} ${activity.friendName} ${t(msg`的《`)}${game.name}${t(msg`》组局邀约。`)}`,
       gameId: game.id,
       inviteId: activity.id,
       returnPath: buildGameInvitePath("/discover/games", {
@@ -124,8 +128,8 @@ export function resolveGameInviteRouteContext(
   }
 
   return {
-    actionLabel: "回到游戏",
-    description: `这条会话来自《${game.name}》的游戏中心接力。`,
+    actionLabel: t(msg`回到游戏`),
+    description: `${t(msg`这条会话来自《`)}${game.name}${t(msg`》的游戏中心接力。`)}`,
     gameId: game.id,
     returnPath: buildGameInvitePath("/discover/games", {
       gameId: game.id,

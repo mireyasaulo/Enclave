@@ -1,5 +1,9 @@
 import { useEffect } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Button } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 
 type FeatureUnavailableDialogProps = {
   open: boolean;
@@ -14,8 +18,9 @@ export function FeatureUnavailableDialog({
   title,
   description,
   onClose,
-  confirmLabel = "我知道了",
+  confirmLabel,
 }: FeatureUnavailableDialogProps) {
+  const resolvedConfirmLabel = confirmLabel ?? t(msg`我知道了`);
   useEffect(() => {
     if (!open) {
       return;
@@ -41,7 +46,7 @@ export function FeatureUnavailableDialog({
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]">
       <button
         type="button"
-        aria-label="关闭提示"
+        aria-label={t(msg`关闭提示`)}
         onClick={onClose}
         className="absolute inset-0"
       />
@@ -62,7 +67,7 @@ export function FeatureUnavailableDialog({
             onClick={onClose}
             className="w-full rounded-[12px] bg-[color:var(--brand-primary)] py-2 text-white shadow-none hover:opacity-95"
           >
-            {confirmLabel}
+            {resolvedConfirmLabel}
           </Button>
         </div>
       </div>

@@ -1,11 +1,6 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
+import { CanActivate, ExecutionContext, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import type { AuthenticatedRequest } from '../../auth/jwt-auth.guard';
 import { rankOf } from './wiki-role.guard';
 
@@ -35,7 +30,11 @@ export class WikiRateLimitGuard implements CanActivate {
     const req = ctx.switchToHttp().getRequest<AuthenticatedRequest>();
     const user = req.user;
     if (!user?.id) {
-      throw new HttpException('未登录用户禁止写入', HttpStatus.UNAUTHORIZED);
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.UNAUTHORIZED,
+        params: { reason: '未登录用户禁止写入' },
+        legacyMessage: '未登录用户禁止写入',
+      });
     }
     const role = user.role ?? 'newcomer';
     const quota = HOURLY_QUOTA[role] ?? HOURLY_QUOTA.newcomer;
@@ -55,14 +54,13 @@ export class WikiRateLimitGuard implements CanActivate {
       const retryAfterSec = Math.ceil(
         (bucket.windowStart + WINDOW_MS - now) / 1000,
       );
-      throw new HttpException(
-        {
-          message: `编辑频率超限：${role} 每小时最多 ${quota} 次写入`,
-          retryAfterSec,
-        },
-        HttpStatus.TOO_MANY_REQUESTS,
-      );
+      throw new AppError('WIKI_RATE_LIMITED', {
+        status: HttpStatus.TOO_MANY_REQUESTS,
+        params: { role, quota, retryAfterSec },
+        legacyMessage: `编辑频率超限：${role} 每小时最多 ${quota} 次写入`,
+      });
     }
     return true;
   }
 }
+// i18n-ignore-end

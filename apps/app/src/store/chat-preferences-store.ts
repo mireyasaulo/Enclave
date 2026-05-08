@@ -23,6 +23,7 @@ export const useChatPreferencesStore = create<ChatPreferencesState>()(
         }),
     }),
     {
+      // i18n-ignore-next-line: zustand storage key, not user-visible
       name: "yinjie-app-chat-preferences",
       storage: createSessionStateStorage(),
     },

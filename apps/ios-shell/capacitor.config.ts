@@ -5,6 +5,7 @@ const config: CapacitorConfig = {
   appName: "隐界",
   webDir: "../app/dist",
   ios: {
+    scheme: "capacitor",
     contentInset: "always",
   },
   plugins: {
@@ -25,10 +26,6 @@ const config: CapacitorConfig = {
       resize: "native",
       resizeOnFullScreen: true,
     },
-  },
-  server: {
-    androidScheme: "https",
-    hostname: "app.yinjie.local",
   },
 };
 

@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   CELEBRITY_CHARACTER_PRESETS,
   type CelebrityCharacterPreset,
@@ -28,3 +29,4 @@ export function getBuiltInCharacterPreset(presetKey: string) {
     (preset) => preset.presetKey === presetKey,
   );
 }
+// i18n-ignore-end

@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 
 type ExpandableTextProps = {
   text: string;
@@ -17,9 +21,11 @@ export function ExpandableText({
   textClassName,
   toggleClassName,
   collapsedLineClampClass = "line-clamp-2",
-  expandLabel = "展开",
-  collapseLabel = "收起",
+  expandLabel,
+  collapseLabel,
 }: ExpandableTextProps) {
+  const resolvedExpandLabel = expandLabel ?? t(msg`展开`);
+  const resolvedCollapseLabel = collapseLabel ?? t(msg`收起`);
   const [expanded, setExpanded] = useState(false);
   const [overflowing, setOverflowing] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
@@ -67,7 +73,7 @@ export function ExpandableText({
             toggleClassName,
           )}
         >
-          {expanded ? collapseLabel : expandLabel}
+          {expanded ? resolvedCollapseLabel : resolvedExpandLabel}
         </button>
       ) : null}
     </div>

@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, MoreThan, MoreThanOrEqual, Repository } from 'typeorm';
@@ -13,6 +14,7 @@ import { GroupMessageEntity } from '../chat/group-message.entity';
 import { GroupReplyTaskEntity } from '../chat/group-reply-task.entity';
 import { GroupReplyTaskService } from '../chat/group-reply-task.service';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   buildGroupReplyIssueSummaryFromTasks,
   calculateGroupReplyCancelRate,
   calculateGroupReplyFailureRate,
@@ -153,7 +155,11 @@ export class ReplyLogicAdminService {
     const owner = await this.getOwnerOrThrow();
     const character = await this.characterRepo.findOneBy({ id: characterId });
     if (!character) {
-      throw new NotFoundException(`Character ${characterId} not found`);
+      throw new AppError('CHARACTER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id: characterId },
+        legacyMessage: `Character ${characterId} not found`,
+      });
     }
 
     const [
@@ -292,7 +298,11 @@ export class ReplyLogicAdminService {
 
     const group = await this.groupRepo.findOneBy({ id: conversationId });
     if (!group) {
-      throw new NotFoundException(`Conversation ${conversationId} not found`);
+      throw new AppError('ADMIN_CONVERSATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { conversationId },
+        legacyMessage: `Conversation ${conversationId} not found`,
+      });
     }
 
     const membership = await this.groupMemberRepo.findOneBy({
@@ -301,7 +311,11 @@ export class ReplyLogicAdminService {
       memberType: 'user',
     });
     if (!membership) {
-      throw new NotFoundException(`Conversation ${conversationId} not found`);
+      throw new AppError('ADMIN_CONVERSATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { conversationId },
+        legacyMessage: `Conversation ${conversationId} not found`,
+      });
     }
 
     const [members, messages] = await Promise.all([
@@ -370,7 +384,11 @@ export class ReplyLogicAdminService {
     const owner = await this.getOwnerOrThrow();
     const character = await this.characterRepo.findOneBy({ id: characterId });
     if (!character) {
-      throw new NotFoundException(`Character ${characterId} not found`);
+      throw new AppError('CHARACTER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id: characterId },
+        legacyMessage: `Character ${characterId} not found`,
+      });
     }
 
     const conversations = filterUserFacingConversations(
@@ -440,9 +458,11 @@ export class ReplyLogicAdminService {
         characters.find((character) => character.id === actorCharacterId) ??
         characters[0];
       if (!selectedCharacter) {
-        throw new NotFoundException(
-          `Conversation ${conversationId} has no character participants`,
-        );
+        throw new AppError('ADMIN_CONVERSATION_NO_CHARACTER_PARTICIPANTS', {
+          status: HttpStatus.NOT_FOUND,
+          params: { conversationId },
+          legacyMessage: `Conversation ${conversationId} has no character participants`,
+        });
       }
 
       const actor = await this.buildActorSnapshot({
@@ -466,7 +486,11 @@ export class ReplyLogicAdminService {
 
     const group = await this.groupRepo.findOneBy({ id: conversationId });
     if (!group) {
-      throw new NotFoundException(`Conversation ${conversationId} not found`);
+      throw new AppError('ADMIN_CONVERSATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { conversationId },
+        legacyMessage: `Conversation ${conversationId} not found`,
+      });
     }
 
     const membership = await this.groupMemberRepo.findOneBy({
@@ -475,7 +499,11 @@ export class ReplyLogicAdminService {
       memberType: 'user',
     });
     if (!membership) {
-      throw new NotFoundException(`Conversation ${conversationId} not found`);
+      throw new AppError('ADMIN_CONVERSATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { conversationId },
+        legacyMessage: `Conversation ${conversationId} not found`,
+      });
     }
 
     const [members, messages] = await Promise.all([
@@ -500,9 +528,11 @@ export class ReplyLogicAdminService {
       characters.find((character) => character.id === actorCharacterId) ??
       characters[0];
     if (!selectedCharacter) {
-      throw new NotFoundException(
-        `Conversation ${conversationId} has no character participants`,
-      );
+      throw new AppError('ADMIN_CONVERSATION_NO_CHARACTER_PARTICIPANTS', {
+        status: HttpStatus.NOT_FOUND,
+        params: { conversationId },
+        legacyMessage: `Conversation ${conversationId} has no character participants`,
+      });
     }
 
     const actor = await this.buildActorSnapshot({
@@ -582,7 +612,10 @@ export class ReplyLogicAdminService {
       order: { createdAt: 'ASC' },
     });
     if (!owner) {
-      throw new NotFoundException('World owner not found');
+      throw new AppError('ADMIN_WORLD_OWNER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'World owner not found',
+      });
     }
 
     return owner;
@@ -1778,3 +1811,4 @@ export class ReplyLogicAdminService {
     };
   }
 }
+// i18n-ignore-end

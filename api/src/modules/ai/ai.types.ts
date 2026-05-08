@@ -1,4 +1,5 @@
 // 场景提示词：每个场景独立配置
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export interface ScenePrompts {
   chat?: string; // 聊天回复
   moments_post?: string; // 发朋友圈
@@ -377,3 +378,4 @@ export interface GenerateMomentOptions {
   generationContext?: MomentGenerationContext;
   usageContext?: AiUsageContext;
 }
+// i18n-ignore-end

@@ -1,17 +1,11 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { FarmEventService } from './farm-event.service';
 import { FarmNpcService } from './farm-npc.service';
 import { FarmStateService } from './farm-state.service';
 import { isFarmCropId } from './crop-catalog';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   FarmCropId,
   FarmEventView,
   FarmHarvestResult,
@@ -122,7 +116,9 @@ export class FarmController {
     const ownerId = await this.stateService.resolveOwnerId();
     const plotIndex = parsePlotIndex(body.plotIndex);
     if (typeof body.characterId !== 'string' || body.characterId.length === 0) {
-      throw new BadRequestException('characterId 必填');
+      throw new AppError('FARM_CHARACTER_REQUIRED', {
+        legacyMessage: 'characterId 必填',
+      });
     }
     return this.stateService.stealFromNpc(ownerId, body.characterId, plotIndex);
   }
@@ -160,14 +156,20 @@ export class FarmController {
 function parsePlotIndex(raw: unknown): number {
   const n = Number(raw);
   if (!Number.isFinite(n) || !Number.isInteger(n) || n < 0) {
-    throw new BadRequestException('plotIndex 必须为非负整数');
+    throw new AppError('FARM_INVALID_PLOT_INDEX', {
+      legacyMessage: 'plotIndex 必须为非负整数',
+    });
   }
   return n;
 }
 
 function parseCropId(raw: unknown): FarmCropId {
   if (typeof raw !== 'string' || !isFarmCropId(raw)) {
-    throw new BadRequestException(`未知作物：${String(raw)}`);
+    throw new AppError('FARM_UNKNOWN_CROP', {
+      params: { cropId: String(raw) },
+      legacyMessage: `未知作物：${String(raw)}`,
+    });
   }
   return raw;
 }
+// i18n-ignore-end

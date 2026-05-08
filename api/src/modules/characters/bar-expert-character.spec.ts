@@ -1,5 +1,6 @@
 import { buildBarExpertCharacter } from './bar-expert-character';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 describe('bar expert character', () => {
   it('keeps a lively default runtime presence', () => {
     const character = buildBarExpertCharacter();
@@ -42,3 +43,4 @@ describe('bar expert character', () => {
     );
   });
 });
+// i18n-ignore-end

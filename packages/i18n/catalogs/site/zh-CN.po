@@ -13,12 +13,12 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:15
-msgid "产品"
-msgstr "产品"
+#: apps/site/src/app/not-found.tsx:19
+msgid "404"
+msgstr "404"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/capability-grid.tsx:67
+#: apps/site/src/components/capability-grid.tsx:11
 #: apps/site/src/components/site-header.tsx:16
 msgid "核心能力"
 msgstr "核心能力"
@@ -30,140 +30,227 @@ msgid "跨端"
 msgstr "跨端"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/self-host-section.tsx:9
+#: apps/site/src/components/faq-accordion.tsx:37
 #: apps/site/src/components/site-header.tsx:18
-msgid "开源自部署"
-msgstr "开源自部署"
+msgid "FAQ"
+msgstr "FAQ"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/download/page.tsx:18
+#: apps/site/src/app/[locale]/download/page.tsx:23
 #: apps/site/src/components/site-footer.tsx:13
 #: apps/site/src/components/site-header.tsx:19
 msgid "下载"
 msgstr "下载"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/hero-section.tsx:17
-#: apps/site/src/components/site-header.tsx:20
-msgid "在线试用"
-msgstr "在线试用"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/one-person-world.tsx:37
-msgid "理念"
-msgstr "理念"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/one-person-world.tsx:38
-msgid "一个属于你的世界，从架构开始"
-msgstr "一个属于你的世界，从架构开始"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/one-person-world.tsx:39
-msgid "隐界不是一个共享的 chatbot 服务，而是一套可独立部署的 AI 社交基础设施。每个实例只为一个人存在。"
-msgstr "隐界不是一个共享的 chatbot 服务，而是一套可独立部署的 AI 社交基础设施。每个实例只为一个人存在。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/self-host-section.tsx:10
-msgid "克隆、起 docker、起飞"
-msgstr "克隆、起 docker、起飞"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/self-host-section.tsx:11
-msgid "完全开源，MIT 许可。无任何外部 SaaS 依赖；一台机器、一条 docker compose up，几分钟就能跑起来。"
-msgstr "完全开源，MIT 许可。无任何外部 SaaS 依赖；一台机器、一条 docker compose up，几分钟就能跑起来。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/self-host-section.tsx:14
-msgid "克隆仓库"
-msgstr "克隆仓库"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/self-host-section.tsx:15
-msgid "一键启动"
-msgstr "一键启动"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/self-host-section.tsx:16
-msgid "浏览器访问"
-msgstr "浏览器访问"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/self-host-section.tsx:17
-msgid "查看完整自部署指南"
-msgstr "查看完整自部署指南"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/self-host-section.tsx:18
-msgid "在 GitHub 上 Star"
-msgstr "在 GitHub 上 Star"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:9
-msgid "一个属于你的 AI 虚拟世界。开源、可自部署、跨端可用。"
-msgstr "一个属于你的 AI 虚拟世界。开源、可自部署、跨端可用。"
-
-#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:212
+#: apps/site/src/components/get-started-cta.tsx:14
+#: apps/site/src/components/hero-section.tsx:15
+#: apps/site/src/components/hero-section.tsx:23
+#: apps/site/src/components/og/og-template.tsx:10
 #: apps/site/src/components/site-footer.tsx:12
-msgid "自部署文档"
-msgstr "自部署文档"
+#: apps/site/src/components/site-header.tsx:20
+msgid "免费开始"
+msgstr "免费开始"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:16
+#: apps/site/src/components/site-header.tsx:21
+msgid "打开菜单"
+msgstr "打开菜单"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:22
+msgid "关闭菜单"
+msgstr "关闭菜单"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:23
+msgid "隐界"
+msgstr "隐界"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/multi-platform-carousel.tsx:54
+msgid "产品截图"
+msgstr "产品截图"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/multi-platform-carousel.tsx:55
+msgid "从入坑到日常使用"
+msgstr "从入坑到日常使用"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/multi-platform-carousel.tsx:56
+msgid "六个核心场景一起看，画面均来自当前线上版本。"
+msgstr "六个核心场景一起看，画面均来自当前线上版本。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:10
+msgid "一个属于你的 AI 虚拟世界。私人居民、动态、群聊、电话——浏览器即开即用。"
+msgstr "一个属于你的 AI 虚拟世界。私人居民、动态、群聊、电话——浏览器即开即用。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx:26
+#: apps/site/src/app/[locale]/changelog/page.tsx:75
 #: apps/site/src/components/site-footer.tsx:14
+msgid "更新日志"
+msgstr "更新日志"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:25
+#: apps/site/src/app/[locale]/privacy/page.tsx:74
+#: apps/site/src/components/site-footer.tsx:16
 msgid "隐私政策"
 msgstr "隐私政策"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:16
-#: apps/site/src/components/site-footer.tsx:15
+#: apps/site/src/app/[locale]/terms/page.tsx:25
+#: apps/site/src/app/[locale]/terms/page.tsx:74
+#: apps/site/src/components/site-footer.tsx:17
 msgid "服务条款"
 msgstr "服务条款"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:16
+#: apps/site/src/components/site-footer.tsx:18
 msgid "联系我们"
 msgstr "联系我们"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/hero-section.tsx:12
-msgid "开源 · 可自部署 · 跨端"
-msgstr "开源 · 可自部署 · 跨端"
+#: apps/site/src/components/site-footer.tsx:19
+msgid "隐界 · Enclave"
+msgstr "隐界 · Enclave"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/hero-section.tsx:13
+#: apps/site/src/components/one-person-world.tsx:39
+msgid "理念"
+msgstr "理念"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/one-person-world.tsx:40
+msgid "属于你的，就只属于你"
+msgstr "属于你的，就只属于你"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/one-person-world.tsx:41
+msgid "隐界为每个人单独搭建一个私人 AI 世界。你的居民、你的关系、你的故事——别人看不到，平台也不会拿去训练。"
+msgstr "隐界为每个人单独搭建一个私人 AI 世界。你的居民、你的关系、你的故事——别人看不到，平台也不会拿去训练。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/hero-section.tsx:10
+msgid "AI 虚拟世界 · 一键开始"
+msgstr "AI 虚拟世界 · 一键开始"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/hero-section.tsx:11
+#: apps/site/src/components/og/og-template.tsx:8
 msgid "一个属于你的 AI 虚拟世界"
 msgstr "一个属于你的 AI 虚拟世界"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/hero-section.tsx:14
+#: apps/site/src/components/hero-section.tsx:12
 msgid "在隐界，你不是和一个 chatbot 聊天，而是拥有一个有居民、有时间、有关系的私人世界。它不与现实对立，让现实里的你，多出一种可能。"
 msgstr "在隐界，你不是和一个 chatbot 聊天，而是拥有一个有居民、有时间、有关系的私人世界。它不与现实对立，让现实里的你，多出一种可能。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/hero-section.tsx:18
-msgid "在 GitHub 查看"
-msgstr "在 GitHub 查看"
+#: apps/site/src/components/hero-section.tsx:16
+msgid "了解能做什么"
+msgstr "了解能做什么"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/hero-section.tsx:19
+#: apps/site/src/components/hero-section.tsx:17
 msgid "核心闭环演示（动图）"
 msgstr "核心闭环演示（动图）"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/hero-section.tsx:59
-msgid "语言版本"
-msgstr "语言版本"
+#: apps/site/src/components/hero-section.tsx:18
+msgid "隐界核心闭环演示动图：聊天、朋友圈、群聊、电话、笔记一气呵成"
+msgstr "隐界核心闭环演示动图：聊天、朋友圈、群聊、电话、笔记一气呵成"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/hero-section.tsx:63
-msgid "移动 + 桌面"
-msgstr "移动 + 桌面"
+#: apps/site/src/components/hero-section.tsx:19
+msgid "私人世界"
+msgstr "私人世界"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/hero-section.tsx:67
-msgid "开源协议"
-msgstr "开源协议"
+#: apps/site/src/components/hero-section.tsx:20
+msgid "一人一实例"
+msgstr "一人一实例"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/hero-section.tsx:21
+msgid "多端同步"
+msgstr "多端同步"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/hero-section.tsx:22
+msgid "浏览器 / 桌面 / 手机"
+msgstr "浏览器 / 桌面 / 手机"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/hero-section.tsx:24
+msgid "注册即用，无需安装"
+msgstr "注册即用，无需安装"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:11
+msgid "立即开始"
+msgstr "立即开始"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:12
+msgid "几秒钟，开启你的隐界世界"
+msgstr "几秒钟，开启你的隐界世界"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:13
+msgid "打开浏览器即可使用，不需要安装；如果你愿意，也可以下载桌面端，或者自己部署一份。"
+msgstr "打开浏览器即可使用，不需要安装；如果你愿意，也可以下载桌面端，或者自己部署一份。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:219
+#: apps/site/src/components/get-started-cta.tsx:15
+msgid "查看下载方式"
+msgstr "查看下载方式"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:16
+msgid "数据自主"
+msgstr "数据自主"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:17
+msgid "一人一实例，对话只属于你"
+msgstr "一人一实例，对话只属于你"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:18
+msgid "跨端同步"
+msgstr "跨端同步"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:19
+msgid "浏览器 / 桌面 / 手机一致体验"
+msgstr "浏览器 / 桌面 / 手机一致体验"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:20
+msgid "开源可审计"
+msgstr "开源可审计"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:21
+msgid "MIT 协议，代码全部公开"
+msgstr "MIT 协议，代码全部公开"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:171
+#: apps/site/src/components/faq-accordion.tsx:36
+msgid "常见问题"
+msgstr "常见问题"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/faq-accordion.tsx:38
+msgid "没找到你的问题？欢迎邮件联系我们。"
+msgstr "没找到你的问题？欢迎邮件联系我们。"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/cross-platform-section.tsx:27
@@ -172,8 +259,8 @@ msgstr "移动随手用，桌面深度用"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/cross-platform-section.tsx:28
-msgid "apps/app 是一份 React 19 + TypeScript 代码库，同时跑在 Web、iOS / Android Capacitor 壳、以及 Tauri 桌面壳上。"
-msgstr "apps/app 是一份 React 19 + TypeScript 代码库，同时跑在 Web、iOS / Android Capacitor 壳、以及 Tauri 桌面壳上。"
+msgid "在浏览器、电脑、手机上都能用，对话和动态实时同步。一个账号，无缝接管。"
+msgstr "在浏览器、电脑、手机上都能用，对话和动态实时同步。一个账号，无缝接管。"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/cross-platform-section.tsx:31
@@ -182,8 +269,8 @@ msgstr "移动端"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/cross-platform-section.tsx:32
-msgid "Web / iOS / Android"
-msgstr "Web / iOS / Android"
+msgid "浏览器 / iOS / Android"
+msgstr "浏览器 / iOS / Android"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/cross-platform-section.tsx:33
@@ -192,581 +279,606 @@ msgstr "桌面端"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/cross-platform-section.tsx:34
-msgid "Tauri · Windows / macOS / Linux"
-msgstr "Tauri · Windows / macOS / Linux"
+msgid "Windows / macOS / Linux"
+msgstr "Windows / macOS / Linux"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:17
-msgid "产品截图"
-msgstr "产品截图"
+#: apps/site/src/components/breadcrumb-nav.tsx:20
+#: apps/site/src/components/seo/breadcrumbs-json-ld.tsx:19
+msgid "首页"
+msgstr "首页"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:18
-msgid "从入坑到日常使用"
-msgstr "从入坑到日常使用"
+#: apps/site/src/components/seo/howto-json-ld.tsx:13
+msgid "如何开始使用隐界"
+msgstr "如何开始使用隐界"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:19
-msgid "六个核心场景一起看，画面均来自 apps/app 当前真实版本。"
-msgstr "六个核心场景一起看，画面均来自 apps/app 当前真实版本。"
+#: apps/site/src/components/seo/howto-json-ld.tsx:14
+msgid "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
+msgstr "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/download-cards.tsx:109
-msgid "敬请期待"
-msgstr "敬请期待"
+#: apps/site/src/components/seo/howto-json-ld.tsx:22
+msgid "打开网页版（最快）"
+msgstr "打开网页版（最快）"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/capability-grid.tsx:68
+#: apps/site/src/components/seo/howto-json-ld.tsx:23
+msgid "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
+msgstr "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx:31
+msgid "下载桌面端（更顺手）"
+msgstr "下载桌面端（更顺手）"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx:32
+msgid "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
+msgstr "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx:40
+msgid "自部署（最自主）"
+msgstr "自部署（最自主）"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx:41
+msgid "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
+msgstr "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/capability-grid.tsx:12
 msgid "不是 chatbot，而是一整个生态"
 msgstr "不是 chatbot，而是一整个生态"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/capability-grid.tsx:69
-msgid "基于 apps/app 的真实代码盘点而成的能力清单：每一项都已在产品中跑通。"
-msgstr "基于 apps/app 的真实代码盘点而成的能力清单：每一项都已在产品中跑通。"
+#: apps/site/src/components/capability-grid.tsx:13
+msgid "为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。"
+msgstr "为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:18
-#: apps/site/src/app/[locale]/terms/page.tsx:18
-msgid "最近更新"
-msgstr "最近更新"
+#: apps/site/src/app/[locale]/use-cases/page.tsx:119
+#: apps/site/src/components/capability-grid.tsx:14
+msgid "查看用例"
+msgstr "查看用例"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:24
-msgid "一、开源许可"
-msgstr "一、开源许可"
+#: apps/site/src/components/download-cards.tsx:116
+msgid "推荐"
+msgstr "推荐"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:27
-msgid "隐界以 MIT 许可证发布。你可以自由使用、修改、分发本项目源代码与产物，包括商业用途，请遵循 MIT 协议中的署名要求。"
-msgstr "隐界以 MIT 许可证发布。你可以自由使用、修改、分发本项目源代码与产物，包括商业用途，请遵循 MIT 协议中的署名要求。"
+#: apps/site/src/components/download-cards.tsx:121
+msgid "敬请期待"
+msgstr "敬请期待"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:34
-msgid "二、合理使用"
-msgstr "二、合理使用"
+#: apps/site/src/app/manifest.ts:10
+#: apps/site/src/components/og/og-template.tsx:11
+#: apps/site/src/components/seo/home-json-ld.tsx:15
+#: apps/site/src/components/seo/site-json-ld.tsx:9
+msgid "隐界 Enclave"
+msgstr "隐界 Enclave"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:37
-msgid "请不要利用隐界从事违反所在国家或地区法律的活动；不要将其用于骚扰、欺诈、传播虚假信息或制造伤害。AI 角色生成的内容由用户负责审阅与判断，不视为隐界开发者的立场或建议。"
-msgstr "请不要利用隐界从事违反所在国家或地区法律的活动；不要将其用于骚扰、欺诈、传播虚假信息或制造伤害。AI 角色生成的内容由用户负责审阅与判断，不视为隐界开发者的立场或建议。"
+#: apps/site/src/app/[locale]/layout.tsx:29
+#: apps/site/src/app/[locale]/page.tsx:28
+#: apps/site/src/components/seo/home-json-ld.tsx:16
+#: apps/site/src/components/seo/site-json-ld.tsx:10
+msgid "私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用，免费开始你的隐界世界。"
+msgstr "私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用，免费开始你的隐界世界。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:44
-msgid "三、订阅与计费"
-msgstr "三、订阅与计费"
+#: apps/site/src/components/seo/home-json-ld.tsx:36
+msgid "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
+msgstr "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:47
-msgid "若你选择官方托管的云服务并购买订阅，账单与你接入的模型供应商绑定，按使用量结算。订阅可随时取消，未使用部分按月按比例退还。"
-msgstr "若你选择官方托管的云服务并购买订阅，账单与你接入的模型供应商绑定，按使用量结算。订阅可随时取消，未使用部分按月按比例退还。"
+#: apps/site/src/components/og/og-template.tsx:9
+msgid "私人 AI 世界 · 浏览器即开即用 · 多端同步"
+msgstr "私人 AI 世界 · 浏览器即开即用 · 多端同步"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:54
-msgid "四、免责声明"
-msgstr "四、免责声明"
+#: apps/site/src/components/og/og-template.tsx:12
+msgid "语言版本"
+msgstr "语言版本"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:57
-msgid "本软件按现状提供，不对适销性、特定用途适用性、不侵权或可用性作任何明示或暗示担保。在适用法律允许的最大范围内，作者与贡献者不承担因使用本软件而产生的任何损失。"
-msgstr "本软件按现状提供，不对适销性、特定用途适用性、不侵权或可用性作任何明示或暗示担保。在适用法律允许的最大范围内，作者与贡献者不承担因使用本软件而产生的任何损失。"
+#: apps/site/src/app/manifest.ts:12
+msgid "一个属于你的 AI 虚拟世界。私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用。"
+msgstr "一个属于你的 AI 虚拟世界。私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:64
-msgid "五、变更"
-msgstr "五、变更"
+#: apps/site/src/app/not-found.tsx:20
+msgid "该页面不存在"
+msgstr "该页面不存在"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:67
-msgid "条款可能根据法律法规与产品演进调整，重大变更我们会在仓库与本页公告。"
-msgstr "条款可能根据法律法规与产品演进调整，重大变更我们会在仓库与本页公告。"
+#: apps/site/src/app/not-found.tsx:21
+msgid "回到首页"
+msgstr "回到首页"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:74
-#: apps/site/src/app/[locale]/terms/page.tsx:72
-msgid "六、联系我们"
-msgstr "六、联系我们"
+#: apps/site/src/app/[locale]/layout.tsx:34
+#: apps/site/src/app/[locale]/page.tsx:27
+msgid "隐界 · 一个属于你的 AI 虚拟世界"
+msgstr "隐界 · 一个属于你的 AI 虚拟世界"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:74
-msgid "如对条款有任何疑问，请发邮件至 yuanzui0728@gmail.com。"
-msgstr "如对条款有任何疑问，请发邮件至 yuanzui0728@gmail.com。"
+#: apps/site/src/app/[locale]/layout.tsx:35
+msgid "%s · 隐界 Enclave"
+msgstr "%s · 隐界 Enclave"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:24
-msgid "一、我们的隐私立场"
-msgstr "一、我们的隐私立场"
+#: apps/site/src/app/[locale]/use-cases/page.tsx:27
+#: apps/site/src/app/[locale]/use-cases/page.tsx:60
+msgid "用例"
+msgstr "用例"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:27
-msgid "隐界采用一人一世界的独立实例架构。除非你主动选择官方托管的云服务，否则你的数据保存在你自己部署的实例里，与任何中央服务器无关。"
-msgstr "隐界采用一人一世界的独立实例架构。除非你主动选择官方托管的云服务，否则你的数据保存在你自己部署的实例里，与任何中央服务器无关。"
+#: apps/site/src/app/[locale]/use-cases/page.tsx:28
+msgid "看看真实场景下隐界能做什么：长期 AI 陪伴、多角色群聊、自部署隐私优先。"
+msgstr "看看真实场景下隐界能做什么：长期 AI 陪伴、多角色群聊、自部署隐私优先。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:34
-msgid "二、自部署用户"
-msgstr "二、自部署用户"
+#: apps/site/src/app/[locale]/use-cases/page.tsx:84
+msgid "真实场景"
+msgstr "真实场景"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:37
-msgid "你完全控制数据存放位置（本地数据库 / 自有服务器 / 云盘）。隐界不会向第三方发送任何用户数据，除非你显式连接外部模型供应商；此时仅相关对话内容根据你的配置发送给该供应商。"
-msgstr "你完全控制数据存放位置（本地数据库 / 自有服务器 / 云盘）。隐界不会向第三方发送任何用户数据，除非你显式连接外部模型供应商；此时仅相关对话内容根据你的配置发送给该供应商。"
+#: apps/site/src/app/[locale]/use-cases/page.tsx:87
+msgid "人们用隐界来做什么"
+msgstr "人们用隐界来做什么"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:44
-msgid "三、托管云服务用户"
-msgstr "三、托管云服务用户"
+#: apps/site/src/app/[locale]/use-cases/page.tsx:90
+msgid "下面这些用例不是虚构的 demo，而是社区里真实在跑的玩法。挑一个最像你的场景看看。"
+msgstr "下面这些用例不是虚构的 demo，而是社区里真实在跑的玩法。挑一个最像你的场景看看。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:47
-msgid "如选择官方托管，我们仅采集运行所需的最少数据：账号标识、订阅状态、错误堆栈与请求日志。这些数据不会用于广告，也不会与第三方共享，仅用于服务运维与计费。"
-msgstr "如选择官方托管，我们仅采集运行所需的最少数据：账号标识、订阅状态、错误堆栈与请求日志。这些数据不会用于广告，也不会与第三方共享，仅用于服务运维与计费。"
+#: apps/site/src/app/[locale]/download/page.tsx:24
+msgid "挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。"
+msgstr "挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:54
-msgid "四、模型供应商"
-msgstr "四、模型供应商"
+#: apps/site/src/app/[locale]/download/page.tsx:66
+msgid "开始使用"
+msgstr "开始使用"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:57
-msgid "AI 对话内容会按你的配置发送给所选模型供应商（OpenAI、Anthropic、Google、DeepSeek 等，或你自部署的本地模型）。具体数据处理方式请参考各供应商的隐私政策。"
-msgstr "AI 对话内容会按你的配置发送给所选模型供应商（OpenAI、Anthropic、Google、DeepSeek 等，或你自部署的本地模型）。具体数据处理方式请参考各供应商的隐私政策。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:64
-msgid "五、你的权利"
-msgstr "五、你的权利"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:67
-msgid "你可以随时导出全部数据、迁移到其他实例、永久删除自己的世界。我们不会保留任何无法删除的数据副本。"
-msgstr "你可以随时导出全部数据、迁移到其他实例、永久删除自己的世界。我们不会保留任何无法删除的数据副本。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:77
-msgid "有任何隐私相关疑问，请发邮件至 yuanzui0728@gmail.com。"
-msgstr "有任何隐私相关疑问，请发邮件至 yuanzui0728@gmail.com。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/download/page.tsx:21
+#: apps/site/src/app/[locale]/download/page.tsx:69
 msgid "挑一种最顺手的方式开始用隐界"
 msgstr "挑一种最顺手的方式开始用隐界"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/download/page.tsx:24
-msgid "桌面端原生封装、网页版即开即用，自部署提供完整自主权。移动端与小程序在路上。"
-msgstr "桌面端原生封装、网页版即开即用，自部署提供完整自主权。移动端与小程序在路上。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/faq-accordion.tsx:35
-msgid "常见问题"
-msgstr "常见问题"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/faq-accordion.tsx:36
-msgid "FAQ"
-msgstr "FAQ"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/faq-accordion.tsx:37
-msgid "没找到你的问题？欢迎邮件联系我们。"
-msgstr "没找到你的问题？欢迎邮件联系我们。"
-#. js-lingui-explicit-id
-msgid "一人一世界"
-msgstr "一人一世界"
-#. js-lingui-explicit-id
-msgid "独立实例架构，数据真正属于用户。隐私不靠承诺，靠架构层保障。"
-msgstr "独立实例架构，数据真正属于用户。隐私不靠承诺，靠架构层保障。"
-#. js-lingui-explicit-id
-msgid "数据自主"
-msgstr "数据自主"
-#. js-lingui-explicit-id
-msgid "全部数据可导入导出，可整包迁移；离开隐界，世界还是你的。"
-msgstr "全部数据可导入导出，可整包迁移；离开隐界，世界还是你的。"
-#. js-lingui-explicit-id
-msgid "AI 平权"
-msgstr "AI 平权"
-#. js-lingui-explicit-id
-msgid "高质量对话不应被少数平台垄断。隐界让任何人都能拥有自己的 AI 居民。"
-msgstr "高质量对话不应被少数平台垄断。隐界让任何人都能拥有自己的 AI 居民。"
-#. js-lingui-explicit-id
-msgid "不取代现实"
-msgstr "不取代现实"
-#. js-lingui-explicit-id
-msgid "白天有同事、有老板，晚上回到隐界有心理咨询师；它补全你的情感维度，而不是替代真实关系。"
-msgstr "白天有同事、有老板，晚上回到隐界有心理咨询师；它补全你的情感维度，而不是替代真实关系。"
-#. js-lingui-explicit-id
-msgid "聊天工作区（多窗口）"
-msgstr "聊天工作区（多窗口）"
-#. js-lingui-explicit-id
-msgid "聊天文件中心"
-msgstr "聊天文件中心"
-#. js-lingui-explicit-id
-msgid "聊天记录全局搜索"
-msgstr "聊天记录全局搜索"
-#. js-lingui-explicit-id
-msgid "视频号直播伴侣"
-msgstr "视频号直播伴侣"
-#. js-lingui-explicit-id
-msgid "原生托盘 / 锁屏"
-msgstr "原生托盘 / 锁屏"
-#. js-lingui-explicit-id
-msgid "隐界真的开源吗？"
-msgstr "隐界真的开源吗？"
-#. js-lingui-explicit-id
-msgid "是。整个 monorepo（apps/app、apps/desktop、cloud-api、admin、site 等）都在 GitHub 上以 MIT 许可证开放，欢迎自部署、二次开发、商用。"
-msgstr "是。整个 monorepo（apps/app、apps/desktop、cloud-api、admin、site 等）都在 GitHub 上以 MIT 许可证开放，欢迎自部署、二次开发、商用。"
-#. js-lingui-explicit-id
-msgid "我的数据保存在哪里？"
-msgstr "我的数据保存在哪里？"
-#. js-lingui-explicit-id
-msgid "保存在你自己部署的实例里。隐界采用一人一世界的独立实例架构，没有中心化的数据后台，没有跨用户的数据合并；你拥有数据所有权。"
-msgstr "保存在你自己部署的实例里。隐界采用一人一世界的独立实例架构，没有中心化的数据后台，没有跨用户的数据合并；你拥有数据所有权。"
-#. js-lingui-explicit-id
-msgid "用什么模型？能换模型吗？"
-msgstr "用什么模型？能换模型吗？"
-#. js-lingui-explicit-id
-msgid "默认与多家主流模型供应商兼容（OpenAI 兼容协议），可在订阅页或自部署配置里切换；本地模型同样支持，只要服务能开 OpenAI 兼容的 HTTP 接口。"
-msgstr "默认与多家主流模型供应商兼容（OpenAI 兼容协议），可在订阅页或自部署配置里切换；本地模型同样支持，只要服务能开 OpenAI 兼容的 HTTP 接口。"
-#. js-lingui-explicit-id
-msgid "可以离线使用吗？"
-msgstr "可以离线使用吗？"
-#. js-lingui-explicit-id
-msgid "本地客户端（Tauri 桌面壳、Capacitor 移动壳）可离线浏览历史；AI 对话需要联网到模型服务（无论你是连云端还是本地模型）。"
-msgstr "本地客户端（Tauri 桌面壳、Capacitor 移动壳）可离线浏览历史；AI 对话需要联网到模型服务（无论你是连云端还是本地模型）。"
-#. js-lingui-explicit-id
-msgid "需要付费吗？"
-msgstr "需要付费吗？"
-#. js-lingui-explicit-id
-msgid "自部署完全免费。如果选择官方托管的云服务，按使用量付费——账单与你接入的模型供应商绑定，没有中间溢价。"
-msgstr "自部署完全免费。如果选择官方托管的云服务，按使用量付费——账单与你接入的模型供应商绑定，没有中间溢价。"
-#. js-lingui-explicit-id
-msgid "支持中英日韩之外的语言吗？"
-msgstr "支持中英日韩之外的语言吗？"
-#. js-lingui-explicit-id
-msgid "界面目前支持简中 / English / 日本語 / 한국어。AI 角色对话本身不限语种，跟着模型能力走。"
-msgstr "界面目前支持简中 / English / 日本語 / 한국어。AI 角色对话本身不限语种，跟着模型能力走。"
-#. js-lingui-explicit-id
-msgid "Windows 桌面端"
-msgstr "Windows 桌面端"
-#. js-lingui-explicit-id
-msgid "Tauri 原生封装，附带托盘和锁屏"
-msgstr "Tauri 原生封装，附带托盘和锁屏"
-#. js-lingui-explicit-id
-msgid "前往 GitHub Releases"
-msgstr "前往 GitHub Releases"
-#. js-lingui-explicit-id
-msgid "macOS 桌面端"
-msgstr "macOS 桌面端"
-#. js-lingui-explicit-id
-msgid "适配 Apple Silicon 与 Intel"
-msgstr "适配 Apple Silicon 与 Intel"
-#. js-lingui-explicit-id
-msgid "网页版（在线试用）"
-msgstr "网页版（在线试用）"
-#. js-lingui-explicit-id
-msgid "无需安装，直接在浏览器里体验"
-msgstr "无需安装，直接在浏览器里体验"
-#. js-lingui-explicit-id
-msgid "打开网页版"
-msgstr "打开网页版"
-#. js-lingui-explicit-id
-msgid "iOS / Android"
-msgstr "iOS / Android"
-#. js-lingui-explicit-id
-msgid "Capacitor 移动壳，敬请期待"
-msgstr "Capacitor 移动壳，敬请期待"
-#. js-lingui-explicit-id
-msgid "微信小程序"
-msgstr "微信小程序"
-#. js-lingui-explicit-id
-msgid "适配国内场景，敬请期待"
-msgstr "适配国内场景，敬请期待"
-#. js-lingui-explicit-id
-msgid "自部署（推荐）"
-msgstr "自部署（推荐）"
-#. js-lingui-explicit-id
-msgid "克隆仓库、docker compose up，几分钟跑起来"
-msgstr "克隆仓库、docker compose up，几分钟跑起来"
-#. js-lingui-explicit-id
-msgid "查看部署指南"
-msgstr "查看部署指南"
-#. js-lingui-explicit-id
-msgid "AI 虚拟世界 · 一键开始"
-msgstr "AI 虚拟世界 · 一键开始"
-#. js-lingui-explicit-id
-msgid "免费开始"
-msgstr "免费开始"
-#. js-lingui-explicit-id
-msgid "了解能做什么"
-msgstr "了解能做什么"
-#. js-lingui-explicit-id
-msgid "私人世界"
-msgstr "私人世界"
-#. js-lingui-explicit-id
-msgid "一人一实例"
-msgstr "一人一实例"
-#. js-lingui-explicit-id
-msgid "多端同步"
-msgstr "多端同步"
-#. js-lingui-explicit-id
-msgid "浏览器 / 桌面 / 手机"
-msgstr "浏览器 / 桌面 / 手机"
-#. js-lingui-explicit-id
-msgid "注册即用，无需安装"
-msgstr "注册即用，无需安装"
-#. js-lingui-explicit-id
-msgid "为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。"
-msgstr "为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。"
-#. js-lingui-explicit-id
-msgid "六个核心场景一起看，画面均来自当前线上版本。"
-msgstr "六个核心场景一起看，画面均来自当前线上版本。"
-#. js-lingui-explicit-id
-msgid "在浏览器、电脑、手机上都能用，对话和动态实时同步。一个账号，无缝接管。"
-msgstr "在浏览器、电脑、手机上都能用，对话和动态实时同步。一个账号，无缝接管。"
-#. js-lingui-explicit-id
-msgid "浏览器 / iOS / Android"
-msgstr "浏览器 / iOS / Android"
-#. js-lingui-explicit-id
-msgid "Windows / macOS / Linux"
-msgstr "Windows / macOS / Linux"
-#. js-lingui-explicit-id
-msgid "每位用户拥有完全独立的世界，互不打扰、互不可见。你的对话只属于你。"
-msgstr "每位用户拥有完全独立的世界，互不打扰、互不可见。你的对话只属于你。"
-#. js-lingui-explicit-id
-msgid "全部数据可一键导出，随时带走；不绑定平台，不锁定关系。"
-msgstr "全部数据可一键导出，随时带走；不绑定平台，不锁定关系。"
-#. js-lingui-explicit-id
-msgid "可信赖的 AI"
-msgstr "可信赖的 AI"
-#. js-lingui-explicit-id
-msgid "代码完全开源、可审计；底层模型可选官方托管或自主接入，过程透明。"
-msgstr "代码完全开源、可审计；底层模型可选官方托管或自主接入，过程透明。"
-#. js-lingui-explicit-id
-msgid "属于你的，就只属于你"
-msgstr "属于你的，就只属于你"
-#. js-lingui-explicit-id
-msgid "隐界为每个人单独搭建一个私人 AI 世界。你的居民、你的关系、你的故事——别人看不到，平台也不会拿去训练。"
-msgstr "隐界为每个人单独搭建一个私人 AI 世界。你的居民、你的关系、你的故事——别人看不到，平台也不会拿去训练。"
-#. js-lingui-explicit-id
-msgid "立即开始"
-msgstr "立即开始"
-#. js-lingui-explicit-id
-msgid "几秒钟，开启你的隐界世界"
-msgstr "几秒钟，开启你的隐界世界"
-#. js-lingui-explicit-id
-msgid "打开浏览器即可使用，不需要安装；如果你愿意，也可以下载桌面端，或者自己部署一份。"
-msgstr "打开浏览器即可使用，不需要安装；如果你愿意，也可以下载桌面端，或者自己部署一份。"
-#. js-lingui-explicit-id
-msgid "查看下载方式"
-msgstr "查看下载方式"
-#. js-lingui-explicit-id
-msgid "一人一实例，对话只属于你"
-msgstr "一人一实例，对话只属于你"
-#. js-lingui-explicit-id
-msgid "跨端同步"
-msgstr "跨端同步"
-#. js-lingui-explicit-id
-msgid "浏览器 / 桌面 / 手机一致体验"
-msgstr "浏览器 / 桌面 / 手机一致体验"
-#. js-lingui-explicit-id
-msgid "开源可审计"
-msgstr "开源可审计"
-#. js-lingui-explicit-id
-msgid "MIT 协议，代码全部公开"
-msgstr "MIT 协议，代码全部公开"
-#. js-lingui-explicit-id
-msgid "隐界是做什么的？"
-msgstr "隐界是做什么的？"
-#. js-lingui-explicit-id
-msgid "隐界是一个 AI 社交世界。每个用户都有一个属于自己的私人世界，里面有 AI 角色、朋友圈、群聊、电话、笔记，可以和角色长期对话、发展关系，让 AI 真正成为日常的一部分。"
-msgstr "隐界是一个 AI 社交世界。每个用户都有一个属于自己的私人世界，里面有 AI 角色、朋友圈、群聊、电话、笔记，可以和角色长期对话、发展关系，让 AI 真正成为日常的一部分。"
-#. js-lingui-explicit-id
-msgid "和普通的 AI 聊天工具有什么不同？"
-msgstr "和普通的 AI 聊天工具有什么不同？"
-#. js-lingui-explicit-id
-msgid "普通的 chatbot 是问一句答一句；隐界是一个有居民、有时间、有关系的虚拟世界。AI 角色会主动发动态、给你打电话、记得过去聊过的事，更像是真实的人际关系。"
-msgstr "普通的 chatbot 是问一句答一句；隐界是一个有居民、有时间、有关系的虚拟世界。AI 角色会主动发动态、给你打电话、记得过去聊过的事，更像是真实的人际关系。"
-#. js-lingui-explicit-id
-msgid "免费注册即可开始使用，基础对话和功能完全免费。如果你需要更高级的模型、更多角色或更长记忆，可以选择按使用量付费的订阅。"
-msgstr "免费注册即可开始使用，基础对话和功能完全免费。如果你需要更高级的模型、更多角色或更长记忆，可以选择按使用量付费的订阅。"
-#. js-lingui-explicit-id
-msgid "我的隐私和数据安全吗？"
-msgstr "我的隐私和数据安全吗？"
-#. js-lingui-explicit-id
-msgid "隐界采用一人一世界的私人实例：你的对话只属于你，别人看不到，平台也不会拿去训练任何对外的模型。你可以随时导出全部数据。"
-msgstr "隐界采用一人一世界的私人实例：你的对话只属于你，别人看不到，平台也不会拿去训练任何对外的模型。你可以随时导出全部数据。"
-#. js-lingui-explicit-id
-msgid "我能信你不会偷偷用我的数据吗？"
-msgstr "我能信你不会偷偷用我的数据吗？"
-#. js-lingui-explicit-id
-msgid "整套代码完全开源（MIT 许可，github.com/yuanzui0728/yinjie-app），任何人都可以审计——包括你自己。如果你不放心托管版，也可以选择自己部署。"
-msgstr "整套代码完全开源（MIT 许可，github.com/yuanzui0728/yinjie-app），任何人都可以审计——包括你自己。如果你不放心托管版，也可以选择自己部署。"
-#. js-lingui-explicit-id
-msgid "支持哪些设备？"
-msgstr "支持哪些设备？"
-#. js-lingui-explicit-id
-msgid "浏览器打开就能用，无需安装。同时提供 Windows / macOS 桌面端，iOS / Android 与微信小程序在路上，所有平台同账号同步。"
-msgstr "浏览器打开就能用，无需安装。同时提供 Windows / macOS 桌面端，iOS / Android 与微信小程序在路上，所有平台同账号同步。"
-#. js-lingui-explicit-id
-msgid "开始使用"
-msgstr "开始使用"
-#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/download/page.tsx:72
 msgid "浏览器即开即用，桌面端体验更佳；移动端与小程序在路上。所有数据云端同步。"
 msgstr "浏览器即开即用，桌面端体验更佳；移动端与小程序在路上。所有数据云端同步。"
+
 #. js-lingui-explicit-id
-msgid "推荐"
-msgstr "推荐"
-#. js-lingui-explicit-id
-msgid "网页版（推荐）"
-msgstr "网页版（推荐）"
-#. js-lingui-explicit-id
-msgid "打开浏览器即用，无需安装；最快开始体验隐界"
-msgstr "打开浏览器即用，无需安装；最快开始体验隐界"
-#. js-lingui-explicit-id
-msgid "原生体验，含托盘和锁屏，适合长期重度使用"
-msgstr "原生体验，含托盘和锁屏，适合长期重度使用"
-#. js-lingui-explicit-id
-msgid "原生移动端 App，敬请期待"
-msgstr "原生移动端 App，敬请期待"
-#. js-lingui-explicit-id
-msgid "自部署（高级）"
-msgstr "自部署（高级）"
-#. js-lingui-explicit-id
-msgid "完全开源、MIT 协议；如果你想拥有 100% 自主权可以自己跑一份"
-msgstr "完全开源、MIT 协议；如果你想拥有 100% 自主权可以自己跑一份"
-#. js-lingui-explicit-id
-msgid "一个属于你的 AI 虚拟世界。私人居民、动态、群聊、电话——浏览器即开即用。"
-msgstr "一个属于你的 AI 虚拟世界。私人居民、动态、群聊、电话——浏览器即开即用。"
-#. js-lingui-explicit-id
-msgid "隐界 · 一个属于你的 AI 虚拟世界"
-msgstr "隐界 · 一个属于你的 AI 虚拟世界"
-#. js-lingui-explicit-id
-msgid "%s · 隐界 Enclave"
-msgstr "%s · 隐界 Enclave"
-#. js-lingui-explicit-id
-msgid "私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用，免费开始你的隐界世界。"
-msgstr "私人 AI 居民、朋友圈、群聊、电话——浏览器即开即用，免费开始你的隐界世界。"
-#. js-lingui-explicit-id
-msgid "下载隐界 · 网页 / 桌面 / 移动 全平台"
-msgstr "下载隐界 · 网页 / 桌面 / 移动 全平台"
-#. js-lingui-explicit-id
-msgid "挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。"
-msgstr "挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。"
-#. js-lingui-explicit-id
-msgid "隐私政策 · 隐界 Enclave"
-msgstr "隐私政策 · 隐界 Enclave"
-#. js-lingui-explicit-id
-msgid "隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。"
-msgstr "隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。"
-#. js-lingui-explicit-id
-msgid "服务条款 · 隐界 Enclave"
-msgstr "服务条款 · 隐界 Enclave"
-#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:26
 msgid "隐界 Enclave 服务条款：开源协议、合理使用、订阅与计费、免责声明。"
 msgstr "隐界 Enclave 服务条款：开源协议、合理使用、订阅与计费、免责声明。"
+
 #. js-lingui-explicit-id
-msgid "隐界 Enclave"
-msgstr "隐界 Enclave"
+#: apps/site/src/app/[locale]/terms/page.tsx:88
+msgid "一、开源许可"
+msgstr "一、开源许可"
+
 #. js-lingui-explicit-id
-msgid "首页"
-msgstr "首页"
+#: apps/site/src/app/[locale]/terms/page.tsx:91
+msgid "隐界以 MIT 许可证发布。你可以自由使用、修改、分发本项目源代码与产物，包括商业用途，请遵循 MIT 协议中的署名要求。"
+msgstr "隐界以 MIT 许可证发布。你可以自由使用、修改、分发本项目源代码与产物，包括商业用途，请遵循 MIT 协议中的署名要求。"
+
 #. js-lingui-explicit-id
-msgid "隐界核心闭环演示动图：聊天、朋友圈、群聊、电话、笔记一气呵成"
-msgstr "隐界核心闭环演示动图：聊天、朋友圈、群聊、电话、笔记一气呵成"
+#: apps/site/src/app/[locale]/terms/page.tsx:98
+msgid "二、合理使用"
+msgstr "二、合理使用"
+
 #. js-lingui-explicit-id
-msgid "隐界聊天界面：与 AI 角色的线程化对话、消息提醒、强提醒、已读标记"
-msgstr "隐界聊天界面：与 AI 角色的线程化对话、消息提醒、强提醒、已读标记"
+#: apps/site/src/app/[locale]/terms/page.tsx:101
+msgid "请不要利用隐界从事违反所在国家或地区法律的活动；不要将其用于骚扰、欺诈、传播虚假信息或制造伤害。AI 角色生成的内容由用户负责审阅与判断，不视为隐界开发者的立场或建议。"
+msgstr "请不要利用隐界从事违反所在国家或地区法律的活动；不要将其用于骚扰、欺诈、传播虚假信息或制造伤害。AI 角色生成的内容由用户负责审阅与判断，不视为隐界开发者的立场或建议。"
+
 #. js-lingui-explicit-id
-msgid "隐界朋友圈：AI 角色与你共享的私人时间线，会主动发动态与互动"
-msgstr "隐界朋友圈：AI 角色与你共享的私人时间线，会主动发动态与互动"
+#: apps/site/src/app/[locale]/terms/page.tsx:108
+msgid "三、订阅与计费"
+msgstr "三、订阅与计费"
+
 #. js-lingui-explicit-id
-msgid "隐界频道流：频道、视频号、官方账号的内容聚合界面"
-msgstr "隐界频道流：频道、视频号、官方账号的内容聚合界面"
+#: apps/site/src/app/[locale]/terms/page.tsx:111
+msgid "若你选择官方托管的云服务并购买订阅，账单与你接入的模型供应商绑定，按使用量结算。订阅可随时取消，未使用部分按月按比例退还。"
+msgstr "若你选择官方托管的云服务并购买订阅，账单与你接入的模型供应商绑定，按使用量结算。订阅可随时取消，未使用部分按月按比例退还。"
+
 #. js-lingui-explicit-id
-msgid "隐界群组：多 AI 角色与你的多人对话场景"
-msgstr "隐界群组：多 AI 角色与你的多人对话场景"
+#: apps/site/src/app/[locale]/terms/page.tsx:118
+msgid "四、免责声明"
+msgstr "四、免责声明"
+
 #. js-lingui-explicit-id
-msgid "隐界新人引导：首次进入虚拟世界的角色初始化与世界设定"
-msgstr "隐界新人引导：首次进入虚拟世界的角色初始化与世界设定"
+#: apps/site/src/app/[locale]/terms/page.tsx:121
+msgid "本软件按现状提供，不对适销性、特定用途适用性、不侵权或可用性作任何明示或暗示担保。在适用法律允许的最大范围内，作者与贡献者不承担因使用本软件而产生的任何损失。"
+msgstr "本软件按现状提供，不对适销性、特定用途适用性、不侵权或可用性作任何明示或暗示担保。在适用法律允许的最大范围内，作者与贡献者不承担因使用本软件而产生的任何损失。"
+
 #. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:128
+msgid "五、变更"
+msgstr "五、变更"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:131
+msgid "条款可能根据法律法规与产品演进调整，重大变更我们会在仓库与本页公告。"
+msgstr "条款可能根据法律法规与产品演进调整，重大变更我们会在仓库与本页公告。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:138
+#: apps/site/src/app/[locale]/terms/page.tsx:136
+msgid "六、联系我们"
+msgstr "六、联系我们"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:138
+msgid "如对条款有任何疑问，请发邮件至 yuanzui0728@gmail.com。"
+msgstr "如对条款有任何疑问，请发邮件至 yuanzui0728@gmail.com。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:150
+msgid "它具体怎么做到"
+msgstr "它具体怎么做到"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:198
+msgid "准备好试一下？"
+msgstr "准备好试一下？"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:201
+msgid "浏览器即开即用，不需要注册任何信用卡。"
+msgstr "浏览器即开即用，不需要注册任何信用卡。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:226
+msgid "看看其它用例"
+msgstr "看看其它用例"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:26
+msgid "隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。"
+msgstr "隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:88
+msgid "一、我们的隐私立场"
+msgstr "一、我们的隐私立场"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:91
+msgid "隐界采用一人一世界的独立实例架构。除非你主动选择官方托管的云服务，否则你的数据保存在你自己部署的实例里，与任何中央服务器无关。"
+msgstr "隐界采用一人一世界的独立实例架构。除非你主动选择官方托管的云服务，否则你的数据保存在你自己部署的实例里，与任何中央服务器无关。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:98
+msgid "二、自部署用户"
+msgstr "二、自部署用户"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:101
+msgid "你完全控制数据存放位置（本地数据库 / 自有服务器 / 云盘）。隐界不会向第三方发送任何用户数据，除非你显式连接外部模型供应商；此时仅相关对话内容根据你的配置发送给该供应商。"
+msgstr "你完全控制数据存放位置（本地数据库 / 自有服务器 / 云盘）。隐界不会向第三方发送任何用户数据，除非你显式连接外部模型供应商；此时仅相关对话内容根据你的配置发送给该供应商。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:108
+msgid "三、托管云服务用户"
+msgstr "三、托管云服务用户"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:111
+msgid "如选择官方托管，我们仅采集运行所需的最少数据：账号标识、订阅状态、错误堆栈与请求日志。这些数据不会用于广告，也不会与第三方共享，仅用于服务运维与计费。"
+msgstr "如选择官方托管，我们仅采集运行所需的最少数据：账号标识、订阅状态、错误堆栈与请求日志。这些数据不会用于广告，也不会与第三方共享，仅用于服务运维与计费。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:118
+msgid "四、模型供应商"
+msgstr "四、模型供应商"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:121
+msgid "AI 对话内容会按你的配置发送给所选模型供应商（OpenAI、Anthropic、Google、DeepSeek 等，或你自部署的本地模型）。具体数据处理方式请参考各供应商的隐私政策。"
+msgstr "AI 对话内容会按你的配置发送给所选模型供应商（OpenAI、Anthropic、Google、DeepSeek 等，或你自部署的本地模型）。具体数据处理方式请参考各供应商的隐私政策。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:128
+msgid "五、你的权利"
+msgstr "五、你的权利"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:131
+msgid "你可以随时导出全部数据、迁移到其他实例、永久删除自己的世界。我们不会保留任何无法删除的数据副本。"
+msgstr "你可以随时导出全部数据、迁移到其他实例、永久删除自己的世界。我们不会保留任何无法删除的数据副本。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:141
+msgid "有任何隐私相关疑问，请发邮件至 yuanzui0728@gmail.com。"
+msgstr "有任何隐私相关疑问，请发邮件至 yuanzui0728@gmail.com。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx:27
+msgid "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
+msgstr "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx:77
+msgid "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
+msgstr "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx:88
+msgid "在 GitHub Releases 查看完整列表"
+msgstr "在 GitHub Releases 查看完整列表"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx:113
+msgid "GitHub Release"
+msgstr "GitHub Release"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx:25
+msgid "AI 虚拟世界"
+msgstr "AI 虚拟世界"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx:26
+msgid "AI 角色社交"
+msgstr "AI 角色社交"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx:27
+msgid "AI 朋友圈"
+msgstr "AI 朋友圈"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/site-json-ld.tsx:28
+msgid "自部署 AI 应用"
+msgstr "自部署 AI 应用"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:22
+msgid "AI 与人共同的时间线"
+msgstr "AI 与人共同的时间线"
+
+#: apps/site/src/lib/capabilities-data.ts:35
+msgid "AI 数字人通话"
+msgstr "AI 数字人通话"
+
+#: apps/site/src/components/download-cards.tsx:68
+msgid "iOS / Android"
+msgstr "iOS / Android"
+
+#: apps/site/src/components/download-cards.tsx:58
+msgid "macOS 桌面端"
+msgstr "macOS 桌面端"
+
+#: apps/site/src/components/download-cards.tsx:48
+msgid "Windows 桌面端"
+msgstr "Windows 桌面端"
+
+#: apps/site/src/components/one-person-world.tsx:16
+msgid "一人一世界"
+msgstr "一人一世界"
+
+#: apps/site/src/lib/capabilities-data.ts:31
+msgid "一对一对话、群聊、线程讨论；消息提醒、强提醒、已读标记一应俱全。"
+msgstr "一对一对话、群聊、线程讨论；消息提醒、强提醒、已读标记一应俱全。"
+
+#: apps/site/src/components/one-person-world.tsx:31
+msgid "不取代现实"
+msgstr "不取代现实"
+
+#: apps/site/src/lib/capabilities-data.ts:65
+msgid "云订阅与权限"
+msgstr "云订阅与权限"
+
+#: apps/site/src/components/one-person-world.tsx:27
+msgid "代码完全开源、可审计；底层模型可选官方托管或自主接入，过程透明。"
+msgstr "代码完全开源、可审计；底层模型可选官方托管或自主接入，过程透明。"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:46
+msgid "你与 AI 化身的资料卡"
+msgstr "你与 AI 化身的资料卡"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:39
+#: apps/site/src/lib/capabilities-data.ts:85
+msgid "入坑引导"
+msgstr "入坑引导"
+
+#: apps/site/src/components/one-person-world.tsx:22
+msgid "全部数据可一键导出，随时带走；不绑定平台，不锁定关系。"
+msgstr "全部数据可一键导出，随时带走；不绑定平台，不锁定关系。"
+
+#: apps/site/src/lib/capabilities-data.ts:46
+msgid "内嵌的小程序生态，随手打开工具、拓展隐界的能力边界。"
+msgstr "内嵌的小程序生态，随手打开工具、拓展隐界的能力边界。"
+
+#: apps/site/src/components/download-cards.tsx:50
+#: apps/site/src/components/download-cards.tsx:60
+msgid "前往 GitHub Releases"
+msgstr "前往 GitHub Releases"
+
+#: apps/site/src/components/download-cards.tsx:49
+msgid "原生体验，含托盘和锁屏，适合长期重度使用"
+msgstr "原生体验，含托盘和锁屏，适合长期重度使用"
+
+#: apps/site/src/components/download-cards.tsx:69
+msgid "原生移动端 App，敬请期待"
+msgstr "原生移动端 App，敬请期待"
+
+#: apps/site/src/lib/capabilities-data.ts:41
+msgid "发布与浏览朋友动态，AI 角色也会发帖、互动、出现在你的时间线。"
+msgstr "发布与浏览朋友动态，AI 角色也会发帖、互动、出现在你的时间线。"
+
+#: apps/site/src/lib/capabilities-data.ts:60
+msgid "发现与场景社交"
+msgstr "发现与场景社交"
+
+#: apps/site/src/components/one-person-world.tsx:26
+msgid "可信赖的 AI"
+msgstr "可信赖的 AI"
+
+#: apps/site/src/lib/capabilities-data.ts:36
+msgid "和虚拟角色实时对话——支持 1 对 1、群组、视频与语音多种形式。"
+msgstr "和虚拟角色实时对话——支持 1 对 1、群组、视频与语音多种形式。"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:34
+msgid "多人对话与角色互动"
+msgstr "多人对话与角色互动"
+
+#: apps/site/src/components/download-cards.tsx:89
+msgid "完全开源、MIT 协议；如果你想拥有 100% 自主权可以自己跑一份"
+msgstr "完全开源、MIT 协议；如果你想拥有 100% 自主权可以自己跑一份"
+
+#: apps/site/src/lib/capabilities-data.ts:45
+msgid "小程序工作区"
+msgstr "小程序工作区"
+
+#: apps/site/src/components/download-cards.tsx:78
+msgid "微信小程序"
+msgstr "微信小程序"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:45
+#: apps/site/src/lib/capabilities-data.ts:86
+msgid "我的角色"
+msgstr "我的角色"
+
+#: apps/site/src/components/download-cards.tsx:38
+msgid "打开浏览器即用，无需安装；最快开始体验隐界"
+msgstr "打开浏览器即用，无需安装；最快开始体验隐界"
+
+#: apps/site/src/components/download-cards.tsx:70
+#: apps/site/src/components/download-cards.tsx:80
+msgid "敬请期待"
+msgstr "敬请期待"
+
+#: apps/site/src/components/one-person-world.tsx:21
+msgid "数据自主"
+msgstr "数据自主"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:40
+msgid "新人启动与世界初始化"
+msgstr "新人启动与世界初始化"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:21
+#: apps/site/src/lib/capabilities-data.ts:82
+msgid "朋友圈"
+msgstr "朋友圈"
+
+#: apps/site/src/lib/capabilities-data.ts:40
+msgid "朋友圈与动态"
+msgstr "朋友圈与动态"
+
+#: apps/site/src/components/download-cards.tsx:90
+msgid "查看部署指南"
+msgstr "查看部署指南"
+
+#: apps/site/src/lib/capabilities-data.ts:56
+msgid "桌面端多窗口笔记，灵感随手记，无缝同步、不受应用边界约束。"
+msgstr "桌面端多窗口笔记，灵感随手记，无缝同步、不受应用边界约束。"
+
+#: apps/site/src/components/one-person-world.tsx:17
+msgid "每位用户拥有完全独立的世界，互不打扰、互不可见。你的对话只属于你。"
+msgstr "每位用户拥有完全独立的世界，互不打扰、互不可见。你的对话只属于你。"
+
+#: apps/site/src/lib/capabilities-data.ts:50
+msgid "游戏中心"
+msgstr "游戏中心"
+
+#: apps/site/src/lib/capabilities-data.ts:51
+msgid "游戏库与邀请系统，把朋友、AI 角色都拉进同一桌。"
+msgstr "游戏库与邀请系统，把朋友、AI 角色都拉进同一桌。"
+
+#: apps/site/src/lib/capabilities-data.ts:66
+msgid "灵活的功能分级与支付，按需开启更高级的模型与能力。"
+msgstr "灵活的功能分级与支付，按需开启更高级的模型与能力。"
+
+#: apps/site/src/components/one-person-world.tsx:32
+msgid "白天有同事、有老板，晚上回到隐界有心理咨询师；它补全你的情感维度，而不是替代真实关系。"
+msgstr "白天有同事、有老板，晚上回到隐界有心理咨询师；它补全你的情感维度，而不是替代真实关系。"
+
+#: apps/site/src/components/download-cards.tsx:39
+msgid "立即开始"
+msgstr "立即开始"
+
+#: apps/site/src/lib/capabilities-data.ts:55
+msgid "笔记工作区（多窗口）"
+msgstr "笔记工作区（多窗口）"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:16
+msgid "线程化对话与消息提醒"
+msgstr "线程化对话与消息提醒"
+
+#: apps/site/src/components/download-cards.tsx:37
+msgid "网页版（推荐）"
+msgstr "网页版（推荐）"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:33
+#: apps/site/src/lib/capabilities-data.ts:84
+msgid "群组"
+msgstr "群组"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:15
+#: apps/site/src/lib/capabilities-data.ts:81
+msgid "聊天"
+msgstr "聊天"
+
+#: apps/site/src/lib/capabilities-data.ts:30
+msgid "聊天与群组"
+msgstr "聊天与群组"
+
+#: apps/site/src/components/download-cards.tsx:88
+msgid "自部署（高级）"
+msgstr "自部署（高级）"
+
+#: apps/site/src/components/download-cards.tsx:59
+msgid "适配 Apple Silicon 与 Intel"
+msgstr "适配 Apple Silicon 与 Intel"
+
+#: apps/site/src/components/download-cards.tsx:79
+msgid "适配国内场景，敬请期待"
+msgstr "适配国内场景，敬请期待"
+
+#: apps/site/src/lib/capabilities-data.ts:61
+msgid "遇见陌生人、按场景社交、浏览世界人物库，遇见新角色与新故事。"
+msgstr "遇见陌生人、按场景社交、浏览世界人物库，遇见新角色与新故事。"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:47
 msgid "隐界我的角色：你与 AI 化身的资料卡、个性、形象设定"
 msgstr "隐界我的角色：你与 AI 化身的资料卡、个性、形象设定"
 
-#. js-lingui-explicit-id
-#: apps/site/src/app/not-found.tsx
-msgid "该页面不存在"
-msgstr "该页面不存在"
-#. js-lingui-explicit-id
-#: apps/site/src/app/not-found.tsx
-msgid "回到首页"
-msgstr "回到首页"
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx
-msgid "如何开始使用隐界"
-msgstr "如何开始使用隐界"
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx
-msgid "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
-msgstr "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx
-msgid "打开网页版（最快）"
-msgstr "打开网页版（最快）"
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx
-msgid "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
-msgstr "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx
-msgid "下载桌面端（更顺手）"
-msgstr "下载桌面端（更顺手）"
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx
-msgid "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
-msgstr "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx
-msgid "自部署（最自主）"
-msgstr "自部署（最自主）"
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx
-msgid "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
-msgstr "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/home-json-ld.tsx
-msgid "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
-msgstr "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/site-json-ld.tsx
-msgid "AI 虚拟世界"
-msgstr "AI 虚拟世界"
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/site-json-ld.tsx
-msgid "AI 角色社交"
-msgstr "AI 角色社交"
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/site-json-ld.tsx
-msgid "AI 朋友圈"
-msgstr "AI 朋友圈"
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/site-json-ld.tsx
-msgid "自部署 AI 应用"
-msgstr "自部署 AI 应用"
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/changelog/page.tsx
-#: apps/site/src/components/site-footer.tsx
-msgid "更新日志"
-msgstr "更新日志"
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/changelog/page.tsx
-msgid "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
-msgstr "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/changelog/page.tsx
-msgid "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
-msgstr "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/changelog/page.tsx
-msgid "在 GitHub Releases 查看完整列表"
-msgstr "在 GitHub Releases 查看完整列表"
+#: apps/site/src/components/multi-platform-carousel.tsx:41
+msgid "隐界新人引导：首次进入虚拟世界的角色初始化与世界设定"
+msgstr "隐界新人引导：首次进入虚拟世界的角色初始化与世界设定"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:23
+msgid "隐界朋友圈：AI 角色与你共享的私人时间线，会主动发动态与互动"
+msgstr "隐界朋友圈：AI 角色与你共享的私人时间线，会主动发动态与互动"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:35
+msgid "隐界群组：多 AI 角色与你的多人对话场景"
+msgstr "隐界群组：多 AI 角色与你的多人对话场景"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:17
+msgid "隐界聊天界面：与 AI 角色的线程化对话、消息提醒、强提醒、已读标记"
+msgstr "隐界聊天界面：与 AI 角色的线程化对话、消息提醒、强提醒、已读标记"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:29
+msgid "隐界频道流：频道、视频号、官方账号的内容聚合界面"
+msgstr "隐界频道流：频道、视频号、官方账号的内容聚合界面"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:28
+msgid "频道、视频号、官方账号"
+msgstr "频道、视频号、官方账号"
+
+#: apps/site/src/components/multi-platform-carousel.tsx:27
+#: apps/site/src/lib/capabilities-data.ts:83
+msgid "频道流"
+msgstr "频道流"

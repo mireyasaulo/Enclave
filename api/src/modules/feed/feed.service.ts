@@ -1,11 +1,6 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, MoreThanOrEqual, Repository } from 'typeorm';
 import { FeedPostEntity } from './feed-post.entity';
@@ -262,7 +257,10 @@ export class FeedService implements OnModuleInit {
       }));
 
     if (!latestPost) {
-      throw new NotFoundException('Channel author not found');
+      throw new AppError('FEED_CHANNEL_AUTHOR_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Channel author not found',
+      });
     }
 
     const [ownerStateMap, commentsPreviewMap, followerCount, isFollowing, bio] =
@@ -462,6 +460,7 @@ export class FeedService implements OnModuleInit {
     options?: {
       sourceKind?: FeedSourceKind;
       recommendationScore?: number;
+      preserveTimestamp?: boolean;
     },
   ): Promise<FeedPostEntity | null> {
     if (post.authorType !== 'character') {
@@ -475,7 +474,7 @@ export class FeedService implements OnModuleInit {
 
     const character = await this.characters.findById(post.authorId);
 
-    return this.createPost({
+    const created = await this.createPost({
       authorAvatar: character?.avatar ?? post.authorAvatar,
       authorId: post.authorId,
       authorName: post.authorName,
@@ -493,6 +492,14 @@ export class FeedService implements OnModuleInit {
       surface: 'feed',
       visibility: (post.visibility as 'public' | 'friends' | 'private') ?? 'public',
     });
+
+    if (options?.preserveTimestamp && post.postedAt) {
+      // 回填历史动态时保留原始时间戳，避免广场顺序混乱。
+      await this.postRepo.update(created.id, { createdAt: post.postedAt });
+      created.createdAt = post.postedAt;
+    }
+
+    return created;
   }
 
   async addOwnerComment(
@@ -564,7 +571,10 @@ export class FeedService implements OnModuleInit {
     const parentComment = await this.commentRepo.findOneBy({ id: commentId });
 
     if (!parentComment) {
-      throw new NotFoundException('Comment not found');
+      throw new AppError('FEED_COMMENT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Comment not found',
+      });
     }
 
     await this.assertOwnerCanInteractWithPost(parentComment.postId);
@@ -742,7 +752,10 @@ export class FeedService implements OnModuleInit {
     const comment = await this.commentRepo.findOneBy({ id: commentId });
 
     if (!comment) {
-      throw new NotFoundException('Comment not found');
+      throw new AppError('FEED_COMMENT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Comment not found',
+      });
     }
 
     await this.assertOwnerCanInteractWithPost(comment.postId);
@@ -825,7 +838,7 @@ export class FeedService implements OnModuleInit {
         },
       });
       if (!text) return null;
-      return this.createPost({
+      const created = await this.createPost({
         authorAvatar: char.avatar,
         authorId: char.id,
         authorName: char.name,
@@ -834,6 +847,13 @@ export class FeedService implements OnModuleInit {
         surface: 'feed',
         text,
       });
+      // 把广场动态的时间戳推到过去 0-15 分钟随机点，避免 cron tick 集中。
+      const jittered = new Date(
+        Date.now() - Math.floor(Math.random() * 15 * 60 * 1000),
+      );
+      await this.postRepo.update(created.id, { createdAt: jittered });
+      created.createdAt = jittered;
+      return created;
     } catch (err) {
       this.logger.error(`Failed to generate feed post for ${characterId}`, err);
       return null;
@@ -984,13 +1004,20 @@ export class FeedService implements OnModuleInit {
             characterName: char.name,
           },
         });
-        await this.addComment({
+        const savedComment = await this.addComment({
           postId: post.id,
           authorId: char.id,
           authorName: char.name,
           authorAvatar: char.avatar,
           authorType: 'character',
           text: reply.text,
+        });
+        // 把广场 AI 评论时间打散到过去 0-60 秒，避免一拨评论卡 cron tick 整点。
+        const jittered = new Date(
+          Date.now() - Math.floor(Math.random() * 60_000),
+        );
+        await this.commentRepo.update(savedComment.id, {
+          createdAt: jittered,
         });
       } catch {
         // ignore
@@ -1340,6 +1367,11 @@ export class FeedService implements OnModuleInit {
       if (post.authorType !== 'character') return true;
       if (!visibleCharacterIds.has(post.authorId)) return false;
       if (post.visibility === 'private') return false;
+      // 广场（surface='feed'）公开可见：所有非屏蔽角色都展示，无论是否好友；
+      // 视频号（surface='channels'）保留 friends 仅好友可见的语义。
+      if (surface === 'feed') {
+        return true;
+      }
       if (post.visibility === 'friends') {
         return ownerFriendIds.has(post.authorId);
       }
@@ -1447,7 +1479,10 @@ export class FeedService implements OnModuleInit {
       };
     }
 
-    throw new NotFoundException('Channel author not found');
+    throw new AppError('FEED_CHANNEL_AUTHOR_NOT_FOUND', {
+      status: HttpStatus.NOT_FOUND,
+      legacyMessage: 'Channel author not found',
+    });
   }
 
   private async resolveAuthorBio(authorId: string, authorType: string) {
@@ -1483,7 +1518,9 @@ export class FeedService implements OnModuleInit {
     const mediaType = this.inferFeedMediaType(media, input.mediaType);
 
     if (!text && media.length === 0) {
-      throw new BadRequestException('动态内容和媒体不能同时为空。');
+      throw new AppError('FEED_EMPTY', {
+        legacyMessage: '动态内容和媒体不能同时为空。',
+      });
     }
 
     this.assertFeedMediaMatchesMediaType(mediaType, media);
@@ -1595,31 +1632,40 @@ export class FeedService implements OnModuleInit {
   ) {
     if (mediaType === 'text') {
       if (media.length > 0) {
-        throw new BadRequestException('纯文本动态不能附带图片或视频。');
+        throw new AppError('FEED_TEXT_NO_MEDIA', {
+          legacyMessage: '纯文本动态不能附带图片或视频。',
+        });
       }
       return;
     }
 
     if (mediaType === 'video') {
       if (media.length !== 1 || media[0]?.kind !== 'video') {
-        throw new BadRequestException('视频动态必须且只能包含 1 条视频。');
+        throw new AppError('FEED_VIDEO_SINGLE', {
+          legacyMessage: '视频动态必须且只能包含 1 条视频。',
+        });
       }
 
       const video = media[0] as MomentVideoAsset;
       if (video.durationMs && video.durationMs > MAX_FEED_VIDEO_DURATION_MS) {
-        throw new BadRequestException('视频时长不能超过 5 分钟。');
+        throw new AppError('FEED_VIDEO_TOO_LONG', {
+          legacyMessage: '视频时长不能超过 5 分钟。',
+        });
       }
       return;
     }
 
     if (media.length < 1 || media.length > MAX_FEED_IMAGE_COUNT) {
-      throw new BadRequestException(
-        `图片动态最多支持 ${MAX_FEED_IMAGE_COUNT} 张图片。`,
-      );
+      throw new AppError('FEED_IMAGES_MAX', {
+        params: { max: MAX_FEED_IMAGE_COUNT },
+        legacyMessage: `图片动态最多支持 ${MAX_FEED_IMAGE_COUNT} 张图片。`,
+      });
     }
 
     if (media.some((asset) => asset.kind !== 'image')) {
-      throw new BadRequestException('图片动态当前只支持图片资源。');
+      throw new AppError('FEED_IMAGES_TYPE_ONLY', {
+        legacyMessage: '图片动态当前只支持图片资源。',
+      });
     }
   }
 
@@ -1746,6 +1792,8 @@ export class FeedService implements OnModuleInit {
     avatarContext?: FeedAvatarContext,
   ): boolean {
     if (post.authorType !== 'character') return true;
+    // 广场（surface='feed'）所有人都能互动；视频号仍保留好友限制。
+    if (post.surface === 'feed') return true;
     if (!avatarContext) return false;
     return avatarContext.ownerFriendCharacterIds.has(post.authorId);
   }
@@ -2035,7 +2083,10 @@ export class FeedService implements OnModuleInit {
   private async assertPostExists(postId: string) {
     const post = await this.postRepo.findOneBy({ id: postId });
     if (!post || post.publishStatus === 'deleted') {
-      throw new NotFoundException('Feed post not found');
+      throw new AppError('FEED_POST_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Feed post not found',
+      });
     }
     return post;
   }
@@ -2043,14 +2094,24 @@ export class FeedService implements OnModuleInit {
   private async assertOwnerCanInteractWithPost(postId: string) {
     const post = await this.assertPostExists(postId);
     if (post.authorType !== 'character') return post;
+    // 广场（surface='feed'）开放给所有人评论 / 点赞，不再要求加好友。
+    if (post.surface === 'feed') return post;
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const friendIds = await this.characters.getActiveFriendCharacterIdSet(
       owner.id,
     );
     if (!friendIds.has(post.authorId)) {
-      throw new ForbiddenException('需先加为好友才能互动');
+      throw new AppError('FEED_NOT_FRIEND', {
+        status: HttpStatus.FORBIDDEN,
+        legacyMessage: '需先加为好友才能互动',
+      });
     }
     return post;
+  }
+
+  async hasFeedPostSyncedFromMoment(momentPostId: string): Promise<boolean> {
+    const existing = await this.findFeedPostSyncedFromMoment(momentPostId);
+    return Boolean(existing);
   }
 
   private async findFeedPostSyncedFromMoment(momentPostId: string) {
@@ -2191,3 +2252,4 @@ function paginate<T>(items: T[], page: number, limit: number) {
   const start = (normalizedPage - 1) * normalizedLimit;
   return items.slice(start, start + normalizedLimit);
 }
+// i18n-ignore-end

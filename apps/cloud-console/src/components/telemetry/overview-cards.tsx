@@ -1,13 +1,15 @@
 import type { TelemetryOverviewResponse } from "@yinjie/contracts";
+import { useCloudConsoleText } from "../../lib/cloud-console-i18n";
 
 export function TelemetryOverviewCards({ data }: { data: TelemetryOverviewResponse }) {
+  const t = useCloudConsoleText();
   const cards = [
-    { label: "页面浏览 PV", value: data.pvCount },
-    { label: "独立访客 UV", value: data.uvCount },
-    { label: "会话数", value: data.sessionCount },
-    { label: "前端错误", value: data.errorCount, tone: "error" as const },
+    { label: t("Page views PV"), value: data.pvCount },
+    { label: t("Unique visitors UV"), value: data.uvCount },
+    { label: t("Sessions"), value: data.sessionCount },
+    { label: t("Frontend errors"), value: data.errorCount, tone: "error" as const },
     {
-      label: "平均会话时长",
+      label: t("Average session duration"),
       value: formatDuration(data.avgSessionDurationMs),
     },
   ];

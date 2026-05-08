@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   getConversationMessages,
   getConversations,
@@ -35,6 +37,8 @@ import {
 import { handleSocketSubscriptionExpiredError } from "../../lib/subscription-expired";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../../store/world-owner-store";
+
+const t = translateRuntimeMessage;
 
 export function useConversationThread(conversationId: string) {
   const queryClient = useQueryClient();
@@ -380,7 +384,7 @@ export function useConversationThread(conversationId: string) {
     });
 
     if (!targetCharacterId) {
-      throw new Error("The target character is not ready yet.");
+      throw new Error(t(msg`The target character is not ready yet.`));
     }
 
     await sendMutation.mutateAsync({
@@ -408,7 +412,7 @@ export function useConversationThread(conversationId: string) {
     });
 
     if (!targetCharacterId) {
-      throw new Error("The target character is not ready yet.");
+      throw new Error(t(msg`The target character is not ready yet.`));
     }
 
     await sendMutation.mutateAsync({
@@ -416,7 +420,8 @@ export function useConversationThread(conversationId: string) {
         conversationId,
         characterId: targetCharacterId,
         type: "sticker",
-        text: overrideText ?? `[表情包] ${sticker.label ?? sticker.stickerId}`,
+        // i18n-ignore-next-line: protocol marker for sticker text payload
+        text: overrideText ?? t(msg`[表情包] ${sticker.label ?? sticker.stickerId}`),
         sticker: {
           sourceType: sticker.sourceType,
           packId: sticker.packId,
@@ -443,7 +448,7 @@ export function useConversationThread(conversationId: string) {
     });
 
     if (!targetCharacterId) {
-      throw new Error("The target character is not ready yet.");
+      throw new Error(t(msg`The target character is not ready yet.`));
     }
 
     if (payload.type === "image") {
@@ -454,7 +459,7 @@ export function useConversationThread(conversationId: string) {
       const result = await uploadChatAttachment(formData, baseUrl);
 
       if (result.attachment.kind !== "image") {
-        throw new Error("图片上传结果异常。");
+        throw new Error(t(msg`图片上传结果异常。`));
       }
 
       await sendMutation.mutateAsync({
@@ -475,7 +480,7 @@ export function useConversationThread(conversationId: string) {
       const result = await uploadChatAttachment(formData, baseUrl);
 
       if (result.attachment.kind !== "file") {
-        throw new Error("文件上传结果异常。");
+        throw new Error(t(msg`文件上传结果异常。`));
       }
 
       await sendMutation.mutateAsync({
@@ -499,7 +504,7 @@ export function useConversationThread(conversationId: string) {
       const result = await uploadChatAttachment(formData, baseUrl);
 
       if (result.attachment.kind !== "voice") {
-        throw new Error("语音上传结果异常。");
+        throw new Error(t(msg`语音上传结果异常。`));
       }
 
       await sendMutation.mutateAsync({
@@ -564,7 +569,7 @@ export function useConversationThread(conversationId: string) {
       });
 
       if (!payload) {
-        throw new Error("这条消息暂时无法重试发送。");
+        throw new Error(t(msg`这条消息暂时无法重试发送。`));
       }
 
       await sendMutation.mutateAsync({

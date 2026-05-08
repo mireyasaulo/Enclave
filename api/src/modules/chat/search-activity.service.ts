@@ -1,8 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { SystemConfigService } from '../config/config.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type SearchHistoryRecord = {
   query: string;
   usedAt: string;
@@ -42,7 +44,9 @@ export class SearchActivityService {
   }): Promise<{ success: true; item: SearchHistoryRecord }> {
     const query = normalizeSearchQuery(input.query);
     if (!query) {
-      throw new BadRequestException('搜索词不能为空。');
+      throw new AppError('CHAT_SEARCH_QUERY_REQUIRED', {
+        legacyMessage: '搜索词不能为空。',
+      });
     }
 
     const owner = await this.worldOwnerService.getOwnerOrThrow();
@@ -124,3 +128,4 @@ function normalizeTimestamp(value: unknown) {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? '' : date.toISOString();
 }
+// i18n-ignore-end

@@ -1,43 +1,26 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
-const SUPPORTED = ["zh-CN", "en-US", "ja-JP", "ko-KR"] as const;
-const DEFAULT_LOCALE = "zh-CN";
-const COOKIE_NAME = "NEXT_LOCALE";
-
-function isSupported(value: string): value is (typeof SUPPORTED)[number] {
-  return (SUPPORTED as readonly string[]).includes(value);
-}
-
-function negotiate(value: string | null | undefined): string | null {
-  if (!value) return null;
-  for (const part of value.split(",")) {
-    const tag = part.split(";")[0].trim().toLowerCase().replaceAll("_", "-");
-    if (!tag) continue;
-    const exact = SUPPORTED.find((s) => s.toLowerCase() === tag);
-    if (exact) return exact;
-    if (tag === "zh" || tag.startsWith("zh-")) return "zh-CN";
-    if (tag === "en" || tag.startsWith("en-")) return "en-US";
-    if (tag === "ja" || tag.startsWith("ja-")) return "ja-JP";
-    if (tag === "ko" || tag.startsWith("ko-")) return "ko-KR";
-  }
-  return null;
-}
+import {
+  DEFAULT_LOCALE,
+  LOCALE_COOKIE_NAME,
+  isSupportedLocale,
+  resolveLocaleFromAcceptLanguage,
+} from "@/lib/locales";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const firstSeg = pathname.split("/")[1] ?? "";
 
-  if (isSupported(firstSeg)) {
+  if (isSupportedLocale(firstSeg)) {
     const headers = new Headers(request.headers);
     headers.set("x-pathname", pathname);
     return NextResponse.next({ request: { headers } });
   }
 
-  const cookieLocale = request.cookies.get(COOKIE_NAME)?.value;
+  const cookieLocale = request.cookies.get(LOCALE_COOKIE_NAME)?.value;
   const negotiated =
-    (cookieLocale && isSupported(cookieLocale) ? cookieLocale : null) ??
-    negotiate(request.headers.get("accept-language")) ??
+    (cookieLocale && isSupportedLocale(cookieLocale) ? cookieLocale : null) ??
+    resolveLocaleFromAcceptLanguage(request.headers.get("accept-language")) ??
     DEFAULT_LOCALE;
 
   const url = request.nextUrl.clone();

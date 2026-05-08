@@ -37,7 +37,8 @@ This package hosts the Capacitor-based Android container for `apps/app`.
 - `pnpm android:doctor` checks the active config and, when `android-shell.config.local.json` exists, still checks tracked production defaults so local overrides do not hide release issues.
 - `pnpm android:doctor` now also checks whether the active Java runtime is at least 21.
 - `pnpm android:bundle` ignores `android-shell.config.local.json`; it can use `YINJIE_ANDROID_*` environment variables as release overrides, and still fails fast when the resulting release runtime config is incomplete.
-- Production defaults disable cleartext traffic; local debugging can override it in `android-shell.config.local.json`.
+- Cleartext traffic is wired through a manifest placeholder (`${yinjieUsesCleartextTraffic}`) injected by build.gradle: debug builds enable it, release builds always disable it. The tracked `AndroidManifest.xml` and `capacitor.config.json` always carry the production-safe values; `pnpm android:configure` no longer rewrites them.
+- `pnpm android:doctor` lints the tracked manifest for cleartext placeholder usage, dev/loopback endpoints, and the `https` androidScheme so a regression like commit db4bb152 cannot silently land again.
 - Android backup and device-transfer extraction are explicitly disabled in the generated manifest resources.
 - Chat voice/video capture in the WebView relies on Capacitor's built-in `BridgeWebChromeClient` permission flow, so the shell manifest must keep `CAMERA`, `RECORD_AUDIO`, and `MODIFY_AUDIO_SETTINGS`.
 - Release signing can come from `apps/android-shell/android-signing.local.properties` or from `YINJIE_UPLOAD_STORE_FILE` / `YINJIE_UPLOAD_STORE_PASSWORD` / `YINJIE_UPLOAD_KEY_ALIAS` / `YINJIE_UPLOAD_KEY_PASSWORD`.

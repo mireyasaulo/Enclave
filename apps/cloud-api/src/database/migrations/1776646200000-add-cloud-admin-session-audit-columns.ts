@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const UP_QUERIES = [
   `ALTER TABLE "cloud_admin_sessions" ADD COLUMN "issuedFromIp" varchar`,
   `ALTER TABLE "cloud_admin_sessions" ADD COLUMN "issuedUserAgent" varchar`,
@@ -31,3 +32,4 @@ export class AddCloudAdminSessionAuditColumns1776646200000
     }
   }
 }
+// i18n-ignore-end

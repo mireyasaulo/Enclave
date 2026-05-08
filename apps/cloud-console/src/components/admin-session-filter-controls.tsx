@@ -14,6 +14,7 @@ import {
   formatAdminSessionSortFieldLabel,
   formatAdminSessionStatusFilterLabel,
 } from "../lib/admin-session-helpers";
+import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
 const SELECT_CLASS_NAME =
   "rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-3 py-2 text-sm normal-case tracking-normal text-[color:var(--text-primary)] outline-none focus:border-[color:var(--border-strong)]";
@@ -57,19 +58,20 @@ export function AdminSessionFilterControls({
   onPageSizeChange,
   className = "grid gap-3 md:grid-cols-2 xl:grid-cols-5",
 }: AdminSessionFilterControlsProps) {
+  const t = useCloudConsoleText();
   return (
     <div className={className}>
       <label className="flex min-w-0 flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Search
+        {t("Search")}
         <input
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
-          placeholder="Session id, IP, client, revoker"
+          placeholder={t("Session id, IP, client, revoker")}
           className={`${SELECT_CLASS_NAME} placeholder-[color:var(--text-muted)]`}
         />
       </label>
       <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Status
+        {t("Status")}
         <select
           value={status}
           onChange={(event) =>
@@ -85,7 +87,7 @@ export function AdminSessionFilterControls({
         </select>
       </label>
       <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Revocation
+        {t("Revocation")}
         <select
           value={revocationReason}
           onChange={(event) =>
@@ -103,7 +105,7 @@ export function AdminSessionFilterControls({
         </select>
       </label>
       <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Scope
+        {t("Scope")}
         <select
           value={scope}
           onChange={(event) =>
@@ -119,7 +121,7 @@ export function AdminSessionFilterControls({
         </select>
       </label>
       <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Sort by
+        {t("Sort by")}
         <select
           value={sortBy}
           onChange={(event) =>
@@ -135,7 +137,7 @@ export function AdminSessionFilterControls({
         </select>
       </label>
       <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Direction
+        {t("Direction")}
         <select
           value={sortDirection}
           onChange={(event) =>
@@ -153,7 +155,7 @@ export function AdminSessionFilterControls({
         </select>
       </label>
       <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-        Page size
+        {t("Page size")}
         <select
           value={String(pageSize)}
           onChange={(event) =>
@@ -163,7 +165,7 @@ export function AdminSessionFilterControls({
         >
           {ADMIN_SESSION_PAGE_SIZE_OPTIONS.map((value) => (
             <option key={value} value={value}>
-              {value} per page
+              {t("{0} per page").replace("{0}", String(value))}
             </option>
           ))}
         </select>

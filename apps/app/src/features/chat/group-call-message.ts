@@ -1,5 +1,12 @@
 import type { DesktopChatCallKind } from "./chat-header-actions";
 
+// i18n-ignore-start: This file builds and parses call invite messages that are
+// stored verbatim in the message `text` field and round-tripped between
+// senders/receivers. The literal Chinese tokens are protocol markers used by
+// both the encoder and the regex/string-prefix parsers below; translating them
+// would break round-trip compatibility. UI presentation translates separately
+// in direct-call-card.ts / group-call-card.ts via the parsed structures.
+
 const DIRECT_VOICE_CALL_PREFIX = "[语音通话]";
 const DIRECT_VIDEO_CALL_PREFIX = "[视频通话]";
 const GROUP_VOICE_CALL_PREFIX = "[群语音通话]";
@@ -524,3 +531,4 @@ function parseGroupCallWaitingMetric(line: string | undefined) {
   const waitingCount = Number(match[1]);
   return Number.isNaN(waitingCount) ? null : waitingCount;
 }
+// i18n-ignore-end

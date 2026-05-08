@@ -1,4 +1,8 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { isDesktopRuntimeAvailable } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 
 export type GroupInviteDeliveryRecord = {
   conversationId: string;
@@ -441,10 +445,10 @@ export function resolveGroupInviteRouteContext(
   }
 
   return {
-    actionLabel: "回到群邀请",
+    actionLabel: t(msg`回到群邀请`),
     description: record.groupName
-      ? `这条会话最近收到过「${record.groupName}」的群邀请。`
-      : "这条会话最近收到过一个群邀请，可回到邀请页继续转发。",
+      ? t(msg`这条会话最近收到过「${record.groupName}」的群邀请。`)
+      : t(msg`这条会话最近收到过一个群邀请，可回到邀请页继续转发。`),
     groupId,
     groupName: record.groupName,
     returnPath: buildGroupInviteReturnPath(groupId, {

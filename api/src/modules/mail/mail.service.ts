@@ -1,9 +1,11 @@
-import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
 import { SocksClient } from 'socks';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type SendVerificationCodeResult = {
   delivered: boolean;
   debugCode: string | null;
@@ -47,7 +49,10 @@ export class MailService {
       this.logger.error(
         `Email send failed to ${email}: ${(error as Error).message}`,
       );
-      throw new ServiceUnavailableException('邮件验证码发送失败，请稍后重试。');
+      throw new AppError('MAIL_CODE_SEND_FAILED', {
+        status: HttpStatus.SERVICE_UNAVAILABLE,
+        legacyMessage: '邮件验证码发送失败，请稍后重试。',
+      });
     }
 
     return { delivered: true, debugCode: null };
@@ -86,3 +91,4 @@ export class MailService {
     return this.transporter;
   }
 }
+// i18n-ignore-end

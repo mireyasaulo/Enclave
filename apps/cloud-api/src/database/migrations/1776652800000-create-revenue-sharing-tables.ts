@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const UP_QUERIES = [
   `CREATE TABLE IF NOT EXISTS "revenue_sharing_policies" (
     "id" varchar PRIMARY KEY NOT NULL,
@@ -131,3 +132,4 @@ export class CreateRevenueSharingTables1776652800000
     }
   }
 }
+// i18n-ignore-end

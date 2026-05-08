@@ -4,19 +4,20 @@
 
 ## 当前状态
 
-- 已提供基础 `package.json`
-- 已提供 `capacitor.config.ts`
+- 已提供基础 `package.json`，Capacitor 系列依赖与 `apps/android-shell` 对齐到 7.1.x
+- 已提供 `capacitor.config.ts`，显式声明 `ios.scheme = "capacitor"`，不再设置 `server.androidScheme` / `server.hostname`
 - 已接通 `sync` / `open` / `doctor` / `configure` 脚本
 - 预期复用 `apps/app/dist` 作为 Web UI 产物
 - `ios/App/App/Plugins/` 已有 `YinjieRuntime` / `YinjieSecureStorage` / `YinjieMobileBridge` 实现
 - 三个 Swift plugin 现已补齐 Capacitor 7 `CAPBridgedPlugin` 元数据，`configure` 会尝试把它们补入 `App.xcodeproj`
 - `YinjieMobileBridge` 当前已接通系统图片选择、系统文件选择、系统相机拍照、外链、文本分享、文件分享、文件预览、通知权限与通知落点恢复
 - 真实 `AppDelegate.swift` 已缓存 APNs token 与通知点击落点
-- 真实 `Info.plist` 已补运行时键位和相机 / 相册 / 麦克风权限文案
+- 真实 `Info.plist` 保留运行时键位 (`Yinjie*`)；显示名 (`CFBundleDisplayName` / `YinjiePublicAppName`) 与权限弹窗文案 (`NSCameraUsageDescription` / `NSPhotoLibraryUsageDescription` / `NSPhotoLibraryAddUsageDescription` / `NSMicrophoneUsageDescription`) 全部为空字符串占位，由 `InfoPlist.strings` 按系统语言驱动
+- `Info.plist` 已声明 `NSAppTransportSecurity`（严格 HTTPS）与 `UIRequiredDeviceCapabilities = arm64`
 - 已接入 `zh-Hans` / `en` / `ja` / `ko` 的 `InfoPlist.strings`，用于本地化 App 名称、公开 App 名称与系统权限弹窗文案
 - `configure` 现在还会在缺失时补实际 `App.entitlements` / `PrivacyInfo.xcprivacy`，并把它们接入 Xcode 工程
 - `configure` 还会在缺失时给真实 `AppDelegate.swift` 补 push token / pending launch target 缓存逻辑，已有实现不覆盖
-- `doctor` 会检查是否在 macOS、是否已生成 `ios/` 工程、`Info.plist` 权限文案、`AppDelegate` push 缓存逻辑、plugin bridge 元数据、Xcode target membership、entitlements、privacy manifest 以及远程 Core API 地址
+- `doctor` 会检查是否在 macOS、是否已生成 `ios/` 工程、`Info.plist` 权限文案、`AppDelegate` push 缓存逻辑、plugin bridge 元数据、Xcode target membership、entitlements、privacy manifest 以及远程 Core API 地址；额外校验 `Info.plist` 是否为本地化空占位、`arm64`、`NSAppTransportSecurity` 是否就位、`capacitor.config.ts` 是否声明 `ios.scheme` 且不写 `server.androidScheme` / `hostname`
 
 ## 后续接入顺序
 
@@ -77,6 +78,12 @@ Push token 约定：
 `pnpm ios:sync` 会基于这些变量生成打包进 iOS App 的 `runtime-config.json`。
 其中 `YINJIE_IOS_CORE_API_BASE_URL` 是必填项；未设置时，同步会直接失败，避免把示例地址打进壳里。
 
+## WebView origin & ATS 契约
+
+- iOS 壳使用 Capacitor 默认 WebView origin（`capacitor://localhost`），不再在 `capacitor.config.ts` 设置 `server.hostname`。WKWebView 把 origin 当作 cookie / `localStorage` / `IndexedDB` 的分区键，**一旦带 `hostname` 的版本上了 TestFlight，再改或删 `hostname` 会导致已安装设备的 Web 持久化数据丢失**。当前壳尚未 TestFlight，所以现在切回默认 origin 是安全的；后续不再改。
+- 已声明 `NSAppTransportSecurity`，禁止 `NSAllowsArbitraryLoads`：业务接口必须全 HTTPS（与 `YINJIE_IOS_CORE_API_BASE_URL` 契约一致）。如果未来需要走 HTTP 的 dev/admin 链路，请显式加 `NSExceptionDomains` 子项而不是开 `NSAllowsArbitraryLoads`。
+- `UIRequiredDeviceCapabilities` 已升到 `arm64`（取代过期的 `armv7`），符合 App Store 仅接受 arm64 的提交规则。
+
 ## configure 行为
 
 - `pnpm ios:configure` 会始终刷新 `xcode-template/` 下的示例文件
@@ -85,6 +92,8 @@ Push token 约定：
 - `ios/App/App/App.entitlements` 与 `ios/App/App/PrivacyInfo.xcprivacy` 会在缺失时按模板补种子，并接入 `CODE_SIGN_ENTITLEMENTS` / `Resources`
 - `ios/App/App/Info.plist` 与 `ios/App/App/AppDelegate.swift` 会在缺少关键键位或 push 落点缓存逻辑时补齐，但不会覆盖已有实现
 - `ios/App/App/{zh-Hans,en,ja,ko}.lproj/InfoPlist.strings` 会按当前壳内置文案同步，并确保 `InfoPlist.strings` 加入 Xcode resources
+- 检测到 `Info.plist` 里的显示名 / 权限文案仍是历史硬编码 zh/英文，会自动改空让 `InfoPlist.strings` 接管；`UIRequiredDeviceCapabilities = armv7` 会自动改 `arm64`；缺 `NSAppTransportSecurity` 会自动补严格块
+- 检测到 `capacitor.config.ts` 仍写了 `server.androidScheme` / `server.hostname` 或没声明 `ios.scheme`，会打印 `warn`（TS 不自动改写，避免破坏注释结构；按 doctor 输出手改一次即可）
 
 ## 建议检查命令
 

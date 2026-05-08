@@ -7,7 +7,9 @@ import { seedCharacters } from './database/seed';
 import { ensureAiRelationshipSeed } from './database/relationship-seed';
 import { WorldOwnerService } from './modules/auth/world-owner.service';
 import { SocialService } from './modules/social/social.service';
+import { AppErrorFilter } from './common/app-error.filter';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 function resolveConfiguredCorsOrigins() {
   return process.env.CORS_ALLOWED_ORIGINS
     ?.split(',')
@@ -74,6 +76,7 @@ async function bootstrap() {
   app.getHttpAdapter().getInstance().set('trust proxy', true);
   app.use(applyCorsHeaders);
   app.setGlobalPrefix('api', { exclude: ['health'] });
+  app.useGlobalFilters(new AppErrorFilter());
   app.use(
     '/api/character-assets',
     express.static(resolveApiPath('public/character-assets')),
@@ -96,3 +99,4 @@ async function bootstrap() {
   console.log(`隐界 API running on port ${process.env.PORT ?? 3000}`);
 }
 void bootstrap();
+// i18n-ignore-end

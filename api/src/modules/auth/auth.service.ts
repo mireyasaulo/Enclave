@@ -1,8 +1,5 @@
-import {
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +8,7 @@ import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { WelcomeMessageService } from './welcome-message.service';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type AuthUserPayload = {
   sub: string;
   username: string;
@@ -42,10 +40,18 @@ export class AuthService {
   async register(username: string, password: string): Promise<AuthSession> {
     const trimmed = username.trim();
     if (!trimmed || !password) {
-      throw new UnauthorizedException('用户名与密码不能为空');
+      throw new AppError('AUTH_USERNAME_PASSWORD_REQUIRED', {
+        status: HttpStatus.UNAUTHORIZED,
+        legacyMessage: '用户名与密码不能为空',
+      });
     }
     const exists = await this.userRepo.findOne({ where: { username: trimmed } });
-    if (exists) throw new ConflictException('用户名已被占用');
+    if (exists) {
+      throw new AppError('AUTH_USERNAME_TAKEN', {
+        status: HttpStatus.CONFLICT,
+        legacyMessage: '用户名已被占用',
+      });
+    }
 
     const passwordHash = await bcrypt.hash(password, 10);
     const adminCount = await this.userRepo.count({ where: { role: 'admin' } });
@@ -72,14 +78,25 @@ export class AuthService {
   async login(username: string, password: string): Promise<AuthSession> {
     const trimmed = username.trim();
     const user = await this.userRepo.findOne({ where: { username: trimmed } });
-    if (!user) throw new UnauthorizedException('账号或密码错误');
+    if (!user) {
+      throw new AppError('AUTH_INVALID_CREDENTIALS', {
+        status: HttpStatus.UNAUTHORIZED,
+        legacyMessage: '账号或密码错误',
+      });
+    }
     if (!user.passwordHash) {
-      throw new UnauthorizedException(
-        '该账号通过邮箱验证码注册，请使用邮箱验证码登录。',
-      );
+      throw new AppError('AUTH_EMAIL_LOGIN_ONLY', {
+        status: HttpStatus.UNAUTHORIZED,
+        legacyMessage: '该账号通过邮箱验证码注册，请使用邮箱验证码登录。',
+      });
     }
     const ok = await bcrypt.compare(password, user.passwordHash);
-    if (!ok) throw new UnauthorizedException('账号或密码错误');
+    if (!ok) {
+      throw new AppError('AUTH_INVALID_CREDENTIALS', {
+        status: HttpStatus.UNAUTHORIZED,
+        legacyMessage: '账号或密码错误',
+      });
+    }
     return this.buildSession(user);
   }
 
@@ -96,7 +113,10 @@ export class AuthService {
   resolveSecret(): string {
     const secret = this.config.get<string>('JWT_SECRET');
     if (!secret) {
-      throw new UnauthorizedException('服务器未配置 JWT_SECRET');
+      throw new AppError('AUTH_JWT_SECRET_MISSING', {
+        status: HttpStatus.UNAUTHORIZED,
+        legacyMessage: '服务器未配置 JWT_SECRET',
+      });
     }
     return secret;
   }
@@ -124,3 +144,4 @@ export class AuthService {
     };
   }
 }
+// i18n-ignore-end

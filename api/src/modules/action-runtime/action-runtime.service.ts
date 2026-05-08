@@ -1,8 +1,6 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
@@ -414,7 +412,11 @@ export class ActionRuntimeService {
     await this.ensureDefaultConnectors();
     const connector = await this.connectorRepo.findOneBy({ id });
     if (!connector) {
-      throw new NotFoundException(`Connector ${id} not found`);
+      throw new AppError('ACTION_CONNECTOR_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id },
+        legacyMessage: `Connector ${id} not found`,
+      });
     }
 
     if (typeof payload.displayName === 'string' && payload.displayName.trim()) {
@@ -456,7 +458,11 @@ export class ActionRuntimeService {
     await this.ensureDefaultConnectors();
     const connector = await this.connectorRepo.findOneBy({ id });
     if (!connector) {
-      throw new NotFoundException(`Connector ${id} not found`);
+      throw new AppError('ACTION_CONNECTOR_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id },
+        legacyMessage: `Connector ${id} not found`,
+      });
     }
 
     const rules = await this.rulesService.getRules();
@@ -540,7 +546,11 @@ export class ActionRuntimeService {
     await this.ensureDefaultConnectors();
     const connector = await this.connectorRepo.findOneBy({ id });
     if (!connector) {
-      throw new NotFoundException(`Connector ${id} not found`);
+      throw new AppError('ACTION_CONNECTOR_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id },
+        legacyMessage: `Connector ${id} not found`,
+      });
     }
 
     if (
@@ -552,9 +562,10 @@ export class ActionRuntimeService {
       return this.discoverHomeAssistantConnector(connector, payload);
     }
 
-    throw new BadRequestException(
-      `当前连接器 ${connector.displayName} 暂不支持自动发现。`,
-    );
+    throw new AppError('ACTION_OPERATION_INVALID', {
+      params: { connectorName: connector.displayName },
+      legacyMessage: `当前连接器 ${connector.displayName} 暂不支持自动发现。`,
+    });
   }
 
   async listRuns(limit = 20) {
@@ -570,7 +581,11 @@ export class ActionRuntimeService {
     await this.ensureDefaultConnectors();
     const run = await this.runRepo.findOneBy({ id });
     if (!run) {
-      throw new NotFoundException(`Action run ${id} not found`);
+      throw new AppError('ACTION_RUN_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id },
+        legacyMessage: `Action run ${id} not found`,
+      });
     }
     return this.serializeRunDetail(run);
   }
@@ -579,12 +594,18 @@ export class ActionRuntimeService {
     await this.ensureDefaultConnectors();
     const run = await this.runRepo.findOneBy({ id });
     if (!run) {
-      throw new NotFoundException(`Action run ${id} not found`);
+      throw new AppError('ACTION_RUN_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id },
+        legacyMessage: `Action run ${id} not found`,
+      });
     }
 
     const plan = run.planPayload;
     if (!plan) {
-      throw new BadRequestException('该动作缺少 plan 快照，当前无法重试。');
+      throw new AppError('ACTION_RUN_NO_PLAN_SNAPSHOT', {
+        legacyMessage: '该动作缺少 plan 快照，当前无法重试。',
+      });
     }
 
     const rules = await this.rulesService.getRules();
@@ -1742,9 +1763,10 @@ export class ActionRuntimeService {
         ),
       };
     }
-    throw new BadRequestException(
-      `尚未为 ${connector.connectorKey} 定义测试样例。`,
-    );
+    throw new AppError('ACTION_OPERATION_INVALID', {
+      params: { connectorKey: connector.connectorKey },
+      legacyMessage: `尚未为 ${connector.connectorKey} 定义测试样例。`,
+    });
   }
 
   private async buildCyberAvatarActionPromptContext() {
@@ -2110,7 +2132,10 @@ export class ActionRuntimeService {
     previewOnly: boolean,
   ): Promise<ActionExecutionResultValue> {
     if (!connector) {
-      throw new Error('连接器不存在。');
+      throw new AppError('ACTION_CONNECTOR_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '连接器不存在。',
+      });
     }
 
     if (connector.providerType === 'http_bridge') {
@@ -2125,9 +2150,10 @@ export class ActionRuntimeService {
       return this.executeMockOperation(plan, connector, previewOnly);
     }
 
-    throw new Error(
-      `当前尚未支持 ${connector.providerType} 类型的真实执行器。`,
-    );
+    throw new AppError('ACTION_OPERATION_INVALID', {
+      params: { providerType: connector.providerType },
+      legacyMessage: `当前尚未支持 ${connector.providerType} 类型的真实执行器。`,
+    });
   }
 
   private async executeOfficialApiOperation(
@@ -3653,3 +3679,4 @@ export class ActionRuntimeService {
     };
   }
 }
+// i18n-ignore-end

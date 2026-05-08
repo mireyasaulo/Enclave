@@ -2,6 +2,7 @@ import type { CharacterEntity } from './character.entity';
 import { DEFAULT_CHARACTER_BIOS } from './character-bios';
 import { getCharacterAvatarBySourceKey } from './character-avatar-assets';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const LAWYER_CHARACTER_ID = 'char-manual-jianheng-lawyer';
 export const LAWYER_SOURCE_KEY = 'lawyer_jianheng';
 
@@ -300,3 +301,4 @@ export function buildLawyerCharacter(): Partial<CharacterEntity> {
     currentActivity: 'working',
   };
 }
+// i18n-ignore-end

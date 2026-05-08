@@ -50,6 +50,27 @@ function fileIncludesAll(filePath, patterns) {
   return patterns.every((pattern) => fileIncludes(filePath, pattern));
 }
 
+function fileMatches(filePath, regex) {
+  if (!fs.existsSync(filePath)) {
+    return false;
+  }
+
+  return regex.test(fs.readFileSync(filePath, "utf8"));
+}
+
+function plistKeyHasEmptyString(filePath, key) {
+  if (!fs.existsSync(filePath)) {
+    return false;
+  }
+
+  const source = fs.readFileSync(filePath, "utf8");
+  const pattern = new RegExp(
+    `<key>${key}</key>\\s*<string></string>`,
+    "m",
+  );
+  return pattern.test(source);
+}
+
 const checks = [
   {
     label: "platform",
@@ -267,6 +288,69 @@ const checks = [
         ? "capacitor.config.ts still defines `bundledWebRuntime` (deprecated since Capacitor 5)"
         : "capacitor.config.ts declares SplashScreen/StatusBar/Keyboard plugin options"
       : "capacitor.config.ts not found",
+  },
+  {
+    label: "capacitor-config-ios-scheme",
+    ok:
+      !fs.existsSync(capacitorConfigPath) ||
+      (!fileMatches(
+        capacitorConfigPath,
+        /server\s*:\s*\{[\s\S]*?androidScheme/m,
+      ) &&
+        !fileMatches(
+          capacitorConfigPath,
+          /server\s*:\s*\{[\s\S]*?hostname/m,
+        ) &&
+        fileMatches(
+          capacitorConfigPath,
+          /ios\s*:\s*\{[\s\S]*?scheme\s*:/m,
+        )),
+    detail: fs.existsSync(capacitorConfigPath)
+      ? "capacitor.config.ts declares ios.scheme and does not override server.androidScheme/hostname"
+      : "capacitor.config.ts not found",
+  },
+  {
+    label: "info-plist-arm64",
+    ok:
+      !fs.existsSync(infoPlistPath) ||
+      (fileIncludes(infoPlistPath, "<string>arm64</string>") &&
+        !fileIncludes(infoPlistPath, "<string>armv7</string>")),
+    detail: fs.existsSync(infoPlistPath)
+      ? "Info.plist UIRequiredDeviceCapabilities targets arm64 (no armv7)"
+      : "Info.plist not found yet; run `pnpm ios:sync` first",
+  },
+  {
+    label: "info-plist-app-transport-security",
+    ok:
+      !fs.existsSync(infoPlistPath) ||
+      fileIncludes(infoPlistPath, "<key>NSAppTransportSecurity</key>"),
+    detail: fs.existsSync(infoPlistPath)
+      ? "Info.plist declares NSAppTransportSecurity (HTTPS-only baseline)"
+      : "Info.plist not found yet; run `pnpm ios:sync` first",
+  },
+  {
+    label: "info-plist-empty-display-name",
+    ok:
+      !fs.existsSync(infoPlistPath) ||
+      (plistKeyHasEmptyString(infoPlistPath, "CFBundleDisplayName") &&
+        plistKeyHasEmptyString(infoPlistPath, "YinjiePublicAppName")),
+    detail: fs.existsSync(infoPlistPath)
+      ? "Info.plist CFBundleDisplayName/YinjiePublicAppName are empty (driven by InfoPlist.strings)"
+      : "Info.plist not found yet; run `pnpm ios:sync` first",
+  },
+  {
+    label: "info-plist-empty-permission-strings",
+    ok:
+      !fs.existsSync(infoPlistPath) ||
+      [
+        "NSCameraUsageDescription",
+        "NSPhotoLibraryUsageDescription",
+        "NSPhotoLibraryAddUsageDescription",
+        "NSMicrophoneUsageDescription",
+      ].every((key) => plistKeyHasEmptyString(infoPlistPath, key)),
+    detail: fs.existsSync(infoPlistPath)
+      ? "Info.plist permission usage descriptions are empty (localized via InfoPlist.strings)"
+      : "Info.plist not found yet; run `pnpm ios:sync` first",
   },
   {
     label: "web-dist-relative-base",

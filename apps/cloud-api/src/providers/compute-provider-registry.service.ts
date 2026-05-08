@@ -5,6 +5,7 @@ import { MockComputeProviderService } from "../orchestration/mock-compute-provid
 import { ManualDockerComputeProviderService } from "./manual-docker-compute-provider.service";
 import type { WorldComputeProvider } from "./compute-provider.types";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 @Injectable()
 export class ComputeProviderRegistryService {
   constructor(
@@ -58,3 +59,4 @@ export class ComputeProviderRegistryService {
     return this.requireProvider(providerKey);
   }
 }
+// i18n-ignore-end

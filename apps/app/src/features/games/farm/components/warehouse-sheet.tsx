@@ -1,7 +1,11 @@
 import { useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { FarmCropId, FarmPlayerStateView } from "@yinjie/contracts";
 import { FARM_CROP_CATALOG } from "@yinjie/contracts";
 import { useSellFarmCrop } from "../use-farm-state";
+
+const t = translateRuntimeMessage;
 
 interface WarehouseSheetProps {
   state: FarmPlayerStateView;
@@ -36,13 +40,13 @@ export function WarehouseSheet({ state, open, onClose }: WarehouseSheetProps) {
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-stone-900/30 sm:items-center">
       <div className="flex max-h-[80vh] w-full max-w-md flex-col rounded-t-3xl bg-white shadow-xl sm:rounded-3xl">
         <header className="flex items-center justify-between border-b border-stone-100 px-4 py-3">
-          <h2 className="text-base font-semibold">仓库</h2>
+          <h2 className="text-base font-semibold">{t(msg`仓库`)}</h2>
           <button
             type="button"
             onClick={onClose}
             className="rounded-full px-2 py-1 text-sm text-stone-500 hover:bg-stone-100"
           >
-            关闭
+            {t(msg`关闭`)}
           </button>
         </header>
         {errorMsg && (
@@ -53,7 +57,7 @@ export function WarehouseSheet({ state, open, onClose }: WarehouseSheetProps) {
         <ul className="flex-1 overflow-y-auto px-4 py-2">
           {entries.length === 0 && (
             <li className="py-8 text-center text-sm text-stone-400">
-              仓库还是空的，先去种点东西吧
+              {t(msg`仓库还是空的，先去种点东西吧`)}
             </li>
           )}
           {entries.map(([cropId, count]) => {
@@ -70,11 +74,11 @@ export function WarehouseSheet({ state, open, onClose }: WarehouseSheetProps) {
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="font-medium">{def.nameZh}</span>
                     <span className="text-xs text-stone-500">
-                      存量 {count}
+                      {t(msg`存量`)} {count}
                     </span>
                   </div>
                   <div className="mt-0.5 text-[11px] text-stone-500">
-                    🪙 {def.sellPrice} / 个
+                    🪙 {def.sellPrice} {t(msg`/ 个`)}
                   </div>
                 </div>
                 <div className="flex gap-1">
@@ -84,7 +88,7 @@ export function WarehouseSheet({ state, open, onClose }: WarehouseSheetProps) {
                     disabled={isPending}
                     className="rounded-full bg-amber-600 px-2 py-1 text-xs text-white hover:bg-amber-700 disabled:opacity-60"
                   >
-                    卖 1
+                    {t(msg`卖 1`)}
                   </button>
                   {count > 1 && (
                     <button
@@ -93,7 +97,7 @@ export function WarehouseSheet({ state, open, onClose }: WarehouseSheetProps) {
                       disabled={isPending}
                       className="rounded-full bg-amber-600 px-2 py-1 text-xs text-white hover:bg-amber-700 disabled:opacity-60"
                     >
-                      全卖
+                      {t(msg`全卖`)}
                     </button>
                   )}
                 </div>

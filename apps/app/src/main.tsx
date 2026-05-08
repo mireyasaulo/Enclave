@@ -22,6 +22,7 @@ import {
   syncNativeLocalePreference,
 } from "./runtime/native-locale";
 import { NativeLocaleSync } from "./runtime/native-locale-sync";
+import { bootstrapAndroid } from "./runtime/adapters/android";
 import { bootstrapIos } from "./runtime/adapters/ios";
 import { router } from "./router";
 import { hydrateCloudSessionStore } from "./store/cloud-session-store";
@@ -81,6 +82,7 @@ installStaleAssetRecovery();
 
 async function bootstrap() {
   void bootstrapIos();
+  void bootstrapAndroid();
   const runtimeConfig = await hydrateNativeRuntimeConfig();
   await hydrateCloudSessionStore();
   const androidLocalePreference = await readNativeLocalePreference();

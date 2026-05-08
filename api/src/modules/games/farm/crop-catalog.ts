@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   FARM_DEFAULT_PLOT_COUNT,
   FARM_LEVEL_EXPERIENCE_THRESHOLDS,
@@ -230,3 +231,4 @@ export function computePlotCountForLevel(level: number): number {
   }
   return plotCount;
 }
+// i18n-ignore-end

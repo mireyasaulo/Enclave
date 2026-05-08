@@ -12,6 +12,7 @@ export function SubscriptionPlansPage() {
     queryFn: () => cloudAdminApi.listSubscriptionPlans(),
   });
   const [selectedPlanId, setSelectedPlanId] = useState("");
+  // i18n-ignore-start: empty defaults and numeric/technical seeds, not UI copy.
   const [draft, setDraft] = useState({
     id: "",
     code: "",
@@ -25,6 +26,7 @@ export function SubscriptionPlansPage() {
     sortOrder: "0",
     description: "",
   });
+  // i18n-ignore-end
 
   useEffect(() => {
     if (!plansQuery.data?.length) {
@@ -164,6 +166,7 @@ export function SubscriptionPlansPage() {
             <input
               value={draft.durationDays}
               onChange={(event) => setDraft((current) => ({ ...current, durationDays: event.target.value }))}
+              // i18n-ignore-next-line: numeric example value.
               placeholder="30"
               className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
             />
@@ -175,6 +178,7 @@ export function SubscriptionPlansPage() {
             <input
               value={draft.priceCents}
               onChange={(event) => setDraft((current) => ({ ...current, priceCents: event.target.value }))}
+              // i18n-ignore-next-line: numeric example value.
               placeholder="0"
               className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
             />
@@ -186,6 +190,7 @@ export function SubscriptionPlansPage() {
             <input
               value={draft.currency}
               onChange={(event) => setDraft((current) => ({ ...current, currency: event.target.value }))}
+              // i18n-ignore-next-line: ISO currency code, not UI copy.
               placeholder="cny"
               className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
             />
@@ -197,6 +202,7 @@ export function SubscriptionPlansPage() {
             <input
               value={draft.sortOrder}
               onChange={(event) => setDraft((current) => ({ ...current, sortOrder: event.target.value }))}
+              // i18n-ignore-next-line: numeric example value.
               placeholder="0"
               className="w-full rounded-2xl border border-[color:var(--border-subtle)] px-3 py-2 text-sm"
             />
@@ -257,6 +263,7 @@ export function SubscriptionPlansPage() {
             variant="secondary"
             className="rounded-2xl"
             onClick={() =>
+              // i18n-ignore-start: empty defaults and numeric/technical seeds, not UI copy.
               setDraft({
                 id: "",
                 code: "",
@@ -270,6 +277,7 @@ export function SubscriptionPlansPage() {
                 sortOrder: "0",
                 description: "",
               })
+              // i18n-ignore-end
             }
           >
             {t("New plan")}

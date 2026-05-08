@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type SeedEntry = {
   id: string;
   label: string;
@@ -396,3 +397,4 @@ export const INFERENCE_MODEL_CATALOG_SEED = MODEL_SEED_ENTRIES.map(
     sortOrder: index + 1,
   }),
 );
+// i18n-ignore-end

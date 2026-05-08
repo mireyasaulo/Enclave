@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const DEFAULT_CHARACTER_BIOS = {
   self: '先把最乱的那一句说出来。我一直都在。',
   action_operator: '想查、想订、想安排、想动手的事，直接交给我。',
@@ -72,3 +73,4 @@ export function isLegacyPresetCharacterBio(
 
   return bio.trim() === '马斯克。' || bio.startsWith('基于');
 }
+// i18n-ignore-end

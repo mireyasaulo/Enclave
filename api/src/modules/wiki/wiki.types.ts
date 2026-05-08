@@ -1,7 +1,9 @@
-import { BadRequestException } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import type { WikiContentSnapshot } from './entities/character-revision.entity';
 import type { CharacterBlueprintRecipeValue } from '../characters/character-blueprint.types';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const WIKI_CONTENT_SCHEMA_VERSION = 2 as const;
 
 export const WIKI_CONTENT_FIELDS = [
@@ -61,9 +63,10 @@ export const WIKI_RECIPE_ROOT_PATHS = [
 export function pickWikiContent(input: Record<string, unknown>): WikiContentSnapshot {
   const rejected = WIKI_REJECTED_FIELDS.filter((key) => input[key] !== undefined);
   if (rejected.length > 0) {
-    throw new BadRequestException(
-      `字段 ${rejected.join(', ')} 不能通过 wiki 通道修改`,
-    );
+    throw new AppError('WIKI_VALIDATION_FAILED', {
+      params: { detail: `字段 ${rejected.join(', ')} 不能通过 wiki 通道修改` },
+      legacyMessage: `字段 ${rejected.join(', ')} 不能通过 wiki 通道修改`,
+    });
   }
   return {
     schemaVersion: WIKI_CONTENT_SCHEMA_VERSION,
@@ -492,7 +495,10 @@ export function assertWikiEditSummary(input: {
   if (!required) return;
   const trimmed = (input.summary ?? '').trim();
   if (trimmed.length < 10) {
-    throw new BadRequestException('该编辑需提供至少 10 字编辑摘要');
+    throw new AppError('WIKI_VALIDATION_FAILED', {
+        params: { detail: '该编辑需提供至少 10 字编辑摘要' },
+        legacyMessage: '该编辑需提供至少 10 字编辑摘要',
+      });
   }
 }
 
@@ -620,3 +626,4 @@ function emojiUsage(
     ? value
     : fallback;
 }
+// i18n-ignore-end

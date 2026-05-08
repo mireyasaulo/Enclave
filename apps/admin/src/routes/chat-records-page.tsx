@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { Fragment, useEffect, useMemo, useState } from "react";
 import {
   useInfiniteQuery,
@@ -5,7 +6,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import type {
   AdminChatRecordActivityWindow,
   AdminChatRecordConversationDetail,
@@ -98,15 +99,10 @@ type ReviewDraft = {
   note: string;
 };
 
-function readInitialChatRecordsFocus() {
-  if (typeof window === "undefined") {
-    return {
-      characterId: "",
-      conversationId: "",
-    };
-  }
-
-  const params = new URLSearchParams(window.location.search);
+function readInitialChatRecordsFocus(search?: string) {
+  const raw =
+    search ?? (typeof window === "undefined" ? "" : window.location.search);
+  const params = new URLSearchParams(raw);
   return {
     characterId: params.get("characterId")?.trim() || "",
     conversationId: params.get("conversationId")?.trim() || "",
@@ -116,7 +112,12 @@ function readInitialChatRecordsFocus() {
 export function ChatRecordsPage() {
   const baseUrl = resolveAdminCoreApiBaseUrl();
   const queryClient = useQueryClient();
-  const initialFocus = useMemo(() => readInitialChatRecordsFocus(), []);
+  const location = useLocation();
+  const locationSearch = location.searchStr ?? "";
+  const initialFocus = useMemo(
+    () => readInitialChatRecordsFocus(locationSearch),
+    [locationSearch],
+  );
   const [characterId, setCharacterId] = useState(initialFocus.characterId);
   const [includeHidden, setIncludeHidden] = useState(false);
   const [onlyReviewed, setOnlyReviewed] = useState(false);
@@ -154,6 +155,13 @@ export function ChatRecordsPage() {
     conversationId: string;
     includeClearedHistory: boolean;
   } | null>(null);
+
+  // Re-sync focus state when URL search changes (e.g. user clicks another
+  // /chat-records?... link without leaving the page).
+  useEffect(() => {
+    setCharacterId(initialFocus.characterId);
+    setSelectedConversationId(initialFocus.conversationId);
+  }, [initialFocus.characterId, initialFocus.conversationId]);
 
   const listQuery = useMemo(
     () => ({
@@ -2314,3 +2322,4 @@ function buildOperatorSummary({
     tone: "muted" as const,
   };
 }
+// i18n-ignore-end

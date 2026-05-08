@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { AvatarChip } from "./avatar-chip";
+
+const t = translateRuntimeMessage;
 
 type SocialPostCardProps = {
   cardId?: string;
@@ -31,7 +35,7 @@ export function SocialPostCard({
   onAuthorClick,
 }: SocialPostCardProps) {
   const authorActionLabel =
-    authorActionAriaLabel ?? `查看 ${authorName} 的详情`;
+    authorActionAriaLabel ?? t(msg`查看 ${authorName} 的详情`);
 
   return (
     <article

@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { execFile } from 'node:child_process';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   mkdtemp,
   readdir,
   readFile,
@@ -1264,3 +1265,4 @@ function toFailedExtractionResult(input: {
     errorMessage: '文档正文抽取失败。',
   };
 }
+// i18n-ignore-end

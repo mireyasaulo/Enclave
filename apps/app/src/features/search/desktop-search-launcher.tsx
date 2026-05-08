@@ -6,6 +6,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { msg } from "@lingui/macro";
+import type { MessageDescriptor } from "@lingui/core";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -146,12 +149,12 @@ type SearchLauncherFocusPanelId =
 
 const searchLauncherFocusRegionLabels: Record<
   SearchLauncherFocusRegion,
-  string
+  MessageDescriptor
 > = {
-  input: "搜索框",
-  suggestions: "建议区",
-  quickAccess: "快捷访问",
-  history: "历史搜索",
+  input: msg`搜索框`,
+  suggestions: msg`建议区`,
+  quickAccess: msg`快捷访问`,
+  history: msg`历史搜索`,
 };
 
 function buildSearchLauncherHistoryActionId(keyword: string) {
@@ -341,6 +344,7 @@ export function DesktopSearchDropdownPanel({
   speechError,
   speechStatus,
 }: DesktopSearchDropdownPanelProps) {
+  const t = useRuntimeTranslator();
   const navigate = useNavigate();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
@@ -444,8 +448,8 @@ export function DesktopSearchDropdownPanel({
       const quickLink: DesktopSearchQuickLink = {
         id: `conversation-${conversation.id}`,
         title: conversation.title,
-        description: `${preview.prefix}${preview.text}`,
-        meta: `${getConversationThreadLabel(conversation)} · ${conversation.participants.length} 位参与者`,
+        description: `${preview.prefix}${preview.text}`, // i18n-ignore-line
+        meta: t(msg`${getConversationThreadLabel(conversation)} · ${conversation.participants.length} 位参与者`),
         badge: getConversationThreadLabel(conversation),
         to: buildDesktopChatThreadPath({
           conversationId: conversation.id,
@@ -455,7 +459,7 @@ export function DesktopSearchDropdownPanel({
 
       return quickLink;
     });
-  }, [conversations, localMessageActionState]);
+  }, [conversations, localMessageActionState, t]);
   const conversationQuickLinkById = useMemo(
     () =>
       new Map(
@@ -504,7 +508,7 @@ export function DesktopSearchDropdownPanel({
             createdAt: message.createdAt,
             messageId: message.messageId,
             senderName: message.senderName,
-            text: message.previewText || "这条消息没有可展示文本。",
+            text: message.previewText || t(msg`这条消息没有可展示文本。`),
           }));
         }),
       );
@@ -557,6 +561,12 @@ export function DesktopSearchDropdownPanel({
           Date.parse(right.createdAt) - Date.parse(left.createdAt),
       );
       const latestTime = Date.parse(sortedMessages[0]?.createdAt ?? "");
+      const conversationForBadge = conversations.find(
+        (item) => item.id === conversationId,
+      );
+      const isGroupConversation = conversationForBadge
+        ? isPersistedGroupConversation(conversationForBadge)
+        : false;
 
       nextGroups.push({
         header,
@@ -564,13 +574,13 @@ export function DesktopSearchDropdownPanel({
         messages: sortedMessages.slice(0, 3).map((message) => ({
           avatarName: header.avatarName,
           avatarSrc: header.avatarSrc,
-          badge: header.badge === "群聊" ? "群聊记录" : "单聊记录",
+          badge: isGroupConversation ? t(msg`群聊记录`) : t(msg`单聊记录`),
           description: `${message.senderName}：${buildSearchPreview(
             message.text,
             normalizedKeyword,
           )}`,
           id: `conversation-message-${message.messageId}`,
-          meta: `聊天记录 · ${formatMessageTimestamp(message.createdAt)}`,
+          meta: t(msg`聊天记录 · ${formatMessageTimestamp(message.createdAt)}`),
           title: header.title,
           to: buildDesktopChatThreadPath({
             conversationId,
@@ -588,8 +598,10 @@ export function DesktopSearchDropdownPanel({
   }, [
     conversationMessageMatchesQuery.data,
     conversationQuickLinkById,
+    conversations,
     localMessageActionState,
     normalizedKeyword,
+    t,
   ]);
   const conversationGroupHeaderIds = useMemo(
     () => new Set(conversationMessageGroups.map((item) => item.header.id)),
@@ -623,17 +635,17 @@ export function DesktopSearchDropdownPanel({
   );
   const officialGroups = useMemo<SearchLauncherOfficialGroup[]>(() => {
     return (officialAccountsQuery.data ?? []).map((account) => {
+      const accountTypeLabel =
+        account.accountType === "service" ? t(msg`服务号`) : t(msg`订阅号`);
       const header = {
         id: `official-account-${account.id}`,
         title: account.name,
         description:
           account.description ||
           account.recentArticle?.summary ||
-          "打开公众号主页与最近文章。",
-        meta: `${account.accountType === "service" ? "服务号" : "订阅号"} · @${
-          account.handle
-        }`,
-        badge: account.accountType === "service" ? "服务号" : "订阅号",
+          t(msg`打开公众号主页与最近文章。`),
+        meta: `${accountTypeLabel} · @${account.handle}`,
+        badge: accountTypeLabel,
         to: buildDesktopOfficialAccountSearchPath(account.id),
         avatarName: account.name,
         avatarSrc: account.avatar,
@@ -644,9 +656,9 @@ export function DesktopSearchDropdownPanel({
             title: account.recentArticle.title,
             description:
               account.recentArticle.summary ||
-              `来自 ${account.name} 的最近文章`,
-            meta: `公众号文章 · ${account.name}`,
-            badge: "公众号文章",
+              t(msg`来自 ${account.name} 的最近文章`),
+            meta: t(msg`公众号文章 · ${account.name}`),
+            badge: t(msg`公众号文章`),
             to: buildDesktopOfficialAccountSearchPath(
               account.id,
               account.recentArticle.id,
@@ -666,7 +678,7 @@ export function DesktopSearchDropdownPanel({
         sortTime: Number.isNaN(sortTime) ? 0 : sortTime,
       };
     });
-  }, [officialAccountsQuery.data]);
+  }, [officialAccountsQuery.data, t]);
   const officialMatches = useMemo(() => {
     if (!normalizedKeyword) {
       return [] as SearchLauncherOfficialGroup[];
@@ -919,11 +931,15 @@ export function DesktopSearchDropdownPanel({
     setNavigationLayer("panel");
     setActiveActionId(actionId);
   }, []);
-  const activeFocusContext = useMemo(() => {
+  const activeFocusContext = useMemo<{
+    panelId: SearchLauncherFocusPanelId;
+    panelTitle: MessageDescriptor;
+    region: SearchLauncherFocusRegion;
+  }>(() => {
     if (navigationLayer === "input") {
       return {
         panelId: null as SearchLauncherFocusPanelId,
-        panelTitle: "搜一搜主入口",
+        panelTitle: msg`搜一搜主入口`,
         region: "input" as SearchLauncherFocusRegion,
       };
     }
@@ -934,7 +950,7 @@ export function DesktopSearchDropdownPanel({
     if (historyIds.has(activeActionId)) {
       return {
         panelId: "history" as SearchLauncherFocusPanelId,
-        panelTitle: "最近搜索",
+        panelTitle: msg`最近搜索`,
         region: "history" as SearchLauncherFocusRegion,
       };
     }
@@ -953,7 +969,7 @@ export function DesktopSearchDropdownPanel({
       if (chatSuggestionIds.has(activeActionId)) {
         return {
           panelId: "chatSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: "聊天",
+          panelTitle: msg`聊天`,
           region: "suggestions" as SearchLauncherFocusRegion,
         };
       }
@@ -968,7 +984,7 @@ export function DesktopSearchDropdownPanel({
       if (officialSuggestionIds.has(activeActionId)) {
         return {
           panelId: "officialSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: "公众号",
+          panelTitle: msg`公众号`,
           region: "suggestions" as SearchLauncherFocusRegion,
         };
       }
@@ -979,7 +995,7 @@ export function DesktopSearchDropdownPanel({
       if (contactSuggestionIds.has(activeActionId)) {
         return {
           panelId: "contactSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: "联系人",
+          panelTitle: msg`联系人`,
           region: "suggestions" as SearchLauncherFocusRegion,
         };
       }
@@ -992,7 +1008,7 @@ export function DesktopSearchDropdownPanel({
       if (worldCharacterSuggestionIds.has(activeActionId)) {
         return {
           panelId: "worldCharacterSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: "世界角色",
+          panelTitle: msg`世界角色`,
           region: "suggestions" as SearchLauncherFocusRegion,
         };
       }
@@ -1003,7 +1019,7 @@ export function DesktopSearchDropdownPanel({
       if (favoriteSuggestionIds.has(activeActionId)) {
         return {
           panelId: "favoriteSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: "收藏",
+          panelTitle: msg`收藏`,
           region: "suggestions" as SearchLauncherFocusRegion,
         };
       }
@@ -1014,14 +1030,14 @@ export function DesktopSearchDropdownPanel({
       if (miniProgramSuggestionIds.has(activeActionId)) {
         return {
           panelId: "miniProgramSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: "小程序",
+          panelTitle: msg`小程序`,
           region: "suggestions" as SearchLauncherFocusRegion,
         };
       }
 
       return {
         panelId: null as SearchLauncherFocusPanelId,
-        panelTitle: "搜索建议",
+        panelTitle: msg`搜索建议`,
         region: "suggestions" as SearchLauncherFocusRegion,
       };
     }
@@ -1029,7 +1045,7 @@ export function DesktopSearchDropdownPanel({
     if (recentConversations.some((item) => item.id === activeActionId)) {
       return {
         panelId: "recentConversations" as SearchLauncherFocusPanelId,
-        panelTitle: "最近聊天",
+        panelTitle: msg`最近聊天`,
         region: "quickAccess" as SearchLauncherFocusRegion,
       };
     }
@@ -1044,7 +1060,7 @@ export function DesktopSearchDropdownPanel({
     if (recentOfficialIds.has(activeActionId)) {
       return {
         panelId: "recentOfficials" as SearchLauncherFocusPanelId,
-        panelTitle: "最近公众号",
+        panelTitle: msg`最近公众号`,
         region: "quickAccess" as SearchLauncherFocusRegion,
       };
     }
@@ -1052,7 +1068,7 @@ export function DesktopSearchDropdownPanel({
     if (recentMiniPrograms.some((item) => item.id === activeActionId)) {
       return {
         panelId: "recentMiniPrograms" as SearchLauncherFocusPanelId,
-        panelTitle: "最近使用的小程序",
+        panelTitle: msg`最近使用的小程序`,
         region: "quickAccess" as SearchLauncherFocusRegion,
       };
     }
@@ -1060,14 +1076,14 @@ export function DesktopSearchDropdownPanel({
     if (recentFavorites.some((item) => item.id === activeActionId)) {
       return {
         panelId: "recentFavorites" as SearchLauncherFocusPanelId,
-        panelTitle: "最近收藏",
+        panelTitle: msg`最近收藏`,
         region: "quickAccess" as SearchLauncherFocusRegion,
       };
     }
 
     return {
       panelId: null as SearchLauncherFocusPanelId,
-      panelTitle: "快捷访问",
+      panelTitle: msg`快捷访问`,
       region: "quickAccess" as SearchLauncherFocusRegion,
     };
   }, [
@@ -1276,14 +1292,14 @@ export function DesktopSearchDropdownPanel({
             speechError
               ? speechError
               : speechStatus === "requesting-permission"
-                ? "正在请求麦克风权限..."
+                ? t(msg`正在请求麦克风权限...`)
                 : speechStatus === "listening"
-                  ? "正在听你说，完成后再点一次语音图标。"
+                  ? t(msg`正在听你说，完成后再点一次语音图标。`)
                   : speechStatus === "processing"
-                    ? "正在整理语音内容..."
+                    ? t(msg`正在整理语音内容...`)
                     : speechDisplayText
-                      ? `识别结果：${speechDisplayText}`
-                      : "语音输入已完成。"
+                      ? t(msg`识别结果：${speechDisplayText}`)
+                      : t(msg`语音输入已完成。`)
           }
           status={
             speechError
@@ -1295,44 +1311,44 @@ export function DesktopSearchDropdownPanel({
                   ? "pending"
                   : "done"
           }
-          title="搜索输入"
+          title={t(msg`搜索输入`)}
         />
       ) : null}
 
       <SearchLauncherFocusStrip
         keyword={trimmedKeyword}
         layer={navigationLayer}
-        panelTitle={activeFocusContext.panelTitle}
+        panelTitle={t(activeFocusContext.panelTitle)}
         region={activeFocusContext.region}
       />
 
       {trimmedKeyword ? (
         <SearchLauncherSection
-          title="搜索建议"
+          title={t(msg`搜索建议`)}
           className="mt-3"
           highlighted={activeFocusContext.region === "suggestions"}
         >
           {suggestionsLoading ? (
             <SearchLauncherStatusCard
-              description="正在整理聊天、联系人、公众号、收藏和小程序结果..."
+              description={t(msg`正在整理聊天、联系人、公众号、收藏和小程序结果...`)}
               status="pending"
-              title="搜索建议"
+              title={t(msg`搜索建议`)}
             />
           ) : null}
 
           {suggestionsError ? (
             <SearchLauncherStatusCard
-              description="搜索建议暂时读取失败，请先试试搜一搜。"
+              description={t(msg`搜索建议暂时读取失败，请先试试搜一搜。`)}
               status="error"
-              title="搜索异常"
+              title={t(msg`搜索异常`)}
             />
           ) : null}
 
           {favoritesError ? (
             <SearchLauncherStatusCard
-              description="收藏列表暂时读取失败，可以直接进入搜一搜继续搜索。"
+              description={t(msg`收藏列表暂时读取失败，可以直接进入搜一搜继续搜索。`)}
               status="error"
-              title="搜索异常"
+              title={t(msg`搜索异常`)}
             />
           ) : null}
 
@@ -1341,9 +1357,9 @@ export function DesktopSearchDropdownPanel({
               {conversationMessageGroups.length ||
               conversationOnlyMatches.length ? (
                 <SearchLauncherCollectionCard
-                  countLabel={`${conversationMessageGroups.length + conversationOnlyMatches.length} 组结果`}
+                  countLabel={t(msg`${conversationMessageGroups.length + conversationOnlyMatches.length} 组结果`)}
                   highlighted={activeFocusContext.panelId === "chatSuggestions"}
-                  title="聊天"
+                  title={t(msg`聊天`)}
                 >
                   <div className="space-y-2">
                     {conversationMessageGroups.map((group) => (
@@ -1363,7 +1379,7 @@ export function DesktopSearchDropdownPanel({
                     {conversationOnlyMatches.length ? (
                       <div className="rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3.5 py-3">
                         <div className="px-0.5 text-[11px] font-medium text-[color:var(--text-muted)]">
-                          会话命中
+                          {t(msg`会话命中`)}
                         </div>
                         <div className="mt-2.5 space-y-2">
                           {conversationOnlyMatches.map((item) => (
@@ -1386,11 +1402,11 @@ export function DesktopSearchDropdownPanel({
               {officialMatches.length ? (
                 <div className="relative">
                   <SearchLauncherCollectionCard
-                    countLabel={`${officialMatches.length} 个入口`}
+                    countLabel={t(msg`${officialMatches.length} 个入口`)}
                     highlighted={
                       activeFocusContext.panelId === "officialSuggestions"
                     }
-                    title="公众号"
+                    title={t(msg`公众号`)}
                   >
                     <div className="space-y-1.5">
                       {officialMatches.map((group) => (
@@ -1418,11 +1434,11 @@ export function DesktopSearchDropdownPanel({
 
               {friendMatches.length ? (
                 <SearchLauncherCollectionCard
-                  countLabel={`${friendMatches.length} 位联系人`}
+                  countLabel={t(msg`${friendMatches.length} 位联系人`)}
                   highlighted={
                     activeFocusContext.panelId === "contactSuggestions"
                   }
-                  title="联系人"
+                  title={t(msg`联系人`)}
                 >
                   <div className="space-y-1.5">
                     {friendMatches.map((item) => (
@@ -1433,8 +1449,8 @@ export function DesktopSearchDropdownPanel({
                         }
                         avatarName={getFriendDisplayName(item)}
                         avatarSrc={item.character.avatar}
-                        badge="联系人"
-                        description={buildFriendSuggestionDescription(item)}
+                        badge={t(msg`联系人`)}
+                        description={buildFriendSuggestionDescription(item, t)}
                         keyword={trimmedKeyword}
                         title={getFriendDisplayName(item)}
                         variant="contact"
@@ -1452,11 +1468,11 @@ export function DesktopSearchDropdownPanel({
 
               {worldCharacterMatches.length ? (
                 <SearchLauncherCollectionCard
-                  countLabel={`${worldCharacterMatches.length} 位角色`}
+                  countLabel={t(msg`${worldCharacterMatches.length} 位角色`)}
                   highlighted={
                     activeFocusContext.panelId === "worldCharacterSuggestions"
                   }
-                  title="世界角色"
+                  title={t(msg`世界角色`)}
                 >
                   <div className="space-y-1.5">
                     {worldCharacterMatches.map((item) => (
@@ -1468,11 +1484,11 @@ export function DesktopSearchDropdownPanel({
                         }
                         avatarName={item.character.name}
                         avatarSrc={item.character.avatar}
-                        badge="可添加"
+                        badge={t(msg`可添加`)}
                         description={
                           item.character.relationship?.trim() ||
                           item.character.currentStatus?.trim() ||
-                          "打开资料卡后可发起好友申请"
+                          t(msg`打开资料卡后可发起好友申请`)
                         }
                         keyword={trimmedKeyword}
                         title={item.character.name}
@@ -1493,11 +1509,11 @@ export function DesktopSearchDropdownPanel({
 
               {favoriteMatches.length ? (
                 <SearchLauncherCollectionCard
-                  countLabel={`${favoriteMatches.length} 条收藏`}
+                  countLabel={t(msg`${favoriteMatches.length} 条收藏`)}
                   highlighted={
                     activeFocusContext.panelId === "favoriteSuggestions"
                   }
-                  title="收藏"
+                  title={t(msg`收藏`)}
                 >
                   <div className="space-y-1.5">
                     {favoriteMatches.map((item) => (
@@ -1518,11 +1534,11 @@ export function DesktopSearchDropdownPanel({
               {miniProgramMatches.length ? (
                 <div className="relative">
                   <SearchLauncherCollectionCard
-                    countLabel={`${miniProgramMatches.length} 个入口`}
+                    countLabel={t(msg`${miniProgramMatches.length} 个入口`)}
                     highlighted={
                       activeFocusContext.panelId === "miniProgramSuggestions"
                     }
-                    title="小程序"
+                    title={t(msg`小程序`)}
                   >
                     <div className="space-y-1.5">
                       {miniProgramMatches.map((item) => (
@@ -1560,12 +1576,12 @@ export function DesktopSearchDropdownPanel({
                         });
                       }}
                     >
-                      去添加朋友
+                      {t(msg`去添加朋友`)}
                     </Button>
                   }
-                  description="没有直接命中的聊天、联系人、公众号、收藏或小程序，可以继续用搜一搜，或去“添加朋友”里找。"
+                  description={t(msg`没有直接命中的聊天、联系人、公众号、收藏或小程序，可以继续用搜一搜，或去"添加朋友"里找。`)}
                   status="empty"
-                  title="搜索结果"
+                  title={t(msg`搜索结果`)}
                 />
               ) : null}
             </div>
@@ -1575,18 +1591,18 @@ export function DesktopSearchDropdownPanel({
 
       {!trimmedKeyword ? (
         <SearchLauncherSection
-          title="快捷访问"
+          title={t(msg`快捷访问`)}
           className="mt-3"
           highlighted={activeFocusContext.region === "quickAccess"}
         >
           <div className="space-y-3">
             {recentConversations.length ? (
               <SearchLauncherCollectionCard
-                countLabel={`${recentConversations.length} 个会话`}
+                countLabel={t(msg`${recentConversations.length} 个会话`)}
                 highlighted={
                   activeFocusContext.panelId === "recentConversations"
                 }
-                title="最近聊天"
+                title={t(msg`最近聊天`)}
               >
                 <div className="space-y-2">
                   {recentConversations.map((item) => (
@@ -1606,9 +1622,9 @@ export function DesktopSearchDropdownPanel({
             {recentOfficials.length ? (
               <div className="relative">
                 <SearchLauncherCollectionCard
-                  countLabel={`${recentOfficials.length} 个入口`}
+                  countLabel={t(msg`${recentOfficials.length} 个入口`)}
                   highlighted={activeFocusContext.panelId === "recentOfficials"}
-                  title="最近公众号"
+                  title={t(msg`最近公众号`)}
                 >
                   <div className="space-y-1.5">
                     {recentOfficials.map((group) => (
@@ -1635,11 +1651,11 @@ export function DesktopSearchDropdownPanel({
             {recentMiniPrograms.length ? (
               <div className="relative">
                 <SearchLauncherCollectionCard
-                  countLabel={`${recentMiniPrograms.length} 个入口`}
+                  countLabel={t(msg`${recentMiniPrograms.length} 个入口`)}
                   highlighted={
                     activeFocusContext.panelId === "recentMiniPrograms"
                   }
-                  title="最近使用的小程序"
+                  title={t(msg`最近使用的小程序`)}
                 >
                   <div className="space-y-1.5">
                     {recentMiniPrograms.map((item) => (
@@ -1662,19 +1678,19 @@ export function DesktopSearchDropdownPanel({
             {favoritesLoading ? (
               <SearchLauncherCollectionCard
                 highlighted={activeFocusContext.panelId === "recentFavorites"}
-                title="最近收藏"
+                title={t(msg`最近收藏`)}
               >
                 <div className="rounded-[12px] bg-white px-3 py-3 text-xs leading-6 text-[color:var(--text-muted)]">
-                  正在同步最近收藏...
+                  {t(msg`正在同步最近收藏...`)}
                 </div>
               </SearchLauncherCollectionCard>
             ) : null}
 
             {!favoritesLoading && recentFavorites.length ? (
               <SearchLauncherCollectionCard
-                countLabel={`${recentFavorites.length} 条收藏`}
+                countLabel={t(msg`${recentFavorites.length} 条收藏`)}
                 highlighted={activeFocusContext.panelId === "recentFavorites"}
-                title="最近收藏"
+                title={t(msg`最近收藏`)}
               >
                 <div className="space-y-1.5">
                   {recentFavorites.map((item) => (
@@ -1696,14 +1712,14 @@ export function DesktopSearchDropdownPanel({
       ) : null}
 
       <SearchLauncherSection
-        title="历史搜索"
+        title={t(msg`历史搜索`)}
         className="mt-3"
         highlighted={activeFocusContext.region === "history"}
       >
         <SearchLauncherCollectionCard
-          countLabel={history.length ? `${history.length} 条记录` : undefined}
+          countLabel={history.length ? t(msg`${history.length} 条记录`) : undefined}
           highlighted={activeFocusContext.region === "history"}
-          title="最近搜索"
+          title={t(msg`最近搜索`)}
         >
           {history.length ? (
             <div className="space-y-1.5">
@@ -1737,7 +1753,7 @@ export function DesktopSearchDropdownPanel({
             </div>
           ) : (
             <div className="rounded-[12px] bg-white px-3 py-3 text-xs leading-6 text-[color:var(--text-muted)]">
-              进入搜一搜并完成一次搜索后，历史关键词会出现在这里。
+              {t(msg`进入搜一搜并完成一次搜索后，历史关键词会出现在这里。`)}
             </div>
           )}
         </SearchLauncherCollectionCard>
@@ -1757,6 +1773,7 @@ function SearchLauncherSection({
   highlighted?: boolean;
   title: string;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <section className={className}>
       <div className="mb-2 flex items-center justify-between px-1">
@@ -1772,7 +1789,7 @@ function SearchLauncherSection({
         </span>
         {highlighted ? (
           <span className="rounded-full bg-[rgba(7,193,96,0.08)] px-2 py-0.5 text-[10px] text-[color:var(--brand-primary)]">
-            当前定位
+            {t(msg`当前定位`)}
           </span>
         ) : null}
       </div>
@@ -1792,7 +1809,8 @@ function SearchLauncherFocusStrip({
   panelTitle: string;
   region: SearchLauncherFocusRegion;
 }) {
-  const regionLabel = searchLauncherFocusRegionLabels[region];
+  const t = useRuntimeTranslator();
+  const regionLabel = t(searchLauncherFocusRegionLabels[region]);
   const toneClassName =
     region === "input"
       ? "bg-[rgba(7,193,96,0.10)] text-[color:var(--brand-primary)]"
@@ -1804,21 +1822,21 @@ function SearchLauncherFocusStrip({
   const description =
     layer === "input"
       ? keyword
-        ? `当前位于搜索框，按 Tab 进入结果层，按 Enter 执行搜索“${keyword}”，按 Esc 关闭下拉。`
-        : "当前位于搜索框，继续输入关键词，或按 Tab 进入结果层；按 Enter 执行搜索，按 Esc 关闭下拉。"
+        ? t(msg`当前位于搜索框，按 Tab 进入结果层，按 Enter 执行搜索"${keyword}"，按 Esc 关闭下拉。`)
+        : t(msg`当前位于搜索框，继续输入关键词，或按 Tab 进入结果层；按 Enter 执行搜索，按 Esc 关闭下拉。`)
       : region === "history"
-        ? "当前位于最近搜索，按 Tab / ↑ ↓ 切换当前项，按 Enter 打开当前项，按 Shift+Tab 或 Esc 回搜索框。"
-        : `当前位于${panelTitle}，按 Tab / ↑ ↓ 切换当前项，按 Enter 打开当前项，按 Shift+Tab 或 Esc 回搜索框。`;
+        ? t(msg`当前位于最近搜索，按 Tab / ↑ ↓ 切换当前项，按 Enter 打开当前项，按 Shift+Tab 或 Esc 回搜索框。`)
+        : t(msg`当前位于${panelTitle}，按 Tab / ↑ ↓ 切换当前项，按 Enter 打开当前项，按 Shift+Tab 或 Esc 回搜索框。`);
   const keyboardHint =
     layer === "input"
-      ? "Tab 进入结果层 · Enter 执行搜索 · Esc 关闭"
-      : "Tab / ↑ ↓ 切换当前项 · Enter 打开当前项 · Shift+Tab / Esc 回搜索框";
+      ? t(msg`Tab 进入结果层 · Enter 执行搜索 · Esc 关闭`)
+      : t(msg`Tab / ↑ ↓ 切换当前项 · Enter 打开当前项 · Shift+Tab / Esc 回搜索框`);
 
   return (
     <section className="mt-2 rounded-[16px] border border-[rgba(7,193,96,0.14)] bg-[rgba(247,250,250,0.94)] px-3.5 py-3">
       <div className="flex flex-wrap items-center gap-2">
         <span className="rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[10px] font-medium text-[color:var(--brand-primary)]">
-          搜索上下文
+          {t(msg`搜索上下文`)}
         </span>
         <span
           className={cn(
@@ -1853,6 +1871,7 @@ function SearchLauncherHeroCard({
   onClick: () => void;
   onMouseEnter?: () => void;
 }) {
+  const t = useRuntimeTranslator();
   return (
     <button
       type="button"
@@ -1872,7 +1891,7 @@ function SearchLauncherHeroCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-3">
             <div className="text-sm font-medium text-[color:var(--text-primary)]">
-              搜一搜
+              {t(msg`搜一搜`)}
             </div>
             <div className="shrink-0 rounded-full bg-white/90 px-2.5 py-1 text-[10px] text-[color:var(--text-muted)]">
               Enter
@@ -1880,8 +1899,8 @@ function SearchLauncherHeroCard({
           </div>
           <div className="mt-1 text-[11px] leading-5 text-[color:var(--text-secondary)]">
             {keyword
-              ? `执行搜索“${keyword}”，进入完整结果页继续查看。`
-              : "执行一次全局搜索，进入完整结果页后继续按分类查看。"}
+              ? t(msg`执行搜索"${keyword}"，进入完整结果页继续查看。`)
+              : t(msg`执行一次全局搜索，进入完整结果页后继续按分类查看。`)}
           </div>
         </div>
       </div>
@@ -1889,8 +1908,8 @@ function SearchLauncherHeroCard({
         <div className="flex items-center justify-between gap-3 text-[11px] text-[color:var(--text-muted)]">
           <span>
             {keyword
-              ? "Enter 执行搜索 · Tab 进入结果层"
-              : "Tab 进入结果层 · 支持聊天、联系人、公众号、收藏和小程序"}
+              ? t(msg`Enter 执行搜索 · Tab 进入结果层`)
+              : t(msg`Tab 进入结果层 · 支持聊天、联系人、公众号、收藏和小程序`)}
           </span>
           <CornerDownLeft size={14} className="shrink-0" />
         </div>
@@ -1910,6 +1929,7 @@ function SearchLauncherStatusCard({
   status: "done" | "empty" | "error" | "pending" | "recording";
   title: string;
 }) {
+  const t = useRuntimeTranslator();
   const toneClassName =
     status === "error"
       ? "border-[rgba(225,29,72,0.14)] bg-[rgba(225,29,72,0.06)]"
@@ -1928,14 +1948,14 @@ function SearchLauncherStatusCard({
           : "bg-white text-[color:var(--text-muted)]";
   const statusLabel =
     status === "error"
-      ? "异常"
+      ? t(msg`异常`)
       : status === "empty"
-        ? "无结果"
+        ? t(msg`无结果`)
         : status === "recording"
-          ? "录音中"
+          ? t(msg`录音中`)
           : status === "pending"
-            ? "处理中"
-            : "已完成";
+            ? t(msg`处理中`)
+            : t(msg`已完成`);
 
   return (
     <section className={cn("mt-2 rounded-[16px] border p-3.5", toneClassName)}>
@@ -2020,6 +2040,7 @@ function SearchLauncherConversationGroupCard({
   onSelectHeader: (item: DesktopSearchQuickLink) => void;
   onSelectMessage: (item: DesktopSearchQuickLink) => void;
 }) {
+  const t = useRuntimeTranslator();
   const headerActive = activeHeaderId === group.header.id;
 
   return (
@@ -2057,7 +2078,7 @@ function SearchLauncherConversationGroupCard({
           </div>
         </div>
         <div className="shrink-0 rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[10px] text-[color:var(--brand-primary)]">
-          {group.totalHits} 条相关记录
+          {t(msg`${group.totalHits} 条相关记录`)}
         </div>
       </button>
 
@@ -2427,9 +2448,12 @@ function SearchLauncherFeatureRow({
   );
 }
 
-function buildFriendSuggestionDescription(item: FriendDirectoryItem) {
+function buildFriendSuggestionDescription(
+  item: FriendDirectoryItem,
+  t: (descriptor: MessageDescriptor) => string,
+) {
   if (getFriendDisplayName(item) !== item.character.name) {
-    return `昵称：${item.character.name}`;
+    return t(msg`昵称：${item.character.name}`);
   }
 
   const tags = item.friendship.tags?.filter(Boolean).join("、");
@@ -2437,7 +2461,7 @@ function buildFriendSuggestionDescription(item: FriendDirectoryItem) {
     item.character.relationship?.trim() ||
     tags ||
     item.character.currentStatus?.trim() ||
-    "打开联系人资料"
+    t(msg`打开联系人资料`)
   );
 }
 
@@ -2453,14 +2477,15 @@ function matchesLauncherQuickLink(
 }
 
 function SearchLauncherComingSoonOverlay() {
+  const t = useRuntimeTranslator();
   return (
     <div className="pointer-events-auto absolute inset-0 z-30 flex items-center justify-center rounded-[16px] bg-black/30 backdrop-blur-[3px]">
       <div className="rounded-[14px] border border-[color:var(--border-faint)] bg-white/95 px-4 py-3 text-center shadow-[var(--shadow-card)]">
         <div className="text-[13px] font-semibold text-[color:var(--text-primary)]">
-          功能开发中
+          {t(msg`功能开发中`)}
         </div>
         <div className="mt-1 text-[11px] text-[color:var(--text-secondary)]">
-          敬请期待
+          {t(msg`敬请期待`)}
         </div>
       </div>
     </div>

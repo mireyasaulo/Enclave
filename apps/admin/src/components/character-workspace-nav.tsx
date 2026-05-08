@@ -1,5 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type Props = {
   characterId: string;
 };
@@ -35,3 +36,4 @@ export function CharacterWorkspaceNav({ characterId }: Props) {
     </div>
   );
 }
+// i18n-ignore-end

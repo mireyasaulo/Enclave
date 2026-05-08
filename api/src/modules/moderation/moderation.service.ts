@@ -1,9 +1,11 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { ModerationReportEntity } from './moderation-report.entity';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const MODERATION_TARGET_TYPES = new Set([
   'character',
   'message',
@@ -46,15 +48,21 @@ export class ModerationService {
     const details = input.details?.trim();
 
     if (!MODERATION_TARGET_TYPES.has(targetType)) {
-      throw new BadRequestException('Unsupported moderation target type.');
+      throw new AppError('MODERATION_TARGET_TYPE_INVALID', {
+        legacyMessage: 'Unsupported moderation target type.',
+      });
     }
 
     if (!targetId) {
-      throw new BadRequestException('Moderation target id is required.');
+      throw new AppError('MODERATION_TARGET_ID_REQUIRED', {
+        legacyMessage: 'Moderation target id is required.',
+      });
     }
 
     if (!reason) {
-      throw new BadRequestException('Moderation reason is required.');
+      throw new AppError('MODERATION_REASON_REQUIRED', {
+        legacyMessage: 'Moderation reason is required.',
+      });
     }
 
     const report = this.moderationRepo.create({
@@ -74,7 +82,9 @@ export class ModerationService {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const normalizedStatus = status.trim();
     if (!MODERATION_STATUSES.has(normalizedStatus)) {
-      throw new BadRequestException('Unsupported moderation status.');
+      throw new AppError('MODERATION_STATUS_INVALID', {
+        legacyMessage: 'Unsupported moderation status.',
+      });
     }
 
     const report = await this.moderationRepo.findOneBy({
@@ -83,7 +93,10 @@ export class ModerationService {
     });
 
     if (!report) {
-      throw new NotFoundException('Moderation report not found.');
+      throw new AppError('MODERATION_REPORT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Moderation report not found.',
+      });
     }
 
     report.status = normalizedStatus;
@@ -103,3 +116,4 @@ export class ModerationService {
     };
   }
 }
+// i18n-ignore-end

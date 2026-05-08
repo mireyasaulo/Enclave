@@ -1,5 +1,6 @@
 import type { CharacterBlueprintRecipeValue } from '../characters/character-blueprint.types';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const SHAKE_DISCOVERY_CONFIG_KEY = 'shake_discovery_config';
 export const SHAKE_DISCOVERY_SESSIONS_KEY = 'shake_discovery_sessions';
 export const MAX_SHAKE_DISCOVERY_SESSIONS = 40;
@@ -208,3 +209,4 @@ export const DEFAULT_SHAKE_DISCOVERY_CONFIG: ShakeDiscoveryConfig = {
   "matchReason": "为什么这次会遇见这个人"
 }`,
 };
+// i18n-ignore-end

@@ -23,6 +23,22 @@
 - 新增 `pnpm ios:audit`，把 `prepare:web + doctor` 收敛成一条检查命令。
 - 更新 `apps/ios-shell/README.md` 和 `docs/release/mobile-bridge-runbook.md`，把当前真实契约与接线顺序写清楚。
 
+## 本轮已处理 (round 2 · 2026-05-07)
+
+- Capacitor 系列依赖与 `apps/android-shell` 对齐到 7.1.x baseline (`@capacitor/core` `^7.1.1`、`@capacitor/ios` `^7.1.1`、`@capacitor/cli` `^7.1.1`、`@capacitor/keyboard` `^7.0.6`、`@capacitor/app` `^7.1.0`、`@capacitor/splash-screen` `^7.0.2`、`@capacitor/status-bar` `^7.0.1`)。
+- `capacitor.config.ts` 删 `server.androidScheme` 与 `server.hostname`，回到 Capacitor 默认 WebView origin（`capacitor://localhost`），并在 `ios:` 块显式声明 `scheme: "capacitor"` 让 doctor 可文本校验。
+- `Info.plist` 与 `xcode-template/Info.plist.example`：`CFBundleDisplayName` / `YinjiePublicAppName` / 4 个 `NS*UsageDescription` 全部改空字符串占位，由 `InfoPlist.strings` 按系统语言驱动。
+- `Info.plist` 加 `NSAppTransportSecurity`（严格 HTTPS，无 `NSAllowsArbitraryLoads`）。
+- `UIRequiredDeviceCapabilities` 把过时的 `armv7` 改为 `arm64`。
+- `configure-ios-project.mjs` 新增 4 个幂等 helper：`ensurePlistStringValueIfHardcoded`（检测旧硬编码改空）、`ensurePlistArmArchitecture`（armv7→arm64）、`ensureAppTransportSecurity`（缺 ATS 补块）、`ensureCapacitorConfigIosScheme`（capacitor.config.ts 漂移检测，不自动改写 TS）。
+- `doctor-ios.mjs` 新增 `fileMatches` / `plistKeyHasEmptyString` helper 与 5 项校验：`capacitor-config-ios-scheme`、`info-plist-arm64`、`info-plist-app-transport-security`、`info-plist-empty-display-name`、`info-plist-empty-permission-strings`。Linux 上 doctor 23 项里 20 PASS（3 WARN 是 `platform=linux` / `core-api-env` / 旧 dist 残留）。
+
+### 新增 P1 风险
+
+- **WebView origin 一次性决策**：`capacitor.config.ts` 移除 `server.hostname` 是单向操作。WKWebView 把 origin 当 cookie / `localStorage` / `IndexedDB` 分区键，一旦上 TestFlight 后再改或删，会让已安装设备的 Web 持久化数据失效；当前壳尚未上 TestFlight，所以现在切回默认 origin 是安全的，但**后续不再改**。
+- **严格 ATS 假设**：业务必须 100% HTTPS（已与 `YINJIE_IOS_CORE_API_BASE_URL` 契约对齐）。后续若引入 HTTP 链路，应在 `NSExceptionDomains` 加白名单，而不是开 `NSAllowsArbitraryLoads`。
+- **plugin minor 升级真机刷 Pods**：必须在 macOS 上跑 `pnpm ios:sync`，Linux 静态校验抓不到坏的 pod 解析。
+
 ## 已确认风险
 
 ### P0

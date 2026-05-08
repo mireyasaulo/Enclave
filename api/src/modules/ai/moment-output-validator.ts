@@ -1,4 +1,5 @@
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   MomentGenerationContext,
   PersonalityProfile,
   SceneKey,
@@ -225,3 +226,4 @@ export function validateGeneratedSceneOutput(input: {
 }
 
 export const validateGeneratedMomentOutput = validateGeneratedSceneOutput;
+// i18n-ignore-end

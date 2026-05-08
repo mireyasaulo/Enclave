@@ -1,5 +1,6 @@
 import type { ImageAttachment, MessageAttachment } from './chat.types';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const MAX_GENERATED_IMAGE_HISTORY_PROMPT_CHARS = 180;
 
 export function buildGeneratedImageHistoryText(imagePrompt: string) {
@@ -52,3 +53,4 @@ function normalizeHistoryPrompt(value: string) {
 
   return `${normalized.slice(0, MAX_GENERATED_IMAGE_HISTORY_PROMPT_CHARS).trim()}…`;
 }
+// i18n-ignore-end

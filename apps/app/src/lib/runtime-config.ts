@@ -33,7 +33,7 @@ export function resolveAppCoreApiBaseUrl() {
     return browserBaseUrl;
   }
 
-  throw new Error("Remote Core API base URL is not configured for this runtime.");
+  throw new Error("Remote Core API base URL is not configured for this runtime."); // i18n-ignore-line
 }
 
 export function resolveAppSocketBaseUrl() {

@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
+import { msg } from "@lingui/macro";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CharacterBlueprintRecipe,
   CharacterBlueprintRevision,
   CharacterFactorySnapshot,
 } from "@yinjie/contracts";
 import { getSystemStatus } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   Button,
   Card,
@@ -39,15 +42,22 @@ import { buildDigitalHumanAdminSummary } from "../lib/digital-human-admin-summar
 import { formatAdminDateTime as formatLocalizedDateTime } from "../lib/format";
 import { CharacterWorkspaceNav } from "../components/character-workspace-nav";
 
-const ACTIVITY_OPTIONS = [
-  { value: "", label: "未设置" },
-  { value: "free", label: "空闲" },
-  { value: "working", label: "工作中" },
-  { value: "eating", label: "吃饭中" },
-  { value: "resting", label: "休息中" },
-  { value: "commuting", label: "通勤中" },
-  { value: "sleeping", label: "睡觉中" },
-];
+const ACTIVITY_LABEL_MESSAGES: Record<string, ReturnType<typeof msg>> = {
+  "": msg`未设置`,
+  free: msg`空闲`,
+  working: msg`工作中`,
+  eating: msg`吃饭中`,
+  resting: msg`休息中`,
+  commuting: msg`通勤中`,
+  sleeping: msg`睡觉中`,
+};
+
+function buildActivityOptions(): Array<{ value: string; label: string }> {
+  return Object.entries(ACTIVITY_LABEL_MESSAGES).map(([value, message]) => ({
+    value,
+    label: translateRuntimeMessage(message),
+  }));
+}
 
 const FACTORY_TABS = [
   { key: "ai", label: "AI 辅助" },
@@ -100,6 +110,7 @@ export function CharacterFactoryPage() {
   const [generationPersonName, setGenerationPersonName] = useState("");
   const [generationSample, setGenerationSample] = useState("");
   const [activeTab, setActiveTab] = useState("identity");
+  const activityOptions = useMemo(buildActivityOptions, []);
 
   const factoryQuery = useQuery({
     queryKey: ["admin-character-factory", characterId],
@@ -1158,7 +1169,7 @@ export function CharacterFactoryPage() {
                         },
                       }))
                     }
-                    options={ACTIVITY_OPTIONS}
+                    options={activityOptions}
                   />
                 </div>
                 <div className="mt-4 flex flex-wrap gap-3">
@@ -1547,3 +1558,4 @@ function formatDateTime(value?: string | null) {
     "notSet",
   );
 }
+// i18n-ignore-end

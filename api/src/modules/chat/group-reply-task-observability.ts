@@ -1,5 +1,6 @@
 import type { GroupReplyTaskEntity } from './group-reply-task.entity';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const GROUP_REPLY_TASK_ARCHIVE_STATS_CONFIG_KEY =
   'group_reply_task_archive_stats_v1';
 
@@ -285,3 +286,4 @@ export function calculateGroupReplyCancelRate(
     statusCounts.sent + statusCounts.cancelled + statusCounts.failed;
   return total > 0 ? statusCounts.cancelled / total : 0;
 }
+// i18n-ignore-end

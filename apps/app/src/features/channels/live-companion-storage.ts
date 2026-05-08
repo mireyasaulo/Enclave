@@ -35,7 +35,7 @@ const MAX_LIVE_HISTORY = 12;
 let liveCompanionNativeWriteQueue: Promise<void> = Promise.resolve();
 
 export const defaultLiveDraft: LiveDraft = {
-  title: "",
+  title: "", // i18n-ignore-line
   topic: "",
   coverHook: "",
   referencePostAuthorName: null,
@@ -58,7 +58,7 @@ function normalizeLiveDraft(
   draft: Partial<LiveDraft> | null | undefined,
 ): LiveDraft {
   return {
-    title: typeof draft?.title === "string" ? draft.title : "",
+    title: typeof draft?.title === "string" ? draft.title : "", // i18n-ignore-line
     topic: typeof draft?.topic === "string" ? draft.topic : "",
     coverHook: typeof draft?.coverHook === "string" ? draft.coverHook : "",
     referencePostAuthorName:

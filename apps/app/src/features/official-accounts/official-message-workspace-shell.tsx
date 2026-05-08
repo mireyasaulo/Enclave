@@ -1,6 +1,10 @@
 import { useEffect, useMemo } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useNavigate } from "@tanstack/react-router";
 import { RouteRedirectState } from "../../components/route-redirect-state";
+
+const t = translateRuntimeMessage;
 import {
   buildDesktopOfficialServiceThreadPath,
   buildDesktopSubscriptionInboxPath,
@@ -67,9 +71,9 @@ export function OfficialMessageWorkspaceShell({
 
   return (
     <RouteRedirectState
-      title="正在切换到桌面公众号消息"
-      description="正在同步桌面消息工作区的公众号路由状态。"
-      loadingLabel="切换桌面公众号消息..."
+      title={t(msg`正在切换到桌面公众号消息`)}
+      description={t(msg`正在同步桌面消息工作区的公众号路由状态。`)}
+      loadingLabel={t(msg`切换桌面公众号消息...`)}
     />
   );
 }

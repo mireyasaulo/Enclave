@@ -74,6 +74,7 @@ import {
   formatCloudConsoleVisibleSessionsRange,
   translateCloudConsoleCsvRow,
   translateCloudConsoleText,
+  translateCloudConsoleTextForActiveLocale,
   useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
 import {
@@ -88,7 +89,7 @@ const ADMIN_SESSION_ACTION_LINK_CLASS_NAME =
 
 function formatDateTime(value?: string | null) {
   if (!value) {
-    return "Not available";
+    return translateCloudConsoleTextForActiveLocale("Not available");
   }
 
   return formatLocaleDateTime(new Date(value), {
@@ -99,12 +100,12 @@ function formatDateTime(value?: string | null) {
 
 function formatDate(value?: string | null) {
   if (!value) {
-    return "Not available";
+    return translateCloudConsoleTextForActiveLocale("Not available");
   }
 
   const parsed = Date.parse(`${value}T00:00:00.000Z`);
   if (!Number.isFinite(parsed)) {
-    return "Not available";
+    return translateCloudConsoleTextForActiveLocale("Not available");
   }
 
   return formatLocaleDateTime(new Date(parsed), {
@@ -117,7 +118,7 @@ function formatDate(value?: string | null) {
 
 function formatDateRange(startValue?: string | null, endValue?: string | null) {
   if (!startValue || !endValue) {
-    return "Not available";
+    return translateCloudConsoleTextForActiveLocale("Not available");
   }
 
   if (startValue === endValue) {
@@ -130,7 +131,9 @@ function formatDateRange(startValue?: string | null, endValue?: string | null) {
 function renderSessionSource(ip?: string | null, userAgent?: string | null) {
   if (!ip && !userAgent) {
     return (
-      <span className="text-[color:var(--text-muted)]">Not available</span>
+      <span className="text-[color:var(--text-muted)]">
+        {translateCloudConsoleTextForActiveLocale("Not available")}
+      </span>
     );
   }
 
@@ -156,7 +159,9 @@ function renderRevocationDetails(session: CloudAdminSessionSummary) {
     !session.revokedBySessionId
   ) {
     return (
-      <span className="text-[color:var(--text-muted)]">Not available</span>
+      <span className="text-[color:var(--text-muted)]">
+        {translateCloudConsoleTextForActiveLocale("Not available")}
+      </span>
     );
   }
 
@@ -349,6 +354,8 @@ type HighlightedOperationReceiptContext = Pick<
 const WATCH_SOURCE_GROUP_ACTIVE_SESSION_THRESHOLD = 2;
 const CRITICAL_SOURCE_GROUP_ACTIVE_SESSION_THRESHOLD = 4;
 const WATCH_SOURCE_GROUP_REVOKED_SESSION_THRESHOLD = 2;
+// i18n-ignore-start: English source labels for risk threshold rules; render
+// sites translate via useCloudConsoleText.
 const SOURCE_GROUP_RISK_THRESHOLD_RULES = [
   {
     id: "watch",
@@ -363,6 +370,7 @@ const SOURCE_GROUP_RISK_THRESHOLD_RULES = [
     tone: "border-rose-300/50 bg-rose-50 text-rose-700",
   },
 ] as const;
+// i18n-ignore-end
 
 function parseTimelineTimestamp(value?: string | null) {
   if (!value) {
@@ -1061,6 +1069,8 @@ function buildSourceGroupRiskTimelineCsv(
   return lines.join("\n");
 }
 
+// i18n-ignore-start: English source labels for filter presets; render sites
+// translate via useCloudConsoleText.
 const ADMIN_SESSION_PRESETS: Array<{
   id: string;
   label: string;
@@ -1095,6 +1105,7 @@ const ADMIN_SESSION_PRESETS: Array<{
     },
   },
 ];
+// i18n-ignore-end
 
 export function AdminSessionsPage() {
   const cloudConsoleQueryKey = ["cloud-console"] as const;
@@ -2129,8 +2140,10 @@ export function AdminSessionsPage() {
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <AdminSessionSectionHeader
-          title="Admin sessions"
-          description="Review live admin sessions, inspect where they were issued from, filter by revocation path, and page through longer audit history."
+          title={t("Admin sessions")}
+          description={t(
+            "Review live admin sessions, inspect where they were issued from, filter by revocation path, and page through longer audit history.",
+          )}
           variant="page"
         />
         <div className="flex flex-wrap items-center gap-3">
@@ -2191,8 +2204,10 @@ export function AdminSessionsPage() {
       <div className="mt-5 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <AdminSessionSectionHeader
-            title="Source groups"
-            description="Aggregate sessions by issue IP and client under the current filters, then revoke an entire source in one action."
+            title={t("Source groups")}
+            description={t(
+              "Aggregate sessions by issue IP and client under the current filters, then revoke an entire source in one action.",
+            )}
           />
           <AdminSessionSummaryChip>
             {sourceGroupSummary}
@@ -2448,8 +2463,10 @@ export function AdminSessionsPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <AdminSessionSectionHeader
-                title="Risk timeline"
-                description="Derived from session issue, expiry, and revoke events inside the focused source group under the current filters."
+                title={t("Risk timeline")}
+                description={t(
+                  "Derived from session issue, expiry, and revoke events inside the focused source group under the current filters.",
+                )}
               />
               {focusedSourceTimelineSummary ? (
                 <div className="mt-2 text-xs text-[color:var(--text-muted)]">
@@ -2469,7 +2486,7 @@ export function AdminSessionsPage() {
               {latestFocusedSourceRiskPoint ? (
                 <div className="mt-3">
                   <AdminSessionSectionHeader
-                    title="Current rationale"
+                    title={t("Current rationale")}
                     variant="subsection"
                   />
                   <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-[color:var(--text-secondary)]">
@@ -2774,7 +2791,7 @@ export function AdminSessionsPage() {
               <th className="px-4 py-3">
                 <input
                   type="checkbox"
-                  aria-label="Select all active admin sessions"
+                  aria-label={t("Select all active admin sessions")}
                   checked={allActiveSelected}
                   disabled={activeSessions.length === 0 || isRevoking}
                   onChange={(event) =>
@@ -3003,12 +3020,12 @@ export function AdminSessionsPage() {
                             {visibleHighlightedOperationReceipts.length ? (
                               <div
                                 role="region"
-                                aria-label="Recent operation receipts"
+                                aria-label={t("Recent operation receipts")}
                                 className="mt-3 rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3"
                               >
                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                   <AdminSessionSectionHeader
-                                    title="Recent operation receipts"
+                                    title={t("Recent operation receipts")}
                                     description={`Showing the latest ${visibleHighlightedOperationReceipts.length} of up to ${HIGHLIGHTED_OPERATION_RECEIPT_LIMIT} receipt(s) for this focused session.`}
                                     variant="subsection"
                                   />
@@ -3205,7 +3222,7 @@ export function AdminSessionsPage() {
 
       <ConsoleConfirmDialog
         open={Boolean(pendingSession)}
-        title="Revoke admin session?"
+        title={t("Revoke admin session?")}
         description={
           pendingSession?.isCurrent
             ? "This is the current console session. New admin requests will need to exchange a fresh short-lived token."
@@ -3226,7 +3243,7 @@ export function AdminSessionsPage() {
 
       <ConsoleConfirmDialog
         open={pendingBulkSessionIds.length > 0}
-        title="Revoke selected admin sessions?"
+        title={t("Revoke selected admin sessions?")}
         description={
           selectedCurrentSession
             ? `This selection includes the current console session. ${pendingBulkSessionIds.length} selected session(s) will stop authorizing admin requests immediately, and the next admin request will need to exchange a fresh short-lived token.`
@@ -3247,7 +3264,7 @@ export function AdminSessionsPage() {
 
       <ConsoleConfirmDialog
         open={pendingFilteredRevoke}
-        title="Revoke all matching admin sessions?"
+        title={t("Revoke all matching admin sessions?")}
         description={filteredRevokeDescription}
         confirmLabel="Revoke matching sessions"
         pendingLabel="Revoking..."
@@ -3261,7 +3278,7 @@ export function AdminSessionsPage() {
 
       <ConsoleConfirmDialog
         open={pendingRiskGroupRevoke}
-        title="Revoke matching risk groups?"
+        title={t("Revoke matching risk groups?")}
         description={sourceGroupRiskRevokeDescription}
         confirmLabel="Revoke risk groups"
         pendingLabel="Revoking..."
@@ -3275,7 +3292,7 @@ export function AdminSessionsPage() {
 
       <ConsoleConfirmDialog
         open={Boolean(pendingSourceGroup)}
-        title="Revoke source group?"
+        title={t("Revoke source group?")}
         description={sourceGroupRevokeDescription}
         confirmLabel="Revoke group"
         pendingLabel="Revoking..."

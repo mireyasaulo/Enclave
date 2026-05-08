@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   BadRequestException,
   Body,
@@ -86,3 +87,4 @@ export class InviteClientController {
     return result;
   }
 }
+// i18n-ignore-end

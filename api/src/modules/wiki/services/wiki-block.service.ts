@@ -1,9 +1,6 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
@@ -32,24 +29,42 @@ export class WikiBlockService {
     },
   ): Promise<WikiBlockEntity> {
     if (!VALID_SCOPES.has(input.scope)) {
-      throw new BadRequestException('scope 必须是 global / page / talk');
+      throw new AppError('WIKI_BLOCK_INVALID_STATE', {
+        params: { detail: 'scope 必须是 global / page / talk' },
+        legacyMessage: 'scope 必须是 global / page / talk',
+      });
     }
     if (input.scope === 'page' && !input.targetCharacterId) {
-      throw new BadRequestException('scope=page 必须给 targetCharacterId');
+      throw new AppError('WIKI_BLOCK_INVALID_STATE', {
+        params: { detail: 'scope=page 必须给 targetCharacterId' },
+        legacyMessage: 'scope=page 必须给 targetCharacterId',
+      });
     }
     if (!input.reason?.trim()) {
-      throw new BadRequestException('封禁必须填写理由');
+      throw new AppError('WIKI_BLOCK_INVALID_STATE', {
+        params: { detail: '封禁必须填写理由' },
+        legacyMessage: '封禁必须填写理由',
+      });
     }
     if (input.userId === actor.id) {
-      throw new BadRequestException('不能封禁自己');
+      throw new AppError('WIKI_BLOCK_INVALID_STATE', {
+        params: { detail: '不能封禁自己' },
+        legacyMessage: '不能封禁自己',
+      });
     }
     const target = await this.userRepo.findOne({ where: { id: input.userId } });
     if (!target) {
-      throw new NotFoundException('目标用户不存在');
+      throw new AppError('WIKI_BLOCK_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '目标用户不存在',
+      });
     }
     const expiresAt = input.expiresAt ? new Date(input.expiresAt) : null;
     if (expiresAt && Number.isNaN(expiresAt.getTime())) {
-      throw new BadRequestException('expiresAt 不是有效时间');
+      throw new AppError('WIKI_BLOCK_INVALID_STATE', {
+        params: { detail: 'expiresAt 不是有效时间' },
+        legacyMessage: 'expiresAt 不是有效时间',
+      });
     }
     const entity = this.blockRepo.create({
       userId: input.userId,
@@ -65,7 +80,10 @@ export class WikiBlockService {
 
   async revoke(blockId: string, actor: AuthenticatedUser): Promise<void> {
     const block = await this.blockRepo.findOne({ where: { id: blockId } });
-    if (!block) throw new NotFoundException('封禁记录不存在');
+    if (!block) throw new AppError('WIKI_BLOCK_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '封禁记录不存在',
+      });
     if (block.revokedAt) {
       return;
     }
@@ -101,14 +119,20 @@ export class WikiBlockService {
       .getMany();
     for (const block of active) {
       if (block.scope === 'global') {
-        throw new ForbiddenException(
-          `你已被全站封禁：${block.reason}${block.expiresAt ? `（到期 ${block.expiresAt.toISOString()}）` : ''}`,
-        );
+        const detail = `你已被全站封禁：${block.reason}${block.expiresAt ? `（到期 ${block.expiresAt.toISOString()}）` : ''}`;
+        throw new AppError('WIKI_FORBIDDEN', {
+          status: HttpStatus.FORBIDDEN,
+          params: { reason: detail },
+          legacyMessage: detail,
+        });
       }
       if (block.scope === 'page' && block.targetCharacterId === characterId) {
-        throw new ForbiddenException(
-          `你被禁止编辑此词条：${block.reason}${block.expiresAt ? `（到期 ${block.expiresAt.toISOString()}）` : ''}`,
-        );
+        const detail = `你被禁止编辑此词条：${block.reason}${block.expiresAt ? `（到期 ${block.expiresAt.toISOString()}）` : ''}`;
+        throw new AppError('WIKI_FORBIDDEN', {
+          status: HttpStatus.FORBIDDEN,
+          params: { reason: detail },
+          legacyMessage: detail,
+        });
       }
     }
   }
@@ -124,3 +148,4 @@ export class WikiBlockService {
       .getCount();
   }
 }
+// i18n-ignore-end

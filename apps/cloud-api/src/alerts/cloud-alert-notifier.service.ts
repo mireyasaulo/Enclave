@@ -2,6 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { CloudWorldEntity } from "../entities/cloud-world.entity";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type CloudAlertWebhookEvent = "world_job_failed" | "world_provider_error";
 
 interface CloudAlertWebhookPayload {
@@ -239,3 +240,4 @@ export class CloudAlertNotifierService {
     return typeof value === "number" && Number.isFinite(value) ? value : null;
   }
 }
+// i18n-ignore-end

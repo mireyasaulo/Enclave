@@ -478,6 +478,8 @@ export interface ResolveWorldAccessRequest {
 export interface CloudWorldSummary {
   id: string;
   phone: string;
+  email?: string | null;
+  ownerDisplayName?: string | null;
   name: string;
   status: CloudWorldLifecycleStatus;
   desiredState?: "running" | "sleeping";

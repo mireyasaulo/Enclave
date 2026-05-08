@@ -1,3 +1,8 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
+
 type CompressedChatBackgroundImage = {
   file: File;
   width: number;
@@ -11,7 +16,7 @@ export async function compressChatBackgroundImage(
   file: File,
 ): Promise<CompressedChatBackgroundImage> {
   if (!file.type.startsWith("image/")) {
-    throw new Error("请选择图片文件作为聊天背景。");
+    throw new Error(t(msg`请选择图片文件作为聊天背景。`));
   }
 
   const image = await loadImage(file);
@@ -25,7 +30,7 @@ export async function compressChatBackgroundImage(
 
   const context = canvas.getContext("2d");
   if (!context) {
-    throw new Error("当前浏览器暂不支持背景图压缩。");
+    throw new Error(t(msg`当前浏览器暂不支持背景图压缩。`));
   }
 
   context.drawImage(image, 0, 0, width, height);
@@ -52,7 +57,7 @@ function loadImage(file: File) {
 
     image.onerror = () => {
       URL.revokeObjectURL(url);
-      reject(new Error("读取图片失败，请换一张再试。"));
+      reject(new Error(t(msg`读取图片失败，请换一张再试。`)));
     };
 
     image.src = url;
@@ -64,7 +69,7 @@ function canvasToBlob(canvas: HTMLCanvasElement) {
     canvas.toBlob(
       (blob) => {
         if (!blob) {
-          reject(new Error("处理背景图失败，请换一张再试。"));
+          reject(new Error(t(msg`处理背景图失败，请换一张再试。`)));
           return;
         }
 

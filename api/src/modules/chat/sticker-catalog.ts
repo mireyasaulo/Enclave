@@ -1,5 +1,6 @@
 import type { StickerAttachment } from './chat.types';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export interface StickerCatalogItem {
   id: string;
   src: string;
@@ -122,3 +123,4 @@ function inferStickerMimeType(url: string) {
 
   return 'image/png';
 }
+// i18n-ignore-end

@@ -6,6 +6,10 @@ import { fileURLToPath } from "node:url";
 
 const mode = process.argv[2] ?? "dev";
 const forwardedArgs = process.argv.slice(3);
+
+function bilingual(en, zh) {
+  return zh ? `${en}\n${zh}` : en;
+}
 const scriptDir = fileURLToPath(new URL(".", import.meta.url));
 const desktopDir = join(scriptDir, "..");
 const cargoBin = join(homedir(), ".cargo", "bin");
@@ -62,10 +66,13 @@ function ensureLinuxDesktopDependencies() {
 
   if (!hasCommand("pkg-config")) {
     console.error(
-      [
-        "Linux desktop build requires pkg-config and GTK/WebKit development libraries.",
-        "Install pkg-config plus the Tauri Linux system dependencies, then rerun this command.",
-      ].join(" "),
+      bilingual(
+        [
+          "Linux desktop build requires pkg-config and GTK/WebKit development libraries.",
+          "Install pkg-config plus the Tauri Linux system dependencies, then rerun this command.",
+        ].join(" "),
+        "Linux 桌面构建需要 pkg-config 与 GTK/WebKit 开发库。请先安装 pkg-config 及 Tauri 的 Linux 系统依赖后再重新运行。",
+      ),
     );
     process.exit(1);
   }
@@ -90,22 +97,26 @@ function ensureLinuxDesktopDependencies() {
     return;
   }
 
+  const debPackages = [
+    "libglib2.0-dev",
+    "libgtk-3-dev",
+    "libwebkit2gtk-4.1-dev",
+    "libsoup-3.0-dev",
+    "libgdk-pixbuf-2.0-dev",
+    "libpango1.0-dev",
+    "libcairo2-dev",
+    "libatk1.0-dev",
+  ].join(" ");
   console.error(
-    [
-      `Missing Linux desktop system packages: ${missingPackages.join(", ")}.`,
-      "Install the Tauri Linux dependencies first.",
-      "For Debian/Ubuntu this usually includes:",
+    bilingual(
       [
-        "libglib2.0-dev",
-        "libgtk-3-dev",
-        "libwebkit2gtk-4.1-dev",
-        "libsoup-3.0-dev",
-        "libgdk-pixbuf-2.0-dev",
-        "libpango1.0-dev",
-        "libcairo2-dev",
-        "libatk1.0-dev",
+        `Missing Linux desktop system packages: ${missingPackages.join(", ")}.`,
+        "Install the Tauri Linux dependencies first.",
+        "For Debian/Ubuntu this usually includes:",
+        debPackages,
       ].join(" "),
-    ].join(" "),
+      `缺少 Linux 桌面构建所需系统包：${missingPackages.join("、")}。请先安装 Tauri 的 Linux 依赖。Debian/Ubuntu 上通常需要：${debPackages}`,
+    ),
   );
   process.exit(1);
 }
@@ -117,10 +128,13 @@ function ensureMacDesktopAssets() {
 
   if (!hasCommand("iconutil")) {
     console.error(
-      [
-        "macOS desktop build expects Apple's iconutil to be available.",
-        "Run this build on a Mac with Xcode Command Line Tools installed.",
-      ].join(" "),
+      bilingual(
+        [
+          "macOS desktop build expects Apple's iconutil to be available.",
+          "Run this build on a Mac with Xcode Command Line Tools installed.",
+        ].join(" "),
+        "macOS 桌面构建依赖 Apple 的 iconutil。请在已安装 Xcode Command Line Tools 的 Mac 上运行本命令。",
+      ),
     );
     process.exit(1);
   }
@@ -134,10 +148,13 @@ function ensureMacDesktopAssets() {
 
   if (iconResult.status !== 0) {
     console.error(
-      [
-        "Missing src-tauri/icons/icon.icns.",
-        "Generate the macOS icon asset before running a desktop build.",
-      ].join(" "),
+      bilingual(
+        [
+          "Missing src-tauri/icons/icon.icns.",
+          "Generate the macOS icon asset before running a desktop build.",
+        ].join(" "),
+        "缺少 src-tauri/icons/icon.icns。请先生成 macOS 图标资源再运行桌面构建。",
+      ),
     );
     process.exit(1);
   }
@@ -150,11 +167,14 @@ function ensureWindowsDesktopDependencies() {
 
   if (!hasCommand("cl", ["/?"]) && !windowsVcVarsPath) {
     console.error(
-      [
-        "Windows desktop build requires MSVC Build Tools.",
-        "Install Visual Studio Build Tools with the Desktop development with C++ workload and Windows SDK,",
-        "or make sure vcvars64.bat is available so this script can load MSVC automatically.",
-      ].join(" "),
+      bilingual(
+        [
+          "Windows desktop build requires MSVC Build Tools.",
+          "Install Visual Studio Build Tools with the Desktop development with C++ workload and Windows SDK,",
+          "or make sure vcvars64.bat is available so this script can load MSVC automatically.",
+        ].join(" "),
+        "Windows 桌面构建需要 MSVC Build Tools。请安装 Visual Studio Build Tools，并勾选「使用 C++ 的桌面开发」工作负载和 Windows SDK；或确保 vcvars64.bat 可被本脚本自动加载。",
+      ),
     );
     process.exit(1);
   }
@@ -168,7 +188,10 @@ function ensureWindowsDesktopDependencies() {
 
   if ((installedTargets.status ?? 1) !== 0) {
     console.error(
-      "Failed to inspect installed Rust targets. Ensure rustup is available before building the Windows desktop shell.",
+      bilingual(
+        "Failed to inspect installed Rust targets. Ensure rustup is available before building the Windows desktop shell.",
+        "无法检查已安装的 Rust target。请先确保 rustup 可用，再构建 Windows 桌面壳。",
+      ),
     );
     process.exit(installedTargets.status ?? 1);
   }
@@ -176,10 +199,13 @@ function ensureWindowsDesktopDependencies() {
   const requiredTarget = explicitTarget ?? "x86_64-pc-windows-msvc";
   if (!installedTargets.stdout.includes(requiredTarget)) {
     console.error(
-      [
-        `Missing Rust target ${requiredTarget}.`,
-        `Run \`rustup target add ${requiredTarget}\` and rerun this command.`,
-      ].join(" "),
+      bilingual(
+        [
+          `Missing Rust target ${requiredTarget}.`,
+          `Run \`rustup target add ${requiredTarget}\` and rerun this command.`,
+        ].join(" "),
+        `缺少 Rust target ${requiredTarget}。请运行 \`rustup target add ${requiredTarget}\` 后重新执行本命令。`,
+      ),
     );
     process.exit(1);
   }
@@ -190,23 +216,29 @@ function ensureWindowsDesktopDependencies() {
   const targetDir = env.CARGO_TARGET_DIR ?? "";
   if (/[^\x00-\x7f]/u.test(targetDir)) {
     console.warn(
-      [
-        `CARGO_TARGET_DIR contains non-ASCII characters: ${targetDir}.`,
-        "Some MSVC link.exe versions fail on such paths.",
-        "If the build fails, set CARGO_TARGET_DIR to an ASCII-only path",
-        "(e.g. `set CARGO_TARGET_DIR=C:\\yinjie-build`) before rerunning.",
-      ].join(" "),
+      bilingual(
+        [
+          `CARGO_TARGET_DIR contains non-ASCII characters: ${targetDir}.`,
+          "Some MSVC link.exe versions fail on such paths.",
+          "If the build fails, set CARGO_TARGET_DIR to an ASCII-only path",
+          "(e.g. `set CARGO_TARGET_DIR=C:\\yinjie-build`) before rerunning.",
+        ].join(" "),
+        `CARGO_TARGET_DIR 含有非 ASCII 字符：${targetDir}。部分 MSVC link.exe 版本在此类路径下会构建失败。若构建报错，请把 CARGO_TARGET_DIR 改成纯 ASCII 路径（例如 \`set CARGO_TARGET_DIR=C:\\yinjie-build\`）后重试。`,
+      ),
     );
   }
 }
 
 if (!hasCommand("rustc") || !hasCommand("cargo")) {
   console.error(
-    [
-      "Rust toolchain is required to run the Yinjie desktop shell.",
-      "Install rustup, restart the terminal, then rerun this command.",
-      "Current JS workspace has already been scaffolded and verified.",
-    ].join(" "),
+    bilingual(
+      [
+        "Rust toolchain is required to run the Yinjie desktop shell.",
+        "Install rustup, restart the terminal, then rerun this command.",
+        "Current JS workspace has already been scaffolded and verified.",
+      ].join(" "),
+      "运行隐界桌面壳需要 Rust 工具链。请先安装 rustup，重启终端后再次执行本命令。当前 JS 工作区已就绪。",
+    ),
   );
   process.exit(1);
 }
@@ -248,15 +280,21 @@ for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
   }
 
   console.error(
-    `Detected transient Windows desktop build failure (attempt ${attempt}/${maxAttempts}). Retrying with serialized cargo jobs...`,
+    bilingual(
+      `Detected transient Windows desktop build failure (attempt ${attempt}/${maxAttempts}). Retrying with serialized cargo jobs...`,
+      `检测到 Windows 桌面构建偶发失败（第 ${attempt}/${maxAttempts} 次尝试），正在以串行 cargo 任务重试……`,
+    ),
   );
   if (attempt >= 3) {
     console.error(
-      [
-        "If the build keeps failing with `os error 5` or WiX light/candle errors,",
-        "add `%CARGO_TARGET_DIR%` and `apps\\desktop\\src-tauri\\target\\` to Windows Defender exclusions,",
-        "and close any IDE/Explorer window indexing those folders.",
-      ].join(" "),
+      bilingual(
+        [
+          "If the build keeps failing with `os error 5` or WiX light/candle errors,",
+          "add `%CARGO_TARGET_DIR%` and `apps\\desktop\\src-tauri\\target\\` to Windows Defender exclusions,",
+          "and close any IDE/Explorer window indexing those folders.",
+        ].join(" "),
+        "如果一直报 `os error 5` 或 WiX light/candle 错误，请把 `%CARGO_TARGET_DIR%` 与 `apps\\desktop\\src-tauri\\target\\` 加到 Windows Defender 例外清单，并关闭正在索引这些目录的 IDE / 资源管理器窗口。",
+      ),
     );
   }
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 3000);
@@ -389,7 +427,12 @@ function loadWindowsVcVarsEnv(vcvarsPath) {
   }
 
   if ((result.status ?? 1) !== 0) {
-    console.error("Failed to load vcvars64.bat for the Windows desktop build.");
+    console.error(
+      bilingual(
+        "Failed to load vcvars64.bat for the Windows desktop build.",
+        "加载 vcvars64.bat 失败，无法进行 Windows 桌面构建。",
+      ),
+    );
     process.exit(result.status ?? 1);
   }
 

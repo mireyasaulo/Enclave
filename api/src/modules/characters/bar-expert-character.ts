@@ -2,6 +2,7 @@ import type { CharacterEntity } from './character.entity';
 import { DEFAULT_CHARACTER_BIOS } from './character-bios';
 import { getCharacterAvatarBySourceKey } from './character-avatar-assets';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const BAR_EXPERT_CHARACTER_ID = 'char-default-bar-expert';
 export const BAR_EXPERT_SOURCE_KEY = 'bar_expert';
 
@@ -280,3 +281,4 @@ export function buildBarExpertCharacter(): Partial<CharacterEntity> {
     currentActivity: 'working',
   };
 }
+// i18n-ignore-end

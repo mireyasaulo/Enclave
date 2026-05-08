@@ -1,11 +1,11 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   Headers,
+  HttpStatus,
   Logger,
   Param,
   Patch,
@@ -17,6 +17,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
+import { AppError } from '../../common/app-error.exception';
 import { SystemConfigService } from '../config/config.service';
 import { ChatService } from './chat.service';
 import {
@@ -188,7 +189,9 @@ export class ChatAttachmentController {
     @Body() body: { width?: string; height?: string; durationMs?: string },
   ) {
     if (!file) {
-      throw new BadRequestException('请先选择一个附件。');
+      throw new AppError('CHAT_ATTACHMENT_REQUIRED', {
+        legacyMessage: '请先选择一个附件。',
+      });
     }
 
     return {
@@ -237,7 +240,9 @@ export class ChatStickerController {
     @Body() body: { label?: string; keywords?: string; width?: string; height?: string },
   ) {
     if (!file) {
-      throw new BadRequestException('请先选择一个表情文件。');
+      throw new AppError('CHAT_STICKER_FILE_REQUIRED', {
+        legacyMessage: '请先选择一个表情文件。',
+      });
     }
 
     return this.customStickersService.createCustomSticker(file, {
@@ -264,11 +269,15 @@ export class ChatStickerController {
     const messageId = body.messageId?.trim();
 
     if (threadType !== 'conversation' && threadType !== 'group') {
-      throw new BadRequestException('缺少合法的 threadType。');
+      throw new AppError('CHAT_THREAD_TYPE_INVALID', {
+        legacyMessage: '缺少合法的 threadType。',
+      });
     }
 
     if (!threadId || !messageId) {
-      throw new BadRequestException('缺少 threadId 或 messageId。');
+      throw new AppError('CHAT_THREAD_OR_MESSAGE_REQUIRED', {
+        legacyMessage: '缺少 threadId 或 messageId。',
+      });
     }
 
     return this.customStickersService.createCustomStickerFromMessage({
@@ -314,12 +323,16 @@ export class VoiceCallsController {
     body: { conversationId?: string; characterId?: string; durationMs?: string },
   ) {
     if (!file) {
-      throw new BadRequestException('请先录一段语音再试。');
+      throw new AppError('AI_AUDIO_REQUIRED', {
+        legacyMessage: '请先录一段语音再试。',
+      });
     }
 
     const conversationId = body.conversationId?.trim();
     if (!conversationId) {
-      throw new BadRequestException('缺少 conversationId。');
+      throw new AppError('CHAT_CONVERSATION_ID_REQUIRED', {
+        legacyMessage: '缺少 conversationId。',
+      });
     }
 
     return this.voiceCallsService.createTurn(file, {
@@ -348,7 +361,9 @@ export class DigitalHumanCallsController {
   ) {
     const conversationId = body.conversationId?.trim();
     if (!conversationId) {
-      throw new BadRequestException('缺少 conversationId。');
+      throw new AppError('CHAT_CONVERSATION_ID_REQUIRED', {
+        legacyMessage: '缺少 conversationId。',
+      });
     }
 
     return this.digitalHumanCallsService.createSession({
@@ -429,7 +444,10 @@ export class DigitalHumanCallsController {
       const providedToken =
         digitalHumanToken?.trim() || bearerToken || token?.trim() || undefined;
       if (providedToken !== expectedToken) {
-        throw new ForbiddenException('数字人 provider 回调鉴权失败。');
+        throw new AppError('CHAT_DIGITAL_HUMAN_AUTH_FAILED', {
+          status: HttpStatus.FORBIDDEN,
+          legacyMessage: '数字人 provider 回调鉴权失败。',
+        });
       }
     }
 
@@ -439,7 +457,9 @@ export class DigitalHumanCallsController {
       body.renderStatus !== 'ready' &&
       body.renderStatus !== 'failed'
     ) {
-      throw new BadRequestException('缺少合法的 renderStatus。');
+      throw new AppError('CHAT_RENDER_STATUS_INVALID', {
+        legacyMessage: '缺少合法的 renderStatus。',
+      });
     }
 
     if (
@@ -448,7 +468,9 @@ export class DigitalHumanCallsController {
       body.status !== 'playing' &&
       body.status !== 'ended'
     ) {
-      throw new BadRequestException('status 非法。');
+      throw new AppError('CHAT_STATUS_INVALID', {
+        legacyMessage: 'status 非法。',
+      });
     }
 
     return this.digitalHumanCallsService.updateProviderState(sessionId, {
@@ -489,7 +511,9 @@ export class DigitalHumanCallsController {
     @Body() body: { durationMs?: string },
   ) {
     if (!file) {
-      throw new BadRequestException('请先录一段语音再试。');
+      throw new AppError('AI_AUDIO_REQUIRED', {
+        legacyMessage: '请先录一段语音再试。',
+      });
     }
 
     return this.digitalHumanCallsService.createTurn(sessionId, file, body.durationMs
@@ -819,3 +843,4 @@ function parseNonNegativeNumber(value?: string) {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined;
 }
+// i18n-ignore-end

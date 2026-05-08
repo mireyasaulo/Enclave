@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { Injectable } from '@nestjs/common';
 import {
   MomentGenerationContext,
@@ -1138,3 +1139,4 @@ ${templates.behavioralGuideline}
     return `<real_world_context>\n${blocks.join('\n\n')}\n</real_world_context>`;
   }
 }
+// i18n-ignore-end

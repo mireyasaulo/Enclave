@@ -7,6 +7,7 @@ type BootstrapScreenProps = {
 // 注意：这个组件是 i18n catalog 加载完成之前的 fallback。
 // 此时 lingui 尚未 hydrate，<Trans> 会回退成 babel 注入的 6 字符 hash id（看起来像乱码）。
 // 因此这里只能用裸中文字符串，不要换回 <Trans>/t(msg``)。
+// i18n-ignore-start: 见上述 fallback 解释
 export function BootstrapScreen({ message }: BootstrapScreenProps) {
   return (
     <div
@@ -68,3 +69,4 @@ export function BootstrapScreen({ message }: BootstrapScreenProps) {
     </div>
   );
 }
+// i18n-ignore-end

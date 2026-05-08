@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   buildLawyerCharacter,
   LAWYER_CHARACTER_ID,
@@ -47,3 +48,4 @@ describe('lawyer character', () => {
     expect(character.profile?.traits?.topicsOfInterest).toContain('劳动纠纷');
   });
 });
+// i18n-ignore-end

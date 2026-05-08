@@ -1,10 +1,12 @@
 import type { TelemetryApiHealthResponse } from "@yinjie/contracts";
+import { useCloudConsoleText } from "../../lib/cloud-console-i18n";
 
 export function TelemetryApiHealthTable({ data }: { data: TelemetryApiHealthResponse }) {
+  const t = useCloudConsoleText();
   if (data.rows.length === 0) {
     return (
       <div className="rounded-2xl border border-(--border-subtle) bg-(--surface-card) p-8 text-center text-sm text-(--text-muted)">
-        当前范围内无 API 调用埋点。
+        {t("No API telemetry in the current range.")}
       </div>
     );
   }
@@ -14,19 +16,19 @@ export function TelemetryApiHealthTable({ data }: { data: TelemetryApiHealthResp
         <thead className="bg-(--surface-soft)">
           <tr>
             <th className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
-              Path
+              {t("Path")}
             </th>
             <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
-              Calls
+              {t("Calls")}
             </th>
             <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
-              Success
+              {t("Success")}
             </th>
             <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
-              p50
+              {t("p50")}
             </th>
             <th className="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
-              p95
+              {t("p95")}
             </th>
           </tr>
         </thead>

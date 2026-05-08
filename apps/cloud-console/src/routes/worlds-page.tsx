@@ -212,6 +212,8 @@ function matchesWorldQuery(
     id: string;
     name: string;
     phone: string;
+    email?: string | null;
+    ownerDisplayName?: string | null;
     status: string;
     healthStatus?: string | null;
     apiBaseUrl?: string | null;
@@ -224,6 +226,8 @@ function matchesWorldQuery(
       item.id,
       item.name,
       item.phone,
+      item.email,
+      item.ownerDisplayName,
       item.status,
       item.healthStatus,
       item.apiBaseUrl,
@@ -244,6 +248,8 @@ function matchesInstanceFleetQuery(
       item.world.id,
       item.world.name,
       item.world.phone,
+      item.world.email,
+      item.world.ownerDisplayName,
       item.world.status,
       item.world.healthStatus,
       item.world.apiBaseUrl,
@@ -713,7 +719,9 @@ export function WorldsPage() {
               onChange={(event) =>
                 updateFilters({ query: event.target.value })
               }
-              placeholder={t("world id, phone, name, provider, or endpoint")}
+              placeholder={t(
+                "world id, phone, email, name, provider, or endpoint",
+              )}
               className="w-full rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3 text-[color:var(--text-primary)] placeholder-[color:var(--text-muted)]"
             />
           </label>
@@ -724,11 +732,11 @@ export function WorldsPage() {
             <thead className="bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]">
               <tr>
                 <th className="px-4 py-3">{t("World")}</th>
-                <th className="px-4 py-3">{t("Phone")}</th>
+                <th className="px-4 py-3">{t("Account")}</th>
                 <th className="px-4 py-3">{t("Status")}</th>
                 <th className="px-4 py-3">{t("Attention")}</th>
                 <th className="px-4 py-3">{t("Health")}</th>
-                <th className="px-4 py-3">API</th>
+                <th className="px-4 py-3">{t("API")}</th>
                 <th className="px-4 py-3">{t("Last interactive")}</th>
                 <th className="px-4 py-3">{t("Updated")}</th>
               </tr>
@@ -752,7 +760,16 @@ export function WorldsPage() {
                       </Link>
                     </td>
                     <td className="px-4 py-3 text-[color:var(--text-secondary)]">
-                      {item.phone}
+                      <div className="flex flex-col">
+                        <span className="text-[color:var(--text-primary)]">
+                          {item.email ?? item.phone}
+                        </span>
+                        {item.email ? (
+                          <span className="text-xs text-[color:var(--text-muted)]">
+                            {item.phone}
+                          </span>
+                        ) : null}
+                      </div>
                     </td>
                     <td className="px-4 py-3 uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                       {item.status}
@@ -979,8 +996,13 @@ export function WorldsPage() {
                         {item.world.name}
                       </Link>
                       <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                        {item.world.phone}
+                        {item.world.email ?? item.world.phone}
                       </div>
+                      {item.world.email ? (
+                        <div className="text-xs text-[color:var(--text-muted)]">
+                          {item.world.phone}
+                        </div>
+                      ) : null}
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-[color:var(--text-primary)]">

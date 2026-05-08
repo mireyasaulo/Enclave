@@ -1,3 +1,8 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
+
 type MobileMessageActionSheetProps = {
   open: boolean;
   onClose: () => void;
@@ -33,29 +38,29 @@ type MobileMessageActionSheetProps = {
 export function MobileMessageActionSheet({
   open,
   onClose,
-  title = "消息操作",
+  title = t(msg`消息操作`),
   preview,
   onReply,
   onQuoteSelection,
-  quoteSelectionLabel = "部分引用",
+  quoteSelectionLabel = t(msg`部分引用`),
   onForward,
   onMultiSelect,
   onSelectToHere,
-  selectToHereLabel = "选择到这里",
+  selectToHereLabel = t(msg`选择到这里`),
   onSetReminder,
-  reminderLabel = "提醒",
+  reminderLabel = t(msg`提醒`),
   onToggleFavorite,
-  favoriteLabel = "收藏",
+  favoriteLabel = t(msg`收藏`),
   onCopy,
   onCopySender,
   onOpenAttachment,
-  openAttachmentLabel = "打开附件",
+  openAttachmentLabel = t(msg`打开附件`),
   onSaveAttachment,
-  saveAttachmentLabel = "保存附件",
+  saveAttachmentLabel = t(msg`保存附件`),
   onRecall,
-  recallLabel = "撤回",
+  recallLabel = t(msg`撤回`),
   onDelete,
-  deleteLabel = "删除",
+  deleteLabel = t(msg`删除`),
 }: MobileMessageActionSheetProps) {
   if (!open) {
     return null;
@@ -66,7 +71,7 @@ export function MobileMessageActionSheet({
       <button
         type="button"
         className="absolute inset-0"
-        aria-label="关闭消息操作菜单"
+        aria-label={t(msg`关闭消息操作菜单`)}
         onClick={onClose}
       />
       <div className="absolute inset-x-0 bottom-0 flex max-h-[85dvh] flex-col rounded-t-[20px] border-t border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] pt-2 shadow-[0_-14px_28px_rgba(15,23,42,0.10)]">
@@ -99,16 +104,16 @@ export function MobileMessageActionSheet({
           </div>
         ) : null}
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-[14px] border border-[color:var(--border-subtle)] bg-white">
-          {onReply ? <ActionButton label="回复" onClick={onReply} /> : null}
+          {onReply ? <ActionButton label={t(msg`回复`)} onClick={onReply} /> : null}
           {onQuoteSelection ? (
             <ActionButton
               label={quoteSelectionLabel}
               onClick={onQuoteSelection}
             />
           ) : null}
-          {onForward ? <ActionButton label="转发" onClick={onForward} /> : null}
+          {onForward ? <ActionButton label={t(msg`转发`)} onClick={onForward} /> : null}
           {onMultiSelect ? (
-            <ActionButton label="多选" onClick={onMultiSelect} />
+            <ActionButton label={t(msg`多选`)} onClick={onMultiSelect} />
           ) : null}
           {onSelectToHere ? (
             <ActionButton
@@ -122,7 +127,7 @@ export function MobileMessageActionSheet({
           {onToggleFavorite ? (
             <ActionButton label={favoriteLabel} onClick={onToggleFavorite} />
           ) : null}
-          <ActionButton label="复制" onClick={onCopy} />
+          <ActionButton label={t(msg`复制`)} onClick={onCopy} />
           {onOpenAttachment ? (
             <ActionButton
               label={openAttachmentLabel}
@@ -136,7 +141,7 @@ export function MobileMessageActionSheet({
             />
           ) : null}
           {onCopySender ? (
-            <ActionButton label="复制发送者" onClick={onCopySender} />
+            <ActionButton label={t(msg`复制发送者`)} onClick={onCopySender} />
           ) : null}
           {onRecall ? (
             <ActionButton label={recallLabel} onClick={onRecall} danger />
@@ -150,7 +155,7 @@ export function MobileMessageActionSheet({
           onClick={onClose}
           className="mt-2.5 flex h-11 w-full items-center justify-center rounded-[14px] border border-[color:var(--border-subtle)] bg-white text-[15px] font-medium text-[#111827] transition active:bg-[color:var(--surface-card-hover)]"
         >
-          取消
+          {t(msg`取消`)}
         </button>
       </div>
     </div>

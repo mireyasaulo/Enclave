@@ -5,6 +5,7 @@ import { AbuseFilterEntity } from '../entities/abuse-filter.entity';
  * 预置反破坏过滤器（首次启动幂等插入）。
  * 后续可在 admin UI 增删改，通过 unique name 防重复。
  */
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const ABUSE_FILTER_SEEDS: Array<DeepPartial<AbuseFilterEntity>> = [
   {
     name: 'frequency_60s_5',
@@ -61,3 +62,4 @@ export const ABUSE_FILTER_SEEDS: Array<DeepPartial<AbuseFilterEntity>> = [
     createdBy: 'system',
   },
 ];
+// i18n-ignore-end

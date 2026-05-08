@@ -1,4 +1,8 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 
 export function getSparkTier(days: number): 0 | 1 | 2 | 3 | 4 | 5 {
   if (!days || days < 3) return 0;
@@ -45,7 +49,7 @@ export function SparkBadge({
         TIER_TEXT_COLOR[tier],
         className,
       )}
-      aria-label={`已连续 ${days} 天`}
+      aria-label={t(msg`已连续 ${days} 天`)}
     >
       <img
         src={`/spark/tier-${tier}.svg`}

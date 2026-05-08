@@ -1,4 +1,8 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { isDesktopRuntimeAvailable } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 
 export type GameCenterStoredState = {
   activeGameId: string | null;
@@ -74,7 +78,7 @@ export function getDefaultGameCenterState(): GameCenterStoredState {
       "activity-lu": "/group/group-weekend",
     },
     lastInviteConversationTitleByActivityId: {
-      "activity-lu": "周末搭子群",
+      "activity-lu": t(msg`周末搭子群`),
     },
     friendInviteStatusByActivityId: {
       "activity-lu": "invited",

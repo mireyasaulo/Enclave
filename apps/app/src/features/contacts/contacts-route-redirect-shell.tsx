@@ -1,6 +1,10 @@
 import { useEffect } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useNavigate } from "@tanstack/react-router";
 import { RouteRedirectState } from "../../components/route-redirect-state";
+
+const t = translateRuntimeMessage;
 import {
   buildDesktopContactsRouteHash,
   type DesktopContactsPane,
@@ -50,9 +54,9 @@ export function ContactsRouteRedirectShell({
 
   return (
     <RouteRedirectState
-      title="正在切换到桌面通讯录"
-      description="正在同步路由并切换到桌面通讯录工作区。"
-      loadingLabel="切换桌面通讯录..."
+      title={t(msg`正在切换到桌面通讯录`)}
+      description={t(msg`正在同步路由并切换到桌面通讯录工作区。`)}
+      loadingLabel={t(msg`切换桌面通讯录...`)}
     />
   );
 }

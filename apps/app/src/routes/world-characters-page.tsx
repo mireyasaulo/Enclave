@@ -6,12 +6,15 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { msg } from "@lingui/macro";
 import { ArrowLeft, Search, UserPlus } from "lucide-react";
 import { getFriends, listCharacters } from "@yinjie/contracts";
-import { useRuntimeTranslator } from "@yinjie/i18n";
+import {
+  translateRuntimeMessage,
+  useRuntimeTranslator,
+} from "@yinjie/i18n";
 import { AppPage, Button, cn } from "@yinjie/ui";
 import { AvatarChip } from "../components/avatar-chip";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -32,6 +35,8 @@ import {
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+
+const t = translateRuntimeMessage;
 
 const DesktopContactsRouteRedirectShell = lazy(async () => {
   const mod =

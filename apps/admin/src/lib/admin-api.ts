@@ -1,4 +1,5 @@
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   ActionConnectorDiscoveryResult,
   ActionConnectorSummary,
   ActionConnectorTestResult,
@@ -112,7 +113,8 @@ function getStorage() {
 
   try {
     return window.localStorage;
-  } catch {
+  } catch (error) {
+    console.warn("[admin] localStorage unavailable", error);
     return null;
   }
 }
@@ -757,3 +759,4 @@ export const adminApi = {
       body: JSON.stringify(payload),
     }),
 };
+// i18n-ignore-end

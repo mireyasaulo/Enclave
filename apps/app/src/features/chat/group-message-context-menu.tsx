@@ -1,4 +1,6 @@
 import { type ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   BellRing,
   CheckSquare,
@@ -14,6 +16,8 @@ import {
   Trash2,
   UserRound,
 } from "lucide-react";
+
+const t = translateRuntimeMessage;
 
 type GroupMessageContextMenuProps = {
   x: number;
@@ -51,30 +55,30 @@ export function GroupMessageContextMenu({
   onClose,
   onReply,
   onQuoteSelection,
-  quoteSelectionLabel = "部分引用",
+  quoteSelectionLabel = t(msg`部分引用`),
   onForward,
   onMultiSelect,
   onSetReminder,
-  reminderLabel = "提醒",
+  reminderLabel = t(msg`提醒`),
   onCopyText,
   onCopySender,
   onToggleFavorite,
-  favoriteLabel = "收藏",
+  favoriteLabel = t(msg`收藏`),
   onAddToStickers,
-  addToStickersLabel = "添加到表情",
+  addToStickersLabel = t(msg`添加到表情`),
   onOpenAttachment,
-  openAttachmentLabel = "打开附件",
+  openAttachmentLabel = t(msg`打开附件`),
   onSaveAttachment,
-  saveAttachmentLabel = "另存为",
+  saveAttachmentLabel = t(msg`另存为`),
   onRecall,
-  recallLabel = "撤回",
+  recallLabel = t(msg`撤回`),
   onDelete,
-  deleteLabel = "删除",
+  deleteLabel = t(msg`删除`),
 }: GroupMessageContextMenuProps) {
   const normalizedReminderLabel =
-    reminderLabel === "提醒" ? "设为提醒" : reminderLabel;
+    reminderLabel === t(msg`提醒`) ? t(msg`设为提醒`) : reminderLabel;
   const normalizedFavoriteLabel =
-    favoriteLabel === "收藏消息" ? "收藏" : favoriteLabel;
+    favoriteLabel === t(msg`收藏消息`) ? t(msg`收藏`) : favoriteLabel;
   const actionCount =
     1 +
     Number(Boolean(onReply)) +
@@ -111,7 +115,7 @@ export function GroupMessageContextMenu({
       <button
         type="button"
         onClick={onClose}
-        aria-label="关闭消息菜单"
+        aria-label={t(msg`关闭消息菜单`)}
         className="absolute inset-0 cursor-default bg-transparent"
       />
 
@@ -122,7 +126,7 @@ export function GroupMessageContextMenu({
       >
         {onReply ? (
           <ContextMenuButton
-            label="回复"
+            label={t(msg`回复`)}
             icon={<CornerUpLeft size={15} />}
             onClick={onReply}
           />
@@ -136,26 +140,26 @@ export function GroupMessageContextMenu({
         ) : null}
         {onForward ? (
           <ContextMenuButton
-            label="转发"
+            label={t(msg`转发`)}
             icon={<Forward size={15} />}
             onClick={onForward}
           />
         ) : null}
         {onMultiSelect ? (
           <ContextMenuButton
-            label="多选"
+            label={t(msg`多选`)}
             icon={<CheckSquare size={15} />}
             onClick={onMultiSelect}
           />
         ) : null}
         <ContextMenuButton
-          label="复制"
+          label={t(msg`复制`)}
           icon={<Copy size={15} />}
           onClick={onCopyText}
         />
         {onCopySender ? (
           <ContextMenuButton
-            label="复制发送者"
+            label={t(msg`复制发送者`)}
             icon={<UserRound size={15} />}
             onClick={onCopySender}
           />

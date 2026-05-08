@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 @Entity('friend_requests')
 export class FriendRequestEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -35,3 +36,4 @@ export class FriendRequestEntity {
   @Column({ name: 'accept_at', type: 'datetime', nullable: true })
   acceptAt?: Date | null;
 }
+// i18n-ignore-end

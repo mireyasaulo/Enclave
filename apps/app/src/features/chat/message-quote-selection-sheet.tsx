@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Button } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 
 type MessageQuoteSelectionSheetProps = {
   open: boolean;
@@ -55,7 +59,7 @@ export function MessageQuoteSelectionSheet({
     <div className="fixed inset-0 z-50 bg-[rgba(15,23,42,0.14)]">
       <button
         type="button"
-        aria-label="关闭部分引用面板"
+        aria-label={t(msg`关闭部分引用面板`)}
         onClick={onClose}
         className="absolute inset-0"
       />
@@ -74,14 +78,14 @@ export function MessageQuoteSelectionSheet({
 
         <div className={isDesktop ? "" : "px-1 pb-0.5"}>
           <div className="text-center text-[12px] text-[#8c8c8c]">
-            部分引用
+            {t(msg`部分引用`)}
           </div>
           <div
             className={`mt-1.5 text-center text-[12px] leading-5 text-[color:var(--text-secondary)] ${
               isDesktop ? "" : "px-3"
             }`}
           >
-            选择来自 {senderName} 的文字，确认后带入回复。
+            {t(msg`选择来自 ${senderName} 的文字，确认后带入回复。`)}
           </div>
         </div>
 
@@ -99,7 +103,7 @@ export function MessageQuoteSelectionSheet({
                 : "text-[10px] tracking-[0.1em]"
             }`}
           >
-            原消息
+            {t(msg`原消息`)}
           </div>
           <textarea
             ref={textareaRef}
@@ -129,8 +133,8 @@ export function MessageQuoteSelectionSheet({
           }`}
         >
           {selectedText
-            ? `将引用：${selectedText}`
-            : "在上方拖动选择要引用的文字。"}
+            ? t(msg`将引用：${selectedText}`)
+            : t(msg`在上方拖动选择要引用的文字。`)}
         </div>
 
         <div
@@ -146,7 +150,7 @@ export function MessageQuoteSelectionSheet({
                 : "h-11 flex-1 rounded-[14px] border-[color:var(--border-subtle)] bg-white text-[15px] active:bg-[color:var(--surface-card-hover)]"
             }
           >
-            取消
+            {t(msg`取消`)}
           </Button>
           <Button
             type="button"
@@ -162,7 +166,7 @@ export function MessageQuoteSelectionSheet({
                 : "h-11 flex-1 rounded-[14px] text-[15px]"
             }
           >
-            引用所选文字
+            {t(msg`引用所选文字`)}
           </Button>
         </div>
       </div>

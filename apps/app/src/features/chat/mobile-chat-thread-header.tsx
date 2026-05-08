@@ -1,4 +1,9 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { ArrowLeft, Ellipsis, type LucideIcon } from "lucide-react";
+
+const t = translateRuntimeMessage;
+
 type MobileChatThreadHeaderProps = {
   title: string;
   subtitle?: string;
@@ -18,7 +23,7 @@ export function MobileChatThreadHeader({
   subtitle,
   onBack,
   onMore,
-  moreLabel = "更多操作",
+  moreLabel = t(msg`更多操作`),
   actions = [],
 }: MobileChatThreadHeaderProps) {
   const titleLeftInset = 46;
@@ -32,7 +37,7 @@ export function MobileChatThreadHeader({
             type="button"
             onClick={onBack}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] text-[#111827] transition active:bg-[color:var(--surface-card-hover)]"
-            aria-label="返回"
+            aria-label={t(msg`返回`)}
           >
             <ArrowLeft size={20} />
           </button>

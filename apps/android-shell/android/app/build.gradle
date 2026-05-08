@@ -50,10 +50,18 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
+            manifestPlaceholders = [
+                yinjieUsesCleartextTraffic: "true",
+                yinjieEnvironment: "development",
+            ]
         }
         release {
             minifyEnabled true
             shrinkResources true
+            manifestPlaceholders = [
+                yinjieUsesCleartextTraffic: "false",
+                yinjieEnvironment: "production",
+            ]
             if (hasReleaseSigning) {
                 signingConfig signingConfigs.release
             }

@@ -53,6 +53,10 @@ import { navigateBackOrFallback } from "../lib/history-back";
 import { normalizePathname } from "../lib/normalize-pathname";
 import { searchStringToObject } from "../lib/route-search";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
 
 const DesktopSearchWorkspace = lazy(async () => {
   const mod = await import("../features/search/desktop-search-workspace");
@@ -410,9 +414,9 @@ export function SearchPage() {
       <Suspense
         fallback={
           <RouteRedirectState
-            title="正在打开桌面搜索"
-            description="正在载入桌面搜索工作区，马上同步当前搜索条件。"
-            loadingLabel="载入桌面搜索..."
+            title={t(msg`正在打开桌面搜索`)}
+            description={t(msg`正在载入桌面搜索工作区，马上同步当前搜索条件。`)}
+            loadingLabel={t(msg`载入桌面搜索...`)}
           />
         }
       >

@@ -54,7 +54,7 @@ export const useCloudSessionStore = create<CloudSessionState>()(
       markHydrated: () => set({ hydrated: true }),
     }),
     {
-      name: "yinjie-app-cloud-session",
+      name: "yinjie-app-cloud-session", // i18n-ignore-line
       storage: createSessionStateStorage(),
       partialize: (state) => ({
         accessToken: state.accessToken,

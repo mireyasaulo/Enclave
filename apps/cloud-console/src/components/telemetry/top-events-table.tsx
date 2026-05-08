@@ -1,10 +1,12 @@
 import type { TelemetryTopEventsResponse } from "@yinjie/contracts";
+import { useCloudConsoleText } from "../../lib/cloud-console-i18n";
 
 export function TelemetryTopEventsTable({ data }: { data: TelemetryTopEventsResponse }) {
+  const t = useCloudConsoleText();
   if (data.rows.length === 0) {
     return (
       <div className="rounded-2xl border border-(--border-subtle) bg-(--surface-card) p-8 text-center text-sm text-(--text-muted)">
-        当前范围内无事件。
+        {t("No events in the current range.")}
       </div>
     );
   }
@@ -13,12 +15,12 @@ export function TelemetryTopEventsTable({ data }: { data: TelemetryTopEventsResp
       <table className="min-w-full divide-y divide-(--border-faint) text-sm">
         <thead className="bg-(--surface-soft)">
           <tr>
-            <Th>App</Th>
-            <Th>Event</Th>
-            <Th>Type</Th>
-            <Th align="right">Count</Th>
-            <Th align="right">Unique users</Th>
-            <Th align="right">Unique anons</Th>
+            <Th>{t("App")}</Th>
+            <Th>{t("Event")}</Th>
+            <Th>{t("Type")}</Th>
+            <Th align="right">{t("Count")}</Th>
+            <Th align="right">{t("Unique users")}</Th>
+            <Th align="right">{t("Unique anons")}</Th>
           </tr>
         </thead>
         <tbody className="divide-y divide-(--border-faint)">

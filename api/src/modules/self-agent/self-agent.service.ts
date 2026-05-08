@@ -1,4 +1,5 @@
-import { NotFoundException, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, LessThanOrEqual } from 'typeorm';
 import { ActionRuntimeService } from '../action-runtime/action-runtime.service';
@@ -14,6 +15,7 @@ import { SelfAgentRulesService } from './self-agent-rules.service';
 import { SelfAgentRunEntity } from './self-agent-run.entity';
 import { SelfAgentWorkspaceService } from './self-agent-workspace.service';
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   SelfAgentRulesValue,
   SelfAgentRunPolicyDecisionValue,
   SelfAgentRunRouteKeyValue,
@@ -527,7 +529,10 @@ export class SelfAgentService {
       id: SELF_CHARACTER_ID,
     });
     if (!character) {
-      throw new NotFoundException('默认 self 角色尚未落库。');
+      throw new AppError('SELF_AGENT_DEFAULT_NOT_INITIALIZED', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '默认 self 角色尚未落库。',
+      });
     }
     return character;
   }
@@ -538,7 +543,10 @@ export class SelfAgentService {
       order: { createdAt: 'ASC' },
     });
     if (!owner) {
-      throw new NotFoundException('世界主人不存在。');
+      throw new AppError('WORLD_OWNER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '世界主人不存在。',
+      });
     }
     return owner;
   }
@@ -700,3 +708,4 @@ export class SelfAgentService {
       .join('');
   }
 }
+// i18n-ignore-end

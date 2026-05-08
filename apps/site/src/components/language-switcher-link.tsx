@@ -1,7 +1,12 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Check } from "lucide-react";
-import { SUPPORTED_LOCALES, getLocaleLabel, type SupportedLocale } from "@/lib/locales";
+import {
+  LOCALE_COOKIE_NAME,
+  SUPPORTED_LOCALES,
+  getLocaleLabel,
+  type SupportedLocale,
+} from "@/lib/locales";
 import { swapLocaleInPath } from "@/lib/locale-routing";
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
@@ -22,7 +27,7 @@ export function LanguageSwitcherLink({ current }: { current: SupportedLocale }) 
   const pathname = usePathname() ?? "/";
 
   function persistLocale(next: SupportedLocale) {
-    document.cookie = `NEXT_LOCALE=${next}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+    document.cookie = `${LOCALE_COOKIE_NAME}=${next}; Path=/; Max-Age=${COOKIE_MAX_AGE}; SameSite=Lax`;
   }
 
   return (

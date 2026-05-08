@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { ArrowLeft, Check } from "lucide-react";
 import {
@@ -97,6 +97,7 @@ export function ProfileSettingsPage() {
     select: (state) => state.location.pathname,
   });
   const isDesktopLayout = useDesktopLayout();
+  const queryClient = useQueryClient();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const ownerId = useWorldOwnerStore((state) => state.id);
@@ -167,6 +168,7 @@ export function ProfileSettingsPage() {
         },
         baseUrl,
       );
+      queryClient.setQueryData(["world-owner", baseUrl], owner);
       hydrateOwner(owner);
       updateOwnerStore({
         username: owner.username,
@@ -184,6 +186,7 @@ export function ProfileSettingsPage() {
         },
         baseUrl,
       );
+      queryClient.setQueryData(["world-owner", baseUrl], owner);
       hydrateOwner(owner);
     },
     onSuccess: () => {
@@ -194,6 +197,7 @@ export function ProfileSettingsPage() {
   const clearApiKeyMutation = useMutation({
     mutationFn: async () => {
       const owner = await clearWorldOwnerApiKey(baseUrl);
+      queryClient.setQueryData(["world-owner", baseUrl], owner);
       hydrateOwner(owner);
       setApiKeyDraft("");
       setApiBaseDraft(owner.customApiBase ?? "");

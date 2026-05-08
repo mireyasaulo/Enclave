@@ -61,6 +61,7 @@ async function invokeDesktop<T>(
 ): Promise<T> {
   const tauriWindow = window as TauriWindow;
   if (!tauriWindow.__TAURI_INTERNALS__?.invoke) {
+    // i18n-ignore-next-line: developer-only guard, never surfaced to users.
     throw new Error("Desktop runtime commands are only available inside the Tauri shell.");
   }
 

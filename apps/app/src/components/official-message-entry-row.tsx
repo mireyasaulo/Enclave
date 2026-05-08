@@ -2,8 +2,12 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { BellOff } from "lucide-react";
 import { cn } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 
 export function OfficialMessageEntryRow({
   title,
@@ -91,7 +95,7 @@ export function OfficialMessageEntryRow({
               <BellOff
                 size={isDesktop ? 13 : 11}
                 className="text-[color:var(--text-dim)]"
-                aria-label="消息免打扰"
+                aria-label={t(msg`消息免打扰`)}
               />
             ) : null}
             {unreadCount > 0 ? (
@@ -101,7 +105,7 @@ export function OfficialMessageEntryRow({
                     "rounded-full",
                     isDesktop ? "h-2 w-2 bg-[#fa5151]" : "h-2 w-2 bg-[#b8b8b8]",
                   )}
-                  aria-label={`${unreadCount} 条未读消息`}
+                  aria-label={t(msg`${unreadCount} 条未读消息`)}
                 />
               ) : (
                 <div

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { ArrowLeft, ImagePlus, Video } from "lucide-react";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice, TextAreaField, cn } from "@yinjie/ui";
 import { MomentComposeMediaPreview } from "../components/moment-compose-media-preview";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -20,6 +22,8 @@ import {
 } from "../features/moments/moment-compose-media";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+
+const t = translateRuntimeMessage;
 
 export function MobileMomentsPublishPage() {
   const isDesktopLayout = useDesktopLayout();
@@ -40,7 +44,7 @@ export function MobileMomentsPublishPage() {
       ? routeState.returnPath
       : undefined;
   const safeReturnHash = safeReturnPath ? routeState.returnHash : undefined;
-  const statusBackLabel = safeReturnPath ? "返回上一页" : "返回朋友圈";
+  const statusBackLabel = safeReturnPath ? t(msg`返回上一页`) : t(msg`返回朋友圈`);
   const resetComposeDraft = composeDraft.reset;
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
@@ -55,7 +59,7 @@ export function MobileMomentsPublishPage() {
         baseUrl,
       }),
     onSuccess: async () => {
-      storeMomentPublishFlash("朋友圈已发布。");
+      storeMomentPublishFlash(t(msg`朋友圈已发布。`));
       composeDraft.reset();
       await queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
@@ -121,7 +125,7 @@ export function MobileMomentsPublishPage() {
       await composeDraft.addImageFiles(files);
     } catch (error) {
       composeDraft.setMediaError(
-        error instanceof Error ? error.message : "图片选择失败，请稍后重试。",
+        error instanceof Error ? error.message : t(msg`图片选择失败，请稍后重试。`),
       );
     }
   }
@@ -131,7 +135,7 @@ export function MobileMomentsPublishPage() {
       await composeDraft.replaceVideoFile(file);
     } catch (error) {
       composeDraft.setMediaError(
-        error instanceof Error ? error.message : "视频选择失败，请稍后重试。",
+        error instanceof Error ? error.message : t(msg`视频选择失败，请稍后重试。`),
       );
     }
   }
@@ -139,9 +143,9 @@ export function MobileMomentsPublishPage() {
   if (isDesktopLayout) {
     return (
       <RouteRedirectState
-        title="正在回到桌面朋友圈"
-        description="发朋友圈在桌面布局里已经并入朋友圈工作区，这里会自动带你返回桌面入口。"
-        loadingLabel="正在打开朋友圈..."
+        title={t(msg`正在回到桌面朋友圈`)}
+        description={t(msg`发朋友圈在桌面布局里已经并入朋友圈工作区，这里会自动带你返回桌面入口。`)}
+        loadingLabel={t(msg`正在打开朋友圈...`)}
       />
     );
   }
@@ -149,7 +153,7 @@ export function MobileMomentsPublishPage() {
   return (
     <AppPage className="space-y-0 bg-[#f2f2f2] px-0 py-0">
       <TabPageTopBar
-        title="发表朋友圈"
+        title={t(msg`发表朋友圈`)}
         titleAlign="center"
         className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.96)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
         leftActions={
@@ -159,7 +163,7 @@ export function MobileMomentsPublishPage() {
             size="icon"
             className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-black/[0.05]"
             onClick={handleBack}
-            aria-label="返回朋友圈"
+            aria-label={t(msg`返回朋友圈`)}
           >
             <ArrowLeft size={17} />
           </Button>
@@ -176,7 +180,7 @@ export function MobileMomentsPublishPage() {
                 : "text-[color:var(--text-dim)]",
             )}
           >
-            {createMutation.isPending ? "发表中" : "发表"}
+            {createMutation.isPending ? t(msg`发表中`) : t(msg`发表`)}
           </button>
         }
       />
@@ -209,10 +213,10 @@ export function MobileMomentsPublishPage() {
         <section className="overflow-hidden rounded-[24px] border border-[rgba(0,0,0,0.05)] bg-white shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
           <div className="border-b border-[rgba(15,23,42,0.06)] px-4 py-3">
             <div className="text-[14px] font-medium text-[color:var(--text-primary)]">
-              这一刻
+              {t(msg`这一刻`)}
             </div>
             <div className="mt-1 text-[11px] leading-5 text-[color:var(--text-muted)]">
-              会同步到朋友圈时间线，适合发日常照片、短视频和临时心情。
+              {t(msg`会同步到朋友圈时间线，适合发日常照片、短视频和临时心情。`)}
             </div>
           </div>
 
@@ -220,8 +224,8 @@ export function MobileMomentsPublishPage() {
             <TextAreaField
               value={composeDraft.text}
               onChange={(event) => composeDraft.setText(event.target.value)}
-              placeholder="这一刻的想法..."
-              className="min-h-[11rem] resize-none rounded-[18px] border-0 bg-[color:var(--surface-console)] px-4 py-3.5 text-[15px] leading-7 shadow-none"
+              placeholder={t(msg`这一刻的想法...`)}
+              className="min-h-[11rem] resize-none rounded-[18px] border-0 bg-[color:var(--surface-console)] px-4 py-3.5 text-[16px] leading-7 shadow-none"
               autoFocus
             />
 
@@ -249,7 +253,7 @@ export function MobileMomentsPublishPage() {
                 onClick={() => imageInputRef.current?.click()}
               >
                 <ImagePlus size={14} className="mr-1" />
-                添加图片
+                {t(msg`添加图片`)}
               </Button>
               <Button
                 type="button"
@@ -260,7 +264,7 @@ export function MobileMomentsPublishPage() {
                 onClick={() => videoInputRef.current?.click()}
               >
                 <Video size={14} className="mr-1" />
-                {composeDraft.videoDraft ? "更换视频" : "添加视频"}
+                {composeDraft.videoDraft ? t(msg`更换视频`) : t(msg`添加视频`)}
               </Button>
             </div>
           </div>
@@ -270,19 +274,18 @@ export function MobileMomentsPublishPage() {
           <div className="flex items-center justify-between px-4 py-3">
             <div>
               <div className="text-[13px] font-medium text-[color:var(--text-primary)]">
-                谁可以看
+                {t(msg`谁可以看`)}
               </div>
               <div className="mt-1 text-[11px] text-[color:var(--text-muted)]">
-                当前发布到朋友圈
+                {t(msg`当前发布到朋友圈`)}
               </div>
             </div>
             <span className="rounded-full bg-[rgba(47,122,63,0.12)] px-3 py-1 text-[11px] font-medium text-[#2f7a3f]">
-              朋友
+              {t(msg`朋友`)}
             </span>
           </div>
           <div className="border-t border-[rgba(15,23,42,0.06)] px-4 py-3 text-[11px] leading-5 text-[color:var(--text-muted)]">
-            图片最多 9 张，视频当前支持 1 条且不超过 5
-            分钟，暂不支持图片和视频混发。
+            {t(msg`图片最多 9 张，视频当前支持 1 条且不超过 5 分钟，暂不支持图片和视频混发。`)}
           </div>
         </section>
       </div>
@@ -291,17 +294,17 @@ export function MobileMomentsPublishPage() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[rgba(17,24,39,0.32)] p-6 backdrop-blur-[3px]">
           <button
             type="button"
-            aria-label="关闭提示"
+            aria-label={t(msg`关闭提示`)}
             onClick={() => setDiscardConfirmOpen(false)}
             className="absolute inset-0"
           />
-          <div className="relative w-full max-w-[320px] overflow-hidden rounded-[18px] bg-white shadow-[var(--shadow-overlay)]">
+          <div className="relative w-[min(320px,calc(100vw-2rem))] overflow-hidden rounded-[18px] bg-white shadow-[var(--shadow-overlay)]">
             <div className="px-6 pb-3 pt-6 text-center">
               <div className="text-[16px] font-medium text-[color:var(--text-primary)]">
-                放弃发表
+                {t(msg`放弃发表`)}
               </div>
               <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-muted)]">
-                返回会丢失已编辑的文字与媒体，确定不发布吗？
+                {t(msg`返回会丢失已编辑的文字与媒体，确定不发布吗？`)}
               </div>
             </div>
             <div className="grid grid-cols-2 border-t border-[color:var(--border-faint)]">
@@ -310,14 +313,14 @@ export function MobileMomentsPublishPage() {
                 onClick={() => setDiscardConfirmOpen(false)}
                 className="border-r border-[color:var(--border-faint)] py-3 text-[15px] text-[color:var(--text-secondary)] active:bg-black/[0.04]"
               >
-                继续编辑
+                {t(msg`继续编辑`)}
               </button>
               <button
                 type="button"
                 onClick={handleConfirmDiscard}
                 className="py-3 text-[15px] font-medium text-[#fa5151] active:bg-black/[0.04]"
               >
-                放弃
+                {t(msg`放弃`)}
               </button>
             </div>
           </div>

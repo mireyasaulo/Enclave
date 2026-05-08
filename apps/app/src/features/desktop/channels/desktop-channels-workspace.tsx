@@ -693,7 +693,7 @@ function ChannelCommentsDrawer({
   const t = useRuntimeTranslator();
   return (
     <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center px-6">
-      <div className="pointer-events-auto flex h-[min(82vh,800px)] w-[380px] flex-col overflow-hidden rounded-[20px] border border-[color:var(--border-faint)] bg-white shadow-[0_24px_60px_rgba(0,0,0,0.32)] sm:translate-x-[260px]">
+      <div className="pointer-events-auto flex max-h-[85vh] w-[380px] flex-col overflow-hidden rounded-[20px] border border-[color:var(--border-faint)] bg-white shadow-[0_24px_60px_rgba(0,0,0,0.32)] sm:translate-x-[260px]">
         <div className="flex items-center justify-between gap-3 border-b border-[color:var(--border-faint)] px-4 py-3">
           <div>
             <div className="text-[14px] font-medium text-[color:var(--text-primary)]">

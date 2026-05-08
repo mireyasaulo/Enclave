@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const CHAT_REPLY_PREFIX_PATTERN = /^\[\[chat_reply:([^\]]+)\]\]\n?/;
 const MENTION_TOKEN_PATTERN = /@[\p{L}\p{N}_-]{1,40}/gu;
 const MENTION_BOUNDARY_PATTERN = /[\s([{'"“‘，。！？、：；,.!?/\\-]/u;
@@ -98,3 +99,4 @@ export function summarizeChatMentions(text: string): ChatMentionSummary {
     mentions,
   };
 }
+// i18n-ignore-end

@@ -20,9 +20,9 @@ import { useConsoleNotice } from "../components/console-notice";
 import { WorldLifecycleActionButtons } from "../components/world-lifecycle-action-buttons";
 import { copyTextToClipboard } from "../lib/clipboard";
 import {
+  getQueueStateFilters,
   groupJobsByQueueState,
   matchesQueueStateFilter,
-  QUEUE_STATE_FILTERS,
   type QueueStateFilter,
 } from "../lib/job-queue-state";
 import { buildCompactJobsRouteSearch } from "../lib/job-route-search";
@@ -32,6 +32,7 @@ import {
   formatCloudConsoleJobLeaseExpires,
   formatCloudConsoleJobLeaseRemaining,
   formatCloudConsoleJobsGroupCount,
+  formatCloudConsoleLegacyProviderLabel,
   translateCloudConsoleTextForActiveLocale,
   useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
@@ -190,7 +191,7 @@ function buildProviderOptions(
     ...providers,
     {
       key: providerKey,
-      label: `${providerKey} (legacy)`,
+      label: formatCloudConsoleLegacyProviderLabel(providerKey),
       description: translateCloudConsoleTextForActiveLocale(
         "This provider key is not in the current catalog yet.",
       ),
@@ -603,10 +604,11 @@ export function WorldDetailPage() {
   } else if (confirmAction === "rotate-callback-token") {
     activeConfirm = {
       title: t("Rotate the callback token?"),
-      description:
+      description: t(
         "Existing bootstrap packages and runtime env overlays will become stale until operators redeploy the updated token.",
-      confirmLabel: "Rotate token",
-      pendingLabel: "Rotating...",
+      ),
+      confirmLabel: t("Rotate token"),
+      pendingLabel: t("Rotating..."),
       danger: true,
       pending: rotateCallbackTokenMutation.isPending,
       onConfirm: () => rotateCallbackTokenMutation.mutate(),
@@ -615,7 +617,7 @@ export function WorldDetailPage() {
 
   return (
     <section className="grid gap-6">
-      <div className="grid gap-6 xl:grid-cols-[1.2fr,0.8fr]">
+      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <div className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
@@ -623,8 +625,13 @@ export function WorldDetailPage() {
                 {world.name}
               </div>
               <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-                {world.phone}
+                {world.email ?? world.phone}
               </div>
+              {world.email ? (
+                <div className="text-xs text-[color:var(--text-muted)]">
+                  {world.phone}
+                </div>
+              ) : null}
               <div className="mt-1 text-xs uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
                 {world.status}
               </div>
@@ -782,6 +789,7 @@ export function WorldDetailPage() {
                 <input
                   value={providerRegion}
                   onChange={(event) => setProviderRegion(event.target.value)}
+                  // i18n-ignore-next-line: example identifier value, not UI copy.
                   placeholder="mock-local"
                   className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3 text-[color:var(--text-primary)]"
                 />
@@ -792,6 +800,7 @@ export function WorldDetailPage() {
                 <input
                   value={providerZone}
                   onChange={(event) => setProviderZone(event.target.value)}
+                  // i18n-ignore-next-line: example identifier value, not UI copy.
                   placeholder="mock-a"
                   className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3 text-[color:var(--text-primary)]"
                 />
@@ -803,6 +812,7 @@ export function WorldDetailPage() {
               <input
                 value={apiBaseUrl}
                 onChange={(event) => setApiBaseUrl(event.target.value)}
+                // i18n-ignore-next-line: example URL value, not UI copy.
                 placeholder="https://world-api.example.com"
                 className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3 text-[color:var(--text-primary)]"
               />
@@ -813,6 +823,7 @@ export function WorldDetailPage() {
               <input
                 value={adminUrl}
                 onChange={(event) => setAdminUrl(event.target.value)}
+                // i18n-ignore-next-line: example URL value, not UI copy.
                 placeholder="https://world-admin.example.com"
                 className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3 text-[color:var(--text-primary)]"
               />
@@ -1347,8 +1358,8 @@ export function WorldDetailPage() {
                       {t("Ops notes")}
                     </div>
                     <div className="mt-2 space-y-2 text-sm text-[color:var(--text-secondary)]">
-                      {bootstrapConfig.notes.map((note) => (
-                        <div key={note}>{note}</div>
+                      {bootstrapConfig.notes.map((note, index) => (
+                        <div key={`note-${index}`}>{note}</div>
                       ))}
                     </div>
                   </div>
@@ -1409,7 +1420,7 @@ export function WorldDetailPage() {
             }
             className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)]"
           >
-            {QUEUE_STATE_FILTERS.map((item) => (
+            {getQueueStateFilters().map((item) => (
               <option key={item.value} value={item.value}>
                 {item.label}
               </option>
@@ -1514,7 +1525,7 @@ export function WorldDetailPage() {
                       <td className="px-4 py-3 text-[color:var(--text-secondary)]">
                         {formatDateTime(job.updatedAt)}
                       </td>
-                      <td className="max-w-[18rem] px-4 py-3 text-[color:var(--text-secondary)]">
+                      <td className="max-w-[18rem] break-words px-4 py-3 align-top text-[color:var(--text-secondary)]">
                         {auditBadgeLabel ? (
                           <div className="mb-2">
                             <span className={JOB_AUDIT_BADGE_CLASS_NAME}>
@@ -1522,7 +1533,9 @@ export function WorldDetailPage() {
                             </span>
                           </div>
                         ) : null}
-                        <div>{describeJobResult(job)}</div>
+                        <div className="whitespace-pre-wrap break-words">
+                          {describeJobResult(job)}
+                        </div>
                       </td>
                     </tr>
                   );

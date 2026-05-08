@@ -1,7 +1,11 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   formatMessageTimestamp,
   parseTimestamp,
 } from "../../lib/format";
+
+const t = translateRuntimeMessage;
 import type { ResultCardFooterCopy } from "../chat/result-card-footer";
 import { parseGroupRelaySummaryMessage } from "./group-relay-message";
 
@@ -10,11 +14,11 @@ type GroupRelaySummary = NonNullable<
 >;
 
 export function resolveGroupRelayCompletionTime(summary: GroupRelaySummary) {
-  if (summary.statusLabel === "已回填") {
+  if (summary.statusLabel === "已回填") { // i18n-ignore-line
     return summary.publishedAtLabel ?? summary.timestampLabel ?? null;
   }
 
-  if (summary.statusLabel === "已完成") {
+  if (summary.statusLabel === "已完成") { // i18n-ignore-line
     return summary.timestampLabel ?? null;
   }
 
@@ -60,13 +64,13 @@ export function resolveGroupRelayPublishStageBadge(summary: GroupRelaySummary) {
 
   if (publishCount <= 1) {
     return {
-      label: "首次回填",
+      label: t(msg`首次回填`),
       tone: "info" as const,
     };
   }
 
   return {
-    label: "多次回填",
+    label: t(msg`多次回填`),
     tone: "success" as const,
   };
 }
@@ -79,13 +83,13 @@ export function resolveGroupRelayCompletionBadge(summary: GroupRelaySummary) {
 
   if (pendingCount === 0) {
     return {
-      label: "已全部确认",
+      label: t(msg`已全部确认`),
       tone: "success" as const,
     };
   }
 
   return {
-    label: "仍有待确认",
+    label: t(msg`仍有待确认`),
     tone: "warning" as const,
   };
 }
@@ -96,18 +100,18 @@ export function resolveGroupRelayCtaCopy(
   const pendingCount = parseGroupRelayCount(summary.pendingMemberCountLabel);
   if (pendingCount === 0) {
     return {
-      description: "点击查看最终结果，必要时再覆盖新的完成状态",
-      actionLabel: "查看结果",
+      description: t(msg`点击查看最终结果，必要时再覆盖新的完成状态`),
+      actionLabel: t(msg`查看结果`),
       tone: "success" as const,
-      ariaLabel: `查看${summary.sourceGroupName}的群接龙结果`,
+      ariaLabel: t(msg`查看${summary.sourceGroupName}的群接龙结果`),
     };
   }
 
   return {
-    description: "点击继续查看和回填接龙",
-    actionLabel: "继续接龙",
+    description: t(msg`点击继续查看和回填接龙`),
+    actionLabel: t(msg`继续接龙`),
     tone: "warning" as const,
-    ariaLabel: `继续接龙${summary.sourceGroupName}的群接龙结果`,
+    ariaLabel: t(msg`继续接龙${summary.sourceGroupName}的群接龙结果`),
   };
 }
 

@@ -19,8 +19,8 @@ import { ConsoleConfirmDialog } from "../components/console-confirm-dialog";
 import { useConsoleNotice } from "../components/console-notice";
 import { WorldLifecycleActionButtons } from "../components/world-lifecycle-action-buttons";
 import {
+  getQueueStateFilters,
   groupJobsByQueueState,
-  QUEUE_STATE_FILTERS,
 } from "../lib/job-queue-state";
 import {
   describeJobResult,
@@ -50,6 +50,7 @@ import {
   formatCloudConsoleJobLeaseAvailable,
   formatCloudConsoleJobLeaseExpires,
   formatCloudConsoleJobLeaseRemaining,
+  formatCloudConsoleJobsGroupCount,
   formatCloudConsolePageOfTotal,
   formatCloudConsolePageSize,
   formatCloudConsoleVisibleJobsRange,
@@ -86,7 +87,7 @@ function formatDateTime(value?: string | null) {
 }
 
 function formatLeaseOwner(value?: string | null) {
-  return value || "Unleased";
+  return value || translateCloudConsoleTextForActiveLocale("Unleased");
 }
 
 function formatDuration(value?: number | null) {
@@ -393,7 +394,7 @@ export function JobsPage() {
       label:
         queueStateFilter === "all"
           ? t("Delayed jobs")
-          : "Delayed jobs in filter",
+          : t("Delayed jobs in filter"),
       count:
         jobSummary?.queueState.delayed ?? jobSummaryFallback.queueState.delayed,
     },
@@ -461,8 +462,12 @@ export function JobsPage() {
           </div>
           <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
             {worldId
-              ? "Inspect provisioning, resume, suspend, and reconcile work for the selected world."
-              : "Inspect provisioning, resume, suspend, and reconcile work across the managed world fleet."}
+              ? t(
+                  "Inspect provisioning, resume, suspend, and reconcile work for the selected world.",
+                )
+              : t(
+                  "Inspect provisioning, resume, suspend, and reconcile work across the managed world fleet.",
+                )}
           </div>
         </div>
 
@@ -543,7 +548,7 @@ export function JobsPage() {
             }
             className="rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-2 text-sm text-[color:var(--text-primary)]"
             >
-              {QUEUE_STATE_FILTERS.map((item) => (
+              {getQueueStateFilters().map((item) => (
                 <option key={item.value} value={item.value}>
                   {item.label}
                 </option>
@@ -723,7 +728,7 @@ export function JobsPage() {
                       {t(group.state.label)}
                     </span>
                     <span className="text-xs uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                      {t("{count} jobs").replace("{count}", String(group.jobs.length))}
+                      {formatCloudConsoleJobsGroupCount(group.jobs.length, locale)}
                     </span>
                   </div>
                 </td>

@@ -1,6 +1,10 @@
 import type { ReactNode } from "react";
+import { msg } from "@lingui/macro";
 import type { ChatBackgroundAsset } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { buildChatBackgroundStyle } from "./chat-background-helpers";
+
+const t = translateRuntimeMessage;
 
 type ChatBackgroundPreviewProps = {
   background?: ChatBackgroundAsset | null;
@@ -32,13 +36,13 @@ export function ChatBackgroundPreview({
         <div className="absolute inset-0 bg-[rgba(255,249,242,0.34)]" />
         <div className="relative flex h-full flex-col justify-end gap-3 px-4 py-4">
           <PreviewBubble align="left" tone="soft">
-            今天这张背景，像不像我们刚刚路过的天气？
+            {t(msg`今天这张背景，像不像我们刚刚路过的天气？`)}
           </PreviewBubble>
           <PreviewBubble align="right" tone="brand">
-            这版预览先按聊天页真实气泡层级来做。
+            {t(msg`这版预览先按聊天页真实气泡层级来做。`)}
           </PreviewBubble>
           <PreviewBubble align="left" tone="soft">
-            保存后，当前聊天页会立即切到这张背景。
+            {t(msg`保存后，当前聊天页会立即切到这张背景。`)}
           </PreviewBubble>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   cancelReminderTask,
@@ -7,7 +8,10 @@ import {
   type ReminderTaskRecord,
   type SnoozeReminderTaskRequest,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
+
+const t = translateRuntimeMessage;
 
 type UseReminderRuntimeTasksOptions = {
   enabled?: boolean;
@@ -47,7 +51,7 @@ export function useReminderRuntimeTasks(
   const completeMutation = useMutation({
     mutationFn: async (taskId: string) => {
       if (!baseUrl) {
-        throw new Error("当前世界地址不可用，暂时无法更新提醒。");
+        throw new Error(t(msg`当前世界地址不可用，暂时无法更新提醒。`));
       }
 
       return completeReminderTask(taskId, baseUrl);
@@ -66,7 +70,7 @@ export function useReminderRuntimeTasks(
       payload: SnoozeReminderTaskRequest;
     }) => {
       if (!baseUrl) {
-        throw new Error("当前世界地址不可用，暂时无法更新提醒。");
+        throw new Error(t(msg`当前世界地址不可用，暂时无法更新提醒。`));
       }
 
       return snoozeReminderTask(taskId, payload, baseUrl);
@@ -79,7 +83,7 @@ export function useReminderRuntimeTasks(
   const cancelMutation = useMutation({
     mutationFn: async (taskId: string) => {
       if (!baseUrl) {
-        throw new Error("当前世界地址不可用，暂时无法更新提醒。");
+        throw new Error(t(msg`当前世界地址不可用，暂时无法更新提醒。`));
       }
 
       return cancelReminderTask(taskId, baseUrl);

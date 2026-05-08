@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Not, Repository } from 'typeorm';
+import { In, IsNull, Not, Repository } from 'typeorm';
 import { FriendshipEntity } from './friendship.entity';
 import { FriendRequestEntity } from './friend-request.entity';
 import { AIRelationshipEntity } from './ai-relationship.entity';
@@ -10,6 +10,7 @@ import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import { NarrativeService } from '../narrative/narrative.service';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   DEFAULT_CHARACTER_IDS,
   SELF_CHARACTER_ID,
 } from '../characters/default-characters';
@@ -49,9 +50,11 @@ export class SocialService {
   ) {}
 
   async getPendingRequests(): Promise<FriendRequestEntity[]> {
+    // 仅返回 acceptAt 为空的 inbound 申请（世界角色主动加用户、需要用户审批）。
+    // acceptAt 非空的 outbound 申请由 scheduler 让世界角色自动通过，不在此列表展示。
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     return this.friendRequestRepo.find({
-      where: { ownerId: owner.id, status: 'pending' },
+      where: { ownerId: owner.id, status: 'pending', acceptAt: IsNull() },
       order: { createdAt: 'DESC' },
     });
   }
@@ -558,7 +561,7 @@ export class SocialService {
     tomorrow.setHours(23, 59, 59, 999);
 
     let acceptAt: Date | null = null;
-    if (!options?.autoAccept && initiator === 'user') {
+    if (!options?.autoAccept && initiator !== 'character') {
       const delaySeconds = await this.decideCharacterAcceptDelay(
         char,
         greeting,
@@ -669,25 +672,14 @@ export class SocialService {
       .filter(Boolean)
       .slice(0, 3)
       .join('\n')
-      .slice(0, 600);
+      .slice(0, 240);
 
-    const prompt = `你是「${character.name}」。
-角色档案：
-${personaSummary || '（暂无更多信息）'}
-
-刚刚有个陌生人向你发送了好友申请，开场白是：「${greeting?.trim() || '（对方没有写开场白）'}」。
-触发场景：${triggerScene?.trim() || '通讯录主动添加'}
-
-请根据你的性格和当时的状态，决定多快通过这个申请：
-- "immediate"：几乎不犹豫，立刻通过（开朗、社交主动型）
-- "short"：几分钟内通过（中性、礼貌型）
-- "medium"：半小时到几小时后通过（慢热、内向、忙碌）
-- "long"：要拖几小时甚至到次日才通过（高冷、谨慎、距离感强）
-
-只输出一个 JSON：{"category": "immediate" | "short" | "medium" | "long", "reason": "一句话说明"}。`;
+    const prompt = `角色「${character.name}」，性格：${personaSummary || '（无）'}。开场白：${greeting?.trim()?.slice(0, 60) || '（无）'}。
+判断这个角色多快会通过这条好友申请，只输出 JSON：{"category": "immediate" | "short" | "medium" | "long"}。
+immediate=立刻通过；short=几分钟；medium=慢热/忙碌；long=高冷/谨慎。`;
 
     try {
-      const result = await this.ai.generateJsonObject({
+      const aiCall = this.ai.generateJsonObject({
         prompt,
         usageContext: {
           surface: 'app',
@@ -698,10 +690,17 @@ ${personaSummary || '（暂无更多信息）'}
           characterId: character.id,
           characterName: character.name,
         },
-        maxTokens: 200,
+        maxTokens: 40,
         temperature: 0.6,
         fallback: { category: 'short' },
       });
+      // 3 秒内拿不到 AI 判断就直接走 short fallback，避免发送按钮长时间转圈
+      const result: Record<string, unknown> = await Promise.race([
+        aiCall as Promise<Record<string, unknown>>,
+        new Promise<Record<string, unknown>>((resolve) =>
+          setTimeout(() => resolve({ category: 'short' }), 3000),
+        ),
+      ]);
       const category =
         typeof result.category === 'string'
           ? result.category.toLowerCase().trim()
@@ -724,18 +723,20 @@ ${personaSummary || '（暂无更多信息）'}
   }
 
   private delayCategoryToSeconds(category: string): number {
+    // 所有类别封顶 5 分钟，让用户可感知地等到世界角色通过；medium / long 仅保留性格差异
+    // （更"高冷"的角色等待区间更靠后），避免出现长达数小时的延迟让用户误以为系统不处理。
     const jitter = (min: number, max: number) =>
       min + Math.floor(Math.random() * Math.max(1, max - min));
     switch (category) {
       case 'immediate':
         return jitter(0, 16);
       case 'medium':
-        return jitter(1800, 7200);
+        return jitter(120, 240);
       case 'long':
-        return jitter(14400, 43200);
+        return jitter(180, 300);
       case 'short':
       default:
-        return jitter(60, 300);
+        return jitter(60, 180);
     }
   }
 
@@ -1099,3 +1100,4 @@ function normalizeTags(tags?: string[] | null) {
   ];
   return normalized.length ? normalized : null;
 }
+// i18n-ignore-end

@@ -342,7 +342,7 @@ export function DiscoverFeedPage() {
     setShowCompose(false);
     setNoticeActionLabel(null);
     setNoticeAction(null);
-    setNotice("");
+    setNotice(""); // i18n-ignore-line
   }, [baseUrl, resetComposeDraft]);
 
   useEffect(() => {
@@ -398,7 +398,7 @@ export function DiscoverFeedPage() {
     }
 
     const timer = window.setTimeout(() => {
-      setNotice("");
+      setNotice(""); // i18n-ignore-line
       setNoticeActionLabel(null);
       setNoticeAction(null);
     }, 2400);

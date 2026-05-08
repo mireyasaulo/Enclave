@@ -625,7 +625,7 @@ export function ContactsPage() {
       return blockCharacter(
         {
           characterId,
-          reason: "来自通讯录详情页加入黑名单",
+          reason: "来自通讯录详情页加入黑名单", // i18n-ignore-line
         },
         baseUrl,
       );

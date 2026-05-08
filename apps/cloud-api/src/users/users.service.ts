@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException, OnModuleInit } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CloudUserDetail,
   CloudUserListResponse,
   CloudUserStatus,
@@ -392,3 +393,4 @@ export class UsersService implements OnModuleInit {
     return inviter?.phone ?? null;
   }
 }
+// i18n-ignore-end

@@ -1,4 +1,6 @@
 import type { KeyboardEvent, ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   AppPage,
   AppSection,
@@ -6,6 +8,8 @@ import {
   InlineNotice,
   cn,
 } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 import { ArrowLeft, Copy, Search, Share2 } from "lucide-react";
 import { TabPageTopBar } from "../../components/tab-page-top-bar";
 import { formatConversationTimestamp } from "../../lib/format";
@@ -111,8 +115,8 @@ export function MobileMiniProgramsWorkspace({
   return (
     <AppPage className="space-y-0 px-0 pb-0 pt-0">
       <TabPageTopBar
-        title="小程序"
-        subtitle="最近使用与常用入口"
+        title={t(msg`小程序`)}
+        subtitle={t(msg`最近使用与常用入口`)}
         titleAlign="center"
         className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
         leftActions={
@@ -136,7 +140,7 @@ export function MobileMiniProgramsWorkspace({
               type="search"
               value={searchText}
               onChange={(event) => onSearchTextChange(event.target.value)}
-              placeholder="搜索小程序、服务或场景"
+              placeholder={t(msg`搜索小程序、服务或场景`)}
               className="h-8.5 w-full rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] pl-9 pr-11 text-[13px] text-[color:var(--text-primary)] outline-none transition-[background-color,border-color] placeholder:text-[color:var(--text-dim)] focus:border-[rgba(7,193,96,0.22)] focus:bg-white"
             />
             {searchText ? (
@@ -145,7 +149,7 @@ export function MobileMiniProgramsWorkspace({
                 onClick={() => onSearchTextChange("")}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-[color:var(--text-muted)]"
               >
-                清空
+                {t(msg`清空`)}
               </button>
             ) : null}
           </label>
@@ -239,8 +243,8 @@ export function MobileMiniProgramsWorkspace({
             </div>
 
             <div className="mt-3.5 grid grid-cols-2 gap-2">
-              <MobileMetric label="最近状态" value={selectedMiniProgram.serviceLabel} />
-              <MobileMetric label="更新" value={selectedMiniProgram.updateNote} />
+              <MobileMetric label={t(msg`最近状态`)} value={selectedMiniProgram.serviceLabel} />
+              <MobileMetric label={t(msg`更新`)} value={selectedMiniProgram.updateNote} />
             </div>
 
             <div className="mt-3.5 flex flex-wrap gap-1.5">
@@ -261,7 +265,7 @@ export function MobileMiniProgramsWorkspace({
                 onClick={() => onOpenMiniProgram(selectedMiniProgram.id)}
                 className="h-8.5 flex-1 border-white/18 bg-white px-3 text-[11px] text-[color:var(--text-primary)] hover:bg-white/92"
               >
-                打开小程序
+                {t(msg`打开小程序`)}
               </Button>
               <Button
                 variant="secondary"
@@ -270,8 +274,8 @@ export function MobileMiniProgramsWorkspace({
                 className="h-8.5 border-white/18 bg-white/10 px-3 text-[11px] text-white hover:bg-white/18"
               >
                 {pinnedMiniProgramIds.includes(selectedMiniProgram.id)
-                  ? "已加入"
-                  : "加入常用"}
+                  ? t(msg`已加入`)
+                  : t(msg`加入常用`)}
               </Button>
             </div>
           </div>
@@ -291,13 +295,13 @@ export function MobileMiniProgramsWorkspace({
           onCopyToMobile={onCopyMiniProgramToMobile}
           copyActionHint={
             nativeMobileShareSupported
-              ? "当前先由轻工作台承接上下文，也可以直接通过系统分享发给联系人或其他应用。"
-              : "当前先由轻工作台承接上下文，也可以直接复制入口链接继续使用。"
+              ? t(msg`当前先由轻工作台承接上下文，也可以直接通过系统分享发给联系人或其他应用。`)
+              : t(msg`当前先由轻工作台承接上下文，也可以直接复制入口链接继续使用。`)
           }
           copyActionIcon={
             nativeMobileShareSupported ? <Share2 size={16} /> : <Copy size={16} />
           }
-          copyActionLabel={nativeMobileShareSupported ? "系统分享" : "复制入口"}
+          copyActionLabel={nativeMobileShareSupported ? t(msg`系统分享`) : t(msg`复制入口`)}
           onOpen={onOpenMiniProgram}
           onToggleTask={onToggleMiniProgramTask}
           onTogglePinned={onTogglePinnedMiniProgram}
@@ -307,14 +311,14 @@ export function MobileMiniProgramsWorkspace({
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
-                最近使用
+                {t(msg`最近使用`)}
               </div>
               <div className="mt-0.5 text-[11px] leading-4 text-[color:var(--text-muted)]">
-                模拟微信里最近打开的小程序快捷入口。
+                {t(msg`模拟微信里最近打开的小程序快捷入口。`)}
               </div>
             </div>
             <div className="text-[10px] text-[color:var(--text-muted)]">
-              {recentMiniPrograms.length} 个
+              {recentMiniPrograms.length} {t(msg`个`)}
             </div>
           </div>
 
@@ -326,10 +330,10 @@ export function MobileMiniProgramsWorkspace({
                 active={selectedMiniProgram.id === miniProgram.id}
                 detail={
                   lastOpenedAtById[miniProgram.id]
-                    ? `上次打开 ${formatConversationTimestamp(
+                    ? `${t(msg`上次打开`)} ${formatConversationTimestamp(
                         lastOpenedAtById[miniProgram.id],
                       )}`
-                    : "还没有打开过"
+                    : t(msg`还没有打开过`)
                 }
                 onClick={() => onSelectMiniProgram(miniProgram.id)}
               />
@@ -341,14 +345,14 @@ export function MobileMiniProgramsWorkspace({
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
-                我的小程序
+                {t(msg`我的小程序`)}
               </div>
               <div className="mt-0.5 text-[11px] leading-4 text-[color:var(--text-muted)]">
-                这里承接微信式固定常用入口。
+                {t(msg`这里承接微信式固定常用入口。`)}
               </div>
             </div>
             <div className="text-[10px] text-[color:var(--text-muted)]">
-              {pinnedMiniPrograms.length} 个
+              {pinnedMiniPrograms.length} {t(msg`个`)}
             </div>
           </div>
 
@@ -370,9 +374,9 @@ export function MobileMiniProgramsWorkspace({
             </div>
           ) : (
             <MobileMiniProgramsStatusCard
-              badge="常用"
-              title="还没有加入我的小程序"
-              description="在推荐卡片或列表里点“加入常用”，这里就会像微信一样沉淀你的固定入口。"
+              badge={t(msg`常用`)}
+              title={t(msg`还没有加入我的小程序`)}
+              description={t(msg`在推荐卡片或列表里点“加入常用”，这里就会像微信一样沉淀你的固定入口。`)}
               action={
                 <Button
                   variant="secondary"
@@ -387,7 +391,7 @@ export function MobileMiniProgramsWorkspace({
                     onSelectMiniProgram(selectedMiniProgram.id);
                   }}
                 >
-                  {statusBackLabel ?? "先看看当前推荐"}
+                  {statusBackLabel ?? t(msg`先看看当前推荐`)}
                 </Button>
               }
             />
@@ -396,7 +400,7 @@ export function MobileMiniProgramsWorkspace({
 
         <AppSection className="space-y-2 border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] shadow-none">
           <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
-            今日推荐
+            {t(msg`今日推荐`)}
           </div>
           <div className="space-y-2">
             {miniProgramCampaigns.slice(0, 2).map((campaign) => {
@@ -435,16 +439,16 @@ export function MobileMiniProgramsWorkspace({
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
-                全部小程序
+                {t(msg`全部小程序`)}
               </div>
               <div className="mt-0.5 text-[11px] leading-4 text-[color:var(--text-muted)]">
                 {searchText
-                  ? `搜索“${searchText.trim()}”命中 ${visibleMiniPrograms.length} 个结果。`
-                  : "按分类浏览当前可用的小程序目录。"}
+                  ? t(msg`搜索“${searchText.trim()}”命中 ${visibleMiniPrograms.length} 个结果。`)
+                  : t(msg`按分类浏览当前可用的小程序目录。`)}
               </div>
             </div>
             <div className="text-[10px] text-[color:var(--text-muted)]">
-              {visibleMiniPrograms.length} 个
+              {t(msg`${visibleMiniPrograms.length} 个`)}
             </div>
           </div>
 
@@ -466,9 +470,9 @@ export function MobileMiniProgramsWorkspace({
             </div>
           ) : (
             <MobileMiniProgramsStatusCard
-              badge="搜索"
-              title="没有匹配的小程序"
-              description="换个关键词，或者切回“全部”分类继续浏览。"
+              badge={t(msg`搜索`)}
+              title={t(msg`没有匹配的小程序`)}
+              description={t(msg`换个关键词，或者切回“全部”分类继续浏览。`)}
               action={
                 <Button
                   variant="secondary"
@@ -484,7 +488,7 @@ export function MobileMiniProgramsWorkspace({
                     onCategoryChange("all");
                   }}
                 >
-                  {statusBackLabel ?? "清空筛选"}
+                  {statusBackLabel ?? t(msg`清空筛选`)}
                 </Button>
               }
             />
@@ -504,17 +508,17 @@ function MobileFeatureComingSoonOverlay({ onBack }: { onBack: () => void }) {
         onClick={onBack}
         variant="ghost"
         size="icon"
-        aria-label="返回"
+        aria-label={t(msg`返回`)}
         className="absolute left-3 top-3 h-10 w-10 rounded-full bg-white/90 text-[color:var(--text-primary)] shadow-[var(--shadow-card)] active:bg-white"
       >
         <ArrowLeft size={18} />
       </Button>
       <div className="mx-6 max-w-[280px] rounded-2xl border border-[color:var(--border-faint)] bg-white/98 px-6 py-6 text-center shadow-[var(--shadow-card)]">
         <div className="text-[17px] font-semibold text-[color:var(--text-primary)]">
-          功能开发中
+          {t(msg`功能开发中`)}
         </div>
         <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-          敬请期待
+          {t(msg`敬请期待`)}
         </div>
         <Button
           type="button"
@@ -523,7 +527,7 @@ function MobileFeatureComingSoonOverlay({ onBack }: { onBack: () => void }) {
           size="md"
           className="mt-5 h-10 w-full rounded-full bg-[color:var(--brand-primary)] text-white"
         >
-          返回
+          {t(msg`返回`)}
         </Button>
       </div>
     </div>
@@ -675,8 +679,10 @@ function MiniProgramListCard({
           </div>
           <div className="mt-1 text-[10px] leading-4 text-[color:var(--text-dim)]">
             {lastOpenedAt
-              ? `上次打开 ${formatConversationTimestamp(lastOpenedAt)} · 已打开 ${launchCount} 次`
-              : `还没有打开过 · 已加入 ${pinned ? "我的小程序" : "目录"}`}
+              ? t(msg`上次打开 ${formatConversationTimestamp(lastOpenedAt)} · 已打开 ${launchCount} 次`)
+              : pinned
+                ? t(msg`还没有打开过 · 已加入我的小程序`)
+                : t(msg`还没有打开过 · 已加入目录`)}
           </div>
         </div>
       </div>
@@ -691,7 +697,7 @@ function MiniProgramListCard({
           }}
           className="h-7.5 rounded-full bg-[#07c160] px-3 text-[10px] text-white hover:bg-[#06ad56]"
         >
-          打开
+          {t(msg`打开`)}
         </Button>
         <Button
           variant="secondary"
@@ -702,7 +708,7 @@ function MiniProgramListCard({
           }}
           className="h-7.5 rounded-full border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas)] px-3 text-[10px] text-[color:var(--text-secondary)]"
         >
-          {pinned ? "移出常用" : "加入常用"}
+          {pinned ? t(msg`移出常用`) : t(msg`加入常用`)}
         </Button>
       </div>
     </div>

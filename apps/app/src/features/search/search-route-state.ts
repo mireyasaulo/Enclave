@@ -1,5 +1,5 @@
 import {
-  searchCategoryLabels,
+  searchCategoryLabelDescriptors,
   type SearchCategory,
 } from "./search-types";
 
@@ -18,7 +18,7 @@ const DEFAULT_SEARCH_ROUTE_STATE: SearchRouteState = {
 };
 
 const validSearchCategories = new Set(
-  searchCategoryLabels.map((item) => item.id),
+  searchCategoryLabelDescriptors.map((item) => item.id),
 );
 const validSearchSources = new Set<SearchRouteSource>(["chat", "contacts"]);
 

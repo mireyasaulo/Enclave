@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const ACTIVE_WORLD_LIFECYCLE_JOB_UNIQUE_INDEX =
   "IDX_world_lifecycle_jobs_active_world";
 
@@ -48,3 +49,4 @@ export class AddActiveWorldLifecycleJobUniqueIndex1776650400000
     );
   }
 }
+// i18n-ignore-end

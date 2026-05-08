@@ -1430,7 +1430,7 @@ export function DesktopChatWorkspace({
       onPointerDownCapture={handleWorkspacePointerDownCapture}
     >
       {standaloneWindow ? null : (
-        <section className="flex w-[324px] shrink-0 flex-col border-r border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.88)]">
+        <section className="flex w-[320px] shrink-0 flex-col border-r border-[color:var(--border-faint)] bg-[rgba(247,250,250,0.88)]">
           <div className="border-b border-[color:var(--border-faint)] bg-[rgba(255,255,255,0.78)] px-3 py-3 backdrop-blur-xl">
             <div className="relative z-20 flex items-center gap-2">
               <div

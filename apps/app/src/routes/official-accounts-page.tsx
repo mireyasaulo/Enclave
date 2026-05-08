@@ -1,6 +1,10 @@
 import { Suspense, lazy, useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+
+const t = translateRuntimeMessage;
 import { ArrowLeft, Newspaper, Search } from "lucide-react";
 import { listOfficialAccounts } from "@yinjie/contracts";
 import { AppPage, Button, cn } from "@yinjie/ui";
@@ -37,9 +41,9 @@ export function OfficialAccountsPage() {
       <Suspense
         fallback={
           <RouteRedirectState
-            title="正在切换到桌面公众号"
-            description="正在跳转到桌面通讯录工作区中的公众号视图。"
-            loadingLabel="切换桌面公众号视图..."
+            title={t(msg`正在切换到桌面公众号`)}
+            description={t(msg`正在跳转到桌面通讯录工作区中的公众号视图。`)}
+            loadingLabel={t(msg`切换桌面公众号视图...`)}
           />
         }
       >
@@ -166,7 +170,7 @@ function MobileOfficialAccountsPage() {
   return (
     <AppPage className="space-y-0 bg-[color:var(--bg-canvas)] px-0 py-0">
       <TabPageTopBar
-        title="公众号"
+        title={t(msg`公众号`)}
         titleAlign="center"
         className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
         leftActions={
@@ -194,7 +198,7 @@ function MobileOfficialAccountsPage() {
             size="icon"
             className="h-9 w-9 rounded-full text-[color:var(--text-primary)] active:bg-black/[0.05]"
             onClick={openSubscriptionInbox}
-            aria-label="打开订阅号消息"
+            aria-label={t(msg`打开订阅号消息`)}
           >
             <Newspaper size={17} />
           </Button>
@@ -209,7 +213,7 @@ function MobileOfficialAccountsPage() {
             type="search"
             value={searchText}
             onChange={(event) => setSearchText(event.target.value)}
-            placeholder="搜索公众号"
+            placeholder={t(msg`搜索公众号`)}
             className="h-9 w-full rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--bg-canvas-elevated)] pl-9 pr-4 text-[12px] text-[color:var(--text-primary)] outline-none transition-[background-color,border-color] duration-[var(--motion-fast)] ease-[var(--ease-standard)] placeholder:text-[color:var(--text-dim)] focus:bg-white"
           />
         </label>
@@ -219,9 +223,9 @@ function MobileOfficialAccountsPage() {
         {accountsQuery.isLoading ? (
           <div className="px-4 pt-2.5">
             <MobileOfficialAccountsStatusCard
-              badge="读取中"
-              title="正在读取公众号"
-              description="稍等一下，正在同步你关注和可浏览的公众号。"
+              badge={t(msg`读取中`)}
+              title={t(msg`正在读取公众号`)}
+              description={t(msg`稍等一下，正在同步你关注和可浏览的公众号。`)}
               tone="loading"
             />
           </div>
@@ -229,8 +233,8 @@ function MobileOfficialAccountsPage() {
         {accountsQuery.isError && accountsQuery.error instanceof Error ? (
           <div className="px-4 pt-2.5">
             <MobileOfficialAccountsStatusCard
-              badge="读取失败"
-              title="公众号列表暂时不可用"
+              badge={t(msg`读取失败`)}
+              title={t(msg`公众号列表暂时不可用`)}
               description={accountsQuery.error.message}
               tone="danger"
               action={
@@ -241,7 +245,7 @@ function MobileOfficialAccountsPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleRetryAccounts}
                   >
-                    重试读取
+                    {t(msg`重试读取`)}
                   </Button>
                   <Button
                     variant="secondary"
@@ -249,7 +253,7 @@ function MobileOfficialAccountsPage() {
                     className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
                     onClick={handleStatusBack}
                   >
-                    {safeReturnPath ? "返回上一页" : "返回通讯录"}
+                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`返回通讯录`)}
                   </Button>
                 </div>
               }
@@ -259,7 +263,7 @@ function MobileOfficialAccountsPage() {
 
         {followedAccounts.length ? (
           <MobileOfficialAccountSection
-            title="最近关注"
+            title={t(msg`最近关注`)}
             count={followedAccounts.length}
           >
             {followedAccounts.map((account) => (
@@ -284,7 +288,7 @@ function MobileOfficialAccountsPage() {
 
         {browseAccounts.length ? (
           <MobileOfficialAccountSection
-            title={followedAccounts.length ? "更多公众号" : "全部公众号"}
+            title={followedAccounts.length ? t(msg`更多公众号`) : t(msg`全部公众号`)}
             count={browseAccounts.length}
           >
             {browseAccounts.map((account) => (
@@ -312,9 +316,9 @@ function MobileOfficialAccountsPage() {
         !filteredAccounts.length ? (
           <div className="px-4 pt-4">
             <MobileOfficialAccountsStatusCard
-              badge="暂无结果"
-              title="没有找到匹配的公众号"
-              description="换个名字、简称或关键词试试。"
+              badge={t(msg`暂无结果`)}
+              title={t(msg`没有找到匹配的公众号`)}
+              description={t(msg`换个名字、简称或关键词试试。`)}
               action={
                 <Button
                   variant="secondary"
@@ -323,10 +327,10 @@ function MobileOfficialAccountsPage() {
                   onClick={handleEmptyStateAction}
                 >
                   {safeReturnPath
-                    ? "返回上一页"
+                    ? t(msg`返回上一页`)
                     : hasSearchText
-                      ? "清空搜索"
-                      : "打开订阅号消息"}
+                      ? t(msg`清空搜索`)
+                      : t(msg`打开订阅号消息`)}
                 </Button>
               }
             />
@@ -347,17 +351,17 @@ function MobileOfficialAccountsPage() {
           }
           variant="ghost"
           size="icon"
-          aria-label="返回"
+          aria-label={t(msg`返回`)}
           className="absolute left-3 top-3 h-10 w-10 rounded-full bg-white/90 text-[color:var(--text-primary)] shadow-[var(--shadow-card)] active:bg-white"
         >
           <ArrowLeft size={18} />
         </Button>
         <div className="mx-6 max-w-[280px] rounded-2xl border border-[color:var(--border-faint)] bg-white/98 px-6 py-6 text-center shadow-[var(--shadow-card)]">
           <div className="text-[17px] font-semibold text-[color:var(--text-primary)]">
-            功能开发中
+            {t(msg`功能开发中`)}
           </div>
           <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-            敬请期待
+            {t(msg`敬请期待`)}
           </div>
           <Button
             type="button"
@@ -374,7 +378,7 @@ function MobileOfficialAccountsPage() {
             size="md"
             className="mt-5 h-10 w-full rounded-full bg-[color:var(--brand-primary)] text-white"
           >
-            返回
+            {t(msg`返回`)}
           </Button>
         </div>
       </div>

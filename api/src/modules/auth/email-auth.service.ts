@@ -1,10 +1,5 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,6 +11,7 @@ import { EmailVerificationSessionEntity } from './email-verification-session.ent
 import { UserEntity } from './user.entity';
 import { WelcomeMessageService } from './welcome-message.service';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export type SendEmailCodeResult = {
@@ -71,7 +67,9 @@ export class EmailAuthService {
     const normalized = this.normalizeEmail(email);
     const trimmedCode = (code ?? '').trim();
     if (!trimmedCode) {
-      throw new BadRequestException('验证码不能为空。');
+      throw new AppError('AUTH_CODE_REQUIRED', {
+        legacyMessage: '验证码不能为空。',
+      });
     }
 
     const session = await this.sessionRepo.findOne({
@@ -79,13 +77,22 @@ export class EmailAuthService {
       order: { createdAt: 'DESC' },
     });
     if (!session) {
-      throw new UnauthorizedException('验证码错误。');
+      throw new AppError('AUTH_CODE_INVALID', {
+        status: HttpStatus.UNAUTHORIZED,
+        legacyMessage: '验证码错误。',
+      });
     }
     if (session.verifiedAt) {
-      throw new UnauthorizedException('该验证码已使用。');
+      throw new AppError('AUTH_CODE_USED', {
+        status: HttpStatus.UNAUTHORIZED,
+        legacyMessage: '该验证码已使用。',
+      });
     }
     if (session.expiresAt.getTime() < Date.now()) {
-      throw new UnauthorizedException('验证码已过期。');
+      throw new AppError('AUTH_CODE_EXPIRED', {
+        status: HttpStatus.UNAUTHORIZED,
+        legacyMessage: '验证码已过期。',
+      });
     }
 
     session.verifiedAt = new Date();
@@ -173,7 +180,10 @@ export class EmailAuthService {
   private resolveJwtSecret(): string {
     const secret = this.config.get<string>('JWT_SECRET');
     if (!secret) {
-      throw new UnauthorizedException('服务器未配置 JWT_SECRET');
+      throw new AppError('AUTH_JWT_SECRET_MISSING', {
+        status: HttpStatus.UNAUTHORIZED,
+        legacyMessage: '服务器未配置 JWT_SECRET',
+      });
     }
     return secret;
   }
@@ -200,10 +210,11 @@ export class EmailAuthService {
       const retryAfter =
         cooldown - Math.floor((Date.now() - latest.createdAt.getTime()) / 1000);
       if (retryAfter > 0) {
-        throw new HttpException(
-          `验证码发送过于频繁，请在 ${retryAfter} 秒后重试。`,
-          HttpStatus.TOO_MANY_REQUESTS,
-        );
+        throw new AppError('AUTH_CODE_RESEND_TOO_FAST', {
+          status: HttpStatus.TOO_MANY_REQUESTS,
+          params: { retryAfter },
+          legacyMessage: `验证码发送过于频繁，请在 ${retryAfter} 秒后重试。`,
+        });
       }
     }
 
@@ -212,10 +223,10 @@ export class EmailAuthService {
       where: { email, createdAt: MoreThan(since) },
     });
     if (count >= max) {
-      throw new HttpException(
-        '该邮箱验证码请求次数过多，请稍后再试。',
-        HttpStatus.TOO_MANY_REQUESTS,
-      );
+      throw new AppError('AUTH_CODE_TOO_MANY', {
+        status: HttpStatus.TOO_MANY_REQUESTS,
+        legacyMessage: '该邮箱验证码请求次数过多，请稍后再试。',
+      });
     }
   }
 
@@ -233,7 +244,9 @@ export class EmailAuthService {
   private normalizeEmail(raw: string): string {
     const trimmed = (raw ?? '').trim().toLowerCase();
     if (!trimmed || !EMAIL_PATTERN.test(trimmed) || trimmed.length > 254) {
-      throw new BadRequestException('邮箱格式不正确。');
+      throw new AppError('AUTH_EMAIL_INVALID', {
+        legacyMessage: '邮箱格式不正确。',
+      });
     }
     return trimmed;
   }
@@ -244,3 +257,4 @@ export class EmailAuthService {
     return Math.floor(parsed);
   }
 }
+// i18n-ignore-end

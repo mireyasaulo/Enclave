@@ -4,6 +4,7 @@ import { WorldOwnerService } from '../auth/world-owner.service';
 import type { ChatBackgroundAsset } from '../chat/chat-background.types';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 @Controller('world')
 export class WorldController {
   constructor(
@@ -80,3 +81,4 @@ export class WorldController {
     return this.worldOwnerService.clearOwnerApiKey();
   }
 }
+// i18n-ignore-end

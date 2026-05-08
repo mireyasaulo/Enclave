@@ -2222,7 +2222,7 @@ function DesktopGroupMemberBrowserDialog({
         className="absolute inset-0"
       />
 
-      <div className="relative flex h-[min(760px,78vh)] w-full max-w-[760px] flex-col overflow-hidden rounded-[22px] border border-[color:var(--border-faint)] bg-white/96 shadow-[var(--shadow-overlay)]">
+      <div className="relative flex max-h-[85vh] w-full max-w-[760px] flex-col overflow-hidden rounded-[22px] border border-[color:var(--border-faint)] bg-white/96 shadow-[var(--shadow-overlay)]">
         <div className="flex items-start justify-between gap-4 border-b border-[color:var(--border-faint)] bg-white/78 px-6 py-4 backdrop-blur-xl">
           <div>
             <div className="text-[16px] font-medium text-[color:var(--text-primary)]">

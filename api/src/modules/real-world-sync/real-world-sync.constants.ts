@@ -1,4 +1,5 @@
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   RealWorldSyncRulesValue,
   RealWorldScenePatchPayloadValue,
 } from './real-world-sync.types';
@@ -148,3 +149,4 @@ export function normalizeRealWorldSyncRules(
     },
   };
 }
+// i18n-ignore-end

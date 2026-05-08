@@ -5,7 +5,7 @@ import type {
   WorldLifecycleJobType,
 } from "@yinjie/contracts";
 import {
-  QUEUE_STATE_FILTERS,
+  QUEUE_STATE_FILTER_VALUES,
   type QueueStateFilter,
 } from "./job-queue-state";
 
@@ -88,9 +88,7 @@ const JOB_SUPERSEDED_BY_FILTER_SET = new Set<string>(
 );
 const JOB_SORT_FIELD_SET = new Set<string>(JOB_SORT_FIELDS);
 const JOB_SORT_DIRECTION_SET = new Set<string>(JOB_SORT_DIRECTIONS);
-const QUEUE_STATE_FILTER_SET = new Set<string>(
-  QUEUE_STATE_FILTERS.map((item) => item.value),
-);
+const QUEUE_STATE_FILTER_SET = new Set<string>(QUEUE_STATE_FILTER_VALUES);
 const PAGE_SIZE_SET = new Set<number>(JOB_PAGE_SIZE_OPTIONS);
 
 function normalizeRouteString(value: unknown) {

@@ -5,6 +5,7 @@ import { validateGeneratedMomentOutput } from '../ai/moment-output-validator';
 import { buildBarExpertCharacter } from './bar-expert-character';
 import { BAR_EXPERT_MOMENT_BASELINES } from './bar-expert-moment-baselines';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type EvalDatasetManifestFixture = {
   id: string;
   caseIds: string[];
@@ -117,3 +118,4 @@ describe('bar expert moment baselines', () => {
     expect(secondRoundBaseline?.text).not.toMatch(/一定更重|越喝越猛|再上强度/u);
   });
 });
+// i18n-ignore-end

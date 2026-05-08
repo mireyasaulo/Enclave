@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useDesktopRuntime } from "@yinjie/ui";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export function DesktopRuntimeGuard() {
   const {
     desktopAvailable,
@@ -151,3 +152,4 @@ function formatCommandSource(source?: string, bundledExists?: boolean) {
 
   return bundledExists ? "sidecar 已就绪" : "sidecar 缺失";
 }
+// i18n-ignore-end

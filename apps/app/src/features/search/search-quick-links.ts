@@ -15,6 +15,10 @@ import {
 } from "../mini-programs/mini-programs-data";
 import { useMiniProgramsState } from "../mini-programs/use-mini-programs-state";
 import { type SearchResultItem } from "./search-types";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
 
 export type SearchQuickLink = {
   id: string;
@@ -37,13 +41,13 @@ type MiniProgramSearchStateSnapshot = {
 };
 
 const FAVORITE_CATEGORY_LABELS: Record<FavoriteRecord["category"], string> = {
-  messages: "收藏消息",
-  notes: "笔记",
-  contacts: "收藏联系人",
-  officialAccounts: "收藏公众号",
-  moments: "收藏朋友圈",
-  feed: "收藏广场动态",
-  channels: "收藏视频号",
+  messages: t(msg`收藏消息`),
+  notes: t(msg`笔记`),
+  contacts: t(msg`收藏联系人`),
+  officialAccounts: t(msg`收藏公众号`),
+  moments: t(msg`收藏朋友圈`),
+  feed: t(msg`收藏广场动态`),
+  channels: t(msg`收藏视频号`),
 };
 
 export function useSearchQuickLinks(
@@ -210,7 +214,7 @@ export function useSearchQuickLinks(
           return rightScore - leftScore;
         }
 
-        return left.name.localeCompare(right.name, "zh-CN");
+        return left.name.localeCompare(right.name, "zh-CN"); // i18n-ignore-line
       })
       .slice(0, 4)
       .map((item) =>
@@ -238,7 +242,7 @@ function buildFavoriteQuickLink(favorite: FavoriteRecord): SearchQuickLink {
   return {
     id: `favorite-${favorite.sourceId}`,
     title: favorite.title,
-    description: favorite.description || "打开这条收藏内容。",
+    description: favorite.description || t(msg`打开这条收藏内容。`),
     meta:
       favorite.meta.trim() ||
       `${FAVORITE_CATEGORY_LABELS[favorite.category]} · ${formatTimestamp(favorite.collectedAt)}`,
@@ -257,10 +261,10 @@ function buildFavoriteSearchResult(favorite: FavoriteRecord): SearchResultItem {
     id: `favorite-result-${favorite.sourceId}`,
     category: "favorites",
     title: favorite.title,
-    description: favorite.description || "打开这条收藏内容。",
+    description: favorite.description || t(msg`打开这条收藏内容。`),
     meta: favorite.meta.trim()
-      ? `收藏 · ${favorite.meta}`
-      : `收藏 · ${collectedAtLabel}`,
+      ? t(msg`收藏 · ${favorite.meta}`)
+      : t(msg`收藏 · ${collectedAtLabel}`),
     keywords: [
       favorite.title,
       favorite.description,
@@ -312,9 +316,9 @@ function buildMiniProgramQuickLink(
     title: miniProgram.name,
     description: miniProgram.slogan,
     meta: lastOpenedAt
-      ? `${pinned ? "我的小程序" : "最近使用"} · ${formatTimestamp(lastOpenedAt)}`
-      : `${pinned ? "我的小程序" : "小程序"} · ${miniProgram.developer}`,
-    badge: launchCount > 0 ? `已打开 ${launchCount} 次` : "打开小程序",
+      ? `${pinned ? t(msg`我的小程序`) : t(msg`最近使用`)} · ${formatTimestamp(lastOpenedAt)}`
+      : `${pinned ? t(msg`我的小程序`) : t(msg`小程序`)} · ${miniProgram.developer}`,
+    badge: launchCount > 0 ? t(msg`已打开 ${launchCount} 次`) : t(msg`打开小程序`),
     to: target.to,
     search: target.search,
     avatarName: miniProgram.name,
@@ -339,8 +343,8 @@ function buildMiniProgramSearchResult(
     title: miniProgram.name,
     description: miniProgram.description || miniProgram.slogan,
     meta: lastOpenedAt
-      ? `${pinned ? "我的小程序" : "最近使用"} · ${formatTimestamp(lastOpenedAt)}`
-      : `小程序 · ${miniProgram.developer}`,
+      ? `${pinned ? t(msg`我的小程序`) : t(msg`最近使用`)} · ${formatTimestamp(lastOpenedAt)}`
+      : t(msg`小程序 · ${miniProgram.developer}`),
     keywords: [
       miniProgram.name,
       miniProgram.slogan,
@@ -355,7 +359,7 @@ function buildMiniProgramSearchResult(
       .toLowerCase(),
     to: target.to,
     search: target.search,
-    badge: "小程序",
+    badge: t(msg`小程序`),
     avatarName: miniProgram.name,
     sortTime: getMiniProgramMatchScore(miniProgram, state),
   };

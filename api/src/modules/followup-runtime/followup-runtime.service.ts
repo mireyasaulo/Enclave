@@ -1,10 +1,7 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { createHash } from 'crypto';
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, In, MoreThanOrEqual, Not, Repository } from 'typeorm';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
@@ -180,7 +177,9 @@ export class FollowupRuntimeService {
   ): Promise<FollowupRecommendationEventResultValue> {
     const normalizedFriendRequestId = friendRequestId.trim();
     if (!normalizedFriendRequestId) {
-      throw new BadRequestException('friendRequestId is required');
+      throw new AppError('FOLLOWUP_FRIEND_REQUEST_REQUIRED', {
+        legacyMessage: 'friendRequestId is required',
+      });
     }
 
     const recommendation = await this.requireRecommendation(recommendationId);
@@ -1399,9 +1398,11 @@ export class FollowupRuntimeService {
       id: recommendationId,
     });
     if (!recommendation) {
-      throw new NotFoundException(
-        `Followup recommendation ${recommendationId} not found`,
-      );
+      throw new AppError('FOLLOWUP_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { recommendationId },
+        legacyMessage: `Followup recommendation ${recommendationId} not found`,
+      });
     }
     return recommendation;
   }
@@ -1693,3 +1694,4 @@ function relationshipPriority(
       return 0;
   }
 }
+// i18n-ignore-end

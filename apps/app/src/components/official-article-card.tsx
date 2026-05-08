@@ -1,7 +1,11 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { OfficialAccountArticleSummary } from "@yinjie/contracts";
 import { Pin, Star } from "lucide-react";
 import { cn } from "@yinjie/ui";
 import { formatTimestamp } from "../lib/format";
+
+const t = translateRuntimeMessage;
 
 export function OfficialArticleCard({
   article,
@@ -61,7 +65,7 @@ export function OfficialArticleCard({
                 )}
               >
                 <Pin size={dense ? 10 : 11} />
-                置顶
+                {t(msg`置顶`)}
               </span>
             ) : null}
             <div
@@ -116,12 +120,12 @@ export function OfficialArticleCard({
                 size={dense ? 11 : 12}
                 className={favorite ? "fill-current" : ""}
               />
-              {favorite ? "已收藏" : "收藏"}
+              {favorite ? t(msg`已收藏`) : t(msg`收藏`)}
             </button>
           ) : null}
           {!compact && !dense ? (
             <div className="shrink-0 rounded-full border border-[rgba(7,193,96,0.14)] bg-[rgba(7,193,96,0.07)] px-2.5 py-1 text-[11px] text-[color:var(--brand-primary)]">
-              {article.readCount} 阅读
+              {article.readCount} {t(msg`阅读`)}
             </div>
           ) : null}
         </div>

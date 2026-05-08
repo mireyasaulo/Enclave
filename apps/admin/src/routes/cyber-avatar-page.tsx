@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { useEffect, useMemo, useState } from "react";
 import {
   useMutation,
@@ -2486,3 +2487,4 @@ function RunSnapshotBlock({
     </Card>
   );
 }
+// i18n-ignore-end

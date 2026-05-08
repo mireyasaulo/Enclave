@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   TelemetryApiHealthResponse,
   TelemetryApiHealthRow,
   TelemetryAppId,
@@ -540,3 +541,4 @@ function percentile(values: number[], q: number): number | null {
   const idx = Math.min(sorted.length - 1, Math.floor(sorted.length * q));
   return Math.round(sorted[idx]);
 }
+// i18n-ignore-end

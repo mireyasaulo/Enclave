@@ -3,6 +3,7 @@ import { msg } from "@lingui/macro";
 import { Link } from "@tanstack/react-router";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   Card,
   MetricCard,
   PanelEmpty,
@@ -1541,3 +1542,4 @@ export function AdminBreadcrumb({
     </nav>
   );
 }
+// i18n-ignore-end

@@ -135,7 +135,7 @@ export function DesktopMessageForwardDialog({
           "relative flex min-w-0 flex-col overflow-hidden",
           isMobile
             ? "h-full bg-[#ededed]"
-            : "h-[min(820px,92vh)] w-full max-w-[1080px] rounded-[22px] border border-[color:var(--border-faint)] bg-white/96 shadow-[var(--shadow-overlay)] lg:h-[min(760px,80vh)] lg:flex-row",
+            : "max-h-[85vh] w-full max-w-[1080px] rounded-[22px] border border-[color:var(--border-faint)] bg-white/96 shadow-[var(--shadow-overlay)] lg:max-h-[80vh] lg:flex-row",
         )}
       >
         {isMobile ? (

@@ -1,10 +1,11 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { randomUUID } from 'crypto';
 import {
-  BadRequestException,
+  HttpStatus,
   Injectable,
   Logger,
-  NotFoundException,
 } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
@@ -212,10 +213,14 @@ export class WechatSyncAdminService {
   ): Promise<WechatSyncPreviewResponseValue> {
     const contacts = normalizeContactBundles(input.contacts);
     if (!contacts.length) {
-      throw new BadRequestException('至少选择一个联系人。');
+      throw new AppError('ADMIN_WECHAT_CONTACTS_AT_LEAST_ONE', {
+        legacyMessage: '至少选择一个联系人。',
+      });
     }
     if (contacts.length > 20) {
-      throw new BadRequestException('单次最多预览 20 个联系人。');
+      throw new AppError('ADMIN_WECHAT_PREVIEW_LIMIT', {
+        legacyMessage: '单次最多预览 20 个联系人。',
+      });
     }
 
     const promptConfig = await this.resolveWechatSyncAnalysisPromptConfig();
@@ -252,10 +257,14 @@ export class WechatSyncAdminService {
       item?.contact?.username?.trim(),
     );
     if (!normalizedItems.length) {
-      throw new BadRequestException('至少选择一个预览通过的联系人。');
+      throw new AppError('ADMIN_WECHAT_PREVIEWED_AT_LEAST_ONE', {
+        legacyMessage: '至少选择一个预览通过的联系人。',
+      });
     }
     if (normalizedItems.length > 20) {
-      throw new BadRequestException('单次最多导入 20 个联系人。');
+      throw new AppError('ADMIN_WECHAT_IMPORT_LIMIT', {
+        legacyMessage: '单次最多导入 20 个联系人。',
+      });
     }
 
     const owner = await this.worldOwnerService.getOwnerOrThrow();
@@ -410,10 +419,15 @@ export class WechatSyncAdminService {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const character = await this.characterRepo.findOneBy({ id: characterId });
     if (!character) {
-      throw new NotFoundException('联系人导入角色不存在。');
+      throw new AppError('ADMIN_WECHAT_CONTACT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '联系人导入角色不存在。',
+      });
     }
     if (character.sourceType !== 'wechat_import') {
-      throw new BadRequestException('只支持补建联系人导入角色的好友关系。');
+      throw new AppError('ADMIN_WECHAT_FRIENDSHIP_ONLY_CONTACT', {
+        legacyMessage: '只支持补建联系人导入角色的好友关系。',
+      });
     }
 
     const existing = await this.friendshipRepo.findOneBy({
@@ -431,7 +445,9 @@ export class WechatSyncAdminService {
       characterId,
     });
     if (!friendship) {
-      throw new BadRequestException('好友关系补建失败。');
+      throw new AppError('ADMIN_WECHAT_FRIENDSHIP_FAILED', {
+        legacyMessage: '好友关系补建失败。',
+      });
     }
 
     friendship.source = friendship.source || 'contact_import';
@@ -452,10 +468,15 @@ export class WechatSyncAdminService {
   ): Promise<WechatSyncRollbackResponseValue> {
     const character = await this.characterRepo.findOneBy({ id: characterId });
     if (!character) {
-      throw new NotFoundException('联系人导入角色不存在。');
+      throw new AppError('ADMIN_WECHAT_CONTACT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '联系人导入角色不存在。',
+      });
     }
     if (character.sourceType !== 'wechat_import') {
-      throw new BadRequestException('只支持回滚联系人导入角色。');
+      throw new AppError('ADMIN_WECHAT_ROLLBACK_ONLY_CONTACT', {
+        legacyMessage: '只支持回滚联系人导入角色。',
+      });
     }
 
     await this.charactersService.delete(characterId);
@@ -2261,3 +2282,4 @@ function normalizeNullableNumber(value: unknown) {
         : NaN;
   return Number.isFinite(normalized) ? normalized : null;
 }
+// i18n-ignore-end

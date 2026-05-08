@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type NeedDiscoveryCadenceType = 'short_interval' | 'daily';
 export type NeedDiscoveryRunStatus = 'success' | 'skipped' | 'failed';
 export type NeedDiscoveryCandidateStatus =
@@ -349,3 +350,4 @@ export type NeedDiscoveryFriendRequestExpiredEvent = {
   ownerId: string;
   expiredAt: Date;
 };
+// i18n-ignore-end

@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export type BarExpertMomentBaseline = {
   id: string;
   caseId: string;
@@ -43,3 +44,4 @@ export const BAR_EXPERT_MOMENT_BASELINES: BarExpertMomentBaseline[] = [
     text: '第二杯最怕的不是没变化，是变化太大。很多人第一杯刚坐稳，就把第二杯点成加码题，后半夜的节奏一下子就快了。',
   },
 ];
+// i18n-ignore-end

@@ -1,9 +1,6 @@
 import { createHash, randomInt, randomUUID } from 'crypto';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, In, MoreThanOrEqual, Repository } from 'typeorm';
 import { UserFeedInteractionEntity } from '../analytics/user-feed-interaction.entity';
@@ -30,6 +27,7 @@ import { MomentPostEntity } from '../moments/moment-post.entity';
 import { FriendshipEntity } from './friendship.entity';
 import { SocialService } from './social.service';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   DEFAULT_SHAKE_DISCOVERY_CONFIG,
   MAX_SHAKE_DISCOVERY_SESSIONS,
   SHAKE_DISCOVERY_CONFIG_KEY,
@@ -95,7 +93,9 @@ export class ShakeDiscoveryService {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const config = await this.getConfig();
     if (!config.enabled) {
-      throw new BadRequestException('摇一摇当前已在后台停用。');
+      throw new AppError('SHAKE_DISABLED', {
+        legacyMessage: '摇一摇当前已在后台停用。',
+      });
     }
 
     const mode = options?.mode === 'reroll' ? 'reroll' : 'new';
@@ -121,9 +121,10 @@ export class ShakeDiscoveryService {
         now.getTime() - latestCreatedAt.getTime() <
           config.cooldownMinutes * 60 * 1000
       ) {
-        throw new BadRequestException(
-          `请至少间隔 ${config.cooldownMinutes} 分钟再摇一次。`,
-        );
+        throw new AppError('SHAKE_COOLDOWN', {
+          params: { cooldownMinutes: config.cooldownMinutes },
+          legacyMessage: `请至少间隔 ${config.cooldownMinutes} 分钟再摇一次。`,
+        });
       }
     }
 
@@ -134,7 +135,9 @@ export class ShakeDiscoveryService {
       return !Number.isNaN(createdAt.getTime()) && createdAt >= startOfDay;
     }).length;
     if (todayCount >= config.maxSessionsPerDay) {
-      throw new BadRequestException('今日摇一摇次数已达到上限。');
+      throw new AppError('SHAKE_DAILY_LIMIT', {
+        legacyMessage: '今日摇一摇次数已达到上限。',
+      });
     }
 
     const cyberAvatarProfile = await this.cyberAvatar.getProfile();
@@ -142,9 +145,9 @@ export class ShakeDiscoveryService {
       config.requireCyberAvatarSignals &&
       (cyberAvatarProfile.signalCount ?? 0) <= 0
     ) {
-      throw new BadRequestException(
-        '当前赛博分身信号不足，暂时还不能生成新的摇一摇角色。',
-      );
+      throw new AppError('SHAKE_CYBER_AVATAR_NO_SIGNAL', {
+        legacyMessage: '当前赛博分身信号不足，暂时还不能生成新的摇一摇角色。',
+      });
     }
 
     const windowStartedAt = new Date(
@@ -364,7 +367,11 @@ export class ShakeDiscoveryService {
     const changed = expirePreviewSessions(sessions, new Date());
     const session = sessions.find((item) => item.id === sessionId);
     if (!session) {
-      throw new NotFoundException(`Shake session ${sessionId} not found`);
+      throw new AppError('SHAKE_SESSION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { sessionId },
+        legacyMessage: `Shake session ${sessionId} not found`,
+      });
     }
     if (session.status === 'expired') {
       if (changed) {
@@ -373,7 +380,9 @@ export class ShakeDiscoveryService {
       return { sessionId, status: 'expired' };
     }
     if (session.status !== 'preview_ready') {
-      throw new BadRequestException('当前摇一摇结果已经不可再放弃。');
+      throw new AppError('SHAKE_NOT_DISCARDABLE', {
+        legacyMessage: '当前摇一摇结果已经不可再放弃。',
+      });
     }
     session.status = 'dismissed';
     session.dismissReason = normalizeDismissReason(reason);
@@ -388,7 +397,11 @@ export class ShakeDiscoveryService {
     const changed = expirePreviewSessions(sessions, new Date());
     const session = sessions.find((item) => item.id === sessionId);
     if (!session) {
-      throw new NotFoundException(`Shake session ${sessionId} not found`);
+      throw new AppError('SHAKE_SESSION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { sessionId },
+        legacyMessage: `Shake session ${sessionId} not found`,
+      });
     }
     const sourceKey = buildShakeSourceKey(session.id);
     if (session.status === 'kept') {
@@ -400,9 +413,9 @@ export class ShakeDiscoveryService {
         await this.writeSessions(owner.id, sessions);
       }
       if (!existingCharacter) {
-        throw new BadRequestException(
-          '当前摇一摇结果已保留，但角色记录不存在。',
-        );
+        throw new AppError('SHAKE_KEPT_CHARACTER_MISSING', {
+          legacyMessage: '当前摇一摇结果已保留，但角色记录不存在。',
+        });
       }
       return {
         sessionId,
@@ -415,10 +428,14 @@ export class ShakeDiscoveryService {
       if (changed) {
         await this.writeSessions(owner.id, sessions);
       }
-      throw new BadRequestException('当前摇一摇结果已经不能再保留。');
+      throw new AppError('SHAKE_NOT_KEEPABLE', {
+        legacyMessage: '当前摇一摇结果已经不能再保留。',
+      });
     }
     if (!session.recipeDraft) {
-      throw new BadRequestException('当前摇一摇结果缺少角色草稿。');
+      throw new AppError('SHAKE_DRAFT_MISSING', {
+        legacyMessage: '当前摇一摇结果缺少角色草稿。',
+      });
     }
 
     const targetCharacterId =
@@ -453,7 +470,9 @@ export class ShakeDiscoveryService {
     }
 
     if (!character) {
-      throw new BadRequestException('当前摇一摇结果无法创建对应角色。');
+      throw new AppError('SHAKE_CHARACTER_CREATE_FAILED', {
+        legacyMessage: '当前摇一摇结果无法创建对应角色。',
+      });
     }
 
     if (session.characterId !== character.id) {
@@ -1316,7 +1335,9 @@ function applyDirectionWeights(
 
 function pickDirection(directions: ShakeDiscoveryDirectionDraft[]) {
   if (!directions.length) {
-    throw new BadRequestException('没有可用的摇一摇方向。');
+    throw new AppError('SHAKE_NO_DIRECTIONS', {
+      legacyMessage: '没有可用的摇一摇方向。',
+    });
   }
   const totalWeight = directions.reduce(
     (sum, item) => sum + (item.computedWeight ?? 0.05),
@@ -1667,25 +1688,19 @@ function isActiveFriendshipStatus(status?: string | null) {
 }
 
 function isCharacterAlreadyExistsError(error: unknown, characterId: string) {
-  if (!(error instanceof BadRequestException)) {
+  if (error instanceof AppError) {
+    const response = error.getResponse();
+    if (response && typeof response === 'object') {
+      const body = response as { code?: unknown; params?: { id?: unknown } };
+      if (body.code === 'CHARACTER_ALREADY_EXISTS' && body.params?.id === characterId) {
+        return true;
+      }
+    }
+  }
+  if (!(error instanceof Error)) {
     return false;
   }
-  const response = error.getResponse();
-  const responseBody =
-    typeof response === 'string'
-      ? null
-      : (response as {
-          message?: string | string[];
-        });
-  const message =
-    typeof response === 'string'
-      ? response
-      : Array.isArray(responseBody?.message)
-        ? responseBody.message.join(' ')
-        : typeof responseBody?.message === 'string'
-          ? responseBody.message
-          : error.message;
-  return message.includes(`Character ${characterId} already exists`);
+  return error.message.includes(`Character ${characterId} already exists`);
 }
 
 function truncateText(value: string | undefined | null, maxLength: number) {
@@ -1800,3 +1815,4 @@ function normalizeInteractionType(type: string) {
       return type;
   }
 }
+// i18n-ignore-end

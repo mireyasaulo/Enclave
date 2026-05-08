@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { msg } from "@lingui/macro";
 import type {
   AdminGameCatalogDetail,
   AdminGameCatalogRevision,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage, useAppLocale } from "@yinjie/i18n";
 import {
   Button,
   Card,
@@ -41,6 +43,8 @@ export function GameReleaseWorkbench({
   selectedGame: AdminGameCatalogDetail | null;
   onFeedback: (feedback: FeedbackPayload) => void;
 }) {
+  useAppLocale();
+  const t = translateRuntimeMessage;
   const queryClient = useQueryClient();
   const [publishSummary, setPublishSummary] = useState("");
   const [publishVisibilityScope, setPublishVisibilityScope] = useState<
@@ -112,7 +116,7 @@ export function GameReleaseWorkbench({
       setPublishSummary("");
       onFeedback({
         tone: "success",
-        message: `${game.name} 已发布为目录版本 v${game.publishedVersion}。`,
+        message: t(msg`${game.name} 已发布为目录版本 v${game.publishedVersion}。`),
       });
     },
   });
@@ -140,7 +144,7 @@ export function GameReleaseWorkbench({
       setRestoreSummary("");
       onFeedback({
         tone: "success",
-        message: `${game.name} 已恢复到修订 #${variables.revisionSequence}。`,
+        message: t(msg`${game.name} 已恢复到修订 #${variables.revisionSequence}。`),
       });
     },
   });
@@ -181,7 +185,7 @@ export function GameReleaseWorkbench({
     if (!selectedGameId || !selectedGame) {
       onFeedback({
         tone: "info",
-        message: "先从目录中选中一款游戏，再执行发布。",
+        message: t(msg`先从目录中选中一款游戏，再执行发布。`),
       });
       return;
     }
@@ -196,7 +200,7 @@ export function GameReleaseWorkbench({
       onFeedback({
         tone: "info",
         message:
-          error instanceof Error ? error.message : "发布版本失败，请稍后重试。",
+          error instanceof Error ? error.message : t(msg`发布版本失败，请稍后重试。`),
       });
     }
   }
@@ -205,7 +209,7 @@ export function GameReleaseWorkbench({
     if (!selectedGameId) {
       onFeedback({
         tone: "info",
-        message: "先选择一个游戏，再执行修订恢复。",
+        message: t(msg`先选择一个游戏，再执行修订恢复。`),
       });
       return;
     }
@@ -221,7 +225,7 @@ export function GameReleaseWorkbench({
       onFeedback({
         tone: "info",
         message:
-          error instanceof Error ? error.message : "恢复修订失败，请稍后重试。",
+          error instanceof Error ? error.message : t(msg`恢复修订失败，请稍后重试。`),
       });
     }
   }
@@ -229,21 +233,21 @@ export function GameReleaseWorkbench({
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-3">
-        <MetricCard label="当前版本号" value={String(selectedGame?.publishedVersion ?? 0)} />
-        <MetricCard label="修订记录" value={String(metrics.revisionCount)} />
-        <MetricCard label="已发布次数" value={String(metrics.publishedCount)} />
+        <MetricCard label={t(msg`当前版本号`)} value={String(selectedGame?.publishedVersion ?? 0)} />
+        <MetricCard label={t(msg`修订记录`)} value={String(metrics.revisionCount)} />
+        <MetricCard label={t(msg`已发布次数`)} value={String(metrics.publishedCount)} />
       </div>
 
       <AdminCallout
-        title="目录草稿已经具备版本发布流"
-        description="这里管理每个游戏的版本历史、发布摘要和最近一次正式发布状态。更新目录资料后会形成新的草稿修订，点击发布才会形成正式版本。"
+        title={t(msg`目录草稿已经具备版本发布流`)}
+        description={t(msg`这里管理每个游戏的版本历史、发布摘要和最近一次正式发布状态。更新目录资料后会形成新的草稿修订，点击发布才会形成正式版本。`)}
         tone="info"
       />
 
       {!selectedGameId || !selectedGame ? (
         <AdminEmptyState
-          title="先选择一个游戏"
-          description="选中目录中的具体游戏后，这里会显示版本历史、修订轨迹和发布操作。"
+          title={t(msg`先选择一个游戏`)}
+          description={t(msg`选中目录中的具体游戏后，这里会显示版本历史、修订轨迹和发布操作。`)}
         />
       ) : (
         <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
@@ -252,38 +256,40 @@ export function GameReleaseWorkbench({
               Release Flow
             </div>
             <div className="mt-2 text-xl font-semibold text-[color:var(--text-primary)]">
-              发布 {selectedGame.name}
+              {t(msg`发布 ${selectedGame.name}`)}
             </div>
             <div className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
-              当前审核状态为 {formatReviewStatus(selectedGame.reviewStatus)}，最近一次发布
-              {selectedGame.lastPublishedAt
-                ? `发生在 ${formatTime(selectedGame.lastPublishedAt)}`
-                : " 尚未发生"}
-              。
+              {t(
+                msg`当前审核状态为 ${formatReviewStatus(selectedGame.reviewStatus)}，最近一次发布${
+                  selectedGame.lastPublishedAt
+                    ? t(msg`发生在 ${formatTime(selectedGame.lastPublishedAt)}`)
+                    : t(msg` 尚未发生`)
+                }。`,
+              )}
             </div>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <SummaryField
-                label="当前可见性"
+                label={t(msg`当前可见性`)}
                 value={formatVisibilityScope(selectedGame.visibilityScope)}
               />
               <SummaryField
-                label="草稿状态"
-                value={selectedGame.hasUnpublishedChanges ? "有未发布修改" : "已同步正式版本"}
+                label={t(msg`草稿状态`)}
+                value={selectedGame.hasUnpublishedChanges ? t(msg`有未发布修改`) : t(msg`已同步正式版本`)}
               />
               <SummaryField
-                label="最新修订"
+                label={t(msg`最新修订`)}
                 value={`#${metrics.latestRevisionSequence || "0"}`}
               />
               <SummaryField
-                label="发布摘要"
-                value={selectedGame.lastPublishedSummary || "暂无发布摘要"}
+                label={t(msg`发布摘要`)}
+                value={selectedGame.lastPublishedSummary || t(msg`暂无发布摘要`)}
               />
             </div>
 
             <label className="mt-5 block">
               <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                发布后可见性
+                {t(msg`发布后可见性`)}
               </div>
               <SelectField
                 value={publishVisibilityScope}
@@ -293,22 +299,22 @@ export function GameReleaseWorkbench({
                   )
                 }
               >
-                <option value="published">正式发布</option>
-                <option value="featured">主推可见</option>
-                <option value="coming_soon">即将上线</option>
-                <option value="internal">内部可见</option>
+                <option value="published">{t(msg`正式发布`)}</option>
+                <option value="featured">{t(msg`主推可见`)}</option>
+                <option value="coming_soon">{t(msg`即将上线`)}</option>
+                <option value="internal">{t(msg`内部可见`)}</option>
               </SelectField>
             </label>
 
             <label className="mt-5 block">
               <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                发布摘要
+                {t(msg`发布摘要`)}
               </div>
               <TextAreaField
                 className="min-h-28"
                 value={publishSummary}
                 onChange={(event) => setPublishSummary(event.target.value)}
-                placeholder="例如：开放到正式发布，补齐首期活动位和新手奖励。"
+                placeholder={t(msg`例如：开放到正式发布，补齐首期活动位和新手奖励。`)}
               />
             </label>
 
@@ -318,17 +324,17 @@ export function GameReleaseWorkbench({
                 onClick={handlePublish}
                 disabled={publishMutation.isPending}
               >
-                {publishMutation.isPending ? "发布中..." : "发布为正式版本"}
+                {publishMutation.isPending ? t(msg`发布中...`) : t(msg`发布为正式版本`)}
               </Button>
               {selectedGame.originSubmissionId ? (
                 <StatusPill tone="warning">
-                  关联投稿 {selectedGame.originSubmissionId}
+                  {t(msg`关联投稿 ${selectedGame.originSubmissionId}`)}
                 </StatusPill>
               ) : null}
               <StatusPill
                 tone={selectedGame.hasUnpublishedChanges ? "warning" : "healthy"}
               >
-                {selectedGame.hasUnpublishedChanges ? "待发布草稿" : "已同步"}
+                {selectedGame.hasUnpublishedChanges ? t(msg`待发布草稿`) : t(msg`已同步`)}
               </StatusPill>
             </div>
           </Card>
@@ -340,17 +346,17 @@ export function GameReleaseWorkbench({
                   Revision Timeline
                 </div>
                 <div className="mt-2 text-xl font-semibold text-[color:var(--text-primary)]">
-                  修订历史
+                  {t(msg`修订历史`)}
                 </div>
                 <div className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
-                  记录每次创建、编辑、投稿入库、恢复和正式发布的快照。
+                  {t(msg`记录每次创建、编辑、投稿入库、恢复和正式发布的快照。`)}
                 </div>
               </div>
             </div>
 
             {revisionsQuery.isLoading ? (
               <div className="mt-5">
-                <LoadingBlock label="正在加载版本历史..." />
+                <LoadingBlock label={t(msg`正在加载版本历史...`)} />
               </div>
             ) : null}
             {revisionsQuery.isError && revisionsQuery.error instanceof Error ? (
@@ -362,8 +368,8 @@ export function GameReleaseWorkbench({
             {!revisionsQuery.isLoading && !(revisionsQuery.data?.length ?? 0) ? (
               <div className="mt-5">
                 <AdminEmptyState
-                  title="还没有修订历史"
-                  description="第一次保存或发布后，这里会开始沉淀版本轨迹。"
+                  title={t(msg`还没有修订历史`)}
+                  description={t(msg`第一次保存或发布后，这里会开始沉淀版本轨迹。`)}
                 />
               </div>
             ) : null}
@@ -376,16 +382,16 @@ export function GameReleaseWorkbench({
                       Snapshot Diff
                     </div>
                     <div className="mt-2 text-lg font-semibold text-[color:var(--text-primary)]">
-                      对比修订 #{comparedRevision.revisionSequence}
+                      {t(msg`对比修订 #${comparedRevision.revisionSequence}`)}
                     </div>
                     <div className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
-                      当前草稿和所选修订的差异会列在下面，确认后可以直接把目录草稿恢复到这个快照。
+                      {t(msg`当前草稿和所选修订的差异会列在下面，确认后可以直接把目录草稿恢复到这个快照。`)}
                     </div>
                   </div>
 
                   <label className="block min-w-[220px]">
                     <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                      对比目标
+                      {t(msg`对比目标`)}
                     </div>
                     <SelectField
                       value={compareRevisionId}
@@ -393,9 +399,9 @@ export function GameReleaseWorkbench({
                     >
                       {(revisionsQuery.data ?? []).map((revision) => (
                         <option key={revision.id} value={revision.id}>
-                          {`修订 #${revision.revisionSequence} · ${formatRevisionChangeSource(
+                          {t(msg`修订 #${revision.revisionSequence} · ${formatRevisionChangeSource(
                             revision.changeSource,
-                          )}`}
+                          )}`)}
                         </option>
                       ))}
                     </SelectField>
@@ -404,32 +410,32 @@ export function GameReleaseWorkbench({
 
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
                   <SummaryField
-                    label="对比修订"
+                    label={t(msg`对比修订`)}
                     value={`#${comparedRevision.revisionSequence}`}
                   />
                   <SummaryField
-                    label="变化字段"
+                    label={t(msg`变化字段`)}
                     value={
                       snapshotDiffs.length > 0
-                        ? `${snapshotDiffs.length} 项`
-                        : "当前草稿已一致"
+                        ? t(msg`${snapshotDiffs.length} 项`)
+                        : t(msg`当前草稿已一致`)
                     }
                   />
                   <SummaryField
-                    label="修订来源"
+                    label={t(msg`修订来源`)}
                     value={formatRevisionChangeSource(comparedRevision.changeSource)}
                   />
                 </div>
 
                 <label className="mt-4 block">
                   <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                    恢复摘要
+                    {t(msg`恢复摘要`)}
                   </div>
                   <TextAreaField
                     className="min-h-24"
                     value={restoreSummary}
                     onChange={(event) => setRestoreSummary(event.target.value)}
-                    placeholder={`例如：回滚到修订 #${comparedRevision.revisionSequence}，撤回最近一轮目录改动。`}
+                    placeholder={t(msg`例如：回滚到修订 #${comparedRevision.revisionSequence}，撤回最近一轮目录改动。`)}
                   />
                 </label>
 
@@ -439,9 +445,9 @@ export function GameReleaseWorkbench({
                     onClick={() => handleRestoreRevision(comparedRevision)}
                     disabled={restoreMutation.isPending}
                   >
-                    {restoreMutation.isPending ? "恢复中..." : "恢复到所选修订"}
+                    {restoreMutation.isPending ? t(msg`恢复中...`) : t(msg`恢复到所选修订`)}
                   </Button>
-                  <StatusPill tone="warning">恢复后会生成一条新的草稿修订</StatusPill>
+                  <StatusPill tone="warning">{t(msg`恢复后会生成一条新的草稿修订`)}</StatusPill>
                 </div>
 
                 {snapshotDiffs.length > 0 ? (
@@ -457,7 +463,7 @@ export function GameReleaseWorkbench({
                         <div className="mt-3 grid gap-3 lg:grid-cols-2">
                           <div>
                             <div className="text-xs text-[color:var(--text-muted)]">
-                              当前草稿
+                              {t(msg`当前草稿`)}
                             </div>
                             <div className="mt-1 text-sm leading-6 text-[color:var(--text-primary)]">
                               {diff.currentValue}
@@ -465,7 +471,7 @@ export function GameReleaseWorkbench({
                           </div>
                           <div>
                             <div className="text-xs text-[color:var(--text-muted)]">
-                              所选修订
+                              {t(msg`所选修订`)}
                             </div>
                             <div className="mt-1 text-sm leading-6 text-[color:var(--text-primary)]">
                               {diff.revisionValue}
@@ -478,8 +484,8 @@ export function GameReleaseWorkbench({
                 ) : (
                   <div className="mt-4">
                     <AdminEmptyState
-                      title="当前草稿与所选修订一致"
-                      description="如果只是想补一条回滚记录，也可以直接执行恢复。"
+                      title={t(msg`当前草稿与所选修订一致`)}
+                      description={t(msg`如果只是想补一条回滚记录，也可以直接执行恢复。`)}
                     />
                   </div>
                 )}
@@ -496,14 +502,14 @@ export function GameReleaseWorkbench({
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="text-sm font-semibold text-[color:var(--text-primary)]">
-                          修订 #{revision.revisionSequence}
+                          {t(msg`修订 #${revision.revisionSequence}`)}
                         </span>
                         <StatusPill tone={resolveRevisionTone(revision.changeSource)}>
                           {formatRevisionChangeSource(revision.changeSource)}
                         </StatusPill>
                         {revision.publishedVersion ? (
                           <StatusPill tone="healthy">
-                            发布版 v{revision.publishedVersion}
+                            {t(msg`发布版 v${revision.publishedVersion}`)}
                           </StatusPill>
                         ) : null}
                       </div>
@@ -511,25 +517,25 @@ export function GameReleaseWorkbench({
                         {formatTime(revision.createdAt)}
                       </div>
                       <div className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                        {revision.summary || revision.snapshot.updateNote || "无摘要"}
+                        {revision.summary || revision.snapshot.updateNote || t(msg`无摘要`)}
                       </div>
                     </div>
 
                     <div className="grid gap-2 sm:grid-cols-2 lg:w-[320px]">
                       <SummaryField
-                        label="审核"
+                        label={t(msg`审核`)}
                         value={formatReviewStatus(revision.snapshot.reviewStatus)}
                       />
                       <SummaryField
-                        label="可见性"
+                        label={t(msg`可见性`)}
                         value={formatVisibilityScope(revision.snapshot.visibilityScope)}
                       />
                       <SummaryField
-                        label="运行方式"
+                        label={t(msg`运行方式`)}
                         value={formatRuntimeMode(revision.snapshot.runtimeMode)}
                       />
                       <SummaryField
-                        label="排序权重"
+                        label={t(msg`排序权重`)}
                         value={String(revision.snapshot.sortOrder)}
                       />
                     </div>
@@ -542,14 +548,14 @@ export function GameReleaseWorkbench({
                       }
                       onClick={() => setCompareRevisionId(revision.id)}
                     >
-                      {compareRevisionId === revision.id ? "对比中" : "对比此修订"}
+                      {compareRevisionId === revision.id ? t(msg`对比中`) : t(msg`对比此修订`)}
                     </Button>
                     <Button
                       variant="secondary"
                       onClick={() => handleRestoreRevision(revision)}
                       disabled={restoreMutation.isPending}
                     >
-                      {restoreMutation.isPending ? "恢复中..." : "恢复到此修订"}
+                      {restoreMutation.isPending ? t(msg`恢复中...`) : t(msg`恢复到此修订`)}
                     </Button>
                   </div>
                 </Card>
@@ -576,17 +582,17 @@ function formatRevisionChangeSource(
 ) {
   switch (value) {
     case "draft_created":
-      return "新建草稿";
+      return translateRuntimeMessage(msg`新建草稿`);
     case "draft_updated":
-      return "更新草稿";
+      return translateRuntimeMessage(msg`更新草稿`);
     case "publish":
-      return "正式发布";
+      return translateRuntimeMessage(msg`正式发布`);
     case "restore":
-      return "恢复修订";
+      return translateRuntimeMessage(msg`恢复修订`);
     case "submission_ingest":
-      return "投稿入库";
+      return translateRuntimeMessage(msg`投稿入库`);
     case "seed_backfill":
-      return "历史回填";
+      return translateRuntimeMessage(msg`历史回填`);
   }
 }
 
@@ -641,124 +647,125 @@ function createSnapshotDiffs(
   currentSnapshot: CatalogSnapshot,
   revisionSnapshot: CatalogSnapshot,
 ): SnapshotDiff[] {
+  const t = translateRuntimeMessage;
   return [
-    buildSnapshotDiff("name", "游戏名", currentSnapshot.name, revisionSnapshot.name),
-    buildSnapshotDiff("slogan", "一句话卖点", currentSnapshot.slogan, revisionSnapshot.slogan),
+    buildSnapshotDiff("name", t(msg`游戏名`), currentSnapshot.name, revisionSnapshot.name),
+    buildSnapshotDiff("slogan", t(msg`一句话卖点`), currentSnapshot.slogan, revisionSnapshot.slogan),
     buildSnapshotDiff(
       "description",
-      "游戏说明",
+      t(msg`游戏说明`),
       currentSnapshot.description,
       revisionSnapshot.description,
     ),
-    buildSnapshotDiff("studio", "工作室", currentSnapshot.studio, revisionSnapshot.studio),
-    buildSnapshotDiff("badge", "徽标", currentSnapshot.badge, revisionSnapshot.badge),
+    buildSnapshotDiff("studio", t(msg`工作室`), currentSnapshot.studio, revisionSnapshot.studio),
+    buildSnapshotDiff("badge", t(msg`徽标`), currentSnapshot.badge, revisionSnapshot.badge),
     buildSnapshotDiff(
       "heroLabel",
-      "主视觉标签",
+      t(msg`主视觉标签`),
       currentSnapshot.heroLabel,
       revisionSnapshot.heroLabel,
     ),
-    buildSnapshotDiff("category", "分类", currentSnapshot.category, revisionSnapshot.category),
+    buildSnapshotDiff("category", t(msg`分类`), currentSnapshot.category, revisionSnapshot.category),
     buildSnapshotDiff("tone", "Tone", currentSnapshot.tone, revisionSnapshot.tone),
     buildSnapshotDiff(
       "deckLabel",
-      "卡片标签",
+      t(msg`卡片标签`),
       currentSnapshot.deckLabel,
       revisionSnapshot.deckLabel,
     ),
     buildSnapshotDiff(
       "estimatedDuration",
-      "时长",
+      t(msg`时长`),
       currentSnapshot.estimatedDuration,
       revisionSnapshot.estimatedDuration,
     ),
     buildSnapshotDiff(
       "rewardLabel",
-      "奖励标签",
+      t(msg`奖励标签`),
       currentSnapshot.rewardLabel,
       revisionSnapshot.rewardLabel,
     ),
     buildSnapshotDiff(
       "sessionObjective",
-      "本局目标",
+      t(msg`本局目标`),
       currentSnapshot.sessionObjective,
       revisionSnapshot.sessionObjective,
     ),
     buildSnapshotDiff(
       "publisherKind",
-      "来源",
+      t(msg`来源`),
       currentSnapshot.publisherKind,
       revisionSnapshot.publisherKind,
     ),
     buildSnapshotDiff(
       "productionKind",
-      "生产方式",
+      t(msg`生产方式`),
       currentSnapshot.productionKind,
       revisionSnapshot.productionKind,
     ),
     buildSnapshotDiff(
       "runtimeMode",
-      "运行方式",
+      t(msg`运行方式`),
       currentSnapshot.runtimeMode,
       revisionSnapshot.runtimeMode,
     ),
     buildSnapshotDiff(
       "reviewStatus",
-      "审核状态",
+      t(msg`审核状态`),
       currentSnapshot.reviewStatus,
       revisionSnapshot.reviewStatus,
     ),
     buildSnapshotDiff(
       "visibilityScope",
-      "可见性",
+      t(msg`可见性`),
       currentSnapshot.visibilityScope,
       revisionSnapshot.visibilityScope,
     ),
     buildSnapshotDiff(
       "sourceCharacterId",
-      "来源角色 ID",
+      t(msg`来源角色 ID`),
       currentSnapshot.sourceCharacterId ?? "",
       revisionSnapshot.sourceCharacterId ?? "",
     ),
     buildSnapshotDiff(
       "sourceCharacterName",
-      "来源角色名",
+      t(msg`来源角色名`),
       currentSnapshot.sourceCharacterName ?? "",
       revisionSnapshot.sourceCharacterName ?? "",
     ),
     buildSnapshotDiff(
       "aiHighlights",
-      "AI 亮点",
+      t(msg`AI 亮点`),
       formatListValue(currentSnapshot.aiHighlights),
       formatListValue(revisionSnapshot.aiHighlights),
     ),
     buildSnapshotDiff(
       "tags",
-      "标签",
+      t(msg`标签`),
       formatListValue(currentSnapshot.tags),
       formatListValue(revisionSnapshot.tags),
     ),
     buildSnapshotDiff(
       "updateNote",
-      "更新说明",
+      t(msg`更新说明`),
       currentSnapshot.updateNote,
       revisionSnapshot.updateNote,
     ),
     buildSnapshotDiff(
       "playersLabel",
-      "玩家状态",
+      t(msg`玩家状态`),
       currentSnapshot.playersLabel,
       revisionSnapshot.playersLabel,
     ),
     buildSnapshotDiff(
       "friendsLabel",
-      "好友状态",
+      t(msg`好友状态`),
       currentSnapshot.friendsLabel,
       revisionSnapshot.friendsLabel,
     ),
     buildSnapshotDiff(
       "sortOrder",
-      "排序权重",
+      t(msg`排序权重`),
       String(currentSnapshot.sortOrder),
       String(revisionSnapshot.sortOrder),
     ),
@@ -782,7 +789,7 @@ function buildSnapshotDiff(
 
 function formatSnapshotValue(value: string) {
   const nextValue = value.trim();
-  return nextValue || "未填写";
+  return nextValue || translateRuntimeMessage(msg`未填写`);
 }
 
 function formatListValue(value: string[]) {
@@ -792,41 +799,41 @@ function formatListValue(value: string[]) {
 function formatReviewStatus(value: AdminGameCatalogDetail["reviewStatus"]) {
   switch (value) {
     case "internal_seed":
-      return "内部种子";
+      return translateRuntimeMessage(msg`内部种子`);
     case "pending_review":
-      return "待审核";
+      return translateRuntimeMessage(msg`待审核`);
     case "approved":
-      return "已通过";
+      return translateRuntimeMessage(msg`已通过`);
     case "rejected":
-      return "已拒绝";
+      return translateRuntimeMessage(msg`已拒绝`);
     case "suspended":
-      return "已暂停";
+      return translateRuntimeMessage(msg`已暂停`);
   }
 }
 
 function formatVisibilityScope(value: AdminGameCatalogDetail["visibilityScope"]) {
   switch (value) {
     case "featured":
-      return "主推可见";
+      return translateRuntimeMessage(msg`主推可见`);
     case "published":
-      return "正式发布";
+      return translateRuntimeMessage(msg`正式发布`);
     case "coming_soon":
-      return "即将上线";
+      return translateRuntimeMessage(msg`即将上线`);
     case "internal":
-      return "内部可见";
+      return translateRuntimeMessage(msg`内部可见`);
   }
 }
 
 function formatRuntimeMode(value: AdminGameCatalogDetail["runtimeMode"]) {
   switch (value) {
     case "workspace_mock":
-      return "工作区占位";
+      return translateRuntimeMessage(msg`工作区占位`);
     case "chat_native":
-      return "聊天式 AI 游戏";
+      return translateRuntimeMessage(msg`聊天式 AI 游戏`);
     case "embedded_web":
-      return "嵌入式 Web";
+      return translateRuntimeMessage(msg`嵌入式 Web`);
     case "remote_session":
-      return "远程会话";
+      return translateRuntimeMessage(msg`远程会话`);
   }
 }
 

@@ -4,6 +4,7 @@ import * as path from 'node:path';
 import Database from 'better-sqlite3';
 import { prepareDatabasePath } from './database-path';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 function seedDatabase(filePath: string, rowCount: number) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   const db = new Database(filePath);
@@ -75,3 +76,4 @@ describe('prepareDatabasePath', () => {
   // hardcoded relative to the repo root and would collide with whatever
   // database.sqlite actually exists in the working tree at test time.
 });
+// i18n-ignore-end

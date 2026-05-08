@@ -593,6 +593,7 @@ async function runScenario() {
 
   const adminHeaders = {
     Authorization: `Bearer ${adminSessionResponse.body.accessToken}`,
+    "Accept-Language": "en-US",
   };
 
   const adminTokenRejectedByClientResponse = await apiFetch(
@@ -1067,7 +1068,7 @@ async function runScenario() {
   );
   assert.equal(
     reconcileNotFoundResponse.body.message,
-    "找不到该云世界。",
+    "Cloud world not found.",
     "missing world message should be readable",
   );
 

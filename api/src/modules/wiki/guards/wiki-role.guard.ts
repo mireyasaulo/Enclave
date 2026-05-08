@@ -1,9 +1,6 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
+import { CanActivate, ExecutionContext, HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { Reflector } from '@nestjs/core';
 import type { AuthenticatedRequest } from '../../auth/jwt-auth.guard';
 
@@ -35,8 +32,13 @@ export class WikiRoleGuard implements CanActivate {
     const req = ctx.switchToHttp().getRequest<AuthenticatedRequest>();
     const role = req.user?.role;
     if (rankOf(role) < rankOf(required)) {
-      throw new ForbiddenException(`需要 ${required} 及以上权限`);
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: { reason: `需要 ${required} 及以上权限` },
+        legacyMessage: `需要 ${required} 及以上权限`,
+      });
     }
     return true;
   }
 }
+// i18n-ignore-end

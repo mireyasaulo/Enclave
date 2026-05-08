@@ -37,9 +37,12 @@ export interface MomentVideoAsset {
 
 export type MomentMediaAsset = MomentImageAsset | MomentVideoAsset;
 
+export type MomentVisibility = 'public' | 'friends' | 'private';
+
 export type CreateMomentInput = {
   text?: string;
   location?: string;
   contentType?: MomentContentType;
   media?: MomentMediaAsset[];
+  visibility?: MomentVisibility;
 };

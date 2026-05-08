@@ -1,5 +1,9 @@
 import type { KeyboardEvent, Ref } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { Button, cn } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 
 type MomentCommentComposerProps = {
   value: string;
@@ -25,8 +29,8 @@ export function MomentCommentComposer({
   inputClassName,
   buttonClassName,
   inputRef,
-  submitLabel = "发送",
-  pendingLabel = "发送中...",
+  submitLabel = t(msg`发送`),
+  pendingLabel = t(msg`发送中...`),
   onChange,
   onSubmit,
 }: MomentCommentComposerProps) {
@@ -56,7 +60,7 @@ export function MomentCommentComposer({
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        aria-label="评论内容"
+        aria-label={t(msg`评论内容`)}
         disabled={disabled}
         inputMode="text"
         enterKeyHint="send"

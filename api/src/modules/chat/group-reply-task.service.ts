@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomUUID } from 'crypto';
@@ -13,6 +14,7 @@ import { ChatGateway } from './chat.gateway';
 import { GroupEntity } from './group.entity';
 import { GroupMessageEntity } from './group-message.entity';
 import {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   GroupReplyTaskEntity,
   type GroupReplyTaskStatus,
 } from './group-reply-task.entity';
@@ -191,18 +193,26 @@ export class GroupReplyTaskService {
   async retryTask(taskId: string) {
     const task = await this.taskRepo.findOneBy({ id: taskId });
     if (!task) {
-      throw new NotFoundException(`Group reply task ${taskId} not found`);
+      throw new AppError('CHAT_REPLY_TASK_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { taskId },
+        legacyMessage: `Group reply task ${taskId} not found`,
+      });
     }
     if (task.status === 'pending' || task.status === 'processing') {
-      throw new BadRequestException('Task is already queued or processing');
+      throw new AppError('CHAT_REPLY_TASK_INVALID_STATE', {
+        legacyMessage: 'Task is already queued or processing',
+      });
     }
     if (task.status === 'sent') {
-      throw new BadRequestException('Sent task cannot be retried');
+      throw new AppError('CHAT_REPLY_TASK_INVALID_STATE', {
+        legacyMessage: 'Sent task cannot be retried',
+      });
     }
     if (await this.hasNewerUserMessage(task)) {
-      throw new BadRequestException(
-        'Task is stale because a newer user message already arrived',
-      );
+      throw new AppError('CHAT_REPLY_TASK_INVALID_STATE', {
+        legacyMessage: 'Task is stale because a newer user message already arrived',
+      });
     }
 
     task.status = 'pending';
@@ -222,21 +232,27 @@ export class GroupReplyTaskService {
       order: { sequenceIndex: 'ASC', createdAt: 'ASC' },
     });
     if (!tasks.length) {
-      throw new NotFoundException(`Group reply turn ${turnId} not found`);
+      throw new AppError('CHAT_REPLY_TASK_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { turnId },
+        legacyMessage: `Group reply turn ${turnId} not found`,
+      });
     }
 
     const [primaryTask] = tasks;
     if (await this.hasNewerUserMessage(primaryTask)) {
-      throw new BadRequestException(
-        'Turn is stale because a newer user message already arrived',
-      );
+      throw new AppError('CHAT_REPLY_TASK_INVALID_STATE', {
+        legacyMessage: 'Turn is stale because a newer user message already arrived',
+      });
     }
 
     const retryableTasks = tasks.filter(
       (task) => task.status === 'failed' || task.status === 'cancelled',
     );
     if (!retryableTasks.length) {
-      throw new BadRequestException('Turn has no retryable tasks');
+      throw new AppError('CHAT_REPLY_TASK_INVALID_STATE', {
+        legacyMessage: 'Turn has no retryable tasks',
+      });
     }
 
     const now = new Date();
@@ -283,7 +299,9 @@ export class GroupReplyTaskService {
       GROUP_REPLY_TASK_TERMINAL_STATUSES.includes(status),
     );
     if (!statuses.length) {
-      throw new BadRequestException('Cleanup requires terminal task statuses');
+      throw new AppError('CHAT_REPLY_TASK_INVALID_STATE', {
+        legacyMessage: 'Cleanup requires terminal task statuses',
+      });
     }
 
     const cutoff = new Date(
@@ -562,7 +580,11 @@ export class GroupReplyTaskService {
   ): Promise<Date> {
     const group = await this.groupRepo.findOneBy({ id: groupId });
     if (!group) {
-      throw new Error(`Group ${groupId} not found`);
+      throw new AppError('CHAT_GROUP_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { groupId },
+        legacyMessage: `Group ${groupId} not found`,
+      });
     }
 
     const message = this.groupMessageRepo.create({
@@ -834,3 +856,4 @@ export class GroupReplyTaskService {
     await this.groupRepo.save(group);
   }
 }
+// i18n-ignore-end

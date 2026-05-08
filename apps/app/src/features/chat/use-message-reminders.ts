@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createMessageReminder,
@@ -8,7 +9,10 @@ import {
   type CreateMessageReminderRequest,
   type MessageReminderRecord,
 } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
+
+const t = translateRuntimeMessage;
 import {
   removeLocalChatMessageReminder,
   replaceLocalChatMessageReminders,
@@ -29,7 +33,7 @@ function buildLegacyReminderRecord(
     threadId: reminder.threadId,
     threadType: reminder.threadType,
     threadTitle: reminder.threadTitle,
-    previewText: reminder.previewText?.trim() || "聊天消息",
+    previewText: reminder.previewText?.trim() || t(msg`聊天消息`),
     remindAt: reminder.remindAt,
     notifiedAt: reminder.notifiedAt,
     createdAt: reminder.notifiedAt ?? reminder.remindAt,
@@ -69,7 +73,7 @@ export function useMessageReminders() {
   const createReminderMutation = useMutation({
     mutationFn: async (payload: SetMessageReminderInput) => {
       if (!baseUrl) {
-        throw new Error("当前世界地址不可用，暂时无法同步提醒。");
+        throw new Error(t(msg`当前世界地址不可用，暂时无法同步提醒。`));
       }
 
       return createMessageReminder(payload, baseUrl);
@@ -89,7 +93,7 @@ export function useMessageReminders() {
   const removeReminderMutation = useMutation({
     mutationFn: async (sourceId: string) => {
       if (!baseUrl) {
-        throw new Error("当前世界地址不可用，暂时无法同步提醒。");
+        throw new Error(t(msg`当前世界地址不可用，暂时无法同步提醒。`));
       }
 
       await removeMessageReminder(sourceId, baseUrl);
@@ -112,7 +116,7 @@ export function useMessageReminders() {
       notifiedAt?: string;
     }) => {
       if (!baseUrl) {
-        throw new Error("当前世界地址不可用，暂时无法同步提醒。");
+        throw new Error(t(msg`当前世界地址不可用，暂时无法同步提醒。`));
       }
 
       return markMessageReminderNotified(
@@ -239,7 +243,7 @@ export function useMessageReminders() {
   ) {
     if (!baseUrl || !input.threadId.trim()) {
       if (!fallbackReminder) {
-        throw new Error("当前消息暂时不能设提醒。");
+        throw new Error(t(msg`当前消息暂时不能设提醒。`));
       }
 
       replaceLocalChatMessageReminders([

@@ -1,4 +1,5 @@
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CloudWorldLifecycleStatus,
   CloudWorldRequestStatus,
 } from "@yinjie/contracts";
@@ -169,3 +170,4 @@ export function getRequestWorldSyncDecision(input: {
       };
   }
 }
+// i18n-ignore-end

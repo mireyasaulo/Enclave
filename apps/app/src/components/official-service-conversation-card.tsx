@@ -1,8 +1,12 @@
 import { type MouseEvent as ReactMouseEvent } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { OfficialAccountServiceConversationSummary } from "@yinjie/contracts";
 import { AvatarChip } from "./avatar-chip";
 import { OfficialMessageEntryRow } from "./official-message-entry-row";
 import { formatConversationTimestamp } from "../lib/format";
+
+const t = translateRuntimeMessage;
 
 export function OfficialServiceConversationCard({
   conversation,
@@ -27,7 +31,7 @@ export function OfficialServiceConversationCard({
       active={active}
       contextMenuOpen={contextMenuOpen}
       title={conversation.account.name}
-      preview={conversation.preview ?? "打开服务号消息"}
+      preview={conversation.preview ?? t(msg`打开服务号消息`)}
       timestampLabel={formatConversationTimestamp(conversation.lastDeliveredAt)}
       unreadCount={conversation.unreadCount}
       muted={conversation.isMuted}

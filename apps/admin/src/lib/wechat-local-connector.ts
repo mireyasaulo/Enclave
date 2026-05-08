@@ -1,5 +1,6 @@
 import type { WechatSyncContactBundle } from "@yinjie/contracts";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 export const DEFAULT_WECHAT_CONNECTOR_BASE_URL = "http://127.0.0.1:17364";
 const WECHAT_CONNECTOR_STORAGE_KEY = "yinjie_wechat_connector_settings";
 
@@ -341,22 +342,4 @@ export function openWechatConnectorUpstreamService(
     },
   );
 }
-
-function normalizeMessageMode(
-  value?: string | null,
-): WechatConnectorBundleMessageMode | null {
-  return value === "all" ? "all" : value === "recent" ? "recent" : null;
-}
-
-function normalizePositiveInteger(value: unknown, fallback: number) {
-  const normalized =
-    typeof value === "number"
-      ? value
-      : typeof value === "string"
-        ? Number(value)
-        : Number.NaN;
-  if (!Number.isFinite(normalized)) {
-    return fallback;
-  }
-  return Math.max(1, Math.trunc(normalized));
-}
+// i18n-ignore-end

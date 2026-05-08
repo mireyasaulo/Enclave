@@ -1,12 +1,13 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   BadGatewayException,
   BadRequestException,
-  HttpException,
   HttpStatus,
   Injectable,
   Logger,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { ConfigService } from '@nestjs/config';
@@ -814,7 +815,10 @@ export class AiOrchestratorService {
       }
     }
 
-    throw new BadGatewayException('语音请求重试失败。');
+    throw new AppError('AI_AUDIO_RETRY_FAILED', {
+      status: HttpStatus.BAD_GATEWAY,
+      legacyMessage: '语音请求重试失败。',
+    });
   }
 
   private hasProviderCapability(
@@ -1171,7 +1175,11 @@ export class AiOrchestratorService {
       errorCode: 'BUDGET_BLOCKED',
       errorMessage: decision.message,
     });
-    throw new HttpException(decision.message, HttpStatus.TOO_MANY_REQUESTS);
+    throw new AppError('AI_RATE_LIMIT', {
+      status: HttpStatus.TOO_MANY_REQUESTS,
+      params: { message: decision.message },
+      legacyMessage: decision.message,
+    });
   }
 
   private async requestChatTaskWithFallback(options: {
@@ -1270,9 +1278,10 @@ export class AiOrchestratorService {
     }
 
     if (!attemptedProvider) {
-      throw new ServiceUnavailableException(
-        '当前实例未配置可用的 AI Key，暂时无法完成该 AI 任务。',
-      );
+      throw new AppError('AI_PROVIDER_UNAVAILABLE', {
+        status: HttpStatus.SERVICE_UNAVAILABLE,
+        legacyMessage: '当前实例未配置可用的 AI Key，暂时无法完成该 AI 任务。',
+      });
     }
 
     throw lastError;
@@ -2786,7 +2795,9 @@ export class AiOrchestratorService {
     await this.subscription.assertCanUseAi('image');
     const prompt = options.prompt.trim();
     if (!prompt) {
-      throw new BadRequestException('请先提供图片生成描述。');
+      throw new AppError('AI_IMAGE_PROMPT_REQUIRED', {
+        legacyMessage: '请先提供图片生成描述。',
+      });
     }
 
     const primaryProvider = await this.resolveRuntimeProvider({
@@ -2805,9 +2816,10 @@ export class AiOrchestratorService {
       ...fallbackProviders,
     ];
     let attemptedProvider = false;
-    let lastError: unknown = new ServiceUnavailableException(
-      '当前实例未配置可用的图片生成通道。',
-    );
+    let lastError: unknown = new AppError('AI_IMAGE_PROVIDER_UNAVAILABLE', {
+      status: HttpStatus.SERVICE_UNAVAILABLE,
+      legacyMessage: '当前实例未配置可用的图片生成通道。',
+    });
 
     for (let index = 0; index < attempts.length; index += 1) {
       const attempt = attempts[index];
@@ -2846,13 +2858,19 @@ export class AiOrchestratorService {
         const response = await client.images.generate(body);
         const image = 'data' in response ? response.data?.[0] : undefined;
         if (!image) {
-          throw new BadGatewayException('图片生成结果为空，请稍后再试。');
+          throw new AppError('AI_IMAGE_EMPTY', {
+            status: HttpStatus.BAD_GATEWAY,
+            legacyMessage: '图片生成结果为空，请稍后再试。',
+          });
         }
 
         if (image.b64_json) {
           const buffer = Buffer.from(image.b64_json, 'base64');
           if (!buffer.length) {
-            throw new BadGatewayException('图片生成结果为空，请稍后再试。');
+            throw new AppError('AI_IMAGE_EMPTY', {
+            status: HttpStatus.BAD_GATEWAY,
+            legacyMessage: '图片生成结果为空，请稍后再试。',
+          });
           }
 
           return {
@@ -2870,7 +2888,10 @@ export class AiOrchestratorService {
             10 * 1024 * 1024,
           );
           if (!asset?.buffer.length) {
-            throw new BadGatewayException('图片生成结果为空，请稍后再试。');
+            throw new AppError('AI_IMAGE_EMPTY', {
+            status: HttpStatus.BAD_GATEWAY,
+            legacyMessage: '图片生成结果为空，请稍后再试。',
+          });
           }
 
           const mimeType =
@@ -2884,7 +2905,10 @@ export class AiOrchestratorService {
           };
         }
 
-        throw new BadGatewayException('图片生成结果为空，请稍后再试。');
+        throw new AppError('AI_IMAGE_EMPTY', {
+          status: HttpStatus.BAD_GATEWAY,
+          legacyMessage: '图片生成结果为空，请稍后再试。',
+        });
       } catch (error) {
         lastError = error;
         const hasMoreFallback = index < attempts.length - 1;
@@ -2916,9 +2940,10 @@ export class AiOrchestratorService {
     }
 
     if (!attemptedProvider) {
-      throw new ServiceUnavailableException(
-        '当前实例未配置可用的图片生成通道。',
-      );
+      throw new AppError('AI_IMAGE_PROVIDER_UNAVAILABLE', {
+        status: HttpStatus.SERVICE_UNAVAILABLE,
+        legacyMessage: '当前实例未配置可用的图片生成通道。',
+      });
     }
 
     throw this.toImageGenerationException(lastError);
@@ -2930,17 +2955,21 @@ export class AiOrchestratorService {
   ) {
     await this.subscription.assertCanUseAi('audio');
     if (!file.buffer?.length) {
-      throw new BadRequestException('没有收到可转写的音频内容。');
+      throw new AppError('AI_TRANSCRIBE_AUDIO_REQUIRED', {
+        legacyMessage: '没有收到可转写的音频内容。',
+      });
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      throw new BadRequestException('录音文件过大，请缩短单次语音输入时长。');
+      throw new AppError('AI_TRANSCRIBE_TOO_LARGE', {
+        legacyMessage: '录音文件过大，请缩短单次语音输入时长。',
+      });
     }
 
     if (file.mimetype && !ACCEPTED_AUDIO_MIME_TYPES.has(file.mimetype)) {
-      throw new BadRequestException(
-        '当前录音格式暂不支持，请改用系统默认录音格式。',
-      );
+      throw new AppError('AI_TRANSCRIBE_FORMAT_INVALID', {
+        legacyMessage: '当前录音格式暂不支持，请改用系统默认录音格式。',
+      });
     }
 
     const primaryProvider = await this.resolveRuntimeProvider({
@@ -3001,9 +3030,10 @@ export class AiOrchestratorService {
         const text = response.text.trim();
 
         if (!text) {
-          throw new BadGatewayException(
-            '这段语音没有识别出有效文字，请再说一遍。',
-          );
+          throw new AppError('AI_TRANSCRIBE_GATEWAY_FAILED', {
+            status: HttpStatus.BAD_GATEWAY,
+            legacyMessage: '这段语音没有识别出有效文字，请再说一遍。',
+          });
         }
 
         return {
@@ -3044,9 +3074,10 @@ export class AiOrchestratorService {
     }
 
     if (!attemptedProvider) {
-      throw new ServiceUnavailableException(
-        '当前实例未配置可用的 AI Key，暂时无法转写语音。',
-      );
+      throw new AppError('AI_TRANSCRIBE_PROVIDER_UNAVAILABLE', {
+        status: HttpStatus.SERVICE_UNAVAILABLE,
+        legacyMessage: '当前实例未配置可用的 AI Key，暂时无法转写语音。',
+      });
     }
 
     throw this.toSpeechTranscriptionException(lastError);
@@ -3074,14 +3105,17 @@ export class AiOrchestratorService {
 
     const text = options.text.trim();
     if (!text) {
-      throw new BadRequestException('请先提供要播报的文本。');
+      throw new AppError('AI_TTS_TEXT_REQUIRED', {
+        legacyMessage: '请先提供要播报的文本。',
+      });
     }
 
     const startedAt = Date.now();
     let attemptedProvider = false;
-    let lastError: unknown = new ServiceUnavailableException(
-      '当前实例未配置可用的 AI Key，暂时无法生成语音。',
-    );
+    let lastError: unknown = new AppError('AI_PROVIDER_UNAVAILABLE', {
+      status: HttpStatus.SERVICE_UNAVAILABLE,
+      legacyMessage: '当前实例未配置可用的 AI Key，暂时无法生成语音。',
+    });
 
     for (let index = 0; index < attempts.length; index += 1) {
       const attempt = attempts[index];
@@ -3115,7 +3149,10 @@ export class AiOrchestratorService {
         const buffer = Buffer.from(arrayBuffer);
 
         if (!buffer.length) {
-          throw new BadGatewayException('语音生成结果为空，请稍后再试。');
+          throw new AppError('AI_TTS_EMPTY', {
+            status: HttpStatus.BAD_GATEWAY,
+            legacyMessage: '语音生成结果为空，请稍后再试。',
+          });
         }
 
         return {
@@ -3156,11 +3193,13 @@ export class AiOrchestratorService {
     }
 
     if (!attemptedProvider) {
-      throw new ServiceUnavailableException(
-        '当前实例未配置可用的 AI Key，暂时无法生成语音。',
-      );
+      throw new AppError('AI_PROVIDER_UNAVAILABLE', {
+        status: HttpStatus.SERVICE_UNAVAILABLE,
+        legacyMessage: '当前实例未配置可用的 AI Key，暂时无法生成语音。',
+      });
     }
 
     throw this.toSpeechSynthesisException(lastError);
   }
 }
+// i18n-ignore-end

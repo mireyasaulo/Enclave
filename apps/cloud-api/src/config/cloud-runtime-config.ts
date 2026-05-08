@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   CLOUD_ADMIN_JWT_AUDIENCE_DEFAULT,
   CLOUD_ADMIN_REFRESH_JWT_AUDIENCE_DEFAULT,
@@ -141,3 +142,4 @@ export function parseJwtDurationToMs(value: string) {
       return null;
   }
 }
+// i18n-ignore-end

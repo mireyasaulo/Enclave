@@ -37,6 +37,7 @@ export function buildOptimisticDirectMessage(input: {
 
   if (payload.type === "sticker") {
     const stickerLabel = sanitizeDisplayedChatText(payload.text ?? "").replace(
+      // i18n-ignore-next-line: protocol marker stripped from text field
       /^\[表情包\]\s*/,
       "",
     );
@@ -49,6 +50,7 @@ export function buildOptimisticDirectMessage(input: {
       senderId: ownerId,
       senderName,
       type: "sticker",
+      // i18n-ignore-next-line: protocol marker for sticker text payload
       text: payload.text ?? "[表情包]",
       attachment: optimisticAttachment
         ? {
@@ -544,6 +546,7 @@ function normalizeRetryText(message: ThreadMessageLike) {
   return implicitText && text === implicitText ? undefined : text;
 }
 
+// i18n-ignore-start: protocol markers for attachment text field, used for round-trip matching
 function buildImplicitAttachmentText(
   type: string,
   attachment?: MessageAttachment,
@@ -578,3 +581,4 @@ function buildImplicitAttachmentText(
 
   return "";
 }
+// i18n-ignore-end

@@ -6,6 +6,8 @@ import {
   useMemo,
   useState,
 } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
@@ -50,24 +52,28 @@ import { searchStringToObject } from "../lib/route-search";
 import { getCurrentWindowTargetPath } from "../runtime/desktop-windowing";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
+const t = translateRuntimeMessage;
+
 const DesktopNotesWorkspace = lazy(async () => {
   const mod = await import("../features/desktop/chat/desktop-notes-workspace");
   return { default: mod.DesktopNotesWorkspace };
 });
 
-const categoryLabels: Array<{
+function getCategoryLabels(): Array<{
   id: "all" | DesktopFavoriteCategory;
   label: string;
-}> = [
-  { id: "all", label: "全部收藏" },
-  { id: "messages", label: "消息" },
-  { id: "notes", label: "笔记" },
-  { id: "contacts", label: "联系人" },
-  { id: "officialAccounts", label: "公众号" },
-  { id: "moments", label: "朋友圈" },
-  { id: "feed", label: "广场动态" },
-  { id: "channels", label: "视频号" },
-];
+}> {
+  return [
+    { id: "all", label: t(msg`全部收藏`) },
+    { id: "messages", label: t(msg`消息`) },
+    { id: "notes", label: t(msg`笔记`) },
+    { id: "contacts", label: t(msg`联系人`) },
+    { id: "officialAccounts", label: t(msg`公众号`) },
+    { id: "moments", label: t(msg`朋友圈`) },
+    { id: "feed", label: t(msg`广场动态`) },
+    { id: "channels", label: t(msg`视频号`) },
+  ];
+}
 
 export function FavoritesPage() {
   const isDesktopLayout = useDesktopLayout();
@@ -256,13 +262,14 @@ export function FavoritesPage() {
           ? await queryClient.fetchQuery({
               queryKey: ["app-favorites", baseUrl],
               queryFn: () => getFavorites(baseUrl),
+              staleTime: 0,
             })
           : (favoritesQuery.data ?? []);
 
       setFavorites(
         mergeDesktopFavoriteRecords(nextRemoteFavorites, nextLocalFavorites),
       );
-      setNotice(`${item.title} 已从收藏中移除。`);
+      setNotice(t(msg`${item.title} 已从收藏中移除。`));
     },
   });
 
@@ -367,9 +374,9 @@ export function FavoritesPage() {
   if (!isDesktopLayout) {
     return (
       <DesktopLayoutRequiredState
-        title="收藏当前仅提供桌面布局"
-        description="收藏工作区目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到消息页继续浏览和发送收藏内容。"
-        actionLabel="返回消息"
+        title={t(msg`收藏当前仅提供桌面布局`)}
+        description={t(msg`收藏工作区目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到消息页继续浏览和发送收藏内容。`)}
+        actionLabel={t(msg`返回消息`)}
         fallbackTo="/tabs/chat"
       />
     );
@@ -407,15 +414,15 @@ export function FavoritesPage() {
 
   return (
     <DesktopUtilityShell
-      title="收藏"
+      title={t(msg`收藏`)}
       subtitle={
         noteEditorRouteState
           ? noteEditorRouteState.noteId
-            ? "这条笔记默认属于收藏，保存后会继续留在收藏列表里。"
-            : "新建笔记会直接作为收藏内容保存。"
+            ? t(msg`这条笔记默认属于收藏，保存后会继续留在收藏列表里。`)
+            : t(msg`新建笔记会直接作为收藏内容保存。`)
           : normalizedSearchText
-            ? `搜索“${searchText.trim()}”命中 ${filteredFavorites.length} 项`
-            : `${counts.all} 项内容已收进桌面收藏`
+            ? t(msg`搜索“${searchText.trim()}”命中 ${filteredFavorites.length} 项`)
+            : t(msg`${counts.all} 项内容已收进桌面收藏`)
       }
       toolbar={
         <Button
@@ -425,7 +432,7 @@ export function FavoritesPage() {
           className="h-9 rounded-[10px] bg-[color:var(--brand-primary)] px-3 text-white hover:opacity-95"
         >
           <FileText size={15} />
-          新建笔记
+          {t(msg`新建笔记`)}
         </Button>
       }
       sidebar={
@@ -434,14 +441,14 @@ export function FavoritesPage() {
             <TextField
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
-              placeholder="搜索已收藏内容"
+              placeholder={t(msg`搜索已收藏内容`)}
               className="rounded-[12px] border-[color:var(--border-faint)] bg-white px-4 py-2.5 shadow-none"
             />
           </div>
 
           <div className="min-h-0 flex-1 overflow-auto p-3">
             <div className="space-y-1">
-              {categoryLabels.map((item) => (
+              {getCategoryLabels().map((item) => (
                 <button
                   key={item.id}
                   type="button"
@@ -463,20 +470,20 @@ export function FavoritesPage() {
 
             <div className="mt-4 rounded-[14px] border border-[color:var(--border-faint)] bg-white px-4 py-4">
               <div className="text-xs text-[color:var(--text-muted)]">
-                收藏概览
+                {t(msg`收藏概览`)}
               </div>
               <div className="mt-3 space-y-3">
                 <FavoriteMetric
-                  label="内容流"
-                  value={`${counts.moments + counts.feed + counts.channels} 项`}
+                  label={t(msg`内容流`)}
+                  value={t(msg`${counts.moments + counts.feed + counts.channels} 项`)}
                 />
                 <FavoriteMetric
-                  label="消息、笔记与联系人"
-                  value={`${counts.messages + counts.notes + counts.contacts} 项`}
+                  label={t(msg`消息、笔记与联系人`)}
+                  value={t(msg`${counts.messages + counts.notes + counts.contacts} 项`)}
                 />
                 <FavoriteMetric
-                  label="公众号"
-                  value={`${counts.officialAccounts} 项`}
+                  label={t(msg`公众号`)}
+                  value={t(msg`${counts.officialAccounts} 项`)}
                 />
               </div>
             </div>
@@ -488,10 +495,10 @@ export function FavoritesPage() {
           <div className="flex h-full min-h-0 flex-col">
             <div className="border-b border-[color:var(--border-faint)] px-5 py-4">
               <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                收藏详情
+                {t(msg`收藏详情`)}
               </div>
               <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                右侧预览当前选中的收藏条目。
+                {t(msg`右侧预览当前选中的收藏条目。`)}
               </div>
             </div>
 
@@ -528,7 +535,7 @@ export function FavoritesPage() {
                   ) : (
                     <div className="rounded-[14px] border border-[color:var(--border-faint)] bg-white p-4">
                       <div className="text-xs text-[color:var(--text-muted)]">
-                        内容摘要
+                        {t(msg`内容摘要`)}
                       </div>
                       <div className="mt-3 text-sm leading-7 text-[color:var(--text-secondary)]">
                         {selectedFavorite.description}
@@ -538,22 +545,22 @@ export function FavoritesPage() {
 
                   <div className="rounded-[14px] border border-[color:var(--border-faint)] bg-white p-4">
                     <div className="text-xs text-[color:var(--text-muted)]">
-                      收藏信息
+                      {t(msg`收藏信息`)}
                     </div>
                     <div className="mt-3 space-y-3">
                       <FavoriteMetric
-                        label="分类"
+                        label={t(msg`分类`)}
                         value={resolveFavoriteCategoryLabel(
                           selectedFavorite.category,
                         )}
                       />
                       <FavoriteMetric
-                        label="收藏时间"
+                        label={t(msg`收藏时间`)}
                         value={formatTimestamp(selectedFavorite.collectedAt)}
                       />
                       {selectedFavoriteNoteSummary ? (
                         <FavoriteMetric
-                          label="最近修改"
+                          label={t(msg`最近修改`)}
                           value={formatTimestamp(
                             selectedFavoriteNoteSummary.updatedAt,
                           )}
@@ -580,7 +587,7 @@ export function FavoritesPage() {
                         }}
                         className="inline-flex h-10 items-center justify-center rounded-[10px] bg-[color:var(--brand-primary)] px-4 text-sm font-medium text-white transition hover:opacity-95"
                       >
-                        打开笔记
+                        {t(msg`打开笔记`)}
                       </button>
                     ) : (
                       <Link
@@ -589,7 +596,7 @@ export function FavoritesPage() {
                         hash={selectedFavoriteNavigationTarget?.hash}
                         className="inline-flex h-10 items-center justify-center rounded-[10px] bg-[color:var(--brand-primary)] px-4 text-sm font-medium text-white transition hover:opacity-95"
                       >
-                        打开内容
+                        {t(msg`打开内容`)}
                       </Link>
                     )}
                     <button
@@ -605,16 +612,16 @@ export function FavoritesPage() {
                       {removeMutation.isPending &&
                       removeMutation.variables?.sourceId ===
                         selectedFavorite.sourceId
-                        ? "移除中..."
-                        : "取消收藏"}
+                        ? t(msg`移除中...`)
+                        : t(msg`取消收藏`)}
                     </button>
                   </div>
                 </div>
               ) : (
                 <div className="flex h-full items-center justify-center">
                   <EmptyState
-                    title="先从中间选择一条收藏"
-                    description="这里会显示摘要、来源和操作入口。"
+                    title={t(msg`先从中间选择一条收藏`)}
+                    description={t(msg`这里会显示摘要、来源和操作入口。`)}
                   />
                 </div>
               )}
@@ -630,9 +637,9 @@ export function FavoritesPage() {
         <Suspense
           fallback={
             <RouteRedirectState
-              title="正在打开桌面笔记"
-              description="正在载入桌面笔记工作区，马上恢复当前笔记内容。"
-              loadingLabel="载入桌面笔记工作区..."
+              title={t(msg`正在打开桌面笔记`)}
+              description={t(msg`正在载入桌面笔记工作区，马上恢复当前笔记内容。`)}
+              loadingLabel={t(msg`载入桌面笔记工作区...`)}
             />
           }
         >
@@ -668,21 +675,21 @@ export function FavoritesPage() {
           ) : null}
 
           {favoritesQuery.isLoading && !favorites.length ? (
-            <LoadingBlock label="正在读取收藏..." />
+            <LoadingBlock label={t(msg`正在读取收藏...`)} />
           ) : null}
 
           {!favoritesQuery.isLoading && !filteredFavorites.length ? (
             <div className="rounded-[18px] border border-dashed border-[color:var(--border-faint)] bg-white/80 p-6">
               <EmptyState
                 title={
-                  normalizedSearchText ? "没有匹配的收藏" : "还没有收藏内容"
+                  normalizedSearchText ? t(msg`没有匹配的收藏`) : t(msg`还没有收藏内容`)
                 }
                 description={
                   normalizedSearchText
-                    ? "换个关键词，或者切回其他分类继续查看。"
+                    ? t(msg`换个关键词，或者切回其他分类继续查看。`)
                     : activeCategory === "notes"
-                      ? "点击右上角“新建笔记”，把第一条收藏笔记写下来。"
-                      : "先到聊天、内容流或公众号里把重要内容加入收藏。"
+                      ? t(msg`点击右上角“新建笔记”，把第一条收藏笔记写下来。`)
+                      : t(msg`先到聊天、内容流或公众号里把重要内容加入收藏。`)
                 }
               />
             </div>
@@ -759,14 +766,14 @@ function FavoriteNotePreview({ summary }: { summary: FavoriteNoteSummary }) {
   return (
     <div className="overflow-hidden rounded-[18px] border border-[rgba(15,23,42,0.08)] bg-[linear-gradient(180deg,#ffffff_0%,#f8faf9_100%)] shadow-[var(--shadow-soft)]">
       <div className="border-b border-[rgba(15,23,42,0.06)] px-4 py-3">
-        <div className="text-xs text-[color:var(--text-muted)]">笔记预览</div>
+        <div className="text-xs text-[color:var(--text-muted)]">{t(msg`笔记预览`)}</div>
         <div className="mt-2 line-clamp-2 text-[15px] font-medium leading-7 text-[color:var(--text-primary)]">
           {summary.title}
         </div>
       </div>
       <div className="space-y-4 px-4 py-4">
         <div className="rounded-[14px] border border-[rgba(15,23,42,0.06)] bg-white px-4 py-4 text-[13px] leading-7 text-[color:var(--text-secondary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
-          {summary.excerpt || "这条笔记还没有正文摘要。"}
+          {summary.excerpt || t(msg`这条笔记还没有正文摘要。`)}
         </div>
         {summary.tags.length ? (
           <div className="flex flex-wrap gap-2">
@@ -784,12 +791,12 @@ function FavoriteNotePreview({ summary }: { summary: FavoriteNoteSummary }) {
           <div className="flex flex-wrap gap-2">
             {imageCount ? (
               <span className="rounded-full bg-[rgba(15,23,42,0.06)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
-                图片 {imageCount}
+                {t(msg`图片 ${imageCount}`)}
               </span>
             ) : null}
             {fileCount ? (
               <span className="rounded-full bg-[rgba(15,23,42,0.06)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
-                文件 {fileCount}
+                {t(msg`文件 ${fileCount}`)}
               </span>
             ) : null}
           </div>
@@ -800,7 +807,7 @@ function FavoriteNotePreview({ summary }: { summary: FavoriteNoteSummary }) {
 }
 
 function resolveFavoriteCategoryLabel(category: DesktopFavoriteCategory) {
-  return categoryLabels.find((item) => item.id === category)?.label ?? "未分类";
+  return getCategoryLabels().find((item) => item.id === category)?.label ?? t(msg`未分类`);
 }
 
 function parseFavoriteNoteIdFromSourceId(sourceId: string) {
@@ -862,7 +869,7 @@ function renderFavoriteListExtra(
       ))}
       {summary.assets.length ? (
         <span className="rounded-full bg-[rgba(15,23,42,0.06)] px-2 py-0.5 text-[10px] text-[color:var(--text-muted)]">
-          附件 {summary.assets.length}
+          {t(msg`附件 ${summary.assets.length}`)}
         </span>
       ) : null}
     </div>

@@ -1,7 +1,11 @@
 import { useEffect } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useNavigate } from "@tanstack/react-router";
 import { getMyCloudProfile, getWorldOwner } from "@yinjie/contracts";
 import { AppPage, AppSection, InlineNotice } from "@yinjie/ui";
+
+const t = translateRuntimeMessage;
 import { readPersistedMobileWebRoute } from "../features/shell/mobile-web-route-persistence";
 import { clearCloudRuntimeSession } from "../lib/cloud-session";
 import { persistInviteCode } from "../lib/invite-code-storage";
@@ -87,7 +91,15 @@ export function SplashPage() {
       }
 
       try {
-        const owner = await getWorldOwner(runtimeConfig.apiBaseUrl);
+        const owner = await Promise.race([
+          getWorldOwner(runtimeConfig.apiBaseUrl),
+          new Promise<never>((_, reject) =>
+            window.setTimeout(
+              () => reject(new Error("splash-bootstrap-timeout")),
+              8000,
+            ),
+          ),
+        ]);
         if (!cancelled) {
           hydrateOwner(owner);
           const restoredRoute =
@@ -134,13 +146,13 @@ export function SplashPage() {
           Beyond Reality
         </div>
         <div className="mx-auto mt-6 flex h-20 w-20 animate-pulse items-center justify-center rounded-[28px] bg-[linear-gradient(135deg,#07c160,#34c759)] text-2xl font-semibold text-white shadow-none">
-          隐界
+          {t(msg`隐界`)}
         </div>
         <h1 className="mt-6 text-4xl font-semibold tracking-[0.08em] text-[color:var(--text-primary)]">
-          欢迎回到你的世界
+          {t(msg`欢迎回到你的世界`)}
         </h1>
         <p className="mt-4 text-sm leading-8 text-[color:var(--text-secondary)]">
-          这里不是一串账号信息，而是一整片会继续生长、继续回应你的个人世界。
+          {t(msg`这里不是一串账号信息，而是一整片会继续生长、继续回应你的个人世界。`)}
         </p>
 
         <div className="mt-6 grid gap-3 text-left sm:grid-cols-3">
@@ -149,7 +161,7 @@ export function SplashPage() {
               Step 1
             </div>
             <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
-              确认入口
+              {t(msg`确认入口`)}
             </div>
           </div>
           <div className="rounded-[22px] border border-black/5 bg-[#fafafa] px-4 py-3 shadow-none">
@@ -157,7 +169,7 @@ export function SplashPage() {
               Step 2
             </div>
             <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
-              同步世界主人
+              {t(msg`同步世界主人`)}
             </div>
           </div>
           <div className="rounded-[22px] border border-black/5 bg-[#fafafa] px-4 py-3 shadow-none">
@@ -165,13 +177,13 @@ export function SplashPage() {
               Step 3
             </div>
             <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
-              继续开启对话
+              {t(msg`继续开启对话`)}
             </div>
           </div>
         </div>
 
         <InlineNotice className="mt-6 text-left" tone="info">
-          正在整理这次进入世界的路径，马上带你回到上次停留的地方。
+          {t(msg`正在整理这次进入世界的路径，马上带你回到上次停留的地方。`)}
         </InlineNotice>
       </AppSection>
     </AppPage>

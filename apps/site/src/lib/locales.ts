@@ -8,6 +8,8 @@ export const SUPPORTED_LOCALES = ["zh-CN", "en-US", "ja-JP", "ko-KR"] as const;
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: SupportedLocale = "zh-CN";
 
+export const LOCALE_COOKIE_NAME = "NEXT_LOCALE";
+
 const LOCALE_LABELS: Record<SupportedLocale, string> = {
   "zh-CN": "简体中文",
   "en-US": "English",

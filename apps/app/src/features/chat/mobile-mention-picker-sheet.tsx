@@ -1,4 +1,8 @@
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { AvatarChip } from "../../components/avatar-chip";
+
+const t = translateRuntimeMessage;
 
 type MentionCandidate = {
   id: string;
@@ -31,7 +35,7 @@ export function MobileMentionPickerSheet({
       <button
         type="button"
         className="absolute inset-0"
-        aria-label="关闭选择提醒成员面板"
+        aria-label={t(msg`关闭选择提醒成员面板`)}
         onClick={onClose}
       />
       <div
@@ -43,10 +47,10 @@ export function MobileMentionPickerSheet({
         </div>
         <div className="px-4 pb-2">
           <div className="text-[10px] uppercase tracking-[0.1em] text-[color:var(--text-dim)]">
-            群成员
+            {t(msg`群成员`)}
           </div>
           <div className="mt-1 text-[13px] font-medium text-[#111827]">
-            选择要提醒的人
+            {t(msg`选择要提醒的人`)}
           </div>
         </div>
         <div className="mx-3 max-h-[46vh] overflow-auto rounded-[14px] border border-[color:var(--border-subtle)] bg-white">
@@ -85,7 +89,7 @@ export function MobileMentionPickerSheet({
             onClick={onClose}
             className="flex h-11 w-full items-center justify-center rounded-[14px] border border-[color:var(--border-subtle)] bg-white text-[15px] font-medium text-[#111827] transition active:bg-[color:var(--surface-card-hover)]"
           >
-            取消
+            {t(msg`取消`)}
           </button>
         </div>
       </div>

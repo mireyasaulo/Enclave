@@ -1,5 +1,9 @@
+import { msg } from "@lingui/macro";
 import type { FarmPlayerStateView } from "@yinjie/contracts";
 import { FARM_LEVEL_EXPERIENCE_THRESHOLDS } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
 
 interface CoinDisplayProps {
   state: FarmPlayerStateView;
@@ -21,25 +25,27 @@ export function CoinDisplay({ state }: CoinDisplayProps) {
   );
 
   return (
-    <div className="flex flex-col gap-2 rounded-2xl bg-gradient-to-br from-amber-50 to-emerald-50 px-4 py-3 shadow-sm">
+    <div className="flex flex-col gap-2 rounded-2xl border border-white/60 bg-white/65 px-4 py-3 shadow-md backdrop-blur-md">
       <div className="flex items-center justify-between">
-        <span className="flex items-center gap-1 text-base font-semibold text-amber-700">
-          <span>🪙</span>
+        <span className="flex items-center gap-1 text-base font-semibold text-amber-700 drop-shadow-sm">
+          <span className="text-lg">🪙</span>
           {state.coins.toLocaleString()}
         </span>
-        <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-xs font-medium text-white">
+        <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-xs font-medium text-white shadow-sm">
           Lv.{currentLevel}
         </span>
       </div>
-      <div className="flex items-center justify-between text-xs text-stone-500">
+      <div className="flex items-center justify-between text-xs text-stone-600">
         <span>
-          经验 {state.experience - currentLevelXp} / {nextLevelXp - currentLevelXp}
+          {t(
+            msg`经验 ${state.experience - currentLevelXp} / ${nextLevelXp - currentLevelXp}`,
+          )}
         </span>
-        <span>田块 {state.plotCount}</span>
+        <span>{t(msg`田块 ${state.plotCount}`)}</span>
       </div>
-      <div className="relative h-1.5 overflow-hidden rounded-full bg-stone-200">
+      <div className="relative h-1.5 overflow-hidden rounded-full bg-stone-200/80">
         <div
-          className="absolute inset-y-0 left-0 bg-emerald-500 transition-all"
+          className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-400 to-emerald-600 transition-all"
           style={{ width: `${progress * 100}%` }}
         />
       </div>

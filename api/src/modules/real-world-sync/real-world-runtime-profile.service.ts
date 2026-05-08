@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type {
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   PersonalityProfile,
   SceneKey,
   ScenePrompts,
@@ -157,3 +158,4 @@ export class RealWorldRuntimeProfileService {
     };
   }
 }
+// i18n-ignore-end

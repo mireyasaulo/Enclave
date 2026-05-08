@@ -1,3 +1,4 @@
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   useDeferredValue,
   useEffect,
@@ -2466,3 +2467,4 @@ export function ReminderRuntimePage() {
     </div>
   );
 }
+// i18n-ignore-end

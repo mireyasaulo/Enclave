@@ -1,5 +1,6 @@
 import type { MigrationInterface, QueryRunner } from "typeorm";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const UP_QUERIES = [
   `ALTER TABLE "cloud_admin_sessions" ADD COLUMN "revokedBySessionId" varchar`,
   `ALTER TABLE "cloud_admin_sessions" ADD COLUMN "revocationReason" varchar`,
@@ -27,3 +28,4 @@ export class AddCloudAdminSessionRevocationMetadata1776647400000
     }
   }
 }
+// i18n-ignore-end

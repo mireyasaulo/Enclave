@@ -1,14 +1,15 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Param,
   Body,
-  NotFoundException,
+  Controller,
+  Delete,
+  Get,
+  HttpStatus,
+  Param,
+  Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { CharactersService } from './characters.service';
 import { CharacterEntity } from './character.entity';
 import { AdminGuard } from '../admin/admin.guard';
@@ -32,7 +33,12 @@ export class CharactersController {
     const char =
       (await this.charactersService.findById(id)) ??
       (await this.charactersService.ensurePresetCharacterInstalled(id));
-    if (!char) throw new NotFoundException(`Character ${id} not found`);
+    if (!char)
+      throw new AppError('CHARACTER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id },
+        legacyMessage: `Character ${id} not found`,
+      });
     return char;
   }
 
@@ -51,7 +57,12 @@ export class CharactersController {
   @UseGuards(AdminGuard)
   async update(@Param('id') id: string, @Body() body: Partial<CharacterEntity>) {
     const existing = await this.charactersService.findById(id);
-    if (!existing) throw new NotFoundException(`Character ${id} not found`);
+    if (!existing)
+      throw new AppError('CHARACTER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id },
+        legacyMessage: `Character ${id} not found`,
+      });
     const updated = { ...existing, ...body, id } as CharacterEntity;
     await this.charactersService.upsert(updated);
     return updated;

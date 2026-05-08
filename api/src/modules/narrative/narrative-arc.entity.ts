@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 @Entity('narrative_arcs')
 export class NarrativeArcEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -29,3 +30,4 @@ export class NarrativeArcEntity {
   @Column({ type: 'datetime', nullable: true })
   completedAt?: Date;
 }
+// i18n-ignore-end

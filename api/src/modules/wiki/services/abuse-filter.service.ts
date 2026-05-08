@@ -1,10 +1,6 @@
-import {
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { AppError } from '../../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LessThan, MoreThan, Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
@@ -152,9 +148,13 @@ export class AbuseFilterService implements OnModuleInit {
     }
 
     if (topAction === 'block') {
-      throw new ForbiddenException({
-        message: `编辑被反破坏过滤器拦截：${matches[0]?.filter.name ?? 'abuse_filter'}`,
-        hits,
+      throw new AppError('WIKI_ABUSE_FILTER_TRIGGERED', {
+        status: HttpStatus.FORBIDDEN,
+        params: {
+          filter: matches[0]?.filter.name ?? 'abuse_filter',
+          hitCount: hits.length,
+        },
+        legacyMessage: `编辑被反破坏过滤器拦截：${matches[0]?.filter.name ?? 'abuse_filter'}`,
       });
     }
 
@@ -242,7 +242,10 @@ export class AbuseFilterService implements OnModuleInit {
 
   async getFilter(id: string): Promise<AbuseFilterEntity> {
     const f = await this.filterRepo.findOne({ where: { id } });
-    if (!f) throw new NotFoundException('过滤器不存在');
+    if (!f) throw new AppError('WIKI_PAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: '过滤器不存在',
+      });
     return f;
   }
 
@@ -384,3 +387,4 @@ function collectAllText(input: AbuseFilterCheckInput): string {
   }
   return parts.filter((p) => typeof p === 'string').join('\n');
 }
+// i18n-ignore-end
