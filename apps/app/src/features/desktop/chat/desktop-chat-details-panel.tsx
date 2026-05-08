@@ -41,6 +41,7 @@ import {
   type UpdateFriendProfileRequest,
 } from "@yinjie/contracts";
 import { translateRuntimeMessage } from "@yinjie/i18n";
+import { translateCharacterBio } from "../../../lib/character-i18n";
 import { ChevronRight, Minus, Plus, Search, X } from "lucide-react";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
@@ -270,7 +271,7 @@ function DirectChatDetailsPanel({
   const displayName = remarkName || targetCharacter?.name || conversation.title;
   const signature =
     targetCharacter?.currentStatus?.trim() ||
-    targetCharacter?.bio?.trim() ||
+    translateCharacterBio(t, targetCharacter?.bio) ||
     (isFriend
       ? t(msg`这个联系人还没有签名。`)
       : t(msg`这个角色还没有签名。`));
@@ -571,7 +572,7 @@ function DirectChatDetailsPanel({
             : null;
 
   return (
-    <div className="space-y-2 bg-[#f5f5f5] px-3 py-3">
+    <div className="space-y-2 bg-[#f5f5f5] px-3 pb-6 pt-3">
       {notice ? <InlineNotice tone="success">{notice}</InlineNotice> : null}
       {characterQuery.isError && characterQuery.error instanceof Error ? (
         <ErrorBlock message={characterQuery.error.message} />
@@ -1465,7 +1466,7 @@ function GroupChatDetailsPanel({
         : null;
 
   return (
-    <div className="space-y-2.5 bg-[#ededed] px-0 py-3">
+    <div className="space-y-2.5 bg-[#ededed] px-0 pb-6 pt-3">
       {notice ? (
         <div className="px-3">
           <InlineNotice tone="success">{notice}</InlineNotice>
