@@ -29,7 +29,9 @@ import {
 type RunningChild = {
   pid: number;
   port: number;
-  child: ChildProcess;
+  // cloud-api 重启后我们能 reattach 到孤儿 child 进程，但拿不到原始 ChildProcess
+  // 句柄。child=null 时用 process.kill / probe-by-pid 操作。
+  child: ChildProcess | null;
   startedAt: Date;
 };
 
@@ -100,15 +102,66 @@ export class LocalProcessComputeProviderService
       );
     }
 
-    const runningInstances = await this.instanceRepo.find({
+    // cloud-api 重启时，已 spawn 的 child 进程是孤儿但仍占着 port + 持着 sqlite。
+    // 之前会无差别 mark stopped → lifecycle worker 看到 stopped 就尝试再 spawn，
+    // 撞上 EADDRINUSE 卡死。这里改成：能 ping 通就 reattach (in-memory 重新登记)，
+    // 真死了才 mark stopped 让 worker 走重启流程。
+    const localProcessInstances = await this.instanceRepo.find({
       where: { providerKey: this.key },
     });
-    for (const instance of runningInstances) {
-      if (instance.powerState === "running" || instance.powerState === "starting") {
+    this.logger.log(
+      `onModuleInit scanning ${localProcessInstances.length} local-process instance(s) for reattach`,
+    );
+    for (const instance of localProcessInstances) {
+      const port = this.parsePersistedPort(instance);
+      const pidRaw = instance.launchConfig?.pid;
+      const pid =
+        typeof pidRaw === "string" && pidRaw.trim()
+          ? Number(pidRaw)
+          : Number(pidRaw ?? 0);
+
+      // 不论 powerState 是什么，先 probe pid+port；活着就 reattach。
+      // 之前会 spawn 失败一次然后把 launchConfig.pid 改成新 pid，再重启时
+      // 那个新 pid 已死，但 port 仍被原孤儿占着 → reattach 永远失败。这里
+      // 改成只信端口存活：能 ping 通就直接当 running，pid 只用来后续 kill。
+      const portHealthy =
+        port && Number.isFinite(port) && port > 0
+          ? await this.pingHealth(port, 1_500)
+          : false;
+
+      this.logger.log(
+        `instance world=${instance.worldId} powerState=${instance.powerState} port=${port} pid=${pid} pidAlive=${pid > 0 ? this.isPidAlive(pid) : "n/a"} portHealthy=${portHealthy}`,
+      );
+
+      if (portHealthy && port) {
+        this.running.set(instance.worldId, {
+          pid,
+          port,
+          child: null,
+          startedAt: instance.bootstrappedAt ?? new Date(),
+        });
+        this.logger.log(
+          `reattached to live local api child world=${instance.worldId} pid=${pid} port=${port}`,
+        );
+        if (instance.powerState !== "running") {
+          instance.powerState = "running";
+          instance.lastOperationAt = new Date();
+          await this.instanceRepo.save(instance);
+        }
+      } else {
         instance.powerState = "stopped";
         instance.lastOperationAt = new Date();
         await this.instanceRepo.save(instance);
       }
+    }
+  }
+
+  private isPidAlive(pid: number) {
+    try {
+      process.kill(pid, 0);
+      return true;
+    } catch {
+      return false;
     }
   }
 
@@ -165,7 +218,7 @@ export class LocalProcessComputeProviderService
     world: CloudWorldEntity,
   ): Promise<WorldInstancePowerTransitionResult> {
     const existing = this.running.get(world.id);
-    if (existing && this.isAlive(existing.child)) {
+    if (existing && this.isAlive(existing)) {
       return { powerState: "running", providerSnapshotId: null };
     }
 
@@ -211,7 +264,7 @@ export class LocalProcessComputeProviderService
     let deploymentState: InspectWorldInstanceResult["deploymentState"];
     let rawStatus: string;
 
-    if (state && this.isAlive(state.child)) {
+    if (state && this.isAlive(state)) {
       const healthy = await this.pingHealth(state.port, 1_500);
       deploymentState = healthy ? "running" : "starting";
       rawStatus = healthy ? "running" : "starting";
@@ -269,15 +322,14 @@ export class LocalProcessComputeProviderService
     return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
   }
 
-  private isAlive(child: ChildProcess) {
-    if (!child.pid) return false;
-    if (child.exitCode !== null) return false;
-    try {
-      process.kill(child.pid, 0);
-      return true;
-    } catch {
-      return false;
+  private isAlive(state: RunningChild) {
+    if (state.child) {
+      if (!state.child.pid) return false;
+      if (state.child.exitCode !== null) return false;
+      return this.isPidAlive(state.child.pid);
     }
+    if (!state.pid) return false;
+    return this.isPidAlive(state.pid);
   }
 
   private async spawnChild(
@@ -372,21 +424,41 @@ export class LocalProcessComputeProviderService
   }
 
   private terminateChild(state: RunningChild) {
-    if (!state.pid || state.child.exitCode !== null) {
+    if (!state.pid) {
       return;
     }
-    try {
-      state.child.kill("SIGTERM");
-    } catch (err) {
-      this.logger.warn(`SIGTERM failed for pid=${state.pid}: ${(err as Error).message}`);
+    if (state.child && state.child.exitCode !== null) {
+      return;
     }
-    setTimeout(() => {
-      if (state.child.exitCode === null) {
+    if (!state.child && !this.isPidAlive(state.pid)) {
+      return;
+    }
+    const sendSignal = (signal: NodeJS.Signals) => {
+      if (state.child) {
         try {
-          state.child.kill("SIGKILL");
-        } catch {
-          // ignore
+          state.child.kill(signal);
+        } catch (err) {
+          this.logger.warn(
+            `${signal} via child handle failed for pid=${state.pid}: ${(err as Error).message}`,
+          );
         }
+      } else {
+        try {
+          process.kill(state.pid, signal);
+        } catch (err) {
+          this.logger.warn(
+            `${signal} via process.kill failed for pid=${state.pid}: ${(err as Error).message}`,
+          );
+        }
+      }
+    };
+    sendSignal("SIGTERM");
+    setTimeout(() => {
+      const stillAlive = state.child
+        ? state.child.exitCode === null
+        : this.isPidAlive(state.pid);
+      if (stillAlive) {
+        sendSignal("SIGKILL");
       }
     }, STOP_GRACE_MS).unref?.();
   }

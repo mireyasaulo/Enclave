@@ -34,6 +34,7 @@ import { UsersModule } from "./users/users.module";
 import { WorldAccessController } from "./world-access/world-access.controller";
 import { WorldAccessService } from "./world-access/world-access.service";
 import { WaitingSessionSyncService } from "./world-access/waiting-session-sync.service";
+import { WorldApiProxyModule } from "./world-api-proxy/world-api-proxy.module";
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { WaitingSessionSyncService } from "./world-access/waiting-session-sync.s
     FeedbackModule,
     TelemetryModule,
     TokenUsageModule,
+    WorldApiProxyModule,
   ],
   controllers: [
     AdminAuthController,
