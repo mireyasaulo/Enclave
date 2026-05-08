@@ -4,11 +4,13 @@ import {
   resolveCoreApiBaseUrl,
   setApiRequestErrorHandler,
   setCloudApiBaseUrlProvider,
+  setCloudWorldApiTokenProvider,
   setCoreApiBaseUrlProvider,
 } from "@yinjie/contracts";
 import { handleApiSubscriptionExpiredError } from "./subscription-expired";
 import { resolveAppRuntimeContext } from "../runtime/platform";
 import { getAppRuntimeConfig } from "../runtime/runtime-config-store";
+import { isCloudSessionExpired, useCloudSessionStore } from "../store/cloud-session-store";
 
 function fallbackBrowserBaseUrl() {
   if (typeof window === "undefined") {
@@ -63,6 +65,20 @@ export function configureContractsRuntime() {
       return browserBaseUrl;
     }
     return DEFAULT_CLOUD_API_BASE_URL;
+  });
+  // 多租户公网部署：world API 的 base URL 走 cloud-api 的反代入口
+  // (路径 /cloud/world-api)。客户端必须把当前 cloud access token 透给反代层，
+  // 反代层凭 token 里的 phone 字段把请求路由到该账号自己的 child process。
+  // 本地直连（localhost / 私网 IP / 桌面壳）不走反代，不附 token，行为不变。
+  setCloudWorldApiTokenProvider((baseUrl) => {
+    if (!baseUrl || !baseUrl.includes("/cloud/world-api")) {
+      return null;
+    }
+    const session = useCloudSessionStore.getState();
+    if (!session.accessToken || isCloudSessionExpired(session.expiresAt)) {
+      return null;
+    }
+    return session.accessToken;
   });
   setApiRequestErrorHandler((error) => {
     handleApiSubscriptionExpiredError(error);

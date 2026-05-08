@@ -234,6 +234,12 @@ let cloudApiBaseUrlProvider: (() => string | null | undefined) | null = null;
 let coreApiAdminSecretProvider:
   | (() => string | null | undefined)
   | null = null;
+// 当 baseUrl 指向 cloud-api 的 world-api 反代入口时（多租户公网部署），
+// 客户端要把 cloud access token 透给反代层让它按 phone 路由到对应 child。
+// provider 决定要不要返回 token；返回 null 表示不附带（local 直连场景）。
+let cloudWorldApiTokenProvider:
+  | ((baseUrl: string | undefined) => string | null | undefined)
+  | null = null;
 let apiRequestErrorHandler:
   | ((error: ApiRequestError) => void)
   | null = null;
@@ -342,6 +348,14 @@ export function setCoreApiAdminSecretProvider(
   coreApiAdminSecretProvider = provider;
 }
 
+export function setCloudWorldApiTokenProvider(
+  provider:
+    | ((baseUrl: string | undefined) => string | null | undefined)
+    | null,
+) {
+  cloudWorldApiTokenProvider = provider;
+}
+
 export function setApiRequestErrorHandler(
   handler: ((error: ApiRequestError) => void) | null,
 ) {
@@ -375,6 +389,14 @@ async function request<T>(
     const adminSecret = coreApiAdminSecretProvider?.()?.trim();
     if (adminSecret) {
       headers.set("X-Admin-Secret", adminSecret);
+    }
+  }
+
+  if (!headers.has("Authorization") && cloudWorldApiTokenProvider) {
+    const resolvedBase = resolveCoreApiBaseUrl(baseUrl, { allowDefault: false });
+    const token = cloudWorldApiTokenProvider(resolvedBase ?? undefined)?.trim();
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
     }
   }
 
