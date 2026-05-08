@@ -16,6 +16,7 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
 import {
   RotateCcw,
+  ArrowLeft,
   ChevronLeft,
   ChevronRight,
   ContactRound,
@@ -26,6 +27,7 @@ import {
   Forward,
   LocateFixed,
   MapPin,
+  MoreHorizontal,
   Pause,
   Play,
   Printer,
@@ -38,6 +40,7 @@ import {
   createMessageFavorite,
   deleteConversationMessage,
   deleteGroupMessage,
+  getFavoriteNote,
   getFavorites,
   getConversations,
   getOrCreateConversation,
@@ -48,6 +51,7 @@ import {
   removeFavorite,
   sendGroupMessage,
   type ConversationListItem,
+  type FavoriteNoteDocument,
   type GroupMessage,
   type MessageAttachment,
   type Message,
@@ -87,6 +91,7 @@ import {
   removeDesktopFavorite,
   upsertDesktopFavorite,
 } from "../features/favorites/favorites-storage";
+import { isFavoriteNoteMissingError } from "../features/favorites/note-editor-helpers";
 import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
 import {
   extractChatReplyMetadata,
@@ -3657,6 +3662,7 @@ export function ChatMessageList({
         <NoteViewerOverlay
           attachment={activeNote.attachment}
           previewImageUrl={activeNote.previewImageUrl}
+          baseUrl={baseUrl}
           onClose={() => setNoteViewerMessageId(null)}
           onLocate={() => {
             setNoteViewerMessageId(null);
@@ -6288,146 +6294,242 @@ function LocationViewerOverlay({
 function NoteViewerOverlay({
   attachment,
   previewImageUrl,
+  baseUrl,
   onClose,
   onLocate,
   onShareOrCopy,
 }: {
   attachment: Extract<MessageAttachment, { kind: "note_card" }>;
   previewImageUrl: string | null;
+  baseUrl: string;
   onClose: () => void;
   onLocate: () => void;
   onShareOrCopy: () => void;
 }) {
   const nativeMobileShareSupported = isNativeMobileShareSurface();
-  const imageCount = attachment.assets.filter(
-    (asset) => asset.kind === "image",
-  ).length;
-  const fileCount = attachment.assets.filter(
+  const [actionMenuOpen, setActionMenuOpen] = useState(false);
+  const noteQuery = useQuery({
+    queryKey: ["favorite-note", baseUrl, attachment.noteId],
+    queryFn: () => getFavoriteNote(attachment.noteId, baseUrl),
+    enabled: Boolean(attachment.noteId),
+  });
+  const document: FavoriteNoteDocument | undefined = noteQuery.data;
+  const noteMissing = isFavoriteNoteMissingError(noteQuery.error);
+  const updatedAtLabel = formatMessageTimestamp(
+    document?.updatedAt ?? attachment.updatedAt,
+  );
+  const title = (document?.title || attachment.title || "").trim() || "未命名笔记";
+  const tags = document?.tags?.length ? document.tags : attachment.tags;
+  const fileAssets = (document?.assets ?? attachment.assets).filter(
     (asset) => asset.kind === "file",
-  ).length;
-  const updatedAtLabel = formatMessageTimestamp(attachment.updatedAt);
+  );
+  const imageAssetsFallback = (document?.assets ?? attachment.assets).filter(
+    (asset) => asset.kind === "image",
+  );
+  const hasContentHtml = Boolean(document?.contentHtml?.trim());
 
   return (
-    <div className="fixed inset-0 z-50 bg-[rgba(5,10,20,0.88)] backdrop-blur-md">
-      <button
-        type="button"
-        onClick={onClose}
-        className="absolute inset-0 cursor-default"
-        aria-label="关闭笔记预览"
-      />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(7,193,96,0.18),transparent_34%),linear-gradient(180deg,rgba(15,23,42,0.12),rgba(15,23,42,0.74))]" />
-      <div className="relative flex h-full flex-col">
-        <div className="flex items-center justify-between px-4 pb-3 pt-[max(env(safe-area-inset-top,0px),1rem)] text-white">
-          <div>
-            <div className="text-[12px] uppercase tracking-[0.18em] text-white/60">
-              聊天笔记
-            </div>
-            <div className="mt-1 text-[18px] font-medium">笔记摘要</div>
-          </div>
-          <ViewerActionButton compact label="关闭笔记预览" onClick={onClose}>
-            <X size={18} />
-          </ViewerActionButton>
+    <div className="fixed inset-0 z-50 flex flex-col bg-[#ededed]">
+      <div className="flex items-center gap-1 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-2 pb-1.5 pt-[max(env(safe-area-inset-top,0px),0.5rem)] text-[color:var(--text-primary)]">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none hover:bg-black/4 active:bg-black/[0.05]"
+          aria-label="返回"
+        >
+          <ArrowLeft size={18} />
+        </Button>
+        <div className="flex-1 text-center text-[16px] font-medium tracking-normal">
+          笔记
         </div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => setActionMenuOpen(true)}
+          className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none hover:bg-black/4 active:bg-black/[0.05]"
+          aria-label="更多操作"
+        >
+          <MoreHorizontal size={20} />
+        </Button>
+      </div>
 
-        <div className="min-h-0 flex-1 px-4 pb-5 pt-2">
-          <div className="mx-auto flex h-full max-w-xl flex-col overflow-hidden rounded-[30px] border border-white/10 bg-[rgba(10,15,28,0.56)] shadow-[0_32px_80px_rgba(0,0,0,0.28)]">
-            {previewImageUrl ? (
-              <div className="relative h-48 overflow-hidden border-b border-white/10 bg-black/20">
-                <img
-                  src={previewImageUrl}
-                  alt={attachment.title}
-                  className="h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(15,23,42,0.08),rgba(15,23,42,0.32))]" />
-              </div>
-            ) : (
-              <div className="flex h-40 items-end border-b border-white/10 bg-[linear-gradient(160deg,rgba(243,246,245,0.2),rgba(221,230,227,0.1))] px-5 py-5">
-                <div className="rounded-[16px] border border-white/12 bg-white/10 px-4 py-2 text-[12px] tracking-[0.18em] text-white/72">
-                  收藏笔记
+      <div className="min-h-0 flex-1 overflow-auto bg-white">
+        {noteMissing ? (
+          <div className="flex h-full flex-col items-center justify-center px-8 text-center">
+            <div className="text-[15px] font-medium text-[color:var(--text-primary)]">
+              笔记已被删除或不可见
+            </div>
+            <div className="mt-2 text-[13px] leading-6 text-[color:var(--text-muted)]">
+              该笔记可能已经被发送者删除，或你不再有查看权限。
+            </div>
+          </div>
+        ) : (
+          <div className="px-5 pb-10 pt-5">
+            <div className="text-[22px] font-semibold leading-8 text-[color:var(--text-primary)]">
+              {title}
+            </div>
+            <div className="mt-1 text-[12px] text-[color:var(--text-muted)]">
+              编辑于 {updatedAtLabel}
+            </div>
+
+            <div className="mt-4">
+              {noteQuery.isLoading && !document ? (
+                <div className="space-y-2.5">
+                  <div className="h-4 w-3/4 rounded bg-[rgba(15,23,42,0.06)]" />
+                  <div className="h-4 w-full rounded bg-[rgba(15,23,42,0.06)]" />
+                  <div className="h-4 w-5/6 rounded bg-[rgba(15,23,42,0.06)]" />
                 </div>
-              </div>
-            )}
-
-            <div className="min-h-0 flex-1 overflow-auto px-5 py-5 text-white">
-              <div className="text-[22px] font-semibold leading-8">
-                {attachment.title}
-              </div>
-              <div className="mt-2 text-[12px] text-white/62">
-                最近更新于 {updatedAtLabel}
-              </div>
-
-              <div className="mt-4 rounded-[20px] border border-white/10 bg-white/6 px-4 py-4 text-[14px] leading-7 text-white/82">
-                {attachment.excerpt?.trim() || "这条笔记暂时没有可展示的摘要内容。"}
-              </div>
-
-              {attachment.tags.length ? (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {attachment.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-[rgba(255,255,255,0.12)] bg-white/8 px-3 py-1 text-[11px] text-white/78"
+              ) : hasContentHtml ? (
+                <div
+                  className={cn(
+                    "text-[15px] leading-7 text-[color:var(--text-primary)]",
+                    "[&_a[data-note-file='true']]:my-1.5 [&_a[data-note-file='true']]:inline-flex [&_a[data-note-file='true']]:items-center [&_a[data-note-file='true']]:rounded-[12px] [&_a[data-note-file='true']]:border [&_a[data-note-file='true']]:border-[rgba(15,23,42,0.08)] [&_a[data-note-file='true']]:bg-[rgba(243,244,246,0.82)] [&_a[data-note-file='true']]:px-3 [&_a[data-note-file='true']]:py-2 [&_a[data-note-file='true']]:text-[13px] [&_a[data-note-file='true']]:text-[color:var(--text-primary)] [&_a[data-note-file='true']]:no-underline",
+                    "[&_img[data-note-image='true']]:my-2 [&_img[data-note-image='true']]:max-h-[60vw] [&_img[data-note-image='true']]:max-w-full [&_img[data-note-image='true']]:rounded-[14px] [&_img[data-note-image='true']]:border [&_img[data-note-image='true']]:border-[rgba(15,23,42,0.08)]",
+                    "[&_[data-note-checkbox='false']]:cursor-default [&_[data-note-checkbox='true']]:cursor-default [&_[data-note-checkbox='true']]:text-[color:var(--brand-primary)]",
+                  )}
+                  dangerouslySetInnerHTML={{
+                    __html: document!.contentHtml,
+                  }}
+                />
+              ) : (
+                <>
+                  {previewImageUrl ? (
+                    <img
+                      src={previewImageUrl}
+                      alt={title}
+                      className="my-2 max-h-[60vw] w-full rounded-[14px] border border-[rgba(15,23,42,0.08)] object-cover"
+                    />
+                  ) : null}
+                  <div className="text-[15px] leading-7 text-[color:var(--text-primary)]">
+                    {attachment.excerpt?.trim() || "这条笔记暂时没有正文内容。"}
+                  </div>
+                  {imageAssetsFallback
+                    .filter((asset) => asset.url && asset.url !== previewImageUrl)
+                    .map((asset) => (
+                      <img
+                        key={asset.id}
+                        src={asset.url}
+                        alt={asset.fileName}
+                        className="my-2 max-h-[60vw] w-full rounded-[14px] border border-[rgba(15,23,42,0.08)] object-cover"
+                      />
+                    ))}
+                  {fileAssets.map((asset) => (
+                    <a
+                      key={asset.id}
+                      href={asset.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="my-1.5 inline-flex items-center gap-2 rounded-[12px] border border-[rgba(15,23,42,0.08)] bg-[rgba(243,244,246,0.82)] px-3 py-2 text-[13px] text-[color:var(--text-primary)] no-underline"
                     >
-                      #{tag}
-                    </span>
+                      <FileText size={14} />
+                      <span className="max-w-[60vw] truncate">
+                        {asset.fileName}
+                      </span>
+                    </a>
                   ))}
-                </div>
-              ) : null}
-
-              <div className="mt-5 grid grid-cols-3 gap-2.5">
-                <NoteViewerMetric
-                  label="图片"
-                  value={imageCount > 0 ? `${imageCount} 张` : "无"}
-                />
-                <NoteViewerMetric
-                  label="文件"
-                  value={fileCount > 0 ? `${fileCount} 个` : "无"}
-                />
-                <NoteViewerMetric
-                  label="内容"
-                  value={attachment.excerpt?.trim() ? "有摘要" : "待补充"}
-                />
-              </div>
-
-              <div className="mt-5 rounded-[18px] border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.06)] px-4 py-3 text-[12px] leading-6 text-white/70">
-                手机端当前提供笔记摘要预览；完整编辑与详情工作区仍需在桌面布局中打开。
-              </div>
+                </>
+              )}
             </div>
-          </div>
-        </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-3 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] pt-2">
-          <ViewerActionButton
-            label={nativeMobileShareSupported ? "系统分享" : "复制摘要"}
-            onClick={onShareOrCopy}
-          >
-            {nativeMobileShareSupported ? (
+            {tags.length ? (
+              <div className="mt-5 flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center rounded-full bg-[rgba(7,193,96,0.08)] px-3 py-1 text-[12px] text-[color:var(--brand-primary)]"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        )}
+      </div>
+
+      {actionMenuOpen ? (
+        <NoteDetailActionSheet
+          shareLabel={
+            nativeMobileShareSupported ? "系统分享" : "复制摘要"
+          }
+          shareIcon={
+            nativeMobileShareSupported ? (
               <Share2 size={16} />
             ) : (
               <Copy size={16} />
-            )}
-          </ViewerActionButton>
-          <ViewerActionButton label="定位消息" onClick={onLocate}>
-            <FileText size={16} />
-          </ViewerActionButton>
-        </div>
-      </div>
+            )
+          }
+          onShareOrCopy={() => {
+            setActionMenuOpen(false);
+            onShareOrCopy();
+          }}
+          onLocate={() => {
+            setActionMenuOpen(false);
+            onLocate();
+          }}
+          onClose={() => setActionMenuOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }
 
-function NoteViewerMetric({
-  label,
-  value,
+function NoteDetailActionSheet({
+  shareLabel,
+  shareIcon,
+  onShareOrCopy,
+  onLocate,
+  onClose,
 }: {
-  label: string;
-  value: string;
+  shareLabel: string;
+  shareIcon: ReactNode;
+  onShareOrCopy: () => void;
+  onLocate: () => void;
+  onClose: () => void;
 }) {
   return (
-    <div className="rounded-[18px] border border-white/10 bg-white/6 px-3.5 py-3 text-center">
-      <div className="text-[10px] uppercase tracking-[0.16em] text-white/52">
-        {label}
+    <div className="fixed inset-0 z-[60] bg-[rgba(15,23,42,0.14)]">
+      <button
+        type="button"
+        className="absolute inset-0"
+        aria-label="关闭操作菜单"
+        onClick={onClose}
+      />
+      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1 rounded-t-[20px] border-t border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] pt-3 shadow-[0_-14px_28px_rgba(15,23,42,0.10)]">
+        <div className="flex justify-center pb-2">
+          <div className="h-1 w-10 rounded-full bg-[rgba(148,163,184,0.45)]" />
+        </div>
+        <button
+          type="button"
+          onClick={onShareOrCopy}
+          className="flex items-center gap-3 rounded-[12px] px-4 py-3 text-left text-[15px] text-[color:var(--text-primary)] transition active:bg-black/[0.04]"
+        >
+          <span className="flex h-7 w-7 items-center justify-center text-[color:var(--text-secondary)]">
+            {shareIcon}
+          </span>
+          {shareLabel}
+        </button>
+        <button
+          type="button"
+          onClick={onLocate}
+          className="flex items-center gap-3 rounded-[12px] px-4 py-3 text-left text-[15px] text-[color:var(--text-primary)] transition active:bg-black/[0.04]"
+        >
+          <span className="flex h-7 w-7 items-center justify-center text-[color:var(--text-secondary)]">
+            <LocateFixed size={16} />
+          </span>
+          定位消息
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-1 rounded-[12px] bg-white px-4 py-3 text-center text-[15px] font-medium text-[color:var(--text-primary)] shadow-[0_1px_0_rgba(15,23,42,0.04)]"
+        >
+          取消
+        </button>
       </div>
-      <div className="mt-2 text-[14px] font-medium text-white">{value}</div>
     </div>
   );
 }
