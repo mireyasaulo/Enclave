@@ -2995,6 +2995,10 @@ msgstr "コンテンツ視点"
 msgid "内置 Core API：{bundledCoreApiStatusLabel}"
 msgstr "内蔵 Core API：{bundledCoreApiStatusLabel}"
 
+#: apps/app/src/features/chat/digital-human-player.tsx:36
+msgid "内置数字人舞台"
+msgstr "内蔵デジタルヒューマンステージ"
+
 #: apps/app/src/routes/desktop-mobile-page.tsx:1780
 #: apps/app/src/routes/desktop-mobile-page.tsx:1901
 #: apps/app/src/routes/desktop-mobile-page.tsx:1993
@@ -6987,6 +6991,10 @@ msgstr "現在のミニプログラムワークスペース"
 msgid "当前工作台"
 msgstr "現在の作業台"
 
+#: apps/app/src/features/chat/digital-human-player.tsx:164
+msgid "当前已切到数字人视频流播放器；若流不可用会自动回退到内置舞台。"
+msgstr "デジタルヒューマンの映像プレイヤーに切り替えました。ストリームが利用できない場合は自動で内蔵ステージへフォールバックします。"
+
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:1046
 msgid "当前已加入本轮群通话"
 msgstr ""
@@ -8634,6 +8642,10 @@ msgstr "別のメッセージ種別を試すか、すべての種類に戻して
 msgid "换个群名称或公告关键词试试。"
 msgstr "別のグループ名やお知らせのキーワードで試してみてください。"
 
+#: apps/app/src/features/chat/digital-human-player.tsx:200
+msgid "排队中"
+msgstr "キュー待ち"
+
 #: apps/app/src/routes/discover-page.tsx:540
 msgid "探索区"
 msgstr "探索エリア"
@@ -9369,6 +9381,10 @@ msgstr ""
 msgid "数字人画面失败"
 msgstr ""
 
+#: apps/app/src/features/chat/digital-human-player.tsx:220
+msgid "数字人画面生成中，请稍候。"
+msgstr "デジタルヒューマンの映像を生成中です。少々お待ちを。"
+
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:919
 msgid "数字人的回复会先显示在这里，再通过语音自动播报。"
 msgstr ""
@@ -9376,6 +9392,26 @@ msgstr ""
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:426
 msgid "数字人视频已接通"
 msgstr ""
+
+#: apps/app/src/features/chat/digital-human-player.tsx:35
+msgid "数字人视频流"
+msgstr "デジタルヒューマン映像"
+
+#: apps/app/src/features/chat/digital-human-player.tsx:222
+msgid "数字人视频流已就绪。"
+msgstr "デジタルヒューマン映像の準備が整いました。"
+
+#: apps/app/src/features/chat/digital-human-player.tsx:163
+msgid "数字人视频流已进入队列，当前会先保持会话连接，渲染完成后自动切到视频流。"
+msgstr "映像はキューに入りました。会話接続は維持され、レンダリングが完了次第映像へ自動切り替えします。"
+
+#: apps/app/src/features/chat/digital-human-player.tsx:161
+msgid "数字人视频流正在渲染，当前会优先保持播放器连接并继续刷新状态。"
+msgstr "映像をレンダリング中です。プレイヤーの接続を維持しつつ状態を更新し続けます。"
+
+#: apps/app/src/features/chat/digital-human-player.tsx:159
+msgid "数字人视频流渲染失败，当前已回退到文字加语音通话链路。可稍后重试连接数字人。"
+msgstr "映像のレンダリングに失敗しました。テキスト＋音声通話にフォールバックしています。あとで再接続できます。"
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:739
 msgid "数字人还没恢复，先重试或改用语音继续。"
@@ -10304,6 +10340,10 @@ msgstr "このターンの要約"
 #: apps/app/src/i18n/static-dom-seed.ts:993
 msgid "本轮时长"
 msgstr "今回の長さ"
+
+#: apps/app/src/features/chat/digital-human-player.tsx:224
+msgid "本轮视频流没有成功生成，但语音回复链路仍然可继续使用。"
+msgstr "今回は映像が生成されませんでしたが、音声返答は引き続き利用できます。"
 
 #: apps/app/src/routes/chat-room-page.tsx:222
 msgid "本轮视频通话已结束。你可以直接继续输入，也可以切回语音发送。"
@@ -11353,6 +11393,10 @@ msgstr ""
 msgid "正在把最新成员状态同步到聊天消息流。"
 msgstr ""
 
+#: apps/app/src/features/chat/digital-human-player.tsx:218
+msgid "正在排队准备数字人画面。"
+msgstr "デジタルヒューマンの映像を準備中（キュー待ち）。"
+
 #: apps/app/src/routes/character-detail-page.tsx:280
 msgid "正在接通..."
 msgstr "接続中..."
@@ -12311,6 +12355,19 @@ msgstr "削除中..."
 msgid "温室"
 msgstr "温室"
 
+#: apps/app/src/features/chat/digital-human-player.tsx:202
+msgid "渲染中"
+msgstr "レンダリング中"
+
+#: apps/app/src/features/chat/digital-human-player.tsx:206
+msgid "渲染失败"
+msgstr "レンダリング失敗"
+
+#: apps/app/src/features/chat/digital-human-player.tsx:99
+#: apps/app/src/features/chat/digital-human-player.tsx:181
+msgid "渲染状态: {renderStatusLabel}"
+msgstr "レンダリング状態: {renderStatusLabel}"
+
 #: apps/app/src/features/shell/desktop-nav-matching.ts:104
 #: apps/app/src/i18n/static-dom-seed.ts:74
 #: apps/app/src/routes/desktop-mobile-page.tsx:139
@@ -12446,6 +12503,7 @@ msgstr "モーメンツを見るのが大好きで、ネタを拾うのが上手
 msgid "特朗普"
 msgstr "トランプ"
 
+#: apps/app/src/features/chat/digital-human-player.tsx:150
 #: apps/app/src/features/subscription/subscription-panel.tsx:467
 #: apps/app/src/features/subscription/subscription-panel.tsx:565
 #: apps/app/src/i18n/static-dom-seed.ts:121
@@ -12979,6 +13037,10 @@ msgstr "動画カバー"
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:490
 msgid "视频已经就绪，会优先展示远端画面。"
 msgstr ""
+
+#: apps/app/src/features/chat/digital-human-player.tsx:204
+msgid "视频流就绪"
+msgstr "映像準備完了"
 
 #: apps/app/src/routes/discover-feed-page.tsx:482
 #: apps/app/src/routes/discover-page.tsx:457
@@ -16641,6 +16703,11 @@ msgstr "連絡先に選択できるメンバーがまだいません"
 msgid "通话"
 msgstr "通話"
 
+#: apps/app/src/features/chat/digital-human-player.tsx:86
+#: apps/app/src/features/chat/digital-human-player.tsx:168
+msgid "通话提示"
+msgstr "通話のヒント"
+
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:982
 #: apps/app/src/i18n/static-dom-seed.ts:996
 msgid "通话暂时不可用"
@@ -17041,6 +17108,7 @@ msgstr ""
 msgid "重试读取评论"
 msgstr ""
 
+#: apps/app/src/features/chat/digital-human-player.tsx:62
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1542
 msgid "重试连接数字人"
 msgstr ""
