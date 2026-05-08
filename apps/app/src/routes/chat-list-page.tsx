@@ -156,9 +156,20 @@ export function ChatListPage() {
   const hash = useRouterState({ select: (state) => state.location.hash });
   const normalizedPathname = normalizePathname(pathname);
   const desktopPathMismatch = normalizedPathname !== "/tabs/chat";
+  // 一旦在桌面布局下落到 /tabs/chat 就锁定；之后 useRouterState 在路由切换瞬间
+  // 反映出新的 pathname 时不再把用户拉回——否则会拦截 + 菜单的 添加朋友 /
+  // 发起群聊 / 新建笔记 等合法导航。
+  const desktopPathStabilizedRef = useRef(false);
 
   useEffect(() => {
-    if (!isDesktopLayout || !desktopPathMismatch) {
+    if (!isDesktopLayout) {
+      return;
+    }
+    if (!desktopPathMismatch) {
+      desktopPathStabilizedRef.current = true;
+      return;
+    }
+    if (desktopPathStabilizedRef.current) {
       return;
     }
 
