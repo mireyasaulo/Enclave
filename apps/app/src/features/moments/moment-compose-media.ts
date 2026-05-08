@@ -13,6 +13,7 @@ import {
   type MomentVideoAsset,
 } from "@yinjie/contracts";
 import { translateRuntimeMessage } from "@yinjie/i18n";
+import { track } from "@yinjie/analytics";
 
 const t = translateRuntimeMessage;
 

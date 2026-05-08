@@ -1,3 +1,10 @@
+import { msg } from "@lingui/macro";
+import { appI18n } from "@yinjie/i18n";
+
+function t(descriptor: ReturnType<typeof msg>) {
+  return appI18n._(descriptor);
+}
+
 // i18n-ignore-start: Builds and parses group-relay message text that is stored
 // verbatim in the message `text` field and round-tripped between sender and
 // receiver. The literal Chinese tokens are protocol markers used by both the

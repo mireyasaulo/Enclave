@@ -265,7 +265,7 @@ export function ContactDetailPane({
                   <span className="inline-flex items-center gap-2">
                     <SparkBadge streak={friendship?.sparkStreak} size="md" />
                     <span className="text-[12px] text-[color:var(--text-muted)]">
-                      {t(msg`已连续 ${friendship?.sparkStreak} 天互动`)}
+                      {t(msg`已连续 ${friendship?.sparkStreak ?? 0} 天互动`)}
                     </span>
                   </span>
                 }

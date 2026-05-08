@@ -80,7 +80,11 @@ function MobileDiscoverEncounterPage() {
         return;
       }
 
-      setMessage(t(msg`${result.character.name} 已加入通讯录：${result.greeting}`));
+      setMessage(
+        t(
+          msg`${result.character.name ?? ""} 已加入通讯录：${result.greeting ?? ""}`,
+        ),
+      );
       void Promise.all([
         queryClient.invalidateQueries({ queryKey: ["app-friend-requests", baseUrl] }),
         queryClient.invalidateQueries({ queryKey: ["app-friends", baseUrl] }),

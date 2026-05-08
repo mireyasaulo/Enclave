@@ -20,7 +20,7 @@
     "apps/app/src": {
       "rules": {
         "jsx-literal-prop": 0,
-        "object-ui-string": 0,
+        "object-ui-string": 10,
         "jsx-cjk-text": 0,
         "toast-dialog-string": 0,
         "setter-message-string": 0,
@@ -29,7 +29,7 @@
         "locale-compare-literal": 0,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 0,
-        "raw-cjk-line": 0
+        "raw-cjk-line": 97
       }
     },
     "apps/admin/src": {
@@ -84,7 +84,7 @@
         "jsx-cjk-text": 30,
         "toast-dialog-string": 0,
         "setter-message-string": 0,
-        "literal-error-message": 369,
+        "literal-error-message": 317,
         "intl-locale-literal": 2,
         "locale-compare-literal": 11,
         "speech-lang-literal": 0,

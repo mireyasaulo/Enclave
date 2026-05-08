@@ -14,7 +14,7 @@ import {
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { translateRuntimeMessage, useRuntimeTranslator } from "@yinjie/i18n";
 import {
   RotateCcw,
   ChevronLeft,

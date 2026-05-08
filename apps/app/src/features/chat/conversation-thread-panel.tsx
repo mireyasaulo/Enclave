@@ -11,6 +11,7 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Phone, Users, Video } from "lucide-react";
 import { type StickerAttachment } from "@yinjie/contracts";
 import { translateRuntimeMessage } from "@yinjie/i18n";
+import { track } from "@yinjie/analytics";
 import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { ChatComposer } from "../../components/chat-composer";
 import { FeatureUnavailableDialog } from "../../components/feature-unavailable-dialog";
