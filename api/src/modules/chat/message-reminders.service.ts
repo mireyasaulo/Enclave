@@ -1,9 +1,6 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { sanitizeAiText } from '../ai/ai-text-sanitizer';
@@ -89,12 +86,16 @@ export class MessageRemindersService {
     input: CreateMessageReminderInput,
   ): Promise<MessageReminderRecord> {
     if (!input.threadId.trim() || !input.messageId.trim()) {
-      throw new BadRequestException('提醒消息缺少必要参数。');
+      throw new AppError('CHAT_REMINDER_PARAMS_REQUIRED', {
+        legacyMessage: '提醒消息缺少必要参数。',
+      });
     }
 
     const remindAt = normalizeIsoTimestamp(input.remindAt);
     if (!remindAt) {
-      throw new BadRequestException('提醒时间格式无效。');
+      throw new AppError('CHAT_REMINDER_TIME_INVALID', {
+        legacyMessage: '提醒时间格式无效。',
+      });
     }
 
     const reminder =
@@ -117,7 +118,9 @@ export class MessageRemindersService {
   ): Promise<MessageReminderRecord> {
     const normalizedSourceId = decodeURIComponent(sourceId).trim();
     if (!normalizedSourceId) {
-      throw new BadRequestException('提醒标识不能为空。');
+      throw new AppError('CHAT_REMINDER_ID_REQUIRED', {
+        legacyMessage: '提醒标识不能为空。',
+      });
     }
 
     const nextNotifiedAt =
@@ -137,7 +140,11 @@ export class MessageRemindersService {
     });
 
     if (!updatedReminder) {
-      throw new NotFoundException(`Reminder ${normalizedSourceId} not found`);
+      throw new AppError('CHAT_REMINDER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { reminderId: normalizedSourceId },
+        legacyMessage: `Reminder ${normalizedSourceId} not found`,
+      });
     }
 
     await this.writeMessageReminders(nextReminders);
@@ -147,7 +154,9 @@ export class MessageRemindersService {
   async removeMessageReminder(sourceId: string): Promise<{ success: true }> {
     const normalizedSourceId = decodeURIComponent(sourceId).trim();
     if (!normalizedSourceId) {
-      throw new BadRequestException('提醒标识不能为空。');
+      throw new AppError('CHAT_REMINDER_ID_REQUIRED', {
+        legacyMessage: '提醒标识不能为空。',
+      });
     }
 
     const current = await this.readMessageReminders();
@@ -173,7 +182,11 @@ export class MessageRemindersService {
     });
 
     if (!conversation || conversation.type !== 'direct') {
-      throw new NotFoundException(`Conversation ${input.threadId} not found`);
+      throw new AppError('CHAT_CONVERSATION_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { threadId: input.threadId },
+        legacyMessage: `Conversation ${input.threadId} not found`,
+      });
     }
 
     const message = await this.messageRepo.findOneBy({
@@ -182,7 +195,11 @@ export class MessageRemindersService {
     });
 
     if (!message) {
-      throw new NotFoundException(`Message ${input.messageId} not found`);
+      throw new AppError('CHAT_MESSAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { messageId: input.messageId },
+        legacyMessage: `Message ${input.messageId} not found`,
+      });
     }
 
     return this.buildMessageReminderRecord({
@@ -216,12 +233,20 @@ export class MessageRemindersService {
     });
 
     if (!membership) {
-      throw new NotFoundException(`Group ${input.threadId} not found`);
+      throw new AppError('CHAT_GROUP_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { threadId: input.threadId },
+        legacyMessage: `Group ${input.threadId} not found`,
+      });
     }
 
     const group = await this.groupRepo.findOneBy({ id: input.threadId });
     if (!group) {
-      throw new NotFoundException(`Group ${input.threadId} not found`);
+      throw new AppError('CHAT_GROUP_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { threadId: input.threadId },
+        legacyMessage: `Group ${input.threadId} not found`,
+      });
     }
 
     const message = await this.groupMessageRepo.findOneBy({
@@ -230,9 +255,11 @@ export class MessageRemindersService {
     });
 
     if (!message) {
-      throw new NotFoundException(
-        `Group message ${input.messageId} not found`,
-      );
+      throw new AppError('CHAT_GROUP_MESSAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { messageId: input.messageId },
+        legacyMessage: `Group message ${input.messageId} not found`,
+      });
     }
 
     return this.buildMessageReminderRecord({

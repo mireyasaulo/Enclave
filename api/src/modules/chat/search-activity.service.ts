@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { SystemConfigService } from '../config/config.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
@@ -43,7 +44,9 @@ export class SearchActivityService {
   }): Promise<{ success: true; item: SearchHistoryRecord }> {
     const query = normalizeSearchQuery(input.query);
     if (!query) {
-      throw new BadRequestException('搜索词不能为空。');
+      throw new AppError('CHAT_SEARCH_QUERY_REQUIRED', {
+        legacyMessage: '搜索词不能为空。',
+      });
     }
 
     const owner = await this.worldOwnerService.getOwnerOrThrow();
