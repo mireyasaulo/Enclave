@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { msg } from "@lingui/macro";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, PenSquare } from "lucide-react";
 import { getMoments } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
@@ -10,13 +10,11 @@ import {
   Button,
   ErrorBlock,
   LoadingBlock,
-  cn,
 } from "@yinjie/ui";
 import { AvatarChip } from "../components/avatar-chip";
 import { EmptyState } from "../components/empty-state";
 import { MomentMediaGallery } from "../components/moment-media-gallery";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
-import { buildDesktopMomentsRouteHash } from "../features/moments/moments-route-state";
 import { buildMobileMomentsPublishRouteHash } from "../features/moments/mobile-moments-publish-route-state";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { formatTimestamp } from "../lib/format";
@@ -150,57 +148,44 @@ export function ProfileMomentsPage() {
           </div>
         ) : null}
 
-        {ownMoments.map((moment) => {
-          const detailHash = buildDesktopMomentsRouteHash({
-            momentId: moment.id,
-            returnPath: "/profile/moments",
-          });
-
-          return (
-            <Link
-              key={moment.id}
-              to="/tabs/moments"
-              hash={detailHash}
-              className={cn(
-                "mx-4 block rounded-[14px] border border-[color:var(--border-faint)] bg-white px-4 py-3 transition-colors",
-                "active:bg-[color:var(--surface-card-hover)]",
-              )}
-            >
-              <div className="text-[11px] tracking-[0.04em] text-[color:var(--text-muted)]">
-                {formatTimestamp(moment.postedAt)}
+        {ownMoments.map((moment) => (
+          <article
+            key={moment.id}
+            className="mx-4 rounded-[14px] border border-[color:var(--border-faint)] bg-white px-4 py-3"
+          >
+            <div className="text-[11px] tracking-[0.04em] text-[color:var(--text-muted)]">
+              {formatTimestamp(moment.postedAt)}
+            </div>
+            {moment.text ? (
+              <p className="mt-1.5 whitespace-pre-wrap text-[14px] leading-7 text-[color:var(--text-primary)]">
+                {moment.text}
+              </p>
+            ) : null}
+            {moment.media.length ? (
+              <div className="mt-2.5">
+                <MomentMediaGallery
+                  contentType={moment.contentType}
+                  media={moment.media}
+                  variant="mobile"
+                />
               </div>
-              {moment.text ? (
-                <p className="mt-1.5 whitespace-pre-wrap text-[14px] leading-7 text-[color:var(--text-primary)]">
-                  {moment.text}
-                </p>
-              ) : null}
-              {moment.media.length ? (
-                <div className="mt-2.5">
-                  <MomentMediaGallery
-                    contentType={moment.contentType}
-                    media={moment.media}
-                    variant="mobile"
-                    stopPropagation
-                  />
-                </div>
-              ) : null}
-              {moment.location ? (
-                <div className="mt-2 text-[12px] text-[color:var(--text-secondary)]">
-                  {moment.location}
-                </div>
-              ) : null}
-              <div className="mt-2.5 flex gap-3 text-[12px] text-[color:var(--text-muted)]">
-                <span>
-                  {t(msg`点赞`)} {moment.likeCount}
-                </span>
-                <span aria-hidden="true">·</span>
-                <span>
-                  {t(msg`评论`)} {moment.commentCount}
-                </span>
+            ) : null}
+            {moment.location ? (
+              <div className="mt-2 text-[12px] text-[color:var(--text-secondary)]">
+                {moment.location}
               </div>
-            </Link>
-          );
-        })}
+            ) : null}
+            <div className="mt-2.5 flex gap-3 text-[12px] text-[color:var(--text-muted)]">
+              <span>
+                {t(msg`点赞`)} {moment.likeCount}
+              </span>
+              <span aria-hidden="true">·</span>
+              <span>
+                {t(msg`评论`)} {moment.commentCount}
+              </span>
+            </div>
+          </article>
+        ))}
       </div>
     </AppPage>
   );
