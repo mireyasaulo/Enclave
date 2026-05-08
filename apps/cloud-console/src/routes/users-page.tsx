@@ -104,6 +104,7 @@ export function UsersPage() {
             <thead className="bg-[#f8faf8] text-left text-[color:var(--text-muted)]">
               <tr>
                 <th className="px-4 py-3 font-medium">{t("Phone")}</th>
+                <th className="px-4 py-3 font-medium">{t("Email")}</th>
                 <th className="px-4 py-3 font-medium">{t("Account")}</th>
                 <th className="px-4 py-3 font-medium">{t("Subscription")}</th>
                 <th className="px-4 py-3 font-medium">{t("Expires")}</th>
@@ -123,6 +124,9 @@ export function UsersPage() {
                     >
                       {user.phone || t("(no phone)")}
                     </Link>
+                  </td>
+                  <td className="px-4 py-3 break-all text-[color:var(--text-secondary)]">
+                    {user.email || "-"}
                   </td>
                   <td className="px-4 py-3">{t(user.status)}</td>
                   <td className="px-4 py-3">{t(user.subscriptionStatus)}</td>

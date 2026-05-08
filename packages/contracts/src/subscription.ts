@@ -132,6 +132,7 @@ export interface CheckoutResponse {
 export interface CloudUserSummary {
   id: string;
   phone: string;
+  email: string | null;
   displayName: string | null;
   status: CloudUserStatus;
   subscriptionStatus: SubscriptionStatus;
