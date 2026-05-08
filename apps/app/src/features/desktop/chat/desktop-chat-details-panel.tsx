@@ -643,9 +643,13 @@ function DirectChatDetailsPanel({
                   value={targetCharacter?.name ?? conversation.title}
                 />
                 <DesktopContactProfileRow
-                  label={t(msg`隐界号`)}
-                  value={identifier ?? t(msg`未设置`)}
-                  muted={!identifier}
+                  label={t(msg`个性签名`)}
+                  value={signature}
+                  multiline
+                  muted={
+                    !targetCharacter?.currentStatus?.trim() &&
+                    !targetCharacter?.bio?.trim()
+                  }
                 />
                 <DesktopContactProfileRow
                   label={t(msg`地区`)}
@@ -675,9 +679,13 @@ function DirectChatDetailsPanel({
                   value={targetCharacter?.relationship || t(msg`世界角色`)}
                 />
                 <DesktopContactProfileRow
-                  label={t(msg`隐界号`)}
-                  value={identifier ?? t(msg`未设置`)}
-                  muted={!identifier}
+                  label={t(msg`个性签名`)}
+                  value={signature}
+                  multiline
+                  muted={
+                    !targetCharacter?.currentStatus?.trim() &&
+                    !targetCharacter?.bio?.trim()
+                  }
                 />
               </>
             )}
@@ -735,18 +743,6 @@ function DirectChatDetailsPanel({
                 });
               }}
               disabled={!targetCharacterId}
-            />
-          </DesktopContactProfileSection>
-
-          <DesktopContactProfileSection title={t(msg`更多信息`)}>
-            <DesktopContactProfileRow
-              label={t(msg`个性签名`)}
-              value={signature}
-              multiline
-              muted={
-                !targetCharacter?.currentStatus?.trim() &&
-                !targetCharacter?.bio?.trim()
-              }
             />
           </DesktopContactProfileSection>
 
