@@ -21,7 +21,7 @@ describe("cloud-console router smoke", () => {
 
     expect(await screen.findByText("Fleet Dashboard")).toBeTruthy();
     expect(await screen.findByText("Attention Queue")).toBeTruthy();
-    expect(await screen.findByText("Ready worlds")).toBeTruthy();
+    expect(await screen.findByText("Operator Queue")).toBeTruthy();
     expect(
       (await screen.findByRole("link", { name: "Worlds" })).getAttribute(
         "href",
@@ -47,7 +47,7 @@ describe("cloud-console router smoke", () => {
 
     expect(await screen.findByText("舰队仪表盘")).toBeTruthy();
     expect(await screen.findByText("关注队列")).toBeTruthy();
-    expect(await screen.findByText("就绪世界")).toBeTruthy();
+    expect(await screen.findByText("打开世界")).toBeTruthy();
     expect(
       (await screen.findByRole("link", { name: "用户" })).getAttribute("href"),
     ).toBe("/users");
