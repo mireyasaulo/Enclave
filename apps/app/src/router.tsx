@@ -179,6 +179,31 @@ const ProfileSettingsPage = lazy(async () => {
   return { default: mod.ProfileSettingsPage };
 });
 
+const ProfileInfoPage = lazy(async () => {
+  const mod = await import("./routes/profile-info-page");
+  return { default: mod.ProfileInfoPage };
+});
+
+const ProfileInfoNamePage = lazy(async () => {
+  const mod = await import("./routes/profile-info-name-page");
+  return { default: mod.ProfileInfoNamePage };
+});
+
+const ProfileInfoSignaturePage = lazy(async () => {
+  const mod = await import("./routes/profile-info-signature-page");
+  return { default: mod.ProfileInfoSignaturePage };
+});
+
+const ProfileInfoAvatarPage = lazy(async () => {
+  const mod = await import("./routes/profile-info-avatar-page");
+  return { default: mod.ProfileInfoAvatarPage };
+});
+
+const ProfileInfoPlaceholderPage = lazy(async () => {
+  const mod = await import("./routes/profile-info-placeholder-page");
+  return { default: mod.ProfileInfoPlaceholderPage };
+});
+
 const ProfileSubscriptionPage = lazy(async () => {
   const mod = await import("./routes/profile-subscription-page");
   return { default: mod.ProfileSubscriptionPage };
@@ -820,6 +845,48 @@ const profileSettingsRoute = createRoute({
   component: ProfileSettingsPage,
 });
 
+const profileInfoRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/info",
+  beforeLoad: requireWorldReady,
+  component: ProfileInfoPage,
+});
+
+const profileInfoNameRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/info/name",
+  beforeLoad: requireWorldReady,
+  component: ProfileInfoNamePage,
+});
+
+const profileInfoSignatureRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/info/signature",
+  beforeLoad: requireWorldReady,
+  component: ProfileInfoSignaturePage,
+});
+
+const profileInfoAvatarRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/info/avatar",
+  beforeLoad: requireWorldReady,
+  component: ProfileInfoAvatarPage,
+});
+
+const profileInfoQrRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/info/qr",
+  beforeLoad: requireWorldReady,
+  component: ProfileInfoPlaceholderPage,
+});
+
+const profileInfoMoreRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/info/more",
+  beforeLoad: requireWorldReady,
+  component: ProfileInfoPlaceholderPage,
+});
+
 const profileSubscriptionRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/profile/subscription",
@@ -985,6 +1052,12 @@ const routeTree = rootRoute.addChildren([
   discoverGamesRoute,
   discoverMiniProgramsRoute,
   profileSettingsRoute,
+  profileInfoRoute,
+  profileInfoNameRoute,
+  profileInfoSignatureRoute,
+  profileInfoAvatarRoute,
+  profileInfoQrRoute,
+  profileInfoMoreRoute,
   profileSubscriptionRoute,
   desktopMobileRoute,
   mobileFriendMomentsRoute,

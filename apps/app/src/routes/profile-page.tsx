@@ -112,7 +112,7 @@ export function ProfilePage() {
 
       <div className="pb-8">
         <Link
-          to={settingsPath as never}
+          to="/profile/info"
           className="mt-1 flex items-center gap-2.5 border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] px-4 py-3 transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:bg-[color:var(--surface-card-hover)]"
         >
           <AvatarChip
