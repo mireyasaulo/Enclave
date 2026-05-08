@@ -513,27 +513,57 @@ export function MobileFriendMomentsPage() {
           !momentsQuery.isError &&
           !isBlocked &&
           friendMoments.length
-            ? friendMoments.map((moment, index) => (
-                <div
-                  key={moment.id}
-                  className={index === 0 ? "" : "border-t border-[#ECECEC]"}
-                >
-                  <WeChatMomentCard
-                    cardId={`moment-post-${moment.id}`}
-                    moment={moment}
-                    ownerId={null}
-                    liked={moment.likes.some(
-                      (like) => like.authorType === "user",
-                    )}
-                    onAuthorTap={openCharacterDetail}
-                    onOpenActionMenu={(rect) =>
-                      setActionBubble({ momentId: moment.id, anchorRect: rect })
-                    }
-                    onDoubleTapLike={() => likeMutation.mutate(moment.id)}
-                    onCommentTap={(comment) => onCommentTap(moment.id, comment)}
-                  />
-                </div>
-              ))
+            ? friendMoments.map((moment, index) => {
+                const date = new Date(moment.postedAt);
+                const dayLabel = Number.isNaN(date.getTime())
+                  ? "--"
+                  : `${date.getDate()}`.padStart(2, "0");
+                const monthLabel = Number.isNaN(date.getTime())
+                  ? "--"
+                  : `${date.getMonth() + 1}月`;
+                return (
+                  <div
+                    key={moment.id}
+                    className={index === 0 ? "" : "border-t border-[#ECECEC]"}
+                  >
+                    <div className="flex items-start gap-2 px-4 py-3.5">
+                      <div className="w-12 shrink-0 pt-1 text-right">
+                        <div className="text-[26px] font-semibold leading-none text-[#1A1A1A]">
+                          {dayLabel}
+                        </div>
+                        <div className="mt-1 text-[11px] tracking-[0.04em] text-[#9A9A9A]">
+                          {monthLabel}
+                        </div>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <WeChatMomentCard
+                          cardId={`moment-post-${moment.id}`}
+                          moment={moment}
+                          ownerId={null}
+                          liked={moment.likes.some(
+                            (like) => like.authorType === "user",
+                          )}
+                          hideAuthor
+                          flush
+                          onAuthorTap={openCharacterDetail}
+                          onOpenActionMenu={(rect) =>
+                            setActionBubble({
+                              momentId: moment.id,
+                              anchorRect: rect,
+                            })
+                          }
+                          onDoubleTapLike={() =>
+                            likeMutation.mutate(moment.id)
+                          }
+                          onCommentTap={(comment) =>
+                            onCommentTap(moment.id, comment)
+                          }
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
             : null}
 
           {likeMutation.isError && likeMutation.error instanceof Error ? (

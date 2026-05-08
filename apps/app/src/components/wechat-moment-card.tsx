@@ -27,6 +27,8 @@ type WeChatMomentCardProps = {
   liked: boolean;
   /** Hides the avatar+nickname header (used inside friend's own moments page). */
   hideAuthor?: boolean;
+  /** Skip outer padding (px-4 pb-3.5 pt-3.5) — useful when wrapped in a row layout. */
+  flush?: boolean;
   /** Highlight the card briefly after a like/comment to scroll-to-target use. */
   cardId?: string;
   /** When the user taps the ⋯ button. Parent should open the action bubble. */
@@ -52,6 +54,7 @@ export const WeChatMomentCard = forwardRef<HTMLElement, WeChatMomentCardProps>(
       ownerId,
       liked,
       hideAuthor = false,
+      flush = false,
       cardId,
       onOpenActionMenu,
       onAuthorTap,
@@ -108,7 +111,10 @@ export const WeChatMomentCard = forwardRef<HTMLElement, WeChatMomentCardProps>(
       <article
         id={cardId}
         ref={ref}
-        className="flex w-full items-start gap-2.5 px-4 pb-3.5 pt-3.5"
+        className={cn(
+          "flex w-full items-start gap-2.5",
+          flush ? "" : "px-4 pb-3.5 pt-3.5",
+        )}
       >
         {!hideAuthor ? (
           <button
