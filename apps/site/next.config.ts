@@ -13,6 +13,9 @@ const config: NextConfig = {
   outputFileTracingRoot: path.join(__dirname, "../../"),
   reactStrictMode: true,
   transpilePackages: ["@yinjie/i18n", "@yinjie/ui"],
+  experimental: {
+    swcPlugins: [["@lingui/swc-plugin", {}]],
+  },
   webpack(config) {
     config.module.rules.push({
       test: /\.po$/,

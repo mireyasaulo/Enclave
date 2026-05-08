@@ -476,8 +476,8 @@ importers:
         specifier: 5.9.5
         version: 5.9.5(typescript@5.9.3)(webpack@5.105.4)
       '@lingui/swc-plugin':
-        specifier: 5.11.0
-        version: 5.11.0(@lingui/core@5.9.5)(next@15.5.16)
+        specifier: 5.5.2
+        version: 5.5.2(@lingui/core@5.9.5)(next@15.5.16)
       '@tailwindcss/postcss':
         specifier: ^4.0.9
         version: 4.2.4
@@ -2183,8 +2183,8 @@ packages:
       react: 19.2.4
     dev: false
 
-  /@lingui/swc-plugin@5.11.0(@lingui/core@5.9.5)(next@15.5.16):
-    resolution: {integrity: sha512-0PBYyozQOiA4WtxKPsnCyrbA9da9zOYehyZjvrv56Kzt9w81xbgnNjuAQZyjIX7UYuqFFE48GvzBqnB5SLLOFA==}
+  /@lingui/swc-plugin@5.5.2(@lingui/core@5.9.5)(next@15.5.16):
+    resolution: {integrity: sha512-QIqfvB6N07o8qvVFptPKh9vZWTTz/l88+7yPP9C6r9niLCHCZeizbpzuTz6o7G0Kd0ZR9txdlUnCkkFD188kkw==}
     peerDependencies:
       '@lingui/core': '5'
       '@swc/core': '*'

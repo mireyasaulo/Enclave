@@ -193,15 +193,7 @@ function RootLayoutContent() {
   const [secret, setSecret] = useState(getCloudAdminSecret);
   const [editingSecret, setEditingSecret] = useState(!getCloudAdminSecret());
   const [draft, setDraft] = useState(getCloudAdminSecret);
-  const moreSectionPaths = [
-    "/users",
-    "/subscription-plans",
-    "/configs",
-    "/invite-audit",
-    "/feedbacks",
-    "/telemetry",
-    "/revenue-sharing",
-  ];
+  const moreSectionPaths = ["/jobs", "/waiting-sync", "/sessions"];
   const moreSectionActive = moreSectionPaths.some((p) => pathname.startsWith(p));
   const [moreExpanded, setMoreExpanded] = useState(moreSectionActive);
   const hasSecret = Boolean(secret.trim());
@@ -288,54 +280,6 @@ function RootLayoutContent() {
         </WorldsPermalinkLink>
       ),
     },
-  ] as const;
-
-  const operationsNavItems = [
-    {
-      key: "jobs",
-      content: (
-        <JobsPermalinkLink
-          className={pathname === "/jobs" ? NAV_LINK_ACTIVE : NAV_LINK}
-          aria-current={pathname === "/jobs" ? "page" : undefined}
-        >
-          <NavLinkContent
-            label={t("Jobs")}
-            hint={t("Queue and leases")}
-          />
-        </JobsPermalinkLink>
-      ),
-    },
-    {
-      key: "waiting-sync",
-      content: (
-        <WaitingSyncPermalinkLink
-          className={pathname === "/waiting-sync" ? NAV_LINK_ACTIVE : NAV_LINK}
-          aria-current={pathname === "/waiting-sync" ? "page" : undefined}
-        >
-          <NavLinkContent
-            label={t("Waiting Sync")}
-            hint={t("Durable tasks")}
-          />
-        </WaitingSyncPermalinkLink>
-      ),
-    },
-    {
-      key: "sessions",
-      content: (
-        <SessionsPermalinkLink
-          className={pathname === "/sessions" ? NAV_LINK_ACTIVE : NAV_LINK}
-          aria-current={pathname === "/sessions" ? "page" : undefined}
-        >
-          <NavLinkContent
-            label={t("Sessions")}
-            hint={t("Access audit")}
-          />
-        </SessionsPermalinkLink>
-      ),
-    },
-  ] as const;
-
-  const moreNavItems = [
     {
       key: "users",
       content: (
@@ -460,6 +404,51 @@ function RootLayoutContent() {
       ),
     },
   ] as const;
+
+  const moreNavItems = [
+    {
+      key: "jobs",
+      content: (
+        <JobsPermalinkLink
+          className={pathname === "/jobs" ? NAV_LINK_ACTIVE : NAV_LINK}
+          aria-current={pathname === "/jobs" ? "page" : undefined}
+        >
+          <NavLinkContent
+            label={t("Jobs")}
+            hint={t("Queue and leases")}
+          />
+        </JobsPermalinkLink>
+      ),
+    },
+    {
+      key: "waiting-sync",
+      content: (
+        <WaitingSyncPermalinkLink
+          className={pathname === "/waiting-sync" ? NAV_LINK_ACTIVE : NAV_LINK}
+          aria-current={pathname === "/waiting-sync" ? "page" : undefined}
+        >
+          <NavLinkContent
+            label={t("Waiting Sync")}
+            hint={t("Durable tasks")}
+          />
+        </WaitingSyncPermalinkLink>
+      ),
+    },
+    {
+      key: "sessions",
+      content: (
+        <SessionsPermalinkLink
+          className={pathname === "/sessions" ? NAV_LINK_ACTIVE : NAV_LINK}
+          aria-current={pathname === "/sessions" ? "page" : undefined}
+        >
+          <NavLinkContent
+            label={t("Sessions")}
+            hint={t("Access audit")}
+          />
+        </SessionsPermalinkLink>
+      ),
+    },
+  ] as const;
   // i18n-ignore-end
 
   return (
@@ -515,17 +504,6 @@ function RootLayoutContent() {
               </div>
               <div className="mt-2 space-y-1">
                 {primaryNavItems.map((item) => (
-                  <div key={item.key}>{item.content}</div>
-                ))}
-              </div>
-            </section>
-
-            <section>
-              <div className="px-1 text-[10px] uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
-                {t("Cloud operations")}
-              </div>
-              <div className="mt-2 space-y-1">
-                {operationsNavItems.map((item) => (
                   <div key={item.key}>{item.content}</div>
                 ))}
               </div>

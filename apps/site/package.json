@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@lingui/loader": "5.9.5",
-    "@lingui/swc-plugin": "5.11.0",
+    "@lingui/swc-plugin": "5.5.2",
     "@tailwindcss/postcss": "^4.0.9",
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.10",
