@@ -23,6 +23,7 @@ import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { CheckoutContactDialog } from "../features/subscription/checkout-contact-dialog";
 import { clearCloudRuntimeSession } from "../lib/cloud-session";
+import { navigateBackOrFallback } from "../lib/history-back";
 import { describeRequestError } from "../lib/request-error";
 import {
   isNativeMobileBridgeAvailable,
@@ -420,8 +421,11 @@ export function ProfileSubscriptionPage() {
     profileQuery.error ?? subscriptionQuery.error ?? inviteQuery.error ?? null;
 
   const goBackToSettings = () =>
-    void navigate({
-      to: isDesktopLayout ? "/desktop/settings" : "/profile/settings",
+    void navigate({ to: "/desktop/settings" });
+
+  const goBack = () =>
+    navigateBackOrFallback(() => {
+      void navigate({ to: "/tabs/profile" });
     });
 
   if (!accessToken) {
@@ -478,11 +482,11 @@ export function ProfileSubscriptionPage() {
           titleAlign="center"
           leftActions={
             <Button
-              onClick={goBackToSettings}
+              onClick={goBack}
               variant="ghost"
               size="icon"
               className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none active:bg-black/[0.05]"
-              aria-label={t(msg`返回设置`)}
+              aria-label={t(msg`返回`)}
             >
               <ArrowLeft size={17} />
             </Button>

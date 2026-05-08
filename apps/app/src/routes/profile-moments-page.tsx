@@ -17,6 +17,7 @@ import { MomentMediaGallery } from "../components/moment-media-gallery";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { formatTimestamp } from "../lib/format";
+import { navigateBackOrFallback } from "../lib/history-back";
 import { describeRequestError } from "../lib/request-error";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
@@ -49,7 +50,10 @@ export function ProfileMomentsPage() {
     return momentsQuery.data.filter((moment) => moment.authorId === ownerId);
   }, [momentsQuery.data, ownerId]);
 
-  const goBack = () => void navigate({ to: "/tabs/profile" });
+  const goBack = () =>
+    navigateBackOrFallback(() => {
+      void navigate({ to: "/tabs/profile" });
+    });
 
   return (
     <AppPage

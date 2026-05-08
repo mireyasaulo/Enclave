@@ -294,7 +294,7 @@ msgid "{0} 个"
 msgstr "{0}"
 
 #. placeholder {0}: filteredWorldCharacterItems.length
-#: apps/app/src/routes/contacts-page.tsx:1493
+#: apps/app/src/routes/contacts-page.tsx:1511
 msgid "{0} 个世界角色"
 msgstr "{0} world characters"
 
@@ -355,7 +355,7 @@ msgid "{0} 人群聊 · 免打扰"
 msgstr "{0}-member group · muted"
 
 #. placeholder {0}: starredFriends.length
-#: apps/app/src/routes/contacts-page.tsx:1334
+#: apps/app/src/routes/contacts-page.tsx:1352
 msgid "{0} 位常联系好友"
 msgstr "{0} frequent contacts"
 
@@ -365,7 +365,7 @@ msgstr "{0} frequent contacts"
 #: apps/app/src/features/desktop/contacts/desktop-contacts-starred-friends-pane.tsx:82
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:479
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:493
-#: apps/app/src/routes/contacts-page.tsx:1491
+#: apps/app/src/routes/contacts-page.tsx:1509
 #: apps/app/src/routes/tags-page.tsx:309
 msgid "{0} 位联系人"
 msgstr "{0} contacts"
@@ -992,7 +992,7 @@ msgstr "{elapsedMinutes} minutes"
 msgid "{fileCount} 个文件"
 msgstr "{fileCount} files"
 
-#: apps/app/src/routes/contacts-page.tsx:1264
+#: apps/app/src/routes/contacts-page.tsx:1282
 msgid "{groupCount} 个群聊"
 msgstr "{groupCount} group chats"
 
@@ -1104,7 +1104,7 @@ msgstr "{ownerName} wants to add you to contacts."
 msgid "{passedCheckCount} / {0} 项通过"
 msgstr "{passedCheckCount} / {0} passed"
 
-#: apps/app/src/routes/contacts-page.tsx:1239
+#: apps/app/src/routes/contacts-page.tsx:1257
 msgid "{pendingRequestCount} 条待处理申请"
 msgstr "{pendingRequestCount} pending requests"
 
@@ -1157,7 +1157,7 @@ msgstr "{statusLabel} · Do not disturb on"
 msgid "{STREAK_BONUS_AT} 连击！+3 节奏分。"
 msgstr "{STREAK_BONUS_AT} 连击！+3 节奏分。"
 
-#: apps/app/src/routes/contacts-page.tsx:1355
+#: apps/app/src/routes/contacts-page.tsx:1373
 msgid "{tagGroupCount} 个标签分组"
 msgstr "{tagGroupCount} tag groups"
 
@@ -2379,7 +2379,7 @@ msgstr "World"
 #: apps/app/src/routes/discover-page.tsx:775
 #: apps/app/src/routes/live-companion-page.tsx:296
 #: apps/app/src/routes/profile-info-page.tsx:32
-#: apps/app/src/routes/profile-moments-page.tsx:83
+#: apps/app/src/routes/profile-moments-page.tsx:87
 #: apps/app/src/routes/profile-page.tsx:121
 #: apps/app/src/routes/profile-page.tsx:128
 #: apps/app/src/routes/profile-page.tsx:131
@@ -2562,7 +2562,7 @@ msgstr "World autonomy"
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:168
 #: apps/app/src/features/search/desktop-search-launcher.tsx:875
 #: apps/app/src/routes/character-detail-page.tsx:257
-#: apps/app/src/routes/contacts-page.tsx:1307
+#: apps/app/src/routes/contacts-page.tsx:1325
 #: apps/app/src/routes/discover-page.tsx:276
 #: apps/app/src/routes/world-characters-page.tsx:302
 #: apps/app/src/routes/world-characters-page.tsx:435
@@ -2584,7 +2584,7 @@ msgstr "World character updates"
 msgid "世界角色和你一起种地，连偷菜的都是熟人。"
 msgstr "World characters farm with you — even the ones stealing crops are familiar faces."
 
-#: apps/app/src/routes/contacts-page.tsx:1608
+#: apps/app/src/routes/contacts-page.tsx:1626
 msgid "世界角色搜索结果"
 msgstr "World character search results"
 
@@ -2598,11 +2598,11 @@ msgstr "World character updates"
 msgid "世界角色暂时不可用"
 msgstr "World characters are temporarily unavailable"
 
-#: apps/app/src/routes/contacts-page.tsx:1609
+#: apps/app/src/routes/contacts-page.tsx:1627
 msgid "世界角色目录"
 msgstr "World character directory"
 
-#: apps/app/src/routes/contacts-page.tsx:1385
+#: apps/app/src/routes/contacts-page.tsx:1403
 msgid "世界角色目录暂时没有刷新成功。"
 msgstr "World character directory failed to refresh."
 
@@ -2797,7 +2797,7 @@ msgid "二维码名片功能开发中，敬请期待。"
 msgstr ""
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:300
-#: apps/app/src/routes/profile-subscription-page.tsx:307
+#: apps/app/src/routes/profile-subscription-page.tsx:308
 msgid "二维码生成失败"
 msgstr "Failed to generate QR code"
 
@@ -2818,7 +2818,7 @@ msgid "云世界访问会话缺失。"
 msgstr "Cloud world access session is missing."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:556
-#: apps/app/src/routes/profile-subscription-page.tsx:583
+#: apps/app/src/routes/profile-subscription-page.tsx:587
 msgid "云端管理后台暂未开放可购套餐。"
 msgstr "No public plans are enabled in the cloud admin yet."
 
@@ -3264,8 +3264,8 @@ msgstr "Will sync to the top of the chat and the message list."
 #: apps/app/src/routes/profile-page.tsx:176
 #: apps/app/src/routes/profile-settings-page.tsx:57
 #: apps/app/src/routes/profile-settings-page.tsx:766
-#: apps/app/src/routes/profile-subscription-page.tsx:477
-#: apps/app/src/routes/profile-subscription-page.tsx:500
+#: apps/app/src/routes/profile-subscription-page.tsx:481
+#: apps/app/src/routes/profile-subscription-page.tsx:504
 msgid "会员中心"
 msgstr "Membership Center"
 
@@ -3672,8 +3672,8 @@ msgstr "Forward one by one, keeping original message structure"
 
 #: apps/app/src/features/contacts/management/management-permissions-detail-screen.tsx:124
 #: apps/app/src/features/desktop/contacts/desktop-contacts-starred-friends-pane.tsx:168
-#: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:379
-#: apps/app/src/routes/contacts-page.tsx:2352
+#: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:380
+#: apps/app/src/routes/contacts-page.tsx:2370
 msgid "保持联系"
 msgstr "Keep in touch"
 
@@ -3840,7 +3840,7 @@ msgstr "Pick a chat from the left first"
 msgid "先从左侧选择一个公众号，或切回常看与文章模式查看精选流。"
 msgstr "Pick an Official Account from the left, or switch back to Frequently read or Articles to browse the curated feed."
 
-#: apps/app/src/routes/contacts-page.tsx:1583
+#: apps/app/src/routes/contacts-page.tsx:1601
 msgid "先从新的朋友里建立关系，或者去看看世界角色。"
 msgstr "Start from New Friends, or browse world characters."
 
@@ -4005,7 +4005,7 @@ msgstr "Just deal with {0} first."
 msgid "先处理主推荐"
 msgstr "Handle the top recommendation first"
 
-#: apps/app/src/routes/contacts-page.tsx:2168
+#: apps/app/src/routes/contacts-page.tsx:2186
 msgid "先处理新的朋友，或者去浏览世界角色。"
 msgstr "Handle New Friends first, or browse world characters."
 
@@ -4238,7 +4238,7 @@ msgstr "Select all"
 #: apps/app/src/routes/channel-author-page.tsx:254
 #: apps/app/src/routes/desktop-chat-files-page.tsx:498
 #: apps/app/src/routes/desktop-chat-files-page.tsx:524
-#: apps/app/src/routes/profile-favorites-page.tsx:42
+#: apps/app/src/routes/profile-favorites-page.tsx:43
 msgid "全部"
 msgstr "All"
 
@@ -4335,14 +4335,14 @@ msgstr "Ticket all"
 #: apps/app/src/features/search/search-types.ts:106
 #: apps/app/src/features/search/search-types.ts:119
 #: apps/app/src/i18n/static-dom-seed.ts:917
-#: apps/app/src/routes/contacts-page.tsx:1286
+#: apps/app/src/routes/contacts-page.tsx:1304
 #: apps/app/src/routes/desktop-mobile-page.tsx:129
 #: apps/app/src/routes/desktop-mobile-page.tsx:590
 #: apps/app/src/routes/favorites-page.tsx:71
 #: apps/app/src/routes/favorites-page.tsx:485
 #: apps/app/src/routes/official-account-detail-page.tsx:398
 #: apps/app/src/routes/official-accounts-page.tsx:173
-#: apps/app/src/routes/profile-favorites-page.tsx:46
+#: apps/app/src/routes/profile-favorites-page.tsx:47
 msgid "公众号"
 msgstr "Official Account"
 
@@ -4661,7 +4661,7 @@ msgid "关闭弹窗"
 msgstr "Close dialog"
 
 #: apps/app/src/routes/chat-list-page.tsx:607
-#: apps/app/src/routes/contacts-page.tsx:1968
+#: apps/app/src/routes/contacts-page.tsx:1986
 msgid "关闭快捷菜单"
 msgstr "Close quick menu"
 
@@ -5333,7 +5333,7 @@ msgid "最近还没有使用过表情。"
 msgstr "No recent stickers yet."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:567
-#: apps/app/src/routes/profile-subscription-page.tsx:594
+#: apps/app/src/routes/profile-subscription-page.tsx:598
 msgid "最近邀请记录"
 msgstr "Recent invite history"
 
@@ -5773,7 +5773,7 @@ msgid "创建中"
 msgstr "Creating"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:587
-#: apps/app/src/routes/profile-subscription-page.tsx:614
+#: apps/app/src/routes/profile-subscription-page.tsx:618
 msgid "创建时间"
 msgstr "Created at"
 
@@ -5933,7 +5933,7 @@ msgid "到手机继续"
 msgstr "Continue on phone"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:491
-#: apps/app/src/routes/profile-subscription-page.tsx:510
+#: apps/app/src/routes/profile-subscription-page.tsx:514
 msgid "到期时间"
 msgstr "Expires at"
 
@@ -6263,7 +6263,7 @@ msgid "单次最多预览 20 个联系人。"
 msgstr "单次最多预览 20 个联系人。"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:210
-#: apps/app/src/routes/profile-subscription-page.tsx:217
+#: apps/app/src/routes/profile-subscription-page.tsx:218
 msgid "单次奖励"
 msgstr "Single-time reward"
 
@@ -6377,7 +6377,7 @@ msgstr "原野站"
 msgid "去做任务"
 msgstr "Do tasks"
 
-#: apps/app/src/routes/profile-moments-page.tsx:104
+#: apps/app/src/routes/profile-moments-page.tsx:108
 msgid "去发布"
 msgstr "Post now"
 
@@ -6893,8 +6893,8 @@ msgstr "Send code"
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:203
 #: apps/app/src/routes/channels-page.tsx:1933
 #: apps/app/src/routes/character-detail-page.tsx:299
-#: apps/app/src/routes/contacts-page.tsx:1985
-#: apps/app/src/routes/contacts-page.tsx:1987
+#: apps/app/src/routes/contacts-page.tsx:2003
+#: apps/app/src/routes/contacts-page.tsx:2005
 #: apps/app/src/routes/mobile-add-friend-page.tsx:406
 #: apps/app/src/routes/mobile-add-friend-page.tsx:775
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:768
@@ -7123,7 +7123,7 @@ msgid "可见动态"
 msgstr "Visible posts"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:508
-#: apps/app/src/routes/profile-subscription-page.tsx:535
+#: apps/app/src/routes/profile-subscription-page.tsx:539
 msgid "可购套餐"
 msgstr "Available plans"
 
@@ -7830,7 +7830,7 @@ msgstr "Image preview failed to open, so it is now shown on this page."
 msgid "在上方拖动选择要引用的文字。"
 msgstr "Drag above to select the text you want to quote."
 
-#: apps/app/src/routes/profile-moments-page.tsx:97
+#: apps/app/src/routes/profile-moments-page.tsx:101
 msgid "在发现页的朋友圈里发布动态，记录你的世界。"
 msgstr "Head to Discover → Moments to post and capture your world."
 
@@ -7858,7 +7858,7 @@ msgstr "Manage the world owner profile and signature in the desktop workspace."
 msgid "在桌面端集中处理所有待通过好友申请。"
 msgstr "Manage all pending friend requests in one place on desktop."
 
-#: apps/app/src/routes/profile-favorites-page.tsx:159
+#: apps/app/src/routes/profile-favorites-page.tsx:163
 msgid "在消息、朋友圈或文章里点击收藏，内容会出现在这里。"
 msgstr "Tap Save in chats, Moments, or articles, and items will appear here."
 
@@ -8163,7 +8163,7 @@ msgstr "Failed to copy the card. Try again later."
 
 #: apps/app/src/features/subscription/checkout-contact-dialog.tsx:131
 #: apps/app/src/features/subscription/subscription-panel.tsx:151
-#: apps/app/src/routes/profile-subscription-page.tsx:158
+#: apps/app/src/routes/profile-subscription-page.tsx:159
 msgid "复制失败，请手动选中复制。"
 msgstr "Copy failed. Select and copy manually."
 
@@ -8279,14 +8279,14 @@ msgid "复制邀请文案"
 msgstr "Copy invitation text"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:270
-#: apps/app/src/routes/profile-subscription-page.tsx:277
+#: apps/app/src/routes/profile-subscription-page.tsx:278
 msgid "复制邀请码"
 msgstr "Copy invite code"
 
 #: apps/app/src/components/official-article-viewer.tsx:278
 #: apps/app/src/components/official-article-viewer.tsx:334
 #: apps/app/src/features/subscription/subscription-panel.tsx:258
-#: apps/app/src/routes/profile-subscription-page.tsx:265
+#: apps/app/src/routes/profile-subscription-page.tsx:266
 msgid "复制链接"
 msgstr "Copy link"
 
@@ -8320,6 +8320,10 @@ msgstr "External digital human ready"
 #: apps/app/src/features/mini-programs/group-relay-card.ts:73
 msgid "多次回填"
 msgstr "Multiple fill-backs"
+
+#: apps/app/src/routes/profile-settings-language-page.tsx:41
+msgid "多语言"
+msgstr ""
 
 #: apps/app/src/features/chat/group-message-context-menu.tsx:150
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:116
@@ -8380,8 +8384,8 @@ msgstr "Night market"
 #: apps/app/src/features/games/farm/crop-presentation.ts:65
 #: apps/app/src/features/subscription/subscription-panel.tsx:213
 #: apps/app/src/features/subscription/subscription-panel.tsx:229
-#: apps/app/src/routes/profile-subscription-page.tsx:220
-#: apps/app/src/routes/profile-subscription-page.tsx:236
+#: apps/app/src/routes/profile-subscription-page.tsx:221
+#: apps/app/src/routes/profile-subscription-page.tsx:237
 msgid "天"
 msgstr "days"
 
@@ -8454,7 +8458,7 @@ msgstr "Friends play often"
 msgid "好友申请"
 msgstr "Friend requests"
 
-#: apps/app/src/routes/contacts-page.tsx:1402
+#: apps/app/src/routes/contacts-page.tsx:1420
 msgid "好友申请入口暂时没有刷新成功。"
 msgstr "Friend request entry failed to refresh."
 
@@ -8472,7 +8476,7 @@ msgstr "Friend request sent."
 msgid "好友申请待处理"
 msgstr "Friend request pending"
 
-#: apps/app/src/routes/contacts-page.tsx:725
+#: apps/app/src/routes/contacts-page.tsx:743
 #: apps/app/src/routes/friend-requests-page.tsx:110
 msgid "好友请求已处理。"
 msgstr "Friend request handled."
@@ -9075,7 +9079,7 @@ msgid "已从当前设备删除这条消息。"
 msgstr "This message was deleted from the current device."
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:199
-#: apps/app/src/routes/contacts-page.tsx:803
+#: apps/app/src/routes/contacts-page.tsx:821
 msgid "已从通讯录删除联系人。"
 msgstr "Contact removed from Contacts."
 
@@ -9203,7 +9207,7 @@ msgstr "Group member nicknames are now hidden."
 #: apps/app/src/routes/character-detail-page.tsx:602
 #: apps/app/src/routes/chat-details-page.tsx:445
 #: apps/app/src/routes/chat-list-page.tsx:358
-#: apps/app/src/routes/contacts-page.tsx:793
+#: apps/app/src/routes/contacts-page.tsx:811
 msgid "已关闭消息免打扰。"
 msgstr "Chat notifications are no longer muted."
 
@@ -9317,7 +9321,7 @@ msgstr "Blocked"
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:178
 #: apps/app/src/routes/character-detail-page.tsx:641
 #: apps/app/src/routes/chat-details-page.tsx:625
-#: apps/app/src/routes/contacts-page.tsx:669
+#: apps/app/src/routes/contacts-page.tsx:687
 msgid "已加入黑名单。"
 msgstr "Added to blocklist."
 
@@ -9331,7 +9335,7 @@ msgid "已参加"
 msgstr "Joined"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:573
-#: apps/app/src/routes/profile-subscription-page.tsx:600
+#: apps/app/src/routes/profile-subscription-page.tsx:604
 msgid "已发放"
 msgstr "Rewarded"
 
@@ -9362,7 +9366,7 @@ msgstr "Message removed from Favorites."
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:326
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:93
 #: apps/app/src/routes/character-detail-page.tsx:560
-#: apps/app/src/routes/contacts-page.tsx:741
+#: apps/app/src/routes/contacts-page.tsx:759
 msgid "已取消星标朋友。"
 msgstr "Removed from starred friends."
 
@@ -9415,7 +9419,7 @@ msgid "已向 {inviteFriendName} 发出一起玩{inviteGameName} 的邀约。"
 msgstr "Invited {inviteFriendName} to play {inviteGameName}."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:167
-#: apps/app/src/routes/profile-subscription-page.tsx:174
+#: apps/app/src/routes/profile-subscription-page.tsx:175
 msgid "已唤起分享面板。"
 msgstr "Share panel opened."
 
@@ -9500,14 +9504,14 @@ msgid "已复制微信号"
 msgstr "WeChat ID copied"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:266
-#: apps/app/src/routes/profile-subscription-page.tsx:273
+#: apps/app/src/routes/profile-subscription-page.tsx:274
 msgid "已复制邀请码。"
 msgstr "Invite code copied."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:184
 #: apps/app/src/features/subscription/subscription-panel.tsx:255
-#: apps/app/src/routes/profile-subscription-page.tsx:191
-#: apps/app/src/routes/profile-subscription-page.tsx:262
+#: apps/app/src/routes/profile-subscription-page.tsx:192
+#: apps/app/src/routes/profile-subscription-page.tsx:263
 msgid "已复制邀请链接。"
 msgstr "Invite link copied."
 
@@ -9629,7 +9633,7 @@ msgstr "Do Not Disturb on"
 #: apps/app/src/routes/character-detail-page.tsx:601
 #: apps/app/src/routes/chat-details-page.tsx:444
 #: apps/app/src/routes/chat-list-page.tsx:357
-#: apps/app/src/routes/contacts-page.tsx:792
+#: apps/app/src/routes/contacts-page.tsx:810
 msgid "已开启消息免打扰。"
 msgstr "Chat notifications muted."
 
@@ -9746,7 +9750,7 @@ msgid "已拉黑"
 msgstr "Blocked"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:574
-#: apps/app/src/routes/profile-subscription-page.tsx:601
+#: apps/app/src/routes/profile-subscription-page.tsx:605
 msgid "已拒绝"
 msgstr "Rejected"
 
@@ -9763,7 +9767,7 @@ msgid "已接通"
 msgstr "Connected"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:389
-#: apps/app/src/routes/profile-subscription-page.tsx:391
+#: apps/app/src/routes/profile-subscription-page.tsx:392
 msgid "已提交开通申请，请联系运营完成支付。"
 msgstr "Activation request submitted. Contact operations to complete payment."
 
@@ -9952,7 +9956,7 @@ msgstr "Confirmed"
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:178
 #: apps/app/src/routes/character-detail-page.tsx:641
-#: apps/app/src/routes/contacts-page.tsx:669
+#: apps/app/src/routes/contacts-page.tsx:687
 msgid "已移出黑名单。"
 msgstr "Removed from blocklist."
 
@@ -10025,7 +10029,7 @@ msgstr "Logged this completion: {0}"
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:326
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:92
 #: apps/app/src/routes/character-detail-page.tsx:560
-#: apps/app/src/routes/contacts-page.tsx:741
+#: apps/app/src/routes/contacts-page.tsx:759
 msgid "已设为星标朋友。"
 msgstr "Added to starred friends."
 
@@ -10073,7 +10077,7 @@ msgid "已转发到 {conversationTitle}。"
 msgstr "Forwarded to {conversationTitle}."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:460
-#: apps/app/src/routes/profile-subscription-page.tsx:463
+#: apps/app/src/routes/profile-subscription-page.tsx:467
 msgid "已过期"
 msgstr "Expired"
 
@@ -10198,7 +10202,7 @@ msgstr "Notified"
 msgid "已通过"
 msgstr "Approved"
 
-#: apps/app/src/routes/contacts-page.tsx:695
+#: apps/app/src/routes/contacts-page.tsx:713
 #: apps/app/src/routes/friend-requests-page.tsx:88
 msgid "已通过好友申请。"
 msgstr "Friend request accepted."
@@ -10365,7 +10369,7 @@ msgstr "The feed brings public posts from many non-friend world people into one 
 #: apps/app/src/routes/discover-page.tsx:511
 #: apps/app/src/routes/discover-page.tsx:734
 #: apps/app/src/routes/favorites-page.tsx:73
-#: apps/app/src/routes/profile-favorites-page.tsx:48
+#: apps/app/src/routes/profile-favorites-page.tsx:49
 msgid "广场动态"
 msgstr "Public Feed"
 
@@ -10988,7 +10992,7 @@ msgid "当前外部数字人播放器模板还没配好，视频页只能停留�
 msgstr "The external digital human player template isn't configured yet; the video page can only stay in placeholder mode or fall back to the built-in flow."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:488
-#: apps/app/src/routes/profile-subscription-page.tsx:507
+#: apps/app/src/routes/profile-subscription-page.tsx:511
 msgid "当前套餐"
 msgstr "Current plan"
 
@@ -11173,7 +11177,7 @@ msgstr "No world characters to display right now"
 msgid "当前没有可执行顺序。"
 msgstr "There is currently no executable sequence."
 
-#: apps/app/src/routes/contacts-page.tsx:1315
+#: apps/app/src/routes/contacts-page.tsx:1333
 msgid "当前没有可浏览的世界角色"
 msgstr "No world characters available right now"
 
@@ -11911,7 +11915,7 @@ msgstr "Fast team play"
 msgid "快速收集"
 msgstr "Quick collect"
 
-#: apps/app/src/routes/contacts-page.tsx:1335
+#: apps/app/src/routes/contacts-page.tsx:1353
 msgid "快速查看设为星标的联系人"
 msgstr "Quickly view starred contacts"
 
@@ -12016,7 +12020,7 @@ msgid "成功后会同步写入当前聊天消息流。"
 msgstr "On success, it will be synced into the current chat stream."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:218
-#: apps/app/src/routes/profile-subscription-page.tsx:225
+#: apps/app/src/routes/profile-subscription-page.tsx:226
 msgid "成功邀请"
 msgstr "Successfully invited"
 
@@ -12296,7 +12300,7 @@ msgid "手机入口"
 msgstr "Mobile Entry Points"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:484
-#: apps/app/src/routes/profile-subscription-page.tsx:503
+#: apps/app/src/routes/profile-subscription-page.tsx:507
 #: apps/app/src/routes/welcome-page.tsx:869
 msgid "手机号"
 msgstr "Phone number"
@@ -12454,7 +12458,7 @@ msgstr "Open Current Document"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1497
 #: apps/app/src/routes/chat-list-page.tsx:626
-#: apps/app/src/routes/contacts-page.tsx:2007
+#: apps/app/src/routes/contacts-page.tsx:2025
 msgid "打开快捷菜单"
 msgstr "Open quick menu"
 
@@ -12468,7 +12472,7 @@ msgid "打开所在位置失败，请稍后再试。"
 msgstr "Failed to open the location, please try again later."
 
 #: apps/app/src/routes/chat-list-page.tsx:702
-#: apps/app/src/routes/contacts-page.tsx:2085
+#: apps/app/src/routes/contacts-page.tsx:2103
 msgid "打开搜一搜"
 msgstr "Open Search"
 
@@ -12713,7 +12717,7 @@ msgid "扫一扫上面的二维码图案，加我为朋友"
 msgstr "Scan the QR code above to add me as a friend"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:309
-#: apps/app/src/routes/profile-subscription-page.tsx:316
+#: apps/app/src/routes/profile-subscription-page.tsx:317
 msgid "扫码加入"
 msgstr "Scan to join"
 
@@ -12993,7 +12997,7 @@ msgid "拒绝"
 msgstr "Decline"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:592
-#: apps/app/src/routes/profile-subscription-page.tsx:619
+#: apps/app/src/routes/profile-subscription-page.tsx:623
 msgid "拒绝原因"
 msgstr "Reject reason"
 
@@ -13189,7 +13193,7 @@ msgstr "Filter by file name and file messages"
 msgid "按来源整理"
 msgstr "Organized by source"
 
-#: apps/app/src/routes/contacts-page.tsx:1356
+#: apps/app/src/routes/contacts-page.tsx:1374
 msgid "按标签整理联系人"
 msgstr "Organize contacts by tags"
 
@@ -13246,11 +13250,11 @@ msgstr "Try another keyword."
 msgid "换个关键词试试，或者切到图片、文件、链接分类继续找。"
 msgstr "Try a different keyword, or switch to Images, Files, or Links to keep looking."
 
-#: apps/app/src/routes/contacts-page.tsx:1582
+#: apps/app/src/routes/contacts-page.tsx:1600
 msgid "换个关键词试试，或者展开世界角色目录继续找人。"
 msgstr "Try another keyword, or expand the world character directory."
 
-#: apps/app/src/routes/contacts-page.tsx:2167
+#: apps/app/src/routes/contacts-page.tsx:2185
 msgid "换个关键词试试，或者继续搜索世界角色。"
 msgstr "Try another keyword, or keep searching world characters."
 
@@ -13407,7 +13411,7 @@ msgid "提交一次聊天场景投诉"
 msgstr "Submit a chat-scene report"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:547
-#: apps/app/src/routes/profile-subscription-page.tsx:574
+#: apps/app/src/routes/profile-subscription-page.tsx:578
 msgid "提交中…"
 msgstr "Submitting…"
 
@@ -13417,7 +13421,7 @@ msgid "提交反馈"
 msgstr "Submit feedback"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:404
-#: apps/app/src/routes/profile-subscription-page.tsx:402
+#: apps/app/src/routes/profile-subscription-page.tsx:403
 msgid "提交开通申请失败，请稍后重试。"
 msgstr "Failed to submit activation request. Please try again later."
 
@@ -13557,8 +13561,8 @@ msgstr "Search Moments, Plaza posts, and Official Accounts"
 #: apps/app/src/features/shell/desktop-nav-matching.ts:98
 #: apps/app/src/features/shell/desktop-shell.tsx:644
 #: apps/app/src/routes/chat-list-page.tsx:709
-#: apps/app/src/routes/contacts-page.tsx:2088
-#: apps/app/src/routes/contacts-page.tsx:2159
+#: apps/app/src/routes/contacts-page.tsx:2106
+#: apps/app/src/routes/contacts-page.tsx:2177
 #: apps/app/src/routes/create-group-page.tsx:422
 #: apps/app/src/routes/mobile-add-friend-page.tsx:414
 msgid "搜索"
@@ -14052,7 +14056,7 @@ msgstr "Harvest"
 #: apps/app/src/routes/discover-feed-page.tsx:948
 #: apps/app/src/routes/favorites-page.tsx:417
 #: apps/app/src/routes/moments-page.tsx:1115
-#: apps/app/src/routes/profile-favorites-page.tsx:115
+#: apps/app/src/routes/profile-favorites-page.tsx:119
 #: apps/app/src/routes/profile-page.tsx:157
 msgid "收藏"
 msgstr "Favorites"
@@ -14194,7 +14198,7 @@ msgstr "Collapse group members"
 msgid "收起表情面板。"
 msgstr "Collapse the sticker panel."
 
-#: apps/app/src/routes/contacts-page.tsx:1310
+#: apps/app/src/routes/contacts-page.tsx:1328
 msgid "收起角色目录"
 msgstr "Collapse character directory"
 
@@ -14752,7 +14756,7 @@ msgstr "The new name will sync to the chat page and the member list."
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:39
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:76
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:291
-#: apps/app/src/routes/contacts-page.tsx:1236
+#: apps/app/src/routes/contacts-page.tsx:1254
 #: apps/app/src/routes/friend-requests-page.tsx:186
 #: apps/app/src/routes/friend-requests-page.tsx:433
 #: apps/app/src/routes/friend-requests-page.tsx:459
@@ -14794,7 +14798,7 @@ msgid "旗帜随风，气氛拉满。"
 msgstr "旗帜随风，气氛拉满。"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:489
-#: apps/app/src/routes/profile-subscription-page.tsx:508
+#: apps/app/src/routes/profile-subscription-page.tsx:512
 msgid "无"
 msgstr "None"
 
@@ -14865,7 +14869,7 @@ msgstr "Duration {0}"
 
 #. placeholder {0}: plan.durationDays
 #: apps/app/src/features/subscription/subscription-panel.tsx:528
-#: apps/app/src/routes/profile-subscription-page.tsx:555
+#: apps/app/src/routes/profile-subscription-page.tsx:559
 msgid "时长 {0} 天"
 msgstr "{0} days"
 
@@ -14934,7 +14938,7 @@ msgstr "Starred"
 #: apps/app/src/features/contacts/contact-utils.ts:135
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:831
 #: apps/app/src/features/desktop/contacts/desktop-contacts-starred-friends-pane.tsx:79
-#: apps/app/src/routes/contacts-page.tsx:1331
+#: apps/app/src/routes/contacts-page.tsx:1349
 #: apps/app/src/routes/starred-friends-page.tsx:189
 msgid "星标朋友"
 msgstr "Starred friend"
@@ -15007,12 +15011,12 @@ msgstr "Nickname"
 #: apps/app/src/features/desktop/chat/desktop-group-member-picker.tsx:245
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:59
 #: apps/app/src/features/desktop/contacts/desktop-contacts-starred-friends-pane.tsx:165
-#: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:376
+#: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:377
 #: apps/app/src/features/search/desktop-search-launcher.tsx:1407
 #: apps/app/src/features/search/use-search-index.ts:329
 #: apps/app/src/routes/character-detail-page.tsx:1462
 #: apps/app/src/routes/chat-details-page.tsx:296
-#: apps/app/src/routes/contacts-page.tsx:2349
+#: apps/app/src/routes/contacts-page.tsx:2367
 #: apps/app/src/routes/create-group-page.tsx:553
 #: apps/app/src/routes/group-member-picker-page.tsx:186
 #: apps/app/src/routes/group-member-picker-page.tsx:236
@@ -15086,7 +15090,7 @@ msgstr "Not recommended yet"
 #: apps/app/src/routes/desktop-mobile-page.tsx:1231
 #: apps/app/src/routes/group-chat-details-page.tsx:705
 #: apps/app/src/routes/live-companion-page.tsx:623
-#: apps/app/src/routes/profile-subscription-page.tsx:212
+#: apps/app/src/routes/profile-subscription-page.tsx:213
 msgid "暂无"
 msgstr "None"
 
@@ -15149,7 +15153,7 @@ msgid "暂无记录"
 msgstr "No records yet"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:600
-#: apps/app/src/routes/profile-subscription-page.tsx:627
+#: apps/app/src/routes/profile-subscription-page.tsx:631
 msgid "暂无邀请记录。"
 msgstr "No invite records yet."
 
@@ -15460,8 +15464,8 @@ msgstr "Friend info"
 #: apps/app/src/routes/moments-page.tsx:879
 #: apps/app/src/routes/moments-page.tsx:1105
 #: apps/app/src/routes/moments-page.tsx:1281
-#: apps/app/src/routes/profile-favorites-page.tsx:47
-#: apps/app/src/routes/profile-moments-page.tsx:62
+#: apps/app/src/routes/profile-favorites-page.tsx:48
+#: apps/app/src/routes/profile-moments-page.tsx:66
 #: apps/app/src/routes/profile-page.tsx:166
 msgid "朋友圈"
 msgstr "Moments"
@@ -15721,7 +15725,7 @@ msgid "未开张"
 msgstr "未开张"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:461
-#: apps/app/src/routes/profile-subscription-page.tsx:464
+#: apps/app/src/routes/profile-subscription-page.tsx:468
 msgid "未开通"
 msgstr "Not active"
 
@@ -15793,7 +15797,7 @@ msgstr "Locked"
 #: apps/app/src/routes/character-detail-page.tsx:255
 #: apps/app/src/routes/chat-details-page.tsx:296
 #: apps/app/src/routes/group-chat-details-page.tsx:815
-#: apps/app/src/routes/profile-subscription-page.tsx:465
+#: apps/app/src/routes/profile-subscription-page.tsx:469
 msgid "未设置"
 msgstr "Not set"
 
@@ -16385,11 +16389,11 @@ msgstr "View the world service terms."
 msgid "查看世界社区规范和反馈口径。"
 msgstr "View the world community guidelines and feedback policy."
 
-#: apps/app/src/routes/contacts-page.tsx:2185
+#: apps/app/src/routes/contacts-page.tsx:2203
 msgid "查看世界角色"
 msgstr "View world characters"
 
-#: apps/app/src/routes/contacts-page.tsx:1318
+#: apps/app/src/routes/contacts-page.tsx:1336
 msgid "查看世界角色目录"
 msgstr "View world character directory"
 
@@ -16436,7 +16440,7 @@ msgstr "View all types"
 msgid "查看全部群成员"
 msgstr "View all group members"
 
-#: apps/app/src/routes/contacts-page.tsx:1264
+#: apps/app/src/routes/contacts-page.tsx:1282
 msgid "查看全部群聊"
 msgstr "View all group chats"
 
@@ -16488,7 +16492,7 @@ msgid "查看图片"
 msgstr "View image"
 
 #: apps/app/src/routes/character-detail-page.tsx:290
-#: apps/app/src/routes/contacts-page.tsx:1240
+#: apps/app/src/routes/contacts-page.tsx:1258
 msgid "查看好友申请"
 msgstr "View friend request"
 
@@ -16496,7 +16500,7 @@ msgstr "View friend request"
 msgid "查看好友申请和最新处理结果"
 msgstr "View friend requests and latest results"
 
-#: apps/app/src/routes/contacts-page.tsx:1287
+#: apps/app/src/routes/contacts-page.tsx:1305
 msgid "查看已上线的内容账号"
 msgstr "View active content accounts"
 
@@ -16537,7 +16541,7 @@ msgid "查看收到的好友申请和处理结果。"
 msgstr "View received friend requests and outcomes."
 
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-workspace.tsx:408
-#: apps/app/src/routes/contacts-page.tsx:1407
+#: apps/app/src/routes/contacts-page.tsx:1425
 #: apps/app/src/routes/world-characters-page.tsx:332
 #: apps/app/src/routes/world-characters-page.tsx:388
 #: apps/app/src/routes/world-characters-page.tsx:420
@@ -16610,7 +16614,7 @@ msgstr "View results"
 msgid "查看群二维码"
 msgstr "View group QR code"
 
-#: apps/app/src/routes/contacts-page.tsx:1421
+#: apps/app/src/routes/contacts-page.tsx:1439
 msgid "查看群聊"
 msgstr "View group chats"
 
@@ -16641,7 +16645,7 @@ msgstr "View the character profile and extended intro"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:313
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:743
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-workspace.tsx:423
-#: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:422
+#: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:423
 #: apps/app/src/routes/character-detail-page.tsx:282
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:66
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:442
@@ -16733,7 +16737,7 @@ msgstr "{0} annotations"
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:380
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:190
 #: apps/app/src/routes/character-detail-page.tsx:297
-#: apps/app/src/routes/contacts-page.tsx:1352
+#: apps/app/src/routes/contacts-page.tsx:1370
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1070
 #: apps/app/src/routes/tags-page.tsx:174
 #: apps/app/src/routes/tags-page.tsx:271
@@ -17136,6 +17140,10 @@ msgstr "Switching to the chat history search sidebar in the desktop chat workspa
 msgid "正在切换到桌面通讯录"
 msgstr "Switching to desktop Contacts"
 
+#: apps/app/src/routes/profile-settings-language-page.tsx:85
+msgid "正在切换语言..."
+msgstr ""
+
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1096
 msgid "正在创建..."
 msgstr "Creating..."
@@ -17176,7 +17184,7 @@ msgstr "Refreshing Channels content"
 msgid "正在刷新这位角色的朋友圈"
 msgstr "Refreshing this character's Moments"
 
-#: apps/app/src/routes/contacts-page.tsx:2148
+#: apps/app/src/routes/contacts-page.tsx:2166
 msgid "正在刷新通讯录"
 msgstr "Refreshing contacts"
 
@@ -17208,15 +17216,15 @@ msgid "正在加载世界主人..."
 msgstr "Loading world owner..."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:435
-#: apps/app/src/routes/profile-subscription-page.tsx:435
+#: apps/app/src/routes/profile-subscription-page.tsx:439
 msgid "正在加载会员信息…"
 msgstr "Loading membership information…"
 
-#: apps/app/src/routes/profile-moments-page.tsx:91
+#: apps/app/src/routes/profile-moments-page.tsx:95
 msgid "正在加载我的朋友圈…"
 msgstr "Loading my Moments…"
 
-#: apps/app/src/routes/profile-favorites-page.tsx:153
+#: apps/app/src/routes/profile-favorites-page.tsx:157
 msgid "正在加载收藏…"
 msgstr "Loading favorites…"
 
@@ -17322,8 +17330,8 @@ msgid "正在打开..."
 msgstr "Opening..."
 
 #: apps/app/src/features/desktop/contacts/desktop-contacts-starred-friends-pane.tsx:163
-#: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:374
-#: apps/app/src/routes/contacts-page.tsx:2347
+#: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:375
+#: apps/app/src/routes/contacts-page.tsx:2365
 msgid "正在打开会话..."
 msgstr "Opening chat..."
 
@@ -17450,7 +17458,7 @@ msgstr "Opening desktop chat history"
 msgid "正在打开桌面订阅号消息"
 msgstr "Opening desktop Subscription Account messages"
 
-#: apps/app/src/routes/contacts-page.tsx:1482
+#: apps/app/src/routes/contacts-page.tsx:1500
 msgid "正在打开桌面通讯录"
 msgstr "Opening desktop Contacts"
 
@@ -17589,7 +17597,7 @@ msgid "正在玩 {0} 的好友"
 msgstr "Friends playing {0}"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:304
-#: apps/app/src/routes/profile-subscription-page.tsx:311
+#: apps/app/src/routes/profile-subscription-page.tsx:312
 msgid "正在生成…"
 msgstr "Generating..."
 
@@ -18001,7 +18009,7 @@ msgstr "Loading the desktop chat workspace; the current conversation will be res
 msgid "正在载入桌面聊天工作区，马上恢复当前群聊。"
 msgstr "Loading the desktop chat workspace; the current group chat will be restored shortly."
 
-#: apps/app/src/routes/contacts-page.tsx:1484
+#: apps/app/src/routes/contacts-page.tsx:1502
 msgid "正在载入桌面通讯录工作区，马上显示联系人和详情。"
 msgstr "Loading desktop Contacts workspace. Contacts and details will appear shortly."
 
@@ -18218,8 +18226,8 @@ msgid "没有找到匹配的群聊"
 msgstr "No matching group chats"
 
 #: apps/app/src/features/contacts/management/management-permissions-screen.tsx:64
-#: apps/app/src/routes/contacts-page.tsx:1577
-#: apps/app/src/routes/contacts-page.tsx:2162
+#: apps/app/src/routes/contacts-page.tsx:1595
+#: apps/app/src/routes/contacts-page.tsx:2180
 msgid "没有找到匹配的联系人"
 msgstr "No matching contacts found"
 
@@ -18365,7 +18373,7 @@ msgstr "Water"
 msgid "浇水 ({0}/{MAX_WATERINGS})"
 msgstr "浇水 ({0}/{MAX_WATERINGS})"
 
-#: apps/app/src/routes/contacts-page.tsx:1598
+#: apps/app/src/routes/contacts-page.tsx:1616
 #: apps/app/src/routes/friend-requests-page.tsx:214
 #: apps/app/src/routes/friend-requests-page.tsx:259
 #: apps/app/src/routes/friend-requests-page.tsx:382
@@ -18410,7 +18418,7 @@ msgstr "The browser blocked the new window. Check popup permissions."
 msgid "浏览目录"
 msgstr "Browse catalog"
 
-#: apps/app/src/routes/contacts-page.tsx:1390
+#: apps/app/src/routes/contacts-page.tsx:1408
 msgid "浏览角色"
 msgstr "Browse characters"
 
@@ -18473,7 +18481,7 @@ msgstr "M"
 #: apps/app/src/routes/desktop-mobile-page.tsx:119
 #: apps/app/src/routes/desktop-mobile-page.tsx:165
 #: apps/app/src/routes/favorites-page.tsx:68
-#: apps/app/src/routes/profile-favorites-page.tsx:43
+#: apps/app/src/routes/profile-favorites-page.tsx:44
 msgid "消息"
 msgstr "Message"
 
@@ -18723,8 +18731,8 @@ msgstr "Clear and resume manage"
 msgid "清空当前关键词，重新查看表情结果。"
 msgstr "Clear the current keyword and review the sticker results again."
 
-#: apps/app/src/routes/contacts-page.tsx:1591
-#: apps/app/src/routes/contacts-page.tsx:2177
+#: apps/app/src/routes/contacts-page.tsx:1609
+#: apps/app/src/routes/contacts-page.tsx:2195
 #: apps/app/src/routes/official-accounts-page.tsx:332
 msgid "清空搜索"
 msgstr "Clear search"
@@ -19089,7 +19097,7 @@ msgstr "点空地开始种植…"
 #: apps/app/src/routes/discover-feed-page.tsx:920
 #: apps/app/src/routes/discover-page.tsx:823
 #: apps/app/src/routes/moments-page.tsx:1087
-#: apps/app/src/routes/profile-moments-page.tsx:139
+#: apps/app/src/routes/profile-moments-page.tsx:143
 msgid "点赞"
 msgstr "Like"
 
@@ -19143,8 +19151,8 @@ msgstr "犯困也能补给，醒着更狠。"
 #: apps/app/src/features/subscription/subscription-panel.tsx:486
 #: apps/app/src/features/subscription/subscription-panel.tsx:584
 #: apps/app/src/i18n/static-dom-seed.ts:121
-#: apps/app/src/routes/profile-subscription-page.tsx:505
-#: apps/app/src/routes/profile-subscription-page.tsx:611
+#: apps/app/src/routes/profile-subscription-page.tsx:509
+#: apps/app/src/routes/profile-subscription-page.tsx:615
 msgid "状态"
 msgstr "Status"
 
@@ -19256,7 +19264,7 @@ msgid "生成预热内容"
 msgstr "Generate warm-up content"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:458
-#: apps/app/src/routes/profile-subscription-page.tsx:461
+#: apps/app/src/routes/profile-subscription-page.tsx:465
 msgid "生效中"
 msgstr "Active"
 
@@ -19849,7 +19857,7 @@ msgstr "Video feed must contain exactly 1 video."
 #: apps/app/src/routes/channels-page.tsx:1156
 #: apps/app/src/routes/discover-page.tsx:167
 #: apps/app/src/routes/favorites-page.tsx:74
-#: apps/app/src/routes/profile-favorites-page.tsx:49
+#: apps/app/src/routes/profile-favorites-page.tsx:50
 msgid "视频号"
 msgstr "Channels"
 
@@ -20269,7 +20277,7 @@ msgstr "Hang on — syncing group info and member status."
 msgid "稍等一下，正在同步聊天资料和设置。"
 msgstr "One moment, syncing chat profile and settings."
 
-#: apps/app/src/routes/contacts-page.tsx:2149
+#: apps/app/src/routes/contacts-page.tsx:2167
 msgid "稍等一下，正在同步联系人、群聊和服务入口。"
 msgstr "Please wait while contacts, group chats, and service entries sync."
 
@@ -20448,7 +20456,7 @@ msgstr "Port occupied: {portOccupiedLabel}"
 #: apps/app/src/features/search/search-quick-links.ts:45
 #: apps/app/src/lib/message-attachment-semantic.ts:227
 #: apps/app/src/routes/favorites-page.tsx:69
-#: apps/app/src/routes/profile-favorites-page.tsx:44
+#: apps/app/src/routes/profile-favorites-page.tsx:45
 msgid "笔记"
 msgstr "Note"
 
@@ -20857,7 +20865,7 @@ msgstr "Character-initiated encounter requests triggered by system events."
 #: apps/app/src/features/subscription/subscription-panel.tsx:278
 #: apps/app/src/i18n/static-dom-seed.ts:895
 #: apps/app/src/routes/group-qr-page.tsx:1353
-#: apps/app/src/routes/profile-subscription-page.tsx:285
+#: apps/app/src/routes/profile-subscription-page.tsx:286
 msgid "系统分享"
 msgstr "System sharing"
 
@@ -20986,7 +20994,7 @@ msgid "纳瓦尔"
 msgstr "Naval"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:226
-#: apps/app/src/routes/profile-subscription-page.tsx:233
+#: apps/app/src/routes/profile-subscription-page.tsx:234
 msgid "累计奖励"
 msgstr "Total rewards"
 
@@ -21551,7 +21559,7 @@ msgstr "Group management"
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:2613
 #: apps/app/src/features/desktop/contacts/desktop-contacts-groups-pane.tsx:71
 #: apps/app/src/lib/conversation-route.ts:27
-#: apps/app/src/routes/contacts-page.tsx:1262
+#: apps/app/src/routes/contacts-page.tsx:1280
 #: apps/app/src/routes/group-announcement-page.tsx:310
 #: apps/app/src/routes/group-announcement-page.tsx:413
 #: apps/app/src/routes/group-chat-background-page.tsx:446
@@ -21599,7 +21607,7 @@ msgstr "Group details"
 msgid "群聊信息暂时不可用"
 msgstr "Group details are temporarily unavailable"
 
-#: apps/app/src/routes/contacts-page.tsx:1416
+#: apps/app/src/routes/contacts-page.tsx:1434
 msgid "群聊入口暂时没有刷新成功。"
 msgstr "Group chat entry failed to refresh."
 
@@ -21842,7 +21850,7 @@ msgstr "Chat removed from the list."
 #: apps/app/src/routes/character-detail-page.tsx:580
 #: apps/app/src/routes/chat-details-page.tsx:430
 #: apps/app/src/routes/chat-list-page.tsx:329
-#: apps/app/src/routes/contacts-page.tsx:766
+#: apps/app/src/routes/contacts-page.tsx:784
 msgid "聊天已取消置顶。"
 msgstr "Chat unpinned."
 
@@ -21852,7 +21860,7 @@ msgstr "Chat unpinned."
 #: apps/app/src/routes/character-detail-page.tsx:580
 #: apps/app/src/routes/chat-details-page.tsx:430
 #: apps/app/src/routes/chat-list-page.tsx:329
-#: apps/app/src/routes/contacts-page.tsx:766
+#: apps/app/src/routes/contacts-page.tsx:784
 msgid "聊天已置顶。"
 msgstr "Chat pinned."
 
@@ -22016,7 +22024,7 @@ msgstr "Images or GIFs from chat can also be added as stickers"
 #: apps/app/src/routes/create-group-page.tsx:497
 #: apps/app/src/routes/favorites-page.tsx:70
 #: apps/app/src/routes/group-member-picker-page.tsx:607
-#: apps/app/src/routes/profile-favorites-page.tsx:45
+#: apps/app/src/routes/profile-favorites-page.tsx:46
 msgid "联系人"
 msgstr "Contact"
 
@@ -22026,7 +22034,7 @@ msgstr "Contact"
 msgid "联系人列表暂时不可用"
 msgstr "Contact list is temporarily unavailable"
 
-#: apps/app/src/routes/contacts-page.tsx:1375
+#: apps/app/src/routes/contacts-page.tsx:1393
 msgid "联系人列表暂时没有刷新成功。"
 msgstr "Contact list failed to refresh."
 
@@ -22058,7 +22066,7 @@ msgstr "Contact profile is temporarily unavailable"
 
 #: apps/app/src/features/subscription/checkout-contact-dialog.tsx:153
 #: apps/app/src/features/subscription/subscription-panel.tsx:548
-#: apps/app/src/routes/profile-subscription-page.tsx:575
+#: apps/app/src/routes/profile-subscription-page.tsx:579
 msgid "联系开通"
 msgstr "Contact to activate"
 
@@ -22552,7 +22560,7 @@ msgid "言初"
 msgstr "Yanchu"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:478
-#: apps/app/src/routes/profile-subscription-page.tsx:497
+#: apps/app/src/routes/profile-subscription-page.tsx:501
 msgid "订阅"
 msgstr "Subscription"
 
@@ -22700,7 +22708,7 @@ msgstr "Evidence"
 #: apps/app/src/i18n/static-dom-seed.ts:318
 #: apps/app/src/routes/channels-page.tsx:1789
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:689
-#: apps/app/src/routes/profile-moments-page.tsx:142
+#: apps/app/src/routes/profile-moments-page.tsx:146
 msgid "评论"
 msgstr "Comment"
 
@@ -23269,7 +23277,7 @@ msgstr "Please select a video file."
 #: apps/app/src/routes/chat-background-page.tsx:342
 #: apps/app/src/routes/chat-details-page.tsx:752
 #: apps/app/src/routes/chat-list-page.tsx:782
-#: apps/app/src/routes/contacts-page.tsx:2147
+#: apps/app/src/routes/contacts-page.tsx:2165
 #: apps/app/src/routes/create-group-page.tsx:433
 #: apps/app/src/routes/discover-feed-page.tsx:794
 #: apps/app/src/routes/friend-requests-page.tsx:225
@@ -23760,7 +23768,7 @@ msgstr "Loading desktop group chat..."
 msgid "载入桌面订阅号消息..."
 msgstr "Loading desktop Subscription Account messages..."
 
-#: apps/app/src/routes/contacts-page.tsx:1486
+#: apps/app/src/routes/contacts-page.tsx:1504
 msgid "载入桌面通讯录..."
 msgstr "Loading desktop Contacts..."
 
@@ -23901,13 +23909,15 @@ msgstr "Recent activity"
 #: apps/app/src/routes/mobile-notes-page.tsx:143
 #: apps/app/src/routes/official-accounts-page.tsx:354
 #: apps/app/src/routes/official-accounts-page.tsx:381
-#: apps/app/src/routes/profile-favorites-page.tsx:124
+#: apps/app/src/routes/profile-favorites-page.tsx:128
 #: apps/app/src/routes/profile-info-avatar-page.tsx:110
 #: apps/app/src/routes/profile-info-name-page.tsx:81
 #: apps/app/src/routes/profile-info-page.tsx:49
 #: apps/app/src/routes/profile-info-placeholder-page.tsx:51
 #: apps/app/src/routes/profile-info-signature-page.tsx:80
-#: apps/app/src/routes/profile-moments-page.tsx:70
+#: apps/app/src/routes/profile-moments-page.tsx:74
+#: apps/app/src/routes/profile-settings-language-page.tsx:49
+#: apps/app/src/routes/profile-subscription-page.tsx:489
 #: apps/app/src/routes/welcome-page.tsx:1138
 msgid "返回"
 msgstr "Back"
@@ -24171,8 +24181,7 @@ msgstr "Back to chat to continue"
 #: apps/app/src/components/mobile-document-shell.tsx:127
 #: apps/app/src/i18n/static-dom-seed.ts:620
 #: apps/app/src/i18n/static-dom-seed.ts:885
-#: apps/app/src/routes/profile-subscription-page.tsx:485
-#: apps/app/src/routes/profile-subscription-page.tsx:520
+#: apps/app/src/routes/profile-subscription-page.tsx:524
 msgid "返回设置"
 msgstr "Back to Settings"
 
@@ -24229,8 +24238,8 @@ msgid "还很安静"
 msgstr "Still quiet"
 
 #. placeholder {0}: worldCharacterDirectoryItems.length
-#: apps/app/src/routes/contacts-page.tsx:1313
-#: apps/app/src/routes/contacts-page.tsx:1317
+#: apps/app/src/routes/contacts-page.tsx:1331
+#: apps/app/src/routes/contacts-page.tsx:1335
 msgid "还有 {0} 个世界角色可浏览"
 msgstr "{0} more world characters to browse"
 
@@ -24292,7 +24301,7 @@ msgstr "Not added to My Mini Programs yet"
 msgid "还没有动静，先停一辆车试试。"
 msgstr "Nothing's happening yet — try parking a car first."
 
-#: apps/app/src/routes/profile-moments-page.tsx:96
+#: apps/app/src/routes/profile-moments-page.tsx:100
 msgid "还没有发布过朋友圈"
 msgstr "You haven't posted any Moments yet"
 
@@ -24397,7 +24406,7 @@ msgstr "Not opened yet · already in My Mini Programs"
 msgid "还没有搜索记录，输入关键词后会保存在这里。"
 msgstr "No search history yet. Keywords you type will be saved here."
 
-#: apps/app/src/routes/profile-favorites-page.tsx:158
+#: apps/app/src/routes/profile-favorites-page.tsx:162
 msgid "还没有收藏任何内容"
 msgstr "Nothing in your favorites yet"
 
@@ -25366,8 +25375,8 @@ msgstr "Commuter fanatic — has a sharp nose for parking spots."
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:117
 #: apps/app/src/features/shell/desktop-nav-matching.ts:47
 #: apps/app/src/features/shell/desktop-nav-matching.ts:48
-#: apps/app/src/routes/contacts-page.tsx:1975
-#: apps/app/src/routes/contacts-page.tsx:2159
+#: apps/app/src/routes/contacts-page.tsx:1993
+#: apps/app/src/routes/contacts-page.tsx:2177
 #: apps/app/src/routes/desktop-mobile-page.tsx:172
 msgid "通讯录"
 msgstr "Contacts"
@@ -25388,7 +25397,7 @@ msgstr "Friend in contacts"
 #: apps/app/src/features/contacts/management/contacts-management-modal.tsx:58
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:128
 #: apps/app/src/features/desktop/contacts/desktop-contacts-workspace.tsx:129
-#: apps/app/src/routes/contacts-page.tsx:1997
+#: apps/app/src/routes/contacts-page.tsx:2015
 msgid "通讯录管理"
 msgstr "Contacts Management"
 
@@ -25398,8 +25407,8 @@ msgid "通讯录联系人 · {0}"
 msgstr "Contact · {0}"
 
 #: apps/app/src/features/contacts/management/management-permissions-screen.tsx:65
-#: apps/app/src/routes/contacts-page.tsx:1578
-#: apps/app/src/routes/contacts-page.tsx:2163
+#: apps/app/src/routes/contacts-page.tsx:1596
+#: apps/app/src/routes/contacts-page.tsx:2181
 msgid "通讯录还是空的"
 msgstr "Contacts are still empty"
 
@@ -25476,7 +25485,7 @@ msgid "邀请两位好友合奏可解锁限定海报。"
 msgstr "Invite two friends to play together to unlock a limited poster."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:295
-#: apps/app/src/routes/profile-subscription-page.tsx:302
+#: apps/app/src/routes/profile-subscription-page.tsx:303
 msgid "邀请二维码"
 msgstr "Invite QR code"
 
@@ -25486,17 +25495,17 @@ msgid "邀请你加入「{groupDisplayName}」"
 msgstr "Invited you to join \"{groupDisplayName}\""
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:195
-#: apps/app/src/routes/profile-subscription-page.tsx:202
+#: apps/app/src/routes/profile-subscription-page.tsx:203
 msgid "邀请功能暂未开放。"
 msgstr "Invite feature isn't open yet."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:190
-#: apps/app/src/routes/profile-subscription-page.tsx:197
+#: apps/app/src/routes/profile-subscription-page.tsx:198
 msgid "邀请奖励"
 msgstr "Invite rewards"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:202
-#: apps/app/src/routes/profile-subscription-page.tsx:209
+#: apps/app/src/routes/profile-subscription-page.tsx:210
 msgid "邀请码"
 msgstr "Invite code"
 
@@ -25510,7 +25519,7 @@ msgid "邀请码（选填）"
 msgstr "Invite code (optional)"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:315
-#: apps/app/src/routes/profile-subscription-page.tsx:322
+#: apps/app/src/routes/profile-subscription-page.tsx:323
 msgid "邀请码生成中，请稍后刷新页面。"
 msgstr "Generating invite code — refresh in a moment."
 
@@ -25654,7 +25663,7 @@ msgstr "重置进度"
 #: apps/app/src/components/chat-message-list.tsx:3158
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:540
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:626
-#: apps/app/src/routes/contacts-page.tsx:2128
+#: apps/app/src/routes/contacts-page.tsx:2146
 msgid "重试"
 msgstr "Retry"
 
@@ -25743,7 +25752,7 @@ msgstr "Retry sending comment"
 msgid "重试取消关注"
 msgstr "Retry unfollow"
 
-#: apps/app/src/routes/contacts-page.tsx:1448
+#: apps/app/src/routes/contacts-page.tsx:1466
 msgid "重试取消星标"
 msgstr "Retry removing star"
 
@@ -25824,7 +25833,7 @@ msgstr "Retry opening file"
 msgid "重试打开相机"
 msgstr "Retry opening camera"
 
-#: apps/app/src/routes/contacts-page.tsx:1432
+#: apps/app/src/routes/contacts-page.tsx:1450
 msgid "重试打开聊天"
 msgstr "Retry opening chat"
 
@@ -25852,7 +25861,7 @@ msgstr "Retry remove"
 msgid "重试结束通话"
 msgstr "Retry ending call"
 
-#: apps/app/src/routes/contacts-page.tsx:1447
+#: apps/app/src/routes/contacts-page.tsx:1465
 msgid "重试设为星标"
 msgstr "Retry starring"
 
@@ -25882,10 +25891,10 @@ msgstr "Retry comment like"
 #: apps/app/src/routes/chat-details-page.tsx:210
 #: apps/app/src/routes/chat-list-page.tsx:772
 #: apps/app/src/routes/chat-list-page.tsx:807
-#: apps/app/src/routes/contacts-page.tsx:1379
-#: apps/app/src/routes/contacts-page.tsx:1389
-#: apps/app/src/routes/contacts-page.tsx:1406
-#: apps/app/src/routes/contacts-page.tsx:1420
+#: apps/app/src/routes/contacts-page.tsx:1397
+#: apps/app/src/routes/contacts-page.tsx:1407
+#: apps/app/src/routes/contacts-page.tsx:1424
+#: apps/app/src/routes/contacts-page.tsx:1438
 #: apps/app/src/routes/create-group-page.tsx:454
 #: apps/app/src/routes/discover-feed-page.tsx:337
 #: apps/app/src/routes/discover-feed-page.tsx:783

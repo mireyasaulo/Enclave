@@ -31,6 +31,7 @@ import { EmptyState } from "../components/empty-state";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { formatTimestamp } from "../lib/format";
+import { navigateBackOrFallback } from "../lib/history-back";
 import { describeRequestError } from "../lib/request-error";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
@@ -98,7 +99,10 @@ export function ProfileFavoritesPage() {
     return data.filter((item) => item.category === activeFilter);
   }, [favoritesQuery.data, activeFilter]);
 
-  const goBack = () => void navigate({ to: "/tabs/profile" });
+  const goBack = () =>
+    navigateBackOrFallback(() => {
+      void navigate({ to: "/tabs/profile" });
+    });
   const goToItem = (item: FavoriteRecord) => {
     if (!item.to) return;
     void navigate({ to: item.to });
