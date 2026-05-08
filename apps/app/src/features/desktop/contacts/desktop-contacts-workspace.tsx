@@ -257,6 +257,7 @@ export function DesktopContactsWorkspace({
                     {worldCharacterSections.map((section, sectionIndex) => (
                       <div
                         key={section.key}
+                        id={section.anchorId}
                         className={cn(
                           sectionIndex > 0
                             ? "mt-2 border-t border-[rgba(0,0,0,0.04)] pt-2"

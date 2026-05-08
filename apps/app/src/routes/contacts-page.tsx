@@ -463,6 +463,22 @@ export function ContactsPage() {
     () => buildContactSections(filteredWorldCharacterItems),
     [filteredWorldCharacterItems],
   );
+  const desktopWorldCharacterSections = useMemo(
+    () =>
+      worldCharacterSections.map((section) => ({
+        ...section,
+        anchorId: `desktop-${section.anchorId}-world`,
+      })),
+    [worldCharacterSections],
+  );
+  const desktopWorldCharacterIndexItems = useMemo(
+    () =>
+      desktopWorldCharacterSections.map((section) => ({
+        key: section.anchorId,
+        indexLabel: section.indexLabel,
+      })),
+    [desktopWorldCharacterSections],
+  );
   const mobileIndexItems = useMemo(
     () =>
       friendSections.map((section) => ({
@@ -472,12 +488,14 @@ export function ContactsPage() {
     [friendSections],
   );
   const desktopIndexItems = useMemo(
-    () =>
-      desktopFriendSections.map((section) => ({
+    () => [
+      ...desktopFriendSections.map((section) => ({
         key: section.anchorId,
         indexLabel: section.indexLabel,
       })),
-    [desktopFriendSections],
+      ...desktopWorldCharacterIndexItems,
+    ],
+    [desktopFriendSections, desktopWorldCharacterIndexItems],
   );
 
   const pendingRequestCount = useMemo(
@@ -1608,7 +1626,7 @@ export function ContactsPage() {
               ? t(msg`世界角色搜索结果`)
               : t(msg`世界角色目录`)
           }
-          worldCharacterSections={worldCharacterSections}
+          worldCharacterSections={desktopWorldCharacterSections}
           activeWorldCharacterId={
             desktopSelection?.kind === "world-character"
               ? desktopSelection.id
