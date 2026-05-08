@@ -1048,22 +1048,10 @@ export class SchedulerService {
   }
 
   private async handleProcessPendingFeedReactions(): Promise<TrackedJobResult> {
-    const runtimeRules = await this.replyLogicRules.getRules();
-    const pending = await this.feedService.getPendingAiReaction(30);
-    let processedCount = 0;
-    for (const post of pending) {
-      await this.feedService.triggerAiReactionForPost(post);
-      processedCount += 1;
-      this.logger.debug(`Triggered AI reaction for feed post ${post.id}`);
-    }
-
-    return {
-      summary: renderTemplate(
-        runtimeRules.schedulerTextTemplates
-          .jobSummaryProcessPendingFeedReactions,
-        { processedCount },
-      ),
-    };
+    // 广场版「NPC autonomy tick」——已对齐朋友圈逻辑：所有可见角色都可能上线，
+    // 用户帖与角色帖都参与候选打分，行动后回写 character_friendships.
+    const result = await this.feedService.runFeedNpcAutonomyTick();
+    return { summary: result.summary };
   }
 
   private async handleCheckChannelsSchedule(): Promise<TrackedJobResult> {

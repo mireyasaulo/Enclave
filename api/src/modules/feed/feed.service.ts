@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, MoreThanOrEqual, Repository } from 'typeorm';
 import { FeedPostEntity } from './feed-post.entity';
 import { FeedCommentEntity } from './feed-comment.entity';
+import { FeedPostLikeEntity } from './feed-post-like.entity';
 import { UserFeedInteractionEntity } from '../analytics/user-feed-interaction.entity';
 import { VideoChannelFollowEntity } from './video-channel-follow.entity';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
@@ -12,6 +13,7 @@ import type { AiMessagePart } from '../ai/ai.types';
 import { CharactersService } from '../characters/characters.service';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { SocialService } from '../social/social.service';
+import { CharacterFriendshipService } from '../social/character-friendship.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import type {
   MomentImageAsset,
@@ -118,6 +120,8 @@ export class FeedService implements OnModuleInit {
     private readonly postRepo: Repository<FeedPostEntity>,
     @InjectRepository(FeedCommentEntity)
     private readonly commentRepo: Repository<FeedCommentEntity>,
+    @InjectRepository(FeedPostLikeEntity)
+    private readonly likeRepo: Repository<FeedPostLikeEntity>,
     @InjectRepository(UserFeedInteractionEntity)
     private readonly interactionRepo: Repository<UserFeedInteractionEntity>,
     @InjectRepository(VideoChannelFollowEntity)
@@ -126,6 +130,7 @@ export class FeedService implements OnModuleInit {
     private readonly characters: CharactersService,
     private readonly worldOwnerService: WorldOwnerService,
     private readonly socialService: SocialService,
+    private readonly characterFriendships: CharacterFriendshipService,
     private readonly cyberAvatar: CyberAvatarService,
     private readonly worldLanguage: WorldLanguageService,
   ) {}
@@ -962,68 +967,219 @@ export class FeedService implements OnModuleInit {
     }
   }
 
-  async getPendingAiReaction(sinceMinutes = 30): Promise<FeedPostEntity[]> {
-    const since = new Date(Date.now() - sinceMinutes * 60 * 1000);
-    return this.postRepo
-      .find({
-        where: {
-          aiReacted: false,
-          authorType: 'user',
-          publishStatus: 'published',
-        },
-        order: { createdAt: 'ASC' },
-      })
-      .then((posts) => posts.filter((post) => post.createdAt >= since));
+  async toggleLike(
+    postId: string,
+    authorId: string,
+    authorName: string,
+    authorAvatar: string,
+    authorType = 'user',
+  ): Promise<{ liked: boolean }> {
+    const existing = await this.likeRepo.findOneBy({ postId, authorId });
+    if (existing) {
+      await this.likeRepo.delete(existing.id);
+      await this.postRepo.decrement({ id: postId }, 'likeCount', 1);
+      return { liked: false };
+    }
+    const like = this.likeRepo.create({
+      postId,
+      authorId,
+      authorName,
+      authorAvatar,
+      authorType,
+    });
+    await this.likeRepo.save(like);
+    await this.postRepo.increment({ id: postId }, 'likeCount', 1);
+    return { liked: true };
   }
 
-  async triggerAiReactionForPost(post: FeedPostEntity): Promise<void> {
+  private jitterPastTimestamp(maxMs: number): Date {
+    return new Date(Date.now() - Math.floor(Math.random() * maxMs));
+  }
+
+  /**
+   * 广场版「NPC autonomy tick」。和朋友圈的 runNpcAutonomyTick 等价，但：
+   *  - 只看 surface='feed'（不动视频号 channels）。
+   *  - 候选池是「全部可见且未被屏蔽」的角色——广场是 public，不受 owner 好友圈限制。
+   *  - 用户帖与角色帖都参与，使 NPC 可以互相点赞/评论形成正反馈。
+   */
+  async runFeedNpcAutonomyTick(): Promise<{
+    summary: string;
+    likeCount: number;
+    commentCount: number;
+  }> {
+    const MAX_LLM_CALLS_PER_TICK = 30;
+    const FREQ_MULTIPLIER: Record<string, number> = {
+      high: 1.5,
+      normal: 1.0,
+      low: 0.5,
+    };
+    const RECENT_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+    const now = new Date();
+    const recentSince = new Date(now.getTime() - RECENT_WINDOW_MS);
+    const hour = now.getHours();
+
     const blockedCharacterIds = new Set(
       await this.socialService.getBlockedCharacterIds(),
     );
-    const chars = (await this.characters.findAllVisibleToOwner()).filter(
+    const candidates = (await this.characters.findAllVisibleToOwner()).filter(
       (char) => !blockedCharacterIds.has(char.id),
     );
-    const selected = chars.filter(() => Math.random() < 0.3).slice(0, 2);
-    for (const char of selected) {
-      const profile = await this.characters.getProfile(char.id);
-      if (!profile) continue;
-      try {
-        const observation = await this.buildFeedAiObservation(post);
-        const reply = await this.ai.generateReply({
-          profile,
-          conversationHistory: [],
-          userMessage: `你在${post.surface === 'channels' ? '视频号' : '广场动态'}里看到一条内容：${observation.summary}，用一句话自然地评论，不超过25字。`,
-          userMessageParts: observation.parts,
-          usageContext: {
-            surface: 'app',
-            scene: 'feed_comment_generate',
-            scopeType: 'character',
-            scopeId: char.id,
-            scopeLabel: char.name,
-            characterId: char.id,
-            characterName: char.name,
-          },
-        });
-        const savedComment = await this.addComment({
-          postId: post.id,
+
+    const activeCandidates = candidates.filter((char) => {
+      const start = char.activeHoursStart ?? 8;
+      const end = char.activeHoursEnd ?? 22;
+      return hour >= start && hour <= end;
+    });
+
+    let llmCallsRemaining = MAX_LLM_CALLS_PER_TICK;
+    let likeCount = 0;
+    let commentCount = 0;
+    let participantCount = 0;
+
+    const recentPosts = await this.postRepo.find({
+      where: {
+        surface: 'feed',
+        publishStatus: 'published',
+        createdAt: MoreThanOrEqual(recentSince),
+      },
+      order: { createdAt: 'DESC' },
+    });
+    if (recentPosts.length === 0) {
+      return {
+        summary: `process_pending_feed_reactions: 最近 24h 广场无帖子可巡查（候选 ${activeCandidates.length} 个）`,
+        likeCount,
+        commentCount,
+      };
+    }
+
+    for (const char of activeCandidates) {
+      const baseChance = char.proactiveBrowseChance ?? 0.3;
+      const freqMul =
+        FREQ_MULTIPLIER[char.activityFrequency ?? 'normal'] ?? 1.0;
+      const browseChance = Math.min(0.95, baseChance * freqMul);
+      if (Math.random() > browseChance) continue;
+
+      participantCount += 1;
+
+      const candidatePosts = recentPosts.filter(
+        (post) => post.authorId !== char.id,
+      );
+      if (candidatePosts.length === 0) continue;
+
+      // 跳过已经赞过的帖子，避免反复点赞同一条。
+      const alreadyLiked = await this.likeRepo.find({
+        where: {
           authorId: char.id,
-          authorName: char.name,
-          authorAvatar: char.avatar,
-          authorType: 'character',
-          text: reply.text,
-        });
-        // 把广场 AI 评论时间打散到过去 0-60 秒，避免一拨评论卡 cron tick 整点。
-        const jittered = new Date(
-          Date.now() - Math.floor(Math.random() * 60_000),
-        );
-        await this.commentRepo.update(savedComment.id, {
-          createdAt: jittered,
-        });
-      } catch {
-        // ignore
+          postId: In(candidatePosts.map((p) => p.id)),
+        },
+        select: ['postId'],
+      });
+      const likedIds = new Set(alreadyLiked.map((row) => row.postId));
+      const fresh = candidatePosts.filter((post) => !likedIds.has(post.id));
+      if (fresh.length === 0) continue;
+
+      const scored = await Promise.all(
+        fresh.map(async (post) => {
+          let intimacy = 0;
+          if (post.authorType === 'character') {
+            intimacy = await this.characterFriendships.getIntimacy(
+              char.id,
+              post.authorId,
+            );
+          }
+          const recencyScore = Math.max(
+            0,
+            1 - (now.getTime() - post.createdAt.getTime()) / RECENT_WINDOW_MS,
+          );
+          return {
+            post,
+            score: intimacy / 50 + recencyScore + Math.random() * 0.3,
+          };
+        }),
+      );
+      scored.sort((a, b) => b.score - a.score);
+      const TOP_K = 3;
+      const top = scored.slice(0, TOP_K);
+
+      for (const { post } of top) {
+        if (Math.random() < 0.5) {
+          try {
+            await this.toggleLike(
+              post.id,
+              char.id,
+              char.name,
+              char.avatar,
+              'character',
+            );
+            // 把点赞时间打散到过去 0-60 秒，避免一拨点赞全卡 cron tick 整点。
+            await this.likeRepo.update(
+              { postId: post.id, authorId: char.id },
+              { createdAt: this.jitterPastTimestamp(60_000) },
+            );
+            likeCount += 1;
+            if (post.authorType === 'character') {
+              await this.characterFriendships.bumpInteraction(
+                char.id,
+                post.authorId,
+              );
+            }
+          } catch {
+            // ignore
+          }
+        }
+
+        if (llmCallsRemaining > 0 && Math.random() < 0.2) {
+          try {
+            const profile = await this.characters.getProfile(char.id);
+            if (!profile) continue;
+            const observation = await this.buildFeedAiObservation(post);
+            const reply = await this.ai.generateReply({
+              profile,
+              conversationHistory: [],
+              userMessage: `${post.authorName}在广场发了一条动态：${observation.summary}。用一句话自然地评论一下，不超过20字。`,
+              userMessageParts: observation.parts,
+              usageContext: {
+                surface: 'app',
+                scene: 'feed_comment_generate',
+                scopeType: 'character',
+                scopeId: char.id,
+                scopeLabel: char.name,
+                characterId: char.id,
+                characterName: char.name,
+              },
+            });
+            llmCallsRemaining -= 1;
+            const savedComment = await this.addComment({
+              postId: post.id,
+              authorId: char.id,
+              authorName: char.name,
+              authorAvatar: char.avatar,
+              authorType: 'character',
+              text: reply.text,
+            });
+            await this.commentRepo.update(savedComment.id, {
+              createdAt: this.jitterPastTimestamp(60_000),
+            });
+            commentCount += 1;
+            if (post.authorType === 'character') {
+              await this.characterFriendships.bumpInteraction(
+                char.id,
+                post.authorId,
+              );
+            }
+          } catch {
+            // ignore
+          }
+        }
       }
     }
-    await this.postRepo.update(post.id, { aiReacted: true });
+
+    return {
+      summary: `process_pending_feed_reactions: ${participantCount} 个 NPC 上线，点赞 ${likeCount} 次，评论 ${commentCount} 次（剩余 LLM 配额 ${llmCallsRemaining}）`,
+      likeCount,
+      commentCount,
+    };
   }
 
   async ensureChannelSeedData() {
