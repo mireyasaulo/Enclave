@@ -2823,7 +2823,7 @@ export function ChatComposer({
       <div
         className={
           isDesktop
-            ? "relative border-t border-black/6 bg-[#ededed] px-3.5 py-3"
+            ? "relative isolate z-30 border-t border-black/6 bg-[#ededed] px-3.5 py-3"
             : "border-t border-black/6 bg-[#f7f7f7] px-2 pb-2 pt-1"
         }
         style={{
@@ -3087,7 +3087,7 @@ export function ChatComposer({
                         />
                         {desktopPlusMenuOpen &&
                         desktopPlusMenuView === "favorites" ? (
-                          <div className="absolute bottom-[calc(100%+0.55rem)] left-0 z-30 w-80 overflow-hidden rounded-[12px] border border-black/8 bg-white shadow-[0_12px_28px_rgba(15,23,42,0.14)]">
+                          <div className="absolute bottom-[calc(100%+0.55rem)] left-0 z-50 w-80 overflow-hidden rounded-[12px] border border-black/8 bg-white shadow-[0_12px_28px_rgba(15,23,42,0.14)]">
                             <DesktopFavoritePicker
                               favorites={desktopFavoriteRecords}
                               busy={composerPending}
