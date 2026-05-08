@@ -500,7 +500,7 @@ export function RevenueSharingPage() {
             >
               {PAYEE_REF_TYPES.map((type) => (
                 <option key={type} value={type}>
-                  {type}
+                  {t(type)}
                 </option>
               ))}
             </select>
@@ -549,7 +549,7 @@ export function RevenueSharingPage() {
                     <td className="px-4 py-3 font-medium">{payee.displayName}</td>
                     <td className="px-4 py-3">{t(payee.status)}</td>
                     <td className="px-4 py-3 font-mono text-xs">
-                      {payee.externalRefType}:{payee.externalRefId}
+                      {t(payee.externalRefType)}:{payee.externalRefId}
                     </td>
                     <td className="px-4 py-3">
                       {formatDateTime(payee.updatedAt, locale)}
@@ -659,7 +659,7 @@ export function RevenueSharingPage() {
                     <td className="px-4 py-3">
                       {item.payeeDisplayName ?? t("Unassigned")}
                     </td>
-                    <td className="px-4 py-3">{item.participantType}</td>
+                    <td className="px-4 py-3">{t(item.participantType)}</td>
                     <td className="px-4 py-3">{t(item.status)}</td>
                     <td className="px-4 py-3 font-semibold">
                       {formatMoney(item.amountCents, item.currency)}
@@ -700,7 +700,7 @@ export function RevenueSharingPage() {
               <tbody className="divide-y divide-[color:var(--border-faint)]">
                 {(eventsQuery.data?.usageEvents ?? []).map((event) => (
                   <tr key={event.id}>
-                    <td className="px-4 py-3">{event.eventType}</td>
+                    <td className="px-4 py-3">{t(event.eventType)}</td>
                     <td className="px-4 py-3">{event.characterName ?? event.characterId}</td>
                     <td className="px-4 py-3">
                       {formatMoney(event.grossAmountCents, event.currency)}
@@ -727,9 +727,9 @@ export function RevenueSharingPage() {
               <tbody className="divide-y divide-[color:var(--border-faint)]">
                 {(eventsQuery.data?.contributionEvents ?? []).map((event) => (
                   <tr key={event.id}>
-                    <td className="px-4 py-3">{event.eventType}</td>
+                    <td className="px-4 py-3">{t(event.eventType)}</td>
                     <td className="px-4 py-3 font-mono text-xs">
-                      {event.contributorExternalRefType}:{event.contributorExternalRefId}
+                      {t(event.contributorExternalRefType)}:{event.contributorExternalRefId}
                     </td>
                     <td className="px-4 py-3">
                       {event.reversedAt ? t("reversed") : t("active")}
