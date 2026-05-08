@@ -294,7 +294,10 @@ export function ParkingWarGame({
       </div>
 
       {/* Mobile NPC chip bar */}
-      <div className="shrink-0 border-t border-[rgba(0,0,0,0.10)] bg-[#e8e0d8] sm:hidden">
+      <div
+        className="shrink-0 border-t border-[rgba(0,0,0,0.10)] bg-[#e8e0d8] sm:hidden"
+        style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom, 0px))" }}
+      >
         <div className="flex gap-1.5 overflow-x-auto px-2 py-2 [scrollbar-width:none]">
           <button
             type="button"
