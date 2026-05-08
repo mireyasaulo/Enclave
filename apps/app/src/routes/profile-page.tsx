@@ -146,28 +146,20 @@ export function ProfilePage() {
             label={t(msg`设置`)}
             to={settingsPath}
           />
-          {showCloudAccountEntries ? (
+        </ProfileEntryGroup>
+
+        {showCloudAccountEntries ? (
+          <ProfileEntryGroup className="mt-3">
             <ProfileEntry
               icon={CreditCard}
               iconClassName="bg-[rgba(22,163,74,0.12)] text-[#15803d]"
               label={t(msg`会员中心`)}
               to="/profile/subscription"
             />
-          ) : null}
-          {showCloudAccountEntries ? (
-            <ProfileActionEntry
-              icon={LogOut}
-              iconClassName="bg-[rgba(220,38,38,0.10)] text-[#b42318]"
-              label={t(msg`退出登录`)}
-              onClick={() => {
-                clearCloudRuntimeSession();
-                void navigate({ to: "/welcome", replace: true });
-              }}
-            />
-          ) : null}
-        </ProfileEntryGroup>
+          </ProfileEntryGroup>
+        ) : null}
 
-        <ProfileEntryGroup className="mt-1">
+        <ProfileEntryGroup className="mt-3">
           <ProfileEntry
             icon={ShieldCheck}
             iconClassName="bg-[rgba(64,169,255,0.12)] text-[#1677ff]"
@@ -187,6 +179,20 @@ export function ProfilePage() {
             to="/legal/community"
           />
         </ProfileEntryGroup>
+
+        {showCloudAccountEntries ? (
+          <ProfileEntryGroup className="mt-3">
+            <ProfileActionEntry
+              icon={LogOut}
+              iconClassName="bg-[rgba(220,38,38,0.10)] text-[#b42318]"
+              label={t(msg`退出登录`)}
+              onClick={() => {
+                clearCloudRuntimeSession();
+                void navigate({ to: "/welcome", replace: true });
+              }}
+            />
+          </ProfileEntryGroup>
+        ) : null}
       </div>
     </AppPage>
   );
