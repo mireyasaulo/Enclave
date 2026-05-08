@@ -156,6 +156,18 @@ http {
       proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # 客户端埋点 SDK 上报到 cloud-api 的 telemetry 入口。app/site/wiki 三端
+    # 都会从浏览器同源 POST /telemetry/events/batch；如果这里没接，事件全部
+    # 落到 SPA fallback 上变成 405/200 HTML，cloud-console 看到的就是空数据。
+    location /telemetry/ {
+      proxy_pass ${cloudUpstream};
+      proxy_http_version 1.1;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
     location = /runtime-config.json {
       add_header Cache-Control "no-store";
       try_files $uri =404;

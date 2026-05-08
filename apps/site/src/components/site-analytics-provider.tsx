@@ -4,16 +4,15 @@ import { track } from "@yinjie/analytics";
 import { AnalyticsProvider } from "@yinjie/analytics/next";
 import { useEffect } from "react";
 
-// Telemetry endpoint is opt-in via env. Marketing site lives on a different
-// origin than cloud-api, so the previous same-origin POST silently 404'd
-// every CTA click. Set NEXT_PUBLIC_TELEMETRY_ENDPOINT in production to a
-// fully-qualified URL (e.g. https://api.enclave.top/telemetry/events/batch)
-// to enable click tracking.
-const ENDPOINT = process.env.NEXT_PUBLIC_TELEMETRY_ENDPOINT ?? null;
+// Telemetry endpoint defaults to the same-origin /telemetry/events/batch
+// path; next.config.ts rewrites that to cloud-api. Set
+// NEXT_PUBLIC_TELEMETRY_ENDPOINT to a fully-qualified URL only when the
+// rewrite is unavailable (e.g. fully static export deployed without Next).
+const ENDPOINT =
+  process.env.NEXT_PUBLIC_TELEMETRY_ENDPOINT ?? "/telemetry/events/batch";
 
 export function SiteAnalyticsProvider({ children }: { children?: React.ReactNode }) {
   useEffect(() => {
-    if (!ENDPOINT) return;
     if (typeof document === "undefined") return;
     const handler = (event: MouseEvent) => {
       const target = event.target;
@@ -30,8 +29,6 @@ export function SiteAnalyticsProvider({ children }: { children?: React.ReactNode
     document.addEventListener("click", handler, { capture: true });
     return () => document.removeEventListener("click", handler, { capture: true });
   }, []);
-
-  if (!ENDPOINT) return <>{children}</>;
 
   return (
     <AnalyticsProvider appId="site" endpoint={ENDPOINT}>
