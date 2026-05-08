@@ -276,22 +276,6 @@ function RootLayoutContent() {
       ),
     },
     {
-      key: "jobs",
-      label: "Jobs",
-      hint: "Queue and leases",
-      content: (
-        <JobsPermalinkLink
-          className={pathname === "/jobs" ? NAV_LINK_ACTIVE : NAV_LINK}
-          aria-current={pathname === "/jobs" ? "page" : undefined}
-        >
-          <NavLinkContent
-            label={t("Jobs")}
-            hint={t("Queue and leases")}
-          />
-        </JobsPermalinkLink>
-      ),
-    },
-    {
       key: "sessions",
       label: "Sessions",
       hint: "Access audit",
@@ -305,22 +289,6 @@ function RootLayoutContent() {
             hint={t("Access audit")}
           />
         </SessionsPermalinkLink>
-      ),
-    },
-    {
-      key: "waiting-sync",
-      label: "Waiting Sync",
-      hint: "Durable tasks",
-      content: (
-        <WaitingSyncPermalinkLink
-          className={pathname === "/waiting-sync" ? NAV_LINK_ACTIVE : NAV_LINK}
-          aria-current={pathname === "/waiting-sync" ? "page" : undefined}
-        >
-          <NavLinkContent
-            label={t("Waiting Sync")}
-            hint={t("Durable tasks")}
-          />
-        </WaitingSyncPermalinkLink>
       ),
     },
     {
@@ -458,6 +426,38 @@ function RootLayoutContent() {
             hint={t("Payees and ledgers")}
           />
         </Link>
+      ),
+    },
+    {
+      key: "jobs",
+      label: "Jobs",
+      hint: "Queue and leases",
+      content: (
+        <JobsPermalinkLink
+          className={pathname === "/jobs" ? NAV_LINK_ACTIVE : NAV_LINK}
+          aria-current={pathname === "/jobs" ? "page" : undefined}
+        >
+          <NavLinkContent
+            label={t("Jobs")}
+            hint={t("Queue and leases")}
+          />
+        </JobsPermalinkLink>
+      ),
+    },
+    {
+      key: "waiting-sync",
+      label: "Waiting Sync",
+      hint: "Durable tasks",
+      content: (
+        <WaitingSyncPermalinkLink
+          className={pathname === "/waiting-sync" ? NAV_LINK_ACTIVE : NAV_LINK}
+          aria-current={pathname === "/waiting-sync" ? "page" : undefined}
+        >
+          <NavLinkContent
+            label={t("Waiting Sync")}
+            hint={t("Durable tasks")}
+          />
+        </WaitingSyncPermalinkLink>
       ),
     },
   ] as const;
