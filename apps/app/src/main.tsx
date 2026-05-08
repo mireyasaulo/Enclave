@@ -6,10 +6,9 @@ import {
   AppLocaleProvider,
   readPersistedLocale,
   readQueryLocale,
-  resolveSupportedLocale,
   type SupportedLocale,
 } from "@yinjie/i18n";
-import { getWorldLanguage, setWorldLanguage } from "@yinjie/contracts";
+import { setWorldLanguage } from "@yinjie/contracts";
 import "@yinjie/ui/tokens.css";
 import "./index.css";
 import { BootstrapScreen } from "./components/bootstrap-screen";
@@ -22,6 +21,7 @@ import {
   syncNativeLocalePreference,
 } from "./runtime/native-locale";
 import { NativeLocaleSync } from "./runtime/native-locale-sync";
+import { BackendLocaleSync } from "./runtime/backend-locale-sync";
 import { bootstrapAndroid } from "./runtime/adapters/android";
 import { bootstrapIos } from "./runtime/adapters/ios";
 import { router } from "./router";
@@ -100,25 +100,12 @@ async function bootstrap() {
   const explicitWebLocalePreference =
     readQueryLocale() ?? readPersistedLocale("app");
 
-  const backendLanguage = await getWorldLanguage()
-    .then((config) => resolveSupportedLocale(config.language))
-    .catch(() => null);
-
-  if (
-    explicitWebLocalePreference &&
-    backendLanguage &&
-    explicitWebLocalePreference !== backendLanguage
-  ) {
-    void setWorldLanguage({ language: explicitWebLocalePreference }).catch(
-      () => {},
-    );
-  }
-
+  // 不再 await 后端 getWorldLanguage()——这是过隧道的纯净 RTT，会把首屏卡在
+  // BootstrapScreen。改成挂载后由 <BackendLocaleSync> 异步拉取并校正：
+  // - 没显式 web locale → 用后端语言软切换（不通知后端，避免循环）。
+  // - 有显式 web locale 且与后端不一致 → 反向 push 后端。
   const initialLocale =
-    desktopLocalePreference && explicitWebLocalePreference
-      ? explicitWebLocalePreference
-      : (nativeLocalePreference?.locale ??
-        (explicitWebLocalePreference ? null : backendLanguage));
+    explicitWebLocalePreference ?? nativeLocalePreference?.locale ?? null;
 
   const handleLocaleChange = (locale: SupportedLocale) => {
     void setWorldLanguage({ language: locale }).catch(() => {});
@@ -136,6 +123,9 @@ async function bootstrap() {
       >
         <NativeLocaleSync
           syncDesktopLocaleOnMount={Boolean(explicitWebLocalePreference)}
+        />
+        <BackendLocaleSync
+          hasExplicitWebLocalePreference={Boolean(explicitWebLocalePreference)}
         />
         <QueryClientProvider client={queryClient}>
           <Suspense fallback={<BootstrapScreen />}>
