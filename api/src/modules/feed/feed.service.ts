@@ -997,10 +997,12 @@ export class FeedService implements OnModuleInit {
   }
 
   /**
-   * 广场版「NPC autonomy tick」。和朋友圈的 runNpcAutonomyTick 等价，但：
-   *  - 只看 surface='feed'（不动视频号 channels）。
-   *  - 候选池是「全部可见且未被屏蔽」的角色——广场是 public，不受 owner 好友圈限制。
+   * 广场 / 视频号版「NPC autonomy tick」。和朋友圈的 runNpcAutonomyTick 等价，但：
+   *  - 同时覆盖 surface='feed' 和 'channels'（视频号也复用同一逻辑——
+   *    旧 triggerAiReactionForPost 也是不分 surface 处理用户帖的）。
+   *  - 候选池是「全部可见且未被屏蔽」的角色——广场/视频号是 public，不受 owner 好友圈限制。
    *  - 用户帖与角色帖都参与，使 NPC 可以互相点赞/评论形成正反馈。
+   *  - 任何被 NPC 互动过的帖子会被回写 aiReacted=true，前端的「AI 已参与回应」标识依赖该字段。
    */
   async runFeedNpcAutonomyTick(): Promise<{
     summary: string;
@@ -1036,10 +1038,13 @@ export class FeedService implements OnModuleInit {
     let likeCount = 0;
     let commentCount = 0;
     let participantCount = 0;
+    // 追踪被 NPC 触动过的帖子，结束时统一回写 aiReacted=true，
+    // 让前端「AI 已参与回应」角标继续生效（对齐旧 triggerAiReactionForPost 的语义）。
+    const reactedPostIds = new Set<string>();
 
     const recentPosts = await this.postRepo.find({
       where: {
-        surface: 'feed',
+        surface: In(['feed', 'channels']),
         publishStatus: 'published',
         createdAt: MoreThanOrEqual(recentSince),
       },
@@ -1047,7 +1052,7 @@ export class FeedService implements OnModuleInit {
     });
     if (recentPosts.length === 0) {
       return {
-        summary: `process_pending_feed_reactions: 最近 24h 广场无帖子可巡查（候选 ${activeCandidates.length} 个）`,
+        summary: `process_pending_feed_reactions: 最近 24h 广场/视频号无帖子可巡查（候选 ${activeCandidates.length} 个）`,
         likeCount,
         commentCount,
       };
@@ -1103,6 +1108,7 @@ export class FeedService implements OnModuleInit {
       const top = scored.slice(0, TOP_K);
 
       for (const { post } of top) {
+        const surfaceLabel = post.surface === 'channels' ? '视频号' : '广场';
         if (Math.random() < 0.5) {
           try {
             await this.toggleLike(
@@ -1118,6 +1124,7 @@ export class FeedService implements OnModuleInit {
               { createdAt: this.jitterPastTimestamp(60_000) },
             );
             likeCount += 1;
+            reactedPostIds.add(post.id);
             if (post.authorType === 'character') {
               await this.characterFriendships.bumpInteraction(
                 char.id,
@@ -1137,7 +1144,7 @@ export class FeedService implements OnModuleInit {
             const reply = await this.ai.generateReply({
               profile,
               conversationHistory: [],
-              userMessage: `${post.authorName}在广场发了一条动态：${observation.summary}。用一句话自然地评论一下，不超过20字。`,
+              userMessage: `${post.authorName}在${surfaceLabel}发了一条动态：${observation.summary}。用一句话自然地评论一下，不超过20字。`,
               userMessageParts: observation.parts,
               usageContext: {
                 surface: 'app',
@@ -1162,6 +1169,7 @@ export class FeedService implements OnModuleInit {
               createdAt: this.jitterPastTimestamp(60_000),
             });
             commentCount += 1;
+            reactedPostIds.add(post.id);
             if (post.authorType === 'character') {
               await this.characterFriendships.bumpInteraction(
                 char.id,
@@ -1173,6 +1181,13 @@ export class FeedService implements OnModuleInit {
           }
         }
       }
+    }
+
+    if (reactedPostIds.size > 0) {
+      await this.postRepo.update(
+        { id: In(Array.from(reactedPostIds)) },
+        { aiReacted: true },
+      );
     }
 
     return {
