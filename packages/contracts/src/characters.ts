@@ -309,6 +309,7 @@ export interface Character {
   inferenceModelId?: string | null;
   allowOwnerKeyOverride?: boolean;
   modelRoutingNotes?: string | null;
+  region?: string | null;
 }
 
 export interface CharacterPresetSummary {

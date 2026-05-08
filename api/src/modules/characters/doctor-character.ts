@@ -339,6 +339,7 @@ export function buildDoctorCharacter(): Partial<CharacterEntity> {
     intimacyLevel: 58,
     currentStatus: '在看门诊，也先帮你把轻重缓急分清。',
     currentActivity: 'working',
+    region: '上海·上海',
   };
 }
 // i18n-ignore-end

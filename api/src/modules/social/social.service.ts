@@ -346,8 +346,15 @@ export class SocialService {
             intimacyLevel:
               characterId === SELF_CHARACTER_ID ? 100 : 60,
             status: 'friend',
+            region: character.region?.trim() || null,
           }),
         );
+      } else if (
+        (!existing.region || !existing.region.trim()) &&
+        character.region?.trim()
+      ) {
+        existing.region = character.region.trim();
+        await this.friendshipRepo.save(existing);
       }
 
       await this.narrativeService.ensureArc(character.id, character.name);
@@ -1036,12 +1043,18 @@ immediate=立刻通过；short=几分钟；medium=慢热/忙碌；long=高冷/�
     let friendship: FriendshipEntity;
     let shouldNotifyConversation = options?.notifyConversation === true;
 
+    const character = await this.characterRepo.findOneBy({ id: characterId });
+    const characterRegion = character?.region?.trim() || null;
+
     if (existing) {
       if (ACTIVE_FRIENDSHIP_STATUSES.has(existing.status)) {
         friendship = existing;
         shouldNotifyConversation = false;
       } else {
         existing.status = 'friend';
+        if ((!existing.region || !existing.region.trim()) && characterRegion) {
+          existing.region = characterRegion;
+        }
         friendship = await this.friendshipRepo.save(existing);
       }
     } else {
@@ -1051,6 +1064,7 @@ immediate=立刻通过；short=几分钟；medium=慢热/忙碌；long=高冷/�
           characterId,
           intimacyLevel: 10,
           status: 'friend',
+          region: characterRegion,
         }),
       );
     }

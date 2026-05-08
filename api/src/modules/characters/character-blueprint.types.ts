@@ -41,6 +41,7 @@ export interface CharacterBlueprintRecipeValue {
     background: string;
     motivation: string;
     worldview: string;
+    region?: string | null;
   };
   expertise: {
     expertDomains: string[];
@@ -178,6 +179,7 @@ export interface CharacterFactorySnapshotContract {
     currentStatus?: string | null;
     currentActivity?: string | null;
     activityMode?: 'auto' | 'manual' | null;
+    region?: string | null;
   };
   blueprint: CharacterBlueprintContract;
   diffSummary: {

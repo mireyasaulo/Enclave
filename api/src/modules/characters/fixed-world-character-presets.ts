@@ -130,6 +130,7 @@ const AXUN_CHARACTER: Partial<CharacterEntity> = {
   intimacyLevel: 28,
   currentActivity: 'working',
   activityMode: 'auto',
+  region: '浙江·杭州',
 };
 
 const LIN_CHEN_CHARACTER: Partial<CharacterEntity> = {
@@ -227,6 +228,7 @@ const LIN_CHEN_CHARACTER: Partial<CharacterEntity> = {
   intimacyLevel: 0,
   currentActivity: 'free',
   activityMode: 'auto',
+  region: '上海·上海',
 };
 
 const LIN_MIAN_CHARACTER: Partial<CharacterEntity> = {
@@ -324,6 +326,7 @@ const LIN_MIAN_CHARACTER: Partial<CharacterEntity> = {
   intimacyLevel: 0,
   currentActivity: 'free',
   activityMode: 'auto',
+  region: '北京·北京',
 };
 
 const XU_ZHE_CHARACTER: Partial<CharacterEntity> = {
@@ -419,6 +422,7 @@ const XU_ZHE_CHARACTER: Partial<CharacterEntity> = {
   intimacyLevel: 0,
   currentActivity: 'free',
   activityMode: 'auto',
+  region: '浙江·杭州',
 };
 
 const SU_YU_CHARACTER: Partial<CharacterEntity> = {
@@ -556,6 +560,7 @@ const SU_YU_CHARACTER: Partial<CharacterEntity> = {
   intimacyLevel: 16,
   currentActivity: 'working',
   activityMode: 'auto',
+  region: '北京·北京',
 };
 
 const ZHOU_RAN_CHARACTER: Partial<CharacterEntity> = {
@@ -843,6 +848,7 @@ const ZHOU_RAN_CHARACTER: Partial<CharacterEntity> = {
   intimacyLevel: 14,
   currentActivity: 'working',
   activityMode: 'auto',
+  region: '上海·上海',
 };
 
 export const FIXED_WORLD_CHARACTER_PRESETS: CelebrityCharacterPreset[] = [

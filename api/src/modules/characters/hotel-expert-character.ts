@@ -340,6 +340,7 @@ export function buildHotelExpertCharacter(): Partial<CharacterEntity> {
     intimacyLevel: 60,
     currentActivity: 'working',
     currentStatus: '在前厅值班，先帮你把这家酒店看明白。',
+    region: '海南·三亚',
   };
 }
 // i18n-ignore-end

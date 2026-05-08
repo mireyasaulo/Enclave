@@ -100,6 +100,10 @@ export async function seedCharacters(dataSource: DataSource): Promise<void> {
       patch.profile = nextProfile;
       refreshedProfiles++;
     }
+    const presetRegion = preset.character.region?.trim();
+    if (presetRegion && (existing.region ?? '').trim() !== presetRegion) {
+      patch.region = presetRegion;
+    }
     if (Object.keys(patch).length > 0) {
       await repo.update({ id: existing.id }, patch);
       if (
@@ -127,4 +131,19 @@ export async function seedCharacters(dataSource: DataSource): Promise<void> {
     console.log(`✓ Canonicalized ${refreshedMetadata} built-in preset records`);
   }
 
+  await dataSource.query(
+    `UPDATE friendships
+       SET region = (
+         SELECT region FROM characters
+          WHERE characters.id = friendships.characterId
+       )
+     WHERE (region IS NULL OR region = '')
+       AND EXISTS (
+         SELECT 1 FROM characters c
+          WHERE c.id = friendships.characterId
+            AND c.region IS NOT NULL
+            AND c.region <> ''
+       )`,
+  );
+  console.log('✓ Backfilled friendship.region from character.region');
 }

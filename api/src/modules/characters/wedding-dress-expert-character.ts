@@ -342,6 +342,7 @@ export function buildWeddingDressExpertCharacter(): Partial<CharacterEntity> {
     intimacyLevel: 50,
     currentActivity: 'working',
     currentStatus: '在看版型和试纱记录，先帮你把上身效果判断清楚。',
+    region: '江苏·苏州',
   };
 }
 // i18n-ignore-end

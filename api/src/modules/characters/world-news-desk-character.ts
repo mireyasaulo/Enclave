@@ -206,6 +206,7 @@ export function buildWorldNewsDeskCharacter(): Partial<CharacterEntity> {
     triggerScenes: [],
     intimacyLevel: 60,
     currentActivity: 'working',
+    region: '虚境·云端',
   };
 }
 // i18n-ignore-end

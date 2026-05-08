@@ -1215,6 +1215,7 @@ function buildCouncilCharacter(
     currentStatus: definition.currentStatus,
     currentActivity: 'working',
     activityMode: 'auto',
+    region: '虚境·云端',
   };
 }
 
