@@ -102,7 +102,15 @@ export class MockComputeProviderService implements WorldComputeProvider {
   }
 
   resolveApiBaseUrl(world: CloudWorldEntity) {
-    return resolveSuggestedWorldApiBaseUrl(world, this.configService) ?? "http://localhost:3000";
+    const resolved = resolveSuggestedWorldApiBaseUrl(world, this.configService);
+    if (resolved) {
+      return resolved;
+    }
+    // 历史上这里硬编码 fallback 到 http://localhost:3000，公网部署时被浏览器
+    // 解析成访问者自己机器的 3000 端口，连不上 → welcome 卡死。多租户接入
+    // 之后 mock provider 已不该再当默认 (CLOUD_DEFAULT_PROVIDER_KEY=local-process)，
+    // 这里改成返回显眼占位符，让上层 / nginx 反代立刻报错而不是默默连错。
+    return "http://mock-provider-not-configured.invalid";
   }
 
   resolveAdminUrl(world: CloudWorldEntity) {

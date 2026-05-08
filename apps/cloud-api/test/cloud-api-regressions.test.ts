@@ -211,6 +211,9 @@ function createWorldAccessService(dataSource: DataSource) {
     {
       normalizePhone: (phone: string) => phone.trim(),
     } as never,
+    {
+      get: () => undefined,
+    } as never,
   );
 }
 
