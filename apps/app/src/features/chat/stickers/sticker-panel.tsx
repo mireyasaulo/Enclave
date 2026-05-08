@@ -3014,7 +3014,7 @@ export function StickerPanel({
                           ? "border-[color:var(--border-subtle)] bg-white text-[#111827]"
                           : "border-transparent bg-transparent text-[#7b7f84]"
                       }`
-                    : `shrink-0 rounded-[16px] p-1.5 transition ${
+                    : `flex shrink-0 flex-col items-center gap-1 rounded-[16px] px-1.5 pb-1 pt-1.5 transition ${
                         active
                           ? "bg-[rgba(160,90,10,0.12)] shadow-[0_6px_14px_rgba(160,90,10,0.14)]"
                           : "bg-transparent hover:bg-white/76"
@@ -3025,24 +3025,35 @@ export function StickerPanel({
                 {isMobile ? (
                   tab.label
                 ) : (
-                  <span
-                    className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-[12px] border text-xs font-semibold ${
-                      active
-                        ? "border-[rgba(160,90,10,0.35)] bg-white text-[#9a5a0a]"
-                        : "border-white/80 bg-white/84 text-[color:var(--text-secondary)]"
-                    }`}
-                  >
-                    {tab.coverSticker ? (
-                      <img
-                        src={tab.coverSticker.url}
-                        alt={tab.label}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <span>{tab.badgeText ?? tab.label.slice(0, 1)}</span>
-                    )}
-                  </span>
+                  <>
+                    <span
+                      className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-[12px] border text-xs font-semibold ${
+                        active
+                          ? "border-[rgba(160,90,10,0.35)] bg-white text-[#9a5a0a]"
+                          : "border-white/80 bg-white/84 text-[color:var(--text-secondary)]"
+                      }`}
+                    >
+                      {tab.coverSticker ? (
+                        <img
+                          src={tab.coverSticker.url}
+                          alt={tab.label}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span>{tab.badgeText ?? tab.label.slice(0, 1)}</span>
+                      )}
+                    </span>
+                    <span
+                      className={`max-w-[64px] truncate text-[10px] leading-tight ${
+                        active
+                          ? "text-[#9a5a0a]"
+                          : "text-[color:var(--text-secondary)]"
+                      }`}
+                    >
+                      {tab.label}
+                    </span>
+                  </>
                 )}
               </button>
             );
