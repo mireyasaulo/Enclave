@@ -3,6 +3,7 @@ import { lingui } from "@lingui/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import viteCompression from "vite-plugin-compression";
 
 function resolveManualChunk(id: string) {
   const normalizedId = id.replace(/\\/g, "/");
@@ -76,14 +77,12 @@ function resolveAppBase(command: "build" | "serve") {
   return process.env.YINJIE_APP_BUILD_BASE === "relative" ? "./" : "/";
 }
 
-function shouldEmptyOutDir(command: "build" | "serve") {
-  if (command !== "build") {
-    return true;
-  }
-
-  // Keep previous hashed web chunks so already-open tabs can still lazy-load
-  // after a deployment. Relative shell bundles should stay clean on each build.
-  return process.env.YINJIE_APP_BUILD_BASE === "relative";
+function shouldEmptyOutDir(_command: "build" | "serve") {
+  // 历史上为兼容已打开页签的 lazy-load 需求保留过旧 hash chunk，但实际部署
+  // 现场会无限堆积（dist/assets 曾累积到 25k 文件 / 434MB）；main.tsx 已内置
+  // vite:preloadError 兜底监听，旧版本页签拉不到旧 chunk 时会自动 reload，
+  // 因此这里直接清空，最稳。
+  return true;
 }
 
 export default defineConfig(({ command }) => ({
@@ -96,6 +95,14 @@ export default defineConfig(({ command }) => ({
     }),
     lingui(),
     tailwindcss(),
+    // 公网隧道下首屏要省字节，vite-plugin-compression 在构建期生成 *.gz 同名
+    // 兄弟文件，nginx 通过 gzip_static on 直接吐，不再现压（CPU + 体积同省）。
+    viteCompression({
+      algorithm: "gzip",
+      ext: ".gz",
+      threshold: 1024,
+      deleteOriginFile: false,
+    }),
   ],
   build: {
     emptyOutDir: shouldEmptyOutDir(command),
