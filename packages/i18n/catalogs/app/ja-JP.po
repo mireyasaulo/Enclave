@@ -1194,6 +1194,7 @@ msgid "三种适合长期保存的世界资料"
 msgstr "長期保存に向く世界資料の3種類"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:301
+#: apps/app/src/components/moment-media-gallery.tsx:338
 #: apps/app/src/i18n/static-dom-seed.ts:868
 msgid "上一张"
 msgstr "前の画像"
@@ -1254,6 +1255,7 @@ msgid "上滑取消，松开后只会转成文字，不会直接发送。"
 msgstr "上にスワイプでキャンセル。離すとテキスト化だけを行い、送信はしません。"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:310
+#: apps/app/src/components/moment-media-gallery.tsx:347
 #: apps/app/src/i18n/static-dom-seed.ts:869
 msgid "下一张"
 msgstr "次の画像"
@@ -2825,6 +2827,8 @@ msgstr "画像ビューアを閉じる"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:274
 #: apps/app/src/components/moment-compose-media-preview.tsx:277
+#: apps/app/src/components/moment-media-gallery.tsx:305
+#: apps/app/src/components/moment-media-gallery.tsx:312
 #: apps/app/src/i18n/static-dom-seed.ts:866
 msgid "关闭图片预览"
 msgstr "画像プレビューを閉じる"
@@ -2900,6 +2904,8 @@ msgstr "メンバー追加ダイアログを閉じる"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:335
 #: apps/app/src/components/moment-compose-media-preview.tsx:346
+#: apps/app/src/components/moment-media-gallery.tsx:371
+#: apps/app/src/components/moment-media-gallery.tsx:388
 #: apps/app/src/i18n/static-dom-seed.ts:870
 msgid "关闭视频预览"
 msgstr "動画プレビューを閉じる"
@@ -5498,6 +5504,7 @@ msgstr "インスタンスモード"
 msgid "实例级"
 msgstr "インスタンス共通"
 
+#: apps/app/src/components/moment-media-gallery.tsx:229
 #: apps/app/src/i18n/static-dom-seed.ts:872
 msgid "实况"
 msgstr "ライブ"
@@ -8284,6 +8291,7 @@ msgid "打开视频号"
 msgstr "動画チャンネルを開く"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:73
+#: apps/app/src/components/moment-media-gallery.tsx:121
 #: apps/app/src/i18n/static-dom-seed.ts:860
 msgid "打开视频预览"
 msgstr "動画プレビューを開く"
@@ -9786,7 +9794,9 @@ msgid "日程管家"
 msgstr "予定マネージャー"
 
 #. placeholder {0}: formatMomentDurationLabel(draft.durationMs)
+#. placeholder {0}: formatMomentDurationLabel(video.durationMs)
 #: apps/app/src/components/moment-compose-media-preview.tsx:343
+#: apps/app/src/components/moment-media-gallery.tsx:380
 msgid "时长 {0}"
 msgstr "再生時間 {0}"
 
@@ -10235,6 +10245,9 @@ msgstr ""
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:282
 #: apps/app/src/components/moment-compose-media-preview.tsx:294
+#: apps/app/src/components/moment-media-gallery.tsx:223
+#: apps/app/src/components/moment-media-gallery.tsx:318
+#: apps/app/src/components/moment-media-gallery.tsx:330
 #: apps/app/src/i18n/static-dom-seed.ts:867
 msgid "朋友圈图片"
 msgstr "モーメンツ画像"
@@ -10262,6 +10275,8 @@ msgid "朋友圈概览"
 msgstr "モーメンツ概要"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:340
+#: apps/app/src/components/moment-media-gallery.tsx:126
+#: apps/app/src/components/moment-media-gallery.tsx:376
 #: apps/app/src/i18n/static-dom-seed.ts:871
 msgid "朋友圈视频"
 msgstr "モーメンツ動画"
@@ -13239,6 +13254,7 @@ msgid "视图"
 msgstr "表示"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:118
+#: apps/app/src/components/moment-media-gallery.tsx:159
 #: apps/app/src/i18n/static-dom-seed.ts:862
 #: apps/app/src/routes/channel-author-page.tsx:230
 #: apps/app/src/routes/channel-author-page.tsx:741

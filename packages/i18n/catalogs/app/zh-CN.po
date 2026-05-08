@@ -1196,6 +1196,7 @@ msgid "三种适合长期保存的世界资料"
 msgstr "三种适合长期保存的世界资料"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:301
+#: apps/app/src/components/moment-media-gallery.tsx:338
 #: apps/app/src/i18n/static-dom-seed.ts:868
 msgid "上一张"
 msgstr "上一张"
@@ -1256,6 +1257,7 @@ msgid "上滑取消，松开后只会转成文字，不会直接发送。"
 msgstr "上滑取消，松开后只会转成文字，不会直接发送。"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:310
+#: apps/app/src/components/moment-media-gallery.tsx:347
 #: apps/app/src/i18n/static-dom-seed.ts:869
 msgid "下一张"
 msgstr "下一张"
@@ -2827,6 +2829,8 @@ msgstr "关闭图片查看器"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:274
 #: apps/app/src/components/moment-compose-media-preview.tsx:277
+#: apps/app/src/components/moment-media-gallery.tsx:305
+#: apps/app/src/components/moment-media-gallery.tsx:312
 #: apps/app/src/i18n/static-dom-seed.ts:866
 msgid "关闭图片预览"
 msgstr "关闭图片预览"
@@ -2902,6 +2906,8 @@ msgstr "关闭添加群成员弹层"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:335
 #: apps/app/src/components/moment-compose-media-preview.tsx:346
+#: apps/app/src/components/moment-media-gallery.tsx:371
+#: apps/app/src/components/moment-media-gallery.tsx:388
 #: apps/app/src/i18n/static-dom-seed.ts:870
 msgid "关闭视频预览"
 msgstr "关闭视频预览"
@@ -5500,6 +5506,7 @@ msgstr "实例模式"
 msgid "实例级"
 msgstr "实例级"
 
+#: apps/app/src/components/moment-media-gallery.tsx:229
 #: apps/app/src/i18n/static-dom-seed.ts:872
 msgid "实况"
 msgstr "实况"
@@ -8286,6 +8293,7 @@ msgid "打开视频号"
 msgstr "打开视频号"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:73
+#: apps/app/src/components/moment-media-gallery.tsx:121
 #: apps/app/src/i18n/static-dom-seed.ts:860
 msgid "打开视频预览"
 msgstr "打开视频预览"
@@ -9788,7 +9796,9 @@ msgid "日程管家"
 msgstr "日程管家"
 
 #. placeholder {0}: formatMomentDurationLabel(draft.durationMs)
+#. placeholder {0}: formatMomentDurationLabel(video.durationMs)
 #: apps/app/src/components/moment-compose-media-preview.tsx:343
+#: apps/app/src/components/moment-media-gallery.tsx:380
 msgid "时长 {0}"
 msgstr "时长 {0}"
 
@@ -10237,6 +10247,9 @@ msgstr "朋友圈和广场动态共用同一套发现入口，但可见范围完
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:282
 #: apps/app/src/components/moment-compose-media-preview.tsx:294
+#: apps/app/src/components/moment-media-gallery.tsx:223
+#: apps/app/src/components/moment-media-gallery.tsx:318
+#: apps/app/src/components/moment-media-gallery.tsx:330
 #: apps/app/src/i18n/static-dom-seed.ts:867
 msgid "朋友圈图片"
 msgstr "朋友圈图片"
@@ -10264,6 +10277,8 @@ msgid "朋友圈概览"
 msgstr "朋友圈概览"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:340
+#: apps/app/src/components/moment-media-gallery.tsx:126
+#: apps/app/src/components/moment-media-gallery.tsx:376
 #: apps/app/src/i18n/static-dom-seed.ts:871
 msgid "朋友圈视频"
 msgstr "朋友圈视频"
@@ -13241,6 +13256,7 @@ msgid "视图"
 msgstr "视图"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:118
+#: apps/app/src/components/moment-media-gallery.tsx:159
 #: apps/app/src/i18n/static-dom-seed.ts:862
 #: apps/app/src/routes/channel-author-page.tsx:230
 #: apps/app/src/routes/channel-author-page.tsx:741
