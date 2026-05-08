@@ -1,10 +1,5 @@
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  NotFoundException,
-  OnModuleInit,
-} from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import OpenAI, { toFile } from 'openai';
@@ -19,6 +14,7 @@ import { InferenceModelCatalogEntryEntity } from './inference-model-catalog-entr
 import { InferenceProviderAccountEntity } from './inference-provider-account.entity';
 import { INFERENCE_MODEL_CATALOG_SEED } from './inference-catalog.seed';
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const DEFAULT_TRANSCRIPTION_MODEL = 'gpt-4o-mini-transcribe';
 const DEFAULT_TTS_MODEL = 'gpt-4o-mini-tts';
 const DEFAULT_TTS_VOICE = 'alloy';
@@ -940,11 +936,15 @@ export class InferenceService implements OnModuleInit {
     );
 
     if (!normalized.name.trim()) {
-      throw new BadRequestException('Provider 账户名称不能为空。');
+      throw new AppError('PROVIDER_ACCOUNT_NAME_REQUIRED', {
+        legacyMessage: 'Provider 账户名称不能为空。',
+      });
     }
 
     if (!normalized.endpoint.trim()) {
-      throw new BadRequestException('Provider 接口地址不能为空。');
+      throw new AppError('PROVIDER_ACCOUNT_ENDPOINT_REQUIRED', {
+        legacyMessage: 'Provider 接口地址不能为空。',
+      });
     }
 
     const id = `provider_${Date.now()}`;
@@ -967,7 +967,11 @@ export class InferenceService implements OnModuleInit {
   async updateProviderAccount(id: string, payload: ProviderPayload) {
     const existing = await this.providerRepo.findOneBy({ id });
     if (!existing) {
-      throw new NotFoundException(`Provider account ${id} not found.`);
+      throw new AppError('PROVIDER_ACCOUNT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id },
+        legacyMessage: `Provider account ${id} not found.`,
+      });
     }
 
     const normalized = this.normalizeProviderPayload(payload, existing);
@@ -989,10 +993,16 @@ export class InferenceService implements OnModuleInit {
   async setDefaultProviderAccount(id: string) {
     const existing = await this.providerRepo.findOneBy({ id });
     if (!existing) {
-      throw new NotFoundException(`Provider account ${id} not found.`);
+      throw new AppError('PROVIDER_ACCOUNT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id },
+        legacyMessage: `Provider account ${id} not found.`,
+      });
     }
     if (!existing.isEnabled) {
-      throw new BadRequestException('请先启用该 Provider 账户，再设为默认。');
+      throw new AppError('PROVIDER_ACCOUNT_DISABLED_FOR_DEFAULT', {
+        legacyMessage: '请先启用该 Provider 账户，再设为默认。',
+      });
     }
 
     await this.setDefaultFlag(id);
@@ -1045,11 +1055,15 @@ export class InferenceService implements OnModuleInit {
       payload.transcriptionApiKey?.trim() || apiKey || '';
 
     if (!endpoint) {
-      throw new BadRequestException('请先填写 Provider 接口地址。');
+      throw new AppError('PROVIDER_ACCOUNT_ENDPOINT_REQUIRED', {
+        legacyMessage: '请先填写 Provider 接口地址。',
+      });
     }
 
     if (!model) {
-      throw new BadRequestException('请先填写默认模型 ID。');
+      throw new AppError('PROVIDER_ACCOUNT_MODEL_REQUIRED', {
+        legacyMessage: '请先填写默认模型 ID。',
+      });
     }
 
     try {
@@ -1366,9 +1380,11 @@ export class InferenceService implements OnModuleInit {
         id: providerAccountId,
       });
       if (!account) {
-        throw new NotFoundException(
-          `Provider account ${providerAccountId} not found.`,
-        );
+        throw new AppError('PROVIDER_ACCOUNT_NOT_FOUND', {
+          status: HttpStatus.NOT_FOUND,
+          params: { providerAccountId },
+          legacyMessage: `Provider account ${providerAccountId} not found.`,
+        });
       }
 
       return this.toResolvedProviderConfig({
@@ -1952,7 +1968,10 @@ export class InferenceService implements OnModuleInit {
       where: { isDefault: true },
     });
     if (!defaultAccount) {
-      throw new NotFoundException('Default provider account not found.');
+      throw new AppError('PROVIDER_ACCOUNT_DEFAULT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Default provider account not found.',
+      });
     }
 
     return defaultAccount;
@@ -2217,7 +2236,9 @@ export class InferenceService implements OnModuleInit {
       order: { sortOrder: 'ASC', label: 'ASC' },
     });
     if (modelCatalog.length === 0) {
-      throw new BadRequestException('至少选择一个可安装的模型目录项。');
+      throw new AppError('PROVIDER_CATALOG_AT_LEAST_ONE_INSTALLABLE', {
+        legacyMessage: '至少选择一个可安装的模型目录项。',
+      });
     }
 
     const providerAccountId =
@@ -2226,7 +2247,11 @@ export class InferenceService implements OnModuleInit {
       id: providerAccountId,
     });
     if (!providerAccount) {
-      throw new NotFoundException(`Provider account ${providerAccountId} not found.`);
+      throw new AppError('PROVIDER_ACCOUNT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { providerAccountId },
+        legacyMessage: `Provider account ${providerAccountId} not found.`,
+      });
     }
 
     let installedCount = 0;
@@ -2370,12 +2395,16 @@ export class InferenceService implements OnModuleInit {
       id: providerAccountId,
     });
     if (!providerAccount) {
-      throw new NotFoundException(`Provider account ${providerAccountId} not found.`);
+      throw new AppError('PROVIDER_ACCOUNT_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { providerAccountId },
+        legacyMessage: `Provider account ${providerAccountId} not found.`,
+      });
     }
     if (!providerAccount.isEnabled) {
-      throw new BadRequestException(
-        '请先启用目标 Provider 账户，再批量换绑模型人格角色。',
-      );
+      throw new AppError('PROVIDER_ACCOUNT_DISABLED_FOR_REBIND', {
+        legacyMessage: '请先启用目标 Provider 账户，再批量换绑模型人格角色。',
+      });
     }
 
     const selectedCatalogEntries =
@@ -2386,7 +2415,9 @@ export class InferenceService implements OnModuleInit {
           })
         : [];
     if (modelIds.length > 0 && selectedCatalogEntries.length === 0) {
-      throw new BadRequestException('至少选择一个已登记的模型目录项。');
+      throw new AppError('PROVIDER_CATALOG_AT_LEAST_ONE_REGISTERED', {
+        legacyMessage: '至少选择一个已登记的模型目录项。',
+      });
     }
 
     const existingCharacters =
@@ -2476,3 +2507,4 @@ export class InferenceService implements OnModuleInit {
     };
   }
 }
+// i18n-ignore-end

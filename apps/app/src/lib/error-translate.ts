@@ -260,6 +260,28 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`语音转写失败，请稍后再试。`);
     case "AI_SPEECH_ASSET_NOT_FOUND":
       return translateRuntimeMessage(msg`语音资源不存在。`);
+    case "PROVIDER_ACCOUNT_NAME_REQUIRED":
+      return translateRuntimeMessage(msg`Provider 账户名称不能为空。`);
+    case "PROVIDER_ACCOUNT_ENDPOINT_REQUIRED":
+      return translateRuntimeMessage(msg`Provider 接口地址不能为空。`);
+    case "PROVIDER_ACCOUNT_NOT_FOUND":
+      return translateRuntimeMessage(
+        msg`Provider 账户不存在：${String(params.id ?? params.providerAccountId ?? "")}`,
+      );
+    case "PROVIDER_ACCOUNT_DISABLED_FOR_DEFAULT":
+      return translateRuntimeMessage(msg`请先启用该 Provider 账户，再设为默认。`);
+    case "PROVIDER_ACCOUNT_DISABLED_FOR_REBIND":
+      return translateRuntimeMessage(
+        msg`请先启用目标 Provider 账户，再批量换绑模型人格角色。`,
+      );
+    case "PROVIDER_ACCOUNT_MODEL_REQUIRED":
+      return translateRuntimeMessage(msg`请先填写默认模型 ID。`);
+    case "PROVIDER_ACCOUNT_DEFAULT_NOT_FOUND":
+      return translateRuntimeMessage(msg`默认 Provider 账户不存在。`);
+    case "PROVIDER_CATALOG_AT_LEAST_ONE_INSTALLABLE":
+      return translateRuntimeMessage(msg`至少选择一个可安装的模型目录项。`);
+    case "PROVIDER_CATALOG_AT_LEAST_ONE_REGISTERED":
+      return translateRuntimeMessage(msg`至少选择一个已登记的模型目录项。`);
     case "VALIDATION_FAILED":
       return translateRuntimeMessage(msg`提交的数据无效，请检查后重试。`);
     case "INTERNAL_ERROR":
