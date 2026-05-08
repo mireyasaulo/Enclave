@@ -74,7 +74,7 @@ export function TelemetryFunnelChart({ data }: { data: TelemetryFunnelResponse }
             <YAxis type="category" dataKey="name" stroke="#64748b" fontSize={11} width={140} />
             <Tooltip
               formatter={(value: number, key) => {
-                if (key === "count") return [value.toLocaleString(), "Count"];
+                if (key === "count") return [value.toLocaleString(), t("Count")];
                 return [value, key];
               }}
             />

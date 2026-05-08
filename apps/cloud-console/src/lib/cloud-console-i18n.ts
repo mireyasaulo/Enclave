@@ -299,7 +299,7 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "30 days": "30 天",
     "All apps": "全部端",
     "Comma-separated event names (in order)": "逗号分隔的事件名（按顺序）",
-    "Apply funnel": "应用漏斗",
+    "Apply funnel": "更新漏斗",
     "Funnel is empty. Please enter steps first.": "漏斗为空。请先输入步骤。",
     "No events in the current range.": "当前范围内无事件。",
     "No API telemetry in the current range.": "当前范围内无 API 调用埋点。",
