@@ -1,7 +1,6 @@
 import {
   useEffect,
   useRef,
-  useState,
   type Dispatch,
   type ReactNode,
   type SetStateAction,
@@ -11,6 +10,7 @@ import type { MessageDescriptor } from "@lingui/core";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import {
   ArrowLeft,
+  ChevronRight,
   Clock3,
   Newspaper,
   Search,
@@ -25,6 +25,7 @@ import {
   type SearchCategory,
   type SearchHistoryItem,
   type SearchMatchCounts,
+  type SearchResultCategory,
   type SearchResultItem,
   type SearchResultSection,
   type SearchScopeCounts,
@@ -113,13 +114,26 @@ export function MobileSearchWorkspace({
   const t = useRuntimeTranslator();
   const getCategoryTitle = useSearchCategoryTitle();
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [expandedSections, setExpandedSections] = useState<
-    Partial<Record<SearchCategory, boolean>>
-  >({});
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  const allViewCategories: SearchResultCategory[] = [
+    "messages",
+    "contacts",
+    "officialAccounts",
+    "favorites",
+  ];
+  const sectionByCategory = new Map(
+    groupedResults.map((section) => [section.category, section]),
+  );
+  const orderedAllSections: SearchResultSection[] = allViewCategories.flatMap(
+    (category) => {
+      const section = sectionByCategory.get(category);
+      return section && section.results.length ? [section] : [];
+    },
+  );
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-[color:var(--bg-canvas)]">
@@ -361,40 +375,17 @@ export function MobileSearchWorkspace({
         {!loading && !error && hasKeyword ? (
           activeCategory === "all" ? (
             <div className="space-y-4">
-              {groupedResults.map((section) => {
-                const expanded = Boolean(expandedSections[section.category]);
-                const sectionResults = expanded
-                  ? section.results
-                  : section.results.slice(0, 3);
-                const comingSoon =
-                  section.category === "miniPrograms" ||
-                  section.category === "officialAccounts";
+              {orderedAllSections.map((section) => {
+                const visible = section.results.slice(0, 3);
+                const hasMore = section.results.length > 3;
 
                 return (
-                  <section key={section.category} className="space-y-2.5">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="text-[14px] font-medium text-[color:var(--text-primary)]">
-                        {getCategoryTitle(section.category)}
-                      </div>
-                      {section.results.length > 3 && !comingSoon ? (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setExpandedSections((current) => ({
-                              ...current,
-                              [section.category]: !current[section.category],
-                            }))
-                          }
-                          className="text-[11px] text-[#15803d]"
-                        >
-                          {expanded
-                            ? t(msg`收起`)
-                            : t(msg`查看更多 ${section.results.length}`)}
-                        </button>
-                      ) : null}
+                  <section key={section.category} className="space-y-2">
+                    <div className="text-[12px] font-medium text-[color:var(--text-muted)]">
+                      {getCategoryTitle(section.category)}
                     </div>
-                    <div className="relative space-y-1.5">
-                      {sectionResults.map((item) => (
+                    <div className="space-y-1">
+                      {visible.map((item) => (
                         <SearchResultCard
                           key={item.id}
                           item={item}
@@ -403,7 +394,18 @@ export function MobileSearchWorkspace({
                           onOpen={onOpenResult}
                         />
                       ))}
-                      {comingSoon ? <MobileSearchComingSoonOverlay /> : null}
+                      {hasMore ? (
+                        <button
+                          type="button"
+                          onClick={() => setActiveCategory(section.category)}
+                          className="flex w-full items-center justify-between gap-2 rounded-[10px] px-3 py-2 text-left text-[12px] text-[color:var(--text-muted)] transition hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
+                        >
+                          <span>
+                            {t(msg`查看更多 ${section.results.length} 条 ${getCategoryTitle(section.category)}`)}
+                          </span>
+                          <ChevronRight size={13} className="shrink-0" />
+                        </button>
+                      ) : null}
                     </div>
                   </section>
                 );
@@ -425,8 +427,7 @@ export function MobileSearchWorkspace({
                     onOpen={onOpenResult}
                   />
                 ))}
-                {activeCategory === "miniPrograms" ||
-                activeCategory === "officialAccounts" ? (
+                {activeCategory === "miniPrograms" ? (
                   <MobileSearchComingSoonOverlay />
                 ) : null}
               </div>
