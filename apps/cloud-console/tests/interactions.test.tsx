@@ -2173,7 +2173,9 @@ describe("cloud-console interactions", () => {
       target: { value: "missing-world" },
     });
 
-    expect(await screen.findByText("No worlds match this filter.")).toBeTruthy();
+    expect(
+      await screen.findByText("No instance rows match the current filter set."),
+    ).toBeTruthy();
 
     fireEvent.change(screen.getByLabelText("World search"), {
       target: { value: "+8613800138000" },
