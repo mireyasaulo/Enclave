@@ -22,6 +22,12 @@ const bootstrapErrorLogPath = path.join(logsDir, "bootstrap-error.log");
 const appDistDir = path.join(rootDir, "apps", "app", "dist");
 const apiUpstream = "http://127.0.0.1:3000";
 const cloudUpstream = "http://127.0.0.1:3001";
+const siteUpstream = "http://127.0.0.1:5185";
+// 公网 HTTPS 隧道 https://1gw06751dd053.vicp.fun （Host 不带端口） 实际打到
+// nginx 5180 而不是直连 5185；HTTP 隧道 :29490 也打 5180。需要在 nginx 这一
+// 层把两个 Host 区分开走 site 还是 app。这个 hostname 与 :29490 端口的隧道
+// 控制台配置一致；如果改隧道域名，这里也要同步。
+const siteHostExact = "1gw06751dd053.vicp.fun";
 // 花生壳两条隧道分别独立映射：
 //   HTTPS https://1gw06751dd053.vicp.fun → 127.0.0.1:5185 (site, Next.js 直连)
 //   HTTP  http://1gw06751dd053.vicp.fun:29490 → 127.0.0.1:5180 (nginx → app dist)
@@ -111,6 +117,17 @@ http {
   map $http_upgrade $connection_upgrade {
     default upgrade;
     '' close;
+  }
+
+  # 花生壳两条隧道实际都进 nginx 5180（公网响应 Server: nginx 已确认）：
+  #   HTTPS https://${siteHostExact}            (Host=${siteHostExact},        无端口) → site (5185)
+  #   HTTP  http://${siteHostExact}:29490       (Host=${siteHostExact}:29490)         → app dist
+  # nginx server_name 匹配会忽略 Host 端口，无法区分；改用 $http_host 精确匹配
+  # 出 $route_to_site，命中时通过 error_page → named location 内部跳转做反代
+  # （避开 "if + proxy_pass is evil"）。
+  map $http_host $route_to_site {
+    default 0;
+    "${siteHostExact}" 1;
   }
 
   server {
@@ -210,12 +227,26 @@ http {
       try_files $uri =404;
     }
 
-    # 所有未匹配前面 /api/、/socket.io/、/cloud/ 等专用 location 的请求都走
-    # SPA 兜底（app dist 的 index.html）。site 由花生壳 HTTPS 隧道直连 5185，
-    # 不经过本 server。
+    # 默认 location：HTTPS 隧道 (Host=${siteHostExact} 无端口) 反代到 site (5185)；
+    # 其他 Host（HTTP :29490 隧道、本机直连）走 app dist (SPA)。
     location / {
+      error_page 418 = @site_proxy;
+      if ($route_to_site) { return 418; }
       add_header Cache-Control "no-store";
       try_files $uri $uri/ /index.html;
+    }
+
+    location @site_proxy {
+      internal;
+      proxy_pass ${siteUpstream};
+      proxy_http_version 1.1;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header Accept-Encoding $http_accept_encoding;
+      proxy_read_timeout 60s;
+      proxy_send_timeout 60s;
     }
   }
 }

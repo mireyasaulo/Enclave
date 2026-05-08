@@ -86,6 +86,27 @@ function shouldEmptyOutDir(_command: "build" | "serve") {
   return true;
 }
 
+// 公网隧道下首屏多了一个被 Vite 注入的 <link rel="stylesheet"> 阻塞渲染。
+// app 的 boot screen 自带 inline critical CSS（index.html 头部），browser 完全
+// 可以先把 boot screen 画出来，主 CSS 异步到位后再切到正式 UI。把 build 输出的
+// stylesheet link 改成 preload + onload 切换 rel='stylesheet' 的异步加载形态，
+// 省掉 1 个阻塞渲染的 RTT。<noscript> 兜底覆盖禁用 JS 的极端情况。
+function asyncCssPlugin() {
+  return {
+    name: "yinjie-app-async-css",
+    enforce: "post" as const,
+    transformIndexHtml(html: string) {
+      return html.replace(
+        /<link\s+rel="stylesheet"([^>]*?)href="([^"]+)"([^>]*)>/g,
+        (_match, before, href, after) => {
+          const otherAttrs = `${before}${after}`.trim();
+          return `<link rel="preload" as="style" href="${href}" ${otherAttrs} onload="this.onload=null;this.rel='stylesheet'"><noscript><link rel="stylesheet" href="${href}" ${otherAttrs}></noscript>`;
+        },
+      );
+    },
+  };
+}
+
 export default defineConfig(({ command }) => ({
   base: resolveAppBase(command),
   plugins: [
@@ -96,6 +117,7 @@ export default defineConfig(({ command }) => ({
     }),
     lingui(),
     tailwindcss(),
+    asyncCssPlugin(),
     // 公网隧道下首屏要省字节，vite-plugin-compression 在构建期生成 *.gz 同名
     // 兄弟文件，nginx 通过 gzip_static on 直接吐，不再现压（CPU + 体积同省）。
     viteCompression({
