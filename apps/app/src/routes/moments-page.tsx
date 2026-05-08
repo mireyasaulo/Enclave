@@ -54,8 +54,6 @@ import { getMomentSummaryText } from "../features/moments/moment-content";
 import { formatTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { normalizePathname } from "../lib/normalize-pathname";
-import { shareWithNativeShell } from "../runtime/mobile-bridge";
-import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
@@ -87,9 +85,6 @@ export function MomentsPage() {
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const nativeDesktopFavorites = runtimeConfig.appPlatform === "desktop";
-  const nativeMobileShareSupported = isNativeMobileShareSurface({
-    isDesktopLayout,
-  });
   const normalizedPathname = normalizePathname(pathname);
   const composeDraft = useMomentComposeDraft();
   const resetComposeDraft = composeDraft.reset;
@@ -597,83 +592,6 @@ export function MomentsPage() {
     });
   }, [isDesktopLayout, routeSelectedMomentId, visibleMoments.length]);
 
-  async function handleShareMoment(moment: (typeof visibleMoments)[number]) {
-    const summaryBody = getMomentSummaryText(moment);
-    const shareHash = buildDesktopMomentsRouteHash({
-      momentId: moment.id,
-    });
-    const sharePath = `${pathname}${shareHash ? `#${shareHash}` : ""}`;
-    const shareUrl =
-      typeof window === "undefined"
-        ? sharePath
-        : `${window.location.origin}${sharePath}`;
-    const locationLine = moment.location
-      ? t(msg`\n位置：${moment.location}`)
-      : "";
-    const summaryText = `${moment.authorName}：${summaryBody}${locationLine}\n${shareUrl}`;
-
-    if (nativeMobileShareSupported) {
-      const shared = await shareWithNativeShell({
-        title: t(msg`${moment.authorName} 的朋友圈`),
-        text: `${moment.authorName}：${summaryBody}${locationLine}`,
-        url: shareUrl,
-      });
-
-      if (shared) {
-        setNoticeTone("success");
-        setNoticeActionLabel(null);
-        setNoticeAction(null);
-        setNotice(t(msg`已打开系统分享面板。`));
-        return;
-      }
-    }
-
-    if (
-      typeof navigator === "undefined" ||
-      !navigator.clipboard ||
-      typeof navigator.clipboard.writeText !== "function"
-    ) {
-      setNoticeTone("info");
-      setNoticeActionLabel(
-        nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
-      );
-      setNoticeAction(() => () => {
-        void handleShareMoment(moment);
-      });
-      setNotice(
-        nativeMobileShareSupported
-          ? t(msg`当前设备暂时无法打开系统分享，请稍后重试。`)
-          : t(msg`当前环境暂不支持复制动态摘要。`),
-      );
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(summaryText);
-      setNoticeTone("success");
-      setNoticeActionLabel(null);
-      setNoticeAction(null);
-      setNotice(
-        nativeMobileShareSupported
-          ? t(msg`系统分享暂时不可用，已复制动态摘要。`)
-          : t(msg`动态摘要已复制。`),
-      );
-    } catch {
-      setNoticeTone("info");
-      setNoticeActionLabel(
-        nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
-      );
-      setNoticeAction(() => () => {
-        void handleShareMoment(moment);
-      });
-      setNotice(
-        nativeMobileShareSupported
-          ? t(msg`系统分享失败，请稍后重试。`)
-          : t(msg`复制动态摘要失败，请稍后重试。`),
-      );
-    }
-  }
-
   if (isDesktopLayout) {
     if (syncedRouteSelectedAuthorId) {
       return (
@@ -860,7 +778,6 @@ export function MomentsPage() {
           ? momentsQuery.error
           : null
       }
-      likePending={likeMutation.isPending}
       pendingCommentMomentId={pendingCommentMomentId}
       notice={notice}
       noticeTone={noticeTone}
@@ -965,7 +882,6 @@ type MobileMomentsViewProps = {
   visibleMoments: Moment[];
   momentsLoading: boolean;
   momentsError: Error | null;
-  likePending: boolean;
   pendingCommentMomentId: string | null | undefined;
   notice: string;
   noticeTone: "success" | "info";
@@ -1006,7 +922,6 @@ function MobileMomentsView({
   visibleMoments,
   momentsLoading,
   momentsError,
-  likePending: _likePending,
   pendingCommentMomentId,
   notice,
   noticeTone,
@@ -1308,55 +1223,6 @@ function PullToRefreshIndicator({
     >
       <span>{label}</span>
     </div>
-  );
-}
-
-function MobileMomentsStatusCard({
-  badge,
-  title,
-  description,
-  tone = "default",
-  action,
-}: {
-  badge: string;
-  title: string;
-  description: string;
-  tone?: "default" | "danger" | "loading";
-  action?: ReactNode;
-}) {
-  const loading = tone === "loading";
-  return (
-    <section
-      className={
-        tone === "danger"
-          ? "rounded-[18px] border border-[color:var(--border-danger)] bg-[linear-gradient(180deg,rgba(255,245,245,0.96),rgba(254,242,242,0.94))] px-4 py-5 text-center shadow-none"
-          : "rounded-[18px] border border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] px-4 py-5 text-center shadow-none"
-      }
-    >
-      <div
-        className={
-          tone === "danger"
-            ? "mx-auto inline-flex rounded-full bg-[rgba(220,38,38,0.08)] px-2.5 py-1 text-[9px] font-medium tracking-[0.04em] text-[color:var(--state-danger-text)]"
-            : "mx-auto inline-flex rounded-full bg-[rgba(7,193,96,0.1)] px-2.5 py-1 text-[9px] font-medium tracking-[0.04em] text-[#07c160]"
-        }
-      >
-        {badge}
-      </div>
-      {loading ? (
-        <div className="mt-3 flex items-center justify-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-black/15 animate-pulse" />
-          <span className="h-2 w-2 rounded-full bg-black/25 animate-pulse [animation-delay:120ms]" />
-          <span className="h-2 w-2 rounded-full bg-[#8ecf9d] animate-pulse [animation-delay:240ms]" />
-        </div>
-      ) : null}
-      <div className="mt-3 text-[15px] font-medium text-[color:var(--text-primary)]">
-        {title}
-      </div>
-      <p className="mx-auto mt-2 max-w-[18rem] text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)]">
-        {description}
-      </p>
-      {action ? <div className="mt-4 flex justify-center">{action}</div> : null}
-    </section>
   );
 }
 
