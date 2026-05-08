@@ -40,6 +40,7 @@ import { CreateCloudFeedbackTable1776654000000 } from "./migrations/177665400000
 import { MakeCloudUsersPhoneNullable1776654600000 } from "./migrations/1776654600000-make-cloud-users-phone-nullable";
 import { UpdateAppPublicBaseUrl1776655200000 } from "./migrations/1776655200000-update-app-public-base-url";
 import { CreateTelemetryTables1776655800000 } from "./migrations/1776655800000-create-telemetry-tables";
+import { AddWorldIdToTelemetry1776656400000 } from "./migrations/1776656400000-add-world-id-to-telemetry";
 import { resolveCloudDatabasePath } from "../config/cloud-runtime-config";
 
 type ConfigReader = {
@@ -90,6 +91,7 @@ export const cloudMigrations = [
   MakeCloudUsersPhoneNullable1776654600000,
   UpdateAppPublicBaseUrl1776655200000,
   CreateTelemetryTables1776655800000,
+  AddWorldIdToTelemetry1776656400000,
 ];
 
 export function buildCloudDataSourceOptions(config: ConfigReader): DataSourceOptions {
