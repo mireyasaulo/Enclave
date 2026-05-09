@@ -405,7 +405,8 @@ export class SocialService {
       const result = await this.ai.generateReply({
         profile: runtimeProfile,
         conversationHistory: [],
-        userMessage: `你刚在${scene}遇到用户，现在要发一条好友申请开场白。像真人顺手发出的第一句话，别太客气，别写成自我介绍名片，不要用括号动作，20字以内。`,
+        userMessage:
+          await this.worldLanguage.formatFriendRequestGreetingTask(scene),
         usageContext: {
           surface: 'app',
           scene: 'social_greeting_generate',
@@ -469,8 +470,7 @@ export class SocialService {
       const result = await this.ai.generateReply({
         profile: runtimeProfile,
         conversationHistory: [],
-        userMessage:
-          '你刚和用户随机相遇，现在发一句很短的开场白。像真人随手接上的第一句话，自然一点，别太客气，不要用括号动作，20字以内。',
+        userMessage: await this.worldLanguage.formatShakeGreetingTask(),
         usageContext: {
           surface: 'app',
           scene: 'social_greeting_generate',

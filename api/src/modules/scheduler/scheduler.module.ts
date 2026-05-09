@@ -25,6 +25,7 @@ import { CyberAvatarModule } from '../cyber-avatar/cyber-avatar.module';
 import { SelfAgentModule } from '../self-agent/self-agent.module';
 import { MomentsModule } from '../moments/moments.module';
 import { MinimaxModule } from '../minimax/minimax.module';
+import { SystemConfigModule } from '../config/config.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { MinimaxModule } from '../minimax/minimax.module';
     SelfAgentModule,
     MomentsModule,
     MinimaxModule,
+    SystemConfigModule,
   ],
   providers: [SchedulerService, SchedulerTelemetryService],
   exports: [SchedulerService, SchedulerTelemetryService],

@@ -2249,9 +2249,18 @@ export class AiOrchestratorService {
         undefined,
         sceneKey,
       );
+      const finalLanguageReminder = await this.worldLanguage.buildFinalReminder();
+      const wrapTaskPrompt = (taskPrompt: string) =>
+        finalLanguageReminder
+          ? `${taskPrompt}\n\n${finalLanguageReminder}`
+          : taskPrompt;
       const taskPrompts = [
-        this.promptBuilder.buildSceneGenerationTaskPrompt(sceneKey, false),
-        this.promptBuilder.buildSceneGenerationTaskPrompt(sceneKey, true),
+        wrapTaskPrompt(
+          this.promptBuilder.buildSceneGenerationTaskPrompt(sceneKey, false),
+        ),
+        wrapTaskPrompt(
+          this.promptBuilder.buildSceneGenerationTaskPrompt(sceneKey, true),
+        ),
       ];
 
       for (let attempt = 0; attempt < taskPrompts.length; attempt += 1) {
@@ -2307,9 +2316,15 @@ export class AiOrchestratorService {
       resolvedGenerationContext,
       sceneKey,
     );
+    const finalLanguageReminderForMoment =
+      await this.worldLanguage.buildFinalReminder();
+    const wrapMomentPrompt = (taskPrompt: string) =>
+      finalLanguageReminderForMoment
+        ? `${taskPrompt}\n\n${finalLanguageReminderForMoment}`
+        : taskPrompt;
     const userPrompts = [
-      promptRequest.userPrompt,
-      promptRequest.retryUserPrompt,
+      wrapMomentPrompt(promptRequest.userPrompt),
+      wrapMomentPrompt(promptRequest.retryUserPrompt),
     ];
 
     for (let attempt = 0; attempt < userPrompts.length; attempt += 1) {

@@ -47,6 +47,7 @@ import { MinimaxJobService } from '../minimax/minimax-job.service';
 import { MinimaxQuotaService } from '../minimax/minimax-quota.service';
 import { MinimaxClient } from '../minimax/minimax.client';
 import { MinimaxAssetStorage } from '../minimax/minimax-asset.storage';
+import { WorldLanguageService } from '../config/world-language.service';
 import type { MinimaxJobEntity } from '../minimax/minimax-job.entity';
 import type { CharacterEntity } from '../characters/character.entity';
 
@@ -104,6 +105,7 @@ export class MomentsService implements OnModuleInit {
     private readonly minimaxQuota: MinimaxQuotaService,
     private readonly minimaxClient: MinimaxClient,
     private readonly minimaxStorage: MinimaxAssetStorage,
+    private readonly worldLanguage: WorldLanguageService,
     @InjectRepository(MomentEntity)
     private momentRepo: Repository<MomentEntity>,
     @InjectRepository(MomentPostEntity)
@@ -586,10 +588,15 @@ export class MomentsService implements OnModuleInit {
               const profile = await this.characters.getProfile(char.id);
               if (!profile) return;
               const observation = await this.buildMomentAiObservation(post);
+              const userMessage = await this.worldLanguage.formatPostCommentTask({
+                authorName: post.authorName,
+                summary: observation.summary,
+                surface: 'moments',
+              });
               const reply = await this.ai.generateReply({
                 profile,
                 conversationHistory: [],
-                userMessage: `${post.authorName}发了一条朋友圈：${observation.summary}。用一句话自然地评论一下，不超过20字。`,
+                userMessage,
                 userMessageParts: observation.parts,
                 usageContext: {
                   surface: 'app',
@@ -723,9 +730,14 @@ export class MomentsService implements OnModuleInit {
             const observation = await this.buildMomentAiObservation(post);
 
             const isPostAuthor = replier.id === post.authorId;
-            const userMessage = isPostAuthor
-              ? `${sourceComment.authorName}在你的朋友圈评论了："${sourceComment.text}"，你的朋友圈内容是：${observation.summary}，回复一下，不超过20字。`
-              : `你刷到${post.authorName}发的朋友圈：${observation.summary}。${sourceComment.authorName}评论了："${sourceComment.text}"，你也想插话回复一下，不超过20字。`;
+            const userMessage =
+              await this.worldLanguage.formatPostCommentReplyTask({
+                postAuthorName: post.authorName,
+                sourceCommenterName: sourceComment.authorName,
+                sourceCommentText: sourceComment.text,
+                summary: observation.summary,
+                isPostAuthor,
+              });
 
             const reply = await this.ai.generateReply({
               profile,
@@ -1651,10 +1663,15 @@ export class MomentsService implements OnModuleInit {
             const profile = await this.characters.getProfile(char.id);
             if (!profile) continue;
             const observation = await this.buildMomentAiObservation(post);
+            const userMessage = await this.worldLanguage.formatPostCommentTask({
+              authorName: post.authorName,
+              summary: observation.summary,
+              surface: 'moments',
+            });
             const reply = await this.ai.generateReply({
               profile,
               conversationHistory: [],
-              userMessage: `${post.authorName}发了一条朋友圈：${observation.summary}。用一句话自然地评论一下，不超过20字。`,
+              userMessage,
               userMessageParts: observation.parts,
               usageContext: {
                 surface: 'app',

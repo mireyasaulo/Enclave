@@ -41,6 +41,7 @@ import { ReminderRuntimeService } from '../reminder-runtime/reminder-runtime.ser
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { SelfAgentService } from '../self-agent/self-agent.service';
 import { MinimaxQuotaService } from '../minimax/minimax-quota.service';
+import { WorldLanguageService } from '../config/world-language.service';
 import {
   WORLD_NEWS_BULLETIN_GENERATION_KIND,
   WORLD_NEWS_DESK_CHARACTER_ID,
@@ -120,6 +121,7 @@ export class SchedulerService {
     private readonly selfAgentService: SelfAgentService,
     private readonly momentsService: MomentsService,
     private readonly minimaxQuota: MinimaxQuotaService,
+    private readonly worldLanguage: WorldLanguageService,
   ) {}
 
   @Cron('*/5 * * * *')
@@ -1384,7 +1386,10 @@ export class SchedulerService {
         }
 
         memorySeededCount += 1;
-        const today = now.toLocaleDateString('zh-CN');
+        const language = await this.worldLanguage.getLanguage();
+        const today = now.toLocaleDateString(
+          this.worldLanguage.getIntlLocale(language),
+        );
         const noActionToken =
           runtimeRules.schedulerTextTemplates.proactiveReminderNoActionToken;
         const runtimeProfile =
@@ -1393,7 +1398,11 @@ export class SchedulerService {
         const replyResult = await this.ai.generateReply({
           profile: runtimeProfile as any,
           conversationHistory: [],
-          userMessage: `今天是${today}，结合你的记忆，请判断是否需要主动向用户发送消息。如果不需要，只回复：${noActionToken}`,
+          userMessage:
+            await this.worldLanguage.formatProactiveReminderJudgmentTask({
+              today,
+              noActionToken,
+            }),
           extraSystemPromptSections:
             char.id === SELF_CHARACTER_ID
               ? selfCyberAvatarPromptSections

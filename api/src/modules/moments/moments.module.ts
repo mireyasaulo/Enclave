@@ -15,6 +15,7 @@ import { CyberAvatarModule } from '../cyber-avatar/cyber-avatar.module';
 import { ReminderRuntimeModule } from '../reminder-runtime/reminder-runtime.module';
 import { MinimaxModule } from '../minimax/minimax.module';
 import { MomentsMinimaxCallbacks } from './moments-minimax.callbacks';
+import { SystemConfigModule } from '../config/config.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { MomentsMinimaxCallbacks } from './moments-minimax.callbacks';
     forwardRef(() => CyberAvatarModule),
     ReminderRuntimeModule,
     MinimaxModule,
+    SystemConfigModule,
   ],
   providers: [MomentsService, MomentsMinimaxCallbacks],
   controllers: [MomentsController],

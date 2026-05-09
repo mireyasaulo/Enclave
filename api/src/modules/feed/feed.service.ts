@@ -1228,7 +1228,6 @@ export class FeedService implements OnModuleInit {
 
       for (const { post, engageMul } of top) {
         if (engageMul <= 0) continue; // 7d 硬截断 / 关系完全冷却
-        const surfaceLabel = post.surface === 'channels' ? '视频号' : '广场';
         if (Math.random() < LIKE_BASE * engageMul) {
           try {
             await this.toggleLike(
@@ -1261,10 +1260,15 @@ export class FeedService implements OnModuleInit {
             const profile = await this.characters.getProfile(char.id);
             if (!profile) continue;
             const observation = await this.buildFeedAiObservation(post);
+            const userMessage = await this.worldLanguage.formatPostCommentTask({
+              authorName: post.authorName,
+              summary: observation.summary,
+              surface: post.surface === 'channels' ? 'channels' : 'feed',
+            });
             const reply = await this.ai.generateReply({
               profile,
               conversationHistory: [],
-              userMessage: `${post.authorName}在${surfaceLabel}发了一条动态：${observation.summary}。用一句话自然地评论一下，不超过20字。`,
+              userMessage,
               userMessageParts: observation.parts,
               usageContext: {
                 surface: 'app',
