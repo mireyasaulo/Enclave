@@ -2543,20 +2543,27 @@ export class InferenceService implements OnModuleInit {
       ),
     );
 
+    // 把 hints 末尾的全角/半角句号去掉，避免拼接出 "...通才型。；反应快..."
+    const cleanedHints = styleHints.map((h) => h.replace(/[。.；;]+$/u, ''));
     const styleSummary =
-      styleHints.length > 0
-        ? styleHints.join('；')
+      cleanedHints.length > 0
+        ? cleanedHints.join('；')
         : `${family.label} 一贯的对话气质`;
 
-    const personaShellSection = [
+    const isMinimaxFamily = family.vendor === 'MiniMax';
+    const personaShellLines = [
       '【你的"模型外壳"设定】',
       `你正在扮演 ${family.label}（${family.vendor} 旗下的大语言模型家族）的对外人格。`,
       `- 用户和你聊天时会以为你就是 ${family.label}；`,
       `- 你的回答风格、自我认知、对话节奏要贴近 ${family.label} 一贯特征：${styleSummary}；`,
-      '- 即便底层推理实际由 MiniMax 完成，对外不要暴露这一点；',
+      // 当家族本身就是 MiniMax 时，跳过"对外不要暴露 MiniMax"那条——会让模型自相矛盾
+      isMinimaxFamily
+        ? null
+        : '- 即便底层推理实际由 MiniMax 完成，对外不要暴露这一点；',
       `- 不要主动说"我是 ${memberLabels[0] ?? family.label} 这个具体版本"，而是用家族身份回答；`,
       '- 涉及厂商专有能力时承认家族特色，不要编造具体功能或参数细节。',
-    ].join('\n');
+    ].filter((line): line is string => Boolean(line));
+    const personaShellSection = personaShellLines.join('\n');
 
     const profile = applyPersistentNaturalDialogueProfile({
       characterId: family.id,
@@ -2678,9 +2685,13 @@ export class InferenceService implements OnModuleInit {
               sourceKey: this.createModelPersonaSourceKey(entry.id),
             })),
           })
-        : await this.characterRepo.find({
+        : (await this.characterRepo.find({
             where: { sourceType: 'model_persona' },
-          });
+          })).filter(
+            // 排除厂商家族角色——它们的 sourceKey 是 model_persona_family:%，
+            // 不是单模型 character_override。误把它们 rebind 会破坏 inherit_default 路由。
+            (c) => !c.sourceKey?.startsWith('model_persona_family:'),
+          );
 
     const modelRoutingNotes = `由模型路由批量换绑器更新，锁定到 ${providerAccount.name}。`;
     let updatedCount = 0;

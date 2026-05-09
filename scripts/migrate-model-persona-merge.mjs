@@ -75,10 +75,12 @@ const UNIQUE_FK_COLUMNS = new Set([
   'wiki_watchlist.characterId',
 ]);
 
-// 二元关系表（A,B 复合 UNIQUE，需要自环清理 + dedupe）
+// 二元关系表（A,B 复合 UNIQUE，需要自环清理 + dedupe + 顺序规范化）
+// orderedPair=true 表示业务侧强制 A<B（character_friendships.orderPair / ai_relationships seed.sort）。
+// 迁移后必须 normalize：A>B 的行 swap；如果 swap 后 (B,A) 已存在则 dedup。
 const PAIR_RELATIONSHIP_TABLES = [
-  ['ai_relationships', 'characterIdA', 'characterIdB'],
-  ['character_friendships', 'characterAId', 'characterBId'],
+  { table: 'ai_relationships', colA: 'characterIdA', colB: 'characterIdB', orderedPair: true },
+  { table: 'character_friendships', colA: 'characterAId', colB: 'characterBId', orderedPair: true },
 ];
 
 // 单值字段：UPDATE table SET col = new WHERE col = old
@@ -399,10 +401,12 @@ function migrateOne(dbPath) {
         if (touched > 0) summary.objectListUpdates[`${tbl}.${col}`] = touched;
       }
 
-      // 6. 二元关系表：把 A/B 都改写到家族 id；删自环；dedupe
+      // 6. 二元关系表：把 A/B 都改写到家族 id；删自环；dedupe；规范顺序
       summary.selfLoopsRemoved = {};
       summary.pairDeduped = {};
-      for (const [tbl, colA, colB] of PAIR_RELATIONSHIP_TABLES) {
+      summary.pairReordered = {};
+      for (const pair of PAIR_RELATIONSHIP_TABLES) {
+        const { table: tbl, colA, colB, orderedPair } = pair;
         if (
           !tableExists(db, tbl) ||
           !columnExists(db, tbl, colA) ||
@@ -448,6 +452,120 @@ function migrateOne(dbPath) {
             )
             .run();
           summary.pairDeduped[tbl] = dropped.changes;
+        }
+        // 6d. 顺序规范化（业务侧 orderPair 要求 A<B）
+        if (orderedPair) {
+          const offenders = db
+            .prepare(
+              `SELECT id, ${colA} AS a, ${colB} AS b FROM ${tbl} WHERE ${colA} > ${colB}`,
+            )
+            .all();
+          let reordered = 0;
+          let droppedAfterReorder = 0;
+          for (const row of offenders) {
+            if (DRY_RUN) {
+              reordered += 1;
+              continue;
+            }
+            // swap 后 (b,a) 是否已存在？已存在则丢弃这条；否则 swap
+            const conflict = db
+              .prepare(
+                `SELECT id FROM ${tbl} WHERE ${colA} = ? AND ${colB} = ?`,
+              )
+              .get(row.b, row.a);
+            if (conflict) {
+              db.prepare(`DELETE FROM ${tbl} WHERE id = ?`).run(row.id);
+              droppedAfterReorder += 1;
+            } else {
+              db.prepare(
+                `UPDATE ${tbl} SET ${colA} = ?, ${colB} = ? WHERE id = ?`,
+              ).run(row.b, row.a, row.id);
+              reordered += 1;
+            }
+          }
+          summary.pairReordered[tbl] = {
+            reordered,
+            droppedAfterReorder,
+          };
+        }
+      }
+
+      // 6.5 把旧 persona 的 aiRelationships cache 字段合并到目标家族角色
+      // （characters.aiRelationships 是 character_friendships 的快照，被 blueprint
+      //  /wiki / friend-seed 用；旧 persona DELETE 后这些条目本会丢失。）
+      summary.aiRelationshipsMerged = 0;
+      if (
+        tableExists(db, 'characters') &&
+        columnExists(db, 'characters', 'aiRelationships')
+      ) {
+        const oldRows = db
+          .prepare(
+            `SELECT id, aiRelationships FROM characters WHERE id IN (${placeholders}) AND aiRelationships IS NOT NULL`,
+          )
+          .all(...oldIds);
+        // 按目标 family 聚合
+        const familyAccum = new Map(); // familyId → Map<peerId, item>
+        for (const row of oldRows) {
+          const familyId = mapping[row.id];
+          if (!familyId) continue;
+          let arr;
+          try {
+            arr = JSON.parse(row.aiRelationships);
+          } catch {
+            continue;
+          }
+          if (!Array.isArray(arr)) continue;
+          if (!familyAccum.has(familyId)) familyAccum.set(familyId, new Map());
+          const acc = familyAccum.get(familyId);
+          for (const item of arr) {
+            if (!item || typeof item !== 'object') continue;
+            const rawPeer = item.characterId;
+            if (typeof rawPeer !== 'string') continue;
+            // 旧 persona → 家族；其它 id 不变
+            const peer = mapping[rawPeer] ?? rawPeer;
+            // 跳过自环（合并后指向自己）
+            if (peer === familyId) continue;
+            // 同一 peer 只记一条（第一条的 strength/relationshipType 胜出）
+            if (!acc.has(peer)) {
+              acc.set(peer, { ...item, characterId: peer });
+            }
+          }
+        }
+        // 合并进家族角色当前的 aiRelationships
+        for (const [familyId, peerMap] of familyAccum.entries()) {
+          if (peerMap.size === 0) continue;
+          const current = db
+            .prepare(
+              'SELECT aiRelationships FROM characters WHERE id = ?',
+            )
+            .get(familyId);
+          let existing = [];
+          if (current?.aiRelationships) {
+            try {
+              const parsed = JSON.parse(current.aiRelationships);
+              if (Array.isArray(parsed)) existing = parsed;
+            } catch {}
+          }
+          const merged = new Map();
+          for (const item of existing) {
+            if (
+              item &&
+              typeof item === 'object' &&
+              typeof item.characterId === 'string' &&
+              item.characterId !== familyId
+            ) {
+              merged.set(item.characterId, item);
+            }
+          }
+          for (const [peer, item] of peerMap.entries()) {
+            if (!merged.has(peer)) merged.set(peer, item);
+          }
+          summary.aiRelationshipsMerged += peerMap.size;
+          if (!DRY_RUN) {
+            db.prepare(
+              'UPDATE characters SET aiRelationships = ? WHERE id = ?',
+            ).run(JSON.stringify(Array.from(merged.values())), familyId);
+          }
         }
       }
 
@@ -520,6 +638,19 @@ function printReport(s) {
     for (const [k, v] of Object.entries(s.pairDeduped)) {
       console.log(`    ${k}: ${v}`);
     }
+  }
+  if (s.pairReordered && Object.keys(s.pairReordered).length > 0) {
+    console.log(`  二元关系表 A<B 规范化：`);
+    for (const [k, v] of Object.entries(s.pairReordered)) {
+      console.log(
+        `    ${k}: 交换=${v.reordered}, 撞冲突丢弃=${v.droppedAfterReorder}`,
+      );
+    }
+  }
+  if (s.aiRelationshipsMerged !== undefined) {
+    console.log(
+      `  characters.aiRelationships 合并到家族角色的关系条目：${s.aiRelationshipsMerged}`,
+    );
   }
   console.log(`  删除的旧 persona 行：${s.deletedPersonaRows}`);
 }
