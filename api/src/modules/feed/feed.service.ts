@@ -1010,6 +1010,19 @@ export class FeedService implements OnModuleInit {
     title?: string | null;
     topicTags?: string[];
   }): Promise<FeedPostEntity> {
+    const media: MomentMediaAsset[] = [
+      {
+        id: `feed-audio-${Date.now()}`,
+        kind: 'audio',
+        url: input.audioUrl,
+        posterUrl: input.posterUrl ?? undefined,
+        mimeType: 'audio/mpeg',
+        fileName: 'feed-audio.mp3',
+        size: 0,
+        durationMs: input.durationMs ?? undefined,
+        title: input.title ?? `${input.authorName}·音乐`,
+      },
+    ];
     return this.createPost({
       authorAvatar: input.authorAvatar ?? '',
       authorId: input.authorId,
@@ -1017,6 +1030,7 @@ export class FeedService implements OnModuleInit {
       authorType: 'character',
       text: input.text,
       title: input.title ?? `${input.authorName}·音乐`,
+      media,
       mediaType: 'audio',
       mediaUrl: input.audioUrl,
       coverUrl: input.posterUrl ?? null,
@@ -1779,12 +1793,29 @@ export class FeedService implements OnModuleInit {
     }
 
     const legacyMediaType =
-      input.mediaType === 'video' || input.mediaType === 'image'
+      input.mediaType === 'video' ||
+      input.mediaType === 'image' ||
+      input.mediaType === 'audio'
         ? input.mediaType
         : 'image';
     const approximateDimensions = buildApproximateFeedMediaDimensions(
       input.aspectRatio,
     );
+
+    if (legacyMediaType === 'audio') {
+      return [
+        {
+          id: 'feed-audio-legacy',
+          kind: 'audio',
+          url: mediaUrl,
+          posterUrl: input.coverUrl?.trim() || undefined,
+          mimeType: 'audio/mpeg',
+          fileName: 'feed-audio',
+          size: 0,
+          durationMs: normalizeOptionalPositiveInteger(input.durationMs),
+        },
+      ];
+    }
 
     if (legacyMediaType === 'video') {
       return [
@@ -1822,6 +1853,9 @@ export class FeedService implements OnModuleInit {
     media: MomentMediaAsset[],
     fallback?: FeedMediaType,
   ): FeedMediaType {
+    if (media[0]?.kind === 'audio') {
+      return 'audio';
+    }
     if (media[0]?.kind === 'video') {
       return 'video';
     }
@@ -1830,7 +1864,14 @@ export class FeedService implements OnModuleInit {
       return 'image';
     }
 
-    return fallback === 'image' || fallback === 'video' ? fallback : 'text';
+    if (
+      fallback === 'image' ||
+      fallback === 'video' ||
+      fallback === 'audio'
+    ) {
+      return fallback;
+    }
+    return 'text';
   }
 
   private assertFeedMediaMatchesMediaType(
@@ -1857,6 +1898,15 @@ export class FeedService implements OnModuleInit {
       if (video.durationMs && video.durationMs > MAX_FEED_VIDEO_DURATION_MS) {
         throw new AppError('FEED_VIDEO_TOO_LONG', {
           legacyMessage: '视频时长不能超过 5 分钟。',
+        });
+      }
+      return;
+    }
+
+    if (mediaType === 'audio') {
+      if (media.length !== 1 || media[0]?.kind !== 'audio') {
+        throw new AppError('FEED_AUDIO_SINGLE', {
+          legacyMessage: '音频动态必须且只能包含 1 条音频。',
         });
       }
       return;

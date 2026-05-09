@@ -11,6 +11,9 @@ const t = translateRuntimeMessage;
 export function resolveFeedMomentContentType(
   media: FeedMediaAsset[],
 ): MomentContentType {
+  if (media[0]?.kind === "audio") {
+    return "audio_card";
+  }
   if (media[0]?.kind === "video") {
     return "video";
   }
@@ -28,6 +31,10 @@ export function getFeedSummaryText(
   const text = post.text.trim();
   if (text) {
     return text;
+  }
+
+  if (post.media[0]?.kind === "audio" || post.mediaType === "audio") {
+    return t(msg`分享了一段音乐`);
   }
 
   if (post.media[0]?.kind === "video" || post.mediaType === "video") {

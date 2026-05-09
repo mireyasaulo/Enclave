@@ -1,6 +1,7 @@
 import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
 import {
+  type MomentAudioAsset,
   type MomentContentType,
   type MomentImageAsset,
   type MomentMediaAsset,
@@ -10,6 +11,7 @@ import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
 import { formatMomentDurationLabel } from "../features/moments/moment-compose-media";
+import { AudioCard } from "./audio-card";
 
 const t = translateRuntimeMessage;
 
@@ -96,6 +98,21 @@ export function MomentMediaGallery({
         event.stopPropagation();
       }
     : undefined;
+
+  if (contentType === "audio_card" && media[0]?.kind === "audio") {
+    const audio = media[0] as MomentAudioAsset;
+    return (
+      <div onClick={handleRootClick}>
+        <AudioCard
+          url={audio.url}
+          posterUrl={audio.posterUrl}
+          title={audio.title || audio.fileName}
+          durationMs={audio.durationMs}
+          variant={variant === "mobile" ? "moment" : "feed"}
+        />
+      </div>
+    );
+  }
 
   if (contentType === "video" && media[0]?.kind === "video") {
     const video = media[0] as MomentVideoAsset;
