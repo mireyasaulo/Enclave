@@ -95,6 +95,11 @@ const configuredSocketOrigins = process.env.CORS_ALLOWED_ORIGINS?.split(',')
   .map((value) => value.trim())
   .filter(Boolean);
 
+// 进程启动时刻作为 buildId：每次 API 重启都换一个，
+// 客户端 socket 连上后比较上次记的 buildId，不同就让浏览器自动 reload + 清 SW。
+// 这是给用户完全透明的「自动升级」机制——无需手动 unregister。
+const SYSTEM_BUILD_ID = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
 @WebSocketGateway({
   cors: {
     origin:
@@ -119,6 +124,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
+    // socket 连接握手后立即下发 buildId，客户端比对自己的旧版本决定是否 reload。
+    client.emit('system.hello', { buildId: SYSTEM_BUILD_ID });
   }
 
   handleDisconnect(client: Socket) {

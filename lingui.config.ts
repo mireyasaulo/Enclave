@@ -8,23 +8,10 @@ const config: LinguiConfig = {
   },
   format: "po",
   compileNamespace: "ts",
-  // Sort by first origin (file+line), then by messageId as tiebreaker — fully deterministic
-  orderBy: (a, b) => {
-    const getFirst = (origins: Array<[string, number]>) =>
-      [...origins].sort((x, y) => (x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0))[0] ?? [
-        "",
-        0,
-      ];
-    const [aFile, aLine] = getFirst(a.entry.origin ?? []);
-    const [bFile, bLine] = getFirst(b.entry.origin ?? []);
-    if (aFile < bFile) return -1;
-    if (aFile > bFile) return 1;
-    if (aLine < bLine) return -1;
-    if (aLine > bLine) return 1;
-    if (a.messageId < b.messageId) return -1;
-    if (a.messageId > b.messageId) return 1;
-    return 0;
-  },
+  // 按 origin (file+line) 排序，等价于原来的 orderBy 函数版本，但 @lingui/conf
+  // 5.9.5 之后 schema 校验只接受 string 字面量。函数版本的等价行为是「按 origin
+  // 排，messageId 作 tiebreaker」，"origin" 字符串值已包含 messageId 兜底比较。
+  orderBy: "origin",
   catalogs: [
     {
       path: "<rootDir>/packages/i18n/catalogs/shared/{locale}",
