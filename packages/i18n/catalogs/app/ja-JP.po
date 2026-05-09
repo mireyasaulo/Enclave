@@ -2110,20 +2110,6 @@ msgid "人"
 msgstr "人"
 
 #: apps/app/src/components/chat-message-list.tsx:5841
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:111
-#: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
-#: apps/app/src/features/chat/conversation-thread-panel.tsx:495
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1087
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:371
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:766
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1134
-#: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:85
-#: apps/app/src/routes/character-detail-page.tsx:930
-#: apps/app/src/routes/desktop-mobile-page.tsx:359
-msgid "视频通话"
-msgstr "ビデオ通話"
-
-#: apps/app/src/components/chat-message-list.tsx:5841
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:155
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:51
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:489
@@ -2137,6 +2123,20 @@ msgstr "ビデオ通話"
 #: apps/app/src/routes/desktop-mobile-page.tsx:360
 msgid "语音通话"
 msgstr "音声通話"
+
+#: apps/app/src/components/chat-message-list.tsx:5841
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:111
+#: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:495
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1087
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:371
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:766
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1134
+#: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:85
+#: apps/app/src/routes/character-detail-page.tsx:930
+#: apps/app/src/routes/desktop-mobile-page.tsx:359
+msgid "视频通话"
+msgstr "ビデオ通話"
 
 #: apps/app/src/components/chat-message-list.tsx:5876
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:472
@@ -12395,16 +12395,16 @@ msgid "买了种子"
 msgstr "種を購入しました"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
-msgid "卖了"
-msgstr "売りました"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:240
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:242
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
 msgid "作物"
 msgstr "作物"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
+msgid "卖了"
+msgstr "売りました"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."

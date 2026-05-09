@@ -7337,16 +7337,16 @@ msgid "下游链路已标注"
 msgstr "다운스트림 체인이 표시되었습니다"
 
 #: apps/admin/src/routes/cyber-avatar-page.tsx:1209
+msgid "已生成"
+msgstr "생성됨"
+
+#: apps/admin/src/routes/cyber-avatar-page.tsx:1209
 #: apps/admin/src/routes/evals-page.tsx:2067
 #: apps/admin/src/routes/evals-page.tsx:2287
 #: apps/admin/src/routes/evals-page.tsx:2336
 #: apps/admin/src/routes/evals-page.tsx:2628
 msgid "空"
 msgstr "비어 있음"
-
-#: apps/admin/src/routes/cyber-avatar-page.tsx:1209
-msgid "已生成"
-msgstr "생성됨"
 
 #: apps/admin/src/routes/cyber-avatar-page.tsx:1214
 msgid "长度"
