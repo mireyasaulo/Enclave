@@ -40,7 +40,7 @@ msgstr " · character {0}"
 msgid " 尚未发生"
 msgstr " has not happened yet"
 
-#: apps/admin/src/routes/chat-records-page.tsx:890
+#: apps/admin/src/routes/chat-records-page.tsx:887
 msgid "，已进入命中上下文模式"
 msgstr ""
 
@@ -48,7 +48,7 @@ msgstr ""
 msgid "，预算预警"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:890
+#: apps/admin/src/routes/chat-records-page.tsx:887
 msgid "，默认按最新向前浏览"
 msgstr ""
 
@@ -251,6 +251,10 @@ msgstr ""
 msgid "24h 提醒"
 msgstr "24h reminders"
 
+#: apps/admin/src/routes/chat-records-page.tsx:1559
+msgid "30 天"
+msgstr ""
+
 #: apps/admin/src/components/game-release-workbench.tsx:738
 #: apps/admin/src/components/game-submission-workbench.tsx:939
 #: apps/admin/src/routes/games-page.tsx:1238
@@ -414,7 +418,7 @@ msgstr "Standing Orders"
 
 #: apps/admin/src/components/root-layout.tsx:180
 #: apps/admin/src/lib/route-breadcrumb.ts:147
-#: apps/admin/src/routes/chat-records-page.tsx:1666
+#: apps/admin/src/routes/chat-records-page.tsx:1663
 msgid "Token 用量"
 msgstr "Token Usage"
 
@@ -481,7 +485,7 @@ msgstr "一键同步微信朋友"
 msgid "一键生成"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:716
+#: apps/admin/src/routes/chat-records-page.tsx:713
 msgid "上一页"
 msgstr ""
 
@@ -535,7 +539,7 @@ msgstr "Next, add callbackToken so provider-state callbacks can be authenticated
 msgid "下一步补外部 provider 模板和回调，把内置播放器替换成真实数字人服务。"
 msgstr "Next, add the external provider template and callback, replacing the built-in player with a real digital-human service."
 
-#: apps/admin/src/routes/chat-records-page.tsx:731
+#: apps/admin/src/routes/chat-records-page.tsx:728
 msgid "下一页"
 msgstr ""
 
@@ -668,7 +672,7 @@ msgstr ""
 msgid "个角色"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1269
+#: apps/admin/src/routes/chat-records-page.tsx:1266
 msgid "中位首响"
 msgstr ""
 
@@ -712,8 +716,8 @@ msgid "主动提醒调度"
 msgstr "Proactive Reminder Schedule"
 
 #: apps/admin/src/routes/chat-records-page.tsx:67
-#: apps/admin/src/routes/chat-records-page.tsx:1241
-#: apps/admin/src/routes/chat-records-page.tsx:1309
+#: apps/admin/src/routes/chat-records-page.tsx:1238
+#: apps/admin/src/routes/chat-records-page.tsx:1306
 msgid "主动消息"
 msgstr ""
 
@@ -768,11 +772,11 @@ msgstr "Featured game IDs"
 msgid "主视觉标签"
 msgstr "Hero label"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1457
+#: apps/admin/src/routes/chat-records-page.tsx:1454
 msgid "主要场景"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1437
+#: apps/admin/src/routes/chat-records-page.tsx:1434
 msgid "主要模型"
 msgstr ""
 
@@ -788,11 +792,11 @@ msgstr "Event Contract"
 msgid "互动响应"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1276
+#: apps/admin/src/routes/chat-records-page.tsx:1273
 msgid "产品洞察"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1376
+#: apps/admin/src/routes/chat-records-page.tsx:1373
 msgid "亲密度"
 msgstr ""
 
@@ -856,7 +860,7 @@ msgid "仅查看 {characterIdFilter}"
 msgstr "Filtered to {characterIdFilter}"
 
 #: apps/admin/src/routes/chat-records-page.tsx:615
-#: apps/admin/src/routes/chat-records-page.tsx:2187
+#: apps/admin/src/routes/chat-records-page.tsx:2184
 msgid "仅看已标记样本"
 msgstr ""
 
@@ -930,7 +934,8 @@ msgstr "Mission"
 #: apps/admin/src/routes/character-editor-page.tsx:991
 #: apps/admin/src/routes/character-factory-page.tsx:50
 #: apps/admin/src/routes/character-runtime-page.tsx:30
-#: apps/admin/src/routes/chat-records-page.tsx:2086
+#: apps/admin/src/routes/chat-records-page.tsx:2083
+#: apps/admin/src/routes/reply-logic-page.tsx:87
 msgid "休息中"
 msgstr "Resting"
 
@@ -1027,15 +1032,15 @@ msgstr ""
 msgid "会话有效期（分钟）"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1247
+#: apps/admin/src/routes/chat-records-page.tsx:1244
 msgid "会话档案"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1233
+#: apps/admin/src/routes/chat-records-page.tsx:1230
 msgid "会话概览"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1391
+#: apps/admin/src/routes/chat-records-page.tsx:1388
 msgid "会话级 Token 成本"
 msgstr ""
 
@@ -1051,8 +1056,8 @@ msgstr ""
 msgid "估算费用"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1959
-#: apps/admin/src/routes/chat-records-page.tsx:1990
+#: apps/admin/src/routes/chat-records-page.tsx:1956
+#: apps/admin/src/routes/chat-records-page.tsx:1987
 msgid "位置"
 msgstr ""
 
@@ -1170,7 +1175,7 @@ msgstr "Save World Language"
 #: apps/admin/src/components/game-submission-workbench.tsx:606
 #: apps/admin/src/routes/character-editor-page.tsx:433
 #: apps/admin/src/routes/character-editor-page.tsx:1172
-#: apps/admin/src/routes/chat-records-page.tsx:1212
+#: apps/admin/src/routes/chat-records-page.tsx:1209
 #: apps/admin/src/routes/dashboard-page.tsx:957
 #: apps/admin/src/routes/games-page.tsx:822
 #: apps/admin/src/routes/self-agent-page.tsx:389
@@ -1197,7 +1202,7 @@ msgstr ""
 msgid "保存后再去发布版本或首页策展，避免运营看到的状态和实际草稿不一致。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1212
+#: apps/admin/src/routes/chat-records-page.tsx:1209
 msgid "保存复盘标记"
 msgstr ""
 
@@ -1400,7 +1405,7 @@ msgstr ""
 msgid "先从左侧选一个候选"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:750
+#: apps/admin/src/routes/chat-records-page.tsx:747
 msgid "先从左侧选择一个会话"
 msgstr ""
 
@@ -1460,7 +1465,7 @@ msgstr "先建角色或导入微信朋友，让角色池形成基础规模。"
 msgid "先恢复世界实例连接，再继续后台操作。"
 msgstr "Restore the world instance connection before continuing admin operations."
 
-#: apps/admin/src/routes/chat-records-page.tsx:1201
+#: apps/admin/src/routes/chat-records-page.tsx:1198
 msgid "先打一个状态或写几句备注，后面筛\"仅看已标记样本\"时就能直接回到它。"
 msgstr ""
 
@@ -1476,7 +1481,7 @@ msgstr "First cover the AI Game Center catalog, source structure, runtime mode, 
 msgid "先把第三方、角色或平台内稿件登记进投稿池。"
 msgstr "Register third-party, character, or in-platform submissions into the pool first."
 
-#: apps/admin/src/routes/chat-records-page.tsx:760
+#: apps/admin/src/routes/chat-records-page.tsx:757
 msgid "先用关键词、类型、时间窗锁定片段，再切回完整时间线继续浏览。"
 msgstr ""
 
@@ -1524,11 +1529,11 @@ msgstr "Select an existing submission or create a new draft first."
 msgid "先选中目录项"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1503
+#: apps/admin/src/routes/chat-records-page.tsx:1500
 msgid "先选择一个会话"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2275
+#: apps/admin/src/routes/chat-records-page.tsx:2272
 msgid "先选择一个会话进入工作区"
 msgstr ""
 
@@ -1624,6 +1629,12 @@ msgstr "Public content samples are ready for spot checks"
 msgid "共"
 msgstr ""
 
+#. placeholder {0}: conversationsQuery.data.total
+#. placeholder {1}: Math.max(conversationsQuery.data.totalPages, 1)
+#: apps/admin/src/routes/chat-records-page.tsx:661
+msgid "共 {0} 个会话，第 {page} / {1} 页"
+msgstr ""
+
 #. placeholder {0}: filteredCharacters.length
 #: apps/admin/src/routes/characters-page.tsx:598
 msgid "共 {0} 个结果"
@@ -1652,7 +1663,7 @@ msgid "关注项"
 msgstr "Watch Items"
 
 #: apps/admin/src/components/game-submission-workbench.tsx:762
-#: apps/admin/src/routes/chat-records-page.tsx:1251
+#: apps/admin/src/routes/chat-records-page.tsx:1248
 #: apps/admin/src/routes/need-discovery-page.tsx:2072
 msgid "关系"
 msgstr "Relationship"
@@ -1693,7 +1704,7 @@ msgstr "Linked game"
 msgid "关键字段已齐备"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2212
+#: apps/admin/src/routes/chat-records-page.tsx:2209
 msgid "关键词"
 msgstr ""
 
@@ -1785,15 +1796,15 @@ msgstr "Internal seed"
 msgid "最低置信度"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1186
+#: apps/admin/src/routes/chat-records-page.tsx:1183
 msgid "最后更新"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1255
+#: apps/admin/src/routes/chat-records-page.tsx:1252
 msgid "最后活跃"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1259
+#: apps/admin/src/routes/chat-records-page.tsx:1256
 msgid "最后清空"
 msgstr ""
 
@@ -1817,7 +1828,7 @@ msgstr "Latest revision"
 msgid "最新动态已纳入抽查范围"
 msgstr "Latest moments are included in spot checks"
 
-#: apps/admin/src/routes/chat-records-page.tsx:913
+#: apps/admin/src/routes/chat-records-page.tsx:910
 msgid "最新时间线"
 msgstr ""
 
@@ -1840,11 +1851,11 @@ msgstr "Latest 3"
 msgid "最近一次"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1331
+#: apps/admin/src/routes/chat-records-page.tsx:1328
 msgid "最近一次用户消息"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1335
+#: apps/admin/src/routes/chat-records-page.tsx:1332
 msgid "最近一次角色回复"
 msgstr ""
 
@@ -1871,7 +1882,7 @@ msgstr ""
 msgid "最近共有 {failedEvalCount} 条失败评测，建议先确认是 provider 波动还是提示链路问题。"
 msgstr "{failedEvalCount} evals failed recently. Check whether this is provider instability or a prompt-chain issue first."
 
-#: apps/admin/src/routes/chat-records-page.tsx:1328
+#: apps/admin/src/routes/chat-records-page.tsx:1325
 msgid "最近发言"
 msgstr ""
 
@@ -1908,7 +1919,7 @@ msgstr ""
 
 #: apps/admin/src/routes/characters-page.tsx:756
 #: apps/admin/src/routes/chat-records-page.tsx:56
-#: apps/admin/src/routes/chat-records-page.tsx:1673
+#: apps/admin/src/routes/chat-records-page.tsx:1670
 msgid "最近活跃"
 msgstr "最近活跃"
 
@@ -1924,7 +1935,7 @@ msgstr ""
 msgid "最近聊天时间"
 msgstr "Last chat time"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1478
+#: apps/admin/src/routes/chat-records-page.tsx:1475
 msgid "最近请求"
 msgstr ""
 
@@ -2018,7 +2029,7 @@ msgstr ""
 msgid "分类"
 msgstr "Category"
 
-#: apps/admin/src/routes/chat-records-page.tsx:2079
+#: apps/admin/src/routes/chat-records-page.tsx:2076
 #: apps/admin/src/routes/need-discovery-page.tsx:2259
 #: apps/admin/src/routes/need-discovery-page.tsx:2262
 #: apps/admin/src/routes/need-discovery-page.tsx:2521
@@ -2120,7 +2131,7 @@ msgstr "Loading"
 msgid "加载差异失败"
 msgstr "Failed to load diff"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1002
+#: apps/admin/src/routes/chat-records-page.tsx:999
 msgid "加载更早消息"
 msgstr ""
 
@@ -2133,7 +2144,7 @@ msgid "动作类型"
 msgstr "Action kind"
 
 #: apps/admin/src/routes/chat-records-page.tsx:623
-#: apps/admin/src/routes/chat-records-page.tsx:2190
+#: apps/admin/src/routes/chat-records-page.tsx:2187
 msgid "包含清空前历史"
 msgstr ""
 
@@ -2375,11 +2386,11 @@ msgstr "Reactivation"
 msgid "可以保存后进入发布或策展流。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1026
+#: apps/admin/src/routes/chat-records-page.tsx:1023
 msgid "可以切回全部类型，或者通过搜索先定位到具体片段。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:703
+#: apps/admin/src/routes/chat-records-page.tsx:700
 msgid "可以切回全部角色，或放宽活跃时间与隐藏会话筛选。"
 msgstr ""
 
@@ -2395,7 +2406,7 @@ msgstr ""
 msgid "可以切换状态或范围，也可以先手动执行一次短周期 / 每日调度。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2316
+#: apps/admin/src/routes/chat-records-page.tsx:2313
 msgid "可以直接点命中片段进入上下文，再结合右侧洞察判断这段样本应归入哪个复盘状态。"
 msgstr ""
 
@@ -2407,7 +2418,7 @@ msgstr "可以继续做新建草稿、版本发布，或切到策展区安排前
 msgid "可以继续切到版本发布、首页策展或投稿入库，处理后续运营动作。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2331
+#: apps/admin/src/routes/chat-records-page.tsx:2328
 msgid "可以继续查看上下文、补充复盘备注，或者跳转到回复逻辑台和 Token 用量页做进一步分析。"
 msgstr ""
 
@@ -2447,7 +2458,7 @@ msgstr "Operations Can Continue"
 msgid "可联调"
 msgstr "Ready to test"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1560
+#: apps/admin/src/routes/chat-records-page.tsx:1557
 msgid "可见"
 msgstr ""
 
@@ -2457,7 +2468,7 @@ msgstr ""
 msgid "可见性"
 msgstr "Visibility"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1236
+#: apps/admin/src/routes/chat-records-page.tsx:1233
 msgid "可见消息"
 msgstr ""
 
@@ -2473,18 +2484,19 @@ msgstr ""
 msgid "可验证"
 msgstr "Ready to Verify"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1065
+#: apps/admin/src/routes/chat-records-page.tsx:1062
 msgid "右侧复盘草稿尚未保存，保存后这段会话才会进入仅看已标记样本的稳定筛选路径。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2284
+#: apps/admin/src/routes/chat-records-page.tsx:2281
 msgid "右侧的状态、标签或备注已经变更，保存后这段会话才能稳定进入样本池筛选。"
 msgstr ""
 
 #: apps/admin/src/routes/character-editor-page.tsx:990
 #: apps/admin/src/routes/character-factory-page.tsx:49
 #: apps/admin/src/routes/character-runtime-page.tsx:29
-#: apps/admin/src/routes/chat-records-page.tsx:2085
+#: apps/admin/src/routes/chat-records-page.tsx:2082
+#: apps/admin/src/routes/reply-logic-page.tsx:86
 msgid "吃饭中"
 msgstr "Eating"
 
@@ -2500,8 +2512,8 @@ msgstr "同步微信朋友"
 msgid "名人预设"
 msgstr "名人预设"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1956
-#: apps/admin/src/routes/chat-records-page.tsx:1987
+#: apps/admin/src/routes/chat-records-page.tsx:1953
+#: apps/admin/src/routes/chat-records-page.tsx:1984
 msgid "名片"
 msgstr ""
 
@@ -2534,8 +2546,8 @@ msgstr "No"
 msgid "含全部单聊历史消息"
 msgstr "Includes all one-on-one chat history"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1570
-#: apps/admin/src/routes/chat-records-page.tsx:1640
+#: apps/admin/src/routes/chat-records-page.tsx:1567
+#: apps/admin/src/routes/chat-records-page.tsx:1637
 msgid "含清空前历史"
 msgstr ""
 
@@ -2590,7 +2602,7 @@ msgstr ""
 msgid "启用链路推理（CoT）"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1790
+#: apps/admin/src/routes/chat-records-page.tsx:1787
 msgid "命中"
 msgstr ""
 
@@ -2636,7 +2648,7 @@ msgstr ""
 
 #: apps/admin/src/components/root-layout.tsx:236
 #: apps/admin/src/lib/route-breadcrumb.ts:157
-#: apps/admin/src/routes/chat-records-page.tsx:1660
+#: apps/admin/src/routes/chat-records-page.tsx:1657
 msgid "回复逻辑"
 msgstr "Reply Logic"
 
@@ -2707,8 +2719,8 @@ msgstr "Complete character filtering, summary review, and quick navigation in on
 #: apps/admin/src/routes/characters-page.tsx:549
 #: apps/admin/src/routes/characters-page.tsx:635
 #: apps/admin/src/routes/characters-page.tsx:722
-#: apps/admin/src/routes/chat-records-page.tsx:1354
-#: apps/admin/src/routes/chat-records-page.tsx:1612
+#: apps/admin/src/routes/chat-records-page.tsx:1351
+#: apps/admin/src/routes/chat-records-page.tsx:1609
 #: apps/admin/src/routes/dashboard-page.tsx:1317
 msgid "在线"
 msgstr "Online"
@@ -2818,15 +2830,15 @@ msgstr ""
 msgid "复盘后可接受"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1156
+#: apps/admin/src/routes/chat-records-page.tsx:1153
 msgid "复盘备注"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1074
+#: apps/admin/src/routes/chat-records-page.tsx:1071
 msgid "复盘操作"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2283
+#: apps/admin/src/routes/chat-records-page.tsx:2280
 msgid "复盘草稿未保存"
 msgstr ""
 
@@ -2948,7 +2960,7 @@ msgstr "好友角色"
 msgid "好友请求 / 摇一摇问候"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1119
+#: apps/admin/src/routes/chat-records-page.tsx:1116
 msgid "如：高需求、高成本、易复用"
 msgstr ""
 
@@ -2956,7 +2968,7 @@ msgstr ""
 msgid "如果只是想补一条回滚记录，也可以直接执行恢复。"
 msgstr "If you just want to record a rollback, you can still proceed."
 
-#: apps/admin/src/routes/chat-records-page.tsx:1009
+#: apps/admin/src/routes/chat-records-page.tsx:1006
 msgid "如果已经完成判断，可以点击上方\"返回最新消息\"回到完整时间线继续浏览。"
 msgstr ""
 
@@ -2979,11 +2991,11 @@ msgstr "Official"
 msgid "定义首页和找游戏页里的主题货架，每个货架都可以承载一组游戏。"
 msgstr "Define themed shelves for the home and discovery pages; each shelf can carry a group of games."
 
-#: apps/admin/src/routes/chat-records-page.tsx:962
+#: apps/admin/src/routes/chat-records-page.tsx:959
 msgid "定位"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:911
+#: apps/admin/src/routes/chat-records-page.tsx:908
 msgid "定位上下文"
 msgstr ""
 
@@ -3126,11 +3138,11 @@ msgstr "Import as catalog draft"
 msgid "导入到本地"
 msgstr "Import to local"
 
-#: apps/admin/src/routes/chat-records-page.tsx:802
+#: apps/admin/src/routes/chat-records-page.tsx:799
 msgid "导出 JSON"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:794
+#: apps/admin/src/routes/chat-records-page.tsx:791
 msgid "导出 Markdown"
 msgstr ""
 
@@ -3204,7 +3216,8 @@ msgstr "Embedded web"
 #: apps/admin/src/routes/character-editor-page.tsx:989
 #: apps/admin/src/routes/character-factory-page.tsx:48
 #: apps/admin/src/routes/character-runtime-page.tsx:28
-#: apps/admin/src/routes/chat-records-page.tsx:2084
+#: apps/admin/src/routes/chat-records-page.tsx:2081
+#: apps/admin/src/routes/reply-logic-page.tsx:85
 msgid "工作中"
 msgstr "Working"
 
@@ -3240,11 +3253,11 @@ msgstr "Once you select a submission on the left, full details and ingest action
 msgid "左侧选中一款游戏后，这里会展示完整目录详情、关键摘要和可编辑字段。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1504
+#: apps/admin/src/routes/chat-records-page.tsx:1501
 msgid "左侧选中角色会话后，这里会展示复盘入口、角色摘要和成本信息。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2276
+#: apps/admin/src/routes/chat-records-page.tsx:2273
 msgid "左侧锁定角色样本，中间阅读完整上下文，右侧再完成复盘标记和联动操作。"
 msgstr ""
 
@@ -3283,7 +3296,7 @@ msgstr ""
 msgid "已入库草稿"
 msgstr "Imported draft"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1078
+#: apps/admin/src/routes/chat-records-page.tsx:1075
 msgid "已入池"
 msgstr ""
 
@@ -3322,7 +3335,7 @@ msgstr ""
 msgid "已启用计价模型"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2315
+#: apps/admin/src/routes/chat-records-page.tsx:2312
 msgid "已命中"
 msgstr ""
 
@@ -3466,11 +3479,11 @@ msgstr "Approved"
 msgid "已配置"
 msgstr "Configured"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1565
+#: apps/admin/src/routes/chat-records-page.tsx:1562
 msgid "已隐藏"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1635
+#: apps/admin/src/routes/chat-records-page.tsx:1632
 msgid "已隐藏会话"
 msgstr ""
 
@@ -3486,7 +3499,7 @@ msgstr "Behind the scenes"
 msgid "平均单次 Token"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1265
+#: apps/admin/src/routes/chat-records-page.tsx:1262
 msgid "平均首响"
 msgstr ""
 
@@ -3542,7 +3555,7 @@ msgstr "Suggested proactive message: {0}"
 msgid "建议优先补齐 bio、记忆摘要或领域标签，避免角色进入运行台后缺少稳定画像。当前筛选口径命中 {filteredCount} 个角色。"
 msgstr "建议优先补齐 bio、记忆摘要或领域标签，避免角色进入运行台后缺少稳定画像。当前筛选口径命中 {filteredCount} 个角色。"
 
-#: apps/admin/src/routes/chat-records-page.tsx:2299
+#: apps/admin/src/routes/chat-records-page.tsx:2296
 msgid "建议先把这段会话纳入复盘池"
 msgstr ""
 
@@ -3562,7 +3575,7 @@ msgstr ""
 msgid "建议确认这些角色是否仍需人工锁定在线/活动模式，避免长期与调度器状态脱节。当前筛选口径命中 {filteredCount} 个角色。"
 msgstr "建议确认这些角色是否仍需人工锁定在线/活动模式，避免长期与调度器状态脱节。当前筛选口径命中 {filteredCount} 个角色。"
 
-#: apps/admin/src/routes/chat-records-page.tsx:2324
+#: apps/admin/src/routes/chat-records-page.tsx:2321
 msgid "建议结合回复节奏、主动消息占比和复盘状态一起判断是否值得继续优化。"
 msgstr ""
 
@@ -3607,7 +3620,7 @@ msgstr ""
 msgid "当 need 确认通过后，决定最终角色草稿和好友申请文案如何生成。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1541
+#: apps/admin/src/routes/chat-records-page.tsx:1538
 #: apps/admin/src/routes/token-usage-page.tsx:2595
 #: apps/admin/src/routes/token-usage-page.tsx:2673
 msgid "当前"
@@ -3654,15 +3667,15 @@ msgstr ""
 msgid "当前优先动作"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2323
+#: apps/admin/src/routes/chat-records-page.tsx:2320
 msgid "当前会话可直接进入成本与质量联动判断"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2330
+#: apps/admin/src/routes/chat-records-page.tsx:2327
 msgid "当前会话已进入稳定查看状态"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1030
+#: apps/admin/src/routes/chat-records-page.tsx:1027
 msgid "当前会话还没有消息"
 msgstr ""
 
@@ -3680,7 +3693,7 @@ msgstr ""
 msgid "当前值班摘要"
 msgstr "Current Duty Summary"
 
-#: apps/admin/src/routes/chat-records-page.tsx:2307
+#: apps/admin/src/routes/chat-records-page.tsx:2304
 msgid "当前包含清空前历史"
 msgstr ""
 
@@ -3688,7 +3701,7 @@ msgstr ""
 msgid "当前口径"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1235
+#: apps/admin/src/routes/chat-records-page.tsx:1232
 msgid "当前口径消息"
 msgstr ""
 
@@ -3709,7 +3722,7 @@ msgstr "Currently online"
 msgid "当前处于会话级聚焦"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2291
+#: apps/admin/src/routes/chat-records-page.tsx:2288
 msgid "当前处于命中上下文模式"
 msgstr ""
 
@@ -3745,7 +3758,7 @@ msgstr "Current hour"
 msgid "当前小时 {0} 不等于主动提醒小时 {1}，跳过本轮。"
 msgstr "Current hour {0} does not match proactive reminder hour {1}; skipping this round."
 
-#: apps/admin/src/routes/chat-records-page.tsx:2300
+#: apps/admin/src/routes/chat-records-page.tsx:2297
 msgid "当前尚未标记状态、标签和备注。先做样本归档，后续运营回看和过滤才会稳定可用。"
 msgstr ""
 
@@ -3753,7 +3766,13 @@ msgstr ""
 msgid "当前尚未配置推理服务。进入设置页可完成首轮配置并测试连通性。"
 msgstr "Inference is not configured yet. Open settings to complete initial configuration and connectivity testing."
 
-#: apps/admin/src/routes/chat-records-page.tsx:1604
+#. placeholder {0}: visibleMessages.length
+#. placeholder {1}: messages.length
+#: apps/admin/src/routes/chat-records-page.tsx:886
+msgid "当前展示 {0} / {1} 条消息"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:1601
 msgid "当前工作会话"
 msgstr ""
 
@@ -3769,7 +3788,7 @@ msgstr ""
 msgid "当前已有请求被预算阻断"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1067
+#: apps/admin/src/routes/chat-records-page.tsx:1064
 msgid "当前已标记为"
 msgstr ""
 
@@ -3890,7 +3909,7 @@ msgstr "This section is not injected."
 msgid "当前查看"
 msgstr "Current View"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1176
+#: apps/admin/src/routes/chat-records-page.tsx:1173
 msgid "当前标记"
 msgstr ""
 
@@ -3915,11 +3934,11 @@ msgstr "The current mode does not depend on an external player template."
 msgid "当前正在查看全局账本"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1008
+#: apps/admin/src/routes/chat-records-page.tsx:1005
 msgid "当前正在查看命中消息附近上下文"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:919
+#: apps/admin/src/routes/chat-records-page.tsx:916
 msgid "当前正在查看清空前历史"
 msgstr ""
 
@@ -3986,7 +4005,7 @@ msgstr "There are no high-priority blockers. Next, verify the latest generation 
 #: apps/admin/src/routes/character-editor-page.tsx:982
 #: apps/admin/src/routes/character-runtime-page.tsx:110
 #: apps/admin/src/routes/characters-page.tsx:752
-#: apps/admin/src/routes/chat-records-page.tsx:1373
+#: apps/admin/src/routes/chat-records-page.tsx:1370
 msgid "当前活动"
 msgstr "Current activity"
 
@@ -4043,7 +4062,7 @@ msgstr "当前筛选下没有游戏"
 msgid "当前筛选下没有运行记录"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1025
+#: apps/admin/src/routes/chat-records-page.tsx:1022
 msgid "当前筛选条件下没有消息"
 msgstr ""
 
@@ -4622,7 +4641,7 @@ msgstr "打开运行台"
 msgid "打开运行设置"
 msgstr "Open Runtime Settings"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1384
+#: apps/admin/src/routes/chat-records-page.tsx:1381
 msgid "打开运行逻辑台"
 msgstr ""
 
@@ -4646,7 +4665,7 @@ msgstr ""
 msgid "执行推理预览"
 msgstr "Run Inference Preview"
 
-#: apps/admin/src/routes/chat-records-page.tsx:770
+#: apps/admin/src/routes/chat-records-page.tsx:767
 msgid "执行搜索"
 msgstr ""
 
@@ -4917,7 +4936,7 @@ msgstr "Enter featured game IDs in order. Use newlines or commas to separate. Sa
 msgid "按频率生成视频号内容，并补足基础内容池。"
 msgstr "Generate channel content by cadence and refill the base content pool."
 
-#: apps/admin/src/routes/chat-records-page.tsx:980
+#: apps/admin/src/routes/chat-records-page.tsx:977
 msgid "换一个关键词、放宽时间范围，或者切回全部消息类型后再试。"
 msgstr ""
 
@@ -4926,7 +4945,7 @@ msgstr ""
 msgid "排名"
 msgstr "Rank"
 
-#: apps/admin/src/routes/chat-records-page.tsx:2198
+#: apps/admin/src/routes/chat-records-page.tsx:2195
 msgid "排序"
 msgstr ""
 
@@ -5083,11 +5102,11 @@ msgstr ""
 msgid "提高后更容易避开重复方向。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:770
+#: apps/admin/src/routes/chat-records-page.tsx:767
 msgid "搜索中..."
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:933
+#: apps/admin/src/routes/chat-records-page.tsx:930
 msgid "搜索命中"
 msgstr ""
 
@@ -5099,7 +5118,7 @@ msgstr "搜索游戏名、工作室、角色出品人或 AI 标签"
 msgid "搜索角色名、关系、领域或 bio"
 msgstr "搜索角色名、关系、领域或 bio"
 
-#: apps/admin/src/routes/chat-records-page.tsx:822
+#: apps/admin/src/routes/chat-records-page.tsx:819
 msgid "搜索需求、措辞、反馈或具体话题"
 msgstr ""
 
@@ -5166,7 +5185,7 @@ msgstr "Expert domains"
 msgid "操作已完成"
 msgstr "Action Completed"
 
-#: apps/admin/src/routes/chat-records-page.tsx:875
+#: apps/admin/src/routes/chat-records-page.tsx:872
 msgid "支持关键词、消息类型、起止日期组合搜索，命中后可直接定位到上下文。"
 msgstr ""
 
@@ -5417,11 +5436,11 @@ msgstr ""
 msgid "无稳定版本"
 msgstr "No stable revision"
 
-#: apps/admin/src/routes/chat-records-page.tsx:940
+#: apps/admin/src/routes/chat-records-page.tsx:937
 msgid "无附加条件"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1808
+#: apps/admin/src/routes/chat-records-page.tsx:1805
 msgid "无额外文本描述"
 msgstr ""
 
@@ -5470,15 +5489,15 @@ msgstr "Duration"
 msgid "时间"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:988
+#: apps/admin/src/routes/chat-records-page.tsx:985
 msgid "时间线"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2292
+#: apps/admin/src/routes/chat-records-page.tsx:2289
 msgid "时间线围绕一条命中消息展开，适合快速判断片段质量；处理完后可回到最新消息继续浏览全局。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:886
+#: apps/admin/src/routes/chat-records-page.tsx:883
 msgid "时间线视角"
 msgstr ""
 
@@ -5499,7 +5518,7 @@ msgid "显示密度"
 msgstr "Display density"
 
 #: apps/admin/src/routes/chat-records-page.tsx:607
-#: apps/admin/src/routes/chat-records-page.tsx:2184
+#: apps/admin/src/routes/chat-records-page.tsx:2181
 msgid "显示隐藏会话"
 msgstr ""
 
@@ -5517,9 +5536,9 @@ msgstr "AI Replies"
 
 #: apps/admin/src/lib/format.ts:12
 #: apps/admin/src/routes/character-runtime-page.tsx:223
-#: apps/admin/src/routes/chat-records-page.tsx:1282
-#: apps/admin/src/routes/chat-records-page.tsx:1286
-#: apps/admin/src/routes/chat-records-page.tsx:2069
+#: apps/admin/src/routes/chat-records-page.tsx:1279
+#: apps/admin/src/routes/chat-records-page.tsx:1283
+#: apps/admin/src/routes/chat-records-page.tsx:2066
 #: apps/admin/src/routes/dashboard-page.tsx:1181
 #: apps/admin/src/routes/dashboard-page.tsx:1764
 #: apps/admin/src/routes/need-discovery-page.tsx:390
@@ -5555,7 +5574,7 @@ msgstr "No Logs"
 msgid "暂无正文"
 msgstr "No body yet"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1967
+#: apps/admin/src/routes/chat-records-page.tsx:1964
 msgid "暂无消息"
 msgstr ""
 
@@ -5699,7 +5718,7 @@ msgstr ""
 msgid "朋友角色列表加载失败"
 msgstr "朋友角色列表加载失败"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1076
+#: apps/admin/src/routes/chat-records-page.tsx:1073
 #: apps/admin/src/routes/dashboard-page.tsx:899
 msgid "未保存"
 msgstr "Unsaved"
@@ -5751,21 +5770,21 @@ msgstr ""
 msgid "未来生成"
 msgstr "Future Generation"
 
-#: apps/admin/src/routes/chat-records-page.tsx:2090
+#: apps/admin/src/routes/chat-records-page.tsx:2087
 msgid "未标注"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1252
-#: apps/admin/src/routes/chat-records-page.tsx:1546
-#: apps/admin/src/routes/chat-records-page.tsx:1617
+#: apps/admin/src/routes/chat-records-page.tsx:1249
+#: apps/admin/src/routes/chat-records-page.tsx:1543
+#: apps/admin/src/routes/chat-records-page.tsx:1614
 msgid "未标注关系"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1361
+#: apps/admin/src/routes/chat-records-page.tsx:1358
 msgid "未标注领域"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1080
+#: apps/admin/src/routes/chat-records-page.tsx:1077
 msgid "未标记"
 msgstr ""
 
@@ -5777,7 +5796,7 @@ msgstr "未标记来源"
 msgid "未检测到字段变化。"
 msgstr "No field changes detected."
 
-#: apps/admin/src/routes/chat-records-page.tsx:1262
+#: apps/admin/src/routes/chat-records-page.tsx:1259
 msgid "未清空"
 msgstr ""
 
@@ -5822,7 +5841,7 @@ msgstr "Not recorded"
 msgid "未记录原模型"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1489
+#: apps/admin/src/routes/chat-records-page.tsx:1486
 msgid "未记录模型"
 msgstr ""
 
@@ -5857,7 +5876,7 @@ msgstr "Not set"
 msgid "未设置时，provider-state 回调不会附带保护 token。"
 msgstr "When unset, provider-state callbacks will not include a protection token."
 
-#: apps/admin/src/routes/chat-records-page.tsx:1630
+#: apps/admin/src/routes/chat-records-page.tsx:1627
 msgid "未进入复盘池"
 msgstr ""
 
@@ -5926,7 +5945,7 @@ msgstr "No action this round"
 msgid "本轮没有生成建议主动话术。"
 msgstr "No proactive message suggested this round."
 
-#: apps/admin/src/routes/chat-records-page.tsx:673
+#: apps/admin/src/routes/chat-records-page.tsx:670
 msgid "本页会话"
 msgstr ""
 
@@ -5962,7 +5981,7 @@ msgstr ""
 msgid "条异常"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2315
+#: apps/admin/src/routes/chat-records-page.tsx:2312
 msgid "条搜索结果"
 msgstr ""
 
@@ -6190,16 +6209,16 @@ msgstr "Standard"
 
 #: apps/admin/src/components/game-release-workbench.tsx:744
 #: apps/admin/src/components/game-submission-workbench.tsx:947
-#: apps/admin/src/routes/chat-records-page.tsx:1109
+#: apps/admin/src/routes/chat-records-page.tsx:1106
 #: apps/admin/src/routes/games-page.tsx:1250
 msgid "标签"
 msgstr "Tags"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1192
+#: apps/admin/src/routes/chat-records-page.tsx:1189
 msgid "标签数"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1087
+#: apps/admin/src/routes/chat-records-page.tsx:1084
 msgid "标记状态"
 msgstr ""
 
@@ -6332,7 +6351,7 @@ msgstr "Check whether characters should publish moments."
 msgid "检查预算预警"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:758
+#: apps/admin/src/routes/chat-records-page.tsx:755
 msgid "检索与定位"
 msgstr ""
 
@@ -6488,8 +6507,8 @@ msgstr "Loading saved inference service configuration..."
 msgid "正在加载投稿池..."
 msgstr "Loading submission pool..."
 
-#: apps/admin/src/routes/chat-records-page.tsx:1001
-#: apps/admin/src/routes/chat-records-page.tsx:1045
+#: apps/admin/src/routes/chat-records-page.tsx:998
+#: apps/admin/src/routes/chat-records-page.tsx:1042
 msgid "正在加载更早消息..."
 msgstr ""
 
@@ -6521,11 +6540,11 @@ msgstr "Syncing remote API, inference gateway, and world surface status."
 msgid "正在导出诊断包..."
 msgstr "Exporting diagnostics package..."
 
-#: apps/admin/src/routes/chat-records-page.tsx:925
+#: apps/admin/src/routes/chat-records-page.tsx:922
 msgid "正在搜索命中消息..."
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1055
+#: apps/admin/src/routes/chat-records-page.tsx:1052
 msgid "正在整理会话洞察..."
 msgstr ""
 
@@ -6542,11 +6561,11 @@ msgstr "Loading self-agent overview..."
 msgid "正在读取 workspace 文档..."
 msgstr "Loading workspace document..."
 
-#: apps/admin/src/routes/chat-records-page.tsx:1393
+#: apps/admin/src/routes/chat-records-page.tsx:1390
 msgid "正在读取会话成本..."
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:665
+#: apps/admin/src/routes/chat-records-page.tsx:662
 msgid "正在读取列表"
 msgstr ""
 
@@ -6554,7 +6573,7 @@ msgstr ""
 msgid "正在读取实例状态"
 msgstr "Reading instance status"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1015
+#: apps/admin/src/routes/chat-records-page.tsx:1012
 msgid "正在读取时间线..."
 msgstr ""
 
@@ -6738,7 +6757,7 @@ msgstr "One connector key per line. When matched, self-agent blocks this kind of
 msgid "每行一个 operation key。用于从主代理层统一禁掉某些动作能力。"
 msgstr "One operation key per line. Use this to disable specific action capabilities at the master-agent layer."
 
-#: apps/admin/src/routes/chat-records-page.tsx:979
+#: apps/admin/src/routes/chat-records-page.tsx:976
 msgid "没有命中消息"
 msgstr ""
 
@@ -6746,7 +6765,7 @@ msgstr ""
 msgid "没有明显预算预警或异常阻断，适合继续观察趋势、角色分布和模型成本结构。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:702
+#: apps/admin/src/routes/chat-records-page.tsx:699
 msgid "没有符合条件的会话"
 msgstr ""
 
@@ -6815,7 +6834,7 @@ msgstr ""
 msgid "活跃房间"
 msgstr "Active Rooms"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1281
+#: apps/admin/src/routes/chat-records-page.tsx:1278
 msgid "活跃日均消息"
 msgstr ""
 
@@ -6828,7 +6847,7 @@ msgstr "Active hours"
 msgid "活跃结束小时（0-23）"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2194
+#: apps/admin/src/routes/chat-records-page.tsx:2191
 msgid "活跃范围"
 msgstr ""
 
@@ -6844,7 +6863,7 @@ msgstr "Active Scheduler Jobs"
 msgid "消息总数"
 msgstr "Total Messages"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1299
+#: apps/admin/src/routes/chat-records-page.tsx:1296
 msgid "消息结构占比"
 msgstr ""
 
@@ -6856,11 +6875,11 @@ msgstr "Clean up pending friend requests that expire today."
 msgid "清空所选"
 msgstr "Clear selection"
 
-#: apps/admin/src/routes/chat-records-page.tsx:777
+#: apps/admin/src/routes/chat-records-page.tsx:774
 msgid "清空条件"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1220
+#: apps/admin/src/routes/chat-records-page.tsx:1217
 msgid "清空标记"
 msgstr ""
 
@@ -6868,7 +6887,7 @@ msgstr ""
 msgid "清空筛选"
 msgstr "清空筛选"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1220
+#: apps/admin/src/routes/chat-records-page.tsx:1217
 msgid "清除中..."
 msgstr ""
 
@@ -6876,7 +6895,7 @@ msgstr ""
 msgid "清除会话聚焦"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:785
+#: apps/admin/src/routes/chat-records-page.tsx:782
 msgid "清除命中"
 msgstr ""
 
@@ -6933,7 +6952,7 @@ msgstr ""
 msgid "游戏说明"
 msgstr "Game description"
 
-#: apps/admin/src/routes/chat-records-page.tsx:936
+#: apps/admin/src/routes/chat-records-page.tsx:933
 msgid "点击任一条即可切到附近上下文。"
 msgstr ""
 
@@ -6971,7 +6990,7 @@ msgid "版本状态"
 msgstr ""
 
 #: apps/admin/src/components/game-submission-workbench.tsx:562
-#: apps/admin/src/routes/chat-records-page.tsx:1180
+#: apps/admin/src/routes/chat-records-page.tsx:1177
 #: apps/admin/src/routes/dashboard-page.tsx:1195
 #: apps/admin/src/routes/token-usage-page.tsx:706
 #: apps/admin/src/routes/token-usage-page.tsx:1334
@@ -7073,8 +7092,8 @@ msgstr "For home event slots, mission reactivation, and feature entries."
 msgid "用当前生效的推理服务配置运行一条预览提示词。"
 msgstr "Run one preview prompt with the currently active inference service configuration."
 
-#: apps/admin/src/routes/chat-records-page.tsx:1240
-#: apps/admin/src/routes/chat-records-page.tsx:1302
+#: apps/admin/src/routes/chat-records-page.tsx:1237
+#: apps/admin/src/routes/chat-records-page.tsx:1299
 msgid "用户消息"
 msgstr ""
 
@@ -7108,12 +7127,12 @@ msgstr "画像资料还不完整"
 msgid "界闻简报调度"
 msgstr "Jiewen Bulletin Schedule"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1561
+#: apps/admin/src/routes/chat-records-page.tsx:1558
 msgid "留存"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1237
-#: apps/admin/src/routes/chat-records-page.tsx:1681
+#: apps/admin/src/routes/chat-records-page.tsx:1234
+#: apps/admin/src/routes/chat-records-page.tsx:1678
 msgid "留存消息"
 msgstr ""
 
@@ -7196,7 +7215,8 @@ msgstr "Sleep delay"
 #: apps/admin/src/routes/character-editor-page.tsx:993
 #: apps/admin/src/routes/character-factory-page.tsx:52
 #: apps/admin/src/routes/character-runtime-page.tsx:32
-#: apps/admin/src/routes/chat-records-page.tsx:2088
+#: apps/admin/src/routes/chat-records-page.tsx:2085
+#: apps/admin/src/routes/reply-logic-page.tsx:89
 msgid "睡觉中"
 msgstr "Sleeping"
 
@@ -7269,8 +7289,8 @@ msgstr ""
 #: apps/admin/src/routes/characters-page.tsx:550
 #: apps/admin/src/routes/characters-page.tsx:635
 #: apps/admin/src/routes/characters-page.tsx:722
-#: apps/admin/src/routes/chat-records-page.tsx:1354
-#: apps/admin/src/routes/chat-records-page.tsx:1612
+#: apps/admin/src/routes/chat-records-page.tsx:1351
+#: apps/admin/src/routes/chat-records-page.tsx:1609
 #: apps/admin/src/routes/dashboard-page.tsx:1041
 #: apps/admin/src/routes/dashboard-page.tsx:1317
 msgid "离线"
@@ -7280,7 +7300,7 @@ msgstr "Offline"
 msgid "离线角色"
 msgstr "离线角色"
 
-#: apps/admin/src/routes/chat-records-page.tsx:2076
+#: apps/admin/src/routes/chat-records-page.tsx:2073
 msgid "秒"
 msgstr ""
 
@@ -7290,9 +7310,9 @@ msgstr ""
 msgid "稳定"
 msgstr "Stable"
 
-#: apps/admin/src/routes/chat-records-page.tsx:966
-#: apps/admin/src/routes/chat-records-page.tsx:1808
-#: apps/admin/src/routes/chat-records-page.tsx:1972
+#: apps/admin/src/routes/chat-records-page.tsx:963
+#: apps/admin/src/routes/chat-records-page.tsx:1805
+#: apps/admin/src/routes/chat-records-page.tsx:1969
 msgid "空消息"
 msgstr ""
 
@@ -7300,7 +7320,8 @@ msgstr ""
 #: apps/admin/src/routes/character-factory-page.tsx:47
 #: apps/admin/src/routes/character-runtime-page.tsx:27
 #: apps/admin/src/routes/character-runtime-page.tsx:214
-#: apps/admin/src/routes/chat-records-page.tsx:2089
+#: apps/admin/src/routes/chat-records-page.tsx:2086
+#: apps/admin/src/routes/reply-logic-page.tsx:84
 msgid "空闲"
 msgstr "Idle"
 
@@ -7341,9 +7362,14 @@ msgstr "Competitive"
 msgid "端口已占用"
 msgstr "Port Occupied"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1961
-#: apps/admin/src/routes/chat-records-page.tsx:1993
+#: apps/admin/src/routes/chat-records-page.tsx:1958
+#: apps/admin/src/routes/chat-records-page.tsx:1990
 msgid "笔记"
+msgstr ""
+
+#. placeholder {0}: conversationsQuery.data.totalPages
+#: apps/admin/src/routes/chat-records-page.tsx:716
+msgid "第 {page} / {0} 页"
 msgstr ""
 
 #: apps/admin/src/components/game-release-workbench.tsx:372
@@ -7446,7 +7472,7 @@ msgstr "Admin Console"
 msgid "管理密钥"
 msgstr "Admin secret"
 
-#: apps/admin/src/routes/chat-records-page.tsx:2216
+#: apps/admin/src/routes/chat-records-page.tsx:2213
 msgid "类型"
 msgstr ""
 
@@ -7462,7 +7488,7 @@ msgstr ""
 msgid "系统已进入可运维状态。建议下一步进入评测页验证当前生成链质量。"
 msgstr "The system is operational. Next, open Evals to verify the current generation chain quality."
 
-#: apps/admin/src/routes/chat-records-page.tsx:1319
+#: apps/admin/src/routes/chat-records-page.tsx:1316
 msgid "系统消息"
 msgstr ""
 
@@ -7474,11 +7500,11 @@ msgstr "System status detected an external player template."
 msgid "紧凑"
 msgstr "Compact"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1404
+#: apps/admin/src/routes/chat-records-page.tsx:1401
 msgid "累计 Token"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1408
+#: apps/admin/src/routes/chat-records-page.tsx:1405
 msgid "累计成本"
 msgstr ""
 
@@ -7486,7 +7512,7 @@ msgstr ""
 msgid "累计消息量"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1400
+#: apps/admin/src/routes/chat-records-page.tsx:1397
 msgid "累计请求"
 msgstr ""
 
@@ -7503,7 +7529,7 @@ msgstr "The live character already matches the wiki stable revision; no sync nee
 msgid "经营"
 msgstr "Strategy"
 
-#: apps/admin/src/routes/chat-records-page.tsx:2222
+#: apps/admin/src/routes/chat-records-page.tsx:2219
 msgid "结束"
 msgstr ""
 
@@ -7544,7 +7570,7 @@ msgstr "继承全局默认"
 msgid "继承实例默认路由"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1046
+#: apps/admin/src/routes/chat-records-page.tsx:1043
 msgid "继续向前加载"
 msgstr ""
 
@@ -7790,7 +7816,7 @@ msgid "表单完整度"
 msgstr ""
 
 #: apps/admin/src/routes/chat-records-page.tsx:71
-#: apps/admin/src/routes/chat-records-page.tsx:1953
+#: apps/admin/src/routes/chat-records-page.tsx:1950
 msgid "表情"
 msgstr ""
 
@@ -7814,8 +7840,8 @@ msgstr ""
 msgid "规则配置工作区"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1249
-#: apps/admin/src/routes/chat-records-page.tsx:2181
+#: apps/admin/src/routes/chat-records-page.tsx:1246
+#: apps/admin/src/routes/chat-records-page.tsx:2178
 #: apps/admin/src/routes/need-discovery-page.tsx:2067
 #: apps/admin/src/routes/token-usage-page.tsx:702
 #: apps/admin/src/routes/token-usage-page.tsx:1008
@@ -7872,7 +7898,7 @@ msgstr "Character Roster and Work Entry"
 msgid "角色名册加载失败"
 msgstr "角色名册加载失败"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1304
+#: apps/admin/src/routes/chat-records-page.tsx:1301
 msgid "角色回复"
 msgstr ""
 
@@ -7921,7 +7947,7 @@ msgstr "角色池结构"
 msgid "角色池结构稳定，可以继续扩充或抽查运行状态"
 msgstr "角色池结构稳定，可以继续扩充或抽查运行状态"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1239
+#: apps/admin/src/routes/chat-records-page.tsx:1236
 msgid "角色消息"
 msgstr ""
 
@@ -8064,7 +8090,7 @@ msgstr "Subscribers"
 msgid "记录每次创建、编辑、投稿入库、恢复和正式发布的快照。"
 msgstr "Records snapshots from create, edit, submission ingest, restore, and formal publish events."
 
-#: apps/admin/src/routes/chat-records-page.tsx:1167
+#: apps/admin/src/routes/chat-records-page.tsx:1164
 msgid "记录这段对话为什么值得复盘、后续应该如何调策略或 Prompt。"
 msgstr ""
 
@@ -8135,8 +8161,8 @@ msgstr "请先选择一款游戏，或新建一个目录草稿。"
 msgid "请检查管理后台和实例连通性。"
 msgstr "Please check the admin console and instance connectivity."
 
-#: apps/admin/src/routes/chat-records-page.tsx:1447
-#: apps/admin/src/routes/chat-records-page.tsx:1467
+#: apps/admin/src/routes/chat-records-page.tsx:1444
+#: apps/admin/src/routes/chat-records-page.tsx:1464
 #: apps/admin/src/routes/token-usage-page.tsx:1196
 msgid "请求"
 msgstr ""
@@ -8159,7 +8185,7 @@ msgstr "Please retry later."
 msgid "请选择游戏"
 msgstr "Please select a game"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1688
+#: apps/admin/src/routes/chat-records-page.tsx:1685
 #: apps/admin/src/routes/dashboard-page.tsx:1933
 msgid "读取中"
 msgstr "Reading"
@@ -8267,7 +8293,7 @@ msgstr ""
 msgid "赛博分身现实摘要"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2219
+#: apps/admin/src/routes/chat-records-page.tsx:2216
 msgid "起始"
 msgstr ""
 
@@ -8450,7 +8476,7 @@ msgstr "Confirm instance connectivity and model availability before content chec
 msgid "运营动作"
 msgstr "运营动作"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1061
+#: apps/admin/src/routes/chat-records-page.tsx:1058
 msgid "运营动作区"
 msgstr ""
 
@@ -8563,7 +8589,7 @@ msgstr "Runtime Diagnostics"
 msgid "运行详情"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1653
+#: apps/admin/src/routes/chat-records-page.tsx:1650
 msgid "运行逻辑台"
 msgstr ""
 
@@ -8571,14 +8597,14 @@ msgstr ""
 msgid "近 30 天"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1426
+#: apps/admin/src/routes/chat-records-page.tsx:1423
 msgid "近 30 天 Token 趋势"
 msgstr ""
 
 #: apps/admin/src/routes/chat-records-page.tsx:530
-#: apps/admin/src/routes/chat-records-page.tsx:1415
-#: apps/admin/src/routes/chat-records-page.tsx:1685
-#: apps/admin/src/routes/chat-records-page.tsx:2324
+#: apps/admin/src/routes/chat-records-page.tsx:1412
+#: apps/admin/src/routes/chat-records-page.tsx:1682
+#: apps/admin/src/routes/chat-records-page.tsx:2321
 msgid "近 30 天成本"
 msgstr ""
 
@@ -8586,13 +8612,13 @@ msgstr ""
 msgid "近 30 天活跃"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1279
+#: apps/admin/src/routes/chat-records-page.tsx:1276
 msgid "近 30 天活跃天数"
 msgstr ""
 
 #: apps/admin/src/routes/chat-records-page.tsx:528
-#: apps/admin/src/routes/chat-records-page.tsx:1238
-#: apps/admin/src/routes/chat-records-page.tsx:1677
+#: apps/admin/src/routes/chat-records-page.tsx:1235
+#: apps/admin/src/routes/chat-records-page.tsx:1674
 msgid "近 30 天消息"
 msgstr ""
 
@@ -8610,11 +8636,11 @@ msgstr ""
 msgid "近 7 天活跃"
 msgstr "近 7 天活跃"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1278
+#: apps/admin/src/routes/chat-records-page.tsx:1275
 msgid "近 7 天活跃天数"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1293
+#: apps/admin/src/routes/chat-records-page.tsx:1290
 msgid "近 7 天消息趋势"
 msgstr ""
 
@@ -8696,7 +8722,7 @@ msgstr "No revision history yet"
 msgid "还没有内容卡"
 msgstr "No content cards yet"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1150
+#: apps/admin/src/routes/chat-records-page.tsx:1147
 msgid "还没有标签，可用上方快捷标签快速沉淀样本特征。"
 msgstr ""
 
@@ -8753,7 +8779,7 @@ msgstr "这个角色当前没有明显待处理项，可以直接进入行为管
 msgid "这个角色当前没有质量偏弱样本。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1031
+#: apps/admin/src/routes/chat-records-page.tsx:1028
 msgid "这个角色的单聊档案还没有积累可回看的历史。"
 msgstr ""
 
@@ -8773,11 +8799,11 @@ msgstr ""
 msgid "这些降级会话已经在复盘中被明确标记为质量偏弱。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1200
+#: apps/admin/src/routes/chat-records-page.tsx:1197
 msgid "这段会话还没有进入复盘池"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1068
+#: apps/admin/src/routes/chat-records-page.tsx:1065
 msgid "这段会话还没有进入复盘池，建议先给出状态、标签和备注，方便后续回看。"
 msgstr ""
 
@@ -8805,7 +8831,7 @@ msgstr "This is a raw debugging entry directly against the current provider. It 
 msgid "这里只编辑摇一摇规则，不展示 session 列表。这样运营改参数时不会被即时记录打断，也更容易确认当前改的是哪一组策略。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:920
+#: apps/admin/src/routes/chat-records-page.tsx:917
 msgid "这里展示数据库仍保留的完整会话样本，可能包含用户在前台已清空的聊天。"
 msgstr ""
 
@@ -8899,11 +8925,11 @@ msgstr "Follow-up Recommendation Schedule"
 msgid "适合排查 need 识别质量和草稿阈值。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1067
+#: apps/admin/src/routes/chat-records-page.tsx:1064
 msgid "适合继续补标签、备注或联动到回复逻辑台。"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:2308
+#: apps/admin/src/routes/chat-records-page.tsx:2305
 msgid "适合追溯长期样本，但这部分内容用户前台可能已经不可见，操作时要明确这是后台留存口径。"
 msgstr ""
 
@@ -8915,7 +8941,7 @@ msgstr "Pick an existing world character to import identity, bio, expert domains
 msgid "选中目录中的具体游戏后，这里会显示版本历史、修订轨迹和发布操作。"
 msgstr "Once a specific game is selected from the catalog, the revision history, change trail, and publish actions will appear here."
 
-#: apps/admin/src/routes/chat-records-page.tsx:751
+#: apps/admin/src/routes/chat-records-page.tsx:748
 msgid "选中角色会话后，中间会进入上下文阅读与定位模式，右侧则同步显示复盘和洞察。"
 msgstr ""
 
@@ -8941,7 +8967,8 @@ msgstr "Select character"
 #: apps/admin/src/routes/character-editor-page.tsx:992
 #: apps/admin/src/routes/character-factory-page.tsx:51
 #: apps/admin/src/routes/character-runtime-page.tsx:31
-#: apps/admin/src/routes/chat-records-page.tsx:2087
+#: apps/admin/src/routes/chat-records-page.tsx:2084
+#: apps/admin/src/routes/reply-logic-page.tsx:88
 msgid "通勤中"
 msgstr "Commuting"
 
@@ -9031,7 +9058,7 @@ msgstr ""
 msgid "间隔分钟"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:990
+#: apps/admin/src/routes/chat-records-page.tsx:987
 msgid "阅读和判断都在这里完成。用户消息右对齐，角色回复左对齐，系统消息居中展示。"
 msgstr ""
 
@@ -9068,8 +9095,8 @@ msgstr ""
 msgid "阻断趋势"
 msgstr ""
 
-#: apps/admin/src/routes/chat-records-page.tsx:1242
-#: apps/admin/src/routes/chat-records-page.tsx:1314
+#: apps/admin/src/routes/chat-records-page.tsx:1239
+#: apps/admin/src/routes/chat-records-page.tsx:1311
 msgid "附件消息"
 msgstr ""
 
@@ -9363,7 +9390,7 @@ msgstr "Verify generation chain quality and locate failed samples."
 msgid "高优先级"
 msgstr "High Priority"
 
-#: apps/admin/src/routes/chat-records-page.tsx:1285
+#: apps/admin/src/routes/chat-records-page.tsx:1282
 msgid "高峰工作日"
 msgstr ""
 
@@ -9399,7 +9426,7 @@ msgstr "默认保底"
 msgid "默认保底角色不可删除。"
 msgstr "默认保底角色不可删除。"
 
-#: apps/admin/src/routes/chat-records-page.tsx:685
+#: apps/admin/src/routes/chat-records-page.tsx:682
 msgid "默认视图：全部角色，按最近活跃排序。"
 msgstr ""
 

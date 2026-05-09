@@ -4,7 +4,6 @@ import { Link, useNavigate, useParams } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   createCharacter,
   getCharacter,
   updateCharacter,
@@ -35,6 +34,7 @@ import { resolveAdminCoreApiBaseUrl } from "../lib/core-api-base";
 import { adminApi } from "../lib/admin-api";
 import { CharacterWorkspaceNav } from "../components/character-workspace-nav";
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const emptyCharacterDraft: CharacterDraft = {
   name: "",
   avatar: "",
@@ -234,6 +234,7 @@ const DEFAULT_PROMPTS = {
 
 这是长期记忆，应当简练、具体、经得起后续反复验证。只输出最终内容，不要加标题，不要写成关系汇报。`,
 };
+// i18n-ignore-end
 
 function csvToList(value: string) {
   return value
@@ -475,17 +476,17 @@ export function CharacterEditorPage() {
             title={t(msg`AI 快速生成`)}
             actions={
               <StatusPill
-                tone={aiGenerateMutation.isSuccess ? “healthy” : “muted”}
+                tone={aiGenerateMutation.isSuccess ? "healthy" : "muted"}
               >
                 {aiGenerateMutation.isSuccess ? t(msg`已填入`) : t(msg`一键生成`)}
               </StatusPill>
             }
           />
-          <p className=”mt-3 text-sm text-[color:var(--text-secondary)]”>
-            {t(msg`输入几句你想要的人设，AI 会先按”更像真实联系人、少一点模板腔”的口径生成姓名、简介、人格特征、职业背景等字段，再填进表单给你继续微调。`)}
+          <p className="mt-3 text-sm text-[color:var(--text-secondary)]">
+            {t(msg`输入几句你想要的人设，AI 会先按"更像真实联系人、少一点模板腔"的口径生成姓名、简介、人格特征、职业背景等字段，再填进表单给你继续微调。`)}
           </p>
-          <InlineNotice className=”mt-3” tone=”muted”>
-            {t(msg`描述里尽量直接写这个人是什么来路、怎么说话、关系远近。别写成”万能助手””专业顾问””高情商陪聊模板”这种壳子。`)}
+          <InlineNotice className="mt-3" tone="muted">
+            {t(msg`描述里尽量直接写这个人是什么来路、怎么说话、关系远近。别写成"万能助手""专业顾问""高情商陪聊模板"这种壳子。`)}
           </InlineNotice>
           <div className="mt-4 flex flex-col gap-3">
             <textarea
@@ -667,7 +668,7 @@ export function CharacterEditorPage() {
                 { value: "", label: t(msg`沿用账户默认模型`) },
                 ...modelCatalog.map((entry) => ({
                   value: entry.id,
-                  label: `${entry.label} · ${entry.vendor}`,
+                  label: `${entry.label} · ${entry.vendor}`, // i18n-ignore-line: dynamic label from data fields
                 })),
               ]}
             />
@@ -1242,4 +1243,3 @@ function normalizeDraft(
     },
   };
 }
-// i18n-ignore-end
