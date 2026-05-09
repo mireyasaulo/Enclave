@@ -32,8 +32,6 @@ import {
   LoadingBlock,
 } from "@yinjie/ui";
 import {
-  AdminCallout,
-  AdminEmptyState,
   AdminMetaText,
   AdminPageHero,
   AdminSectionHeader,
@@ -696,29 +694,27 @@ export function TokenUsagePage() {
     { label: t(msg`时间`), value: `${from} 至 ${to}` },
     {
       label: t(msg`粒度`),
-      value: grain === "month" ? t(msg`按月`) : grain === "week" ? t(msg`按周`) : t(msg`按天`),
+      value:
+        grain === "month"
+          ? t(msg`按月`)
+          : grain === "week"
+            ? t(msg`按周`)
+            : t(msg`按天`),
     },
     characterId
       ? { label: t(msg`角色`), value: activeCharacterName || characterId }
       : null,
     conversationId ? { label: t(msg`会话`), value: conversationId } : null,
     status
-      ? { label: t(msg`状态`), value: status === "success" ? t(msg`仅成功`) : t(msg`仅失败`) }
+      ? {
+          label: t(msg`状态`),
+          value: status === "success" ? t(msg`仅成功`) : t(msg`仅失败`),
+        }
       : null,
     billingSource
       ? { label: t(msg`计费来源`), value: formatBillingSource(billingSource) }
       : null,
   ].filter(Boolean) as Array<{ label: string; value: string }>;
-  const operatorSummary = buildTokenUsageOperatorSummary({
-    hasConfiguredPricing,
-    pricingModelCount: configuredPricingCount,
-    overallBudgetState,
-    budgetAlertCount,
-    blockedRequestCount,
-    downgradedRequestCount,
-    conversationId,
-    activeCharacterName,
-  });
   const workspaceItems = [
     {
       key: "overview",
@@ -734,11 +730,10 @@ export function TokenUsagePage() {
       badge: budgetAlertCount
         ? `${formatInteger(budgetAlertCount)} ${t(msg`条预警`)}`
         : t(msg`当前无预警`),
-      tone: (
-        overallBudgetState === "exceeded" || overallBudgetState === "warning"
-          ? "warning"
-          : "success"
-      ) as "warning" | "success",
+      tone: (overallBudgetState === "exceeded" ||
+      overallBudgetState === "warning"
+        ? "warning"
+        : "success") as "warning" | "success",
     },
     {
       key: "exceptions",
@@ -748,9 +743,9 @@ export function TokenUsagePage() {
         blockedRequestCount || downgradedRequestCount
           ? `${formatInteger(blockedRequestCount + downgradedRequestCount)} ${t(msg`条异常`)}`
           : t(msg`当前无异常`),
-      tone: (
-        blockedRequestCount || downgradedRequestCount ? "warning" : "success"
-      ) as "warning" | "success",
+      tone: (blockedRequestCount || downgradedRequestCount
+        ? "warning"
+        : "success") as "warning" | "success",
     },
     {
       key: "pricing",
@@ -770,7 +765,9 @@ export function TokenUsagePage() {
       badge: blockedRequestCount
         ? `${formatInteger(blockedRequestCount)} ${t(msg`次阻断`)}`
         : t(msg`当前无阻断`),
-      tone: (blockedRequestCount ? "warning" : "success") as "warning" | "success",
+      tone: (blockedRequestCount ? "warning" : "success") as
+        | "warning"
+        | "success",
     },
     {
       key: "downgraded",
@@ -788,12 +785,10 @@ export function TokenUsagePage() {
       badge: downgradeQuality?.reviewedConversationCount
         ? `${formatInteger(downgradeQuality.reviewedConversationCount)} ${t(msg`条已复盘`)}`
         : t(msg`等待复盘样本`),
-      tone: (
-        (downgradeQuality?.tooWeakConversationCount ?? 0) > 0 ||
-        pendingOutcomeSamples.length > 0
-          ? "warning"
-          : "info"
-      ) as "warning" | "info",
+      tone: ((downgradeQuality?.tooWeakConversationCount ?? 0) > 0 ||
+      pendingOutcomeSamples.length > 0
+        ? "warning"
+        : "info") as "warning" | "info",
     },
   ];
   const budgetFocusItems = [...(budgetSummary?.characters ?? [])]
@@ -810,22 +805,15 @@ export function TokenUsagePage() {
     setStatus("");
     setBillingSource("");
   };
-  const openWorkspace = (
-    workspace: TokenUsageWorkspace,
-    exceptionView?: TokenUsageExceptionView,
-  ) => {
-    setActiveWorkspace(workspace);
-    if (exceptionView) {
-      setActiveExceptionView(exceptionView);
-    }
-  };
 
   return (
     <div className="space-y-6">
       <AdminPageHero
         eyebrow={t(msg`AI 用量`)}
         title={t(msg`Token 用量与预算中心`)}
-        description={t(msg`这里把实例里的 AI 请求沉淀成运营账本，方便先看预算健康度，再处理阻断、降级和价格配置。`)}
+        description={t(
+          msg`这里把实例里的 AI 请求沉淀成运营账本，方便先看预算健康度，再处理阻断、降级和价格配置。`,
+        )}
         actions={
           <div className="flex flex-wrap gap-2">
             <QuickRangeButton
@@ -883,312 +871,163 @@ export function TokenUsagePage() {
         <ErrorBlock message={saveBudgetMutation.error.message} />
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[1.25fr_0.95fr]">
-        <AdminCallout
-          title={operatorSummary.title}
-          tone={operatorSummary.tone}
-          description={
-            <div className="space-y-2">
-              <p>{operatorSummary.description}</p>
-              <p className="text-xs text-[color:var(--text-muted)]">
-                {t(msg`当前预算状态：`)}{formatBudgetState(overallBudgetState)}{t(msg`，预算预警`)}{" "}
-                {formatInteger(budgetAlertCount)} {t(msg`条，预算阻断`)}{" "}
-                {formatInteger(blockedRequestCount)} {t(msg`次，自动降级`)}{" "}
-                {formatInteger(downgradedRequestCount)} {t(msg`次。`)}
-              </p>
-            </div>
-          }
+      <Card className="bg-[color:var(--surface-console)]">
+        <AdminSectionHeader
+          title={t(msg`工作区切换`)}
           actions={
-            <>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() =>
-                  openWorkspace(
-                    operatorSummary.primaryAction.workspace,
-                    operatorSummary.primaryAction.exceptionView,
-                  )
-                }
-              >
-                {operatorSummary.primaryAction.label}
-              </Button>
-              {operatorSummary.secondaryAction ? (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() =>
-                    openWorkspace(
-                      operatorSummary.secondaryAction?.workspace ?? "overview",
-                      operatorSummary.secondaryAction?.exceptionView,
-                    )
-                  }
-                >
-                  {operatorSummary.secondaryAction?.label ?? t(msg`查看总览`)}
-                </Button>
-              ) : null}
-            </>
+            <span className="text-xs text-[color:var(--text-muted)]">
+              {t(msg`当前视图：`)}
+              {workspaceItems.find((item) => item.key === activeWorkspace)
+                ?.label ?? t(msg`总览`)}
+            </span>
           }
         />
 
-        <Card className="bg-[color:var(--surface-console)]">
-          <AdminSectionHeader
-            title={t(msg`工作区切换`)}
-            actions={
-              <span className="text-xs text-[color:var(--text-muted)]">
-                {t(msg`当前视图：`)}
-                {workspaceItems.find((item) => item.key === activeWorkspace)
-                  ?.label ?? t(msg`总览`)}
-              </span>
-            }
+        <div className="mt-5">
+          <SelectionDeck
+            items={workspaceItems}
+            activeKey={activeWorkspace}
+            onChange={(key) => setActiveWorkspace(key as TokenUsageWorkspace)}
           />
+        </div>
 
-          <div className="mt-5">
-            <SelectionDeck
-              items={workspaceItems}
-              activeKey={activeWorkspace}
-              onChange={(key) => setActiveWorkspace(key as TokenUsageWorkspace)}
-            />
+        <div className="mt-5 space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <AdminMetaText>{t(msg`当前口径`)}</AdminMetaText>
+            <span className="text-xs text-[color:var(--text-muted)]">
+              {formatInteger(activeFilterTags.length)} {t(msg`个条件`)}
+            </span>
           </div>
-
-          <div className="mt-5 space-y-3">
-            <div className="flex items-center justify-between gap-3">
-              <AdminMetaText>{t(msg`当前口径`)}</AdminMetaText>
-              <span className="text-xs text-[color:var(--text-muted)]">
-                {formatInteger(activeFilterTags.length)} {t(msg`个条件`)}
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {activeFilterTags.map((item) => (
-                <ActiveFilterPill
-                  key={`${item.label}-${item.value}`}
-                  label={item.label}
-                  value={item.value}
-                />
-              ))}
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      <div className="grid gap-6 xl:grid-cols-[1.25fr_0.85fr]">
-        <Card className="space-y-5 bg-[color:var(--surface-console)]">
-          <AdminSectionHeader
-            title={t(msg`筛选工作台`)}
-            actions={
-              <Button variant="ghost" size="sm" onClick={resetFilters}>
-                {t(msg`重置筛选`)}
-              </Button>
-            }
-          />
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            <FilterField label={t(msg`开始日期`)}>
-              <input
-                type="date"
-                value={from}
-                onChange={(event) => setFrom(event.target.value)}
-                className={INPUT_CLASS_NAME}
-              />
-            </FilterField>
-            <FilterField label={t(msg`结束日期`)}>
-              <input
-                type="date"
-                value={to}
-                onChange={(event) => setTo(event.target.value)}
-                className={INPUT_CLASS_NAME}
-              />
-            </FilterField>
-            <FilterField label={t(msg`聚合粒度`)}>
-              <select
-                value={grain}
-                onChange={(event) =>
-                  setGrain(event.target.value as "day" | "week" | "month")
-                }
-                className={INPUT_CLASS_NAME}
-              >
-                <option value="day">{t(msg`按天`)}</option>
-                <option value="week">{t(msg`按周`)}</option>
-                <option value="month">{t(msg`按月`)}</option>
-              </select>
-            </FilterField>
-            <FilterField label={t(msg`角色`)}>
-              <select
-                value={characterId}
-                onChange={(event) => setCharacterId(event.target.value)}
-                className={INPUT_CLASS_NAME}
-              >
-                <option value="">{t(msg`全部角色`)}</option>
-                {characters.map((character) => (
-                  <option key={character.id} value={character.id}>
-                    {character.name}
-                  </option>
-                ))}
-              </select>
-            </FilterField>
-            <FilterField label={t(msg`请求状态`)}>
-              <select
-                value={status}
-                onChange={(event) =>
-                  setStatus(event.target.value as "" | TokenUsageStatus)
-                }
-                className={INPUT_CLASS_NAME}
-              >
-                <option value="">{t(msg`全部状态`)}</option>
-                <option value="success">{t(msg`仅成功`)}</option>
-                <option value="failed">{t(msg`仅失败`)}</option>
-              </select>
-            </FilterField>
-            <FilterField label={t(msg`计费来源`)}>
-              <select
-                value={billingSource}
-                onChange={(event) =>
-                  setBillingSource(
-                    event.target.value as "" | TokenUsageBillingSource,
-                  )
-                }
-                className={INPUT_CLASS_NAME}
-              >
-                <option value="">{t(msg`全部来源`)}</option>
-                <option value="instance_default">{t(msg`实例默认 Key`)}</option>
-                <option value="owner_custom">{t(msg`世界主人 Key`)}</option>
-              </select>
-            </FilterField>
-          </div>
-
           <div className="flex flex-wrap gap-2">
-            {conversationId ? (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setConversationId("")}
-              >
-                {t(msg`清除会话聚焦`)}
-              </Button>
-            ) : null}
-            {characterId ? (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setCharacterId("")}
-              >
-                {t(msg`清除角色筛选`)}
-              </Button>
-            ) : null}
-            {status ? (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setStatus("")}
-              >
-                {t(msg`清除状态筛选`)}
-              </Button>
-            ) : null}
-            {billingSource ? (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setBillingSource("")}
-              >
-                {t(msg`清除计费来源`)}
-              </Button>
-            ) : null}
-          </div>
-        </Card>
-
-        <Card className="bg-[color:var(--surface-console)]">
-          <AdminSectionHeader
-            title={t(msg`当前焦点`)}
-            actions={<BudgetStateBadge state={overallBudgetState} />}
-          />
-
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <SummaryTile
-              label={t(msg`预算预警`)}
-              value={formatInteger(budgetAlertCount)}
-            />
-            <SummaryTile
-              label={t(msg`预算阻断`)}
-              value={formatInteger(blockedRequestCount)}
-            />
-            <SummaryTile
-              label={t(msg`自动降级`)}
-              value={formatInteger(downgradedRequestCount)}
-            />
-            <SummaryTile
-              label={t(msg`已启用计价模型`)}
-              value={formatInteger(enabledPricingCount)}
-            />
-          </div>
-
-          <div className="mt-5 space-y-3">
-            <div className="flex items-center justify-between gap-3">
-              <AdminMetaText>{t(msg`优先处理对象`)}</AdminMetaText>
-              <span className="text-xs text-[color:var(--text-muted)]">
-                {formatInteger(
-                  [
-                    budgetFocusItems[0],
-                    topBlockedCharacter,
-                    topDowngradedCharacter,
-                    topTooWeakCharacter,
-                  ].filter(Boolean).length,
-                )}{" "}
-                {t(msg`项`)}
-              </span>
-            </div>
-
-            {budgetFocusItems[0] ||
-            topBlockedCharacter ||
-            topDowngradedCharacter ||
-            topTooWeakCharacter ? (
-              <div className="grid gap-3">
-                {budgetFocusItems[0] ? (
-                  <FocusSignalCard
-                    title={t(msg`预算最紧角色`)}
-                    value={budgetFocusItems[0].characterName}
-                    detail={`${formatBudgetState(resolveBudgetState(budgetFocusItems[0].budget))} · ${t(msg`最高占比`)} ${formatBudgetRatioSummary(budgetFocusItems[0].budget)}`}
-                    tone={
-                      resolveBudgetState(budgetFocusItems[0].budget) ===
-                        "exceeded" ||
-                      resolveBudgetState(budgetFocusItems[0].budget) ===
-                        "warning"
-                        ? "warning"
-                        : "default"
-                    }
-                  />
-                ) : null}
-                {topBlockedCharacter ? (
-                  <FocusSignalCard
-                    title={t(msg`阻断命中最高角色`)}
-                    value={topBlockedCharacter.label}
-                    detail={`${formatInteger(topBlockedCharacter.requestCount)} ${t(msg`次阻断`)}`}
-                    tone="warning"
-                  />
-                ) : null}
-                {topDowngradedCharacter ? (
-                  <FocusSignalCard
-                    title={t(msg`降级命中最高角色`)}
-                    value={topDowngradedCharacter.label}
-                    detail={`${formatInteger(topDowngradedCharacter.requestCount)} ${t(msg`次降级`)}`}
-                    tone="info"
-                  />
-                ) : null}
-                {topTooWeakCharacter ? (
-                  <FocusSignalCard
-                    title={t(msg`质量风险最高角色`)}
-                    value={topTooWeakCharacter.characterName}
-                    detail={`${t(msg`质量偏弱`)} ${formatInteger(topTooWeakCharacter.tooWeakConversationCount)} / ${t(msg`待补结论`)} ${formatInteger(topTooWeakCharacter.pendingOutcomeConversationCount)}`}
-                    tone="warning"
-                  />
-                ) : null}
-              </div>
-            ) : (
-              <AdminEmptyState
-                title={t(msg`当前没有需要优先处理的对象`)}
-                description={t(msg`本时间范围内没有明显预算预警、阻断或降级质量风险。`)}
+            {activeFilterTags.map((item) => (
+              <ActiveFilterPill
+                key={`${item.label}-${item.value}`}
+                label={item.label}
+                value={item.value}
               />
-            )}
+            ))}
           </div>
-        </Card>
-      </div>
+        </div>
+      </Card>
+
+      <Card className="space-y-5 bg-[color:var(--surface-console)]">
+        <AdminSectionHeader
+          title={t(msg`筛选工作台`)}
+          actions={
+            <Button variant="ghost" size="sm" onClick={resetFilters}>
+              {t(msg`重置筛选`)}
+            </Button>
+          }
+        />
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <FilterField label={t(msg`开始日期`)}>
+            <input
+              type="date"
+              value={from}
+              onChange={(event) => setFrom(event.target.value)}
+              className={INPUT_CLASS_NAME}
+            />
+          </FilterField>
+          <FilterField label={t(msg`结束日期`)}>
+            <input
+              type="date"
+              value={to}
+              onChange={(event) => setTo(event.target.value)}
+              className={INPUT_CLASS_NAME}
+            />
+          </FilterField>
+          <FilterField label={t(msg`聚合粒度`)}>
+            <select
+              value={grain}
+              onChange={(event) =>
+                setGrain(event.target.value as "day" | "week" | "month")
+              }
+              className={INPUT_CLASS_NAME}
+            >
+              <option value="day">{t(msg`按天`)}</option>
+              <option value="week">{t(msg`按周`)}</option>
+              <option value="month">{t(msg`按月`)}</option>
+            </select>
+          </FilterField>
+          <FilterField label={t(msg`角色`)}>
+            <select
+              value={characterId}
+              onChange={(event) => setCharacterId(event.target.value)}
+              className={INPUT_CLASS_NAME}
+            >
+              <option value="">{t(msg`全部角色`)}</option>
+              {characters.map((character) => (
+                <option key={character.id} value={character.id}>
+                  {character.name}
+                </option>
+              ))}
+            </select>
+          </FilterField>
+          <FilterField label={t(msg`请求状态`)}>
+            <select
+              value={status}
+              onChange={(event) =>
+                setStatus(event.target.value as "" | TokenUsageStatus)
+              }
+              className={INPUT_CLASS_NAME}
+            >
+              <option value="">{t(msg`全部状态`)}</option>
+              <option value="success">{t(msg`仅成功`)}</option>
+              <option value="failed">{t(msg`仅失败`)}</option>
+            </select>
+          </FilterField>
+          <FilterField label={t(msg`计费来源`)}>
+            <select
+              value={billingSource}
+              onChange={(event) =>
+                setBillingSource(
+                  event.target.value as "" | TokenUsageBillingSource,
+                )
+              }
+              className={INPUT_CLASS_NAME}
+            >
+              <option value="">{t(msg`全部来源`)}</option>
+              <option value="instance_default">{t(msg`实例默认 Key`)}</option>
+              <option value="owner_custom">{t(msg`世界主人 Key`)}</option>
+            </select>
+          </FilterField>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {conversationId ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setConversationId("")}
+            >
+              {t(msg`清除会话聚焦`)}
+            </Button>
+          ) : null}
+          {characterId ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setCharacterId("")}
+            >
+              {t(msg`清除角色筛选`)}
+            </Button>
+          ) : null}
+          {status ? (
+            <Button variant="secondary" size="sm" onClick={() => setStatus("")}>
+              {t(msg`清除状态筛选`)}
+            </Button>
+          ) : null}
+          {billingSource ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setBillingSource("")}
+            >
+              {t(msg`清除计费来源`)}
+            </Button>
+          ) : null}
+        </div>
+      </Card>
 
       {activeWorkspace === "overview" ? (
         <>
@@ -1198,7 +1037,8 @@ export function TokenUsagePage() {
                 title={t(msg`时间趋势`)}
                 actions={
                   <span className="text-xs text-[color:var(--text-muted)]">
-                    {t(msg`请求`)} {formatInteger(overview?.requestCount ?? 0)} {t(msg`次`)}
+                    {t(msg`请求`)} {formatInteger(overview?.requestCount ?? 0)}{" "}
+                    {t(msg`次`)}
                   </span>
                 }
               />
@@ -1225,7 +1065,9 @@ export function TokenUsagePage() {
                   ))}
                 </div>
               ) : (
-                <EmptyState text={t(msg`当前筛选条件下还没有可展示的趋势数据。`)} />
+                <EmptyState
+                  text={t(msg`当前筛选条件下还没有可展示的趋势数据。`)}
+                />
               )}
             </Card>
 
@@ -1276,7 +1118,9 @@ export function TokenUsagePage() {
                   />
                   <FocusSignalCard
                     title={t(msg`价格配置`)}
-                    value={hasConfiguredPricing ? t(msg`已就绪`) : t(msg`待补价格`)}
+                    value={
+                      hasConfiguredPricing ? t(msg`已就绪`) : t(msg`待补价格`)
+                    }
                     detail={
                       hasConfiguredPricing
                         ? `${t(msg`已计价`)} ${formatInteger(configuredPricingCount)} ${t(msg`个模型`)}`
@@ -1362,7 +1206,8 @@ export function TokenUsagePage() {
                         <td className="py-3 pr-4">
                           <div>{formatInteger(record.totalTokens)}</div>
                           <div className="text-xs text-[color:var(--text-muted)]">
-                            {t(msg`输入`)} {formatInteger(record.promptTokens)} / {t(msg`输出`)}{" "}
+                            {t(msg`输入`)} {formatInteger(record.promptTokens)}{" "}
+                            / {t(msg`输出`)}{" "}
                             {formatInteger(record.completionTokens)}
                           </div>
                         </td>
@@ -1378,7 +1223,9 @@ export function TokenUsagePage() {
                                   : "rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700"
                               }
                             >
-                              {record.status === "success" ? t(msg`成功`) : t(msg`失败`)}
+                              {record.status === "success"
+                                ? t(msg`成功`)
+                                : t(msg`失败`)}
                             </span>
                             {record.errorCode ? (
                               <div className="text-xs text-[color:var(--text-muted)]">
@@ -1416,7 +1263,9 @@ export function TokenUsagePage() {
             <div className="mt-5 space-y-5">
               <BudgetStatusPanel
                 title={t(msg`整体预算`)}
-                description={t(msg`按今天和本月累计的真实账本用量来判断是否逼近阈值。`)}
+                description={t(
+                  msg`按今天和本月累计的真实账本用量来判断是否逼近阈值。`,
+                )}
                 status={overallBudgetStatus}
                 currency={currency}
               />
@@ -1514,7 +1363,9 @@ export function TokenUsagePage() {
                       {t(msg`整体预算`)}
                     </div>
                     <div className="text-xs text-[color:var(--text-muted)]">
-                      {t(msg`支持按 token 或费用设置日预算、月预算和预警阈值。`)}
+                      {t(
+                        msg`支持按 token 或费用设置日预算、月预算和预警阈值。`,
+                      )}
                     </div>
                   </div>
                   <label className="flex items-center gap-2 text-xs text-[color:var(--text-secondary)]">
@@ -1638,7 +1489,6 @@ export function TokenUsagePage() {
                     </select>
                   </FilterField>
                   <FilterField label={t(msg`日预算上限`)}>
-
                     <input
                       type="number"
                       min="0"
@@ -1722,7 +1572,9 @@ export function TokenUsagePage() {
                     />
                   ))
                 ) : (
-                  <EmptyState text={t(msg`还没有角色预算配置，点击右上角可以新增。`)} />
+                  <EmptyState
+                    text={t(msg`还没有角色预算配置，点击右上角可以新增。`)}
+                  />
                 )}
               </div>
 
@@ -1732,7 +1584,9 @@ export function TokenUsagePage() {
                   onClick={() => saveBudgetMutation.mutate()}
                   disabled={saveBudgetMutation.isPending}
                 >
-                  {saveBudgetMutation.isPending ? t(msg`保存中...`) : t(msg`保存预算配置`)}
+                  {saveBudgetMutation.isPending
+                    ? t(msg`保存中...`)
+                    : t(msg`保存预算配置`)}
                 </Button>
               </div>
             </div>
@@ -1827,7 +1681,8 @@ export function TokenUsagePage() {
                                 <div className="flex items-center justify-between gap-3 text-xs text-[color:var(--text-secondary)]">
                                   <span>{point.label}</span>
                                   <span>
-                                    {formatInteger(point.requestCount)} {t(msg`次阻断`)}
+                                    {formatInteger(point.requestCount)}{" "}
+                                    {t(msg`次阻断`)}
                                   </span>
                                 </div>
                                 <div className="h-3 rounded-full bg-[color:var(--surface-primary)]">
@@ -1842,13 +1697,17 @@ export function TokenUsagePage() {
                             ))}
                           </div>
                         ) : (
-                          <EmptyState text={t(msg`当前时间范围内没有预算阻断趋势数据。`)} />
+                          <EmptyState
+                            text={t(msg`当前时间范围内没有预算阻断趋势数据。`)}
+                          />
                         )}
                       </div>
                     </div>
                   ) : (
                     <div className="mt-5">
-                      <EmptyState text={t(msg`当前时间范围内没有预算阻断记录。`)} />
+                      <EmptyState
+                        text={t(msg`当前时间范围内没有预算阻断记录。`)}
+                      />
                     </div>
                   )}
                 </Card>
@@ -1875,9 +1734,15 @@ export function TokenUsagePage() {
                     <table className="min-w-full text-left text-sm">
                       <thead className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                         <tr>
-                          <th className="pb-3 pr-4 font-medium">{t(msg`时间`)}</th>
-                          <th className="pb-3 pr-4 font-medium">{t(msg`对象`)}</th>
-                          <th className="pb-3 pr-4 font-medium">{t(msg`场景`)}</th>
+                          <th className="pb-3 pr-4 font-medium">
+                            {t(msg`时间`)}
+                          </th>
+                          <th className="pb-3 pr-4 font-medium">
+                            {t(msg`对象`)}
+                          </th>
+                          <th className="pb-3 pr-4 font-medium">
+                            {t(msg`场景`)}
+                          </th>
                           <th className="pb-3 font-medium">{t(msg`原因`)}</th>
                         </tr>
                       </thead>
@@ -1982,7 +1847,8 @@ export function TokenUsagePage() {
                                 <div className="flex items-center justify-between gap-3 text-xs text-[color:var(--text-secondary)]">
                                   <span>{point.label}</span>
                                   <span>
-                                    {formatInteger(point.requestCount)} {t(msg`次降级`)}
+                                    {formatInteger(point.requestCount)}{" "}
+                                    {t(msg`次降级`)}
                                   </span>
                                 </div>
                                 <div className="h-3 rounded-full bg-[color:var(--surface-primary)]">
@@ -1997,13 +1863,17 @@ export function TokenUsagePage() {
                             ))}
                           </div>
                         ) : (
-                          <EmptyState text={t(msg`当前时间范围内没有预算降级趋势数据。`)} />
+                          <EmptyState
+                            text={t(msg`当前时间范围内没有预算降级趋势数据。`)}
+                          />
                         )}
                       </div>
                     </div>
                   ) : (
                     <div className="mt-5">
-                      <EmptyState text={t(msg`当前时间范围内没有预算降级记录。`)} />
+                      <EmptyState
+                        text={t(msg`当前时间范围内没有预算降级记录。`)}
+                      />
                     </div>
                   )}
                 </Card>
@@ -2030,9 +1900,15 @@ export function TokenUsagePage() {
                     <table className="min-w-full text-left text-sm">
                       <thead className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                         <tr>
-                          <th className="pb-3 pr-4 font-medium">{t(msg`时间`)}</th>
-                          <th className="pb-3 pr-4 font-medium">{t(msg`对象`)}</th>
-                          <th className="pb-3 pr-4 font-medium">{t(msg`场景`)}</th>
+                          <th className="pb-3 pr-4 font-medium">
+                            {t(msg`时间`)}
+                          </th>
+                          <th className="pb-3 pr-4 font-medium">
+                            {t(msg`对象`)}
+                          </th>
+                          <th className="pb-3 pr-4 font-medium">
+                            {t(msg`场景`)}
+                          </th>
                           <th className="pb-3 font-medium">{t(msg`原因`)}</th>
                         </tr>
                       </thead>
@@ -2099,7 +1975,9 @@ export function TokenUsagePage() {
                         {formatInteger(
                           downgradeInsights.untraceableRequestCount,
                         )}{" "}
-                        {t(msg`次降级记录缺少原模型快照，节省金额会按已追踪到的模型切换保守估算。`)}
+                        {t(
+                          msg`次降级记录缺少原模型快照，节省金额会按已追踪到的模型切换保守估算。`,
+                        )}
                       </InlineNotice>
                     ) : null}
 
@@ -2134,15 +2012,21 @@ export function TokenUsagePage() {
                         <table className="min-w-full text-left text-sm">
                           <thead className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                             <tr>
-                              <th className="pb-3 pr-4 font-medium">{t(msg`原模型`)}</th>
+                              <th className="pb-3 pr-4 font-medium">
+                                {t(msg`原模型`)}
+                              </th>
                               <th className="pb-3 pr-4 font-medium">
                                 {t(msg`降级后模型`)}
                               </th>
-                              <th className="pb-3 pr-4 font-medium">{t(msg`请求数`)}</th>
+                              <th className="pb-3 pr-4 font-medium">
+                                {t(msg`请求数`)}
+                              </th>
                               <th className="pb-3 pr-4 font-medium">
                                 {t(msg`实际成本`)}
                               </th>
-                              <th className="pb-3 font-medium">{t(msg`节省`)}</th>
+                              <th className="pb-3 font-medium">
+                                {t(msg`节省`)}
+                              </th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-[color:var(--border-faint)] text-[color:var(--text-secondary)]">
@@ -2150,12 +2034,14 @@ export function TokenUsagePage() {
                               <tr key={`switch-table-${item.key}`}>
                                 <td className="py-3 pr-4">
                                   <div className="font-medium text-[color:var(--text-primary)]">
-                                    {item.requestedModel || t(msg`未记录原模型`)}
+                                    {item.requestedModel ||
+                                      t(msg`未记录原模型`)}
                                   </div>
                                 </td>
                                 <td className="py-3 pr-4">
                                   <div className="font-medium text-[color:var(--text-primary)]">
-                                    {item.appliedModel || t(msg`未记录降级模型`)}
+                                    {item.appliedModel ||
+                                      t(msg`未记录降级模型`)}
                                   </div>
                                 </td>
                                 <td className="py-3 pr-4">
@@ -2188,7 +2074,9 @@ export function TokenUsagePage() {
                         </table>
                       </div>
                     ) : (
-                      <EmptyState text={t(msg`当前时间范围内还没有模型切换洞察数据。`)} />
+                      <EmptyState
+                        text={t(msg`当前时间范围内还没有模型切换洞察数据。`)}
+                      />
                     )}
                   </div>
                 </Card>
@@ -2207,7 +2095,8 @@ export function TokenUsagePage() {
                     title={t(msg`降级质量闭环`)}
                     actions={
                       <span className="text-xs text-[color:var(--text-muted)]">
-                        {t(msg`可追踪会话`)} {formatPercent(downgradeScopedCoverage)}
+                        {t(msg`可追踪会话`)}{" "}
+                        {formatPercent(downgradeScopedCoverage)}
                       </span>
                     }
                   />
@@ -2219,7 +2108,9 @@ export function TokenUsagePage() {
                         {formatInteger(
                           downgradeQuality?.unscopedRequestCount ?? 0,
                         )}{" "}
-                        {t(msg`次降级请求不在会话范围内，因此质量追踪只覆盖可还原的聊天线程。`)}
+                        {t(
+                          msg`次降级请求不在会话范围内，因此质量追踪只覆盖可还原的聊天线程。`,
+                        )}
                       </InlineNotice>
                     ) : null}
 
@@ -2292,13 +2183,19 @@ export function TokenUsagePage() {
                     <div className="grid gap-4">
                       <ReviewSampleList
                         title={t(msg`质量偏弱样本`)}
-                        description={t(msg`这些降级会话已经在复盘中被明确标记为质量偏弱。`)}
+                        description={t(
+                          msg`这些降级会话已经在复盘中被明确标记为质量偏弱。`,
+                        )}
                         samples={tooWeakSamples}
-                        emptyText={t(msg`当前时间范围内没有质量偏弱的降级样本。`)}
+                        emptyText={t(
+                          msg`当前时间范围内没有质量偏弱的降级样本。`,
+                        )}
                       />
                       <ReviewSampleList
                         title={t(msg`等待补结果`)}
-                        description={t(msg`这些会话已经被复盘，但还没有落下可接受或偏弱结论。`)}
+                        description={t(
+                          msg`这些会话已经被复盘，但还没有落下可接受或偏弱结论。`,
+                        )}
                         samples={pendingOutcomeSamples}
                         emptyText={t(msg`当前没有等待补结论的降级样本。`)}
                       />
@@ -2351,13 +2248,17 @@ export function TokenUsagePage() {
             />
             {syncN1nMutation.isSuccess && syncN1nMutation.data ? (
               <InlineNotice tone="success" className="mt-3">
-                {t(msg`已同步`)} {syncN1nMutation.data.catalogItems} {t(msg`个模型单价，并回填`)}{" "}
+                {t(msg`已同步`)} {syncN1nMutation.data.catalogItems}{" "}
+                {t(msg`个模型单价，并回填`)}{" "}
                 {syncN1nMutation.data.recomputedRows} {t(msg`条历史账本费用。`)}
               </InlineNotice>
             ) : null}
             {syncN1nMutation.isError &&
             syncN1nMutation.error instanceof Error ? (
-              <ErrorBlock message={syncN1nMutation.error.message} className="mt-3" />
+              <ErrorBlock
+                message={syncN1nMutation.error.message}
+                className="mt-3"
+              />
             ) : null}
 
             <div className="mt-5 space-y-3">
@@ -2469,7 +2370,9 @@ export function TokenUsagePage() {
                 onClick={() => savePricingMutation.mutate()}
                 disabled={savePricingMutation.isPending}
               >
-                {savePricingMutation.isPending ? t(msg`保存中...`) : t(msg`保存价格配置`)}
+                {savePricingMutation.isPending
+                  ? t(msg`保存中...`)
+                  : t(msg`保存价格配置`)}
               </Button>
             </div>
           </Card>
@@ -2500,17 +2403,27 @@ export function TokenUsagePage() {
               <div className="mt-5 space-y-3">
                 {!hasConfiguredPricing ? (
                   <InlineNotice tone="warning">
-                    {t(msg`当前还没有配置有效模型单价，页面里的估算费用会先按 0 计算。补齐后，新入账请求会开始写入价格快照。`)}
+                    {t(
+                      msg`当前还没有配置有效模型单价，页面里的估算费用会先按 0 计算。补齐后，新入账请求会开始写入价格快照。`,
+                    )}
                   </InlineNotice>
                 ) : null}
 
                 <FocusSignalCard
                   title={t(msg`运营建议`)}
-                  value={hasConfiguredPricing ? t(msg`价格口径已建立`) : t(msg`优先补价格`)}
+                  value={
+                    hasConfiguredPricing
+                      ? t(msg`价格口径已建立`)
+                      : t(msg`优先补价格`)
+                  }
                   detail={
                     hasConfiguredPricing
-                      ? t(msg`后续如果模型价格发生变化，只会影响新入账请求，不会回改历史快照。`)
-                      : t(msg`建议先把高频模型补齐，避免运营判断成本时出现 0 金额误判。`)
+                      ? t(
+                          msg`后续如果模型价格发生变化，只会影响新入账请求，不会回改历史快照。`,
+                        )
+                      : t(
+                          msg`建议先把高频模型补齐，避免运营判断成本时出现 0 金额误判。`,
+                        )
                   }
                   tone={hasConfiguredPricing ? "info" : "warning"}
                 />
@@ -2536,20 +2449,6 @@ type SelectionDeckItem = {
   detail: string;
   badge: string;
   tone?: "default" | "warning" | "success" | "info";
-};
-
-type TokenUsageOperatorAction = {
-  label: string;
-  workspace: TokenUsageWorkspace;
-  exceptionView?: TokenUsageExceptionView;
-};
-
-type TokenUsageOperatorSummary = {
-  title: string;
-  description: string;
-  tone: "warning" | "success" | "info";
-  primaryAction: TokenUsageOperatorAction;
-  secondaryAction?: TokenUsageOperatorAction;
 };
 
 function SelectionDeck({
@@ -2682,109 +2581,6 @@ function QuickRangeButton({
   );
 }
 
-function buildTokenUsageOperatorSummary({
-  hasConfiguredPricing,
-  pricingModelCount,
-  overallBudgetState,
-  budgetAlertCount,
-  blockedRequestCount,
-  downgradedRequestCount,
-  conversationId,
-  activeCharacterName,
-}: {
-  hasConfiguredPricing: boolean;
-  pricingModelCount: number;
-  overallBudgetState: TokenUsageBudgetState;
-  budgetAlertCount: number;
-  blockedRequestCount: number;
-  downgradedRequestCount: number;
-  conversationId: string;
-  activeCharacterName: string;
-}): TokenUsageOperatorSummary {
-  const t = translateRuntimeMessage;
-  if (overallBudgetState === "exceeded") {
-    return {
-      title: t(msg`整体预算已经超限`),
-      description: t(msg`先确认整体预算阈值、降级模型和关键角色预算，避免持续阻断高价值请求。`),
-      tone: "warning",
-      primaryAction: { label: t(msg`去看预算操作`), workspace: "budget" },
-      secondaryAction: {
-        label: t(msg`查看预算阻断`),
-        workspace: "exceptions",
-        exceptionView: "blocked",
-      },
-    };
-  }
-
-  if (blockedRequestCount > 0) {
-    return {
-      title: t(msg`当前已有请求被预算阻断`),
-      description: t(msg`优先回看被挡住的角色和场景，确认是阈值过紧，还是应该改为超限降级。`),
-      tone: "warning",
-      primaryAction: {
-        label: t(msg`打开预算阻断`),
-        workspace: "exceptions",
-        exceptionView: "blocked",
-      },
-      secondaryAction: { label: t(msg`调整预算规则`), workspace: "budget" },
-    };
-  }
-
-  if (overallBudgetState === "warning" || budgetAlertCount > 0) {
-    return {
-      title: t(msg`预算已经进入预警区间`),
-      description: t(msg`当前还没到全面阻断，但已经接近阈值，适合先检查整体预算和高频角色预算。`),
-      tone: "warning",
-      primaryAction: { label: t(msg`检查预算预警`), workspace: "budget" },
-      secondaryAction: { label: t(msg`查看总览趋势`), workspace: "overview" },
-    };
-  }
-
-  if (downgradedRequestCount > 0) {
-    return {
-      title: t(msg`预算降级正在生效`),
-      description: t(msg`建议确认节省是否明显，以及降级后的质量是否还能接受，避免省钱但伤体验。`),
-      tone: "info",
-      primaryAction: {
-        label: t(msg`查看降级效果`),
-        workspace: "exceptions",
-        exceptionView: "quality",
-      },
-      secondaryAction: {
-        label: t(msg`查看降级日志`),
-        workspace: "exceptions",
-        exceptionView: "downgraded",
-      },
-    };
-  }
-
-  if (!hasConfiguredPricing) {
-    return {
-      title: t(msg`费用口径还没有建立`),
-      description: `${t(msg`当前已启用`)} ${formatInteger(pricingModelCount)} ${t(msg`个有价格快照的模型。建议先补齐高频模型单价，避免运营看到 0 成本。`)}`,
-      tone: "warning",
-      primaryAction: { label: t(msg`去补价格`), workspace: "pricing" },
-    };
-  }
-
-  if (conversationId) {
-    return {
-      title: t(msg`当前处于会话级聚焦`),
-      description: `${activeCharacterName ? `${t(msg`正在查看`)} ${activeCharacterName} ${t(msg`的`)}` : t(msg`正在查看`)}${t(msg`单个会话账本，更适合排查具体线程而不是看全局预算。`)}`,
-      tone: "info",
-      primaryAction: { label: t(msg`查看会话总览`), workspace: "overview" },
-    };
-  }
-
-  return {
-    title: t(msg`当前账本运行平稳`),
-    description: t(msg`没有明显预算预警或异常阻断，适合继续观察趋势、角色分布和模型成本结构。`),
-    tone: "success",
-    primaryAction: { label: t(msg`查看总览`), workspace: "overview" },
-    secondaryAction: { label: t(msg`维护价格配置`), workspace: "pricing" },
-  };
-}
-
 function formatBillingSource(value?: TokenUsageBillingSource | null | "") {
   if (value === "owner_custom") {
     return translateRuntimeMessage(msg`世界主人 Key`);
@@ -2856,7 +2652,8 @@ function BudgetStatusPanel({
             {description}
           </div>
           <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-            {t(msg`当前模式：`)}{formatBudgetEnforcement(status.enforcement)}
+            {t(msg`当前模式：`)}
+            {formatBudgetEnforcement(status.enforcement)}
           </div>
           {status.enforcement === "downgrade" ? (
             <div className="mt-1 text-xs text-[color:var(--text-muted)]">
@@ -2906,12 +2703,14 @@ function CharacterBudgetPanel({
             </div>
           ) : null}
           <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-            {t(msg`当前模式：`)}{formatBudgetEnforcement(item.budget.enforcement)}
+            {t(msg`当前模式：`)}
+            {formatBudgetEnforcement(item.budget.enforcement)}
           </div>
           {item.budget.enforcement === "downgrade" ? (
             <div className="mt-1 text-xs text-[color:var(--text-muted)]">
               {t(msg`降级模型：`)}
-              {item.budget.downgradeModel?.trim() || t(msg`未配置，超限后将阻断`)}
+              {item.budget.downgradeModel?.trim() ||
+                t(msg`未配置，超限后将阻断`)}
             </div>
           ) : null}
         </div>
@@ -2964,10 +2763,12 @@ function BudgetPeriodCard({
           {t(msg`已使用`)} {formatBudgetValue(summary.used, metric, currency)}
         </div>
         <div className="text-xs text-[color:var(--text-muted)]">
-          {t(msg`预算上限`)} {formatBudgetValue(summary.limit, metric, currency)}
+          {t(msg`预算上限`)}{" "}
+          {formatBudgetValue(summary.limit, metric, currency)}
         </div>
         <div className="text-xs text-[color:var(--text-muted)]">
-          {t(msg`剩余额度`)} {formatBudgetValue(summary.remaining, metric, currency)}
+          {t(msg`剩余额度`)}{" "}
+          {formatBudgetValue(summary.remaining, metric, currency)}
         </div>
         <div className="text-xs text-[color:var(--text-muted)]">
           {t(msg`预算占比`)} {formatRatio(summary.ratio)}
@@ -3125,7 +2926,9 @@ function CharacterBudgetEditor({
                   : null,
               })
             }
-            placeholder={item.metric === "cost" ? t(msg`例如 10`) : t(msg`例如 100000`)}
+            placeholder={
+              item.metric === "cost" ? t(msg`例如 10`) : t(msg`例如 100000`)
+            }
             className={INPUT_CLASS_NAME}
           />
         </FilterField>
@@ -3142,7 +2945,9 @@ function CharacterBudgetEditor({
                   : null,
               })
             }
-            placeholder={item.metric === "cost" ? t(msg`例如 200`) : t(msg`例如 1000000`)}
+            placeholder={
+              item.metric === "cost" ? t(msg`例如 200`) : t(msg`例如 1000000`)
+            }
             className={INPUT_CLASS_NAME}
           />
         </FilterField>
@@ -3300,8 +3105,8 @@ function DowngradeSwitchCard({
                       (item.appliedModel || t(msg`未记录降级模型`))}
                   </div>
                   <div className="text-xs text-[color:var(--text-muted)]">
-                    {formatInteger(item.requestCount)} {t(msg`次请求`)} / {t(msg`实际`)}{" "}
-                    {formatCost(item.estimatedCost, currency)}
+                    {formatInteger(item.requestCount)} {t(msg`次请求`)} /{" "}
+                    {t(msg`实际`)} {formatCost(item.estimatedCost, currency)}
                   </div>
                 </div>
                 <div className="text-right">
@@ -3309,7 +3114,8 @@ function DowngradeSwitchCard({
                     {formatCost(item.estimatedSavings, currency)}
                   </div>
                   <div className="text-xs text-[color:var(--text-muted)]">
-                    {t(msg`原本`)} {formatCost(item.estimatedOriginalCost, currency)}
+                    {t(msg`原本`)}{" "}
+                    {formatCost(item.estimatedOriginalCost, currency)}
                   </div>
                 </div>
               </div>
@@ -3448,13 +3254,16 @@ function DowngradeCharacterQualityCard({
                   </div>
                   <div className="mt-1 text-xs text-[color:var(--text-muted)]">
                     {formatInteger(item.requestCount)} {t(msg`次降级请求`)} /{" "}
-                    {formatInteger(item.reviewedConversationCount)} {t(msg`条已复盘`)} /{" "}
-                    {formatInteger(item.distinctConversationCount)} {t(msg`个会话`)}
+                    {formatInteger(item.reviewedConversationCount)}{" "}
+                    {t(msg`条已复盘`)} /{" "}
+                    {formatInteger(item.distinctConversationCount)}{" "}
+                    {t(msg`个会话`)}
                   </div>
                 </div>
                 <div className="text-right text-xs text-[color:var(--text-muted)]">
                   <div>
-                    {t(msg`质量偏弱`)} {formatInteger(item.tooWeakConversationCount)}
+                    {t(msg`质量偏弱`)}{" "}
+                    {formatInteger(item.tooWeakConversationCount)}
                   </div>
                   <div className="mt-1">
                     {t(msg`待补结论`)}{" "}
@@ -3569,7 +3378,12 @@ function PriorityBadge({ score }: { score: number }) {
       : score >= 45
         ? "border-amber-200 bg-amber-50 text-amber-700"
         : "border-emerald-200 bg-emerald-50 text-emerald-700";
-  const label = score >= 70 ? t(msg`高优先级`) : score >= 45 ? t(msg`持续关注`) : t(msg`稳定`);
+  const label =
+    score >= 70
+      ? t(msg`高优先级`)
+      : score >= 45
+        ? t(msg`持续关注`)
+        : t(msg`稳定`);
 
   return (
     <span
@@ -3790,15 +3604,27 @@ function formatScene(scene: string) {
     shake_discovery_generate: translateRuntimeMessage(msg`摇一摇候选生成`),
     need_discovery_short_analyze: translateRuntimeMessage(msg`短周期需求分析`),
     need_discovery_daily_analyze: translateRuntimeMessage(msg`每日需求分析`),
-    need_discovery_character_generate: translateRuntimeMessage(msg`需求补位角色生成`),
-    followup_runtime_open_loop_extract: translateRuntimeMessage(msg`主动跟进线索提取`),
-    followup_runtime_handoff_message: translateRuntimeMessage(msg`主动跟进推荐文案生成`),
-    followup_runtime_friend_request_greeting: translateRuntimeMessage(msg`主动跟进好友申请问候`),
-    followup_runtime_friend_request_notice: translateRuntimeMessage(msg`主动跟进好友申请提醒`),
+    need_discovery_character_generate: translateRuntimeMessage(
+      msg`需求补位角色生成`,
+    ),
+    followup_runtime_open_loop_extract: translateRuntimeMessage(
+      msg`主动跟进线索提取`,
+    ),
+    followup_runtime_handoff_message: translateRuntimeMessage(
+      msg`主动跟进推荐文案生成`,
+    ),
+    followup_runtime_friend_request_greeting: translateRuntimeMessage(
+      msg`主动跟进好友申请问候`,
+    ),
+    followup_runtime_friend_request_notice: translateRuntimeMessage(
+      msg`主动跟进好友申请提醒`,
+    ),
     cyber_avatar_incremental: translateRuntimeMessage(msg`赛博分身增量建模`),
     cyber_avatar_deep_refresh: translateRuntimeMessage(msg`赛博分身深度刷新`),
     cyber_avatar_full_rebuild: translateRuntimeMessage(msg`赛博分身全量重建`),
-    cyber_avatar_real_world_brief: translateRuntimeMessage(msg`赛博分身现实摘要`),
+    cyber_avatar_real_world_brief: translateRuntimeMessage(
+      msg`赛博分身现实摘要`,
+    ),
     action_runtime_plan: translateRuntimeMessage(msg`动作执行规划`),
   };
 

@@ -1841,8 +1841,8 @@ function GroupReplyRuntimeCard({
     : (runtime.archiveSummary?.statusCounts ?? null);
   const hasActiveTaskFilter = actorFilter !== "all" || statusFilter !== "all";
   const taskFilterSummary = [
-    `角色：${selectedActorOption?.name ?? "全部角色"}`,
-    `状态：${statusFilter === "all" ? "全部状态" : formatGroupReplyTaskStatus(statusFilter)}`,
+    `${t(msg`角色`)}：${selectedActorOption?.name ?? t(msg`全部角色`)}`,
+    `${t(msg`状态`)}：${statusFilter === "all" ? t(msg`全部状态`) : formatGroupReplyTaskStatus(statusFilter)}`,
   ].join(" · ");
 
   function scrollToTaskSection() {
@@ -1870,30 +1870,30 @@ function GroupReplyRuntimeCard({
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
-        title="群聊回复任务"
+        title={t(msg`群聊回复任务`)}
         actions={
           <div className="flex flex-wrap gap-3">
             <SelectFieldBlock
-              label="状态筛选"
+              label={t(msg`状态筛选`)}
               value={statusFilter}
               onChange={(value) =>
                 setStatusFilter(value as "all" | ReplyLogicGroupReplyTaskStatus)
               }
               options={[
-                { value: "all", label: "全部状态" },
-                { value: "pending", label: "待执行" },
-                { value: "processing", label: "处理中" },
-                { value: "failed", label: "失败" },
-                { value: "cancelled", label: "已取消" },
-                { value: "sent", label: "已发送" },
+                { value: "all", label: t(msg`全部状态`) },
+                { value: "pending", label: t(msg`待执行`) },
+                { value: "processing", label: t(msg`处理中`) },
+                { value: "failed", label: t(msg`失败`) },
+                { value: "cancelled", label: t(msg`已取消`) },
+                { value: "sent", label: t(msg`已发送`) },
               ]}
             />
             <SelectFieldBlock
-              label="角色筛选"
+              label={t(msg`角色筛选`)}
               value={actorFilter}
               onChange={setActorFilter}
               options={[
-                { value: "all", label: "全部角色" },
+                { value: "all", label: t(msg`全部角色`) },
                 ...actorOptions.map((actor) => ({
                   value: actor.id,
                   label: actor.name,
@@ -1901,14 +1901,14 @@ function GroupReplyRuntimeCard({
               ]}
             />
             <SelectFieldBlock
-              label="清理保留期"
+              label={t(msg`清理保留期`)}
               value={cleanupDays}
               onChange={setCleanupDays}
               options={[
-                { value: "3", label: "保留 3 天" },
-                { value: "7", label: "保留 7 天" },
-                { value: "14", label: "保留 14 天" },
-                { value: "30", label: "保留 30 天" },
+                { value: "3", label: t(msg`保留 3 天`) },
+                { value: "7", label: t(msg`保留 7 天`) },
+                { value: "14", label: t(msg`保留 14 天`) },
+                { value: "30", label: t(msg`保留 30 天`) },
               ]}
             />
             <Button
@@ -1918,7 +1918,7 @@ function GroupReplyRuntimeCard({
               disabled={cleanupMutation.isPending}
               className="self-end"
             >
-              {cleanupMutation.isPending ? "清理中..." : "清理终态任务"}
+              {cleanupMutation.isPending ? t(msg`清理中...`) : t(msg`清理终态任务`)}
             </Button>
           </div>
         }
@@ -2324,7 +2324,7 @@ function GroupReplyRuntimeCard({
                                 issue.status === "failed" ? "warning" : "muted"
                               }
                             >
-                              {issue.status === "failed" ? "失败" : "取消"}
+                              {issue.status === "failed" ? t(msg`失败`) : t(msg`取消`)}
                             </StatusPill>
                             <StatusPill tone="muted">
                               {issue.source === "error_message"
