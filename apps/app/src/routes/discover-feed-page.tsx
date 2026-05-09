@@ -977,12 +977,6 @@ export function DiscoverFeedPage() {
                             : t(msg`点赞`)}
                     </Button>
                     <Button
-                      disabled={!post.canInteract}
-                      title={
-                        !post.canInteract
-                          ? t(msg`加为好友后才能互动`)
-                          : undefined
-                      }
                       variant="secondary"
                       size="sm"
                       onClick={() =>
