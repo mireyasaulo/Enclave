@@ -18,9 +18,30 @@ msgid "404"
 msgstr "404"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-footer.tsx:10
-msgid "一个属于你的 AI 虚拟世界。私人居民、动态、群聊、电话——浏览器即开即用。"
-msgstr "あなただけの AI バーチャルワールド。プライベートな住人・モーメンツ・グループチャット・通話 — ブラウザで開くだけ。"
+#: apps/site/src/components/capability-grid.tsx:11
+#: apps/site/src/components/site-header.tsx:16
+msgid "核心能力"
+msgstr "コア機能"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/cross-platform-section.tsx:28
+#: apps/site/src/components/site-header.tsx:17
+msgid "跨端"
+msgstr "クロスプラットフォーム"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/faq-accordion.tsx:39
+#: apps/site/src/components/site-header.tsx:18
+msgid "FAQ"
+msgstr "FAQ"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/download/page.tsx:23
+#: apps/site/src/app/manifest.ts:71
+#: apps/site/src/components/site-footer.tsx:13
+#: apps/site/src/components/site-header.tsx:19
+msgid "下载"
+msgstr "ダウンロード"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:212
@@ -34,12 +55,34 @@ msgid "免费开始"
 msgstr "無料で始める"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/download/page.tsx:23
-#: apps/site/src/app/manifest.ts:71
-#: apps/site/src/components/site-footer.tsx:13
-#: apps/site/src/components/site-header.tsx:19
-msgid "下载"
-msgstr "ダウンロード"
+#: apps/site/src/components/site-header.tsx:21
+msgid "打开菜单"
+msgstr "メニューを開く"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:22
+msgid "关闭菜单"
+msgstr "メニューを閉じる"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:23
+msgid "隐界"
+msgstr "Enclave"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:24
+msgid "Enclave 首页"
+msgstr "Enclave ホーム"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-header.tsx:25
+msgid "语言"
+msgstr "言語"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/site-footer.tsx:10
+msgid "一个属于你的 AI 虚拟世界。私人居民、动态、群聊、电话——浏览器即开即用。"
+msgstr "あなただけの AI バーチャルワールド。プライベートな住人・モーメンツ・グループチャット・通話 — ブラウザで開くだけ。"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/changelog/page.tsx:26
@@ -74,47 +117,39 @@ msgid "隐界 · Enclave"
 msgstr "Enclave"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/capability-grid.tsx:11
-#: apps/site/src/components/site-header.tsx:16
-msgid "核心能力"
-msgstr "コア機能"
+#: apps/site/src/components/site-footer.tsx:37
+msgid "MIT License"
+msgstr "MIT License"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:28
-#: apps/site/src/components/site-header.tsx:17
-msgid "跨端"
-msgstr "クロスプラットフォーム"
+#: apps/site/src/components/one-person-world.tsx:39
+msgid "理念"
+msgstr "理念"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/faq-accordion.tsx:39
-#: apps/site/src/components/site-header.tsx:18
-msgid "FAQ"
-msgstr "FAQ"
+#: apps/site/src/components/one-person-world.tsx:40
+msgid "属于你的，就只属于你"
+msgstr "あなたのものは、あなただけのもの"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:21
-msgid "打开菜单"
-msgstr "メニューを開く"
+#: apps/site/src/components/one-person-world.tsx:41
+msgid "隐界为每个人单独搭建一个私人 AI 世界。你的居民、你的关系、你的故事——别人看不到，平台也不会拿去训练。"
+msgstr "エンクレイブはユーザーごとにプライベートな AI 世界を提供します。住人・関係性・物語は誰にも見られず、外部モデルの学習にも使いません。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:22
-msgid "关闭菜单"
-msgstr "メニューを閉じる"
+#: apps/site/src/components/multi-platform-carousel.tsx:54
+msgid "产品截图"
+msgstr "スクリーンショット"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:23
-msgid "隐界"
-msgstr "Enclave"
+#: apps/site/src/components/multi-platform-carousel.tsx:55
+msgid "从入坑到日常使用"
+msgstr "オンボーディングから日常使いまで"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:24
-msgid "Enclave 首页"
-msgstr "Enclave ホーム"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/site-header.tsx:25
-msgid "语言"
-msgstr "言語"
+#: apps/site/src/components/multi-platform-carousel.tsx:56
+msgid "六个核心场景一起看，画面均来自当前线上版本。"
+msgstr "6 つのコアシーンを一望。画面はすべて公開中のバージョンから。"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/hero-section.tsx:10
@@ -173,6 +208,17 @@ msgid "注册即用，无需安装"
 msgstr "登録するだけ、インストール不要"
 
 #. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:171
+#: apps/site/src/components/faq-accordion.tsx:38
+msgid "常见问题"
+msgstr "よくある質問"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/faq-accordion.tsx:40
+msgid "没找到你的问题？欢迎邮件联系我们。"
+msgstr "ご質問が見つかりませんか？お気軽にメールでお問い合わせください。"
+
+#. js-lingui-explicit-id
 #: apps/site/src/components/get-started-cta.tsx:11
 msgid "立即开始"
 msgstr "今すぐ開始"
@@ -224,40 +270,20 @@ msgid "MIT 协议，代码全部公开"
 msgstr "MIT ライセンス、全コード公開"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:171
-#: apps/site/src/components/faq-accordion.tsx:38
-msgid "常见问题"
-msgstr "よくある質問"
+#: apps/site/src/components/capability-grid.tsx:12
+msgid "不是 chatbot，而是一整个生态"
+msgstr "チャットボットではない、ひとつのエコシステム"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/faq-accordion.tsx:40
-msgid "没找到你的问题？欢迎邮件联系我们。"
-msgstr "ご質問が見つかりませんか？お気軽にメールでお問い合わせください。"
+#: apps/site/src/components/capability-grid.tsx:13
+msgid "为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。"
+msgstr "日常の寄り添いと深い対話のために設計された AI ソーシャル体験。すべて稼働中の機能です。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/one-person-world.tsx:39
-msgid "理念"
-msgstr "理念"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/one-person-world.tsx:40
-msgid "属于你的，就只属于你"
-msgstr "あなたのものは、あなただけのもの"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/one-person-world.tsx:41
-msgid "隐界为每个人单独搭建一个私人 AI 世界。你的居民、你的关系、你的故事——别人看不到，平台也不会拿去训练。"
-msgstr "エンクレイブはユーザーごとにプライベートな AI 世界を提供します。住人・関係性・物語は誰にも見られず、外部モデルの学習にも使いません。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/download-cards.tsx:116
-msgid "推荐"
-msgstr "おすすめ"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/download-cards.tsx:121
-msgid "敬请期待"
-msgstr "近日公開"
+#: apps/site/src/app/[locale]/use-cases/page.tsx:119
+#: apps/site/src/components/capability-grid.tsx:14
+msgid "查看用例"
+msgstr "ユースケースを読む"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/cross-platform-section.tsx:29
@@ -290,19 +316,65 @@ msgid "Windows / macOS / Linux"
 msgstr "Windows / macOS / Linux"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:54
-msgid "产品截图"
-msgstr "スクリーンショット"
+#: apps/site/src/components/breadcrumb-nav.tsx:25
+#: apps/site/src/components/seo/breadcrumbs-json-ld.tsx:24
+msgid "首页"
+msgstr "ホーム"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:55
-msgid "从入坑到日常使用"
-msgstr "オンボーディングから日常使いまで"
+#: apps/site/src/components/breadcrumb-nav.tsx:34
+msgid "面包屑导航"
+msgstr "パンくずリスト"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:56
-msgid "六个核心场景一起看，画面均来自当前线上版本。"
-msgstr "6 つのコアシーンを一望。画面はすべて公開中のバージョンから。"
+#: apps/site/src/components/download-cards.tsx:116
+msgid "推荐"
+msgstr "おすすめ"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/download-cards.tsx:121
+msgid "敬请期待"
+msgstr "近日公開"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx:13
+msgid "如何开始使用隐界"
+msgstr "エンクレイブの始め方"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx:14
+msgid "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
+msgstr "エンクレイブを始める3つの方法：ブラウザですぐ使う、デスクトップアプリでネイティブ体験、セルフホストで完全に自分のものにする。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx:22
+msgid "打开网页版（最快）"
+msgstr "ウェブ版を開く（最短）"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx:23
+msgid "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
+msgstr "「今すぐ始める」をクリックすれば、インストール不要でブラウザ上にエンクレイブの世界が開きます。初めての方におすすめ。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx:31
+msgid "下载桌面端（更顺手）"
+msgstr "デスクトップ版をダウンロード（より快適に）"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx:32
+msgid "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
+msgstr "GitHub Releases から Windows または macOS インストーラーを入手すると、ネイティブ動作・トレイ常駐・ロック画面通知が使えます。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx:40
+msgid "自部署（最自主）"
+msgstr "セルフホスト（完全に自分のもの）"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/seo/howto-json-ld.tsx:41
+msgid "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
+msgstr "リポジトリをクローンしてデプロイ手順に従い、自分専用のインスタンスを立ち上げましょう。データは 100% 自分のマシンに残り、ライセンスは MIT です。"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/manifest.ts:12
@@ -339,33 +411,6 @@ msgstr "AI のタイムライン"
 #: apps/site/src/components/seo/site-json-ld.tsx:28
 msgid "自部署 AI 应用"
 msgstr "セルフホスト型 AI アプリ"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/capability-grid.tsx:12
-msgid "不是 chatbot，而是一整个生态"
-msgstr "チャットボットではない、ひとつのエコシステム"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/capability-grid.tsx:13
-msgid "为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。"
-msgstr "日常の寄り添いと深い対話のために設計された AI ソーシャル体験。すべて稼働中の機能です。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/page.tsx:119
-#: apps/site/src/components/capability-grid.tsx:14
-msgid "查看用例"
-msgstr "ユースケースを読む"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/breadcrumb-nav.tsx:25
-#: apps/site/src/components/seo/breadcrumbs-json-ld.tsx:24
-msgid "首页"
-msgstr "ホーム"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/breadcrumb-nav.tsx:34
-msgid "面包屑导航"
-msgstr "パンくずリスト"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/seo/home-json-ld.tsx:36
@@ -466,6 +511,78 @@ msgid "%s · 隐界 Enclave"
 msgstr "%s · 隐界 Enclave"
 
 #. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:26
+msgid "隐界 Enclave 服务条款：开源协议、合理使用、订阅与计费、免责声明。"
+msgstr "エンクレイブ利用規約：オープンソースライセンス、適切な利用、サブスクと請求、免責事項。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:76
+#: apps/site/src/app/[locale]/terms/page.tsx:76
+msgid "最近更新："
+msgstr "最終更新："
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:82
+msgid "一、开源许可"
+msgstr "一、オープンソースライセンス"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:85
+msgid "隐界以 MIT 许可证发布。你可以自由使用、修改、分发本项目源代码与产物，包括商业用途，请遵循 MIT 协议中的署名要求。"
+msgstr "エンクレイブは MIT ライセンスで公開されています。MIT ライセンスの帰属表示を遵守する限り、ソースおよび成果物を自由に使用・改変・再配布できます（商用利用を含む）。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:92
+msgid "二、合理使用"
+msgstr "二、適切な利用"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:95
+msgid "请不要利用隐界从事违反所在国家或地区法律的活动；不要将其用于骚扰、欺诈、传播虚假信息或制造伤害。AI 角色生成的内容由用户负责审阅与判断，不视为隐界开发者的立场或建议。"
+msgstr "ご利用地域の法律に違反する活動、嫌がらせ、詐欺、虚偽情報の拡散、他者への加害目的でエンクレイブを利用しないでください。AI が生成するコンテンツの確認・判断はユーザーの責任であり、エンクレイブ開発者の立場や推奨を表すものではありません。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:102
+msgid "三、订阅与计费"
+msgstr "三、サブスクと請求"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:105
+msgid "若你选择官方托管的云服务并购买订阅，账单与你接入的模型供应商绑定，按使用量结算。订阅可随时取消，未使用部分按月按比例退还。"
+msgstr "マネージドクラウドのサブスクをご利用の場合、請求は接続したモデルプロバイダーに紐づき、使用量ベースで計算されます。いつでも解約可能で、未使用分は月割りで返金されます。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:112
+msgid "四、免责声明"
+msgstr "四、免責事項"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:115
+msgid "本软件按现状提供，不对适销性、特定用途适用性、不侵权或可用性作任何明示或暗示担保。在适用法律允许的最大范围内，作者与贡献者不承担因使用本软件而产生的任何损失。"
+msgstr "本ソフトウェアは現状のまま提供され、商品性、特定目的への適合性、非侵害性、可用性のいずれも明示・黙示を問わず保証されません。適用法が許す最大限の範囲で、作者および貢献者はソフトウェアの利用により生じた損害について一切責任を負いません。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:122
+msgid "五、变更"
+msgstr "五、変更"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:125
+msgid "条款可能根据法律法规与产品演进调整，重大变更我们会在仓库与本页公告。"
+msgstr "本規約は法令や製品の発展に応じて改定されることがあります。重要な変更はリポジトリおよび本ページにてお知らせします。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:132
+#: apps/site/src/app/[locale]/terms/page.tsx:130
+msgid "六、联系我们"
+msgstr "六、お問い合わせ"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/terms/page.tsx:132
+msgid "如对条款有任何疑问，请发邮件至 yuanzui0728@gmail.com。"
+msgstr "規約に関するご質問は yuanzui0728@gmail.com までメールでお寄せください。"
+
+#. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/use-cases/page.tsx:28
 msgid "看看真实场景下隐界能做什么：长期 AI 陪伴、多角色群聊、自部署隐私优先。"
 msgstr "実際の使い方を見てみよう：長期 AI コンパニオン、複数キャラの群チャット、セルフホストでのプライバシー優先運用。"
@@ -484,92 +601,6 @@ msgstr "みんなはエンクレイブをこう使っている"
 #: apps/site/src/app/[locale]/use-cases/page.tsx:90
 msgid "下面这些用例不是虚构的 demo，而是社区里真实在跑的玩法。挑一个最像你的场景看看。"
 msgstr "以下は架空のデモではなく、コミュニティで実際に動いている遊び方です。あなたに近いシナリオから読んでみてください。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:26
-msgid "隐界 Enclave 服务条款：开源协议、合理使用、订阅与计费、免责声明。"
-msgstr "エンクレイブ利用規約：オープンソースライセンス、適切な利用、サブスクと請求、免責事項。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:88
-msgid "一、开源许可"
-msgstr "一、オープンソースライセンス"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:91
-msgid "隐界以 MIT 许可证发布。你可以自由使用、修改、分发本项目源代码与产物，包括商业用途，请遵循 MIT 协议中的署名要求。"
-msgstr "エンクレイブは MIT ライセンスで公開されています。MIT ライセンスの帰属表示を遵守する限り、ソースおよび成果物を自由に使用・改変・再配布できます（商用利用を含む）。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:98
-msgid "二、合理使用"
-msgstr "二、適切な利用"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:101
-msgid "请不要利用隐界从事违反所在国家或地区法律的活动；不要将其用于骚扰、欺诈、传播虚假信息或制造伤害。AI 角色生成的内容由用户负责审阅与判断，不视为隐界开发者的立场或建议。"
-msgstr "ご利用地域の法律に違反する活動、嫌がらせ、詐欺、虚偽情報の拡散、他者への加害目的でエンクレイブを利用しないでください。AI が生成するコンテンツの確認・判断はユーザーの責任であり、エンクレイブ開発者の立場や推奨を表すものではありません。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:108
-msgid "三、订阅与计费"
-msgstr "三、サブスクと請求"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:111
-msgid "若你选择官方托管的云服务并购买订阅，账单与你接入的模型供应商绑定，按使用量结算。订阅可随时取消，未使用部分按月按比例退还。"
-msgstr "マネージドクラウドのサブスクをご利用の場合、請求は接続したモデルプロバイダーに紐づき、使用量ベースで計算されます。いつでも解約可能で、未使用分は月割りで返金されます。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:118
-msgid "四、免责声明"
-msgstr "四、免責事項"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:121
-msgid "本软件按现状提供，不对适销性、特定用途适用性、不侵权或可用性作任何明示或暗示担保。在适用法律允许的最大范围内，作者与贡献者不承担因使用本软件而产生的任何损失。"
-msgstr "本ソフトウェアは現状のまま提供され、商品性、特定目的への適合性、非侵害性、可用性のいずれも明示・黙示を問わず保証されません。適用法が許す最大限の範囲で、作者および貢献者はソフトウェアの利用により生じた損害について一切責任を負いません。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:128
-msgid "五、变更"
-msgstr "五、変更"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:131
-msgid "条款可能根据法律法规与产品演进调整，重大变更我们会在仓库与本页公告。"
-msgstr "本規約は法令や製品の発展に応じて改定されることがあります。重要な変更はリポジトリおよび本ページにてお知らせします。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:138
-#: apps/site/src/app/[locale]/terms/page.tsx:136
-msgid "六、联系我们"
-msgstr "六、お問い合わせ"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/terms/page.tsx:138
-msgid "如对条款有任何疑问，请发邮件至 yuanzui0728@gmail.com。"
-msgstr "規約に関するご質問は yuanzui0728@gmail.com までメールでお寄せください。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/download/page.tsx:24
-msgid "挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。"
-msgstr "あなたに合った方法でエンクレイブを開始：Web 版はすぐに使え、デスクトップ版でさらに深く、セルフホストで完全な自由を。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/download/page.tsx:66
-msgid "开始使用"
-msgstr "はじめる"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/download/page.tsx:69
-msgid "挑一种最顺手的方式开始用隐界"
-msgstr "あなたに合った形で隐界を始めましょう"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/download/page.tsx:72
-msgid "浏览器即开即用，桌面端体验更佳；移动端与小程序在路上。所有数据云端同步。"
-msgstr "ブラウザですぐに利用でき、本格利用にはデスクトップ版がおすすめ。モバイルアプリとミニプログラムは準備中。すべてクラウドで同期します。"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:150
@@ -592,6 +623,86 @@ msgid "看看其它用例"
 msgstr "他のユースケースも見る"
 
 #. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:26
+msgid "隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。"
+msgstr "エンクレイブがあなたのデータを収集・保存・利用する方法。セルフホストとマネージドクラウドの両方をカバーします。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:82
+msgid "一、我们的隐私立场"
+msgstr "一、当社のプライバシー方針"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:85
+msgid "隐界采用一人一世界的独立实例架构。除非你主动选择官方托管的云服务，否则你的数据保存在你自己部署的实例里，与任何中央服务器无关。"
+msgstr "エンクレイブはひとりにひとつのインスタンス構成で動作します。マネージドクラウドを選択しない限り、データはご自身のインスタンス内にのみ保存され、いかなる中央サーバーとも切り離されています。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:92
+msgid "二、自部署用户"
+msgstr "二、セルフホストユーザー"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:95
+msgid "你完全控制数据存放位置（本地数据库 / 自有服务器 / 云盘）。隐界不会向第三方发送任何用户数据，除非你显式连接外部模型供应商；此时仅相关对话内容根据你的配置发送给该供应商。"
+msgstr "データの保管先（ローカル DB／自己サーバー／クラウド）はあなたが完全にコントロールします。外部モデルプロバイダーを明示的に接続した場合を除き、エンクレイブが第三者にユーザーデータを送信することはありません。接続時にも、設定に応じた会話のみが送信されます。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:102
+msgid "三、托管云服务用户"
+msgstr "三、マネージドクラウドユーザー"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:105
+msgid "如选择官方托管，我们仅采集运行所需的最少数据：账号标识、订阅状态、错误堆栈与请求日志。这些数据不会用于广告，也不会与第三方共享，仅用于服务运维与计费。"
+msgstr "マネージドクラウドを利用する場合、当社はサービス稼働に必要な最小限のデータ（アカウント識別子、サブスク状態、エラースタック、リクエストログ）のみを収集します。これらは広告に利用せず、第三者にも共有しません。運用・請求のみに使用します。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:112
+msgid "四、模型供应商"
+msgstr "四、モデルプロバイダー"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:115
+msgid "AI 对话内容会按你的配置发送给所选模型供应商（OpenAI、Anthropic、Google、DeepSeek 等，或你自部署的本地模型）。具体数据处理方式请参考各供应商的隐私政策。"
+msgstr "AI 会話の内容は、設定に従って選択したモデルプロバイダー（OpenAI、Anthropic、Google、DeepSeek など、またはセルフホストモデル）に送信されます。各プロバイダーのプライバシーポリシーをご参照ください。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:122
+msgid "五、你的权利"
+msgstr "五、あなたの権利"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:125
+msgid "你可以随时导出全部数据、迁移到其他实例、永久删除自己的世界。我们不会保留任何无法删除的数据副本。"
+msgstr "いつでも全データのエクスポート、他インスタンスへの移行、世界の完全削除が可能です。当社が削除できないコピーを保持することはありません。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/privacy/page.tsx:135
+msgid "有任何隐私相关疑问，请发邮件至 yuanzui0728@gmail.com。"
+msgstr "プライバシーに関するご質問は yuanzui0728@gmail.com までメールでお寄せください。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/download/page.tsx:24
+msgid "挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。"
+msgstr "あなたに合った方法でエンクレイブを開始：Web 版はすぐに使え、デスクトップ版でさらに深く、セルフホストで完全な自由を。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/download/page.tsx:66
+msgid "开始使用"
+msgstr "はじめる"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/download/page.tsx:69
+msgid "挑一种最顺手的方式开始用隐界"
+msgstr "あなたに合った形で隐界を始めましょう"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/download/page.tsx:72
+msgid "浏览器即开即用，桌面端体验更佳；移动端与小程序在路上。所有数据云端同步。"
+msgstr "ブラウザですぐに利用でき、本格利用にはデスクトップ版がおすすめ。モバイルアプリとミニプログラムは準備中。すべてクラウドで同期します。"
+
+#. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/changelog/page.tsx:27
 msgid "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
 msgstr "エンクレイブの各バージョンで何が入ったか：新機能、改善、修正、そしてその背景にある判断。"
@@ -610,106 +721,6 @@ msgstr "GitHub Releases で全リリースを見る"
 #: apps/site/src/app/[locale]/changelog/page.tsx:113
 msgid "GitHub Release"
 msgstr "GitHub Release"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:26
-msgid "隐界如何采集、存储、使用你的数据。包含自部署用户与托管云用户两种场景。"
-msgstr "エンクレイブがあなたのデータを収集・保存・利用する方法。セルフホストとマネージドクラウドの両方をカバーします。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:88
-msgid "一、我们的隐私立场"
-msgstr "一、当社のプライバシー方針"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:91
-msgid "隐界采用一人一世界的独立实例架构。除非你主动选择官方托管的云服务，否则你的数据保存在你自己部署的实例里，与任何中央服务器无关。"
-msgstr "エンクレイブはひとりにひとつのインスタンス構成で動作します。マネージドクラウドを選択しない限り、データはご自身のインスタンス内にのみ保存され、いかなる中央サーバーとも切り離されています。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:98
-msgid "二、自部署用户"
-msgstr "二、セルフホストユーザー"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:101
-msgid "你完全控制数据存放位置（本地数据库 / 自有服务器 / 云盘）。隐界不会向第三方发送任何用户数据，除非你显式连接外部模型供应商；此时仅相关对话内容根据你的配置发送给该供应商。"
-msgstr "データの保管先（ローカル DB／自己サーバー／クラウド）はあなたが完全にコントロールします。外部モデルプロバイダーを明示的に接続した場合を除き、エンクレイブが第三者にユーザーデータを送信することはありません。接続時にも、設定に応じた会話のみが送信されます。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:108
-msgid "三、托管云服务用户"
-msgstr "三、マネージドクラウドユーザー"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:111
-msgid "如选择官方托管，我们仅采集运行所需的最少数据：账号标识、订阅状态、错误堆栈与请求日志。这些数据不会用于广告，也不会与第三方共享，仅用于服务运维与计费。"
-msgstr "マネージドクラウドを利用する場合、当社はサービス稼働に必要な最小限のデータ（アカウント識別子、サブスク状態、エラースタック、リクエストログ）のみを収集します。これらは広告に利用せず、第三者にも共有しません。運用・請求のみに使用します。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:118
-msgid "四、模型供应商"
-msgstr "四、モデルプロバイダー"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:121
-msgid "AI 对话内容会按你的配置发送给所选模型供应商（OpenAI、Anthropic、Google、DeepSeek 等，或你自部署的本地模型）。具体数据处理方式请参考各供应商的隐私政策。"
-msgstr "AI 会話の内容は、設定に従って選択したモデルプロバイダー（OpenAI、Anthropic、Google、DeepSeek など、またはセルフホストモデル）に送信されます。各プロバイダーのプライバシーポリシーをご参照ください。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:128
-msgid "五、你的权利"
-msgstr "五、あなたの権利"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:131
-msgid "你可以随时导出全部数据、迁移到其他实例、永久删除自己的世界。我们不会保留任何无法删除的数据副本。"
-msgstr "いつでも全データのエクスポート、他インスタンスへの移行、世界の完全削除が可能です。当社が削除できないコピーを保持することはありません。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/privacy/page.tsx:141
-msgid "有任何隐私相关疑问，请发邮件至 yuanzui0728@gmail.com。"
-msgstr "プライバシーに関するご質問は yuanzui0728@gmail.com までメールでお寄せください。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:13
-msgid "如何开始使用隐界"
-msgstr "エンクレイブの始め方"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:14
-msgid "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
-msgstr "エンクレイブを始める3つの方法：ブラウザですぐ使う、デスクトップアプリでネイティブ体験、セルフホストで完全に自分のものにする。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:22
-msgid "打开网页版（最快）"
-msgstr "ウェブ版を開く（最短）"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:23
-msgid "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
-msgstr "「今すぐ始める」をクリックすれば、インストール不要でブラウザ上にエンクレイブの世界が開きます。初めての方におすすめ。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:31
-msgid "下载桌面端（更顺手）"
-msgstr "デスクトップ版をダウンロード（より快適に）"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:32
-msgid "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
-msgstr "GitHub Releases から Windows または macOS インストーラーを入手すると、ネイティブ動作・トレイ常駐・ロック画面通知が使えます。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:40
-msgid "自部署（最自主）"
-msgstr "セルフホスト（完全に自分のもの）"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:41
-msgid "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
-msgstr "リポジトリをクローンしてデプロイ手順に従い、自分専用のインスタンスを立ち上げましょう。データは 100% 自分のマシンに残り、ライセンスは MIT です。"
 
 #: apps/site/src/lib/changelog-data.ts:35
 msgid "\"自己\"角色 × 赛博分身闭环：self-agent 路由 + 管理后台控制台 + Cyber Avatar real_world_sync"
