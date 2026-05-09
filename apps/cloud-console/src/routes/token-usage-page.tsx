@@ -785,11 +785,11 @@ function PricingTab() {
       void queryClient.invalidateQueries({
         queryKey: ["token-usage", "pricing"],
       });
+      void queryClient.invalidateQueries({ queryKey: ["token-usage"] });
       showNotice(
-        t("Synced {count} models from n1n.ai").replace(
-          "{count}",
-          String(data.upserted),
-        ),
+        t("Synced {count} models, recomputed {days} days of cost.")
+          .replace("{count}", String(data.upserted))
+          .replace("{days}", String(data.recomputedDays)),
       );
     },
     onError: (error: unknown) => showCloudAdminErrorNotice(showNotice, error),

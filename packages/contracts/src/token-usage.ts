@@ -377,6 +377,8 @@ export interface CloudTokenPricingSyncResult {
   fetchedAt: string;
   upserted: number;
   skipped: number;
+  recomputedDays: number;
+  recomputedRows: number;
 }
 
 export interface TokenUsageDowngradeQualityInsights {
