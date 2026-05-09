@@ -81,7 +81,7 @@ export function AdminSessionFilterControls({
         >
           {ADMIN_SESSION_STATUS_FILTERS.map((value) => (
             <option key={value} value={value}>
-              {formatAdminSessionStatusFilterLabel(value)}
+              {t(formatAdminSessionStatusFilterLabel(value))}
             </option>
           ))}
         </select>
@@ -99,7 +99,7 @@ export function AdminSessionFilterControls({
         >
           {ADMIN_SESSION_REASON_FILTERS.map((value) => (
             <option key={value} value={value}>
-              {formatAdminSessionReasonFilterLabel(value)}
+              {t(formatAdminSessionReasonFilterLabel(value))}
             </option>
           ))}
         </select>
@@ -115,7 +115,7 @@ export function AdminSessionFilterControls({
         >
           {ADMIN_SESSION_SCOPE_FILTERS.map((value) => (
             <option key={value} value={value}>
-              {formatAdminSessionScopeLabel(value)}
+              {t(formatAdminSessionScopeLabel(value))}
             </option>
           ))}
         </select>
@@ -131,7 +131,7 @@ export function AdminSessionFilterControls({
         >
           {ADMIN_SESSION_SORT_FIELDS.map((value) => (
             <option key={value} value={value}>
-              {formatAdminSessionSortFieldLabel(value)}
+              {t(formatAdminSessionSortFieldLabel(value))}
             </option>
           ))}
         </select>
@@ -149,7 +149,7 @@ export function AdminSessionFilterControls({
         >
           {ADMIN_SESSION_SORT_DIRECTIONS.map((value) => (
             <option key={value} value={value}>
-              {formatAdminSessionSortDirectionLabel(value)}
+              {t(formatAdminSessionSortDirectionLabel(value))}
             </option>
           ))}
         </select>

@@ -171,7 +171,7 @@ function renderRevocationDetails(session: CloudAdminSessionSummary) {
         {formatDateTime(session.revokedAt)}
       </div>
       <div className="text-xs text-[color:var(--text-primary)]">
-        {formatRevocationReason(session.revocationReason)}
+        {translateCloudConsoleTextForActiveLocale(formatRevocationReason(session.revocationReason))}
       </div>
       <div
         className="max-w-[18rem] truncate font-mono text-[11px] text-[color:var(--text-muted)]"
@@ -1244,7 +1244,7 @@ export function AdminSessionsPage() {
 
   function describeSourceRiskSelection() {
     return hasSourceRiskFilter
-      ? `Risk filter: ${formatSourceGroupRiskFilterLabel(filters.sourceRiskLevel)}.`
+      ? t("Risk filter: {0}.").replace("{0}", t(formatSourceGroupRiskFilterLabel(filters.sourceRiskLevel)))
       : getAdminSessionSourceRiskSelectionPrompt(locale);
   }
 
@@ -2045,27 +2045,29 @@ export function AdminSessionsPage() {
   const filteredRevokeDescription =
     filters.scope === "current"
       ? hasSourceFocus
-        ? "This will revoke the current active admin session if it still matches the focused source group and current filters."
-        : "This will revoke the current active admin session if it still matches the current filters."
+        ? t("This will revoke the current active admin session if it still matches the focused source group and current filters.")
+        : t("This will revoke the current active admin session if it still matches the current filters.")
       : hasSourceFocus
-        ? "This will revoke every active admin session in the focused source group that still matches the current filters, including sessions on other pages."
-        : "This will revoke every active admin session matching the current filters, including sessions on other pages.";
+        ? t("This will revoke every active admin session in the focused source group that still matches the current filters, including sessions on other pages.")
+        : t("This will revoke every active admin session matching the current filters, including sessions on other pages.");
   const sourceGroupRevokeDescription = pendingSourceGroup
     ? pendingSourceGroup.mode === "focused-source"
       ? pendingSourceGroup.group.currentSessions > 0
-        ? "This focused source group includes the current console session. Every active session in this focused source group will stop authorizing admin requests immediately, even if the current list is narrowed to one session, and the next admin request will need to exchange a fresh short-lived token."
-        : "Every active session in this focused source group will stop authorizing admin requests immediately, even if the current list is narrowed to one session."
+        ? t("This focused source group includes the current console session. Every active session in this focused source group will stop authorizing admin requests immediately, even if the current list is narrowed to one session, and the next admin request will need to exchange a fresh short-lived token.")
+        : t("Every active session in this focused source group will stop authorizing admin requests immediately, even if the current list is narrowed to one session.")
       : pendingSourceGroup.group.currentSessions > 0
-        ? "This source group includes the current console session. Every matching active session in this source group will stop authorizing admin requests immediately, and the next admin request will need to exchange a fresh short-lived token."
-        : "Every matching active session in this source group will stop authorizing admin requests immediately."
-    : "Every matching active session in this source group will stop authorizing admin requests immediately.";
+        ? t("This source group includes the current console session. Every matching active session in this source group will stop authorizing admin requests immediately, and the next admin request will need to exchange a fresh short-lived token.")
+        : t("Every matching active session in this source group will stop authorizing admin requests immediately.")
+    : t("Every matching active session in this source group will stop authorizing admin requests immediately.");
   const sourceGroupRiskRevokeDescription = hasSourceFocus
-    ? `This will revoke every active session in source groups marked ${formatSourceGroupRiskFilterLabel(
-        filters.sourceRiskLevel,
-      ).toLowerCase()} that still match the focused source group and current filters.`
-    : `This will revoke every active session in source groups marked ${formatSourceGroupRiskFilterLabel(
-        filters.sourceRiskLevel,
-      ).toLowerCase()} that still match the current filters, including groups on other pages.`;
+    ? t("This will revoke every active session in source groups marked {0} that still match the focused source group and current filters.").replace(
+        "{0}",
+        t(formatSourceGroupRiskFilterLabel(filters.sourceRiskLevel)).toLowerCase(),
+      )
+    : t("This will revoke every active session in source groups marked {0} that still match the current filters, including groups on other pages.").replace(
+        "{0}",
+        t(formatSourceGroupRiskFilterLabel(filters.sourceRiskLevel)).toLowerCase(),
+      );
 
   function focusSourceGroup(group: CloudAdminSessionSourceGroupSummary) {
     updateFilters({
@@ -2478,7 +2480,7 @@ export function AdminSessionsPage() {
                     key={rule.id}
                     className={`rounded-full border px-2 py-1 ${rule.tone}`}
                   >
-                    {rule.label}: {rule.description}
+                    {t(rule.label)}: {t(rule.description)}
                   </span>
                 ))}
               </div>
@@ -3149,7 +3151,7 @@ export function AdminSessionsPage() {
                               Revocation reason
                             </div>
                             <div className="mt-1 text-[color:var(--text-primary)]">
-                              {formatRevocationReason(session.revocationReason)}
+                              {t(formatRevocationReason(session.revocationReason))}
                             </div>
                           </div>
                           <div>

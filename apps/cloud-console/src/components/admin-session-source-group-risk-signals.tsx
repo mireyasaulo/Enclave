@@ -1,5 +1,6 @@
 import type { CloudAdminSessionSourceGroupRiskSignal } from "@yinjie/contracts";
 import { formatAdminSessionSourceGroupRiskSignalLabel } from "../lib/admin-session-helpers";
+import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
 type AdminSessionSourceGroupRiskSignalsProps = {
   signals: CloudAdminSessionSourceGroupRiskSignal[];
@@ -18,6 +19,8 @@ export function AdminSessionSourceGroupRiskSignals({
   emptyMessage,
   emptyClassName = "text-[11px] text-[color:var(--text-muted)]",
 }: AdminSessionSourceGroupRiskSignalsProps) {
+  const t = useCloudConsoleText();
+
   if (!signals.length) {
     return emptyMessage ? <div className={emptyClassName}>{emptyMessage}</div> : null;
   }
@@ -26,7 +29,7 @@ export function AdminSessionSourceGroupRiskSignals({
     <div className={className}>
       {signals.map((signal) => (
         <span key={`${keyPrefix}-${signal}`} className={pillClassName}>
-          {formatAdminSessionSourceGroupRiskSignalLabel(signal)}
+          {t(formatAdminSessionSourceGroupRiskSignalLabel(signal))}
         </span>
       ))}
     </div>

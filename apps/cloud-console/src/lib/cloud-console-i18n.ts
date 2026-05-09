@@ -481,6 +481,65 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Focused target": "聚焦目标",
     "Artifact summary": "产物摘要",
     API: "API",
+
+    // admin-session-meta.ts 标签
+    Active: "活跃",
+    Expired: "已过期",
+    Revoked: "已撤销",
+    Unknown: "未知",
+    Logout: "退出登录",
+    "Manual revoke": "手动撤销",
+    "Refresh reuse": "令牌复用",
+    "All reasons": "全部原因",
+    "All sessions": "全部会话",
+    "Current only": "仅当前",
+    Created: "创建时间",
+    "Refresh expiry": "刷新令牌到期",
+    "Last used": "最近使用",
+    "Revoked at": "撤销时间",
+    Ascending: "升序",
+    Descending: "降序",
+    "Active sessions": "活跃会话",
+    "Total sessions": "总会话数",
+    "Latest used": "最近使用",
+    "Latest created": "最近创建",
+    "Latest revoked": "最近撤销",
+    "All risk levels": "全部风险级别",
+    "Critical only": "仅严重",
+    "Watch only": "仅观察",
+    "Normal only": "仅正常",
+    "Refresh reuse detected": "检测到令牌复用",
+    "Repeated revocations": "重复撤销",
+    "Multiple active sessions": "多个活跃会话",
+
+    // 风险阈值规则
+    "Watch threshold": "观察阈值",
+    "Critical threshold": "严重阈值",
+    "2+ active or 2+ revoked": "2 个以上活跃或已撤销",
+    "4+ active or any refresh reuse": "4 个以上活跃或存在令牌复用",
+
+    // 撤销确认弹窗描述
+    "Risk filter: {0}.": "风险筛选：{0}。",
+    "This will revoke the current active admin session if it still matches the focused source group and current filters.":
+      "如果当前活跃管理员会话仍符合聚焦来源分组和当前筛选条件，将撤销该会话。",
+    "This will revoke the current active admin session if it still matches the current filters.":
+      "如果当前活跃管理员会话仍符合当前筛选条件，将撤销该会话。",
+    "This will revoke every active admin session in the focused source group that still matches the current filters, including sessions on other pages.":
+      "将撤销聚焦来源分组中所有仍符合当前筛选条件的活跃管理员会话，包括其他页面上的会话。",
+    "This will revoke every active admin session matching the current filters, including sessions on other pages.":
+      "将撤销所有符合当前筛选条件的活跃管理员会话，包括其他页面上的会话。",
+    "This focused source group includes the current console session. Every active session in this focused source group will stop authorizing admin requests immediately, even if the current list is narrowed to one session, and the next admin request will need to exchange a fresh short-lived token.":
+      "该聚焦来源分组包含当前控制台会话。此聚焦来源分组中的所有活跃会话将立即停止授权管理请求，即使当前列表已缩小到一个会话，下次管理请求也需要交换一个新的短期令牌。",
+    "Every active session in this focused source group will stop authorizing admin requests immediately, even if the current list is narrowed to one session.":
+      "此聚焦来源分组中的所有活跃会话将立即停止授权管理请求，即使当前列表已缩小到一个会话。",
+    "This source group includes the current console session. Every matching active session in this source group will stop authorizing admin requests immediately, and the next admin request will need to exchange a fresh short-lived token.":
+      "该来源分组包含当前控制台会话。此来源分组中所有匹配的活跃会话将立即停止授权管理请求，下次管理请求需要交换一个新的短期令牌。",
+    "Every matching active session in this source group will stop authorizing admin requests immediately.":
+      "此来源分组中所有匹配的活跃会话将立即停止授权管理请求。",
+    "This will revoke every active session in source groups marked {0} that still match the focused source group and current filters.":
+      "将撤销标记为 {0} 的来源分组中所有仍符合聚焦来源分组和当前筛选条件的活跃会话。",
+    "This will revoke every active session in source groups marked {0} that still match the current filters, including groups on other pages.":
+      "将撤销标记为 {0} 的来源分组中所有仍符合当前筛选条件的活跃会话，包括其他页面上的分组。",
   },
   "ja-JP": {
     "Token Usage": "Token 使用量",
@@ -974,6 +1033,65 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Focused target": "フォーカスしたターゲット",
     "Artifact summary": "アーティファクトサマリー",
     API: "API",
+
+    // admin-session-meta.ts 標識ラベル
+    Active: "アクティブ",
+    Expired: "期限切れ",
+    Revoked: "取り消し済み",
+    Unknown: "不明",
+    Logout: "ログアウト",
+    "Manual revoke": "手動取り消し",
+    "Refresh reuse": "トークン再使用",
+    "All reasons": "すべての原因",
+    "All sessions": "すべてのセッション",
+    "Current only": "現在のみ",
+    Created: "作成日時",
+    "Refresh expiry": "リフレッシュ有効期限",
+    "Last used": "最終使用",
+    "Revoked at": "取り消し日時",
+    Ascending: "昇順",
+    Descending: "降順",
+    "Active sessions": "アクティブセッション",
+    "Total sessions": "全セッション数",
+    "Latest used": "最終使用",
+    "Latest created": "最終作成",
+    "Latest revoked": "最終取り消し",
+    "All risk levels": "全リスクレベル",
+    "Critical only": "重大のみ",
+    "Watch only": "監視のみ",
+    "Normal only": "通常のみ",
+    "Refresh reuse detected": "トークン再使用を検出",
+    "Repeated revocations": "繰り返しの取り消し",
+    "Multiple active sessions": "複数のアクティブセッション",
+
+    // リスクしきい値ルール
+    "Watch threshold": "監視しきい値",
+    "Critical threshold": "重大しきい値",
+    "2+ active or 2+ revoked": "アクティブまたは取り消し済みが 2 以上",
+    "4+ active or any refresh reuse": "アクティブが 4 以上またはトークン再使用あり",
+
+    // 取り消し確認モーダルの説明
+    "Risk filter: {0}.": "リスクフィルター: {0}。",
+    "This will revoke the current active admin session if it still matches the focused source group and current filters.":
+      "現在のアクティブな管理者セッションが注目している発行元グループと現在のフィルターに一致する場合、取り消します。",
+    "This will revoke the current active admin session if it still matches the current filters.":
+      "現在のアクティブな管理者セッションが現在のフィルターに一致する場合、取り消します。",
+    "This will revoke every active admin session in the focused source group that still matches the current filters, including sessions on other pages.":
+      "現在のフィルターに一致する注目している発行元グループ内のすべてのアクティブな管理者セッションを取り消します（他のページのセッションを含む）。",
+    "This will revoke every active admin session matching the current filters, including sessions on other pages.":
+      "現在のフィルターに一致するすべてのアクティブな管理者セッションを取り消します（他のページのセッションを含む）。",
+    "This focused source group includes the current console session. Every active session in this focused source group will stop authorizing admin requests immediately, even if the current list is narrowed to one session, and the next admin request will need to exchange a fresh short-lived token.":
+      "この注目している発行元グループには現在のコンソールセッションが含まれています。現在のリストが 1 つのセッションに絞られていても、このグループ内のすべてのアクティブセッションは管理リクエストの認可を即座に停止し、次の管理リクエストでは新しい短期トークンの交換が必要になります。",
+    "Every active session in this focused source group will stop authorizing admin requests immediately, even if the current list is narrowed to one session.":
+      "現在のリストが 1 つのセッションに絞られていても、この注目している発行元グループ内のすべてのアクティブセッションは管理リクエストの認可を即座に停止します。",
+    "This source group includes the current console session. Every matching active session in this source group will stop authorizing admin requests immediately, and the next admin request will need to exchange a fresh short-lived token.":
+      "この発行元グループには現在のコンソールセッションが含まれています。このグループ内のすべての一致するアクティブセッションは管理リクエストの認可を即座に停止し、次の管理リクエストでは新しい短期トークンの交換が必要になります。",
+    "Every matching active session in this source group will stop authorizing admin requests immediately.":
+      "このグループ内のすべての一致するアクティブセッションは管理リクエストの認可を即座に停止します。",
+    "This will revoke every active session in source groups marked {0} that still match the focused source group and current filters.":
+      "{0} とマークされた発行元グループ内で注目している発行元グループと現在のフィルターに一致するすべてのアクティブセッションを取り消します。",
+    "This will revoke every active session in source groups marked {0} that still match the current filters, including groups on other pages.":
+      "{0} とマークされた発行元グループ内で現在のフィルターに一致するすべてのアクティブセッションを取り消します（他のページのグループを含む）。",
   },
   "ko-KR": {
     "Token Usage": "토큰 사용량",
@@ -1461,6 +1579,65 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Focused target": "집중된 대상",
     "Artifact summary": "아티팩트 요약",
     API: "API",
+
+    // admin-session-meta.ts 레이블
+    Active: "활성",
+    Expired: "만료됨",
+    Revoked: "취소됨",
+    Unknown: "알 수 없음",
+    Logout: "로그아웃",
+    "Manual revoke": "수동 취소",
+    "Refresh reuse": "토큰 재사용",
+    "All reasons": "모든 이유",
+    "All sessions": "모든 세션",
+    "Current only": "현재만",
+    Created: "생성",
+    "Refresh expiry": "리프레시 만료",
+    "Last used": "최근 사용",
+    "Revoked at": "취소 시간",
+    Ascending: "오름차순",
+    Descending: "내림차순",
+    "Active sessions": "활성 세션",
+    "Total sessions": "전체 세션",
+    "Latest used": "최근 사용",
+    "Latest created": "최근 생성",
+    "Latest revoked": "최근 취소",
+    "All risk levels": "전체 위험 수준",
+    "Critical only": "심각만",
+    "Watch only": "관찰만",
+    "Normal only": "일반만",
+    "Refresh reuse detected": "토큰 재사용 감지됨",
+    "Repeated revocations": "반복 취소",
+    "Multiple active sessions": "다수의 활성 세션",
+
+    // 위험 임계값 규칙
+    "Watch threshold": "관찰 임계값",
+    "Critical threshold": "심각 임계값",
+    "2+ active or 2+ revoked": "활성 또는 취소 2건 이상",
+    "4+ active or any refresh reuse": "활성 4건 이상 또는 토큰 재사용",
+
+    // 취소 확인 모달 설명
+    "Risk filter: {0}.": "위험 필터: {0}.",
+    "This will revoke the current active admin session if it still matches the focused source group and current filters.":
+      "현재 활성 관리자 세션이 집중된 발급 그룹과 현재 필터와 일치하면 취소합니다.",
+    "This will revoke the current active admin session if it still matches the current filters.":
+      "현재 활성 관리자 세션이 현재 필터와 일치하면 취소합니다.",
+    "This will revoke every active admin session in the focused source group that still matches the current filters, including sessions on other pages.":
+      "집중된 발급 그룹에서 현재 필터와 일치하는 모든 활성 관리자 세션을 취소합니다(다른 페이지의 세션 포함).",
+    "This will revoke every active admin session matching the current filters, including sessions on other pages.":
+      "현재 필터와 일치하는 모든 활성 관리자 세션을 취소합니다(다른 페이지의 세션 포함).",
+    "This focused source group includes the current console session. Every active session in this focused source group will stop authorizing admin requests immediately, even if the current list is narrowed to one session, and the next admin request will need to exchange a fresh short-lived token.":
+      "이 집중된 발급 그룹에는 현재 콘솔 세션이 포함되어 있습니다. 현재 목록이 하나의 세션으로 좁혀져 있더라도 이 그룹의 모든 활성 세션은 즉시 관리자 요청 인증을 중단하며, 다음 관리자 요청은 새 단기 토큰 교환이 필요합니다.",
+    "Every active session in this focused source group will stop authorizing admin requests immediately, even if the current list is narrowed to one session.":
+      "현재 목록이 하나의 세션으로 좁혀져 있더라도 이 집중된 발급 그룹의 모든 활성 세션은 즉시 관리자 요청 인증을 중단합니다.",
+    "This source group includes the current console session. Every matching active session in this source group will stop authorizing admin requests immediately, and the next admin request will need to exchange a fresh short-lived token.":
+      "이 발급 그룹에는 현재 콘솔 세션이 포함되어 있습니다. 이 그룹의 일치하는 모든 활성 세션은 즉시 관리자 요청 인증을 중단하며, 다음 관리자 요청은 새 단기 토큰 교환이 필요합니다.",
+    "Every matching active session in this source group will stop authorizing admin requests immediately.":
+      "이 그룹의 일치하는 모든 활성 세션은 즉시 관리자 요청 인증을 중단합니다.",
+    "This will revoke every active session in source groups marked {0} that still match the focused source group and current filters.":
+      "{0}으로 표시된 발급 그룹 중 집중된 발급 그룹과 현재 필터와 일치하는 모든 활성 세션을 취소합니다.",
+    "This will revoke every active session in source groups marked {0} that still match the current filters, including groups on other pages.":
+      "{0}으로 표시된 발급 그룹 중 현재 필터와 일치하는 모든 활성 세션을 취소합니다(다른 페이지의 그룹 포함).",
   },
 };
 // i18n-ignore-end
