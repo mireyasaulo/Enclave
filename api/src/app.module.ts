@@ -29,6 +29,7 @@ import { RealWorldSyncModule } from './modules/real-world-sync/real-world-sync.m
 import { FollowupRuntimeModule } from './modules/followup-runtime/followup-runtime.module';
 import { InferenceModule } from './modules/inference/inference.module';
 import { ReminderRuntimeModule } from './modules/reminder-runtime/reminder-runtime.module';
+import { MinimaxModule } from './modules/minimax/minimax.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { SubscriptionExpiredFilter } from './modules/subscription/subscription-expired.filter';
 import { WikiModule } from './modules/wiki/wiki.module';
@@ -238,6 +239,7 @@ import {
     RealWorldSyncModule,
     FollowupRuntimeModule,
     ReminderRuntimeModule,
+    MinimaxModule,
     InferenceModule,
     SubscriptionModule,
     CloudRuntimeModule,
