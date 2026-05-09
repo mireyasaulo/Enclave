@@ -43,6 +43,8 @@ import type {
   SendPhoneCodeResponse,
   VerifyEmailCodeRequest,
   VerifyEmailCodeResponse,
+  VerifyGoogleIdTokenRequest,
+  VerifyGoogleIdTokenResponse,
   VerifyPhoneCodeRequest,
   VerifyPhoneCodeResponse,
   WorldAccessSessionSummary,
@@ -1142,6 +1144,20 @@ export function verifyCloudEmailCode(
 ) {
   return requestCloudApi<VerifyEmailCodeResponse>(
     "/cloud/auth/email/verify-code",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
+export function verifyCloudGoogleIdToken(
+  payload: VerifyGoogleIdTokenRequest,
+  baseUrl?: string,
+) {
+  return requestCloudApi<VerifyGoogleIdTokenResponse>(
+    "/cloud/auth/google/verify-id-token",
     {
       method: "POST",
       body: JSON.stringify(payload),
