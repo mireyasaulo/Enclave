@@ -12,15 +12,6 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#. placeholder {0}: moment.location
-#: apps/app/src/routes/moments-page.tsx:610
-msgid ""
-"\n"
-"位置：{0}"
-msgstr ""
-"\n"
-"位置：{0}"
-
 #: apps/app/src/routes/discover-feed-page.tsx:887
 #: apps/app/src/routes/discover-page.tsx:797
 msgid " · AI 已参与回应"
@@ -48,7 +39,7 @@ msgid " {speechProviderSummary}。"
 msgstr " {speechProviderSummary}。"
 
 #: apps/app/src/components/moment-post-card.tsx:126
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:414
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:501
 msgid " 回复 "
 msgstr " 回复 "
 
@@ -92,7 +83,7 @@ msgstr "、"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:188
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:425
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:420
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:507
 msgid "："
 msgstr "："
 
@@ -527,7 +518,7 @@ msgstr "{0} 暂未接入。"
 #. placeholder {0}: historyRows.length
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:654
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:227
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:282
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:369
 #: apps/app/src/routes/channels-page.tsx:1792
 #: apps/app/src/routes/desktop-chat-history-page.tsx:405
 #: apps/app/src/routes/desktop-chat-history-page.tsx:408
@@ -646,11 +637,6 @@ msgstr "{0} 的广场动态"
 msgid "{0} 的当前工作台，带上最近使用和本地待办上下文。"
 msgstr "{0} 的当前工作台，带上最近使用和本地待办上下文。"
 
-#. placeholder {0}: moment.authorName
-#: apps/app/src/routes/moments-page.tsx:616
-msgid "{0} 的朋友圈"
-msgstr "{0} 的朋友圈"
-
 #. placeholder {0}: post.authorName
 #: apps/app/src/routes/live-companion-page.tsx:949
 msgid "{0} 的视频号内容"
@@ -764,7 +750,7 @@ msgstr "{0} 赞"
 #. placeholder {1}: moment.commentCount
 #. placeholder {1}: post.commentCount
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:150
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:205
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:292
 msgid "{0} 赞 · {1} 评论"
 msgstr "{0} 赞 · {1} 评论"
 
@@ -860,7 +846,7 @@ msgid "{0}全部结果"
 msgstr "{0}全部结果"
 
 #. placeholder {0}: date.getFullYear()
-#: apps/app/src/components/wechat-moment-card.tsx:391
+#: apps/app/src/components/wechat-moment-card.tsx:408
 msgid "{0}年{month}月{day}日"
 msgstr "{0}年{month}月{day}日"
 
@@ -955,15 +941,15 @@ msgstr "{count} 条命中"
 msgid "{count} 项"
 msgstr "{count} 项"
 
-#: apps/app/src/components/wechat-moment-card.tsx:384
+#: apps/app/src/components/wechat-moment-card.tsx:401
 msgid "{diffDay} 天前"
 msgstr "{diffDay} 天前"
 
-#: apps/app/src/components/wechat-moment-card.tsx:369
+#: apps/app/src/components/wechat-moment-card.tsx:386
 msgid "{diffHour} 小时前"
 msgstr "{diffHour} 小时前"
 
-#: apps/app/src/components/wechat-moment-card.tsx:366
+#: apps/app/src/components/wechat-moment-card.tsx:383
 msgid "{diffMin} 分钟前"
 msgstr "{diffMin} 分钟前"
 
@@ -1075,7 +1061,7 @@ msgstr "{minutes} 分钟"
 msgid "{minutes} 分钟前"
 msgstr "{minutes} 分钟前"
 
-#: apps/app/src/components/wechat-moment-card.tsx:389
+#: apps/app/src/components/wechat-moment-card.tsx:406
 msgid "{month}月{day}日"
 msgstr "{month}月{day}日"
 
@@ -1234,7 +1220,7 @@ msgid "》组局邀约。"
 msgstr "》组局邀约。"
 
 #. placeholder {0}: replyTargetComment.text
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:350
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:437
 msgid "「{0}」"
 msgstr "「{0}」"
 
@@ -2244,8 +2230,8 @@ msgid "下半夜出没，车都贵。"
 msgstr "下半夜出没，车都贵。"
 
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:369
-#: apps/app/src/routes/moments-page.tsx:1298
-#: apps/app/src/routes/profile-moments-page.tsx:232
+#: apps/app/src/routes/moments-page.tsx:1260
+#: apps/app/src/routes/profile-moments-page.tsx:473
 msgid "下拉刷新"
 msgstr "下拉刷新"
 
@@ -2369,6 +2355,7 @@ msgstr "世界"
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:361
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:118
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:411
+#: apps/app/src/features/desktop/moments/desktop-profile-moments-workspace.tsx:179
 #: apps/app/src/features/shell/desktop-shell.tsx:72
 #: apps/app/src/routes/channel-author-page.tsx:397
 #: apps/app/src/routes/desktop-feedback-page.tsx:119
@@ -2377,9 +2364,9 @@ msgstr "世界"
 #: apps/app/src/routes/discover-feed-page.tsx:843
 #: apps/app/src/routes/discover-page.tsx:775
 #: apps/app/src/routes/live-companion-page.tsx:296
-#: apps/app/src/routes/moments-page.tsx:1051
+#: apps/app/src/routes/moments-page.tsx:1006
 #: apps/app/src/routes/profile-info-page.tsx:32
-#: apps/app/src/routes/profile-moments-page.tsx:167
+#: apps/app/src/routes/profile-moments-page.tsx:266
 #: apps/app/src/routes/profile-page.tsx:121
 #: apps/app/src/routes/profile-page.tsx:128
 #: apps/app/src/routes/profile-page.tsx:131
@@ -3414,7 +3401,7 @@ msgstr "你们已经是朋友，可以直接开始聊天。"
 msgid "你先发一条，或者等世界里的其他人先开口。"
 msgstr "你先发一条，或者等世界里的其他人先开口。"
 
-#: apps/app/src/routes/moments-page.tsx:1221
+#: apps/app/src/routes/moments-page.tsx:1183
 msgid "你先发一条动态，或者等世界里的角色们先开口。"
 msgstr "你先发一条动态，或者等世界里的角色们先开口。"
 
@@ -5372,7 +5359,7 @@ msgstr "写点想让世界居民都能看到的内容..."
 
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:336
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:356
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:380
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:467
 #: apps/app/src/i18n/static-dom-seed.ts:431
 #: apps/app/src/routes/discover-feed-page.tsx:979
 #: apps/app/src/routes/discover-page.tsx:853
@@ -5716,7 +5703,7 @@ msgid "列车驶离始发站 {0}。"
 msgstr "列车驶离始发站 {0}。"
 
 #: apps/app/src/components/official-article-viewer.tsx:520
-#: apps/app/src/components/wechat-moment-card.tsx:365
+#: apps/app/src/components/wechat-moment-card.tsx:382
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:1019
 msgid "刚刚"
 msgstr "刚刚"
@@ -5790,7 +5777,7 @@ msgstr "删当前后会清空表情库，可继续添加 {nextSlotsAvailable} �
 #: apps/app/src/components/chat-message-list.tsx:3240
 #: apps/app/src/components/chat-message-list.tsx:3368
 #: apps/app/src/components/chat-message-list.tsx:3533
-#: apps/app/src/components/wechat-moment-card.tsx:204
+#: apps/app/src/components/wechat-moment-card.tsx:221
 #: apps/app/src/features/chat/group-message-context-menu.tsx:76
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:63
 #: apps/app/src/features/chat/reminder-task-panel.tsx:283
@@ -5810,6 +5797,7 @@ msgid "删除中"
 msgstr "删除中"
 
 #: apps/app/src/components/chat-message-list.tsx:2671
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:199
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1088
 msgid "删除中..."
 msgstr "删除中..."
@@ -5866,6 +5854,10 @@ msgstr "删除当前聊天内容"
 #: apps/app/src/features/chat/reminder-task-panel.tsx:137
 msgid "删除提醒失败，请稍后再试。"
 msgstr "删除提醒失败，请稍后再试。"
+
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:199
+msgid "删除朋友圈"
+msgstr "删除朋友圈"
 
 #: apps/app/src/components/chat-composer.tsx:4739
 msgid "删除标注"
@@ -6040,12 +6032,12 @@ msgstr "功能开发中，敬请期待。"
 msgid "功能异常"
 msgstr "功能异常"
 
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:214
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:301
 #: apps/app/src/routes/discover-feed-page.tsx:896
 msgid "加为好友后才能互动"
 msgstr "加为好友后才能互动"
 
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:387
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:474
 msgid "加为好友后才能评论。"
 msgstr "加为好友后才能评论。"
 
@@ -6144,7 +6136,6 @@ msgid "动态内容和媒体不能同时为空。"
 msgstr "动态内容和媒体不能同时为空。"
 
 #: apps/app/src/routes/discover-feed-page.tsx:558
-#: apps/app/src/routes/moments-page.tsx:658
 msgid "动态摘要已复制。"
 msgstr "动态摘要已复制。"
 
@@ -6484,8 +6475,8 @@ msgid "发一条广场动态"
 msgstr "发一条广场动态"
 
 #: apps/app/src/i18n/static-dom-seed.ts:430
-#: apps/app/src/routes/moments-page.tsx:1079
-#: apps/app/src/routes/moments-page.tsx:1230
+#: apps/app/src/routes/moments-page.tsx:1034
+#: apps/app/src/routes/moments-page.tsx:1192
 msgid "发一条朋友圈"
 msgstr "发一条朋友圈"
 
@@ -6598,6 +6589,7 @@ msgstr "发文章到手机"
 #: apps/app/src/features/desktop/moments/desktop-moment-compose-panel.tsx:80
 #: apps/app/src/features/desktop/moments/desktop-moments-feed.tsx:104
 #: apps/app/src/features/desktop/moments/desktop-moments-toolbar.tsx:49
+#: apps/app/src/features/desktop/moments/desktop-profile-moments-workspace.tsx:205
 #: apps/app/src/i18n/static-dom-seed.ts:41
 msgid "发朋友圈"
 msgstr "发朋友圈"
@@ -6606,8 +6598,9 @@ msgstr "发朋友圈"
 msgid "发朋友圈在桌面布局里已经并入朋友圈工作区，这里会自动带你返回桌面入口。"
 msgstr "发朋友圈在桌面布局里已经并入朋友圈工作区，这里会自动带你返回桌面入口。"
 
-#: apps/app/src/routes/profile-moments-page.tsx:210
-#: apps/app/src/routes/profile-moments-page.tsx:281
+#: apps/app/src/features/desktop/moments/desktop-profile-moments-workspace.tsx:133
+#: apps/app/src/routes/profile-moments-page.tsx:451
+#: apps/app/src/routes/profile-moments-page.tsx:522
 msgid "发条朋友圈"
 msgstr "发条朋友圈"
 
@@ -6913,7 +6906,7 @@ msgstr "取消关注"
 
 #: apps/app/src/components/chat-composer.tsx:5458
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:320
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:358
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:445
 msgid "取消回复"
 msgstr "取消回复"
 
@@ -7185,7 +7178,8 @@ msgstr "同屏"
 msgid "同步下午安排"
 msgstr "同步下午安排"
 
-#: apps/app/src/routes/splash-page.tsx:172
+#: apps/app/src/components/bootstrap-screen.tsx:66
+#: apps/app/src/routes/splash-page.tsx:198
 msgid "同步世界主人"
 msgstr "同步世界主人"
 
@@ -7549,7 +7543,7 @@ msgstr "回填到原群聊"
 msgid "回填接龙结果"
 msgstr "回填接龙结果"
 
-#: apps/app/src/components/wechat-moment-card.tsx:284
+#: apps/app/src/components/wechat-moment-card.tsx:301
 #: apps/app/src/features/chat/group-message-context-menu.tsx:129
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:107
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1484
@@ -7578,7 +7572,7 @@ msgstr "回复 {0}："
 #. placeholder {0}: replyTarget.authorName
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1300
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:335
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:379
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:466
 #: apps/app/src/routes/channels-page.tsx:1945
 msgid "回复 {0}..."
 msgstr "回复 {0}..."
@@ -7608,7 +7602,7 @@ msgstr "回复层"
 msgid "回复已生成，画面还在准备中。"
 msgstr "回复已生成，画面还在准备中。"
 
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:320
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:407
 msgid "回复这条评论"
 msgstr "回复这条评论"
 
@@ -7811,7 +7805,8 @@ msgstr "图片过大，请压缩到 1MB 以内再试。"
 #: apps/app/src/routes/friend-moments-page.tsx:294
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:119
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:128
-#: apps/app/src/routes/moments-page.tsx:563
+#: apps/app/src/routes/moments-page.tsx:604
+#: apps/app/src/routes/profile-moments-page.tsx:281
 msgid "图片选择失败，请稍后重试。"
 msgstr "图片选择失败，请稍后重试。"
 
@@ -7990,7 +7985,7 @@ msgstr "处理中"
 #: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:138
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:217
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:161
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:230
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:317
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:945
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:497
 #: apps/app/src/routes/channel-author-page.tsx:441
@@ -8118,7 +8113,6 @@ msgid "复制到手机失败，请稍后重试。"
 msgstr "复制到手机失败，请稍后重试。"
 
 #: apps/app/src/routes/discover-feed-page.tsx:571
-#: apps/app/src/routes/moments-page.tsx:671
 msgid "复制动态摘要失败，请稍后重试。"
 msgstr "复制动态摘要失败，请稍后重试。"
 
@@ -9249,6 +9243,11 @@ msgstr "已删除：{0}"
 msgid "已删除并退出群聊。"
 msgstr "已删除并退出群聊。"
 
+#: apps/app/src/routes/moments-page.tsx:325
+#: apps/app/src/routes/profile-moments-page.tsx:217
+msgid "已删除这条朋友圈。"
+msgstr "已删除这条朋友圈。"
+
 #: apps/app/src/components/chat-message-list.tsx:967
 #: apps/app/src/i18n/static-dom-seed.ts:947
 msgid "已删除这条消息。"
@@ -9697,7 +9696,6 @@ msgstr "已打开文件。"
 #: apps/app/src/routes/group-qr-page.tsx:969
 #: apps/app/src/routes/group-qr-page.tsx:1001
 #: apps/app/src/routes/mini-programs-page.tsx:390
-#: apps/app/src/routes/moments-page.tsx:625
 #: apps/app/src/routes/official-account-article-page.tsx:285
 #: apps/app/src/routes/official-account-detail-page.tsx:224
 msgid "已打开系统分享面板。"
@@ -9794,7 +9792,7 @@ msgstr "已收拢"
 #: apps/app/src/components/official-article-viewer.tsx:320
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:647
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:174
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:246
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:333
 #: apps/app/src/i18n/static-dom-seed.ts:920
 #: apps/app/src/routes/channels-page.tsx:1533
 msgid "已收藏"
@@ -10040,7 +10038,7 @@ msgstr "已设为消息提醒 · {summary}。"
 msgid "已设提醒 · {0}"
 msgstr "已设提醒 · {0}"
 
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:232
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:319
 #: apps/app/src/i18n/static-dom-seed.ts:366
 #: apps/app/src/routes/discover-feed-page.tsx:917
 #: apps/app/src/routes/discover-page.tsx:822
@@ -11337,7 +11335,6 @@ msgid "当前环境暂不支持复制到手机。"
 msgstr "当前环境暂不支持复制到手机。"
 
 #: apps/app/src/routes/discover-feed-page.tsx:545
-#: apps/app/src/routes/moments-page.tsx:645
 msgid "当前环境暂不支持复制动态摘要。"
 msgstr "当前环境暂不支持复制动态摘要。"
 
@@ -11621,7 +11618,6 @@ msgstr "当前设备暂时无法打开相机，请先改用相册选图。"
 #: apps/app/src/routes/group-qr-page.tsx:1010
 #: apps/app/src/routes/mini-programs-page.tsx:404
 #: apps/app/src/routes/mini-programs-page.tsx:411
-#: apps/app/src/routes/moments-page.tsx:644
 #: apps/app/src/routes/official-account-article-page.tsx:234
 #: apps/app/src/routes/official-account-detail-page.tsx:238
 msgid "当前设备暂时无法打开系统分享，请稍后重试。"
@@ -12056,7 +12052,7 @@ msgstr "成熟"
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-workspace.tsx:72
 #: apps/app/src/features/desktop/feed/desktop-feed-compose-panel.tsx:102
 #: apps/app/src/features/desktop/moments/desktop-moment-compose-panel.tsx:102
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:173
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:260
 #: apps/app/src/features/games/parking-war/parking-war-engine.ts:602
 #: apps/app/src/lib/conversation-preview.ts:69
 #: apps/app/src/routes/character-detail-page.tsx:123
@@ -12064,7 +12060,7 @@ msgstr "成熟"
 #: apps/app/src/routes/group-chat-details-page.tsx:365
 #: apps/app/src/routes/mobile-add-friend-page.tsx:103
 #: apps/app/src/routes/mobile-add-friend-page.tsx:718
-#: apps/app/src/routes/moments-page.tsx:219
+#: apps/app/src/routes/moments-page.tsx:216
 #: apps/app/src/routes/profile-page.tsx:99
 msgid "我"
 msgstr "我"
@@ -12147,7 +12143,8 @@ msgstr "我的小程序。"
 msgid "我的摄像头预览"
 msgstr "我的摄像头预览"
 
-#: apps/app/src/routes/profile-moments-page.tsx:192
+#: apps/app/src/features/desktop/moments/desktop-profile-moments-workspace.tsx:196
+#: apps/app/src/routes/profile-moments-page.tsx:433
 msgid "我的朋友圈"
 msgstr "我的朋友圈"
 
@@ -12315,7 +12312,7 @@ msgstr "打印图片"
 msgid "打开"
 msgstr "打开"
 
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:255
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:342
 msgid "打开 TA 的朋友圈"
 msgstr "打开 TA 的朋友圈"
 
@@ -14020,7 +14017,7 @@ msgstr "收获"
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:53
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:647
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:174
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:246
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:333
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:258
 #: apps/app/src/features/search/desktop-search-launcher.tsx:869
 #: apps/app/src/features/search/desktop-search-workspace.tsx:125
@@ -14962,7 +14959,7 @@ msgstr "春季家具套装上线"
 msgid "春季家具票 + 顾客好感"
 msgstr "春季家具票 + 顾客好感"
 
-#: apps/app/src/components/wechat-moment-card.tsx:381
+#: apps/app/src/components/wechat-moment-card.tsx:398
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1040
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1257
 msgid "昨天"
@@ -15258,8 +15255,9 @@ msgstr "更多内容"
 msgid "更多功能"
 msgstr "更多功能"
 
-#: apps/app/src/components/wechat-moment-card.tsx:214
+#: apps/app/src/components/wechat-moment-card.tsx:231
 #: apps/app/src/features/chat/mobile-chat-thread-header.tsx:26
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:181
 #: apps/app/src/i18n/static-dom-seed.ts:742
 msgid "更多操作"
 msgstr "更多操作"
@@ -15436,9 +15434,10 @@ msgstr "朋友信息"
 #: apps/app/src/routes/favorites-page.tsx:72
 #: apps/app/src/routes/friend-moments-page.tsx:592
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:293
-#: apps/app/src/routes/moments-page.tsx:805
-#: apps/app/src/routes/moments-page.tsx:1056
+#: apps/app/src/routes/moments-page.tsx:769
+#: apps/app/src/routes/moments-page.tsx:1011
 #: apps/app/src/routes/profile-favorites-page.tsx:48
+#: apps/app/src/routes/profile-moments-page.tsx:394
 #: apps/app/src/routes/profile-page.tsx:166
 msgid "朋友圈"
 msgstr "朋友圈"
@@ -15446,7 +15445,8 @@ msgstr "朋友圈"
 #. placeholder {0}: formatTimestamp(moment.postedAt)
 #: apps/app/src/features/search/use-search-index.ts:425
 #: apps/app/src/routes/friend-moments-page.tsx:587
-#: apps/app/src/routes/moments-page.tsx:803
+#: apps/app/src/routes/moments-page.tsx:767
+#: apps/app/src/routes/profile-moments-page.tsx:391
 msgid "朋友圈 · {0}"
 msgstr "朋友圈 · {0}"
 
@@ -15463,10 +15463,10 @@ msgstr "朋友圈不存在。"
 #: apps/app/src/routes/friend-moments-page.tsx:179
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:117
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:151
-#: apps/app/src/routes/moments-page.tsx:247
-#: apps/app/src/routes/moments-page.tsx:284
-#: apps/app/src/routes/profile-moments-page.tsx:92
-#: apps/app/src/routes/profile-moments-page.tsx:127
+#: apps/app/src/routes/moments-page.tsx:244
+#: apps/app/src/routes/moments-page.tsx:294
+#: apps/app/src/routes/profile-moments-page.tsx:116
+#: apps/app/src/routes/profile-moments-page.tsx:162
 msgid "朋友圈互动已更新。"
 msgstr "朋友圈互动已更新。"
 
@@ -15506,7 +15506,8 @@ msgstr "朋友圈媒体不存在。"
 #: apps/app/src/i18n/static-dom-seed.ts:1079
 #: apps/app/src/routes/friend-moments-page.tsx:137
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:60
-#: apps/app/src/routes/moments-page.tsx:181
+#: apps/app/src/routes/moments-page.tsx:178
+#: apps/app/src/routes/profile-moments-page.tsx:183
 msgid "朋友圈已发布。"
 msgstr "朋友圈已发布。"
 
@@ -15516,7 +15517,7 @@ msgstr "朋友圈当前仅支持图片或视频。"
 
 #: apps/app/src/i18n/static-dom-seed.ts:38
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:457
-#: apps/app/src/routes/moments-page.tsx:1149
+#: apps/app/src/routes/moments-page.tsx:1104
 msgid "朋友圈暂时不可用"
 msgstr "朋友圈暂时不可用"
 
@@ -16213,8 +16214,8 @@ msgid "松开鼠标发送图片或文件"
 msgstr "松开鼠标发送图片或文件"
 
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:368
-#: apps/app/src/routes/moments-page.tsx:1297
-#: apps/app/src/routes/profile-moments-page.tsx:231
+#: apps/app/src/routes/moments-page.tsx:1259
+#: apps/app/src/routes/profile-moments-page.tsx:472
 msgid "松手刷新"
 msgstr "松手刷新"
 
@@ -16303,7 +16304,7 @@ msgid "查看 {0} 的单聊通话记录"
 msgstr "查看 {0} 的单聊通话记录"
 
 #. placeholder {0}: moment.authorName
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:127
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:214
 msgid "查看 {0} 的朋友圈"
 msgstr "查看 {0} 的朋友圈"
 
@@ -16955,7 +16956,8 @@ msgstr "次"
 msgid "次优先备选"
 msgstr "次优先备选"
 
-#: apps/app/src/routes/splash-page.tsx:152
+#: apps/app/src/components/bootstrap-screen.tsx:46
+#: apps/app/src/routes/splash-page.tsx:178
 msgid "欢迎回到你的世界"
 msgstr "欢迎回到你的世界"
 
@@ -17040,7 +17042,7 @@ msgstr "正在切换到桌面发现页"
 msgid "正在切换到桌面发现页..."
 msgstr "正在切换到桌面发现页..."
 
-#: apps/app/src/routes/moments-page.tsx:681
+#: apps/app/src/routes/moments-page.tsx:645
 msgid "正在切换到桌面好友朋友圈工作区，马上显示对应居民的动态。"
 msgstr "正在切换到桌面好友朋友圈工作区，马上显示对应居民的动态。"
 
@@ -17052,7 +17054,7 @@ msgstr "正在切换到桌面新的朋友"
 msgid "正在切换到桌面星标朋友"
 msgstr "正在切换到桌面星标朋友"
 
-#: apps/app/src/routes/moments-page.tsx:682
+#: apps/app/src/routes/moments-page.tsx:646
 msgid "正在切换到桌面朋友圈..."
 msgstr "正在切换到桌面朋友圈..."
 
@@ -17143,8 +17145,8 @@ msgid "正在删除..."
 msgstr "正在删除..."
 
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:366
-#: apps/app/src/routes/moments-page.tsx:1295
-#: apps/app/src/routes/profile-moments-page.tsx:229
+#: apps/app/src/routes/moments-page.tsx:1257
+#: apps/app/src/routes/profile-moments-page.tsx:470
 msgid "正在刷新..."
 msgstr "正在刷新..."
 
@@ -17152,7 +17154,7 @@ msgstr "正在刷新..."
 msgid "正在刷新广场动态"
 msgstr "正在刷新广场动态"
 
-#: apps/app/src/routes/moments-page.tsx:1142
+#: apps/app/src/routes/moments-page.tsx:1097
 msgid "正在刷新朋友圈"
 msgstr "正在刷新朋友圈"
 
@@ -17200,7 +17202,8 @@ msgstr "正在加载世界主人..."
 msgid "正在加载会员信息…"
 msgstr "正在加载会员信息…"
 
-#: apps/app/src/routes/profile-moments-page.tsx:258
+#: apps/app/src/features/desktop/moments/desktop-profile-moments-workspace.tsx:119
+#: apps/app/src/routes/profile-moments-page.tsx:499
 msgid "正在加载我的朋友圈"
 msgstr "正在加载我的朋友圈"
 
@@ -17281,7 +17284,7 @@ msgstr "正在回到桌面朋友圈"
 #. placeholder {0}: replyTarget.authorName
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1283
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:314
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:346
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:433
 #: apps/app/src/routes/channels-page.tsx:1926
 msgid "正在回复 {0}"
 msgstr "正在回复 {0}"
@@ -17313,7 +17316,7 @@ msgstr "正在打开..."
 msgid "正在打开会话..."
 msgstr "正在打开会话..."
 
-#: apps/app/src/routes/moments-page.tsx:680
+#: apps/app/src/routes/moments-page.tsx:644
 msgid "正在打开好友朋友圈"
 msgstr "正在打开好友朋友圈"
 
@@ -17355,6 +17358,10 @@ msgstr "正在打开桌面对话"
 msgid "正在打开桌面小程序"
 msgstr "正在打开桌面小程序"
 
+#: apps/app/src/routes/profile-moments-page.tsx:302
+msgid "正在打开桌面我的朋友圈"
+msgstr "正在打开桌面我的朋友圈"
+
 #: apps/app/src/routes/search-page.tsx:428
 msgid "正在打开桌面搜索"
 msgstr "正在打开桌面搜索"
@@ -17363,7 +17370,7 @@ msgstr "正在打开桌面搜索"
 msgid "正在打开桌面星标朋友..."
 msgstr "正在打开桌面星标朋友..."
 
-#: apps/app/src/routes/moments-page.tsx:701
+#: apps/app/src/routes/moments-page.tsx:665
 msgid "正在打开桌面朋友圈"
 msgstr "正在打开桌面朋友圈"
 
@@ -17536,7 +17543,8 @@ msgstr "正在整理语音内容..."
 msgid "正在整理这一轮回复，马上就会回到这里。"
 msgstr "正在整理这一轮回复，马上就会回到这里。"
 
-#: apps/app/src/routes/splash-page.tsx:186
+#: apps/app/src/components/bootstrap-screen.tsx:81
+#: apps/app/src/routes/splash-page.tsx:212
 msgid "正在整理这次进入世界的路径，马上带你回到上次停留的地方。"
 msgstr "正在整理这次进入世界的路径，马上带你回到上次停留的地方。"
 
@@ -17943,7 +17951,7 @@ msgstr "正在载入桌面搜索工作区，马上同步当前搜索条件。"
 msgid "正在载入桌面文章阅读视图，马上显示当前内容。"
 msgstr "正在载入桌面文章阅读视图，马上显示当前内容。"
 
-#: apps/app/src/routes/moments-page.tsx:702
+#: apps/app/src/routes/moments-page.tsx:666
 msgid "正在载入桌面朋友圈工作区，马上显示动态和详情。"
 msgstr "正在载入桌面朋友圈工作区，马上显示动态和详情。"
 
@@ -17966,6 +17974,10 @@ msgstr "正在载入桌面看一看工作区，马上显示当前动态内容。
 #: apps/app/src/routes/channels-page.tsx:950
 msgid "正在载入桌面视频号工作区，马上显示当前频道内容。"
 msgstr "正在载入桌面视频号工作区，马上显示当前频道内容。"
+
+#: apps/app/src/routes/profile-moments-page.tsx:303
+msgid "正在载入桌面端我的朋友圈工作区。"
+msgstr "正在载入桌面端我的朋友圈工作区。"
 
 #: apps/app/src/routes/games-page.tsx:493
 msgid "正在载入桌面端游戏中心。"
@@ -19665,10 +19677,19 @@ msgstr "确定"
 msgid "确定({0})"
 msgstr "确定({0})"
 
+#: apps/app/src/routes/moments-page.tsx:861
+#: apps/app/src/routes/profile-moments-page.tsx:546
+msgid "确定删除这条朋友圈吗？"
+msgstr "确定删除这条朋友圈吗？"
+
 #. placeholder {0}: selectedIds.length
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:224
 msgid "确定删除选中的 {0} 个朋友吗?"
 msgstr "确定删除选中的 {0} 个朋友吗?"
+
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:121
+msgid "确定要删除这条朋友圈吗？此操作无法撤销。"
+msgstr "确定要删除这条朋友圈吗？此操作无法撤销。"
 
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:995
 msgid "确定要重置整个停车场吗？"
@@ -19691,7 +19712,8 @@ msgstr "确认今天待办"
 msgid "确认今天新回来的回执结果，避免漏掉进度变化。"
 msgstr "确认今天新回来的回执结果，避免漏掉进度变化。"
 
-#: apps/app/src/routes/splash-page.tsx:164
+#: apps/app/src/components/bootstrap-screen.tsx:58
+#: apps/app/src/routes/splash-page.tsx:190
 msgid "确认入口"
 msgstr "确认入口"
 
@@ -19931,7 +19953,8 @@ msgstr "视频解析失败，请换一个文件再试。"
 #: apps/app/src/routes/friend-moments-page.tsx:304
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:129
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:138
-#: apps/app/src/routes/moments-page.tsx:575
+#: apps/app/src/routes/moments-page.tsx:616
+#: apps/app/src/routes/profile-moments-page.tsx:293
 msgid "视频选择失败，请稍后重试。"
 msgstr "视频选择失败，请稍后重试。"
 
@@ -20850,7 +20873,6 @@ msgstr "系统分享"
 #: apps/app/src/routes/group-qr-page.tsx:941
 #: apps/app/src/routes/mini-programs-page.tsx:423
 #: apps/app/src/routes/mini-programs-page.tsx:429
-#: apps/app/src/routes/moments-page.tsx:670
 #: apps/app/src/routes/official-account-article-page.tsx:256
 #: apps/app/src/routes/official-account-detail-page.tsx:260
 msgid "系统分享失败，请稍后重试。"
@@ -20876,7 +20898,6 @@ msgid "系统分享暂时不可用，已复制内容摘要。"
 msgstr "系统分享暂时不可用，已复制内容摘要。"
 
 #: apps/app/src/routes/discover-feed-page.tsx:557
-#: apps/app/src/routes/moments-page.tsx:657
 msgid "系统分享暂时不可用，已复制动态摘要。"
 msgstr "系统分享暂时不可用，已复制动态摘要。"
 
@@ -21156,7 +21177,8 @@ msgstr "继续加载更早消息"
 msgid "继续取消收藏"
 msgstr "继续取消收藏"
 
-#: apps/app/src/routes/splash-page.tsx:180
+#: apps/app/src/components/bootstrap-screen.tsx:74
+#: apps/app/src/routes/splash-page.tsx:206
 msgid "继续开启对话"
 msgstr "继续开启对话"
 
@@ -22396,7 +22418,7 @@ msgid "覆盖最近使用和目录里的入口。"
 msgstr "覆盖最近使用和目录里的入口。"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2435
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:173
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:260
 #: apps/app/src/features/search/use-search-index.ts:353
 msgid "角色"
 msgstr "角色"
@@ -22586,7 +22608,8 @@ msgstr "训练完，就想看猫爬上爬下。"
 msgid "记下灵感、待办、链接和图片，发到聊天里也很方便。"
 msgstr "记下灵感、待办、链接和图片，发到聊天里也很方便。"
 
-#: apps/app/src/routes/profile-moments-page.tsx:274
+#: apps/app/src/features/desktop/moments/desktop-profile-moments-workspace.tsx:130
+#: apps/app/src/routes/profile-moments-page.tsx:515
 msgid "记录此刻，你的朋友圈会出现在这里。"
 msgstr "记录此刻，你的朋友圈会出现在这里。"
 
@@ -22667,7 +22690,7 @@ msgstr "证据"
 
 #: apps/app/src/components/wechat-action-bubble.tsx:120
 #: apps/app/src/components/wechat-comment-bar.tsx:105
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:279
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:366
 #: apps/app/src/i18n/static-dom-seed.ts:318
 #: apps/app/src/routes/channels-page.tsx:1789
 msgid "评论"
@@ -23064,8 +23087,8 @@ msgstr "请先补充问题描述。"
 #: apps/app/src/routes/discover-feed-page.tsx:225
 #: apps/app/src/routes/friend-moments-page.tsx:156
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:128
-#: apps/app/src/routes/moments-page.tsx:258
-#: apps/app/src/routes/profile-moments-page.tsx:104
+#: apps/app/src/routes/moments-page.tsx:255
+#: apps/app/src/routes/profile-moments-page.tsx:128
 msgid "请先输入评论内容。"
 msgstr "请先输入评论内容。"
 
@@ -23495,7 +23518,7 @@ msgid "赛道日志"
 msgstr "赛道日志"
 
 #: apps/app/src/components/wechat-action-bubble.tsx:107
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:233
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:320
 #: apps/app/src/i18n/static-dom-seed.ts:317
 msgid "赞"
 msgstr "赞"
@@ -23685,11 +23708,15 @@ msgstr "载入桌面对话..."
 msgid "载入桌面小程序..."
 msgstr "载入桌面小程序..."
 
+#: apps/app/src/routes/profile-moments-page.tsx:304
+msgid "载入桌面我的朋友圈..."
+msgstr "载入桌面我的朋友圈..."
+
 #: apps/app/src/routes/search-page.tsx:430
 msgid "载入桌面搜索..."
 msgstr "载入桌面搜索..."
 
-#: apps/app/src/routes/moments-page.tsx:703
+#: apps/app/src/routes/moments-page.tsx:667
 msgid "载入桌面朋友圈..."
 msgstr "载入桌面朋友圈..."
 
@@ -23860,7 +23887,7 @@ msgstr "近期动向"
 #: apps/app/src/routes/mobile-add-friend-page.tsx:343
 #: apps/app/src/routes/mobile-note-editor-page.tsx:897
 #: apps/app/src/routes/mobile-notes-page.tsx:143
-#: apps/app/src/routes/moments-page.tsx:1066
+#: apps/app/src/routes/moments-page.tsx:1021
 #: apps/app/src/routes/official-accounts-page.tsx:354
 #: apps/app/src/routes/official-accounts-page.tsx:381
 #: apps/app/src/routes/profile-favorites-page.tsx:128
@@ -23869,7 +23896,7 @@ msgstr "近期动向"
 #: apps/app/src/routes/profile-info-page.tsx:49
 #: apps/app/src/routes/profile-info-placeholder-page.tsx:51
 #: apps/app/src/routes/profile-info-signature-page.tsx:80
-#: apps/app/src/routes/profile-moments-page.tsx:200
+#: apps/app/src/routes/profile-moments-page.tsx:441
 #: apps/app/src/routes/profile-settings-language-page.tsx:49
 #: apps/app/src/routes/profile-subscription-page.tsx:489
 #: apps/app/src/routes/welcome-page.tsx:1138
@@ -23890,6 +23917,7 @@ msgstr "返回上一步"
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1481
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1523
 #: apps/app/src/features/desktop/moments/desktop-friend-moments-workspace.tsx:261
+#: apps/app/src/features/desktop/moments/desktop-profile-moments-workspace.tsx:190
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:682
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:714
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:747
@@ -23938,9 +23966,9 @@ msgstr "返回上一步"
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:42
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:65
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:428
-#: apps/app/src/routes/moments-page.tsx:325
-#: apps/app/src/routes/moments-page.tsx:1169
-#: apps/app/src/routes/moments-page.tsx:1230
+#: apps/app/src/routes/moments-page.tsx:366
+#: apps/app/src/routes/moments-page.tsx:1124
+#: apps/app/src/routes/moments-page.tsx:1192
 #: apps/app/src/routes/official-account-article-page.tsx:208
 #: apps/app/src/routes/official-account-detail-page.tsx:388
 #: apps/app/src/routes/official-account-detail-page.tsx:419
@@ -24179,7 +24207,7 @@ msgid "还差"
 msgstr "还差"
 
 #: apps/app/src/i18n/static-dom-seed.ts:1081
-#: apps/app/src/routes/moments-page.tsx:1218
+#: apps/app/src/routes/moments-page.tsx:1180
 msgid "还很安静"
 msgstr "还很安静"
 
@@ -24199,7 +24227,7 @@ msgid "还没有{0}"
 msgstr "还没有{0}"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:151
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:206
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:293
 #: apps/app/src/i18n/static-dom-seed.ts:316
 msgid "还没有互动"
 msgstr "还没有互动"
@@ -24247,7 +24275,8 @@ msgstr "还没有加入我的小程序"
 msgid "还没有动静，先停一辆车试试。"
 msgstr "还没有动静，先停一辆车试试。"
 
-#: apps/app/src/routes/profile-moments-page.tsx:273
+#: apps/app/src/features/desktop/moments/desktop-profile-moments-workspace.tsx:129
+#: apps/app/src/routes/profile-moments-page.tsx:514
 msgid "还没有发布过朋友圈"
 msgstr "还没有发布过朋友圈"
 
@@ -24443,7 +24472,7 @@ msgstr "还没有自定义表情，可上传图片 / GIF，也能把聊天里的
 msgid "还没有订阅号消息"
 msgstr "还没有订阅号消息"
 
-#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:333
+#: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:420
 msgid "还没有评论，你可以成为第一个回应的人。"
 msgstr "还没有评论，你可以成为第一个回应的人。"
 
@@ -24887,7 +24916,8 @@ msgstr "这里不只看朋友，也能看到世界里的居民正在说什么。
 msgid "这里不新造设备接口，先用当前世界的真实运行状态来判断手机接力是否值得继续。"
 msgstr "这里不新造设备接口，先用当前世界的真实运行状态来判断手机接力是否值得继续。"
 
-#: apps/app/src/routes/splash-page.tsx:155
+#: apps/app/src/components/bootstrap-screen.tsx:49
+#: apps/app/src/routes/splash-page.tsx:181
 msgid "这里不是一串账号信息，而是一整片会继续生长、继续回应你的个人世界。"
 msgstr "这里不是一串账号信息，而是一整片会继续生长、继续回应你的个人世界。"
 
@@ -25665,8 +25695,6 @@ msgstr "重试关注"
 #: apps/app/src/routes/group-qr-page.tsx:1006
 #: apps/app/src/routes/mini-programs-page.tsx:403
 #: apps/app/src/routes/mini-programs-page.tsx:422
-#: apps/app/src/routes/moments-page.tsx:637
-#: apps/app/src/routes/moments-page.tsx:663
 #: apps/app/src/routes/official-account-article-page.tsx:237
 #: apps/app/src/routes/official-account-article-page.tsx:259
 #: apps/app/src/routes/official-account-detail-page.tsx:240
@@ -25742,8 +25770,6 @@ msgstr "重试场景相遇"
 #: apps/app/src/routes/group-qr-page.tsx:985
 #: apps/app/src/routes/mini-programs-page.tsx:442
 #: apps/app/src/routes/mini-programs-page.tsx:459
-#: apps/app/src/routes/moments-page.tsx:637
-#: apps/app/src/routes/moments-page.tsx:663
 #: apps/app/src/routes/official-account-article-page.tsx:237
 #: apps/app/src/routes/official-account-article-page.tsx:259
 #: apps/app/src/routes/official-account-detail-page.tsx:240
@@ -25859,9 +25885,9 @@ msgstr "重试评论点赞"
 #: apps/app/src/routes/group-qr-page.tsx:1148
 #: apps/app/src/routes/group-qr-page.tsx:1635
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:471
-#: apps/app/src/routes/moments-page.tsx:326
-#: apps/app/src/routes/moments-page.tsx:1161
-#: apps/app/src/routes/moments-page.tsx:1169
+#: apps/app/src/routes/moments-page.tsx:367
+#: apps/app/src/routes/moments-page.tsx:1116
+#: apps/app/src/routes/moments-page.tsx:1124
 #: apps/app/src/routes/official-account-article-page.tsx:380
 #: apps/app/src/routes/official-account-article-page.tsx:483
 #: apps/app/src/routes/official-account-detail-page.tsx:379
@@ -26152,7 +26178,8 @@ msgstr "除虫"
 msgid "隐"
 msgstr "隐"
 
-#: apps/app/src/routes/splash-page.tsx:149
+#: apps/app/src/components/bootstrap-screen.tsx:43
+#: apps/app/src/routes/splash-page.tsx:175
 msgid "隐界"
 msgstr "隐界"
 
