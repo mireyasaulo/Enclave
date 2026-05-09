@@ -1702,6 +1702,36 @@ export class MomentsService implements OnModuleInit {
 
   // ============= MiniMax 音乐贴 / 视频贴 =============
 
+  // 优先调用 MiniMax /v1/lyrics_generation 生成真正的歌词；失败或配额耗尽时
+  // fallback 到本地 composeMusicLyrics（按标点切分 seedText 凑结构）
+  private async generateLyricsOrFallback(
+    characterName: string,
+    seedText: string,
+  ): Promise<string> {
+    if (!this.minimaxClient.isConfigured()) {
+      return composeMusicLyrics(characterName, seedText);
+    }
+    const reserved = await this.minimaxQuota.tryReserve('lyrics');
+    if (!reserved) {
+      this.logger.debug('lyrics quota exhausted, using local fallback');
+      return composeMusicLyrics(characterName, seedText);
+    }
+    try {
+      const result = await this.minimaxClient.generateLyrics({
+        prompt: `为 ${characterName} 这一刻心境写一首中文歌词，结构包含 [verse] 和 [chorus]。情绪线索：${seedText.slice(0, 200)}`,
+      });
+      await this.minimaxQuota.commit('lyrics');
+      this.logger.log(`lyrics generated via minimax for ${characterName}`);
+      return result.lyrics;
+    } catch (err) {
+      await this.minimaxQuota.release('lyrics');
+      this.logger.warn(
+        `minimax lyrics gen failed, falling back: ${(err as Error)?.message}`,
+      );
+      return composeMusicLyrics(characterName, seedText);
+    }
+  }
+
   async scheduleMinimaxMusicMoment(
     char: CharacterEntity,
   ): Promise<MomentPostEntity | null> {
@@ -1746,10 +1776,11 @@ export class MomentsService implements OnModuleInit {
       seedText = `${char.name} 写了一首歌，记录此刻心情。`;
     }
 
+    const lyrics = await this.generateLyricsOrFallback(char.name, seedText);
     const job = await this.minimaxJobs.enqueueMusicJob({
       model: 'music-2.6',
       prompt: composeMusicPrompt(char.name, seedText),
-      lyrics: composeMusicLyrics(char.name, seedText),
+      lyrics,
       characterId: char.id,
       characterName: char.name,
       characterAvatar: char.avatar,
