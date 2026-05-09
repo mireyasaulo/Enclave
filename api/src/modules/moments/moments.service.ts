@@ -37,11 +37,18 @@ import {
 } from './moment-media.storage';
 import {
   type CreateMomentInput,
+  type MomentAudioAsset,
   type MomentContentType,
   type MomentImageAsset,
   type MomentMediaAsset,
   type MomentVideoAsset,
 } from './moment-media.types';
+import { MinimaxJobService } from '../minimax/minimax-job.service';
+import { MinimaxQuotaService } from '../minimax/minimax-quota.service';
+import { MinimaxClient } from '../minimax/minimax.client';
+import { MinimaxAssetStorage } from '../minimax/minimax-asset.storage';
+import type { MinimaxJobEntity } from '../minimax/minimax-job.entity';
+import type { CharacterEntity } from '../characters/character.entity';
 
 export interface MomentInteraction {
   characterId: string;
@@ -93,6 +100,10 @@ export class MomentsService implements OnModuleInit {
     private readonly feedService: FeedService,
     private readonly cyberAvatar: CyberAvatarService,
     private readonly reminderRuntime: ReminderRuntimeService,
+    private readonly minimaxJobs: MinimaxJobService,
+    private readonly minimaxQuota: MinimaxQuotaService,
+    private readonly minimaxClient: MinimaxClient,
+    private readonly minimaxStorage: MinimaxAssetStorage,
     @InjectRepository(MomentEntity)
     private momentRepo: Repository<MomentEntity>,
     @InjectRepository(MomentPostEntity)
@@ -1200,6 +1211,21 @@ export class MomentsService implements OnModuleInit {
       };
     }
 
+    if (asset.kind === 'audio') {
+      return {
+        id: asset.id?.trim() || `moment-audio-${index + 1}`,
+        kind: 'audio',
+        url: asset.url?.trim() || '',
+        posterUrl: asset.posterUrl?.trim() || undefined,
+        mimeType: asset.mimeType?.trim() || 'audio/mpeg',
+        fileName: asset.fileName?.trim() || `audio-${index + 1}`,
+        size: Math.max(0, Math.round(asset.size ?? 0)),
+        durationMs: normalizeOptionalPositiveNumber(asset.durationMs),
+        title: asset.title?.trim() || undefined,
+        lyrics: asset.lyrics?.trim() || undefined,
+      };
+    }
+
     return {
       id: asset.id?.trim() || `moment-image-${index + 1}`,
       kind: 'image',
@@ -1225,12 +1251,18 @@ export class MomentsService implements OnModuleInit {
       return 'text';
     }
 
+    if (media.some((asset) => asset.kind === 'audio')) {
+      return 'audio_card';
+    }
+
     if (media.some((asset) => asset.kind === 'video')) {
       return 'video';
     }
 
     if (
-      media.some((asset) => asset.kind === 'image' && asset.livePhoto?.enabled)
+      media.some(
+        (asset) => asset.kind === 'image' && (asset as MomentImageAsset).livePhoto?.enabled,
+      )
     ) {
       return 'live_photo';
     }
@@ -1241,7 +1273,8 @@ export class MomentsService implements OnModuleInit {
   private normalizeMomentContentType(value?: string): MomentContentType {
     return value === 'image_album' ||
       value === 'video' ||
-      value === 'live_photo'
+      value === 'live_photo' ||
+      value === 'audio_card'
       ? value
       : 'text';
   }
@@ -1272,6 +1305,15 @@ export class MomentsService implements OnModuleInit {
       ) {
         throw new AppError('MOMENTS_VIDEO_TOO_LONG', {
           legacyMessage: '朋友圈视频时长不能超过 5 分钟。',
+        });
+      }
+      return;
+    }
+
+    if (contentType === 'audio_card') {
+      if (media.length !== 1 || media[0]?.kind !== 'audio') {
+        throw new AppError('MOMENTS_AUDIO_SINGLE', {
+          legacyMessage: '音乐朋友圈必须且只能包含 1 条音频。',
         });
       }
       return;
@@ -1424,6 +1466,21 @@ export class MomentsService implements OnModuleInit {
       return video.durationMs
         ? `1 条时长约 ${Math.round(video.durationMs / 1000)} 秒的视频`
         : '1 条视频';
+    }
+
+    if (contentType === 'audio_card') {
+      const audio = media[0];
+      if (!audio || audio.kind !== 'audio') {
+        return '1 段音乐';
+      }
+      const title = audio.title?.trim();
+      const seconds = audio.durationMs
+        ? `${Math.round(audio.durationMs / 1000)} 秒`
+        : null;
+      const parts = [title ? `《${title}》` : '一段音乐', seconds].filter(
+        Boolean,
+      );
+      return parts.join('，');
     }
 
     const imageCount = media.filter((asset) => asset.kind === 'image').length;
@@ -1642,5 +1699,274 @@ export class MomentsService implements OnModuleInit {
       commentCount,
     };
   }
+
+  // ============= MiniMax 音乐贴 / 视频贴 =============
+
+  async scheduleMinimaxMusicMoment(
+    char: CharacterEntity,
+  ): Promise<MomentPostEntity | null> {
+    if (!(await this.isCharacterVisibleToOwner(char.id))) {
+      return null;
+    }
+    const profile = await this.characters.getProfile(char.id);
+    if (!profile) return null;
+
+    let seedText = '';
+    try {
+      seedText = (
+        await this.ai.generateMoment({
+          profile,
+          currentTime: new Date(),
+          usageContext: {
+            surface: 'app',
+            scene: 'minimax_music_seed',
+            scopeType: 'character',
+            scopeId: char.id,
+            scopeLabel: char.name,
+            characterId: char.id,
+            characterName: char.name,
+          },
+        })
+      ).trim();
+    } catch (err) {
+      this.logger.warn(
+        `music seed text gen failed for ${char.id}: ${(err as Error)?.message}`,
+      );
+    }
+    if (!seedText) {
+      seedText = `${char.name} 写了一首歌，记录此刻心情。`;
+    }
+
+    const job = await this.minimaxJobs.enqueueMusicJob({
+      model: 'music-2.6',
+      prompt: composeMusicPrompt(char.name, seedText),
+      lyrics: undefined,
+      characterId: char.id,
+      characterName: char.name,
+      characterAvatar: char.avatar,
+      targetType: 'moment_post',
+    });
+    if (!job) {
+      this.logger.warn(
+        `enqueueMusicJob declined for ${char.id} (quota or config)`,
+      );
+      return null;
+    }
+
+    const post = this.postRepo.create({
+      authorId: char.id,
+      authorName: char.name,
+      authorAvatar: char.avatar,
+      authorType: 'character',
+      visibility: this.deriveDefaultVisibility(char.socialOpenness),
+      text: seedText,
+      contentType: 'audio_card',
+      mediaPayload: undefined,
+      postedAt: this.jitterPastTimestamp(15 * 60 * 1000),
+      generationKind: 'minimax_music',
+      generationMetadata: {
+        minimaxJobId: job.id,
+        minimaxModel: 'music-2.6',
+        pending: true,
+      },
+    });
+    const saved = await this.postRepo.save(post);
+    await this.minimaxJobs.attachTarget(job.id, saved.id);
+    this.logger.log(
+      `moment ${saved.id} queued minimax music job ${job.id} for ${char.name}`,
+    );
+    return saved;
+  }
+
+  async scheduleMinimaxVideoMoment(
+    char: CharacterEntity,
+    pickModel: () => Promise<
+      'MiniMax-Hailuo-02-Fast' | 'MiniMax-Hailuo-02' | null
+    >,
+  ): Promise<MomentPostEntity | null> {
+    if (!(await this.isCharacterVisibleToOwner(char.id))) {
+      return null;
+    }
+    const model = await pickModel();
+    if (!model) return null;
+
+    const profile = await this.characters.getProfile(char.id);
+    if (!profile) return null;
+
+    let seedText = '';
+    try {
+      seedText = (
+        await this.ai.generateMoment({
+          profile,
+          currentTime: new Date(),
+          usageContext: {
+            surface: 'app',
+            scene: 'minimax_moment_video',
+            scopeType: 'character',
+            scopeId: char.id,
+            scopeLabel: char.name,
+            characterId: char.id,
+            characterName: char.name,
+          },
+        })
+      ).trim();
+    } catch (err) {
+      this.logger.warn(
+        `moment-video text gen failed for ${char.id}: ${(err as Error)?.message}`,
+      );
+    }
+    if (!seedText) seedText = `${char.name} 拍了一段画面记录今天。`;
+
+    const job = await this.minimaxJobs.enqueueVideoJob({
+      model,
+      prompt: composeMomentVideoPrompt(char.name, profile.relationship, seedText),
+      resolution: '768P',
+      characterId: char.id,
+      characterName: char.name,
+      characterAvatar: char.avatar,
+      targetType: 'moment_post',
+    });
+    if (!job) return null;
+
+    const post = this.postRepo.create({
+      authorId: char.id,
+      authorName: char.name,
+      authorAvatar: char.avatar,
+      authorType: 'character',
+      visibility: this.deriveDefaultVisibility(char.socialOpenness),
+      text: seedText,
+      contentType: 'video',
+      mediaPayload: undefined,
+      postedAt: this.jitterPastTimestamp(15 * 60 * 1000),
+      generationKind: 'minimax_video',
+      generationMetadata: {
+        minimaxJobId: job.id,
+        minimaxModel: model,
+        pending: true,
+      },
+    });
+    const saved = await this.postRepo.save(post);
+    await this.minimaxJobs.attachTarget(job.id, saved.id);
+    this.logger.log(
+      `moment ${saved.id} queued minimax video job ${job.id} (${model}) for ${char.name}`,
+    );
+    return saved;
+  }
+
+  async applyMinimaxMusicToPost(
+    postId: string,
+    audio: MomentAudioAsset,
+  ): Promise<void> {
+    const post = await this.postRepo.findOneBy({ id: postId });
+    if (!post) {
+      this.logger.warn(`applyMinimaxMusicToPost: post ${postId} missing`);
+      return;
+    }
+    const meta: Record<string, unknown> = {
+      ...(post.generationMetadata ?? {}),
+    };
+    delete meta.pending;
+    post.contentType = 'audio_card';
+    post.mediaPayload = this.serializeMomentMedia([audio]);
+    post.generationMetadata = meta;
+    const saved = await this.postRepo.save(post);
+    void this.scheduleCharacterInteractions(saved);
+  }
+
+  async applyMinimaxVideoToPost(
+    postId: string,
+    video: MomentVideoAsset,
+  ): Promise<void> {
+    const post = await this.postRepo.findOneBy({ id: postId });
+    if (!post) {
+      this.logger.warn(`applyMinimaxVideoToPost: post ${postId} missing`);
+      return;
+    }
+    const meta: Record<string, unknown> = {
+      ...(post.generationMetadata ?? {}),
+    };
+    delete meta.pending;
+    post.contentType = 'video';
+    post.mediaPayload = this.serializeMomentMedia([video]);
+    post.generationMetadata = meta;
+    const saved = await this.postRepo.save(post);
+    void this.scheduleCharacterInteractions(saved);
+  }
+
+  async deleteMinimaxPlaceholderPost(postId: string): Promise<void> {
+    const post = await this.postRepo.findOneBy({ id: postId });
+    if (!post) return;
+    const meta = (post.generationMetadata ?? {}) as Record<string, unknown>;
+    if (meta?.pending !== true) {
+      // 真实生成已落地，不应再删
+      return;
+    }
+    await this.commentRepo.delete({ postId });
+    await this.likeRepo.delete({ postId });
+    await this.postRepo.delete(postId);
+  }
+
+  async tryRenderMinimaxMusicCover(
+    job: MinimaxJobEntity,
+    seedText: string,
+  ): Promise<{ url: string; fileName: string } | null> {
+    if (!this.minimaxClient.isConfigured()) return null;
+    const reserved = await this.minimaxQuota.tryReserve('image-01');
+    if (!reserved) return null;
+    try {
+      const image = await this.minimaxClient.generateImage({
+        model: 'image-01',
+        prompt: composeMusicCoverPrompt(job.characterName, seedText),
+        aspectRatio: '1:1',
+      });
+      const persisted = await this.minimaxStorage.persist({
+        buffer: image.buffer,
+        mimeType: image.mimeType,
+        kind: 'image',
+        suffix: '-cover',
+      });
+      await this.minimaxQuota.commit('image-01');
+      return { url: persisted.publicUrl, fileName: persisted.fileName };
+    } catch (err) {
+      await this.minimaxQuota.release('image-01');
+      this.logger.warn(
+        `music cover gen failed for job ${job.id}: ${(err as Error)?.message}`,
+      );
+      return null;
+    }
+  }
+}
+
+function composeMusicPrompt(characterName: string, seedText: string): string {
+  return [
+    `${characterName} 心境的器乐 / 轻人声小品，1 分钟内。`,
+    `情绪线索：${seedText.slice(0, 200)}`,
+    '风格：电子流行 + 氛围合成器，节奏适中，情感清晰。',
+  ].join(' ');
+}
+
+function composeMomentVideoPrompt(
+  characterName: string,
+  relationship: string | undefined,
+  seedText: string,
+): string {
+  const relSnippet = relationship?.trim()
+    ? `角色定位：${relationship.slice(0, 100)}。`
+    : '';
+  return [
+    `${characterName} 朋友圈短片，9:16 竖屏，6 秒。`,
+    relSnippet,
+    `情境：${seedText.slice(0, 200)}。`,
+    '风格：生活感、真实光线、轻微镜头运动。',
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+function composeMusicCoverPrompt(
+  characterName: string,
+  seedText: string,
+): string {
+  return `音乐封面：${characterName} 视角，${seedText.slice(0, 80)}。极简电影风，柔和色调，正方形海报构图。`;
 }
 // i18n-ignore-end

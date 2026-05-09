@@ -2390,6 +2390,21 @@ function normalizeFeedMediaAsset(
     };
   }
 
+  if (asset.kind === 'audio') {
+    return {
+      id: asset.id?.trim() || `feed-audio-${index + 1}`,
+      kind: 'audio',
+      url: asset.url?.trim() || '',
+      posterUrl: asset.posterUrl?.trim() || undefined,
+      mimeType: asset.mimeType?.trim() || 'audio/mpeg',
+      fileName: asset.fileName?.trim() || `audio-${index + 1}`,
+      size: Math.max(0, Math.round(asset.size ?? 0)),
+      durationMs: normalizeOptionalPositiveInteger(asset.durationMs),
+      title: asset.title?.trim() || undefined,
+      lyrics: asset.lyrics?.trim() || undefined,
+    };
+  }
+
   return {
     id: asset.id?.trim() || `feed-image-${index + 1}`,
     kind: 'image',
@@ -2426,7 +2441,7 @@ function normalizeOptionalPositiveFloat(value?: number | null) {
 }
 
 function resolveFeedMediaAspectRatio(media?: MomentMediaAsset | null) {
-  if (!media) {
+  if (!media || media.kind === 'audio') {
     return undefined;
   }
 

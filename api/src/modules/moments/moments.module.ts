@@ -13,6 +13,8 @@ import { SocialModule } from '../social/social.module';
 import { FeedModule } from '../feed/feed.module';
 import { CyberAvatarModule } from '../cyber-avatar/cyber-avatar.module';
 import { ReminderRuntimeModule } from '../reminder-runtime/reminder-runtime.module';
+import { MinimaxModule } from '../minimax/minimax.module';
+import { MomentsMinimaxCallbacks } from './moments-minimax.callbacks';
 
 @Module({
   imports: [
@@ -29,8 +31,9 @@ import { ReminderRuntimeModule } from '../reminder-runtime/reminder-runtime.modu
     FeedModule,
     forwardRef(() => CyberAvatarModule),
     ReminderRuntimeModule,
+    MinimaxModule,
   ],
-  providers: [MomentsService],
+  providers: [MomentsService, MomentsMinimaxCallbacks],
   controllers: [MomentsController],
   exports: [MomentsService],
 })
