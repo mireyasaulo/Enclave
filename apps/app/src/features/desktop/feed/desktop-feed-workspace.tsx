@@ -50,6 +50,8 @@ type DesktopFeedWorkspaceProps = {
   onRemoveImage: (id: string) => void;
   onRemoveVideo: () => void;
   onRefresh: () => void;
+  /** 可选 — 点击行内「分享图卡」时上抛 postId，由 page 弹出 modal。 */
+  onShare?: (postId: string) => void;
   onTextChange: (value: string) => void;
   onToggleFavorite: (postId: string) => void;
   onVideoFileSelected: (file: File | null) => void;
@@ -91,59 +93,60 @@ export function DesktopFeedWorkspace({
   onRemoveImage,
   onRemoveVideo,
   onRefresh,
+  onShare,
   onTextChange,
   onToggleFavorite,
   onVideoFileSelected,
 }: DesktopFeedWorkspaceProps) {
-  const [expandedPostId, setExpandedPostId] = useState<string | null>(
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(
     routeSelectedPostId,
   );
   const scrollViewportRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setExpandedPostId((current) =>
+    setSelectedPostId((current) =>
       current === routeSelectedPostId ? current : routeSelectedPostId,
     );
   }, [routeSelectedPostId]);
 
   const detailQuery = useQuery({
-    queryKey: ["app-feed-post", baseUrl, expandedPostId],
+    queryKey: ["app-feed-post", baseUrl, selectedPostId],
     queryFn: async () => {
-      if (!expandedPostId) {
+      if (!selectedPostId) {
         return null;
       }
 
-      return (await getFeedPost(expandedPostId, baseUrl)) ?? null;
+      return (await getFeedPost(selectedPostId, baseUrl)) ?? null;
     },
-    enabled: Boolean(expandedPostId),
+    enabled: Boolean(selectedPostId),
   });
 
   useEffect(() => {
-    if (!expandedPostId) {
+    if (!selectedPostId) {
       return;
     }
 
-    if (!posts.some((post) => post.id === expandedPostId)) {
-      setExpandedPostId(null);
+    if (!posts.some((post) => post.id === selectedPostId)) {
+      setSelectedPostId(null);
     }
-  }, [posts, expandedPostId]);
+  }, [posts, selectedPostId]);
 
   useEffect(() => {
-    onSelectedPostChange?.(expandedPostId);
-  }, [onSelectedPostChange, expandedPostId]);
+    onSelectedPostChange?.(selectedPostId);
+  }, [onSelectedPostChange, selectedPostId]);
 
   useEffect(() => {
-    if (!expandedPostId || typeof document === "undefined") {
+    if (!selectedPostId || typeof document === "undefined") {
       return;
     }
 
     const frame = window.requestAnimationFrame(() => {
       document
-        .getElementById(`desktop-feed-post-${expandedPostId}`)
+        .getElementById(`desktop-feed-post-${selectedPostId}`)
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [expandedPostId]);
+  }, [selectedPostId]);
 
   return (
     <div className="relative flex h-full min-h-0 bg-[rgba(244,247,246,0.98)]">
@@ -181,18 +184,19 @@ export function DesktopFeedWorkspace({
                 }
                 detailLoading={detailQuery.isLoading}
                 detailPost={detailQuery.data ?? null}
-                expandedPostId={expandedPostId}
+                selectedPostId={selectedPostId}
                 isLoading={isLoading}
                 likePendingPostId={likePendingPostId}
                 posts={posts}
                 isPostFavorite={isPostFavorite}
                 onCancelCommentReply={onCancelCommentReply}
-                onCollapse={() => setExpandedPostId(null)}
+                onCollapse={() => setSelectedPostId(null)}
                 onCommentChange={onCommentChange}
                 onCommentSubmit={onCommentSubmit}
-                onExpand={(postId) => setExpandedPostId(postId)}
+                onExpand={(postId) => setSelectedPostId(postId)}
                 onLike={onLike}
                 onOpenCompose={() => setShowCompose(true)}
+                onShare={onShare}
                 onStartCommentReply={onStartCommentReply}
                 onToggleFavorite={onToggleFavorite}
               />

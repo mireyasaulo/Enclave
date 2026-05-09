@@ -1,0 +1,345 @@
+import {
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
+import { msg } from "@lingui/macro";
+import * as htmlToImage from "html-to-image";
+import QRCode from "qrcode";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+
+const t = translateRuntimeMessage;
+
+// 水印里的 QR 与文案都指向 site 主域名。
+// 不读 env，因为 app 客户端的 SITE_URL 没有现成常量，且这个值固定。
+const SITE_URL = "https://www.enclave.top";
+
+type Props = {
+  /**
+   * 当前要导出的卡片 id；null 时整个 modal 隐藏。
+   * 用 id 而不是对象 — 父组件每次 render 都重新 find()，对象 ref 会变。
+   */
+  cardKey: string | null;
+  /** 离屏容器里渲染的卡片内容；常见做法是传一个微信卡片或自定义动态卡 */
+  children: ReactNode;
+  /** 水印中间的两行文字，例如 "{name} 的 AI 朋友圈" */
+  watermarkSubtitle: string;
+  /** 模态标题（顶栏），如 "分享我的朋友圈" */
+  modalTitle: string;
+  /** 底部小贴士文案 */
+  bottomHint: string;
+  /** 下载文件名前缀（拼上 cardKey） */
+  filenamePrefix: string;
+  onClose: () => void;
+};
+
+/**
+ * 通用「分享图卡」模态：
+ * 1. 离屏渲染 children → html-to-image 截图为 PNG
+ * 2. 顶部：标题 + 关闭
+ * 3. 中部：预览图（生成中显示 loading）
+ * 4. 底部：保存 / 分享按钮（移动端走 Web Share API，桌面 download）
+ *
+ * children 应该是一段 self-contained 的卡片 JSX，会被放进白底 480px 容器里。
+ */
+export function ShareCardModal({
+  cardKey,
+  children,
+  watermarkSubtitle,
+  modalTitle,
+  bottomHint,
+  filenamePrefix,
+  onClose,
+}: Props) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [qr, setQr] = useState<string | null>(null);
+  const [pngDataUrl, setPngDataUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // 生成一次 QR — site URL 固定。失败时悄悄省掉，水印仍然有文字。
+  useEffect(() => {
+    let cancelled = false;
+    QRCode.toDataURL(SITE_URL, {
+      margin: 1,
+      width: 128,
+      errorCorrectionLevel: "M",
+    })
+      .then((url) => {
+        if (!cancelled) setQr(url);
+      })
+      .catch(() => {
+        if (!cancelled) setQr(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // 截图触发：每次换 cardKey 重做。等 QR 准备好（避免水印缺图）后再画。
+  useEffect(() => {
+    if (!cardKey) return;
+    setPngDataUrl(null);
+    setError(null);
+    let cancelled = false;
+
+    const run = async () => {
+      // 等两帧让 React 完成首次绘制
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      );
+      const node = cardRef.current;
+      if (!node || cancelled) return;
+
+      // 视频节点 html-to-image 画不出来（canvas drawImage 需要 video 加载完才行，
+      // 实际上这里 video 通常没加载到 metadata）。把它替换成 poster 图，
+      // 没 poster 就直接隐藏 — 这样导出图里不会出现一个空白方块。
+      node.querySelectorAll("video").forEach((video) => {
+        const poster = video.getAttribute("poster");
+        if (poster) {
+          const placeholder = document.createElement("img");
+          placeholder.src = poster;
+          placeholder.style.cssText = video.getAttribute("style") ?? "";
+          placeholder.className = video.className;
+          placeholder.width = video.clientWidth;
+          placeholder.height = video.clientHeight;
+          video.replaceWith(placeholder);
+        } else {
+          video.style.display = "none";
+        }
+      });
+
+      // 把所有 <img> 转成同源 data URL — 避免 cross-origin 把 canvas tainted 后
+      // toDataURL 抛 SecurityError。fetch 失败的图就让它空着，不影响其他元素。
+      const imgs = Array.from(node.querySelectorAll("img"));
+      await Promise.all(
+        imgs.map(async (img) => {
+          if (!img.src || img.src.startsWith("data:")) return;
+          try {
+            const resp = await fetch(img.src, { cache: "force-cache" });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const blob = await resp.blob();
+            const dataUrl = await new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(String(reader.result));
+              reader.onerror = () => reject(reader.error);
+              reader.readAsDataURL(blob);
+            });
+            img.src = dataUrl;
+            await new Promise<void>((r) =>
+              img.complete
+                ? r()
+                : img.addEventListener("load", () => r(), { once: true }),
+            );
+          } catch {
+            // 单图加载失败不要拦住整张图卡
+          }
+        }),
+      );
+      if (cancelled) return;
+
+      try {
+        const dataUrl = await htmlToImage.toPng(node, {
+          pixelRatio: 2,
+          cacheBust: false,
+          backgroundColor: "#ffffff",
+        });
+        if (!cancelled) setPngDataUrl(dataUrl);
+      } catch (err) {
+        console.error("[share-card] export failed", err);
+        if (!cancelled) {
+          setError(t(msg`图片生成失败，请稍后重试`));
+        }
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [cardKey, qr]);
+
+  // ESC 关闭 — 必须放在任何条件 return 之前以遵守 hooks 规则
+  useEffect(() => {
+    if (!cardKey) return;
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [cardKey, onClose]);
+
+  if (!cardKey) return null;
+
+  const handleSaveOrShare = async () => {
+    if (!pngDataUrl) return;
+    const fileName = `${filenamePrefix}-${cardKey}.png`;
+
+    try {
+      if (
+        typeof navigator !== "undefined" &&
+        "canShare" in navigator &&
+        "share" in navigator
+      ) {
+        try {
+          const blob = await fetch(pngDataUrl).then((r) => r.blob());
+          const file = new File([blob], fileName, { type: "image/png" });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: modalTitle,
+              text: SITE_URL,
+            });
+            return;
+          }
+        } catch (shareErr) {
+          if (
+            shareErr instanceof Error &&
+            shareErr.name === "AbortError"
+          ) {
+            return;
+          }
+        }
+      }
+
+      const a = document.createElement("a");
+      a.href = pngDataUrl;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (err) {
+      console.error("[share-card] save failed", err);
+      setError(t(msg`保存失败，请长按图片手动保存`));
+    }
+  };
+
+  return createPortal(
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-[1100] flex items-center justify-center bg-black/60 p-4"
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      {/* 离屏渲染目标：fixed + left:-10000 避开视口但仍参与布局，html-to-image 能拿到尺寸 */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          left: "-10000px",
+          top: 0,
+          width: 480,
+          pointerEvents: "none",
+        }}
+      >
+        <div
+          ref={cardRef}
+          style={{
+            width: 480,
+            background: "#FFFFFF",
+            fontFamily:
+              "-apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Segoe UI', sans-serif",
+          }}
+        >
+          {children}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 14,
+              padding: "14px 16px 18px",
+              borderTop: "1px solid #EDEDED",
+              background: "#F7F7F7",
+            }}
+          >
+            {qr ? (
+              <img
+                src={qr}
+                alt=""
+                width={72}
+                height={72}
+                style={{
+                  width: 72,
+                  height: 72,
+                  borderRadius: 6,
+                  background: "#FFFFFF",
+                  padding: 4,
+                  border: "1px solid #E5E5E5",
+                }}
+              />
+            ) : null}
+            <div style={{ flex: 1, minWidth: 0, lineHeight: 1.5 }}>
+              <div
+                style={{
+                  fontSize: 15,
+                  fontWeight: 600,
+                  color: "#1A1A1A",
+                  marginBottom: 2,
+                }}
+              >
+                {t(msg`隐界 Enclave`)}
+              </div>
+              <div style={{ fontSize: 13, color: "#4C4C4C" }}>
+                {watermarkSubtitle}
+              </div>
+              <div style={{ fontSize: 12, color: "#9A9A9A", marginTop: 2 }}>
+                {t(msg`enclave.top · 浏览器即开即用`)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 用户可见的预览 + 操作 */}
+      <div className="relative flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+          <div className="text-[15px] font-medium text-gray-900">
+            {modalTitle}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t(msg`关闭`)}
+            className="rounded-md px-2 py-1 text-sm text-gray-500 active:bg-gray-100"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="max-h-[60vh] overflow-auto bg-[#F2F2F2] p-3">
+          {error ? (
+            <div className="py-12 text-center text-sm text-red-500">{error}</div>
+          ) : pngDataUrl ? (
+            <img
+              src={pngDataUrl}
+              alt={t(msg`分享图卡预览`)}
+              className="w-full rounded-md shadow-sm"
+            />
+          ) : (
+            <div className="py-12 text-center text-sm text-gray-500">
+              {t(msg`生成图片中…`)}
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-gray-100 px-4 py-3">
+          <div className="mb-3 text-center text-[12px] text-gray-500">
+            {bottomHint}
+          </div>
+          <button
+            type="button"
+            onClick={handleSaveOrShare}
+            disabled={!pngDataUrl}
+            className="w-full rounded-full bg-[#07C160] py-3 text-[15px] font-medium text-white active:bg-[#06A050] disabled:cursor-not-allowed disabled:bg-gray-300"
+          >
+            {t(msg`保存 / 分享图片`)}
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}

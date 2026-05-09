@@ -7,7 +7,15 @@ import {
 } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock, LoadingBlock, TextField, cn } from "@yinjie/ui";
-import { Bot, Heart, MessageCircle, Star, UserRound, X } from "lucide-react";
+import {
+  Bot,
+  Heart,
+  MessageCircle,
+  Share2,
+  Star,
+  UserRound,
+  X,
+} from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { MomentMediaGallery } from "../../../components/moment-media-gallery";
 import {
@@ -34,6 +42,8 @@ type DesktopFeedRowProps = {
   onCommentSubmit: () => void;
   onExpand: () => void;
   onLike: () => void;
+  /** 可选 — 触发"分享图卡"。 */
+  onShare?: () => void;
   onStartCommentReply?: (comment: FeedComment) => void;
   onToggleFavorite: () => void;
 };
@@ -55,6 +65,7 @@ export function DesktopFeedRow({
   onCommentSubmit,
   onExpand,
   onLike,
+  onShare,
   onStartCommentReply,
   onToggleFavorite,
 }: DesktopFeedRowProps) {
@@ -173,6 +184,17 @@ export function DesktopFeedRow({
                 <Star size={14} className={favorite ? "fill-current" : ""} />
                 {favorite ? t(msg`已收藏`) : t(msg`收藏`)}
               </button>
+              {onShare ? (
+                <button
+                  type="button"
+                  onClick={onShare}
+                  aria-label={t(msg`生成分享图卡`)}
+                  className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[color:var(--border-faint)] px-2.5 text-[12px] text-[color:var(--text-secondary)] transition-[background-color,color,border-color] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
+                >
+                  <Share2 size={14} />
+                  {t(msg`分享图卡`)}
+                </button>
+              ) : null}
             </div>
           </div>
 

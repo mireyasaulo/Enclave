@@ -29,6 +29,8 @@ type DesktopFeedListProps = {
   onExpand: (postId: string) => void;
   onLike: (postId: string) => void;
   onOpenCompose: () => void;
+  /** 可选 — 触发"分享图卡"上抛 postId。 */
+  onShare?: (postId: string) => void;
   onStartCommentReply?: (comment: FeedComment) => void;
   onToggleFavorite: (postId: string) => void;
 };
@@ -52,6 +54,7 @@ export function DesktopFeedList({
   onExpand,
   onLike,
   onOpenCompose,
+  onShare,
   onStartCommentReply,
   onToggleFavorite,
 }: DesktopFeedListProps) {
@@ -92,6 +95,7 @@ export function DesktopFeedList({
                 onCommentSubmit={() => onCommentSubmit(post.id)}
                 onExpand={() => onExpand(post.id)}
                 onLike={() => onLike(post.id)}
+                onShare={onShare ? () => onShare(post.id) : undefined}
                 onStartCommentReply={onStartCommentReply}
                 onToggleFavorite={() => onToggleFavorite(post.id)}
               />

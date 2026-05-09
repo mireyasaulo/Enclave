@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   Copy,
   Heart,
+  Image as ImageIcon,
   PenSquare,
   Share2,
 } from "lucide-react";
@@ -26,6 +27,7 @@ import {
 } from "@yinjie/contracts";
 import { AppPage, Button, InlineNotice, TextField } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
+import { FeedPostShareCardModal } from "../components/feed-post-share-card-modal";
 import { MomentMediaGallery } from "../components/moment-media-gallery";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import {
@@ -101,6 +103,8 @@ export function DiscoverFeedPage() {
   );
   const [noticeAction, setNoticeAction] = useState<(() => void) | null>(null);
   const [favoriteSourceIds, setFavoriteSourceIds] = useState<string[]>([]);
+  // 「分享图卡」目标 post id — 与 link-share 分开存，用户可以两种都点。
+  const [shareCardPostId, setShareCardPostId] = useState<string | null>(null);
   const routeState = parseFeedRouteHash(hash);
   const normalizedDesktopReturnPath =
     isDesktopLayout && routeState.returnPath === "/discover/feed"
@@ -696,9 +700,19 @@ export function DiscoverFeedPage() {
               nextFavorites.map((favorite) => favorite.sourceId),
             );
           }}
+          onShare={(postId) => setShareCardPostId(postId)}
           onVideoFileSelected={(file) => {
             void handleVideoFileSelected(file);
           }}
+        />
+        <FeedPostShareCardModal
+          post={
+            shareCardPostId
+              ? visiblePosts.find((item) => item.id === shareCardPostId) ?? null
+              : null
+          }
+          ownerDisplayName={ownerUsername?.trim() || t(msg`世界主人`)}
+          onClose={() => setShareCardPostId(null)}
         />
       </Suspense>
     );
@@ -844,24 +858,36 @@ export function DiscoverFeedPage() {
                     : t(msg`居民动态`)
                 }`}
                 headerActions={
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full text-[color:var(--text-muted)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
-                    onClick={() => void handleSharePost(post)}
-                    aria-label={
-                      nativeMobileShareSupported
-                        ? t(msg`分享这条动态`)
-                        : t(msg`复制这条动态摘要`)
-                    }
-                  >
-                    {nativeMobileShareSupported ? (
-                      <Share2 size={15} />
-                    ) : (
-                      <Copy size={15} />
-                    )}
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full text-[color:var(--text-muted)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
+                      onClick={() => setShareCardPostId(post.id)}
+                      aria-label={t(msg`生成分享图卡`)}
+                    >
+                      <ImageIcon size={15} />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full text-[color:var(--text-muted)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
+                      onClick={() => void handleSharePost(post)}
+                      aria-label={
+                        nativeMobileShareSupported
+                          ? t(msg`分享这条动态`)
+                          : t(msg`复制这条动态摘要`)
+                      }
+                    >
+                      {nativeMobileShareSupported ? (
+                        <Share2 size={15} />
+                      ) : (
+                        <Copy size={15} />
+                      )}
+                    </Button>
+                  </div>
                 }
                 body={
                   <div className="space-y-3">
@@ -1061,6 +1087,18 @@ export function DiscoverFeedPage() {
           ) : null}
         </section>
       </div>
+
+      <FeedPostShareCardModal
+        post={
+          shareCardPostId
+            ? visiblePosts.find((item) => item.id === shareCardPostId) ?? null
+            : null
+        }
+        ownerDisplayName={
+          ownerUsername?.trim() || t(msg`世界主人`)
+        }
+        onClose={() => setShareCardPostId(null)}
+      />
     </AppPage>
   );
 }
