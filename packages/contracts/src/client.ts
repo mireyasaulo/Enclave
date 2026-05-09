@@ -727,6 +727,16 @@ function normalizeMomentMediaAsset(
     };
   }
 
+  if (asset.kind === "audio") {
+    return {
+      ...asset,
+      url: normalizeAttachmentAssetUrl(asset.url, baseUrl),
+      posterUrl: asset.posterUrl
+        ? normalizeAttachmentAssetUrl(asset.posterUrl, baseUrl)
+        : asset.posterUrl,
+    };
+  }
+
   return {
     ...asset,
     url: normalizeAttachmentAssetUrl(asset.url, baseUrl),
@@ -889,7 +899,7 @@ function normalizeFeedPost<T extends FeedPost>(post: T, baseUrl?: string): T {
     aspectRatio:
       typeof post.aspectRatio === "number" && Number.isFinite(post.aspectRatio)
         ? post.aspectRatio
-        : primaryMedia?.width && primaryMedia.height
+        : primaryMedia && primaryMedia.kind !== "audio" && primaryMedia.width && primaryMedia.height
           ? primaryMedia.width / primaryMedia.height
           : null,
     topicTags: Array.isArray(post.topicTags) ? post.topicTags : [],
