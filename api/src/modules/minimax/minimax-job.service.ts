@@ -217,8 +217,10 @@ export class MinimaxJobService {
 
     if (job.status === 'pending') {
       try {
-        let firstFrameImageUrl = payload.firstFrameImageUrl ?? job.coverUrl ?? undefined;
+        let firstFrameImageUrl: string | undefined =
+          payload.firstFrameImageUrl ?? undefined;
         let coverFileName = job.coverFileName ?? undefined;
+        let coverPublicUrl = job.coverUrl ?? undefined;
         const needsFirstFrame =
           job.model === 'MiniMax-Hailuo-2.3-Fast' && !firstFrameImageUrl;
         if (needsFirstFrame) {
@@ -243,8 +245,11 @@ export class MinimaxJobService {
               kind: 'image',
               suffix: '-firstframe',
             });
-            firstFrameImageUrl = persisted.publicUrl;
+            // MiniMax accepts a data URL for first_frame_image; the persisted
+            // public URL points at the local API which they can't fetch.
+            firstFrameImageUrl = `data:${img.mimeType};base64,${img.buffer.toString('base64')}`;
             coverFileName = persisted.fileName;
+            coverPublicUrl = persisted.publicUrl;
             await this.quota.commit('image-01');
             await this.repo.update(job.id, {
               coverUrl: persisted.publicUrl,
@@ -255,7 +260,6 @@ export class MinimaxJobService {
             this.logger.warn(
               `cover gen failed for job ${job.id}: ${(err as Error)?.message}`,
             );
-            // Demote: drop Fast and retry with HD.
             await this.maybeDemoteFastToHd(job);
             return;
           }
@@ -274,6 +278,7 @@ export class MinimaxJobService {
           lastAttemptAt: new Date(),
           executeAfter: new Date(Date.now() + VIDEO_POLL_INTERVAL_MS),
           coverFileName,
+          coverUrl: coverPublicUrl,
         });
         this.logger.log(
           `video job ${job.id} submitted: model=${job.model} task=${submit.taskId}`,

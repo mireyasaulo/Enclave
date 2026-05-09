@@ -89,7 +89,8 @@ export class MinimaxClient {
       file_id?: string;
       base_resp?: MinimaxBaseResp;
     }>(`/v1/query/video_generation?task_id=${encodeURIComponent(taskId)}`);
-    this.assertSuccess(response.base_resp, 'video query');
+    // 不调用 assertSuccess：query 在任务失败时也会返回 base_resp.status_code != 0，
+    // 但 top-level status='Fail' 已经表达了真实状态，应当读 status 而不是抛错。
     const status = (response.status ?? 'Unknown') as MinimaxVideoStatus;
     return {
       status,

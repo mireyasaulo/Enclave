@@ -1740,7 +1740,7 @@ export class MomentsService implements OnModuleInit {
     const job = await this.minimaxJobs.enqueueMusicJob({
       model: 'music-2.6',
       prompt: composeMusicPrompt(char.name, seedText),
-      lyrics: undefined,
+      lyrics: composeMusicLyrics(char.name, seedText),
       characterId: char.id,
       characterName: char.name,
       characterAvatar: char.avatar,
@@ -1943,6 +1943,24 @@ function composeMusicPrompt(characterName: string, seedText: string): string {
     `情绪线索：${seedText.slice(0, 200)}`,
     '风格：电子流行 + 氛围合成器，节奏适中，情感清晰。',
   ].join(' ');
+}
+
+function composeMusicLyrics(_characterName: string, seedText: string): string {
+  const trimmed = seedText.replace(/\s+/g, ' ').trim();
+  if (!trimmed) {
+    return '\n[verse]\n慢慢走进灯光里\n收起一身风尘\n[chorus]\n这一刻让我留下\n继续向前再向前\n';
+  }
+  const lines = trimmed
+    .split(/[，。！？!?,.\n]/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .slice(0, 8);
+  while (lines.length < 4) {
+    lines.push(trimmed.slice(0, Math.min(20, trimmed.length)));
+  }
+  const verse = lines.slice(0, Math.ceil(lines.length / 2)).join('\n');
+  const chorus = lines.slice(Math.ceil(lines.length / 2)).join('\n');
+  return `\n[verse]\n${verse}\n[chorus]\n${chorus || verse}\n`;
 }
 
 function composeMomentVideoPrompt(
