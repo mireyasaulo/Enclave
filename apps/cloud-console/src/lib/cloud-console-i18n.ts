@@ -86,6 +86,8 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Sync from n1n.ai": "从 n1n.ai 同步",
     "Syncing…": "同步中…",
     "Synced {count} models from n1n.ai": "已从 n1n.ai 同步 {count} 个模型",
+    "Synced {count} models, recomputed {days} days of cost.":
+      "已同步 {count} 个模型，重算 {days} 天费用。", // i18n-ignore-line: runtime dict value
     "Back to token usage": "返回 Token 用量",
     "Breakdown": "维度拆解",
     "By character": "按角色",
@@ -548,6 +550,8 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Syncing…": "同期中…",
     "Synced {count} models from n1n.ai":
       "n1n.ai から {count} 件のモデルを同期しました",
+    "Synced {count} models, recomputed {days} days of cost.":
+      "{count} 件のモデルを同期し、{days} 日分の費用を再計算しました。", // i18n-ignore-line: runtime dict value
     "Back to token usage": "Token 使用量に戻る",
     "Breakdown": "内訳",
     "By character": "キャラクター別",
@@ -1039,6 +1043,8 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Syncing…": "동기화 중…",
     "Synced {count} models from n1n.ai":
       "n1n.ai에서 모델 {count}개를 동기화했습니다",
+    "Synced {count} models, recomputed {days} days of cost.":
+      "모델 {count}개 동기화, {days}일 비용 재계산 완료.",
     "Back to token usage": "토큰 사용량으로 돌아가기",
     "Breakdown": "분석",
     "By character": "캐릭터별",

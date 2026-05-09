@@ -1070,7 +1070,7 @@ export function WelcomePage() {
                     track("login_fail", {
                       method: "google",
                       authMode,
-                      message: "gis_onError",
+                      message: "gis_onError", // i18n-ignore-line: telemetry error code
                     });
                   }}
                   useOneTap={false}
