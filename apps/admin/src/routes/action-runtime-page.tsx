@@ -635,8 +635,8 @@ export function ActionRuntimePage() {
         ...current,
         [connector.id]:
           mode === "missing"
-            ? "当前推荐项都已经存在，没有新增映射。"
-            : "当前没有可写入的推荐映射。",
+            ? t(msg`当前推荐项都已经存在，没有新增映射。`)
+            : t(msg`当前没有可写入的推荐映射。`),
       }));
       return;
     }
@@ -648,8 +648,8 @@ export function ActionRuntimePage() {
       ...current,
       [connector.id]:
         mode === "missing"
-          ? `已补入 ${mergeResult.appliedCount} 条未配置映射，自动避开 ${mergeResult.disambiguatedCount} 个冲突 key，跳过 ${mergeResult.skippedCount} 条无法处理的项。`
-          : `已写入 ${mergeResult.appliedCount} 条推荐映射，自动避开 ${mergeResult.disambiguatedCount} 个冲突 key，跳过 ${mergeResult.skippedCount} 条无法处理的项。`,
+          ? t(msg`已补入 ${mergeResult.appliedCount} 条未配置映射，自动避开 ${mergeResult.disambiguatedCount} 个冲突 key，跳过 ${mergeResult.skippedCount} 条无法处理的项。`)
+          : t(msg`已写入 ${mergeResult.appliedCount} 条推荐映射，自动避开 ${mergeResult.disambiguatedCount} 个冲突 key，跳过 ${mergeResult.skippedCount} 条无法处理的项。`),
     }));
   }
 
@@ -1837,8 +1837,8 @@ export function ActionRuntimePage() {
                         {selectedConnector.providerType === "http_bridge" ? (
                           <AdminCallout
                             tone="info"
-                            title="HTTP Bridge 契约"
-                            description="服务端会向 `endpointConfig.url` 发送 JSON：`{ connectorKey, operationKey, domain, title, goal, riskLevel, requiresConfirmation, previewOnly, slots, missingSlots, sentAt }`。返回 JSON 时优先读取 `resultSummary` / `summary`、`result`、`execution`。"
+                            title={t(msg`HTTP Bridge 契约`)}
+                            description={t(msg`服务端会向 \`endpointConfig.url\` 发送 JSON：\`{ connectorKey, operationKey, domain, title, goal, riskLevel, requiresConfirmation, previewOnly, slots, missingSlots, sentAt }\`。返回 JSON 时优先读取 \`resultSummary\` / \`summary\`、\`result\`、\`execution\`。`)}
                           />
                         ) : null}
 
@@ -1872,8 +1872,8 @@ export function ActionRuntimePage() {
                                   }
                                 >
                                   {selectedConnectorDiscovering
-                                    ? "发现中..."
-                                    : "发现实体"}
+                                    ? t(msg`发现中...`)
+                                    : t(msg`发现实体`)}
                                 </Button>
                               </div>
                               <div className="mt-4">
@@ -2086,7 +2086,7 @@ export function ActionRuntimePage() {
                               testMessage: value,
                             })
                           }
-                          placeholder="留空则使用系统默认样例。"
+                          placeholder={t(msg`留空则使用系统默认样例。`)}
                           textareaClassName="min-h-24"
                         />
 
@@ -2377,19 +2377,18 @@ function ActionRunDetailPanel({ detail }: { detail: ActionRunDetail }) {
           </div>
         </AdminMiniPanel>
 
-        <AdminMiniPanel title="参数情况" tone="soft">
+        <AdminMiniPanel title={t(msg`参数情况`)} tone="soft">
           <div className="space-y-2 text-sm text-[color:var(--text-secondary)]">
             <AdminSoftBox>
-              缺失参数：
-              {detail.missingSlots.length
+              {t(msg`缺失参数：${detail.missingSlots.length
                 ? detail.missingSlots.join(" / ")
-                : " 无"}
+                : "无"}`)}
             </AdminSoftBox>
             <AdminSoftBox>
-              结果摘要：{detail.resultSummary || "暂无"}
+              {t(msg`结果摘要：${detail.resultSummary || "暂无"}`)}
             </AdminSoftBox>
             <AdminSoftBox>
-              错误信息：{detail.errorMessage || "暂无"}
+              {t(msg`错误信息：${detail.errorMessage || "暂无"}`)}
             </AdminSoftBox>
           </div>
         </AdminMiniPanel>
@@ -2431,6 +2430,7 @@ function buildActionOperatorSummary(
   overview: ActionRuntimeOverview,
   connectors: ActionConnectorSummary[],
 ) {
+  const t = translateRuntimeMessage;
   const errorConnectors = connectors.filter(
     (connector) => connector.status === "error",
   );
@@ -2441,112 +2441,113 @@ function buildActionOperatorSummary(
     !overview.operatorCharacter
   ) {
     notes.push(
-      `当前缺少 sourceKey = ${overview.rules.policy.entryCharacterSourceKey} 的动作角色，真实世界动作链不会正常工作。`,
+      t(msg`当前缺少 sourceKey = ${overview.rules.policy.entryCharacterSourceKey} 的动作角色，真实世界动作链不会正常工作。`),
     );
   }
 
   if (!overview.rules.policy.entryCharacterSourceKey) {
-    notes.push("当前未限制动作入口角色，任何角色消息都可能命中动作链。");
+    notes.push(t(msg`当前未限制动作入口角色，任何角色消息都可能命中动作链。`));
   }
 
   if (!overview.rules.policy.enabled) {
-    notes.push("动作入口当前处于关闭状态，用户消息不会进入 Action Runtime。");
+    notes.push(t(msg`动作入口当前处于关闭状态，用户消息不会进入 Action Runtime。`));
   }
 
   if (overview.counts.readyConnectors === 0) {
-    notes.push("当前没有已就绪连接器，先去连接器编排完成配置和启用。");
+    notes.push(t(msg`当前没有已就绪连接器，先去连接器编排完成配置和启用。`));
   }
 
   if (overview.counts.awaitingSlots > 0) {
-    notes.push(`有 ${overview.counts.awaitingSlots} 条动作在等待补参数。`);
+    notes.push(t(msg`有 ${overview.counts.awaitingSlots} 条动作在等待补参数。`));
   }
 
   if (overview.counts.awaitingConfirmation > 0) {
     notes.push(
-      `有 ${overview.counts.awaitingConfirmation} 条动作在等待用户确认。`,
+      t(msg`有 ${overview.counts.awaitingConfirmation} 条动作在等待用户确认。`),
     );
   }
 
   if (overview.counts.failed > 0) {
     notes.push(
-      `最近有 ${overview.counts.failed} 条动作执行失败，需要回看 trace。`,
+      t(msg`最近有 ${overview.counts.failed} 条动作执行失败，需要回看 trace。`),
     );
   }
 
   if (errorConnectors.length > 0) {
     notes.push(
-      `有 ${errorConnectors.length} 个连接器处于 error，优先检查最近错误和凭证状态。`,
+      t(msg`有 ${errorConnectors.length} 个连接器处于 error，优先检查最近错误和凭证状态。`),
     );
   }
 
   if (!notes.length) {
     return {
       tone: "success" as const,
-      title: "动作链当前可用",
+      title: t(msg`动作链当前可用`),
       notes: [
-        "动作角色、动作入口和连接器状态都正常，可以继续做消息预演或回看成功样本。",
+        t(msg`动作角色、动作入口和连接器状态都正常，可以继续做消息预演或回看成功样本。`),
       ],
     };
   }
 
   return {
     tone: "warning" as const,
-    title: "当前有动作链待处理事项",
+    title: t(msg`当前有动作链待处理事项`),
     notes,
   };
 }
 
 function buildActionRunHint(detail: ActionRunDetail) {
+  const t = translateRuntimeMessage;
   if (detail.status === "awaiting_slots") {
     return {
       tone: "warning" as const,
-      title: "当前动作在等待补参数",
+      title: t(msg`当前动作在等待补参数`),
       description: detail.missingSlots.length
-        ? `还缺 ${detail.missingSlots.join(" / ")}，先判断是用户表达不完整，还是连接器映射缺失。`
-        : "当前动作仍处于待补参数状态，先检查 plan 和 slotPayload。",
+        ? t(msg`还缺 ${detail.missingSlots.join(" / ")}，先判断是用户表达不完整，还是连接器映射缺失。`)
+        : t(msg`当前动作仍处于待补参数状态，先检查 plan 和 slotPayload。`),
     };
   }
 
   if (detail.status === "awaiting_confirmation") {
     return {
       tone: "info" as const,
-      title: "当前动作在等待用户确认",
+      title: t(msg`当前动作在等待用户确认`),
       description:
-        "先看风险等级、确认模板和 Policy Decision，再决定是否需要调整确认词或自动执行范围。",
+        t(msg`先看风险等级、确认模板和 Policy Decision，再决定是否需要调整确认词或自动执行范围。`),
     };
   }
 
   if (detail.status === "failed") {
     return {
       tone: "warning" as const,
-      title: "当前动作执行失败",
+      title: t(msg`当前动作执行失败`),
       description:
-        "优先看 Error Payload 和 Trace Payload，其次检查连接器状态、凭证和 endpoint config。",
+        t(msg`优先看 Error Payload 和 Trace Payload，其次检查连接器状态、凭证和 endpoint config。`),
     };
   }
 
   if (detail.status === "succeeded") {
     return {
       tone: "success" as const,
-      title: "当前动作已成功执行",
+      title: t(msg`当前动作已成功执行`),
       description:
-        "可从 Result Payload 和 Trace Payload 回看动作副作用，并拿这条样本作为后续预演的基线。",
+        t(msg`可从 Result Payload 和 Trace Payload 回看动作副作用，并拿这条样本作为后续预演的基线。`),
     };
   }
 
   if (detail.status === "cancelled") {
     return {
       tone: "muted" as const,
-      title: "当前动作已取消",
-      description: "回看确认链路和用户拒绝语义，确认这次取消是否符合预期。",
+      title: t(msg`当前动作已取消`),
+      description: t(msg`回看确认链路和用户拒绝语义，确认这次取消是否符合预期。`),
     };
   }
 
   return {
     tone: "info" as const,
-    title: "当前动作仍在处理中",
+    title: t(msg`当前动作仍在处理中`),
     description:
-      "继续关注 Trace Payload，确认 planner、执行器和连接器的阶段变化。",
+      t(msg`继续关注 Trace Payload，确认 planner、执行器和连接器的阶段变化。`),
   };
 }
 
@@ -2600,68 +2601,73 @@ function syncConnectorDrafts(
 }
 
 function translatePlannerMode(mode: ActionRuntimeRules["plannerMode"]) {
+  const t = translateRuntimeMessage;
   if (mode === "llm_with_heuristic_fallback") {
-    return "LLM 优先 + 回退";
+    return t(msg`LLM 优先 + 回退`);
   }
   if (mode === "llm") {
-    return "纯 LLM";
+    return t(msg`纯 LLM`);
   }
-  return "纯规则";
+  return t(msg`纯规则`);
 }
 
 function translateRiskLevel(level: ActionRiskLevel) {
+  const t = translateRuntimeMessage;
   if (level === "read_only") {
-    return "只读";
+    return t(msg`只读`);
   }
   if (level === "reversible_low_risk") {
-    return "低风险可逆";
+    return t(msg`低风险可逆`);
   }
-  return "付费/不可逆";
+  return t(msg`付费/不可逆`);
 }
 
 function translateRunStatus(status: ActionRunSummary["status"]) {
+  const t = translateRuntimeMessage;
   if (status === "awaiting_slots") {
-    return "待补参数";
+    return t(msg`待补参数`);
   }
   if (status === "awaiting_confirmation") {
-    return "待确认";
+    return t(msg`待确认`);
   }
   if (status === "succeeded") {
-    return "已成功";
+    return t(msg`已成功`);
   }
   if (status === "failed") {
-    return "失败";
+    return t(msg`失败`);
   }
   if (status === "cancelled") {
-    return "已取消";
+    return t(msg`已取消`);
   }
   if (status === "running") {
-    return "执行中";
+    return t(msg`执行中`);
   }
-  return "草稿";
+  return t(msg`草稿`);
 }
 
 function translateConnectorStatus(status: ActionConnectorSummary["status"]) {
+  const t = translateRuntimeMessage;
   if (status === "ready") {
-    return "已就绪";
+    return t(msg`已就绪`);
   }
   if (status === "error") {
-    return "错误";
+    return t(msg`错误`);
   }
-  return "已停用";
+  return t(msg`已停用`);
 }
 
 function translateProviderType(
   providerType: ActionConnectorSummary["providerType"],
 ) {
+  const t = translateRuntimeMessage;
   if (providerType === "official_api") {
-    return "官方 API";
+    return t(msg`官方 API`);
   }
   if (providerType === "http_bridge") {
     return "HTTP Bridge";
   }
   if (providerType === "browser_operator") {
-    return "浏览器执行器";
+    return t(msg`浏览器执行器`);
   }
   return "Mock";
 }
@@ -2727,11 +2733,11 @@ function parseEndpointConfig(value: string): {
       return { value: null };
     }
     if (Array.isArray(parsed) || typeof parsed !== "object") {
-      return { value: null, error: "Endpoint Config 需要是 JSON 对象。" };
+      return { value: null, error: "Endpoint Config needs to be a JSON object." };
     }
     return { value: parsed as Record<string, unknown> };
   } catch {
-    return { value: null, error: "Endpoint Config 不是合法 JSON。" };
+    return { value: null, error: "Endpoint Config is not valid JSON." };
   }
 }
 
@@ -2958,23 +2964,26 @@ function resolveRunTone(
 function translateRunRetryStep(
   step: "awaiting_slots" | "awaiting_confirmation" | "executed",
 ) {
+  const t = translateRuntimeMessage;
   if (step === "awaiting_slots") {
-    return "待补参数";
+    return t(msg`待补参数`);
   }
   if (step === "awaiting_confirmation") {
-    return "待确认";
+    return t(msg`待确认`);
   }
-  return "已重新执行";
+  return t(msg`已重新执行`);
 }
 
 function translateDiscoveryTopologySource(source: string) {
+  const t = translateRuntimeMessage;
   if (source === "websocket_registry") {
-    return "WebSocket registry 优先";
+    return t(msg`WebSocket registry 优先`);
   }
-  return "states 启发式";
+  return t(msg`states 启发式`);
 }
 
 function translateDiscoverySource(source: string) {
+  const t = translateRuntimeMessage;
   if (source === "entity_registry") {
     return "Entity Registry";
   }
@@ -2982,12 +2991,10 @@ function translateDiscoverySource(source: string) {
     return "Device Registry";
   }
   if (source === "heuristic") {
-    return "名称启发式";
+    return t(msg`名称启发式`);
   }
   if (source === "unresolved") {
-    return "未识别";
+    return t(msg`未识别`);
   }
   return source;
 }
-
-// i18n-ignore-end
