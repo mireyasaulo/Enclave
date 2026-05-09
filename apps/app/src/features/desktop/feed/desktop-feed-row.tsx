@@ -168,6 +168,15 @@ export function DesktopFeedRow({
               </button>
               <button
                 type="button"
+                onClick={expanded ? onCollapse : onExpand}
+                aria-pressed={expanded}
+                className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[color:var(--border-faint)] px-2.5 text-[12px] text-[color:var(--text-secondary)] transition-[background-color,color,border-color] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
+              >
+                <MessageCircle size={14} />
+                {t(msg`评论`)}
+              </button>
+              <button
+                type="button"
                 onClick={onToggleFavorite}
                 className={cn(
                   "inline-flex h-8 items-center gap-1.5 rounded-xl border px-2.5 text-[12px] transition-[background-color,color,border-color]",
