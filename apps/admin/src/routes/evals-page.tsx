@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+// i18n-ignore-start: data / seed / preset content — not yet migrated.
 import {
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   compareEvalRuns,
   getGenerationTrace,
   getEvalDataset,
@@ -108,6 +110,7 @@ type EvalsPreset = {
 };
 
 export function EvalsPage() {
+  const t = translateRuntimeMessage;
   const baseUrl = resolveAdminCoreApiBaseUrl();
   const queryClient = useQueryClient();
   const systemStatusQuery = useQuery({
@@ -2760,23 +2763,23 @@ export function EvalsPage() {
 function formatEvalStatus(status: string) {
   switch (status) {
     case "queued":
-      return "排队中";
+      return translateRuntimeMessage(msg`排队中`);
     case "running":
-      return "运行中";
+      return translateRuntimeMessage(msg`运行中`);
     case "passed":
-      return "通过";
+      return translateRuntimeMessage(msg`通过`);
     case "failed":
-      return "失败";
+      return translateRuntimeMessage(msg`失败`);
     case "success":
-      return "成功";
+      return translateRuntimeMessage(msg`成功`);
     case "fallback":
-      return "回退";
+      return translateRuntimeMessage(msg`回退`);
     case "error":
-      return "错误";
+      return translateRuntimeMessage(msg`错误`);
     case "scaffolded":
-      return "脚手架";
+      return translateRuntimeMessage(msg`脚手架`);
     case "completed":
-      return "已完成";
+      return translateRuntimeMessage(msg`已完成`);
     default:
       return status;
   }
@@ -2785,13 +2788,13 @@ function formatEvalStatus(status: string) {
 function formatEvalMode(mode: string) {
   switch (mode) {
     case "single":
-      return "单次";
+      return translateRuntimeMessage(msg`单次`);
     case "pairwise":
-      return "成对";
+      return translateRuntimeMessage(msg`成对`);
     case "replay":
-      return "回放";
+      return translateRuntimeMessage(msg`回放`);
     case "persona_gate":
-      return "角色门控";
+      return translateRuntimeMessage(msg`角色门控`);
     default:
       return mode;
   }
@@ -2800,11 +2803,11 @@ function formatEvalMode(mode: string) {
 function formatCompareOutcome(outcome: string) {
   switch (outcome) {
     case "win":
-      return "候选胜出";
+      return translateRuntimeMessage(msg`候选胜出`);
     case "lose":
-      return "候选落后";
+      return translateRuntimeMessage(msg`候选落后`);
     case "tie":
-      return "持平";
+      return translateRuntimeMessage(msg`持平`);
     default:
       return outcome;
   }
@@ -2813,11 +2816,11 @@ function formatCompareOutcome(outcome: string) {
 function formatCompareCaseFilter(filter: "all" | "different" | "failed") {
   switch (filter) {
     case "all":
-      return "全部用例";
+      return translateRuntimeMessage(msg`全部用例`);
     case "different":
-      return "仅差异用例";
+      return translateRuntimeMessage(msg`仅差异用例`);
     case "failed":
-      return "仅失败用例";
+      return translateRuntimeMessage(msg`仅失败用例`);
     default:
       return filter;
   }
@@ -2826,13 +2829,13 @@ function formatCompareCaseFilter(filter: "all" | "different" | "failed") {
 function formatCompareOutcomeFilter(filter: "all" | "win" | "lose" | "tie") {
   switch (filter) {
     case "all":
-      return "全部结果";
+      return translateRuntimeMessage(msg`全部结果`);
     case "win":
-      return "候选胜出";
+      return translateRuntimeMessage(msg`候选胜出`);
     case "lose":
-      return "候选落后";
+      return translateRuntimeMessage(msg`候选落后`);
     case "tie":
-      return "持平";
+      return translateRuntimeMessage(msg`持平`);
     default:
       return filter;
   }
@@ -2841,11 +2844,11 @@ function formatCompareOutcomeFilter(filter: "all" | "win" | "lose" | "tie") {
 function formatTraceScope(scope: "all" | "run" | "compare") {
   switch (scope) {
     case "all":
-      return "全部链路";
+      return translateRuntimeMessage(msg`全部链路`);
     case "run":
-      return "当前运行";
+      return translateRuntimeMessage(msg`当前运行`);
     case "compare":
-      return "当前对比";
+      return translateRuntimeMessage(msg`当前对比`);
     default:
       return scope;
   }
@@ -2854,17 +2857,17 @@ function formatTraceScope(scope: "all" | "run" | "compare") {
 function formatTraceSource(source: string) {
   switch (source) {
     case "chat.reply":
-      return "聊天直回";
+      return translateRuntimeMessage(msg`聊天直回`);
     case "eval.judge":
-      return "评测裁判";
+      return translateRuntimeMessage(msg`评测裁判`);
     case "social.greeting":
-      return "社交打招呼";
+      return translateRuntimeMessage(msg`社交打招呼`);
     case "group.intent":
-      return "群聊意图判断";
+      return translateRuntimeMessage(msg`群聊意图判断`);
     case "group.coordinator":
-      return "群聊协调回复";
+      return translateRuntimeMessage(msg`群聊协调回复`);
     case "memory.summary":
-      return "记忆摘要";
+      return translateRuntimeMessage(msg`记忆摘要`);
     default:
       return source;
   }
@@ -2873,11 +2876,11 @@ function formatTraceSource(source: string) {
 function formatJudgeSource(source: string) {
   switch (source) {
     case "llm":
-      return "LLM 裁判";
+      return translateRuntimeMessage(msg`LLM 裁判`);
     case "heuristic":
-      return "启发式兜底";
+      return translateRuntimeMessage(msg`启发式兜底`);
     case "scaffolded":
-      return "未正式判分";
+      return translateRuntimeMessage(msg`未正式判分`);
     default:
       return source;
   }
@@ -2899,13 +2902,13 @@ function collectGenerationTraceIds(caseResult: { traceIds: string[]; judgeTraceI
 function formatEvalTargetType(targetType: string) {
   switch (targetType) {
     case "turn":
-      return "单轮";
+      return translateRuntimeMessage(msg`单轮`);
     case "session":
-      return "会话";
+      return translateRuntimeMessage(msg`会话`);
     case "world_event_chain":
-      return "世界事件链";
+      return translateRuntimeMessage(msg`世界事件链`);
     case "persona":
-      return "人设";
+      return translateRuntimeMessage(msg`人设`);
     default:
       return targetType;
   }
@@ -2914,11 +2917,11 @@ function formatEvalTargetType(targetType: string) {
 function formatPromptRole(role: string) {
   switch (role) {
     case "system":
-      return "系统";
+      return translateRuntimeMessage(msg`系统`);
     case "user":
-      return "用户";
+      return translateRuntimeMessage(msg`用户`);
     case "assistant":
-      return "助手";
+      return translateRuntimeMessage(msg`助手`);
     default:
       return role;
   }
@@ -2929,7 +2932,7 @@ function formatPromptVariantValue(
   labelMap: Map<string, string>,
 ) {
   if (!value) {
-    return "默认";
+    return translateRuntimeMessage(msg`默认`);
   }
 
   return labelMap.get(value) ?? value;
@@ -2940,7 +2943,7 @@ function formatMemoryStrategyValue(
   labelMap: Map<string, string>,
 ) {
   if (!value || value === "default") {
-    return "默认";
+    return translateRuntimeMessage(msg`默认`);
   }
 
   return labelMap.get(value) ?? value;
@@ -2952,19 +2955,19 @@ function formatTraceCompareMatch(value: string) {
     return value;
   }
 
-  return `${side === "baseline" ? "基线" : side === "candidate" ? "候选" : side} · ${caseId}`;
+  return `${side === "baseline" ? translateRuntimeMessage(msg`基线`) : side === "candidate" ? translateRuntimeMessage(msg`候选`) : side} · ${caseId}`;
 }
 
 function formatDecisionStatus(status: "keep-testing" | "promote" | "rollback" | "archive") {
   switch (status) {
     case "keep-testing":
-      return "继续测试";
+      return translateRuntimeMessage(msg`继续测试`);
     case "promote":
-      return "采用候选";
+      return translateRuntimeMessage(msg`采用候选`);
     case "rollback":
-      return "回滚";
+      return translateRuntimeMessage(msg`回滚`);
     case "archive":
-      return "归档";
+      return translateRuntimeMessage(msg`归档`);
     default:
       return status;
   }

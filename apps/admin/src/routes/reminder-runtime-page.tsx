@@ -986,7 +986,7 @@ function ReminderRuntimeConfigPanel({
                   }
                 />
                 <NumberField
-                  label="默认单次提醒分钟"
+                  label={t(msg`默认单次提醒分钟`)}
                   value={draft.defaultReminderMinute}
                   min={0}
                   max={59}
@@ -995,7 +995,7 @@ function ReminderRuntimeConfigPanel({
                   }
                 />
                 <NumberField
-                  label="习惯提醒默认小时"
+                  label={t(msg`习惯提醒默认小时`)}
                   value={draft.habitDefaultHour}
                   min={0}
                   max={23}
@@ -1004,7 +1004,7 @@ function ReminderRuntimeConfigPanel({
                   }
                 />
                 <NumberField
-                  label="习惯提醒默认分钟"
+                  label={t(msg`习惯提醒默认分钟`)}
                   value={draft.habitDefaultMinute}
                   min={0}
                   max={59}
@@ -1016,13 +1016,13 @@ function ReminderRuntimeConfigPanel({
             </ConfigGroup>
 
             <ConfigGroup
-              title="问询节奏"
-              description="控制小盯主动问一句的时间窗口，以及一次列表展示的上限。"
+              title={t(msg`问询节奏`)}
+              description={t(msg`控制小盯主动问一句的时间窗口，以及一次列表展示的上限。`)}
             >
               <div className="space-y-4">
                 <div>
                   <AdminTextField
-                    label="问询小时点"
+                    label={t(msg`问询小时点`)}
                     value={formatCheckinHoursInput(draft.checkinHours)}
                     onChange={(value) =>
                       onChange({
@@ -1032,12 +1032,12 @@ function ReminderRuntimeConfigPanel({
                     }
                   />
                   <div className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
-                    用逗号分隔 0-23 的小时值，例如 `9, 13, 21`。
+                    {t(msg`用逗号分隔 0-23 的小时值，例如 \`9, 13, 21\`。`)}
                   </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   <NumberField
-                    label="最小问询间隔（小时）"
+                    label={t(msg`最小问询间隔（小时）`)}
                     value={draft.checkinMinIntervalHours}
                     min={1}
                     max={72}
@@ -1046,7 +1046,7 @@ function ReminderRuntimeConfigPanel({
                     }
                   />
                   <NumberField
-                    label="聊天列表最大项数"
+                    label={t(msg`聊天列表最大项数`)}
                     value={draft.maxListItems}
                     min={1}
                     max={20}
@@ -1056,7 +1056,7 @@ function ReminderRuntimeConfigPanel({
                   />
                 </div>
                 <AdminSoftBox className="text-xs leading-5">
-                  当前问询窗口：{formatCheckinHours(draft.checkinHours)}。
+                  {t(msg`当前问询窗口：${formatCheckinHours(draft.checkinHours)}。`)}
                 </AdminSoftBox>
               </div>
             </ConfigGroup>
@@ -1066,33 +1066,33 @@ function ReminderRuntimeConfigPanel({
         {activeTab === "messages" ? (
           <div className="space-y-4">
             <ConfigGroup
-              title="入口与列表文案"
-              description="决定用户问“你能做什么”“我有哪些提醒”时，小盯如何回应。支持占位符：`{{index}}`、`{{title}}`、`{{scheduleText}}`。"
+              title={t(msg`入口与列表文案`)}
+              description={t(msg`决定用户问”你能做什么””我有哪些提醒”时，小盯如何回应。支持占位符：\`{{index}}\`、\`{{title}}\`、\`{{scheduleText}}\`。`)}
             >
-              <div className="space-y-4">
+              <div className=”space-y-4”>
                 <AdminTextArea
-                  label="帮助文案"
+                  label={t(msg`帮助文案`)}
                   value={draft.textTemplates.helpMessage}
                   onChange={(value) => updateTextTemplate("helpMessage", value)}
                   textareaClassName="min-h-24"
                 />
                 <div className="grid gap-4">
                   <AdminTextField
-                    label="空列表文案"
+                    label={t(msg`空列表文案`)}
                     value={draft.textTemplates.taskListEmpty}
                     onChange={(value) =>
                       updateTextTemplate("taskListEmpty", value)
                     }
                   />
                   <AdminTextField
-                    label="列表头文案"
+                    label={t(msg`列表头文案`)}
                     value={draft.textTemplates.taskListHeader}
                     onChange={(value) =>
                       updateTextTemplate("taskListHeader", value)
                     }
                   />
                   <AdminTextField
-                    label="列表项模板"
+                    label={t(msg`列表项模板`)}
                     value={draft.textTemplates.taskListItem}
                     onChange={(value) =>
                       updateTextTemplate("taskListItem", value)
@@ -1103,97 +1103,97 @@ function ReminderRuntimeConfigPanel({
             </ConfigGroup>
 
             <ConfigGroup
-              title="任务处置文案"
-              description="用于删除、顺延、完成和创建提醒时的回执。支持占位符：`{{title}}`、`{{untilLabel}}`、`{{scheduleText}}`、`{{time}}`、`{{weekdayLabel}}`、`{{dateTimeLabel}}`。"
+              title={t(msg`任务处置文案`)}
+              description={t(msg`用于删除、顺延、完成和创建提醒时的回执。支持占位符：\`{{title}}\`、\`{{untilLabel}}\`、\`{{scheduleText}}\`、\`{{time}}\`、\`{{weekdayLabel}}\`、\`{{dateTimeLabel}}\`。`)}
             >
               <div className="space-y-4">
                 <div className="grid gap-4">
                   <AdminTextField
-                    label="删除失败文案"
+                    label={t(msg`删除失败文案`)}
                     value={draft.textTemplates.taskCancelMissing}
                     onChange={(value) =>
                       updateTextTemplate("taskCancelMissing", value)
                     }
                   />
                   <AdminTextField
-                    label="删除成功文案"
+                    label={t(msg`删除成功文案`)}
                     value={draft.textTemplates.taskCancelSuccess}
                     onChange={(value) =>
                       updateTextTemplate("taskCancelSuccess", value)
                     }
                   />
                   <AdminTextField
-                    label="顺延失败文案"
+                    label={t(msg`顺延失败文案`)}
                     value={draft.textTemplates.taskSnoozeMissing}
                     onChange={(value) =>
                       updateTextTemplate("taskSnoozeMissing", value)
                     }
                   />
                   <AdminTextField
-                    label="顺延成功文案"
+                    label={t(msg`顺延成功文案`)}
                     value={draft.textTemplates.taskSnoozeSuccess}
                     onChange={(value) =>
                       updateTextTemplate("taskSnoozeSuccess", value)
                     }
                   />
                   <AdminTextField
-                    label="完成失败文案"
+                    label={t(msg`完成失败文案`)}
                     value={draft.textTemplates.taskCompleteMissing}
                     onChange={(value) =>
                       updateTextTemplate("taskCompleteMissing", value)
                     }
                   />
                   <AdminTextField
-                    label="单次完成文案"
+                    label={t(msg`单次完成文案`)}
                     value={draft.textTemplates.taskCompleteOneTimeSuccess}
                     onChange={(value) =>
                       updateTextTemplate("taskCompleteOneTimeSuccess", value)
                     }
                   />
                   <AdminTextField
-                    label="重复完成文案"
+                    label={t(msg`重复完成文案`)}
                     value={draft.textTemplates.taskCompleteRecurringSuccess}
                     onChange={(value) =>
                       updateTextTemplate("taskCompleteRecurringSuccess", value)
                     }
                   />
                   <AdminTextField
-                    label="缺少事项文案"
+                    label={t(msg`缺少事项文案`)}
                     value={draft.textTemplates.taskCreateMissingTitle}
                     onChange={(value) =>
                       updateTextTemplate("taskCreateMissingTitle", value)
                     }
                   />
                   <AdminTextField
-                    label="缺少时间文案"
+                    label={t(msg`缺少时间文案`)}
                     value={draft.textTemplates.taskCreateMissingTime}
                     onChange={(value) =>
                       updateTextTemplate("taskCreateMissingTime", value)
                     }
                   />
                   <AdminTextField
-                    label="习惯创建文案"
+                    label={t(msg`习惯创建文案`)}
                     value={draft.textTemplates.taskCreateHabitSuccess}
                     onChange={(value) =>
                       updateTextTemplate("taskCreateHabitSuccess", value)
                     }
                   />
                   <AdminTextField
-                    label="每天创建文案"
+                    label={t(msg`每天创建文案`)}
                     value={draft.textTemplates.taskCreateDailySuccess}
                     onChange={(value) =>
                       updateTextTemplate("taskCreateDailySuccess", value)
                     }
                   />
                   <AdminTextField
-                    label="每周创建文案"
+                    label={t(msg`每周创建文案`)}
                     value={draft.textTemplates.taskCreateWeeklySuccess}
                     onChange={(value) =>
                       updateTextTemplate("taskCreateWeeklySuccess", value)
                     }
                   />
                   <AdminTextField
-                    label="单次创建文案"
+                    label={t(msg`单次创建文案`)}
                     value={draft.textTemplates.taskCreateOneTimeSuccess}
                     onChange={(value) =>
                       updateTextTemplate("taskCreateOneTimeSuccess", value)
@@ -1204,40 +1204,40 @@ function ReminderRuntimeConfigPanel({
             </ConfigGroup>
 
             <ConfigGroup
-              title="主动提醒与问询文案"
-              description="影响真正发出的到点提醒和空闲时的小问询。支持占位符：`{{title}}`、`{{activeCount}}`。"
+              title={t(msg`主动提醒与问询文案`)}
+              description={t(msg`影响真正发出的到点提醒和空闲时的小问询。支持占位符：\`{{title}}\`、\`{{activeCount}}\`。`)}
             >
               <div className="grid gap-4">
                 <AdminTextField
-                  label="硬提醒文案"
+                  label={t(msg`硬提醒文案`)}
                   value={draft.textTemplates.dueReminderHard}
                   onChange={(value) =>
                     updateTextTemplate("dueReminderHard", value)
                   }
                 />
                 <AdminTextField
-                  label="习惯提醒文案"
+                  label={t(msg`习惯提醒文案`)}
                   value={draft.textTemplates.dueReminderHabit}
                   onChange={(value) =>
                     updateTextTemplate("dueReminderHabit", value)
                   }
                 />
                 <AdminTextField
-                  label="普通提醒文案"
+                  label={t(msg`普通提醒文案`)}
                   value={draft.textTemplates.dueReminderDefault}
                   onChange={(value) =>
                     updateTextTemplate("dueReminderDefault", value)
                   }
                 />
                 <AdminTextField
-                  label="有活跃任务时问询"
+                  label={t(msg`有活跃任务时问询`)}
                   value={draft.textTemplates.checkinWithActiveTasks}
                   onChange={(value) =>
                     updateTextTemplate("checkinWithActiveTasks", value)
                   }
                 />
                 <AdminTextField
-                  label="无活跃任务时问询"
+                  label={t(msg`无活跃任务时问询`)}
                   value={draft.textTemplates.checkinWithoutActiveTasks}
                   onChange={(value) =>
                     updateTextTemplate("checkinWithoutActiveTasks", value)
@@ -1251,17 +1251,17 @@ function ReminderRuntimeConfigPanel({
         {activeTab === "moments" ? (
           <div className="space-y-4">
             <AdminCallout
-              title="发圈模板按“每行一条候选”生效"
-              tone="info"
-              description="支持占位符：`{{focus}}`、`{{title}}`、`{{category}}`、`{{scheduleText}}`、`{{completionCount}}`、`{{companionLine}}`。同一时段会按种子稳定挑选其中一条。"
+              title={t(msg`发圈模板按”每行一条候选”生效`)}
+              tone=”info”
+              description={t(msg`支持占位符：\`{{focus}}\`、\`{{title}}\`、\`{{category}}\`、\`{{scheduleText}}\`、\`{{completionCount}}\`、\`{{companionLine}}\`。同一时段会按种子稳定挑选其中一条。`)}
             />
             <ConfigGroup
-              title="轻提醒发圈模板"
-              description="把晨间、晚间和通用窗口拆开调，方便运营按语气分别收敛。"
+              title={t(msg`轻提醒发圈模板`)}
+              description={t(msg`把晨间、晚间和通用窗口拆开调，方便运营按语气分别收敛。`)}
             >
-              <div className="space-y-4">
+              <div className=”space-y-4”>
                 <AdminTextArea
-                  label="晨间模板"
+                  label={t(msg`晨间模板`)}
                   value={draft.promptTemplates.momentNudgeMorningTemplates}
                   onChange={(value) =>
                     updatePromptTemplate("momentNudgeMorningTemplates", value)
@@ -1269,7 +1269,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-32"
                 />
                 <AdminTextArea
-                  label="晚间模板"
+                  label={t(msg`晚间模板`)}
                   value={draft.promptTemplates.momentNudgeEveningTemplates}
                   onChange={(value) =>
                     updatePromptTemplate("momentNudgeEveningTemplates", value)
@@ -1277,7 +1277,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-32"
                 />
                 <AdminTextArea
-                  label="通用模板"
+                  label={t(msg`通用模板`)}
                   value={draft.promptTemplates.momentNudgeGeneralTemplates}
                   onChange={(value) =>
                     updatePromptTemplate("momentNudgeGeneralTemplates", value)
@@ -1292,18 +1292,18 @@ function ReminderRuntimeConfigPanel({
         {activeTab === "parser" ? (
           <div className="space-y-4">
             <AdminCallout
-              title="这里改的是“用户原话如何进提醒链”"
-              tone="info"
-              description="帮助 / 列表 / 删除 / 完成 / 顺延按上到下顺序判断；只有前面都没命中，才会进入“创建提醒”解析。当前支持“纯规则”与“规则优先 + 模型兜底”两种模式。"
+              title={t(msg`这里改的是”用户原话如何进提醒链”`)}
+              tone=”info”
+              description={t(msg`帮助 / 列表 / 删除 / 完成 / 顺延按上到下顺序判断；只有前面都没命中，才会进入”创建提醒”解析。当前支持”纯规则”与”规则优先 + 模型兜底”两种模式。`)}
             />
 
             <ConfigGroup
-              title="解析模式"
-              description="建议默认走“规则优先 + 模型兜底”。模型不会直接写库，只会先把原话改写成标准提醒口令，再交回规则引擎处理。"
+              title={t(msg`解析模式`)}
+              description={t(msg`建议默认走”规则优先 + 模型兜底”。模型不会直接写库，只会先把原话改写成标准提醒口令，再交回规则引擎处理。`)}
             >
-              <div className="space-y-4">
+              <div className=”space-y-4”>
                 <SelectField
-                  label="当前模式"
+                  label={t(msg`当前模式`)}
                   value={draft.parserRules.parserMode}
                   onChange={(value) =>
                     updateParserMode(
@@ -1313,16 +1313,16 @@ function ReminderRuntimeConfigPanel({
                   options={[
                     {
                       value: "rules_with_llm_fallback",
-                      label: "规则优先 + 模型兜底",
+                      label: t(msg`规则优先 + 模型兜底`),
                     },
                     {
                       value: "rules_only",
-                      label: "纯规则",
+                      label: t(msg`纯规则`),
                     },
                   ]}
                 />
                 <AdminTextArea
-                  label="模型兜底提示模板"
+                  label={t(msg`模型兜底提示模板`)}
                   value={draft.parserRules.llmFallbackPrompt}
                   onChange={updateParserPrompt}
                   textareaClassName="min-h-40"
@@ -1331,12 +1331,12 @@ function ReminderRuntimeConfigPanel({
             </ConfigGroup>
 
             <ConfigGroup
-              title="意图识别"
-              description="决定哪些话会被识别成帮助、列表、删除、修改、完成、顺延。这里适合放正则或强触发片段。"
+              title={t(msg`意图识别`)}
+              description={t(msg`决定哪些话会被识别成帮助、列表、删除、修改、完成、顺延。这里适合放正则或强触发片段。`)}
             >
               <div className="grid gap-4 xl:grid-cols-2">
                 <AdminTextArea
-                  label="帮助意图"
+                  label={t(msg`帮助意图`)}
                   value={formatLineList(draft.parserRules.helpIntentPatterns)}
                   onChange={(value) =>
                     updateParserArrayField("helpIntentPatterns", value)
@@ -1344,7 +1344,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-24"
                 />
                 <AdminTextArea
-                  label="列表意图"
+                  label={t(msg`列表意图`)}
                   value={formatLineList(draft.parserRules.listIntentPatterns)}
                   onChange={(value) =>
                     updateParserArrayField("listIntentPatterns", value)
@@ -1352,7 +1352,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-24"
                 />
                 <AdminTextArea
-                  label="删除意图"
+                  label={t(msg`删除意图`)}
                   value={formatLineList(draft.parserRules.cancelIntentPatterns)}
                   onChange={(value) =>
                     updateParserArrayField("cancelIntentPatterns", value)
@@ -1360,7 +1360,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-24"
                 />
                 <AdminTextArea
-                  label="修改意图"
+                  label={t(msg`修改意图`)}
                   value={formatLineList(draft.parserRules.updateIntentPatterns)}
                   onChange={(value) =>
                     updateParserArrayField("updateIntentPatterns", value)
@@ -1368,7 +1368,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-24"
                 />
                 <AdminTextArea
-                  label="完成意图"
+                  label={t(msg`完成意图`)}
                   value={formatLineList(
                     draft.parserRules.completeIntentPatterns,
                   )}
@@ -1378,7 +1378,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-24"
                 />
                 <AdminTextArea
-                  label="顺延意图"
+                  label={t(msg`顺延意图`)}
                   value={formatLineList(draft.parserRules.snoozeIntentPatterns)}
                   onChange={(value) =>
                     updateParserArrayField("snoozeIntentPatterns", value)
@@ -1389,12 +1389,12 @@ function ReminderRuntimeConfigPanel({
             </ConfigGroup>
 
             <ConfigGroup
-              title="创建入口与类型识别"
-              description="先判断有没有进入“创建提醒”入口，再根据每天 / 每周 / 习惯类词汇决定落成单次、重复还是习惯提醒。"
+              title={t(msg`创建入口与类型识别`)}
+              description={t(msg`先判断有没有进入”创建提醒”入口，再根据每天 / 每周 / 习惯类词汇决定落成单次、重复还是习惯提醒。`)}
             >
-              <div className="grid gap-4 xl:grid-cols-2">
+              <div className=”grid gap-4 xl:grid-cols-2”>
                 <AdminTextArea
-                  label="创建提醒入口关键词"
+                  label={t(msg`创建提醒入口关键词`)}
                   value={formatLineList(draft.parserRules.createIntentKeywords)}
                   onChange={(value) =>
                     updateParserArrayField("createIntentKeywords", value)
@@ -1402,7 +1402,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-28"
                 />
                 <AdminTextArea
-                  label="每日重复关键词"
+                  label={t(msg`每日重复关键词`)}
                   value={formatLineList(
                     draft.parserRules.dailyRecurrenceKeywords,
                   )}
@@ -1412,7 +1412,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-28"
                 />
                 <AdminTextArea
-                  label="每周重复前缀"
+                  label={t(msg`每周重复前缀`)}
                   value={formatLineList(
                     draft.parserRules.weeklyRecurrenceKeywords,
                   )}
@@ -1422,7 +1422,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-28"
                 />
                 <AdminTextArea
-                  label="习惯意图关键词"
+                  label={t(msg`习惯意图关键词`)}
                   value={formatLineList(draft.parserRules.habitIntentKeywords)}
                   onChange={(value) =>
                     updateParserArrayField("habitIntentKeywords", value)
@@ -1430,7 +1430,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-28"
                 />
                 <AdminTextArea
-                  label="习惯事项关键词"
+                  label={t(msg`习惯事项关键词`)}
                   value={formatLineList(draft.parserRules.habitKeywords)}
                   onChange={(value) =>
                     updateParserArrayField("habitKeywords", value)
@@ -1438,7 +1438,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-28"
                 />
                 <AdminTextArea
-                  label="硬提醒关键词"
+                  label={t(msg`硬提醒关键词`)}
                   value={formatLineList(draft.parserRules.hardReminderKeywords)}
                   onChange={(value) =>
                     updateParserArrayField("hardReminderKeywords", value)
@@ -1449,12 +1449,12 @@ function ReminderRuntimeConfigPanel({
             </ConfigGroup>
 
             <ConfigGroup
-              title="类别关键词"
-              description="创建提醒后会按标题命中类别关键词；命不中时落到 `general`。"
+              title={t(msg`类别关键词`)}
+              description={t(msg`创建提醒后会按标题命中类别关键词；命不中时落到 \`general\`。`)}
             >
               <div className="grid gap-4 xl:grid-cols-2">
                 <AdminTextArea
-                  label="健康"
+                  label={t(msg`健康`)}
                   value={formatLineList(
                     draft.parserRules.categoryKeywords.health,
                   )}
@@ -1464,7 +1464,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-24"
                 />
                 <AdminTextArea
-                  label="采购"
+                  label={t(msg`采购`)}
                   value={formatLineList(
                     draft.parserRules.categoryKeywords.shopping,
                   )}
@@ -1474,7 +1474,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-24"
                 />
                 <AdminTextArea
-                  label="生活"
+                  label={t(msg`生活`)}
                   value={formatLineList(
                     draft.parserRules.categoryKeywords.lifestyle,
                   )}
@@ -1484,7 +1484,7 @@ function ReminderRuntimeConfigPanel({
                   textareaClassName="min-h-24"
                 />
                 <AdminTextArea
-                  label="成长"
+                  label={t(msg`成长`)}
                   value={formatLineList(
                     draft.parserRules.categoryKeywords.growth,
                   )}
@@ -1497,27 +1497,27 @@ function ReminderRuntimeConfigPanel({
             </ConfigGroup>
 
             <ConfigGroup
-              title="时间语义默认值"
-              description="用户只说“早上 / 下午 / 晚上”而没写具体点数时，会落到这里。显式写了 `8点`、`8:30` 仍优先按显式时间解析。"
+              title={t(msg`时间语义默认值`)}
+              description={t(msg`用户只说”早上 / 下午 / 晚上”而没写具体点数时，会落到这里。显式写了 \`8点\`、\`8:30\` 仍优先按显式时间解析。`)}
             >
-              <div className="grid gap-4 xl:grid-cols-2">
+              <div className=”grid gap-4 xl:grid-cols-2”>
                 {PARSER_PERIOD_FIELDS.map((field) => {
                   const value =
                     draft.parserRules.periodDefaultClocks[field.key];
                   return (
                     <div
                       key={field.key}
-                      className="rounded-[18px] border border-[color:var(--border-faint)] bg-white/70 p-4"
+                      className=”rounded-[18px] border border-[color:var(--border-faint)] bg-white/70 p-4”
                     >
-                      <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                        {field.label}
+                      <div className=”text-sm font-semibold text-[color:var(--text-primary)]”>
+                        {t(field.label)}
                       </div>
-                      <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                        {field.description}
+                      <div className=”mt-1 text-xs leading-5 text-[color:var(--text-muted)]”>
+                        {t(field.description)}
                       </div>
-                      <div className="mt-4 space-y-4">
+                      <div className=”mt-4 space-y-4”>
                         <AdminTextArea
-                          label="命中词"
+                          label={t(msg`命中词`)}
                           value={formatLineList(value.patterns)}
                           onChange={(nextValue) =>
                             updateParserPeriodPatterns(field.key, nextValue)
@@ -1526,7 +1526,7 @@ function ReminderRuntimeConfigPanel({
                         />
                         <div className="grid gap-4 md:grid-cols-2">
                           <NumberField
-                            label="默认小时"
+                            label={t(msg`默认小时`)}
                             value={value.hour}
                             min={0}
                             max={23}
@@ -1539,7 +1539,7 @@ function ReminderRuntimeConfigPanel({
                             }
                           />
                           <NumberField
-                            label="默认分钟"
+                            label={t(msg`默认分钟`)}
                             value={value.minute}
                             min={0}
                             max={59}
@@ -1560,27 +1560,27 @@ function ReminderRuntimeConfigPanel({
             </ConfigGroup>
 
             <ConfigGroup
-              title="解析预览器"
-              description="输入一句候选用户原话，直接查看会不会命中提醒链、会落成什么提醒、命中了哪些规则。预览使用当前页面 draft，不会落库。"
+              title={t(msg`解析预览器`)}
+              description={t(msg`输入一句候选用户原话，直接查看会不会命中提醒链、会落成什么提醒、命中了哪些规则。预览使用当前页面 draft，不会落库。`)}
             >
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-2">
                   {PARSER_PREVIEW_EXAMPLES.map((example) => (
                     <Button
-                      key={example.label}
+                      key={String(example.label.id)}
                       variant="secondary"
                       size="sm"
                       onClick={() => onPreviewInputChange(example.message)}
                     >
-                      {example.label}
+                      {t(example.label)}
                     </Button>
                   ))}
                 </div>
                 <AdminTextArea
-                  label="候选原话"
+                  label={t(msg`候选原话`)}
                   value={previewInput}
                   onChange={onPreviewInputChange}
-                  placeholder="例如：明早8点提醒我吃药 / 每周五晚上提醒我买猫粮 / 今天先帮我记着晚上开会。"
+                  placeholder={t(msg`例如：明早8点提醒我吃药 / 每周五晚上提醒我买猫粮 / 今天先帮我记着晚上开会。`)}
                   textareaClassName="min-h-28"
                 />
                 <div className="flex justify-end">
@@ -1590,7 +1590,7 @@ function ReminderRuntimeConfigPanel({
                     disabled={!previewInput.trim() || previewPending}
                     onClick={onRunPreview}
                   >
-                    {previewPending ? "预演中..." : "运行解析预演"}
+                    {previewPending ? t(msg`预演中...`) : t(msg`运行解析预演`)}
                   </Button>
                 </div>
 
@@ -1603,30 +1603,28 @@ function ReminderRuntimeConfigPanel({
                     <div className="space-y-4">
                       <div className="grid gap-3 md:grid-cols-2">
                         <AdminValueCard
-                          label="动作"
+                          label={t(msg`动作`)}
                           value={
-                            PREVIEW_ACTION_LABELS[previewResult.action] ??
-                            previewResult.action
+                            t(PREVIEW_ACTION_LABELS[previewResult.action] ?? msg`${previewResult.action}`)
                           }
                         />
                         <AdminValueCard
-                          label="解析来源"
+                          label={t(msg`解析来源`)}
                           value={
-                            PREVIEW_SOURCE_LABELS[previewResult.source] ??
-                            previewResult.source
+                            t(PREVIEW_SOURCE_LABELS[previewResult.source] ?? msg`${previewResult.source}`)
                           }
                         />
                         <AdminValueCard
-                          label="处理结果"
+                          label={t(msg`处理结果`)}
                           value={
                             previewResult.handled
-                              ? "会进入提醒运行时"
-                              : "继续走普通聊天链路"
+                              ? t(msg`会进入提醒运行时`)
+                              : t(msg`继续走普通聊天链路`)
                           }
                         />
                         <AdminValueCard
-                          label="提取标题"
-                          value={previewResult.extractedTitle || "未提取"}
+                          label={t(msg`提取标题`)}
+                          value={previewResult.extractedTitle || t(msg`未提取`)}
                         />
                         <AdminValueCard
                           label="评估时间"
