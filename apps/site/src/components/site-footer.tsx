@@ -34,7 +34,7 @@ export async function SiteFooter({ locale }: { locale: SupportedLocale }) {
             <span>{labels.brand}</span>
           </div>
           <p className="mt-3 text-sm leading-6 text-(--text-secondary)">{tagline}</p>
-          <p className="mt-4 text-xs text-(--text-dim)">© {year} Enclave · MIT License</p>
+          <p className="mt-4 text-xs text-(--text-dim)">© {year} Enclave · {i18n._("MIT License")}</p>
         </div>
         <nav className="flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium text-(--text-secondary)">
           <a href={siteLinks.app} target="_blank" rel="noreferrer" className="hover:text-(--brand-primary)">

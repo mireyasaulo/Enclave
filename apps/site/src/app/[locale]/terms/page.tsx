@@ -73,13 +73,7 @@ export default async function TermsPage({
       <header>
         <h1 className="text-3xl font-bold sm:text-4xl">{i18n._("服务条款")}</h1>
         <p className="mt-3 text-sm text-(--text-muted)">
-          {safeLocale === "en-US"
-            ? `Last updated: ${TERMS_MODIFIED}`
-            : safeLocale === "ja-JP"
-              ? `最終更新：${TERMS_MODIFIED}`
-              : safeLocale === "ko-KR"
-                ? `마지막 업데이트: ${TERMS_MODIFIED}`
-                : `最近更新：${TERMS_MODIFIED}`}
+          {`${i18n._("最近更新：")}${TERMS_MODIFIED}`}
         </p>
       </header>
       <div className="mt-10 space-y-8 text-(--text-secondary) leading-7">

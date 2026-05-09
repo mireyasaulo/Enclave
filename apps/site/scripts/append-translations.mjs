@@ -177,6 +177,9 @@ const TRANSLATIONS = [
   ["隐界群组：多 AI 角色与你的多人对话场景", "Enclave groups: multi-party rooms where you and several AI characters chat together", "エンクレイブのグループ：複数の AI キャラクターとあなたが集まる多人数チャット", "엔클레이브 그룹: 여러 AI 캐릭터와 함께하는 다자 대화 방"],
   ["隐界新人引导：首次进入虚拟世界的角色初始化与世界设定", "Enclave onboarding: the first-time character setup and world bootstrap flow", "エンクレイブのオンボーディング：初回のキャラクター設定と世界の立ち上げ", "엔클레이브 온보딩: 첫 진입 시 캐릭터 설정과 세계 초기화 화면"],
   ["隐界我的角色：你与 AI 化身的资料卡、个性、形象设定", "Enclave self character: profile cards, personality, and appearance for you and your AI avatar", "エンクレイブの「マイキャラ」：あなたと AI 分身のプロフィール、性格、ビジュアル設定", "엔클레이브 내 캐릭터: 당신과 AI 아바타의 프로필, 성격, 비주얼 설정"],
+  // ===== privacy/terms date label + footer license =====
+  ["最近更新：", "Last updated: ", "最終更新：", "마지막 업데이트: "],
+  ["MIT License", "MIT License", "MIT License", "MIT 라이선스"],
 ];
 
 const LOCALES = ["zh-CN", "en-US", "ja-JP", "ko-KR"];

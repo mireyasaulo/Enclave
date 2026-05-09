@@ -73,13 +73,7 @@ export default async function PrivacyPage({
       <header>
         <h1 className="text-3xl font-bold sm:text-4xl">{i18n._("隐私政策")}</h1>
         <p className="mt-3 text-sm text-(--text-muted)">
-          {safeLocale === "en-US"
-            ? `Last updated: ${PRIVACY_MODIFIED}`
-            : safeLocale === "ja-JP"
-              ? `最終更新：${PRIVACY_MODIFIED}`
-              : safeLocale === "ko-KR"
-                ? `마지막 업데이트: ${PRIVACY_MODIFIED}`
-                : `最近更新：${PRIVACY_MODIFIED}`}
+          {`${i18n._("最近更新：")}${PRIVACY_MODIFIED}`}
         </p>
       </header>
       <div className="mt-10 space-y-8 text-(--text-secondary) leading-7">
