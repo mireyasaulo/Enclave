@@ -40,6 +40,7 @@ import { FollowupRuntimeService } from '../followup-runtime/followup-runtime.ser
 import { ReminderRuntimeService } from '../reminder-runtime/reminder-runtime.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { SelfAgentService } from '../self-agent/self-agent.service';
+import { MinimaxQuotaService } from '../minimax/minimax-quota.service';
 import {
   WORLD_NEWS_BULLETIN_GENERATION_KIND,
   WORLD_NEWS_DESK_CHARACTER_ID,
@@ -118,6 +119,7 @@ export class SchedulerService {
     private readonly cyberAvatar: CyberAvatarService,
     private readonly selfAgentService: SelfAgentService,
     private readonly momentsService: MomentsService,
+    private readonly minimaxQuota: MinimaxQuotaService,
   ) {}
 
   @Cron('*/5 * * * *')
@@ -970,15 +972,112 @@ export class SchedulerService {
       }
     }
 
+    const minimaxStats = await this.tryGenerateMinimaxMomentsThisTick(
+      chars.filter((c) => c.id !== REMINDER_CHARACTER_ID),
+      now,
+      hour,
+      startOfDay,
+    );
+
     return {
-      summary: renderTemplate(
+      summary: `${renderTemplate(
         runtimeRules.schedulerTextTemplates.jobSummaryCheckMomentSchedule,
         {
           characterCount: chars.length,
           generatedCount,
         },
-      ),
+      )}; minimax: music=${minimaxStats.music} video=${minimaxStats.video}`,
     };
+  }
+
+  private async tryGenerateMinimaxMomentsThisTick(
+    chars: CharacterEntity[],
+    now: Date,
+    hour: number,
+    startOfDay: Date,
+  ): Promise<{ music: number; video: number }> {
+    const MUSIC_PER_CHAR_PROB = 0.05;
+    const MUSIC_MAX_PER_TICK = 3;
+    const VIDEO_MAX_PER_TICK = 1;
+    let music = 0;
+    let video = 0;
+
+    if ((await this.minimaxQuota.availableToday('music-2.6')) <= 0) {
+      // 跳过音乐扫描以省 LLM tokens
+    } else {
+      const candidates = chars.filter((char) => {
+        const start = char.activeHoursStart ?? 8;
+        const end = char.activeHoursEnd ?? 22;
+        return hour >= start && hour <= end;
+      });
+      shuffleInPlace(candidates);
+      for (const char of candidates) {
+        if (music >= MUSIC_MAX_PER_TICK) break;
+        if (Math.random() > MUSIC_PER_CHAR_PROB) continue;
+        const todayMusic = await this.momentPostRepo.count({
+          where: {
+            authorId: char.id,
+            generationKind: 'minimax_music',
+            postedAt: Between(startOfDay, now),
+          },
+        });
+        if (todayMusic > 0) continue;
+        const post = await this.momentsService.scheduleMinimaxMusicMoment(char);
+        if (post) {
+          music += 1;
+          this.logger.log(
+            `minimax music moment ${post.id} scheduled for ${char.name}`,
+          );
+        }
+      }
+    }
+
+    const remainingVideo =
+      (await this.minimaxQuota.availableToday('MiniMax-Hailuo-02-Fast')) +
+      (await this.minimaxQuota.availableToday('MiniMax-Hailuo-02'));
+    if (remainingVideo > 0) {
+      const candidates = chars.filter((char) => {
+        const start = char.activeHoursStart ?? 8;
+        const end = char.activeHoursEnd ?? 22;
+        return hour >= start && hour <= end;
+      });
+      shuffleInPlace(candidates);
+      for (const char of candidates) {
+        if (video >= VIDEO_MAX_PER_TICK) break;
+        const todayVideo = await this.momentPostRepo.count({
+          where: {
+            authorId: char.id,
+            generationKind: 'minimax_video',
+            postedAt: Between(startOfDay, now),
+          },
+        });
+        if (todayVideo > 0) continue;
+        const post = await this.momentsService.scheduleMinimaxVideoMoment(
+          char,
+          () => this.pickMinimaxVideoModel(),
+        );
+        if (post) {
+          video += 1;
+          this.logger.log(
+            `minimax video moment ${post.id} scheduled for ${char.name}`,
+          );
+        }
+      }
+    }
+
+    return { music, video };
+  }
+
+  private async pickMinimaxVideoModel(): Promise<
+    'MiniMax-Hailuo-02-Fast' | 'MiniMax-Hailuo-02' | null
+  > {
+    if ((await this.minimaxQuota.availableToday('MiniMax-Hailuo-02-Fast')) > 0) {
+      return 'MiniMax-Hailuo-02-Fast';
+    }
+    if ((await this.minimaxQuota.availableToday('MiniMax-Hailuo-02')) > 0) {
+      return 'MiniMax-Hailuo-02';
+    }
+    return null;
   }
 
   private async handleTriggerFollowupRecommendations(
@@ -1854,5 +1953,13 @@ export class SchedulerService {
       ),
     };
   }
+}
+
+function shuffleInPlace<T>(items: T[]): T[] {
+  for (let i = items.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  return items;
 }
 // i18n-ignore-end
