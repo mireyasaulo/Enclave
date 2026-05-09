@@ -171,11 +171,13 @@ export class MinimaxJobService {
   async cancelJob(jobId: string): Promise<void> {
     const job = await this.repo.findOne({ where: { id: jobId } });
     if (!job) return;
-    if (job.status === 'pending' || job.status === 'submitted') {
+    // 只有 completed 时配额才被 commit；pending/submitted/downloading 状态下
+    // 配额仍是 reserved，必须 release 否则今日额度白扣。
+    if (job.status !== 'completed' && job.status !== 'failed') {
       await this.quota.release(job.model);
     }
     await this.repo.delete(jobId);
-    this.logger.warn(`cancelled minimax job ${jobId} (orphan rollback)`);
+    this.logger.warn(`cancelled minimax job ${jobId} status=${job.status} (orphan rollback)`);
   }
 
   async getJob(jobId: string): Promise<MinimaxJobEntity | null> {
@@ -510,6 +512,14 @@ export class MinimaxJobService {
             durationMs: q.durationMs ?? null,
             remoteDownloadUrl: file.downloadUrl,
           });
+        } else if (q.status === 'Success') {
+          // Success 但既无 audioHex 也无 fileId — 服务端语义破损，
+          // 继续轮询不会变出数据，直接失败。
+          await this.markFailed(
+            job,
+            'MUSIC_QUERY_NO_PAYLOAD',
+            'music task Success but no audioHex/fileId',
+          );
         } else if (q.status === 'Fail') {
           await this.markFailed(
             job,

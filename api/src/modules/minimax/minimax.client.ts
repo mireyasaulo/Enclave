@@ -30,18 +30,18 @@ const QUOTA_EXHAUSTED_CODES = new Set<number>([1008, 1042]);
 // 1002 触发 RPM 限流 / 2003 模型并发数超限 / 1004 鉴权(可能瞬时网络)：可重试
 const RETRIABLE_PROVIDER_CODES = new Set<number>([1002, 1004, 2003]);
 
+// 注意：故意不在 fetch 完成后 clearTimeout。fetch 在收到 headers 时就 resolve，
+// 但 body 读取（response.text / arrayBuffer）是流式的，可能再卡几分钟。让 timer
+// 自然到期触发 abort，body 读取也会抛 AbortError，避免完整生命周期失去超时保护。
+// 正常完成路径下 timer 几十秒后过期，对资源无影响。
 async function fetchWithTimeout(
   url: string,
   init: RequestInit,
   timeoutMs: number,
 ): Promise<Response> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  try {
-    return await fetch(url, { ...init, signal: controller.signal });
-  } finally {
-    clearTimeout(timer);
-  }
+  setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...init, signal: controller.signal });
 }
 
 export class MinimaxClientError extends Error {
@@ -275,9 +275,21 @@ export class MinimaxClient {
   ): Promise<MinimaxBinary> {
     const max = opts?.maxBytes ?? DOWNLOAD_MAX_BYTES;
     let res: Response;
+    let arrayBuffer: ArrayBuffer;
     try {
       res = await fetchWithTimeout(url, {}, DOWNLOAD_TIMEOUT_MS);
+      if (!res.ok) {
+        throw new MinimaxClientError(
+          'MINIMAX_DOWNLOAD_HTTP',
+          `download http ${res.status}`,
+          res.status >= 500 || res.status === 429,
+          res.status,
+        );
+      }
+      // 注意：body 读取也受 timer 保护，timer 到期会让 arrayBuffer() 抛 AbortError
+      arrayBuffer = await res.arrayBuffer();
     } catch (error) {
+      if (error instanceof MinimaxClientError) throw error;
       const err = error as Error & { name?: string };
       const isTimeout = err?.name === 'AbortError';
       throw new MinimaxClientError(
@@ -288,15 +300,6 @@ export class MinimaxClient {
         true,
       );
     }
-    if (!res.ok) {
-      throw new MinimaxClientError(
-        'MINIMAX_DOWNLOAD_HTTP',
-        `download http ${res.status}`,
-        res.status >= 500 || res.status === 429,
-        res.status,
-      );
-    }
-    const arrayBuffer = await res.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     if (!buffer.length) {
       throw new MinimaxClientError(
@@ -339,6 +342,7 @@ export class MinimaxClient {
     }
     const url = `${this.baseUrl}${pathname}`;
     let response: Response;
+    let text: string;
     try {
       response = await fetchWithTimeout(
         url,
@@ -352,6 +356,8 @@ export class MinimaxClient {
         },
         REQUEST_TIMEOUT_MS,
       );
+      // body 读取也在 try 内：timer 到期触发 abort 时 text() 也会抛 AbortError
+      text = await response.text();
     } catch (error) {
       const err = error as Error & { name?: string };
       const isTimeout = err?.name === 'AbortError';
@@ -363,7 +369,6 @@ export class MinimaxClient {
         true,
       );
     }
-    const text = await response.text();
     if (!response.ok) {
       // 优先解析 base_resp.status_code，确定性失败（如 1008 余额不足）
       // 不应被无脑标 retriable=true 触发指数退避重试。
