@@ -19,6 +19,22 @@ import {
 
 const DEFAULT_BASE_URL = 'https://api.minimaxi.com';
 const DOWNLOAD_MAX_BYTES = 256 * 1024 * 1024; // 256 MB
+const REQUEST_TIMEOUT_MS = 30_000; // API 请求 30s
+const DOWNLOAD_TIMEOUT_MS = 120_000; // 二进制下载 120s
+
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number,
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 export class MinimaxClientError extends Error {
   constructor(
@@ -229,11 +245,15 @@ export class MinimaxClient {
     const max = opts?.maxBytes ?? DOWNLOAD_MAX_BYTES;
     let res: Response;
     try {
-      res = await fetch(url);
+      res = await fetchWithTimeout(url, {}, DOWNLOAD_TIMEOUT_MS);
     } catch (error) {
+      const err = error as Error & { name?: string };
+      const isTimeout = err?.name === 'AbortError';
       throw new MinimaxClientError(
-        'MINIMAX_DOWNLOAD_NETWORK',
-        `download network failure: ${(error as Error)?.message}`,
+        isTimeout ? 'MINIMAX_DOWNLOAD_TIMEOUT' : 'MINIMAX_DOWNLOAD_NETWORK',
+        isTimeout
+          ? `download timed out after ${DOWNLOAD_TIMEOUT_MS}ms`
+          : `download network failure: ${err?.message}`,
         true,
       );
     }
@@ -289,18 +309,26 @@ export class MinimaxClient {
     const url = `${this.baseUrl}${pathname}`;
     let response: Response;
     try {
-      response = await fetch(url, {
-        method,
-        headers: {
-          Authorization: `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
+      response = await fetchWithTimeout(
+        url,
+        {
+          method,
+          headers: {
+            Authorization: `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: method === 'GET' ? undefined : JSON.stringify(body ?? {}),
         },
-        body: method === 'GET' ? undefined : JSON.stringify(body ?? {}),
-      });
+        REQUEST_TIMEOUT_MS,
+      );
     } catch (error) {
+      const err = error as Error & { name?: string };
+      const isTimeout = err?.name === 'AbortError';
       throw new MinimaxClientError(
-        'MINIMAX_NETWORK',
-        `network failure on ${pathname}: ${(error as Error)?.message}`,
+        isTimeout ? 'MINIMAX_TIMEOUT' : 'MINIMAX_NETWORK',
+        isTimeout
+          ? `${pathname} timed out after ${REQUEST_TIMEOUT_MS}ms`
+          : `network failure on ${pathname}: ${err?.message}`,
         true,
       );
     }
