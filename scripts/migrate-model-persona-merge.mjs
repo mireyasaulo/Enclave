@@ -11,6 +11,8 @@
 //   node scripts/migrate-model-persona-merge.mjs --dry-run          # 不写入
 //   node scripts/migrate-model-persona-merge.mjs                    # 实际执行（带备份提示）
 //   node scripts/migrate-model-persona-merge.mjs --db /path/to.db   # 指定单个 db
+//   node scripts/migrate-model-persona-merge.mjs --template-db data/database.sqlite
+//                                                                    # 缺 family 时从此 DB 复制 12 行
 
 import { createRequire } from 'node:module';
 import { existsSync, readdirSync, statSync } from 'node:fs';
@@ -27,6 +29,9 @@ const DRY_RUN = args.includes('--dry-run');
 const explicitDbIdx = args.indexOf('--db');
 const EXPLICIT_DB =
   explicitDbIdx >= 0 ? args[explicitDbIdx + 1] : null;
+const templateDbIdx = args.indexOf('--template-db');
+const TEMPLATE_DB =
+  templateDbIdx >= 0 ? args[templateDbIdx + 1] : null;
 
 // 模型 id → 家族 id（必须与 inference-catalog.seed.ts 中 VENDOR_FAMILY_PERSONAS 保持一致）
 const FAMILY_BY_MODEL = {
@@ -188,7 +193,77 @@ function columnExists(db, table, column) {
   return cols.some((c) => c.name === column);
 }
 
-function migrateOne(dbPath) {
+function ensureFamilyFromTemplate(db, templateDb) {
+  // 找出目标 DB 缺的 family ids
+  const targetFamilies = new Set(
+    db
+      .prepare(
+        "SELECT id FROM characters WHERE sourceKey LIKE 'model_persona_family:%'",
+      )
+      .all()
+      .map((r) => r.id),
+  );
+  const templateRows = templateDb
+    .prepare(
+      "SELECT * FROM characters WHERE sourceKey LIKE 'model_persona_family:%'",
+    )
+    .all();
+  if (templateRows.length === 0) {
+    return { copied: 0, alreadyPresent: targetFamilies.size, missing: [] };
+  }
+
+  // 拿目标 DB 的列定义，确保 INSERT 列与 schema 对齐（模板可能多/少几列）
+  const targetCols = db
+    .prepare('PRAGMA table_info(characters)')
+    .all()
+    .map((c) => c.name);
+  const targetColSet = new Set(targetCols);
+
+  let copied = 0;
+  const missingBefore = templateRows
+    .map((r) => r.id)
+    .filter((id) => !targetFamilies.has(id));
+  for (const row of templateRows) {
+    if (targetFamilies.has(row.id)) continue;
+    // 清空运行时字段
+    const cleaned = { ...row };
+    cleaned.aiRelationships = null;
+    cleaned.lastActiveAt = null;
+    cleaned.intimacyLevel = 0;
+    cleaned.currentStatus = null;
+    if (typeof cleaned.profile === 'string') {
+      try {
+        const profile = JSON.parse(cleaned.profile);
+        if (profile && typeof profile === 'object') {
+          if (profile.memory && typeof profile.memory === 'object') {
+            profile.memory = {
+              coreMemory: '',
+              recentSummary: '',
+              forgettingCurve: profile.memory.forgettingCurve ?? 70,
+            };
+          }
+          delete profile.realWorldContext;
+          delete profile.wechatSyncImport;
+          cleaned.profile = JSON.stringify(profile);
+        }
+      } catch {
+        // 模板 profile 解析失败就原样 INSERT
+      }
+    }
+    // 只保留目标 schema 里有的列
+    const cols = Object.keys(cleaned).filter((c) => targetColSet.has(c));
+    const placeholders = cols.map(() => '?').join(',');
+    const values = cols.map((c) => cleaned[c]);
+    db.prepare(
+      `INSERT OR IGNORE INTO characters (${cols.join(',')}) VALUES (${placeholders})`,
+    ).run(...values);
+    copied += 1;
+  }
+
+  return { copied, alreadyPresent: targetFamilies.size, missing: missingBefore };
+}
+
+function migrateOne(dbPath, templateDb) {
   const db = new Database(dbPath);
   const summary = {
     dbPath,
@@ -201,6 +276,7 @@ function migrateOne(dbPath) {
     objectListUpdates: {},
     selfLoopsRemoved: 0,
     deletedPersonaRows: 0,
+    familyEnsured: null,
     error: null,
   };
 
@@ -248,6 +324,11 @@ function migrateOne(dbPath) {
     }
     summary.mapping = mapping;
 
+    // 1.5 缺 family 时从 template DB 复制
+    if (templateDb && !DRY_RUN) {
+      summary.familyEnsured = ensureFamilyFromTemplate(db, templateDb);
+    }
+
     // 2. 校验 12 个家族角色都已存在
     const targetIds = Array.from(new Set(Object.values(mapping)));
     const existingFamilyIds = new Set(
@@ -260,9 +341,16 @@ function migrateOne(dbPath) {
     );
     const missingFamily = targetIds.filter((id) => !existingFamilyIds.has(id));
     if (missingFamily.length > 0) {
-      throw new Error(
-        `缺少家族角色：${missingFamily.join(', ')}\n请先在 admin UI 点 "安装/重置厂商家族角色" 创建这些 character，再跑迁移。`,
-      );
+      // dry-run 模式下只警告，不抛错（让 dry-run 看完整 summary）
+      if (DRY_RUN) {
+        console.warn(
+          `⚠️ DRY-RUN：缺家族 ${missingFamily.length} 个；跑实际迁移时请加 --template-db。`,
+        );
+      } else {
+        throw new Error(
+          `缺少家族角色：${missingFamily.join(', ')}\n请加 --template-db <已含 family 的 DB> 或先在 admin UI 跑安装。`,
+        );
+      }
     }
 
     // 3. 单值字段批量更新（事务）
@@ -660,6 +748,11 @@ function printReport(s) {
       `  characters.aiRelationships 合并到家族角色的关系条目：${s.aiRelationshipsMerged}`,
     );
   }
+  if (s.familyEnsured) {
+    console.log(
+      `  从模板复制的 family 角色：copied=${s.familyEnsured.copied}, alreadyPresent=${s.familyEnsured.alreadyPresent}`,
+    );
+  }
   console.log(`  删除的旧 persona 行：${s.deletedPersonaRows}`);
 }
 
@@ -675,12 +768,30 @@ if (dbs.length === 0) {
   process.exit(1);
 }
 
+// 准备 template DB 句柄（如果有）
+let templateDb = null;
+if (TEMPLATE_DB) {
+  if (!existsSync(TEMPLATE_DB)) {
+    console.error(`❌ --template-db 指向的文件不存在：${TEMPLATE_DB}`);
+    process.exit(1);
+  }
+  templateDb = new Database(TEMPLATE_DB, { readonly: true });
+  console.log(`📋 模板 DB：${TEMPLATE_DB}`);
+}
+
 let hadError = false;
 for (const dbPath of dbs) {
-  const summary = migrateOne(dbPath);
+  // 跳过自身做模板的 DB（避免对模板做修改）
+  if (TEMPLATE_DB && path.resolve(dbPath) === path.resolve(TEMPLATE_DB)) {
+    console.log(`\n=== ${dbPath} ===\n  跳过：模板 DB 不参与自身迁移`);
+    continue;
+  }
+  const summary = migrateOne(dbPath, templateDb);
   printReport(summary);
   if (summary.error) hadError = true;
 }
+
+if (templateDb) templateDb.close();
 
 if (hadError) {
   console.log('\n❌ 至少一个 DB 失败，请回滚备份后排查。');
