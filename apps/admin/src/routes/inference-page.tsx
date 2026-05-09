@@ -582,6 +582,24 @@ export function InferencePage() {
     },
   });
 
+  const installFamilyMutation = useMutation({
+    mutationFn: (forceUpdateExisting: boolean) =>
+      adminApi.installVendorFamilyPersonas({ forceUpdateExisting }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["admin-inference-overview"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["admin-characters"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["admin-characters-crud"],
+        }),
+      ]);
+    },
+  });
+
   const installSelectedMutation = useMutation({
     mutationFn: (forceUpdateExisting: boolean) =>
       adminApi.installModelPersonas({
@@ -1657,21 +1675,28 @@ export function InferencePage() {
               <div className="h-px bg-[color:var(--border-faint)]" />
 
               <div className="space-y-3">
+                <div className="rounded-[12px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-3 py-2 text-xs text-[color:var(--text-secondary)]">
+                  {t(msg`推荐：把 30+ 个旧模型人格折叠为 12 个厂商家族角色（OpenAI/Anthropic/Google/...），实际推理走全局默认 provider，提示词里模仿对应厂商风格。覆盖刷新会重建 system prompt。首次执行后请运行 scripts/migrate-model-persona-merge.mjs 把旧聊天记录迁到新角色。`)}
+                </div>
                 <Button
-                  variant="secondary"
+                  variant="primary"
                   className="w-full justify-center"
-                  onClick={() => installMutation.mutate(false)}
-                  disabled={!canRunBulkAction || installMutation.isPending}
+                  onClick={() => installFamilyMutation.mutate(false)}
+                  disabled={installFamilyMutation.isPending}
                 >
-                  {installMutation.isPending ? t(msg`安装中...`) : t(msg`安装全部模型人格`)}
+                  {installFamilyMutation.isPending
+                    ? t(msg`安装中...`)
+                    : t(msg`安装厂商家族角色 (12 个)`)}
                 </Button>
                 <Button
                   variant="secondary"
                   className="w-full justify-center"
-                  onClick={() => installMutation.mutate(true)}
-                  disabled={!canRunBulkAction || installMutation.isPending}
+                  onClick={() => installFamilyMutation.mutate(true)}
+                  disabled={installFamilyMutation.isPending}
                 >
-                  {installMutation.isPending ? t(msg`刷新中...`) : t(msg`覆盖刷新全部`)}
+                  {installFamilyMutation.isPending
+                    ? t(msg`刷新中...`)
+                    : t(msg`覆盖刷新全部家族角色`)}
                 </Button>
               </div>
             </div>

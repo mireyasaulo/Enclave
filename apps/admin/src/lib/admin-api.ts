@@ -43,6 +43,8 @@ import type {
   InstallCharacterPresetsResult,
   InstallModelPersonasRequest,
   InstallModelPersonasResult,
+  InstallVendorFamilyPersonasRequest,
+  InstallVendorFamilyPersonasResult,
   RebindModelPersonasRequest,
   RebindModelPersonasResult,
   NeedDiscoveryConfig,
@@ -302,6 +304,14 @@ export const adminApi = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  installVendorFamilyPersonas: (payload: InstallVendorFamilyPersonasRequest) =>
+    adminFetch<InstallVendorFamilyPersonasResult>(
+      "/inference/vendor-family-personas/install",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+    ),
   getConfig: () => adminFetch<Record<string, string>>("/config"),
   setConfig: (key: string, value: string) =>
     adminFetch<{ success: boolean }>("/config", {
