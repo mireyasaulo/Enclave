@@ -20,6 +20,7 @@ import {
   LoadingBlock,
 } from "@yinjie/ui";
 import { ArrowLeft } from "lucide-react";
+import { MomentShareCardModal } from "../components/moment-share-card-modal";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { WeChatActionBubble } from "../components/wechat-action-bubble";
 import {
@@ -320,6 +321,16 @@ export function MobileFriendMomentsPage() {
     activeMoment?.likes.some((like) => like.authorType === "user"),
   );
 
+  // 「分享图卡」目标 — 点 ⋯ → 分享时把 momentId 存下来。
+  // 用 id 而不是整个对象，friendMoments 后续刷新时预览也会跟着新。
+  const [shareMomentId, setShareMomentId] = useState<string | null>(null);
+  const shareMoment = shareMomentId
+    ? friendMoments.find((moment) => moment.id === shareMomentId) ?? null
+    : null;
+  const shareLiked = Boolean(
+    shareMoment?.likes.some((like) => like.authorType === "user"),
+  );
+
   const onCommentTap = (momentId: string, comment: MomentComment | null) => {
     setCommentBarTarget({
       momentId,
@@ -606,7 +617,20 @@ export function MobileFriendMomentsPage() {
             onCommentTap(actionBubble.momentId, null);
           }
         }}
+        onShare={() => {
+          if (actionBubble) {
+            setShareMomentId(actionBubble.momentId);
+          }
+        }}
         onClose={() => setActionBubble(null)}
+      />
+
+      <MomentShareCardModal
+        moment={shareMoment}
+        liked={shareLiked}
+        ownerId={null}
+        ownerDisplayName={displayName}
+        onClose={() => setShareMomentId(null)}
       />
 
       <WeChatCommentBar

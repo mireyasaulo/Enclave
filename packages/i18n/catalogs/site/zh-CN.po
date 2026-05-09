@@ -117,57 +117,6 @@ msgid "语言"
 msgstr "语言"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:11
-msgid "立即开始"
-msgstr "立即开始"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:12
-msgid "几秒钟，开启你的隐界世界"
-msgstr "几秒钟，开启你的隐界世界"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:13
-msgid "打开浏览器即可使用，不需要安装；如果你愿意，也可以下载桌面端，或者自己部署一份。"
-msgstr "打开浏览器即可使用，不需要安装；如果你愿意，也可以下载桌面端，或者自己部署一份。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:219
-#: apps/site/src/components/get-started-cta.tsx:15
-msgid "查看下载方式"
-msgstr "查看下载方式"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:16
-msgid "数据自主"
-msgstr "数据自主"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:17
-msgid "一人一实例，对话只属于你"
-msgstr "一人一实例，对话只属于你"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:18
-msgid "跨端同步"
-msgstr "跨端同步"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:19
-msgid "浏览器 / 桌面 / 手机一致体验"
-msgstr "浏览器 / 桌面 / 手机一致体验"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:20
-msgid "开源可审计"
-msgstr "开源可审计"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:21
-msgid "MIT 协议，代码全部公开"
-msgstr "MIT 协议，代码全部公开"
-
-#. js-lingui-explicit-id
 #: apps/site/src/components/hero-section.tsx:10
 msgid "AI 虚拟世界 · 一键开始"
 msgstr "AI 虚拟世界 · 一键开始"
@@ -224,6 +173,68 @@ msgid "注册即用，无需安装"
 msgstr "注册即用，无需安装"
 
 #. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:11
+msgid "立即开始"
+msgstr "立即开始"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:12
+msgid "几秒钟，开启你的隐界世界"
+msgstr "几秒钟，开启你的隐界世界"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:13
+msgid "打开浏览器即可使用，不需要安装；如果你愿意，也可以下载桌面端，或者自己部署一份。"
+msgstr "打开浏览器即可使用，不需要安装；如果你愿意，也可以下载桌面端，或者自己部署一份。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:219
+#: apps/site/src/components/get-started-cta.tsx:15
+msgid "查看下载方式"
+msgstr "查看下载方式"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:16
+msgid "数据自主"
+msgstr "数据自主"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:17
+msgid "一人一实例，对话只属于你"
+msgstr "一人一实例，对话只属于你"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:18
+msgid "跨端同步"
+msgstr "跨端同步"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:19
+msgid "浏览器 / 桌面 / 手机一致体验"
+msgstr "浏览器 / 桌面 / 手机一致体验"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:20
+msgid "开源可审计"
+msgstr "开源可审计"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:21
+msgid "MIT 协议，代码全部公开"
+msgstr "MIT 协议，代码全部公开"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:171
+#: apps/site/src/components/faq-accordion.tsx:38
+msgid "常见问题"
+msgstr "常见问题"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/faq-accordion.tsx:40
+msgid "没找到你的问题？欢迎邮件联系我们。"
+msgstr "没找到你的问题？欢迎邮件联系我们。"
+
+#. js-lingui-explicit-id
 #: apps/site/src/components/one-person-world.tsx:39
 msgid "理念"
 msgstr "理念"
@@ -239,17 +250,6 @@ msgid "隐界为每个人单独搭建一个私人 AI 世界。你的居民、你
 msgstr "隐界为每个人单独搭建一个私人 AI 世界。你的居民、你的关系、你的故事——别人看不到，平台也不会拿去训练。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:171
-#: apps/site/src/components/faq-accordion.tsx:38
-msgid "常见问题"
-msgstr "常见问题"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/faq-accordion.tsx:40
-msgid "没找到你的问题？欢迎邮件联系我们。"
-msgstr "没找到你的问题？欢迎邮件联系我们。"
-
-#. js-lingui-explicit-id
 #: apps/site/src/components/download-cards.tsx:116
 msgid "推荐"
 msgstr "推荐"
@@ -260,20 +260,49 @@ msgid "敬请期待"
 msgstr "敬请期待"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/capability-grid.tsx:12
-msgid "不是 chatbot，而是一整个生态"
-msgstr "不是 chatbot，而是一整个生态"
+#: apps/site/src/components/cross-platform-section.tsx:29
+msgid "移动随手用，桌面深度用"
+msgstr "移动随手用，桌面深度用"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/capability-grid.tsx:13
-msgid "为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。"
-msgstr "为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。"
+#: apps/site/src/components/cross-platform-section.tsx:30
+msgid "在浏览器、电脑、手机上都能用，对话和动态实时同步。一个账号，无缝接管。"
+msgstr "在浏览器、电脑、手机上都能用，对话和动态实时同步。一个账号，无缝接管。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/page.tsx:119
-#: apps/site/src/components/capability-grid.tsx:14
-msgid "查看用例"
-msgstr "查看用例"
+#: apps/site/src/components/cross-platform-section.tsx:33
+msgid "移动端"
+msgstr "移动端"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/cross-platform-section.tsx:34
+msgid "浏览器 / iOS / Android"
+msgstr "浏览器 / iOS / Android"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/cross-platform-section.tsx:35
+msgid "桌面端"
+msgstr "桌面端"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/cross-platform-section.tsx:36
+msgid "Windows / macOS / Linux"
+msgstr "Windows / macOS / Linux"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/multi-platform-carousel.tsx:54
+msgid "产品截图"
+msgstr "产品截图"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/multi-platform-carousel.tsx:55
+msgid "从入坑到日常使用"
+msgstr "从入坑到日常使用"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/multi-platform-carousel.tsx:56
+msgid "六个核心场景一起看，画面均来自当前线上版本。"
+msgstr "六个核心场景一起看，画面均来自当前线上版本。"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/manifest.ts:12
@@ -312,49 +341,20 @@ msgid "自部署 AI 应用"
 msgstr "自部署 AI 应用"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:13
-msgid "如何开始使用隐界"
-msgstr "如何开始使用隐界"
+#: apps/site/src/components/capability-grid.tsx:12
+msgid "不是 chatbot，而是一整个生态"
+msgstr "不是 chatbot，而是一整个生态"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:14
-msgid "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
-msgstr "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
+#: apps/site/src/components/capability-grid.tsx:13
+msgid "为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。"
+msgstr "为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:22
-msgid "打开网页版（最快）"
-msgstr "打开网页版（最快）"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:23
-msgid "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
-msgstr "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:31
-msgid "下载桌面端（更顺手）"
-msgstr "下载桌面端（更顺手）"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:32
-msgid "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
-msgstr "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:40
-msgid "自部署（最自主）"
-msgstr "自部署（最自主）"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:41
-msgid "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
-msgstr "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/home-json-ld.tsx:36
-msgid "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
-msgstr "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
+#: apps/site/src/app/[locale]/use-cases/page.tsx:119
+#: apps/site/src/components/capability-grid.tsx:14
+msgid "查看用例"
+msgstr "查看用例"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/breadcrumb-nav.tsx:25
@@ -363,34 +363,14 @@ msgid "首页"
 msgstr "首页"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:29
-msgid "移动随手用，桌面深度用"
-msgstr "移动随手用，桌面深度用"
+#: apps/site/src/components/breadcrumb-nav.tsx:34
+msgid "面包屑导航"
+msgstr "面包屑导航"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:30
-msgid "在浏览器、电脑、手机上都能用，对话和动态实时同步。一个账号，无缝接管。"
-msgstr "在浏览器、电脑、手机上都能用，对话和动态实时同步。一个账号，无缝接管。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:33
-msgid "移动端"
-msgstr "移动端"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:34
-msgid "浏览器 / iOS / Android"
-msgstr "浏览器 / iOS / Android"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:35
-msgid "桌面端"
-msgstr "桌面端"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:36
-msgid "Windows / macOS / Linux"
-msgstr "Windows / macOS / Linux"
+#: apps/site/src/components/seo/home-json-ld.tsx:36
+msgid "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
+msgstr "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/og/og-template.tsx:9
@@ -401,6 +381,16 @@ msgstr "私人 AI 世界 · 浏览器即开即用 · 多端同步"
 #: apps/site/src/components/og/og-template.tsx:12
 msgid "语言版本"
 msgstr "语言版本"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/not-found.tsx:20
+msgid "该页面不存在"
+msgstr "该页面不存在"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/not-found.tsx:21
+msgid "回到首页"
+msgstr "回到首页"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/manifest.ts:14
@@ -463,16 +453,6 @@ msgstr "更新"
 #: apps/site/src/app/manifest.ts:86
 msgid "查看产品最新更新"
 msgstr "查看产品最新更新"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/not-found.tsx:20
-msgid "该页面不存在"
-msgstr "该页面不存在"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/not-found.tsx:21
-msgid "回到首页"
-msgstr "回到首页"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/layout.tsx:34
@@ -572,26 +552,6 @@ msgid "如对条款有任何疑问，请发邮件至 yuanzui0728@gmail.com。"
 msgstr "如对条款有任何疑问，请发邮件至 yuanzui0728@gmail.com。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/changelog/page.tsx:27
-msgid "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
-msgstr "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/changelog/page.tsx:77
-msgid "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
-msgstr "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/changelog/page.tsx:88
-msgid "在 GitHub Releases 查看完整列表"
-msgstr "在 GitHub Releases 查看完整列表"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/changelog/page.tsx:113
-msgid "GitHub Release"
-msgstr "GitHub Release"
-
-#. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/download/page.tsx:24
 msgid "挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。"
 msgstr "挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。"
@@ -610,6 +570,46 @@ msgstr "挑一种最顺手的方式开始用隐界"
 #: apps/site/src/app/[locale]/download/page.tsx:72
 msgid "浏览器即开即用，桌面端体验更佳；移动端与小程序在路上。所有数据云端同步。"
 msgstr "浏览器即开即用，桌面端体验更佳；移动端与小程序在路上。所有数据云端同步。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:150
+msgid "它具体怎么做到"
+msgstr "它具体怎么做到"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:198
+msgid "准备好试一下？"
+msgstr "准备好试一下？"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:201
+msgid "浏览器即开即用，不需要注册任何信用卡。"
+msgstr "浏览器即开即用，不需要注册任何信用卡。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:226
+msgid "看看其它用例"
+msgstr "看看其它用例"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx:27
+msgid "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
+msgstr "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx:77
+msgid "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
+msgstr "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx:88
+msgid "在 GitHub Releases 查看完整列表"
+msgstr "在 GitHub Releases 查看完整列表"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx:113
+msgid "GitHub Release"
+msgstr "GitHub Release"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/privacy/page.tsx:26
@@ -672,44 +672,44 @@ msgid "有任何隐私相关疑问，请发邮件至 yuanzui0728@gmail.com。"
 msgstr "有任何隐私相关疑问，请发邮件至 yuanzui0728@gmail.com。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:150
-msgid "它具体怎么做到"
-msgstr "它具体怎么做到"
+#: apps/site/src/components/seo/howto-json-ld.tsx:13
+msgid "如何开始使用隐界"
+msgstr "如何开始使用隐界"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:198
-msgid "准备好试一下？"
-msgstr "准备好试一下？"
+#: apps/site/src/components/seo/howto-json-ld.tsx:14
+msgid "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
+msgstr "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:201
-msgid "浏览器即开即用，不需要注册任何信用卡。"
-msgstr "浏览器即开即用，不需要注册任何信用卡。"
+#: apps/site/src/components/seo/howto-json-ld.tsx:22
+msgid "打开网页版（最快）"
+msgstr "打开网页版（最快）"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:226
-msgid "看看其它用例"
-msgstr "看看其它用例"
+#: apps/site/src/components/seo/howto-json-ld.tsx:23
+msgid "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
+msgstr "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/breadcrumb-nav.tsx:34
-msgid "面包屑导航"
-msgstr "面包屑导航"
+#: apps/site/src/components/seo/howto-json-ld.tsx:31
+msgid "下载桌面端（更顺手）"
+msgstr "下载桌面端（更顺手）"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:54
-msgid "产品截图"
-msgstr "产品截图"
+#: apps/site/src/components/seo/howto-json-ld.tsx:32
+msgid "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
+msgstr "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:55
-msgid "从入坑到日常使用"
-msgstr "从入坑到日常使用"
+#: apps/site/src/components/seo/howto-json-ld.tsx:40
+msgid "自部署（最自主）"
+msgstr "自部署（最自主）"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:56
-msgid "六个核心场景一起看，画面均来自当前线上版本。"
-msgstr "六个核心场景一起看，画面均来自当前线上版本。"
+#: apps/site/src/components/seo/howto-json-ld.tsx:41
+msgid "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
+msgstr "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
 
 #: apps/site/src/lib/changelog-data.ts:35
 msgid "\"自己\"角色 × 赛博分身闭环：self-agent 路由 + 管理后台控制台 + Cyber Avatar real_world_sync"

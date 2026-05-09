@@ -23,6 +23,7 @@ import type { MessageDescriptor } from "@lingui/core";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice } from "@yinjie/ui";
 import { RouteRedirectState } from "../components/route-redirect-state";
+import { MomentShareCardModal } from "../components/moment-share-card-modal";
 import { WeChatActionBubble } from "../components/wechat-action-bubble";
 import {
   WeChatCommentBar,
@@ -1005,6 +1006,17 @@ function MobileMomentsView({
   );
   const ownerName = ownerUsername?.trim() || t(msg`世界主人`);
 
+  // 「分享图卡」目标。点 ⋯ → 「分享」时把当时 actionBubble 的 momentId 存下来，
+  // 用 id 而不是整个 moment 对象 — 这样 visibleMoments 后续刷新时预览图也跟着新。
+  const [shareMomentId, setShareMomentId] = useState<string | null>(null);
+  const shareMoment = shareMomentId
+    ? visibleMoments.find((moment) => moment.id === shareMomentId) ?? null
+    : null;
+  const shareLiked = Boolean(
+    ownerId &&
+      shareMoment?.likes.some((like) => like.authorId === ownerId),
+  );
+
   return (
     <AppPage className="relative space-y-0 bg-white px-0 pb-0 pt-0">
       <TabPageTopBar
@@ -1213,7 +1225,20 @@ function MobileMomentsView({
             onCommentTap(actionBubble.momentId, null);
           }
         }}
+        onShare={() => {
+          if (actionBubble) {
+            setShareMomentId(actionBubble.momentId);
+          }
+        }}
         onClose={onCloseActionMenu}
+      />
+
+      <MomentShareCardModal
+        moment={shareMoment}
+        liked={shareLiked}
+        ownerId={ownerId}
+        ownerDisplayName={ownerName}
+        onClose={() => setShareMomentId(null)}
       />
 
       <WeChatCommentBar

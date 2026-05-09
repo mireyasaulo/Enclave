@@ -117,57 +117,6 @@ msgid "语言"
 msgstr "언어"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:11
-msgid "立即开始"
-msgstr "지금 시작"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:12
-msgid "几秒钟，开启你的隐界世界"
-msgstr "몇 초 만에 당신의 엔클레이브 세계를 열어 보세요"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:13
-msgid "打开浏览器即可使用，不需要安装；如果你愿意，也可以下载桌面端，或者自己部署一份。"
-msgstr "브라우저를 열기만 하면 됩니다. 네이티브가 더 좋다면 데스크톱 버전, 완전한 제어를 원한다면 자체 호스팅도 가능합니다."
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:219
-#: apps/site/src/components/get-started-cta.tsx:15
-msgid "查看下载方式"
-msgstr "다운로드 방법 보기"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:16
-msgid "数据自主"
-msgstr "데이터 주권"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:17
-msgid "一人一实例，对话只属于你"
-msgstr "한 사람당 하나의 인스턴스, 대화는 오직 당신의 것"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:18
-msgid "跨端同步"
-msgstr "멀티 디바이스 동기화"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:19
-msgid "浏览器 / 桌面 / 手机一致体验"
-msgstr "브라우저, 데스크톱, 모바일에서 일관된 경험"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:20
-msgid "开源可审计"
-msgstr "오픈소스, 감사 가능"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/get-started-cta.tsx:21
-msgid "MIT 协议，代码全部公开"
-msgstr "MIT 라이선스, 전 코드 공개"
-
-#. js-lingui-explicit-id
 #: apps/site/src/components/hero-section.tsx:10
 msgid "AI 虚拟世界 · 一键开始"
 msgstr "AI 가상 세계 · 한 번에 시작"
@@ -224,6 +173,68 @@ msgid "注册即用，无需安装"
 msgstr "가입 즉시 사용, 설치 불필요"
 
 #. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:11
+msgid "立即开始"
+msgstr "지금 시작"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:12
+msgid "几秒钟，开启你的隐界世界"
+msgstr "몇 초 만에 당신의 엔클레이브 세계를 열어 보세요"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:13
+msgid "打开浏览器即可使用，不需要安装；如果你愿意，也可以下载桌面端，或者自己部署一份。"
+msgstr "브라우저를 열기만 하면 됩니다. 네이티브가 더 좋다면 데스크톱 버전, 완전한 제어를 원한다면 자체 호스팅도 가능합니다."
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:219
+#: apps/site/src/components/get-started-cta.tsx:15
+msgid "查看下载方式"
+msgstr "다운로드 방법 보기"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:16
+msgid "数据自主"
+msgstr "데이터 주권"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:17
+msgid "一人一实例，对话只属于你"
+msgstr "한 사람당 하나의 인스턴스, 대화는 오직 당신의 것"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:18
+msgid "跨端同步"
+msgstr "멀티 디바이스 동기화"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:19
+msgid "浏览器 / 桌面 / 手机一致体验"
+msgstr "브라우저, 데스크톱, 모바일에서 일관된 경험"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:20
+msgid "开源可审计"
+msgstr "오픈소스, 감사 가능"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/get-started-cta.tsx:21
+msgid "MIT 协议，代码全部公开"
+msgstr "MIT 라이선스, 전 코드 공개"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:171
+#: apps/site/src/components/faq-accordion.tsx:38
+msgid "常见问题"
+msgstr "자주 묻는 질문"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/faq-accordion.tsx:40
+msgid "没找到你的问题？欢迎邮件联系我们。"
+msgstr "찾으시는 질문이 없나요? 언제든 이메일로 문의해 주세요."
+
+#. js-lingui-explicit-id
 #: apps/site/src/components/one-person-world.tsx:39
 msgid "理念"
 msgstr "철학"
@@ -239,17 +250,6 @@ msgid "隐界为每个人单独搭建一个私人 AI 世界。你的居民、你
 msgstr "엔클레이브는 사용자마다 별도의 프라이빗 AI 세계를 제공합니다. 거주민, 관계, 이야기 모두 외부에 공개되지 않으며 외부 모델 학습에도 사용되지 않습니다."
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:171
-#: apps/site/src/components/faq-accordion.tsx:38
-msgid "常见问题"
-msgstr "자주 묻는 질문"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/faq-accordion.tsx:40
-msgid "没找到你的问题？欢迎邮件联系我们。"
-msgstr "찾으시는 질문이 없나요? 언제든 이메일로 문의해 주세요."
-
-#. js-lingui-explicit-id
 #: apps/site/src/components/download-cards.tsx:116
 msgid "推荐"
 msgstr "추천"
@@ -260,20 +260,49 @@ msgid "敬请期待"
 msgstr "출시 예정"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/capability-grid.tsx:12
-msgid "不是 chatbot，而是一整个生态"
-msgstr "챗봇이 아닌, 하나의 생태계"
+#: apps/site/src/components/cross-platform-section.tsx:29
+msgid "移动随手用，桌面深度用"
+msgstr "모바일은 가볍게, 데스크톱은 깊게"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/capability-grid.tsx:13
-msgid "为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。"
-msgstr "일상의 동반과 깊은 대화를 위해 설계된 AI 소셜 경험. 모두 실제 제품에서 동작합니다."
+#: apps/site/src/components/cross-platform-section.tsx:30
+msgid "在浏览器、电脑、手机上都能用，对话和动态实时同步。一个账号，无缝接管。"
+msgstr "브라우저, 데스크톱, 모바일에서 모두 사용 가능하며 대화와 피드가 실시간 동기화됩니다. 하나의 계정으로 자연스럽게 이어집니다."
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/page.tsx:119
-#: apps/site/src/components/capability-grid.tsx:14
-msgid "查看用例"
-msgstr "사용 사례 보기"
+#: apps/site/src/components/cross-platform-section.tsx:33
+msgid "移动端"
+msgstr "모바일"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/cross-platform-section.tsx:34
+msgid "浏览器 / iOS / Android"
+msgstr "브라우저 / iOS / Android"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/cross-platform-section.tsx:35
+msgid "桌面端"
+msgstr "데스크톱"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/cross-platform-section.tsx:36
+msgid "Windows / macOS / Linux"
+msgstr "Windows / macOS / Linux"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/multi-platform-carousel.tsx:54
+msgid "产品截图"
+msgstr "스크린샷"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/multi-platform-carousel.tsx:55
+msgid "从入坑到日常使用"
+msgstr "온보딩부터 일상 사용까지"
+
+#. js-lingui-explicit-id
+#: apps/site/src/components/multi-platform-carousel.tsx:56
+msgid "六个核心场景一起看，画面均来自当前线上版本。"
+msgstr "6 가지 핵심 화면을 한자리에. 모든 화면은 라이브 빌드에서 가져왔습니다."
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/manifest.ts:12
@@ -312,49 +341,20 @@ msgid "自部署 AI 应用"
 msgstr "셀프 호스팅 AI 앱"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:13
-msgid "如何开始使用隐界"
-msgstr "엔클레이브 시작하는 방법"
+#: apps/site/src/components/capability-grid.tsx:12
+msgid "不是 chatbot，而是一整个生态"
+msgstr "챗봇이 아닌, 하나의 생태계"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:14
-msgid "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
-msgstr "엔클레이브를 시작하는 세 가지 방법: 브라우저에서 바로 사용, 데스크톱 앱으로 네이티브 경험, 셀프 호스팅으로 완전한 자율성."
+#: apps/site/src/components/capability-grid.tsx:13
+msgid "为日常陪伴和深度对话设计的 AI 社交体验，每一项都已在产品中跑通。"
+msgstr "일상의 동반과 깊은 대화를 위해 설계된 AI 소셜 경험. 모두 실제 제품에서 동작합니다."
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:22
-msgid "打开网页版（最快）"
-msgstr "웹 버전 열기 (가장 빠름)"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:23
-msgid "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
-msgstr "\"지금 시작하기\"를 누르면 설치 없이 브라우저에서 바로 엔클레이브 세계가 열립니다. 처음 사용하기에 가장 좋습니다."
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:31
-msgid "下载桌面端（更顺手）"
-msgstr "데스크톱 앱 다운로드 (더 쾌적함)"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:32
-msgid "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
-msgstr "GitHub Releases 에서 Windows 또는 macOS 설치 파일을 받아 네이티브 경험, 트레이 아이콘, 잠금화면 지원을 누리세요."
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:40
-msgid "自部署（最自主）"
-msgstr "셀프 호스팅 (가장 자율적)"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/howto-json-ld.tsx:41
-msgid "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
-msgstr "저장소를 클론하고 배포 가이드를 따라 본인 전용 인스턴스를 띄우면, 데이터는 100% 본인 머신에 남고 라이선스는 MIT 입니다."
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/seo/home-json-ld.tsx:36
-msgid "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
-msgstr "최신 브라우저 (Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+)"
+#: apps/site/src/app/[locale]/use-cases/page.tsx:119
+#: apps/site/src/components/capability-grid.tsx:14
+msgid "查看用例"
+msgstr "사용 사례 보기"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/breadcrumb-nav.tsx:25
@@ -363,34 +363,14 @@ msgid "首页"
 msgstr "홈"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:29
-msgid "移动随手用，桌面深度用"
-msgstr "모바일은 가볍게, 데스크톱은 깊게"
+#: apps/site/src/components/breadcrumb-nav.tsx:34
+msgid "面包屑导航"
+msgstr "브레드크럼"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:30
-msgid "在浏览器、电脑、手机上都能用，对话和动态实时同步。一个账号，无缝接管。"
-msgstr "브라우저, 데스크톱, 모바일에서 모두 사용 가능하며 대화와 피드가 실시간 동기화됩니다. 하나의 계정으로 자연스럽게 이어집니다."
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:33
-msgid "移动端"
-msgstr "모바일"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:34
-msgid "浏览器 / iOS / Android"
-msgstr "브라우저 / iOS / Android"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:35
-msgid "桌面端"
-msgstr "데스크톱"
-
-#. js-lingui-explicit-id
-#: apps/site/src/components/cross-platform-section.tsx:36
-msgid "Windows / macOS / Linux"
-msgstr "Windows / macOS / Linux"
+#: apps/site/src/components/seo/home-json-ld.tsx:36
+msgid "现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）"
+msgstr "최신 브라우저 (Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+)"
 
 #. js-lingui-explicit-id
 #: apps/site/src/components/og/og-template.tsx:9
@@ -401,6 +381,16 @@ msgstr "프라이빗 AI 월드 · 브라우저에서 즉시 사용 · 멀티 디
 #: apps/site/src/components/og/og-template.tsx:12
 msgid "语言版本"
 msgstr "언어"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/not-found.tsx:20
+msgid "该页面不存在"
+msgstr "페이지를 찾을 수 없습니다"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/not-found.tsx:21
+msgid "回到首页"
+msgstr "홈으로 돌아가기"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/manifest.ts:14
@@ -463,16 +453,6 @@ msgstr "업데이트"
 #: apps/site/src/app/manifest.ts:86
 msgid "查看产品最新更新"
 msgstr "최신 제품 업데이트 보기"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/not-found.tsx:20
-msgid "该页面不存在"
-msgstr "페이지를 찾을 수 없습니다"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/not-found.tsx:21
-msgid "回到首页"
-msgstr "홈으로 돌아가기"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/layout.tsx:34
@@ -572,26 +552,6 @@ msgid "如对条款有任何疑问，请发邮件至 yuanzui0728@gmail.com。"
 msgstr "약관 관련 문의는 yuanzui0728@gmail.com 으로 이메일을 보내주세요."
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/changelog/page.tsx:27
-msgid "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
-msgstr "엔클레이브의 각 버전에서 무엇이 들어왔는지: 새 기능, 개선, 수정, 그 배경의 판단까지."
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/changelog/page.tsx:77
-msgid "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
-msgstr "각 버전이 어떤 것을 담았고 왜 그렇게 했는지. 전체 릴리스 노트는 GitHub 에 있습니다."
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/changelog/page.tsx:88
-msgid "在 GitHub Releases 查看完整列表"
-msgstr "GitHub Releases 에서 전체 목록 보기"
-
-#. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/changelog/page.tsx:113
-msgid "GitHub Release"
-msgstr "GitHub Release"
-
-#. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/download/page.tsx:24
 msgid "挑选最顺手的方式开始用隐界：网页版即开即用，桌面端体验更佳，自部署完全自主。"
 msgstr "당신에게 가장 잘 맞는 방식으로 엔클레이브를 시작하세요. 웹은 즉시 사용 가능, 데스크톱은 더 깊은 경험, 자체 호스팅은 완전한 자율성."
@@ -610,6 +570,46 @@ msgstr "당신에게 가장 잘 맞는 방식으로 엔클레이브를 시작해
 #: apps/site/src/app/[locale]/download/page.tsx:72
 msgid "浏览器即开即用，桌面端体验更佳；移动端与小程序在路上。所有数据云端同步。"
 msgstr "브라우저에서 즉시 사용하고, 더 깊이 사용하고 싶다면 데스크톱 버전을 받으세요. 모바일과 미니 프로그램은 준비 중이며, 모든 데이터가 클라우드로 동기화됩니다."
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:150
+msgid "它具体怎么做到"
+msgstr "실제로 어떻게 동작하는가"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:198
+msgid "准备好试一下？"
+msgstr "한번 써보시겠어요?"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:201
+msgid "浏览器即开即用，不需要注册任何信用卡。"
+msgstr "브라우저에서 바로 시작하세요. 신용카드 등록도, 설치도 필요 없습니다."
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:226
+msgid "看看其它用例"
+msgstr "다른 사용 사례도 보기"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx:27
+msgid "隐界 Enclave 每个版本带来了什么：新功能、改进、修复，以及背后的取舍。"
+msgstr "엔클레이브의 각 버전에서 무엇이 들어왔는지: 새 기능, 개선, 수정, 그 배경의 판단까지."
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx:77
+msgid "每个版本带来了什么、为什么这么做。完整 release notes 请见 GitHub。"
+msgstr "각 버전이 어떤 것을 담았고 왜 그렇게 했는지. 전체 릴리스 노트는 GitHub 에 있습니다."
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx:88
+msgid "在 GitHub Releases 查看完整列表"
+msgstr "GitHub Releases 에서 전체 목록 보기"
+
+#. js-lingui-explicit-id
+#: apps/site/src/app/[locale]/changelog/page.tsx:113
+msgid "GitHub Release"
+msgstr "GitHub Release"
 
 #. js-lingui-explicit-id
 #: apps/site/src/app/[locale]/privacy/page.tsx:26
@@ -672,44 +672,44 @@ msgid "有任何隐私相关疑问，请发邮件至 yuanzui0728@gmail.com。"
 msgstr "개인정보 관련 문의는 yuanzui0728@gmail.com 으로 이메일을 보내주세요."
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:150
-msgid "它具体怎么做到"
-msgstr "실제로 어떻게 동작하는가"
+#: apps/site/src/components/seo/howto-json-ld.tsx:13
+msgid "如何开始使用隐界"
+msgstr "엔클레이브 시작하는 방법"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:198
-msgid "准备好试一下？"
-msgstr "한번 써보시겠어요?"
+#: apps/site/src/components/seo/howto-json-ld.tsx:14
+msgid "三种开始使用隐界的方式：浏览器即开即用、桌面端原生体验、自部署完全自主。"
+msgstr "엔클레이브를 시작하는 세 가지 방법: 브라우저에서 바로 사용, 데스크톱 앱으로 네이티브 경험, 셀프 호스팅으로 완전한 자율성."
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:201
-msgid "浏览器即开即用，不需要注册任何信用卡。"
-msgstr "브라우저에서 바로 시작하세요. 신용카드 등록도, 설치도 필요 없습니다."
+#: apps/site/src/components/seo/howto-json-ld.tsx:22
+msgid "打开网页版（最快）"
+msgstr "웹 버전 열기 (가장 빠름)"
 
 #. js-lingui-explicit-id
-#: apps/site/src/app/[locale]/use-cases/[slug]/page.tsx:226
-msgid "看看其它用例"
-msgstr "다른 사용 사례도 보기"
+#: apps/site/src/components/seo/howto-json-ld.tsx:23
+msgid "点击「立即开始」，浏览器直接进入隐界世界，无需安装；适合第一次体验。"
+msgstr "\"지금 시작하기\"를 누르면 설치 없이 브라우저에서 바로 엔클레이브 세계가 열립니다. 처음 사용하기에 가장 좋습니다."
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/breadcrumb-nav.tsx:34
-msgid "面包屑导航"
-msgstr "브레드크럼"
+#: apps/site/src/components/seo/howto-json-ld.tsx:31
+msgid "下载桌面端（更顺手）"
+msgstr "데스크톱 앱 다운로드 (더 쾌적함)"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:54
-msgid "产品截图"
-msgstr "스크린샷"
+#: apps/site/src/components/seo/howto-json-ld.tsx:32
+msgid "前往 GitHub Releases 下载 Windows 或 macOS 安装包，获得原生体验、托盘与锁屏支持。"
+msgstr "GitHub Releases 에서 Windows 또는 macOS 설치 파일을 받아 네이티브 경험, 트레이 아이콘, 잠금화면 지원을 누리세요."
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:55
-msgid "从入坑到日常使用"
-msgstr "온보딩부터 일상 사용까지"
+#: apps/site/src/components/seo/howto-json-ld.tsx:40
+msgid "自部署（最自主）"
+msgstr "셀프 호스팅 (가장 자율적)"
 
 #. js-lingui-explicit-id
-#: apps/site/src/components/multi-platform-carousel.tsx:56
-msgid "六个核心场景一起看，画面均来自当前线上版本。"
-msgstr "6 가지 핵심 화면을 한자리에. 모든 화면은 라이브 빌드에서 가져왔습니다."
+#: apps/site/src/components/seo/howto-json-ld.tsx:41
+msgid "克隆仓库按部署文档跑一份属于自己的实例，数据 100% 在自己机器上，MIT 许可。"
+msgstr "저장소를 클론하고 배포 가이드를 따라 본인 전용 인스턴스를 띄우면, 데이터는 100% 본인 머신에 남고 라이선스는 MIT 입니다."
 
 #: apps/site/src/lib/changelog-data.ts:35
 msgid "\"自己\"角色 × 赛博分身闭环：self-agent 路由 + 管理后台控制台 + Cyber Avatar real_world_sync"
