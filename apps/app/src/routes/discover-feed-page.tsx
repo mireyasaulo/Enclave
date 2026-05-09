@@ -127,7 +127,8 @@ export function DiscoverFeedPage() {
 
   const feedQuery = useQuery({
     queryKey: ["app-feed", baseUrl],
-    queryFn: () => getFeed(1, 20, baseUrl),
+    // 广场没有分页 UI：限额定高，确保所有可见公开动态都能展示。
+    queryFn: () => getFeed(1, 200, baseUrl),
   });
   const blockedQuery = useQuery({
     queryKey: ["app-discover-blocked-characters", baseUrl],

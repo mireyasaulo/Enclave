@@ -233,7 +233,7 @@ export function DiscoverPage() {
 
   const feedQuery = useQuery({
     queryKey: ["app-feed", baseUrl],
-    queryFn: () => getFeed(1, 20, baseUrl),
+    queryFn: () => getFeed(1, 200, baseUrl),
   });
   const blockedQuery = useQuery({
     queryKey: ["app-discover-blocked-characters", baseUrl],
