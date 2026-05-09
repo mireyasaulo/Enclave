@@ -24,6 +24,12 @@ const DOWNLOAD_MAX_BYTES = 256 * 1024 * 1024; // 256 MB
 const REQUEST_TIMEOUT_MS = 30_000; // API 请求 30s
 const DOWNLOAD_TIMEOUT_MS = 120_000; // 二进制下载 120s
 
+// MiniMax base_resp.status_code 分类
+// 1008 余额不足 / 1042 单日 token 超限：确定性失败，重试浪费时间和日志
+const QUOTA_EXHAUSTED_CODES = new Set<number>([1008, 1042]);
+// 1002 触发 RPM 限流 / 2003 模型并发数超限 / 1004 鉴权(可能瞬时网络)：可重试
+const RETRIABLE_PROVIDER_CODES = new Set<number>([1002, 1004, 2003]);
+
 async function fetchWithTimeout(
   url: string,
   init: RequestInit,
@@ -359,15 +365,34 @@ export class MinimaxClient {
     }
     const text = await response.text();
     if (!response.ok) {
-      const retriable = response.status >= 500 || response.status === 429;
+      // 优先解析 base_resp.status_code，确定性失败（如 1008 余额不足）
+      // 不应被无脑标 retriable=true 触发指数退避重试。
+      const providerCode = tryExtractProviderCode(text);
+      if (providerCode !== null && QUOTA_EXHAUSTED_CODES.has(providerCode)) {
+        this.logger.warn(
+          `minimax quota exhausted url=${url} status=${response.status} provider_code=${providerCode}`,
+        );
+        throw new MinimaxClientError(
+          'MINIMAX_QUOTA_EXHAUSTED',
+          `${pathname} provider quota exhausted (code=${providerCode})`,
+          false,
+          response.status,
+          providerCode,
+        );
+      }
+      const retriable =
+        (providerCode !== null && RETRIABLE_PROVIDER_CODES.has(providerCode)) ||
+        response.status >= 500 ||
+        response.status === 429;
       this.logger.warn(
-        `minimax http error url=${url} status=${response.status} body=${text.slice(0, 400)}`,
+        `minimax http error url=${url} status=${response.status} provider_code=${providerCode ?? 'n/a'} body=${text.slice(0, 400)}`,
       );
       throw new MinimaxClientError(
         'MINIMAX_HTTP',
-        `${pathname} returned ${response.status}: ${text.slice(0, 200)}`,
+        `${pathname} returned ${response.status}${providerCode !== null ? ` provider=${providerCode}` : ''}: ${text.slice(0, 200)}`,
         retriable,
         response.status,
+        providerCode ?? undefined,
       );
     }
     try {
@@ -391,7 +416,16 @@ export class MinimaxClient {
     this.logger.warn(
       `minimax ${context} failed status_code=${resp.status_code} msg=${resp.status_msg ?? ''}`,
     );
-    const retriable = resp.status_code === 1002 || resp.status_code === 1004;
+    if (QUOTA_EXHAUSTED_CODES.has(resp.status_code)) {
+      throw new MinimaxClientError(
+        'MINIMAX_QUOTA_EXHAUSTED',
+        `minimax ${context} quota exhausted: ${msg}`,
+        false,
+        undefined,
+        resp.status_code,
+      );
+    }
+    const retriable = RETRIABLE_PROVIDER_CODES.has(resp.status_code);
     throw new MinimaxClientError(
       'MINIMAX_PROVIDER',
       `minimax ${context} failed: ${msg}`,
@@ -399,6 +433,17 @@ export class MinimaxClient {
       undefined,
       resp.status_code,
     );
+  }
+}
+
+function tryExtractProviderCode(text: string): number | null {
+  if (!text) return null;
+  try {
+    const parsed = JSON.parse(text) as { base_resp?: { status_code?: number } };
+    const code = parsed?.base_resp?.status_code;
+    return typeof code === 'number' ? code : null;
+  } catch {
+    return null;
   }
 }
 
