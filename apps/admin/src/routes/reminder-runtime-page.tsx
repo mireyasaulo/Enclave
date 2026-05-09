@@ -129,39 +129,39 @@ const PARSER_PERIOD_FIELDS: Array<{
   description: ReturnType<typeof msg>;
 }> = [
   {
-    key: “sleepBefore”,
+    key: "sleepBefore",
     label: msg`睡前`,
-    description: msg`兜住”睡前记得...”这类表达。`,
+    description: msg`兜住"睡前记得..."这类表达。`,
   },
   {
-    key: “morning”,
+    key: "morning",
     label: msg`早上 / 明早`,
-    description: msg`用于晨间默认时间，同时承接”今早 / 明早”。`,
+    description: msg`用于晨间默认时间，同时承接"今早 / 明早"。`,
   },
   {
-    key: “lateMorning”,
+    key: "lateMorning",
     label: msg`上午`,
     description: msg`上午但没写具体点数时，会默认落到这里。`,
   },
   {
-    key: “noon”,
+    key: "noon",
     label: msg`中午`,
-    description: msg`显式”中午”但没写分秒时，按这里落点。`,
+    description: msg`显式"中午"但没写分秒时，按这里落点。`,
   },
   {
-    key: “afternoon”,
+    key: "afternoon",
     label: msg`下午`,
-    description: msg`显式”下午”但没写具体时间时，按这里落点。`,
+    description: msg`显式"下午"但没写具体时间时，按这里落点。`,
   },
   {
-    key: “dusk”,
+    key: "dusk",
     label: msg`傍晚`,
     description: msg`适合饭点前后的柔性提醒。`,
   },
   {
-    key: “evening”,
+    key: "evening",
     label: msg`晚上 / 今晚 / 明晚`,
-    description: msg`晚间默认时间，同时承接”今晚 / 明晚”。`,
+    description: msg`晚间默认时间，同时承接"今晚 / 明晚"。`,
   },
 ];
 
@@ -440,15 +440,15 @@ function buildOperationsSummary(overview: ReminderRuntimeOverview) {
 
   if (stats.overdueTaskCount > 0) {
     return {
-      tone: “warning” as const,
+      tone: "warning" as const,
       title: t(msg`优先处理 ${stats.overdueTaskCount} 条逾期提醒`),
-      description: t(msg`当前仍有 ${stats.overdueTaskCount} 条任务已超过计划时间，其中 ${stats.hardTaskCount} 条是硬提醒。建议先切到”优先处理”队列逐条判断是完成、顺延还是继续观察。`),
+      description: t(msg`当前仍有 ${stats.overdueTaskCount} 条任务已超过计划时间，其中 ${stats.hardTaskCount} 条是硬提醒。建议先切到"优先处理"队列逐条判断是完成、顺延还是继续观察。`),
     };
   }
 
   if (stats.dueSoonTaskCount > 0) {
     return {
-      tone: “info” as const,
+      tone: "info" as const,
       title: t(msg`未来 6 小时内有 ${stats.dueSoonTaskCount} 条提醒会到点`),
       description: t(msg`当前没有逾期项，但下一波提醒已经接近触发窗口，适合提前检查是否存在扎堆触发或需要顺延的事项。`),
     };
@@ -456,7 +456,7 @@ function buildOperationsSummary(overview: ReminderRuntimeOverview) {
 
   if (stats.activeTaskCount === 0) {
     return {
-      tone: “muted” as const,
+      tone: "muted" as const,
       title: t(msg`当前没有活跃提醒`),
       description: t(msg`值班侧重点可以转向最近出站内容和规则窗口，确认提醒角色近期是否仍有需要新增的盯办事项。`),
     };
@@ -464,14 +464,14 @@ function buildOperationsSummary(overview: ReminderRuntimeOverview) {
 
   if (!recentMessages.length && !recentMoments.length) {
     return {
-      tone: “info” as const,
+      tone: "info" as const,
       title: t(msg`提醒队列存在，但今天还没有对外动作`),
-      description: t(msg`可以先看值班工作台里的最近触发时间，必要时执行一次”到点提醒”验证链路是否按预期出站。`),
+      description: t(msg`可以先看值班工作台里的最近触发时间，必要时执行一次"到点提醒"验证链路是否按预期出站。`),
     };
   }
 
   return {
-    tone: “success” as const,
+    tone: "success" as const,
     title: t(msg`提醒链路运行稳定`),
     description: t(msg`当前共有 ${stats.activeTaskCount} 条活跃提醒，今天已触发 ${stats.deliveredTodayCount} 次、完成 ${stats.completedTodayCount} 次，可继续回看最近输出内容和完成节奏。`),
   };
@@ -1067,9 +1067,9 @@ function ReminderRuntimeConfigPanel({
           <div className="space-y-4">
             <ConfigGroup
               title={t(msg`入口与列表文案`)}
-              description={t(msg`决定用户问”你能做什么””我有哪些提醒”时，小盯如何回应。支持占位符：\`{{index}}\`、\`{{title}}\`、\`{{scheduleText}}\`。`)}
+              description={t(msg`决定用户问"你能做什么""我有哪些提醒"时，小盯如何回应。支持占位符：\`{{index}}\`、\`{{title}}\`、\`{{scheduleText}}\`。`)}
             >
-              <div className=”space-y-4”>
+              <div className="space-y-4">
                 <AdminTextArea
                   label={t(msg`帮助文案`)}
                   value={draft.textTemplates.helpMessage}
@@ -1251,15 +1251,15 @@ function ReminderRuntimeConfigPanel({
         {activeTab === "moments" ? (
           <div className="space-y-4">
             <AdminCallout
-              title={t(msg`发圈模板按”每行一条候选”生效`)}
-              tone=”info”
+              title={t(msg`发圈模板按"每行一条候选"生效`)}
+              tone="info"
               description={t(msg`支持占位符：\`{{focus}}\`、\`{{title}}\`、\`{{category}}\`、\`{{scheduleText}}\`、\`{{completionCount}}\`、\`{{companionLine}}\`。同一时段会按种子稳定挑选其中一条。`)}
             />
             <ConfigGroup
               title={t(msg`轻提醒发圈模板`)}
               description={t(msg`把晨间、晚间和通用窗口拆开调，方便运营按语气分别收敛。`)}
             >
-              <div className=”space-y-4”>
+              <div className="space-y-4">
                 <AdminTextArea
                   label={t(msg`晨间模板`)}
                   value={draft.promptTemplates.momentNudgeMorningTemplates}
@@ -1292,16 +1292,16 @@ function ReminderRuntimeConfigPanel({
         {activeTab === "parser" ? (
           <div className="space-y-4">
             <AdminCallout
-              title={t(msg`这里改的是”用户原话如何进提醒链”`)}
-              tone=”info”
-              description={t(msg`帮助 / 列表 / 删除 / 完成 / 顺延按上到下顺序判断；只有前面都没命中，才会进入”创建提醒”解析。当前支持”纯规则”与”规则优先 + 模型兜底”两种模式。`)}
+              title={t(msg`这里改的是"用户原话如何进提醒链"`)}
+              tone="info"
+              description={t(msg`帮助 / 列表 / 删除 / 完成 / 顺延按上到下顺序判断；只有前面都没命中，才会进入"创建提醒"解析。当前支持"纯规则"与"规则优先 + 模型兜底"两种模式。`)}
             />
 
             <ConfigGroup
               title={t(msg`解析模式`)}
-              description={t(msg`建议默认走”规则优先 + 模型兜底”。模型不会直接写库，只会先把原话改写成标准提醒口令，再交回规则引擎处理。`)}
+              description={t(msg`建议默认走"规则优先 + 模型兜底"。模型不会直接写库，只会先把原话改写成标准提醒口令，再交回规则引擎处理。`)}
             >
-              <div className=”space-y-4”>
+              <div className="space-y-4">
                 <SelectField
                   label={t(msg`当前模式`)}
                   value={draft.parserRules.parserMode}
@@ -1390,9 +1390,9 @@ function ReminderRuntimeConfigPanel({
 
             <ConfigGroup
               title={t(msg`创建入口与类型识别`)}
-              description={t(msg`先判断有没有进入”创建提醒”入口，再根据每天 / 每周 / 习惯类词汇决定落成单次、重复还是习惯提醒。`)}
+              description={t(msg`先判断有没有进入"创建提醒"入口，再根据每天 / 每周 / 习惯类词汇决定落成单次、重复还是习惯提醒。`)}
             >
-              <div className=”grid gap-4 xl:grid-cols-2”>
+              <div className="grid gap-4 xl:grid-cols-2">
                 <AdminTextArea
                   label={t(msg`创建提醒入口关键词`)}
                   value={formatLineList(draft.parserRules.createIntentKeywords)}
@@ -1498,24 +1498,24 @@ function ReminderRuntimeConfigPanel({
 
             <ConfigGroup
               title={t(msg`时间语义默认值`)}
-              description={t(msg`用户只说”早上 / 下午 / 晚上”而没写具体点数时，会落到这里。显式写了 \`8点\`、\`8:30\` 仍优先按显式时间解析。`)}
+              description={t(msg`用户只说"早上 / 下午 / 晚上"而没写具体点数时，会落到这里。显式写了 \`8点\`、\`8:30\` 仍优先按显式时间解析。`)}
             >
-              <div className=”grid gap-4 xl:grid-cols-2”>
+              <div className="grid gap-4 xl:grid-cols-2">
                 {PARSER_PERIOD_FIELDS.map((field) => {
                   const value =
                     draft.parserRules.periodDefaultClocks[field.key];
                   return (
                     <div
                       key={field.key}
-                      className=”rounded-[18px] border border-[color:var(--border-faint)] bg-white/70 p-4”
+                      className="rounded-[18px] border border-[color:var(--border-faint)] bg-white/70 p-4"
                     >
-                      <div className=”text-sm font-semibold text-[color:var(--text-primary)]”>
+                      <div className="text-sm font-semibold text-[color:var(--text-primary)]">
                         {t(field.label)}
                       </div>
-                      <div className=”mt-1 text-xs leading-5 text-[color:var(--text-muted)]”>
+                      <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
                         {t(field.description)}
                       </div>
-                      <div className=”mt-4 space-y-4”>
+                      <div className="mt-4 space-y-4">
                         <AdminTextArea
                           label={t(msg`命中词`)}
                           value={formatLineList(value.patterns)}
@@ -1627,7 +1627,7 @@ function ReminderRuntimeConfigPanel({
                           value={previewResult.extractedTitle || t(msg`未提取`)}
                         />
                         <AdminValueCard
-                          label="评估时间"
+                          label={t(msg`评估时间`)}
                           value={`${previewResult.timezone} · ${formatDateTime(
                             previewResult.evaluatedAt,
                           )}`}
@@ -1635,29 +1635,29 @@ function ReminderRuntimeConfigPanel({
                       </div>
 
                       <AdminSoftBox>
-                        结论：
+                        {t(msg`结论：`)}
                         <div className="mt-2 text-sm leading-6">
                           {previewResult.reason}
                         </div>
                       </AdminSoftBox>
 
                       <AdminSoftBox>
-                        回复预览：
+                        {t(msg`回复预览：`)}
                         <div className="mt-2 text-sm leading-6">
                           {previewResult.responseText ||
-                            "当前消息不会由提醒运行时接管。"}
+                            t(msg`当前消息不会由提醒运行时接管。`)}
                         </div>
                       </AdminSoftBox>
 
                       {previewResult.canonicalMessage ? (
                         <AdminSoftBox>
-                          兜底标准口令：
+                          {t(msg`兜底标准口令：`)}
                           <div className="mt-2 text-sm leading-6">
                             {previewResult.canonicalMessage}
                           </div>
                           {previewResult.fallbackReason ? (
                             <div className="mt-2 text-xs text-[color:var(--text-muted)]">
-                              模型判断：{previewResult.fallbackReason}
+                              {t(msg`模型判断：${previewResult.fallbackReason}`)}
                             </div>
                           ) : null}
                         </AdminSoftBox>
@@ -1666,30 +1666,27 @@ function ReminderRuntimeConfigPanel({
                       {previewResult.parsedTask ? (
                         <div className="grid gap-3 md:grid-cols-2">
                           <AdminValueCard
-                            label="提醒类型"
+                            label={t(msg`提醒类型`)}
                             value={
-                              TASK_KIND_LABELS[previewResult.parsedTask.kind] ??
-                              previewResult.parsedTask.kind
+                              t(TASK_KIND_LABELS[previewResult.parsedTask.kind] ?? msg`${previewResult.parsedTask.kind}`)
                             }
                           />
                           <AdminValueCard
-                            label="优先级"
+                            label={t(msg`优先级`)}
                             value={
                               previewResult.parsedTask.priority === "hard"
-                                ? "硬提醒"
-                                : "轻提醒"
+                                ? t(msg`硬提醒`)
+                                : t(msg`轻提醒`)
                             }
                           />
                           <AdminValueCard
-                            label="类别"
+                            label={t(msg`类别`)}
                             value={
-                              TASK_CATEGORY_LABELS[
-                                previewResult.parsedTask.category
-                              ] ?? previewResult.parsedTask.category
+                              t(TASK_CATEGORY_LABELS[previewResult.parsedTask.category] ?? msg`${previewResult.parsedTask.category}`)
                             }
                           />
                           <AdminValueCard
-                            label="下一次触发"
+                            label={t(msg`下一次触发`)}
                             value={formatDateTime(
                               previewResult.parsedTask.nextTriggerAt ??
                                 previewResult.parsedTask.dueAt,
@@ -1700,7 +1697,7 @@ function ReminderRuntimeConfigPanel({
 
                       {previewResult.referencedTask ? (
                         <AdminSoftBox>
-                          当前命中的已有提醒：
+                          {t(msg`当前命中的已有提醒：`)}
                           <div className="mt-2 text-sm leading-6">
                             {previewResult.referencedTask.title}
                             <div className="mt-1 text-xs text-[color:var(--text-muted)]">
@@ -1713,8 +1710,8 @@ function ReminderRuntimeConfigPanel({
                       {previewResult.needsClarification ? (
                         <AdminCallout
                           tone="warning"
-                          title="当前还需要澄清"
-                          description="说明规则已经命中提醒链，但标题或时间还不够完整，实际会回复用户继续补信息。"
+                          title={t(msg`当前还需要澄清`)}
+                          description={t(msg`说明规则已经命中提醒链，但标题或时间还不够完整，实际会回复用户继续补信息。`)}
                         />
                       ) : null}
                     </div>
@@ -1722,7 +1719,7 @@ function ReminderRuntimeConfigPanel({
                     <div className="space-y-4">
                       <div>
                         <div className="mb-2 text-sm font-semibold text-[color:var(--text-primary)]">
-                          命中规则
+                          {t(msg`命中规则`)}
                         </div>
                         <AdminCodeBlock
                           value={prettyJson(previewResult.matchedRules)}
@@ -1731,7 +1728,7 @@ function ReminderRuntimeConfigPanel({
 
                       <div>
                         <div className="mb-2 text-sm font-semibold text-[color:var(--text-primary)]">
-                          解析结果详情
+                          {t(msg`解析结果详情`)}
                         </div>
                         <AdminCodeBlock
                           value={prettyJson({
@@ -1746,8 +1743,8 @@ function ReminderRuntimeConfigPanel({
                   </div>
                 ) : (
                   <AdminEmptyState
-                    title="还没有解析结果"
-                    description="先输入一句候选用户原话，再点“运行解析预演”，这里会展示命中规则、解析结果和回复预览。"
+                    title={t(msg`还没有解析结果`)}
+                    description={t(msg`先输入一句候选用户原话，再点"运行解析预演"，这里会展示命中规则、解析结果和回复预览。`)}
                   />
                 )}
               </div>
@@ -1762,7 +1759,7 @@ function ReminderRuntimeConfigPanel({
             onClick={onSave}
             disabled={savePending || !dirty}
           >
-            {savePending ? "保存中..." : "保存规则与模板"}
+            {savePending ? t(msg`保存中...`) : t(msg`保存规则与模板`)}
           </Button>
         </div>
       </div>
@@ -1857,6 +1854,7 @@ function SelectField({
 }
 
 export function ReminderRuntimePage() {
+  const t = translateRuntimeMessage;
   const baseUrl = resolveAdminCoreApiBaseUrl();
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState<ReminderRuntimeRules | null>(null);
@@ -1899,7 +1897,7 @@ export function ReminderRuntimePage() {
     mutationFn: (jobId: ReminderSchedulerJob) =>
       runSchedulerJob(jobId, baseUrl),
     onSuccess: async (_, jobId) => {
-      setNotice(JOB_SUCCESS_NOTICES[jobId]);
+      setNotice(t(JOB_SUCCESS_NOTICES[jobId]));
       await Promise.all([
         invalidateReminderRuntimeOverview(),
         queryClient.invalidateQueries({
@@ -1913,7 +1911,7 @@ export function ReminderRuntimePage() {
     mutationFn: () => adminApi.setReminderRuntimeRules(draft ?? {}),
     onSuccess: async (rules) => {
       setDraft(rules);
-      setNotice("提醒运行时配置已保存。");
+      setNotice(t(msg`提醒运行时配置已保存。`));
       await queryClient.invalidateQueries({
         queryKey: ["admin-reminder-runtime", baseUrl],
       });
@@ -1936,8 +1934,8 @@ export function ReminderRuntimePage() {
     onSuccess: async ({ task }) => {
       setNotice(
         task.kind === "one_time"
-          ? `已完成：${task.title}`
-          : `已记录完成：${task.title}`,
+          ? t(msg`已完成：${task.title}`)
+          : t(msg`已记录完成：${task.title}`),
       );
       await invalidateReminderRuntimeOverview();
     },
@@ -1954,8 +1952,8 @@ export function ReminderRuntimePage() {
     onSuccess: async ({ task }, variables) => {
       setNotice(
         variables.payload.until
-          ? `${task.title} 已顺到明天。`
-          : `${task.title} 已往后顺 30 分钟。`,
+          ? t(msg`${task.title} 已顺到明天。`)
+          : t(msg`${task.title} 已往后顺 30 分钟。`),
       );
       await invalidateReminderRuntimeOverview();
     },
@@ -1964,7 +1962,7 @@ export function ReminderRuntimePage() {
   const cancelTaskMutation = useMutation({
     mutationFn: (taskId: string) => adminApi.cancelReminderRuntimeTask(taskId),
     onSuccess: async ({ task }) => {
-      setNotice(`已删除：${task.title}`);
+      setNotice(t(msg`已删除：${task.title}`));
       await invalidateReminderRuntimeOverview();
     },
   });
@@ -2020,19 +2018,19 @@ export function ReminderRuntimePage() {
     const stats = overviewQuery.data?.stats;
     return [
       {
-        label: "逾期 / 6 小时内",
+        label: t(msg`逾期 / 6 小时内`),
         value: `${stats?.overdueTaskCount ?? 0} / ${stats?.dueSoonTaskCount ?? 0}`,
       },
       {
-        label: "习惯 / 硬提醒",
+        label: t(msg`习惯 / 硬提醒`),
         value: `${stats?.habitTaskCount ?? 0} / ${stats?.hardTaskCount ?? 0}`,
       },
       {
-        label: "今日触发 / 完成",
+        label: t(msg`今日触发 / 完成`),
         value: `${stats?.deliveredTodayCount ?? 0} / ${stats?.completedTodayCount ?? 0}`,
       },
       {
-        label: "今日发圈",
+        label: t(msg`今日发圈`),
         value: stats?.momentCountToday ?? 0,
       },
     ];
@@ -2069,7 +2067,7 @@ export function ReminderRuntimePage() {
   }, [filteredTasks, selectedTaskId]);
 
   if (overviewQuery.isLoading && !overviewQuery.data) {
-    return <LoadingBlock label="正在读取提醒运行时概览..." />;
+    return <LoadingBlock label={t(msg`正在读取提醒运行时概览...`)} />;
   }
 
   if (!overviewQuery.data) {
@@ -2078,14 +2076,14 @@ export function ReminderRuntimePage() {
         message={
           overviewQuery.error instanceof Error
             ? overviewQuery.error.message
-            : "提醒运行时概览加载失败。"
+            : t(msg`提醒运行时概览加载失败。`)
         }
       />
     );
   }
 
   if (!draft) {
-    return <LoadingBlock label="正在同步提醒运行时配置..." />;
+    return <LoadingBlock label={t(msg`正在同步提醒运行时配置...`)} />;
   }
 
   const { stats } = overviewQuery.data;
@@ -2094,24 +2092,24 @@ export function ReminderRuntimePage() {
   const taskGroups = [
     {
       key: "overdue" as const,
-      label: "逾期",
-      description: "已经超过计划时间，优先判断是否要立刻处置。",
+      label: t(msg`逾期`),
+      description: t(msg`已经超过计划时间，优先判断是否要立刻处置。`),
       tasks: filteredTasks.filter(
         (task) => resolveTaskQueue(task, now) === "overdue",
       ),
     },
     {
       key: "due_soon" as const,
-      label: "6 小时内到点",
-      description: "下一波提醒即将触发，适合提前整理。",
+      label: t(msg`6 小时内到点`),
+      description: t(msg`下一波提醒即将触发，适合提前整理。`),
       tasks: filteredTasks.filter(
         (task) => resolveTaskQueue(task, now) === "due_soon",
       ),
     },
     {
       key: "routine" as const,
-      label: "常规排队",
-      description: "暂不紧急，但仍可回看节奏与说明。",
+      label: t(msg`常规排队`),
+      description: t(msg`暂不紧急，但仍可回看节奏与说明。`),
       tasks: filteredTasks.filter(
         (task) => resolveTaskQueue(task, now) === "routine",
       ),
@@ -2122,10 +2120,10 @@ export function ReminderRuntimePage() {
   return (
     <div className="space-y-6">
       <AdminPageHero
-        eyebrow="提醒运行时"
-        title="小盯值班台：先看风险，再处理提醒"
-        description="把逾期、即将到点、最近触发与最近输出收敛到同一页，方便运营先判断优先级，再逐条完成、顺延或删除提醒。"
-        badges={["承接角色：小盯"]}
+        eyebrow={t(msg`提醒运行时`)}
+        title={t(msg`小盯值班台：先看风险，再处理提醒`)}
+        description={t(msg`把逾期、即将到点、最近触发与最近输出收敛到同一页，方便运营先判断优先级，再逐条完成、顺延或删除提醒。`)}
+        badges={[t(msg`承接角色：小盯`)]}
         metrics={metrics}
         actions={
           <>
@@ -2137,8 +2135,8 @@ export function ReminderRuntimePage() {
               disabled={runMutation.isPending}
             >
               {runningJob === "trigger_due_reminder_tasks"
-                ? "执行中..."
-                : "执行到点提醒"}
+                ? t(msg`执行中...`)
+                : t(msg`执行到点提醒`)}
             </Button>
             <Button
               variant="secondary"
@@ -2147,8 +2145,8 @@ export function ReminderRuntimePage() {
               disabled={runMutation.isPending}
             >
               {runningJob === "trigger_reminder_checkins"
-                ? "执行中..."
-                : "执行问询"}
+                ? t(msg`执行中...`)
+                : t(msg`执行问询`)}
             </Button>
             <Button
               variant="primary"
@@ -2156,7 +2154,7 @@ export function ReminderRuntimePage() {
               onClick={() => saveMutation.mutate()}
               disabled={saveMutation.isPending || !dirty}
             >
-              {saveMutation.isPending ? "保存中..." : "保存配置"}
+              {saveMutation.isPending ? t(msg`保存中...`) : t(msg`保存配置`)}
             </Button>
             <Button
               variant="primary"
@@ -2165,8 +2163,8 @@ export function ReminderRuntimePage() {
               disabled={runMutation.isPending}
             >
               {runningJob === "check_moment_schedule"
-                ? "执行中..."
-                : "执行发圈窗口"}
+                ? t(msg`执行中...`)
+                : t(msg`执行发圈窗口`)}
             </Button>
           </>
         }
@@ -2197,12 +2195,12 @@ export function ReminderRuntimePage() {
         <div className="space-y-6">
           <Card className="bg-[color:var(--surface-console)]">
             <AdminSectionHeader
-              title="值班工作台"
+              title={t(msg`值班工作台`)}
               actions={
                 <StatusPill
                   tone={filteredTasks.length > 0 ? "healthy" : "muted"}
                 >
-                  显示 {filteredTasks.length} / {stats.activeTaskCount} 条
+                  {t(msg`显示 ${filteredTasks.length} / ${stats.activeTaskCount} 条`)}
                 </StatusPill>
               }
             />
@@ -2212,7 +2210,7 @@ export function ReminderRuntimePage() {
                   <AdminPillTextField
                     value={taskSearch}
                     onChange={setTaskSearch}
-                    placeholder="搜提醒标题、说明、分类或调度文案"
+                    placeholder={t(msg`搜提醒标题、说明、分类或调度文案`)}
                     className="w-full lg:max-w-sm"
                   />
                   <AdminPillSelectField
@@ -2226,33 +2224,33 @@ export function ReminderRuntimePage() {
                     }
                     className="w-full lg:w-[180px]"
                   >
-                    <option value="focus">优先处理</option>
-                    <option value="all">全部任务</option>
-                    <option value="hard">只看硬提醒</option>
-                    <option value="habit">只看习惯</option>
+                    <option value="focus">{t(msg`优先处理`)}</option>
+                    <option value="all">{t(msg`全部任务`)}</option>
+                    <option value="hard">{t(msg`只看硬提醒`)}</option>
+                    <option value="habit">{t(msg`只看习惯`)}</option>
                   </AdminPillSelectField>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <TaskFilterChip
-                    label="优先处理"
+                    label={t(msg`优先处理`)}
                     count={buildTaskFilterCount("focus", overviewQuery.data)}
                     active={taskFilter === "focus"}
                     onClick={() => setTaskFilter("focus")}
                   />
                   <TaskFilterChip
-                    label="全部"
+                    label={t(msg`全部`)}
                     count={buildTaskFilterCount("all", overviewQuery.data)}
                     active={taskFilter === "all"}
                     onClick={() => setTaskFilter("all")}
                   />
                   <TaskFilterChip
-                    label="硬提醒"
+                    label={t(msg`硬提醒`)}
                     count={buildTaskFilterCount("hard", overviewQuery.data)}
                     active={taskFilter === "hard"}
                     onClick={() => setTaskFilter("hard")}
                   />
                   <TaskFilterChip
-                    label="习惯"
+                    label={t(msg`习惯`)}
                     count={buildTaskFilterCount("habit", overviewQuery.data)}
                     active={taskFilter === "habit"}
                     onClick={() => setTaskFilter("habit")}
@@ -2276,7 +2274,7 @@ export function ReminderRuntimePage() {
                               </div>
                             </div>
                             <StatusPill tone={queueTone(group.key)}>
-                              {group.tasks.length} 条
+                              {t(msg`${group.tasks.length} 条`)}
                             </StatusPill>
                           </div>
                           <div className="space-y-3">
@@ -2322,21 +2320,21 @@ export function ReminderRuntimePage() {
                       />
                     ) : (
                       <AdminEmptyState
-                        title="当前筛选下没有焦点提醒"
-                        description="调整左侧筛选条件后，这里会展示一条可直接处理的焦点提醒。"
+                        title={t(msg`当前筛选下没有焦点提醒`)}
+                        description={t(msg`调整左侧筛选条件后，这里会展示一条可直接处理的焦点提醒。`)}
                       />
                     )}
                   </div>
                 ) : (
                   <AdminEmptyState
-                    title="没有匹配的提醒"
-                    description="当前筛选和搜索条件下没有结果，建议清空关键字或切换到“全部任务”继续查看。"
+                    title={t(msg`没有匹配的提醒`)}
+                    description={t(msg`当前筛选和搜索条件下没有结果，建议清空关键字或切换到"全部任务"继续查看。`)}
                   />
                 )
               ) : (
                 <AdminEmptyState
-                  title="当前没有活跃提醒"
-                  description="用户还没有交给小盯新的提醒事项，或者当前活跃提醒已经全部完成 / 删除。"
+                  title={t(msg`当前没有活跃提醒`)}
+                  description={t(msg`用户还没有交给小盯新的提醒事项，或者当前活跃提醒已经全部完成 / 删除。`)}
                 />
               )}
             </div>
@@ -2345,58 +2343,58 @@ export function ReminderRuntimePage() {
 
         <div className="space-y-6">
           <Card className="bg-[color:var(--surface-console)]">
-            <AdminSectionHeader title="值班摘要" />
+            <AdminSectionHeader title={t(msg`值班摘要`)} />
             <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
-              <AdminMiniPanel title="当前风险" tone="soft">
+              <AdminMiniPanel title={t(msg`当前风险`)} tone="soft">
                 <div className="text-sm font-medium text-[color:var(--text-primary)]">
                   {stats.overdueTaskCount > 0
-                    ? `${stats.overdueTaskCount} 条逾期`
+                    ? t(msg`${stats.overdueTaskCount} 条逾期`)
                     : stats.dueSoonTaskCount > 0
-                      ? `${stats.dueSoonTaskCount} 条即将到点`
+                      ? t(msg`${stats.dueSoonTaskCount} 条即将到点`)
                       : stats.activeTaskCount > 0
-                        ? "队列稳定"
-                        : "暂无活跃提醒"}
+                        ? t(msg`队列稳定`)
+                        : t(msg`暂无活跃提醒`)}
                 </div>
               </AdminMiniPanel>
-              <AdminMiniPanel title="最近私聊出站" tone="soft">
+              <AdminMiniPanel title={t(msg`最近私聊出站`)} tone="soft">
                 <div className="text-sm font-medium text-[color:var(--text-primary)]">
                   {overviewQuery.data.recentMessages[0]
                     ? formatDateTime(
                         overviewQuery.data.recentMessages[0].createdAt,
                       )
-                    : "暂无"}
+                    : t(msg`暂无`)}
                 </div>
               </AdminMiniPanel>
-              <AdminMiniPanel title="最近完成" tone="soft">
+              <AdminMiniPanel title={t(msg`最近完成`)} tone="soft">
                 <div className="text-sm font-medium text-[color:var(--text-primary)]">
                   {overviewQuery.data.recentCompletedTasks[0]?.lastCompletedAt
                     ? formatDateTime(
                         overviewQuery.data.recentCompletedTasks[0]
                           .lastCompletedAt,
                       )
-                    : "暂无"}
+                    : t(msg`暂无`)}
                 </div>
               </AdminMiniPanel>
-              <AdminMiniPanel title="最近轻提醒发圈" tone="soft">
+              <AdminMiniPanel title={t(msg`最近轻提醒发圈`)} tone="soft">
                 <div className="text-sm font-medium text-[color:var(--text-primary)]">
                   {overviewQuery.data.recentMoments[0]
                     ? formatDateTime(
                         overviewQuery.data.recentMoments[0].postedAt,
                       )
-                    : "暂无"}
+                    : t(msg`暂无`)}
                 </div>
               </AdminMiniPanel>
             </div>
             <div className="mt-4 space-y-3">
               {overviewQuery.data.recentMessages[0] ? (
                 <AdminSoftBox>
-                  最新私聊：
+                  {t(msg`最新私聊：`)}
                   {truncateText(overviewQuery.data.recentMessages[0].text, 90)}
                 </AdminSoftBox>
               ) : null}
               {overviewQuery.data.recentMoments[0] ? (
                 <AdminSoftBox>
-                  最新发圈：
+                  {t(msg`最新发圈：`)}
                   {truncateText(overviewQuery.data.recentMoments[0].text, 90)}
                 </AdminSoftBox>
               ) : null}
@@ -2429,12 +2427,12 @@ export function ReminderRuntimePage() {
 
           <Card className="bg-[color:var(--surface-console)]">
             <AdminSectionHeader
-              title="最近执行流水"
+              title={t(msg`最近执行流水`)}
               actions={
                 <StatusPill
                   tone={recentActivity.length > 0 ? "healthy" : "muted"}
                 >
-                  {recentActivity.length} 条
+                  {t(msg`${recentActivity.length} 条`)}
                 </StatusPill>
               }
             />
@@ -2463,8 +2461,8 @@ export function ReminderRuntimePage() {
                 ))
               ) : (
                 <AdminEmptyState
-                  title="还没有最近动作"
-                  description="这里会汇总最近触发、完成、私聊出站和朋友圈轻提醒，方便运营快速回看刚刚发生了什么。"
+                  title={t(msg`还没有最近动作`)}
+                  description={t(msg`这里会汇总最近触发、完成、私聊出站和朋友圈轻提醒，方便运营快速回看刚刚发生了什么。`)}
                 />
               )}
             </div>
@@ -2475,4 +2473,3 @@ export function ReminderRuntimePage() {
   );
 }
 
-// i18n-ignore-end
