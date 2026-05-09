@@ -35,7 +35,6 @@ import {
 import { adminApi } from "../lib/admin-api";
 import { formatAdminDateTime as formatLocalizedDateTime } from "../lib/format";
 
-// i18n-ignore-start: migration in progress — remaining raw strings pending wrapping
 type WorkspaceTab = "overview" | "providers" | "models";
 type ModelStatusFilter = "all" | InferenceModelCatalogEntry["status"];
 type ModelCapabilityFilter = "all" | "reasoning" | "vision" | "audio";
@@ -524,7 +523,7 @@ export function InferencePage() {
           selectedProviderId && selectedProviderId !== "new"
             ? selectedProviderId
             : undefined,
-        prompt: "请只回复 ok。",
+        prompt: "请只回复 ok。", // i18n-ignore-line: AI diagnostic prompt, not user-facing UI
       }),
     onSuccess: async (result) => {
       setDiagnosticResult(result);
@@ -541,7 +540,7 @@ export function InferencePage() {
           selectedProviderId && selectedProviderId !== "new"
             ? selectedProviderId
             : undefined,
-        prompt: "请只回复 ok。",
+        prompt: "请只回复 ok。", // i18n-ignore-line: AI diagnostic prompt, not user-facing UI
       }),
     onSuccess: async (snapshot) => {
       setDiagnosticResult(snapshot.results.at(-1) ?? null);
@@ -1820,5 +1819,3 @@ export function InferencePage() {
     </div>
   );
 }
-
-// i18n-ignore-end

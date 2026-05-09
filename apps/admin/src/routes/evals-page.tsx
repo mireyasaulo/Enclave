@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { translateRuntimeMessage } from "@yinjie/i18n";
-// i18n-ignore-start: data / seed / preset content — not yet migrated.
 import {
   compareEvalRuns,
   getGenerationTrace,
@@ -2528,8 +2527,8 @@ window.alert(t(msg`预设 JSON 无效`));
                     {trace.id}
                   </div>
                   <div className="mt-3 grid gap-2">
-                    <div>{t(msg`角色`)}：{trace.characterId ?? "无"}</div>
-                    <div>{t(msg`会话`)}：{trace.conversationId ?? "无"}</div>
+                    <div>{t(msg`角色`)}：{trace.characterId ?? t(msg`无`)}</div>
+                    <div>{t(msg`会话`)}：{trace.conversationId ?? t(msg`无`)}</div>
                     <div>{t(msg`创建时间`)}：{trace.createdAt}</div>
                   </div>
                 </button>
@@ -3085,4 +3084,3 @@ function setQueryParam(params: URLSearchParams, key: string, value: string | nul
   }
   params.set(key, value);
 }
-// i18n-ignore-end
