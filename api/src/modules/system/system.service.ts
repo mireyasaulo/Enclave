@@ -24,6 +24,7 @@ import {
   InferenceService,
   type InferenceDiagnosticCapability,
 } from '../inference/inference.service';
+import { executeChatCompletion } from '../ai/chat-completion-stream.util';
 
 type ProviderPayload = {
   endpoint: string;
@@ -1271,7 +1272,7 @@ export class SystemService {
 
     try {
       const client = this.createProviderClient(effectiveJudgeProvider);
-      const response = await client.chat.completions.create({
+      const response = await executeChatCompletion(client, {
         model: effectiveJudgeProvider.model,
         messages: promptMessages.map((message) => ({
           role:
@@ -1362,7 +1363,7 @@ export class SystemService {
 
     try {
       const client = this.createProviderClient(providerConfig);
-      const response = await client.chat.completions.create({
+      const response = await executeChatCompletion(client, {
         model: requestedModel,
         messages: promptMessages.map((message) => ({
           role:
@@ -2524,7 +2525,7 @@ export class SystemService {
 
   private async testChatProviderConnection(payload: ProviderPayload) {
     const client = this.createProviderClient(payload);
-    await client.chat.completions.create({
+    await executeChatCompletion(client, {
       model: payload.model,
       messages: [{ role: 'user', content: 'ping' }],
       max_tokens: 1,
@@ -2787,7 +2788,7 @@ export class SystemService {
     const client = this.createProviderClient(providerConfig);
 
     try {
-      const response = await client.chat.completions.create({
+      const response = await executeChatCompletion(client, {
         model: payload.model?.trim() || providerConfig.model,
         messages: [
           ...(payload.systemPrompt?.trim()
@@ -2899,7 +2900,7 @@ export class SystemService {
 
     try {
       const client = this.createProviderClient(effectiveProvider);
-      const response = await client.chat.completions.create({
+      const response = await executeChatCompletion(client, {
         model: effectiveProvider.model,
         messages: promptMessages.map((message) => ({
           role:

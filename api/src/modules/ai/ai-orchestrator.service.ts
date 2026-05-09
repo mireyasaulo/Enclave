@@ -45,6 +45,10 @@ import {
 } from '../inference/inference.service';
 import { SubscriptionService } from '../subscription/subscription.service';
 import { MinimaxNativeClient } from './minimax-native.client';
+import {
+  executeChatCompletion,
+  type ChatCompletionTaskResult,
+} from './chat-completion-stream.util';
 
 const DEFAULT_TTS_VOICE = 'alloy';
 const MAX_INLINE_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -178,22 +182,6 @@ type ProviderFallbackCandidate = {
     | 'character_instance_route'
     | 'instance_default_route'
     | 'enabled_provider_route';
-};
-
-type ChatCompletionTaskResult = {
-  usage?: {
-    prompt_tokens?: number;
-    completion_tokens?: number;
-    input_tokens?: number;
-    output_tokens?: number;
-    total_tokens?: number;
-  } | null;
-  model?: string | null;
-  choices: Array<{
-    message?: {
-      content?: string | null;
-    } | null;
-  }>;
 };
 
 @Injectable()
@@ -1390,7 +1378,7 @@ export class AiOrchestratorService {
       const mergedSystemPrompt = finalLanguageReminder
         ? `${systemPrompt}\n\n${finalLanguageReminder}`
         : systemPrompt;
-      const response = await client.chat.completions.create({
+      const response = await executeChatCompletion(client, {
         model: provider.model,
         messages: [
           { role: 'system', content: mergedSystemPrompt },
@@ -2273,7 +2261,7 @@ export class AiOrchestratorService {
           characterId: profile.characterId,
           label: `${sceneKey} generation`,
           request: (client, activeProvider) =>
-            client.chat.completions.create({
+            executeChatCompletion(client, {
               model: activeProvider.model,
               messages: [
                 { role: 'system', content: systemPrompt },
@@ -2331,7 +2319,7 @@ export class AiOrchestratorService {
         characterId: profile.characterId,
         label: 'moment generation',
         request: (client, activeProvider) =>
-          client.chat.completions.create({
+          executeChatCompletion(client, {
             model: activeProvider.model,
             messages: [
               { role: 'system', content: promptRequest.systemPrompt },
@@ -2392,7 +2380,7 @@ export class AiOrchestratorService {
       characterId: resolvedUsageContext.characterId,
       label: 'personality extraction',
       request: (client, provider) =>
-        client.chat.completions.create({
+        executeChatCompletion(client, {
           model: provider.model,
           messages: [{ role: 'user', content: prompt }],
           max_tokens: 600,
@@ -2488,7 +2476,8 @@ export class AiOrchestratorService {
       usageContext,
       label: 'quick character generation',
       request: (client, provider) =>
-        client.chat.completions.create(
+        executeChatCompletion(
+          client,
           {
             model: provider.model,
             messages: requestMessages,
@@ -2531,7 +2520,7 @@ export class AiOrchestratorService {
         characterId: options.usageContext.characterId,
         label: 'json generation',
         request: (client, provider) =>
-          client.chat.completions.create({
+          executeChatCompletion(client, {
             model: provider.model,
             messages: [{ role: 'user', content: prompt }],
             max_tokens: options.maxTokens ?? 1200,
@@ -2570,7 +2559,7 @@ export class AiOrchestratorService {
         characterId: options.usageContext.characterId,
         label: 'plain text generation',
         request: (client, provider) =>
-          client.chat.completions.create({
+          executeChatCompletion(client, {
             model: provider.model,
             messages: [{ role: 'user', content: prompt }],
             max_tokens: options.maxTokens ?? 800,
@@ -2620,7 +2609,7 @@ export class AiOrchestratorService {
         characterId: profile.characterId,
         label: 'memory compression',
         request: (client, provider) =>
-          client.chat.completions.create({
+          executeChatCompletion(client, {
             model: provider.model,
             messages: [{ role: 'user', content: prompt }],
             max_tokens: 200,
@@ -2662,7 +2651,7 @@ export class AiOrchestratorService {
         characterId: resolvedUsageContext.characterId,
         label: 'core memory extraction',
         request: (client, provider) =>
-          client.chat.completions.create({
+          executeChatCompletion(client, {
             model: provider.model,
             messages: [{ role: 'user', content: prompt }],
             max_tokens: 300,
@@ -2711,7 +2700,7 @@ export class AiOrchestratorService {
         characterId: resolvedUsageContext.characterId,
         label: 'intent classification',
         request: (client, provider) =>
-          client.chat.completions.create({
+          executeChatCompletion(client, {
             model: provider.model,
             messages: [{ role: 'user', content: prompt }],
             max_tokens: 200,

@@ -14,6 +14,7 @@ import { InferenceModelCatalogEntryEntity } from './inference-model-catalog-entr
 import { InferenceProviderAccountEntity } from './inference-provider-account.entity';
 import { INFERENCE_MODEL_CATALOG_SEED } from './inference-catalog.seed';
 import { MinimaxNativeClient } from '../ai/minimax-native.client';
+import { executeChatCompletion } from '../ai/chat-completion-stream.util';
 
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const DEFAULT_TRANSCRIPTION_MODEL = 'gpt-4o-mini-transcribe';
@@ -1018,7 +1019,7 @@ export class InferenceService implements OnModuleInit {
     model: string;
   }) {
     const client = this.buildProviderClient(payload);
-    await client.chat.completions.create({
+    await executeChatCompletion(client, {
       model: payload.model,
       messages: [{ role: 'user', content: 'ping' }],
       max_tokens: 1,
@@ -1478,7 +1479,7 @@ export class InferenceService implements OnModuleInit {
         temperature: 0,
       });
     } else {
-      await client.chat.completions.create({
+      await executeChatCompletion(client, {
         model: provider.model,
         messages: [{ role: 'user', content: prompt }],
         max_tokens: 8,
@@ -1545,7 +1546,7 @@ export class InferenceService implements OnModuleInit {
         temperature: 0,
       });
     } else {
-      await client.chat.completions.create({
+      await executeChatCompletion(client, {
         model: provider.model,
         messages: [
           {
@@ -1672,7 +1673,7 @@ export class InferenceService implements OnModuleInit {
           apiKey: candidateProvider.apiKey,
           model: candidateProvider.model,
         });
-        const response = await client.chat.completions.create({
+        const response = await executeChatCompletion(client, {
           model: candidateProvider.model,
           messages: [
             {
@@ -1696,7 +1697,7 @@ export class InferenceService implements OnModuleInit {
           temperature: 0,
         });
         const replyText = extractChatCompletionTextContent(
-          response.choices[0]?.message?.content,
+          response.choices[0]?.message?.content ?? null,
         );
         const normalizedReply = normalizeAudioProbeReply(replyText);
         const matched =
