@@ -595,8 +595,18 @@ function ChannelVideoPlayer({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [muted, setMuted] = useState(true);
 
+  // React 的 muted prop 是异步设到 DOM 上的，浏览器评估 autoplay 时可能还没 muted →
+  // autoplay 被策略拦截。用 callback ref 在 React 把 element 挂到 DOM 之前就把
+  // muted 同步到 IDL 属性上。参考 facebook/react#10389。
+  const setVideoNode = (node: HTMLVideoElement | null) => {
+    videoRef.current = node;
+    if (node) {
+      node.muted = true;
+      node.defaultMuted = true;
+    }
+  };
+
   // 进入视口的 slide 自动播放，离开的暂停。
-  // 浏览器策略要求 autoplay 必须 muted，所以默认静音；用户可以点视频本体或右上角按钮切换。
   useEffect(() => {
     const video = videoRef.current;
     if (!video) {
@@ -607,7 +617,7 @@ function ChannelVideoPlayer({
       const playResult = video.play();
       if (playResult && typeof playResult.catch === "function") {
         playResult.catch(() => {
-          // 自动播放被阻断时静默失败：用户点击切换静音会再次触发 play。
+          // 自动播放被阻断时静默失败；用户点击切换静音会再次触发 play。
         });
       }
     } else {
@@ -636,7 +646,7 @@ function ChannelVideoPlayer({
   return (
     <>
       <video
-        ref={videoRef}
+        ref={setVideoNode}
         // key 让 src 变化时强制重建 video element，避免上一个视频的 buffered range 干扰
         key={url}
         src={url}
@@ -645,7 +655,7 @@ function ChannelVideoPlayer({
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="auto"
         onClick={() => setMuted((current) => !current)}
         className="absolute inset-0 h-full w-full cursor-pointer bg-black object-contain"
       />
@@ -653,7 +663,10 @@ function ChannelVideoPlayer({
         type="button"
         aria-label={muted ? t(msg`取消静音`) : t(msg`静音`)}
         aria-pressed={!muted}
-        onClick={() => setMuted((current) => !current)}
+        onClick={(event) => {
+          event.stopPropagation();
+          setMuted((current) => !current);
+        }}
         className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/22 bg-black/45 text-white backdrop-blur-sm transition hover:bg-black/65"
       >
         {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
