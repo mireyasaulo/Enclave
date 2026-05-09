@@ -140,13 +140,13 @@ function renderSessionSource(ip?: string | null, userAgent?: string | null) {
   return (
     <div className="space-y-1">
       <div className="font-mono text-xs text-[color:var(--text-primary)]">
-        {ip || "Unknown IP"}
+        {ip || translateCloudConsoleTextForActiveLocale("Unknown IP")}
       </div>
       <div
         className="max-w-[22rem] truncate text-xs text-[color:var(--text-secondary)]"
         title={userAgent || undefined}
       >
-        {userAgent || "Unknown client"}
+        {userAgent || translateCloudConsoleTextForActiveLocale("Unknown client")}
       </div>
     </div>
   );
@@ -179,7 +179,7 @@ function renderRevocationDetails(session: CloudAdminSessionSummary) {
       >
         {session.revokedBySessionId
           ? `By ${session.revokedBySessionId}`
-          : "By unknown session"}
+          : translateCloudConsoleTextForActiveLocale("By unknown session")}
       </div>
     </div>
   );
@@ -188,12 +188,12 @@ function renderRevocationDetails(session: CloudAdminSessionSummary) {
 function formatTimelineViewLabel(view: SourceGroupRiskTimelineView) {
   switch (view) {
     case "daily":
-      return "Daily summary";
+      return translateCloudConsoleTextForActiveLocale("Daily summary");
     case "weekly":
-      return "Weekly summary";
+      return translateCloudConsoleTextForActiveLocale("Weekly summary");
     case "events":
     default:
-      return "Event view";
+      return translateCloudConsoleTextForActiveLocale("Event view");
   }
 }
 
@@ -506,12 +506,12 @@ function formatSourceGroupTimelineSessionMatchReason(
 ) {
   switch (reason) {
     case "active-threshold":
-      return "Active threshold match";
+      return translateCloudConsoleTextForActiveLocale("Active threshold match");
     case "revoked-threshold":
-      return "Revoked threshold match";
+      return translateCloudConsoleTextForActiveLocale("Revoked threshold match");
     case "refresh-reuse":
     default:
-      return "Refresh reuse match";
+      return translateCloudConsoleTextForActiveLocale("Refresh reuse match");
   }
 }
 
@@ -596,7 +596,7 @@ function buildSourceGroupTimelineMatchedSessions(
 
 function describeSourceGroupTimelineEventSummary(
   labels: string[],
-  fallback = "Source state changed",
+  fallback = translateCloudConsoleTextForActiveLocale("Source state changed"),
 ) {
   if (!labels.length) {
     return fallback;
@@ -625,7 +625,7 @@ function buildSourceGroupRiskTimeline(
   };
 
   for (const session of snapshot.sessions) {
-    addEventLabel(session.createdAt, "Session issued");
+    addEventLabel(session.createdAt, translateCloudConsoleTextForActiveLocale("Session issued"));
 
     const expiresAt = parseTimelineTimestamp(session.expiresAt);
     const revokedAt = parseTimelineTimestamp(session.revokedAt);
@@ -633,20 +633,20 @@ function buildSourceGroupRiskTimeline(
       expiresAt !== null &&
       (revokedAt === null || expiresAt < revokedAt)
     ) {
-      addEventLabel(session.expiresAt, "Session expired");
+      addEventLabel(session.expiresAt, translateCloudConsoleTextForActiveLocale("Session expired"));
     }
 
     if (session.revokedAt) {
       addEventLabel(
         session.revokedAt,
         session.revocationReason === "refresh-token-reuse"
-          ? "Refresh reuse revoke"
-          : "Session revoked",
+          ? translateCloudConsoleTextForActiveLocale("Refresh reuse revoke")
+          : translateCloudConsoleTextForActiveLocale("Session revoked"),
       );
     }
   }
 
-  addEventLabel(snapshot.generatedAt, "Current snapshot");
+  addEventLabel(snapshot.generatedAt, translateCloudConsoleTextForActiveLocale("Current snapshot"));
 
   return [...eventLabelsByTimestamp.entries()]
     .sort(
@@ -756,7 +756,7 @@ function buildSourceGroupRiskDailyTimeline(
         day,
         pointCount: points.length,
         timestamp: new Date(latestTimestampMs).toISOString(),
-        eventSummary: `Daily summary of ${points.length} timeline point(s)`,
+        eventSummary: translateCloudConsoleTextForActiveLocale("Daily summary of {0} timeline point(s)").replace("{0}", String(points.length)),
       } satisfies SourceGroupRiskTimelineDailyPoint;
     });
 }
@@ -817,7 +817,7 @@ function buildSourceGroupRiskWeeklyTimeline(
         weekEnd: addUtcDays(weekStart, 6),
         pointCount: points.length,
         timestamp: new Date(latestTimestampMs).toISOString(),
-        eventSummary: `Weekly summary of ${points.length} timeline point(s)`,
+        eventSummary: translateCloudConsoleTextForActiveLocale("Weekly summary of {0} timeline point(s)").replace("{0}", String(points.length)),
       } satisfies SourceGroupRiskTimelineWeeklyPoint;
     });
 }
@@ -1432,8 +1432,8 @@ export function AdminSessionsPage() {
       settlePendingSessionMutation();
       const notice = createRequestScopedNotice(
         session.isCurrent
-          ? "Current admin session revoked. Console will re-issue a short-lived token on the next request."
-          : "Admin session revoked.",
+          ? t("Current admin session revoked. Console will re-issue a short-lived token on the next request.")
+          : t("Admin session revoked."),
         session.isCurrent ? "warning" : "success",
         response.requestId,
       );
@@ -1478,10 +1478,10 @@ export function AdminSessionsPage() {
           skippedCount,
           revokedCurrentSession,
           zeroMessage:
-            "No selected admin sessions were revoked. The list may already be stale.",
-          successMessage: (count) => `Revoked ${count} selected session(s).`,
+            t("No selected admin sessions were revoked. The list may already be stale."),
+          successMessage: (count) => t("Revoked {0} selected session(s).").replace("{0}", String(count)),
           skippedMessage: (count) =>
-            `${count} session(s) were already unavailable.`,
+            t("{0} session(s) were already unavailable.").replace("{0}", String(count)),
         }),
       );
     },
@@ -1501,11 +1501,11 @@ export function AdminSessionsPage() {
           revokedCount: response.data.revokedCount,
           skippedCount: response.data.skippedCount,
           revokedCurrentSession: response.data.revokedCurrentSession,
-          zeroMessage: "No matching active admin sessions were revoked.",
+          zeroMessage: t("No matching active admin sessions were revoked."),
           successMessage: (count) =>
-            `Revoked ${count} matching active session(s).`,
+            t("Revoked {0} matching active session(s).").replace("{0}", String(count)),
           skippedMessage: (count) =>
-            `${count} session(s) were skipped because they were already unavailable.`,
+            t("{0} session(s) were skipped because they were already unavailable.").replace("{0}", String(count)),
         }),
       );
     },
@@ -1539,11 +1539,11 @@ export function AdminSessionsPage() {
         skippedCount: response.data.skippedCount,
         revokedCurrentSession: response.data.revokedCurrentSession,
         zeroMessage:
-          "No active admin sessions in the selected source group were revoked.",
+          t("No active admin sessions in the selected source group were revoked."),
         successMessage: (count) =>
-          `Revoked ${count} matching active session(s) in the selected source group.`,
+          t("Revoked {0} matching active session(s) in the selected source group.").replace("{0}", String(count)),
         skippedMessage: (count) =>
-          `${count} session(s) were skipped because they were already unavailable.`,
+          t("{0} session(s) were skipped because they were already unavailable.").replace("{0}", String(count)),
       });
       showAdminSessionsMutationNotice(notice);
       if (payload.mode === "focused-source") {
@@ -2441,7 +2441,7 @@ export function AdminSessionsPage() {
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[color:var(--border-brand)] bg-[color:var(--brand-soft)] px-4 py-3">
           <div>
             <AdminSessionBrandEyebrow>
-              Viewing source group
+              {t("Viewing source group")}
             </AdminSessionBrandEyebrow>
             <div className="mt-2">
               {renderSessionSource(
@@ -2454,7 +2454,7 @@ export function AdminSessionsPage() {
             tone="brand-outline"
             onClick={clearSourceFocus}
           >
-            Clear source focus
+            {t("Clear source focus")}
           </AdminSessionActionButton>
         </div>
       ) : null}
@@ -2562,7 +2562,7 @@ export function AdminSessionsPage() {
 
           {focusedSourceSnapshotQuery.isLoading ? (
             <div className="mt-4 text-sm text-[color:var(--text-muted)]">
-              Loading risk timeline...
+              {t("Loading risk timeline...")}
             </div>
           ) : null}
 
@@ -2570,7 +2570,7 @@ export function AdminSessionsPage() {
           !focusedSourceSnapshotQuery.isError &&
           !visibleFocusedSourceRiskTimeline.length ? (
             <div className="mt-4 text-sm text-[color:var(--text-muted)]">
-              No timeline points are available for the focused source group.
+              {t("No timeline points are available for the focused source group.")}
             </div>
           ) : null}
 
@@ -2633,7 +2633,7 @@ export function AdminSessionsPage() {
                       signals={point.riskSignals}
                       keyPrefix={point.id}
                       className="mt-3 flex flex-wrap gap-2 text-[11px] text-[color:var(--text-secondary)]"
-                      emptyMessage="No risk signals at this point."
+                      emptyMessage={t("No risk signals at this point.")}
                       emptyClassName="mt-3 text-[11px] text-[color:var(--text-muted)]"
                     />
 
@@ -2646,18 +2646,18 @@ export function AdminSessionsPage() {
                           } matched sessions for ${point.eventSummary}`}
                         >
                           {matchedSessionsExpanded
-                            ? "Hide matched sessions"
-                            : "Show matched sessions"}
+                            ? t("Hide matched sessions")
+                            : t("Show matched sessions")}
                         </AdminSessionActionButton>
 
                         {matchedSessionsExpanded ? (
                           <div className="mt-3 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-3">
                             <div className="text-[11px] uppercase tracking-[0.14em] text-[color:var(--text-muted)]">
-                              Matched sessions at this point
+                              {t("Matched sessions at this point")}
                             </div>
                             {timelineView !== "events" ? (
                               <div className="mt-1 text-[11px] text-[color:var(--text-secondary)]">
-                                These sessions reflect the latest event captured in this summary.
+                                {t("These sessions reflect the latest event captured in this summary.")}
                               </div>
                             ) : null}
                             <div className="mt-3 space-y-2">
@@ -2703,7 +2703,7 @@ export function AdminSessionsPage() {
                                         }
                                         aria-label={`View ${match.session.id} in sessions list`}
                                       >
-                                        View in sessions list
+                                        {t("View in sessions list")}
                                       </AdminSessionActionButton>
                                       {match.session.status === "active" ? (
                                         <AdminSessionActionButton
@@ -2722,7 +2722,7 @@ export function AdminSessionsPage() {
                                   <div className="mt-2 grid gap-2 text-[11px] text-[color:var(--text-secondary)] sm:grid-cols-3">
                                     <div>
                                       <div className="uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
-                                        Issued
+                                        {t("Issued")}
                                       </div>
                                       <div className="mt-1 text-[color:var(--text-primary)]">
                                         {formatDateTime(match.session.createdAt)}
@@ -2730,7 +2730,7 @@ export function AdminSessionsPage() {
                                     </div>
                                     <div>
                                       <div className="uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
-                                        Last used
+                                        {t("Last used")}
                                       </div>
                                       <div className="mt-1 text-[color:var(--text-primary)]">
                                         {formatDateTime(match.session.lastUsedAt)}
@@ -2738,7 +2738,7 @@ export function AdminSessionsPage() {
                                     </div>
                                     <div>
                                       <div className="uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
-                                        Revoked
+                                        {t("Revoked")}
                                       </div>
                                       <div className="mt-1 text-[color:var(--text-primary)]">
                                         {formatDateTime(match.session.revokedAt)}
@@ -2841,12 +2841,12 @@ export function AdminSessionsPage() {
                       </span>
                       {session.isCurrent ? (
                         <AdminSessionBrandBadge>
-                          Current
+                          {t("Current")}
                         </AdminSessionBrandBadge>
                       ) : null}
                       {session.id === highlightedSessionId ? (
                         <AdminSessionBrandBadge variant="outline">
-                          Timeline focus
+                          {t("Timeline focus")}
                         </AdminSessionBrandBadge>
                       ) : null}
                     </div>
@@ -2889,7 +2889,7 @@ export function AdminSessionsPage() {
                       }
                       onClick={() => setPendingSession(session)}
                     >
-                      Revoke
+                      {t("Revoke")}
                     </AdminSessionActionButton>
                   </td>
                 </tr>
@@ -2898,17 +2898,17 @@ export function AdminSessionsPage() {
                     <td colSpan={10} className="px-4 pb-4 pt-0">
                       <div className="rounded-2xl border border-[color:var(--border-brand)] bg-[color:var(--surface-soft)] p-4">
                         <AdminSessionBrandEyebrow size="compact">
-                          Timeline audit detail
+                          {t("Timeline audit detail")}
                         </AdminSessionBrandEyebrow>
                         <div className="mt-1 text-xs text-[color:var(--text-secondary)]">
-                          Focused from the risk timeline so you can verify audit fields before taking session actions.
+                          {t("Focused from the risk timeline so you can verify audit fields before taking session actions.")}
                         </div>
                         {highlightedFocusedSourceSummary ? (
                           <div className="mt-3 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3">
                             <div className="flex flex-wrap items-start justify-between gap-3">
                               <div>
                                 <div className="text-[11px] uppercase tracking-[0.14em] text-[color:var(--text-muted)]">
-                                  Focused source risk
+                                  {t("Focused source risk")}
                                 </div>
                                 <div className="mt-2">
                                   <AdminSessionSourceGroupRiskBadge
@@ -2947,7 +2947,7 @@ export function AdminSessionsPage() {
                                 }
                                 onClick={exportHighlightedFocusedSourceSnapshot}
                               >
-                                Export focused source snapshot
+                                {t("Export focused source snapshot")}
                               </AdminSessionActionButton>
                               <AdminSessionActionButton
                                 tone="danger"
@@ -2958,7 +2958,7 @@ export function AdminSessionsPage() {
                                 }
                                 onClick={openHighlightedFocusedSourceRevoke}
                               >
-                                Revoke focused source
+                                {t("Revoke focused source")}
                               </AdminSessionActionButton>
                             </div>
                             {latestFocusedSourceRiskPoint ? (
@@ -2966,10 +2966,10 @@ export function AdminSessionsPage() {
                                 <div className="flex flex-wrap items-start justify-between gap-3">
                                   <div>
                                     <div className="text-[11px] uppercase tracking-[0.14em] text-[color:var(--text-muted)]">
-                                      Latest timeline snapshot
+                                      {t("Latest timeline snapshot")}
                                     </div>
                                     <div className="mt-1 text-[11px] text-[color:var(--text-secondary)]">
-                                      Synced with {formatTimelineViewLabel(timelineView)}.
+                                      {t("Synced with {0}.").replace("{0}", formatTimelineViewLabel(timelineView))}
                                     </div>
                                     <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
                                       {latestFocusedSourceRiskPoint.eventSummary}
@@ -2990,11 +2990,11 @@ export function AdminSessionsPage() {
                                   {timelineView !== "events" &&
                                   "pointCount" in latestFocusedSourceRiskPoint ? (
                                     <AdminSessionNeutralChip size="compact">
-                                      {latestFocusedSourceRiskPoint.pointCount} timeline point(s)
+                                      {t("{0} timeline point(s)").replace("{0}", String(latestFocusedSourceRiskPoint.pointCount))}
                                     </AdminSessionNeutralChip>
                                   ) : null}
                                   <AdminSessionNeutralChip size="compact">
-                                    {latestFocusedSourceMatchedSessions.length} matched session(s)
+                                    {t("{0} matched session(s)").replace("{0}", String(latestFocusedSourceMatchedSessions.length))}
                                   </AdminSessionNeutralChip>
                                   <AdminSessionSourceGroupSummaryPills
                                     activeSessions={latestFocusedSourceRiskPoint.activeSessions}
@@ -3068,7 +3068,7 @@ export function AdminSessionsPage() {
                                       <div className="mt-3 grid gap-3 text-[11px] text-current/90 md:grid-cols-3">
                                         <div>
                                           <div className="uppercase tracking-[0.12em] opacity-80">
-                                            Session context
+                                            {t("Session context")}
                                           </div>
                                           <div
                                             className="mt-1 max-w-[22rem] truncate font-mono text-[color:var(--text-primary)]"
@@ -3079,7 +3079,7 @@ export function AdminSessionsPage() {
                                         </div>
                                         <div>
                                           <div className="uppercase tracking-[0.12em] opacity-80">
-                                            Source context
+                                            {t("Source context")}
                                           </div>
                                           <div className="mt-1">
                                             {renderSessionSource(
@@ -3090,7 +3090,7 @@ export function AdminSessionsPage() {
                                         </div>
                                         <div>
                                           <div className="uppercase tracking-[0.12em] opacity-80">
-                                            Request id
+                                            {t("Request id")}
                                           </div>
                                           <div
                                             className="mt-1 max-w-[22rem] break-all font-mono text-[color:var(--text-primary)]"
@@ -3110,7 +3110,7 @@ export function AdminSessionsPage() {
                         <div className="mt-3 grid gap-3 text-xs text-[color:var(--text-secondary)] md:grid-cols-2 xl:grid-cols-3">
                           <div>
                             <div className="uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
-                              Issued from
+                              {t("Issued from")}
                             </div>
                             <div className="mt-1">
                               {renderSessionSource(
@@ -3121,7 +3121,7 @@ export function AdminSessionsPage() {
                           </div>
                           <div>
                             <div className="uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
-                              Last client
+                              {t("Last client")}
                             </div>
                             <div className="mt-1">
                               {renderSessionSource(
@@ -3132,7 +3132,7 @@ export function AdminSessionsPage() {
                           </div>
                           <div>
                             <div className="uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
-                              Last refreshed
+                              {t("Last refreshed")}
                             </div>
                             <div className="mt-1 text-[color:var(--text-primary)]">
                               {formatDateTime(session.lastRefreshedAt)}
@@ -3148,7 +3148,7 @@ export function AdminSessionsPage() {
                           </div>
                           <div>
                             <div className="uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
-                              Revocation reason
+                              {t("Revocation reason")}
                             </div>
                             <div className="mt-1 text-[color:var(--text-primary)]">
                               {t(formatRevocationReason(session.revocationReason))}
@@ -3156,7 +3156,7 @@ export function AdminSessionsPage() {
                           </div>
                           <div>
                             <div className="uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
-                              Revoked by session
+                              {t("Revoked by session")}
                             </div>
                             <div
                               className="mt-1 font-mono text-[11px] text-[color:var(--text-primary)]"
@@ -3225,8 +3225,8 @@ export function AdminSessionsPage() {
         title={t("Revoke admin session?")}
         description={
           pendingSession?.isCurrent
-            ? "This is the current console session. New admin requests will need to exchange a fresh short-lived token."
-            : "The selected session will stop authorizing admin requests immediately."
+            ? t("This is the current console session. New admin requests will need to exchange a fresh short-lived token.")
+            : t("The selected session will stop authorizing admin requests immediately.")
         }
         confirmLabel="Revoke session"
         pendingLabel="Revoking..."
@@ -3246,8 +3246,8 @@ export function AdminSessionsPage() {
         title={t("Revoke selected admin sessions?")}
         description={
           selectedCurrentSession
-            ? `This selection includes the current console session. ${pendingBulkSessionIds.length} selected session(s) will stop authorizing admin requests immediately, and the next admin request will need to exchange a fresh short-lived token.`
-            : `${pendingBulkSessionIds.length} selected session(s) will stop authorizing admin requests immediately.`
+            ? t("This selection includes the current console session. {0} selected session(s) will stop authorizing admin requests immediately, and the next admin request will need to exchange a fresh short-lived token.").replace("{0}", String(pendingBulkSessionIds.length))
+            : t("{0} selected session(s) will stop authorizing admin requests immediately.").replace("{0}", String(pendingBulkSessionIds.length))
         }
         confirmLabel="Revoke selected"
         pendingLabel="Revoking..."

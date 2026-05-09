@@ -540,6 +540,88 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
       "将撤销标记为 {0} 的来源分组中所有仍符合聚焦来源分组和当前筛选条件的活跃会话。",
     "This will revoke every active session in source groups marked {0} that still match the current filters, including groups on other pages.":
       "将撤销标记为 {0} 的来源分组中所有仍符合当前筛选条件的活跃会话，包括其他页面上的分组。",
+
+    // admin-sessions-page 其他字符串
+    "Unknown IP": "未知 IP",
+    "By unknown session": "来自未知会话",
+    "Active threshold match": "活跃阈值匹配",
+    "Revoked threshold match": "撤销阈值匹配",
+    "Refresh reuse match": "令牌复用匹配",
+    "Source state changed": "来源状态变更",
+    "Refresh reuse revoke": "令牌复用撤销",
+    "Last refreshed": "最近刷新时间",
+    "No risk signals at this point.": "此时间点无风险信号。",
+    "Hide matched sessions": "收起匹配会话",
+    "Show matched sessions": "展开匹配会话",
+    "Matched sessions at this point": "此时间点的匹配会话",
+    "Revoking...": "撤销中…",
+    "Revoke matching sessions": "撤销匹配会话",
+    "Revoke risk groups": "撤销风险分组",
+    "This is the current console session. New admin requests will need to exchange a fresh short-lived token.":
+      "这是当前控制台会话。新的管理请求需要交换一个新的短期令牌。",
+    "The selected session will stop authorizing admin requests immediately.":
+      "所选会话将立即停止授权管理请求。",
+    "This selection includes the current console session. {0} selected session(s) will stop authorizing admin requests immediately, and the next admin request will need to exchange a fresh short-lived token.":
+      "此选择包含当前控制台会话。{0} 个选中的会话将立即停止授权管理请求，下次管理请求需要交换一个新的短期令牌。",
+    "{0} selected session(s) will stop authorizing admin requests immediately.":
+      "{0} 个选中的会话将立即停止授权管理请求。",
+
+    // waiting-session-sync-page 字符串
+    "Reviewing tasks": "正在查看任务",
+    "Review tasks": "查看任务",
+    "Context focused": "上下文已聚焦",
+    "Focus context": "聚焦上下文",
+    "Clear failed task": "清除失败任务",
+    "Clearing...": "清除中…",
+    "Delete failed task {0}. This removes the durable record from the retry queue.":
+      "删除失败任务 {0}，将从重试队列中移除该持久记录。",
+    "Delete all matching failed waiting sync tasks for the current task type and search filters.":
+      "删除当前任务类型和搜索筛选条件匹配的所有失败等待同步任务。",
+
+    // waiting-session-sync-fragments 状态 pills 和 artifact summary
+    "Failed {0}": "失败 {0}",
+    "Pending {0}": "待处理 {0}",
+    "Running {0}": "运行中 {0}",
+    "Ids {0}": "ID {0} 个",
+    "Keys {0}": "键 {0} 个",
+    "Targets {0}": "目标 {0} 个",
+    "Target values: {0}": "目标值：{0}",
+    "World detail: {0}": "世界详情：{0}",
+    "Daily summary of {0} timeline point(s)": "每日摘要（{0} 个时间线节点）",
+    "Weekly summary of {0} timeline point(s)": "每周摘要（{0} 个时间线节点）",
+    "Focused source risk": "聚焦来源风险",
+    "Focused from the risk timeline so you can verify audit fields before taking session actions.":
+      "从风险时间线聚焦，可在执行会话操作前验证审计字段。",
+    "Export focused source snapshot": "导出聚焦来源快照",
+    "Revoke": "撤销",
+    "Current": "当前",
+    "Revoke focused source": "撤销聚焦来源",
+    "Latest timeline snapshot": "最新时间线快照",
+    "Synced with {0}.": "已与{0}同步。",
+    "{0} timeline point(s)": "{0} 个时间线节点",
+    "{0} matched session(s)": "{0} 个匹配会话",
+    "Issued": "签发时间",
+    "Viewing source group": "查看来源分组",
+    "Clear source focus": "清除来源聚焦",
+    "Loading risk timeline...": "正在加载风险时间线…",
+    "No timeline points are available for the focused source group.":
+      "当前聚焦的来源分组暂无时间线节点。",
+    "View in sessions list": "在会话列表中查看",
+    "Current admin session revoked. Console will re-issue a short-lived token on the next request.":
+      "当前管理员会话已撤销，控制台将在下次请求时重新签发短期令牌。",
+    "Admin session revoked.": "管理员会话已撤销。",
+    "No selected admin sessions were revoked. The list may already be stale.":
+      "未撤销任何所选管理员会话，列表可能已过期。",
+    "Revoked {0} selected session(s).": "已撤销 {0} 个所选会话。",
+    "{0} session(s) were already unavailable.": "{0} 个会话已不可用。",
+    "No matching active admin sessions were revoked.": "未撤销任何匹配的活跃管理员会话。",
+    "Revoked {0} matching active session(s).": "已撤销 {0} 个匹配的活跃会话。",
+    "{0} session(s) were skipped because they were already unavailable.":
+      "{0} 个会话因已不可用而被跳过。",
+    "No active admin sessions in the selected source group were revoked.":
+      "所选来源分组中无活跃管理员会话被撤销。",
+    "Revoked {0} matching active session(s) in the selected source group.":
+      "已撤销所选来源分组中 {0} 个匹配的活跃会话。",
   },
   "ja-JP": {
     "Token Usage": "Token 使用量",
@@ -1092,6 +1174,88 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
       "{0} とマークされた発行元グループ内で注目している発行元グループと現在のフィルターに一致するすべてのアクティブセッションを取り消します。",
     "This will revoke every active session in source groups marked {0} that still match the current filters, including groups on other pages.":
       "{0} とマークされた発行元グループ内で現在のフィルターに一致するすべてのアクティブセッションを取り消します（他のページのグループを含む）。",
+
+    // admin-sessions-page その他の文字列
+    "Unknown IP": "不明な IP",
+    "By unknown session": "不明なセッションによる",
+    "Active threshold match": "アクティブしきい値一致",
+    "Revoked threshold match": "取り消しきい値一致",
+    "Refresh reuse match": "トークン再使用一致",
+    "Source state changed": "ソース状態変更",
+    "Refresh reuse revoke": "トークン再使用取り消し",
+    "Last refreshed": "最終リフレッシュ",
+    "No risk signals at this point.": "この時点でリスクシグナルはありません。",
+    "Hide matched sessions": "一致セッションを折りたたむ",
+    "Show matched sessions": "一致セッションを展開",
+    "Matched sessions at this point": "この時点での一致セッション",
+    "Revoking...": "取り消し中…",
+    "Revoke matching sessions": "一致するセッションを取り消す",
+    "Revoke risk groups": "リスクグループを取り消す",
+    "This is the current console session. New admin requests will need to exchange a fresh short-lived token.":
+      "これは現在のコンソールセッションです。新しい管理リクエストには新しい短期トークンの交換が必要です。",
+    "The selected session will stop authorizing admin requests immediately.":
+      "選択したセッションは管理リクエストの認可を即座に停止します。",
+    "This selection includes the current console session. {0} selected session(s) will stop authorizing admin requests immediately, and the next admin request will need to exchange a fresh short-lived token.":
+      "この選択には現在のコンソールセッションが含まれます。選択した {0} 件のセッションは管理リクエストの認可を即座に停止し、次の管理リクエストでは新しい短期トークンの交換が必要です。",
+    "{0} selected session(s) will stop authorizing admin requests immediately.":
+      "選択した {0} 件のセッションは管理リクエストの認可を即座に停止します。",
+
+    // waiting-session-sync-page
+    "Reviewing tasks": "タスクを確認中",
+    "Review tasks": "タスクを確認",
+    "Context focused": "コンテキスト絞り込み済み",
+    "Focus context": "コンテキストを絞り込む",
+    "Clear failed task": "失敗タスクをクリア",
+    "Clearing...": "クリア中…",
+    "Delete failed task {0}. This removes the durable record from the retry queue.":
+      "失敗タスク {0} を削除します。リトライキューから永続レコードが削除されます。",
+    "Delete all matching failed waiting sync tasks for the current task type and search filters.":
+      "現在のタスクタイプと検索フィルターに一致するすべての失敗した待機同期タスクを削除します。",
+
+    // waiting-session-sync-fragments
+    "Failed {0}": "失敗 {0}",
+    "Pending {0}": "待機中 {0}",
+    "Running {0}": "実行中 {0}",
+    "Ids {0}": "ID {0} 件",
+    "Keys {0}": "キー {0} 件",
+    "Targets {0}": "ターゲット {0} 件",
+    "Target values: {0}": "ターゲット値: {0}",
+    "World detail: {0}": "ワールド詳細: {0}",
+    "Daily summary of {0} timeline point(s)": "日次サマリー（タイムライン {0} 件）",
+    "Weekly summary of {0} timeline point(s)": "週次サマリー（タイムライン {0} 件）",
+    "Focused source risk": "フォーカスしたソースのリスク",
+    "Focused from the risk timeline so you can verify audit fields before taking session actions.":
+      "セッション操作の前に監査フィールドを確認できるよう、リスクタイムラインからフォーカスしています。",
+    "Export focused source snapshot": "フォーカスしたソースのスナップショットをエクスポート",
+    "Revoke": "取り消す",
+    "Current": "現在",
+    "Revoke focused source": "フォーカスしたソースを取り消す",
+    "Latest timeline snapshot": "最新タイムラインスナップショット",
+    "Synced with {0}.": "{0}と同期中。",
+    "{0} timeline point(s)": "タイムライン {0} 件",
+    "{0} matched session(s)": "一致セッション {0} 件",
+    "Issued": "発行日時",
+    "Viewing source group": "発行元グループを表示",
+    "Clear source focus": "ソースフォーカスをクリア",
+    "Loading risk timeline...": "リスクタイムラインを読み込み中…",
+    "No timeline points are available for the focused source group.":
+      "フォーカスしたソースグループにタイムラインポイントがありません。",
+    "View in sessions list": "セッション一覧で確認",
+    "Current admin session revoked. Console will re-issue a short-lived token on the next request.":
+      "現在の管理者セッションが取り消されました。コンソールは次のリクエスト時に短期トークンを再発行します。",
+    "Admin session revoked.": "管理者セッションが取り消されました。",
+    "No selected admin sessions were revoked. The list may already be stale.":
+      "選択した管理者セッションは取り消されませんでした。リストが古い可能性があります。",
+    "Revoked {0} selected session(s).": "{0} 件の選択したセッションを取り消しました。",
+    "{0} session(s) were already unavailable.": "{0} 件のセッションはすでに利用不可でした。",
+    "No matching active admin sessions were revoked.": "一致する有効な管理者セッションは取り消されませんでした。",
+    "Revoked {0} matching active session(s).": "{0} 件の一致する有効なセッションを取り消しました。",
+    "{0} session(s) were skipped because they were already unavailable.":
+      "{0} 件のセッションはすでに利用不可のためスキップされました。",
+    "No active admin sessions in the selected source group were revoked.":
+      "選択したソースグループ内の有効な管理者セッションは取り消されませんでした。",
+    "Revoked {0} matching active session(s) in the selected source group.":
+      "選択したソースグループ内の {0} 件の一致する有効なセッションを取り消しました。",
   },
   "ko-KR": {
     "Token Usage": "토큰 사용량",
@@ -1638,6 +1802,88 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
       "{0}으로 표시된 발급 그룹 중 집중된 발급 그룹과 현재 필터와 일치하는 모든 활성 세션을 취소합니다.",
     "This will revoke every active session in source groups marked {0} that still match the current filters, including groups on other pages.":
       "{0}으로 표시된 발급 그룹 중 현재 필터와 일치하는 모든 활성 세션을 취소합니다(다른 페이지의 그룹 포함).",
+
+    // admin-sessions-page 기타 문자열
+    "Unknown IP": "알 수 없는 IP",
+    "By unknown session": "알 수 없는 세션에 의해",
+    "Active threshold match": "활성 임계값 일치",
+    "Revoked threshold match": "취소 임계값 일치",
+    "Refresh reuse match": "토큰 재사용 일치",
+    "Source state changed": "소스 상태 변경",
+    "Refresh reuse revoke": "토큰 재사용 취소",
+    "Last refreshed": "마지막 갱신",
+    "No risk signals at this point.": "이 시점에 위험 신호가 없습니다.",
+    "Hide matched sessions": "일치 세션 숨기기",
+    "Show matched sessions": "일치 세션 보기",
+    "Matched sessions at this point": "이 시점의 일치 세션",
+    "Revoking...": "취소 중…",
+    "Revoke matching sessions": "일치 세션 취소",
+    "Revoke risk groups": "위험 그룹 취소",
+    "This is the current console session. New admin requests will need to exchange a fresh short-lived token.":
+      "이것은 현재 콘솔 세션입니다. 새 관리자 요청은 새 단기 토큰 교환이 필요합니다.",
+    "The selected session will stop authorizing admin requests immediately.":
+      "선택한 세션은 즉시 관리자 요청 인증을 중단합니다.",
+    "This selection includes the current console session. {0} selected session(s) will stop authorizing admin requests immediately, and the next admin request will need to exchange a fresh short-lived token.":
+      "이 선택에는 현재 콘솔 세션이 포함됩니다. 선택한 {0}개의 세션은 즉시 관리자 요청 인증을 중단하며, 다음 관리자 요청은 새 단기 토큰 교환이 필요합니다.",
+    "{0} selected session(s) will stop authorizing admin requests immediately.":
+      "선택한 {0}개의 세션은 즉시 관리자 요청 인증을 중단합니다.",
+
+    // waiting-session-sync-page
+    "Reviewing tasks": "작업 검토 중",
+    "Review tasks": "작업 검토",
+    "Context focused": "컨텍스트 집중됨",
+    "Focus context": "컨텍스트 집중",
+    "Clear failed task": "실패 작업 정리",
+    "Clearing...": "정리 중…",
+    "Delete failed task {0}. This removes the durable record from the retry queue.":
+      "실패 작업 {0}을 삭제합니다. 재시도 큐에서 영구 기록이 제거됩니다.",
+    "Delete all matching failed waiting sync tasks for the current task type and search filters.":
+      "현재 작업 유형 및 검색 필터와 일치하는 모든 실패한 대기 동기화 작업을 삭제합니다.",
+
+    // waiting-session-sync-fragments
+    "Failed {0}": "실패 {0}",
+    "Pending {0}": "대기 중 {0}",
+    "Running {0}": "실행 중 {0}",
+    "Ids {0}": "ID {0}건",
+    "Keys {0}": "키 {0}건",
+    "Targets {0}": "타겟 {0}건",
+    "Target values: {0}": "타겟 값: {0}",
+    "World detail: {0}": "월드 상세: {0}",
+    "Daily summary of {0} timeline point(s)": "일별 요약 (타임라인 {0}건)",
+    "Weekly summary of {0} timeline point(s)": "주별 요약 (타임라인 {0}건)",
+    "Focused source risk": "포커스된 소스 위험",
+    "Focused from the risk timeline so you can verify audit fields before taking session actions.":
+      "세션 작업 전 감사 필드를 확인할 수 있도록 위험 타임라인에서 포커스되었습니다.",
+    "Export focused source snapshot": "포커스된 소스 스냅샷 내보내기",
+    "Revoke": "취소",
+    "Current": "현재",
+    "Revoke focused source": "포커스된 소스 취소",
+    "Latest timeline snapshot": "최신 타임라인 스냅샷",
+    "Synced with {0}.": "{0}과 동기화됨.",
+    "{0} timeline point(s)": "타임라인 {0}건",
+    "{0} matched session(s)": "일치 세션 {0}건",
+    "Issued": "발급 시간",
+    "Viewing source group": "소스 그룹 보기",
+    "Clear source focus": "소스 포커스 초기화",
+    "Loading risk timeline...": "위험 타임라인 로딩 중…",
+    "No timeline points are available for the focused source group.":
+      "포커스된 소스 그룹에 사용 가능한 타임라인 포인트가 없습니다.",
+    "View in sessions list": "세션 목록에서 보기",
+    "Current admin session revoked. Console will re-issue a short-lived token on the next request.":
+      "현재 관리자 세션이 취소되었습니다. 콘솔은 다음 요청 시 단기 토큰을 재발급합니다.",
+    "Admin session revoked.": "관리자 세션이 취소되었습니다.",
+    "No selected admin sessions were revoked. The list may already be stale.":
+      "선택한 관리자 세션이 취소되지 않았습니다. 목록이 이미 오래되었을 수 있습니다.",
+    "Revoked {0} selected session(s).": "선택한 세션 {0}건이 취소되었습니다.",
+    "{0} session(s) were already unavailable.": "{0}건의 세션이 이미 사용 불가 상태였습니다.",
+    "No matching active admin sessions were revoked.": "일치하는 활성 관리자 세션이 취소되지 않았습니다.",
+    "Revoked {0} matching active session(s).": "일치하는 활성 세션 {0}건이 취소되었습니다.",
+    "{0} session(s) were skipped because they were already unavailable.":
+      "{0}건의 세션이 이미 사용 불가 상태여서 건너뛰었습니다.",
+    "No active admin sessions in the selected source group were revoked.":
+      "선택한 소스 그룹의 활성 관리자 세션이 취소되지 않았습니다.",
+    "Revoked {0} matching active session(s) in the selected source group.":
+      "선택한 소스 그룹의 일치하는 활성 세션 {0}건이 취소되었습니다.",
   },
 };
 // i18n-ignore-end
