@@ -46,7 +46,6 @@ import { adminApi } from "../lib/admin-api";
 import { resolveAdminCoreApiBaseUrl } from "../lib/core-api-base";
 import { formatAdminDateTime as formatLocalizedDateTime } from "../lib/format";
 
-// i18n-ignore-start: migration in progress — remaining raw strings pending wrapping
 type ReminderSchedulerJob =
   | "trigger_due_reminder_tasks"
   | "trigger_reminder_checkins"
