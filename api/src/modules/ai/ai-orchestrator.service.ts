@@ -44,6 +44,7 @@ import {
   type ResolvedInferenceCapabilityProfile,
 } from '../inference/inference.service';
 import { SubscriptionService } from '../subscription/subscription.service';
+import { MinimaxNativeClient } from './minimax-native.client';
 
 const DEFAULT_TTS_VOICE = 'alloy';
 const MAX_INLINE_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -2844,11 +2845,30 @@ export class AiOrchestratorService {
       }
 
       attemptedProvider = true;
-      const client = this.createProviderClientFromEndpoint({
-        endpoint: provider.imageGenerationEndpoint,
-        apiKey: provider.imageGenerationApiKey,
-      });
       try {
+        if (
+          MinimaxNativeClient.isMinimaxEndpoint(provider.imageGenerationEndpoint)
+        ) {
+          const minimax = new MinimaxNativeClient(
+            provider.imageGenerationEndpoint,
+            provider.imageGenerationApiKey,
+          );
+          const result = await minimax.generateImage({
+            model: imageModel,
+            prompt,
+            size: options.size,
+          });
+          return {
+            buffer: result.buffer,
+            mimeType: result.mimeType,
+            fileExtension: this.getImageFileExtension(result.mimeType),
+            provider: imageModel,
+          };
+        }
+        const client = this.createProviderClientFromEndpoint({
+          endpoint: provider.imageGenerationEndpoint,
+          apiKey: provider.imageGenerationApiKey,
+        });
         const body: OpenAI.Images.ImageGenerateParamsNonStreaming = {
           model: imageModel,
           prompt,
@@ -3138,15 +3158,38 @@ export class AiOrchestratorService {
       attemptedProvider = true;
       const voice =
         options.voice?.trim() || provider.ttsVoice || DEFAULT_TTS_VOICE;
-      const client = this.createProviderClientFromEndpoint({
-        endpoint: provider.ttsEndpoint,
-        apiKey: provider.ttsApiKey,
-      });
       const instructions = await this.worldLanguage.buildSpeechInstructions({
         existingInstructions: options.instructions,
       });
 
       try {
+        if (MinimaxNativeClient.isMinimaxEndpoint(provider.ttsEndpoint)) {
+          const minimax = new MinimaxNativeClient(
+            provider.ttsEndpoint,
+            provider.ttsApiKey,
+          );
+          const result = await this.retrySpeechRequest(
+            'speech synthesis',
+            () =>
+              minimax.synthesizeSpeech({
+                model: provider.ttsModel,
+                text,
+                voiceId: voice,
+              }),
+          );
+          return {
+            buffer: result.buffer,
+            mimeType: result.mimeType,
+            fileExtension: 'mp3',
+            durationMs: Date.now() - startedAt,
+            provider: provider.ttsModel,
+            voice,
+          };
+        }
+        const client = this.createProviderClientFromEndpoint({
+          endpoint: provider.ttsEndpoint,
+          apiKey: provider.ttsApiKey,
+        });
         const response = await this.retrySpeechRequest('speech synthesis', () =>
           client.audio.speech.create({
             model: provider.ttsModel,
