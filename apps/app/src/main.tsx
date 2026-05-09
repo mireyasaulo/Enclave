@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import {
@@ -144,9 +145,13 @@ async function bootstrap() {
           hasExplicitWebLocalePreference={Boolean(explicitWebLocalePreference)}
         />
         <QueryClientProvider client={queryClient}>
-          <Suspense fallback={<BootstrapScreen />}>
-            <RouterProvider router={router} />
-          </Suspense>
+          <GoogleOAuthProvider
+            clientId={import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID ?? ""}
+          >
+            <Suspense fallback={<BootstrapScreen />}>
+              <RouterProvider router={router} />
+            </Suspense>
+          </GoogleOAuthProvider>
         </QueryClientProvider>
       </AppLocaleProvider>
     </React.StrictMode>,

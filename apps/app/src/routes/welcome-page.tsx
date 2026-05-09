@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 import { msg } from "@lingui/macro";
+import { useLingui } from "@lingui/react";
+import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -18,6 +20,7 @@ import {
   sendCloudPhoneCode,
   updateWorldOwner,
   verifyCloudEmailCode,
+  verifyCloudGoogleIdToken,
   verifyCloudPhoneCode,
   type WorldAccessSessionSummary,
 } from "@yinjie/contracts";
@@ -242,6 +245,11 @@ function mobileNoticeTone(
 
 export function WelcomePage() {
   const t = useRuntimeTranslator();
+  const { i18n } = useLingui();
+  const googleClientId = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID ?? "";
+  // 国内访问 accounts.google.com 被墙——zh-CN locale 默认隐藏 Google 按钮，
+  // 其他语言（en/ja/ko）显示。海外华人若坚持用中文界面会损失这个入口，可接受。
+  const showGoogleButton = Boolean(googleClientId) && i18n.locale !== "zh-CN";
   const navigate = useNavigate();
   const searchStr = useRouterState({
     select: (state) => state.location.searchStr,
@@ -624,6 +632,93 @@ export function WelcomePage() {
     }
   }
 
+  async function continueWithGoogleSignIn(idToken: string) {
+    setIsContinuing(true);
+    setEntryError("");
+    setOwnerError("");
+
+    let verifySucceeded = false;
+    try {
+      const inviteCodePayload =
+        authMode === "register" && inviteCode ? inviteCode : undefined;
+      const verifyResult = await verifyCloudGoogleIdToken(
+        {
+          idToken,
+          inviteCode: inviteCodePayload,
+          deviceFingerprint: getDeviceFingerprint(),
+        },
+        normalizedCloudApiBaseUrl || undefined,
+      );
+
+      const accessToken = verifyResult.accessToken;
+      setEmail(verifyResult.email);
+      setCloudAccessToken(accessToken);
+      saveCloudSession({
+        accessToken,
+        expiresAt: verifyResult.expiresAt,
+        phone: null,
+        profile: null,
+      });
+      verifySucceeded = true;
+      track(
+        authMode === "register" ? "register_success" : "login_success",
+        { method: "google" },
+      );
+
+      const session = await resolveMyCloudWorldAccess(
+        {
+          clientPlatform: runtimeConfig.appPlatform,
+          clientVersion: runtimeConfig.appVersionName,
+        },
+        accessToken,
+        normalizedCloudApiBaseUrl || undefined,
+      );
+
+      setCloudAccessSessionId(session.id);
+      setConnectedAccessSessionId(null);
+      queryClient.setQueryData(
+        buildCloudAccessSessionQueryKey(normalizedCloudApiBaseUrl, session.id, accessToken),
+        session,
+      );
+
+      setAppRuntimeConfig({
+        apiBaseUrl: undefined,
+        socketBaseUrl: undefined,
+        worldAccessMode: "cloud",
+        cloudApiBaseUrl: normalizedCloudApiBaseUrl || undefined,
+        cloudPhone: "",
+        cloudWorldId: session.worldId ?? undefined,
+        bootstrapSource: "user",
+      });
+
+      if (FAILURE_CLOUD_SESSION_STATUSES.has(session.status)) {
+        setEntryError(describeCloudSessionFailure(t, session));
+        return;
+      }
+
+      setNotice(describeCloudSession(t, session));
+
+      if (session.status === "ready") {
+        await connectToResolvedCloudWorld(accessToken, "", session);
+      }
+    } catch (error) {
+      setReadyBaseUrl(null);
+      setEntryError(describeRequestError(error, t(msg`Google 登录失败，请稍后重试。`)));
+      const message = error instanceof Error ? error.message.slice(0, 200) : null;
+      if (!verifySucceeded) {
+        track("login_fail", { method: "google", authMode, message });
+      } else {
+        track("cloud_world_entry_fail", {
+          method: "google",
+          authMode,
+          message,
+        });
+      }
+    } finally {
+      setIsContinuing(false);
+    }
+  }
+
   async function continueWithCloudWorld() {
     if (accountType === "phone" && !phone.trim()) {
       setEntryError(t(msg`请输入手机号。`));
@@ -946,6 +1041,47 @@ export function WelcomePage() {
               </Button>
             </div>
           </div>
+
+          {showGoogleButton ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <span className="h-px flex-1 bg-[color:var(--border-faint)]" />
+                <span className="text-[10px] uppercase tracking-[0.32em] text-[color:var(--text-muted)]">
+                  {t(msg`或`)}
+                </span>
+                <span className="h-px flex-1 bg-[color:var(--border-faint)]" />
+              </div>
+              <div className="flex justify-center">
+                <GoogleLogin
+                  onSuccess={(credentialResponse) => {
+                    const idToken = credentialResponse.credential;
+                    if (!idToken) {
+                      setEntryError(
+                        t(msg`Google 登录失败，请稍后重试。`),
+                      );
+                      return;
+                    }
+                    void continueWithGoogleSignIn(idToken);
+                  }}
+                  onError={() => {
+                    setEntryError(
+                      t(msg`Google 登录失败，请检查网络后重试。`),
+                    );
+                    track("login_fail", {
+                      method: "google",
+                      authMode,
+                      message: "gis_onError",
+                    });
+                  }}
+                  useOneTap={false}
+                  text={authMode === "register" ? "signup_with" : "signin_with"}
+                  shape="pill"
+                  size="large"
+                  width="320"
+                />
+              </div>
+            </div>
+          ) : null}
 
           {authMode === "register" ? (
             <label className="block space-y-2">
