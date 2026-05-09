@@ -1023,28 +1023,25 @@ export class SystemService {
         )
       : [];
 
-    const messages = [
-      {
-        role: 'system',
-        content: joinNonEmptySections([
-          traceSource === 'memory.summary'
-            ? '你是记忆摘要助手，只保留对后续真正有用的信息，不逐句复述。'
-            : traceSource === 'group.intent'
-              ? '你是群聊升级判断器，只按场景需求输出 JSON，不解释过程。'
-              : character.profile?.coreLogic ??
-                character.profile?.systemPrompt ??
-                `${character.name}，${character.relationship}。`,
-          scenePrompt,
-          promptVariant.instruction ? `提示词变体：${promptVariant.instruction}` : '',
-          memoryStrategy.promptInstruction
-            ? `记忆策略提示：${memoryStrategy.promptInstruction}`
-            : '',
-          `评测任务：${caseRecord.title}`,
-          `场景说明：${caseRecord.description}`,
-          `硬规则：${caseRecord.expectations.hardRules.join('；') || '无'}`,
-          `禁止结果：${caseRecord.expectations.forbiddenOutcomes.join('；') || '无'}`,
-        ]),
-      },
+    // 把 case prompt / 记忆 / 上下文等多块 system 内容合并成一条，保证 messages
+    // 第一条且仅一条 system —— 兼容 MiniMax 等严格只允许首条 system 的 provider。
+    const systemSections: string[] = [
+      traceSource === 'memory.summary'
+        ? '你是记忆摘要助手，只保留对后续真正有用的信息，不逐句复述。'
+        : traceSource === 'group.intent'
+          ? '你是群聊升级判断器，只按场景需求输出 JSON，不解释过程。'
+          : character.profile?.coreLogic ??
+            character.profile?.systemPrompt ??
+            `${character.name}，${character.relationship}。`,
+      scenePrompt,
+      promptVariant.instruction ? `提示词变体：${promptVariant.instruction}` : '',
+      memoryStrategy.promptInstruction
+        ? `记忆策略提示：${memoryStrategy.promptInstruction}`
+        : '',
+      `评测任务：${caseRecord.title}`,
+      `场景说明：${caseRecord.description}`,
+      `硬规则：${caseRecord.expectations.hardRules.join('；') || '无'}`,
+      `禁止结果：${caseRecord.expectations.forbiddenOutcomes.join('；') || '无'}`,
     ];
 
     if (
@@ -1052,13 +1049,12 @@ export class SystemService {
       typeof input.memorySummary === 'string' &&
       input.memorySummary.trim().length > 0
     ) {
-      messages.push({
-        role: 'system',
-        content: `近期记忆：${clipText(
+      systemSections.push(
+        `近期记忆：${clipText(
           input.memorySummary.trim(),
           memoryStrategy.truncateMemoryChars ?? 1200,
         )}`,
-      });
+      );
     }
 
     const contextSections: string[] = [];
@@ -1085,11 +1081,12 @@ export class SystemService {
       contextSections.push(`话题：${input.topic.trim()}`);
     }
     if (contextSections.length > 0) {
-      messages.push({
-        role: 'system',
-        content: contextSections.join('\n'),
-      });
+      systemSections.push(contextSections.join('\n'));
     }
+
+    const messages: Array<{ role: string; content: string }> = [
+      { role: 'system', content: joinNonEmptySections(systemSections) },
+    ];
 
     const historyWindowSize = memoryStrategy.keepRecentTurns ?? history.length;
     const recentHistory = history.slice(-historyWindowSize);

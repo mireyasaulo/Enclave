@@ -1338,14 +1338,15 @@ export class AiOrchestratorService {
           allowImageInput,
           allowDocumentInput,
         );
+        // Responses API 用 instructions 字段承载 system 内容，避免在 input 数组里再插
+        // 第二条 system role（部分 provider 严格不允许 system 出现在 instructions 之外）。
+        const mergedInstructions = finalLanguageReminder
+          ? `${systemPrompt}\n\n${finalLanguageReminder}`
+          : systemPrompt;
         const response = await client.responses.create({
           model: provider.model,
-          instructions: systemPrompt,
-          input: [
-            ...historyMessages,
-            { role: 'system', content: finalLanguageReminder },
-            currentMessage,
-          ],
+          instructions: mergedInstructions,
+          input: [...historyMessages, currentMessage],
           max_output_tokens: 500,
           temperature: 0.85,
         });
