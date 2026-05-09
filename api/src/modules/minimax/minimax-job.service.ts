@@ -23,13 +23,17 @@ import type { MinimaxVideoModel, MinimaxMusicModel } from './minimax.types';
 
 const VIDEO_POLL_INTERVAL_MS = 30_000;
 const VIDEO_MAX_ATTEMPTS = 25; // ~12 minutes at 30s per
+const MUSIC_POLL_INTERVAL_MS = 30_000;
+const MUSIC_MAX_ATTEMPTS = 10; // ~5 minutes at 30s per
 const STALE_VIDEO_AFTER_MS = 15 * 60 * 1000;
-const STALE_MUSIC_AFTER_MS = 90 * 1000;
+// 异步音乐轮询期间 lastAttemptAt 每 30s 刷新，所以 stale 阈值
+// 主要用于"提交后进程崩溃"等异常情况，按视频对齐到 5 分钟。
+const STALE_MUSIC_AFTER_MS = 5 * 60 * 1000;
 // 重排上界：防止 submitted 卡住 → 重排 → 又卡住的死循环。
 // attemptCount 不仅记轮询次数，也记重排次数。
 const STALE_REQUEUE_MAX_ATTEMPTS: Record<MinimaxJobKind, number> = {
   video: VIDEO_MAX_ATTEMPTS * 2, // 50
-  music: 10,
+  music: MUSIC_MAX_ATTEMPTS * 2, // 20
 };
 
 interface EnqueueVideoArgs {
@@ -411,36 +415,22 @@ export class MinimaxJobService {
           lyrics: payload.lyrics,
         });
         if (result.kind === 'inline') {
-          const persisted = await this.storage.persist({
+          await this.completeMusicJob(job, {
             buffer: result.buffer,
             mimeType: result.mimeType,
-            kind: 'music',
+            durationMs: result.durationMs ?? null,
           });
+        } else {
+          // 异步任务路径：保存 taskId，转 submitted，等下次轮询
           await this.repo.update(job.id, {
-            status: 'completed',
-            localFileName: persisted.fileName,
-            localUrl: persisted.publicUrl,
-            localMimeType: persisted.mimeType,
-            localSize: persisted.size,
-            localDurationMs: result.durationMs ?? null,
-            completedAt: new Date(),
+            status: 'submitted',
+            taskId: result.taskId,
             attemptCount: job.attemptCount + 1,
             lastAttemptAt: new Date(),
+            executeAfter: new Date(Date.now() + MUSIC_POLL_INTERVAL_MS),
           });
-          await this.quota.commit(job.model);
           this.logger.log(
-            `music job ${job.id} inline -> ${persisted.fileName} (${persisted.size}B)`,
-          );
-          const finalJob = await this.repo.findOneByOrFail({ id: job.id });
-          await this.fireOnCompleted(finalJob);
-        } else {
-          // music-2.6 至今未给我们见过 task 异步路径。如果 MiniMax 后续切到 async
-          // 模式我们才真的需要 /v1/query/music_generation 查询。当前没有实现，
-          // 直接 fail 比挂在 'submitted' 状态白白消耗轮询周期更诚实。
-          await this.markFailed(
-            job,
-            'MUSIC_ASYNC_NOT_SUPPORTED',
-            `music returned task=${result.taskId} but no query path implemented`,
+            `music job ${job.id} submitted async: model=${job.model} task=${result.taskId}`,
           );
         }
       } catch (error) {
@@ -450,14 +440,100 @@ export class MinimaxJobService {
     }
 
     if (job.status === 'submitted') {
-      // 仅当 enqueueMusicJob 之后服务被重启、状态机没机会转到终态时会进到这。
-      // 没有真正的 query 实现，直接判失败终态。
-      await this.markFailed(
-        job,
-        'MUSIC_ASYNC_NOT_SUPPORTED',
-        'music job stuck in submitted (async path not implemented)',
-      );
+      if (!job.taskId) {
+        await this.markFailed(job, 'NO_TASK_ID', 'submitted music missing taskId');
+        return;
+      }
+      if (job.attemptCount >= MUSIC_MAX_ATTEMPTS) {
+        await this.markFailed(
+          job,
+          'POLL_EXHAUSTED',
+          `music polled ${job.attemptCount} times without success`,
+        );
+        return;
+      }
+      try {
+        const q = await this.client.queryMusic(job.taskId);
+        if (q.status === 'Success' && q.audioHex) {
+          // 内联返回：直接完成
+          const buffer = Buffer.from(q.audioHex, 'hex');
+          if (!buffer.length) {
+            await this.markFailed(
+              job,
+              'MUSIC_QUERY_EMPTY_AUDIO',
+              'query returned empty audio buffer',
+            );
+            return;
+          }
+          await this.completeMusicJob(job, {
+            buffer,
+            mimeType: 'audio/mpeg',
+            durationMs: q.durationMs ?? null,
+          });
+        } else if (q.status === 'Success' && q.fileId) {
+          // file 模式：通过 retrieveFile + downloadBinary 拉回
+          const file = await this.client.retrieveFile(q.fileId);
+          const dl = await this.client.downloadBinary(file.downloadUrl);
+          await this.completeMusicJob(job, {
+            buffer: dl.buffer,
+            mimeType: dl.mimeType || 'audio/mpeg',
+            durationMs: q.durationMs ?? null,
+            remoteDownloadUrl: file.downloadUrl,
+          });
+        } else if (q.status === 'Fail') {
+          await this.markFailed(
+            job,
+            'PROVIDER_FAIL',
+            q.failReason ?? 'music task reported Fail',
+          );
+        } else {
+          await this.repo.update(job.id, {
+            attemptCount: job.attemptCount + 1,
+            lastAttemptAt: new Date(),
+            executeAfter: new Date(Date.now() + MUSIC_POLL_INTERVAL_MS),
+          });
+          this.logger.debug(
+            `music job ${job.id} status=${q.status} attempt=${job.attemptCount + 1}`,
+          );
+        }
+      } catch (error) {
+        await this.handleClientError(job, error, 'query music');
+      }
     }
+  }
+
+  private async completeMusicJob(
+    job: MinimaxJobEntity,
+    data: {
+      buffer: Buffer;
+      mimeType: string;
+      durationMs: number | null;
+      remoteDownloadUrl?: string;
+    },
+  ): Promise<void> {
+    const persisted = await this.storage.persist({
+      buffer: data.buffer,
+      mimeType: data.mimeType,
+      kind: 'music',
+    });
+    await this.repo.update(job.id, {
+      status: 'completed',
+      remoteDownloadUrl: data.remoteDownloadUrl ?? null,
+      localFileName: persisted.fileName,
+      localUrl: persisted.publicUrl,
+      localMimeType: persisted.mimeType,
+      localSize: persisted.size,
+      localDurationMs: data.durationMs,
+      completedAt: new Date(),
+      attemptCount: job.attemptCount + 1,
+      lastAttemptAt: new Date(),
+    });
+    await this.quota.commit(job.model);
+    this.logger.log(
+      `music job ${job.id} completed -> ${persisted.fileName} (${persisted.size}B)`,
+    );
+    const finalJob = await this.repo.findOneByOrFail({ id: job.id });
+    await this.fireOnCompleted(finalJob);
   }
 
   private async tryReadCoverAsDataUrl(

@@ -10,7 +10,9 @@ import {
   type MinimaxLyricsInput,
   type MinimaxLyricsResult,
   type MinimaxMusicInput,
+  type MinimaxMusicQueryResult,
   type MinimaxMusicResult,
+  type MinimaxMusicStatus,
   type MinimaxVideoQueryResult,
   type MinimaxVideoStatus,
   type MinimaxVideoSubmitInput,
@@ -217,6 +219,29 @@ export class MinimaxClient {
       'music generation returned no audio and no task_id',
       true,
     );
+  }
+
+  async queryMusic(taskId: string): Promise<MinimaxMusicQueryResult> {
+    const response = await this.getJson<{
+      status?: string;
+      file_id?: string;
+      data?: { audio?: string; status?: number };
+      duration?: number;
+      base_resp?: MinimaxBaseResp;
+    }>(`/v1/query/music_generation?task_id=${encodeURIComponent(taskId)}`);
+    // 与 queryVideo 一致：query 返回 base_resp 失败码也不抛错，
+    // 优先读 status 判定真实状态。
+    const status = (response.status ?? 'Unknown') as MinimaxMusicStatus;
+    return {
+      status,
+      audioHex: response.data?.audio?.trim() || undefined,
+      fileId: response.file_id ? String(response.file_id) : undefined,
+      durationMs:
+        typeof response.duration === 'number'
+          ? Math.round(response.duration * 1000)
+          : undefined,
+      failReason: response.base_resp?.status_msg,
+    };
   }
 
   async generateLyrics(

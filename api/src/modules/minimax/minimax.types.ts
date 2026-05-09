@@ -76,6 +76,24 @@ export type MinimaxMusicResult =
     }
   | { kind: 'task'; taskId: string };
 
+// 音乐异步轮询：MiniMax 后续若启用异步生成会返回 task_id，
+// 沿用与视频相同的 query 模式：返回状态 + 音频(inline)或 fileId(异步下载)。
+export type MinimaxMusicStatus =
+  | 'Preparing'
+  | 'Queueing'
+  | 'Processing'
+  | 'Success'
+  | 'Fail'
+  | 'Unknown';
+
+export interface MinimaxMusicQueryResult {
+  status: MinimaxMusicStatus;
+  audioHex?: string;
+  fileId?: string;
+  durationMs?: number;
+  failReason?: string;
+}
+
 export interface MinimaxLyricsInput {
   prompt: string;
 }
