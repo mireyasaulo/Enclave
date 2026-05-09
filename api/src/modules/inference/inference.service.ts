@@ -13,6 +13,7 @@ import { decryptUserApiKey, encryptUserApiKey } from '../auth/api-key-crypto';
 import { InferenceModelCatalogEntryEntity } from './inference-model-catalog-entry.entity';
 import { InferenceProviderAccountEntity } from './inference-provider-account.entity';
 import { INFERENCE_MODEL_CATALOG_SEED } from './inference-catalog.seed';
+import { MinimaxNativeClient } from '../ai/minimax-native.client';
 
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const DEFAULT_TRANSCRIPTION_MODEL = 'gpt-4o-mini-transcribe';
@@ -1805,18 +1806,34 @@ export class InferenceService implements OnModuleInit {
       );
     }
 
-    const client = this.buildProviderClient({
-      endpoint: provider.ttsEndpoint,
-      apiKey: provider.ttsApiKey,
-      model: provider.ttsModel,
-    });
-    const response = await client.audio.speech.create({
-      model: provider.ttsModel,
-      voice: provider.ttsVoice || DEFAULT_TTS_VOICE,
-      input: input.prompt?.trim() || '你好，这是一段语音诊断。',
-      response_format: 'mp3',
-    });
-    const buffer = Buffer.from(await response.arrayBuffer());
+    const probeText = input.prompt?.trim() || '你好，这是一段语音诊断。';
+    const voice = provider.ttsVoice || DEFAULT_TTS_VOICE;
+    let buffer: Buffer;
+    if (MinimaxNativeClient.isMinimaxEndpoint(provider.ttsEndpoint)) {
+      const minimax = new MinimaxNativeClient(
+        provider.ttsEndpoint,
+        provider.ttsApiKey,
+      );
+      const result = await minimax.synthesizeSpeech({
+        model: provider.ttsModel,
+        text: probeText,
+        voiceId: voice,
+      });
+      buffer = result.buffer;
+    } else {
+      const client = this.buildProviderClient({
+        endpoint: provider.ttsEndpoint,
+        apiKey: provider.ttsApiKey,
+        model: provider.ttsModel,
+      });
+      const response = await client.audio.speech.create({
+        model: provider.ttsModel,
+        voice,
+        input: probeText,
+        response_format: 'mp3',
+      });
+      buffer = Buffer.from(await response.arrayBuffer());
+    }
     if (!buffer.length) {
       throw new Error('TTS provider 返回了空音频。');
     }
@@ -1830,7 +1847,7 @@ export class InferenceService implements OnModuleInit {
       model: provider.ttsModel,
       metadata: {
         byteLength: buffer.length,
-        voice: provider.ttsVoice || DEFAULT_TTS_VOICE,
+        voice,
       },
     });
   }
@@ -1858,34 +1875,54 @@ export class InferenceService implements OnModuleInit {
       );
     }
 
-    const client = this.buildProviderClient({
-      endpoint: provider.imageGenerationEndpoint,
-      apiKey: provider.imageGenerationApiKey,
-      model: provider.imageGenerationModel,
-    });
     const model = provider.imageGenerationModel;
-    const body: OpenAI.Images.ImageGenerateParamsNonStreaming = {
-      model,
-      prompt:
-        input.prompt?.trim() || 'A tiny diagnostic icon: a red circle on white background.',
-    };
-    if (/^(gpt-image|chatgpt-image)/i.test(model)) {
-      body.output_format = 'png';
-      body.quality = 'low';
-      body.size = '1024x1024';
-    } else if (/^dall-e-3/i.test(model)) {
-      body.quality = 'standard';
-      body.response_format = 'b64_json';
-      body.size = '1024x1024';
-    } else if (/^dall-e-2/i.test(model)) {
-      body.response_format = 'b64_json';
-      body.size = '1024x1024';
-    }
+    const prompt =
+      input.prompt?.trim() ||
+      'A tiny diagnostic icon: a red circle on white background.';
+    let returnedShape: 'b64_json' | 'url' | 'native_buffer';
+    let revisedPrompt: string | null = null;
+    if (
+      MinimaxNativeClient.isMinimaxEndpoint(provider.imageGenerationEndpoint)
+    ) {
+      const minimax = new MinimaxNativeClient(
+        provider.imageGenerationEndpoint,
+        provider.imageGenerationApiKey,
+      );
+      const result = await minimax.generateImage({ model, prompt });
+      if (!result.buffer.length) {
+        throw new Error('图片生成 provider 返回了空结果。');
+      }
+      returnedShape = 'native_buffer';
+    } else {
+      const client = this.buildProviderClient({
+        endpoint: provider.imageGenerationEndpoint,
+        apiKey: provider.imageGenerationApiKey,
+        model,
+      });
+      const body: OpenAI.Images.ImageGenerateParamsNonStreaming = {
+        model,
+        prompt,
+      };
+      if (/^(gpt-image|chatgpt-image)/i.test(model)) {
+        body.output_format = 'png';
+        body.quality = 'low';
+        body.size = '1024x1024';
+      } else if (/^dall-e-3/i.test(model)) {
+        body.quality = 'standard';
+        body.response_format = 'b64_json';
+        body.size = '1024x1024';
+      } else if (/^dall-e-2/i.test(model)) {
+        body.response_format = 'b64_json';
+        body.size = '1024x1024';
+      }
 
-    const response = await client.images.generate(body);
-    const image = 'data' in response ? response.data?.[0] : undefined;
-    if (!image?.b64_json && !image?.url) {
-      throw new Error('图片生成 provider 返回了空结果。');
+      const response = await client.images.generate(body);
+      const image = 'data' in response ? response.data?.[0] : undefined;
+      if (!image?.b64_json && !image?.url) {
+        throw new Error('图片生成 provider 返回了空结果。');
+      }
+      returnedShape = image.b64_json ? 'b64_json' : 'url';
+      revisedPrompt = image.revised_prompt ?? null;
     }
 
     return this.buildDiagnosticResult('image_generation', provider, startedAt, {
@@ -1896,8 +1933,8 @@ export class InferenceService implements OnModuleInit {
       endpoint: provider.imageGenerationEndpoint,
       model,
       metadata: {
-        returned: image.b64_json ? 'b64_json' : 'url',
-        revisedPrompt: image.revised_prompt ?? null,
+        returned: returnedShape,
+        revisedPrompt,
       },
     });
   }
@@ -2102,26 +2139,36 @@ export class InferenceService implements OnModuleInit {
     const imageGenerationApiKey = this.decodeSecret(
       input.account.imageGenerationApiKeyEncrypted,
     );
+    const mainEndpoint = input.account.endpoint;
+    // 当某个能力没有单独配置 endpoint/apiKey 时，回落到主 endpoint+apiKey。
+    // OpenAI 兼容网关（如 n1n.ai）一般用同一个 base URL 同时提供 chat / audio.speech / images.generate / audio.transcriptions。
+    const inheritedTtsEndpoint =
+      input.account.ttsEndpoint?.trim() || mainEndpoint;
+    const inheritedTtsApiKey = ttsApiKey || apiKey;
+    const inheritedImageEndpoint =
+      input.account.imageGenerationEndpoint?.trim() || mainEndpoint;
+    const inheritedImageApiKey = imageGenerationApiKey || apiKey;
+    const inheritedTranscriptionEndpoint =
+      input.account.transcriptionEndpoint?.trim() || mainEndpoint;
+    const inheritedTranscriptionApiKey = transcriptionApiKey || apiKey;
 
     return {
       accountId: input.account.id,
       accountName: input.account.name,
       providerKind: this.normalizeProviderKind(),
       allowOwnerKeyOverride: input.allowOwnerKeyOverride,
-      endpoint: input.account.endpoint,
+      endpoint: mainEndpoint,
       model: input.modelId,
       apiKey,
-      transcriptionEndpoint:
-        input.account.transcriptionEndpoint?.trim() || '',
-      transcriptionApiKey,
+      transcriptionEndpoint: inheritedTranscriptionEndpoint,
+      transcriptionApiKey: inheritedTranscriptionApiKey,
       transcriptionModel: input.account.transcriptionModel?.trim() || '',
-      ttsEndpoint: input.account.ttsEndpoint?.trim() || '',
-      ttsApiKey,
+      ttsEndpoint: inheritedTtsEndpoint,
+      ttsApiKey: inheritedTtsApiKey,
       ttsModel: input.account.ttsModel?.trim() || DEFAULT_TTS_MODEL,
       ttsVoice: input.account.ttsVoice?.trim() || DEFAULT_TTS_VOICE,
-      imageGenerationEndpoint:
-        input.account.imageGenerationEndpoint?.trim() || '',
-      imageGenerationApiKey,
+      imageGenerationEndpoint: inheritedImageEndpoint,
+      imageGenerationApiKey: inheritedImageApiKey,
       imageGenerationModel: input.account.imageGenerationModel?.trim() || '',
       apiStyle:
         input.account.apiStyle === 'openai-responses'
