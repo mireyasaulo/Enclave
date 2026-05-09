@@ -60,7 +60,7 @@ export function FollowupRuntimePage() {
     if (!notice) {
       return;
     }
-    const timer = window.setTimeout(() => setNotice(""), 2600);
+    const timer = window.setTimeout(() => setNotice(""), 2600); // i18n-ignore-line: clears transient notice state
     return () => window.clearTimeout(timer);
   }, [notice]);
 

@@ -1179,7 +1179,7 @@ window.alert(t(msg`预设 JSON 无效`));
         <div className="space-y-4">
           <AdminInfoRows title={t(msg`当前聚焦`)} rows={currentFocusRows} />
           {shareViewName.trim() ? (
-            <InlineNotice tone="info">当前分享视图：{shareViewName.trim()}</InlineNotice>
+            <InlineNotice tone="info">{t(msg`当前分享视图：${shareViewName.trim()}`)}</InlineNotice>
           ) : null}
         </div>
       </div>
@@ -1266,7 +1266,7 @@ window.alert(t(msg`预设 JSON 无效`));
         {shareViewName.trim() ? (
           <div className="mt-4">
             <span className="rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-2 text-sm text-sky-100">
-              视图：{shareViewName.trim()}
+              {t(msg`视图：${shareViewName.trim()}`)}
             </span>
           </div>
         ) : null}
@@ -2255,7 +2255,7 @@ window.alert(t(msg`预设 JSON 无效`));
           {compareQuery.data ? (
             <div className="space-y-4">
               <ListItemCard
-                title={`${compareQuery.data.candidateDatasetId} 对比 ${compareQuery.data.baselineDatasetId}`}
+                title={t(msg`${compareQuery.data.candidateDatasetId} 对比 ${compareQuery.data.baselineDatasetId}`)}
                 footer={
                   <div className="grid gap-3 md:grid-cols-4">
                     <MetricCard label={t(msg`用例数`)} value={displayedComparisons.length} />
@@ -2405,7 +2405,7 @@ window.alert(t(msg`预设 JSON 无效`));
 {traceFiltersExpanded ? t(msg`隐藏链路筛选`) : t(msg`显示链路筛选`)}
           </Button>
           <div className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-2 text-sm text-[color:var(--text-secondary)]">
-            已启用 {activeTraceFilterCount} 个筛选
+            {t(msg`已启用 ${activeTraceFilterCount} 个筛选`)}
           </div>
         </div>
         <InlineNotice className="mt-4" tone="muted">
@@ -2494,7 +2494,7 @@ window.alert(t(msg`预设 JSON 无效`));
                       : "healthy"
                 }
               >
-                已选链路：{traceDetailQuery.data.id}
+                {t(msg`已选链路：${traceDetailQuery.data.id}`)}
               </StatusPill>
               <StatusPill>{formatTraceSource(traceDetailQuery.data.source)}</StatusPill>
 {focusedCaseId ? <StatusPill tone="warning">{t(msg`聚焦用例`)}：{focusedCaseId}</StatusPill> : null}
@@ -2629,6 +2629,7 @@ window.alert(t(msg`预设 JSON 无效`));
                   </div>
                 </div>
                 {traceDetailQuery.data.output.judgePayload ? (
+                  // i18n-ignore-next-line: admin technical label
                   <SnapshotPanel title="Judge JSON" value={traceDetailQuery.data.output.judgePayload} />
                 ) : null}
               </AdminDetailPanel>

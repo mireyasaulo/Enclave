@@ -78,6 +78,7 @@ const RULE_TABS: Array<{ key: RulesTab; label: ReturnType<typeof msg> }> = [
   { key: "prompts", label: msg`提示模板` },
 ];
 
+// i18n-ignore-start: sample demo data for action planner preview
 const PREVIEW_EXAMPLES = [
   {
     label: msg`智能家居`,
@@ -92,6 +93,7 @@ const PREVIEW_EXAMPLES = [
     message: "帮我看看今天上海天气，顺便告诉我适不适合出门。",
   },
 ];
+// i18n-ignore-end
 
 const RISK_LEVEL_OPTIONS: Array<{
   value: ActionRiskLevel;
@@ -535,7 +537,7 @@ export function ActionRuntimePage() {
       connectorDrafts[connector.id] ?? createConnectorDraft(connector);
     const parsed = parseEndpointConfig(draft.endpointConfigText);
     if (parsed.error) {
-      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。";
+      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。"; // i18n-ignore-line: admin technical error fallback
       setConnectorDraftErrors((current) => ({
         ...current,
         [connector.id]: errorMessage,
@@ -556,7 +558,7 @@ export function ActionRuntimePage() {
       connectorDrafts[connector.id] ?? createConnectorDraft(connector);
     const parsed = parseEndpointConfig(draft.endpointConfigText);
     if (parsed.error) {
-      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。";
+      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。"; // i18n-ignore-line: admin technical error fallback
       setConnectorDraftErrors((current) => ({
         ...current,
         [connector.id]: errorMessage,
@@ -578,7 +580,7 @@ export function ActionRuntimePage() {
       connectorDrafts[connector.id] ?? createConnectorDraft(connector);
     const parsed = parseEndpointConfig(draft.endpointConfigText);
     if (parsed.error) {
-      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。";
+      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。"; // i18n-ignore-line: admin technical error fallback
       setConnectorDraftErrors((current) => ({
         ...current,
         [connector.id]: errorMessage,
@@ -615,7 +617,7 @@ export function ActionRuntimePage() {
       connectorDrafts[connector.id] ?? createConnectorDraft(connector);
     const parsed = parseEndpointConfig(draft.endpointConfigText);
     if (parsed.error) {
-      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。";
+      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。"; // i18n-ignore-line: admin technical error fallback
       setConnectorDraftErrors((current) => ({
         ...current,
         [connector.id]: errorMessage,
@@ -840,7 +842,7 @@ export function ActionRuntimePage() {
                 }
               />
               <AdminValueCard
-                label="Planner"
+                label="Planner" // i18n-ignore-line: admin technical label
                 value={translatePlannerMode(overview.rules.plannerMode)}
               />
               <AdminValueCard
@@ -979,7 +981,7 @@ export function ActionRuntimePage() {
                 />
                 <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                   <MetricCard
-                    label="Planner"
+                    label="Planner" // i18n-ignore-line: admin technical label
                     value={translatePlannerMode(overview.rules.plannerMode)}
                   />
                   <MetricCard
@@ -1144,11 +1146,13 @@ export function ActionRuntimePage() {
                             </StatusPill>
                           }
                           meta={`${translateProviderType(connector.providerType)} · ${connector.connectorKey}`}
+                          // i18n-ignore-start: nested template literal inside t(msg`...`)
                           description={t(msg`支持 ${connector.capabilities.length} 个操作${
                             connector.lastError
                               ? ` · 最近错误：${connector.lastError}`
                               : ""
                           }`)}
+                          // i18n-ignore-end
                           actions={
                             <Button
                               variant="secondary"
@@ -1236,7 +1240,7 @@ export function ActionRuntimePage() {
                     <AdminSectionHeader title={t(msg`Planner 与入口`)} />
                     <div className="mt-4 space-y-6">
                       <AdminSelectField
-                        label="Planner Mode"
+                        label="Planner Mode" // i18n-ignore-line: admin technical label
                         value={rulesDraft.plannerMode}
                         onChange={(value) =>
                           patchRules((current) => ({
@@ -1262,7 +1266,7 @@ export function ActionRuntimePage() {
                           onChange={(value) =>
                             setPolicyValue("entryCharacterSourceKey", value)
                           }
-                          placeholder="action_operator"
+                          placeholder="action_operator" // i18n-ignore-line: technical identifier placeholder
                         />
                       </div>
                       <div className="-mt-2 text-[12px] leading-5 text-[color:var(--text-dim)]">
@@ -1367,7 +1371,7 @@ export function ActionRuntimePage() {
                     <AdminSectionHeader title={t(msg`Planner 与中间态文案`)} />
                     <div className="mt-4 space-y-4">
                       <AdminTextArea
-                        label="Planner Prompt"
+                        label="Planner Prompt" // i18n-ignore-line: admin technical label
                         value={rulesDraft.promptTemplates.plannerSystemPrompt}
                         onChange={(value) =>
                           setPromptTemplate("plannerSystemPrompt", value)
@@ -1821,11 +1825,13 @@ export function ActionRuntimePage() {
                                     ? t(msg`当前连接器已停用，保存配置后记得重新启用。`)
                                     : t(msg`当前连接器已就绪，可以直接做自检和预演验证。`)}
                               </AdminSoftBox>
+                              {/* i18n-ignore-start: conditional values interpolated inside t(msg`...`) */}
                               <AdminSoftBox>
                                 {t(msg`凭证状态：${selectedConnector.credentialConfigured
                                   ? "已配置"
                                   : "未配置"}`)}
                               </AdminSoftBox>
+                              {/* i18n-ignore-end */}
                               <AdminSoftBox>
                                 {t(msg`最后错误：${selectedConnector.lastError || "暂无"}`)}
                               </AdminSoftBox>
@@ -1915,6 +1921,7 @@ export function ActionRuntimePage() {
                                         ? t(msg`发现到 ${selectedConnectorDiscoveryResult.itemCount} 个候选实体`)
                                         : t(msg`没有发现匹配实体`)
                                     }
+                                    // i18n-ignore-start: nested template literals inside t(msg`...`)
                                     description={t(msg`拉取时间 ${formatDateTime(selectedConnectorDiscoveryResult.fetchedAt)}${
                                       selectedConnectorDiscoveryResult.query
                                         ? `，当前筛选：${selectedConnectorDiscoveryResult.query}`
@@ -1922,6 +1929,7 @@ export function ActionRuntimePage() {
                                     }。房间识别模式：${translateDiscoveryTopologySource(
                                       selectedConnectorDiscoveryResult.topologySource,
                                     )}。点"写入映射"会把推荐 target 合并进当前草稿，不会自动保存。`)}
+                                    // i18n-ignore-end
                                   />
                                   {selectedConnectorDiscoveryResult.warnings.map(
                                     (warning) => (
@@ -1941,11 +1949,13 @@ export function ActionRuntimePage() {
                                     />
                                   ) : null}
                                   <div className="flex flex-wrap items-center gap-3 rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] p-4">
+                                    {/* i18n-ignore-start: multiline t(msg`...`) with interpolation */}
                                     <div className="text-sm leading-6 text-[color:var(--text-secondary)]">
                                       {t(msg`当前草稿已有 ${countExistingMappedTargets(
                                         selectedConnector,
                                       )} 条 deviceTargets 映射。`)}
                                     </div>
+                                    {/* i18n-ignore-end */}
                                     <Button
                                       variant="secondary"
                                       disabled={
@@ -2025,6 +2035,7 @@ export function ActionRuntimePage() {
                                             value={item.key}
                                           />
                                         </div>
+                                        {/* i18n-ignore-start: nested template literals inside t(msg`...`) */}
                                         <div className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">
                                           {t(msg`房间来源：${translateDiscoverySource(
                                             item.roomSource,
@@ -2036,13 +2047,14 @@ export function ActionRuntimePage() {
                                             ? `（${item.registryDeviceName}）`
                                             : ""}`)}
                                         </div>
+                                        {/* i18n-ignore-end */}
                                         <div className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
                                           {t(msg`可执行动作：`)}
                                           {item.availableActions.join(" / ")}
                                         </div>
                                         <div className="mt-3">
                                           <LabeledCodeBlock
-                                            label="Target Config"
+                                            label="Target Config" // i18n-ignore-line: admin technical label
                                             value={prettyJson(
                                               item.targetConfig,
                                             )}
@@ -2067,7 +2079,7 @@ export function ActionRuntimePage() {
                           }
                         />
                         <AdminTextArea
-                          label="Endpoint Config JSON"
+                          label="Endpoint Config JSON" // i18n-ignore-line: admin technical label
                           value={selectedConnectorDraft.endpointConfigText}
                           onChange={(value) =>
                             updateConnectorDraft(selectedConnector.id, {
@@ -2378,11 +2390,13 @@ function ActionRunDetailPanel({ detail }: { detail: ActionRunDetail }) {
 
         <AdminMiniPanel title={t(msg`参数情况`)} tone="soft">
           <div className="space-y-2 text-sm text-[color:var(--text-secondary)]">
+            {/* i18n-ignore-start: conditional values inside t(msg`...`) */}
             <AdminSoftBox>
               {t(msg`缺失参数：${detail.missingSlots.length
                 ? detail.missingSlots.join(" / ")
                 : "无"}`)}
             </AdminSoftBox>
+            {/* i18n-ignore-end */}
             <AdminSoftBox>
               {t(msg`结果摘要：${detail.resultSummary || "暂无"}`)}
             </AdminSoftBox>
@@ -2393,6 +2407,7 @@ function ActionRunDetailPanel({ detail }: { detail: ActionRunDetail }) {
         </AdminMiniPanel>
       </div>
 
+      {/* i18n-ignore-start: admin technical payload labels */}
       <LabeledCodeBlock
         label="Plan Payload"
         value={prettyJson(detail.planPayload ?? {})}
@@ -2421,6 +2436,7 @@ function ActionRunDetailPanel({ detail }: { detail: ActionRunDetail }) {
         label="Trace Payload"
         value={prettyJson(detail.tracePayload ?? {})}
       />
+      {/* i18n-ignore-end */}
     </div>
   );
 }
@@ -2872,12 +2888,14 @@ function buildSpecificTargetKeyLabel(
   if (!text || text === genericDevice) {
     return "";
   }
+  // i18n-ignore-start: device name normalization logic — CJK device category strings
   if (
     genericDevice === "灯" &&
     /^(主|副|床头|吊|台|壁|落地|氛围)$/u.test(text)
   ) {
     return `${text}灯`;
   }
+  // i18n-ignore-end
   return text;
 }
 

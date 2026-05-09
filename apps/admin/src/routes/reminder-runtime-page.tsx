@@ -164,6 +164,7 @@ const PARSER_PERIOD_FIELDS: Array<{
   },
 ];
 
+// i18n-ignore-start: sample demo data for reminder parser preview
 const PARSER_PREVIEW_EXAMPLES: Array<{ label: ReturnType<typeof msg>; message: string }> = [
   {
     label: msg`单次提醒`,
@@ -186,6 +187,7 @@ const PARSER_PREVIEW_EXAMPLES: Array<{ label: ReturnType<typeof msg>; message: s
     message: "买猫粮已经搞定了",
   },
 ];
+// i18n-ignore-end
 
 const PREVIEW_ACTION_LABELS: Record<string, ReturnType<typeof msg>> = {
   help: msg`帮助`,
@@ -1863,7 +1865,7 @@ export function ReminderRuntimePage() {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [configTab, setConfigTab] = useState<ReminderConfigTab>("schedule");
   const [parserPreviewInput, setParserPreviewInput] =
-    useState("明早8点提醒我吃药");
+    useState("明早8点提醒我吃药"); // i18n-ignore-line: sample demo initial value
   const deferredTaskSearch = useDeferredValue(normalizeSearchText(taskSearch));
 
   const overviewQuery = useQuery({
@@ -1882,7 +1884,7 @@ export function ReminderRuntimePage() {
     if (!notice) {
       return;
     }
-    const timer = window.setTimeout(() => setNotice(""), 2600);
+    const timer = window.setTimeout(() => setNotice(""), 2600); // i18n-ignore-line: clears transient notice state
     return () => window.clearTimeout(timer);
   }, [notice]);
 

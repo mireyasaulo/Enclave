@@ -1007,7 +1007,7 @@ function OverviewWorkspace({
 
       <div className="grid gap-4 xl:grid-cols-2">
         <ProfileStatePanel
-          title="Live State"
+          title="Live State" // i18n-ignore-line: admin technical label
           subtitle={t(msg`短窗口内最活跃、最即时的状态层`)}
           summaryRows={[
             { label: t(msg`情绪`), value: profile.liveState.mood || t(msg`暂无`) },
@@ -1024,7 +1024,7 @@ function OverviewWorkspace({
           ]}
         />
         <ProfileStatePanel
-          title="Recent State"
+          title="Recent State" // i18n-ignore-line: admin technical label
           subtitle={t(msg`近期重复出现的目标、摩擦和偏好信号`)}
           groups={[
             { label: t(msg`近期目标`), items: profile.recentState.recentGoals },
@@ -1543,7 +1543,7 @@ function RulesWorkspace({
             ]}
           />
           <AdminCallout
-            tone={parsedRules ? “info” : “warning”}
+            tone={parsedRules ? "info" : "warning"}
             title={parsedRules ? t(msg`推荐编辑方式`) : t(msg`当前草稿有格式错误`)}
             description={
               parsedRules
@@ -2052,7 +2052,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminTextField
-                      label="Google News CEID"
+                      label="Google News CEID" // i18n-ignore-line: admin technical label
                       value={parsedRules.interaction.googleNews.editionCeid}
                       onChange={(value) =>
                         patchRulesDraft((current) => ({
@@ -2090,7 +2090,7 @@ function RulesWorkspace({
 
                   <div className="grid gap-4 xl:grid-cols-3">
                     <AdminTextArea
-                      label="Owner Query Overrides"
+                      label="Owner Query Overrides" // i18n-ignore-line: admin technical label
                       value={parsedRules.interaction.ownerQueryOverrides.join(
                         "\n",
                       )}
@@ -2107,7 +2107,7 @@ function RulesWorkspace({
                       textareaClassName="min-h-[200px]"
                     />
                     <AdminTextArea
-                      label="Source Allowlist"
+                      label="Source Allowlist" // i18n-ignore-line: admin technical label
                       value={parsedRules.interaction.sourceAllowlist.join("\n")}
                       onChange={(value) =>
                         patchRulesDraft((current) => ({
@@ -2122,7 +2122,7 @@ function RulesWorkspace({
                       textareaClassName="min-h-[200px]"
                     />
                     <AdminTextArea
-                      label="Source Blocklist"
+                      label="Source Blocklist" // i18n-ignore-line: admin technical label
                       value={parsedRules.interaction.sourceBlocklist.join("\n")}
                       onChange={(value) =>
                         patchRulesDraft((current) => ({
@@ -2138,7 +2138,7 @@ function RulesWorkspace({
                     />
                   </div>
 
-                  <AdminMiniPanel title="Signal Weights" tone="soft">
+                  <AdminMiniPanel title="Signal Weights" tone="soft"> {/* i18n-ignore-line: admin technical label */}
                     <AdminCodeBlock
                       value={safePrettyJson(parsedRules.signalWeights)}
                     />
@@ -2148,14 +2148,14 @@ function RulesWorkspace({
             </div>
           ) : (
             <AdminCallout
-              tone=”warning”
+              tone=""
               title={t(msg`结构化编辑不可用`)}
               description={t(msg`当前草稿 JSON 无法解析，先去”原始 JSON”修复。`)}
             />
           )
         ) : null}
 
-        {rulesTab === “prompts” ? (
+        {rulesTab === "prompts" ? (
           parsedRules ? (
             <div className="space-y-6">
               <Card className="bg-white/90">
@@ -2211,14 +2211,14 @@ function RulesWorkspace({
             </div>
           ) : (
             <AdminCallout
-              tone=”warning”
+              tone=""
               title={t(msg`结构化编辑不可用`)}
               description={t(msg`当前草稿 JSON 无法解析，先去”原始 JSON”修复。`)}
             />
           )
         ) : null}
 
-        {rulesTab === “json” ? (
+        {rulesTab === "json" ? (
           <Card className="bg-white/90">
             <AdminSectionHeader
               title={t(msg`原始 JSON`)}
@@ -2335,7 +2335,7 @@ function RealWorldBriefPanel({
               : "0",
           },
           {
-            label: "Query Hints",
+            label: "Query Hints", // i18n-ignore-line: admin technical label
             value: joinList(brief.queryHints),
           },
         ]}
@@ -2346,6 +2346,7 @@ function RealWorldBriefPanel({
       />
       {!compact ? (
         <>
+          {/* i18n-ignore-start: admin technical labels for snapshot/panel blocks */}
           <RunSnapshotBlock
             title="Bullet Points"
             value={{ bulletPoints: brief.bulletPoints }}
@@ -2354,13 +2355,14 @@ function RealWorldBriefPanel({
             title="Need Signals"
             value={{ needSignals: brief.needSignals }}
           />
+          {/* i18n-ignore-end */}
         </>
       ) : (
         <div className="grid gap-4 xl:grid-cols-2">
-          <AdminMiniPanel title="Bullet Points" tone="soft">
+          <AdminMiniPanel title="Bullet Points" tone="soft"> {/* i18n-ignore-line: admin technical label */}
             <PillList items={brief.bulletPoints} />
           </AdminMiniPanel>
-          <AdminMiniPanel title="Need Signals" tone="soft">
+          <AdminMiniPanel title="Need Signals" tone="soft"> {/* i18n-ignore-line: admin technical label */}
             <PillList items={brief.needSignals} />
           </AdminMiniPanel>
         </div>
@@ -2457,6 +2459,7 @@ function CyberAvatarRunDetailPanel({
           { label: t(msg`错误信息`), value: detail.errorMessage ?? t(msg`无`) },
         ]}
       />
+      {/* i18n-ignore-start: admin technical snapshot/payload labels */}
       <div className="space-y-4">
         <RunSnapshotBlock title="Input Snapshot" value={detail.inputSnapshot} />
         <RunSnapshotBlock
@@ -2473,6 +2476,7 @@ function CyberAvatarRunDetailPanel({
         />
         <RunSnapshotBlock title="Merge Diff" value={detail.mergeDiffPayload} />
       </div>
+      {/* i18n-ignore-end */}
     </div>
   );
 }

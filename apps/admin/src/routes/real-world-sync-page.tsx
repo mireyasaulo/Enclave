@@ -988,11 +988,13 @@ export function RealWorldSyncPage() {
         <AdminActionFeedback
           tone="busy"
           title={t(msg`界闻补发中`)}
+          // i18n-ignore-start: nested t() calls inside t(msg`...`)
           description={t(msg`正在补发${
             publishBulletinMutation.variables
               ? t(BULLETIN_SLOT_LABELS[publishBulletinMutation.variables])
               : t(msg`界闻`)
           }，完成后会自动刷新今日播报状态。`)}
+          // i18n-ignore-end
         />
       ) : null}
       {publishBulletinMutation.isSuccess ? (
@@ -1549,10 +1551,12 @@ export function RealWorldSyncPage() {
                             <AdminCallout
                               title={t(msg`界闻三段更新`)}
                               tone="success"
+                              // i18n-ignore-start: multiline t(msg`...`) with function call interpolation
                               description={t(msg`今天已完成：${formatBulletinSlots(
                                 detail.todayBulletinSlots,
                                 t,
                               )}。调度窗口为 07:30-09:30、11:30-13:30、18:30-21:00，同一时段当天只发一次。`)}
+                              // i18n-ignore-end
                               actions={
                                 <>
                                   {BULLETIN_SLOT_ORDER.map((slot) => (
@@ -1580,12 +1584,12 @@ export function RealWorldSyncPage() {
 
                           {detail.activeDigest ? (
                             <>
-                              <AdminSubpanel title="Scene Patch">
+                              <AdminSubpanel title="Scene Patch"> {/* i18n-ignore-line: admin technical label */}
                                 <ScenePatchPanel digest={detail.activeDigest} />
                               </AdminSubpanel>
 
                               {detail.activeDigest.globalOverlay ? (
-                                <AdminSubpanel title="Global Overlay">
+                                <AdminSubpanel title="Global Overlay"> {/* i18n-ignore-line: admin technical label */}
                                   <AdminCodeBlock
                                     value={detail.activeDigest.globalOverlay}
                                   />
@@ -1727,11 +1731,13 @@ export function RealWorldSyncPage() {
                   <AdminCallout
                     title={t(msg`默认 Provider 行为`)}
                     tone="info"
+                    // i18n-ignore-start: nested t() inside t(msg`...`)
                     description={t(msg`当前默认 Provider 为 ${
                       PROVIDER_MODE_LABELS[rulesDraft.providerMode]
                         ? t(PROVIDER_MODE_LABELS[rulesDraft.providerMode])
                         : rulesDraft.providerMode
                     }。普通公众人物会先按这里采集；界闻角色仍固定优先走专用 RSS 聚合。`)}
+                    // i18n-ignore-end
                   />
 
                   <div className="grid gap-4 md:grid-cols-2">

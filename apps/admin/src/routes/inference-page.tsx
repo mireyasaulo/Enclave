@@ -47,7 +47,7 @@ const WORKSPACE_TABS: Array<{ key: WorkspaceTab; label: ReturnType<typeof msg> }
 ];
 
 const emptyDraft: InferenceProviderAccountDraft = {
-  name: "",
+  name: "", // i18n-ignore-line: empty default value
   endpoint: "https://api.openai.com/v1",
   defaultModelId: "gpt-4.1-mini",
   apiKey: "",
@@ -1407,9 +1407,9 @@ export function InferencePage() {
                     options={[
                       {
                         value: "openai-chat-completions",
-                        label: "Chat Completions",
+                        label: "Chat Completions", // i18n-ignore-line: admin technical label
                       },
-                      { value: "openai-responses", label: "Responses" },
+                      { value: "openai-responses", label: "Responses" }, // i18n-ignore-line: admin technical label
                     ]}
                   />
                   <Field
