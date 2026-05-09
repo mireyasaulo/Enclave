@@ -1742,12 +1742,14 @@ export function getLatestWorldContext(baseUrl?: string) {
   return requestLegacyApi<WorldContext>("/world/context", undefined, baseUrl);
 }
 
-export function getFriendRequests(baseUrl?: string) {
-  return requestLegacyApi<FriendRequest[]>(
-    "/social/friend-requests",
-    undefined,
-    baseUrl,
-  );
+export function getFriendRequests(
+  baseUrl?: string,
+  opts?: { direction?: "inbound" | "outbound" | "all" },
+) {
+  const path = opts?.direction
+    ? `/social/friend-requests?direction=${encodeURIComponent(opts.direction)}`
+    : "/social/friend-requests";
+  return requestLegacyApi<FriendRequest[]>(path, undefined, baseUrl);
 }
 
 export function getConversations(baseUrl?: string) {

@@ -23,6 +23,7 @@ export interface FriendRequest {
   status: string;
   createdAt: string;
   expiresAt?: string;
+  acceptAt?: string | null;
 }
 
 export interface Friendship {

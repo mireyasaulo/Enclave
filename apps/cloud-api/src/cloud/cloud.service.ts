@@ -719,7 +719,7 @@ export class CloudService {
       "cloud.updateWorld",
     );
 
-    return this.serializeWorld(world);
+    return this.serializeWorldWithUser(world);
   }
 
   async listJobs(
@@ -1017,7 +1017,7 @@ export class CloudService {
       throw new NotFoundException("找不到该云世界。");
     }
 
-    return this.serializeWorld(reconciledWorld);
+    return this.serializeWorldWithUser(reconciledWorld);
   }
 
   async rotateWorldCallbackToken(
@@ -1043,7 +1043,7 @@ export class CloudService {
       world.status === "bootstrapping" ||
       world.status === "creating"
     ) {
-      return this.serializeWorld(world);
+      return this.serializeWorldWithUser(world);
     }
 
     const jobType = await this.chooseRecoveryJobType(world.id);
@@ -1064,7 +1064,7 @@ export class CloudService {
       world.id,
       "cloud.resumeWorld",
     );
-    return this.serializeWorld(world);
+    return this.serializeWorldWithUser(world);
   }
 
   async suspendWorld(id: string) {
@@ -1074,7 +1074,7 @@ export class CloudService {
       throw new BadRequestException("当前世界不可休眠。");
     }
     if (currentStatus === "sleeping" || currentStatus === "stopping") {
-      return this.serializeWorld(world);
+      return this.serializeWorldWithUser(world);
     }
     if (currentStatus !== "ready" && currentStatus !== "starting") {
       throw new BadRequestException("只有处于活跃中的世界才可以进入休眠。");
@@ -1092,7 +1092,7 @@ export class CloudService {
       world.id,
       "cloud.suspendWorld",
     );
-    return this.serializeWorld(world);
+    return this.serializeWorldWithUser(world);
   }
 
   async retryWorld(id: string) {
@@ -1127,7 +1127,7 @@ export class CloudService {
       world.id,
       "cloud.retryWorld",
     );
-    return this.serializeWorld(world);
+    return this.serializeWorldWithUser(world);
   }
 
   private async syncWorldForRequest(
@@ -1260,6 +1260,15 @@ export class CloudService {
       world.failureMessage = worldProjection.failureMessage;
 
     await repos.worldRepo.save(world);
+  }
+
+  private async serializeWorldWithUser(
+    world: CloudWorldEntity,
+  ): Promise<CloudWorldSummary> {
+    const user = world.phone
+      ? await this.userRepo.findOne({ where: { phone: world.phone } })
+      : null;
+    return this.serializeWorld(world, user);
   }
 
   private serializeWorld(
