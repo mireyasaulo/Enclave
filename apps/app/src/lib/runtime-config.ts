@@ -24,13 +24,51 @@ function fallbackBrowserBaseUrl() {
   return null;
 }
 
+// 浏览器同源回落分两类：
+// - 本地直连（localhost / 127.x / 私网 IP / 内网域名 / 桌面壳的 file://）：
+//   允许 baseUrl = ${origin}，请求直接打到本机 api(3000)，无鉴权 = 单租户本地开发场景。
+// - 远程公网域名（vicp.fun / 公网 IP / 隧道）：必须走 cloud-api 的多租户反代入口
+//   ${origin}/cloud/world-api，由 cloud-api 凭 cloud access token 路由到对应账号 child；
+//   否则匿名访问会直通本机的共享 owner db，等同于把本地数据公开。
+function isLocalLikeHostname(hostname: string) {
+  if (!hostname) return true;
+  if (hostname === "localhost" || hostname === "::1") return true;
+  if (hostname.startsWith("127.")) return true;
+  if (hostname.startsWith("10.") || hostname.startsWith("192.168.")) return true;
+  // RFC1918 172.16.0.0/12
+  const m172 = /^172\.(\d+)\./.exec(hostname);
+  if (m172) {
+    const second = Number(m172[1]);
+    if (second >= 16 && second <= 31) return true;
+  }
+  // *.local / *.lan / *.internal 视作内网
+  if (/\.(local|lan|internal)$/i.test(hostname)) return true;
+  return false;
+}
+
+function isRemoteWebOrigin() {
+  if (typeof window === "undefined") return false;
+  const protocol = window.location.protocol;
+  if (protocol !== "http:" && protocol !== "https:") return false;
+  return !isLocalLikeHostname(window.location.hostname);
+}
+
+function fallbackCoreApiBaseUrl() {
+  const origin = fallbackBrowserBaseUrl();
+  if (!origin) return null;
+  if (isRemoteWebOrigin()) {
+    return `${origin}/cloud/world-api`;
+  }
+  return origin;
+}
+
 export function resolveAppCoreApiBaseUrl() {
   const runtimeConfig = getAppRuntimeConfig();
   if (runtimeConfig.apiBaseUrl) {
     return runtimeConfig.apiBaseUrl;
   }
 
-  const browserBaseUrl = fallbackBrowserBaseUrl();
+  const browserBaseUrl = fallbackCoreApiBaseUrl();
   if (browserBaseUrl) {
     return browserBaseUrl;
   }
@@ -49,6 +87,10 @@ export function resolveAppSocketBaseUrl() {
   }
 
   return resolveAppCoreApiBaseUrl();
+}
+
+export function isRemoteWebDeployment() {
+  return isRemoteWebOrigin();
 }
 
 export function configureContractsRuntime() {
