@@ -1,5 +1,6 @@
 import { Global, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { CloudUserOAuthIdentityEntity } from "../entities/cloud-user-oauth-identity.entity";
 import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { EmailVerificationSessionEntity } from "../entities/email-verification-session.entity";
 import { PhoneVerificationSessionEntity } from "../entities/phone-verification-session.entity";
@@ -18,6 +19,7 @@ import { ServiceTokenGuard } from "./service-token.guard";
       PhoneVerificationSessionEntity,
       EmailVerificationSessionEntity,
       CloudUserEntity,
+      CloudUserOAuthIdentityEntity,
     ]),
   ],
   providers: [
