@@ -482,6 +482,32 @@ export function TokenUsagePage() {
     },
   });
 
+  const syncN1nMutation = useMutation({
+    mutationFn: () => adminApi.syncTokenUsagePricingFromN1n(),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["admin-token-usage-pricing"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["admin-token-usage-overview"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["admin-token-usage-trend"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["admin-token-usage-breakdown"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["admin-token-usage-records"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["admin-token-usage-downgrade-insights"],
+        }),
+      ]);
+    },
+  });
+
   const saveBudgetMutation = useMutation({
     mutationFn: async () => {
       if (!budgetDraft) {
@@ -2286,20 +2312,42 @@ export function TokenUsagePage() {
             <AdminSectionHeader
               title="模型价格"
               actions={
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() =>
-                    setPricingDraft((current) => ({
-                      currency: current?.currency ?? "CNY",
-                      items: [...(current?.items ?? []), emptyPricingItem()],
-                    }))
-                  }
-                >
-                  新增模型
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => syncN1nMutation.mutate()}
+                    disabled={syncN1nMutation.isPending}
+                  >
+                    {syncN1nMutation.isPending
+                      ? "同步中..."
+                      : "从 n1n.ai 同步并回填"}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() =>
+                      setPricingDraft((current) => ({
+                        currency: current?.currency ?? "CNY",
+                        items: [...(current?.items ?? []), emptyPricingItem()],
+                      }))
+                    }
+                  >
+                    新增模型
+                  </Button>
+                </div>
               }
             />
+            {syncN1nMutation.isSuccess && syncN1nMutation.data ? (
+              <InlineNotice tone="success" className="mt-3">
+                已同步 {syncN1nMutation.data.catalogItems} 个模型单价，并回填{" "}
+                {syncN1nMutation.data.recomputedRows} 条历史账本费用。
+              </InlineNotice>
+            ) : null}
+            {syncN1nMutation.isError &&
+            syncN1nMutation.error instanceof Error ? (
+              <ErrorBlock message={syncN1nMutation.error.message} className="mt-3" />
+            ) : null}
 
             <div className="mt-5 space-y-3">
               <FilterField label="结算币种">

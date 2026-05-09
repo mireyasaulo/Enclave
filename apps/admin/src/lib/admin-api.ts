@@ -751,6 +751,15 @@ export const adminApi = {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
+  syncTokenUsagePricingFromN1n: () =>
+    adminFetch<{
+      source: "n1n.ai";
+      fetchedAt: string;
+      catalogItems: number;
+      recomputedRows: number;
+    }>("/token-usage/sync-pricing-from-n1n", {
+      method: "POST",
+    }),
   getTokenUsageBudgets: () =>
     adminFetch<TokenUsageBudgetSnapshot>("/token-usage/budgets"),
   setTokenUsageBudgets: (payload: TokenUsageBudgetSnapshot["config"]) =>

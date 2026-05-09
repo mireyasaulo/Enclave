@@ -18,6 +18,7 @@ import { CharacterBlueprintService } from '../characters/character-blueprint.ser
 import { ReplyLogicAdminService } from './reply-logic-admin.service';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import { AiUsageLedgerService } from '../analytics/ai-usage-ledger.service';
+import { N1nPricingSyncService } from '../analytics/n1n-pricing-sync.service';
 import { WechatSyncAdminService } from './wechat-sync-admin.service';
 import { WikiSyncAdminService } from './wiki-sync-admin.service';
 import { CloudTokenUsageSyncService } from '../cloud-runtime/cloud-token-usage-sync.service';
@@ -78,6 +79,7 @@ export class AdminController {
     private readonly selfAgentService: SelfAgentService,
     private readonly worldLanguageService: WorldLanguageService,
     private readonly cloudTokenUsageSync: CloudTokenUsageSyncService,
+    private readonly n1nPricingSync: N1nPricingSyncService,
   ) {}
 
   @Get('stats')
@@ -445,6 +447,11 @@ export class AdminController {
   async runCloudTokenUsageSync() {
     await this.cloudTokenUsageSync.runSync();
     return { ok: true };
+  }
+
+  @Post('token-usage/sync-pricing-from-n1n')
+  syncTokenUsagePricingFromN1n() {
+    return this.n1nPricingSync.syncFromN1n();
   }
 
   @Get('token-usage/platform-defaults')
