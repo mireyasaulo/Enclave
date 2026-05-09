@@ -25,6 +25,12 @@ const VIDEO_POLL_INTERVAL_MS = 30_000;
 const VIDEO_MAX_ATTEMPTS = 25; // ~12 minutes at 30s per
 const STALE_VIDEO_AFTER_MS = 15 * 60 * 1000;
 const STALE_MUSIC_AFTER_MS = 90 * 1000;
+// 重排上界：防止 submitted 卡住 → 重排 → 又卡住的死循环。
+// attemptCount 不仅记轮询次数，也记重排次数。
+const STALE_REQUEUE_MAX_ATTEMPTS: Record<MinimaxJobKind, number> = {
+  video: VIDEO_MAX_ATTEMPTS * 2, // 50
+  music: 10,
+};
 
 interface EnqueueVideoArgs {
   model: MinimaxVideoModel;
@@ -522,11 +528,25 @@ export class MinimaxJobService {
       },
       take: 5,
     });
+    const maxAttempts = STALE_REQUEUE_MAX_ATTEMPTS[kind];
     for (const job of stale) {
-      this.logger.warn(`requeue stale ${kind} job ${job.id}`);
+      const nextAttempt = job.attemptCount + 1;
+      if (nextAttempt >= maxAttempts) {
+        await this.markFailed(
+          job,
+          'STALE_REQUEUE_EXHAUSTED',
+          `requeued ${nextAttempt} times without progress (max=${maxAttempts})`,
+        );
+        continue;
+      }
+      this.logger.warn(
+        `requeue stale ${kind} job ${job.id} attempt=${nextAttempt}/${maxAttempts}`,
+      );
       await this.repo.update(job.id, {
         status: 'pending',
         executeAfter: new Date(),
+        attemptCount: nextAttempt,
+        lastAttemptAt: new Date(),
       });
     }
   }
