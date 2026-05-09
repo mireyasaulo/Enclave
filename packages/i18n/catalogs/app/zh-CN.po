@@ -12395,16 +12395,16 @@ msgid "买了种子"
 msgstr "买了种子"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
+msgid "卖了"
+msgstr "卖了"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:240
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:242
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
 msgid "作物"
 msgstr "作物"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
-msgid "卖了"
-msgstr "卖了"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -12633,13 +12633,13 @@ msgid "h 成熟"
 msgstr "h 成熟"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
-msgid "/ 包，售价"
-msgstr "/ 包，售价"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:81
 msgid "/ 个"
 msgstr "/ 个"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
+msgid "/ 包，售价"
+msgstr "/ 包，售价"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:77
 msgid "已存"

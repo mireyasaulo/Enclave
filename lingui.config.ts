@@ -8,8 +8,23 @@ const config: LinguiConfig = {
   },
   format: "po",
   compileNamespace: "ts",
-  // "origin" uses binary path comparison (no locale collation) → deterministic across runs
-  orderBy: "origin",
+  // Sort by first origin (file+line), then by messageId as tiebreaker — fully deterministic
+  orderBy: (a, b) => {
+    const getFirst = (origins: Array<[string, number]>) =>
+      [...origins].sort((x, y) => (x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0))[0] ?? [
+        "",
+        0,
+      ];
+    const [aFile, aLine] = getFirst(a.entry.origin ?? []);
+    const [bFile, bLine] = getFirst(b.entry.origin ?? []);
+    if (aFile < bFile) return -1;
+    if (aFile > bFile) return 1;
+    if (aLine < bLine) return -1;
+    if (aLine > bLine) return 1;
+    if (a.messageId < b.messageId) return -1;
+    if (a.messageId > b.messageId) return 1;
+    return 0;
+  },
   catalogs: [
     {
       path: "<rootDir>/packages/i18n/catalogs/shared/{locale}",
