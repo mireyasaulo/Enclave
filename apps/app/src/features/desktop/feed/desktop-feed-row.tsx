@@ -413,13 +413,8 @@ function CommentRow({
   replyToName: string | null;
 }) {
   const t = useRuntimeTranslator();
-  return (
-    <div
-      className={cn(
-        "rounded-[10px]",
-        active ? "bg-[rgba(7,193,96,0.06)] px-2 py-1.5" : null,
-      )}
-    >
+  const body = (
+    <>
       <div className="flex items-center gap-2 text-[12px]">
         <span className="font-medium text-[#07c160]">
           {comment.authorName}
@@ -454,17 +449,25 @@ function CommentRow({
         ) : null}
         <span className="text-[color:var(--text-primary)]">{comment.text}</span>
       </div>
-      {canReply ? (
-        <div className="mt-1 flex justify-end">
-          <button
-            type="button"
-            onClick={onStartReply}
-            className="rounded-full border border-[color:var(--border-faint)] bg-white px-2.5 py-0.5 text-[11px] text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)]"
-          >
-            {t(msg`回复`)}
-          </button>
-        </div>
-      ) : null}
-    </div>
+    </>
+  );
+
+  if (!canReply) {
+    return <div className="rounded-[10px] px-2 py-1.5">{body}</div>;
+  }
+  return (
+    <button
+      type="button"
+      onClick={onStartReply}
+      title={t(msg`回复这条评论`)}
+      className={cn(
+        "block w-full rounded-[10px] px-2 py-1.5 text-left transition-colors",
+        active
+          ? "bg-[rgba(7,193,96,0.12)]"
+          : "hover:bg-[color:var(--surface-console)]",
+      )}
+    >
+      {body}
+    </button>
   );
 }
