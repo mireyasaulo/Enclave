@@ -57,186 +57,186 @@ type EvidenceTab = "runs" | "signals" | "items" | "briefs" | "need-discovery";
 type RulesTab = "common" | "sources" | "prompts" | "json";
 type ProjectionTab = keyof CyberAvatarPromptProjection;
 
-const WORKSPACE_TABS: Array<{ key: WorkspaceTab; label: string }> = [
-  { key: "overview", label: "运营总览" },
-  { key: "projection", label: "Prompt 投影" },
-  { key: "evidence", label: "运行证据" },
-  { key: "rules", label: "规则编辑" },
+const WORKSPACE_TABS: Array<{ key: WorkspaceTab; label: ReturnType<typeof msg> }> = [
+  { key: "overview", label: msg`运营总览` },
+  { key: "projection", label: msg`Prompt 投影` },
+  { key: "evidence", label: msg`运行证据` },
+  { key: "rules", label: msg`规则编辑` },
 ];
 
-const EVIDENCE_TABS: Array<{ key: EvidenceTab; label: string }> = [
-  { key: "runs", label: "运行记录" },
-  { key: "signals", label: "最近信号" },
-  { key: "items", label: "外部条目" },
-  { key: "briefs", label: "外部简报" },
-  { key: "need-discovery", label: "需求上游" },
+const EVIDENCE_TABS: Array<{ key: EvidenceTab; label: ReturnType<typeof msg> }> = [
+  { key: "runs", label: msg`运行记录` },
+  { key: "signals", label: msg`最近信号` },
+  { key: "items", label: msg`外部条目` },
+  { key: "briefs", label: msg`外部简报` },
+  { key: "need-discovery", label: msg`需求上游` },
 ];
 
-const RULE_TABS: Array<{ key: RulesTab; label: string }> = [
-  { key: "common", label: "常用开关" },
-  { key: "sources", label: "来源与回流" },
-  { key: "prompts", label: "提示词模板" },
-  { key: "json", label: "原始 JSON" },
+const RULE_TABS: Array<{ key: RulesTab; label: ReturnType<typeof msg> }> = [
+  { key: "common", label: msg`常用开关` },
+  { key: "sources", label: msg`来源与回流` },
+  { key: "prompts", label: msg`提示词模板` },
+  { key: "json", label: msg`原始 JSON` },
 ];
 
 const PROJECTION_SECTIONS: Array<{
   key: ProjectionTab;
-  label: string;
-  description: string;
-  consumers: string[];
+  label: ReturnType<typeof msg>;
+  description: ReturnType<typeof msg>;
+  consumers: Array<ReturnType<typeof msg>>;
 }> = [
   {
     key: "coreInstruction",
-    label: "核心约束",
-    description: "用户长期稳定边界、偏好和判断习惯的收口段。",
+    label: msg`核心约束`,
+    description: msg`用户长期稳定边界、偏好和判断习惯的收口段。`,
     consumers: [
-      "self 单聊",
-      "self 群聊",
-      "主动跟进",
-      "动作运行时",
-      "scheduler 主动消息",
+      msg`self 单聊`,
+      msg`self 群聊`,
+      msg`主动跟进`,
+      msg`动作运行时`,
+      msg`scheduler 主动消息`,
     ],
   },
   {
     key: "worldInteractionPrompt",
-    label: "世界内互动",
-    description: "用户在这个世界里怎么聊天、怎么回应、怎么接人。",
-    consumers: ["self 单聊", "self 群聊", "主动跟进", "scheduler 主动消息"],
+    label: msg`世界内互动`,
+    description: msg`用户在这个世界里怎么聊天、怎么回应、怎么接人。`,
+    consumers: [msg`self 单聊`, msg`self 群聊`, msg`主动跟进`, msg`scheduler 主动消息`],
   },
   {
     key: "realWorldInteractionPrompt",
-    label: "真实世界互动",
-    description: "用户和现实服务、现实信息之间的交互倾向。",
-    consumers: ["动作运行时"],
+    label: msg`真实世界互动`,
+    description: msg`用户和现实服务、现实信息之间的交互倾向。`,
+    consumers: [msg`动作运行时`],
   },
   {
     key: "proactivePrompt",
-    label: "主动跟进",
-    description: "用户更愿意被怎样提醒、推进和回捞未闭环事项。",
-    consumers: ["主动跟进", "scheduler 主动消息"],
+    label: msg`主动跟进`,
+    description: msg`用户更愿意被怎样提醒、推进和回捞未闭环事项。`,
+    consumers: [msg`主动跟进`, msg`scheduler 主动消息`],
   },
   {
     key: "actionPlanningPrompt",
-    label: "动作规划",
-    description: "用户授权行动助理去做真实世界动作时的偏好和约束。",
-    consumers: ["动作运行时"],
+    label: msg`动作规划`,
+    description: msg`用户授权行动助理去做真实世界动作时的偏好和约束。`,
+    consumers: [msg`动作运行时`],
   },
   {
     key: "memoryBlock",
-    label: "赛博分身记忆",
-    description: "供下游链路读取的压缩上下文块，用来补足短窗口。",
+    label: msg`赛博分身记忆`,
+    description: msg`供下游链路读取的压缩上下文块，用来补足短窗口。`,
     consumers: [
-      "self 单聊",
-      "self 群聊",
-      "主动跟进",
-      "动作运行时",
-      "scheduler 主动消息",
-      "需求发现",
+      msg`self 单聊`,
+      msg`self 群聊`,
+      msg`主动跟进`,
+      msg`动作运行时`,
+      msg`scheduler 主动消息`,
+      msg`需求发现`,
     ],
   },
 ];
 
-const RUN_MODE_LABELS: Record<CyberAvatarRunSummary["mode"], string> = {
-  incremental: "增量刷新",
-  deep_refresh: "深度刷新",
-  full_rebuild: "全量重建",
-  projection_only: "只重投影",
-  preview: "预览",
-  real_world_sync: "真实世界回流",
+const RUN_MODE_LABELS: Record<CyberAvatarRunSummary["mode"], ReturnType<typeof msg>> = {
+  incremental: msg`增量刷新`,
+  deep_refresh: msg`深度刷新`,
+  full_rebuild: msg`全量重建`,
+  projection_only: msg`只重投影`,
+  preview: msg`预览`,
+  real_world_sync: msg`真实世界回流`,
 };
 
-const SIGNAL_TYPE_LABELS: Record<CyberAvatarSignal["signalType"], string> = {
-  direct_message: "单聊消息",
-  group_message: "群聊消息",
-  moment_post: "朋友圈发布",
-  feed_post: "广场动态",
-  channel_post: "视频号内容",
-  feed_interaction: "内容互动",
-  friendship_event: "社交关系变化",
-  owner_profile_update: "世界主人资料更新",
-  search_activity: "搜索行为",
-  favorite_action: "收藏动作",
-  real_world_action: "真实世界动作",
-  location_update: "位置更新",
-  real_world_item: "真实世界条目",
-  real_world_brief: "真实世界简报",
+const SIGNAL_TYPE_LABELS: Record<CyberAvatarSignal["signalType"], ReturnType<typeof msg>> = {
+  direct_message: msg`单聊消息`,
+  group_message: msg`群聊消息`,
+  moment_post: msg`朋友圈发布`,
+  feed_post: msg`广场动态`,
+  channel_post: msg`视频号内容`,
+  feed_interaction: msg`内容互动`,
+  friendship_event: msg`社交关系变化`,
+  owner_profile_update: msg`世界主人资料更新`,
+  search_activity: msg`搜索行为`,
+  favorite_action: msg`收藏动作`,
+  real_world_action: msg`真实世界动作`,
+  location_update: msg`位置更新`,
+  real_world_item: msg`真实世界条目`,
+  real_world_brief: msg`真实世界简报`,
 };
 
-const SURFACE_LABELS: Record<string, string> = {
-  chat: "聊天",
-  group: "群聊",
-  moments: "朋友圈",
-  feed: "广场",
-  channels: "视频号",
-  social: "社交",
-  owner: "世界主人",
-  real_world: "真实世界",
+const SURFACE_LABELS: Record<string, ReturnType<typeof msg>> = {
+  chat: msg`聊天`,
+  group: msg`群聊`,
+  moments: msg`朋友圈`,
+  feed: msg`广场`,
+  channels: msg`视频号`,
+  social: msg`社交`,
+  owner: msg`世界主人`,
+  real_world: msg`真实世界`,
 };
 
 const SOURCE_TOGGLE_FIELDS: Array<{
   key: keyof CyberAvatarRuntimeRules["sourceToggles"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { key: "includeDirectMessages", label: "单聊消息" },
-  { key: "includeGroupMessages", label: "群聊消息" },
-  { key: "includeMomentPosts", label: "朋友圈" },
-  { key: "includeFeedPosts", label: "广场动态" },
-  { key: "includeChannelPosts", label: "视频号" },
-  { key: "includeFeedInteractions", label: "内容互动" },
-  { key: "includeFriendshipEvents", label: "社交关系" },
-  { key: "includeOwnerProfileUpdates", label: "资料更新" },
-  { key: "includeSearchActivity", label: "搜索行为" },
-  { key: "includeFavoriteActions", label: "收藏动作" },
-  { key: "includeRealWorldActions", label: "真实世界动作" },
-  { key: "includeLocationUpdates", label: "位置更新" },
-  { key: "includeRealWorldItems", label: "真实世界条目" },
-  { key: "includeRealWorldBriefs", label: "真实世界简报" },
+  { key: "includeDirectMessages", label: msg`单聊消息` },
+  { key: "includeGroupMessages", label: msg`群聊消息` },
+  { key: "includeMomentPosts", label: msg`朋友圈` },
+  { key: "includeFeedPosts", label: msg`广场动态` },
+  { key: "includeChannelPosts", label: msg`视频号` },
+  { key: "includeFeedInteractions", label: msg`内容互动` },
+  { key: "includeFriendshipEvents", label: msg`社交关系` },
+  { key: "includeOwnerProfileUpdates", label: msg`资料更新` },
+  { key: "includeSearchActivity", label: msg`搜索行为` },
+  { key: "includeFavoriteActions", label: msg`收藏动作` },
+  { key: "includeRealWorldActions", label: msg`真实世界动作` },
+  { key: "includeLocationUpdates", label: msg`位置更新` },
+  { key: "includeRealWorldItems", label: msg`真实世界条目` },
+  { key: "includeRealWorldBriefs", label: msg`真实世界简报` },
 ];
 
 const PROMPT_TEMPLATE_FIELDS: Array<{
   key: keyof CyberAvatarRuntimeRules["promptTemplates"];
-  label: string;
-  description: string;
+  label: ReturnType<typeof msg>;
+  description: ReturnType<typeof msg>;
 }> = [
   {
     key: "incrementalDigestPrompt",
-    label: "增量刷新 Prompt",
-    description: "面向 pending signals 的快速画像更新指令。",
+    label: msg`增量刷新 Prompt`,
+    description: msg`面向 pending signals 的快速画像更新指令。`,
   },
   {
     key: "deepRefreshPrompt",
-    label: "深度刷新 Prompt",
-    description: "面向较大窗口历史信号的重构指令。",
+    label: msg`深度刷新 Prompt`,
+    description: msg`面向较大窗口历史信号的重构指令。`,
   },
   {
     key: "projectionCoreInstructionTemplate",
-    label: "核心约束模板",
-    description: "生成 coreInstruction 的模板。",
+    label: msg`核心约束模板`,
+    description: msg`生成 coreInstruction 的模板。`,
   },
   {
     key: "projectionWorldInteractionTemplate",
-    label: "世界内互动模板",
-    description: "生成 worldInteractionPrompt 的模板。",
+    label: msg`世界内互动模板`,
+    description: msg`生成 worldInteractionPrompt 的模板。`,
   },
   {
     key: "projectionRealWorldInteractionTemplate",
-    label: "真实世界互动模板",
-    description: "生成 realWorldInteractionPrompt 的模板。",
+    label: msg`真实世界互动模板`,
+    description: msg`生成 realWorldInteractionPrompt 的模板。`,
   },
   {
     key: "projectionProactiveTemplate",
-    label: "主动跟进模板",
-    description: "生成 proactivePrompt 的模板。",
+    label: msg`主动跟进模板`,
+    description: msg`生成 proactivePrompt 的模板。`,
   },
   {
     key: "projectionActionPlanningTemplate",
-    label: "动作规划模板",
-    description: "生成 actionPlanningPrompt 的模板。",
+    label: msg`动作规划模板`,
+    description: msg`生成 actionPlanningPrompt 的模板。`,
   },
   {
     key: "projectionMemoryTemplate",
-    label: "记忆块模板",
-    description: "生成 memoryBlock 的模板。",
+    label: msg`记忆块模板`,
+    description: msg`生成 memoryBlock 的模板。`,
   },
 ];
 
@@ -259,7 +259,7 @@ function formatDateTime(value?: string | null) {
   );
 }
 
-function joinList(items: string[], emptyLabel = "暂无") {
+function joinList(items: string[], emptyLabel = translateRuntimeMessage(msg`暂无`)) {
   return items.length ? items.join(" / ") : emptyLabel;
 }
 
@@ -305,15 +305,16 @@ function resolveProfileTone(status: string) {
 }
 
 function translateRunMode(mode: CyberAvatarRunSummary["mode"]) {
-  return RUN_MODE_LABELS[mode] ?? mode;
+  return translateRuntimeMessage(RUN_MODE_LABELS[mode] ?? msg`${mode}`);
 }
 
 function translateSignalType(type: CyberAvatarSignal["signalType"]) {
-  return SIGNAL_TYPE_LABELS[type] ?? type;
+  return translateRuntimeMessage(SIGNAL_TYPE_LABELS[type] ?? msg`${type}`);
 }
 
 function translateSurface(surface: string) {
-  return SURFACE_LABELS[surface] ?? surface;
+  const label = SURFACE_LABELS[surface];
+  return label ? translateRuntimeMessage(label) : surface;
 }
 
 function buildOperatorSummary(input: {
@@ -331,48 +332,48 @@ function buildOperatorSummary(input: {
   if (input.hasRulesParseError) {
     tone = "warning";
     notes.push(
-      "规则草稿 JSON 当前无法解析，结构化编辑已不可用，先在原始 JSON 里修复格式。",
+      translateRuntimeMessage(msg`规则草稿 JSON 当前无法解析，结构化编辑已不可用，先在原始 JSON 里修复格式。`),
     );
   }
 
   if (input.profileStatus !== "ready") {
     tone = "warning";
     notes.push(
-      `画像当前状态为 ${input.profileStatus}，建议先检查最近一次 run 的输入快照和跳过/失败原因。`,
+      translateRuntimeMessage(msg`画像当前状态为 ${input.profileStatus}，建议先检查最近一次 run 的输入快照和跳过/失败原因。`),
     );
   }
 
   if (input.pendingSignalCount > 0) {
     tone = tone === "success" ? "info" : tone;
     notes.push(
-      `当前还有 ${input.pendingSignalCount} 条待处理信号，适合先跑一次增量刷新。`,
+      translateRuntimeMessage(msg`当前还有 ${input.pendingSignalCount} 条待处理信号，适合先跑一次增量刷新。`),
     );
   }
 
   if (input.missingSurfaces.length > 0) {
     tone = tone === "success" ? "info" : tone;
     notes.push(
-      `最近窗口缺失 ${joinList(input.missingSurfaces)}，可回到来源与回流里检查采集开关。`,
+      translateRuntimeMessage(msg`最近窗口缺失 ${joinList(input.missingSurfaces)}，可回到来源与回流里检查采集开关。`),
     );
   }
 
   if (input.realWorldEnabled && !input.hasLatestBrief) {
     tone = tone === "success" ? "info" : tone;
     notes.push(
-      "真实世界回流已启用但还没有最新简报，建议拉一次真实世界信息确认外部查询链路是否正常。",
+      translateRuntimeMessage(msg`真实世界回流已启用但还没有最新简报，建议拉一次真实世界信息确认外部查询链路是否正常。`),
     );
   }
 
   if (input.isRulesDirty) {
     tone = tone === "success" ? "info" : tone;
     notes.push(
-      "当前有未保存的规则草稿，若已确认变更，可以直接保存并跑一次重投影或增量刷新。",
+      translateRuntimeMessage(msg`当前有未保存的规则草稿，若已确认变更，可以直接保存并跑一次重投影或增量刷新。`),
     );
   }
 
   if (!notes.length) {
     notes.push(
-      "当前画像、Prompt 投影和真实世界回流都处于可运营状态，可以直接检查 Prompt 投影或做细粒度规则调优。",
+      translateRuntimeMessage(msg`当前画像、Prompt 投影和真实世界回流都处于可运营状态，可以直接检查 Prompt 投影或做细粒度规则调优。`),
     );
   }
 
@@ -380,15 +381,16 @@ function buildOperatorSummary(input: {
     tone,
     title:
       tone === "warning"
-        ? "当前有待处理项"
+        ? translateRuntimeMessage(msg`当前有待处理项`)
         : tone === "info"
-          ? "当前有可操作项"
-          : "当前运行状态稳定",
+          ? translateRuntimeMessage(msg`当前有可操作项`)
+          : translateRuntimeMessage(msg`当前运行状态稳定`),
     notes,
   };
 }
 
 export function CyberAvatarPage() {
+  const t = translateRuntimeMessage;
   const baseUrl = resolveAdminCoreApiBaseUrl();
   const queryClient = useQueryClient();
   const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>("overview");
@@ -509,7 +511,7 @@ export function CyberAvatarPage() {
   }, [overviewRulesJson, rulesJsonDraft]);
 
   if (overviewQuery.isLoading) {
-    return <LoadingBlock label="正在读取赛博分身概览..." />;
+    return <LoadingBlock label={t(msg`正在读取赛博分身概览...`)} />;
   }
 
   if (overviewQuery.isError && overviewQuery.error instanceof Error) {
@@ -519,8 +521,8 @@ export function CyberAvatarPage() {
   if (!overviewQuery.data) {
     return (
       <AdminEmptyState
-        title="赛博分身概览暂不可用"
-        description="后台还没有拿到画像、规则或运行记录。先检查后端 cyber-avatar 模块是否已成功加载。"
+        title={t(msg`赛博分身概览暂不可用`)}
+        description={t(msg`后台还没有拿到画像、规则或运行记录。先检查后端 cyber-avatar 模块是否已成功加载。`)}
       />
     );
   }
@@ -545,7 +547,7 @@ export function CyberAvatarPage() {
 
   function handleSaveRules() {
     if (!parsedRules) {
-      setRulesParseError("规则 JSON 解析失败，先修正格式再保存。");
+      setRulesParseError(t(msg`规则 JSON 解析失败，先修正格式再保存。`));
       setWorkspaceTab("rules");
       setRulesTab("json");
       return;
@@ -565,7 +567,7 @@ export function CyberAvatarPage() {
   ) {
     if (!parsedRules) {
       setRulesParseError(
-        "当前 JSON 草稿格式错误，先到“原始 JSON”里修复后再使用结构化编辑。",
+        t(msg`当前 JSON 草稿格式错误，先到”原始 JSON”里修复后再使用结构化编辑。`),
       );
       setWorkspaceTab("rules");
       setRulesTab("json");
@@ -578,23 +580,23 @@ export function CyberAvatarPage() {
   }
 
   const heroMetrics = [
-    { label: "画像版本", value: profile.version },
-    { label: "总信号数", value: profile.signalCount },
-    { label: "待处理信号", value: profile.pendingSignalCount },
+    { label: t(msg`画像版本`), value: profile.version },
+    { label: t(msg`总信号数`), value: profile.signalCount },
+    { label: t(msg`待处理信号`), value: profile.pendingSignalCount },
     {
-      label: "最近构建时间",
-      value: profile.lastBuiltAt ? formatDateTime(profile.lastBuiltAt) : "暂无",
+      label: t(msg`最近构建时间`),
+      value: profile.lastBuiltAt ? formatDateTime(profile.lastBuiltAt) : t(msg`暂无`),
     },
-    { label: "外部回流条目", value: realWorld.stats.acceptedItems },
-    { label: "活跃外部简报", value: realWorld.stats.activeBriefs },
+    { label: t(msg`外部回流条目`), value: realWorld.stats.acceptedItems },
+    { label: t(msg`活跃外部简报`), value: realWorld.stats.activeBriefs },
   ];
 
   return (
     <div className="space-y-6">
       <AdminPageHero
         eyebrow="Cyber Avatar Ops"
-        title="赛博分身建模、回流与运营工作台"
-        description="把用户在世界内的行为信号、画像状态、Prompt 投影、真实世界回流与 need-discovery 上游统一收进一个运营工作区，方便快速判断当前状态、定位异常并调整规则。"
+        title={t(msg`赛博分身建模、回流与运营工作台`)}
+        description={t(msg`把用户在世界内的行为信号、画像状态、Prompt 投影、真实世界回流与 need-discovery 上游统一收进一个运营工作区，方便快速判断当前状态、定位异常并调整规则。`)}
         actions={
           <>
             <Button
@@ -605,14 +607,14 @@ export function CyberAvatarPage() {
                 })
               }
             >
-              刷新概览
+              {t(msg`刷新概览`)}
             </Button>
             <Button
               variant="secondary"
               disabled={!isRulesDirty}
               onClick={resetRulesDraft}
             >
-              重置草稿
+              {t(msg`重置草稿`)}
             </Button>
             <Button
               variant="primary"
@@ -621,7 +623,7 @@ export function CyberAvatarPage() {
               }
               onClick={handleSaveRules}
             >
-              {saveRulesMutation.isPending ? "保存中..." : "保存规则"}
+              {saveRulesMutation.isPending ? t(msg`保存中...`) : t(msg`保存规则`)}
             </Button>
           </>
         }
@@ -649,7 +651,7 @@ export function CyberAvatarPage() {
                 setEvidenceTab("runs");
               }}
             >
-              查看运行证据
+              {t(msg`查看运行证据`)}
             </Button>
             <Button
               variant="secondary"
@@ -658,7 +660,7 @@ export function CyberAvatarPage() {
                 setRulesTab("common");
               }}
             >
-              去规则编辑
+              {t(msg`去规则编辑`)}
             </Button>
           </>
         }
@@ -667,8 +669,8 @@ export function CyberAvatarPage() {
       {saveRulesMutation.isSuccess ? (
         <AdminActionFeedback
           tone="success"
-          title="赛博分身规则已保存"
-          description="新的抓取开关、调度参数和提示词模板已经写入系统配置。"
+          title={t(msg`赛博分身规则已保存`)}
+          description={t(msg`新的抓取开关、调度参数和提示词模板已经写入系统配置。`)}
         />
       ) : null}
       {saveRulesMutation.isError && saveRulesMutation.error instanceof Error ? (
@@ -678,8 +680,8 @@ export function CyberAvatarPage() {
       {runMutation.isSuccess ? (
         <AdminActionFeedback
           tone="success"
-          title={`运行已完成：${translateRunMode(runMutation.data.mode)}`}
-          description={`状态 ${runMutation.data.status}，处理了 ${runMutation.data.signalCount} 条信号。`}
+          title={t(msg`运行已完成：${translateRunMode(runMutation.data.mode)}`)}
+          description={t(msg`状态 ${runMutation.data.status}，处理了 ${runMutation.data.signalCount} 条信号。`)}
         />
       ) : null}
       {runMutation.isError && runMutation.error instanceof Error ? (
@@ -689,68 +691,65 @@ export function CyberAvatarPage() {
       <div className="grid gap-6 xl:grid-cols-[0.36fr_0.64fr]">
         <div className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <AdminSectionNav
-            title="工作区"
+            title={t(msg`工作区`)}
             items={[
               {
-                label: "运营总览",
-                detail:
-                  "先判断画像健康度、真实世界回流和 need-discovery 上游是否正常。",
+                label: t(msg`运营总览`),
+                detail: t(msg`先判断画像健康度、真实世界回流和 need-discovery 上游是否正常。`),
                 onClick: () => setWorkspaceTab("overview"),
               },
               {
-                label: "Prompt 投影",
-                detail:
-                  "逐段查看当前 projection，并确认它实际影响哪些下游链路。",
+                label: t(msg`Prompt 投影`),
+                detail: t(msg`逐段查看当前 projection，并确认它实际影响哪些下游链路。`),
                 onClick: () => setWorkspaceTab("projection"),
               },
               {
-                label: "运行证据",
-                detail:
-                  "回看最近 runs、signals、real-world items 和 briefs，定位画像变化来源。",
+                label: t(msg`运行证据`),
+                detail: t(msg`回看最近 runs、signals、real-world items 和 briefs，定位画像变化来源。`),
                 onClick: () => setWorkspaceTab("evidence"),
               },
               {
-                label: "规则编辑",
-                detail: "优先用结构化配置改高频参数，需要时再进入原始 JSON。",
+                label: t(msg`规则编辑`),
+                detail: t(msg`优先用结构化配置改高频参数，需要时再进入原始 JSON。`),
                 onClick: () => setWorkspaceTab("rules"),
               },
             ]}
           />
 
           <Card className="bg-[color:var(--surface-console)]">
-            <AdminSectionHeader title="快捷运行" />
+            <AdminSectionHeader title={t(msg`快捷运行`)} />
             <div className="mt-4 grid gap-3">
               <RunActionButton
-                label="跑一次增量刷新"
-                pendingLabel="执行中..."
+                label={t(msg`跑一次增量刷新`)}
+                pendingLabel={t(msg`执行中...`)}
                 active={runMutation.variables === "incremental"}
                 pending={runMutation.isPending}
                 onClick={() => runMutation.mutate("incremental")}
               />
               <RunActionButton
-                label="跑一次深度刷新"
-                pendingLabel="执行中..."
+                label={t(msg`跑一次深度刷新`)}
+                pendingLabel={t(msg`执行中...`)}
                 active={runMutation.variables === "deep_refresh"}
                 pending={runMutation.isPending}
                 onClick={() => runMutation.mutate("deep_refresh")}
               />
               <RunActionButton
-                label="全量重建"
-                pendingLabel="执行中..."
+                label={t(msg`全量重建`)}
+                pendingLabel={t(msg`执行中...`)}
                 active={runMutation.variables === "full_rebuild"}
                 pending={runMutation.isPending}
                 onClick={() => runMutation.mutate("full_rebuild")}
               />
               <RunActionButton
-                label="只重投影 Prompt"
-                pendingLabel="执行中..."
+                label={t(msg`只重投影 Prompt`)}
+                pendingLabel={t(msg`执行中...`)}
                 active={runMutation.variables === "project"}
                 pending={runMutation.isPending}
                 onClick={() => runMutation.mutate("project")}
               />
               <RunActionButton
-                label="拉一次真实世界信息"
-                pendingLabel="执行中..."
+                label={t(msg`拉一次真实世界信息`)}
+                pendingLabel={t(msg`执行中...`)}
                 active={runMutation.variables === "real_world"}
                 pending={runMutation.isPending}
                 onClick={() => runMutation.mutate("real_world")}
@@ -759,10 +758,10 @@ export function CyberAvatarPage() {
           </Card>
 
           <Card className="bg-[color:var(--surface-console)]">
-            <AdminSectionHeader title="当前脉冲" />
+            <AdminSectionHeader title={t(msg`当前脉冲`)} />
             <div className="mt-4 grid gap-3">
               <AdminValueCard
-                label="画像状态"
+                label={t(msg`画像状态`)}
                 value={
                   <StatusPill tone={resolveProfileTone(profile.status)}>
                     {profile.status}
@@ -770,27 +769,27 @@ export function CyberAvatarPage() {
                 }
               />
               <AdminValueCard
-                label="当前情绪 / 能量"
-                value={`${profile.liveState.mood || "暂无"} / ${profile.liveState.energy || "暂无"}`}
+                label={t(msg`当前情绪 / 能量`)}
+                value={`${profile.liveState.mood || t(msg`暂无`)} / ${profile.liveState.energy || t(msg`暂无`)}`}
               />
               <AdminValueCard
-                label="社交温度"
-                value={profile.liveState.socialTemperature || "暂无"}
+                label={t(msg`社交温度`)}
+                value={profile.liveState.socialTemperature || t(msg`暂无`)}
               />
               <AdminValueCard
-                label="最新 focus"
+                label={t(msg`最新 focus`)}
                 value={joinList(profile.liveState.focus)}
               />
               <AdminValueCard
-                label="最后信号时间"
+                label={t(msg`最后信号时间`)}
                 value={formatDateTime(profile.lastSignalAt)}
               />
               <AdminValueCard
-                label="最新外部简报"
+                label={t(msg`最新外部简报`)}
                 value={
                   realWorld.latestBrief
                     ? formatDateTime(realWorld.latestBrief.createdAt)
-                    : "暂无"
+                    : t(msg`暂无`)
                 }
               />
             </div>
@@ -798,7 +797,7 @@ export function CyberAvatarPage() {
 
           <Card className="bg-[color:var(--surface-console)]">
             <AdminSectionHeader
-              title="当前选中运行"
+              title={t(msg`当前选中运行`)}
               actions={
                 activeRun ? (
                   <StatusPill tone={resolveRunTone(activeRun.status)}>
@@ -811,16 +810,15 @@ export function CyberAvatarPage() {
               {activeRun ? (
                 <div className="space-y-3">
                   <AdminSoftBox>
-                    {translateRunMode(activeRun.mode)} · 画像版本 v
-                    {activeRun.profileVersion}
+                    {t(msg`${translateRunMode(activeRun.mode)} · 画像版本 v${activeRun.profileVersion}`)}
                   </AdminSoftBox>
                   <AdminInfoRows
-                    title="运行摘要"
+                    title={t(msg`运行摘要`)}
                     rows={[
-                      { label: "触发方式", value: activeRun.trigger },
-                      { label: "处理信号", value: activeRun.signalCount },
+                      { label: t(msg`触发方式`), value: activeRun.trigger },
+                      { label: t(msg`处理信号`), value: activeRun.signalCount },
                       {
-                        label: "时间窗口",
+                        label: t(msg`时间窗口`),
                         value: `${formatDateTime(activeRun.windowStartedAt)} → ${formatDateTime(activeRun.windowEndedAt)}`,
                       },
                     ]}
@@ -828,8 +826,8 @@ export function CyberAvatarPage() {
                 </div>
               ) : (
                 <AdminEmptyState
-                  title="尚未选择运行"
-                  description="执行一次刷新或从运行证据里选中某条 run。"
+                  title={t(msg`尚未选择运行`)}
+                  description={t(msg`执行一次刷新或从运行证据里选中某条 run。`)}
                 />
               )}
             </div>
@@ -838,7 +836,7 @@ export function CyberAvatarPage() {
 
         <div className="space-y-6">
           <AdminTabs
-            tabs={WORKSPACE_TABS}
+            tabs={WORKSPACE_TABS.map((tab) => ({ ...tab, label: t(tab.label) }))}
             activeKey={workspaceTab}
             onChange={(key) => setWorkspaceTab(key as WorkspaceTab)}
           />
@@ -929,11 +927,12 @@ function OverviewWorkspace({
   realWorld: CyberAvatarRealWorldOverview;
   needDiscoveryQuery: UseQueryResult<NeedDiscoveryOverview>;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <div className="space-y-6">
       <Card className="bg-[color:var(--surface-console)]">
         <AdminSectionHeader
-          title="画像健康与构建状态"
+          title={t(msg`画像健康与构建状态`)}
           actions={
             <StatusPill tone={resolveProfileTone(profile.status)}>
               {profile.status}
@@ -942,46 +941,46 @@ function OverviewWorkspace({
         />
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <MetricCard
-            label="liveState 置信度"
+            label={t(msg`liveState 置信度`)}
             value={profile.confidence.liveState.toFixed(2)}
           />
           <MetricCard
-            label="recentState 置信度"
+            label={t(msg`recentState 置信度`)}
             value={profile.confidence.recentState.toFixed(2)}
           />
           <MetricCard
-            label="stableCore 置信度"
+            label={t(msg`stableCore 置信度`)}
             value={profile.confidence.stableCore.toFixed(2)}
           />
           <MetricCard
-            label="覆盖窗口"
-            value={`${profile.sourceCoverage.windowDays} 天`}
+            label={t(msg`覆盖窗口`)}
+            value={t(msg`${profile.sourceCoverage.windowDays} 天`)}
           />
         </div>
         <div className="mt-4 grid gap-4 xl:grid-cols-2">
           <AdminInfoRows
-            title="构建状态"
+            title={t(msg`构建状态`)}
             rows={[
               {
-                label: "最后信号时间",
+                label: t(msg`最后信号时间`),
                 value: formatDateTime(profile.lastSignalAt),
               },
               {
-                label: "最后构建时间",
+                label: t(msg`最后构建时间`),
                 value: formatDateTime(profile.lastBuiltAt),
               },
               {
-                label: "最后投影时间",
+                label: t(msg`最后投影时间`),
                 value: formatDateTime(profile.lastProjectedAt),
               },
-              { label: "最后运行 ID", value: profile.lastRunId ?? "暂无" },
+              { label: t(msg`最后运行 ID`), value: profile.lastRunId ?? t(msg`暂无`) },
             ]}
           />
           <AdminInfoRows
-            title="信号覆盖"
+            title={t(msg`信号覆盖`)}
             rows={[
               {
-                label: "覆盖面",
+                label: t(msg`覆盖面`),
                 value: joinList(
                   profile.sourceCoverage.coveredSurfaces.map((item) =>
                     translateSurface(item),
@@ -989,16 +988,16 @@ function OverviewWorkspace({
                 ),
               },
               {
-                label: "缺失面",
+                label: t(msg`缺失面`),
                 value: joinList(
                   profile.sourceCoverage.missingSurfaces.map((item) =>
                     translateSurface(item),
                   ),
                 ),
               },
-              { label: "当前 focus", value: joinList(profile.liveState.focus) },
+              { label: t(msg`当前 focus`), value: joinList(profile.liveState.focus) },
               {
-                label: "活跃主题",
+                label: t(msg`活跃主题`),
                 value: joinList(profile.liveState.activeTopics),
               },
             ]}
@@ -1009,37 +1008,37 @@ function OverviewWorkspace({
       <div className="grid gap-4 xl:grid-cols-2">
         <ProfileStatePanel
           title="Live State"
-          subtitle="短窗口内最活跃、最即时的状态层"
+          subtitle={t(msg`短窗口内最活跃、最即时的状态层`)}
           summaryRows={[
-            { label: "情绪", value: profile.liveState.mood || "暂无" },
-            { label: "能量", value: profile.liveState.energy || "暂无" },
+            { label: t(msg`情绪`), value: profile.liveState.mood || t(msg`暂无`) },
+            { label: t(msg`能量`), value: profile.liveState.energy || t(msg`暂无`) },
             {
-              label: "社交温度",
-              value: profile.liveState.socialTemperature || "暂无",
+              label: t(msg`社交温度`),
+              value: profile.liveState.socialTemperature || t(msg`暂无`),
             },
           ]}
           groups={[
-            { label: "当前 focus", items: profile.liveState.focus },
-            { label: "活跃主题", items: profile.liveState.activeTopics },
-            { label: "Open Loops", items: profile.liveState.openLoops },
+            { label: t(msg`当前 focus`), items: profile.liveState.focus },
+            { label: t(msg`活跃主题`), items: profile.liveState.activeTopics },
+            { label: t(msg`Open Loops`), items: profile.liveState.openLoops },
           ]}
         />
         <ProfileStatePanel
           title="Recent State"
-          subtitle="近期重复出现的目标、摩擦和偏好信号"
+          subtitle={t(msg`近期重复出现的目标、摩擦和偏好信号`)}
           groups={[
-            { label: "近期目标", items: profile.recentState.recentGoals },
-            { label: "近期摩擦", items: profile.recentState.recentFriction },
+            { label: t(msg`近期目标`), items: profile.recentState.recentGoals },
+            { label: t(msg`近期摩擦`), items: profile.recentState.recentFriction },
             {
-              label: "偏好信号",
+              label: t(msg`偏好信号`),
               items: profile.recentState.recentPreferenceSignals,
             },
             {
-              label: "关系信号",
+              label: t(msg`关系信号`),
               items: profile.recentState.recentRelationshipSignals,
             },
             {
-              label: "Recurring Topics",
+              label: t(msg`Recurring Topics`),
               items: profile.recentState.recurringTopics,
             },
           ]}
@@ -1047,30 +1046,30 @@ function OverviewWorkspace({
       </div>
 
       <Card className="bg-[color:var(--surface-console)]">
-        <AdminSectionHeader title="Stable Core" />
+        <AdminSectionHeader title={t(msg`Stable Core`)} />
         <div className="mt-4 grid gap-4 xl:grid-cols-[0.85fr_1.15fr]">
-          <AdminMiniPanel title="身份摘要" className="bg-white/90">
+          <AdminMiniPanel title={t(msg`身份摘要`)} className="bg-white/90">
             <div className="text-sm leading-7 text-[color:var(--text-secondary)]">
-              {profile.stableCore.identitySummary || "暂无稳定身份摘要。"}
+              {profile.stableCore.identitySummary || t(msg`暂无稳定身份摘要。`)}
             </div>
           </AdminMiniPanel>
           <div className="grid gap-4 md:grid-cols-2">
-            <AdminMiniPanel title="沟通方式">
+            <AdminMiniPanel title={t(msg`沟通方式`)}>
               <PillList items={profile.stableCore.communicationStyle} />
             </AdminMiniPanel>
-            <AdminMiniPanel title="决策方式">
+            <AdminMiniPanel title={t(msg`决策方式`)}>
               <PillList items={profile.stableCore.decisionStyle} />
             </AdminMiniPanel>
-            <AdminMiniPanel title="偏好模型">
+            <AdminMiniPanel title={t(msg`偏好模型`)}>
               <PillList items={profile.stableCore.preferenceModel} />
             </AdminMiniPanel>
-            <AdminMiniPanel title="社交姿态">
+            <AdminMiniPanel title={t(msg`社交姿态`)}>
               <PillList items={profile.stableCore.socialPosture} />
             </AdminMiniPanel>
-            <AdminMiniPanel title="日常模式">
+            <AdminMiniPanel title={t(msg`日常模式`)}>
               <PillList items={profile.stableCore.routinePatterns} />
             </AdminMiniPanel>
-            <AdminMiniPanel title="边界与风险">
+            <AdminMiniPanel title={t(msg`边界与风险`)}>
               <PillList
                 items={[
                   ...profile.stableCore.boundaries,
@@ -1085,44 +1084,44 @@ function OverviewWorkspace({
       <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
         <Card className="bg-[color:var(--surface-console)]">
           <AdminSectionHeader
-            title="真实世界回流"
+            title={t(msg`真实世界回流`)}
             actions={
               <StatusPill tone={realWorld.latestBrief ? "healthy" : "muted"}>
-                {realWorld.latestBrief ? "已有最新简报" : "暂无简报"}
+                {realWorld.latestBrief ? t(msg`已有最新简报`) : t(msg`暂无简报`)}
               </StatusPill>
             }
           />
           <div className="mt-4 grid gap-4">
             <div className="grid gap-3 md:grid-cols-2">
               <MetricCard
-                label="接纳条目"
+                label={t(msg`接纳条目`)}
                 value={realWorld.stats.acceptedItems}
               />
               <MetricCard
-                label="活跃简报"
+                label={t(msg`活跃简报`)}
                 value={realWorld.stats.activeBriefs}
               />
             </div>
             <AdminInfoRows
-              title="回流状态"
+              title={t(msg`回流状态`)}
               rows={[
                 {
-                  label: "最近条目时间",
+                  label: t(msg`最近条目时间`),
                   value: formatDateTime(realWorld.stats.latestAcceptedAt),
                 },
                 {
-                  label: "最近简报时间",
+                  label: t(msg`最近简报时间`),
                   value: formatDateTime(realWorld.stats.latestBriefAt),
                 },
                 {
-                  label: "Query Preview",
+                  label: t(msg`Query Preview`),
                   value: joinList(realWorld.queryPreview),
                 },
                 {
-                  label: "Need Discovery 上游",
+                  label: t(msg`Need Discovery 上游`),
                   value: realWorld.rules.feedNeedDiscoveryEnabled
-                    ? "已启用"
-                    : "已关闭",
+                    ? t(msg`已启用`)
+                    : t(msg`已关闭`),
                 },
               ]}
             />
@@ -1130,18 +1129,18 @@ function OverviewWorkspace({
               <RealWorldBriefPanel brief={realWorld.latestBrief} compact />
             ) : (
               <AdminEmptyState
-                title="还没有外部简报"
-                description="先手动执行一次真实世界回流，后台会把外部条目整理成一份可读简报。"
+                title={t(msg`还没有外部简报`)}
+                description={t(msg`先手动执行一次真实世界回流，后台会把外部条目整理成一份可读简报。`)}
               />
             )}
           </div>
         </Card>
 
         <Card className="bg-[color:var(--surface-console)]">
-          <AdminSectionHeader title="好友需求上游" />
+          <AdminSectionHeader title={t(msg`好友需求上游`)} />
           <div className="mt-4">
             {needDiscoveryQuery.isLoading ? (
-              <LoadingBlock label="正在读取好友需求发现概览..." />
+              <LoadingBlock label={t(msg`正在读取好友需求发现概览...`)} />
             ) : needDiscoveryQuery.isError &&
               needDiscoveryQuery.error instanceof Error ? (
               <ErrorBlock message={needDiscoveryQuery.error.message} />
@@ -1149,8 +1148,8 @@ function OverviewWorkspace({
               <NeedDiscoverySnapshotPanel detail={needDiscoveryQuery.data} />
             ) : (
               <AdminEmptyState
-                title="需求发现概览暂不可用"
-                description="后端 need-discovery 模块未返回数据。"
+                title={t(msg`需求发现概览暂不可用`)}
+                description={t(msg`后端 need-discovery 模块未返回数据。`)}
               />
             )}
           </div>
@@ -1171,14 +1170,15 @@ function ProjectionWorkspace({
   onProjectionTabChange: (value: ProjectionTab) => void;
   selectedProjection: (typeof PROJECTION_SECTIONS)[number];
 }) {
+  const t = translateRuntimeMessage;
   const selectedValue = profile.promptProjection[projectionTab];
 
   return (
     <div className="space-y-6">
       <Card className="bg-[color:var(--surface-console)]">
         <AdminSectionHeader
-          title="Prompt Projection Catalog"
-          actions={<StatusPill tone="muted">下游链路已标注</StatusPill>}
+          title={t(msg`Prompt Projection Catalog`)}
+          actions={<StatusPill tone="muted">{t(msg`下游链路已标注`)}</StatusPill>}
         />
         <div className="mt-4 grid gap-4 xl:grid-cols-[0.88fr_1.12fr]">
           <div className="space-y-3">
@@ -1199,24 +1199,24 @@ function ProjectionWorkspace({
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                        {section.label}
+                        {t(section.label)}
                       </div>
                       <div className="mt-1 text-xs leading-5 text-[color:var(--text-secondary)]">
-                        {section.description}
+                        {t(section.description)}
                       </div>
                     </div>
                     <StatusPill tone={value.trim() ? "healthy" : "muted"}>
-                      {value.trim() ? "已生成" : "空"}
+                      {value.trim() ? t(msg`已生成`) : t(msg`空`)}
                     </StatusPill>
                   </div>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
                     <AdminValueCard
-                      label="长度"
-                      value={`${value.trim().length} 字`}
+                      label={t(msg`长度`)}
+                      value={t(msg`${value.trim().length} 字`)}
                     />
                     <AdminValueCard
-                      label="下游"
-                      value={`${section.consumers.length} 条`}
+                      label={t(msg`下游`)}
+                      value={t(msg`${section.consumers.length} 条`)}
                     />
                   </div>
                 </button>
@@ -1226,35 +1226,35 @@ function ProjectionWorkspace({
 
           <Card className="bg-white/90">
             <AdminSectionHeader
-              title={selectedProjection.label}
+              title={t(selectedProjection.label)}
               actions={
                 <StatusPill tone={selectedValue.trim() ? "healthy" : "muted"}>
-                  {selectedValue.trim() ? "当前生效中" : "当前为空"}
+                  {selectedValue.trim() ? t(msg`当前生效中`) : t(msg`当前为空`)}
                 </StatusPill>
               }
             />
             <div className="mt-4 grid gap-4">
-              <AdminSoftBox>{selectedProjection.description}</AdminSoftBox>
+              <AdminSoftBox>{t(selectedProjection.description)}</AdminSoftBox>
               <AdminInfoRows
-                title="下游消费链路"
+                title={t(msg`下游消费链路`)}
                 rows={[
                   {
-                    label: "影响范围",
-                    value: joinList(selectedProjection.consumers),
+                    label: t(msg`影响范围`),
+                    value: joinList(selectedProjection.consumers.map((c) => t(c))),
                   },
                   {
-                    label: "建议检查",
+                    label: t(msg`建议检查`),
                     value:
                       selectedProjection.key === "memoryBlock"
-                        ? "关注过长或过泛，避免把短窗口信息再次稀释。"
+                        ? t(msg`关注过长或过泛，避免把短窗口信息再次稀释。`)
                         : selectedProjection.key === "coreInstruction"
-                          ? "优先检查边界、口吻和长期稳定偏好是否被正确收口。"
-                          : "查看对应下游链路是否出现行为偏差，再回看这段内容。",
+                          ? t(msg`优先检查边界、口吻和长期稳定偏好是否被正确收口。`)
+                          : t(msg`查看对应下游链路是否出现行为偏差，再回看这段内容。`),
                   },
                 ]}
               />
               <AdminCodeBlock
-                value={selectedValue || "暂无"}
+                value={selectedValue || t(msg`暂无`)}
                 className="min-h-[360px]"
               />
             </div>
@@ -1286,12 +1286,13 @@ function EvidenceWorkspace({
   activeRun: CyberAvatarRunDetail | undefined;
   runDetailQuery: UseQueryResult<CyberAvatarRunDetail>;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <Card className="bg-[color:var(--surface-console)]">
-      <AdminSectionHeader title="运行证据与输入样本" />
+      <AdminSectionHeader title={t(msg`运行证据与输入样本`)} />
       <div className="mt-4 space-y-4">
         <AdminTabs
-          tabs={EVIDENCE_TABS}
+          tabs={EVIDENCE_TABS.map((tab) => ({ ...tab, label: t(tab.label) }))}
           activeKey={evidenceTab}
           onChange={(key) => onEvidenceTabChange(key as EvidenceTab)}
         />
@@ -1309,8 +1310,8 @@ function EvidenceWorkspace({
                         {run.status}
                       </StatusPill>
                     }
-                    meta={`触发方式 ${run.trigger} · ${formatDateTime(run.createdAt)}`}
-                    description={`处理信号 ${run.signalCount} 条${run.skipReason ? ` · 跳过原因 ${run.skipReason}` : ""}`}
+                    meta={t(msg`触发方式 ${run.trigger} · ${formatDateTime(run.createdAt)}`)}
+                    description={t(msg`处理信号 ${run.signalCount} 条${run.skipReason ? ` · 跳过原因 ${run.skipReason}` : ""}`)}
                     actions={
                       <Button
                         variant={
@@ -1319,7 +1320,7 @@ function EvidenceWorkspace({
                         size="sm"
                         onClick={() => onSelectRunId(run.id)}
                       >
-                        查看详情
+                        {t(msg`查看详情`)}
                       </Button>
                     }
                     className={
@@ -1331,14 +1332,14 @@ function EvidenceWorkspace({
                 ))
               ) : (
                 <AdminEmptyState
-                  title="还没有运行记录"
-                  description="先手动跑一次增量刷新或深度刷新，后台才会留下可观测的 run 快照。"
+                  title={t(msg`还没有运行记录`)}
+                  description={t(msg`先手动跑一次增量刷新或深度刷新，后台才会留下可观测的 run 快照。`)}
                 />
               )}
             </div>
             <div>
               {runDetailQuery.isLoading ? (
-                <LoadingBlock label="正在读取 run 详情..." />
+                <LoadingBlock label={t(msg`正在读取 run 详情...`)} />
               ) : runDetailQuery.isError &&
                 runDetailQuery.error instanceof Error ? (
                 <ErrorBlock message={runDetailQuery.error.message} />
@@ -1346,8 +1347,8 @@ function EvidenceWorkspace({
                 <CyberAvatarRunDetailPanel detail={activeRun} />
               ) : (
                 <AdminEmptyState
-                  title="未选择运行记录"
-                  description="从左侧点开一条运行记录，就能看到输入快照、聚合结果、提示词和 merge diff。"
+                  title={t(msg`未选择运行记录`)}
+                  description={t(msg`从左侧点开一条运行记录，就能看到输入快照、聚合结果、提示词和 merge diff。`)}
                 />
               )}
             </div>
@@ -1375,15 +1376,15 @@ function EvidenceWorkspace({
                         className="max-h-56 overflow-y-auto"
                       />
                     ) : (
-                      <AdminMetaText>当前无 payload</AdminMetaText>
+                      <AdminMetaText>{t(msg`当前无 payload`)}</AdminMetaText>
                     )
                   }
                 />
               ))
             ) : (
               <AdminEmptyState
-                title="还没有行为信号"
-                description="等用户产生聊天、朋友圈、广场或社交操作之后，这里会开始积累赛博分身的输入证据。"
+                title={t(msg`还没有行为信号`)}
+                description={t(msg`等用户产生聊天、朋友圈、广场或社交操作之后，这里会开始积累赛博分身的输入证据。`)}
               />
             )}
           </div>
@@ -1405,12 +1406,12 @@ function EvidenceWorkspace({
                   description={item.normalizedSummary}
                   details={
                     <AdminInfoRows
-                      title="条目详情"
+                      title={t(msg`条目详情`)}
                       rows={[
-                        { label: "查询", value: item.queryText },
-                        { label: "标签", value: joinList(item.topicTags) },
+                        { label: t(msg`查询`), value: item.queryText },
+                        { label: t(msg`标签`), value: joinList(item.topicTags) },
                         {
-                          label: "综合分",
+                          label: t(msg`综合分`),
                           value: item.compositeScore.toFixed(2),
                         },
                       ]}
@@ -1420,8 +1421,8 @@ function EvidenceWorkspace({
               ))
             ) : (
               <AdminEmptyState
-                title="还没有回流条目"
-                description="拉取真实世界信息后，这里会显示被接纳或被过滤的外部条目。"
+                title={t(msg`还没有回流条目`)}
+                description={t(msg`拉取真实世界信息后，这里会显示被接纳或被过滤的外部条目。`)}
               />
             )}
           </div>
@@ -1433,8 +1434,8 @@ function EvidenceWorkspace({
               <RealWorldBriefPanel brief={realWorld.latestBrief} />
             ) : (
               <AdminEmptyState
-                title="还没有外部简报"
-                description="先手动执行一次真实世界回流，后台会把外部条目整理成一份可读简报。"
+                title={t(msg`还没有外部简报`)}
+                description={t(msg`先手动执行一次真实世界回流，后台会把外部条目整理成一份可读简报。`)}
               />
             )}
 
@@ -1465,7 +1466,7 @@ function EvidenceWorkspace({
         {evidenceTab === "need-discovery" ? (
           <div>
             {needDiscoveryQuery.isLoading ? (
-              <LoadingBlock label="正在读取好友需求发现概览..." />
+              <LoadingBlock label={t(msg`正在读取好友需求发现概览...`)} />
             ) : needDiscoveryQuery.isError &&
               needDiscoveryQuery.error instanceof Error ? (
               <ErrorBlock message={needDiscoveryQuery.error.message} />
@@ -1473,8 +1474,8 @@ function EvidenceWorkspace({
               <NeedDiscoverySnapshotPanel detail={needDiscoveryQuery.data} />
             ) : (
               <AdminEmptyState
-                title="需求发现概览暂不可用"
-                description="后端 need-discovery 模块未返回数据。"
+                title={t(msg`需求发现概览暂不可用`)}
+                description={t(msg`后端 need-discovery 模块未返回数据。`)}
               />
             )}
           </div>
@@ -1503,6 +1504,7 @@ function RulesWorkspace({
     updater: (current: CyberAvatarRuntimeRules) => CyberAvatarRuntimeRules,
   ) => void;
 }) {
+  const t = translateRuntimeMessage;
   const enabledSourceCount = parsedRules
     ? Object.values(parsedRules.sourceToggles).filter(Boolean).length
     : 0;
@@ -1510,49 +1512,49 @@ function RulesWorkspace({
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
-        title="规则与提示词配置"
+        title={t(msg`规则与提示词配置`)}
         actions={<AdminDraftStatusPill ready dirty={isRulesDirty} />}
       />
       <div className="mt-4 space-y-4">
         <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
           <AdminInfoRows
-            title="当前草稿快照"
+            title={t(msg`当前草稿快照`)}
             rows={[
               {
-                label: "自动建模",
-                value: parsedRules?.enabled ? "已启用" : "已关闭",
+                label: t(msg`自动建模`),
+                value: parsedRules?.enabled ? t(msg`已启用`) : t(msg`已关闭`),
               },
               {
-                label: "采集来源",
+                label: t(msg`采集来源`),
                 value: parsedRules
-                  ? `${enabledSourceCount} 项已启用`
-                  : "草稿无效",
+                  ? t(msg`${enabledSourceCount} 项已启用`)
+                  : t(msg`草稿无效`),
               },
               {
-                label: "真实世界回流",
+                label: t(msg`真实世界回流`),
                 value: parsedRules?.interaction.realWorldSyncEnabled
-                  ? "已启用"
-                  : "已关闭",
+                  ? t(msg`已启用`)
+                  : t(msg`已关闭`),
               },
               {
-                label: "提示词模板",
-                value: parsedRules ? "可结构化编辑" : "先修复 JSON",
+                label: t(msg`提示词模板`),
+                value: parsedRules ? t(msg`可结构化编辑`) : t(msg`先修复 JSON`),
               },
             ]}
           />
           <AdminCallout
-            tone={parsedRules ? "info" : "warning"}
-            title={parsedRules ? "推荐编辑方式" : "当前草稿有格式错误"}
+            tone={parsedRules ? “info” : “warning”}
+            title={parsedRules ? t(msg`推荐编辑方式`) : t(msg`当前草稿有格式错误`)}
             description={
               parsedRules
-                ? "高频开关、调度参数和提示词模板优先在结构化表单里改；需要一次性改很多字段时再切到原始 JSON。"
-                : "当前 JSON 草稿无法解析，结构化编辑会被锁住。先切到“原始 JSON”修复格式，页面会自动恢复结构化视图。"
+                ? t(msg`高频开关、调度参数和提示词模板优先在结构化表单里改；需要一次性改很多字段时再切到原始 JSON。`)
+                : t(msg`当前 JSON 草稿无法解析，结构化编辑会被锁住。先切到”原始 JSON”修复格式，页面会自动恢复结构化视图。`)
             }
           />
         </div>
 
         <AdminTabs
-          tabs={RULE_TABS}
+          tabs={RULE_TABS.map((tab) => ({ ...tab, label: t(tab.label) }))}
           activeKey={rulesTab}
           onChange={(key) => onRulesTabChange(key as RulesTab)}
         />
@@ -1561,10 +1563,10 @@ function RulesWorkspace({
           parsedRules ? (
             <div className="space-y-6">
               <Card className="bg-white/90">
-                <AdminSectionHeader title="运行总开关" />
+                <AdminSectionHeader title={t(msg`运行总开关`)} />
                 <div className="mt-4 flex flex-wrap gap-2">
                   <AdminToggle
-                    label="启用赛博分身"
+                    label={t(msg`启用赛博分身`)}
                     checked={parsedRules.enabled}
                     onChange={(checked) =>
                       patchRulesDraft((current) => ({
@@ -1574,7 +1576,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminToggle
-                    label="启用采集"
+                    label={t(msg`启用采集`)}
                     checked={parsedRules.captureEnabled}
                     onChange={(checked) =>
                       patchRulesDraft((current) => ({
@@ -1584,7 +1586,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminToggle
-                    label="启用增量刷新"
+                    label={t(msg`启用增量刷新`)}
                     checked={parsedRules.incrementalUpdateEnabled}
                     onChange={(checked) =>
                       patchRulesDraft((current) => ({
@@ -1594,7 +1596,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminToggle
-                    label="启用深度刷新"
+                    label={t(msg`启用深度刷新`)}
                     checked={parsedRules.deepRefreshEnabled}
                     onChange={(checked) =>
                       patchRulesDraft((current) => ({
@@ -1604,7 +1606,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminToggle
-                    label="启用 Prompt 投影"
+                    label={t(msg`启用 Prompt 投影`)}
                     checked={parsedRules.projectionEnabled}
                     onChange={(checked) =>
                       patchRulesDraft((current) => ({
@@ -1614,7 +1616,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminToggle
-                    label="暂停自动更新"
+                    label={t(msg`暂停自动更新`)}
                     checked={parsedRules.pauseAutoUpdates}
                     onChange={(checked) =>
                       patchRulesDraft((current) => ({
@@ -1627,10 +1629,10 @@ function RulesWorkspace({
               </Card>
 
               <Card className="bg-white/90">
-                <AdminSectionHeader title="调度参数" />
+                <AdminSectionHeader title={t(msg`调度参数`)} />
                 <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                   <AdminTextField
-                    label="增量最小信号数"
+                    label={t(msg`增量最小信号数`)}
                     type="number"
                     value={parsedRules.scheduling.minSignalsPerIncrementalRun}
                     onChange={(value) =>
@@ -1644,7 +1646,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminTextField
-                    label="增量最大信号数"
+                    label={t(msg`增量最大信号数`)}
                     type="number"
                     value={parsedRules.scheduling.maxSignalsPerIncrementalRun}
                     onChange={(value) =>
@@ -1658,7 +1660,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminTextField
-                    label="增量最小间隔(分钟)"
+                    label={t(msg`增量最小间隔(分钟)`)}
                     type="number"
                     value={
                       parsedRules.scheduling.minMinutesBetweenIncrementalRuns
@@ -1674,7 +1676,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminTextField
-                    label="增量扫描周期(分钟)"
+                    label={t(msg`增量扫描周期(分钟)`)}
                     type="number"
                     value={parsedRules.scheduling.incrementalScanEveryMinutes}
                     onChange={(value) =>
@@ -1688,7 +1690,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminTextField
-                    label="深度刷新周期(小时)"
+                    label={t(msg`深度刷新周期(小时)`)}
                     type="number"
                     value={parsedRules.scheduling.deepRefreshEveryHours}
                     onChange={(value) =>
@@ -1702,7 +1704,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminTextField
-                    label="近期窗口(天)"
+                    label={t(msg`近期窗口(天)`)}
                     type="number"
                     value={parsedRules.scheduling.recentWindowDays}
                     onChange={(value) =>
@@ -1716,7 +1718,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminTextField
-                    label="稳定核心窗口(天)"
+                    label={t(msg`稳定核心窗口(天)`)}
                     type="number"
                     value={parsedRules.scheduling.stableCoreWindowDays}
                     onChange={(value) =>
@@ -1730,7 +1732,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminTextField
-                    label="全量重建窗口(天)"
+                    label={t(msg`全量重建窗口(天)`)}
                     type="number"
                     value={parsedRules.scheduling.fullRebuildWindowDays}
                     onChange={(value) =>
@@ -1747,10 +1749,10 @@ function RulesWorkspace({
               </Card>
 
               <Card className="bg-white/90">
-                <AdminSectionHeader title="稳定核心合并规则" />
+                <AdminSectionHeader title={t(msg`稳定核心合并规则`)} />
                 <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                   <AdminTextField
-                    label="稳定核心阈值"
+                    label={t(msg`稳定核心阈值`)}
                     type="number"
                     value={parsedRules.mergeRules.stableCoreChangeThreshold}
                     onChange={(value) =>
@@ -1764,7 +1766,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminTextField
-                    label="边界变化阈值"
+                    label={t(msg`边界变化阈值`)}
                     type="number"
                     value={parsedRules.mergeRules.boundaryChangeThreshold}
                     onChange={(value) =>
@@ -1778,7 +1780,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminTextField
-                    label="偏好衰减(天)"
+                    label={t(msg`偏好衰减(天)`)}
                     type="number"
                     value={parsedRules.mergeRules.preferenceDecayDays}
                     onChange={(value) =>
@@ -1792,7 +1794,7 @@ function RulesWorkspace({
                     }
                   />
                   <AdminTextField
-                    label="Open Loop 衰减(天)"
+                    label={t(msg`Open Loop 衰减(天)`)}
                     type="number"
                     value={parsedRules.mergeRules.openLoopDecayDays}
                     onChange={(value) =>
@@ -1811,8 +1813,8 @@ function RulesWorkspace({
           ) : (
             <AdminCallout
               tone="warning"
-              title="结构化编辑不可用"
-              description="当前草稿 JSON 无法解析，先去“原始 JSON”修复。"
+              title={t(msg`结构化编辑不可用`)}
+              description={t(msg`当前草稿 JSON 无法解析，先去“原始 JSON”修复。`)}
             />
           )
         ) : null}
@@ -1821,12 +1823,12 @@ function RulesWorkspace({
           parsedRules ? (
             <div className="space-y-6">
               <Card className="bg-white/90">
-                <AdminSectionHeader title="信号来源开关" />
+                <AdminSectionHeader title={t(msg`信号来源开关`)} />
                 <div className="mt-4 flex flex-wrap gap-2">
                   {SOURCE_TOGGLE_FIELDS.map((field) => (
                     <AdminToggle
                       key={field.key}
-                      label={field.label}
+                      label={t(field.label)}
                       checked={parsedRules.sourceToggles[field.key]}
                       onChange={(checked) =>
                         patchRulesDraft((current) => ({
@@ -1843,11 +1845,11 @@ function RulesWorkspace({
               </Card>
 
               <Card className="bg-white/90">
-                <AdminSectionHeader title="真实世界回流与上游联动" />
+                <AdminSectionHeader title={t(msg`真实世界回流与上游联动`)} />
                 <div className="mt-4 space-y-5">
                   <div className="flex flex-wrap gap-2">
                     <AdminToggle
-                      label="启用交互规则"
+                      label={t(msg`启用交互规则`)}
                       checked={parsedRules.interaction.enabled}
                       onChange={(checked) =>
                         patchRulesDraft((current) => ({
@@ -1860,7 +1862,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminToggle
-                      label="启用真实世界同步"
+                      label={t(msg`启用真实世界同步`)}
                       checked={parsedRules.interaction.realWorldSyncEnabled}
                       onChange={(checked) =>
                         patchRulesDraft((current) => ({
@@ -1873,7 +1875,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminToggle
-                      label="回流生成信号"
+                      label={t(msg`回流生成信号`)}
                       checked={parsedRules.interaction.createSignals}
                       onChange={(checked) =>
                         patchRulesDraft((current) => ({
@@ -1886,7 +1888,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminToggle
-                      label="喂给 Need Discovery"
+                      label={t(msg`喂给 Need Discovery`)}
                       checked={parsedRules.interaction.feedNeedDiscoveryEnabled}
                       onChange={(checked) =>
                         patchRulesDraft((current) => ({
@@ -1899,7 +1901,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminToggle
-                      label="空结果回退 mock"
+                      label={t(msg`空结果回退 mock`)}
                       checked={
                         parsedRules.interaction.googleNews.fallbackToMockOnEmpty
                       }
@@ -1920,7 +1922,7 @@ function RulesWorkspace({
 
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                     <AdminTextField
-                      label="每轮 Query 数"
+                      label={t(msg`每轮 Query 数`)}
                       type="number"
                       value={parsedRules.interaction.maxQueriesPerRun}
                       onChange={(value) =>
@@ -1934,7 +1936,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminTextField
-                      label="默认时效(小时)"
+                      label={t(msg`默认时效(小时)`)}
                       type="number"
                       value={parsedRules.interaction.defaultRecencyHours}
                       onChange={(value) =>
@@ -1948,7 +1950,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminTextField
-                      label="每个 Query 最大条目"
+                      label={t(msg`每个 Query 最大条目`)}
                       type="number"
                       value={parsedRules.interaction.maxItemsPerQuery}
                       onChange={(value) =>
@@ -1962,7 +1964,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminTextField
-                      label="每轮最多接纳条目"
+                      label={t(msg`每轮最多接纳条目`)}
                       type="number"
                       value={parsedRules.interaction.maxAcceptedItemsPerRun}
                       onChange={(value) =>
@@ -1976,7 +1978,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminTextField
-                      label="每份简报最多条目"
+                      label={t(msg`每份简报最多条目`)}
                       type="number"
                       value={parsedRules.interaction.maxItemsPerBrief}
                       onChange={(value) =>
@@ -1990,7 +1992,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminTextField
-                      label="最低接纳分"
+                      label={t(msg`最低接纳分`)}
                       type="number"
                       value={parsedRules.interaction.minimumItemScore}
                       onChange={(value) =>
@@ -2004,7 +2006,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminTextField
-                      label="同步周期(小时)"
+                      label={t(msg`同步周期(小时)`)}
                       type="number"
                       value={parsedRules.interaction.syncEveryHours}
                       onChange={(value) =>
@@ -2018,7 +2020,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminTextField
-                      label="Google News 语言"
+                      label={t(msg`Google News 语言`)}
                       value={parsedRules.interaction.googleNews.editionLanguage}
                       onChange={(value) =>
                         patchRulesDraft((current) => ({
@@ -2034,7 +2036,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminTextField
-                      label="Google News 地区"
+                      label={t(msg`Google News 地区`)}
                       value={parsedRules.interaction.googleNews.editionRegion}
                       onChange={(value) =>
                         patchRulesDraft((current) => ({
@@ -2066,7 +2068,7 @@ function RulesWorkspace({
                       }
                     />
                     <AdminTextField
-                      label="Google News 每轮条目"
+                      label={t(msg`Google News 每轮条目`)}
                       type="number"
                       value={
                         parsedRules.interaction.googleNews.maxEntriesPerQuery
@@ -2101,7 +2103,7 @@ function RulesWorkspace({
                           },
                         }))
                       }
-                      description="一行一个额外 Query，优先用来补手工关注主题。"
+                      description={t(msg`一行一个额外 Query，优先用来补手工关注主题。`)}
                       textareaClassName="min-h-[200px]"
                     />
                     <AdminTextArea
@@ -2116,7 +2118,7 @@ function RulesWorkspace({
                           },
                         }))
                       }
-                      description="一行一个允许源，留空表示不过滤。"
+                      description={t(msg`一行一个允许源，留空表示不过滤。`)}
                       textareaClassName="min-h-[200px]"
                     />
                     <AdminTextArea
@@ -2131,7 +2133,7 @@ function RulesWorkspace({
                           },
                         }))
                       }
-                      description="一行一个屏蔽源，用来快速剔除低质量来源。"
+                      description={t(msg`一行一个屏蔽源，用来快速剔除低质量来源。`)}
                       textareaClassName="min-h-[200px]"
                     />
                   </div>
@@ -2146,23 +2148,23 @@ function RulesWorkspace({
             </div>
           ) : (
             <AdminCallout
-              tone="warning"
-              title="结构化编辑不可用"
-              description="当前草稿 JSON 无法解析，先去“原始 JSON”修复。"
+              tone=”warning”
+              title={t(msg`结构化编辑不可用`)}
+              description={t(msg`当前草稿 JSON 无法解析，先去”原始 JSON”修复。`)}
             />
           )
         ) : null}
 
-        {rulesTab === "prompts" ? (
+        {rulesTab === “prompts” ? (
           parsedRules ? (
             <div className="space-y-6">
               <Card className="bg-white/90">
-                <AdminSectionHeader title="建模与投影模板" />
+                <AdminSectionHeader title={t(msg`建模与投影模板`)} />
                 <div className="mt-4 grid gap-4">
                   {PROMPT_TEMPLATE_FIELDS.map((field) => (
                     <AdminTextArea
                       key={field.key}
-                      label={field.label}
+                      label={t(field.label)}
                       value={parsedRules.promptTemplates[field.key]}
                       onChange={(value) =>
                         patchRulesDraft((current) => ({
@@ -2173,7 +2175,7 @@ function RulesWorkspace({
                           },
                         }))
                       }
-                      description={field.description}
+                      description={t(field.description)}
                       textareaClassName="min-h-[200px]"
                     />
                   ))}
@@ -2181,10 +2183,10 @@ function RulesWorkspace({
               </Card>
 
               <Card className="bg-white/90">
-                <AdminSectionHeader title="真实世界交互模板" />
+                <AdminSectionHeader title={t(msg`真实世界交互模板`)} />
                 <div className="mt-4">
                   <AdminTextArea
-                    label="真实世界简报 Prompt"
+                    label={t(msg`真实世界简报 Prompt`)}
                     value={
                       parsedRules.interaction.promptTemplates
                         .realWorldBriefPrompt
@@ -2201,7 +2203,7 @@ function RulesWorkspace({
                         },
                       }))
                     }
-                    description="把接纳条目整理成可读简报时使用。"
+                    description={t(msg`把接纳条目整理成可读简报时使用。`)}
                     textareaClassName="min-h-[220px]"
                   />
                 </div>
@@ -2209,38 +2211,38 @@ function RulesWorkspace({
             </div>
           ) : (
             <AdminCallout
-              tone="warning"
-              title="结构化编辑不可用"
-              description="当前草稿 JSON 无法解析，先去“原始 JSON”修复。"
+              tone=”warning”
+              title={t(msg`结构化编辑不可用`)}
+              description={t(msg`当前草稿 JSON 无法解析，先去”原始 JSON”修复。`)}
             />
           )
         ) : null}
 
-        {rulesTab === "json" ? (
+        {rulesTab === “json” ? (
           <Card className="bg-white/90">
             <AdminSectionHeader
-              title="原始 JSON"
+              title={t(msg`原始 JSON`)}
               actions={
                 <StatusPill tone={parsedRules ? "healthy" : "warning"}>
-                  {parsedRules ? "可解析" : "格式错误"}
+                  {parsedRules ? t(msg`可解析`) : t(msg`格式错误`)}
                 </StatusPill>
               }
             />
             <div className="mt-4 space-y-4">
               <AdminCallout
                 tone={parsedRules ? "info" : "warning"}
-                title={parsedRules ? "高级编辑模式" : "当前 JSON 无法解析"}
+                title={parsedRules ? t(msg`高级编辑模式`) : t(msg`当前 JSON 无法解析`)}
                 description={
                   parsedRules
-                    ? "适合批量改 signal weights、批量调模板或直接贴整段规则对象。这里的内容会和结构化编辑共用同一份草稿。"
-                    : "先修复这里的 JSON，再回到结构化编辑。页面会自动恢复结构化表单。"
+                    ? t(msg`适合批量改 signal weights、批量调模板或直接贴整段规则对象。这里的内容会和结构化编辑共用同一份草稿。`)
+                    : t(msg`先修复这里的 JSON，再回到结构化编辑。页面会自动恢复结构化表单。`)
                 }
               />
               <AdminTextArea
-                label="赛博分身规则 JSON"
+                label={t(msg`赛博分身规则 JSON`)}
                 value={rulesJsonDraft}
                 onChange={onRulesJsonDraftChange}
-                description="支持直接粘贴完整对象。保存前会重新做一次 JSON 解析。"
+                description={t(msg`支持直接粘贴完整对象。保存前会重新做一次 JSON 解析。`)}
                 textareaClassName="min-h-[640px] font-mono text-xs leading-6"
               />
             </div>
@@ -2292,7 +2294,7 @@ function ProfileStatePanel({
 
 function PillList({
   items,
-  emptyLabel = "暂无",
+  emptyLabel = translateRuntimeMessage(msg`暂无`),
 }: {
   items: string[];
   emptyLabel?: string;
@@ -2319,14 +2321,15 @@ function RealWorldBriefPanel({
   brief: CyberAvatarRealWorldBrief;
   compact?: boolean;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <div className="space-y-4">
       <AdminInfoRows
         title={brief.title}
         rows={[
-          { label: "简报日期", value: brief.briefDate },
+          { label: t(msg`简报日期`), value: brief.briefDate },
           {
-            label: "相关条目",
+            label: t(msg`相关条目`),
             value: brief.relatedItemIds.length
               ? String(brief.relatedItemIds.length)
               : "0",
@@ -2371,24 +2374,25 @@ function NeedDiscoverySnapshotPanel({
 }: {
   detail: NeedDiscoveryOverview;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <div className="space-y-4">
       <div className="grid gap-3 md:grid-cols-2">
-        <MetricCard label="待处理候选" value={detail.stats.pendingCandidates} />
+        <MetricCard label={t(msg`待处理候选`)} value={detail.stats.pendingCandidates} />
         <MetricCard
-          label="今日可生成上限"
+          label={t(msg`今日可生成上限`)}
           value={detail.config.shared.dailyCreationLimit}
         />
       </div>
       <AdminInfoRows
-        title="执行配置"
+        title={t(msg`执行配置`)}
         rows={[
           {
-            label: "短周期模式",
-            value: `${detail.config.shortInterval.executionMode} / ${detail.config.shortInterval.intervalMinutes} 分钟`,
+            label: t(msg`短周期模式`),
+            value: t(msg`${detail.config.shortInterval.executionMode} / ${detail.config.shortInterval.intervalMinutes} 分钟`),
           },
           {
-            label: "日周期模式",
+            label: t(msg`日周期模式`),
             value: `${detail.config.daily.executionMode} / ${detail.config.daily.runAtHour
               .toString()
               .padStart(2, "0")}:${detail.config.daily.runAtMinute
@@ -2396,15 +2400,15 @@ function NeedDiscoverySnapshotPanel({
               .padStart(2, "0")}`,
           },
           {
-            label: "允许领域",
+            label: t(msg`允许领域`),
             value:
               [
-                detail.config.shared.allowMedical ? "医疗" : null,
-                detail.config.shared.allowLegal ? "法律" : null,
-                detail.config.shared.allowFinance ? "金融" : null,
+                detail.config.shared.allowMedical ? t(msg`医疗`) : null,
+                detail.config.shared.allowLegal ? t(msg`法律`) : null,
+                detail.config.shared.allowFinance ? t(msg`金融`) : null,
               ]
                 .filter(Boolean)
-                .join(" / ") || "全部关闭",
+                .join(" / ") || t(msg`全部关闭`),
           },
         ]}
       />
@@ -2415,15 +2419,15 @@ function NeedDiscoverySnapshotPanel({
               key={candidate.id}
               title={`${candidate.needCategory} · ${candidate.needKey}`}
               badges={<StatusPill tone="muted">{candidate.status}</StatusPill>}
-              meta={`置信度 ${candidate.confidenceScore.toFixed(2)} · 优先级 ${candidate.priorityScore.toFixed(2)}`}
-              description={candidate.coverageGapSummary ?? "暂无覆盖缺口摘要"}
+              meta={t(msg`置信度 ${candidate.confidenceScore.toFixed(2)} · 优先级 ${candidate.priorityScore.toFixed(2)}`)}
+              description={candidate.coverageGapSummary ?? t(msg`暂无覆盖缺口摘要`)}
             />
           ))}
         </div>
       ) : (
         <AdminEmptyState
-          title="当前没有活跃候选"
-          description="真实世界简报和用户行为会继续作为 need-discovery 的上游输入。"
+          title={t(msg`当前没有活跃候选`)}
+          description={t(msg`真实世界简报和用户行为会继续作为 need-discovery 的上游输入。`)}
         />
       )}
     </div>
@@ -2435,21 +2439,22 @@ function CyberAvatarRunDetailPanel({
 }: {
   detail: CyberAvatarRunDetail;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <div className="space-y-4">
       <div className="grid gap-3 md:grid-cols-2">
-        <MetricCard label="模式" value={translateRunMode(detail.mode)} />
-        <MetricCard label="处理信号" value={detail.signalCount} />
+        <MetricCard label={t(msg`模式`)} value={translateRunMode(detail.mode)} />
+        <MetricCard label={t(msg`处理信号`)} value={detail.signalCount} />
       </div>
       <AdminInfoRows
-        title="执行摘要"
+        title={t(msg`执行摘要`)}
         rows={[
-          { label: "触发方式", value: detail.trigger },
-          { label: "画像版本", value: detail.profileVersion },
-          { label: "开始窗口", value: formatDateTime(detail.windowStartedAt) },
-          { label: "结束窗口", value: formatDateTime(detail.windowEndedAt) },
-          { label: "跳过原因", value: detail.skipReason ?? "无" },
-          { label: "错误信息", value: detail.errorMessage ?? "无" },
+          { label: t(msg`触发方式`), value: detail.trigger },
+          { label: t(msg`画像版本`), value: detail.profileVersion },
+          { label: t(msg`开始窗口`), value: formatDateTime(detail.windowStartedAt) },
+          { label: t(msg`结束窗口`), value: formatDateTime(detail.windowEndedAt) },
+          { label: t(msg`跳过原因`), value: detail.skipReason ?? t(msg`无`) },
+          { label: t(msg`错误信息`), value: detail.errorMessage ?? t(msg`无`) },
         ]}
       />
       <div className="space-y-4">
@@ -2479,11 +2484,12 @@ function RunSnapshotBlock({
   title: string;
   value: Record<string, unknown> | null | undefined;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <Card className="bg-white/90">
       <AdminSectionHeader title={title} />
       <div className="mt-3">
-        <AdminCodeBlock value={value ? safePrettyJson(value) : "暂无"} />
+        <AdminCodeBlock value={value ? safePrettyJson(value) : t(msg`暂无`)} />
       </div>
     </Card>
   );
