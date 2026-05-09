@@ -310,16 +310,19 @@ export class InferenceService implements OnModuleInit {
     await this.seedModelCatalog();
     await this.ensureDefaultProviderAccount();
     try {
-      const result = await this.installModelPersonas();
+      // 自动安装 12 个厂商家族角色（不再自动创建 30+ 个 model_persona 个体）；
+      // 旧 installModelPersonas 仍保留供 admin 端按需调用，但默认不再触发，
+      // 否则会和 family 角色重复，且每次 nest 重启都重建被合并/删除的旧角色。
+      const result = await this.installVendorFamilyPersonas();
       const changedCount = result.installedCount + result.updatedCount;
       if (changedCount > 0) {
         this.logger.log(
-          `Auto-installed model personas: +${result.installedCount}, updated ${result.updatedCount}, skipped ${result.skippedCount}.`,
+          `Auto-installed vendor-family personas: +${result.installedCount}, updated ${result.updatedCount}, skipped ${result.skippedCount}.`,
         );
       }
     } catch (error) {
       this.logger.warn(
-        `Failed to auto-install model personas: ${extractErrorMessage(error)}`,
+        `Failed to auto-install vendor-family personas: ${extractErrorMessage(error)}`,
       );
     }
   }
@@ -2480,8 +2483,8 @@ export class InferenceService implements OnModuleInit {
       }
 
       const built = this.buildVendorFamilyCharacterDraft(family, catalogById);
-      // 覆盖刷新时保留运行时积累的字段：记忆 / 关系图 / 最近活跃时间 / 实时状态。
-      // 否则点 "覆盖刷新" 会把家族角色和用户的对话积累全部清零。
+      // 覆盖刷新时保留运行时积累字段：记忆 / 真实世界感知 / 关系图 /
+      // 最近活跃 / 亲密度 / 当前状态。否则误点 "覆盖刷新" 会清零这些数据。
       const merged: Partial<CharacterEntity> = {
         ...existing,
         ...built,
@@ -2490,19 +2493,25 @@ export class InferenceService implements OnModuleInit {
         merged.profile = {
           ...built.profile,
           memory: existing.profile.memory ?? built.profile.memory,
+          // realWorldContext 由 real-world-sync 运行时填充
+          realWorldContext:
+            existing.profile.realWorldContext ?? built.profile.realWorldContext,
+          // wechatSyncImport 是导入元数据
+          wechatSyncImport:
+            existing.profile.wechatSyncImport ?? built.profile.wechatSyncImport,
         };
       }
-      if (existing?.aiRelationships !== undefined) {
-        merged.aiRelationships = existing.aiRelationships;
-      }
-      if (existing?.lastActiveAt !== undefined) {
-        merged.lastActiveAt = existing.lastActiveAt;
-      }
-      if (existing?.intimacyLevel !== undefined) {
+      if (existing) {
+        if (existing.aiRelationships !== undefined) {
+          merged.aiRelationships = existing.aiRelationships;
+        }
+        if (existing.lastActiveAt !== undefined) {
+          merged.lastActiveAt = existing.lastActiveAt;
+        }
         merged.intimacyLevel = existing.intimacyLevel;
-      }
-      if (existing?.currentStatus !== undefined) {
-        merged.currentStatus = existing.currentStatus;
+        if (existing.currentStatus !== undefined) {
+          merged.currentStatus = existing.currentStatus;
+        }
       }
       const saved = await this.characterRepo.save(
         this.characterRepo.create(merged),
