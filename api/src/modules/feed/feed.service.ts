@@ -30,6 +30,7 @@ import {
 import { WorldLanguageService } from '../config/world-language.service';
 import { MinimaxJobService } from '../minimax/minimax-job.service';
 import { MinimaxQuotaService } from '../minimax/minimax-quota.service';
+import { MinimaxClient } from '../minimax/minimax.client';
 import type { MinimaxVideoModel } from '../minimax/minimax.types';
 
 type FeedSurface = 'feed' | 'channels';
@@ -102,6 +103,7 @@ export class FeedService implements OnModuleInit {
     private readonly worldLanguage: WorldLanguageService,
     private readonly minimaxJobs: MinimaxJobService,
     private readonly minimaxQuota: MinimaxQuotaService,
+    private readonly minimaxClient: MinimaxClient,
   ) {}
 
   async onModuleInit() {
@@ -843,6 +845,13 @@ export class FeedService implements OnModuleInit {
   ): Promise<FeedPostEntity | null> {
     if (options?.skipAi) {
       // 视频号失败时跳过：topUp 路径不再用 demo 兜底，避免重复占视频额度。
+      return null;
+    }
+
+    if (!this.minimaxClient.isConfigured()) {
+      this.logger.warn(
+        'generateChannelPost skipped: MINIMAX_API_KEY not configured',
+      );
       return null;
     }
 

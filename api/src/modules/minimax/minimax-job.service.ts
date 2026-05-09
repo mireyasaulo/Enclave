@@ -2,7 +2,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { LessThan, Repository } from 'typeorm';
+import { resolveReadableMomentMediaPath } from '../moments/moment-media.storage';
 import { MinimaxJobEntity } from './minimax-job.entity';
 import {
   type MinimaxJobInputPayload,
@@ -20,7 +23,6 @@ import type { MinimaxVideoModel, MinimaxMusicModel } from './minimax.types';
 
 const VIDEO_POLL_INTERVAL_MS = 30_000;
 const VIDEO_MAX_ATTEMPTS = 25; // ~12 minutes at 30s per
-const MUSIC_MAX_ATTEMPTS = 8;
 const STALE_VIDEO_AFTER_MS = 15 * 60 * 1000;
 const STALE_MUSIC_AFTER_MS = 90 * 1000;
 
@@ -224,44 +226,57 @@ export class MinimaxJobService {
         const needsFirstFrame =
           job.model === 'MiniMax-Hailuo-2.3-Fast' && !firstFrameImageUrl;
         if (needsFirstFrame) {
-          const reservedCover = await this.quota.tryReserve('image-01');
-          if (!reservedCover) {
-            await this.markFailed(
-              job,
-              'COVER_QUOTA',
-              'Fast model needs first_frame_image but image-01 quota exhausted',
-            );
-            return;
+          // 重试场景：之前已经生成过封面就直接复用磁盘文件，
+          // 不再重复消耗 image-01 配额。
+          if (coverFileName) {
+            const reused = await this.tryReadCoverAsDataUrl(coverFileName);
+            if (reused) {
+              firstFrameImageUrl = reused;
+              this.logger.log(
+                `video job ${job.id} reusing existing cover ${coverFileName} (no image-01 spend)`,
+              );
+            }
           }
-          try {
-            const img = await this.client.generateImage({
-              model: 'image-01',
-              prompt: `Cinematic 9:16 portrait still — ${payload.prompt.slice(0, 200)}`,
-              aspectRatio: '9:16',
-            });
-            const persisted = await this.storage.persist({
-              buffer: img.buffer,
-              mimeType: img.mimeType,
-              kind: 'image',
-              suffix: '-firstframe',
-            });
-            // MiniMax accepts a data URL for first_frame_image; the persisted
-            // public URL points at the local API which they can't fetch.
-            firstFrameImageUrl = `data:${img.mimeType};base64,${img.buffer.toString('base64')}`;
-            coverFileName = persisted.fileName;
-            coverPublicUrl = persisted.publicUrl;
-            await this.quota.commit('image-01');
-            await this.repo.update(job.id, {
-              coverUrl: persisted.publicUrl,
-              coverFileName: persisted.fileName,
-            });
-          } catch (err) {
-            await this.quota.release('image-01');
-            this.logger.warn(
-              `cover gen failed for job ${job.id}: ${(err as Error)?.message}`,
-            );
-            await this.maybeDemoteFastToHd(job);
-            return;
+          if (!firstFrameImageUrl) {
+            const reservedCover = await this.quota.tryReserve('image-01');
+            if (!reservedCover) {
+              await this.markFailed(
+                job,
+                'COVER_QUOTA',
+                'Fast model needs first_frame_image but image-01 quota exhausted',
+              );
+              return;
+            }
+            try {
+              const img = await this.client.generateImage({
+                model: 'image-01',
+                prompt: `Cinematic 9:16 portrait still — ${payload.prompt.slice(0, 200)}`,
+                aspectRatio: '9:16',
+              });
+              const persisted = await this.storage.persist({
+                buffer: img.buffer,
+                mimeType: img.mimeType,
+                kind: 'image',
+                suffix: '-firstframe',
+              });
+              // MiniMax accepts a data URL for first_frame_image; the persisted
+              // public URL points at the local API which they can't fetch.
+              firstFrameImageUrl = `data:${img.mimeType};base64,${img.buffer.toString('base64')}`;
+              coverFileName = persisted.fileName;
+              coverPublicUrl = persisted.publicUrl;
+              await this.quota.commit('image-01');
+              await this.repo.update(job.id, {
+                coverUrl: persisted.publicUrl,
+                coverFileName: persisted.fileName,
+              });
+            } catch (err) {
+              await this.quota.release('image-01');
+              this.logger.warn(
+                `cover gen failed for job ${job.id}: ${(err as Error)?.message}`,
+              );
+              await this.maybeDemoteFastToHd(job);
+              return;
+            }
           }
         }
 
@@ -413,14 +428,14 @@ export class MinimaxJobService {
           const finalJob = await this.repo.findOneByOrFail({ id: job.id });
           await this.fireOnCompleted(finalJob);
         } else {
-          await this.repo.update(job.id, {
-            status: 'submitted',
-            taskId: result.taskId,
-            attemptCount: job.attemptCount + 1,
-            lastAttemptAt: new Date(),
-            executeAfter: new Date(Date.now() + 5_000),
-          });
-          this.logger.log(`music job ${job.id} async task=${result.taskId}`);
+          // music-2.6 至今未给我们见过 task 异步路径。如果 MiniMax 后续切到 async
+          // 模式我们才真的需要 /v1/query/music_generation 查询。当前没有实现，
+          // 直接 fail 比挂在 'submitted' 状态白白消耗轮询周期更诚实。
+          await this.markFailed(
+            job,
+            'MUSIC_ASYNC_NOT_SUPPORTED',
+            `music returned task=${result.taskId} but no query path implemented`,
+          );
         }
       } catch (error) {
         await this.handleClientError(job, error, 'submit music');
@@ -429,23 +444,35 @@ export class MinimaxJobService {
     }
 
     if (job.status === 'submitted') {
-      if (job.attemptCount >= MUSIC_MAX_ATTEMPTS) {
-        await this.markFailed(
-          job,
-          'POLL_EXHAUSTED',
-          `music polled ${job.attemptCount} times without inline result`,
-        );
-        return;
-      }
-      // The current MiniMax music endpoint typically returns inline audio. If
-      // the gateway switches to a true async path the client returns kind='task'
-      // and we'd need a query endpoint here. Until then, mark failed after the
-      // attempt cap so the job doesn't dangle.
-      await this.repo.update(job.id, {
-        attemptCount: job.attemptCount + 1,
-        lastAttemptAt: new Date(),
-        executeAfter: new Date(Date.now() + 10_000),
-      });
+      // 仅当 enqueueMusicJob 之后服务被重启、状态机没机会转到终态时会进到这。
+      // 没有真正的 query 实现，直接判失败终态。
+      await this.markFailed(
+        job,
+        'MUSIC_ASYNC_NOT_SUPPORTED',
+        'music job stuck in submitted (async path not implemented)',
+      );
+    }
+  }
+
+  private async tryReadCoverAsDataUrl(
+    fileName: string,
+  ): Promise<string | null> {
+    try {
+      const fullPath = resolveReadableMomentMediaPath(fileName);
+      const buf = await readFile(fullPath);
+      const ext = path.extname(fileName).toLowerCase();
+      const mime =
+        ext === '.png'
+          ? 'image/png'
+          : ext === '.webp'
+            ? 'image/webp'
+            : 'image/jpeg';
+      return `data:${mime};base64,${buf.toString('base64')}`;
+    } catch (err) {
+      this.logger.warn(
+        `cover file ${fileName} unreadable: ${(err as Error)?.message}`,
+      );
+      return null;
     }
   }
 

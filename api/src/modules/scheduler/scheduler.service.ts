@@ -1032,10 +1032,24 @@ export class SchedulerService {
       }
     }
 
+    // 视频号优先：朋友圈视频只在视频额度仍有 ≥3 / 4 时启动，
+    // 保证视频号 cron 至少能再拿到 3 次（每天 4 次总额度）。
+    // 同时朋友圈每天最多 1 条 MiniMax 视频。
     const remainingVideo =
       (await this.minimaxQuota.availableToday('MiniMax-Hailuo-2.3-Fast')) +
       (await this.minimaxQuota.availableToday('MiniMax-Hailuo-2.3'));
-    if (remainingVideo > 0) {
+    const MOMENT_VIDEO_RESERVE_FOR_CHANNELS = 3;
+    const MAX_MOMENT_VIDEOS_PER_DAY = 1;
+    const todayMomentVideos = await this.momentPostRepo.count({
+      where: {
+        generationKind: 'minimax_video',
+        postedAt: Between(startOfDay, now),
+      },
+    });
+    if (
+      remainingVideo > MOMENT_VIDEO_RESERVE_FOR_CHANNELS &&
+      todayMomentVideos < MAX_MOMENT_VIDEOS_PER_DAY
+    ) {
       const candidates = chars.filter((char) => {
         const start = char.activeHoursStart ?? 8;
         const end = char.activeHoursEnd ?? 22;
@@ -1044,14 +1058,14 @@ export class SchedulerService {
       shuffleInPlace(candidates);
       for (const char of candidates) {
         if (video >= VIDEO_MAX_PER_TICK) break;
-        const todayVideo = await this.momentPostRepo.count({
+        const todayVideoForChar = await this.momentPostRepo.count({
           where: {
             authorId: char.id,
             generationKind: 'minimax_video',
             postedAt: Between(startOfDay, now),
           },
         });
-        if (todayVideo > 0) continue;
+        if (todayVideoForChar > 0) continue;
         const post = await this.momentsService.scheduleMinimaxVideoMoment(
           char,
           () => this.pickMinimaxVideoModel(),

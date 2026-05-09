@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
 import { Pause, Play } from "lucide-react";
 import { cn } from "@yinjie/ui";
+import { useRuntimeTranslator } from "@yinjie/i18n";
 
 type AudioCardProps = {
   url: string;
@@ -35,6 +37,7 @@ export function AudioCard({
   durationMs,
   variant = "moment",
 }: AudioCardProps) {
+  const t = useRuntimeTranslator();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -64,13 +67,21 @@ export function AudioCard({
       setPlaying(false);
       setProgress(0);
     };
+    // 通过 pauseOthers 被外部暂停时，audio 元素状态变了但本组件 React 状态不会自动同步。
+    // 监听 play/pause 让按钮图标跟着 audio 元素走。
+    const onPlay = () => setPlaying(true);
+    const onPause = () => setPlaying(false);
     el.addEventListener("timeupdate", onTime);
     el.addEventListener("loadedmetadata", onLoaded);
     el.addEventListener("ended", onEnded);
+    el.addEventListener("play", onPlay);
+    el.addEventListener("pause", onPause);
     return () => {
       el.removeEventListener("timeupdate", onTime);
       el.removeEventListener("loadedmetadata", onLoaded);
       el.removeEventListener("ended", onEnded);
+      el.removeEventListener("play", onPlay);
+      el.removeEventListener("pause", onPause);
     };
   }, []);
 
@@ -81,11 +92,10 @@ export function AudioCard({
     if (el.paused) {
       pauseOthers(el);
       void el.play();
-      setPlaying(true);
     } else {
       el.pause();
-      setPlaying(false);
     }
+    // playing 状态由 onPlay/onPause 监听器更新，不在这里同步。
   };
 
   const handleSeek = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,14 +132,14 @@ export function AudioCard({
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="truncate text-sm font-medium">
-          {title ?? "音乐"}
+          {title ?? t(msg`音乐`)}
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={handleToggle}
             className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25"
-            aria-label={playing ? "暂停" : "播放"}
+            aria-label={playing ? t(msg`暂停`) : t(msg`播放`)}
           >
             {playing ? (
               <Pause className="h-4 w-4" />

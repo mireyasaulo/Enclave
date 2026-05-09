@@ -42,7 +42,10 @@ export class MinimaxClient {
     this.apiKey = (config.get<string>('MINIMAX_API_KEY') ?? '').trim();
     this.baseUrl = (
       config.get<string>('MINIMAX_BASE_URL') ?? DEFAULT_BASE_URL
-    ).replace(/\/+$/, '');
+    )
+      .replace(/\/+$/, '')
+      // 路径都自带 /v1 前缀，base 末尾若也带 /v1 会拼成 /v1/v1/... → 404
+      .replace(/\/v1$/, '');
     if (!this.apiKey) {
       this.logger.warn(
         'MINIMAX_API_KEY missing — token-plan video/music generation disabled',
@@ -304,11 +307,9 @@ export class MinimaxClient {
     const text = await response.text();
     if (!response.ok) {
       const retriable = response.status >= 500 || response.status === 429;
-      this.logger.warn('minimax http error', {
-        url,
-        status: response.status,
-        bodyPreview: text.slice(0, 400),
-      });
+      this.logger.warn(
+        `minimax http error url=${url} status=${response.status} body=${text.slice(0, 400)}`,
+      );
       throw new MinimaxClientError(
         'MINIMAX_HTTP',
         `${pathname} returned ${response.status}: ${text.slice(0, 200)}`,
@@ -334,10 +335,9 @@ export class MinimaxClient {
     if (!resp) return;
     if (resp.status_code === 0) return;
     const msg = resp.status_msg ?? `code=${resp.status_code}`;
-    this.logger.warn(`minimax ${context} failed`, {
-      status_code: resp.status_code,
-      status_msg: resp.status_msg,
-    });
+    this.logger.warn(
+      `minimax ${context} failed status_code=${resp.status_code} msg=${resp.status_msg ?? ''}`,
+    );
     const retriable = resp.status_code === 1002 || resp.status_code === 1004;
     throw new MinimaxClientError(
       'MINIMAX_PROVIDER',

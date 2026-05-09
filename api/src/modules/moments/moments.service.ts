@@ -1705,6 +1705,11 @@ export class MomentsService implements OnModuleInit {
   async scheduleMinimaxMusicMoment(
     char: CharacterEntity,
   ): Promise<MomentPostEntity | null> {
+    // 提前拦截：MiniMax 未配置或配额耗尽时不浪费 LLM tokens 去生成种子文本。
+    if (!this.minimaxClient.isConfigured()) return null;
+    if ((await this.minimaxQuota.availableToday('music-2.6')) <= 0) {
+      return null;
+    }
     if (!(await this.isCharacterVisibleToOwner(char.id))) {
       return null;
     }
@@ -1784,6 +1789,7 @@ export class MomentsService implements OnModuleInit {
       'MiniMax-Hailuo-2.3-Fast' | 'MiniMax-Hailuo-2.3' | null
     >,
   ): Promise<MomentPostEntity | null> {
+    if (!this.minimaxClient.isConfigured()) return null;
     if (!(await this.isCharacterVisibleToOwner(char.id))) {
       return null;
     }
