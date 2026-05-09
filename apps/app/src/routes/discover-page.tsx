@@ -794,7 +794,7 @@ export function DiscoverPage() {
                   summary={
                     post.likeCount > 0 || post.commentCount > 0
                       ? t(
-                          msg`${post.likeCount} 赞 · ${post.commentCount} 评论${post.aiReacted ? t(msg` · AI 已参与回应`) : ""}`,
+                          msg`${post.likeCount} 赞 · ${post.commentCount} 评论`,
                         )
                       : summaryText || undefined
                   }

@@ -1501,11 +1501,6 @@ function MobileChannelsCard({
           <div className="rounded-full bg-[rgba(15,23,42,0.62)] px-2.5 py-1 text-[10px] font-medium tracking-[0.04em] text-white">
             {t(msg`视频号推荐`)}
           </div>
-          {post.aiReacted ? (
-            <div className="rounded-full bg-[rgba(7,193,96,0.9)] px-2.5 py-1 text-[10px] font-medium text-white">
-              {t(msg`AI 已互动`)}
-            </div>
-          ) : null}
         </div>
 
         <div className="absolute inset-y-0 right-0 flex items-center pr-3.5">

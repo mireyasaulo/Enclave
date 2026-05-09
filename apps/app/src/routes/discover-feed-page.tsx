@@ -910,7 +910,7 @@ export function DiscoverFeedPage() {
                   post.likeCount > 0 || post.commentCount > 0
                     ? `${t(msg`${post.likeCount} 赞`)} · ${t(
                         msg`${post.commentCount} 评论`,
-                      )}${post.aiReacted ? t(msg` · AI 已参与回应`) : ""}`
+                      )}`
                     : summaryText || undefined
                 }
                 actions={
