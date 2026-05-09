@@ -5,6 +5,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { LessThan, Repository } from 'typeorm';
+// mp3-duration 没带 .d.ts；签名: (buffer | filename, cbrEstimate?, cb?) -> Promise<seconds>
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const mp3Duration: (input: Buffer | string) => Promise<number> = require('mp3-duration');
 import { resolveReadableMomentMediaPath } from '../moments/moment-media.storage';
 import { MinimaxJobEntity } from './minimax-job.entity';
 import {
@@ -556,6 +559,22 @@ export class MinimaxJobService {
       mimeType: data.mimeType,
       kind: 'music',
     });
+    // MiniMax query 实测从来不返回 duration 字段，client 端 audio-card 的 0:00
+    // 完全靠浏览器 loadedmetadata 兜底。这里读 MP3 帧头估时长，让 mediaPayload 落库
+    // 时就有 durationMs，UI 首屏就不会闪 0:00。失败仅记日志，不阻塞 job 完成。
+    let durationMs = data.durationMs;
+    if (durationMs == null) {
+      try {
+        const seconds = await mp3Duration(data.buffer);
+        if (Number.isFinite(seconds) && seconds > 0) {
+          durationMs = Math.round(seconds * 1000);
+        }
+      } catch (err) {
+        this.logger.warn(
+          `mp3-duration extraction failed for job ${job.id}: ${(err as Error)?.message}`,
+        );
+      }
+    }
     await this.repo.update(job.id, {
       status: 'completed',
       remoteDownloadUrl: data.remoteDownloadUrl ?? null,
@@ -563,7 +582,7 @@ export class MinimaxJobService {
       localUrl: persisted.publicUrl,
       localMimeType: persisted.mimeType,
       localSize: persisted.size,
-      localDurationMs: data.durationMs,
+      localDurationMs: durationMs,
       completedAt: new Date(),
       attemptCount: job.attemptCount + 1,
       lastAttemptAt: new Date(),
