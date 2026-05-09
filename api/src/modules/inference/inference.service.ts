@@ -2480,11 +2480,32 @@ export class InferenceService implements OnModuleInit {
       }
 
       const built = this.buildVendorFamilyCharacterDraft(family, catalogById);
+      // 覆盖刷新时保留运行时积累的字段：记忆 / 关系图 / 最近活跃时间 / 实时状态。
+      // 否则点 "覆盖刷新" 会把家族角色和用户的对话积累全部清零。
+      const merged: Partial<CharacterEntity> = {
+        ...existing,
+        ...built,
+      };
+      if (existing?.profile && built.profile) {
+        merged.profile = {
+          ...built.profile,
+          memory: existing.profile.memory ?? built.profile.memory,
+        };
+      }
+      if (existing?.aiRelationships !== undefined) {
+        merged.aiRelationships = existing.aiRelationships;
+      }
+      if (existing?.lastActiveAt !== undefined) {
+        merged.lastActiveAt = existing.lastActiveAt;
+      }
+      if (existing?.intimacyLevel !== undefined) {
+        merged.intimacyLevel = existing.intimacyLevel;
+      }
+      if (existing?.currentStatus !== undefined) {
+        merged.currentStatus = existing.currentStatus;
+      }
       const saved = await this.characterRepo.save(
-        this.characterRepo.create({
-          ...existing,
-          ...built,
-        }),
+        this.characterRepo.create(merged),
       );
 
       if (existing) {
