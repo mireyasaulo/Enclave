@@ -85,49 +85,15 @@ export function getChatSocket() {
     ...(token ? { auth: { token }, query: { token } } : {}),
   });
 
-  // 服务端版本变更自动升级：每次 API 进程启动都换一个 buildId，握手时下发。
-  // 客户端比较 localStorage 上次记的 buildId，不同就清 PWA SW + 缓存 + reload。
-  // 让用户完全无感知地拿到新代码 + 新数据，无需手动 unregister。
+  // 服务端 buildId 仅记录在 localStorage 中供调试；自动 reload 已下线，
+  // dev 环境 nest watch 频繁热重启会让客户端死循环 reload，
+  // 现在改为用户手动刷新。
   socket.on("system.hello", (payload: { buildId?: string }) => {
     if (typeof window === "undefined") return;
     const nextId = payload?.buildId;
     if (!nextId) return;
-    const STORAGE_KEY = "yinjie:server-build-id";
-    let prevId: string | null = null;
     try {
-      prevId = window.localStorage.getItem(STORAGE_KEY);
-    } catch {
-      prevId = null;
-    }
-    if (prevId && prevId !== nextId) {
-      // 服务器换版本了 → 清 SW + 缓存 + 硬刷
-      void (async () => {
-        try {
-          if (
-            typeof navigator !== "undefined" &&
-            navigator.serviceWorker?.getRegistrations
-          ) {
-            const regs = await navigator.serviceWorker.getRegistrations();
-            await Promise.all(regs.map((r) => r.unregister()));
-          }
-          if (typeof caches !== "undefined") {
-            const keys = await caches.keys();
-            await Promise.all(keys.map((k) => caches.delete(k)));
-          }
-        } catch {
-          // 清理失败不阻塞 reload，浏览器自身缓存策略也能拿到大部分新内容
-        }
-        try {
-          window.localStorage.setItem(STORAGE_KEY, nextId);
-        } catch {
-          // ignore
-        }
-        window.location.reload();
-      })();
-      return;
-    }
-    try {
-      window.localStorage.setItem(STORAGE_KEY, nextId);
+      window.localStorage.setItem("yinjie:server-build-id", nextId);
     } catch {
       // ignore
     }
