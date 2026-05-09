@@ -1380,12 +1380,16 @@ export class AiOrchestratorService {
         allowImageInput,
         allowAudioInput,
       );
+      // MiniMax-M2.7 等模型不允许 system role 出现在 messages 第一条之外的位置，
+      // 把语言提醒合并进首条 system，再用单条 system 起头。
+      const mergedSystemPrompt = finalLanguageReminder
+        ? `${systemPrompt}\n\n${finalLanguageReminder}`
+        : systemPrompt;
       const response = await client.chat.completions.create({
         model: provider.model,
         messages: [
-          { role: 'system', content: systemPrompt },
+          { role: 'system', content: mergedSystemPrompt },
           ...historyMessages,
-          { role: 'system', content: finalLanguageReminder },
           currentMessage,
         ],
         max_tokens: 500,
@@ -1859,13 +1863,16 @@ export class AiOrchestratorService {
     );
     const includedHistory = conversationHistory.slice(-historyWindow);
     const finalLanguageReminder = await this.worldLanguage.buildFinalReminder();
+    const mergedSystemPrompt = finalLanguageReminder
+      ? `${systemPrompt}\n\n${finalLanguageReminder}`
+      : systemPrompt;
     const requestMessages: Array<{
       role: 'system' | 'user' | 'assistant';
       content: string;
     }> = [
       {
         role: 'system',
-        content: systemPrompt,
+        content: mergedSystemPrompt,
       },
       ...includedHistory.map((message) => ({
         role:
@@ -1876,10 +1883,6 @@ export class AiOrchestratorService {
           ? `[${message.characterId}]: ${message.content}`
           : message.content,
       })),
-      {
-        role: 'system',
-        content: finalLanguageReminder,
-      },
       {
         role: 'user',
         content: userMessage,
