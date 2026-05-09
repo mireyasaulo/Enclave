@@ -829,6 +829,11 @@ export function TokenUsagePage() {
         actions={
           <div className="flex flex-wrap gap-2">
             <QuickRangeButton
+              label={t(msg`今日`)}
+              active={activeQuickRange === "today"}
+              onClick={() => applyPreset("today", setFrom, setTo)}
+            />
+            <QuickRangeButton
               label={t(msg`近 7 天`)}
               active={activeQuickRange === "7d"}
               onClick={() => applyPreset("7d", setFrom, setTo)}
@@ -3803,10 +3808,13 @@ function formatScene(scene: string) {
 function resolveActiveQuickRange(
   from: string,
   to: string,
-): "7d" | "30d" | "month" | null {
+): "today" | "7d" | "30d" | "month" | null {
   const today = formatDateInput(new Date());
   if (to !== today) {
     return null;
+  }
+  if (from === today) {
+    return "today";
   }
   if (from === monthStartInput()) {
     return "month";
@@ -3821,11 +3829,16 @@ function resolveActiveQuickRange(
 }
 
 function applyPreset(
-  preset: "7d" | "30d" | "month",
+  preset: "today" | "7d" | "30d" | "month",
   setFrom: (value: string) => void,
   setTo: (value: string) => void,
 ) {
-  setTo(formatDateInput(new Date()));
+  const today = formatDateInput(new Date());
+  setTo(today);
+  if (preset === "today") {
+    setFrom(today);
+    return;
+  }
   if (preset === "month") {
     setFrom(monthStartInput());
     return;

@@ -658,10 +658,7 @@ export function ChatRecordsPage() {
                   </div>
                   <div className="mt-1 text-xs text-[color:var(--text-muted)]">
                     {conversationsQuery.data
-                      ? `共 ${conversationsQuery.data.total} 个会话，第 ${page} / ${Math.max(
-                          conversationsQuery.data.totalPages,
-                          1,
-                        )} 页`
+                      ? t(msg`共 ${conversationsQuery.data.total} 个会话，第 ${page} / ${Math.max(conversationsQuery.data.totalPages, 1)} 页`)
                       : t(msg`正在读取列表`)}
                   </div>
                 </div>
@@ -716,7 +713,7 @@ export function ChatRecordsPage() {
                   {t(msg`上一页`)}
                 </Button>
                 <span className="text-xs text-[color:var(--text-muted)]">
-                  第 {page} / {conversationsQuery.data.totalPages} 页
+                  {t(msg`第 ${page} / ${conversationsQuery.data.totalPages} 页`)}
                 </span>
                 <Button
                   variant="secondary"
@@ -886,7 +883,7 @@ export function ChatRecordsPage() {
                   {t(msg`时间线视角`)}
                 </div>
                 <div className="text-sm text-[color:var(--text-secondary)]">
-                  当前展示 {visibleMessages.length} / {messages.length} 条消息
+                  {t(msg`当前展示 ${visibleMessages.length} / ${messages.length} 条消息`)}
                   {focusedMessageId ? t(msg`，已进入命中上下文模式`) : t(msg`，默认按最新向前浏览`)}。
                 </div>
               </div>
@@ -1559,7 +1556,7 @@ function ConversationListItemCard({
       <div className="mt-3 flex flex-wrap gap-2 text-[12px] text-[color:var(--text-muted)]">
         <span>{t(msg`可见`)} {item.visibleMessageCount}</span>
         <span>{t(msg`留存`)} {item.storedMessageCount}</span>
-        <span>30 天 {item.recentMessageCount30d}</span>
+        <span>{t(msg`30 天`)} {item.recentMessageCount30d}</span>
         {item.isHidden ? (
           <span className="rounded-full bg-amber-50 px-2 py-0.5 text-amber-700">
             {t(msg`已隐藏`)}
@@ -1840,7 +1837,7 @@ function TrendBars({
               style={{
                 height: `${Math.max(8, Math.round((item.totalMessages / maxValue) * 96))}px`,
               }}
-              title={`${item.date} · 总 ${item.totalMessages} · 用户 ${item.userMessages} · 角色 ${item.characterMessages}`}
+              title={`${item.date} · 总 ${item.totalMessages} · 用户 ${item.userMessages} · 角色 ${item.characterMessages}`} // i18n-ignore-line: admin metric tooltip
             />
           </div>
           <div className="text-[12px] text-[color:var(--text-muted)]">
@@ -1915,7 +1912,7 @@ function TokenTrendBars({
               style={{
                 height: `${Math.max(8, Math.round((item.totalTokens / maxValue) * 80))}px`,
               }}
-              title={`${item.label} · Token ${item.totalTokens} · 请求 ${item.requestCount}`}
+              title={`${item.label} · Token ${item.totalTokens} · 请求 ${item.requestCount}`} // i18n-ignore-line: admin metric tooltip
             />
           </div>
           <div className="text-[12px] text-[color:var(--text-muted)]">{item.label}</div>

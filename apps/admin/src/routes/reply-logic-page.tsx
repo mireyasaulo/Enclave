@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   updateCharacter,
   type Character,
   type MemoryLayers,
@@ -75,16 +76,17 @@ type EditableCharacter = Omit<Character, "profile"> & {
   profile: EditableProfile;
 };
 
+// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 const ACTIVITY_OPTIONS: Array<{
   value: NonNullable<Character["currentActivity"]>;
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "free", label: "空闲" },
-  { value: "working", label: "工作中" },
-  { value: "eating", label: "吃饭中" },
-  { value: "resting", label: "休息中" },
-  { value: "commuting", label: "通勤中" },
-  { value: "sleeping", label: "睡觉中" },
+  { value: "free", label: msg`空闲` },
+  { value: "working", label: msg`工作中` },
+  { value: "eating", label: msg`吃饭中` },
+  { value: "resting", label: msg`休息中` },
+  { value: "commuting", label: msg`通勤中` },
+  { value: "sleeping", label: msg`睡觉中` },
 ];
 
 function readInitialReplyLogicFocus() {
@@ -113,6 +115,7 @@ function readInitialReplyLogicFocus() {
 
 export function ReplyLogicPage() {
   const baseUrl = resolveAdminCoreApiBaseUrl();
+  const t = translateRuntimeMessage;
   const queryClient = useQueryClient();
   const initialFocus = useMemo(() => readInitialReplyLogicFocus(), []);
   const [scope, setScope] = useState<InspectorScope>(initialFocus.scope);
@@ -337,7 +340,7 @@ export function ReplyLogicPage() {
     mutationFn: async () => {
       const userMessage = previewMessage.trim();
       if (!userMessage) {
-        throw new Error("请先输入候选用户消息。");
+        throw new Error(translateRuntimeMessage(msg`请先输入候选用户消息。`));
       }
 
       if (scope === "character") {
@@ -463,55 +466,55 @@ export function ReplyLogicPage() {
   const providerFooterMessage =
     providerSetup.providerProbeMutation.data?.message ??
     (providerSetup.providerSaveMutation.data
-      ? `已保存实例级推理服务：${providerSetup.providerSaveMutation.data.model}`
-      : "这里保存的是实例级兜底推理服务；如果世界主人配置了个人 API 密钥，聊天主链路仍会优先使用个人配置。");
+      ? translateRuntimeMessage(msg`已保存实例级推理服务：${providerSetup.providerSaveMutation.data.model}`)
+      : translateRuntimeMessage(msg`这里保存的是实例级兜底推理服务；如果世界主人配置了个人 API 密钥，聊天主链路仍会优先使用个人配置。`));
 
   const targetSummaryRows =
     scope === "character" && selectedCharacter
       ? [
-          { label: "角色", value: selectedCharacter.name },
+          { label: t(msg`角色`), value: selectedCharacter.name },
           {
-            label: "活动",
+            label: t(msg`活动`),
             value: formatActivity(selectedCharacter.currentActivity),
           },
           {
-            label: "在线",
-            value: selectedCharacter.isOnline ? "在线" : "离线",
+            label: t(msg`在线`),
+            value: selectedCharacter.isOnline ? t(msg`在线`) : t(msg`离线`),
           },
         ]
       : scope === "conversation" && selectedConversation
         ? [
-            { label: "会话", value: selectedConversation.title },
+            { label: t(msg`会话`), value: selectedConversation.title },
             {
-              label: "来源",
+              label: t(msg`来源`),
               value: formatConversationSource(selectedConversation.source),
             },
             {
-              label: "参与角色",
-              value: selectedConversation.participantNames.join(" / ") || "无",
+              label: t(msg`参与角色`),
+              value: selectedConversation.participantNames.join(" / ") || t(msg`无`),
             },
           ]
-        : [{ label: "当前目标", value: "未选择" }];
+        : [{ label: t(msg`当前目标`), value: t(msg`未选择`) }];
   const providerSummaryRows = [
     {
-      label: "模型",
-      value: `${overview?.provider.model ?? "未配置"} (${formatProviderModelSource(overview?.provider.modelSource ?? "")})`,
+      label: t(msg`模型`),
+      value: `${overview?.provider.model ?? t(msg`未配置`)} (${formatProviderModelSource(overview?.provider.modelSource ?? "")})`,
     },
     {
-      label: "接口地址",
-      value: `${overview?.provider.endpoint ?? "未配置"} (${formatProviderEndpointSource(overview?.provider.endpointSource ?? "")})`,
+      label: t(msg`接口地址`),
+      value: `${overview?.provider.endpoint ?? t(msg`未配置`)} (${formatProviderEndpointSource(overview?.provider.endpointSource ?? "")})`,
     },
     {
-      label: "API 密钥",
+      label: t(msg`API 密钥`),
       value: formatProviderApiKeySource(overview?.provider.apiKeySource ?? ""),
     },
     {
-      label: "实例级模型",
-      value: overview?.provider.configuredProviderModel ?? "未设置",
+      label: t(msg`实例级模型`),
+      value: overview?.provider.configuredProviderModel ?? t(msg`未设置`),
     },
     {
-      label: "实例级接口地址",
-      value: overview?.provider.configuredProviderEndpoint ?? "未设置",
+      label: t(msg`实例级接口地址`),
+      value: overview?.provider.configuredProviderEndpoint ?? t(msg`未设置`),
     },
   ];
 
@@ -528,18 +531,18 @@ export function ReplyLogicPage() {
   return (
     <div className="space-y-6">
       {overviewQuery.isLoading ? (
-        <LoadingBlock label="正在读取回复逻辑总览..." />
+        <LoadingBlock label={t(msg`正在读取回复逻辑总览...`)} />
       ) : null}
       {overviewQuery.isError && overviewQuery.error instanceof Error ? (
         <ErrorBlock message={overviewQuery.error.message} />
       ) : null}
       {initialFocus.conversationId || initialFocus.characterId ? (
         <InlineNotice>
-          当前已带入
+          {t(msg`当前已带入`)}
           {initialFocus.conversationId
-            ? `会话 ${initialFocus.conversationId}`
-            : `角色 ${initialFocus.characterId}`}
-          的回复逻辑上下文。
+            ? ` ${t(msg`会话`)} ${initialFocus.conversationId}`
+            : ` ${t(msg`角色`)} ${initialFocus.characterId}`}
+          {t(msg`的回复逻辑上下文。`)}
         </InlineNotice>
       ) : null}
 
@@ -555,7 +558,7 @@ export function ReplyLogicPage() {
                   size="sm"
                   className="flex-1 justify-center"
                 >
-                  刷新快照
+                  {t(msg`刷新快照`)}
                 </Button>
                 <Button
                   onClick={saveRuntimeRulesDraft}
@@ -568,18 +571,18 @@ export function ReplyLogicPage() {
                   }
                 >
                   {runtimeRulesSaveMutation.isPending
-                    ? "保存中..."
-                    : "保存规则"}
+                    ? t(msg`保存中...`)
+                    : t(msg`保存规则`)}
                 </Button>
               </div>
 
               {/* Jump links */}
               <div className="flex flex-wrap gap-2">
                 {[
-                  { label: "快照", id: "reply-logic-inspector" },
-                  { label: "预演", id: "reply-logic-preview" },
-                  { label: "配置", id: "reply-logic-config" },
-                  { label: "规则", id: "reply-logic-rules" },
+                  { label: t(msg`快照`), id: "reply-logic-inspector" },
+                  { label: t(msg`预演`), id: "reply-logic-preview" },
+                  { label: t(msg`配置`), id: "reply-logic-config" },
+                  { label: t(msg`规则`), id: "reply-logic-rules" },
                 ].map((item) => (
                   <button
                     key={item.id}
@@ -603,7 +606,7 @@ export function ReplyLogicPage() {
                         : "rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-3 py-2 text-sm text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-subtle)] hover:text-[color:var(--text-primary)]"
                     }
                   >
-                    按角色
+                    {t(msg`按角色`)}
                   </button>
                   <button
                     type="button"
@@ -614,32 +617,32 @@ export function ReplyLogicPage() {
                         : "rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-3 py-2 text-sm text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-subtle)] hover:text-[color:var(--text-primary)]"
                     }
                   >
-                    按会话
+                    {t(msg`按会话`)}
                   </button>
                 </div>
                 <div className="mt-3 space-y-3">
                   {scope === "character" ? (
                     <TargetListCard
-                      title="角色列表"
+                      title={t(msg`角色列表`)}
                       items={(overview.characters ?? []).map((item) => ({
                         id: item.id,
                         title: item.name,
                         subtitle: formatActivity(item.currentActivity),
                         active: item.id === activeCharacterId,
-                        status: item.isOnline ? "在线" : "离线",
+                        status: item.isOnline ? t(msg`在线`) : t(msg`离线`),
                         tone: item.isOnline ? "healthy" : "muted",
                         onSelect: () => setSelectedCharacterId(item.id),
                       }))}
                     />
                   ) : (
                     <TargetListCard
-                      title="会话列表"
+                      title={t(msg`会话列表`)}
                       items={(overview.conversations ?? []).map((item) => ({
                         id: item.id,
                         title: item.title,
                         subtitle: formatConversationSource(item.source),
                         active: item.id === activeConversationId,
-                        status: item.participantNames.join(" / ") || "无角色",
+                        status: item.participantNames.join(" / ") || t(msg`无角色`),
                         tone: "muted" as const,
                         onSelect: () => setSelectedConversationId(item.id),
                       }))}
@@ -648,16 +651,16 @@ export function ReplyLogicPage() {
                 </div>
               </Card>
 
-              <AdminInfoRows title="目标摘要" rows={targetSummaryRows} />
+              <AdminInfoRows title={t(msg`目标摘要`)} rows={targetSummaryRows} />
 
               <AdminInfoRows
-                title="真实运行推理服务"
+                title={t(msg`真实运行推理服务`)}
                 rows={providerSummaryRows}
               />
 
               {overview.provider.notes.length ? (
                 <Card className="bg-[color:var(--surface-console)]">
-                  <SectionHeading>运行备注</SectionHeading>
+                  <SectionHeading>{t(msg`运行备注`)}</SectionHeading>
                   <div className="mt-4 space-y-2">
                     {overview.provider.notes.map((note) => (
                       <InlineNotice key={note} tone="warning">
@@ -669,10 +672,10 @@ export function ReplyLogicPage() {
               ) : null}
 
               <Card className="bg-[color:var(--surface-console)]">
-                <SectionHeading>运行时常量</SectionHeading>
+                <SectionHeading>{t(msg`运行时常量`)}</SectionHeading>
                 <SnapshotPanel
                   className="mt-4"
-                  title="当前生效运行时摘要"
+                  title={t(msg`当前生效运行时摘要`)}
                   value={formatRuntimeConstants(overview.constants)}
                 />
               </Card>
@@ -716,27 +719,27 @@ export function ReplyLogicPage() {
               <div id="reply-logic-config">
                 <Card className="bg-[color:var(--surface-console)]">
                   <AdminSectionHeader
-                    title="配置抽屉"
+                    title={t(msg`配置抽屉`)}
                     actions={
                       <AdminDraftStatusPill
                         ready={Boolean(characterDraft)}
                         dirty={isCharacterDraftDirty}
-                        loadingLabel="等待目标"
+                        loadingLabel={t(msg`等待目标`)}
                       />
                     }
                   />
                   <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-1">
                     <MetricCard
-                      label="当前范围"
-                      value={scope === "character" ? "角色" : "会话"}
+                      label={t(msg`当前范围`)}
+                      value={scope === "character" ? t(msg`角色`) : t(msg`会话`)}
                     />
                     <MetricCard
-                      label="配置目标"
+                      label={t(msg`配置目标`)}
                       value={
                         editableCharacterSource?.name ??
                         (scope === "conversation"
-                          ? "先选择会话角色"
-                          : "先选择角色")
+                          ? t(msg`先选择会话角色`)
+                          : t(msg`先选择角色`))
                       }
                     />
                   </div>
@@ -744,7 +747,7 @@ export function ReplyLogicPage() {
                   {scope === "conversation" ? (
                     <SelectFieldBlock
                       className="mt-4"
-                      label="会话内配置角色"
+                      label={t(msg`会话内配置角色`)}
                       value={configuredConversationActorId}
                       onChange={setConfiguredConversationActorId}
                       options={conversationActorOptions.map((item) => ({
@@ -755,15 +758,14 @@ export function ReplyLogicPage() {
                   ) : null}
 
                   <InlineNotice className="mt-4" tone="muted">
-                    这里改的是实体字段和 `profile`
-                    配置对象。本页不会实时重算草稿提示词，保存后会刷新右侧快照，看到真实生效结果。
+                    {t(msg`这里改的是实体字段和 profile 配置对象。本页不会实时重算草稿提示词，保存后会刷新右侧快照，看到真实生效结果。`)}
                   </InlineNotice>
                 </Card>
               </div>
 
               <Card className="bg-[color:var(--surface-console)]">
                 <AdminSectionHeader
-                  title="角色配置"
+                  title={t(msg`角色配置`)}
                   actions={
                     editableCharacterSource ? (
                       <StatusPill
@@ -771,7 +773,7 @@ export function ReplyLogicPage() {
                           editableCharacterSource.isOnline ? "healthy" : "muted"
                         }
                       >
-                        {editableCharacterSource.isOnline ? "在线" : "离线"}
+                        {editableCharacterSource.isOnline ? t(msg`在线`) : t(msg`离线`)}
                       </StatusPill>
                     ) : null
                   }
@@ -781,22 +783,22 @@ export function ReplyLogicPage() {
                   scope === "character" && characterSnapshotQuery.isLoading ? (
                     <LoadingBlock
                       className="mt-4"
-                      label="正在加载角色配置..."
+                      label={t(msg`正在加载角色配置...`)}
                     />
                   ) : scope === "conversation" &&
                     conversationSnapshotQuery.isLoading ? (
                     <LoadingBlock
                       className="mt-4"
-                      label="正在加载会话角色配置..."
+                      label={t(msg`正在加载会话角色配置...`)}
                     />
                   ) : (
                     <AdminEmptyState
                       className="mt-4"
-                      title="当前没有可编辑角色"
+                      title={t(msg`当前没有可编辑角色`)}
                       description={
                         scope === "conversation"
-                          ? "先在会话内选择一个角色，再修改它的运行配置。"
-                          : "先在左侧选择一个角色，再开始编辑运行配置。"
+                          ? t(msg`先在会话内选择一个角色，再修改它的运行配置。`)
+                          : t(msg`先在左侧选择一个角色，再开始编辑运行配置。`)
                       }
                     />
                   )
@@ -804,9 +806,7 @@ export function ReplyLogicPage() {
                   <>
                     {characterDraft.profile.systemPrompt?.trim() ? (
                       <InlineNotice className="mt-4" tone="warning">
-                        当前已填写
-                        `systemPrompt`，真实回复时会直接覆盖结构化提示词拼装。你在下面改的身份、语气、边界字段，只有清空
-                        `systemPrompt` 后才会重新体现在最终提示词里。
+                        {t(msg`当前已填写 systemPrompt，真实回复时会直接覆盖结构化提示词拼装。你在下面改的身份、语气、边界字段，只有清空 systemPrompt 后才会重新体现在最终提示词里。`)}
                       </InlineNotice>
                     ) : null}
 
@@ -819,15 +819,15 @@ export function ReplyLogicPage() {
                     {characterSaveMutation.isSuccess ? (
                       <AdminActionFeedback
                         tone="success"
-                        title="角色配置已保存"
-                        description="运行时快照正在刷新。"
+                        title={t(msg`角色配置已保存`)}
+                        description={t(msg`运行时快照正在刷新。`)}
                       />
                     ) : null}
 
                     <div className="mt-4 space-y-6">
-                      <ConfigSection title="回复运行">
+                      <ConfigSection title={t(msg`回复运行`)}>
                         <FieldBlock
-                          label="关系描述"
+                          label={t(msg`关系描述`)}
                           value={characterDraft.relationship}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
@@ -837,9 +837,9 @@ export function ReplyLogicPage() {
                           }
                         />
                         <FieldBlock
-                          label="擅长领域"
+                          label={t(msg`擅长领域`)}
                           value={listToCsv(characterDraft.expertDomains)}
-                          placeholder="法律, 理财, 心理"
+                          placeholder={t(msg`法律, 理财, 心理`)}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
                               ...current,
@@ -848,7 +848,7 @@ export function ReplyLogicPage() {
                           }
                         />
                         <SelectFieldBlock
-                          label="在线状态模式"
+                          label={t(msg`在线状态模式`)}
                           value={characterDraft.onlineMode ?? "auto"}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
@@ -858,12 +858,12 @@ export function ReplyLogicPage() {
                             }))
                           }
                           options={[
-                            { value: "auto", label: "自动调度" },
-                            { value: "manual", label: "人工锁定" },
+                            { value: "auto", label: t(msg`自动调度`) },
+                            { value: "manual", label: t(msg`人工锁定`) },
                           ]}
                         />
                         <SelectFieldBlock
-                          label="当前活动模式"
+                          label={t(msg`当前活动模式`)}
                           value={characterDraft.activityMode ?? "auto"}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
@@ -873,12 +873,12 @@ export function ReplyLogicPage() {
                             }))
                           }
                           options={[
-                            { value: "auto", label: "自动调度" },
-                            { value: "manual", label: "人工锁定" },
+                            { value: "auto", label: t(msg`自动调度`) },
+                            { value: "manual", label: t(msg`人工锁定`) },
                           ]}
                         />
                         <SelectFieldBlock
-                          label="当前活动"
+                          label={t(msg`当前活动`)}
                           value={characterDraft.currentActivity ?? ""}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
@@ -887,7 +887,7 @@ export function ReplyLogicPage() {
                             }))
                           }
                           options={[
-                            { value: "", label: "未设置 / 交给调度" },
+                            { value: "", label: t(msg`未设置 / 交给调度`) },
                             ...ACTIVITY_OPTIONS.map((item) => ({
                               value: item.value,
                               label: item.label,
@@ -896,7 +896,7 @@ export function ReplyLogicPage() {
                         />
                         <div className="grid gap-4 md:grid-cols-2">
                           <FieldBlock
-                            label="活跃开始小时"
+                            label={t(msg`活跃开始小时`)}
                             value={characterDraft.activeHoursStart ?? ""}
                             type="number"
                             min={0}
@@ -909,7 +909,7 @@ export function ReplyLogicPage() {
                             }
                           />
                           <FieldBlock
-                            label="活跃结束小时"
+                            label={t(msg`活跃结束小时`)}
                             value={characterDraft.activeHoursEnd ?? ""}
                             type="number"
                             min={0}
@@ -924,7 +924,7 @@ export function ReplyLogicPage() {
                         </div>
                         <div className="flex flex-wrap gap-3">
                           <ToggleChip
-                            label="在线"
+                            label={t(msg`在线`)}
                             checked={characterDraft.isOnline}
                             onChange={(event) =>
                               patchCharacterDraft((current) => ({
@@ -937,16 +937,16 @@ export function ReplyLogicPage() {
                         {(characterDraft.onlineMode ?? "auto") === "auto" ||
                         (characterDraft.activityMode ?? "auto") === "auto" ? (
                           <InlineNotice tone="warning">
-                            处于“自动调度”的字段仍会被定时任务更新；切到“人工锁定”后，后台手动设置的在线状态或当前活动才会持续生效。
+                            {t(msg`处于”自动调度”的字段仍会被定时任务更新；切到”人工锁定”后，后台手动设置的在线状态或当前活动才会持续生效。`)}
                           </InlineNotice>
                         ) : null}
                       </ConfigSection>
 
-                      <ConfigSection title="底层逻辑">
+                      <ConfigSection title={t(msg`底层逻辑`)}>
                         <TextAreaBlock
-                          label="底层逻辑"
+                          label={t(msg`底层逻辑`)}
                           value={characterDraft.profile.coreLogic ?? ""}
-                          description="所有场景强制注入。描述角色的核心人格、价值观、思维方式。这里写的内容在聊天、发帖、评论等每个场景都会生效。"
+                          description={t(msg`所有场景强制注入。描述角色的核心人格、价值观、思维方式。这里写的内容在聊天、发帖、评论等每个场景都会生效。`)}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
                               ...current,
@@ -956,14 +956,14 @@ export function ReplyLogicPage() {
                         />
                       </ConfigSection>
 
-                      <ConfigSection title="场景提示词 — 主动发布">
+                      <ConfigSection title={t(msg`场景提示词 — 主动发布`)}>
                         <TextAreaBlock
-                          label="发朋友圈"
+                          label={t(msg`发朋友圈`)}
                           value={
                             characterDraft.profile.scenePrompts?.moments_post ??
                             ""
                           }
-                          description="触发：定时发朋友圈（由发圈频率控制）。无实时上下文。写发圈内容偏好、常见话题、风格规范，以及是否偏好配图/纯文字等倾向。"
+                          description={t(msg`触发：定时发朋友圈（由发圈频率控制）。无实时上下文。写发圈内容偏好、常见话题、风格规范，以及是否偏好配图/纯文字等倾向。`)}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
                               ...current,
@@ -978,11 +978,11 @@ export function ReplyLogicPage() {
                           }
                         />
                         <TextAreaBlock
-                          label="发 Feed 贴文"
+                          label={t(msg`发 Feed 贴文`)}
                           value={
                             characterDraft.profile.scenePrompts?.feed_post ?? ""
                           }
-                          description="触发：定时在广场发贴（由 Feed 频率控制）。无实时上下文。写公开发帖的风格、内容方向、是否引导讨论等。"
+                          description={t(msg`触发：定时在广场发贴（由 Feed 频率控制）。无实时上下文。写公开发帖的风格、内容方向、是否引导讨论等。`)}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
                               ...current,
@@ -997,12 +997,12 @@ export function ReplyLogicPage() {
                           }
                         />
                         <TextAreaBlock
-                          label="发视频号"
+                          label={t(msg`发视频号`)}
                           value={
                             characterDraft.profile.scenePrompts?.channel_post ??
                             ""
                           }
-                          description="触发：定时发视频号内容。无实时上下文。写视频号文案风格、内容结构要求（标题/正文/话题标签等）。"
+                          description={t(msg`触发：定时发视频号内容。无实时上下文。写视频号文案风格、内容结构要求（标题/正文/话题标签等）。`)}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
                               ...current,
@@ -1018,13 +1018,13 @@ export function ReplyLogicPage() {
                         />
                       </ConfigSection>
 
-                      <ConfigSection title="场景提示词 — 互动响应">
+                      <ConfigSection title={t(msg`场景提示词 — 互动响应`)}>
                         <TextAreaBlock
-                          label="聊天回复"
+                          label={t(msg`聊天回复`)}
                           value={
                             characterDraft.profile.scenePrompts?.chat ?? ""
                           }
-                          description="触发：用户发消息时。系统自动注入：当前时间、角色活动状态、距上次聊天时长。写聊天风格、话题偏好、对话节奏，可引导 AI 调整回复长短和语气。"
+                          description={t(msg`触发：用户发消息时。系统自动注入：当前时间、角色活动状态、距上次聊天时长。写聊天风格、话题偏好、对话节奏，可引导 AI 调整回复长短和语气。`)}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
                               ...current,
@@ -1039,12 +1039,12 @@ export function ReplyLogicPage() {
                           }
                         />
                         <TextAreaBlock
-                          label="朋友圈评论/回复"
+                          label={t(msg`朋友圈评论/回复`)}
                           value={
                             characterDraft.profile.scenePrompts
                               ?.moments_comment ?? ""
                           }
-                          description="触发：角色浏览到用户朋友圈时自动评论。写评论语气、常用开场方式、喜欢哪类内容多互动，不喜欢哪类则少评甚至不评。"
+                          description={t(msg`触发：角色浏览到用户朋友圈时自动评论。写评论语气、常用开场方式、喜欢哪类内容多互动，不喜欢哪类则少评甚至不评。`)}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
                               ...current,
@@ -1059,12 +1059,12 @@ export function ReplyLogicPage() {
                           }
                         />
                         <TextAreaBlock
-                          label="Feed 评论"
+                          label={t(msg`Feed 评论`)}
                           value={
                             characterDraft.profile.scenePrompts?.feed_comment ??
                             ""
                           }
-                          description="触发：角色看到用户 Feed 贴文时自动评论。写评论偏好，例如犀利点评 / 鼓励互动 / 专业补充，以及对哪类帖子积极评论。"
+                          description={t(msg`触发：角色看到用户 Feed 贴文时自动评论。写评论偏好，例如犀利点评 / 鼓励互动 / 专业补充，以及对哪类帖子积极评论。`)}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
                               ...current,
@@ -1079,11 +1079,11 @@ export function ReplyLogicPage() {
                           }
                         />
                         <TextAreaBlock
-                          label="好友请求/摇一摇问候"
+                          label={t(msg`好友请求/摇一摇问候`)}
                           value={
                             characterDraft.profile.scenePrompts?.greeting ?? ""
                           }
-                          description="触发：角色发起好友申请或摇一摇。只生成一句打招呼的话，建议写简短有特点的开场方式，20 字以内效果最佳。"
+                          description={t(msg`触发：角色发起好友申请或摇一摇。只生成一句打招呼的话，建议写简短有特点的开场方式，20 字以内效果最佳。`)}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
                               ...current,
@@ -1098,11 +1098,11 @@ export function ReplyLogicPage() {
                           }
                         />
                         <TextAreaBlock
-                          label="主动提醒"
+                          label={t(msg`主动提醒`)}
                           value={
                             characterDraft.profile.scenePrompts?.proactive ?? ""
                           }
-                          description="触发：定时任务检测角色记忆，决定是否主动给用户发消息。写什么情况下应该主动发（如记得某事想分享），什么情况下保持沉默。不填则由底层逻辑判断。"
+                          description={t(msg`触发：定时任务检测角色记忆，决定是否主动给用户发消息。写什么情况下应该主动发（如记得某事想分享），什么情况下保持沉默。不填则由底层逻辑判断。`)}
                           onChange={(value) =>
                             patchCharacterDraft((current) => ({
                               ...current,
@@ -1118,24 +1118,24 @@ export function ReplyLogicPage() {
                         />
                       </ConfigSection>
 
-                      <ConfigSection title="记忆（当前值）">
+                      <ConfigSection title={t(msg`记忆（当前值）`)}>
                         <p className="text-xs text-[color:var(--text-secondary)]">
-                          核心记忆每周一自动更新，近期摘要每日自动更新。在运行台中可查看和手动覆盖当前值。
+                          {t(msg`核心记忆每周一自动更新，近期摘要每日自动更新。在运行台中可查看和手动覆盖当前值。`)}
                         </p>
                         <div className="rounded border border-[color:var(--border-faint)] px-3 py-2 text-xs text-[color:var(--text-secondary)]">
                           <p>
                             <span className="font-medium text-[color:var(--text-primary)]">
-                              核心记忆：
+                              {t(msg`核心记忆：`)}
                             </span>
                             {characterDraft.profile.memory.coreMemory ||
-                              "（暂无）"}
+                              t(msg`（暂无）`)}
                           </p>
                           <p className="mt-1">
                             <span className="font-medium text-[color:var(--text-primary)]">
-                              近期摘要：
+                              {t(msg`近期摘要：`)}
                             </span>
                             {characterDraft.profile.memory.recentSummary ||
-                              "（暂无）"}
+                              t(msg`（暂无）`)}
                           </p>
                         </div>
                       </ConfigSection>
@@ -1145,7 +1145,7 @@ export function ReplyLogicPage() {
                           variant="secondary"
                           onClick={resetCharacterDraft}
                         >
-                          重置草稿
+                          {t(msg`重置草稿`)}
                         </Button>
                         <Button
                           variant="secondary"
@@ -1169,7 +1169,7 @@ export function ReplyLogicPage() {
                             }))
                           }
                         >
-                          清空所有提示词
+                          {t(msg`清空所有提示词`)}
                         </Button>
                         <Button
                           variant="secondary"
@@ -1186,7 +1186,7 @@ export function ReplyLogicPage() {
                             }))
                           }
                         >
-                          清空近期摘要
+                          {t(msg`清空近期摘要`)}
                         </Button>
                         <Button
                           variant="primary"
@@ -1197,8 +1197,8 @@ export function ReplyLogicPage() {
                           }
                         >
                           {characterSaveMutation.isPending
-                            ? "保存中..."
-                            : "保存角色配置"}
+                            ? t(msg`保存中...`)
+                            : t(msg`保存角色配置`)}
                         </Button>
                       </div>
                     </div>
@@ -1208,19 +1208,19 @@ export function ReplyLogicPage() {
 
               <Card className="bg-[color:var(--surface-console)]">
                 <AdminSectionHeader
-                  title="回复运行配置"
+                  title={t(msg`回复运行配置`)}
                   actions={
                     <StatusPill
                       tone={providerSetup.providerReady ? "healthy" : "warning"}
                     >
-                      {providerSetup.providerReady ? "已配置" : "待配置"}
+                      {providerSetup.providerReady ? t(msg`已配置`) : t(msg`待配置`)}
                     </StatusPill>
                   }
                 />
 
                 <div className="mt-4 space-y-4">
                   <FieldBlock
-                    label="接口地址"
+                    label={t(msg`接口地址`)}
                     value={providerSetup.providerDraft.endpoint}
                     placeholder="https://api.openai.com/v1"
                     onChange={(value) =>
@@ -1230,7 +1230,7 @@ export function ReplyLogicPage() {
 
                   <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
                     <SelectFieldBlock
-                      label="模式"
+                      label={t(msg`模式`)}
                       value={providerSetup.providerDraft.mode}
                       onChange={(value) =>
                         providerSetup.updateProviderDraft(
@@ -1239,12 +1239,12 @@ export function ReplyLogicPage() {
                         )
                       }
                       options={[
-                        { value: "local-compatible", label: "本地兼容" },
-                        { value: "cloud", label: "云端模式" },
+                        { value: "local-compatible", label: t(msg`本地兼容`) },
+                        { value: "cloud", label: t(msg`云端模式`) },
                       ]}
                     />
                     <FieldBlock
-                      label="模型"
+                      label={t(msg`模型`)}
                       value={providerSetup.providerDraft.model}
                       placeholder="gpt-4.1-mini"
                       list="reply-logic-available-models"
@@ -1262,10 +1262,10 @@ export function ReplyLogicPage() {
                   </div>
 
                   <FieldBlock
-                    label="API 密钥"
+                    label={t(msg`API 密钥`)}
                     value={providerSetup.providerDraft.apiKey ?? ""}
                     type="password"
-                    placeholder="输入实例级推理服务 API 密钥"
+                    placeholder={t(msg`输入实例级推理服务 API 密钥`)}
                     onChange={(value) =>
                       providerSetup.updateProviderDraft("apiKey", value)
                     }
@@ -1285,8 +1285,8 @@ export function ReplyLogicPage() {
                   {providerSetup.providerSaveMutation.isSuccess ? (
                     <AdminActionFeedback
                       tone="success"
-                      title="运行配置已保存"
-                      description="实例级推理服务已保存，运行时快照正在刷新。"
+                      title={t(msg`运行配置已保存`)}
+                      description={t(msg`实例级推理服务已保存，运行时快照正在刷新。`)}
                     />
                   ) : null}
 
@@ -1297,8 +1297,8 @@ export function ReplyLogicPage() {
                       disabled={providerSetup.providerProbeMutation.isPending}
                     >
                       {providerSetup.providerProbeMutation.isPending
-                        ? "测试中..."
-                        : "测试连接"}
+                        ? t(msg`测试中...`)
+                        : t(msg`测试连接`)}
                     </Button>
                     <Button
                       variant="primary"
@@ -1306,8 +1306,8 @@ export function ReplyLogicPage() {
                       disabled={providerSetup.providerSaveMutation.isPending}
                     >
                       {providerSetup.providerSaveMutation.isPending
-                        ? "保存中..."
-                        : "保存运行配置"}
+                        ? t(msg`保存中...`)
+                        : t(msg`保存运行配置`)}
                     </Button>
                   </div>
 
@@ -1388,17 +1388,18 @@ function CharacterInspectorPanel({
     | ReplyLogicConstantSummary["narrativePresentationTemplates"]
     | null;
 }) {
+  const t = translateRuntimeMessage;
   if (!selectedCharacter) {
     return (
       <AdminEmptyState
-        title="当前没有可选角色"
-        description="先在左侧角色列表里选中一个角色，再查看真实回复快照。"
+        title={t(msg`当前没有可选角色`)}
+        description={t(msg`先在左侧角色列表里选中一个角色，再查看真实回复快照。`)}
       />
     );
   }
 
   if (query.isLoading) {
-    return <LoadingBlock label="正在读取角色回复快照..." />;
+    return <LoadingBlock label={t(msg`正在读取角色回复快照...`)} />;
   }
 
   if (query.isError && query.error instanceof Error) {
@@ -1408,8 +1409,8 @@ function CharacterInspectorPanel({
   if (!query.data) {
     return (
       <AdminEmptyState
-        title="角色回复快照暂不可用"
-        description="刷新一次快照；如果仍不可用，先检查推理服务配置和角色运行状态。"
+        title={t(msg`角色回复快照暂不可用`)}
+        description={t(msg`刷新一次快照；如果仍不可用，先检查推理服务配置和角色运行状态。`)}
       />
     );
   }
@@ -1417,25 +1418,25 @@ function CharacterInspectorPanel({
   return (
     <>
       <Card className="bg-[color:var(--surface-console)]">
-        <SectionHeading>当前角色</SectionHeading>
+        <SectionHeading>{t(msg`当前角色`)}</SectionHeading>
         <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <MetricCard label="名称" value={query.data.character.name} />
+          <MetricCard label={t(msg`名称`)} value={query.data.character.name} />
           <MetricCard
-            label="关系"
+            label={t(msg`关系`)}
             value={formatRelationship(query.data.character.relationship)}
           />
           <MetricCard
-            label="活动"
+            label={t(msg`活动`)}
             value={formatActivity(query.data.character.currentActivity)}
           />
           <MetricCard
-            label="遗忘曲线"
+            label={t(msg`遗忘曲线`)}
             value={query.data.actor.forgettingCurve}
           />
         </div>
       </Card>
 
-      <ActorSnapshotCard actor={query.data.actor} title="单聊回复角色快照" />
+      <ActorSnapshotCard actor={query.data.actor} title={t(msg`单聊回复角色快照`)} />
 
       <NarrativeCard
         arcs={query.data.narrativeArc ? [query.data.narrativeArc] : []}
@@ -1443,7 +1444,7 @@ function CharacterInspectorPanel({
       />
 
       <Card className="bg-[color:var(--surface-console)]">
-        <SectionHeading>备注</SectionHeading>
+        <SectionHeading>{t(msg`备注`)}</SectionHeading>
         <AdminNoteList
           className="mt-4"
           items={query.data.notes.map((note) => formatReplyLogicText(note))}
@@ -1476,13 +1477,14 @@ function ReplyPreviewPanel({
   isPending: boolean;
   onRunPreview: () => void;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
-        title="候选消息预演"
+        title={t(msg`候选消息预演`)}
         actions={
           <StatusPill tone={preview ? "healthy" : "muted"}>
-            {preview ? "已生成预演" : "等待预演"}
+            {preview ? t(msg`已生成预演`) : t(msg`等待预演`)}
           </StatusPill>
         }
       />
@@ -1490,7 +1492,7 @@ function ReplyPreviewPanel({
       {scope === "conversation" ? (
         <SelectFieldBlock
           className="mt-4"
-          label="预演角色"
+          label={t(msg`预演角色`)}
           value={configuredConversationActorId}
           onChange={onConfiguredConversationActorIdChange}
           options={actorOptions.map((item) => ({
@@ -1501,9 +1503,9 @@ function ReplyPreviewPanel({
       ) : null}
 
       <TextAreaBlock
-        label="候选用户消息"
+        label={t(msg`候选用户消息`)}
         value={previewMessage}
-        placeholder="输入一条你想预演的用户消息。"
+        placeholder={t(msg`输入一条你想预演的用户消息。`)}
         onChange={onPreviewMessageChange}
       />
 
@@ -1511,21 +1513,21 @@ function ReplyPreviewPanel({
 
       <div className="mt-4 flex flex-wrap gap-3">
         <Button variant="secondary" onClick={() => onPreviewMessageChange("")}>
-          清空
+          {t(msg`清空`)}
         </Button>
         <Button
           variant="primary"
           onClick={onRunPreview}
           disabled={!previewMessage.trim() || isPending}
         >
-          {isPending ? "预演中..." : "执行预演"}
+          {isPending ? t(msg`预演中...`) : t(msg`执行预演`)}
         </Button>
       </div>
 
       {preview ? (
         <div className="mt-6 space-y-6 border-t border-[color:var(--border-faint)] pt-6">
-          <ActorSnapshotCard actor={preview.actor} title="候选消息预演快照" />
-          <AdminSubpanel title="预演备注" contentClassName="mt-3">
+          <ActorSnapshotCard actor={preview.actor} title={t(msg`候选消息预演快照`)} />
+          <AdminSubpanel title={t(msg`预演备注`)} contentClassName="mt-3">
             <AdminNoteList
               items={preview.notes.map((note) => formatReplyLogicText(note))}
             />
@@ -1549,17 +1551,18 @@ function ConversationInspectorPanel({
     | ReplyLogicConstantSummary["narrativePresentationTemplates"]
     | null;
 }) {
+  const t = translateRuntimeMessage;
   if (!selectedConversation) {
     return (
       <AdminEmptyState
-        title="当前没有可选会话"
-        description="切换到按会话查看后，先在左侧会话列表里选中一个目标。"
+        title={t(msg`当前没有可选会话`)}
+        description={t(msg`切换到按会话查看后，先在左侧会话列表里选中一个目标。`)}
       />
     );
   }
 
   if (query.isLoading) {
-    return <LoadingBlock label="正在读取会话回复快照..." />;
+    return <LoadingBlock label={t(msg`正在读取会话回复快照...`)} />;
   }
 
   if (query.isError && query.error instanceof Error) {
@@ -1569,8 +1572,8 @@ function ConversationInspectorPanel({
   if (!query.data) {
     return (
       <AdminEmptyState
-        title="会话回复快照暂不可用"
-        description="先刷新快照；如果仍不可用，检查该会话是否已有参与角色和可见历史。"
+        title={t(msg`会话回复快照暂不可用`)}
+        description={t(msg`先刷新快照；如果仍不可用，检查该会话是否已有参与角色和可见历史。`)}
       />
     );
   }
@@ -1578,18 +1581,18 @@ function ConversationInspectorPanel({
   return (
     <>
       <Card className="bg-[color:var(--surface-console)]">
-        <SectionHeading>会话分支</SectionHeading>
+        <SectionHeading>{t(msg`会话分支`)}</SectionHeading>
         <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <MetricCard label="标题" value={query.data.conversation.title} />
+          <MetricCard label={t(msg`标题`)} value={query.data.conversation.title} />
           <MetricCard
-            label="类型"
+            label={t(msg`类型`)}
             value={formatConversationType(query.data.conversation.type)}
           />
           <MetricCard
-            label="来源"
+            label={t(msg`来源`)}
             value={formatConversationSource(query.data.conversation.source)}
           />
-          <MetricCard label="参与角色" value={query.data.actors.length} />
+          <MetricCard label={t(msg`参与角色`)} value={query.data.actors.length} />
         </div>
         <AdminRecordCard
           className="mt-4"
@@ -1605,7 +1608,7 @@ function ConversationInspectorPanel({
       </Card>
 
       <Card className="bg-[color:var(--surface-console)]">
-        <SectionHeading>可见会话历史</SectionHeading>
+        <SectionHeading>{t(msg`可见会话历史`)}</SectionHeading>
         <HistoryList className="mt-4" items={query.data.visibleMessages} />
       </Card>
 
@@ -1623,7 +1626,7 @@ function ConversationInspectorPanel({
           <ActorSnapshotCard
             key={`${query.data.conversation.id}-${actor.character.id}`}
             actor={actor}
-            title={`${actor.character.name} 快照`}
+            title={`${actor.character.name} ${t(msg`快照`)}`}
           />
         ))}
       </div>
@@ -1647,6 +1650,7 @@ function GroupReplyRuntimeCard({
   runtime: ReplyLogicGroupReplyRuntimeSummary;
   visibleMessages: ReplyLogicHistoryItem[];
 }) {
+  const t = translateRuntimeMessage;
   const queryClient = useQueryClient();
   const taskSectionRef = useRef<HTMLDivElement | null>(null);
   const [statusFilter, setStatusFilter] = useState<
@@ -2363,7 +2367,7 @@ function GroupReplyRuntimeCard({
                 size="sm"
                 onClick={() => focusFilteredTasks("all", "all")}
               >
-                清空筛选
+                {t(msg`清空`)}筛选
               </Button>
             }
             className="bg-white/90"
@@ -2630,6 +2634,7 @@ function ActorSnapshotCard({
   actor: ReplyLogicActorSnapshot;
   title: string;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <SectionHeading>{title}</SectionHeading>
@@ -2691,6 +2696,7 @@ function ActorSnapshotCard({
 }
 
 function StateGateCard({ gate }: { gate: ReplyLogicStateGateSummary }) {
+  const t = translateRuntimeMessage;
   return (
     <AdminSubpanel title="状态门" contentClassName="mt-3">
       <div className="flex justify-end">
@@ -2737,6 +2743,7 @@ function HistoryList({
   items: ReplyLogicHistoryItem[];
   className?: string;
 }) {
+  const t = translateRuntimeMessage;
   if (!items.length) {
     return (
       <AdminEmptyState
@@ -2795,6 +2802,7 @@ function RequestMessageList({
   items: ReplyLogicActorSnapshot["requestMessages"];
   className?: string;
 }) {
+  const t = translateRuntimeMessage;
   if (!items.length) {
     return (
       <AdminEmptyState
@@ -2842,6 +2850,7 @@ function NarrativeCard({
     | ReplyLogicConstantSummary["narrativePresentationTemplates"]
     | null;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <SectionHeading>记忆与叙事</SectionHeading>
@@ -2909,6 +2918,7 @@ function RuntimeRulesEditorCard({
   onReset: () => void;
   onSave: () => void;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
@@ -4708,14 +4718,14 @@ function toneForGate(mode: ReplyLogicStateGateSummary["mode"]) {
 
 function formatGateMode(mode: ReplyLogicStateGateSummary["mode"]) {
   if (mode === "immediate") {
-    return "立即回复";
+    return translateRuntimeMessage(msg`立即回复`);
   }
 
   if (mode === "not_applied") {
-    return "未应用";
+    return translateRuntimeMessage(msg`未应用`);
   }
 
-  return "延迟回复";
+  return translateRuntimeMessage(msg`延迟回复`);
 }
 
 function formatStateGateReason(gate: ReplyLogicStateGateSummary) {
@@ -4724,11 +4734,11 @@ function formatStateGateReason(gate: ReplyLogicStateGateSummary) {
 
 function formatNarrativeStatus(status: string) {
   if (status === "completed") {
-    return "已完成";
+    return translateRuntimeMessage(msg`已完成`);
   }
 
   if (status === "active") {
-    return "进行中";
+    return translateRuntimeMessage(msg`进行中`);
   }
 
   return status;
@@ -4737,11 +4747,11 @@ function formatNarrativeStatus(status: string) {
 function formatProviderModelSource(source: string) {
   switch (source) {
     case "system_config_ai_model":
-      return "系统配置 ai_model";
+      return translateRuntimeMessage(msg`系统配置 ai_model`);
     case "env_ai_model":
-      return "环境变量 AI_MODEL";
+      return translateRuntimeMessage(msg`环境变量 AI_MODEL`);
     case "deepseek_default":
-      return "DeepSeek 默认模型";
+      return translateRuntimeMessage(msg`DeepSeek 默认模型`);
     default:
       return source;
   }
@@ -4750,11 +4760,11 @@ function formatProviderModelSource(source: string) {
 function formatProviderEndpointSource(source: string) {
   switch (source) {
     case "owner_custom_base":
-      return "世界主人自定义地址";
+      return translateRuntimeMessage(msg`世界主人自定义地址`);
     case "env_default":
-      return "环境变量 OPENAI_BASE_URL";
+      return translateRuntimeMessage(msg`环境变量 OPENAI_BASE_URL`);
     case "deepseek_default":
-      return "DeepSeek 默认地址";
+      return translateRuntimeMessage(msg`DeepSeek 默认地址`);
     default:
       return source;
   }
@@ -4763,11 +4773,11 @@ function formatProviderEndpointSource(source: string) {
 function formatProviderApiKeySource(source: string) {
   switch (source) {
     case "owner_custom":
-      return "世界主人自定义密钥";
+      return translateRuntimeMessage(msg`世界主人自定义密钥`);
     case "env_default":
-      return "环境变量默认密钥";
+      return translateRuntimeMessage(msg`环境变量默认密钥`);
     case "missing":
-      return "未配置";
+      return translateRuntimeMessage(msg`未配置`);
     default:
       return source;
   }
@@ -5128,34 +5138,34 @@ function parseNarrativeMilestones(
 
 function formatConversationType(type: string) {
   if (type === "group") {
-    return "群聊";
+    return translateRuntimeMessage(msg`群聊`);
   }
 
-  return "单聊";
+  return translateRuntimeMessage(msg`单聊`);
 }
 
 function formatConversationSource(
   source: ReplyLogicOverview["conversations"][number]["source"],
 ) {
   if (source === "group") {
-    return "群聊";
+    return translateRuntimeMessage(msg`群聊`);
   }
 
-  return "单聊";
+  return translateRuntimeMessage(msg`单聊`);
 }
 
 function formatGroupReplyTaskStatus(status: ReplyLogicGroupReplyTaskStatus) {
   switch (status) {
     case "pending":
-      return "待执行";
+      return translateRuntimeMessage(msg`待执行`);
     case "processing":
-      return "处理中";
+      return translateRuntimeMessage(msg`处理中`);
     case "sent":
-      return "已发送";
+      return translateRuntimeMessage(msg`已发送`);
     case "cancelled":
-      return "已取消";
+      return translateRuntimeMessage(msg`已取消`);
     case "failed":
-      return "失败";
+      return translateRuntimeMessage(msg`失败`);
     default:
       return status;
   }
@@ -5183,19 +5193,19 @@ function formatGroupReplyDisposition(
 ) {
   switch (disposition) {
     case "selected_targeted":
-      return "选中：明确指向";
+      return translateRuntimeMessage(msg`选中：明确指向`);
     case "selected_fallback":
-      return "选中：兜底最高分";
+      return translateRuntimeMessage(msg`选中：兜底最高分`);
     case "selected_followup":
-      return "选中：补充回复";
+      return translateRuntimeMessage(msg`选中：补充回复`);
     case "skipped_not_targeted":
-      return "跳过：未命中";
+      return translateRuntimeMessage(msg`跳过：未命中`);
     case "skipped_random_gate":
-      return "跳过：概率未过";
+      return translateRuntimeMessage(msg`跳过：概率未过`);
     case "skipped_without_explicit_interest":
-      return "跳过：无扩散资格";
+      return translateRuntimeMessage(msg`跳过：无扩散资格`);
     case "skipped_max_speakers":
-      return "跳过：人数已满";
+      return translateRuntimeMessage(msg`跳过：人数已满`);
     default:
       return disposition;
   }
@@ -5218,19 +5228,19 @@ function describeGroupReplyDisposition(
 ) {
   switch (disposition) {
     case "selected_targeted":
-      return "被回复目标或显式提及时，planner 会优先把他放进本轮发言名单。";
+      return translateRuntimeMessage(msg`被回复目标或显式提及时，planner 会优先把他放进本轮发言名单。`);
     case "selected_fallback":
-      return "这轮没有明显命中对象时，planner 会让分数最高的角色兜底接话。";
+      return translateRuntimeMessage(msg`这轮没有明显命中对象时，planner 会让分数最高的角色兜底接话。`);
     case "selected_followup":
-      return "主答之外的补充位，需要同时满足扩散条件和概率门控。";
+      return translateRuntimeMessage(msg`主答之外的补充位，需要同时满足扩散条件和概率门控。`);
     case "skipped_not_targeted":
-      return "这一轮没有明确指向到该角色，也没有进入补充回复条件。";
+      return translateRuntimeMessage(msg`这一轮没有明确指向到该角色，也没有进入补充回复条件。`);
     case "skipped_random_gate":
-      return "该角色进入候选池了，但活动频率概率门没有通过。";
+      return translateRuntimeMessage(msg`该角色进入候选池了，但活动频率概率门没有通过。`);
     case "skipped_without_explicit_interest":
-      return "当前消息没有明确提及，也不是 @所有人，所以不会额外扩散到其他角色。";
+      return translateRuntimeMessage(msg`当前消息没有明确提及，也不是 @所有人，所以不会额外扩散到其他角色。`);
     case "skipped_max_speakers":
-      return "这一轮允许发言的人数已满，即使命中条件也不再继续排入。";
+      return translateRuntimeMessage(msg`这一轮允许发言的人数已满，即使命中条件也不再继续排入。`);
     default:
       return disposition;
   }
@@ -5238,20 +5248,20 @@ function describeGroupReplyDisposition(
 
 function describeGroupReplyIssue(issue: ReplyLogicGroupReplyIssueSummary) {
   if (issue.source === "cancel_reason") {
-    return `最近群聊任务里，这个取消原因共出现 ${issue.count} 次，通常说明旧轮次被更新的用户消息覆盖，或者执行前角色上下文已经失效。`;
+    return translateRuntimeMessage(msg`最近群聊任务里，这个取消原因共出现 ${issue.count} 次，通常说明旧轮次被更新的用户消息覆盖，或者执行前角色上下文已经失效。`);
   }
 
-  return `最近群聊任务里，这类执行错误共出现 ${issue.count} 次。优先看失败任务明细里的原始错误，再决定是重新入队还是修运行环境。`;
+  return translateRuntimeMessage(msg`最近群聊任务里，这类执行错误共出现 ${issue.count} 次。优先看失败任务明细里的原始错误，再决定是重新入队还是修运行环境。`);
 }
 
 function describeArchivedGroupReplyIssue(
   issue: ReplyLogicGroupReplyIssueSummary,
 ) {
   if (issue.source === "cancel_reason") {
-    return `这是已经归档的历史取消热点，累计出现 ${issue.count} 次，适合用来判断长期是否存在过度取消或轮次过时问题。`;
+    return translateRuntimeMessage(msg`这是已经归档的历史取消热点，累计出现 ${issue.count} 次，适合用来判断长期是否存在过度取消或轮次过时问题。`);
   }
 
-  return `这是已经归档的历史失败热点，累计出现 ${issue.count} 次，适合用来判断某类 provider 或上下文错误是否反复出现。`;
+  return translateRuntimeMessage(msg`这是已经归档的历史失败热点，累计出现 ${issue.count} 次，适合用来判断某类 provider 或上下文错误是否反复出现。`);
 }
 
 function toneForGroupReplyActorDriftSeverity(
@@ -5272,11 +5282,11 @@ function formatGroupReplyActorDriftSeverity(
 ) {
   switch (severity) {
     case "warning":
-      return "异常抬升";
+      return translateRuntimeMessage(msg`异常抬升`);
     case "watch":
-      return "需要关注";
+      return translateRuntimeMessage(msg`需要关注`);
     default:
-      return "稳定";
+      return translateRuntimeMessage(msg`稳定`);
   }
 }
 
@@ -5285,11 +5295,11 @@ function formatGroupReplyActorDriftBaselineSource(
 ) {
   switch (source) {
     case "actor_archive":
-      return "角色历史";
+      return translateRuntimeMessage(msg`角色历史`);
     case "group_archive":
-      return "群聊整体历史";
+      return translateRuntimeMessage(msg`群聊整体历史`);
     default:
-      return "暂无历史基线";
+      return translateRuntimeMessage(msg`暂无历史基线`);
   }
 }
 
@@ -5297,10 +5307,10 @@ function describeGroupReplyActorDrift(
   actor: ReplyLogicGroupReplyActorDriftSummary,
 ) {
   if (actor.baselineSource === "none") {
-    return `最近 8 轮里，这个角色已有 ${actor.recentTaskCount} 条终态任务；因为还没有足够历史基线，所以先按绝对异常率 ${(actor.recentIssueRate * 100).toFixed(1)}% 做兜底监控。`;
+    return translateRuntimeMessage(msg`最近 8 轮里，这个角色已有 ${actor.recentTaskCount} 条终态任务；因为还没有足够历史基线，所以先按绝对异常率 ${(actor.recentIssueRate * 100).toFixed(1)}% 做兜底监控。`);
   }
 
-  return `最近 ${actor.recentTurnCount} 轮里，这个角色的异常率是 ${(actor.recentIssueRate * 100).toFixed(1)}%，相对${formatGroupReplyActorDriftBaselineSource(actor.baselineSource)}抬高了 ${formatRateDelta(actor.issueRateDelta)}。`;
+  return translateRuntimeMessage(msg`最近 ${actor.recentTurnCount} 轮里，这个角色的异常率是 ${(actor.recentIssueRate * 100).toFixed(1)}%，相对${formatGroupReplyActorDriftBaselineSource(actor.baselineSource)}抬高了 ${formatRateDelta(actor.issueRateDelta)}。`);
 }
 
 function formatRateDelta(value: number) {
@@ -5364,10 +5374,10 @@ function formatGroupReplyIssueLabel(
 ) {
   if (source === "cancel_reason") {
     if (value === "superseded_by_new_user_message") {
-      return "新用户消息覆盖了旧轮任务";
+      return translateRuntimeMessage(msg`新用户消息覆盖了旧轮任务`);
     }
     if (value === "actor_missing") {
-      return "角色缺失或画像不可用";
+      return translateRuntimeMessage(msg`角色缺失或画像不可用`);
     }
   }
 
@@ -5382,78 +5392,78 @@ function formatArchiveTrendDate(date: string) {
       day: "2-digit",
       weekday: "short",
     },
-    "未记录日期",
+    translateRuntimeMessage(msg`未记录日期`),
   );
 }
 
 function describeArchiveTrendPoint(
   point: ReplyLogicGroupReplyArchiveTrendPoint,
 ) {
-  return `当天共归档 ${point.taskCount} 条终态任务，涉及 ${point.turnCount} 轮；其中已发送 ${point.sentCount} 条、已取消 ${point.cancelledCount} 条、失败 ${point.failedCount} 条。`;
+  return translateRuntimeMessage(msg`当天共归档 ${point.taskCount} 条终态任务，涉及 ${point.turnCount} 轮；其中已发送 ${point.sentCount} 条、已取消 ${point.cancelledCount} 条、失败 ${point.failedCount} 条。`);
 }
 
 function describeArchiveActorSummary(
   actor: ReplyLogicGroupReplyArchiveActorSummary,
 ) {
-  return `长期归档里，这个角色累计参与 ${actor.taskCount} 条任务；成功发送 ${actor.sentCount} 条，取消 ${actor.cancelledCount} 条，失败 ${actor.failedCount} 条。`;
+  return translateRuntimeMessage(msg`长期归档里，这个角色累计参与 ${actor.taskCount} 条任务；成功发送 ${actor.sentCount} 条，取消 ${actor.cancelledCount} 条，失败 ${actor.failedCount} 条。`);
 }
 
 function formatGroupReplyCandidateMeta(recentSpeakerIndex: number) {
   if (recentSpeakerIndex < 0) {
-    return "最近发言惩罚：未触发";
+    return translateRuntimeMessage(msg`最近发言惩罚：未触发`);
   }
 
-  return `最近发言惩罚：窗口内第 ${recentSpeakerIndex + 1} 位`;
+  return translateRuntimeMessage(msg`最近发言惩罚：窗口内第 ${recentSpeakerIndex + 1} 位`);
 }
 
 function describeGroupReplyTask(
   task: ReplyLogicGroupReplyTurnSummary["tasks"][number],
 ) {
   if (task.status === "sent") {
-    return `已发出，发送时间 ${formatDateTime(task.sentAt)}。`;
+    return translateRuntimeMessage(msg`已发出，发送时间 ${formatDateTime(task.sentAt)}。`);
   }
   if (task.status === "processing") {
-    return `任务已开始执行，上次尝试时间 ${formatDateTime(task.lastAttemptAt)}。`;
+    return translateRuntimeMessage(msg`任务已开始执行，上次尝试时间 ${formatDateTime(task.lastAttemptAt)}。`);
   }
   if (task.status === "pending") {
-    return "任务仍在排队，等待到达计划执行时间。";
+    return translateRuntimeMessage(msg`任务仍在排队，等待到达计划执行时间。`);
   }
   if (task.status === "cancelled") {
-    return `任务已取消，原因：${formatGroupReplyCancelReason(task.cancelReason)}。`;
+    return translateRuntimeMessage(msg`任务已取消，原因：${formatGroupReplyCancelReason(task.cancelReason)}。`);
   }
-  return `任务失败${task.errorMessage ? `：${task.errorMessage}` : "。"} `;
+  return translateRuntimeMessage(msg`任务失败${task.errorMessage ? `：${task.errorMessage}` : "。"} `);
 }
 
 function formatGroupReplyCancelReason(reason?: string | null) {
   switch (reason) {
     case "superseded_by_new_user_message":
-      return "同群出现了更新的用户消息";
+      return translateRuntimeMessage(msg`同群出现了更新的用户消息`);
     case "actor_missing":
-      return "角色已不存在或画像不可用";
+      return translateRuntimeMessage(msg`角色已不存在或画像不可用`);
     default:
-      return reason || "未记录";
+      return reason || translateRuntimeMessage(msg`未记录`);
   }
 }
 
 function formatRelationship(value?: string | null) {
   if (!value) {
-    return "未设置";
+    return translateRuntimeMessage(msg`未设置`);
   }
 
   const normalized = value.trim().toLowerCase();
   switch (normalized) {
     case "self":
-      return "自己";
+      return translateRuntimeMessage(msg`自己`);
     case "family":
-      return "家人";
+      return translateRuntimeMessage(msg`家人`);
     case "friend":
-      return "朋友";
+      return translateRuntimeMessage(msg`朋友`);
     case "expert":
-      return "专家";
+      return translateRuntimeMessage(msg`专家`);
     case "mentor":
-      return "导师";
+      return translateRuntimeMessage(msg`导师`);
     case "acquaintance":
-      return "熟人";
+      return translateRuntimeMessage(msg`熟人`);
     default:
       return value;
   }
@@ -5461,17 +5471,17 @@ function formatRelationship(value?: string | null) {
 
 function formatActivity(activity?: string | null) {
   const matched = ACTIVITY_OPTIONS.find((item) => item.value === activity);
-  return matched?.label ?? "未设置";
+  return matched ? translateRuntimeMessage(matched.label) : translateRuntimeMessage(msg`未设置`);
 }
 
 function formatSenderType(senderType: ReplyLogicHistoryItem["senderType"]) {
   switch (senderType) {
     case "user":
-      return "世界主人";
+      return translateRuntimeMessage(msg`世界主人`);
     case "character":
-      return "角色";
+      return translateRuntimeMessage(msg`角色`);
     case "system":
-      return "系统";
+      return translateRuntimeMessage(msg`系统`);
     default:
       return senderType;
   }
@@ -5480,23 +5490,23 @@ function formatSenderType(senderType: ReplyLogicHistoryItem["senderType"]) {
 function formatMessageType(type: string) {
   switch (type) {
     case "text":
-      return "文本";
+      return translateRuntimeMessage(msg`文本`);
     case "system":
-      return "系统";
+      return translateRuntimeMessage(msg`系统`);
     case "proactive":
-      return "主动消息";
+      return translateRuntimeMessage(msg`主动消息`);
     case "image":
-      return "图片";
+      return translateRuntimeMessage(msg`图片`);
     case "file":
-      return "文件";
+      return translateRuntimeMessage(msg`文件`);
     case "contact_card":
-      return "名片";
+      return translateRuntimeMessage(msg`名片`);
     case "location_card":
-      return "位置卡片";
+      return translateRuntimeMessage(msg`位置卡片`);
     case "sticker":
-      return "表情包";
+      return translateRuntimeMessage(msg`表情包`);
     case "article_card":
-      return "文章卡片";
+      return translateRuntimeMessage(msg`文章卡片`);
     default:
       return type;
   }
@@ -5511,25 +5521,25 @@ function formatPromptSectionLabel(
 ) {
   switch (section.key) {
     case "identity":
-      return "身份设定";
+      return translateRuntimeMessage(msg`身份设定`);
     case "personality_and_tone":
-      return "语气与风格";
+      return translateRuntimeMessage(msg`语气与风格`);
     case "behavioral_patterns":
-      return "行为模式";
+      return translateRuntimeMessage(msg`行为模式`);
     case "cognitive_boundaries":
-      return "认知边界";
+      return translateRuntimeMessage(msg`认知边界`);
     case "internal_reasoning":
-      return "内部推理";
+      return translateRuntimeMessage(msg`内部推理`);
     case "collaboration_routing":
-      return "协作路由";
+      return translateRuntimeMessage(msg`协作路由`);
     case "memory":
-      return "记忆";
+      return translateRuntimeMessage(msg`记忆`);
     case "current_context":
-      return "当前上下文";
+      return translateRuntimeMessage(msg`当前上下文`);
     case "group_chat":
-      return "群聊上下文";
+      return translateRuntimeMessage(msg`群聊上下文`);
     case "rules":
-      return "规则";
+      return translateRuntimeMessage(msg`规则`);
     default:
       return section.label;
   }
@@ -5542,7 +5552,7 @@ function formatNarrativeTitle(
     | null,
 ) {
   if (title.endsWith(" relationship arc")) {
-    const suffix = narrativePresentation?.relationshipArcSuffix ?? "关系弧线";
+    const suffix = narrativePresentation?.relationshipArcSuffix ?? translateRuntimeMessage(msg`关系弧线`);
     return `${title.replace(/ relationship arc$/, "")} ${suffix}`;
   }
 
@@ -5566,17 +5576,17 @@ function formatNarrativeMilestoneLabel(
 
   switch (label) {
     case "connected":
-      return "已建立连接";
+      return translateRuntimeMessage(msg`已建立连接`);
     case "first_breakthrough":
-      return "首次突破";
+      return translateRuntimeMessage(msg`首次突破`);
     case "shared_context":
-      return "共享语境";
+      return translateRuntimeMessage(msg`共享语境`);
     case "growing_trust":
-      return "信任增长";
+      return translateRuntimeMessage(msg`信任增长`);
     case "inner_circle":
-      return "进入内圈";
+      return translateRuntimeMessage(msg`进入内圈`);
     case "story_complete":
-      return "关系完成";
+      return translateRuntimeMessage(msg`关系完成`);
     default:
       return label;
   }
