@@ -1293,6 +1293,15 @@ export class AiOrchestratorService {
       emptyTextFallback,
     } = request;
     const finalLanguageReminder = await this.worldLanguage.buildFinalReminder();
+    // 把语言提醒贴在当前用户消息末尾，作为模型生成前看到的最后一段指令。
+    // 之前合并进 system prompt 时，长长的角色档案/规则（多为中文）会盖过它，
+    // 导致 world_language=en-US 的账号里仍有大量中文回复（反之亦然）。
+    const currentUserMessageWithLanguage: ChatMessage = finalLanguageReminder
+      ? {
+          ...currentUserMessage,
+          content: `${currentUserMessage.content}\n\n${finalLanguageReminder}`,
+        }
+      : currentUserMessage;
     const hasImageInput = this.requestContainsImageInput(request);
     const hasAudioInput = this.requestContainsAudioInput(request);
     const hasDocumentInput = this.requestContainsDocumentInput(request);
@@ -1323,21 +1332,16 @@ export class AiOrchestratorService {
           ),
         );
         const currentMessage = await this.buildResponsesMessage(
-          currentUserMessage,
+          currentUserMessageWithLanguage,
           provider,
           capabilities,
           isGroupChat,
           allowImageInput,
           allowDocumentInput,
         );
-        // Responses API 用 instructions 字段承载 system 内容，避免在 input 数组里再插
-        // 第二条 system role（部分 provider 严格不允许 system 出现在 instructions 之外）。
-        const mergedInstructions = finalLanguageReminder
-          ? `${systemPrompt}\n\n${finalLanguageReminder}`
-          : systemPrompt;
         const response = await client.responses.create({
           model: provider.model,
-          instructions: mergedInstructions,
+          instructions: systemPrompt,
           input: [...historyMessages, currentMessage],
           max_output_tokens: 500,
           temperature: 0.85,
@@ -1367,21 +1371,16 @@ export class AiOrchestratorService {
         ),
       );
       const currentMessage = await this.buildChatCompletionMessage(
-        currentUserMessage,
+        currentUserMessageWithLanguage,
         provider,
         isGroupChat,
         allowImageInput,
         allowAudioInput,
       );
-      // MiniMax-M2.7 等模型不允许 system role 出现在 messages 第一条之外的位置，
-      // 把语言提醒合并进首条 system，再用单条 system 起头。
-      const mergedSystemPrompt = finalLanguageReminder
-        ? `${systemPrompt}\n\n${finalLanguageReminder}`
-        : systemPrompt;
       const response = await executeChatCompletion(client, {
         model: provider.model,
         messages: [
-          { role: 'system', content: mergedSystemPrompt },
+          { role: 'system', content: systemPrompt },
           ...historyMessages,
           currentMessage,
         ],
@@ -1856,16 +1855,16 @@ export class AiOrchestratorService {
     );
     const includedHistory = conversationHistory.slice(-historyWindow);
     const finalLanguageReminder = await this.worldLanguage.buildFinalReminder();
-    const mergedSystemPrompt = finalLanguageReminder
-      ? `${systemPrompt}\n\n${finalLanguageReminder}`
-      : systemPrompt;
+    const userMessageWithLanguage = finalLanguageReminder
+      ? `${userMessage}\n\n${finalLanguageReminder}`
+      : userMessage;
     const requestMessages: Array<{
       role: 'system' | 'user' | 'assistant';
       content: string;
     }> = [
       {
         role: 'system',
-        content: mergedSystemPrompt,
+        content: systemPrompt,
       },
       ...includedHistory.map((message) => ({
         role:
@@ -1878,7 +1877,7 @@ export class AiOrchestratorService {
       })),
       {
         role: 'user',
-        content: userMessage,
+        content: userMessageWithLanguage,
       },
     ];
     const worldCtx = await this.worldService.getLatest();
