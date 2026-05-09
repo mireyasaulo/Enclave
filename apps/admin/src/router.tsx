@@ -106,6 +106,11 @@ const InferencePage = lazy(async () => {
   return { default: mod.InferencePage };
 });
 
+const MinimaxQuotaPage = lazy(async () => {
+  const mod = await import("./routes/minimax-quota-page");
+  return { default: mod.MinimaxQuotaPage };
+});
+
 const rootRoute = createRootRoute({
   component: RootLayout,
 });
@@ -230,6 +235,12 @@ const inferenceRoute = createRoute({
   component: InferencePage,
 });
 
+const minimaxQuotaRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/minimax-quota",
+  component: MinimaxQuotaPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   setupRoute,
@@ -251,6 +262,7 @@ const routeTree = rootRoute.addChildren([
   chatRecordsRoute,
   tokenUsageRoute,
   inferenceRoute,
+  minimaxQuotaRoute,
 ]);
 
 export const router = createRouter({

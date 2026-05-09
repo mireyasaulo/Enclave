@@ -767,5 +767,20 @@ export const adminApi = {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
+  getMinimaxQuota: () => adminFetch<MinimaxQuotaResponse>("/minimax/quota"),
 };
+
+export interface MinimaxQuotaSnapshot {
+  used: number;
+  reserved: number;
+  committed: number;
+  limit: number;
+  remaining: number;
+}
+
+export interface MinimaxQuotaResponse {
+  date: string;
+  byModel: Record<string, MinimaxQuotaSnapshot>;
+  warnings: string[];
+}
 // i18n-ignore-end
