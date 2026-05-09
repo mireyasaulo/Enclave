@@ -1415,6 +1415,28 @@ export function WelcomePage() {
             </MobileWelcomeNotice>
           )
         ) : null}
+        {sendEmailCodeMutation.isError && sendEmailCodeMutation.error instanceof Error ? (
+          isDesktopLayout ? (
+            <ErrorBlock message={sendEmailCodeMutation.error.message} />
+          ) : (
+            <MobileWelcomeNotice
+              tone="danger"
+              action={
+                email.trim() && !sendEmailCodeMutation.isPending ? (
+                  <button
+                    type="button"
+                    onClick={() => sendEmailCodeMutation.mutate()}
+                    className="shrink-0 rounded-full border border-[rgba(220,38,38,0.14)] bg-white px-2 py-0.5 text-[10px] font-medium text-[#b42318]"
+                  >
+                    {t(msg`重试发送`)}
+                  </button>
+                ) : undefined
+              }
+            >
+              {sendEmailCodeMutation.error.message}
+            </MobileWelcomeNotice>
+          )
+        ) : null}
         {cloudAccessSessionQuery.isError && cloudAccessSessionQuery.error instanceof Error ? (
           isDesktopLayout ? (
             <ErrorBlock message={cloudAccessSessionQuery.error.message} />
