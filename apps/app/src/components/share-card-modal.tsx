@@ -16,6 +16,54 @@ const t = translateRuntimeMessage;
 // 不读 env，因为 app 客户端的 SITE_URL 没有现成常量，且这个值固定。
 const SITE_URL = "https://www.enclave.top";
 
+// QR 是 site URL 编码出来的 data URL，整个 app 生命周期都不变。
+// 第一次生成后挂在模块作用域，后续 modal 打开直接读 — 不再每次重新生成。
+let qrPromise: Promise<string | null> | null = null;
+function getQrDataUrl(): Promise<string | null> {
+  if (!qrPromise) {
+    qrPromise = QRCode.toDataURL(SITE_URL, {
+      margin: 1,
+      width: 128,
+      errorCorrectionLevel: "M",
+    }).catch(() => null);
+  }
+  return qrPromise;
+}
+
+/**
+ * 等一张 <img> 加载完成（或失败 / 超时），永远 resolve 不 reject。
+ * 不带超时 promise 在 data URL 异常时可能永远 hang。
+ */
+function waitImgSettled(img: HTMLImageElement, timeoutMs = 3000): Promise<void> {
+  return new Promise((resolve) => {
+    if (img.complete && img.naturalWidth > 0) {
+      resolve();
+      return;
+    }
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timer);
+      img.removeEventListener("load", finish);
+      img.removeEventListener("error", finish);
+      resolve();
+    };
+    const timer = window.setTimeout(finish, timeoutMs);
+    img.addEventListener("load", finish, { once: true });
+    img.addEventListener("error", finish, { once: true });
+  });
+}
+
+async function blobToDataURL(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
+
 type Props = {
   /**
    * 当前要导出的卡片 id；null 时整个 modal 隐藏。
@@ -61,26 +109,14 @@ export function ShareCardModal({
   const [pngDataUrl, setPngDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // 生成一次 QR — site URL 固定。失败时悄悄省掉，水印仍然有文字。
+  // QR 是模块级缓存的 promise，第一次生成、之后所有 modal 共享。失败时取 null。
   useEffect(() => {
     let cancelled = false;
-    QRCode.toDataURL(SITE_URL, {
-      margin: 1,
-      width: 128,
-      errorCorrectionLevel: "M",
-    })
-      .then((url) => {
-        if (!cancelled) {
-          setQr(url);
-          setQrReady(true);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setQr(null);
-          setQrReady(true);
-        }
-      });
+    getQrDataUrl().then((url) => {
+      if (cancelled) return;
+      setQr(url);
+      setQrReady(true);
+    });
     return () => {
       cancelled = true;
     };
@@ -119,41 +155,26 @@ export function ShareCardModal({
         }
       });
 
-      // 把所有 <img> 转成同源 data URL — 避免 cross-origin 把 canvas tainted 后
-      // toDataURL 抛 SecurityError。fetch 失败的图就让它空着，不影响其他元素。
+      // 处理所有 <img>：
+      // - 跨源 http(s) 图：fetch + 转 data URL 替换 src — 避开 canvas tainted。
+      // - 已经是 data URL 的（如 QR、avatar fallback）：跳过转换，但仍然 wait
+      //   它加载完，否则 toPng 时图可能还在 decode 中导致截图缺图。
+      // 单图失败不拦截整张截图。
       const imgs = Array.from(node.querySelectorAll("img"));
       await Promise.all(
         imgs.map(async (img) => {
-          if (!img.src || img.src.startsWith("data:")) return;
-          try {
-            const resp = await fetch(img.src, { cache: "force-cache" });
-            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-            const blob = await resp.blob();
-            const dataUrl = await new Promise<string>((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onload = () => resolve(String(reader.result));
-              reader.onerror = () => reject(reader.error);
-              reader.readAsDataURL(blob);
-            });
-            img.src = dataUrl;
-            // 等 src 替换完成。同时监听 load / error，并加 3 秒超时，
-            // 避免 data URL 异常时 promise 永远 hang 导致截图卡住。
-            await new Promise<void>((resolve) => {
-              if (img.complete && img.naturalWidth > 0) {
-                resolve();
-                return;
-              }
-              const timer = window.setTimeout(resolve, 3000);
-              const done = () => {
-                window.clearTimeout(timer);
-                resolve();
-              };
-              img.addEventListener("load", done, { once: true });
-              img.addEventListener("error", done, { once: true });
-            });
-          } catch {
-            // 单图加载失败不要拦住整张图卡
+          if (img.src && !img.src.startsWith("data:")) {
+            try {
+              const resp = await fetch(img.src, { cache: "force-cache" });
+              if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+              const dataUrl = await blobToDataURL(await resp.blob());
+              img.src = dataUrl;
+            } catch {
+              // 失败的图不再 wait — 它的 load/error 已触发或永不触发
+              return;
+            }
           }
+          await waitImgSettled(img);
         }),
       );
       if (cancelled) return;
@@ -188,6 +209,17 @@ export function ShareCardModal({
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [cardKey, onClose]);
+
+  // body 滚动锁 — modal 打开时背景不能滚动（手机上特别重要，否则手指滑动
+  // 会同时滚动底层页面）。
+  useEffect(() => {
+    if (!cardKey) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [cardKey]);
 
   if (!cardKey) return null;
 
