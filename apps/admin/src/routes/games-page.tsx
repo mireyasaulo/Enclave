@@ -829,52 +829,52 @@ export function GamesPage() {
               </div>
 
               <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                <AdminMiniPanel title="当前工作区" tone="soft">
+                <AdminMiniPanel title={t(msg`当前工作区`)} tone="soft">
                   <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                    {workspaceTab === "catalog" ? "目录编辑" : "版本发布"}
+                    {workspaceTab === "catalog" ? t(msg`目录编辑`) : t(msg`版本发布`)}
                   </div>
                   <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
                     {workspaceTab === "catalog"
-                      ? "维护资料、状态和前台标签。"
-                      : "管理修订记录、正式发布和回滚。"}
+                      ? t(msg`维护资料、状态和前台标签。`)
+                      : t(msg`管理修订记录、正式发布和回滚。`)}
                   </div>
                 </AdminMiniPanel>
-                <AdminMiniPanel title="下一步建议" tone="soft">
+                <AdminMiniPanel title={t(msg`下一步建议`)} tone="soft">
                   <div className="text-sm font-medium text-[color:var(--text-primary)]">
                     {selectedGame
                       ? summarizeNextActionLabel(selectedGame)
-                      : "先选中目录项"}
+                      : t(msg`先选中目录项`)}
                   </div>
                   <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
                     {selectedGame
                       ? summarizeGameNextStep(selectedGame)
-                      : "左侧队列按优先级排序，可直接进入处理。"}
+                      : t(msg`左侧队列按优先级排序，可直接进入处理。`)}
                   </div>
                 </AdminMiniPanel>
-                <AdminMiniPanel title="版本状态" tone="soft">
+                <AdminMiniPanel title={t(msg`版本状态`)} tone="soft">
                   <div className="text-sm font-medium text-[color:var(--text-primary)]">
                     {selectedGame
                       ? `v${selectedGame.publishedVersion || 0}`
                       : isCreating
-                        ? "尚未发布"
-                        : "未选择"}
+                        ? t(msg`尚未发布`)
+                        : t(msg`未选择`)}
                   </div>
                   <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
                     {selectedGame?.lastPublishedAt
-                      ? `上次发布于 ${formatTime(selectedGame.lastPublishedAt)}`
-                      : "当前没有正式发布时间记录。"}
+                      ? t(msg`上次发布于 ${formatTime(selectedGame.lastPublishedAt)}`)
+                      : t(msg`当前没有正式发布时间记录。`)}
                   </div>
                 </AdminMiniPanel>
-                <AdminMiniPanel title="表单完整度" tone="soft">
+                <AdminMiniPanel title={t(msg`表单完整度`)} tone="soft">
                   <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                    {draftReady ? "关键字段已齐备" : `还缺 ${draftIssues.length} 项`}
+                    {draftReady ? t(msg`关键字段已齐备`) : t(msg`还缺 ${draftIssues.length} 项`)}
                   </div>
                   <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
                     {draftReady
                       ? isDraftDirty
-                        ? "可以保存后进入发布或策展流。"
-                        : "表单内容已和当前草稿同步。"
-                      : `优先补齐：${draftIssues.slice(0, 3).join("、")}`}
+                        ? t(msg`可以保存后进入发布或策展流。`)
+                        : t(msg`表单内容已和当前草稿同步。`)
+                      : t(msg`优先补齐：${draftIssues.slice(0, 3).join("、")}`)}
                   </div>
                 </AdminMiniPanel>
               </div>
@@ -948,14 +948,14 @@ function CatalogEditorWorkspace({
   }
 
   if (selectedGameQuery.isLoading && !isCreating) {
-    return <LoadingBlock label="正在加载游戏详情..." />;
+    return <LoadingBlock label={t(msg`正在加载游戏详情...`)} />;
   }
 
   if (!isCreating && !selectedGameId) {
     return (
       <AdminEmptyState
-        title="先选择一个游戏"
-        description="左侧选中一款游戏后，这里会展示完整目录详情、关键摘要和可编辑字段。"
+        title={t(msg`先选择一个游戏`)}
+        description={t(msg`左侧选中一款游戏后，这里会展示完整目录详情、关键摘要和可编辑字段。`)}
       />
     );
   }
@@ -966,38 +966,38 @@ function CatalogEditorWorkspace({
         tone={!draftReady ? "warning" : isDraftDirty ? "info" : "success"}
         title={
           !draftReady
-            ? "草稿还不适合流入后续运营环节"
+            ? t(msg`草稿还不适合流入后续运营环节`)
             : isDraftDirty
-              ? "草稿有未保存修改"
-              : "当前目录资料已同步"
+              ? t(msg`草稿有未保存修改`)
+              : t(msg`当前目录资料已同步`)
         }
         description={
           !draftReady
-            ? `请先补齐以下关键字段：${draftIssues.join("、")}。`
+            ? t(msg`请先补齐以下关键字段：${draftIssues.join("、")}。`)
             : isDraftDirty
-              ? "保存后再去发布版本或首页策展，避免运营看到的状态和实际草稿不一致。"
-              : "可以继续切到版本发布、首页策展或投稿入库，处理后续运营动作。"
+              ? t(msg`保存后再去发布版本或首页策展，避免运营看到的状态和实际草稿不一致。`)
+              : t(msg`可以继续切到版本发布、首页策展或投稿入库，处理后续运营动作。`)
         }
       />
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <AdminDetailPanel title="基础资料">
+        <AdminDetailPanel title={t(msg`基础资料`)}>
           <div className="grid gap-4 2xl:grid-cols-2">
             <EditorField
-              label="游戏 ID"
+              label={t(msg`游戏 ID`)}
               value={draft.id}
               onChange={(value) => setDraft((current) => ({ ...current, id: value }))}
               disabled={!isCreating}
-              placeholder="例如 signal-squad"
+              placeholder="signal-squad"
             />
             <EditorField
-              label="游戏名"
+              label={t(msg`游戏名`)}
               value={draft.name}
               onChange={(value) => setDraft((current) => ({ ...current, name: value }))}
-              placeholder="输入目录显示名称"
+              placeholder={t(msg`输入目录显示名称`)}
             />
             <EditorField
-              label="工作室"
+              label={t(msg`工作室`)}
               value={draft.studio}
               onChange={(value) =>
                 setDraft((current) => ({ ...current, studio: value }))
@@ -1007,47 +1007,47 @@ function CatalogEditorWorkspace({
               label="Badge"
               value={draft.badge}
               onChange={(value) => setDraft((current) => ({ ...current, badge: value }))}
-              placeholder="例如 新作、爆款"
+              placeholder={t(msg`例如 新作、爆款`)}
             />
             <EditorField
-              label="Hero 标签"
+              label={t(msg`Hero 标签`)}
               value={draft.heroLabel}
               onChange={(value) =>
                 setDraft((current) => ({ ...current, heroLabel: value }))
               }
             />
             <EditorField
-              label="Deck 标签"
+              label={t(msg`Deck 标签`)}
               value={draft.deckLabel}
               onChange={(value) =>
                 setDraft((current) => ({ ...current, deckLabel: value }))
               }
             />
             <EditorField
-              label="一句话卖点"
+              label={t(msg`一句话卖点`)}
               value={draft.slogan}
               onChange={(value) =>
                 setDraft((current) => ({ ...current, slogan: value }))
               }
-              placeholder="例如 三分钟一局，把反应和协作压到最紧"
+              placeholder={t(msg`例如 三分钟一局，把反应和协作压到最紧`)}
               className="2xl:col-span-2"
             />
             <EditorTextArea
-              label="游戏简介"
+              label={t(msg`游戏简介`)}
               value={draft.description}
               onChange={(value) =>
                 setDraft((current) => ({ ...current, description: value }))
               }
-              placeholder="描述这款 AI 游戏的玩法、目标和回流价值"
+              placeholder={t(msg`描述这款 AI 游戏的玩法、目标和回流价值`)}
               className="2xl:col-span-2"
             />
           </div>
         </AdminDetailPanel>
 
-        <AdminDetailPanel title="前台定位">
+        <AdminDetailPanel title={t(msg`前台定位`)}>
           <div className="grid gap-4 2xl:grid-cols-2">
             <EditorSelect
-              label="目录分类"
+              label={t(msg`目录分类`)}
               value={draft.category}
               onChange={(value) =>
                 setDraft((current) => ({
@@ -1072,7 +1072,7 @@ function CatalogEditorWorkspace({
               options={TONE_OPTIONS}
             />
             <EditorField
-              label="单局时长"
+              label={t(msg`单局时长`)}
               value={draft.estimatedDuration}
               onChange={(value) =>
                 setDraft((current) => ({
@@ -1080,57 +1080,57 @@ function CatalogEditorWorkspace({
                   estimatedDuration: value,
                 }))
               }
-              placeholder="例如 3-5 分钟"
+              placeholder={t(msg`例如 3-5 分钟`)}
             />
             <EditorField
-              label="奖励文案"
+              label={t(msg`奖励文案`)}
               value={draft.rewardLabel}
               onChange={(value) =>
                 setDraft((current) => ({ ...current, rewardLabel: value }))
               }
-              placeholder="例如 连胜奖励、周榜积分"
+              placeholder={t(msg`例如 连胜奖励、周榜积分`)}
             />
             <EditorField
-              label="玩家热度"
+              label={t(msg`玩家热度`)}
               value={draft.playersLabel}
               onChange={(value) =>
                 setDraft((current) => ({ ...current, playersLabel: value }))
               }
-              placeholder="例如 2.4k 在玩"
+              placeholder={t(msg`例如 2.4k 在玩`)}
             />
             <EditorField
-              label="社交热度"
+              label={t(msg`社交热度`)}
               value={draft.friendsLabel}
               onChange={(value) =>
                 setDraft((current) => ({ ...current, friendsLabel: value }))
               }
-              placeholder="例如 236 位好友在聊"
+              placeholder={t(msg`例如 236 位好友在聊`)}
             />
             <EditorField
-              label="更新摘要"
+              label={t(msg`更新摘要`)}
               value={draft.updateNote}
               onChange={(value) =>
                 setDraft((current) => ({ ...current, updateNote: value }))
               }
-              placeholder="例如 新增赛季对抗、优化新手引导"
+              placeholder={t(msg`例如 新增赛季对抗、优化新手引导`)}
               className="2xl:col-span-2"
             />
             <EditorTextArea
-              label="本局目标"
+              label={t(msg`本局目标`)}
               value={draft.sessionObjective}
               onChange={(value) =>
                 setDraft((current) => ({ ...current, sessionObjective: value }))
               }
-              placeholder="说明玩家本轮打开后应该做什么"
+              placeholder={t(msg`说明玩家本轮打开后应该做什么`)}
               className="2xl:col-span-2"
             />
           </div>
         </AdminDetailPanel>
 
-        <AdminDetailPanel title="运营与审核">
+        <AdminDetailPanel title={t(msg`运营与审核`)}>
           <div className="grid gap-4 2xl:grid-cols-2">
             <EditorSelect
-              label="来源"
+              label={t(msg`来源`)}
               value={draft.publisherKind}
               onChange={(value) =>
                 setDraft((current) => ({
@@ -1144,7 +1144,7 @@ function CatalogEditorWorkspace({
               }))}
             />
             <EditorSelect
-              label="生产方式"
+              label={t(msg`生产方式`)}
               value={draft.productionKind}
               onChange={(value) =>
                 setDraft((current) => ({
@@ -1158,7 +1158,7 @@ function CatalogEditorWorkspace({
               }))}
             />
             <EditorSelect
-              label="运行方式"
+              label={t(msg`运行方式`)}
               value={draft.runtimeMode}
               onChange={(value) =>
                 setDraft((current) => ({
@@ -1172,7 +1172,7 @@ function CatalogEditorWorkspace({
               }))}
             />
             <EditorSelect
-              label="审核状态"
+              label={t(msg`审核状态`)}
               value={draft.reviewStatus}
               onChange={(value) =>
                 setDraft((current) => ({
@@ -1186,7 +1186,7 @@ function CatalogEditorWorkspace({
               }))}
             />
             <EditorSelect
-              label="可见性"
+              label={t(msg`可见性`)}
               value={draft.visibilityScope}
               onChange={(value) =>
                 setDraft((current) => ({
@@ -1200,7 +1200,7 @@ function CatalogEditorWorkspace({
               }))}
             />
             <EditorField
-              label="排序权重"
+              label={t(msg`排序权重`)}
               value={draft.sortOrder}
               onChange={(value) =>
                 setDraft((current) => ({ ...current, sortOrder: value }))
@@ -1210,10 +1210,10 @@ function CatalogEditorWorkspace({
           </div>
         </AdminDetailPanel>
 
-        <AdminDetailPanel title="来源与标签">
+        <AdminDetailPanel title={t(msg`来源与标签`)}>
           <div className="grid gap-4 2xl:grid-cols-2">
             <EditorField
-              label="来源角色 ID"
+              label={t(msg`来源角色 ID`)}
               value={draft.sourceCharacterId}
               onChange={(value) =>
                 setDraft((current) => ({
@@ -1221,10 +1221,10 @@ function CatalogEditorWorkspace({
                   sourceCharacterId: value,
                 }))
               }
-              placeholder="例如 character-conductor-01"
+              placeholder="character-conductor-01"
             />
             <EditorField
-              label="来源角色名"
+              label={t(msg`来源角色名`)}
               value={draft.sourceCharacterName}
               onChange={(value) =>
                 setDraft((current) => ({
@@ -1232,10 +1232,10 @@ function CatalogEditorWorkspace({
                   sourceCharacterName: value,
                 }))
               }
-              placeholder="例如 星野乘务长"
+              placeholder={t(msg`例如 星野乘务长`)}
             />
             <EditorTextArea
-              label="AI 亮点"
+              label={t(msg`AI 亮点`)}
               value={draft.aiHighlightsText}
               onChange={(value) =>
                 setDraft((current) => ({
@@ -1243,16 +1243,16 @@ function CatalogEditorWorkspace({
                   aiHighlightsText: value,
                 }))
               }
-              placeholder="用逗号或换行分隔，例如 AI 陪练，AI 剧情生成"
+              placeholder={t(msg`用逗号或换行分隔，例如 AI 陪练，AI 剧情生成`)}
               className="2xl:col-span-2"
             />
             <EditorTextArea
-              label="标签"
+              label={t(msg`标签`)}
               value={draft.tagsText}
               onChange={(value) =>
                 setDraft((current) => ({ ...current, tagsText: value }))
               }
-              placeholder="用逗号或换行分隔，例如 组队，3 分钟，赛季"
+              placeholder={t(msg`用逗号或换行分隔，例如 组队，3 分钟，赛季`)}
               className="2xl:col-span-2"
             />
           </div>
