@@ -42,8 +42,8 @@ export async function generateMetadata({
   const useCase = findUseCase(slug);
   if (!useCase) return {};
   const i18n = await getServerI18n(locale);
-  const title = i18n._(useCase.titleZh);
-  const description = i18n._(useCase.shortDescZh);
+  const title = i18n._(useCase.title);
+  const description = i18n._(useCase.shortDesc);
   const segment = `use-cases/${useCase.slug}`;
   return {
     title,
@@ -80,8 +80,8 @@ export default async function UseCaseDetailPage({
     "@type": "FAQPage",
     mainEntity: useCase.faqs.map((f) => ({
       "@type": "Question",
-      name: i18n._(f.qZh),
-      acceptedAnswer: { "@type": "Answer", text: i18n._(f.aZh) },
+      name: i18n._(f.q),
+      acceptedAnswer: { "@type": "Answer", text: i18n._(f.a) },
     })),
   };
 
@@ -93,14 +93,14 @@ export default async function UseCaseDetailPage({
         locale={safeLocale}
         trail={[
           { titleZh: "用例", segment: "use-cases" },
-          { titleZh: useCase.titleZh, segment },
+          { titleZh: useCase.title, segment },
         ]}
       />
       <ArticleJsonLd
         locale={safeLocale}
         segment={segment}
-        headlineZh={useCase.titleZh}
-        descriptionZh={useCase.shortDescZh}
+        headlineZh={useCase.title}
+        descriptionZh={useCase.shortDesc}
         datePublished={useCase.publishedDate}
         dateModified={useCase.modifiedDate}
       />
@@ -109,7 +109,7 @@ export default async function UseCaseDetailPage({
         locale={safeLocale}
         trail={[
           { titleZh: "用例", segment: "use-cases" },
-          { titleZh: useCase.titleZh, segment },
+          { titleZh: useCase.title, segment },
         ]}
       />
 
@@ -119,30 +119,30 @@ export default async function UseCaseDetailPage({
             <Icon size={20} strokeWidth={2} />
           </span>
           <span className="text-sm font-semibold uppercase tracking-wider text-(--brand-primary)">
-            {i18n._(useCase.eyebrowZh)}
+            {i18n._(useCase.eyebrow)}
           </span>
         </span>
         <h1 className="mt-4 text-3xl font-bold sm:text-4xl">
-          {i18n._(useCase.titleZh)}
+          {i18n._(useCase.title)}
         </h1>
         <p className="mt-4 text-lg leading-8 text-(--text-secondary)">
-          {i18n._(useCase.shortDescZh)}
+          {i18n._(useCase.shortDesc)}
         </p>
       </header>
 
       <article className="mt-10 space-y-10 leading-7 text-(--text-secondary)">
         <section>
           <h2 className="text-xl font-semibold text-(--text-primary)">
-            {i18n._(useCase.problemTitleZh)}
+            {i18n._(useCase.problemTitle)}
           </h2>
-          <p className="mt-3">{i18n._(useCase.problemBodyZh)}</p>
+          <p className="mt-3">{i18n._(useCase.problemBody)}</p>
         </section>
 
         <section>
           <h2 className="text-xl font-semibold text-(--text-primary)">
-            {i18n._(useCase.solutionTitleZh)}
+            {i18n._(useCase.solutionTitle)}
           </h2>
-          <p className="mt-3">{i18n._(useCase.solutionBodyZh)}</p>
+          <p className="mt-3">{i18n._(useCase.solutionBody)}</p>
         </section>
 
         <section>
@@ -152,14 +152,14 @@ export default async function UseCaseDetailPage({
           <ul className="mt-4 grid gap-4 sm:grid-cols-2">
             {useCase.features.map((f) => (
               <li
-                key={f.titleZh}
+                key={f.title.id ?? String(f.title.message)}
                 className="rounded-xl border border-(--border-subtle) bg-(--surface-card) p-5"
               >
                 <h3 className="text-base font-semibold text-(--text-primary)">
-                  {i18n._(f.titleZh)}
+                  {i18n._(f.title)}
                 </h3>
                 <p className="mt-2 text-sm leading-6 text-(--text-secondary)">
-                  {i18n._(f.descZh)}
+                  {i18n._(f.desc)}
                 </p>
               </li>
             ))}
@@ -173,19 +173,19 @@ export default async function UseCaseDetailPage({
           <ul className="mt-4 space-y-3">
             {useCase.faqs.map((f) => (
               <li
-                key={f.qZh}
+                key={f.q.id ?? String(f.q.message)}
                 className="overflow-hidden rounded-xl border border-(--border-subtle) bg-(--surface-card)"
               >
                 <details className="group">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold text-(--text-primary) transition hover:bg-(--surface-soft)">
-                    <span>{i18n._(f.qZh)}</span>
+                    <span>{i18n._(f.q)}</span>
                     <ChevronRight
                       size={16}
                       className="shrink-0 text-(--text-muted) transition group-open:rotate-90 group-open:text-(--brand-primary)"
                     />
                   </summary>
                   <div className="border-t border-(--border-faint) px-5 py-4 text-sm leading-7 text-(--text-secondary)">
-                    {i18n._(f.aZh)}
+                    {i18n._(f.a)}
                   </div>
                 </details>
               </li>
@@ -239,7 +239,7 @@ export default async function UseCaseDetailPage({
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold text-(--text-primary)">
-                        {i18n._(u.titleZh)}
+                        {i18n._(u.title)}
                       </span>
                     </span>
                     <ArrowRight size={14} className="text-(--text-muted)" />

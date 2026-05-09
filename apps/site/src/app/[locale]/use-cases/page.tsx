@@ -64,7 +64,7 @@ export default async function UseCasesHubPage({
       "@type": "ListItem",
       position: idx + 1,
       url: `${SITE_BASE_URL}/${safeLocale}/use-cases/${u.slug}`,
-      name: i18n._(u.titleZh),
+      name: i18n._(u.title),
     })),
   };
 
@@ -107,13 +107,13 @@ export default async function UseCasesHubPage({
                   <Icon size={22} strokeWidth={2} />
                 </span>
                 <span className="mt-4 text-xs font-semibold uppercase tracking-wider text-(--brand-primary)">
-                  {i18n._(u.eyebrowZh)}
+                  {i18n._(u.eyebrow)}
                 </span>
                 <h2 className="mt-2 text-lg font-semibold text-(--text-primary)">
-                  {i18n._(u.titleZh)}
+                  {i18n._(u.title)}
                 </h2>
                 <p className="mt-3 text-sm leading-6 text-(--text-secondary)">
-                  {i18n._(u.shortDescZh)}
+                  {i18n._(u.shortDesc)}
                 </p>
                 <span className="mt-5 flex items-center gap-1.5 text-sm font-semibold text-(--brand-primary) transition group-hover:gap-2.5">
                   {i18n._("查看用例")}
