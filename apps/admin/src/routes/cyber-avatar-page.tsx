@@ -1206,7 +1206,9 @@ function ProjectionWorkspace({
                       </div>
                     </div>
                     <StatusPill tone={value.trim() ? "healthy" : "muted"}>
-                      {value.trim() ? t(msg`已生成`) : t(msg`空`)}
+                      {value.trim()
+                        ? t(msg`已生成`)
+                        : t(msg`空`)}
                     </StatusPill>
                   </div>
                   <div className="mt-3 grid gap-2 sm:grid-cols-2">
