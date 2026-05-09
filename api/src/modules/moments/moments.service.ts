@@ -1793,30 +1793,39 @@ export class MomentsService implements OnModuleInit {
       return null;
     }
 
-    const post = this.postRepo.create({
-      authorId: char.id,
-      authorName: char.name,
-      authorAvatar: char.avatar,
-      authorType: 'character',
-      visibility: this.deriveDefaultVisibility(char.socialOpenness),
-      text: seedText,
-      contentType: 'audio_card',
-      mediaPayload: undefined,
-      postedAt: this.jitterPastTimestamp(15 * 60 * 1000),
-      generationKind: 'minimax_music',
-      generationMetadata: {
-        minimaxJobId: job.id,
-        // 使用 job 实际占用的模型（可能是 fallback 后的 music-2.5）
-        minimaxModel: job.model,
-        pending: true,
-      },
-    });
-    const saved = await this.postRepo.save(post);
-    await this.minimaxJobs.attachTarget(job.id, saved.id);
-    this.logger.log(
-      `moment ${saved.id} queued minimax music job ${job.id} for ${char.name}`,
-    );
-    return saved;
+    try {
+      const post = this.postRepo.create({
+        authorId: char.id,
+        authorName: char.name,
+        authorAvatar: char.avatar,
+        authorType: 'character',
+        visibility: this.deriveDefaultVisibility(char.socialOpenness),
+        text: seedText,
+        contentType: 'audio_card',
+        mediaPayload: undefined,
+        postedAt: this.jitterPastTimestamp(15 * 60 * 1000),
+        generationKind: 'minimax_music',
+        generationMetadata: {
+          minimaxJobId: job.id,
+          // 使用 job 实际占用的模型（可能是 fallback 后的 music-2.5）
+          minimaxModel: job.model,
+          pending: true,
+        },
+      });
+      const saved = await this.postRepo.save(post);
+      await this.minimaxJobs.attachTarget(job.id, saved.id);
+      this.logger.log(
+        `moment ${saved.id} queued minimax music job ${job.id} for ${char.name}`,
+      );
+      return saved;
+    } catch (err) {
+      // post 创建失败必须回滚 job：否则配额白扣，cron 还会去执行 orphan job
+      await this.minimaxJobs.cancelJob(job.id);
+      this.logger.error(
+        `moment-music post creation failed, rolled back job ${job.id}: ${(err as Error)?.message}`,
+      );
+      throw err;
+    }
   }
 
   async scheduleMinimaxVideoMoment(
@@ -1870,29 +1879,37 @@ export class MomentsService implements OnModuleInit {
     });
     if (!job) return null;
 
-    const post = this.postRepo.create({
-      authorId: char.id,
-      authorName: char.name,
-      authorAvatar: char.avatar,
-      authorType: 'character',
-      visibility: this.deriveDefaultVisibility(char.socialOpenness),
-      text: seedText,
-      contentType: 'video',
-      mediaPayload: undefined,
-      postedAt: this.jitterPastTimestamp(15 * 60 * 1000),
-      generationKind: 'minimax_video',
-      generationMetadata: {
-        minimaxJobId: job.id,
-        minimaxModel: model,
-        pending: true,
-      },
-    });
-    const saved = await this.postRepo.save(post);
-    await this.minimaxJobs.attachTarget(job.id, saved.id);
-    this.logger.log(
-      `moment ${saved.id} queued minimax video job ${job.id} (${model}) for ${char.name}`,
-    );
-    return saved;
+    try {
+      const post = this.postRepo.create({
+        authorId: char.id,
+        authorName: char.name,
+        authorAvatar: char.avatar,
+        authorType: 'character',
+        visibility: this.deriveDefaultVisibility(char.socialOpenness),
+        text: seedText,
+        contentType: 'video',
+        mediaPayload: undefined,
+        postedAt: this.jitterPastTimestamp(15 * 60 * 1000),
+        generationKind: 'minimax_video',
+        generationMetadata: {
+          minimaxJobId: job.id,
+          minimaxModel: model,
+          pending: true,
+        },
+      });
+      const saved = await this.postRepo.save(post);
+      await this.minimaxJobs.attachTarget(job.id, saved.id);
+      this.logger.log(
+        `moment ${saved.id} queued minimax video job ${job.id} (${model}) for ${char.name}`,
+      );
+      return saved;
+    } catch (err) {
+      await this.minimaxJobs.cancelJob(job.id);
+      this.logger.error(
+        `moment-video post creation failed, rolled back job ${job.id}: ${(err as Error)?.message}`,
+      );
+      throw err;
+    }
   }
 
   async applyMinimaxMusicToPost(

@@ -923,30 +923,40 @@ export class FeedService implements OnModuleInit {
       return null;
     }
 
-    const draft = await this.createPost({
-      authorAvatar: selectedCharacter.avatar,
-      authorId: selectedCharacter.id,
-      authorName: selectedCharacter.name,
-      authorType: 'character',
-      title: composeChannelTitle(selectedCharacter.name, text),
-      mediaType: 'video',
-      mediaUrl: '',
-      coverUrl: null,
-      durationMs: undefined,
-      aspectRatio: CHANNEL_VIDEO_ASPECT_RATIO,
-      topicTags: CHANNEL_VIDEO_TOPIC_TAGS,
-      sourceKind: 'character_generated',
-      recommendationScore: 100,
-      surface: 'channels',
-      publishStatus: 'draft',
-      statsPayload: { minimaxJobId: job.id, minimaxModel: model },
-      text,
-    });
-    await this.minimaxJobs.attachTarget(job.id, draft.id);
-    this.logger.log(
-      `channel draft ${draft.id} queued minimax video job ${job.id} (${model})`,
-    );
-    return draft;
+    try {
+      const draft = await this.createPost({
+        authorAvatar: selectedCharacter.avatar,
+        authorId: selectedCharacter.id,
+        authorName: selectedCharacter.name,
+        authorType: 'character',
+        title: composeChannelTitle(selectedCharacter.name, text),
+        mediaType: 'video',
+        mediaUrl: '',
+        coverUrl: null,
+        durationMs: undefined,
+        aspectRatio: CHANNEL_VIDEO_ASPECT_RATIO,
+        topicTags: CHANNEL_VIDEO_TOPIC_TAGS,
+        sourceKind: 'character_generated',
+        recommendationScore: 100,
+        surface: 'channels',
+        publishStatus: 'draft',
+        statsPayload: { minimaxJobId: job.id, minimaxModel: model },
+        text,
+      });
+      await this.minimaxJobs.attachTarget(job.id, draft.id);
+      this.logger.log(
+        `channel draft ${draft.id} queued minimax video job ${job.id} (${model})`,
+      );
+      return draft;
+    } catch (err) {
+      // createPost / attachTarget 失败必须回滚 job：否则配额白扣、cron 会
+      // 去执行一个没有目标可挂的 orphan job。
+      await this.minimaxJobs.cancelJob(job.id);
+      this.logger.error(
+        `channel post creation failed, rolled back minimax job ${job.id}: ${(err as Error)?.message}`,
+      );
+      throw err;
+    }
   }
 
   async applyMinimaxVideoToChannelPost(

@@ -165,6 +165,19 @@ export class MinimaxJobService {
     await this.repo.update(jobId, { targetId });
   }
 
+  // 调用方：enqueue 成功但后续 createPost / attachTarget 抛错时，必须调这个
+  // 把已 reserve 的配额释放并删掉 orphan job。否则配额白扣、cron 还会去执行
+  // 一个没有目标可挂的 job。
+  async cancelJob(jobId: string): Promise<void> {
+    const job = await this.repo.findOne({ where: { id: jobId } });
+    if (!job) return;
+    if (job.status === 'pending' || job.status === 'submitted') {
+      await this.quota.release(job.model);
+    }
+    await this.repo.delete(jobId);
+    this.logger.warn(`cancelled minimax job ${jobId} (orphan rollback)`);
+  }
+
   async getJob(jobId: string): Promise<MinimaxJobEntity | null> {
     return this.repo.findOne({ where: { id: jobId } });
   }
