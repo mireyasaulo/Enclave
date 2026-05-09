@@ -13,9 +13,9 @@ import {
   Copy,
   Heart,
   Image as ImageIcon,
-  MessageCircle,
   PenSquare,
   Share2,
+  X,
 } from "lucide-react";
 import {
   addFeedComment,
@@ -26,11 +26,7 @@ import {
   type FeedComment,
   type FeedListResponse,
 } from "@yinjie/contracts";
-import { AppPage, Button, InlineNotice } from "@yinjie/ui";
-import {
-  WeChatCommentBar,
-  type WeChatCommentBarReplyTarget,
-} from "../components/wechat-comment-bar";
+import { AppPage, Button, InlineNotice, TextField } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { FeedPostShareCardModal } from "../components/feed-post-share-card-modal";
 import { MomentMediaGallery } from "../components/moment-media-gallery";
@@ -100,9 +96,11 @@ export function DiscoverFeedPage() {
     commentId: string;
     postId: string;
   } | null>(null);
-  const [commentBarTarget, setCommentBarTarget] = useState<{
+  const [mobileReplyTarget, setMobileReplyTarget] = useState<{
+    authorId: string;
+    authorName: string;
+    commentId: string;
     postId: string;
-    replyTo: WeChatCommentBarReplyTarget | null;
   } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [notice, setNotice] = useState("");
@@ -254,7 +252,7 @@ export function DiscoverFeedPage() {
       setDesktopReplyTarget((current) =>
         current?.postId === input.postId ? null : current,
       );
-      setCommentBarTarget((current) =>
+      setMobileReplyTarget((current) =>
         current?.postId === input.postId ? null : current,
       );
       setNoticeTone("success");
@@ -290,24 +288,7 @@ export function DiscoverFeedPage() {
     });
   }
 
-  function submitMobileBarComment() {
-    if (!commentBarTarget) return;
-    const replyTo = commentBarTarget.replyTo;
-    commentMutation.mutate({
-      postId: commentBarTarget.postId,
-      replyTarget: replyTo
-        ? {
-            authorId: replyTo.authorId,
-            authorName: replyTo.authorName,
-            commentId: replyTo.commentId,
-            postId: commentBarTarget.postId,
-          }
-        : null,
-      text: commentDrafts[commentBarTarget.postId] ?? "",
-    });
-  }
-
-  const pendingLikePostId = likeMutation.isPending
+const pendingLikePostId = likeMutation.isPending
     ? likeMutation.variables
     : null;
   const pendingCommentPostId = commentMutation.isPending
@@ -373,7 +354,7 @@ export function DiscoverFeedPage() {
   useEffect(() => {
     resetComposeDraft();
     setCommentDrafts({});
-    setCommentBarTarget(null);
+    setMobileReplyTarget(null);
     setShowCompose(false);
     setNoticeActionLabel(null);
     setNoticeAction(null);
@@ -979,19 +960,6 @@ export function DiscoverFeedPage() {
                     <Button
                       variant="secondary"
                       size="sm"
-                      onClick={() =>
-                        setCommentBarTarget({
-                          postId: post.id,
-                          replyTo: null,
-                        })
-                      }
-                    >
-                      <MessageCircle size={13} />
-                      {t(msg`评论`)}
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="sm"
                       onClick={() => {
                         const nextFavorites = collected
                           ? removeDesktopFavorite(sourceId)
@@ -1034,16 +1002,18 @@ export function DiscoverFeedPage() {
                             type="button"
                             onClick={(event) => {
                               event.stopPropagation();
-                              setCommentBarTarget({
+                              setMobileReplyTarget({
+                                authorId: comment.authorId,
+                                authorName: comment.authorName,
+                                commentId: comment.id,
                                 postId: post.id,
-                                replyTo: {
-                                  authorId: comment.authorId,
-                                  authorName: comment.authorName,
-                                  commentId: comment.id,
-                                },
                               });
                             }}
-                            className="block w-full rounded-[8px] px-1 py-0.5 text-left text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)] active:bg-[rgba(7,193,96,0.08)]"
+                            className={`block w-full rounded-[8px] px-1 py-0.5 text-left text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)] active:bg-[rgba(7,193,96,0.08)] ${
+                              mobileReplyTarget?.commentId === comment.id
+                                ? "bg-[rgba(7,193,96,0.08)]"
+                                : ""
+                            }`}
                           >
                             <span className="text-[color:var(--text-primary)]">
                               {comment.authorName}
@@ -1062,6 +1032,63 @@ export function DiscoverFeedPage() {
                       })}
                     </div>
                   ) : null
+                }
+                composer={
+                  <div className="flex w-full flex-col gap-1.5">
+                    {mobileReplyTarget?.postId === post.id ? (
+                      <div className="flex items-center justify-between gap-2 rounded-[10px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
+                        <div className="truncate">
+                          {t(msg`正在回复 ${mobileReplyTarget.authorName}`)}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setMobileReplyTarget(null)}
+                          aria-label={t(msg`取消回复`)}
+                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[color:var(--text-muted)] active:bg-white"
+                        >
+                          <X size={11} />
+                        </button>
+                      </div>
+                    ) : null}
+                    <div className="flex w-full items-center gap-2">
+                      <TextField
+                        value={commentDrafts[post.id] ?? ""}
+                        onChange={(event) =>
+                          setCommentDrafts((current) => ({
+                            ...current,
+                            [post.id]: event.target.value,
+                          }))
+                        }
+                        placeholder={
+                          mobileReplyTarget?.postId === post.id
+                            ? t(msg`回复 ${mobileReplyTarget.authorName}...`)
+                            : t(msg`写评论...`)
+                        }
+                        className="min-w-0 flex-1 rounded-full py-1.5 text-[12px]"
+                      />
+                      <Button
+                        disabled={
+                          !(commentDrafts[post.id] ?? "").trim() ||
+                          commentMutation.isPending
+                        }
+                        onClick={() =>
+                          submitComment(post.id, {
+                            replyTarget:
+                              mobileReplyTarget?.postId === post.id
+                                ? mobileReplyTarget
+                                : null,
+                          })
+                        }
+                        variant="primary"
+                        size="sm"
+                        className="h-8 px-3 text-[12px]"
+                      >
+                        {pendingCommentPostId === post.id
+                          ? t(msg`发送中...`)
+                          : t(msg`发送`)}
+                      </Button>
+                    </div>
+                  </div>
                 }
               />
             );
@@ -1140,31 +1167,6 @@ export function DiscoverFeedPage() {
           ownerUsername?.trim() || t(msg`世界主人`)
         }
         onClose={() => setShareCardPostId(null)}
-      />
-
-      <WeChatCommentBar
-        open={Boolean(commentBarTarget)}
-        replyTo={commentBarTarget?.replyTo ?? null}
-        value={
-          commentBarTarget
-            ? commentDrafts[commentBarTarget.postId] ?? ""
-            : ""
-        }
-        onChange={(value) => {
-          if (commentBarTarget) {
-            setCommentDrafts((current) => ({
-              ...current,
-              [commentBarTarget.postId]: value,
-            }));
-          }
-        }}
-        pending={
-          commentBarTarget
-            ? pendingCommentPostId === commentBarTarget.postId
-            : false
-        }
-        onSubmit={submitMobileBarComment}
-        onClose={() => setCommentBarTarget(null)}
       />
     </AppPage>
   );
