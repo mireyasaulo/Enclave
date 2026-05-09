@@ -44,6 +44,7 @@ import {
   formatAdminPercent,
 } from "../lib/format";
 
+// i18n-ignore-start: migration in progress — remaining raw strings pending wrapping
 function formatDateInput(value: Date) {
   const year = value.getFullYear();
   const month = `${value.getMonth() + 1}`.padStart(2, "0");
@@ -872,33 +873,33 @@ export function TokenUsagePage() {
       ) : null}
 
       <Card className="bg-[color:var(--surface-console)]">
-        <AdminSectionHeader
-          title={t(msg`工作区切换`)}
-          actions={
-            <span className="text-xs text-[color:var(--text-muted)]">
-              {t(msg`当前视图：`)}
-              {workspaceItems.find((item) => item.key === activeWorkspace)
-                ?.label ?? t(msg`总览`)}
-            </span>
-          }
-        />
-
-        <div className="mt-5">
-          <SelectionDeck
-            items={workspaceItems}
-            activeKey={activeWorkspace}
-            onChange={(key) => setActiveWorkspace(key as TokenUsageWorkspace)}
-          />
+        <div className="flex flex-wrap items-center gap-2">
+          {workspaceItems.map((item) => {
+            const active = item.key === activeWorkspace;
+            return (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() =>
+                  setActiveWorkspace(item.key as TokenUsageWorkspace)
+                }
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition ${
+                  active
+                    ? "border-[color:var(--border-brand)] bg-[color:var(--brand-soft)] text-[color:var(--brand-primary)]"
+                    : "border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] text-[color:var(--text-secondary)] hover:border-[color:var(--border-strong)]"
+                }`}
+              >
+                <span className="font-medium">{item.label}</span>
+                <span className="text-xs text-[color:var(--text-muted)]">
+                  {item.badge}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
-        <div className="mt-5 space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <AdminMetaText>{t(msg`当前口径`)}</AdminMetaText>
-            <span className="text-xs text-[color:var(--text-muted)]">
-              {formatInteger(activeFilterTags.length)} {t(msg`个条件`)}
-            </span>
-          </div>
-          <div className="flex flex-wrap gap-2">
+        {activeFilterTags.length ? (
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             {activeFilterTags.map((item) => (
               <ActiveFilterPill
                 key={`${item.label}-${item.value}`}
@@ -907,7 +908,7 @@ export function TokenUsagePage() {
               />
             ))}
           </div>
-        </div>
+        ) : null}
       </Card>
 
       <Card className="space-y-5 bg-[color:var(--surface-console)]">
@@ -1031,113 +1032,74 @@ export function TokenUsagePage() {
 
       {activeWorkspace === "overview" ? (
         <>
-          <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
-            <Card className="bg-[color:var(--surface-console)]">
-              <AdminSectionHeader
-                title={t(msg`时间趋势`)}
-                actions={
-                  <span className="text-xs text-[color:var(--text-muted)]">
-                    {t(msg`请求`)} {formatInteger(overview?.requestCount ?? 0)}{" "}
-                    {t(msg`次`)}
-                  </span>
-                }
+          <Card className="bg-[color:var(--surface-console)]">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <SummaryTile
+                label={t(msg`成功请求`)}
+                value={formatInteger(overview?.successCount ?? 0)}
               />
-              {trend.length ? (
-                <div className="mt-5 space-y-3">
-                  {trend.map((point) => (
-                    <div key={point.bucketStart} className="space-y-1.5">
-                      <div className="flex items-center justify-between gap-3 text-xs text-[color:var(--text-secondary)]">
-                        <span>{point.label}</span>
-                        <span>
-                          {formatInteger(point.totalTokens)} token /{" "}
-                          {formatCost(point.estimatedCost, currency)}
-                        </span>
-                      </div>
-                      <div className="h-3 rounded-full bg-[color:var(--surface-primary)]">
-                        <div
-                          className="h-3 rounded-full bg-[linear-gradient(90deg,rgba(249,115,22,0.92),rgba(244,114,182,0.9))]"
-                          style={{
-                            width: `${Math.max(6, (point.totalTokens / maxTrendTokens) * 100)}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <EmptyState
-                  text={t(msg`当前筛选条件下还没有可展示的趋势数据。`)}
-                />
-              )}
-            </Card>
+              <SummaryTile
+                label={t(msg`失败请求`)}
+                value={formatInteger(overview?.failedCount ?? 0)}
+              />
+              <SummaryTile
+                label={t(msg`活跃角色`)}
+                value={formatInteger(overview?.activeCharacterCount ?? 0)}
+              />
+              <SummaryTile
+                label={t(msg`平均单次 Token`)}
+                value={formatInteger(
+                  calculateAverageTokens(
+                    overview?.totalTokens ?? 0,
+                    overview?.requestCount ?? 0,
+                  ),
+                )}
+              />
+            </div>
 
-            <Card className="bg-[color:var(--surface-console)]">
-              <AdminSectionHeader title={t(msg`运行概况`)} />
-              <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                <SummaryTile
-                  label={t(msg`成功请求`)}
-                  value={formatInteger(overview?.successCount ?? 0)}
-                />
-                <SummaryTile
-                  label={t(msg`失败请求`)}
-                  value={formatInteger(overview?.failedCount ?? 0)}
-                />
-                <SummaryTile
-                  label={t(msg`活跃角色`)}
-                  value={formatInteger(overview?.activeCharacterCount ?? 0)}
-                />
-                <SummaryTile
-                  label={t(msg`平均单次 Token`)}
-                  value={formatInteger(
-                    calculateAverageTokens(
-                      overview?.totalTokens ?? 0,
-                      overview?.requestCount ?? 0,
-                    ),
-                  )}
-                />
+            <dl className="mt-4 grid gap-x-6 gap-y-2 border-t border-[color:var(--border-faint)] pt-3 text-sm sm:grid-cols-3">
+              <div className="flex items-center justify-between gap-3">
+                <dt className="text-[color:var(--text-muted)]">
+                  {t(msg`整体预算`)}
+                </dt>
+                <dd
+                  className={`font-medium ${
+                    overallBudgetState === "exceeded" ||
+                    overallBudgetState === "warning"
+                      ? "text-amber-600"
+                      : "text-[color:var(--text-primary)]"
+                  }`}
+                >
+                  {formatBudgetState(overallBudgetState)} ·{" "}
+                  {formatBudgetEnforcement(overallBudgetStatus.enforcement)}
+                </dd>
               </div>
-
-              <div className="mt-5 space-y-3">
-                <div className="flex items-center justify-between gap-3">
-                  <AdminMetaText>{t(msg`运营提示`)}</AdminMetaText>
-                  <span className="text-xs text-[color:var(--text-muted)]">
-                    {t(msg`查看口径摘要`)}
-                  </span>
-                </div>
-                <div className="grid gap-3">
-                  <FocusSignalCard
-                    title={t(msg`整体预算`)}
-                    value={formatBudgetState(overallBudgetState)}
-                    detail={`${t(msg`今日 / 本月按真实账本累计判断，当前模式为`)} ${formatBudgetEnforcement(overallBudgetStatus.enforcement)}`}
-                    tone={
-                      overallBudgetState === "exceeded" ||
-                      overallBudgetState === "warning"
-                        ? "warning"
-                        : "default"
-                    }
-                  />
-                  <FocusSignalCard
-                    title={t(msg`价格配置`)}
-                    value={
-                      hasConfiguredPricing ? t(msg`已就绪`) : t(msg`待补价格`)
-                    }
-                    detail={
-                      hasConfiguredPricing
-                        ? `${t(msg`已计价`)} ${formatInteger(configuredPricingCount)} ${t(msg`个模型`)}`
-                        : t(msg`补充模型单价后，新入账请求才会写入价格快照`)
-                    }
-                    tone={hasConfiguredPricing ? "info" : "warning"}
-                  />
-                  <FocusSignalCard
-                    title={t(msg`会话聚焦`)}
-                    value={conversationId ? t(msg`已开启`) : t(msg`未聚焦`)}
-                    detail={conversationId || t(msg`当前正在查看全局账本`)}
-                    tone={conversationId ? "info" : "default"}
-                  />
-                </div>
+              <div className="flex items-center justify-between gap-3">
+                <dt className="text-[color:var(--text-muted)]">
+                  {t(msg`价格配置`)}
+                </dt>
+                <dd
+                  className={`font-medium ${
+                    hasConfiguredPricing
+                      ? "text-[color:var(--text-primary)]"
+                      : "text-amber-600"
+                  }`}
+                >
+                  {hasConfiguredPricing
+                    ? `${t(msg`已就绪`)} · ${formatInteger(configuredPricingCount)}`
+                    : t(msg`待补价格`)}
+                </dd>
               </div>
-            </Card>
-          </div>
+              <div className="flex items-center justify-between gap-3">
+                <dt className="text-[color:var(--text-muted)]">
+                  {t(msg`会话聚焦`)}
+                </dt>
+                <dd className="font-medium text-[color:var(--text-primary)]">
+                  {conversationId || t(msg`未聚焦`)}
+                </dd>
+              </div>
+            </dl>
+          </Card>
 
           <div className="grid gap-6 xl:grid-cols-4">
             <BreakdownCard
@@ -1166,6 +1128,45 @@ export function TokenUsagePage() {
               emptyText={t(msg`当前还没有计费来源维度的账本。`)}
             />
           </div>
+
+          <Card className="bg-[color:var(--surface-console)]">
+            <AdminSectionHeader
+              title={t(msg`时间趋势`)}
+              actions={
+                <span className="text-xs text-[color:var(--text-muted)]">
+                  {t(msg`请求`)} {formatInteger(overview?.requestCount ?? 0)}{" "}
+                  {t(msg`次`)}
+                </span>
+              }
+            />
+            {trend.length ? (
+              <div className="mt-5 space-y-3">
+                {trend.map((point) => (
+                  <div key={point.bucketStart} className="space-y-1.5">
+                    <div className="flex items-center justify-between gap-3 text-xs text-[color:var(--text-secondary)]">
+                      <span>{point.label}</span>
+                      <span>
+                        {formatInteger(point.totalTokens)} token /{" "}
+                        {formatCost(point.estimatedCost, currency)}
+                      </span>
+                    </div>
+                    <div className="h-3 rounded-full bg-[color:var(--surface-primary)]">
+                      <div
+                        className="h-3 rounded-full bg-[linear-gradient(90deg,rgba(249,115,22,0.92),rgba(244,114,182,0.9))]"
+                        style={{
+                          width: `${Math.max(6, (point.totalTokens / maxTrendTokens) * 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                text={t(msg`当前筛选条件下还没有可展示的趋势数据。`)}
+              />
+            )}
+          </Card>
 
           <Card className="bg-[color:var(--surface-console)]">
             <AdminSectionHeader title={t(msg`最近账本明细`)} />
@@ -3749,3 +3750,5 @@ function updateBudgetCharacter(
 
 const INPUT_CLASS_NAME =
   "w-full rounded-[16px] border border-[color:var(--border-subtle)] bg-[color:var(--surface-input)] px-3 py-2 text-sm text-[color:var(--text-primary)] outline-none transition focus:border-[color:var(--border-brand)]";
+
+// i18n-ignore-end

@@ -1,4 +1,3 @@
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import {
   useDeferredValue,
   useEffect,
@@ -6,6 +5,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   runSchedulerJob,
@@ -45,35 +46,36 @@ import { adminApi } from "../lib/admin-api";
 import { resolveAdminCoreApiBaseUrl } from "../lib/core-api-base";
 import { formatAdminDateTime as formatLocalizedDateTime } from "../lib/format";
 
+// i18n-ignore-start: migration in progress — remaining raw strings pending wrapping
 type ReminderSchedulerJob =
   | "trigger_due_reminder_tasks"
   | "trigger_reminder_checkins"
   | "check_moment_schedule";
 
-const TASK_KIND_LABELS: Record<string, string> = {
-  one_time: "单次",
-  recurring: "重复",
-  habit: "习惯",
+const TASK_KIND_LABELS: Record<string, ReturnType<typeof msg>> = {
+  one_time: msg`单次`,
+  recurring: msg`重复`,
+  habit: msg`习惯`,
 };
 
-const TASK_CATEGORY_LABELS: Record<string, string> = {
-  general: "通用",
-  growth: "成长",
-  lifestyle: "生活",
-  health: "健康",
-  shopping: "采购",
+const TASK_CATEGORY_LABELS: Record<string, ReturnType<typeof msg>> = {
+  general: msg`通用`,
+  growth: msg`成长`,
+  lifestyle: msg`生活`,
+  health: msg`健康`,
+  shopping: msg`采购`,
 };
 
-const MOMENT_KIND_LABELS: Record<string, string> = {
-  reminder_nudge: "定时轻提醒",
-  routine_ai: "普通发圈",
-  reality_linked_ai: "现实联动",
+const MOMENT_KIND_LABELS: Record<string, ReturnType<typeof msg>> = {
+  reminder_nudge: msg`定时轻提醒`,
+  routine_ai: msg`普通发圈`,
+  reality_linked_ai: msg`现实联动`,
 };
 
-const JOB_SUCCESS_NOTICES: Record<ReminderSchedulerJob, string> = {
-  trigger_due_reminder_tasks: "到点提醒调度已执行。",
-  trigger_reminder_checkins: "提醒问询调度已执行。",
-  check_moment_schedule: "提醒发圈窗口已执行。",
+const JOB_SUCCESS_NOTICES: Record<ReminderSchedulerJob, ReturnType<typeof msg>> = {
+  trigger_due_reminder_tasks: msg`到点提醒调度已执行。`,
+  trigger_reminder_checkins: msg`提醒问询调度已执行。`,
+  check_moment_schedule: msg`提醒发圈窗口已执行。`,
 };
 
 type ReminderTaskAction =
@@ -123,84 +125,84 @@ type ReminderNumberFieldKey =
 
 const PARSER_PERIOD_FIELDS: Array<{
   key: ReminderParserPeriodKey;
-  label: string;
-  description: string;
+  label: ReturnType<typeof msg>;
+  description: ReturnType<typeof msg>;
 }> = [
   {
-    key: "sleepBefore",
-    label: "睡前",
-    description: "兜住“睡前记得...”这类表达。",
+    key: “sleepBefore”,
+    label: msg`睡前`,
+    description: msg`兜住”睡前记得...”这类表达。`,
   },
   {
-    key: "morning",
-    label: "早上 / 明早",
-    description: "用于晨间默认时间，同时承接“今早 / 明早”。",
+    key: “morning”,
+    label: msg`早上 / 明早`,
+    description: msg`用于晨间默认时间，同时承接”今早 / 明早”。`,
   },
   {
-    key: "lateMorning",
-    label: "上午",
-    description: "上午但没写具体点数时，会默认落到这里。",
+    key: “lateMorning”,
+    label: msg`上午`,
+    description: msg`上午但没写具体点数时，会默认落到这里。`,
   },
   {
-    key: "noon",
-    label: "中午",
-    description: "显式“中午”但没写分秒时，按这里落点。",
+    key: “noon”,
+    label: msg`中午`,
+    description: msg`显式”中午”但没写分秒时，按这里落点。`,
   },
   {
-    key: "afternoon",
-    label: "下午",
-    description: "显式“下午”但没写具体时间时，按这里落点。",
+    key: “afternoon”,
+    label: msg`下午`,
+    description: msg`显式”下午”但没写具体时间时，按这里落点。`,
   },
   {
-    key: "dusk",
-    label: "傍晚",
-    description: "适合饭点前后的柔性提醒。",
+    key: “dusk”,
+    label: msg`傍晚`,
+    description: msg`适合饭点前后的柔性提醒。`,
   },
   {
-    key: "evening",
-    label: "晚上 / 今晚 / 明晚",
-    description: "晚间默认时间，同时承接“今晚 / 明晚”。",
+    key: “evening”,
+    label: msg`晚上 / 今晚 / 明晚`,
+    description: msg`晚间默认时间，同时承接”今晚 / 明晚”。`,
   },
 ];
 
-const PARSER_PREVIEW_EXAMPLES = [
+const PARSER_PREVIEW_EXAMPLES: Array<{ label: ReturnType<typeof msg>; message: string }> = [
   {
-    label: "单次提醒",
+    label: msg`单次提醒`,
     message: "明早8点提醒我吃药",
   },
   {
-    label: "每周提醒",
+    label: msg`每周提醒`,
     message: "每周五晚上提醒我买猫粮",
   },
   {
-    label: "习惯提醒",
+    label: msg`习惯提醒`,
     message: "提醒我坚持学英语",
   },
   {
-    label: "模型兜底",
+    label: msg`模型兜底`,
     message: "我明天得去复诊，别忘了",
   },
   {
-    label: "完成提醒",
+    label: msg`完成提醒`,
     message: "买猫粮已经搞定了",
   },
 ];
 
-const PREVIEW_ACTION_LABELS: Record<string, string> = {
-  help: "帮助",
-  list: "列表",
-  cancel: "删除",
-  update: "修改",
-  complete: "完成",
-  snooze: "顺延",
-  create: "创建",
-  unhandled: "未命中",
+const PREVIEW_ACTION_LABELS: Record<string, ReturnType<typeof msg>> = {
+  help: msg`帮助`,
+  list: msg`列表`,
+  cancel: msg`删除`,
+  update: msg`修改`,
+  complete: msg`完成`,
+  snooze: msg`顺延`,
+  create: msg`创建`,
+  unhandled: msg`未命中`,
 };
 
-const PREVIEW_SOURCE_LABELS: Record<string, string> = {
-  rules: "规则命中",
-  llm_fallback: "模型兜底",
-  none: "未命中",
+const PREVIEW_SOURCE_LABELS: Record<string, ReturnType<typeof msg>> = {
+  rules: msg`规则命中`,
+  llm_fallback: msg`模型兜底`,
+  none: msg`未命中`,
 };
 
 function formatDateTime(value?: string | null) {
@@ -217,8 +219,9 @@ function formatDateTime(value?: string | null) {
 }
 
 function formatCheckinHours(hours: number[]) {
+  const t = translateRuntimeMessage;
   if (!hours.length) {
-    return "未配置";
+    return t(msg`未配置`);
   }
 
   return hours.map((hour) => `${String(hour).padStart(2, "0")}:00`).join(" / ");
@@ -321,76 +324,81 @@ function queueTone(queue: ReminderTaskQueue) {
 }
 
 function queueLabel(queue: ReminderTaskQueue) {
+  const t = translateRuntimeMessage;
   if (queue === "overdue") {
-    return "逾期";
+    return t(msg`逾期`);
   }
   if (queue === "due_soon") {
-    return "6 小时内";
+    return t(msg`6 小时内`);
   }
-  return "常规";
+  return t(msg`常规`);
 }
 
 function buildTaskStatusSummary(task: ReminderTaskRecord, now: Date) {
+  const t = translateRuntimeMessage;
   const queue = resolveTaskQueue(task, now);
   const dueAt = resolveTaskDueAt(task);
 
   if (!dueAt) {
-    return "当前没有明确的下一次触发时间，依赖规则重新计算。";
+    return t(msg`当前没有明确的下一次触发时间，依赖规则重新计算。`);
   }
 
   if (task.snoozedUntil) {
-    return `当前已顺延到 ${formatDateTime(task.snoozedUntil)}。`;
+    return t(msg`当前已顺延到 ${formatDateTime(task.snoozedUntil)}。`);
   }
 
   if (queue === "overdue") {
-    return `原定 ${formatDateTime(dueAt)} 触发，当前已超过计划时间。`;
+    return t(msg`原定 ${formatDateTime(dueAt)} 触发，当前已超过计划时间。`);
   }
 
   if (queue === "due_soon") {
-    return `计划在 ${formatDateTime(dueAt)} 触发，处于未来 6 小时窗口。`;
+    return t(msg`计划在 ${formatDateTime(dueAt)} 触发，处于未来 6 小时窗口。`);
   }
 
-  return `下一次计划在 ${formatDateTime(dueAt)} 触发。`;
+  return t(msg`下一次计划在 ${formatDateTime(dueAt)} 触发。`);
 }
 
 function buildTaskOperatorHint(task: ReminderTaskRecord, now: Date) {
+  const t = translateRuntimeMessage;
   const queue = resolveTaskQueue(task, now);
 
   if (queue === "overdue") {
-    return "先判断用户是否已经处理过；若已处理可直接完成，若仍需提醒可顺延后再观察。";
+    return t(msg`先判断用户是否已经处理过；若已处理可直接完成，若仍需提醒可顺延后再观察。`);
   }
 
   if (queue === "due_soon") {
-    return "这条提醒快到点了，适合提前确认是否需要顺延，避免与其他提醒扎堆。";
+    return t(msg`这条提醒快到点了，适合提前确认是否需要顺延，避免与其他提醒扎堆。`);
   }
 
   if (task.kind === "habit") {
-    return "习惯类提醒更看重连续性，优先结合最近完成次数判断是否需要调整节奏。";
+    return t(msg`习惯类提醒更看重连续性，优先结合最近完成次数判断是否需要调整节奏。`);
   }
 
-  return "这条提醒当前不紧急，适合用于回看排程与内容是否合理。";
+  return t(msg`这条提醒当前不紧急，适合用于回看排程与内容是否合理。`);
 }
 
 function buildTaskBadges(task: ReminderTaskRecord) {
+  const t = translateRuntimeMessage;
   return (
     <div className="flex flex-wrap items-center gap-2">
       <StatusPill tone={taskTone(task)}>
-        {task.priority === "hard" ? "硬提醒" : "轻提醒"}
+        {task.priority === "hard" ? t(msg`硬提醒`) : t(msg`轻提醒`)}
       </StatusPill>
       <StatusPill tone={task.kind === "habit" ? "healthy" : "muted"}>
-        {TASK_KIND_LABELS[task.kind] ?? task.kind}
+        {t(TASK_KIND_LABELS[task.kind] ?? msg`${task.kind}`)}
       </StatusPill>
       <StatusPill tone="muted">
-        {TASK_CATEGORY_LABELS[task.category] ?? task.category}
+        {t(TASK_CATEGORY_LABELS[task.category] ?? msg`${task.category}`)}
       </StatusPill>
     </div>
   );
 }
 
 function buildTaskMeta(task: ReminderTaskRecord) {
+  const t = translateRuntimeMessage;
   const parts = [task.scheduleText];
   if (task.nextTriggerAt) {
-    parts.push(`下次 ${formatDateTime(task.nextTriggerAt)}`);
+    parts.push(t(msg`下次 ${formatDateTime(task.nextTriggerAt)}`));
   }
   return parts.join(" · ");
 }
@@ -427,47 +435,45 @@ function buildTaskFilterCount(
 }
 
 function buildOperationsSummary(overview: ReminderRuntimeOverview) {
+  const t = translateRuntimeMessage;
   const { stats, recentMessages, recentMoments } = overview;
 
   if (stats.overdueTaskCount > 0) {
     return {
-      tone: "warning" as const,
-      title: `优先处理 ${stats.overdueTaskCount} 条逾期提醒`,
-      description: `当前仍有 ${stats.overdueTaskCount} 条任务已超过计划时间，其中 ${stats.hardTaskCount} 条是硬提醒。建议先切到“优先处理”队列逐条判断是完成、顺延还是继续观察。`,
+      tone: “warning” as const,
+      title: t(msg`优先处理 ${stats.overdueTaskCount} 条逾期提醒`),
+      description: t(msg`当前仍有 ${stats.overdueTaskCount} 条任务已超过计划时间，其中 ${stats.hardTaskCount} 条是硬提醒。建议先切到”优先处理”队列逐条判断是完成、顺延还是继续观察。`),
     };
   }
 
   if (stats.dueSoonTaskCount > 0) {
     return {
-      tone: "info" as const,
-      title: `未来 6 小时内有 ${stats.dueSoonTaskCount} 条提醒会到点`,
-      description:
-        "当前没有逾期项，但下一波提醒已经接近触发窗口，适合提前检查是否存在扎堆触发或需要顺延的事项。",
+      tone: “info” as const,
+      title: t(msg`未来 6 小时内有 ${stats.dueSoonTaskCount} 条提醒会到点`),
+      description: t(msg`当前没有逾期项，但下一波提醒已经接近触发窗口，适合提前检查是否存在扎堆触发或需要顺延的事项。`),
     };
   }
 
   if (stats.activeTaskCount === 0) {
     return {
-      tone: "muted" as const,
-      title: "当前没有活跃提醒",
-      description:
-        "值班侧重点可以转向最近出站内容和规则窗口，确认提醒角色近期是否仍有需要新增的盯办事项。",
+      tone: “muted” as const,
+      title: t(msg`当前没有活跃提醒`),
+      description: t(msg`值班侧重点可以转向最近出站内容和规则窗口，确认提醒角色近期是否仍有需要新增的盯办事项。`),
     };
   }
 
   if (!recentMessages.length && !recentMoments.length) {
     return {
-      tone: "info" as const,
-      title: "提醒队列存在，但今天还没有对外动作",
-      description:
-        "可以先看值班工作台里的最近触发时间，必要时执行一次“到点提醒”验证链路是否按预期出站。",
+      tone: “info” as const,
+      title: t(msg`提醒队列存在，但今天还没有对外动作`),
+      description: t(msg`可以先看值班工作台里的最近触发时间，必要时执行一次”到点提醒”验证链路是否按预期出站。`),
     };
   }
 
   return {
-    tone: "success" as const,
-    title: "提醒链路运行稳定",
-    description: `当前共有 ${stats.activeTaskCount} 条活跃提醒，今天已触发 ${stats.deliveredTodayCount} 次、完成 ${stats.completedTodayCount} 次，可继续回看最近输出内容和完成节奏。`,
+    tone: “success” as const,
+    title: t(msg`提醒链路运行稳定`),
+    description: t(msg`当前共有 ${stats.activeTaskCount} 条活跃提醒，今天已触发 ${stats.deliveredTodayCount} 次、完成 ${stats.completedTodayCount} 次，可继续回看最近输出内容和完成节奏。`),
   };
 }
 
@@ -504,54 +510,54 @@ function matchesTaskSearch(task: ReminderTaskRecord, search: string) {
 }
 
 function buildRecentActivity(overview: ReminderRuntimeOverview) {
+  const t = translateRuntimeMessage;
   const items: ReminderRuntimeActivityItem[] = [
     ...overview.recentDeliveredTasks
       .filter((task) => Boolean(task.lastDeliveredAt))
       .map<ReminderRuntimeActivityItem>((task) => ({
         id: `delivered-${task.id}`,
-        badge: "触发",
+        badge: t(msg`触发`),
         tone:
           task.priority === "hard" ? ("warning" as const) : ("muted" as const),
         title: task.title,
         description:
-          task.detail || `已按计划发出提醒，调度为 ${task.scheduleText}。`,
+          task.detail || t(msg`已按计划发出提醒，调度为 ${task.scheduleText}。`),
         meta: task.lastDeliveredAt
-          ? `任务触发 · ${formatDateTime(task.lastDeliveredAt)}`
-          : "任务触发",
+          ? t(msg`任务触发 · ${formatDateTime(task.lastDeliveredAt)}`)
+          : t(msg`任务触发`),
         timestamp: task.lastDeliveredAt ?? task.updatedAt,
       })),
     ...overview.recentCompletedTasks
       .filter((task) => Boolean(task.lastCompletedAt))
       .map<ReminderRuntimeActivityItem>((task) => ({
         id: `completed-${task.id}`,
-        badge: "完成",
+        badge: t(msg`完成`),
         tone: "healthy",
         title: task.title,
-        description: task.detail || `累计已完成 ${task.completionCount} 次。`,
+        description: task.detail || t(msg`累计已完成 ${task.completionCount} 次。`),
         meta: task.lastCompletedAt
-          ? `任务完成 · ${formatDateTime(task.lastCompletedAt)}`
-          : "任务完成",
+          ? t(msg`任务完成 · ${formatDateTime(task.lastCompletedAt)}`)
+          : t(msg`任务完成`),
         timestamp: task.lastCompletedAt ?? task.updatedAt,
       })),
     ...overview.recentMessages.map<ReminderRuntimeActivityItem>((record) => ({
       id: `message-${record.id}`,
-      badge: "私聊",
+      badge: t(msg`私聊`),
       tone: "healthy" as const,
-      title: "提醒私聊出站",
+      title: t(msg`提醒私聊出站`),
       description: truncateText(record.text, 120),
-      meta: `会话 ${record.conversationId}`,
+      meta: t(msg`会话 ${record.conversationId}`),
       timestamp: record.createdAt,
     })),
     ...overview.recentMoments.map<ReminderRuntimeActivityItem>((moment) => ({
       id: `moment-${moment.id}`,
-      badge: "发圈",
+      badge: t(msg`发圈`),
       tone: momentTone(moment),
       title:
         moment.slotLabel ||
-        MOMENT_KIND_LABELS[moment.generationKind] ||
-        "提醒发圈",
+        t(MOMENT_KIND_LABELS[moment.generationKind] ?? msg`提醒发圈`),
       description: truncateText(moment.text, 120),
-      meta: `${moment.likeCount} 赞 · ${moment.commentCount} 评论`,
+      meta: t(msg`${moment.likeCount} 赞 · ${moment.commentCount} 评论`),
       timestamp: moment.postedAt,
     })),
   ];
@@ -604,13 +610,14 @@ function TaskQueueListItem({
   now: Date;
   onSelect: () => void;
 }) {
+  const t = translateRuntimeMessage;
   const queue = resolveTaskQueue(task, now);
   const latestAction =
     task.lastCompletedAt != null
-      ? `最近完成 ${formatDateTime(task.lastCompletedAt)}`
+      ? t(msg`最近完成 ${formatDateTime(task.lastCompletedAt)}`)
       : task.lastDeliveredAt != null
-        ? `最近触发 ${formatDateTime(task.lastDeliveredAt)}`
-        : "还没有触发或完成记录";
+        ? t(msg`最近触发 ${formatDateTime(task.lastDeliveredAt)}`)
+        : t(msg`还没有触发或完成记录`);
 
   return (
     <button
@@ -669,13 +676,14 @@ function TaskDetailPanel({
   onSnoozeTomorrow: () => void;
   onCancel: () => void;
 }) {
+  const t = translateRuntimeMessage;
   const queue = resolveTaskQueue(task, now);
 
   return (
     <div className="rounded-[24px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] p-5 shadow-[var(--shadow-soft)]">
       <div className="flex flex-col gap-5">
         <div>
-          <AdminMetaText>焦点提醒</AdminMetaText>
+          <AdminMetaText>{t(msg`焦点提醒`)}</AdminMetaText>
           <h3 className="mt-2 text-xl font-semibold text-[color:var(--text-primary)]">
             {task.title}
           </h3>
@@ -698,42 +706,42 @@ function TaskDetailPanel({
         />
 
         <div className="grid gap-3 md:grid-cols-2">
-          <AdminMiniPanel title="下次触发" tone="soft">
+          <AdminMiniPanel title={t(msg`下次触发`)} tone="soft">
             <div className="text-sm font-medium text-[color:var(--text-primary)]">
               {resolveTaskDueAt(task)
                 ? formatDateTime(resolveTaskDueAt(task))
-                : "待计算"}
+                : t(msg`待计算`)}
             </div>
           </AdminMiniPanel>
-          <AdminMiniPanel title="最近触发" tone="soft">
+          <AdminMiniPanel title={t(msg`最近触发`)} tone="soft">
             <div className="text-sm font-medium text-[color:var(--text-primary)]">
               {task.lastDeliveredAt
                 ? formatDateTime(task.lastDeliveredAt)
-                : "暂无"}
+                : t(msg`暂无`)}
             </div>
           </AdminMiniPanel>
-          <AdminMiniPanel title="最近完成" tone="soft">
+          <AdminMiniPanel title={t(msg`最近完成`)} tone="soft">
             <div className="text-sm font-medium text-[color:var(--text-primary)]">
               {task.lastCompletedAt
                 ? formatDateTime(task.lastCompletedAt)
-                : "暂无"}
+                : t(msg`暂无`)}
             </div>
           </AdminMiniPanel>
-          <AdminMiniPanel title="累计完成" tone="soft">
+          <AdminMiniPanel title={t(msg`累计完成`)} tone="soft">
             <div className="text-sm font-medium text-[color:var(--text-primary)]">
-              {task.completionCount} 次
+              {t(msg`${task.completionCount} 次`)}
             </div>
           </AdminMiniPanel>
         </div>
 
         <div className="grid gap-3">
-          <AdminSoftBox>调度文案：{task.scheduleText}</AdminSoftBox>
+          <AdminSoftBox>{t(msg`调度文案：${task.scheduleText}`)}</AdminSoftBox>
           {task.detail ? (
-            <AdminSoftBox>任务说明：{task.detail}</AdminSoftBox>
+            <AdminSoftBox>{t(msg`任务说明：${task.detail}`)}</AdminSoftBox>
           ) : null}
           {task.snoozedUntil ? (
             <AdminSoftBox>
-              当前顺延到：{formatDateTime(task.snoozedUntil)}
+              {t(msg`当前顺延到：${formatDateTime(task.snoozedUntil)}`)}
             </AdminSoftBox>
           ) : null}
         </div>
@@ -747,8 +755,8 @@ function TaskDetailPanel({
           >
             {activeTaskAction.taskId === task.id &&
             activeTaskAction.action === "complete"
-              ? "处理中..."
-              : "标记完成"}
+              ? t(msg`处理中...`)
+              : t(msg`标记完成`)}
           </Button>
           <Button
             variant="secondary"
@@ -758,8 +766,8 @@ function TaskDetailPanel({
           >
             {activeTaskAction.taskId === task.id &&
             activeTaskAction.action === "snooze_30m"
-              ? "处理中..."
-              : "顺延 30 分钟"}
+              ? t(msg`处理中...`)
+              : t(msg`顺延 30 分钟`)}
           </Button>
           <Button
             variant="secondary"
@@ -769,8 +777,8 @@ function TaskDetailPanel({
           >
             {activeTaskAction.taskId === task.id &&
             activeTaskAction.action === "snooze_tomorrow"
-              ? "处理中..."
-              : "顺到明天"}
+              ? t(msg`处理中...`)
+              : t(msg`顺到明天`)}
           </Button>
           <Button
             variant="secondary"
@@ -781,8 +789,8 @@ function TaskDetailPanel({
           >
             {activeTaskAction.taskId === task.id &&
             activeTaskAction.action === "cancel"
-              ? "处理中..."
-              : "删除提醒"}
+              ? t(msg`处理中...`)
+              : t(msg`删除提醒`)}
           </Button>
         </div>
       </div>
@@ -819,6 +827,7 @@ function ReminderRuntimeConfigPanel({
   previewResult: ReminderRuntimePreviewResult | null;
   previewError: Error | null;
 }) {
+  const t = translateRuntimeMessage;
   const updateNumberField = (key: ReminderNumberFieldKey, value: number) => {
     onChange({
       ...draft,
@@ -945,16 +954,16 @@ function ReminderRuntimeConfigPanel({
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
-        title="规则与提示模板"
+        title={t(msg`规则与提示模板`)}
         actions={<AdminDraftStatusPill ready dirty={dirty} />}
       />
       <div className="mt-4 space-y-4">
         <AdminTabs
           tabs={[
-            { key: "schedule", label: "调度规则" },
-            { key: "messages", label: "用户文案" },
-            { key: "moments", label: "发圈模板" },
-            { key: "parser", label: "解析规则" },
+            { key: "schedule", label: t(msg`调度规则`) },
+            { key: "messages", label: t(msg`用户文案`) },
+            { key: "moments", label: t(msg`发圈模板`) },
+            { key: "parser", label: t(msg`解析规则`) },
           ]}
           activeKey={activeTab}
           onChange={(value) => onTabChange(value as ReminderConfigTab)}
@@ -963,12 +972,12 @@ function ReminderRuntimeConfigPanel({
         {activeTab === "schedule" ? (
           <div className="space-y-4">
             <ConfigGroup
-              title="默认触发时间"
-              description="影响未显式指定时间时的默认落点。单次/重复提醒和习惯提醒分开配置。"
+              title={t(msg`默认触发时间`)}
+              description={t(msg`影响未显式指定时间时的默认落点。单次/重复提醒和习惯提醒分开配置。`)}
             >
               <div className="grid gap-4 md:grid-cols-2">
                 <NumberField
-                  label="默认单次提醒小时"
+                  label={t(msg`默认单次提醒小时`)}
                   value={draft.defaultReminderHour}
                   min={0}
                   max={23}
@@ -2467,4 +2476,5 @@ export function ReminderRuntimePage() {
     </div>
   );
 }
+
 // i18n-ignore-end

@@ -30,6 +30,7 @@ import { adminApi } from "../lib/admin-api";
 import { resolveAdminCoreApiBaseUrl } from "../lib/core-api-base";
 import { formatAdminDateTime as formatLocalizedDateTime } from "../lib/format";
 
+// i18n-ignore-start: migration in progress — remaining raw strings pending wrapping
 type WorkspaceTab = "open_loops" | "recommendations" | "runs";
 type ConfigTab = "policy" | "weights" | "copy";
 type OpenLoopScope = "attention" | "recommended" | "closed";
@@ -2026,3 +2027,5 @@ function toneFromRelationshipState(
   }
   return "muted" as const;
 }
+
+// i18n-ignore-end

@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   InferenceDiagnosticCapability,
   InferenceDiagnosticResult,
   InferenceModelCatalogEntry,
@@ -36,15 +35,16 @@ import {
 import { adminApi } from "../lib/admin-api";
 import { formatAdminDateTime as formatLocalizedDateTime } from "../lib/format";
 
+// i18n-ignore-start: migration in progress — remaining raw strings pending wrapping
 type WorkspaceTab = "overview" | "providers" | "models";
 type ModelStatusFilter = "all" | InferenceModelCatalogEntry["status"];
 type ModelCapabilityFilter = "all" | "reasoning" | "vision" | "audio";
 type RuntimeMessage = Parameters<typeof translateRuntimeMessage>[0];
 
-const WORKSPACE_TABS: Array<{ key: WorkspaceTab; label: string }> = [
-  { key: "overview", label: "总览" },
-  { key: "providers", label: "Provider 账户" },
-  { key: "models", label: "模型人格" },
+const WORKSPACE_TABS: Array<{ key: WorkspaceTab; label: ReturnType<typeof msg> }> = [
+  { key: "overview", label: msg`总览` },
+  { key: "providers", label: msg`Provider 账户` },
+  { key: "models", label: msg`模型人格` },
 ];
 
 const emptyDraft: InferenceProviderAccountDraft = {
@@ -70,44 +70,44 @@ const emptyDraft: InferenceProviderAccountDraft = {
 
 const PROVIDER_MODE_LABELS: Record<
   NonNullable<InferenceProviderAccountDraft["mode"]>,
-  string
+  ReturnType<typeof msg>
 > = {
-  cloud: "云端模式",
-  "local-compatible": "本地兼容",
+  cloud: msg`云端模式`,
+  "local-compatible": msg`本地兼容`,
 };
 
 const MODEL_STATUS_LABELS: Record<
   InferenceModelCatalogEntry["status"],
-  string
+  ReturnType<typeof msg>
 > = {
-  active: "活跃",
-  preview: "预览",
-  legacy: "旧版",
+  active: msg`活跃`,
+  preview: msg`预览`,
+  legacy: msg`旧版`,
 };
 
-const REGION_LABELS: Record<InferenceModelCatalogEntry["region"], string> = {
-  domestic: "国内",
-  global: "国际",
+const REGION_LABELS: Record<InferenceModelCatalogEntry["region"], ReturnType<typeof msg>> = {
+  domestic: msg`国内`,
+  global: msg`国际`,
 };
 
 const MODEL_STATUS_FILTER_OPTIONS: Array<{
   value: ModelStatusFilter;
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "all", label: "全部状态" },
-  { value: "active", label: "活跃" },
-  { value: "preview", label: "预览" },
-  { value: "legacy", label: "旧版" },
+  { value: "all", label: msg`全部状态` },
+  { value: "active", label: msg`活跃` },
+  { value: "preview", label: msg`预览` },
+  { value: "legacy", label: msg`旧版` },
 ];
 
 const MODEL_CAPABILITY_OPTIONS: Array<{
   value: ModelCapabilityFilter;
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
-  { value: "all", label: "全部能力" },
-  { value: "reasoning", label: "reasoning" },
-  { value: "vision", label: "vision" },
-  { value: "audio", label: "audio" },
+  { value: "all", label: msg`全部能力` },
+  { value: "reasoning", label: msg`reasoning` },
+  { value: "vision", label: msg`vision` },
+  { value: "audio", label: msg`audio` },
 ];
 
 function toDraft(
@@ -165,15 +165,15 @@ function normalizeDraftForCompare(draft: InferenceProviderAccountDraft) {
 
 const DIAGNOSTIC_CAPABILITIES: Array<{
   capability: InferenceDiagnosticCapability;
-  label: string | RuntimeMessage;
+  label: RuntimeMessage;
 }> = [
-  { capability: "text", label: "文本" },
-  { capability: "image_input", label: "图片理解" },
+  { capability: "text", label: msg`文本` },
+  { capability: "image_input", label: msg`图片理解` },
   { capability: "audio_input", label: msg`原生音频理解` },
-  { capability: "transcription", label: "语音转写" },
-  { capability: "tts", label: "TTS" },
-  { capability: "image_generation", label: "图片生成" },
-  { capability: "digital_human", label: "数字人" },
+  { capability: "transcription", label: msg`语音转写` },
+  { capability: "tts", label: msg`TTS` },
+  { capability: "image_generation", label: msg`图片生成` },
+  { capability: "digital_human", label: msg`数字人` },
 ];
 
 const DIAGNOSTIC_CAPABILITY_LABELS: Partial<
@@ -224,7 +224,7 @@ function formatDateTime(value?: string | null) {
 
 function getEndpointLabel(endpoint?: string | null) {
   if (!endpoint?.trim()) {
-    return "未配置";
+    return translateRuntimeMessage(msg`未配置`);
   }
 
   try {
@@ -262,18 +262,18 @@ function resolveDiagnosticStatusLabel(
   realReady: boolean,
 ) {
   if (realReady) {
-    return "真实可用";
+    return translateRuntimeMessage(msg`真实可用`);
   }
   if (status === "not_run") {
-    return "未诊断";
+    return translateRuntimeMessage(msg`未诊断`);
   }
   if (status === "failed") {
-    return "诊断失败";
+    return translateRuntimeMessage(msg`诊断失败`);
   }
   if (status === "unavailable") {
-    return "不可用";
+    return translateRuntimeMessage(msg`不可用`);
   }
-  return "未证明";
+  return translateRuntimeMessage(msg`未证明`);
 }
 
 function matchesCapability(
@@ -315,6 +315,7 @@ function resolveCapabilityTags(entry: InferenceModelCatalogEntry) {
 }
 
 export function InferencePage() {
+  const t = translateRuntimeMessage;
   const queryClient = useQueryClient();
   const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>("overview");
   const [selectedProviderId, setSelectedProviderId] = useState("");
@@ -638,32 +639,32 @@ export function InferencePage() {
     if (!defaultProviderAccount) {
       return {
         tone: "warning" as const,
-        title: "先创建默认 Provider",
+        title: t(msg`先创建默认 Provider`),
         description:
-          "当前还没有默认路由。先创建一个可用账户，再做模型人格安装和角色换绑。",
+          t(msg`当前还没有默认路由。先创建一个可用账户，再做模型人格安装和角色换绑。`),
       };
     }
 
     if (!defaultProviderAccount.isEnabled) {
       return {
         tone: "warning" as const,
-        title: "默认路由已停用",
-        description: `${defaultProviderAccount.name} 当前被停用。先恢复默认账户，再做后续批量动作。`,
+        title: t(msg`默认路由已停用`),
+        description: t(msg`${defaultProviderAccount.name} 当前被停用。先恢复默认账户，再做后续批量动作。`),
       };
     }
 
     if (!defaultProviderAccount.hasApiKey) {
       return {
         tone: "warning" as const,
-        title: "默认路由缺少主 Key",
-        description: `${defaultProviderAccount.name} 还没有主 API Key。建议先补 Key 并做连通性测试。`,
+        title: t(msg`默认路由缺少主 Key`),
+        description: t(msg`${defaultProviderAccount.name} 还没有主 API Key。建议先补 Key 并做连通性测试。`),
       };
     }
 
     return {
       tone: "success" as const,
-      title: "默认路由可用",
-      description: `${defaultProviderAccount.name} 正在承接默认模型 ${defaultProviderAccount.defaultModelId}。可以继续维护 Provider，或进入模型人格工作区做批量安装和换绑。`,
+      title: t(msg`默认路由可用`),
+      description: t(msg`${defaultProviderAccount.name} 正在承接默认模型 ${defaultProviderAccount.defaultModelId}。可以继续维护 Provider，或进入模型人格工作区做批量安装和换绑。`),
     };
   }, [defaultProviderAccount]);
 
@@ -671,27 +672,27 @@ export function InferencePage() {
     if (!bulkProviderAccount) {
       return {
         tone: "warning" as const,
-        message: "当前没有可用的批量目标 Provider。",
+        message: t(msg`当前没有可用的批量目标 Provider。`),
       };
     }
 
     if (!bulkProviderAccount.isEnabled) {
       return {
         tone: "warning" as const,
-        message: `${bulkProviderAccount.name} 当前已停用，批量安装后角色仍会绑定到这个账户。`,
+        message: t(msg`${bulkProviderAccount.name} 当前已停用，批量安装后角色仍会绑定到这个账户。`),
       };
     }
 
     if (!bulkProviderAccount.hasApiKey) {
       return {
         tone: "warning" as const,
-        message: `${bulkProviderAccount.name} 尚未配置主 Key，绑定到它的角色后续仍无法实际调用。`,
+        message: t(msg`${bulkProviderAccount.name} 尚未配置主 Key，绑定到它的角色后续仍无法实际调用。`),
       };
     }
 
     return {
       tone: "info" as const,
-      message: `当前批量动作将写入 ${bulkProviderAccount.name}，不再跟随正在编辑的 Provider 自动切换。`,
+      message: t(msg`当前批量动作将写入 ${bulkProviderAccount.name}，不再跟随正在编辑的 Provider 自动切换。`),
     };
   }, [bulkProviderAccount]);
 
@@ -1844,4 +1845,5 @@ export function InferencePage() {
     </div>
   );
 }
+
 // i18n-ignore-end
