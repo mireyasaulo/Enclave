@@ -9,77 +9,10 @@
     <link rel="preconnect" href="/" crossorigin />
     <link rel="dns-prefetch" href="/" />
     <script>
-      // 后端版本变化时自动升级（清 SW + 缓存 + reload），用户完全无感知。
-      // 这段 inline 脚本独立于 React bundle 之外，每个页面加载都会执行；
-      // setInterval 让已加载页面也会在 30s 内自动检测到新部署。
-      (function () {
-        if (typeof window === "undefined") return;
-        var STORAGE_KEY = "yinjie:server-build-id";
-        var LOOP_GUARD_KEY = "yinjie:server-build-id-last-reload";
-        var LOOP_GUARD_MS = 60000;
-        var INTERVAL_MS = 30000;
-        var inFlight = false;
-        function recentlyReloaded() {
-          try {
-            var raw = window.sessionStorage.getItem(LOOP_GUARD_KEY);
-            if (!raw) return false;
-            var ts = parseInt(raw, 10);
-            if (!ts) return false;
-            return Date.now() - ts < LOOP_GUARD_MS;
-          } catch (e) { return false; }
-        }
-        function check() {
-          if (inFlight) return;
-          inFlight = true;
-          fetch("/api/system/build-id", { cache: "no-store", credentials: "same-origin" })
-            .then(function (r) { return r.ok ? r.json() : null; })
-            .then(function (data) {
-              inFlight = false;
-              var nextId = data && data.buildId;
-              if (!nextId) return;
-              var prevId = null;
-              try { prevId = window.localStorage.getItem(STORAGE_KEY); } catch (e) {}
-              if (prevId && prevId !== nextId) {
-                if (recentlyReloaded()) {
-                  // 上次刚因 build-id 变化 reload 过；如果 build-id 还在变，
-                  // 多半是后端在频繁热重启（dev 环境），不要再 reload，避免死循环。
-                  try { window.localStorage.setItem(STORAGE_KEY, nextId); } catch (e) {}
-                  return;
-                }
-                Promise.resolve()
-                  .then(function () {
-                    if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
-                      return navigator.serviceWorker.getRegistrations().then(function (regs) {
-                        return Promise.all(regs.map(function (reg) { return reg.unregister(); }));
-                      });
-                    }
-                  })
-                  .then(function () {
-                    if (typeof caches !== "undefined" && caches.keys) {
-                      return caches.keys().then(function (keys) {
-                        return Promise.all(keys.map(function (k) { return caches.delete(k); }));
-                      });
-                    }
-                  })
-                  .catch(function () {})
-                  .then(function () {
-                    try { window.localStorage.setItem(STORAGE_KEY, nextId); } catch (e) {}
-                    try { window.sessionStorage.setItem(LOOP_GUARD_KEY, String(Date.now())); } catch (e) {}
-                    window.location.reload();
-                  });
-                return;
-              }
-              try { window.localStorage.setItem(STORAGE_KEY, nextId); } catch (e) {}
-            })
-            .catch(function () { inFlight = false; });
-        }
-        // 启动时立即检查一次，避免首屏拿到旧版本后还要再等 30s
-        check();
-        setInterval(check, INTERVAL_MS);
-        document.addEventListener("visibilitychange", function () {
-          if (document.visibilityState === "visible") check();
-        });
-      })();
+      // 自动 reload 已下线：dev 环境下后端 nest watch 一编译就换 build-id，
+      // 让前端轮询触发 reload 会把页面卡进死循环；改为手动刷新。
+      // 想检测新版本可以自己调 GET /api/system/build-id 与
+      // localStorage["yinjie:server-build-id"] 比对，需要时再触发刷新。
     </script>
     <style>
       :root {
