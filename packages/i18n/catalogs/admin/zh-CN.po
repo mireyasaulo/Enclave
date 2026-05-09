@@ -9877,12 +9877,6 @@ msgid "运行预设"
 msgstr "运行预设"
 
 #: apps/admin/src/routes/evals-page.tsx:1552
-#: apps/admin/src/routes/evals-page.tsx:2328
-#: apps/admin/src/routes/evals-page.tsx:2926
-msgid "基线"
-msgstr "基线"
-
-#: apps/admin/src/routes/evals-page.tsx:1552
 #: apps/admin/src/routes/evals-page.tsx:1552
 #: apps/admin/src/routes/evals-page.tsx:1555
 #: apps/admin/src/routes/evals-page.tsx:1555
@@ -9897,6 +9891,12 @@ msgstr "基线"
 #: apps/admin/src/routes/inference-page.tsx:1089
 msgid "默认"
 msgstr "默认"
+
+#: apps/admin/src/routes/evals-page.tsx:1552
+#: apps/admin/src/routes/evals-page.tsx:2328
+#: apps/admin/src/routes/evals-page.tsx:2926
+msgid "基线"
+msgstr "基线"
 
 #: apps/admin/src/routes/evals-page.tsx:1555
 #: apps/admin/src/routes/evals-page.tsx:2377
