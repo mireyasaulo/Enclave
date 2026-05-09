@@ -31,7 +31,7 @@ export async function BreadcrumbNav({
   ];
 
   return (
-    <nav aria-label="Breadcrumb" className="mb-6 text-sm text-(--text-muted)">
+    <nav aria-label={i18n._("面包屑导航")} className="mb-6 text-sm text-(--text-muted)">
       <ol className="flex flex-wrap items-center gap-1.5">
         {items.map((item, idx) => {
           const isLast = idx === items.length - 1;

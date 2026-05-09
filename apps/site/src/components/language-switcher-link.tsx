@@ -23,7 +23,13 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
  * Cookie persistence is preserved via an onClick handler that runs
  * before navigation (Next.js Link allows onClick + href).
  */
-export function LanguageSwitcherLink({ current }: { current: SupportedLocale }) {
+export function LanguageSwitcherLink({
+  current,
+  ariaLabel,
+}: {
+  current: SupportedLocale;
+  ariaLabel: string;
+}) {
   const pathname = usePathname() ?? "/";
 
   function persistLocale(next: SupportedLocale) {
@@ -34,7 +40,7 @@ export function LanguageSwitcherLink({ current }: { current: SupportedLocale }) 
     <details className="group relative">
       <summary
         className="flex cursor-pointer list-none items-center gap-1.5 rounded-lg border border-(--border-subtle) bg-(--surface-card) px-3 py-1.5 text-sm text-(--text-primary) shadow-(--shadow-soft) transition hover:border-(--brand-primary) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-primary)"
-        aria-label="Language"
+        aria-label={ariaLabel}
       >
         <span>{getLocaleLabel(current)}</span>
         <ChevronDown size={14} className="shrink-0 transition group-open:rotate-180" />
