@@ -1,8 +1,9 @@
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import type {
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   RealWorldDigestRecord,
   RealWorldNewsBulletinSlot,
   RealWorldSignalRecord,
@@ -45,83 +46,83 @@ type DetailTab = "digest" | "signals" | "runs";
 type RulesTab = "strategy" | "sources" | "prompts";
 type CharacterListFilter = "all" | "attention" | "newsdesk";
 
-const APPLY_MODE_LABELS: Record<string, string> = {
-  disabled: "关闭",
-  shadow: "影子模式",
-  live: "直接生效",
-  manual: "人工查看",
+const APPLY_MODE_LABELS: Record<string, ReturnType<typeof msg>> = {
+  disabled: msg`关闭`,
+  shadow: msg`影子模式`,
+  live: msg`直接生效`,
+  manual: msg`人工查看`,
 };
 
-const PROVIDER_MODE_LABELS: Record<string, string> = {
-  google_news_rss: "Google News RSS",
-  mock: "Mock 回退",
+const PROVIDER_MODE_LABELS: Record<string, ReturnType<typeof msg>> = {
+  google_news_rss: msg`Google News RSS`,
+  mock: msg`Mock 回退`,
 };
 
-const SUBJECT_TYPE_LABELS: Record<string, string> = {
-  living_public_figure: "现实公众人物",
-  organization_proxy: "机构代理主体",
-  historical_snapshot: "历史快照",
-  fictional_or_private: "虚构或私域主体",
+const SUBJECT_TYPE_LABELS: Record<string, ReturnType<typeof msg>> = {
+  living_public_figure: msg`现实公众人物`,
+  organization_proxy: msg`机构代理主体`,
+  historical_snapshot: msg`历史快照`,
+  fictional_or_private: msg`虚构或私域主体`,
 };
 
-const REALITY_MOMENT_POLICY_LABELS: Record<string, string> = {
-  disabled: "关闭",
-  optional: "可选",
-  force_one_daily: "强制每日一条",
+const REALITY_MOMENT_POLICY_LABELS: Record<string, ReturnType<typeof msg>> = {
+  disabled: msg`关闭`,
+  optional: msg`可选`,
+  force_one_daily: msg`强制每日一条`,
 };
 
-const RUN_STATUS_LABELS: Record<string, string> = {
-  running: "执行中",
-  success: "成功",
-  failed: "失败",
-  partial: "部分成功",
+const RUN_STATUS_LABELS: Record<string, ReturnType<typeof msg>> = {
+  running: msg`执行中`,
+  success: msg`成功`,
+  failed: msg`失败`,
+  partial: msg`部分成功`,
 };
 
-const RUN_TYPE_LABELS: Record<string, string> = {
-  signal_collect: "信号采集",
-  digest_generate: "Digest 生成",
-  manual_resync: "人工重跑",
+const RUN_TYPE_LABELS: Record<string, ReturnType<typeof msg>> = {
+  signal_collect: msg`信号采集`,
+  digest_generate: msg`Digest 生成`,
+  manual_resync: msg`人工重跑`,
 };
 
-const DIGEST_STATUS_LABELS: Record<string, string> = {
-  draft: "草稿",
-  active: "生效中",
-  superseded: "已替换",
-  failed: "失败",
+const DIGEST_STATUS_LABELS: Record<string, ReturnType<typeof msg>> = {
+  draft: msg`草稿`,
+  active: msg`生效中`,
+  superseded: msg`已替换`,
+  failed: msg`失败`,
 };
 
-const SIGNAL_STATUS_LABELS: Record<string, string> = {
-  accepted: "已采纳",
-  filtered_low_confidence: "低可信过滤",
-  filtered_identity_mismatch: "身份不匹配",
-  filtered_duplicate: "重复过滤",
-  manual_excluded: "人工排除",
+const SIGNAL_STATUS_LABELS: Record<string, ReturnType<typeof msg>> = {
+  accepted: msg`已采纳`,
+  filtered_low_confidence: msg`低可信过滤`,
+  filtered_identity_mismatch: msg`身份不匹配`,
+  filtered_duplicate: msg`重复过滤`,
+  manual_excluded: msg`人工排除`,
 };
 
-const SIGNAL_TYPE_LABELS: Record<string, string> = {
-  news_article: "新闻报道",
-  official_post: "官方发声",
-  interview: "采访",
-  public_appearance: "公开露面",
-  product_release: "产品发布",
-  other: "其他",
+const SIGNAL_TYPE_LABELS: Record<string, ReturnType<typeof msg>> = {
+  news_article: msg`新闻报道`,
+  official_post: msg`官方发声`,
+  interview: msg`采访`,
+  public_appearance: msg`公开露面`,
+  product_release: msg`产品发布`,
+  other: msg`其他`,
 };
 
-const SCENE_PATCH_LABELS: Record<string, string> = {
-  chat: "聊天回复",
-  moments_post: "朋友圈发文",
-  moments_comment: "朋友圈评论",
-  feed_post: "广场动态发文",
-  channel_post: "视频号内容",
-  feed_comment: "广场评论",
-  greeting: "好友请求问候",
-  proactive: "主动提醒",
+const SCENE_PATCH_LABELS: Record<string, ReturnType<typeof msg>> = {
+  chat: msg`聊天回复`,
+  moments_post: msg`朋友圈发文`,
+  moments_comment: msg`朋友圈评论`,
+  feed_post: msg`广场动态发文`,
+  channel_post: msg`视频号内容`,
+  feed_comment: msg`广场评论`,
+  greeting: msg`好友请求问候`,
+  proactive: msg`主动提醒`,
 };
 
-const BULLETIN_SLOT_LABELS: Record<RealWorldNewsBulletinSlot, string> = {
-  morning: "早报",
-  noon: "午报",
-  evening: "晚报",
+const BULLETIN_SLOT_LABELS: Record<RealWorldNewsBulletinSlot, ReturnType<typeof msg>> = {
+  morning: msg`早报`,
+  noon: msg`午报`,
+  evening: msg`晚报`,
 };
 
 const BULLETIN_SLOT_ORDER: RealWorldNewsBulletinSlot[] = [
@@ -219,12 +220,15 @@ function sortBulletinSlots(slots: RealWorldNewsBulletinSlot[]) {
   );
 }
 
-function formatBulletinSlots(slots: RealWorldNewsBulletinSlot[]) {
+function formatBulletinSlots(
+  slots: RealWorldNewsBulletinSlot[],
+  t: typeof translateRuntimeMessage,
+) {
   const ordered = sortBulletinSlots(slots);
   if (ordered.length === 0) {
-    return "未发布";
+    return t(msg`未发布`);
   }
-  return ordered.map((slot) => BULLETIN_SLOT_LABELS[slot]).join(" / ");
+  return ordered.map((slot) => t(BULLETIN_SLOT_LABELS[slot])).join(" / ");
 }
 
 function readMetadataRecord(value: unknown) {
@@ -300,27 +304,30 @@ function buildSignalDebugSnapshot(signal: RealWorldSignalRecord) {
   };
 }
 
-function buildCharacterAttentionReasons(item: RealWorldSyncCharacterSummary) {
+function buildCharacterAttentionReasons(
+  item: RealWorldSyncCharacterSummary,
+  t: typeof translateRuntimeMessage,
+) {
   const reasons: string[] = [];
   if (item.applyMode === "live" && !item.hasActiveDigest) {
-    reasons.push("Live 未生效");
+    reasons.push(t(msg`Live 未生效`));
   }
   if (item.latestRunStatus === "failed") {
-    reasons.push("最近同步失败");
+    reasons.push(t(msg`最近同步失败`));
   }
   if (
     !item.isWorldNewsDesk &&
     item.applyMode !== "disabled" &&
     !item.hasRealityLinkedMomentToday
   ) {
-    reasons.push("今日未发圈");
+    reasons.push(t(msg`今日未发圈`));
   }
   if (
     item.isWorldNewsDesk &&
     item.applyMode !== "disabled" &&
     item.todayBulletinSlots.length === 0
   ) {
-    reasons.push("今日待播报");
+    reasons.push(t(msg`今日待播报`));
   }
   return reasons;
 }
@@ -352,16 +359,19 @@ function getCharacterAttentionScore(item: RealWorldSyncCharacterSummary) {
   return score;
 }
 
-function buildCharacterListMeta(item: RealWorldSyncCharacterSummary) {
+function buildCharacterListMeta(
+  item: RealWorldSyncCharacterSummary,
+  t: typeof translateRuntimeMessage,
+) {
   const headline = item.isWorldNewsDesk
-    ? `界闻进度 ${formatBulletinSlots(item.todayBulletinSlots)}`
-    : `今日采纳 ${item.todayAcceptedSignalCount} 条 · 发圈 ${
-        item.hasRealityLinkedMomentToday ? "已完成" : "未完成"
-      }`;
+    ? t(msg`界闻进度 ${formatBulletinSlots(item.todayBulletinSlots, t)}`)
+    : t(msg`今日采纳 ${item.todayAcceptedSignalCount} 条 · 发圈 ${
+        item.hasRealityLinkedMomentToday ? t(msg`已完成`) : t(msg`未完成`)
+      }`);
 
   const followup = item.latestRunAt
-    ? `最近 ${RUN_STATUS_LABELS[item.latestRunStatus ?? "success"] ?? item.latestRunStatus} · ${formatCompactTime(item.latestRunAt)}`
-    : "最近暂无执行记录";
+    ? t(msg`最近 ${t(RUN_STATUS_LABELS[item.latestRunStatus ?? "success"] ?? msg`${item.latestRunStatus}`)} · ${formatCompactTime(item.latestRunAt)}`)
+    : t(msg`最近暂无执行记录`);
 
   return `${headline} · ${followup}`;
 }

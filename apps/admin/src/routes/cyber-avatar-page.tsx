@@ -1,5 +1,6 @@
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { useEffect, useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
   useMutation,
   useQuery,
@@ -2487,4 +2488,3 @@ function RunSnapshotBlock({
     </Card>
   );
 }
-// i18n-ignore-end

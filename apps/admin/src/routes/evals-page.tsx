@@ -1835,7 +1835,7 @@ window.alert(t(msg`预设 JSON 无效`));
                         })
                       }
                       disabled={reportDecisionBusy}
-                    >{{t(msg`采用候选`)}}</Button>
+                    >{t(msg`采用候选`)}</Button>
                     <Button
                       variant="secondary"
                       size="sm"

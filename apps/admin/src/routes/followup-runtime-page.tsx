@@ -283,23 +283,23 @@ export function FollowupRuntimePage() {
       <AdminPageHero
         eyebrow={t(msg`主动跟进`)}
         title={t(msg`我自己回捞未闭环事项`)}
-        description={t(msg`把”需要再接一下”的事情和”已经推进中的推荐”拆开来看。运营先判断当前闭环卡在哪，再决定是调规则还是直接复跑。`)}
+        description={t(msg`把"需要再接一下"的事情和"已经推进中的推荐"拆开来看。运营先判断当前闭环卡在哪，再决定是调规则还是直接复跑。`)}
         badges={[t(msg`承接角色：我自己`)]}
         metrics={metrics}
         actions={
           <>
             <AdminDraftStatusPill ready dirty={dirty} />
             <Button
-              variant=”secondary”
-              size=”sm”
+              variant="secondary"
+              size="sm"
               onClick={() => runMutation.mutate()}
               disabled={runMutation.isPending}
             >
               {runMutation.isPending ? t(msg`执行中...`) : t(msg`立即执行`)}
             </Button>
             <Button
-              variant=”primary”
-              size=”sm”
+              variant="primary"
+              size="sm"
               onClick={() => saveMutation.mutate()}
               disabled={saveMutation.isPending || !dirty}
             >
@@ -655,16 +655,16 @@ function RecommendationWorkbench({
     <div className="mt-6 space-y-4">
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <AdminMetaText>
-          {t(msg`这里重点看”推荐发出去之后卡在哪一步”。`)}
+          {t(msg`这里重点看"推荐发出去之后卡在哪一步"。`)}
         </AdminMetaText>
         <AdminSubTabs
           tabs={[
             {
-              key: “in_progress”,
+              key: "in_progress",
               label: t(msg`推进中 ${buckets.in_progress.length}`),
             },
-            { key: “converted”, label: t(msg`已转化 ${buckets.converted.length}`) },
-            { key: “closed”, label: t(msg`已结束 ${buckets.closed.length}`) },
+            { key: "converted", label: t(msg`已转化 ${buckets.converted.length}`) },
+            { key: "closed", label: t(msg`已结束 ${buckets.closed.length}`) },
           ]}
           activeKey={scope}
           onChange={(value) => setScope(value as RecommendationScope)}
@@ -850,13 +850,13 @@ function RunWorkbench({ runs }: { runs: FollowupRunRecord[] }) {
     <div className="mt-6 space-y-4">
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <AdminMetaText>
-          {t(msg`运行记录用于判断这轮调度是”没信号”，还是”真异常”。`)}
+          {t(msg`运行记录用于判断这轮调度是"没信号"，还是"真异常"。`)}
         </AdminMetaText>
         <AdminSubTabs
           tabs={[
-            { key: “attention”, label: t(msg`待排查 ${buckets.attention.length}`) },
-            { key: “healthy”, label: t(msg`成功 ${buckets.healthy.length}`) },
-            { key: “all”, label: t(msg`全部 ${buckets.all.length}`) },
+            { key: "attention", label: t(msg`待排查 ${buckets.attention.length}`) },
+            { key: "healthy", label: t(msg`成功 ${buckets.healthy.length}`) },
+            { key: "all", label: t(msg`全部 ${buckets.all.length}`) },
           ]}
           activeKey={scope}
           onChange={(value) => setScope(value as RunScope)}
@@ -1188,16 +1188,16 @@ function WeightConfigSection({
 }) {
   const t = translateRuntimeMessage;
   return (
-    <div className=”mt-6 space-y-4”>
-      <AdminSoftBox className=”text-xs leading-5”>
-        {t(msg`权重负责”推荐给谁”的排序。先调大方向，再微调惩罚项，避免一次把所有候选顺序打乱。`)}
+    <div className="mt-6 space-y-4">
+      <AdminSoftBox className="text-xs leading-5">
+        {t(msg`权重负责"推荐给谁"的排序。先调大方向，再微调惩罚项，避免一次把所有候选顺序打乱。`)}
       </AdminSoftBox>
 
       <ConfigGroup
         title={t(msg`推荐打分权重`)}
         description={t(msg`正向项负责把更合适的人推上来，惩罚项负责压住重复推荐和关系冲突。`)}
       >
-        <div className=”grid gap-4 md:grid-cols-2”>
+        <div className="grid gap-4 md:grid-cols-2">
           <NumberField
             label={t(msg`已有好友加成`)}
             value={draft.candidateWeights.existingFriendBoost}
@@ -1309,16 +1309,16 @@ function CopyConfigSection({
 }) {
   const t = translateRuntimeMessage;
   return (
-    <div className=”mt-6 space-y-4”>
-      <AdminSoftBox className=”text-xs leading-5”>
-        {t(msg`只有在门槛和权重稳定后，再改 Prompt 与文案。否则很难判断是”策略问题”还是”表达问题”。`)}
+    <div className="mt-6 space-y-4">
+      <AdminSoftBox className="text-xs leading-5">
+        {t(msg`只有在门槛和权重稳定后，再改 Prompt 与文案。否则很难判断是"策略问题"还是"表达问题"。`)}
       </AdminSoftBox>
 
       <ConfigGroup
         title={t(msg`Prompt 模板`)}
         description={t(msg`这些提示词决定 open loop 提取、我自己消息、好友申请招呼语和申请后通知的生成方式。`)}
       >
-        <div className=”space-y-4”>
+        <div className="space-y-4">
           <TextareaField
             label={t(msg`Open loop 提取 Prompt`)}
             rows={14}
@@ -1382,7 +1382,7 @@ function CopyConfigSection({
         title={t(msg`系统文案`)}
         description={t(msg`这些短文案会直接影响运营回看和用户感知，建议先保证语义稳定，再调语气。`)}
       >
-        <div className=”grid gap-4 md:grid-cols-2”>
+        <div className="grid gap-4 md:grid-cols-2">
           <TextField
             label={t(msg`成功总结文案`)}
             value={draft.textTemplates.jobSummarySuccess}
@@ -1888,9 +1888,9 @@ function describeOpenLoop(
   rules: FollowupRuntimeRules,
 ) {
   const t = translateRuntimeMessage;
-  if (loop.status === “recommended”) {
+  if (loop.status === "recommended") {
     return {
-      tone: “success” as const,
+      tone: "success" as const,
       title: t(msg`这条线索已经进入推荐阶段`),
       description: t(msg`当前更值得运营关注的是推荐后有没有真正被打开、加友和继续对话。`),
     };
@@ -1898,7 +1898,7 @@ function describeOpenLoop(
 
   if (loop.handoffNeedScore >= rules.minHandoffNeedScore) {
     return {
-      tone: “warning” as const,
+      tone: "warning" as const,
       title: t(msg`这条线索已经达到 handoff 阈值`),
       description: t(msg`如果它仍停留在待判断或观察阶段，优先检查本轮容量限制、冷却规则或候选排序是否把它压住了。`),
     };
@@ -1906,14 +1906,14 @@ function describeOpenLoop(
 
   if (loop.closureScore >= 0.7) {
     return {
-      tone: “info” as const,
+      tone: "info" as const,
       title: t(msg`这条线索看起来已经部分收口`),
-      description: t(msg`当前更像是”已有人接住但还没完全闭环”，不一定需要再主动打扰一次。`),
+      description: t(msg`当前更像是"已有人接住但还没完全闭环"，不一定需要再主动打扰一次。`),
     };
   }
 
   return {
-    tone: “info” as const,
+    tone: "info" as const,
     title: t(msg`这条线索仍在观察窗口内`),
     description: t(msg`优先看 handoff 需要度、来源线程和最近提及时间，判断是否要通过调阈值把它提上来。`),
   };

@@ -1266,7 +1266,7 @@ export function ActionRuntimePage() {
                           placeholder="action_operator"
                         />
                       </div>
-                      <div className=”-mt-2 text-[12px] leading-5 text-[color:var(--text-dim)]”>
+                      <div className="-mt-2 text-[12px] leading-5 text-[color:var(--text-dim)]">
                         {t(msg`默认是 \`action_operator\`。留空表示不限制角色，只建议用于兼容或排障。`)}
                       </div>
 
@@ -1277,12 +1277,12 @@ export function ActionRuntimePage() {
                         )}
                         onChange={(value) =>
                           setPolicyValue(
-                            “trustedOperationKeys”,
+                            "trustedOperationKeys",
                             parseStringList(value),
                           )
                         }
-                        description={t(msg`只有同时命中”自动执行风险等级”和这里的 operationKey，动作才会直接执行。`)}
-                        textareaClassName=”min-h-32”
+                        description={t(msg`只有同时命中"自动执行风险等级"和这里的 operationKey，动作才会直接执行。`)}
+                        textareaClassName="min-h-32"
                       />
                     </div>
                   </Card>
@@ -1439,17 +1439,17 @@ export function ActionRuntimePage() {
           {workspaceTab === "preview" ? (
             <div className="space-y-6">
               <AdminCallout
-                tone=”info”
+                tone="info"
                 title={t(msg`消息预演`)}
-                description={t(msg`这里用来验证”某句话是否会命中真实世界动作链”。先预演，再回去改门控或提示模板，定位会更快。`)}
+                description={t(msg`这里用来验证"某句话是否会命中真实世界动作链"。先预演，再回去改门控或提示模板，定位会更快。`)}
               />
 
-              <Card className=”bg-[color:var(--surface-console)]”>
+              <Card className="bg-[color:var(--surface-console)]">
                 <AdminSectionHeader
                   title={t(msg`预演输入`)}
                   actions={
                     <Button
-                      variant=”primary”
+                      variant="primary"
                       disabled={
                         !previewMessage.trim() || previewMutation.isPending
                       }
@@ -1461,13 +1461,13 @@ export function ActionRuntimePage() {
                     </Button>
                   }
                 />
-                <div className=”mt-4 space-y-4”>
-                  <div className=”flex flex-wrap gap-2”>
+                <div className="mt-4 space-y-4">
+                  <div className="flex flex-wrap gap-2">
                     {PREVIEW_EXAMPLES.map((example) => (
                       <Button
                         key={t(example.label)}
-                        variant=”secondary”
-                        size=”sm”
+                        variant="secondary"
+                        size="sm"
                         onClick={() => setPreviewMessage(example.message)}
                       >
                         {t(example.label)}
@@ -1479,7 +1479,7 @@ export function ActionRuntimePage() {
                     value={previewMessage}
                     onChange={setPreviewMessage}
                     placeholder={t(msg`例如：帮我把客厅空调调到 24 度，或者今晚给我点个 40 块以内的轻食外卖。`)}
-                    textareaClassName=”min-h-32”
+                    textareaClassName="min-h-32"
                   />
                 </div>
               </Card>
@@ -1571,7 +1571,7 @@ export function ActionRuntimePage() {
               ) : (
                 <AdminEmptyState
                   title={t(msg`还没有预演结果`)}
-                  description={t(msg`输入一条候选消息后点”运行预演”，这里会显示是否命中动作链以及生成出的 plan。`)}
+                  description={t(msg`输入一条候选消息后点"运行预演"，这里会显示是否命中动作链以及生成出的 plan。`)}
                 />
               )}
             </div>
@@ -1846,17 +1846,17 @@ export function ActionRuntimePage() {
                         "official-home-assistant-smart-home" ? (
                           <div className="space-y-4">
                             <AdminCallout
-                              tone=”info”
+                              tone="info"
                               title={t(msg`Home Assistant 配置方式`)}
-                              description={t(msg`填写 \`baseUrl\`，把 Long-Lived Access Token 填进 credential。\`deviceTargets\` 用 “房间:设备” 作为 key，例如 \`客厅:空调\`；每个 target 至少包含 \`entityId\`，可选 \`serviceDomain\`、\`turnOnService\`、\`turnOffService\`、\`setTemperatureService\`、\`temperatureField\`。`)}
+                              description={t(msg`填写 \`baseUrl\`，把 Long-Lived Access Token 填进 credential。\`deviceTargets\` 用 "房间:设备" 作为 key，例如 \`客厅:空调\`；每个 target 至少包含 \`entityId\`，可选 \`serviceDomain\`、\`turnOnService\`、\`turnOffService\`、\`setTemperatureService\`、\`temperatureField\`。`)}
                             />
-                            <div className=”rounded-[18px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] p-4”>
-                              <div className=”flex items-center justify-between gap-3”>
+                            <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] p-4">
+                              <div className="flex items-center justify-between gap-3">
                                 <div>
-                                  <div className=”text-sm font-semibold text-[color:var(--text-primary)]”>
+                                  <div className="text-sm font-semibold text-[color:var(--text-primary)]">
                                     {t(msg`实体发现与映射向导`)}
                                   </div>
-                                  <div className=”mt-1 text-sm leading-6 text-[color:var(--text-secondary)]”>
+                                  <div className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
                                     {t(msg`会优先通过 Home Assistant WebSocket registry 识别 area / device / entity 关系，失败时回退到 \`/api/states\`，并给出推荐的 \`deviceTargets\` 键。`)}
                                   </div>
                                 </div>
@@ -1919,16 +1919,16 @@ export function ActionRuntimePage() {
                                     description={t(msg`拉取时间 ${formatDateTime(selectedConnectorDiscoveryResult.fetchedAt)}${
                                       selectedConnectorDiscoveryResult.query
                                         ? `，当前筛选：${selectedConnectorDiscoveryResult.query}`
-                                        : “”
+                                        : ""
                                     }。房间识别模式：${translateDiscoveryTopologySource(
                                       selectedConnectorDiscoveryResult.topologySource,
-                                    )}。点”写入映射”会把推荐 target 合并进当前草稿，不会自动保存。`)}
+                                    )}。点"写入映射"会把推荐 target 合并进当前草稿，不会自动保存。`)}
                                   />
                                   {selectedConnectorDiscoveryResult.warnings.map(
                                     (warning) => (
                                       <AdminCallout
                                         key={warning}
-                                        tone=”warning”
+                                        tone="warning"
                                         title={t(msg`识别回退提示`)}
                                         description={warning}
                                       />
@@ -1936,19 +1936,19 @@ export function ActionRuntimePage() {
                                   )}
                                   {selectedConnectorFeedback ? (
                                     <AdminCallout
-                                      tone=”success”
+                                      tone="success"
                                       title={t(msg`映射草稿已更新`)}
                                       description={selectedConnectorFeedback}
                                     />
                                   ) : null}
-                                  <div className=”flex flex-wrap items-center gap-3 rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] p-4”>
-                                    <div className=”text-sm leading-6 text-[color:var(--text-secondary)]”>
+                                  <div className="flex flex-wrap items-center gap-3 rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] p-4">
+                                    <div className="text-sm leading-6 text-[color:var(--text-secondary)]">
                                       {t(msg`当前草稿已有 ${countExistingMappedTargets(
                                         selectedConnector,
                                       )} 条 deviceTargets 映射。`)}
                                     </div>
                                     <Button
-                                      variant=”secondary”
+                                      variant="secondary"
                                       disabled={
                                         !selectedConnectorDiscoveryResult.items
                                           .length
@@ -1957,14 +1957,14 @@ export function ActionRuntimePage() {
                                         applyHomeAssistantTargetSuggestions(
                                           selectedConnector,
                                           selectedConnectorDiscoveryResult.items,
-                                          “missing”,
+                                          "missing",
                                         )
                                       }
                                     >
                                       {t(msg`只补未配置项`)}
                                     </Button>
                                     <Button
-                                      variant=”secondary”
+                                      variant="secondary"
                                       disabled={
                                         !selectedConnectorDiscoveryResult.items
                                           .length
@@ -1973,7 +1973,7 @@ export function ActionRuntimePage() {
                                         applyHomeAssistantTargetSuggestions(
                                           selectedConnector,
                                           selectedConnectorDiscoveryResult.items,
-                                          “all”,
+                                          "all",
                                         )
                                       }
                                     >
@@ -2223,14 +2223,14 @@ export function ActionRuntimePage() {
                 }
                 description={
                   attentionRuns.length
-                    ? t(msg`优先从”待处理”视角回看等待补参数、等待确认和执行失败的动作，再决定是改规则、补连接器还是重试。`)
-                    : t(msg`最近动作已经基本收口，可以从”已完成”回看成功样本，或者去消息预演继续做验证。`)
+                    ? t(msg`优先从"待处理"视角回看等待补参数、等待确认和执行失败的动作，再决定是改规则、补连接器还是重试。`)
+                    : t(msg`最近动作已经基本收口，可以从"已完成"回看成功样本，或者去消息预演继续做验证。`)
                 }
               />
 
-              <Card className=”bg-[color:var(--surface-console)]”>
+              <Card className="bg-[color:var(--surface-console)]">
                 <AdminSectionHeader title={t(msg`运行筛选`)} />
-                <div className=”mt-4”>
+                <div className="mt-4">
                   <AdminTabs
                     tabs={evidenceTabs}
                     activeKey={evidenceTab}
@@ -2239,10 +2239,10 @@ export function ActionRuntimePage() {
                 </div>
               </Card>
 
-              <div className=”grid gap-6 xl:grid-cols-[0.82fr_1.18fr]”>
-                <Card className=”bg-[color:var(--surface-console)]”>
+              <div className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr]">
+                <Card className="bg-[color:var(--surface-console)]">
                   <AdminSectionHeader title={t(msg`运行列表`)} />
-                  <div className=”mt-4 space-y-3”>
+                  <div className="mt-4 space-y-3">
                     {visibleRuns.length ? (
                       visibleRuns.map((run) => (
                         <AdminSelectableCard
@@ -2273,13 +2273,13 @@ export function ActionRuntimePage() {
                   </div>
                 </Card>
 
-                <Card className=”bg-[color:var(--surface-console)]”>
+                <Card className="bg-[color:var(--surface-console)]">
                   <AdminSectionHeader
                     title={t(msg`动作详情`)}
                     actions={
                       selectedRunId ? (
                         <Button
-                          variant=”secondary”
+                          variant="secondary"
                           disabled={retryRunMutation.isPending}
                           onClick={() => retryRunMutation.mutate(selectedRunId)}
                         >
@@ -2290,7 +2290,7 @@ export function ActionRuntimePage() {
                       ) : undefined
                     }
                   />
-                  <div className=”mt-4”>
+                  <div className="mt-4">
                     {!selectedRunId ? (
                       <AdminEmptyState
                         title={t(msg`还没有选中动作`)}
