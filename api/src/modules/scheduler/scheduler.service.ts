@@ -1002,7 +1002,10 @@ export class SchedulerService {
     let music = 0;
     let video = 0;
 
-    if ((await this.minimaxQuota.availableToday('music-2.6')) <= 0) {
+    const musicAvailable =
+      (await this.minimaxQuota.availableToday('music-2.6')) > 0 ||
+      (await this.minimaxQuota.availableToday('music-2.5')) > 0;
+    if (!musicAvailable) {
       // 跳过音乐扫描以省 LLM tokens
     } else {
       const candidates = chars.filter((char) => {

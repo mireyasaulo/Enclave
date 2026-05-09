@@ -1707,7 +1707,11 @@ export class MomentsService implements OnModuleInit {
   ): Promise<MomentPostEntity | null> {
     // 提前拦截：MiniMax 未配置或配额耗尽时不浪费 LLM tokens 去生成种子文本。
     if (!this.minimaxClient.isConfigured()) return null;
-    if ((await this.minimaxQuota.availableToday('music-2.6')) <= 0) {
+    // music-2.6 主力 + music-2.5 fallback；任一有余额就值得继续
+    const musicAvailable =
+      (await this.minimaxQuota.availableToday('music-2.6')) > 0 ||
+      (await this.minimaxQuota.availableToday('music-2.5')) > 0;
+    if (!musicAvailable) {
       return null;
     }
     if (!(await this.isCharacterVisibleToOwner(char.id))) {
@@ -1771,7 +1775,8 @@ export class MomentsService implements OnModuleInit {
       generationKind: 'minimax_music',
       generationMetadata: {
         minimaxJobId: job.id,
-        minimaxModel: 'music-2.6',
+        // 使用 job 实际占用的模型（可能是 fallback 后的 music-2.5）
+        minimaxModel: job.model,
         pending: true,
       },
     });

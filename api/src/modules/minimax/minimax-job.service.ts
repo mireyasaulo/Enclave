@@ -116,10 +116,27 @@ export class MinimaxJobService {
       this.logger.warn('enqueueMusicJob skipped: MINIMAX_API_KEY missing');
       return null;
     }
-    const reserved = await this.quota.tryReserve(args.model);
-    if (!reserved) {
-      this.logger.warn(`enqueueMusicJob skipped: ${args.model} quota exhausted`);
+    // fallback 链：music-2.6 用尽时降级到 music-2.5（4/日）多顶 4 个名额。
+    // 上游统一传 'music-2.6'，质量优先；2.5 仅作余额耗尽兜底。
+    const fallbackChain: MinimaxMusicModel[] =
+      args.model === 'music-2.6' ? ['music-2.6', 'music-2.5'] : [args.model];
+    let actualModel: MinimaxMusicModel | null = null;
+    for (const m of fallbackChain) {
+      if (await this.quota.tryReserve(m)) {
+        actualModel = m;
+        break;
+      }
+    }
+    if (!actualModel) {
+      this.logger.warn(
+        `enqueueMusicJob skipped: all music quota exhausted (${fallbackChain.join('/')})`,
+      );
       return null;
+    }
+    if (actualModel !== args.model) {
+      this.logger.log(
+        `enqueueMusicJob fell back ${args.model} → ${actualModel}`,
+      );
     }
     const payload: MinimaxMusicJobInputPayload = {
       kind: 'music',
@@ -130,7 +147,7 @@ export class MinimaxJobService {
       kind: 'music',
       status: 'pending',
       inputPayload: JSON.stringify(payload),
-      model: args.model,
+      model: actualModel,
       targetType: args.targetType,
       targetId: null,
       characterId: args.characterId,
