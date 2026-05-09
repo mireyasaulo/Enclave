@@ -77,7 +77,11 @@ export function getChatSocket() {
   const token = resolveSocketAuthToken(nextSocketBaseUrl);
   socket = io(namespaceUrl, {
     path: enginePath,
-    transports: ["websocket", "polling"],
+    // polling 在前 + websocket 升级：花生壳 / 部分公网隧道不转发 WS upgrade(101)，
+    // 直接 transports:["websocket","polling"] 会让 socket.io-client 先尝试 ws，
+    // upgrade 失败后陷入死循环不发任何 emit。改成 polling-first 让初始握手用
+    // long-polling 拿到 sid，能升级就升级，不能升级也保持工作。
+    transports: ["polling", "websocket"],
     ...(token ? { auth: { token }, query: { token } } : {}),
   });
 
