@@ -15,15 +15,13 @@
       // localStorage["yinjie:server-build-id"] 比对，需要时再触发刷新。
     </script>
     <script>
-      // SW 兜底清理：本地预览（127.0.0.1 / localhost / 局域网 IP 等）一律
-      // 不装 SW，并主动清掉历史遗留的 SW + caches。生产 host 才走 SW 缓存。
-      // 这段 inline 脚本必须在 React bundle 之前执行，因为 bundle 本身可能
-      // 就是从旧 SW precache 里拿出来的——必须先把旧 SW 干掉，下次刷新才能
-      // 真正命中网络新版本。
+      // SW 兜底清理：app 已经把 SW 整体下线（public/sw.js 是自毁开关），
+      // 这段 inline 是双保险——所有 host 都跑，发现还有 SW 注册就 unregister
+      // + 清 caches + reload。sessionStorage 守护避免反复 reload。
+      // 必须在 React bundle 之前执行，因为 bundle 自己就有可能是旧 SW
+      // precache 里掏出来的，得先把旧 SW 干掉才能拿到不带拦截的资源。
       (function () {
         if (typeof window === "undefined") return;
-        var PROD_SW_HOSTS = ["1gw06751dd053.vicp.fun"];
-        if (PROD_SW_HOSTS.indexOf(window.location.hostname) >= 0) return;
         if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
         var GUARD_KEY = "yinjie:sw-cleanup-reload";
         var alreadyTried = false;
