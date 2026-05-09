@@ -27,11 +27,25 @@ export interface QuotaSnapshot {
 @Injectable()
 export class MinimaxQuotaService {
   private readonly logger = new Logger(MinimaxQuotaService.name);
+  // 当日已经告警过的 "model:date" key，跨日期自然失效（key 含日期）
+  private readonly warnedToday = new Set<string>();
 
   constructor(
     @InjectRepository(MinimaxQuotaEntity)
     private readonly repo: Repository<MinimaxQuotaEntity>,
   ) {}
+
+  // 配额耗尽预警：reserve 成功后，如果剩余 ≤ 1，写一次性 warn 日志，
+  // 方便 ops 在日志里抓，避免频繁 reserve 触发日志洪水。
+  private maybeWarnLowRemaining(model: string, remaining: number): void {
+    if (remaining > 1) return;
+    const key = `${model}:${todayInShanghai()}`;
+    if (this.warnedToday.has(key)) return;
+    this.warnedToday.add(key);
+    this.logger.warn(
+      `minimax quota low: model=${model} remaining=${remaining} (day=${todayInShanghai()})`,
+    );
+  }
 
   async availableToday(model: string): Promise<number> {
     const limit = getDailyLimit(model);
@@ -50,7 +64,7 @@ export class MinimaxQuotaService {
       return false;
     }
     const usageDate = todayInShanghai();
-    return this.repo.manager.transaction(async (mgr) => {
+    const ok = await this.repo.manager.transaction(async (mgr) => {
       const row = await mgr.findOne(MinimaxQuotaEntity, {
         where: { model, usageDate },
       });
@@ -78,6 +92,11 @@ export class MinimaxQuotaService {
         .execute();
       return (result.affected ?? 0) === 1;
     });
+    if (ok) {
+      const remaining = await this.availableToday(model);
+      this.maybeWarnLowRemaining(model, remaining);
+    }
+    return ok;
   }
 
   async commit(model: string): Promise<void> {
