@@ -12,18 +12,18 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: apps/app/src/components/audio-card.tsx:135
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:535
-#: apps/app/src/routes/channels-page.tsx:1278
+#: apps/app/src/components/audio-card.tsx:139
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:548
+#: apps/app/src/routes/channels-page.tsx:1291
 msgid "音乐"
 msgstr "음악"
 
-#: apps/app/src/components/audio-card.tsx:142
+#: apps/app/src/components/audio-card.tsx:146
 #: apps/app/src/i18n/static-dom-seed.ts:349
 msgid "播放"
 msgstr "재생"
 
-#: apps/app/src/components/audio-card.tsx:142
+#: apps/app/src/components/audio-card.tsx:146
 msgid "暂停"
 msgstr "일시정지"
 
@@ -245,7 +245,7 @@ msgstr "마이크 권한 요청 중..."
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:140
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:197
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:236
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1340
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1446
 #: apps/app/src/features/desktop/chat/desktop-chat-confirm-dialog.tsx:97
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:161
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1087
@@ -261,7 +261,7 @@ msgstr "마이크 권한 요청 중..."
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:173
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:470
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:203
-#: apps/app/src/routes/channels-page.tsx:1978
+#: apps/app/src/routes/channels-page.tsx:1991
 #: apps/app/src/routes/character-detail-page.tsx:306
 #: apps/app/src/routes/contacts-page.tsx:2004
 #: apps/app/src/routes/contacts-page.tsx:2006
@@ -355,7 +355,7 @@ msgstr "스티커"
 #: apps/app/src/features/chat/group-message-context-menu.tsx:66
 #: apps/app/src/features/chat/group-message-context-menu.tsx:81
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:53
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:697
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:803
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:189
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:355
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:258
@@ -369,9 +369,9 @@ msgstr "스티커"
 #: apps/app/src/features/shell/desktop-nav-matching.ts:65
 #: apps/app/src/features/shell/desktop-nav-matching.ts:66
 #: apps/app/src/i18n/static-dom-seed.ts:65
-#: apps/app/src/routes/channels-page.tsx:1578
+#: apps/app/src/routes/channels-page.tsx:1591
 #: apps/app/src/routes/desktop-chat-files-page.tsx:757
-#: apps/app/src/routes/discover-feed-page.tsx:1024
+#: apps/app/src/routes/discover-feed-page.tsx:1018
 #: apps/app/src/routes/favorites-page.tsx:416
 #: apps/app/src/routes/profile-favorites-page.tsx:119
 #: apps/app/src/routes/profile-page.tsx:157
@@ -452,7 +452,7 @@ msgstr "Enter로 보내기"
 #: apps/app/src/components/chat-composer.tsx:4051
 #: apps/app/src/components/moment-comment-composer.tsx:32
 #: apps/app/src/components/wechat-comment-bar.tsx:168
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1365
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1471
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:370
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:202
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:934
@@ -460,7 +460,7 @@ msgstr "Enter로 보내기"
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:373
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:392
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:184
-#: apps/app/src/routes/channels-page.tsx:2002
+#: apps/app/src/routes/channels-page.tsx:2015
 #: apps/app/src/routes/discover-page.tsx:867
 #: apps/app/src/routes/mobile-add-friend-page.tsx:791
 #: apps/app/src/routes/mobile-note-editor-page.tsx:924
@@ -740,13 +740,13 @@ msgstr "원본으로 보내기 (Cmd/Ctrl+Enter)"
 #: apps/app/src/components/chat-composer.tsx:5381
 #: apps/app/src/components/mobile-chat-attachment-preview.tsx:109
 #: apps/app/src/components/moment-comment-composer.tsx:33
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1365
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1471
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:934
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:114
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:169
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:373
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:392
-#: apps/app/src/routes/channels-page.tsx:2002
+#: apps/app/src/routes/channels-page.tsx:2015
 #: apps/app/src/routes/character-detail-page.tsx:298
 #: apps/app/src/routes/discover-page.tsx:866
 #: apps/app/src/routes/mobile-add-friend-page.tsx:686
@@ -959,8 +959,8 @@ msgstr "복사에 실패했습니다. 잠시 후 다시 시도하세요."
 #: apps/app/src/components/official-article-viewer.tsx:98
 #: apps/app/src/components/official-article-viewer.tsx:122
 #: apps/app/src/i18n/static-dom-seed.ts:879
-#: apps/app/src/routes/channels-page.tsx:746
-#: apps/app/src/routes/channels-page.tsx:773
+#: apps/app/src/routes/channels-page.tsx:754
+#: apps/app/src/routes/channels-page.tsx:781
 #: apps/app/src/routes/character-detail-page.tsx:769
 #: apps/app/src/routes/character-detail-page.tsx:793
 #: apps/app/src/routes/chat-details-page.tsx:390
@@ -995,7 +995,7 @@ msgstr "위치 정보가 복사되었습니다."
 #: apps/app/src/components/mobile-document-shell.tsx:64
 #: apps/app/src/components/official-article-viewer.tsx:143
 #: apps/app/src/i18n/static-dom-seed.ts:875
-#: apps/app/src/routes/channels-page.tsx:734
+#: apps/app/src/routes/channels-page.tsx:742
 #: apps/app/src/routes/character-detail-page.tsx:751
 #: apps/app/src/routes/chat-details-page.tsx:372
 #: apps/app/src/routes/discover-feed-page.tsx:560
@@ -1018,7 +1018,7 @@ msgstr "시스템 공유 패널을 열었습니다."
 #: apps/app/src/components/mobile-document-shell.tsx:78
 #: apps/app/src/components/official-article-viewer.tsx:94
 #: apps/app/src/i18n/static-dom-seed.ts:876
-#: apps/app/src/routes/channels-page.tsx:753
+#: apps/app/src/routes/channels-page.tsx:761
 #: apps/app/src/routes/character-detail-page.tsx:765
 #: apps/app/src/routes/chat-details-page.tsx:386
 #: apps/app/src/routes/discover-feed-page.tsx:579
@@ -1050,8 +1050,8 @@ msgstr "이 기기에서는 지금 시스템 공유를 열 수 없습니다. 잠
 #: apps/app/src/components/official-article-viewer.tsx:122
 #: apps/app/src/components/official-article-viewer.tsx:150
 #: apps/app/src/i18n/static-dom-seed.ts:878
-#: apps/app/src/routes/channels-page.tsx:746
-#: apps/app/src/routes/channels-page.tsx:773
+#: apps/app/src/routes/channels-page.tsx:754
+#: apps/app/src/routes/channels-page.tsx:781
 #: apps/app/src/routes/character-detail-page.tsx:768
 #: apps/app/src/routes/character-detail-page.tsx:792
 #: apps/app/src/routes/chat-details-page.tsx:389
@@ -1089,7 +1089,7 @@ msgstr "시스템 공유를 일시적으로 사용할 수 없어 위치 내용�
 #: apps/app/src/components/mobile-document-shell.tsx:100
 #: apps/app/src/components/official-article-viewer.tsx:118
 #: apps/app/src/i18n/static-dom-seed.ts:882
-#: apps/app/src/routes/channels-page.tsx:780
+#: apps/app/src/routes/channels-page.tsx:788
 #: apps/app/src/routes/character-detail-page.tsx:789
 #: apps/app/src/routes/chat-details-page.tsx:410
 #: apps/app/src/routes/discover-feed-page.tsx:605
@@ -1385,7 +1385,7 @@ msgstr "즐겨찾기 중..."
 #: apps/app/src/components/chat-message-list.tsx:3214
 #: apps/app/src/features/chat/group-message-context-menu.tsx:143
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:114
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:691
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:797
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:371
 #: apps/app/src/i18n/static-dom-seed.ts:934
 msgid "转发"
@@ -1592,7 +1592,7 @@ msgstr "메시지 내용이 복사되었습니다."
 #: apps/app/src/components/chat-message-list.tsx:3462
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:958
 #: apps/app/src/routes/desktop-chat-files-page.tsx:757
-#: apps/app/src/routes/discover-feed-page.tsx:1024
+#: apps/app/src/routes/discover-feed-page.tsx:1018
 #: apps/app/src/routes/favorites-page.tsx:615
 #: apps/app/src/routes/official-account-detail-page.tsx:522
 msgid "取消收藏"
@@ -1916,10 +1916,10 @@ msgstr "[채팅 기록]"
 #: apps/app/src/components/wechat-moment-card.tsx:301
 #: apps/app/src/features/chat/group-message-context-menu.tsx:129
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:107
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1534
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1640
 #: apps/app/src/i18n/static-dom-seed.ts:935
-#: apps/app/src/routes/channels-page.tsx:1934
-#: apps/app/src/routes/discover-feed-page.tsx:1059
+#: apps/app/src/routes/channels-page.tsx:1947
+#: apps/app/src/routes/discover-feed-page.tsx:1053
 msgid "回复"
 msgstr "답장"
 
@@ -2367,8 +2367,8 @@ msgid "保存图片到相册，发到 X / 小红书 / 微博 引发更多人来�
 msgstr "이미지를 갤러리에 저장한 뒤 X / 샤오훙수 / 웨이보에 올려 더 많은 사람들이 보게 해주세요"
 
 #: apps/app/src/components/feed-post-share-card-modal.tsx:72
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:951
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1504
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1057
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1610
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2434
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:91
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:187
@@ -2386,7 +2386,7 @@ msgstr "이미지를 갤러리에 저장한 뒤 X / 샤오훙수 / 웨이보에 
 #: apps/app/src/routes/desktop-mobile-page.tsx:1221
 #: apps/app/src/routes/discover-feed-page.tsx:745
 #: apps/app/src/routes/discover-feed-page.tsx:888
-#: apps/app/src/routes/discover-feed-page.tsx:1146
+#: apps/app/src/routes/discover-feed-page.tsx:1140
 #: apps/app/src/routes/discover-page.tsx:775
 #: apps/app/src/routes/live-companion-page.tsx:296
 #: apps/app/src/routes/moments-page.tsx:1011
@@ -2407,7 +2407,7 @@ msgstr "주민 게시물"
 
 #. placeholder {0}: post.likeCount
 #: apps/app/src/components/feed-post-share-card-modal.tsx:156
-#: apps/app/src/routes/channels-page.tsx:1694
+#: apps/app/src/routes/channels-page.tsx:1707
 #: apps/app/src/routes/discover-feed-page.tsx:942
 msgid "{0} 赞"
 msgstr "좋아요 {0}개"
@@ -2415,7 +2415,7 @@ msgstr "좋아요 {0}개"
 #. placeholder {0}: post.commentCount
 #: apps/app/src/components/feed-post-share-card-modal.tsx:159
 #: apps/app/src/routes/channel-author-page.tsx:583
-#: apps/app/src/routes/channels-page.tsx:1695
+#: apps/app/src/routes/channels-page.tsx:1708
 #: apps/app/src/routes/discover-feed-page.tsx:943
 msgid "{0} 评论"
 msgstr "댓글 {0}개"
@@ -2649,9 +2649,9 @@ msgstr "도구 공유"
 #: apps/app/src/i18n/static-dom-seed.ts:884
 #: apps/app/src/routes/channel-author-page.tsx:333
 #: apps/app/src/routes/channel-author-page.tsx:367
-#: apps/app/src/routes/channels-page.tsx:1109
-#: apps/app/src/routes/channels-page.tsx:1140
-#: apps/app/src/routes/channels-page.tsx:1171
+#: apps/app/src/routes/channels-page.tsx:1122
+#: apps/app/src/routes/channels-page.tsx:1153
+#: apps/app/src/routes/channels-page.tsx:1184
 #: apps/app/src/routes/character-detail-page.tsx:285
 #: apps/app/src/routes/chat-background-page.tsx:375
 #: apps/app/src/routes/chat-background-page.tsx:407
@@ -2663,7 +2663,7 @@ msgstr "도구 공유"
 #: apps/app/src/routes/discover-feed-page.tsx:370
 #: apps/app/src/routes/discover-feed-page.tsx:828
 #: apps/app/src/routes/discover-feed-page.tsx:867
-#: apps/app/src/routes/discover-feed-page.tsx:1131
+#: apps/app/src/routes/discover-feed-page.tsx:1125
 #: apps/app/src/routes/discover-scene-page.tsx:254
 #: apps/app/src/routes/friend-moments-page.tsx:458
 #: apps/app/src/routes/friend-requests-page.tsx:258
@@ -2929,7 +2929,7 @@ msgid "评论内容"
 msgstr "댓글 내용"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:74
-#: apps/app/src/components/moment-media-gallery.tsx:139
+#: apps/app/src/components/moment-media-gallery.tsx:140
 #: apps/app/src/i18n/static-dom-seed.ts:860
 msgid "打开视频预览"
 msgstr "동영상 미리보기 열기"
@@ -2940,8 +2940,8 @@ msgid "视频封面"
 msgstr "동영상 커버"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:119
-#: apps/app/src/components/moment-media-gallery.tsx:179
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1023
+#: apps/app/src/components/moment-media-gallery.tsx:180
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1129
 #: apps/app/src/i18n/static-dom-seed.ts:862
 #: apps/app/src/routes/channel-author-page.tsx:230
 #: apps/app/src/routes/channel-author-page.tsx:741
@@ -2991,8 +2991,8 @@ msgstr ", {remainingCount}장 더 추가할 수 있습니다."
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:273
 #: apps/app/src/components/moment-compose-media-preview.tsx:276
-#: apps/app/src/components/moment-media-gallery.tsx:517
-#: apps/app/src/components/moment-media-gallery.tsx:524
+#: apps/app/src/components/moment-media-gallery.tsx:518
+#: apps/app/src/components/moment-media-gallery.tsx:525
 #: apps/app/src/i18n/static-dom-seed.ts:866
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1022
 msgid "关闭图片预览"
@@ -3000,24 +3000,24 @@ msgstr "이미지 미리보기 닫기"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:281
 #: apps/app/src/components/moment-compose-media-preview.tsx:293
-#: apps/app/src/components/moment-media-gallery.tsx:229
-#: apps/app/src/components/moment-media-gallery.tsx:435
-#: apps/app/src/components/moment-media-gallery.tsx:530
-#: apps/app/src/components/moment-media-gallery.tsx:542
-#: apps/app/src/components/moment-media-gallery.tsx:640
+#: apps/app/src/components/moment-media-gallery.tsx:230
+#: apps/app/src/components/moment-media-gallery.tsx:436
+#: apps/app/src/components/moment-media-gallery.tsx:531
+#: apps/app/src/components/moment-media-gallery.tsx:543
+#: apps/app/src/components/moment-media-gallery.tsx:641
 #: apps/app/src/i18n/static-dom-seed.ts:867
 msgid "朋友圈图片"
 msgstr "모멘트 이미지"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:300
-#: apps/app/src/components/moment-media-gallery.tsx:550
+#: apps/app/src/components/moment-media-gallery.tsx:551
 #: apps/app/src/i18n/static-dom-seed.ts:868
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1069
 msgid "上一张"
 msgstr "이전 이미지"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:309
-#: apps/app/src/components/moment-media-gallery.tsx:559
+#: apps/app/src/components/moment-media-gallery.tsx:560
 #: apps/app/src/i18n/static-dom-seed.ts:869
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1080
 msgid "下一张"
@@ -3025,15 +3025,15 @@ msgstr "다음 이미지"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:333
 #: apps/app/src/components/moment-compose-media-preview.tsx:344
-#: apps/app/src/components/moment-media-gallery.tsx:582
-#: apps/app/src/components/moment-media-gallery.tsx:599
+#: apps/app/src/components/moment-media-gallery.tsx:583
+#: apps/app/src/components/moment-media-gallery.tsx:600
 #: apps/app/src/i18n/static-dom-seed.ts:870
 msgid "关闭视频预览"
 msgstr "동영상 미리보기 닫기"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:338
-#: apps/app/src/components/moment-media-gallery.tsx:144
-#: apps/app/src/components/moment-media-gallery.tsx:587
+#: apps/app/src/components/moment-media-gallery.tsx:145
+#: apps/app/src/components/moment-media-gallery.tsx:588
 #: apps/app/src/i18n/static-dom-seed.ts:871
 msgid "朋友圈视频"
 msgstr "모멘트 동영상"
@@ -3041,13 +3041,13 @@ msgstr "모멘트 동영상"
 #. placeholder {0}: formatMomentDurationLabel(draft.durationMs)
 #. placeholder {0}: formatMomentDurationLabel(video.durationMs)
 #: apps/app/src/components/moment-compose-media-preview.tsx:341
-#: apps/app/src/components/moment-media-gallery.tsx:591
+#: apps/app/src/components/moment-media-gallery.tsx:592
 msgid "时长 {0}"
 msgstr "길이 {0}"
 
-#: apps/app/src/components/moment-media-gallery.tsx:236
-#: apps/app/src/components/moment-media-gallery.tsx:442
-#: apps/app/src/components/moment-media-gallery.tsx:647
+#: apps/app/src/components/moment-media-gallery.tsx:237
+#: apps/app/src/components/moment-media-gallery.tsx:443
+#: apps/app/src/components/moment-media-gallery.tsx:648
 #: apps/app/src/i18n/static-dom-seed.ts:872
 msgid "实况"
 msgstr "라이브"
@@ -3116,14 +3116,14 @@ msgid "订阅号"
 msgstr "구독 계정"
 
 #: apps/app/src/components/official-account-list-item.tsx:75
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:644
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:985
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:750
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1091
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:740
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:885
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:1089
 #: apps/app/src/i18n/static-dom-seed.ts:778
 #: apps/app/src/routes/channel-author-page.tsx:443
-#: apps/app/src/routes/channels-page.tsx:1634
+#: apps/app/src/routes/channels-page.tsx:1647
 #: apps/app/src/routes/official-account-detail-page.tsx:491
 msgid "已关注"
 msgstr "팔로우 중"
@@ -3161,11 +3161,11 @@ msgstr "고정"
 #: apps/app/src/components/official-article-card.tsx:123
 #: apps/app/src/components/official-article-viewer.tsx:262
 #: apps/app/src/components/official-article-viewer.tsx:320
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:697
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:803
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:189
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:355
 #: apps/app/src/i18n/static-dom-seed.ts:920
-#: apps/app/src/routes/channels-page.tsx:1578
+#: apps/app/src/routes/channels-page.tsx:1591
 msgid "已收藏"
 msgstr "저장됨"
 
@@ -3225,7 +3225,7 @@ msgstr "링크 복사"
 #: apps/app/src/components/official-article-viewer.tsx:334
 #: apps/app/src/components/wechat-action-bubble.tsx:142
 #: apps/app/src/i18n/static-dom-seed.ts:460
-#: apps/app/src/routes/channels-page.tsx:1587
+#: apps/app/src/routes/channels-page.tsx:1600
 msgid "分享"
 msgstr "공유"
 
@@ -3355,8 +3355,8 @@ msgstr "좋아요"
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:176
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:388
 #: apps/app/src/i18n/static-dom-seed.ts:318
-#: apps/app/src/routes/channels-page.tsx:1834
-#: apps/app/src/routes/discover-feed-page.tsx:996
+#: apps/app/src/routes/channels-page.tsx:1847
+#: apps/app/src/routes/discover-feed-page.tsx:990
 msgid "评论"
 msgstr "댓글"
 
@@ -3788,7 +3788,7 @@ msgstr "전체 멤버"
 #: apps/app/src/features/desktop/official-accounts/desktop-subscription-workspace.tsx:390
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:650
 #: apps/app/src/features/search/mobile-search-workspace.tsx:207
-#: apps/app/src/routes/channels-page.tsx:1148
+#: apps/app/src/routes/channels-page.tsx:1161
 #: apps/app/src/routes/character-detail-page.tsx:287
 #: apps/app/src/routes/chat-background-page.tsx:342
 #: apps/app/src/routes/chat-details-page.tsx:752
@@ -3834,9 +3834,9 @@ msgstr "채팅 기록을 일시적으로 사용할 수 없습니다"
 #: apps/app/src/features/search/mobile-search-workspace.tsx:226
 #: apps/app/src/i18n/static-dom-seed.ts:39
 #: apps/app/src/routes/channel-author-page.tsx:325
-#: apps/app/src/routes/channels-page.tsx:1109
-#: apps/app/src/routes/channels-page.tsx:1132
-#: apps/app/src/routes/channels-page.tsx:1140
+#: apps/app/src/routes/channels-page.tsx:1122
+#: apps/app/src/routes/channels-page.tsx:1145
+#: apps/app/src/routes/channels-page.tsx:1153
 #: apps/app/src/routes/character-detail-page.tsx:283
 #: apps/app/src/routes/chat-background-page.tsx:367
 #: apps/app/src/routes/chat-background-page.tsx:399
@@ -7580,14 +7580,14 @@ msgstr "연락처가 아직 비어 있습니다"
 msgid "批量管理"
 msgstr "일괄 관리"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:321
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:324
 #: apps/app/src/i18n/static-dom-seed.ts:49
-#: apps/app/src/routes/channels-page.tsx:1061
-#: apps/app/src/routes/channels-page.tsx:1174
+#: apps/app/src/routes/channels-page.tsx:1074
+#: apps/app/src/routes/channels-page.tsx:1187
 msgid "换一批"
 msgstr "새로 보기"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:331
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:334
 #: apps/app/src/features/shell/desktop-nav-config.ts:89
 #: apps/app/src/i18n/static-dom-seed.ts:59
 #: apps/app/src/routes/live-companion-page.tsx:257
@@ -7595,146 +7595,154 @@ msgstr "새로 보기"
 msgid "直播伴侣"
 msgstr "라이브 도우미"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:354
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:357
 #: apps/app/src/routes/live-companion-page.tsx:654
 msgid "正在读取视频号内容..."
 msgstr "채널 콘텐츠 불러오는 중..."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:361
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:364
 #: apps/app/src/i18n/static-dom-seed.ts:60
 msgid "视频号还没有内容"
 msgstr "채널 콘텐츠가 아직 없습니다"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:362
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:365
 msgid "暂时还没有可看的内容。"
 msgstr "아직 볼 수 있는 콘텐츠가 없습니다."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:447
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:451
 msgid "转发还在路上"
 msgstr "전달 기능이 준비 중입니다"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:448
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:452
 msgid "视频号转发能力还在开发中，等播放器到位后会一起开放。"
 msgstr "채널 전달 기능은 아직 개발 중이며 플레이어 준비가 끝나면 함께 공개됩니다."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:564
-#: apps/app/src/routes/channels-page.tsx:1306
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:575
+#: apps/app/src/routes/channels-page.tsx:1319
 msgid "暂无可播放内容"
 msgstr "재생 가능한 콘텐츠가 없습니다"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:567
-#: apps/app/src/routes/channels-page.tsx:1309
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:578
+#: apps/app/src/routes/channels-page.tsx:1322
 msgid "稍后再来看看"
 msgstr "나중에 다시 확인해 보세요"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:608
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:664
+msgid "取消静音"
+msgstr ""
+
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:664
+msgid "静音"
+msgstr ""
+
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:714
 #: apps/app/src/i18n/static-dom-seed.ts:346
-#: apps/app/src/routes/channels-page.tsx:1552
+#: apps/app/src/routes/channels-page.tsx:1565
 msgid "视频号推荐"
 msgstr "채널 추천"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:645
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:751
 msgid "+ 关注"
 msgstr "+ 팔로우"
 
 #. placeholder {0}: selectedPost.commentCount
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:750
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:856
 msgid "评论 {0}"
 msgstr "{0}에 댓글"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:758
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:864
 msgid "关闭评论"
 msgstr "댓글 닫기"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:816
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:922
 msgid "关闭作者主页"
 msgstr "작성자 프로필 닫기"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:852
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:958
 msgid "上一条"
 msgstr "이전"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:861
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:967
 msgid "下一条"
 msgstr "다음"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:894
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1000
 #: apps/app/src/routes/channel-author-page.tsx:223
 msgid "这位居民暂时还没有填写视频号简介。"
 msgstr "이 주민은 아직 채널 소개를 작성하지 않았습니다."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:895
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1001
 #: apps/app/src/routes/channel-author-page.tsx:224
 msgid "这个视频号作者暂时还没有填写简介。"
 msgstr "이 채널 작성자는 아직 소개를 작성하지 않았습니다."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:906
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1012
 #: apps/app/src/i18n/static-dom-seed.ts:350
 #: apps/app/src/routes/channel-author-page.tsx:281
 msgid "作者主页"
 msgstr "작성자 홈"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:910
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1016
 msgid "回到内容"
 msgstr "콘텐츠로 돌아가기"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:916
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1022
 #: apps/app/src/routes/channel-author-page.tsx:307
 msgid "正在读取作者主页..."
 msgstr "작성자 페이지 불러오는 중..."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:929
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1035
 #: apps/app/src/routes/channel-author-page.tsx:314
 msgid "作者主页暂时不可用"
 msgstr "작성자 프로필을 사용할 수 없습니다"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:930
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1036
 msgid "这位作者的信息还没有准备好，稍后再试。"
 msgstr "이 작성자의 정보가 아직 준비되지 않았습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:950
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1056
 #: apps/app/src/routes/channel-author-page.tsx:396
 msgid "居民作者"
 msgstr "주민 작성자"
 
 #. placeholder {0}: profile.followerCount
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:962
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1068
 msgid "{0} 关注者"
 msgstr "팔로워 {0}명"
 
 #. placeholder {0}: profile.recentPosts.length
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:965
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1071
 msgid "{0} 条内容"
 msgstr "{0}건"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:968
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1074
 msgid "{liveClipCount} 条直播回放"
 msgstr "라이브 다시보기 {liveClipCount}개"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:985
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1091
 #: apps/app/src/i18n/static-dom-seed.ts:347
 #: apps/app/src/routes/channel-author-page.tsx:444
-#: apps/app/src/routes/channels-page.tsx:1635
+#: apps/app/src/routes/channels-page.tsx:1648
 msgid "+关注"
 msgstr "+ 팔로우"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:993
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1038
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1099
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1144
 msgid "当前内容"
 msgstr "현재 콘텐츠"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:999
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1105
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:1273
 #: apps/app/src/i18n/static-dom-seed.ts:826
 #: apps/app/src/routes/channel-author-page.tsx:411
 msgid "最近内容"
 msgstr "최근 콘텐츠"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1017
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1123
 msgid "查看这条内容"
 msgstr "이 항목 보기"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1021
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1127
 #: apps/app/src/i18n/static-dom-seed.ts:1051
 #: apps/app/src/routes/channel-author-page.tsx:232
 #: apps/app/src/routes/channel-author-page.tsx:416
@@ -7743,7 +7751,7 @@ msgstr "이 항목 보기"
 msgid "直播回放"
 msgstr "라이브 다시보기"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1024
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1130
 #: apps/app/src/i18n/static-dom-seed.ts:1052
 #: apps/app/src/routes/channel-author-page.tsx:231
 #: apps/app/src/routes/channel-author-page.tsx:758
@@ -7751,130 +7759,130 @@ msgstr "라이브 다시보기"
 msgid "动态"
 msgstr "게시물"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1047
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1153
 msgid "这位作者暂时还没有可以展示的内容。"
 msgstr "이 작성자는 아직 표시할 콘텐츠가 없습니다."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1055
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1161
 msgid "当前路由和作者数据还在同步，稍后会自动收敛到最新作者资料。"
 msgstr "라우트와 작성자 데이터가 동기화 중입니다. 잠시 후 최신 작성자 프로필로 정리됩니다."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1066
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1172
 msgid "{viewCount} 播放"
 msgstr "재생수 {viewCount}"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1070
-#: apps/app/src/routes/channels-page.tsx:2019
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1176
+#: apps/app/src/routes/channels-page.tsx:2032
 msgid "{seconds} 秒"
 msgstr "{seconds}초"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1259
-#: apps/app/src/routes/channels-page.tsx:1884
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1365
+#: apps/app/src/routes/channels-page.tsx:1897
 msgid "正在读取评论..."
 msgstr "댓글 불러오는 중..."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1264
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1370
 #: apps/app/src/i18n/static-dom-seed.ts:357
 msgid "这条内容还没有评论，你可以先开口。"
 msgstr "이 콘텐츠에는 아직 댓글이 없습니다. 먼저 말해 보세요."
 
 #. placeholder {0}: threadIdsWithReplies.length
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1270
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1376
 msgid "共 {0} 个可折叠线程"
 msgstr "접을 수 있는 스레드 {0}개"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1278
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1384
 msgid "全部展开"
 msgstr "모두 펼치기"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1285
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1391
 msgid "全部收起"
 msgstr "모두 접기"
 
 #. placeholder {0}: activeReply.authorName
 #. placeholder {0}: commentReplyTarget.authorName
 #. placeholder {0}: replyTarget.authorName
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1333
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1439
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:340
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:455
-#: apps/app/src/routes/channels-page.tsx:1971
+#: apps/app/src/routes/channels-page.tsx:1984
 msgid "正在回复 {0}"
 msgstr "{0}에게 답장하는 중"
 
 #. placeholder {0}: activeReply.authorName
 #. placeholder {0}: commentReplyTarget.authorName
 #. placeholder {0}: replyTarget.authorName
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1350
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1456
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:361
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:488
-#: apps/app/src/routes/channels-page.tsx:1990
+#: apps/app/src/routes/channels-page.tsx:2003
 msgid "回复 {0}..."
 msgstr "{0}에게 답장..."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1352
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1458
 #: apps/app/src/i18n/static-dom-seed.ts:637
 msgid "写下你对这条视频号内容的评论..."
 msgstr "이 영상 채널 게시물에 대한 댓글을 작성하세요..."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1353
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1459
 msgid "先选择一条内容"
 msgstr "먼저 항목을 선택하세요"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1409
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1515
 #: apps/app/src/i18n/static-dom-seed.ts:815
 msgid "楼中楼"
 msgstr "대댓글"
 
 #. placeholder {0}: replies.length
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1413
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1519
 msgid "展开 {0} 条跟帖"
 msgstr "{0}개 답글 펼치기"
 
 #. placeholder {0}: replies.length
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1414
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1520
 msgid "收起 {0} 条跟帖"
 msgstr "{0}개 답글 접기"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1427
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1533
 msgid "这个线程里还有跟帖。"
 msgstr "이 스레드에 답글이 더 있습니다."
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1503
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1609
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:128
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:431
 #: apps/app/src/i18n/static-dom-seed.ts:173
 msgid "居民"
 msgstr "주민"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1508
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1614
 msgid "回复层"
 msgstr "답글 스레드"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1512
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1618
 msgid "主评论"
 msgstr "주요 댓글"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1522
-#: apps/app/src/routes/channels-page.tsx:1922
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1628
+#: apps/app/src/routes/channels-page.tsx:1935
 msgid "回复 {replyTargetName}"
 msgstr "{replyTargetName}에게 답장"
 
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1552
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1658
 #: apps/app/src/features/search/desktop-search-launcher.tsx:1370
-#: apps/app/src/routes/channels-page.tsx:1560
-#: apps/app/src/routes/channels-page.tsx:1952
+#: apps/app/src/routes/channels-page.tsx:1573
+#: apps/app/src/routes/channels-page.tsx:1965
 msgid "处理中"
 msgstr "처리 중"
 
 #. placeholder {0}: comment.likeCount
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1554
-#: apps/app/src/routes/channels-page.tsx:1954
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1660
+#: apps/app/src/routes/channels-page.tsx:1967
 msgid "已赞 {0}"
 msgstr "{0} 좋아요 함"
 
 #. placeholder {0}: comment.likeCount
-#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1555
-#: apps/app/src/routes/channels-page.tsx:1955
+#: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1661
+#: apps/app/src/routes/channels-page.tsx:1968
 msgid "赞 {0}"
 msgstr "좋아요 {0}"
 
@@ -8633,7 +8641,7 @@ msgstr "검색 실패"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:647
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:253
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:391
-#: apps/app/src/routes/channels-page.tsx:1837
+#: apps/app/src/routes/channels-page.tsx:1850
 #: apps/app/src/routes/desktop-chat-history-page.tsx:405
 #: apps/app/src/routes/desktop-chat-history-page.tsx:408
 #: apps/app/src/routes/desktop-mobile-page.tsx:943
@@ -10757,7 +10765,7 @@ msgid "广场还没有新动态"
 msgstr "광장에 아직 새 게시물이 없습니다"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-list.tsx:111
-#: apps/app/src/routes/discover-feed-page.tsx:1122
+#: apps/app/src/routes/discover-feed-page.tsx:1116
 #: apps/app/src/routes/discover-page.tsx:890
 msgid "你先发一条居民公开可见的动态，或者等世界里的居民先开口。"
 msgstr "주민에게 공개되는 게시물을 먼저 올리거나, 세계 주민이 먼저 말하기를 기다려 보세요."
@@ -10856,7 +10864,7 @@ msgstr "이 댓글에 답글"
 #: apps/app/src/i18n/static-dom-seed.ts:67
 #: apps/app/src/routes/discover-feed-page.tsx:725
 #: apps/app/src/routes/discover-feed-page.tsx:755
-#: apps/app/src/routes/discover-feed-page.tsx:1014
+#: apps/app/src/routes/discover-feed-page.tsx:1008
 #: apps/app/src/routes/discover-page.tsx:151
 #: apps/app/src/routes/discover-page.tsx:511
 #: apps/app/src/routes/discover-page.tsx:734
@@ -11365,7 +11373,6 @@ msgstr "{0}님의 모멘츠 보기"
 
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:323
 #: apps/app/src/routes/discover-feed-page.tsx:953
-#: apps/app/src/routes/discover-feed-page.tsx:983
 msgid "加为好友后才能互动"
 msgstr "친구로 추가한 뒤에 교류할 수 있어요"
 
@@ -11783,7 +11790,7 @@ msgstr "잠시만요, 이 구독 기사를 준비하고 있습니다."
 #: apps/app/src/features/search/mobile-search-workspace.tsx:215
 #: apps/app/src/i18n/static-dom-seed.ts:37
 #: apps/app/src/routes/channel-author-page.tsx:313
-#: apps/app/src/routes/channels-page.tsx:1120
+#: apps/app/src/routes/channels-page.tsx:1133
 #: apps/app/src/routes/chat-background-page.tsx:355
 #: apps/app/src/routes/chat-background-page.tsx:387
 #: apps/app/src/routes/chat-details-page.tsx:763
@@ -12395,16 +12402,16 @@ msgid "买了种子"
 msgstr "씨앗 구매 완료"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
+msgid "卖了"
+msgstr "판매 완료"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:240
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:242
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
 msgid "作物"
 msgstr "작물"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
-msgid "卖了"
-msgstr "판매 완료"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -17582,7 +17589,7 @@ msgstr "모먼트 · {0}"
 #. placeholder {0}: formatTimestamp(post.createdAt)
 #: apps/app/src/features/search/use-search-index.ts:450
 #: apps/app/src/routes/discover-feed-page.tsx:723
-#: apps/app/src/routes/discover-feed-page.tsx:1011
+#: apps/app/src/routes/discover-feed-page.tsx:1005
 msgid "广场动态 · {0}"
 msgstr "광장 게시물 · {0}"
 
@@ -17625,16 +17632,16 @@ msgid "设置"
 msgstr "설정"
 
 #: apps/app/src/features/shell/desktop-nav-matching.ts:86
-#: apps/app/src/routes/discover-feed-page.tsx:1119
+#: apps/app/src/routes/discover-feed-page.tsx:1113
 msgid "广场"
 msgstr "광장"
 
 #: apps/app/src/features/shell/desktop-nav-matching.ts:91
 #: apps/app/src/features/shell/desktop-nav-matching.ts:92
 #: apps/app/src/i18n/static-dom-seed.ts:47
-#: apps/app/src/routes/channels-page.tsx:804
-#: apps/app/src/routes/channels-page.tsx:1027
-#: apps/app/src/routes/channels-page.tsx:1157
+#: apps/app/src/routes/channels-page.tsx:812
+#: apps/app/src/routes/channels-page.tsx:1040
+#: apps/app/src/routes/channels-page.tsx:1170
 #: apps/app/src/routes/discover-page.tsx:167
 #: apps/app/src/routes/favorites-page.tsx:73
 #: apps/app/src/routes/profile-favorites-page.tsx:50
@@ -18187,7 +18194,7 @@ msgid "现在发一条"
 msgstr "지금 게시"
 
 #: apps/app/src/i18n/static-dom-seed.ts:48
-#: apps/app/src/routes/channels-page.tsx:1028
+#: apps/app/src/routes/channels-page.tsx:1041
 msgid "内容推荐与视频动态"
 msgstr "추천 콘텐츠와 영상 업데이트"
 
@@ -18207,17 +18214,17 @@ msgid "当前先聚焦推荐流体验，系统会持续补充 AI 生成的视频
 msgstr "현재는 추천 피드 경험에 집중하며, 시스템이 AI 생성 영상과 상호작용 데모를 계속 추가합니다."
 
 #: apps/app/src/i18n/static-dom-seed.ts:55
-#: apps/app/src/routes/channels-page.tsx:1122
+#: apps/app/src/routes/channels-page.tsx:1135
 msgid "视频号暂时不可用"
 msgstr "채널을 일시적으로 사용할 수 없습니다"
 
 #: apps/app/src/i18n/static-dom-seed.ts:56
-#: apps/app/src/routes/channels-page.tsx:1158
+#: apps/app/src/routes/channels-page.tsx:1171
 msgid "还没有内容"
 msgstr "아직 콘텐츠가 없습니다"
 
 #: apps/app/src/i18n/static-dom-seed.ts:57
-#: apps/app/src/routes/channels-page.tsx:1160
+#: apps/app/src/routes/channels-page.tsx:1173
 msgid "再生成一批内容后，这里会逐步形成更连续的视频推荐流。"
 msgstr "콘텐츠를 한 번 더 생성하면 더 연속적인 영상 추천 피드가 됩니다."
 
@@ -18812,7 +18819,7 @@ msgid "当前播放"
 msgstr "현재 재생 중"
 
 #: apps/app/src/i18n/static-dom-seed.ts:461
-#: apps/app/src/routes/channels-page.tsx:1591
+#: apps/app/src/routes/channels-page.tsx:1604
 msgid "减少推荐"
 msgstr "추천 줄이기"
 
@@ -18821,12 +18828,12 @@ msgid "· 视频号动态"
 msgstr "· 영상 채널 게시물"
 
 #: apps/app/src/i18n/static-dom-seed.ts:463
-#: apps/app/src/routes/channels-page.tsx:1682
+#: apps/app/src/routes/channels-page.tsx:1695
 msgid "还没有评论，先聊一句。"
 msgstr "아직 댓글이 없습니다. 먼저 한마디 남겨보세요."
 
 #: apps/app/src/i18n/static-dom-seed.ts:464
-#: apps/app/src/routes/channels-page.tsx:1703
+#: apps/app/src/routes/channels-page.tsx:1716
 msgid "打开评论"
 msgstr "댓글 열기"
 
@@ -19526,7 +19533,7 @@ msgid "刚刚捕捉到的世界画面"
 msgstr "방금 포착한 월드 장면"
 
 #: apps/app/src/i18n/static-dom-seed.ts:642
-#: apps/app/src/routes/channels-page.tsx:1692
+#: apps/app/src/routes/channels-page.tsx:1705
 #: apps/app/src/routes/live-companion-page.tsx:905
 msgid "短片"
 msgstr "짧은 영상"
@@ -19534,7 +19541,7 @@ msgstr "짧은 영상"
 #: apps/app/src/i18n/static-dom-seed.ts:643
 #: apps/app/src/routes/channel-author-page.tsx:764
 #: apps/app/src/routes/channel-author-page.tsx:799
-#: apps/app/src/routes/channels-page.tsx:1692
+#: apps/app/src/routes/channels-page.tsx:1705
 #: apps/app/src/routes/live-companion-page.tsx:905
 msgid "内容卡片"
 msgstr "콘텐츠 카드"
@@ -21532,7 +21539,7 @@ msgstr "영상 채널 작성자"
 #: apps/app/src/routes/channel-author-page.tsx:333
 #: apps/app/src/routes/channel-author-page.tsx:367
 #: apps/app/src/routes/channel-author-page.tsx:452
-#: apps/app/src/routes/channels-page.tsx:1876
+#: apps/app/src/routes/channels-page.tsx:1889
 msgid "返回视频号"
 msgstr "채널로 돌아가기"
 
@@ -21578,7 +21585,7 @@ msgstr "현재 섹션：{activeCollectionLabel}, 총 {0} 항목."
 #. placeholder {0}: post.viewCount ?? 0
 #: apps/app/src/routes/channel-author-page.tsx:579
 #: apps/app/src/routes/channel-author-page.tsx:750
-#: apps/app/src/routes/channels-page.tsx:2015
+#: apps/app/src/routes/channels-page.tsx:2028
 msgid "{0} 播放"
 msgstr "재생수 {0}"
 
@@ -21682,86 +21689,86 @@ msgid "重试发送评论"
 msgstr "댓글 전송 재시도"
 
 #. placeholder {0}: post.authorName
-#: apps/app/src/routes/channels-page.tsx:724
+#: apps/app/src/routes/channels-page.tsx:732
 msgid "{0} 的视频号动态"
 msgstr "{0}님의 채널 게시물"
 
-#: apps/app/src/routes/channels-page.tsx:754
+#: apps/app/src/routes/channels-page.tsx:762
 msgid "当前环境暂不支持复制内容摘要。"
 msgstr "현재 환경에서는 콘텐츠 요약 복사를 지원하지 않습니다."
 
-#: apps/app/src/routes/channels-page.tsx:767
+#: apps/app/src/routes/channels-page.tsx:775
 msgid "系统分享暂时不可用，已复制内容摘要。"
 msgstr "시스템 공유를 사용할 수 없어 콘텐츠 요약을 복사했습니다."
 
-#: apps/app/src/routes/channels-page.tsx:768
+#: apps/app/src/routes/channels-page.tsx:776
 msgid "内容摘要已复制。"
 msgstr "콘텐츠 요약을 복사했습니다."
 
-#: apps/app/src/routes/channels-page.tsx:781
+#: apps/app/src/routes/channels-page.tsx:789
 msgid "复制内容摘要失败，请稍后重试。"
 msgstr "콘텐츠 요약 복사에 실패했습니다. 잠시 후 다시 시도하세요."
 
 #. placeholder {0}: formatTimestamp(post.createdAt)
-#: apps/app/src/routes/channels-page.tsx:802
+#: apps/app/src/routes/channels-page.tsx:810
 msgid "视频号 · {0}"
 msgstr "채널 · {0}"
 
-#: apps/app/src/routes/channels-page.tsx:935
+#: apps/app/src/routes/channels-page.tsx:948
 msgid "正在定位桌面视频号内容"
 msgstr "데스크톱 채널 콘텐츠 탐색 중"
 
-#: apps/app/src/routes/channels-page.tsx:937
+#: apps/app/src/routes/channels-page.tsx:950
 msgid "当前链接指向的内容不在推荐流里，正在补齐这条视频后再切进工作区。"
 msgstr "이 링크의 콘텐츠는 추천에 포함되어 있지 않습니다. 동영상을 불러온 후 작업 공간으로 전환합니다."
 
-#: apps/app/src/routes/channels-page.tsx:939
+#: apps/app/src/routes/channels-page.tsx:952
 msgid "定位视频号内容..."
 msgstr "채널 콘텐츠 탐색 중..."
 
-#: apps/app/src/routes/channels-page.tsx:949
+#: apps/app/src/routes/channels-page.tsx:962
 msgid "正在打开桌面视频号"
 msgstr "데스크톱 채널을 여는 중"
 
-#: apps/app/src/routes/channels-page.tsx:951
+#: apps/app/src/routes/channels-page.tsx:964
 msgid "正在载入桌面视频号工作区，马上显示当前频道内容。"
 msgstr "데스크톱 채널 작업 공간을 불러오고 있습니다. 곧 현재 채널 내용이 표시됩니다."
 
-#: apps/app/src/routes/channels-page.tsx:953
+#: apps/app/src/routes/channels-page.tsx:966
 msgid "载入桌面视频号..."
 msgstr "데스크톱 채널을 불러오는 중..."
 
-#: apps/app/src/routes/channels-page.tsx:1061
-#: apps/app/src/routes/channels-page.tsx:1173
+#: apps/app/src/routes/channels-page.tsx:1074
+#: apps/app/src/routes/channels-page.tsx:1186
 msgid "生成中..."
 msgstr "생성 중..."
 
-#: apps/app/src/routes/channels-page.tsx:1149
+#: apps/app/src/routes/channels-page.tsx:1162
 msgid "正在刷新视频号内容"
 msgstr "채널 콘텐츠 새로 고치는 중"
 
-#: apps/app/src/routes/channels-page.tsx:1150
+#: apps/app/src/routes/channels-page.tsx:1163
 msgid "稍等一下，正在同步推荐流和互动状态。"
 msgstr "잠시만요, 추천 피드와 상호작용 상태를 동기화하고 있습니다."
 
 #. placeholder {0}: formatTimestamp(post.createdAt)
-#: apps/app/src/routes/channels-page.tsx:1618
+#: apps/app/src/routes/channels-page.tsx:1631
 msgid "{0} · 视频号动态"
 msgstr "{0} · 채널 게시물"
 
-#: apps/app/src/routes/channels-page.tsx:1668
+#: apps/app/src/routes/channels-page.tsx:1681
 msgid "最近评论"
 msgstr "최근 댓글"
 
-#: apps/app/src/routes/channels-page.tsx:1823
+#: apps/app/src/routes/channels-page.tsx:1836
 msgid "关闭评论面板"
 msgstr "댓글 패널 닫기"
 
-#: apps/app/src/routes/channels-page.tsx:1889
+#: apps/app/src/routes/channels-page.tsx:1902
 msgid "还没有评论，先发第一句。"
 msgstr "아직 댓글이 없습니다. 먼저 한 마디 남겨보세요."
 
-#: apps/app/src/routes/channels-page.tsx:1991
+#: apps/app/src/routes/channels-page.tsx:2004
 msgid "说点什么..."
 msgstr "무엇이든 말하세요..."
 
@@ -23918,7 +23925,7 @@ msgid "世界居民公开可见"
 msgstr "세계 주민에게 공개"
 
 #: apps/app/src/routes/discover-feed-page.tsx:788
-#: apps/app/src/routes/discover-feed-page.tsx:1131
+#: apps/app/src/routes/discover-feed-page.tsx:1125
 #: apps/app/src/routes/discover-page.tsx:615
 msgid "发一条广场动态"
 msgstr "광장 게시물 작성"
@@ -23948,7 +23955,7 @@ msgstr "이 게시물 요약 복사"
 msgid "需好友"
 msgstr "친구 전용"
 
-#: apps/app/src/routes/discover-feed-page.tsx:1120
+#: apps/app/src/routes/discover-feed-page.tsx:1114
 msgid "还没有新动态"
 msgstr "아직 새 게시물이 없습니다"
 
