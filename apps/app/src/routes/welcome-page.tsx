@@ -36,6 +36,7 @@ import { assertWorldReachable } from "../lib/world-entry";
 import { setAppRuntimeConfig, useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { isCloudSessionExpired, useCloudSessionStore } from "../store/cloud-session-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
+import { assertOwnerIdentity } from "../lib/user-scoped-state";
 
 type WorldAccessMode = "cloud" | "local";
 type LocalWorldApiAdjustment = "api-path" | "app-dev-port";
@@ -651,6 +652,11 @@ export function WelcomePage() {
       );
 
       const accessToken = verifyResult.accessToken;
+      // 切号哨兵：Google 登录用邮箱当 identity（Google 账号绑定的邮箱与 cloud-api
+      // 的合成 phone 一一对应）。换号时把上一个用户的所有 zustand / localStorage
+      // / React Query 缓存先清干净，再写入新身份和 token。一致或首次登录则只
+      // 补写 identity，不影响已有状态。
+      await assertOwnerIdentity(`google:${verifyResult.email}`, { queryClient });
       setEmail(verifyResult.email);
       setCloudAccessToken(accessToken);
       saveCloudSession({
@@ -761,6 +767,8 @@ export function WelcomePage() {
 
           accessToken = verifyResult.accessToken;
           verifiedPhone = "";
+          // 切号哨兵：邮箱用户的身份键用邮箱本身，跟 Google 登录路径区分开。
+          await assertOwnerIdentity(`email:${verifyResult.email}`, { queryClient });
           setEmail(verifyResult.email);
           setCloudAccessToken(verifyResult.accessToken);
           saveCloudSession({
@@ -787,6 +795,9 @@ export function WelcomePage() {
 
           accessToken = verifyResult.accessToken;
           verifiedPhone = verifyResult.phone;
+          // 切号哨兵：电话登录用 normalized phone 当 identity，跟 bootstrap 时
+          // 从 cloud-session-store.phone 推导出的格式保持一致。
+          await assertOwnerIdentity(`phone:${verifyResult.phone}`, { queryClient });
           setPhone(verifyResult.phone);
           setCloudAccessToken(verifyResult.accessToken);
           saveCloudSession({
