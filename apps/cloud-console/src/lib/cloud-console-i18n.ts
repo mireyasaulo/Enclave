@@ -622,6 +622,8 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
       "所选来源分组中无活跃管理员会话被撤销。",
     "Revoked {0} matching active session(s) in the selected source group.":
       "已撤销所选来源分组中 {0} 个匹配的活跃会话。",
+    "Open task permalink": "打开任务永久链接",
+    "Open review permalink": "打开查看永久链接",
   },
   "ja-JP": {
     "Token Usage": "Token 使用量",
@@ -1256,6 +1258,8 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
       "選択したソースグループ内の有効な管理者セッションは取り消されませんでした。",
     "Revoked {0} matching active session(s) in the selected source group.":
       "選択したソースグループ内の {0} 件の一致する有効なセッションを取り消しました。",
+    "Open task permalink": "タスクのパーマリンクを開く",
+    "Open review permalink": "レビューのパーマリンクを開く",
   },
   "ko-KR": {
     "Token Usage": "토큰 사용량",
@@ -1884,6 +1888,8 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
       "선택한 소스 그룹의 활성 관리자 세션이 취소되지 않았습니다.",
     "Revoked {0} matching active session(s) in the selected source group.":
       "선택한 소스 그룹의 일치하는 활성 세션 {0}건이 취소되었습니다.",
+    "Open task permalink": "작업 영구 링크 열기",
+    "Open review permalink": "검토 영구 링크 열기",
   },
 };
 // i18n-ignore-end
