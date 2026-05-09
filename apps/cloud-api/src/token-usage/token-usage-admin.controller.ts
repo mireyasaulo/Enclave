@@ -12,6 +12,7 @@ import {
 import type {
   CloudTokenPricingCatalogResponse,
   CloudTokenPricingItem,
+  CloudTokenPricingSyncResult,
   CloudTokenUsageBudgetItem,
   CloudTokenUsageBudgetResponse,
   CloudTokenUsageOverviewResponse,
@@ -20,6 +21,7 @@ import type {
   TokenUsageTrendPoint,
 } from "@yinjie/contracts";
 import { AdminGuard } from "../auth/admin.guard";
+import { N1nPricingSyncService } from "./n1n-pricing-sync.service";
 import {
   CloudTokenUsageRangeQueryDto,
   CloudTokenUsageWorldsQueryDto,
@@ -32,7 +34,10 @@ import { TokenUsageService } from "./token-usage.service";
 @Controller("admin/cloud/token-usage")
 @UseGuards(AdminGuard)
 export class TokenUsageAdminController {
-  constructor(private readonly tokenUsage: TokenUsageService) {}
+  constructor(
+    private readonly tokenUsage: TokenUsageService,
+    private readonly n1nSync: N1nPricingSyncService,
+  ) {}
 
   @Get("overview")
   getOverview(
@@ -120,5 +125,10 @@ export class TokenUsageAdminController {
   @Delete("pricing")
   deletePricing(@Query() query: DeleteCloudTokenPricingQueryDto) {
     return this.tokenUsage.deletePricing(query.currency, query.model);
+  }
+
+  @Post("pricing/sync-n1n")
+  syncPricingFromN1n(): Promise<CloudTokenPricingSyncResult> {
+    return this.n1nSync.syncFromN1n();
   }
 }

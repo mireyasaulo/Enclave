@@ -50,6 +50,7 @@ import type {
   RevenueSettlementPreviewResponse,
   CloudTokenPricingCatalogResponse,
   CloudTokenPricingItem,
+  CloudTokenPricingSyncResult,
   CloudTokenUsageBudgetItem,
   CloudTokenUsageBudgetResponse,
   CloudTokenUsageOverviewResponse,
@@ -1539,5 +1540,11 @@ export const cloudAdminApi = {
     adminFetch<{ ok: true }>(
       `/token-usage/pricing${buildQueryString({ currency, model })}`,
       { method: "DELETE" },
+    ),
+
+  syncCloudTokenPricingFromN1n: () =>
+    adminFetch<CloudTokenPricingSyncResult>(
+      "/token-usage/pricing/sync-n1n",
+      { method: "POST" },
     ),
 };
