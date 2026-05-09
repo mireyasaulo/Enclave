@@ -6,6 +6,7 @@ import {
   SendEmailCodeDto,
   VerifyCodeDto,
   VerifyEmailCodeDto,
+  VerifyGoogleIdTokenDto,
 } from "../http-dto/cloud-api.dto";
 import {
   resolveCloudAuthTokenTtl,
@@ -15,6 +16,7 @@ import {
 import { CLOUD_CLIENT_ACCESS_TOKEN_PURPOSE } from "./cloud-jwt.constants";
 import { CloudClientAuthGuard } from "./cloud-client-auth.guard";
 import { EmailAuthService } from "./email-auth.service";
+import { GoogleAuthService } from "./google-auth.service";
 import { PhoneAuthService } from "./phone-auth.service";
 
 function parseTtlMs(ttl: string): number {
@@ -51,6 +53,7 @@ export class CloudAuthController {
   constructor(
     private readonly phoneAuthService: PhoneAuthService,
     private readonly emailAuthService: EmailAuthService,
+    private readonly googleAuthService: GoogleAuthService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
@@ -109,6 +112,18 @@ export class CloudAuthController {
     @Req() request: { headers: Record<string, string | string[] | undefined> },
   ) {
     return this.emailAuthService.verifyCode(body.email, body.code, {
+      inviteCode: body.inviteCode ?? null,
+      deviceFingerprint: body.deviceFingerprint ?? null,
+      ip: extractIp(request),
+    });
+  }
+
+  @Post("google/verify-id-token")
+  verifyGoogleIdToken(
+    @Body() body: VerifyGoogleIdTokenDto,
+    @Req() request: { headers: Record<string, string | string[] | undefined> },
+  ) {
+    return this.googleAuthService.verifyIdToken(body.idToken, {
       inviteCode: body.inviteCode ?? null,
       deviceFingerprint: body.deviceFingerprint ?? null,
       ip: extractIp(request),

@@ -7,6 +7,7 @@ import { PhoneVerificationSessionEntity } from "../entities/phone-verification-s
 import { CloudClientAuthGuard } from "./cloud-client-auth.guard";
 import { CloudMailService } from "./cloud-mail.service";
 import { EmailAuthService } from "./email-auth.service";
+import { GoogleAuthService } from "./google-auth.service";
 import { MockEmailProviderService } from "./mock-email-provider.service";
 import { MockSmsProviderService } from "./mock-sms-provider.service";
 import { PhoneAuthService } from "./phone-auth.service";
@@ -25,6 +26,7 @@ import { ServiceTokenGuard } from "./service-token.guard";
   providers: [
     PhoneAuthService,
     EmailAuthService,
+    GoogleAuthService,
     CloudMailService,
     MockSmsProviderService,
     MockEmailProviderService,
@@ -34,6 +36,7 @@ import { ServiceTokenGuard } from "./service-token.guard";
   exports: [
     PhoneAuthService,
     EmailAuthService,
+    GoogleAuthService,
     CloudMailService,
     MockSmsProviderService,
     MockEmailProviderService,
