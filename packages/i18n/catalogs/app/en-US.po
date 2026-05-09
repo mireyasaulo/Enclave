@@ -2642,7 +2642,7 @@ msgstr "items"
 
 #: apps/app/src/routes/profile-info-page.tsx:38
 msgid "个人信息"
-msgstr ""
+msgstr "Profile"
 
 #: apps/app/src/routes/profile-settings-page.tsx:57
 #: apps/app/src/routes/profile-settings-page.tsx:292
@@ -2789,7 +2789,7 @@ msgstr "Failed to load event stream:"
 
 #: apps/app/src/routes/profile-info-placeholder-page.tsx:34
 msgid "二维码名片功能开发中，敬请期待。"
-msgstr ""
+msgstr "QR card feature is coming soon."
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:300
 #: apps/app/src/routes/profile-subscription-page.tsx:308
@@ -2875,7 +2875,7 @@ msgstr "Chat only — they won't appear in Moments or other social spaces."
 
 #: apps/app/src/routes/mobile-notes-page.tsx:303
 msgid "仅含附件的草稿"
-msgstr ""
+msgstr "Draft with attachments only"
 
 #: apps/app/src/routes/desktop-chat-files-page.tsx:964
 msgid "仅图片"
@@ -3073,7 +3073,7 @@ msgstr "Choose content from Live Companion and the current prep status will appe
 
 #: apps/app/src/routes/profile-info-avatar-page.tsx:165
 msgid "从相册选择"
-msgstr ""
+msgstr "Select from album"
 
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:483
 msgid "从相册选择图片"
@@ -3248,7 +3248,7 @@ msgstr "Submit a chat-scene report using the current conversation as the source.
 
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:194
 msgid "会以笔记卡片形式出现在对话里。"
-msgstr ""
+msgstr "Will appear as a note card in conversations."
 
 #: apps/app/src/i18n/static-dom-seed.ts:435
 msgid "会同步到朋友圈时间线，适合发日常照片、短视频和临时心情。"
@@ -3441,7 +3441,7 @@ msgstr "Hi, I'm {normalizedOwnerName}. I'd like to add you to my contacts."
 
 #: apps/app/src/routes/mobile-add-friend-page.tsx:719
 msgid "你好，我是{owner}，想把你添加到通讯录里。"
-msgstr ""
+msgstr "Hi, I'm {owner}. I'd like to add you to my contacts."
 
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:540
 msgid "你已关闭本地摄像头，仍可继续进行数字人视频通话。"
@@ -3533,7 +3533,7 @@ msgstr "Failed to save world owner profile."
 #: apps/app/src/routes/profile-info-name-page.tsx:98
 #: apps/app/src/routes/profile-info-signature-page.tsx:97
 msgid "保存中"
-msgstr ""
+msgstr "Saving…"
 
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:942
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1223
@@ -3897,7 +3897,7 @@ msgstr "Save important content from chats, feeds, or official accounts first."
 
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:138
 msgid "先去消息列表里建立一些聊天，再回来发送笔记。"
-msgstr ""
+msgstr "Start some chats first, then come back to send notes."
 
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:153
 msgid "先去消息列表里建立一些聊天线程，再回来发送笔记。"
@@ -4750,7 +4750,7 @@ msgstr "Close add members dialog"
 
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1188
 msgid "关闭确认弹层"
-msgstr ""
+msgstr "Close confirmation dialog"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:333
 #: apps/app/src/components/moment-compose-media-preview.tsx:344
@@ -5353,7 +5353,7 @@ msgstr "Best for exact lookup"
 
 #: apps/app/src/routes/profile-info-signature-page.tsx:108
 msgid "写一句此刻想说的话"
-msgstr ""
+msgstr "Write something you want to say right now"
 
 #: apps/app/src/i18n/static-dom-seed.ts:774
 #: apps/app/src/routes/group-announcement-page.tsx:447
@@ -5679,7 +5679,7 @@ msgstr "Switching desktop friend requests..."
 
 #: apps/app/src/routes/mobile-add-friend-page.tsx:81
 msgid "切换桌面添加朋友..."
-msgstr ""
+msgstr "Switching to desktop to add friends…"
 
 #: apps/app/src/routes/channel-author-page.tsx:267
 msgid "切换桌面视频号..."
@@ -5687,7 +5687,7 @@ msgstr "Switching desktop Channels..."
 
 #: apps/app/src/routes/mobile-note-editor-page.tsx:127
 msgid "切换桌面笔记..."
-msgstr ""
+msgstr "Switching to desktop notes…"
 
 #: apps/app/src/routes/group-contacts-page.tsx:46
 msgid "切换桌面群聊视图..."
@@ -5849,7 +5849,7 @@ msgstr "After deletion, this chat will be removed from the message list and will
 
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1086
 msgid "删除后会从收藏的笔记列表中移除，无法恢复。"
-msgstr ""
+msgstr "Once deleted, it will be removed from your saved notes and cannot be recovered."
 
 #: apps/app/src/routes/character-detail-page.tsx:952
 msgid "删除后会从通讯录移除这个联系人。"
@@ -5893,7 +5893,7 @@ msgstr "Failed to delete reminder. Please try again later."
 
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:220
 msgid "删除朋友圈"
-msgstr ""
+msgstr "Delete post"
 
 #: apps/app/src/components/chat-composer.tsx:4739
 msgid "删除标注"
@@ -5939,7 +5939,7 @@ msgstr "Failed to delete sticker. Try again later."
 
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1085
 msgid "删除这条笔记？"
-msgstr ""
+msgstr "Delete this note?"
 
 #: apps/app/src/features/games/game-center-data.ts:188
 msgid "利用极光赛道的两段加速门，争取把本周圈速压进前 10%。"
@@ -6611,7 +6611,7 @@ msgstr "Post to feed"
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:138
 msgid "发广场动态在桌面布局里已经并入广场工作区，这里会自动带你返回桌面入口。"
-msgstr ""
+msgstr "Publishing to the public square has moved to the desktop workspace. You'll be redirected there."
 
 #: apps/app/src/routes/desktop-mobile-page.tsx:1472
 msgid "发当前工作台到手机"
@@ -6638,7 +6638,7 @@ msgstr "Posting Moments has merged into the Moments workspace on desktop. We'll 
 #: apps/app/src/routes/profile-moments-page.tsx:461
 #: apps/app/src/routes/profile-moments-page.tsx:532
 msgid "发条朋友圈"
-msgstr ""
+msgstr "Post a moment"
 
 #: apps/app/src/features/chat/conversation-strong-reminder.ts:55
 msgid "发来了一条新消息"
@@ -6700,7 +6700,7 @@ msgstr "Publishing"
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:147
 msgid "发表广场动态"
-msgstr ""
+msgstr "Publish to Public Square"
 
 #: apps/app/src/i18n/static-dom-seed.ts:432
 msgid "发表朋友圈"
@@ -6869,7 +6869,7 @@ msgstr "Send preview"
 
 #: apps/app/src/routes/mobile-add-friend-page.tsx:813
 msgid "发送验证申请，对方通过后即可成为朋友。"
-msgstr ""
+msgstr "Send a friend request. You'll become friends once they accept."
 
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:111
 msgid "发送验证申请后，对方通过即可成为朋友。"
@@ -7262,7 +7262,7 @@ msgstr "名单整理中，待继续"
 #: apps/app/src/routes/profile-info-name-page.tsx:74
 #: apps/app/src/routes/profile-info-page.tsx:67
 msgid "名字"
-msgstr ""
+msgstr "Name"
 
 #: apps/app/src/components/chat-message-list.tsx:4126
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:143
@@ -7780,7 +7780,7 @@ msgstr "Failed to send image. Please try again later."
 
 #: apps/app/src/routes/profile-info-avatar-page.tsx:141
 msgid "图片地址"
-msgstr ""
+msgstr "Image URL"
 
 #: apps/app/src/components/chat-composer.tsx:6606
 msgid "图片处理失败，请先裁剪后再发送。"
@@ -7792,7 +7792,7 @@ msgstr "Image processing failed. Please try again later."
 
 #: apps/app/src/routes/profile-info-avatar-page.tsx:168
 msgid "图片大小不超过 1MB"
-msgstr ""
+msgstr "Image must be under 1 MB"
 
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:267
 msgid "图片归档"
@@ -7838,7 +7838,7 @@ msgstr "Image is too large. Please crop it before sending."
 
 #: apps/app/src/routes/profile-info-avatar-page.tsx:73
 msgid "图片过大，请压缩到 1MB 以内再试。"
-msgstr ""
+msgstr "Image is too large. Please compress it to under 1 MB and try again."
 
 #: apps/app/src/routes/discover-feed-page.tsx:466
 #: apps/app/src/routes/discover-page.tsx:445
@@ -8345,7 +8345,7 @@ msgstr "Multiple fill-backs"
 #: apps/app/src/routes/profile-settings-language-page.tsx:41
 #: apps/app/src/routes/profile-settings-page.tsx:270
 msgid "多语言"
-msgstr ""
+msgstr "Language"
 
 #: apps/app/src/features/chat/group-message-context-menu.tsx:150
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:116
@@ -8423,7 +8423,7 @@ msgstr "太困了，能睡到一只猫旁边吗。"
 
 #: apps/app/src/routes/profile-info-page.tsx:59
 msgid "头像"
-msgstr ""
+msgstr "Avatar"
 
 #: apps/app/src/features/games/night-market/night-market-data.ts:50
 msgid "套圈打靶摊"
@@ -8509,7 +8509,7 @@ msgstr "Friend's parking lot"
 
 #: apps/app/src/routes/profile-info-name-page.tsx:115
 msgid "好名字让朋友更容易找到你，最多 {NAME_MAX_LENGTH} 个字符。"
-msgstr ""
+msgstr "A good name helps friends find you. Up to {NAME_MAX_LENGTH} characters."
 
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:97
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:220
@@ -9286,7 +9286,7 @@ msgstr "Deleted and left the group chat."
 #: apps/app/src/routes/moments-page.tsx:326
 #: apps/app/src/routes/profile-moments-page.tsx:218
 msgid "已删除这条朋友圈。"
-msgstr ""
+msgstr "Post deleted."
 
 #: apps/app/src/components/chat-message-list.tsx:967
 #: apps/app/src/i18n/static-dom-seed.ts:947
@@ -9849,7 +9849,7 @@ msgstr "Saved 1 message to Favorites."
 
 #: apps/app/src/routes/mobile-notes-page.tsx:197
 msgid "已收藏笔记"
-msgstr ""
+msgstr "Saved notes"
 
 #: apps/app/src/routes/channels-page.tsx:289
 msgid "已收藏这条视频号内容。"
@@ -10937,7 +10937,7 @@ msgstr "Current reference content"
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:271
 msgid "当前发布到广场"
-msgstr ""
+msgstr "Now posting to Public Square"
 
 #: apps/app/src/i18n/static-dom-seed.ts:437
 msgid "当前发布到朋友圈"
@@ -12153,7 +12153,7 @@ msgstr "Me"
 #: apps/app/src/routes/profile-info-page.tsx:92
 #: apps/app/src/routes/profile-info-placeholder-page.tsx:30
 msgid "我的二维码名片"
-msgstr ""
+msgstr "My QR Card"
 
 #: apps/app/src/i18n/static-dom-seed.ts:429
 msgid "我的动态"
@@ -12186,7 +12186,7 @@ msgstr "My camera preview"
 #: apps/app/src/features/desktop/moments/desktop-profile-moments-workspace.tsx:206
 #: apps/app/src/routes/profile-moments-page.tsx:443
 msgid "我的朋友圈"
-msgstr ""
+msgstr "My Moments"
 
 #: apps/app/src/components/chat-message-list.tsx:3376
 msgid "我的消息"
@@ -12199,7 +12199,7 @@ msgstr "My games"
 
 #: apps/app/src/routes/mobile-notes-page.tsx:133
 msgid "我的笔记"
-msgstr ""
+msgstr "My Notes"
 
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:206
 msgid "我的资料"
@@ -12294,7 +12294,7 @@ msgstr "Screenshot preview"
 
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:320
 msgid "所在位置"
-msgstr ""
+msgstr "Location"
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:961
 msgid "所有人"
@@ -13529,7 +13529,7 @@ msgstr "Reminder management"
 
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:325
 msgid "提醒谁看"
-msgstr ""
+msgstr "Notify to view"
 
 #: apps/app/src/features/chat/mobile-message-reminder-sheet.tsx:24
 msgid "提醒这条消息"
@@ -13642,7 +13642,7 @@ msgstr "Search preparation"
 
 #: apps/app/src/features/search/desktop-search-launcher.tsx:1231
 msgid "搜索历史"
-msgstr ""
+msgstr "Search history"
 
 #. placeholder {0}: results.length
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:406
@@ -13688,7 +13688,7 @@ msgstr "Search suggestions"
 
 #: apps/app/src/features/search/desktop-search-launcher.tsx:1169
 msgid "搜索建议暂时读取失败，请按 Enter 进入完整搜索。"
-msgstr ""
+msgstr "Failed to load suggestions. Press Enter for full search."
 
 #: apps/app/src/features/search/desktop-search-workspace.tsx:1212
 #: apps/app/src/i18n/static-dom-seed.ts:72
@@ -15317,7 +15317,7 @@ msgstr "More profile details"
 
 #: apps/app/src/routes/profile-info-placeholder-page.tsx:35
 msgid "更多资料字段开发中，敬请期待。"
-msgstr ""
+msgstr "More profile fields coming soon."
 
 #: apps/app/src/i18n/static-dom-seed.ts:455
 #: apps/app/src/routes/discover-scene-page.tsx:44
@@ -15335,7 +15335,7 @@ msgstr "Emphasizes pace, ranking, and competition."
 
 #: apps/app/src/routes/profile-info-avatar-page.tsx:103
 msgid "更换头像"
-msgstr ""
+msgstr "Change avatar"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-compose-panel.tsx:150
 #: apps/app/src/features/desktop/moments/desktop-moment-compose-panel.tsx:150
@@ -16583,13 +16583,13 @@ msgstr "View starred friends"
 #. placeholder {1}: getCategoryTitle(section.category)
 #: apps/app/src/features/search/mobile-search-workspace.tsx:404
 msgid "查看更多 {0} 条 {1}"
-msgstr ""
+msgstr "View {0} more {1}"
 
 #. placeholder {0}: config.entries.length
 #. placeholder {1}: config.title
 #: apps/app/src/features/search/desktop-search-launcher.tsx:1206
 msgid "查看更多 {0} 条 {1} →"
-msgstr ""
+msgstr "View {0} more {1} →"
 
 #: apps/app/src/components/chat-message-list.tsx:2591
 #: apps/app/src/i18n/static-dom-seed.ts:718
@@ -17166,7 +17166,7 @@ msgstr "Switching to desktop Contacts"
 
 #: apps/app/src/routes/profile-settings-language-page.tsx:85
 msgid "正在切换语言..."
-msgstr ""
+msgstr "Switching language…"
 
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1096
 msgid "正在创建..."
@@ -17249,7 +17249,7 @@ msgstr "Loading membership information…"
 #: apps/app/src/features/desktop/moments/desktop-profile-moments-workspace.tsx:128
 #: apps/app/src/routes/profile-moments-page.tsx:509
 msgid "正在加载我的朋友圈"
-msgstr ""
+msgstr "Loading My Moments…"
 
 #: apps/app/src/routes/profile-favorites-page.tsx:157
 msgid "正在加载收藏…"
@@ -17317,7 +17317,7 @@ msgstr "Waking Yinjie..."
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:137
 msgid "正在回到桌面广场"
-msgstr ""
+msgstr "Returning to desktop Public Square…"
 
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:146
 msgid "正在回到桌面朋友圈"
@@ -17366,7 +17366,7 @@ msgstr "Opening friend Moments"
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:139
 msgid "正在打开广场..."
-msgstr ""
+msgstr "Opening Public Square…"
 
 #: apps/app/src/routes/notes-page.tsx:48
 msgid "正在打开收藏笔记..."
@@ -17404,7 +17404,7 @@ msgstr "Opening desktop Mini Programs"
 
 #: apps/app/src/routes/profile-moments-page.tsx:303
 msgid "正在打开桌面我的朋友圈"
-msgstr ""
+msgstr "Opening desktop My Moments…"
 
 #: apps/app/src/routes/search-page.tsx:428
 msgid "正在打开桌面搜索"
@@ -17436,7 +17436,7 @@ msgstr "Opening desktop add members"
 
 #: apps/app/src/routes/mobile-add-friend-page.tsx:79
 msgid "正在打开桌面添加朋友"
-msgstr ""
+msgstr "Opening desktop Add Friends…"
 
 #: apps/app/src/routes/channels-page.tsx:948
 msgid "正在打开桌面视频号"
@@ -17572,7 +17572,7 @@ msgstr "Gathering matching messages in the current chat."
 
 #: apps/app/src/features/search/desktop-search-launcher.tsx:1163
 msgid "正在整理结果..."
-msgstr ""
+msgstr "Processing results…"
 
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:45
 #: apps/app/src/i18n/static-dom-seed.ts:838
@@ -17759,7 +17759,7 @@ msgstr "Loading feed posts..."
 
 #: apps/app/src/routes/mobile-notes-page.tsx:164
 msgid "正在读取我的笔记..."
-msgstr ""
+msgstr "Loading my notes…"
 
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:628
 #: apps/app/src/routes/favorites-page.tsx:678
@@ -17939,11 +17939,11 @@ msgstr "Loading blocked list..."
 
 #: apps/app/src/routes/mobile-add-friend-page.tsx:80
 msgid "正在跳转到桌面添加朋友工作区。"
-msgstr ""
+msgstr "Redirecting to desktop Add Friends workspace."
 
 #: apps/app/src/routes/mobile-note-editor-page.tsx:126
 msgid "正在跳转到桌面笔记编辑器。"
-msgstr ""
+msgstr "Redirecting to desktop note editor."
 
 #: apps/app/src/routes/world-characters-page.tsx:64
 msgid "正在跳转到桌面通讯录工作区中的世界角色视图。"
@@ -18021,7 +18021,7 @@ msgstr "Loading the desktop Channels workspace; current channel content will app
 
 #: apps/app/src/routes/profile-moments-page.tsx:304
 msgid "正在载入桌面端我的朋友圈工作区。"
-msgstr ""
+msgstr "Loading desktop My Moments workspace."
 
 #: apps/app/src/routes/games-page.tsx:493
 msgid "正在载入桌面端游戏中心。"
@@ -18296,7 +18296,7 @@ msgstr "No items from {senderFilterDisplayLabel}"
 
 #: apps/app/src/features/search/desktop-search-launcher.tsx:1220
 msgid "没有直接命中的结果，按 Enter 进入完整搜索。"
-msgstr ""
+msgstr "No direct matches. Press Enter for full search."
 
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:672
 msgid "没空闲的车"
@@ -18834,7 +18834,7 @@ msgstr "Clear history"
 
 #: apps/app/src/routes/mobile-add-friend-page.tsx:394
 msgid "清空输入"
-msgstr ""
+msgstr "Clear input"
 
 #: apps/app/src/features/games/cat-inn/cat-inn-game.tsx:259
 msgid "清空这一格"
@@ -19007,7 +19007,7 @@ msgstr "Tap 'Group members' to pick others, or switch back to 'All members'."
 
 #: apps/app/src/routes/profile-info-avatar-page.tsx:135
 msgid "点击下方更换"
-msgstr ""
+msgstr "Tap below to change"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:317
 msgid "点击任意队员领取补给"
@@ -19728,7 +19728,7 @@ msgstr "Confirm ({0})"
 #: apps/app/src/routes/moments-page.tsx:862
 #: apps/app/src/routes/profile-moments-page.tsx:556
 msgid "确定删除这条朋友圈吗？"
-msgstr ""
+msgstr "Delete this post?"
 
 #. placeholder {0}: selectedIds.length
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:224
@@ -19737,7 +19737,7 @@ msgstr "Delete the {0} selected friends?"
 
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:127
 msgid "确定要删除这条朋友圈吗？此操作无法撤销。"
-msgstr ""
+msgstr "Delete this post? This cannot be undone."
 
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:995
 msgid "确定要重置整个停车场吗？"
@@ -20161,7 +20161,7 @@ msgstr "Removing..."
 
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:241
 msgid "移除图片"
-msgstr ""
+msgstr "Remove image"
 
 #. placeholder {0}: draft.file.name || ""
 #: apps/app/src/components/moment-compose-media-preview.tsx:195
@@ -20186,7 +20186,7 @@ msgstr "Remove tag {tag}"
 
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:276
 msgid "移除视频"
-msgstr ""
+msgstr "Remove video"
 
 #: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:94
 msgid "移除群成员"
@@ -20862,7 +20862,7 @@ msgstr "Bold"
 
 #: apps/app/src/routes/profile-info-avatar-page.tsx:149
 msgid "粘贴图片 URL 或留空"
-msgstr ""
+msgstr "Paste image URL or leave empty"
 
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:565
 msgid "精选"
@@ -22320,7 +22320,7 @@ msgstr "Draft"
 #. placeholder {0}: formatMessageTimestamp(draft.updatedAt)
 #: apps/app/src/routes/mobile-notes-page.tsx:306
 msgid "草稿 · 更新于 {0}"
-msgstr ""
+msgstr "Draft · Updated {0}"
 
 #: apps/app/src/features/games/cloud-farm/cloud-farm-data.ts:48
 msgid "草莓"
@@ -22654,12 +22654,12 @@ msgstr "训练完，就想看猫爬上爬下。"
 
 #: apps/app/src/routes/mobile-notes-page.tsx:217
 msgid "记下灵感、待办、链接和图片，发到聊天里也很方便。"
-msgstr ""
+msgstr "Capture ideas, to-dos, links, and images. Easy to share in chats."
 
 #: apps/app/src/features/desktop/moments/desktop-profile-moments-workspace.tsx:139
 #: apps/app/src/routes/profile-moments-page.tsx:525
 msgid "记录此刻，你的朋友圈会出现在这里。"
-msgstr ""
+msgstr "Capture your moments and they'll appear here."
 
 #: apps/app/src/i18n/static-dom-seed.ts:679
 msgid "许哲"
@@ -23187,7 +23187,7 @@ msgstr "Check that the Yinjie ID is complete, or try searching by character name
 
 #: apps/app/src/routes/mobile-add-friend-page.tsx:551
 msgid "请检查隐界号是否完整，或者换个关键词试试。"
-msgstr ""
+msgstr "Make sure the Yinjie ID is complete, or try a different keyword."
 
 #: apps/app/src/features/chat/mobile-ai-call-screen.tsx:242
 msgid "请求中"
@@ -23339,7 +23339,7 @@ msgstr "Failed to read the image. Try another one."
 
 #: apps/app/src/routes/profile-info-avatar-page.tsx:79
 msgid "读取图片失败，请换一张试试。"
-msgstr ""
+msgstr "Failed to load image. Please try another."
 
 #: apps/app/src/features/desktop/official-accounts/desktop-subscription-workspace.tsx:397
 #: apps/app/src/features/desktop/official-accounts/desktop-subscription-workspace.tsx:411
@@ -23758,7 +23758,7 @@ msgstr "Loading desktop Mini Programs..."
 
 #: apps/app/src/routes/profile-moments-page.tsx:305
 msgid "载入桌面我的朋友圈..."
-msgstr ""
+msgstr "Loading desktop My Moments…"
 
 #: apps/app/src/routes/search-page.tsx:430
 msgid "载入桌面搜索..."
@@ -23827,11 +23827,11 @@ msgstr "Typing a keyword pauses delete mode temporarily. Clearing search returns
 
 #: apps/app/src/routes/profile-info-name-page.tsx:109
 msgid "输入名字"
-msgstr ""
+msgstr "Enter name"
 
 #: apps/app/src/routes/mobile-add-friend-page.tsx:522
 msgid "输入完整的隐界号能精确命中，也可以用角色名或资料关键词搜索。"
-msgstr ""
+msgstr "Enter a full Yinjie ID for an exact match, or search by character name or profile keywords."
 
 #: apps/app/src/components/chat-composer.tsx:2210
 #: apps/app/src/components/chat-composer.tsx:6313
@@ -24060,7 +24060,7 @@ msgstr "Back to official account list"
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:42
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:157
 msgid "返回广场"
-msgstr ""
+msgstr "Back to Public Square"
 
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:894
 #: apps/app/src/i18n/static-dom-seed.ts:1073
@@ -24484,7 +24484,7 @@ msgstr "No Channels content yet"
 
 #: apps/app/src/routes/mobile-notes-page.tsx:216
 msgid "还没有笔记"
-msgstr ""
+msgstr "No notes yet"
 
 #: apps/app/src/features/shell/desktop-shell.tsx:934
 msgid "还没有签名，去个人资料写一句吧"
@@ -26146,7 +26146,7 @@ msgstr "Attachment payload is invalid."
 
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1078
 msgid "附件上传中..."
-msgstr ""
+msgstr "Uploading attachments…"
 
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:652
 #: apps/app/src/i18n/static-dom-seed.ts:1070
@@ -26269,7 +26269,7 @@ msgstr "Yinjie ID"
 
 #: apps/app/src/routes/mobile-add-friend-page.tsx:381
 msgid "隐界号 / 角色名"
-msgstr ""
+msgstr "Yinjie ID / Character name"
 
 #. placeholder {0}: buildYinjieId(character.id)
 #. placeholder {0}: buildYinjieId(targetCharacterId)
