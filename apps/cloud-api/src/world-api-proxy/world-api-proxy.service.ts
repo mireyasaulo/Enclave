@@ -131,7 +131,7 @@ export class WorldApiProxyService {
           JSON.stringify({
             statusCode: 502,
             errorCode: "WORLD_UPSTREAM_UNAVAILABLE",
-            message: "World instance upstream is currently unavailable.",
+            message: "World instance upstream is currently unavailable.", // i18n-ignore-line: backend API error code
           }),
         );
       } else {

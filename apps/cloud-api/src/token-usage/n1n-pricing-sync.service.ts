@@ -261,7 +261,7 @@ export class N1nPricingSyncService {
       return body.data;
     } catch (error) {
       if ((error as { name?: string }).name === "AbortError") {
-        throw new BadGatewayException("n1n.ai ratio_config request timed out");
+        throw new BadGatewayException("n1n.ai ratio_config request timed out"); // i18n-ignore-line: backend exception
       }
       if (error instanceof BadGatewayException) {
         throw error;

@@ -955,7 +955,7 @@ function PricingEditor(props: {
           className={FIELD}
           value={model}
           onChange={(event) => setModel(event.target.value)}
-          placeholder="claude-haiku-4-5"
+          placeholder="claude-haiku-4-5" // i18n-ignore-line: model name placeholder
         />
       </label>
       <label className="block">
