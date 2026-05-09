@@ -72,7 +72,20 @@ export class WorldApiProxyService {
     res: http.ServerResponse,
     target: WorldApiTarget,
     subPath: string,
+    phone: string,
   ) {
+    const startedAt = process.hrtime.bigint();
+    const method = req.method ?? "GET";
+    // 结构化 metric 行（cloud-api.out.log 可 grep/tail 拉到 prometheus / 日志栈）：
+    // proxy_metric kind=http world=... phone=... method=... path=... status=... ms=...
+    // 一切异步路径都不能 throw，否则会污染 hot path。
+    const emitMetric = (status: number, errKind: string | null) => {
+      const ms = Number((process.hrtime.bigint() - startedAt) / 1_000_000n);
+      this.logger.log(
+        `proxy_metric kind=http world=${target.worldId} phone=${phone} method=${method} path="${subPath.split("?")[0]}" status=${status} ms=${ms}${errKind ? ` err=${errKind}` : ""}`,
+      );
+    };
+
     const filteredHeaders: http.OutgoingHttpHeaders = {};
     for (const [key, value] of Object.entries(req.headers)) {
       if (value === undefined) continue;
@@ -102,6 +115,8 @@ export class WorldApiProxyService {
           res.setHeader(key, value);
         }
         upstreamRes.pipe(res);
+        upstreamRes.on("end", () => emitMetric(res.statusCode, null));
+        upstreamRes.on("error", () => emitMetric(res.statusCode, "upstream_stream"));
       },
     );
 
@@ -122,10 +137,12 @@ export class WorldApiProxyService {
       } else {
         res.destroy();
       }
+      emitMetric(502, "upstream_connect");
     });
 
     req.on("aborted", () => {
       upstream.destroy();
+      emitMetric(499, "client_aborted");
     });
     req.pipe(upstream);
   }

@@ -1163,6 +1163,25 @@ function buildCloudAuthHeaders(
   };
 }
 
+export type RefreshCloudAccessTokenResponse = {
+  accessToken: string;
+  expiresAt: string;
+};
+
+// Sliding TTL：临到期前调，cloud-api 用现有 token 鉴权后签新 token 返回，
+// 不需要重发邮件验证码。token 已过期则 401，调用方应清 cloud-session-store
+// 引导用户重新登录。
+export function refreshCloudAccessToken(
+  accessToken: string,
+  baseUrl?: string,
+) {
+  return requestCloudApi<RefreshCloudAccessTokenResponse>(
+    "/cloud/auth/refresh-access",
+    buildCloudAuthHeaders(accessToken, { method: "POST" }),
+    baseUrl,
+  );
+}
+
 export function getMyCloudWorld(accessToken: string, baseUrl?: string) {
   return requestCloudApi<CloudWorldLookupResponse>(
     "/cloud/me/world",

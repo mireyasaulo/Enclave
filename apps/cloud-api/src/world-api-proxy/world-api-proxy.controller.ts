@@ -32,6 +32,6 @@ export class WorldApiProxyController {
       ? originalUrl.slice(PROXY_PATH_PREFIX.length) || "/"
       : originalUrl || "/";
 
-    this.proxyService.proxyHttp(req, res, target, subPath);
+    this.proxyService.proxyHttp(req, res, target, subPath, phone);
   }
 }

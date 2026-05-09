@@ -26,7 +26,10 @@ import { registerAppServiceWorker } from "./runtime/register-service-worker";
 import { bootstrapAndroid } from "./runtime/adapters/android";
 import { bootstrapIos } from "./runtime/adapters/ios";
 import { router } from "./router";
-import { hydrateCloudSessionStore } from "./store/cloud-session-store";
+import {
+  hydrateCloudSessionStore,
+  refreshCloudSessionIfNeeded,
+} from "./store/cloud-session-store";
 import { hydrateNativeRuntimeConfig } from "./runtime/runtime-config-store";
 
 const VITE_PRELOAD_RECOVERY_KEY = "yinjie-app-vite-preload-recovery";
@@ -93,6 +96,12 @@ async function bootstrap() {
   const nativeLocalePreference =
     androidLocalePreference ?? desktopLocalePreference;
   configureContractsRuntime();
+  // Sliding TTL：boot 时检查一次，再每小时复查；token 临到期 (剩余 < 1d)
+  // 自动调 cloud-api refresh-access 续命，过期则不动让登录流程兜底。
+  void refreshCloudSessionIfNeeded();
+  setInterval(() => {
+    void refreshCloudSessionIfNeeded();
+  }, 60 * 60 * 1000).unref?.();
   bootstrapAnalytics();
   const preferredLocales = [
     ...(nativeLocalePreference?.preferredLocales ?? []),
