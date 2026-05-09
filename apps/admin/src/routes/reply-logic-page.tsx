@@ -1924,10 +1924,10 @@ function GroupReplyRuntimeCard({
         }
       />
       <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="待执行" value={runtime.pendingTaskCount} />
-        <MetricCard label="处理中" value={runtime.processingTaskCount} />
-        <MetricCard label="失败" value={runtime.failedTaskCount} />
-        <MetricCard label="匹配轮次" value={filteredTurns.length} />
+        <MetricCard label={t(msg`待执行`)} value={runtime.pendingTaskCount} />
+        <MetricCard label={t(msg`处理中`)} value={runtime.processingTaskCount} />
+        <MetricCard label={t(msg`失败`)} value={runtime.failedTaskCount} />
+        <MetricCard label={t(msg`匹配轮次`)} value={filteredTurns.length} />
       </div>
 
       <AdminNoteList
@@ -1946,33 +1946,33 @@ function GroupReplyRuntimeCard({
       {cleanupMutation.isSuccess ? (
         <AdminActionFeedback
           tone="success"
-          title="终态任务已清理"
+          title={t(msg`终态任务已清理`)}
           description={cleanupMutation.data.note}
         />
       ) : null}
       {retryMutation.isSuccess ? (
         <AdminActionFeedback
           tone="success"
-          title="失败任务已重新入队"
+          title={t(msg`失败任务已重新入队`)}
           description={retryMutation.data.note}
         />
       ) : null}
       {retryTurnMutation.isSuccess ? (
         <AdminActionFeedback
           tone="success"
-          title="整轮任务已重新入队"
+          title={t(msg`整轮任务已重新入队`)}
           description={retryTurnMutation.data.note}
         />
       ) : null}
 
-      <AdminSubpanel title="问题聚合" contentClassName="mt-4">
+      <AdminSubpanel title={t(msg`问题聚合`)} contentClassName="mt-4">
         {!visibleIssueSummary.length ? (
           <AdminEmptyState
-            title="最近没有失败或取消集中点"
+            title={t(msg`最近没有失败或取消集中点`)}
             description={
               actorFilter === "all" && statusFilter === "all"
-                ? "当前任务执行比较稳定，最近轮次里没有显著的失败/取消原因聚合。"
-                : "当前筛选条件下，没有发现明显的失败或取消原因聚合。"
+                ? t(msg`当前任务执行比较稳定，最近轮次里没有显著的失败/取消原因聚合。`)
+                : t(msg`当前筛选条件下，没有发现明显的失败或取消原因聚合。`)
             }
           />
         ) : (
@@ -1986,12 +1986,12 @@ function GroupReplyRuntimeCard({
                     <StatusPill
                       tone={issue.status === "failed" ? "warning" : "muted"}
                     >
-                      {issue.status === "failed" ? "失败" : "取消"}
+                      {issue.status === "failed" ? t(msg`失败`) : t(msg`取消`)}
                     </StatusPill>
                     <StatusPill tone="muted">
-                      {issue.source === "error_message" ? "错误" : "取消原因"}
+                      {issue.source === "error_message" ? t(msg`错误`) : t(msg`取消原因`)}
                     </StatusPill>
-                    <StatusPill tone="warning">{issue.count} 次</StatusPill>
+                    <StatusPill tone="warning">{issue.count} {t(msg`次`)}</StatusPill>
                   </>
                 }
                 description={describeGroupReplyIssue(issue)}
@@ -2002,18 +2002,18 @@ function GroupReplyRuntimeCard({
         )}
       </AdminSubpanel>
 
-      <AdminSubpanel title="近期恶化角色" contentClassName="mt-4">
+      <AdminSubpanel title={t(msg`近期恶化角色`)} contentClassName="mt-4">
         {!visibleActorDrift.length ? (
           <AdminEmptyState
             title={
               actorFilter === "all"
-                ? "最近没有明显恶化角色"
-                : "当前角色最近没有异常抬头"
+                ? t(msg`最近没有明显恶化角色`)
+                : t(msg`当前角色最近没有异常抬头`)
             }
             description={
               actorFilter === "all"
-                ? "这里对比最近 8 轮终态任务和历史基线，只展示近期失败率或取消率明显抬高的角色。"
-                : "该角色最近 8 轮没有足够的终态样本，或者它的失败/取消率还没有明显高于历史基线。"
+                ? t(msg`这里对比最近 8 轮终态任务和历史基线，只展示近期失败率或取消率明显抬高的角色。`)
+                : t(msg`该角色最近 8 轮没有足够的终态样本，或者它的失败/取消率还没有明显高于历史基线。`)
             }
           />
         ) : (
@@ -2030,13 +2030,13 @@ function GroupReplyRuntimeCard({
                       {formatGroupReplyActorDriftSeverity(actor.severity)}
                     </StatusPill>
                     <StatusPill tone="muted">
-                      最近 {actor.recentTaskCount} 任务
+                      {t(msg`最近`)} {actor.recentTaskCount} {t(msg`任务`)}
                     </StatusPill>
                     <StatusPill tone="muted">
-                      {actor.recentTurnCount} 轮
+                      {actor.recentTurnCount} {t(msg`轮`)}
                     </StatusPill>
                     <StatusPill tone="warning">
-                      异常率 {(actor.recentIssueRate * 100).toFixed(1)}%
+                      {t(msg`异常率`)} {(actor.recentIssueRate * 100).toFixed(1)}%
                     </StatusPill>
                     <StatusPill
                       tone={actor.issueRateDelta > 0 ? "warning" : "muted"}
@@ -2050,38 +2050,38 @@ function GroupReplyRuntimeCard({
                   <div className="space-y-3">
                     <div className="flex flex-wrap gap-2">
                       <StatusPill tone="healthy">
-                        发送 {actor.recentSentCount}
+                        {t(msg`发送`)} {actor.recentSentCount}
                       </StatusPill>
                       <StatusPill tone="muted">
-                        取消 {actor.recentCancelledCount}
+                        {t(msg`取消`)} {actor.recentCancelledCount}
                       </StatusPill>
                       <StatusPill tone="warning">
-                        失败 {actor.recentFailedCount}
+                        {t(msg`失败`)} {actor.recentFailedCount}
                       </StatusPill>
                       {actor.openTaskCount > 0 ? (
                         <StatusPill tone="muted">
-                          未落定 {actor.openTaskCount}
+                          {t(msg`未落定`)} {actor.openTaskCount}
                         </StatusPill>
                       ) : null}
                     </div>
                     <div className="text-xs leading-6 text-[color:var(--text-muted)]">
-                      基线来源：
+                      {t(msg`基线来源`)}：
                       {formatGroupReplyActorDriftBaselineSource(
                         actor.baselineSource,
                       )}
                       {" · "}
-                      基线异常率 {(actor.baselineIssueRate * 100).toFixed(1)}%
+                      {t(msg`基线异常率`)} {(actor.baselineIssueRate * 100).toFixed(1)}%
                       {" · "}
-                      失败率偏移 {formatRateDelta(actor.failureRateDelta)}
+                      {t(msg`失败率偏移`)} {formatRateDelta(actor.failureRateDelta)}
                       {" · "}
-                      取消率偏移 {formatRateDelta(actor.cancelRateDelta)}
+                      {t(msg`取消率偏移`)} {formatRateDelta(actor.cancelRateDelta)}
                     </div>
                     {actor.issueSummary.length ? (
                       <AdminNoteList
                         items={actor.issueSummary.map(
                           (issue) =>
-                            `${issue.label} · ${issue.count} 次 · ${
-                              issue.status === "failed" ? "失败" : "取消"
+                            `${issue.label} · ${issue.count} ${t(msg`次`)} · ${
+                              issue.status === "failed" ? t(msg`失败`) : t(msg`取消`)
                             }`,
                         )}
                       />
@@ -2097,7 +2097,7 @@ function GroupReplyRuntimeCard({
                         focusFilteredTasks(actor.actorCharacterId, "all")
                       }
                     >
-                      查看该角色轮次
+                      {t(msg`查看该角色轮次`)}
                     </Button>
                     {actor.recentFailedCount > 0 ? (
                       <Button
@@ -2107,7 +2107,7 @@ function GroupReplyRuntimeCard({
                           focusFilteredTasks(actor.actorCharacterId, "failed")
                         }
                       >
-                        筛到失败任务
+                        {t(msg`筛到失败任务`)}
                       </Button>
                     ) : null}
                     {actor.recentCancelledCount > 0 ? (
@@ -2121,7 +2121,7 @@ function GroupReplyRuntimeCard({
                           )
                         }
                       >
-                        筛到取消任务
+                        {t(msg`筛到取消任务`)}
                       </Button>
                     ) : null}
                   </>
@@ -2133,23 +2133,23 @@ function GroupReplyRuntimeCard({
         )}
       </AdminSubpanel>
 
-      <AdminSubpanel title="历史归档" contentClassName="mt-4">
+      <AdminSubpanel title={t(msg`历史归档`)} contentClassName="mt-4">
         {!runtime.archiveSummary ? (
           <AdminEmptyState
-            title="还没有归档统计"
-            description="终态任务尚未进入清理窗口，或者这组数据还没有被归档。"
+            title={t(msg`还没有归档统计`)}
+            description={t(msg`终态任务尚未进入清理窗口，或者这组数据还没有被归档。`)}
           />
         ) : (
           <div className="space-y-4">
             {actorFilter !== "all" ? (
               selectedArchiveActor ? (
                 <InlineNotice tone="muted">
-                  历史归档已按角色过滤：{selectedArchiveActor.actorName}。
+                  {t(msg`历史归档已按角色过滤`)}：{selectedArchiveActor.actorName}。
                 </InlineNotice>
               ) : (
                 <AdminEmptyState
-                  title="当前角色还没有归档数据"
-                  description={`实时任务里能看到 ${selectedActorOption?.name ?? "该角色"}，但历史归档中暂时还没有它的终态统计。`}
+                  title={t(msg`当前角色还没有归档数据`)}
+                  description={`${t(msg`实时任务里能看到`)} ${selectedActorOption?.name ?? t(msg`该角色`)}，${t(msg`但历史归档中暂时还没有它的终态统计。`)}`}
                 />
               )
             ) : null}
@@ -2158,28 +2158,28 @@ function GroupReplyRuntimeCard({
               <>
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                   <MetricCard
-                    label="已归档任务"
+                    label={t(msg`已归档任务`)}
                     value={
                       selectedArchiveActor?.taskCount ??
                       runtime.archiveSummary.archivedTaskCount
                     }
                   />
                   <MetricCard
-                    label="已归档轮次"
+                    label={t(msg`已归档轮次`)}
                     value={
                       selectedArchiveActor?.turnCount ??
                       runtime.archiveSummary.archivedTurnCount
                     }
                   />
                   <MetricCard
-                    label="历史失败率"
+                    label={t(msg`历史失败率`)}
                     value={`${(
                       (selectedArchiveActor?.failureRate ??
                         runtime.archiveSummary.failureRate) * 100
                     ).toFixed(1)}%`}
                   />
                   <MetricCard
-                    label="历史取消率"
+                    label={t(msg`历史取消率`)}
                     value={`${(
                       (selectedArchiveActor?.cancelRate ??
                         runtime.archiveSummary.cancelRate) * 100
@@ -2190,48 +2190,48 @@ function GroupReplyRuntimeCard({
                 <AdminRecordCard
                   title={
                     selectedArchiveActor
-                      ? `归档状态分布 · ${selectedArchiveActor.actorName}`
-                      : "归档状态分布"
+                      ? `${t(msg`归档状态分布`)} · ${selectedArchiveActor.actorName}`
+                      : t(msg`归档状态分布`)
                   }
                   badges={
                     <>
                       <StatusPill tone="healthy">
-                        已发送 {archiveMetricStatusCounts?.sent ?? 0}
+                        {t(msg`已发送`)} {archiveMetricStatusCounts?.sent ?? 0}
                       </StatusPill>
                       <StatusPill tone="muted">
-                        已取消 {archiveMetricStatusCounts?.cancelled ?? 0}
+                        {t(msg`已取消`)} {archiveMetricStatusCounts?.cancelled ?? 0}
                       </StatusPill>
                       <StatusPill tone="warning">
-                        失败 {archiveMetricStatusCounts?.failed ?? 0}
+                        {t(msg`失败`)} {archiveMetricStatusCounts?.failed ?? 0}
                       </StatusPill>
                     </>
                   }
-                  meta={`最近归档：${formatDateTime(runtime.archiveSummary.lastArchivedAt)} · 归档截止：${formatDateTime(runtime.archiveSummary.lastCutoff)}`}
+                  meta={`${t(msg`最近归档`)}：${formatDateTime(runtime.archiveSummary.lastArchivedAt)} · ${t(msg`归档截止`)}：${formatDateTime(runtime.archiveSummary.lastCutoff)}`}
                   description={
                     selectedArchiveActor
-                      ? "这些统计只看当前角色已经归档的终态任务，用来判断它是否在长期上持续恶化。"
-                      : "这些统计来自已经被清理出任务表的历史终态任务，用来保留长期运行趋势。"
+                      ? t(msg`这些统计只看当前角色已经归档的终态任务，用来判断它是否在长期上持续恶化。`)
+                      : t(msg`这些统计来自已经被清理出任务表的历史终态任务，用来保留长期运行趋势。`)
                   }
                   className="bg-white/90"
                 />
 
-                <AdminSubpanel title="按天趋势">
+                <AdminSubpanel title={t(msg`按天趋势`)}>
                   <div className="mb-4 max-w-[220px]">
                     <SelectFieldBlock
-                      label="时间范围"
+                      label={t(msg`时间范围`)}
                       value={archiveTrendWindow}
                       onChange={setArchiveTrendWindow}
                       options={[
-                        { value: "7", label: "最近 7 天" },
-                        { value: "14", label: "最近 14 天" },
-                        { value: "30", label: "最近 30 天" },
+                        { value: "7", label: t(msg`最近 7 天`) },
+                        { value: "14", label: t(msg`最近 14 天`) },
+                        { value: "30", label: t(msg`最近 30 天`) },
                       ]}
                     />
                   </div>
                   {!visibleArchiveTrend.length ? (
                     <AdminEmptyState
-                      title="当前时间范围没有归档趋势"
-                      description="要么还没形成足够归档数据，要么所选窗口内暂无历史清理记录。"
+                      title={t(msg`当前时间范围没有归档趋势`)}
+                      description={t(msg`要么还没形成足够归档数据，要么所选窗口内暂无历史清理记录。`)}
                     />
                   ) : (
                     <div className="space-y-3">
@@ -2242,16 +2242,16 @@ function GroupReplyRuntimeCard({
                           badges={
                             <>
                               <StatusPill tone="muted">
-                                {point.taskCount} 任务
+                                {point.taskCount} {t(msg`任务`)}
                               </StatusPill>
                               <StatusPill tone="muted">
-                                {point.turnCount} 轮
+                                {point.turnCount} {t(msg`轮`)}
                               </StatusPill>
                               <StatusPill tone="warning">
-                                失败率 {(point.failureRate * 100).toFixed(1)}%
+                                {t(msg`失败率`)} {(point.failureRate * 100).toFixed(1)}%
                               </StatusPill>
                               <StatusPill tone="muted">
-                                取消率 {(point.cancelRate * 100).toFixed(1)}%
+                                {t(msg`取消率`)} {(point.cancelRate * 100).toFixed(1)}%
                               </StatusPill>
                             </>
                           }
@@ -2263,11 +2263,11 @@ function GroupReplyRuntimeCard({
                   )}
                 </AdminSubpanel>
 
-                <AdminSubpanel title="角色异常率">
+                <AdminSubpanel title={t(msg`角色异常率`)}>
                   {!visibleArchiveActors.length ? (
                     <AdminEmptyState
-                      title="还没有角色归档画像"
-                      description="当前归档数据还不足以形成角色级长期统计。"
+                      title={t(msg`还没有角色归档画像`)}
+                      description={t(msg`当前归档数据还不足以形成角色级长期统计。`)}
                     />
                   ) : (
                     <div className="space-y-3">
@@ -2278,19 +2278,19 @@ function GroupReplyRuntimeCard({
                           badges={
                             <>
                               <StatusPill tone="muted">
-                                {actor.taskCount} 任务
+                                {actor.taskCount} {t(msg`任务`)}
                               </StatusPill>
                               <StatusPill tone="muted">
-                                {actor.turnCount} 轮
+                                {actor.turnCount} {t(msg`轮`)}
                               </StatusPill>
                               <StatusPill tone="warning">
-                                异常率 {(actor.issueRate * 100).toFixed(1)}%
+                                {t(msg`异常率`)} {(actor.issueRate * 100).toFixed(1)}%
                               </StatusPill>
                               <StatusPill tone="warning">
-                                失败率 {(actor.failureRate * 100).toFixed(1)}%
+                                {t(msg`失败率`)} {(actor.failureRate * 100).toFixed(1)}%
                               </StatusPill>
                               <StatusPill tone="muted">
-                                取消率 {(actor.cancelRate * 100).toFixed(1)}%
+                                {t(msg`取消率`)} {(actor.cancelRate * 100).toFixed(1)}%
                               </StatusPill>
                             </>
                           }
@@ -2304,11 +2304,11 @@ function GroupReplyRuntimeCard({
 
                 {!visibleArchiveIssueSummary.length ? (
                   <AdminEmptyState
-                    title="归档里没有异常热点"
+                    title={t(msg`归档里没有异常热点`)}
                     description={
                       selectedArchiveActor
-                        ? "当前角色的已归档历史里，没有形成显著的失败或取消原因聚合。"
-                        : "已归档的历史任务里，当前没有形成显著的失败/取消原因聚合。"
+                        ? t(msg`当前角色的已归档历史里，没有形成显著的失败或取消原因聚合。`)
+                        : t(msg`已归档的历史任务里，当前没有形成显著的失败/取消原因聚合。`)
                     }
                   />
                 ) : (
@@ -2328,11 +2328,11 @@ function GroupReplyRuntimeCard({
                             </StatusPill>
                             <StatusPill tone="muted">
                               {issue.source === "error_message"
-                                ? "归档错误"
-                                : "归档取消原因"}
+                                ? t(msg`归档错误`)
+                                : t(msg`归档取消原因`)}
                             </StatusPill>
                             <StatusPill tone="warning">
-                              {issue.count} 次
+                              {issue.count} {t(msg`次`)}
                             </StatusPill>
                           </>
                         }
@@ -2351,13 +2351,13 @@ function GroupReplyRuntimeCard({
       <div ref={taskSectionRef} className="mt-4 space-y-4">
         {hasActiveTaskFilter ? (
           <AdminRecordCard
-            title="当前任务筛选"
-            description="这里显示的是最近轮次里与当前筛选条件匹配的任务和对应轮次。"
+            title={t(msg`当前任务筛选`)}
+            description={t(msg`这里显示的是最近轮次里与当前筛选条件匹配的任务和对应轮次。`)}
             badges={
               <>
                 <StatusPill tone="muted">{taskFilterSummary}</StatusPill>
                 <StatusPill tone="warning">
-                  {filteredTurns.length} 轮命中
+                  {filteredTurns.length} {t(msg`轮命中`)}
                 </StatusPill>
               </>
             }
@@ -2367,7 +2367,7 @@ function GroupReplyRuntimeCard({
                 size="sm"
                 onClick={() => focusFilteredTasks("all", "all")}
               >
-                {t(msg`清空`)}筛选
+                {t(msg`清空筛选`)}
               </Button>
             }
             className="bg-white/90"
@@ -2376,8 +2376,8 @@ function GroupReplyRuntimeCard({
 
         {!filteredTurns.length ? (
           <AdminEmptyState
-            title="当前筛选下没有匹配任务"
-            description="可以放宽状态或角色筛选，或者先让群聊实际跑几轮。"
+            title={t(msg`当前筛选下没有匹配任务`)}
+            description={t(msg`可以放宽状态或角色筛选，或者先让群聊实际跑几轮。`)}
           />
         ) : (
           <div className="space-y-4">
@@ -2388,32 +2388,32 @@ function GroupReplyRuntimeCard({
               return (
                 <AdminSubpanel
                   key={turn.turnId}
-                  title={`轮次 ${turn.turnId.slice(0, 8)}`}
+                  title={`${t(msg`轮次`)} ${turn.turnId.slice(0, 8)}`}
                   contentClassName="mt-4"
                 >
                   <AdminRecordCard
                     title={
                       triggerMessage
-                        ? `触发消息 · ${triggerMessage.senderName}`
-                        : `触发消息 ${turn.triggerMessageId.slice(0, 8)}`
+                        ? `${t(msg`触发消息`)} · ${triggerMessage.senderName}`
+                        : `${t(msg`触发消息`)} ${turn.triggerMessageId.slice(0, 8)}`
                     }
-                    meta={`触发时间：${formatDateTime(turn.triggerMessageCreatedAt)} · 最近更新：${formatDateTime(turn.updatedAt)}`}
+                    meta={`${t(msg`触发时间`)}：${formatDateTime(turn.triggerMessageCreatedAt)} · ${t(msg`最近更新`)}：${formatDateTime(turn.updatedAt)}`}
                     description={
                       triggerMessage?.text ||
-                      "这条触发消息已不在当前可见窗口内。"
+                      t(msg`这条触发消息已不在当前可见窗口内。`)
                     }
                     badges={
                       <>
                         <StatusPill tone="warning">
-                          最多 {turn.maxSpeakers} 人
+                          {t(msg`最多`)} {turn.maxSpeakers} {t(msg`人`)}
                         </StatusPill>
                         {turn.explicitInterest ? (
-                          <StatusPill tone="healthy">有明确指向</StatusPill>
+                          <StatusPill tone="healthy">{t(msg`有明确指向`)}</StatusPill>
                         ) : (
-                          <StatusPill tone="muted">无明确指向</StatusPill>
+                          <StatusPill tone="muted">{t(msg`无明确指向`)}</StatusPill>
                         )}
                         {turn.hasMentionAll ? (
-                          <StatusPill tone="warning">@所有人</StatusPill>
+                          <StatusPill tone="warning">@{t(msg`所有人`)}</StatusPill>
                         ) : null}
                       </>
                     }
@@ -2423,37 +2423,37 @@ function GroupReplyRuntimeCard({
                           <StatusPill
                             tone={toneForGroupReplyTaskStatus("pending")}
                           >
-                            待执行 {turn.statusCounts.pending}
+                            {t(msg`待执行`)} {turn.statusCounts.pending}
                           </StatusPill>
                           <StatusPill
                             tone={toneForGroupReplyTaskStatus("processing")}
                           >
-                            处理中 {turn.statusCounts.processing}
+                            {t(msg`处理中`)} {turn.statusCounts.processing}
                           </StatusPill>
                           <StatusPill
                             tone={toneForGroupReplyTaskStatus("sent")}
                           >
-                            已发送 {turn.statusCounts.sent}
+                            {t(msg`已发送`)} {turn.statusCounts.sent}
                           </StatusPill>
                           <StatusPill
                             tone={toneForGroupReplyTaskStatus("cancelled")}
                           >
-                            已取消 {turn.statusCounts.cancelled}
+                            {t(msg`已取消`)} {turn.statusCounts.cancelled}
                           </StatusPill>
                           <StatusPill
                             tone={toneForGroupReplyTaskStatus("failed")}
                           >
-                            失败 {turn.statusCounts.failed}
+                            {t(msg`失败`)} {turn.statusCounts.failed}
                           </StatusPill>
                         </div>
                         {turn.mentionTargets.length ||
                         turn.replyTargetCharacterId ? (
                           <div className="text-xs leading-6 text-[color:var(--text-muted)]">
                             {turn.mentionTargets.length
-                              ? `提及：${turn.mentionTargets.join("、")}`
-                              : "未显式提及角色"}
+                              ? `${t(msg`提及`)}：${turn.mentionTargets.join("、")}`
+                              : t(msg`未显式提及角色`)}
                             {turn.replyTargetCharacterId
-                              ? ` · 回复目标：${turn.replyTargetCharacterId}`
+                              ? ` · ${t(msg`回复目标`)}：${turn.replyTargetCharacterId}`
                               : ""}
                           </div>
                         ) : null}
@@ -2474,19 +2474,19 @@ function GroupReplyRuntimeCard({
                         >
                           {retryTurnMutation.isPending &&
                           retryTurnMutation.variables === turn.turnId
-                            ? "整轮重试中..."
-                            : "重试本轮未完成任务"}
+                            ? t(msg`整轮重试中...`)
+                            : t(msg`重试本轮未完成任务`)}
                         </Button>
                       ) : null
                     }
                   />
 
                   <div className="mt-4 grid gap-4 xl:grid-cols-2">
-                    <AdminSubpanel title="候选决策">
+                    <AdminSubpanel title={t(msg`候选决策`)}>
                       {!turn.candidates.length ? (
                         <AdminEmptyState
-                          title="没有候选快照"
-                          description="该轮次是在老数据写入前产生的，所以只保留了任务结果。"
+                          title={t(msg`没有候选快照`)}
+                          description={t(msg`该轮次是在老数据写入前产生的，所以只保留了任务结果。`)}
                         />
                       ) : (
                         <div className="space-y-3">
@@ -2509,16 +2509,16 @@ function GroupReplyRuntimeCard({
                                     )}
                                   </StatusPill>
                                   <StatusPill tone="muted">
-                                    分数 {candidate.score.toFixed(1)}
+                                    {t(msg`分数`)} {candidate.score.toFixed(1)}
                                   </StatusPill>
                                   {candidate.isReplyTarget ? (
                                     <StatusPill tone="healthy">
-                                      回复目标
+                                      {t(msg`回复目标`)}
                                     </StatusPill>
                                   ) : null}
                                   {candidate.isExplicitTarget ? (
                                     <StatusPill tone="warning">
-                                      被提及
+                                      {t(msg`被提及`)}
                                     </StatusPill>
                                   ) : null}
                                   <StatusPill
@@ -2529,8 +2529,8 @@ function GroupReplyRuntimeCard({
                                     }
                                   >
                                     {candidate.randomPassed
-                                      ? "概率通过"
-                                      : "概率未过"}
+                                      ? t(msg`概率通过`)
+                                      : t(msg`概率未过`)}
                                   </StatusPill>
                                 </>
                               }
@@ -2544,13 +2544,13 @@ function GroupReplyRuntimeCard({
                       )}
                     </AdminSubpanel>
 
-                    <AdminSubpanel title="任务执行">
+                    <AdminSubpanel title={t(msg`任务执行`)}>
                       <div className="space-y-3">
                         {turn.tasks.map((task) => (
                           <AdminRecordCard
                             key={task.id}
                             title={`${task.sequenceIndex + 1}. ${task.actorName}`}
-                            meta={`计划执行：${formatDateTime(task.executeAfter)}`}
+                            meta={`${t(msg`计划执行`)}：${formatDateTime(task.executeAfter)}`}
                             badges={
                               <>
                                 <StatusPill
@@ -2574,21 +2574,21 @@ function GroupReplyRuntimeCard({
                             description={describeGroupReplyTask(task)}
                             details={
                               <div className="space-y-2 text-xs leading-6 text-[color:var(--text-muted)]">
-                                <div>分数：{task.score.toFixed(1)}</div>
+                                <div>{t(msg`分数`)}：{task.score.toFixed(1)}</div>
                                 <div>
-                                  概率门：
-                                  {task.randomPassed ? "通过" : "未通过"} ·
-                                  被提及：
-                                  {task.isExplicitTarget ? "是" : "否"} ·
-                                  回复目标：
-                                  {task.isReplyTarget ? "是" : "否"}
+                                  {t(msg`概率门`)}：
+                                  {task.randomPassed ? t(msg`通过`) : t(msg`未通过`)} ·
+                                  {t(msg`被提及`)}：
+                                  {task.isExplicitTarget ? t(msg`是`) : t(msg`否`)} ·
+                                  {t(msg`回复目标`)}：
+                                  {task.isReplyTarget ? t(msg`是`) : t(msg`否`)}
                                 </div>
                                 {task.errorMessage ? (
-                                  <div>错误：{task.errorMessage}</div>
+                                  <div>{t(msg`错误`)}：{task.errorMessage}</div>
                                 ) : null}
                                 {task.cancelReason ? (
                                   <div>
-                                    取消原因：
+                                    {t(msg`取消原因`)}：
                                     {formatGroupReplyCancelReason(
                                       task.cancelReason,
                                     )}
@@ -2606,8 +2606,8 @@ function GroupReplyRuntimeCard({
                                 >
                                   {retryMutation.isPending &&
                                   retryMutation.variables === task.id
-                                    ? "重试中..."
-                                    : "重新入队"}
+                                    ? t(msg`重试中...`)
+                                    : t(msg`重新入队`)}
                                 </Button>
                               ) : null
                             }
@@ -2643,23 +2643,23 @@ function ActorSnapshotCard({
         <div className="space-y-4">
           <StateGateCard gate={actor.stateGate} />
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
-            <MetricCard label="模型" value={actor.model} />
+            <MetricCard label={t(msg`模型`)} value={actor.model} />
             <MetricCard
-              label="API 可用"
-              value={actor.apiAvailable ? "可用" : "不可用"}
+              label={t(msg`API 可用`)}
+              value={actor.apiAvailable ? t(msg`可用`) : t(msg`不可用`)}
             />
-            <MetricCard label="历史窗口" value={actor.historyWindow} />
-            <MetricCard label="可见消息数" value={actor.visibleHistoryCount} />
+            <MetricCard label={t(msg`历史窗口`)} value={actor.historyWindow} />
+            <MetricCard label={t(msg`可见消息数`)} value={actor.visibleHistoryCount} />
             <MetricCard
-              label="最近聊天时间"
+              label={t(msg`最近聊天时间`)}
               value={formatDateTime(actor.lastChatAt)}
             />
             <MetricCard
-              label="世界上下文"
-              value={actor.worldContextText || "暂无快照"}
+              label={t(msg`世界上下文`)}
+              value={actor.worldContextText || t(msg`暂无快照`)}
             />
           </div>
-          <AdminSubpanel title="角色备注" contentClassName="mt-3">
+          <AdminSubpanel title={t(msg`角色备注`)} contentClassName="mt-3">
             <AdminNoteList
               items={actor.notes.map((note) => formatReplyLogicText(note))}
             />
@@ -2667,7 +2667,7 @@ function ActorSnapshotCard({
         </div>
 
         <div className="space-y-4">
-          <AdminSubpanel title="提示词分段">
+          <AdminSubpanel title={t(msg`提示词分段`)}>
             <AdminPromptSectionList
               sections={actor.promptSections.map((section) => ({
                 key: section.key,
@@ -2678,15 +2678,15 @@ function ActorSnapshotCard({
             />
           </AdminSubpanel>
 
-          <AdminSubpanel title="最终生效提示词">
+          <AdminSubpanel title={t(msg`最终生效提示词`)}>
             <AdminCodeBlock value={actor.effectivePrompt} />
           </AdminSubpanel>
 
-          <AdminSubpanel title="上下文窗口">
+          <AdminSubpanel title={t(msg`上下文窗口`)}>
             <HistoryList items={actor.windowMessages} />
           </AdminSubpanel>
 
-          <AdminSubpanel title="最终请求消息">
+          <AdminSubpanel title={t(msg`最终请求消息`)}>
             <RequestMessageList items={actor.requestMessages} />
           </AdminSubpanel>
         </div>
@@ -2698,7 +2698,7 @@ function ActorSnapshotCard({
 function StateGateCard({ gate }: { gate: ReplyLogicStateGateSummary }) {
   const t = translateRuntimeMessage;
   return (
-    <AdminSubpanel title="状态门" contentClassName="mt-3">
+    <AdminSubpanel title={t(msg`状态门`)} contentClassName="mt-3">
       <div className="flex justify-end">
         <StatusPill tone={toneForGate(gate.mode)}>
           {formatGateMode(gate.mode)}
@@ -2711,14 +2711,14 @@ function StateGateCard({ gate }: { gate: ReplyLogicStateGateSummary }) {
         <div className="mt-3 space-y-2">
           {gate.activity ? (
             <AdminInfoRow
-              label="活动"
+              label={t(msg`活动`)}
               value={formatActivity(gate.activity)}
               className="bg-white/80 px-3 py-2.5"
             />
           ) : null}
           {gate.delayMs ? (
             <AdminInfoRow
-              label="延迟"
+              label={t(msg`延迟`)}
               value={`${gate.delayMs.min}ms - ${gate.delayMs.max}ms`}
               className="bg-white/80 px-3 py-2.5"
             />
@@ -2747,8 +2747,8 @@ function HistoryList({
   if (!items.length) {
     return (
       <AdminEmptyState
-        title="当前没有可见历史消息"
-        description="这通常表示上下文窗口还没形成，或者当前会话暂时没有纳入可见历史。"
+        title={t(msg`当前没有可见历史消息`)}
+        description={t(msg`这通常表示上下文窗口还没形成，或者当前会话暂时没有纳入可见历史。`)}
       />
     );
   }
@@ -2763,7 +2763,7 @@ function HistoryList({
             badges={
               <>
                 <StatusPill tone={item.includedInWindow ? "healthy" : "muted"}>
-                  {item.includedInWindow ? "进入窗口" : "仅可见"}
+                  {item.includedInWindow ? t(msg`进入窗口`) : t(msg`仅可见`)}
                 </StatusPill>
                 <StatusPill tone="muted">
                   {formatSenderType(item.senderType)}
@@ -2806,8 +2806,8 @@ function RequestMessageList({
   if (!items.length) {
     return (
       <AdminEmptyState
-        title="当前没有模型请求消息"
-        description="先执行一次候选消息预演，或等待真实运行后再回来查看请求消息。"
+        title={t(msg`当前没有模型请求消息`)}
+        description={t(msg`先执行一次候选消息预演，或等待真实运行后再回来查看请求消息。`)}
       />
     );
   }
@@ -2853,12 +2853,12 @@ function NarrativeCard({
   const t = translateRuntimeMessage;
   return (
     <Card className="bg-[color:var(--surface-console)]">
-      <SectionHeading>记忆与叙事</SectionHeading>
+      <SectionHeading>{t(msg`记忆与叙事`)}</SectionHeading>
       {!arcs.length ? (
         <AdminEmptyState
           className="mt-4"
-          title="当前没有叙事弧线记录"
-          description="这说明该角色或会话还没有形成可观测的叙事推进，先查看运行历史或等待后续互动。"
+          title={t(msg`当前没有叙事弧线记录`)}
+          description={t(msg`这说明该角色或会话还没有形成可观测的叙事推进，先查看运行历史或等待后续互动。`)}
         />
       ) : (
         <div className="mt-4 space-y-4">
@@ -2876,7 +2876,7 @@ function NarrativeCard({
                   <StatusPill tone="muted">{arc.progress}%</StatusPill>
                 </>
               }
-              meta={`创建：${formatDateTime(arc.createdAt)} · 完成：${formatDateTime(arc.completedAt)}`}
+              meta={`${t(msg`创建`)}：${formatDateTime(arc.createdAt)} · ${t(msg`完成`)}：${formatDateTime(arc.completedAt)}`}
               details={
                 <div className="flex flex-wrap gap-2">
                   {arc.milestones.map((item) => (
@@ -2922,32 +2922,32 @@ function RuntimeRulesEditorCard({
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
-        title="运行规则配置"
+        title={t(msg`运行规则配置`)}
         actions={
           <AdminDraftStatusPill ready={Boolean(draft)} dirty={isDirty} />
         }
       />
 
       {!draft ? (
-        <LoadingBlock className="mt-4" label="正在加载运行规则..." />
+        <LoadingBlock className="mt-4" label={t(msg`正在加载运行规则...`)} />
       ) : (
         <>
           <InlineNotice className="mt-4" tone="muted">
-            这里改的是回复与生活调度的全局运行规则。保存后，角色快照、会话快照和状态门控摘要会按新规则刷新。
+            {t(msg`这里改的是回复与生活调度的全局运行规则。保存后，角色快照、会话快照和状态门控摘要会按新规则刷新。`)}
           </InlineNotice>
           {error ? <ErrorBlock message={error} /> : null}
           {isSuccess ? (
             <AdminActionFeedback
               tone="success"
-              title="运行规则已保存"
-              description="相关快照正在按新规则刷新。"
+              title={t(msg`运行规则已保存`)}
+              description={t(msg`相关快照正在按新规则刷新。`)}
             />
           ) : null}
 
           <div className="mt-4 space-y-6">
-            <ConfigSection title="提示语与延迟">
+            <ConfigSection title={t(msg`提示语与延迟`)}>
               <TextAreaBlock
-                label="睡眠提示语"
+                label={t(msg`睡眠提示语`)}
                 value={listToLines(draft.sleepHintMessages)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -2957,7 +2957,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="工作中提示语"
+                label={t(msg`工作中提示语`)}
                 value={listToLines(draft.busyHintMessages.working)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -2970,7 +2970,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="通勤中提示语"
+                label={t(msg`通勤中提示语`)}
                 value={listToLines(draft.busyHintMessages.commuting)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -2984,7 +2984,7 @@ function RuntimeRulesEditorCard({
               />
               <div className="grid gap-4 md:grid-cols-2">
                 <FieldBlock
-                  label="睡眠延迟最小值"
+                  label={t(msg`睡眠延迟最小值`)}
                   value={draft.sleepDelayMs.min}
                   type="number"
                   min={0}
@@ -3002,7 +3002,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="睡眠延迟最大值"
+                  label={t(msg`睡眠延迟最大值`)}
                   value={draft.sleepDelayMs.max}
                   type="number"
                   min={0}
@@ -3020,7 +3020,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="忙碌延迟最小值"
+                  label={t(msg`忙碌延迟最小值`)}
                   value={draft.busyDelayMs.min}
                   type="number"
                   min={0}
@@ -3038,7 +3038,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="忙碌延迟最大值"
+                  label={t(msg`忙碌延迟最大值`)}
                   value={draft.busyDelayMs.max}
                   type="number"
                   min={0}
@@ -3058,10 +3058,10 @@ function RuntimeRulesEditorCard({
               </div>
             </ConfigSection>
 
-            <ConfigSection title="群聊与记忆">
+            <ConfigSection title={t(msg`群聊与记忆`)}>
               <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-1">
                 <FieldBlock
-                  label="高频角色回复概率"
+                  label={t(msg`高频角色回复概率`)}
                   value={draft.groupReplyChance.high}
                   type="number"
                   min={0}
@@ -3080,7 +3080,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="中频角色回复概率"
+                  label={t(msg`中频角色回复概率`)}
                   value={draft.groupReplyChance.normal}
                   type="number"
                   min={0}
@@ -3099,7 +3099,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="低频角色回复概率"
+                  label={t(msg`低频角色回复概率`)}
                   value={draft.groupReplyChance.low}
                   type="number"
                   min={0}
@@ -3120,7 +3120,7 @@ function RuntimeRulesEditorCard({
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <FieldBlock
-                  label="群聊延迟最小值"
+                  label={t(msg`群聊延迟最小值`)}
                   value={draft.groupReplyDelayMs.min}
                   type="number"
                   min={0}
@@ -3138,7 +3138,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="群聊延迟最大值"
+                  label={t(msg`群聊延迟最大值`)}
                   value={draft.groupReplyDelayMs.max}
                   type="number"
                   min={0}
@@ -3156,7 +3156,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="记忆压缩间隔"
+                  label={t(msg`记忆压缩间隔`)}
                   value={draft.memoryCompressionEveryMessages}
                   type="number"
                   min={1}
@@ -3173,10 +3173,10 @@ function RuntimeRulesEditorCard({
               </div>
             </ConfigSection>
 
-            <ConfigSection title="生活调度">
+            <ConfigSection title={t(msg`生活调度`)}>
               <div className="grid gap-4 md:grid-cols-2">
                 <FieldBlock
-                  label="朋友圈生成概率"
+                  label={t(msg`朋友圈生成概率`)}
                   value={draft.momentGenerateChance}
                   type="number"
                   min={0}
@@ -3192,7 +3192,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="视频号生成概率"
+                  label={t(msg`视频号生成概率`)}
                   value={draft.channelGenerateChance}
                   type="number"
                   min={0}
@@ -3208,7 +3208,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="场景加好友概率"
+                  label={t(msg`场景加好友概率`)}
                   value={draft.sceneFriendRequestChance}
                   type="number"
                   min={0}
@@ -3224,7 +3224,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="基础活动权重"
+                  label={t(msg`基础活动权重`)}
                   value={draft.activityBaseWeight}
                   type="number"
                   min={0}
@@ -3240,7 +3240,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="主动提醒小时"
+                  label={t(msg`主动提醒小时`)}
                   value={draft.proactiveReminderHour}
                   type="number"
                   min={0}
@@ -3262,7 +3262,7 @@ function RuntimeRulesEditorCard({
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <FieldBlock
-                  label="睡眠时段（0-23，逗号分隔）"
+                  label={t(msg`睡眠时段（0-23，逗号分隔）`)}
                   value={hourListToCsv(draft.activityScheduleHours.sleeping)}
                   onChange={(value) =>
                     onPatch((current) => ({
@@ -3278,7 +3278,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="通勤时段（0-23，逗号分隔）"
+                  label={t(msg`通勤时段（0-23，逗号分隔）`)}
                   value={hourListToCsv(draft.activityScheduleHours.commuting)}
                   onChange={(value) =>
                     onPatch((current) => ({
@@ -3294,7 +3294,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="工作时段（0-23，逗号分隔）"
+                  label={t(msg`工作时段（0-23，逗号分隔）`)}
                   value={hourListToCsv(draft.activityScheduleHours.working)}
                   onChange={(value) =>
                     onPatch((current) => ({
@@ -3310,7 +3310,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="吃饭时段（0-23，逗号分隔）"
+                  label={t(msg`吃饭时段（0-23，逗号分隔）`)}
                   value={hourListToCsv(draft.activityScheduleHours.eating)}
                   onChange={(value) =>
                     onPatch((current) => ({
@@ -3327,7 +3327,7 @@ function RuntimeRulesEditorCard({
                 />
               </div>
               <TextAreaBlock
-                label="随机活动候选池（每行一个 activity）"
+                label={t(msg`随机活动候选池（每行一个 activity）`)}
                 value={listToLines(draft.activityRandomPool)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3338,7 +3338,7 @@ function RuntimeRulesEditorCard({
               />
               <div className="grid gap-4 md:grid-cols-2">
                 <SelectFieldBlock
-                  label="默认角色在线状态"
+                  label={t(msg`默认角色在线状态`)}
                   value={
                     draft.defaultCharacterRules.isOnline ? "online" : "offline"
                   }
@@ -3352,12 +3352,12 @@ function RuntimeRulesEditorCard({
                     }))
                   }
                   options={[
-                    { value: "online", label: "在线" },
-                    { value: "offline", label: "离线" },
+                    { value: "online", label: t(msg`在线`) },
+                    { value: "offline", label: t(msg`离线`) },
                   ]}
                 />
                 <SelectFieldBlock
-                  label="默认角色活动"
+                  label={t(msg`默认角色活动`)}
                   value={draft.defaultCharacterRules.activity}
                   onChange={(value) =>
                     onPatch((current) => ({
@@ -3375,7 +3375,7 @@ function RuntimeRulesEditorCard({
                 />
               </div>
               <TextAreaBlock
-                label="场景加好友候选（每行一个）"
+                label={t(msg`场景加好友候选（每行一个）`)}
                 value={listToLines(draft.sceneFriendRequestScenes)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3386,7 +3386,7 @@ function RuntimeRulesEditorCard({
               />
               <div className="grid gap-4 md:grid-cols-2">
                 <FieldBlock
-                  label="AI 关系初始类型"
+                  label={t(msg`AI 关系初始类型`)}
                   value={draft.relationshipInitialType}
                   onChange={(value) =>
                     onPatch((current) => ({
@@ -3396,7 +3396,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="AI 关系初始强度"
+                  label={t(msg`AI 关系初始强度`)}
                   value={draft.relationshipInitialStrength}
                   type="number"
                   min={0}
@@ -3416,7 +3416,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="AI 关系增长概率"
+                  label={t(msg`AI 关系增长概率`)}
                   value={draft.relationshipUpdateChance}
                   type="number"
                   min={0}
@@ -3432,7 +3432,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="AI 关系增长步长"
+                  label={t(msg`AI 关系增长步长`)}
                   value={draft.relationshipUpdateStep}
                   type="number"
                   min={0}
@@ -3452,7 +3452,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="AI 关系强度上限"
+                  label={t(msg`AI 关系强度上限`)}
                   value={draft.relationshipStrengthMax}
                   type="number"
                   min={1}
@@ -3473,7 +3473,7 @@ function RuntimeRulesEditorCard({
                 />
               </div>
               <TextAreaBlock
-                label="AI 关系初始背景模板（{{leftName}} / {{rightName}}）"
+                label={t(msg`AI 关系初始背景模板（{{leftName}} / {{rightName}}）`)}
                 value={draft.relationshipInitialBackstory}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3484,10 +3484,10 @@ function RuntimeRulesEditorCard({
               />
             </ConfigSection>
 
-            <ConfigSection title="窗口与叙事">
+            <ConfigSection title={t(msg`窗口与叙事`)}>
               <div className="grid gap-4 md:grid-cols-2">
                 <FieldBlock
-                  label="历史窗口基础值"
+                  label={t(msg`历史窗口基础值`)}
                   value={draft.historyWindow.base}
                   type="number"
                   min={1}
@@ -3505,7 +3505,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <FieldBlock
-                  label="历史窗口浮动范围"
+                  label={t(msg`历史窗口浮动范围`)}
                   value={draft.historyWindow.range}
                   type="number"
                   min={0}
@@ -3524,9 +3524,9 @@ function RuntimeRulesEditorCard({
                 />
               </div>
               <TextAreaBlock
-                label="叙事里程碑"
+                label={t(msg`叙事里程碑`)}
                 value={narrativeMilestonesToLines(draft.narrativeMilestones)}
-                placeholder="每行一个：threshold|label|progress"
+                placeholder={t(msg`每行一个：threshold|label|progress`)}
                 onChange={(value) =>
                   onPatch((current) => ({
                     ...current,
@@ -3538,7 +3538,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <FieldBlock
-                label="关系弧线标题后缀"
+                label={t(msg`关系弧线标题后缀`)}
                 value={
                   draft.narrativePresentationTemplates.relationshipArcSuffix
                 }
@@ -3553,7 +3553,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="里程碑显示标签（key=value）"
+                label={t(msg`里程碑显示标签（key=value）`)}
                 value={recordToLines(
                   draft.narrativePresentationTemplates.milestoneLabels,
                 )}
@@ -3572,15 +3572,14 @@ function RuntimeRulesEditorCard({
               />
             </ConfigSection>
 
-            <ConfigSection title="System Prompt 模板">
+            <ConfigSection title={t(msg`System Prompt 模板`)}>
               <InlineNotice tone="muted">
-                这里改的是结构化 system prompt
-                的母版。支持的占位符会直接在标签里标出来，例如{" "}
-                <code>{"{{name}}"}</code>、<code>{"{{relationship}}"}</code>、
-                <code>{"{{currentTime}}"}</code>。
+                {t(msg`这里改的是结构化 system prompt 的母版。支持的占位符会直接在标签里标出来，例如`)}{" "}
+                <code>{"{{name}}"}</code>{t(msg`、`)}<code>{"{{relationship}}"}</code>{t(msg`、`)}
+                <code>{"{{currentTime}}"}</code>{t(msg`。`)}
               </InlineNotice>
               <TextAreaBlock
-                label="身份兜底模板（{{name}} / {{relationship}}）"
+                label={t(msg`身份兜底模板（{{name}} / {{relationship}}）`)}
                 value={draft.promptTemplates.identityFallback}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3593,7 +3592,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="链路推理提示"
+                label={t(msg`链路推理提示`)}
                 value={draft.promptTemplates.chainOfThoughtInstruction}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3606,7 +3605,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="反思提示"
+                label={t(msg`反思提示`)}
                 value={draft.promptTemplates.reflectionInstruction}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3619,7 +3618,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="协作路由提示"
+                label={t(msg`协作路由提示`)}
                 value={draft.promptTemplates.collaborationRouting}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3632,7 +3631,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="空记忆提示"
+                label={t(msg`空记忆提示`)}
                 value={draft.promptTemplates.emptyMemory}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3645,7 +3644,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="行为指导提示"
+                label={t(msg`行为指导提示`)}
                 value={draft.promptTemplates.behavioralGuideline}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3658,7 +3657,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="群聊提示"
+                label={t(msg`群聊提示`)}
                 value={draft.promptTemplates.groupChatInstruction}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3671,7 +3670,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="基础规则列表（{{name}} / {{relationship}} / {{currentTime}}）"
+                label={t(msg`基础规则列表（{{name}} / {{relationship}} / {{currentTime}}）`)}
                 value={listToLines(draft.promptTemplates.baseRules)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3685,13 +3684,12 @@ function RuntimeRulesEditorCard({
               />
             </ConfigSection>
 
-            <ConfigSection title="生成器 Prompt 模板">
+            <ConfigSection title={t(msg`生成器 Prompt 模板`)}>
               <InlineNotice tone="muted">
-                这部分会直接影响朋友圈生成、人格提取、意图分类、记忆压缩等 AI
-                子链路。
+                {t(msg`这部分会直接影响朋友圈生成、人格提取、意图分类、记忆压缩等 AI 子链路。`)}
               </InlineNotice>
               <TextAreaBlock
-                label="朋友圈生成模板（{{name}} / {{relationship}} / {{dayOfWeek}} / {{timeOfDay}} / {{clockTime}} / {{emotionalTone}} / {{topicsHint}}）"
+                label={t(msg`朋友圈生成模板（{{name}} / {{relationship}} / {{dayOfWeek}} / {{timeOfDay}} / {{clockTime}} / {{emotionalTone}} / {{topicsHint}}）`)}
                 value={draft.promptTemplates.momentPrompt}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3704,7 +3702,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="人格提取模板（{{personName}} / {{chatSample}}）"
+                label={t(msg`人格提取模板（{{personName}} / {{chatSample}}）`)}
                 value={draft.promptTemplates.personalityExtractionPrompt}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3717,7 +3715,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="意图分类模板（{{userMessage}} / {{characterName}} / {{characterDomains}}）"
+                label={t(msg`意图分类模板（{{userMessage}} / {{characterName}} / {{characterDomains}}）`)}
                 value={draft.promptTemplates.intentClassificationPrompt}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3730,7 +3728,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="记忆压缩模板（{{name}} / {{chatHistory}}）"
+                label={t(msg`记忆压缩模板（{{name}} / {{chatHistory}}）`)}
                 value={draft.promptTemplates.memoryCompressionPrompt}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3743,7 +3741,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="拉群说明模板（{{triggerCharName}} / {{invitedCharNames}} / {{topic}}）"
+                label={t(msg`拉群说明模板（{{triggerCharName}} / {{invitedCharNames}} / {{topic}}）`)}
                 value={draft.promptTemplates.groupCoordinatorPrompt}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3757,12 +3755,12 @@ function RuntimeRulesEditorCard({
               />
             </ConfigSection>
 
-            <ConfigSection title="语义标签">
+            <ConfigSection title={t(msg`语义标签`)}>
               <InlineNotice tone="muted">
-                这里定义回复链路里会被拼进 Prompt 的专长、活动、星期和时段标签。
+                {t(msg`这里定义回复链路里会被拼进 Prompt 的专长、活动、星期和时段标签。`)}
               </InlineNotice>
               <TextAreaBlock
-                label="专长标签（key=value）"
+                label={t(msg`专长标签（key=value）`)}
                 value={recordToLines(draft.semanticLabels.domainLabels)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3778,7 +3776,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="活动标签（key=value）"
+                label={t(msg`活动标签（key=value）`)}
                 value={recordToLines(draft.semanticLabels.activityLabels)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3794,7 +3792,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="星期标签（每行一个，按周日到周六）"
+                label={t(msg`星期标签（每行一个，按周日到周六）`)}
                 value={listToLines(draft.semanticLabels.weekdayLabels)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3810,7 +3808,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="时段标签（key=value）"
+                label={t(msg`时段标签（key=value）`)}
                 value={recordToLines(draft.semanticLabels.timeOfDayLabels)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3827,13 +3825,13 @@ function RuntimeRulesEditorCard({
               />
             </ConfigSection>
 
-            <ConfigSection title="观测说明模板">
+            <ConfigSection title={t(msg`观测说明模板`)}>
               <InlineNotice tone="muted">
-                这部分主要影响后台快照里的状态门和链路备注文案；忙碌/睡眠状态支持{" "}
-                <code>{"{{activity}}"}</code> 占位符。
+                {t(msg`这部分主要影响后台快照里的状态门和链路备注文案；忙碌/睡眠状态支持`)}{" "}
+                <code>{"{{activity}}"}</code> {t(msg`占位符。`)}
               </InlineNotice>
               <TextAreaBlock
-                label="睡眠状态门说明"
+                label={t(msg`睡眠状态门说明`)}
                 value={draft.observabilityTemplates.stateGateSleeping}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3846,7 +3844,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="忙碌状态门说明"
+                label={t(msg`忙碌状态门说明`)}
                 value={draft.observabilityTemplates.stateGateBusy}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3859,7 +3857,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="立即回复说明"
+                label={t(msg`立即回复说明`)}
                 value={draft.observabilityTemplates.stateGateImmediate}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3872,7 +3870,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="未应用状态门说明"
+                label={t(msg`未应用状态门说明`)}
                 value={draft.observabilityTemplates.stateGateNotApplied}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3885,7 +3883,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="可用 API Key 备注"
+                label={t(msg`可用 API Key 备注`)}
                 value={draft.observabilityTemplates.actorNoteApiAvailable}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3898,7 +3896,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="无 API Key 备注"
+                label={t(msg`无 API Key 备注`)}
                 value={draft.observabilityTemplates.actorNoteApiUnavailable}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3911,7 +3909,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="群聊上下文备注"
+                label={t(msg`群聊上下文备注`)}
                 value={draft.observabilityTemplates.actorNoteGroupContext}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3924,7 +3922,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="单聊上下文备注"
+                label={t(msg`单聊上下文备注`)}
                 value={draft.observabilityTemplates.actorNoteDirectContext}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3938,13 +3936,12 @@ function RuntimeRulesEditorCard({
               />
             </ConfigSection>
 
-            <ConfigSection title="世界快照规则">
+            <ConfigSection title={t(msg`世界快照规则`)}>
               <InlineNotice tone="muted">
-                这里定义世界上下文的生成方式，以及注入到 system prompt
-                时的拼接模板。
+                {t(msg`这里定义世界上下文的生成方式，以及注入到 system prompt 时的拼接模板。`)}
               </InlineNotice>
               <TextAreaBlock
-                label="季节标签（key=value）"
+                label={t(msg`季节标签（key=value）`)}
                 value={recordToLines(draft.worldContextRules.seasonLabels)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -3961,7 +3958,7 @@ function RuntimeRulesEditorCard({
               />
               <div className="grid gap-4 md:grid-cols-2">
                 <TextAreaBlock
-                  label="春季天气候选"
+                  label={t(msg`春季天气候选`)}
                   value={listToLines(
                     draft.worldContextRules.weatherOptions.spring,
                   )}
@@ -3979,7 +3976,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <TextAreaBlock
-                  label="夏季天气候选"
+                  label={t(msg`夏季天气候选`)}
                   value={listToLines(
                     draft.worldContextRules.weatherOptions.summer,
                   )}
@@ -3997,7 +3994,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <TextAreaBlock
-                  label="秋季天气候选"
+                  label={t(msg`秋季天气候选`)}
                   value={listToLines(
                     draft.worldContextRules.weatherOptions.autumn,
                   )}
@@ -4015,7 +4012,7 @@ function RuntimeRulesEditorCard({
                   }
                 />
                 <TextAreaBlock
-                  label="冬季天气候选"
+                  label={t(msg`冬季天气候选`)}
                   value={listToLines(
                     draft.worldContextRules.weatherOptions.winter,
                   )}
@@ -4034,7 +4031,7 @@ function RuntimeRulesEditorCard({
                 />
               </div>
               <TextAreaBlock
-                label="节日规则（month|day|label）"
+                label={t(msg`节日规则（month|day|label）`)}
                 value={holidayRulesToLines(draft.worldContextRules.holidays)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4050,7 +4047,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="本地时间模板（{{timeOfDay}} / {{hour}} / {{minute}}）"
+                label={t(msg`本地时间模板（{{timeOfDay}} / {{hour}} / {{minute}}）`)}
                 value={draft.worldContextRules.localTimeTemplate}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4063,7 +4060,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="上下文字段模板（key=value）"
+                label={t(msg`上下文字段模板（key=value）`)}
                 value={recordToLines(
                   draft.worldContextRules.contextFieldTemplates,
                 )}
@@ -4082,7 +4079,7 @@ function RuntimeRulesEditorCard({
               />
               <div className="grid gap-4 md:grid-cols-2">
                 <FieldBlock
-                  label="上下文分隔符"
+                  label={t(msg`上下文分隔符`)}
                   value={draft.worldContextRules.contextSeparator}
                   onChange={(value) =>
                     onPatch((current) => ({
@@ -4096,7 +4093,7 @@ function RuntimeRulesEditorCard({
                 />
               </div>
               <TextAreaBlock
-                label="Prompt 注入模板（{{context}}）"
+                label={t(msg`Prompt 注入模板（{{context}}）`)}
                 value={draft.worldContextRules.promptContextTemplate}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4110,13 +4107,12 @@ function RuntimeRulesEditorCard({
               />
             </ConfigSection>
 
-            <ConfigSection title="链路解释模板">
+            <ConfigSection title={t(msg`链路解释模板`)}>
               <InlineNotice tone="muted">
-                这部分主要影响后台里“角色视图备注 / 会话分支摘要 /
-                候选消息预演说明 / 历史窗口注释”这些解释文字。
+                {t(msg`这部分主要影响后台里”角色视图备注 / 会话分支摘要 / 候选消息预演说明 / 历史窗口注释”这些解释文字。`)}
               </InlineNotice>
               <TextAreaBlock
-                label="角色视图总说明"
+                label={t(msg`角色视图总说明`)}
                 value={draft.inspectorTemplates.characterViewIntro}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4129,7 +4125,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="角色视图-已找到单聊"
+                label={t(msg`角色视图-已找到单聊`)}
                 value={draft.inspectorTemplates.characterViewHistoryFound}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4142,7 +4138,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="角色视图-未找到单聊"
+                label={t(msg`角色视图-未找到单聊`)}
                 value={draft.inspectorTemplates.characterViewHistoryMissing}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4155,7 +4151,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="历史窗口内注释"
+                label={t(msg`历史窗口内注释`)}
                 value={draft.inspectorTemplates.historyIncludedNote}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4168,7 +4164,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="历史窗口外注释"
+                label={t(msg`历史窗口外注释`)}
                 value={draft.inspectorTemplates.historyExcludedNote}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4181,7 +4177,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="Stored Group 标题"
+                label={t(msg`Stored Group 标题`)}
                 value={draft.inspectorTemplates.storedGroupTitle}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4194,7 +4190,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="Stored Group-升级说明"
+                label={t(msg`Stored Group-升级说明`)}
                 value={draft.inspectorTemplates.storedGroupUpgradedNote}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4207,7 +4203,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="Stored Group-下一步说明"
+                label={t(msg`Stored Group-下一步说明`)}
                 value={draft.inspectorTemplates.storedGroupNextReplyNote}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4220,7 +4216,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="Direct Branch 标题"
+                label={t(msg`Direct Branch 标题`)}
                 value={draft.inspectorTemplates.directBranchTitle}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4233,7 +4229,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="Direct Branch-下一步说明"
+                label={t(msg`Direct Branch-下一步说明`)}
                 value={draft.inspectorTemplates.directBranchNextReplyNote}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4246,7 +4242,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="Formal Group 标题"
+                label={t(msg`Formal Group 标题`)}
                 value={draft.inspectorTemplates.formalGroupTitle}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4259,7 +4255,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="Formal Group-状态门说明"
+                label={t(msg`Formal Group-状态门说明`)}
                 value={draft.inspectorTemplates.formalGroupStateGateNote}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4272,7 +4268,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="Formal Group-回复规则说明"
+                label={t(msg`Formal Group-回复规则说明`)}
                 value={draft.inspectorTemplates.formalGroupReplyRuleNote}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4285,7 +4281,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="预演-角色说明"
+                label={t(msg`预演-角色说明`)}
                 value={draft.inspectorTemplates.previewCharacterIntro}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4298,7 +4294,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="预演-角色有历史"
+                label={t(msg`预演-角色有历史`)}
                 value={draft.inspectorTemplates.previewCharacterWithHistory}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4311,7 +4307,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="预演-角色无历史"
+                label={t(msg`预演-角色无历史`)}
                 value={draft.inspectorTemplates.previewCharacterWithoutHistory}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4324,7 +4320,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="预演-Stored Group"
+                label={t(msg`预演-Stored Group`)}
                 value={draft.inspectorTemplates.previewStoredGroup}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4337,7 +4333,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="预演-Direct Conversation"
+                label={t(msg`预演-Direct Conversation`)}
                 value={draft.inspectorTemplates.previewDirectConversation}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4350,7 +4346,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="预演-Formal Group"
+                label={t(msg`预演-Formal Group`)}
                 value={draft.inspectorTemplates.previewFormalGroup}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4363,7 +4359,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="预演-默认用户消息"
+                label={t(msg`预演-默认用户消息`)}
                 value={draft.inspectorTemplates.previewDefaultUserMessage}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4377,13 +4373,12 @@ function RuntimeRulesEditorCard({
               />
             </ConfigSection>
 
-            <ConfigSection title="Provider 备注模板">
+            <ConfigSection title={t(msg`Provider 备注模板`)}>
               <InlineNotice tone="muted">
-                这里改的是回复逻辑总览里 Provider
-                差异备注，不影响真实推理请求，只影响后台解释文本。
+                {t(msg`这里改的是回复逻辑总览里 Provider 差异备注，不影响真实推理请求，只影响后台解释文本。`)}
               </InlineNotice>
               <TextAreaBlock
-                label="Provider 备注（key=value）"
+                label={t(msg`Provider 备注（key=value）`)}
                 value={recordToLines(draft.providerTemplates)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4397,12 +4392,12 @@ function RuntimeRulesEditorCard({
               />
             </ConfigSection>
 
-            <ConfigSection title="角色运行备注模板">
+            <ConfigSection title={t(msg`角色运行备注模板`)}>
               <InlineNotice tone="muted">
-                这部分会出现在角色运行逻辑台的生活逻辑观测里，用来解释为什么某些调度会跳过角色。
+                {t(msg`这部分会出现在角色运行逻辑台的生活逻辑观测里，用来解释为什么某些调度会跳过角色。`)}
               </InlineNotice>
               <TextAreaBlock
-                label="角色运行备注（key=value）"
+                label={t(msg`角色运行备注（key=value）`)}
                 value={recordToLines(draft.runtimeNoteTemplates)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4416,13 +4411,12 @@ function RuntimeRulesEditorCard({
               />
             </ConfigSection>
 
-            <ConfigSection title="调度器任务说明">
+            <ConfigSection title={t(msg`调度器任务说明`)}>
               <InlineNotice tone="muted">
-                这里改的是 Scheduler 任务列表里的描述文字，不改 cron
-                表达式和实际触发频率。
+                {t(msg`这里改的是 Scheduler 任务列表里的描述文字，不改 cron 表达式和实际触发频率。`)}
               </InlineNotice>
               <TextAreaBlock
-                label="任务名称（key=value）"
+                label={t(msg`任务名称（key=value）`)}
                 value={recordToLines(draft.schedulerNames)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4435,7 +4429,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="任务说明（key=value）"
+                label={t(msg`任务说明（key=value）`)}
                 value={recordToLines(draft.schedulerDescriptions)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4448,7 +4442,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="下一次执行提示（key=value）"
+                label={t(msg`下一次执行提示（key=value）`)}
                 value={recordToLines(draft.schedulerNextRunHints)}
                 onChange={(value) =>
                   onPatch((current) => ({
@@ -4462,16 +4456,16 @@ function RuntimeRulesEditorCard({
               />
             </ConfigSection>
 
-            <ConfigSection title="调度事件与摘要模板">
+            <ConfigSection title={t(msg`调度事件与摘要模板`)}>
               <InlineNotice tone="muted">
-                这里改的是调度执行结果、生活事件和主动提醒子链路里的文本模板。支持{" "}
-                <code>{"{{count}}"}</code>、<code>{"{{characterCount}}"}</code>
-                、<code>{"{{scene}}"}</code>、<code>{"{{postId}}"}</code>、
-                <code>{"{{activity}}"}</code>、<code>{"{{otherName}}"}</code>{" "}
-                等占位符。
+                {t(msg`这里改的是调度执行结果、生活事件和主动提醒子链路里的文本模板。支持`)}{" "}
+                <code>{"{{count}}"}</code>{t(msg`、`)}<code>{"{{characterCount}}"}</code>
+                {t(msg`、`)}<code>{"{{scene}}"}</code>{t(msg`、`)}<code>{"{{postId}}"}</code>{t(msg`、`)}
+                <code>{"{{activity}}"}</code>{t(msg`、`)}<code>{"{{otherName}}"}</code>{" "}
+                {t(msg`等占位符。`)}
               </InlineNotice>
               <TextAreaBlock
-                label="调度事件与摘要（key=value）"
+                label={t(msg`调度事件与摘要（key=value）`)}
                 value={schedulerTextTemplatesToLines(
                   draft.schedulerTextTemplates,
                 )}
@@ -4486,7 +4480,7 @@ function RuntimeRulesEditorCard({
                 }
               />
               <TextAreaBlock
-                label="主动提醒检查 Prompt（{{characterName}} / {{memoryText}} / {{today}}）"
+                label={t(msg`主动提醒检查 Prompt（{{characterName}} / {{memoryText}} / {{today}}）`)}
                 value={
                   draft.schedulerTextTemplates.proactiveReminderCheckPrompt
                 }
@@ -4504,14 +4498,14 @@ function RuntimeRulesEditorCard({
 
             <div className="flex flex-wrap gap-3 border-t border-[color:var(--border-faint)] pt-5">
               <Button variant="secondary" onClick={onReset}>
-                重置运行规则
+                {t(msg`重置运行规则`)}
               </Button>
               <Button
                 variant="primary"
                 onClick={onSave}
                 disabled={!isDirty || isPending}
               >
-                {isPending ? "保存中..." : "保存运行规则"}
+                {isPending ? t(msg`保存中...`) : t(msg`保存运行规则`)}
               </Button>
             </div>
           </div>
