@@ -91,6 +91,21 @@ export class CharacterFriendshipService implements OnApplicationBootstrap {
     return row?.intimacy ?? 0;
   }
 
+  async getRelation(
+    a: string,
+    b: string,
+  ): Promise<{ intimacy: number; lastInteractedAt: Date | null }> {
+    if (a === b) return { intimacy: 0, lastInteractedAt: null };
+    const [x, y] = orderPair(a, b);
+    const row = await this.repo.findOne({
+      where: { characterAId: x, characterBId: y },
+    });
+    return {
+      intimacy: row?.intimacy ?? 0,
+      lastInteractedAt: row?.lastInteractedAt ?? null,
+    };
+  }
+
   async bumpInteraction(a: string, b: string, delta = 0.5): Promise<void> {
     if (a === b) return;
     const [x, y] = orderPair(a, b);

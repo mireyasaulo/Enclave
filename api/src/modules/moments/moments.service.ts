@@ -16,6 +16,12 @@ import { MomentLikeEntity } from './moment-like.entity';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { SocialService } from '../social/social.service';
 import { CharacterFriendshipService } from '../social/character-friendship.service';
+import {
+  NPC_USER_POST_NEUTRAL_INTIMACY,
+  npcIntimacyMultiplier,
+  npcPostRecencyMultiplier,
+  npcRelationCoolingFactor,
+} from '../social/npc-engagement.utils';
 import { FeedService } from '../feed/feed.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { ReminderRuntimeService } from '../reminder-runtime/reminder-runtime.service';
@@ -504,10 +510,17 @@ export class MomentsService implements OnModuleInit {
 
     allChars.forEach((char, i) => {
       const freq = char.activityFrequency ?? 'normal';
-      const baseChance = freq === 'high' ? 0.6 : freq === 'low' ? 0.2 : 0.4;
+      // 改前 0.6 / 0.4 / 0.2，改后约 1/3
+      const baseChance = freq === 'high' ? 0.2 : freq === 'low' ? 0.07 : 0.13;
       const intimacy = intimacyByCharId.get(char.id) ?? 0;
-      const intimacyMultiplier = 1 + intimacy / 50; // up to ~3x at intimacy=100
-      const interactChance = Math.min(0.95, baseChance * intimacyMultiplier);
+      const effectiveIntimacy =
+        post.authorType === 'character'
+          ? intimacy
+          : NPC_USER_POST_NEUTRAL_INTIMACY;
+      const interactChance = Math.min(
+        0.5,
+        baseChance * npcIntimacyMultiplier(effectiveIntimacy),
+      );
       if (Math.random() > interactChance) return;
 
       // Delay based on activity frequency; closer friends react sooner
@@ -1447,10 +1460,14 @@ export class MomentsService implements OnModuleInit {
       normal: 1.0,
       low: 0.5,
     };
-    const RECENT_WINDOW_MS = 24 * 60 * 60 * 1000;
+    // 候选窗口扩到 7d；旧帖通过 npcPostRecencyMultiplier 在掷骰子层衰减/截断。
+    const RECENT_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+    const LIKE_BASE = 0.2;
+    const COMMENT_BASE = 0.07;
 
     const now = new Date();
-    const recentSince = new Date(now.getTime() - RECENT_WINDOW_MS);
+    const nowMs = now.getTime();
+    const recentSince = new Date(nowMs - RECENT_WINDOW_MS);
     const hour = now.getHours();
 
     // 候选池放开到所有可见角色（preset / model_persona / default_seed 等）。
@@ -1474,7 +1491,7 @@ export class MomentsService implements OnModuleInit {
     });
     if (recentPosts.length === 0) {
       return {
-        summary: `npc_autonomy_tick: 最近 24h 无帖子可巡查（候选 ${activeCandidates.length} 个）`,
+        summary: `npc_autonomy_tick: 最近 7d 无帖子可巡查（候选 ${activeCandidates.length} 个）`,
         likeCount,
         commentCount,
       };
@@ -1488,11 +1505,10 @@ export class MomentsService implements OnModuleInit {
       // 朋友圈是「好友圈」语义：非好友角色不会主动到任何朋友圈里露脸。
       if (!ownerFriendCharacterIds.has(char.id)) continue;
 
-      const baseChance =
-        char.proactiveBrowseChance ?? 0.3;
+      const baseChance = char.proactiveBrowseChance ?? 0.1;
       const freqMul =
         FREQ_MULTIPLIER[char.activityFrequency ?? 'normal'] ?? 1.0;
-      const browseChance = Math.min(0.95, baseChance * freqMul);
+      const browseChance = Math.min(0.5, baseChance * freqMul);
       if (Math.random() > browseChance) continue;
 
       participantCount += 1;
@@ -1516,29 +1532,38 @@ export class MomentsService implements OnModuleInit {
 
       const scored = await Promise.all(
         fresh.map(async (post) => {
-          let intimacy = 0;
+          let effectiveIntimacy: number;
           if (post.authorType === 'character') {
-            intimacy = await this.characterFriendships.getIntimacy(
+            const rel = await this.characterFriendships.getRelation(
               char.id,
               post.authorId,
             );
+            effectiveIntimacy =
+              rel.intimacy *
+              npcRelationCoolingFactor(nowMs, rel.lastInteractedAt);
+          } else {
+            effectiveIntimacy = NPC_USER_POST_NEUTRAL_INTIMACY;
           }
-          const recencyScore = Math.max(
-            0,
-            1 - (now.getTime() - post.postedAt.getTime()) / RECENT_WINDOW_MS,
+          const recencyMul = npcPostRecencyMultiplier(
+            nowMs,
+            post.postedAt.getTime(),
           );
-          return {
-            post,
-            score: intimacy / 50 + recencyScore + Math.random() * 0.3,
-          };
+          const intimacyMul = npcIntimacyMultiplier(effectiveIntimacy);
+          const engageMul = recencyMul * intimacyMul;
+          // 排序得分仍带随机扰动；engageMul 用于掷骰子。
+          const score =
+            effectiveIntimacy / 50 + recencyMul + Math.random() * 0.3;
+          return { post, score, engageMul };
         }),
       );
       scored.sort((a, b) => b.score - a.score);
-      const TOP_K = 3;
+      const TOP_K = 2;
       const top = scored.slice(0, TOP_K);
 
-      for (const { post } of top) {
-        if (Math.random() < 0.5) {
+      for (const { post, engageMul } of top) {
+        if (engageMul <= 0) continue; // 7d 硬截断 / 关系完全冷却
+
+        if (Math.random() < LIKE_BASE * engageMul) {
           try {
             await this.toggleLike(
               post.id,
@@ -1564,7 +1589,7 @@ export class MomentsService implements OnModuleInit {
           }
         }
 
-        if (llmCallsRemaining > 0 && Math.random() < 0.2) {
+        if (llmCallsRemaining > 0 && Math.random() < COMMENT_BASE * engageMul) {
           try {
             const profile = await this.characters.getProfile(char.id);
             if (!profile) continue;

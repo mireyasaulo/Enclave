@@ -21,6 +21,12 @@ import type {
   MomentVideoAsset,
 } from '../moments/moment-media.types';
 import { MomentPostEntity } from '../moments/moment-post.entity';
+import {
+  NPC_USER_POST_NEUTRAL_INTIMACY,
+  npcIntimacyMultiplier,
+  npcPostRecencyMultiplier,
+  npcRelationCoolingFactor,
+} from '../social/npc-engagement.utils';
 import { WorldLanguageService } from '../config/world-language.service';
 
 type FeedSurface = 'feed' | 'channels';
@@ -1015,10 +1021,14 @@ export class FeedService implements OnModuleInit {
       normal: 1.0,
       low: 0.5,
     };
-    const RECENT_WINDOW_MS = 24 * 60 * 60 * 1000;
+    // 候选窗口扩到 7d；旧帖通过 npcPostRecencyMultiplier 在掷骰子层衰减/截断。
+    const RECENT_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+    const LIKE_BASE = 0.2;
+    const COMMENT_BASE = 0.07;
 
     const now = new Date();
-    const recentSince = new Date(now.getTime() - RECENT_WINDOW_MS);
+    const nowMs = now.getTime();
+    const recentSince = new Date(nowMs - RECENT_WINDOW_MS);
     const hour = now.getHours();
 
     const blockedCharacterIds = new Set(
@@ -1052,17 +1062,17 @@ export class FeedService implements OnModuleInit {
     });
     if (recentPosts.length === 0) {
       return {
-        summary: `process_pending_feed_reactions: 最近 24h 广场/视频号无帖子可巡查（候选 ${activeCandidates.length} 个）`,
+        summary: `process_pending_feed_reactions: 最近 7d 广场/视频号无帖子可巡查（候选 ${activeCandidates.length} 个）`,
         likeCount,
         commentCount,
       };
     }
 
     for (const char of activeCandidates) {
-      const baseChance = char.proactiveBrowseChance ?? 0.3;
+      const baseChance = char.proactiveBrowseChance ?? 0.1;
       const freqMul =
         FREQ_MULTIPLIER[char.activityFrequency ?? 'normal'] ?? 1.0;
-      const browseChance = Math.min(0.95, baseChance * freqMul);
+      const browseChance = Math.min(0.5, baseChance * freqMul);
       if (Math.random() > browseChance) continue;
 
       participantCount += 1;
@@ -1086,30 +1096,37 @@ export class FeedService implements OnModuleInit {
 
       const scored = await Promise.all(
         fresh.map(async (post) => {
-          let intimacy = 0;
+          let effectiveIntimacy: number;
           if (post.authorType === 'character') {
-            intimacy = await this.characterFriendships.getIntimacy(
+            const rel = await this.characterFriendships.getRelation(
               char.id,
               post.authorId,
             );
+            effectiveIntimacy =
+              rel.intimacy *
+              npcRelationCoolingFactor(nowMs, rel.lastInteractedAt);
+          } else {
+            effectiveIntimacy = NPC_USER_POST_NEUTRAL_INTIMACY;
           }
-          const recencyScore = Math.max(
-            0,
-            1 - (now.getTime() - post.createdAt.getTime()) / RECENT_WINDOW_MS,
+          const recencyMul = npcPostRecencyMultiplier(
+            nowMs,
+            post.createdAt.getTime(),
           );
-          return {
-            post,
-            score: intimacy / 50 + recencyScore + Math.random() * 0.3,
-          };
+          const intimacyMul = npcIntimacyMultiplier(effectiveIntimacy);
+          const engageMul = recencyMul * intimacyMul;
+          const score =
+            effectiveIntimacy / 50 + recencyMul + Math.random() * 0.3;
+          return { post, score, engageMul };
         }),
       );
       scored.sort((a, b) => b.score - a.score);
-      const TOP_K = 3;
+      const TOP_K = 2;
       const top = scored.slice(0, TOP_K);
 
-      for (const { post } of top) {
+      for (const { post, engageMul } of top) {
+        if (engageMul <= 0) continue; // 7d 硬截断 / 关系完全冷却
         const surfaceLabel = post.surface === 'channels' ? '视频号' : '广场';
-        if (Math.random() < 0.5) {
+        if (Math.random() < LIKE_BASE * engageMul) {
           try {
             await this.toggleLike(
               post.id,
@@ -1136,7 +1153,7 @@ export class FeedService implements OnModuleInit {
           }
         }
 
-        if (llmCallsRemaining > 0 && Math.random() < 0.2) {
+        if (llmCallsRemaining > 0 && Math.random() < COMMENT_BASE * engageMul) {
           try {
             const profile = await this.characters.getProfile(char.id);
             if (!profile) continue;
