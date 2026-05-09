@@ -55,6 +55,9 @@ export function ShareCardModal({
 }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [qr, setQr] = useState<string | null>(null);
+  // qrReady 与 qr 分开 — 失败时 qr 仍是 null 但 qrReady=true 表示"已经定下来了"。
+  // 截图等 qrReady 后再开始，避免先无 QR 截一次、QR 到了再重截一次。
+  const [qrReady, setQrReady] = useState(false);
   const [pngDataUrl, setPngDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,10 +70,16 @@ export function ShareCardModal({
       errorCorrectionLevel: "M",
     })
       .then((url) => {
-        if (!cancelled) setQr(url);
+        if (!cancelled) {
+          setQr(url);
+          setQrReady(true);
+        }
       })
       .catch(() => {
-        if (!cancelled) setQr(null);
+        if (!cancelled) {
+          setQr(null);
+          setQrReady(true);
+        }
       });
     return () => {
       cancelled = true;
@@ -79,7 +88,7 @@ export function ShareCardModal({
 
   // 截图触发：每次换 cardKey 重做。等 QR 准备好（避免水印缺图）后再画。
   useEffect(() => {
-    if (!cardKey) return;
+    if (!cardKey || !qrReady) return;
     setPngDataUrl(null);
     setError(null);
     let cancelled = false;
@@ -127,11 +136,21 @@ export function ShareCardModal({
               reader.readAsDataURL(blob);
             });
             img.src = dataUrl;
-            await new Promise<void>((r) =>
-              img.complete
-                ? r()
-                : img.addEventListener("load", () => r(), { once: true }),
-            );
+            // 等 src 替换完成。同时监听 load / error，并加 3 秒超时，
+            // 避免 data URL 异常时 promise 永远 hang 导致截图卡住。
+            await new Promise<void>((resolve) => {
+              if (img.complete && img.naturalWidth > 0) {
+                resolve();
+                return;
+              }
+              const timer = window.setTimeout(resolve, 3000);
+              const done = () => {
+                window.clearTimeout(timer);
+                resolve();
+              };
+              img.addEventListener("load", done, { once: true });
+              img.addEventListener("error", done, { once: true });
+            });
           } catch {
             // 单图加载失败不要拦住整张图卡
           }
@@ -158,7 +177,7 @@ export function ShareCardModal({
     return () => {
       cancelled = true;
     };
-  }, [cardKey, qr]);
+  }, [cardKey, qrReady]);
 
   // ESC 关闭 — 必须放在任何条件 return 之前以遵守 hooks 规则
   useEffect(() => {

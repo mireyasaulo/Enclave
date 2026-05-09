@@ -17,7 +17,7 @@ type DesktopFeedListProps = {
   detailErrorMessage?: string | null;
   detailLoading: boolean;
   detailPost?: FeedPostWithComments | null;
-  expandedPostId: string | null;
+  selectedPostId: string | null;
   isLoading: boolean;
   likePendingPostId: string | null;
   posts: FeedPostListItem[];
@@ -42,7 +42,7 @@ export function DesktopFeedList({
   detailErrorMessage = null,
   detailLoading,
   detailPost = null,
-  expandedPostId,
+  selectedPostId,
   isLoading,
   likePendingPostId,
   posts,
@@ -71,7 +71,7 @@ export function DesktopFeedList({
       {!isLoading && posts.length > 0 ? (
         <div className="space-y-4 pb-6">
           {posts.map((post) => {
-            const expanded = post.id === expandedPostId;
+            const expanded = post.id === selectedPostId;
             return (
               <DesktopFeedRow
                 key={post.id}
