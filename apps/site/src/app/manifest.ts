@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { resolveLocaleFromRequest } from "@/lib/locale-from-request";
 import { getServerI18n } from "@/i18n/server";
-import { siteLinks } from "@/lib/site-links";
 
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const locale = await resolveLocaleFromRequest();
@@ -64,12 +63,14 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
       },
     ],
     // 长按桌面图标显示的快捷入口（Android Chrome / Edge 支持，iOS 暂忽略）。
+    // 注意：url 必须在 manifest scope 内（同源同前缀），跨源链接会被浏览器静默丢弃，
+    // 所以这里指向站内路由而非 SaaS App 域名。
     shortcuts: [
       {
-        name: i18n._("打开 App"),
-        short_name: i18n._("App"),
-        description: i18n._("直接进入 Web App"),
-        url: siteLinks.app,
+        name: i18n._("下载 App"),
+        short_name: i18n._("下载"),
+        description: i18n._("查看各平台下载方式"),
+        url: `/${locale}/download`,
         icons: [{ src: "/icon-192.png", sizes: "192x192", type: "image/png" }],
       },
       {
