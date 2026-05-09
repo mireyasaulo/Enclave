@@ -602,6 +602,13 @@ export function ChannelsPage() {
       return;
     }
 
+    // URL 是 section 的真理之源；如果 React state 还没追平 URL（effect 578 还没跑完），
+    // 不要拿旧 state 反向写 URL，否则会把刚发生的 tab 切换覆盖掉。
+    const urlSection = routeState.section ?? "recommended";
+    if (urlSection !== activeSection) {
+      return;
+    }
+
     const nextHash = buildDesktopChannelsRouteHash({
       postId: desktopSelectedPostId,
       authorId: syncedRouteSelectedAuthorId,
@@ -628,6 +635,7 @@ export function ChannelsPage() {
     isDesktopLayout,
     navigate,
     pathname,
+    routeState.section,
   ]);
 
   useEffect(() => {
@@ -830,6 +838,11 @@ export function ChannelsPage() {
     }
 
     if (isDesktopLayout) {
+      // 同步把 React state 切到新 section 并清掉旧 post 锚点，
+      // 否则后面同步 URL 的 effect 会读到旧 state，把刚发生的 tab 切换覆盖回去。
+      setActiveSection(section);
+      setDesktopSelectedPostId(null);
+      setDesktopReplyTarget(null);
       void navigate({
         to: "/tabs/channels",
         hash: buildDesktopChannelsRouteHash({
