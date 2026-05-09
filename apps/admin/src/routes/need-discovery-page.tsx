@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   NeedDiscoveryCandidateRecord,
   NeedDiscoveryConfig,
   NeedDiscoveryRunRecord,
@@ -52,61 +53,62 @@ type NeedDiscoveryJob =
   | "discover_need_characters_daily";
 
 const NEED_DISCOVERY_NOTICES: Record<NeedDiscoveryJob, string> = {
-  discover_need_characters_short_interval: "短周期需求发现已执行。",
-  discover_need_characters_daily: "每日需求发现已执行。",
+  discover_need_characters_short_interval: "短周期需求发现已执行。", // i18n-ignore-line
+  discover_need_characters_daily: "每日需求发现已执行。", // i18n-ignore-line
 };
 
 const WORKSPACE_TABS: Array<{ key: NeedDiscoveryView; label: string }> = [
-  { key: "overview", label: "总览" },
-  { key: "candidates", label: "候选处理" },
-  { key: "config", label: "规则配置" },
-  { key: "shake", label: "摇一摇" },
+  { key: "overview", label: msg`总览` },
+  { key: "candidates", label: msg`候选处理` },
+  { key: "config", label: msg`规则配置` },
+  { key: "shake", label: msg`摇一摇` },
 ];
 
 const CONFIG_TABS: Array<{ key: ConfigPanelKey; label: string }> = [
-  { key: "short", label: "短周期" },
-  { key: "daily", label: "每日" },
-  { key: "shared", label: "共享约束" },
+  { key: "short", label: msg`短周期` },
+  { key: "daily", label: msg`每日` },
+  { key: "shared", label: msg`共享约束` },
 ];
 
 const SHAKE_TABS: Array<{ key: ShakePanelKey; label: string }> = [
-  { key: "sessions", label: "Session" },
-  { key: "config", label: "配置" },
+  { key: "sessions", label: msg`Session` },
+  { key: "config", label: msg`配置` },
 ];
 
 const SHAKE_TRACE_TABS: Array<{ key: ShakeTraceTab; label: string }> = [
-  { key: "planning", label: "方向规划 Prompt" },
-  { key: "generation", label: "角色生成 Prompt" },
+  { key: "planning", label: msg`方向规划 Prompt` },
+  { key: "generation", label: msg`角色生成 Prompt` },
 ];
 
 const CANDIDATE_STATUS_OPTIONS: Array<{
   value: CandidateStatusFilter;
   label: string;
 }> = [
-  { value: "all", label: "全部" },
-  { value: "draft", label: "草稿" },
-  { value: "friend_request_pending", label: "待通过" },
-  { value: "accepted", label: "已接受" },
-  { value: "declined", label: "已拒绝" },
-  { value: "expired", label: "已过期" },
-  { value: "deleted", label: "已删除" },
-  { value: "generation_failed", label: "生成失败" },
+  { value: "all", label: msg`全部` },
+  { value: "draft", label: msg`草稿` },
+  { value: "friend_request_pending", label: msg`待通过` },
+  { value: "accepted", label: msg`已接受` },
+  { value: "declined", label: msg`已拒绝` },
+  { value: "expired", label: msg`已过期` },
+  { value: "deleted", label: msg`已删除` },
+  { value: "generation_failed", label: msg`生成失败` },
 ];
 
 const SHAKE_STATUS_OPTIONS: Array<{
   value: ShakeStatusFilter;
   label: string;
 }> = [
-  { value: "all", label: "全部" },
-  { value: "preview_ready", label: "待决定" },
-  { value: "kept", label: "已保留" },
-  { value: "dismissed", label: "已跳过" },
-  { value: "expired", label: "已过期" },
-  { value: "failed", label: "生成失败" },
-  { value: "generating", label: "生成中" },
+  { value: "all", label: msg`全部` },
+  { value: "preview_ready", label: msg`待决定` },
+  { value: "kept", label: msg`已保留` },
+  { value: "dismissed", label: msg`已跳过` },
+  { value: "expired", label: msg`已过期` },
+  { value: "failed", label: msg`生成失败` },
+  { value: "generating", label: msg`生成中` },
 ];
 
 export function NeedDiscoveryPage() {
+  const t = translateRuntimeMessage;
   const baseUrl = resolveAdminCoreApiBaseUrl();
   const queryClient = useQueryClient();
 
@@ -183,7 +185,7 @@ export function NeedDiscoveryPage() {
     if (!notice) {
       return;
     }
-    const timer = window.setTimeout(() => setNotice(""), 2600);
+    const timer = window.setTimeout(() => setNotice(""), 2600); // i18n-ignore-line: clear
     return () => window.clearTimeout(timer);
   }, [notice]);
 
@@ -200,7 +202,7 @@ export function NeedDiscoveryPage() {
     },
     onSuccess: async (config) => {
       setDraft(config);
-      setNotice("需求发现与摇一摇配置已保存。");
+      setNotice(t(msg`需求发现与摇一摇配置已保存。`));
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["admin-need-discovery", baseUrl],
@@ -446,11 +448,11 @@ export function NeedDiscoveryPage() {
     if (serverShakeConfig) {
       setShakeDraft(serverShakeConfig);
     }
-    setNotice("已恢复为服务端当前配置。");
+    setNotice(t(msg`已恢复为服务端当前配置。`));
   };
 
   if (overviewQuery.isLoading && !overviewQuery.data) {
-    return <LoadingBlock label="正在读取需求发现配置..." />;
+    return <LoadingBlock label={t(msg`正在读取需求发现配置...`)} />;
   }
 
   if (overviewQuery.isError && overviewQuery.error instanceof Error) {
@@ -462,15 +464,15 @@ export function NeedDiscoveryPage() {
   }
 
   if (!overviewQuery.data || !draft || !shakeDraft) {
-    return <LoadingBlock label="正在读取需求发现与摇一摇配置..." />;
+    return <LoadingBlock label={t(msg`正在读取需求发现与摇一摇配置...`)} />;
   }
 
   return (
     <div className="space-y-6">
       <AdminPageHero
-        eyebrow="需求发现"
-        title="角色缺口识别与自动加友"
-        description="把今日排查、候选处理、规则调整和摇一摇检查拆成独立工作模式。先切到当下要做的那一件事，再进入详情，不再在长页里来回找。"
+        eyebrow={t(msg`需求发现`)}
+        title={t(msg`角色缺口识别与自动加友`)}
+        description={t(msg`把今日排查、候选处理、规则调整和摇一摇检查拆成独立工作模式。先切到当下要做的那一件事，再进入详情，不再在长页里来回找。`)}
         metrics={metrics}
         actions={
           <>
@@ -482,7 +484,7 @@ export function NeedDiscoveryPage() {
               }
               disabled={runMutation.isPending}
             >
-              立即跑短周期
+              {t(msg`立即跑短周期`)}
             </Button>
             <Button
               variant="secondary"
@@ -492,7 +494,7 @@ export function NeedDiscoveryPage() {
               }
               disabled={runMutation.isPending}
             >
-              立即跑每日
+              {t(msg`立即跑每日`)}
             </Button>
           </>
         }
@@ -630,16 +632,17 @@ function WorkspaceToolbar({
   saveDisabled: boolean;
   resetDisabled: boolean;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <Card className="sticky top-24 z-20 bg-[linear-gradient(145deg,rgba(255,255,255,0.98),rgba(255,249,241,0.95),rgba(240,253,246,0.92))]">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-              当前优先动作
+              {t(msg`当前优先动作`)}
             </div>
             <StatusPill tone={hasUnsavedChanges ? "warning" : "healthy"}>
-              {hasUnsavedChanges ? "有未保存改动" : "可直接按线上状态排查"}
+              {hasUnsavedChanges ? t(msg`有未保存改动`) : t(msg`可直接按线上状态排查`)}
             </StatusPill>
           </div>
           <div className="mt-2 text-sm text-[color:var(--text-primary)]">
@@ -651,14 +654,14 @@ function WorkspaceToolbar({
           </div>
           <div className="mt-2 flex flex-wrap gap-2">
             {hasUnsavedNeedConfig ? (
-              <StatusPill tone="warning">自动补位规则待保存</StatusPill>
+              <StatusPill tone="warning">{t(msg`自动补位规则待保存`)}</StatusPill>
             ) : (
-              <StatusPill tone="healthy">自动补位规则已同步</StatusPill>
+              <StatusPill tone="healthy">{t(msg`自动补位规则已同步`)}</StatusPill>
             )}
             {hasUnsavedShakeConfig ? (
-              <StatusPill tone="warning">摇一摇规则待保存</StatusPill>
+              <StatusPill tone="warning">{t(msg`摇一摇规则待保存`)}</StatusPill>
             ) : (
-              <StatusPill tone="muted">摇一摇规则未改动</StatusPill>
+              <StatusPill tone="muted">{t(msg`摇一摇规则未改动`)}</StatusPill>
             )}
           </div>
         </div>
@@ -747,11 +750,12 @@ function OverviewWorkspace({
     status?: ShakeStatusFilter,
   ) => void;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <div className="space-y-6">
       <Card className="bg-[color:var(--surface-console)]">
         <AdminSectionHeader
-          title="今天先做什么"
+          title={t(msg`今天先做什么`)}
           actions={
             <StatusPill
               tone={
@@ -775,9 +779,9 @@ function OverviewWorkspace({
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          label="候选池"
+          label={t(msg`候选池`)}
           value={queueOccupancy}
-          detail="待处理候选过多会压住新补位。"
+          detail={t(msg`待处理候选过多会压住新补位。`)}
           meta={
             <StatusPill
               tone={
@@ -796,18 +800,18 @@ function OverviewWorkspace({
           }
         />
         <MetricCard
-          label="最新运行"
+          label={t(msg`最新运行`)}
           value={
             latestRun
               ? `${formatCadenceLabel(latestRun.cadenceType)} · ${labelForRun(
                   latestRun.status,
                 )}`
-              : "暂无"
+              : t(msg`暂无`)
           }
           detail={
             latestRun
               ? `${formatCompactDateTime(latestRun.startedAt)} · 信号 ${latestRun.signalCount} 条`
-              : "等待首次调度。"
+              : t(msg`等待首次调度。`)
           }
           meta={
             latestRun ? (
@@ -818,12 +822,12 @@ function OverviewWorkspace({
           }
         />
         <MetricCard
-          label="24h 将过期"
+          label={t(msg`24h 将过期`)}
           value={expiringSoonCount}
-          detail="优先清掉将过期且仍待通过的候选。"
+          detail={t(msg`优先清掉将过期且仍待通过的候选。`)}
         />
         <MetricCard
-          label="摇一摇待决定"
+          label={t(msg`摇一摇待决定`)}
           value={shakeStatusCounts.preview_ready}
           detail={`已保留 ${shakeStatusCounts.kept} · 最近 ${shakeSessions.length}`}
         />
@@ -851,6 +855,7 @@ function OverviewWorkspace({
 }
 
 function OverviewActionCard({ action }: { action: TodayAction }) {
+  const t = translateRuntimeMessage;
   return (
     <div
       className={[
@@ -876,10 +881,10 @@ function OverviewActionCard({ action }: { action: TodayAction }) {
           }
         >
           {action.tone === "warning"
-            ? "优先"
+            ? t(msg`优先`)
             : action.tone === "success"
-              ? "稳定"
-              : "查看"}
+              ? t(msg`稳定`)
+              : t(msg`查看`)}
         </StatusPill>
       </div>
       <div className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
@@ -910,6 +915,7 @@ function CadenceOverviewCard({
   onOpenRunWorkspace: (cadence?: RunCadenceFilter) => void;
   onOpenConfigWorkspace: (panel?: ConfigPanelKey) => void;
 }) {
+  const t = translateRuntimeMessage;
   const shortLatest =
     latestRun?.cadenceType === "short_interval" ? latestRun : null;
   const dailyLatest = latestRun?.cadenceType === "daily" ? latestRun : null;
@@ -917,45 +923,45 @@ function CadenceOverviewCard({
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
-        title="自动补位概览"
+        title={t(msg`自动补位概览`)}
         actions={
           <StatusPill tone={enabledCadenceCount === 0 ? "warning" : "healthy"}>
-            {enabledCadenceCount}/2 节奏开启
+            {`${enabledCadenceCount}/2 ${t(msg`节奏开启`)}`}
           </StatusPill>
         }
       />
       <div className="mt-4 grid gap-4 xl:grid-cols-3">
         <SummaryButtonCard
-          title="短周期补位"
+          title={t(msg`短周期补位`)}
           detail={`${
             draft.shortInterval.enabled ? "启用中" : "已停用"
           } · ${formatExecutionMode(draft.shortInterval.executionMode)}`}
           meta={`每 ${draft.shortInterval.intervalMinutes} 分钟 · 回看 ${draft.shortInterval.lookbackHours} 小时`}
-          actionLabel="查看短周期规则"
+          actionLabel={t(msg`查看短周期规则`)}
           onClick={() => onOpenConfigWorkspace("short")}
           tone={draft.shortInterval.enabled ? "healthy" : "warning"}
         />
         <SummaryButtonCard
-          title="每日补位"
+          title={t(msg`每日补位`)}
           detail={`${
             draft.daily.enabled ? "启用中" : "已停用"
           } · ${formatExecutionMode(draft.daily.executionMode)}`}
           meta={`每天 ${padNumber(draft.daily.runAtHour)}:${padNumber(
             draft.daily.runAtMinute,
           )} · 回看 ${draft.daily.lookbackDays} 天`}
-          actionLabel="查看每日规则"
+          actionLabel={t(msg`查看每日规则`)}
           onClick={() => onOpenConfigWorkspace("daily")}
           tone={draft.daily.enabled ? "healthy" : "warning"}
         />
         <SummaryButtonCard
-          title="共享约束"
+          title={t(msg`共享约束`)}
           detail={`队列 ${draft.shared.pendingCandidateLimit} · 每日创建 ${draft.shared.dailyCreationLimit}`}
           meta={`抑制期 ${draft.shared.shortSuppressionDays}/${draft.shared.dailySuppressionDays} 天 · 风险域 ${formatRiskDomains(
             draft.shared.allowMedical,
             draft.shared.allowLegal,
             draft.shared.allowFinance,
           )}`}
-          actionLabel="查看共享约束"
+          actionLabel={t(msg`查看共享约束`)}
           onClick={() => onOpenConfigWorkspace("shared")}
           tone="muted"
         />
@@ -972,13 +978,13 @@ function CadenceOverviewCard({
               最近短周期运行
             </div>
             <StatusPill tone={toneForRun(shortLatest?.status ?? "skipped")}>
-              {shortLatest ? labelForRun(shortLatest.status) : "暂无"}
+              {shortLatest ? labelForRun(shortLatest.status) : t(msg`暂无`)}
             </StatusPill>
           </div>
           <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
             {shortLatest
               ? `${formatCompactDateTime(shortLatest.startedAt)} · 信号 ${shortLatest.signalCount} 条`
-              : "还没有短周期 recent run。"}
+              : t(msg`还没有短周期 recent run。`)}
           </div>
         </button>
         <button
@@ -991,13 +997,13 @@ function CadenceOverviewCard({
               最近每日运行
             </div>
             <StatusPill tone={toneForRun(dailyLatest?.status ?? "skipped")}>
-              {dailyLatest ? labelForRun(dailyLatest.status) : "暂无"}
+              {dailyLatest ? labelForRun(dailyLatest.status) : t(msg`暂无`)}
             </StatusPill>
           </div>
           <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
             {dailyLatest
               ? `${formatCompactDateTime(dailyLatest.startedAt)} · 信号 ${dailyLatest.signalCount} 条`
-              : "还没有每日 recent run。"}
+              : t(msg`还没有每日 recent run。`)}
           </div>
         </button>
       </div>
@@ -1023,15 +1029,16 @@ function HealthOverviewCard({
     status?: ShakeStatusFilter,
   ) => void;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <Card className="bg-[color:var(--surface-console)]">
-      <AdminSectionHeader title="当前处理压力" />
+      <AdminSectionHeader title={t(msg`当前处理压力`)} />
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         <SummaryButtonCard
-          title="待通过候选"
+          title={t(msg`待通过候选`)}
           detail={`${candidateStatusCounts.friend_request_pending} 条`}
-          meta="通常应优先处理，避免长期积压。"
-          actionLabel="打开候选队列"
+          meta={t(msg`通常应优先处理，避免长期积压。`)}
+          actionLabel={t(msg`打开候选队列`)}
           onClick={() => onOpenCandidateQueue("friend_request_pending")}
           tone={
             candidateStatusCounts.friend_request_pending > 0
@@ -1040,49 +1047,49 @@ function HealthOverviewCard({
           }
         />
         <SummaryButtonCard
-          title="草稿候选"
+          title={t(msg`草稿候选`)}
           detail={`${candidateStatusCounts.draft} 条`}
-          meta="适合排查 need 识别质量和草稿阈值。"
-          actionLabel="查看草稿"
+          meta={t(msg`适合排查 need 识别质量和草稿阈值。`)}
+          actionLabel={t(msg`查看草稿`)}
           onClick={() => onOpenCandidateQueue("draft")}
           tone={candidateStatusCounts.draft > 0 ? "info" : "muted"}
         />
         <SummaryButtonCard
-          title="生成失败"
+          title={t(msg`生成失败`)}
           detail={`${candidateStatusCounts.generation_failed} 条`}
-          meta="优先确认是 Prompt、输入信号还是生成链路异常。"
-          actionLabel="查看失败候选"
+          meta={t(msg`优先确认是 Prompt、输入信号还是生成链路异常。`)}
+          actionLabel={t(msg`查看失败候选`)}
           onClick={() => onOpenCandidateQueue("generation_failed")}
           tone={
             candidateStatusCounts.generation_failed > 0 ? "warning" : "muted"
           }
         />
         <SummaryButtonCard
-          title="摇一摇待决定"
+          title={t(msg`摇一摇待决定`)}
           detail={`${shakeStatusCounts.preview_ready} 条`}
           meta={`已保留 ${shakeStatusCounts.kept} · 已过期 ${shakeStatusCounts.expired}`}
-          actionLabel="查看 session"
+          actionLabel={t(msg`查看 session`)}
           onClick={() => onOpenShakeWorkspace("sessions", "preview_ready")}
           tone={shakeStatusCounts.preview_ready > 0 ? "info" : "muted"}
         />
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <AdminMiniPanel title="当前候选池">
+        <AdminMiniPanel title={t(msg`当前候选池`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
-            当前候选 {activeCandidates.length} 条
+            {t(msg`当前候选`)} {activeCandidates.length} {t(msg`条`)}
           </div>
           <div className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
-            最近候选 {recentCandidates.length} 条
+            {t(msg`最近候选`)} {recentCandidates.length} {t(msg`条`)}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="历史结果">
+        <AdminMiniPanel title={t(msg`历史结果`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
-            已接受 {candidateStatusCounts.accepted} · 已拒绝{" "}
+            {t(msg`已接受`)} {candidateStatusCounts.accepted} · {t(msg`已拒绝`)}{" "}
             {candidateStatusCounts.declined}
           </div>
           <div className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
-            已过期 {candidateStatusCounts.expired} · 已删除{" "}
+            {t(msg`已过期`)} {candidateStatusCounts.expired} · {t(msg`已删除`)}{" "}
             {candidateStatusCounts.deleted}
           </div>
         </AdminMiniPanel>
@@ -1106,6 +1113,7 @@ function SummaryButtonCard({
   onClick: () => void;
   tone: "warning" | "healthy" | "info" | "muted";
 }) {
+  const t = translateRuntimeMessage;
   return (
     <div className="rounded-[20px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] p-4 shadow-[var(--shadow-soft)]">
       <div className="flex items-center justify-between gap-3">
@@ -1122,12 +1130,12 @@ function SummaryButtonCard({
           }
         >
           {tone === "warning"
-            ? "需关注"
+            ? t(msg`需关注`)
             : tone === "healthy"
-              ? "正常"
+              ? t(msg`正常`)
               : tone === "info"
-                ? "查看"
-                : "概览"}
+                ? t(msg`查看`)
+                : t(msg`概览`)}
         </StatusPill>
       </div>
       <div className="mt-2 text-sm text-[color:var(--text-primary)]">
@@ -1188,10 +1196,12 @@ function CandidatesWorkspace({
   onSelectRun: (id: string) => void;
   expiringSoonCount: number;
 }) {
+  const t = translateRuntimeMessage;
+  const t = translateRuntimeMessage;
   return (
     <div className="space-y-6">
       <AdminCallout
-        title="候选处理工作区"
+        title={t(msg`候选处理工作区`)}
         tone="info"
         description="左侧只看候选列表和筛选，右侧只看当前选中候选的完整信息；运行记录收在下方单独处理，避免在一大堆卡片里来回扫。"
       />
@@ -1262,54 +1272,54 @@ function CandidateQueueCard({
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
-        title="候选队列"
+        title={t(msg`候选队列`)}
         actions={
           <StatusPill tone={filteredCandidates.length ? "healthy" : "muted"}>
-            筛后 {filteredCandidates.length} 条
+            {t(msg`筛后`)} {filteredCandidates.length} {t(msg`条`)}
           </StatusPill>
         }
       />
 
       <div className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-1">
-        <AdminMiniPanel title="当前数据源">
+        <AdminMiniPanel title={t(msg`当前数据源`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
-            {dataset === "active" ? "当前候选" : "最近候选"}
+            {dataset === "active" ? t(msg`当前候选`) : t(msg`最近候选`)}
           </div>
           <div className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
-            共 {sourceCount} 条
+            {t(msg`共`)} {sourceCount} {t(msg`条`)}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="待处理压力">
+        <AdminMiniPanel title={t(msg`待处理压力`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
-            待通过 {candidateStatusCounts.friend_request_pending}
+            {t(msg`待通过`)} {candidateStatusCounts.friend_request_pending}
           </div>
           <div className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
-            草稿 {candidateStatusCounts.draft} · 失败{" "}
+            {t(msg`草稿`)} {candidateStatusCounts.draft} · {t(msg`失败`)}{" "}
             {candidateStatusCounts.generation_failed}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="时效提醒">
+        <AdminMiniPanel title={t(msg`时效提醒`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
-            24h 将过期 {expiringSoonCount}
+            24h {t(msg`将过期`)} {expiringSoonCount}
           </div>
           <div className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
-            需要尽快处理待通过候选。
+            {t(msg`需要尽快处理待通过候选。`)}
           </div>
         </AdminMiniPanel>
       </div>
 
       <div className="mt-4 space-y-4">
         <SelectionBar
-          label="候选范围"
+          label={t(msg`候选范围`)}
           options={[
-            { key: "active", label: "当前候选" },
-            { key: "recent", label: "最近候选" },
+            { key: "active", label: t(msg`当前候选`) },
+            { key: "recent", label: t(msg`最近候选`) },
           ]}
           activeKey={dataset}
           onChange={(key) => onDatasetChange(key as CandidateDatasetKey)}
         />
         <SelectionBar
-          label="状态筛选"
+          label={t(msg`状态筛选`)}
           options={CANDIDATE_STATUS_OPTIONS.map((option) => ({
             key: option.value,
             label:
@@ -1321,7 +1331,7 @@ function CandidateQueueCard({
           onChange={(key) => onStatusFilterChange(key as CandidateStatusFilter)}
         />
         <SelectionBar
-          label="来源 cadence"
+          label={t(msg`来源 cadence`)}
           options={[
             { key: "all", label: `全部 ${sourceCount}` },
             {
@@ -1343,8 +1353,8 @@ function CandidateQueueCard({
       <div className="mt-5 space-y-2">
         {filteredCandidates.length === 0 ? (
           <AdminEmptyState
-            title="当前筛选下没有候选"
-            description="可以切换状态或范围，也可以先手动执行一次短周期 / 每日调度。"
+            title={t(msg`当前筛选下没有候选`)}
+            description={t(msg`可以切换状态或范围，也可以先手动执行一次短周期 / 每日调度。`)}
           />
         ) : (
           filteredCandidates.map((candidate) => (
@@ -1370,6 +1380,9 @@ function CandidateListItem({
   selected: boolean;
   onClick: () => void;
 }) {
+  const t = translateRuntimeMessage;
+  const t = translateRuntimeMessage;
+  const t = translateRuntimeMessage;
   return (
     <button
       type="button"
@@ -1396,7 +1409,7 @@ function CandidateListItem({
       </div>
 
       <div className="mt-3 line-clamp-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-        {candidate.coverageGapSummary || "暂无缺口摘要。"}
+        {candidate.coverageGapSummary || t(msg`暂无缺口摘要。`)}
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[color:var(--text-muted)]">
@@ -1420,14 +1433,15 @@ function CandidateInspectorCard({
   relatedRun: NeedDiscoveryRunRecord | null;
   onOpenRelatedRun: (runId: string) => void;
 }) {
+  const t = translateRuntimeMessage;
   if (!candidate) {
     return (
       <Card className="bg-[color:var(--surface-console)]">
-        <AdminSectionHeader title="候选详情" />
+        <AdminSectionHeader title={t(msg`候选详情`)} />
         <div className="mt-4">
           <AdminEmptyState
-            title="先从左侧选一个候选"
-            description="候选详情会显示完整缺口摘要、证据、好友申请开场以及对应运行。"
+            title={t(msg`先从左侧选一个候选`)}
+            description={t(msg`候选详情会显示完整缺口摘要、证据、好友申请开场以及对应运行。`)}
           />
         </div>
       </Card>
@@ -1437,7 +1451,7 @@ function CandidateInspectorCard({
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
-        title="候选详情"
+        title={t(msg`候选详情`)}
         actions={
           <div className="flex flex-wrap gap-2">
             <StatusPill tone={toneForCandidate(candidate.status)}>
@@ -1465,28 +1479,28 @@ function CandidateInspectorCard({
             size="sm"
             onClick={() => onOpenRelatedRun(relatedRun.id)}
           >
-            查看对应运行
+            {t(msg`查看对应运行`)}
           </Button>
         ) : null}
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-4">
-        <AdminMiniPanel title="Need 分类">
+        <AdminMiniPanel title={t(msg`Need 分类`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {candidate.needCategory}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="优先级">
+        <AdminMiniPanel title={t(msg`优先级`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {candidate.priorityScore.toFixed(2)}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="置信度">
+        <AdminMiniPanel title={t(msg`置信度`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {candidate.confidenceScore.toFixed(2)}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="时效">
+        <AdminMiniPanel title={t(msg`时效`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {buildCandidateTimingLabel(candidate)}
           </div>
@@ -1494,7 +1508,7 @@ function CandidateInspectorCard({
       </div>
 
       <AdminCallout
-        title="缺口摘要"
+        title={t(msg`缺口摘要`)}
         tone={
           candidate.status === "generation_failed" ||
           candidate.status === "declined" ||
@@ -1505,11 +1519,11 @@ function CandidateInspectorCard({
               : "muted"
         }
         className="mt-4"
-        description={candidate.coverageGapSummary || "暂无缺口摘要。"}
+        description={candidate.coverageGapSummary || t(msg`暂无缺口摘要。`)}
       />
 
       {candidate.evidenceHighlights.length ? (
-        <AdminSubpanel title="证据高亮" className="mt-4 bg-white/85">
+        <AdminSubpanel title={t(msg`证据高亮`)} className="mt-4 bg-white/85">
           <div className="flex flex-wrap gap-2">
             {candidate.evidenceHighlights.map((item, index) => (
               <span
@@ -1525,7 +1539,7 @@ function CandidateInspectorCard({
 
       {candidate.friendRequestGreeting ? (
         <AdminSubpanel
-          title="好友申请开场"
+          title={t(msg`好友申请开场`)}
           className="mt-4 bg-white/85"
           contentClassName="mt-3 text-sm leading-7 text-[color:var(--text-secondary)]"
         >
@@ -1575,24 +1589,25 @@ function RunsInspectorCard({
   selectedRunId: string | null;
   onSelectRun: (id: string) => void;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
-        title="运行详情"
+        title={t(msg`运行详情`)}
         actions={
           <StatusPill tone={runs.length ? "healthy" : "muted"}>
-            {runs.length} 条
+            {runs.length} {t(msg`条`)}
           </StatusPill>
         }
       />
 
       <div className="mt-4">
         <SelectionBar
-          label="运行筛选"
+          label={t(msg`运行筛选`)}
           options={[
-            { key: "all", label: "全部" },
-            { key: "short_interval", label: "短周期" },
-            { key: "daily", label: "每日" },
+            { key: "all", label: t(msg`全部`) },
+            { key: "short_interval", label: t(msg`短周期`) },
+            { key: "daily", label: msg`每日` },
           ]}
           activeKey={cadenceFilter}
           onChange={(key) => onCadenceFilterChange(key as RunCadenceFilter)}
@@ -1602,8 +1617,8 @@ function RunsInspectorCard({
       {runs.length === 0 ? (
         <div className="mt-4">
           <AdminEmptyState
-            title="当前筛选下没有运行记录"
-            description="可以切换 cadence，或者先执行一次短周期 / 每日调度。"
+            title={t(msg`当前筛选下没有运行记录`)}
+            description={t(msg`可以切换 cadence，或者先执行一次短周期 / 每日调度。`)}
           />
         </div>
       ) : (
@@ -1623,8 +1638,8 @@ function RunsInspectorCard({
             <RunDetailCard run={selectedRun} />
           ) : (
             <AdminEmptyState
-              title="还没有选中运行"
-              description="从左侧选择一条运行记录后，这里会展示完整摘要和窗口信息。"
+              title={t(msg`还没有选中运行`)}
+              description={t(msg`从左侧选择一条运行记录后，这里会展示完整摘要和窗口信息。`)}
             />
           )}
         </div>
@@ -1665,13 +1680,14 @@ function RunListItem({
         {formatCompactDateTime(run.startedAt)}
       </div>
       <div className="mt-2 line-clamp-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-        {run.summary || run.skipReason || run.errorMessage || "暂无摘要"}
+        {run.summary || run.skipReason || run.errorMessage || t(msg`暂无摘要`)}
       </div>
     </button>
   );
 }
 
 function RunDetailCard({ run }: { run: NeedDiscoveryRunRecord }) {
+  const t = translateRuntimeMessage;
   return (
     <div className="rounded-[24px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] p-4 shadow-[var(--shadow-soft)]">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
@@ -1691,17 +1707,17 @@ function RunDetailCard({ run }: { run: NeedDiscoveryRunRecord }) {
       </div>
 
       <div className="mt-4 grid gap-3 md:grid-cols-3">
-        <AdminMiniPanel title="信号数">
+        <AdminMiniPanel title={t(msg`信号数`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
-            {run.signalCount} 条
+            {run.signalCount} {t(msg`条`)}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="信号窗口">
+        <AdminMiniPanel title={t(msg`信号窗口`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {formatRunWindow(run)}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="最近信号">
+        <AdminMiniPanel title={t(msg`最近信号`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {formatCompactDateTime(run.latestSignalAt)}
           </div>
@@ -1709,15 +1725,15 @@ function RunDetailCard({ run }: { run: NeedDiscoveryRunRecord }) {
       </div>
 
       <AdminCallout
-        title="运行摘要"
+        title={t(msg`运行摘要`)}
         tone={run.status === "failed" ? "warning" : "muted"}
         className="mt-4"
         description={
-          run.summary || run.skipReason || run.errorMessage || "暂无摘要"
+          run.summary || run.skipReason || run.errorMessage || t(msg`暂无摘要`)
         }
       />
 
-      <AdminSubpanel title="命中 need key" className="mt-4 bg-white/85">
+      <AdminSubpanel title={t(msg`命中 need key`)} className="mt-4 bg-white/85">
         {run.selectedNeedKeys.length ? (
           <div className="flex flex-wrap gap-2">
             {run.selectedNeedKeys.map((item) => (
@@ -1731,7 +1747,7 @@ function RunDetailCard({ run }: { run: NeedDiscoveryRunRecord }) {
           </div>
         ) : (
           <div className="text-sm text-[color:var(--text-secondary)]">
-            没有选中 need key。
+            {t(msg`没有选中 need key。`)}
           </div>
         )}
       </AdminSubpanel>
@@ -1760,18 +1776,19 @@ function ConfigWorkspace({
   hasUnsavedNeedConfig: boolean;
   hasUnsavedShakeConfig: boolean;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <div className="space-y-6">
       <Card className="bg-[color:var(--surface-console)]">
         <AdminSectionHeader
-          title="规则配置工作区"
+          title={t(msg`规则配置工作区`)}
           actions={
             <div className="flex flex-wrap gap-2">
               <StatusPill tone={hasUnsavedNeedConfig ? "warning" : "healthy"}>
-                自动补位 {hasUnsavedNeedConfig ? "待保存" : "已同步"}
+                自动补位 {hasUnsavedNeedConfig ? t(msg`待保存`) : t(msg`已同步`)}
               </StatusPill>
               <StatusPill tone={hasUnsavedShakeConfig ? "warning" : "muted"}>
-                摇一摇 {hasUnsavedShakeConfig ? "待保存" : "未改动"}
+                摇一摇 {hasUnsavedShakeConfig ? t(msg`待保存`) : t(msg`未改动`)}
               </StatusPill>
             </div>
           }
@@ -1790,8 +1807,8 @@ function ConfigWorkspace({
 
       {panel === "short" ? (
         <CadenceCard
-          title="短周期策略"
-          description="更看重最近一段时间的压力、症状、即时求助信号。"
+          title={t(msg`短周期策略`)}
+          description={t(msg`更看重最近一段时间的压力、症状、即时求助信号。`)}
           cadenceType="short"
           config={draft}
           onChange={onChange}
@@ -1800,8 +1817,8 @@ function ConfigWorkspace({
 
       {panel === "daily" ? (
         <CadenceCard
-          title="每日策略"
-          description="更看重反复出现的主题、长期缺口和稳定角色位。"
+          title={t(msg`每日策略`)}
+          description={t(msg`更看重反复出现的主题、长期缺口和稳定角色位。`)}
           cadenceType="daily"
           config={draft}
           onChange={onChange}
@@ -1846,16 +1863,18 @@ function ShakeWorkspace({
   onConfigChange: (next: ShakeDiscoveryConfig) => void;
   statusCounts: Record<ShakeDiscoverySessionRecord["status"], number>;
 }) {
+  const t = translateRuntimeMessage;
+  const t = translateRuntimeMessage;
   return (
     <div className="space-y-6">
       <Card className="bg-[color:var(--surface-console)]">
         <AdminSectionHeader
-          title="摇一摇工作区"
+          title={t(msg`摇一摇工作区`)}
           actions={
             <StatusPill
               tone={statusCounts.preview_ready > 0 ? "warning" : "healthy"}
             >
-              待决定 {statusCounts.preview_ready}
+              {t(msg`待决定`)} {statusCounts.preview_ready}
             </StatusPill>
           }
         />
@@ -1917,21 +1936,21 @@ function ShakeSessionQueueCard({
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
-        title="Session 列表"
+        title={t(msg`Session 列表`)}
         actions={
           <StatusPill tone={sessions.length ? "healthy" : "muted"}>
-            {sessions.length} 条
+            {sessions.length} {t(msg`条`)}
           </StatusPill>
         }
       />
 
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-1">
-        <AdminMiniPanel title="待决定">
+        <AdminMiniPanel title={t(msg`待决定`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
-            {statusCounts.preview_ready} 条
+            {statusCounts.preview_ready} {t(msg`条`)}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="已保留 / 已过期">
+        <AdminMiniPanel title={t(msg`已保留 / 已过期`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {statusCounts.kept} / {statusCounts.expired}
           </div>
@@ -1940,7 +1959,7 @@ function ShakeSessionQueueCard({
 
       <div className="mt-4">
         <SelectionBar
-          label="状态筛选"
+          label={t(msg`状态筛选`)}
           options={SHAKE_STATUS_OPTIONS.map((option) => ({
             key: option.value,
             label:
@@ -1956,8 +1975,8 @@ function ShakeSessionQueueCard({
       <div className="mt-5 space-y-2">
         {sessions.length === 0 ? (
           <AdminEmptyState
-            title="当前筛选下没有 session"
-            description="可以切换状态，或者等待新的摇一摇记录产生后再抽查。"
+            title={t(msg`当前筛选下没有 session`)}
+            description={t(msg`可以切换状态，或者等待新的摇一摇记录产生后再抽查。`)}
           />
         ) : (
           sessions.map((session) => (
@@ -2008,7 +2027,7 @@ function ShakeSessionListItem({
         </StatusPill>
       </div>
       <div className="mt-3 line-clamp-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-        {session.matchReason || session.failureReason || "暂无说明。"}
+        {session.matchReason || session.failureReason || t(msg`暂无说明。`)}
       </div>
       <div className="mt-3 text-xs text-[color:var(--text-muted)]">
         {formatCompactDateTime(session.createdAt)}
@@ -2026,14 +2045,15 @@ function ShakeSessionInspectorCard({
   traceTab: ShakeTraceTab;
   onTraceTabChange: (tab: ShakeTraceTab) => void;
 }) {
+  const t = translateRuntimeMessage;
   if (!session) {
     return (
       <Card className="bg-[color:var(--surface-console)]">
-        <AdminSectionHeader title="Session 详情" />
+        <AdminSectionHeader title={t(msg`Session 详情`)} />
         <div className="mt-4">
           <AdminEmptyState
-            title="先从左侧选一个 session"
-            description="这里会展示匹配理由、问候语、方向信息以及规划 / 生成 Prompt。"
+            title={t(msg`先从左侧选一个 session`)}
+            description={t(msg`这里会展示匹配理由、问候语、方向信息以及规划 / 生成 Prompt。`)}
           />
         </div>
       </Card>
@@ -2043,7 +2063,7 @@ function ShakeSessionInspectorCard({
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
-        title="Session 详情"
+        title={t(msg`Session 详情`)}
         actions={
           <StatusPill tone={toneForShakeStatus(session.status)}>
             {labelForShakeStatus(session.status)}
@@ -2052,22 +2072,22 @@ function ShakeSessionInspectorCard({
       />
 
       <div className="mt-4 grid gap-3 md:grid-cols-4">
-        <AdminMiniPanel title="角色">
+        <AdminMiniPanel title={t(msg`角色`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {session.character.name}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="关系">
+        <AdminMiniPanel title={t(msg`关系`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {session.character.relationship}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="创建时间">
+        <AdminMiniPanel title={t(msg`创建时间`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {formatCompactDateTime(session.createdAt)}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="有效期">
+        <AdminMiniPanel title={t(msg`有效期`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {session.expiresAt
               ? formatCompactDateTime(session.expiresAt)
@@ -2087,18 +2107,18 @@ function ShakeSessionInspectorCard({
         }
         className="mt-4"
         description={
-          session.matchReason || session.failureReason || "暂无说明。"
+          session.matchReason || session.failureReason || t(msg`暂无说明。`)
         }
       />
 
       <div className="mt-4 grid gap-4 xl:grid-cols-2">
-        <AdminSubpanel title="问候语" className="bg-white/85">
+        <AdminSubpanel title={t(msg`问候语`)} className="bg-white/85">
           <div className="text-sm leading-7 text-[color:var(--text-secondary)]">
-            {session.greeting || "暂无"}
+            {session.greeting || t(msg`暂无`)}
           </div>
         </AdminSubpanel>
 
-        <AdminSubpanel title="方向摘要" className="bg-white/85">
+        <AdminSubpanel title={t(msg`方向摘要`)} className="bg-white/85">
           {session.selectedDirection ? (
             <div className="space-y-3">
               <div className="text-sm font-medium text-[color:var(--text-primary)]">
@@ -2149,7 +2169,7 @@ function ShakeSessionInspectorCard({
             </div>
           ) : (
             <div className="text-sm text-[color:var(--text-secondary)]">
-              当前没有选中方向信息。
+              {t(msg`当前没有选中方向信息。`)}
             </div>
           )}
         </AdminSubpanel>
@@ -2163,15 +2183,15 @@ function ShakeSessionInspectorCard({
         />
         <AdminSubpanel
           title={
-            traceTab === "planning" ? "方向规划 Prompt" : "角色生成 Prompt"
+            traceTab === "planning" ? t(msg`方向规划 Prompt`) : t(msg`角色生成 Prompt`)
           }
           className="mt-4 bg-white/85"
         >
           <AdminCodeBlock
             value={
               traceTab === "planning"
-                ? session.planningPrompt || "暂无"
-                : session.generationPrompt || "暂无"
+                ? session.planningPrompt || t(msg`暂无`)
+                : session.generationPrompt || t(msg`暂无`)
             }
             className="border-0 bg-transparent p-0"
           />
@@ -2192,6 +2212,7 @@ function SelectionBar({
   activeKey: string;
   onChange: (key: string) => void;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <div>
       <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
@@ -2225,13 +2246,14 @@ function ShakeConfigCard({
   config: ShakeDiscoveryConfig;
   onChange: (next: ShakeDiscoveryConfig) => void;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
-        title="摇一摇即时生成"
+        title={t(msg`摇一摇即时生成`)}
         actions={
           <StatusPill tone={config.enabled ? "healthy" : "warning"}>
-            {config.enabled ? "启用中" : "已停用"}
+            {config.enabled ? t(msg`启用中`) : t(msg`已停用`)}
           </StatusPill>
         }
       />
@@ -2241,18 +2263,18 @@ function ShakeConfigCard({
       </p>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <AdminMiniPanel title="时效与频控">
+        <AdminMiniPanel title={t(msg`时效与频控`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
-            冷却 {config.cooldownMinutes} 分钟
+            {t(msg`冷却`)} {config.cooldownMinutes} {t(msg`分钟`)}
           </div>
           <div className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
             单次有效 {config.sessionExpiryMinutes} 分钟 · 每日上限{" "}
             {config.maxSessionsPerDay}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="方向采样">
+        <AdminMiniPanel title={t(msg`方向采样`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
-            方向 {config.candidateDirectionCount} 个
+            {t(msg`方向`)} {config.candidateDirectionCount} {t(msg`个`)}
           </div>
           <div className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
             回看 {config.evidenceWindowHours} 小时 · 证据最多{" "}
@@ -2263,13 +2285,13 @@ function ShakeConfigCard({
 
       <div className="mt-5 space-y-4">
         <ConfigBlock
-          title="开关与时效"
-          description="控制是否允许即时相遇，以及 session 的冷却和过期策略。"
+          title={t(msg`开关与时效`)}
+          description={t(msg`控制是否允许即时相遇，以及 session 的冷却和过期策略。`)}
         >
           <div className="grid gap-4 md:grid-cols-2">
             <ConfigCheckbox
-              label="启用摇一摇生成"
-              hint="关闭后用户仍可进入入口，但不会生成新候选。"
+              label={t(msg`启用摇一摇生成`)}
+              hint={t(msg`关闭后用户仍可进入入口，但不会生成新候选。`)}
               checked={config.enabled}
               onChange={(checked) =>
                 onChange({
@@ -2279,8 +2301,8 @@ function ShakeConfigCard({
               }
             />
             <ConfigCheckbox
-              label="要求已有赛博分身信号"
-              hint="开启后，只有画像足够完整时才允许生成临时候选。"
+              label={t(msg`要求已有赛博分身信号`)}
+              hint={t(msg`开启后，只有画像足够完整时才允许生成临时候选。`)}
               checked={config.requireCyberAvatarSignals}
               onChange={(checked) =>
                 onChange({
@@ -2290,8 +2312,8 @@ function ShakeConfigCard({
               }
             />
             <ConfigNumber
-              label="冷却分钟"
-              hint="限制连续摇一摇频率，避免临时候选抖动过大。"
+              label={t(msg`冷却分钟`)}
+              hint={t(msg`限制连续摇一摇频率，避免临时候选抖动过大。`)}
               value={config.cooldownMinutes}
               onChange={(value) =>
                 onChange({
@@ -2301,8 +2323,8 @@ function ShakeConfigCard({
               }
             />
             <ConfigNumber
-              label="会话有效期（分钟）"
-              hint="超过这个时间，待决定的临时候选会自动过期。"
+              label={t(msg`会话有效期（分钟）`)}
+              hint={t(msg`超过这个时间，待决定的临时候选会自动过期。`)}
               value={config.sessionExpiryMinutes}
               onChange={(value) =>
                 onChange({
@@ -2312,8 +2334,8 @@ function ShakeConfigCard({
               }
             />
             <ConfigNumber
-              label="每日最多摇一摇"
-              hint="控制单日即时相遇曝光量。"
+              label={t(msg`每日最多摇一摇`)}
+              hint={t(msg`控制单日即时相遇曝光量。`)}
               value={config.maxSessionsPerDay}
               onChange={(value) =>
                 onChange({
@@ -2326,13 +2348,13 @@ function ShakeConfigCard({
         </ConfigBlock>
 
         <ConfigBlock
-          title="方向采样与权重"
-          description="控制一次摇一摇从多少证据里取样，以及生成方向的新鲜感和惊喜程度。"
+          title={t(msg`方向采样与权重`)}
+          description={t(msg`控制一次摇一摇从多少证据里取样，以及生成方向的新鲜感和惊喜程度。`)}
         >
           <div className="grid gap-4 md:grid-cols-2">
             <ConfigNumber
-              label="回看小时"
-              hint="越长越稳定，越短越贴近当下状态。"
+              label={t(msg`回看小时`)}
+              hint={t(msg`越长越稳定，越短越贴近当下状态。`)}
               value={config.evidenceWindowHours}
               onChange={(value) =>
                 onChange({
@@ -2342,8 +2364,8 @@ function ShakeConfigCard({
               }
             />
             <ConfigNumber
-              label="最多证据条数"
-              hint="限制一次规划时注入多少上游信号。"
+              label={t(msg`最多证据条数`)}
+              hint={t(msg`限制一次规划时注入多少上游信号。`)}
               value={config.maxEvidenceItems}
               onChange={(value) =>
                 onChange({
@@ -2353,8 +2375,8 @@ function ShakeConfigCard({
               }
             />
             <ConfigNumber
-              label="候选方向数"
-              hint="方向数越多，运营可观察到的相遇分布越丰富。"
+              label={t(msg`候选方向数`)}
+              hint={t(msg`方向数越多，运营可观察到的相遇分布越丰富。`)}
               value={config.candidateDirectionCount}
               onChange={(value) =>
                 onChange({
@@ -2364,8 +2386,8 @@ function ShakeConfigCard({
               }
             />
             <ConfigNumber
-              label="新鲜感权重"
-              hint="提高后更容易避开重复方向。"
+              label={t(msg`新鲜感权重`)}
+              hint={t(msg`提高后更容易避开重复方向。`)}
               step={0.05}
               value={config.noveltyWeight}
               onChange={(value) =>
@@ -2376,8 +2398,8 @@ function ShakeConfigCard({
               }
             />
             <ConfigNumber
-              label="惊喜系数"
-              hint="提高后会更愿意抽取非最稳妥但仍合理的方向。"
+              label={t(msg`惊喜系数`)}
+              hint={t(msg`提高后会更愿意抽取非最稳妥但仍合理的方向。`)}
               step={0.05}
               value={config.surpriseWeight}
               onChange={(value) =>
@@ -2391,12 +2413,12 @@ function ShakeConfigCard({
         </ConfigBlock>
 
         <ConfigBlock
-          title="高风险领域"
-          description="手动摇一摇可以允许更强的即时性，但高风险领域仍要严格控边界。"
+          title={t(msg`高风险领域`)}
+          description={t(msg`手动摇一摇可以允许更强的即时性，但高风险领域仍要严格控边界。`)}
         >
           <div className="grid gap-4 md:grid-cols-2">
             <ConfigCheckbox
-              label="允许医疗类角色"
+              label={t(msg`允许医疗类角色`)}
               checked={config.allowMedical}
               onChange={(checked) =>
                 onChange({
@@ -2406,7 +2428,7 @@ function ShakeConfigCard({
               }
             />
             <ConfigCheckbox
-              label="允许法律类角色"
+              label={t(msg`允许法律类角色`)}
               checked={config.allowLegal}
               onChange={(checked) =>
                 onChange({
@@ -2416,7 +2438,7 @@ function ShakeConfigCard({
               }
             />
             <ConfigCheckbox
-              label="允许金融类角色"
+              label={t(msg`允许金融类角色`)}
               checked={config.allowFinance}
               onChange={(checked) =>
                 onChange({
@@ -2429,11 +2451,11 @@ function ShakeConfigCard({
         </ConfigBlock>
 
         <ConfigBlock
-          title="方向规划 Prompt"
-          description="决定这次摇一摇应该往哪几类真实联系人方向去想。"
+          title={t(msg`方向规划 Prompt`)}
+          description={t(msg`决定这次摇一摇应该往哪几类真实联系人方向去想。`)}
         >
           <PromptField
-            label="方向规划提示词"
+            label={t(msg`方向规划提示词`)}
             value={config.planningPrompt}
             minHeightClassName="min-h-[240px]"
             onChange={(value) =>
@@ -2446,11 +2468,11 @@ function ShakeConfigCard({
         </ConfigBlock>
 
         <ConfigBlock
-          title="角色生成 Prompt"
-          description="决定方向确定后，如何把它落成一个用户愿意决定是否添加的真实联系人。"
+          title={t(msg`角色生成 Prompt`)}
+          description={t(msg`决定方向确定后，如何把它落成一个用户愿意决定是否添加的真实联系人。`)}
         >
           <PromptField
-            label="角色生成提示词"
+            label={t(msg`角色生成提示词`)}
             value={config.roleGenerationPrompt}
             minHeightClassName="min-h-[280px]"
             onChange={(value) =>
@@ -2479,6 +2501,8 @@ function CadenceCard({
   config: NeedDiscoveryConfig;
   onChange: (next: NeedDiscoveryConfig) => void;
 }) {
+  const t = translateRuntimeMessage;
+  const t = translateRuntimeMessage;
   const cadence = cadenceType === "short" ? config.shortInterval : config.daily;
 
   return (
@@ -2487,7 +2511,7 @@ function CadenceCard({
         title={title}
         actions={
           <StatusPill tone={cadence.enabled ? "healthy" : "warning"}>
-            {cadence.enabled ? "启用中" : "已停用"}
+            {cadence.enabled ? t(msg`启用中`) : t(msg`已停用`)}
           </StatusPill>
         }
       />
@@ -2496,12 +2520,12 @@ function CadenceCard({
       </p>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <AdminMiniPanel title="执行模式">
+        <AdminMiniPanel title={t(msg`执行模式`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {formatExecutionMode(cadence.executionMode)}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="运行节奏">
+        <AdminMiniPanel title={t(msg`运行节奏`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {cadenceType === "short"
               ? `每 ${config.shortInterval.intervalMinutes} 分钟`
@@ -2510,32 +2534,32 @@ function CadenceCard({
                 )}`}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="回看窗口">
+        <AdminMiniPanel title={t(msg`回看窗口`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {cadenceType === "short"
               ? `${config.shortInterval.lookbackHours} 小时`
               : `${config.daily.lookbackDays} 天`}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="候选阈值">
+        <AdminMiniPanel title={t(msg`候选阈值`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
-            最多 {cadence.maxCandidatesPerRun} 个
+            {t(msg`最多`)} {cadence.maxCandidatesPerRun} {t(msg`个`)}
           </div>
           <div className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
-            最低置信度 {cadence.minConfidenceScore.toFixed(2)}
+            {t(msg`最低置信度`)} {cadence.minConfidenceScore.toFixed(2)}
           </div>
         </AdminMiniPanel>
       </div>
 
       <div className="mt-5 space-y-4">
         <ConfigBlock
-          title="开关与执行模式"
-          description="决定这条 cadence 是否参与自动补位，以及是直接发申请还是只生成草稿。"
+          title={t(msg`开关与执行模式`)}
+          description={t(msg`决定这条 cadence 是否参与自动补位，以及是直接发申请还是只生成草稿。`)}
         >
           <div className="grid gap-4 md:grid-cols-2">
             <ConfigCheckbox
-              label="启用该节奏"
-              hint="关闭后，该 cadence 不再产出新候选。"
+              label={t(msg`启用该节奏`)}
+              hint={t(msg`关闭后，该 cadence 不再产出新候选。`)}
               checked={cadence.enabled}
               onChange={(checked) =>
                 onChange({
@@ -2549,11 +2573,11 @@ function CadenceCard({
             />
             <ConfigSelect
               label="执行模式"
-              hint="dry run 适合先观察候选质量，auto send 适合直接补位。"
+              hint={t(msg`dry run 适合先观察候选质量，auto send 适合直接补位。`)}
               value={cadence.executionMode}
               options={[
-                { value: "auto_send", label: "直接创建并发起好友申请" },
-                { value: "dry_run", label: "只生成候选草稿" },
+                { value: "auto_send", label: t(msg`直接创建并发起好友申请`) },
+                { value: "dry_run", label: t(msg`只生成候选草稿`) },
               ]}
               onChange={(value) =>
                 onChange({
@@ -2570,15 +2594,15 @@ function CadenceCard({
         </ConfigBlock>
 
         <ConfigBlock
-          title="节奏与窗口"
-          description="决定这条 cadence 什么时候跑、看多久的信号，以及是否允许空跑。"
+          title={t(msg`节奏与窗口`)}
+          description={t(msg`决定这条 cadence 什么时候跑、看多久的信号，以及是否允许空跑。`)}
         >
           <div className="grid gap-4 md:grid-cols-2">
             {cadenceType === "short" ? (
               <>
                 <ConfigNumber
-                  label="间隔分钟"
-                  hint="越短越敏感，越长越稳。"
+                  label={t(msg`间隔分钟`)}
+                  hint={t(msg`越短越敏感，越长越稳。`)}
                   value={config.shortInterval.intervalMinutes}
                   onChange={(value) =>
                     onChange({
@@ -2591,8 +2615,8 @@ function CadenceCard({
                   }
                 />
                 <ConfigNumber
-                  label="回看小时"
-                  hint="决定短周期会读到多长时间窗口的信号。"
+                  label={t(msg`回看小时`)}
+                  hint={t(msg`决定短周期会读到多长时间窗口的信号。`)}
                   value={config.shortInterval.lookbackHours}
                   onChange={(value) =>
                     onChange({
@@ -2606,7 +2630,7 @@ function CadenceCard({
                 />
                 <ConfigCheckbox
                   label="无新信号则跳过"
-                  hint="开启后能降低无效运行。"
+                  hint={t(msg`开启后能降低无效运行。`)}
                   checked={config.shortInterval.skipIfNoNewSignals}
                   onChange={(checked) =>
                     onChange({
@@ -2622,8 +2646,8 @@ function CadenceCard({
             ) : (
               <>
                 <ConfigNumber
-                  label="执行小时"
-                  hint="按本地时间设置每日启动点。"
+                  label={t(msg`执行小时`)}
+                  hint={t(msg`按本地时间设置每日启动点。`)}
                   value={config.daily.runAtHour}
                   onChange={(value) =>
                     onChange({
@@ -2633,8 +2657,8 @@ function CadenceCard({
                   }
                 />
                 <ConfigNumber
-                  label="执行分钟"
-                  hint="和执行小时组合成固定的日调度时间。"
+                  label={t(msg`执行分钟`)}
+                  hint={t(msg`和执行小时组合成固定的日调度时间。`)}
                   value={config.daily.runAtMinute}
                   onChange={(value) =>
                     onChange({
@@ -2644,8 +2668,8 @@ function CadenceCard({
                   }
                 />
                 <ConfigNumber
-                  label="回看天数"
-                  hint="越长越偏向结构性缺口。"
+                  label={t(msg`回看天数`)}
+                  hint={t(msg`越长越偏向结构性缺口。`)}
                   value={config.daily.lookbackDays}
                   onChange={(value) =>
                     onChange({
@@ -2660,13 +2684,13 @@ function CadenceCard({
         </ConfigBlock>
 
         <ConfigBlock
-          title="候选阈值"
-          description="控制每轮最多生成多少候选，以及需要多高的置信度才允许通过。"
+          title={t(msg`候选阈值`)}
+          description={t(msg`控制每轮最多生成多少候选，以及需要多高的置信度才允许通过。`)}
         >
           <div className="grid gap-4 md:grid-cols-2">
             <ConfigNumber
-              label="单次最多候选"
-              hint="太高会让候选池快速堆积。"
+              label={t(msg`单次最多候选`)}
+              hint={t(msg`太高会让候选池快速堆积。`)}
               value={cadence.maxCandidatesPerRun}
               onChange={(value) =>
                 onChange({
@@ -2679,8 +2703,8 @@ function CadenceCard({
               }
             />
             <ConfigNumber
-              label="最低置信度"
-              hint="太低会引入噪音，太高会错过边缘但有价值的候选。"
+              label={t(msg`最低置信度`)}
+              hint={t(msg`太低会引入噪音，太高会错过边缘但有价值的候选。`)}
               step={0.01}
               value={cadence.minConfidenceScore}
               onChange={(value) =>
@@ -2697,11 +2721,11 @@ function CadenceCard({
         </ConfigBlock>
 
         <ConfigBlock
-          title="分析 Prompt"
-          description="决定这条 cadence 如何从最近信号中识别角色缺口和 need key。"
+          title={t(msg`分析 Prompt`)}
+          description={t(msg`决定这条 cadence 如何从最近信号中识别角色缺口和 need key。`)}
         >
           <PromptField
-            label="分析提示词"
+            label={t(msg`分析提示词`)}
             value={cadence.promptTemplate}
             minHeightClassName="min-h-[240px]"
             onChange={(value) =>
@@ -2732,8 +2756,8 @@ function SharedCard({
   return (
     <Card className="bg-[color:var(--surface-console)]">
       <AdminSectionHeader
-        title="共享约束"
-        actions={<StatusPill tone="muted">跨节奏统一</StatusPill>}
+        title={t(msg`共享约束`)}
+        actions={<StatusPill tone="muted">{t(msg`跨节奏统一`)}</StatusPill>}
       />
       <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">
         这里不是单条 cadence
@@ -2741,25 +2765,25 @@ function SharedCard({
       </p>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <AdminMiniPanel title="队列上限">
+        <AdminMiniPanel title={t(msg`队列上限`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
-            待处理最多 {shared.pendingCandidateLimit}
+            {t(msg`待处理最多`)} {shared.pendingCandidateLimit}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="创建上限">
+        <AdminMiniPanel title={t(msg`创建上限`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
-            每日最多 {shared.dailyCreationLimit}
+            {t(msg`每日最多`)} {shared.dailyCreationLimit}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="抑制期">
+        <AdminMiniPanel title={t(msg`抑制期`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
-            短周期 {shared.shortSuppressionDays} 天
+            {t(msg`短周期`)} {shared.shortSuppressionDays} {t(msg`天`)}
           </div>
           <div className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
-            每日 {shared.dailySuppressionDays} 天
+            {t(msg`每日`)} {shared.dailySuppressionDays} {t(msg`天`)}
           </div>
         </AdminMiniPanel>
-        <AdminMiniPanel title="风险域">
+        <AdminMiniPanel title={t(msg`风险域`)}>
           <div className="text-sm text-[color:var(--text-primary)]">
             {formatRiskDomains(
               shared.allowMedical,
@@ -2772,13 +2796,13 @@ function SharedCard({
 
       <div className="mt-5 space-y-4">
         <ConfigBlock
-          title="容量与过期"
-          description="控制候选池最多允许积压多少条，以及好友申请多久后视为无效。"
+          title={t(msg`容量与过期`)}
+          description={t(msg`控制候选池最多允许积压多少条，以及好友申请多久后视为无效。`)}
         >
           <div className="grid gap-4 md:grid-cols-2">
             <ConfigNumber
-              label="待处理候选上限"
-              hint="达到上限后，新候选会受抑制。"
+              label={t(msg`待处理候选上限`)}
+              hint={t(msg`达到上限后，新候选会受抑制。`)}
               value={shared.pendingCandidateLimit}
               onChange={(value) =>
                 onChange({
@@ -2788,8 +2812,8 @@ function SharedCard({
               }
             />
             <ConfigNumber
-              label="每日创建上限"
-              hint="控制单日自动补位的整体产量。"
+              label={t(msg`每日创建上限`)}
+              hint={t(msg`控制单日自动补位的整体产量。`)}
               value={shared.dailyCreationLimit}
               onChange={(value) =>
                 onChange({
@@ -2799,8 +2823,8 @@ function SharedCard({
               }
             />
             <ConfigNumber
-              label="好友申请有效期（天）"
-              hint="超时后会自动按过期处理。"
+              label={t(msg`好友申请有效期（天）`)}
+              hint={t(msg`超时后会自动按过期处理。`)}
               value={shared.expiryDays}
               onChange={(value) =>
                 onChange({
@@ -2813,13 +2837,13 @@ function SharedCard({
         </ConfigBlock>
 
         <ConfigBlock
-          title="去重与抑制"
-          description="避免相似方向反复命中，以及同一 need 在短期内被重复生成。"
+          title={t(msg`去重与抑制`)}
+          description={t(msg`避免相似方向反复命中，以及同一 need 在短期内被重复生成。`)}
         >
           <div className="grid gap-4 md:grid-cols-2">
             <ConfigNumber
-              label="短周期抑制期（天）"
-              hint="避免最近刚触发过的短期 need 反复进入候选池。"
+              label={t(msg`短周期抑制期（天）`)}
+              hint={t(msg`避免最近刚触发过的短期 need 反复进入候选池。`)}
               value={shared.shortSuppressionDays}
               onChange={(value) =>
                 onChange({
@@ -2829,8 +2853,8 @@ function SharedCard({
               }
             />
             <ConfigNumber
-              label="每日抑制期（天）"
-              hint="避免每日策略反复生成同类稳定角色位。"
+              label={t(msg`每日抑制期（天）`)}
+              hint={t(msg`避免每日策略反复生成同类稳定角色位。`)}
               value={shared.dailySuppressionDays}
               onChange={(value) =>
                 onChange({
@@ -2840,8 +2864,8 @@ function SharedCard({
               }
             />
             <ConfigNumber
-              label="领域重叠阈值"
-              hint="值越低，越严格地把相似角色当成已覆盖。"
+              label={t(msg`领域重叠阈值`)}
+              hint={t(msg`值越低，越严格地把相似角色当成已覆盖。`)}
               step={0.05}
               value={shared.coverageDomainOverlapThreshold}
               onChange={(value) =>
@@ -2858,12 +2882,12 @@ function SharedCard({
         </ConfigBlock>
 
         <ConfigBlock
-          title="高风险领域边界"
-          description="医疗、法律、金融角色属于高风险方向，是否允许需要明确管理。"
+          title={t(msg`高风险领域边界`)}
+          description={t(msg`医疗、法律、金融角色属于高风险方向，是否允许需要明确管理。`)}
         >
           <div className="grid gap-4 md:grid-cols-2">
             <ConfigCheckbox
-              label="允许医疗类角色"
+              label={t(msg`允许医疗类角色`)}
               checked={shared.allowMedical}
               onChange={(checked) =>
                 onChange({
@@ -2873,7 +2897,7 @@ function SharedCard({
               }
             />
             <ConfigCheckbox
-              label="允许法律类角色"
+              label={t(msg`允许法律类角色`)}
               checked={shared.allowLegal}
               onChange={(checked) =>
                 onChange({
@@ -2883,7 +2907,7 @@ function SharedCard({
               }
             />
             <ConfigCheckbox
-              label="允许金融类角色"
+              label={t(msg`允许金融类角色`)}
               checked={shared.allowFinance}
               onChange={(checked) =>
                 onChange({
@@ -2896,11 +2920,11 @@ function SharedCard({
         </ConfigBlock>
 
         <ConfigBlock
-          title="角色生成 Prompt"
-          description="当 need 确认通过后，决定最终角色草稿和好友申请文案如何生成。"
+          title={t(msg`角色生成 Prompt`)}
+          description={t(msg`当 need 确认通过后，决定最终角色草稿和好友申请文案如何生成。`)}
         >
           <PromptField
-            label="角色生成提示词"
+            label={t(msg`角色生成提示词`)}
             value={shared.roleGenerationPrompt}
             minHeightClassName="min-h-[300px]"
             onChange={(value) =>
@@ -3106,10 +3130,10 @@ function buildTodayActions({
   if (hasUnsavedChanges) {
     actions.push({
       key: "save-draft",
-      title: "先处理未保存草稿",
+      title: translateRuntimeMessage(msg`先处理未保存草稿`),
       description:
-        "当前页面的规则改动还没写回服务端。先确认是否保存，再继续看候选或运行，避免判断基于旧配置。",
-      actionLabel: "去看规则",
+        translateRuntimeMessage(msg`当前页面的规则改动还没写回服务端。先确认是否保存，再继续看候选或运行，避免判断基于旧配置。`),
+      actionLabel: translateRuntimeMessage(msg`去看规则`),
       tone: "warning",
       onClick: () => openConfigWorkspace("short"),
     });
@@ -3118,9 +3142,9 @@ function buildTodayActions({
   if (draft && activeCandidates.length >= draft.shared.pendingCandidateLimit) {
     actions.push({
       key: "queue-full",
-      title: "候选池已到上限",
+      title: translateRuntimeMessage(msg`候选池已到上限`),
       description: `当前活跃候选 ${activeCandidates.length} 条，已触及共享上限 ${draft.shared.pendingCandidateLimit}。建议先处理候选，再决定是否下调生成量。`,
-      actionLabel: "打开候选队列",
+      actionLabel: translateRuntimeMessage(msg`打开候选队列`),
       tone: "warning",
       onClick: () => openCandidateQueue(primaryCandidateStatus),
     });
@@ -3129,12 +3153,12 @@ function buildTodayActions({
   if (latestRun?.status === "failed") {
     actions.push({
       key: "latest-run-failed",
-      title: "最近调度失败",
+      title: translateRuntimeMessage(msg`最近调度失败`),
       description:
         latestRun.errorMessage ||
         latestRun.summary ||
-        "最近一次运行失败，但没有返回更多摘要。",
-      actionLabel: "查看运行详情",
+        translateRuntimeMessage(msg`最近一次运行失败，但没有返回更多摘要。`),
+      actionLabel: translateRuntimeMessage(msg`查看运行详情`),
       tone: "warning",
       onClick: () => openRunWorkspace(latestRun.cadenceType),
     });
@@ -3143,9 +3167,9 @@ function buildTodayActions({
   if (expiringSoonCount > 0) {
     actions.push({
       key: "candidate-expiring",
-      title: "有候选即将过期",
+      title: translateRuntimeMessage(msg`有候选即将过期`),
       description: `未来 24 小时内有 ${expiringSoonCount} 条候选会过期，适合优先清理仍待通过的记录。`,
-      actionLabel: "查看待通过候选",
+      actionLabel: translateRuntimeMessage(msg`查看待通过候选`),
       tone: "info",
       onClick: () => openCandidateQueue("friend_request_pending"),
     });
@@ -3154,9 +3178,9 @@ function buildTodayActions({
   if (shakePendingCount > 0) {
     actions.push({
       key: "shake-pending",
-      title: "摇一摇存在待决定 session",
+      title: translateRuntimeMessage(msg`摇一摇存在待决定 session`),
       description: `当前有 ${shakePendingCount} 条即时相遇还没决定，建议抽查 matchReason、方向摘要和问候语。`,
-      actionLabel: "查看摇一摇 session",
+      actionLabel: translateRuntimeMessage(msg`查看摇一摇 session`),
       tone: "info",
       onClick: () => openShakeWorkspace("sessions", "preview_ready"),
     });
@@ -3166,28 +3190,28 @@ function buildTodayActions({
     actions.push(
       {
         key: "stable-candidates",
-        title: "当前状态稳定",
+        title: translateRuntimeMessage(msg`当前状态稳定`),
         description:
-          "自动补位没有明显阻塞。可以抽查候选质量，或者微调短周期 / 每日规则。",
-        actionLabel: "打开候选处理",
+          translateRuntimeMessage(msg`自动补位没有明显阻塞。可以抽查候选质量，或者微调短周期 / 每日规则。`),
+        actionLabel: translateRuntimeMessage(msg`打开候选处理`),
         tone: "success",
         onClick: () => openCandidateQueue("all"),
       },
       {
         key: "stable-config",
-        title: "规则可按需微调",
+        title: translateRuntimeMessage(msg`规则可按需微调`),
         description:
-          "如果想更保守地控量，优先看共享约束；如果想提速补位，优先看短周期。",
-        actionLabel: "查看共享约束",
+          translateRuntimeMessage(msg`如果想更保守地控量，优先看共享约束；如果想提速补位，优先看短周期。`),
+        actionLabel: translateRuntimeMessage(msg`查看共享约束`),
         tone: "info",
         onClick: () => openConfigWorkspace("shared"),
       },
       {
         key: "stable-shake",
-        title: "摇一摇可做抽样巡检",
+        title: translateRuntimeMessage(msg`摇一摇可做抽样巡检`),
         description:
-          "当前没有明显待处理堆积，适合抽查 session 文案是否自然、方向是否足够多样。",
-        actionLabel: "打开摇一摇",
+          translateRuntimeMessage(msg`当前没有明显待处理堆积，适合抽查 session 文案是否自然、方向是否足够多样。`),
+        actionLabel: translateRuntimeMessage(msg`打开摇一摇`),
         tone: "info",
         onClick: () => openShakeWorkspace("sessions", "all"),
       },
@@ -3303,9 +3327,9 @@ function toneForRun(status: NeedDiscoveryRunRecord["status"]) {
 
 function labelForRun(status: NeedDiscoveryRunRecord["status"]) {
   if (status === "failed") {
-    return "失败";
+    return translateRuntimeMessage(msg`失败`);
   }
-  return status === "success" ? "成功" : "跳过";
+  return status === "success" ? translateRuntimeMessage(msg`成功`) : translateRuntimeMessage(msg`跳过`);
 }
 
 function toneForCandidate(status: NeedDiscoveryCandidateRecord["status"]) {
@@ -3325,19 +3349,19 @@ function toneForCandidate(status: NeedDiscoveryCandidateRecord["status"]) {
 function labelForCandidate(status: NeedDiscoveryCandidateRecord["status"]) {
   switch (status) {
     case "friend_request_pending":
-      return "待通过";
+      return translateRuntimeMessage(msg`待通过`);
     case "accepted":
-      return "已接受";
+      return translateRuntimeMessage(msg`已接受`);
     case "declined":
-      return "已拒绝";
+      return translateRuntimeMessage(msg`已拒绝`);
     case "expired":
-      return "已过期";
+      return translateRuntimeMessage(msg`已过期`);
     case "deleted":
-      return "已删除";
+      return translateRuntimeMessage(msg`已删除`);
     case "generation_failed":
-      return "生成失败";
+      return translateRuntimeMessage(msg`生成失败`);
     default:
-      return "草稿";
+      return translateRuntimeMessage(msg`草稿`);
   }
 }
 
@@ -3354,17 +3378,17 @@ function toneForShakeStatus(status: ShakeDiscoverySessionRecord["status"]) {
 function labelForShakeStatus(status: ShakeDiscoverySessionRecord["status"]) {
   switch (status) {
     case "preview_ready":
-      return "待决定";
+      return translateRuntimeMessage(msg`待决定`);
     case "kept":
-      return "已保留";
+      return translateRuntimeMessage(msg`已保留`);
     case "dismissed":
-      return "已跳过";
+      return translateRuntimeMessage(msg`已跳过`);
     case "expired":
-      return "已过期";
+      return translateRuntimeMessage(msg`已过期`);
     case "failed":
-      return "生成失败";
+      return translateRuntimeMessage(msg`生成失败`);
     case "generating":
-      return "生成中";
+      return translateRuntimeMessage(msg`生成中`);
     default:
       return status;
   }
@@ -3373,35 +3397,35 @@ function labelForShakeStatus(status: ShakeDiscoverySessionRecord["status"]) {
 function formatCadenceLabel(
   cadenceType: NeedDiscoveryRunRecord["cadenceType"],
 ) {
-  return cadenceType === "short_interval" ? "短周期" : "每日";
+  return cadenceType === "short_interval" ? translateRuntimeMessage(msg`短周期`) : translateRuntimeMessage(msg`每日`);
 }
 
 function formatExecutionMode(value: "dry_run" | "auto_send") {
-  return value === "dry_run" ? "只生成草稿" : "直接创建并发起好友申请";
+  return value === "dry_run" ? translateRuntimeMessage(msg`只生成草稿`) : translateRuntimeMessage(msg`直接创建并发起好友申请`);
 }
 
 function buildCandidateTimingLabel(candidate: NeedDiscoveryCandidateRecord) {
   if (candidate.acceptedAt) {
-    return `接受于 ${formatCompactDateTime(candidate.acceptedAt)}`;
+    return `${translateRuntimeMessage(msg`接受于`)} ${formatCompactDateTime(candidate.acceptedAt)}`;
   }
   if (candidate.declinedAt) {
-    return `拒绝于 ${formatCompactDateTime(candidate.declinedAt)}`;
+    return `${translateRuntimeMessage(msg`拒绝于`)} ${formatCompactDateTime(candidate.declinedAt)}`;
   }
   if (candidate.expiresAt) {
-    return `过期于 ${formatCompactDateTime(candidate.expiresAt)}`;
+    return `${translateRuntimeMessage(msg`过期于`)} ${formatCompactDateTime(candidate.expiresAt)}`;
   }
   if (candidate.suppressedUntil) {
-    return `抑制到 ${formatCompactDateTime(candidate.suppressedUntil)}`;
+    return `${translateRuntimeMessage(msg`抑制到`)} ${formatCompactDateTime(candidate.suppressedUntil)}`;
   }
   if (candidate.deletedAt) {
-    return `删除于 ${formatCompactDateTime(candidate.deletedAt)}`;
+    return `${translateRuntimeMessage(msg`删除于`)} ${formatCompactDateTime(candidate.deletedAt)}`;
   }
-  return `更新于 ${formatCompactDateTime(candidate.updatedAt)}`;
+  return `${translateRuntimeMessage(msg`更新于`)} ${formatCompactDateTime(candidate.updatedAt)}`;
 }
 
 function formatRunWindow(run: NeedDiscoveryRunRecord) {
   if (!run.windowStartedAt && !run.windowEndedAt) {
-    return "未记录窗口";
+    return translateRuntimeMessage(msg`未记录窗口`);
   }
 
   return `${formatCompactDateTime(run.windowStartedAt)} -> ${formatCompactDateTime(
@@ -3415,12 +3439,12 @@ function formatRiskDomains(
   allowFinance: boolean,
 ) {
   const items = [
-    allowMedical ? "医疗" : null,
-    allowLegal ? "法律" : null,
-    allowFinance ? "金融" : null,
+    allowMedical ? translateRuntimeMessage(msg`医疗`) : null,
+    allowLegal ? translateRuntimeMessage(msg`法律`) : null,
+    allowFinance ? translateRuntimeMessage(msg`金融`) : null,
   ].filter((item): item is string => Boolean(item));
 
-  return items.length ? items.join(" / ") : "全部关闭";
+  return items.length ? items.join(" / ") : translateRuntimeMessage(msg`全部关闭`);
 }
 
 function isWithinHours(value?: string | null, hours = 24) {
@@ -3597,4 +3621,3 @@ function normalizeFloat(value: unknown, fallback: number) {
   }
   return Math.max(0, Math.min(1, parsed));
 }
-// i18n-ignore-end

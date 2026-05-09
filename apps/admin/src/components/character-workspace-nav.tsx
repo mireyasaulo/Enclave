@@ -1,11 +1,13 @@
+import { msg } from "@lingui/macro";
 import { Link, useLocation } from "@tanstack/react-router";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
 type Props = {
   characterId: string;
 };
 
 export function CharacterWorkspaceNav({ characterId }: Props) {
+  const t = translateRuntimeMessage;
   const location = useLocation();
   const pathname = location.pathname;
 
@@ -14,8 +16,8 @@ export function CharacterWorkspaceNav({ characterId }: Props) {
   const isEditor = !isFactory && !isRuntime;
 
   const tabs = [
-    { label: "行为管理", to: `/characters/${characterId}`, active: isEditor },
-    { label: "运行台", to: `/characters/${characterId}/runtime`, active: isRuntime },
+    { label: t(msg`行为管理`), to: `/characters/${characterId}`, active: isEditor },
+    { label: t(msg`运行台`), to: `/characters/${characterId}/runtime`, active: isRuntime },
   ];
 
   return (
@@ -36,4 +38,3 @@ export function CharacterWorkspaceNav({ characterId }: Props) {
     </div>
   );
 }
-// i18n-ignore-end

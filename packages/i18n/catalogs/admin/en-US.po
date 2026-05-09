@@ -40,6 +40,18 @@ msgstr " · character {0}"
 msgid " 尚未发生"
 msgstr " has not happened yet"
 
+#: apps/admin/src/routes/chat-records-page.tsx:890
+msgid "，已进入命中上下文模式"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:889
+msgid "，预算预警"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:890
+msgid "，默认按最新向前浏览"
+msgstr ""
+
 #: apps/admin/src/routes/self-agent-page.tsx:290
 msgid "\"我自己\"主代理工作台"
 msgstr "\\\"我自己\\\"主代理工作台"
@@ -253,6 +265,10 @@ msgstr "AI 游戏目录工作台"
 msgid "AI 生成"
 msgstr "AI-generated"
 
+#: apps/admin/src/routes/token-usage-page.tsx:826
+msgid "AI 用量"
+msgstr ""
+
 #: apps/admin/src/components/game-submission-workbench.tsx:100
 #: apps/admin/src/routes/games-page.tsx:117
 msgid "AI 辅助"
@@ -334,6 +350,10 @@ msgstr "Standing Orders"
 msgid "Token 用量"
 msgstr "Token Usage"
 
+#: apps/admin/src/routes/token-usage-page.tsx:827
+msgid "Token 用量与预算中心"
+msgstr ""
+
 #. placeholder {0}: evalOverviewQuery.data?.traceCount ?? 0
 #: apps/admin/src/routes/dashboard-page.tsx:1288
 msgid "Trace {0}"
@@ -384,6 +404,10 @@ msgstr "Select all updated characters"
 msgid "一键同步微信朋友"
 msgstr "一键同步微信朋友"
 
+#: apps/admin/src/routes/chat-records-page.tsx:716
+msgid "上一页"
+msgstr ""
+
 #: apps/admin/src/routes/character-runtime-page.tsx:277
 msgid "上下文窗口"
 msgstr "Context window"
@@ -421,6 +445,10 @@ msgstr "Next, add callbackToken so provider-state callbacks can be authenticated
 msgid "下一步补外部 provider 模板和回调，把内置播放器替换成真实数字人服务。"
 msgstr "Next, add the external provider template and callback, replacing the built-in player with a real digital-human service."
 
+#: apps/admin/src/routes/chat-records-page.tsx:731
+msgid "下一页"
+msgstr ""
+
 #: apps/admin/src/routes/characters-wiki-sync-section.tsx:477
 msgid "下方列表显示的角色要么已与 wiki 一致，要么尚无 wiki 稳定版本。展开任意一行查看具体说明。如需同步，先到 wiki 提交一次能自动通过审核的修订。"
 msgstr "Characters below are either already in sync with wiki or have no wiki stable revision yet. Expand any row to read details. To sync, submit a wiki revision that auto-passes patrol first."
@@ -456,6 +484,10 @@ msgstr "World Context"
 msgid "世界主人"
 msgstr "World Owner"
 
+#: apps/admin/src/routes/token-usage-page.tsx:1047
+msgid "世界主人 Key"
+msgstr ""
+
 #. placeholder {0}: overview.identity.ownerName
 #: apps/admin/src/routes/self-agent-page.tsx:293
 msgid "世界主人：{0}"
@@ -476,6 +508,7 @@ msgid "世界快照"
 msgstr "World Snapshot"
 
 #: apps/admin/src/lib/route-breadcrumb.ts:138
+#: apps/admin/src/routes/chat-records-page.tsx:498
 msgid "世界样本与会话档案"
 msgstr "World Samples and Conversation Records"
 
@@ -510,6 +543,14 @@ msgstr "Failed to save world language"
 msgid "世界语言已切换为 {0}。"
 msgstr "World language switched to {0}."
 
+#: apps/admin/src/routes/token-usage-page.tsx:760
+msgid "个已计价模型"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:952
+msgid "个条件"
+msgstr ""
+
 #: apps/admin/src/components/admin-sidebar.tsx:133
 msgid "主人"
 msgstr "Owner"
@@ -539,6 +580,10 @@ msgstr "Active reminder"
 #: apps/admin/src/routes/dashboard-page.tsx:2196
 msgid "主动提醒调度"
 msgstr "Proactive Reminder Schedule"
+
+#: apps/admin/src/routes/chat-records-page.tsx:67
+msgid "主动消息"
+msgstr ""
 
 #: apps/admin/src/components/root-layout.tsx:258
 #: apps/admin/src/lib/route-breadcrumb.ts:78
@@ -604,9 +649,19 @@ msgstr "Visible only"
 msgid "仅在线"
 msgstr "仅在线"
 
+#: apps/admin/src/routes/token-usage-page.tsx:706
+#: apps/admin/src/routes/token-usage-page.tsx:1032
+msgid "仅失败"
+msgstr ""
+
 #: apps/admin/src/routes/characters-page.tsx:231
 msgid "仅好友角色"
 msgstr "仅好友角色"
+
+#: apps/admin/src/routes/token-usage-page.tsx:706
+#: apps/admin/src/routes/token-usage-page.tsx:1031
+msgid "仅成功"
+msgstr ""
 
 #: apps/admin/src/routes/characters-wiki-sync-section.tsx:320
 msgid "仅有更新"
@@ -623,6 +678,10 @@ msgstr "Missing locally"
 #: apps/admin/src/routes/characters-wiki-sync-section.tsx:339
 msgid "仅查看 {characterIdFilter}"
 msgstr "Filtered to {characterIdFilter}"
+
+#: apps/admin/src/routes/chat-records-page.tsx:615
+msgid "仅看已标记样本"
+msgstr ""
 
 #: apps/admin/src/routes/characters-page.tsx:234
 msgid "仅离线"
@@ -648,6 +707,10 @@ msgstr "从左侧选择一个游戏后，这里会展示编辑、发布和运营
 #: apps/admin/src/routes/dashboard-page.tsx:1853
 msgid "令牌数"
 msgstr "Tokens"
+
+#: apps/admin/src/routes/token-usage-page.tsx:757
+msgid "价格配置"
+msgstr ""
 
 #: apps/admin/src/components/game-curation-workbench.tsx:92
 msgid "任务"
@@ -685,6 +748,10 @@ msgstr "优先去角色名册筛出资料未补齐的角色，先补画像，再
 msgid "优先处理 {0} 个待审核目录，再发布 {1} 个未同步正式版本的修改。"
 msgstr "优先处理 {0} 个待审核目录，再发布 {1} 个未同步正式版本的修改。"
 
+#: apps/admin/src/routes/token-usage-page.tsx:1119
+msgid "优先处理对象"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:722
 msgid "优先处理当前实例最关键的阻塞项。"
 msgstr "Handle the most important blocker for this instance first."
@@ -697,9 +764,29 @@ msgstr "Determines whether operations can continue"
 msgid "优先检查手动托管角色，确认这些人工锁定是否还需要保留。"
 msgstr "优先检查手动托管角色，确认这些人工锁定是否还需要保留。"
 
+#: apps/admin/src/routes/token-usage-page.tsx:769
+msgid "优先确认哪些请求被直接拦截、是否误伤关键角色。"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:378
 msgid "优先进入设置页检查桌面托管状态和运行路径。"
 msgstr "Open settings first to check desktop hosting state and runtime paths."
+
+#: apps/admin/src/routes/token-usage-page.tsx:704
+msgid "会话"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:487
+msgid "会话列表加载失败"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:550
+msgid "会话导航"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:865
+msgid "估算费用"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1865
 msgid "低频高风险"
@@ -832,6 +919,10 @@ msgstr "Allow delegation to action-runtime"
 msgid "允许委托 reminder-runtime"
 msgstr "Allow delegation to reminder-runtime"
 
+#: apps/admin/src/routes/chat-records-page.tsx:750
+msgid "先从左侧选择一个会话"
+msgstr ""
+
 #: apps/admin/src/routes/characters-page.tsx:873
 msgid "先从左侧选择一个角色"
 msgstr "先从左侧选择一个角色"
@@ -892,6 +983,10 @@ msgstr "First cover the AI Game Center catalog, source structure, runtime mode, 
 msgid "先把第三方、角色或平台内稿件登记进投稿池。"
 msgstr "Register third-party, character, or in-platform submissions into the pool first."
 
+#: apps/admin/src/routes/chat-records-page.tsx:760
+msgid "先用关键词、类型、时间窗锁定片段，再切回完整时间线继续浏览。"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1427
 msgid "先看最近有没有失败，再决定是手动触发 job，还是排查实时房间与客户端连接。"
 msgstr "Check recent failures first, then decide whether to run a job manually or inspect realtime rooms and clients."
@@ -944,6 +1039,10 @@ msgstr "Pick a character first, then import character details."
 msgid "先选择一条投稿"
 msgstr "Select a submission first"
 
+#: apps/admin/src/routes/chat-records-page.tsx:552
+msgid "先锁定会话范围，再进入中间时间线与右侧复盘操作。"
+msgstr ""
+
 #: apps/admin/src/components/admin-workbench.tsx:677
 msgid "入口"
 msgstr "Entry"
@@ -956,6 +1055,10 @@ msgstr "Ingesting..."
 msgid "全部"
 msgstr "All"
 
+#: apps/admin/src/routes/chat-records-page.tsx:79
+msgid "全部会话"
+msgstr ""
+
 #: apps/admin/src/routes/characters-page.tsx:561
 msgid "全部关系"
 msgstr "全部关系"
@@ -965,10 +1068,12 @@ msgid "全部审核"
 msgstr "全部审核"
 
 #: apps/admin/src/routes/games-page.tsx:643
+#: apps/admin/src/routes/token-usage-page.tsx:1045
 msgid "全部来源"
 msgstr "全部来源"
 
 #: apps/admin/src/routes/characters-page.tsx:548
+#: apps/admin/src/routes/token-usage-page.tsx:1030
 msgid "全部状态"
 msgstr "全部状态"
 
@@ -976,7 +1081,13 @@ msgstr "全部状态"
 msgid "全部目录"
 msgstr "全部目录"
 
+#: apps/admin/src/routes/chat-records-page.tsx:65
+msgid "全部类型"
+msgstr ""
+
 #: apps/admin/src/routes/characters-page.tsx:539
+#: apps/admin/src/routes/chat-records-page.tsx:573
+#: apps/admin/src/routes/token-usage-page.tsx:1014
 msgid "全部角色"
 msgstr "全部角色"
 
@@ -1130,6 +1241,10 @@ msgstr "Latest revision"
 msgid "最新动态已纳入抽查范围"
 msgstr "Latest moments are included in spot checks"
 
+#: apps/admin/src/routes/chat-records-page.tsx:913
+msgid "最新时间线"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:451
 msgid "最近 {recentSchedulerErrorCount} 条调度记录返回 error，建议先复核 job 状态和最近执行摘要。"
 msgstr "{recentSchedulerErrorCount} recent scheduler records returned error. Review job status and recent summaries first."
@@ -1176,6 +1291,7 @@ msgid "最近日志"
 msgstr "Recent Logs"
 
 #: apps/admin/src/routes/characters-page.tsx:756
+#: apps/admin/src/routes/chat-records-page.tsx:56
 msgid "最近活跃"
 msgstr "最近活跃"
 
@@ -1211,6 +1327,10 @@ msgstr "Recent runs {0}"
 #: apps/admin/src/routes/dashboard-page.tsx:1185
 msgid "最近错误"
 msgstr "Last Error"
+
+#: apps/admin/src/routes/token-usage-page.tsx:1142
+msgid "最高占比"
+msgstr ""
 
 #: apps/admin/src/components/game-release-workbench.tsx:668
 #: apps/admin/src/components/game-submission-workbench.tsx:815
@@ -1261,6 +1381,10 @@ msgstr "Due Reminder Schedule"
 msgid "刷新 WorldContext 快照，供回复链路读取当前世界状态。"
 msgstr "Refresh the WorldContext snapshot for the reply pipeline."
 
+#: apps/admin/src/routes/chat-records-page.tsx:556
+msgid "刷新中"
+msgstr ""
+
 #: apps/admin/src/routes/characters-wiki-sync-section.tsx:329
 msgid "刷新中…"
 msgstr "Refreshing…"
@@ -1289,6 +1413,10 @@ msgstr "Failed to load diff"
 #: apps/admin/src/components/game-curation-workbench.tsx:1093
 msgid "动作类型"
 msgstr "Action kind"
+
+#: apps/admin/src/routes/chat-records-page.tsx:623
+msgid "包含清空前历史"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:650
 #: apps/admin/src/routes/dashboard-page.tsx:831
@@ -1433,6 +1561,10 @@ msgstr "Narrative arc"
 msgid "召回"
 msgstr "Reactivation"
 
+#: apps/admin/src/routes/chat-records-page.tsx:703
+msgid "可以切回全部角色，或放宽活跃时间与隐藏会话筛选。"
+msgstr ""
+
 #: apps/admin/src/routes/games-page.tsx:712
 msgid "可以继续做新建草稿、版本发布，或切到策展区安排前台曝光。"
 msgstr "可以继续做新建草稿、版本发布，或切到策展区安排前台曝光。"
@@ -1440,6 +1572,10 @@ msgstr "可以继续做新建草稿、版本发布，或切到策展区安排前
 #: apps/admin/src/routes/dashboard-page.tsx:1081
 msgid "可在调试与运维区查看"
 msgstr "Available in Debug and Operations"
+
+#: apps/admin/src/routes/chat-records-page.tsx:101
+msgid "可复用"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:668
 msgid "可继续"
@@ -1539,6 +1675,10 @@ msgstr "Reply with a natural everyday greeting. Do not explain."
 msgid "回复、评测和自动内容生成都会受到影响，运营动作缺乏可验证输出。"
 msgstr "Replies, evals, and automatic content generation are affected, leaving operations without verifiable output."
 
+#: apps/admin/src/routes/chat-records-page.tsx:103
+msgid "回复优秀"
+msgstr ""
+
 #: apps/admin/src/components/root-layout.tsx:236
 #: apps/admin/src/lib/route-breadcrumb.ts:157
 msgid "回复逻辑"
@@ -1575,6 +1715,14 @@ msgstr "Troubleshoot the reply pipeline around characters, sessions, and global 
 #: apps/admin/src/components/root-layout.tsx:237
 msgid "围绕角色、会话和全局规则排查回复链路。"
 msgstr "Trace reply chains around characters, sessions, and global rules."
+
+#: apps/admin/src/routes/chat-records-page.tsx:499
+msgid "围绕运营主路径重排成”找会话 -> 看上下文 -> 标样本 -> 跳联动台”的工作台，降低扫读和复盘成本。"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:68
+msgid "图片"
+msgstr ""
 
 #: apps/admin/src/lib/route-breadcrumb.ts:42
 msgid "在一个工作区里完成角色筛选、摘要查看和快捷跳转。"
@@ -1737,6 +1885,14 @@ msgstr "Official"
 msgid "定义首页和找游戏页里的主题货架，每个货架都可以承载一组游戏。"
 msgstr "Define themed shelves for the home and discovery pages; each shelf can carry a group of games."
 
+#: apps/admin/src/routes/chat-records-page.tsx:962
+msgid "定位"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:911
+msgid "定位上下文"
+msgstr ""
+
 #: apps/admin/src/routes/characters-page.tsx:496
 msgid "定位到名册"
 msgstr "定位到名册"
@@ -1776,6 +1932,10 @@ msgstr "Instance Status and Configuration"
 #: apps/admin/src/components/root-layout.tsx:55
 msgid "实例状态待确认"
 msgstr "Instance status needs confirmation"
+
+#: apps/admin/src/routes/token-usage-page.tsx:1046
+msgid "实例默认 Key"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1626
 msgid "实时连接与契约"
@@ -1847,6 +2007,14 @@ msgstr "Import as catalog draft"
 msgid "导入到本地"
 msgstr "Import to local"
 
+#: apps/admin/src/routes/chat-records-page.tsx:802
+msgid "导出 JSON"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:794
+msgid "导出 Markdown"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1885
 msgid "导出诊断包"
 msgstr "Export Diagnostics Package"
@@ -1901,6 +2069,10 @@ msgstr "Embedded web"
 msgid "工作中"
 msgstr "Working"
 
+#: apps/admin/src/routes/token-usage-page.tsx:930
+msgid "工作区切换"
+msgstr ""
+
 #: apps/admin/src/components/game-release-workbench.tsx:830
 #: apps/admin/src/components/game-submission-workbench.tsx:89
 #: apps/admin/src/components/game-submission-workbench.tsx:1072
@@ -1944,6 +2116,14 @@ msgstr "Synced with formal version"
 #: apps/admin/src/routes/dashboard-page.tsx:1515
 msgid "已启用"
 msgstr "Enabled"
+
+#: apps/admin/src/routes/token-usage-page.tsx:1112
+msgid "已启用计价模型"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:91
+msgid "已处理"
+msgstr ""
 
 #. placeholder {0}: feedReactions[1]
 #: apps/admin/src/routes/dashboard-page.tsx:2328
@@ -2088,9 +2268,17 @@ msgstr "建议继续抽查独立模型角色的路由绑定和备注，确保角
 msgid "开始小时"
 msgstr "Start hour"
 
+#: apps/admin/src/routes/token-usage-page.tsx:979
+msgid "开始日期"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:831
 msgid "异常"
 msgstr "Abnormal"
+
+#: apps/admin/src/routes/token-usage-page.tsx:745
+msgid "异常闭环"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:2414
 msgid "当前不在界闻早报、午报或晚报窗口，且未指定补发时段。"
@@ -2128,6 +2316,10 @@ msgstr "Still using built-in digital human stage mode; suitable for validating s
 #: apps/admin/src/routes/dashboard-page.tsx:1991
 msgid "当前值班摘要"
 msgstr "Current Duty Summary"
+
+#: apps/admin/src/routes/token-usage-page.tsx:950
+msgid "当前口径"
+msgstr ""
 
 #: apps/admin/src/components/game-curation-workbench.tsx:333
 msgid "当前可引用的游戏目录"
@@ -2196,6 +2388,10 @@ msgstr "Current Inference Service"
 msgid "当前推理服务已配置，适合直接做联通性和基础输出验证。"
 msgstr "The current inference service is configured and ready for connectivity and baseline output checks."
 
+#: apps/admin/src/routes/token-usage-page.tsx:750
+msgid "当前无异常"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:753
 msgid "当前无阻塞"
 msgstr "No Blockers"
@@ -2203,6 +2399,18 @@ msgstr "No Blockers"
 #: apps/admin/src/routes/games-page.tsx:622
 msgid "当前无阻塞项"
 msgstr "当前无阻塞项"
+
+#: apps/admin/src/routes/token-usage-page.tsx:772
+msgid "当前无阻断"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:781
+msgid "当前无降级"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:736
+msgid "当前无预警"
+msgstr ""
 
 #. placeholder {0}: localTime ?? unknownLabel
 #. placeholder {1}: worldLocation ?? hangzhouLabel
@@ -2250,6 +2458,10 @@ msgstr "The model catalog or heuristic detection does not declare Chat Completio
 msgid "当前模式不依赖外部播放器模板。"
 msgstr "The current mode does not depend on an external player template."
 
+#: apps/admin/src/routes/chat-records-page.tsx:919
+msgid "当前正在查看清空前历史"
+msgstr ""
+
 #: apps/admin/src/routes/character-runtime-page.tsx:296
 msgid "当前没有上下文窗口消息。"
 msgstr "No context-window messages right now."
@@ -2278,6 +2490,10 @@ msgstr "No extension parameters JSON is configured."
 msgid "当前没有新的调度失败记录，若内容产出异常，可先手动执行关键 job 做一次验证。"
 msgstr "There are no new scheduler failures. If content output looks abnormal, manually run a key job to verify."
 
+#: apps/admin/src/routes/token-usage-page.tsx:1180
+msgid "当前没有需要优先处理的对象"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:357
 msgid "当前没有高优先级阻塞，可以继续做内容抽查和运营操作。"
 msgstr "There are no high-priority blockers; continue content spot checks and operations."
@@ -2290,6 +2506,10 @@ msgstr "There are no high-priority blockers. Next, verify the latest generation 
 #: apps/admin/src/routes/characters-page.tsx:752
 msgid "当前活动"
 msgstr "Current activity"
+
+#: apps/admin/src/routes/token-usage-page.tsx:1094
+msgid "当前焦点"
+msgstr ""
 
 #: apps/admin/src/components/game-release-workbench.tsx:236
 msgid "当前版本号"
@@ -2306,6 +2526,10 @@ msgstr "当前目录已基本同步正式版本"
 #: apps/admin/src/routes/games-page.tsx:693
 msgid "当前视图"
 msgstr "当前视图"
+
+#: apps/admin/src/routes/token-usage-page.tsx:933
+msgid "当前视图："
+msgstr ""
 
 #: apps/admin/src/routes/games-page.tsx:707
 msgid "当前视图内的目录状态比较稳定"
@@ -2326,6 +2550,10 @@ msgstr "System operations are wired through typed contracts and can switch to re
 #: apps/admin/src/routes/characters-page.tsx:1041
 msgid "当前结构比较稳定，可以继续扩充角色池，或抽查重点角色的运行台与工厂配置。"
 msgstr "当前结构比较稳定，可以继续扩充角色池，或抽查重点角色的运行台与工厂配置。"
+
+#: apps/admin/src/routes/chat-records-page.tsx:657
+msgid "当前结果"
+msgstr ""
 
 #. placeholder {0}: filteredCharacters.length
 #: apps/admin/src/routes/characters-page.tsx:226
@@ -2351,6 +2579,10 @@ msgstr "Differences between the current draft and the selected revision are list
 #: apps/admin/src/components/game-release-workbench.tsx:421
 msgid "当前草稿已一致"
 msgstr "Current draft already in sync"
+
+#: apps/admin/src/routes/chat-records-page.tsx:321
+msgid "当前角色"
+msgstr ""
 
 #. placeholder {0}: summary.totalCount
 #. placeholder {1}: summary.friendCount
@@ -2407,6 +2639,10 @@ msgstr "No scheduler run records yet."
 msgid "当前选中：{0}"
 msgstr "当前选中：{0}"
 
+#: apps/admin/src/routes/token-usage-page.tsx:889
+msgid "当前预算状态："
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2016
 msgid "当前首页未发现高优先级阻塞。"
 msgstr "No high-priority blockers found on this dashboard."
@@ -2449,6 +2685,10 @@ msgstr "Pending item"
 #: apps/admin/src/routes/dashboard-page.tsx:746
 msgid "待处理队列"
 msgstr "Pending Queue"
+
+#: apps/admin/src/routes/chat-records-page.tsx:88
+msgid "待复盘"
+msgstr ""
 
 #: apps/admin/src/components/game-release-workbench.tsx:804
 #: apps/admin/src/components/game-submission-workbench.tsx:109
@@ -2493,9 +2733,17 @@ msgstr "Actions awaiting confirmation"
 msgid "待获取"
 msgstr "Pending Fetch"
 
+#: apps/admin/src/routes/token-usage-page.tsx:761
+msgid "待补价格"
+msgstr ""
+
 #: apps/admin/src/routes/self-agent-page.tsx:311
 msgid "待补参数动作"
 msgstr "Actions awaiting slot fill"
+
+#: apps/admin/src/routes/token-usage-page.tsx:1173
+msgid "待补结论"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:642
 msgid "待补齐"
@@ -2532,10 +2780,23 @@ msgstr "快捷操作"
 msgid "性格"
 msgstr "Personality"
 
+#: apps/admin/src/routes/token-usage-page.tsx:853
+msgid "总 Token"
+msgstr ""
+
 #. placeholder {0}: schedulerJobs.length
 #: apps/admin/src/routes/dashboard-page.tsx:1483
 msgid "总任务 {0}"
 msgstr "Total jobs {0}"
+
+#: apps/admin/src/routes/chat-records-page.tsx:523
+msgid "总会话数"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:725
+#: apps/admin/src/routes/token-usage-page.tsx:935
+msgid "总览"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1272
 msgid "总角色 {totalCharacters}"
@@ -2587,6 +2848,10 @@ msgstr "Restore summary"
 #: apps/admin/src/components/game-curation-workbench.tsx:536
 msgid "恢复线上"
 msgstr "Restore live"
+
+#: apps/admin/src/routes/chat-records-page.tsx:517
+msgid "恢复默认筛选"
+msgstr ""
 
 #: apps/admin/src/routes/character-runtime-page.tsx:371
 #: apps/admin/src/routes/dashboard-page.tsx:1602
@@ -2682,6 +2947,10 @@ msgstr "Running..."
 #: apps/admin/src/routes/dashboard-page.tsx:1819
 msgid "执行推理预览"
 msgstr "Run Inference Preview"
+
+#: apps/admin/src/routes/chat-records-page.tsx:770
+msgid "执行搜索"
+msgstr ""
 
 #. placeholder {0}: formatCompactDateTime(run.updatedAt)
 #: apps/admin/src/routes/self-agent-page.tsx:679
@@ -2836,9 +3105,23 @@ msgstr "Blocked connector keys"
 msgid "拦截的 operation keys"
 msgstr "Blocked operation keys"
 
+#: apps/admin/src/routes/chat-records-page.tsx:89
+msgid "持续观察"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:699
+#: apps/admin/src/routes/token-usage-page.tsx:1004
+msgid "按周"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2235
 msgid "按场景触发新的好友请求机会。"
 msgstr "Trigger new friend-request opportunities by scene."
+
+#: apps/admin/src/routes/token-usage-page.tsx:699
+#: apps/admin/src/routes/token-usage-page.tsx:1003
+msgid "按天"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:2215
 msgid "按小时判断是否需要由提醒角色主动追问有没有新的待提醒事项。"
@@ -2852,6 +3135,11 @@ msgstr "Sorted by impact priority so the next operator can act immediately."
 msgid "按日维度刷新人物需求候选和覆盖缺口。"
 msgstr "Refresh character-need candidates and coverage gaps on a daily cadence."
 
+#: apps/admin/src/routes/token-usage-page.tsx:699
+#: apps/admin/src/routes/token-usage-page.tsx:1005
+msgid "按月"
+msgstr ""
+
 #: apps/admin/src/lib/route-breadcrumb.ts:129
 msgid "按模块整理基础资料、人格设定与行为约束，减少长表单迷路感。"
 msgstr "Organize profile basics, personality settings, and behavior constraints by module to reduce long-form friction."
@@ -2864,10 +3152,18 @@ msgstr "Enter featured game IDs in order. Use newlines or commas to separate. Sa
 msgid "按频率生成视频号内容，并补足基础内容池。"
 msgstr "Generate channel content by cadence and refill the base content pool."
 
+#: apps/admin/src/routes/chat-records-page.tsx:980
+msgid "换一个关键词、放宽时间范围，或者切回全部消息类型后再试。"
+msgstr ""
+
 #: apps/admin/src/components/game-curation-workbench.tsx:750
 #: apps/admin/src/components/game-curation-workbench.tsx:875
 msgid "排名"
 msgstr "Rank"
+
+#: apps/admin/src/routes/chat-records-page.tsx:584
+msgid "排序方式"
+msgstr ""
 
 #: apps/admin/src/components/game-release-workbench.tsx:538
 #: apps/admin/src/components/game-release-workbench.tsx:768
@@ -2885,6 +3181,10 @@ msgstr "Troubleshoot Reply Logic"
 #: apps/admin/src/routes/dashboard-page.tsx:733
 msgid "排查真实回复链路和全局规则。"
 msgstr "Inspect the real reply chain and global rules."
+
+#: apps/admin/src/routes/token-usage-page.tsx:746
+msgid "排查预算阻断、自动降级和质量回看样本。"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1045
 msgid "探测中"
@@ -2953,6 +3253,14 @@ msgstr "Reminder Runtime"
 msgid "提醒问询调度"
 msgstr "Reminder Check-in Schedule"
 
+#: apps/admin/src/routes/chat-records-page.tsx:770
+msgid "搜索中..."
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:933
+msgid "搜索命中"
+msgstr ""
+
 #: apps/admin/src/routes/games-page.tsx:630
 msgid "搜索游戏名、工作室、角色出品人或 AI 标签"
 msgstr "搜索游戏名、工作室、角色出品人或 AI 标签"
@@ -2960,6 +3268,10 @@ msgstr "搜索游戏名、工作室、角色出品人或 AI 标签"
 #: apps/admin/src/routes/characters-page.tsx:531
 msgid "搜索角色名、关系、领域或 bio"
 msgstr "搜索角色名、关系、领域或 bio"
+
+#: apps/admin/src/routes/chat-records-page.tsx:822
+msgid "搜索需求、措辞、反馈或具体话题"
+msgstr ""
 
 #: apps/admin/src/routes/characters-page.tsx:1200
 msgid "摇一摇生成"
@@ -2980,6 +3292,10 @@ msgstr "Expert domains"
 #: apps/admin/src/routes/dashboard-page.tsx:1984
 msgid "操作已完成"
 msgstr "Action Completed"
+
+#: apps/admin/src/routes/chat-records-page.tsx:875
+msgid "支持关键词、消息类型、起止日期组合搜索，命中后可直接定位到上下文。"
+msgstr ""
 
 #: apps/admin/src/components/admin-workbench.tsx:1017
 #: apps/admin/src/routes/characters-wiki-sync-section.tsx:544
@@ -3034,10 +3350,18 @@ msgstr "Datasets"
 msgid "整理配方、比对发布差异，并把草稿发布到运行时。"
 msgstr "Organize recipes, compare publish diffs, and publish drafts to runtime."
 
+#: apps/admin/src/routes/chat-records-page.tsx:69
+msgid "文件"
+msgstr ""
+
 #. placeholder {0}: activeDocumentSummary.name
 #: apps/admin/src/routes/self-agent-page.tsx:624
 msgid "文件名：{0}"
 msgstr "Filename: {0}"
+
+#: apps/admin/src/routes/chat-records-page.tsx:66
+msgid "文本"
+msgstr ""
 
 #: apps/admin/src/routes/self-agent-page.tsx:586
 msgid "文档尚未初始化"
@@ -3158,6 +3482,10 @@ msgstr "Invalid"
 msgid "无稳定版本"
 msgstr "No stable revision"
 
+#: apps/admin/src/routes/chat-records-page.tsx:940
+msgid "无附加条件"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1870
 msgid "日常维护"
 msgstr "Routine Maintenance"
@@ -3179,6 +3507,22 @@ msgstr "old"
 msgid "时长"
 msgstr "Duration"
 
+#: apps/admin/src/routes/token-usage-page.tsx:696
+msgid "时间"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:988
+msgid "时间线"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:886
+msgid "时间线视角"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:1193
+msgid "时间趋势"
+msgstr ""
+
 #: apps/admin/src/routes/character-runtime-page.tsx:176
 msgid "是"
 msgstr "Yes"
@@ -3190,6 +3534,10 @@ msgstr "Within active window"
 #: apps/admin/src/components/admin-topbar.tsx:134
 msgid "显示密度"
 msgstr "Display density"
+
+#: apps/admin/src/routes/chat-records-page.tsx:607
+msgid "显示隐藏会话"
+msgstr ""
 
 #: apps/admin/src/routes/self-agent-page.tsx:98
 msgid "普通自我对话"
@@ -3315,6 +3663,7 @@ msgid "未发生"
 msgstr "Not occurred"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:192
+#: apps/admin/src/routes/token-usage-page.tsx:121
 msgid "未启用"
 msgstr "Disabled"
 
@@ -3394,6 +3743,7 @@ msgstr "Not recorded"
 #: apps/admin/src/routes/characters-page.tsx:753
 #: apps/admin/src/routes/characters-page.tsx:1125
 #: apps/admin/src/routes/characters-page.tsx:1185
+#: apps/admin/src/routes/token-usage-page.tsx:112
 msgid "未设置"
 msgstr "Not set"
 
@@ -3422,6 +3772,14 @@ msgstr "Local character missing"
 msgid "本局目标"
 msgstr "Session objective"
 
+#: apps/admin/src/routes/token-usage-page.tsx:1181
+msgid "本时间范围内没有明显预算预警、阻断或降级质量风险。"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:842
+msgid "本月"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:661
 msgid "本班结论"
 msgstr "Shift Conclusion"
@@ -3441,6 +3799,26 @@ msgstr "No action this round"
 #: apps/admin/src/routes/self-agent-page.tsx:683
 msgid "本轮没有生成建议主动话术。"
 msgstr "No proactive message suggested this round."
+
+#: apps/admin/src/routes/chat-records-page.tsx:673
+msgid "本页会话"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:890
+msgid "条，预算阻断"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:789
+msgid "条已复盘"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:749
+msgid "条异常"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:735
+msgid "条预警"
+msgstr ""
 
 #: apps/admin/src/components/game-release-workbench.tsx:696
 #: apps/admin/src/components/game-submission-workbench.tsx:628
@@ -3510,9 +3888,17 @@ msgstr "查看待发布"
 msgid "查看待审核"
 msgstr "查看待审核"
 
+#: apps/admin/src/routes/token-usage-page.tsx:921
+msgid "查看总览"
+msgstr ""
+
 #: apps/admin/src/lib/route-breadcrumb.ts:101
 msgid "查看提醒角色当前在盯哪些事项、最近有没有真正提醒出去，以及晨间 / 晚间的长期习惯提醒是否稳定落地。"
 msgstr "View what the reminder character is tracking, whether reminders were actually sent recently, and whether morning/evening long-term habit reminders are stable."
+
+#: apps/admin/src/routes/token-usage-page.tsx:733
+msgid "查看整体和角色预算状态，集中调整规则和阈值。"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:2069
 msgid "查看真实回复链路、规则和常量。"
@@ -3687,9 +4073,17 @@ msgstr "Checked {0} characters, generated {1} channel posts, and refilled the co
 msgid "检查界闻早报、午报、晚报是否需要补发。"
 msgstr "Check whether Jiewen morning, noon, and evening bulletins need backfill."
 
+#: apps/admin/src/routes/token-usage-page.tsx:787
+msgid "检查节省是否有效，质量是否还能接受，是否需要复盘。"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:2233
 msgid "检查角色是否应发布朋友圈内容。"
 msgstr "Check whether characters should publish moments."
+
+#: apps/admin/src/routes/chat-records-page.tsx:758
+msgid "检索与定位"
+msgstr ""
 
 #: apps/admin/src/components/game-curation-workbench.tsx:797
 #: apps/admin/src/components/game-curation-workbench.tsx:922
@@ -3746,9 +4140,39 @@ msgstr "Mode"
 msgid "模拟"
 msgstr "Mock"
 
+#: apps/admin/src/routes/token-usage-page.tsx:1196
+msgid "次"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:891
+msgid "次，自动降级"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:892
+msgid "次。"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:727
+msgid "次请求"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:771
+#: apps/admin/src/routes/token-usage-page.tsx:1157
+msgid "次阻断"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:780
+#: apps/admin/src/routes/token-usage-page.tsx:1165
+msgid "次降级"
+msgstr ""
+
 #: apps/admin/src/routes/games-page.tsx:552
 msgid "正在加载 AI 游戏目录..."
 msgstr "正在加载 AI 游戏目录..."
+
+#: apps/admin/src/routes/token-usage-page.tsx:649
+msgid "正在加载 Token 用量中心..."
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1779
 msgid "正在加载已保存的推理服务配置..."
@@ -3782,6 +4206,10 @@ msgstr "Syncing remote API, inference gateway, and world surface status."
 msgid "正在导出诊断包..."
 msgstr "Exporting diagnostics package..."
 
+#: apps/admin/src/routes/chat-records-page.tsx:925
+msgid "正在搜索命中消息..."
+msgstr ""
+
 #: apps/admin/src/routes/self-agent-page.tsx:237
 msgid "正在读取 self-agent 总览..."
 msgstr "Loading self-agent overview..."
@@ -3789,6 +4217,10 @@ msgstr "Loading self-agent overview..."
 #: apps/admin/src/routes/self-agent-page.tsx:634
 msgid "正在读取 workspace 文档..."
 msgstr "Loading workspace document..."
+
+#: apps/admin/src/routes/chat-records-page.tsx:665
+msgid "正在读取列表"
+msgstr ""
 
 #: apps/admin/src/components/root-layout.tsx:63
 msgid "正在读取实例状态"
@@ -3893,6 +4325,14 @@ msgstr "One connector key per line. When matched, self-agent blocks this kind of
 msgid "每行一个 operation key。用于从主代理层统一禁掉某些动作能力。"
 msgstr "One operation key per line. Use this to disable specific action capabilities at the master-agent layer."
 
+#: apps/admin/src/routes/chat-records-page.tsx:979
+msgid "没有命中消息"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:702
+msgid "没有符合条件的会话"
+msgstr ""
+
 #: apps/admin/src/components/game-curation-workbench.tsx:997
 msgid "活动 ID"
 msgstr "Event ID"
@@ -3961,13 +4401,37 @@ msgstr "Clean up pending friend requests that expire today."
 msgid "清空所选"
 msgstr "Clear selection"
 
+#: apps/admin/src/routes/chat-records-page.tsx:777
+msgid "清空条件"
+msgstr ""
+
 #: apps/admin/src/routes/characters-page.tsx:586
 msgid "清空筛选"
 msgstr "清空筛选"
 
+#: apps/admin/src/routes/token-usage-page.tsx:1059
+msgid "清除会话聚焦"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:785
+msgid "清除命中"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:1077
+msgid "清除状态筛选"
+msgstr ""
+
 #: apps/admin/src/routes/characters-wiki-sync-section.tsx:347
 msgid "清除筛选"
 msgstr "Clear filter"
+
+#: apps/admin/src/routes/token-usage-page.tsx:1068
+msgid "清除角色筛选"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:1086
+msgid "清除计费来源"
+msgstr ""
 
 #: apps/admin/src/routes/characters-page.tsx:298
 msgid "清除错误"
@@ -3994,6 +4458,10 @@ msgstr "Game Catalog"
 #: apps/admin/src/components/game-submission-workbench.tsx:781
 msgid "游戏说明"
 msgstr "Game description"
+
+#: apps/admin/src/routes/chat-records-page.tsx:936
+msgid "点击任一条即可切到附近上下文。"
+msgstr ""
 
 #: apps/admin/src/components/game-curation-workbench.tsx:696
 msgid "热门榜"
@@ -4022,6 +4490,7 @@ msgstr "Version update"
 
 #: apps/admin/src/components/game-submission-workbench.tsx:562
 #: apps/admin/src/routes/dashboard-page.tsx:1195
+#: apps/admin/src/routes/token-usage-page.tsx:706
 msgid "状态"
 msgstr "Status"
 
@@ -4137,6 +4606,14 @@ msgstr "目录队列里还有待推进事项"
 #: apps/admin/src/routes/dashboard-page.tsx:911
 msgid "目标世界语言"
 msgstr "Target World Language"
+
+#: apps/admin/src/routes/token-usage-page.tsx:778
+msgid "看哪些请求被降级，以及是否集中命中某些角色或场景。"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:726
+msgid "看趋势、排行和最近账本，先判断是否真的有异常。"
+msgstr ""
 
 #: apps/admin/src/components/root-layout.tsx:280
 #: apps/admin/src/lib/route-breadcrumb.ts:167
@@ -4255,6 +4732,10 @@ msgstr "Waiting for health probe"
 msgid "等待加载"
 msgstr "Waiting to load"
 
+#: apps/admin/src/routes/token-usage-page.tsx:790
+msgid "等待复盘样本"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1969
 msgid "等待本地运行时日志..."
 msgstr "Waiting for local runtime logs..."
@@ -4288,6 +4769,7 @@ msgid "策展草稿已恢复到当前线上配置。"
 msgstr "Curation draft has been restored to the current live config."
 
 #: apps/admin/src/routes/characters-page.tsx:518
+#: apps/admin/src/routes/token-usage-page.tsx:971
 msgid "筛选工作台"
 msgstr "筛选工作台"
 
@@ -4307,6 +4789,14 @@ msgstr "Admin Console"
 msgid "管理密钥"
 msgstr "Admin secret"
 
+#: apps/admin/src/routes/token-usage-page.tsx:698
+msgid "粒度"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:72
+msgid "系统"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:309
 msgid "系统已进入可运维状态。建议下一步进入评测页验证当前生成链质量。"
 msgstr "The system is operational. Next, open Evals to verify the current generation chain quality."
@@ -4318,6 +4808,10 @@ msgstr "System status detected an external player template."
 #: apps/admin/src/components/admin-topbar.tsx:72
 msgid "紧凑"
 msgstr "Compact"
+
+#: apps/admin/src/routes/chat-records-page.tsx:58
+msgid "累计消息量"
+msgstr ""
 
 #: apps/admin/src/routes/characters-wiki-sync-section.tsx:669
 msgid "线上有这个角色，但 wiki 还没有对应的词条。可以到 wiki 创建一个词条；提交后再回来同步。"
@@ -4340,6 +4834,10 @@ msgstr "Finish Reason"
 msgid "结束小时"
 msgstr "End hour"
 
+#: apps/admin/src/routes/token-usage-page.tsx:987
+msgid "结束日期"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1825
 msgid "结果"
 msgstr "Result"
@@ -4355,6 +4853,10 @@ msgstr "继承全局默认"
 #: apps/admin/src/components/game-curation-workbench.tsx:1146
 msgid "维护\"看内容\"分栏里的攻略、更新、幕后专题等内容卡。"
 msgstr "维护\\\"看内容\\\"分栏里的攻略、更新、幕后专题等内容卡。"
+
+#: apps/admin/src/routes/token-usage-page.tsx:758
+msgid "维护模型单价，保证费用估算口径稳定可用。"
+msgstr ""
 
 #: apps/admin/src/components/game-curation-workbench.tsx:203
 msgid "编辑精选"
@@ -4392,8 +4894,13 @@ msgstr "Chat-style AI game"
 
 #: apps/admin/src/components/root-layout.tsx:207
 #: apps/admin/src/lib/route-breadcrumb.ts:137
+#: apps/admin/src/routes/chat-records-page.tsx:497
 msgid "聊天记录"
 msgstr "Chat Records"
+
+#: apps/admin/src/routes/chat-records-page.tsx:478
+msgid "聊天记录概览加载失败"
+msgstr ""
 
 #: apps/admin/src/routes/characters-page.tsx:402
 #: apps/admin/src/routes/characters-page.tsx:1204
@@ -4408,6 +4915,10 @@ msgstr "Contact information"
 #: apps/admin/src/routes/games-page.tsx:85
 msgid "聚会"
 msgstr "Party"
+
+#: apps/admin/src/routes/token-usage-page.tsx:995
+msgid "聚合粒度"
+msgstr ""
 
 #: apps/admin/src/routes/self-agent-page.tsx:42
 msgid "能力边界"
@@ -4425,6 +4936,10 @@ msgstr "Auto heartbeat: every 30 minutes"
 #: apps/admin/src/routes/self-agent-page.tsx:675
 msgid "自动调度"
 msgstr "Auto-schedule"
+
+#: apps/admin/src/routes/token-usage-page.tsx:1108
+msgid "自动降级"
+msgstr ""
 
 #: apps/admin/src/routes/characters-page.tsx:567
 #: apps/admin/src/routes/characters-page.tsx:1183
@@ -4452,6 +4967,10 @@ msgstr "Draft Unsaved"
 msgid "草稿状态"
 msgstr "Draft state"
 
+#: apps/admin/src/components/character-workspace-nav.tsx:19
+msgid "行为管理"
+msgstr ""
+
 #: apps/admin/src/lib/route-breadcrumb.ts:168
 msgid "行动助理动作运行时"
 msgstr "Action Assistant Runtime"
@@ -4472,9 +4991,18 @@ msgstr "Complete Inference Setup"
 msgid "补齐模型、接口和 API Key，否则无法跑真实生成。"
 msgstr "Complete model, endpoint, and API Key setup, otherwise real generation cannot run."
 
+#: apps/admin/src/routes/chat-records-page.tsx:71
+msgid "表情"
+msgstr ""
+
 #: apps/admin/src/routes/self-agent-page.tsx:89
 msgid "被策略拦下"
 msgstr "Blocked by policy"
+
+#: apps/admin/src/routes/token-usage-page.tsx:702
+#: apps/admin/src/routes/token-usage-page.tsx:1008
+msgid "角色"
+msgstr ""
 
 #: apps/admin/src/components/root-layout.tsx:192
 msgid "角色与内容"
@@ -4575,6 +5103,10 @@ msgstr "Character Editing"
 msgid "角色缺口识别与自动加友"
 msgstr "Character Gap Detection and Auto Friend-Adding"
 
+#: apps/admin/src/routes/chat-records-page.tsx:563
+msgid "角色范围"
+msgstr ""
+
 #: apps/admin/src/components/game-submission-workbench.tsx:701
 msgid "角色资料快速带入"
 msgstr "Quick-import character details"
@@ -4611,6 +5143,11 @@ msgstr "Trigger scenes"
 #: apps/admin/src/routes/character-runtime-page.tsx:187
 msgid "触发场景数"
 msgstr "Trigger scenes"
+
+#: apps/admin/src/routes/token-usage-page.tsx:709
+#: apps/admin/src/routes/token-usage-page.tsx:1035
+msgid "计费来源"
+msgstr ""
 
 #: apps/admin/src/routes/dashboard-page.tsx:1675
 msgid "订阅数"
@@ -4653,6 +5190,10 @@ msgstr "Evals Runtime"
 msgid "语言约束会注入最终生成 Prompt 的末尾，用来覆盖角色旧提示词里可能残留的中文回复要求。"
 msgstr "The language constraint is appended to the final generation prompt to override any leftover Chinese reply requirements in older character prompts."
 
+#: apps/admin/src/routes/chat-records-page.tsx:70
+msgid "语音"
+msgstr ""
+
 #: apps/admin/src/routes/games-page.tsx:512
 msgid "请先选择一款游戏，或新建一个目录草稿。"
 msgstr "请先选择一款游戏，或新建一个目录草稿。"
@@ -4660,6 +5201,14 @@ msgstr "请先选择一款游戏，或新建一个目录草稿。"
 #: apps/admin/src/routes/self-agent-page.tsx:247
 msgid "请检查管理后台和实例连通性。"
 msgstr "Please check the admin console and instance connectivity."
+
+#: apps/admin/src/routes/token-usage-page.tsx:1196
+msgid "请求"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:1022
+msgid "请求状态"
+msgstr ""
 
 #: apps/admin/src/routes/self-agent-page.tsx:641
 msgid "请稍后重试。"
@@ -4726,6 +5275,14 @@ msgstr "Shelf description"
 msgid "货架标题"
 msgstr "Shelf title"
 
+#: apps/admin/src/routes/token-usage-page.tsx:1173
+msgid "质量偏弱"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:1171
+msgid "质量风险最高角色"
+msgstr ""
+
 #: apps/admin/src/routes/characters-page.tsx:401
 msgid "资料待补齐"
 msgstr "资料待补齐"
@@ -4754,6 +5311,10 @@ msgstr "Jump to Scheduler Troubleshooting"
 msgid "跳过"
 msgstr "Skip"
 
+#: apps/admin/src/routes/token-usage-page.tsx:857
+msgid "输入 Token"
+msgstr ""
+
 #. placeholder {0}: run.inputPreview
 #: apps/admin/src/routes/self-agent-page.tsx:751
 msgid "输入：{0}"
@@ -4766,6 +5327,10 @@ msgstr "Input"
 #: apps/admin/src/components/admin-sidebar.tsx:275
 msgid "输入后台密钥"
 msgstr "Enter admin secret"
+
+#: apps/admin/src/routes/token-usage-page.tsx:861
+msgid "输出 Token"
+msgstr ""
 
 #. placeholder {0}: run.outputPreview
 #: apps/admin/src/routes/self-agent-page.tsx:754
@@ -4852,6 +5417,10 @@ msgstr "Running"
 msgid "运行体征"
 msgstr "Runtime Vitals"
 
+#: apps/admin/src/components/character-workspace-nav.tsx:20
+msgid "运行台"
+msgstr ""
+
 #: apps/admin/src/components/root-layout.tsx:170
 msgid "运行总览"
 msgstr "Runtime Overview"
@@ -4897,7 +5466,33 @@ msgstr "Runtime Settings"
 msgid "运行诊断"
 msgstr "Runtime Diagnostics"
 
+#: apps/admin/src/routes/token-usage-page.tsx:837
+msgid "近 30 天"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:530
+msgid "近 30 天成本"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:81
+msgid "近 30 天活跃"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:528
+msgid "近 30 天消息"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:57
+msgid "近 30 天消息量"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:832
+msgid "近 7 天"
+msgstr ""
+
 #: apps/admin/src/routes/characters-page.tsx:403
+#: apps/admin/src/routes/chat-records-page.tsx:80
+#: apps/admin/src/routes/chat-records-page.tsx:525
 msgid "近 7 天活跃"
 msgstr "近 7 天活跃"
 
@@ -4936,6 +5531,10 @@ msgstr "No recent interactions; skipping memory update."
 #: apps/admin/src/routes/self-agent-page.tsx:370
 msgid "近期巡检记录：{0} 条"
 msgstr "Recent heartbeat records: {0}"
+
+#: apps/admin/src/routes/chat-records-page.tsx:508
+msgid "返回最新消息"
+msgstr ""
 
 #: apps/admin/src/routes/games-page.tsx:807
 msgid "返回目录编辑"
@@ -4992,6 +5591,14 @@ msgstr "This changes the world runtime language, not the admin UI language. Afte
 #: apps/admin/src/routes/dashboard-page.tsx:1747
 msgid "这里只是直连当前 provider 的原始调试入口，不走角色运行时，也不是角色 system prompt 的编辑入口。"
 msgstr "This is a raw debugging entry directly against the current provider. It does not use character runtime or edit character system prompts."
+
+#: apps/admin/src/routes/chat-records-page.tsx:920
+msgid "这里展示数据库仍保留的完整会话样本，可能包含用户在前台已清空的聊天。"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:828
+msgid "这里把实例里的 AI 请求沉淀成运营账本，方便先看预算健康度，再处理阻断、降级和价格配置。"
+msgstr ""
 
 #: apps/admin/src/routes/self-agent-page.tsx:291
 msgid "这里收口 self-agent 的长期 workspace、主动巡检和近期待处理事项，让\"我自己\"不再只是单条 prompt，而是一个可运营的主代理。"
@@ -5083,6 +5690,10 @@ msgstr "Pick an existing world character to import identity, bio, expert domains
 msgid "选中目录中的具体游戏后，这里会显示版本历史、修订轨迹和发布操作。"
 msgstr "Once a specific game is selected from the catalog, the revision history, change trail, and publish actions will appear here."
 
+#: apps/admin/src/routes/chat-records-page.tsx:751
+msgid "选中角色会话后，中间会进入上下文阅读与定位模式，右侧则同步显示复盘和洞察。"
+msgstr ""
+
 #: apps/admin/src/routes/characters-page.tsx:874
 msgid "选中角色后，这里会显示状态摘要、快捷操作和谨慎操作入口。"
 msgstr "选中角色后，这里会显示状态摘要、快捷操作和谨慎操作入口。"
@@ -5134,7 +5745,13 @@ msgstr "重新加载好友标记"
 msgid "重新加载角色"
 msgstr "重新加载角色"
 
+#: apps/admin/src/routes/chat-records-page.tsx:90
+msgid "重点样本"
+msgstr ""
+
 #: apps/admin/src/routes/characters-page.tsx:522
+#: apps/admin/src/routes/token-usage-page.tsx:847
+#: apps/admin/src/routes/token-usage-page.tsx:974
 msgid "重置筛选"
 msgstr "重置筛选"
 
@@ -5146,6 +5763,10 @@ msgstr "Error: {inferenceGatewayLastError}"
 msgid "长期记忆"
 msgstr "Long-term memory"
 
+#: apps/admin/src/routes/chat-records-page.tsx:990
+msgid "阅读和判断都在这里完成。用户消息右对齐，角色回复左对齐，系统消息居中展示。"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1768
 msgid "队列深度"
 msgstr "Queue Depth"
@@ -5155,9 +5776,21 @@ msgstr "Queue Depth"
 msgid "阻塞项"
 msgstr "Blockers"
 
+#: apps/admin/src/routes/token-usage-page.tsx:1155
+msgid "阻断命中最高角色"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1799
 msgid "附加 System Prompt（调试用，可留空）"
 msgstr "Additional System Prompt (optional for debugging)"
+
+#: apps/admin/src/routes/token-usage-page.tsx:1163
+msgid "降级命中最高角色"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:786
+msgid "降级质量"
+msgstr ""
 
 #: apps/admin/src/components/admin-sidebar.tsx:146
 msgid "隐界"
@@ -5199,6 +5832,10 @@ msgstr "Centralized management of multiple Provider accounts, model catalogs, de
 msgid "需关注"
 msgstr "需关注"
 
+#: apps/admin/src/routes/chat-records-page.tsx:102
+msgid "需排查"
+msgstr ""
+
 #: apps/admin/src/components/root-layout.tsx:241
 #: apps/admin/src/lib/route-breadcrumb.ts:68
 msgid "需求发现"
@@ -5228,6 +5865,31 @@ msgstr "Breadcrumbs"
 msgid "页面导航"
 msgstr "Page Navigation"
 
+#: apps/admin/src/routes/token-usage-page.tsx:1129
+msgid "项"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:1140
+msgid "预算最紧角色"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:732
+msgid "预算操作"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:768
+#: apps/admin/src/routes/token-usage-page.tsx:1104
+msgid "预算阻断"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:777
+msgid "预算降级"
+msgstr ""
+
+#: apps/admin/src/routes/token-usage-page.tsx:1100
+msgid "预算预警"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:1818
 msgid "预览执行中..."
 msgstr "Running preview..."
@@ -5239,6 +5901,10 @@ msgstr "Preview returned no output."
 #: apps/admin/src/routes/characters-page.tsx:833
 msgid "领域标签"
 msgstr "领域标签"
+
+#: apps/admin/src/routes/chat-records-page.tsx:100
+msgid "首响偏慢"
+msgstr ""
 
 #: apps/admin/src/components/game-curation-workbench.tsx:560
 msgid "首页主推位"
@@ -5262,6 +5928,14 @@ msgstr "Verify generation chain quality and locate failed samples."
 msgid "高优先级"
 msgstr "High Priority"
 
+#: apps/admin/src/routes/chat-records-page.tsx:99
+msgid "高成本"
+msgstr ""
+
+#: apps/admin/src/routes/chat-records-page.tsx:98
+msgid "高需求"
+msgstr ""
+
 #: apps/admin/src/routes/dashboard-page.tsx:931
 msgid "默认世界语言"
 msgstr "Default World Language"
@@ -5273,6 +5947,10 @@ msgstr "默认保底"
 #: apps/admin/src/routes/characters-page.tsx:850
 msgid "默认保底角色不可删除。"
 msgstr "默认保底角色不可删除。"
+
+#: apps/admin/src/routes/chat-records-page.tsx:685
+msgid "默认视图：全部角色，按最近活跃排序。"
+msgstr ""
 
 #: apps/admin/src/routes/characters-page.tsx:864
 msgid "默认角色受保护"

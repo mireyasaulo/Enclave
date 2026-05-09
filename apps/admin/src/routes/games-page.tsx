@@ -988,7 +988,7 @@ function CatalogEditorWorkspace({
               value={draft.id}
               onChange={(value) => setDraft((current) => ({ ...current, id: value }))}
               disabled={!isCreating}
-              placeholder="signal-squad"
+              placeholder="signal-squad" // i18n-ignore-line: internal id
             />
             <EditorField
               label={t(msg`游戏名`)}
