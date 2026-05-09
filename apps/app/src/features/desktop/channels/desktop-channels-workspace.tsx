@@ -42,6 +42,7 @@ import { AudioCard } from "../../../components/audio-card";
 import { EmptyState } from "../../../components/empty-state";
 import { FeatureUnavailableDialog } from "../../../components/feature-unavailable-dialog";
 import { formatTimestamp } from "../../../lib/format";
+import { resolveAppMediaUrl } from "../../../lib/media-url";
 
 type DesktopChannelsWorkspaceProps = {
   activeSection: FeedChannelHomeSection;
@@ -526,12 +527,15 @@ function ChannelMediaSurface({
   const videoAsset = post.media?.find((asset) => asset.kind === "video");
 
   if (post.mediaType === "audio" && (audioAsset || post.mediaUrl)) {
+    const backgroundCover = resolveAppMediaUrl(
+      audioAsset?.posterUrl ?? post.coverUrl ?? undefined,
+    );
     return (
       <div className="relative flex flex-1 items-center justify-center bg-gradient-to-b from-[#1f2533] to-[#0a0c10] px-6">
-        {post.coverUrl || audioAsset?.posterUrl ? (
+        {backgroundCover ? (
           // 浮在背景里的封面图（半透明），给音乐贴一些视觉氛围
           <img
-            src={audioAsset?.posterUrl ?? post.coverUrl ?? undefined}
+            src={backgroundCover}
             alt={post.title ?? ""}
             className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30 blur-[1px]"
           />
@@ -552,10 +556,13 @@ function ChannelMediaSurface({
   }
 
   if (post.mediaType === "video" && (videoAsset?.url || post.mediaUrl)) {
+    const resolvedPoster = resolveAppMediaUrl(
+      videoAsset?.posterUrl ?? post.coverUrl ?? undefined,
+    );
     return (
       <ChannelVideoPlayer
-        url={videoAsset?.url ?? post.mediaUrl ?? ""}
-        posterUrl={videoAsset?.posterUrl ?? post.coverUrl ?? undefined}
+        url={resolveAppMediaUrl(videoAsset?.url ?? post.mediaUrl ?? "")}
+        posterUrl={resolvedPoster || undefined}
         isActive={isActive}
       />
     );
