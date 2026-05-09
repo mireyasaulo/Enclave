@@ -49,6 +49,7 @@
     "dev:cloud-api:stop": "node ./scripts/dev-services.mjs stop cloud-api",
     "dev:cloud-api:restart": "node ./scripts/dev-services.mjs restart cloud-api",
     "dev:cloud-api:status": "node ./scripts/dev-services.mjs status cloud-api",
+    "smoke:multi-tenant-proxy": "node ./scripts/multi-tenant-proxy-smoke.mjs",
     "dev:api": "node ./scripts/dev-services.mjs start api",
     "dev:api:stop": "node ./scripts/dev-services.mjs stop api",
     "dev:api:restart": "node ./scripts/dev-services.mjs restart api",
