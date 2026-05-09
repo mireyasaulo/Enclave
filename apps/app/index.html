@@ -14,6 +14,41 @@
       // 想检测新版本可以自己调 GET /api/system/build-id 与
       // localStorage["yinjie:server-build-id"] 比对，需要时再触发刷新。
     </script>
+    <script>
+      // SW 兜底清理：本地预览（127.0.0.1 / localhost / 局域网 IP 等）一律
+      // 不装 SW，并主动清掉历史遗留的 SW + caches。生产 host 才走 SW 缓存。
+      // 这段 inline 脚本必须在 React bundle 之前执行，因为 bundle 本身可能
+      // 就是从旧 SW precache 里拿出来的——必须先把旧 SW 干掉，下次刷新才能
+      // 真正命中网络新版本。
+      (function () {
+        if (typeof window === "undefined") return;
+        var PROD_SW_HOSTS = ["1gw06751dd053.vicp.fun"];
+        if (PROD_SW_HOSTS.indexOf(window.location.hostname) >= 0) return;
+        if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
+        var GUARD_KEY = "yinjie:sw-cleanup-reload";
+        var alreadyTried = false;
+        try { alreadyTried = window.sessionStorage.getItem(GUARD_KEY) === "1"; } catch (e) {}
+        if (alreadyTried) return;
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          if (!regs || regs.length === 0) {
+            try { window.sessionStorage.setItem(GUARD_KEY, "1"); } catch (e) {}
+            return null;
+          }
+          return Promise.all(regs.map(function (r) { return r.unregister(); }))
+            .then(function () {
+              if (typeof caches !== "undefined" && caches.keys) {
+                return caches.keys().then(function (keys) {
+                  return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+                });
+              }
+            })
+            .then(function () {
+              try { window.sessionStorage.setItem(GUARD_KEY, "1"); } catch (e) {}
+              window.location.reload();
+            });
+        }).catch(function () {});
+      })();
+    </script>
     <style>
       :root {
         color-scheme: light;
