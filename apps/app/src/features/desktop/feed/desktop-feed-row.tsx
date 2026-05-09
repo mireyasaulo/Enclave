@@ -128,11 +128,6 @@ export function DesktopFeedRow({
                   ? t(msg`居民`)
                   : t(msg`世界主人`)}
               </span>
-              {post.aiReacted ? (
-                <span className="rounded-md border border-[rgba(7,193,96,0.12)] bg-white px-2 py-1 text-[10px] font-medium text-[color:var(--text-primary)] shadow-[inset_0_-2px_0_0_var(--brand-primary)]">
-                  {t(msg`AI 已回应`)}
-                </span>
-              ) : null}
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[color:var(--text-muted)]">
               <span>{formatTimestamp(post.createdAt)}</span>
