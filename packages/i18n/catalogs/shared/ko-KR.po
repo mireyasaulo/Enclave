@@ -12,53 +12,37 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: packages/ui/src/components/provider-setup-form.tsx:151
-msgid "云端模式"
-msgstr "클라우드 모드"
-
 #: packages/i18n/src/runtime/formatters.ts:61
 msgid "刚刚"
 msgstr "방금"
-
-#: packages/ui/src/components/loading-block.tsx:28
-msgid "加载中..."
-msgstr "로딩 중..."
-
-#: packages/ui/src/components/setup-step-list.tsx:45
-msgid "处理中"
-msgstr "처리 중"
-
-#: packages/ui/src/components/setup-status-card.tsx:38
-msgid "就绪"
-msgstr "준비됨"
-
-#: packages/ui/src/components/setup-status-card.tsx:39
-msgid "待完善"
-msgstr "보완 필요"
 
 #: packages/i18n/src/runtime/formatters.ts:65
 msgid "昨天"
 msgstr "어제"
 
-#: packages/ui/src/components/provider-setup-form.tsx:148
-msgid "本地兼容"
-msgstr "로컬 호환"
-
-#: packages/i18n/src/runtime/language-switcher.tsx:88
-msgid "正在切换语言..."
-msgstr "언어를 전환하는 중..."
+#: packages/i18n/src/runtime/language-switcher.tsx:29
+msgid "语言偏好保存在当前设备并立即生效，同时决定好友回复使用的语言。"
+msgstr "언어 환경설정은 현재 기기에 저장되어 즉시 적용되며, 친구가 답장할 때 사용하는 언어도 함께 결정합니다."
 
 #: packages/i18n/src/runtime/language-switcher.tsx:60
 msgid "界面语言"
 msgstr "인터페이스 언어"
 
-#: packages/i18n/src/runtime/language-switcher.tsx:29
-msgid "语言偏好保存在当前设备并立即生效，同时决定好友回复使用的语言。"
-msgstr "언어 환경설정은 현재 기기에 저장되어 즉시 적용되며, 친구가 답장할 때 사용하는 언어도 함께 결정합니다."
+#: packages/i18n/src/runtime/language-switcher.tsx:88
+msgid "正在切换语言..."
+msgstr "언어를 전환하는 중..."
 
-#: packages/ui/src/components/provider-setup-form.tsx:237
-msgid "转写 API 密钥"
-msgstr "전사 API 키"
+#: packages/ui/src/components/loading-block.tsx:28
+msgid "加载中..."
+msgstr "로딩 중..."
+
+#: packages/ui/src/components/provider-setup-form.tsx:148
+msgid "本地兼容"
+msgstr "로컬 호환"
+
+#: packages/ui/src/components/provider-setup-form.tsx:151
+msgid "云端模式"
+msgstr "클라우드 모드"
 
 #: packages/ui/src/components/provider-setup-form.tsx:201
 msgid "转写接口地址"
@@ -68,6 +52,22 @@ msgstr "전사 엔드포인트"
 msgid "转写模型"
 msgstr "전사 모델"
 
+#: packages/ui/src/components/provider-setup-form.tsx:237
+msgid "转写 API 密钥"
+msgstr "전사 API 키"
+
+#: packages/ui/src/components/setup-status-card.tsx:38
+msgid "就绪"
+msgstr "준비됨"
+
+#: packages/ui/src/components/setup-status-card.tsx:39
+msgid "待完善"
+msgstr "보완 필요"
+
 #: packages/ui/src/components/setup-step-list.tsx:44
 msgid "通过"
 msgstr "통과"
+
+#: packages/ui/src/components/setup-step-list.tsx:45
+msgid "处理中"
+msgstr "처리 중"

@@ -8,6 +8,8 @@ const config: LinguiConfig = {
   },
   format: "po",
   compileNamespace: "ts",
+  // "origin" uses binary path comparison (no locale collation) → deterministic across runs
+  orderBy: "origin",
   catalogs: [
     {
       path: "<rootDir>/packages/i18n/catalogs/shared/{locale}",
