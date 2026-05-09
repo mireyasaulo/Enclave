@@ -436,8 +436,12 @@ export class AiOrchestratorService {
 
   private resolveLocalAssetPath(url: string) {
     try {
-      const parsed = new URL(url);
-      const normalizedPath = parsed.pathname.replace(/\/+$/, '');
+      // 兼容相对路径 (e.g. '/api/moments/media/foo.mp4')；MiniMax 资产现在
+      // 一律存相对路径让浏览器跨域名通用，服务端转录路径要在此识别。
+      const isAbsolute = /^https?:\/\//i.test(url);
+      const normalizedPath = isAbsolute
+        ? new URL(url).pathname.replace(/\/+$/, '')
+        : url.split('?')[0].split('#')[0].replace(/\/+$/, '');
       const fileName = decodeURIComponent(
         path.basename(normalizedPath.split('/').pop() ?? ''),
       );

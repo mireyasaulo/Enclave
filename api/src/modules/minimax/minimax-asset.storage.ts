@@ -16,13 +16,13 @@ export interface PersistedAsset {
 @Injectable()
 export class MinimaxAssetStorage {
   private readonly logger = new Logger(MinimaxAssetStorage.name);
-  private readonly publicBaseUrl: string;
+  private readonly serverBaseUrl: string;
 
   constructor(config: ConfigService) {
-    const raw = (
+    // 仅服务端内部 fetch (e.g. 视频转录) 用得到，客户端用相对路径不会读它。
+    this.serverBaseUrl = (
       config.get<string>('PUBLIC_API_BASE_URL') ?? 'http://localhost:3000'
     ).replace(/\/+$/, '');
-    this.publicBaseUrl = raw;
   }
 
   async persist(input: {
@@ -37,12 +37,23 @@ export class MinimaxAssetStorage {
     const fileName = `${Date.now()}-${randomUUID().slice(0, 8)}-minimax-${input.kind}${input.suffix ?? ''}.${ext}`;
     const target = path.join(dir, fileName);
     await writeFile(target, input.buffer);
+    // 关键：返回相对路径而非绝对 URL。客户端基于自己 origin 拼接（公网/局域网/原生壳都通用），
+    // 服务端如果要 fetch（如转录）再用 absolutize() 拼上 PUBLIC_API_BASE_URL。
+    // 之前写绝对 URL `http://localhost:3000/...` 导致从公网域名打开的浏览器把 mediaUrl 当成
+    // 用户自己的 localhost，全部 404。
     return {
       fileName,
-      publicUrl: `${this.publicBaseUrl}/api/moments/media/${fileName}`,
+      publicUrl: `/api/moments/media/${fileName}`,
       size: input.buffer.length,
       mimeType: input.mimeType,
     };
+  }
+
+  absolutize(maybeRelative: string | null | undefined): string | null {
+    if (!maybeRelative) return null;
+    if (/^https?:\/\//i.test(maybeRelative)) return maybeRelative;
+    if (maybeRelative.startsWith('/')) return `${this.serverBaseUrl}${maybeRelative}`;
+    return `${this.serverBaseUrl}/${maybeRelative}`;
   }
 }
 
