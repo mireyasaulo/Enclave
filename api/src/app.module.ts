@@ -57,6 +57,7 @@ import { GroupMessageEntity } from './modules/chat/group-message.entity';
 import { GroupReplyTaskEntity } from './modules/chat/group-reply-task.entity';
 import { ReplyArtifactJobEntity } from './modules/chat/reply-artifact-job.entity';
 import { MinimaxQuotaEntity } from './modules/minimax/minimax-quota.entity';
+import { MinimaxJobEntity } from './modules/minimax/minimax-job.entity';
 import { MediaInsightJobEntity } from './modules/chat/media-insight-job.entity';
 import { ChatCustomStickerEntity } from './modules/chat/custom-sticker.entity';
 import { FeedPostEntity } from './modules/feed/feed-post.entity';
@@ -157,6 +158,7 @@ import {
           GroupReplyTaskEntity,
           ReplyArtifactJobEntity,
           MinimaxQuotaEntity,
+          MinimaxJobEntity,
           MediaInsightJobEntity,
           ChatCustomStickerEntity,
           FeedPostEntity,
