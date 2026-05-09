@@ -172,11 +172,10 @@ export function ChatListPage() {
   const desktopPathStabilizedRef = useRef(false);
 
   useEffect(() => {
-    if (!isDesktopLayout) {
-      return;
-    }
-    if (!desktopPathMismatch) {
-      desktopPathStabilizedRef.current = true;
+    if (!isDesktopLayout || !desktopPathMismatch) {
+      if (!desktopPathMismatch) {
+        desktopPathStabilizedRef.current = true;
+      }
       return;
     }
     if (desktopPathStabilizedRef.current) {

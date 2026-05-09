@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { type Moment, type MomentComment } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";

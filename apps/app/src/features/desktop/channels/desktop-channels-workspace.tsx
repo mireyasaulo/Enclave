@@ -29,7 +29,6 @@ import {
   ChevronRight,
   ChevronUp,
   MessageCircleMore,
-  PlaySquare,
   RadioTower,
   RefreshCcw,
   Share2,
@@ -38,7 +37,6 @@ import {
 } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
-import { ExpandableText } from "../../../components/expandable-text";
 import { FeatureUnavailableDialog } from "../../../components/feature-unavailable-dialog";
 import { formatTimestamp } from "../../../lib/format";
 

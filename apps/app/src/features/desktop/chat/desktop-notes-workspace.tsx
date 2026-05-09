@@ -428,6 +428,7 @@ export function DesktopNotesWorkspace({
     noteQuery.isLoading,
     selectedNoteId,
     sessionKey,
+    t,
   ]);
 
   useEffect(() => {

@@ -215,6 +215,7 @@ export function DesktopDirectCallPanel({
     latestTurn,
     micMuted,
     speech.status,
+    t,
   ]);
   const statusHint = useMemo(() => {
     if (isVideoMode && digitalHumanCall.sessionState === "connecting") {
@@ -307,6 +308,7 @@ export function DesktopDirectCallPanel({
     digitalHumanCall.session?.streamUrl,
     digitalHumanCall.sessionState,
     digitalHumanGatewayCopy?.statusHint,
+    t,
   ]);
   const callLabel = isVideoMode
     ? t(msg`AI 数字人视频通话`)

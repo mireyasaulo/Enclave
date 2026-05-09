@@ -329,8 +329,8 @@ export function GamesPage() {
 
   async function handleCopyGameToMobile(gameId: string) {
     const game = getGameCenterGame(gameId);
-    const path = buildGameInvitePath("/discover/games", { gameId });
-    const link = resolveMobileHandoffLink(path);
+    const conversationPath = buildGameInvitePath("/discover/games", { gameId });
+    const link = resolveMobileHandoffLink(conversationPath);
 
     if (nativeMobileShareSupported) {
       const shared = await shareWithNativeShell({
@@ -443,7 +443,7 @@ export function GamesPage() {
         category: "games",
         description: t(msg`把 ${handoffName} 的入口发到手机继续，保留最近玩过和活动状态。`),
         label: `${handoffName} ${t(msg`接力`)}`,
-        path,
+        path: conversationPath,
       });
       setNoticeTone("success");
       setNoticeActionState(null);

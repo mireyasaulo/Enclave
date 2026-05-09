@@ -388,6 +388,21 @@ export function MomentsPage() {
     });
   }
 
+  function openDesktopFriendMoments(targetMoment: Moment) {
+    if (targetMoment?.authorType !== "character") {
+      return;
+    }
+    void navigate({
+      to: "/desktop/friend-moments/$characterId",
+      params: { characterId: targetMoment.authorId },
+      hash: buildDesktopFriendMomentsRouteHash({
+        source: "moments",
+        returnPath: desktopMomentsPath,
+        returnHash: buildDesktopMomentsRouteHash({}),
+      }),
+    });
+  }
+
   function navigateToRouteStateReturn() {
     if (!safeReturnPath) {
       return false;
@@ -728,23 +743,12 @@ export function MomentsPage() {
             void handleImageFilesSelected(files);
           }}
           onLike={(momentId) => likeMutation.mutate(momentId)}
-          onOpenAuthorPopover={({ anchorElement, moment }) => {
-            if (moment.authorType !== "character") {
+          onOpenAuthorPopover={({ moment: targetMoment }) => {
+            if (targetMoment?.authorType !== "character") {
               return;
             }
 
-            setDesktopAvatarPopover({
-              anchorElement,
-              characterId: moment.authorId,
-              fallbackAvatar: moment.authorAvatar,
-              fallbackName: moment.authorName,
-              returnHash: buildDesktopMomentsRouteHash({
-                authorId: routeSelectedAuthorId ?? undefined,
-                momentId: moment.id,
-                returnPath: safeReturnPath,
-                returnHash: safeReturnHash,
-              }),
-            });
+            openDesktopFriendMoments(targetMoment);
           }}
           onToggleFavorite={(momentId) => {
             const moment = visibleMoments.find((item) => item.id === momentId);
