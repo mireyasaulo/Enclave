@@ -112,6 +112,48 @@ const services = {
       }
     },
   },
+  // 公网官网走的就是 next start (prod build)，避免 next dev 5-10x 性能损失。
+  // 启动顺序：sync-assets → next build → next start -p 5185。
+  // 与 `site` 共用 5185 端口，互斥；切换时先 stop 另一边。
+  "site-prod": {
+    cwd: path.join(rootDir, "apps", "site"),
+    command: nodeBinary,
+    args: [path.join(rootDir, "apps", "site", "node_modules", "next", "dist", "bin", "next"), "start", "-p", "5185"],
+    env: {
+      NODE_ENV: "production",
+    },
+    port: 5185,
+    url: "http://127.0.0.1:5185/",
+    prestart() {
+      const syncResult = spawnSync(nodeBinary, [path.join(rootDir, "apps", "site", "scripts", "sync-assets.mjs")], {
+        cwd: path.join(rootDir, "apps", "site"),
+        env: process.env,
+        shell: false,
+        stdio: "inherit",
+        windowsHide: true,
+      });
+      if (syncResult.error) throw syncResult.error;
+      if (syncResult.status !== 0) {
+        throw new Error(`site asset sync failed with exit code ${syncResult.status ?? "unknown"}.`);
+      }
+
+      const buildResult = spawnSync(
+        nodeBinary,
+        [path.join(rootDir, "apps", "site", "node_modules", "next", "dist", "bin", "next"), "build"],
+        {
+          cwd: path.join(rootDir, "apps", "site"),
+          env: { ...process.env, NODE_ENV: "production" },
+          shell: false,
+          stdio: "inherit",
+          windowsHide: true,
+        },
+      );
+      if (buildResult.error) throw buildResult.error;
+      if (buildResult.status !== 0) {
+        throw new Error(`site production build failed with exit code ${buildResult.status ?? "unknown"}.`);
+      }
+    },
+  },
   "wechat-connector": {
     cwd: rootDir,
     command: nodeBinary,

@@ -240,12 +240,15 @@ export class MomentsService implements OnModuleInit {
     });
     const saved = await this.commentRepo.save(comment);
     await this.postRepo.increment({ id: postId }, 'commentCount', 1);
-    // Schedule AI replies to user comment
-    if (authorType === 'user') {
+    // 朋友圈评论的 AI 回复链：
+    // - 用户评论 / 其他角色评论 → 安排世界角色去回复
+    // - 已经是「回复」的评论本身不再触发新回复，避免无限套娃
+    if (!replyToCommentId) {
       void this.scheduleAiCommentReplies(postId, {
         commentId: saved.id,
         authorId,
         authorName,
+        authorType,
         text,
       });
     }
@@ -275,6 +278,27 @@ export class MomentsService implements OnModuleInit {
     await this.likeRepo.save(like);
     await this.postRepo.increment({ id: postId }, 'likeCount', 1);
     return { liked: true };
+  }
+
+  async deleteOwnerPost(postId: string): Promise<{ success: true; id: string }> {
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const post = await this.postRepo.findOneBy({ id: postId });
+    if (!post) {
+      throw new AppError('MOMENT_NOT_FOUND', {
+        legacyMessage: '该朋友圈不存在或已被删除。',
+        status: HttpStatus.NOT_FOUND,
+      });
+    }
+    if (post.authorType !== 'user' || post.authorId !== owner.id) {
+      throw new AppError('MOMENT_DELETE_FORBIDDEN', {
+        legacyMessage: '只能删除自己发布的朋友圈。',
+        status: HttpStatus.FORBIDDEN,
+      });
+    }
+    await this.commentRepo.delete({ postId });
+    await this.likeRepo.delete({ postId });
+    await this.postRepo.delete(postId);
+    return { success: true, id: postId };
   }
 
   async generateMomentForCharacter(
@@ -456,15 +480,14 @@ export class MomentsService implements OnModuleInit {
         character.id !== post.authorId && visibleCharacterIds.has(character.id),
     );
 
-    // 用户发的「friends」朋友圈：只有已加好友的角色能进入互动队列。
-    if (post.authorType === 'user' && post.visibility === 'friends') {
-      const owner = await this.worldOwnerService.getOwnerOrThrow();
-      const friendCharacterIds =
-        await this.characters.getActiveFriendCharacterIdSet(owner.id);
-      allChars = allChars.filter((character) =>
-        friendCharacterIds.has(character.id),
-      );
-    }
+    // 朋友圈是「好友圈」语义：所有帖子的点赞/评论候选都只从已加好友的角色里挑，
+    // 与 canOwnerViewPost / _enrichPost 的展示门控保持一致。
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const friendCharacterIds =
+      await this.characters.getActiveFriendCharacterIdSet(owner.id);
+    allChars = allChars.filter((character) =>
+      friendCharacterIds.has(character.id),
+    );
 
     const intimacyByCharId = new Map<string, number>();
     if (post.authorType === 'character') {
@@ -598,60 +621,121 @@ export class MomentsService implements OnModuleInit {
       commentId: string;
       authorId: string;
       authorName: string;
+      authorType?: string;
       text: string;
     },
   ) {
     const post = await this.postRepo.findOneBy({ id: postId });
     if (!post || post.authorType !== 'character') return;
-    if (!(await this.isCharacterVisibleToOwner(post.authorId))) return;
 
-    const char = await this.characters.findById(post.authorId);
-    if (!char) return;
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const [visibleCharacterIds, friendCharacterIds] = await Promise.all([
+      this.getVisibleCharacterIdSet(),
+      this.characters.getActiveFriendCharacterIdSet(owner.id),
+    ]);
 
-    const delay = 30000 + Math.random() * 60000; // 30s - 90s
-    setTimeout(() => {
-      void (async () => {
-        try {
-          if (!(await this.isCharacterVisibleToOwner(char.id))) {
-            return;
+    if (
+      !visibleCharacterIds.has(post.authorId) ||
+      !friendCharacterIds.has(post.authorId)
+    ) {
+      return;
+    }
+
+    // 来源评论者：若是角色，必须是已加好友（与展示门控保持一致）；
+    // 用户自己的评论也允许触发。
+    if (
+      sourceComment.authorType === 'character' &&
+      !friendCharacterIds.has(sourceComment.authorId)
+    ) {
+      return;
+    }
+
+    // 候选回复者集合：
+    // 1) 贴主本人（贴主不能回复自己的评论）
+    // 2) 30% 概率再随机挑一个「围观」好友角色插话
+    const repliers: { id: string; name: string; avatar: string }[] = [];
+
+    if (post.authorId !== sourceComment.authorId) {
+      const author = await this.characters.findById(post.authorId);
+      if (author) {
+        repliers.push({
+          id: author.id,
+          name: author.name,
+          avatar: author.avatar,
+        });
+      }
+    }
+
+    if (Math.random() < 0.3) {
+      const allFriends = (await this.characters.findAllVisibleToOwner()).filter(
+        (c) =>
+          friendCharacterIds.has(c.id) &&
+          visibleCharacterIds.has(c.id) &&
+          c.id !== post.authorId &&
+          c.id !== sourceComment.authorId,
+      );
+      if (allFriends.length > 0) {
+        const bystander =
+          allFriends[Math.floor(Math.random() * allFriends.length)];
+        repliers.push({
+          id: bystander.id,
+          name: bystander.name,
+          avatar: bystander.avatar,
+        });
+      }
+    }
+
+    if (repliers.length === 0) return;
+
+    repliers.forEach((replier, index) => {
+      const delay = 30000 + Math.random() * 60000 + index * 15000; // 30-90s，错开
+      setTimeout(() => {
+        void (async () => {
+          try {
+            if (!(await this.isCharacterVisibleToOwner(replier.id))) return;
+
+            const profile = await this.characters.getProfile(replier.id);
+            if (!profile) return;
+            const observation = await this.buildMomentAiObservation(post);
+
+            const isPostAuthor = replier.id === post.authorId;
+            const userMessage = isPostAuthor
+              ? `${sourceComment.authorName}在你的朋友圈评论了："${sourceComment.text}"，你的朋友圈内容是：${observation.summary}，回复一下，不超过20字。`
+              : `你刷到${post.authorName}发的朋友圈：${observation.summary}。${sourceComment.authorName}评论了："${sourceComment.text}"，你也想插话回复一下，不超过20字。`;
+
+            const reply = await this.ai.generateReply({
+              profile,
+              conversationHistory: [],
+              userMessage,
+              userMessageParts: observation.parts,
+              usageContext: {
+                surface: 'app',
+                scene: 'moment_comment_generate',
+                scopeType: 'character',
+                scopeId: replier.id,
+                scopeLabel: replier.name,
+                characterId: replier.id,
+                characterName: replier.name,
+              },
+            });
+            await this.addComment(
+              postId,
+              replier.id,
+              replier.name,
+              replier.avatar,
+              reply.text,
+              'character',
+              {
+                replyToCommentId: sourceComment.commentId,
+                replyToAuthorId: sourceComment.authorId,
+              },
+            );
+          } catch {
+            // ignore
           }
-
-          const profile = await this.characters.getProfile(char.id);
-          if (!profile) return;
-          const observation = await this.buildMomentAiObservation(post);
-
-          const reply = await this.ai.generateReply({
-            profile,
-            conversationHistory: [],
-            userMessage: `${sourceComment.authorName}在你的朋友圈评论了："${sourceComment.text}"，你的朋友圈内容是：${observation.summary}，回复一下，不超过20字。`,
-            userMessageParts: observation.parts,
-            usageContext: {
-              surface: 'app',
-              scene: 'moment_comment_generate',
-              scopeType: 'character',
-              scopeId: char.id,
-              scopeLabel: char.name,
-              characterId: char.id,
-              characterName: char.name,
-            },
-          });
-          await this.addComment(
-            postId,
-            char.id,
-            char.name,
-            char.avatar,
-            reply.text,
-            'character',
-            {
-              replyToCommentId: sourceComment.commentId,
-              replyToAuthorId: sourceComment.authorId,
-            },
-          );
-        } catch {
-          // ignore
-        }
-      })();
-    }, delay);
+        })();
+      }, delay);
+    });
   }
 
   private async getVisibleCharacterIds(): Promise<string[]> {
@@ -756,15 +840,19 @@ export class MomentsService implements OnModuleInit {
         order: { createdAt: 'ASC' },
       }),
     ]);
+    // 朋友圈是「好友圈」语义：非好友角色的点赞/评论不在这里露出，
+    // 与 canOwnerViewPost 处的门控（lines 685-687）保持一致。
     const visibleLikes = likes.filter(
       (like) =>
         like.authorType !== 'character' ||
-        resolvedAvatarContext.visibleCharacterIds.has(like.authorId),
+        (resolvedAvatarContext.visibleCharacterIds.has(like.authorId) &&
+          resolvedAvatarContext.ownerFriendCharacterIds.has(like.authorId)),
     );
     const visibleComments = comments.filter(
       (comment) =>
         comment.authorType !== 'character' ||
-        resolvedAvatarContext.visibleCharacterIds.has(comment.authorId),
+        (resolvedAvatarContext.visibleCharacterIds.has(comment.authorId) &&
+          resolvedAvatarContext.ownerFriendCharacterIds.has(comment.authorId)),
     );
     const serializedLikes = visibleLikes.map((like) =>
       this.serializeMomentLike(like, resolvedAvatarContext),
@@ -1397,6 +1485,9 @@ export class MomentsService implements OnModuleInit {
       await this.characters.getActiveFriendCharacterIdSet(owner.id);
 
     for (const char of activeCandidates) {
+      // 朋友圈是「好友圈」语义：非好友角色不会主动到任何朋友圈里露脸。
+      if (!ownerFriendCharacterIds.has(char.id)) continue;
+
       const baseChance =
         char.proactiveBrowseChance ?? 0.3;
       const freqMul =
@@ -1406,18 +1497,9 @@ export class MomentsService implements OnModuleInit {
 
       participantCount += 1;
 
-      const candidatePosts = recentPosts.filter((post) => {
-        if (post.authorId === char.id) return false;
-        // 用户「friends」朋友圈只让已加好友的角色巡查到。
-        if (
-          post.authorType === 'user' &&
-          post.visibility === 'friends' &&
-          !ownerFriendCharacterIds.has(char.id)
-        ) {
-          return false;
-        }
-        return true;
-      });
+      const candidatePosts = recentPosts.filter(
+        (post) => post.authorId !== char.id,
+      );
       if (candidatePosts.length === 0) continue;
 
       // Skip posts already liked by this NPC

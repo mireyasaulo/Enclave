@@ -20,6 +20,7 @@ import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import { AiUsageLedgerService } from '../analytics/ai-usage-ledger.service';
 import { WechatSyncAdminService } from './wechat-sync-admin.service';
 import { WikiSyncAdminService } from './wiki-sync-admin.service';
+import { CloudTokenUsageSyncService } from '../cloud-runtime/cloud-token-usage-sync.service';
 import type {
   WikiSyncApplyRequest,
   WikiSyncImportRequest,
@@ -76,6 +77,7 @@ export class AdminController {
     private readonly reminderRuntimeService: ReminderRuntimeService,
     private readonly selfAgentService: SelfAgentService,
     private readonly worldLanguageService: WorldLanguageService,
+    private readonly cloudTokenUsageSync: CloudTokenUsageSyncService,
   ) {}
 
   @Get('stats')
@@ -437,6 +439,23 @@ export class AdminController {
         note: item.note,
       })),
     });
+  }
+
+  @Post('token-usage/cloud-sync/run')
+  async runCloudTokenUsageSync() {
+    await this.cloudTokenUsageSync.runSync();
+    return { ok: true };
+  }
+
+  @Get('token-usage/platform-defaults')
+  async getTokenUsagePlatformDefaults() {
+    const snapshot = await this.cloudTokenUsageSync.getPlatformDefaultsSnapshot();
+    return { snapshot };
+  }
+
+  @Post('token-usage/platform-defaults/apply')
+  async applyTokenUsagePlatformDefaults() {
+    return this.cloudTokenUsageSync.applyPlatformDefaults();
   }
 
   @Get('token-usage/budgets')

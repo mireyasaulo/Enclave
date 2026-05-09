@@ -1299,6 +1299,7 @@ export class AiOrchestratorService {
       isGroupChat,
       emptyTextFallback,
     } = request;
+    const finalLanguageReminder = await this.worldLanguage.buildFinalReminder();
     const hasImageInput = this.requestContainsImageInput(request);
     const hasAudioInput = this.requestContainsAudioInput(request);
     const hasDocumentInput = this.requestContainsDocumentInput(request);
@@ -1339,7 +1340,11 @@ export class AiOrchestratorService {
         const response = await client.responses.create({
           model: provider.model,
           instructions: systemPrompt,
-          input: [...historyMessages, currentMessage],
+          input: [
+            ...historyMessages,
+            { role: 'system', content: finalLanguageReminder },
+            currentMessage,
+          ],
           max_output_tokens: 500,
           temperature: 0.85,
         });
@@ -1379,6 +1384,7 @@ export class AiOrchestratorService {
         messages: [
           { role: 'system', content: systemPrompt },
           ...historyMessages,
+          { role: 'system', content: finalLanguageReminder },
           currentMessage,
         ],
         max_tokens: 500,
@@ -1851,6 +1857,7 @@ export class AiOrchestratorService {
       profile.memory?.forgettingCurve,
     );
     const includedHistory = conversationHistory.slice(-historyWindow);
+    const finalLanguageReminder = await this.worldLanguage.buildFinalReminder();
     const requestMessages: Array<{
       role: 'system' | 'user' | 'assistant';
       content: string;
@@ -1868,6 +1875,10 @@ export class AiOrchestratorService {
           ? `[${message.characterId}]: ${message.content}`
           : message.content,
       })),
+      {
+        role: 'system',
+        content: finalLanguageReminder,
+      },
       {
         role: 'user',
         content: userMessage,

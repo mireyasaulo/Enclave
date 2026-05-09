@@ -4,6 +4,7 @@ import {
   LoaderCircle,
   Mic,
   Search,
+  Settings,
   Square,
   type LucideIcon,
 } from "lucide-react";
@@ -47,6 +48,8 @@ export type DesktopContactsWorkspaceProps = {
   speechButtonDisabled: boolean;
   onSpeechButtonClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   shortcutList: ReactNode;
+  indexList?: ReactNode;
+  directoryScrollRef?: RefObject<HTMLDivElement | null>;
   notice?: string | null;
   errors?: string[];
   loading: boolean;
@@ -55,12 +58,16 @@ export type DesktopContactsWorkspaceProps = {
   pendingCharacterId?: string | null;
   onSelectFriend: (characterId: string) => void;
   onOpenFriendChat: (characterId: string) => void;
+  bulkMode?: boolean;
+  bulkSelectedIds?: ReadonlySet<string>;
   emptyState?: ReactNode;
   worldCharacterTitle: string;
   worldCharacterSections: ContactSection<WorldCharacterDirectoryItem>[];
   activeWorldCharacterId?: string | null;
   onSelectWorldCharacter: (characterId: string) => void;
   detailContent: ReactNode;
+  onOpenManagement?: () => void;
+  bulkActionBar?: ReactNode;
 };
 
 export function DesktopContactsWorkspace({
@@ -77,6 +84,8 @@ export function DesktopContactsWorkspace({
   speechButtonDisabled,
   onSpeechButtonClick,
   shortcutList,
+  indexList = null,
+  directoryScrollRef,
   notice = null,
   errors = [],
   loading,
@@ -85,12 +94,16 @@ export function DesktopContactsWorkspace({
   pendingCharacterId = null,
   onSelectFriend,
   onOpenFriendChat,
+  bulkMode = false,
+  bulkSelectedIds,
   emptyState = null,
   worldCharacterTitle,
   worldCharacterSections,
   activeWorldCharacterId = null,
   onSelectWorldCharacter,
   detailContent,
+  onOpenManagement,
+  bulkActionBar = null,
 }: DesktopContactsWorkspaceProps) {
   const t = useRuntimeTranslator();
   return (
@@ -99,12 +112,25 @@ export function DesktopContactsWorkspace({
         <div className="flex h-full min-h-0">
           <section className="flex w-[320px] shrink-0 flex-col border-r border-[rgba(0,0,0,0.06)] bg-[#f7f7f7]">
             <div className="border-b border-[rgba(0,0,0,0.06)] bg-[#f7f7f7] px-4 py-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <div className="text-[15px] font-medium text-[color:var(--text-primary)]">
                   {t(msg`通讯录`)}
                 </div>
-                <div className="text-[11px] text-[color:var(--text-muted)]">
-                  {directoryCountLabel}
+                <div className="flex items-center gap-2">
+                  <div className="text-[11px] text-[color:var(--text-muted)]">
+                    {directoryCountLabel}
+                  </div>
+                  {onOpenManagement ? (
+                    <button
+                      type="button"
+                      onClick={onOpenManagement}
+                      className="flex h-7 w-7 items-center justify-center rounded-[8px] text-[color:var(--text-secondary)] transition-colors hover:bg-black/5 hover:text-[color:var(--text-primary)]"
+                      aria-label={t(msg`通讯录管理`)}
+                      title={t(msg`通讯录管理`)}
+                    >
+                      <Settings size={15} />
+                    </button>
+                  ) : null}
                 </div>
               </div>
 
@@ -153,99 +179,111 @@ export function DesktopContactsWorkspace({
               </div>
             </div>
 
-            <div className="px-2 py-2">{shortcutList}</div>
+            <div className="relative min-h-0 flex-1">
+              <div
+                ref={directoryScrollRef}
+                className="h-full overflow-auto bg-[#f7f7f7] pb-5"
+              >
+                <div className="px-2 py-2">{shortcutList}</div>
 
-            <div className="min-h-0 flex-1 overflow-auto bg-[#f7f7f7] pb-5">
-              {notice ? (
-                <div className="px-3 pb-2">
-                  <InlineNotice
-                    tone="info"
-                    className="border-[rgba(0,0,0,0.06)] bg-white text-xs"
+                {notice ? (
+                  <div className="px-3 pb-2">
+                    <InlineNotice
+                      tone="info"
+                      className="border-[rgba(0,0,0,0.06)] bg-white text-xs"
+                    >
+                      {notice}
+                    </InlineNotice>
+                  </div>
+                ) : null}
+
+                {errors.map((message) => (
+                  <div key={message} className="px-3 pb-2">
+                    <ErrorBlock message={message} />
+                  </div>
+                ))}
+
+                {loading ? (
+                  <LoadingBlock
+                    className="px-4 py-6 text-left"
+                    label={t(msg`正在读取联系人...`)}
+                  />
+                ) : null}
+
+                {!loading && friendSections.length ? (
+                  <div className="overflow-hidden">
+                    <DesktopDirectoryTitle title={t(msg`联系人`)} />
+                    {friendSections.map((section, sectionIndex) => (
+                      <div
+                        key={section.key}
+                        id={section.anchorId}
+                        className={cn(
+                          sectionIndex > 0
+                            ? "mt-2 border-t border-[rgba(0,0,0,0.04)] pt-2"
+                            : undefined,
+                        )}
+                      >
+                        <DesktopSectionHeader title={section.title} />
+                        {section.items.map((item, index) => (
+                          <DesktopFriendListRow
+                            key={item.character.id}
+                            item={item}
+                            index={index}
+                            pendingCharacterId={pendingCharacterId}
+                            active={activeFriendId === item.character.id}
+                            bulkMode={bulkMode}
+                            selected={
+                              bulkSelectedIds?.has(item.character.id) ?? false
+                            }
+                            onClick={() => onSelectFriend(item.character.id)}
+                            onDoubleClick={() =>
+                              onOpenFriendChat(item.character.id)
+                            }
+                          />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+
+                {!loading && !friendSections.length ? emptyState : null}
+
+                {worldCharacterSections.length ? (
+                  <div
+                    id="world-character-directory"
+                    className="mt-3 overflow-hidden border-t border-[rgba(0,0,0,0.04)] pt-2"
                   >
-                    {notice}
-                  </InlineNotice>
-                </div>
-              ) : null}
-
-              {errors.map((message) => (
-                <div key={message} className="px-3 pb-2">
-                  <ErrorBlock message={message} />
-                </div>
-              ))}
-
-              {loading ? (
-                <LoadingBlock
-                  className="px-4 py-6 text-left"
-                  label={t(msg`正在读取联系人...`)}
-                />
-              ) : null}
-
-              {!loading && friendSections.length ? (
-                <div className="overflow-hidden">
-                  <DesktopDirectoryTitle title={t(msg`联系人`)} />
-                  {friendSections.map((section, sectionIndex) => (
-                    <div
-                      key={section.key}
-                      id={section.anchorId}
-                      className={cn(
-                        sectionIndex > 0
-                          ? "mt-2 border-t border-[rgba(0,0,0,0.04)] pt-2"
-                          : undefined,
-                      )}
-                    >
-                      <DesktopSectionHeader title={section.title} />
-                      {section.items.map((item, index) => (
-                        <DesktopFriendListRow
-                          key={item.character.id}
-                          item={item}
-                          index={index}
-                          pendingCharacterId={pendingCharacterId}
-                          active={activeFriendId === item.character.id}
-                          onClick={() => onSelectFriend(item.character.id)}
-                          onDoubleClick={() =>
-                            onOpenFriendChat(item.character.id)
-                          }
-                        />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-
-              {!loading && !friendSections.length ? emptyState : null}
-
-              {worldCharacterSections.length ? (
-                <div
-                  id="world-character-directory"
-                  className="mt-3 overflow-hidden border-t border-[rgba(0,0,0,0.04)] pt-2"
-                >
-                  <DesktopDirectoryTitle title={worldCharacterTitle} />
-                  {worldCharacterSections.map((section, sectionIndex) => (
-                    <div
-                      key={section.key}
-                      className={cn(
-                        sectionIndex > 0
-                          ? "mt-2 border-t border-[rgba(0,0,0,0.04)] pt-2"
-                          : undefined,
-                      )}
-                    >
-                      <DesktopSectionHeader title={section.title} />
-                      {section.items.map((item, index) => (
-                        <DesktopWorldCharacterRow
-                          key={item.character.id}
-                          item={item}
-                          index={index}
-                          active={activeWorldCharacterId === item.character.id}
-                          onClick={() =>
-                            onSelectWorldCharacter(item.character.id)
-                          }
-                        />
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
+                    <DesktopDirectoryTitle title={worldCharacterTitle} />
+                    {worldCharacterSections.map((section, sectionIndex) => (
+                      <div
+                        key={section.key}
+                        id={section.anchorId}
+                        className={cn(
+                          sectionIndex > 0
+                            ? "mt-2 border-t border-[rgba(0,0,0,0.04)] pt-2"
+                            : undefined,
+                        )}
+                      >
+                        <DesktopSectionHeader title={section.title} />
+                        {section.items.map((item, index) => (
+                          <DesktopWorldCharacterRow
+                            key={item.character.id}
+                            item={item}
+                            index={index}
+                            active={activeWorldCharacterId === item.character.id}
+                            onClick={() =>
+                              onSelectWorldCharacter(item.character.id)
+                            }
+                          />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+              {indexList}
             </div>
+            {bulkActionBar}
           </section>
 
           <section className="min-w-0 flex-1 bg-[#f5f5f5]">
@@ -270,6 +308,8 @@ function DesktopFriendListRow({
   index,
   pendingCharacterId,
   active,
+  bulkMode = false,
+  selected = false,
   onClick,
   onDoubleClick,
 }: {
@@ -277,6 +317,8 @@ function DesktopFriendListRow({
   index: number;
   pendingCharacterId?: string | null;
   active?: boolean;
+  bulkMode?: boolean;
+  selected?: boolean;
   onClick: () => void;
   onDoubleClick?: () => void;
 }) {
@@ -294,6 +336,31 @@ function DesktopFriendListRow({
           : undefined,
       )}
     >
+      {bulkMode ? (
+        <span
+          className={cn(
+            "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors",
+            selected
+              ? "border-[#07c160] bg-[#07c160] text-white"
+              : "border-[color:var(--border-subtle)] bg-white",
+          )}
+        >
+          {selected ? (
+            <svg
+              viewBox="0 0 16 16"
+              width="11"
+              height="11"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="3 8.5 6.5 12 13 5" />
+            </svg>
+          ) : null}
+        </span>
+      ) : null}
       <AvatarChip
         name={item.character.name}
         src={item.character.avatar}

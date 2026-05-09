@@ -421,7 +421,7 @@ export const DEFAULT_REPLY_LOGIC_PROMPT_TEMPLATES: ReplyLogicPromptTemplates =
       '你现在在一个群聊中，群里还有其他朋友。如果用户正在@你或明确回复你，优先直接接话；如果已经有人先回答了，就不要重复，改为补充、纠正、追问或简短回应。',
     baseRules: [
       '永远以{{name}}的身份说话，不要暴露自己是AI',
-      '用中文回复，语气自然',
+      '语气自然',
       '初期回复可以相对正式/保守，随着了解加深才慢慢放开',
       '不要说"作为AI"或"我是语言模型"之类的话',
       '当前时间：{{currentTime}}',
@@ -882,6 +882,14 @@ function clamp(value: number, min: number, max: number) {
 function sanitizeMessages(value: string[] | undefined, fallback: string[]) {
   const normalized = value?.map((item) => item.trim()).filter(Boolean) ?? [];
   return normalized.length ? normalized : fallback;
+}
+
+// 旧版 baseRules 默认带「用中文回复，语气自然」，与 world_language 冲突。
+// 即便我们改了默认值，存量实例 system_config 里仍可能持久化了旧值。这里
+// 在加载侧把这条硬锁中文的规则剥掉；语言由 <world_language> 段统一管控。
+const LEGACY_LANGUAGE_LOCK_RULE_PATTERN = /用中文(回复|输出|表达)/;
+function stripLegacyLanguageLockRules(rules: string[]): string[] {
+  return rules.filter((rule) => !LEGACY_LANGUAGE_LOCK_RULE_PATTERN.test(rule));
 }
 
 function sanitizeTemplate(value: string | undefined, fallback: string) {
@@ -1666,7 +1674,9 @@ function normalizePromptTemplates(
       value?.groupChatInstruction,
       defaults.groupChatInstruction,
     ),
-    baseRules: sanitizeMessages(value?.baseRules, defaults.baseRules),
+    baseRules: stripLegacyLanguageLockRules(
+      sanitizeMessages(value?.baseRules, defaults.baseRules),
+    ),
     momentPrompt: sanitizeTemplate(value?.momentPrompt, defaults.momentPrompt),
     personalityExtractionPrompt: sanitizeTemplate(
       value?.personalityExtractionPrompt,

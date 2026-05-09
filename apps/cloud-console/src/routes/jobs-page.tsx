@@ -449,9 +449,11 @@ export function JobsPage() {
     },
   });
   const activeConfirm = confirmAction
-    ? createWorldActionConfirmationCopy(confirmAction.action, {
-        name: confirmAction.worldName,
-      })
+    ? createWorldActionConfirmationCopy(
+        confirmAction.action,
+        { name: confirmAction.worldName },
+        locale,
+      )
     : null;
   const pageErrors = [
     jobsQuery.error,

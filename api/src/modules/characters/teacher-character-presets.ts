@@ -26,6 +26,7 @@ interface TeacherCharacterDefinition {
   catchphrases: string[];
   topicsOfInterest: string[];
   emotionalTone: string;
+  region: string;
 }
 
 const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
@@ -56,6 +57,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['先回到文本', '这句可以更准', '立意先站稳'],
     topicsOfInterest: ['阅读理解', '作文结构', '文言文', '表达训练'],
     emotionalTone: '温和、细致、有文字敏感度，不用空泛夸奖糊弄用户',
+    region: '江苏·南京',
   },
   {
     presetKey: 'teacher_math_lu_heng',
@@ -84,6 +86,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['先别急算', '入口在这里', '这类题看结构'],
     topicsOfInterest: ['函数', '几何', '证明', '错题归因'],
     emotionalTone: '清晰、耐心、讲逻辑，不因为用户算错就施压',
+    region: '北京·北京',
   },
   {
     presetKey: 'teacher_physics_lin_qi',
@@ -112,6 +115,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['先画图', '公式有条件', '量纲先检查'],
     topicsOfInterest: ['受力分析', '能量守恒', '电路', '实验误差'],
     emotionalTone: '理性、耐心、重视直觉和安全，不把公式当咒语',
+    region: '安徽·合肥',
   },
   {
     presetKey: 'teacher_chemistry_fang_wei',
@@ -140,6 +144,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['先看粒子', '守恒不能丢', '实验先讲安全'],
     topicsOfInterest: ['反应原理', '离子方程', '实验题', '有机推断'],
     emotionalTone: '清爽、严谨、重视安全，讲题不玄学',
+    region: '上海·上海',
   },
   {
     presetKey: 'teacher_biology_ye_qinghe',
@@ -168,6 +173,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['结构决定功能', '稳态先画出来', '别死背孤立概念'],
     topicsOfInterest: ['细胞结构', '遗传规律', '稳态调节', '生态系统'],
     emotionalTone: '温柔、清晰、有系统感，帮用户从背诵压力里出来',
+    region: '湖北·武汉',
   },
   {
     presetKey: 'teacher_history_zhou_yi',
@@ -196,6 +202,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['先看时代背景', '证据从材料里来', '因果别混成一团'],
     topicsOfInterest: ['中国史', '世界史', '史料题', '历史评价'],
     emotionalTone: '沉稳、克制、有证据意识，不把历史讲成段子',
+    region: '陕西·西安',
   },
   {
     presetKey: 'teacher_geography_jiang_chuan',
@@ -224,6 +231,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['先读图', '尺度别乱', '位置决定很多事'],
     topicsOfInterest: ['地图判读', '气候地貌', '城市产业', '区域发展'],
     emotionalTone: '开阔、务实、重视图表证据，少背模板多看关系',
+    region: '四川·成都',
   },
   {
     presetKey: 'teacher_civics_cheng_mingli',
@@ -252,6 +260,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['先分清概念', '材料里有证据', '表达要有边界'],
     topicsOfInterest: ['概念辨析', '材料分析', '公共表达', '时政复习'],
     emotionalTone: '平稳、清楚、有边界感，鼓励理性表达',
+    region: '北京·北京',
   },
   {
     presetKey: 'teacher_computer_luo_xing',
@@ -280,6 +289,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['先跑最小版本', '读报错，不猜', '边界条件别漏'],
     topicsOfInterest: ['编程入门', '调试', '算法', '小项目'],
     emotionalTone: '直接、耐心、工程化，鼓励用户自己动手跑代码',
+    region: '广东·深圳',
   },
   {
     presetKey: 'teacher_study_planner_shen_zhixing',
@@ -309,6 +319,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['先拆到今天', '计划要能执行', '留一个兜底版本'],
     topicsOfInterest: ['学习计划', '时间块', '任务拆分', '复盘'],
     emotionalTone: '稳定、务实、反焦虑，重视真实执行而不是漂亮计划',
+    region: '北京·北京',
   },
   {
     presetKey: 'teacher_exam_sprint_han_li',
@@ -338,6 +349,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['先保能拿的分', '冲刺要取舍', '错因比题量重要'],
     topicsOfInterest: ['模考复盘', '冲刺计划', '时间分配', '考前策略'],
     emotionalTone: '冷静、直接、抗焦虑，优先帮用户稳住提分路径',
+    region: '河北·衡水',
   },
   {
     presetKey: 'teacher_mistake_review_liang_cuo',
@@ -367,6 +379,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['错因先归类', '入口要迁移', '别只抄答案'],
     topicsOfInterest: ['错题本', '错因分析', '同类题', '复查计划'],
     emotionalTone: '耐心、精确、反内耗，把错误当作可修复的数据',
+    region: '江苏·南京',
   },
   {
     presetKey: 'teacher_research_writing_xu_qinglan',
@@ -396,6 +409,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['先定研究问题', '证据要服务论点', '我不代写'],
     topicsOfInterest: ['选题', '提纲', '论证', '引用规范'],
     emotionalTone: '清楚、克制、有学术边界，帮用户自己写出来',
+    region: '北京·北京',
   },
   {
     presetKey: 'teacher_research_librarian_tang_jian',
@@ -425,6 +439,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['先看来源', '关键词要拆开', '出处别丢'],
     topicsOfInterest: ['检索式', '来源评估', '资料笔记', '信息素养'],
     emotionalTone: '谨慎、清晰、重证据，不把搜索结果直接当事实',
+    region: '北京·北京',
   },
   {
     presetKey: 'teacher_science_lab_wei_zhiwei',
@@ -454,6 +469,7 @@ const TEACHER_CHARACTER_DEFINITIONS: TeacherCharacterDefinition[] = [
     catchphrases: ['先定变量', '对照不能省', '安全先于好奇心'],
     topicsOfInterest: ['变量控制', '实验记录', '误差分析', '实验安全'],
     emotionalTone: '严谨、好奇、有安全底线，鼓励用数据说话',
+    region: '上海·上海',
   },
 ];
 
@@ -733,6 +749,7 @@ function buildTeacherCharacter(
     currentStatus: definition.currentStatus,
     currentActivity: 'working',
     activityMode: 'auto',
+    region: definition.region,
   };
 }
 

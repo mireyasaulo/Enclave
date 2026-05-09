@@ -346,8 +346,15 @@ export class SocialService {
             intimacyLevel:
               characterId === SELF_CHARACTER_ID ? 100 : 60,
             status: 'friend',
+            region: character.region?.trim() || null,
           }),
         );
+      } else if (
+        (!existing.region || !existing.region.trim()) &&
+        character.region?.trim()
+      ) {
+        existing.region = character.region.trim();
+        await this.friendshipRepo.save(existing);
       }
 
       await this.narrativeService.ensureArc(character.id, character.name);
@@ -902,6 +909,126 @@ immediate=立刻通过；short=几分钟；medium=慢热/忙碌；long=高冷/�
     return { success: true };
   }
 
+  async updateFriendPermissions(
+    characterId: string,
+    payload: {
+      momentsHiddenFromMe?: boolean;
+      momentsHiddenFromThem?: boolean;
+      chatOnly?: boolean;
+    },
+  ): Promise<FriendshipEntity> {
+    const owner = await this.worldOwnerService.getOwnerOrThrow();
+    const friendship = await this.friendshipRepo.findOneBy({
+      ownerId: owner.id,
+      characterId,
+    });
+
+    if (
+      !friendship ||
+      friendship.status === 'blocked' ||
+      friendship.status === 'removed'
+    ) {
+      throw new Error('Friend not found');
+    }
+
+    if (typeof payload.momentsHiddenFromMe === 'boolean') {
+      friendship.momentsHiddenFromMe = payload.momentsHiddenFromMe;
+    }
+    if (typeof payload.momentsHiddenFromThem === 'boolean') {
+      friendship.momentsHiddenFromThem = payload.momentsHiddenFromThem;
+    }
+    if (typeof payload.chatOnly === 'boolean') {
+      friendship.chatOnly = payload.chatOnly;
+    }
+
+    return this.friendshipRepo.save(friendship);
+  }
+
+  async bulkFriendshipAction(payload: {
+    characterIds: string[];
+    action: 'add-tag' | 'remove-tag' | 'star' | 'unstar' | 'delete' | 'block';
+    tag?: string;
+  }): Promise<{ updated: number; failed: string[] }> {
+    const ids = Array.from(new Set(payload.characterIds.filter(Boolean)));
+    const failed: string[] = [];
+    let updated = 0;
+
+    for (const characterId of ids) {
+      try {
+        switch (payload.action) {
+          case 'star':
+            await this.setFriendStarred(characterId, true);
+            break;
+          case 'unstar':
+            await this.setFriendStarred(characterId, false);
+            break;
+          case 'delete':
+            await this.deleteFriend(characterId);
+            break;
+          case 'block':
+            await this.blockCharacter(characterId);
+            break;
+          case 'add-tag': {
+            const tag = payload.tag?.trim();
+            if (!tag) throw new Error('tag required');
+            const owner = await this.worldOwnerService.getOwnerOrThrow();
+            const fs = await this.friendshipRepo.findOneBy({
+              ownerId: owner.id,
+              characterId,
+            });
+            if (
+              !fs ||
+              fs.status === 'blocked' ||
+              fs.status === 'removed'
+            ) {
+              throw new Error('Friend not found');
+            }
+            const next = normalizeTags([...(fs.tags ?? []), tag]);
+            await this.updateFriendProfile(characterId, {
+              remarkName: fs.remarkName ?? null,
+              tags: next,
+            });
+            break;
+          }
+          case 'remove-tag': {
+            const tag = payload.tag?.trim();
+            if (!tag) throw new Error('tag required');
+            const owner = await this.worldOwnerService.getOwnerOrThrow();
+            const fs = await this.friendshipRepo.findOneBy({
+              ownerId: owner.id,
+              characterId,
+            });
+            if (
+              !fs ||
+              fs.status === 'blocked' ||
+              fs.status === 'removed'
+            ) {
+              throw new Error('Friend not found');
+            }
+            const next = normalizeTags(
+              (fs.tags ?? []).filter((t) => t !== tag),
+            );
+            await this.updateFriendProfile(characterId, {
+              remarkName: fs.remarkName ?? null,
+              tags: next,
+            });
+            break;
+          }
+          default:
+            throw new Error(`Unknown action: ${payload.action as string}`);
+        }
+        updated += 1;
+      } catch (error) {
+        this.logger.warn(
+          `bulkFriendshipAction failed for ${characterId}: ${(error as Error).message}`,
+        );
+        failed.push(characterId);
+      }
+    }
+
+    return { updated, failed };
+  }
+
   async updateIntimacy(characterId: string, delta: number): Promise<void> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const friendship = await this.friendshipRepo.findOneBy({
@@ -1036,12 +1163,18 @@ immediate=立刻通过；short=几分钟；medium=慢热/忙碌；long=高冷/�
     let friendship: FriendshipEntity;
     let shouldNotifyConversation = options?.notifyConversation === true;
 
+    const character = await this.characterRepo.findOneBy({ id: characterId });
+    const characterRegion = character?.region?.trim() || null;
+
     if (existing) {
       if (ACTIVE_FRIENDSHIP_STATUSES.has(existing.status)) {
         friendship = existing;
         shouldNotifyConversation = false;
       } else {
         existing.status = 'friend';
+        if ((!existing.region || !existing.region.trim()) && characterRegion) {
+          existing.region = characterRegion;
+        }
         friendship = await this.friendshipRepo.save(existing);
       }
     } else {
@@ -1051,6 +1184,7 @@ immediate=立刻通过；short=几分钟；medium=慢热/忙碌；long=高冷/�
           characterId,
           intimacyLevel: 10,
           status: 'friend',
+          region: characterRegion,
         }),
       );
     }

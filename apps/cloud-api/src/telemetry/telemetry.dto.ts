@@ -76,6 +76,12 @@ export class TelemetryEventInputDto {
   @Transform(trimNullableString)
   @IsOptional()
   @IsString()
+  @MaxLength(120)
+  worldId?: string | null;
+
+  @Transform(trimNullableString)
+  @IsOptional()
+  @IsString()
   @MaxLength(2000)
   pagePath?: string | null;
 

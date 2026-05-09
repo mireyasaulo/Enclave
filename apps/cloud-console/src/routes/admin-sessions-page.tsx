@@ -2405,8 +2405,7 @@ export function AdminSessionsPage() {
         {!sourceGroupsQuery.isLoading &&
         !sourceGroupsQuery.isError &&
         sourceGroupTotal > 0 ? (
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-[color:var(--text-secondary)]">
-            <div>{sourceGroupSummary}</div>
+          <div className="mt-4 flex flex-wrap items-center justify-end gap-3 text-sm text-[color:var(--text-secondary)]">
             <div className="flex items-center gap-3">
               <span>
                 {formatCloudConsolePageOfTotal(
@@ -3195,8 +3194,7 @@ export function AdminSessionsPage() {
         ) : null}
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-[color:var(--text-secondary)]">
-        <div>{summary}</div>
+      <div className="mt-4 flex flex-wrap items-center justify-end gap-3 text-sm text-[color:var(--text-secondary)]">
         <div className="flex items-center gap-3">
           <span>
             Page {filters.page} of {totalPages}

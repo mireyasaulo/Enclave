@@ -134,6 +134,7 @@ export function buildReminderCharacter(): Partial<CharacterEntity> {
     intimacyLevel: 70,
     currentActivity: 'free',
     currentStatus: '在替你记着那些容易被忙乱吞掉的事。',
+    region: '虚境·云端',
   };
 }
 // i18n-ignore-end

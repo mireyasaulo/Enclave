@@ -1256,6 +1256,28 @@ export function ChatComposer({
     }
   };
 
+  const handleStickerPanelSelect = (sticker: StickerAttachment) => {
+    if (sticker.sourceType === "builtin" && sticker.label) {
+      insertTextAtCursor(`[${sticker.label}]`);
+      setRecentStickers(
+        pushRecentSticker({
+          sourceType: sticker.sourceType,
+          packId: sticker.packId,
+          stickerId: sticker.stickerId,
+        }),
+      );
+      if (isDesktop) {
+        setStickerPanelOpen(false);
+        focusInput();
+      } else {
+        returnMobileComposerToText({ focusInput: true });
+      }
+      return;
+    }
+
+    void handleSendSticker(sticker);
+  };
+
   const pickAlbum = () => {
     if (attachmentBusy) {
       return;
@@ -2474,6 +2496,16 @@ export function ChatComposer({
     setPendingSelection(activeMention.start + mentionText.length);
   };
 
+  const insertTextAtCursor = (snippet: string) => {
+    const insertAt = Math.min(
+      Math.max(inputCursor ?? value.length, 0),
+      value.length,
+    );
+    const nextValue = `${value.slice(0, insertAt)}${snippet}${value.slice(insertAt)}`;
+    onChange(nextValue);
+    setPendingSelection(insertAt + snippet.length);
+  };
+
   const handleDesktopInputKeyDown = (
     event: KeyboardEvent<HTMLTextAreaElement>,
   ) => {
@@ -3086,9 +3118,7 @@ export function ChatComposer({
                             setRecentStickers(items)
                           }
                           onError={setAttachmentError}
-                          onSelect={(sticker) =>
-                            void handleSendSticker(sticker)
-                          }
+                          onSelect={handleStickerPanelSelect}
                         />
                       ) : null}
                     </div>
@@ -3359,7 +3389,7 @@ export function ChatComposer({
               onPackChange={setActiveStickerPackId}
               onRecentItemsChange={(items) => setRecentStickers(items)}
               onError={setAttachmentError}
-              onSelect={(sticker) => void handleSendSticker(sticker)}
+              onSelect={handleStickerPanelSelect}
             />
           ) : null}
         </div>

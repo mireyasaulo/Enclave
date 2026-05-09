@@ -49,6 +49,18 @@ type AppLocaleProviderProps = {
   onLocaleChange?: (locale: SupportedLocale) => unknown | Promise<unknown>;
   preferredLocales?: readonly string[];
   surface: I18nAppSurface;
+  /**
+   * 渲染策略：
+   * - false（默认）：catalog 加载完之前显示 fallback，children 不渲染。
+   *   适合 admin / cloud-console / wiki 这种内部端，对首屏字数没要求。
+   * - true：立即渲染 children；catalog 还没到位时 lingui 会回落到源文 ID
+   *   （隐界 app 源文是 zh-CN 中文，所以 zh-CN 用户视觉上无差别；en/ja/ko
+   *   用户首屏会看到 0.3-1s 的中文 flash 然后切换到目标语言）。
+   *   好处是公网隧道下首屏不再被 100KB+ catalog 下载阻塞。
+   *   appI18n 在 i18n-instance.ts 已经做过 setupI18n + activate(DEFAULT_LOCALE,
+   *   {})，所以 i18n._() 在 catalog 到位前调用是安全的（返回源 ID）。
+   */
+  renderBeforeReady?: boolean;
 };
 
 const AppLocaleContext = createContext<AppLocaleContextValue | null>(null);
@@ -60,6 +72,7 @@ export function AppLocaleProvider({
   onLocaleChange,
   preferredLocales,
   surface,
+  renderBeforeReady = false,
 }: AppLocaleProviderProps) {
   const initialLocale = useMemo(() => {
     const queryLocale = readQueryLocale();
@@ -187,15 +200,56 @@ export function AppLocaleProvider({
       return;
     }
 
-    const timeoutId = window.setTimeout(() => {
+    // 其它 locale catalog 主要用于即时语言切换。这一发预下载在公网慢网环境
+    // 下有 ~330KB gzipped 的额外带宽（zh-CN / en-US / ja-JP / ko-KR 三个），
+    // 直接跟用户首屏后立刻发起的交互请求抢带宽。多重防线：
+    //   1) Network Information API 报 slow-2g/2g/3g 或 saveData=true → 完全跳过
+    //   2) 否则 requestIdleCallback({ timeout: 30s }) 等浏览器空闲再发
+    //   3) 都没有就 fallback 5s 后开始
+    type ConnectionInfo = {
+      effectiveType?: "slow-2g" | "2g" | "3g" | "4g";
+      saveData?: boolean;
+    };
+    type NavigatorWithConnection = Navigator & { connection?: ConnectionInfo };
+    if (typeof navigator !== "undefined") {
+      const conn = (navigator as NavigatorWithConnection).connection;
+      if (conn?.saveData === true) {
+        return; // Save-Data 用户明确要省流量
+      }
+      if (
+        conn?.effectiveType === "slow-2g" ||
+        conn?.effectiveType === "2g" ||
+        conn?.effectiveType === "3g"
+      ) {
+        return; // 慢网下不预热
+      }
+    }
+
+    type IdleScheduler = {
+      requestIdleCallback: (
+        cb: () => void,
+        opts?: { timeout: number },
+      ) => number;
+      cancelIdleCallback: (handle: number) => void;
+    };
+    const idle = globalThis as Partial<IdleScheduler>;
+    const fire = () =>
       prefetchMessagesForSurface(
         surface,
         SUPPORTED_LOCALES.filter(
           (availableLocale) => availableLocale !== locale,
         ),
       );
-    }, 200);
 
+    if (
+      typeof idle.requestIdleCallback === "function" &&
+      typeof idle.cancelIdleCallback === "function"
+    ) {
+      const handle = idle.requestIdleCallback(fire, { timeout: 30_000 });
+      return () => idle.cancelIdleCallback?.(handle);
+    }
+
+    const timeoutId = window.setTimeout(fire, 5_000);
     return () => window.clearTimeout(timeoutId);
   }, [isReady, locale, surface]);
 
@@ -226,10 +280,16 @@ export function AppLocaleProvider({
     ],
   );
 
+  // renderBeforeReady=true 时让 children 立即出来；catalog 到位后 React 会
+  // 因为 activationVersion 增加 + locale state 更新自动重渲染，把源 ID 替换
+  // 成目标 locale。textDictionary 此时是空 Map，DomTextLocalizer 在空表上
+  // 是 no-op，安全。
+  const shouldRenderChildren = isReady || renderBeforeReady;
+
   return (
     <AppLocaleContext.Provider value={contextValue}>
       <I18nProvider i18n={appI18n}>
-        {isReady ? (
+        {shouldRenderChildren ? (
           <>
             <DomTextLocalizer
               dictionary={textDictionary}

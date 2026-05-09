@@ -22,6 +22,7 @@ import {
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
+import { translateCharacterBio } from "../../../lib/character-i18n";
 import { isPersistedGroupConversation } from "../../../lib/conversation-route";
 import { formatTimestamp } from "../../../lib/format";
 import { buildYinjieId } from "../../../lib/yinjie-id";
@@ -188,7 +189,7 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
   const signature = isOwner
     ? ownerSignature.trim() || t(msg`在现实之外，进入另一片世界。`)
     : character?.currentStatus?.trim() ||
-      character?.bio?.trim() ||
+      translateCharacterBio(t, character?.bio) ||
       (isFriend ? t(msg`这个联系人还没有签名。`) : t(msg`这个角色还没有签名。`));
   const relationshipSummary = isOwner
     ? t(msg`当前世界实例的唯一主人`)
@@ -230,10 +231,13 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
           label: t(msg`隐界号`),
           value: identifier,
         },
-        friendship?.region?.trim()
+        friendship?.region?.trim() || character?.region?.trim()
           ? {
               label: t(msg`地区`),
-              value: friendship.region.trim(),
+              value:
+                friendship?.region?.trim() ||
+                character?.region?.trim() ||
+                "",
             }
           : null,
         friendship?.source?.trim()
@@ -277,6 +281,7 @@ export function DesktopMessageAvatarPopover(props: DesktopMessageAvatarPopoverPr
     displayName,
     friendship?.lastInteractedAt,
     friendship?.region,
+    character?.region,
     friendship?.source,
     groupMember?.id,
     hasPendingFriendRequest,

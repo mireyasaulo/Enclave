@@ -6,6 +6,10 @@ import { CloudAdminSessionEntity } from "../entities/cloud-admin-session.entity"
 import { CloudConfigEntity } from "../entities/cloud-config.entity";
 import { CloudFeedbackEntity } from "../entities/cloud-feedback.entity";
 import { CloudInstanceEntity } from "../entities/cloud-instance.entity";
+import { CloudTokenPricingCatalogEntity } from "../entities/cloud-token-pricing-catalog.entity";
+import { CloudTokenUsageBreakdownDailyEntity } from "../entities/cloud-token-usage-breakdown-daily.entity";
+import { CloudTokenUsageBudgetEntity } from "../entities/cloud-token-usage-budget.entity";
+import { CloudTokenUsageDailyEntity } from "../entities/cloud-token-usage-daily.entity";
 import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { CloudWorldRequestEntity } from "../entities/cloud-world-request.entity";
 import { CloudWorldEntity } from "../entities/cloud-world.entity";
@@ -40,6 +44,8 @@ import { CreateCloudFeedbackTable1776654000000 } from "./migrations/177665400000
 import { MakeCloudUsersPhoneNullable1776654600000 } from "./migrations/1776654600000-make-cloud-users-phone-nullable";
 import { UpdateAppPublicBaseUrl1776655200000 } from "./migrations/1776655200000-update-app-public-base-url";
 import { CreateTelemetryTables1776655800000 } from "./migrations/1776655800000-create-telemetry-tables";
+import { AddWorldIdToTelemetry1776656400000 } from "./migrations/1776656400000-add-world-id-to-telemetry";
+import { CreateCloudTokenUsageTables1776657000000 } from "./migrations/1776657000000-create-cloud-token-usage-tables";
 import { resolveCloudDatabasePath } from "../config/cloud-runtime-config";
 
 type ConfigReader = {
@@ -71,6 +77,10 @@ export const cloudEntities = [
   CloudFeedbackEntity,
   ClientTelemetryEventEntity,
   ClientTelemetryDailyEntity,
+  CloudTokenUsageDailyEntity,
+  CloudTokenUsageBreakdownDailyEntity,
+  CloudTokenUsageBudgetEntity,
+  CloudTokenPricingCatalogEntity,
 ] as const;
 
 export const cloudMigrations = [
@@ -90,6 +100,8 @@ export const cloudMigrations = [
   MakeCloudUsersPhoneNullable1776654600000,
   UpdateAppPublicBaseUrl1776655200000,
   CreateTelemetryTables1776655800000,
+  AddWorldIdToTelemetry1776656400000,
+  CreateCloudTokenUsageTables1776657000000,
 ];
 
 export function buildCloudDataSourceOptions(config: ConfigReader): DataSourceOptions {

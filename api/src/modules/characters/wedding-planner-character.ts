@@ -324,6 +324,7 @@ export function buildWeddingPlannerCharacter(): Partial<CharacterEntity> {
     triggerScenes: [],
     intimacyLevel: 55,
     currentActivity: 'working',
+    region: '上海·上海',
   };
 }
 // i18n-ignore-end

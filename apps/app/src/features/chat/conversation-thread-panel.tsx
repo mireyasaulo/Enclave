@@ -1,5 +1,6 @@
 import {
   type ReactNode,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -193,9 +194,15 @@ export function ConversationThreadPanel({
   const {
     ref: scrollAnchorRef,
     isAtBottom,
+    isAtBottomRef,
     pendingCount,
     scrollToBottom,
   } = scrollAnchor;
+  const handleMessageMediaReady = useCallback(() => {
+    if (isAtBottomRef.current) {
+      scrollToBottom("auto");
+    }
+  }, [isAtBottomRef, scrollToBottom]);
   const effectiveBackground = backgroundQuery.data?.effectiveBackground ?? null;
   const isReminderConversation =
     conversationType === "direct" && participants[0] === REMINDER_CHARACTER_ID;
@@ -756,6 +763,7 @@ export function ConversationThreadPanel({
                 !isDesktop && onBack ? t(msg`返回上一页`) : undefined
               }
               onErrorAction={!isDesktop && onBack ? onBack : null}
+              onMediaReady={handleMessageMediaReady}
               emptyState={
                 !isDesktop &&
                 !messagesQuery.isLoading &&

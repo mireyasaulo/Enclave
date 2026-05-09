@@ -48,6 +48,7 @@ export function AvatarChip({
       src={resolvedSrc}
       alt={name ?? "avatar"}
       loading="lazy"
+      decoding="async"
       onError={() => {
         if (!loadFailed) {
           setLoadFailed(true);

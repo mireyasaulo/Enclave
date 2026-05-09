@@ -35,6 +35,8 @@ const RESTORABLE_STATIC_PATHNAMES = new Set([
   "/discover/games",
   "/discover/mini-programs",
   "/profile/settings",
+  "/profile/favorites",
+  "/profile/moments",
 ]);
 const RESTORABLE_PATH_PATTERNS = [
   /^\/chat\/[^/]+$/,

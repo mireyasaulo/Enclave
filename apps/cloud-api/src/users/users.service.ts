@@ -371,6 +371,7 @@ export class UsersService implements OnModuleInit {
     return {
       id: user.id,
       phone: user.phone ?? "",
+      email: user.email,
       displayName: user.displayName,
       status: user.status as CloudUserStatus,
       subscriptionStatus,

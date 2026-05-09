@@ -2,7 +2,6 @@ import {
   Suspense,
   lazy,
   useEffect,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -13,10 +12,8 @@ import {
   ArrowLeft,
   Copy,
   Heart,
-  ImagePlus,
   PenSquare,
   Share2,
-  Video,
 } from "lucide-react";
 import {
   addFeedComment,
@@ -29,8 +26,6 @@ import {
 } from "@yinjie/contracts";
 import { AppPage, Button, InlineNotice, TextField } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
-import { MobileSocialComposerCard } from "../components/mobile-social-composer-card";
-import { MomentComposeMediaPreview } from "../components/moment-compose-media-preview";
 import { MomentMediaGallery } from "../components/moment-media-gallery";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import {
@@ -50,6 +45,8 @@ import {
   buildFeedRouteHash,
   parseFeedRouteHash,
 } from "../features/feed/feed-route-state";
+import { buildMobileFeedPublishRouteHash } from "../features/feed/mobile-feed-publish-route-state";
+import { consumeFeedPublishFlash } from "../features/feed/feed-publish-flash";
 import {
   getFeedSummaryText,
   resolveFeedMomentContentType,
@@ -60,9 +57,6 @@ import { shareWithNativeShell } from "../runtime/mobile-bridge";
 import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
-
-const FEED_COMPOSER_SECTION_ID = "discover-feed-composer-card";
-const FEED_COMPOSER_TEXTAREA_ID = "discover-feed-composer-input";
 const DesktopFeedWorkspace = lazy(async () => {
   const mod = await import("../features/desktop/feed/desktop-feed-workspace");
   return { default: mod.DesktopFeedWorkspace };
@@ -90,8 +84,6 @@ export function DiscoverFeedPage() {
   });
   const composeDraft = useMomentComposeDraft();
   const resetComposeDraft = composeDraft.reset;
-  const imageInputRef = useRef<HTMLInputElement | null>(null);
-  const videoInputRef = useRef<HTMLInputElement | null>(null);
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>(
     {},
   );
@@ -322,19 +314,27 @@ export function DiscoverFeedPage() {
     void blockedQuery.refetch();
   }
 
+  function openMobileFeedPublishPage() {
+    const currentHash = hash.startsWith("#") ? hash.slice(1) : hash;
+    void navigate({
+      to: "/discover/feed/publish",
+      hash: buildMobileFeedPublishRouteHash({
+        returnPath: pathname,
+        returnHash: currentHash || undefined,
+      }),
+    });
+  }
+
   function handleEmptyStateAction() {
     if (navigateToRouteStateReturn()) {
       return;
     }
 
-    focusComposer();
+    openMobileFeedPublishPage();
   }
   const interactionActionLabel = safeReturnPath
     ? t(msg`返回上一页`)
     : t(msg`重试读取`);
-  const composerErrorActionLabel = safeReturnPath
-    ? t(msg`返回上一页`)
-    : t(msg`继续编辑`);
 
   useEffect(() => {
     resetComposeDraft();
@@ -344,6 +344,19 @@ export function DiscoverFeedPage() {
     setNoticeAction(null);
     setNotice(""); // i18n-ignore-line
   }, [baseUrl, resetComposeDraft]);
+
+  useEffect(() => {
+    if (isDesktopLayout) {
+      return;
+    }
+    const flash = consumeFeedPublishFlash();
+    if (flash) {
+      setNoticeTone("success");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(flash);
+    }
+  }, [isDesktopLayout]);
 
   useEffect(() => {
     setFavoriteSourceIds(readDesktopFavorites().map((item) => item.sourceId));
@@ -442,23 +455,6 @@ export function DiscoverFeedPage() {
     safeReturnHash,
     safeReturnPath,
   ]);
-
-  function focusComposer() {
-    if (typeof document === "undefined") {
-      return;
-    }
-
-    document
-      .getElementById(FEED_COMPOSER_SECTION_ID)
-      ?.scrollIntoView({ block: "start", behavior: "smooth" });
-
-    window.requestAnimationFrame(() => {
-      const textarea = document.getElementById(FEED_COMPOSER_TEXTAREA_ID);
-      if (textarea instanceof HTMLTextAreaElement) {
-        textarea.focus();
-      }
-    });
-  }
 
   async function handleImageFilesSelected(files: FileList | null) {
     try {
@@ -743,7 +739,7 @@ export function DiscoverFeedPage() {
             variant="ghost"
             size="icon"
             className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-black/[0.05]"
-            onClick={focusComposer}
+            onClick={openMobileFeedPublishPage}
             aria-label={t(msg`发一条广场动态`)}
           >
             <PenSquare size={17} />
@@ -752,83 +748,6 @@ export function DiscoverFeedPage() {
       />
 
       <div className="space-y-2.5 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] pt-2.5">
-        <MobileSocialComposerCard
-          sectionId={FEED_COMPOSER_SECTION_ID}
-          textareaId={FEED_COMPOSER_TEXTAREA_ID}
-          title={t(msg`发一条广场动态`)}
-          description={t(
-            msg`发到广场后，世界里的居民都可能看到、点赞，甚至继续接话。`,
-          )}
-          scopeLabel={t(msg`公开可见`)}
-          scopeClassName="bg-[rgba(7,193,96,0.12)] text-[#07c160]"
-          value={composeDraft.text}
-          onChange={composeDraft.setText}
-          placeholder={t(msg`写点想让世界居民都能看到的内容...`)}
-          helperText={t(
-            msg`这条内容会进入公开动态流，更适合发讨论、状态和世界广播。`,
-          )}
-          submitLabel={t(msg`发布`)}
-          submittingLabel={t(msg`正在发布...`)}
-          mediaPreview={
-            composeDraft.imageDrafts.length > 0 || composeDraft.videoDraft ? (
-              <MomentComposeMediaPreview
-                imageDrafts={composeDraft.imageDrafts}
-                videoDraft={composeDraft.videoDraft}
-                onRemoveImage={(id) => composeDraft.removeImageDraft(id)}
-                onRemoveVideo={() => composeDraft.clearVideoDraft()}
-                variant="mobile"
-              />
-            ) : null
-          }
-          mediaActions={
-            <>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                disabled={
-                  !composeDraft.canAddImages || createMutation.isPending
-                }
-                className="h-9 rounded-full border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 text-[11px]"
-                onClick={() => imageInputRef.current?.click()}
-              >
-                <ImagePlus size={14} className="mr-1" />
-                {t(msg`添加图片`)}
-              </Button>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                disabled={!composeDraft.canAddVideo || createMutation.isPending}
-                className="h-9 rounded-full border-[color:var(--border-subtle)] bg-[color:var(--surface-panel)] px-3 text-[11px]"
-                onClick={() => videoInputRef.current?.click()}
-              >
-                <Video size={14} className="mr-1" />
-                {composeDraft.videoDraft ? t(msg`更换视频`) : t(msg`添加视频`)}
-              </Button>
-            </>
-          }
-          pending={createMutation.isPending}
-          disabled={!composeDraft.hasContent || createMutation.isPending}
-          errorMessage={
-            composeDraft.mediaError ??
-            (createMutation.isError && createMutation.error instanceof Error
-              ? createMutation.error.message
-              : null)
-          }
-          errorActionLabel={composerErrorActionLabel}
-          onErrorAction={() => {
-            if (safeReturnPath) {
-              handleStatusBack();
-              return;
-            }
-
-            composeDraft.setMediaError(null);
-            createMutation.reset();
-          }}
-          onSubmit={() => createMutation.mutate()}
-        />
-
         <section className="space-y-2">
           <div className="px-1">
             <div className="text-[11px] text-[color:var(--text-muted)]">
@@ -1142,28 +1061,6 @@ export function DiscoverFeedPage() {
           ) : null}
         </section>
       </div>
-
-      <input
-        ref={imageInputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        className="hidden"
-        onChange={(event) => {
-          void handleImageFilesSelected(event.currentTarget.files);
-          event.currentTarget.value = "";
-        }}
-      />
-      <input
-        ref={videoInputRef}
-        type="file"
-        accept="video/*"
-        className="hidden"
-        onChange={(event) => {
-          void handleVideoFileSelected(event.currentTarget.files?.[0] ?? null);
-          event.currentTarget.value = "";
-        }}
-      />
     </AppPage>
   );
 }

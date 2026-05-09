@@ -60,6 +60,11 @@ import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 import { translateRuntimeMessage } from "@yinjie/i18n";
+import {
+  translateCharacterActivity,
+  translateCharacterBio,
+  translateExpertDomains,
+} from "../lib/character-i18n";
 
 const CHARACTER_DETAIL_BLOCK_REASON = "character_detail_block";
 
@@ -307,7 +312,6 @@ export function CharacterDetailPage() {
   const commonGroupsLabel = t(msg`共同群聊`);
   const currentStatusLabel = t(msg`当前状态`);
   const expertiseLabel = t(msg`擅长领域`);
-  const toneStyleLabel = t(msg`语气风格`);
   const coreDirectiveLabel = t(msg`核心理念`);
   const bioLabel = t(msg`角色简介`);
   const noMoreIntroLabel = t(msg`暂时没有更多介绍。`);
@@ -324,17 +328,15 @@ export function CharacterDetailPage() {
   const displayName = remarkName || character?.name || detailInfoLabel;
   const signature =
     character?.currentStatus?.trim() ||
-    character?.bio?.trim() ||
+    translateCharacterBio(t, character?.bio) ||
     t(msg`这个角色还没有个性签名。`);
   const expertiseSummary = character?.expertDomains?.length
-    ? character.expertDomains.join("、")
+    ? translateExpertDomains(t, character.expertDomains, "join")
     : unsetLabel;
   const activitySummary =
-    character?.currentActivity?.trim() ||
+    translateCharacterActivity(t, character?.currentActivity) ||
     character?.relationship?.trim() ||
     t(msg`暂无状态`);
-  const toneSummary =
-    character?.profile?.traits?.emotionalTone?.trim() || unsetLabel;
   const coreDirective = character?.profile?.coreDirective?.trim() || "";
   const tagSummary = friendship?.tags?.length
     ? friendship.tags.join("、")
@@ -1476,7 +1478,7 @@ export function CharacterDetailPage() {
                   >
                     {isFriend
                       ? t(
-                          msg`地区：${friendship?.region?.trim() || unsetLabel}`,
+                          msg`地区：${friendship?.region?.trim() || character?.region?.trim() || unsetLabel}`,
                         )
                       : t(
                           msg`身份：${character.relationship || worldRoleLabel}`,
@@ -1640,9 +1642,10 @@ export function CharacterDetailPage() {
               <ProfileRow
                 label={regionLabel}
                 value={
-                  isFriend
-                    ? friendship?.region?.trim() || unsetLabel
-                    : character.relationship || worldRoleLabel
+                  (isFriend
+                    ? friendship?.region?.trim() ||
+                      character.region?.trim()
+                    : character.region?.trim()) || unsetLabel
                 }
                 compact={!isDesktopLayout}
               />
@@ -1685,17 +1688,12 @@ export function CharacterDetailPage() {
               flatOnMobile={!isDesktopLayout}
               compact={!isDesktopLayout}
             >
-              {isDesktopLayout ? (
+              {isDesktopLayout && isFriend ? (
                 <ProfileRow
                   label={recentInteractionLabel}
-                  value={
-                    isFriend
-                      ? formatTimestamp(
-                          friendship?.lastInteractedAt ??
-                            character.lastActiveAt,
-                        )
-                      : formatTimestamp(character.lastActiveAt)
-                  }
+                  value={formatTimestamp(
+                    friendship?.lastInteractedAt ?? character.lastActiveAt,
+                  )}
                   compact={!isDesktopLayout}
                 />
               ) : null}
@@ -1740,7 +1738,7 @@ export function CharacterDetailPage() {
                   compact={!isDesktopLayout}
                 />
               ) : null}
-              {isDesktopLayout ? (
+              {isDesktopLayout && isFriend ? (
                 <ProfileRow
                   label={currentStatusLabel}
                   value={activitySummary}
@@ -1752,13 +1750,6 @@ export function CharacterDetailPage() {
                   label={expertiseLabel}
                   value={expertiseSummary}
                   multiline
-                  compact={!isDesktopLayout}
-                />
-              ) : null}
-              {isDesktopLayout ? (
-                <ProfileRow
-                  label={toneStyleLabel}
-                  value={toneSummary}
                   compact={!isDesktopLayout}
                 />
               ) : null}
@@ -1805,7 +1796,7 @@ export function CharacterDetailPage() {
                       : "text-[13px] leading-6",
                   )}
                 >
-                  {character.bio?.trim() || noMoreIntroLabel}
+                  {translateCharacterBio(t, character.bio) || noMoreIntroLabel}
                 </div>
               </div>
             </ProfileSection>

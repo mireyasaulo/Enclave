@@ -15,9 +15,6 @@ import {
 import { useConsoleNotice } from "../components/console-notice";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import {
-  formatCloudConsoleActiveVersion,
-  formatCloudConsoleAllocationCount,
-  formatCloudConsolePayeeProfileCount,
   formatCloudConsoleSettlementGenerated,
   formatCloudConsoleVersionShort,
   translateCloudConsoleText,
@@ -218,19 +215,9 @@ export function RevenueSharingPage() {
   });
 
   const policyCards = useMemo(() => {
-    const policy = policyQuery.data;
     const ledger = ledgerQuery.data;
+    const preview = settlementPreviewQuery.data;
     return [
-      {
-        label: t("Policy"),
-        value: policy?.status === "active" ? t("Active") : t("Inactive"),
-      },
-      {
-        label: t("Version"),
-        value: policy
-          ? formatCloudConsoleVersionShort(policy.version, locale)
-          : t("Not loaded"),
-      },
       {
         label: t("Payable"),
         value: ledger
@@ -246,8 +233,18 @@ export function RevenueSharingPage() {
           ? formatMoney(ledger.summary.totalHeldCents, ledger.summary.currency)
           : t("Not loaded"),
       },
+      {
+        label: t("Settlement preview"),
+        value: preview
+          ? formatMoney(preview.totalAmountCents, preview.currency)
+          : t("Not loaded"),
+      },
+      {
+        label: t("Allocations"),
+        value: ledger ? ledger.total.toLocaleString() : t("Not loaded"),
+      },
     ];
-  }, [ledgerQuery.data, locale, policyQuery.data, t]);
+  }, [ledgerQuery.data, settlementPreviewQuery.data, t]);
 
   const pageError =
     policyQuery.error ??
@@ -280,16 +277,29 @@ export function RevenueSharingPage() {
 
       <section className={SECTION}>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
+          <div className="flex flex-wrap items-center gap-3">
             <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
               {t("Revenue policy")}
             </h2>
-            <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              {formatCloudConsoleActiveVersion(
-                policyQuery.data?.version ?? 0,
-                locale,
-              )}
-            </div>
+            <span
+              className={
+                policyQuery.data?.status === "active"
+                  ? "rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700"
+                  : "rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-soft)] px-2 py-0.5 text-xs font-medium text-[color:var(--text-muted)]"
+              }
+            >
+              {policyQuery.data?.status === "active"
+                ? t("Active")
+                : t("Inactive")}
+            </span>
+            {policyQuery.data ? (
+              <span className="text-xs text-[color:var(--text-muted)]">
+                {formatCloudConsoleVersionShort(
+                  policyQuery.data.version,
+                  locale,
+                )}
+              </span>
+            ) : null}
           </div>
           <button
             type="button"
@@ -439,18 +449,10 @@ export function RevenueSharingPage() {
       </section>
 
       <section className={SECTION}>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
-              {t("Payees")}
-            </h2>
-            <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              {formatCloudConsolePayeeProfileCount(
-                payeesQuery.data?.length ?? 0,
-                locale,
-              )}
-            </div>
-          </div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
+            {t("Payees")}
+          </h2>
           <button
             type="button"
             className={BUTTON}
@@ -500,7 +502,7 @@ export function RevenueSharingPage() {
             >
               {PAYEE_REF_TYPES.map((type) => (
                 <option key={type} value={type}>
-                  {type}
+                  {t(type)}
                 </option>
               ))}
             </select>
@@ -549,7 +551,7 @@ export function RevenueSharingPage() {
                     <td className="px-4 py-3 font-medium">{payee.displayName}</td>
                     <td className="px-4 py-3">{t(payee.status)}</td>
                     <td className="px-4 py-3 font-mono text-xs">
-                      {payee.externalRefType}:{payee.externalRefId}
+                      {t(payee.externalRefType)}:{payee.externalRefId}
                     </td>
                     <td className="px-4 py-3">
                       {formatDateTime(payee.updatedAt, locale)}
@@ -571,17 +573,9 @@ export function RevenueSharingPage() {
 
       <section className={SECTION}>
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
-              {t("Ledger")}
-            </h2>
-            <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              {formatCloudConsoleAllocationCount(
-                ledgerQuery.data?.total ?? 0,
-                locale,
-              )}
-            </div>
-          </div>
+          <h2 className="text-lg font-semibold text-[color:var(--text-primary)]">
+            {t("Ledger")}
+          </h2>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
@@ -605,80 +599,42 @@ export function RevenueSharingPage() {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
-          <div className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-primary)] p-4">
-            <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-              {t("Settlement preview")}
-            </div>
-            <div className="mt-3 text-2xl font-semibold">
-              {settlementPreviewQuery.data
-                ? formatMoney(
-                    settlementPreviewQuery.data.totalAmountCents,
-                    settlementPreviewQuery.data.currency,
-                  )
-                : t("Not loaded")}
-            </div>
-            <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-              {formatCloudConsoleAllocationCount(
-                settlementPreviewQuery.data?.allocationCount ?? 0,
-                locale,
-              )}
-            </div>
-            <div className="mt-4 space-y-2">
-              {(settlementPreviewQuery.data?.payees ?? []).slice(0, 6).map((payee) => (
-                <div
-                  key={payee.payeeId}
-                  className="flex items-center justify-between gap-3 rounded-xl bg-[color:var(--surface-soft)] px-3 py-2 text-sm"
-                >
-                  <span className="min-w-0 truncate">{payee.payeeDisplayName}</span>
-                  <span className="shrink-0 font-medium">
-                    {formatMoney(
-                      payee.amountCents,
-                      settlementPreviewQuery.data?.currency ?? "CNY",
-                    )}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="overflow-x-auto rounded-2xl border border-[color:var(--border-faint)]">
-            <table className="min-w-full text-left text-sm">
-              <thead className="bg-[color:var(--surface-soft)] text-xs uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
-                <tr>
-                  <th className="px-4 py-3 font-medium">{t("Payee")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Participant")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Status")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Amount")}</th>
-                  <th className="px-4 py-3 font-medium">{t("Created")}</th>
+        <div className="mt-5 overflow-x-auto rounded-2xl border border-[color:var(--border-faint)]">
+          <table className="min-w-full text-left text-sm">
+            <thead className="bg-[color:var(--surface-soft)] text-xs uppercase tracking-[0.12em] text-[color:var(--text-muted)]">
+              <tr>
+                <th className="px-4 py-3 font-medium">{t("Payee")}</th>
+                <th className="px-4 py-3 font-medium">{t("Participant")}</th>
+                <th className="px-4 py-3 font-medium">{t("Status")}</th>
+                <th className="px-4 py-3 font-medium">{t("Amount")}</th>
+                <th className="px-4 py-3 font-medium">{t("Created")}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[color:var(--border-faint)]">
+              {(ledgerQuery.data?.items ?? []).map((item) => (
+                <tr key={item.id}>
+                  <td className="px-4 py-3">
+                    {item.payeeDisplayName ?? t("Unassigned")}
+                  </td>
+                  <td className="px-4 py-3">{t(item.participantType)}</td>
+                  <td className="px-4 py-3">{t(item.status)}</td>
+                  <td className="px-4 py-3 font-semibold">
+                    {formatMoney(item.amountCents, item.currency)}
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatDateTime(item.createdAt, locale)}
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-[color:var(--border-faint)]">
-                {(ledgerQuery.data?.items ?? []).map((item) => (
-                  <tr key={item.id}>
-                    <td className="px-4 py-3">
-                      {item.payeeDisplayName ?? t("Unassigned")}
-                    </td>
-                    <td className="px-4 py-3">{item.participantType}</td>
-                    <td className="px-4 py-3">{t(item.status)}</td>
-                    <td className="px-4 py-3 font-semibold">
-                      {formatMoney(item.amountCents, item.currency)}
-                    </td>
-                    <td className="px-4 py-3">
-                      {formatDateTime(item.createdAt, locale)}
-                    </td>
-                  </tr>
-                ))}
-                {ledgerQuery.data?.items.length === 0 ? (
-                  <tr>
-                    <td className="px-4 py-6 text-[color:var(--text-muted)]" colSpan={5}>
-                      {t("No allocations.")}
-                    </td>
-                  </tr>
-                ) : null}
-              </tbody>
-            </table>
-          </div>
+              ))}
+              {ledgerQuery.data?.items.length === 0 ? (
+                <tr>
+                  <td className="px-4 py-6 text-[color:var(--text-muted)]" colSpan={5}>
+                    {t("No allocations.")}
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -700,7 +656,7 @@ export function RevenueSharingPage() {
               <tbody className="divide-y divide-[color:var(--border-faint)]">
                 {(eventsQuery.data?.usageEvents ?? []).map((event) => (
                   <tr key={event.id}>
-                    <td className="px-4 py-3">{event.eventType}</td>
+                    <td className="px-4 py-3">{t(event.eventType)}</td>
                     <td className="px-4 py-3">{event.characterName ?? event.characterId}</td>
                     <td className="px-4 py-3">
                       {formatMoney(event.grossAmountCents, event.currency)}
@@ -727,9 +683,9 @@ export function RevenueSharingPage() {
               <tbody className="divide-y divide-[color:var(--border-faint)]">
                 {(eventsQuery.data?.contributionEvents ?? []).map((event) => (
                   <tr key={event.id}>
-                    <td className="px-4 py-3">{event.eventType}</td>
+                    <td className="px-4 py-3">{t(event.eventType)}</td>
                     <td className="px-4 py-3 font-mono text-xs">
-                      {event.contributorExternalRefType}:{event.contributorExternalRefId}
+                      {t(event.contributorExternalRefType)}:{event.contributorExternalRefId}
                     </td>
                     <td className="px-4 py-3">
                       {event.reversedAt ? t("reversed") : t("active")}

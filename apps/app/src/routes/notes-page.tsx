@@ -2,9 +2,10 @@ import { useEffect } from "react";
 import { msg } from "@lingui/macro";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useRuntimeTranslator } from "@yinjie/i18n";
-import { AppPage, Button, LoadingBlock } from "@yinjie/ui";
+import { AppPage, LoadingBlock } from "@yinjie/ui";
 import { buildDesktopFavoritesWorkspaceRouteHash } from "../features/favorites/favorites-route-state";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+import { MobileNotesPage } from "./mobile-notes-page";
 
 export function NotesPage() {
   const t = useRuntimeTranslator();
@@ -31,26 +32,7 @@ export function NotesPage() {
   }, [hash, isDesktopLayout, navigate]);
 
   if (!isDesktopLayout) {
-    return (
-      <AppPage className="flex h-full items-center justify-center bg-[color:var(--bg-app)] px-5">
-        <div className="w-full max-w-md rounded-[22px] border border-[color:var(--border-faint)] bg-white p-8 shadow-[var(--shadow-card)]">
-          <div className="text-xl font-semibold text-[color:var(--text-primary)]">
-            {t(msg`笔记当前仅提供桌面布局`)}
-          </div>
-          <div className="mt-3 text-sm leading-7 text-[color:var(--text-secondary)]">
-            {t(msg`微信式笔记编辑器目前只在 Web 端桌面布局和桌面壳内启用，移动端先回到消息页继续使用。`)}
-          </div>
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={() => navigate({ to: "/tabs/chat" })}
-            className="mt-6 w-full rounded-xl bg-[color:var(--brand-primary)] text-white hover:opacity-95"
-          >
-            {t(msg`返回消息`)}
-          </Button>
-        </div>
-      </AppPage>
-    );
+    return <MobileNotesPage />;
   }
 
   return (

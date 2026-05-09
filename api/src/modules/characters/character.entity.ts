@@ -109,4 +109,7 @@ export class CharacterEntity {
 
   @Column('text', { nullable: true })
   modelRoutingNotes?: string | null;
+
+  @Column('text', { nullable: true })
+  region?: string | null;
 }

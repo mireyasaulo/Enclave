@@ -3,12 +3,14 @@ import { msg } from "@lingui/macro";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   BookText,
+  Camera,
   ChevronRight,
   CreditCard,
   FileText,
   LogOut,
   Settings,
   ShieldCheck,
+  Star,
 } from "lucide-react";
 import { AppPage, cn } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
@@ -112,7 +114,7 @@ export function ProfilePage() {
 
       <div className="pb-8">
         <Link
-          to={settingsPath as never}
+          to="/profile/info"
           className="mt-1 flex items-center gap-2.5 border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] px-4 py-3 transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)] hover:bg-[color:var(--surface-card-hover)]"
         >
           <AvatarChip
@@ -146,28 +148,40 @@ export function ProfilePage() {
             label={t(msg`设置`)}
             to={settingsPath}
           />
-          {showCloudAccountEntries ? (
+        </ProfileEntryGroup>
+
+        <ProfileEntryGroup className="mt-3">
+          <ProfileEntry
+            icon={Star}
+            iconClassName="bg-[rgba(250,173,20,0.12)] text-[#d48806]"
+            label={t(msg`收藏`)}
+            to="/profile/favorites"
+          />
+        </ProfileEntryGroup>
+
+        <ProfileEntryGroup className="mt-3">
+          <ProfileActionEntry
+            icon={Camera}
+            iconClassName="bg-[rgba(168,85,247,0.12)] text-[#7e22ce]"
+            label={t(msg`朋友圈`)}
+            onClick={() => {
+              void navigate({ to: "/profile/moments" });
+            }}
+          />
+        </ProfileEntryGroup>
+
+        {showCloudAccountEntries ? (
+          <ProfileEntryGroup className="mt-3">
             <ProfileEntry
               icon={CreditCard}
               iconClassName="bg-[rgba(22,163,74,0.12)] text-[#15803d]"
               label={t(msg`会员中心`)}
               to="/profile/subscription"
             />
-          ) : null}
-          {showCloudAccountEntries ? (
-            <ProfileActionEntry
-              icon={LogOut}
-              iconClassName="bg-[rgba(220,38,38,0.10)] text-[#b42318]"
-              label={t(msg`退出登录`)}
-              onClick={() => {
-                clearCloudRuntimeSession();
-                void navigate({ to: "/welcome", replace: true });
-              }}
-            />
-          ) : null}
-        </ProfileEntryGroup>
+          </ProfileEntryGroup>
+        ) : null}
 
-        <ProfileEntryGroup className="mt-1">
+        <ProfileEntryGroup className="mt-3">
           <ProfileEntry
             icon={ShieldCheck}
             iconClassName="bg-[rgba(64,169,255,0.12)] text-[#1677ff]"
@@ -187,6 +201,20 @@ export function ProfilePage() {
             to="/legal/community"
           />
         </ProfileEntryGroup>
+
+        {showCloudAccountEntries ? (
+          <ProfileEntryGroup className="mt-3">
+            <ProfileActionEntry
+              icon={LogOut}
+              iconClassName="bg-[rgba(220,38,38,0.10)] text-[#b42318]"
+              label={t(msg`退出登录`)}
+              onClick={() => {
+                clearCloudRuntimeSession();
+                void navigate({ to: "/welcome", replace: true });
+              }}
+            />
+          </ProfileEntryGroup>
+        ) : null}
       </div>
     </AppPage>
   );

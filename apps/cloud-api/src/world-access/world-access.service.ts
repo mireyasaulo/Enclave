@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import type {
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
@@ -44,7 +45,25 @@ export class WorldAccessService {
     private readonly accessSessionRepo: Repository<WorldAccessSessionEntity>,
     private readonly computeProviderRegistry: ComputeProviderRegistryService,
     private readonly phoneAuthService: PhoneAuthService,
+    private readonly configService: ConfigService,
   ) {}
+
+  // 公网部署：world API 不直接暴露 child 的 127.0.0.1:port，而是把所有客户端
+  // 流量收口到 cloud-api 反代 (/cloud/world-api)，按 cloud token 路由到对应
+  // child。这里把 session 序列化成给客户端的 resolvedApiBaseUrl 时统一替换成
+  // 这个反代入口；本地直连场景（没配 env）保留 child 的真实 baseUrl 不变。
+  private resolveClientFacingApiBaseUrl(rawBaseUrl: string | null) {
+    if (!rawBaseUrl) {
+      return rawBaseUrl;
+    }
+    const proxyBase = this.configService
+      .get<string>("CLOUD_WORLD_PUBLIC_PROXY_BASE_URL")
+      ?.trim();
+    if (!proxyBase) {
+      return rawBaseUrl;
+    }
+    return proxyBase.replace(/\/+$/, "");
+  }
 
   async resolveWorldAccessByPhone(phone: string, payload: ResolveWorldAccessRequest): Promise<ResolveWorldAccessResponse> {
     const normalizedPhone = this.phoneAuthService.normalizePhone(phone);
@@ -437,7 +456,7 @@ export class WorldAccessService {
       status: session.status as WorldAccessSessionSummary["status"],
       phase: session.phase as WorldAccessSessionSummary["phase"],
       displayStatus: session.displayStatus,
-      resolvedApiBaseUrl: session.resolvedApiBaseUrl,
+      resolvedApiBaseUrl: this.resolveClientFacingApiBaseUrl(session.resolvedApiBaseUrl),
       retryAfterSeconds: session.retryAfterSeconds,
       estimatedWaitSeconds: session.estimatedWaitSeconds,
       failureReason: session.failureReason,

@@ -19,6 +19,11 @@ import {
 ])
 @Index("IDX_client_telemetry_events_session", ["sessionId"])
 @Index("IDX_client_telemetry_events_user_time", ["userId", "occurredAt"])
+@Index("IDX_client_telemetry_events_app_world_time", [
+  "appId",
+  "worldId",
+  "occurredAt",
+])
 export class ClientTelemetryEventEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
@@ -37,6 +42,9 @@ export class ClientTelemetryEventEntity {
 
   @Column({ type: "text", nullable: true })
   userId: string | null;
+
+  @Column({ type: "varchar", length: 120, nullable: true })
+  worldId: string | null;
 
   @Column()
   sessionId: string;

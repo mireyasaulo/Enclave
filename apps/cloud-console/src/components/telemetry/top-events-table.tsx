@@ -20,7 +20,6 @@ export function TelemetryTopEventsTable({ data }: { data: TelemetryTopEventsResp
             <Th>{t("Type")}</Th>
             <Th align="right">{t("Count")}</Th>
             <Th align="right">{t("Unique users")}</Th>
-            <Th align="right">{t("Unique anons")}</Th>
           </tr>
         </thead>
         <tbody className="divide-y divide-(--border-faint)">
@@ -33,7 +32,6 @@ export function TelemetryTopEventsTable({ data }: { data: TelemetryTopEventsResp
                 {row.count.toLocaleString()}
               </Td>
               <Td align="right">{row.uniqueUsers.toLocaleString()}</Td>
-              <Td align="right">{row.uniqueAnons.toLocaleString()}</Td>
             </tr>
           ))}
         </tbody>

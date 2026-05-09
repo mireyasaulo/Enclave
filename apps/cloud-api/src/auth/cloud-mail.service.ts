@@ -20,6 +20,7 @@ export class CloudMailService {
   async sendVerificationCode(
     email: string,
     code: string,
+    isNewUser: boolean,
   ): Promise<{ delivered: boolean; debugCode: string | null }> {
     const transporter = this.resolveTransporter();
     if (!transporter) {
@@ -32,15 +33,7 @@ export class CloudMailService {
       this.config.get<string>("CLOUD_MAIL_FROM_NAME") ?? "隐界云";
     const from = fromAddress ? `${fromName} <${fromAddress}>` : fromName;
 
-    const subject = "【隐界云】登录验证码";
-    const text = `您的登录验证码是 ${code}，10 分钟内有效。如非本人操作请忽略此邮件。`;
-    const html = `
-      <div style="font-family: -apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif; line-height:1.6; color:#1f2937;">
-        <p>您正在登录 <strong>隐界云</strong>，验证码：</p>
-        <p style="font-size:28px; letter-spacing:6px; font-weight:600; color:#1d4ed8;">${code}</p>
-        <p style="color:#6b7280; font-size:13px;">10 分钟内有效。如非本人操作请忽略此邮件。</p>
-      </div>
-    `.trim();
+    const { subject, text, html } = this.buildLoginMail(code, isNewUser);
 
     try {
       await transporter.sendMail({ from, to: email, subject, text, html });
@@ -52,6 +45,63 @@ export class CloudMailService {
     }
 
     return { delivered: true, debugCode: null };
+  }
+
+  private buildLoginMail(
+    code: string,
+    isNewUser: boolean,
+  ): { subject: string; text: string; html: string } {
+    if (isNewUser) {
+      const subject = "【隐界云】欢迎来到隐界云";
+      const text = [
+        "看到你来了。",
+        "",
+        "用这串数字进来就好：",
+        "",
+        code,
+        "",
+        "10 分钟内有效。",
+        "如果不是你本人在操作，把这封信忘掉就行，我们什么都不会发生。",
+        "",
+        "—— 隐界云，一直都在",
+      ].join("\n");
+      const html = `
+        <div style="font-family: -apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif; line-height:1.8; color:#1f2937;">
+          <p style="margin:0 0 16px;">看到你来了。</p>
+          <p style="margin:0 0 8px;">用这串数字进来就好：</p>
+          <p style="font-size:28px; letter-spacing:6px; font-weight:600; color:#1d4ed8; margin:12px 0 20px;">${code}</p>
+          <p style="color:#6b7280; font-size:13px; margin:0 0 4px;">10 分钟内有效。</p>
+          <p style="color:#6b7280; font-size:13px; margin:0 0 24px;">如果不是你本人在操作，把这封信忘掉就行，我们什么都不会发生。</p>
+          <p style="color:#6b7280; font-size:13px; margin:0;">—— 隐界云，一直都在</p>
+        </div>
+      `.trim();
+      return { subject, text, html };
+    }
+
+    const subject = "【隐界云】你回来了";
+    const text = [
+      "你回来了。",
+      "",
+      "用这串数字继续：",
+      "",
+      code,
+      "",
+      "10 分钟内有效。",
+      "如果不是你本人在操作，把这封信忘掉就行。",
+      "",
+      "—— 隐界云，一直都在",
+    ].join("\n");
+    const html = `
+      <div style="font-family: -apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif; line-height:1.8; color:#1f2937;">
+        <p style="margin:0 0 16px;">你回来了。</p>
+        <p style="margin:0 0 8px;">用这串数字继续：</p>
+        <p style="font-size:28px; letter-spacing:6px; font-weight:600; color:#1d4ed8; margin:12px 0 20px;">${code}</p>
+        <p style="color:#6b7280; font-size:13px; margin:0 0 4px;">10 分钟内有效。</p>
+        <p style="color:#6b7280; font-size:13px; margin:0 0 24px;">如果不是你本人在操作，把这封信忘掉就行。</p>
+        <p style="color:#6b7280; font-size:13px; margin:0;">—— 隐界云，一直都在</p>
+      </div>
+    `.trim();
+    return { subject, text, html };
   }
 
   private resolveTransporter(): Transporter | null {

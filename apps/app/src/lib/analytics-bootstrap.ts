@@ -1,4 +1,5 @@
 import { init as initAnalytics, isInitialized } from "@yinjie/analytics";
+import { getAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useCloudSessionStore } from "../store/cloud-session-store";
 import { resolveAppCloudApiBaseUrl } from "./runtime-config";
 
@@ -21,5 +22,14 @@ export function bootstrapAnalytics(): void {
     },
     userIdProvider: () =>
       useCloudSessionStore.getState().profile?.id ?? null,
+    // 用户进入云世界后 runtime-config 会被 setAppRuntimeConfig 写入 cloudWorldId，
+    // 此后每条事件都带上 worldId，cloud-console 就能按世界切片看埋点。
+    worldIdProvider: () => {
+      try {
+        return getAppRuntimeConfig().cloudWorldId ?? null;
+      } catch {
+        return null;
+      }
+    },
   });
 }

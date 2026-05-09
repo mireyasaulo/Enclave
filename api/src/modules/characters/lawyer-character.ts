@@ -299,6 +299,7 @@ export function buildLawyerCharacter(): Partial<CharacterEntity> {
     intimacyLevel: 56,
     currentStatus: '在看材料，先把时间线和证据排清。',
     currentActivity: 'working',
+    region: '北京·北京',
   };
 }
 // i18n-ignore-end

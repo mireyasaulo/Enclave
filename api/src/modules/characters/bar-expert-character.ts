@@ -279,6 +279,7 @@ export function buildBarExpertCharacter(): Partial<CharacterEntity> {
     intimacyLevel: 60,
     currentStatus: '在吧台边，先帮你把今晚这杯点明白。',
     currentActivity: 'working',
+    region: '上海·上海',
   };
 }
 // i18n-ignore-end

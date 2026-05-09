@@ -37,6 +37,11 @@ export class EmailAuthService {
     const normalized = this.normalizeEmail(email);
     await this.enforceSendCodeRateLimit(normalized);
 
+    const existing = await this.userRepo.findOne({
+      where: { email: normalized },
+    });
+    const isNewUser = !existing;
+
     const code = this.generateCode();
     const expiresAt = new Date(Date.now() + this.getCodeTtlSeconds() * 1000);
     const session = this.sessionRepo.create({
@@ -50,7 +55,7 @@ export class EmailAuthService {
 
     let result: Awaited<ReturnType<MailService['sendVerificationCode']>>;
     try {
-      result = await this.mail.sendVerificationCode(normalized, code);
+      result = await this.mail.sendVerificationCode(normalized, code, isNewUser);
     } catch (error) {
       await this.sessionRepo.delete({ id: session.id });
       throw error;

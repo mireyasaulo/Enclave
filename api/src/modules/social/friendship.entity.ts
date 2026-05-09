@@ -50,5 +50,14 @@ export class FriendshipEntity {
 
   @Column({ type: 'varchar', length: 10, nullable: true })
   sparkLastDay?: string | null;
+
+  @Column({ default: false })
+  momentsHiddenFromMe: boolean;
+
+  @Column({ default: false })
+  momentsHiddenFromThem: boolean;
+
+  @Column({ default: false })
+  chatOnly: boolean;
 }
 // i18n-ignore-end

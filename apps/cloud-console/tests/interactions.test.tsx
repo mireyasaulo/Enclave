@@ -973,7 +973,7 @@ async function renderAdminSessionsPage() {
 }
 
 async function expectAdminSessionsSummary(summary: string) {
-  expect(await screen.findAllByText(summary)).toHaveLength(2);
+  expect(await screen.findAllByText(summary)).toHaveLength(1);
 }
 
 function expectAdminSessionsFirstDataRowContains(text: string) {
@@ -2173,7 +2173,9 @@ describe("cloud-console interactions", () => {
       target: { value: "missing-world" },
     });
 
-    expect(await screen.findByText("No worlds match this filter.")).toBeTruthy();
+    expect(
+      await screen.findByText("No instance rows match the current filter set."),
+    ).toBeTruthy();
 
     fireEvent.change(screen.getByLabelText("World search"), {
       target: { value: "+8613800138000" },
@@ -2249,7 +2251,7 @@ describe("cloud-console interactions", () => {
 
     await setAdminSessionsSearch("Mobile Safari");
 
-    expect(await screen.findAllByText("Showing 1-1 of 1")).toHaveLength(2);
+    expect(await screen.findAllByText("Showing 1-1 of 1")).toHaveLength(1);
 
     await revokeAdminSessionsFilteredAndAssert({
       requests,
@@ -2526,7 +2528,7 @@ describe("cloud-console interactions", () => {
     await renderAdminSessionsPage();
 
     await setAdminSessionsSearch("Mobile Safari");
-    expect(await screen.findAllByText("Showing 1-1 of 1")).toHaveLength(2);
+    expect(await screen.findAllByText("Showing 1-1 of 1")).toHaveLength(1);
 
     await revokeAdminSessionsFilteredAndAssert({
       requests,
@@ -3814,61 +3816,6 @@ describe("cloud-console interactions", () => {
     expect(await screen.findByText("Lifecycle jobs")).toBeTruthy();
     expect(screen.getByDisplayValue("audit: superseded")).toBeTruthy();
     expect(await screen.findByText("No jobs match this filter.")).toBeTruthy();
-  });
-
-  it("shows recent superseded lifecycle jobs on the dashboard", async () => {
-    installCloudAdminApiMock({
-      job: {
-        status: "cancelled",
-        failureCode: "superseded_by_new_job",
-        resultPayload: {
-          action: "superseded_by_new_job",
-          supersededByJobType: "resume",
-        },
-        supersededByJobType: "resume",
-      },
-    });
-    renderRoute("/");
-
-    expect(await screen.findByText("Superseded Queue")).toBeTruthy();
-    expect(await screen.findByText("Superseded by resume")).toBeTruthy();
-    expect(
-      await screen.findByText("Superseded by newer resume request."),
-    ).toBeTruthy();
-    expect(
-      await screen.findByRole("link", { name: /Open superseded queue/i }),
-    ).toBeTruthy();
-  });
-
-  it("opens world-scoped superseded jobs from the dashboard queue", async () => {
-    installCloudAdminApiMock({
-      job: {
-        status: "cancelled",
-        failureCode: "superseded_by_new_job",
-        resultPayload: {
-          action: "superseded_by_new_job",
-          supersededByJobType: "resume",
-        },
-        supersededByJobType: "resume",
-      },
-    });
-    renderRoute("/");
-
-    expect(await screen.findByText("Superseded Queue")).toBeTruthy();
-
-    fireEvent.click(
-      await screen.findByRole("link", {
-        name: "Open superseded jobs for Mock World",
-      }),
-    );
-
-    expect(await screen.findByText("Lifecycle jobs")).toBeTruthy();
-    expect(await screen.findByText("World scope")).toBeTruthy();
-    expect(screen.getByDisplayValue("audit: superseded")).toBeTruthy();
-    expect(
-      (await screen.findAllByRole("link", { name: "Mock World" })).length,
-    ).toBeGreaterThan(0);
-    expect(await screen.findByText("Superseded by resume")).toBeTruthy();
   });
 
   it("opens world-scoped failed jobs from the dashboard queue", async () => {

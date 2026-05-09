@@ -18,6 +18,7 @@ import {
   Plus,
   QrCode,
   Search,
+  Settings,
   Star,
   Tag,
   UserPlus,
@@ -50,6 +51,8 @@ import { RouteRedirectState } from "../components/route-redirect-state";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { ContactDetailPane } from "../features/contacts/contact-detail-pane";
 import { ContactIndexList } from "../features/contacts/contact-index-list";
+import { ContactsBulkActionBar } from "../features/contacts/management/contacts-bulk-action-bar";
+import { ContactsManagementModal } from "../features/contacts/management/contacts-management-modal";
 import {
   ContactShortcutList,
   type ContactShortcutListItem,
@@ -277,6 +280,7 @@ const mobileQuickActionItems: MobileQuickActionItem[] = [
 export function ContactsPage() {
   const t = useRuntimeTranslator();
   const pageRef = useRef<HTMLDivElement | null>(null);
+  const desktopDirectoryScrollRef = useRef<HTMLDivElement | null>(null);
   const isDesktopLayout = useDesktopLayout();
   const navigate = useNavigate();
   const pathname = useRouterState({
@@ -293,16 +297,38 @@ export function ContactsPage() {
     routeState.showWorldCharacters,
   );
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
+  const [managementOpen, setManagementOpen] = useState(false);
+  const [bulkMode, setBulkMode] = useState(false);
+  const [bulkSelectedIds, setBulkSelectedIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const exitBulkMode = useCallback(() => {
+    setBulkMode(false);
+    setBulkSelectedIds(new Set());
+  }, []);
+  const toggleBulkSelection = useCallback((characterId: string) => {
+    setBulkSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(characterId)) {
+        next.delete(characterId);
+      } else {
+        next.add(characterId);
+      }
+      return next;
+    });
+  }, []);
   const [desktopSelection, setDesktopSelection] = useState<DesktopSelection>(
     () => buildDesktopSelectionFromRouteState(hash),
   );
   const [activeMobileIndexKey, setActiveMobileIndexKey] = useState<
     string | null
   >(null);
+  const [activeDesktopIndexKey, setActiveDesktopIndexKey] = useState<
+    string | null
+  >(null);
   const previousBaseUrlRef = useRef(baseUrl);
   const startChatResetRef = useRef<() => void>(() => {});
-  const effectiveSearchText = isDesktopLayout ? searchText : "";
-  const deferredSearchText = useDeferredValue(effectiveSearchText);
+  const deferredSearchText = useDeferredValue("");
   const desktopContactsPath = "/tabs/contacts";
   const initialPathnameRef = useRef(pathname);
   const initialHashRef = useRef(hash);
@@ -437,6 +463,22 @@ export function ContactsPage() {
     () => buildContactSections(filteredWorldCharacterItems),
     [filteredWorldCharacterItems],
   );
+  const desktopWorldCharacterSections = useMemo(
+    () =>
+      worldCharacterSections.map((section) => ({
+        ...section,
+        anchorId: `desktop-${section.anchorId}-world`,
+      })),
+    [worldCharacterSections],
+  );
+  const desktopWorldCharacterIndexItems = useMemo(
+    () =>
+      desktopWorldCharacterSections.map((section) => ({
+        key: section.anchorId,
+        indexLabel: section.indexLabel,
+      })),
+    [desktopWorldCharacterSections],
+  );
   const mobileIndexItems = useMemo(
     () =>
       friendSections.map((section) => ({
@@ -444,6 +486,16 @@ export function ContactsPage() {
         indexLabel: section.indexLabel,
       })),
     [friendSections],
+  );
+  const desktopIndexItems = useMemo(
+    () => [
+      ...desktopFriendSections.map((section) => ({
+        key: section.anchorId,
+        indexLabel: section.indexLabel,
+      })),
+      ...desktopWorldCharacterIndexItems,
+    ],
+    [desktopFriendSections, desktopWorldCharacterIndexItems],
   );
 
   const pendingRequestCount = useMemo(
@@ -794,14 +846,14 @@ export function ContactsPage() {
     setActiveMobileIndexKey((current) => {
       if (
         current &&
-        friendSections.some((section) => section.anchorId === current)
+        mobileIndexItems.some((item) => item.key === current)
       ) {
         return current;
       }
 
-      return friendSections[0]?.anchorId ?? null;
+      return mobileIndexItems[0]?.key ?? null;
     });
-  }, [friendSections, normalizedSearchText]);
+  }, [mobileIndexItems, friendSections, normalizedSearchText]);
 
   useEffect(() => {
     if (isDesktopLayout || normalizedSearchText || !friendSections.length) {
@@ -820,18 +872,18 @@ export function ContactsPage() {
 
       const containerRect = scrollContainer.getBoundingClientRect();
       const stickyOffset = 104;
-      let nextActiveKey = friendSections[0]?.anchorId ?? null;
+      let nextActiveKey = mobileIndexItems[0]?.key ?? null;
 
-      for (const section of friendSections) {
-        const sectionElement = document.getElementById(section.anchorId);
-        if (!sectionElement) {
+      for (const item of mobileIndexItems) {
+        const anchorElement = document.getElementById(item.key);
+        if (!anchorElement) {
           continue;
         }
 
         const topOffset =
-          sectionElement.getBoundingClientRect().top - containerRect.top;
+          anchorElement.getBoundingClientRect().top - containerRect.top;
         if (topOffset <= stickyOffset) {
-          nextActiveKey = section.anchorId;
+          nextActiveKey = item.key;
         } else {
           break;
         }
@@ -850,7 +902,74 @@ export function ContactsPage() {
     return () => {
       scrollContainer.removeEventListener("scroll", syncActiveMobileIndexKey);
     };
-  }, [friendSections, isDesktopLayout, normalizedSearchText]);
+  }, [mobileIndexItems, friendSections, isDesktopLayout, normalizedSearchText]);
+
+  useEffect(() => {
+    if (!isDesktopLayout) {
+      setActiveDesktopIndexKey(null);
+      return;
+    }
+
+    setActiveDesktopIndexKey((current) => {
+      if (
+        current &&
+        desktopIndexItems.some((item) => item.key === current)
+      ) {
+        return current;
+      }
+
+      return desktopIndexItems[0]?.key ?? null;
+    });
+  }, [desktopIndexItems, isDesktopLayout]);
+
+  useEffect(() => {
+    if (!isDesktopLayout) {
+      return;
+    }
+
+    const scrollContainer = desktopDirectoryScrollRef.current;
+    if (!scrollContainer) {
+      return;
+    }
+
+    const syncActiveDesktopIndexKey = () => {
+      if (typeof document === "undefined") {
+        return;
+      }
+
+      const containerRect = scrollContainer.getBoundingClientRect();
+      const stickyOffset = 8;
+      let nextActiveKey = desktopIndexItems[0]?.key ?? null;
+
+      for (const item of desktopIndexItems) {
+        const anchorElement = document.getElementById(item.key);
+        if (!anchorElement) {
+          continue;
+        }
+
+        const topOffset =
+          anchorElement.getBoundingClientRect().top - containerRect.top;
+        if (topOffset <= stickyOffset) {
+          nextActiveKey = item.key;
+        } else {
+          break;
+        }
+      }
+
+      setActiveDesktopIndexKey((current) =>
+        current === nextActiveKey ? current : nextActiveKey,
+      );
+    };
+
+    syncActiveDesktopIndexKey();
+    scrollContainer.addEventListener("scroll", syncActiveDesktopIndexKey, {
+      passive: true,
+    });
+
+    return () => {
+      scrollContainer.removeEventListener("scroll", syncActiveDesktopIndexKey);
+    };
+  }, [desktopIndexItems, isDesktopLayout]);
 
   useEffect(() => {
     if (!isDesktopLayout) {
@@ -1112,6 +1231,29 @@ export function ContactsPage() {
       behavior,
       block: "start",
     });
+  }
+
+  function handleDesktopIndexJump(
+    anchorId: string,
+    behavior: ScrollBehavior = "smooth",
+  ) {
+    setActiveDesktopIndexKey(anchorId);
+
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    const target = document.getElementById(anchorId);
+    const container = desktopDirectoryScrollRef.current;
+    if (!target || !container) {
+      return;
+    }
+
+    const containerRect = container.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const offsetTop =
+      targetRect.top - containerRect.top + container.scrollTop;
+    container.scrollTo({ top: offsetTop, behavior });
   }
   const shortcutItems: ContactShortcutListItem[] = [
     {
@@ -1386,6 +1528,18 @@ export function ContactsPage() {
               variant="desktop-flat"
             />
           }
+          indexList={
+            desktopIndexItems.length ? (
+              <ContactIndexList
+                items={desktopIndexItems}
+                activeKey={activeDesktopIndexKey}
+                compact
+                className="absolute right-1 top-1/2 z-10 -translate-y-1/2"
+                onSelect={handleDesktopIndexJump}
+              />
+            ) : null
+          }
+          directoryScrollRef={desktopDirectoryScrollRef}
           notice={notice}
           errors={desktopErrors}
           loading={friendsQuery.isLoading}
@@ -1394,7 +1548,37 @@ export function ContactsPage() {
             desktopSelection?.kind === "friend" ? desktopSelection.id : null
           }
           pendingCharacterId={pendingCharacterId}
+          bulkMode={bulkMode}
+          bulkSelectedIds={bulkSelectedIds}
+          onOpenManagement={() => setManagementOpen(true)}
+          bulkActionBar={
+            bulkMode ? (
+              <ContactsBulkActionBar
+                desktop
+                selectedIds={Array.from(bulkSelectedIds)}
+                totalIds={desktopFriendSections.flatMap((section) =>
+                  section.items.map((item) => item.character.id),
+                )}
+                onSelectAll={() =>
+                  setBulkSelectedIds(
+                    new Set(
+                      desktopFriendSections.flatMap((section) =>
+                        section.items.map((item) => item.character.id),
+                      ),
+                    ),
+                  )
+                }
+                onClearSelection={() => setBulkSelectedIds(new Set())}
+                onDone={exitBulkMode}
+                setNotice={setNotice}
+              />
+            ) : null
+          }
           onSelectFriend={(characterId) => {
+            if (bulkMode) {
+              toggleBulkSelection(characterId);
+              return;
+            }
             const nextSelection = {
               kind: "friend",
               id: characterId,
@@ -1402,7 +1586,13 @@ export function ContactsPage() {
             setDesktopSelection(nextSelection);
             commitDesktopRouteState(nextSelection, showWorldCharacters);
           }}
-          onOpenFriendChat={handleStartChat}
+          onOpenFriendChat={(characterId) => {
+            if (bulkMode) {
+              toggleBulkSelection(characterId);
+              return;
+            }
+            handleStartChat(characterId);
+          }}
           emptyState={
             !friendsQuery.isError ? (
               <div className="px-3">
@@ -1443,7 +1633,7 @@ export function ContactsPage() {
               ? t(msg`世界角色搜索结果`)
               : t(msg`世界角色目录`)
           }
-          worldCharacterSections={worldCharacterSections}
+          worldCharacterSections={desktopWorldCharacterSections}
           activeWorldCharacterId={
             desktopSelection?.kind === "world-character"
               ? desktopSelection.id
@@ -1777,6 +1967,19 @@ export function ContactsPage() {
             )
           }
         />
+        <ContactsManagementModal
+          open={managementOpen}
+          onClose={() => setManagementOpen(false)}
+          onEnterBulkMode={() => {
+            setManagementOpen(false);
+            setBulkSelectedIds(new Set());
+            setBulkMode(true);
+          }}
+          onOpenTags={() => {
+            setManagementOpen(false);
+            void navigate({ to: "/contacts/tags" });
+          }}
+        />
       </Suspense>
     );
   }
@@ -1798,7 +2001,28 @@ export function ContactsPage() {
           titleAlign="center"
           className="z-40 mx-0 mt-0 mb-0 overflow-visible border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
           rightActions={
-            <div className="relative">
+            bulkMode ? (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={exitBulkMode}
+                className="h-9 rounded-full bg-transparent px-3 text-[13px] text-[color:var(--text-primary)] shadow-none hover:bg-black/4 active:bg-black/[0.05]"
+                aria-label={t(msg`取消`)}
+              >
+                {t(msg`取消`)}
+              </Button>
+            ) : (
+            <div className="relative flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => setManagementOpen(true)}
+                className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none hover:bg-black/4 active:bg-black/[0.05]"
+                aria-label={t(msg`通讯录管理`)}
+              >
+                <Settings size={15} />
+              </Button>
               <Button
                 type="button"
                 variant="ghost"
@@ -1810,7 +2034,7 @@ export function ContactsPage() {
                 <Plus size={15} strokeWidth={2.4} />
               </Button>
 
-              {isQuickMenuOpen ? (
+              {isQuickMenuOpen && !bulkMode ? (
                 <div className="absolute right-0 top-[calc(100%+0.3rem)] z-40 w-[10rem] overflow-hidden rounded-[11px] bg-[rgba(44,44,44,0.96)] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.2)]">
                   {mobileQuickActionItems.map((item) => {
                     const Icon = item.icon;
@@ -1866,6 +2090,7 @@ export function ContactsPage() {
                 </div>
               ) : null}
             </div>
+            )
           }
         >
           <div className="pt-1.5">
@@ -1998,7 +2223,15 @@ export function ContactsPage() {
                     key={item.character.id}
                     item={item}
                     index={index}
-                    onClick={() => handleOpenProfile(item.character.id)}
+                    bulkMode={bulkMode}
+                    selected={bulkSelectedIds.has(item.character.id)}
+                    onClick={() => {
+                      if (bulkMode) {
+                        toggleBulkSelection(item.character.id);
+                        return;
+                      }
+                      handleOpenProfile(item.character.id);
+                    }}
                   />
                 ))}
               </div>
@@ -2006,7 +2239,7 @@ export function ContactsPage() {
           </section>
         </div>
 
-        {!normalizedSearchText && friendSections.length ? (
+        {!normalizedSearchText && friendSections.length && !bulkMode ? (
           <ContactIndexList
             items={mobileIndexItems}
             activeKey={activeMobileIndexKey}
@@ -2015,6 +2248,41 @@ export function ContactsPage() {
             onSelect={handleIndexJumpWithBehavior}
           />
         ) : null}
+
+        {bulkMode ? (
+          <ContactsBulkActionBar
+            selectedIds={Array.from(bulkSelectedIds)}
+            totalIds={friendSections.flatMap((section) =>
+              section.items.map((item) => item.character.id),
+            )}
+            onSelectAll={() =>
+              setBulkSelectedIds(
+                new Set(
+                  friendSections.flatMap((section) =>
+                    section.items.map((item) => item.character.id),
+                  ),
+                ),
+              )
+            }
+            onClearSelection={() => setBulkSelectedIds(new Set())}
+            onDone={exitBulkMode}
+            setNotice={setNotice}
+          />
+        ) : null}
+
+        <ContactsManagementModal
+          open={managementOpen}
+          onClose={() => setManagementOpen(false)}
+          onEnterBulkMode={() => {
+            setManagementOpen(false);
+            setBulkSelectedIds(new Set());
+            setBulkMode(true);
+          }}
+          onOpenTags={() => {
+            setManagementOpen(false);
+            void navigate({ to: "/contacts/tags" });
+          }}
+        />
       </AppPage>
     </div>
   );
@@ -2026,6 +2294,8 @@ function FriendListRow({
   pendingCharacterId,
   desktop = false,
   active = false,
+  bulkMode = false,
+  selected = false,
   onClick,
   onDoubleClick,
 }: {
@@ -2034,6 +2304,8 @@ function FriendListRow({
   pendingCharacterId?: string | null;
   desktop?: boolean;
   active?: boolean;
+  bulkMode?: boolean;
+  selected?: boolean;
   onClick: () => void;
   onDoubleClick?: () => void;
 }) {
@@ -2045,7 +2317,7 @@ function FriendListRow({
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       className={cn(
-        "flex w-full items-center gap-3 bg-[color:var(--bg-canvas-elevated)] text-left transition-colors",
+        "yj-list-item-virtual flex w-full items-center gap-3 bg-[color:var(--bg-canvas-elevated)] text-left transition-colors",
         desktop
           ? "px-4 py-3.5 hover:bg-[color:var(--surface-console)]"
           : "py-2.5 pl-4 pr-7 hover:bg-[color:var(--surface-card-hover)]",
@@ -2055,6 +2327,31 @@ function FriendListRow({
           : undefined,
       )}
     >
+      {bulkMode ? (
+        <span
+          className={cn(
+            "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors",
+            selected
+              ? "border-[#07c160] bg-[#07c160] text-white"
+              : "border-[color:var(--border-subtle)] bg-white",
+          )}
+        >
+          {selected ? (
+            <svg
+              viewBox="0 0 16 16"
+              width="11"
+              height="11"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="3 8.5 6.5 12 13 5" />
+            </svg>
+          ) : null}
+        </span>
+      ) : null}
       <AvatarChip
         name={item.character.name}
         src={item.character.avatar}

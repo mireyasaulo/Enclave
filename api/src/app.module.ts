@@ -59,6 +59,7 @@ import { MediaInsightJobEntity } from './modules/chat/media-insight-job.entity';
 import { ChatCustomStickerEntity } from './modules/chat/custom-sticker.entity';
 import { FeedPostEntity } from './modules/feed/feed-post.entity';
 import { FeedCommentEntity } from './modules/feed/feed-comment.entity';
+import { FeedPostLikeEntity } from './modules/feed/feed-post-like.entity';
 import { VideoChannelFollowEntity } from './modules/feed/video-channel-follow.entity';
 import { GameCatalogEntity } from './modules/games/game-catalog.entity';
 import { GameCatalogRevisionEntity } from './modules/games/game-catalog-revision.entity';
@@ -157,6 +158,7 @@ import {
           ChatCustomStickerEntity,
           FeedPostEntity,
           FeedCommentEntity,
+          FeedPostLikeEntity,
           VideoChannelFollowEntity,
           GameCatalogEntity,
           GameCatalogRevisionEntity,

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import QRCode from "qrcode";
 import {
   createCheckout,
@@ -18,8 +19,11 @@ import {
   InlineNotice,
   LoadingBlock,
 } from "@yinjie/ui";
+import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+import { CheckoutContactDialog } from "../features/subscription/checkout-contact-dialog";
 import { clearCloudRuntimeSession } from "../lib/cloud-session";
+import { navigateBackOrFallback } from "../lib/history-back";
 import { describeRequestError } from "../lib/request-error";
 import {
   isNativeMobileBridgeAvailable,
@@ -332,7 +336,12 @@ export function ProfileSubscriptionPage() {
   const accessToken = useCloudSessionStore((state) => state.accessToken);
   const phone = useCloudSessionStore((state) => state.phone);
   const setProfile = useCloudSessionStore((state) => state.setProfile);
-  const [checkoutNotice, setCheckoutNotice] = useState("");
+  const [contactDialog, setContactDialog] = useState<{
+    open: boolean;
+    hint: string;
+    contact: string;
+    planName: string;
+  }>({ open: false, hint: "", contact: "", planName: "" }); // i18n-ignore-line
 
   useEffect(() => {
     if (accessToken) {
@@ -375,17 +384,21 @@ export function ProfileSubscriptionPage() {
 
   const [checkoutError, setCheckoutError] = useState("");
   const checkoutMutation = useMutation({
-    mutationFn: (planCode: string) =>
+    mutationFn: ({ planCode }: { planCode: string; planName: string }) =>
       createCheckout({ planCode }, accessToken ?? ""),
-    onSuccess: (result) => {
+    onSuccess: (result, variables) => {
       setCheckoutError("");
-      setCheckoutNotice(
-        [result.hint, result.contact].filter(Boolean).join(" ") ||
-          t(msg`已提交开通申请，请联系运营完成支付。`),
-      );
+      const hint =
+        result.hint || t(msg`已提交开通申请，请联系运营完成支付。`);
+      setContactDialog({
+        open: true,
+        hint,
+        contact: result.contact ?? "",
+        planName: variables.planName,
+      });
     },
     onError: (error) => {
-      setCheckoutNotice("");
+      setContactDialog((prev) => ({ ...prev, open: false }));
       setCheckoutError(
         describeRequestError(error, t(msg`提交开通申请失败，请稍后重试。`)),
       );
@@ -407,10 +420,13 @@ export function ProfileSubscriptionPage() {
   const error =
     profileQuery.error ?? subscriptionQuery.error ?? inviteQuery.error ?? null;
 
-  function handleCloudLogout() {
-    clearCloudRuntimeSession();
-    void navigate({ to: "/welcome", replace: true });
-  }
+  const goBackToSettings = () =>
+    void navigate({ to: "/desktop/settings" });
+
+  const goBack = () =>
+    navigateBackOrFallback(() => {
+      void navigate({ to: "/tabs/profile" });
+    });
 
   if (!accessToken) {
     return null;
@@ -460,6 +476,23 @@ export function ProfileSubscriptionPage() {
         paddingBottom: "max(1.5rem, calc(env(safe-area-inset-bottom, 0px) + 1.5rem))",
       }}
     >
+      {!isDesktopLayout ? (
+        <TabPageTopBar
+          title={t(msg`会员中心`)}
+          titleAlign="center"
+          leftActions={
+            <Button
+              onClick={goBack}
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none active:bg-black/[0.05]"
+              aria-label={t(msg`返回`)}
+            >
+              <ArrowLeft size={17} />
+            </Button>
+          }
+        />
+      ) : null}
       <div className="mx-auto flex max-w-4xl flex-col gap-4">
         <AppSection className="overflow-hidden rounded-[28px] border-black/5 bg-[linear-gradient(135deg,#f7fff8,#ffffff)] px-6 py-6 shadow-none">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -481,28 +514,17 @@ export function ProfileSubscriptionPage() {
                 {t(msg`到期时间`)}: {expiresLabel}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="secondary"
-                className="rounded-2xl border-[color:var(--border-faint)] bg-white shadow-none"
-                onClick={() =>
-                  void navigate({
-                    to: isDesktopLayout
-                      ? "/desktop/settings"
-                      : "/profile/settings",
-                  })
-                }
-              >
-                {t(msg`返回设置`)}
-              </Button>
-              <Button
-                variant="secondary"
-                className="rounded-2xl border-[rgba(220,38,38,0.14)] bg-white text-[#b42318] shadow-none hover:bg-[#fff5f5]"
-                onClick={handleCloudLogout}
-              >
-                {t(msg`退出登录`)}
-              </Button>
-            </div>
+            {isDesktopLayout ? (
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="secondary"
+                  className="rounded-2xl border-[color:var(--border-faint)] bg-white shadow-none"
+                  onClick={goBackToSettings}
+                >
+                  {t(msg`返回设置`)}
+                </Button>
+              </div>
+            ) : null}
           </div>
           {subscription.copy.welcomePromoBanner ? (
             <InlineNotice className="mt-4" tone="success">
@@ -516,11 +538,6 @@ export function ProfileSubscriptionPage() {
             <div className="text-sm font-semibold text-[color:var(--text-primary)]">
               {t(msg`可购套餐`)}
             </div>
-            {checkoutNotice ? (
-              <InlineNotice className="mt-4" tone="info">
-                {checkoutNotice}
-              </InlineNotice>
-            ) : null}
             {checkoutError ? (
               <InlineNotice className="mt-4" tone="danger">
                 {checkoutError}
@@ -550,7 +567,12 @@ export function ProfileSubscriptionPage() {
                         variant="primary"
                         className="mt-3 rounded-2xl bg-[#07c160] text-white shadow-none hover:bg-[#06ad56]"
                         disabled={checkoutMutation.isPending}
-                        onClick={() => checkoutMutation.mutate(plan.code)}
+                        onClick={() =>
+                          checkoutMutation.mutate({
+                            planCode: plan.code,
+                            planName: plan.name,
+                          })
+                        }
                       >
                         {checkoutMutation.isPending
                           ? t(msg`提交中…`)
@@ -614,6 +636,16 @@ export function ProfileSubscriptionPage() {
           </div>
         </div>
       </div>
+
+      <CheckoutContactDialog
+        open={contactDialog.open}
+        hint={contactDialog.hint}
+        contact={contactDialog.contact}
+        planName={contactDialog.planName}
+        onClose={() =>
+          setContactDialog((prev) => ({ ...prev, open: false }))
+        }
+      />
     </AppPage>
   );
 }

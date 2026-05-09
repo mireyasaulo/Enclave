@@ -1,3 +1,5 @@
+import { getBuiltinStickerByLabel } from "@yinjie/contracts";
+
 const thoughtBlockPattern = /<thought\b[^>]*>[\s\S]*?<\/thought>/gi;
 const internalReasoningBlockPattern =
   /<internal_reasoning\b[^>]*>[\s\S]*?<\/internal_reasoning>/gi;
@@ -26,7 +28,69 @@ export type ChatTextSegment =
       kind: "mention";
       text: string;
       tone: "member" | "all";
+    }
+  | {
+      kind: "sticker";
+      text: string;
+      label: string;
+      src: string;
+      packId: string;
+      stickerId: string;
+      width: number;
+      height: number;
     };
+
+const builtinStickerTokenPattern = /\[([^\[\]\n]{1,40})\]/g;
+
+function expandBuiltinStickerSegments(
+  source: ChatTextSegment,
+): ChatTextSegment[] {
+  if (source.kind !== "text") {
+    return [source];
+  }
+
+  const text = source.text;
+  if (!text || text.indexOf("[") < 0) {
+    return [source];
+  }
+
+  const out: ChatTextSegment[] = [];
+  let cursor = 0;
+  for (const match of text.matchAll(builtinStickerTokenPattern)) {
+    const start = match.index ?? -1;
+    if (start < 0) {
+      continue;
+    }
+    const label = match[1];
+    const sticker = label ? getBuiltinStickerByLabel(label) : null;
+    if (!sticker) {
+      continue;
+    }
+
+    if (start > cursor) {
+      out.push({ kind: "text", text: text.slice(cursor, start) });
+    }
+    out.push({
+      kind: "sticker",
+      text: match[0],
+      label: sticker.label,
+      src: sticker.src,
+      packId: sticker.packId,
+      stickerId: sticker.stickerId,
+      width: sticker.width,
+      height: sticker.height,
+    });
+    cursor = start + match[0].length;
+  }
+
+  if (cursor === 0) {
+    return [source];
+  }
+  if (cursor < text.length) {
+    out.push({ kind: "text", text: text.slice(cursor) });
+  }
+  return out;
+}
 
 export type ChatMentionSummary = {
   hasMentionAll: boolean;
@@ -145,7 +209,7 @@ export function splitChatTextSegments(text: string): ChatTextSegment[] {
     });
   }
 
-  return segments.length
+  const baseSegments: ChatTextSegment[] = segments.length
     ? segments
     : [
         {
@@ -153,6 +217,8 @@ export function splitChatTextSegments(text: string): ChatTextSegment[] {
           text: sanitized,
         },
       ];
+
+  return baseSegments.flatMap(expandBuiltinStickerSegments);
 }
 
 export function summarizeChatMentions(text: string): ChatMentionSummary {

@@ -130,12 +130,15 @@ import type {
 import type {
   BlockCharacterRequest,
   BlockedCharacter,
+  BulkFriendshipRequest,
+  BulkFriendshipResponse,
   FriendListItem,
   FriendRequest,
   SendFriendRequestRequest,
   SetFriendStarredRequest,
   TriggerSceneRequest,
   UnblockCharacterRequest,
+  UpdateFriendPermissionsRequest,
   UpdateFriendProfileRequest,
 } from "./social";
 import type {
@@ -230,6 +233,12 @@ let coreApiBaseUrlProvider: (() => string | null | undefined) | null = null;
 let cloudApiBaseUrlProvider: (() => string | null | undefined) | null = null;
 let coreApiAdminSecretProvider:
   | (() => string | null | undefined)
+  | null = null;
+// 当 baseUrl 指向 cloud-api 的 world-api 反代入口时（多租户公网部署），
+// 客户端要把 cloud access token 透给反代层让它按 phone 路由到对应 child。
+// provider 决定要不要返回 token；返回 null 表示不附带（local 直连场景）。
+let cloudWorldApiTokenProvider:
+  | ((baseUrl: string | undefined) => string | null | undefined)
   | null = null;
 let apiRequestErrorHandler:
   | ((error: ApiRequestError) => void)
@@ -339,6 +348,14 @@ export function setCoreApiAdminSecretProvider(
   coreApiAdminSecretProvider = provider;
 }
 
+export function setCloudWorldApiTokenProvider(
+  provider:
+    | ((baseUrl: string | undefined) => string | null | undefined)
+    | null,
+) {
+  cloudWorldApiTokenProvider = provider;
+}
+
 export function setApiRequestErrorHandler(
   handler: ((error: ApiRequestError) => void) | null,
 ) {
@@ -372,6 +389,14 @@ async function request<T>(
     const adminSecret = coreApiAdminSecretProvider?.()?.trim();
     if (adminSecret) {
       headers.set("X-Admin-Secret", adminSecret);
+    }
+  }
+
+  if (!headers.has("Authorization") && cloudWorldApiTokenProvider) {
+    const resolvedBase = resolveCoreApiBaseUrl(baseUrl, { allowDefault: false });
+    const token = cloudWorldApiTokenProvider(resolvedBase ?? undefined)?.trim();
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
     }
   }
 
@@ -1513,6 +1538,29 @@ export function exportDiagnostics(baseUrl?: string) {
 }
 
 export function getWorldOwner(baseUrl?: string) {
+  // 公网隧道下首屏会被 splash 的这一发 RTT 卡住 ~500ms。app 的 index.html 在
+  // worldAccessMode=local 时会用 inline 脚本提前 fire 同一个 fetch，并把
+  // Promise 挂到 window.__YINJIE_BOOT_OWNER_FETCH__。这里命中一次就消耗掉，
+  // 任何异常都回退到走完整 requestLegacyApi 流程，保证降级安全。
+  if (typeof window !== "undefined") {
+    const carrier = window as unknown as {
+      __YINJIE_BOOT_OWNER_FETCH__?: Promise<Response>;
+    };
+    const inflight = carrier.__YINJIE_BOOT_OWNER_FETCH__;
+    if (inflight) {
+      carrier.__YINJIE_BOOT_OWNER_FETCH__ = undefined;
+      return inflight
+        .then(async (response) => {
+          if (!response.ok) {
+            throw new Error(`world-owner-prewarm-${response.status}`);
+          }
+          return (await response.json()) as WorldOwner;
+        })
+        .catch(() =>
+          requestLegacyApi<WorldOwner>("/world/owner", undefined, baseUrl),
+        );
+    }
+  }
   return requestLegacyApi<WorldOwner>("/world/owner", undefined, baseUrl);
 }
 
@@ -2680,6 +2728,35 @@ export function unblockCharacter(
   );
 }
 
+export function updateFriendPermissions(
+  characterId: string,
+  payload: UpdateFriendPermissionsRequest,
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FriendListItem["friendship"]>(
+    `/social/friends/${characterId}/permissions`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
+export function bulkFriendshipAction(
+  payload: BulkFriendshipRequest,
+  baseUrl?: string,
+) {
+  return requestLegacyApi<BulkFriendshipResponse>(
+    "/social/friends/bulk",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
 export function listModerationReports(baseUrl?: string) {
   return requestLegacyApi<ModerationReport[]>(
     "/moderation/reports",
@@ -2736,6 +2813,14 @@ export function createUserMoment(
     },
     baseUrl,
   ).then((moment) => normalizeMoment(moment, resolvedBaseUrl));
+}
+
+export function deleteMoment(id: string, baseUrl?: string) {
+  return requestLegacyApi<{ success: boolean; id: string }>(
+    `/moments/${id}`,
+    { method: "DELETE" },
+    baseUrl,
+  );
 }
 
 export function uploadMomentMedia(payload: FormData, baseUrl?: string) {

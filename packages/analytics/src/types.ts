@@ -21,6 +21,13 @@ export interface InitOptions {
    */
   endpointProvider?: () => string | null | undefined;
   userIdProvider?: () => string | null | undefined;
+  /**
+   * Lazy resolver for the current cloud world id, called on every event.
+   * Returns the worldId the user is currently inside, or null when the
+   * surface has no world concept (site/wiki) or the user hasn't entered
+   * one yet. Mirrors the userIdProvider pattern.
+   */
+  worldIdProvider?: () => string | null | undefined;
   release?: string | null;
   flushIntervalMs?: number;
   maxBatchSize?: number;
@@ -33,10 +40,18 @@ export interface InitOptions {
 
 export interface InternalState {
   options: Required<
-    Omit<InitOptions, "userIdProvider" | "release" | "endpoint" | "endpointProvider">
+    Omit<
+      InitOptions,
+      | "userIdProvider"
+      | "worldIdProvider"
+      | "release"
+      | "endpoint"
+      | "endpointProvider"
+    >
   > & {
     endpointProvider: () => string | null;
     userIdProvider: () => string | null;
+    worldIdProvider: () => string | null;
     release: string | null;
   };
   anonId: string;

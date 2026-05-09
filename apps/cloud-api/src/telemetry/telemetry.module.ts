@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { AdminAuthService } from "../auth/admin-auth.service";
 import { AdminGuard } from "../auth/admin.guard";
 import { CloudAdminSessionEntity } from "../entities/cloud-admin-session.entity";
+import { CloudWorldEntity } from "../entities/cloud-world.entity";
 import { ClientTelemetryDailyEntity } from "../entities/client-telemetry-daily.entity";
 import { ClientTelemetryEventEntity } from "../entities/client-telemetry-event.entity";
 import { TelemetryAdminController } from "./telemetry-admin.controller";
@@ -16,6 +17,7 @@ import { TelemetryService } from "./telemetry.service";
       ClientTelemetryEventEntity,
       ClientTelemetryDailyEntity,
       CloudAdminSessionEntity,
+      CloudWorldEntity,
     ]),
   ],
   controllers: [TelemetryPublicController, TelemetryAdminController],

@@ -39,6 +39,11 @@ const MobileMomentsPublishPage = lazy(async () => {
   return { default: mod.MobileMomentsPublishPage };
 });
 
+const MobileFeedPublishPage = lazy(async () => {
+  const mod = await import("./routes/mobile-feed-publish-page");
+  return { default: mod.MobileFeedPublishPage };
+});
+
 const FriendMomentsPage = lazy(async () => {
   const mod = await import("./routes/friend-moments-page");
   return { default: mod.FriendMomentsPage };
@@ -174,9 +179,49 @@ const ProfileSettingsPage = lazy(async () => {
   return { default: mod.ProfileSettingsPage };
 });
 
+const ProfileSettingsLanguagePage = lazy(async () => {
+  const mod = await import("./routes/profile-settings-language-page");
+  return { default: mod.ProfileSettingsLanguagePage };
+});
+
+const ProfileInfoPage = lazy(async () => {
+  const mod = await import("./routes/profile-info-page");
+  return { default: mod.ProfileInfoPage };
+});
+
+const ProfileInfoNamePage = lazy(async () => {
+  const mod = await import("./routes/profile-info-name-page");
+  return { default: mod.ProfileInfoNamePage };
+});
+
+const ProfileInfoSignaturePage = lazy(async () => {
+  const mod = await import("./routes/profile-info-signature-page");
+  return { default: mod.ProfileInfoSignaturePage };
+});
+
+const ProfileInfoAvatarPage = lazy(async () => {
+  const mod = await import("./routes/profile-info-avatar-page");
+  return { default: mod.ProfileInfoAvatarPage };
+});
+
+const ProfileInfoPlaceholderPage = lazy(async () => {
+  const mod = await import("./routes/profile-info-placeholder-page");
+  return { default: mod.ProfileInfoPlaceholderPage };
+});
+
 const ProfileSubscriptionPage = lazy(async () => {
   const mod = await import("./routes/profile-subscription-page");
   return { default: mod.ProfileSubscriptionPage };
+});
+
+const ProfileFavoritesPage = lazy(async () => {
+  const mod = await import("./routes/profile-favorites-page");
+  return { default: mod.ProfileFavoritesPage };
+});
+
+const ProfileMomentsPage = lazy(async () => {
+  const mod = await import("./routes/profile-moments-page");
+  return { default: mod.ProfileMomentsPage };
 });
 
 const DesktopMobilePage = lazy(async () => {
@@ -289,6 +334,11 @@ const FriendRequestsPage = lazy(async () => {
   return { default: mod.FriendRequestsPage };
 });
 
+const MobileAddFriendPage = lazy(async () => {
+  const mod = await import("./routes/mobile-add-friend-page");
+  return { default: mod.MobileAddFriendPage };
+});
+
 const GroupChatPage = lazy(async () => {
   const mod = await import("./routes/group-chat-page");
   return { default: mod.GroupChatPage };
@@ -342,6 +392,11 @@ const CreateGroupPage = lazy(async () => {
 const NotesPage = lazy(async () => {
   const mod = await import("./routes/notes-page");
   return { default: mod.NotesPage };
+});
+
+const MobileNoteEditorPage = lazy(async () => {
+  const mod = await import("./routes/mobile-note-editor-page");
+  return { default: mod.MobileNoteEditorPage };
 });
 
 const LegalPrivacyPage = lazy(async () => {
@@ -567,6 +622,13 @@ const friendRequestsRoute = createRoute({
   component: FriendRequestsPage,
 });
 
+const mobileAddFriendRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/add-friend",
+  beforeLoad: requireWorldReady,
+  component: MobileAddFriendPage,
+});
+
 const starredFriendsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/contacts/starred",
@@ -721,6 +783,13 @@ const notesRoute = createRoute({
   component: NotesPage,
 });
 
+const mobileNoteEditorRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/notes/new",
+  beforeLoad: requireWorldReady,
+  component: MobileNoteEditorPage,
+});
+
 const discoverMomentsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/discover/moments",
@@ -733,6 +802,13 @@ const discoverMomentsPublishRoute = createRoute({
   path: "/discover/moments/publish",
   beforeLoad: requireWorldReady,
   component: MobileMomentsPublishPage,
+});
+
+const discoverFeedPublishRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/discover/feed/publish",
+  beforeLoad: requireWorldReady,
+  component: MobileFeedPublishPage,
 });
 
 const discoverEncounterRoute = createRoute({
@@ -784,11 +860,74 @@ const profileSettingsRoute = createRoute({
   component: ProfileSettingsPage,
 });
 
+const profileSettingsLanguageRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/settings/language",
+  beforeLoad: requireWorldReady,
+  component: ProfileSettingsLanguagePage,
+});
+
+const profileInfoRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/info",
+  beforeLoad: requireWorldReady,
+  component: ProfileInfoPage,
+});
+
+const profileInfoNameRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/info/name",
+  beforeLoad: requireWorldReady,
+  component: ProfileInfoNamePage,
+});
+
+const profileInfoSignatureRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/info/signature",
+  beforeLoad: requireWorldReady,
+  component: ProfileInfoSignaturePage,
+});
+
+const profileInfoAvatarRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/info/avatar",
+  beforeLoad: requireWorldReady,
+  component: ProfileInfoAvatarPage,
+});
+
+const profileInfoQrRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/info/qr",
+  beforeLoad: requireWorldReady,
+  component: ProfileInfoPlaceholderPage,
+});
+
+const profileInfoMoreRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/info/more",
+  beforeLoad: requireWorldReady,
+  component: ProfileInfoPlaceholderPage,
+});
+
 const profileSubscriptionRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/profile/subscription",
   beforeLoad: requireWorldReady,
   component: ProfileSubscriptionPage,
+});
+
+const profileFavoritesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/favorites",
+  beforeLoad: requireWorldReady,
+  component: ProfileFavoritesPage,
+});
+
+const profileMomentsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profile/moments",
+  beforeLoad: requireWorldReady,
+  component: ProfileMomentsPage,
 });
 
 const desktopMobileRoute = createRoute({
@@ -938,16 +1077,27 @@ const routeTree = rootRoute.addChildren([
   groupMemberRemoveRoute,
   createGroupRoute,
   notesRoute,
+  mobileNoteEditorRoute,
   discoverMomentsRoute,
   discoverMomentsPublishRoute,
   discoverEncounterRoute,
   discoverSceneRoute,
   discoverFeedRoute,
+  discoverFeedPublishRoute,
   discoverChannelsRoute,
   discoverGamesRoute,
   discoverMiniProgramsRoute,
   profileSettingsRoute,
+  profileSettingsLanguageRoute,
+  profileInfoRoute,
+  profileInfoNameRoute,
+  profileInfoSignatureRoute,
+  profileInfoAvatarRoute,
+  profileInfoQrRoute,
+  profileInfoMoreRoute,
   profileSubscriptionRoute,
+  profileFavoritesRoute,
+  profileMomentsRoute,
   desktopMobileRoute,
   mobileFriendMomentsRoute,
   desktopFriendMomentsRoute,
@@ -959,6 +1109,7 @@ const routeTree = rootRoute.addChildren([
   desktopNoteWindowRoute,
   desktopFeedbackRoute,
   desktopAddFriendRoute,
+  mobileAddFriendRoute,
   desktopSettingsRoute,
   liveCompanionRoute,
   legalPrivacyRoute,

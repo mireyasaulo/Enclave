@@ -1,14 +1,30 @@
 import type { ReactNode } from "react";
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/macro";
+import {
+  translateRuntimeMessage,
+  useAppLocale,
+} from "@yinjie/i18n";
 
 type BootstrapScreenProps = {
   message?: ReactNode;
 };
 
-// 注意：这个组件是 i18n catalog 加载完成之前的 fallback。
-// 此时 lingui 尚未 hydrate，<Trans> 会回退成 babel 注入的 6 字符 hash id（看起来像乱码）。
-// 因此这里只能用裸中文字符串，不要换回 <Trans>/t(msg``)。
-// i18n-ignore-start: 见上述 fallback 解释
+// 这个组件被复用在两处：
+// 1. <AppLocaleProvider> 的 fallback —— 此时 i18n catalog 还没 hydrate，
+//    lingui 没有任何翻译可查，<Trans>/t() 会回退成 babel 注入的 6 字符
+//    hash id（看起来像乱码），所以必须用裸源串。
+// 2. 路由切换时的 <Suspense> fallback —— 此时 catalog 已经 ready，
+//    若仍然用裸中文，日韩英用户会在每次切页面时短暂看到中文 flash。
+//
+// 通过 useAppLocale().isReady 区分两种语境：未就绪用裸中文，已就绪走真正
+// 的 t() 翻译。两种 fallback 都被包在 AppLocaleContext.Provider 内，
+// 所以 hook 调用总是安全的。
 export function BootstrapScreen({ message }: BootstrapScreenProps) {
+  const { isReady } = useAppLocale();
+  const t = (descriptor: MessageDescriptor) =>
+    isReady ? translateRuntimeMessage(descriptor) : descriptor.message ?? "";
+
   return (
     <div
       className="flex min-h-screen min-h-dvh items-center justify-center bg-[#f5f5f5] px-4 py-10 text-center"
@@ -24,13 +40,13 @@ export function BootstrapScreen({ message }: BootstrapScreenProps) {
           Beyond Reality
         </div>
         <div className="mx-auto mt-6 flex h-20 w-20 animate-pulse items-center justify-center rounded-[28px] bg-[linear-gradient(135deg,#07c160,#34c759)] text-2xl font-semibold text-white shadow-none">
-          隐界
+          {t(msg`隐界`)}
         </div>
         <h1 className="mt-6 text-4xl font-semibold tracking-[0.08em] text-[color:var(--text-primary)]">
-          欢迎回到你的世界
+          {t(msg`欢迎回到你的世界`)}
         </h1>
         <p className="mt-4 text-sm leading-8 text-[color:var(--text-secondary)]">
-          这里不是一串账号信息，而是一整片会继续生长、继续回应你的个人世界。
+          {t(msg`这里不是一串账号信息，而是一整片会继续生长、继续回应你的个人世界。`)}
         </p>
 
         <div className="mt-6 grid gap-3 text-left sm:grid-cols-3">
@@ -39,7 +55,7 @@ export function BootstrapScreen({ message }: BootstrapScreenProps) {
               Step 1
             </div>
             <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
-              确认入口
+              {t(msg`确认入口`)}
             </div>
           </div>
           <div className="rounded-[22px] border border-black/5 bg-[#fafafa] px-4 py-3 shadow-none">
@@ -47,7 +63,7 @@ export function BootstrapScreen({ message }: BootstrapScreenProps) {
               Step 2
             </div>
             <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
-              同步世界主人
+              {t(msg`同步世界主人`)}
             </div>
           </div>
           <div className="rounded-[22px] border border-black/5 bg-[#fafafa] px-4 py-3 shadow-none">
@@ -55,18 +71,16 @@ export function BootstrapScreen({ message }: BootstrapScreenProps) {
               Step 3
             </div>
             <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
-              继续开启对话
+              {t(msg`继续开启对话`)}
             </div>
           </div>
         </div>
 
         <div className="mt-6 rounded-[22px] border border-[rgba(7,193,96,0.12)] bg-[rgba(7,193,96,0.06)] px-4 py-3 text-left text-sm leading-7 text-[#475569]">
-          {message ?? (
-            <>正在整理这次进入世界的路径，马上带你回到上次停留的地方。</>
-          )}
+          {message ??
+            t(msg`正在整理这次进入世界的路径，马上带你回到上次停留的地方。`)}
         </div>
       </div>
     </div>
   );
 }
-// i18n-ignore-end

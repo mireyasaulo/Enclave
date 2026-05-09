@@ -23,10 +23,18 @@ const appDistDir = path.join(rootDir, "apps", "app", "dist");
 const apiUpstream = "http://127.0.0.1:3000";
 const cloudUpstream = "http://127.0.0.1:3001";
 const siteUpstream = "http://127.0.0.1:5185";
-// vicp.fun HTTPS 隧道实际落到本机 5180（而非控制台显示的 5185）。两条隧道
-// 共用 5180 时只能靠 Host 头区分：HTTPS 隧道 Host=vicp.fun（无端口），HTTP
-// 隧道 Host=vicp.fun:29490。这里用 $http_host 精确匹配做分流。
+// 公网 HTTPS 隧道 https://1gw06751dd053.vicp.fun （Host 不带端口） 实际打到
+// nginx 5180 而不是直连 5185；HTTP 隧道 :29490 也打 5180。需要在 nginx 这一
+// 层把两个 Host 区分开走 site 还是 app。这个 hostname 与 :29490 端口的隧道
+// 控制台配置一致；如果改隧道域名，这里也要同步。
 const siteHostExact = "1gw06751dd053.vicp.fun";
+// 花生壳两条隧道分别独立映射：
+//   HTTPS https://1gw06751dd053.vicp.fun → 127.0.0.1:5185 (site, Next.js 直连)
+//   HTTP  http://1gw06751dd053.vicp.fun:29490 → 127.0.0.1:5180 (nginx → app dist)
+// nginx 5180 只服务 app；不再尝试按 Host 反代到 site。原先在 location / 中
+// 的 if-Host=vicp.fun → proxy_pass 5185 写法既不可靠（"if is evil"），又因为
+// nginx 在 server_name 匹配时忽略 Host 端口，会把 :29490 隧道的请求也吃进去
+// 反代到 5185，导致用户 :29490 看到的是 site 而不是 app。
 const listenAddress = "127.0.0.1:5180";
 
 ensureDir(runtimeDir);
@@ -72,6 +80,36 @@ http {
   include /etc/nginx/mime.types;
   default_type application/octet-stream;
   sendfile on;
+  tcp_nopush on;
+  tcp_nodelay on;
+  keepalive_timeout 65s;
+
+  # 公网隧道带宽受限，所有可压缩文本类资源都走 gzip。
+  # vite 构建时由 vite-plugin-compression 生成 *.gz 同名兄弟文件，
+  # gzip_static on 让 nginx 直接吐预压缩文件，不再现压。
+  gzip on;
+  gzip_static on;
+  gzip_vary on;
+  gzip_proxied any;
+  gzip_min_length 1024;
+  gzip_comp_level 6;
+  gzip_types
+    text/plain
+    text/css
+    text/javascript
+    application/javascript
+    application/json
+    application/manifest+json
+    application/xml
+    application/xhtml+xml
+    application/rss+xml
+    application/atom+xml
+    application/wasm
+    text/xml
+    image/svg+xml
+    font/woff2
+    font/ttf
+    font/otf;
 
   access_log ${path.join(logsDir, "access.log")};
   error_log ${path.join(logsDir, "error.log")};
@@ -79,6 +117,17 @@ http {
   map $http_upgrade $connection_upgrade {
     default upgrade;
     '' close;
+  }
+
+  # 花生壳两条隧道实际都进 nginx 5180（公网响应 Server: nginx 已确认）：
+  #   HTTPS https://${siteHostExact}            (Host=${siteHostExact},        无端口) → site (5185)
+  #   HTTP  http://${siteHostExact}:29490       (Host=${siteHostExact}:29490)         → app dist
+  # nginx server_name 匹配会忽略 Host 端口，无法区分；改用 $http_host 精确匹配
+  # 出 $route_to_site，命中时通过 error_page → named location 内部跳转做反代
+  # （避开 "if + proxy_pass is evil"）。
+  map $http_host $route_to_site {
+    default 0;
+    "${siteHostExact}" 1;
   }
 
   server {
@@ -156,6 +205,18 @@ http {
       proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # 客户端埋点 SDK 上报到 cloud-api 的 telemetry 入口。app/site/wiki 三端
+    # 都会从浏览器同源 POST /telemetry/events/batch；如果这里没接，事件全部
+    # 落到 SPA fallback 上变成 405/200 HTML，cloud-console 看到的就是空数据。
+    location /telemetry/ {
+      proxy_pass ${cloudUpstream};
+      proxy_http_version 1.1;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
     location = /runtime-config.json {
       add_header Cache-Control "no-store";
       try_files $uri =404;
@@ -166,14 +227,26 @@ http {
       try_files $uri =404;
     }
 
-    # 公网 HTTPS 隧道 (Host 严格等于 ${siteHostExact}) -> 反代到官网
-    # Next.js (5185)；其他 Host（HTTP 隧道带端口、本地直连）走 app dist。
+    # 默认 location：HTTPS 隧道 (Host=${siteHostExact} 无端口) 反代到 site (5185)；
+    # 其他 Host（HTTP :29490 隧道、本机直连）走 app dist (SPA)。
     location / {
-      if ($http_host = "${siteHostExact}") {
-        proxy_pass ${siteUpstream};
-      }
+      error_page 418 = @site_proxy;
+      if ($route_to_site) { return 418; }
       add_header Cache-Control "no-store";
       try_files $uri $uri/ /index.html;
+    }
+
+    location @site_proxy {
+      internal;
+      proxy_pass ${siteUpstream};
+      proxy_http_version 1.1;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header Accept-Encoding $http_accept_encoding;
+      proxy_read_timeout 60s;
+      proxy_send_timeout 60s;
     }
   }
 }

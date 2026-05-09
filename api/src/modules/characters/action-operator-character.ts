@@ -91,6 +91,7 @@ export function buildActionOperatorCharacter(): Partial<CharacterEntity> {
     intimacyLevel: 65,
     currentActivity: 'working',
     currentStatus: '在等你把想办的那件事直接丢过来。',
+    region: '虚境·云端',
   };
 }
 // i18n-ignore-end

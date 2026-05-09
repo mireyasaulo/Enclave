@@ -11,7 +11,9 @@ import {
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock, InlineNotice } from "@yinjie/ui";
 import { SparkBadge } from "../../components/spark-badge";
+import { translateCharacterBio } from "../../lib/character-i18n";
 import { formatTimestamp } from "../../lib/format";
+import { buildYinjieId } from "../../lib/yinjie-id";
 import { useAppRuntimeConfig } from "../../runtime/runtime-config-store";
 import { DesktopContactTextEditDialog } from "./desktop-contact-text-edit-dialog";
 import {
@@ -132,7 +134,7 @@ export function ContactDetailPane({
   const isFriend = Boolean(friendship);
   const remarkName = friendship?.remarkName?.trim() || "";
   const displayName = remarkName || character.name;
-  const identifier = `yinjie_${character.id.slice(0, 8)}`;
+  const identifier = buildYinjieId(character.id);
   const relationshipSummary = remarkName
     ? t(msg`昵称：${character.name}`)
     : isFriend
@@ -140,7 +142,7 @@ export function ContactDetailPane({
       : character.relationship || t(msg`世界角色`);
   const signature =
     character.currentStatus?.trim() ||
-    character.bio?.trim() ||
+    translateCharacterBio(t, character.bio) ||
     (isFriend
       ? t(msg`这个联系人还没有签名。`)
       : t(msg`这个角色还没有签名。`));
@@ -245,8 +247,14 @@ export function ContactDetailPane({
             <DesktopContactProfileRow label={t(msg`隐界号`)} value={identifier} />
             <DesktopContactProfileRow
               label={t(msg`地区`)}
-              value={friendship?.region?.trim() || t(msg`未设置`)}
-              muted={!friendship?.region?.trim()}
+              value={
+                friendship?.region?.trim() ||
+                character?.region?.trim() ||
+                t(msg`未设置`)
+              }
+              muted={
+                !friendship?.region?.trim() && !character?.region?.trim()
+              }
             />
             <DesktopContactProfileRow
               label={t(msg`来源`)}

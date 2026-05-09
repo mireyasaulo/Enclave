@@ -52,35 +52,22 @@ export function SplashPage() {
         return;
       }
 
-      if (runtimeConfig.worldAccessMode === "cloud") {
-        const cloudSession = useCloudSessionStore.getState();
-        if (
-          !runtimeConfig.apiBaseUrl ||
-          !cloudSession.accessToken ||
-          isCloudSessionExpired(cloudSession.expiresAt)
-        ) {
-          clearCloudRuntimeSession();
-          if (!cancelled) {
-            void navigate({ to: "/welcome", replace: true });
-          }
-          return;
+      // 校验 cloud session（纯本地，不发 HTTP），无效直接跳。
+      const isCloudMode = runtimeConfig.worldAccessMode === "cloud";
+      const cloudSession = isCloudMode
+        ? useCloudSessionStore.getState()
+        : null;
+      if (
+        isCloudMode &&
+        (!runtimeConfig.apiBaseUrl ||
+          !cloudSession?.accessToken ||
+          isCloudSessionExpired(cloudSession.expiresAt))
+      ) {
+        clearCloudRuntimeSession();
+        if (!cancelled) {
+          void navigate({ to: "/welcome", replace: true });
         }
-
-        try {
-          const profile = await getMyCloudProfile(
-            cloudSession.accessToken,
-            runtimeConfig.cloudApiBaseUrl,
-          );
-          if (!cancelled) {
-            setCloudProfile(profile);
-          }
-        } catch {
-          clearCloudRuntimeSession();
-          if (!cancelled) {
-            void navigate({ to: "/welcome", replace: true });
-          }
-          return;
-        }
+        return;
       }
 
       if (!runtimeConfig.apiBaseUrl) {
@@ -90,38 +77,77 @@ export function SplashPage() {
         return;
       }
 
-      try {
-        const owner = await Promise.race([
-          getWorldOwner(runtimeConfig.apiBaseUrl),
-          new Promise<never>((_, reject) =>
-            window.setTimeout(
-              () => reject(new Error("splash-bootstrap-timeout")),
-              8000,
-            ),
-          ),
-        ]);
-        if (!cancelled) {
-          hydrateOwner(owner);
-          const restoredRoute =
-            isMobileWebRuntime(runtimeConfig.appPlatform)
-              ? readPersistedMobileWebRoute()
-              : null;
-          void navigate({
-            to:
-              owner.onboardingCompleted
-                ? restoredRoute ?? "/tabs/chat"
-                : "/welcome",
-            replace: true,
-          });
-        }
-      } catch {
-        if (runtimeConfig.worldAccessMode === "cloud") {
+      // 公网隧道下两次串行 RTT (~500ms × 2) 是首屏可见浪费的最后一段。
+      // getMyCloudProfile 走 /cloud/me/profile（cloud-api 3001），
+      // getWorldOwner 走 /api/world/owner（api 3000），完全不同 upstream，
+      // 用 allSettled 真并行 + 整体 8s 超时兜底。
+      const profilePromise =
+        isCloudMode && cloudSession?.accessToken
+          ? getMyCloudProfile(
+              cloudSession.accessToken,
+              runtimeConfig.cloudApiBaseUrl,
+            )
+          : Promise.resolve(null);
+      const ownerPromise = getWorldOwner(runtimeConfig.apiBaseUrl);
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        window.setTimeout(
+          () => reject(new Error("splash-bootstrap-timeout")),
+          8000,
+        ),
+      );
+
+      const [profileResult, ownerResult] = (await Promise.race([
+        Promise.allSettled([profilePromise, ownerPromise]),
+        timeoutPromise,
+      ]).catch(() => null)) ?? [null, null];
+
+      if (cancelled) {
+        return;
+      }
+
+      // 整体超时（8s 内两个都没回） → 清 cloud + /welcome
+      if (!ownerResult) {
+        if (isCloudMode) {
           clearCloudRuntimeSession();
         }
-        if (!cancelled) {
-          void navigate({ to: "/welcome", replace: true });
-        }
+        void navigate({ to: "/welcome", replace: true });
+        return;
       }
+
+      // cloud profile 失败：cloud 必须有效，否则降级到 /welcome
+      if (
+        isCloudMode &&
+        profileResult &&
+        profileResult.status === "rejected"
+      ) {
+        clearCloudRuntimeSession();
+        void navigate({ to: "/welcome", replace: true });
+        return;
+      }
+      if (profileResult && profileResult.status === "fulfilled" && profileResult.value) {
+        setCloudProfile(profileResult.value);
+      }
+
+      // owner 失败 → 通常是后端没起或网络抖动，回 /welcome
+      if (ownerResult.status === "rejected") {
+        if (isCloudMode) {
+          clearCloudRuntimeSession();
+        }
+        void navigate({ to: "/welcome", replace: true });
+        return;
+      }
+
+      const owner = ownerResult.value;
+      hydrateOwner(owner);
+      const restoredRoute = isMobileWebRuntime(runtimeConfig.appPlatform)
+        ? readPersistedMobileWebRoute()
+        : null;
+      void navigate({
+        to: owner.onboardingCompleted
+          ? restoredRoute ?? "/tabs/chat"
+          : "/welcome",
+        replace: true,
+      });
     }
 
     void continueBoot();

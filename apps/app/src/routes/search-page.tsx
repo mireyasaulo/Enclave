@@ -1,4 +1,11 @@
-import { Suspense, lazy, useEffect, useRef, useState } from "react";
+import {
+  Suspense,
+  lazy,
+  useDeferredValue,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   clearSearchHistory,
@@ -83,9 +90,13 @@ export function SearchPage() {
     routeState.category,
   );
   const [history, setHistory] = useState(() => loadSearchHistory());
-  const effectiveSearchText = isDesktopLayout
+  const rawEffectiveSearchText = isDesktopLayout
     ? committedSearchText
     : searchText;
+  // 移动端 search 直接 bind searchText，每次按键都会重跑 useSearchIndex（涉及
+  // 全表 fuzzy 匹配 + 多类别聚合）。useDeferredValue 让连续输入期间 React 跳
+  // 过中间帧的重渲染，保留输入响应感。
+  const effectiveSearchText = useDeferredValue(rawEffectiveSearchText);
   const desktopSearchPath = "/tabs/search";
   const normalizedPathname = normalizePathname(pathname);
   const desktopPathMismatch =

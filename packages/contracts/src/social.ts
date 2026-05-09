@@ -41,6 +41,9 @@ export interface Friendship {
   sparkStreak?: number;
   sparkStartedAt?: string | null;
   sparkLastDay?: string | null;
+  momentsHiddenFromMe?: boolean;
+  momentsHiddenFromThem?: boolean;
+  chatOnly?: boolean;
 }
 
 export interface FriendListItem {
@@ -94,4 +97,29 @@ export interface BlockCharacterRequest {
 
 export interface UnblockCharacterRequest {
   characterId: string;
+}
+
+export interface UpdateFriendPermissionsRequest {
+  momentsHiddenFromMe?: boolean;
+  momentsHiddenFromThem?: boolean;
+  chatOnly?: boolean;
+}
+
+export type BulkFriendshipAction =
+  | "add-tag"
+  | "remove-tag"
+  | "star"
+  | "unstar"
+  | "delete"
+  | "block";
+
+export interface BulkFriendshipRequest {
+  characterIds: string[];
+  action: BulkFriendshipAction;
+  tag?: string;
+}
+
+export interface BulkFriendshipResponse {
+  updated: number;
+  failed: string[];
 }

@@ -9,6 +9,8 @@ import type {
   TelemetryRange,
   TelemetryTimeseriesResponse,
   TelemetryTopEventsResponse,
+  TelemetryTopWorldsResponse,
+  TelemetryWorldRow,
 } from "@yinjie/contracts";
 import { Transform } from "class-transformer";
 import { IsIn, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
@@ -32,6 +34,12 @@ class RangeQueryDto {
   @IsOptional()
   @IsIn(APP_ID_VALUES, { message: "appId 不合法。" })
   appId?: (typeof APP_ID_VALUES)[number];
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  worldId?: string;
 }
 
 class TimeseriesQueryDto extends RangeQueryDto {
@@ -65,6 +73,7 @@ export class TelemetryAdminController {
     return this.telemetry.overview(
       (q.range ?? "7d") as TelemetryRange,
       q.appId as TelemetryAppId | undefined,
+      q.worldId,
     );
   }
 
@@ -75,6 +84,7 @@ export class TelemetryAdminController {
       (q.range ?? "7d") as TelemetryRange,
       q.groupBy ?? "none",
       q.appId as TelemetryAppId | undefined,
+      q.worldId,
     );
   }
 
@@ -83,6 +93,7 @@ export class TelemetryAdminController {
     return this.telemetry.topEvents(
       (q.range ?? "7d") as TelemetryRange,
       q.appId as TelemetryAppId | undefined,
+      q.worldId,
     );
   }
 
@@ -97,6 +108,7 @@ export class TelemetryAdminController {
       steps,
       (q.range ?? "7d") as TelemetryRange,
       q.appId as TelemetryAppId | undefined,
+      q.worldId,
     );
   }
 
@@ -105,6 +117,7 @@ export class TelemetryAdminController {
     return this.telemetry.apiHealth(
       (q.range ?? "7d") as TelemetryRange,
       q.appId as TelemetryAppId | undefined,
+      q.worldId,
     );
   }
 
@@ -113,6 +126,21 @@ export class TelemetryAdminController {
     return this.telemetry.errors(
       (q.range ?? "7d") as TelemetryRange,
       q.appId as TelemetryAppId | undefined,
+      q.worldId,
+    );
+  }
+
+  @Get("top-worlds")
+  topWorlds(@Query() q: RangeQueryDto): Promise<TelemetryTopWorldsResponse> {
+    return this.telemetry.topWorlds(
+      (q.range ?? "7d") as TelemetryRange,
+    );
+  }
+
+  @Get("worlds")
+  worlds(@Query() q: RangeQueryDto): Promise<TelemetryWorldRow[]> {
+    return this.telemetry.listWorldsForFilter(
+      (q.range ?? "7d") as TelemetryRange,
     );
   }
 }

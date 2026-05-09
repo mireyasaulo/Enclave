@@ -48,6 +48,16 @@ import type {
   RevenueSettlementBatchSummary,
   RevenueSettlementPreviewRequest,
   RevenueSettlementPreviewResponse,
+  CloudTokenPricingCatalogResponse,
+  CloudTokenPricingItem,
+  CloudTokenUsageBudgetItem,
+  CloudTokenUsageBudgetResponse,
+  CloudTokenUsageOverviewResponse,
+  CloudTokenUsageWorldListResponse,
+  TokenUsageBreakdownResponse,
+  TokenUsageTrendPoint,
+  UpdateCloudTokenUsageBudgetRequest,
+  UpsertCloudTokenPricingRequest,
   RevenueSharingPolicySummary,
   RejectInviteRedemptionRequest,
   RevokeCloudAdminSessionSourceGroupRequest,
@@ -67,6 +77,8 @@ import type {
   TelemetryRange,
   TelemetryTimeseriesResponse,
   TelemetryTopEventsResponse,
+  TelemetryTopWorldsResponse,
+  TelemetryWorldRow,
   UpdateRevenueSharingPolicyRequest,
   UpsertCloudConfigRequest,
   UpsertRevenuePayeeRequest,
@@ -1360,9 +1372,13 @@ export const cloudAdminApi = {
       body: JSON.stringify(payload),
     }),
 
-  getTelemetryOverview: (range: TelemetryRange, appId?: TelemetryAppId) =>
+  getTelemetryOverview: (
+    range: TelemetryRange,
+    appId?: TelemetryAppId,
+    worldId?: string,
+  ) =>
     adminFetch<TelemetryOverviewResponse>(
-      `/telemetry/overview${buildQueryString({ range, appId })}`,
+      `/telemetry/overview${buildQueryString({ range, appId, worldId })}`,
     ),
 
   getTelemetryTimeseries: (params: {
@@ -1370,32 +1386,158 @@ export const cloudAdminApi = {
     range: TelemetryRange;
     groupBy?: "appId" | "none";
     appId?: TelemetryAppId;
+    worldId?: string;
   }) =>
     adminFetch<TelemetryTimeseriesResponse>(
       `/telemetry/timeseries${buildQueryString(params)}`,
     ),
 
-  getTelemetryTopEvents: (range: TelemetryRange, appId?: TelemetryAppId) =>
+  getTelemetryTopEvents: (
+    range: TelemetryRange,
+    appId?: TelemetryAppId,
+    worldId?: string,
+  ) =>
     adminFetch<TelemetryTopEventsResponse>(
-      `/telemetry/top-events${buildQueryString({ range, appId })}`,
+      `/telemetry/top-events${buildQueryString({ range, appId, worldId })}`,
     ),
 
   getTelemetryFunnel: (params: {
     steps: string;
     range: TelemetryRange;
     appId?: TelemetryAppId;
+    worldId?: string;
   }) =>
     adminFetch<TelemetryFunnelResponse>(
       `/telemetry/funnel${buildQueryString(params)}`,
     ),
 
-  getTelemetryApiHealth: (range: TelemetryRange, appId?: TelemetryAppId) =>
+  getTelemetryApiHealth: (
+    range: TelemetryRange,
+    appId?: TelemetryAppId,
+    worldId?: string,
+  ) =>
     adminFetch<TelemetryApiHealthResponse>(
-      `/telemetry/api-health${buildQueryString({ range, appId })}`,
+      `/telemetry/api-health${buildQueryString({ range, appId, worldId })}`,
     ),
 
-  getTelemetryErrors: (range: TelemetryRange, appId?: TelemetryAppId) =>
+  getTelemetryErrors: (
+    range: TelemetryRange,
+    appId?: TelemetryAppId,
+    worldId?: string,
+  ) =>
     adminFetch<TelemetryErrorsResponse>(
-      `/telemetry/errors${buildQueryString({ range, appId })}`,
+      `/telemetry/errors${buildQueryString({ range, appId, worldId })}`,
+    ),
+
+  getTelemetryTopWorlds: (range: TelemetryRange) =>
+    adminFetch<TelemetryTopWorldsResponse>(
+      `/telemetry/top-worlds${buildQueryString({ range })}`,
+    ),
+
+  listTelemetryWorlds: (range: TelemetryRange) =>
+    adminFetch<TelemetryWorldRow[]>(
+      `/telemetry/worlds${buildQueryString({ range })}`,
+    ),
+
+  getCloudTokenUsageOverview: (filters?: { from?: string; to?: string }) =>
+    adminFetch<CloudTokenUsageOverviewResponse>(
+      `/token-usage/overview${buildQueryString({
+        from: filters?.from,
+        to: filters?.to,
+      })}`,
+    ),
+
+  getCloudTokenUsageTrends: (filters?: { from?: string; to?: string }) =>
+    adminFetch<TokenUsageTrendPoint[]>(
+      `/token-usage/trends${buildQueryString({
+        from: filters?.from,
+        to: filters?.to,
+      })}`,
+    ),
+
+  listCloudTokenUsageWorlds: (filters?: {
+    from?: string;
+    to?: string;
+    sort?: "tokens" | "cost" | "requests" | "failureRate";
+    dir?: "asc" | "desc";
+    page?: number;
+    pageSize?: number;
+    search?: string;
+  }) =>
+    adminFetch<CloudTokenUsageWorldListResponse>(
+      `/token-usage/worlds${buildQueryString({
+        from: filters?.from,
+        to: filters?.to,
+        sort: filters?.sort,
+        dir: filters?.dir,
+        page: filters?.page,
+        pageSize: filters?.pageSize,
+        search: filters?.search,
+      })}`,
+    ),
+
+  getCloudTokenUsageWorldBreakdown: (
+    worldId: string,
+    filters?: { from?: string; to?: string },
+  ) =>
+    adminFetch<TokenUsageBreakdownResponse>(
+      `/token-usage/worlds/${worldId}/breakdown${buildQueryString({
+        from: filters?.from,
+        to: filters?.to,
+      })}`,
+    ),
+
+  getCloudTokenUsageWorldDaily: (
+    worldId: string,
+    filters?: { from?: string; to?: string },
+  ) =>
+    adminFetch<
+      Array<{
+        bucketDate: string;
+        currency: string;
+        promptTokens: number;
+        completionTokens: number;
+        totalTokens: number;
+        estimatedCost: number;
+        requestCount: number;
+        successCount: number;
+        failedCount: number;
+        activeCharacterCount: number;
+        syncedAt: string;
+      }>
+    >(
+      `/token-usage/worlds/${worldId}/daily${buildQueryString({
+        from: filters?.from,
+        to: filters?.to,
+      })}`,
+    ),
+
+  getCloudTokenUsageBudgets: () =>
+    adminFetch<CloudTokenUsageBudgetResponse>("/token-usage/budgets"),
+
+  upsertCloudTokenUsageBudget: (payload: UpdateCloudTokenUsageBudgetRequest) =>
+    adminFetch<CloudTokenUsageBudgetItem>("/token-usage/budgets", {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+
+  deleteCloudTokenUsageBudget: (worldId: string) =>
+    adminFetch<{ ok: true }>(`/token-usage/budgets/${worldId}`, {
+      method: "DELETE",
+    }),
+
+  getCloudTokenPricingCatalog: () =>
+    adminFetch<CloudTokenPricingCatalogResponse>("/token-usage/pricing"),
+
+  upsertCloudTokenPricing: (payload: UpsertCloudTokenPricingRequest) =>
+    adminFetch<CloudTokenPricingItem>("/token-usage/pricing", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  deleteCloudTokenPricing: (currency: "CNY" | "USD", model: string) =>
+    adminFetch<{ ok: true }>(
+      `/token-usage/pricing${buildQueryString({ currency, model })}`,
+      { method: "DELETE" },
     ),
 };

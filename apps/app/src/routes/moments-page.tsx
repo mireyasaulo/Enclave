@@ -9,20 +9,28 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
-import { ArrowLeft, Copy, Heart, PenSquare, Share2 } from "lucide-react";
+import { ArrowLeft, Camera } from "lucide-react";
 import {
   addMomentComment,
+  deleteMoment,
   getBlockedCharacters,
   getMoments,
   toggleMomentLike,
   type Moment,
+  type MomentComment,
 } from "@yinjie/contracts";
+import type { MessageDescriptor } from "@lingui/core";
 import { useRuntimeTranslator } from "@yinjie/i18n";
-import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
-import { MomentMediaGallery } from "../components/moment-media-gallery";
-import { MomentCommentComposer } from "../components/moment-comment-composer";
+import { AppPage, Button, InlineNotice } from "@yinjie/ui";
 import { RouteRedirectState } from "../components/route-redirect-state";
-import { SocialPostCard } from "../components/social-post-card";
+import { WeChatActionBubble } from "../components/wechat-action-bubble";
+import {
+  WeChatCommentBar,
+  type WeChatCommentBarReplyTarget,
+} from "../components/wechat-comment-bar";
+import { WeChatMomentCard } from "../components/wechat-moment-card";
+import { WeChatMomentsCover } from "../components/wechat-moments-cover";
+import { usePullToRefresh } from "../features/moments/use-pull-to-refresh";
 import {
   hydrateDesktopFavoritesFromNative,
   readDesktopFavorites,
@@ -47,8 +55,6 @@ import { getMomentSummaryText } from "../features/moments/moment-content";
 import { formatTimestamp } from "../lib/format";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { normalizePathname } from "../lib/normalize-pathname";
-import { shareWithNativeShell } from "../runtime/mobile-bridge";
-import { isNativeMobileShareSurface } from "../runtime/mobile-share-surface";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
@@ -80,9 +86,6 @@ export function MomentsPage() {
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const nativeDesktopFavorites = runtimeConfig.appPlatform === "desktop";
-  const nativeMobileShareSupported = isNativeMobileShareSurface({
-    isDesktopLayout,
-  });
   const normalizedPathname = normalizePathname(pathname);
   const composeDraft = useMomentComposeDraft();
   const resetComposeDraft = composeDraft.reset;
@@ -94,6 +97,15 @@ export function MomentsPage() {
     authorName: string;
     commentId: string;
     postId: string;
+  } | null>(null);
+  // 移动端微信化交互状态
+  const [actionBubble, setActionBubble] = useState<{
+    momentId: string;
+    anchorRect: DOMRect;
+  } | null>(null);
+  const [commentBarTarget, setCommentBarTarget] = useState<{
+    momentId: string;
+    replyTo: WeChatCommentBarReplyTarget | null;
   } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [notice, setNotice] = useState("");
@@ -243,17 +255,27 @@ export function MomentsPage() {
         throw new Error(t(msg`请先输入评论内容。`));
       }
 
-      const replyTo =
+      const desktopTarget =
         desktopReplyTarget && desktopReplyTarget.postId === momentId
           ? desktopReplyTarget
           : null;
+      const mobileTarget =
+        commentBarTarget?.momentId === momentId
+          ? commentBarTarget.replyTo
+          : null;
+      const target = desktopTarget
+        ? {
+            commentId: desktopTarget.commentId,
+            authorId: desktopTarget.authorId,
+          }
+        : mobileTarget;
 
       return addMomentComment(
         momentId,
         {
           text,
-          replyToCommentId: replyTo?.commentId,
-          replyToAuthorId: replyTo?.authorId,
+          replyToCommentId: target?.commentId,
+          replyToAuthorId: target?.authorId,
         },
         baseUrl,
       );
@@ -263,10 +285,44 @@ export function MomentsPage() {
       setDesktopReplyTarget((current) =>
         current?.postId === momentId ? null : current,
       );
+      setCommentBarTarget((current) =>
+        current?.momentId === momentId ? null : current,
+      );
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`朋友圈互动已更新。`));
+      await queryClient.invalidateQueries({
+        queryKey: ["app-moments", baseUrl],
+      });
+    },
+  });
+  const deleteMutation = useMutation({
+    mutationFn: (momentId: string) => deleteMoment(momentId, baseUrl),
+    onMutate: async (momentId) => {
+      await queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] });
+      const snapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments", baseUrl],
+      });
+      snapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(
+          key,
+          data.filter((item) => item.id !== momentId),
+        );
+      });
+      return { snapshots };
+    },
+    onError: (_error, _momentId, context) => {
+      context?.snapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+    },
+    onSuccess: async () => {
+      setNoticeTone("success");
+      setNoticeActionLabel(null);
+      setNoticeAction(null);
+      setNotice(t(msg`已删除这条朋友圈。`));
       await queryClient.invalidateQueries({
         queryKey: ["app-moments", baseUrl],
       });
@@ -583,83 +639,6 @@ export function MomentsPage() {
     });
   }, [isDesktopLayout, routeSelectedMomentId, visibleMoments.length]);
 
-  async function handleShareMoment(moment: (typeof visibleMoments)[number]) {
-    const summaryBody = getMomentSummaryText(moment);
-    const shareHash = buildDesktopMomentsRouteHash({
-      momentId: moment.id,
-    });
-    const sharePath = `${pathname}${shareHash ? `#${shareHash}` : ""}`;
-    const shareUrl =
-      typeof window === "undefined"
-        ? sharePath
-        : `${window.location.origin}${sharePath}`;
-    const locationLine = moment.location
-      ? t(msg`\n位置：${moment.location}`)
-      : "";
-    const summaryText = `${moment.authorName}：${summaryBody}${locationLine}\n${shareUrl}`;
-
-    if (nativeMobileShareSupported) {
-      const shared = await shareWithNativeShell({
-        title: t(msg`${moment.authorName} 的朋友圈`),
-        text: `${moment.authorName}：${summaryBody}${locationLine}`,
-        url: shareUrl,
-      });
-
-      if (shared) {
-        setNoticeTone("success");
-        setNoticeActionLabel(null);
-        setNoticeAction(null);
-        setNotice(t(msg`已打开系统分享面板。`));
-        return;
-      }
-    }
-
-    if (
-      typeof navigator === "undefined" ||
-      !navigator.clipboard ||
-      typeof navigator.clipboard.writeText !== "function"
-    ) {
-      setNoticeTone("info");
-      setNoticeActionLabel(
-        nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
-      );
-      setNoticeAction(() => () => {
-        void handleShareMoment(moment);
-      });
-      setNotice(
-        nativeMobileShareSupported
-          ? t(msg`当前设备暂时无法打开系统分享，请稍后重试。`)
-          : t(msg`当前环境暂不支持复制动态摘要。`),
-      );
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(summaryText);
-      setNoticeTone("success");
-      setNoticeActionLabel(null);
-      setNoticeAction(null);
-      setNotice(
-        nativeMobileShareSupported
-          ? t(msg`系统分享暂时不可用，已复制动态摘要。`)
-          : t(msg`动态摘要已复制。`),
-      );
-    } catch {
-      setNoticeTone("info");
-      setNoticeActionLabel(
-        nativeMobileShareSupported ? t(msg`重试分享`) : t(msg`重试复制`),
-      );
-      setNoticeAction(() => () => {
-        void handleShareMoment(moment);
-      });
-      setNotice(
-        nativeMobileShareSupported
-          ? t(msg`系统分享失败，请稍后重试。`)
-          : t(msg`复制动态摘要失败，请稍后重试。`),
-      );
-    }
-  }
-
   if (isDesktopLayout) {
     if (syncedRouteSelectedAuthorId) {
       return (
@@ -834,504 +813,464 @@ export function MomentsPage() {
   }
 
   return (
-    <AppPage className="space-y-0 px-0 pb-0 pt-0">
-      {isDiscoverSubPage ? (
-        <TabPageTopBar
-          title={t(msg`朋友圈`)}
-          subtitle={t(msg`世界角色动态`)}
-          titleAlign="center"
-          className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
-          leftActions={
-            <Button
-              onClick={() =>
-                navigateBackOrFallback(() => {
-                  if (safeReturnPath) {
-                    void navigate({
-                      to: safeReturnPath,
-                      ...(safeReturnHash ? { hash: safeReturnHash } : {}),
-                    });
-                    return;
-                  }
+    <MobileMomentsView
+      isDiscoverSubPage={isDiscoverSubPage}
+      ownerId={ownerId}
+      ownerAvatar={ownerAvatar}
+      ownerUsername={ownerUsername}
+      visibleMoments={visibleMoments}
+      momentsLoading={momentsQuery.isLoading}
+      momentsError={
+        momentsQuery.isError && momentsQuery.error instanceof Error
+          ? momentsQuery.error
+          : null
+      }
+      pendingCommentMomentId={pendingCommentMomentId}
+      notice={notice}
+      noticeTone={noticeTone}
+      noticeActionLabel={noticeActionLabel}
+      noticeAction={noticeAction}
+      interactionActionLabel={interactionActionLabel}
+      hasReturnPath={Boolean(safeReturnPath)}
+      actionBubble={actionBubble}
+      commentBarTarget={commentBarTarget}
+      commentDrafts={commentDrafts}
+      tx={t}
+      onBack={() =>
+        navigateBackOrFallback(() => {
+          if (safeReturnPath) {
+            void navigate({
+              to: safeReturnPath,
+              ...(safeReturnHash ? { hash: safeReturnHash } : {}),
+            });
+            return;
+          }
 
-                  void navigate({ to: "/tabs/discover" });
-                })
+          void navigate({ to: "/tabs/discover" });
+        })
+      }
+      onCompose={openMobileMomentsPublishPage}
+      onAuthorTap={(moment) => {
+        if (moment.authorType === "character") {
+          openMobileFriendMoments(moment.authorId);
+        }
+      }}
+      onLikeMoment={(momentId) => likeMutation.mutate(momentId)}
+      onDeleteMoment={(momentId) => {
+        if (deleteMutation.isPending) return;
+        if (
+          typeof window !== "undefined" &&
+          !window.confirm(t(msg`确定删除这条朋友圈吗？`))
+        ) {
+          return;
+        }
+        deleteMutation.mutate(momentId);
+      }}
+      onOpenActionMenu={(momentId, anchorRect) =>
+        setActionBubble({ momentId, anchorRect })
+      }
+      onCloseActionMenu={() => setActionBubble(null)}
+      onCommentTap={(momentId, comment) =>
+        setCommentBarTarget({
+          momentId,
+          replyTo: comment
+            ? {
+                authorId: comment.authorId,
+                authorName: comment.authorName,
+                commentId: comment.id,
               }
+            : null,
+        })
+      }
+      onCloseCommentBar={() => setCommentBarTarget(null)}
+      onCommentChange={(momentId, value) =>
+        setCommentDrafts((current) => ({
+          ...current,
+          [momentId]: value,
+        }))
+      }
+      onCommentSubmit={(momentId) => commentMutation.mutate(momentId)}
+      onRefresh={async () => {
+        await Promise.all([
+          momentsQuery.refetch(),
+          ownerId ? blockedQuery.refetch() : Promise.resolve(null),
+        ]);
+      }}
+      onRetry={handleRetryLoad}
+      onEmptyAction={handleEmptyStateAction}
+      onNoticeBack={handleStatusBack}
+      likeError={
+        likeMutation.isError && likeMutation.error instanceof Error
+          ? likeMutation.error
+          : null
+      }
+      commentError={
+        commentMutation.isError && commentMutation.error instanceof Error
+          ? commentMutation.error
+          : null
+      }
+    />
+  );
+}
+
+type MobileMomentsViewProps = {
+  isDiscoverSubPage: boolean;
+  ownerId: string | null;
+  ownerAvatar: string | null;
+  ownerUsername: string | null;
+  visibleMoments: Moment[];
+  momentsLoading: boolean;
+  momentsError: Error | null;
+  pendingCommentMomentId: string | null | undefined;
+  notice: string;
+  noticeTone: "success" | "info";
+  noticeActionLabel: string | null;
+  noticeAction: (() => void) | null;
+  interactionActionLabel: string;
+  hasReturnPath: boolean;
+  actionBubble: { momentId: string; anchorRect: DOMRect } | null;
+  commentBarTarget: {
+    momentId: string;
+    replyTo: WeChatCommentBarReplyTarget | null;
+  } | null;
+  commentDrafts: Record<string, string>;
+  tx: (descriptor: MessageDescriptor) => string;
+  onBack: () => void;
+  onCompose: () => void;
+  onAuthorTap: (moment: Moment) => void;
+  onLikeMoment: (momentId: string) => void;
+  onDeleteMoment: (momentId: string) => void;
+  onOpenActionMenu: (momentId: string, anchorRect: DOMRect) => void;
+  onCloseActionMenu: () => void;
+  onCommentTap: (momentId: string, comment: MomentComment | null) => void;
+  onCloseCommentBar: () => void;
+  onCommentChange: (momentId: string, value: string) => void;
+  onCommentSubmit: (momentId: string) => void;
+  onRefresh: () => Promise<unknown>;
+  onRetry: () => void;
+  onEmptyAction: () => void;
+  onNoticeBack: () => void;
+  likeError: Error | null;
+  commentError: Error | null;
+};
+
+function MobileMomentsView({
+  isDiscoverSubPage,
+  ownerId,
+  ownerAvatar,
+  ownerUsername,
+  visibleMoments,
+  momentsLoading,
+  momentsError,
+  pendingCommentMomentId,
+  notice,
+  noticeTone,
+  noticeActionLabel,
+  noticeAction,
+  interactionActionLabel,
+  hasReturnPath,
+  actionBubble,
+  commentBarTarget,
+  commentDrafts,
+  tx,
+  onBack,
+  onCompose,
+  onAuthorTap,
+  onLikeMoment,
+  onDeleteMoment,
+  onOpenActionMenu,
+  onCloseActionMenu,
+  onCommentTap,
+  onCloseCommentBar,
+  onCommentChange,
+  onCommentSubmit,
+  onRefresh,
+  onRetry,
+  onEmptyAction,
+  onNoticeBack,
+  likeError,
+  commentError,
+}: MobileMomentsViewProps) {
+  const t = tx;
+  const { containerRef, state: pullState } = usePullToRefresh({
+    onRefresh,
+    enabled: true,
+  });
+
+  const activeMoment = actionBubble
+    ? visibleMoments.find((moment) => moment.id === actionBubble.momentId) ??
+      null
+    : null;
+  const liked = Boolean(
+    ownerId &&
+      activeMoment?.likes.some((like) => like.authorId === ownerId),
+  );
+  const ownerName = ownerUsername?.trim() || t(msg`世界主人`);
+
+  return (
+    <AppPage className="relative space-y-0 bg-white px-0 pb-0 pt-0">
+      <TabPageTopBar
+        title={t(msg`朋友圈`)}
+        titleAlign="center"
+        className="mx-0 mb-0 mt-0 border-b border-[#ECECEC] bg-white px-4 pb-1.5 pt-1.5 text-[#1A1A1A] shadow-none"
+        leftActions={
+          isDiscoverSubPage ? (
+            <Button
+              onClick={onBack}
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-black/[0.05]"
+              className="h-9 w-9 rounded-full border-0 bg-transparent text-[#1A1A1A] active:bg-black/[0.05]"
+              aria-label={t(msg`返回`)}
             >
               <ArrowLeft size={17} />
             </Button>
-          }
-          rightActions={
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-black/[0.05]"
-              onClick={openMobileMomentsPublishPage}
-              aria-label={t(msg`发一条朋友圈`)}
-            >
-              <PenSquare size={17} />
-            </Button>
-          }
-        />
-      ) : (
-        <TabPageTopBar
-          title={t(msg`朋友圈`)}
-          subtitle={t(msg`世界角色动态`)}
-          className="mx-0 mb-0 mt-0 border-b border-[color:var(--border-faint)] bg-[rgba(247,247,247,0.94)] px-4 pb-1.5 pt-1.5 text-[color:var(--text-primary)] shadow-none"
-          rightActions={
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-full border-0 bg-transparent text-[color:var(--text-primary)] active:bg-black/[0.05]"
-              onClick={openMobileMomentsPublishPage}
-              aria-label={t(msg`发一条朋友圈`)}
-            >
-              <PenSquare size={17} />
-            </Button>
-          }
-        />
-      )}
+          ) : undefined
+        }
+        rightActions={
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 rounded-full border-0 bg-transparent text-[#1A1A1A] active:bg-black/[0.05]"
+            onClick={onCompose}
+            aria-label={t(msg`发一条朋友圈`)}
+          >
+            <Camera size={20} strokeWidth={1.6} />
+          </Button>
+        }
+      />
 
-      <div className="space-y-2.5 px-4 pb-[calc(env(safe-area-inset-bottom,0px)+1rem)] pt-2.5">
-        <section className="space-y-2">
-          <div className="px-1">
-            <div className="text-[11px] text-[color:var(--text-muted)]">
-              {t(msg`最近动态`)}
-            </div>
-            <div className="mt-0.5 text-[10px] leading-4 text-[color:var(--text-muted)]">
-              {t(msg`这里会展示世界里的角色和你最近发布的朋友圈内容。`)}
-            </div>
-          </div>
+      <div
+        ref={containerRef}
+        className="relative flex-1 overflow-y-auto overscroll-contain bg-white"
+        style={{ overflowAnchor: "none" }}
+      >
+        <PullToRefreshIndicator state={pullState} t={t} />
+
+        <div
+          style={{
+            transform: `translateY(${pullState.offset}px)`,
+            transition: pullState.pulling ? "none" : "transform 220ms ease-out",
+          }}
+        >
+          <WeChatMomentsCover
+            nickname={ownerName}
+            avatarUrl={ownerAvatar}
+          />
+
           {notice ? (
-            <MobileMomentsInlineNotice
-              tone={noticeTone}
-              action={
-                noticeTone === "info" ? (
-                  <div className="flex items-center gap-1.5">
-                    {noticeAction && noticeActionLabel ? (
+            <div className="px-4 pt-3">
+              <MobileMomentsInlineNotice
+                tone={noticeTone}
+                action={
+                  noticeTone === "info" ? (
+                    <div className="flex items-center gap-1.5">
+                      {noticeAction && noticeActionLabel ? (
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          className="h-7 shrink-0 rounded-full border-[#E5E5E5] bg-white px-3 text-[11px]"
+                          onClick={noticeAction}
+                        >
+                          {noticeActionLabel}
+                        </Button>
+                      ) : null}
                       <Button
                         type="button"
                         variant="secondary"
                         size="sm"
-                        className="h-7 shrink-0 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[11px]"
-                        onClick={noticeAction}
+                        className="h-7 shrink-0 rounded-full border-[#E5E5E5] bg-white px-3 text-[11px]"
+                        onClick={onNoticeBack}
                       >
-                        {noticeActionLabel}
+                        {interactionActionLabel}
                       </Button>
-                    ) : null}
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      className="h-7 shrink-0 rounded-full border-[color:var(--border-subtle)] bg-white px-3 text-[11px]"
-                      onClick={handleStatusBack}
-                    >
-                      {interactionActionLabel}
-                    </Button>
-                  </div>
-                ) : undefined
+                    </div>
+                  ) : undefined
+                }
+              >
+                {notice}
+              </MobileMomentsInlineNotice>
+            </div>
+          ) : null}
+
+          {momentsLoading && !visibleMoments.length ? (
+            <div className="px-4 pt-10 pb-12 text-center text-[12px] text-[#9A9A9A]">
+              {t(msg`正在刷新朋友圈`)}
+            </div>
+          ) : null}
+
+          {momentsError ? (
+            <div className="px-4 pt-10 pb-12 text-center">
+              <div className="text-[14px] font-medium text-[#1A1A1A]">
+                {t(msg`朋友圈暂时不可用`)}
+              </div>
+              <div className="mt-2 text-[12px] text-[#9A9A9A]">
+                {momentsError.message}
+              </div>
+              <div className="mt-4 flex justify-center gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="h-8 rounded-full border-[#E5E5E5] bg-white px-3.5 text-[11px]"
+                  onClick={onRetry}
+                >
+                  {t(msg`重试读取`)}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="h-8 rounded-full border-[#E5E5E5] bg-white px-3.5 text-[11px]"
+                  onClick={onNoticeBack}
+                >
+                  {hasReturnPath ? t(msg`返回上一页`) : t(msg`重试读取`)}
+                </Button>
+              </div>
+            </div>
+          ) : null}
+
+          {visibleMoments.map((moment, index) => (
+            <div
+              key={moment.id}
+              className={
+                index === 0
+                  ? ""
+                  : "border-t border-[#ECECEC]"
               }
             >
-              {notice}
-            </MobileMomentsInlineNotice>
-          ) : null}
-          {momentsQuery.isLoading ? (
-            <MobileMomentsStatusCard
-              badge={t(msg`读取中`)}
-              title={t(msg`正在刷新朋友圈`)}
-              description={t(msg`稍等一下，正在同步世界里的最新动态。`)}
-              tone="loading"
-            />
-          ) : null}
-          {momentsQuery.isError && momentsQuery.error instanceof Error ? (
-            <MobileMomentsStatusCard
-              badge={t(msg`读取失败`)}
-              title={t(msg`朋友圈暂时不可用`)}
-              description={momentsQuery.error.message}
-              tone="danger"
-              action={
-                <div className="flex flex-wrap items-center justify-center gap-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
-                    onClick={handleRetryLoad}
-                  >
-                    {t(msg`重试读取`)}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
-                    onClick={handleStatusBack}
-                  >
-                    {safeReturnPath ? t(msg`返回上一页`) : t(msg`重试读取`)}
-                  </Button>
-                </div>
-              }
-            />
-          ) : null}
-
-          {visibleMoments.map((moment) => {
-            const sourceId = `moment-${moment.id}`;
-            const collected = favoriteSourceIds.includes(sourceId);
-            const routeHash = buildDesktopMomentsRouteHash({
-              momentId: moment.id,
-            });
-
-            return (
-              <SocialPostCard
+              <WeChatMomentCard
                 cardId={`moment-post-${moment.id}`}
-                key={moment.id}
-                authorName={moment.authorName}
-                authorAvatar={moment.authorAvatar}
-                authorActionAriaLabel={
-                  moment.authorType === "character"
-                    ? t(msg`查看 ${moment.authorName} 的朋友圈`)
+                moment={moment}
+                ownerId={ownerId}
+                liked={
+                  Boolean(ownerId) &&
+                  moment.likes.some((like) => like.authorId === ownerId)
+                }
+                onAuthorTap={() => onAuthorTap(moment)}
+                onOpenActionMenu={(rect) => onOpenActionMenu(moment.id, rect)}
+                onDoubleTapLike={() => onLikeMoment(moment.id)}
+                onCommentTap={(comment) => onCommentTap(moment.id, comment)}
+                onDelete={
+                  ownerId &&
+                  moment.authorType === "user" &&
+                  moment.authorId === ownerId
+                    ? () => onDeleteMoment(moment.id)
                     : undefined
-                }
-                meta={formatTimestamp(moment.postedAt)}
-                onAuthorClick={
-                  moment.authorType === "character"
-                    ? () => openMobileFriendMoments(moment.authorId)
-                    : undefined
-                }
-                headerActions={
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full text-[color:var(--text-muted)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
-                    onClick={() => void handleShareMoment(moment)}
-                    aria-label={
-                      nativeMobileShareSupported
-                        ? t(msg`分享这条朋友圈`)
-                        : t(msg`复制这条动态摘要`)
-                    }
-                  >
-                    {nativeMobileShareSupported ? (
-                      <Share2 size={15} />
-                    ) : (
-                      <Copy size={15} />
-                    )}
-                  </Button>
-                }
-                body={
-                  <>
-                    {moment.authorType === "user" ? (
-                      <div className="mb-2 inline-flex rounded-full bg-[rgba(47,122,63,0.12)] px-2 py-0.5 text-[10px] font-medium text-[#2f7a3f]">
-                        {t(msg`我的动态`)}
-                      </div>
-                    ) : null}
-                    {moment.text.trim() ? <div>{moment.text}</div> : null}
-                    {moment.media.length > 0 ? (
-                      <div className={moment.text.trim() ? "mt-3" : ""}>
-                        <MomentMediaGallery
-                          contentType={moment.contentType}
-                          media={moment.media}
-                          variant="mobile"
-                        />
-                      </div>
-                    ) : null}
-                  </>
-                }
-                summary={t(msg`${moment.likeCount} 赞 · ${moment.commentCount} 评论`)}
-                actions={
-                  <div className="flex flex-wrap gap-2">
-                    {moment.authorType === "character" ? (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => openMobileFriendMoments(moment.authorId)}
-                      >
-                        {t(msg`Ta 的朋友圈`)}
-                      </Button>
-                    ) : null}
-                    {(() => {
-                      const liked =
-                        Boolean(ownerId) &&
-                        moment.likes.some(
-                          (like) => like.authorId === ownerId,
-                        );
-                      return (
-                        <Button
-                          disabled={likeMutation.isPending}
-                          onClick={() => likeMutation.mutate(moment.id)}
-                          variant="secondary"
-                          size="sm"
-                          className={
-                            liked
-                              ? "border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] text-[#07c160]"
-                              : undefined
-                          }
-                        >
-                          <Heart
-                            size={13}
-                            className={liked ? "fill-current" : undefined}
-                          />
-                          {pendingLikeMomentId === moment.id
-                            ? t(msg`处理中...`)
-                            : liked
-                              ? t(msg`已赞`)
-                              : t(msg`点赞`)}
-                        </Button>
-                      );
-                    })()}
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => {
-                        const nextFavorites = collected
-                          ? removeDesktopFavorite(sourceId)
-                          : upsertDesktopFavorite({
-                              id: `favorite-${sourceId}`,
-                              sourceId,
-                              category: "moments",
-                              title: moment.authorName,
-                              description: getMomentSummaryText(moment),
-                              meta: t(msg`朋友圈 · ${formatTimestamp(moment.postedAt)}`),
-                              to: `/tabs/moments${routeHash ? `#${routeHash}` : ""}`,
-                              badge: t(msg`朋友圈`),
-                              avatarName: moment.authorName,
-                              avatarSrc: moment.authorAvatar,
-                            });
-
-                        setFavoriteSourceIds(
-                          nextFavorites.map((favorite) => favorite.sourceId),
-                        );
-                      }}
-                    >
-                      {collected ? t(msg`取消收藏`) : t(msg`收藏`)}
-                    </Button>
-                  </div>
-                }
-                secondary={
-                  (() => {
-                    const activeReply =
-                      desktopReplyTarget?.postId === moment.id
-                        ? desktopReplyTarget
-                        : null;
-                    const commentsById = new Map(
-                      moment.comments.map((comment) => [comment.id, comment] as const),
-                    );
-                    const replyTargetComment = activeReply
-                      ? (commentsById.get(activeReply.commentId) ?? null)
-                      : null;
-                    const hasComments = moment.comments.length > 0;
-                    if (!hasComments && !activeReply) {
-                      return null;
-                    }
-                    return (
-                      <div className="space-y-2">
-                        {hasComments ? (
-                          <div className="space-y-1.5 rounded-[14px] bg-[color:var(--surface-soft)] p-2.5">
-                            {moment.comments.map((comment) => {
-                              const replyToName = comment.replyToCommentId
-                                ? (commentsById.get(comment.replyToCommentId)
-                                    ?.authorName ?? null)
-                                : null;
-                              const isActiveTarget =
-                                activeReply?.commentId === comment.id;
-                              return (
-                                <button
-                                  key={comment.id}
-                                  type="button"
-                                  onClick={() =>
-                                    setDesktopReplyTarget({
-                                      authorId: comment.authorId,
-                                      authorName: comment.authorName,
-                                      commentId: comment.id,
-                                      postId: moment.id,
-                                    })
-                                  }
-                                  className={cn(
-                                    "block w-full rounded-[8px] px-1.5 py-0.5 text-left text-[11px] leading-[1.35rem] transition-colors",
-                                    isActiveTarget
-                                      ? "bg-[rgba(7,193,96,0.12)]"
-                                      : "hover:bg-white",
-                                  )}
-                                >
-                                  <span className="font-medium text-[#07c160]">
-                                    {comment.authorName}
-                                  </span>
-                                  {replyToName ? (
-                                    <>
-                                      <span className="text-[color:var(--text-secondary)]">
-                                        {" "}{t(msg`回复`)}{" "}
-                                      </span>
-                                      <span className="font-medium text-[#07c160]">
-                                        {replyToName}
-                                      </span>
-                                    </>
-                                  ) : null}
-                                  <span className="text-[color:var(--text-secondary)]">：</span>
-                                  <span className="text-[color:var(--text-primary)]">{comment.text}</span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        ) : null}
-                        {activeReply ? (
-                          <div className="flex items-start justify-between gap-2 rounded-[12px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[11px] text-[color:var(--text-secondary)]">
-                            <div className="min-w-0 flex-1 space-y-1">
-                              <div className="truncate">
-                                {t(msg`正在回复 ${activeReply.authorName}`)}
-                              </div>
-                              {replyTargetComment ? (
-                                <div className="truncate text-[color:var(--text-muted)]">
-                                  「{replyTargetComment.text}」
-                                </div>
-                              ) : null}
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => setDesktopReplyTarget(null)}
-                              aria-label={t(msg`取消回复`)}
-                              className="shrink-0 rounded-full px-2 py-0.5 text-[11px] text-[color:var(--text-muted)] hover:bg-white"
-                            >
-                              {t(msg`取消`)}
-                            </button>
-                          </div>
-                        ) : null}
-                      </div>
-                    );
-                  })()
-                }
-                composer={
-                  <MomentCommentComposer
-                    value={commentDrafts[moment.id] ?? ""}
-                    onChange={(value) =>
-                      setCommentDrafts((current) => ({
-                        ...current,
-                        [moment.id]: value,
-                      }))
-                    }
-                    onSubmit={() => commentMutation.mutate(moment.id)}
-                    pending={pendingCommentMomentId === moment.id}
-                    disabled={commentMutation.isPending}
-                    placeholder={
-                      desktopReplyTarget?.postId === moment.id
-                        ? t(msg`回复 ${desktopReplyTarget.authorName}...`)
-                        : t(msg`写评论...`)
-                    }
-                    pendingLabel={t(msg`发送中...`)}
-                    className="w-full"
-                    inputClassName="rounded-full py-1.5 text-[16px]"
-                    buttonClassName="h-8 px-3 text-[12px]"
-                  />
                 }
               />
-            );
-          })}
+            </div>
+          ))}
 
-          {likeMutation.isError && likeMutation.error instanceof Error ? (
-            <MobileMomentsInlineNotice
-              tone="info"
-              action={
-                <button
-                  type="button"
-                  onClick={handleStatusBack}
-                  className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
-                >
-                  {interactionActionLabel}
-                </button>
-              }
-            >
-              {likeMutation.error.message}
-            </MobileMomentsInlineNotice>
+          {likeError ? (
+            <div className="px-4 pt-3">
+              <MobileMomentsInlineNotice tone="info">
+                {likeError.message}
+              </MobileMomentsInlineNotice>
+            </div>
           ) : null}
-          {commentMutation.isError && commentMutation.error instanceof Error ? (
-            <MobileMomentsInlineNotice
-              tone="info"
-              action={
-                <button
-                  type="button"
-                  onClick={handleStatusBack}
-                  className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
-                >
-                  {interactionActionLabel}
-                </button>
-              }
-            >
-              {commentMutation.error.message}
-            </MobileMomentsInlineNotice>
+          {commentError ? (
+            <div className="px-4 pt-3">
+              <MobileMomentsInlineNotice tone="info">
+                {commentError.message}
+              </MobileMomentsInlineNotice>
+            </div>
           ) : null}
 
-          {!momentsQuery.isLoading &&
-          !momentsQuery.isError &&
-          !visibleMoments.length ? (
-            <MobileMomentsStatusCard
-              badge={t(msg`朋友圈`)}
-              title={t(msg`还很安静`)}
-              description={t(msg`你先发一条动态，或者等世界里的角色们先开口。`)}
-              action={
+          {!momentsLoading && !momentsError && !visibleMoments.length ? (
+            <div className="px-4 pt-12 pb-16 text-center">
+              <div className="text-[14px] font-medium text-[#1A1A1A]">
+                {t(msg`还很安静`)}
+              </div>
+              <div className="mt-2 text-[12px] text-[#9A9A9A]">
+                {t(msg`你先发一条动态，或者等世界里的角色们先开口。`)}
+              </div>
+              <div className="mt-4 flex justify-center">
                 <Button
                   variant="primary"
                   size="sm"
-                  className="h-8 rounded-full bg-[#07c160] px-3.5 text-[11px] text-white hover:bg-[#06ad56]"
-                  onClick={handleEmptyStateAction}
+                  className="h-8 rounded-full bg-[#07C160] px-3.5 text-[12px] text-white hover:bg-[#06ad56]"
+                  onClick={onEmptyAction}
                 >
-                  {safeReturnPath ? t(msg`返回上一页`) : t(msg`发一条朋友圈`)}
+                  {hasReturnPath ? t(msg`返回上一页`) : t(msg`发一条朋友圈`)}
                 </Button>
-              }
-            />
+              </div>
+            </div>
           ) : null}
-        </section>
+
+          <div className="h-[calc(env(safe-area-inset-bottom,0px)+24px)]" />
+        </div>
       </div>
+
+      <WeChatActionBubble
+        open={Boolean(actionBubble)}
+        anchorRect={actionBubble?.anchorRect ?? null}
+        liked={liked}
+        onLike={() => {
+          if (actionBubble) {
+            onLikeMoment(actionBubble.momentId);
+          }
+        }}
+        onComment={() => {
+          if (actionBubble) {
+            onCommentTap(actionBubble.momentId, null);
+          }
+        }}
+        onClose={onCloseActionMenu}
+      />
+
+      <WeChatCommentBar
+        open={Boolean(commentBarTarget)}
+        replyTo={commentBarTarget?.replyTo ?? null}
+        value={
+          commentBarTarget
+            ? commentDrafts[commentBarTarget.momentId] ?? ""
+            : ""
+        }
+        onChange={(value) => {
+          if (commentBarTarget) {
+            onCommentChange(commentBarTarget.momentId, value);
+          }
+        }}
+        pending={
+          commentBarTarget
+            ? pendingCommentMomentId === commentBarTarget.momentId
+            : false
+        }
+        onSubmit={() => {
+          if (commentBarTarget) {
+            onCommentSubmit(commentBarTarget.momentId);
+          }
+        }}
+        onClose={onCloseCommentBar}
+      />
     </AppPage>
   );
 }
 
-function MobileMomentsStatusCard({
-  badge,
-  title,
-  description,
-  tone = "default",
-  action,
+function PullToRefreshIndicator({
+  state,
+  t,
 }: {
-  badge: string;
-  title: string;
-  description: string;
-  tone?: "default" | "danger" | "loading";
-  action?: ReactNode;
+  state: { offset: number; refreshing: boolean; pulling: boolean };
+  t: (descriptor: MessageDescriptor) => string;
 }) {
-  const loading = tone === "loading";
+  if (!state.offset && !state.refreshing) return null;
+  const label = state.refreshing
+    ? t(msg`正在刷新...`)
+    : state.offset >= 64
+      ? t(msg`松手刷新`)
+      : t(msg`下拉刷新`);
   return (
-    <section
-      className={
-        tone === "danger"
-          ? "rounded-[18px] border border-[color:var(--border-danger)] bg-[linear-gradient(180deg,rgba(255,245,245,0.96),rgba(254,242,242,0.94))] px-4 py-5 text-center shadow-none"
-          : "rounded-[18px] border border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] px-4 py-5 text-center shadow-none"
-      }
+    <div
+      className="pointer-events-none absolute left-0 right-0 z-10 flex items-center justify-center text-[12px] text-[#9A9A9A]"
+      style={{
+        top: 0,
+        height: `${state.offset || 60}px`,
+        transform: `translateY(-${(state.offset || 60) - state.offset}px)`,
+      }}
     >
-      <div
-        className={
-          tone === "danger"
-            ? "mx-auto inline-flex rounded-full bg-[rgba(220,38,38,0.08)] px-2.5 py-1 text-[9px] font-medium tracking-[0.04em] text-[color:var(--state-danger-text)]"
-            : "mx-auto inline-flex rounded-full bg-[rgba(7,193,96,0.1)] px-2.5 py-1 text-[9px] font-medium tracking-[0.04em] text-[#07c160]"
-        }
-      >
-        {badge}
-      </div>
-      {loading ? (
-        <div className="mt-3 flex items-center justify-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-black/15 animate-pulse" />
-          <span className="h-2 w-2 rounded-full bg-black/25 animate-pulse [animation-delay:120ms]" />
-          <span className="h-2 w-2 rounded-full bg-[#8ecf9d] animate-pulse [animation-delay:240ms]" />
-        </div>
-      ) : null}
-      <div className="mt-3 text-[15px] font-medium text-[color:var(--text-primary)]">
-        {title}
-      </div>
-      <p className="mx-auto mt-2 max-w-[18rem] text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)]">
-        {description}
-      </p>
-      {action ? <div className="mt-4 flex justify-center">{action}</div> : null}
-    </section>
+      <span>{label}</span>
+    </div>
   );
 }
 

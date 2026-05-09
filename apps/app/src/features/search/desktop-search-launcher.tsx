@@ -11,17 +11,7 @@ import type { MessageDescriptor } from "@lingui/core";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import {
-  Blocks,
-  Bookmark,
-  Clock3,
-  CornerDownLeft,
-  MessageSquareText,
-  Newspaper,
-  Search,
-  Sparkles,
-  UsersRound,
-} from "lucide-react";
+import { ChevronRight, Clock3 } from "lucide-react";
 import {
   getConversations,
   getFriends,
@@ -30,7 +20,7 @@ import {
   searchConversationMessages,
   searchGroupMessages,
 } from "@yinjie/contracts";
-import { Button, cn } from "@yinjie/ui";
+import { cn } from "@yinjie/ui";
 import { AvatarChip } from "../../components/avatar-chip";
 import { getConversationPreviewParts } from "../../lib/conversation-preview";
 import { formatMessageTimestamp } from "../../lib/format";
@@ -60,11 +50,11 @@ import {
   buildSearchRouteHash,
   type SearchRouteSource,
 } from "./search-route-state";
+import type { SearchCategory } from "./search-types";
 import {
   applyDesktopSearchReturnContext,
   resolveSearchNavigationTarget,
 } from "./search-navigation";
-import { buildDesktopAddFriendRouteHash } from "../contacts/add-friend-route-state";
 import { buildDesktopContactsRouteHash } from "../contacts/contacts-route-state";
 import { buildDesktopChatThreadPath } from "../desktop/chat/desktop-chat-route-state";
 import {
@@ -125,36 +115,22 @@ type SearchLauncherConversationGroup = {
   totalHits: number;
 };
 
-type SearchLauncherFocusRegion =
-  | "input"
-  | "suggestions"
-  | "quickAccess"
-  | "history";
-
 type SearchLauncherNavigationLayer = "input" | "panel";
 
-type SearchLauncherFocusPanelId =
-  | "chatSuggestions"
-  | "officialSuggestions"
-  | "contactSuggestions"
-  | "worldCharacterSuggestions"
-  | "favoriteSuggestions"
-  | "miniProgramSuggestions"
-  | "recentConversations"
-  | "recentOfficials"
-  | "recentMiniPrograms"
-  | "recentFavorites"
-  | "history"
-  | null;
+type LauncherResultEntry = {
+  id: string;
+  title: string;
+  description?: string;
+  avatarName: string;
+  avatarSrc?: string | null;
+  onSelect: () => void;
+};
 
-const searchLauncherFocusRegionLabels: Record<
-  SearchLauncherFocusRegion,
-  MessageDescriptor
-> = {
-  input: msg`搜索框`,
-  suggestions: msg`建议区`,
-  quickAccess: msg`快捷访问`,
-  history: msg`历史搜索`,
+type LauncherCategoryConfig = {
+  category: SearchCategory;
+  entries: LauncherResultEntry[];
+  title: string;
+  viewMoreActionId: string;
 };
 
 function buildSearchLauncherHistoryActionId(keyword: string) {
@@ -361,14 +337,7 @@ export function DesktopSearchDropdownPanel({
     [source, trimmedKeyword],
   );
   const shouldLoadSuggestions = true;
-  const {
-    favoriteMatches,
-    favoritesError,
-    favoritesLoading,
-    miniProgramMatches,
-    recentFavorites,
-    recentMiniPrograms,
-  } = useSearchQuickLinks(trimmedKeyword);
+  const { favoriteMatches } = useSearchQuickLinks(trimmedKeyword);
 
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
@@ -629,10 +598,6 @@ export function DesktopSearchDropdownPanel({
       ),
     [conversationGroupHeaderIds, conversationMatches],
   );
-  const recentConversations = useMemo(
-    () => conversationQuickLinks.slice(0, 4),
-    [conversationQuickLinks],
-  );
   const officialGroups = useMemo<SearchLauncherOfficialGroup[]>(() => {
     return (officialAccountsQuery.data ?? []).map((account) => {
       const accountTypeLabel =
@@ -694,13 +659,6 @@ export function DesktopSearchDropdownPanel({
       )
       .slice(0, 4);
   }, [normalizedKeyword, officialGroups]);
-  const recentOfficials = useMemo(() => {
-    return officialGroups
-      .slice()
-      .sort((left, right) => right.sortTime - left.sortTime)
-      .slice(0, 4);
-  }, [officialGroups]);
-
   const suggestionsLoading =
     shouldLoadSuggestions &&
     (friendsQuery.isLoading ||
@@ -720,8 +678,7 @@ export function DesktopSearchDropdownPanel({
     friendMatches.length > 0 ||
     worldCharacterMatches.length > 0 ||
     officialMatches.length > 0 ||
-    favoriteMatches.length > 0 ||
-    miniProgramMatches.length > 0;
+    favoriteMatches.length > 0;
   const [activeActionId, setActiveActionId] =
     useState<string>("launcher-search");
   const [navigationLayer, setNavigationLayer] =
@@ -768,6 +725,167 @@ export function DesktopSearchDropdownPanel({
     [applyDesktopSearchReturn, navigate, onClose],
   );
 
+  const buildViewMoreNavigate = useCallback(
+    (category: SearchCategory) => {
+      return () => {
+        onClose?.();
+        void navigate({
+          to: "/tabs/search",
+          hash: buildSearchRouteHash({
+            category,
+            keyword: trimmedKeyword,
+            source,
+          }),
+        });
+      };
+    },
+    [navigate, onClose, source, trimmedKeyword],
+  );
+
+  const chatEntries = useMemo<LauncherResultEntry[]>(() => {
+    if (!trimmedKeyword) {
+      return [];
+    }
+
+    const out: LauncherResultEntry[] = [];
+    for (const group of conversationMessageGroups) {
+      const firstMessage = group.messages[0];
+      if (!firstMessage) {
+        continue;
+      }
+      out.push({
+        id: firstMessage.id,
+        title: group.header.title,
+        description: firstMessage.description,
+        avatarName: group.header.avatarName ?? group.header.title,
+        avatarSrc: group.header.avatarSrc,
+        onSelect: () => handleOpenQuickLink(firstMessage),
+      });
+    }
+    for (const item of conversationOnlyMatches) {
+      out.push({
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        avatarName: item.avatarName ?? item.title,
+        avatarSrc: item.avatarSrc,
+        onSelect: () => handleOpenQuickLink(item),
+      });
+    }
+    return out;
+  }, [
+    conversationMessageGroups,
+    conversationOnlyMatches,
+    handleOpenQuickLink,
+    trimmedKeyword,
+  ]);
+
+  const contactEntries = useMemo<LauncherResultEntry[]>(() => {
+    if (!trimmedKeyword) {
+      return [];
+    }
+
+    return friendMatches.map((item) => ({
+      id: `friend-${item.character.id}`,
+      title: getFriendDisplayName(item),
+      description: buildFriendSuggestionDescription(item, t),
+      avatarName: getFriendDisplayName(item),
+      avatarSrc: item.character.avatar,
+      onSelect: () => handleOpenCharacterDetail(item.character.id),
+    }));
+  }, [friendMatches, handleOpenCharacterDetail, t, trimmedKeyword]);
+
+  const officialEntries = useMemo<LauncherResultEntry[]>(() => {
+    if (!trimmedKeyword) {
+      return [];
+    }
+
+    return officialMatches.map((group) => ({
+      id: group.header.id,
+      title: group.header.title,
+      description: group.article?.title ?? group.header.description,
+      avatarName: group.header.avatarName ?? group.header.title,
+      avatarSrc: group.header.avatarSrc,
+      onSelect: () => handleOpenQuickLink(group.header),
+    }));
+  }, [handleOpenQuickLink, officialMatches, trimmedKeyword]);
+
+  const favoriteEntries = useMemo<LauncherResultEntry[]>(() => {
+    if (!trimmedKeyword) {
+      return [];
+    }
+
+    return favoriteMatches.map((item) => ({
+      id: item.id,
+      title: item.title,
+      description: item.description,
+      avatarName: item.avatarName ?? item.title,
+      avatarSrc: item.avatarSrc,
+      onSelect: () => handleOpenQuickLink(item),
+    }));
+  }, [favoriteMatches, handleOpenQuickLink, trimmedKeyword]);
+
+  const worldCharacterEntries = useMemo<LauncherResultEntry[]>(() => {
+    if (!trimmedKeyword) {
+      return [];
+    }
+
+    return worldCharacterMatches.map((item) => ({
+      id: `world-character-${item.character.id}`,
+      title: item.character.name,
+      description:
+        item.character.relationship?.trim() ||
+        item.character.currentStatus?.trim() ||
+        t(msg`打开资料卡后可发起好友申请`),
+      avatarName: item.character.name,
+      avatarSrc: item.character.avatar,
+      onSelect: () => handleOpenCharacterDetail(item.character.id),
+    }));
+  }, [handleOpenCharacterDetail, t, trimmedKeyword, worldCharacterMatches]);
+
+  const categories = useMemo<LauncherCategoryConfig[]>(
+    () => [
+      {
+        category: "messages",
+        entries: chatEntries,
+        title: t(msg`聊天记录`),
+        viewMoreActionId: "view-more-messages",
+      },
+      {
+        category: "contacts",
+        entries: contactEntries,
+        title: t(msg`联系人`),
+        viewMoreActionId: "view-more-contacts",
+      },
+      {
+        category: "officialAccounts",
+        entries: officialEntries,
+        title: t(msg`公众号`),
+        viewMoreActionId: "view-more-officialAccounts",
+      },
+      {
+        category: "favorites",
+        entries: favoriteEntries,
+        title: t(msg`收藏`),
+        viewMoreActionId: "view-more-favorites",
+      },
+      {
+        category: "contacts",
+        entries: worldCharacterEntries,
+        title: t(msg`世界角色`),
+        viewMoreActionId: "view-more-worldCharacters",
+      },
+    ],
+    [
+      chatEntries,
+      contactEntries,
+      favoriteEntries,
+      officialEntries,
+      t,
+      worldCharacterEntries,
+    ],
+  );
+
   const actionItems = useMemo<SearchLauncherActionItem[]>(() => {
     const items: SearchLauncherActionItem[] = [
       {
@@ -777,106 +895,19 @@ export function DesktopSearchDropdownPanel({
     ];
 
     if (trimmedKeyword) {
-      conversationMessageGroups.forEach((group) => {
-        items.push({
-          id: group.header.id,
-          onSelect: () => handleOpenQuickLink(group.header),
+      categories.forEach((config) => {
+        const visible = config.entries.slice(0, 3);
+        visible.forEach((entry) => {
+          items.push({ id: entry.id, onSelect: entry.onSelect });
         });
-
-        group.messages.forEach((item) => {
+        if (config.entries.length > 3) {
           items.push({
-            id: item.id,
-            onSelect: () => handleOpenQuickLink(item),
-          });
-        });
-      });
-
-      conversationOnlyMatches.forEach((item) => {
-        items.push({
-          id: item.id,
-          onSelect: () => handleOpenQuickLink(item),
-        });
-      });
-
-      officialMatches.forEach((group) => {
-        items.push({
-          id: group.header.id,
-          onSelect: () => handleOpenQuickLink(group.header),
-        });
-
-        const article = group.article;
-        if (article) {
-          items.push({
-            id: article.id,
-            onSelect: () => handleOpenQuickLink(article),
+            id: config.viewMoreActionId,
+            onSelect: buildViewMoreNavigate(config.category),
           });
         }
-      });
-
-      friendMatches.forEach((item) => {
-        items.push({
-          id: `friend-${item.character.id}`,
-          onSelect: () => handleOpenCharacterDetail(item.character.id),
-        });
-      });
-
-      worldCharacterMatches.forEach((item) => {
-        items.push({
-          id: `world-character-${item.character.id}`,
-          onSelect: () => handleOpenCharacterDetail(item.character.id),
-        });
-      });
-
-      favoriteMatches.forEach((item) => {
-        items.push({
-          id: item.id,
-          onSelect: () => handleOpenQuickLink(item),
-        });
-      });
-
-      miniProgramMatches.forEach((item) => {
-        items.push({
-          id: item.id,
-          onSelect: () => handleOpenQuickLink(item),
-        });
       });
     } else {
-      recentConversations.forEach((item) => {
-        items.push({
-          id: item.id,
-          onSelect: () => handleOpenQuickLink(item),
-        });
-      });
-
-      recentOfficials.forEach((group) => {
-        items.push({
-          id: group.header.id,
-          onSelect: () => handleOpenQuickLink(group.header),
-        });
-
-        const article = group.article;
-        if (article) {
-          items.push({
-            id: article.id,
-            onSelect: () => handleOpenQuickLink(article),
-          });
-        }
-      });
-
-      recentMiniPrograms.forEach((item) => {
-        items.push({
-          id: item.id,
-          onSelect: () => handleOpenQuickLink(item),
-        });
-      });
-
-      recentFavorites.forEach((item) => {
-        items.push({
-          id: item.id,
-          onSelect: () => handleOpenQuickLink(item),
-        });
-      });
-
       history.forEach((item) => {
         items.push({
           id: buildSearchLauncherHistoryActionId(item.keyword),
@@ -887,23 +918,12 @@ export function DesktopSearchDropdownPanel({
 
     return items;
   }, [
-    conversationMessageGroups,
-    conversationOnlyMatches,
-    favoriteMatches,
-    friendMatches,
-    handleOpenCharacterDetail,
-    handleOpenQuickLink,
+    buildViewMoreNavigate,
+    categories,
     history,
     keyword,
-    miniProgramMatches,
     onOpenSearch,
-    officialMatches,
-    recentConversations,
-    recentFavorites,
-    recentOfficials,
-    recentMiniPrograms,
     trimmedKeyword,
-    worldCharacterMatches,
   ]);
   const panelActionItems = useMemo(
     () => actionItems.filter((item) => item.id !== "launcher-search"),
@@ -931,178 +951,6 @@ export function DesktopSearchDropdownPanel({
     setNavigationLayer("panel");
     setActiveActionId(actionId);
   }, []);
-  const activeFocusContext = useMemo<{
-    panelId: SearchLauncherFocusPanelId;
-    panelTitle: MessageDescriptor;
-    region: SearchLauncherFocusRegion;
-  }>(() => {
-    if (navigationLayer === "input") {
-      return {
-        panelId: null as SearchLauncherFocusPanelId,
-        panelTitle: msg`搜一搜主入口`,
-        region: "input" as SearchLauncherFocusRegion,
-      };
-    }
-
-    const historyIds = new Set(
-      history.map((item) => buildSearchLauncherHistoryActionId(item.keyword)),
-    );
-    if (historyIds.has(activeActionId)) {
-      return {
-        panelId: "history" as SearchLauncherFocusPanelId,
-        panelTitle: msg`最近搜索`,
-        region: "history" as SearchLauncherFocusRegion,
-      };
-    }
-
-    if (trimmedKeyword) {
-      const chatSuggestionIds = new Set<string>();
-      conversationMessageGroups.forEach((group) => {
-        chatSuggestionIds.add(group.header.id);
-        group.messages.forEach((item) => {
-          chatSuggestionIds.add(item.id);
-        });
-      });
-      conversationOnlyMatches.forEach((item) => {
-        chatSuggestionIds.add(item.id);
-      });
-      if (chatSuggestionIds.has(activeActionId)) {
-        return {
-          panelId: "chatSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: msg`聊天`,
-          region: "suggestions" as SearchLauncherFocusRegion,
-        };
-      }
-
-      const officialSuggestionIds = new Set<string>();
-      officialMatches.forEach((group) => {
-        officialSuggestionIds.add(group.header.id);
-        if (group.article) {
-          officialSuggestionIds.add(group.article.id);
-        }
-      });
-      if (officialSuggestionIds.has(activeActionId)) {
-        return {
-          panelId: "officialSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: msg`公众号`,
-          region: "suggestions" as SearchLauncherFocusRegion,
-        };
-      }
-
-      const contactSuggestionIds = new Set(
-        friendMatches.map((item) => `friend-${item.character.id}`),
-      );
-      if (contactSuggestionIds.has(activeActionId)) {
-        return {
-          panelId: "contactSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: msg`联系人`,
-          region: "suggestions" as SearchLauncherFocusRegion,
-        };
-      }
-
-      const worldCharacterSuggestionIds = new Set(
-        worldCharacterMatches.map(
-          (item) => `world-character-${item.character.id}`,
-        ),
-      );
-      if (worldCharacterSuggestionIds.has(activeActionId)) {
-        return {
-          panelId: "worldCharacterSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: msg`世界角色`,
-          region: "suggestions" as SearchLauncherFocusRegion,
-        };
-      }
-
-      const favoriteSuggestionIds = new Set(
-        favoriteMatches.map((item) => item.id),
-      );
-      if (favoriteSuggestionIds.has(activeActionId)) {
-        return {
-          panelId: "favoriteSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: msg`收藏`,
-          region: "suggestions" as SearchLauncherFocusRegion,
-        };
-      }
-
-      const miniProgramSuggestionIds = new Set(
-        miniProgramMatches.map((item) => item.id),
-      );
-      if (miniProgramSuggestionIds.has(activeActionId)) {
-        return {
-          panelId: "miniProgramSuggestions" as SearchLauncherFocusPanelId,
-          panelTitle: msg`小程序`,
-          region: "suggestions" as SearchLauncherFocusRegion,
-        };
-      }
-
-      return {
-        panelId: null as SearchLauncherFocusPanelId,
-        panelTitle: msg`搜索建议`,
-        region: "suggestions" as SearchLauncherFocusRegion,
-      };
-    }
-
-    if (recentConversations.some((item) => item.id === activeActionId)) {
-      return {
-        panelId: "recentConversations" as SearchLauncherFocusPanelId,
-        panelTitle: msg`最近聊天`,
-        region: "quickAccess" as SearchLauncherFocusRegion,
-      };
-    }
-
-    const recentOfficialIds = new Set<string>();
-    recentOfficials.forEach((group) => {
-      recentOfficialIds.add(group.header.id);
-      if (group.article) {
-        recentOfficialIds.add(group.article.id);
-      }
-    });
-    if (recentOfficialIds.has(activeActionId)) {
-      return {
-        panelId: "recentOfficials" as SearchLauncherFocusPanelId,
-        panelTitle: msg`最近公众号`,
-        region: "quickAccess" as SearchLauncherFocusRegion,
-      };
-    }
-
-    if (recentMiniPrograms.some((item) => item.id === activeActionId)) {
-      return {
-        panelId: "recentMiniPrograms" as SearchLauncherFocusPanelId,
-        panelTitle: msg`最近使用的小程序`,
-        region: "quickAccess" as SearchLauncherFocusRegion,
-      };
-    }
-
-    if (recentFavorites.some((item) => item.id === activeActionId)) {
-      return {
-        panelId: "recentFavorites" as SearchLauncherFocusPanelId,
-        panelTitle: msg`最近收藏`,
-        region: "quickAccess" as SearchLauncherFocusRegion,
-      };
-    }
-
-    return {
-      panelId: null as SearchLauncherFocusPanelId,
-      panelTitle: msg`快捷访问`,
-      region: "quickAccess" as SearchLauncherFocusRegion,
-    };
-  }, [
-    activeActionId,
-    conversationMessageGroups,
-    conversationOnlyMatches,
-    favoriteMatches,
-    friendMatches,
-    history,
-    miniProgramMatches,
-    officialMatches,
-    recentConversations,
-    recentFavorites,
-    recentOfficials,
-    recentMiniPrograms,
-    trimmedKeyword,
-    worldCharacterMatches,
-    navigationLayer,
-  ]);
 
   useEffect(() => {
     setActiveActionId((current) => {
@@ -1279,13 +1127,6 @@ export function DesktopSearchDropdownPanel({
         className,
       )}
     >
-      <SearchLauncherHeroCard
-        active={navigationLayer === "input"}
-        keyword={trimmedKeyword}
-        onClick={() => onOpenSearch(keyword)}
-        onMouseEnter={activateLauncherSearch}
-      />
-
       {speechStatus !== "idle" || speechError ? (
         <SearchLauncherStatusCard
           description={
@@ -1315,605 +1156,177 @@ export function DesktopSearchDropdownPanel({
         />
       ) : null}
 
-      <SearchLauncherFocusStrip
-        keyword={trimmedKeyword}
-        layer={navigationLayer}
-        panelTitle={t(activeFocusContext.panelTitle)}
-        region={activeFocusContext.region}
-      />
-
       {trimmedKeyword ? (
-        <SearchLauncherSection
-          title={t(msg`搜索建议`)}
-          className="mt-3"
-          highlighted={activeFocusContext.region === "suggestions"}
-        >
+        <div className="mt-1">
           {suggestionsLoading ? (
-            <SearchLauncherStatusCard
-              description={t(msg`正在整理聊天、联系人、公众号、收藏和小程序结果...`)}
-              status="pending"
-              title={t(msg`搜索建议`)}
-            />
+            <div className="px-2 py-3 text-[12px] text-[color:var(--text-muted)]">
+              {t(msg`正在整理结果...`)}
+            </div>
           ) : null}
 
-          {suggestionsError ? (
-            <SearchLauncherStatusCard
-              description={t(msg`搜索建议暂时读取失败，请先试试搜一搜。`)}
-              status="error"
-              title={t(msg`搜索异常`)}
-            />
-          ) : null}
-
-          {favoritesError ? (
-            <SearchLauncherStatusCard
-              description={t(msg`收藏列表暂时读取失败，可以直接进入搜一搜继续搜索。`)}
-              status="error"
-              title={t(msg`搜索异常`)}
-            />
+          {!suggestionsLoading && suggestionsError ? (
+            <div className="px-2 py-3 text-[12px] text-[#be123c]">
+              {t(msg`搜索建议暂时读取失败，请按 Enter 进入完整搜索。`)}
+            </div>
           ) : null}
 
           {!suggestionsLoading && !suggestionsError ? (
-            <div className="space-y-3">
-              {conversationMessageGroups.length ||
-              conversationOnlyMatches.length ? (
-                <SearchLauncherCollectionCard
-                  countLabel={t(msg`${conversationMessageGroups.length + conversationOnlyMatches.length} 组结果`)}
-                  highlighted={activeFocusContext.panelId === "chatSuggestions"}
-                  title={t(msg`聊天`)}
-                >
-                  <div className="space-y-2">
-                    {conversationMessageGroups.map((group) => (
-                      <SearchLauncherConversationGroupCard
-                        key={group.id}
-                        activeHeaderId={activeActionId}
-                        activeMessageId={activeActionId}
-                        group={group}
-                        keyword={trimmedKeyword}
-                        onOpenHeader={(item) => handleOpenQuickLink(item)}
-                        onOpenMessage={(item) => handleOpenQuickLink(item)}
-                        onSelectHeader={(item) => activatePanelAction(item.id)}
-                        onSelectMessage={(item) => activatePanelAction(item.id)}
-                      />
-                    ))}
+            <>
+              {categories.map((config) => {
+                if (!config.entries.length) {
+                  return null;
+                }
 
-                    {conversationOnlyMatches.length ? (
-                      <div className="rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-3.5 py-3">
-                        <div className="px-0.5 text-[11px] font-medium text-[color:var(--text-muted)]">
-                          {t(msg`会话命中`)}
-                        </div>
-                        <div className="mt-2.5 space-y-2">
-                          {conversationOnlyMatches.map((item) => (
-                            <SearchLauncherConversationThreadCard
-                              key={item.id}
-                              active={activeActionId === item.id}
-                              item={item}
-                              keyword={trimmedKeyword}
-                              onMouseEnter={() => activatePanelAction(item.id)}
-                              onClick={() => handleOpenQuickLink(item)}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
-                </SearchLauncherCollectionCard>
-              ) : null}
+                const visible = config.entries.slice(0, 3);
+                const hasMore = config.entries.length > 3;
 
-              {officialMatches.length ? (
-                <div className="relative">
-                  <SearchLauncherCollectionCard
-                    countLabel={t(msg`${officialMatches.length} 个入口`)}
-                    highlighted={
-                      activeFocusContext.panelId === "officialSuggestions"
-                    }
-                    title={t(msg`公众号`)}
+                return (
+                  <section
+                    key={config.viewMoreActionId}
+                    className="mt-1 first:mt-0"
                   >
-                    <div className="space-y-1.5">
-                      {officialMatches.map((group) => (
-                        <SearchLauncherOfficialGroupCard
-                          key={group.id}
-                          activeArticleId={activeActionId}
-                          activeHeaderId={activeActionId}
-                          group={group}
+                    <div className="px-2 pb-1 pt-2 text-[11px] font-medium text-[color:var(--text-muted)]">
+                      {config.title}
+                    </div>
+                    <div className="space-y-0.5">
+                      {visible.map((entry) => (
+                        <SearchLauncherResultRow
+                          key={entry.id}
+                          active={activeActionId === entry.id}
+                          entry={entry}
                           keyword={trimmedKeyword}
-                          onOpenArticle={(item) => handleOpenQuickLink(item)}
-                          onOpenHeader={(item) => handleOpenQuickLink(item)}
-                          onSelectArticle={(item) =>
-                            activatePanelAction(item.id)
-                          }
-                          onSelectHeader={(item) =>
-                            activatePanelAction(item.id)
-                          }
+                          onMouseEnter={() => activatePanelAction(entry.id)}
                         />
                       ))}
-                    </div>
-                  </SearchLauncherCollectionCard>
-                  <SearchLauncherComingSoonOverlay />
-                </div>
-              ) : null}
-
-              {friendMatches.length ? (
-                <SearchLauncherCollectionCard
-                  countLabel={t(msg`${friendMatches.length} 位联系人`)}
-                  highlighted={
-                    activeFocusContext.panelId === "contactSuggestions"
-                  }
-                  title={t(msg`联系人`)}
-                >
-                  <div className="space-y-1.5">
-                    {friendMatches.map((item) => (
-                      <SearchLauncherCharacterRow
-                        key={`friend-${item.character.id}`}
-                        active={
-                          activeActionId === `friend-${item.character.id}`
-                        }
-                        avatarName={getFriendDisplayName(item)}
-                        avatarSrc={item.character.avatar}
-                        badge={t(msg`联系人`)}
-                        description={buildFriendSuggestionDescription(item, t)}
-                        keyword={trimmedKeyword}
-                        title={getFriendDisplayName(item)}
-                        variant="contact"
-                        onMouseEnter={() =>
-                          activatePanelAction(`friend-${item.character.id}`)
-                        }
-                        onClick={() =>
-                          handleOpenCharacterDetail(item.character.id)
-                        }
-                      />
-                    ))}
-                  </div>
-                </SearchLauncherCollectionCard>
-              ) : null}
-
-              {worldCharacterMatches.length ? (
-                <SearchLauncherCollectionCard
-                  countLabel={t(msg`${worldCharacterMatches.length} 位角色`)}
-                  highlighted={
-                    activeFocusContext.panelId === "worldCharacterSuggestions"
-                  }
-                  title={t(msg`世界角色`)}
-                >
-                  <div className="space-y-1.5">
-                    {worldCharacterMatches.map((item) => (
-                      <SearchLauncherCharacterRow
-                        key={`world-character-${item.character.id}`}
-                        active={
-                          activeActionId ===
-                          `world-character-${item.character.id}`
-                        }
-                        avatarName={item.character.name}
-                        avatarSrc={item.character.avatar}
-                        badge={t(msg`可添加`)}
-                        description={
-                          item.character.relationship?.trim() ||
-                          item.character.currentStatus?.trim() ||
-                          t(msg`打开资料卡后可发起好友申请`)
-                        }
-                        keyword={trimmedKeyword}
-                        title={item.character.name}
-                        variant="worldCharacter"
-                        onMouseEnter={() =>
-                          activatePanelAction(
-                            `world-character-${item.character.id}`,
-                          )
-                        }
-                        onClick={() =>
-                          handleOpenCharacterDetail(item.character.id)
-                        }
-                      />
-                    ))}
-                  </div>
-                </SearchLauncherCollectionCard>
-              ) : null}
-
-              {favoriteMatches.length ? (
-                <SearchLauncherCollectionCard
-                  countLabel={t(msg`${favoriteMatches.length} 条收藏`)}
-                  highlighted={
-                    activeFocusContext.panelId === "favoriteSuggestions"
-                  }
-                  title={t(msg`收藏`)}
-                >
-                  <div className="space-y-1.5">
-                    {favoriteMatches.map((item) => (
-                      <SearchLauncherFeatureRow
-                        key={item.id}
-                        active={activeActionId === item.id}
-                        item={item}
-                        keyword={trimmedKeyword}
-                        variant="favorites"
-                        onMouseEnter={() => activatePanelAction(item.id)}
-                        onClick={() => handleOpenQuickLink(item)}
-                      />
-                    ))}
-                  </div>
-                </SearchLauncherCollectionCard>
-              ) : null}
-
-              {miniProgramMatches.length ? (
-                <div className="relative">
-                  <SearchLauncherCollectionCard
-                    countLabel={t(msg`${miniProgramMatches.length} 个入口`)}
-                    highlighted={
-                      activeFocusContext.panelId === "miniProgramSuggestions"
-                    }
-                    title={t(msg`小程序`)}
-                  >
-                    <div className="space-y-1.5">
-                      {miniProgramMatches.map((item) => (
-                        <SearchLauncherFeatureRow
-                          key={item.id}
-                          active={activeActionId === item.id}
-                          item={item}
-                          keyword={trimmedKeyword}
-                          variant="miniPrograms"
-                          onMouseEnter={() => activatePanelAction(item.id)}
-                          onClick={() => handleOpenQuickLink(item)}
+                      {hasMore ? (
+                        <SearchLauncherViewMoreRow
+                          active={
+                            activeActionId === config.viewMoreActionId
+                          }
+                          label={t(msg`查看更多 ${config.entries.length} 条 ${config.title} →`)}
+                          onMouseEnter={() =>
+                            activatePanelAction(config.viewMoreActionId)
+                          }
+                          onClick={buildViewMoreNavigate(config.category)}
                         />
-                      ))}
+                      ) : null}
                     </div>
-                  </SearchLauncherCollectionCard>
-                  <SearchLauncherComingSoonOverlay />
-                </div>
-              ) : null}
+                  </section>
+                );
+              })}
 
               {!hasSuggestionResults ? (
-                <SearchLauncherStatusCard
-                  action={
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      className="rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 shadow-none hover:bg-[color:var(--surface-card-hover)]"
-                      onClick={() => {
-                        onClose?.();
-                        void navigate({
-                          to: "/desktop/add-friend",
-                          hash: buildDesktopAddFriendRouteHash({
-                            keyword: trimmedKeyword,
-                          }),
-                        });
-                      }}
-                    >
-                      {t(msg`去添加朋友`)}
-                    </Button>
-                  }
-                  description={t(msg`没有直接命中的聊天、联系人、公众号、收藏或小程序，可以继续用搜一搜，或去"添加朋友"里找。`)}
-                  status="empty"
-                  title={t(msg`搜索结果`)}
-                />
+                <div className="px-2 py-3 text-[12px] text-[color:var(--text-muted)]">
+                  {t(msg`没有直接命中的结果，按 Enter 进入完整搜索。`)}
+                </div>
               ) : null}
-            </div>
+            </>
           ) : null}
-        </SearchLauncherSection>
+        </div>
       ) : null}
 
-      {!trimmedKeyword ? (
-        <SearchLauncherSection
-          title={t(msg`快捷访问`)}
-          className="mt-3"
-          highlighted={activeFocusContext.region === "quickAccess"}
-        >
-          <div className="space-y-3">
-            {recentConversations.length ? (
-              <SearchLauncherCollectionCard
-                countLabel={t(msg`${recentConversations.length} 个会话`)}
-                highlighted={
-                  activeFocusContext.panelId === "recentConversations"
-                }
-                title={t(msg`最近聊天`)}
-              >
-                <div className="space-y-2">
-                  {recentConversations.map((item) => (
-                    <SearchLauncherConversationThreadCard
-                      key={item.id}
-                      active={activeActionId === item.id}
-                      item={item}
-                      keyword=""
-                      onMouseEnter={() => activatePanelAction(item.id)}
-                      onClick={() => handleOpenQuickLink(item)}
-                    />
-                  ))}
-                </div>
-              </SearchLauncherCollectionCard>
-            ) : null}
-
-            {recentOfficials.length ? (
-              <div className="relative">
-                <SearchLauncherCollectionCard
-                  countLabel={t(msg`${recentOfficials.length} 个入口`)}
-                  highlighted={activeFocusContext.panelId === "recentOfficials"}
-                  title={t(msg`最近公众号`)}
-                >
-                  <div className="space-y-1.5">
-                    {recentOfficials.map((group) => (
-                      <SearchLauncherOfficialGroupCard
-                        key={group.id}
-                        activeArticleId={activeActionId}
-                        activeHeaderId={activeActionId}
-                        group={group}
-                        keyword=""
-                        onOpenArticle={(item) => handleOpenQuickLink(item)}
-                        onOpenHeader={(item) => handleOpenQuickLink(item)}
-                        onSelectArticle={(item) =>
-                          activatePanelAction(item.id)
-                        }
-                        onSelectHeader={(item) => activatePanelAction(item.id)}
-                      />
-                    ))}
-                  </div>
-                </SearchLauncherCollectionCard>
-                <SearchLauncherComingSoonOverlay />
-              </div>
-            ) : null}
-
-            {recentMiniPrograms.length ? (
-              <div className="relative">
-                <SearchLauncherCollectionCard
-                  countLabel={t(msg`${recentMiniPrograms.length} 个入口`)}
-                  highlighted={
-                    activeFocusContext.panelId === "recentMiniPrograms"
-                  }
-                  title={t(msg`最近使用的小程序`)}
-                >
-                  <div className="space-y-1.5">
-                    {recentMiniPrograms.map((item) => (
-                      <SearchLauncherFeatureRow
-                        key={item.id}
-                        active={activeActionId === item.id}
-                        item={item}
-                        keyword=""
-                        variant="miniPrograms"
-                        onMouseEnter={() => activatePanelAction(item.id)}
-                        onClick={() => handleOpenQuickLink(item)}
-                      />
-                    ))}
-                  </div>
-                </SearchLauncherCollectionCard>
-                <SearchLauncherComingSoonOverlay />
-              </div>
-            ) : null}
-
-            {favoritesLoading ? (
-              <SearchLauncherCollectionCard
-                highlighted={activeFocusContext.panelId === "recentFavorites"}
-                title={t(msg`最近收藏`)}
-              >
-                <div className="rounded-[12px] bg-white px-3 py-3 text-xs leading-6 text-[color:var(--text-muted)]">
-                  {t(msg`正在同步最近收藏...`)}
-                </div>
-              </SearchLauncherCollectionCard>
-            ) : null}
-
-            {!favoritesLoading && recentFavorites.length ? (
-              <SearchLauncherCollectionCard
-                countLabel={t(msg`${recentFavorites.length} 条收藏`)}
-                highlighted={activeFocusContext.panelId === "recentFavorites"}
-                title={t(msg`最近收藏`)}
-              >
-                <div className="space-y-1.5">
-                  {recentFavorites.map((item) => (
-                    <SearchLauncherFeatureRow
-                      key={item.id}
-                      active={activeActionId === item.id}
-                      item={item}
-                      keyword=""
-                      variant="favorites"
-                      onMouseEnter={() => activatePanelAction(item.id)}
-                      onClick={() => handleOpenQuickLink(item)}
-                    />
-                  ))}
-                </div>
-              </SearchLauncherCollectionCard>
-            ) : null}
+      {history.length ? (
+        <section className="mt-1">
+          <div className="px-2 pb-1 pt-2 text-[11px] font-medium text-[color:var(--text-muted)]">
+            {t(msg`搜索历史`)}
           </div>
-        </SearchLauncherSection>
-      ) : null}
-
-      <SearchLauncherSection
-        title={t(msg`历史搜索`)}
-        className="mt-3"
-        highlighted={activeFocusContext.region === "history"}
-      >
-        <SearchLauncherCollectionCard
-          countLabel={history.length ? t(msg`${history.length} 条记录`) : undefined}
-          highlighted={activeFocusContext.region === "history"}
-          title={t(msg`最近搜索`)}
-        >
-          {history.length ? (
-            <div className="space-y-1.5">
-              {history.map((item) => (
+          <div className="space-y-0.5">
+            {history.map((item) => {
+              const actionId = buildSearchLauncherHistoryActionId(item.keyword);
+              const active = activeActionId === actionId;
+              return (
                 <button
                   key={item.keyword}
                   type="button"
                   onClick={() => onOpenSearch(item.keyword)}
-                  onMouseEnter={() =>
-                    activatePanelAction(
-                      buildSearchLauncherHistoryActionId(item.keyword),
-                    )
-                  }
+                  onMouseEnter={() => activatePanelAction(actionId)}
                   className={cn(
-                    "flex w-full items-center gap-2.5 rounded-[12px] bg-white px-3 py-2.5 text-left text-sm transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
-                    activeActionId ===
-                      buildSearchLauncherHistoryActionId(item.keyword)
-                      ? "text-[color:var(--text-primary)] shadow-[0_8px_18px_rgba(15,23,42,0.06)]"
-                      : "text-[color:var(--text-secondary)] hover:bg-[rgba(7,193,96,0.04)] hover:text-[color:var(--text-primary)]",
+                    "flex w-full items-center gap-2.5 rounded-[8px] px-2 py-2 text-left text-[13px] transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
+                    active
+                      ? "bg-[color:var(--surface-console)] text-[color:var(--text-primary)]"
+                      : "text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]",
                   )}
                 >
                   <Clock3
-                    size={14}
+                    size={13}
                     className="shrink-0 text-[color:var(--text-dim)]"
                   />
                   <span className="truncate">
                     {renderHighlightedText(item.keyword, trimmedKeyword)}
                   </span>
                 </button>
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-[12px] bg-white px-3 py-3 text-xs leading-6 text-[color:var(--text-muted)]">
-              {t(msg`进入搜一搜并完成一次搜索后，历史关键词会出现在这里。`)}
-            </div>
-          )}
-        </SearchLauncherCollectionCard>
-      </SearchLauncherSection>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }
 
-function SearchLauncherSection({
-  children,
-  className,
-  highlighted = false,
-  title,
+function SearchLauncherResultRow({
+  active,
+  entry,
+  keyword,
+  onMouseEnter,
 }: {
-  children: ReactNode;
-  className?: string;
-  highlighted?: boolean;
-  title: string;
+  active: boolean;
+  entry: LauncherResultEntry;
+  keyword: string;
+  onMouseEnter?: () => void;
 }) {
-  const t = useRuntimeTranslator();
   return (
-    <section className={className}>
-      <div className="mb-2 flex items-center justify-between px-1">
-        <span
-          className={cn(
-            "text-[11px] font-medium",
-            highlighted
-              ? "text-[color:var(--brand-primary)]"
-              : "text-[color:var(--text-primary)]",
-          )}
-        >
-          {title}
-        </span>
-        {highlighted ? (
-          <span className="rounded-full bg-[rgba(7,193,96,0.08)] px-2 py-0.5 text-[10px] text-[color:var(--brand-primary)]">
-            {t(msg`当前定位`)}
-          </span>
+    <button
+      type="button"
+      onClick={entry.onSelect}
+      onMouseEnter={onMouseEnter}
+      className={cn(
+        "flex w-full items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
+        active
+          ? "bg-[color:var(--surface-console)]"
+          : "hover:bg-[color:var(--surface-console)]",
+      )}
+    >
+      <AvatarChip name={entry.avatarName} src={entry.avatarSrc} size="sm" />
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
+          {renderHighlightedText(entry.title, keyword)}
+        </div>
+        {entry.description ? (
+          <div className="mt-0.5 truncate text-[12px] text-[color:var(--text-muted)]">
+            {renderHighlightedText(entry.description, keyword)}
+          </div>
         ) : null}
       </div>
-      {children}
-    </section>
+    </button>
   );
 }
 
-function SearchLauncherFocusStrip({
-  keyword,
-  layer,
-  panelTitle,
-  region,
-}: {
-  keyword: string;
-  layer: SearchLauncherNavigationLayer;
-  panelTitle: string;
-  region: SearchLauncherFocusRegion;
-}) {
-  const t = useRuntimeTranslator();
-  const regionLabel = t(searchLauncherFocusRegionLabels[region]);
-  const toneClassName =
-    region === "input"
-      ? "bg-[rgba(7,193,96,0.10)] text-[color:var(--brand-primary)]"
-      : region === "suggestions"
-        ? "bg-[rgba(59,130,246,0.10)] text-[#1d4ed8]"
-        : region === "quickAccess"
-          ? "bg-[rgba(15,118,110,0.10)] text-[#226448]"
-          : "bg-[rgba(180,132,23,0.10)] text-[#9a6b12]";
-  const description =
-    layer === "input"
-      ? keyword
-        ? t(msg`当前位于搜索框，按 Tab 进入结果层，按 Enter 执行搜索"${keyword}"，按 Esc 关闭下拉。`)
-        : t(msg`当前位于搜索框，继续输入关键词，或按 Tab 进入结果层；按 Enter 执行搜索，按 Esc 关闭下拉。`)
-      : region === "history"
-        ? t(msg`当前位于最近搜索，按 Tab / ↑ ↓ 切换当前项，按 Enter 打开当前项，按 Shift+Tab 或 Esc 回搜索框。`)
-        : t(msg`当前位于${panelTitle}，按 Tab / ↑ ↓ 切换当前项，按 Enter 打开当前项，按 Shift+Tab 或 Esc 回搜索框。`);
-  const keyboardHint =
-    layer === "input"
-      ? t(msg`Tab 进入结果层 · Enter 执行搜索 · Esc 关闭`)
-      : t(msg`Tab / ↑ ↓ 切换当前项 · Enter 打开当前项 · Shift+Tab / Esc 回搜索框`);
-
-  return (
-    <section className="mt-2 rounded-[16px] border border-[rgba(7,193,96,0.14)] bg-[rgba(247,250,250,0.94)] px-3.5 py-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[10px] font-medium text-[color:var(--brand-primary)]">
-          {t(msg`搜索上下文`)}
-        </span>
-        <span
-          className={cn(
-            "rounded-full px-2.5 py-1 text-[10px] font-medium",
-            toneClassName,
-          )}
-        >
-          {regionLabel}
-        </span>
-        <span className="rounded-full bg-white px-2.5 py-1 text-[10px] text-[color:var(--text-muted)]">
-          {panelTitle}
-        </span>
-      </div>
-      <div className="mt-2 text-[11px] leading-5 text-[color:var(--text-secondary)]">
-        {description}
-      </div>
-      <div className="mt-2 inline-flex items-center rounded-full bg-white px-2.5 py-1 text-[10px] text-[color:var(--text-muted)]">
-        {keyboardHint}
-      </div>
-    </section>
-  );
-}
-
-function SearchLauncherHeroCard({
+function SearchLauncherViewMoreRow({
   active,
-  keyword,
+  label,
   onClick,
   onMouseEnter,
 }: {
   active: boolean;
-  keyword: string;
+  label: string;
   onClick: () => void;
   onMouseEnter?: () => void;
 }) {
-  const t = useRuntimeTranslator();
   return (
     <button
       type="button"
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       className={cn(
-        "w-full overflow-hidden rounded-[18px] border text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
+        "flex w-full items-center justify-between gap-2 rounded-[8px] px-2 py-1.5 text-left text-[12px] transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
         active
-          ? "border-[#cfe4d2] bg-[linear-gradient(135deg,rgba(7,193,96,0.18),rgba(7,193,96,0.08)_45%,white)]"
-          : "border-[#dce9dd] bg-[linear-gradient(135deg,rgba(7,193,96,0.14),rgba(7,193,96,0.05)_45%,white)] hover:border-[#cfe4d2] hover:bg-[linear-gradient(135deg,rgba(7,193,96,0.18),rgba(7,193,96,0.08)_45%,white)]",
+          ? "bg-[color:var(--surface-console)] text-[color:var(--text-primary)]"
+          : "text-[color:var(--text-muted)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]",
       )}
     >
-      <div className="flex items-start gap-3 px-4 py-4">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-white text-[color:var(--brand-primary)] shadow-[0_8px_18px_rgba(7,193,96,0.10)]">
-          <Search size={17} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-sm font-medium text-[color:var(--text-primary)]">
-              {t(msg`搜一搜`)}
-            </div>
-            <div className="shrink-0 rounded-full bg-white/90 px-2.5 py-1 text-[10px] text-[color:var(--text-muted)]">
-              Enter
-            </div>
-          </div>
-          <div className="mt-1 text-[11px] leading-5 text-[color:var(--text-secondary)]">
-            {keyword
-              ? t(msg`执行搜索"${keyword}"，进入完整结果页继续查看。`)
-              : t(msg`执行一次全局搜索，进入完整结果页后继续按分类查看。`)}
-          </div>
-        </div>
-      </div>
-      <div className="border-t border-white/80 px-4 py-2.5">
-        <div className="flex items-center justify-between gap-3 text-[11px] text-[color:var(--text-muted)]">
-          <span>
-            {keyword
-              ? t(msg`Enter 执行搜索 · Tab 进入结果层`)
-              : t(msg`Tab 进入结果层 · 支持聊天、联系人、公众号、收藏和小程序`)}
-          </span>
-          <CornerDownLeft size={14} className="shrink-0" />
-        </div>
-      </div>
+      <span className="truncate">{label}</span>
+      <ChevronRight size={12} className="shrink-0" />
     </button>
   );
 }
@@ -1986,468 +1399,6 @@ function SearchLauncherStatusCard({
   );
 }
 
-function SearchLauncherCollectionCard({
-  children,
-  countLabel,
-  highlighted = false,
-  title,
-}: {
-  children: ReactNode;
-  countLabel?: string;
-  highlighted?: boolean;
-  title: string;
-}) {
-  return (
-    <section
-      className={cn(
-        "rounded-[18px] border p-3.5 transition-[border-color,box-shadow,background]",
-        highlighted
-          ? "border-[rgba(7,193,96,0.16)] bg-[linear-gradient(180deg,rgba(7,193,96,0.08),rgba(7,193,96,0.03)_40%,white)] shadow-[0_12px_28px_rgba(7,193,96,0.08)]"
-          : "border-[color:var(--border-faint)] bg-[color:var(--surface-console)]",
-      )}
-    >
-      <div className="flex items-center justify-between gap-3 px-0.5">
-        <div className="text-[11px] font-medium text-[color:var(--text-primary)]">
-          {title}
-        </div>
-        {countLabel ? (
-          <div className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[10px] text-[color:var(--text-muted)]">
-            {countLabel}
-          </div>
-        ) : null}
-      </div>
-      <div className="mt-2.5">{children}</div>
-    </section>
-  );
-}
-
-function SearchLauncherConversationGroupCard({
-  activeHeaderId,
-  activeMessageId,
-  group,
-  keyword,
-  onOpenHeader,
-  onOpenMessage,
-  onSelectHeader,
-  onSelectMessage,
-}: {
-  activeHeaderId: string;
-  activeMessageId: string;
-  group: SearchLauncherConversationGroup;
-  keyword: string;
-  onOpenHeader: (item: DesktopSearchQuickLink) => void;
-  onOpenMessage: (item: DesktopSearchQuickLink) => void;
-  onSelectHeader: (item: DesktopSearchQuickLink) => void;
-  onSelectMessage: (item: DesktopSearchQuickLink) => void;
-}) {
-  const t = useRuntimeTranslator();
-  const headerActive = activeHeaderId === group.header.id;
-
-  return (
-    <section className="overflow-hidden rounded-[16px] border border-[#dde8dc] bg-[linear-gradient(180deg,#f9fcfa,white)]">
-      <button
-        type="button"
-        onClick={() => onOpenHeader(group.header)}
-        onMouseEnter={() => onSelectHeader(group.header)}
-        className={cn(
-          "flex w-full items-start gap-3 px-3.5 py-3 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
-          headerActive
-            ? "bg-[rgba(7,193,96,0.06)]"
-            : "hover:bg-[rgba(7,193,96,0.04)]",
-        )}
-      >
-        <AvatarChip
-          name={group.header.avatarName ?? group.header.title}
-          src={group.header.avatarSrc}
-          size="wechat"
-        />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="truncate text-sm font-medium text-[color:var(--text-primary)]">
-              {renderHighlightedText(group.header.title, keyword)}
-            </span>
-            <span className="rounded-full bg-[rgba(7,193,96,0.08)] px-2 py-0.5 text-[10px] text-[color:var(--brand-primary)]">
-              {group.header.badge}
-            </span>
-          </div>
-          <div className="mt-1 truncate text-[11px] text-[color:var(--text-muted)]">
-            {renderHighlightedText(group.header.meta, keyword)}
-          </div>
-          <div className="mt-2 line-clamp-2 text-[11px] leading-5 text-[color:var(--text-secondary)]">
-            {renderHighlightedText(group.header.description, keyword)}
-          </div>
-        </div>
-        <div className="shrink-0 rounded-full bg-[rgba(7,193,96,0.10)] px-2.5 py-1 text-[10px] text-[color:var(--brand-primary)]">
-          {t(msg`${group.totalHits} 条相关记录`)}
-        </div>
-      </button>
-
-      <div className="border-t border-[color:var(--border-faint)] px-3.5 py-2.5">
-        <div className="space-y-2">
-          {group.messages.map((item) => {
-            const active = activeMessageId === item.id;
-
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => onOpenMessage(item)}
-                onMouseEnter={() => onSelectMessage(item)}
-                className={cn(
-                  "flex w-full items-start gap-3 rounded-[12px] px-3 py-2.5 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
-                  active
-                    ? "bg-[rgba(7,193,96,0.06)]"
-                    : "bg-white hover:bg-[rgba(7,193,96,0.04)]",
-                )}
-              >
-                <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-[rgba(7,193,96,0.10)] text-[#15803d]">
-                  <MessageSquareText size={15} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="line-clamp-2 text-[11px] leading-5 text-[color:var(--text-secondary)]">
-                    {renderHighlightedText(item.description, keyword)}
-                  </div>
-                  <div className="mt-1 truncate text-[11px] text-[color:var(--text-muted)]">
-                    {renderHighlightedText(item.meta, keyword)}
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SearchLauncherConversationThreadCard({
-  active = false,
-  item,
-  keyword,
-  onMouseEnter,
-  onClick,
-}: {
-  active?: boolean;
-  item: DesktopSearchQuickLink;
-  keyword: string;
-  onMouseEnter?: () => void;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      className={cn(
-        "w-full overflow-hidden rounded-[16px] border text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
-        active
-          ? "border-[#d6e7d6] bg-[linear-gradient(180deg,#f6fbf6,white)]"
-          : "border-[#e3ece3] bg-[linear-gradient(180deg,#fbfdfb,white)] hover:border-[#d6e7d6] hover:bg-[linear-gradient(180deg,#f6fbf6,white)]",
-      )}
-    >
-      <div className="flex items-start gap-3 px-3.5 py-3">
-        <AvatarChip
-          name={item.avatarName ?? item.title}
-          src={item.avatarSrc}
-          size="wechat"
-        />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="truncate text-sm font-medium text-[color:var(--text-primary)]">
-              {renderHighlightedText(item.title, keyword)}
-            </span>
-            <span className="rounded-full bg-[rgba(7,193,96,0.08)] px-2 py-0.5 text-[10px] text-[color:var(--brand-primary)]">
-              {item.badge}
-            </span>
-          </div>
-          <div className="mt-1 truncate text-[11px] text-[color:var(--text-muted)]">
-            {renderHighlightedText(item.meta, keyword)}
-          </div>
-        </div>
-        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(7,193,96,0.10)] text-[#15803d]">
-          <MessageSquareText size={15} />
-        </div>
-      </div>
-
-      <div className="border-t border-[color:var(--border-faint)] px-3.5 py-2.5">
-        <div className="rounded-[12px] bg-white px-3 py-2.5">
-          <div className="line-clamp-2 text-[11px] leading-5 text-[color:var(--text-secondary)]">
-            {renderHighlightedText(item.description, keyword)}
-          </div>
-        </div>
-      </div>
-    </button>
-  );
-}
-
-function SearchLauncherOfficialGroupCard({
-  activeArticleId,
-  activeHeaderId,
-  group,
-  keyword,
-  onOpenArticle,
-  onOpenHeader,
-  onSelectArticle,
-  onSelectHeader,
-}: {
-  activeArticleId: string;
-  activeHeaderId: string;
-  group: SearchLauncherOfficialGroup;
-  keyword: string;
-  onOpenArticle: (item: DesktopSearchQuickLink) => void;
-  onOpenHeader: (item: DesktopSearchQuickLink) => void;
-  onSelectArticle: (item: DesktopSearchQuickLink) => void;
-  onSelectHeader: (item: DesktopSearchQuickLink) => void;
-}) {
-  const headerActive = activeHeaderId === group.header.id;
-  const articleActive = group.article
-    ? activeArticleId === group.article.id
-    : false;
-
-  return (
-    <section className="overflow-hidden rounded-[16px] border border-[#dfe7dd] bg-[linear-gradient(180deg,#fbfdfb,white)]">
-      <button
-        type="button"
-        onClick={() => onOpenHeader(group.header)}
-        onMouseEnter={() => onSelectHeader(group.header)}
-        className={cn(
-          "flex w-full items-start gap-3 px-3.5 py-3 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
-          headerActive
-            ? "bg-[rgba(7,193,96,0.06)]"
-            : "hover:bg-[rgba(7,193,96,0.04)]",
-        )}
-      >
-        <AvatarChip
-          name={group.header.avatarName ?? group.header.title}
-          src={group.header.avatarSrc}
-          size="wechat"
-        />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="truncate text-sm font-medium text-[color:var(--text-primary)]">
-              {renderHighlightedText(group.header.title, keyword)}
-            </span>
-            <span className="rounded-full bg-[rgba(15,23,42,0.06)] px-2 py-0.5 text-[10px] text-[color:var(--text-secondary)]">
-              {group.header.badge}
-            </span>
-          </div>
-          <div className="mt-1 truncate text-[11px] text-[color:var(--text-muted)]">
-            {renderHighlightedText(group.header.meta, keyword)}
-          </div>
-          <div className="mt-2 line-clamp-2 text-[11px] leading-5 text-[color:var(--text-secondary)]">
-            {renderHighlightedText(group.header.description, keyword)}
-          </div>
-        </div>
-        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(7,193,96,0.10)] text-[#1d6a37]">
-          <Newspaper size={15} />
-        </div>
-      </button>
-
-      {group.article ? (
-        <div className="border-t border-[color:var(--border-faint)] px-3.5 py-2.5">
-          <button
-            type="button"
-            onClick={() => onOpenArticle(group.article!)}
-            onMouseEnter={() => onSelectArticle(group.article!)}
-            className={cn(
-              "flex w-full items-start gap-3 rounded-[12px] px-3 py-2.5 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
-              articleActive
-                ? "bg-[rgba(7,193,96,0.06)]"
-                : "bg-white hover:bg-[rgba(7,193,96,0.04)]",
-            )}
-          >
-            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] bg-[rgba(7,193,96,0.10)] text-[#1d6a37]">
-              <Newspaper size={15} />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
-                {renderHighlightedText(group.article.title, keyword)}
-              </div>
-              <div className="mt-1 truncate text-[11px] text-[color:var(--text-muted)]">
-                {renderHighlightedText(group.article.meta, keyword)}
-              </div>
-              <div className="mt-2 line-clamp-2 text-[11px] leading-5 text-[color:var(--text-secondary)]">
-                {renderHighlightedText(group.article.description, keyword)}
-              </div>
-            </div>
-          </button>
-        </div>
-      ) : null}
-    </section>
-  );
-}
-
-function SearchLauncherCharacterRow({
-  active = false,
-  avatarName,
-  avatarSrc,
-  badge,
-  description,
-  keyword,
-  onMouseEnter,
-  onClick,
-  title,
-  variant,
-}: {
-  active?: boolean;
-  avatarName: string;
-  avatarSrc?: string | null;
-  badge: string;
-  description: string;
-  keyword: string;
-  onMouseEnter?: () => void;
-  onClick: () => void;
-  title: string;
-  variant: "contact" | "worldCharacter";
-}) {
-  const toneClassName =
-    variant === "contact"
-      ? active
-        ? "border-[#cfe0cf] bg-[linear-gradient(180deg,#f5fbf6,white)]"
-        : "border-[#d9e7d9] bg-[linear-gradient(180deg,#f9fcfa,white)] hover:border-[#cfe0cf] hover:bg-[linear-gradient(180deg,#f5fbf6,white)]"
-      : active
-        ? "border-[#e7e0c8] bg-[linear-gradient(180deg,#fffaf0,white)]"
-        : "border-[#eee6ce] bg-[linear-gradient(180deg,#fffdf7,white)] hover:border-[#e7e0c8] hover:bg-[linear-gradient(180deg,#fffaf0,white)]";
-  const badgeClassName =
-    variant === "contact"
-      ? "bg-[rgba(7,193,96,0.08)] text-[color:var(--brand-primary)]"
-      : "bg-[rgba(180,132,23,0.10)] text-[#9a6b12]";
-  const metaTextClassName =
-    variant === "contact" ? "text-[color:var(--text-muted)]" : "text-[#8a6a24]";
-  const iconClassName =
-    variant === "contact"
-      ? "bg-[rgba(7,193,96,0.10)] text-[#15803d]"
-      : "bg-[rgba(180,132,23,0.12)] text-[#a16207]";
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      className={cn(
-        "flex w-full items-center gap-3 rounded-[14px] border px-3.5 py-3 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
-        toneClassName,
-      )}
-    >
-      <AvatarChip name={avatarName} src={avatarSrc} size="wechat" />
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <span className="truncate text-sm font-medium text-[color:var(--text-primary)]">
-            {renderHighlightedText(title, keyword)}
-          </span>
-          <span
-            className={cn(
-              "rounded-full px-2 py-0.5 text-[10px]",
-              badgeClassName,
-            )}
-          >
-            {badge}
-          </span>
-        </div>
-        <div className={cn("mt-1 truncate text-[11px]", metaTextClassName)}>
-          {renderHighlightedText(description, keyword)}
-        </div>
-      </div>
-      <div
-        className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-          iconClassName,
-        )}
-      >
-        {variant === "contact" ? (
-          <UsersRound size={15} />
-        ) : (
-          <Sparkles size={15} />
-        )}
-      </div>
-    </button>
-  );
-}
-
-function SearchLauncherFeatureRow({
-  active = false,
-  item,
-  keyword,
-  onMouseEnter,
-  onClick,
-  variant,
-}: {
-  active?: boolean;
-  item: DesktopSearchQuickLink;
-  keyword: string;
-  onMouseEnter?: () => void;
-  onClick: () => void;
-  variant: "favorites" | "miniPrograms";
-}) {
-  const toneClassName =
-    variant === "favorites"
-      ? active
-        ? "border-[#e7d8ad] bg-[linear-gradient(180deg,#fff9ee,white)]"
-        : "border-[#efe2bf] bg-[linear-gradient(180deg,#fffdf7,white)] hover:border-[#e7d8ad] hover:bg-[linear-gradient(180deg,#fff9ee,white)]"
-      : active
-        ? "border-[#cfe2d8] bg-[linear-gradient(180deg,#f5faf7,white)]"
-        : "border-[#d8e7df] bg-[linear-gradient(180deg,#f7fbf9,white)] hover:border-[#cfe2d8] hover:bg-[linear-gradient(180deg,#f5faf7,white)]";
-  const badgeClassName =
-    variant === "favorites"
-      ? "bg-[rgba(180,132,23,0.10)] text-[#9a6b12]"
-      : "bg-[rgba(15,118,110,0.10)] text-[#226448]";
-  const iconClassName =
-    variant === "favorites"
-      ? "bg-[rgba(180,132,23,0.12)] text-[#a16207]"
-      : "bg-[rgba(15,118,110,0.12)] text-[#0f766e]";
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      className={cn(
-        "flex w-full items-start gap-3 rounded-[14px] border px-3.5 py-3 text-left transition-colors duration-[var(--motion-fast)] ease-[var(--ease-standard)]",
-        toneClassName,
-      )}
-    >
-      <AvatarChip
-        name={item.avatarName ?? item.title}
-        src={item.avatarSrc}
-        size="wechat"
-      />
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <span className="truncate text-sm font-medium text-[color:var(--text-primary)]">
-            {renderHighlightedText(item.title, keyword)}
-          </span>
-          <span
-            className={cn(
-              "rounded-full px-2 py-0.5 text-[10px]",
-              badgeClassName,
-            )}
-          >
-            {item.badge}
-          </span>
-        </div>
-        <div className="mt-1 truncate text-[11px] text-[color:var(--text-muted)]">
-          {renderHighlightedText(item.meta, keyword)}
-        </div>
-        <div className="mt-2 line-clamp-2 text-[11px] leading-5 text-[color:var(--text-secondary)]">
-          {renderHighlightedText(item.description, keyword)}
-        </div>
-      </div>
-      <div
-        className={cn(
-          "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-          iconClassName,
-        )}
-      >
-        {variant === "favorites" ? (
-          <Bookmark size={15} />
-        ) : (
-          <Blocks size={15} />
-        )}
-      </div>
-    </button>
-  );
-}
-
 function buildFriendSuggestionDescription(
   item: FriendDirectoryItem,
   t: (descriptor: MessageDescriptor) => string,
@@ -2476,18 +1427,3 @@ function matchesLauncherQuickLink(
     .includes(keyword);
 }
 
-function SearchLauncherComingSoonOverlay() {
-  const t = useRuntimeTranslator();
-  return (
-    <div className="pointer-events-auto absolute inset-0 z-30 flex items-center justify-center rounded-[16px] bg-black/30 backdrop-blur-[3px]">
-      <div className="rounded-[14px] border border-[color:var(--border-faint)] bg-white/95 px-4 py-3 text-center shadow-[var(--shadow-card)]">
-        <div className="text-[13px] font-semibold text-[color:var(--text-primary)]">
-          {t(msg`功能开发中`)}
-        </div>
-        <div className="mt-1 text-[11px] text-[color:var(--text-secondary)]">
-          {t(msg`敬请期待`)}
-        </div>
-      </div>
-    </div>
-  );
-}

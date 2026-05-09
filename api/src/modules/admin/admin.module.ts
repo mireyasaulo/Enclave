@@ -44,6 +44,7 @@ import { WikiModule } from '../wiki/wiki.module';
 import { CharacterPageEntity } from '../wiki/entities/character-page.entity';
 import { CharacterRevisionEntity } from '../wiki/entities/character-revision.entity';
 import { WikiSyncAdminService } from './wiki-sync-admin.service';
+import { CloudRuntimeModule } from '../cloud-runtime/cloud-runtime.module';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { WikiSyncAdminService } from './wiki-sync-admin.service';
     ReminderRuntimeModule,
     SelfAgentModule,
     WikiModule,
+    CloudRuntimeModule,
     TypeOrmModule.forFeature([
       UserEntity,
       CharacterEntity,

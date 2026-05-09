@@ -40,7 +40,12 @@ export function ConversationStrongReminderHost() {
     queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
     enabled: Boolean(baseUrl),
-    refetchInterval: 10_000,
+    // 强提醒只是壳层装饰性的提示气泡，没必要每 10s 拉，30s + window focus
+    // 已经够用；公网隧道下减少冗余请求。chat-list / desktop-chat-workspace
+    // 的 socket 监听本来就会 invalidate 同一个 query。
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
+    staleTime: 15_000,
   });
 
   const directConversations = useMemo(

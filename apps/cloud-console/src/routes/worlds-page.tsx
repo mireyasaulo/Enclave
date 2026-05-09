@@ -9,6 +9,7 @@ import type {
 import {
   compareByLocale,
   formatDateTime as formatLocaleDateTime,
+  useAppLocale,
 } from "@yinjie/i18n";
 import {
   CloudAdminErrorBlock,
@@ -21,12 +22,6 @@ import { copyTextToClipboard } from "../lib/clipboard";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import { translateCloudConsoleTextForActiveLocale,
   useCloudConsoleText } from "../lib/cloud-console-i18n";
-import {
-  MetricCard,
-  MetricCardGrid,
-  PageHeader,
-  SurfaceCard,
-} from "../components/ui";
 import {
   createRequestScopedNotice,
   showRequestScopedNotice,
@@ -96,14 +91,6 @@ function getAttentionLabel(item: CloudWorldAttentionItem) {
     default:
       return translateCloudConsoleTextForActiveLocale("Attention");
   }
-}
-
-function getMetricTone(value: number) {
-  if (value > 0) {
-    return "text-[color:var(--text-primary)]";
-  }
-
-  return "text-[color:var(--text-secondary)]";
 }
 
 function getHealthBucket(status?: string | null): HealthFilter {
@@ -213,36 +200,6 @@ function includesNormalizedQuery(
   );
 }
 
-function matchesWorldQuery(
-  item: {
-    id: string;
-    name: string;
-    phone: string;
-    email?: string | null;
-    ownerDisplayName?: string | null;
-    status: string;
-    healthStatus?: string | null;
-    apiBaseUrl?: string | null;
-    adminUrl?: string | null;
-  },
-  query: string,
-) {
-  return includesNormalizedQuery(
-    [
-      item.id,
-      item.name,
-      item.phone,
-      item.email,
-      item.ownerDisplayName,
-      item.status,
-      item.healthStatus,
-      item.apiBaseUrl,
-      item.adminUrl,
-    ],
-    query,
-  );
-}
-
 function matchesInstanceFleetQuery(
   item: CloudWorldInstanceFleetItem,
   query: string,
@@ -287,6 +244,7 @@ type QuickActionConfirmState = {
 
 export function WorldsPage() {
   const t = useCloudConsoleText();
+  const { locale } = useAppLocale();
   const navigate = useNavigate({ from: "/worlds" });
   const filters = useSearch({ from: "/worlds" });
   const queryClient = useQueryClient();
@@ -323,13 +281,6 @@ export function WorldsPage() {
     );
   }
 
-  const worldsQuery = useQuery({
-    queryKey: ["cloud-console", "worlds", statusFilter],
-    queryFn: () =>
-      cloudAdminApi.listWorlds(
-        statusFilter === "all" ? undefined : statusFilter,
-      ),
-  });
   const instanceFleetQuery = useQuery({
     queryKey: ["cloud-console", "instances", statusFilter],
     queryFn: () =>
@@ -441,14 +392,6 @@ export function WorldsPage() {
     queryFilter,
   ]);
 
-  const filteredWorlds = useMemo(
-    () =>
-      (worldsQuery.data ?? []).filter((item) =>
-        matchesWorldQuery(item, queryFilter),
-      ),
-    [queryFilter, worldsQuery.data],
-  );
-
   const fleetMetrics = useMemo(() => {
     const items = filteredInstanceFleet;
     return {
@@ -494,151 +437,17 @@ export function WorldsPage() {
     },
   });
   const activeConfirm = confirmAction
-    ? createWorldActionConfirmationCopy(confirmAction.action, {
-        name: confirmAction.worldName,
-      })
+    ? createWorldActionConfirmationCopy(
+        confirmAction.action,
+        { name: confirmAction.worldName },
+        locale,
+      )
     : null;
 
   return (
     <div className="space-y-5">
-      <SurfaceCard>
-        <PageHeader
-          title={t("World drift summary")}
-          subtitle="This panel folds together runtime heartbeat freshness, provider-observed drift, and queued recovery jobs."
-          meta={`Updated ${formatDateTime(driftSummaryQuery.data?.generatedAt)}`}
-        />
-
-        <MetricCardGrid cols={4}>
-          <MetricCard
-            label={t("Attention worlds")}
-            value={driftSummaryQuery.data?.attentionWorlds ?? 0}
-            description={t("Worlds that currently need operator attention.")}
-            valueClassName={getMetricTone(
-              driftSummaryQuery.data?.attentionWorlds ?? 0,
-            )}
-          />
-          <MetricCard
-            label={t("Critical alerts")}
-            value={driftSummaryQuery.data?.criticalAttentionWorlds ?? 0}
-            description="Worlds already in critical state, including failed and escalated alerts."
-            valueClassName={getMetricTone(
-              driftSummaryQuery.data?.criticalAttentionWorlds ?? 0,
-            )}
-          />
-          <MetricCard
-            label={t("Escalated worlds")}
-            value={driftSummaryQuery.data?.escalatedWorlds ?? 0}
-            description="Alerts upgraded because retry or stale-heartbeat thresholds were crossed."
-            valueClassName={getMetricTone(
-              driftSummaryQuery.data?.escalatedWorlds ?? 0,
-            )}
-          />
-          <MetricCard
-            label={t("Recovery queued")}
-            value={driftSummaryQuery.data?.recoveryQueuedWorlds ?? 0}
-            description="Worlds that already have active `resume` or `provision` work in flight."
-            valueClassName={getMetricTone(
-              driftSummaryQuery.data?.recoveryQueuedWorlds ?? 0,
-            )}
-          />
-        </MetricCardGrid>
-
-        <MetricCardGrid cols={2} className="mt-3" compact>
-          <MetricCard
-            label={t("Heartbeat stale")}
-            value={driftSummaryQuery.data?.heartbeatStaleWorlds ?? 0}
-            description={t(
-              "Runtime is not checking in within the configured stale window.",
-            )}
-            valueClassName={getMetricTone(
-              driftSummaryQuery.data?.heartbeatStaleWorlds ?? 0,
-            )}
-          />
-          <MetricCard
-            label={t("Provider drift")}
-            value={driftSummaryQuery.data?.providerDriftWorlds ?? 0}
-            description="Provider reports power state that disagrees with desired world state."
-            valueClassName={getMetricTone(
-              driftSummaryQuery.data?.providerDriftWorlds ?? 0,
-            )}
-          />
-        </MetricCardGrid>
-
-        <div className="mt-5 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-          <div className="text-sm font-medium text-[color:var(--text-primary)]">
-            {t("Top attention items")}
-          </div>
-          <div className="mt-3 space-y-3">
-            {(driftSummaryQuery.data?.attentionItems ?? [])
-              .slice(0, 6)
-              .map((item) => (
-                <div
-                  key={item.worldId}
-                  className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Link
-                        to="/worlds/$worldId"
-                        params={{ worldId: item.worldId }}
-                        className="text-sm font-medium text-[color:var(--text-primary)] hover:underline"
-                      >
-                        {item.worldName}
-                      </Link>
-                      <span
-                        className={`rounded-full border px-2 py-1 text-[11px] uppercase tracking-[0.18em] ${getAttentionTone(item.severity)}`}
-                      >
-                        {getAttentionLabel(item)}
-                      </span>
-                      {item.escalated ? (
-                        <span className="rounded-full border border-rose-300/60 bg-rose-50 px-2 py-1 text-[11px] uppercase tracking-[0.18em] text-rose-700">
-                          {t("Escalated")}
-                        </span>
-                      ) : null}
-                    </div>
-                    <div className="mt-2 text-sm text-[color:var(--text-secondary)]">
-                      {item.message}
-                    </div>
-                    <div className="mt-2 text-xs text-[color:var(--text-muted)]">
-                      Retry count {item.retryCount}
-                      {typeof item.staleHeartbeatSeconds === "number"
-                        ? ` • stale ${item.staleHeartbeatSeconds}s`
-                        : ""}
-                    </div>
-                  </div>
-                  <div className="text-right text-xs text-[color:var(--text-muted)]">
-                    <div>{item.phone}</div>
-                    <div className="mt-1 uppercase tracking-[0.18em]">
-                      {item.worldStatus}
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-            {driftSummaryQuery.isLoading ? (
-              <div className="text-sm text-[color:var(--text-muted)]">
-                {t("Loading drift summary...")}
-              </div>
-            ) : null}
-
-            {driftSummaryQuery.isError &&
-            driftSummaryQuery.error instanceof Error ? (
-              <CloudAdminErrorBlock error={driftSummaryQuery.error} />
-            ) : null}
-
-            {!driftSummaryQuery.isLoading &&
-            !driftSummaryQuery.isError &&
-            !driftSummaryQuery.data?.attentionItems.length ? (
-              <div className="text-sm text-[color:var(--text-muted)]">
-                {t("No active drift or heartbeat issues right now.")}
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </SurfaceCard>
-
-      <SurfaceCard>
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <section className="rounded-[28px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-5 shadow-[var(--shadow-section)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="text-xl font-semibold text-[color:var(--text-primary)]">
               {t("Managed worlds")}
@@ -649,32 +458,33 @@ export function WorldsPage() {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={() => void copyWorldsPermalink()}
-              className="rounded-full border border-[color:var(--border-faint)] px-4 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
-            >
-              {t("Copy worlds permalink")}
-            </button>
-            {WORLD_STATUS_FILTERS.map((status) => (
-              <button
-                key={status}
-                type="button"
-                onClick={() => updateFilters({ status })}
-                className={`rounded-full border px-3 py-2 text-xs uppercase tracking-[0.2em] ${
-                  statusFilter === status
-                    ? "border-[color:var(--border-strong)] bg-[color:var(--surface-tertiary)] text-[color:var(--text-primary)]"
-                    : "border-[color:var(--border-faint)] text-[color:var(--text-secondary)]"
-                }`}
-              >
-                {status}
-              </button>
-            ))}
-          </div>
+          <button
+            type="button"
+            onClick={() => void copyWorldsPermalink()}
+            className="rounded-full border border-[color:var(--border-faint)] px-4 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
+          >
+            {t("Copy worlds permalink")}
+          </button>
         </div>
 
-        <div className="mt-4 max-w-xl">
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          {WORLD_STATUS_FILTERS.map((status) => (
+            <button
+              key={status}
+              type="button"
+              onClick={() => updateFilters({ status })}
+              className={`rounded-full border px-3 py-2 text-xs uppercase tracking-[0.2em] ${
+                statusFilter === status
+                  ? "border-[color:var(--border-strong)] bg-[color:var(--surface-tertiary)] text-[color:var(--text-primary)]"
+                  : "border-[color:var(--border-faint)] text-[color:var(--text-secondary)]"
+              }`}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-4 grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end">
           <label className="text-sm text-[color:var(--text-secondary)]">
             <div className="mb-2">{t("Search worlds")}</div>
             <input
@@ -689,129 +499,6 @@ export function WorldsPage() {
               className="w-full rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-input)] px-4 py-3 text-[color:var(--text-primary)] placeholder-[color:var(--text-muted)]"
             />
           </label>
-        </div>
-
-        <div className="mt-5 overflow-x-auto rounded-2xl border border-[color:var(--border-faint)]">
-          <table className="min-w-[72rem] border-collapse text-left text-sm">
-            <thead className="bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]">
-              <tr>
-                <th className="px-4 py-3">{t("World")}</th>
-                <th className="px-4 py-3">{t("Account")}</th>
-                <th className="px-4 py-3">{t("Status")}</th>
-                <th className="px-4 py-3">{t("Attention")}</th>
-                <th className="px-4 py-3">{t("Health")}</th>
-                <th className="px-4 py-3">{t("API")}</th>
-                <th className="px-4 py-3">{t("Last interactive")}</th>
-                <th className="px-4 py-3">{t("Updated")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredWorlds.map((item) => {
-                const attention = attentionByWorldId.get(item.id);
-
-                return (
-                  <tr
-                    key={item.id}
-                    className="border-t border-[color:var(--border-faint)]"
-                  >
-                    <td className="px-4 py-3">
-                      <Link
-                        to="/worlds/$worldId"
-                        params={{ worldId: item.id }}
-                        className="text-[color:var(--text-primary)] hover:underline"
-                      >
-                        {item.name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-[color:var(--text-secondary)]">
-                      <div className="flex flex-col">
-                        <span className="text-[color:var(--text-primary)]">
-                          {item.email ?? item.phone}
-                        </span>
-                        {item.email ? (
-                          <span className="text-xs text-[color:var(--text-muted)]">
-                            {item.phone}
-                          </span>
-                        ) : null}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                      {item.status}
-                    </td>
-                    <td className="px-4 py-3">
-                      {attention ? (
-                        <div className="space-y-1">
-                          <div
-                            className={`inline-flex rounded-full border px-2 py-1 text-[11px] uppercase tracking-[0.18em] ${getAttentionTone(attention.severity)}`}
-                          >
-                            {getAttentionLabel(attention)}
-                          </div>
-                          {attention.escalated ? (
-                            <div className="text-[11px] uppercase tracking-[0.18em] text-rose-700">
-                              {t("Escalated")}
-                            </div>
-                          ) : null}
-                          <div className="max-w-[18rem] text-xs text-[color:var(--text-secondary)]">
-                            {attention.message}
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-[color:var(--text-secondary)]">
-                          {t("Healthy")}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-[color:var(--text-secondary)]">
-                      {item.healthStatus ?? "unknown"}
-                    </td>
-                    <td className="max-w-[18rem] truncate px-4 py-3 text-[color:var(--text-secondary)]">
-                      {item.apiBaseUrl ?? t("Not set")}
-                    </td>
-                    <td className="px-4 py-3 text-[color:var(--text-secondary)]">
-                      {formatDateTime(item.lastInteractiveAt)}
-                    </td>
-                    <td className="px-4 py-3 text-[color:var(--text-secondary)]">
-                      {formatDateTime(item.updatedAt)}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-
-          {worldsQuery.isError && worldsQuery.error instanceof Error ? (
-            <div className="p-4">
-              <CloudAdminErrorBlock error={worldsQuery.error} />
-            </div>
-          ) : null}
-
-          {worldsQuery.isLoading ? (
-            <div className="p-4 text-sm text-[color:var(--text-muted)]">
-              {t("Loading worlds...")}
-            </div>
-          ) : null}
-
-          {!worldsQuery.isLoading &&
-          !worldsQuery.isError &&
-          !filteredWorlds.length ? (
-            <div className="p-4 text-sm text-[color:var(--text-muted)]">
-              {t("No worlds match this filter.")}
-            </div>
-          ) : null}
-        </div>
-      </SurfaceCard>
-
-      <SurfaceCard>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="text-xl font-semibold text-[color:var(--text-primary)]">
-              {t("Instance fleet")}
-            </div>
-            <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              Work from the instance point of view: provider placement, power
-              state, heartbeat freshness, and quick lifecycle actions.
-            </div>
-          </div>
 
           <div className="grid min-w-[18rem] gap-2 sm:grid-cols-2">
             <select
@@ -921,10 +608,11 @@ export function WorldsPage() {
         ) : null}
 
         <div className="mt-5 overflow-x-auto rounded-2xl border border-[color:var(--border-faint)]">
-          <table className="min-w-[90rem] border-collapse text-left text-sm">
+          <table className="min-w-[96rem] border-collapse text-left text-sm">
             <thead className="bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]">
               <tr>
                 <th className="px-4 py-3">{t("World")}</th>
+                <th className="px-4 py-3">{t("Status")}</th>
                 <th className="px-4 py-3">{t("Provider")}</th>
                 <th className="px-4 py-3">{t("Instance")}</th>
                 <th className="px-4 py-3">{t("Power")}</th>
@@ -967,6 +655,9 @@ export function WorldsPage() {
                           {item.world.phone}
                         </div>
                       ) : null}
+                    </td>
+                    <td className="px-4 py-3 uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+                      {item.world.status}
                     </td>
                     <td className="px-4 py-3">
                       <div className="text-[color:var(--text-primary)]">
@@ -1028,7 +719,10 @@ export function WorldsPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3 text-[color:var(--text-secondary)]">
-                      {formatDateTime(lastHeartbeatAt)}
+                      <div>{formatDateTime(lastHeartbeatAt)}</div>
+                      <div className="mt-1 text-xs text-[color:var(--text-muted)]">
+                        {t("Last interactive")}: {formatDateTime(item.world.lastInteractiveAt)}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <WorldLifecycleActionButtons
@@ -1088,7 +782,7 @@ export function WorldsPage() {
             </div>
           ) : null}
         </div>
-      </SurfaceCard>
+      </section>
 
       <ConsoleConfirmDialog
         open={Boolean(activeConfirm && confirmAction)}

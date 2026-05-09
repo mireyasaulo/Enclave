@@ -80,6 +80,16 @@ const TelemetryPage = lazy(async () => {
   return { default: mod.TelemetryPage };
 });
 
+const TokenUsagePage = lazy(async () => {
+  const mod = await import("./routes/token-usage-page");
+  return { default: mod.TokenUsagePage };
+});
+
+const TokenUsageWorldDetailPage = lazy(async () => {
+  const mod = await import("./routes/token-usage-world-detail-page");
+  return { default: mod.TokenUsageWorldDetailPage };
+});
+
 const rootRoute = createRootRoute({
   component: RootLayout,
 });
@@ -172,6 +182,18 @@ const telemetryRoute = createRoute({
   component: TelemetryPage,
 });
 
+const tokenUsageRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/token-usage",
+  component: TokenUsagePage,
+});
+
+const tokenUsageWorldDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/token-usage/$worldId",
+  component: TokenUsageWorldDetailPage,
+});
+
 export const routeTree = rootRoute.addChildren([
   indexRoute,
   worldsRoute,
@@ -186,6 +208,8 @@ export const routeTree = rootRoute.addChildren([
   inviteAuditRoute,
   feedbacksRoute,
   telemetryRoute,
+  tokenUsageRoute,
+  tokenUsageWorldDetailRoute,
   revenueSharingRoute,
 ]);
 

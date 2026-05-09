@@ -118,10 +118,9 @@ export function ContactIndexList({
         if (gestureActiveRef.current) {
           suppressClickRef.current = true;
           handleGestureSelect(event.clientY);
+          event.currentTarget.setPointerCapture(event.pointerId);
+          event.preventDefault();
         }
-
-        event.currentTarget.setPointerCapture(event.pointerId);
-        event.preventDefault();
       }}
       onPointerMove={(event) => {
         if (gesturePointerIdRef.current !== event.pointerId) {
@@ -139,6 +138,9 @@ export function ContactIndexList({
 
           gestureActiveRef.current = true;
           suppressClickRef.current = true;
+          if (!event.currentTarget.hasPointerCapture(event.pointerId)) {
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }
         }
 
         handleGestureSelect(event.clientY);

@@ -4,6 +4,7 @@ import { FeedService } from './feed.service';
 import { FeedController } from './feed.controller';
 import { FeedPostEntity } from './feed-post.entity';
 import { FeedCommentEntity } from './feed-comment.entity';
+import { FeedPostLikeEntity } from './feed-post-like.entity';
 import { UserFeedInteractionEntity } from '../analytics/user-feed-interaction.entity';
 import { VideoChannelFollowEntity } from './video-channel-follow.entity';
 import { AiModule } from '../ai/ai.module';
@@ -18,6 +19,7 @@ import { SystemConfigModule } from '../config/config.module';
     TypeOrmModule.forFeature([
       FeedPostEntity,
       FeedCommentEntity,
+      FeedPostLikeEntity,
       UserFeedInteractionEntity,
       VideoChannelFollowEntity,
     ]),

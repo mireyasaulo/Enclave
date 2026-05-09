@@ -112,6 +112,7 @@ import {
 } from "../../../lib/conversation-route";
 import { formatConversationTimestamp } from "../../../lib/format";
 import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
+import { onChatMessage, onConversationUpdated } from "../../../lib/socket";
 import { getCurrentWindowTargetPath } from "../../../runtime/desktop-windowing";
 import { useWorldOwnerStore } from "../../../store/world-owner-store";
 import {
@@ -294,17 +295,23 @@ export function DesktopChatWorkspace({
     setDetailsActionRequest(null);
   }, []);
 
+  // 与移动端 chat-list 同样：3s 轮询 → 60s 兜底 + onWindowFocus + 接 socket
+  // onConversationUpdated/onChatMessage 即时 invalidate。
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
     enabled: Boolean(ownerId),
-    refetchInterval: 3_000,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+    staleTime: 15_000,
   });
   const messageEntriesQuery = useQuery({
     queryKey: ["app-official-message-entries", baseUrl],
     queryFn: () => getOfficialAccountMessageEntries(baseUrl),
     enabled: Boolean(ownerId),
-    refetchInterval: 3_000,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+    staleTime: 15_000,
   });
 
   const blockedQuery = useQuery({
@@ -312,6 +319,23 @@ export function DesktopChatWorkspace({
     queryFn: () => getBlockedCharacters(baseUrl),
     enabled: Boolean(ownerId),
   });
+
+  useEffect(() => {
+    const offUpdated = onConversationUpdated(() => {
+      void queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
+    });
+    const offMessage = onChatMessage(() => {
+      void queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
+    });
+    return () => {
+      offUpdated();
+      offMessage();
+    };
+  }, [baseUrl, queryClient]);
 
   const blockedCharacterIds = useMemo(
     () => new Set((blockedQuery.data ?? []).map((item) => item.characterId)),
@@ -335,7 +359,7 @@ export function DesktopChatWorkspace({
   } = useChatReminderEntries({
     reminders,
     conversations,
-    keyword: searchTerm,
+    keyword: "",
   });
   const hasNotifiedReminderGroup = useMemo(
     () => filteredReminderGroups.some((group) => group.status === "notified"),
@@ -363,7 +387,7 @@ export function DesktopChatWorkspace({
         conversations,
         subscriptionInboxSummary,
         serviceConversations,
-        searchTerm,
+        searchTerm: "",
         getConversationPreviewText: (conversation) =>
           getConversationPreviewParts(conversation, localMessageActionState)
             .text,
@@ -371,7 +395,6 @@ export function DesktopChatWorkspace({
     [
       conversations,
       localMessageActionState,
-      searchTerm,
       serviceConversations,
       subscriptionInboxSummary,
     ],
@@ -1724,17 +1747,6 @@ export function DesktopChatWorkspace({
               ))}
             </div>
 
-            {!conversationsQuery.isLoading &&
-            !filteredReminderEntries.length &&
-            !desktopMessageEntries.length &&
-            searchTerm.trim() ? (
-              <div className="px-2 pt-5">
-                <EmptyState
-                  title={t(msg`没有匹配的会话`)}
-                  description={t(msg`换个关键词试试。`)}
-                />
-              </div>
-            ) : null}
           </div>
         </section>
       )}
@@ -2780,6 +2792,18 @@ function renderConversationPreviewText(text: string): ReactNode {
   return segments.map((segment, index) => {
     if (segment.kind === "text") {
       return <span key={`text-${index}`}>{segment.text}</span>;
+    }
+
+    if (segment.kind === "sticker") {
+      return (
+        <img
+          key={`sticker-${index}-${segment.packId}-${segment.stickerId}`}
+          src={segment.src}
+          alt={segment.label}
+          draggable={false}
+          className="inline-block h-5 w-5 align-[-0.35em] object-contain"
+        />
+      );
     }
 
     return (

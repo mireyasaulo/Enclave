@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { isSupportedLocale, type SupportedLocale } from "@/lib/locales";
 import { getServerI18n } from "@/i18n/server";
@@ -58,11 +59,16 @@ export default async function HomePage({
       <HomeJsonLd locale={safeLocale} />
       <HeroSection locale={safeLocale} />
       <CapabilityGrid locale={safeLocale} />
-      <MultiPlatformCarousel locale={safeLocale} />
-      <OnePersonWorld locale={safeLocale} />
-      <CrossPlatformSection locale={safeLocale} />
-      <GetStartedCta locale={safeLocale} />
-      <FaqAccordion locale={safeLocale} />
+      {/* 折叠下方组件用 Suspense 让 Next.js 走 streaming HTML，首屏 Hero+Capability
+          能提前 flush，后端 i18n/数据并行渲染。Suspense 完成后整页仍是完整 HTML，
+          对 SEO 无影响。 */}
+      <Suspense fallback={null}>
+        <MultiPlatformCarousel locale={safeLocale} />
+        <OnePersonWorld locale={safeLocale} />
+        <CrossPlatformSection locale={safeLocale} />
+        <GetStartedCta locale={safeLocale} />
+        <FaqAccordion locale={safeLocale} />
+      </Suspense>
     </>
   );
 }

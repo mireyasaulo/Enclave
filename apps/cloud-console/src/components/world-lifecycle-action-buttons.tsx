@@ -1,4 +1,5 @@
 import type { CloudWorldSummary } from "@yinjie/contracts";
+import { useAppLocale } from "@yinjie/i18n";
 import {
   createWorldActionAriaLabel,
   createWorldActionDisplayLabel,
@@ -31,6 +32,7 @@ export function WorldLifecycleActionButtons({
   className = DEFAULT_ACTION_GROUP_CLASS_NAME,
   buttonClassName = DEFAULT_ACTION_BUTTON_CLASS_NAME,
 }: WorldLifecycleActionButtonsProps) {
+  const { locale } = useAppLocale();
   if (!actions.length) {
     return null;
   }
@@ -53,8 +55,8 @@ export function WorldLifecycleActionButtons({
             className={buttonClassName}
           >
             {isPending
-              ? createWorldActionPendingLabel(action)
-              : createWorldActionDisplayLabel(action)}
+              ? createWorldActionPendingLabel(action, locale)
+              : createWorldActionDisplayLabel(action, locale)}
           </button>
         );
       })}

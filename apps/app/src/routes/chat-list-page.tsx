@@ -30,6 +30,7 @@ import {
   BellRing,
   CheckCheck,
   Circle,
+  FileText,
   Plus,
   Pin,
   QrCode,
@@ -73,7 +74,10 @@ import {
   buildMobileOfficialRouteHash,
   parseMobileOfficialRouteState,
 } from "../features/official-accounts/mobile-official-route-state";
+import { buildMobileAddFriendRouteHash } from "../features/contacts/mobile-add-friend-route-state";
 import { buildMobileFriendRequestsRouteHash } from "../features/contacts/mobile-friend-requests-route-state";
+import { createDesktopNoteDraft } from "../features/favorites/note-drafts-storage";
+import { buildMobileNoteEditorRouteHash } from "../features/notes/mobile-note-editor-route-state";
 import { buildSearchRouteHash } from "../features/search/search-route-state";
 import { useMessageReminders } from "../features/chat/use-message-reminders";
 import { useChatReminderActions } from "../features/chat/use-chat-reminder-actions";
@@ -88,12 +92,13 @@ import { isPersistedGroupConversation } from "../lib/conversation-route";
 import { buildCreateGroupRouteHash } from "../lib/create-group-route-state";
 import { formatConversationTimestamp } from "../lib/format";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+import { onChatMessage, onConversationUpdated } from "../lib/socket";
 
 type QuickActionItem = {
   key: string;
   label: ChatListMessage;
   icon: typeof Users;
-  to?: "/group/new" | "/friend-requests";
+  to?: "/group/new" | "/friend-requests" | "/add-friend" | "/notes/new";
   disabled?: boolean;
   disabledLabel?: ChatListMessage;
 };
@@ -111,7 +116,13 @@ const quickActionItems: QuickActionItem[] = [
     key: "add-friend",
     label: msg`添加朋友`,
     icon: UserPlus,
-    to: "/friend-requests",
+    to: "/add-friend",
+  },
+  {
+    key: "create-note",
+    label: msg`新建笔记`,
+    icon: FileText,
+    to: "/notes/new",
   },
   {
     key: "scan",
@@ -155,9 +166,20 @@ export function ChatListPage() {
   const hash = useRouterState({ select: (state) => state.location.hash });
   const normalizedPathname = normalizePathname(pathname);
   const desktopPathMismatch = normalizedPathname !== "/tabs/chat";
+  // 一旦在桌面布局下落到 /tabs/chat 就锁定；之后 useRouterState 在路由切换瞬间
+  // 反映出新的 pathname 时不再把用户拉回——否则会拦截 + 菜单的 添加朋友 /
+  // 发起群聊 / 新建笔记 等合法导航。
+  const desktopPathStabilizedRef = useRef(false);
 
   useEffect(() => {
-    if (!isDesktopLayout || !desktopPathMismatch) {
+    if (!isDesktopLayout) {
+      return;
+    }
+    if (!desktopPathMismatch) {
+      desktopPathStabilizedRef.current = true;
+      return;
+    }
+    if (desktopPathStabilizedRef.current) {
       return;
     }
 
@@ -228,15 +250,24 @@ function MobileChatListPage() {
     [officialRouteState.returnHash, officialRouteState.returnPath],
   );
 
+  // 后端 conversation_updated/new_message 事件是房间级 emit（user 必须先
+  // join_conversation 才会收到），chat-list 默认不在任何 room；所以这里把
+  // refetchInterval 从 3s 拉长到 60s 当兜底，并通过 onConversationUpdated
+  // 监听 + window focus 触发即时刷新——用户已经进过的会话仍能立即同步，
+  // 公网隧道下空闲时网络请求量降一个数量级。
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
     queryFn: () => getConversations(baseUrl),
-    refetchInterval: isActiveTab ? 3_000 : false,
+    refetchInterval: isActiveTab ? 60_000 : false,
+    refetchOnWindowFocus: true,
+    staleTime: 15_000,
   });
   const messageEntriesQuery = useQuery({
     queryKey: ["app-official-message-entries", baseUrl],
     queryFn: () => getOfficialAccountMessageEntries(baseUrl),
-    refetchInterval: isActiveTab ? 3_000 : false,
+    refetchInterval: isActiveTab ? 60_000 : false,
+    refetchOnWindowFocus: true,
+    staleTime: 15_000,
   });
 
   const conversations = useMemo(
@@ -473,17 +504,57 @@ function MobileChatListPage() {
     };
   }, [baseUrl, queryClient]);
 
-  function handleNavigate(to: "/group/new" | "/friend-requests") {
+  // socket onConversationUpdated / onChatMessage 是房间级事件——chat-list 自身
+  // 不在任何房间，但 socket 是全局复用的：用户曾打开过的聊天室仍然 join 着，
+  // 那些会话变更可以即刻反映到列表上，不必等下一次 60s 兜底轮询。
+  useEffect(() => {
+    const offUpdated = onConversationUpdated(() => {
+      void queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
+    });
+    const offMessage = onChatMessage(() => {
+      void queryClient.invalidateQueries({
+        queryKey: ["app-conversations", baseUrl],
+      });
+    });
+    return () => {
+      offUpdated();
+      offMessage();
+    };
+  }, [baseUrl, queryClient]);
+
+  function handleNavigate(
+    to: "/group/new" | "/friend-requests" | "/add-friend" | "/notes/new",
+  ) {
     setIsQuickMenuOpen(false);
     setNotice(null);
+
+    if (to === "/notes/new") {
+      const draft = createDesktopNoteDraft();
+      const nextHash = buildMobileNoteEditorRouteHash({
+        draftId: draft.draftId,
+        returnPath: pathname,
+      });
+      void navigate({
+        to,
+        ...(nextHash ? { hash: nextHash } : {}),
+      });
+      return;
+    }
+
     const nextHash =
       to === "/group/new"
         ? buildCreateGroupRouteHash({
             returnPath: pathname,
           })
-        : buildMobileFriendRequestsRouteHash({
-            returnPath: pathname,
-          });
+        : to === "/add-friend"
+          ? buildMobileAddFriendRouteHash({
+              returnPath: pathname,
+            })
+          : buildMobileFriendRequestsRouteHash({
+              returnPath: pathname,
+            });
     void navigate({
       to,
       ...(nextHash ? { hash: nextHash } : {}),
@@ -1390,7 +1461,10 @@ function ConversationListItemLink({
 
   return (
     <div
-      className={cn("relative overflow-hidden bg-[#c4c7cc]", className)}
+      className={cn(
+        "yj-list-item-virtual relative overflow-hidden bg-[#c4c7cc]",
+        className,
+      )}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

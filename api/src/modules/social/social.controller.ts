@@ -54,6 +54,31 @@ export class SocialController {
     return this.socialService.deleteFriend(characterId);
   }
 
+  @Patch('friends/:characterId/permissions')
+  updateFriendPermissions(
+    @Param('characterId') characterId: string,
+    @Body()
+    body: {
+      momentsHiddenFromMe?: boolean;
+      momentsHiddenFromThem?: boolean;
+      chatOnly?: boolean;
+    },
+  ) {
+    return this.socialService.updateFriendPermissions(characterId, body);
+  }
+
+  @Post('friends/bulk')
+  bulkFriendshipAction(
+    @Body()
+    body: {
+      characterIds: string[];
+      action: 'add-tag' | 'remove-tag' | 'star' | 'unstar' | 'delete' | 'block';
+      tag?: string;
+    },
+  ) {
+    return this.socialService.bulkFriendshipAction(body);
+  }
+
   @Get('blocks')
   getBlockedCharacters() {
     return this.socialService.getBlockedCharacters();

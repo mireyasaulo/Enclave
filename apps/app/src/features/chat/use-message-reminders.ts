@@ -67,7 +67,9 @@ export function useMessageReminders() {
     queryKey: ["app-message-reminders", baseUrl],
     queryFn: () => getMessageReminders(baseUrl),
     enabled: Boolean(baseUrl),
-    refetchInterval: 10_000,
+    // 提醒清单很少在 10s 内连续变更：30s + 切回窗口时刷新已经够用。
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
   });
 
   const createReminderMutation = useMutation({

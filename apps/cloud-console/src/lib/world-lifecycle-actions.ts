@@ -6,7 +6,7 @@ import { cloudAdminApi } from "./cloud-admin-api";
 import {
   formatCloudConsoleSuspendWorldTitle,
   formatCloudConsoleRetryWorldRecoveryTitle,
-  translateCloudConsoleTextForActiveLocale,
+  selectCloudConsoleText,
 } from "./cloud-console-i18n";
 
 export type WorldLifecycleAction =
@@ -121,31 +121,77 @@ export function createWorldActionLabel(
   }
 }
 
-export function createWorldActionDisplayLabel(action: WorldLifecycleAction) {
+export function createWorldActionDisplayLabel(
+  action: WorldLifecycleAction,
+  locale?: string | null,
+) {
   switch (action) {
     case "resume":
-      return "Resume";
+      return selectCloudConsoleText(locale, {
+        "en-US": "Resume",
+        "zh-CN": "恢复",
+        "ja-JP": "再開",
+        "ko-KR": "재개",
+      });
     case "suspend":
-      return "Suspend";
+      return selectCloudConsoleText(locale, {
+        "en-US": "Suspend",
+        "zh-CN": "挂起",
+        "ja-JP": "一時停止",
+        "ko-KR": "일시 중지",
+      });
     case "retry":
-      return "Retry";
+      return selectCloudConsoleText(locale, {
+        "en-US": "Retry",
+        "zh-CN": "重试",
+        "ja-JP": "再試行",
+        "ko-KR": "재시도",
+      });
     case "reconcile":
     default:
-      return "Reconcile";
+      return selectCloudConsoleText(locale, {
+        "en-US": "Reconcile",
+        "zh-CN": "对账",
+        "ja-JP": "整合",
+        "ko-KR": "조정",
+      });
   }
 }
 
-export function createWorldActionPendingLabel(action: WorldLifecycleAction) {
+export function createWorldActionPendingLabel(
+  action: WorldLifecycleAction,
+  locale?: string | null,
+) {
   switch (action) {
     case "resume":
-      return "Resuming...";
+      return selectCloudConsoleText(locale, {
+        "en-US": "Resuming...",
+        "zh-CN": "正在恢复…",
+        "ja-JP": "再開中…",
+        "ko-KR": "재개 중…",
+      });
     case "suspend":
-      return "Suspending...";
+      return selectCloudConsoleText(locale, {
+        "en-US": "Suspending...",
+        "zh-CN": "正在挂起…",
+        "ja-JP": "一時停止中…",
+        "ko-KR": "일시 중지 중…",
+      });
     case "retry":
-      return "Retrying...";
+      return selectCloudConsoleText(locale, {
+        "en-US": "Retrying...",
+        "zh-CN": "正在重试…",
+        "ja-JP": "再試行中…",
+        "ko-KR": "재시도 중…",
+      });
     case "reconcile":
     default:
-      return "Reconciling...";
+      return selectCloudConsoleText(locale, {
+        "en-US": "Reconciling...",
+        "zh-CN": "正在对账…",
+        "ja-JP": "整合中…",
+        "ko-KR": "조정 중…",
+      });
   }
 }
 
@@ -167,32 +213,52 @@ export function requiresWorldActionConfirmation(
 export function createWorldActionConfirmationCopy(
   action: ConfirmableWorldLifecycleAction,
   world: Pick<CloudWorldSummary, "name">,
+  locale?: string | null,
 ) {
   switch (action) {
     case "suspend":
       return {
-        title: formatCloudConsoleSuspendWorldTitle(world.name),
-        description: translateCloudConsoleTextForActiveLocale(
-          "The world will move toward sleeping state and active sessions may need to reconnect after it wakes again.",
-        ),
-        confirmLabel: translateCloudConsoleTextForActiveLocale("Suspend world"),
-        pendingLabel: translateCloudConsoleTextForActiveLocale(
-          createWorldActionPendingLabel(action),
-        ),
+        title: formatCloudConsoleSuspendWorldTitle(world.name, locale),
+        description: selectCloudConsoleText(locale, {
+          "en-US":
+            "The world will move toward sleeping state and active sessions may need to reconnect after it wakes again.",
+          "zh-CN":
+            "世界将进入休眠状态，重新唤醒后活跃会话可能需要重新连接。",
+          "ja-JP":
+            "ワールドはスリープ状態に移行し、再開後はアクティブなセッションを再接続する必要がある場合があります。",
+          "ko-KR":
+            "월드는 절전 상태로 전환되며, 다시 깨어난 후 활성 세션은 재연결이 필요할 수 있습니다.",
+        }),
+        confirmLabel: selectCloudConsoleText(locale, {
+          "en-US": "Suspend world",
+          "zh-CN": "挂起世界",
+          "ja-JP": "ワールドを一時停止",
+          "ko-KR": "월드 일시 중지",
+        }),
+        pendingLabel: createWorldActionPendingLabel(action, locale),
         danger: true,
       };
     case "retry":
     default:
       return {
-        title: formatCloudConsoleRetryWorldRecoveryTitle(world.name),
-        description: translateCloudConsoleTextForActiveLocale(
-          "This will queue a new recovery action and clear the current failure state for the world.",
-        ),
-        confirmLabel:
-          translateCloudConsoleTextForActiveLocale("Retry recovery"),
-        pendingLabel: translateCloudConsoleTextForActiveLocale(
-          createWorldActionPendingLabel(action),
-        ),
+        title: formatCloudConsoleRetryWorldRecoveryTitle(world.name, locale),
+        description: selectCloudConsoleText(locale, {
+          "en-US":
+            "This will queue a new recovery action and clear the current failure state for the world.",
+          "zh-CN":
+            "这会排队一个新的恢复动作，并清除该世界当前的失败状态。",
+          "ja-JP":
+            "新しい復旧アクションをキューに追加し、ワールドの現在の失敗状態をクリアします。",
+          "ko-KR":
+            "새 복구 작업을 큐에 추가하고 월드의 현재 실패 상태를 초기화합니다.",
+        }),
+        confirmLabel: selectCloudConsoleText(locale, {
+          "en-US": "Retry recovery",
+          "zh-CN": "重试恢复",
+          "ja-JP": "復旧を再試行",
+          "ko-KR": "복구 재시도",
+        }),
+        pendingLabel: createWorldActionPendingLabel(action, locale),
         danger: true,
       };
   }
