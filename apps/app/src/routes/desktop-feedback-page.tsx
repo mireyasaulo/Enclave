@@ -17,7 +17,6 @@ import {
   Button,
   ErrorBlock,
   InlineNotice,
-  LoadingBlock,
   TextField,
   cn,
 } from "@yinjie/ui";
@@ -117,10 +116,7 @@ export function DesktopFeedbackPage() {
   const baseUrl = runtimeConfig.apiBaseUrl;
   const cloudApiBaseUrl = runtimeConfig.cloudApiBaseUrl;
   const worldOwnerLabel = t(msg`世界主人`);
-  const noSignatureLabel = t(msg`暂无签名`);
   const notConfiguredLabel = t(msg`未配置`);
-  const noSnapshotLabel = t(msg`暂无`);
-  const unknownLabel = t(msg`未知`);
   const categoryOptions = useMemo(
     () =>
       categoryOptionConfigs.map((item) => ({
@@ -375,105 +371,6 @@ export function DesktopFeedbackPage() {
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
-      }
-      aside={
-        <div className="flex h-full min-h-0 flex-col">
-          <div className="border-b border-[color:var(--border-faint)] px-5 py-4">
-            <div className="text-sm font-medium text-[color:var(--text-primary)]">
-              {t(msg`实例上下文`)}
-            </div>
-            <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-              {t(msg`右侧承接当前实例、诊断摘要和系统状态。`)}
-            </div>
-          </div>
-
-          <div className="min-h-0 flex-1 overflow-auto p-5">
-            <div className="space-y-5">
-              <div className="rounded-[14px] border border-[color:var(--border-faint)] bg-white p-4">
-                <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                  {t(msg`当前上下文`)}
-                </div>
-                <div className="mt-4 space-y-3">
-                  <FeedbackContextRow
-                    label={t(msg`实例地址`)}
-                    value={baseUrl || notConfiguredLabel}
-                  />
-                  <FeedbackContextRow
-                    label={t(msg`运行平台`)}
-                    value={runtimeConfig.appPlatform || "web"}
-                  />
-                  <FeedbackContextRow
-                    label={worldOwnerLabel}
-                    value={ownerName || worldOwnerLabel}
-                  />
-                  <FeedbackContextRow
-                    label={t(msg`签名`)}
-                    value={ownerSignature || noSignatureLabel}
-                  />
-                </div>
-              </div>
-
-              <div className="rounded-[14px] border border-[color:var(--border-faint)] bg-white p-4">
-                <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                  {t(msg`诊断摘要`)}
-                </div>
-                <div className="mt-4">
-                  {systemStatusQuery.isLoading ? (
-                    <LoadingBlock label={t(msg`正在读取实例状态...`)} />
-                  ) : (
-                    <div className="space-y-3">
-                      <FeedbackContextRow
-                        label="Core API" // i18n-ignore-line
-                        value={
-                          systemStatusQuery.data?.coreApi.healthy
-                            ? t(msg`在线`)
-                            : t(msg`异常`)
-                        }
-                      />
-                      <FeedbackContextRow
-                        label={t(msg`数据库`)}
-                        value={
-                          systemStatusQuery.data?.database.connected
-                            ? t(msg`已连接`)
-                            : t(msg`未连接`)
-                        }
-                      />
-                      <FeedbackContextRow
-                        label={t(msg`推理网关`)}
-                        value={
-                          systemStatusQuery.data?.inferenceGateway.healthy
-                            ? t(msg`可用`)
-                            : t(msg`待恢复`)
-                        }
-                      />
-                      <FeedbackContextRow
-                        label={t(msg`实例模式`)}
-                        value={systemStatusQuery.data?.appMode ?? unknownLabel}
-                      />
-                      <FeedbackContextRow
-                        label={t(msg`最近快照`)}
-                        value={
-                          systemStatusQuery.data?.scheduler.lastWorldSnapshotAt
-                            ? formatTimestamp(
-                                systemStatusQuery.data.scheduler
-                                  .lastWorldSnapshotAt,
-                              )
-                            : noSnapshotLabel
-                        }
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <FeedbackStatCard
-                label={t(msg`反馈包摘要`)}
-                value={diagnosticSummary}
-                compact
-              />
             </div>
           </div>
         </div>
@@ -912,41 +809,17 @@ function FeedbackTextarea({
   );
 }
 
-function FeedbackContextRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-[12px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3">
-      <div className="text-xs text-[color:var(--text-muted)]">{label}</div>
-      <div className="mt-1 break-all text-sm leading-6 text-[color:var(--text-primary)]">
-        {value}
-      </div>
-    </div>
-  );
-}
-
 function FeedbackStatCard({
-  compact = false,
   label,
   value,
 }: {
-  compact?: boolean;
   label: string;
   value: string;
 }) {
   return (
     <div className="rounded-[12px] border border-[color:var(--border-faint)] bg-white p-4 shadow-[var(--shadow-soft)]">
       <div className="text-xs text-[color:var(--text-muted)]">{label}</div>
-      <div
-        className={cn(
-          "mt-2 font-medium text-[color:var(--text-primary)]",
-          compact ? "text-sm leading-6" : "text-base",
-        )}
-      >
+      <div className="mt-2 font-medium text-[color:var(--text-primary)] text-base">
         {value}
       </div>
     </div>
