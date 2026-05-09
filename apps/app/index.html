@@ -15,8 +15,19 @@
       (function () {
         if (typeof window === "undefined") return;
         var STORAGE_KEY = "yinjie:server-build-id";
+        var LOOP_GUARD_KEY = "yinjie:server-build-id-last-reload";
+        var LOOP_GUARD_MS = 60000;
         var INTERVAL_MS = 30000;
         var inFlight = false;
+        function recentlyReloaded() {
+          try {
+            var raw = window.sessionStorage.getItem(LOOP_GUARD_KEY);
+            if (!raw) return false;
+            var ts = parseInt(raw, 10);
+            if (!ts) return false;
+            return Date.now() - ts < LOOP_GUARD_MS;
+          } catch (e) { return false; }
+        }
         function check() {
           if (inFlight) return;
           inFlight = true;
@@ -29,6 +40,12 @@
               var prevId = null;
               try { prevId = window.localStorage.getItem(STORAGE_KEY); } catch (e) {}
               if (prevId && prevId !== nextId) {
+                if (recentlyReloaded()) {
+                  // 上次刚因 build-id 变化 reload 过；如果 build-id 还在变，
+                  // 多半是后端在频繁热重启（dev 环境），不要再 reload，避免死循环。
+                  try { window.localStorage.setItem(STORAGE_KEY, nextId); } catch (e) {}
+                  return;
+                }
                 Promise.resolve()
                   .then(function () {
                     if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
@@ -47,6 +64,7 @@
                   .catch(function () {})
                   .then(function () {
                     try { window.localStorage.setItem(STORAGE_KEY, nextId); } catch (e) {}
+                    try { window.sessionStorage.setItem(LOOP_GUARD_KEY, String(Date.now())); } catch (e) {}
                     window.location.reload();
                   });
                 return;
