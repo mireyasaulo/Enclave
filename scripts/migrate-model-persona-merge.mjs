@@ -1,0 +1,550 @@
+#!/usr/bin/env node
+// 把 30 个 model persona 角色合并为 12 个厂商家族角色（family_openai 等）。
+// 一次性数据迁移：把 12+ 张表里指向旧 persona id 的字段 UPDATE 到新 family id，
+// 处理 JSON 数组字段，清理 ai_relationships 自环，最后删除旧 persona character 行。
+//
+// 前置条件：
+//   admin UI 已点击过"安装/重置厂商家族角色"，确保 12 个 family_* character 已存在。
+//   （脚本会校验，缺则报错。）
+//
+// 用法：
+//   node scripts/migrate-model-persona-merge.mjs --dry-run          # 不写入
+//   node scripts/migrate-model-persona-merge.mjs                    # 实际执行（带备份提示）
+//   node scripts/migrate-model-persona-merge.mjs --db /path/to.db   # 指定单个 db
+
+import { createRequire } from 'node:module';
+import { existsSync, readdirSync, statSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(__dirname, '..');
+const apiRequire = createRequire(path.join(REPO_ROOT, 'api', 'package.json'));
+const Database = apiRequire('better-sqlite3');
+
+const args = process.argv.slice(2);
+const DRY_RUN = args.includes('--dry-run');
+const explicitDbIdx = args.indexOf('--db');
+const EXPLICIT_DB =
+  explicitDbIdx >= 0 ? args[explicitDbIdx + 1] : null;
+
+// 模型 id → 家族 id（必须与 inference-catalog.seed.ts 中 VENDOR_FAMILY_PERSONAS 保持一致）
+const FAMILY_BY_MODEL = {
+  'gpt-4.1': 'family_openai',
+  'gpt-4.1-mini': 'family_openai',
+  'gpt-4o': 'family_openai',
+  'gpt-4o-mini': 'family_openai',
+  'gpt-5': 'family_openai',
+  o1: 'family_openai',
+  o3: 'family_openai',
+  'o4-mini-all': 'family_openai',
+  'claude-opus-4-20250514': 'family_anthropic',
+  'claude-sonnet-4-5': 'family_anthropic',
+  'claude-haiku-4-5-20251001-thinking': 'family_anthropic',
+  'gemini-2.5-pro': 'family_google',
+  'gemini-2.5-flash': 'family_google',
+  'grok-4.1': 'family_xai',
+  'grok-4.1-fast': 'family_xai',
+  'deepseek-chat': 'family_deepseek',
+  'deepseek-r1': 'family_deepseek',
+  'deepseek-v3': 'family_deepseek',
+  'qwen3-max': 'family_aliyun',
+  'qwen3-coder-plus': 'family_aliyun',
+  'qwen-turbo-2025-07-15': 'family_aliyun',
+  'qvq-max': 'family_aliyun',
+  'ERNIE-Tiny-8K': 'family_baidu',
+  'glm-4.5': 'family_zhipu',
+  'glm-4.5-air': 'family_zhipu',
+  'kimi-k2': 'family_moonshot',
+  'kimi-latest': 'family_moonshot',
+  'hunyuan-t1': 'family_tencent',
+  'MiniMax-M2.7': 'family_minimax',
+  'MiniMax-M2.7-highspeed': 'family_minimax',
+  'MiniMax-M1': 'family_minimax',
+  'llama-3.2-1b-instruct': 'family_meta',
+};
+const ALL_FAMILY_IDS = Array.from(new Set(Object.values(FAMILY_BY_MODEL)));
+
+// 有 UNIQUE 约束（单列或复合）的列，旧→新可能撞约束。
+// 模式：UPDATE OR IGNORE，然后 DELETE 落单的旧 id 行。
+const UNIQUE_FK_COLUMNS = new Set([
+  'character_blueprints.characterId',
+  'character_pages.characterId',
+  'farm_npc_states.characterId',
+  'video_channel_follows.authorId',
+  'wiki_watchlist.characterId',
+]);
+
+// 二元关系表（A,B 复合 UNIQUE，需要自环清理 + dedupe）
+const PAIR_RELATIONSHIP_TABLES = [
+  ['ai_relationships', 'characterIdA', 'characterIdB'],
+  ['character_friendships', 'characterAId', 'characterBId'],
+];
+
+// 单值字段：UPDATE table SET col = new WHERE col = old
+const SCALAR_TABLES = [
+  ['action_runs', 'characterId'],
+  ['ai_behavior_logs', 'characterId'],
+  ['ai_usage_ledger', 'characterId'],
+  ['character_blueprint_revisions', 'characterId'],
+  ['character_blueprints', 'characterId'],
+  ['character_pages', 'characterId'],
+  ['character_real_world_digests', 'characterId'],
+  ['character_real_world_signals', 'characterId'],
+  ['character_real_world_sync_runs', 'characterId'],
+  ['character_revisions', 'characterId'],
+  ['farm_npc_states', 'characterId'],
+  ['feed_comments', 'authorId'],
+  ['feed_comments', 'replyToAuthorId'],
+  ['feed_post_likes', 'authorId'],
+  ['feed_posts', 'authorId'],
+  ['followup_recommendations', 'recommenderCharacterId'],
+  ['followup_recommendations', 'targetCharacterId'],
+  ['friend_requests', 'characterId'],
+  ['friendships', 'characterId'],
+  ['game_catalog_entries', 'sourceCharacterId'],
+  ['game_submissions', 'sourceCharacterId'],
+  ['group_members', 'memberId'],
+  ['group_messages', 'senderId'],
+  ['group_reply_tasks', 'actorCharacterId'],
+  ['media_insight_jobs', 'characterId'],
+  ['messages', 'senderId'],
+  ['minimax_jobs', 'characterId'],
+  ['moment_comments', 'authorId'],
+  ['moment_comments', 'replyToAuthorId'],
+  ['moment_likes', 'authorId'],
+  ['moment_posts', 'authorId'],
+  ['moments', 'authorId'],
+  ['narrative_arcs', 'characterId'],
+  ['need_discovery_candidates', 'characterId'],
+  ['reminder_tasks', 'characterId'],
+  ['reply_artifact_jobs', 'characterId'],
+  ['self_agent_runs', 'characterId'],
+  ['video_channel_follows', 'authorId'],
+  ['wiki_abuse_filter_hits', 'characterId'],
+  ['wiki_blocks', 'targetCharacterId'],
+  ['wiki_edit_submissions', 'characterId'],
+  ['wiki_field_protections', 'characterId'],
+  ['wiki_protection_logs', 'characterId'],
+  ['wiki_talk_posts', 'authorId'],
+  ['wiki_talk_threads', 'authorId'],
+  ['wiki_talk_threads', 'characterId'],
+  ['wiki_watchlist', 'characterId'],
+];
+
+// JSON 数组字段：read-modify-write，把数组里的旧 id 替换为新 id（去重）
+const JSON_ARRAY_COLUMNS = [
+  ['conversations', 'id', 'participants'],
+  ['followup_open_loops', 'id', 'sourceCharacterIds'],
+];
+
+// JSON 对象列表字段：[{ characterId: ... }] 这种，characters.aiRelationships 是典型
+const JSON_OBJECT_LIST_COLUMNS = [
+  ['characters', 'id', 'aiRelationships', 'characterId'],
+];
+
+function discoverDatabases() {
+  if (EXPLICIT_DB) {
+    if (!existsSync(EXPLICIT_DB)) {
+      console.error(`❌ --db 指向的文件不存在：${EXPLICIT_DB}`);
+      process.exit(1);
+    }
+    return [EXPLICIT_DB];
+  }
+  const candidates = [];
+  const root = path.join(REPO_ROOT, 'data', 'database.sqlite');
+  if (existsSync(root)) candidates.push(root);
+  const accountsDir = path.join(REPO_ROOT, 'data', 'accounts');
+  if (existsSync(accountsDir) && statSync(accountsDir).isDirectory()) {
+    for (const entry of readdirSync(accountsDir)) {
+      const dbPath = path.join(accountsDir, entry, 'database.sqlite');
+      if (existsSync(dbPath)) candidates.push(dbPath);
+    }
+  }
+  return candidates;
+}
+
+function tableExists(db, name) {
+  return Boolean(
+    db
+      .prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name = ?")
+      .get(name),
+  );
+}
+
+function columnExists(db, table, column) {
+  if (!tableExists(db, table)) return false;
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all();
+  return cols.some((c) => c.name === column);
+}
+
+function migrateOne(dbPath) {
+  const db = new Database(dbPath);
+  const summary = {
+    dbPath,
+    skipped: false,
+    reason: null,
+    oldPersonaCount: 0,
+    mapping: {},
+    scalarUpdates: {},
+    jsonUpdates: {},
+    objectListUpdates: {},
+    selfLoopsRemoved: 0,
+    deletedPersonaRows: 0,
+    error: null,
+  };
+
+  try {
+    if (!tableExists(db, 'characters')) {
+      summary.skipped = true;
+      summary.reason = 'characters 表不存在';
+      return summary;
+    }
+
+    // 1. 收集旧 persona character 与映射
+    const oldPersonas = db
+      .prepare(
+        `SELECT id, sourceKey, inferenceModelId
+         FROM characters
+         WHERE sourceType = 'model_persona' AND sourceKey LIKE 'model_persona:%'`,
+      )
+      .all();
+    summary.oldPersonaCount = oldPersonas.length;
+    if (oldPersonas.length === 0) {
+      summary.skipped = true;
+      summary.reason = '没有旧 model_persona 角色，已是迁移后状态';
+      return summary;
+    }
+
+    const mapping = {}; // oldId → newFamilyId
+    const unmapped = [];
+    for (const row of oldPersonas) {
+      const modelId =
+        row.inferenceModelId?.trim() ||
+        (row.sourceKey?.startsWith('model_persona:')
+          ? row.sourceKey.slice('model_persona:'.length).trim()
+          : '');
+      const familyId = FAMILY_BY_MODEL[modelId];
+      if (!familyId) {
+        unmapped.push({ id: row.id, modelId });
+        continue;
+      }
+      mapping[row.id] = familyId;
+    }
+    if (unmapped.length > 0) {
+      throw new Error(
+        `无法映射的旧 persona：${JSON.stringify(unmapped)}（请扩展 FAMILY_BY_MODEL）`,
+      );
+    }
+    summary.mapping = mapping;
+
+    // 2. 校验 12 个家族角色都已存在
+    const targetIds = Array.from(new Set(Object.values(mapping)));
+    const existingFamilyIds = new Set(
+      db
+        .prepare(
+          `SELECT id FROM characters WHERE id IN (${targetIds.map(() => '?').join(',')})`,
+        )
+        .all(...targetIds)
+        .map((r) => r.id),
+    );
+    const missingFamily = targetIds.filter((id) => !existingFamilyIds.has(id));
+    if (missingFamily.length > 0) {
+      throw new Error(
+        `缺少家族角色：${missingFamily.join(', ')}\n请先在 admin UI 点 "安装/重置厂商家族角色" 创建这些 character，再跑迁移。`,
+      );
+    }
+
+    // 3. 单值字段批量更新（事务）
+    const oldIds = Object.keys(mapping);
+    const placeholders = oldIds.map(() => '?').join(',');
+    summary.uniqueDropped = {};
+    const exec = db.transaction(() => {
+      for (const [tbl, col] of SCALAR_TABLES) {
+        if (!columnExists(db, tbl, col)) continue;
+        const beforeQuery = db
+          .prepare(
+            `SELECT ${col} AS v, COUNT(*) AS c FROM ${tbl} WHERE ${col} IN (${placeholders}) GROUP BY ${col}`,
+          )
+          .all(...oldIds);
+        const totalAffected = beforeQuery.reduce((sum, r) => sum + r.c, 0);
+        if (totalAffected === 0) continue;
+        const isUnique = UNIQUE_FK_COLUMNS.has(`${tbl}.${col}`);
+        const verb = isUnique ? 'UPDATE OR IGNORE' : 'UPDATE';
+        if (!DRY_RUN) {
+          for (const oldId of oldIds) {
+            db.prepare(
+              `${verb} ${tbl} SET ${col} = ? WHERE ${col} = ?`,
+            ).run(mapping[oldId], oldId);
+          }
+          if (isUnique) {
+            // 撞 UNIQUE 约束没换成功的旧行：丢弃（家族角色已存在该侧记录）
+            const drop = db
+              .prepare(
+                `DELETE FROM ${tbl} WHERE ${col} IN (${placeholders})`,
+              )
+              .run(...oldIds);
+            if (drop.changes > 0) {
+              summary.uniqueDropped[`${tbl}.${col}`] = drop.changes;
+            }
+          }
+        }
+        summary.scalarUpdates[`${tbl}.${col}`] = totalAffected;
+      }
+
+      // 4. JSON 数组字段
+      for (const [tbl, idCol, col] of JSON_ARRAY_COLUMNS) {
+        if (!columnExists(db, tbl, col)) continue;
+        const rows = db
+          .prepare(
+            `SELECT ${idCol} AS rowId, ${col} AS payload FROM ${tbl} WHERE ${col} IS NOT NULL`,
+          )
+          .all();
+        let touched = 0;
+        for (const row of rows) {
+          let arr;
+          try {
+            arr = JSON.parse(row.payload);
+          } catch {
+            continue;
+          }
+          if (!Array.isArray(arr)) continue;
+          let changed = false;
+          const next = [];
+          for (const item of arr) {
+            if (typeof item === 'string' && mapping[item]) {
+              next.push(mapping[item]);
+              changed = true;
+            } else {
+              next.push(item);
+            }
+          }
+          if (!changed) continue;
+          // 去重保持插入顺序
+          const seen = new Set();
+          const dedup = next.filter((v) => {
+            const key = typeof v === 'string' ? v : JSON.stringify(v);
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+          touched += 1;
+          if (!DRY_RUN) {
+            db.prepare(
+              `UPDATE ${tbl} SET ${col} = ? WHERE ${idCol} = ?`,
+            ).run(JSON.stringify(dedup), row.rowId);
+          }
+        }
+        if (touched > 0) summary.jsonUpdates[`${tbl}.${col}`] = touched;
+      }
+
+      // 5. JSON 对象列表字段（characters.aiRelationships）
+      for (const [tbl, idCol, col, fieldKey] of JSON_OBJECT_LIST_COLUMNS) {
+        if (!columnExists(db, tbl, col)) continue;
+        const rows = db
+          .prepare(
+            `SELECT ${idCol} AS rowId, ${col} AS payload FROM ${tbl} WHERE ${col} IS NOT NULL`,
+          )
+          .all();
+        let touched = 0;
+        for (const row of rows) {
+          let arr;
+          try {
+            arr = JSON.parse(row.payload);
+          } catch {
+            continue;
+          }
+          if (!Array.isArray(arr)) continue;
+          let changed = false;
+          const next = [];
+          for (const item of arr) {
+            if (
+              item &&
+              typeof item === 'object' &&
+              typeof item[fieldKey] === 'string' &&
+              mapping[item[fieldKey]]
+            ) {
+              next.push({ ...item, [fieldKey]: mapping[item[fieldKey]] });
+              changed = true;
+            } else {
+              next.push(item);
+            }
+          }
+          if (!changed) continue;
+          // 同 rowId 不能给自己建关系：合并后可能出现 row.rowId === item.fieldKey，过滤掉
+          const filtered = next.filter(
+            (item) =>
+              !(
+                item &&
+                typeof item === 'object' &&
+                item[fieldKey] === row.rowId
+              ),
+          );
+          // 同一对手只保留一条
+          const seenKeys = new Set();
+          const dedup = filtered.filter((item) => {
+            if (!item || typeof item !== 'object') return true;
+            const k = item[fieldKey];
+            if (seenKeys.has(k)) return false;
+            seenKeys.add(k);
+            return true;
+          });
+          touched += 1;
+          if (!DRY_RUN) {
+            db.prepare(
+              `UPDATE ${tbl} SET ${col} = ? WHERE ${idCol} = ?`,
+            ).run(JSON.stringify(dedup), row.rowId);
+          }
+        }
+        if (touched > 0) summary.objectListUpdates[`${tbl}.${col}`] = touched;
+      }
+
+      // 6. 二元关系表：把 A/B 都改写到家族 id；删自环；dedupe
+      summary.selfLoopsRemoved = {};
+      summary.pairDeduped = {};
+      for (const [tbl, colA, colB] of PAIR_RELATIONSHIP_TABLES) {
+        if (
+          !tableExists(db, tbl) ||
+          !columnExists(db, tbl, colA) ||
+          !columnExists(db, tbl, colB)
+        ) {
+          continue;
+        }
+        // 6a. UPDATE OR IGNORE 把 A/B 改写到家族 id（避开 (A,B) 复合 UNIQUE 撞车）
+        if (!DRY_RUN) {
+          for (const oldId of oldIds) {
+            db.prepare(
+              `UPDATE OR IGNORE ${tbl} SET ${colA} = ? WHERE ${colA} = ?`,
+            ).run(mapping[oldId], oldId);
+            db.prepare(
+              `UPDATE OR IGNORE ${tbl} SET ${colB} = ? WHERE ${colB} = ?`,
+            ).run(mapping[oldId], oldId);
+          }
+          // 没换成功的（撞复合 UNIQUE）：丢弃
+          db.prepare(
+            `DELETE FROM ${tbl} WHERE ${colA} IN (${placeholders}) OR ${colB} IN (${placeholders})`,
+          ).run(...oldIds, ...oldIds);
+        }
+        // 6b. 删自环（合并后 A==B）
+        const selfLoops = db
+          .prepare(
+            `SELECT COUNT(*) AS c FROM ${tbl} WHERE ${colA} = ${colB}`,
+          )
+          .get();
+        summary.selfLoopsRemoved[tbl] = selfLoops.c;
+        if (!DRY_RUN && selfLoops.c > 0) {
+          db.prepare(
+            `DELETE FROM ${tbl} WHERE ${colA} = ${colB}`,
+          ).run();
+        }
+        // 6c. dedupe：同 (A,B) 多行只保留 id 最小
+        if (!DRY_RUN) {
+          const dropped = db
+            .prepare(
+              `DELETE FROM ${tbl}
+               WHERE id NOT IN (
+                 SELECT MIN(id) FROM ${tbl} GROUP BY ${colA}, ${colB}
+               )`,
+            )
+            .run();
+          summary.pairDeduped[tbl] = dropped.changes;
+        }
+      }
+
+      // 7. 最后删除旧 persona character 行
+      if (!DRY_RUN) {
+        const del = db
+          .prepare(
+            `DELETE FROM characters WHERE id IN (${placeholders})`,
+          )
+          .run(...oldIds);
+        summary.deletedPersonaRows = del.changes;
+      } else {
+        summary.deletedPersonaRows = oldIds.length;
+      }
+    });
+
+    exec();
+  } catch (error) {
+    summary.error = error.message;
+  } finally {
+    db.close();
+  }
+
+  return summary;
+}
+
+function printReport(s) {
+  console.log(`\n=== ${s.dbPath} ===`);
+  if (s.skipped) {
+    console.log(`  跳过：${s.reason}`);
+    return;
+  }
+  if (s.error) {
+    console.log(`  ❌ 失败：${s.error}`);
+    return;
+  }
+  console.log(`  旧 persona 角色：${s.oldPersonaCount}`);
+  console.log(`  映射条目：${Object.keys(s.mapping).length}`);
+  console.log(`  目标家族 id：${ALL_FAMILY_IDS.length} 个`);
+  console.log(`  单值字段更新（受影响行数 / 表.列）：`);
+  for (const [k, v] of Object.entries(s.scalarUpdates)) {
+    console.log(`    ${k}: ${v}`);
+  }
+  if (Object.keys(s.jsonUpdates).length > 0) {
+    console.log(`  JSON 数组字段（受影响行数）：`);
+    for (const [k, v] of Object.entries(s.jsonUpdates)) {
+      console.log(`    ${k}: ${v}`);
+    }
+  }
+  if (Object.keys(s.objectListUpdates).length > 0) {
+    console.log(`  JSON 对象列表（受影响行数）：`);
+    for (const [k, v] of Object.entries(s.objectListUpdates)) {
+      console.log(`    ${k}: ${v}`);
+    }
+  }
+  if (s.uniqueDropped && Object.keys(s.uniqueDropped).length > 0) {
+    console.log(`  UNIQUE 冲突丢弃的旧行：`);
+    for (const [k, v] of Object.entries(s.uniqueDropped)) {
+      console.log(`    ${k}: ${v}`);
+    }
+  }
+  if (s.selfLoopsRemoved && Object.keys(s.selfLoopsRemoved).length > 0) {
+    console.log(`  二元关系表自环：`);
+    for (const [k, v] of Object.entries(s.selfLoopsRemoved)) {
+      console.log(`    ${k}: ${v}`);
+    }
+  }
+  if (s.pairDeduped && Object.keys(s.pairDeduped).length > 0) {
+    console.log(`  二元关系表 dedupe 删除：`);
+    for (const [k, v] of Object.entries(s.pairDeduped)) {
+      console.log(`    ${k}: ${v}`);
+    }
+  }
+  console.log(`  删除的旧 persona 行：${s.deletedPersonaRows}`);
+}
+
+console.log(
+  DRY_RUN
+    ? '🔍 DRY-RUN 模式：只计数，不写入。'
+    : '⚠️  实际执行模式。请确认已备份 data/database.sqlite。',
+);
+
+const dbs = discoverDatabases();
+if (dbs.length === 0) {
+  console.error('❌ 没找到任何数据库（root 或 data/accounts/*/database.sqlite）');
+  process.exit(1);
+}
+
+let hadError = false;
+for (const dbPath of dbs) {
+  const summary = migrateOne(dbPath);
+  printReport(summary);
+  if (summary.error) hadError = true;
+}
+
+if (hadError) {
+  console.log('\n❌ 至少一个 DB 失败，请回滚备份后排查。');
+  process.exit(2);
+}
+console.log('\n✅ 完成。');
