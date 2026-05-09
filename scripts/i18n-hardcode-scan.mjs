@@ -359,7 +359,9 @@ function isCommentOnly(line) {
     trimmed.startsWith("//") ||
     trimmed.startsWith("/*") ||
     trimmed.startsWith("*") ||
-    trimmed.startsWith("*/")
+    trimmed.startsWith("*/") ||
+    trimmed.startsWith("{/*") ||
+    trimmed.startsWith("*/}")
   );
 }
 
