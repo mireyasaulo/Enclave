@@ -17,15 +17,9 @@ import type {
 } from "@yinjie/contracts";
 import { MoreThan, Repository } from "typeorm";
 import { createHash } from "node:crypto";
-import {
-  parseJwtDurationToMs,
-  resolveCloudAuthTokenTtl,
-  resolveCloudClientJwtAudience,
-  resolveCloudJwtIssuer,
-} from "../config/cloud-runtime-config";
 import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { EmailVerificationSessionEntity } from "../entities/email-verification-session.entity";
-import { CLOUD_CLIENT_ACCESS_TOKEN_PURPOSE } from "./cloud-jwt.constants";
+import { issueCloudClientAccessToken } from "./cloud-client-token";
 import { CloudMailService } from "./cloud-mail.service";
 
 const DEV_BYPASS_CODE = "123456";
@@ -158,21 +152,13 @@ export class EmailAuthService {
     }
 
     // 邮箱用户在云端用合成 phone 作为身份标识，CloudClientAuthGuard 与下游 by-phone 查询都能命中。
-    const accessToken = await this.jwtService.signAsync(
-      {
-        sid: session.id,
-        phone: synthPhone,
-        email: normalized,
-        purpose: CLOUD_CLIENT_ACCESS_TOKEN_PURPOSE,
-      },
-      {
-        expiresIn: resolveCloudAuthTokenTtl(this.configService) as never,
-        issuer: resolveCloudJwtIssuer(this.configService),
-        audience: resolveCloudClientJwtAudience(this.configService),
-        subject: synthPhone,
-      },
-    );
-    const expiresAt = new Date(Date.now() + this.getTokenTtlMs()).toISOString();
+    const { accessToken, expiresAt } = await issueCloudClientAccessToken({
+      jwtService: this.jwtService,
+      configService: this.configService,
+      sessionId: session.id,
+      synthPhone,
+      email: normalized,
+    });
 
     return {
       accessToken,
@@ -217,19 +203,6 @@ export class EmailAuthService {
         this.configService.get<string>("CLOUD_CODE_TTL_SECONDS"),
       600,
     );
-  }
-
-  private getTokenTtlMs() {
-    const configured = this.configService.get<string>("CLOUD_AUTH_TOKEN_TTL_MS");
-    const asNumber = configured ? Number(configured) : Number.NaN;
-    if (Number.isFinite(asNumber) && asNumber > 0) {
-      return asNumber;
-    }
-    const parsedTtl = parseJwtDurationToMs(
-      resolveCloudAuthTokenTtl(this.configService),
-    );
-    if (parsedTtl && parsedTtl > 0) return parsedTtl;
-    return 7 * 24 * 60 * 60 * 1000;
   }
 
   private async enforceSendCodeRateLimit(email: string) {
