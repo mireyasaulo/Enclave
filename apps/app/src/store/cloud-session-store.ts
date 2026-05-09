@@ -97,7 +97,7 @@ export async function refreshCloudSessionIfNeeded(
   const expiresMs = Date.parse(state.expiresAt);
   if (!Number.isFinite(expiresMs)) return false;
   const remaining = expiresMs - Date.now();
-  if (remaining <= 0) return false; // 已过期，留给登录流程兜底
+  if (remaining <= 0) return false; // i18n-ignore-line: dev comment - 已过期，留给登录流程兜底
   if (remaining > REFRESH_THRESHOLD_MS) return false;
 
   if (inflightRefresh) {

@@ -135,7 +135,7 @@ function MobileDiscoverScenePage() {
   });
 
   useEffect(() => {
-    setMessage("");
+    setMessage(""); // i18n-ignore-line: clearing state
   }, [baseUrl]);
 
   function navigateToRouteStateReturn() {

@@ -452,7 +452,7 @@ export function MomentsPage() {
 
     setNoticeActionLabel(null);
     setNoticeAction(null);
-    setNotice("");
+    setNotice(""); // i18n-ignore-line: clearing state
   }, [baseUrl, resetComposeDraft]);
 
   useEffect(() => {
@@ -508,7 +508,7 @@ export function MomentsPage() {
     }
 
     const timer = window.setTimeout(() => {
-      setNotice("");
+      setNotice(""); // i18n-ignore-line: clearing state
       setNoticeActionLabel(null);
       setNoticeAction(null);
     }, 2400);

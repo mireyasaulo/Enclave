@@ -187,7 +187,7 @@ export function MomentMediaGallery({
   // 1 张：单图按原比例自适应（最大 ~210px 宽）
   // 4 张：2×2，宽度 = 2 × 单格 + 1 × gap
   // 其他：3 列方格
-  const cellSize = 105; // px，单方格边长（mobile）
+  const cellSize = 105; // i18n-ignore-line: dev comment - px，单方格边长（mobile）
   const cellSizeNonMobile = 110;
   const gridGapPx = 4;
   const cellPx = isMobileVariant ? cellSize : cellSizeNonMobile;
@@ -637,9 +637,9 @@ function WeChatGridCell({
 function computeWeChatSingleImageStyle(
   asset: MomentImageAsset,
 ): { width: string; height: string } {
-  const SQUARE = 165; // 正方形上限
-  const LONG = 220; // 长边
-  const SHORT = 145; // 短边
+  const SQUARE = 165; // i18n-ignore-line: dev comment
+  const LONG = 220; // i18n-ignore-line: dev comment
+  const SHORT = 145; // i18n-ignore-line: dev comment
   const w = asset.width ?? 0;
   const h = asset.height ?? 0;
 

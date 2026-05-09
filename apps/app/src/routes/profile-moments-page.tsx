@@ -11,7 +11,7 @@ import {
   type Moment,
   type MomentComment,
 } from "@yinjie/contracts";
-import { useRuntimeTranslator } from "@yinjie/i18n";
+import { getActiveLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppPage,
   Button,
@@ -650,7 +650,7 @@ function PersonalAlbumRow({
     : `${date.getDate()}`.padStart(2, "0");
   const monthLabel = Number.isNaN(date.getTime())
     ? "--"
-    : `${date.getMonth() + 1}月`;
+    : new Intl.DateTimeFormat(getActiveLocale(), { month: "long" }).format(date);
   return (
     <div className="flex items-start gap-2 px-4 py-3.5">
       <div className="w-12 shrink-0 pt-1 text-right">

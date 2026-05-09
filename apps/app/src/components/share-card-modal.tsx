@@ -166,7 +166,7 @@ export function ShareCardModal({
           if (img.src && !img.src.startsWith("data:")) {
             try {
               const resp = await fetch(img.src, { cache: "force-cache" });
-              if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+              if (!resp.ok) throw new Error(`HTTP ${resp.status}`); // i18n-ignore-line: error code
               const dataUrl = await blobToDataURL(await resp.blob());
               img.src = dataUrl;
             } catch {
@@ -275,7 +275,7 @@ export function ShareCardModal({
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      {/* 离屏渲染目标：fixed + left:-10000 避开视口但仍参与布局，html-to-image 能拿到尺寸 */}
+      {/* i18n-ignore-line: dev comment - 离屏渲染目标 */}
       <div
         aria-hidden="true"
         style={{
@@ -344,7 +344,7 @@ export function ShareCardModal({
         </div>
       </div>
 
-      {/* 用户可见的预览 + 操作 */}
+      {/* i18n-ignore-line: dev comment - 用户可见的预览 + 操作 */}
       <div className="relative flex w-full max-w-md flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
           <div className="text-[15px] font-medium text-gray-900">

@@ -8,7 +8,7 @@ import {
   declineFriendRequest,
   getFriendRequests,
 } from "@yinjie/contracts";
-import { useRuntimeTranslator } from "@yinjie/i18n";
+import { getActiveLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 
 type Translator = ReturnType<typeof useRuntimeTranslator>;
@@ -481,7 +481,7 @@ function formatFriendRequestDate(t: Translator, createdAt: string) {
     return t(msg`今天`);
   }
 
-  const formatter = new Intl.DateTimeFormat("zh-CN", {
+  const formatter = new Intl.DateTimeFormat(getActiveLocale(), {
     month: "2-digit",
     day: "2-digit",
   });

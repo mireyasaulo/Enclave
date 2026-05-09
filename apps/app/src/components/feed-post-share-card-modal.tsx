@@ -139,7 +139,7 @@ function FeedPostExportCard({ post }: { post: FeedPost }) {
         </div>
       ) : null}
 
-      {/* 互动数据 — 静态摘要，不显示按钮 */}
+      {/* i18n-ignore-line: dev comment - 互动数据静态摘要 */}
       {post.likeCount + post.commentCount + post.viewCount > 0 ? (
         <div
           style={{

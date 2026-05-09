@@ -11,7 +11,7 @@ import {
   toggleMomentLike,
   type MomentComment,
 } from "@yinjie/contracts";
-import { translateRuntimeMessage } from "@yinjie/i18n";
+import { getActiveLocale, translateRuntimeMessage } from "@yinjie/i18n";
 import {
   AppPage,
   Button,
@@ -531,7 +531,7 @@ export function MobileFriendMomentsPage() {
                   : `${date.getDate()}`.padStart(2, "0");
                 const monthLabel = Number.isNaN(date.getTime())
                   ? "--"
-                  : `${date.getMonth() + 1}月`;
+                  : new Intl.DateTimeFormat(getActiveLocale(), { month: "long" }).format(date);
                 return (
                   <div
                     key={moment.id}
