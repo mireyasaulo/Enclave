@@ -13,6 +13,7 @@ import {
   Copy,
   Heart,
   Image as ImageIcon,
+  MessageCircle,
   PenSquare,
   Share2,
 } from "lucide-react";
@@ -25,7 +26,11 @@ import {
   type FeedComment,
   type FeedListResponse,
 } from "@yinjie/contracts";
-import { AppPage, Button, InlineNotice, TextField } from "@yinjie/ui";
+import { AppPage, Button, InlineNotice } from "@yinjie/ui";
+import {
+  WeChatCommentBar,
+  type WeChatCommentBarReplyTarget,
+} from "../components/wechat-comment-bar";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { FeedPostShareCardModal } from "../components/feed-post-share-card-modal";
 import { MomentMediaGallery } from "../components/moment-media-gallery";
@@ -94,6 +99,10 @@ export function DiscoverFeedPage() {
     authorName: string;
     commentId: string;
     postId: string;
+  } | null>(null);
+  const [commentBarTarget, setCommentBarTarget] = useState<{
+    postId: string;
+    replyTo: WeChatCommentBarReplyTarget | null;
   } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [notice, setNotice] = useState("");
@@ -245,6 +254,9 @@ export function DiscoverFeedPage() {
       setDesktopReplyTarget((current) =>
         current?.postId === input.postId ? null : current,
       );
+      setCommentBarTarget((current) =>
+        current?.postId === input.postId ? null : current,
+      );
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
@@ -275,6 +287,23 @@ export function DiscoverFeedPage() {
       postId,
       replyTarget: options?.replyTarget ?? null,
       text: commentDrafts[postId] ?? "",
+    });
+  }
+
+  function submitMobileBarComment() {
+    if (!commentBarTarget) return;
+    const replyTo = commentBarTarget.replyTo;
+    commentMutation.mutate({
+      postId: commentBarTarget.postId,
+      replyTarget: replyTo
+        ? {
+            authorId: replyTo.authorId,
+            authorName: replyTo.authorName,
+            commentId: replyTo.commentId,
+            postId: commentBarTarget.postId,
+          }
+        : null,
+      text: commentDrafts[commentBarTarget.postId] ?? "",
     });
   }
 
@@ -344,6 +373,7 @@ export function DiscoverFeedPage() {
   useEffect(() => {
     resetComposeDraft();
     setCommentDrafts({});
+    setCommentBarTarget(null);
     setShowCompose(false);
     setNoticeActionLabel(null);
     setNoticeAction(null);
@@ -947,6 +977,25 @@ export function DiscoverFeedPage() {
                             : t(msg`点赞`)}
                     </Button>
                     <Button
+                      disabled={!post.canInteract}
+                      title={
+                        !post.canInteract
+                          ? t(msg`加为好友后才能互动`)
+                          : undefined
+                      }
+                      variant="secondary"
+                      size="sm"
+                      onClick={() =>
+                        setCommentBarTarget({
+                          postId: post.id,
+                          replyTo: null,
+                        })
+                      }
+                    >
+                      <MessageCircle size={13} />
+                      {t(msg`评论`)}
+                    </Button>
+                    <Button
                       variant="secondary"
                       size="sm"
                       onClick={() => {
@@ -978,49 +1027,47 @@ export function DiscoverFeedPage() {
                 }
                 secondary={
                   post.commentsPreview.length > 0 ? (
-                    <div className="space-y-1.5 rounded-[14px] bg-[color:var(--surface-soft)] p-2.5">
-                      {post.commentsPreview.map((comment) => (
-                        <div
-                          key={comment.id}
-                          className="text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)]"
-                        >
-                          <span className="text-[color:var(--text-primary)]">
-                            {comment.authorName}
-                          </span>
-                          {`：${comment.text}`}
-                        </div>
-                      ))}
+                    <div className="space-y-0.5 rounded-[14px] bg-[color:var(--surface-soft)] p-2.5">
+                      {post.commentsPreview.map((comment) => {
+                        const replyToName = comment.replyToCommentId
+                          ? post.commentsPreview.find(
+                              (item) => item.id === comment.replyToCommentId,
+                            )?.authorName ?? null
+                          : null;
+                        return (
+                          <button
+                            key={comment.id}
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setCommentBarTarget({
+                                postId: post.id,
+                                replyTo: {
+                                  authorId: comment.authorId,
+                                  authorName: comment.authorName,
+                                  commentId: comment.id,
+                                },
+                              });
+                            }}
+                            className="block w-full rounded-[8px] px-1 py-0.5 text-left text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)] active:bg-[rgba(7,193,96,0.08)]"
+                          >
+                            <span className="text-[color:var(--text-primary)]">
+                              {comment.authorName}
+                            </span>
+                            {replyToName ? (
+                              <>
+                                <span> {t(msg`回复`)} </span>
+                                <span className="text-[color:var(--text-primary)]">
+                                  {replyToName}
+                                </span>
+                              </>
+                            ) : null}
+                            {`：${comment.text}`}
+                          </button>
+                        );
+                      })}
                     </div>
                   ) : null
-                }
-                composer={
-                  <>
-                    <TextField
-                      value={commentDrafts[post.id] ?? ""}
-                      onChange={(event) =>
-                        setCommentDrafts((current) => ({
-                          ...current,
-                          [post.id]: event.target.value,
-                        }))
-                      }
-                      placeholder={t(msg`写评论...`)}
-                      className="min-w-0 flex-1 rounded-full py-1.5 text-[12px]"
-                    />
-                    <Button
-                      disabled={
-                        !(commentDrafts[post.id] ?? "").trim() ||
-                        commentMutation.isPending
-                      }
-                      onClick={() => submitComment(post.id)}
-                      variant="primary"
-                      size="sm"
-                      className="h-8 px-3 text-[12px]"
-                    >
-                      {pendingCommentPostId === post.id
-                        ? t(msg`发送中...`)
-                        : t(msg`发送`)}
-                    </Button>
-                  </>
                 }
               />
             );
@@ -1099,6 +1146,31 @@ export function DiscoverFeedPage() {
           ownerUsername?.trim() || t(msg`世界主人`)
         }
         onClose={() => setShareCardPostId(null)}
+      />
+
+      <WeChatCommentBar
+        open={Boolean(commentBarTarget)}
+        replyTo={commentBarTarget?.replyTo ?? null}
+        value={
+          commentBarTarget
+            ? commentDrafts[commentBarTarget.postId] ?? ""
+            : ""
+        }
+        onChange={(value) => {
+          if (commentBarTarget) {
+            setCommentDrafts((current) => ({
+              ...current,
+              [commentBarTarget.postId]: value,
+            }));
+          }
+        }}
+        pending={
+          commentBarTarget
+            ? pendingCommentPostId === commentBarTarget.postId
+            : false
+        }
+        onSubmit={submitMobileBarComment}
+        onClose={() => setCommentBarTarget(null)}
       />
     </AppPage>
   );
