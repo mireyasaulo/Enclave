@@ -643,7 +643,7 @@ msgid "{0} 涌来 {customers} 位顾客（待收银 {income} 券）。"
 msgstr "{0} 涌来 {customers} 位顾客（待收银 {income} 券）。"
 
 #. placeholder {0}: post.authorName
-#: apps/app/src/routes/discover-feed-page.tsx:520
+#: apps/app/src/routes/discover-feed-page.tsx:521
 msgid "{0} 的广场动态"
 msgstr "{0} 的广场动态"
 
@@ -747,7 +747,7 @@ msgstr "{0} 胜 {1}。"
 #: apps/app/src/components/feed-post-share-card-modal.tsx:159
 #: apps/app/src/routes/channel-author-page.tsx:583
 #: apps/app/src/routes/channels-page.tsx:1695
-#: apps/app/src/routes/discover-feed-page.tsx:912
+#: apps/app/src/routes/discover-feed-page.tsx:913
 msgid "{0} 评论"
 msgstr "{0} 评论"
 
@@ -760,7 +760,7 @@ msgstr "{0} 评论 · {1} 赞"
 #. placeholder {0}: post.likeCount
 #: apps/app/src/components/feed-post-share-card-modal.tsx:156
 #: apps/app/src/routes/channels-page.tsx:1694
-#: apps/app/src/routes/discover-feed-page.tsx:911
+#: apps/app/src/routes/discover-feed-page.tsx:912
 msgid "{0} 赞"
 msgstr "{0} 赞"
 
@@ -844,7 +844,7 @@ msgid "{0}：{1}"
 msgstr "{0}：{1}"
 
 #. placeholder {0}: post.authorName
-#: apps/app/src/routes/discover-feed-page.tsx:521
+#: apps/app/src/routes/discover-feed-page.tsx:522
 msgid "{0}：{postSummary}"
 msgstr "{0}：{postSummary}"
 
@@ -2394,9 +2394,9 @@ msgstr "世界"
 #: apps/app/src/routes/desktop-feedback-page.tsx:119
 #: apps/app/src/routes/desktop-mobile-page.tsx:207
 #: apps/app/src/routes/desktop-mobile-page.tsx:1221
-#: apps/app/src/routes/discover-feed-page.tsx:714
-#: apps/app/src/routes/discover-feed-page.tsx:857
-#: apps/app/src/routes/discover-feed-page.tsx:1098
+#: apps/app/src/routes/discover-feed-page.tsx:715
+#: apps/app/src/routes/discover-feed-page.tsx:858
+#: apps/app/src/routes/discover-feed-page.tsx:1099
 #: apps/app/src/routes/discover-page.tsx:775
 #: apps/app/src/routes/live-companion-page.tsx:296
 #: apps/app/src/routes/moments-page.tsx:1011
@@ -2483,7 +2483,7 @@ msgstr "世界地址已连通，正在进入应用前同步世界主人资料。
 msgid "世界实例在线"
 msgstr "世界实例在线"
 
-#: apps/app/src/routes/discover-feed-page.tsx:725
+#: apps/app/src/routes/discover-feed-page.tsx:726
 #: apps/app/src/routes/discover-page.tsx:514
 msgid "世界居民公开可见"
 msgstr "世界居民公开可见"
@@ -3456,7 +3456,7 @@ msgid "你先发一条动态，或者等世界里的角色们先开口。"
 msgstr "你先发一条动态，或者等世界里的角色们先开口。"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-list.tsx:111
-#: apps/app/src/routes/discover-feed-page.tsx:1074
+#: apps/app/src/routes/discover-feed-page.tsx:1075
 #: apps/app/src/routes/discover-page.tsx:890
 msgid "你先发一条居民公开可见的动态，或者等世界里的居民先开口。"
 msgstr "你先发一条居民公开可见的动态，或者等世界里的居民先开口。"
@@ -5204,7 +5204,7 @@ msgid "最近删除：{0}"
 msgstr "最近删除：{0}"
 
 #: apps/app/src/i18n/static-dom-seed.ts:35
-#: apps/app/src/routes/discover-feed-page.tsx:768
+#: apps/app/src/routes/discover-feed-page.tsx:769
 msgid "最近动态"
 msgstr "最近动态"
 
@@ -5437,7 +5437,7 @@ msgstr "写点想让世界居民都能看到的内容..."
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:373
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:489
 #: apps/app/src/i18n/static-dom-seed.ts:431
-#: apps/app/src/routes/discover-feed-page.tsx:1005
+#: apps/app/src/routes/discover-feed-page.tsx:1006
 #: apps/app/src/routes/discover-page.tsx:853
 msgid "写评论..."
 msgstr "写评论..."
@@ -5618,7 +5618,7 @@ msgid "分享聊天内容"
 msgstr "分享聊天内容"
 
 #: apps/app/src/components/feed-post-share-card-modal.tsx:33
-#: apps/app/src/routes/discover-feed-page.tsx:880
+#: apps/app/src/routes/discover-feed-page.tsx:881
 msgid "分享这条动态"
 msgstr "分享这条动态"
 
@@ -6128,7 +6128,7 @@ msgid "功能异常"
 msgstr "功能异常"
 
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:323
-#: apps/app/src/routes/discover-feed-page.tsx:922
+#: apps/app/src/routes/discover-feed-page.tsx:923
 msgid "加为好友后才能互动"
 msgstr "加为好友后才能互动"
 
@@ -6230,7 +6230,7 @@ msgstr "动态不存在。"
 msgid "动态内容和媒体不能同时为空。"
 msgstr "动态内容和媒体不能同时为空。"
 
-#: apps/app/src/routes/discover-feed-page.tsx:562
+#: apps/app/src/routes/discover-feed-page.tsx:563
 msgid "动态摘要已复制。"
 msgstr "动态摘要已复制。"
 
@@ -6563,8 +6563,8 @@ msgstr "反馈状态"
 msgid "反馈草稿已清空。"
 msgstr "反馈草稿已清空。"
 
-#: apps/app/src/routes/discover-feed-page.tsx:757
-#: apps/app/src/routes/discover-feed-page.tsx:1083
+#: apps/app/src/routes/discover-feed-page.tsx:758
+#: apps/app/src/routes/discover-feed-page.tsx:1084
 #: apps/app/src/routes/discover-page.tsx:615
 msgid "发一条广场动态"
 msgstr "发一条广场动态"
@@ -6814,7 +6814,7 @@ msgstr "发起群聊"
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:383
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:184
 #: apps/app/src/routes/channels-page.tsx:2002
-#: apps/app/src/routes/discover-feed-page.tsx:1020
+#: apps/app/src/routes/discover-feed-page.tsx:1021
 #: apps/app/src/routes/discover-page.tsx:867
 #: apps/app/src/routes/mobile-add-friend-page.tsx:791
 #: apps/app/src/routes/mobile-note-editor-page.tsx:924
@@ -6840,7 +6840,7 @@ msgstr "发送中"
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:383
 #: apps/app/src/routes/channels-page.tsx:2002
 #: apps/app/src/routes/character-detail-page.tsx:298
-#: apps/app/src/routes/discover-feed-page.tsx:1019
+#: apps/app/src/routes/discover-feed-page.tsx:1020
 #: apps/app/src/routes/discover-page.tsx:866
 #: apps/app/src/routes/mobile-add-friend-page.tsx:686
 #: apps/app/src/routes/welcome-page.tsx:1050
@@ -7031,7 +7031,7 @@ msgstr "取消提醒失败，请稍后再试。"
 #: apps/app/src/components/chat-message-list.tsx:3462
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:958
 #: apps/app/src/routes/desktop-chat-files-page.tsx:757
-#: apps/app/src/routes/discover-feed-page.tsx:974
+#: apps/app/src/routes/discover-feed-page.tsx:975
 #: apps/app/src/routes/favorites-page.tsx:615
 #: apps/app/src/routes/official-account-detail-page.tsx:522
 msgid "取消收藏"
@@ -7924,7 +7924,7 @@ msgstr "图片过大，请先裁剪后再发送。"
 msgid "图片过大，请压缩到 1MB 以内再试。"
 msgstr "图片过大，请压缩到 1MB 以内再试。"
 
-#: apps/app/src/routes/discover-feed-page.tsx:470
+#: apps/app/src/routes/discover-feed-page.tsx:471
 #: apps/app/src/routes/discover-page.tsx:445
 #: apps/app/src/routes/friend-moments-page.tsx:294
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:119
@@ -8113,7 +8113,7 @@ msgstr "处理中"
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:945
 #: apps/app/src/features/official-accounts/service/official-account-service-thread.tsx:497
 #: apps/app/src/routes/channel-author-page.tsx:441
-#: apps/app/src/routes/discover-feed-page.tsx:941
+#: apps/app/src/routes/discover-feed-page.tsx:942
 #: apps/app/src/routes/discover-page.tsx:820
 #: apps/app/src/routes/friend-requests-page.tsx:326
 #: apps/app/src/routes/official-account-detail-page.tsx:509
@@ -8237,7 +8237,7 @@ msgstr "复制到手机"
 msgid "复制到手机失败，请稍后重试。"
 msgstr "复制到手机失败，请稍后重试。"
 
-#: apps/app/src/routes/discover-feed-page.tsx:575
+#: apps/app/src/routes/discover-feed-page.tsx:576
 msgid "复制动态摘要失败，请稍后重试。"
 msgstr "复制动态摘要失败，请稍后重试。"
 
@@ -8380,7 +8380,7 @@ msgstr "复制裁剪图"
 msgid "复制这张隐界名片"
 msgstr "复制这张隐界名片"
 
-#: apps/app/src/routes/discover-feed-page.tsx:881
+#: apps/app/src/routes/discover-feed-page.tsx:882
 msgid "复制这条动态摘要"
 msgstr "复制这条动态摘要"
 
@@ -9069,7 +9069,7 @@ msgid "居民公开"
 msgstr "居民公开"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:134
-#: apps/app/src/routes/discover-feed-page.tsx:896
+#: apps/app/src/routes/discover-feed-page.tsx:897
 #: apps/app/src/routes/discover-page.tsx:781
 msgid "居民公开可见"
 msgstr "居民公开可见"
@@ -9080,7 +9080,7 @@ msgid "居民办事"
 msgstr "居民办事"
 
 #: apps/app/src/components/feed-post-share-card-modal.tsx:72
-#: apps/app/src/routes/discover-feed-page.tsx:858
+#: apps/app/src/routes/discover-feed-page.tsx:859
 #: apps/app/src/routes/discover-page.tsx:550
 #: apps/app/src/routes/discover-page.tsx:775
 msgid "居民动态"
@@ -9830,7 +9830,7 @@ msgstr "已打开文件。"
 #: apps/app/src/routes/channels-page.tsx:734
 #: apps/app/src/routes/character-detail-page.tsx:751
 #: apps/app/src/routes/chat-details-page.tsx:372
-#: apps/app/src/routes/discover-feed-page.tsx:529
+#: apps/app/src/routes/discover-feed-page.tsx:530
 #: apps/app/src/routes/games-page.tsx:345
 #: apps/app/src/routes/group-announcement-page.tsx:185
 #: apps/app/src/routes/group-chat-details-page.tsx:398
@@ -10184,7 +10184,7 @@ msgstr "已设提醒 · {0}"
 
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:341
 #: apps/app/src/i18n/static-dom-seed.ts:366
-#: apps/app/src/routes/discover-feed-page.tsx:943
+#: apps/app/src/routes/discover-feed-page.tsx:944
 #: apps/app/src/routes/discover-page.tsx:822
 msgid "已赞"
 msgstr "已赞"
@@ -10461,12 +10461,12 @@ msgid "平直海岸线，最适合先把节奏找到。"
 msgstr "平直海岸线，最适合先把节奏找到。"
 
 #: apps/app/src/features/shell/desktop-nav-matching.ts:86
-#: apps/app/src/routes/discover-feed-page.tsx:1071
+#: apps/app/src/routes/discover-feed-page.tsx:1072
 msgid "广场"
 msgstr "广场"
 
-#: apps/app/src/routes/discover-feed-page.tsx:208
-#: apps/app/src/routes/discover-feed-page.tsx:253
+#: apps/app/src/routes/discover-feed-page.tsx:209
+#: apps/app/src/routes/discover-feed-page.tsx:254
 #: apps/app/src/routes/discover-page.tsx:369
 #: apps/app/src/routes/discover-page.tsx:385
 msgid "广场互动已更新。"
@@ -10485,9 +10485,9 @@ msgstr "广场会把很多并非好友关系的世界人公开发言一起放进
 #: apps/app/src/features/search/use-search-index.ts:463
 #: apps/app/src/features/shell/desktop-nav-matching.ts:85
 #: apps/app/src/i18n/static-dom-seed.ts:67
-#: apps/app/src/routes/discover-feed-page.tsx:694
-#: apps/app/src/routes/discover-feed-page.tsx:724
-#: apps/app/src/routes/discover-feed-page.tsx:964
+#: apps/app/src/routes/discover-feed-page.tsx:695
+#: apps/app/src/routes/discover-feed-page.tsx:725
+#: apps/app/src/routes/discover-feed-page.tsx:965
 #: apps/app/src/routes/discover-page.tsx:151
 #: apps/app/src/routes/discover-page.tsx:511
 #: apps/app/src/routes/discover-page.tsx:734
@@ -10498,18 +10498,18 @@ msgstr "广场动态"
 
 #. placeholder {0}: formatTimestamp(post.createdAt)
 #: apps/app/src/features/search/use-search-index.ts:450
-#: apps/app/src/routes/discover-feed-page.tsx:692
-#: apps/app/src/routes/discover-feed-page.tsx:961
+#: apps/app/src/routes/discover-feed-page.tsx:693
+#: apps/app/src/routes/discover-feed-page.tsx:962
 msgid "广场动态 · {0}"
 msgstr "广场动态 · {0}"
 
-#: apps/app/src/routes/discover-feed-page.tsx:152
+#: apps/app/src/routes/discover-feed-page.tsx:153
 #: apps/app/src/routes/discover-page.tsx:254
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:57
 msgid "广场动态已发布，世界居民公开可见。"
 msgstr "广场动态已发布，世界居民公开可见。"
 
-#: apps/app/src/routes/discover-feed-page.tsx:817
+#: apps/app/src/routes/discover-feed-page.tsx:818
 msgid "广场动态暂时不可用"
 msgstr "广场动态暂时不可用"
 
@@ -10517,7 +10517,7 @@ msgstr "广场动态暂时不可用"
 msgid "广场发布"
 msgstr "广场发布"
 
-#: apps/app/src/routes/discover-feed-page.tsx:252
+#: apps/app/src/routes/discover-feed-page.tsx:253
 msgid "广场回复已发送。"
 msgstr "广场回复已发送。"
 
@@ -11481,7 +11481,7 @@ msgstr "当前环境暂不支持复制内容摘要。"
 msgid "当前环境暂不支持复制到手机。"
 msgstr "当前环境暂不支持复制到手机。"
 
-#: apps/app/src/routes/discover-feed-page.tsx:549
+#: apps/app/src/routes/discover-feed-page.tsx:550
 msgid "当前环境暂不支持复制动态摘要。"
 msgstr "当前环境暂不支持复制动态摘要。"
 
@@ -11755,7 +11755,7 @@ msgstr "当前设备暂时无法打开相机，请先改用相册选图。"
 #: apps/app/src/routes/channels-page.tsx:753
 #: apps/app/src/routes/character-detail-page.tsx:765
 #: apps/app/src/routes/chat-details-page.tsx:386
-#: apps/app/src/routes/discover-feed-page.tsx:548
+#: apps/app/src/routes/discover-feed-page.tsx:549
 #: apps/app/src/routes/games-page.tsx:357
 #: apps/app/src/routes/games-page.tsx:362
 #: apps/app/src/routes/group-announcement-page.tsx:199
@@ -14198,7 +14198,7 @@ msgstr "收获"
 #: apps/app/src/i18n/static-dom-seed.ts:65
 #: apps/app/src/routes/channels-page.tsx:1578
 #: apps/app/src/routes/desktop-chat-files-page.tsx:757
-#: apps/app/src/routes/discover-feed-page.tsx:974
+#: apps/app/src/routes/discover-feed-page.tsx:975
 #: apps/app/src/routes/favorites-page.tsx:416
 #: apps/app/src/routes/profile-favorites-page.tsx:119
 #: apps/app/src/routes/profile-page.tsx:157
@@ -17370,7 +17370,7 @@ msgstr "正在删除..."
 msgid "正在刷新..."
 msgstr "正在刷新..."
 
-#: apps/app/src/routes/discover-feed-page.tsx:809
+#: apps/app/src/routes/discover-feed-page.tsx:810
 msgid "正在刷新广场动态"
 msgstr "正在刷新广场动态"
 
@@ -17558,7 +17558,7 @@ msgstr "正在打开朋友圈..."
 msgid "正在打开桌面公众号文章"
 msgstr "正在打开桌面公众号文章"
 
-#: apps/app/src/routes/discover-feed-page.tsx:595
+#: apps/app/src/routes/discover-feed-page.tsx:596
 msgid "正在打开桌面发现"
 msgstr "正在打开桌面发现"
 
@@ -18187,7 +18187,7 @@ msgstr "正在载入桌面消息工作区中的服务号会话。"
 msgid "正在载入桌面消息工作区中的订阅号消息视图。"
 msgstr "正在载入桌面消息工作区中的订阅号消息视图。"
 
-#: apps/app/src/routes/discover-feed-page.tsx:597
+#: apps/app/src/routes/discover-feed-page.tsx:598
 msgid "正在载入桌面看一看工作区，马上显示当前动态内容。"
 msgstr "正在载入桌面看一看工作区，马上显示当前动态内容。"
 
@@ -19304,7 +19304,7 @@ msgid "点空地开始种植…"
 msgstr "点空地开始种植…"
 
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:167
-#: apps/app/src/routes/discover-feed-page.tsx:946
+#: apps/app/src/routes/discover-feed-page.tsx:947
 #: apps/app/src/routes/discover-page.tsx:823
 msgid "点赞"
 msgstr "点赞"
@@ -19459,7 +19459,7 @@ msgid "生成中..."
 msgstr "生成中..."
 
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:186
-#: apps/app/src/routes/discover-feed-page.tsx:868
+#: apps/app/src/routes/discover-feed-page.tsx:869
 msgid "生成分享图卡"
 msgstr "生成分享图卡"
 
@@ -20176,7 +20176,7 @@ msgstr "视频流就绪"
 msgid "视频解析失败，请换一个文件再试。"
 msgstr "视频解析失败，请换一个文件再试。"
 
-#: apps/app/src/routes/discover-feed-page.tsx:482
+#: apps/app/src/routes/discover-feed-page.tsx:483
 #: apps/app/src/routes/discover-page.tsx:457
 #: apps/app/src/routes/friend-moments-page.tsx:304
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:129
@@ -20443,7 +20443,7 @@ msgstr "稍等一下，正在同步可加入当前群聊的联系人。"
 msgid "稍等一下，正在同步可拉进群的联系人。"
 msgstr "稍等一下，正在同步可拉进群的联系人。"
 
-#: apps/app/src/routes/discover-feed-page.tsx:810
+#: apps/app/src/routes/discover-feed-page.tsx:811
 msgid "稍等一下，正在同步居民公开动态和互动状态。"
 msgstr "稍等一下，正在同步居民公开动态和互动状态。"
 
@@ -21111,7 +21111,7 @@ msgstr "系统分享"
 #: apps/app/src/routes/channels-page.tsx:780
 #: apps/app/src/routes/character-detail-page.tsx:789
 #: apps/app/src/routes/chat-details-page.tsx:410
-#: apps/app/src/routes/discover-feed-page.tsx:574
+#: apps/app/src/routes/discover-feed-page.tsx:575
 #: apps/app/src/routes/games-page.tsx:374
 #: apps/app/src/routes/games-page.tsx:380
 #: apps/app/src/routes/group-announcement-page.tsx:223
@@ -21143,7 +21143,7 @@ msgstr "系统分享暂时不可用，已复制公众号摘要。"
 msgid "系统分享暂时不可用，已复制内容摘要。"
 msgstr "系统分享暂时不可用，已复制内容摘要。"
 
-#: apps/app/src/routes/discover-feed-page.tsx:561
+#: apps/app/src/routes/discover-feed-page.tsx:562
 msgid "系统分享暂时不可用，已复制动态摘要。"
 msgstr "系统分享暂时不可用，已复制动态摘要。"
 
@@ -23352,7 +23352,7 @@ msgid "请先补充问题描述。"
 msgstr "请先补充问题描述。"
 
 #: apps/app/src/routes/channels-page.tsx:219
-#: apps/app/src/routes/discover-feed-page.tsx:229
+#: apps/app/src/routes/discover-feed-page.tsx:230
 #: apps/app/src/routes/friend-moments-page.tsx:156
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:129
 #: apps/app/src/routes/moments-page.tsx:256
@@ -23531,7 +23531,7 @@ msgstr "请选择视频文件。"
 #: apps/app/src/routes/chat-list-page.tsx:811
 #: apps/app/src/routes/contacts-page.tsx:2166
 #: apps/app/src/routes/create-group-page.tsx:433
-#: apps/app/src/routes/discover-feed-page.tsx:808
+#: apps/app/src/routes/discover-feed-page.tsx:809
 #: apps/app/src/routes/friend-requests-page.tsx:225
 #: apps/app/src/routes/group-announcement-page.tsx:300
 #: apps/app/src/routes/group-chat-background-page.tsx:333
@@ -23576,7 +23576,7 @@ msgstr "读取图片失败，请换一张试试。"
 #: apps/app/src/routes/chat-details-page.tsx:802
 #: apps/app/src/routes/chat-list-page.tsx:821
 #: apps/app/src/routes/create-group-page.tsx:443
-#: apps/app/src/routes/discover-feed-page.tsx:816
+#: apps/app/src/routes/discover-feed-page.tsx:817
 #: apps/app/src/routes/friend-requests-page.tsx:235
 #: apps/app/src/routes/group-chat-background-page.tsx:345
 #: apps/app/src/routes/group-chat-background-page.tsx:377
@@ -23961,7 +23961,7 @@ msgstr "轻轻试一次，就可能遇到一段新的关系线索。"
 msgid "载入桌面公众号文章..."
 msgstr "载入桌面公众号文章..."
 
-#: apps/app/src/routes/discover-feed-page.tsx:599
+#: apps/app/src/routes/discover-feed-page.tsx:600
 msgid "载入桌面发现工作区..."
 msgstr "载入桌面发现工作区..."
 
@@ -24210,10 +24210,10 @@ msgstr "返回上一步"
 #: apps/app/src/routes/chat-details-page.tsx:190
 #: apps/app/src/routes/create-group-page.tsx:270
 #: apps/app/src/routes/discover-encounter-page.tsx:201
-#: apps/app/src/routes/discover-feed-page.tsx:340
-#: apps/app/src/routes/discover-feed-page.tsx:797
-#: apps/app/src/routes/discover-feed-page.tsx:836
-#: apps/app/src/routes/discover-feed-page.tsx:1083
+#: apps/app/src/routes/discover-feed-page.tsx:341
+#: apps/app/src/routes/discover-feed-page.tsx:798
+#: apps/app/src/routes/discover-feed-page.tsx:837
+#: apps/app/src/routes/discover-feed-page.tsx:1084
 #: apps/app/src/routes/discover-scene-page.tsx:254
 #: apps/app/src/routes/friend-moments-page.tsx:458
 #: apps/app/src/routes/friend-requests-page.tsx:258
@@ -24664,7 +24664,7 @@ msgstr "还没有收藏任何内容"
 msgid "还没有收藏内容"
 msgstr "还没有收藏内容"
 
-#: apps/app/src/routes/discover-feed-page.tsx:1072
+#: apps/app/src/routes/discover-feed-page.tsx:1073
 msgid "还没有新动态"
 msgstr "还没有新动态"
 
@@ -25193,7 +25193,7 @@ msgstr "这轮群语音通话已经结束，当前保留为状态记录卡片。
 msgid "这里不只看朋友，世界主人和居民的公开发言都会进入这条流。"
 msgstr "这里不只看朋友，世界主人和居民的公开发言都会进入这条流。"
 
-#: apps/app/src/routes/discover-feed-page.tsx:771
+#: apps/app/src/routes/discover-feed-page.tsx:772
 #: apps/app/src/routes/discover-page.tsx:737
 msgid "这里不只看朋友，也能看到世界里的居民正在说什么。"
 msgstr "这里不只看朋友，也能看到世界里的居民正在说什么。"
@@ -25975,8 +25975,8 @@ msgstr "重试关注"
 #: apps/app/src/routes/character-detail-page.tsx:792
 #: apps/app/src/routes/chat-details-page.tsx:389
 #: apps/app/src/routes/chat-details-page.tsx:413
-#: apps/app/src/routes/discover-feed-page.tsx:541
-#: apps/app/src/routes/discover-feed-page.tsx:567
+#: apps/app/src/routes/discover-feed-page.tsx:542
+#: apps/app/src/routes/discover-feed-page.tsx:568
 #: apps/app/src/routes/games-page.tsx:356
 #: apps/app/src/routes/games-page.tsx:373
 #: apps/app/src/routes/group-announcement-page.tsx:202
@@ -26052,8 +26052,8 @@ msgstr "重试场景相遇"
 #: apps/app/src/routes/character-detail-page.tsx:793
 #: apps/app/src/routes/chat-details-page.tsx:390
 #: apps/app/src/routes/chat-details-page.tsx:414
-#: apps/app/src/routes/discover-feed-page.tsx:541
-#: apps/app/src/routes/discover-feed-page.tsx:567
+#: apps/app/src/routes/discover-feed-page.tsx:542
+#: apps/app/src/routes/discover-feed-page.tsx:568
 #: apps/app/src/routes/games-page.tsx:393
 #: apps/app/src/routes/games-page.tsx:410
 #: apps/app/src/routes/group-announcement-page.tsx:203
@@ -26157,10 +26157,10 @@ msgstr "重试评论点赞"
 #: apps/app/src/routes/contacts-page.tsx:1425
 #: apps/app/src/routes/contacts-page.tsx:1439
 #: apps/app/src/routes/create-group-page.tsx:454
-#: apps/app/src/routes/discover-feed-page.tsx:341
-#: apps/app/src/routes/discover-feed-page.tsx:797
-#: apps/app/src/routes/discover-feed-page.tsx:828
-#: apps/app/src/routes/discover-feed-page.tsx:836
+#: apps/app/src/routes/discover-feed-page.tsx:342
+#: apps/app/src/routes/discover-feed-page.tsx:798
+#: apps/app/src/routes/discover-feed-page.tsx:829
+#: apps/app/src/routes/discover-feed-page.tsx:837
 #: apps/app/src/routes/friend-requests-page.tsx:248
 #: apps/app/src/routes/group-announcement-page.tsx:322
 #: apps/app/src/routes/group-announcement-page.tsx:424
@@ -26656,7 +26656,7 @@ msgstr "雾湖清晨"
 msgid "需先加为好友才能互动。"
 msgstr "需先加为好友才能互动。"
 
-#: apps/app/src/routes/discover-feed-page.tsx:945
+#: apps/app/src/routes/discover-feed-page.tsx:946
 msgid "需好友"
 msgstr "需好友"
 
