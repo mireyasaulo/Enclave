@@ -60,7 +60,7 @@ msgstr "(not generated yet)"
 #: apps/admin/src/routes/reply-logic-page.tsx:1131
 #: apps/admin/src/routes/reply-logic-page.tsx:1138
 msgid "（暂无）"
-msgstr ""
+msgstr "(None)"
 
 #: apps/admin/src/routes/character-editor-page.tsx:654
 msgid "（默认）"
@@ -308,7 +308,7 @@ msgstr "AI-assisted"
 #: apps/admin/src/routes/reply-logic-page.tsx:508
 #: apps/admin/src/routes/reply-logic-page.tsx:1265
 msgid "API 密钥"
-msgstr ""
+msgstr "API Key"
 
 #: apps/admin/src/routes/dashboard-page.tsx:626
 msgid "Core API"
@@ -324,11 +324,11 @@ msgstr "Deck tag"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:4767
 msgid "DeepSeek 默认地址"
-msgstr ""
+msgstr "DeepSeek Default Endpoint"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:4754
 msgid "DeepSeek 默认模型"
-msgstr ""
+msgstr "DeepSeek Default Model"
 
 #: apps/admin/src/routes/need-discovery-page.tsx:2566
 msgid "dry run 适合先观察候选质量，auto send 适合直接补位。"
@@ -618,11 +618,11 @@ msgstr "World owner profile"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:4763
 msgid "世界主人自定义地址"
-msgstr ""
+msgstr "World Owner Custom Endpoint"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:4776
 msgid "世界主人自定义密钥"
-msgstr ""
+msgstr "World Owner Custom Key"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2170
 msgid "世界快照"
@@ -797,7 +797,7 @@ msgstr "Hero label"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5235
 msgid "主答之外的补充位，需要同时满足扩散条件和概率门控。"
-msgstr ""
+msgstr "Supplementary slot beyond the primary reply, requires both diffusion conditions and probability gating to be met."
 
 #: apps/admin/src/routes/chat-records-page.tsx:1454
 msgid "主要场景"
@@ -817,7 +817,7 @@ msgstr "Event Contract"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1243
 msgid "云端模式"
-msgstr ""
+msgstr "Cloud Mode"
 
 #: apps/admin/src/routes/character-editor-page.tsx:849
 msgid "互动响应"
@@ -967,22 +967,22 @@ msgstr "Mission"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5429
 msgid "任务仍在排队，等待到达计划执行时间。"
-msgstr ""
+msgstr "Task is still queued, waiting to reach the scheduled execution time."
 
 #. placeholder {0}: task.errorMessage ? `：${task.errorMessage}` : "。"
 #: apps/admin/src/routes/reply-logic-page.tsx:5434
 msgid "任务失败{0} "
-msgstr ""
+msgstr "Task failed {0} "
 
 #. placeholder {0}: formatGroupReplyCancelReason(task.cancelReason)
 #: apps/admin/src/routes/reply-logic-page.tsx:5432
 msgid "任务已取消，原因：{0}。"
-msgstr ""
+msgstr "Task cancelled, reason: {0}."
 
 #. placeholder {0}: formatDateTime(task.lastAttemptAt)
 #: apps/admin/src/routes/reply-logic-page.tsx:5426
 msgid "任务已开始执行，上次尝试时间 {0}。"
-msgstr ""
+msgstr "Task has started, last attempt at {0}."
 
 #: apps/admin/src/routes/character-editor-page.tsx:991
 #: apps/admin/src/routes/character-factory-page.tsx:50
@@ -1070,15 +1070,15 @@ msgstr "Session"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:750
 msgid "会话内配置角色"
-msgstr ""
+msgstr "Configure Character in Session"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1584
 msgid "会话分支"
-msgstr ""
+msgstr "Session Branch"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:639
 msgid "会话列表"
-msgstr ""
+msgstr "Session List"
 
 #: apps/admin/src/routes/chat-records-page.tsx:487
 msgid "会话列表加载失败"
@@ -1086,7 +1086,7 @@ msgstr "Failed to load session list"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1575
 msgid "会话回复快照暂不可用"
-msgstr ""
+msgstr "Session Reply Snapshot Unavailable"
 
 #: apps/admin/src/routes/chat-records-page.tsx:550
 msgid "会话导航"
@@ -1127,7 +1127,7 @@ msgstr "Location"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5505
 msgid "位置卡片"
-msgstr ""
+msgstr "Location Card"
 
 #: apps/admin/src/routes/character-editor-page.tsx:978
 msgid "低频"
@@ -1321,11 +1321,11 @@ msgstr "Failed to save character"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1201
 msgid "保存角色配置"
-msgstr ""
+msgstr "Save Character Config"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1310
 msgid "保存运行配置"
-msgstr ""
+msgstr "Save Runtime Config"
 
 #: apps/admin/src/routes/token-usage-page.tsx:1569
 msgid "保存预算配置"
@@ -1333,19 +1333,19 @@ msgstr "Save budget config"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1910
 msgid "保留 14 天"
-msgstr ""
+msgstr "Retain 14 Days"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1908
 msgid "保留 3 天"
-msgstr ""
+msgstr "Retain 3 Days"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1911
 msgid "保留 30 天"
-msgstr ""
+msgstr "Retain 30 Days"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1909
 msgid "保留 7 天"
-msgstr ""
+msgstr "Retain 7 Days"
 
 #: apps/admin/src/routes/dashboard-page.tsx:1940
 msgid "保留最近日志入口，方便做故障留痕和快速定位，不再让日志列表挤占首页中段。"
@@ -1353,7 +1353,7 @@ msgstr "Keep recent log entry points for troubleshooting without letting logs ta
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5585
 msgid "信任增长"
-msgstr ""
+msgstr "Trust Growth"
 
 #: apps/admin/src/routes/need-discovery-page.tsx:1557
 msgid "信号"
@@ -1421,15 +1421,15 @@ msgstr "Candidate Pool at Capacity"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1484
 msgid "候选消息预演"
-msgstr ""
+msgstr "Candidate Message Rehearsal"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1529
 msgid "候选消息预演快照"
-msgstr ""
+msgstr "Candidate Message Rehearsal Snapshot"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1506
 msgid "候选用户消息"
-msgstr ""
+msgstr "Candidate User Message"
 
 #: apps/admin/src/routes/need-discovery-page.tsx:1310
 msgid "候选范围"
@@ -1547,7 +1547,7 @@ msgstr "Create your first character, or sync a batch from WeChat friends, then s
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1576
 msgid "先刷新快照；如果仍不可用，检查该会话是否已有参与角色和可见历史。"
-msgstr ""
+msgstr "Refresh the snapshot first; if still unavailable, check whether this session has participating characters and visible history."
 
 #: apps/admin/src/components/game-curation-workbench.tsx:322
 msgid "先在上面的目录工作台里创建游戏，策展配置才能引用这些游戏 ID。"
@@ -1555,15 +1555,15 @@ msgstr "Create games in the catalog workbench above first, then the curation con
 
 #: apps/admin/src/routes/reply-logic-page.tsx:800
 msgid "先在会话内选择一个角色，再修改它的运行配置。"
-msgstr ""
+msgstr "Select a character in the session first, then modify its runtime config."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1396
 msgid "先在左侧角色列表里选中一个角色，再查看真实回复快照。"
-msgstr ""
+msgstr "Select a character from the left character list first, then view the actual reply snapshot."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:801
 msgid "先在左侧选择一个角色，再开始编辑运行配置。"
-msgstr ""
+msgstr "Select a character on the left first, then start editing the runtime config."
 
 #: apps/admin/src/components/game-submission-workbench.tsx:733
 msgid "先在角色页创建或导入角色，再把角色产游稿件带进投稿池。"
@@ -1680,11 +1680,11 @@ msgstr "Select a submission first"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:741
 msgid "先选择会话角色"
-msgstr ""
+msgstr "Select a Session Character First"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:742
 msgid "先选择角色"
-msgstr ""
+msgstr "Select a Character First"
 
 #: apps/admin/src/routes/chat-records-page.tsx:552
 msgid "先锁定会话范围，再进入中间时间线与右侧复盘操作。"
@@ -1788,7 +1788,7 @@ msgstr "Shared Constraints"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5583
 msgid "共享语境"
-msgstr ""
+msgstr "Shared Context"
 
 #: apps/admin/src/routes/dashboard-page.tsx:424
 #: apps/admin/src/routes/dashboard-page.tsx:438
@@ -1820,11 +1820,11 @@ msgstr "Relationship Distribution"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5589
 msgid "关系完成"
-msgstr ""
+msgstr "Relationship Completion"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5555
 msgid "关系弧线"
-msgstr ""
+msgstr "Relationship Arc"
 
 #: apps/admin/src/routes/character-editor-page.tsx:550
 #: apps/admin/src/routes/characters-wiki-sync-section.tsx:41
@@ -1938,7 +1938,7 @@ msgstr "Internal review notes, ops suggestions, or rejection reason"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5532
 msgid "内部推理"
-msgstr ""
+msgstr "Internal Reasoning"
 
 #: apps/admin/src/components/game-release-workbench.tsx:802
 #: apps/admin/src/routes/games-page.tsx:136
@@ -1997,7 +1997,7 @@ msgstr "Latest Run"
 #. placeholder {3}: formatRateDelta(actor.issueRateDelta)
 #: apps/admin/src/routes/reply-logic-page.tsx:5313
 msgid "最近 {0} 轮里，这个角色的异常率是 {1}%，相对{2}抬高了 {3}。"
-msgstr ""
+msgstr "In the last {0} rounds, this character's anomaly rate is {1}%, raised by {3} relative to {2}."
 
 #: apps/admin/src/routes/dashboard-page.tsx:451
 msgid "最近 {recentSchedulerErrorCount} 条调度记录返回 error，建议先复核 job 状态和最近执行摘要。"
@@ -2012,7 +2012,7 @@ msgstr "Latest 3"
 #. placeholder {1}: (actor.recentIssueRate * 100).toFixed(1)
 #: apps/admin/src/routes/reply-logic-page.tsx:5310
 msgid "最近 8 轮里，这个角色已有 {0} 条终态任务；因为还没有足够历史基线，所以先按绝对异常率 {1}% 做兜底监控。"
-msgstr ""
+msgstr "In the last 8 rounds, this character has {0} terminal-state tasks; since there is not yet enough historical baseline, monitoring falls back to absolute anomaly rate {1}%."
 
 #: apps/admin/src/routes/token-usage-page.tsx:1633
 #: apps/admin/src/routes/token-usage-page.tsx:1788
@@ -2056,12 +2056,12 @@ msgstr "Recent Messages"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5413
 msgid "最近发言惩罚：未触发"
-msgstr ""
+msgstr "Recent Speech Penalty: Not Triggered"
 
 #. placeholder {0}: recentSpeakerIndex + 1
 #: apps/admin/src/routes/reply-logic-page.tsx:5416
 msgid "最近发言惩罚：窗口内第 {0} 位"
-msgstr ""
+msgstr "Recent Speech Penalty: #{0} in Window"
 
 #: apps/admin/src/routes/dashboard-page.tsx:1486
 msgid "最近失败"
@@ -2111,12 +2111,12 @@ msgstr "Recent Short-cycle Runs"
 #. placeholder {0}: issue.count
 #: apps/admin/src/routes/reply-logic-page.tsx:5251
 msgid "最近群聊任务里，这个取消原因共出现 {0} 次，通常说明旧轮次被更新的用户消息覆盖，或者执行前角色上下文已经失效。"
-msgstr ""
+msgstr "In recent group chat tasks, this cancellation reason occurred {0} times, typically indicating old rounds were overwritten by newer user messages, or the character context expired before execution."
 
 #. placeholder {0}: issue.count
 #: apps/admin/src/routes/reply-logic-page.tsx:5254
 msgid "最近群聊任务里，这类执行错误共出现 {0} 次。优先看失败任务明细里的原始错误，再决定是重新入队还是修运行环境。"
-msgstr ""
+msgstr "In recent group chat tasks, this type of execution error occurred {0} times. Check the raw error in the failed task details first, then decide whether to re-queue or fix the runtime environment."
 
 #: apps/admin/src/routes/character-runtime-page.tsx:154
 msgid "最近聊天时间"
@@ -2221,7 +2221,7 @@ msgstr "Minutes"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1559
 msgid "切换到按会话查看后，先在左侧会话列表里选中一个目标。"
-msgstr ""
+msgstr "After switching to session view, select a target from the session list on the left."
 
 #: apps/admin/src/components/world-language-switcher.tsx:53
 msgid "切换聊天、朋友圈和世界内容生成语言"
@@ -2283,7 +2283,7 @@ msgstr "Refresh the WorldContext snapshot for the reply pipeline."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1413
 msgid "刷新一次快照；如果仍不可用，先检查推理服务配置和角色运行状态。"
-msgstr ""
+msgstr "Refresh the snapshot once; if still unavailable, check the inference service config and character runtime status first."
 
 #: apps/admin/src/routes/chat-records-page.tsx:556
 msgid "刷新中"
@@ -2299,7 +2299,7 @@ msgstr "Refresh diff"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:561
 msgid "刷新快照"
-msgstr ""
+msgstr "Refresh Snapshot"
 
 #: apps/admin/src/routes/games-page.tsx:1047
 msgid "前台定位"
@@ -2357,7 +2357,7 @@ msgstr "Medical, legal, and financial roles are high-risk categories and require
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5534
 msgid "协作路由"
-msgstr ""
+msgstr "Collaborative Routing"
 
 #: apps/admin/src/routes/dashboard-page.tsx:650
 #: apps/admin/src/routes/dashboard-page.tsx:831
@@ -2387,7 +2387,7 @@ msgstr "Maintain new-game ranks and copy separately, not shared with the hot ran
 #: apps/admin/src/routes/reply-logic-page.tsx:5144
 #: apps/admin/src/routes/reply-logic-page.tsx:5154
 msgid "单聊"
-msgstr ""
+msgstr "Direct Chat"
 
 #: apps/admin/src/routes/token-usage-page.tsx:3490
 msgid "单聊回复生成"
@@ -2395,7 +2395,7 @@ msgstr "DM Reply Generation"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1439
 msgid "单聊回复角色快照"
-msgstr ""
+msgstr "Direct Chat Reply Character Snapshot"
 
 #: apps/admin/src/components/game-release-workbench.tsx:672
 msgid "卡片标签"
@@ -2483,7 +2483,7 @@ msgstr "Deduplication & Suppression"
 #: apps/admin/src/routes/reply-logic-page.tsx:493
 #: apps/admin/src/routes/reply-logic-page.tsx:1595
 msgid "参与角色"
-msgstr ""
+msgstr "Participating Characters"
 
 #: apps/admin/src/lib/digital-human-admin-summary.ts:33
 msgid "参数无效"
@@ -2550,7 +2550,7 @@ msgstr "happened on {0}"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1000
 msgid "发视频号"
-msgstr ""
+msgstr "Post Video Channel"
 
 #: apps/admin/src/routes/character-editor-page.tsx:828
 msgid "发视频号内容"
@@ -2672,7 +2672,7 @@ msgstr "Visible"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1611
 msgid "可见会话历史"
-msgstr ""
+msgstr "Visible Conversation History"
 
 #: apps/admin/src/components/game-release-workbench.tsx:530
 #: apps/admin/src/components/game-release-workbench.tsx:720
@@ -2722,7 +2722,7 @@ msgstr "Sync WeChat Friends"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5440
 msgid "同群出现了更新的用户消息"
-msgstr ""
+msgstr "A newer user message appeared in the same group"
 
 #: apps/admin/src/routes/characters-page.tsx:1194
 msgid "名人预设"
@@ -2866,11 +2866,11 @@ msgstr "Excellent Reply"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:828
 msgid "回复运行"
-msgstr ""
+msgstr "Reply Run"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1211
 msgid "回复运行配置"
-msgstr ""
+msgstr "Reply Run Configuration"
 
 #: apps/admin/src/components/root-layout.tsx:236
 #: apps/admin/src/lib/route-breadcrumb.ts:157
@@ -2983,7 +2983,7 @@ msgstr "Online status"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:851
 msgid "在线状态模式"
-msgstr ""
+msgstr "Online Status Mode"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2178
 msgid "在线状态调度"
@@ -3027,11 +3027,11 @@ msgstr "Scene Prompt"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:959
 msgid "场景提示词 — 主动发布"
-msgstr ""
+msgstr "Scene Prompt — Proactive Post"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1021
 msgid "场景提示词 — 互动响应"
-msgstr ""
+msgstr "Scene Prompt — Interactive Response"
 
 #: apps/admin/src/routes/character-editor-page.tsx:253
 #: apps/admin/src/routes/character-editor-page.tsx:533
@@ -3044,12 +3044,12 @@ msgstr "Basic Profile"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:940
 msgid "处于”自动调度”的字段仍会被定时任务更新；切到”人工锁定”后，后台手动设置的在线状态或当前活动才会持续生效。"
-msgstr ""
+msgstr "Fields in \"Auto Schedule\" mode will still be updated by scheduled tasks; once switched to \"Manual Lock\", only the online status or current activity set manually in the backend will persist."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1885
 #: apps/admin/src/routes/reply-logic-page.tsx:5162
 msgid "处理中"
-msgstr ""
+msgstr "Processing"
 
 #. placeholder {0}: statusQuery.data?.inferenceGateway.inFlightRequests ?? 0
 #. placeholder {1}: statusQuery.data?.inferenceGateway.maxConcurrency ?? 0
@@ -3219,7 +3219,7 @@ msgstr "Friend Request / Shake Greeting"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1082
 msgid "好友请求/摇一摇问候"
-msgstr ""
+msgstr "Friend Request / Shake Greeting"
 
 #: apps/admin/src/routes/chat-records-page.tsx:1116
 msgid "如：高需求、高成本、易复用"
@@ -3302,15 +3302,15 @@ msgstr "Instance status needs confirmation"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:516
 msgid "实例级接口地址"
-msgstr ""
+msgstr "Instance-Level API Endpoint"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1289
 msgid "实例级推理服务已保存，运行时快照正在刷新。"
-msgstr ""
+msgstr "Instance-level inference service saved; runtime snapshot is refreshing."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:512
 msgid "实例级模型"
-msgstr ""
+msgstr "Instance-Level Model"
 
 #: apps/admin/src/routes/token-usage-page.tsx:981
 #: apps/admin/src/routes/token-usage-page.tsx:2510
@@ -3552,7 +3552,7 @@ msgstr "Saved"
 #. placeholder {0}: providerSetup.providerSaveMutation.data.model
 #: apps/admin/src/routes/reply-logic-page.tsx:469
 msgid "已保存实例级推理服务：{0}"
-msgstr ""
+msgstr "Instance-level inference service saved: {0}"
 
 #: apps/admin/src/routes/need-discovery-page.tsx:103
 #: apps/admin/src/routes/need-discovery-page.tsx:3372
@@ -3589,7 +3589,7 @@ msgstr "Deleted"
 #. placeholder {0}: formatDateTime(task.sentAt)
 #: apps/admin/src/routes/reply-logic-page.tsx:5423
 msgid "已发出，发送时间 {0}。"
-msgstr ""
+msgstr "Sent at {0}."
 
 #: apps/admin/src/components/game-release-workbench.tsx:238
 msgid "已发布次数"
@@ -3598,12 +3598,12 @@ msgstr "Publish count"
 #: apps/admin/src/routes/reply-logic-page.tsx:1888
 #: apps/admin/src/routes/reply-logic-page.tsx:5164
 msgid "已发送"
-msgstr ""
+msgstr "Sent"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1887
 #: apps/admin/src/routes/reply-logic-page.tsx:5166
 msgid "已取消"
-msgstr ""
+msgstr "Cancelled"
 
 #: apps/admin/src/components/admin-workbench.tsx:598
 #: apps/admin/src/components/game-release-workbench.tsx:337
@@ -3649,7 +3649,7 @@ msgstr "Reviewed"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:4737
 msgid "已完成"
-msgstr ""
+msgstr "Completed"
 
 #: apps/admin/src/components/admin-sidebar.tsx:158
 #: apps/admin/src/routes/dashboard-page.tsx:1024
@@ -3663,7 +3663,7 @@ msgstr "Applied"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5579
 msgid "已建立连接"
-msgstr ""
+msgstr "Connection Established"
 
 #: apps/admin/src/routes/token-usage-page.tsx:1123
 msgid "已开启"
@@ -3705,7 +3705,7 @@ msgstr "Generated and filled in — please review and adjust below"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1487
 msgid "已生成预演"
-msgstr ""
+msgstr "Rehearsal Generated"
 
 #: apps/admin/src/routes/dashboard-page.tsx:1740
 msgid "已生成预览"
@@ -3854,7 +3854,7 @@ msgstr "Underlying logic"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:4728
 msgid "延迟回复"
-msgstr ""
+msgstr "Delayed Reply"
 
 #. placeholder {0}: run.suggestedMessage
 #: apps/admin/src/routes/self-agent-page.tsx:682
@@ -3919,7 +3919,7 @@ msgstr "Abnormal"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5285
 msgid "异常抬升"
-msgstr ""
+msgstr "Anomalous Spike"
 
 #: apps/admin/src/routes/token-usage-page.tsx:733
 #: apps/admin/src/routes/token-usage-page.tsx:1581
@@ -3938,7 +3938,7 @@ msgstr "Current"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5538
 msgid "当前上下文"
-msgstr ""
+msgstr "Current Context"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2414
 msgid "当前不在界闻早报、午报或晚报窗口，且未指定补发时段。"
@@ -4092,11 +4092,11 @@ msgstr "Current workspace"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:809
 msgid "当前已填写 systemPrompt，真实回复时会直接覆盖结构化提示词拼装。你在下面改的身份、语气、边界字段，只有清空 systemPrompt 后才会重新体现在最终提示词里。"
-msgstr ""
+msgstr "A systemPrompt is currently filled in, which will directly override the structured prompt assembly during actual replies. The identity, tone, and boundary fields you edit below will only take effect in the final prompt after the systemPrompt is cleared."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:541
 msgid "当前已带入"
-msgstr ""
+msgstr "Currently Loaded"
 
 #: apps/admin/src/routes/chat-records-page.tsx:1064
 msgid "当前已标记为"
@@ -4270,7 +4270,7 @@ msgstr "No input/output preview to show right now."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:797
 msgid "当前没有可编辑角色"
-msgstr ""
+msgstr "No editable character available"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2418
 msgid "当前没有可见角色，跳过朋友圈调度。"
@@ -4278,11 +4278,11 @@ msgstr "No visible characters right now; skipping moment scheduling."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1558
 msgid "当前没有可选会话"
-msgstr ""
+msgstr "No conversation available"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1395
 msgid "当前没有可选角色"
-msgstr ""
+msgstr "No character available"
 
 #: apps/admin/src/lib/digital-human-admin-summary.ts:107
 msgid "当前没有扩展参数 JSON。"
@@ -4330,11 +4330,11 @@ msgstr "Current activity"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:866
 msgid "当前活动模式"
-msgstr ""
+msgstr "Current Activity Mode"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5241
 msgid "当前消息没有明确提及，也不是 @所有人，所以不会额外扩散到其他角色。"
-msgstr ""
+msgstr "The current message does not explicitly mention anyone and is not @everyone, so it will not be distributed to other characters."
 
 #: apps/admin/src/components/game-release-workbench.tsx:236
 msgid "当前版本号"
@@ -4350,7 +4350,7 @@ msgstr "Currently Active"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:678
 msgid "当前生效运行时摘要"
-msgstr ""
+msgstr "Currently Active Runtime Summary"
 
 #: apps/admin/src/routes/games-page.tsx:566
 msgid "当前目录已基本同步正式版本"
@@ -4362,7 +4362,7 @@ msgstr "Current directory data synced"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:497
 msgid "当前目标"
-msgstr ""
+msgstr "Current Target"
 
 #: apps/admin/src/routes/games-page.tsx:693
 msgid "当前视图"
@@ -4432,7 +4432,7 @@ msgstr "Currently inheriting global default routing."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:733
 msgid "当前范围"
-msgstr ""
+msgstr "Current Scope"
 
 #: apps/admin/src/components/game-release-workbench.tsx:466
 msgid "当前草稿"
@@ -4581,7 +4581,7 @@ msgstr "No Pending Blockers on This Dashboard"
 #. placeholder {4}: point.failedCount
 #: apps/admin/src/routes/reply-logic-page.tsx:5402
 msgid "当天共归档 {0} 条终态任务，涉及 {1} 轮；其中已发送 {2} 条、已取消 {3} 条、失败 {4} 条。"
-msgstr ""
+msgstr "A total of {0} terminal tasks were archived today, spanning {1} rounds; of which {2} were sent, {3} cancelled, and {4} failed."
 
 #: apps/admin/src/routes/dashboard-page.tsx:935
 msgid "影响范围"
@@ -4753,7 +4753,7 @@ msgstr "Quick actions"
 #: apps/admin/src/routes/reply-logic-page.tsx:582
 #: apps/admin/src/routes/reply-logic-page.tsx:1629
 msgid "快照"
-msgstr ""
+msgstr "Snapshot"
 
 #: apps/admin/src/routes/token-usage-page.tsx:3500
 msgid "快速生成角色"
@@ -5030,7 +5030,7 @@ msgstr "Execution Mode"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1523
 msgid "执行预演"
-msgstr ""
+msgstr "Run Rehearsal"
 
 #: apps/admin/src/routes/dashboard-page.tsx:1205
 msgid "扩展参数"
@@ -5208,7 +5208,7 @@ msgstr "Determine proximity to threshold based on actual ledger usage accumulate
 
 #: apps/admin/src/routes/reply-logic-page.tsx:620
 msgid "按会话"
-msgstr ""
+msgstr "By Conversation"
 
 #: apps/admin/src/routes/token-usage-page.tsx:697
 #: apps/admin/src/routes/token-usage-page.tsx:939
@@ -5266,7 +5266,7 @@ msgstr "Organize profile basics, personality settings, and behavior constraints 
 
 #: apps/admin/src/routes/reply-logic-page.tsx:609
 msgid "按角色"
-msgstr ""
+msgstr "By Character"
 
 #: apps/admin/src/routes/token-usage-page.tsx:1304
 msgid "按角色预算"
@@ -5343,7 +5343,7 @@ msgstr "API"
 #: apps/admin/src/routes/reply-logic-page.tsx:504
 #: apps/admin/src/routes/reply-logic-page.tsx:1223
 msgid "接口地址"
-msgstr ""
+msgstr "API Endpoint"
 
 #: apps/admin/src/routes/need-discovery-page.tsx:2343
 msgid "控制一次摇一摇从多少证据里取样，以及生成方向的新鲜感和惊喜程度。"
@@ -5628,7 +5628,7 @@ msgstr "Document not initialized"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5509
 msgid "文章卡片"
-msgstr ""
+msgstr "Article Card"
 
 #: apps/admin/src/routes/characters-wiki-sync-section.tsx:717
 #: apps/admin/src/routes/characters-wiki-sync-section.tsx:778
@@ -5725,7 +5725,7 @@ msgstr "New-game ranking is empty"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5377
 msgid "新用户消息覆盖了旧轮任务"
-msgstr ""
+msgstr "New user message overrode old-round task"
 
 #: apps/admin/src/routes/games-page.tsx:787
 msgid "新草稿"
@@ -5800,7 +5800,7 @@ msgstr "No stable revision"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:645
 msgid "无角色"
-msgstr ""
+msgstr "No Character"
 
 #: apps/admin/src/routes/chat-records-page.tsx:937
 msgid "无附加条件"
@@ -5923,7 +5923,7 @@ msgstr "No content"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5302
 msgid "暂无历史基线"
-msgstr ""
+msgstr "No Historical Baseline"
 
 #: apps/admin/src/components/game-release-workbench.tsx:286
 msgid "暂无发布摘要"
@@ -6071,7 +6071,7 @@ msgstr "Moments comment / reply"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1042
 msgid "朋友圈评论/回复"
-msgstr ""
+msgstr "Moments Comment / Reply"
 
 #: apps/admin/src/routes/token-usage-page.tsx:3493
 msgid "朋友圈评论生成"
@@ -6220,7 +6220,7 @@ msgstr "Original model not recorded"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5395
 msgid "未记录日期"
-msgstr ""
+msgstr "Date Not Recorded"
 
 #: apps/admin/src/routes/chat-records-page.tsx:1486
 msgid "未记录模型"
@@ -6259,7 +6259,7 @@ msgstr "Not set"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:890
 msgid "未设置 / 交给调度"
-msgstr ""
+msgstr "Not Set / Delegate to Scheduler"
 
 #: apps/admin/src/lib/digital-human-admin-summary.ts:100
 msgid "未设置时，provider-state 回调不会附带保护 token。"
@@ -6297,7 +6297,7 @@ msgstr "Open-loop items"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1242
 msgid "本地兼容"
-msgstr ""
+msgstr "Local Compatible"
 
 #: apps/admin/src/routes/characters-wiki-sync-section.tsx:74
 msgid "本地角色不存在"
@@ -6619,7 +6619,7 @@ msgstr "Core memory"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1128
 msgid "核心记忆："
-msgstr ""
+msgstr "Core Memory:"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2200
 #: apps/admin/src/routes/token-usage-page.tsx:3504
@@ -6643,7 +6643,7 @@ msgstr "Core memory updates weekly on Mondays; recent summary updates daily."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1123
 msgid "核心记忆每周一自动更新，近期摘要每日自动更新。在运行台中可查看和手动覆盖当前值。"
-msgstr ""
+msgstr "Core memory is auto-updated every Monday; recent summaries are auto-updated daily. You can view and manually override the current values in the runtime console."
 
 #: apps/admin/src/routes/dashboard-page.tsx:2241
 msgid "根据时间段刷新角色当前活动状态。"
@@ -6865,7 +6865,7 @@ msgstr "Loading Token Usage Center..."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:792
 msgid "正在加载会话角色配置..."
-msgstr ""
+msgstr "Loading session character config..."
 
 #: apps/admin/src/routes/dashboard-page.tsx:1779
 msgid "正在加载已保存的推理服务配置..."
@@ -6902,7 +6902,7 @@ msgstr "Loading character list..."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:786
 msgid "正在加载角色配置..."
-msgstr ""
+msgstr "Loading character config..."
 
 #: apps/admin/src/components/root-layout.tsx:65
 msgid "正在同步远程 API、推理网关和世界表面状态。"
@@ -6930,7 +6930,7 @@ msgstr "Loading workspace document..."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1565
 msgid "正在读取会话回复快照..."
-msgstr ""
+msgstr "Reading session reply snapshot..."
 
 #: apps/admin/src/routes/chat-records-page.tsx:1390
 msgid "正在读取会话成本..."
@@ -6942,7 +6942,7 @@ msgstr "Loading list"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:534
 msgid "正在读取回复逻辑总览..."
-msgstr ""
+msgstr "Reading reply logic overview..."
 
 #: apps/admin/src/components/root-layout.tsx:63
 msgid "正在读取实例状态"
@@ -6962,7 +6962,7 @@ msgstr "Reading desktop runtime diagnostics..."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1402
 msgid "正在读取角色回复快照..."
-msgstr ""
+msgstr "Reading character reply snapshot..."
 
 #: apps/admin/src/routes/need-discovery-page.tsx:467
 msgid "正在读取需求发现与摇一摇配置..."
@@ -7158,12 +7158,12 @@ msgstr "Legal"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:842
 msgid "法律, 理财, 心理"
-msgstr ""
+msgstr "Legal, Finance, Psychology"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:477
 #: apps/admin/src/routes/reply-logic-page.tsx:1429
 msgid "活动"
-msgstr ""
+msgstr "Activity"
 
 #: apps/admin/src/components/game-curation-workbench.tsx:997
 msgid "活动 ID"
@@ -7212,7 +7212,7 @@ msgstr "Activity frequency"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:899
 msgid "活跃开始小时"
-msgstr ""
+msgstr "Active Start Hour"
 
 #: apps/admin/src/routes/character-editor-page.tsx:1017
 msgid "活跃开始小时（0-23）"
@@ -7233,7 +7233,7 @@ msgstr "Active hours"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:912
 msgid "活跃结束小时"
-msgstr ""
+msgstr "Active End Hour"
 
 #: apps/admin/src/routes/character-editor-page.tsx:1027
 msgid "活跃结束小时（0-23）"
@@ -7253,11 +7253,11 @@ msgstr "Active Scheduler Jobs"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1300
 msgid "测试中..."
-msgstr ""
+msgstr "Testing..."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1301
 msgid "测试连接"
-msgstr ""
+msgstr "Test Connection"
 
 #: apps/admin/src/routes/dashboard-page.tsx:841
 msgid "消息总数"
@@ -7269,11 +7269,11 @@ msgstr "Message structure breakdown"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1921
 msgid "清理中..."
-msgstr ""
+msgstr "Cleaning up..."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1904
 msgid "清理保留期"
-msgstr ""
+msgstr "Cleanup Retention Period"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2219
 msgid "清理当天过期的待处理好友请求。"
@@ -7281,16 +7281,16 @@ msgstr "Clean up pending friend requests that expire today."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1921
 msgid "清理终态任务"
-msgstr ""
+msgstr "Clean Up Terminal-State Tasks"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1516
 #: apps/admin/src/routes/reply-logic-page.tsx:2370
 msgid "清空"
-msgstr ""
+msgstr "Clear"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1172
 msgid "清空所有提示词"
-msgstr ""
+msgstr "Clear All Prompts"
 
 #: apps/admin/src/routes/characters-wiki-sync-section.tsx:365
 msgid "清空所选"
@@ -7310,7 +7310,7 @@ msgstr "Clear filters"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1189
 msgid "清空近期摘要"
-msgstr ""
+msgstr "Clear Recent Summary"
 
 #: apps/admin/src/routes/chat-records-page.tsx:1217
 msgid "清除中..."
@@ -7396,7 +7396,7 @@ msgstr "Hot ranking is empty"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5466
 msgid "熟人"
-msgstr ""
+msgstr "Acquaintance"
 
 #: apps/admin/src/routes/dashboard-page.tsx:864
 msgid "版本"
@@ -7463,11 +7463,11 @@ msgstr "Players label"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:4752
 msgid "环境变量 AI_MODEL"
-msgstr ""
+msgstr "Env Var AI_MODEL"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:4765
 msgid "环境变量 OPENAI_BASE_URL"
-msgstr ""
+msgstr "Env Var OPENAI_BASE_URL"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2535
 msgid "环境变量覆盖"
@@ -7475,7 +7475,7 @@ msgstr "Environment override"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:4778
 msgid "环境变量默认密钥"
-msgstr ""
+msgstr "Env Var Default Key"
 
 #. placeholder {0}: needDiscoveryCandidates[1]
 #: apps/admin/src/routes/dashboard-page.tsx:2399
@@ -7581,7 +7581,7 @@ msgstr "Retention Message"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:545
 msgid "的回复逻辑上下文。"
-msgstr ""
+msgstr "'s reply logic context."
 
 #: apps/admin/src/routes/token-usage-page.tsx:1425
 #: apps/admin/src/routes/token-usage-page.tsx:2789
@@ -7631,7 +7631,7 @@ msgstr "Target World Language"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:654
 msgid "目标摘要"
-msgstr ""
+msgstr "Target Summary"
 
 #: apps/admin/src/routes/need-discovery-page.tsx:2569
 #: apps/admin/src/routes/need-discovery-page.tsx:3393
@@ -7657,7 +7657,7 @@ msgstr "Real-world action"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:657
 msgid "真实运行推理服务"
-msgstr ""
+msgstr "Live Inference Service"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:347
 msgid "睡眠延迟"
@@ -7864,7 +7864,7 @@ msgstr "Waiting for desktop shell confirmation"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:727
 msgid "等待目标"
-msgstr ""
+msgstr "Awaiting Target"
 
 #: apps/admin/src/lib/digital-human-admin-summary.ts:19
 msgid "等待系统状态返回数字人 provider 配置。"
@@ -7892,7 +7892,7 @@ msgstr "Awaiting selection"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1487
 msgid "等待预演"
-msgstr ""
+msgstr "Awaiting Rehearsal"
 
 #: apps/admin/src/routes/dashboard-page.tsx:1741
 msgid "等待预览"
@@ -7965,7 +7965,7 @@ msgstr "System status detected an external player template."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:4750
 msgid "系统配置 ai_model"
-msgstr ""
+msgstr "System Config ai_model"
 
 #: apps/admin/src/components/admin-topbar.tsx:72
 msgid "紧凑"
@@ -8094,15 +8094,15 @@ msgstr "Confidence"
 #: apps/admin/src/routes/reply-logic-page.tsx:5141
 #: apps/admin/src/routes/reply-logic-page.tsx:5151
 msgid "群聊"
-msgstr ""
+msgstr "Group Chat"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5540
 msgid "群聊上下文"
-msgstr ""
+msgstr "Group Chat Context"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1873
 msgid "群聊回复任务"
-msgstr ""
+msgstr "Group Chat Reply Task"
 
 #: apps/admin/src/routes/token-usage-page.tsx:3491
 msgid "群聊回复生成"
@@ -8110,7 +8110,7 @@ msgstr "Group chat reply generation"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5300
 msgid "群聊整体历史"
-msgstr ""
+msgstr "Group Chat Full History"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:223
 #: apps/admin/src/routes/dashboard-page.tsx:1559
@@ -8263,7 +8263,7 @@ msgstr "Draft is not ready for downstream operations"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5528
 msgid "行为模式"
-msgstr ""
+msgstr "Behavior Pattern"
 
 #: apps/admin/src/components/character-workspace-nav.tsx:19
 #: apps/admin/src/routes/character-editor-page.tsx:417
@@ -8310,11 +8310,11 @@ msgstr "Emoji"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5507
 msgid "表情包"
-msgstr ""
+msgstr "Sticker / Meme"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5231
 msgid "被回复目标或显式提及时，planner 会优先把他放进本轮发言名单。"
-msgstr ""
+msgstr "When replied to or explicitly mentioned, the planner will prioritize adding this character to the current round's speaker list."
 
 #: apps/admin/src/routes/self-agent-page.tsx:89
 msgid "被策略拦下"
@@ -8327,7 +8327,7 @@ msgstr "Requires existing cyber avatar signal"
 #: apps/admin/src/routes/reply-logic-page.tsx:585
 #: apps/admin/src/routes/reply-logic-page.tsx:5542
 msgid "规则"
-msgstr ""
+msgstr "Rules"
 
 #: apps/admin/src/routes/need-discovery-page.tsx:3191
 msgid "规则可按需微调"
@@ -8385,7 +8385,7 @@ msgstr "Character-made"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:626
 msgid "角色列表"
-msgstr ""
+msgstr "Character List"
 
 #: apps/admin/src/lib/route-breadcrumb.ts:109
 msgid "角色制造与发布"
@@ -8393,7 +8393,7 @@ msgstr "Character Factory and Publishing"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5298
 msgid "角色历史"
-msgstr ""
+msgstr "Character History"
 
 #: apps/admin/src/components/game-submission-workbench.tsx:760
 msgid "角色名"
@@ -8418,7 +8418,7 @@ msgstr "Character Reply"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1412
 msgid "角色回复快照暂不可用"
-msgstr ""
+msgstr "Character reply snapshot unavailable"
 
 #: apps/admin/src/lib/route-breadcrumb.ts:108
 msgid "角色工厂"
@@ -8434,7 +8434,7 @@ msgstr "Character workshop"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5442
 msgid "角色已不存在或画像不可用"
-msgstr ""
+msgstr "Character no longer exists or profile unavailable"
 
 #: apps/admin/src/routes/character-editor-page.tsx:468
 msgid "角色已保存"
@@ -8504,7 +8504,7 @@ msgstr "Character Profile & Routing Summary"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1892
 msgid "角色筛选"
-msgstr ""
+msgstr "Character Filter"
 
 #: apps/admin/src/lib/route-breadcrumb.ts:126
 msgid "角色编辑"
@@ -8517,7 +8517,7 @@ msgstr "Character Gap Detection and Auto Friend-Adding"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5380
 msgid "角色缺失或画像不可用"
-msgstr ""
+msgstr "Character missing or profile unavailable"
 
 #: apps/admin/src/routes/chat-records-page.tsx:563
 msgid "角色范围"
@@ -8557,11 +8557,11 @@ msgstr "Character runtime logic unavailable"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:768
 msgid "角色配置"
-msgstr ""
+msgstr "Character Config"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:822
 msgid "角色配置已保存"
-msgstr ""
+msgstr "Character config saved"
 
 #: apps/admin/src/routes/token-usage-page.tsx:1542
 #: apps/admin/src/routes/token-usage-page.tsx:2714
@@ -8594,7 +8594,7 @@ msgstr "Trigger: when the user sends a message. The system auto-injects: current
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1027
 msgid "触发：用户发消息时。系统自动注入：当前时间、角色活动状态、距上次聊天时长。写聊天风格、话题偏好、对话节奏，可引导 AI 调整回复长短和语气。"
-msgstr ""
+msgstr "Trigger: when a user sends a message. Auto-injected by system: current time, character activity status, time since last chat. Define chat style, topic preferences, and conversation pace; can guide the AI to adjust reply length and tone."
 
 #: apps/admin/src/routes/character-editor-page.tsx:891
 #: apps/admin/src/routes/reply-logic-page.tsx:1086
@@ -8637,7 +8637,7 @@ msgstr "Subscribers"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5530
 msgid "认知边界"
-msgstr ""
+msgstr "Cognitive Boundary"
 
 #: apps/admin/src/components/game-release-workbench.tsx:352
 msgid "记录每次创建、编辑、投稿入库、恢复和正式发布的快照。"
@@ -8649,11 +8649,11 @@ msgstr "Note why this conversation is worth reviewing and how strategy or prompt
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5536
 msgid "记忆"
-msgstr ""
+msgstr "Memory"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1121
 msgid "记忆（当前值）"
-msgstr ""
+msgstr "Memory (Current Value)"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:131
 msgid "记忆与状态"
@@ -8699,11 +8699,11 @@ msgstr "Evals Runtime"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5239
 msgid "该角色进入候选池了，但活动频率概率门没有通过。"
-msgstr ""
+msgstr "This character entered the candidate pool but did not pass the activity frequency probability gate."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5526
 msgid "语气与风格"
-msgstr ""
+msgstr "Tone & Style"
 
 #: apps/admin/src/routes/dashboard-page.tsx:990
 msgid "语言约束会注入最终生成 Prompt 的末尾，用来覆盖角色旧提示词里可能残留的中文回复要求。"
@@ -8724,7 +8724,7 @@ msgstr "Please fill in the following required fields first: {0}."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:343
 msgid "请先输入候选用户消息。"
-msgstr ""
+msgstr "Please enter a candidate user message first."
 
 #: apps/admin/src/routes/games-page.tsx:512
 msgid "请先选择一款游戏，或新建一个目录草稿。"
@@ -8927,23 +8927,23 @@ msgstr "Skip"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5208
 msgid "跳过：人数已满"
-msgstr ""
+msgstr "Skip: Capacity Full"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5206
 msgid "跳过：无扩散资格"
-msgstr ""
+msgstr "Skip: Not Eligible for Spread"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5202
 msgid "跳过：未命中"
-msgstr ""
+msgstr "Skip: No Match"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5204
 msgid "跳过：概率未过"
-msgstr ""
+msgstr "Skip: Probability Not Met"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5524
 msgid "身份设定"
-msgstr ""
+msgstr "Identity Setup"
 
 #: apps/admin/src/routes/token-usage-page.tsx:1199
 msgid "输入"
@@ -8960,7 +8960,7 @@ msgstr "Input: {0}"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1508
 msgid "输入一条你想预演的用户消息。"
-msgstr ""
+msgstr "Enter a user message you want to rehearse."
 
 #: apps/admin/src/routes/dashboard-page.tsx:1806
 msgid "输入内容"
@@ -8980,7 +8980,7 @@ msgstr "Enter admin secret"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1268
 msgid "输入实例级推理服务 API 密钥"
-msgstr ""
+msgstr "Enter instance-level inference service API key"
 
 #: apps/admin/src/routes/games-page.tsx:997
 msgid "输入目录显示名称"
@@ -9113,7 +9113,7 @@ msgstr "Runtime Console"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:663
 msgid "运行备注"
-msgstr ""
+msgstr "Run Notes"
 
 #: apps/admin/src/components/root-layout.tsx:170
 msgid "运行总览"
@@ -9153,11 +9153,11 @@ msgstr "Runtime has not fully recovered. Open settings first to confirm remote A
 
 #: apps/admin/src/routes/reply-logic-page.tsx:675
 msgid "运行时常量"
-msgstr ""
+msgstr "Runtime Constants"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:823
 msgid "运行时快照正在刷新。"
-msgstr ""
+msgstr "Runtime snapshot is refreshing."
 
 #: apps/admin/src/routes/token-usage-page.tsx:1067
 msgid "运行概况"
@@ -9195,7 +9195,7 @@ msgstr "Run Logic Console"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1288
 msgid "运行配置已保存"
-msgstr ""
+msgstr "Run configuration saved"
 
 #: apps/admin/src/routes/token-usage-page.tsx:821
 msgid "近 30 天"
@@ -9266,7 +9266,7 @@ msgstr "Recent summary"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1135
 msgid "近期摘要："
-msgstr ""
+msgstr "Recent Summary:"
 
 #: apps/admin/src/routes/dashboard-page.tsx:2198
 msgid "近期摘要日更"
@@ -9377,11 +9377,11 @@ msgstr "This section supports spot checks rather than full management, so it kee
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5243
 msgid "这一轮允许发言的人数已满，即使命中条件也不再继续排入。"
-msgstr ""
+msgstr "The speaker limit for this round has been reached; no more will be queued even if conditions are met."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5237
 msgid "这一轮没有明确指向到该角色，也没有进入补充回复条件。"
-msgstr ""
+msgstr "This round has no explicit targeting of this character, nor does it meet the supplementary reply conditions."
 
 #: apps/admin/src/routes/token-usage-page.tsx:3222
 msgid "这个角色当前没有待补结论样本。"
@@ -9418,12 +9418,12 @@ msgstr "These downgraded sessions have been explicitly marked as low-quality dur
 #. placeholder {0}: issue.count
 #: apps/admin/src/routes/reply-logic-page.tsx:5261
 msgid "这是已经归档的历史取消热点，累计出现 {0} 次，适合用来判断长期是否存在过度取消或轮次过时问题。"
-msgstr ""
+msgstr "This is an archived historical cancellation hotspot that has occurred {0} times in total, useful for assessing whether excessive cancellations or stale rounds are a long-term issue."
 
 #. placeholder {0}: issue.count
 #: apps/admin/src/routes/reply-logic-page.tsx:5264
 msgid "这是已经归档的历史失败热点，累计出现 {0} 次，适合用来判断某类 provider 或上下文错误是否反复出现。"
-msgstr ""
+msgstr "This is an archived historical failure hotspot that has occurred {0} times in total, useful for determining whether a certain provider or context error recurs repeatedly."
 
 #: apps/admin/src/routes/chat-records-page.tsx:1197
 msgid "这段会话还没有进入复盘池"
@@ -9435,7 +9435,7 @@ msgstr "This session has not entered the review pool yet. It is recommended to a
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5233
 msgid "这轮没有明显命中对象时，planner 会让分数最高的角色兜底接话。"
-msgstr ""
+msgstr "When there is no clear match this round, the planner assigns the highest-scoring character as the fallback responder."
 
 #: apps/admin/src/routes/need-discovery-page.tsx:2753
 msgid "这里不是单条 cadence 的细节，而是所有自动补位统一遵守的队列上限、抑制期和风险域边界。"
@@ -9451,7 +9451,7 @@ msgstr "This will display the match reason, greeting, directional info, and the 
 
 #: apps/admin/src/routes/reply-logic-page.tsx:470
 msgid "这里保存的是实例级兜底推理服务；如果世界主人配置了个人 API 密钥，聊天主链路仍会优先使用个人配置。"
-msgstr ""
+msgstr "This stores the instance-level fallback inference service; if the world owner has configured a personal API key, the main chat pipeline will still prioritize the personal configuration."
 
 #: apps/admin/src/routes/dashboard-page.tsx:905
 msgid "这里切换的是世界运行语言，不是后台界面语言。保存后，新的聊天回复、朋友圈、评论、广场动态、视频号、开场白、主动消息和语音链路都会按目标语言生成；历史内容不会回写。"
@@ -9479,7 +9479,7 @@ msgstr "这里收口 self-agent 的长期 workspace、主动巡检和近期待�
 
 #: apps/admin/src/routes/reply-logic-page.tsx:761
 msgid "这里改的是实体字段和 profile 配置对象。本页不会实时重算草稿提示词，保存后会刷新右侧快照，看到真实生效结果。"
-msgstr ""
+msgstr "This edits entity fields and profile configuration objects. This page does not recalculate draft prompts in real time; saving will refresh the snapshot on the right to show the actual effective result."
 
 #: apps/admin/src/components/game-submission-workbench.tsx:486
 msgid "这里沉淀未来的游戏供给入口。稿件可以先审核，再一键导入为目录草稿，后续继续沿发布流走向正式上线。"
@@ -9510,7 +9510,7 @@ msgstr "Open the runs, compare, and trace workspaces."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5587
 msgid "进入内圈"
-msgstr ""
+msgstr "Enter Inner Circle"
 
 #: apps/admin/src/routes/character-runtime-page.tsx:286
 msgid "进入窗口"
@@ -9538,7 +9538,7 @@ msgstr "Open the scheduler section to view recent failure details."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:4741
 msgid "进行中"
-msgstr ""
+msgstr "In Progress"
 
 #: apps/admin/src/components/admin-sidebar.tsx:102
 msgid "远程 API 离线"
@@ -9585,15 +9585,15 @@ msgstr "Pick an existing world character to import identity, bio, expert domains
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5198
 msgid "选中：兜底最高分"
-msgstr ""
+msgstr "Selected: Fallback Highest Score"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5196
 msgid "选中：明确指向"
-msgstr ""
+msgstr "Selected: Explicit Target"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5200
 msgid "选中：补充回复"
-msgstr ""
+msgstr "Selected: Supplementary Reply"
 
 #: apps/admin/src/components/game-release-workbench.tsx:250
 msgid "选中目录中的具体游戏后，这里会显示版本历史、修订轨迹和发布操作。"
@@ -9636,7 +9636,7 @@ msgstr "Should generally be handled first to avoid long-term backlog."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1433
 msgid "遗忘曲线"
-msgstr ""
+msgstr "Forgetting Curve"
 
 #: apps/admin/src/routes/character-editor-page.tsx:732
 msgid "遗忘曲线（0-100，默认70）"
@@ -9669,7 +9669,7 @@ msgstr "Configure rules, Prompt, and the recommendation flow for self to recover
 
 #: apps/admin/src/routes/reply-logic-page.tsx:722
 msgid "配置抽屉"
-msgstr ""
+msgstr "Config Drawer"
 
 #: apps/admin/src/components/game-curation-workbench.tsx:697
 msgid "配置榜单顺序、说明文案和每个排名对应的游戏。"
@@ -9677,7 +9677,7 @@ msgstr "Configure ranking order, copy, and the game tied to each rank."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:737
 msgid "配置目标"
-msgstr ""
+msgstr "Configuration Target"
 
 #: apps/admin/src/lib/route-breadcrumb.ts:71
 msgid "配置短周期和每日节奏的提示词、频率、角色生成策略，并查看运行记录与候选结果。"
@@ -9707,7 +9707,7 @@ msgstr "Reset Filters"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1148
 msgid "重置草稿"
-msgstr ""
+msgstr "Reset Draft"
 
 #: apps/admin/src/routes/need-discovery-page.tsx:3433
 msgid "金融"
@@ -9723,7 +9723,7 @@ msgstr "Error: {inferenceGatewayLastError}"
 #. placeholder {3}: actor.failedCount
 #: apps/admin/src/routes/reply-logic-page.tsx:5408
 msgid "长期归档里，这个角色累计参与 {0} 条任务；成功发送 {1} 条，取消 {2} 条，失败 {3} 条。"
-msgstr ""
+msgstr "In long-term archives, this character has participated in {0} tasks in total; {1} sent successfully, {2} cancelled, {3} failed."
 
 #: apps/admin/src/routes/self-agent-page.tsx:44
 msgid "长期记忆"
@@ -9910,7 +9910,7 @@ msgstr "Need-filling Character Generation"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5287
 msgid "需要关注"
-msgstr ""
+msgstr "Needs Attention"
 
 #: apps/admin/src/routes/need-discovery-page.tsx:1303
 msgid "需要尽快处理待通过候选。"
@@ -9934,19 +9934,19 @@ msgstr "Page Navigation"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:583
 msgid "预演"
-msgstr ""
+msgstr "Rehearsal"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1523
 msgid "预演中..."
-msgstr ""
+msgstr "Rehearsing..."
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1530
 msgid "预演备注"
-msgstr ""
+msgstr "Rehearsal Notes"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:1495
 msgid "预演角色"
-msgstr ""
+msgstr "Rehearsal Character"
 
 #: apps/admin/src/routes/token-usage-page.tsx:2684
 msgid "预算上限"
@@ -10043,7 +10043,7 @@ msgstr "Slow First Response"
 
 #: apps/admin/src/routes/reply-logic-page.tsx:5581
 msgid "首次突破"
-msgstr ""
+msgstr "First Breakthrough"
 
 #: apps/admin/src/components/game-curation-workbench.tsx:560
 msgid "首页主推位"
