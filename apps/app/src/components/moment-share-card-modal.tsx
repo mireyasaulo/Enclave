@@ -70,25 +70,59 @@ export function MomentShareCardModal({
       const node = cardRef.current;
       if (!node || cancelled) return;
 
-      // 等所有 <img> 加载完成（含失败 — 失败的图就让它空着，不卡住截图）
+      // 视频节点 html-to-image 画不出来（canvas drawImage 需要 video 加载完才行，
+      // 实际上这里 video 通常没加载到 metadata）。把它替换成 poster 图，
+      // 没 poster 就直接隐藏 — 这样导出图里不会出现一个空白方块。
+      node.querySelectorAll("video").forEach((video) => {
+        const poster = video.getAttribute("poster");
+        if (poster) {
+          const placeholder = document.createElement("img");
+          placeholder.src = poster;
+          placeholder.style.cssText = video.getAttribute("style") ?? "";
+          placeholder.className = video.className;
+          placeholder.width = video.clientWidth;
+          placeholder.height = video.clientHeight;
+          video.replaceWith(placeholder);
+        } else {
+          video.style.display = "none";
+        }
+      });
+
+      // 把所有 <img> 转成同源 data URL — 避免 cross-origin 把 canvas tainted 后
+      // toDataURL 抛 SecurityError。fetch 失败的图就让它空着，不影响其他元素。
       const imgs = Array.from(node.querySelectorAll("img"));
       await Promise.all(
-        imgs.map((img) =>
-          img.complete && img.naturalWidth > 0
-            ? Promise.resolve()
-            : new Promise<void>((resolve) => {
-                const done = () => resolve();
-                img.addEventListener("load", done, { once: true });
-                img.addEventListener("error", done, { once: true });
-              }),
-        ),
+        imgs.map(async (img) => {
+          // 已经是 data: 的不动。
+          if (!img.src || img.src.startsWith("data:")) return;
+          try {
+            const resp = await fetch(img.src, { cache: "force-cache" });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const blob = await resp.blob();
+            const dataUrl = await new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(String(reader.result));
+              reader.onerror = () => reject(reader.error);
+              reader.readAsDataURL(blob);
+            });
+            img.src = dataUrl;
+            // 等一帧让 src 替换生效再继续
+            await new Promise<void>((r) =>
+              img.complete
+                ? r()
+                : img.addEventListener("load", () => r(), { once: true }),
+            );
+          } catch {
+            // 单图加载失败不要拦住整张图卡，让它空着
+          }
+        }),
       );
       if (cancelled) return;
 
       try {
         const dataUrl = await htmlToImage.toPng(node, {
           pixelRatio: 2,
-          cacheBust: true,
+          cacheBust: false, // 已经转成 data URL 了，不再需要 cacheBust
           backgroundColor: "#ffffff",
         });
         if (!cancelled) setPngDataUrl(dataUrl);
@@ -124,35 +158,46 @@ export function MomentShareCardModal({
     if (!pngDataUrl) return;
     const fileName = `enclave-moment-${moment.id}.png`;
 
-    // 移动端优先尝试 Web Share API（带文件），iOS 15.4+ / Android Chrome 都支持
-    if (
-      typeof navigator !== "undefined" &&
-      "canShare" in navigator &&
-      "share" in navigator
-    ) {
-      try {
-        const blob = await fetch(pngDataUrl).then((r) => r.blob());
-        const file = new File([blob], fileName, { type: "image/png" });
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: t(msg`我的隐界朋友圈`),
-            text: `${SITE_URL}`,
-          });
-          return;
+    try {
+      // 移动端优先尝试 Web Share API（带文件），iOS 15.4+ / Android Chrome 都支持
+      if (
+        typeof navigator !== "undefined" &&
+        "canShare" in navigator &&
+        "share" in navigator
+      ) {
+        try {
+          const blob = await fetch(pngDataUrl).then((r) => r.blob());
+          const file = new File([blob], fileName, { type: "image/png" });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: t(msg`我的隐界朋友圈`),
+              text: SITE_URL,
+            });
+            return;
+          }
+        } catch (shareErr) {
+          // AbortError = 用户取消，不算错误；其它继续 fall through 到下载兜底
+          if (
+            shareErr instanceof Error &&
+            shareErr.name === "AbortError"
+          ) {
+            return;
+          }
         }
-      } catch {
-        // 用户取消或不支持，继续走下载兜底
       }
-    }
 
-    // 桌面 / 不支持 Web Share 的环境：直接触发下载
-    const a = document.createElement("a");
-    a.href = pngDataUrl;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+      // 桌面 / 不支持 Web Share 的环境：直接触发下载
+      const a = document.createElement("a");
+      a.href = pngDataUrl;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (err) {
+      console.error("[moment-share] save failed", err);
+      setError(t(msg`保存失败，请长按图片手动保存`));
+    }
   };
 
   // 导出渲染时禁用 ⋯ 按钮 + 删除按钮（onDelete 不传即可）

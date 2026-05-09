@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { type Moment, type MomentComment } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
@@ -6,6 +6,7 @@ import { Button, ErrorBlock, InlineNotice, LoadingBlock } from "@yinjie/ui";
 import { ArrowLeft, PenSquare } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
+import { MomentShareCardModal } from "../../../components/moment-share-card-modal";
 import { parseTimestamp } from "../../../lib/format";
 import { DesktopMomentComposePanel } from "./desktop-moment-compose-panel";
 import {
@@ -102,6 +103,14 @@ export function DesktopProfileMomentsWorkspace({
   const t = useRuntimeTranslator();
   const scrollViewportRef = useRef<HTMLDivElement | null>(null);
 
+  const [shareMomentId, setShareMomentId] = useState<string | null>(null);
+  const shareMoment = shareMomentId
+    ? moments.find((moment) => moment.id === shareMomentId) ?? null
+    : null;
+  const shareLiked = Boolean(
+    ownerId && shareMoment?.likes.some((like) => like.authorId === ownerId),
+  );
+
   const sortedMoments = useMemo(
     () =>
       [...moments].sort(
@@ -160,6 +169,7 @@ export function DesktopProfileMomentsWorkspace({
             onCommentSubmit={() => onCommentSubmit(moment.id)}
             onDelete={() => onDelete(moment.id)}
             onLike={() => onLike(moment.id)}
+            onShare={() => setShareMomentId(moment.id)}
             onStartCommentReply={
               onStartCommentReply
                 ? (comment) =>
@@ -297,6 +307,14 @@ export function DesktopProfileMomentsWorkspace({
           onVideoFileSelected={onVideoFileSelected}
         />
       ) : null}
+
+      <MomentShareCardModal
+        moment={shareMoment}
+        liked={shareLiked}
+        ownerId={ownerId}
+        ownerDisplayName={displayName}
+        onClose={() => setShareMomentId(null)}
+      />
     </div>
   );
 }
