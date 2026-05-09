@@ -217,10 +217,54 @@ export class MinimaxJobService {
 
     if (job.status === 'pending') {
       try {
+        let firstFrameImageUrl = payload.firstFrameImageUrl ?? job.coverUrl ?? undefined;
+        let coverFileName = job.coverFileName ?? undefined;
+        const needsFirstFrame =
+          job.model === 'MiniMax-Hailuo-2.3-Fast' && !firstFrameImageUrl;
+        if (needsFirstFrame) {
+          const reservedCover = await this.quota.tryReserve('image-01');
+          if (!reservedCover) {
+            await this.markFailed(
+              job,
+              'COVER_QUOTA',
+              'Fast model needs first_frame_image but image-01 quota exhausted',
+            );
+            return;
+          }
+          try {
+            const img = await this.client.generateImage({
+              model: 'image-01',
+              prompt: `Cinematic 9:16 portrait still — ${payload.prompt.slice(0, 200)}`,
+              aspectRatio: '9:16',
+            });
+            const persisted = await this.storage.persist({
+              buffer: img.buffer,
+              mimeType: img.mimeType,
+              kind: 'image',
+              suffix: '-firstframe',
+            });
+            firstFrameImageUrl = persisted.publicUrl;
+            coverFileName = persisted.fileName;
+            await this.quota.commit('image-01');
+            await this.repo.update(job.id, {
+              coverUrl: persisted.publicUrl,
+              coverFileName: persisted.fileName,
+            });
+          } catch (err) {
+            await this.quota.release('image-01');
+            this.logger.warn(
+              `cover gen failed for job ${job.id}: ${(err as Error)?.message}`,
+            );
+            // Demote: drop Fast and retry with HD.
+            await this.maybeDemoteFastToHd(job);
+            return;
+          }
+        }
+
         const submit = await this.client.submitVideo({
           model: job.model as MinimaxVideoModel,
           prompt: payload.prompt,
-          firstFrameImageUrl: payload.firstFrameImageUrl,
+          firstFrameImageUrl,
           resolution: payload.resolution ?? '768P',
         });
         await this.repo.update(job.id, {
@@ -229,6 +273,7 @@ export class MinimaxJobService {
           attemptCount: job.attemptCount + 1,
           lastAttemptAt: new Date(),
           executeAfter: new Date(Date.now() + VIDEO_POLL_INTERVAL_MS),
+          coverFileName,
         });
         this.logger.log(
           `video job ${job.id} submitted: model=${job.model} task=${submit.taskId}`,
@@ -397,6 +442,39 @@ export class MinimaxJobService {
         executeAfter: new Date(Date.now() + 10_000),
       });
     }
+  }
+
+  private async maybeDemoteFastToHd(job: MinimaxJobEntity): Promise<void> {
+    if (job.model !== 'MiniMax-Hailuo-2.3-Fast') {
+      await this.markFailed(job, 'COVER_FAIL', 'cover gen failed (non-Fast job)');
+      return;
+    }
+    const hdAvailable = await this.quota.availableToday('MiniMax-Hailuo-2.3');
+    if (hdAvailable <= 0) {
+      await this.markFailed(
+        job,
+        'COVER_FAIL_NO_HD_FALLBACK',
+        'cover gen failed and no HD quota for fallback',
+      );
+      return;
+    }
+    const reserved = await this.quota.tryReserve('MiniMax-Hailuo-2.3');
+    if (!reserved) {
+      await this.markFailed(
+        job,
+        'COVER_FAIL_HD_RESERVE',
+        'cover gen failed and HD reserve race lost',
+      );
+      return;
+    }
+    await this.quota.release('MiniMax-Hailuo-2.3-Fast');
+    await this.repo.update(job.id, {
+      model: 'MiniMax-Hailuo-2.3',
+      executeAfter: new Date(),
+      attemptCount: job.attemptCount + 1,
+      lastAttemptAt: new Date(),
+    });
+    this.logger.log(`job ${job.id} demoted Fast → HD (cover gen failed)`);
   }
 
   private async requeueStaleJobs(

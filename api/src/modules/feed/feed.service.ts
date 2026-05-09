@@ -379,7 +379,10 @@ export class FeedService implements OnModuleInit {
     surface?: FeedSurface;
     visibility?: 'public' | 'friends' | 'private';
   }): Promise<FeedPostEntity> {
-    const normalizedInput = this.normalizeCreatePostInput(input);
+    const normalizedInput = this.normalizeCreatePostInput({
+      ...input,
+      publishStatus: input.publishStatus,
+    });
     const post = this.postRepo.create({
       authorAvatar: input.authorAvatar,
       authorId: input.authorId,
@@ -1045,11 +1048,11 @@ export class FeedService implements OnModuleInit {
   }
 
   private async pickVideoModel(): Promise<MinimaxVideoModel | null> {
-    if ((await this.minimaxQuota.availableToday('MiniMax-Hailuo-02-Fast')) > 0) {
-      return 'MiniMax-Hailuo-02-Fast';
+    if ((await this.minimaxQuota.availableToday('MiniMax-Hailuo-2.3-Fast')) > 0) {
+      return 'MiniMax-Hailuo-2.3-Fast';
     }
-    if ((await this.minimaxQuota.availableToday('MiniMax-Hailuo-02')) > 0) {
-      return 'MiniMax-Hailuo-02';
+    if ((await this.minimaxQuota.availableToday('MiniMax-Hailuo-2.3')) > 0) {
+      return 'MiniMax-Hailuo-2.3';
     }
     return null;
   }
@@ -1729,6 +1732,7 @@ export class FeedService implements OnModuleInit {
     coverUrl?: string | null;
     durationMs?: number;
     aspectRatio?: number;
+    publishStatus?: 'draft' | 'published' | 'hidden' | 'deleted';
   }) {
     const text = input.text.trim();
     const explicitMedia = this.normalizeFeedMediaInput(input.media);
@@ -1738,13 +1742,15 @@ export class FeedService implements OnModuleInit {
         : this.buildFeedMediaFromLegacyInput(input);
     const mediaType = this.inferFeedMediaType(media, input.mediaType);
 
-    if (!text && media.length === 0) {
+    if (!text && media.length === 0 && input.publishStatus !== 'draft') {
       throw new AppError('FEED_EMPTY', {
         legacyMessage: '动态内容和媒体不能同时为空。',
       });
     }
 
-    this.assertFeedMediaMatchesMediaType(mediaType, media);
+    if (input.publishStatus !== 'draft') {
+      this.assertFeedMediaMatchesMediaType(mediaType, media);
+    }
     const primaryMedia = media[0];
 
     return {

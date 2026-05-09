@@ -1033,8 +1033,8 @@ export class SchedulerService {
     }
 
     const remainingVideo =
-      (await this.minimaxQuota.availableToday('MiniMax-Hailuo-02-Fast')) +
-      (await this.minimaxQuota.availableToday('MiniMax-Hailuo-02'));
+      (await this.minimaxQuota.availableToday('MiniMax-Hailuo-2.3-Fast')) +
+      (await this.minimaxQuota.availableToday('MiniMax-Hailuo-2.3'));
     if (remainingVideo > 0) {
       const candidates = chars.filter((char) => {
         const start = char.activeHoursStart ?? 8;
@@ -1069,13 +1069,13 @@ export class SchedulerService {
   }
 
   private async pickMinimaxVideoModel(): Promise<
-    'MiniMax-Hailuo-02-Fast' | 'MiniMax-Hailuo-02' | null
+    'MiniMax-Hailuo-2.3-Fast' | 'MiniMax-Hailuo-2.3' | null
   > {
-    if ((await this.minimaxQuota.availableToday('MiniMax-Hailuo-02-Fast')) > 0) {
-      return 'MiniMax-Hailuo-02-Fast';
+    if ((await this.minimaxQuota.availableToday('MiniMax-Hailuo-2.3-Fast')) > 0) {
+      return 'MiniMax-Hailuo-2.3-Fast';
     }
-    if ((await this.minimaxQuota.availableToday('MiniMax-Hailuo-02')) > 0) {
-      return 'MiniMax-Hailuo-02';
+    if ((await this.minimaxQuota.availableToday('MiniMax-Hailuo-2.3')) > 0) {
+      return 'MiniMax-Hailuo-2.3';
     }
     return null;
   }

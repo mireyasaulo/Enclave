@@ -1781,7 +1781,7 @@ export class MomentsService implements OnModuleInit {
   async scheduleMinimaxVideoMoment(
     char: CharacterEntity,
     pickModel: () => Promise<
-      'MiniMax-Hailuo-02-Fast' | 'MiniMax-Hailuo-02' | null
+      'MiniMax-Hailuo-2.3-Fast' | 'MiniMax-Hailuo-2.3' | null
     >,
   ): Promise<MomentPostEntity | null> {
     if (!(await this.isCharacterVisibleToOwner(char.id))) {

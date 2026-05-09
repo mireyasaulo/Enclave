@@ -1,8 +1,8 @@
 // i18n-ignore-start: provider adapter — error/log strings only.
 
 export type MinimaxVideoModel =
-  | 'MiniMax-Hailuo-02-Fast'
-  | 'MiniMax-Hailuo-02';
+  | 'MiniMax-Hailuo-2.3-Fast'
+  | 'MiniMax-Hailuo-2.3';
 
 export type MinimaxMusicModel = 'music-2.6' | 'music-2.5';
 
