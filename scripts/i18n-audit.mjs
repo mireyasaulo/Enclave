@@ -208,7 +208,7 @@ function collectIssues(diffText) {
     }
 
     const addedLine = line.slice(1);
-    if (!addedLine.trim() || isAllowedLine(addedLine)) {
+    if (!addedLine.trim() || isAllowedLine(addedLine) || addedLine.includes("i18n-ignore-line")) {
       currentLineNumber += 1;
       continue;
     }
