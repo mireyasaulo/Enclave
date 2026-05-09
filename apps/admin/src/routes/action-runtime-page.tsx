@@ -48,7 +48,6 @@ import {
 } from "../lib/format";
 import { resolveAdminCoreApiBaseUrl } from "../lib/core-api-base";
 
-// i18n-ignore-start: migration in progress — remaining raw strings pending wrapping
 type WorkspaceTab =
   | "overview"
   | "rules"
@@ -674,8 +673,8 @@ export function ActionRuntimePage() {
     <div className="space-y-6">
       <AdminPageHero
         eyebrow="Action Runtime"
-        title="行动助理真实世界动作工作台"
-        description="围绕运营人员的查看路径重排：先看当前动作链是否健康，再决定是改门控、跑预演、校连接器，还是回看执行证据。"
+        title={t(msg`行动助理真实世界动作工作台`)}
+        description={t(msg`围绕运营人员的查看路径重排：先看当前动作链是否健康，再决定是改门控、跑预演、校连接器，还是回看执行证据。`)}
         badges={[
           t(msg`承接角色：${
             overview.operatorCharacter?.name ??
@@ -2075,7 +2074,7 @@ export function ActionRuntimePage() {
                               endpointConfigText: value,
                             })
                           }
-                          placeholder='例如：{"city":"上海"}'
+                          placeholder={t(msg`例如：{"city":"上海"}`)}
                           textareaClassName="min-h-36 font-mono text-xs"
                         />
                         <AdminTextArea
