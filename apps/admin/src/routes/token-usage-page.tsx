@@ -90,7 +90,7 @@ function formatInteger(value: number) {
 }
 
 function formatCost(value: number, currency: "CNY" | "USD") {
-  return formatAdminCurrency(value, currency, 2);
+  return formatAdminCurrency(value, currency, currency === "USD" ? 4 : 2);
 }
 
 function formatDateTime(value: string) {
