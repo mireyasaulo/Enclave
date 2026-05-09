@@ -689,6 +689,10 @@ export class MinimaxJobService {
       lastAttemptAt: new Date(),
     });
     await this.quota.release(job.model);
+    // 失败 job 的本地中间产物（视频 mp4 / 音乐 mp3 / 封面图）回收；
+    // 不影响成功 job 的文件（它们被 post 引用着）。
+    await this.storage.unlinkIfExists(job.localFileName);
+    await this.storage.unlinkIfExists(job.coverFileName);
     this.logger.warn(`job ${job.id} failed code=${code} msg=${message}`);
     const refreshed = await this.repo.findOne({ where: { id: job.id } });
     if (refreshed) await this.fireOnFailed(refreshed);

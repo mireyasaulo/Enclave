@@ -1,10 +1,13 @@
 // i18n-ignore-start: provider adapter — log strings only.
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, unlink, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
-import { resolvePrimaryMomentMediaStorageDir } from '../moments/moment-media.storage';
+import {
+  resolvePrimaryMomentMediaStorageDir,
+  resolveReadableMomentMediaPath,
+} from '../moments/moment-media.storage';
 
 export interface PersistedAsset {
   fileName: string;
@@ -54,6 +57,24 @@ export class MinimaxAssetStorage {
     if (/^https?:\/\//i.test(maybeRelative)) return maybeRelative;
     if (maybeRelative.startsWith('/')) return `${this.serverBaseUrl}${maybeRelative}`;
     return `${this.serverBaseUrl}/${maybeRelative}`;
+  }
+
+  // 容错删除：文件不存在或路径异常都静默通过；仅记日志，不抛异常。
+  // 用于 markFailed 时回收磁盘，避免失败任务的中间产物永留。
+  async unlinkIfExists(fileName: string | null | undefined): Promise<void> {
+    if (!fileName) return;
+    const target = resolveReadableMomentMediaPath(fileName);
+    try {
+      await unlink(target);
+      this.logger.debug(`unlinked minimax asset ${fileName}`);
+    } catch (err) {
+      const code = (err as NodeJS.ErrnoException)?.code;
+      if (code !== 'ENOENT') {
+        this.logger.warn(
+          `unlink ${fileName} failed: ${(err as Error)?.message}`,
+        );
+      }
+    }
   }
 }
 
