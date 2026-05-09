@@ -3,6 +3,7 @@ import { msg } from "@lingui/macro";
 import { Pause, Play } from "lucide-react";
 import { cn } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
+import { resolveAppMediaUrl } from "../lib/media-url";
 
 type AudioCardProps = {
   url: string;
@@ -109,6 +110,9 @@ export function AudioCard({
 
   const cardSize = variant === "feed" ? "max-w-[360px]" : "max-w-[320px]";
 
+  const resolvedAudioUrl = resolveAppMediaUrl(url);
+  const resolvedPosterUrl = posterUrl ? resolveAppMediaUrl(posterUrl) : undefined;
+
   return (
     <div
       className={cn(
@@ -118,9 +122,9 @@ export function AudioCard({
       onClick={(event) => event.stopPropagation()}
     >
       <div className="relative h-16 w-16 flex-none overflow-hidden rounded-xl bg-zinc-800">
-        {posterUrl ? (
+        {resolvedPosterUrl ? (
           <img
-            src={posterUrl}
+            src={resolvedPosterUrl}
             alt={title ?? "music cover"}
             className="h-full w-full object-cover"
           />
@@ -162,7 +166,7 @@ export function AudioCard({
           </span>
         </div>
       </div>
-      <audio ref={audioRef} src={url} preload="metadata" />
+      <audio ref={audioRef} src={resolvedAudioUrl} preload="metadata" />
     </div>
   );
 }
