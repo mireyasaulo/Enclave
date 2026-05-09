@@ -822,6 +822,13 @@ export function InferencePage() {
           description={t(msg`已更新 ${rebindMutation.data.updatedCount} 个，跳过 ${rebindMutation.data.skippedCount} 个，未安装 ${rebindMutation.data.missingCount} 个。`)}
         />
       ) : null}
+      {installFamilyMutation.data ? (
+        <AdminActionFeedback
+          tone="success"
+          title={t(msg`厂商家族角色处理完成`)}
+          description={t(msg`新增 ${installFamilyMutation.data.installedCount} 个，更新 ${installFamilyMutation.data.updatedCount} 个，跳过 ${installFamilyMutation.data.skippedCount} 个。`)}
+        />
+      ) : null}
       {saveMutation.isError && saveMutation.error instanceof Error ? (
         <AdminErrorState
           title={t(msg`保存 Provider 账户失败`)}
@@ -877,6 +884,15 @@ export function InferencePage() {
           title={t(msg`模型人格换绑失败`)}
           detail={rebindMutation.error.message}
           onRetry={() => rebindMutation.reset()}
+          retryLabel={t(msg`清除错误`)}
+        />
+      ) : null}
+      {installFamilyMutation.isError &&
+      installFamilyMutation.error instanceof Error ? (
+        <AdminErrorState
+          title={t(msg`厂商家族角色安装失败`)}
+          detail={installFamilyMutation.error.message}
+          onRetry={() => installFamilyMutation.reset()}
           retryLabel={t(msg`清除错误`)}
         />
       ) : null}

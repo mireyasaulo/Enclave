@@ -87,6 +87,11 @@ const PAIR_RELATIONSHIP_TABLES = [
 const SCALAR_TABLES = [
   ['action_runs', 'characterId'],
   ['ai_behavior_logs', 'characterId'],
+  // ai_behavior_logs.targetId / farm_event_logs.targetId / minimax_jobs.targetId /
+  // moderation_reports.targetId 是 polymorphic 引用（targetType 区分）。
+  // oldIds 是高度特异的 model_<id>_<hash> 模式，不会撞到 user/其他实体 ID，
+  // 所以无需按 targetType 过滤即可安全 UPDATE。
+  ['ai_behavior_logs', 'targetId'],
   ['ai_usage_ledger', 'characterId'],
   ['character_blueprint_revisions', 'characterId'],
   ['character_blueprints', 'characterId'],
@@ -95,6 +100,7 @@ const SCALAR_TABLES = [
   ['character_real_world_signals', 'characterId'],
   ['character_real_world_sync_runs', 'characterId'],
   ['character_revisions', 'characterId'],
+  ['farm_event_logs', 'targetId'],
   ['farm_npc_states', 'characterId'],
   ['feed_comments', 'authorId'],
   ['feed_comments', 'replyToAuthorId'],
@@ -112,6 +118,8 @@ const SCALAR_TABLES = [
   ['media_insight_jobs', 'characterId'],
   ['messages', 'senderId'],
   ['minimax_jobs', 'characterId'],
+  ['minimax_jobs', 'targetId'],
+  ['moderation_reports', 'targetId'],
   ['moment_comments', 'authorId'],
   ['moment_comments', 'replyToAuthorId'],
   ['moment_likes', 'authorId'],

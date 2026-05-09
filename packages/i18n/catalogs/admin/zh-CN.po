@@ -331,7 +331,7 @@ msgstr "恢复线上"
 #: apps/admin/src/routes/dashboard-page.tsx:957
 #: apps/admin/src/routes/followup-runtime-page.tsx:305
 #: apps/admin/src/routes/games-page.tsx:822
-#: apps/admin/src/routes/inference-page.tsx:1153
+#: apps/admin/src/routes/inference-page.tsx:1169
 #: apps/admin/src/routes/real-world-sync-page.tsx:1710
 #: apps/admin/src/routes/real-world-sync-page.tsx:2073
 #: apps/admin/src/routes/reminder-runtime-page.tsx:1763
@@ -1282,8 +1282,8 @@ msgstr "拟入库 ID"
 #: apps/admin/src/routes/chat-records-page.tsx:1177
 #: apps/admin/src/routes/dashboard-page.tsx:1195
 #: apps/admin/src/routes/evals-page.tsx:2577
-#: apps/admin/src/routes/inference-page.tsx:1173
-#: apps/admin/src/routes/inference-page.tsx:1732
+#: apps/admin/src/routes/inference-page.tsx:1189
+#: apps/admin/src/routes/inference-page.tsx:1748
 #: apps/admin/src/routes/reply-logic-page.tsx:1845
 #: apps/admin/src/routes/token-usage-page.tsx:711
 #: apps/admin/src/routes/token-usage-page.tsx:1184
@@ -1772,11 +1772,11 @@ msgstr "下一步补外部 provider 模板和回调，把内置播放器替换�
 
 #: apps/admin/src/lib/digital-human-admin-summary.ts:88
 #: apps/admin/src/routes/dashboard-page.tsx:633
-#: apps/admin/src/routes/inference-page.tsx:1180
-#: apps/admin/src/routes/inference-page.tsx:1189
-#: apps/admin/src/routes/inference-page.tsx:1198
-#: apps/admin/src/routes/inference-page.tsx:1207
-#: apps/admin/src/routes/inference-page.tsx:1350
+#: apps/admin/src/routes/inference-page.tsx:1196
+#: apps/admin/src/routes/inference-page.tsx:1205
+#: apps/admin/src/routes/inference-page.tsx:1214
+#: apps/admin/src/routes/inference-page.tsx:1223
+#: apps/admin/src/routes/inference-page.tsx:1366
 #: apps/admin/src/routes/reply-logic-page.tsx:1216
 msgid "已配置"
 msgstr "已配置"
@@ -1784,11 +1784,11 @@ msgstr "已配置"
 #: apps/admin/src/lib/digital-human-admin-summary.ts:89
 #: apps/admin/src/lib/format.ts:17
 #: apps/admin/src/routes/inference-page.tsx:226
-#: apps/admin/src/routes/inference-page.tsx:1181
-#: apps/admin/src/routes/inference-page.tsx:1190
-#: apps/admin/src/routes/inference-page.tsx:1199
-#: apps/admin/src/routes/inference-page.tsx:1208
-#: apps/admin/src/routes/inference-page.tsx:1350
+#: apps/admin/src/routes/inference-page.tsx:1197
+#: apps/admin/src/routes/inference-page.tsx:1206
+#: apps/admin/src/routes/inference-page.tsx:1215
+#: apps/admin/src/routes/inference-page.tsx:1224
+#: apps/admin/src/routes/inference-page.tsx:1366
 #: apps/admin/src/routes/real-world-sync-page.tsx:1417
 #: apps/admin/src/routes/real-world-sync-page.tsx:1466
 #: apps/admin/src/routes/real-world-sync-page.tsx:1473
@@ -1826,9 +1826,9 @@ msgstr "已设置"
 #: apps/admin/src/routes/characters-page.tsx:1125
 #: apps/admin/src/routes/characters-page.tsx:1185
 #: apps/admin/src/routes/followup-runtime-page.tsx:786
-#: apps/admin/src/routes/inference-page.tsx:951
-#: apps/admin/src/routes/inference-page.tsx:955
-#: apps/admin/src/routes/inference-page.tsx:962
+#: apps/admin/src/routes/inference-page.tsx:967
+#: apps/admin/src/routes/inference-page.tsx:971
+#: apps/admin/src/routes/inference-page.tsx:978
 #: apps/admin/src/routes/reply-logic-page.tsx:513
 #: apps/admin/src/routes/reply-logic-page.tsx:517
 #: apps/admin/src/routes/reply-logic-page.tsx:5444
@@ -2433,8 +2433,8 @@ msgstr "错误连接器"
 #. placeholder {0}: filteredModels.length
 #: apps/admin/src/routes/action-runtime-page.tsx:854
 #: apps/admin/src/routes/followup-runtime-page.tsx:580
-#: apps/admin/src/routes/inference-page.tsx:1624
-#: apps/admin/src/routes/inference-page.tsx:1628
+#: apps/admin/src/routes/inference-page.tsx:1640
+#: apps/admin/src/routes/inference-page.tsx:1644
 #: apps/admin/src/routes/real-world-sync-page.tsx:1219
 msgid "{0} 个"
 msgstr "{0} 个"
@@ -2445,7 +2445,7 @@ msgstr "最近成功"
 
 #: apps/admin/src/routes/action-runtime-page.tsx:868
 #: apps/admin/src/routes/characters-page.tsx:778
-#: apps/admin/src/routes/inference-page.tsx:976
+#: apps/admin/src/routes/inference-page.tsx:992
 msgid "快捷操作"
 msgstr "快捷操作"
 
@@ -2893,7 +2893,7 @@ msgid "尚未自检"
 msgstr "尚未自检"
 
 #: apps/admin/src/routes/action-runtime-page.tsx:1625
-#: apps/admin/src/routes/inference-page.tsx:1102
+#: apps/admin/src/routes/inference-page.tsx:1118
 msgid "当前编辑"
 msgstr "当前编辑"
 
@@ -2941,7 +2941,7 @@ msgid "启用中..."
 msgstr "启用中..."
 
 #: apps/admin/src/routes/action-runtime-page.tsx:1743
-#: apps/admin/src/routes/inference-page.tsx:1112
+#: apps/admin/src/routes/inference-page.tsx:1128
 #: apps/admin/src/routes/token-usage-page.tsx:1390
 msgid "启用"
 msgstr "启用"
@@ -2951,7 +2951,7 @@ msgid "停用中..."
 msgstr "停用中..."
 
 #: apps/admin/src/routes/action-runtime-page.tsx:1762
-#: apps/admin/src/routes/inference-page.tsx:1112
+#: apps/admin/src/routes/inference-page.tsx:1128
 msgid "停用"
 msgstr "停用"
 
@@ -3424,7 +3424,7 @@ msgstr "执行中"
 #: apps/admin/src/routes/character-factory-page.tsx:1272
 #: apps/admin/src/routes/character-factory-page.tsx:1505
 #: apps/admin/src/routes/followup-runtime-page.tsx:1762
-#: apps/admin/src/routes/inference-page.tsx:1126
+#: apps/admin/src/routes/inference-page.tsx:1142
 #: apps/admin/src/routes/need-discovery-page.tsx:88
 #: apps/admin/src/routes/need-discovery-page.tsx:1294
 #: apps/admin/src/routes/need-discovery-page.tsx:3353
@@ -3442,7 +3442,7 @@ msgstr "错误"
 
 #: apps/admin/src/routes/action-runtime-page.tsx:2671
 #: apps/admin/src/routes/followup-runtime-page.tsx:215
-#: apps/admin/src/routes/inference-page.tsx:929
+#: apps/admin/src/routes/inference-page.tsx:945
 #: apps/admin/src/routes/need-discovery-page.tsx:937
 #: apps/admin/src/routes/need-discovery-page.tsx:947
 #: apps/admin/src/routes/need-discovery-page.tsx:2248
@@ -3563,13 +3563,14 @@ msgstr "保存角色失败"
 #: apps/admin/src/routes/evals-page.tsx:1351
 #: apps/admin/src/routes/evals-page.tsx:1360
 #: apps/admin/src/routes/evals-page.tsx:1369
-#: apps/admin/src/routes/inference-page.tsx:830
-#: apps/admin/src/routes/inference-page.tsx:838
-#: apps/admin/src/routes/inference-page.tsx:846
-#: apps/admin/src/routes/inference-page.tsx:855
-#: apps/admin/src/routes/inference-page.tsx:863
-#: apps/admin/src/routes/inference-page.tsx:872
-#: apps/admin/src/routes/inference-page.tsx:880
+#: apps/admin/src/routes/inference-page.tsx:837
+#: apps/admin/src/routes/inference-page.tsx:845
+#: apps/admin/src/routes/inference-page.tsx:853
+#: apps/admin/src/routes/inference-page.tsx:862
+#: apps/admin/src/routes/inference-page.tsx:870
+#: apps/admin/src/routes/inference-page.tsx:879
+#: apps/admin/src/routes/inference-page.tsx:887
+#: apps/admin/src/routes/inference-page.tsx:896
 msgid "清除错误"
 msgstr "清除错误"
 
@@ -3747,7 +3748,7 @@ msgid "默认账户"
 msgstr "默认账户"
 
 #: apps/admin/src/routes/character-editor-page.tsx:654
-#: apps/admin/src/routes/inference-page.tsx:1617
+#: apps/admin/src/routes/inference-page.tsx:1633
 msgid "（默认）"
 msgstr "（默认）"
 
@@ -5025,7 +5026,7 @@ msgstr "一键同步微信朋友"
 
 #: apps/admin/src/routes/characters-page.tsx:321
 #: apps/admin/src/routes/dashboard-page.tsx:836
-#: apps/admin/src/routes/inference-page.tsx:1060
+#: apps/admin/src/routes/inference-page.tsx:1076
 msgid "角色总数"
 msgstr "角色总数"
 
@@ -6702,7 +6703,7 @@ msgstr "只重投影"
 #: apps/admin/src/routes/cyber-avatar-page.tsx:144
 #: apps/admin/src/routes/inference-page.tsx:83
 #: apps/admin/src/routes/inference-page.tsx:98
-#: apps/admin/src/routes/inference-page.tsx:1713
+#: apps/admin/src/routes/inference-page.tsx:1729
 msgid "预览"
 msgstr "预览"
 
@@ -7820,7 +7821,7 @@ msgstr "真实世界简报和用户行为会继续作为 need-discovery 的上�
 #: apps/admin/src/routes/dashboard-page.tsx:1477
 #: apps/admin/src/routes/evals-page.tsx:1611
 #: apps/admin/src/routes/evals-page.tsx:2036
-#: apps/admin/src/routes/inference-page.tsx:1402
+#: apps/admin/src/routes/inference-page.tsx:1418
 #: apps/admin/src/routes/reply-logic-page.tsx:1233
 msgid "模式"
 msgstr "模式"
@@ -9497,8 +9498,8 @@ msgstr "当前数据集"
 #: apps/admin/src/routes/evals-page.tsx:1140
 #: apps/admin/src/routes/evals-page.tsx:1141
 #: apps/admin/src/routes/games-page.tsx:860
-#: apps/admin/src/routes/inference-page.tsx:1073
-#: apps/admin/src/routes/inference-page.tsx:1632
+#: apps/admin/src/routes/inference-page.tsx:1089
+#: apps/admin/src/routes/inference-page.tsx:1648
 #: apps/admin/src/routes/reply-logic-page.tsx:497
 msgid "未选择"
 msgstr "未选择"
@@ -9877,6 +9878,12 @@ msgid "运行预设"
 msgstr "运行预设"
 
 #: apps/admin/src/routes/evals-page.tsx:1552
+#: apps/admin/src/routes/evals-page.tsx:2328
+#: apps/admin/src/routes/evals-page.tsx:2926
+msgid "基线"
+msgstr "基线"
+
+#: apps/admin/src/routes/evals-page.tsx:1552
 #: apps/admin/src/routes/evals-page.tsx:1552
 #: apps/admin/src/routes/evals-page.tsx:1555
 #: apps/admin/src/routes/evals-page.tsx:1555
@@ -9888,15 +9895,9 @@ msgstr "运行预设"
 #: apps/admin/src/routes/evals-page.tsx:1656
 #: apps/admin/src/routes/evals-page.tsx:2903
 #: apps/admin/src/routes/evals-page.tsx:2914
-#: apps/admin/src/routes/inference-page.tsx:1107
+#: apps/admin/src/routes/inference-page.tsx:1123
 msgid "默认"
 msgstr "默认"
-
-#: apps/admin/src/routes/evals-page.tsx:1552
-#: apps/admin/src/routes/evals-page.tsx:2328
-#: apps/admin/src/routes/evals-page.tsx:2926
-msgid "基线"
-msgstr "基线"
 
 #: apps/admin/src/routes/evals-page.tsx:1555
 #: apps/admin/src/routes/evals-page.tsx:2377
@@ -10140,7 +10141,7 @@ msgid "持平"
 msgstr "持平"
 
 #: apps/admin/src/routes/evals-page.tsx:1901
-#: apps/admin/src/routes/inference-page.tsx:1583
+#: apps/admin/src/routes/inference-page.tsx:1599
 #: apps/admin/src/routes/reply-logic-page.tsx:1447
 #: apps/admin/src/routes/token-usage-page.tsx:2905
 msgid "备注"
@@ -10721,9 +10722,9 @@ msgid "调度状态"
 msgstr "调度状态"
 
 #: apps/admin/src/routes/followup-runtime-page.tsx:215
-#: apps/admin/src/routes/inference-page.tsx:929
-#: apps/admin/src/routes/inference-page.tsx:1027
-#: apps/admin/src/routes/inference-page.tsx:1174
+#: apps/admin/src/routes/inference-page.tsx:945
+#: apps/admin/src/routes/inference-page.tsx:1043
+#: apps/admin/src/routes/inference-page.tsx:1190
 #: apps/admin/src/routes/need-discovery-page.tsx:937
 #: apps/admin/src/routes/need-discovery-page.tsx:947
 #: apps/admin/src/routes/need-discovery-page.tsx:2248
@@ -10807,7 +10808,7 @@ msgid "当前策略快照"
 msgstr "当前策略快照"
 
 #: apps/admin/src/routes/followup-runtime-page.tsx:340
-#: apps/admin/src/routes/inference-page.tsx:1174
+#: apps/admin/src/routes/inference-page.tsx:1190
 msgid "停用中"
 msgstr "停用中"
 
@@ -11117,7 +11118,7 @@ msgid "这轮运行没有额外的跳过原因或错误信息。"
 msgstr "这轮运行没有额外的跳过原因或错误信息。"
 
 #: apps/admin/src/routes/followup-runtime-page.tsx:938
-#: apps/admin/src/routes/inference-page.tsx:1806
+#: apps/admin/src/routes/inference-page.tsx:1822
 msgid "选中"
 msgstr "选中"
 
@@ -11609,7 +11610,7 @@ msgid "新建游戏草稿"
 msgstr "新建游戏草稿"
 
 #: apps/admin/src/routes/games-page.tsx:583
-#: apps/admin/src/routes/inference-page.tsx:1040
+#: apps/admin/src/routes/inference-page.tsx:1056
 msgid "目录总数"
 msgstr "目录总数"
 
@@ -11940,20 +11941,20 @@ msgid "总览"
 msgstr "总览"
 
 #: apps/admin/src/routes/inference-page.tsx:74
-#: apps/admin/src/routes/inference-page.tsx:1411
+#: apps/admin/src/routes/inference-page.tsx:1427
 #: apps/admin/src/routes/reply-logic-page.tsx:1243
 msgid "云端模式"
 msgstr "云端模式"
 
 #: apps/admin/src/routes/inference-page.tsx:75
-#: apps/admin/src/routes/inference-page.tsx:1412
+#: apps/admin/src/routes/inference-page.tsx:1428
 #: apps/admin/src/routes/reply-logic-page.tsx:1242
 msgid "本地兼容"
 msgstr "本地兼容"
 
 #: apps/admin/src/routes/inference-page.tsx:82
 #: apps/admin/src/routes/inference-page.tsx:97
-#: apps/admin/src/routes/inference-page.tsx:1710
+#: apps/admin/src/routes/inference-page.tsx:1726
 msgid "活跃"
 msgstr "活跃"
 
@@ -12028,7 +12029,7 @@ msgid "原生音频语义探针通过，系统已确认存在真实可用的音�
 msgstr "原生音频语义探针通过，系统已确认存在真实可用的音频理解模型。"
 
 #: apps/admin/src/routes/inference-page.tsx:264
-#: apps/admin/src/routes/inference-page.tsx:1292
+#: apps/admin/src/routes/inference-page.tsx:1308
 msgid "真实可用"
 msgstr "真实可用"
 
@@ -12113,7 +12114,7 @@ msgid "把默认路由检查、Provider 维护、模型人格批量处理拆成�
 msgstr "把默认路由检查、Provider 维护、模型人格批量处理拆成三个独立工作区，减少阅读负担，也避免编辑中的 Provider 误伤批量目标。"
 
 #: apps/admin/src/routes/inference-page.tsx:748
-#: apps/admin/src/routes/inference-page.tsx:918
+#: apps/admin/src/routes/inference-page.tsx:934
 msgid "默认路由"
 msgstr "默认路由"
 
@@ -12122,17 +12123,17 @@ msgid "启用中账户"
 msgstr "启用中账户"
 
 #: apps/admin/src/routes/inference-page.tsx:752
-#: apps/admin/src/routes/inference-page.tsx:1707
+#: apps/admin/src/routes/inference-page.tsx:1723
 msgid "模型目录"
 msgstr "模型目录"
 
 #: apps/admin/src/routes/inference-page.tsx:754
-#: apps/admin/src/routes/inference-page.tsx:1068
+#: apps/admin/src/routes/inference-page.tsx:1084
 msgid "模型人格角色"
 msgstr "模型人格角色"
 
 #: apps/admin/src/routes/inference-page.tsx:767
-#: apps/admin/src/routes/inference-page.tsx:1134
+#: apps/admin/src/routes/inference-page.tsx:1150
 msgid "新建 Provider"
 msgstr "新建 Provider"
 
@@ -12157,7 +12158,7 @@ msgid "连通性测试成功"
 msgstr "连通性测试成功"
 
 #: apps/admin/src/routes/inference-page.tsx:799
-#: apps/admin/src/routes/inference-page.tsx:835
+#: apps/admin/src/routes/inference-page.tsx:842
 msgid "连通性测试失败"
 msgstr "连通性测试失败"
 
@@ -12165,14 +12166,18 @@ msgstr "连通性测试失败"
 msgid "全量模型人格处理完成"
 msgstr "全量模型人格处理完成"
 
+#. placeholder {0}: installFamilyMutation.data.installedCount
 #. placeholder {0}: installMutation.data.installedCount
 #. placeholder {0}: installSelectedMutation.data.installedCount
+#. placeholder {1}: installFamilyMutation.data.updatedCount
 #. placeholder {1}: installMutation.data.updatedCount
 #. placeholder {1}: installSelectedMutation.data.updatedCount
+#. placeholder {2}: installFamilyMutation.data.skippedCount
 #. placeholder {2}: installMutation.data.skippedCount
 #. placeholder {2}: installSelectedMutation.data.skippedCount
 #: apps/admin/src/routes/inference-page.tsx:808
 #: apps/admin/src/routes/inference-page.tsx:815
+#: apps/admin/src/routes/inference-page.tsx:829
 msgid "新增 {0} 个，更新 {1} 个，跳过 {2} 个。"
 msgstr "新增 {0} 个，更新 {1} 个，跳过 {2} 个。"
 
@@ -12191,470 +12196,478 @@ msgstr "模型人格角色换绑完成"
 msgid "已更新 {0} 个，跳过 {1} 个，未安装 {2} 个。"
 msgstr "已更新 {0} 个，跳过 {1} 个，未安装 {2} 个。"
 
-#: apps/admin/src/routes/inference-page.tsx:827
+#: apps/admin/src/routes/inference-page.tsx:828
+msgid "厂商家族角色处理完成"
+msgstr "厂商家族角色处理完成"
+
+#: apps/admin/src/routes/inference-page.tsx:834
 msgid "保存 Provider 账户失败"
 msgstr "保存 Provider 账户失败"
 
-#: apps/admin/src/routes/inference-page.tsx:843
+#: apps/admin/src/routes/inference-page.tsx:850
 msgid "单项诊断失败"
 msgstr "单项诊断失败"
 
-#: apps/admin/src/routes/inference-page.tsx:852
+#: apps/admin/src/routes/inference-page.tsx:859
 msgid "全量诊断失败"
 msgstr "全量诊断失败"
 
-#: apps/admin/src/routes/inference-page.tsx:860
+#: apps/admin/src/routes/inference-page.tsx:867
 msgid "批量安装模型人格失败"
 msgstr "批量安装模型人格失败"
 
-#: apps/admin/src/routes/inference-page.tsx:869
+#: apps/admin/src/routes/inference-page.tsx:876
 msgid "选中模型人格安装失败"
 msgstr "选中模型人格安装失败"
 
-#: apps/admin/src/routes/inference-page.tsx:877
+#: apps/admin/src/routes/inference-page.tsx:884
 msgid "模型人格换绑失败"
 msgstr "模型人格换绑失败"
 
-#: apps/admin/src/routes/inference-page.tsx:905
+#: apps/admin/src/routes/inference-page.tsx:893
+msgid "厂商家族角色安装失败"
+msgstr "厂商家族角色安装失败"
+
+#: apps/admin/src/routes/inference-page.tsx:921
 msgid "维护 Provider"
 msgstr "维护 Provider"
 
-#: apps/admin/src/routes/inference-page.tsx:910
+#: apps/admin/src/routes/inference-page.tsx:926
 msgid "去做模型人格批量处理"
 msgstr "去做模型人格批量处理"
 
-#: apps/admin/src/routes/inference-page.tsx:939
+#: apps/admin/src/routes/inference-page.tsx:955
 msgid "Key 已配置"
 msgstr "Key 已配置"
 
-#: apps/admin/src/routes/inference-page.tsx:940
+#: apps/admin/src/routes/inference-page.tsx:956
 msgid "缺少 Key"
 msgstr "缺少 Key"
 
-#: apps/admin/src/routes/inference-page.tsx:944
+#: apps/admin/src/routes/inference-page.tsx:960
 msgid "未设置默认路由"
 msgstr "未设置默认路由"
 
-#: apps/admin/src/routes/inference-page.tsx:950
+#: apps/admin/src/routes/inference-page.tsx:966
 msgid "默认 Provider"
 msgstr "默认 Provider"
 
-#: apps/admin/src/routes/inference-page.tsx:954
+#: apps/admin/src/routes/inference-page.tsx:970
 msgid "默认模型"
 msgstr "默认模型"
 
-#: apps/admin/src/routes/inference-page.tsx:958
-#: apps/admin/src/routes/inference-page.tsx:1392
+#: apps/admin/src/routes/inference-page.tsx:974
+#: apps/admin/src/routes/inference-page.tsx:1408
 #: apps/admin/src/routes/reply-logic-page.tsx:504
 #: apps/admin/src/routes/reply-logic-page.tsx:1223
 msgid "接口地址"
 msgstr "接口地址"
 
-#: apps/admin/src/routes/inference-page.tsx:966
-#: apps/admin/src/routes/inference-page.tsx:1212
+#: apps/admin/src/routes/inference-page.tsx:982
+#: apps/admin/src/routes/inference-page.tsx:1228
 msgid "最近更新时间"
 msgstr "最近更新时间"
 
-#: apps/admin/src/routes/inference-page.tsx:971
+#: apps/admin/src/routes/inference-page.tsx:987
 msgid "默认账户会继续兼容旧版 /system/provider。切默认时，旧链路也会一起切换。"
 msgstr "默认账户会继续兼容旧版 /system/provider。切默认时，旧链路也会一起切换。"
 
-#: apps/admin/src/routes/inference-page.tsx:986
+#: apps/admin/src/routes/inference-page.tsx:1002
 msgid "维护默认 Provider"
 msgstr "维护默认 Provider"
 
-#: apps/admin/src/routes/inference-page.tsx:988
+#: apps/admin/src/routes/inference-page.tsx:1004
 msgid "直接进入账户编辑，做保存、测试和设默认。"
 msgstr "直接进入账户编辑，做保存、测试和设默认。"
 
-#: apps/admin/src/routes/inference-page.tsx:999
+#: apps/admin/src/routes/inference-page.tsx:1015
 msgid "新建一个额外 Provider"
 msgstr "新建一个额外 Provider"
 
-#: apps/admin/src/routes/inference-page.tsx:1001
+#: apps/admin/src/routes/inference-page.tsx:1017
 msgid "录入新账户，不影响当前默认路由。"
 msgstr "录入新账户，不影响当前默认路由。"
 
-#: apps/admin/src/routes/inference-page.tsx:1009
+#: apps/admin/src/routes/inference-page.tsx:1025
 msgid "批量处理模型人格"
 msgstr "批量处理模型人格"
 
-#: apps/admin/src/routes/inference-page.tsx:1011
+#: apps/admin/src/routes/inference-page.tsx:1027
 msgid "先选目标 Provider，再安装、覆盖刷新或换绑。"
 msgstr "先选目标 Provider，再安装、覆盖刷新或换绑。"
 
-#: apps/admin/src/routes/inference-page.tsx:1020
+#: apps/admin/src/routes/inference-page.tsx:1036
 msgid "Provider 池概况"
 msgstr "Provider 池概况"
 
-#: apps/admin/src/routes/inference-page.tsx:1023
+#: apps/admin/src/routes/inference-page.tsx:1039
 msgid "账户总数"
 msgstr "账户总数"
 
-#: apps/admin/src/routes/inference-page.tsx:1028
+#: apps/admin/src/routes/inference-page.tsx:1044
 msgid "{enabledProviderCount} 个"
 msgstr "{enabledProviderCount} 个"
 
-#: apps/admin/src/routes/inference-page.tsx:1031
+#: apps/admin/src/routes/inference-page.tsx:1047
 msgid "已配置主 Key"
 msgstr "已配置主 Key"
 
-#: apps/admin/src/routes/inference-page.tsx:1032
+#: apps/admin/src/routes/inference-page.tsx:1048
 msgid "{providerWithApiKeyCount} 个"
 msgstr "{providerWithApiKeyCount} 个"
 
-#: apps/admin/src/routes/inference-page.tsx:1038
+#: apps/admin/src/routes/inference-page.tsx:1054
 msgid "模型目录概况"
 msgstr "模型目录概况"
 
-#: apps/admin/src/routes/inference-page.tsx:1042
+#: apps/admin/src/routes/inference-page.tsx:1058
 msgid "活跃模型"
 msgstr "活跃模型"
 
-#: apps/admin/src/routes/inference-page.tsx:1043
+#: apps/admin/src/routes/inference-page.tsx:1059
 msgid "{activeModelCount} 个"
 msgstr "{activeModelCount} 个"
 
-#: apps/admin/src/routes/inference-page.tsx:1046
+#: apps/admin/src/routes/inference-page.tsx:1062
 msgid "预览模型"
 msgstr "预览模型"
 
-#: apps/admin/src/routes/inference-page.tsx:1047
+#: apps/admin/src/routes/inference-page.tsx:1063
 msgid "{previewModelCount} 个"
 msgstr "{previewModelCount} 个"
 
-#: apps/admin/src/routes/inference-page.tsx:1050
+#: apps/admin/src/routes/inference-page.tsx:1066
 msgid "支持 reasoning"
 msgstr "支持 reasoning"
 
-#: apps/admin/src/routes/inference-page.tsx:1051
+#: apps/admin/src/routes/inference-page.tsx:1067
 msgid "{reasoningModelCount} 个"
 msgstr "{reasoningModelCount} 个"
 
-#: apps/admin/src/routes/inference-page.tsx:1057
+#: apps/admin/src/routes/inference-page.tsx:1073
 msgid "角色绑定概况"
 msgstr "角色绑定概况"
 
-#: apps/admin/src/routes/inference-page.tsx:1064
+#: apps/admin/src/routes/inference-page.tsx:1080
 msgid "已绑定模型路由"
 msgstr "已绑定模型路由"
 
-#: apps/admin/src/routes/inference-page.tsx:1072
+#: apps/admin/src/routes/inference-page.tsx:1088
 msgid "当前批量目标"
 msgstr "当前批量目标"
 
-#: apps/admin/src/routes/inference-page.tsx:1085
+#: apps/admin/src/routes/inference-page.tsx:1101
 msgid "账户列表"
 msgstr "账户列表"
 
-#: apps/admin/src/routes/inference-page.tsx:1091
+#: apps/admin/src/routes/inference-page.tsx:1107
 msgid "新建"
 msgstr "新建"
 
-#: apps/admin/src/routes/inference-page.tsx:1121
+#: apps/admin/src/routes/inference-page.tsx:1137
 msgid "新建 Provider 账户"
 msgstr "新建 Provider 账户"
 
-#: apps/admin/src/routes/inference-page.tsx:1122
+#: apps/admin/src/routes/inference-page.tsx:1138
 msgid "不会自动切换默认路由"
 msgstr "不会自动切换默认路由"
 
-#: apps/admin/src/routes/inference-page.tsx:1123
+#: apps/admin/src/routes/inference-page.tsx:1139
 msgid "保存后才会进入账户池，也不会自动成为批量目标。"
 msgstr "保存后才会进入账户池，也不会自动成为批量目标。"
 
-#: apps/admin/src/routes/inference-page.tsx:1124
+#: apps/admin/src/routes/inference-page.tsx:1140
 msgid "当前新建"
 msgstr "当前新建"
 
-#: apps/admin/src/routes/inference-page.tsx:1134
+#: apps/admin/src/routes/inference-page.tsx:1150
 msgid "编辑 Provider"
 msgstr "编辑 Provider"
 
-#: apps/admin/src/routes/inference-page.tsx:1145
+#: apps/admin/src/routes/inference-page.tsx:1161
 #: apps/admin/src/routes/reply-logic-page.tsx:1300
 msgid "测试中..."
 msgstr "测试中..."
 
-#: apps/admin/src/routes/inference-page.tsx:1145
+#: apps/admin/src/routes/inference-page.tsx:1161
 #: apps/admin/src/routes/reply-logic-page.tsx:1301
 msgid "测试连接"
 msgstr "测试连接"
 
-#: apps/admin/src/routes/inference-page.tsx:1153
+#: apps/admin/src/routes/inference-page.tsx:1169
 msgid "保存"
 msgstr "保存"
 
-#: apps/admin/src/routes/inference-page.tsx:1164
+#: apps/admin/src/routes/inference-page.tsx:1180
 msgid "切换中..."
 msgstr "切换中..."
 
-#: apps/admin/src/routes/inference-page.tsx:1164
+#: apps/admin/src/routes/inference-page.tsx:1180
 msgid "设为默认"
 msgstr "设为默认"
 
-#: apps/admin/src/routes/inference-page.tsx:1177
+#: apps/admin/src/routes/inference-page.tsx:1193
 msgid "主 Key"
 msgstr "主 Key"
 
-#: apps/admin/src/routes/inference-page.tsx:1185
+#: apps/admin/src/routes/inference-page.tsx:1201
 msgid "转写 Key"
 msgstr "转写 Key"
 
-#: apps/admin/src/routes/inference-page.tsx:1194
-#: apps/admin/src/routes/inference-page.tsx:1504
+#: apps/admin/src/routes/inference-page.tsx:1210
+#: apps/admin/src/routes/inference-page.tsx:1520
 msgid "TTS Key"
 msgstr "TTS Key"
 
-#: apps/admin/src/routes/inference-page.tsx:1203
-#: apps/admin/src/routes/inference-page.tsx:1553
+#: apps/admin/src/routes/inference-page.tsx:1219
+#: apps/admin/src/routes/inference-page.tsx:1569
 msgid "图片生成 Key"
 msgstr "图片生成 Key"
 
-#: apps/admin/src/routes/inference-page.tsx:1219
+#: apps/admin/src/routes/inference-page.tsx:1235
 msgid "新建账户保存前不会成为默认路由，也不会自动成为模型人格的批量目标。"
 msgstr "新建账户保存前不会成为默认路由，也不会自动成为模型人格的批量目标。"
 
-#: apps/admin/src/routes/inference-page.tsx:1224
+#: apps/admin/src/routes/inference-page.tsx:1240
 msgid "账户名称、接口地址和默认模型 ID 必填。"
 msgstr "账户名称、接口地址和默认模型 ID 必填。"
 
-#: apps/admin/src/routes/inference-page.tsx:1231
+#: apps/admin/src/routes/inference-page.tsx:1247
 msgid "真实多模态诊断"
 msgstr "真实多模态诊断"
 
-#: apps/admin/src/routes/inference-page.tsx:1233
+#: apps/admin/src/routes/inference-page.tsx:1249
 msgid "一键运行会写入最新快照，系统状态页只按这份真实诊断结果展示多模态就绪状态。"
 msgstr "一键运行会写入最新快照，系统状态页只按这份真实诊断结果展示多模态就绪状态。"
 
-#: apps/admin/src/routes/inference-page.tsx:1248
+#: apps/admin/src/routes/inference-page.tsx:1264
 msgid "全量诊断中..."
 msgstr "全量诊断中..."
 
-#: apps/admin/src/routes/inference-page.tsx:1249
+#: apps/admin/src/routes/inference-page.tsx:1265
 msgid "运行全部诊断"
 msgstr "运行全部诊断"
 
-#: apps/admin/src/routes/inference-page.tsx:1267
+#: apps/admin/src/routes/inference-page.tsx:1283
 msgid "诊断中..."
 msgstr "诊断中..."
 
-#: apps/admin/src/routes/inference-page.tsx:1278
+#: apps/admin/src/routes/inference-page.tsx:1294
 msgid "请先保存 Provider 账户，再进行真实通道诊断。"
 msgstr "请先保存 Provider 账户，再进行真实通道诊断。"
 
-#: apps/admin/src/routes/inference-page.tsx:1292
+#: apps/admin/src/routes/inference-page.tsx:1308
 msgid "未证明可用"
 msgstr "未证明可用"
 
-#: apps/admin/src/routes/inference-page.tsx:1298
+#: apps/admin/src/routes/inference-page.tsx:1314
 msgid "最近快照："
 msgstr "最近快照："
 
-#: apps/admin/src/routes/inference-page.tsx:1301
+#: apps/admin/src/routes/inference-page.tsx:1317
 msgid "· 真实可用"
 msgstr "· 真实可用"
 
-#: apps/admin/src/routes/inference-page.tsx:1304
+#: apps/admin/src/routes/inference-page.tsx:1320
 msgid "，失败"
 msgstr "，失败"
 
-#: apps/admin/src/routes/inference-page.tsx:1306
+#: apps/admin/src/routes/inference-page.tsx:1322
 msgid "，不可用"
 msgstr "，不可用"
 
-#: apps/admin/src/routes/inference-page.tsx:1313
+#: apps/admin/src/routes/inference-page.tsx:1329
 msgid "尚未保存真实诊断快照。"
 msgstr "尚未保存真实诊断快照。"
 
-#: apps/admin/src/routes/inference-page.tsx:1331
+#: apps/admin/src/routes/inference-page.tsx:1347
 msgid "未绑定诊断结果"
 msgstr "未绑定诊断结果"
 
-#: apps/admin/src/routes/inference-page.tsx:1351
+#: apps/admin/src/routes/inference-page.tsx:1367
 msgid "已声明"
 msgstr "已声明"
 
-#: apps/admin/src/routes/inference-page.tsx:1351
+#: apps/admin/src/routes/inference-page.tsx:1367
 msgid "未声明"
 msgstr "未声明"
 
-#: apps/admin/src/routes/inference-page.tsx:1355
+#: apps/admin/src/routes/inference-page.tsx:1371
 msgid "未检查"
 msgstr "未检查"
 
-#: apps/admin/src/routes/inference-page.tsx:1367
+#: apps/admin/src/routes/inference-page.tsx:1383
 msgid "基础接入"
 msgstr "基础接入"
 
-#: apps/admin/src/routes/inference-page.tsx:1371
+#: apps/admin/src/routes/inference-page.tsx:1387
 msgid "账户名称"
 msgstr "账户名称"
 
-#: apps/admin/src/routes/inference-page.tsx:1381
+#: apps/admin/src/routes/inference-page.tsx:1397
 msgid "默认模型 ID"
 msgstr "默认模型 ID"
 
-#: apps/admin/src/routes/inference-page.tsx:1416
+#: apps/admin/src/routes/inference-page.tsx:1432
 msgid "API 风格"
 msgstr "API 风格"
 
-#: apps/admin/src/routes/inference-page.tsx:1434
+#: apps/admin/src/routes/inference-page.tsx:1450
 msgid "API Key"
 msgstr "API Key"
 
-#: apps/admin/src/routes/inference-page.tsx:1449
+#: apps/admin/src/routes/inference-page.tsx:1465
 msgid "语音能力"
 msgstr "语音能力"
 
-#: apps/admin/src/routes/inference-page.tsx:1453
+#: apps/admin/src/routes/inference-page.tsx:1469
 msgid "语音转写接口"
 msgstr "语音转写接口"
 
-#: apps/admin/src/routes/inference-page.tsx:1463
+#: apps/admin/src/routes/inference-page.tsx:1479
 msgid "语音转写模型"
 msgstr "语音转写模型"
 
-#: apps/admin/src/routes/inference-page.tsx:1473
+#: apps/admin/src/routes/inference-page.tsx:1489
 msgid "语音转写 Key"
 msgstr "语音转写 Key"
 
-#: apps/admin/src/routes/inference-page.tsx:1484
+#: apps/admin/src/routes/inference-page.tsx:1500
 msgid "TTS 接口"
 msgstr "TTS 接口"
 
-#: apps/admin/src/routes/inference-page.tsx:1494
+#: apps/admin/src/routes/inference-page.tsx:1510
 msgid "TTS 模型"
 msgstr "TTS 模型"
 
-#: apps/admin/src/routes/inference-page.tsx:1515
+#: apps/admin/src/routes/inference-page.tsx:1531
 msgid "TTS 音色"
 msgstr "TTS 音色"
 
-#: apps/admin/src/routes/inference-page.tsx:1529
+#: apps/admin/src/routes/inference-page.tsx:1545
 msgid "图片回复能力"
 msgstr "图片回复能力"
 
-#: apps/admin/src/routes/inference-page.tsx:1533
+#: apps/admin/src/routes/inference-page.tsx:1549
 msgid "图片生成接口"
 msgstr "图片生成接口"
 
-#: apps/admin/src/routes/inference-page.tsx:1543
+#: apps/admin/src/routes/inference-page.tsx:1559
 msgid "图片生成模型"
 msgstr "图片生成模型"
 
-#: apps/admin/src/routes/inference-page.tsx:1568
+#: apps/admin/src/routes/inference-page.tsx:1584
 msgid "维护信息"
 msgstr "维护信息"
 
-#: apps/admin/src/routes/inference-page.tsx:1572
+#: apps/admin/src/routes/inference-page.tsx:1588
 msgid "启用该账户"
 msgstr "启用该账户"
 
-#: apps/admin/src/routes/inference-page.tsx:1602
+#: apps/admin/src/routes/inference-page.tsx:1618
 msgid "批量动作"
 msgstr "批量动作"
 
-#: apps/admin/src/routes/inference-page.tsx:1605
+#: apps/admin/src/routes/inference-page.tsx:1621
 msgid "目标已选择"
 msgstr "目标已选择"
 
-#: apps/admin/src/routes/inference-page.tsx:1605
+#: apps/admin/src/routes/inference-page.tsx:1621
 msgid "未选择目标"
 msgstr "未选择目标"
 
-#: apps/admin/src/routes/inference-page.tsx:1612
+#: apps/admin/src/routes/inference-page.tsx:1628
 msgid "目标 Provider"
 msgstr "目标 Provider"
 
-#: apps/admin/src/routes/inference-page.tsx:1617
+#: apps/admin/src/routes/inference-page.tsx:1633
 msgid "（停用）"
 msgstr "（停用）"
 
-#: apps/admin/src/routes/inference-page.tsx:1623
+#: apps/admin/src/routes/inference-page.tsx:1639
 msgid "已选模型"
 msgstr "已选模型"
 
-#: apps/admin/src/routes/inference-page.tsx:1627
+#: apps/admin/src/routes/inference-page.tsx:1643
 msgid "当前筛选结果"
 msgstr "当前筛选结果"
 
-#: apps/admin/src/routes/inference-page.tsx:1631
+#: apps/admin/src/routes/inference-page.tsx:1647
 msgid "目标模型"
 msgstr "目标模型"
 
-#: apps/admin/src/routes/inference-page.tsx:1650
-#: apps/admin/src/routes/inference-page.tsx:1688
+#: apps/admin/src/routes/inference-page.tsx:1666
+#: apps/admin/src/routes/inference-page.tsx:1704
 msgid "安装中..."
 msgstr "安装中..."
 
-#: apps/admin/src/routes/inference-page.tsx:1651
+#: apps/admin/src/routes/inference-page.tsx:1667
 msgid "安装选中模型人格"
 msgstr "安装选中模型人格"
 
-#: apps/admin/src/routes/inference-page.tsx:1662
-#: apps/admin/src/routes/inference-page.tsx:1698
+#: apps/admin/src/routes/inference-page.tsx:1678
+#: apps/admin/src/routes/inference-page.tsx:1714
 #: apps/admin/src/routes/real-world-sync-page.tsx:928
 msgid "刷新中..."
 msgstr "刷新中..."
 
-#: apps/admin/src/routes/inference-page.tsx:1663
+#: apps/admin/src/routes/inference-page.tsx:1679
 msgid "覆盖刷新选中"
 msgstr "覆盖刷新选中"
 
-#: apps/admin/src/routes/inference-page.tsx:1671
+#: apps/admin/src/routes/inference-page.tsx:1687
 msgid "换绑中..."
 msgstr "换绑中..."
 
-#: apps/admin/src/routes/inference-page.tsx:1671
+#: apps/admin/src/routes/inference-page.tsx:1687
 msgid "换绑选中角色"
 msgstr "换绑选中角色"
 
-#: apps/admin/src/routes/inference-page.tsx:1679
+#: apps/admin/src/routes/inference-page.tsx:1695
 msgid "推荐：把 30+ 个旧模型人格折叠为 12 个厂商家族角色（OpenAI/Anthropic/Google/...），实际推理走全局默认 provider，提示词里模仿对应厂商风格。覆盖刷新会重建 system prompt。首次执行后请运行 scripts/migrate-model-persona-merge.mjs 把旧聊天记录迁到新角色。"
 msgstr "推荐：把 30+ 个旧模型人格折叠为 12 个厂商家族角色（OpenAI/Anthropic/Google/...），实际推理走全局默认 provider，提示词里模仿对应厂商风格。覆盖刷新会重建 system prompt。首次执行后请运行 scripts/migrate-model-persona-merge.mjs 把旧聊天记录迁到新角色。"
 
-#: apps/admin/src/routes/inference-page.tsx:1689
+#: apps/admin/src/routes/inference-page.tsx:1705
 msgid "安装厂商家族角色 (12 个)"
 msgstr "安装厂商家族角色 (12 个)"
 
-#: apps/admin/src/routes/inference-page.tsx:1699
+#: apps/admin/src/routes/inference-page.tsx:1715
 msgid "覆盖刷新全部家族角色"
 msgstr "覆盖刷新全部家族角色"
 
-#: apps/admin/src/routes/inference-page.tsx:1719
+#: apps/admin/src/routes/inference-page.tsx:1735
 msgid "已选"
 msgstr "已选"
 
-#: apps/admin/src/routes/inference-page.tsx:1727
+#: apps/admin/src/routes/inference-page.tsx:1743
 msgid "搜索模型 / 角色名 / 厂商"
 msgstr "搜索模型 / 角色名 / 厂商"
 
-#: apps/admin/src/routes/inference-page.tsx:1740
+#: apps/admin/src/routes/inference-page.tsx:1756
 msgid "能力"
 msgstr "能力"
 
-#: apps/admin/src/routes/inference-page.tsx:1756
+#: apps/admin/src/routes/inference-page.tsx:1772
 msgid "取消当前筛选"
 msgstr "取消当前筛选"
 
-#: apps/admin/src/routes/inference-page.tsx:1757
+#: apps/admin/src/routes/inference-page.tsx:1773
 msgid "选中当前筛选"
 msgstr "选中当前筛选"
 
-#: apps/admin/src/routes/inference-page.tsx:1766
+#: apps/admin/src/routes/inference-page.tsx:1782
 msgid "清空选择"
 msgstr "清空选择"
 
-#: apps/admin/src/routes/inference-page.tsx:1812
+#: apps/admin/src/routes/inference-page.tsx:1828
 msgid "推荐角色"
 msgstr "推荐角色"
 
-#: apps/admin/src/routes/inference-page.tsx:1815
+#: apps/admin/src/routes/inference-page.tsx:1831
 msgid "模型 ID"
 msgstr "模型 ID"
 
-#: apps/admin/src/routes/inference-page.tsx:1838
+#: apps/admin/src/routes/inference-page.tsx:1854
 msgid "没有匹配的模型目录项。"
 msgstr "没有匹配的模型目录项。"
 
