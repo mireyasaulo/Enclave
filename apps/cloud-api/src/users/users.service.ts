@@ -101,11 +101,13 @@ export class UsersService implements OnModuleInit {
         firstLoginAt: now,
         lastLoginAt: now,
         registrationIp: context.ip ?? null,
+        lastLoginIp: context.ip ?? null,
         registrationDeviceFingerprint: context.deviceFingerprint ?? null,
       });
       user = await this.userRepo.save(user);
     } else {
       user.lastLoginAt = now;
+      if (context.ip) user.lastLoginIp = context.ip;
       if (!user.registrationIp && context.ip) user.registrationIp = context.ip;
       if (!user.registrationDeviceFingerprint && context.deviceFingerprint) {
         user.registrationDeviceFingerprint = context.deviceFingerprint;
@@ -174,11 +176,13 @@ export class UsersService implements OnModuleInit {
         firstLoginAt: now,
         lastLoginAt: now,
         registrationIp: context.ip ?? null,
+        lastLoginIp: context.ip ?? null,
         registrationDeviceFingerprint: context.deviceFingerprint ?? null,
       });
       user = await this.userRepo.save(user);
     } else {
       user.lastLoginAt = now;
+      if (context.ip) user.lastLoginIp = context.ip;
       if (!user.phone) user.phone = synthPhone;
       if (!user.emailVerifiedAt) user.emailVerifiedAt = now;
       if (!user.registrationIp && context.ip) user.registrationIp = context.ip;
@@ -415,6 +419,7 @@ export class UsersService implements OnModuleInit {
       inviteCode: ownInviteCode?.code ?? null,
       redeemCount: ownInviteCode?.redeemCount ?? 0,
       registrationIp: user.registrationIp,
+      lastLoginIp: user.lastLoginIp,
       createdAt: user.createdAt.toISOString(),
       lastLoginAt: user.lastLoginAt?.toISOString() ?? null,
     };

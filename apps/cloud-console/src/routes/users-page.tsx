@@ -113,6 +113,8 @@ export function UsersPage() {
                 <th className="px-4 py-3 font-medium">{t("Subscription")}</th>
                 <th className="px-4 py-3 font-medium">{t("Expires")}</th>
                 <th className="px-4 py-3 font-medium">{t("Registered")}</th>
+                <th className="px-4 py-3 font-medium">{t("Registration IP")}</th>
+                <th className="px-4 py-3 font-medium">{t("Last login IP")}</th>
                 <th className="px-4 py-3 font-medium">{t("Inviter")}</th>
                 <th className="px-4 py-3 font-medium">{t("World")}</th>
                 <th className="px-4 py-3 font-medium">{t("Plan")}</th>
@@ -139,6 +141,12 @@ export function UsersPage() {
                     {formatTimestamp(user.subscriptionExpiresAt)}
                   </td>
                   <td className="px-4 py-3">{formatTimestamp(user.createdAt)}</td>
+                  <td className="px-4 py-3 break-all text-[color:var(--text-secondary)]">
+                    {user.registrationIp || "-"}
+                  </td>
+                  <td className="px-4 py-3 break-all text-[color:var(--text-secondary)]">
+                    {user.lastLoginIp || "-"}
+                  </td>
                   <td className="px-4 py-3">{user.inviterPhone || "-"}</td>
                   <td className="px-4 py-3">
                     {user.worldStatus ? t(user.worldStatus) : "-"}

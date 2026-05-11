@@ -48,6 +48,7 @@ import { CreateTelemetryTables1776655800000 } from "./migrations/1776655800000-c
 import { AddWorldIdToTelemetry1776656400000 } from "./migrations/1776656400000-add-world-id-to-telemetry";
 import { CreateCloudTokenUsageTables1776657000000 } from "./migrations/1776657000000-create-cloud-token-usage-tables";
 import { CreateCloudUserOAuthIdentities1776657600000 } from "./migrations/1776657600000-create-cloud-user-oauth-identities";
+import { AddCloudUserLastLoginIp1776658200000 } from "./migrations/1776658200000-add-cloud-user-last-login-ip";
 import { resolveCloudDatabasePath } from "../config/cloud-runtime-config";
 
 type ConfigReader = {
@@ -106,6 +107,7 @@ export const cloudMigrations = [
   AddWorldIdToTelemetry1776656400000,
   CreateCloudTokenUsageTables1776657000000,
   CreateCloudUserOAuthIdentities1776657600000,
+  AddCloudUserLastLoginIp1776658200000,
 ];
 
 export function buildCloudDataSourceOptions(config: ConfigReader): DataSourceOptions {
