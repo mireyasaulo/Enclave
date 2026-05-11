@@ -1915,6 +1915,251 @@ export class FeedService implements OnModuleInit {
     };
   }
 
+  /**
+   * 角色主动把热门视频号帖子转发到好友（owner）的私聊里。
+   *
+   * 节流策略（业务上必须有，否则一上线就会被卡片刷屏）：
+   *  - 每个 owner 每天最多收到 3 条角色主动转发
+   *  - 同一角色 24h 内最多发 1 条
+   *  - 角色不会重复转发自己曾经转过的帖子
+   *
+   * 候选帖：surface=channels, mediaType in (video,audio), 创建于 3d 内，
+   * recommendationScore ≥ 50，且 isPostMediaPlayable 为真。
+   *
+   * LLM 配额：本 cron 单独限 6 次（短评生成）；超过 → 不再给 note 文案，仅卡片。
+   */
+  async runChannelProactiveForwardTick(): Promise<{
+    summary: string;
+    forwarded: number;
+  }> {
+    const MAX_FORWARDS_PER_OWNER_PER_DAY = 3;
+    const MAX_LLM_CALLS_PER_TICK = 6;
+    const RECENT_WINDOW_MS = 3 * 24 * 60 * 60 * 1000;
+    const RECOMMENDATION_THRESHOLD = 50;
+    const BASE_BROWSE_CHANCE = 0.05;
+
+    const nowMs = Date.now();
+    const recentSince = new Date(nowMs - RECENT_WINDOW_MS);
+    const dayWindowSince = new Date(nowMs - 24 * 60 * 60 * 1000);
+
+    let owner;
+    try {
+      owner = await this.worldOwnerService.getOwnerOrThrow();
+    } catch {
+      return {
+        summary: 'channel_proactive_forward: 无 owner 上下文，跳过',
+        forwarded: 0,
+      };
+    }
+
+    // 当日已收到的角色主动转发计数（用于全局上限）
+    const recentForwards = await this.interactionRepo.find({
+      where: {
+        ownerId: owner.id,
+        type: 'forward_to_chat',
+        createdAt: MoreThanOrEqual(dayWindowSince),
+      },
+      select: ['id', 'postId', 'payload', 'createdAt'],
+    });
+    const sentByCharCount = new Map<string, number>();
+    const characterForwardedPostIds = new Map<string, Set<string>>();
+    let totalProactiveForwardsToday = 0;
+    for (const row of recentForwards) {
+      const payload = row.payload as
+        | { viaActor?: string; viaActorType?: string }
+        | null;
+      const actor = payload?.viaActor;
+      if (payload?.viaActorType !== 'character' || !actor) continue;
+      totalProactiveForwardsToday += 1;
+      sentByCharCount.set(actor, (sentByCharCount.get(actor) ?? 0) + 1);
+      if (!characterForwardedPostIds.has(actor)) {
+        characterForwardedPostIds.set(actor, new Set());
+      }
+      characterForwardedPostIds.get(actor)!.add(row.postId);
+    }
+    if (totalProactiveForwardsToday >= MAX_FORWARDS_PER_OWNER_PER_DAY) {
+      return {
+        summary: `channel_proactive_forward: owner 24h 内已收到 ${totalProactiveForwardsToday} 条转发，达到上限`,
+        forwarded: 0,
+      };
+    }
+    const remainingGlobalQuota =
+      MAX_FORWARDS_PER_OWNER_PER_DAY - totalProactiveForwardsToday;
+
+    // 候选帖
+    const candidatePostsRaw = await this.postRepo.find({
+      where: [
+        {
+          surface: 'channels',
+          publishStatus: 'published',
+          mediaType: 'video',
+          createdAt: MoreThanOrEqual(recentSince),
+        },
+        {
+          surface: 'channels',
+          publishStatus: 'published',
+          mediaType: 'audio',
+          createdAt: MoreThanOrEqual(recentSince),
+        },
+      ],
+      order: { recommendationScore: 'DESC', createdAt: 'DESC' },
+    });
+    const candidatePosts = candidatePostsRaw.filter(
+      (post) =>
+        (post.recommendationScore ?? 0) >= RECOMMENDATION_THRESHOLD &&
+        this.isPostMediaPlayable(post),
+    );
+    if (candidatePosts.length === 0) {
+      return {
+        summary:
+          'channel_proactive_forward: 近 3d 无符合阈值的可转发视频号帖，跳过',
+        forwarded: 0,
+      };
+    }
+
+    // 候选角色：与 owner 的角色好友（避免给陌生角色发）
+    const friendCharacterIds = await this.socialService.getFriendCharacterIds(
+      owner.id,
+    );
+    if (friendCharacterIds.length === 0) {
+      return {
+        summary: 'channel_proactive_forward: owner 还没有角色好友',
+        forwarded: 0,
+      };
+    }
+    const blockedSet = new Set(
+      await this.socialService.getBlockedCharacterIds(owner.id),
+    );
+    const allCharacters = await this.characters.findAllVisibleToOwner(owner.id);
+    const characterById = new Map(allCharacters.map((c) => [c.id, c]));
+    const friendCharacters = friendCharacterIds
+      .map((id) => characterById.get(id))
+      .filter(
+        (c): c is (typeof allCharacters)[number] =>
+          Boolean(c) && !blockedSet.has(c!.id),
+      );
+
+    let llmCallsRemaining = MAX_LLM_CALLS_PER_TICK;
+    let forwarded = 0;
+
+    // 角色顺序随机化，避免每次都是同一个先发
+    const shuffledFriends = [...friendCharacters].sort(
+      () => Math.random() - 0.5,
+    );
+
+    for (const char of shuffledFriends) {
+      if (forwarded >= remainingGlobalQuota) break;
+      // 每角色每天 1 条
+      if ((sentByCharCount.get(char.id) ?? 0) >= 1) continue;
+      // 概率筛
+      if (Math.random() > BASE_BROWSE_CHANCE) continue;
+
+      // 该角色已经发过的帖子集合
+      const alreadySentPosts =
+        characterForwardedPostIds.get(char.id) ?? new Set<string>();
+
+      // 给候选帖打分（亲密度 × 时效 + 推荐分），跳过已发过的，跳过自己当作者的
+      const scored = await Promise.all(
+        candidatePosts
+          .filter(
+            (post) =>
+              post.authorId !== char.id && !alreadySentPosts.has(post.id),
+          )
+          .map(async (post) => {
+            let intimacy = NPC_USER_POST_NEUTRAL_INTIMACY;
+            if (post.authorType === 'character') {
+              const rel = await this.characterFriendships.getRelation(
+                char.id,
+                post.authorId,
+              );
+              intimacy =
+                rel.intimacy *
+                npcRelationCoolingFactor(nowMs, rel.lastInteractedAt);
+            }
+            const recencyMul = npcPostRecencyMultiplier(
+              nowMs,
+              post.createdAt.getTime(),
+            );
+            const intimacyMul = npcIntimacyMultiplier(intimacy);
+            const score =
+              (post.recommendationScore ?? 0) / 100 +
+              intimacyMul +
+              recencyMul +
+              Math.random() * 0.1;
+            return { post, score };
+          }),
+      );
+      if (scored.length === 0) continue;
+      scored.sort((a, b) => b.score - a.score);
+      const pick = scored[0]?.post;
+      if (!pick) continue;
+
+      // 生成可选短评（≤ 24 字）
+      let note: string | undefined;
+      if (llmCallsRemaining > 0) {
+        try {
+          const profile = await this.characters.getProfile(char.id);
+          if (profile) {
+            const observation = await this.buildFeedAiObservation(pick);
+            const userMessage = await this.worldLanguage.formatPostCommentTask({
+              authorName: pick.authorName,
+              summary: observation.summary,
+              surface: 'channels',
+            });
+            const reply = await this.ai.generateReply({
+              profile,
+              conversationHistory: [],
+              userMessage:
+                `${userMessage}\n（请用一句很短的转发推荐，≤ 24 字，像顺手在私聊里说"看看这个，挺有意思"那样自然）`,
+              userMessageParts: observation.parts,
+              usageContext: {
+                surface: 'app',
+                scene: 'channel_forward_quip',
+                scopeType: 'character',
+                scopeId: char.id,
+                scopeLabel: char.name,
+                characterId: char.id,
+                characterName: char.name,
+              },
+            });
+            llmCallsRemaining -= 1;
+            const trimmed = (reply.text ?? '').trim();
+            if (trimmed) note = trimmed.slice(0, 24);
+          }
+        } catch {
+          // ignore — note 是可选的，没有就纯卡片
+        }
+      }
+
+      try {
+        await this.forwardChannelPostToChat({
+          actorType: 'character',
+          actorId: char.id,
+          actorName: char.name,
+          actorAvatar: char.avatar,
+          postId: pick.id,
+          targetCharacterId: char.id,
+          note,
+        });
+        forwarded += 1;
+        sentByCharCount.set(char.id, (sentByCharCount.get(char.id) ?? 0) + 1);
+        const seen =
+          characterForwardedPostIds.get(char.id) ?? new Set<string>();
+        seen.add(pick.id);
+        characterForwardedPostIds.set(char.id, seen);
+      } catch (error) {
+        this.logger.warn(
+          `runChannelProactiveForwardTick: forward failed for char=${char.id} post=${pick.id}: ${(error as Error).message}`,
+        );
+      }
+    }
+
+    return {
+      summary: `channel_proactive_forward: 投递 ${forwarded} 条角色主动转发（剩余配额 ${remainingGlobalQuota - forwarded}/${MAX_FORWARDS_PER_OWNER_PER_DAY}，本次 LLM 用量 ${MAX_LLM_CALLS_PER_TICK - llmCallsRemaining}）`,
+      forwarded,
+    };
+  }
+
   async ensureChannelSeedData() {
     // 视频号已切换到 MiniMax 真实生成；冷启不再用 demo 占位（用户决策：失败时跳过）。
     // 留空方法保持调用点向后兼容。
