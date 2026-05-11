@@ -332,6 +332,113 @@ export function MomentsPage() {
   });
 
   const commentMutation = useMutation({
+    // onMutate: optimistic 插入临时评论 + 清输入/回复目标。
+    // 公网隧道 ~600ms RTT 下，原 onSuccess 才清 drafts 会让用户看到输入框
+    // 600ms 不消失；optimistic 插入还让评论立刻可见。临时 id 以 'optimistic-'
+    // 前缀打标，onSuccess 通过 invalidate 让真实数据替换；onError 回滚 snapshot
+    // 并恢复 drafts/reply target。
+    onMutate: async (momentId: string) => {
+      const text = commentDrafts[momentId]?.trim();
+      if (!text || !ownerId) {
+        return { skipped: true as const };
+      }
+
+      const desktopTarget =
+        desktopReplyTarget && desktopReplyTarget.postId === momentId
+          ? desktopReplyTarget
+          : null;
+      const mobileTarget =
+        commentBarTarget?.momentId === momentId
+          ? commentBarTarget.replyTo
+          : null;
+      const target = desktopTarget
+        ? {
+            commentId: desktopTarget.commentId,
+            authorId: desktopTarget.authorId,
+          }
+        : mobileTarget;
+
+      await Promise.all([
+        queryClient.cancelQueries({
+          queryKey: ["app-moments-paged", baseUrl],
+        }),
+        queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] }),
+      ]);
+
+      const flatSnapshots = queryClient.getQueriesData<Moment[]>({
+        queryKey: ["app-moments", baseUrl],
+      });
+      const pagedSnapshots = queryClient.getQueriesData<
+        InfiniteData<MomentsPageResponse>
+      >({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
+
+      const tempId = `optimistic-comment-${ownerId}-${Date.now()}`;
+      const tempComment: MomentComment = {
+        id: tempId,
+        postId: momentId,
+        authorId: ownerId,
+        authorName: ownerUsername ?? t(msg`我`),
+        authorAvatar: ownerAvatar ?? "",
+        authorType: "user",
+        text,
+        replyToCommentId: target?.commentId ?? null,
+        replyToAuthorId: target?.authorId ?? null,
+        createdAt: new Date().toISOString(),
+      };
+
+      const appendComment = (moment: Moment): Moment =>
+        moment.id !== momentId
+          ? moment
+          : {
+              ...moment,
+              comments: [...moment.comments, tempComment],
+              commentCount: moment.commentCount + 1,
+            };
+
+      flatSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<Moment[]>(key, data.map(appendComment));
+      });
+      pagedSnapshots.forEach(([key, data]) => {
+        if (!data) return;
+        queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(key, {
+          ...data,
+          pages: data.pages.map((page) => ({
+            ...page,
+            items: page.items.map(appendComment),
+          })),
+        });
+      });
+
+      // 清输入与 reply target —— 用户看到立刻清空，体感"已发送"。
+      const savedDraft = commentDrafts[momentId] ?? "";
+      const savedDesktopReply =
+        desktopReplyTarget && desktopReplyTarget.postId === momentId
+          ? desktopReplyTarget
+          : null;
+      const savedMobileReply =
+        commentBarTarget?.momentId === momentId ? commentBarTarget : null;
+
+      setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
+      setDesktopReplyTarget((current) =>
+        current?.postId === momentId ? null : current,
+      );
+      setCommentBarTarget((current) =>
+        current?.momentId === momentId ? null : current,
+      );
+
+      return {
+        skipped: false as const,
+        flatSnapshots,
+        pagedSnapshots,
+        momentId,
+        savedDraft,
+        savedDesktopReply,
+        savedMobileReply,
+      };
+    },
     mutationFn: (momentId: string) => {
       const text = commentDrafts[momentId]?.trim();
       if (!text) {
@@ -363,19 +470,34 @@ export function MomentsPage() {
         baseUrl,
       );
     },
-    onSuccess: async (_, momentId) => {
-      setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
-      setDesktopReplyTarget((current) =>
-        current?.postId === momentId ? null : current,
-      );
-      setCommentBarTarget((current) =>
-        current?.momentId === momentId ? null : current,
-      );
+    onError: (_err, _momentId, context) => {
+      if (!context || context.skipped) return;
+      context.flatSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      context.pagedSnapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      // 恢复 drafts / reply target，让用户能改后重发。
+      setCommentDrafts((current) => ({
+        ...current,
+        [context.momentId]: context.savedDraft,
+      }));
+      if (context.savedDesktopReply) {
+        setDesktopReplyTarget(context.savedDesktopReply);
+      }
+      if (context.savedMobileReply) {
+        setCommentBarTarget(context.savedMobileReply);
+      }
+    },
+    onSuccess: async () => {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`朋友圈互动已更新。`));
-      // 同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page、search-index 等)
+      // 同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page、search-index 等)。
+      // optimistic 临时评论被真实数据替换 —— 临时 id 形如 'optimistic-comment-*'，
+      // 服务端返回真实 id 后 refetch 直接覆盖整个 comments 数组。
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-moments-paged", baseUrl],

@@ -15,6 +15,7 @@ import {
   likeFeedPost,
   shake,
   triggerSceneFriendRequest,
+  type FeedComment,
   type FeedListResponse,
 } from "@yinjie/contracts";
 import {
@@ -224,6 +225,8 @@ export function DiscoverPage() {
     isDesktopLayout && normalizedPathname !== desktopDiscoverPath;
   const queryClient = useQueryClient();
   const ownerId = useWorldOwnerStore((state) => state.id);
+  const ownerUsername = useWorldOwnerStore((state) => state.username);
+  const ownerAvatar = useWorldOwnerStore((state) => state.avatar);
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const composeDraft = useMomentComposeDraft();
@@ -404,6 +407,59 @@ export function DiscoverPage() {
   });
 
   const commentFeedMutation = useMutation({
+    // optimistic 插入临时评论 + 立即清输入框，避免公网隧道 ~600ms RTT 期间
+    // 用户看到输入框不消失 / 评论不出现。临时 id 形如 optimistic-feed-comment-*，
+    // onSuccess 时 invalidate refetch 让真实 comment 替换。
+    onMutate: async (postId: string) => {
+      const text = feedCommentDrafts[postId]?.trim();
+      if (!text || !ownerId) return { skipped: true as const };
+
+      await queryClient.cancelQueries({ queryKey: ["app-feed", baseUrl] });
+
+      const snapshots = queryClient.getQueriesData<FeedListResponse>({
+        queryKey: ["app-feed", baseUrl],
+      });
+
+      const tempComment: FeedComment = {
+        id: `optimistic-feed-comment-${ownerId}-${Date.now()}`,
+        postId,
+        authorId: ownerId,
+        authorName: ownerUsername ?? t(msg`我`),
+        authorAvatar: ownerAvatar ?? "",
+        authorType: "user",
+        text,
+        parentCommentId: null,
+        replyToCommentId: null,
+        replyToAuthorId: null,
+        likeCount: 0,
+        likedByOwner: false,
+        createdAt: new Date().toISOString(),
+      };
+
+      snapshots.forEach(([key, data]) => {
+        if (!data?.posts) return;
+        queryClient.setQueryData<FeedListResponse>(key, {
+          ...data,
+          posts: data.posts.map((post) =>
+            post.id !== postId
+              ? post
+              : {
+                  ...post,
+                  commentsPreview: [
+                    ...(post.commentsPreview ?? []),
+                    tempComment,
+                  ],
+                  commentCount: post.commentCount + 1,
+                },
+          ),
+        });
+      });
+
+      const savedDraft = feedCommentDrafts[postId] ?? "";
+      setFeedCommentDrafts((current) => ({ ...current, [postId]: "" }));
+
+      return { skipped: false as const, snapshots, postId, savedDraft };
+    },
     mutationFn: (postId: string) =>
       addFeedComment(
         postId,
@@ -412,8 +468,17 @@ export function DiscoverPage() {
         },
         baseUrl,
       ),
-    onSuccess: async (_, postId) => {
-      setFeedCommentDrafts((current) => ({ ...current, [postId]: "" }));
+    onError: (_err, _postId, context) => {
+      if (!context || context.skipped) return;
+      context.snapshots.forEach(([key, data]) => {
+        queryClient.setQueryData(key, data);
+      });
+      setFeedCommentDrafts((current) => ({
+        ...current,
+        [context.postId]: context.savedDraft,
+      }));
+    },
+    onSuccess: async () => {
       setSuccessNotice(t(msg`广场互动已更新。`));
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
