@@ -63,6 +63,19 @@ function resolveManualChunk(id: string) {
       return "vendor-html-to-image";
     }
 
+    // @lingui runtime (~15-20KB) 拆 vendor-i18n —— catalog 自身已经按 locale
+    // 单独 chunk + modulepreload，runtime 这部分原本被 vendor-misc 吃掉。
+    if (normalizedId.includes("/@lingui/")) {
+      return "vendor-i18n";
+    }
+
+    // @react-oauth/google (~25-35KB) 拆 vendor-oauth —— 配合 main.tsx 把
+    // GoogleOAuthProvider 下沉到 welcome-page，这个 chunk 现在只在 welcome
+    // 路由打开时才拉，不再吃首屏。
+    if (normalizedId.includes("/@react-oauth/")) {
+      return "vendor-oauth";
+    }
+
     return "vendor-misc";
   }
 
