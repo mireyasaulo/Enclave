@@ -31,18 +31,27 @@ pnpm -v   # should print 8.15.4
 
 ```bash
 git clone https://github.com/yuanzui0728/enclave.git && cd enclave
-pnpm install
+pnpm install                       # workspace packages (apps/* + packages/*)
+( cd api && npm install )          # api ships its own npm lock and isn't a pnpm workspace member
 cp api/.env.example api/.env
 # Edit api/.env — at minimum set DEEPSEEK_API_KEY and ADMIN_SECRET
-pnpm dev
+pnpm dev:api                       # NestJS backend (:3000)
+pnpm dev:app                       # main app Vite dev (:5180)
+# Want the admin console too? add: pnpm dev:admin (:5181)
 ```
 
-`pnpm dev` runs `scripts/dev-services.mjs` and brings up api + app + admin + cloud-console + cloud-api **together**, managing their processes and ports. Logs are multiplexed into a single terminal.
+> ⚠️ Don't just run `pnpm dev` here: that command targets the multi-tenant cloud flow (it starts app + admin + wiki + cloud-api + cloud-console) and **deliberately excludes api** — for self-hosted / single-tenant dev you need api running on :3000 directly.
+
+`pnpm dev:*` detaches each service to the background, and **logs land in `logs/dev-services/<service>.{out,err}.log` — they are not streamed to your terminal**. To tail them live:
+
+```bash
+tail -f logs/dev-services/api.out.log
+```
 
 Open:
 
 - Main app: <http://localhost:5180>
-- Admin console: <http://localhost:5181>
+- Admin console: <http://localhost:5181> (only if you started `pnpm dev:admin`)
 - Backend API: <http://localhost:3000>
 
 ---

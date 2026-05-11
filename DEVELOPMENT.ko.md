@@ -31,18 +31,27 @@ pnpm -v   # 8.15.4 가 나오면 OK
 
 ```bash
 git clone https://github.com/yuanzui0728/enclave.git && cd enclave
-pnpm install
+pnpm install                       # workspace 패키지(apps/* + packages/*)
+( cd api && npm install )          # api 는 자체 npm lock 을 쓰며 pnpm workspace 멤버가 아니므로 별도 설치 필수
 cp api/.env.example api/.env
 # api/.env 편집: 최소한 DEEPSEEK_API_KEY 와 ADMIN_SECRET 채우기
-pnpm dev
+pnpm dev:api                       # NestJS 백엔드(:3000)
+pnpm dev:app                       # 메인 앱 Vite dev(:5180)
+# 관리 콘솔도 띄우려면: pnpm dev:admin(:5181)
 ```
 
-`pnpm dev` 는 `scripts/dev-services.mjs` 를 통해 api + app + admin + cloud-console + cloud-api 를 **동시에** 띄우고 프로세스/포트를 관리해줍니다. 로그는 한 터미널에 모입니다.
+> ⚠️ 여기서 `pnpm dev` 를 그냥 실행하지 마세요: 이 명령은 멀티테넌트 클라우드 흐름용(app + admin + wiki + cloud-api + cloud-console 기동)이며 **의도적으로 api 를 포함하지 않습니다** —— 셀프호스트 / 싱글테넌트 개발에서는 오히려 api 가 :3000 에 단독으로 떠 있어야 합니다.
+
+`pnpm dev:*` 는 프로세스를 백그라운드로 detach 하며, **로그는 `logs/dev-services/<service>.{out,err}.log` 로 떨어지고 터미널에는 스트리밍되지 않습니다**. 실시간으로 따라가려면:
+
+```bash
+tail -f logs/dev-services/api.out.log
+```
 
 열기:
 
 - 메인 앱: <http://localhost:5180>
-- 관리 콘솔: <http://localhost:5181>
+- 관리 콘솔: <http://localhost:5181>(`pnpm dev:admin` 을 띄운 경우에만)
 - 백엔드 API: <http://localhost:3000>
 
 ---

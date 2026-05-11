@@ -241,10 +241,11 @@ docker compose up -d --build admin
 
 ```bash
 # 仓库根目录
-pnpm install --frozen-lockfile
+pnpm install --frozen-lockfile     # workspace 包；api/ 不在 pnpm workspace 内
 cd api
-pnpm build
-node dist/main          # 或者 pm2 start dist/main --name yinjie-api
+npm ci                             # api/ 走 npm + package-lock.json
+npm run build                      # 等价 nest build；产物在 api/dist
+node dist/main                     # 或者 pm2 start dist/main --name yinjie-api
 ```
 
 `api/.env` 必须就位（参考第 2 步）。SQLite 数据库会自动建在 `DATABASE_PATH` 指向的位置。

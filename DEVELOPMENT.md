@@ -31,18 +31,27 @@ pnpm -v   # 应输出 8.15.4
 
 ```bash
 git clone https://github.com/yuanzui0728/enclave.git && cd enclave
-pnpm install
+pnpm install                       # workspace 包（apps/* + packages/*）
+( cd api && npm install )          # api 自带 npm 锁，不在 pnpm workspace 里，必须单独装
 cp api/.env.example api/.env
 # 编辑 api/.env：至少填 DEEPSEEK_API_KEY 和 ADMIN_SECRET
-pnpm dev
+pnpm dev:api                       # 后端 NestJS（:3000）
+pnpm dev:app                       # 主 App Vite dev（:5180）
+# 想看管理后台再来一条：pnpm dev:admin（:5181）
 ```
 
-`pnpm dev` 会通过 `scripts/dev-services.mjs` **同时**拉起 api + app + admin + cloud-console + cloud-api，并接管它们的进程与端口。日志聚合在一个终端窗口。
+> ⚠️ 不要直接跑 `pnpm dev`：这条命令是为多租户云模式准备的（启 app + admin + wiki + cloud-api + cloud-console），**故意不含 api** —— 自部署 / 单租户场景反而需要 api 单独在 :3000 上跑。
+
+`pnpm dev:*` 把进程 detach 到后台，**日志落在 `logs/dev-services/<服务>.{out,err}.log`，不会刷在终端窗口里**。想跟实时日志：
+
+```bash
+tail -f logs/dev-services/api.out.log
+```
 
 打开：
 
 - 主 App：<http://localhost:5180>
-- 管理后台：<http://localhost:5181>
+- 管理后台：<http://localhost:5181>（跑了 `pnpm dev:admin` 才有）
 - 后端 API：<http://localhost:3000>
 
 ---
