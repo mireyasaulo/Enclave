@@ -19,6 +19,7 @@ import { CLOUD_CLIENT_ACCESS_TOKEN_PURPOSE } from "./cloud-jwt.constants";
 
 type CloudRequest = {
   headers: Record<string, string | string[] | undefined>;
+  query?: Record<string, string | string[] | undefined>;
   cloudPhone?: string;
 };
 
@@ -40,11 +41,16 @@ export class CloudClientAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<CloudRequest>();
     const authorization = request.headers["authorization"];
-    const token =
+    // 优先用 Authorization header；fallback 用 ?token= / ?auth_token= 查询串，
+    // 给 <video src>/<audio src>/<img src> 这类无法设置 header 的媒体请求兜底
+    // （与 world-api-ws-proxy 里 extractToken 的策略一致）。
+    const headerToken =
       typeof authorization === "string" &&
       authorization.startsWith("Bearer ")
-        ? authorization.slice("Bearer ".length)
+        ? authorization.slice("Bearer ".length).trim() || null
         : null;
+    const queryToken = headerToken ? null : extractQueryToken(request.query);
+    const token = headerToken ?? queryToken;
 
     if (!token) {
       throw new UnauthorizedException("Missing cloud access token.");
@@ -82,5 +88,22 @@ export class CloudClientAuthGuard implements CanActivate {
     request.cloudPhone = payload.phone;
     return true;
   }
+}
+
+function extractQueryToken(
+  query?: Record<string, string | string[] | undefined>,
+): string | null {
+  if (!query) return null;
+  const candidates = [query["token"], query["auth_token"]];
+  for (const candidate of candidates) {
+    if (typeof candidate === "string") {
+      const trimmed = candidate.trim();
+      if (trimmed) return trimmed;
+    } else if (Array.isArray(candidate) && candidate.length > 0) {
+      const first = typeof candidate[0] === "string" ? candidate[0].trim() : "";
+      if (first) return first;
+    }
+  }
+  return null;
 }
 // i18n-ignore-end
