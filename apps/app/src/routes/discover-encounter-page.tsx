@@ -124,8 +124,6 @@ function MobileDiscoverEncounterPage() {
     <MobileDiscoverToolShell
       title={t(msg`摇一摇`)}
       subtitle={t(msg`随机遇见新的世界居民`)}
-      shareTitle={t(msg`摇一摇`)}
-      shareSummary={t(msg`随机遇见新的世界居民，点一下就会尝试安排一次新的相遇，并直接保留到你的通讯录。`)}
       heroTitle={t(msg`随机相遇`)}
       heroDescription={t(msg`每次摇一摇都会先生成一个新的相遇结果；当前页面会直接保留这次结果，并把对方加入你的通讯录。`)}
       heroVisual={<Compass size={28} />}
