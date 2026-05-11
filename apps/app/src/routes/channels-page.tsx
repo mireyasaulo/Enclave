@@ -46,6 +46,7 @@ import {
 import { AppPage, Button, cn, InlineNotice } from "@yinjie/ui";
 import { AudioCard } from "../components/audio-card";
 import { AvatarChip } from "../components/avatar-chip";
+import { resolveAppMediaUrl } from "../lib/media-url";
 import { ExpandableText } from "../components/expandable-text";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import {
@@ -1278,7 +1279,9 @@ function MobileChannelMediaSurface({ post }: { post: FeedPostListItem }) {
       <div className="relative flex h-[64dvh] w-full items-center justify-center bg-gradient-to-b from-[#1f2533] to-[#0a0c10] px-6">
         {audioAsset?.posterUrl || post.coverUrl ? (
           <img
-            src={audioAsset?.posterUrl ?? post.coverUrl ?? undefined}
+            src={resolveAppMediaUrl(
+              audioAsset?.posterUrl ?? post.coverUrl ?? undefined,
+            )}
             alt={post.title ?? ""}
             className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30 blur-[1px]"
           />
@@ -1299,11 +1302,13 @@ function MobileChannelMediaSurface({ post }: { post: FeedPostListItem }) {
   }
 
   if (post.mediaType === "video" && (videoAsset?.url || post.mediaUrl)) {
+    const rawVideoUrl = videoAsset?.url ?? post.mediaUrl ?? undefined;
+    const rawPosterUrl = videoAsset?.posterUrl ?? post.coverUrl ?? undefined;
     return (
       <video
-        key={videoAsset?.url ?? post.mediaUrl}
-        src={videoAsset?.url ?? post.mediaUrl ?? undefined}
-        poster={videoAsset?.posterUrl ?? post.coverUrl ?? undefined}
+        key={rawVideoUrl}
+        src={rawVideoUrl ? resolveAppMediaUrl(rawVideoUrl) : undefined}
+        poster={rawPosterUrl ? resolveAppMediaUrl(rawPosterUrl) : undefined}
         controls
         playsInline
         preload="metadata"
