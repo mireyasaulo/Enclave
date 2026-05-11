@@ -2,6 +2,10 @@
 AGENTS.md
 CLAUDE.md
 
+# 云世界管理平台模块（不再开源，已 commit 的历史保留；新文件不入仓）
+apps/cloud-api/
+apps/cloud-console/
+
 # Dependencies
 node_modules/
 apps/*/node_modules/
