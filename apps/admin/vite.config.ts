@@ -27,5 +27,36 @@ export default defineConfig({
   server: {
     host: "127.0.0.1",
     port: 5181,
+    // Admin 后台所有真实接口都走 main-api（3000）和 cloud-api（3001）。
+    // 没有代理时 /api/admin/* 会被 vite SPA fallback 吞掉返回 index.html，
+    // 浏览器侧表现为 "Failed to fetch" / JSON 解析失败。
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:3000",
+        changeOrigin: true,
+      },
+      "/health": {
+        target: "http://127.0.0.1:3000",
+        changeOrigin: true,
+      },
+      "/socket.io": {
+        target: "ws://127.0.0.1:3000",
+        changeOrigin: true,
+        ws: true,
+      },
+      // cloud-console / cloud-api 入口（admin 仪表盘里有跨实例查询的链路）。
+      "/cloud": {
+        target: "http://127.0.0.1:3001",
+        changeOrigin: true,
+      },
+      "/admin/cloud": {
+        target: "http://127.0.0.1:3001",
+        changeOrigin: true,
+      },
+      "/telemetry": {
+        target: "http://127.0.0.1:3001",
+        changeOrigin: true,
+      },
+    },
   },
 });
