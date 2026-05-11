@@ -2855,6 +2855,35 @@ export function getMoments(baseUrl?: string) {
   );
 }
 
+export interface MomentsPageResponse {
+  items: Moment[];
+  total: number;
+  hasMore: boolean;
+}
+
+export function getMomentsPage(
+  params: { page?: number; limit?: number } = {},
+  baseUrl?: string,
+): Promise<MomentsPageResponse> {
+  const resolvedBaseUrl = resolveCoreApiBaseUrl(baseUrl, {
+    allowDefault: false,
+  });
+  const search = new URLSearchParams();
+  search.set("page", String(Math.max(1, Math.floor(params.page ?? 1))));
+  search.set("limit", String(Math.max(1, Math.floor(params.limit ?? 20))));
+  return requestLegacyApi<{ items: Moment[]; total: number; hasMore: boolean }>(
+    `/moments?${search.toString()}`,
+    undefined,
+    baseUrl,
+  ).then((response) => ({
+    items: response.items.map((moment) =>
+      normalizeMoment(moment, resolvedBaseUrl),
+    ),
+    total: response.total,
+    hasMore: response.hasMore,
+  }));
+}
+
 export function getMoment(id: string, baseUrl?: string) {
   const resolvedBaseUrl = resolveCoreApiBaseUrl(baseUrl, {
     allowDefault: false,
