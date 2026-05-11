@@ -60,6 +60,14 @@ data/chat-attachments/
 data/moments-media/
 data/self-agent-workspace/
 data/accounts/
+# 本地 sqlite 备份与遗留快照
+data/*.sqlite
+data/*.sqlite-*
+data/*.sqlite.bak*
+data/*.sqlite.predry*
+data/yinjie.sqlite
+# Playwright 运行残留
+apps/app/test-results/
 api/storage/chat-attachments/
 api/storage/ai-speech/
 runtime-data/app-web-nginx/
