@@ -259,7 +259,12 @@ http {
     location / {
       error_page 418 = @site_proxy;
       if ($route_to_site) { return 418; }
-      add_header Cache-Control "no-store";
+      # no-store 会让公网每次刷新都全量传 index.html (~12KB)；
+      # no-cache 允许浏览器缓存但强制每次走 If-None-Match 验证。
+      # nginx 对静态文件自动发 ETag/Last-Modified，命中走 304 空响应，
+      # 公网隧道下省 body 传输和解析（重访 ~200-300ms）。hash 资源仍 1y immutable，
+      # 所以 index.html 改成 must-revalidate 不会导致用户拿到陈旧 chunk。
+      add_header Cache-Control "no-cache";
       try_files $uri $uri/ /index.html;
     }
 
