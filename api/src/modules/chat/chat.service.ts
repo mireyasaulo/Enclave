@@ -833,7 +833,10 @@ export class ChatService {
       text?.trim() || this.getAttachmentFallbackText(attachment);
 
     const messageEntity = this.msgRepo.create({
-      id: `msg_${Date.now()}_${attachment.kind}`,
+      // 加随机后缀避免 cron / 多 client 并发转发时 PrimaryColumn 冲突
+      // （saveProactiveAttachmentMessage 用的旧 `${Date.now()}_${kind}` 模式
+      //  会有 1ms 内插入两条 = 主键冲突的小概率）
+      id: `msg_${Date.now()}_${attachment.kind}_${randomUUID().slice(0, 8)}`,
       conversationId,
       senderType: 'user',
       senderId,
