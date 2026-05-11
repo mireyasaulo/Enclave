@@ -308,6 +308,34 @@ const pendingLikePostId = likeMutation.isPending
       !blockedCharacterIds.has(post.authorId),
   );
 
+  function toggleFavoriteByPostId(postId: string) {
+    const post = visiblePosts.find((item) => item.id === postId);
+    if (!post) {
+      return;
+    }
+
+    const sourceId = `feed-${post.id}`;
+    const collected = favoriteSourceIds.includes(sourceId);
+    const nextFavorites = collected
+      ? removeDesktopFavorite(sourceId)
+      : upsertDesktopFavorite({
+          id: `favorite-${sourceId}`,
+          sourceId,
+          category: "feed",
+          title: post.authorName,
+          description: getFeedSummaryText(post),
+          meta: t(msg`广场动态 · ${formatTimestamp(post.createdAt)}`),
+          to: `/tabs/feed${buildFeedRouteHash({ postId: post.id }) ? `#${buildFeedRouteHash({ postId: post.id })}` : ""}`,
+          badge: t(msg`广场动态`),
+          avatarName: post.authorName,
+          avatarSrc: post.authorAvatar,
+        });
+
+    setFavoriteSourceIds(
+      nextFavorites.map((favorite) => favorite.sourceId),
+    );
+  }
+
   function navigateToRouteStateReturn() {
     if (!safeReturnPath) {
       return false;
@@ -691,33 +719,7 @@ const pendingLikePostId = likeMutation.isPending
             }
           }}
           onTextChange={composeDraft.setText}
-          onToggleFavorite={(postId) => {
-            const post = visiblePosts.find((item) => item.id === postId);
-            if (!post) {
-              return;
-            }
-
-            const sourceId = `feed-${post.id}`;
-            const collected = favoriteSourceIds.includes(sourceId);
-            const nextFavorites = collected
-              ? removeDesktopFavorite(sourceId)
-              : upsertDesktopFavorite({
-                  id: `favorite-${sourceId}`,
-                  sourceId,
-                  category: "feed",
-                  title: post.authorName,
-                  description: getFeedSummaryText(post),
-                  meta: t(msg`广场动态 · ${formatTimestamp(post.createdAt)}`),
-                  to: `/tabs/feed${buildFeedRouteHash({ postId: post.id }) ? `#${buildFeedRouteHash({ postId: post.id })}` : ""}`,
-                  badge: t(msg`广场动态`),
-                  avatarName: post.authorName,
-                  avatarSrc: post.authorAvatar,
-                });
-
-            setFavoriteSourceIds(
-              nextFavorites.map((favorite) => favorite.sourceId),
-            );
-          }}
+          onToggleFavorite={(postId) => toggleFavoriteByPostId(postId)}
           onShare={(postId) => setShareCardPostId(postId)}
           onVideoFileSelected={(file) => {
             void handleVideoFileSelected(file);
@@ -860,7 +862,6 @@ const pendingLikePostId = likeMutation.isPending
 
           {visiblePosts.map((post) => {
             const sourceId = `feed-${post.id}`;
-            const collected = favoriteSourceIds.includes(sourceId);
             const postSummaryText = getFeedSummaryText(post);
             const summaryText = post.text.trim() ? "" : postSummaryText;
 
@@ -932,36 +933,8 @@ const pendingLikePostId = likeMutation.isPending
                     : summaryText || undefined
                 }
                 actions={
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => {
-                        const nextFavorites = collected
-                          ? removeDesktopFavorite(sourceId)
-                          : upsertDesktopFavorite({
-                              id: `favorite-${sourceId}`,
-                              sourceId,
-                              category: "feed",
-                              title: post.authorName,
-                              description: postSummaryText,
-                              meta: t(
-                                msg`广场动态 · ${formatTimestamp(post.createdAt)}`,
-                              ),
-                              to: "/tabs/feed",
-                              badge: t(msg`广场动态`),
-                              avatarName: post.authorName,
-                              avatarSrc: post.authorAvatar,
-                            });
-
-                        setFavoriteSourceIds(
-                          nextFavorites.map((favorite) => favorite.sourceId),
-                        );
-                      }}
-                    >
-                      {collected ? t(msg`取消收藏`) : t(msg`收藏`)}
-                    </Button>
-                    {post.canInteract ? (
+                  post.canInteract ? (
+                    <div className="flex w-full justify-end">
                       <button
                         type="button"
                         onClick={(event) => {
@@ -971,12 +944,12 @@ const pendingLikePostId = likeMutation.isPending
                           setActionBubble({ postId: post.id, anchorRect: rect });
                         }}
                         aria-label={t(msg`更多操作`)}
-                        className="ml-auto inline-flex h-7 w-9 items-center justify-center rounded-[4px] bg-[#F2F2F2] text-[#4C4C4C] active:bg-[#E5E5E5]"
+                        className="inline-flex h-7 w-9 items-center justify-center rounded-[4px] bg-[#F2F2F2] text-[#4C4C4C] active:bg-[#E5E5E5]"
                       >
                         <MoreHorizontalDots />
                       </button>
-                    ) : null}
-                  </div>
+                    </div>
+                  ) : null
                 }
                 secondary={
                   post.commentsPreview.length > 0 ? (
@@ -1129,6 +1102,11 @@ const pendingLikePostId = likeMutation.isPending
               )
             : false
         }
+        favorited={
+          actionBubble
+            ? favoriteSourceIds.includes(`feed-${actionBubble.postId}`)
+            : false
+        }
         onLike={() => {
           if (!actionBubble) return;
           likeMutation.mutate(actionBubble.postId);
@@ -1139,6 +1117,10 @@ const pendingLikePostId = likeMutation.isPending
             postId: actionBubble.postId,
             replyTo: null,
           });
+        }}
+        onFavorite={() => {
+          if (!actionBubble) return;
+          toggleFavoriteByPostId(actionBubble.postId);
         }}
         onClose={() => setActionBubble(null)}
       />
