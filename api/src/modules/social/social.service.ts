@@ -436,10 +436,18 @@ export class SocialService {
       ? SCENE_LABEL_ZH[normalizedScene]
       : scene;
 
-    let greeting = await this.worldLanguage.buildSceneGreetingFallback({
-      characterName: char.name,
-      scene: promptScene,
-    });
+    // fallback 命中的角色与请求场景无关，用「不期而遇」的 shake 文案更连贯；
+    // scene 命中才让 AI 顺着「在 X 里遇到你」开场。
+    const isFallback = matchSource === 'fallback';
+    let greeting = isFallback
+      ? await this.worldLanguage.buildShakeGreetingFallback(char.name)
+      : await this.worldLanguage.buildSceneGreetingFallback({
+          characterName: char.name,
+          scene: promptScene,
+        });
+    const greetingTask = isFallback
+      ? await this.worldLanguage.formatShakeGreetingTask()
+      : await this.worldLanguage.formatFriendRequestGreetingTask(promptScene);
     const runtimeProfile =
       (await this.charactersService.getRuntimeProfileFromCharacter(char)) ??
       char.profile;
@@ -447,8 +455,7 @@ export class SocialService {
       const result = await this.ai.generateReply({
         profile: runtimeProfile,
         conversationHistory: [],
-        userMessage:
-          await this.worldLanguage.formatFriendRequestGreetingTask(promptScene),
+        userMessage: greetingTask,
         usageContext: {
           surface: 'app',
           scene: 'social_greeting_generate',

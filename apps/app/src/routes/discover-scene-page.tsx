@@ -170,17 +170,25 @@ function MobileDiscoverScenePage() {
     [hash],
   );
 
-  // 每秒推一下时间，让按钮冷却倒计时刷新
+  // 冷却倒计时刷新：每 200ms 推一次 now，到点立刻清掉自己，避免空转。
   useEffect(() => {
     if (cooldownUntil <= Date.now()) {
       return;
     }
-    cooldownTimerRef.current = window.setInterval(() => {
-      setNow(Date.now());
+    const id = window.setInterval(() => {
+      const next = Date.now();
+      setNow(next);
+      if (next >= cooldownUntil) {
+        window.clearInterval(id);
+        if (cooldownTimerRef.current === id) {
+          cooldownTimerRef.current = null;
+        }
+      }
     }, 200);
+    cooldownTimerRef.current = id;
     return () => {
-      if (cooldownTimerRef.current != null) {
-        window.clearInterval(cooldownTimerRef.current);
+      window.clearInterval(id);
+      if (cooldownTimerRef.current === id) {
         cooldownTimerRef.current = null;
       }
     };

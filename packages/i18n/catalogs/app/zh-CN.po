@@ -2747,7 +2747,7 @@ msgstr "分享工具"
 #: apps/app/src/routes/discover-feed-page.tsx:906
 #: apps/app/src/routes/discover-feed-page.tsx:945
 #: apps/app/src/routes/discover-feed-page.tsx:1178
-#: apps/app/src/routes/discover-scene-page.tsx:387
+#: apps/app/src/routes/discover-scene-page.tsx:395
 #: apps/app/src/routes/friend-moments-page.tsx:461
 #: apps/app/src/routes/friend-requests-page.tsx:258
 #: apps/app/src/routes/friend-requests-page.tsx:381
@@ -3319,9 +3319,9 @@ msgstr "文章来源于 {0}"
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:955
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1029
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1253
-#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:199
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:234
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:320
-#: apps/app/src/routes/friend-requests-page.tsx:481
+#: apps/app/src/routes/friend-requests-page.tsx:521
 msgid "今天"
 msgstr "今天"
 
@@ -3618,6 +3618,7 @@ msgstr "视频通话暂未开放"
 #: apps/app/src/features/chat/chat-location-scenes.ts:10
 #: apps/app/src/routes/discover-page.tsx:71
 #: apps/app/src/routes/discover-scene-page.tsx:47
+#: apps/app/src/routes/friend-requests-page.tsx:473
 msgid "咖啡馆"
 msgstr "咖啡馆"
 
@@ -3628,6 +3629,7 @@ msgstr "窗边有热咖啡和低声播放的爵士乐。"
 #: apps/app/src/features/chat/chat-location-scenes.ts:15
 #: apps/app/src/routes/discover-page.tsx:73
 #: apps/app/src/routes/discover-scene-page.tsx:49
+#: apps/app/src/routes/friend-requests-page.tsx:477
 msgid "图书馆"
 msgstr "图书馆"
 
@@ -3638,6 +3640,7 @@ msgstr "安静的阅读区里，翻页声比说话声更清楚。"
 #: apps/app/src/features/chat/chat-location-scenes.ts:20
 #: apps/app/src/routes/discover-page.tsx:74
 #: apps/app/src/routes/discover-scene-page.tsx:50
+#: apps/app/src/routes/friend-requests-page.tsx:479
 msgid "公园"
 msgstr "公园"
 
@@ -3648,6 +3651,7 @@ msgstr "树荫、长椅和慢下来的傍晚风。"
 #: apps/app/src/features/chat/chat-location-scenes.ts:25
 #: apps/app/src/routes/discover-page.tsx:72
 #: apps/app/src/routes/discover-scene-page.tsx:48
+#: apps/app/src/routes/friend-requests-page.tsx:475
 msgid "健身房"
 msgstr "健身房"
 
@@ -10487,9 +10491,72 @@ msgstr "等待世界里的相遇事件触发新的申请。"
 msgid "来自摇一摇"
 msgstr "来自摇一摇"
 
-#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:181
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:183
+msgid "来自咖啡馆"
+msgstr "来自咖啡馆"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:185
+msgid "来自健身房"
+msgstr "来自健身房"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:187
+msgid "来自图书馆"
+msgstr "来自图书馆"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:189
+msgid "来自公园"
+msgstr "来自公园"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:191
+msgid "来自教室"
+msgstr "来自教室"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:193
+msgid "来自实验室"
+msgstr "来自实验室"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:195
+msgid "来自办公室"
+msgstr "来自办公室"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:197
+msgid "来自联合办公空间"
+msgstr "来自联合办公空间"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:199
+msgid "来自自习室"
+msgstr "来自自习室"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:201
+msgid "来自餐厅"
+msgstr "来自餐厅"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:203
+msgid "来自博物馆"
+msgstr "来自博物馆"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:205
+msgid "来自书店"
+msgstr "来自书店"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:207
+msgid "来自旅途"
+msgstr "来自旅途"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:209
+msgid "来自夜晚的街道"
+msgstr "来自夜晚的街道"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:211
+msgid "来自剧场"
+msgstr "来自剧场"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:213
+msgid "来自居家场景"
+msgstr "来自居家场景"
+
+#: apps/app/src/features/desktop/contacts/desktop-contacts-friend-requests-pane.tsx:215
 #: apps/app/src/features/desktop/contacts/desktop-friend-requests-workspace.tsx:302
-#: apps/app/src/routes/friend-requests-page.tsx:466
 msgid "来自 {triggerScene}"
 msgstr "来自 {triggerScene}"
 
@@ -18812,7 +18879,7 @@ msgid "换一个地点，换一种相遇方式"
 msgstr "换一个地点，换一种相遇方式"
 
 #: apps/app/src/i18n/static-dom-seed.ts:452
-#: apps/app/src/routes/discover-scene-page.tsx:286
+#: apps/app/src/routes/discover-scene-page.tsx:294
 msgid "选择一个地点"
 msgstr "选择一个地点"
 
@@ -23848,7 +23915,7 @@ msgid "重试摇一摇"
 msgstr "重试摇一摇"
 
 #: apps/app/src/routes/discover-encounter-page.tsx:227
-#: apps/app/src/routes/discover-scene-page.tsx:388
+#: apps/app/src/routes/discover-scene-page.tsx:396
 msgid "回发现页"
 msgstr "回发现页"
 
@@ -23978,7 +24045,7 @@ msgid "随机"
 msgstr "随机"
 
 #: apps/app/src/routes/discover-page.tsx:138
-#: apps/app/src/routes/discover-scene-page.tsx:285
+#: apps/app/src/routes/discover-scene-page.tsx:293
 msgid "场景相遇"
 msgstr "场景相遇"
 
@@ -24012,7 +24079,7 @@ msgid "场景相遇已写入好友申请列表。"
 msgstr "场景相遇已写入好友申请列表。"
 
 #: apps/app/src/routes/discover-page.tsx:317
-#: apps/app/src/routes/discover-scene-page.tsx:208
+#: apps/app/src/routes/discover-scene-page.tsx:216
 msgid "对你产生了兴趣。"
 msgstr "对你产生了兴趣。"
 
@@ -24092,7 +24159,7 @@ msgstr "先生成临时候选，你决定要不要把他留下。"
 
 #. placeholder {0}: t(scene.label)
 #: apps/app/src/routes/discover-page.tsx:609
-#: apps/app/src/routes/discover-scene-page.tsx:349
+#: apps/app/src/routes/discover-scene-page.tsx:357
 msgid "正在前往{0}..."
 msgstr "正在前往{0}..."
 
@@ -24159,50 +24226,62 @@ msgid "内容与服务"
 msgstr "内容与服务"
 
 #: apps/app/src/routes/discover-scene-page.tsx:51
+#: apps/app/src/routes/friend-requests-page.tsx:481
 msgid "教室"
 msgstr "教室"
 
 #: apps/app/src/routes/discover-scene-page.tsx:52
+#: apps/app/src/routes/friend-requests-page.tsx:483
 msgid "实验室"
 msgstr "实验室"
 
 #: apps/app/src/routes/discover-scene-page.tsx:53
+#: apps/app/src/routes/friend-requests-page.tsx:485
 msgid "办公室"
 msgstr "办公室"
 
 #: apps/app/src/routes/discover-scene-page.tsx:54
+#: apps/app/src/routes/friend-requests-page.tsx:487
 msgid "联合办公空间"
 msgstr "联合办公空间"
 
 #: apps/app/src/routes/discover-scene-page.tsx:55
+#: apps/app/src/routes/friend-requests-page.tsx:489
 msgid "自习室"
 msgstr "自习室"
 
 #: apps/app/src/routes/discover-scene-page.tsx:56
+#: apps/app/src/routes/friend-requests-page.tsx:491
 msgid "餐厅"
 msgstr "餐厅"
 
 #: apps/app/src/routes/discover-scene-page.tsx:57
+#: apps/app/src/routes/friend-requests-page.tsx:493
 msgid "博物馆"
 msgstr "博物馆"
 
 #: apps/app/src/routes/discover-scene-page.tsx:58
+#: apps/app/src/routes/friend-requests-page.tsx:495
 msgid "书店"
 msgstr "书店"
 
 #: apps/app/src/routes/discover-scene-page.tsx:59
+#: apps/app/src/routes/friend-requests-page.tsx:497
 msgid "旅途"
 msgstr "旅途"
 
 #: apps/app/src/routes/discover-scene-page.tsx:60
+#: apps/app/src/routes/friend-requests-page.tsx:499
 msgid "夜晚的街道"
 msgstr "夜晚的街道"
 
 #: apps/app/src/routes/discover-scene-page.tsx:61
+#: apps/app/src/routes/friend-requests-page.tsx:501
 msgid "剧场"
 msgstr "剧场"
 
 #: apps/app/src/routes/discover-scene-page.tsx:62
+#: apps/app/src/routes/friend-requests-page.tsx:503
 msgid "居家场景"
 msgstr "居家场景"
 
@@ -24210,33 +24289,33 @@ msgstr "居家场景"
 msgid "桌面端的场景相遇入口已经收口到桌面发现工作区，先回到主发现页。"
 msgstr "桌面端的场景相遇入口已经收口到桌面发现工作区，先回到主发现页。"
 
-#: apps/app/src/routes/discover-scene-page.tsx:203
+#: apps/app/src/routes/discover-scene-page.tsx:211
 msgid "{sceneLabel}里和别处都暂时没有新的相遇了。"
 msgstr "{sceneLabel}里和别处都暂时没有新的相遇了。"
 
 #. placeholder {0}: request.characterName
-#: apps/app/src/routes/discover-scene-page.tsx:214
+#: apps/app/src/routes/discover-scene-page.tsx:222
 msgid "{0} 不在{sceneLabel}，但顺路碰到了你：{greeting}"
 msgstr "{0} 不在{sceneLabel}，但顺路碰到了你：{greeting}"
 
 #. placeholder {0}: request.characterName
-#: apps/app/src/routes/discover-scene-page.tsx:221
+#: apps/app/src/routes/discover-scene-page.tsx:229
 msgid "{0} 在{sceneLabel}里注意到了你：{greeting}"
 msgstr "{0} 在{sceneLabel}里注意到了你：{greeting}"
 
-#: apps/app/src/routes/discover-scene-page.tsx:290
+#: apps/app/src/routes/discover-scene-page.tsx:298
 msgid "今日已偶遇 {encounterCount} 人"
 msgstr "今日已偶遇 {encounterCount} 人"
 
-#: apps/app/src/routes/discover-scene-page.tsx:307
+#: apps/app/src/routes/discover-scene-page.tsx:315
 msgid "去通过"
 msgstr "去通过"
 
-#: apps/app/src/routes/discover-scene-page.tsx:360
+#: apps/app/src/routes/discover-scene-page.tsx:368
 msgid "稍等 {cooldownRemainSec} 秒再出发吧。"
 msgstr "稍等 {cooldownRemainSec} 秒再出发吧。"
 
-#: apps/app/src/routes/discover-scene-page.tsx:378
+#: apps/app/src/routes/discover-scene-page.tsx:386
 msgid "重试场景相遇"
 msgstr "重试场景相遇"
 
@@ -24400,6 +24479,10 @@ msgstr "重试拒绝"
 #: apps/app/src/routes/friend-requests-page.tsx:435
 msgid "去发现页摇一摇，或等待场景触发新的相遇。"
 msgstr "去发现页摇一摇，或等待场景触发新的相遇。"
+
+#: apps/app/src/routes/friend-requests-page.tsx:467
+msgid "来自{localizedScene}"
+msgstr "来自{localizedScene}"
 
 #: apps/app/src/routes/games-page.tsx:192
 #: apps/app/src/routes/games-page.tsx:322
