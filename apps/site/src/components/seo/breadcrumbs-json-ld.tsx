@@ -1,9 +1,14 @@
+import type { MessageDescriptor } from "@lingui/core";
 import { getServerI18n } from "@/i18n/server";
 import type { SupportedLocale } from "@/lib/locales";
 import { pageUrl } from "@/lib/seo-metadata";
 import { JsonLd } from "./json-ld";
 
-type Crumb = { titleZh: string; segment: string };
+type Crumb = { titleZh: string | MessageDescriptor; segment: string };
+
+function tr(i18n: Awaited<ReturnType<typeof getServerI18n>>, v: string | MessageDescriptor) {
+  return typeof v === "string" ? i18n._(v) : i18n._(v);
+}
 
 export async function BreadcrumbsJsonLd({
   locale,
@@ -24,7 +29,7 @@ export async function BreadcrumbsJsonLd({
     ...trail.map((c, idx) => ({
       "@type": "ListItem",
       position: idx + 2,
-      name: i18n._(c.titleZh),
+      name: tr(i18n, c.titleZh),
       item: pageUrl(locale, c.segment),
     })),
   ];

@@ -1,41 +1,90 @@
-import { detectAppPlatform } from "./platform";
+// SW 已经从 app 整体下线：
+//   - vite.config.ts 不再用 vite-plugin-pwa 生成 sw.js；
+//   - public/sw.js 是「自毁开关」：浏览器 update check 拿到后会 claim →
+//     清 caches → 让 client 刷新 → unregister 自己；
+//   - 这个函数原本负责注册 SW，现在改成「兜底清理已存量 SW」+
+//     「监听自毁开关发的 postMessage 触发 reload」，确保历史装机能干净退出。
+// SW precache 在多次构建之间锁住旧 chunk，导致用户拿不到新代码，这条路径
+// 不再值得维护——索性彻底走 nginx + 浏览器 HTTP 缓存。
+//
+// 兜底清理用 sessionStorage 守护避免反复 reload。一个标签页内最多 reload
+// 一次；关掉再开就重新跑一次（理论上那时已经没 SW 了，立即返回）。
 
-// 仅在「web 端 + 生产构建 + 浏览器支持 SW」时注册：
-// - Capacitor (iOS/Android) 和 Tauri (desktop) 各自有原生缓存机制，不需要 SW；
-//   且 SW 在 file:// scheme 上根本注册不了。
-// - 开发服务器（vite dev）下 SW 容易缓存到旧 chunk 引起调试困惑，已在
-//   vite-plugin-pwa devOptions.enabled=false 关掉 dev 期 SW 生成。
-// 注册时机放在首屏渲染之后（idleCallback），避免与首屏 JS 抢带宽。
+const CLEANUP_GUARD_KEY = "yinjie:sw-cleanup-done";
+
+function hasNavigatorSW(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return "serviceWorker" in navigator;
+}
+
+async function unregisterAllAndClearCaches(): Promise<boolean> {
+  if (!hasNavigatorSW()) return false;
+  let didSomething = false;
+  try {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    if (regs.length > 0) {
+      didSomething = true;
+      await Promise.all(regs.map((r) => r.unregister()));
+    }
+  } catch {
+    // ignore
+  }
+  try {
+    if (typeof caches !== "undefined") {
+      const keys = await caches.keys();
+      if (keys.length > 0) {
+        didSomething = true;
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return didSomething;
+}
+
 export function registerAppServiceWorker() {
-  if (!import.meta.env.PROD) {
-    return;
+  if (typeof window === "undefined") return;
+  if (!hasNavigatorSW()) return;
+
+  // 自毁开关 SW 在 activate 阶段会 postMessage({type: "yinjie-sw-please-reload"})
+  // 兜底（如果 client.navigate 在某些平台被禁止）。一旦收到，主动 reload。
+  try {
+    navigator.serviceWorker.addEventListener("message", (event) => {
+      const data = event.data as { type?: string } | null;
+      if (data && data.type === "yinjie-sw-please-reload") {
+        try {
+          window.sessionStorage.setItem(CLEANUP_GUARD_KEY, "1");
+        } catch {
+          // ignore
+        }
+        window.location.reload();
+      }
+    });
+  } catch {
+    // ignore
   }
-  if (typeof window === "undefined" || typeof navigator === "undefined") {
-    return;
+
+  // 兜底清理：sessionStorage 守护，每个标签页最多 reload 一次。
+  let alreadyCleaned = false;
+  try {
+    alreadyCleaned = window.sessionStorage.getItem(CLEANUP_GUARD_KEY) === "1";
+  } catch {
+    alreadyCleaned = true;
   }
-  if (!("serviceWorker" in navigator)) {
-    return;
-  }
-  if (detectAppPlatform() !== "web") {
+  if (alreadyCleaned) {
     return;
   }
 
-  const run = () => {
-    navigator.serviceWorker
-      .register("/sw.js", { scope: "/" })
-      .catch(() => {
-        // SW 注册失败不影响业务，沉默忽略即可。
-      });
-  };
-
-  type IdleScheduler = {
-    requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => number;
-  };
-  const idle = globalThis as Partial<IdleScheduler>;
-  if (typeof idle.requestIdleCallback === "function") {
-    idle.requestIdleCallback(run, { timeout: 4000 });
-    return;
-  }
-
-  window.setTimeout(run, 1500);
+  void (async () => {
+    const didCleanup = await unregisterAllAndClearCaches();
+    try {
+      window.sessionStorage.setItem(CLEANUP_GUARD_KEY, "1");
+    } catch {
+      // ignore
+    }
+    if (didCleanup) {
+      window.location.reload();
+    }
+  })();
 }

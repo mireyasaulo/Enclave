@@ -95,6 +95,8 @@ async function bootstrap() {
   const owner = await app.get(WorldOwnerService).ensureSingleOwnerMigration();
   await app.get(SocialService).ensureDefaultFriendships(owner.id);
 
+  app.enableShutdownHooks();
+
   await app.listen(process.env.PORT ?? 3000);
   console.log(`隐界 API running on port ${process.env.PORT ?? 3000}`);
 }

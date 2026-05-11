@@ -221,4 +221,15 @@ export class InferenceAdminController {
   ) {
     return this.inferenceService.rebindModelPersonas(body);
   }
+
+  @Post('vendor-family-personas/install')
+  installVendorFamilyPersonas(
+    @Body()
+    body: {
+      vendors?: string[];
+      forceUpdateExisting?: boolean;
+    },
+  ) {
+    return this.inferenceService.installVendorFamilyPersonas(body);
+  }
 }

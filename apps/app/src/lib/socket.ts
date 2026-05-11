@@ -77,8 +77,26 @@ export function getChatSocket() {
   const token = resolveSocketAuthToken(nextSocketBaseUrl);
   socket = io(namespaceUrl, {
     path: enginePath,
-    transports: ["websocket", "polling"],
+    // polling 在前 + websocket 升级：花生壳 / 部分公网隧道不转发 WS upgrade(101)，
+    // 直接 transports:["websocket","polling"] 会让 socket.io-client 先尝试 ws，
+    // upgrade 失败后陷入死循环不发任何 emit。改成 polling-first 让初始握手用
+    // long-polling 拿到 sid，能升级就升级，不能升级也保持工作。
+    transports: ["polling", "websocket"],
     ...(token ? { auth: { token }, query: { token } } : {}),
+  });
+
+  // 服务端 buildId 仅记录在 localStorage 中供调试；自动 reload 已下线，
+  // dev 环境 nest watch 频繁热重启会让客户端死循环 reload，
+  // 现在改为用户手动刷新。
+  socket.on("system.hello", (payload: { buildId?: string }) => {
+    if (typeof window === "undefined") return;
+    const nextId = payload?.buildId;
+    if (!nextId) return;
+    try {
+      window.localStorage.setItem("yinjie:server-build-id", nextId);
+    } catch {
+      // ignore
+    }
   });
 
   // socket.io-client 重连用初始 query；cloud token 续期或重登后 query 会过期

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import {
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   compareEvalRuns,
   getGenerationTrace,
   getEvalDataset,
@@ -108,6 +109,7 @@ type EvalsPreset = {
 };
 
 export function EvalsPage() {
+  const t = translateRuntimeMessage;
   const baseUrl = resolveAdminCoreApiBaseUrl();
   const queryClient = useQueryClient();
   const systemStatusQuery = useQuery({
@@ -364,7 +366,7 @@ export function EvalsPage() {
         baseUrl,
       ),
     onSuccess: async (result) => {
-      setSuccessNotice(`数据集运行完成：${result.id}`);
+setSuccessNotice(t(msg`数据集运行完成：${result.id}`));
       setSelectedDatasetId(result.datasetId);
       setSelectedRunId(result.id);
       await Promise.all([
@@ -391,7 +393,7 @@ export function EvalsPage() {
         baseUrl,
       ),
     onSuccess: async (result) => {
-      setSuccessNotice(`成对评测已完成：${result.comparison.id}`);
+setSuccessNotice(t(msg`成对评测已完成：${result.comparison.id}`));
       setSelectedDatasetId(result.candidateRun.datasetId);
       setBaselineRunId(result.baselineRun.id);
       setCandidateRunId(result.candidateRun.id);
@@ -409,7 +411,7 @@ export function EvalsPage() {
   const runExperimentPresetMutation = useMutation({
     mutationFn: (presetId: string) => runEvalExperimentPreset(presetId, baseUrl),
     onSuccess: async (result) => {
-      setSuccessNotice(`实验预设已执行完成：${result.preset.id}`);
+setSuccessNotice(t(msg`实验预设已执行完成：${result.preset.id}`));
       if (result.pairwiseRun) {
         setSelectedDatasetId(result.pairwiseRun.candidateRun.datasetId);
         setBaselineRunId(result.pairwiseRun.baselineRun.id);
@@ -447,7 +449,7 @@ export function EvalsPage() {
         baseUrl,
       ),
     onSuccess: async (report) => {
-      setSuccessNotice(`报告决策已更新：${formatDecisionStatus(report.decisionStatus)}`);
+setSuccessNotice(t(msg`报告决策已更新：${formatDecisionStatus(report.decisionStatus)}`));
       setSelectedReportId(report.id);
       setReportDecisionNote("");
       await queryClient.invalidateQueries({ queryKey: ["admin-eval-experiment-reports", baseUrl] });
@@ -936,7 +938,7 @@ export function EvalsPage() {
   }
 
   async function exportAllPresets() {
-      await copyPresetPayload(JSON.stringify(savedPresets, null, 2), "复制预设 JSON");
+      await copyPresetPayload(JSON.stringify(savedPresets, null, 2), t(msg`复制预设 JSON`));
   }
 
   async function exportCurrentPreset() {
@@ -945,14 +947,14 @@ export function EvalsPage() {
       return;
     }
     const preset = savedPresets.find((item) => item.name === name) ?? currentPresetSnapshot(name);
-    await copyPresetPayload(JSON.stringify(preset, null, 2), "复制当前预设 JSON");
+    await copyPresetPayload(JSON.stringify(preset, null, 2), t(msg`复制当前预设 JSON`));
   }
 
   function importPresets() {
     if (typeof window === "undefined") {
       return;
     }
-    const raw = window.prompt("粘贴预设 JSON");
+const raw = window.prompt(t(msg`粘贴预设 JSON`));
     if (!raw) {
       return;
     }
@@ -995,7 +997,7 @@ export function EvalsPage() {
       ]);
       persistSavedPresets(mergedPresets);
     } catch {
-      window.alert("预设 JSON 无效");
+window.alert(t(msg`预设 JSON 无效`));
     }
   }
 
@@ -1132,21 +1134,21 @@ export function EvalsPage() {
   }
 
   const currentFocusRows = [
-    { label: "显示模式", value: compactView ? "紧凑" : "完整" },
-    { label: "当前数据集", value: selectedDatasetId ?? "全部" },
-    { label: "当前运行", value: selectedRunId ?? "未选择" },
-    { label: "当前链路", value: selectedTraceId ?? "未选择" },
-    { label: "实验报告", value: selectedReport?.presetTitle ?? "未选择" },
-    { label: "用例聚焦", value: focusedCaseId ?? "未聚焦" },
-    { label: "数字人状态", value: digitalHumanSummary.statusLabel },
+    { label: t(msg`显示模式`), value: compactView ? t(msg`紧凑`) : t(msg`完整`) },
+    { label: t(msg`当前数据集`), value: selectedDatasetId ?? t(msg`全部`) },
+    { label: t(msg`当前运行`), value: selectedRunId ?? t(msg`未选择`) },
+    { label: t(msg`当前链路`), value: selectedTraceId ?? t(msg`未选择`) },
+    { label: t(msg`实验报告`), value: selectedReport?.presetTitle ?? t(msg`未选择`) },
+    { label: t(msg`用例聚焦`), value: focusedCaseId ?? t(msg`未聚焦`) },
+    { label: t(msg`数字人状态`), value: digitalHumanSummary.statusLabel },
   ];
   const quickStatusRows = [
-    { label: "最近运行", value: overviewQuery.data?.latestRunAt ?? "暂无" },
-    { label: "对比筛选", value: `${activeCompareFilterCount} 个` },
-    { label: "链路筛选", value: `${activeTraceFilterCount} 个` },
+    { label: t(msg`最近运行`), value: overviewQuery.data?.latestRunAt ?? t(msg`暂无`) },
+    { label: t(msg`对比筛选`), value: t(msg`${activeCompareFilterCount} 个`) },
+    { label: t(msg`链路筛选`), value: t(msg`${activeTraceFilterCount} 个`) },
     {
-      label: "当前对比",
-      value: baselineRunId && candidateRunId ? "已锁定" : "未锁定",
+      label: t(msg`当前对比`),
+      value: baselineRunId && candidateRunId ? t(msg`已锁定`) : t(msg`未锁定`),
     },
   ];
 
@@ -1154,32 +1156,30 @@ export function EvalsPage() {
     <div className="space-y-6">
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <AdminPageHero
-          eyebrow="评测工作台"
-          title="先选视图，再跑实验，再下钻链路。"
-          description="这里负责运行数据集、比较实验结果、查看实验报告，并沿着生成链路继续下钻到提示词与上下文。"
+          eyebrow={t(msg`评测工作台`)}
+          title={t(msg`先选视图，再跑实验，再下钻链路。`)}
+          description={t(msg`这里负责运行数据集、比较实验结果、查看实验报告，并沿着生成链路继续下钻到提示词与上下文。`)}
           actions={
             <>
               <Button variant={compactView ? "primary" : "secondary"} onClick={() => setCompactView((value) => !value)}>
-                {compactView ? "紧凑模式：开" : "紧凑模式：关"}
+{compactView ? t(msg`紧凑模式：开`) : t(msg`紧凑模式：关`)}
               </Button>
-              <Button variant="secondary" onClick={resetViewState}>
-                重置筛选
-              </Button>
+              <Button variant="secondary" onClick={resetViewState}>{t(msg`重置筛选`)}</Button>
             </>
           }
           metrics={[
-            { label: "数据集", value: overviewQuery.data?.datasetCount ?? 0 },
-            { label: "运行次数", value: overviewQuery.data?.runCount ?? 0 },
-            { label: "链路数", value: overviewQuery.data?.traceCount ?? 0 },
-            { label: "数字人", value: digitalHumanSummary.statusLabel },
-            { label: "失败运行", value: overviewQuery.data?.failedRunCount ?? 0 },
+            { label: t(msg`数据集`), value: overviewQuery.data?.datasetCount ?? 0 },
+            { label: t(msg`运行次数`), value: overviewQuery.data?.runCount ?? 0 },
+            { label: t(msg`链路数`), value: overviewQuery.data?.traceCount ?? 0 },
+            { label: t(msg`数字人`), value: digitalHumanSummary.statusLabel },
+            { label: t(msg`失败运行`), value: overviewQuery.data?.failedRunCount ?? 0 },
           ]}
         />
 
         <div className="space-y-4">
-          <AdminInfoRows title="当前聚焦" rows={currentFocusRows} />
+          <AdminInfoRows title={t(msg`当前聚焦`)} rows={currentFocusRows} />
           {shareViewName.trim() ? (
-            <InlineNotice tone="info">当前分享视图：{shareViewName.trim()}</InlineNotice>
+            <InlineNotice tone="info">{t(msg`当前分享视图：${shareViewName.trim()}`)}</InlineNotice>
           ) : null}
         </div>
       </div>
@@ -1187,30 +1187,30 @@ export function EvalsPage() {
         tone={digitalHumanSummary.ready ? "success" : "warning"}
         title={
           digitalHumanSummary.ready
-            ? "数字人链路已进入可联调状态"
-            : `数字人当前阻塞：${digitalHumanSummary.statusLabel}`
+            ? t(msg`数字人链路已进入可联调状态`)
+            : t(msg`数字人当前阻塞：${digitalHumanSummary.statusLabel}`)
         }
-        description={`${digitalHumanSummary.description} ${digitalHumanSummary.nextStep}`}
+        description={t(msg`${digitalHumanSummary.description} ${digitalHumanSummary.nextStep}`)}
       />
 
       <div className="grid gap-6 xl:grid-cols-[300px_minmax(0,1fr)]">
         <div className="space-y-6 xl:sticky xl:top-24 xl:self-start">
           <AdminSectionNav
-            title="工作区导航"
+            title={t(msg`工作区导航`)}
             items={[
-              { label: "评测概览", detail: "看全局状态与视图配置", onClick: () => jumpToSection("eval-overview") },
-              { label: "已保存视图", detail: "保存和复用筛选组合", onClick: () => jumpToSection("eval-presets") },
-              { label: "运行入口", detail: "数据集、预设与最近运行", onClick: () => jumpToSection("eval-runs"), disabled: compactView },
-              { label: "实验报告", detail: "查看决策与关键差异", onClick: () => jumpToSection("eval-reports"), disabled: compactView },
-              { label: "运行对比", detail: "锁定基线和候选，缩小差异范围", onClick: () => jumpToSection("eval-compare") },
-              { label: "生成链路", detail: "查看 prompt、上下文和失败标签", onClick: () => jumpToSection("eval-traces") },
+              { label: t(msg`评测概览`), detail: t(msg`看全局状态与视图配置`), onClick: () => jumpToSection("eval-overview") },
+              { label: t(msg`已保存视图`), detail: t(msg`保存和复用筛选组合`), onClick: () => jumpToSection("eval-presets") },
+              { label: t(msg`运行入口`), detail: t(msg`数据集、预设与最近运行`), onClick: () => jumpToSection("eval-runs"), disabled: compactView },
+              { label: t(msg`实验报告`), detail: t(msg`查看决策与关键差异`), onClick: () => jumpToSection("eval-reports"), disabled: compactView },
+              { label: t(msg`运行对比`), detail: t(msg`锁定基线和候选，缩小差异范围`), onClick: () => jumpToSection("eval-compare") },
+              { label: t(msg`生成链路`), detail: t(msg`查看 prompt、上下文和失败标签`), onClick: () => jumpToSection("eval-traces") },
             ]}
           />
 
-          <AdminInfoRows title="快速状态" rows={quickStatusRows} />
+          <AdminInfoRows title={t(msg`快速状态`)} rows={quickStatusRows} />
 
           <Card className="bg-[color:var(--surface-console)]">
-            <SectionHeading>预设速览</SectionHeading>
+            <SectionHeading>{t(msg`预设速览`)}</SectionHeading>
             <div className="mt-4 space-y-3">
               {savedPresets.slice(0, 4).map((preset) => (
                 <AdminSelectableCard
@@ -1221,29 +1221,29 @@ export function EvalsPage() {
                   }}
                   active={presetName === preset.name}
                   title={preset.name}
-                  subtitle={preset.shareViewName || "未命名视图"}
+                  subtitle={preset.shareViewName || t(msg`未命名视图`)}
                   meta={
                     <>
-                      <span>数据集 {preset.selectedDatasetId ?? "全部"}</span>
+                      <span>{t(msg`数据集`)} {preset.selectedDatasetId ?? t(msg`全部`)}</span>
                       <span className="mx-1">·</span>
-                      <span>对比 {formatCompareCaseFilter(preset.compareCaseFilter)}</span>
+                      <span>{t(msg`对比`)} {formatCompareCaseFilter(preset.compareCaseFilter)}</span>
                       <span className="mx-1">·</span>
-                      <span>链路 {formatTraceScope(preset.traceScopeFilter)}</span>
+                      <span>{t(msg`链路`)} {formatTraceScope(preset.traceScopeFilter)}</span>
                     </>
                   }
                   badge={
                     <StatusPill tone={preset.compactView ? "healthy" : "muted"}>
-                      {preset.compactView ? "紧凑" : "完整"}
+                      {preset.compactView ? t(msg`紧凑`) : t(msg`完整`)}
                     </StatusPill>
                   }
-                  activeLabel="当前预设"
+                  activeLabel={t(msg`当前预设`)}
                   className="py-3.5"
                 />
               ))}
               {savedPresets.length === 0 ? (
                 <AdminEmptyState
-                  title="还没有保存的视图预设"
-                  description="先在评测概览里保存一组筛选状态，后面就能反复复用。"
+                  title={t(msg`还没有保存的视图预设`)}
+                  description={t(msg`先在评测概览里保存一组筛选状态，后面就能反复复用。`)}
                 />
               ) : null}
             </div>
@@ -1252,48 +1252,40 @@ export function EvalsPage() {
 
         <div className="space-y-6">
       <Card id="eval-overview" className="bg-[color:var(--surface-console)]">
-        <SectionHeading>评测概览</SectionHeading>
+        <SectionHeading>{t(msg`评测概览`)}</SectionHeading>
         <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-          <MetricCard label="数据集" value={overviewQuery.data?.datasetCount ?? 0} />
-          <MetricCard label="运行次数" value={overviewQuery.data?.runCount ?? 0} />
-          <MetricCard label="链路数" value={overviewQuery.data?.traceCount ?? 0} />
-          <MetricCard label="回退链路" value={overviewQuery.data?.fallbackTraceCount ?? 0} />
-          <MetricCard label="失败运行" value={overviewQuery.data?.failedRunCount ?? 0} />
+          <MetricCard label={t(msg`数据集`)} value={overviewQuery.data?.datasetCount ?? 0} />
+          <MetricCard label={t(msg`运行次数`)} value={overviewQuery.data?.runCount ?? 0} />
+          <MetricCard label={t(msg`链路数`)} value={overviewQuery.data?.traceCount ?? 0} />
+          <MetricCard label={t(msg`回退链路`)} value={overviewQuery.data?.fallbackTraceCount ?? 0} />
+          <MetricCard label={t(msg`失败运行`)} value={overviewQuery.data?.failedRunCount ?? 0} />
         </div>
         <div className="mt-4 text-sm text-[color:var(--text-secondary)]">
-          最近运行：{overviewQuery.data?.latestRunAt ?? "暂无"}
+          {t(msg`最近运行`)}：{overviewQuery.data?.latestRunAt ?? t(msg`暂无`)}
         </div>
         {shareViewName.trim() ? (
           <div className="mt-4">
             <span className="rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-2 text-sm text-sky-100">
-              视图：{shareViewName.trim()}
+              {t(msg`视图：${shareViewName.trim()}`)}
             </span>
           </div>
         ) : null}
         <InlineNotice className="mt-4" tone={compactView ? "info" : "muted"}>
           {compactView
-            ? "当前是紧凑模式，只优先展示失败、异常和差异明显的结果。"
-            : "当前是完整模式，适合完整浏览运行记录、对比结果、实验报告和生成链路。"}
+            ? t(msg`当前是紧凑模式，只优先展示失败、异常和差异明显的结果。`)
+            : t(msg`当前是完整模式，适合完整浏览运行记录、对比结果、实验报告和生成链路。`)}
         </InlineNotice>
         <div className="mt-4 flex flex-wrap gap-3">
-          <AdminPillTextField value={presetName} onChange={setPresetName} placeholder="预设名称" className="w-auto min-w-44" />
-          <AdminPillTextField value={shareViewName} onChange={setShareViewName} placeholder="分享视图名称" className="w-auto min-w-48" />
-          <Button variant="secondary" onClick={saveCurrentPreset}>
-            保存预设
-          </Button>
+          <AdminPillTextField value={presetName} onChange={setPresetName} placeholder={t(msg`预设名称`)} className="w-auto min-w-44" />
+          <AdminPillTextField value={shareViewName} onChange={setShareViewName} placeholder={t(msg`分享视图名称`)} className="w-auto min-w-48" />
+          <Button variant="secondary" onClick={saveCurrentPreset}>{t(msg`保存预设`)}</Button>
           <Button variant="secondary" onClick={() => {
             void exportCurrentPreset();
-          }}>
-            导出当前预设
-          </Button>
+          }}>{t(msg`导出当前预设`)}</Button>
           <Button variant="secondary" onClick={() => {
             void exportAllPresets();
-          }}>
-            导出全部预设
-          </Button>
-          <Button variant="secondary" onClick={importPresets}>
-            导入预设
-          </Button>
+          }}>{t(msg`导出全部预设`)}</Button>
+          <Button variant="secondary" onClick={importPresets}>{t(msg`导入预设`)}</Button>
           <AdminPillSelectField
             value={presetName}
             onChange={(value) => {
@@ -1301,7 +1293,7 @@ export function EvalsPage() {
               applyPreset(value);
             }}
           >
-            <option value="">应用预设</option>
+            <option value="">{t(msg`应用预设`)}</option>
             {savedPresets.map((preset) => (
               <option key={preset.name} value={preset.name}>
                 {preset.name}
@@ -1309,31 +1301,27 @@ export function EvalsPage() {
             ))}
           </AdminPillSelectField>
           {presetName && savedPresets.some((preset) => preset.name === presetName) ? (
-            <Button variant="danger" onClick={() => deletePreset(presetName)}>
-              删除预设
-            </Button>
+            <Button variant="danger" onClick={() => deletePreset(presetName)}>{t(msg`删除预设`)}</Button>
           ) : null}
           <Button variant="secondary" onClick={() => {
             void copyCurrentViewLink();
-          }}>
-            复制视图链接
-          </Button>
+          }}>{t(msg`复制视图链接`)}</Button>
         </div>
         {evalRunBusy || reportDecisionBusy ? (
           <AdminActionFeedback
             className="mt-4"
             tone="busy"
-            title="评测任务执行中"
+            title={t(msg`评测任务执行中`)}
             description={
               activeDatasetRunId
-                ? `正在执行数据集 ${activeDatasetRunId}...`
+                ? t(msg`正在执行数据集 ${activeDatasetRunId}...`)
                 : activePairwiseRunId
-                  ? `正在执行 ${activePairwiseRunId} 的成对评测...`
+                  ? t(msg`正在执行 ${activePairwiseRunId} 的成对评测...`)
                   : activePresetRunId
-                    ? `正在执行预设 ${activePresetRunId}...`
+                    ? t(msg`正在执行预设 ${activePresetRunId}...`)
                     : activeReportDecisionId
-                      ? `正在更新报告 ${activeReportDecisionId} 的决策...`
-                      : "评测操作执行中..."
+                      ? t(msg`正在更新报告 ${activeReportDecisionId} 的决策...`)
+                      : t(msg`评测操作执行中...`)
             }
           />
         ) : null}
@@ -1341,50 +1329,50 @@ export function EvalsPage() {
           <AdminActionFeedback
             className="mt-4"
             tone="success"
-            title="评测任务已完成"
+            title={t(msg`评测任务已完成`)}
             description={successNotice}
           />
         ) : null}
         {runDatasetMutation.isError && runDatasetMutation.error instanceof Error ? (
           <AdminErrorState
             className="mt-4"
-            title="数据集评测失败"
+            title={t(msg`数据集评测失败`)}
             detail={runDatasetMutation.error.message}
             onRetry={() => runDatasetMutation.reset()}
-            retryLabel="清除错误"
+            retryLabel={t(msg`清除错误`)}
           />
         ) : null}
         {runPairwiseMutation.isError && runPairwiseMutation.error instanceof Error ? (
           <AdminErrorState
             className="mt-4"
-            title="对比评测失败"
+            title={t(msg`对比评测失败`)}
             detail={runPairwiseMutation.error.message}
             onRetry={() => runPairwiseMutation.reset()}
-            retryLabel="清除错误"
+            retryLabel={t(msg`清除错误`)}
           />
         ) : null}
         {runExperimentPresetMutation.isError && runExperimentPresetMutation.error instanceof Error ? (
           <AdminErrorState
             className="mt-4"
-            title="预设实验运行失败"
+            title={t(msg`预设实验运行失败`)}
             detail={runExperimentPresetMutation.error.message}
             onRetry={() => runExperimentPresetMutation.reset()}
-            retryLabel="清除错误"
+            retryLabel={t(msg`清除错误`)}
           />
         ) : null}
         {updateReportDecisionMutation.isError && updateReportDecisionMutation.error instanceof Error ? (
           <AdminErrorState
             className="mt-4"
-            title="评测决议更新失败"
+            title={t(msg`评测决议更新失败`)}
             detail={updateReportDecisionMutation.error.message}
             onRetry={() => updateReportDecisionMutation.reset()}
-            retryLabel="清除错误"
+            retryLabel={t(msg`清除错误`)}
           />
         ) : null}
       </Card>
 
       <Card id="eval-presets" className="bg-[color:var(--surface-console)]">
-        <SectionHeading>已保存视图</SectionHeading>
+        <SectionHeading>{t(msg`已保存视图`)}</SectionHeading>
         <div className="mt-4 grid gap-3 xl:grid-cols-3">
           {savedPresets.map((preset) => (
             <AdminRecordCard
@@ -1392,21 +1380,21 @@ export function EvalsPage() {
               title={
                 <>
                   {preset.name}
-                  {preset.pinned ? " · 已置顶" : ""}
+                  {preset.pinned ? t(msg` · 已置顶`) : ""}
                 </>
               }
               badges={
                 <StatusPill tone={preset.compactView ? "healthy" : "muted"}>
-                  {preset.compactView ? "紧凑" : "完整"}
+                  {preset.compactView ? t(msg`紧凑`) : t(msg`完整`)}
                 </StatusPill>
               }
-              meta={preset.shareViewName || "未命名视图"}
+              meta={preset.shareViewName || t(msg`未命名视图`)}
               details={
                 <div className="grid gap-2 text-xs">
-                  <div>数据集：{preset.selectedDatasetId ?? "全部"}</div>
-                  <div>对比：{formatCompareCaseFilter(preset.compareCaseFilter)} / {formatCompareOutcomeFilter(preset.compareOutcomeFilter)}</div>
+                  <div>{t(msg`数据集`)}：{preset.selectedDatasetId ?? t(msg`全部`)}</div>
+                  <div>{t(msg`对比`)}：{formatCompareCaseFilter(preset.compareCaseFilter)} / {formatCompareOutcomeFilter(preset.compareOutcomeFilter)}</div>
                   <div>
-                    链路：{formatTraceScope(preset.traceScopeFilter)} / {preset.traceSource ? formatTraceSource(preset.traceSource) : "全部来源"}
+                    {t(msg`链路`)}：{formatTraceScope(preset.traceScopeFilter)} / {preset.traceSource ? formatTraceSource(preset.traceSource) : t(msg`全部来源`)}
                   </div>
                 </div>
               }
@@ -1417,22 +1405,18 @@ export function EvalsPage() {
                     size="sm"
                     onClick={() => togglePresetPinned(preset.name)}
                   >
-                    {preset.pinned ? "取消置顶" : "置顶"}
+                    {preset.pinned ? t(msg`取消置顶`) : t(msg`置顶`)}
                   </Button>
                   <Button
                     variant="secondary"
                     size="sm"
                     onClick={() => movePreset(preset.name, "up")}
-                  >
-                    上移
-                  </Button>
+                  >{t(msg`上移`)}</Button>
                   <Button
                     variant="secondary"
                     size="sm"
                     onClick={() => movePreset(preset.name, "down")}
-                  >
-                    下移
-                  </Button>
+                  >{t(msg`下移`)}</Button>
                   <Button
                     variant="secondary"
                     size="sm"
@@ -1440,17 +1424,15 @@ export function EvalsPage() {
                       setPresetName(preset.name);
                       applyPreset(preset.name);
                     }}
-                  >
-                    应用视图
-                  </Button>
+                  >{t(msg`应用视图`)}</Button>
                 </>
               }
             />
           ))}
           {savedPresets.length === 0 ? (
             <AdminEmptyState
-              title="当前还没有保存的视图"
-              description="先把当前筛选状态保存为预设，后面切换视图会更快。"
+              title={t(msg`当前还没有保存的视图`)}
+              description={t(msg`先把当前筛选状态保存为预设，后面切换视图会更快。`)}
             />
           ) : null}
         </div>
@@ -1459,16 +1441,16 @@ export function EvalsPage() {
       {!compactView ? (
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <Card id="eval-runs" className="bg-[color:var(--surface-console)]">
-          <SectionHeading>数据集运行</SectionHeading>
+          <SectionHeading>{t(msg`数据集运行`)}</SectionHeading>
           <InlineNotice className="mt-4" tone="muted">
-            这里是运行入口。先填实验标签和候选覆盖配置，再按数据集执行单次运行或成对评测。
+            {t(msg`这里是运行入口。先填实验标签和候选覆盖配置，再按数据集执行单次运行或成对评测。`)}
           </InlineNotice>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
-            <AdminInlineTextField value={experimentLabel} onChange={setExperimentLabel} placeholder="实验标签" />
-            <AdminInlineTextField value={pairwiseProviderOverride} onChange={setPairwiseProviderOverride} placeholder="候选模型覆盖" />
+            <AdminInlineTextField value={experimentLabel} onChange={setExperimentLabel} placeholder={t(msg`实验标签`)} />
+            <AdminInlineTextField value={pairwiseProviderOverride} onChange={setPairwiseProviderOverride} placeholder={t(msg`候选模型覆盖`)} />
           </div>
           <div className="mt-3 grid gap-3 md:grid-cols-2">
-            <AdminInlineTextField value={pairwiseJudgeModelOverride} onChange={setPairwiseJudgeModelOverride} placeholder="裁判模型覆盖" />
+            <AdminInlineTextField value={pairwiseJudgeModelOverride} onChange={setPairwiseJudgeModelOverride} placeholder={t(msg`裁判模型覆盖`)} />
             <AdminInlineSelectField value={pairwisePromptVariant} onChange={setPairwisePromptVariant}>
               {promptVariants.map((variant) => (
                 <option key={variant.id} value={variant.id}>
@@ -1479,7 +1461,7 @@ export function EvalsPage() {
           </div>
           <div className="mt-3 grid gap-3 md:grid-cols-2">
             <AdminInlineSelectField value={pairwiseMemoryPolicyVariant} onChange={setPairwiseMemoryPolicyVariant}>
-              <option value="default">默认记忆策略</option>
+              <option value="default">{t(msg`默认记忆策略`)}</option>
               {memoryStrategies.map((strategy) => (
                 <option key={strategy.id} value={strategy.id}>
                   {strategy.label}
@@ -1511,7 +1493,7 @@ export function EvalsPage() {
                       }}
                       disabled={evalRunBusy}
                     >
-                      {pending ? "执行中" : "运行数据集"}
+                      {pending ? t(msg`执行中`) : t(msg`运行数据集`)}
                     </Button>
                       <Button
                       variant="primary"
@@ -1523,14 +1505,14 @@ export function EvalsPage() {
                       }}
                       disabled={evalRunBusy}
                     >
-                      {pairwisePending ? "对比中..." : "运行成对评测"}
+                      {pairwisePending ? t(msg`对比中...`) : t(msg`运行成对评测`)}
                     </Button>
                     </>
                   }
                   body={<div className="leading-6">{dataset.description}</div>}
                   footer={
                     <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                      {dataset.caseIds.length} 个用例 · 评分规则：{dataset.rubricIds.join(", ")}
+  {t(msg`${dataset.caseIds.length} 个用例 · 评分规则：`)} {dataset.rubricIds.join(", ")}
                     </div>
                   }
                 />
@@ -1540,9 +1522,9 @@ export function EvalsPage() {
         </Card>
 
         <Card className="bg-[color:var(--surface-console)]">
-          <SectionHeading>实验预设</SectionHeading>
+          <SectionHeading>{t(msg`实验预设`)}</SectionHeading>
           <InlineNotice className="mt-4" tone="muted">
-            预设适合把基线与候选的组合固化下来，重复执行同一实验。
+            {t(msg`预设适合把基线与候选的组合固化下来，重复执行同一实验。`)}
           </InlineNotice>
           <div className="mt-4 space-y-3">
             {experimentPresets.map((preset) => {
@@ -1560,17 +1542,17 @@ export function EvalsPage() {
                       onClick={() => runExperimentPresetMutation.mutate(preset.id)}
                       disabled={evalRunBusy}
                     >
-                      {pending ? "执行中" : "运行预设"}
+                      {pending ? t(msg`执行中`) : t(msg`运行预设`)}
                     </Button>
                   }
                   body={<div className="leading-6">{preset.description}</div>}
                   footer={<div className="grid gap-2 text-xs text-[color:var(--text-muted)]">
-                    <div>标签：{preset.experimentLabel ?? preset.id}</div>
+                    <div>{t(msg`标签`)}：{preset.experimentLabel ?? preset.id}</div>
                     <div>
-                      基线：{preset.baseline?.providerOverride ?? "默认"} / {preset.baseline?.judgeModelOverride ?? "默认"} / {formatPromptVariantValue(preset.baseline?.promptVariant ?? null, promptVariantLabelMap)} / {formatMemoryStrategyValue(preset.baseline?.memoryPolicyVariant ?? null, memoryStrategyLabelMap)}
+                      {t(msg`基线`)}：{preset.baseline?.providerOverride ?? t(msg`默认`)} / {preset.baseline?.judgeModelOverride ?? t(msg`默认`)} / {formatPromptVariantValue(preset.baseline?.promptVariant ?? null, promptVariantLabelMap)} / {formatMemoryStrategyValue(preset.baseline?.memoryPolicyVariant ?? null, memoryStrategyLabelMap)}
                     </div>
                     <div>
-                      候选：{preset.candidate?.providerOverride ?? "默认"} / {preset.candidate?.judgeModelOverride ?? "默认"} / {formatPromptVariantValue(preset.candidate?.promptVariant ?? null, promptVariantLabelMap)} / {formatMemoryStrategyValue(preset.candidate?.memoryPolicyVariant ?? null, memoryStrategyLabelMap)}
+                      {t(msg`候选`)}：{preset.candidate?.providerOverride ?? t(msg`默认`)} / {preset.candidate?.judgeModelOverride ?? t(msg`默认`)} / {formatPromptVariantValue(preset.candidate?.promptVariant ?? null, promptVariantLabelMap)} / {formatMemoryStrategyValue(preset.candidate?.memoryPolicyVariant ?? null, memoryStrategyLabelMap)}
                     </div>
                   </div>}
                 />
@@ -1578,28 +1560,28 @@ export function EvalsPage() {
             })}
             {experimentPresets.length === 0 ? (
               <AdminEmptyState
-                title="当前还没有实验预设"
-                description="先沉淀一组基线和候选组合，后续重复实验时会更高效。"
+                title={t(msg`当前还没有实验预设`)}
+                description={t(msg`先沉淀一组基线和候选组合，后续重复实验时会更高效。`)}
               />
             ) : null}
           </div>
         </Card>
 
         <Card className="bg-[color:var(--surface-console)]">
-          <SectionHeading>最近运行</SectionHeading>
+          <SectionHeading>{t(msg`最近运行`)}</SectionHeading>
           <div className="mt-4 flex flex-wrap gap-3">
             <AdminPillSelectField value={selectedDatasetId ?? ""} onChange={(value) => setSelectedDatasetId(value || null)}>
-              <option value="">全部数据集</option>
+              <option value="">{t(msg`全部数据集`)}</option>
               {datasetList.map((dataset) => (
                 <option key={dataset.id} value={dataset.id}>
                   {dataset.title}
                 </option>
               ))}
             </AdminPillSelectField>
-            <AdminPillTextField value={historyProviderFilter} onChange={setHistoryProviderFilter} placeholder="推理模型" />
-            <AdminPillTextField value={historyJudgeFilter} onChange={setHistoryJudgeFilter} placeholder="裁判模型" />
+            <AdminPillTextField value={historyProviderFilter} onChange={setHistoryProviderFilter} placeholder={t(msg`推理模型`)} />
+            <AdminPillTextField value={historyJudgeFilter} onChange={setHistoryJudgeFilter} placeholder={t(msg`裁判模型`)} />
             <AdminPillSelectField value={historyPromptVariantFilter} onChange={setHistoryPromptVariantFilter}>
-              <option value="">全部提示词变体</option>
+              <option value="">{t(msg`全部提示词变体`)}</option>
               {promptVariants.map((variant) => (
                 <option key={`history-prompt-${variant.id}`} value={variant.id}>
                   {variant.label}
@@ -1607,7 +1589,7 @@ export function EvalsPage() {
               ))}
             </AdminPillSelectField>
             <AdminPillSelectField value={historyMemoryPolicyFilter} onChange={setHistoryMemoryPolicyFilter}>
-              <option value="">全部记忆策略</option>
+              <option value="">{t(msg`全部记忆策略`)}</option>
               {memoryStrategies.map((strategy) => (
                 <option key={`history-${strategy.id}`} value={strategy.id}>
                   {strategy.label}
@@ -1626,31 +1608,31 @@ export function EvalsPage() {
                   subtitle={run.id}
                   actions={<StatusPill tone={run.status === "failed" ? "warning" : "healthy"}>{formatEvalStatus(run.status)}</StatusPill>}
                   footer={<div className="grid gap-2 text-sm">
-                    <div>模式：{formatEvalMode(run.mode)}</div>
-                    <div>实验：{run.experimentLabel ?? "无"}</div>
-                    <div>推理模型：{run.effectiveProviderModel ?? "默认"}</div>
-                    <div>裁判模型：{run.effectiveJudgeModel ?? "默认"}</div>
-                    <div>提示词：{formatPromptVariantValue(run.promptVariant ?? null, promptVariantLabelMap)}</div>
-                    <div>记忆：{formatMemoryStrategyValue(run.memoryPolicyVariant ?? null, memoryStrategyLabelMap)}</div>
-                    <div>开始时间：{run.startedAt}</div>
-                    <div>用例数：{run.summary.caseCount}</div>
-                    <div>通过：{run.summary.passedCases}</div>
-                    <div>失败：{run.summary.failedCases}</div>
-                    <div>脚手架：{run.summary.scaffoldedCases}</div>
+                    <div>{t(msg`模式`)}：{formatEvalMode(run.mode)}</div>
+                    <div>{t(msg`实验`)}：{run.experimentLabel ?? t(msg`无`)}</div>
+                    <div>{t(msg`推理模型`)}：{run.effectiveProviderModel ?? t(msg`默认`)}</div>
+                    <div>{t(msg`裁判模型`)}：{run.effectiveJudgeModel ?? t(msg`默认`)}</div>
+                    <div>{t(msg`提示词`)}：{formatPromptVariantValue(run.promptVariant ?? null, promptVariantLabelMap)}</div>
+                    <div>{t(msg`记忆`)}：{formatMemoryStrategyValue(run.memoryPolicyVariant ?? null, memoryStrategyLabelMap)}</div>
+                    <div>{t(msg`开始时间`)}：{run.startedAt}</div>
+                    <div>{t(msg`用例数`)}：{run.summary.caseCount}</div>
+                    <div>{t(msg`通过`)}：{run.summary.passedCases}</div>
+                    <div>{t(msg`失败`)}：{run.summary.failedCases}</div>
+                    <div>{t(msg`脚手架`)}：{run.summary.scaffoldedCases}</div>
                   </div>}
                 />
               ))
             ) : (
               <AdminEmptyState
-                title="当前还没有评测运行记录"
-                description="先运行一个数据集，后面才能查看运行详情、报告和对比历史。"
+                title={t(msg`当前还没有评测运行记录`)}
+                description={t(msg`先运行一个数据集，后面才能查看运行详情、报告和对比历史。`)}
               />
             )}
           </div>
         </Card>
 
         <Card className="bg-[color:var(--surface-console)]">
-          <SectionHeading>对比历史</SectionHeading>
+          <SectionHeading>{t(msg`对比历史`)}</SectionHeading>
           <div className="mt-4 space-y-3">
             {(comparisonsQuery.data ?? []).slice(0, 5).map((comparison) => (
               <ListItemCard
@@ -1668,25 +1650,25 @@ export function EvalsPage() {
                   </StatusPill>
                 }
                 footer={<div className="grid gap-2">
-                  <div>数据集：{comparison.candidateDatasetId}</div>
-                  <div>基线 模型/裁判：{comparison.baselineProviderModel ?? "默认"} / {comparison.baselineJudgeModel ?? "默认"}</div>
-                  <div>基线 提示词/记忆：{formatPromptVariantValue(comparison.baselinePromptVariant ?? null, promptVariantLabelMap)} / {formatMemoryStrategyValue(comparison.baselineMemoryPolicyVariant ?? null, memoryStrategyLabelMap)}</div>
-                  <div>候选 模型/裁判：{comparison.candidateProviderModel ?? "默认"} / {comparison.candidateJudgeModel ?? "默认"}</div>
-                  <div>候选 提示词/记忆：{formatPromptVariantValue(comparison.candidatePromptVariant ?? null, promptVariantLabelMap)} / {formatMemoryStrategyValue(comparison.candidateMemoryPolicyVariant ?? null, memoryStrategyLabelMap)}</div>
+                  <div>{t(msg`数据集`)}：{comparison.candidateDatasetId}</div>
+                  <div>{t(msg`基线 模型/裁判`)}：{comparison.baselineProviderModel ?? t(msg`默认`)} / {comparison.baselineJudgeModel ?? t(msg`默认`)}</div>
+                  <div>{t(msg`基线 提示词/记忆`)}：{formatPromptVariantValue(comparison.baselinePromptVariant ?? null, promptVariantLabelMap)} / {formatMemoryStrategyValue(comparison.baselineMemoryPolicyVariant ?? null, memoryStrategyLabelMap)}</div>
+                  <div>{t(msg`候选 模型/裁判`)}：{comparison.candidateProviderModel ?? t(msg`默认`)} / {comparison.candidateJudgeModel ?? t(msg`默认`)}</div>
+                  <div>{t(msg`候选 提示词/记忆`)}：{formatPromptVariantValue(comparison.candidatePromptVariant ?? null, promptVariantLabelMap)} / {formatMemoryStrategyValue(comparison.candidateMemoryPolicyVariant ?? null, memoryStrategyLabelMap)}</div>
                 </div>}
               />
             ))}
             {(comparisonsQuery.data ?? []).length === 0 ? (
               <AdminEmptyState
-                title="当前还没有对比记录"
-                description="先运行一次成对评测，才能开始查看基线与候选的差异。"
+                title={t(msg`当前还没有对比记录`)}
+                description={t(msg`先运行一次成对评测，才能开始查看基线与候选的差异。`)}
               />
             ) : null}
           </div>
         </Card>
 
         <Card id="eval-reports" className="bg-[color:var(--surface-console)]">
-          <SectionHeading>实验报告</SectionHeading>
+          <SectionHeading>{t(msg`实验报告`)}</SectionHeading>
           <div className="mt-4 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
             <div className="space-y-3">
             {visibleExperimentReports.slice(0, 8).map((report) => (
@@ -1704,15 +1686,15 @@ export function EvalsPage() {
                   </StatusPill>
                 }
                 meta={<div className="grid gap-2">
-                  <div>数据集：{report.datasetId}</div>
-                  <div>汇总：{report.summary.wins} / {report.summary.losses} / {report.summary.ties}</div>
-                  <div>标签：{report.experimentLabel ?? "无"}</div>
+                  <div>{t(msg`数据集`)}：{report.datasetId}</div>
+                  <div>{t(msg`汇总`)}：{report.summary.wins} / {report.summary.losses} / {report.summary.ties}</div>
+                  <div>{t(msg`标签`)}：{report.experimentLabel ?? t(msg`无`)}</div>
                 </div>}
                 body={
                   <>
                     {report.recommendations.length > 0 ? (
                   <div className="rounded-xl border border-emerald-400/20 bg-emerald-500/10 p-3">
-                    <div className="text-xs uppercase tracking-[0.16em] text-emerald-100">建议</div>
+                    <div className="text-xs uppercase tracking-[0.16em] text-emerald-100">{t(msg`建议`)}</div>
                     <div className="mt-2 space-y-2">
                       {report.recommendations.slice(0, 3).map((item) => (
                         <div key={`${report.id}-recommend-${item}`} className="text-sm text-emerald-50">
@@ -1724,7 +1706,7 @@ export function EvalsPage() {
                 ) : null}
                     {report.regressions.length > 0 ? (
                   <div className="mt-3 rounded-xl border border-rose-400/20 bg-rose-500/10 p-3">
-                    <div className="text-xs uppercase tracking-[0.16em] text-rose-100">回退点</div>
+                    <div className="text-xs uppercase tracking-[0.16em] text-rose-100">{t(msg`回退点`)}</div>
                     <div className="mt-2 space-y-2">
                       {report.regressions.slice(0, 3).map((item) => (
                         <div key={`${report.id}-regression-${item}`} className="text-sm text-rose-50">
@@ -1753,7 +1735,7 @@ export function EvalsPage() {
                   </div>
                 ) : null}
                 {report.topCaseDeltas.length > 0 ? (
-                  <AdminMiniPanel title="重点用例差异" tone="soft" className="mt-3" contentClassName="space-y-2">
+                  <AdminMiniPanel title={t(msg`重点用例差异`)} tone="soft" className="mt-3" contentClassName="space-y-2">
                       {report.topCaseDeltas.slice(0, 3).map((item) => (
                         <div key={`${report.id}-${item.caseId}`} className="flex items-center justify-between gap-3">
                           <div className="text-[color:var(--text-primary)]">{item.caseId}</div>
@@ -1779,18 +1761,18 @@ export function EvalsPage() {
             ))}
             {visibleExperimentReports.length === 0 ? (
               <AdminEmptyState
-                title={experimentReports.length === 0 ? "当前还没有实验报告" : "当前筛选下没有实验报告"}
+                title={experimentReports.length === 0 ? t(msg`当前还没有实验报告`) : t(msg`当前筛选下没有实验报告`)}
                 description={
                   experimentReports.length === 0
-                    ? "先运行一次实验预设，系统才会生成建议、回退点和决策依据。"
-                    : "换一个数据集或实验标签，或者先清空当前筛选。"
+                    ? t(msg`先运行一次实验预设，系统才会生成建议、回退点和决策依据。`)
+                    : t(msg`换一个数据集或实验标签，或者先清空当前筛选。`)
                 }
               />
             ) : null}
             </div>
             <div>
               {selectedReport ? (
-                <AdminDetailPanel title="实验报告详情">
+                <AdminDetailPanel title={t(msg`实验报告详情`)}>
                   <div className="flex items-center justify-between gap-3">
                     <div className="font-semibold text-[color:var(--text-primary)]">{selectedReport.presetTitle}</div>
                     <StatusPill tone={selectedReport.summary.wins > selectedReport.summary.losses ? "healthy" : "muted"}>
@@ -1801,26 +1783,26 @@ export function EvalsPage() {
                     {selectedReport.createdAt} · {selectedReport.id}
                   </div>
                   <div className="mt-4 grid gap-2 md:grid-cols-2">
-                    <div>数据集：{selectedReport.datasetId}</div>
-                    <div>标签：{selectedReport.experimentLabel ?? "无"}</div>
-                    <div>单次运行：{selectedReport.singleRunId ?? "无"}</div>
-                    <div>对比记录：{selectedReport.comparisonId ?? "无"}</div>
-                    <div>基线运行：{selectedReport.baselineRunId ?? "无"}</div>
-                    <div>候选运行：{selectedReport.candidateRunId ?? "无"}</div>
-                    <div>决策：{formatDecisionStatus(selectedReport.decisionStatus)}</div>
-                    <div>动作：{selectedReport.appliedAction ?? "无"}</div>
-                    <div>决策时间：{selectedReport.decidedAt ?? "无"}</div>
-                    <div>决策人：{selectedReport.decidedBy ?? "无"}</div>
+                    <div>{t(msg`数据集`)}：{selectedReport.datasetId}</div>
+                    <div>{t(msg`标签`)}：{selectedReport.experimentLabel ?? t(msg`无`)}</div>
+                    <div>{t(msg`单次运行`)}：{selectedReport.singleRunId ?? t(msg`无`)}</div>
+                    <div>{t(msg`对比记录`)}：{selectedReport.comparisonId ?? t(msg`无`)}</div>
+                    <div>{t(msg`基线运行`)}：{selectedReport.baselineRunId ?? t(msg`无`)}</div>
+                    <div>{t(msg`候选运行`)}：{selectedReport.candidateRunId ?? t(msg`无`)}</div>
+                    <div>{t(msg`决策`)}：{formatDecisionStatus(selectedReport.decisionStatus)}</div>
+                    <div>{t(msg`动作`)}：{selectedReport.appliedAction ?? t(msg`无`)}</div>
+                    <div>{t(msg`决策时间`)}：{selectedReport.decidedAt ?? t(msg`无`)}</div>
+                    <div>{t(msg`决策人`)}：{selectedReport.decidedBy ?? t(msg`无`)}</div>
                   </div>
                   <div className="mt-4">
                     <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                      决策备注
+                      {t(msg`决策备注`)}
                     </div>
                     <TextAreaField
                       className="min-h-24"
                       value={reportDecisionNote}
                       onChange={(event) => setReportDecisionNote(event.target.value)}
-                      placeholder="补一条这次继续测试、采用、回滚或归档的依据。"
+                      placeholder={t(msg`补一条这次继续测试、采用、回滚或归档的依据。`)}
                     />
                   </div>
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -1837,7 +1819,7 @@ export function EvalsPage() {
                       }
                       disabled={reportDecisionBusy}
                     >
-                      {reportDecisionBusy && activeReportDecisionId === selectedReport.id ? "更新中..." : "继续测试"}
+                      {reportDecisionBusy && activeReportDecisionId === selectedReport.id ? t(msg`更新中...`) : t(msg`继续测试`)}
                     </Button>
                     <Button
                       variant="secondary"
@@ -1852,9 +1834,7 @@ export function EvalsPage() {
                         })
                       }
                       disabled={reportDecisionBusy}
-                    >
-                      采用候选
-                    </Button>
+                    >{t(msg`采用候选`)}</Button>
                     <Button
                       variant="secondary"
                       size="sm"
@@ -1868,9 +1848,7 @@ export function EvalsPage() {
                         })
                       }
                       disabled={reportDecisionBusy}
-                    >
-                      回滚
-                    </Button>
+                    >{t(msg`回滚`)}</Button>
                     <Button
                       variant="secondary"
                       size="sm"
@@ -1884,9 +1862,7 @@ export function EvalsPage() {
                         })
                       }
                       disabled={reportDecisionBusy}
-                    >
-                      归档
-                    </Button>
+                    >{t(msg`归档`)}</Button>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-3">
                     {selectedReport.singleRunId ? (
@@ -1894,9 +1870,7 @@ export function EvalsPage() {
                         variant="secondary"
                         size="sm"
                         onClick={() => setSelectedRunId(selectedReport.singleRunId ?? null)}
-                      >
-                        打开单次运行
-                      </Button>
+                      >{t(msg`打开单次运行`)}</Button>
                     ) : null}
                     {selectedReport.baselineRunId && selectedReport.candidateRunId ? (
                       <Button
@@ -1907,28 +1881,24 @@ export function EvalsPage() {
                           setBaselineRunId(selectedReport.baselineRunId ?? "");
                           setCandidateRunId(selectedReport.candidateRunId ?? "");
                         }}
-                      >
-                        加载对比
-                      </Button>
+                      >{t(msg`加载对比`)}</Button>
                     ) : null}
                     {selectedReport.candidateRunId ? (
                       <Button
                         variant="secondary"
                         size="sm"
                         onClick={() => setSelectedRunId(selectedReport.candidateRunId ?? null)}
-                      >
-                        打开候选运行
-                      </Button>
+                      >{t(msg`打开候选运行`)}</Button>
                     ) : null}
                   </div>
                   <div className="mt-4 grid gap-3 md:grid-cols-4">
-                    <MetricCard label="用例数" value={selectedReport.summary.totalCases} />
-                    <MetricCard label="胜出" value={selectedReport.summary.wins} />
-                    <MetricCard label="落后" value={selectedReport.summary.losses} />
-                    <MetricCard label="持平" value={selectedReport.summary.ties} />
+                    <MetricCard label={t(msg`用例数`)} value={selectedReport.summary.totalCases} />
+                    <MetricCard label={t(msg`胜出`)} value={selectedReport.summary.wins} />
+                    <MetricCard label={t(msg`落后`)} value={selectedReport.summary.losses} />
+                    <MetricCard label={t(msg`持平`)} value={selectedReport.summary.ties} />
                   </div>
                   {selectedReport.notes.length > 0 ? (
-                    <AdminMiniPanel title="备注" tone="soft" className="mt-4" contentClassName="space-y-2">
+                    <AdminMiniPanel title={t(msg`备注`)} tone="soft" className="mt-4" contentClassName="space-y-2">
                         {selectedReport.notes.map((note) => (
                           <div key={`${selectedReport.id}-${note}`} className="text-[color:var(--text-primary)]">
                             {note}
@@ -1937,7 +1907,7 @@ export function EvalsPage() {
                     </AdminMiniPanel>
                   ) : null}
                   {selectedReport.topCaseDeltas.length > 0 ? (
-                    <AdminMiniPanel title="重点用例差异" tone="soft" className="mt-4" contentClassName="space-y-2">
+                    <AdminMiniPanel title={t(msg`重点用例差异`)} tone="soft" className="mt-4" contentClassName="space-y-2">
                         {selectedReport.topCaseDeltas.map((item) => (
                           <div key={`${selectedReport.id}-detail-${item.caseId}`} className="flex items-center justify-between gap-3">
                             <div className="text-[color:var(--text-primary)]">{item.caseId}</div>
@@ -1949,7 +1919,7 @@ export function EvalsPage() {
                     </AdminMiniPanel>
                   ) : null}
                   {selectedReport.failureTagDeltas.length > 0 ? (
-                    <AdminMiniPanel title="失败标签差异" tone="soft" className="mt-4" contentClassName="flex flex-wrap gap-2">
+                    <AdminMiniPanel title={t(msg`失败标签差异`)} tone="soft" className="mt-4" contentClassName="flex flex-wrap gap-2">
                         {selectedReport.failureTagDeltas.map((item) => (
                           <TagBadge key={`${selectedReport.id}-failure-${item.key}`} tone="warning">
                             {item.label} · {item.baselineCount}{"->"}{item.candidateCount} ({item.delta >= 0 ? "+" : ""}{item.delta})
@@ -1960,8 +1930,8 @@ export function EvalsPage() {
                 </AdminDetailPanel>
               ) : (
                 <AdminEmptyState
-                  title="先选择一份实验报告"
-                  description="选中左侧报告后，这里会展示它的汇总、建议、差异和决策信息。"
+                  title={t(msg`先选择一份实验报告`)}
+                  description={t(msg`选中左侧报告后，这里会展示它的汇总、建议、差异和决策信息。`)}
                 />
               )}
             </div>
@@ -1972,7 +1942,7 @@ export function EvalsPage() {
 
       {!compactView ? (
       <Card className="bg-[color:var(--surface-console)]">
-        <SectionHeading>数据集详情</SectionHeading>
+        <SectionHeading>{t(msg`数据集详情`)}</SectionHeading>
         <div className="mt-4">
           {datasetDetailQuery.data ? (
             <div className="space-y-4">
@@ -1981,7 +1951,7 @@ export function EvalsPage() {
                 subtitle={`${datasetDetailQuery.data.manifest.id} · ${formatEvalTargetType(datasetDetailQuery.data.manifest.targetType)} · ${datasetDetailQuery.data.manifest.version}`}
                 actions={
                   <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                    归属：{datasetDetailQuery.data.manifest.owner}
+{t(msg`归属`)}：{datasetDetailQuery.data.manifest.owner}
                   </div>
                 }
                 body={<div className="leading-6">{datasetDetailQuery.data.manifest.description}</div>}
@@ -2001,14 +1971,14 @@ export function EvalsPage() {
                       <>
                         <div className="leading-6">{caseRecord.description}</div>
                         <div className="mt-4 grid gap-3">
-                      <SnapshotPanel title="用例输入" value={caseRecord.input} />
+                      <SnapshotPanel title={t(msg`用例输入`)} value={caseRecord.input} />
                         </div>
                       </>
                     }
                     footer={
                       <>
                     <div>
-                      <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">硬规则</div>
+                      <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`硬规则`)}</div>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {caseRecord.expectations.hardRules.map((rule) => (
                           <TagBadge key={`${caseRecord.id}-rule-${rule}`}>{rule}</TagBadge>
@@ -2016,7 +1986,7 @@ export function EvalsPage() {
                       </div>
                     </div>
                     <div className="mt-4">
-                      <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">禁止结果</div>
+                      <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`禁止结果`)}</div>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {caseRecord.expectations.forbiddenOutcomes.map((outcome) => (
                           <TagBadge key={`${caseRecord.id}-outcome-${outcome}`} tone="danger">{outcome}</TagBadge>
@@ -2024,7 +1994,7 @@ export function EvalsPage() {
                       </div>
                     </div>
                     <div className="mt-4">
-                      <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">裁判规则</div>
+                      <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`裁判规则`)}</div>
                       <div className="mt-2 flex flex-wrap gap-2">
                         {caseRecord.expectations.judgeRubrics.map((rubric) => (
                           <TagBadge key={`${caseRecord.id}-rubric-${rubric}`} tone="warning">{rubric}</TagBadge>
@@ -2039,8 +2009,8 @@ export function EvalsPage() {
             </div>
           ) : (
             <AdminEmptyState
-              title="先选择一个数据集"
-              description="点选上方数据集卡片后，这里会展示用例输入、硬规则和裁判标准。"
+              title={t(msg`先选择一个数据集`)}
+              description={t(msg`点选上方数据集卡片后，这里会展示用例输入、硬规则和裁判标准。`)}
             />
           )}
         </div>
@@ -2049,7 +2019,7 @@ export function EvalsPage() {
 
       {!compactView ? (
       <Card className="bg-[color:var(--surface-console)]">
-        <SectionHeading>运行详情</SectionHeading>
+        <SectionHeading>{t(msg`运行详情`)}</SectionHeading>
         <div className="mt-4">
           {runDetailQuery.data ? (
             <div className="space-y-4">
@@ -2063,10 +2033,10 @@ export function EvalsPage() {
                 }
                 footer={
                   <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                    <MetricCard label="模式" value={formatEvalMode(runDetailQuery.data.mode)} />
-                    <MetricCard label="开始时间" value={runDetailQuery.data.startedAt} />
-                    <MetricCard label="运行器" value={runDetailQuery.data.runnerVersion} />
-                    <MetricCard label="裁判器" value={runDetailQuery.data.judgeVersion} />
+                    <MetricCard label={t(msg`模式`)} value={formatEvalMode(runDetailQuery.data.mode)} />
+                    <MetricCard label={t(msg`开始时间`)} value={runDetailQuery.data.startedAt} />
+                    <MetricCard label={t(msg`运行器`)} value={runDetailQuery.data.runnerVersion} />
+                    <MetricCard label={t(msg`裁判器`)} value={runDetailQuery.data.judgeVersion} />
                   </div>
                 }
               />
@@ -2088,17 +2058,17 @@ export function EvalsPage() {
                         </StatusPill>
                         {caseResult.judgeSource ? (
                           <TagBadge tone={caseResult.judgeSource === "llm" ? "success" : caseResult.judgeSource === "heuristic" ? "warning" : "info"}>
-                            裁判：{formatJudgeSource(caseResult.judgeSource)}
+  {t(msg`裁判`)}：{formatJudgeSource(caseResult.judgeSource)}
                           </TagBadge>
                         ) : null}
                       </div>
                     </div>
                     <div className="mt-3 whitespace-pre-wrap break-words leading-6 text-[color:var(--text-primary)]">
-                      {caseResult.output || "空"}
+  {caseResult.output || t(msg`空`)}
                     </div>
                     {caseResult.scores.length > 0 ? (
                       <div className="mt-3">
-                        <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">评分</div>
+                        <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`评分`)}</div>
                         <div className="mt-2 flex flex-wrap gap-2">
                           {caseResult.scores.map((score) => (
                             <TagBadge key={`${caseResult.caseId}-${score.key}`} tone="success">
@@ -2115,7 +2085,7 @@ export function EvalsPage() {
                     ) : null}
                     {caseResult.ruleViolations.length > 0 ? (
                       <div className="mt-3">
-                        <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">规则违背</div>
+                        <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`规则违背`)}</div>
                         <div className="mt-2 flex flex-wrap gap-2">
                           {caseResult.ruleViolations.map((violation) => (
                             <TagBadge key={violation} tone="warning">{violation}</TagBadge>
@@ -2125,7 +2095,7 @@ export function EvalsPage() {
                     ) : null}
                     {caseResult.failureTags.length > 0 ? (
                       <div className="mt-3">
-                        <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">失败标签</div>
+                        <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`失败标签`)}</div>
                         <div className="mt-2 flex flex-wrap gap-2">
                           {caseResult.failureTags.map((tag) => (
                             <TagBadge key={`${caseResult.caseId}-${tag.key}`} tone="danger">
@@ -2138,7 +2108,7 @@ export function EvalsPage() {
                     ) : null}
                     {collectGenerationTraceIds(caseResult).length > 0 ? (
                       <div className="mt-3">
-                        <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">生成链路</div>
+                        <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`生成链路`)}</div>
                         <div className="mt-2 flex flex-wrap gap-2">
                           {collectGenerationTraceIds(caseResult).map((traceId) => (
                             <button
@@ -2159,7 +2129,7 @@ export function EvalsPage() {
                     ) : null}
                     {collectJudgeTraceIds(caseResult).length > 0 ? (
                       <div className="mt-3">
-                        <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">裁判链路</div>
+                        <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`裁判链路`)}</div>
                         <div className="mt-2 flex flex-wrap gap-2">
                           {collectJudgeTraceIds(caseResult).map((traceId) => (
                             <button
@@ -2180,15 +2150,15 @@ export function EvalsPage() {
                     ) : null}
                     {selectedDatasetCaseMap.get(caseResult.caseId) ? (
                       <div className="mt-4 rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] p-3">
-                        <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">用例期望</div>
+                        <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`用例期望`)}</div>
                         <div className="mt-3">
-                          <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">输入</div>
+                          <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`输入`)}</div>
                           <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-words text-xs leading-6 text-[color:var(--text-primary)]">
                             {JSON.stringify(selectedDatasetCaseMap.get(caseResult.caseId)?.input ?? {}, null, 2)}
                           </pre>
                         </div>
                         <div className="mt-3">
-                          <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">硬规则</div>
+                          <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`硬规则`)}</div>
                           <div className="mt-2 flex flex-wrap gap-2">
                             {(selectedDatasetCaseMap.get(caseResult.caseId)?.expectations.hardRules ?? []).map((rule) => (
                               <TagBadge key={`${caseResult.caseId}-expected-rule-${rule}`}>{rule}</TagBadge>
@@ -2196,7 +2166,7 @@ export function EvalsPage() {
                           </div>
                         </div>
                         <div className="mt-3">
-                          <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">禁止结果</div>
+                          <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`禁止结果`)}</div>
                           <div className="mt-2 flex flex-wrap gap-2">
                             {(selectedDatasetCaseMap.get(caseResult.caseId)?.expectations.forbiddenOutcomes ?? []).map((outcome) => (
                               <TagBadge key={`${caseResult.caseId}-expected-outcome-${outcome}`} tone="danger">{outcome}</TagBadge>
@@ -2211,8 +2181,8 @@ export function EvalsPage() {
             </div>
           ) : (
             <AdminEmptyState
-              title="先选择一次运行"
-              description="选中最近运行后，这里会展开用例级输出、规则违背和链路关联。"
+              title={t(msg`先选择一次运行`)}
+              description={t(msg`选中最近运行后，这里会展开用例级输出、规则违背和链路关联。`)}
             />
           )}
         </div>
@@ -2220,7 +2190,7 @@ export function EvalsPage() {
       ) : null}
 
       <Card id="eval-compare" className="bg-[color:var(--surface-console)]">
-        <SectionHeading>运行对比</SectionHeading>
+        <SectionHeading>{t(msg`运行对比`)}</SectionHeading>
         <div className="mt-4">
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <Button
@@ -2228,25 +2198,25 @@ export function EvalsPage() {
               size="sm"
               onClick={() => setCompareFiltersExpanded((value) => !value)}
             >
-              {compareFiltersExpanded ? "隐藏对比筛选" : "显示对比筛选"}
+{compareFiltersExpanded ? t(msg`隐藏对比筛选`) : t(msg`显示对比筛选`)}
             </Button>
             <div className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-2 text-sm text-[color:var(--text-secondary)]">
-              已启用 {activeCompareFilterCount} 个筛选
+              {t(msg`已启用 ${activeCompareFilterCount} 个筛选`)}
             </div>
             {compareDatasetId ? (
               <div className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-2 text-sm text-[color:var(--text-secondary)]">
-                数据集：{compareDatasetId}
+                {t(msg`数据集`)}：{compareDatasetId}
               </div>
             ) : null}
           </div>
           <InlineNotice className="mb-4" tone="muted">
-            先锁定基线与候选，再按用例结果、失败标签和搜索词收窄比较范围。
+            {t(msg`先锁定基线与候选，再按用例结果、失败标签和搜索词收窄比较范围。`)}
           </InlineNotice>
           {compareFiltersExpanded ? (
           <div className="mb-4 flex flex-wrap gap-3">
-            <AdminPillTextField value={compareCaseSearch} onChange={setCompareCaseSearch} placeholder="搜索用例编号" className="w-auto min-w-44" />
+            <AdminPillTextField value={compareCaseSearch} onChange={setCompareCaseSearch} placeholder={t(msg`搜索用例编号`)} className="w-auto min-w-44" />
             <AdminPillSelectField value={baselineRunId} onChange={setBaselineRunId}>
-              <option value="">选择基线运行</option>
+              <option value="">{t(msg`选择基线运行`)}</option>
               {comparableRuns.map((run) => (
                 <option key={`baseline-${run.id}`} value={run.id}>
                   {run.datasetId} · {run.id}
@@ -2254,7 +2224,7 @@ export function EvalsPage() {
               ))}
             </AdminPillSelectField>
             <AdminPillSelectField value={candidateRunId} onChange={setCandidateRunId}>
-              <option value="">选择候选运行</option>
+              <option value="">{t(msg`选择候选运行`)}</option>
               {comparableRuns.map((run) => (
                 <option key={`candidate-${run.id}`} value={run.id}>
                   {run.datasetId} · {run.id}
@@ -2262,18 +2232,18 @@ export function EvalsPage() {
               ))}
             </AdminPillSelectField>
             <AdminPillSelectField value={compareCaseFilter} onChange={(value) => setCompareCaseFilter(value as "all" | "different" | "failed")}>
-              <option value="all">全部用例</option>
-              <option value="different">仅差异用例</option>
-              <option value="failed">仅失败用例</option>
+              <option value="all">{t(msg`全部用例`)}</option>
+              <option value="different">{t(msg`仅差异用例`)}</option>
+              <option value="failed">{t(msg`仅失败用例`)}</option>
             </AdminPillSelectField>
             <AdminPillSelectField value={compareOutcomeFilter} onChange={(value) => setCompareOutcomeFilter(value as "all" | "win" | "lose" | "tie")}>
-              <option value="all">全部结果</option>
-              <option value="win">候选胜出</option>
-              <option value="lose">候选落后</option>
-              <option value="tie">持平</option>
+              <option value="all">{t(msg`全部结果`)}</option>
+              <option value="win">{t(msg`候选胜出`)}</option>
+              <option value="lose">{t(msg`候选落后`)}</option>
+              <option value="tie">{t(msg`持平`)}</option>
             </AdminPillSelectField>
             <AdminPillSelectField value={compareFailureTagFilter} onChange={setCompareFailureTagFilter}>
-              <option value="">全部失败标签</option>
+              <option value="">{t(msg`全部失败标签`)}</option>
               {availableCompareFailureTags.map((tagKey) => (
                 <option key={tagKey} value={tagKey}>
                   {tagKey}
@@ -2285,13 +2255,13 @@ export function EvalsPage() {
           {compareQuery.data ? (
             <div className="space-y-4">
               <ListItemCard
-                title={`${compareQuery.data.candidateDatasetId} 对比 ${compareQuery.data.baselineDatasetId}`}
+                title={t(msg`${compareQuery.data.candidateDatasetId} 对比 ${compareQuery.data.baselineDatasetId}`)}
                 footer={
                   <div className="grid gap-3 md:grid-cols-4">
-                    <MetricCard label="用例数" value={displayedComparisons.length} />
-                    <MetricCard label="胜出" value={filteredComparisonSummary.wins} />
-                    <MetricCard label="落后" value={filteredComparisonSummary.losses} />
-                    <MetricCard label="持平" value={filteredComparisonSummary.ties} />
+                    <MetricCard label={t(msg`用例数`)} value={displayedComparisons.length} />
+                    <MetricCard label={t(msg`胜出`)} value={filteredComparisonSummary.wins} />
+                    <MetricCard label={t(msg`落后`)} value={filteredComparisonSummary.losses} />
+                    <MetricCard label={t(msg`持平`)} value={filteredComparisonSummary.ties} />
                   </div>
                 }
               />
@@ -2305,16 +2275,16 @@ export function EvalsPage() {
                       </StatusPill>
                     </div>
                     <div className="mt-3 grid gap-2">
-                      <div>基线状态：{comparison.baselineStatus ? formatEvalStatus(comparison.baselineStatus) : "无"}</div>
-                      <div>候选状态：{comparison.candidateStatus ? formatEvalStatus(comparison.candidateStatus) : "无"}</div>
-                      <div>基线得分：{comparison.baselineScoreTotal.toFixed(2)}</div>
-                      <div>候选得分：{comparison.candidateScoreTotal.toFixed(2)}</div>
-                      <div>分差：{comparison.scoreDelta >= 0 ? "+" : ""}{comparison.scoreDelta.toFixed(2)}</div>
+                      <div>{t(msg`基线状态`)}：{comparison.baselineStatus ? formatEvalStatus(comparison.baselineStatus) : t(msg`无`)}</div>
+                      <div>{t(msg`候选状态`)}：{comparison.candidateStatus ? formatEvalStatus(comparison.candidateStatus) : t(msg`无`)}</div>
+                      <div>{t(msg`基线得分`)}：{comparison.baselineScoreTotal.toFixed(2)}</div>
+                      <div>{t(msg`候选得分`)}：{comparison.candidateScoreTotal.toFixed(2)}</div>
+                      <div>{t(msg`分差`)}：{comparison.scoreDelta >= 0 ? "+" : ""}{comparison.scoreDelta.toFixed(2)}</div>
                     </div>
                     <div className="mt-4 grid gap-3 xl:grid-cols-2">
-                      <AdminMiniPanel title="基线输出">
+                      <AdminMiniPanel title={t(msg`基线输出`)}>
                         <div className="mt-2 whitespace-pre-wrap break-words leading-6 text-[color:var(--text-primary)]">
-                          {comparison.baselineOutput || "空"}
+{comparison.baselineOutput || t(msg`空`)}
                         </div>
                         {comparison.baselineRuleViolations.length > 0 ? (
                           <div className="mt-3 flex flex-wrap gap-2">
@@ -2324,7 +2294,7 @@ export function EvalsPage() {
                           </div>
                         ) : null}
                         {comparison.baselineScores.length > 0 ? (
-                          <AdminMiniPanel title="基线评分" tone="soft" className="mt-3" contentClassName="space-y-2">
+                          <AdminMiniPanel title={t(msg`基线评分`)} tone="soft" className="mt-3" contentClassName="space-y-2">
                               {comparison.baselineScores.map((score) => (
                                 <div key={`baseline-score-${comparison.caseId}-${score.key}`} className="flex items-center justify-between gap-3">
                                   <div className="text-[color:var(--text-primary)]">{score.label}</div>
@@ -2355,15 +2325,15 @@ export function EvalsPage() {
                                   focusCase(comparison.caseId, comparison.baselineTraceIds);
                                 }}
                               >
-                                基线 · {formatTraceSource(traceSourceById.get(traceId) ?? traceId)}
+{t(msg`基线`)} · {formatTraceSource(traceSourceById.get(traceId) ?? traceId)}
                               </Button>
                             ))}
                           </div>
                         ) : null}
                       </AdminMiniPanel>
-                      <AdminMiniPanel title="候选输出">
+                      <AdminMiniPanel title={t(msg`候选输出`)}>
                         <div className="mt-2 whitespace-pre-wrap break-words leading-6 text-[color:var(--text-primary)]">
-                          {comparison.candidateOutput || "空"}
+{comparison.candidateOutput || t(msg`空`)}
                         </div>
                         {comparison.candidateRuleViolations.length > 0 ? (
                           <div className="mt-3 flex flex-wrap gap-2">
@@ -2373,7 +2343,7 @@ export function EvalsPage() {
                           </div>
                         ) : null}
                         {comparison.candidateScores.length > 0 ? (
-                          <AdminMiniPanel title="候选评分" tone="soft" className="mt-3" contentClassName="space-y-2">
+                          <AdminMiniPanel title={t(msg`候选评分`)} tone="soft" className="mt-3" contentClassName="space-y-2">
                               {comparison.candidateScores.map((score) => (
                                 <div key={`candidate-score-${comparison.caseId}-${score.key}`} className="flex items-center justify-between gap-3">
                                   <div className="text-[color:var(--text-primary)]">{score.label}</div>
@@ -2404,7 +2374,7 @@ export function EvalsPage() {
                                   focusCase(comparison.caseId, comparison.candidateTraceIds);
                                 }}
                               >
-                                候选 · {formatTraceSource(traceSourceById.get(traceId) ?? traceId)}
+{t(msg`候选`)} · {formatTraceSource(traceSourceById.get(traceId) ?? traceId)}
                               </Button>
                             ))}
                           </div>
@@ -2417,39 +2387,39 @@ export function EvalsPage() {
             </div>
           ) : (
             <AdminEmptyState
-              title="至少需要两次运行"
-              description="先积累两次可比较的运行记录，才能锁定基线和候选做成对分析。"
+              title={t(msg`至少需要两次运行`)}
+              description={t(msg`先积累两次可比较的运行记录，才能锁定基线和候选做成对分析。`)}
             />
           )}
         </div>
       </Card>
 
       <Card id="eval-traces" className="bg-[color:var(--surface-console)]">
-        <SectionHeading>生成链路</SectionHeading>
+        <SectionHeading>{t(msg`生成链路`)}</SectionHeading>
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <Button
             variant="secondary"
             size="sm"
             onClick={() => setTraceFiltersExpanded((value) => !value)}
           >
-            {traceFiltersExpanded ? "隐藏链路筛选" : "显示链路筛选"}
+{traceFiltersExpanded ? t(msg`隐藏链路筛选`) : t(msg`显示链路筛选`)}
           </Button>
           <div className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-2 text-sm text-[color:var(--text-secondary)]">
-            已启用 {activeTraceFilterCount} 个筛选
+            {t(msg`已启用 ${activeTraceFilterCount} 个筛选`)}
           </div>
         </div>
         <InlineNotice className="mt-4" tone="muted">
-          评测链路用于下钻生成提示词、judge 输出、回退路径和失败标签。可以按运行、对比、用例和来源逐层收窄。
+          {t(msg`评测链路用于下钻生成提示词、judge 输出、回退路径和失败标签。可以按运行、对比、用例和来源逐层收窄。`)}
         </InlineNotice>
         {traceFiltersExpanded ? (
         <div className="mt-4 flex flex-wrap gap-3">
           <AdminPillSelectField value={traceScopeFilter} onChange={(value) => setTraceScopeFilter(value as "all" | "run" | "compare")}>
-            <option value="all">全部链路</option>
-            <option value="run">当前运行链路</option>
-            <option value="compare">当前对比链路</option>
+            <option value="all">{t(msg`全部链路`)}</option>
+            <option value="run">{t(msg`当前运行链路`)}</option>
+            <option value="compare">{t(msg`当前对比链路`)}</option>
           </AdminPillSelectField>
           <AdminPillSelectField value={traceCaseFilter} onChange={setTraceCaseFilter}>
-            <option value="">全部用例</option>
+            <option value="">{t(msg`全部用例`)}</option>
             {availableTraceCaseIds.map((caseId) => (
               <option key={caseId} value={caseId}>
                 {caseId}
@@ -2457,7 +2427,7 @@ export function EvalsPage() {
             ))}
           </AdminPillSelectField>
           <AdminPillSelectField value={traceFailureTagFilter} onChange={setTraceFailureTagFilter}>
-            <option value="">全部失败标签</option>
+            <option value="">{t(msg`全部失败标签`)}</option>
             {availableTraceFailureTags.map((tagKey) => (
               <option key={tagKey} value={tagKey}>
                 {tagKey}
@@ -2465,22 +2435,22 @@ export function EvalsPage() {
             ))}
           </AdminPillSelectField>
           <AdminPillSelectField value={traceSource} onChange={setTraceSource}>
-            <option value="">全部来源</option>
-            <option value="chat.reply">聊天直回</option>
-            <option value="eval.judge">评测裁判</option>
-            <option value="social.greeting">社交打招呼</option>
-            <option value="group.intent">群聊意图判断</option>
-            <option value="group.coordinator">群聊协调回复</option>
-            <option value="memory.summary">记忆摘要</option>
+            <option value="">{t(msg`全部来源`)}</option>
+            <option value="chat.reply">{t(msg`聊天直回`)}</option>
+            <option value="eval.judge">{t(msg`评测裁判`)}</option>
+            <option value="social.greeting">{t(msg`社交打招呼`)}</option>
+            <option value="group.intent">{t(msg`群聊意图判断`)}</option>
+            <option value="group.coordinator">{t(msg`群聊协调回复`)}</option>
+            <option value="memory.summary">{t(msg`记忆摘要`)}</option>
           </AdminPillSelectField>
           <AdminPillSelectField value={traceStatus} onChange={setTraceStatus}>
-            <option value="">全部状态</option>
-            <option value="success">成功</option>
-            <option value="fallback">回退</option>
-            <option value="error">错误</option>
+            <option value="">{t(msg`全部状态`)}</option>
+            <option value="success">{t(msg`成功`)}</option>
+            <option value="fallback">{t(msg`回退`)}</option>
+            <option value="error">{t(msg`错误`)}</option>
           </AdminPillSelectField>
           <AdminPillSelectField value={traceCharacterId} onChange={setTraceCharacterId}>
-            <option value="">全部角色</option>
+            <option value="">{t(msg`全部角色`)}</option>
             {availableCharacterIds.map((characterId) => (
               <option key={characterId} value={characterId ?? ""}>
                 {characterId}
@@ -2494,26 +2464,26 @@ export function EvalsPage() {
               className="border-amber-400/30 bg-amber-500/10 text-amber-100"
               onClick={clearTraceFocus}
             >
-              清除用例聚焦：{focusedCaseId}
+{t(msg`清除用例聚焦`)}：{focusedCaseId}
             </Button>
           ) : null}
         </div>
         ) : null}
         <div className="mt-4 flex flex-wrap gap-3 text-sm text-[color:var(--text-secondary)]">
           <div className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-2">
-            范围总数：{scopedTraces.length}
+            {t(msg`范围总数`)}：{scopedTraces.length}
           </div>
           <div className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-2">
-            当前展示：{displayedTraces.length}
+            {t(msg`当前展示`)}：{displayedTraces.length}
           </div>
           {focusedTraceIds.length > 0 ? (
             <div className="rounded-full border border-amber-400/30 bg-amber-500/10 px-4 py-2 text-amber-100">
-              聚焦命中：{visibleTraces.length}
+              {t(msg`聚焦命中`)}：{visibleTraces.length}
             </div>
           ) : null}
         </div>
         {traceDetailQuery.data ? (
-          <AdminDetailPanel className="mt-4" title="当前链路聚焦">
+          <AdminDetailPanel className="mt-4" title={t(msg`当前链路聚焦`)}>
             <div className="flex flex-wrap items-center gap-3">
               <StatusPill
                 tone={
@@ -2524,13 +2494,13 @@ export function EvalsPage() {
                       : "healthy"
                 }
               >
-                已选链路：{traceDetailQuery.data.id}
+                {t(msg`已选链路：${traceDetailQuery.data.id}`)}
               </StatusPill>
               <StatusPill>{formatTraceSource(traceDetailQuery.data.source)}</StatusPill>
-              {focusedCaseId ? <StatusPill tone="warning">聚焦用例：{focusedCaseId}</StatusPill> : null}
-              {selectedTraceCaseIds.length > 0 ? <StatusPill>关联用例：{selectedTraceCaseIds.length}</StatusPill> : null}
-              {selectedTraceFailureTags.length > 0 ? (
-                <StatusPill tone="warning">失败标签：{selectedTraceFailureTags.length}</StatusPill>
+{focusedCaseId ? <StatusPill tone="warning">{t(msg`聚焦用例`)}：{focusedCaseId}</StatusPill> : null}
+{selectedTraceCaseIds.length > 0 ? <StatusPill>{t(msg`关联用例`)}：{selectedTraceCaseIds.length}</StatusPill> : null}
+{selectedTraceFailureTags.length > 0 ? (
+                <StatusPill tone="warning">{t(msg`失败标签`)}：{selectedTraceFailureTags.length}</StatusPill>
               ) : null}
             </div>
           </AdminDetailPanel>
@@ -2557,22 +2527,22 @@ export function EvalsPage() {
                     {trace.id}
                   </div>
                   <div className="mt-3 grid gap-2">
-                    <div>角色：{trace.characterId ?? "无"}</div>
-                    <div>会话：{trace.conversationId ?? "无"}</div>
-                    <div>创建时间：{trace.createdAt}</div>
+                    <div>{t(msg`角色`)}：{trace.characterId ?? t(msg`无`)}</div>
+                    <div>{t(msg`会话`)}：{trace.conversationId ?? t(msg`无`)}</div>
+                    <div>{t(msg`创建时间`)}：{trace.createdAt}</div>
                   </div>
                 </button>
               ))
             ) : (
               <AdminEmptyState
-                title="当前还没有生成链路"
-                description="先运行数据集或触发一次真实生成，后面才能沿链路下钻到 prompt 和上下文。"
+                title={t(msg`当前还没有生成链路`)}
+                description={t(msg`先运行数据集或触发一次真实生成，后面才能沿链路下钻到 prompt 和上下文。`)}
               />
             )}
           </div>
           <div>
             {traceDetailQuery.data ? (
-              <AdminDetailPanel title="链路输出" contentClassName="space-y-4">
+              <AdminDetailPanel title={t(msg`链路输出`)} contentClassName="space-y-4">
                 <div className="flex items-center justify-between gap-3">
                   <div className="font-semibold text-[color:var(--text-primary)]">{formatTraceSource(traceDetailQuery.data.source)}</div>
                   <div className="flex flex-wrap items-center justify-end gap-2">
@@ -2581,66 +2551,66 @@ export function EvalsPage() {
                     </StatusPill>
                     {traceDetailQuery.data.evaluationSummary?.judgeSource ? (
                       <TagBadge tone={traceDetailQuery.data.evaluationSummary.judgeSource === "llm" ? "success" : traceDetailQuery.data.evaluationSummary.judgeSource === "heuristic" ? "warning" : "info"}>
-                        裁判：{formatJudgeSource(traceDetailQuery.data.evaluationSummary.judgeSource)}
+{t(msg`裁判`)}：{formatJudgeSource(traceDetailQuery.data.evaluationSummary.judgeSource)}
                       </TagBadge>
                     ) : null}
                   </div>
                 </div>
                 <div className="grid gap-2">
-                  <div>链路：{traceDetailQuery.data.id}</div>
-                  <div>角色：{traceDetailQuery.data.characterId ?? "无"}</div>
-                  <div>模型：{traceDetailQuery.data.provider?.model ?? "无"}</div>
-                  <div>耗时：{traceDetailQuery.data.latencyMs ?? 0} ms</div>
+                  <div>{t(msg`链路`)}：{traceDetailQuery.data.id}</div>
+                  <div>{t(msg`角色`)}：{traceDetailQuery.data.characterId ?? t(msg`无`)}</div>
+                  <div>{t(msg`模型`)}：{traceDetailQuery.data.provider?.model ?? t(msg`无`)}</div>
+                  <div>{t(msg`耗时`)}：{traceDetailQuery.data.latencyMs ?? 0} ms</div>
                 </div>
-                <AdminMiniPanel title="筛选命中">
+                <AdminMiniPanel title={t(msg`筛选命中`)}>
                   <div className="mt-2 flex flex-wrap gap-2">
                     <TagBadge>
-                      范围：{formatTraceScope(traceScopeFilter)}
+{t(msg`范围`)}：{formatTraceScope(traceScopeFilter)}
                     </TagBadge>
                     {traceSource ? (
                       <TagBadge>
-                        来源：{formatTraceSource(traceDetailQuery.data.source)}
+{t(msg`来源`)}：{formatTraceSource(traceDetailQuery.data.source)}
                       </TagBadge>
                     ) : null}
                     {traceStatus ? (
                       <TagBadge>
-                        状态：{formatEvalStatus(traceDetailQuery.data.status)}
+{t(msg`状态`)}：{formatEvalStatus(traceDetailQuery.data.status)}
                       </TagBadge>
                     ) : null}
                     {traceCharacterId ? (
                       <TagBadge>
-                        角色：{traceDetailQuery.data.characterId ?? "无"}
+{t(msg`角色`)}：{traceDetailQuery.data.characterId ?? t(msg`无`)}
                       </TagBadge>
                     ) : null}
                     {traceCaseFilter ? (
                       <TagBadge tone="warning">
-                        用例：{selectedTraceCaseIds.join(", ") || "无关联用例"}
+{t(msg`用例`)}：{selectedTraceCaseIds.join(", ") || t(msg`无关联用例`)}
                       </TagBadge>
                     ) : null}
                     {traceFailureTagFilter ? (
                       <TagBadge tone="danger">
-                        失败标签：{selectedTraceFailureTags.join(", ") || "无"}
+{t(msg`失败标签`)}：{selectedTraceFailureTags.join(", ") || t(msg`无`)}
                       </TagBadge>
                     ) : null}
                     {focusedCaseId ? (
                       <TagBadge tone="info">
-                        聚焦用例：{focusedCaseId}
+{t(msg`聚焦用例`)}：{focusedCaseId}
                       </TagBadge>
                     ) : null}
                     {selectedTraceLinkedRunCases.length > 0 ? (
                       <TagBadge tone="success">
-                        选中运行：{selectedTraceLinkedRunCases.join(", ")}
+{t(msg`选中运行`)}：{selectedTraceLinkedRunCases.join(", ")}
                       </TagBadge>
                     ) : null}
                     {selectedTraceComparisonMatches.length > 0 ? (
                       <TagBadge tone="accent">
-                        对比角色：{selectedTraceComparisonMatches.map(formatTraceCompareMatch).join(", ")}
+{t(msg`对比角色`)}：{selectedTraceComparisonMatches.map(formatTraceCompareMatch).join(", ")}
                       </TagBadge>
                     ) : null}
                   </div>
                 </AdminMiniPanel>
                 <div>
-                  <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">提示词消息</div>
+                  <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`提示词消息`)}</div>
                   <div className="mt-2 space-y-2">
                     {traceDetailQuery.data.input.promptMessages.map((message, index) => (
                       <AdminMiniPanel key={`${message.role}-${index}`} title={formatPromptRole(message.role)}>
@@ -2650,39 +2620,40 @@ export function EvalsPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">输出</div>
+                  <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`输出`)}</div>
                   <div className="mt-2 whitespace-pre-wrap break-words rounded-xl border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] p-3 text-[color:var(--text-secondary)]">
                     {traceDetailQuery.data.output.normalizedOutput ??
                       traceDetailQuery.data.output.rawOutput ??
                       traceDetailQuery.data.output.errorMessage ??
-                      "空"}
+                      t(msg`空`)}
                   </div>
                 </div>
                 {traceDetailQuery.data.output.judgePayload ? (
+                  // i18n-ignore-next-line: admin technical label
                   <SnapshotPanel title="Judge JSON" value={traceDetailQuery.data.output.judgePayload} />
                 ) : null}
               </AdminDetailPanel>
             ) : (
               <AdminEmptyState
-                title="先选择一条链路"
-                description="选中左侧链路后，这里会展示提示词消息、筛选命中和标准化输出。"
+                title={t(msg`先选择一条链路`)}
+                description={t(msg`选中左侧链路后，这里会展示提示词消息、筛选命中和标准化输出。`)}
               />
             )}
           </div>
           <div>
             {traceDetailQuery.data ? (
-              <AdminDetailPanel title="链路上下文" contentClassName="space-y-4">
+              <AdminDetailPanel title={t(msg`链路上下文`)} contentClassName="space-y-4">
                 <div className="grid gap-3">
-                  <SnapshotPanel title="请求配置" value={traceDetailQuery.data.input.requestConfig} />
-                  <SnapshotPanel title="世界上下文快照" value={traceDetailQuery.data.input.worldContextSnapshot} />
-                  <SnapshotPanel title="活动快照" value={traceDetailQuery.data.input.activitySnapshot} />
-                  <SnapshotPanel title="记忆快照" value={traceDetailQuery.data.input.memorySnapshot} />
+                  <SnapshotPanel title={t(msg`请求配置`)} value={traceDetailQuery.data.input.requestConfig} />
+                  <SnapshotPanel title={t(msg`世界上下文快照`)} value={traceDetailQuery.data.input.worldContextSnapshot} />
+                  <SnapshotPanel title={t(msg`活动快照`)} value={traceDetailQuery.data.input.activitySnapshot} />
+                  <SnapshotPanel title={t(msg`记忆快照`)} value={traceDetailQuery.data.input.memorySnapshot} />
                 </div>
                 {traceDetailQuery.data.evaluationSummary ? (
                   <>
-                    <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">评测汇总</div>
+                    <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`评测汇总`)}</div>
                     <div className="grid gap-3">
-                      <AdminMiniPanel title="评分">
+                      <AdminMiniPanel title={t(msg`评分`)}>
                         <div className="mt-2 space-y-2">
                           {traceDetailQuery.data.evaluationSummary.scores.map((score) => (
                             <div key={score.key} className="flex items-center justify-between gap-3">
@@ -2692,7 +2663,7 @@ export function EvalsPage() {
                           ))}
                         </div>
                       </AdminMiniPanel>
-                      <AdminMiniPanel title="失败标签">
+                      <AdminMiniPanel title={t(msg`失败标签`)}>
                         <div className="mt-2 flex flex-wrap gap-2">
                           {traceDetailQuery.data.evaluationSummary.failureTags.length > 0 ? (
                             traceDetailQuery.data.evaluationSummary.failureTags.map((tag) => (
@@ -2702,17 +2673,17 @@ export function EvalsPage() {
                               </TagBadge>
                             ))
                           ) : (
-                            <span className="text-[color:var(--text-secondary)]">无</span>
+<span className="text-[color:var(--text-secondary)]">{t(msg`无`)}</span>
                           )}
                         </div>
                       </AdminMiniPanel>
-                      <AdminMiniPanel title="裁判信息">
+                      <AdminMiniPanel title={t(msg`裁判信息`)}>
                         <div className="mt-2 space-y-2 text-sm text-[color:var(--text-secondary)]">
-                          <div>来源：{traceDetailQuery.data.evaluationSummary.judgeSource ? formatJudgeSource(traceDetailQuery.data.evaluationSummary.judgeSource) : "无"}</div>
-                          <div>结论：{traceDetailQuery.data.evaluationSummary.judgeRationale || "无"}</div>
+                          <div>{t(msg`来源`)}：{traceDetailQuery.data.evaluationSummary.judgeSource ? formatJudgeSource(traceDetailQuery.data.evaluationSummary.judgeSource) : t(msg`无`)}</div>
+                          <div>{t(msg`结论`)}：{traceDetailQuery.data.evaluationSummary.judgeRationale || t(msg`无`)}</div>
                           <div>
-                            规则违背：
-                            {traceDetailQuery.data.evaluationSummary.ruleViolations?.length ? ` ${traceDetailQuery.data.evaluationSummary.ruleViolations.join("；")}` : " 无"}
+                            {t(msg`规则违背`)}：
+                            {traceDetailQuery.data.evaluationSummary.ruleViolations?.length ? ` ${traceDetailQuery.data.evaluationSummary.ruleViolations.join("；")}` : t(msg` 无`)}
                           </div>
                         </div>
                       </AdminMiniPanel>
@@ -2720,7 +2691,7 @@ export function EvalsPage() {
                   </>
                 ) : null}
                 {runDetailQuery.data ? (
-                  <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">关联用例</div>
+                  <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">{t(msg`关联用例`)}</div>
                 ) : null}
                 {runDetailQuery.data ? (
                   <div className="flex flex-wrap gap-2">
@@ -2737,15 +2708,15 @@ export function EvalsPage() {
                         </Button>
                       ))}
                     {runDetailQuery.data.caseResults.every((caseResult) => !collectCaseTraceIds(caseResult).includes(traceDetailQuery.data.id)) ? (
-                      <span className="text-[color:var(--text-secondary)]">当前所选运行中无关联用例</span>
+<span className="text-[color:var(--text-secondary)]">{t(msg`当前所选运行中无关联用例`)}</span>
                     ) : null}
                   </div>
                 ) : null}
               </AdminDetailPanel>
             ) : (
               <AdminEmptyState
-                title="先选择一条链路"
-                description="选中后，这里会展示请求配置、世界快照、评测汇总和关联用例。"
+                title={t(msg`先选择一条链路`)}
+                description={t(msg`选中后，这里会展示请求配置、世界快照、评测汇总和关联用例。`)}
               />
             )}
           </div>
@@ -2760,23 +2731,23 @@ export function EvalsPage() {
 function formatEvalStatus(status: string) {
   switch (status) {
     case "queued":
-      return "排队中";
+      return translateRuntimeMessage(msg`排队中`);
     case "running":
-      return "运行中";
+      return translateRuntimeMessage(msg`运行中`);
     case "passed":
-      return "通过";
+      return translateRuntimeMessage(msg`通过`);
     case "failed":
-      return "失败";
+      return translateRuntimeMessage(msg`失败`);
     case "success":
-      return "成功";
+      return translateRuntimeMessage(msg`成功`);
     case "fallback":
-      return "回退";
+      return translateRuntimeMessage(msg`回退`);
     case "error":
-      return "错误";
+      return translateRuntimeMessage(msg`错误`);
     case "scaffolded":
-      return "脚手架";
+      return translateRuntimeMessage(msg`脚手架`);
     case "completed":
-      return "已完成";
+      return translateRuntimeMessage(msg`已完成`);
     default:
       return status;
   }
@@ -2785,13 +2756,13 @@ function formatEvalStatus(status: string) {
 function formatEvalMode(mode: string) {
   switch (mode) {
     case "single":
-      return "单次";
+      return translateRuntimeMessage(msg`单次`);
     case "pairwise":
-      return "成对";
+      return translateRuntimeMessage(msg`成对`);
     case "replay":
-      return "回放";
+      return translateRuntimeMessage(msg`回放`);
     case "persona_gate":
-      return "角色门控";
+      return translateRuntimeMessage(msg`角色门控`);
     default:
       return mode;
   }
@@ -2800,11 +2771,11 @@ function formatEvalMode(mode: string) {
 function formatCompareOutcome(outcome: string) {
   switch (outcome) {
     case "win":
-      return "候选胜出";
+      return translateRuntimeMessage(msg`候选胜出`);
     case "lose":
-      return "候选落后";
+      return translateRuntimeMessage(msg`候选落后`);
     case "tie":
-      return "持平";
+      return translateRuntimeMessage(msg`持平`);
     default:
       return outcome;
   }
@@ -2813,11 +2784,11 @@ function formatCompareOutcome(outcome: string) {
 function formatCompareCaseFilter(filter: "all" | "different" | "failed") {
   switch (filter) {
     case "all":
-      return "全部用例";
+      return translateRuntimeMessage(msg`全部用例`);
     case "different":
-      return "仅差异用例";
+      return translateRuntimeMessage(msg`仅差异用例`);
     case "failed":
-      return "仅失败用例";
+      return translateRuntimeMessage(msg`仅失败用例`);
     default:
       return filter;
   }
@@ -2826,13 +2797,13 @@ function formatCompareCaseFilter(filter: "all" | "different" | "failed") {
 function formatCompareOutcomeFilter(filter: "all" | "win" | "lose" | "tie") {
   switch (filter) {
     case "all":
-      return "全部结果";
+      return translateRuntimeMessage(msg`全部结果`);
     case "win":
-      return "候选胜出";
+      return translateRuntimeMessage(msg`候选胜出`);
     case "lose":
-      return "候选落后";
+      return translateRuntimeMessage(msg`候选落后`);
     case "tie":
-      return "持平";
+      return translateRuntimeMessage(msg`持平`);
     default:
       return filter;
   }
@@ -2841,11 +2812,11 @@ function formatCompareOutcomeFilter(filter: "all" | "win" | "lose" | "tie") {
 function formatTraceScope(scope: "all" | "run" | "compare") {
   switch (scope) {
     case "all":
-      return "全部链路";
+      return translateRuntimeMessage(msg`全部链路`);
     case "run":
-      return "当前运行";
+      return translateRuntimeMessage(msg`当前运行`);
     case "compare":
-      return "当前对比";
+      return translateRuntimeMessage(msg`当前对比`);
     default:
       return scope;
   }
@@ -2854,17 +2825,17 @@ function formatTraceScope(scope: "all" | "run" | "compare") {
 function formatTraceSource(source: string) {
   switch (source) {
     case "chat.reply":
-      return "聊天直回";
+      return translateRuntimeMessage(msg`聊天直回`);
     case "eval.judge":
-      return "评测裁判";
+      return translateRuntimeMessage(msg`评测裁判`);
     case "social.greeting":
-      return "社交打招呼";
+      return translateRuntimeMessage(msg`社交打招呼`);
     case "group.intent":
-      return "群聊意图判断";
+      return translateRuntimeMessage(msg`群聊意图判断`);
     case "group.coordinator":
-      return "群聊协调回复";
+      return translateRuntimeMessage(msg`群聊协调回复`);
     case "memory.summary":
-      return "记忆摘要";
+      return translateRuntimeMessage(msg`记忆摘要`);
     default:
       return source;
   }
@@ -2873,11 +2844,11 @@ function formatTraceSource(source: string) {
 function formatJudgeSource(source: string) {
   switch (source) {
     case "llm":
-      return "LLM 裁判";
+      return translateRuntimeMessage(msg`LLM 裁判`);
     case "heuristic":
-      return "启发式兜底";
+      return translateRuntimeMessage(msg`启发式兜底`);
     case "scaffolded":
-      return "未正式判分";
+      return translateRuntimeMessage(msg`未正式判分`);
     default:
       return source;
   }
@@ -2899,13 +2870,13 @@ function collectGenerationTraceIds(caseResult: { traceIds: string[]; judgeTraceI
 function formatEvalTargetType(targetType: string) {
   switch (targetType) {
     case "turn":
-      return "单轮";
+      return translateRuntimeMessage(msg`单轮`);
     case "session":
-      return "会话";
+      return translateRuntimeMessage(msg`会话`);
     case "world_event_chain":
-      return "世界事件链";
+      return translateRuntimeMessage(msg`世界事件链`);
     case "persona":
-      return "人设";
+      return translateRuntimeMessage(msg`人设`);
     default:
       return targetType;
   }
@@ -2914,11 +2885,11 @@ function formatEvalTargetType(targetType: string) {
 function formatPromptRole(role: string) {
   switch (role) {
     case "system":
-      return "系统";
+      return translateRuntimeMessage(msg`系统`);
     case "user":
-      return "用户";
+      return translateRuntimeMessage(msg`用户`);
     case "assistant":
-      return "助手";
+      return translateRuntimeMessage(msg`助手`);
     default:
       return role;
   }
@@ -2929,7 +2900,7 @@ function formatPromptVariantValue(
   labelMap: Map<string, string>,
 ) {
   if (!value) {
-    return "默认";
+    return translateRuntimeMessage(msg`默认`);
   }
 
   return labelMap.get(value) ?? value;
@@ -2940,7 +2911,7 @@ function formatMemoryStrategyValue(
   labelMap: Map<string, string>,
 ) {
   if (!value || value === "default") {
-    return "默认";
+    return translateRuntimeMessage(msg`默认`);
   }
 
   return labelMap.get(value) ?? value;
@@ -2952,19 +2923,19 @@ function formatTraceCompareMatch(value: string) {
     return value;
   }
 
-  return `${side === "baseline" ? "基线" : side === "candidate" ? "候选" : side} · ${caseId}`;
+  return `${side === "baseline" ? translateRuntimeMessage(msg`基线`) : side === "candidate" ? translateRuntimeMessage(msg`候选`) : side} · ${caseId}`;
 }
 
 function formatDecisionStatus(status: "keep-testing" | "promote" | "rollback" | "archive") {
   switch (status) {
     case "keep-testing":
-      return "继续测试";
+      return translateRuntimeMessage(msg`继续测试`);
     case "promote":
-      return "采用候选";
+      return translateRuntimeMessage(msg`采用候选`);
     case "rollback":
-      return "回滚";
+      return translateRuntimeMessage(msg`回滚`);
     case "archive":
-      return "归档";
+      return translateRuntimeMessage(msg`归档`);
     default:
       return status;
   }
@@ -3114,4 +3085,3 @@ function setQueryParam(params: URLSearchParams, key: string, value: string | nul
   }
   params.set(key, value);
 }
-// i18n-ignore-end

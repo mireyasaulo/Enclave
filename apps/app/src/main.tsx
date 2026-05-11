@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import {
@@ -16,6 +17,11 @@ import { bootstrapAnalytics } from "./lib/analytics-bootstrap";
 import { queryClient } from "./lib/query-client";
 import { configureContractsRuntime } from "./lib/runtime-config";
 import {
+  clearUserScopedClientState,
+  readPersistedOwnerIdentity,
+  writePersistedOwnerIdentity,
+} from "./lib/user-scoped-state";
+import {
   readDesktopLocalePreference,
   readNativeLocalePreference,
   syncNativeLocalePreference,
@@ -26,7 +32,10 @@ import { registerAppServiceWorker } from "./runtime/register-service-worker";
 import { bootstrapAndroid } from "./runtime/adapters/android";
 import { bootstrapIos } from "./runtime/adapters/ios";
 import { router } from "./router";
-import { hydrateCloudSessionStore } from "./store/cloud-session-store";
+import {
+  hydrateCloudSessionStore,
+  refreshCloudSessionIfNeeded,
+} from "./store/cloud-session-store";
 import { hydrateNativeRuntimeConfig } from "./runtime/runtime-config-store";
 
 const VITE_PRELOAD_RECOVERY_KEY = "yinjie-app-vite-preload-recovery";
@@ -85,7 +94,21 @@ async function bootstrap() {
   void bootstrapIos();
   void bootstrapAndroid();
   const runtimeConfig = await hydrateNativeRuntimeConfig();
-  await hydrateCloudSessionStore();
+  const cloudSession = await hydrateCloudSessionStore();
+  // 身份哨兵：electronic 客户端持久化的"已登录用户身份"跟 hydrate 出来的 cloud
+  // session 不一致时（比如旧版本切号没清干净、用户跨版本登录、手动改过
+  // localStorage），把所有 user-scoped 状态硬清一遍走 /welcome 重新登录。电话
+  // 登录的 phone 字段保存在 cloud-session-store 里，邮箱 / Google 登录时 phone
+  // 为空，那条路径靠 welcome-page 在 verify code 成功后做对账。
+  if (cloudSession.phone) {
+    const expectedIdentity = `phone:${cloudSession.phone}`;
+    const persistedIdentity = readPersistedOwnerIdentity();
+    if (!persistedIdentity) {
+      writePersistedOwnerIdentity(expectedIdentity);
+    } else if (persistedIdentity !== expectedIdentity) {
+      await clearUserScopedClientState({ queryClient });
+    }
+  }
   const androidLocalePreference = await readNativeLocalePreference();
   const desktopLocalePreference = androidLocalePreference
     ? null
@@ -93,6 +116,12 @@ async function bootstrap() {
   const nativeLocalePreference =
     androidLocalePreference ?? desktopLocalePreference;
   configureContractsRuntime();
+  // Sliding TTL：boot 时检查一次，再每小时复查；token 临到期 (剩余 < 1d)
+  // 自动调 cloud-api refresh-access 续命，过期则不动让登录流程兜底。
+  void refreshCloudSessionIfNeeded();
+  setInterval(() => {
+    void refreshCloudSessionIfNeeded();
+  }, 60 * 60 * 1000).unref?.();
   bootstrapAnalytics();
   const preferredLocales = [
     ...(nativeLocalePreference?.preferredLocales ?? []),
@@ -135,9 +164,13 @@ async function bootstrap() {
           hasExplicitWebLocalePreference={Boolean(explicitWebLocalePreference)}
         />
         <QueryClientProvider client={queryClient}>
-          <Suspense fallback={<BootstrapScreen />}>
-            <RouterProvider router={router} />
-          </Suspense>
+          <GoogleOAuthProvider
+            clientId={import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID ?? ""}
+          >
+            <Suspense fallback={<BootstrapScreen />}>
+              <RouterProvider router={router} />
+            </Suspense>
+          </GoogleOAuthProvider>
         </QueryClientProvider>
       </AppLocaleProvider>
     </React.StrictMode>,

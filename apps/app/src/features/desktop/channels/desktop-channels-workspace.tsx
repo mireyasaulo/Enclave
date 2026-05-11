@@ -29,18 +29,20 @@ import {
   ChevronRight,
   ChevronUp,
   MessageCircleMore,
-  PlaySquare,
   RadioTower,
   RefreshCcw,
   Share2,
   ThumbsUp,
+  Volume2,
+  VolumeX,
   X,
 } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
+import { AudioCard } from "../../../components/audio-card";
 import { EmptyState } from "../../../components/empty-state";
-import { ExpandableText } from "../../../components/expandable-text";
 import { FeatureUnavailableDialog } from "../../../components/feature-unavailable-dialog";
 import { formatTimestamp } from "../../../lib/format";
+import { resolveAppMediaUrl } from "../../../lib/media-url";
 
 type DesktopChannelsWorkspaceProps = {
   activeSection: FeedChannelHomeSection;
@@ -375,6 +377,7 @@ export function DesktopChannelsWorkspace({
                 <ChannelFeedSlide
                   key={post.id}
                   post={post}
+                  isActive={post.id === selectedPost?.id}
                   registerSlide={registerSlide}
                   isFavorite={isPostFavorite(post.id)}
                   likePending={likePendingPostId === post.id}
@@ -512,8 +515,169 @@ function ChannelActionButton({
   );
 }
 
+function ChannelMediaSurface({
+  post,
+  isActive,
+}: {
+  post: FeedPostListItem;
+  isActive: boolean;
+}) {
+  const t = useRuntimeTranslator();
+  const audioAsset = post.media?.find((asset) => asset.kind === "audio");
+  const videoAsset = post.media?.find((asset) => asset.kind === "video");
+
+  if (post.mediaType === "audio" && (audioAsset || post.mediaUrl)) {
+    const backgroundCover = resolveAppMediaUrl(
+      audioAsset?.posterUrl ?? post.coverUrl ?? undefined,
+    );
+    return (
+      <div className="relative flex flex-1 items-center justify-center bg-gradient-to-b from-[#1f2533] to-[#0a0c10] px-6">
+        {backgroundCover ? (
+          // 浮在背景里的封面图（半透明），给音乐贴一些视觉氛围
+          <img
+            src={backgroundCover}
+            alt={post.title ?? ""}
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30 blur-[1px]"
+          />
+        ) : null}
+        <div className="relative">
+          <AudioCard
+            url={audioAsset?.url ?? post.mediaUrl ?? ""}
+            posterUrl={audioAsset?.posterUrl ?? post.coverUrl ?? undefined}
+            title={
+              audioAsset?.title ?? post.title ?? `${post.authorName}·${t(msg`音乐`)}`
+            }
+            durationMs={audioAsset?.durationMs ?? post.durationMs ?? undefined}
+            variant="feed"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (post.mediaType === "video" && (videoAsset?.url || post.mediaUrl)) {
+    const resolvedPoster = resolveAppMediaUrl(
+      videoAsset?.posterUrl ?? post.coverUrl ?? undefined,
+    );
+    return (
+      <ChannelVideoPlayer
+        url={resolveAppMediaUrl(videoAsset?.url ?? post.mediaUrl ?? "")}
+        posterUrl={resolvedPoster || undefined}
+        isActive={isActive}
+      />
+    );
+  }
+
+  return (
+    <div className="flex flex-1 items-center justify-center text-center">
+      <div className="px-6">
+        <div className="text-[16px] font-semibold text-white">
+          {t(msg`暂无可播放内容`)}
+        </div>
+        <div className="mt-2 text-[13px] leading-6 text-white/72">
+          {t(msg`稍后再来看看`)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChannelVideoPlayer({
+  url,
+  posterUrl,
+  isActive,
+}: {
+  url: string;
+  posterUrl?: string;
+  isActive: boolean;
+}) {
+  const t = useRuntimeTranslator();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [muted, setMuted] = useState(true);
+
+  // React 的 muted prop 是异步设到 DOM 上的，浏览器评估 autoplay 时可能还没 muted →
+  // autoplay 被策略拦截。用 callback ref 在 React 把 element 挂到 DOM 之前就把
+  // muted 同步到 IDL 属性上。参考 facebook/react#10389。
+  const setVideoNode = (node: HTMLVideoElement | null) => {
+    videoRef.current = node;
+    if (node) {
+      node.muted = true;
+      node.defaultMuted = true;
+    }
+  };
+
+  // 进入视口的 slide 自动播放，离开的暂停。
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    if (isActive) {
+      const playResult = video.play();
+      if (playResult && typeof playResult.catch === "function") {
+        playResult.catch(() => {
+          // 自动播放被阻断时静默失败；用户点击切换静音会再次触发 play。
+        });
+      }
+    } else {
+      video.pause();
+      video.currentTime = 0;
+    }
+  }, [isActive, url]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+    video.muted = muted;
+    if (!muted && isActive) {
+      const playResult = video.play();
+      if (playResult && typeof playResult.catch === "function") {
+        playResult.catch(() => {
+          // 取消静音后若浏览器仍阻断，回退到静音继续播放。
+          setMuted(true);
+        });
+      }
+    }
+  }, [muted, isActive]);
+
+  return (
+    <>
+      <video
+        ref={setVideoNode}
+        // key 让 src 变化时强制重建 video element，避免上一个视频的 buffered range 干扰
+        key={url}
+        src={url}
+        poster={posterUrl}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        onClick={() => setMuted((current) => !current)}
+        className="absolute inset-0 h-full w-full cursor-pointer bg-black object-contain"
+      />
+      <button
+        type="button"
+        aria-label={muted ? t(msg`取消静音`) : t(msg`静音`)}
+        aria-pressed={!muted}
+        onClick={(event) => {
+          event.stopPropagation();
+          setMuted((current) => !current);
+        }}
+        className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/22 bg-black/45 text-white backdrop-blur-sm transition hover:bg-black/65"
+      >
+        {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+      </button>
+    </>
+  );
+}
+
 function ChannelFeedSlide({
   post,
+  isActive,
   registerSlide,
   isFavorite,
   likePending,
@@ -525,6 +689,7 @@ function ChannelFeedSlide({
   onToggleFavorite,
 }: {
   post: FeedPostListItem;
+  isActive: boolean;
   registerSlide: (postId: string, node: HTMLDivElement | null) => void;
   isFavorite: boolean;
   likePending: boolean;
@@ -544,16 +709,7 @@ function ChannelFeedSlide({
     >
       <div className="flex max-h-full items-end gap-4">
         <article className="relative flex aspect-[9/16] h-[min(82vh,800px)] flex-shrink-0 overflow-hidden rounded-[20px] bg-[#0d0e12] shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
-          <div className="flex flex-1 items-center justify-center text-center">
-            <div className="px-6">
-              <div className="text-[16px] font-semibold text-white">
-                {t(msg`视频功能正在开发中`)}
-              </div>
-              <div className="mt-2 text-[13px] leading-6 text-white/72">
-                {t(msg`敬请期待`)}
-              </div>
-            </div>
-          </div>
+          <ChannelMediaSurface post={post} isActive={isActive} />
           <div className="pointer-events-none absolute left-4 top-4 rounded-md bg-[rgba(15,23,42,0.68)] px-2.5 py-1 text-[11px] font-medium text-white">
             {t(msg`视频号推荐`)}
           </div>

@@ -114,13 +114,13 @@ export default async function ChangelogPage({
               </a>
             </header>
             <p className="mt-3 text-(--text-secondary)">
-              {i18n._(release.headlineZh)}
+              {i18n._(release.headline)}
             </p>
 
-            {release.sections.map((section) => (
-              <section key={section.titleZh} className="mt-6">
+            {release.sections.map((section, sIdx) => (
+              <section key={sIdx} className="mt-6">
                 <h3 className="text-lg font-semibold text-(--text-primary)">
-                  {i18n._(section.titleZh)}
+                  {i18n._(section.title)}
                 </h3>
                 <ul className="mt-3 list-disc space-y-2 pl-5 text-(--text-secondary) leading-7">
                   {section.items.map((item, idx) => (

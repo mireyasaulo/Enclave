@@ -13,6 +13,8 @@ import { AuthModule } from '../auth/auth.module';
 import { SocialModule } from '../social/social.module';
 import { CyberAvatarModule } from '../cyber-avatar/cyber-avatar.module';
 import { SystemConfigModule } from '../config/config.module';
+import { MinimaxModule } from '../minimax/minimax.module';
+import { FeedMinimaxCallbacks } from './feed-minimax.callbacks';
 
 @Module({
   imports: [
@@ -29,8 +31,9 @@ import { SystemConfigModule } from '../config/config.module';
     SocialModule,
     SystemConfigModule,
     forwardRef(() => CyberAvatarModule),
+    MinimaxModule,
   ],
-  providers: [FeedService],
+  providers: [FeedService, FeedMinimaxCallbacks],
   controllers: [FeedController],
   exports: [FeedService],
 })

@@ -127,6 +127,7 @@ async function createTestDataSource() {
       WorldLifecycleJobEntity,
       WorldAccessSessionEntity,
       WaitingSessionSyncTaskEntity,
+      CloudUserEntity,
     ],
     synchronize: true,
   });

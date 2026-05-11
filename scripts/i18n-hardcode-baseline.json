@@ -19,17 +19,17 @@
     },
     "apps/app/src": {
       "rules": {
-        "jsx-literal-prop": 41,
+        "jsx-literal-prop": 0,
         "object-ui-string": 0,
-        "jsx-cjk-text": 2,
+        "jsx-cjk-text": 0,
         "toast-dialog-string": 0,
-        "setter-message-string": 4,
-        "literal-error-message": 1,
-        "intl-locale-literal": 1,
+        "setter-message-string": 0,
+        "literal-error-message": 0,
+        "intl-locale-literal": 0,
         "locale-compare-literal": 0,
         "speech-lang-literal": 0,
         "prompt-locale-instruction": 0,
-        "raw-cjk-line": 99
+        "raw-cjk-line": 0
       }
     },
     "apps/admin/src": {

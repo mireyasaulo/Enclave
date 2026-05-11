@@ -60,6 +60,9 @@ api/storage/ai-speech/
 runtime-data/app-web-nginx/
 cloud-platform.sqlite
 cloud-platform.sqlite-journal
+cloud-platform.sqlite.bak-*
+cloud-platform.sqlite.legacy
+apps/cloud-api/cloud-platform.sqlite*
 
 # Logs
 logs/

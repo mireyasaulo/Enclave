@@ -7,7 +7,15 @@ import {
 } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { Button, ErrorBlock, LoadingBlock, TextField, cn } from "@yinjie/ui";
-import { Bot, Heart, MessageCircle, Star, UserRound, X } from "lucide-react";
+import {
+  Bot,
+  Heart,
+  MessageCircle,
+  Share2,
+  Star,
+  UserRound,
+  X,
+} from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { MomentMediaGallery } from "../../../components/moment-media-gallery";
 import {
@@ -34,6 +42,8 @@ type DesktopFeedRowProps = {
   onCommentSubmit: () => void;
   onExpand: () => void;
   onLike: () => void;
+  /** 可选 — 触发"分享图卡"。 */
+  onShare?: () => void;
   onStartCommentReply?: (comment: FeedComment) => void;
   onToggleFavorite: () => void;
 };
@@ -55,6 +65,7 @@ export function DesktopFeedRow({
   onCommentSubmit,
   onExpand,
   onLike,
+  onShare,
   onStartCommentReply,
   onToggleFavorite,
 }: DesktopFeedRowProps) {
@@ -117,11 +128,6 @@ export function DesktopFeedRow({
                   ? t(msg`居民`)
                   : t(msg`世界主人`)}
               </span>
-              {post.aiReacted ? (
-                <span className="rounded-md border border-[rgba(7,193,96,0.12)] bg-white px-2 py-1 text-[10px] font-medium text-[color:var(--text-primary)] shadow-[inset_0_-2px_0_0_var(--brand-primary)]">
-                  {t(msg`AI 已回应`)}
-                </span>
-              ) : null}
             </div>
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[color:var(--text-muted)]">
               <span>{formatTimestamp(post.createdAt)}</span>
@@ -162,6 +168,15 @@ export function DesktopFeedRow({
               </button>
               <button
                 type="button"
+                onClick={expanded ? onCollapse : onExpand}
+                aria-pressed={expanded}
+                className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[color:var(--border-faint)] px-2.5 text-[12px] text-[color:var(--text-secondary)] transition-[background-color,color,border-color] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
+              >
+                <MessageCircle size={14} />
+                {t(msg`评论`)}
+              </button>
+              <button
+                type="button"
                 onClick={onToggleFavorite}
                 className={cn(
                   "inline-flex h-8 items-center gap-1.5 rounded-xl border px-2.5 text-[12px] transition-[background-color,color,border-color]",
@@ -173,6 +188,17 @@ export function DesktopFeedRow({
                 <Star size={14} className={favorite ? "fill-current" : ""} />
                 {favorite ? t(msg`已收藏`) : t(msg`收藏`)}
               </button>
+              {onShare ? (
+                <button
+                  type="button"
+                  onClick={onShare}
+                  aria-label={t(msg`生成分享图卡`)}
+                  className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[color:var(--border-faint)] px-2.5 text-[12px] text-[color:var(--text-secondary)] transition-[background-color,color,border-color] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
+                >
+                  <Share2 size={14} />
+                  {t(msg`分享图卡`)}
+                </button>
+              ) : null}
             </div>
           </div>
 
@@ -387,13 +413,8 @@ function CommentRow({
   replyToName: string | null;
 }) {
   const t = useRuntimeTranslator();
-  return (
-    <div
-      className={cn(
-        "rounded-[10px]",
-        active ? "bg-[rgba(7,193,96,0.06)] px-2 py-1.5" : null,
-      )}
-    >
+  const body = (
+    <>
       <div className="flex items-center gap-2 text-[12px]">
         <span className="font-medium text-[#07c160]">
           {comment.authorName}
@@ -428,17 +449,25 @@ function CommentRow({
         ) : null}
         <span className="text-[color:var(--text-primary)]">{comment.text}</span>
       </div>
-      {canReply ? (
-        <div className="mt-1 flex justify-end">
-          <button
-            type="button"
-            onClick={onStartReply}
-            className="rounded-full border border-[color:var(--border-faint)] bg-white px-2.5 py-0.5 text-[11px] text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)]"
-          >
-            {t(msg`回复`)}
-          </button>
-        </div>
-      ) : null}
-    </div>
+    </>
+  );
+
+  if (!canReply) {
+    return <div className="rounded-[10px] px-2 py-1.5">{body}</div>;
+  }
+  return (
+    <button
+      type="button"
+      onClick={onStartReply}
+      title={t(msg`回复这条评论`)}
+      className={cn(
+        "block w-full rounded-[10px] px-2 py-1.5 text-left transition-colors",
+        active
+          ? "bg-[rgba(7,193,96,0.12)]"
+          : "hover:bg-[color:var(--surface-console)]",
+      )}
+    >
+      {body}
+    </button>
   );
 }

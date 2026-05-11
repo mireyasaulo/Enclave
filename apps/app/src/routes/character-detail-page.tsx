@@ -174,8 +174,8 @@ export function CharacterDetailPage() {
     queryFn: () => getFriends(baseUrl),
   });
   const friendRequestsQuery = useQuery({
-    queryKey: ["app-friend-requests", baseUrl],
-    queryFn: () => getFriendRequests(baseUrl),
+    queryKey: ["app-friend-requests", baseUrl, "all"],
+    queryFn: () => getFriendRequests(baseUrl, { direction: "all" }),
   });
   const blockedQuery = useQuery({
     queryKey: ["app-chat-details-blocked", baseUrl],
@@ -249,9 +249,15 @@ export function CharacterDetailPage() {
   const isBlocked = (blockedQuery.data ?? []).some(
     (item) => item.characterId === characterId,
   );
-  const hasPendingFriendRequest = (friendRequestsQuery.data ?? []).some(
+  const pendingFriendRequest = (friendRequestsQuery.data ?? []).find(
     (item) => item.characterId === characterId && item.status === "pending",
   );
+  const hasInboundFriendRequest =
+    !!pendingFriendRequest && !pendingFriendRequest.acceptAt;
+  const hasOutboundFriendRequest =
+    !!pendingFriendRequest && !!pendingFriendRequest.acceptAt;
+  const hasPendingFriendRequest =
+    hasInboundFriendRequest || hasOutboundFriendRequest;
   const unsetLabel = t(msg`未设置`);
   const worldContactLabel = t(msg`世界联系人`);
   const worldRoleLabel = t(msg`世界角色`);
@@ -288,6 +294,7 @@ export function CharacterDetailPage() {
   const voiceCallLabel = t(msg`语音通话`);
   const audioVideoCallLabel = t(msg`音视频通话`);
   const viewFriendRequestLabel = t(msg`查看好友申请`);
+  const awaitingAcceptanceLabel = t(msg`等待对方通过`);
   const sendingLabel = t(msg`发送中...`);
   const addToContactsLabel = t(msg`添加到通讯录`);
   const profileSectionTitle = t(msg`资料`);
@@ -820,7 +827,7 @@ export function CharacterDetailPage() {
     setMobileSheetAction("delete");
   };
   const handleAddToContacts = () => {
-    if (hasPendingFriendRequest) {
+    if (hasInboundFriendRequest) {
       if (isDesktopLayout) {
         void navigate({
           to: "/tabs/contacts",
@@ -1551,15 +1558,18 @@ export function CharacterDetailPage() {
                       }}
                       className="h-11 rounded-[12px] bg-[#07c160] text-[15px] text-white shadow-none hover:bg-[#06ad56]"
                       disabled={
-                        sendFriendRequestMutation.isPending &&
-                        !hasPendingFriendRequest
+                        hasOutboundFriendRequest ||
+                        (sendFriendRequestMutation.isPending &&
+                          !hasPendingFriendRequest)
                       }
                     >
-                      {hasPendingFriendRequest
-                        ? viewFriendRequestLabel
-                        : sendFriendRequestMutation.isPending
-                          ? sendingLabel
-                          : addToContactsLabel}
+                      {hasOutboundFriendRequest
+                        ? awaitingAcceptanceLabel
+                        : hasInboundFriendRequest
+                          ? viewFriendRequestLabel
+                          : sendFriendRequestMutation.isPending
+                            ? sendingLabel
+                            : addToContactsLabel}
                     </Button>
                   )}
                 </div>
@@ -1892,15 +1902,18 @@ export function CharacterDetailPage() {
               <MobileProfileActionButton
                 primary
                 label={
-                  hasPendingFriendRequest
-                    ? viewFriendRequestLabel
-                    : sendFriendRequestMutation.isPending
-                      ? sendingLabel
-                      : addToContactsLabel
+                  hasOutboundFriendRequest
+                    ? awaitingAcceptanceLabel
+                    : hasInboundFriendRequest
+                      ? viewFriendRequestLabel
+                      : sendFriendRequestMutation.isPending
+                        ? sendingLabel
+                        : addToContactsLabel
                 }
                 disabled={
-                  sendFriendRequestMutation.isPending &&
-                  !hasPendingFriendRequest
+                  hasOutboundFriendRequest ||
+                  (sendFriendRequestMutation.isPending &&
+                    !hasPendingFriendRequest)
                 }
                 onClick={() => {
                   setNotice(null);

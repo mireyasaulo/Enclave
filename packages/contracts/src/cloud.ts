@@ -135,6 +135,20 @@ export interface VerifyEmailCodeResponse {
   expiresAt: string;
 }
 
+export interface VerifyGoogleIdTokenRequest {
+  idToken: string;
+  inviteCode?: string;
+  deviceFingerprint?: string;
+}
+
+export interface VerifyGoogleIdTokenResponse {
+  accessToken: string;
+  email: string;
+  expiresAt: string;
+  displayName: string | null;
+  avatarUrl: string | null;
+}
+
 export interface IssueCloudAdminAccessTokenResponse {
   accessToken: string;
   expiresAt: string;

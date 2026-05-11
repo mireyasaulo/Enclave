@@ -8,7 +8,7 @@ import {
   declineFriendRequest,
   getFriendRequests,
 } from "@yinjie/contracts";
-import { useRuntimeTranslator } from "@yinjie/i18n";
+import { getActiveLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice, cn } from "@yinjie/ui";
 
 type Translator = ReturnType<typeof useRuntimeTranslator>;
@@ -481,9 +481,11 @@ function formatFriendRequestDate(t: Translator, createdAt: string) {
     return t(msg`今天`);
   }
 
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${month}-${day}`;
+  const formatter = new Intl.DateTimeFormat(getActiveLocale(), {
+    month: "2-digit",
+    day: "2-digit",
+  });
+  return formatter.format(date).replace(/\//g, "-");
 }
 
 function MobileFriendRequestsStatusCard({

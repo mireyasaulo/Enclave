@@ -99,16 +99,16 @@ export function ProfilePage() {
         title={t(msg`我`)}
         titleAlign="center"
         rightActions={
-          <button
-            type="button"
+          <Link
+            to={settingsPath as never}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[color:var(--text-primary)] transition-colors active:bg-black/[0.05]"
+            aria-label={t(msg`打开设置`)}
             onClick={() => {
               void navigate({ to: settingsPath });
             }}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[color:var(--text-primary)] transition-colors active:bg-black/[0.05]"
-            aria-label={t(msg`打开设置`)}
           >
             <Settings size={17} />
-          </button>
+          </Link>
         }
       />
 

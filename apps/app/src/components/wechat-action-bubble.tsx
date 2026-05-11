@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { msg } from "@lingui/macro";
-import { Heart, MessageCircle } from "lucide-react";
+import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 
 const t = translateRuntimeMessage;
@@ -12,6 +12,12 @@ type WeChatActionBubbleProps = {
   liked: boolean;
   onLike: () => void;
   onComment: () => void;
+  /**
+   * 可选 — 提供时气泡里多出一个「分享」入口（导出图卡）。
+   * 大多数地方（自己的朋友圈/朋友的朋友圈）都希望有；某些受限场景
+   * （比如不可分享的内容）不传即可隐藏。
+   */
+  onShare?: () => void;
   onClose: () => void;
 };
 
@@ -21,6 +27,7 @@ export function WeChatActionBubble({
   liked,
   onLike,
   onComment,
+  onShare,
   onClose,
 }: WeChatActionBubbleProps) {
   const [mounted, setMounted] = useState(false);
@@ -119,6 +126,23 @@ export function WeChatActionBubble({
         <MessageCircle size={14} />
         <span>{t(msg`评论`)}</span>
       </button>
+      {onShare ? (
+        <>
+          <span className="my-1.5 w-px bg-white/25" aria-hidden="true" />
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onShare();
+              onClose();
+            }}
+            className="flex items-center gap-1 px-3.5 transition-colors active:bg-black/30"
+          >
+            <Share2 size={14} />
+            <span>{t(msg`分享`)}</span>
+          </button>
+        </>
+      ) : null}
 
       <span
         aria-hidden="true"

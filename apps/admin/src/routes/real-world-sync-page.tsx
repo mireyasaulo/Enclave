@@ -1,8 +1,9 @@
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import type {
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   RealWorldDigestRecord,
   RealWorldNewsBulletinSlot,
   RealWorldSignalRecord,
@@ -45,83 +46,83 @@ type DetailTab = "digest" | "signals" | "runs";
 type RulesTab = "strategy" | "sources" | "prompts";
 type CharacterListFilter = "all" | "attention" | "newsdesk";
 
-const APPLY_MODE_LABELS: Record<string, string> = {
-  disabled: "关闭",
-  shadow: "影子模式",
-  live: "直接生效",
-  manual: "人工查看",
+const APPLY_MODE_LABELS: Record<string, ReturnType<typeof msg>> = {
+  disabled: msg`关闭`,
+  shadow: msg`影子模式`,
+  live: msg`直接生效`,
+  manual: msg`人工查看`,
 };
 
-const PROVIDER_MODE_LABELS: Record<string, string> = {
-  google_news_rss: "Google News RSS",
-  mock: "Mock 回退",
+const PROVIDER_MODE_LABELS: Record<string, ReturnType<typeof msg>> = {
+  google_news_rss: msg`Google News RSS`,
+  mock: msg`Mock 回退`,
 };
 
-const SUBJECT_TYPE_LABELS: Record<string, string> = {
-  living_public_figure: "现实公众人物",
-  organization_proxy: "机构代理主体",
-  historical_snapshot: "历史快照",
-  fictional_or_private: "虚构或私域主体",
+const SUBJECT_TYPE_LABELS: Record<string, ReturnType<typeof msg>> = {
+  living_public_figure: msg`现实公众人物`,
+  organization_proxy: msg`机构代理主体`,
+  historical_snapshot: msg`历史快照`,
+  fictional_or_private: msg`虚构或私域主体`,
 };
 
-const REALITY_MOMENT_POLICY_LABELS: Record<string, string> = {
-  disabled: "关闭",
-  optional: "可选",
-  force_one_daily: "强制每日一条",
+const REALITY_MOMENT_POLICY_LABELS: Record<string, ReturnType<typeof msg>> = {
+  disabled: msg`关闭`,
+  optional: msg`可选`,
+  force_one_daily: msg`强制每日一条`,
 };
 
-const RUN_STATUS_LABELS: Record<string, string> = {
-  running: "执行中",
-  success: "成功",
-  failed: "失败",
-  partial: "部分成功",
+const RUN_STATUS_LABELS: Record<string, ReturnType<typeof msg>> = {
+  running: msg`执行中`,
+  success: msg`成功`,
+  failed: msg`失败`,
+  partial: msg`部分成功`,
 };
 
-const RUN_TYPE_LABELS: Record<string, string> = {
-  signal_collect: "信号采集",
-  digest_generate: "Digest 生成",
-  manual_resync: "人工重跑",
+const RUN_TYPE_LABELS: Record<string, ReturnType<typeof msg>> = {
+  signal_collect: msg`信号采集`,
+  digest_generate: msg`Digest 生成`,
+  manual_resync: msg`人工重跑`,
 };
 
-const DIGEST_STATUS_LABELS: Record<string, string> = {
-  draft: "草稿",
-  active: "生效中",
-  superseded: "已替换",
-  failed: "失败",
+const DIGEST_STATUS_LABELS: Record<string, ReturnType<typeof msg>> = {
+  draft: msg`草稿`,
+  active: msg`生效中`,
+  superseded: msg`已替换`,
+  failed: msg`失败`,
 };
 
-const SIGNAL_STATUS_LABELS: Record<string, string> = {
-  accepted: "已采纳",
-  filtered_low_confidence: "低可信过滤",
-  filtered_identity_mismatch: "身份不匹配",
-  filtered_duplicate: "重复过滤",
-  manual_excluded: "人工排除",
+const SIGNAL_STATUS_LABELS: Record<string, ReturnType<typeof msg>> = {
+  accepted: msg`已采纳`,
+  filtered_low_confidence: msg`低可信过滤`,
+  filtered_identity_mismatch: msg`身份不匹配`,
+  filtered_duplicate: msg`重复过滤`,
+  manual_excluded: msg`人工排除`,
 };
 
-const SIGNAL_TYPE_LABELS: Record<string, string> = {
-  news_article: "新闻报道",
-  official_post: "官方发声",
-  interview: "采访",
-  public_appearance: "公开露面",
-  product_release: "产品发布",
-  other: "其他",
+const SIGNAL_TYPE_LABELS: Record<string, ReturnType<typeof msg>> = {
+  news_article: msg`新闻报道`,
+  official_post: msg`官方发声`,
+  interview: msg`采访`,
+  public_appearance: msg`公开露面`,
+  product_release: msg`产品发布`,
+  other: msg`其他`,
 };
 
-const SCENE_PATCH_LABELS: Record<string, string> = {
-  chat: "聊天回复",
-  moments_post: "朋友圈发文",
-  moments_comment: "朋友圈评论",
-  feed_post: "广场动态发文",
-  channel_post: "视频号内容",
-  feed_comment: "广场评论",
-  greeting: "好友请求问候",
-  proactive: "主动提醒",
+const SCENE_PATCH_LABELS: Record<string, ReturnType<typeof msg>> = {
+  chat: msg`聊天回复`,
+  moments_post: msg`朋友圈发文`,
+  moments_comment: msg`朋友圈评论`,
+  feed_post: msg`广场动态发文`,
+  channel_post: msg`视频号内容`,
+  feed_comment: msg`广场评论`,
+  greeting: msg`好友请求问候`,
+  proactive: msg`主动提醒`,
 };
 
-const BULLETIN_SLOT_LABELS: Record<RealWorldNewsBulletinSlot, string> = {
-  morning: "早报",
-  noon: "午报",
-  evening: "晚报",
+const BULLETIN_SLOT_LABELS: Record<RealWorldNewsBulletinSlot, ReturnType<typeof msg>> = {
+  morning: msg`早报`,
+  noon: msg`午报`,
+  evening: msg`晚报`,
 };
 
 const BULLETIN_SLOT_ORDER: RealWorldNewsBulletinSlot[] = [
@@ -219,12 +220,15 @@ function sortBulletinSlots(slots: RealWorldNewsBulletinSlot[]) {
   );
 }
 
-function formatBulletinSlots(slots: RealWorldNewsBulletinSlot[]) {
+function formatBulletinSlots(
+  slots: RealWorldNewsBulletinSlot[],
+  t: typeof translateRuntimeMessage,
+) {
   const ordered = sortBulletinSlots(slots);
   if (ordered.length === 0) {
-    return "未发布";
+    return t(msg`未发布`);
   }
-  return ordered.map((slot) => BULLETIN_SLOT_LABELS[slot]).join(" / ");
+  return ordered.map((slot) => t(BULLETIN_SLOT_LABELS[slot])).join(" / ");
 }
 
 function readMetadataRecord(value: unknown) {
@@ -300,27 +304,30 @@ function buildSignalDebugSnapshot(signal: RealWorldSignalRecord) {
   };
 }
 
-function buildCharacterAttentionReasons(item: RealWorldSyncCharacterSummary) {
+function buildCharacterAttentionReasons(
+  item: RealWorldSyncCharacterSummary,
+  t: typeof translateRuntimeMessage,
+) {
   const reasons: string[] = [];
   if (item.applyMode === "live" && !item.hasActiveDigest) {
-    reasons.push("Live 未生效");
+    reasons.push(t(msg`Live 未生效`));
   }
   if (item.latestRunStatus === "failed") {
-    reasons.push("最近同步失败");
+    reasons.push(t(msg`最近同步失败`));
   }
   if (
     !item.isWorldNewsDesk &&
     item.applyMode !== "disabled" &&
     !item.hasRealityLinkedMomentToday
   ) {
-    reasons.push("今日未发圈");
+    reasons.push(t(msg`今日未发圈`));
   }
   if (
     item.isWorldNewsDesk &&
     item.applyMode !== "disabled" &&
     item.todayBulletinSlots.length === 0
   ) {
-    reasons.push("今日待播报");
+    reasons.push(t(msg`今日待播报`));
   }
   return reasons;
 }
@@ -352,16 +359,19 @@ function getCharacterAttentionScore(item: RealWorldSyncCharacterSummary) {
   return score;
 }
 
-function buildCharacterListMeta(item: RealWorldSyncCharacterSummary) {
+function buildCharacterListMeta(
+  item: RealWorldSyncCharacterSummary,
+  t: typeof translateRuntimeMessage,
+) {
   const headline = item.isWorldNewsDesk
-    ? `界闻进度 ${formatBulletinSlots(item.todayBulletinSlots)}`
-    : `今日采纳 ${item.todayAcceptedSignalCount} 条 · 发圈 ${
-        item.hasRealityLinkedMomentToday ? "已完成" : "未完成"
-      }`;
+    ? t(msg`界闻进度 ${formatBulletinSlots(item.todayBulletinSlots, t)}`)
+    : t(msg`今日采纳 ${item.todayAcceptedSignalCount} 条 · 发圈 ${
+        item.hasRealityLinkedMomentToday ? t(msg`已完成`) : t(msg`未完成`)
+      }`);
 
   const followup = item.latestRunAt
-    ? `最近 ${RUN_STATUS_LABELS[item.latestRunStatus ?? "success"] ?? item.latestRunStatus} · ${formatCompactTime(item.latestRunAt)}`
-    : "最近暂无执行记录";
+    ? t(msg`最近 ${t(RUN_STATUS_LABELS[item.latestRunStatus ?? "success"] ?? msg`${item.latestRunStatus}`)} · ${formatCompactTime(item.latestRunAt)}`)
+    : t(msg`最近暂无执行记录`);
 
   return `${headline} · ${followup}`;
 }
@@ -380,7 +390,10 @@ function sortCharacters(characters: RealWorldSyncCharacterSummary[]) {
   });
 }
 
-function buildOperationsSummary(overview: RealWorldSyncOverview) {
+function buildOperationsSummary(
+  overview: RealWorldSyncOverview,
+  t: typeof translateRuntimeMessage,
+) {
   const liveWithoutDigestCount = overview.characters.filter(
     (item) => item.applyMode === "live" && !item.hasActiveDigest,
   ).length;
@@ -400,25 +413,24 @@ function buildOperationsSummary(overview: RealWorldSyncOverview) {
   const messages: string[] = [];
   if (liveWithoutDigestCount > 0) {
     messages.push(
-      `${liveWithoutDigestCount} 个 Live 角色还没有生效中的 digest`,
+      t(msg`${liveWithoutDigestCount} 个 Live 角色还没有生效中的 digest`),
     );
   }
   if (failedRunsCount > 0) {
-    messages.push(`最近 ${failedRunsCount} 次同步失败，需要回看抓取或模板`);
+    messages.push(t(msg`最近 ${failedRunsCount} 次同步失败，需要回看抓取或模板`));
   }
   if (partialRunsCount > 0) {
-    messages.push(`还有 ${partialRunsCount} 次部分成功的运行值得复盘`);
+    messages.push(t(msg`还有 ${partialRunsCount} 次部分成功的运行值得复盘`));
   }
   if (missingMomentCount > 0) {
-    messages.push(`${missingMomentCount} 个角色今天还没有形成现实发圈结果`);
+    messages.push(t(msg`${missingMomentCount} 个角色今天还没有形成现实发圈结果`));
   }
 
   if (messages.length === 0) {
     return {
       tone: "success" as const,
-      title: "当前联动节奏稳定",
-      description:
-        "Live 角色都有生效 digest，最近没有失败运行。建议按左侧角色队列做抽检，重点回看今天新增信号和界闻补发情况。",
+      title: t(msg`当前联动节奏稳定`),
+      description: t(msg`Live 角色都有生效 digest，最近没有失败运行。建议按左侧角色队列做抽检，重点回看今天新增信号和界闻补发情况。`),
     };
   }
 
@@ -427,20 +439,21 @@ function buildOperationsSummary(overview: RealWorldSyncOverview) {
       liveWithoutDigestCount > 0 || failedRunsCount > 0
         ? ("warning" as const)
         : ("info" as const),
-    title: "当前有待处理项",
-    description: `${messages.join("；")}。建议先从左侧待处理角色开始，再决定是否调整全局规则。`,
+    title: t(msg`当前有待处理项`),
+    description: t(msg`${messages.join("；")}。建议先从左侧待处理角色开始，再决定是否调整全局规则。`),
   };
 }
 
 function SignalDebugPanel({
   signal,
-  title = "抓取调试",
+  title,
   defaultOpen = false,
 }: {
   signal: RealWorldSignalRecord;
   title?: string;
   defaultOpen?: boolean;
 }) {
+  const t = translateRuntimeMessage;
   const debugSnapshot = buildSignalDebugSnapshot(signal);
   if (!debugSnapshot) {
     return null;
@@ -455,12 +468,12 @@ function SignalDebugPanel({
       open={defaultOpen}
     >
       <summary className="cursor-pointer text-sm font-medium text-[color:var(--text-secondary)]">
-        {title}
+        {title ?? t(msg`抓取调试`)}
       </summary>
       <div className="mt-3 space-y-3">
         {articleExcerpt ? (
           <AdminCallout
-            title="正文摘录"
+            title={t(msg`正文摘录`)}
             tone="info"
             description={articleExcerpt}
           />
@@ -473,7 +486,7 @@ function SignalDebugPanel({
               rel="noreferrer"
               className="underline"
             >
-              打开解析后的文章
+              {t(msg`打开解析后的文章`)}
             </a>
           </div>
         ) : null}
@@ -488,6 +501,7 @@ function BulletinSlotStatusGrid({
 }: {
   slots: RealWorldNewsBulletinSlot[];
 }) {
+  const t = translateRuntimeMessage;
   return (
     <div className="grid gap-2 sm:grid-cols-3">
       {BULLETIN_SLOT_ORDER.map((slot) => {
@@ -503,10 +517,10 @@ function BulletinSlotStatusGrid({
           >
             <div className="flex items-center justify-between gap-3">
               <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                {BULLETIN_SLOT_LABELS[slot]}
+                {t(BULLETIN_SLOT_LABELS[slot])}
               </div>
               <StatusPill tone={published ? "healthy" : "muted"}>
-                {published ? "已发布" : "待发布"}
+                {published ? t(msg`已发布`) : t(msg`待发布`)}
               </StatusPill>
             </div>
           </div>
@@ -517,6 +531,7 @@ function BulletinSlotStatusGrid({
 }
 
 function ScenePatchPanel({ digest }: { digest: RealWorldDigestRecord }) {
+  const t = translateRuntimeMessage;
   const entries = Object.entries(digest.scenePatchPayload).filter(
     ([, value]) => typeof value === "string" && value.trim(),
   ) as Array<[string, string]>;
@@ -524,8 +539,8 @@ function ScenePatchPanel({ digest }: { digest: RealWorldDigestRecord }) {
   if (!entries.length) {
     return (
       <AdminEmptyState
-        title="当前没有可展示的 Scene Patch"
-        description="这轮 digest 没有向聊天、发圈或主动提醒写入额外场景覆盖。"
+        title={t(msg`当前没有可展示的 Scene Patch`)}
+        description={t(msg`这轮 digest 没有向聊天、发圈或主动提醒写入额外场景覆盖。`)}
       />
     );
   }
@@ -537,7 +552,7 @@ function ScenePatchPanel({ digest }: { digest: RealWorldDigestRecord }) {
           key={key}
           className="rounded-[18px] border border-[color:var(--border-faint)] bg-white/85 p-4 shadow-[var(--shadow-soft)]"
         >
-          <AdminMetaText>{SCENE_PATCH_LABELS[key] ?? key}</AdminMetaText>
+          <AdminMetaText>{SCENE_PATCH_LABELS[key] ? t(SCENE_PATCH_LABELS[key]) : key}</AdminMetaText>
           <div className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[color:var(--text-secondary)]">
             {value}
           </div>
@@ -554,6 +569,7 @@ function SignalRecordCard({
   signal: RealWorldSignalRecord;
   defaultDebugOpen?: boolean;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <div className="space-y-2">
       <AdminRecordCard
@@ -561,26 +577,26 @@ function SignalRecordCard({
         badges={
           <>
             <StatusPill tone={toneForSignalStatus(signal.status)}>
-              {SIGNAL_STATUS_LABELS[signal.status] ?? signal.status}
+              {SIGNAL_STATUS_LABELS[signal.status] ? t(SIGNAL_STATUS_LABELS[signal.status]) : signal.status}
             </StatusPill>
             <StatusPill tone="muted">
-              {SIGNAL_TYPE_LABELS[signal.signalType] ?? signal.signalType}
+              {SIGNAL_TYPE_LABELS[signal.signalType] ? t(SIGNAL_TYPE_LABELS[signal.signalType]) : signal.signalType}
             </StatusPill>
           </>
         }
         meta={`${signal.sourceName} · ${formatCompactTime(signal.publishedAt ?? signal.capturedAt)}`}
-        description={signal.normalizedSummary ?? signal.snippet ?? "暂无概况"}
+        description={signal.normalizedSummary ?? signal.snippet ?? t(msg`暂无概况`)}
         details={
           <div className="space-y-3">
             <div className="grid gap-2 md:grid-cols-3">
               <AdminSoftBox className="text-xs">
-                可信度 {formatScore(signal.credibilityScore)}
+                {t(msg`可信度 ${formatScore(signal.credibilityScore)}`)}
               </AdminSoftBox>
               <AdminSoftBox className="text-xs">
-                相关性 {formatScore(signal.relevanceScore)}
+                {t(msg`相关性 ${formatScore(signal.relevanceScore)}`)}
               </AdminSoftBox>
               <AdminSoftBox className="text-xs">
-                身份匹配 {formatScore(signal.identityMatchScore)}
+                {t(msg`身份匹配 ${formatScore(signal.identityMatchScore)}`)}
               </AdminSoftBox>
             </div>
             {signal.sourceUrl ? (
@@ -591,7 +607,7 @@ function SignalRecordCard({
                   rel="noreferrer"
                   className="underline"
                 >
-                  打开原始来源
+                  {t(msg`打开原始来源`)}
                 </a>
               </div>
             ) : null}
@@ -610,29 +626,30 @@ function RunRecordCard({
   run: RealWorldSyncRunRecord;
   characterName?: string | null;
 }) {
+  const t = translateRuntimeMessage;
   return (
     <AdminRecordCard
-      title={characterName ?? RUN_TYPE_LABELS[run.runType] ?? run.runType}
+      title={characterName ?? (RUN_TYPE_LABELS[run.runType] ? t(RUN_TYPE_LABELS[run.runType]) : run.runType)}
       badges={
         <>
           <StatusPill tone={toneForRunStatus(run.status)}>
-            {RUN_STATUS_LABELS[run.status] ?? run.status}
+            {RUN_STATUS_LABELS[run.status] ? t(RUN_STATUS_LABELS[run.status]) : run.status}
           </StatusPill>
           <StatusPill tone="muted">
-            {RUN_TYPE_LABELS[run.runType] ?? run.runType}
+            {RUN_TYPE_LABELS[run.runType] ? t(RUN_TYPE_LABELS[run.runType]) : run.runType}
           </StatusPill>
         </>
       }
-      meta={`开始 ${formatCompactTime(run.startedAt)}${
-        run.finishedAt ? ` · 结束 ${formatCompactTime(run.finishedAt)}` : ""
-      }`}
-      description={`采纳 ${run.acceptedSignalCount} 条，过滤 ${run.filteredSignalCount} 条${
-        run.searchQuery ? ` · 查询 ${run.searchQuery}` : ""
-      }`}
+      meta={t(msg`开始 ${formatCompactTime(run.startedAt)}${
+        run.finishedAt ? t(msg` · 结束 ${formatCompactTime(run.finishedAt)}`) : ""
+      }`)}
+      description={t(msg`采纳 ${run.acceptedSignalCount} 条，过滤 ${run.filteredSignalCount} 条${
+        run.searchQuery ? t(msg` · 查询 ${run.searchQuery}`) : ""
+      }`)}
       details={
         run.errorMessage ? (
           <AdminCallout
-            title="本轮错误"
+            title={t(msg`本轮错误`)}
             tone="warning"
             description={run.errorMessage}
           />
@@ -643,31 +660,32 @@ function RunRecordCard({
 }
 
 function DigestRecordCard({ digest }: { digest: RealWorldDigestRecord }) {
+  const t = translateRuntimeMessage;
   return (
     <AdminRecordCard
       title={formatCompactTime(digest.updatedAt)}
       badges={
         <>
           <StatusPill tone={toneForDigestStatus(digest.status)}>
-            {DIGEST_STATUS_LABELS[digest.status] ?? digest.status}
+            {DIGEST_STATUS_LABELS[digest.status] ? t(DIGEST_STATUS_LABELS[digest.status]) : digest.status}
           </StatusPill>
           {digest.appliedMode ? (
             <StatusPill tone={toneForApplyMode(digest.appliedMode)}>
-              {APPLY_MODE_LABELS[digest.appliedMode] ?? digest.appliedMode}
+              {APPLY_MODE_LABELS[digest.appliedMode] ? t(APPLY_MODE_LABELS[digest.appliedMode]) : digest.appliedMode}
             </StatusPill>
           ) : null}
         </>
       }
-      meta={`信号 ${digest.signalIds.length} 条${
+      meta={t(msg`信号 ${digest.signalIds.length} 条${
         digest.appliedAt
-          ? ` · 应用时间 ${formatCompactTime(digest.appliedAt)}`
+          ? t(msg` · 应用时间 ${formatCompactTime(digest.appliedAt)}`)
           : ""
-      }`}
+      }`)}
       description={digest.dailySummary}
       details={
         digest.realityMomentBrief ? (
           <AdminSoftBox className="text-xs">
-            发圈锚点：{digest.realityMomentBrief}
+            {t(msg`发圈锚点：`)}{digest.realityMomentBrief}
           </AdminSoftBox>
         ) : undefined
       }
@@ -676,6 +694,7 @@ function DigestRecordCard({ digest }: { digest: RealWorldDigestRecord }) {
 }
 
 export function RealWorldSyncPage() {
+  const t = translateRuntimeMessage;
   const baseUrl = resolveAdminCoreApiBaseUrl();
   const queryClient = useQueryClient();
   const [rulesDraft, setRulesDraft] = useState<RealWorldSyncRules | null>(null);
@@ -834,7 +853,7 @@ export function RealWorldSyncPage() {
   }, [overviewQuery.data, rulesDraft]);
 
   if (overviewQuery.isLoading) {
-    return <LoadingBlock label="正在读取真实世界联动..." />;
+    return <LoadingBlock label={t(msg`正在读取真实世界联动...`)} />;
   }
 
   if (overviewQuery.isError && overviewQuery.error instanceof Error) {
@@ -844,8 +863,8 @@ export function RealWorldSyncPage() {
   if (!overviewQuery.data || !rulesDraft) {
     return (
       <AdminEmptyState
-        title="真实世界联动暂不可用"
-        description="后端 real-world-sync 模块还没成功返回概览数据。"
+        title={t(msg`真实世界联动暂不可用`)}
+        description={t(msg`后端 real-world-sync 模块还没成功返回概览数据。`)}
       />
     );
   }
@@ -861,7 +880,7 @@ export function RealWorldSyncPage() {
     ) ?? null;
   const bulletinDeskCharacter =
     overview.characters.find((item) => item.isWorldNewsDesk) ?? null;
-  const operationsSummary = buildOperationsSummary(overview);
+  const operationsSummary = buildOperationsSummary(overview, t);
   const attentionCharacters = sortedCharacters.filter(
     (item) => getCharacterAttentionScore(item) > 0,
   );
@@ -884,17 +903,17 @@ export function RealWorldSyncPage() {
     <div className="space-y-6">
       <AdminPageHero
         eyebrow="Reality Sync"
-        title="现实联动运营工作台"
-        description="把外部现实信号、Digest 生效、界闻补发和发圈结果收敛到同一条值班路径里。运营先看今日节奏和待处理角色，再决定是否调全局规则。"
+        title={t(msg`现实联动运营工作台`)}
+        description={t(msg`把外部现实信号、Digest 生效、界闻补发和发圈结果收敛到同一条值班路径里。运营先看今日节奏和待处理角色，再决定是否调全局规则。`)}
         badges={[
-          `专属播报角色：${bulletinDeskCharacter?.characterName ?? "界闻"}`,
-          "覆盖角色：已启用现实联动角色",
+          t(msg`专属播报角色：${bulletinDeskCharacter?.characterName ?? t(msg`界闻`)}`),
+          t(msg`覆盖角色：已启用现实联动角色`),
         ]}
         metrics={[
-          { label: "已启用角色", value: overview.stats.enabledCharacters },
-          { label: "Live 生效角色", value: overview.stats.liveCharacters },
-          { label: "生效中 Digest", value: overview.stats.activeDigests },
-          { label: "今日信号数", value: overview.stats.signalsToday },
+          { label: t(msg`已启用角色`), value: overview.stats.enabledCharacters },
+          { label: t(msg`Live 生效角色`), value: overview.stats.liveCharacters },
+          { label: t(msg`生效中 Digest`), value: overview.stats.activeDigests },
+          { label: t(msg`今日信号数`), value: overview.stats.signalsToday },
         ]}
         actions={
           <>
@@ -906,7 +925,7 @@ export function RealWorldSyncPage() {
                 })
               }
             >
-              {overviewQuery.isFetching ? "刷新中..." : "刷新概览"}
+              {overviewQuery.isFetching ? t(msg`刷新中...`) : t(msg`刷新概览`)}
             </Button>
             <Button
               variant="secondary"
@@ -914,8 +933,8 @@ export function RealWorldSyncPage() {
               onClick={() => runMutation.mutate(null)}
             >
               {runMutation.isPending && runMutation.variables == null
-                ? "全量同步中..."
-                : "全量立即同步"}
+                ? t(msg`全量同步中...`)
+                : t(msg`全量立即同步`)}
             </Button>
             <Button
               variant="ghost"
@@ -926,8 +945,8 @@ export function RealWorldSyncPage() {
               }
             >
               {workspaceTab === "operations"
-                ? "查看全局规则"
-                : "回到运营工作台"}
+                ? t(msg`查看全局规则`)
+                : t(msg`回到运营工作台`)}
             </Button>
           </>
         }
@@ -936,44 +955,46 @@ export function RealWorldSyncPage() {
       {saveRulesMutation.isPending ? (
         <AdminActionFeedback
           tone="busy"
-          title="正在保存 Reality Sync 规则"
-          description="新的默认采集窗口、来源过滤和提示词模板正在写入后台配置。"
+          title={t(msg`正在保存 Reality Sync 规则`)}
+          description={t(msg`新的默认采集窗口、来源过滤和提示词模板正在写入后台配置。`)}
         />
       ) : null}
       {saveRulesMutation.isSuccess ? (
         <AdminActionFeedback
           tone="success"
-          title="Reality Sync 规则已保存"
-          description="新的默认搜索窗口、信号阈值和概况模板已经写入后台配置。"
+          title={t(msg`Reality Sync 规则已保存`)}
+          description={t(msg`新的默认搜索窗口、信号阈值和概况模板已经写入后台配置。`)}
         />
       ) : null}
       {runMutation.isPending ? (
         <AdminActionFeedback
           tone="busy"
-          title="Reality Sync 正在执行"
+          title={t(msg`Reality Sync 正在执行`)}
           description={
             currentRunTargetName
-              ? `正在同步 ${currentRunTargetName}，完成后会自动刷新角色详情和概览。`
-              : "正在触发全量 Reality Sync，完成后会自动刷新概览。"
+              ? t(msg`正在同步 ${currentRunTargetName}，完成后会自动刷新角色详情和概览。`)
+              : t(msg`正在触发全量 Reality Sync，完成后会自动刷新概览。`)
           }
         />
       ) : null}
       {runMutation.isSuccess ? (
         <AdminActionFeedback
           tone="success"
-          title="Reality Sync 已执行"
-          description={`成功 ${runMutation.data.successCount} 个，失败 ${runMutation.data.failedCount} 个。`}
+          title={t(msg`Reality Sync 已执行`)}
+          description={t(msg`成功 ${runMutation.data.successCount} 个，失败 ${runMutation.data.failedCount} 个。`)}
         />
       ) : null}
       {publishBulletinMutation.isPending ? (
         <AdminActionFeedback
           tone="busy"
-          title="界闻补发中"
-          description={`正在补发${
+          title={t(msg`界闻补发中`)}
+          // i18n-ignore-start: nested t() calls inside t(msg`...`)
+          description={t(msg`正在补发${
             publishBulletinMutation.variables
-              ? BULLETIN_SLOT_LABELS[publishBulletinMutation.variables]
-              : "界闻"
-          }，完成后会自动刷新今日播报状态。`}
+              ? t(BULLETIN_SLOT_LABELS[publishBulletinMutation.variables])
+              : t(msg`界闻`)
+          }，完成后会自动刷新今日播报状态。`)}
+          // i18n-ignore-end
         />
       ) : null}
       {publishBulletinMutation.isSuccess ? (
@@ -981,8 +1002,8 @@ export function RealWorldSyncPage() {
           tone={publishBulletinMutation.data.created ? "success" : "info"}
           title={
             publishBulletinMutation.data.created
-              ? "界闻更新已发出"
-              : "界闻这轮没重复发"
+              ? t(msg`界闻更新已发出`)
+              : t(msg`界闻这轮没重复发`)
           }
           description={publishBulletinMutation.data.summary}
         />
@@ -1002,31 +1023,31 @@ export function RealWorldSyncPage() {
         <div className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <Card className="bg-[color:var(--surface-console)]">
             <AdminSectionHeader
-              title="角色队列"
+              title={t(msg`角色队列`)}
               actions={
                 <StatusPill
                   tone={attentionCharacters.length ? "warning" : "muted"}
                 >
                   {attentionCharacters.length
-                    ? `${attentionCharacters.length} 个待处理`
-                    : "全部平稳"}
+                    ? t(msg`${attentionCharacters.length} 个待处理`)
+                    : t(msg`全部平稳`)}
                 </StatusPill>
               }
             />
             <div className="mt-4 space-y-4">
               <AdminTabs
                 tabs={[
-                  { key: "all", label: `全部 ${sortedCharacters.length}` },
+                  { key: "all", label: t(msg`全部 ${sortedCharacters.length}`) },
                   {
                     key: "attention",
-                    label: `待处理 ${attentionCharacters.length}`,
+                    label: t(msg`待处理 ${attentionCharacters.length}`),
                   },
                   {
                     key: "newsdesk",
-                    label: `界闻 ${
+                    label: t(msg`界闻 ${
                       sortedCharacters.filter((item) => item.isWorldNewsDesk)
                         .length
-                    }`,
+                    }`),
                   },
                 ]}
                 activeKey={characterListFilter}
@@ -1035,38 +1056,40 @@ export function RealWorldSyncPage() {
                 }
               />
               <AdminTextField
-                label="搜索角色"
+                label={t(msg`搜索角色`)}
                 value={characterQuery}
                 onChange={setCharacterQuery}
-                placeholder="角色名 / 主体名称"
+                placeholder={t(msg`角色名 / 主体名称`)}
               />
 
               {filteredCharacters.length > 0 ? (
                 <div className="space-y-3">
                   {filteredCharacters.map((item) => {
                     const attentionReasons =
-                      buildCharacterAttentionReasons(item);
+                      buildCharacterAttentionReasons(item, t);
                     return (
                       <AdminSelectableCard
                         key={item.characterId}
                         active={selectedCharacterId === item.characterId}
                         title={item.characterName}
-                        subtitle={`${item.subjectName} · ${
-                          SUBJECT_TYPE_LABELS[item.subjectType] ??
-                          item.subjectType
-                        }`}
-                        meta={buildCharacterListMeta(item)}
+                        subtitle={t(msg`${item.subjectName} · ${
+                          SUBJECT_TYPE_LABELS[item.subjectType]
+                            ? t(SUBJECT_TYPE_LABELS[item.subjectType])
+                            : item.subjectType
+                        }`)}
+                        meta={buildCharacterListMeta(item, t)}
                         badge={
                           <div className="flex flex-col items-end gap-2">
                             {attentionReasons.length > 0 ? (
-                              <StatusPill tone="warning">待处理</StatusPill>
+                              <StatusPill tone="warning">{t(msg`待处理`)}</StatusPill>
                             ) : null}
                             {item.isWorldNewsDesk ? (
-                              <StatusPill tone="healthy">界闻</StatusPill>
+                              <StatusPill tone="healthy">{t(msg`界闻`)}</StatusPill>
                             ) : null}
                             <StatusPill tone={toneForApplyMode(item.applyMode)}>
-                              {APPLY_MODE_LABELS[item.applyMode] ??
-                                item.applyMode}
+                              {APPLY_MODE_LABELS[item.applyMode]
+                                ? t(APPLY_MODE_LABELS[item.applyMode])
+                                : item.applyMode}
                             </StatusPill>
                           </div>
                         }
@@ -1080,8 +1103,8 @@ export function RealWorldSyncPage() {
                 </div>
               ) : (
                 <AdminEmptyState
-                  title="没有匹配的角色"
-                  description="换一个筛选条件，或者回到“全部角色”查看完整队列。"
+                  title={t(msg`没有匹配的角色`)}
+                  description={t(msg`换一个筛选条件，或者回到"全部角色"查看完整队列。`)}
                 />
               )}
             </div>
@@ -1089,20 +1112,18 @@ export function RealWorldSyncPage() {
 
           <Card className="bg-[color:var(--surface-console)]">
             <AdminSectionHeader
-              title="排查提示"
-              actions={<StatusPill tone="muted">值班顺序</StatusPill>}
+              title={t(msg`排查提示`)}
+              actions={<StatusPill tone="muted">{t(msg`值班顺序`)}</StatusPill>}
             />
             <div className="mt-4 space-y-3 text-sm leading-6 text-[color:var(--text-secondary)]">
               <AdminSoftBox>
-                先看左侧标记为“待处理”的角色，优先处理 Live
-                未生效和最近失败的同步。
+                {t(msg`先看左侧标记为"待处理"的角色，优先处理 Live 未生效和最近失败的同步。`)}
               </AdminSoftBox>
               <AdminSoftBox>
-                界闻角色先确认三段播报进度，再决定是否补发早报 / 午报 / 晚报。
+                {t(msg`界闻角色先确认三段播报进度，再决定是否补发早报 / 午报 / 晚报。`)}
               </AdminSoftBox>
               <AdminSoftBox>
-                只有在问题跨角色重复出现时，再切到“全局规则”改 Provider、阈值或
-                Prompt。
+                {t(msg`只有在问题跨角色重复出现时，再切到"全局规则"改 Provider、阈值或 Prompt。`)}
               </AdminSoftBox>
             </div>
           </Card>
@@ -1126,7 +1147,7 @@ export function RealWorldSyncPage() {
                       setWorkspaceTab("operations");
                     }}
                   >
-                    聚焦待处理角色
+                    {t(msg`聚焦待处理角色`)}
                   </Button>
                 ) : null}
                 <Button
@@ -1134,7 +1155,7 @@ export function RealWorldSyncPage() {
                   size="sm"
                   onClick={() => setWorkspaceTab("rules")}
                 >
-                  检查全局规则
+                  {t(msg`检查全局规则`)}
                 </Button>
               </>
             }
@@ -1142,10 +1163,10 @@ export function RealWorldSyncPage() {
 
           <AdminTabs
             tabs={[
-              { key: "operations", label: "运营工作台" },
+              { key: "operations", label: t(msg`运营工作台`) },
               {
                 key: "rules",
-                label: isRulesDirty ? "全局规则 *" : "全局规则",
+                label: isRulesDirty ? t(msg`全局规则 *`) : t(msg`全局规则`),
               },
             ]}
             activeKey={workspaceTab}
@@ -1156,7 +1177,7 @@ export function RealWorldSyncPage() {
             <div className="space-y-6">
               <Card className="bg-[color:var(--surface-console)]">
                 <AdminSectionHeader
-                  title="今日值班面板"
+                  title={t(msg`今日值班面板`)}
                   actions={
                     <StatusPill
                       tone={
@@ -1164,8 +1185,8 @@ export function RealWorldSyncPage() {
                       }
                     >
                       {attentionCharacters.length > 0
-                        ? "需要人工跟进"
-                        : "当前运行平稳"}
+                        ? t(msg`需要人工跟进`)
+                        : t(msg`当前运行平稳`)}
                     </StatusPill>
                   }
                 />
@@ -1174,32 +1195,32 @@ export function RealWorldSyncPage() {
                   <div className="space-y-4">
                     <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                       <AdminValueCard
-                        label="生效中 Digest"
-                        value={`${overview.stats.activeDigests} 个角色`}
+                        label={t(msg`生效中 Digest`)}
+                        value={t(msg`${overview.stats.activeDigests} 个角色`)}
                       />
                       <AdminValueCard
-                        label="今日现实发圈"
-                        value={`${overview.stats.realityLinkedMomentsToday} 条`}
+                        label={t(msg`今日现实发圈`)}
+                        value={t(msg`${overview.stats.realityLinkedMomentsToday} 条`)}
                       />
                       <AdminValueCard
-                        label="今日新闻更新"
-                        value={`${overview.stats.newsBulletinsToday} 条`}
+                        label={t(msg`今日新闻更新`)}
+                        value={t(msg`${overview.stats.newsBulletinsToday} 条`)}
                       />
                       <AdminValueCard
-                        label="最近失败运行"
-                        value={`${recentRiskRuns.filter((run) => run.status === "failed").length} 次`}
+                        label={t(msg`最近失败运行`)}
+                        value={t(msg`${recentRiskRuns.filter((run) => run.status === "failed").length} 次`)}
                       />
                       <AdminValueCard
-                        label="今日已采纳信号"
-                        value={`${recentAcceptedSignals.length} 条`}
+                        label={t(msg`今日已采纳信号`)}
+                        value={t(msg`${recentAcceptedSignals.length} 条`)}
                       />
                       <AdminValueCard
-                        label="待处理角色"
-                        value={`${attentionCharacters.length} 个`}
+                        label={t(msg`待处理角色`)}
+                        value={t(msg`${attentionCharacters.length} 个`)}
                       />
                     </div>
 
-                    <AdminSubpanel title="最新采纳信号">
+                    <AdminSubpanel title={t(msg`最新采纳信号`)}>
                       {recentAcceptedSignals.length > 0 ? (
                         <div className="space-y-3">
                           {recentAcceptedSignals.slice(0, 3).map((signal) => (
@@ -1208,23 +1229,24 @@ export function RealWorldSyncPage() {
                               title={signal.title}
                               badges={
                                 <StatusPill tone="healthy">
-                                  {SIGNAL_TYPE_LABELS[signal.signalType] ??
-                                    signal.signalType}
+                                  {SIGNAL_TYPE_LABELS[signal.signalType]
+                                    ? t(SIGNAL_TYPE_LABELS[signal.signalType])
+                                    : signal.signalType}
                                 </StatusPill>
                               }
                               meta={`${signal.sourceName} · ${formatCompactTime(signal.publishedAt ?? signal.capturedAt)}`}
                               description={
                                 signal.normalizedSummary ??
                                 signal.snippet ??
-                                "暂无概况"
+                                t(msg`暂无概况`)
                               }
                             />
                           ))}
                         </div>
                       ) : (
                         <AdminEmptyState
-                          title="今天还没有采纳信号"
-                          description="先执行同步，或者回看 Provider 和来源过滤规则。"
+                          title={t(msg`今天还没有采纳信号`)}
+                          description={t(msg`先执行同步，或者回看 Provider 和来源过滤规则。`)}
                         />
                       )}
                     </AdminSubpanel>
@@ -1232,13 +1254,14 @@ export function RealWorldSyncPage() {
 
                   <div className="space-y-4">
                     <AdminActionGroup
-                      title="三段界闻"
+                      title={t(msg`三段界闻`)}
                       description={
                         bulletinDeskCharacter
-                          ? `当前界闻角色：${bulletinDeskCharacter.characterName}。今天已完成 ${formatBulletinSlots(
+                          ? t(msg`当前界闻角色：${bulletinDeskCharacter.characterName}。今天已完成 ${formatBulletinSlots(
                               bulletinDeskCharacter.todayBulletinSlots,
-                            )}。`
-                          : "当前还没有启用界闻角色。"
+                              t,
+                            )}。`)
+                          : t(msg`当前还没有启用界闻角色。`)
                       }
                     >
                       {bulletinDeskCharacter ? (
@@ -1259,23 +1282,23 @@ export function RealWorldSyncPage() {
                               >
                                 {publishBulletinMutation.isPending &&
                                 publishBulletinMutation.variables === slot
-                                  ? `补发${BULLETIN_SLOT_LABELS[slot]}中...`
-                                  : `补发${BULLETIN_SLOT_LABELS[slot]}`}
+                                  ? t(msg`补发${t(BULLETIN_SLOT_LABELS[slot])}中...`)
+                                  : t(msg`补发${t(BULLETIN_SLOT_LABELS[slot])}`)}
                               </Button>
                             ))}
                           </div>
                         </div>
                       ) : (
                         <AdminEmptyState
-                          title="暂无界闻角色"
-                          description="先在角色工厂启用现实联动，并设置一位承担三段播报的角色。"
+                          title={t(msg`暂无界闻角色`)}
+                          description={t(msg`先在角色工厂启用现实联动，并设置一位承担三段播报的角色。`)}
                         />
                       )}
                     </AdminActionGroup>
 
                     <AdminActionGroup
-                      title="最近异常"
-                      description="优先回看失败或部分成功的运行，避免 digest 未生效。"
+                      title={t(msg`最近异常`)}
+                      description={t(msg`优先回看失败或部分成功的运行，避免 digest 未生效。`)}
                     >
                       {recentRiskRuns.length > 0 ? (
                         <div className="space-y-3">
@@ -1291,8 +1314,8 @@ export function RealWorldSyncPage() {
                         </div>
                       ) : (
                         <AdminEmptyState
-                          title="最近没有异常运行"
-                          description="最近几轮同步都没有失败或部分成功。"
+                          title={t(msg`最近没有异常运行`)}
+                          description={t(msg`最近几轮同步都没有失败或部分成功。`)}
                         />
                       )}
                     </AdminActionGroup>
@@ -1302,7 +1325,7 @@ export function RealWorldSyncPage() {
 
               {selectedCharacterSummary ? (
                 detailQuery.isLoading ? (
-                  <LoadingBlock label="正在读取角色现实概况..." />
+                  <LoadingBlock label={t(msg`正在读取角色现实概况...`)} />
                 ) : detailQuery.isError &&
                   detailQuery.error instanceof Error ? (
                   <ErrorBlock message={detailQuery.error.message} />
@@ -1311,26 +1334,28 @@ export function RealWorldSyncPage() {
                     <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                       <div className="max-w-3xl">
                         <div className="text-[12px] uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
-                          角色工作台
+                          {t(msg`角色工作台`)}
                         </div>
                         <h3 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">
                           {detail.characterName}
                         </h3>
                         <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
                           {detail.config.subjectName} ·{" "}
-                          {SUBJECT_TYPE_LABELS[detail.config.subjectType] ??
-                            detail.config.subjectType}
+                          {SUBJECT_TYPE_LABELS[detail.config.subjectType]
+                            ? t(SUBJECT_TYPE_LABELS[detail.config.subjectType])
+                            : detail.config.subjectType}
                         </p>
                         <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
                           {detail.isWorldNewsDesk
-                            ? `界闻角色，今日播报进度：${formatBulletinSlots(
+                            ? t(msg`界闻角色，今日播报进度：${formatBulletinSlots(
                                 detail.todayBulletinSlots,
-                              )}。`
-                            : `今日采纳 ${selectedCharacterSummary.todayAcceptedSignalCount} 条信号，现实发圈 ${
+                                t,
+                              )}。`)
+                            : t(msg`今日采纳 ${selectedCharacterSummary.todayAcceptedSignalCount} 条信号，现实发圈 ${
                                 detail.hasRealityLinkedMomentToday
-                                  ? "已完成"
-                                  : "还未完成"
-                              }。`}
+                                  ? t(msg`已完成`)
+                                  : t(msg`还未完成`)
+                              }。`)}
                         </p>
                       </div>
 
@@ -1338,13 +1363,14 @@ export function RealWorldSyncPage() {
                         <StatusPill
                           tone={toneForApplyMode(detail.config.applyMode)}
                         >
-                          {APPLY_MODE_LABELS[detail.config.applyMode] ??
-                            detail.config.applyMode}
+                          {APPLY_MODE_LABELS[detail.config.applyMode]
+                            ? t(APPLY_MODE_LABELS[detail.config.applyMode])
+                            : detail.config.applyMode}
                         </StatusPill>
                         {detail.activeDigest ? (
-                          <StatusPill tone="healthy">Digest 生效中</StatusPill>
+                          <StatusPill tone="healthy">{t(msg`Digest 生效中`)}</StatusPill>
                         ) : (
-                          <StatusPill tone="warning">Digest 未生效</StatusPill>
+                          <StatusPill tone="warning">{t(msg`Digest 未生效`)}</StatusPill>
                         )}
                         <Button
                           variant="secondary"
@@ -1353,49 +1379,51 @@ export function RealWorldSyncPage() {
                         >
                           {runMutation.isPending &&
                           runMutation.variables === detail.characterId
-                            ? "同步中..."
-                            : "立即同步"}
+                            ? t(msg`同步中...`)
+                            : t(msg`立即同步`)}
                         </Button>
                         <Link
                           to="/characters/$characterId/factory"
                           params={{ characterId: detail.characterId }}
                         >
-                          <Button variant="secondary">配置角色</Button>
+                          <Button variant="secondary">{t(msg`配置角色`)}</Button>
                         </Link>
                       </div>
                     </div>
 
                     <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                       <AdminValueCard
-                        label="现实发圈策略"
+                        label={t(msg`现实发圈策略`)}
                         value={
                           REALITY_MOMENT_POLICY_LABELS[
                             detail.config.realityMomentPolicy
-                          ] ?? detail.config.realityMomentPolicy
+                          ]
+                            ? t(REALITY_MOMENT_POLICY_LABELS[detail.config.realityMomentPolicy])
+                            : detail.config.realityMomentPolicy
                         }
                       />
                       <AdminValueCard
-                        label="最近同步"
+                        label={t(msg`最近同步`)}
                         value={
                           selectedCharacterSummary.latestRunAt
-                            ? `${RUN_STATUS_LABELS[selectedCharacterSummary.latestRunStatus ?? "success"] ?? selectedCharacterSummary.latestRunStatus} · ${formatCompactTime(
+                            ? t(msg`${RUN_STATUS_LABELS[selectedCharacterSummary.latestRunStatus ?? "success"] ? t(RUN_STATUS_LABELS[selectedCharacterSummary.latestRunStatus ?? "success"]) : selectedCharacterSummary.latestRunStatus} · ${formatCompactTime(
                                 selectedCharacterSummary.latestRunAt,
-                              )}`
-                            : "暂无记录"
+                              )}`)
+                            : t(msg`暂无记录`)
                         }
                       />
                       <AdminValueCard
-                        label="查询模板"
-                        value={detail.config.queryTemplate || "未配置"}
+                        label={t(msg`查询模板`)}
+                        value={detail.config.queryTemplate || t(msg`未配置`)}
                       />
                       <AdminValueCard
-                        label="今日状态"
+                        label={t(msg`今日状态`)}
                         value={
                           detail.isWorldNewsDesk
-                            ? formatBulletinSlots(detail.todayBulletinSlots)
+                            ? formatBulletinSlots(detail.todayBulletinSlots, t)
                             : detail.hasRealityLinkedMomentToday
-                              ? "现实发圈已完成"
-                              : "现实发圈待生成"
+                              ? t(msg`现实发圈已完成`)
+                              : t(msg`现实发圈待生成`)
                         }
                       />
                     </div>
@@ -1403,9 +1431,9 @@ export function RealWorldSyncPage() {
                     <div className="mt-6">
                       <AdminTabs
                         tabs={[
-                          { key: "digest", label: "当前 Digest" },
-                          { key: "signals", label: "信号明细" },
-                          { key: "runs", label: "运行记录" },
+                          { key: "digest", label: t(msg`当前 Digest`) },
+                          { key: "signals", label: t(msg`信号明细`) },
+                          { key: "runs", label: t(msg`运行记录`) },
                         ]}
                         activeKey={detailTab}
                         onChange={(value) => setDetailTab(value as DetailTab)}
@@ -1416,43 +1444,43 @@ export function RealWorldSyncPage() {
                       {detailTab === "digest" ? (
                         <div className="space-y-4">
                           <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-                            <AdminSubpanel title="角色配置">
+                            <AdminSubpanel title={t(msg`角色配置`)}>
                               <div className="grid gap-3 md:grid-cols-2">
                                 <AdminValueCard
-                                  label="主体名称"
+                                  label={t(msg`主体名称`)}
                                   value={detail.config.subjectName}
                                 />
                                 <AdminValueCard
-                                  label="主体类型"
+                                  label={t(msg`主体类型`)}
                                   value={
-                                    SUBJECT_TYPE_LABELS[
-                                      detail.config.subjectType
-                                    ] ?? detail.config.subjectType
+                                    SUBJECT_TYPE_LABELS[detail.config.subjectType]
+                                      ? t(SUBJECT_TYPE_LABELS[detail.config.subjectType])
+                                      : detail.config.subjectType
                                   }
                                 />
                                 <AdminValueCard
-                                  label="别名"
+                                  label={t(msg`别名`)}
                                   value={
                                     detail.config.aliases.length > 0
                                       ? detail.config.aliases.join(" / ")
-                                      : "未配置"
+                                      : t(msg`未配置`)
                                   }
                                 />
                                 <AdminValueCard
-                                  label="手动 steering"
+                                  label={t(msg`手动 steering`)}
                                   value={
                                     detail.config.manualSteeringNotes ||
-                                    "未配置"
+                                    t(msg`未配置`)
                                   }
                                 />
                               </div>
                             </AdminSubpanel>
 
-                            <AdminSubpanel title="当前生效结果">
+                            <AdminSubpanel title={t(msg`当前生效结果`)}>
                               {detail.activeDigest ? (
                                 <div className="space-y-4">
                                   <AdminCallout
-                                    title="今日现实概况"
+                                    title={t(msg`今日现实概况`)}
                                     tone="info"
                                     description={
                                       detail.activeDigest.dailySummary
@@ -1460,30 +1488,29 @@ export function RealWorldSyncPage() {
                                   />
                                   <div className="grid gap-3 md:grid-cols-2">
                                     <AdminValueCard
-                                      label="Digest 状态"
+                                      label={t(msg`Digest 状态`)}
                                       value={
-                                        DIGEST_STATUS_LABELS[
-                                          detail.activeDigest.status
-                                        ] ?? detail.activeDigest.status
+                                        DIGEST_STATUS_LABELS[detail.activeDigest.status]
+                                          ? t(DIGEST_STATUS_LABELS[detail.activeDigest.status])
+                                          : detail.activeDigest.status
                                       }
                                     />
                                     <AdminValueCard
-                                      label="应用模式"
+                                      label={t(msg`应用模式`)}
                                       value={
                                         detail.activeDigest.appliedMode
-                                          ? (APPLY_MODE_LABELS[
-                                              detail.activeDigest.appliedMode
-                                            ] ??
-                                            detail.activeDigest.appliedMode)
-                                          : "未记录"
+                                          ? (APPLY_MODE_LABELS[detail.activeDigest.appliedMode]
+                                              ? t(APPLY_MODE_LABELS[detail.activeDigest.appliedMode])
+                                              : detail.activeDigest.appliedMode)
+                                          : t(msg`未记录`)
                                       }
                                     />
                                     <AdminValueCard
-                                      label="信号数"
-                                      value={`${detail.activeDigest.signalIds.length} 条`}
+                                      label={t(msg`信号数`)}
+                                      value={t(msg`${detail.activeDigest.signalIds.length} 条`)}
                                     />
                                     <AdminValueCard
-                                      label="更新时间"
+                                      label={t(msg`更新时间`)}
                                       value={formatCompactTime(
                                         detail.activeDigest.updatedAt,
                                       )}
@@ -1491,19 +1518,19 @@ export function RealWorldSyncPage() {
                                   </div>
                                   {detail.activeDigest.behaviorSummary ? (
                                     <AdminSoftBox>
-                                      行为摘要：
+                                      {t(msg`行为摘要：`)}
                                       {detail.activeDigest.behaviorSummary}
                                     </AdminSoftBox>
                                   ) : null}
                                   {detail.activeDigest.stanceShiftSummary ? (
                                     <AdminSoftBox>
-                                      立场变化：
+                                      {t(msg`立场变化：`)}
                                       {detail.activeDigest.stanceShiftSummary}
                                     </AdminSoftBox>
                                   ) : null}
                                   {detail.activeDigest.realityMomentBrief ? (
                                     <AdminCallout
-                                      title="现实发圈锚点"
+                                      title={t(msg`现实发圈锚点`)}
                                       tone="success"
                                       description={
                                         detail.activeDigest.realityMomentBrief
@@ -1513,8 +1540,8 @@ export function RealWorldSyncPage() {
                                 </div>
                               ) : (
                                 <AdminEmptyState
-                                  title="当前还没有生效中的现实概况"
-                                  description="该角色还没跑出 live digest，或者当前处于 shadow / disabled 模式。"
+                                  title={t(msg`当前还没有生效中的现实概况`)}
+                                  description={t(msg`该角色还没跑出 live digest，或者当前处于 shadow / disabled 模式。`)}
                                 />
                               )}
                             </AdminSubpanel>
@@ -1522,11 +1549,14 @@ export function RealWorldSyncPage() {
 
                           {detail.isWorldNewsDesk ? (
                             <AdminCallout
-                              title="界闻三段更新"
+                              title={t(msg`界闻三段更新`)}
                               tone="success"
-                              description={`今天已完成：${formatBulletinSlots(
+                              // i18n-ignore-start: multiline t(msg`...`) with function call interpolation
+                              description={t(msg`今天已完成：${formatBulletinSlots(
                                 detail.todayBulletinSlots,
-                              )}。调度窗口为 07:30-09:30、11:30-13:30、18:30-21:00，同一时段当天只发一次。`}
+                                t,
+                              )}。调度窗口为 07:30-09:30、11:30-13:30、18:30-21:00，同一时段当天只发一次。`)}
+                              // i18n-ignore-end
                               actions={
                                 <>
                                   {BULLETIN_SLOT_ORDER.map((slot) => (
@@ -1543,8 +1573,8 @@ export function RealWorldSyncPage() {
                                     >
                                       {publishBulletinMutation.isPending &&
                                       publishBulletinMutation.variables === slot
-                                        ? `补发${BULLETIN_SLOT_LABELS[slot]}中...`
-                                        : `补发${BULLETIN_SLOT_LABELS[slot]}`}
+                                        ? t(msg`补发${t(BULLETIN_SLOT_LABELS[slot])}中...`)
+                                        : t(msg`补发${t(BULLETIN_SLOT_LABELS[slot])}`)}
                                     </Button>
                                   ))}
                                 </>
@@ -1554,12 +1584,12 @@ export function RealWorldSyncPage() {
 
                           {detail.activeDigest ? (
                             <>
-                              <AdminSubpanel title="Scene Patch">
+                              <AdminSubpanel title="Scene Patch"> {/* i18n-ignore-line: admin technical label */}
                                 <ScenePatchPanel digest={detail.activeDigest} />
                               </AdminSubpanel>
 
                               {detail.activeDigest.globalOverlay ? (
-                                <AdminSubpanel title="Global Overlay">
+                                <AdminSubpanel title="Global Overlay"> {/* i18n-ignore-line: admin technical label */}
                                   <AdminCodeBlock
                                     value={detail.activeDigest.globalOverlay}
                                   />
@@ -1568,7 +1598,7 @@ export function RealWorldSyncPage() {
                             </>
                           ) : null}
 
-                          <AdminSubpanel title="最近 Digest 记录">
+                          <AdminSubpanel title={t(msg`最近 Digest 记录`)}>
                             {detail.recentDigests.length > 0 ? (
                               <div className="space-y-3">
                                 {detail.recentDigests
@@ -1582,8 +1612,8 @@ export function RealWorldSyncPage() {
                               </div>
                             ) : (
                               <AdminEmptyState
-                                title="还没有历史 Digest"
-                                description="需要先有一次成功的 digest 生成，历史记录才会出现在这里。"
+                                title={t(msg`还没有历史 Digest`)}
+                                description={t(msg`需要先有一次成功的 digest 生成，历史记录才会出现在这里。`)}
                               />
                             )}
                           </AdminSubpanel>
@@ -1593,9 +1623,9 @@ export function RealWorldSyncPage() {
                       {detailTab === "signals" ? (
                         <div className="space-y-4">
                           <AdminCallout
-                            title="信号排查"
+                            title={t(msg`信号排查`)}
                             tone="info"
-                            description={`这里保留最近采集到的现实信号、归一化摘要和抓取调试快照。先看状态与三项分数，再决定是调来源过滤、阈值还是 Prompt。`}
+                            description={t(msg`这里保留最近采集到的现实信号、归一化摘要和抓取调试快照。先看状态与三项分数，再决定是调来源过滤、阈值还是 Prompt。`)}
                           />
                           {detail.recentSignals.length > 0 ? (
                             <div className="space-y-3">
@@ -1613,8 +1643,8 @@ export function RealWorldSyncPage() {
                             </div>
                           ) : (
                             <AdminEmptyState
-                              title="最近没有信号"
-                              description="先执行同步，或者检查该角色是否真的启用了现实联动。"
+                              title={t(msg`最近没有信号`)}
+                              description={t(msg`先执行同步，或者检查该角色是否真的启用了现实联动。`)}
                             />
                           )}
                         </div>
@@ -1623,9 +1653,9 @@ export function RealWorldSyncPage() {
                       {detailTab === "runs" ? (
                         <div className="space-y-4">
                           <AdminCallout
-                            title="运行回看"
+                            title={t(msg`运行回看`)}
                             tone="info"
-                            description="一轮运行会经历信号采集、digest 生成和人工重跑几种状态。异常时优先看查询词、采纳/过滤数量和错误信息。"
+                            description={t(msg`一轮运行会经历信号采集、digest 生成和人工重跑几种状态。异常时优先看查询词、采纳/过滤数量和错误信息。`)}
                           />
                           {detail.recentRuns.length > 0 ? (
                             <div className="space-y-3">
@@ -1635,8 +1665,8 @@ export function RealWorldSyncPage() {
                             </div>
                           ) : (
                             <AdminEmptyState
-                              title="还没有运行记录"
-                              description="当前角色还没有执行过现实联动。"
+                              title={t(msg`还没有运行记录`)}
+                              description={t(msg`当前角色还没有执行过现实联动。`)}
                             />
                           )}
                         </div>
@@ -1646,11 +1676,11 @@ export function RealWorldSyncPage() {
                 ) : null
               ) : (
                 <AdminEmptyState
-                  title="还没有启用真实世界联动的角色"
-                  description="先去角色工厂打开“真实世界链接”，再回来观察每日现实概况和现实发圈。"
+                  title={t(msg`还没有启用真实世界联动的角色`)}
+                  description={t(msg`先去角色工厂打开"真实世界链接"，再回来观察每日现实概况和现实发圈。`)}
                   actions={
                     <Link to="/characters">
-                      <Button variant="secondary">前往角色工厂</Button>
+                      <Button variant="secondary">{t(msg`前往角色工厂`)}</Button>
                     </Link>
                   }
                 />
@@ -1659,7 +1689,7 @@ export function RealWorldSyncPage() {
           ) : (
             <Card className="bg-[color:var(--surface-console)]">
               <AdminSectionHeader
-                title="全局规则"
+                title={t(msg`全局规则`)}
                 actions={
                   <div className="flex flex-wrap items-center gap-3">
                     <AdminDraftStatusPill ready dirty={isRulesDirty} />
@@ -1669,7 +1699,7 @@ export function RealWorldSyncPage() {
                       disabled={!isRulesDirty}
                       onClick={() => setRulesDraft(overview.rules)}
                     >
-                      重置草稿
+                      {t(msg`重置草稿`)}
                     </Button>
                     <Button
                       variant="primary"
@@ -1677,8 +1707,8 @@ export function RealWorldSyncPage() {
                       onClick={() => saveRulesMutation.mutate(rulesDraft)}
                     >
                       {saveRulesMutation.isPending
-                        ? "保存中..."
-                        : "保存全局规则"}
+                        ? t(msg`保存中...`)
+                        : t(msg`保存全局规则`)}
                     </Button>
                   </div>
                 }
@@ -1687,9 +1717,9 @@ export function RealWorldSyncPage() {
               <div className="mt-4">
                 <AdminTabs
                   tabs={[
-                    { key: "strategy", label: "采集策略" },
-                    { key: "sources", label: "来源过滤" },
-                    { key: "prompts", label: "Prompt 模板" },
+                    { key: "strategy", label: t(msg`采集策略`) },
+                    { key: "sources", label: t(msg`来源过滤`) },
+                    { key: "prompts", label: t(msg`Prompt 模板`) },
                   ]}
                   activeKey={rulesTab}
                   onChange={(value) => setRulesTab(value as RulesTab)}
@@ -1699,17 +1729,20 @@ export function RealWorldSyncPage() {
               {rulesTab === "strategy" ? (
                 <div className="mt-5 space-y-4">
                   <AdminCallout
-                    title="默认 Provider 行为"
+                    title={t(msg`默认 Provider 行为`)}
                     tone="info"
-                    description={`当前默认 Provider 为 ${
-                      PROVIDER_MODE_LABELS[rulesDraft.providerMode] ??
-                      rulesDraft.providerMode
-                    }。普通公众人物会先按这里采集；界闻角色仍固定优先走专用 RSS 聚合。`}
+                    // i18n-ignore-start: nested t() inside t(msg`...`)
+                    description={t(msg`当前默认 Provider 为 ${
+                      PROVIDER_MODE_LABELS[rulesDraft.providerMode]
+                        ? t(PROVIDER_MODE_LABELS[rulesDraft.providerMode])
+                        : rulesDraft.providerMode
+                    }。普通公众人物会先按这里采集；界闻角色仍固定优先走专用 RSS 聚合。`)}
+                    // i18n-ignore-end
                   />
 
                   <div className="grid gap-4 md:grid-cols-2">
                     <AdminSelectField
-                      label="默认采集 Provider"
+                      label={t(msg`默认采集 Provider`)}
                       value={rulesDraft.providerMode}
                       onChange={(value) =>
                         setRulesDraft((current) =>
@@ -1725,16 +1758,16 @@ export function RealWorldSyncPage() {
                       options={[
                         {
                           value: "google_news_rss",
-                          label: PROVIDER_MODE_LABELS.google_news_rss,
+                          label: t(PROVIDER_MODE_LABELS.google_news_rss),
                         },
                         {
                           value: "mock",
-                          label: PROVIDER_MODE_LABELS.mock,
+                          label: t(PROVIDER_MODE_LABELS.mock),
                         },
                       ]}
                     />
                     <AdminTextField
-                      label="默认语言区域"
+                      label={t(msg`默认语言区域`)}
                       value={rulesDraft.defaultLocale}
                       onChange={(value) =>
                         setRulesDraft((current) =>
@@ -1748,7 +1781,7 @@ export function RealWorldSyncPage() {
                       }
                     />
                     <AdminTextField
-                      label="回溯小时"
+                      label={t(msg`回溯小时`)}
                       value={rulesDraft.defaultRecencyHours}
                       type="number"
                       min={1}
@@ -1767,7 +1800,7 @@ export function RealWorldSyncPage() {
                       }
                     />
                     <AdminTextField
-                      label="每轮最多信号"
+                      label={t(msg`每轮最多信号`)}
                       value={rulesDraft.defaultMaxSignalsPerRun}
                       type="number"
                       min={1}
@@ -1786,7 +1819,7 @@ export function RealWorldSyncPage() {
                       }
                     />
                     <AdminTextField
-                      label="最低可信阈值"
+                      label={t(msg`最低可信阈值`)}
                       value={rulesDraft.defaultMinimumConfidence}
                       type="number"
                       min={0}
@@ -1806,7 +1839,7 @@ export function RealWorldSyncPage() {
                       }
                     />
                     <AdminTextField
-                      label="Google News 语言"
+                      label={t(msg`Google News 语言`)}
                       value={rulesDraft.googleNews.editionLanguage}
                       onChange={(value) =>
                         setRulesDraft((current) =>
@@ -1823,7 +1856,7 @@ export function RealWorldSyncPage() {
                       }
                     />
                     <AdminTextField
-                      label="Google News 地区"
+                      label={t(msg`Google News 地区`)}
                       value={rulesDraft.googleNews.editionRegion}
                       onChange={(value) =>
                         setRulesDraft((current) =>
@@ -1840,7 +1873,7 @@ export function RealWorldSyncPage() {
                       }
                     />
                     <AdminTextField
-                      label="Google News CEID"
+                      label={t(msg`Google News CEID`)}
                       value={rulesDraft.googleNews.editionCeid}
                       onChange={(value) =>
                         setRulesDraft((current) =>
@@ -1857,7 +1890,7 @@ export function RealWorldSyncPage() {
                       }
                     />
                     <AdminTextField
-                      label="Google News 拉取上限"
+                      label={t(msg`Google News 拉取上限`)}
                       value={rulesDraft.googleNews.maxEntriesPerQuery}
                       type="number"
                       min={1}
@@ -1879,7 +1912,7 @@ export function RealWorldSyncPage() {
                       }
                     />
                     <AdminSelectField
-                      label="无结果时回退 Mock"
+                      label={t(msg`无结果时回退 Mock`)}
                       value={String(
                         rulesDraft.googleNews.fallbackToMockOnEmpty,
                       )}
@@ -1898,8 +1931,8 @@ export function RealWorldSyncPage() {
                         )
                       }
                       options={[
-                        { value: "true", label: "开启回退" },
-                        { value: "false", label: "仅保留真实结果" },
+                        { value: "true", label: t(msg`开启回退`) },
+                        { value: "false", label: t(msg`仅保留真实结果`) },
                       ]}
                     />
                   </div>
@@ -1909,13 +1942,13 @@ export function RealWorldSyncPage() {
               {rulesTab === "sources" ? (
                 <div className="mt-5 space-y-4">
                   <AdminCallout
-                    title="来源过滤建议"
+                    title={t(msg`来源过滤建议`)}
                     tone="info"
-                    description="白名单用于保留可信媒体或官方源，黑名单用于提前拦截低质站点。多个来源使用逗号分隔。"
+                    description={t(msg`白名单用于保留可信媒体或官方源，黑名单用于提前拦截低质站点。多个来源使用逗号分隔。`)}
                   />
                   <div className="grid gap-4">
                     <AdminTextField
-                      label="默认白名单来源"
+                      label={t(msg`默认白名单来源`)}
                       value={listToCsv(rulesDraft.defaultSourceAllowlist)}
                       onChange={(value) =>
                         setRulesDraft((current) =>
@@ -1929,7 +1962,7 @@ export function RealWorldSyncPage() {
                       }
                     />
                     <AdminTextField
-                      label="默认黑名单来源"
+                      label={t(msg`默认黑名单来源`)}
                       value={listToCsv(rulesDraft.defaultSourceBlocklist)}
                       onChange={(value) =>
                         setRulesDraft((current) =>
@@ -1949,12 +1982,12 @@ export function RealWorldSyncPage() {
               {rulesTab === "prompts" ? (
                 <div className="mt-5 space-y-4">
                   <AdminCallout
-                    title="Prompt 调整原则"
+                    title={t(msg`Prompt 调整原则`)}
                     tone="info"
-                    description="只有当同类问题跨角色重复出现时，再动这里的全局 Prompt；单角色异常优先回角色配置或具体抓取证据。"
+                    description={t(msg`只有当同类问题跨角色重复出现时，再动这里的全局 Prompt；单角色异常优先回角色配置或具体抓取证据。`)}
                   />
                   <AdminTextArea
-                    label="信号归一化提示词"
+                    label={t(msg`信号归一化提示词`)}
                     value={rulesDraft.promptTemplates.signalNormalizationPrompt}
                     onChange={(value) =>
                       setRulesDraft((current) =>
@@ -1971,7 +2004,7 @@ export function RealWorldSyncPage() {
                     }
                   />
                   <AdminTextArea
-                    label="每日概况提示词"
+                    label={t(msg`每日概况提示词`)}
                     value={rulesDraft.promptTemplates.dailyDigestPrompt}
                     onChange={(value) =>
                       setRulesDraft((current) =>
@@ -1988,7 +2021,7 @@ export function RealWorldSyncPage() {
                     }
                   />
                   <AdminTextArea
-                    label="Scene Patch 提示词"
+                    label={t(msg`Scene Patch 提示词`)}
                     value={rulesDraft.promptTemplates.scenePatchPrompt}
                     onChange={(value) =>
                       setRulesDraft((current) =>
@@ -2005,7 +2038,7 @@ export function RealWorldSyncPage() {
                     }
                   />
                   <AdminTextArea
-                    label="现实发圈提示词"
+                    label={t(msg`现实发圈提示词`)}
                     value={rulesDraft.promptTemplates.realityMomentPrompt}
                     onChange={(value) =>
                       setRulesDraft((current) =>
@@ -2030,14 +2063,14 @@ export function RealWorldSyncPage() {
                   disabled={!isRulesDirty}
                   onClick={() => setRulesDraft(overview.rules)}
                 >
-                  重置草稿
+                  {t(msg`重置草稿`)}
                 </Button>
                 <Button
                   variant="primary"
                   disabled={!isRulesDirty || saveRulesMutation.isPending}
                   onClick={() => saveRulesMutation.mutate(rulesDraft)}
                 >
-                  {saveRulesMutation.isPending ? "保存中..." : "保存全局规则"}
+                  {saveRulesMutation.isPending ? t(msg`保存中...`) : t(msg`保存全局规则`)}
                 </Button>
               </div>
             </Card>
@@ -2047,4 +2080,3 @@ export function RealWorldSyncPage() {
     </div>
   );
 }
-// i18n-ignore-end

@@ -1,6 +1,7 @@
 import {
   Injectable,
   Logger,
+  OnApplicationShutdown,
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
@@ -110,10 +111,16 @@ type SyncConfig = {
   intervalMs: number;
 };
 
-const DEFAULT_INTERVAL_MS = 60 * 60 * 1000;
+// Default to 5min so cloud-console reflects each running world within a tight
+// freshness window. Override via CLOUD_TOKEN_USAGE_SYNC_INTERVAL_MS if a
+// deployment wants the historical 60min cadence.
+const DEFAULT_INTERVAL_MS = 5 * 60 * 1000;
+const SHUTDOWN_FLUSH_TIMEOUT_MS = 5_000;
 
 @Injectable()
-export class CloudTokenUsageSyncService implements OnModuleInit, OnModuleDestroy {
+export class CloudTokenUsageSyncService
+  implements OnModuleInit, OnModuleDestroy, OnApplicationShutdown
+{
   private readonly logger = new Logger(CloudTokenUsageSyncService.name);
   private timer: NodeJS.Timeout | null = null;
   private syncing = false;
@@ -143,6 +150,24 @@ export class CloudTokenUsageSyncService implements OnModuleInit, OnModuleDestroy
       clearInterval(this.timer);
       this.timer = null;
     }
+  }
+
+  /**
+   * Best-effort final flush before the process exits (covers world suspend
+   * and graceful shutdown). Bounded by SHUTDOWN_FLUSH_TIMEOUT_MS so a hung
+   * cloud-api never blocks the world from exiting.
+   */
+  async onApplicationShutdown() {
+    const config = this.getConfig();
+    if (!config) return;
+    const flush = this.runSync().catch((error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Final flush failed: ${message}`);
+    });
+    const timeout = new Promise<void>((resolve) =>
+      setTimeout(resolve, SHUTDOWN_FLUSH_TIMEOUT_MS),
+    );
+    await Promise.race([flush, timeout]);
   }
 
   async runSync(): Promise<void> {

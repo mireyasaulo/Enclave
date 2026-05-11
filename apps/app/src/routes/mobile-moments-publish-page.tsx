@@ -89,7 +89,7 @@ export function MobileMomentsPublishPage() {
 
   useEffect(() => {
     if (!toast) return;
-    const timer = window.setTimeout(() => setToast(""), 1600);
+    const timer = window.setTimeout(() => setToast(""), 1600); // i18n-ignore-line: clearing state
     return () => window.clearTimeout(timer);
   }, [toast]);
 
@@ -166,7 +166,7 @@ export function MobileMomentsPublishPage() {
   return (
     <AppPage className="space-y-0 bg-[#F7F7F7] px-0 py-0">
       <TabPageTopBar
-        title=""
+        title="" // i18n-ignore-line: intentionally empty
         className="mx-0 mb-0 mt-0 border-b border-[#ECECEC] bg-[#F7F7F7] px-3 pb-1.5 pt-1.5 text-[#1A1A1A] shadow-none"
         leftActions={
           <button

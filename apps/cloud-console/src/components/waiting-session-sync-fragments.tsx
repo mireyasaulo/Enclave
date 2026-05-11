@@ -229,6 +229,7 @@ export function WaitingSessionSyncTaskStatusBadge({
   status: CloudWaitingSessionSyncTaskSummary["status"];
   className?: string;
 }) {
+  const t = useCloudConsoleText();
   return (
     <span
       className={joinClasses(
@@ -237,7 +238,7 @@ export function WaitingSessionSyncTaskStatusBadge({
         className,
       )}
     >
-      {TASK_STATUS_LABELS[status]}
+      {t(TASK_STATUS_LABELS[status])}
     </span>
   );
 }
@@ -249,16 +250,17 @@ export function WaitingSessionSyncStatusPills({
   summary: WaitingSessionSyncStatusSummary;
   className?: string;
 }) {
+  const t = useCloudConsoleText();
   return (
     <div className={joinClasses("flex flex-wrap gap-2 text-xs", className)}>
       <span className="rounded-full border border-rose-300/40 bg-rose-50 px-3 py-1 text-rose-700">
-        Failed {summary.failed}
+        {t("Failed {0}").replace("{0}", String(summary.failed))}
       </span>
       <span className="rounded-full border border-amber-300/40 bg-amber-50 px-3 py-1 text-amber-700">
-        Pending {summary.pending}
+        {t("Pending {0}").replace("{0}", String(summary.pending))}
       </span>
       <span className="rounded-full border border-sky-300/40 bg-sky-50 px-3 py-1 text-sky-700">
-        Running {summary.running}
+        {t("Running {0}").replace("{0}", String(summary.running))}
       </span>
     </div>
   );
@@ -284,19 +286,19 @@ export function WaitingSessionSyncArtifactSummary({
       </div>
       <div className="mt-2 flex flex-wrap gap-2">
         <span className="rounded-full border border-sky-200/30 px-3 py-1">
-          Ids {artifact.taskIds.length}
+          {t("Ids {0}").replace("{0}", String(artifact.taskIds.length))}
         </span>
         <span className="rounded-full border border-sky-200/30 px-3 py-1">
-          Keys {artifact.taskKeys.length}
+          {t("Keys {0}").replace("{0}", String(artifact.taskKeys.length))}
         </span>
         <span className="rounded-full border border-sky-200/30 px-3 py-1">
-          Targets {artifact.targetValues.length}
+          {t("Targets {0}").replace("{0}", String(artifact.targetValues.length))}
         </span>
       </div>
       <div className="mt-3 leading-6 text-sky-700/85">
-        <div>Target values: {artifact.targetValues.join(" · ")}</div>
+        <div>{t("Target values: {0}").replace("{0}", artifact.targetValues.join(" · "))}</div>
         {artifact.worldDetailPath ? (
-          <div>World detail: {artifact.worldDetailPath}</div>
+          <div>{t("World detail: {0}").replace("{0}", artifact.worldDetailPath)}</div>
         ) : null}
       </div>
     </div>

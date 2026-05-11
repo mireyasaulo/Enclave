@@ -43,6 +43,8 @@ import type {
   InstallCharacterPresetsResult,
   InstallModelPersonasRequest,
   InstallModelPersonasResult,
+  InstallVendorFamilyPersonasRequest,
+  InstallVendorFamilyPersonasResult,
   RebindModelPersonasRequest,
   RebindModelPersonasResult,
   NeedDiscoveryConfig,
@@ -302,6 +304,14 @@ export const adminApi = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  installVendorFamilyPersonas: (payload: InstallVendorFamilyPersonasRequest) =>
+    adminFetch<InstallVendorFamilyPersonasResult>(
+      "/inference/vendor-family-personas/install",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      },
+    ),
   getConfig: () => adminFetch<Record<string, string>>("/config"),
   setConfig: (key: string, value: string) =>
     adminFetch<{ success: boolean }>("/config", {
@@ -751,6 +761,15 @@ export const adminApi = {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
+  syncTokenUsagePricingFromN1n: () =>
+    adminFetch<{
+      source: "n1n.ai";
+      fetchedAt: string;
+      catalogItems: number;
+      recomputedRows: number;
+    }>("/token-usage/sync-pricing-from-n1n", {
+      method: "POST",
+    }),
   getTokenUsageBudgets: () =>
     adminFetch<TokenUsageBudgetSnapshot>("/token-usage/budgets"),
   setTokenUsageBudgets: (payload: TokenUsageBudgetSnapshot["config"]) =>
@@ -758,5 +777,20 @@ export const adminApi = {
       method: "PATCH",
       body: JSON.stringify(payload),
     }),
+  getMinimaxQuota: () => adminFetch<MinimaxQuotaResponse>("/minimax/quota"),
 };
+
+export interface MinimaxQuotaSnapshot {
+  used: number;
+  reserved: number;
+  committed: number;
+  limit: number;
+  remaining: number;
+}
+
+export interface MinimaxQuotaResponse {
+  date: string;
+  byModel: Record<string, MinimaxQuotaSnapshot>;
+  warnings: string[];
+}
 // i18n-ignore-end

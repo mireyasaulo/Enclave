@@ -2,7 +2,8 @@ export type MomentContentType =
   | 'text'
   | 'image_album'
   | 'video'
-  | 'live_photo';
+  | 'live_photo'
+  | 'audio_card';
 
 export interface MomentLivePhotoMetadata {
   enabled: boolean;
@@ -35,7 +36,23 @@ export interface MomentVideoAsset {
   durationMs?: number;
 }
 
-export type MomentMediaAsset = MomentImageAsset | MomentVideoAsset;
+export interface MomentAudioAsset {
+  id: string;
+  kind: 'audio';
+  url: string;
+  posterUrl?: string;
+  mimeType: string;
+  fileName: string;
+  size: number;
+  durationMs?: number;
+  title?: string;
+  lyrics?: string;
+}
+
+export type MomentMediaAsset =
+  | MomentImageAsset
+  | MomentVideoAsset
+  | MomentAudioAsset;
 
 export type MomentVisibility = 'public' | 'friends' | 'private';
 

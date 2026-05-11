@@ -330,24 +330,23 @@ export function ContactsPage() {
   const startChatResetRef = useRef<() => void>(() => {});
   const deferredSearchText = useDeferredValue("");
   const desktopContactsPath = "/tabs/contacts";
-  const initialPathnameRef = useRef(pathname);
-  const initialHashRef = useRef(hash);
+  const normalizedPathname = normalizePathname(pathname);
+  const desktopPathMismatch = normalizedPathname !== desktopContactsPath;
 
   useEffect(() => {
-    const initialPathname = normalizePathname(initialPathnameRef.current);
-    if (!isDesktopLayout || initialPathname === desktopContactsPath) {
+    if (!isDesktopLayout) {
+      return;
+    }
+    if (!desktopPathMismatch) {
       return;
     }
 
     void navigate({
       to: desktopContactsPath,
-      hash: initialHashRef.current || undefined,
+      hash: hash || undefined,
       replace: true,
     });
-    // 仅在挂载时纠正一次 legacy 路径，挂载后 router 状态更新会触发重渲染
-    // 但此时 pathname 可能已经在向其他 tab 过渡，不应回弹到 /tabs/contacts。
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [desktopContactsPath, desktopPathMismatch, hash, isDesktopLayout, navigate]);
 
   const friendsQuery = useQuery({
     queryKey: ["app-friends", baseUrl],
@@ -389,19 +388,14 @@ export function ContactsPage() {
         return;
       }
 
-      if (isDesktopLayout) {
-        void navigate({
-          to: "/tabs/chat",
-          hash: buildDesktopChatRouteHash({
-            conversationId: conversation.id,
-          }),
-        });
-      } else {
-        void navigate({
-          to: "/chat/$conversationId",
-          params: { conversationId: conversation.id },
-        });
-      }
+      void navigate({
+        to: isDesktopLayout
+          ? buildDesktopChatThreadPath({ conversationId: conversation.id, })
+          : "/chat/$conversationId",
+        params: isDesktopLayout
+          ? undefined
+          : { conversationId: conversation.id },
+      } as never);
     },
   });
 

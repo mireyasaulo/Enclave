@@ -112,10 +112,17 @@ export function setupWorldApiWsProxy(
 
       const target = await proxyService.resolveTarget(phone);
       if (!target) {
+        logger.log(
+          `proxy_metric kind=ws_open phone=${phone} status=503 err=instance_not_ready`,
+        );
         return writeHandshakeError(clientSocket, 503, "Service Unavailable");
       }
 
       const subPath = req.url!.slice(PROXY_PATH_PREFIX.length) || "/";
+      const wsStartedAt = process.hrtime.bigint();
+      logger.log(
+        `proxy_metric kind=ws_open world=${target.worldId} phone=${phone} status=101`,
+      );
       const upstream = net.createConnection(
         { host: target.host, port: target.port },
         () => {
@@ -140,6 +147,15 @@ export function setupWorldApiWsProxy(
         },
       );
 
+      let metricEmitted = false;
+      const emitCloseMetric = (reason: string) => {
+        if (metricEmitted) return;
+        metricEmitted = true;
+        const ms = Number((process.hrtime.bigint() - wsStartedAt) / 1_000_000n);
+        logger.log(
+          `proxy_metric kind=ws_close world=${target.worldId} phone=${phone} ms=${ms} reason=${reason}`,
+        );
+      };
       const cleanup = () => {
         clientSocket.destroy();
         upstream.destroy();
@@ -148,13 +164,21 @@ export function setupWorldApiWsProxy(
         logger.warn(
           `ws upstream error world=${target.worldId} ${err instanceof Error ? err.message : String(err)}`,
         );
+        emitCloseMetric("upstream_error");
         cleanup();
       });
       clientSocket.on("error", () => {
+        emitCloseMetric("client_error");
         upstream.destroy();
       });
-      clientSocket.on("close", () => upstream.destroy());
-      upstream.on("close", () => clientSocket.destroy());
+      clientSocket.on("close", () => {
+        emitCloseMetric("client_close");
+        upstream.destroy();
+      });
+      upstream.on("close", () => {
+        emitCloseMetric("upstream_close");
+        clientSocket.destroy();
+      });
     })().catch((err) => {
       logger.error(
         `unexpected ws upgrade handler error: ${err instanceof Error ? err.stack ?? err.message : String(err)}`,

@@ -43,6 +43,8 @@ import type {
   SendPhoneCodeResponse,
   VerifyEmailCodeRequest,
   VerifyEmailCodeResponse,
+  VerifyGoogleIdTokenRequest,
+  VerifyGoogleIdTokenResponse,
   VerifyPhoneCodeRequest,
   VerifyPhoneCodeResponse,
   WorldAccessSessionSummary,
@@ -725,6 +727,16 @@ function normalizeMomentMediaAsset(
     };
   }
 
+  if (asset.kind === "audio") {
+    return {
+      ...asset,
+      url: normalizeAttachmentAssetUrl(asset.url, baseUrl),
+      posterUrl: asset.posterUrl
+        ? normalizeAttachmentAssetUrl(asset.posterUrl, baseUrl)
+        : asset.posterUrl,
+    };
+  }
+
   return {
     ...asset,
     url: normalizeAttachmentAssetUrl(asset.url, baseUrl),
@@ -887,7 +899,7 @@ function normalizeFeedPost<T extends FeedPost>(post: T, baseUrl?: string): T {
     aspectRatio:
       typeof post.aspectRatio === "number" && Number.isFinite(post.aspectRatio)
         ? post.aspectRatio
-        : primaryMedia?.width && primaryMedia.height
+        : primaryMedia && primaryMedia.kind !== "audio" && primaryMedia.width && primaryMedia.height
           ? primaryMedia.width / primaryMedia.height
           : null,
     topicTags: Array.isArray(post.topicTags) ? post.topicTags : [],
@@ -1150,6 +1162,20 @@ export function verifyCloudEmailCode(
   );
 }
 
+export function verifyCloudGoogleIdToken(
+  payload: VerifyGoogleIdTokenRequest,
+  baseUrl?: string,
+) {
+  return requestCloudApi<VerifyGoogleIdTokenResponse>(
+    "/cloud/auth/google/verify-id-token",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
 function buildCloudAuthHeaders(
   accessToken: string,
   init?: RequestInit,
@@ -1161,6 +1187,25 @@ function buildCloudAuthHeaders(
     ...init,
     headers,
   };
+}
+
+export type RefreshCloudAccessTokenResponse = {
+  accessToken: string;
+  expiresAt: string;
+};
+
+// Sliding TTL：临到期前调，cloud-api 用现有 token 鉴权后签新 token 返回，
+// 不需要重发邮件验证码。token 已过期则 401，调用方应清 cloud-session-store
+// 引导用户重新登录。
+export function refreshCloudAccessToken(
+  accessToken: string,
+  baseUrl?: string,
+) {
+  return requestCloudApi<RefreshCloudAccessTokenResponse>(
+    "/cloud/auth/refresh-access",
+    buildCloudAuthHeaders(accessToken, { method: "POST" }),
+    baseUrl,
+  );
 }
 
 export function getMyCloudWorld(accessToken: string, baseUrl?: string) {
@@ -1707,12 +1752,14 @@ export function getLatestWorldContext(baseUrl?: string) {
   return requestLegacyApi<WorldContext>("/world/context", undefined, baseUrl);
 }
 
-export function getFriendRequests(baseUrl?: string) {
-  return requestLegacyApi<FriendRequest[]>(
-    "/social/friend-requests",
-    undefined,
-    baseUrl,
-  );
+export function getFriendRequests(
+  baseUrl?: string,
+  opts?: { direction?: "inbound" | "outbound" | "all" },
+) {
+  const path = opts?.direction
+    ? `/social/friend-requests?direction=${encodeURIComponent(opts.direction)}`
+    : "/social/friend-requests";
+  return requestLegacyApi<FriendRequest[]>(path, undefined, baseUrl);
 }
 
 export function getConversations(baseUrl?: string) {

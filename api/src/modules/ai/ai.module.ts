@@ -10,6 +10,7 @@ import { SystemConfigModule } from '../config/config.module';
 import { WorldModule } from '../world/world.module';
 import { AiUsageLedgerEntity } from '../analytics/ai-usage-ledger.entity';
 import { AiUsageLedgerService } from '../analytics/ai-usage-ledger.service';
+import { N1nPricingSyncService } from '../analytics/n1n-pricing-sync.service';
 import { CharacterEntity } from '../characters/character.entity';
 import { ConversationEntity } from '../chat/conversation.entity';
 import { GroupEntity } from '../chat/group.entity';
@@ -38,6 +39,7 @@ import { SubscriptionModule } from '../subscription/subscription.module';
     PromptBuilderService,
     ReplyLogicRulesService,
     AiUsageLedgerService,
+    N1nPricingSyncService,
     MomentGenerationContextService,
   ],
   exports: [
@@ -46,6 +48,7 @@ import { SubscriptionModule } from '../subscription/subscription.module';
     PromptBuilderService,
     ReplyLogicRulesService,
     AiUsageLedgerService,
+    N1nPricingSyncService,
     MomentGenerationContextService,
   ],
 })

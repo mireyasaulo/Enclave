@@ -21,6 +21,8 @@ type DesktopMomentsFeedProps = {
   onCommentChange: (momentId: string, value: string) => void;
   onCommentSubmit: (momentId: string) => void;
   onLike: (momentId: string) => void;
+  /** 可选：点击行内「分享」时上抛，由调用方弹出分享图卡。 */
+  onShare?: (momentId: string) => void;
   onStartCommentReply?: (comment: MomentComment) => void;
   onToggleFavorite: (momentId: string) => void;
   onOpenCompose: () => void;
@@ -43,6 +45,7 @@ export function DesktopMomentsFeed({
   onCommentChange,
   onCommentSubmit,
   onLike,
+  onShare,
   onStartCommentReply,
   onToggleFavorite,
   onOpenCompose,
@@ -78,6 +81,7 @@ export function DesktopMomentsFeed({
               onCommentChange={(value) => onCommentChange(moment.id, value)}
               onCommentSubmit={() => onCommentSubmit(moment.id)}
               onLike={() => onLike(moment.id)}
+              onShare={onShare ? () => onShare(moment.id) : undefined}
               onStartCommentReply={onStartCommentReply}
               onToggleFavorite={() => onToggleFavorite(moment.id)}
               onSelectAuthor={

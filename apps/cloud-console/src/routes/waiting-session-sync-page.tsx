@@ -66,6 +66,7 @@ import {
   formatCloudConsoleReceiptCountSummary,
   formatCloudConsoleUpdatedAtLine,
   translateCloudConsoleText,
+  translateCloudConsoleTextForActiveLocale,
   useCloudConsoleText,
 } from "../lib/cloud-console-i18n";
 import {
@@ -139,7 +140,7 @@ const WAITING_SESSION_SYNC_VISIBLE_TASK_RECEIPT_LIMIT = 3;
 
 function formatDateTime(value?: string | null) {
   if (!value) {
-    return "Not available";
+    return translateCloudConsoleTextForActiveLocale("Not available");
   }
 
   return formatLocaleDateTime(new Date(value), {
@@ -151,11 +152,11 @@ function formatDateTime(value?: string | null) {
 function formatTaskType(taskType: CloudWaitingSessionSyncTaskSummary["taskType"]) {
   switch (taskType) {
     case "refresh_world":
-      return "Refresh world";
+      return translateCloudConsoleTextForActiveLocale("Refresh world");
     case "refresh_phone":
-      return "Refresh phone";
+      return translateCloudConsoleTextForActiveLocale("Refresh phone");
     case "invalidate_phone":
-      return "Invalidate phone";
+      return translateCloudConsoleTextForActiveLocale("Invalidate phone");
     default:
       return taskType;
   }
@@ -164,11 +165,11 @@ function formatTaskType(taskType: CloudWaitingSessionSyncTaskSummary["taskType"]
 function formatStatus(status: CloudWaitingSessionSyncTaskSummary["status"]) {
   switch (status) {
     case "failed":
-      return "Failed";
+      return translateCloudConsoleTextForActiveLocale("Failed");
     case "pending":
-      return "Pending";
+      return translateCloudConsoleTextForActiveLocale("Pending");
     case "running":
-      return "Running";
+      return translateCloudConsoleTextForActiveLocale("Running");
     default:
       return status;
   }
@@ -179,10 +180,10 @@ function formatWaitingSessionSyncTaskReceiptLabel(
 ) {
   switch (kind) {
     case "task-clear":
-      return "Clear task";
+      return translateCloudConsoleTextForActiveLocale("Clear task");
     case "task-replay":
     default:
-      return "Replay task";
+      return translateCloudConsoleTextForActiveLocale("Replay task");
   }
 }
 
@@ -971,10 +972,10 @@ export function WaitingSessionSyncPage() {
             statusOptions={WAITING_SESSION_SYNC_STATUS_FILTERS}
             taskTypeOptions={WAITING_SESSION_SYNC_TASK_TYPE_FILTERS}
             getStatusLabel={(option) =>
-              option === "all" ? "All statuses" : formatStatus(option)
+              option === "all" ? t("All statuses") : formatStatus(option)
             }
             getTaskTypeLabel={(option) =>
-              option === "all" ? "All task types" : formatTaskType(option)
+              option === "all" ? t("All task types") : formatTaskType(option)
             }
             onStatusChange={(nextStatus) =>
               updateFilters({
@@ -1247,8 +1248,8 @@ export function WaitingSessionSyncPage() {
                     }
                   >
                     {normalizedQuery === reviewSectionContext
-                      ? "Context focused"
-                      : "Focus context"}
+                      ? t("Context focused")
+                      : t("Focus context")}
                   </WaitingSessionSyncActionButton>
                   {reviewedContextGroup ? (
                     <>
@@ -1256,19 +1257,19 @@ export function WaitingSessionSyncPage() {
                         tone="sky"
                         onClick={() => exportContextSnapshot(reviewedContextGroup)}
                       >
-                        Export context snapshot
+                        {t("Export context snapshot")}
                       </WaitingSessionSyncActionButton>
                       <WaitingSessionSyncActionButton
                         tone="sky"
                         onClick={() => exportContextCsv(reviewedContextGroup)}
                       >
-                        Export context CSV
+                        {t("Export context CSV")}
                       </WaitingSessionSyncActionButton>
                       <WaitingSessionSyncActionButton
                         tone="sky"
                         onClick={() => void copyReviewedContext()}
                       >
-                        Copy review context
+                        {t("Copy review context")}
                       </WaitingSessionSyncActionButton>
                     </>
                   ) : null}
@@ -1278,7 +1279,7 @@ export function WaitingSessionSyncPage() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Open review permalink
+                    {t("Open review permalink")}
                   </WaitingSessionSyncActionAnchor>
                   <WaitingSessionSyncActionButton
                     tone="sky"
@@ -1334,7 +1335,7 @@ export function WaitingSessionSyncPage() {
                         variant="ghost"
                         onClick={() => updateFilters({ reviewTaskId: "" })}
                       >
-                        Clear task highlight
+                        {t("Clear task highlight")}
                       </WaitingSessionSyncActionButton>
                       <WaitingSessionSyncActionAnchor
                         tone="sky"
@@ -1346,7 +1347,7 @@ export function WaitingSessionSyncPage() {
                         target="_blank"
                         rel="noreferrer"
                       >
-                        Open task permalink
+                        {t("Open task permalink")}
                       </WaitingSessionSyncActionAnchor>
                     </div>
 
@@ -1359,7 +1360,7 @@ export function WaitingSessionSyncPage() {
                         <div className="flex flex-wrap items-start justify-between gap-3">
                           <div>
                             <div className="text-xs uppercase tracking-[0.18em] text-sky-700/75">
-                              Recent task receipts
+                              {t("Recent task receipts")}
                             </div>
                             <div className="mt-2 text-xs leading-6 text-sky-700/75">
                               Showing the latest {visibleHighlightedTaskReceipts.length} of up
@@ -1372,7 +1373,7 @@ export function WaitingSessionSyncPage() {
                             variant="ghost"
                             onClick={clearVisibleHighlightedTaskReceipts}
                           >
-                            Clear receipts
+                            {t("Clear receipts")}
                           </WaitingSessionSyncActionButton>
                         </div>
 
@@ -1623,7 +1624,7 @@ export function WaitingSessionSyncPage() {
                           })
                         }
                       >
-                        {contextReviewed ? "Reviewing tasks" : "Review tasks"}
+                        {contextReviewed ? t("Reviewing tasks") : t("Review tasks")}
                       </WaitingSessionSyncActionButton>
                       <WaitingSessionSyncActionButton
                         tone="neutral"
@@ -1635,19 +1636,19 @@ export function WaitingSessionSyncPage() {
                           })
                         }
                       >
-                        {contextFocused ? "Context focused" : "Focus context"}
+                        {contextFocused ? t("Context focused") : t("Focus context")}
                       </WaitingSessionSyncActionButton>
                       <WaitingSessionSyncActionButton
                         tone="neutral"
                         onClick={() => exportContextSnapshot(group)}
                       >
-                        Export context snapshot
+                        {t("Export context snapshot")}
                       </WaitingSessionSyncActionButton>
                       <WaitingSessionSyncActionButton
                         tone="neutral"
                         onClick={() => exportContextCsv(group)}
                       >
-                        Export context CSV
+                        {t("Export context CSV")}
                       </WaitingSessionSyncActionButton>
                       {group.refreshWorldTarget ? (
                         <Link
@@ -1870,13 +1871,13 @@ export function WaitingSessionSyncPage() {
         open={clearDialogOpen}
         title={
           clearConfirmState?.mode === "single"
-            ? "Clear failed task"
-            : "Clear matching failed tasks"
+            ? t("Clear failed task")
+            : t("Clear matching failed tasks")
         }
         description={
           clearConfirmState?.mode === "single"
-            ? `Delete failed task ${clearConfirmState.task.taskKey}. This removes the durable record from the retry queue.`
-            : "Delete all matching failed waiting sync tasks for the current task type and search filters."
+            ? t("Delete failed task {0}. This removes the durable record from the retry queue.").replace("{0}", clearConfirmState.task.taskKey)
+            : t("Delete all matching failed waiting sync tasks for the current task type and search filters.")
         }
         confirmLabel="Clear failed task"
         pendingLabel="Clearing..."

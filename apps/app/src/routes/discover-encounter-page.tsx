@@ -94,8 +94,7 @@ function MobileDiscoverEncounterPage() {
   });
 
   useEffect(() => {
-    // i18n-ignore-next-line: clears local notice state, not user-visible copy
-    setMessage("");
+    setMessage(""); // i18n-ignore-line: clearing state
   }, [baseUrl]);
 
   function navigateToRouteStateReturn() {

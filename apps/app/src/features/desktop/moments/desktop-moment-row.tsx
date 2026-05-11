@@ -15,6 +15,7 @@ import {
   MapPin,
   MessageCircle,
   MoreHorizontal,
+  Share2,
   Star,
   Trash2,
   UserRound,
@@ -48,6 +49,10 @@ type DesktopMomentRowProps = {
   onCommentSubmit: () => void;
   onDelete?: () => void;
   onLike: () => void;
+  /**
+   * 点击「分享」时把这条 moment 抛上去做导出图卡。可选：不传时菜单里不显示分享项。
+   */
+  onShare?: () => void;
   onStartCommentReply?: (comment: MomentComment) => void;
   onToggleFavorite: () => void;
   onAuthorAction?: () => void;
@@ -70,6 +75,7 @@ export function DesktopMomentRow({
   onCommentSubmit,
   onDelete,
   onLike,
+  onShare,
   onStartCommentReply,
   onToggleFavorite,
   onAuthorAction,
@@ -170,7 +176,7 @@ export function DesktopMomentRow({
       id={`desktop-moment-post-${moment.id}`}
       className="relative rounded-[16px] border border-[color:var(--border-faint)] bg-white px-4 py-4 shadow-[var(--shadow-section)]"
     >
-      {onDelete ? (
+      {onDelete || onShare ? (
         <div ref={menuRef} className="absolute right-3 top-3">
           <button
             type="button"
@@ -188,16 +194,32 @@ export function DesktopMomentRow({
               role="menu"
               className="absolute right-0 top-9 z-10 min-w-[140px] overflow-hidden rounded-[12px] border border-[color:var(--border-faint)] bg-white shadow-[0_8px_24px_rgba(15,23,42,0.12)]"
             >
-              <button
-                type="button"
-                role="menuitem"
-                onClick={handleDeleteClick}
-                disabled={deleteLoading}
-                className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] text-[#d23535] transition-colors hover:bg-[rgba(210,53,53,0.06)] disabled:opacity-55"
-              >
-                <Trash2 size={14} />
-                {deleteLoading ? t(msg`删除中...`) : t(msg`删除朋友圈`)}
-              </button>
+              {onShare ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    onShare();
+                  }}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] text-[color:var(--text-primary)] transition-colors hover:bg-[color:var(--surface-console)]"
+                >
+                  <Share2 size={14} />
+                  {t(msg`分享图卡`)}
+                </button>
+              ) : null}
+              {onDelete ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={handleDeleteClick}
+                  disabled={deleteLoading}
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] text-[#d23535] transition-colors hover:bg-[rgba(210,53,53,0.06)] disabled:opacity-55"
+                >
+                  <Trash2 size={14} />
+                  {deleteLoading ? t(msg`删除中...`) : t(msg`删除朋友圈`)}
+                </button>
+              ) : null}
             </div>
           ) : null}
         </div>

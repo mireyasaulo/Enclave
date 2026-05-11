@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { msg } from "@lingui/macro";
+import { translateRuntimeMessage } from "@yinjie/i18n";
 import type {
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   ActionConnectorDiscoveryResult,
   ActionConnectorSummary,
   ActionConnectorTestResult,
@@ -64,75 +65,78 @@ type ConnectorDraft = {
   credential: string;
 };
 
-const WORKSPACE_TABS: Array<{ key: WorkspaceTab; label: string }> = [
-  { key: "overview", label: "运营总览" },
-  { key: "rules", label: "规则编辑" },
-  { key: "preview", label: "消息预演" },
-  { key: "connectors", label: "连接器编排" },
-  { key: "evidence", label: "执行证据" },
+const WORKSPACE_TABS: Array<{ key: WorkspaceTab; label: ReturnType<typeof msg> }> = [
+  { key: "overview", label: msg`运营总览` },
+  { key: "rules", label: msg`规则编辑` },
+  { key: "preview", label: msg`消息预演` },
+  { key: "connectors", label: msg`连接器编排` },
+  { key: "evidence", label: msg`执行证据` },
 ];
 
-const RULE_TABS: Array<{ key: RulesTab; label: string }> = [
-  { key: "policy", label: "门控策略" },
-  { key: "prompts", label: "提示模板" },
+const RULE_TABS: Array<{ key: RulesTab; label: ReturnType<typeof msg> }> = [
+  { key: "policy", label: msg`门控策略` },
+  { key: "prompts", label: msg`提示模板` },
 ];
 
+// i18n-ignore-start: sample demo data for action planner preview
 const PREVIEW_EXAMPLES = [
   {
-    label: "智能家居",
+    label: msg`智能家居`,
     message: "帮我把客厅空调调到 24 度，风速调成自动。",
   },
   {
-    label: "轻食外卖",
+    label: msg`轻食外卖`,
     message: "今晚帮我点个 40 块以内的轻食外卖。",
   },
   {
-    label: "信息查询",
+    label: msg`信息查询`,
     message: "帮我看看今天上海天气，顺便告诉我适不适合出门。",
   },
 ];
+// i18n-ignore-end
 
 const RISK_LEVEL_OPTIONS: Array<{
   value: ActionRiskLevel;
-  label: string;
-  description: string;
+  label: ReturnType<typeof msg>;
+  description: ReturnType<typeof msg>;
 }> = [
   {
     value: "read_only",
-    label: "只读",
-    description: "只整理候选、查询信息，不直接产生副作用。",
+    label: msg`只读`,
+    description: msg`只整理候选、查询信息，不直接产生副作用。`,
   },
   {
     value: "reversible_low_risk",
-    label: "低风险可逆",
-    description: "例如智能家居状态调整，可自动执行但仍需留痕。",
+    label: msg`低风险可逆`,
+    description: msg`例如智能家居状态调整，可自动执行但仍需留痕。`,
   },
   {
     value: "cost_or_irreversible",
-    label: "付费/不可逆",
-    description: "涉及下单、预订、付款，默认必须确认。",
+    label: msg`付费/不可逆`,
+    description: msg`涉及下单、预订、付款，默认必须确认。`,
   },
 ];
 
 const PLANNER_MODE_OPTIONS: Array<{
   value: ActionRuntimeRules["plannerMode"];
-  label: string;
+  label: ReturnType<typeof msg>;
 }> = [
   {
     value: "llm_with_heuristic_fallback",
-    label: "LLM 优先，失败回退规则",
+    label: msg`LLM 优先，失败回退规则`,
   },
   {
     value: "llm",
-    label: "纯 LLM planner",
+    label: msg`纯 LLM planner`,
   },
   {
     value: "heuristic",
-    label: "纯规则 planner",
+    label: msg`纯规则 planner`,
   },
 ];
 
 export function ActionRuntimePage() {
+  const t = translateRuntimeMessage;
   const baseUrl = resolveAdminCoreApiBaseUrl();
   const queryClient = useQueryClient();
   const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>("overview");
@@ -348,7 +352,7 @@ export function ActionRuntimePage() {
     mutationFn: (id: string) => adminApi.retryActionRuntimeRun(id),
     onSuccess: (result) => {
       setRunActionFeedback(
-        `已触发动作重试，当前阶段：${translateRunRetryStep(result.nextStep)}。`,
+        t(msg`已触发动作重试，当前阶段：${translateRunRetryStep(result.nextStep)}。`),
       );
       setSelectedRunId(result.run.id);
       setWorkspaceTab("evidence");
@@ -372,7 +376,7 @@ export function ActionRuntimePage() {
   }, [overviewQuery.data, rulesDraft]);
 
   if (overviewQuery.isLoading) {
-    return <LoadingBlock label="正在读取 Action Runtime..." />;
+    return <LoadingBlock label={t(msg`正在读取 Action Runtime...`)} />;
   }
 
   if (overviewQuery.isError && overviewQuery.error instanceof Error) {
@@ -382,8 +386,8 @@ export function ActionRuntimePage() {
   if (!overviewQuery.data || !rulesDraft) {
     return (
       <AdminEmptyState
-        title="Action Runtime 暂不可用"
-        description="稍后再刷新一次；如果持续为空，先检查后端 action-runtime 模块是否已成功加载。"
+        title={t(msg`Action Runtime 暂不可用`)}
+        description={t(msg`稍后再刷新一次；如果持续为空，先检查后端 action-runtime 模块是否已成功加载。`)}
       />
     );
   }
@@ -444,9 +448,9 @@ export function ActionRuntimePage() {
     completedRuns.find((run) => run.status === "succeeded") ?? null;
   const latestRun = rawRecentRuns[0] ?? null;
   const evidenceTabs: Array<{ key: EvidenceTab; label: string }> = [
-    { key: "all", label: `全部运行 (${rawRecentRuns.length})` },
-    { key: "attention", label: `待处理 (${attentionRuns.length})` },
-    { key: "completed", label: `已完成 (${completedRuns.length})` },
+    { key: "all", label: t(msg`全部运行 (${rawRecentRuns.length})`) },
+    { key: "attention", label: t(msg`待处理 (${attentionRuns.length})`) },
+    { key: "completed", label: t(msg`已完成 (${completedRuns.length})`) },
   ];
 
   function resetRulesDraft() {
@@ -533,7 +537,7 @@ export function ActionRuntimePage() {
       connectorDrafts[connector.id] ?? createConnectorDraft(connector);
     const parsed = parseEndpointConfig(draft.endpointConfigText);
     if (parsed.error) {
-      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。";
+      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。"; // i18n-ignore-line: admin technical error fallback
       setConnectorDraftErrors((current) => ({
         ...current,
         [connector.id]: errorMessage,
@@ -554,7 +558,7 @@ export function ActionRuntimePage() {
       connectorDrafts[connector.id] ?? createConnectorDraft(connector);
     const parsed = parseEndpointConfig(draft.endpointConfigText);
     if (parsed.error) {
-      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。";
+      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。"; // i18n-ignore-line: admin technical error fallback
       setConnectorDraftErrors((current) => ({
         ...current,
         [connector.id]: errorMessage,
@@ -576,7 +580,7 @@ export function ActionRuntimePage() {
       connectorDrafts[connector.id] ?? createConnectorDraft(connector);
     const parsed = parseEndpointConfig(draft.endpointConfigText);
     if (parsed.error) {
-      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。";
+      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。"; // i18n-ignore-line: admin technical error fallback
       setConnectorDraftErrors((current) => ({
         ...current,
         [connector.id]: errorMessage,
@@ -613,7 +617,7 @@ export function ActionRuntimePage() {
       connectorDrafts[connector.id] ?? createConnectorDraft(connector);
     const parsed = parseEndpointConfig(draft.endpointConfigText);
     if (parsed.error) {
-      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。";
+      const errorMessage = parsed.error ?? "Endpoint Config 无法解析。"; // i18n-ignore-line: admin technical error fallback
       setConnectorDraftErrors((current) => ({
         ...current,
         [connector.id]: errorMessage,
@@ -632,8 +636,8 @@ export function ActionRuntimePage() {
         ...current,
         [connector.id]:
           mode === "missing"
-            ? "当前推荐项都已经存在，没有新增映射。"
-            : "当前没有可写入的推荐映射。",
+            ? t(msg`当前推荐项都已经存在，没有新增映射。`)
+            : t(msg`当前没有可写入的推荐映射。`),
       }));
       return;
     }
@@ -645,8 +649,8 @@ export function ActionRuntimePage() {
       ...current,
       [connector.id]:
         mode === "missing"
-          ? `已补入 ${mergeResult.appliedCount} 条未配置映射，自动避开 ${mergeResult.disambiguatedCount} 个冲突 key，跳过 ${mergeResult.skippedCount} 条无法处理的项。`
-          : `已写入 ${mergeResult.appliedCount} 条推荐映射，自动避开 ${mergeResult.disambiguatedCount} 个冲突 key，跳过 ${mergeResult.skippedCount} 条无法处理的项。`,
+          ? t(msg`已补入 ${mergeResult.appliedCount} 条未配置映射，自动避开 ${mergeResult.disambiguatedCount} 个冲突 key，跳过 ${mergeResult.skippedCount} 条无法处理的项。`)
+          : t(msg`已写入 ${mergeResult.appliedCount} 条推荐映射，自动避开 ${mergeResult.disambiguatedCount} 个冲突 key，跳过 ${mergeResult.skippedCount} 条无法处理的项。`),
     }));
   }
 
@@ -671,19 +675,19 @@ export function ActionRuntimePage() {
     <div className="space-y-6">
       <AdminPageHero
         eyebrow="Action Runtime"
-        title="行动助理真实世界动作工作台"
-        description="围绕运营人员的查看路径重排：先看当前动作链是否健康，再决定是改门控、跑预演、校连接器，还是回看执行证据。"
+        title={t(msg`行动助理真实世界动作工作台`)}
+        description={t(msg`围绕运营人员的查看路径重排：先看当前动作链是否健康，再决定是改门控、跑预演、校连接器，还是回看执行证据。`)}
         badges={[
-          `承接角色：${
+          t(msg`承接角色：${
             overview.operatorCharacter?.name ??
-            (overview.rules.policy.entryCharacterSourceKey || "未限制角色")
-          }`,
+            (overview.rules.policy.entryCharacterSourceKey || t(msg`未限制角色`))
+          }`),
         ]}
         metrics={[
-          { label: "总动作数", value: overview.counts.totalRuns },
-          { label: "待处理动作", value: attentionRuns.length },
-          { label: "失败动作", value: overview.counts.failed },
-          { label: "已就绪连接器", value: overview.counts.readyConnectors },
+          { label: t(msg`总动作数`), value: overview.counts.totalRuns },
+          { label: t(msg`待处理动作`), value: attentionRuns.length },
+          { label: t(msg`失败动作`), value: overview.counts.failed },
+          { label: t(msg`已就绪连接器`), value: overview.counts.readyConnectors },
         ]}
         actions={
           <>
@@ -695,21 +699,21 @@ export function ActionRuntimePage() {
                 })
               }
             >
-              刷新概览
+              {t(msg`刷新概览`)}
             </Button>
             <Button
               variant="secondary"
               disabled={!isRulesDirty}
               onClick={resetRulesDraft}
             >
-              重置草稿
+              {t(msg`重置草稿`)}
             </Button>
             <Button
               variant="primary"
               disabled={!isRulesDirty || saveRulesMutation.isPending}
               onClick={() => saveRulesMutation.mutate(rulesDraft)}
             >
-              {saveRulesMutation.isPending ? "保存中..." : "保存规则"}
+              {saveRulesMutation.isPending ? t(msg`保存中...`) : t(msg`保存规则`)}
             </Button>
           </>
         }
@@ -734,7 +738,7 @@ export function ActionRuntimePage() {
                 setEvidenceTab("attention");
               }}
             >
-              查看待处理动作
+              {t(msg`查看待处理动作`)}
             </Button>
             <Button
               variant="secondary"
@@ -747,7 +751,7 @@ export function ActionRuntimePage() {
                 setWorkspaceTab("preview");
               }}
             >
-              {errorConnectors.length ? "检查错误连接器" : "去消息预演"}
+              {errorConnectors.length ? t(msg`检查错误连接器`) : t(msg`去消息预演`)}
             </Button>
           </>
         }
@@ -756,8 +760,8 @@ export function ActionRuntimePage() {
       {saveRulesMutation.isSuccess ? (
         <AdminActionFeedback
           tone="success"
-          title="Action Runtime 规则已保存"
-          description="新的门控策略和提示模板已经写入系统配置。"
+          title={t(msg`Action Runtime 规则已保存`)}
+          description={t(msg`新的门控策略和提示模板已经写入系统配置。`)}
         />
       ) : null}
       {saveRulesMutation.isError && saveRulesMutation.error instanceof Error ? (
@@ -766,7 +770,7 @@ export function ActionRuntimePage() {
       {runActionFeedback ? (
         <AdminActionFeedback
           tone="info"
-          title="动作重试已提交"
+          title={t(msg`动作重试已提交`)}
           description={runActionFeedback}
         />
       ) : null}
@@ -777,42 +781,42 @@ export function ActionRuntimePage() {
       <div className="grid gap-6 xl:grid-cols-[0.34fr_0.66fr]">
         <div className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <AdminSectionNav
-            title="工作区"
+            title={t(msg`工作区`)}
             items={[
               {
-                label: "运营总览",
+                label: t(msg`运营总览`),
                 detail:
-                  "先确认动作入口、动作角色、待处理动作和连接器是否健康。",
+                  t(msg`先确认动作入口、动作角色、待处理动作和连接器是否健康。`),
                 onClick: () => setWorkspaceTab("overview"),
               },
               {
-                label: "规则编辑",
-                detail: "拆开看门控策略和提示模板，减少长页面滚动。",
+                label: t(msg`规则编辑`),
+                detail: t(msg`拆开看门控策略和提示模板，减少长页面滚动。`),
                 onClick: () => setWorkspaceTab("rules"),
               },
               {
-                label: "消息预演",
-                detail: "快速验证一条用户话术是否会命中真实世界动作链。",
+                label: t(msg`消息预演`),
+                detail: t(msg`快速验证一条用户话术是否会命中真实世界动作链。`),
                 onClick: () => setWorkspaceTab("preview"),
               },
               {
-                label: "连接器编排",
-                detail: "按选中连接器查看配置、自检、凭证和实体映射。",
+                label: t(msg`连接器编排`),
+                detail: t(msg`按选中连接器查看配置、自检、凭证和实体映射。`),
                 onClick: () => setWorkspaceTab("connectors"),
               },
               {
-                label: "执行证据",
-                detail: "按待处理、已完成两种视角回看动作运行与完整 trace。",
+                label: t(msg`执行证据`),
+                detail: t(msg`按待处理、已完成两种视角回看动作运行与完整 trace。`),
                 onClick: () => setWorkspaceTab("evidence"),
               },
             ]}
           />
 
           <Card className="bg-[color:var(--surface-console)]">
-            <AdminSectionHeader title="当前脉冲" />
+            <AdminSectionHeader title={t(msg`当前脉冲`)} />
             <div className="mt-4 grid gap-3">
               <AdminValueCard
-                label="动作角色"
+                label={t(msg`动作角色`)}
                 value={
                   overview.operatorCharacter ? (
                     <StatusPill tone="healthy">
@@ -823,45 +827,45 @@ export function ActionRuntimePage() {
                       {overview.rules.policy.entryCharacterSourceKey}
                     </StatusPill>
                   ) : (
-                    <StatusPill tone="muted">未限制角色</StatusPill>
+                    <StatusPill tone="muted">{t(msg`未限制角色`)}</StatusPill>
                   )
                 }
               />
               <AdminValueCard
-                label="动作入口"
+                label={t(msg`动作入口`)}
                 value={
                   <StatusPill
                     tone={overview.rules.policy.enabled ? "healthy" : "warning"}
                   >
-                    {overview.rules.policy.enabled ? "已启用" : "已关闭"}
+                    {overview.rules.policy.enabled ? t(msg`已启用`) : t(msg`已关闭`)}
                   </StatusPill>
                 }
               />
               <AdminValueCard
-                label="Planner"
+                label="Planner" // i18n-ignore-line: admin technical label
                 value={translatePlannerMode(overview.rules.plannerMode)}
               />
               <AdminValueCard
-                label="待处理动作"
-                value={`${attentionRuns.length} 条`}
+                label={t(msg`待处理动作`)}
+                value={t(msg`${attentionRuns.length} 条`)}
               />
               <AdminValueCard
-                label="错误连接器"
-                value={`${errorConnectors.length} 个`}
+                label={t(msg`错误连接器`)}
+                value={t(msg`${errorConnectors.length} 个`)}
               />
               <AdminValueCard
-                label="最近成功"
+                label={t(msg`最近成功`)}
                 value={
                   latestSucceededRun
                     ? formatDateTime(latestSucceededRun.updatedAt)
-                    : "暂无"
+                    : t(msg`暂无`)
                 }
               />
             </div>
           </Card>
 
           <Card className="bg-[color:var(--surface-console)]">
-            <AdminSectionHeader title="快捷操作" />
+            <AdminSectionHeader title={t(msg`快捷操作`)} />
             <div className="mt-4 grid gap-3">
               <Button
                 variant="secondary"
@@ -870,7 +874,7 @@ export function ActionRuntimePage() {
                   setEvidenceTab("attention");
                 }}
               >
-                处理待运营动作
+                {t(msg`处理待运营动作`)}
               </Button>
               <Button
                 variant="secondary"
@@ -881,7 +885,7 @@ export function ActionRuntimePage() {
                   }
                 }}
               >
-                检查连接器
+                {t(msg`检查连接器`)}
               </Button>
               <Button
                 variant="secondary"
@@ -890,7 +894,7 @@ export function ActionRuntimePage() {
                   setWorkspaceTab("preview");
                 }}
               >
-                预填智能家居示例
+                {t(msg`预填智能家居示例`)}
               </Button>
               <Button
                 variant="secondary"
@@ -899,14 +903,14 @@ export function ActionRuntimePage() {
                   setRulesTab("policy");
                 }}
               >
-                编辑动作规则
+                {t(msg`编辑动作规则`)}
               </Button>
             </div>
           </Card>
 
           <Card className="bg-[color:var(--surface-console)]">
             <AdminSectionHeader
-              title="当前选中连接器"
+              title={t(msg`当前选中连接器`)}
               actions={
                 selectedConnector ? (
                   <StatusPill
@@ -921,28 +925,28 @@ export function ActionRuntimePage() {
               {selectedConnector ? (
                 <div className="grid gap-3">
                   <AdminValueCard
-                    label="名称"
+                    label={t(msg`名称`)}
                     value={selectedConnector.displayName}
                   />
                   <AdminValueCard
-                    label="类型"
+                    label={t(msg`类型`)}
                     value={translateProviderType(
                       selectedConnector.providerType,
                     )}
                   />
                   <AdminValueCard
-                    label="能力数"
-                    value={`${selectedConnector.capabilities.length} 项`}
+                    label={t(msg`能力数`)}
+                    value={t(msg`${selectedConnector.capabilities.length} 项`)}
                   />
                   <AdminValueCard
-                    label="最近自检"
+                    label={t(msg`最近自检`)}
                     value={formatDateTime(selectedConnector.lastHealthCheckAt)}
                   />
                 </div>
               ) : (
                 <AdminEmptyState
-                  title="还没有连接器"
-                  description="等 Action Runtime 初始化完连接器后，这里会显示当前选中的一项。"
+                  title={t(msg`还没有连接器`)}
+                  description={t(msg`等 Action Runtime 初始化完连接器后，这里会显示当前选中的一项。`)}
                 />
               )}
             </div>
@@ -951,7 +955,7 @@ export function ActionRuntimePage() {
 
         <div className="space-y-6">
           <AdminTabs
-            tabs={WORKSPACE_TABS}
+            tabs={WORKSPACE_TABS.map((tab) => ({ ...tab, label: t(tab.label) }))}
             activeKey={workspaceTab}
             onChange={(key) => setWorkspaceTab(key as WorkspaceTab)}
           />
@@ -960,42 +964,42 @@ export function ActionRuntimePage() {
             <div className="space-y-6">
               <Card className="bg-[color:var(--surface-console)]">
                 <AdminSectionHeader
-                  title="动作链状态概览"
+                  title={t(msg`动作链状态概览`)}
                   actions={
                     overview.operatorCharacter ? (
                       <StatusPill tone="healthy">
-                        动作角色：{overview.operatorCharacter.name}
+                        {t(msg`动作角色：${overview.operatorCharacter.name}`)}
                       </StatusPill>
                     ) : overview.rules.policy.entryCharacterSourceKey ? (
                       <StatusPill tone="warning">
-                        缺少 {overview.rules.policy.entryCharacterSourceKey}
+                        {t(msg`缺少 ${overview.rules.policy.entryCharacterSourceKey}`)}
                       </StatusPill>
                     ) : (
-                      <StatusPill tone="muted">未限制入口角色</StatusPill>
+                      <StatusPill tone="muted">{t(msg`未限制入口角色`)}</StatusPill>
                     )
                   }
                 />
                 <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                   <MetricCard
-                    label="Planner"
+                    label="Planner" // i18n-ignore-line: admin technical label
                     value={translatePlannerMode(overview.rules.plannerMode)}
                   />
                   <MetricCard
-                    label="自动执行风险等级"
+                    label={t(msg`自动执行风险等级`)}
                     value={
                       overview.rules.policy.autoExecuteRiskLevels.length
                         ? overview.rules.policy.autoExecuteRiskLevels
                             .map(translateRiskLevel)
                             .join(" / ")
-                        : "无"
+                        : t(msg`无`)
                     }
                   />
                   <MetricCard
-                    label="可信自动执行操作"
+                    label={t(msg`可信自动执行操作`)}
                     value={overview.rules.policy.trustedOperationKeys.length}
                   />
                   <MetricCard
-                    label="已停用连接器"
+                    label={t(msg`已停用连接器`)}
                     value={disabledConnectors.length}
                   />
                 </div>
@@ -1003,55 +1007,55 @@ export function ActionRuntimePage() {
 
               <div className="grid gap-6 xl:grid-cols-2">
                 <AdminInfoRows
-                  title="当前门控"
+                  title={t(msg`当前门控`)}
                   rows={[
                     {
-                      label: "动作入口",
+                      label: t(msg`动作入口`),
                       value: overview.rules.policy.enabled
-                        ? "已启用"
-                        : "已关闭",
+                        ? t(msg`已启用`)
+                        : t(msg`已关闭`),
                     },
                     {
-                      label: "入口角色 sourceKey",
+                      label: t(msg`入口角色 sourceKey`),
                       value:
                         overview.rules.policy.entryCharacterSourceKey ||
-                        "未限制",
+                        t(msg`未限制`),
                     },
                     {
-                      label: "确认关键词",
+                      label: t(msg`确认关键词`),
                       value:
                         overview.rules.policy.confirmationKeywords.join(
                           " / ",
-                        ) || "暂无",
+                        ) || t(msg`暂无`),
                     },
                     {
-                      label: "拒绝关键词",
+                      label: t(msg`拒绝关键词`),
                       value:
                         overview.rules.policy.rejectionKeywords.join(" / ") ||
-                        "暂无",
+                        t(msg`暂无`),
                     },
                   ]}
                 />
                 <AdminInfoRows
-                  title="当前任务压力"
+                  title={t(msg`当前任务压力`)}
                   rows={[
                     {
-                      label: "待补参数",
-                      value: `${overview.counts.awaitingSlots} 条`,
+                      label: t(msg`待补参数`),
+                      value: t(msg`${overview.counts.awaitingSlots} 条`),
                     },
                     {
-                      label: "待确认",
-                      value: `${overview.counts.awaitingConfirmation} 条`,
+                      label: t(msg`待确认`),
+                      value: t(msg`${overview.counts.awaitingConfirmation} 条`),
                     },
                     {
-                      label: "失败动作",
-                      value: `${overview.counts.failed} 条`,
+                      label: t(msg`失败动作`),
+                      value: t(msg`${overview.counts.failed} 条`),
                     },
                     {
-                      label: "最近动作",
+                      label: t(msg`最近动作`),
                       value: latestRun
                         ? formatDateTime(latestRun.updatedAt)
-                        : "暂无",
+                        : t(msg`暂无`),
                     },
                   ]}
                 />
@@ -1060,7 +1064,7 @@ export function ActionRuntimePage() {
               <div className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
                 <Card className="bg-[color:var(--surface-console)]">
                   <AdminSectionHeader
-                    title="待运营处理"
+                    title={t(msg`待运营处理`)}
                     actions={
                       <Button
                         variant="secondary"
@@ -1070,7 +1074,7 @@ export function ActionRuntimePage() {
                           setEvidenceTab("attention");
                         }}
                       >
-                        去执行证据
+                        {t(msg`去执行证据`)}
                       </Button>
                     }
                   />
@@ -1101,15 +1105,15 @@ export function ActionRuntimePage() {
                                 setEvidenceTab("attention");
                               }}
                             >
-                              查看详情
+                              {t(msg`查看详情`)}
                             </Button>
                           }
                         />
                       ))
                     ) : (
                       <AdminEmptyState
-                        title="当前没有待处理动作"
-                        description="没有待补参数、待确认或失败动作，当前动作链可以继续用来做预演和连接器维护。"
+                        title={t(msg`当前没有待处理动作`)}
+                        description={t(msg`没有待补参数、待确认或失败动作，当前动作链可以继续用来做预演和连接器维护。`)}
                       />
                     )}
                   </div>
@@ -1117,14 +1121,14 @@ export function ActionRuntimePage() {
 
                 <Card className="bg-[color:var(--surface-console)]">
                   <AdminSectionHeader
-                    title="连接器状态"
+                    title={t(msg`连接器状态`)}
                     actions={
                       <Button
                         variant="secondary"
                         size="sm"
                         onClick={() => setWorkspaceTab("connectors")}
                       >
-                        去连接器编排
+                        {t(msg`去连接器编排`)}
                       </Button>
                     }
                   />
@@ -1142,11 +1146,13 @@ export function ActionRuntimePage() {
                             </StatusPill>
                           }
                           meta={`${translateProviderType(connector.providerType)} · ${connector.connectorKey}`}
-                          description={`支持 ${connector.capabilities.length} 个操作${
+                          // i18n-ignore-start: nested template literal inside t(msg`...`)
+                          description={t(msg`支持 ${connector.capabilities.length} 个操作${
                             connector.lastError
                               ? ` · 最近错误：${connector.lastError}`
                               : ""
-                          }`}
+                          }`)}
+                          // i18n-ignore-end
                           actions={
                             <Button
                               variant="secondary"
@@ -1156,15 +1162,15 @@ export function ActionRuntimePage() {
                                 setWorkspaceTab("connectors");
                               }}
                             >
-                              打开
+                              {t(msg`打开`)}
                             </Button>
                           }
                         />
                       ))
                     ) : (
                       <AdminEmptyState
-                        title="当前没有连接器"
-                        description="Action Runtime 初始化完成后，这里会列出可执行的真实世界连接器。"
+                        title={t(msg`当前没有连接器`)}
+                        description={t(msg`Action Runtime 初始化完成后，这里会列出可执行的真实世界连接器。`)}
                       />
                     )}
                   </div>
@@ -1172,7 +1178,7 @@ export function ActionRuntimePage() {
               </div>
 
               <Card className="bg-[color:var(--surface-console)]">
-                <AdminSectionHeader title="最近完成动作" />
+                <AdminSectionHeader title={t(msg`最近完成动作`)} />
                 <div className="mt-4 space-y-3">
                   {completedRuns.length ? (
                     completedRuns
@@ -1192,8 +1198,8 @@ export function ActionRuntimePage() {
                       ))
                   ) : (
                     <AdminEmptyState
-                      title="还没有完成动作"
-                      description="等动作真正执行成功或被取消后，这里会积累最近完成的样本。"
+                      title={t(msg`还没有完成动作`)}
+                      description={t(msg`等动作真正执行成功或被取消后，这里会积累最近完成的样本。`)}
                     />
                   )}
                 </div>
@@ -1205,13 +1211,13 @@ export function ActionRuntimePage() {
             <div className="space-y-6">
               <AdminCallout
                 tone="info"
-                title="规则编辑建议"
-                description="门控策略决定哪些消息会进入动作链，提示模板决定进入动作链后的对话方式。先改门控，再调模板，能更快定位问题。"
+                title={t(msg`规则编辑建议`)}
+                description={t(msg`门控策略决定哪些消息会进入动作链，提示模板决定进入动作链后的对话方式。先改门控，再调模板，能更快定位问题。`)}
               />
 
               <Card className="bg-[color:var(--surface-console)]">
                 <AdminSectionHeader
-                  title="规则编辑"
+                  title={t(msg`规则编辑`)}
                   actions={
                     <AdminDraftStatusPill
                       ready={Boolean(rulesDraft)}
@@ -1221,7 +1227,7 @@ export function ActionRuntimePage() {
                 />
                 <div className="mt-4">
                   <AdminTabs
-                    tabs={RULE_TABS}
+                    tabs={RULE_TABS.map((tab) => ({ ...tab, label: t(tab.label) }))}
                     activeKey={rulesTab}
                     onChange={(key) => setRulesTab(key as RulesTab)}
                   />
@@ -1231,10 +1237,10 @@ export function ActionRuntimePage() {
               {rulesTab === "policy" ? (
                 <div className="grid gap-6 xl:grid-cols-[0.88fr_1.12fr]">
                   <Card className="bg-[color:var(--surface-console)]">
-                    <AdminSectionHeader title="Planner 与入口" />
+                    <AdminSectionHeader title={t(msg`Planner 与入口`)} />
                     <div className="mt-4 space-y-6">
                       <AdminSelectField
-                        label="Planner Mode"
+                        label="Planner Mode" // i18n-ignore-line: admin technical label
                         value={rulesDraft.plannerMode}
                         onChange={(value) =>
                           patchRules((current) => ({
@@ -1243,33 +1249,32 @@ export function ActionRuntimePage() {
                               value as ActionRuntimeRules["plannerMode"],
                           }))
                         }
-                        options={PLANNER_MODE_OPTIONS}
+                        options={PLANNER_MODE_OPTIONS.map((opt) => ({ ...opt, label: t(opt.label) }))}
                       />
 
                       <div className="grid gap-4 md:grid-cols-2">
                         <AdminToggle
-                          label="启用动作入口"
+                          label={t(msg`启用动作入口`)}
                           checked={rulesDraft.policy.enabled}
                           onChange={(checked) =>
                             setPolicyValue("enabled", checked)
                           }
                         />
                         <AdminTextField
-                          label="入口角色 sourceKey"
+                          label={t(msg`入口角色 sourceKey`)}
                           value={rulesDraft.policy.entryCharacterSourceKey}
                           onChange={(value) =>
                             setPolicyValue("entryCharacterSourceKey", value)
                           }
-                          placeholder="action_operator"
+                          placeholder="action_operator" // i18n-ignore-line: technical identifier placeholder
                         />
                       </div>
                       <div className="-mt-2 text-[12px] leading-5 text-[color:var(--text-dim)]">
-                        默认是
-                        `action_operator`。留空表示不限制角色，只建议用于兼容或排障。
+                        {t(msg`默认是 \`action_operator\`。留空表示不限制角色，只建议用于兼容或排障。`)}
                       </div>
 
                       <AdminTextArea
-                        label="可信自动执行操作"
+                        label={t(msg`可信自动执行操作`)}
                         value={formatStringList(
                           rulesDraft.policy.trustedOperationKeys,
                         )}
@@ -1279,7 +1284,7 @@ export function ActionRuntimePage() {
                             parseStringList(value),
                           )
                         }
-                        description="只有同时命中“自动执行风险等级”和这里的 operationKey，动作才会直接执行。"
+                        description={t(msg`只有同时命中"自动执行风险等级"和这里的 operationKey，动作才会直接执行。`)}
                         textareaClassName="min-h-32"
                       />
                     </div>
@@ -1287,10 +1292,10 @@ export function ActionRuntimePage() {
 
                   <div className="space-y-6">
                     <Card className="bg-[color:var(--surface-console)]">
-                      <AdminSectionHeader title="确认与拒绝语义" />
+                      <AdminSectionHeader title={t(msg`确认与拒绝语义`)} />
                       <div className="mt-4 grid gap-4 xl:grid-cols-2">
                         <AdminTextArea
-                          label="确认关键词"
+                          label={t(msg`确认关键词`)}
                           value={formatStringList(
                             rulesDraft.policy.confirmationKeywords,
                           )}
@@ -1300,11 +1305,11 @@ export function ActionRuntimePage() {
                               parseStringList(value),
                             )
                           }
-                          description="每行一个关键词；用户说到这些词时，待确认动作会继续执行。"
+                          description={t(msg`每行一个关键词；用户说到这些词时，待确认动作会继续执行。`)}
                           textareaClassName="min-h-32"
                         />
                         <AdminTextArea
-                          label="拒绝关键词"
+                          label={t(msg`拒绝关键词`)}
                           value={formatStringList(
                             rulesDraft.policy.rejectionKeywords,
                           )}
@@ -1314,14 +1319,14 @@ export function ActionRuntimePage() {
                               parseStringList(value),
                             )
                           }
-                          description="每行一个关键词；命中后，待确认动作会直接取消。"
+                          description={t(msg`每行一个关键词；命中后，待确认动作会直接取消。`)}
                           textareaClassName="min-h-32"
                         />
                       </div>
                     </Card>
 
                     <Card className="bg-[color:var(--surface-console)]">
-                      <AdminSectionHeader title="自动执行风险等级" />
+                      <AdminSectionHeader title={t(msg`自动执行风险等级`)} />
                       <div className="mt-4 grid gap-3 md:grid-cols-3">
                         {RISK_LEVEL_OPTIONS.map((option) => {
                           const active =
@@ -1342,14 +1347,14 @@ export function ActionRuntimePage() {
                             >
                               <div className="flex items-center justify-between gap-3">
                                 <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                                  {option.label}
+                                  {t(option.label)}
                                 </div>
                                 <StatusPill tone={active ? "healthy" : "muted"}>
-                                  {active ? "自动执行" : "需额外判断"}
+                                  {active ? t(msg`自动执行`) : t(msg`需额外判断`)}
                                 </StatusPill>
                               </div>
                               <div className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                                {option.description}
+                                {t(option.description)}
                               </div>
                             </button>
                           );
@@ -1363,10 +1368,10 @@ export function ActionRuntimePage() {
               {rulesTab === "prompts" ? (
                 <div className="grid gap-6 xl:grid-cols-2">
                   <Card className="bg-[color:var(--surface-console)]">
-                    <AdminSectionHeader title="Planner 与中间态文案" />
+                    <AdminSectionHeader title={t(msg`Planner 与中间态文案`)} />
                     <div className="mt-4 space-y-4">
                       <AdminTextArea
-                        label="Planner Prompt"
+                        label="Planner Prompt" // i18n-ignore-line: admin technical label
                         value={rulesDraft.promptTemplates.plannerSystemPrompt}
                         onChange={(value) =>
                           setPromptTemplate("plannerSystemPrompt", value)
@@ -1374,21 +1379,21 @@ export function ActionRuntimePage() {
                         textareaClassName="min-h-40"
                       />
                       <AdminTextArea
-                        label="澄清模板"
+                        label={t(msg`澄清模板`)}
                         value={rulesDraft.promptTemplates.clarificationTemplate}
                         onChange={(value) =>
                           setPromptTemplate("clarificationTemplate", value)
                         }
                       />
                       <AdminTextArea
-                        label="确认模板"
+                        label={t(msg`确认模板`)}
                         value={rulesDraft.promptTemplates.confirmationTemplate}
                         onChange={(value) =>
                           setPromptTemplate("confirmationTemplate", value)
                         }
                       />
                       <AdminTextArea
-                        label="待确认提醒模板"
+                        label={t(msg`待确认提醒模板`)}
                         value={
                           rulesDraft.promptTemplates
                             .pendingConfirmationReminderTemplate
@@ -1404,24 +1409,24 @@ export function ActionRuntimePage() {
                   </Card>
 
                   <Card className="bg-[color:var(--surface-console)]">
-                    <AdminSectionHeader title="执行结果文案" />
+                    <AdminSectionHeader title={t(msg`执行结果文案`)} />
                     <div className="mt-4 space-y-4">
                       <AdminTextArea
-                        label="成功模板"
+                        label={t(msg`成功模板`)}
                         value={rulesDraft.promptTemplates.successTemplate}
                         onChange={(value) =>
                           setPromptTemplate("successTemplate", value)
                         }
                       />
                       <AdminTextArea
-                        label="失败模板"
+                        label={t(msg`失败模板`)}
                         value={rulesDraft.promptTemplates.failureTemplate}
                         onChange={(value) =>
                           setPromptTemplate("failureTemplate", value)
                         }
                       />
                       <AdminTextArea
-                        label="取消模板"
+                        label={t(msg`取消模板`)}
                         value={rulesDraft.promptTemplates.cancelledTemplate}
                         onChange={(value) =>
                           setPromptTemplate("cancelledTemplate", value)
@@ -1438,13 +1443,13 @@ export function ActionRuntimePage() {
             <div className="space-y-6">
               <AdminCallout
                 tone="info"
-                title="消息预演"
-                description="这里用来验证“某句话是否会命中真实世界动作链”。先预演，再回去改门控或提示模板，定位会更快。"
+                title={t(msg`消息预演`)}
+                description={t(msg`这里用来验证"某句话是否会命中真实世界动作链"。先预演，再回去改门控或提示模板，定位会更快。`)}
               />
 
               <Card className="bg-[color:var(--surface-console)]">
                 <AdminSectionHeader
-                  title="预演输入"
+                  title={t(msg`预演输入`)}
                   actions={
                     <Button
                       variant="primary"
@@ -1455,7 +1460,7 @@ export function ActionRuntimePage() {
                         previewMutation.mutate(previewMessage.trim())
                       }
                     >
-                      {previewMutation.isPending ? "预演中..." : "运行预演"}
+                      {previewMutation.isPending ? t(msg`预演中...`) : t(msg`运行预演`)}
                     </Button>
                   }
                 />
@@ -1463,20 +1468,20 @@ export function ActionRuntimePage() {
                   <div className="flex flex-wrap gap-2">
                     {PREVIEW_EXAMPLES.map((example) => (
                       <Button
-                        key={example.label}
+                        key={t(example.label)}
                         variant="secondary"
                         size="sm"
                         onClick={() => setPreviewMessage(example.message)}
                       >
-                        {example.label}
+                        {t(example.label)}
                       </Button>
                     ))}
                   </div>
                   <AdminTextArea
-                    label="候选消息"
+                    label={t(msg`候选消息`)}
                     value={previewMessage}
                     onChange={setPreviewMessage}
-                    placeholder="例如：帮我把客厅空调调到 24 度，或者今晚给我点个 40 块以内的轻食外卖。"
+                    placeholder={t(msg`例如：帮我把客厅空调调到 24 度，或者今晚给我点个 40 块以内的轻食外卖。`)}
                     textareaClassName="min-h-32"
                   />
                 </div>
@@ -1491,7 +1496,7 @@ export function ActionRuntimePage() {
                 <div className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr]">
                   <Card className="bg-[color:var(--surface-console)]">
                     <AdminSectionHeader
-                      title="预演结论"
+                      title={t(msg`预演结论`)}
                       actions={
                         <StatusPill
                           tone={
@@ -1499,50 +1504,50 @@ export function ActionRuntimePage() {
                           }
                         >
                           {previewMutation.data.handled
-                            ? "命中动作链"
-                            : "未命中"}
+                            ? t(msg`命中动作链`)
+                            : t(msg`未命中`)}
                         </StatusPill>
                       }
                     />
                     <div className="mt-4 space-y-4">
                       <AdminSoftBox>
-                        判定原因：{previewMutation.data.reason}
+                        {t(msg`判定原因：${previewMutation.data.reason}`)}
                       </AdminSoftBox>
                       <AdminSoftBox>
-                        回复预览：
+                        {t(msg`回复预览：`)}
                         <div className="mt-2">
                           {previewMutation.data.responsePreview ??
-                            "当前消息会继续走普通聊天链路。"}
+                            t(msg`当前消息会继续走普通聊天链路。`)}
                         </div>
                       </AdminSoftBox>
                       {previewMutation.data.plan ? (
                         <div className="grid gap-3 md:grid-cols-2">
                           <AdminValueCard
-                            label="标题"
+                            label={t(msg`标题`)}
                             value={previewMutation.data.plan.title}
                           />
                           <AdminValueCard
-                            label="风险等级"
+                            label={t(msg`风险等级`)}
                             value={translateRiskLevel(
                               previewMutation.data.plan.riskLevel,
                             )}
                           />
                           <AdminValueCard
-                            label="是否要求确认"
+                            label={t(msg`是否要求确认`)}
                             value={
                               previewMutation.data.plan.requiresConfirmation
-                                ? "是"
-                                : "否"
+                                ? t(msg`是`)
+                                : t(msg`否`)
                             }
                           />
                           <AdminValueCard
-                            label="缺失参数"
+                            label={t(msg`缺失参数`)}
                             value={
                               previewMutation.data.plan.missingSlots.length
                                 ? previewMutation.data.plan.missingSlots.join(
                                     " / ",
                                   )
-                                : "无"
+                                : t(msg`无`)
                             }
                           />
                         </div>
@@ -1551,7 +1556,7 @@ export function ActionRuntimePage() {
                   </Card>
 
                   <Card className="bg-[color:var(--surface-console)]">
-                    <AdminSectionHeader title="Plan 明细" />
+                    <AdminSectionHeader title={t(msg`Plan 明细`)} />
                     <div className="mt-4">
                       {previewMutation.data.plan ? (
                         <AdminCodeBlock
@@ -1559,8 +1564,8 @@ export function ActionRuntimePage() {
                         />
                       ) : (
                         <AdminEmptyState
-                          title="当前没有 plan"
-                          description="这条话术没有命中动作链，所以没有生成动作 plan。"
+                          title={t(msg`当前没有 plan`)}
+                          description={t(msg`这条话术没有命中动作链，所以没有生成动作 plan。`)}
                         />
                       )}
                     </div>
@@ -1568,8 +1573,8 @@ export function ActionRuntimePage() {
                 </div>
               ) : (
                 <AdminEmptyState
-                  title="还没有预演结果"
-                  description="输入一条候选消息后点“运行预演”，这里会显示是否命中动作链以及生成出的 plan。"
+                  title={t(msg`还没有预演结果`)}
+                  description={t(msg`输入一条候选消息后点"运行预演"，这里会显示是否命中动作链以及生成出的 plan。`)}
                 />
               )}
             </div>
@@ -1581,19 +1586,19 @@ export function ActionRuntimePage() {
                 tone={errorConnectors.length ? "warning" : "success"}
                 title={
                   errorConnectors.length
-                    ? "当前有连接器需要处理"
-                    : "连接器总体状态正常"
+                    ? t(msg`当前有连接器需要处理`)
+                    : t(msg`连接器总体状态正常`)
                 }
                 description={
                   errorConnectors.length
-                    ? `当前共有 ${errorConnectors.length} 个连接器处于 error。优先看最近错误、凭证状态和自检结果。`
-                    : "建议先选中某个连接器，再在右侧统一完成配置、自检和启停操作。"
+                    ? t(msg`当前共有 ${errorConnectors.length} 个连接器处于 error。优先看最近错误、凭证状态和自检结果。`)
+                    : t(msg`建议先选中某个连接器，再在右侧统一完成配置、自检和启停操作。`)
                 }
               />
 
               <div className="grid gap-6 xl:grid-cols-[0.78fr_1.22fr]">
                 <Card className="bg-[color:var(--surface-console)]">
-                  <AdminSectionHeader title="连接器列表" />
+                  <AdminSectionHeader title={t(msg`连接器列表`)} />
                   <div className="mt-4 space-y-3">
                     {sortedConnectors.length ? (
                       sortedConnectors.map((connector) => (
@@ -1601,14 +1606,14 @@ export function ActionRuntimePage() {
                           key={connector.id}
                           active={selectedConnectorId === connector.id}
                           title={connector.displayName}
-                          subtitle={`${translateProviderType(connector.providerType)} · ${connector.capabilities.length} 个动作`}
+                          subtitle={t(msg`${translateProviderType(connector.providerType)} · ${connector.capabilities.length} 个动作`)}
                           meta={[
                             connector.connectorKey,
                             connector.lastHealthCheckAt
-                              ? `最近自检 ${formatDateTime(
+                              ? t(msg`最近自检 ${formatDateTime(
                                   connector.lastHealthCheckAt,
-                                )}`
-                              : "尚未自检",
+                                )}`)
+                              : t(msg`尚未自检`),
                           ].join(" · ")}
                           badge={
                             <StatusPill
@@ -1617,14 +1622,14 @@ export function ActionRuntimePage() {
                               {translateConnectorStatus(connector.status)}
                             </StatusPill>
                           }
-                          activeLabel="当前编辑"
+                          activeLabel={t(msg`当前编辑`)}
                           onClick={() => setSelectedConnectorId(connector.id)}
                         />
                       ))
                     ) : (
                       <AdminEmptyState
-                        title="还没有连接器"
-                        description="Action Runtime 初始化完成后，这里会列出真实世界连接器。"
+                        title={t(msg`还没有连接器`)}
+                        description={t(msg`Action Runtime 初始化完成后，这里会列出真实世界连接器。`)}
                       />
                     )}
                   </div>
@@ -1633,8 +1638,8 @@ export function ActionRuntimePage() {
                 <Card className="bg-[color:var(--surface-console)]">
                   {!selectedConnector || !selectedConnectorDraft ? (
                     <AdminEmptyState
-                      title="未选择连接器"
-                      description="从左侧点开一个连接器后，这里会展示它的配置、凭证、自检和映射详情。"
+                      title={t(msg`未选择连接器`)}
+                      description={t(msg`从左侧点开一个连接器后，这里会展示它的配置、凭证、自检和映射详情。`)}
                     />
                   ) : (
                     <>
@@ -1670,7 +1675,7 @@ export function ActionRuntimePage() {
                               handleSaveConnector(selectedConnector)
                             }
                           >
-                            {selectedConnectorSaving ? "保存中..." : "保存配置"}
+                            {selectedConnectorSaving ? t(msg`保存中...`) : t(msg`保存配置`)}
                           </Button>
                           {selectedConnector.providerType === "official_api" ||
                           selectedConnector.providerType === "http_bridge" ? (
@@ -1686,7 +1691,7 @@ export function ActionRuntimePage() {
                                 )
                               }
                             >
-                              清除凭证
+                              {t(msg`清除凭证`)}
                             </Button>
                           ) : null}
                           <Button
@@ -1701,8 +1706,8 @@ export function ActionRuntimePage() {
                             }
                           >
                             {selectedConnectorTesting
-                              ? "自检中..."
-                              : "测试连接器"}
+                              ? t(msg`自检中...`)
+                              : t(msg`测试连接器`)}
                           </Button>
                           {selectedConnector.connectorKey ===
                           "official-home-assistant-smart-home" ? (
@@ -1714,8 +1719,8 @@ export function ActionRuntimePage() {
                               }
                             >
                               {selectedConnectorDiscovering
-                                ? "发现中..."
-                                : "发现实体"}
+                                ? t(msg`发现中...`)
+                                : t(msg`发现实体`)}
                             </Button>
                           ) : null}
                           <Button
@@ -1734,8 +1739,8 @@ export function ActionRuntimePage() {
                             {selectedConnectorToggling &&
                             toggleConnectorStatusMutation.variables?.status ===
                               "ready"
-                              ? "启用中..."
-                              : "启用"}
+                              ? t(msg`启用中...`)
+                              : t(msg`启用`)}
                           </Button>
                           <Button
                             variant="secondary"
@@ -1753,36 +1758,36 @@ export function ActionRuntimePage() {
                             {selectedConnectorToggling &&
                             toggleConnectorStatusMutation.variables?.status ===
                               "disabled"
-                              ? "停用中..."
-                              : "停用"}
+                              ? t(msg`停用中...`)
+                              : t(msg`停用`)}
                           </Button>
                         </div>
 
                         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                           <AdminValueCard
-                            label="类型"
+                            label={t(msg`类型`)}
                             value={translateProviderType(
                               selectedConnector.providerType,
                             )}
                           />
                           <AdminValueCard
-                            label="能力数"
-                            value={`${selectedConnector.capabilities.length} 项`}
+                            label={t(msg`能力数`)}
+                            value={t(msg`${selectedConnector.capabilities.length} 项`)}
                           />
                           <AdminValueCard
-                            label="最近自检"
+                            label={t(msg`最近自检`)}
                             value={formatDateTime(
                               selectedConnector.lastHealthCheckAt,
                             )}
                           />
                           <AdminValueCard
-                            label="最后更新时间"
+                            label={t(msg`最后更新时间`)}
                             value={formatDateTime(selectedConnector.updatedAt)}
                           />
                         </div>
 
                         <div className="grid gap-4 xl:grid-cols-2">
-                          <AdminMiniPanel title="支持操作" tone="soft">
+                          <AdminMiniPanel title={t(msg`支持操作`)} tone="soft">
                             <div className="space-y-2">
                               {selectedConnector.capabilities.length ? (
                                 selectedConnector.capabilities.map(
@@ -1797,7 +1802,7 @@ export function ActionRuntimePage() {
                                           capability.riskLevel,
                                         )}
                                         {capability.requiresConfirmation
-                                          ? " · 需确认"
+                                          ? t(msg` · 需确认`)
                                           : ""}
                                       </div>
                                     </AdminSoftBox>
@@ -1805,30 +1810,30 @@ export function ActionRuntimePage() {
                                 )
                               ) : (
                                 <AdminSoftBox>
-                                  当前未声明可执行动作。
+                                  {t(msg`当前未声明可执行动作。`)}
                                 </AdminSoftBox>
                               )}
                             </div>
                           </AdminMiniPanel>
 
-                          <AdminMiniPanel title="运维提示" tone="soft">
+                          <AdminMiniPanel title={t(msg`运维提示`)} tone="soft">
                             <div className="space-y-2">
                               <AdminSoftBox>
                                 {selectedConnector.status === "error"
-                                  ? "当前连接器处于 error，优先检查最近错误、自检结果和凭证。"
+                                  ? t(msg`当前连接器处于 error，优先检查最近错误、自检结果和凭证。`)
                                   : selectedConnector.status === "disabled"
-                                    ? "当前连接器已停用，保存配置后记得重新启用。"
-                                    : "当前连接器已就绪，可以直接做自检和预演验证。"}
+                                    ? t(msg`当前连接器已停用，保存配置后记得重新启用。`)
+                                    : t(msg`当前连接器已就绪，可以直接做自检和预演验证。`)}
                               </AdminSoftBox>
+                              {/* i18n-ignore-start: conditional values interpolated inside t(msg`...`) */}
                               <AdminSoftBox>
-                                凭证状态：
-                                {selectedConnector.credentialConfigured
-                                  ? " 已配置"
-                                  : " 未配置"}
+                                {t(msg`凭证状态：${selectedConnector.credentialConfigured
+                                  ? "已配置"
+                                  : "未配置"}`)}
                               </AdminSoftBox>
+                              {/* i18n-ignore-end */}
                               <AdminSoftBox>
-                                最后错误：
-                                {selectedConnector.lastError || " 暂无"}
+                                {t(msg`最后错误：${selectedConnector.lastError || "暂无"}`)}
                               </AdminSoftBox>
                             </div>
                           </AdminMiniPanel>
@@ -1837,8 +1842,8 @@ export function ActionRuntimePage() {
                         {selectedConnector.providerType === "http_bridge" ? (
                           <AdminCallout
                             tone="info"
-                            title="HTTP Bridge 契约"
-                            description="服务端会向 `endpointConfig.url` 发送 JSON：`{ connectorKey, operationKey, domain, title, goal, riskLevel, requiresConfirmation, previewOnly, slots, missingSlots, sentAt }`。返回 JSON 时优先读取 `resultSummary` / `summary`、`result`、`execution`。"
+                            title={t(msg`HTTP Bridge 契约`)}
+                            description={t(msg`服务端会向 \`endpointConfig.url\` 发送 JSON：\`{ connectorKey, operationKey, domain, title, goal, riskLevel, requiresConfirmation, previewOnly, slots, missingSlots, sentAt }\`。返回 JSON 时优先读取 \`resultSummary\` / \`summary\`、\`result\`、\`execution\`。`)}
                           />
                         ) : null}
 
@@ -1847,21 +1852,17 @@ export function ActionRuntimePage() {
                           <div className="space-y-4">
                             <AdminCallout
                               tone="info"
-                              title="Home Assistant 配置方式"
-                              description="填写 `baseUrl`，把 Long-Lived Access Token 填进 credential。`deviceTargets` 用 “房间:设备” 作为 key，例如 `客厅:空调`；每个 target 至少包含 `entityId`，可选 `serviceDomain`、`turnOnService`、`turnOffService`、`setTemperatureService`、`temperatureField`。"
+                              title={t(msg`Home Assistant 配置方式`)}
+                              description={t(msg`填写 \`baseUrl\`，把 Long-Lived Access Token 填进 credential。\`deviceTargets\` 用 "房间:设备" 作为 key，例如 \`客厅:空调\`；每个 target 至少包含 \`entityId\`，可选 \`serviceDomain\`、\`turnOnService\`、\`turnOffService\`、\`setTemperatureService\`、\`temperatureField\`。`)}
                             />
                             <div className="rounded-[18px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] p-4">
                               <div className="flex items-center justify-between gap-3">
                                 <div>
                                   <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-                                    实体发现与映射向导
+                                    {t(msg`实体发现与映射向导`)}
                                   </div>
                                   <div className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
-                                    会优先通过 Home Assistant WebSocket registry
-                                    识别 area / device / entity
-                                    关系，失败时回退到
-                                    `/api/states`，并给出推荐的 `deviceTargets`
-                                    键。
+                                    {t(msg`会优先通过 Home Assistant WebSocket registry 识别 area / device / entity 关系，失败时回退到 \`/api/states\`，并给出推荐的 \`deviceTargets\` 键。`)}
                                   </div>
                                 </div>
                                 <Button
@@ -1876,20 +1877,20 @@ export function ActionRuntimePage() {
                                   }
                                 >
                                   {selectedConnectorDiscovering
-                                    ? "发现中..."
-                                    : "发现实体"}
+                                    ? t(msg`发现中...`)
+                                    : t(msg`发现实体`)}
                                 </Button>
                               </div>
                               <div className="mt-4">
                                 <AdminTextField
-                                  label="发现筛选词"
+                                  label={t(msg`发现筛选词`)}
                                   value={selectedConnectorDraft.discoveryQuery}
                                   onChange={(value) =>
                                     updateConnectorDraft(selectedConnector.id, {
                                       discoveryQuery: value,
                                     })
                                   }
-                                  placeholder="可按房间、设备、entity_id 检索，例如 客厅 / 空调 / light."
+                                  placeholder={t(msg`可按房间、设备、entity_id 检索，例如 客厅 / 空调 / light.`)}
                                 />
                               </div>
                               {discoverConnectorMutation.isError &&
@@ -1917,23 +1918,25 @@ export function ActionRuntimePage() {
                                     }
                                     title={
                                       selectedConnectorDiscoveryResult.itemCount
-                                        ? `发现到 ${selectedConnectorDiscoveryResult.itemCount} 个候选实体`
-                                        : "没有发现匹配实体"
+                                        ? t(msg`发现到 ${selectedConnectorDiscoveryResult.itemCount} 个候选实体`)
+                                        : t(msg`没有发现匹配实体`)
                                     }
-                                    description={`拉取时间 ${formatDateTime(selectedConnectorDiscoveryResult.fetchedAt)}${
+                                    // i18n-ignore-start: nested template literals inside t(msg`...`)
+                                    description={t(msg`拉取时间 ${formatDateTime(selectedConnectorDiscoveryResult.fetchedAt)}${
                                       selectedConnectorDiscoveryResult.query
                                         ? `，当前筛选：${selectedConnectorDiscoveryResult.query}`
                                         : ""
                                     }。房间识别模式：${translateDiscoveryTopologySource(
                                       selectedConnectorDiscoveryResult.topologySource,
-                                    )}。点“写入映射”会把推荐 target 合并进当前草稿，不会自动保存。`}
+                                    )}。点"写入映射"会把推荐 target 合并进当前草稿，不会自动保存。`)}
+                                    // i18n-ignore-end
                                   />
                                   {selectedConnectorDiscoveryResult.warnings.map(
                                     (warning) => (
                                       <AdminCallout
                                         key={warning}
                                         tone="warning"
-                                        title="识别回退提示"
+                                        title={t(msg`识别回退提示`)}
                                         description={warning}
                                       />
                                     ),
@@ -1941,18 +1944,18 @@ export function ActionRuntimePage() {
                                   {selectedConnectorFeedback ? (
                                     <AdminCallout
                                       tone="success"
-                                      title="映射草稿已更新"
+                                      title={t(msg`映射草稿已更新`)}
                                       description={selectedConnectorFeedback}
                                     />
                                   ) : null}
                                   <div className="flex flex-wrap items-center gap-3 rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] p-4">
+                                    {/* i18n-ignore-start: multiline t(msg`...`) with interpolation */}
                                     <div className="text-sm leading-6 text-[color:var(--text-secondary)]">
-                                      当前草稿已有{" "}
-                                      {countExistingMappedTargets(
+                                      {t(msg`当前草稿已有 ${countExistingMappedTargets(
                                         selectedConnector,
-                                      )}{" "}
-                                      条 deviceTargets 映射。
+                                      )} 条 deviceTargets 映射。`)}
                                     </div>
+                                    {/* i18n-ignore-end */}
                                     <Button
                                       variant="secondary"
                                       disabled={
@@ -1967,7 +1970,7 @@ export function ActionRuntimePage() {
                                         )
                                       }
                                     >
-                                      只补未配置项
+                                      {t(msg`只补未配置项`)}
                                     </Button>
                                     <Button
                                       variant="secondary"
@@ -1983,7 +1986,7 @@ export function ActionRuntimePage() {
                                         )
                                       }
                                     >
-                                      批量写入全部
+                                      {t(msg`批量写入全部`)}
                                     </Button>
                                   </div>
                                   {selectedConnectorDiscoveryResult.items.map(
@@ -1999,7 +2002,7 @@ export function ActionRuntimePage() {
                                             </div>
                                             <div className="mt-1 text-xs text-[color:var(--text-muted)]">
                                               {item.entityId} · {item.domain} ·
-                                              当前状态 {item.state}
+                                              {t(msg`当前状态 ${item.state}`)}
                                             </div>
                                           </div>
                                           <Button
@@ -2011,50 +2014,47 @@ export function ActionRuntimePage() {
                                               )
                                             }
                                           >
-                                            写入映射
+                                            {t(msg`写入映射`)}
                                           </Button>
                                         </div>
                                         <div className="mt-3 grid gap-3 md:grid-cols-3">
                                           <MetricCard
-                                            label="推荐房间"
+                                            label={t(msg`推荐房间`)}
                                             value={
-                                              item.suggestedRoom || "未识别"
+                                              item.suggestedRoom || t(msg`未识别`)
                                             }
                                           />
                                           <MetricCard
-                                            label="推荐设备"
+                                            label={t(msg`推荐设备`)}
                                             value={
-                                              item.suggestedDevice || "设备"
+                                              item.suggestedDevice || t(msg`设备`)
                                             }
                                           />
                                           <MetricCard
-                                            label="映射键"
+                                            label={t(msg`映射键`)}
                                             value={item.key}
                                           />
                                         </div>
+                                        {/* i18n-ignore-start: nested template literals inside t(msg`...`) */}
                                         <div className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-                                          房间来源：
-                                          {translateDiscoverySource(
+                                          {t(msg`房间来源：${translateDiscoverySource(
                                             item.roomSource,
-                                          )}
-                                          {item.registryAreaName
+                                          )}${item.registryAreaName
                                             ? `（${item.registryAreaName}）`
-                                            : ""}{" "}
-                                          · 设备来源：
-                                          {translateDiscoverySource(
+                                            : ""} · 设备来源：${translateDiscoverySource(
                                             item.deviceSource,
-                                          )}
-                                          {item.registryDeviceName
+                                          )}${item.registryDeviceName
                                             ? `（${item.registryDeviceName}）`
-                                            : ""}
+                                            : ""}`)}
                                         </div>
+                                        {/* i18n-ignore-end */}
                                         <div className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                                          可执行动作：
+                                          {t(msg`可执行动作：`)}
                                           {item.availableActions.join(" / ")}
                                         </div>
                                         <div className="mt-3">
                                           <LabeledCodeBlock
-                                            label="Target Config"
+                                            label="Target Config" // i18n-ignore-line: admin technical label
                                             value={prettyJson(
                                               item.targetConfig,
                                             )}
@@ -2070,7 +2070,7 @@ export function ActionRuntimePage() {
                         ) : null}
 
                         <AdminTextField
-                          label="显示名称"
+                          label={t(msg`显示名称`)}
                           value={selectedConnectorDraft.displayName}
                           onChange={(value) =>
                             updateConnectorDraft(selectedConnector.id, {
@@ -2079,25 +2079,25 @@ export function ActionRuntimePage() {
                           }
                         />
                         <AdminTextArea
-                          label="Endpoint Config JSON"
+                          label="Endpoint Config JSON" // i18n-ignore-line: admin technical label
                           value={selectedConnectorDraft.endpointConfigText}
                           onChange={(value) =>
                             updateConnectorDraft(selectedConnector.id, {
                               endpointConfigText: value,
                             })
                           }
-                          placeholder='例如：{"city":"上海"}'
+                          placeholder={t(msg`例如：{"city":"上海"}`)}
                           textareaClassName="min-h-36 font-mono text-xs"
                         />
                         <AdminTextArea
-                          label="测试消息"
+                          label={t(msg`测试消息`)}
                           value={selectedConnectorDraft.testMessage}
                           onChange={(value) =>
                             updateConnectorDraft(selectedConnector.id, {
                               testMessage: value,
                             })
                           }
-                          placeholder="留空则使用系统默认样例。"
+                          placeholder={t(msg`留空则使用系统默认样例。`)}
                           textareaClassName="min-h-24"
                         />
 
@@ -2117,8 +2117,8 @@ export function ActionRuntimePage() {
                             }
                             placeholder={
                               selectedConnector.credentialConfigured
-                                ? "已配置新凭证时再覆盖；留空则保持不变。"
-                                : "输入凭证后保存。"
+                                ? t(msg`已配置新凭证时再覆盖；留空则保持不变。`)
+                                : t(msg`输入凭证后保存。`)
                             }
                           />
                         ) : null}
@@ -2156,7 +2156,7 @@ export function ActionRuntimePage() {
                         {selectedConnector.lastError ? (
                           <AdminCallout
                             tone="warning"
-                            title="最近一次连接器错误"
+                            title={t(msg`最近一次连接器错误`)}
                             description={selectedConnector.lastError}
                           />
                         ) : null}
@@ -2171,13 +2171,13 @@ export function ActionRuntimePage() {
                             }
                             title={
                               selectedConnector.credentialConfigured
-                                ? "凭证已配置"
-                                : "凭证未配置"
+                                ? t(msg`凭证已配置`)
+                                : t(msg`凭证未配置`)
                             }
                             description={
                               selectedConnector.providerType === "official_api"
-                                ? "官方 API 连接器不会回显已保存 token；填写新值并保存即可覆盖。"
-                                : "Bridge credential 同样只写入不回显；需要替换时重新填写并保存。"
+                                ? t(msg`官方 API 连接器不会回显已保存 token；填写新值并保存即可覆盖。`)
+                                : t(msg`Bridge credential 同样只写入不回显；需要替换时重新填写并保存。`)
                             }
                           />
                         ) : null}
@@ -2192,8 +2192,8 @@ export function ActionRuntimePage() {
                               }
                               title={
                                 selectedConnectorTestResult.ok
-                                  ? "连接器自检通过"
-                                  : "连接器自检失败"
+                                  ? t(msg`连接器自检通过`)
+                                  : t(msg`连接器自检失败`)
                               }
                               description={
                                 selectedConnectorTestResult.errorMessage ??
@@ -2229,18 +2229,18 @@ export function ActionRuntimePage() {
                 tone={attentionRuns.length ? "warning" : "success"}
                 title={
                   attentionRuns.length
-                    ? "当前有待处理动作"
-                    : "当前没有待处理动作"
+                    ? t(msg`当前有待处理动作`)
+                    : t(msg`当前没有待处理动作`)
                 }
                 description={
                   attentionRuns.length
-                    ? "优先从“待处理”视角回看等待补参数、等待确认和执行失败的动作，再决定是改规则、补连接器还是重试。"
-                    : "最近动作已经基本收口，可以从“已完成”回看成功样本，或者去消息预演继续做验证。"
+                    ? t(msg`优先从"待处理"视角回看等待补参数、等待确认和执行失败的动作，再决定是改规则、补连接器还是重试。`)
+                    : t(msg`最近动作已经基本收口，可以从"已完成"回看成功样本，或者去消息预演继续做验证。`)
                 }
               />
 
               <Card className="bg-[color:var(--surface-console)]">
-                <AdminSectionHeader title="运行筛选" />
+                <AdminSectionHeader title={t(msg`运行筛选`)} />
                 <div className="mt-4">
                   <AdminTabs
                     tabs={evidenceTabs}
@@ -2252,7 +2252,7 @@ export function ActionRuntimePage() {
 
               <div className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr]">
                 <Card className="bg-[color:var(--surface-console)]">
-                  <AdminSectionHeader title="运行列表" />
+                  <AdminSectionHeader title={t(msg`运行列表`)} />
                   <div className="mt-4 space-y-3">
                     {visibleRuns.length ? (
                       visibleRuns.map((run) => (
@@ -2271,14 +2271,14 @@ export function ActionRuntimePage() {
                               {translateRunStatus(run.status)}
                             </StatusPill>
                           }
-                          activeLabel="当前查看"
+                          activeLabel={t(msg`当前查看`)}
                           onClick={() => setSelectedRunId(run.id)}
                         />
                       ))
                     ) : (
                       <AdminEmptyState
-                        title="当前筛选下没有动作"
-                        description="切换到其它筛选，或者先在真实对话里触发一次动作链。"
+                        title={t(msg`当前筛选下没有动作`)}
+                        description={t(msg`切换到其它筛选，或者先在真实对话里触发一次动作链。`)}
                       />
                     )}
                   </div>
@@ -2286,7 +2286,7 @@ export function ActionRuntimePage() {
 
                 <Card className="bg-[color:var(--surface-console)]">
                   <AdminSectionHeader
-                    title="动作详情"
+                    title={t(msg`动作详情`)}
                     actions={
                       selectedRunId ? (
                         <Button
@@ -2295,8 +2295,8 @@ export function ActionRuntimePage() {
                           onClick={() => retryRunMutation.mutate(selectedRunId)}
                         >
                           {retryRunMutation.isPending
-                            ? "重试中..."
-                            : "重试动作"}
+                            ? t(msg`重试中...`)
+                            : t(msg`重试动作`)}
                         </Button>
                       ) : undefined
                     }
@@ -2304,11 +2304,11 @@ export function ActionRuntimePage() {
                   <div className="mt-4">
                     {!selectedRunId ? (
                       <AdminEmptyState
-                        title="还没有选中动作"
-                        description="从左侧点开一条运行记录后，这里会展示 plan、执行结果和完整 trace。"
+                        title={t(msg`还没有选中动作`)}
+                        description={t(msg`从左侧点开一条运行记录后，这里会展示 plan、执行结果和完整 trace。`)}
                       />
                     ) : runDetailQuery.isLoading ? (
-                      <LoadingBlock label="正在读取动作详情..." />
+                      <LoadingBlock label={t(msg`正在读取动作详情...`)} />
                     ) : runDetailQuery.isError &&
                       runDetailQuery.error instanceof Error ? (
                       <ErrorBlock message={runDetailQuery.error.message} />
@@ -2316,8 +2316,8 @@ export function ActionRuntimePage() {
                       <ActionRunDetailPanel detail={runDetailQuery.data} />
                     ) : (
                       <AdminEmptyState
-                        title="动作详情暂不可用"
-                        description="刷新一次概览；如果仍然为空，说明当前动作还没写入详情。"
+                        title={t(msg`动作详情暂不可用`)}
+                        description={t(msg`刷新一次概览；如果仍然为空，说明当前动作还没写入详情。`)}
                       />
                     )}
                   </div>
@@ -2343,6 +2343,7 @@ function LabeledCodeBlock({ label, value }: { label: string; value: string }) {
 }
 
 function ActionRunDetailPanel({ detail }: { detail: ActionRunDetail }) {
+  const t = translateRuntimeMessage;
   const hint = buildActionRunHint(detail);
 
   return (
@@ -2355,7 +2356,7 @@ function ActionRunDetailPanel({ detail }: { detail: ActionRunDetail }) {
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <AdminValueCard
-          label="状态"
+          label={t(msg`状态`)}
           value={
             <StatusPill tone={resolveRunTone(detail.status)}>
               {translateRunStatus(detail.status)}
@@ -2363,48 +2364,50 @@ function ActionRunDetailPanel({ detail }: { detail: ActionRunDetail }) {
           }
         />
         <AdminValueCard
-          label="风险等级"
+          label={t(msg`风险等级`)}
           value={translateRiskLevel(detail.riskLevel)}
         />
         <AdminValueCard
-          label="是否要求确认"
-          value={detail.requiresConfirmation ? "是" : "否"}
+          label={t(msg`是否要求确认`)}
+          value={detail.requiresConfirmation ? t(msg`是`) : t(msg`否`)}
         />
         <AdminValueCard
-          label="更新时间"
+          label={t(msg`更新时间`)}
           value={formatDateTime(detail.updatedAt)}
         />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <AdminMiniPanel title="动作摘要" tone="soft">
+        <AdminMiniPanel title={t(msg`动作摘要`)} tone="soft">
           <div className="space-y-2 text-sm text-[color:var(--text-secondary)]">
-            <AdminSoftBox>标题：{detail.title}</AdminSoftBox>
-            <AdminSoftBox>用户目标：{detail.userGoal}</AdminSoftBox>
+            <AdminSoftBox>{t(msg`标题：${detail.title}`)}</AdminSoftBox>
+            <AdminSoftBox>{t(msg`用户目标：${detail.userGoal}`)}</AdminSoftBox>
             <AdminSoftBox>
-              连接器：{detail.connectorKey} · {detail.operationKey}
+              {t(msg`连接器：${detail.connectorKey} · ${detail.operationKey}`)}
             </AdminSoftBox>
           </div>
         </AdminMiniPanel>
 
-        <AdminMiniPanel title="参数情况" tone="soft">
+        <AdminMiniPanel title={t(msg`参数情况`)} tone="soft">
           <div className="space-y-2 text-sm text-[color:var(--text-secondary)]">
+            {/* i18n-ignore-start: conditional values inside t(msg`...`) */}
             <AdminSoftBox>
-              缺失参数：
-              {detail.missingSlots.length
+              {t(msg`缺失参数：${detail.missingSlots.length
                 ? detail.missingSlots.join(" / ")
-                : " 无"}
+                : "无"}`)}
+            </AdminSoftBox>
+            {/* i18n-ignore-end */}
+            <AdminSoftBox>
+              {t(msg`结果摘要：${detail.resultSummary || "暂无"}`)}
             </AdminSoftBox>
             <AdminSoftBox>
-              结果摘要：{detail.resultSummary || "暂无"}
-            </AdminSoftBox>
-            <AdminSoftBox>
-              错误信息：{detail.errorMessage || "暂无"}
+              {t(msg`错误信息：${detail.errorMessage || "暂无"}`)}
             </AdminSoftBox>
           </div>
         </AdminMiniPanel>
       </div>
 
+      {/* i18n-ignore-start: admin technical payload labels */}
       <LabeledCodeBlock
         label="Plan Payload"
         value={prettyJson(detail.planPayload ?? {})}
@@ -2433,6 +2436,7 @@ function ActionRunDetailPanel({ detail }: { detail: ActionRunDetail }) {
         label="Trace Payload"
         value={prettyJson(detail.tracePayload ?? {})}
       />
+      {/* i18n-ignore-end */}
     </div>
   );
 }
@@ -2441,6 +2445,7 @@ function buildActionOperatorSummary(
   overview: ActionRuntimeOverview,
   connectors: ActionConnectorSummary[],
 ) {
+  const t = translateRuntimeMessage;
   const errorConnectors = connectors.filter(
     (connector) => connector.status === "error",
   );
@@ -2451,112 +2456,113 @@ function buildActionOperatorSummary(
     !overview.operatorCharacter
   ) {
     notes.push(
-      `当前缺少 sourceKey = ${overview.rules.policy.entryCharacterSourceKey} 的动作角色，真实世界动作链不会正常工作。`,
+      t(msg`当前缺少 sourceKey = ${overview.rules.policy.entryCharacterSourceKey} 的动作角色，真实世界动作链不会正常工作。`),
     );
   }
 
   if (!overview.rules.policy.entryCharacterSourceKey) {
-    notes.push("当前未限制动作入口角色，任何角色消息都可能命中动作链。");
+    notes.push(t(msg`当前未限制动作入口角色，任何角色消息都可能命中动作链。`));
   }
 
   if (!overview.rules.policy.enabled) {
-    notes.push("动作入口当前处于关闭状态，用户消息不会进入 Action Runtime。");
+    notes.push(t(msg`动作入口当前处于关闭状态，用户消息不会进入 Action Runtime。`));
   }
 
   if (overview.counts.readyConnectors === 0) {
-    notes.push("当前没有已就绪连接器，先去连接器编排完成配置和启用。");
+    notes.push(t(msg`当前没有已就绪连接器，先去连接器编排完成配置和启用。`));
   }
 
   if (overview.counts.awaitingSlots > 0) {
-    notes.push(`有 ${overview.counts.awaitingSlots} 条动作在等待补参数。`);
+    notes.push(t(msg`有 ${overview.counts.awaitingSlots} 条动作在等待补参数。`));
   }
 
   if (overview.counts.awaitingConfirmation > 0) {
     notes.push(
-      `有 ${overview.counts.awaitingConfirmation} 条动作在等待用户确认。`,
+      t(msg`有 ${overview.counts.awaitingConfirmation} 条动作在等待用户确认。`),
     );
   }
 
   if (overview.counts.failed > 0) {
     notes.push(
-      `最近有 ${overview.counts.failed} 条动作执行失败，需要回看 trace。`,
+      t(msg`最近有 ${overview.counts.failed} 条动作执行失败，需要回看 trace。`),
     );
   }
 
   if (errorConnectors.length > 0) {
     notes.push(
-      `有 ${errorConnectors.length} 个连接器处于 error，优先检查最近错误和凭证状态。`,
+      t(msg`有 ${errorConnectors.length} 个连接器处于 error，优先检查最近错误和凭证状态。`),
     );
   }
 
   if (!notes.length) {
     return {
       tone: "success" as const,
-      title: "动作链当前可用",
+      title: t(msg`动作链当前可用`),
       notes: [
-        "动作角色、动作入口和连接器状态都正常，可以继续做消息预演或回看成功样本。",
+        t(msg`动作角色、动作入口和连接器状态都正常，可以继续做消息预演或回看成功样本。`),
       ],
     };
   }
 
   return {
     tone: "warning" as const,
-    title: "当前有动作链待处理事项",
+    title: t(msg`当前有动作链待处理事项`),
     notes,
   };
 }
 
 function buildActionRunHint(detail: ActionRunDetail) {
+  const t = translateRuntimeMessage;
   if (detail.status === "awaiting_slots") {
     return {
       tone: "warning" as const,
-      title: "当前动作在等待补参数",
+      title: t(msg`当前动作在等待补参数`),
       description: detail.missingSlots.length
-        ? `还缺 ${detail.missingSlots.join(" / ")}，先判断是用户表达不完整，还是连接器映射缺失。`
-        : "当前动作仍处于待补参数状态，先检查 plan 和 slotPayload。",
+        ? t(msg`还缺 ${detail.missingSlots.join(" / ")}，先判断是用户表达不完整，还是连接器映射缺失。`)
+        : t(msg`当前动作仍处于待补参数状态，先检查 plan 和 slotPayload。`),
     };
   }
 
   if (detail.status === "awaiting_confirmation") {
     return {
       tone: "info" as const,
-      title: "当前动作在等待用户确认",
+      title: t(msg`当前动作在等待用户确认`),
       description:
-        "先看风险等级、确认模板和 Policy Decision，再决定是否需要调整确认词或自动执行范围。",
+        t(msg`先看风险等级、确认模板和 Policy Decision，再决定是否需要调整确认词或自动执行范围。`),
     };
   }
 
   if (detail.status === "failed") {
     return {
       tone: "warning" as const,
-      title: "当前动作执行失败",
+      title: t(msg`当前动作执行失败`),
       description:
-        "优先看 Error Payload 和 Trace Payload，其次检查连接器状态、凭证和 endpoint config。",
+        t(msg`优先看 Error Payload 和 Trace Payload，其次检查连接器状态、凭证和 endpoint config。`),
     };
   }
 
   if (detail.status === "succeeded") {
     return {
       tone: "success" as const,
-      title: "当前动作已成功执行",
+      title: t(msg`当前动作已成功执行`),
       description:
-        "可从 Result Payload 和 Trace Payload 回看动作副作用，并拿这条样本作为后续预演的基线。",
+        t(msg`可从 Result Payload 和 Trace Payload 回看动作副作用，并拿这条样本作为后续预演的基线。`),
     };
   }
 
   if (detail.status === "cancelled") {
     return {
       tone: "muted" as const,
-      title: "当前动作已取消",
-      description: "回看确认链路和用户拒绝语义，确认这次取消是否符合预期。",
+      title: t(msg`当前动作已取消`),
+      description: t(msg`回看确认链路和用户拒绝语义，确认这次取消是否符合预期。`),
     };
   }
 
   return {
     tone: "info" as const,
-    title: "当前动作仍在处理中",
+    title: t(msg`当前动作仍在处理中`),
     description:
-      "继续关注 Trace Payload，确认 planner、执行器和连接器的阶段变化。",
+      t(msg`继续关注 Trace Payload，确认 planner、执行器和连接器的阶段变化。`),
   };
 }
 
@@ -2610,68 +2616,73 @@ function syncConnectorDrafts(
 }
 
 function translatePlannerMode(mode: ActionRuntimeRules["plannerMode"]) {
+  const t = translateRuntimeMessage;
   if (mode === "llm_with_heuristic_fallback") {
-    return "LLM 优先 + 回退";
+    return t(msg`LLM 优先 + 回退`);
   }
   if (mode === "llm") {
-    return "纯 LLM";
+    return t(msg`纯 LLM`);
   }
-  return "纯规则";
+  return t(msg`纯规则`);
 }
 
 function translateRiskLevel(level: ActionRiskLevel) {
+  const t = translateRuntimeMessage;
   if (level === "read_only") {
-    return "只读";
+    return t(msg`只读`);
   }
   if (level === "reversible_low_risk") {
-    return "低风险可逆";
+    return t(msg`低风险可逆`);
   }
-  return "付费/不可逆";
+  return t(msg`付费/不可逆`);
 }
 
 function translateRunStatus(status: ActionRunSummary["status"]) {
+  const t = translateRuntimeMessage;
   if (status === "awaiting_slots") {
-    return "待补参数";
+    return t(msg`待补参数`);
   }
   if (status === "awaiting_confirmation") {
-    return "待确认";
+    return t(msg`待确认`);
   }
   if (status === "succeeded") {
-    return "已成功";
+    return t(msg`已成功`);
   }
   if (status === "failed") {
-    return "失败";
+    return t(msg`失败`);
   }
   if (status === "cancelled") {
-    return "已取消";
+    return t(msg`已取消`);
   }
   if (status === "running") {
-    return "执行中";
+    return t(msg`执行中`);
   }
-  return "草稿";
+  return t(msg`草稿`);
 }
 
 function translateConnectorStatus(status: ActionConnectorSummary["status"]) {
+  const t = translateRuntimeMessage;
   if (status === "ready") {
-    return "已就绪";
+    return t(msg`已就绪`);
   }
   if (status === "error") {
-    return "错误";
+    return t(msg`错误`);
   }
-  return "已停用";
+  return t(msg`已停用`);
 }
 
 function translateProviderType(
   providerType: ActionConnectorSummary["providerType"],
 ) {
+  const t = translateRuntimeMessage;
   if (providerType === "official_api") {
-    return "官方 API";
+    return t(msg`官方 API`);
   }
   if (providerType === "http_bridge") {
     return "HTTP Bridge";
   }
   if (providerType === "browser_operator") {
-    return "浏览器执行器";
+    return t(msg`浏览器执行器`);
   }
   return "Mock";
 }
@@ -2737,11 +2748,11 @@ function parseEndpointConfig(value: string): {
       return { value: null };
     }
     if (Array.isArray(parsed) || typeof parsed !== "object") {
-      return { value: null, error: "Endpoint Config 需要是 JSON 对象。" };
+      return { value: null, error: "Endpoint Config needs to be a JSON object." };
     }
     return { value: parsed as Record<string, unknown> };
   } catch {
-    return { value: null, error: "Endpoint Config 不是合法 JSON。" };
+    return { value: null, error: "Endpoint Config is not valid JSON." };
   }
 }
 
@@ -2877,12 +2888,14 @@ function buildSpecificTargetKeyLabel(
   if (!text || text === genericDevice) {
     return "";
   }
+  // i18n-ignore-start: device name normalization logic — CJK device category strings
   if (
     genericDevice === "灯" &&
     /^(主|副|床头|吊|台|壁|落地|氛围)$/u.test(text)
   ) {
     return `${text}灯`;
   }
+  // i18n-ignore-end
   return text;
 }
 
@@ -2968,23 +2981,26 @@ function resolveRunTone(
 function translateRunRetryStep(
   step: "awaiting_slots" | "awaiting_confirmation" | "executed",
 ) {
+  const t = translateRuntimeMessage;
   if (step === "awaiting_slots") {
-    return "待补参数";
+    return t(msg`待补参数`);
   }
   if (step === "awaiting_confirmation") {
-    return "待确认";
+    return t(msg`待确认`);
   }
-  return "已重新执行";
+  return t(msg`已重新执行`);
 }
 
 function translateDiscoveryTopologySource(source: string) {
+  const t = translateRuntimeMessage;
   if (source === "websocket_registry") {
-    return "WebSocket registry 优先";
+    return t(msg`WebSocket registry 优先`);
   }
-  return "states 启发式";
+  return t(msg`states 启发式`);
 }
 
 function translateDiscoverySource(source: string) {
+  const t = translateRuntimeMessage;
   if (source === "entity_registry") {
     return "Entity Registry";
   }
@@ -2992,11 +3008,10 @@ function translateDiscoverySource(source: string) {
     return "Device Registry";
   }
   if (source === "heuristic") {
-    return "名称启发式";
+    return t(msg`名称启发式`);
   }
   if (source === "unresolved") {
-    return "未识别";
+    return t(msg`未识别`);
   }
   return source;
 }
-// i18n-ignore-end

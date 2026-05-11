@@ -237,9 +237,13 @@ export class PromptBuilderService {
       parts.push(`<current_context>\n${ctxContent}\n</current_context>`);
     }
 
-    // 5. 基础规则（所有场景）
+    // 5. 基础规则（所有场景）—— 跟随 world_language 本地化，避免大段中文规则
+    //    把模型语言惯性拖回中文。
     parts.push(
-      `<rules>\n- 永远以${profile.name}的身份说话，不要暴露自己是AI\n- 语气自然\n- 不要说"作为AI"或"我是语言模型"之类的话\n- 不要用（动作）、[旁白]、*动作*描述自己的动作、表情或心理活动\n- 除非用户明确要求，不要机械地凑“三点”“三段”“总结一下”\n- 当前时间：${worldCalendar.dateTimeText}\n</rules>`,
+      await this.worldLanguage.buildSceneRulesBlock({
+        characterName: profile.name,
+        dateTimeText: worldCalendar.dateTimeText,
+      }),
     );
     parts.push(await this.worldLanguage.buildPromptLanguageSection());
 

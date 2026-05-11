@@ -29,6 +29,7 @@ import { RealWorldSyncModule } from './modules/real-world-sync/real-world-sync.m
 import { FollowupRuntimeModule } from './modules/followup-runtime/followup-runtime.module';
 import { InferenceModule } from './modules/inference/inference.module';
 import { ReminderRuntimeModule } from './modules/reminder-runtime/reminder-runtime.module';
+import { MinimaxModule } from './modules/minimax/minimax.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { SubscriptionExpiredFilter } from './modules/subscription/subscription-expired.filter';
 import { WikiModule } from './modules/wiki/wiki.module';
@@ -55,6 +56,8 @@ import { GroupMemberEntity } from './modules/chat/group-member.entity';
 import { GroupMessageEntity } from './modules/chat/group-message.entity';
 import { GroupReplyTaskEntity } from './modules/chat/group-reply-task.entity';
 import { ReplyArtifactJobEntity } from './modules/chat/reply-artifact-job.entity';
+import { MinimaxQuotaEntity } from './modules/minimax/minimax-quota.entity';
+import { MinimaxJobEntity } from './modules/minimax/minimax-job.entity';
 import { MediaInsightJobEntity } from './modules/chat/media-insight-job.entity';
 import { ChatCustomStickerEntity } from './modules/chat/custom-sticker.entity';
 import { FeedPostEntity } from './modules/feed/feed-post.entity';
@@ -154,6 +157,8 @@ import {
           GroupMessageEntity,
           GroupReplyTaskEntity,
           ReplyArtifactJobEntity,
+          MinimaxQuotaEntity,
+          MinimaxJobEntity,
           MediaInsightJobEntity,
           ChatCustomStickerEntity,
           FeedPostEntity,
@@ -238,6 +243,7 @@ import {
     RealWorldSyncModule,
     FollowupRuntimeModule,
     ReminderRuntimeModule,
+    MinimaxModule,
     InferenceModule,
     SubscriptionModule,
     CloudRuntimeModule,

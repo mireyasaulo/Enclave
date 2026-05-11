@@ -23,6 +23,7 @@ import type { MessageDescriptor } from "@lingui/core";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, InlineNotice } from "@yinjie/ui";
 import { RouteRedirectState } from "../components/route-redirect-state";
+import { MomentShareCardModal } from "../components/moment-share-card-modal";
 import { WeChatActionBubble } from "../components/wechat-action-bubble";
 import {
   WeChatCommentBar,
@@ -387,6 +388,21 @@ export function MomentsPage() {
     });
   }
 
+  function openDesktopFriendMoments(targetMoment: Moment) {
+    if (targetMoment?.authorType !== "character") {
+      return;
+    }
+    void navigate({
+      to: "/desktop/friend-moments/$characterId",
+      params: { characterId: targetMoment.authorId },
+      hash: buildDesktopFriendMomentsRouteHash({
+        source: "moments",
+        returnPath: desktopMomentsPath,
+        returnHash: buildDesktopMomentsRouteHash({}),
+      }),
+    });
+  }
+
   function navigateToRouteStateReturn() {
     if (!safeReturnPath) {
       return false;
@@ -436,8 +452,7 @@ export function MomentsPage() {
 
     setNoticeActionLabel(null);
     setNoticeAction(null);
-    // i18n-ignore-next-line: clears notice state, not user-visible copy
-    setNotice("");
+    setNotice(""); // i18n-ignore-line: clearing state
   }, [baseUrl, resetComposeDraft]);
 
   useEffect(() => {
@@ -493,8 +508,7 @@ export function MomentsPage() {
     }
 
     const timer = window.setTimeout(() => {
-      // i18n-ignore-next-line: clears notice state, not user-visible copy
-      setNotice("");
+      setNotice(""); // i18n-ignore-line: clearing state
       setNoticeActionLabel(null);
       setNoticeAction(null);
     }, 2400);
@@ -729,23 +743,12 @@ export function MomentsPage() {
             void handleImageFilesSelected(files);
           }}
           onLike={(momentId) => likeMutation.mutate(momentId)}
-          onOpenAuthorPopover={({ anchorElement, moment }) => {
-            if (moment.authorType !== "character") {
+          onOpenAuthorPopover={({ moment: targetMoment }) => {
+            if (targetMoment?.authorType !== "character") {
               return;
             }
 
-            setDesktopAvatarPopover({
-              anchorElement,
-              characterId: moment.authorId,
-              fallbackAvatar: moment.authorAvatar,
-              fallbackName: moment.authorName,
-              returnHash: buildDesktopMomentsRouteHash({
-                authorId: routeSelectedAuthorId ?? undefined,
-                momentId: moment.id,
-                returnPath: safeReturnPath,
-                returnHash: safeReturnHash,
-              }),
-            });
+            openDesktopFriendMoments(targetMoment);
           }}
           onToggleFavorite={(momentId) => {
             const moment = visibleMoments.find((item) => item.id === momentId);
@@ -1007,6 +1010,17 @@ function MobileMomentsView({
   );
   const ownerName = ownerUsername?.trim() || t(msg`世界主人`);
 
+  // 「分享图卡」目标。点 ⋯ → 「分享」时把当时 actionBubble 的 momentId 存下来，
+  // 用 id 而不是整个 moment 对象 — 这样 visibleMoments 后续刷新时预览图也跟着新。
+  const [shareMomentId, setShareMomentId] = useState<string | null>(null);
+  const shareMoment = shareMomentId
+    ? visibleMoments.find((moment) => moment.id === shareMomentId) ?? null
+    : null;
+  const shareLiked = Boolean(
+    ownerId &&
+      shareMoment?.likes.some((like) => like.authorId === ownerId),
+  );
+
   return (
     <AppPage className="relative space-y-0 bg-white px-0 pb-0 pt-0">
       <TabPageTopBar
@@ -1215,7 +1229,20 @@ function MobileMomentsView({
             onCommentTap(actionBubble.momentId, null);
           }
         }}
+        onShare={() => {
+          if (actionBubble) {
+            setShareMomentId(actionBubble.momentId);
+          }
+        }}
         onClose={onCloseActionMenu}
+      />
+
+      <MomentShareCardModal
+        moment={shareMoment}
+        liked={shareLiked}
+        ownerId={ownerId}
+        ownerDisplayName={ownerName}
+        onClose={() => setShareMomentId(null)}
       />
 
       <WeChatCommentBar

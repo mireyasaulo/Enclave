@@ -21,11 +21,21 @@ import type {
   MomentVideoAsset,
 } from '../moments/moment-media.types';
 import { MomentPostEntity } from '../moments/moment-post.entity';
+import {
+  NPC_USER_POST_NEUTRAL_INTIMACY,
+  npcIntimacyMultiplier,
+  npcPostRecencyMultiplier,
+  npcRelationCoolingFactor,
+} from '../social/npc-engagement.utils';
 import { WorldLanguageService } from '../config/world-language.service';
+import { MinimaxJobService } from '../minimax/minimax-job.service';
+import { MinimaxQuotaService } from '../minimax/minimax-quota.service';
+import { MinimaxClient } from '../minimax/minimax.client';
+import type { MinimaxVideoModel } from '../minimax/minimax.types';
 
 type FeedSurface = 'feed' | 'channels';
 type FeedChannelHomeSection = 'recommended' | 'friends' | 'following' | 'live';
-type FeedMediaType = 'text' | 'image' | 'video';
+type FeedMediaType = 'text' | 'image' | 'video' | 'audio';
 type FeedSourceKind =
   | 'seed'
   | 'ai_generated'
@@ -63,50 +73,8 @@ const CHANNEL_HOME_SECTION_LABELS: Record<FeedChannelHomeSection, string> = {
   live: '直播',
 };
 
-const CHANNEL_DEMO_POSTS: Array<{
-  title: string;
-  text: string;
-  coverUrl: string;
-  mediaType: 'video';
-  mediaUrl: string;
-  durationMs: number;
-  topicTags: string[];
-  aspectRatio: number;
-}> = [
-  {
-    title: '雾港夜巡',
-    text: 'AI 夜航日志：雾港上空的低空巡游短片，第一视角穿过霓虹塔群。',
-    coverUrl: 'https://placehold.co/720x1280/png?text=Yinjie+Night+Patrol',
-    mediaType: 'video',
-    mediaUrl:
-      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
-    durationMs: 26000,
-    topicTags: ['夜景', '巡游', 'AI世界'],
-    aspectRatio: 9 / 16,
-  },
-  {
-    title: '晨光海岸',
-    text: 'AI 居民拍到的晨光海岸，海风、长桥和低饱和城市天际线被压进 20 秒短片里。',
-    coverUrl: 'https://placehold.co/720x1280/png?text=Yinjie+Morning+Coast',
-    mediaType: 'video',
-    mediaUrl:
-      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-    durationMs: 20000,
-    topicTags: ['海岸', '清晨', '城市'],
-    aspectRatio: 9 / 16,
-  },
-  {
-    title: '玻璃温室漫游',
-    text: 'AI 合成的玻璃温室散步片段，镜头从花墙缓慢推到中央光井。',
-    coverUrl: 'https://placehold.co/720x1280/png?text=Yinjie+Glasshouse',
-    mediaType: 'video',
-    mediaUrl:
-      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-    durationMs: 18000,
-    topicTags: ['温室', '漫游', '生活'],
-    aspectRatio: 9 / 16,
-  },
-];
+const CHANNEL_VIDEO_TOPIC_TAGS = ['AI世界', '隐界'];
+const CHANNEL_VIDEO_ASPECT_RATIO = 9 / 16;
 
 const MAX_FEED_IMAGE_COUNT = 9;
 const MAX_FEED_VIDEO_DURATION_MS = 5 * 60 * 1000;
@@ -133,6 +101,9 @@ export class FeedService implements OnModuleInit {
     private readonly characterFriendships: CharacterFriendshipService,
     private readonly cyberAvatar: CyberAvatarService,
     private readonly worldLanguage: WorldLanguageService,
+    private readonly minimaxJobs: MinimaxJobService,
+    private readonly minimaxQuota: MinimaxQuotaService,
+    private readonly minimaxClient: MinimaxClient,
   ) {}
 
   async onModuleInit() {
@@ -410,7 +381,10 @@ export class FeedService implements OnModuleInit {
     surface?: FeedSurface;
     visibility?: 'public' | 'friends' | 'private';
   }): Promise<FeedPostEntity> {
-    const normalizedInput = this.normalizeCreatePostInput(input);
+    const normalizedInput = this.normalizeCreatePostInput({
+      ...input,
+      publishStatus: input.publishStatus,
+    });
     const post = this.postRepo.create({
       authorAvatar: input.authorAvatar,
       authorId: input.authorId,
@@ -869,6 +843,26 @@ export class FeedService implements OnModuleInit {
     characterId?: string,
     options?: { skipAi?: boolean },
   ): Promise<FeedPostEntity | null> {
+    if (options?.skipAi) {
+      // 视频号失败时跳过：topUp 路径不再用 demo 兜底，避免重复占视频额度。
+      return null;
+    }
+
+    if (!this.minimaxClient.isConfigured()) {
+      this.logger.warn(
+        'generateChannelPost skipped: MINIMAX_API_KEY not configured',
+      );
+      return null;
+    }
+
+    const model = await this.pickVideoModel();
+    if (!model) {
+      this.logger.warn(
+        'generateChannelPost skipped: MiniMax video quota exhausted today',
+      );
+      return null;
+    }
+
     const candidates = await this.characters.findAllVisibleToOwner();
     const eligibleCharacters = candidates.filter((character) =>
       characterId ? character.id === characterId : character.feedFrequency > 0,
@@ -883,88 +877,203 @@ export class FeedService implements OnModuleInit {
     }
 
     const profile = await this.characters.getProfile(selectedCharacter.id);
-    const media = this.pickChannelMedia(selectedCharacter.id);
     const fallbackText = await this.worldLanguage.buildChannelFallbackText(
       selectedCharacter.name,
     );
 
-    if (!profile || options?.skipAi) {
-      return this.createPost({
-        authorAvatar: selectedCharacter.avatar,
-        authorId: selectedCharacter.id,
-        authorName: selectedCharacter.name,
-        authorType: 'character',
-        title: media.title,
-        mediaType: 'video',
-        mediaUrl: media.mediaUrl,
-        coverUrl: media.coverUrl,
-        durationMs: media.durationMs,
-        aspectRatio: media.aspectRatio,
-        topicTags: media.topicTags,
-        sourceKind: options?.skipAi ? 'seed' : 'ai_generated',
-        recommendationScore: 80,
-        surface: 'channels',
-        text: fallbackText,
-      });
+    let text = fallbackText;
+    if (profile) {
+      try {
+        const baseText = await this.ai.generateMoment({
+          profile,
+          currentTime: new Date(),
+          usageContext: {
+            surface: 'app',
+            scene: 'channel_post_generate',
+            scopeType: 'character',
+            scopeId: selectedCharacter.id,
+            scopeLabel: selectedCharacter.name,
+            characterId: selectedCharacter.id,
+            characterName: selectedCharacter.name,
+          },
+        });
+        text = baseText.trim() || fallbackText;
+      } catch (err) {
+        this.logger.warn(
+          `channel text gen failed for ${selectedCharacter.id}, using fallback: ${(err as Error)?.message}`,
+        );
+      }
+    }
+
+    const videoPrompt = composeChannelVideoPrompt(
+      selectedCharacter.name,
+      profile?.relationship,
+      text,
+    );
+    const job = await this.minimaxJobs.enqueueVideoJob({
+      model,
+      prompt: videoPrompt,
+      resolution: '768P',
+      characterId: selectedCharacter.id,
+      characterName: selectedCharacter.name,
+      characterAvatar: selectedCharacter.avatar,
+      targetType: 'channel_post',
+    });
+    if (!job) {
+      return null;
     }
 
     try {
-      const baseText = await this.ai.generateMoment({
-        profile,
-        currentTime: new Date(),
-        usageContext: {
-          surface: 'app',
-          scene: 'channel_post_generate',
-          scopeType: 'character',
-          scopeId: selectedCharacter.id,
-          scopeLabel: selectedCharacter.name,
-          characterId: selectedCharacter.id,
-          characterName: selectedCharacter.name,
-        },
-      });
-      const text = baseText.trim() || fallbackText;
-
-      return this.createPost({
+      const draft = await this.createPost({
         authorAvatar: selectedCharacter.avatar,
         authorId: selectedCharacter.id,
         authorName: selectedCharacter.name,
         authorType: 'character',
-        title: media.title,
+        title: composeChannelTitle(selectedCharacter.name, text),
         mediaType: 'video',
-        mediaUrl: media.mediaUrl,
-        coverUrl: media.coverUrl,
-        durationMs: media.durationMs,
-        aspectRatio: media.aspectRatio,
-        topicTags: media.topicTags,
+        mediaUrl: '',
+        coverUrl: null,
+        durationMs: undefined,
+        aspectRatio: CHANNEL_VIDEO_ASPECT_RATIO,
+        topicTags: CHANNEL_VIDEO_TOPIC_TAGS,
         sourceKind: 'character_generated',
         recommendationScore: 100,
         surface: 'channels',
+        publishStatus: 'draft',
+        statsPayload: { minimaxJobId: job.id, minimaxModel: model },
         text,
       });
-    } catch (err) {
-      this.logger.error(
-        `Failed to generate channels post for ${selectedCharacter.id}`,
-        err,
+      await this.minimaxJobs.attachTarget(job.id, draft.id);
+      this.logger.log(
+        `channel draft ${draft.id} queued minimax video job ${job.id} (${model})`,
       );
-
-      return this.createPost({
-        authorAvatar: selectedCharacter.avatar,
-        authorId: selectedCharacter.id,
-        authorName: selectedCharacter.name,
-        authorType: 'character',
-        title: media.title,
-        mediaType: 'video',
-        mediaUrl: media.mediaUrl,
-        coverUrl: media.coverUrl,
-        durationMs: media.durationMs,
-        aspectRatio: media.aspectRatio,
-        topicTags: media.topicTags,
-        sourceKind: 'seed',
-        recommendationScore: 80,
-        surface: 'channels',
-        text: fallbackText,
-      });
+      return draft;
+    } catch (err) {
+      // createPost / attachTarget 失败必须回滚 job：否则配额白扣、cron 会
+      // 去执行一个没有目标可挂的 orphan job。
+      await this.minimaxJobs.cancelJob(job.id);
+      this.logger.error(
+        `channel post creation failed, rolled back minimax job ${job.id}: ${(err as Error)?.message}`,
+      );
+      throw err;
     }
+  }
+
+  async applyMinimaxVideoToChannelPost(
+    postId: string,
+    media: {
+      mediaUrl: string;
+      coverUrl: string | null;
+      durationMs: number | null;
+    },
+  ): Promise<void> {
+    const post = await this.postRepo.findOneBy({ id: postId });
+    if (!post) {
+      this.logger.warn(`applyMinimaxVideoToChannelPost: post ${postId} missing`);
+      return;
+    }
+    const jittered = new Date(
+      Date.now() - Math.floor(Math.random() * 15 * 60 * 1000),
+    );
+    await this.postRepo.update(postId, {
+      mediaUrl: media.mediaUrl,
+      coverUrl: media.coverUrl,
+      durationMs: media.durationMs,
+      mediaType: 'video',
+      aspectRatio: CHANNEL_VIDEO_ASPECT_RATIO,
+      publishStatus: 'published',
+      createdAt: jittered,
+    });
+  }
+
+  async applyMinimaxAudioToChannelPost(
+    postId: string,
+    media: {
+      audioUrl: string;
+      posterUrl: string | null;
+      durationMs: number | null;
+    },
+  ): Promise<void> {
+    const post = await this.postRepo.findOneBy({ id: postId });
+    if (!post) {
+      this.logger.warn(`applyMinimaxAudioToChannelPost: post ${postId} missing`);
+      return;
+    }
+    const jittered = new Date(
+      Date.now() - Math.floor(Math.random() * 15 * 60 * 1000),
+    );
+    await this.postRepo.update(postId, {
+      mediaUrl: media.audioUrl,
+      coverUrl: media.posterUrl,
+      durationMs: media.durationMs,
+      mediaType: 'audio',
+      aspectRatio: 1,
+      publishStatus: 'published',
+      createdAt: jittered,
+    });
+  }
+
+  async deleteChannelDraftPost(postId: string): Promise<void> {
+    const post = await this.postRepo.findOneBy({ id: postId });
+    if (!post || post.publishStatus !== 'draft') {
+      return;
+    }
+    await this.postRepo.delete(postId);
+  }
+
+  async createChannelAudioPost(input: {
+    authorId: string;
+    authorName: string;
+    authorAvatar?: string | null;
+    audioUrl: string;
+    posterUrl?: string | null;
+    durationMs?: number | null;
+    text: string;
+    title?: string | null;
+    topicTags?: string[];
+  }): Promise<FeedPostEntity> {
+    const media: MomentMediaAsset[] = [
+      {
+        id: `feed-audio-${Date.now()}`,
+        kind: 'audio',
+        url: input.audioUrl,
+        posterUrl: input.posterUrl ?? undefined,
+        mimeType: 'audio/mpeg',
+        fileName: 'feed-audio.mp3',
+        size: 0,
+        durationMs: input.durationMs ?? undefined,
+        title: input.title ?? `${input.authorName}·音乐`,
+      },
+    ];
+    return this.createPost({
+      authorAvatar: input.authorAvatar ?? '',
+      authorId: input.authorId,
+      authorName: input.authorName,
+      authorType: 'character',
+      text: input.text,
+      title: input.title ?? `${input.authorName}·音乐`,
+      media,
+      mediaType: 'audio',
+      mediaUrl: input.audioUrl,
+      coverUrl: input.posterUrl ?? null,
+      durationMs: input.durationMs ?? undefined,
+      aspectRatio: 1,
+      topicTags: input.topicTags ?? ['音乐', 'AI世界'],
+      sourceKind: 'character_generated',
+      recommendationScore: 90,
+      surface: 'channels',
+      publishStatus: 'published',
+    });
+  }
+
+  private async pickVideoModel(): Promise<MinimaxVideoModel | null> {
+    if ((await this.minimaxQuota.availableToday('MiniMax-Hailuo-2.3-Fast')) > 0) {
+      return 'MiniMax-Hailuo-2.3-Fast';
+    }
+    if ((await this.minimaxQuota.availableToday('MiniMax-Hailuo-2.3')) > 0) {
+      return 'MiniMax-Hailuo-2.3';
+    }
+    return null;
   }
 
   async toggleLike(
@@ -1015,10 +1124,14 @@ export class FeedService implements OnModuleInit {
       normal: 1.0,
       low: 0.5,
     };
-    const RECENT_WINDOW_MS = 24 * 60 * 60 * 1000;
+    // 候选窗口扩到 7d；旧帖通过 npcPostRecencyMultiplier 在掷骰子层衰减/截断。
+    const RECENT_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+    const LIKE_BASE = 0.2;
+    const COMMENT_BASE = 0.07;
 
     const now = new Date();
-    const recentSince = new Date(now.getTime() - RECENT_WINDOW_MS);
+    const nowMs = now.getTime();
+    const recentSince = new Date(nowMs - RECENT_WINDOW_MS);
     const hour = now.getHours();
 
     const blockedCharacterIds = new Set(
@@ -1052,17 +1165,17 @@ export class FeedService implements OnModuleInit {
     });
     if (recentPosts.length === 0) {
       return {
-        summary: `process_pending_feed_reactions: 最近 24h 广场/视频号无帖子可巡查（候选 ${activeCandidates.length} 个）`,
+        summary: `process_pending_feed_reactions: 最近 7d 广场/视频号无帖子可巡查（候选 ${activeCandidates.length} 个）`,
         likeCount,
         commentCount,
       };
     }
 
     for (const char of activeCandidates) {
-      const baseChance = char.proactiveBrowseChance ?? 0.3;
+      const baseChance = char.proactiveBrowseChance ?? 0.1;
       const freqMul =
         FREQ_MULTIPLIER[char.activityFrequency ?? 'normal'] ?? 1.0;
-      const browseChance = Math.min(0.95, baseChance * freqMul);
+      const browseChance = Math.min(0.5, baseChance * freqMul);
       if (Math.random() > browseChance) continue;
 
       participantCount += 1;
@@ -1086,30 +1199,36 @@ export class FeedService implements OnModuleInit {
 
       const scored = await Promise.all(
         fresh.map(async (post) => {
-          let intimacy = 0;
+          let effectiveIntimacy: number;
           if (post.authorType === 'character') {
-            intimacy = await this.characterFriendships.getIntimacy(
+            const rel = await this.characterFriendships.getRelation(
               char.id,
               post.authorId,
             );
+            effectiveIntimacy =
+              rel.intimacy *
+              npcRelationCoolingFactor(nowMs, rel.lastInteractedAt);
+          } else {
+            effectiveIntimacy = NPC_USER_POST_NEUTRAL_INTIMACY;
           }
-          const recencyScore = Math.max(
-            0,
-            1 - (now.getTime() - post.createdAt.getTime()) / RECENT_WINDOW_MS,
+          const recencyMul = npcPostRecencyMultiplier(
+            nowMs,
+            post.createdAt.getTime(),
           );
-          return {
-            post,
-            score: intimacy / 50 + recencyScore + Math.random() * 0.3,
-          };
+          const intimacyMul = npcIntimacyMultiplier(effectiveIntimacy);
+          const engageMul = recencyMul * intimacyMul;
+          const score =
+            effectiveIntimacy / 50 + recencyMul + Math.random() * 0.3;
+          return { post, score, engageMul };
         }),
       );
       scored.sort((a, b) => b.score - a.score);
-      const TOP_K = 3;
+      const TOP_K = 2;
       const top = scored.slice(0, TOP_K);
 
-      for (const { post } of top) {
-        const surfaceLabel = post.surface === 'channels' ? '视频号' : '广场';
-        if (Math.random() < 0.5) {
+      for (const { post, engageMul } of top) {
+        if (engageMul <= 0) continue; // 7d 硬截断 / 关系完全冷却
+        if (Math.random() < LIKE_BASE * engageMul) {
           try {
             await this.toggleLike(
               post.id,
@@ -1136,15 +1255,20 @@ export class FeedService implements OnModuleInit {
           }
         }
 
-        if (llmCallsRemaining > 0 && Math.random() < 0.2) {
+        if (llmCallsRemaining > 0 && Math.random() < COMMENT_BASE * engageMul) {
           try {
             const profile = await this.characters.getProfile(char.id);
             if (!profile) continue;
             const observation = await this.buildFeedAiObservation(post);
+            const userMessage = await this.worldLanguage.formatPostCommentTask({
+              authorName: post.authorName,
+              summary: observation.summary,
+              surface: post.surface === 'channels' ? 'channels' : 'feed',
+            });
             const reply = await this.ai.generateReply({
               profile,
               conversationHistory: [],
-              userMessage: `${post.authorName}在${surfaceLabel}发了一条动态：${observation.summary}。用一句话自然地评论一下，不超过20字。`,
+              userMessage,
               userMessageParts: observation.parts,
               usageContext: {
                 surface: 'app',
@@ -1198,62 +1322,14 @@ export class FeedService implements OnModuleInit {
   }
 
   async ensureChannelSeedData() {
-    const existingCount = await this.postRepo.count({
-      where: { surface: 'channels', publishStatus: 'published' },
-    });
-    if (existingCount > 0) {
-      return;
-    }
-
-    const authors = (await this.characters.findAllVisibleToOwner()).slice(
-      0,
-      CHANNEL_DEMO_POSTS.length,
-    );
-    if (!authors.length) {
-      return;
-    }
-
-    for (const [index, demoPost] of CHANNEL_DEMO_POSTS.entries()) {
-      const author = authors[index % authors.length];
-      await this.createPost({
-        authorAvatar: author.avatar,
-        authorId: author.id,
-        authorName: author.name,
-        authorType: 'character',
-        title: demoPost.title,
-        mediaType: demoPost.mediaType,
-        mediaUrl: demoPost.mediaUrl,
-        coverUrl: demoPost.coverUrl,
-        durationMs: demoPost.durationMs,
-        aspectRatio: demoPost.aspectRatio,
-        topicTags: demoPost.topicTags,
-        favoriteCount: 0,
-        sourceKind: 'seed',
-        surface: 'channels',
-        text: demoPost.text,
-        viewCount: 18 + index * 7,
-        watchCount: 12 + index * 5,
-      });
-    }
+    // 视频号已切换到 MiniMax 真实生成；冷启不再用 demo 占位（用户决策：失败时跳过）。
+    // 留空方法保持调用点向后兼容。
   }
 
-  async topUpChannelsIfNeeded(targetCount = 6) {
-    const recentCount = await this.postRepo.count({
-      where: {
-        createdAt: MoreThanOrEqual(new Date(Date.now() - 48 * 60 * 60 * 1000)),
-        publishStatus: 'published',
-        surface: 'channels',
-      },
-    });
-
-    if (recentCount >= targetCount) {
-      return;
-    }
-
-    const missingCount = targetCount - recentCount;
-    for (let index = 0; index < missingCount; index += 1) {
-      await this.generateChannelPost(undefined, { skipAi: true });
-    }
+  async topUpChannelsIfNeeded(_targetCount = 6) {
+    // 真实视频依赖 MiniMax Token Plan 配额（4 次/日全局），不再做用户访问期填充。
+    // 视频号产出由 scheduler 的 channels cron 按角色频率推动。
+    void _targetCount;
   }
 
   private async buildCommentsPreviewMap(
@@ -1679,6 +1755,7 @@ export class FeedService implements OnModuleInit {
     coverUrl?: string | null;
     durationMs?: number;
     aspectRatio?: number;
+    publishStatus?: 'draft' | 'published' | 'hidden' | 'deleted';
   }) {
     const text = input.text.trim();
     const explicitMedia = this.normalizeFeedMediaInput(input.media);
@@ -1688,13 +1765,15 @@ export class FeedService implements OnModuleInit {
         : this.buildFeedMediaFromLegacyInput(input);
     const mediaType = this.inferFeedMediaType(media, input.mediaType);
 
-    if (!text && media.length === 0) {
+    if (!text && media.length === 0 && input.publishStatus !== 'draft') {
       throw new AppError('FEED_EMPTY', {
         legacyMessage: '动态内容和媒体不能同时为空。',
       });
     }
 
-    this.assertFeedMediaMatchesMediaType(mediaType, media);
+    if (input.publishStatus !== 'draft') {
+      this.assertFeedMediaMatchesMediaType(mediaType, media);
+    }
     const primaryMedia = media[0];
 
     return {
@@ -1743,12 +1822,29 @@ export class FeedService implements OnModuleInit {
     }
 
     const legacyMediaType =
-      input.mediaType === 'video' || input.mediaType === 'image'
+      input.mediaType === 'video' ||
+      input.mediaType === 'image' ||
+      input.mediaType === 'audio'
         ? input.mediaType
         : 'image';
     const approximateDimensions = buildApproximateFeedMediaDimensions(
       input.aspectRatio,
     );
+
+    if (legacyMediaType === 'audio') {
+      return [
+        {
+          id: 'feed-audio-legacy',
+          kind: 'audio',
+          url: mediaUrl,
+          posterUrl: input.coverUrl?.trim() || undefined,
+          mimeType: 'audio/mpeg',
+          fileName: 'feed-audio',
+          size: 0,
+          durationMs: normalizeOptionalPositiveInteger(input.durationMs),
+        },
+      ];
+    }
 
     if (legacyMediaType === 'video') {
       return [
@@ -1786,6 +1882,9 @@ export class FeedService implements OnModuleInit {
     media: MomentMediaAsset[],
     fallback?: FeedMediaType,
   ): FeedMediaType {
+    if (media[0]?.kind === 'audio') {
+      return 'audio';
+    }
     if (media[0]?.kind === 'video') {
       return 'video';
     }
@@ -1794,7 +1893,14 @@ export class FeedService implements OnModuleInit {
       return 'image';
     }
 
-    return fallback === 'image' || fallback === 'video' ? fallback : 'text';
+    if (
+      fallback === 'image' ||
+      fallback === 'video' ||
+      fallback === 'audio'
+    ) {
+      return fallback;
+    }
+    return 'text';
   }
 
   private assertFeedMediaMatchesMediaType(
@@ -1821,6 +1927,15 @@ export class FeedService implements OnModuleInit {
       if (video.durationMs && video.durationMs > MAX_FEED_VIDEO_DURATION_MS) {
         throw new AppError('FEED_VIDEO_TOO_LONG', {
           legacyMessage: '视频时长不能超过 5 分钟。',
+        });
+      }
+      return;
+    }
+
+    if (mediaType === 'audio') {
+      if (media.length !== 1 || media[0]?.kind !== 'audio') {
+        throw new AppError('FEED_AUDIO_SINGLE', {
+          legacyMessage: '音频动态必须且只能包含 1 条音频。',
         });
       }
       return;
@@ -2308,17 +2423,31 @@ export class FeedService implements OnModuleInit {
     });
   }
 
-  private pickChannelMedia(seed: string) {
-    let hash = 0;
-    for (const character of seed) {
-      hash = (hash * 33 + (character.codePointAt(0) ?? 0)) >>> 0;
-    }
+}
 
-    return (
-      CHANNEL_DEMO_POSTS[hash % CHANNEL_DEMO_POSTS.length] ??
-      CHANNEL_DEMO_POSTS[0]
-    );
-  }
+function composeChannelVideoPrompt(
+  characterName: string,
+  relationship: string | undefined,
+  text: string,
+): string {
+  const personaSnippet = relationship?.trim()
+    ? `角色定位：${relationship.slice(0, 120)}。`
+    : '';
+  const trimmedText = text.replace(/\s+/g, ' ').trim().slice(0, 300);
+  return [
+    `${characterName} 的视频号短片，9:16 竖屏，6 秒。`,
+    personaSnippet,
+    `画面主题：${trimmedText || '城市夜景慢镜头，空气中带着 AI 隐界的氛围'}。`,
+    '风格：电影感、低饱和、柔和光线、轻微镜头运动。',
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+function composeChannelTitle(characterName: string, text: string): string {
+  const trimmed = text.replace(/\s+/g, ' ').trim();
+  if (!trimmed) return `${characterName}·视频`;
+  return trimmed.length <= 24 ? trimmed : `${trimmed.slice(0, 20)}…`;
 }
 
 function normalizeFeedMediaAsset(
@@ -2337,6 +2466,21 @@ function normalizeFeedMediaAsset(
       width: normalizeOptionalPositiveInteger(asset.width),
       height: normalizeOptionalPositiveInteger(asset.height),
       durationMs: normalizeOptionalPositiveInteger(asset.durationMs),
+    };
+  }
+
+  if (asset.kind === 'audio') {
+    return {
+      id: asset.id?.trim() || `feed-audio-${index + 1}`,
+      kind: 'audio',
+      url: asset.url?.trim() || '',
+      posterUrl: asset.posterUrl?.trim() || undefined,
+      mimeType: asset.mimeType?.trim() || 'audio/mpeg',
+      fileName: asset.fileName?.trim() || `audio-${index + 1}`,
+      size: Math.max(0, Math.round(asset.size ?? 0)),
+      durationMs: normalizeOptionalPositiveInteger(asset.durationMs),
+      title: asset.title?.trim() || undefined,
+      lyrics: asset.lyrics?.trim() || undefined,
     };
   }
 
@@ -2376,7 +2520,7 @@ function normalizeOptionalPositiveFloat(value?: number | null) {
 }
 
 function resolveFeedMediaAspectRatio(media?: MomentMediaAsset | null) {
-  if (!media) {
+  if (!media || media.kind === 'audio') {
     return undefined;
   }
 

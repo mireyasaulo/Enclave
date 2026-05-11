@@ -10,6 +10,7 @@ import { CloudTokenPricingCatalogEntity } from "../entities/cloud-token-pricing-
 import { CloudTokenUsageBreakdownDailyEntity } from "../entities/cloud-token-usage-breakdown-daily.entity";
 import { CloudTokenUsageBudgetEntity } from "../entities/cloud-token-usage-budget.entity";
 import { CloudTokenUsageDailyEntity } from "../entities/cloud-token-usage-daily.entity";
+import { CloudUserOAuthIdentityEntity } from "../entities/cloud-user-oauth-identity.entity";
 import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { CloudWorldRequestEntity } from "../entities/cloud-world-request.entity";
 import { CloudWorldEntity } from "../entities/cloud-world.entity";
@@ -46,6 +47,7 @@ import { UpdateAppPublicBaseUrl1776655200000 } from "./migrations/1776655200000-
 import { CreateTelemetryTables1776655800000 } from "./migrations/1776655800000-create-telemetry-tables";
 import { AddWorldIdToTelemetry1776656400000 } from "./migrations/1776656400000-add-world-id-to-telemetry";
 import { CreateCloudTokenUsageTables1776657000000 } from "./migrations/1776657000000-create-cloud-token-usage-tables";
+import { CreateCloudUserOAuthIdentities1776657600000 } from "./migrations/1776657600000-create-cloud-user-oauth-identities";
 import { resolveCloudDatabasePath } from "../config/cloud-runtime-config";
 
 type ConfigReader = {
@@ -63,6 +65,7 @@ export const cloudEntities = [
   WaitingSessionSyncTaskEntity,
   WorldLifecycleJobEntity,
   CloudUserEntity,
+  CloudUserOAuthIdentityEntity,
   SubscriptionPlanEntity,
   UserSubscriptionEntity,
   InviteCodeEntity,
@@ -102,6 +105,7 @@ export const cloudMigrations = [
   CreateTelemetryTables1776655800000,
   AddWorldIdToTelemetry1776656400000,
   CreateCloudTokenUsageTables1776657000000,
+  CreateCloudUserOAuthIdentities1776657600000,
 ];
 
 export function buildCloudDataSourceOptions(config: ConfigReader): DataSourceOptions {

@@ -779,6 +779,22 @@ function PricingTab() {
     onError: (error: unknown) => showCloudAdminErrorNotice(showNotice, error),
   });
 
+  const syncMutation = useMutation({
+    mutationFn: cloudAdminApi.syncCloudTokenPricingFromN1n,
+    onSuccess: (data) => {
+      void queryClient.invalidateQueries({
+        queryKey: ["token-usage", "pricing"],
+      });
+      void queryClient.invalidateQueries({ queryKey: ["token-usage"] });
+      showNotice(
+        t("Synced {count} models, recomputed {days} days of cost.")
+          .replace("{count}", String(data.upserted))
+          .replace("{days}", String(data.recomputedDays)),
+      );
+    },
+    onError: (error: unknown) => showCloudAdminErrorNotice(showNotice, error),
+  });
+
   if (catalogQuery.error) {
     return <CloudAdminErrorBlock error={catalogQuery.error} />;
   }
@@ -788,8 +804,20 @@ function PricingTab() {
   return (
     <div className="space-y-6">
       <section className={SECTION}>
-        <div className="text-sm font-semibold text-[color:var(--text-primary)]">
-          {t("Pricing catalog")}
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="text-sm font-semibold text-[color:var(--text-primary)]">
+            {t("Pricing catalog")}
+          </div>
+          <button
+            type="button"
+            className={BUTTON}
+            onClick={() => syncMutation.mutate()}
+            disabled={syncMutation.isPending}
+          >
+            {syncMutation.isPending
+              ? t("Syncing…")
+              : t("Sync from n1n.ai")}
+          </button>
         </div>
         <div className="mt-3 overflow-hidden rounded-2xl border border-[color:var(--border-subtle)]">
           <table className="w-full text-sm">
@@ -895,7 +923,7 @@ function PricingEditor(props: {
   submitting: boolean;
 }) {
   const t = useCloudConsoleText();
-  const [currency, setCurrency] = useState<"CNY" | "USD">("CNY");
+  const [currency, setCurrency] = useState<"CNY" | "USD">("USD");
   const [model, setModel] = useState("");
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
@@ -927,7 +955,7 @@ function PricingEditor(props: {
           className={FIELD}
           value={model}
           onChange={(event) => setModel(event.target.value)}
-          placeholder="claude-haiku-4-5"
+          placeholder="claude-haiku-4-5" // i18n-ignore-line: model name placeholder
         />
       </label>
       <label className="block">

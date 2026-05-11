@@ -4,8 +4,5 @@
   "applicationId": "com.yinjie.mobile",
   "appVersionName": "1.0.0",
   "appVersionCode": 1,
-  "apiBaseUrl": "http://10.0.2.2:39091",
-  "worldAccessMode": "local",
-  "configStatus": "configured",
-  "socketBaseUrl": "http://10.0.2.2:39091"
+  "configStatus": "unconfigured"
 }

@@ -16,6 +16,12 @@ import { MomentLikeEntity } from './moment-like.entity';
 import { WorldOwnerService } from '../auth/world-owner.service';
 import { SocialService } from '../social/social.service';
 import { CharacterFriendshipService } from '../social/character-friendship.service';
+import {
+  NPC_USER_POST_NEUTRAL_INTIMACY,
+  npcIntimacyMultiplier,
+  npcPostRecencyMultiplier,
+  npcRelationCoolingFactor,
+} from '../social/npc-engagement.utils';
 import { FeedService } from '../feed/feed.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { ReminderRuntimeService } from '../reminder-runtime/reminder-runtime.service';
@@ -31,11 +37,19 @@ import {
 } from './moment-media.storage';
 import {
   type CreateMomentInput,
+  type MomentAudioAsset,
   type MomentContentType,
   type MomentImageAsset,
   type MomentMediaAsset,
   type MomentVideoAsset,
 } from './moment-media.types';
+import { MinimaxJobService } from '../minimax/minimax-job.service';
+import { MinimaxQuotaService } from '../minimax/minimax-quota.service';
+import { MinimaxClient } from '../minimax/minimax.client';
+import { MinimaxAssetStorage } from '../minimax/minimax-asset.storage';
+import { WorldLanguageService } from '../config/world-language.service';
+import type { MinimaxJobEntity } from '../minimax/minimax-job.entity';
+import type { CharacterEntity } from '../characters/character.entity';
 
 export interface MomentInteraction {
   characterId: string;
@@ -87,6 +101,11 @@ export class MomentsService implements OnModuleInit {
     private readonly feedService: FeedService,
     private readonly cyberAvatar: CyberAvatarService,
     private readonly reminderRuntime: ReminderRuntimeService,
+    private readonly minimaxJobs: MinimaxJobService,
+    private readonly minimaxQuota: MinimaxQuotaService,
+    private readonly minimaxClient: MinimaxClient,
+    private readonly minimaxStorage: MinimaxAssetStorage,
+    private readonly worldLanguage: WorldLanguageService,
     @InjectRepository(MomentEntity)
     private momentRepo: Repository<MomentEntity>,
     @InjectRepository(MomentPostEntity)
@@ -504,10 +523,17 @@ export class MomentsService implements OnModuleInit {
 
     allChars.forEach((char, i) => {
       const freq = char.activityFrequency ?? 'normal';
-      const baseChance = freq === 'high' ? 0.6 : freq === 'low' ? 0.2 : 0.4;
+      // 改前 0.6 / 0.4 / 0.2，改后约 1/3
+      const baseChance = freq === 'high' ? 0.2 : freq === 'low' ? 0.07 : 0.13;
       const intimacy = intimacyByCharId.get(char.id) ?? 0;
-      const intimacyMultiplier = 1 + intimacy / 50; // up to ~3x at intimacy=100
-      const interactChance = Math.min(0.95, baseChance * intimacyMultiplier);
+      const effectiveIntimacy =
+        post.authorType === 'character'
+          ? intimacy
+          : NPC_USER_POST_NEUTRAL_INTIMACY;
+      const interactChance = Math.min(
+        0.5,
+        baseChance * npcIntimacyMultiplier(effectiveIntimacy),
+      );
       if (Math.random() > interactChance) return;
 
       // Delay based on activity frequency; closer friends react sooner
@@ -562,10 +588,15 @@ export class MomentsService implements OnModuleInit {
               const profile = await this.characters.getProfile(char.id);
               if (!profile) return;
               const observation = await this.buildMomentAiObservation(post);
+              const userMessage = await this.worldLanguage.formatPostCommentTask({
+                authorName: post.authorName,
+                summary: observation.summary,
+                surface: 'moments',
+              });
               const reply = await this.ai.generateReply({
                 profile,
                 conversationHistory: [],
-                userMessage: `${post.authorName}发了一条朋友圈：${observation.summary}。用一句话自然地评论一下，不超过20字。`,
+                userMessage,
                 userMessageParts: observation.parts,
                 usageContext: {
                   surface: 'app',
@@ -699,9 +730,14 @@ export class MomentsService implements OnModuleInit {
             const observation = await this.buildMomentAiObservation(post);
 
             const isPostAuthor = replier.id === post.authorId;
-            const userMessage = isPostAuthor
-              ? `${sourceComment.authorName}在你的朋友圈评论了："${sourceComment.text}"，你的朋友圈内容是：${observation.summary}，回复一下，不超过20字。`
-              : `你刷到${post.authorName}发的朋友圈：${observation.summary}。${sourceComment.authorName}评论了："${sourceComment.text}"，你也想插话回复一下，不超过20字。`;
+            const userMessage =
+              await this.worldLanguage.formatPostCommentReplyTask({
+                postAuthorName: post.authorName,
+                sourceCommenterName: sourceComment.authorName,
+                sourceCommentText: sourceComment.text,
+                summary: observation.summary,
+                isPostAuthor,
+              });
 
             const reply = await this.ai.generateReply({
               profile,
@@ -1187,6 +1223,21 @@ export class MomentsService implements OnModuleInit {
       };
     }
 
+    if (asset.kind === 'audio') {
+      return {
+        id: asset.id?.trim() || `moment-audio-${index + 1}`,
+        kind: 'audio',
+        url: asset.url?.trim() || '',
+        posterUrl: asset.posterUrl?.trim() || undefined,
+        mimeType: asset.mimeType?.trim() || 'audio/mpeg',
+        fileName: asset.fileName?.trim() || `audio-${index + 1}`,
+        size: Math.max(0, Math.round(asset.size ?? 0)),
+        durationMs: normalizeOptionalPositiveNumber(asset.durationMs),
+        title: asset.title?.trim() || undefined,
+        lyrics: asset.lyrics?.trim() || undefined,
+      };
+    }
+
     return {
       id: asset.id?.trim() || `moment-image-${index + 1}`,
       kind: 'image',
@@ -1212,12 +1263,18 @@ export class MomentsService implements OnModuleInit {
       return 'text';
     }
 
+    if (media.some((asset) => asset.kind === 'audio')) {
+      return 'audio_card';
+    }
+
     if (media.some((asset) => asset.kind === 'video')) {
       return 'video';
     }
 
     if (
-      media.some((asset) => asset.kind === 'image' && asset.livePhoto?.enabled)
+      media.some(
+        (asset) => asset.kind === 'image' && (asset as MomentImageAsset).livePhoto?.enabled,
+      )
     ) {
       return 'live_photo';
     }
@@ -1228,7 +1285,8 @@ export class MomentsService implements OnModuleInit {
   private normalizeMomentContentType(value?: string): MomentContentType {
     return value === 'image_album' ||
       value === 'video' ||
-      value === 'live_photo'
+      value === 'live_photo' ||
+      value === 'audio_card'
       ? value
       : 'text';
   }
@@ -1259,6 +1317,15 @@ export class MomentsService implements OnModuleInit {
       ) {
         throw new AppError('MOMENTS_VIDEO_TOO_LONG', {
           legacyMessage: '朋友圈视频时长不能超过 5 分钟。',
+        });
+      }
+      return;
+    }
+
+    if (contentType === 'audio_card') {
+      if (media.length !== 1 || media[0]?.kind !== 'audio') {
+        throw new AppError('MOMENTS_AUDIO_SINGLE', {
+          legacyMessage: '音乐朋友圈必须且只能包含 1 条音频。',
         });
       }
       return;
@@ -1413,6 +1480,21 @@ export class MomentsService implements OnModuleInit {
         : '1 条视频';
     }
 
+    if (contentType === 'audio_card') {
+      const audio = media[0];
+      if (!audio || audio.kind !== 'audio') {
+        return '1 段音乐';
+      }
+      const title = audio.title?.trim();
+      const seconds = audio.durationMs
+        ? `${Math.round(audio.durationMs / 1000)} 秒`
+        : null;
+      const parts = [title ? `《${title}》` : '一段音乐', seconds].filter(
+        Boolean,
+      );
+      return parts.join('，');
+    }
+
     const imageCount = media.filter((asset) => asset.kind === 'image').length;
     if (contentType === 'live_photo') {
       return `${imageCount} 张图片（含实况照片）`;
@@ -1447,10 +1529,14 @@ export class MomentsService implements OnModuleInit {
       normal: 1.0,
       low: 0.5,
     };
-    const RECENT_WINDOW_MS = 24 * 60 * 60 * 1000;
+    // 候选窗口扩到 7d；旧帖通过 npcPostRecencyMultiplier 在掷骰子层衰减/截断。
+    const RECENT_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+    const LIKE_BASE = 0.2;
+    const COMMENT_BASE = 0.07;
 
     const now = new Date();
-    const recentSince = new Date(now.getTime() - RECENT_WINDOW_MS);
+    const nowMs = now.getTime();
+    const recentSince = new Date(nowMs - RECENT_WINDOW_MS);
     const hour = now.getHours();
 
     // 候选池放开到所有可见角色（preset / model_persona / default_seed 等）。
@@ -1474,7 +1560,7 @@ export class MomentsService implements OnModuleInit {
     });
     if (recentPosts.length === 0) {
       return {
-        summary: `npc_autonomy_tick: 最近 24h 无帖子可巡查（候选 ${activeCandidates.length} 个）`,
+        summary: `npc_autonomy_tick: 最近 7d 无帖子可巡查（候选 ${activeCandidates.length} 个）`,
         likeCount,
         commentCount,
       };
@@ -1488,11 +1574,10 @@ export class MomentsService implements OnModuleInit {
       // 朋友圈是「好友圈」语义：非好友角色不会主动到任何朋友圈里露脸。
       if (!ownerFriendCharacterIds.has(char.id)) continue;
 
-      const baseChance =
-        char.proactiveBrowseChance ?? 0.3;
+      const baseChance = char.proactiveBrowseChance ?? 0.1;
       const freqMul =
         FREQ_MULTIPLIER[char.activityFrequency ?? 'normal'] ?? 1.0;
-      const browseChance = Math.min(0.95, baseChance * freqMul);
+      const browseChance = Math.min(0.5, baseChance * freqMul);
       if (Math.random() > browseChance) continue;
 
       participantCount += 1;
@@ -1516,29 +1601,38 @@ export class MomentsService implements OnModuleInit {
 
       const scored = await Promise.all(
         fresh.map(async (post) => {
-          let intimacy = 0;
+          let effectiveIntimacy: number;
           if (post.authorType === 'character') {
-            intimacy = await this.characterFriendships.getIntimacy(
+            const rel = await this.characterFriendships.getRelation(
               char.id,
               post.authorId,
             );
+            effectiveIntimacy =
+              rel.intimacy *
+              npcRelationCoolingFactor(nowMs, rel.lastInteractedAt);
+          } else {
+            effectiveIntimacy = NPC_USER_POST_NEUTRAL_INTIMACY;
           }
-          const recencyScore = Math.max(
-            0,
-            1 - (now.getTime() - post.postedAt.getTime()) / RECENT_WINDOW_MS,
+          const recencyMul = npcPostRecencyMultiplier(
+            nowMs,
+            post.postedAt.getTime(),
           );
-          return {
-            post,
-            score: intimacy / 50 + recencyScore + Math.random() * 0.3,
-          };
+          const intimacyMul = npcIntimacyMultiplier(effectiveIntimacy);
+          const engageMul = recencyMul * intimacyMul;
+          // 排序得分仍带随机扰动；engageMul 用于掷骰子。
+          const score =
+            effectiveIntimacy / 50 + recencyMul + Math.random() * 0.3;
+          return { post, score, engageMul };
         }),
       );
       scored.sort((a, b) => b.score - a.score);
-      const TOP_K = 3;
+      const TOP_K = 2;
       const top = scored.slice(0, TOP_K);
 
-      for (const { post } of top) {
-        if (Math.random() < 0.5) {
+      for (const { post, engageMul } of top) {
+        if (engageMul <= 0) continue; // 7d 硬截断 / 关系完全冷却
+
+        if (Math.random() < LIKE_BASE * engageMul) {
           try {
             await this.toggleLike(
               post.id,
@@ -1564,15 +1658,20 @@ export class MomentsService implements OnModuleInit {
           }
         }
 
-        if (llmCallsRemaining > 0 && Math.random() < 0.2) {
+        if (llmCallsRemaining > 0 && Math.random() < COMMENT_BASE * engageMul) {
           try {
             const profile = await this.characters.getProfile(char.id);
             if (!profile) continue;
             const observation = await this.buildMomentAiObservation(post);
+            const userMessage = await this.worldLanguage.formatPostCommentTask({
+              authorName: post.authorName,
+              summary: observation.summary,
+              surface: 'moments',
+            });
             const reply = await this.ai.generateReply({
               profile,
               conversationHistory: [],
-              userMessage: `${post.authorName}发了一条朋友圈：${observation.summary}。用一句话自然地评论一下，不超过20字。`,
+              userMessage,
               userMessageParts: observation.parts,
               usageContext: {
                 surface: 'app',
@@ -1617,5 +1716,351 @@ export class MomentsService implements OnModuleInit {
       commentCount,
     };
   }
+
+  // ============= MiniMax 音乐贴 / 视频贴 =============
+
+  // 优先调用 MiniMax /v1/lyrics_generation 生成真正的歌词；失败或配额耗尽时
+  // fallback 到本地 composeMusicLyrics（按标点切分 seedText 凑结构）
+  private async generateLyricsOrFallback(
+    characterName: string,
+    seedText: string,
+  ): Promise<string> {
+    if (!this.minimaxClient.isConfigured()) {
+      return composeMusicLyrics(characterName, seedText);
+    }
+    const reserved = await this.minimaxQuota.tryReserve('lyrics');
+    if (!reserved) {
+      this.logger.debug('lyrics quota exhausted, using local fallback');
+      return composeMusicLyrics(characterName, seedText);
+    }
+    try {
+      const result = await this.minimaxClient.generateLyrics({
+        prompt: `为 ${characterName} 这一刻心境写一首中文歌词，结构包含 [verse] 和 [chorus]。情绪线索：${seedText.slice(0, 200)}`,
+      });
+      await this.minimaxQuota.commit('lyrics');
+      this.logger.log(`lyrics generated via minimax for ${characterName}`);
+      return result.lyrics;
+    } catch (err) {
+      await this.minimaxQuota.release('lyrics');
+      this.logger.warn(
+        `minimax lyrics gen failed, falling back: ${(err as Error)?.message}`,
+      );
+      return composeMusicLyrics(characterName, seedText);
+    }
+  }
+
+  async scheduleMinimaxMusicMoment(
+    char: CharacterEntity,
+  ): Promise<MomentPostEntity | null> {
+    // 提前拦截：MiniMax 未配置或配额耗尽时不浪费 LLM tokens 去生成种子文本。
+    if (!this.minimaxClient.isConfigured()) return null;
+    // music-2.6 主力 + music-2.5 fallback；任一有余额就值得继续
+    const musicAvailable =
+      (await this.minimaxQuota.availableToday('music-2.6')) > 0 ||
+      (await this.minimaxQuota.availableToday('music-2.5')) > 0;
+    if (!musicAvailable) {
+      return null;
+    }
+    if (!(await this.isCharacterVisibleToOwner(char.id))) {
+      return null;
+    }
+    const profile = await this.characters.getProfile(char.id);
+    if (!profile) return null;
+
+    let seedText = '';
+    try {
+      seedText = (
+        await this.ai.generateMoment({
+          profile,
+          currentTime: new Date(),
+          usageContext: {
+            surface: 'app',
+            scene: 'minimax_music_seed',
+            scopeType: 'character',
+            scopeId: char.id,
+            scopeLabel: char.name,
+            characterId: char.id,
+            characterName: char.name,
+          },
+        })
+      ).trim();
+    } catch (err) {
+      this.logger.warn(
+        `music seed text gen failed for ${char.id}: ${(err as Error)?.message}`,
+      );
+    }
+    if (!seedText) {
+      seedText = `${char.name} 写了一首歌，记录此刻心情。`;
+    }
+
+    const lyrics = await this.generateLyricsOrFallback(char.name, seedText);
+    const job = await this.minimaxJobs.enqueueMusicJob({
+      model: 'music-2.6',
+      prompt: composeMusicPrompt(char.name, seedText),
+      lyrics,
+      characterId: char.id,
+      characterName: char.name,
+      characterAvatar: char.avatar,
+      targetType: 'moment_post',
+    });
+    if (!job) {
+      this.logger.warn(
+        `enqueueMusicJob declined for ${char.id} (quota or config)`,
+      );
+      return null;
+    }
+
+    try {
+      const post = this.postRepo.create({
+        authorId: char.id,
+        authorName: char.name,
+        authorAvatar: char.avatar,
+        authorType: 'character',
+        visibility: this.deriveDefaultVisibility(char.socialOpenness),
+        text: seedText,
+        contentType: 'audio_card',
+        mediaPayload: undefined,
+        postedAt: this.jitterPastTimestamp(15 * 60 * 1000),
+        generationKind: 'minimax_music',
+        generationMetadata: {
+          minimaxJobId: job.id,
+          // 使用 job 实际占用的模型（可能是 fallback 后的 music-2.5）
+          minimaxModel: job.model,
+          pending: true,
+        },
+      });
+      const saved = await this.postRepo.save(post);
+      await this.minimaxJobs.attachTarget(job.id, saved.id);
+      this.logger.log(
+        `moment ${saved.id} queued minimax music job ${job.id} for ${char.name}`,
+      );
+      return saved;
+    } catch (err) {
+      // post 创建失败必须回滚 job：否则配额白扣，cron 还会去执行 orphan job
+      await this.minimaxJobs.cancelJob(job.id);
+      this.logger.error(
+        `moment-music post creation failed, rolled back job ${job.id}: ${(err as Error)?.message}`,
+      );
+      throw err;
+    }
+  }
+
+  async scheduleMinimaxVideoMoment(
+    char: CharacterEntity,
+    pickModel: () => Promise<
+      'MiniMax-Hailuo-2.3-Fast' | 'MiniMax-Hailuo-2.3' | null
+    >,
+  ): Promise<MomentPostEntity | null> {
+    if (!this.minimaxClient.isConfigured()) return null;
+    if (!(await this.isCharacterVisibleToOwner(char.id))) {
+      return null;
+    }
+    const model = await pickModel();
+    if (!model) return null;
+
+    const profile = await this.characters.getProfile(char.id);
+    if (!profile) return null;
+
+    let seedText = '';
+    try {
+      seedText = (
+        await this.ai.generateMoment({
+          profile,
+          currentTime: new Date(),
+          usageContext: {
+            surface: 'app',
+            scene: 'minimax_moment_video',
+            scopeType: 'character',
+            scopeId: char.id,
+            scopeLabel: char.name,
+            characterId: char.id,
+            characterName: char.name,
+          },
+        })
+      ).trim();
+    } catch (err) {
+      this.logger.warn(
+        `moment-video text gen failed for ${char.id}: ${(err as Error)?.message}`,
+      );
+    }
+    if (!seedText) seedText = `${char.name} 拍了一段画面记录今天。`;
+
+    const job = await this.minimaxJobs.enqueueVideoJob({
+      model,
+      prompt: composeMomentVideoPrompt(char.name, profile.relationship, seedText),
+      resolution: '768P',
+      characterId: char.id,
+      characterName: char.name,
+      characterAvatar: char.avatar,
+      targetType: 'moment_post',
+    });
+    if (!job) return null;
+
+    try {
+      const post = this.postRepo.create({
+        authorId: char.id,
+        authorName: char.name,
+        authorAvatar: char.avatar,
+        authorType: 'character',
+        visibility: this.deriveDefaultVisibility(char.socialOpenness),
+        text: seedText,
+        contentType: 'video',
+        mediaPayload: undefined,
+        postedAt: this.jitterPastTimestamp(15 * 60 * 1000),
+        generationKind: 'minimax_video',
+        generationMetadata: {
+          minimaxJobId: job.id,
+          minimaxModel: model,
+          pending: true,
+        },
+      });
+      const saved = await this.postRepo.save(post);
+      await this.minimaxJobs.attachTarget(job.id, saved.id);
+      this.logger.log(
+        `moment ${saved.id} queued minimax video job ${job.id} (${model}) for ${char.name}`,
+      );
+      return saved;
+    } catch (err) {
+      await this.minimaxJobs.cancelJob(job.id);
+      this.logger.error(
+        `moment-video post creation failed, rolled back job ${job.id}: ${(err as Error)?.message}`,
+      );
+      throw err;
+    }
+  }
+
+  async applyMinimaxMusicToPost(
+    postId: string,
+    audio: MomentAudioAsset,
+  ): Promise<void> {
+    const post = await this.postRepo.findOneBy({ id: postId });
+    if (!post) {
+      this.logger.warn(`applyMinimaxMusicToPost: post ${postId} missing`);
+      return;
+    }
+    const meta: Record<string, unknown> = {
+      ...(post.generationMetadata ?? {}),
+    };
+    delete meta.pending;
+    post.contentType = 'audio_card';
+    post.mediaPayload = this.serializeMomentMedia([audio]);
+    post.generationMetadata = meta;
+    const saved = await this.postRepo.save(post);
+    void this.scheduleCharacterInteractions(saved);
+  }
+
+  async applyMinimaxVideoToPost(
+    postId: string,
+    video: MomentVideoAsset,
+  ): Promise<void> {
+    const post = await this.postRepo.findOneBy({ id: postId });
+    if (!post) {
+      this.logger.warn(`applyMinimaxVideoToPost: post ${postId} missing`);
+      return;
+    }
+    const meta: Record<string, unknown> = {
+      ...(post.generationMetadata ?? {}),
+    };
+    delete meta.pending;
+    post.contentType = 'video';
+    post.mediaPayload = this.serializeMomentMedia([video]);
+    post.generationMetadata = meta;
+    const saved = await this.postRepo.save(post);
+    void this.scheduleCharacterInteractions(saved);
+  }
+
+  async deleteMinimaxPlaceholderPost(postId: string): Promise<void> {
+    const post = await this.postRepo.findOneBy({ id: postId });
+    if (!post) return;
+    const meta = (post.generationMetadata ?? {}) as Record<string, unknown>;
+    if (meta?.pending !== true) {
+      // 真实生成已落地，不应再删
+      return;
+    }
+    await this.commentRepo.delete({ postId });
+    await this.likeRepo.delete({ postId });
+    await this.postRepo.delete(postId);
+  }
+
+  async tryRenderMinimaxMusicCover(
+    job: MinimaxJobEntity,
+    seedText: string,
+  ): Promise<{ url: string; fileName: string } | null> {
+    if (!this.minimaxClient.isConfigured()) return null;
+    const reserved = await this.minimaxQuota.tryReserve('image-01');
+    if (!reserved) return null;
+    try {
+      const image = await this.minimaxClient.generateImage({
+        model: 'image-01',
+        prompt: composeMusicCoverPrompt(job.characterName, seedText),
+        aspectRatio: '1:1',
+      });
+      const persisted = await this.minimaxStorage.persist({
+        buffer: image.buffer,
+        mimeType: image.mimeType,
+        kind: 'image',
+        suffix: '-cover',
+      });
+      await this.minimaxQuota.commit('image-01');
+      return { url: persisted.publicUrl, fileName: persisted.fileName };
+    } catch (err) {
+      await this.minimaxQuota.release('image-01');
+      this.logger.warn(
+        `music cover gen failed for job ${job.id}: ${(err as Error)?.message}`,
+      );
+      return null;
+    }
+  }
+}
+
+function composeMusicPrompt(characterName: string, seedText: string): string {
+  return [
+    `${characterName} 心境的器乐 / 轻人声小品，1 分钟内。`,
+    `情绪线索：${seedText.slice(0, 200)}`,
+    '风格：电子流行 + 氛围合成器，节奏适中，情感清晰。',
+  ].join(' ');
+}
+
+function composeMusicLyrics(_characterName: string, seedText: string): string {
+  const trimmed = seedText.replace(/\s+/g, ' ').trim();
+  if (!trimmed) {
+    return '\n[verse]\n慢慢走进灯光里\n收起一身风尘\n[chorus]\n这一刻让我留下\n继续向前再向前\n';
+  }
+  const lines = trimmed
+    .split(/[，。！？!?,.\n]/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .slice(0, 8);
+  while (lines.length < 4) {
+    lines.push(trimmed.slice(0, Math.min(20, trimmed.length)));
+  }
+  const verse = lines.slice(0, Math.ceil(lines.length / 2)).join('\n');
+  const chorus = lines.slice(Math.ceil(lines.length / 2)).join('\n');
+  return `\n[verse]\n${verse}\n[chorus]\n${chorus || verse}\n`;
+}
+
+function composeMomentVideoPrompt(
+  characterName: string,
+  relationship: string | undefined,
+  seedText: string,
+): string {
+  const relSnippet = relationship?.trim()
+    ? `角色定位：${relationship.slice(0, 100)}。`
+    : '';
+  return [
+    `${characterName} 朋友圈短片，9:16 竖屏，6 秒。`,
+    relSnippet,
+    `情境：${seedText.slice(0, 200)}。`,
+    '风格：生活感、真实光线、轻微镜头运动。',
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+function composeMusicCoverPrompt(
+  characterName: string,
+  seedText: string,
+): string {
+  return `音乐封面：${characterName} 视角，${seedText.slice(0, 80)}。极简电影风，柔和色调，正方形海报构图。`;
 }
 // i18n-ignore-end

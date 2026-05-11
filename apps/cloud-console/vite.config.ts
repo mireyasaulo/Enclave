@@ -18,6 +18,7 @@ export default defineConfig({
     alias: {
       "@yinjie/ui/tokens.css": fileURLToPath(new URL("../../packages/ui/src/tokens.css", import.meta.url)),
       "@yinjie/contracts": fileURLToPath(new URL("../../packages/contracts/src/index.ts", import.meta.url)),
+      "@yinjie/i18n/runtime/surface-text-dictionaries-cloud-console": fileURLToPath(new URL("../../packages/i18n/src/runtime/surface-text-dictionaries-cloud-console.ts", import.meta.url)),
       "@yinjie/i18n": fileURLToPath(new URL("../../packages/i18n/src/index.ts", import.meta.url)),
       "@yinjie/ui": fileURLToPath(new URL("../../packages/ui/src/index.ts", import.meta.url)),
       "@": fileURLToPath(new URL("./src", import.meta.url)),

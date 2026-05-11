@@ -9,7 +9,10 @@ const t = translateRuntimeMessage;
 import { readPersistedMobileWebRoute } from "../features/shell/mobile-web-route-persistence";
 import { clearCloudRuntimeSession } from "../lib/cloud-session";
 import { persistInviteCode } from "../lib/invite-code-storage";
-import { requiresRemoteServiceConfiguration } from "../lib/runtime-config";
+import {
+  isRemoteWebDeployment,
+  requiresRemoteServiceConfiguration,
+} from "../lib/runtime-config";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { isMobileWebRuntime, resolveAppRuntimeContext } from "../runtime/platform";
 import {
@@ -53,7 +56,10 @@ export function SplashPage() {
       }
 
       // 校验 cloud session（纯本地，不发 HTTP），无效直接跳。
-      const isCloudMode = runtimeConfig.worldAccessMode === "cloud";
+      // 远程公网部署（vicp.fun / 公网 IP / 隧道）强制走 cloud 模式：
+      // 即使 worldAccessMode 还没被持久化设置，也不允许匿名直通本机 owner。
+      const isCloudMode =
+        runtimeConfig.worldAccessMode === "cloud" || isRemoteWebDeployment();
       const cloudSession = isCloudMode
         ? useCloudSessionStore.getState()
         : null;

@@ -12,8 +12,10 @@ import {
   ArrowLeft,
   Copy,
   Heart,
+  Image as ImageIcon,
   PenSquare,
   Share2,
+  X,
 } from "lucide-react";
 import {
   addFeedComment,
@@ -26,6 +28,7 @@ import {
 } from "@yinjie/contracts";
 import { AppPage, Button, InlineNotice, TextField } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
+import { FeedPostShareCardModal } from "../components/feed-post-share-card-modal";
 import { MomentMediaGallery } from "../components/moment-media-gallery";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import {
@@ -93,6 +96,12 @@ export function DiscoverFeedPage() {
     commentId: string;
     postId: string;
   } | null>(null);
+  const [mobileReplyTarget, setMobileReplyTarget] = useState<{
+    authorId: string;
+    authorName: string;
+    commentId: string;
+    postId: string;
+  } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [notice, setNotice] = useState("");
   const [noticeTone, setNoticeTone] = useState<"success" | "info">("success");
@@ -101,6 +110,8 @@ export function DiscoverFeedPage() {
   );
   const [noticeAction, setNoticeAction] = useState<(() => void) | null>(null);
   const [favoriteSourceIds, setFavoriteSourceIds] = useState<string[]>([]);
+  // 「分享图卡」目标 post id — 与 link-share 分开存，用户可以两种都点。
+  const [shareCardPostId, setShareCardPostId] = useState<string | null>(null);
   const routeState = parseFeedRouteHash(hash);
   const normalizedDesktopReturnPath =
     isDesktopLayout && routeState.returnPath === "/discover/feed"
@@ -123,7 +134,8 @@ export function DiscoverFeedPage() {
 
   const feedQuery = useQuery({
     queryKey: ["app-feed", baseUrl],
-    queryFn: () => getFeed(1, 20, baseUrl),
+    // 广场没有分页 UI：限额定高，确保所有可见公开动态都能展示。
+    queryFn: () => getFeed(1, 200, baseUrl),
   });
   const blockedQuery = useQuery({
     queryKey: ["app-discover-blocked-characters", baseUrl],
@@ -240,6 +252,9 @@ export function DiscoverFeedPage() {
       setDesktopReplyTarget((current) =>
         current?.postId === input.postId ? null : current,
       );
+      setMobileReplyTarget((current) =>
+        current?.postId === input.postId ? null : current,
+      );
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
@@ -273,7 +288,7 @@ export function DiscoverFeedPage() {
     });
   }
 
-  const pendingLikePostId = likeMutation.isPending
+const pendingLikePostId = likeMutation.isPending
     ? likeMutation.variables
     : null;
   const pendingCommentPostId = commentMutation.isPending
@@ -339,6 +354,7 @@ export function DiscoverFeedPage() {
   useEffect(() => {
     resetComposeDraft();
     setCommentDrafts({});
+    setMobileReplyTarget(null);
     setShowCompose(false);
     setNoticeActionLabel(null);
     setNoticeAction(null);
@@ -696,9 +712,19 @@ export function DiscoverFeedPage() {
               nextFavorites.map((favorite) => favorite.sourceId),
             );
           }}
+          onShare={(postId) => setShareCardPostId(postId)}
           onVideoFileSelected={(file) => {
             void handleVideoFileSelected(file);
           }}
+        />
+        <FeedPostShareCardModal
+          post={
+            shareCardPostId
+              ? visiblePosts.find((item) => item.id === shareCardPostId) ?? null
+              : null
+          }
+          ownerDisplayName={ownerUsername?.trim() || t(msg`世界主人`)}
+          onClose={() => setShareCardPostId(null)}
         />
       </Suspense>
     );
@@ -844,24 +870,36 @@ export function DiscoverFeedPage() {
                     : t(msg`居民动态`)
                 }`}
                 headerActions={
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full text-[color:var(--text-muted)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
-                    onClick={() => void handleSharePost(post)}
-                    aria-label={
-                      nativeMobileShareSupported
-                        ? t(msg`分享这条动态`)
-                        : t(msg`复制这条动态摘要`)
-                    }
-                  >
-                    {nativeMobileShareSupported ? (
-                      <Share2 size={15} />
-                    ) : (
-                      <Copy size={15} />
-                    )}
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full text-[color:var(--text-muted)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
+                      onClick={() => setShareCardPostId(post.id)}
+                      aria-label={t(msg`生成分享图卡`)}
+                    >
+                      <ImageIcon size={15} />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full text-[color:var(--text-muted)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
+                      onClick={() => void handleSharePost(post)}
+                      aria-label={
+                        nativeMobileShareSupported
+                          ? t(msg`分享这条动态`)
+                          : t(msg`复制这条动态摘要`)
+                      }
+                    >
+                      {nativeMobileShareSupported ? (
+                        <Share2 size={15} />
+                      ) : (
+                        <Copy size={15} />
+                      )}
+                    </Button>
+                  </div>
                 }
                 body={
                   <div className="space-y-3">
@@ -884,7 +922,7 @@ export function DiscoverFeedPage() {
                   post.likeCount > 0 || post.commentCount > 0
                     ? `${t(msg`${post.likeCount} 赞`)} · ${t(
                         msg`${post.commentCount} 评论`,
-                      )}${post.aiReacted ? t(msg` · AI 已参与回应`) : ""}`
+                      )}`
                     : summaryText || undefined
                 }
                 actions={
@@ -951,49 +989,106 @@ export function DiscoverFeedPage() {
                 }
                 secondary={
                   post.commentsPreview.length > 0 ? (
-                    <div className="space-y-1.5 rounded-[14px] bg-[color:var(--surface-soft)] p-2.5">
-                      {post.commentsPreview.map((comment) => (
-                        <div
-                          key={comment.id}
-                          className="text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)]"
-                        >
-                          <span className="text-[color:var(--text-primary)]">
-                            {comment.authorName}
-                          </span>
-                          {`：${comment.text}`}
-                        </div>
-                      ))}
+                    <div className="space-y-0.5 rounded-[14px] bg-[color:var(--surface-soft)] p-2.5">
+                      {post.commentsPreview.map((comment) => {
+                        const replyToName = comment.replyToCommentId
+                          ? post.commentsPreview.find(
+                              (item) => item.id === comment.replyToCommentId,
+                            )?.authorName ?? null
+                          : null;
+                        return (
+                          <button
+                            key={comment.id}
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setMobileReplyTarget({
+                                authorId: comment.authorId,
+                                authorName: comment.authorName,
+                                commentId: comment.id,
+                                postId: post.id,
+                              });
+                            }}
+                            className={`block w-full rounded-[8px] px-1 py-0.5 text-left text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)] active:bg-[rgba(7,193,96,0.08)] ${
+                              mobileReplyTarget?.commentId === comment.id
+                                ? "bg-[rgba(7,193,96,0.08)]"
+                                : ""
+                            }`}
+                          >
+                            <span className="text-[color:var(--text-primary)]">
+                              {comment.authorName}
+                            </span>
+                            {replyToName ? (
+                              <>
+                                <span> {t(msg`回复`)} </span>
+                                <span className="text-[color:var(--text-primary)]">
+                                  {replyToName}
+                                </span>
+                              </>
+                            ) : null}
+                            {`：${comment.text}`}
+                          </button>
+                        );
+                      })}
                     </div>
                   ) : null
                 }
                 composer={
-                  <>
-                    <TextField
-                      value={commentDrafts[post.id] ?? ""}
-                      onChange={(event) =>
-                        setCommentDrafts((current) => ({
-                          ...current,
-                          [post.id]: event.target.value,
-                        }))
-                      }
-                      placeholder={t(msg`写评论...`)}
-                      className="min-w-0 flex-1 rounded-full py-1.5 text-[12px]"
-                    />
-                    <Button
-                      disabled={
-                        !(commentDrafts[post.id] ?? "").trim() ||
-                        commentMutation.isPending
-                      }
-                      onClick={() => submitComment(post.id)}
-                      variant="primary"
-                      size="sm"
-                      className="h-8 px-3 text-[12px]"
-                    >
-                      {pendingCommentPostId === post.id
-                        ? t(msg`发送中...`)
-                        : t(msg`发送`)}
-                    </Button>
-                  </>
+                  <div className="flex w-full flex-col gap-1.5">
+                    {mobileReplyTarget?.postId === post.id ? (
+                      <div className="flex items-center justify-between gap-2 rounded-[10px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
+                        <div className="truncate">
+                          {t(msg`正在回复 ${mobileReplyTarget.authorName}`)}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setMobileReplyTarget(null)}
+                          aria-label={t(msg`取消回复`)}
+                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[color:var(--text-muted)] active:bg-white"
+                        >
+                          <X size={11} />
+                        </button>
+                      </div>
+                    ) : null}
+                    <div className="flex w-full items-center gap-2">
+                      <TextField
+                        value={commentDrafts[post.id] ?? ""}
+                        onChange={(event) =>
+                          setCommentDrafts((current) => ({
+                            ...current,
+                            [post.id]: event.target.value,
+                          }))
+                        }
+                        placeholder={
+                          mobileReplyTarget?.postId === post.id
+                            ? t(msg`回复 ${mobileReplyTarget.authorName}...`)
+                            : t(msg`写评论...`)
+                        }
+                        className="min-w-0 flex-1 rounded-full py-1.5 text-[12px]"
+                      />
+                      <Button
+                        disabled={
+                          !(commentDrafts[post.id] ?? "").trim() ||
+                          commentMutation.isPending
+                        }
+                        onClick={() =>
+                          submitComment(post.id, {
+                            replyTarget:
+                              mobileReplyTarget?.postId === post.id
+                                ? mobileReplyTarget
+                                : null,
+                          })
+                        }
+                        variant="primary"
+                        size="sm"
+                        className="h-8 px-3 text-[12px]"
+                      >
+                        {pendingCommentPostId === post.id
+                          ? t(msg`发送中...`)
+                          : t(msg`发送`)}
+                      </Button>
+                    </div>
+                  </div>
                 }
               />
             );
@@ -1061,6 +1156,18 @@ export function DiscoverFeedPage() {
           ) : null}
         </section>
       </div>
+
+      <FeedPostShareCardModal
+        post={
+          shareCardPostId
+            ? visiblePosts.find((item) => item.id === shareCardPostId) ?? null
+            : null
+        }
+        ownerDisplayName={
+          ownerUsername?.trim() || t(msg`世界主人`)
+        }
+        onClose={() => setShareCardPostId(null)}
+      />
     </AppPage>
   );
 }

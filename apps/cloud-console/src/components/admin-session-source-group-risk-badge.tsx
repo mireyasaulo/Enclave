@@ -4,6 +4,7 @@ import {
   getAdminSessionSourceGroupRiskTone,
   getAdminSessionSourceGroupRiskToneStyles,
 } from "../lib/admin-session-helpers";
+import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
 type AdminSessionSourceGroupRiskBadgeProps = {
   riskLevel: CloudAdminSessionSourceGroupRiskLevel;
@@ -14,6 +15,7 @@ export function AdminSessionSourceGroupRiskBadge({
   riskLevel,
   className,
 }: AdminSessionSourceGroupRiskBadgeProps) {
+  const t = useCloudConsoleText();
   const tone = getAdminSessionSourceGroupRiskTone(riskLevel);
   const toneStyles = getAdminSessionSourceGroupRiskToneStyles(riskLevel);
 
@@ -22,7 +24,7 @@ export function AdminSessionSourceGroupRiskBadge({
       data-tone={tone}
       className={`rounded-full border ${toneStyles.badge}${className ? ` ${className}` : ""}`}
     >
-      {formatAdminSessionSourceGroupRiskLevelLabel(riskLevel)}
+      {t(formatAdminSessionSourceGroupRiskLevelLabel(riskLevel))}
     </span>
   );
 }

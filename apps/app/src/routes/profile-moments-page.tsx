@@ -11,7 +11,7 @@ import {
   type Moment,
   type MomentComment,
 } from "@yinjie/contracts";
-import { useRuntimeTranslator } from "@yinjie/i18n";
+import { getActiveLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import {
   AppPage,
   Button,
@@ -22,6 +22,7 @@ import {
 import { EmptyState } from "../components/empty-state";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
+import { MomentShareCardModal } from "../components/moment-share-card-modal";
 import { WeChatActionBubble } from "../components/wechat-action-bubble";
 import {
   WeChatCommentBar,
@@ -427,6 +428,15 @@ export function ProfileMomentsPage() {
     ownerId && activeMoment?.likes.some((like) => like.authorId === ownerId),
   );
 
+  // 「分享图卡」目标 — 点 ⋯ → 分享时把 momentId 存下来。
+  const [shareMomentId, setShareMomentId] = useState<string | null>(null);
+  const shareMoment = shareMomentId
+    ? ownMoments.find((moment) => moment.id === shareMomentId) ?? null
+    : null;
+  const shareLiked = Boolean(
+    ownerId && shareMoment?.likes.some((like) => like.authorId === ownerId),
+  );
+
   return (
     <AppPage className="relative space-y-0 bg-white px-0 py-0">
       <TabPageTopBar
@@ -571,7 +581,20 @@ export function ProfileMomentsPage() {
             onCommentTap(actionBubble.momentId, null);
           }
         }}
+        onShare={() => {
+          if (actionBubble) {
+            setShareMomentId(actionBubble.momentId);
+          }
+        }}
         onClose={() => setActionBubble(null)}
+      />
+
+      <MomentShareCardModal
+        moment={shareMoment}
+        liked={shareLiked}
+        ownerId={ownerId}
+        ownerDisplayName={displayName}
+        onClose={() => setShareMomentId(null)}
       />
 
       <WeChatCommentBar
@@ -627,7 +650,7 @@ function PersonalAlbumRow({
     : `${date.getDate()}`.padStart(2, "0");
   const monthLabel = Number.isNaN(date.getTime())
     ? "--"
-    : `${date.getMonth() + 1}月`;
+    : new Intl.DateTimeFormat(getActiveLocale(), { month: "long" }).format(date);
   return (
     <div className="flex items-start gap-2 px-4 py-3.5">
       <div className="w-12 shrink-0 pt-1 text-right">

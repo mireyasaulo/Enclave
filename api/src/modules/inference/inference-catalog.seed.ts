@@ -354,16 +354,38 @@ const MODEL_SEED_ENTRIES: SeedEntry[] = [
     description: '腾讯混元推理模型，适合作为中文社交型角色。',
   },
   {
+    id: 'MiniMax-M2.7',
+    label: 'MiniMax M2.7',
+    vendor: 'MiniMax',
+    providerFamily: 'minimax',
+    region: 'domestic',
+    status: 'active',
+    defaultAvatar: '🪐',
+    rolePromptHint: '中文表达自然、思辨平衡，适合作为日常陪伴主力。',
+    description: 'MiniMax Token Plan 主力模型，适合作为日常陪伴和泛娱乐角色。',
+  },
+  {
+    id: 'MiniMax-M2.7-highspeed',
+    label: 'MiniMax M2.7 高速',
+    vendor: 'MiniMax',
+    providerFamily: 'minimax',
+    region: 'domestic',
+    status: 'active',
+    defaultAvatar: '⚡',
+    rolePromptHint: '高速吞吐版本，适合短回复、高频互动。',
+    description: 'MiniMax M2.7 高速通道，低峰可达 ~100 TPS，适合高频角色。',
+  },
+  {
     id: 'MiniMax-M1',
     label: 'MiniMax M1',
     vendor: 'MiniMax',
     providerFamily: 'minimax',
     region: 'domestic',
-    status: 'active',
+    status: 'legacy',
     supportsAudio: true,
     defaultAvatar: '🎙️',
     rolePromptHint: '适合语音和陪伴场景，表达贴近日常。',
-    description: 'MiniMax 主力模型，适合作为语音陪伴和泛娱乐角色。',
+    description: 'MiniMax 旧版主力模型（Token Plan 不再覆盖）。',
   },
   {
     id: 'llama-3.2-1b-instruct',
@@ -397,4 +419,119 @@ export const INFERENCE_MODEL_CATALOG_SEED = MODEL_SEED_ENTRIES.map(
     sortOrder: index + 1,
   }),
 );
+
+export type VendorFamilyPersonaDefinition = {
+  vendor: string;
+  id: string;
+  label: string;
+  avatar: string;
+  members: readonly string[];
+};
+
+// 12 个厂商家族角色——把 30 个 model persona 折叠为按厂商分组的"对外人格"。
+// 实际推理统一走全局默认 provider（MiniMax），system prompt 里追加"模仿该厂商风格"。
+export const VENDOR_FAMILY_PERSONAS: readonly VendorFamilyPersonaDefinition[] = [
+  {
+    vendor: 'OpenAI',
+    id: 'family_openai',
+    label: 'OpenAI',
+    avatar: '🧠',
+    members: [
+      'gpt-4.1',
+      'gpt-4.1-mini',
+      'gpt-4o',
+      'gpt-4o-mini',
+      'gpt-5',
+      'o1',
+      'o3',
+      'o4-mini-all',
+    ],
+  },
+  {
+    vendor: 'Anthropic',
+    id: 'family_anthropic',
+    label: 'Anthropic',
+    avatar: '🪶',
+    members: [
+      'claude-opus-4-20250514',
+      'claude-sonnet-4-5',
+      'claude-haiku-4-5-20251001-thinking',
+    ],
+  },
+  {
+    vendor: 'Google',
+    id: 'family_google',
+    label: 'Google DeepMind',
+    avatar: '✦',
+    members: ['gemini-2.5-pro', 'gemini-2.5-flash'],
+  },
+  {
+    vendor: 'xAI',
+    id: 'family_xai',
+    label: 'xAI',
+    avatar: '𝕏',
+    members: ['grok-4.1', 'grok-4.1-fast'],
+  },
+  {
+    vendor: 'DeepSeek',
+    id: 'family_deepseek',
+    label: 'DeepSeek',
+    avatar: '🐋',
+    members: ['deepseek-chat', 'deepseek-r1', 'deepseek-v3'],
+  },
+  {
+    vendor: '阿里云',
+    id: 'family_aliyun',
+    label: '通义千问',
+    avatar: '☁️',
+    members: [
+      'qwen3-max',
+      'qwen3-coder-plus',
+      'qwen-turbo-2025-07-15',
+      'qvq-max',
+    ],
+  },
+  {
+    vendor: '百度',
+    id: 'family_baidu',
+    label: '文心一言',
+    avatar: '🔥',
+    members: ['ERNIE-Tiny-8K'],
+  },
+  {
+    vendor: '智谱',
+    id: 'family_zhipu',
+    label: '智谱清言',
+    avatar: '🧊',
+    members: ['glm-4.5', 'glm-4.5-air'],
+  },
+  {
+    vendor: '月之暗面',
+    id: 'family_moonshot',
+    label: 'Kimi',
+    avatar: '🌙',
+    members: ['kimi-k2', 'kimi-latest'],
+  },
+  {
+    vendor: '腾讯混元',
+    id: 'family_tencent',
+    label: '腾讯混元',
+    avatar: '🐧',
+    members: ['hunyuan-t1'],
+  },
+  {
+    vendor: 'MiniMax',
+    id: 'family_minimax',
+    label: 'MiniMax',
+    avatar: '🎴',
+    members: ['MiniMax-M2.7', 'MiniMax-M2.7-highspeed', 'MiniMax-M1'],
+  },
+  {
+    vendor: 'Meta',
+    id: 'family_meta',
+    label: 'Llama',
+    avatar: '🦙',
+    members: ['llama-3.2-1b-instruct'],
+  },
+];
 // i18n-ignore-end

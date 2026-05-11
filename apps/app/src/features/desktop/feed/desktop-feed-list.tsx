@@ -17,7 +17,7 @@ type DesktopFeedListProps = {
   detailErrorMessage?: string | null;
   detailLoading: boolean;
   detailPost?: FeedPostWithComments | null;
-  expandedPostId: string | null;
+  selectedPostId: string | null;
   isLoading: boolean;
   likePendingPostId: string | null;
   posts: FeedPostListItem[];
@@ -29,6 +29,8 @@ type DesktopFeedListProps = {
   onExpand: (postId: string) => void;
   onLike: (postId: string) => void;
   onOpenCompose: () => void;
+  /** 可选 — 触发"分享图卡"上抛 postId。 */
+  onShare?: (postId: string) => void;
   onStartCommentReply?: (comment: FeedComment) => void;
   onToggleFavorite: (postId: string) => void;
 };
@@ -40,7 +42,7 @@ export function DesktopFeedList({
   detailErrorMessage = null,
   detailLoading,
   detailPost = null,
-  expandedPostId,
+  selectedPostId,
   isLoading,
   likePendingPostId,
   posts,
@@ -52,6 +54,7 @@ export function DesktopFeedList({
   onExpand,
   onLike,
   onOpenCompose,
+  onShare,
   onStartCommentReply,
   onToggleFavorite,
 }: DesktopFeedListProps) {
@@ -68,7 +71,7 @@ export function DesktopFeedList({
       {!isLoading && posts.length > 0 ? (
         <div className="space-y-4 pb-6">
           {posts.map((post) => {
-            const expanded = post.id === expandedPostId;
+            const expanded = post.id === selectedPostId;
             return (
               <DesktopFeedRow
                 key={post.id}
@@ -92,6 +95,7 @@ export function DesktopFeedList({
                 onCommentSubmit={() => onCommentSubmit(post.id)}
                 onExpand={() => onExpand(post.id)}
                 onLike={() => onLike(post.id)}
+                onShare={onShare ? () => onShare(post.id) : undefined}
                 onStartCommentReply={onStartCommentReply}
                 onToggleFavorite={() => onToggleFavorite(post.id)}
               />

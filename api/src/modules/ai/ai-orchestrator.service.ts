@@ -44,6 +44,11 @@ import {
   type ResolvedInferenceCapabilityProfile,
 } from '../inference/inference.service';
 import { SubscriptionService } from '../subscription/subscription.service';
+import { MinimaxNativeClient } from './minimax-native.client';
+import {
+  executeChatCompletion,
+  type ChatCompletionTaskResult,
+} from './chat-completion-stream.util';
 
 const DEFAULT_TTS_VOICE = 'alloy';
 const MAX_INLINE_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -177,22 +182,6 @@ type ProviderFallbackCandidate = {
     | 'character_instance_route'
     | 'instance_default_route'
     | 'enabled_provider_route';
-};
-
-type ChatCompletionTaskResult = {
-  usage?: {
-    prompt_tokens?: number;
-    completion_tokens?: number;
-    input_tokens?: number;
-    output_tokens?: number;
-    total_tokens?: number;
-  } | null;
-  model?: string | null;
-  choices: Array<{
-    message?: {
-      content?: string | null;
-    } | null;
-  }>;
 };
 
 @Injectable()
@@ -435,8 +424,12 @@ export class AiOrchestratorService {
 
   private resolveLocalAssetPath(url: string) {
     try {
-      const parsed = new URL(url);
-      const normalizedPath = parsed.pathname.replace(/\/+$/, '');
+      // 兼容相对路径 (e.g. '/api/moments/media/foo.mp4')；MiniMax 资产现在
+      // 一律存相对路径让浏览器跨域名通用，服务端转录路径要在此识别。
+      const isAbsolute = /^https?:\/\//i.test(url);
+      const normalizedPath = isAbsolute
+        ? new URL(url).pathname.replace(/\/+$/, '')
+        : url.split('?')[0].split('#')[0].replace(/\/+$/, '');
       const fileName = decodeURIComponent(
         path.basename(normalizedPath.split('/').pop() ?? ''),
       );
@@ -1300,6 +1293,15 @@ export class AiOrchestratorService {
       emptyTextFallback,
     } = request;
     const finalLanguageReminder = await this.worldLanguage.buildFinalReminder();
+    // 把语言提醒贴在当前用户消息末尾，作为模型生成前看到的最后一段指令。
+    // 之前合并进 system prompt 时，长长的角色档案/规则（多为中文）会盖过它，
+    // 导致 world_language=en-US 的账号里仍有大量中文回复（反之亦然）。
+    const currentUserMessageWithLanguage: ChatMessage = finalLanguageReminder
+      ? {
+          ...currentUserMessage,
+          content: `${currentUserMessage.content}\n\n${finalLanguageReminder}`,
+        }
+      : currentUserMessage;
     const hasImageInput = this.requestContainsImageInput(request);
     const hasAudioInput = this.requestContainsAudioInput(request);
     const hasDocumentInput = this.requestContainsDocumentInput(request);
@@ -1330,7 +1332,7 @@ export class AiOrchestratorService {
           ),
         );
         const currentMessage = await this.buildResponsesMessage(
-          currentUserMessage,
+          currentUserMessageWithLanguage,
           provider,
           capabilities,
           isGroupChat,
@@ -1340,11 +1342,7 @@ export class AiOrchestratorService {
         const response = await client.responses.create({
           model: provider.model,
           instructions: systemPrompt,
-          input: [
-            ...historyMessages,
-            { role: 'system', content: finalLanguageReminder },
-            currentMessage,
-          ],
+          input: [...historyMessages, currentMessage],
           max_output_tokens: 500,
           temperature: 0.85,
         });
@@ -1373,18 +1371,17 @@ export class AiOrchestratorService {
         ),
       );
       const currentMessage = await this.buildChatCompletionMessage(
-        currentUserMessage,
+        currentUserMessageWithLanguage,
         provider,
         isGroupChat,
         allowImageInput,
         allowAudioInput,
       );
-      const response = await client.chat.completions.create({
+      const response = await executeChatCompletion(client, {
         model: provider.model,
         messages: [
           { role: 'system', content: systemPrompt },
           ...historyMessages,
-          { role: 'system', content: finalLanguageReminder },
           currentMessage,
         ],
         max_tokens: 500,
@@ -1858,6 +1855,9 @@ export class AiOrchestratorService {
     );
     const includedHistory = conversationHistory.slice(-historyWindow);
     const finalLanguageReminder = await this.worldLanguage.buildFinalReminder();
+    const userMessageWithLanguage = finalLanguageReminder
+      ? `${userMessage}\n\n${finalLanguageReminder}`
+      : userMessage;
     const requestMessages: Array<{
       role: 'system' | 'user' | 'assistant';
       content: string;
@@ -1876,12 +1876,8 @@ export class AiOrchestratorService {
           : message.content,
       })),
       {
-        role: 'system',
-        content: finalLanguageReminder,
-      },
-      {
         role: 'user',
-        content: userMessage,
+        content: userMessageWithLanguage,
       },
     ];
     const worldCtx = await this.worldService.getLatest();
@@ -2253,9 +2249,18 @@ export class AiOrchestratorService {
         undefined,
         sceneKey,
       );
+      const finalLanguageReminder = await this.worldLanguage.buildFinalReminder();
+      const wrapTaskPrompt = (taskPrompt: string) =>
+        finalLanguageReminder
+          ? `${taskPrompt}\n\n${finalLanguageReminder}`
+          : taskPrompt;
       const taskPrompts = [
-        this.promptBuilder.buildSceneGenerationTaskPrompt(sceneKey, false),
-        this.promptBuilder.buildSceneGenerationTaskPrompt(sceneKey, true),
+        wrapTaskPrompt(
+          this.promptBuilder.buildSceneGenerationTaskPrompt(sceneKey, false),
+        ),
+        wrapTaskPrompt(
+          this.promptBuilder.buildSceneGenerationTaskPrompt(sceneKey, true),
+        ),
       ];
 
       for (let attempt = 0; attempt < taskPrompts.length; attempt += 1) {
@@ -2264,7 +2269,7 @@ export class AiOrchestratorService {
           characterId: profile.characterId,
           label: `${sceneKey} generation`,
           request: (client, activeProvider) =>
-            client.chat.completions.create({
+            executeChatCompletion(client, {
               model: activeProvider.model,
               messages: [
                 { role: 'system', content: systemPrompt },
@@ -2311,9 +2316,15 @@ export class AiOrchestratorService {
       resolvedGenerationContext,
       sceneKey,
     );
+    const finalLanguageReminderForMoment =
+      await this.worldLanguage.buildFinalReminder();
+    const wrapMomentPrompt = (taskPrompt: string) =>
+      finalLanguageReminderForMoment
+        ? `${taskPrompt}\n\n${finalLanguageReminderForMoment}`
+        : taskPrompt;
     const userPrompts = [
-      promptRequest.userPrompt,
-      promptRequest.retryUserPrompt,
+      wrapMomentPrompt(promptRequest.userPrompt),
+      wrapMomentPrompt(promptRequest.retryUserPrompt),
     ];
 
     for (let attempt = 0; attempt < userPrompts.length; attempt += 1) {
@@ -2322,7 +2333,7 @@ export class AiOrchestratorService {
         characterId: profile.characterId,
         label: 'moment generation',
         request: (client, activeProvider) =>
-          client.chat.completions.create({
+          executeChatCompletion(client, {
             model: activeProvider.model,
             messages: [
               { role: 'system', content: promptRequest.systemPrompt },
@@ -2383,7 +2394,7 @@ export class AiOrchestratorService {
       characterId: resolvedUsageContext.characterId,
       label: 'personality extraction',
       request: (client, provider) =>
-        client.chat.completions.create({
+        executeChatCompletion(client, {
           model: provider.model,
           messages: [{ role: 'user', content: prompt }],
           max_tokens: 600,
@@ -2479,7 +2490,8 @@ export class AiOrchestratorService {
       usageContext,
       label: 'quick character generation',
       request: (client, provider) =>
-        client.chat.completions.create(
+        executeChatCompletion(
+          client,
           {
             model: provider.model,
             messages: requestMessages,
@@ -2522,7 +2534,7 @@ export class AiOrchestratorService {
         characterId: options.usageContext.characterId,
         label: 'json generation',
         request: (client, provider) =>
-          client.chat.completions.create({
+          executeChatCompletion(client, {
             model: provider.model,
             messages: [{ role: 'user', content: prompt }],
             max_tokens: options.maxTokens ?? 1200,
@@ -2561,7 +2573,7 @@ export class AiOrchestratorService {
         characterId: options.usageContext.characterId,
         label: 'plain text generation',
         request: (client, provider) =>
-          client.chat.completions.create({
+          executeChatCompletion(client, {
             model: provider.model,
             messages: [{ role: 'user', content: prompt }],
             max_tokens: options.maxTokens ?? 800,
@@ -2611,7 +2623,7 @@ export class AiOrchestratorService {
         characterId: profile.characterId,
         label: 'memory compression',
         request: (client, provider) =>
-          client.chat.completions.create({
+          executeChatCompletion(client, {
             model: provider.model,
             messages: [{ role: 'user', content: prompt }],
             max_tokens: 200,
@@ -2653,7 +2665,7 @@ export class AiOrchestratorService {
         characterId: resolvedUsageContext.characterId,
         label: 'core memory extraction',
         request: (client, provider) =>
-          client.chat.completions.create({
+          executeChatCompletion(client, {
             model: provider.model,
             messages: [{ role: 'user', content: prompt }],
             max_tokens: 300,
@@ -2702,7 +2714,7 @@ export class AiOrchestratorService {
         characterId: resolvedUsageContext.characterId,
         label: 'intent classification',
         request: (client, provider) =>
-          client.chat.completions.create({
+          executeChatCompletion(client, {
             model: provider.model,
             messages: [{ role: 'user', content: prompt }],
             max_tokens: 200,
@@ -2844,11 +2856,30 @@ export class AiOrchestratorService {
       }
 
       attemptedProvider = true;
-      const client = this.createProviderClientFromEndpoint({
-        endpoint: provider.imageGenerationEndpoint,
-        apiKey: provider.imageGenerationApiKey,
-      });
       try {
+        if (
+          MinimaxNativeClient.isMinimaxEndpoint(provider.imageGenerationEndpoint)
+        ) {
+          const minimax = new MinimaxNativeClient(
+            provider.imageGenerationEndpoint,
+            provider.imageGenerationApiKey,
+          );
+          const result = await minimax.generateImage({
+            model: imageModel,
+            prompt,
+            size: options.size,
+          });
+          return {
+            buffer: result.buffer,
+            mimeType: result.mimeType,
+            fileExtension: this.getImageFileExtension(result.mimeType),
+            provider: imageModel,
+          };
+        }
+        const client = this.createProviderClientFromEndpoint({
+          endpoint: provider.imageGenerationEndpoint,
+          apiKey: provider.imageGenerationApiKey,
+        });
         const body: OpenAI.Images.ImageGenerateParamsNonStreaming = {
           model: imageModel,
           prompt,
@@ -3138,15 +3169,38 @@ export class AiOrchestratorService {
       attemptedProvider = true;
       const voice =
         options.voice?.trim() || provider.ttsVoice || DEFAULT_TTS_VOICE;
-      const client = this.createProviderClientFromEndpoint({
-        endpoint: provider.ttsEndpoint,
-        apiKey: provider.ttsApiKey,
-      });
       const instructions = await this.worldLanguage.buildSpeechInstructions({
         existingInstructions: options.instructions,
       });
 
       try {
+        if (MinimaxNativeClient.isMinimaxEndpoint(provider.ttsEndpoint)) {
+          const minimax = new MinimaxNativeClient(
+            provider.ttsEndpoint,
+            provider.ttsApiKey,
+          );
+          const result = await this.retrySpeechRequest(
+            'speech synthesis',
+            () =>
+              minimax.synthesizeSpeech({
+                model: provider.ttsModel,
+                text,
+                voiceId: voice,
+              }),
+          );
+          return {
+            buffer: result.buffer,
+            mimeType: result.mimeType,
+            fileExtension: 'mp3',
+            durationMs: Date.now() - startedAt,
+            provider: provider.ttsModel,
+            voice,
+          };
+        }
+        const client = this.createProviderClientFromEndpoint({
+          endpoint: provider.ttsEndpoint,
+          apiKey: provider.ttsApiKey,
+        });
         const response = await this.retrySpeechRequest('speech synthesis', () =>
           client.audio.speech.create({
             model: provider.ttsModel,

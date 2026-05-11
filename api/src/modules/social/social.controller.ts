@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ShakeDiscoveryService } from './shake-discovery.service';
 import { SocialService } from './social.service';
 
@@ -10,8 +19,12 @@ export class SocialController {
   ) {}
 
   @Get('friend-requests')
-  getPendingRequests() {
-    return this.socialService.getPendingRequests();
+  getPendingRequests(
+    @Query('direction') direction?: 'inbound' | 'outbound' | 'all',
+  ) {
+    const normalized =
+      direction === 'outbound' || direction === 'all' ? direction : 'inbound';
+    return this.socialService.getPendingRequests(normalized);
   }
 
   @Post('friend-requests/:id/accept')

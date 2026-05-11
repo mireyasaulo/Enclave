@@ -24,10 +24,12 @@ export function ConsoleConfirmDialog({
   onClose,
   onConfirm,
 }: ConsoleConfirmDialogProps) {
-  const resolvedConfirmLabel =
-    confirmLabel ?? translateCloudConsoleTextForActiveLocale("Confirm");
-  const resolvedPendingLabel =
-    pendingLabel ?? translateCloudConsoleTextForActiveLocale("Working...");
+  const resolvedConfirmLabel = translateCloudConsoleTextForActiveLocale(
+    confirmLabel ?? "Confirm",
+  );
+  const resolvedPendingLabel = translateCloudConsoleTextForActiveLocale(
+    pendingLabel ?? "Working...",
+  );
   const cancelLabel = translateCloudConsoleTextForActiveLocale("Cancel");
   const closeLabel = translateCloudConsoleTextForActiveLocale("Close");
   const reactId = useId();

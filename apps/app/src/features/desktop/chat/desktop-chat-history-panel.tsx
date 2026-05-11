@@ -249,13 +249,6 @@ export function DesktopChatHistoryPanel({
     }
   }
 
-  function clearCategoryFilter(refocus = true) {
-    setActiveCategory("all");
-    if (refocus) {
-      focusSearchInput(true);
-    }
-  }
-
   return (
     <div className="flex h-full min-h-0 flex-col bg-[#f7f7f7]">
       <div

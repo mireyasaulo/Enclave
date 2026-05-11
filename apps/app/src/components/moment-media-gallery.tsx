@@ -1,6 +1,7 @@
 import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
 import {
+  type MomentAudioAsset,
   type MomentContentType,
   type MomentImageAsset,
   type MomentMediaAsset,
@@ -10,6 +11,8 @@ import { ChevronLeft, ChevronRight, Play, X } from "lucide-react";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
 import { formatMomentDurationLabel } from "../features/moments/moment-compose-media";
+import { AudioCard } from "./audio-card";
+import { resolveAppMediaUrl } from "../lib/media-url";
 
 const t = translateRuntimeMessage;
 
@@ -97,6 +100,21 @@ export function MomentMediaGallery({
       }
     : undefined;
 
+  if (contentType === "audio_card" && media[0]?.kind === "audio") {
+    const audio = media[0] as MomentAudioAsset;
+    return (
+      <div onClick={handleRootClick}>
+        <AudioCard
+          url={audio.url}
+          posterUrl={audio.posterUrl}
+          title={audio.title || audio.fileName}
+          durationMs={audio.durationMs}
+          variant={variant === "mobile" ? "moment" : "feed"}
+        />
+      </div>
+    );
+  }
+
   if (contentType === "video" && media[0]?.kind === "video") {
     const video = media[0] as MomentVideoAsset;
     return (
@@ -123,7 +141,7 @@ export function MomentMediaGallery({
           >
             {video.posterUrl ? (
               <img
-                src={video.posterUrl}
+                src={resolveAppMediaUrl(video.posterUrl)}
                 alt={video.fileName || t(msg`朋友圈视频`)}
                 loading="lazy"
                 decoding="async"
@@ -137,7 +155,7 @@ export function MomentMediaGallery({
               />
             ) : (
               <video
-                src={video.url}
+                src={resolveAppMediaUrl(video.url)}
                 className="w-full bg-black object-cover"
                 style={{
                   aspectRatio:
@@ -187,7 +205,7 @@ export function MomentMediaGallery({
   // 1 张：单图按原比例自适应（最大 ~210px 宽）
   // 4 张：2×2，宽度 = 2 × 单格 + 1 × gap
   // 其他：3 列方格
-  const cellSize = 105; // px，单方格边长（mobile）
+  const cellSize = 105; // i18n-ignore-line: dev comment - px，单方格边长（mobile）
   const cellSizeNonMobile = 110;
   const gridGapPx = 4;
   const cellPx = isMobileVariant ? cellSize : cellSizeNonMobile;
@@ -208,7 +226,7 @@ export function MomentMediaGallery({
             style={computeWeChatSingleImageStyle(single)}
           >
             <img
-              src={single.thumbnailUrl || single.url}
+              src={resolveAppMediaUrl(single.thumbnailUrl || single.url)}
               alt={single.fileName || t(msg`朋友圈图片`)}
               className="h-full w-full object-cover"
               loading="lazy"
@@ -414,7 +432,7 @@ export function MomentMediaGallery({
             }}
           >
             <img
-              src={asset.thumbnailUrl || asset.url}
+              src={resolveAppMediaUrl(asset.thumbnailUrl || asset.url)}
               alt={asset.fileName || t(msg`朋友圈图片`)}
               className="h-full w-full object-cover transition duration-200 hover:scale-[1.015]"
               loading="lazy"
@@ -521,7 +539,7 @@ function MomentImageViewerOverlay({
 
       <div className="absolute inset-0 flex items-center justify-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+4.5rem)] pt-[calc(env(safe-area-inset-top,0px)+4.5rem)]">
         <img
-          src={image.url}
+          src={resolveAppMediaUrl(image.url)}
           alt={image.fileName || t(msg`朋友圈图片`)}
           className="max-h-full max-w-full object-contain"
         />
@@ -587,8 +605,8 @@ function MomentVideoViewerOverlay({
 
       <div className="absolute inset-0 flex items-center justify-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+2rem)] pt-[calc(env(safe-area-inset-top,0px)+4.5rem)]">
         <video
-          src={video.url}
-          poster={video.posterUrl}
+          src={resolveAppMediaUrl(video.url)}
+          poster={video.posterUrl ? resolveAppMediaUrl(video.posterUrl) : undefined}
           className="max-h-full max-w-full rounded-[20px] bg-black"
           controls
           autoPlay
@@ -619,7 +637,7 @@ function WeChatGridCell({
       style={{ width: `${size}px`, height: `${size}px` }}
     >
       <img
-        src={asset.thumbnailUrl || asset.url}
+        src={resolveAppMediaUrl(asset.thumbnailUrl || asset.url)}
         alt={asset.fileName || t(msg`朋友圈图片`)}
         className="h-full w-full object-cover"
         loading="lazy"
@@ -637,9 +655,9 @@ function WeChatGridCell({
 function computeWeChatSingleImageStyle(
   asset: MomentImageAsset,
 ): { width: string; height: string } {
-  const SQUARE = 165; // 正方形上限
-  const LONG = 220; // 长边
-  const SHORT = 145; // 短边
+  const SQUARE = 165; // i18n-ignore-line: dev comment
+  const LONG = 220; // i18n-ignore-line: dev comment
+  const SHORT = 145; // i18n-ignore-line: dev comment
   const w = asset.width ?? 0;
   const h = asset.height ?? 0;
 

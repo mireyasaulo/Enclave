@@ -8,6 +8,7 @@ import { CloudTokenUsageBreakdownDailyEntity } from "../entities/cloud-token-usa
 import { CloudTokenUsageBudgetEntity } from "../entities/cloud-token-usage-budget.entity";
 import { CloudTokenUsageDailyEntity } from "../entities/cloud-token-usage-daily.entity";
 import { CloudWorldEntity } from "../entities/cloud-world.entity";
+import { N1nPricingSyncService } from "./n1n-pricing-sync.service";
 import { TokenUsageAdminController } from "./token-usage-admin.controller";
 import { TokenUsageRuntimeController } from "./token-usage-runtime.controller";
 import { TokenUsageService } from "./token-usage.service";
@@ -24,7 +25,12 @@ import { TokenUsageService } from "./token-usage.service";
     ]),
   ],
   controllers: [TokenUsageAdminController, TokenUsageRuntimeController],
-  providers: [TokenUsageService, AdminGuard, AdminAuthService],
+  providers: [
+    TokenUsageService,
+    N1nPricingSyncService,
+    AdminGuard,
+    AdminAuthService,
+  ],
   exports: [TokenUsageService],
 })
 export class TokenUsageModule {}

@@ -1,3 +1,4 @@
+import type { MessageDescriptor } from "@lingui/core";
 import { getServerI18n } from "@/i18n/server";
 import type { SupportedLocale } from "@/lib/locales";
 import { SITE_BASE_URL, pageUrl } from "@/lib/seo-metadata";
@@ -20,19 +21,21 @@ export async function ArticleJsonLd({
 }: {
   locale: SupportedLocale;
   segment: string;
-  headlineZh: string;
-  descriptionZh: string;
+  headlineZh: string | MessageDescriptor;
+  descriptionZh: string | MessageDescriptor;
   datePublished: string;
   dateModified: string;
 }) {
   const i18n = await getServerI18n(locale);
   const url = pageUrl(locale, segment);
+  const tr = (v: string | MessageDescriptor) =>
+    typeof v === "string" ? i18n._(v) : i18n._(v);
 
   const data = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: i18n._(headlineZh),
-    description: i18n._(descriptionZh),
+    headline: tr(headlineZh),
+    description: tr(descriptionZh),
     datePublished,
     dateModified,
     inLanguage: locale,

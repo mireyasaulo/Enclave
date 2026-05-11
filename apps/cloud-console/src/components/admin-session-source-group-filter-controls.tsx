@@ -72,7 +72,7 @@ export function AdminSessionSourceGroupFilterControls({
           >
             {ADMIN_SESSION_SOURCE_GROUP_SORT_FIELDS.map((value) => (
               <option key={value} value={value}>
-                {formatAdminSessionSourceGroupSortFieldLabel(value)}
+                {t(formatAdminSessionSourceGroupSortFieldLabel(value))}
               </option>
             ))}
           </select>
@@ -90,7 +90,7 @@ export function AdminSessionSourceGroupFilterControls({
           >
             {ADMIN_SESSION_SOURCE_GROUP_SORT_DIRECTIONS.map((value) => (
               <option key={value} value={value}>
-                {formatAdminSessionSourceGroupSortDirectionLabel(value)}
+                {t(formatAdminSessionSourceGroupSortDirectionLabel(value))}
               </option>
             ))}
           </select>
@@ -108,7 +108,7 @@ export function AdminSessionSourceGroupFilterControls({
           >
             {ADMIN_SESSION_SOURCE_GROUP_RISK_LEVELS.map((value) => (
               <option key={value} value={value}>
-                {formatAdminSessionSourceGroupRiskFilterLabel(value)}
+                {t(formatAdminSessionSourceGroupRiskFilterLabel(value))}
               </option>
             ))}
           </select>

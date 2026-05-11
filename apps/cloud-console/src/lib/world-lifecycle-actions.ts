@@ -121,6 +121,7 @@ export function createWorldActionLabel(
   }
 }
 
+// i18n-ignore-start: selectCloudConsoleText multi-locale dictionaries — zh/ja/ko are translated values, not hardcoded UI copy
 export function createWorldActionDisplayLabel(
   action: WorldLifecycleAction,
   locale?: string | null,
@@ -263,6 +264,7 @@ export function createWorldActionConfirmationCopy(
       };
   }
 }
+// i18n-ignore-end
 
 export function performWorldLifecycleAction(
   worldId: string,

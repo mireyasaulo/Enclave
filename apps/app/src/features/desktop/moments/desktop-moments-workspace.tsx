@@ -1,5 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { msg } from "@lingui/macro";
 import { type Moment, type MomentComment } from "@yinjie/contracts";
+import { translateRuntimeMessage } from "@yinjie/i18n";
+import { MomentShareCardModal } from "../../../components/moment-share-card-modal";
 import { DesktopMomentComposePanel } from "./desktop-moment-compose-panel";
 import { DesktopMomentsFeed } from "./desktop-moments-feed";
 import { type MomentCommentReplyTarget } from "./desktop-moment-row";
@@ -8,6 +11,8 @@ import {
   type MomentVideoDraft,
 } from "../../moments/moment-compose-media";
 import { DesktopMomentsToolbar } from "./desktop-moments-toolbar";
+
+const t = translateRuntimeMessage;
 
 type DesktopMomentsWorkspaceProps = {
   commentDrafts: Record<string, string>;
@@ -94,6 +99,16 @@ export function DesktopMomentsWorkspace({
 }: DesktopMomentsWorkspaceProps) {
   const scrollViewportRef = useRef<HTMLDivElement | null>(null);
 
+  // 「分享图卡」目标 — 只存 id，moments 后续刷新时预览图也跟着新。
+  const [shareMomentId, setShareMomentId] = useState<string | null>(null);
+  const shareMoment = shareMomentId
+    ? moments.find((moment) => moment.id === shareMomentId) ?? null
+    : null;
+  const shareLiked = Boolean(
+    ownerId && shareMoment?.likes.some((like) => like.authorId === ownerId),
+  );
+  const shareOwnerName = ownerUsername?.trim() || t(msg`世界主人`);
+
   useEffect(() => {
     if (!scrollToMomentId || typeof document === "undefined") {
       return;
@@ -150,6 +165,7 @@ export function DesktopMomentsWorkspace({
                 onCommentChange={onCommentChange}
                 onCommentSubmit={onCommentSubmit}
                 onLike={onLike}
+                onShare={(momentId) => setShareMomentId(momentId)}
                 onStartCommentReply={
                   onStartCommentReply
                     ? (comment) =>
@@ -188,6 +204,14 @@ export function DesktopMomentsWorkspace({
           onVideoFileSelected={onVideoFileSelected}
         />
       ) : null}
+
+      <MomentShareCardModal
+        moment={shareMoment}
+        liked={shareLiked}
+        ownerId={ownerId ?? null}
+        ownerDisplayName={shareOwnerName}
+        onClose={() => setShareMomentId(null)}
+      />
     </div>
   );
 }

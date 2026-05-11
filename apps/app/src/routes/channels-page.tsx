@@ -44,6 +44,7 @@ import {
   type FeedPostWithComments,
 } from "@yinjie/contracts";
 import { AppPage, Button, cn, InlineNotice } from "@yinjie/ui";
+import { AudioCard } from "../components/audio-card";
 import { AvatarChip } from "../components/avatar-chip";
 import { ExpandableText } from "../components/expandable-text";
 import { RouteRedirectState } from "../components/route-redirect-state";
@@ -601,6 +602,13 @@ export function ChannelsPage() {
       return;
     }
 
+    // URL 是 section 的真理之源；如果 React state 还没追平 URL（effect 578 还没跑完），
+    // 不要拿旧 state 反向写 URL，否则会把刚发生的 tab 切换覆盖掉。
+    const urlSection = routeState.section ?? "recommended";
+    if (urlSection !== activeSection) {
+      return;
+    }
+
     const nextHash = buildDesktopChannelsRouteHash({
       postId: desktopSelectedPostId,
       authorId: syncedRouteSelectedAuthorId,
@@ -627,6 +635,7 @@ export function ChannelsPage() {
     isDesktopLayout,
     navigate,
     pathname,
+    routeState.section,
   ]);
 
   useEffect(() => {
@@ -829,6 +838,11 @@ export function ChannelsPage() {
     }
 
     if (isDesktopLayout) {
+      // 同步把 React state 切到新 section 并清掉旧 post 锚点，
+      // 否则后面同步 URL 的 effect 会读到旧 state，把刚发生的 tab 切换覆盖回去。
+      setActiveSection(section);
+      setDesktopSelectedPostId(null);
+      setDesktopReplyTarget(null);
       void navigate({
         to: "/tabs/channels",
         hash: buildDesktopChannelsRouteHash({
@@ -1254,6 +1268,64 @@ export function ChannelsPage() {
   );
 }
 
+function MobileChannelMediaSurface({ post }: { post: FeedPostListItem }) {
+  const t = useRuntimeTranslator();
+  const audioAsset = post.media?.find((asset) => asset.kind === "audio");
+  const videoAsset = post.media?.find((asset) => asset.kind === "video");
+
+  if (post.mediaType === "audio" && (audioAsset || post.mediaUrl)) {
+    return (
+      <div className="relative flex h-[64dvh] w-full items-center justify-center bg-gradient-to-b from-[#1f2533] to-[#0a0c10] px-6">
+        {audioAsset?.posterUrl || post.coverUrl ? (
+          <img
+            src={audioAsset?.posterUrl ?? post.coverUrl ?? undefined}
+            alt={post.title ?? ""}
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30 blur-[1px]"
+          />
+        ) : null}
+        <div className="relative">
+          <AudioCard
+            url={audioAsset?.url ?? post.mediaUrl ?? ""}
+            posterUrl={audioAsset?.posterUrl ?? post.coverUrl ?? undefined}
+            title={
+              audioAsset?.title ?? post.title ?? `${post.authorName}·${t(msg`音乐`)}`
+            }
+            durationMs={audioAsset?.durationMs ?? post.durationMs ?? undefined}
+            variant="moment"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (post.mediaType === "video" && (videoAsset?.url || post.mediaUrl)) {
+    return (
+      <video
+        key={videoAsset?.url ?? post.mediaUrl}
+        src={videoAsset?.url ?? post.mediaUrl ?? undefined}
+        poster={videoAsset?.posterUrl ?? post.coverUrl ?? undefined}
+        controls
+        playsInline
+        preload="metadata"
+        className="h-[64dvh] w-full bg-black object-contain"
+      />
+    );
+  }
+
+  return (
+    <div className="flex h-[64dvh] w-full items-center justify-center bg-black px-6 text-center">
+      <div>
+        <div className="text-[16px] font-semibold text-white">
+          {t(msg`暂无可播放内容`)}
+        </div>
+        <div className="mt-2 text-[13px] leading-6 text-white/72">
+          {t(msg`稍后再来看看`)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MobileChannelsStatusCard({
   badge,
   title,
@@ -1484,16 +1556,7 @@ function MobileChannelsCard({
       className="snap-start scroll-mt-2 overflow-hidden rounded-[18px] border border-[color:var(--border-subtle)] bg-white shadow-none"
     >
       <div className="relative min-h-[calc(100dvh-12rem)] bg-[#0f1115]">
-        <div className="flex h-[64dvh] w-full items-center justify-center bg-black px-6 text-center">
-          <div>
-            <div className="text-[16px] font-semibold text-white">
-              {t(msg`视频功能正在开发中`)}
-            </div>
-            <div className="mt-2 text-[13px] leading-6 text-white/72">
-              {t(msg`敬请期待`)}
-            </div>
-          </div>
-        </div>
+        <MobileChannelMediaSurface post={post} />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-[linear-gradient(180deg,rgba(15,23,42,0.78),rgba(15,23,42,0))]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-[linear-gradient(180deg,rgba(15,23,42,0),rgba(15,23,42,0.88))]" />
 
@@ -1501,11 +1564,6 @@ function MobileChannelsCard({
           <div className="rounded-full bg-[rgba(15,23,42,0.62)] px-2.5 py-1 text-[10px] font-medium tracking-[0.04em] text-white">
             {t(msg`视频号推荐`)}
           </div>
-          {post.aiReacted ? (
-            <div className="rounded-full bg-[rgba(7,193,96,0.9)] px-2.5 py-1 text-[10px] font-medium text-white">
-              {t(msg`AI 已互动`)}
-            </div>
-          ) : null}
         </div>
 
         <div className="absolute inset-y-0 right-0 flex items-center pr-3.5">

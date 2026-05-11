@@ -64,6 +64,11 @@ export function resolveCloudDatabasePath(config: ConfigReader) {
   return config.get<string>("CLOUD_DATABASE_PATH")?.trim() || "cloud-platform.sqlite";
 }
 
+export function resolveGoogleOAuthClientId(config: ConfigReader): string | null {
+  const value = config.get<string>("GOOGLE_OAUTH_CLIENT_ID")?.trim();
+  return value || null;
+}
+
 export function isStrictSecretValidationEnabled(config: ConfigReader) {
   const explicitFlag = config.get<string>("CLOUD_ENFORCE_STRICT_SECRETS")?.trim().toLowerCase();
   if (explicitFlag) {

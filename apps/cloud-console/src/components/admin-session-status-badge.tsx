@@ -4,6 +4,7 @@ import {
   getAdminSessionStatusTone,
   getAdminSessionStatusToneStyles,
 } from "../lib/admin-session-helpers";
+import { useCloudConsoleText } from "../lib/cloud-console-i18n";
 
 type AdminSessionStatusBadgeProps = {
   status: CloudAdminSessionStatus;
@@ -14,6 +15,7 @@ export function AdminSessionStatusBadge({
   status,
   className,
 }: AdminSessionStatusBadgeProps) {
+  const t = useCloudConsoleText();
   const tone = getAdminSessionStatusTone(status);
   const toneStyles = getAdminSessionStatusToneStyles(status);
 
@@ -22,7 +24,7 @@ export function AdminSessionStatusBadge({
       data-tone={tone}
       className={`rounded-full border ${toneStyles.badge}${className ? ` ${className}` : ""}`}
     >
-      {formatAdminSessionStatusLabel(status)}
+      {t(formatAdminSessionStatusLabel(status))}
     </span>
   );
 }

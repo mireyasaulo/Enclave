@@ -130,6 +130,17 @@ http {
     "${siteHostExact}" 1;
   }
 
+  # 公网 Host（vicp.fun 隧道 / 公网域名）下禁止 /api/ + /socket.io/ 直通本机 3000。
+  # 这两条路径上的 api 是单租户、无鉴权、共享 owner db 的本机开发实例；公网放开
+  # 等于把本地数据公开（任何人访问都看到同一个 owner 的聊天/朋友圈/角色）。前端
+  # 在远程 origin 下应当把 baseUrl 改为 \${origin}/cloud/world-api（cloud-api 反代
+  # + 按 token 路由到对应账号 child）。本地直连（127.0.0.1 / localhost / 私网 IP）
+  # 保持直通，单机开发体验不变。
+  map $http_host $is_public_host {
+    default 0;
+    ~^${siteHostExact.replace(/\./g, "\\.")} 1;
+  }
+
   server {
     listen ${listenAddress} default_server;
     server_name _;
@@ -157,6 +168,8 @@ http {
     }
 
     location /api/ {
+      # 公网 Host 不允许直通本机 3000（共享 owner db）。前端应走 /cloud/world-api。
+      if ($is_public_host) { return 403; }
       proxy_pass ${apiUpstream};
       proxy_http_version 1.1;
       proxy_set_header Host $host;
@@ -175,6 +188,9 @@ http {
     }
 
     location /socket.io/ {
+      # 公网 Host 同理走多租户反代（前端 socket 在 baseUrl 含 /cloud/world-api
+      # 时会自动 path 到 /cloud/world-api/socket.io）；本机直连保持直通。
+      if ($is_public_host) { return 403; }
       proxy_pass ${apiUpstream};
       proxy_http_version 1.1;
       proxy_set_header Upgrade $http_upgrade;

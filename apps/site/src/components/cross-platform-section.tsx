@@ -1,23 +1,25 @@
 import { Smartphone, Monitor, Check } from "lucide-react";
+import { msg } from "@lingui/macro";
+import type { MessageDescriptor } from "@lingui/core";
 import { getServerI18n } from "@/i18n/server";
 import type { SupportedLocale } from "@/lib/locales";
 
-const MOBILE_FEATURES = [
-  "聊天与群组",
-  "朋友圈与动态",
-  "AI 数字人通话",
-  "小程序工作区",
-  "游戏中心",
-  "发现与场景社交",
+const MOBILE_FEATURES: MessageDescriptor[] = [
+  msg`聊天与群组`,
+  msg`朋友圈与动态`,
+  msg`AI 数字人通话`,
+  msg`小程序工作区`,
+  msg`游戏中心`,
+  msg`发现与场景社交`,
 ];
 
-const DESKTOP_FEATURES = [
-  "聊天工作区（多窗口）",
-  "笔记工作区（多窗口）",
-  "聊天文件中心",
-  "聊天记录全局搜索",
-  "视频号直播伴侣",
-  "原生托盘 / 锁屏",
+const DESKTOP_FEATURES: MessageDescriptor[] = [
+  msg`聊天工作区（多窗口）`,
+  msg`笔记工作区（多窗口）`,
+  msg`聊天文件中心`,
+  msg`聊天记录全局搜索`,
+  msg`视频号直播伴侣`,
+  msg`原生托盘 / 锁屏`,
 ];
 
 export async function CrossPlatformSection({ locale }: { locale: SupportedLocale }) {
@@ -57,7 +59,7 @@ export async function CrossPlatformSection({ locale }: { locale: SupportedLocale
             </div>
             <ul className="mt-6 grid gap-2 text-sm text-(--text-secondary) sm:grid-cols-2">
               {MOBILE_FEATURES.map((f) => (
-                <li key={f} className="flex items-center gap-2">
+                <li key={f.id ?? String(f.message)} className="flex items-center gap-2">
                   <Check size={14} className="shrink-0 text-(--brand-accent)" />
                   <span>{i18n._(f)}</span>
                 </li>
@@ -76,7 +78,7 @@ export async function CrossPlatformSection({ locale }: { locale: SupportedLocale
             </div>
             <ul className="mt-6 grid gap-2 text-sm text-(--text-secondary) sm:grid-cols-2">
               {DESKTOP_FEATURES.map((f) => (
-                <li key={f} className="flex items-center gap-2">
+                <li key={f.id ?? String(f.message)} className="flex items-center gap-2">
                   <Check size={14} className="shrink-0 text-(--brand-accent)" />
                   <span>{i18n._(f)}</span>
                 </li>

@@ -372,6 +372,15 @@ export interface DeleteCloudTokenPricingRequest {
   model: string;
 }
 
+export interface CloudTokenPricingSyncResult {
+  source: "n1n.ai";
+  fetchedAt: string;
+  upserted: number;
+  skipped: number;
+  recomputedDays: number;
+  recomputedRows: number;
+}
+
 export interface TokenUsageDowngradeQualityInsights {
   generatedAt: string;
   requestCount: number;

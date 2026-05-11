@@ -22,7 +22,7 @@ export class WorldApiProxyController {
       res.status(503).json({
         statusCode: 503,
         errorCode: "WORLD_INSTANCE_NOT_READY",
-        message: "World instance is not ready for this account.",
+        message: "World instance is not ready for this account.", // i18n-ignore-line: backend API error code
       });
       return;
     }
@@ -32,6 +32,6 @@ export class WorldApiProxyController {
       ? originalUrl.slice(PROXY_PATH_PREFIX.length) || "/"
       : originalUrl || "/";
 
-    this.proxyService.proxyHttp(req, res, target, subPath);
+    this.proxyService.proxyHttp(req, res, target, subPath, phone);
   }
 }

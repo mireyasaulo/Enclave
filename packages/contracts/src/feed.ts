@@ -6,7 +6,7 @@ import type {
 
 export type FeedSurface = "feed" | "channels";
 export type FeedAuthorType = "user" | "character";
-export type FeedMediaType = "text" | "image" | "video";
+export type FeedMediaType = "text" | "image" | "video" | "audio";
 export type FeedPublishStatus = "draft" | "published" | "hidden" | "deleted";
 export type FeedSourceKind =
   | "seed"

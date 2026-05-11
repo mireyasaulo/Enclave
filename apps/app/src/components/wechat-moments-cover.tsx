@@ -45,7 +45,7 @@ export function WeChatMomentsCover({
       className={cn("relative w-full bg-white", className)}
       style={{ height: 276 }}
     >
-      {/* 封面背景层：仅在前 260px 区域内绘制并裁切 */}
+      {/* i18n-ignore-line: dev comment - 封面背景层 */}
       <div
         className="absolute inset-x-0 top-0 overflow-hidden bg-[#9aaec4]"
         style={{ height: 260, ...coverStyle }}
@@ -61,10 +61,12 @@ export function WeChatMomentsCover({
         ) : null}
       </div>
 
+      {/* i18n-ignore-start: dev comment - 头像昵称布局说明 */}
       {/* 头像 + 昵称：群组的 bottom 位于离 section.bottom 28px 处，
           与原始 (cover 260px + bottom-3 12px) 视觉位置一致；头像组件
           沿用 translate-y-7 (28px) 让其底部贴在 section.bottom，
           完整露出 64px 头像。 */}
+      {/* i18n-ignore-end */}
       <div className="absolute bottom-7 right-4 flex items-end gap-3">
         <div
           className="max-w-[60vw] truncate text-right text-[17px] font-semibold leading-[22px] text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.32)]"

@@ -236,6 +236,28 @@ export class VerifyEmailCodeDto {
   deviceFingerprint?: string;
 }
 
+export class VerifyGoogleIdTokenDto {
+  @Transform(trimString)
+  @IsString({ message: "idToken 必须是字符串。" })
+  @MinLength(1, { message: "idToken 不能为空。" })
+  @MaxLength(8192, { message: "idToken 不能超过 8192 个字符。" })
+  idToken: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString({ message: "inviteCode 必须是字符串。" })
+  @MinLength(1, { message: "inviteCode 不能为空。" })
+  @MaxLength(32, { message: "inviteCode 不能超过 32 个字符。" })
+  inviteCode?: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString({ message: "deviceFingerprint 必须是字符串。" })
+  @MinLength(1, { message: "deviceFingerprint 不能为空。" })
+  @MaxLength(128, { message: "deviceFingerprint 不能超过 128 个字符。" })
+  deviceFingerprint?: string;
+}
+
 export class CheckoutDto {
   @Transform(trimString)
   @IsString({ message: "planCode 必须是字符串。" })

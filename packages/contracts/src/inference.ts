@@ -178,3 +178,15 @@ export interface RebindModelPersonasResult {
   missingCount: number;
   characters: Character[];
 }
+
+export interface InstallVendorFamilyPersonasRequest {
+  vendors?: string[];
+  forceUpdateExisting?: boolean;
+}
+
+export interface InstallVendorFamilyPersonasResult {
+  installedCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  characters: Character[];
+}

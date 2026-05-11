@@ -3,7 +3,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
 import type {
-// i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CharacterBlueprintRecipe,
   CharacterBlueprintRevision,
   CharacterFactorySnapshot,
@@ -59,47 +58,48 @@ function buildActivityOptions(): Array<{ value: string; label: string }> {
   }));
 }
 
-const FACTORY_TABS = [
-  { key: "ai", label: "AI 辅助" },
-  { key: "identity", label: "身份关系" },
-  { key: "expertise", label: "能力边界" },
-  { key: "tone", label: "语气与场景提示词" },
-  { key: "memory", label: "记忆策略" },
-  { key: "publish", label: "推理发布" },
-  { key: "versions", label: "版本 Diff" },
+const FACTORY_TABS: Array<{ key: string; label: ReturnType<typeof msg> }> = [
+  { key: "ai", label: msg`AI 辅助` },
+  { key: "identity", label: msg`身份关系` },
+  { key: "expertise", label: msg`能力边界` },
+  { key: "tone", label: msg`语气与场景提示词` },
+  { key: "memory", label: msg`记忆策略` },
+  { key: "publish", label: msg`推理发布` },
+  { key: "versions", label: msg`版本 Diff` },
 ];
 
 const SCENE_PROMPT_SECTIONS: Array<{
-  title: string;
+  title: ReturnType<typeof msg>;
   items: Array<{
     key: keyof CharacterBlueprintRecipe["prompting"]["scenePrompts"];
-    label: string;
+    label: ReturnType<typeof msg>;
   }>;
 }> = [
   {
-    title: "底层与聊天",
-    items: [{ key: "chat", label: "聊天场景提示词" }],
+    title: msg`底层与聊天`,
+    items: [{ key: "chat", label: msg`聊天场景提示词` }],
   },
   {
-    title: "主动发布",
+    title: msg`主动发布`,
     items: [
-      { key: "moments_post", label: "发朋友圈" },
-      { key: "feed_post", label: "发 Feed 贴文" },
-      { key: "channel_post", label: "发视频号内容" },
+      { key: "moments_post", label: msg`发朋友圈` },
+      { key: "feed_post", label: msg`发 Feed 贴文` },
+      { key: "channel_post", label: msg`发视频号内容` },
     ],
   },
   {
-    title: "互动响应",
+    title: msg`互动响应`,
     items: [
-      { key: "moments_comment", label: "朋友圈评论 / 回复" },
-      { key: "feed_comment", label: "Feed 评论" },
-      { key: "greeting", label: "好友请求 / 摇一摇问候" },
-      { key: "proactive", label: "主动提醒" },
+      { key: "moments_comment", label: msg`朋友圈评论 / 回复` },
+      { key: "feed_comment", label: msg`Feed 评论` },
+      { key: "greeting", label: msg`好友请求 / 摇一摇问候` },
+      { key: "proactive", label: msg`主动提醒` },
     ],
   },
 ];
 
 export function CharacterFactoryPage() {
+  const t = translateRuntimeMessage;
   const { characterId } = useParams({
     from: "/characters/$characterId/factory",
   });
@@ -220,7 +220,7 @@ export function CharacterFactoryPage() {
   if (factoryQuery.isError && factoryQuery.error instanceof Error) {
     return (
       <AdminErrorState
-        title="角色工厂加载失败"
+        title={t(msg`角色工厂加载失败`)}
         detail={factoryQuery.error.message}
         onRetry={() => factoryQuery.refetch()}
       />
@@ -230,8 +230,8 @@ export function CharacterFactoryPage() {
   if (!factoryQuery.data || !draft) {
     return (
       <AdminErrorState
-        title="角色工厂数据暂不可用"
-        detail="未能从远程获取到工厂快照。"
+        title={t(msg`角色工厂数据暂不可用`)}
+        detail={t(msg`未能从远程获取到工厂快照。`)}
         onRetry={() => factoryQuery.refetch()}
       />
     );
@@ -255,19 +255,19 @@ export function CharacterFactoryPage() {
 
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <AdminPageHero
-          eyebrow="角色工厂"
+          eyebrow={t(msg`角色工厂`)}
           title={snapshot.character.name}
-          description="在这里定义角色配方、查看发布版本、对比草稿差异，并把制造阶段的设定发布到运行时实体。"
+          description={t(msg`在这里定义角色配方、查看发布版本、对比草稿差异，并把制造阶段的设定发布到运行时实体。`)}
           actions={
             <>
               <Link to="/characters">
                 <Button variant="secondary" size="lg">
-                  返回角色中心
+                  {t(msg`返回角色中心`)}
                 </Button>
               </Link>
               <Link to="/characters/$characterId" params={{ characterId }}>
                 <Button variant="secondary" size="lg">
-                  基础资料
+                  {t(msg`基础资料`)}
                 </Button>
               </Link>
               <Button
@@ -278,7 +278,7 @@ export function CharacterFactoryPage() {
                 }
                 disabled={!isDirty}
               >
-                重置草稿
+                {t(msg`重置草稿`)}
               </Button>
               <Button
                 variant="primary"
@@ -286,40 +286,40 @@ export function CharacterFactoryPage() {
                 onClick={() => draft && saveMutation.mutate(draft)}
                 disabled={!isDirty || saveMutation.isPending}
               >
-                {saveMutation.isPending ? "保存中..." : "保存草稿"}
+                {saveMutation.isPending ? t(msg`保存中...`) : t(msg`保存草稿`)}
               </Button>
             </>
           }
           metrics={[
             {
-              label: "来源",
+              label: t(msg`来源`),
               value: formatSourceType(snapshot.blueprint.sourceType),
             },
-            { label: "状态", value: formatStatus(snapshot.blueprint.status) },
+            { label: t(msg`状态`), value: formatStatus(snapshot.blueprint.status) },
             {
-              label: "已发布版本",
+              label: t(msg`已发布版本`),
               value: snapshot.blueprint.publishedVersion || 0,
             },
             {
-              label: "未发布变更",
-              value: snapshot.diffSummary.hasUnpublishedChanges ? "有" : "无",
+              label: t(msg`未发布变更`),
+              value: snapshot.diffSummary.hasUnpublishedChanges ? t(msg`有`) : t(msg`无`),
             },
           ]}
         />
 
         <Card className="bg-[color:var(--surface-console)]">
-          <SectionHeading>当前状态</SectionHeading>
+          <SectionHeading>{t(msg`当前状态`)}</SectionHeading>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <MetricCard label="运行态漂移字段" value={driftFieldCount} />
+            <MetricCard label={t(msg`运行态漂移字段`)} value={driftFieldCount} />
             <MetricCard
-              label="发布将覆盖字段"
+              label={t(msg`发布将覆盖字段`)}
               value={snapshot.publishDiff.changedCount}
             />
             <MetricCard
-              label="草稿变更字段"
+              label={t(msg`草稿变更字段`)}
               value={snapshot.diffSummary.changedFields.length}
             />
-            <MetricCard label="版本记录" value={revisions.length} />
+            <MetricCard label={t(msg`版本记录`)} value={revisions.length} />
           </div>
         </Card>
       </div>
@@ -328,54 +328,53 @@ export function CharacterFactoryPage() {
         tone={digitalHumanSummary.ready ? "success" : "warning"}
         title={
           digitalHumanSummary.ready
-            ? "数字人链路已进入可联调状态"
-            : `数字人当前阻塞：${digitalHumanSummary.statusLabel}`
+            ? t(msg`数字人链路已进入可联调状态`)
+            : t(msg`数字人当前阻塞：${digitalHumanSummary.statusLabel}`)
         }
-        description={`${digitalHumanSummary.description} ${digitalHumanSummary.nextStep}`}
+        description={t(msg`${digitalHumanSummary.description} ${digitalHumanSummary.nextStep}`)}
       />
 
       {saveMutation.isError && saveMutation.error instanceof Error ? (
         <AdminErrorState
-          title="保存草稿失败"
+          title={t(msg`保存草稿失败`)}
           detail={saveMutation.error.message}
           onRetry={() => saveMutation.reset()}
-          retryLabel="清除错误"
+          retryLabel={t(msg`清除错误`)}
         />
       ) : null}
       {publishMutation.isError && publishMutation.error instanceof Error ? (
         <AdminErrorState
-          title="发布到运行时失败"
+          title={t(msg`发布到运行时失败`)}
           detail={publishMutation.error.message}
           onRetry={() => publishMutation.reset()}
-          retryLabel="清除错误"
+          retryLabel={t(msg`清除错误`)}
         />
       ) : null}
       {restoreMutation.isError && restoreMutation.error instanceof Error ? (
         <AdminErrorState
-          title="恢复版本失败"
+          title={t(msg`恢复版本失败`)}
           detail={restoreMutation.error.message}
           onRetry={() => restoreMutation.reset()}
-          retryLabel="清除错误"
+          retryLabel={t(msg`清除错误`)}
         />
       ) : null}
       {aiGenerateMutation.isError &&
       aiGenerateMutation.error instanceof Error ? (
         <AdminErrorState
-          title="AI 生成失败"
+          title={t(msg`AI 生成失败`)}
           detail={aiGenerateMutation.error.message}
           onRetry={() => aiGenerateMutation.reset()}
-          retryLabel="清除错误"
+          retryLabel={t(msg`清除错误`)}
         />
       ) : null}
 
       <InlineNotice tone="muted">
-        工厂页改的是角色配方。只有点击"发布到运行时"后，配方才会映射到当前
-        `Character` 实体并影响真实对话与生活逻辑。
+        {t(msg`工厂页改的是角色配方。只有点击"发布到运行时"后，配方才会映射到当前 \`Character\` 实体并影响真实对话与生活逻辑。`)}
       </InlineNotice>
 
       {/* Tab 导航 */}
       <AdminTabs
-        tabs={FACTORY_TABS}
+        tabs={FACTORY_TABS.map((tab) => ({ ...tab, label: t(tab.label) }))}
         activeKey={activeTab}
         onChange={setActiveTab}
       />
@@ -385,23 +384,23 @@ export function CharacterFactoryPage() {
           {/* Tab: AI 辅助 */}
           {activeTab === "ai" ? (
             <Card className="bg-[color:var(--surface-console)]">
-              <SectionHeading>AI 辅助制造</SectionHeading>
+              <SectionHeading>{t(msg`AI 辅助制造`)}</SectionHeading>
               <InlineNotice className="mt-4" tone="muted">
-                输入一段角色聊天样本后，后台会走人格提取链，把可结构化的语气、口头禅、兴趣、情绪基调和记忆摘要写回工厂草稿。
+                {t(msg`输入一段角色聊天样本后，后台会走人格提取链，把可结构化的语气、口头禅、兴趣、情绪基调和记忆摘要写回工厂草稿。`)}
               </InlineNotice>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <FieldBlock
-                  label="样本人名"
+                  label={t(msg`样本人名`)}
                   value={generationPersonName}
                   onChange={setGenerationPersonName}
-                  placeholder="角色名字"
+                  placeholder={t(msg`角色名字`)}
                 />
               </div>
               <TextAreaBlock
-                label="聊天样本"
+                label={t(msg`聊天样本`)}
                 value={generationSample}
                 onChange={setGenerationSample}
-                placeholder="贴一段足够体现说话风格的聊天样本。"
+                placeholder={t(msg`贴一段足够体现说话风格的聊天样本。`)}
               />
               <div className="mt-4 flex flex-wrap gap-3">
                 <Button
@@ -409,7 +408,7 @@ export function CharacterFactoryPage() {
                   onClick={() => setGenerationSample("")}
                   disabled={!generationSample.trim()}
                 >
-                  清空样本
+                  {t(msg`清空样本`)}
                 </Button>
                 <Button
                   variant="primary"
@@ -419,20 +418,20 @@ export function CharacterFactoryPage() {
                   }
                 >
                   {aiGenerateMutation.isPending
-                    ? "生成中..."
-                    : "生成并写入草稿"}
+                    ? t(msg`生成中...`)
+                    : t(msg`生成并写入草稿`)}
                 </Button>
               </div>
               {snapshot.blueprint.lastAiGeneration ? (
                 <div className="mt-6 space-y-4">
-                  <SectionHeading>最近一次 AI 制造链路</SectionHeading>
+                  <SectionHeading>{t(msg`最近一次 AI 制造链路`)}</SectionHeading>
                   <div className="grid gap-4 md:grid-cols-2">
                     <ValueSnapshot
-                      label="样本人名"
+                      label={t(msg`样本人名`)}
                       value={snapshot.blueprint.lastAiGeneration.personName}
                     />
                     <ValueSnapshot
-                      label="生成时间"
+                      label={t(msg`生成时间`)}
                       value={formatDateTime(
                         snapshot.blueprint.lastAiGeneration.requestedAt,
                       )}
@@ -449,7 +448,7 @@ export function CharacterFactoryPage() {
                   </div>
                   <div>
                     <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                      聊天样本
+                      {t(msg`聊天样本`)}
                     </div>
                     <CodeBlock
                       value={snapshot.blueprint.lastAiGeneration.chatSample}
@@ -457,7 +456,7 @@ export function CharacterFactoryPage() {
                   </div>
                   <div>
                     <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                      提取 Prompt
+                      {t(msg`提取 Prompt`)}
                     </div>
                     <CodeBlock
                       value={snapshot.blueprint.lastAiGeneration.prompt}
@@ -465,7 +464,7 @@ export function CharacterFactoryPage() {
                   </div>
                   <div>
                     <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                      结构化结果
+                      {t(msg`结构化结果`)}
                     </div>
                     <CodeBlock
                       value={JSON.stringify(
@@ -478,7 +477,7 @@ export function CharacterFactoryPage() {
                 </div>
               ) : (
                 <InlineNotice className="mt-4" tone="muted">
-                  当前还没有 AI 辅助制造记录。
+                  {t(msg`当前还没有 AI 辅助制造记录。`)}
                 </InlineNotice>
               )}
             </Card>
@@ -487,10 +486,10 @@ export function CharacterFactoryPage() {
           {/* Tab: 身份关系 */}
           {activeTab === "identity" ? (
             <Card className="bg-[color:var(--surface-console)]">
-              <SectionHeading>身份与关系</SectionHeading>
+              <SectionHeading>{t(msg`身份与关系`)}</SectionHeading>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <FieldBlock
-                  label="名称"
+                  label={t(msg`名称`)}
                   value={draft.identity.name}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -500,7 +499,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <FieldBlock
-                  label="关系描述"
+                  label={t(msg`关系描述`)}
                   value={draft.identity.relationship}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -510,7 +509,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <SelectFieldBlock
-                  label="关系类型"
+                  label={t(msg`关系类型`)}
                   value={draft.identity.relationshipType}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -522,16 +521,16 @@ export function CharacterFactoryPage() {
                     }))
                   }
                   options={[
-                    { value: "family", label: "家人" },
-                    { value: "friend", label: "朋友" },
-                    { value: "expert", label: "专家" },
-                    { value: "mentor", label: "导师" },
-                    { value: "custom", label: "自定义" },
-                    { value: "self", label: "自己" },
+                    { value: "family", label: t(msg`家人`) },
+                    { value: "friend", label: t(msg`朋友`) },
+                    { value: "expert", label: t(msg`专家`) },
+                    { value: "mentor", label: t(msg`导师`) },
+                    { value: "custom", label: t(msg`自定义`) },
+                    { value: "self", label: t(msg`自己`) },
                   ]}
                 />
                 <FieldBlock
-                  label="头像"
+                  label={t(msg`头像`)}
                   value={draft.identity.avatar}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -541,7 +540,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <FieldBlock
-                  label="职业"
+                  label={t(msg`职业`)}
                   value={draft.identity.occupation}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -552,7 +551,7 @@ export function CharacterFactoryPage() {
                 />
               </div>
               <TextAreaBlock
-                label="简介"
+                label={t(msg`简介`)}
                 value={draft.identity.bio}
                 onChange={(value) =>
                   patchDraft((current) => ({
@@ -562,7 +561,7 @@ export function CharacterFactoryPage() {
                 }
               />
               <TextAreaBlock
-                label="背景"
+                label={t(msg`背景`)}
                 value={draft.identity.background}
                 onChange={(value) =>
                   patchDraft((current) => ({
@@ -572,7 +571,7 @@ export function CharacterFactoryPage() {
                 }
               />
               <TextAreaBlock
-                label="核心动机"
+                label={t(msg`核心动机`)}
                 value={draft.identity.motivation}
                 onChange={(value) =>
                   patchDraft((current) => ({
@@ -582,7 +581,7 @@ export function CharacterFactoryPage() {
                 }
               />
               <TextAreaBlock
-                label="世界观"
+                label={t(msg`世界观`)}
                 value={draft.identity.worldview}
                 onChange={(value) =>
                   patchDraft((current) => ({
@@ -597,10 +596,10 @@ export function CharacterFactoryPage() {
           {/* Tab: 能力边界 */}
           {activeTab === "expertise" ? (
             <Card className="bg-[color:var(--surface-console)]">
-              <SectionHeading>能力域与边界</SectionHeading>
+              <SectionHeading>{t(msg`能力域与边界`)}</SectionHeading>
               <div className="mt-4 space-y-4">
                 <FieldBlock
-                  label="擅长领域"
+                  label={t(msg`擅长领域`)}
                   value={listToCsv(draft.expertise.expertDomains)}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -613,7 +612,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <TextAreaBlock
-                  label="专长描述"
+                  label={t(msg`专长描述`)}
                   value={draft.expertise.expertiseDescription}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -626,7 +625,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <TextAreaBlock
-                  label="知识边界"
+                  label={t(msg`知识边界`)}
                   value={draft.expertise.knowledgeLimits}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -639,7 +638,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <TextAreaBlock
-                  label="超界拒绝方式"
+                  label={t(msg`超界拒绝方式`)}
                   value={draft.expertise.refusalStyle}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -655,11 +654,11 @@ export function CharacterFactoryPage() {
           {/* Tab: 语气行为 */}
           {activeTab === "tone" ? (
             <Card className="bg-[color:var(--surface-console)]">
-              <SectionHeading>语气、底层逻辑与场景提示词</SectionHeading>
+              <SectionHeading>{t(msg`语气、底层逻辑与场景提示词`)}</SectionHeading>
               <div className="mt-4 space-y-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <FieldBlock
-                    label="情绪基调"
+                    label={t(msg`情绪基调`)}
                     value={draft.tone.emotionalTone}
                     onChange={(value) =>
                       patchDraft((current) => ({
@@ -669,7 +668,7 @@ export function CharacterFactoryPage() {
                     }
                   />
                   <SelectFieldBlock
-                    label="回复长度"
+                    label={t(msg`回复长度`)}
                     value={draft.tone.responseLength}
                     onChange={(value) =>
                       patchDraft((current) => ({
@@ -682,13 +681,13 @@ export function CharacterFactoryPage() {
                       }))
                     }
                     options={[
-                      { value: "short", label: "简短" },
-                      { value: "medium", label: "适中" },
-                      { value: "long", label: "详细" },
+                      { value: "short", label: t(msg`简短`) },
+                      { value: "medium", label: t(msg`适中`) },
+                      { value: "long", label: t(msg`详细`) },
                     ]}
                   />
                   <SelectFieldBlock
-                    label="表情使用"
+                    label={t(msg`表情使用`)}
                     value={draft.tone.emojiUsage}
                     onChange={(value) =>
                       patchDraft((current) => ({
@@ -701,13 +700,13 @@ export function CharacterFactoryPage() {
                       }))
                     }
                     options={[
-                      { value: "none", label: "不用" },
-                      { value: "occasional", label: "偶尔" },
-                      { value: "frequent", label: "频繁" },
+                      { value: "none", label: t(msg`不用`) },
+                      { value: "occasional", label: t(msg`偶尔`) },
+                      { value: "frequent", label: t(msg`频繁`) },
                     ]}
                   />
                   <FieldBlock
-                    label="工作风格"
+                    label={t(msg`工作风格`)}
                     value={draft.tone.workStyle}
                     onChange={(value) =>
                       patchDraft((current) => ({
@@ -717,7 +716,7 @@ export function CharacterFactoryPage() {
                     }
                   />
                   <FieldBlock
-                    label="社交风格"
+                    label={t(msg`社交风格`)}
                     value={draft.tone.socialStyle}
                     onChange={(value) =>
                       patchDraft((current) => ({
@@ -728,7 +727,7 @@ export function CharacterFactoryPage() {
                   />
                 </div>
                 <FieldBlock
-                  label="说话习惯"
+                  label={t(msg`说话习惯`)}
                   value={listToCsv(draft.tone.speechPatterns)}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -741,7 +740,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <FieldBlock
-                  label="口头禅"
+                  label={t(msg`口头禅`)}
                   value={listToCsv(draft.tone.catchphrases)}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -751,7 +750,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <FieldBlock
-                  label="兴趣话题"
+                  label={t(msg`兴趣话题`)}
                   value={listToCsv(draft.tone.topicsOfInterest)}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -764,7 +763,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <FieldBlock
-                  label="语言禁忌"
+                  label={t(msg`语言禁忌`)}
                   value={listToCsv(draft.tone.taboos)}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -774,7 +773,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <FieldBlock
-                  label="个人癖好"
+                  label={t(msg`个人癖好`)}
                   value={listToCsv(draft.tone.quirks)}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -786,14 +785,13 @@ export function CharacterFactoryPage() {
               </div>
               <div className="mt-6 border-t border-[color:var(--border-faint)] pt-5 space-y-6">
                 <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                  新提示词架构
+                  {t(msg`新提示词架构`)}
                 </div>
                 <InlineNotice tone="muted">
-                  角色工厂现在优先维护 `coreLogic +
-                  scenePrompts`。这些字段会直接进入真实回复、发帖、评论和主动提醒链路。
+                  {t(msg`角色工厂现在优先维护 \`coreLogic + scenePrompts\`。这些字段会直接进入真实回复、发帖、评论和主动提醒链路。`)}
                 </InlineNotice>
                 <TextAreaBlock
-                  label="底层逻辑"
+                  label={t(msg`底层逻辑`)}
                   value={draft.prompting.coreLogic}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -803,14 +801,14 @@ export function CharacterFactoryPage() {
                   }
                 />
                 {SCENE_PROMPT_SECTIONS.map((section) => (
-                  <div key={section.title} className="space-y-4">
+                  <div key={section.title.id} className="space-y-4">
                     <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                      {section.title}
+                      {t(section.title)}
                     </div>
                     {section.items.map((item) => (
                       <TextAreaBlock
                         key={item.key}
-                        label={item.label}
+                        label={t(item.label)}
                         value={draft.prompting.scenePrompts[item.key]}
                         onChange={(value) =>
                           patchDraft((current) => ({
@@ -830,13 +828,13 @@ export function CharacterFactoryPage() {
                 ))}
                 <div className="space-y-4 border-t border-[color:var(--border-faint)] pt-5">
                   <div className="text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                    兼容字段
+                    {t(msg`兼容字段`)}
                   </div>
                   <InlineNotice tone="muted">
-                    以下字段仅用于兼容旧角色和旧提示词链路。新角色默认以新提示词架构为主。
+                    {t(msg`以下字段仅用于兼容旧角色和旧提示词链路。新角色默认以新提示词架构为主。`)}
                   </InlineNotice>
                   <TextAreaBlock
-                    label="行动纲领（兼容）"
+                    label={t(msg`行动纲领（兼容）`)}
                     value={draft.tone.coreDirective ?? ""}
                     onChange={(value) =>
                       patchDraft((current) => ({
@@ -846,7 +844,7 @@ export function CharacterFactoryPage() {
                     }
                   />
                   <TextAreaBlock
-                    label="基础提示词（兼容）"
+                    label={t(msg`基础提示词（兼容）`)}
                     value={draft.tone.basePrompt}
                     onChange={(value) =>
                       patchDraft((current) => ({
@@ -856,7 +854,7 @@ export function CharacterFactoryPage() {
                     }
                   />
                   <TextAreaBlock
-                    label="系统提示词（兼容）"
+                    label={t(msg`系统提示词（兼容）`)}
                     value={draft.tone.systemPrompt}
                     onChange={(value) =>
                       patchDraft((current) => ({
@@ -873,10 +871,10 @@ export function CharacterFactoryPage() {
           {/* Tab: 记忆策略 */}
           {activeTab === "memory" ? (
             <Card className="bg-[color:var(--surface-console)]">
-              <SectionHeading>记忆底稿与生活策略</SectionHeading>
+              <SectionHeading>{t(msg`记忆底稿与生活策略`)}</SectionHeading>
               <div className="mt-4 space-y-4">
                 <TextAreaBlock
-                  label="记忆摘要"
+                  label={t(msg`记忆摘要`)}
                   value={draft.memorySeed.memorySummary}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -889,7 +887,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <TextAreaBlock
-                  label="核心记忆"
+                  label={t(msg`核心记忆`)}
                   value={draft.memorySeed.coreMemory}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -899,7 +897,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <TextAreaBlock
-                  label="近期摘要初始值"
+                  label={t(msg`近期摘要初始值`)}
                   value={draft.memorySeed.recentSummarySeed}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -912,7 +910,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <TextAreaBlock
-                  label="近期摘要提取提示词"
+                  label={t(msg`近期摘要提取提示词`)}
                   value={draft.memorySeed.recentSummaryPrompt}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -925,7 +923,7 @@ export function CharacterFactoryPage() {
                   }
                 />
                 <TextAreaBlock
-                  label="核心记忆提取提示词"
+                  label={t(msg`核心记忆提取提示词`)}
                   value={draft.memorySeed.coreMemoryPrompt}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -939,7 +937,7 @@ export function CharacterFactoryPage() {
                 />
                 <div className="grid gap-4 md:grid-cols-2">
                   <FieldBlock
-                    label="遗忘曲线"
+                    label={t(msg`遗忘曲线`)}
                     value={draft.memorySeed.forgettingCurve}
                     type="number"
                     min={0}
@@ -958,7 +956,7 @@ export function CharacterFactoryPage() {
                     }
                   />
                   <SelectFieldBlock
-                    label="活动频率"
+                    label={t(msg`活动频率`)}
                     value={draft.lifeStrategy.activityFrequency}
                     onChange={(value) =>
                       patchDraft((current) => ({
@@ -970,13 +968,13 @@ export function CharacterFactoryPage() {
                       }))
                     }
                     options={[
-                      { value: "high", label: "高频" },
-                      { value: "normal", label: "中频" },
-                      { value: "low", label: "低频" },
+                      { value: "high", label: t(msg`高频`) },
+                      { value: "normal", label: t(msg`中频`) },
+                      { value: "low", label: t(msg`低频`) },
                     ]}
                   />
                   <FieldBlock
-                    label="朋友圈频率"
+                    label={t(msg`朋友圈频率`)}
                     value={draft.lifeStrategy.momentsFrequency}
                     type="number"
                     min={0}
@@ -994,7 +992,7 @@ export function CharacterFactoryPage() {
                     }
                   />
                   <FieldBlock
-                    label="视频号频率"
+                    label={t(msg`视频号频率`)}
                     value={draft.lifeStrategy.feedFrequency}
                     type="number"
                     min={0}
@@ -1012,7 +1010,7 @@ export function CharacterFactoryPage() {
                     }
                   />
                   <FieldBlock
-                    label="活跃开始小时"
+                    label={t(msg`活跃开始小时`)}
                     value={draft.lifeStrategy.activeHoursStart ?? ""}
                     type="number"
                     min={0}
@@ -1028,7 +1026,7 @@ export function CharacterFactoryPage() {
                     }
                   />
                   <FieldBlock
-                    label="活跃结束小时"
+                    label={t(msg`活跃结束小时`)}
                     value={draft.lifeStrategy.activeHoursEnd ?? ""}
                     type="number"
                     min={0}
@@ -1045,7 +1043,7 @@ export function CharacterFactoryPage() {
                   />
                 </div>
                 <FieldBlock
-                  label="触发场景"
+                  label={t(msg`触发场景`)}
                   value={listToCsv(draft.lifeStrategy.triggerScenes)}
                   onChange={(value) =>
                     patchDraft((current) => ({
@@ -1065,13 +1063,13 @@ export function CharacterFactoryPage() {
           {activeTab === "publish" ? (
             <div className="space-y-6">
               <Card className="bg-[color:var(--surface-console)]">
-                <SectionHeading>推理与路由</SectionHeading>
+                <SectionHeading>{t(msg`推理与路由`)}</SectionHeading>
                 <InlineNotice className="mt-4" tone="muted">
-                  这里定义发布后角色默认带上的推理开关，而不是运行时临时覆盖值。
+                  {t(msg`这里定义发布后角色默认带上的推理开关，而不是运行时临时覆盖值。`)}
                 </InlineNotice>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <ToggleChip
-                    label="启用链路推理"
+                    label={t(msg`启用链路推理`)}
                     checked={draft.reasoning.enableCoT}
                     onChange={(event) =>
                       patchDraft((current) => ({
@@ -1084,7 +1082,7 @@ export function CharacterFactoryPage() {
                     }
                   />
                   <ToggleChip
-                    label="启用反思"
+                    label={t(msg`启用反思`)}
                     checked={draft.reasoning.enableReflection}
                     onChange={(event) =>
                       patchDraft((current) => ({
@@ -1097,7 +1095,7 @@ export function CharacterFactoryPage() {
                     }
                   />
                   <ToggleChip
-                    label="启用路由"
+                    label={t(msg`启用路由`)}
                     checked={draft.reasoning.enableRouting}
                     onChange={(event) =>
                       patchDraft((current) => ({
@@ -1113,10 +1111,10 @@ export function CharacterFactoryPage() {
               </Card>
 
               <Card className="bg-[color:var(--surface-console)]">
-                <SectionHeading>发布映射</SectionHeading>
+                <SectionHeading>{t(msg`发布映射`)}</SectionHeading>
                 <div className="mt-4 grid gap-4 md:grid-cols-2">
                   <SelectFieldBlock
-                    label="在线模式默认值"
+                    label={t(msg`在线模式默认值`)}
                     value={draft.publishMapping.onlineModeDefault}
                     onChange={(value) =>
                       patchDraft((current) => ({
@@ -1129,12 +1127,12 @@ export function CharacterFactoryPage() {
                       }))
                     }
                     options={[
-                      { value: "auto", label: "自动调度" },
-                      { value: "manual", label: "人工锁定" },
+                      { value: "auto", label: t(msg`自动调度`) },
+                      { value: "manual", label: t(msg`人工锁定`) },
                     ]}
                   />
                   <SelectFieldBlock
-                    label="活动模式默认值"
+                    label={t(msg`活动模式默认值`)}
                     value={draft.publishMapping.activityModeDefault}
                     onChange={(value) =>
                       patchDraft((current) => ({
@@ -1147,18 +1145,18 @@ export function CharacterFactoryPage() {
                       }))
                     }
                     options={[
-                      { value: "auto", label: "自动调度" },
-                      { value: "manual", label: "人工锁定" },
+                      { value: "auto", label: t(msg`自动调度`) },
+                      { value: "manual", label: t(msg`人工锁定`) },
                     ]}
                   />
                   <FieldBlock
-                    label="初始在线状态"
-                    value={draft.publishMapping.initialOnline ? "在线" : "离线"}
+                    label={t(msg`初始在线状态`)}
+                    value={draft.publishMapping.initialOnline ? t(msg`在线`) : t(msg`离线`)}
                     disabled
                     onChange={() => undefined}
                   />
                   <SelectFieldBlock
-                    label="初始活动"
+                    label={t(msg`初始活动`)}
                     value={draft.publishMapping.initialActivity ?? ""}
                     onChange={(value) =>
                       patchDraft((current) => ({
@@ -1174,7 +1172,7 @@ export function CharacterFactoryPage() {
                 </div>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <ToggleChip
-                    label="作为模板发布"
+                    label={t(msg`作为模板发布`)}
                     checked={draft.publishMapping.isTemplate}
                     onChange={(event) =>
                       patchDraft((current) => ({
@@ -1187,7 +1185,7 @@ export function CharacterFactoryPage() {
                     }
                   />
                   <ToggleChip
-                    label="发布后初始在线"
+                    label={t(msg`发布后初始在线`)}
                     checked={draft.publishMapping.initialOnline}
                     onChange={(event) =>
                       patchDraft((current) => ({
@@ -1208,7 +1206,7 @@ export function CharacterFactoryPage() {
           {activeTab === "versions" ? (
             <div className="space-y-6">
               <Card className="bg-[color:var(--surface-console)]">
-                <SectionHeading>草稿差异</SectionHeading>
+                <SectionHeading>{t(msg`草稿差异`)}</SectionHeading>
                 {snapshot.diffSummary.changedFields.length ? (
                   <div className="mt-4 flex flex-wrap gap-2">
                     {snapshot.diffSummary.changedFields.map((field) => (
@@ -1221,21 +1219,20 @@ export function CharacterFactoryPage() {
                   <AdminActionFeedback
                     className="mt-4"
                     tone="success"
-                    title="当前草稿已同步"
-                    description="当前草稿与已发布版本一致。"
+                    title={t(msg`当前草稿已同步`)}
+                    description={t(msg`当前草稿与已发布版本一致。`)}
                   />
                 )}
               </Card>
 
               <div className="grid gap-6 xl:grid-cols-2">
                 <Card className="bg-[color:var(--surface-console)]">
-                  <SectionHeading>字段来源</SectionHeading>
+                  <SectionHeading>{t(msg`字段来源`)}</SectionHeading>
                   <InlineNotice
                     className="mt-4"
                     tone={driftFieldCount > 0 ? "warning" : "muted"}
                   >
-                    这里展示运行时 `Character`
-                    字段来自哪个配方字段，以及当前运行态是否已经偏离上次发布结果。
+                    {t(msg`这里展示运行时 \`Character\` 字段来自哪个配方字段，以及当前运行态是否已经偏离上次发布结果。`)}
                   </InlineNotice>
                   <div className="mt-4 space-y-3">
                     {snapshot.fieldSources.map((item) => (
@@ -1264,15 +1261,15 @@ export function CharacterFactoryPage() {
                         details={
                           <div className="grid gap-3 md:grid-cols-3">
                             <ValueSnapshot
-                              label="运行时"
+                              label={t(msg`运行时`)}
                               value={item.runtimeValue}
                             />
                             <ValueSnapshot
-                              label="已发布"
+                              label={t(msg`已发布`)}
                               value={item.publishedValue}
                             />
                             <ValueSnapshot
-                              label="草稿"
+                              label={t(msg`草稿`)}
                               value={item.draftValue}
                             />
                           </div>
@@ -1283,14 +1280,14 @@ export function CharacterFactoryPage() {
                 </Card>
 
                 <Card className="bg-[color:var(--surface-console)]">
-                  <SectionHeading>发布映射 Diff</SectionHeading>
+                  <SectionHeading>{t(msg`发布映射 Diff`)}</SectionHeading>
                   <InlineNotice
                     className="mt-4"
                     tone={changedPublishItems.length ? "warning" : "success"}
                   >
                     {changedPublishItems.length
-                      ? `当前草稿一旦发布，会覆盖 ${changedPublishItems.length} 个运行时字段。`
-                      : "当前运行时与草稿发布结果一致，发布不会改动角色实体。"}
+                      ? t(msg`当前草稿一旦发布，会覆盖 ${changedPublishItems.length} 个运行时字段。`)
+                      : t(msg`当前运行时与草稿发布结果一致，发布不会改动角色实体。`)}
                   </InlineNotice>
                   <div className="mt-4 space-y-3">
                     {changedPublishItems.map((item) => (
@@ -1298,7 +1295,7 @@ export function CharacterFactoryPage() {
                         key={`${item.targetField}-${item.recipeField}`}
                         title={item.label}
                         badges={
-                          <StatusPill tone="warning">发布后变更</StatusPill>
+                          <StatusPill tone="warning">{t(msg`发布后变更`)}</StatusPill>
                         }
                         meta={
                           <>
@@ -1308,11 +1305,11 @@ export function CharacterFactoryPage() {
                         details={
                           <div className="grid gap-3 md:grid-cols-2">
                             <ValueSnapshot
-                              label="当前运行时"
+                              label={t(msg`当前运行时`)}
                               value={item.currentValue}
                             />
                             <ValueSnapshot
-                              label="发布后"
+                              label={t(msg`发布后`)}
                               value={item.nextValue}
                             />
                           </div>
@@ -1320,15 +1317,12 @@ export function CharacterFactoryPage() {
                       />
                     ))}
                     {changedPublishItems.length === 0 ? (
-                      <AdminPanelEmpty message="当前没有需要覆盖的运行态字段。" />
+                      <AdminPanelEmpty message={t(msg`当前没有需要覆盖的运行态字段。`)} />
                     ) : null}
                     {snapshot.publishDiff.items.length >
                     changedPublishItems.length ? (
                       <div className="text-sm text-[color:var(--text-muted)]">
-                        其余{" "}
-                        {snapshot.publishDiff.items.length -
-                          changedPublishItems.length}{" "}
-                        个字段发布后保持不变。
+                        {t(msg`其余 ${snapshot.publishDiff.items.length - changedPublishItems.length} 个字段发布后保持不变。`)}
                       </div>
                     ) : null}
                   </div>
@@ -1336,7 +1330,7 @@ export function CharacterFactoryPage() {
               </div>
 
               <Card className="bg-[color:var(--surface-console)]">
-                <SectionHeading>版本记录</SectionHeading>
+                <SectionHeading>{t(msg`版本记录`)}</SectionHeading>
                 {revisionsQuery.isLoading ? (
                   <AdminSkeletonCard className="mt-4" rows={3} />
                 ) : null}
@@ -1344,7 +1338,7 @@ export function CharacterFactoryPage() {
                 revisionsQuery.error instanceof Error ? (
                   <AdminErrorState
                     className="mt-4"
-                    title="加载版本失败"
+                    title={t(msg`加载版本失败`)}
                     detail={revisionsQuery.error.message}
                     onRetry={() => revisionsQuery.refetch()}
                   />
@@ -1353,7 +1347,7 @@ export function CharacterFactoryPage() {
                   {revisions.map((revision) => (
                     <AdminRecordCard
                       key={revision.id}
-                      title={revision.summary?.trim() || "无发布说明"}
+                      title={revision.summary?.trim() || t(msg`无发布说明`)}
                       badges={
                         <>
                           <StatusPill tone="muted">
@@ -1377,8 +1371,8 @@ export function CharacterFactoryPage() {
                         >
                           {restoreMutation.isPending &&
                           restoreMutation.variables === revision.id
-                            ? "恢复中..."
-                            : "恢复到草稿"}
+                            ? t(msg`恢复中...`)
+                            : t(msg`恢复到草稿`)}
                         </Button>
                       }
                     />
@@ -1387,7 +1381,7 @@ export function CharacterFactoryPage() {
               </Card>
 
               <Card className="bg-[color:var(--surface-console)]">
-                <SectionHeading>已发布快照</SectionHeading>
+                <SectionHeading>{t(msg`已发布快照`)}</SectionHeading>
                 <CodeBlock
                   className="mt-4"
                   value={JSON.stringify(
@@ -1405,26 +1399,26 @@ export function CharacterFactoryPage() {
         <div className="space-y-6 xl:sticky xl:top-24 xl:self-start">
           <Card className="bg-[color:var(--surface-console)]">
             <AdminSectionHeader
-              title="发布操作"
+              title={t(msg`发布操作`)}
               actions={
                 <StatusPill
                   tone={publishMutation.isPending ? "warning" : "muted"}
                 >
-                  {publishMutation.isPending ? "发布中" : "等待发布"}
+                  {publishMutation.isPending ? t(msg`发布中`) : t(msg`等待发布`)}
                 </StatusPill>
               }
             />
             <TextAreaBlock
-              label="发布说明"
+              label={t(msg`发布说明`)}
               value={publishSummary}
-              placeholder="这次发布改了什么"
+              placeholder={t(msg`这次发布改了什么`)}
               onChange={setPublishSummary}
             />
             {publishMutation.isSuccess ? (
               <AdminActionFeedback
                 tone="success"
-                title="草稿已发布"
-                description="运行时实体已经更新为最新草稿。"
+                title={t(msg`草稿已发布`)}
+                description={t(msg`运行时实体已经更新为最新草稿。`)}
               />
             ) : null}
             <div className="mt-4 flex flex-wrap gap-3">
@@ -1433,22 +1427,22 @@ export function CharacterFactoryPage() {
                 onClick={() => publishMutation.mutate()}
                 disabled={publishMutation.isPending}
               >
-                {publishMutation.isPending ? "发布中..." : "发布到运行时"}
+                {publishMutation.isPending ? t(msg`发布中...`) : t(msg`发布到运行时`)}
               </Button>
             </div>
           </Card>
 
           <AdminInfoRows
-            title="运营提示"
+            title={t(msg`运营提示`)}
             rows={[
-              { label: "草稿状态", value: isDirty ? "有未保存变更" : "已同步" },
+              { label: t(msg`草稿状态`), value: isDirty ? t(msg`有未保存变更`) : t(msg`已同步`) },
               {
-                label: "发布状态",
+                label: t(msg`发布状态`),
                 value: snapshot.diffSummary.hasUnpublishedChanges
-                  ? "待发布"
-                  : "已发布同步",
+                  ? t(msg`待发布`)
+                  : t(msg`已发布同步`),
               },
-              { label: "建议流程", value: "先改草稿，再看 Diff，最后发布" },
+              { label: t(msg`建议流程`), value: t(msg`先改草稿，再看 Diff，最后发布`) },
             ]}
           />
         </div>
@@ -1487,45 +1481,48 @@ function parseOptionalHour(value: string) {
 function formatSourceType(
   value: CharacterFactorySnapshot["blueprint"]["sourceType"],
 ) {
+  const t = translateRuntimeMessage;
   switch (value) {
     case "default_seed":
-      return "内置默认角色";
+      return t(msg`内置默认角色`);
     case "preset_catalog":
-      return "预设目录角色";
+      return t(msg`预设目录角色`);
     case "manual_admin":
-      return "后台手工角色";
+      return t(msg`后台手工角色`);
     case "template_clone":
-      return "模板克隆";
+      return t(msg`模板克隆`);
     case "ai_generated":
-      return "AI 生成";
+      return t(msg`AI 生成`);
     default:
       return value;
   }
 }
 
 function formatStatus(value: CharacterFactorySnapshot["blueprint"]["status"]) {
+  const t = translateRuntimeMessage;
   switch (value) {
     case "draft":
-      return "草稿";
+      return t(msg`草稿`);
     case "published":
-      return "已发布";
+      return t(msg`已发布`);
     case "archived":
-      return "已归档";
+      return t(msg`已归档`);
     default:
       return value;
   }
 }
 
 function formatChangeSource(value: CharacterBlueprintRevision["changeSource"]) {
+  const t = translateRuntimeMessage;
   switch (value) {
     case "publish":
-      return "发布";
+      return t(msg`发布`);
     case "restore":
-      return "恢复";
+      return t(msg`恢复`);
     case "seed_backfill":
-      return "回填";
+      return t(msg`回填`);
     case "manual_snapshot":
-      return "手工快照";
+      return t(msg`手工快照`);
     default:
       return value;
   }
@@ -1534,13 +1531,14 @@ function formatChangeSource(value: CharacterBlueprintRevision["changeSource"]) {
 function formatFieldSourceStatus(
   value: CharacterFactorySnapshot["fieldSources"][number]["status"],
 ) {
+  const t = translateRuntimeMessage;
   switch (value) {
     case "draft_only":
-      return "仅草稿";
+      return t(msg`仅草稿`);
     case "published_sync":
-      return "已发布同步";
+      return t(msg`已发布同步`);
     case "runtime_drift":
-      return "运行态漂移";
+      return t(msg`运行态漂移`);
     default:
       return value;
   }
@@ -1558,4 +1556,3 @@ function formatDateTime(value?: string | null) {
     "notSet",
   );
 }
-// i18n-ignore-end

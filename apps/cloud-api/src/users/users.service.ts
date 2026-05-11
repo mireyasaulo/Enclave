@@ -10,6 +10,10 @@ import type {
 } from "@yinjie/contracts";
 import { Between, Brackets, In, Repository } from "typeorm";
 import { EmailAuthService } from "../auth/email-auth.service";
+import {
+  GoogleAuthService,
+  type GoogleVerifiedProfile,
+} from "../auth/google-auth.service";
 import { PhoneAuthService } from "../auth/phone-auth.service";
 import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { CloudWorldEntity } from "../entities/cloud-world.entity";
@@ -44,6 +48,7 @@ export class UsersService implements OnModuleInit {
     private readonly invite: InviteService,
     private readonly phoneAuth: PhoneAuthService,
     private readonly emailAuth: EmailAuthService,
+    private readonly googleAuth: GoogleAuthService,
   ) {}
 
   onModuleInit() {
@@ -73,6 +78,14 @@ export class UsersService implements OnModuleInit {
           `ensureUserByEmail hook failed for email=${email}: ${(error as Error).message}`,
         );
       }
+    });
+
+    this.googleAuth.registerPostVerifyHook(async (profile, synthPhone, extras) => {
+      return this.ensureUserByGoogle(profile, synthPhone, {
+        inviteCode: extras.inviteCode ?? null,
+        ip: extras.ip ?? null,
+        deviceFingerprint: extras.deviceFingerprint ?? null,
+      });
     });
   }
 
@@ -217,6 +230,26 @@ export class UsersService implements OnModuleInit {
       }
     }
 
+    return user;
+  }
+
+  async ensureUserByGoogle(
+    profile: GoogleVerifiedProfile,
+    synthPhone: string,
+    context: EnsureUserContext = {},
+  ) {
+    const user = await this.ensureUserByEmail(profile.email, synthPhone, context);
+    if (profile.displayName && !user.displayName) {
+      user.displayName = profile.displayName;
+      await this.userRepo.save(user);
+    }
+    try {
+      await this.googleAuth.upsertIdentity(user.id, profile);
+    } catch (error) {
+      this.logger.warn(
+        `upsertGoogleIdentity failed for user=${user.id}: ${(error as Error).message}`,
+      );
+    }
     return user;
   }
 

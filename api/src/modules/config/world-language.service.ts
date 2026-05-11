@@ -136,9 +136,221 @@ export class WorldLanguageService {
     return FINAL_LANGUAGE_REMINDERS[await this.getLanguage()];
   }
 
+  /**
+   * 朋友圈/广场/视频号场景里 NPC 给「来自现场观察 → 用一句话点评一下」的任务描述模板。
+   * 本地化的目的：让用户消息里的元指令和 world_language 一致，避免「中文模板 + 英文回复要求」
+   * 这种内部冲突让模型语言选择不稳定。
+   */
+  async formatPostCommentTask(input: {
+    authorName: string;
+    summary: string;
+    surface: 'moments' | 'feed' | 'channels';
+  }): Promise<string> {
+    const language = await this.getLanguage();
+    const { authorName, summary, surface } = input;
+    const surfaceLabel = ((): string => {
+      switch (language) {
+        case 'en-US':
+          return surface === 'moments'
+            ? 'Moments'
+            : surface === 'channels'
+              ? 'Channels'
+              : 'Square';
+        case 'ja-JP':
+          return surface === 'moments'
+            ? 'モーメンツ'
+            : surface === 'channels'
+              ? '動画チャンネル'
+              : '広場';
+        case 'ko-KR':
+          return surface === 'moments'
+            ? '모먼트'
+            : surface === 'channels'
+              ? '비디오 채널'
+              : '광장';
+        case 'zh-CN':
+        default:
+          return surface === 'moments'
+            ? '朋友圈'
+            : surface === 'channels'
+              ? '视频号'
+              : '广场';
+      }
+    })();
+    switch (language) {
+      case 'en-US':
+        return `${authorName} just posted on ${surfaceLabel}: ${summary}. Drop a natural one-line comment, under 20 words.`;
+      case 'ja-JP':
+        return `${authorName}が${surfaceLabel}に投稿しました：${summary}。一行で自然にコメントしてください（20文字以内）。`;
+      case 'ko-KR':
+        return `${authorName}님이 ${surfaceLabel}에 글을 올렸어요: ${summary}. 한 줄로 자연스럽게 댓글을 달아주세요(20자 이내).`;
+      case 'zh-CN':
+      default:
+        return `${authorName}在${surfaceLabel}发了一条动态：${summary}。用一句话自然地评论一下，不超过20字。`;
+    }
+  }
+
+  /**
+   * 调度器主动提醒前的"是否要发"判断任务。今日日期 + 不需要发就回 noActionToken。
+   */
+  async formatProactiveReminderJudgmentTask(input: {
+    today: string;
+    noActionToken: string;
+  }): Promise<string> {
+    const language = await this.getLanguage();
+    const { today, noActionToken } = input;
+    switch (language) {
+      case 'en-US':
+        return `Today is ${today}. Based on your memory, decide whether you should proactively send the user a message. If you should not, reply with only: ${noActionToken}`;
+      case 'ja-JP':
+        return `今日は${today}です。あなたの記憶を踏まえて、ユーザーに自発的にメッセージを送るべきか判断してください。送る必要がなければ、${noActionToken} とだけ返してください。`;
+      case 'ko-KR':
+        return `오늘은 ${today}입니다. 당신의 기억을 토대로, 사용자에게 먼저 메시지를 보내야 할지 판단하세요. 보낼 필요가 없으면 ${noActionToken} 만 답하세요.`;
+      case 'zh-CN':
+      default:
+        return `今天是${today}，结合你的记忆，请判断是否需要主动向用户发送消息。如果不需要，只回复：${noActionToken}`;
+    }
+  }
+
+  /**
+   * 触发好友申请时，让 NPC 写一句"开场白"的任务描述。
+   */
+  async formatFriendRequestGreetingTask(scene: string): Promise<string> {
+    const language = await this.getLanguage();
+    switch (language) {
+      case 'en-US':
+        return `You just ran into the user during ${scene}. Now write the first message of your friend request — like a real person dropping a casual opener, not a polite intro card. No stage directions, under 20 words.`;
+      case 'ja-JP':
+        return `あなたは${scene}でユーザーと出会ったばかりです。これから友だち申請の最初の一言を送ります。本人がそのまま打つような自然な一言で、丁寧すぎず、自己紹介カードのようにせず、括弧の動作描写は使わず、20文字以内で書いてください。`;
+      case 'ko-KR':
+        return `당신은 방금 ${scene}에서 사용자를 만났어요. 이제 친구 신청의 첫 한마디를 보내야 해요. 사람이 자연스럽게 보내는 첫 메시지처럼, 너무 격식 차리지 않고, 자기소개 명함처럼도 쓰지 말고, 괄호 안 동작 묘사 없이, 20자 이내로 써주세요.`;
+      case 'zh-CN':
+      default:
+        return `你刚在${scene}遇到用户，现在要发一条好友申请开场白。像真人顺手发出的第一句话，别太客气，别写成自我介绍名片，不要用括号动作，20字以内。`;
+    }
+  }
+
+  /**
+   * 摇一摇随机相遇时让 NPC 发出的开场白任务描述。
+   */
+  async formatShakeGreetingTask(): Promise<string> {
+    const language = await this.getLanguage();
+    switch (language) {
+      case 'en-US':
+        return `You just ran into the user by chance. Send a very short opener, like a real person picking up the conversation naturally. Don't be over-polite, no stage directions, under 20 words.`;
+      case 'ja-JP':
+        return `あなたはユーザーと偶然出会ったばかりです。とても短い最初の一言を送ってください。本人がさらっと続ける感じで、丁寧すぎず、括弧の動作描写は使わず、20文字以内で。`;
+      case 'ko-KR':
+        return `당신은 방금 사용자와 우연히 마주쳤어요. 아주 짧은 첫인사를 보내세요. 사람이 자연스럽게 이어가듯, 너무 격식 차리지 않고, 괄호 안 동작 묘사 없이, 20자 이내로.`;
+      case 'zh-CN':
+      default:
+        return `你刚和用户随机相遇，现在发一句很短的开场白。像真人随手接上的第一句话，自然一点，别太客气，不要用括号动作，20字以内。`;
+    }
+  }
+
+  /**
+   * 朋友圈被评论后，让贴主或围观角色去回评的任务描述模板。
+   */
+  async formatPostCommentReplyTask(input: {
+    postAuthorName: string;
+    sourceCommenterName: string;
+    sourceCommentText: string;
+    summary: string;
+    isPostAuthor: boolean;
+  }): Promise<string> {
+    const language = await this.getLanguage();
+    const {
+      postAuthorName,
+      sourceCommenterName,
+      sourceCommentText,
+      summary,
+      isPostAuthor,
+    } = input;
+    switch (language) {
+      case 'en-US':
+        return isPostAuthor
+          ? `${sourceCommenterName} commented on your Moments post: "${sourceCommentText}". Your post said: ${summary}. Reply briefly, under 20 words.`
+          : `You're scrolling and see ${postAuthorName}'s Moments post: ${summary}. ${sourceCommenterName} commented: "${sourceCommentText}". Jump in with a brief reply, under 20 words.`;
+      case 'ja-JP':
+        return isPostAuthor
+          ? `${sourceCommenterName}があなたのモーメンツに「${sourceCommentText}」とコメントしました。投稿内容：${summary}。短く返信してください（20文字以内）。`
+          : `あなたは${postAuthorName}のモーメンツを見ています：${summary}。${sourceCommenterName}が「${sourceCommentText}」とコメント。あなたも短く割り込んで返信してください（20文字以内）。`;
+      case 'ko-KR':
+        return isPostAuthor
+          ? `${sourceCommenterName}님이 당신의 모먼트에 "${sourceCommentText}"라고 댓글을 달았어요. 글 내용: ${summary}. 짧게 답글을 달아주세요(20자 이내).`
+          : `${postAuthorName}님의 모먼트를 보고 있어요: ${summary}. ${sourceCommenterName}님이 "${sourceCommentText}"라고 댓글을 달았네요. 끼어들어 짧게 답해 보세요(20자 이내).`;
+      case 'zh-CN':
+      default:
+        return isPostAuthor
+          ? `${sourceCommenterName}在你的朋友圈评论了："${sourceCommentText}"，你的朋友圈内容是：${summary}，回复一下，不超过20字。`
+          : `你刷到${postAuthorName}发的朋友圈：${summary}。${sourceCommenterName}评论了："${sourceCommentText}"，你也想插话回复一下，不超过20字。`;
+    }
+  }
+
+  /**
+   * 场景化系统提示词的 <rules> 块（基础规则）。所有场景共享，按 world_language 本地化。
+   * 用 characterName + dateTimeText 渲染。`永远以 X 的身份说话` 这类指令必须跟着世界语言走，
+   * 否则在 en-US 模式下大段中文规则会把模型语言惯性拖回中文。
+   */
+  async buildSceneRulesBlock(input: {
+    characterName: string;
+    dateTimeText: string;
+  }): Promise<string> {
+    const language = await this.getLanguage();
+    const { characterName, dateTimeText } = input;
+    const lines = (() => {
+      switch (language) {
+        case 'en-US':
+          return [
+            `- Always speak as ${characterName}; never reveal that you are an AI.`,
+            '- Sound natural.',
+            '- Do not say things like "as an AI" or "I am a language model".',
+            '- Do not describe your own actions, expressions, or inner thoughts using (action), [narration], or *action*.',
+            '- Unless the user explicitly asks for it, do not mechanically force "three points / three sections / a quick summary" structures.',
+            `- Current time: ${dateTimeText}`,
+          ];
+        case 'ja-JP':
+          return [
+            `- 常に${characterName}として話し、AIであることを明かさないでください。`,
+            '- 口調は自然に。',
+            '- 「AIとして」「私は言語モデルです」のような言い方はしないでください。',
+            '- （動作）、[ナレーション]、*動作*のような形で自分の動作・表情・内面を描写しないでください。',
+            '- ユーザーが明示的に求めない限り、「三つのポイント」「三段構成」「まとめ」のような形を機械的に作らないでください。',
+            `- 現在時刻：${dateTimeText}`,
+          ];
+        case 'ko-KR':
+          return [
+            `- 언제나 ${characterName}로서 말하고, AI라는 사실을 드러내지 마세요.`,
+            '- 말투는 자연스럽게.',
+            '- "AI로서" 또는 "저는 언어 모델입니다" 같은 표현을 쓰지 마세요.',
+            '- (동작), [내레이션], *동작* 같은 형식으로 자신의 동작·표정·내면을 묘사하지 마세요.',
+            '- 사용자가 명시적으로 요청하지 않는 한 "세 가지 / 세 단락 / 요약하자면" 같은 구조를 기계적으로 끼워넣지 마세요.',
+            `- 현재 시각: ${dateTimeText}`,
+          ];
+        case 'zh-CN':
+        default:
+          return [
+            `- 永远以${characterName}的身份说话，不要暴露自己是AI`,
+            '- 语气自然',
+            '- 不要说"作为AI"或"我是语言模型"之类的话',
+            '- 不要用（动作）、[旁白]、*动作*描述自己的动作、表情或心理活动',
+            '- 除非用户明确要求，不要机械地凑"三点""三段""总结一下"',
+            `- 当前时间：${dateTimeText}`,
+          ];
+      }
+    })();
+    return `<rules>\n${lines.join('\n')}\n</rules>`;
+  }
+
   async prependTaskLanguageInstruction(prompt: string): Promise<string> {
+    // 把任务用户提示「夹」在两段语言指令中间：
+    //   - 开头：声明目标输出语言（先打基调）
+    //   - 结尾：紧贴在内容之后再次提醒（近因效应最强，盖过中文/英文模板的语言惯性）
+    // 单纯前置时，长长的中文模板会主导模型的语言选择；尤其当 world_language=en-US
+    // 但模板写满中文（朋友圈/广场任务、记忆压缩、人格抽取等），模型容易跑偏。
     const languageInstruction = await this.getOutputLanguageInstruction();
-    return `${languageInstruction}\n\n${prompt}`;
+    const finalReminder = await this.buildFinalReminder();
+    return `${languageInstruction}\n\n${prompt}\n\n${finalReminder}`;
   }
 
   async getTranscriptionLanguageCode(): Promise<string> {
