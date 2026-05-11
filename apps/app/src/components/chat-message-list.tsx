@@ -94,6 +94,7 @@ import {
 import { isFavoriteNoteMissingError } from "../features/favorites/note-editor-helpers";
 import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
 import { buildDesktopChannelsRouteHash } from "../features/channels/channels-route-state";
+import { resolveAppMediaUrl } from "../lib/media-url";
 import {
   extractChatReplyMetadata,
   sanitizeDisplayedChatText,
@@ -1829,12 +1830,12 @@ export function ChatMessageList({
         postId: attachment.postId,
         section: "recommended",
       });
-      const targetPath =
-        variant === "desktop" ? "/discover/channels" : "/channels";
-      void navigate({
-        to: targetPath,
-        hash: channelsHash,
-      });
+      // 桌面走 /discover/channels；移动走 /tabs/channels（与 channels-page 保持一致）
+      if (variant === "desktop") {
+        void navigate({ to: "/discover/channels", hash: channelsHash });
+      } else {
+        void navigate({ to: "/tabs/channels", hash: channelsHash });
+      }
       return;
     }
 
@@ -5102,7 +5103,7 @@ function FeedPostCardMessage({
 }) {
   const isDesktop = variant === "desktop";
   const cover = attachment.coverUrl
-    ? resolveAttachmentUrl(attachment.coverUrl)
+    ? resolveAppMediaUrl(attachment.coverUrl)
     : null;
   const mediaLabel = (() => {
     if (attachment.mediaType === "video") return translateRuntimeMessage(msg`视频`);
