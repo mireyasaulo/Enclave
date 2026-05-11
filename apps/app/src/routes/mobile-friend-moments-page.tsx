@@ -36,8 +36,10 @@ import {
   parseMobileFriendMomentsRouteState,
 } from "../features/moments/mobile-friend-moments-route-state";
 import { usePullToRefresh } from "../features/moments/use-pull-to-refresh";
+import { useOptimisticMomentLikeHandlers } from "../features/moments/use-optimistic-like";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+import { useWorldOwnerStore } from "../store/world-owner-store";
 
 const t = translateRuntimeMessage;
 
@@ -52,6 +54,9 @@ export function MobileFriendMomentsPage() {
   const queryClient = useQueryClient();
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
+  const ownerId = useWorldOwnerStore((state) => state.id);
+  const ownerUsername = useWorldOwnerStore((state) => state.username);
+  const ownerAvatar = useWorldOwnerStore((state) => state.avatar);
   const resolvedCharacterId = characterId ?? "";
   const routeState = useMemo(
     () => parseMobileFriendMomentsRouteState(hash),
@@ -110,17 +115,22 @@ export function MobileFriendMomentsPage() {
     enabled: Boolean(resolvedCharacterId),
   });
 
+  const optimisticLike = useOptimisticMomentLikeHandlers({
+    baseUrl,
+    ownerId,
+    ownerUsername,
+    ownerAvatar,
+  });
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
+    onMutate: optimisticLike.onMutate,
+    onError: optimisticLike.onError,
     onSuccess: async () => {
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
       });
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-moments-paged", baseUrl] }),
-      ]);
+      await optimisticLike.invalidate();
     },
   });
   const commentMutation = useMutation({

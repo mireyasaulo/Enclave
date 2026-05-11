@@ -38,6 +38,7 @@ import {
   publishMomentComposeDraft,
   useMomentComposeDraft,
 } from "../features/moments/moment-compose-media";
+import { useOptimisticMomentLikeHandlers } from "../features/moments/use-optimistic-like";
 import { translateCharacterBio } from "../lib/character-i18n";
 import { isDesktopOnlyPath, navigateBackOrFallback } from "../lib/history-back";
 import { formatTimestamp } from "../lib/format";
@@ -141,14 +142,19 @@ export function FriendMomentsPage() {
       ]);
     },
   });
+  const optimisticLike = useOptimisticMomentLikeHandlers({
+    baseUrl,
+    ownerId,
+    ownerUsername,
+    ownerAvatar,
+  });
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
+    onMutate: optimisticLike.onMutate,
+    onError: optimisticLike.onError,
     onSuccess: async () => {
       setNotice(t(msg`朋友圈互动已更新。`));
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-moments-paged", baseUrl] }),
-      ]);
+      await optimisticLike.invalidate();
     },
   });
   const commentMutation = useMutation({

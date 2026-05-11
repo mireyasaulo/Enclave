@@ -40,6 +40,7 @@ import {
   publishMomentComposeDraft,
   useMomentComposeDraft,
 } from "../features/moments/moment-compose-media";
+import { useOptimisticMomentLikeHandlers } from "../features/moments/use-optimistic-like";
 import { buildMobileMomentsPublishRouteHash } from "../features/moments/mobile-moments-publish-route-state";
 import { usePullToRefresh } from "../features/moments/use-pull-to-refresh";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
@@ -109,17 +110,22 @@ export function ProfileMomentsPage() {
     );
   }, [momentsQuery.data, ownerId]);
 
+  const optimisticLike = useOptimisticMomentLikeHandlers({
+    baseUrl,
+    ownerId,
+    ownerUsername: ownerName,
+    ownerAvatar,
+  });
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
+    onMutate: optimisticLike.onMutate,
+    onError: optimisticLike.onError,
     onSuccess: async () => {
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
       });
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-moments-paged", baseUrl] }),
-      ]);
+      await optimisticLike.invalidate();
     },
   });
 
