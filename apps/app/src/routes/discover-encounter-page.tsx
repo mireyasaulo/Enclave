@@ -160,23 +160,6 @@ function MobileDiscoverEncounterPage() {
         })
       }
     >
-      <section className="overflow-hidden rounded-[16px] border border-black/5 bg-white">
-        <div className="grid grid-cols-2 divide-x divide-black/5">
-          <div className="px-4 py-4">
-            <div className="text-[12px] text-[#8c8c8c]">{t(msg`匹配方式`)}</div>
-            <div className="mt-1 text-[15px] font-medium text-[#111827]">
-              {t(msg`随机安排`)}
-            </div>
-          </div>
-          <div className="px-4 py-4">
-            <div className="text-[12px] text-[#8c8c8c]">{t(msg`结果处理`)}</div>
-            <div className="mt-1 text-[15px] font-medium text-[#111827]">
-              {t(msg`直接保留`)}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {shakeMutation.isError && shakeMutation.error instanceof Error ? (
         <InlineNotice
           className="rounded-[11px] px-2.5 py-1.5 text-[11px] leading-[1.35rem] shadow-none"
