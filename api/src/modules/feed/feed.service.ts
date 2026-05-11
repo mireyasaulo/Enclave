@@ -1,5 +1,6 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
 import { existsSync } from 'node:fs';
+import path from 'node:path';
 import {
   forwardRef,
   HttpStatus,
@@ -800,6 +801,18 @@ export class FeedService implements OnModuleInit {
       });
     }
 
+    // 校验目标角色真实存在——否则 chatService.getOrCreateConversation 会用
+    // characterId 当 title 兜底创建一个空壳 conversation，体验很怪。
+    const targetCharacter = await this.characters.findById(
+      input.targetCharacterId,
+    );
+    if (!targetCharacter) {
+      throw new AppError('FEED_FORWARD_TARGET_REQUIRED', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: 'Target character not found',
+      });
+    }
+
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const conv = await this.chatService.getOrCreateConversation(
       input.targetCharacterId,
@@ -1435,15 +1448,22 @@ export class FeedService implements OnModuleInit {
 
       const intimacyByCharId = new Map<string, number>();
       if (post.authorType === 'character') {
-        await Promise.all(
+        // 单角色 getIntimacy 失败不该让整批反应都丢——用 allSettled，
+        // 拿不到的就当 0（中性）继续走概率筛。
+        const results = await Promise.allSettled(
           allChars.map(async (char) => {
             const intimacy = await this.characterFriendships.getIntimacy(
               char.id,
               post.authorId,
             );
-            intimacyByCharId.set(char.id, intimacy);
+            return [char.id, intimacy] as const;
           }),
         );
+        for (const r of results) {
+          if (r.status === 'fulfilled') {
+            intimacyByCharId.set(r.value[0], r.value[1]);
+          }
+        }
       }
 
       allChars.forEach((char, i) => {
@@ -1998,6 +2018,9 @@ export class FeedService implements OnModuleInit {
     });
     const sentByCharCount = new Map<string, number>();
     const characterForwardedPostIds = new Map<string, Set<string>>();
+    // 跨角色去重：同一帖子 24h 内最多只被任一角色主动转发一次。
+    // 否则 3 个角色都挑中同一爆款 → user 在 3 个不同私聊里收到同一卡片，刷屏。
+    const postsForwardedToday = new Set<string>();
     let totalProactiveForwardsToday = 0;
     for (const row of recentForwards) {
       const payload = row.payload as
@@ -2011,6 +2034,7 @@ export class FeedService implements OnModuleInit {
         characterForwardedPostIds.set(actor, new Set());
       }
       characterForwardedPostIds.get(actor)!.add(row.postId);
+      postsForwardedToday.add(row.postId);
     }
     if (totalProactiveForwardsToday >= MAX_FORWARDS_PER_OWNER_PER_DAY) {
       return {
@@ -2093,12 +2117,15 @@ export class FeedService implements OnModuleInit {
       const alreadySentPosts =
         characterForwardedPostIds.get(char.id) ?? new Set<string>();
 
-      // 给候选帖打分（亲密度 × 时效 + 推荐分），跳过已发过的，跳过自己当作者的
+      // 给候选帖打分（亲密度 × 时效 + 推荐分），跳过已发过的、跳过自己当作者的、
+      // 跳过 24h 内已被任意角色转过的（跨角色去重，避免同一帖子刷屏）
       const scored = await Promise.all(
         candidatePosts
           .filter(
             (post) =>
-              post.authorId !== char.id && !alreadySentPosts.has(post.id),
+              post.authorId !== char.id &&
+              !alreadySentPosts.has(post.id) &&
+              !postsForwardedToday.has(post.id),
           )
           .map(async (post) => {
             let intimacy = NPC_USER_POST_NEUTRAL_INTIMACY;
@@ -2183,6 +2210,8 @@ export class FeedService implements OnModuleInit {
           characterForwardedPostIds.get(char.id) ?? new Set<string>();
         seen.add(pick.id);
         characterForwardedPostIds.set(char.id, seen);
+        // 同 tick 内后续角色不再选这条
+        postsForwardedToday.add(pick.id);
       } catch (error) {
         this.logger.warn(
           `runChannelProactiveForwardTick: forward failed for char=${char.id} post=${pick.id}: ${(error as Error).message}`,
@@ -2502,11 +2531,15 @@ export class FeedService implements OnModuleInit {
     return urls.some((url) => {
       if (url.startsWith('blob:') || url.startsWith('data:')) return true;
       if (url.startsWith('/api/moments/media/')) {
-        const fileName = url.slice('/api/moments/media/'.length);
+        // 去掉 ?token=...# 之类后缀，再 basename 防 ../traversal
+        const cleanPath = url.split('?')[0].split('#')[0];
+        const rawName = cleanPath.slice('/api/moments/media/'.length);
+        const fileName = path.basename(rawName).trim();
+        if (!fileName) return false;
         return existsSync(resolveReadableMomentMediaPath(fileName));
       }
       try {
-        const host = new URL(url).hostname;
+        const host = new URL(url).hostname.toLowerCase();
         return !FEED_DEAD_MEDIA_HOSTS.has(host);
       } catch {
         return false;

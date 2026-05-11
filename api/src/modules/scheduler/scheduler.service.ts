@@ -572,6 +572,12 @@ export class SchedulerService {
             this.handleCheckChannelsSchedule(),
           )
         ).summary;
+      case 'channel_proactive_forward':
+        return (
+          await this.executeTrackedJob(jobId, () =>
+            this.handleChannelProactiveForward(),
+          )
+        ).summary;
       case 'update_character_status':
         return (
           await this.executeTrackedJob(jobId, () =>
