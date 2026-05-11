@@ -2169,6 +2169,31 @@ export function formatCloudConsoleLastGeneratedAt(
   });
 }
 
+export function formatCloudConsoleProviderWorldsCount(
+  count: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `${count} worlds`,
+    "zh-CN": `${count} 个世界`,
+    "ja-JP": `${count} ワールド`,
+    "ko-KR": `${count}개 월드`,
+  });
+}
+
+export function formatCloudConsoleProviderRunningError(
+  running: number,
+  errorCount: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Running ${running} · Error ${errorCount}`,
+    "zh-CN": `运行中 ${running} · 错误 ${errorCount}`,
+    "ja-JP": `実行中 ${running} · エラー ${errorCount}`,
+    "ko-KR": `실행 중 ${running} · 오류 ${errorCount}`,
+  });
+}
+
 export function formatCloudConsoleJobsGroupCount(
   count: number,
   locale?: string | null,
