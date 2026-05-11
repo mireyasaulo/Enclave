@@ -47,6 +47,9 @@ export class CloudUserEntity {
   @Column({ type: "text", nullable: true })
   registrationIp: string | null;
 
+  @Column({ type: "text", nullable: true })
+  lastLoginIp: string | null;
+
   @Index()
   @Column({ type: "text", nullable: true })
   registrationDeviceFingerprint: string | null;

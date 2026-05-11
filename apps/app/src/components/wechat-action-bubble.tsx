@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { msg } from "@lingui/macro";
-import { Heart, MessageCircle, Share2 } from "lucide-react";
+import { Heart, MessageCircle, Share2, Star } from "lucide-react";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 
 const t = translateRuntimeMessage;
@@ -18,6 +18,12 @@ type WeChatActionBubbleProps = {
    * （比如不可分享的内容）不传即可隐藏。
    */
   onShare?: () => void;
+  /**
+   * 可选 — 提供时气泡里多出一个「收藏 / 取消收藏」入口。
+   * 朋友圈本身没有收藏概念，广场（feed）专属能力。
+   */
+  onFavorite?: () => void;
+  favorited?: boolean;
   onClose: () => void;
 };
 
@@ -28,6 +34,8 @@ export function WeChatActionBubble({
   onLike,
   onComment,
   onShare,
+  onFavorite,
+  favorited = false,
   onClose,
 }: WeChatActionBubbleProps) {
   const [mounted, setMounted] = useState(false);
@@ -126,6 +134,28 @@ export function WeChatActionBubble({
         <MessageCircle size={14} />
         <span>{t(msg`评论`)}</span>
       </button>
+      {onFavorite ? (
+        <>
+          <span className="my-1.5 w-px bg-white/25" aria-hidden="true" />
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onFavorite();
+              onClose();
+            }}
+            className="flex items-center gap-1 px-3.5 transition-colors active:bg-black/30"
+          >
+            <Star
+              size={14}
+              className={
+                favorited ? "fill-[#FAD961] text-[#FAD961]" : "text-white"
+              }
+            />
+            <span>{favorited ? t(msg`取消收藏`) : t(msg`收藏`)}</span>
+          </button>
+        </>
+      ) : null}
       {onShare ? (
         <>
           <span className="my-1.5 w-px bg-white/25" aria-hidden="true" />

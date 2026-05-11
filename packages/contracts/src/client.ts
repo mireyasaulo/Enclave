@@ -595,6 +595,25 @@ function normalizeAttachmentAssetUrl(url: string, baseUrl?: string) {
       ? window.location.origin
       : undefined;
   const targetUrl = tryParseUrl(resolvedBaseUrl ?? browserOriginUrl);
+
+  // 当输入是绝对路径（/api/...）且 baseUrl 带非空 pathname 前缀（如
+  // /cloud/world-api 多租户反代），WHATWG URL 拼接会把 baseUrl 的 pathname
+  // 整段丢掉（new URL('/api/x','http://h/cloud/world-api') = 'http://h/api/x'）。
+  // 这会让媒体 src 跳过反代直奔 nginx，被 1c20a2fe 加固的 /api/ 拦截规则 403。
+  // 检测这种 case 并手动保留前缀。
+  if (
+    normalizedUrl.startsWith("/") &&
+    !normalizedUrl.startsWith("//") &&
+    targetUrl &&
+    targetUrl.pathname &&
+    targetUrl.pathname !== "/"
+  ) {
+    const prefix = targetUrl.pathname.replace(/\/+$/, "");
+    if (!normalizedUrl.startsWith(`${prefix}/`) && normalizedUrl !== prefix) {
+      return `${targetUrl.origin}${prefix}${normalizedUrl}`;
+    }
+  }
+
   const resolvedUrl =
     tryParseUrl(normalizedUrl, targetUrl?.toString()) ??
     tryParseUrl(normalizedUrl, browserOriginUrl);

@@ -296,6 +296,9 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Diagnostic summary": "诊断摘要",
     Phone: "手机号",
     Email: "邮箱",
+    Registered: "注册时间",
+    "Registration IP": "注册 IP",
+    "Last login IP": "当前 IP",
     Owner: "世界主人",
     "Owner signature": "世界主人签名",
     "App platform": "运行平台",
@@ -922,6 +925,9 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Diagnostic summary": "診断サマリ",
     Phone: "電話番号",
     Email: "メール",
+    Registered: "登録日時",
+    "Registration IP": "登録 IP",
+    "Last login IP": "現在の IP",
     Owner: "ワールドオーナー",
     "Owner signature": "オーナーの署名",
     "App platform": "実行プラットフォーム",
@@ -1554,6 +1560,9 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Diagnostic summary": "진단 요약",
     Phone: "전화번호",
     Email: "이메일",
+    Registered: "가입 시각",
+    "Registration IP": "가입 IP",
+    "Last login IP": "현재 IP",
     Owner: "월드 오너",
     "Owner signature": "오너 서명",
     "App platform": "실행 플랫폼",
@@ -2166,6 +2175,31 @@ export function formatCloudConsoleLastGeneratedAt(
     "zh-CN": `最近生成于 ${date}`,
     "ja-JP": `最終生成 ${date}`,
     "ko-KR": `최근 생성 ${date}`,
+  });
+}
+
+export function formatCloudConsoleProviderWorldsCount(
+  count: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `${count} worlds`,
+    "zh-CN": `${count} 个世界`,
+    "ja-JP": `${count} ワールド`,
+    "ko-KR": `${count}개 월드`,
+  });
+}
+
+export function formatCloudConsoleProviderRunningError(
+  running: number,
+  errorCount: number,
+  locale?: string | null,
+) {
+  return selectCloudConsoleText(locale, {
+    "en-US": `Running ${running} · Error ${errorCount}`,
+    "zh-CN": `运行中 ${running} · 错误 ${errorCount}`,
+    "ja-JP": `実行中 ${running} · エラー ${errorCount}`,
+    "ko-KR": `실행 중 ${running} · 오류 ${errorCount}`,
   });
 }
 

@@ -143,6 +143,7 @@ export interface CloudUserSummary {
   inviteCode: string | null;
   redeemCount: number;
   registrationIp: string | null;
+  lastLoginIp: string | null;
   createdAt: string;
   lastLoginAt: string | null;
 }

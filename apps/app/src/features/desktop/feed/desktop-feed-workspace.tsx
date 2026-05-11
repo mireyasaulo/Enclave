@@ -190,10 +190,9 @@ export function DesktopFeedWorkspace({
                 posts={posts}
                 isPostFavorite={isPostFavorite}
                 onCancelCommentReply={onCancelCommentReply}
-                onCollapse={() => setSelectedPostId(null)}
                 onCommentChange={onCommentChange}
                 onCommentSubmit={onCommentSubmit}
-                onExpand={(postId) => setSelectedPostId(postId)}
+                onLoadFullComments={(postId) => setSelectedPostId(postId)}
                 onLike={onLike}
                 onOpenCompose={() => setShowCompose(true)}
                 onShare={onShare}

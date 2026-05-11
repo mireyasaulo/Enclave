@@ -223,8 +223,14 @@
     <script>
       // 浏览器（含内网穿透域名）首次访问时没有任何持久化配置或注入配置，
       // runtime 启动会判定 worldAccessMode 缺失而停在 "请先回到 setup" 页面。
-      // 这里给纯 web 上下文一个默认值：apiBaseUrl 用当前 origin（nginx 已把
-      // /api/、/socket.io/、/cloud/ 反代到本机后端），worldAccessMode=local。
+      // 这里给纯 web 上下文一个默认值：
+      // - 本地直连（localhost / 127.x / 私网 IP / *.local / *.lan / *.internal）：
+      //   apiBaseUrl=${origin}，请求直连本机 api(3000)，单租户开发场景。
+      // - 远程公网域名（vicp.fun / 公网 IP）：apiBaseUrl=${origin}/cloud/world-api，
+      //   走 cloud-api 多租户反代到对应账号 child；nginx 在公网 Host 下对 /api/、
+      //   /socket.io/ 直接返 403（commit 1c20a2fe），不能用裸 origin 否则朋友圈
+      //   <video src>/<audio src>/<img src> 拼出的 /api/moments/media/* 全部 403
+      //   播不了。这段逻辑必须和 runtime-config.ts 的 fallbackCoreApiBaseUrl 一致。
       // Capacitor / Tauri 等原生壳启动后会通过 hydrateNativeRuntimeConfig
       // 用真实的 apiBaseUrl 覆盖，所以这段注入不会干扰移动端和桌面壳。
       (function () {
@@ -234,10 +240,27 @@
         if (loc.protocol !== "http:" && loc.protocol !== "https:") return;
         if (w.__YINJIE_RUNTIME_CONFIG__) return;
         if (w.Capacitor || w.__TAURI__ || w.__TAURI_INTERNALS__) return;
+        function isLocalLikeHostname(host) {
+          if (!host) return true;
+          if (host === "localhost" || host === "::1") return true;
+          if (host.indexOf("127.") === 0) return true;
+          if (host.indexOf("10.") === 0 || host.indexOf("192.168.") === 0) return true;
+          var m172 = /^172\.(\d+)\./.exec(host);
+          if (m172) {
+            var second = Number(m172[1]);
+            if (second >= 16 && second <= 31) return true;
+          }
+          if (/\.(local|lan|internal)$/i.test(host)) return true;
+          return false;
+        }
+        var isRemoteWeb = !isLocalLikeHostname(loc.hostname);
+        var resolvedBaseUrl = isRemoteWeb
+          ? loc.origin + "/cloud/world-api"
+          : loc.origin;
         w.__YINJIE_RUNTIME_CONFIG__ = {
-          apiBaseUrl: loc.origin,
-          socketBaseUrl: loc.origin,
-          worldAccessMode: "local",
+          apiBaseUrl: resolvedBaseUrl,
+          socketBaseUrl: resolvedBaseUrl,
+          worldAccessMode: isRemoteWeb ? "cloud" : "local",
           configStatus: "configured",
           bootstrapSource: "window",
         };

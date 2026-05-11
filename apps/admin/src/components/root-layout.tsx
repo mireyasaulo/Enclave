@@ -232,6 +232,13 @@ function resolveNavItems() {
           ),
         },
         {
+          to: "/digital-human" as const,
+          label: t(msg`数字人 Provider`),
+          hint: t(
+            msg`配置外部数字人播放器模板、回调 token 和扩展参数，把内置播放器替换成真实数字人服务。`,
+          ),
+        },
+        {
           to: "/reply-logic" as const,
           label: t(msg`回复逻辑`),
           hint: t(msg`围绕角色、会话和全局规则排查回复链路。`),
