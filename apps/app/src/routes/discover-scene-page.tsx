@@ -27,7 +27,6 @@ import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 type Scene = {
   id: string;
   label: MessageDescriptor;
-  description: MessageDescriptor;
   icon: typeof Coffee;
 };
 
@@ -35,25 +34,21 @@ const scenes: Scene[] = [
   {
     id: "coffee_shop",
     label: msg`咖啡馆`,
-    description: msg`适合轻松开场和日常寒暄。`,
     icon: Coffee,
   },
   {
     id: "gym",
     label: msg`健身房`,
-    description: msg`更容易遇到直接一点的搭话。`,
     icon: Dumbbell,
   },
   {
     id: "library",
     label: msg`图书馆`,
-    description: msg`偏安静，也更像慢热型相遇。`,
     icon: BookOpen,
   },
   {
     id: "park",
     label: msg`公园`,
-    description: msg`随机性更强，气氛也更开放。`,
     icon: Trees,
   },
 ];
@@ -164,11 +159,7 @@ function MobileDiscoverScenePage() {
   return (
     <MobileDiscoverToolShell
       title={t(msg`场景相遇`)}
-      subtitle={t(msg`换一个地点，换一种相遇方式`)}
-      shareTitle={t(msg`场景相遇`)}
-      shareSummary={t(msg`选择一个地点，触发不同角色的靠近方式，并把结果直接写进新的好友申请。`)}
       heroTitle={t(msg`选择一个地点`)}
-      heroDescription={t(msg`不同地点会触发不同角色的靠近方式，并把结果写进新的好友申请。`)}
       heroVisual={<MapPin size={28} />}
       notice={
         message ? (
@@ -216,15 +207,9 @@ function MobileDiscoverScenePage() {
                     ? t(msg`正在前往${t(scene.label)}...`)
                     : t(scene.label)}
                 </div>
-                <div className="mt-1 text-[12px] leading-5 text-[#8c8c8c]">
-                  {t(scene.description)}
-                </div>
               </button>
             );
           })}
-        </div>
-        <div className="border-t border-black/5 px-4 py-3 text-[13px] leading-6 text-[#6b7280]">
-          {t(msg`点一下就触发，不做多层确认，结果会直接回到好友申请里。`)}
         </div>
       </section>
 
