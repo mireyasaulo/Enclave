@@ -11,6 +11,7 @@ WORKDIR /repo
 # Bring in workspace manifest + lockfile so pnpm can install just what apps/site needs.
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/site/package.json apps/site/package.json
+COPY packages/analytics/package.json packages/analytics/package.json
 COPY packages/i18n/package.json packages/i18n/package.json
 COPY packages/ui/package.json packages/ui/package.json
 COPY packages/contracts/package.json packages/contracts/package.json

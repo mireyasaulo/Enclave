@@ -12,7 +12,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/healthz"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -38,7 +38,10 @@ services:
       retries: 3
       start_period: 15s
 
+  # 公开营销/落地页站点。自托管用户默认不需要，放在 site profile 下。
+  # 想启动：docker compose --profile site up -d
   site:
+    profiles: ["site"]
     build:
       context: .
       dockerfile: apps/site/Dockerfile
