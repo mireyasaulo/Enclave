@@ -51,6 +51,18 @@ function resolveManualChunk(id: string) {
       return "vendor-shell";
     }
 
+    // qrcode (~70KB) 和 html-to-image (~30KB) 只在分享/订阅二维码场景用到，
+    // 但被多个动态 import 入口（share-card-modal、profile-subscription、
+    // subscription-panel 各拆 dynamic import）引用 — 若不显式拆出，Rollup
+    // 会把它们升级到 vendor-misc 当共享 chunk，重新挤进首屏关键路径，把
+    // 动态 import 的好处吃光。这里强制单独成 chunk，只在第一次需要时拉。
+    if (normalizedId.includes("/qrcode/")) {
+      return "vendor-qrcode";
+    }
+    if (normalizedId.includes("/html-to-image/")) {
+      return "vendor-html-to-image";
+    }
+
     return "vendor-misc";
   }
 
