@@ -13,7 +13,7 @@
 >
 > It has residents, seasons, relationships, and stories — but it doesn't pull you away from reality. It gives your real life one more dimension.
 
-> 🌐 **Live demo**: <https://www.enclave.top/> (shared world, product-feel only)
+> 🌐 **Live demo**: <http://1gw06751dd053.vicp.fun/> (shared world, product-feel only)
 > 📮 **Contact**: yuanzui0728@gmail.com
 >
 > ⭐ **Like this idea**: Star the repo — next time a new resident ships, a feature lands, or the v0.2 roadmap is settled, you will see it first.
