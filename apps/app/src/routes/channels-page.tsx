@@ -65,6 +65,9 @@ import { normalizePathname } from "../lib/normalize-pathname";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 const EMPTY_CHANNEL_POSTS: FeedPostListItem[] = [];
+// 单页拉取上限：badge 上显示的 count 只在 count <= 这个值时才出现，
+// 避免「推荐 62 但只能看到 20 条」造成的「数字对不上实际」困惑。
+const CHANNELS_PAGE_LIMIT = 20;
 const DesktopChannelsWorkspace = lazy(async () => {
   const mod =
     await import("../features/desktop/channels/desktop-channels-workspace");
@@ -143,7 +146,7 @@ export function ChannelsPage() {
     queryFn: () =>
       getChannelHome(baseUrl, {
         section: activeSection,
-        limit: 20,
+        limit: CHANNELS_PAGE_LIMIT,
       }),
   });
 
@@ -1023,7 +1026,11 @@ export function ChannelsPage() {
               )}
             >
               {section.label}
-              {section.count > 0 ? ` ${section.count}` : ""}
+              {/* 只在该 section 已经全部加载（count ≤ 单页上限）时才显示数字，
+                  防止「推荐 62 但只能看 20」的视觉错位 */}
+              {section.count > 0 && section.count <= CHANNELS_PAGE_LIMIT
+                ? ` ${section.count}`
+                : ""}
             </button>
           ))}
         </div>
