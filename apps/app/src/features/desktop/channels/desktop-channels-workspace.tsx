@@ -93,10 +93,6 @@ type DesktopChannelsWorkspaceProps = {
   }>;
 };
 
-// 单页上限——和 channels-page 的 CHANNELS_PAGE_LIMIT 保持一致；
-// section badge 上的 count 只在 count ≤ 这个值时显示，否则隐藏避免视觉错位。
-const DESKTOP_CHANNELS_PAGE_LIMIT = 20;
-
 const DESKTOP_CHANNEL_COMMENT_THREAD_STORAGE_KEY =
   "yinjie:channels:desktop-comment-threads";
 
@@ -319,14 +315,6 @@ export function DesktopChannelsWorkspace({
                     )}
                   >
                     {section.label}
-                    {/* 只在该 section 已经全部加载（count ≤ 单页上限）时才显示数字，
-                        防止「推荐 62 但只能看 20」的视觉错位 */}
-                    {section.count > 0 &&
-                    section.count <= DESKTOP_CHANNELS_PAGE_LIMIT ? (
-                      <span className="ml-1 text-[11px] text-[color:var(--text-muted)]">
-                        {section.count}
-                      </span>
-                    ) : null}
                   </span>
                   {active ? (
                     <span className="pointer-events-none absolute bottom-0 left-1/2 h-[2px] w-7 -translate-x-1/2 rounded-full bg-[color:var(--brand-primary)]" />
