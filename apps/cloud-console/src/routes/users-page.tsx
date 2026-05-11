@@ -11,7 +11,7 @@ import {
 } from "../lib/cloud-console-i18n";
 import { SurfaceCard } from "../components/ui";
 
-function formatExpiresAt(value?: string | null) {
+function formatTimestamp(value?: string | null) {
   if (!value) return "-";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
@@ -112,6 +112,7 @@ export function UsersPage() {
                 <th className="px-4 py-3 font-medium">{t("Account")}</th>
                 <th className="px-4 py-3 font-medium">{t("Subscription")}</th>
                 <th className="px-4 py-3 font-medium">{t("Expires")}</th>
+                <th className="px-4 py-3 font-medium">{t("Registered")}</th>
                 <th className="px-4 py-3 font-medium">{t("Inviter")}</th>
                 <th className="px-4 py-3 font-medium">{t("World")}</th>
                 <th className="px-4 py-3 font-medium">{t("Plan")}</th>
@@ -135,8 +136,9 @@ export function UsersPage() {
                   <td className="px-4 py-3">{t(user.status)}</td>
                   <td className="px-4 py-3">{t(user.subscriptionStatus)}</td>
                   <td className="px-4 py-3">
-                    {formatExpiresAt(user.subscriptionExpiresAt)}
+                    {formatTimestamp(user.subscriptionExpiresAt)}
                   </td>
+                  <td className="px-4 py-3">{formatTimestamp(user.createdAt)}</td>
                   <td className="px-4 py-3">{user.inviterPhone || "-"}</td>
                   <td className="px-4 py-3">
                     {user.worldStatus ? t(user.worldStatus) : "-"}
