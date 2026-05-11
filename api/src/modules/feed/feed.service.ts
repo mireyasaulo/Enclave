@@ -97,6 +97,19 @@ const FEED_DEAD_MEDIA_HOSTS = new Set<string>([
   'commondatastorage.googleapis.com',
 ]);
 
+// 角色主动转发时附带短评的清洗：去掉换行 / 引号 / 末尾省略号，强制 ≤ 24 字。
+function sanitizeForwardQuip(raw: string | undefined | null): string {
+  if (!raw) return '';
+  const cleaned = raw
+    .replace(/[\r\n]+/g, ' ')
+    .replace(/^["“”'']+|["“”'']+$/g, '')
+    .trim();
+  if (!cleaned) return '';
+  // 留 24 个 unicode "字"——简化用 Array.from 近似，不严格按 grapheme 拆分
+  const chars = Array.from(cleaned);
+  return chars.length <= 24 ? cleaned : `${chars.slice(0, 23).join('')}…`;
+}
+
 @Injectable()
 export class FeedService implements OnModuleInit {
   private readonly logger = new Logger(FeedService.name);
@@ -809,26 +822,25 @@ export class FeedService implements OnModuleInit {
       surface: 'channels',
     };
 
-    let savedMessage;
-    if (input.actorType === 'character') {
-      // 复用既有的 proactive-attachment 通道：service 写库 + gateway 通过 socket 推给在线 client
-      savedMessage = await this.chatGateway.sendProactiveAttachmentMessage(
-        conversationId,
-        input.actorId,
-        input.actorName,
-        attachment,
-        input.note?.trim() || undefined,
-      );
-    } else {
-      savedMessage = await this.chatService.sendMessage(conversationId, {
-        type: 'feed_post_card',
-        text: input.note?.trim() || '',
-        attachment,
-      });
-      // sendMessage 返回数组（含潜在 AI 回复），实际转发卡片是首条
-      const first = Array.isArray(savedMessage) ? savedMessage[0] : savedMessage;
-      savedMessage = first;
-    }
+    // 两条路径都走「直接写消息 + socket emit」，不要走 sendMessage —— 那会等
+    // 一次 LLM 回包，HTTP 请求会卡到 5-10s，前端 toast 慢。微信视频号转发到
+    // 聊天的体感本来也是「卡片即时出现，对方再不再回是看心情」。
+    const savedMessage =
+      input.actorType === 'character'
+        ? await this.chatGateway.sendProactiveAttachmentMessage(
+            conversationId,
+            input.actorId,
+            input.actorName,
+            attachment,
+            input.note?.trim() || undefined,
+          )
+        : await this.chatGateway.sendUserAttachmentMessage(
+            conversationId,
+            input.actorId,
+            input.actorName,
+            attachment,
+            input.note?.trim() || undefined,
+          );
 
     await this.postRepo.increment({ id: post.id }, 'shareCount', 1);
 
@@ -1475,8 +1487,23 @@ export class FeedService implements OnModuleInit {
               ).has(char.id);
               if (!stillVisible) return;
 
-              // 60% 评论 / 40% 点赞（与 plan 一致）
-              const isComment = Math.random() < 0.6;
+              // 与 cron tick 共享后端表，必须查重防止：
+              //   · toggleLike 重入 → 已有的 like 被反向删掉
+              //   · 同一角色同一 post 被刷出多条 AI 评论
+              const [existingLike, existingCommentCount] = await Promise.all([
+                this.likeRepo.findOneBy({ postId: fresh.id, authorId: char.id }),
+                this.commentRepo.count({
+                  where: { postId: fresh.id, authorId: char.id },
+                }),
+              ]);
+              const hasComment = existingCommentCount > 0;
+              if (existingLike && hasComment) return;
+
+              // 60% 评论 / 40% 点赞（与 plan 一致）；若该路径已有产物则走另一条
+              let isComment = Math.random() < 0.6;
+              if (isComment && hasComment) isComment = false;
+              if (!isComment && existingLike) isComment = !hasComment;
+
               if (isComment) {
                 const profile = await this.characters.getProfile(char.id);
                 if (!profile) return;
@@ -1523,6 +1550,7 @@ export class FeedService implements OnModuleInit {
                 return;
               }
 
+              if (existingLike) return;
               await this.toggleLike(
                 fresh.id,
                 char.id,
@@ -1643,6 +1671,13 @@ export class FeedService implements OnModuleInit {
                 await this.getVisibleCharacterIdSet(owner.id)
               ).has(replier.id);
               if (!stillVisible) return;
+
+              // 防止同一 replier 对同一源评论生成多条回复（cron 触发 + 用户多次评论可能并发）。
+              const alreadyReplied = await this.commentRepo.findOneBy({
+                authorId: replier.id,
+                replyToCommentId: sourceComment.commentId,
+              });
+              if (alreadyReplied) return;
 
               const profile = await this.characters.getProfile(replier.id);
               if (!profile) return;
@@ -2101,16 +2136,17 @@ export class FeedService implements OnModuleInit {
           const profile = await this.characters.getProfile(char.id);
           if (profile) {
             const observation = await this.buildFeedAiObservation(pick);
-            const userMessage = await this.worldLanguage.formatPostCommentTask({
-              authorName: pick.authorName,
-              summary: observation.summary,
-              surface: 'channels',
-            });
+            // 单独的 forward-quip 提示，避免和 formatPostCommentTask 的"评论一下"冲突。
+            // 不通过 worldLanguage 是因为这是新 surface，目前还没本地化模板；
+            // 中文一句话足够，AI 会按角色 persona 自然改写。
+            const userMessage =
+              `${pick.authorName} 在视频号发了：${observation.summary}。\n` +
+              `用一句话简短地把它转给好友，像在微信里顺手说"看看这个"那样自然，` +
+              `不要客套，不要解释，不要复述内容，≤ 24 字。`;
             const reply = await this.ai.generateReply({
               profile,
               conversationHistory: [],
-              userMessage:
-                `${userMessage}\n（请用一句很短的转发推荐，≤ 24 字，像顺手在私聊里说"看看这个，挺有意思"那样自然）`,
+              userMessage,
               userMessageParts: observation.parts,
               usageContext: {
                 surface: 'app',
@@ -2123,8 +2159,8 @@ export class FeedService implements OnModuleInit {
               },
             });
             llmCallsRemaining -= 1;
-            const trimmed = (reply.text ?? '').trim();
-            if (trimmed) note = trimmed.slice(0, 24);
+            const trimmed = sanitizeForwardQuip(reply.text);
+            if (trimmed) note = trimmed;
           }
         } catch {
           // ignore — note 是可选的，没有就纯卡片

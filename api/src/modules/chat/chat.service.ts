@@ -812,6 +812,55 @@ export class ChatService {
     return this.serializeMessage(messageEntity);
   }
 
+  /**
+   * 把用户主动塞进会话的「附件卡片」消息直接落库 + 推 socket，不触发 AI 自动回复。
+   *
+   * 使用场景：视频号转发到聊天 —— 用户的转发动作不需要友角色立刻自动接话，
+   * 否则 HTTP 请求要等一次 LLM 调用回包（~5-10s），UX 会卡。
+   *
+   * 复用 saveProactiveAttachmentMessage 的写库 / history / activity 流程，
+   * 仅区别：senderType='user'，history 推进走 role='user'。
+   */
+  async saveUserAttachmentMessage(
+    conversationId: string,
+    senderId: string,
+    senderName: string,
+    attachment: MessageAttachment,
+    text?: string,
+  ): Promise<Message> {
+    const entity = await this.requireOwnedConversation(conversationId);
+    const fallbackText =
+      text?.trim() || this.getAttachmentFallbackText(attachment);
+
+    const messageEntity = this.msgRepo.create({
+      id: `msg_${Date.now()}_${attachment.kind}`,
+      conversationId,
+      senderType: 'user',
+      senderId,
+      senderName,
+      type: attachment.kind,
+      text: fallbackText,
+      attachmentKind: attachment.kind,
+      attachmentPayload: JSON.stringify(attachment),
+    });
+
+    await this.msgRepo.save(messageEntity);
+    await this.touchConversationActivity(
+      entity,
+      messageEntity.createdAt ?? new Date(),
+    );
+
+    const history = await this.ensureConversationHistory(entity);
+    history.push({
+      role: 'user',
+      content: fallbackText,
+      parts: this.buildTextAiParts(fallbackText),
+    });
+    this.conversationHistory.set(conversationId, history);
+
+    return this.serializeMessage(messageEntity);
+  }
+
   async saveSystemMessage(
     conversationId: string,
     text: string,
