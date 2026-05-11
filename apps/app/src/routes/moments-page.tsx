@@ -170,10 +170,21 @@ export function MomentsPage() {
     getNextPageParam: (lastPage, allPages) =>
       lastPage.hasMore ? allPages.length + 1 : undefined,
   });
-  const momentsData = useMemo<Moment[]>(
-    () => momentsQuery.data?.pages.flatMap((page) => page.items) ?? [],
-    [momentsQuery.data],
-  );
+  // 按 id 去重：分页路径下若新发/删除导致页间边界偏移，page N 末尾和 page N+1 开头
+  // 可能拿到同一条 moment。UI 层兜底去重，避免列表重复闪烁。
+  const momentsData = useMemo<Moment[]>(() => {
+    if (!momentsQuery.data) return [];
+    const seen = new Set<string>();
+    const items: Moment[] = [];
+    for (const page of momentsQuery.data.pages) {
+      for (const moment of page.items) {
+        if (seen.has(moment.id)) continue;
+        seen.add(moment.id);
+        items.push(moment);
+      }
+    }
+    return items;
+  }, [momentsQuery.data]);
   const momentsHasNextPage = momentsQuery.hasNextPage;
   const momentsIsFetchingNextPage = momentsQuery.isFetchingNextPage;
   const momentsFetchNextPage = momentsQuery.fetchNextPage;
@@ -196,6 +207,21 @@ export function MomentsPage() {
     enabled: Boolean(ownerId),
   });
 
+  function resetMomentsToFirstPage() {
+    // 帖子数量变化（发布/删除）时把已加载多页收回 page 1：
+    // 避免 invalidate 同时 refetch 多页造成的分页边界重复或丢失（page 1 末尾 = page 2 开头）。
+    queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
+      ["app-moments-paged", baseUrl],
+      (current) =>
+        current
+          ? {
+              pages: current.pages.slice(0, 1),
+              pageParams: current.pageParams.slice(0, 1),
+            }
+          : current,
+    );
+  }
+
   const createMutation = useMutation({
     mutationFn: () =>
       publishMomentComposeDraft({
@@ -211,6 +237,7 @@ export function MomentsPage() {
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`朋友圈已发布。`));
+      resetMomentsToFirstPage();
       // 同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page、search-index 等)
       await Promise.all([
         queryClient.invalidateQueries({
@@ -390,6 +417,9 @@ export function MomentsPage() {
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`已删除这条朋友圈。`));
+      // 删除会让分页边界前移：如不先把 cache 收回到 page 1，refetch 多页时下一页
+      // 的第一条会被前面那页的末尾"吃掉"，造成中间漏一条。
+      resetMomentsToFirstPage();
       // 同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page、search-index 等)
       await Promise.all([
         queryClient.invalidateQueries({
@@ -967,16 +997,7 @@ export function MomentsPage() {
       onCommentSubmit={(momentId) => commentMutation.mutate(momentId)}
       onRefresh={async () => {
         // 重置到第 1 页：剔除其余页，让首页 refetch 拉新数据；用户再触底时重新堆。
-        queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
-          ["app-moments-paged", baseUrl],
-          (current) =>
-            current
-              ? {
-                  pages: current.pages.slice(0, 1),
-                  pageParams: current.pageParams.slice(0, 1),
-                }
-              : current,
-        );
+        resetMomentsToFirstPage();
         await Promise.all([
           momentsQuery.refetch(),
           ownerId ? blockedQuery.refetch() : Promise.resolve(null),

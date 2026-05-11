@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  type InfiniteData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   addFeedComment,
@@ -252,6 +257,17 @@ export function DiscoverPage() {
     onSuccess: async () => {
       composeDraft.reset();
       setSuccessNotice(t(msg`广场动态已发布，世界居民公开可见。`));
+      // discover-feed-page 走无限分页：发布后分页边界后移，先把 paged cache 收回到 page 1
+      queryClient.setQueryData<InfiniteData<FeedListResponse>>(
+        ["app-feed-paged", baseUrl],
+        (current) =>
+          current
+            ? {
+                pages: current.pages.slice(0, 1),
+                pageParams: current.pageParams.slice(0, 1),
+              }
+            : current,
+      );
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
         queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),

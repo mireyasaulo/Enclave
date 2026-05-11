@@ -159,12 +159,21 @@ export function DiscoverFeedPage() {
       return fetched < lastPage.total ? allPages.length + 1 : undefined;
     },
   });
-  const feedPosts = useMemo(
-    () => feedQuery.data?.pages.flatMap((page) => page.posts) ?? [],
-    [feedQuery.data],
-  );
-  const feedTotal = feedQuery.data?.pages[0]?.total ?? 0;
-
+  // 按 id 去重：分页路径下若新发/删除导致页间边界偏移，page N 末尾和 page N+1 开头
+  // 可能拿到同一条 post。UI 层兜底去重，避免列表重复闪烁。
+  const feedPosts = useMemo(() => {
+    if (!feedQuery.data) return [] as FeedListResponse["posts"];
+    const seen = new Set<string>();
+    const items: FeedListResponse["posts"] = [];
+    for (const page of feedQuery.data.pages) {
+      for (const post of page.posts) {
+        if (seen.has(post.id)) continue;
+        seen.add(post.id);
+        items.push(post);
+      }
+    }
+    return items;
+  }, [feedQuery.data]);
   // 触底加载：sentinel 进入视口 → fetchNextPage。
   // 用默认 root=null（viewport）+ rootMargin 提前触发，避免触到底再等。
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -226,6 +235,9 @@ export function DiscoverFeedPage() {
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`广场动态已发布，世界居民公开可见。`));
+      // 发布会让分页边界整体后移：若不先把 cache 收回到 page 1，
+      // refetch 多页会让原 page 1 末尾那条同时出现在新 page 1 末尾 + 新 page 2 开头（重复）。
+      resetFeedToFirstPage();
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
         // 同时刷新旧 key，让 discover-page 和 search-index 等共用 cache 的页面也同步
