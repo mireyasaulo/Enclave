@@ -24,6 +24,7 @@ import {
   setConversationPinned,
   setGroupPinned,
   updateGroupPreferences,
+  type ConversationListItem,
 } from "@yinjie/contracts";
 import {
   BellOff,
@@ -320,6 +321,35 @@ function MobileChatListPage() {
   const hasMessageEntriesError =
     messageEntriesQuery.isError && messageEntriesQuery.error instanceof Error;
 
+  // optimistic helper: 把单个 conversation 的某些字段就地 patch，遍历所有
+  // ["app-conversations", baseUrl, ...] 形态的 cache（含 hash 后缀的变种）。
+  // 公网隧道 ~600ms RTT 下，pin/mute 不做 optimistic 会让用户看到 600ms 后
+  // 才有 UI 反应。
+  const patchConversationCache = async (
+    conversationId: string,
+    patch: (item: ConversationListItem) => ConversationListItem,
+  ) => {
+    await queryClient.cancelQueries({
+      queryKey: ["app-conversations", baseUrl],
+    });
+    const snapshots = queryClient.getQueriesData<ConversationListItem[]>({
+      queryKey: ["app-conversations", baseUrl],
+    });
+    snapshots.forEach(([key, data]) => {
+      if (!data) return;
+      queryClient.setQueryData<ConversationListItem[]>(
+        key,
+        data.map((item) => (item.id === conversationId ? patch(item) : item)),
+      );
+    });
+    return snapshots;
+  };
+  const restoreConversationCache = (
+    snapshots: ReturnType<typeof queryClient.getQueriesData<ConversationListItem[]>>,
+  ) => {
+    snapshots.forEach(([key, data]) => queryClient.setQueryData(key, data));
+  };
+
   const pinMutation = useMutation({
     mutationFn: async ({
       conversationId,
@@ -333,6 +363,21 @@ function MobileChatListPage() {
       isGroup
         ? setGroupPinned(conversationId, { pinned }, baseUrl)
         : setConversationPinned(conversationId, { pinned }, baseUrl),
+    onMutate: async (variables) => {
+      const now = new Date().toISOString();
+      const snapshots = await patchConversationCache(
+        variables.conversationId,
+        (item) => ({
+          ...item,
+          isPinned: variables.pinned,
+          pinnedAt: variables.pinned ? now : undefined,
+        }),
+      );
+      return { snapshots };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.snapshots) restoreConversationCache(context.snapshots);
+    },
     onSuccess: async (_, variables) => {
       setNotice(
         variables.pinned ? t(msg`聊天已置顶。`) : t(msg`聊天已取消置顶。`),
@@ -360,6 +405,21 @@ function MobileChatListPage() {
       isGroup
         ? updateGroupPreferences(conversationId, { isMuted: muted }, baseUrl)
         : setConversationMuted(conversationId, { muted }, baseUrl),
+    onMutate: async (variables) => {
+      const now = new Date().toISOString();
+      const snapshots = await patchConversationCache(
+        variables.conversationId,
+        (item) => ({
+          ...item,
+          isMuted: variables.muted,
+          mutedAt: variables.muted ? now : undefined,
+        }),
+      );
+      return { snapshots };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.snapshots) restoreConversationCache(context.snapshots);
+    },
     onSuccess: async (_, variables) => {
       setNotice(
         variables.muted
