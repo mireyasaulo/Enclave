@@ -252,7 +252,10 @@ export function DiscoverPage() {
     onSuccess: async () => {
       composeDraft.reset();
       setSuccessNotice(t(msg`广场动态已发布，世界居民公开可见。`));
-      await queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
+        queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
+      ]);
     },
   });
 
@@ -367,7 +370,10 @@ export function DiscoverPage() {
     },
     onSuccess: async () => {
       setSuccessNotice(t(msg`广场互动已更新。`));
-      await queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
+        queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
+      ]);
     },
   });
 
@@ -383,7 +389,10 @@ export function DiscoverPage() {
     onSuccess: async (_, postId) => {
       setFeedCommentDrafts((current) => ({ ...current, [postId]: "" }));
       setSuccessNotice(t(msg`广场互动已更新。`));
-      await queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
+        queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
+      ]);
     },
   });
 

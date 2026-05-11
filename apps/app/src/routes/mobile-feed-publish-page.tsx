@@ -58,6 +58,8 @@ export function MobileFeedPublishPage() {
       composeDraft.reset();
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
+        // discover-feed-page 用 paged key 走无限分页，要同步刷新
+        queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
         queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] }),
       ]);
       void navigate({

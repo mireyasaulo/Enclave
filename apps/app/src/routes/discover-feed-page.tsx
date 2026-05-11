@@ -148,7 +148,7 @@ export function DiscoverFeedPage() {
   // 广场用无限分页：首屏 20 条，触底拉下一页，避免一次性把 200 条都拉过来
   // （后端那侧虽有 page 但前端老 client 写死 limit=200，整体反序列化和 JSON 媒体载荷都很沉）。
   const feedQuery = useInfiniteQuery({
-    queryKey: ["app-feed", baseUrl],
+    queryKey: ["app-feed-paged", baseUrl],
     initialPageParam: 1,
     queryFn: ({ pageParam }) => getFeed(pageParam, 20, baseUrl),
     getNextPageParam: (lastPage, allPages) => {
@@ -227,6 +227,8 @@ export function DiscoverFeedPage() {
       setNoticeAction(null);
       setNotice(t(msg`广场动态已发布，世界居民公开可见。`));
       await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
+        // 同时刷新旧 key，让 discover-page 和 search-index 等共用 cache 的页面也同步
         queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
         queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] }),
       ]);
@@ -236,11 +238,11 @@ export function DiscoverFeedPage() {
   const likeMutation = useMutation({
     mutationFn: (postId: string) => likeFeedPost(postId, baseUrl),
     onMutate: async (postId) => {
-      await queryClient.cancelQueries({ queryKey: ["app-feed", baseUrl] });
+      await queryClient.cancelQueries({ queryKey: ["app-feed-paged", baseUrl] });
       const snapshots = queryClient.getQueriesData<
         InfiniteData<FeedListResponse>
       >({
-        queryKey: ["app-feed", baseUrl],
+        queryKey: ["app-feed-paged", baseUrl],
       });
       snapshots.forEach(([key, data]) => {
         if (!data) {
@@ -288,6 +290,8 @@ export function DiscoverFeedPage() {
       setNoticeAction(null);
       setNotice(t(msg`广场互动已更新。`));
       await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
+        // 同时刷新旧 key，让 discover-page 和 search-index 等共用 cache 的页面也同步
         queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
         queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] }),
       ]);
@@ -337,6 +341,8 @@ export function DiscoverFeedPage() {
           : t(msg`广场互动已更新。`),
       );
       await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
+        // 同时刷新旧 key，让 discover-page 和 search-index 等共用 cache 的页面也同步
         queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
         queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] }),
       ]);
@@ -418,7 +424,7 @@ const pendingLikePostId = likeMutation.isPending
 
   function resetFeedToFirstPage() {
     queryClient.setQueryData<InfiniteData<FeedListResponse>>(
-      ["app-feed", baseUrl],
+      ["app-feed-paged", baseUrl],
       (current) =>
         current
           ? {

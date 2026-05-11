@@ -163,7 +163,7 @@ export function MomentsPage() {
   // 朋友圈用无限分页，避免一次性把所有动态都拉过来（之前 1 次 ≈ 139 条 SQL）。
   // 每页 20 条；触底 → fetchNextPage；下拉刷新 → 重置到第 1 页。
   const momentsQuery = useInfiniteQuery({
-    queryKey: ["app-moments", baseUrl],
+    queryKey: ["app-moments-paged", baseUrl],
     initialPageParam: 1,
     queryFn: ({ pageParam }) =>
       getMomentsPage({ page: pageParam, limit: 20 }, baseUrl),
@@ -211,9 +211,15 @@ export function MomentsPage() {
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`朋友圈已发布。`));
-      await queryClient.invalidateQueries({
-        queryKey: ["app-moments", baseUrl],
-      });
+      // 同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page、search-index 等)
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["app-moments-paged", baseUrl],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["app-moments", baseUrl],
+        }),
+      ]);
     },
   });
 
@@ -227,11 +233,11 @@ export function MomentsPage() {
           >,
         };
       }
-      await queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] });
+      await queryClient.cancelQueries({ queryKey: ["app-moments-paged", baseUrl] });
       const snapshots = queryClient.getQueriesData<
         InfiniteData<MomentsPageResponse>
       >({
-        queryKey: ["app-moments", baseUrl],
+        queryKey: ["app-moments-paged", baseUrl],
       });
       snapshots.forEach(([key, data]) => {
         if (!data) {
@@ -286,9 +292,15 @@ export function MomentsPage() {
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`朋友圈互动已更新。`));
-      await queryClient.invalidateQueries({
-        queryKey: ["app-moments", baseUrl],
-      });
+      // 同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page、search-index 等)
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["app-moments-paged", baseUrl],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["app-moments", baseUrl],
+        }),
+      ]);
     },
   });
 
@@ -336,19 +348,25 @@ export function MomentsPage() {
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`朋友圈互动已更新。`));
-      await queryClient.invalidateQueries({
-        queryKey: ["app-moments", baseUrl],
-      });
+      // 同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page、search-index 等)
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["app-moments-paged", baseUrl],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["app-moments", baseUrl],
+        }),
+      ]);
     },
   });
   const deleteMutation = useMutation({
     mutationFn: (momentId: string) => deleteMoment(momentId, baseUrl),
     onMutate: async (momentId) => {
-      await queryClient.cancelQueries({ queryKey: ["app-moments", baseUrl] });
+      await queryClient.cancelQueries({ queryKey: ["app-moments-paged", baseUrl] });
       const snapshots = queryClient.getQueriesData<
         InfiniteData<MomentsPageResponse>
       >({
-        queryKey: ["app-moments", baseUrl],
+        queryKey: ["app-moments-paged", baseUrl],
       });
       snapshots.forEach(([key, data]) => {
         if (!data) return;
@@ -372,9 +390,15 @@ export function MomentsPage() {
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`已删除这条朋友圈。`));
-      await queryClient.invalidateQueries({
-        queryKey: ["app-moments", baseUrl],
-      });
+      // 同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page、search-index 等)
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["app-moments-paged", baseUrl],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["app-moments", baseUrl],
+        }),
+      ]);
     },
   });
   const pendingLikeMomentId = likeMutation.isPending
@@ -944,7 +968,7 @@ export function MomentsPage() {
       onRefresh={async () => {
         // 重置到第 1 页：剔除其余页，让首页 refetch 拉新数据；用户再触底时重新堆。
         queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
-          ["app-moments", baseUrl],
+          ["app-moments-paged", baseUrl],
           (current) =>
             current
               ? {

@@ -59,9 +59,11 @@ export function MobileMomentsPublishPage() {
     onSuccess: async () => {
       storeMomentPublishFlash(t(msg`朋友圈已发布。`));
       composeDraft.reset();
-      await queryClient.invalidateQueries({
-        queryKey: ["app-moments", baseUrl],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] }),
+        // moments-page 用 paged key 走无限分页
+        queryClient.invalidateQueries({ queryKey: ["app-moments-paged", baseUrl] }),
+      ]);
       void navigate({
         to: safeReturnPath ?? "/discover/moments",
         ...(safeReturnHash ? { hash: safeReturnHash } : {}),
