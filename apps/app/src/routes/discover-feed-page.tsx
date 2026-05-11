@@ -814,6 +814,7 @@ const pendingLikePostId = likeMutation.isPending
           onRemoveImage={(id) => composeDraft.removeImageDraft(id)}
           onRemoveVideo={() => composeDraft.clearVideoDraft()}
           onRefresh={() => {
+            resetFeedToFirstPage();
             void feedQuery.refetch();
             if (ownerId) {
               void blockedQuery.refetch();

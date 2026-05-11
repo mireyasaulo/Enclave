@@ -522,11 +522,14 @@ export function MomentsPage() {
       return;
     }
 
+    // 先收回到 page 1 再 refetch，避免多页 refetch 命中分页边界偏移
+    resetMomentsToFirstPage();
     void momentsQuery.refetch();
     void blockedQuery.refetch();
   }
 
   function handleRetryLoad() {
+    resetMomentsToFirstPage();
     void momentsQuery.refetch();
     void blockedQuery.refetch();
   }
@@ -883,6 +886,7 @@ export function MomentsPage() {
             );
           }}
           onRefresh={() => {
+            resetMomentsToFirstPage();
             void momentsQuery.refetch();
             if (ownerId) {
               void blockedQuery.refetch();
