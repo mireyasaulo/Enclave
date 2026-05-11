@@ -300,6 +300,14 @@ Enclave는 아직 자라나는 세계입니다. 어떤 방식으로든 환영합
 
 Enclave의 커뮤니티가 저 "자신"이라는 주민처럼 — **부드럽고, 존중하며, 편견 없는** 곳이기를 바랍니다.
 
+### 💬 커뮤니티 참여
+
+작성자의 개인 WeChat을 스캔하고 "Enclave"라고 메모해 주세요. 함께 이야기해요:
+
+<p align="center">
+  <img src="docs/assets/wechat-personal-qr.png" alt="작성자의 개인 WeChat QR 코드" width="240" />
+</p>
+
 ---
 
 ## 📄 라이선스

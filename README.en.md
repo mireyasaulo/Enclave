@@ -329,6 +329,14 @@ Details in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 We want the Enclave community to feel the way the "Yourself" resident feels: gentle, respectful, without prejudice.
 
+### 💬 Join the community
+
+Scan to add the author on WeChat (note "Enclave"), and let's talk:
+
+<p align="center">
+  <img src="docs/assets/wechat-personal-qr.png" alt="Author's personal WeChat QR" width="240" />
+</p>
+
 ---
 
 ## 📄 License
