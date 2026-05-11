@@ -1,0 +1,28 @@
+# build context = ./api，根目录 .dockerignore 在这条路径下不生效。
+# 必须在 api/ 内单独列：把宿主机（可能是 Windows / macOS）的 node_modules、
+# 已编译产物、本地数据库与日志拦在外面，避免 npm ci 装好的 Linux 原生
+# 二进制（如 better-sqlite3 的 .node）被 COPY . . 用宿主机版本覆盖。
+node_modules
+
+# 本地构建产物，容器内会重新 nest build
+dist
+build
+
+# 本地 dev 数据 / 临时数据库
+data
+database.sqlite
+database.sqlite-journal
+database.sqlite-wal
+database.sqlite-shm
+storage
+
+# 日志 / 编辑器 / OS 杂物
+*.log
+logs
+.DS_Store
+Thumbs.db
+
+# 本地编辑器与版本控制（也不会被 build 用到）
+.idea
+.vscode
+.git
