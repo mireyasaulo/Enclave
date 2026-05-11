@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { msg } from "@lingui/macro";
 import {
   type FeedComment,
@@ -6,7 +6,7 @@ import {
   type FeedPostWithComments,
 } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
-import { Button, ErrorBlock, LoadingBlock, TextField, cn } from "@yinjie/ui";
+import { ErrorBlock, LoadingBlock, cn } from "@yinjie/ui";
 import {
   Bot,
   Heart,
@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
+import { MomentCommentComposer } from "../../../components/moment-comment-composer";
 import { MomentMediaGallery } from "../../../components/moment-media-gallery";
 import {
   getFeedSummaryText,
@@ -32,15 +33,13 @@ type DesktopFeedRowProps = {
   detailErrorMessage?: string | null;
   detailLoading?: boolean;
   detailPost?: FeedPostWithComments | null;
-  expanded: boolean;
   favorite: boolean;
   likeLoading: boolean;
   post: FeedPostListItem;
   onCancelCommentReply?: () => void;
-  onCollapse: () => void;
   onCommentChange: (value: string) => void;
   onCommentSubmit: () => void;
-  onExpand: () => void;
+  onLoadFullComments?: () => void;
   onLike: () => void;
   /** 可选 — 触发"分享图卡"。 */
   onShare?: () => void;
@@ -55,41 +54,79 @@ export function DesktopFeedRow({
   detailErrorMessage = null,
   detailLoading = false,
   detailPost = null,
-  expanded,
   favorite,
   likeLoading,
   post,
   onCancelCommentReply,
-  onCollapse,
   onCommentChange,
   onCommentSubmit,
-  onExpand,
+  onLoadFullComments,
   onLike,
   onShare,
   onStartCommentReply,
   onToggleFavorite,
 }: DesktopFeedRowProps) {
   const t = useRuntimeTranslator();
+  const composerInputRef = useRef<HTMLTextAreaElement>(null);
   const hasText = Boolean(post.text.trim());
   const hasMedia = post.media.length > 0;
   const mediaSummaryText = hasText ? "" : getFeedSummaryText(post);
-  const previewCount = post.commentsPreview.length;
-  const hasMore = post.commentCount > previewCount;
 
-  const commentThreads = useMemo(() => {
-    if (!detailPost) {
-      return [] as Array<{ root: FeedComment; replies: FeedComment[] }>;
+  const commentsForDisplay = useMemo(() => {
+    if (detailPost) {
+      return detailPost.comments;
     }
-    const rootComments = detailPost.comments.filter(
-      (comment) => !comment.parentCommentId,
-    );
-    return rootComments.map((root) => ({
-      root,
-      replies: detailPost.comments.filter(
-        (comment) => comment.parentCommentId === root.id,
+    return post.commentsPreview;
+  }, [detailPost, post.commentsPreview]);
+
+  const commentsById = useMemo(
+    () =>
+      new Map(
+        commentsForDisplay.map((comment) => [comment.id, comment] as const),
       ),
-    }));
-  }, [detailPost]);
+    [commentsForDisplay],
+  );
+  const authorNameById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const comment of commentsForDisplay) {
+      if (comment.authorId && comment.authorName) {
+        map.set(comment.authorId, comment.authorName);
+      }
+    }
+    return map;
+  }, [commentsForDisplay]);
+
+  function lookupReplyToName(comment: FeedComment): string | null {
+    if (comment.replyToCommentId) {
+      const target = commentsById.get(comment.replyToCommentId);
+      if (target?.authorName) {
+        return target.authorName;
+      }
+    }
+    if (comment.replyToAuthorId) {
+      return authorNameById.get(comment.replyToAuthorId) ?? null;
+    }
+    return null;
+  }
+
+  const focusComposer = () => {
+    requestAnimationFrame(() => {
+      composerInputRef.current?.focus();
+    });
+  };
+
+  const activeReply =
+    commentReplyTarget && commentReplyTarget.postId === post.id
+      ? commentReplyTarget
+      : null;
+  const replyTargetComment = activeReply
+    ? (commentsById.get(activeReply.commentId) ??
+      post.commentsPreview.find((item) => item.id === activeReply.commentId) ??
+      null)
+    : null;
+  const canReply = Boolean(onStartCommentReply);
+  const showLoadMore =
+    !detailPost && post.commentCount > commentsForDisplay.length;
 
   return (
     <article
@@ -168,8 +205,8 @@ export function DesktopFeedRow({
               </button>
               <button
                 type="button"
-                onClick={expanded ? onCollapse : onExpand}
-                aria-pressed={expanded}
+                onClick={focusComposer}
+                aria-label={t(msg`评论`)}
                 className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[color:var(--border-faint)] px-2.5 text-[12px] text-[color:var(--text-secondary)] transition-[background-color,color,border-color] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]"
               >
                 <MessageCircle size={14} />
@@ -202,272 +239,164 @@ export function DesktopFeedRow({
             </div>
           </div>
 
-          {!expanded && previewCount > 0 ? (
-            <div className="mt-3 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3">
-              <div className="space-y-2 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-                {post.commentsPreview.map((comment) => (
-                  <div key={comment.id}>
-                    <span className="font-medium text-[color:var(--text-primary)]">
-                      {comment.authorName}
-                    </span>
-                    <span className="text-[color:var(--text-dim)]">
-                      {t(msg`：`)}
-                    </span>
-                    <span>{comment.text}</span>
-                  </div>
-                ))}
+          <div className="mt-3 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-[12px] font-medium text-[color:var(--text-primary)]">
+                <MessageCircle size={13} />
+                {t(msg`评论`)}
               </div>
-              {hasMore ? (
-                <button
-                  type="button"
-                  onClick={onExpand}
-                  className="mt-3 text-[12px] font-medium text-[color:var(--brand-primary)]"
-                >
-                  {t(msg`查看全部 ${post.commentCount} 条评论`)}
-                </button>
-              ) : null}
+              <span className="text-[11px] text-[color:var(--text-muted)]">
+                {t(msg`${post.commentCount} 条`)}
+              </span>
             </div>
-          ) : null}
 
-          {!expanded && previewCount === 0 && hasMore ? (
-            <div className="mt-3">
+            {detailLoading ? (
+              <div className="mt-3">
+                <LoadingBlock label={t(msg`正在读取完整评论...`)} />
+              </div>
+            ) : null}
+
+            {detailErrorMessage ? (
+              <div className="mt-3">
+                <ErrorBlock message={detailErrorMessage} />
+              </div>
+            ) : null}
+
+            {commentsForDisplay.length > 0 ? (
+              <div className="mt-3 space-y-1.5">
+                {commentsForDisplay.map((comment) => {
+                  const replyToName = lookupReplyToName(comment);
+                  const isActiveReply = activeReply?.commentId === comment.id;
+                  if (!canReply) {
+                    return (
+                      <div
+                        key={comment.id}
+                        className="rounded-[10px] px-2 py-1.5 text-[13px] leading-6"
+                      >
+                        <CommentLine
+                          authorName={comment.authorName}
+                          replyToName={replyToName}
+                          text={comment.text}
+                        />
+                      </div>
+                    );
+                  }
+                  return (
+                    <button
+                      key={comment.id}
+                      type="button"
+                      onClick={() => {
+                        onStartCommentReply?.(comment);
+                        focusComposer();
+                      }}
+                      className={cn(
+                        "block w-full rounded-[10px] px-2 py-1.5 text-left text-[13px] leading-6 transition-colors",
+                        isActiveReply
+                          ? "bg-[rgba(7,193,96,0.12)]"
+                          : "hover:bg-white",
+                      )}
+                      title={t(msg`回复这条评论`)}
+                    >
+                      <CommentLine
+                        authorName={comment.authorName}
+                        replyToName={replyToName}
+                        text={comment.text}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            ) : !detailLoading ? (
+              <div className="mt-3 text-[12px] text-[color:var(--text-muted)]">
+                {t(msg`还没有评论，你可以成为第一个回应的人。`)}
+              </div>
+            ) : null}
+
+            {showLoadMore && onLoadFullComments ? (
               <button
                 type="button"
-                onClick={onExpand}
-                className="text-[12px] font-medium text-[color:var(--brand-primary)]"
+                onClick={onLoadFullComments}
+                className="mt-3 text-[12px] font-medium text-[color:var(--brand-primary)]"
               >
-                {t(msg`查看全部 ${post.commentCount} 条评论`)}
+                {detailLoading
+                  ? t(msg`正在读取...`)
+                  : t(msg`查看全部 ${post.commentCount} 条评论`)}
               </button>
-            </div>
-          ) : null}
+            ) : null}
 
-          {expanded ? (
-            <div className="mt-3 rounded-[14px] border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-4 py-3">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-[12px] font-medium text-[color:var(--text-primary)]">
-                  <MessageCircle size={13} />
-                  {t(msg`评论区`)}
+            {activeReply ? (
+              <div className="mt-3 flex items-start justify-between gap-2 rounded-[10px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[12px] text-[color:var(--text-secondary)]">
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="truncate">
+                    {t(msg`正在回复 ${activeReply.authorName}`)}
+                  </div>
+                  {replyTargetComment ? (
+                    <div className="truncate text-[color:var(--text-muted)]">
+                      {t(msg`「${replyTargetComment.text}」`)}
+                    </div>
+                  ) : null}
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-[color:var(--text-muted)]">
-                    {t(msg`${post.commentCount} 条`)}
-                  </span>
+                {onCancelCommentReply ? (
                   <button
                     type="button"
-                    onClick={onCollapse}
-                    aria-label={t(msg`收起评论`)}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)]"
+                    onClick={onCancelCommentReply}
+                    aria-label={t(msg`取消回复`)}
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[color:var(--text-muted)] hover:bg-white"
                   >
                     <X size={12} />
                   </button>
-                </div>
+                ) : null}
               </div>
+            ) : null}
 
-              {detailLoading ? (
-                <div className="mt-3">
-                  <LoadingBlock label={t(msg`正在读取完整评论...`)} />
-                </div>
-              ) : null}
-
-              {detailErrorMessage ? (
-                <div className="mt-3">
-                  <ErrorBlock message={detailErrorMessage} />
-                </div>
-              ) : null}
-
-              {!detailLoading && detailPost ? (
-                commentThreads.length > 0 ? (
-                  <div className="mt-3 space-y-3">
-                    {commentThreads.map(({ root, replies }) => (
-                      <div
-                        key={root.id}
-                        className="rounded-[12px] border border-[color:var(--border-faint)] bg-white px-3.5 py-3"
-                      >
-                        <CommentRow
-                          comment={root}
-                          replyToName={null}
-                          canReply={Boolean(onStartCommentReply)}
-                          active={commentReplyTarget?.commentId === root.id}
-                          onStartReply={
-                            onStartCommentReply
-                              ? () => onStartCommentReply(root)
-                              : undefined
-                          }
-                        />
-                        {replies.length > 0 ? (
-                          <div className="mt-3 space-y-2 border-l border-[color:var(--border-faint)] pl-3">
-                            {replies.map((reply) => {
-                              const replyToName =
-                                reply.replyToCommentId &&
-                                reply.replyToCommentId !== root.id
-                                  ? (replies.find(
-                                      (item) =>
-                                        item.id === reply.replyToCommentId,
-                                    )?.authorName ?? null)
-                                  : null;
-                              return (
-                                <CommentRow
-                                  key={reply.id}
-                                  comment={reply}
-                                  replyToName={replyToName}
-                                  canReply={Boolean(onStartCommentReply)}
-                                  active={
-                                    commentReplyTarget?.commentId === reply.id
-                                  }
-                                  onStartReply={
-                                    onStartCommentReply
-                                      ? () => onStartCommentReply(reply)
-                                      : undefined
-                                  }
-                                />
-                              );
-                            })}
-                          </div>
-                        ) : null}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="mt-3 rounded-[12px] border border-dashed border-[color:var(--border-faint)] bg-white px-3.5 py-3 text-[12px] text-[color:var(--text-muted)]">
-                    {t(msg`暂时还没有评论，你可以先说一句。`)}
-                  </div>
-                )
-              ) : null}
-
-              {commentReplyTarget ? (
-                <div className="mt-3 flex items-center justify-between gap-2 rounded-[12px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-3 py-2 text-[12px] text-[color:var(--text-secondary)]">
-                  <div className="truncate">
-                    {t(msg`正在回复 ${commentReplyTarget.authorName}`)}
-                  </div>
-                  {onCancelCommentReply ? (
-                    <button
-                      type="button"
-                      onClick={onCancelCommentReply}
-                      aria-label={t(msg`取消回复`)}
-                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[color:var(--text-muted)] hover:bg-white"
-                    >
-                      <X size={12} />
-                    </button>
-                  ) : null}
-                </div>
-              ) : null}
-
-              <div className="mt-3 flex items-center gap-2 border-t border-[color:var(--border-faint)] pt-3">
-                <TextField
-                  value={commentDraft}
-                  onChange={(event) => onCommentChange(event.target.value)}
-                  placeholder={
-                    commentReplyTarget
-                      ? t(msg`回复 ${commentReplyTarget.authorName}...`)
-                      : t(msg`写评论...`)
-                  }
-                  className="min-w-0 flex-1 rounded-xl border-[color:var(--border-faint)] bg-white px-4 py-2 text-[13px] shadow-none hover:bg-white focus:border-[rgba(7,193,96,0.18)] focus:shadow-none"
-                />
-                <Button
-                  variant="primary"
-                  size="sm"
-                  disabled={!commentDraft.trim() || commentLoading}
-                  onClick={onCommentSubmit}
-                  className="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
-                >
-                  {commentLoading ? t(msg`发送中...`) : t(msg`发送`)}
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="mt-3 flex items-center gap-2">
-              <TextField
+            <div className="mt-3 border-t border-[color:var(--border-faint)] pt-3">
+              <MomentCommentComposer
                 value={commentDraft}
-                onChange={(event) => onCommentChange(event.target.value)}
-                placeholder={t(msg`写评论...`)}
-                className="min-w-0 flex-1 rounded-xl border-[color:var(--border-faint)] bg-white px-4 py-2 text-[13px] shadow-none hover:bg-white focus:border-[rgba(7,193,96,0.18)] focus:shadow-none"
+                onChange={onCommentChange}
+                onSubmit={onCommentSubmit}
+                pending={commentLoading}
+                inputRef={composerInputRef}
+                placeholder={
+                  activeReply
+                    ? t(msg`回复 ${activeReply.authorName}...`)
+                    : t(msg`写评论...`)
+                }
+                inputClassName="rounded-xl border-[color:var(--border-faint)] bg-white px-4 py-2 text-[13px] shadow-none hover:bg-white focus:border-[rgba(7,193,96,0.14)] focus:shadow-none"
+                buttonClassName="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
               />
-              <Button
-                variant="primary"
-                size="sm"
-                disabled={!commentDraft.trim() || commentLoading}
-                onClick={onCommentSubmit}
-                className="bg-[color:var(--brand-primary)] text-white shadow-none hover:opacity-95"
-              >
-                {commentLoading ? t(msg`发送中...`) : t(msg`发送`)}
-              </Button>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </article>
   );
 }
 
-function CommentRow({
-  active,
-  canReply,
-  comment,
-  onStartReply,
+function CommentLine({
+  authorName,
   replyToName,
+  text,
 }: {
-  active: boolean;
-  canReply: boolean;
-  comment: FeedComment;
-  onStartReply?: () => void;
+  authorName: string;
   replyToName: string | null;
+  text: string;
 }) {
   const t = useRuntimeTranslator();
-  const body = (
-    <>
-      <div className="flex items-center gap-2 text-[12px]">
-        <span className="font-medium text-[#07c160]">
-          {comment.authorName}
-        </span>
-        <span
-          className={cn(
-            "rounded-md border px-2 py-0.5 text-[10px] font-medium",
-            comment.authorType === "character"
-              ? "border-[rgba(7,193,96,0.12)] bg-[rgba(7,193,96,0.06)] text-[color:var(--brand-primary)]"
-              : "border-[color:var(--border-faint)] bg-white text-[color:var(--text-secondary)]",
-          )}
-        >
-          {comment.authorType === "character"
-            ? t(msg`居民`)
-            : t(msg`世界主人`)}
-        </span>
-        <span className="text-[color:var(--text-dim)]">
-          {formatTimestamp(comment.createdAt)}
-        </span>
-      </div>
-      <div className="mt-1.5 text-[13px] leading-6 text-[color:var(--text-secondary)]">
-        {replyToName ? (
-          <>
-            <span className="text-[color:var(--text-secondary)]">
-              {t(msg`回复 `)}
-            </span>
-            <span className="font-medium text-[#07c160]">{replyToName}</span>
-            <span className="text-[color:var(--text-secondary)]">
-              {t(msg`：`)}
-            </span>
-          </>
-        ) : null}
-        <span className="text-[color:var(--text-primary)]">{comment.text}</span>
-      </div>
-    </>
-  );
-
-  if (!canReply) {
-    return <div className="rounded-[10px] px-2 py-1.5">{body}</div>;
-  }
   return (
-    <button
-      type="button"
-      onClick={onStartReply}
-      title={t(msg`回复这条评论`)}
-      className={cn(
-        "block w-full rounded-[10px] px-2 py-1.5 text-left transition-colors",
-        active
-          ? "bg-[rgba(7,193,96,0.12)]"
-          : "hover:bg-[color:var(--surface-console)]",
-      )}
-    >
-      {body}
-    </button>
+    <span>
+      <span className="font-medium text-[#07c160]">{authorName}</span>
+      {replyToName ? (
+        <>
+          <span className="text-[color:var(--text-secondary)]">
+            {t(msg` 回复 `)}
+          </span>
+          <span className="font-medium text-[#07c160]">{replyToName}</span>
+        </>
+      ) : null}
+      <span className="text-[color:var(--text-secondary)]">
+        {t(msg`：`)}
+      </span>
+      <span className="text-[color:var(--text-primary)]">{text}</span>
+    </span>
   );
 }

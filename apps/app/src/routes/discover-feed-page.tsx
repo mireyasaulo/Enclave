@@ -11,11 +11,9 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Copy,
-  Heart,
   Image as ImageIcon,
   PenSquare,
   Share2,
-  X,
 } from "lucide-react";
 import {
   addFeedComment,
@@ -26,7 +24,7 @@ import {
   type FeedComment,
   type FeedListResponse,
 } from "@yinjie/contracts";
-import { AppPage, Button, InlineNotice, TextField } from "@yinjie/ui";
+import { AppPage, Button, InlineNotice } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { FeedPostShareCardModal } from "../components/feed-post-share-card-modal";
 import { MomentMediaGallery } from "../components/moment-media-gallery";
@@ -39,6 +37,11 @@ import {
 } from "../features/favorites/favorites-storage";
 import { SocialPostCard } from "../components/social-post-card";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
+import { WeChatActionBubble } from "../components/wechat-action-bubble";
+import {
+  WeChatCommentBar,
+  type WeChatCommentBarReplyTarget,
+} from "../components/wechat-comment-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import {
   publishFeedComposeDraft,
@@ -96,11 +99,13 @@ export function DiscoverFeedPage() {
     commentId: string;
     postId: string;
   } | null>(null);
-  const [mobileReplyTarget, setMobileReplyTarget] = useState<{
-    authorId: string;
-    authorName: string;
-    commentId: string;
+  const [actionBubble, setActionBubble] = useState<{
     postId: string;
+    anchorRect: DOMRect;
+  } | null>(null);
+  const [commentBarTarget, setCommentBarTarget] = useState<{
+    postId: string;
+    replyTo: WeChatCommentBarReplyTarget | null;
   } | null>(null);
   const [showCompose, setShowCompose] = useState(false);
   const [notice, setNotice] = useState("");
@@ -252,7 +257,7 @@ export function DiscoverFeedPage() {
       setDesktopReplyTarget((current) =>
         current?.postId === input.postId ? null : current,
       );
-      setMobileReplyTarget((current) =>
+      setCommentBarTarget((current) =>
         current?.postId === input.postId ? null : current,
       );
       setNoticeTone("success");
@@ -354,7 +359,8 @@ const pendingLikePostId = likeMutation.isPending
   useEffect(() => {
     resetComposeDraft();
     setCommentDrafts({});
-    setMobileReplyTarget(null);
+    setActionBubble(null);
+    setCommentBarTarget(null);
     setShowCompose(false);
     setNoticeActionLabel(null);
     setNoticeAction(null);
@@ -926,37 +932,7 @@ const pendingLikePostId = likeMutation.isPending
                     : summaryText || undefined
                 }
                 actions={
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      disabled={likeMutation.isPending || !post.canInteract}
-                      title={
-                        !post.canInteract
-                          ? t(msg`加为好友后才能互动`)
-                          : undefined
-                      }
-                      onClick={() => likeMutation.mutate(post.id)}
-                      variant="secondary"
-                      size="sm"
-                      className={
-                        post.ownerState?.hasLiked
-                          ? "border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] text-[#07c160]"
-                          : undefined
-                      }
-                    >
-                      <Heart
-                        size={13}
-                        className={
-                          post.ownerState?.hasLiked ? "fill-current" : undefined
-                        }
-                      />
-                      {pendingLikePostId === post.id
-                        ? t(msg`处理中...`)
-                        : post.ownerState?.hasLiked
-                          ? t(msg`已赞`)
-                          : !post.canInteract
-                            ? t(msg`需好友`)
-                            : t(msg`点赞`)}
-                    </Button>
+                  <div className="flex flex-wrap items-center gap-2">
                     <Button
                       variant="secondary"
                       size="sm"
@@ -985,110 +961,83 @@ const pendingLikePostId = likeMutation.isPending
                     >
                       {collected ? t(msg`取消收藏`) : t(msg`收藏`)}
                     </Button>
+                    {post.canInteract ? (
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          const rect =
+                            event.currentTarget.getBoundingClientRect();
+                          setActionBubble({ postId: post.id, anchorRect: rect });
+                        }}
+                        aria-label={t(msg`更多操作`)}
+                        className="ml-auto inline-flex h-7 w-9 items-center justify-center rounded-[4px] bg-[#F2F2F2] text-[#4C4C4C] active:bg-[#E5E5E5]"
+                      >
+                        <MoreHorizontalDots />
+                      </button>
+                    ) : null}
                   </div>
                 }
                 secondary={
                   post.commentsPreview.length > 0 ? (
-                    <div className="space-y-0.5 rounded-[14px] bg-[color:var(--surface-soft)] p-2.5">
-                      {post.commentsPreview.map((comment) => {
-                        const replyToName = comment.replyToCommentId
-                          ? post.commentsPreview.find(
-                              (item) => item.id === comment.replyToCommentId,
-                            )?.authorName ?? null
-                          : null;
-                        return (
+                    <div className="overflow-hidden rounded-[3px] border border-[#EDEDED] bg-[#F7F7F7]">
+                      <div className="space-y-0.5 px-2.5 py-1.5 text-[13px] leading-[22px]">
+                        {post.commentsPreview.map((comment) => {
+                          const replyToName = comment.replyToCommentId
+                            ? (post.commentsPreview.find(
+                                (item) => item.id === comment.replyToCommentId,
+                              )?.authorName ?? null)
+                            : null;
+                          return (
+                            <button
+                              key={comment.id}
+                              type="button"
+                              onClick={() => {
+                                if (!post.canInteract) return;
+                                setCommentBarTarget({
+                                  postId: post.id,
+                                  replyTo: {
+                                    authorId: comment.authorId,
+                                    authorName: comment.authorName,
+                                    commentId: comment.id,
+                                  },
+                                });
+                              }}
+                              className="block w-full text-left text-[#1A1A1A] active:bg-[#EFEFEF]"
+                            >
+                              <span className="text-[#576B95]">
+                                {comment.authorName}
+                              </span>
+                              {replyToName ? (
+                                <>
+                                  <span> {t(msg`回复`)} </span>
+                                  <span className="text-[#576B95]">
+                                    {replyToName}
+                                  </span>
+                                </>
+                              ) : null}
+                              <span>：{comment.text}</span>
+                            </button>
+                          );
+                        })}
+                        {post.commentCount > post.commentsPreview.length ? (
                           <button
-                            key={comment.id}
                             type="button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              setMobileReplyTarget({
-                                authorId: comment.authorId,
-                                authorName: comment.authorName,
-                                commentId: comment.id,
+                            onClick={() => {
+                              if (!post.canInteract) return;
+                              setCommentBarTarget({
                                 postId: post.id,
+                                replyTo: null,
                               });
                             }}
-                            className={`block w-full rounded-[8px] px-1 py-0.5 text-left text-[11px] leading-[1.35rem] text-[color:var(--text-secondary)] active:bg-[rgba(7,193,96,0.08)] ${
-                              mobileReplyTarget?.commentId === comment.id
-                                ? "bg-[rgba(7,193,96,0.08)]"
-                                : ""
-                            }`}
+                            className="mt-1 block text-left text-[12px] text-[#576B95] active:opacity-60"
                           >
-                            <span className="text-[color:var(--text-primary)]">
-                              {comment.authorName}
-                            </span>
-                            {replyToName ? (
-                              <>
-                                <span> {t(msg`回复`)} </span>
-                                <span className="text-[color:var(--text-primary)]">
-                                  {replyToName}
-                                </span>
-                              </>
-                            ) : null}
-                            {`：${comment.text}`}
+                            {t(msg`查看全部 ${post.commentCount} 条评论`)}
                           </button>
-                        );
-                      })}
+                        ) : null}
+                      </div>
                     </div>
                   ) : null
-                }
-                composer={
-                  <div className="flex w-full flex-col gap-1.5">
-                    {mobileReplyTarget?.postId === post.id ? (
-                      <div className="flex items-center justify-between gap-2 rounded-[10px] border border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] px-2.5 py-1 text-[11px] text-[color:var(--text-secondary)]">
-                        <div className="truncate">
-                          {t(msg`正在回复 ${mobileReplyTarget.authorName}`)}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setMobileReplyTarget(null)}
-                          aria-label={t(msg`取消回复`)}
-                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[color:var(--text-muted)] active:bg-white"
-                        >
-                          <X size={11} />
-                        </button>
-                      </div>
-                    ) : null}
-                    <div className="flex w-full items-center gap-2">
-                      <TextField
-                        value={commentDrafts[post.id] ?? ""}
-                        onChange={(event) =>
-                          setCommentDrafts((current) => ({
-                            ...current,
-                            [post.id]: event.target.value,
-                          }))
-                        }
-                        placeholder={
-                          mobileReplyTarget?.postId === post.id
-                            ? t(msg`回复 ${mobileReplyTarget.authorName}...`)
-                            : t(msg`写评论...`)
-                        }
-                        className="min-w-0 flex-1 rounded-full py-1.5 text-[12px]"
-                      />
-                      <Button
-                        disabled={
-                          !(commentDrafts[post.id] ?? "").trim() ||
-                          commentMutation.isPending
-                        }
-                        onClick={() =>
-                          submitComment(post.id, {
-                            replyTarget:
-                              mobileReplyTarget?.postId === post.id
-                                ? mobileReplyTarget
-                                : null,
-                          })
-                        }
-                        variant="primary"
-                        size="sm"
-                        className="h-8 px-3 text-[12px]"
-                      >
-                        {pendingCommentPostId === post.id
-                          ? t(msg`发送中...`)
-                          : t(msg`发送`)}
-                      </Button>
-                    </div>
-                  </div>
                 }
               />
             );
@@ -1168,7 +1117,84 @@ const pendingLikePostId = likeMutation.isPending
         }
         onClose={() => setShareCardPostId(null)}
       />
+
+      <WeChatActionBubble
+        open={Boolean(actionBubble)}
+        anchorRect={actionBubble?.anchorRect ?? null}
+        liked={
+          actionBubble
+            ? Boolean(
+                visiblePosts.find((item) => item.id === actionBubble.postId)
+                  ?.ownerState?.hasLiked,
+              )
+            : false
+        }
+        onLike={() => {
+          if (!actionBubble) return;
+          likeMutation.mutate(actionBubble.postId);
+        }}
+        onComment={() => {
+          if (!actionBubble) return;
+          setCommentBarTarget({
+            postId: actionBubble.postId,
+            replyTo: null,
+          });
+        }}
+        onClose={() => setActionBubble(null)}
+      />
+
+      <WeChatCommentBar
+        open={Boolean(commentBarTarget)}
+        replyTo={commentBarTarget?.replyTo ?? null}
+        value={
+          commentBarTarget
+            ? (commentDrafts[commentBarTarget.postId] ?? "")
+            : ""
+        }
+        onChange={(value: string) => {
+          if (!commentBarTarget) return;
+          setCommentDrafts((current) => ({
+            ...current,
+            [commentBarTarget.postId]: value,
+          }));
+        }}
+        pending={
+          commentBarTarget
+            ? pendingCommentPostId === commentBarTarget.postId
+            : false
+        }
+        onSubmit={() => {
+          if (!commentBarTarget) return;
+          submitComment(commentBarTarget.postId, {
+            replyTarget: commentBarTarget.replyTo
+              ? {
+                  authorId: commentBarTarget.replyTo.authorId,
+                  authorName: commentBarTarget.replyTo.authorName,
+                  commentId: commentBarTarget.replyTo.commentId,
+                  postId: commentBarTarget.postId,
+                }
+              : null,
+          });
+        }}
+        onClose={() => setCommentBarTarget(null)}
+      />
     </AppPage>
+  );
+}
+
+function MoreHorizontalDots() {
+  return (
+    <svg
+      width="14"
+      height="3"
+      viewBox="0 0 14 3"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <circle cx="2" cy="1.5" r="1.2" />
+      <circle cx="7" cy="1.5" r="1.2" />
+      <circle cx="12" cy="1.5" r="1.2" />
+    </svg>
   );
 }
 

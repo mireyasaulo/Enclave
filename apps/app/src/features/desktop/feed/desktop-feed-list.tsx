@@ -23,10 +23,9 @@ type DesktopFeedListProps = {
   posts: FeedPostListItem[];
   isPostFavorite: (postId: string) => boolean;
   onCancelCommentReply?: () => void;
-  onCollapse: () => void;
   onCommentChange: (postId: string, value: string) => void;
   onCommentSubmit: (postId: string) => void;
-  onExpand: (postId: string) => void;
+  onLoadFullComments: (postId: string) => void;
   onLike: (postId: string) => void;
   onOpenCompose: () => void;
   /** 可选 — 触发"分享图卡"上抛 postId。 */
@@ -48,10 +47,9 @@ export function DesktopFeedList({
   posts,
   isPostFavorite,
   onCancelCommentReply,
-  onCollapse,
   onCommentChange,
   onCommentSubmit,
-  onExpand,
+  onLoadFullComments,
   onLike,
   onOpenCompose,
   onShare,
@@ -71,29 +69,33 @@ export function DesktopFeedList({
       {!isLoading && posts.length > 0 ? (
         <div className="space-y-4 pb-6">
           {posts.map((post) => {
-            const expanded = post.id === selectedPostId;
+            const isDetailLoaded = post.id === selectedPostId;
             return (
               <DesktopFeedRow
                 key={post.id}
                 commentDraft={commentDrafts[post.id] ?? ""}
                 commentLoading={commentPendingPostId === post.id}
                 commentReplyTarget={
-                  expanded ? commentReplyTarget : null
+                  commentReplyTarget?.postId === post.id
+                    ? commentReplyTarget
+                    : null
                 }
-                detailErrorMessage={expanded ? detailErrorMessage : null}
-                detailLoading={expanded ? detailLoading : false}
+                detailErrorMessage={
+                  isDetailLoaded ? detailErrorMessage : null
+                }
+                detailLoading={isDetailLoaded ? detailLoading : false}
                 detailPost={
-                  expanded && detailPost?.id === post.id ? detailPost : null
+                  isDetailLoaded && detailPost?.id === post.id
+                    ? detailPost
+                    : null
                 }
-                expanded={expanded}
                 favorite={isPostFavorite(post.id)}
                 likeLoading={likePendingPostId === post.id}
                 post={post}
                 onCancelCommentReply={onCancelCommentReply}
-                onCollapse={onCollapse}
                 onCommentChange={(value) => onCommentChange(post.id, value)}
                 onCommentSubmit={() => onCommentSubmit(post.id)}
-                onExpand={() => onExpand(post.id)}
+                onLoadFullComments={() => onLoadFullComments(post.id)}
                 onLike={() => onLike(post.id)}
                 onShare={onShare ? () => onShare(post.id) : undefined}
                 onStartCommentReply={onStartCommentReply}
