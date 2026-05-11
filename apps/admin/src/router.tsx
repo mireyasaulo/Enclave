@@ -111,6 +111,11 @@ const MinimaxQuotaPage = lazy(async () => {
   return { default: mod.MinimaxQuotaPage };
 });
 
+const DigitalHumanPage = lazy(async () => {
+  const mod = await import("./routes/digital-human-page");
+  return { default: mod.DigitalHumanPage };
+});
+
 const rootRoute = createRootRoute({
   component: RootLayout,
 });
@@ -241,6 +246,12 @@ const minimaxQuotaRoute = createRoute({
   component: MinimaxQuotaPage,
 });
 
+const digitalHumanRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/digital-human",
+  component: DigitalHumanPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   setupRoute,
@@ -263,6 +274,7 @@ const routeTree = rootRoute.addChildren([
   tokenUsageRoute,
   inferenceRoute,
   minimaxQuotaRoute,
+  digitalHumanRoute,
 ]);
 
 export const router = createRouter({

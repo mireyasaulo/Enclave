@@ -21,9 +21,16 @@ export function buildDigitalHumanAdminSummary(
     provider: "mock_digital_human" as const,
   };
 
+  const realReady =
+    gateway.mode === "external_iframe" && gateway.realReady === true;
+  const externalConfigured =
+    gateway.mode === "external_iframe" &&
+    gateway.playerTemplateConfigured &&
+    gateway.paramsValid;
+
   const statusLabel =
     gateway.mode === "external_iframe"
-      ? gateway.ready
+      ? realReady
         ? t(msg`可联调`)
         : !gateway.playerTemplateConfigured
           ? t(msg`缺模板`)
@@ -31,7 +38,9 @@ export function buildDigitalHumanAdminSummary(
             ? t(msg`缺回调`)
             : !gateway.paramsValid
               ? t(msg`参数无效`)
-              : t(msg`待配置`)
+              : externalConfigured
+                ? t(msg`待诊断`)
+                : t(msg`待配置`)
       : t(msg`模拟`);
 
   const description =
@@ -45,7 +54,7 @@ export function buildDigitalHumanAdminSummary(
           ? t(
               msg`扩展参数 JSON 当前无效，外部数字人实例参数没有成功注入到播放器模板。`,
             )
-          : gateway.mode === "external_iframe" && gateway.ready
+          : gateway.mode === "external_iframe" && realReady
             ? gateway.paramsCount > 0
               ? t(
                   msg`外部数字人 Provider 已就绪，当前模板会注入 ${gateway.paramsCount} 个上游参数。`,
@@ -53,15 +62,19 @@ export function buildDigitalHumanAdminSummary(
               : t(
                   msg`外部数字人 Provider 已就绪，当前可以直接联调真实播放器和状态回写。`,
                 )
-            : gateway.mode === "mock_stage"
+            : gateway.mode === "external_iframe" && externalConfigured
               ? t(
-                  msg`当前仍在内置数字人舞台模式，适合先验证会话、语音和状态链路。`,
+                  msg`外部数字人模板和回调已配齐，但还没有跑过一次真实联调诊断。`,
                 )
-              : gateway.mode === "mock_iframe"
+              : gateway.mode === "mock_stage"
                 ? t(
-                    msg`当前仍在内置数字人播放器模式，播放器壳已接通，但还不是真实外部数字人。`,
+                    msg`当前仍在内置数字人舞台模式，适合先验证会话、语音和状态链路。`,
                   )
-                : gateway.message;
+                : gateway.mode === "mock_iframe"
+                  ? t(
+                      msg`当前仍在内置数字人播放器模式，播放器壳已接通，但还不是真实外部数字人。`,
+                    )
+                  : gateway.message;
 
   const nextStep =
     gateway.mode === "external_iframe" && !gateway.playerTemplateConfigured
@@ -70,16 +83,20 @@ export function buildDigitalHumanAdminSummary(
         ? t(msg`下一步补 callbackToken，让 provider-state 回调进入可鉴权状态。`)
         : gateway.mode === "external_iframe" && !gateway.paramsValid
           ? t(msg`下一步修正 providerParams JSON，再重试外部视频通话联调。`)
-          : gateway.mode === "external_iframe" && gateway.ready
+          : gateway.mode === "external_iframe" && realReady
             ? t(msg`下一步直接发起一次真实数字人视频通话，核对回调和画面切换。`)
-            : gateway.mode === "mock_stage"
-              ? t(msg`下一步把模式切到 external_iframe，并补真实播放器模板。`)
-              : t(
-                  msg`下一步补外部 provider 模板和回调，把内置播放器替换成真实数字人服务。`,
-                );
+            : gateway.mode === "external_iframe" && externalConfigured
+              ? t(
+                  msg`下一步在「模型与路由」跑一次数字人诊断，确认真实 provider 回调成功。`,
+                )
+              : gateway.mode === "mock_stage"
+                ? t(msg`下一步把模式切到 external_iframe，并补真实播放器模板。`)
+                : t(
+                    msg`下一步补外部 provider 模板和回调，把内置播放器替换成真实数字人服务。`,
+                  );
 
   return {
-    ready: gateway.ready,
+    ready: realReady,
     statusLabel,
     modeLabel: formatDigitalHumanAdminMode(gateway.mode),
     description,

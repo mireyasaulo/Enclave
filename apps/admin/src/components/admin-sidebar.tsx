@@ -115,7 +115,7 @@ export function AdminSidebar({
     issues.push({
       label: t(msg`数字人 ${digitalHumanSummary.statusLabel}`),
       detail: digitalHumanSummary.nextStep,
-      to: "/",
+      to: "/digital-human",
     });
   }
   if (ownerCount !== null && ownerCount !== 1) {
