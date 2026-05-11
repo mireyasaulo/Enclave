@@ -42,6 +42,8 @@ docker compose up -d
 
 The first boot runs a single-owner migration and makes you the master of this world. Full reference: [DEPLOY.md](DEPLOY.md).
 
+> 💻 Want to run from source (`pnpm dev` brings up api+app+admin together), build the Android shell, or look up ports / restart scripts? See [DEVELOPMENT.en.md](DEVELOPMENT.en.md).
+
 ---
 
 Enclave is an open-source, AI-driven private social platform.
@@ -273,48 +275,6 @@ The backend has 20+ modules. Key ones: `ai` · `auth` · `characters` · `chat` 
 
 ---
 
-## 🚀 Quick start
-
-```bash
-pnpm install
-cp api/.env.example api/.env
-docker compose up -d
-```
-
-The root compose file starts:
-
-- `web` — production web client (port `80`)
-- `api` — the world-instance backend (port `3000`)
-
-The database lives at `data/database.sqlite` at the repo root. Restarts don't wipe it. If you have an older copy at `api/database.sqlite` or `api/data/database.sqlite`, it gets migrated automatically.
-
-Health check:
-
-```bash
-curl http://localhost/healthz
-curl http://localhost/health
-```
-
-Deploying on a single domain? Set `PUBLIC_API_BASE_URL` in `api/.env` to the public web root (e.g. `https://app.your-domain.com`) — **without** a `/api` suffix.
-
-### Android local dev
-
-```bash
-pnpm android:run
-```
-
-Auto-sets `ANDROID_SDK_ROOT`, downloads JDK 21 if your system Java is older, connects to a running emulator or boots the first available AVD, builds the web bundle, syncs Capacitor, installs the debug APK, and launches the app.
-
-For the full local stack (API + Android):
-
-```bash
-pnpm android:run:local
-```
-
-Or run `./start-android-emulator.sh` from the repo root — it starts the Enclave API on `127.0.0.1:39092` and wires the emulator to `10.0.2.2:39092`.
-
----
-
 ## 🗺 Entering your world
 
 First-launch path:
@@ -382,6 +342,7 @@ We chose MIT because we want this to travel as far as possible, with as few gate
 ## 📚 More
 
 - [PROJECT_INTRO.md](PROJECT_INTRO.md) — The long-form product thesis (Chinese, for now).
+- [DEVELOPMENT.en.md](DEVELOPMENT.en.md) — Local development: full `pnpm dev` workflow, per-service start/stop, ports, Android shell, env vars.
 - [DEPLOY.md](DEPLOY.md) — Deployment guide.
 - [docs/contact-import-platforms.md](docs/contact-import-platforms.md) — Multi-platform contact import layer and platform status.
 - [docs/product-lines.md](docs/product-lines.md) — Cross-platform product lines.
