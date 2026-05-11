@@ -547,7 +547,11 @@ export function MobileFriendMomentsPage() {
                 return (
                   <div
                     key={moment.id}
-                    className={index === 0 ? "" : "border-t border-[#ECECEC]"}
+                    className={
+                      index === 0
+                        ? "yj-list-item-virtual-card"
+                        : "yj-list-item-virtual-card border-t border-[#ECECEC]"
+                    }
                   >
                     <div className="flex items-start gap-2 px-4 py-3.5">
                       <div className="w-12 shrink-0 pt-1 text-right">

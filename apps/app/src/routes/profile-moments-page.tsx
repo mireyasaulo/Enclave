@@ -549,7 +549,11 @@ export function ProfileMomentsPage() {
           {ownMoments.map((moment, index) => (
             <div
               key={moment.id}
-              className={index === 0 ? "" : "border-t border-[#ECECEC]"}
+              className={
+                index === 0
+                  ? "yj-list-item-virtual-card"
+                  : "yj-list-item-virtual-card border-t border-[#ECECEC]"
+              }
             >
               <PersonalAlbumRow
                 moment={moment}
