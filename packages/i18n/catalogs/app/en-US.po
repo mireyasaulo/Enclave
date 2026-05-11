@@ -28,37 +28,37 @@ msgid "暂停"
 msgstr "Pause"
 
 #: apps/app/src/components/bootstrap-screen.tsx:43
-#: apps/app/src/routes/splash-page.tsx:175
+#: apps/app/src/routes/splash-page.tsx:181
 msgid "隐界"
 msgstr "Yinjie"
 
 #: apps/app/src/components/bootstrap-screen.tsx:46
-#: apps/app/src/routes/splash-page.tsx:178
+#: apps/app/src/routes/splash-page.tsx:184
 msgid "欢迎回到你的世界"
 msgstr "Welcome back to your world"
 
 #: apps/app/src/components/bootstrap-screen.tsx:49
-#: apps/app/src/routes/splash-page.tsx:181
+#: apps/app/src/routes/splash-page.tsx:187
 msgid "这里不是一串账号信息，而是一整片会继续生长、继续回应你的个人世界。"
 msgstr "This isn't a string of account info — it's a whole personal world that keeps growing and responding to you."
 
 #: apps/app/src/components/bootstrap-screen.tsx:58
-#: apps/app/src/routes/splash-page.tsx:190
+#: apps/app/src/routes/splash-page.tsx:196
 msgid "确认入口"
 msgstr "Confirm entry"
 
 #: apps/app/src/components/bootstrap-screen.tsx:66
-#: apps/app/src/routes/splash-page.tsx:198
+#: apps/app/src/routes/splash-page.tsx:204
 msgid "同步世界主人"
 msgstr "Sync world owner"
 
 #: apps/app/src/components/bootstrap-screen.tsx:74
-#: apps/app/src/routes/splash-page.tsx:206
+#: apps/app/src/routes/splash-page.tsx:212
 msgid "继续开启对话"
 msgstr "Continue starting the conversation"
 
 #: apps/app/src/components/bootstrap-screen.tsx:81
-#: apps/app/src/routes/splash-page.tsx:212
+#: apps/app/src/routes/splash-page.tsx:218
 msgid "正在整理这次进入世界的路径，马上带你回到上次停留的地方。"
 msgstr "Plotting your path into the world. Bringing you back to where you left off shortly."
 
@@ -2112,20 +2112,6 @@ msgid "人"
 msgstr " people"
 
 #: apps/app/src/components/chat-message-list.tsx:5841
-#: apps/app/src/components/mobile-chat-plus-panel.tsx:111
-#: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
-#: apps/app/src/features/chat/conversation-thread-panel.tsx:495
-#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1087
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:371
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:766
-#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1134
-#: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:85
-#: apps/app/src/routes/character-detail-page.tsx:930
-#: apps/app/src/routes/desktop-mobile-page.tsx:359
-msgid "视频通话"
-msgstr "Video call"
-
-#: apps/app/src/components/chat-message-list.tsx:5841
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:155
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:51
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:489
@@ -2139,6 +2125,20 @@ msgstr "Video call"
 #: apps/app/src/routes/desktop-mobile-page.tsx:360
 msgid "语音通话"
 msgstr "Voice call"
+
+#: apps/app/src/components/chat-message-list.tsx:5841
+#: apps/app/src/components/mobile-chat-plus-panel.tsx:111
+#: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
+#: apps/app/src/features/chat/conversation-thread-panel.tsx:495
+#: apps/app/src/features/chat/group-chat-thread-panel.tsx:1087
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:371
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:766
+#: apps/app/src/features/chat/mobile-ai-call-screen.tsx:1134
+#: apps/app/src/features/desktop/chat/desktop-chat-header-actions.tsx:85
+#: apps/app/src/routes/character-detail-page.tsx:930
+#: apps/app/src/routes/desktop-mobile-page.tsx:359
+msgid "视频通话"
+msgstr "Video call"
 
 #: apps/app/src/components/chat-message-list.tsx:5876
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:472
@@ -12407,16 +12407,16 @@ msgid "买了种子"
 msgstr "Bought seeds"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
-msgid "卖了"
-msgstr "Sold"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:240
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:242
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
 msgid "作物"
 msgstr "Crops"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
+msgid "卖了"
+msgstr "Sold"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."

@@ -9878,12 +9878,6 @@ msgid "运行预设"
 msgstr "実行プリセット"
 
 #: apps/admin/src/routes/evals-page.tsx:1552
-#: apps/admin/src/routes/evals-page.tsx:2328
-#: apps/admin/src/routes/evals-page.tsx:2926
-msgid "基线"
-msgstr "ベースライン"
-
-#: apps/admin/src/routes/evals-page.tsx:1552
 #: apps/admin/src/routes/evals-page.tsx:1552
 #: apps/admin/src/routes/evals-page.tsx:1555
 #: apps/admin/src/routes/evals-page.tsx:1555
@@ -9898,6 +9892,12 @@ msgstr "ベースライン"
 #: apps/admin/src/routes/inference-page.tsx:1123
 msgid "默认"
 msgstr "デフォルト"
+
+#: apps/admin/src/routes/evals-page.tsx:1552
+#: apps/admin/src/routes/evals-page.tsx:2328
+#: apps/admin/src/routes/evals-page.tsx:2926
+msgid "基线"
+msgstr "ベースライン"
 
 #: apps/admin/src/routes/evals-page.tsx:1555
 #: apps/admin/src/routes/evals-page.tsx:2377
@@ -12991,6 +12991,12 @@ msgid "当前候选池"
 msgstr "現在の候補プール"
 
 #: apps/admin/src/routes/need-discovery-page.tsx:1078
+#: apps/admin/src/routes/need-discovery-page.tsx:1283
+#: apps/admin/src/routes/need-discovery-page.tsx:1312
+msgid "当前候选"
+msgstr "現在の候補"
+
+#: apps/admin/src/routes/need-discovery-page.tsx:1078
 #: apps/admin/src/routes/need-discovery-page.tsx:1081
 #: apps/admin/src/routes/need-discovery-page.tsx:1275
 #: apps/admin/src/routes/need-discovery-page.tsx:1286
@@ -13004,12 +13010,6 @@ msgstr "現在の候補プール"
 #: apps/admin/src/routes/token-usage-page.tsx:1561
 msgid "条"
 msgstr "件"
-
-#: apps/admin/src/routes/need-discovery-page.tsx:1078
-#: apps/admin/src/routes/need-discovery-page.tsx:1283
-#: apps/admin/src/routes/need-discovery-page.tsx:1312
-msgid "当前候选"
-msgstr "現在の候補"
 
 #: apps/admin/src/routes/need-discovery-page.tsx:1081
 #: apps/admin/src/routes/need-discovery-page.tsx:1283
