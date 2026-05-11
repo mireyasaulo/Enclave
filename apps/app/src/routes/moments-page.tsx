@@ -1414,8 +1414,8 @@ function MobileMomentsView({
               key={moment.id}
               className={
                 index === 0
-                  ? ""
-                  : "border-t border-[#ECECEC]"
+                  ? "yj-list-item-virtual-card"
+                  : "yj-list-item-virtual-card border-t border-[#ECECEC]"
               }
             >
               <WeChatMomentCard

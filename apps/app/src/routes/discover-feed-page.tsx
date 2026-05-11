@@ -968,9 +968,9 @@ const pendingLikePostId = likeMutation.isPending
             const summaryText = post.text.trim() ? "" : postSummaryText;
 
             return (
+              <div key={post.id} className="yj-list-item-virtual-card">
               <SocialPostCard
                 cardId={`feed-post-${post.id}`}
-                key={post.id}
                 authorName={post.authorName}
                 authorAvatar={post.authorAvatar}
                 meta={`${formatTimestamp(post.createdAt)} · ${
@@ -1115,6 +1115,7 @@ const pendingLikePostId = likeMutation.isPending
                   ) : null
                 }
               />
+              </div>
             );
           })}
 
