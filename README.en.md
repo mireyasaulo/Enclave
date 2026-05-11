@@ -42,7 +42,7 @@ docker compose up -d
 
 The first boot runs a single-owner migration and makes you the master of this world. Full reference: [DEPLOY.md](DEPLOY.md).
 
-> 💻 Want to run from source (`pnpm dev` brings up api+app+admin together), build the Android shell, or look up ports / restart scripts? See [DEVELOPMENT.en.md](DEVELOPMENT.en.md).
+> 💻 Want to run from source (`pnpm dev:api` + `pnpm dev:app` to bring up the backend and the main app), build the Android shell, or look up ports / restart scripts? See [DEVELOPMENT.en.md](DEVELOPMENT.en.md).
 
 ---
 
@@ -350,7 +350,7 @@ We chose MIT because we want this to travel as far as possible, with as few gate
 ## 📚 More
 
 - [PROJECT_INTRO.md](PROJECT_INTRO.md) — The long-form product thesis (Chinese, for now).
-- [DEVELOPMENT.en.md](DEVELOPMENT.en.md) — Local development: full `pnpm dev` workflow, per-service start/stop, ports, Android shell, env vars.
+- [DEVELOPMENT.en.md](DEVELOPMENT.en.md) — Local development: per-service start (`pnpm dev:api` / `dev:app` / `dev:admin`), ports, Android shell, env vars.
 - [DEPLOY.md](DEPLOY.md) — Deployment guide.
 - [docs/contact-import-platforms.md](docs/contact-import-platforms.md) — Multi-platform contact import layer and platform status.
 - [docs/product-lines.md](docs/product-lines.md) — Cross-platform product lines.

@@ -40,7 +40,7 @@ docker compose up -d
 
 첫 부팅 시 단일 오너 마이그레이션이 실행되어 당신이 이 세계의 주인이 됩니다. 자세한 내용은 [DEPLOY.md](DEPLOY.md) 참고.
 
-> 💻 소스에서 로컬로 돌리고 싶거나(`pnpm dev` 한 줄로 api+app+admin 동시 기동) / Android 셸 / 포트 / 재기동 스크립트가 궁금하다면 → [DEVELOPMENT.ko.md](DEVELOPMENT.ko.md)
+> 💻 소스에서 로컬로 돌리고 싶거나(`pnpm dev:api` + `pnpm dev:app` 으로 백엔드와 메인 앱 기동) / Android 셸 / 포트 / 재기동 스크립트가 궁금하다면 → [DEVELOPMENT.ko.md](DEVELOPMENT.ko.md)
 
 ---
 
@@ -321,7 +321,7 @@ MIT를 고른 이유는 이 프로젝트를 가능한 한 멀리, 가능한 한 
 ## 📚 더 읽기
 
 - [PROJECT_INTRO.md](PROJECT_INTRO.md) — 제품 철학의 긴 버전(지금은 중국어만).
-- [DEVELOPMENT.ko.md](DEVELOPMENT.ko.md) — 로컬 개발: `pnpm dev` 풀세트 · 서비스별 기동/정지 · 포트 · Android 연동 · 환경 변수.
+- [DEVELOPMENT.ko.md](DEVELOPMENT.ko.md) — 로컬 개발: 서비스별 기동(`pnpm dev:api` / `dev:app` / `dev:admin`) · 포트 · Android 연동 · 환경 변수.
 - [DEPLOY.md](DEPLOY.md) — 배포 가이드.
 - [docs/product-lines.md](docs/product-lines.md) — 멀티 플랫폼 구성 설명.
 - [docs/release/desktop-host-regression.md](docs/release/desktop-host-regression.md) — 데스크톱 리그레션 체크리스트.
