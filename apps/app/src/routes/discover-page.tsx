@@ -299,25 +299,35 @@ export function DiscoverPage() {
         },
         baseUrl,
       );
-      return { request: result, scene };
+      return { ...result, scene };
     },
-    onSuccess: ({ request, scene }) => {
+    onSuccess: ({ request, matchSource, scene }) => {
       const sceneLabel =
         scenes.find((item) => item.id === scene)?.label ?? null;
       const translatedSceneLabel = sceneLabel ? t(sceneLabel) : scene;
 
-      if (!request) {
-        setSceneMessage(t(msg`${translatedSceneLabel} 里暂时没有新的相遇。`));
+      if (!request || matchSource === "none") {
+        setSceneMessage(
+          t(msg`${translatedSceneLabel}里和别处都暂时没有新的相遇了。`),
+        );
         return;
       }
 
       setSuccessNotice(t(msg`场景相遇已写入好友申请列表。`));
       const greeting = request.greeting ?? t(msg`对你产生了兴趣。`);
-      setSceneMessage(
-        t(
-          msg`${request.characterName} 在${translatedSceneLabel}里注意到了你：${greeting}`,
-        ),
-      );
+      if (matchSource === "fallback") {
+        setSceneMessage(
+          t(
+            msg`${request.characterName} 不在${translatedSceneLabel}，但顺路碰到了你：${greeting}`,
+          ),
+        );
+      } else {
+        setSceneMessage(
+          t(
+            msg`${request.characterName} 在${translatedSceneLabel}里注意到了你：${greeting}`,
+          ),
+        );
+      }
       void queryClient.invalidateQueries({
         queryKey: ["app-friend-requests", baseUrl],
       });

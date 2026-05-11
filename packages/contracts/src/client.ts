@@ -139,6 +139,7 @@ import type {
   SendFriendRequestRequest,
   SetFriendStarredRequest,
   TriggerSceneRequest,
+  TriggerSceneResponse,
   UnblockCharacterRequest,
   UpdateFriendPermissionsRequest,
   UpdateFriendProfileRequest,
@@ -3700,7 +3701,7 @@ export function triggerSceneFriendRequest(
   payload: TriggerSceneRequest,
   baseUrl?: string,
 ) {
-  return requestLegacyApi<FriendRequest | null>(
+  return requestLegacyApi<TriggerSceneResponse>(
     "/social/trigger-scene",
     {
       method: "POST",

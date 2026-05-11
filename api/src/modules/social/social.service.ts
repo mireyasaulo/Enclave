@@ -16,6 +16,14 @@ import {
 } from '../characters/default-characters';
 import { listBuiltInCharacterPresets } from '../characters/built-in-character-presets';
 import { listCelebrityCharacterPresets } from '../characters/celebrity-character-presets';
+import {
+  SCENE_LABEL_ZH,
+  matchCandidatesByScene,
+  normalizeScene,
+  pickWeightedRandom,
+  type SceneId,
+  type SceneMatchSource,
+} from './scene-matching';
 import { ChatService } from '../chat/chat.service';
 import { CharactersService } from '../characters/characters.service';
 import { AppEvents, EventBusService } from '../events/event-bus.service';
@@ -370,40 +378,67 @@ export class SocialService {
     }
   }
 
-  async triggerSceneFriendRequest(
-    scene: string,
-  ): Promise<FriendRequestEntity | null> {
+  async triggerSceneFriendRequest(scene: string): Promise<{
+    request: FriendRequestEntity | null;
+    matchSource: SceneMatchSource;
+  }> {
     const owner = await this.worldOwnerService.getOwnerOrThrow();
 
-    // 从硬编码预设中按场景过滤，不依赖 DB 是否已安装
+    // 归一化场景 ID（cafe → coffee_shop 等）
+    const normalizedScene: SceneId | null = normalizeScene(scene);
     const allPresets = listBuiltInCharacterPresets();
-    const candidates = allPresets.filter((p) =>
-      (p.character.triggerScenes ?? []).includes(scene),
-    );
-    if (candidates.length === 0) return null;
 
+    // 既要排除已经是好友的，也要排除已经有 pending 申请的（避免重复轰炸）。
     const existingFriendships = await this.friendshipRepo.find({
       where: { ownerId: owner.id },
     });
-    const existingIds = new Set(
+    const friendIds = new Set(
       existingFriendships.map((friendship) => friendship.characterId),
     );
-    const available = candidates.filter((p) => !existingIds.has(p.id));
-    if (available.length === 0) return null;
-
-    const preset = available[Math.floor(Math.random() * available.length)];
-    const char = preset.character as CharacterEntity;
-
-    const existing = await this.friendRequestRepo.findOneBy({
-      ownerId: owner.id,
-      characterId: char.id,
-      status: 'pending',
+    const pendingRequests = await this.friendRequestRepo.find({
+      where: { ownerId: owner.id, status: 'pending' },
     });
-    if (existing) return null;
+    const pendingIds = new Set(pendingRequests.map((r) => r.characterId));
+    const occupied = new Set([...friendIds, ...pendingIds]);
+
+    let matchSource: SceneMatchSource = 'none';
+    let chosenPreset: (typeof allPresets)[number] | null = null;
+
+    // 1) 场景匹配：基于角色实时属性打分
+    if (normalizedScene) {
+      const scored = matchCandidatesByScene(allPresets, normalizedScene).filter(
+        (c) => !occupied.has(c.preset.id),
+      );
+      if (scored.length > 0) {
+        chosenPreset = pickWeightedRandom(scored);
+        matchSource = 'scene';
+      }
+    }
+
+    // 2) 兜底：从所有未占用的预设里随机
+    if (!chosenPreset) {
+      const fallbackPool = allPresets.filter((p) => !occupied.has(p.id));
+      if (fallbackPool.length > 0) {
+        chosenPreset =
+          fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
+        matchSource = 'fallback';
+      }
+    }
+
+    if (!chosenPreset) {
+      return { request: null, matchSource: 'none' };
+    }
+
+    const char = chosenPreset.character as CharacterEntity;
+
+    // 给 AI prompt 的场景词：优先用归一化后中文标签，否则保留原始输入
+    const promptScene = normalizedScene
+      ? SCENE_LABEL_ZH[normalizedScene]
+      : scene;
 
     let greeting = await this.worldLanguage.buildSceneGreetingFallback({
       characterName: char.name,
-      scene,
+      scene: promptScene,
     });
     const runtimeProfile =
       (await this.charactersService.getRuntimeProfileFromCharacter(char)) ??
@@ -413,7 +448,7 @@ export class SocialService {
         profile: runtimeProfile,
         conversationHistory: [],
         userMessage:
-          await this.worldLanguage.formatFriendRequestGreetingTask(scene),
+          await this.worldLanguage.formatFriendRequestGreetingTask(promptScene),
         usageContext: {
           surface: 'app',
           scene: 'social_greeting_generate',
@@ -439,12 +474,13 @@ export class SocialService {
       characterId: char.id,
       characterName: char.name,
       characterAvatar: char.avatar,
-      triggerScene: scene,
+      triggerScene: normalizedScene ?? scene,
       greeting,
       status: 'pending',
       expiresAt: tomorrow,
     });
-    return this.friendRequestRepo.save(req);
+    const saved = await this.friendRequestRepo.save(req);
+    return { request: saved, matchSource };
   }
 
   async shake(): Promise<{
