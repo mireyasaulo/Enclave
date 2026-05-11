@@ -1,4 +1,5 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
+import { existsSync } from 'node:fs';
 import { HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -21,6 +22,7 @@ import type {
   MomentVideoAsset,
 } from '../moments/moment-media.types';
 import { MomentPostEntity } from '../moments/moment-post.entity';
+import { resolveReadableMomentMediaPath } from '../moments/moment-media.storage';
 import {
   NPC_USER_POST_NEUTRAL_INTIMACY,
   npcIntimacyMultiplier,
@@ -79,6 +81,12 @@ const CHANNEL_VIDEO_ASPECT_RATIO = 9 / 16;
 const MAX_FEED_IMAGE_COUNT = 9;
 const MAX_FEED_VIDEO_DURATION_MS = 5 * 60 * 1000;
 
+// 已知失效的外部媒体 host（持续返 403/410 / DNS 不通）。
+// 视频号过滤会把指向这些 host 的视频/音频帖隐藏。新增条目时小写域名即可。
+const FEED_DEAD_MEDIA_HOSTS = new Set<string>([
+  'commondatastorage.googleapis.com',
+]);
+
 @Injectable()
 export class FeedService implements OnModuleInit {
   private readonly logger = new Logger(FeedService.name);
@@ -108,6 +116,7 @@ export class FeedService implements OnModuleInit {
 
   async onModuleInit() {
     await this.backfillFeedAuthorAvatars();
+    await this.cleanupBrokenChannelPosts();
   }
 
   async getFeed(
@@ -125,11 +134,29 @@ export class FeedService implements OnModuleInit {
       ownerId: owner.id,
       ownerAvatar: owner.avatar,
     });
-    const visiblePosts =
-      surface === 'channels'
-        ? await this.getVisibleChannelPosts(owner.id, 'recommended')
-        : await this.getVisibleFeedPosts(surface, owner.id);
-    const pagedPosts = paginate(visiblePosts, page, limit);
+
+    let pagedPosts: FeedPostEntity[];
+    let total: number;
+    if (surface === 'feed') {
+      // 广场：SQL 层完成 visibility 过滤 + skip/take，避免拉全表后再内存过滤
+      const result = await this.findVisibleFeedPostsPaged(
+        owner.id,
+        page,
+        limit,
+      );
+      pagedPosts = result.posts;
+      total = result.total;
+    } else {
+      // 视频号：保留旧路径——需要叠 blocked / not_interested / section 等复合规则，
+      // 全集语义在 channels 还有 ChannelHome 等多个调用方依赖。
+      const visiblePosts = await this.getVisibleChannelPosts(
+        owner.id,
+        'recommended',
+      );
+      pagedPosts = paginate(visiblePosts, page, limit);
+      total = visiblePosts.length;
+    }
+
     const [commentsPreviewMap, ownerStateMap] = await Promise.all([
       this.buildCommentsPreviewMap(
         pagedPosts.map((post) => post.id),
@@ -144,7 +171,7 @@ export class FeedService implements OnModuleInit {
         ...this.serializePost(post, ownerStateMap.get(post.id), avatarContext),
         commentsPreview: commentsPreviewMap.get(post.id) ?? [],
       })),
-      total: visiblePosts.length,
+      total,
     };
   }
 
@@ -1598,6 +1625,83 @@ export class FeedService implements OnModuleInit {
     };
   }
 
+  // 视频号死链/无 URL 的视频/音频帖直接不展示。
+  // 文本/图片帖不在本规则管辖范围（用户决策：只隐藏死链/无 URL 的视频音频帖）。
+  private isPostMediaPlayable(post: FeedPostEntity): boolean {
+    if (post.mediaType !== 'video' && post.mediaType !== 'audio') return true;
+
+    const urls: string[] = [];
+    try {
+      const arr = JSON.parse(post.mediaPayload ?? '[]') as Array<{
+        kind?: string;
+        url?: string;
+      }>;
+      for (const a of Array.isArray(arr) ? arr : []) {
+        if (
+          a?.kind === post.mediaType &&
+          typeof a.url === 'string' &&
+          a.url.trim()
+        ) {
+          urls.push(a.url.trim());
+        }
+      }
+    } catch {
+      /* malformed payload — fall through to legacy mediaUrl */
+    }
+    if (post.mediaUrl?.trim()) urls.push(post.mediaUrl.trim());
+    if (urls.length === 0) return false;
+
+    return urls.some((url) => {
+      if (url.startsWith('blob:') || url.startsWith('data:')) return true;
+      if (url.startsWith('/api/moments/media/')) {
+        const fileName = url.slice('/api/moments/media/'.length);
+        return existsSync(resolveReadableMomentMediaPath(fileName));
+      }
+      try {
+        const host = new URL(url).hostname;
+        return !FEED_DEAD_MEDIA_HOSTS.has(host);
+      } catch {
+        return false;
+      }
+    });
+  }
+
+  // 启动时把死链/无 URL 的视频号视频/音频帖批量标 hidden，避免每次请求重算。
+  // 重复跑无副作用：已经 hidden 的不会再次匹配 publishStatus='published' 条件。
+  private async cleanupBrokenChannelPosts() {
+    try {
+      const candidates = await this.postRepo.find({
+        where: [
+          {
+            surface: 'channels',
+            publishStatus: 'published',
+            mediaType: 'video',
+          },
+          {
+            surface: 'channels',
+            publishStatus: 'published',
+            mediaType: 'audio',
+          },
+        ],
+      });
+      const broken = candidates.filter(
+        (post) => !this.isPostMediaPlayable(post),
+      );
+      if (broken.length === 0) return;
+      await this.postRepo.update(
+        { id: In(broken.map((post) => post.id)) },
+        { publishStatus: 'hidden' },
+      );
+      this.logger.log(
+        `cleanupBrokenChannelPosts: hid ${broken.length} channels post(s) without playable media`,
+      );
+    } catch (error) {
+      this.logger.warn(
+        `cleanupBrokenChannelPosts failed: ${(error as Error).message}`,
+      );
+    }
+  }
+
   private async getVisibleFeedPosts(surface: FeedSurface, ownerId: string) {
     const posts = await this.postRepo.find({
       where: { surface, publishStatus: 'published' },
@@ -1614,6 +1718,10 @@ export class FeedService implements OnModuleInit {
       if (post.authorType !== 'character') return true;
       if (!visibleCharacterIds.has(post.authorId)) return false;
       if (post.visibility === 'private') return false;
+      // 视频号过滤：视频/音频帖必须有可播放 URL（本地文件存在或非死链外站）。
+      if (surface === 'channels' && !this.isPostMediaPlayable(post)) {
+        return false;
+      }
       // 广场（surface='feed'）公开可见：所有非屏蔽角色都展示，无论是否好友；
       // 视频号（surface='channels'）保留 friends 仅好友可见的语义。
       if (surface === 'feed') {
@@ -1624,6 +1732,41 @@ export class FeedService implements OnModuleInit {
       }
       return true;
     });
+  }
+
+  /**
+   * 广场专用 SQL 分页路径：把 visibility 过滤下推到 WHERE 子句，避免拉全表后再内存过滤。
+   * 仅供 surface='feed'（广场动态）使用——视频号（'channels'）还要叠 blocked/not_interested/section
+   * 等过滤，逻辑更复杂，保留旧的 getVisibleChannelPosts。
+   */
+  private async findVisibleFeedPostsPaged(
+    ownerId: string,
+    page: number,
+    limit: number,
+  ): Promise<{ posts: FeedPostEntity[]; total: number }> {
+    const visibleCharacterIds = await this.getVisibleCharacterIdSet(ownerId);
+    const visibleIds = Array.from(visibleCharacterIds);
+
+    const qb = this.postRepo
+      .createQueryBuilder('post')
+      .where('post.surface = :surface', { surface: 'feed' })
+      .andWhere('post.publishStatus = :status', { status: 'published' });
+
+    if (visibleIds.length === 0) {
+      qb.andWhere("post.authorType <> 'character'");
+    } else {
+      qb.andWhere(
+        "(post.authorType <> 'character' OR (post.authorId IN (:...visibleIds) AND post.visibility <> 'private'))",
+        { visibleIds },
+      );
+    }
+
+    qb.orderBy('post.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [posts, total] = await qb.getManyAndCount();
+    return { posts, total };
   }
 
   private async getVisibleChannelPosts(
