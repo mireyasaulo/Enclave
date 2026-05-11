@@ -1763,7 +1763,7 @@ export function CharacterDetailPage() {
                   compact={!isDesktopLayout}
                 />
               ) : null}
-              {coreDirective ? (
+              {isDesktopLayout && coreDirective ? (
                 <div className="border-t border-[color:var(--border-faint)] px-4 py-3">
                   <div
                     className={cn(
