@@ -1,5 +1,6 @@
 import {
   Suspense,
+  memo,
   useEffect,
   lazy,
   useMemo,
@@ -1272,18 +1273,7 @@ function MobileChatListStatusCard({
   );
 }
 
-function ConversationListItemLink({
-  conversation,
-  localMessageActionState,
-  open,
-  pending = false,
-  onOpenChange,
-  onTogglePinned,
-  onToggleMuted,
-  onToggleReadState,
-  onHide,
-  className,
-}: {
+type ConversationListItemLinkProps = {
   conversation: ConversationListEntry;
   localMessageActionState: ReturnType<typeof useLocalChatMessageActionState>;
   open: boolean;
@@ -1294,7 +1284,20 @@ function ConversationListItemLink({
   onToggleReadState?: () => void;
   onHide: () => void;
   className?: string;
-}) {
+};
+
+function ConversationListItemLinkImpl({
+  conversation,
+  localMessageActionState,
+  open,
+  pending = false,
+  onOpenChange,
+  onTogglePinned,
+  onToggleMuted,
+  onToggleReadState,
+  onHide,
+  className,
+}: ConversationListItemLinkProps) {
   const t = useRuntimeTranslator();
   const gestureRef = useRef<{
     startX: number;
@@ -1588,6 +1591,21 @@ function ConversationListItemLink({
     </div>
   );
 }
+
+// memo + 自定义 comparator：parent visibleConversations.map 每次 render 都把
+// onTogglePinned/onToggleMuted/... 当 inline arrow，每行新引用。这里只比较
+// 数据属性，handler 引用变化忽略；optimistic pin/mute 时只有改动的会话的
+// conversation 对象引用变 → 其他行跳过重渲染。
+const ConversationListItemLink = memo(
+  ConversationListItemLinkImpl,
+  (prev, next) =>
+    prev.conversation === next.conversation &&
+    prev.localMessageActionState === next.localMessageActionState &&
+    prev.open === next.open &&
+    prev.pending === next.pending &&
+    prev.className === next.className &&
+    Boolean(prev.onToggleReadState) === Boolean(next.onToggleReadState),
+);
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
