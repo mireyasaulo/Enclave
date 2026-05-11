@@ -48,6 +48,7 @@ import { buildVoiceAttachmentSummary } from './voice-attachment-summary';
 import {
   ContactCardAttachment,
   Conversation,
+  FeedPostCardAttachment,
   FileAttachment,
   ImageAttachment,
   LocationCardAttachment,
@@ -126,6 +127,11 @@ type SendConversationMessageInput =
       type: 'note_card';
       text?: string;
       attachment: NoteCardAttachment;
+    }
+  | {
+      type: 'feed_post_card';
+      text?: string;
+      attachment: FeedPostCardAttachment;
     };
 
 type UploadedAttachmentFile = {
@@ -1684,7 +1690,8 @@ export class ChatService {
         | 'voice'
         | 'contact_card'
         | 'location_card'
-        | 'note_card',
+        | 'note_card'
+        | 'feed_post_card',
       text:
         entity.senderType === 'user'
           ? entity.text
@@ -1880,7 +1887,8 @@ export class ChatService {
       | 'voice'
       | 'contact_card'
       | 'location_card'
-      | 'note_card';
+      | 'note_card'
+      | 'feed_post_card';
     text: string;
     promptText: string;
     aiParts: AiMessagePart[];
@@ -1918,7 +1926,8 @@ export class ChatService {
       input.type === 'voice' ||
       input.type === 'contact_card' ||
       input.type === 'location_card' ||
-      input.type === 'note_card'
+      input.type === 'note_card' ||
+      input.type === 'feed_post_card'
     ) {
       if (!input.attachment || input.attachment.kind !== input.type) {
         throw new AppError('CHAT_ATTACHMENT_PAYLOAD_INVALID', {
@@ -2070,6 +2079,10 @@ export class ChatService {
       return this.buildTextAiParts(promptText);
     }
 
+    if (attachment.kind === 'feed_post_card') {
+      return this.buildTextAiParts(promptText);
+    }
+
     return [
       {
         type: 'sticker',
@@ -2198,6 +2211,16 @@ export class ChatService {
         attachment.tags.length
           ? `标签：${attachment.tags.map((tag) => `#${tag}`).join(' ')}`
           : '',
+      ].filter(Boolean);
+      const captionText = caption ? `，补充说明：${caption}` : '';
+      return `${detailParts.join('，')}${captionText}`.trim();
+    }
+
+    if (attachment.kind === 'feed_post_card') {
+      const detailParts = [
+        `转发了一条 ${attachment.authorName} 的视频号`,
+        attachment.title ? `标题：${attachment.title}` : '',
+        attachment.excerpt ? `摘要：${attachment.excerpt}` : '',
       ].filter(Boolean);
       const captionText = caption ? `，补充说明：${caption}` : '';
       return `${detailParts.join('，')}${captionText}`.trim();

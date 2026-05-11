@@ -3377,6 +3377,31 @@ export function shareFeedPost(
   );
 }
 
+export interface FeedForwardToChatRequest {
+  targetCharacterId: string;
+  note?: string;
+}
+
+export interface FeedForwardToChatResult {
+  messageId: string;
+  conversationId: string;
+}
+
+export function forwardFeedPostToChat(
+  id: string,
+  payload: FeedForwardToChatRequest,
+  baseUrl?: string,
+) {
+  return requestLegacyApi<FeedForwardToChatResult>(
+    `/feed/${id}/forward-to-chat`,
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
 export function viewFeedPost(
   id: string,
   payload?: FeedViewRequest,
