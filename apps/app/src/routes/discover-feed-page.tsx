@@ -249,21 +249,46 @@ export function DiscoverFeedPage() {
         videoDraft: composeDraft.videoDraft,
         baseUrl,
       }),
-    onSuccess: () => {
+    onSuccess: (newPost) => {
       composeDraft.reset();
       setShowCompose(false);
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`广场动态已发布，世界居民公开可见。`));
-      // 发布会让分页边界整体后移：若不先把 cache 收回到 page 1，
-      // refetch 多页会让原 page 1 末尾那条同时出现在新 page 1 末尾 + 新 page 2 开头（重复）。
-      resetFeedToFirstPage();
-      // fire-and-forget：await refetch 会让"发表中"按钮多卡 600ms+
+      // 立刻把新 post prepend 到 paged 头部 + 平铺 flat cache，本页就能马上看到刚发的内容；
+      // 顺便把已加载的多页砍回 1 页（发布后分页边界后移，避免 page 1 末尾和 page 2 开头重复）。
+      const newListItem = { ...newPost, commentsPreview: [] };
+      queryClient.setQueryData<InfiniteData<FeedListResponse>>(
+        ["app-feed-paged", baseUrl],
+        (current) =>
+          current && current.pages.length > 0
+            ? {
+                pages: [
+                  {
+                    ...current.pages[0]!,
+                    posts: [newListItem, ...current.pages[0]!.posts],
+                    total: current.pages[0]!.total + 1,
+                  },
+                ],
+                pageParams: current.pageParams.slice(0, 1),
+              }
+            : current,
+      );
+      queryClient.setQueryData<FeedListResponse>(
+        ["app-feed", baseUrl],
+        (current) =>
+          current
+            ? {
+                posts: [newListItem, ...current.posts],
+                total: current.total + 1,
+              }
+            : current,
+      );
+      // 后台 invalidate 让 discover-page、search-index 等共用 cache 的页面也合并最新状态
       void queryClient.invalidateQueries({
         queryKey: ["app-feed-paged", baseUrl],
       });
-      // 同时刷新旧 key，让 discover-page 和 search-index 等共用 cache 的页面也同步
       void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
       void queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] });
     },
@@ -318,17 +343,15 @@ export function DiscoverFeedPage() {
         queryClient.setQueryData(key, data);
       });
     },
-    onSuccess: async () => {
+    onSuccess: () => {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`广场互动已更新。`));
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
-        // 同时刷新旧 key，让 discover-page 和 search-index 等共用 cache 的页面也同步
-        queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] }),
-      ]);
+      // fire-and-forget：optimistic 已显示心；await 会卡 isPending，连点点赞被 disabled。
+      void queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] });
+      void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
+      void queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] });
     },
   });
 

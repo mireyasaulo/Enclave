@@ -257,21 +257,39 @@ export function DiscoverPage() {
         videoDraft: composeDraft.videoDraft,
         baseUrl,
       }),
-    onSuccess: () => {
+    onSuccess: (newPost) => {
       composeDraft.reset();
       setSuccessNotice(t(msg`广场动态已发布，世界居民公开可见。`));
-      // discover-feed-page 走无限分页：发布后分页边界后移，先把 paged cache 收回到 page 1
+      // 立刻把新 post prepend 到 paged 头部（顺手把已加载的多页砍回 1 页避免分页边界重复）+
+      // 平铺 flat cache，跳到 /tabs/feed 时立即可见，不必等 refetch 完成。
+      const newListItem = { ...newPost, commentsPreview: [] };
       queryClient.setQueryData<InfiniteData<FeedListResponse>>(
         ["app-feed-paged", baseUrl],
         (current) =>
-          current
+          current && current.pages.length > 0
             ? {
-                pages: current.pages.slice(0, 1),
+                pages: [
+                  {
+                    ...current.pages[0]!,
+                    posts: [newListItem, ...current.pages[0]!.posts],
+                    total: current.pages[0]!.total + 1,
+                  },
+                ],
                 pageParams: current.pageParams.slice(0, 1),
               }
             : current,
       );
-      // fire-and-forget：await refetch 会让"发表中"按钮多卡 600ms+
+      queryClient.setQueryData<FeedListResponse>(
+        ["app-feed", baseUrl],
+        (current) =>
+          current
+            ? {
+                posts: [newListItem, ...current.posts],
+                total: current.total + 1,
+              }
+            : current,
+      );
+      // 后台 invalidate 让其它共享 cache 的页面同步合并最新状态
       void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
       void queryClient.invalidateQueries({
         queryKey: ["app-feed-paged", baseUrl],

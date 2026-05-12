@@ -241,16 +241,34 @@ export function MomentsPage() {
         videoDraft: composeDraft.videoDraft,
         baseUrl,
       }),
-    onSuccess: () => {
+    onSuccess: (newMoment) => {
       composeDraft.reset();
       setShowCompose(false);
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`朋友圈已发布。`));
-      resetMomentsToFirstPage();
-      // fire-and-forget：await refetch 会让"发表中"按钮一直保持 pending；
-      // 同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page、search-index 等)
+      // 立刻把新发布的 moment prepend 到 paged 头部并把已加载的多页砍回 1 页 ——
+      // 之前 fire-and-forget invalidate 后 600ms+ 才更新 UI，用户感受到"得刷新才能看到"。
+      queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
+        ["app-moments-paged", baseUrl],
+        (current) =>
+          current && current.pages.length > 0
+            ? {
+                pages: [
+                  {
+                    ...current.pages[0]!,
+                    items: [newMoment, ...current.pages[0]!.items],
+                  },
+                ],
+                pageParams: current.pageParams.slice(0, 1),
+              }
+            : current,
+      );
+      queryClient.setQueryData<Moment[]>(["app-moments", baseUrl], (current) =>
+        current ? [newMoment, ...current] : current,
+      );
+      // 后台 invalidate 让其它共享 cache 的页面（profile/friend-moments-page、search-index 等）也同步
       void queryClient.invalidateQueries({
         queryKey: ["app-moments-paged", baseUrl],
       });
@@ -324,20 +342,19 @@ export function MomentsPage() {
         queryClient.setQueryData(key, data);
       });
     },
-    onSuccess: async () => {
+    onSuccess: () => {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`朋友圈互动已更新。`));
-      // 同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page、search-index 等)
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["app-moments-paged", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-moments", baseUrl],
-        }),
-      ]);
+      // fire-and-forget：optimistic 已显示心；await refetch 会卡 isPending，
+      // 连点点赞会被 disabled。同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page 等)。
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments", baseUrl],
+      });
     },
   });
 
@@ -546,7 +563,7 @@ export function MomentsPage() {
         queryClient.setQueryData(key, data);
       });
     },
-    onSuccess: async () => {
+    onSuccess: () => {
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
@@ -554,15 +571,13 @@ export function MomentsPage() {
       // 删除会让分页边界前移：如不先把 cache 收回到 page 1，refetch 多页时下一页
       // 的第一条会被前面那页的末尾"吃掉"，造成中间漏一条。
       resetMomentsToFirstPage();
-      // 同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page、search-index 等)
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["app-moments-paged", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-moments", baseUrl],
-        }),
-      ]);
+      // fire-and-forget：optimistic 已把这条从 cache 抹掉；await 会让删除按钮多卡 600ms+。
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments", baseUrl],
+      });
     },
   });
   const pendingLikeMomentId = likeMutation.isPending

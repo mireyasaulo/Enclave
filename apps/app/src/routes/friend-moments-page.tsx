@@ -15,6 +15,7 @@ import {
   getFriends,
   getMoments,
   toggleMomentLike,
+  type Moment,
 } from "@yinjie/contracts";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { AppPage, Button, ErrorBlock, LoadingBlock } from "@yinjie/ui";
@@ -144,11 +145,15 @@ export function FriendMomentsPage() {
         videoDraft: composeDraft.videoDraft,
         baseUrl,
       }),
-    onSuccess: () => {
+    onSuccess: (newMoment) => {
       composeDraft.reset();
       setShowCompose(false);
       setNotice(t(msg`朋友圈已发布。`));
-      // fire-and-forget：await refetch 会让"发表中"按钮多卡 600ms+
+      // 立刻 prepend 到共享 flat / paged cache：本页按好友 characterId 过滤不会显示用户自己的动态，
+      // 但用户随手切到 /tabs/moments 或 /profile/moments 时应该能直接看到刚发的内容。
+      queryClient.setQueryData<Moment[]>(["app-moments", baseUrl], (current) =>
+        current ? [newMoment, ...current] : current,
+      );
       void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
       void queryClient.invalidateQueries({
         queryKey: ["app-moments-paged", baseUrl],
@@ -165,9 +170,11 @@ export function FriendMomentsPage() {
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
     onMutate: optimisticLike.onMutate,
     onError: optimisticLike.onError,
-    onSuccess: async () => {
+    onSuccess: () => {
       setNotice(t(msg`朋友圈互动已更新。`));
-      await optimisticLike.invalidate();
+      // fire-and-forget：optimistic 已显示红心；await refetch 会让 isPending
+      // 一直挂着，公网隧道下连点会卡几秒。
+      void optimisticLike.invalidate();
     },
   });
   const commentMutation = useMutation({
@@ -192,16 +199,17 @@ export function FriendMomentsPage() {
         baseUrl,
       );
     },
-    onSuccess: async (_, momentId) => {
+    onSuccess: (_, momentId) => {
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
       setDesktopReplyTarget((current) =>
         current?.postId === momentId ? null : current,
       );
       setNotice(t(msg`朋友圈互动已更新。`));
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-moments-paged", baseUrl] }),
-      ]);
+      // fire-and-forget：await 会让"发表"按钮一直 disabled，公网隧道下感觉评论卡几秒。
+      void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
     },
   });
 

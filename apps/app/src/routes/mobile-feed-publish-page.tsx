@@ -58,23 +58,39 @@ export function MobileFeedPublishPage() {
         videoDraft: composeDraft.videoDraft,
         baseUrl,
       }),
-    onSuccess: () => {
+    onSuccess: (newPost) => {
       storeFeedPublishFlash(t(msg`广场动态已发布，世界居民公开可见。`));
       composeDraft.reset();
-      // 发布会让分页边界后移：把 paged cache 收回到 page 1，避免下次 mount discover-feed-page
-      // 时多页 refetch 造成边界重复（page 1 末尾 = page 2 开头）。
+      // 把新 post prepend 到 paged 头部 + 平铺 flat cache，跳到 /discover/feed 时立刻可见，
+      // 不必等后台 refetch；同时砍回 page 1，避免发布后分页边界重复。
+      const newListItem = { ...newPost, commentsPreview: [] };
       queryClient.setQueryData<InfiniteData<FeedListResponse>>(
         ["app-feed-paged", baseUrl],
         (current) =>
-          current
+          current && current.pages.length > 0
             ? {
-                pages: current.pages.slice(0, 1),
+                pages: [
+                  {
+                    ...current.pages[0]!,
+                    posts: [newListItem, ...current.pages[0]!.posts],
+                    total: current.pages[0]!.total + 1,
+                  },
+                ],
                 pageParams: current.pageParams.slice(0, 1),
               }
             : current,
       );
+      queryClient.setQueryData<FeedListResponse>(
+        ["app-feed", baseUrl],
+        (current) =>
+          current
+            ? {
+                posts: [newListItem, ...current.posts],
+                total: current.total + 1,
+              }
+            : current,
+      );
       // fire-and-forget：原来 await refetch 让"发表中"按钮多卡 600ms+。
-      // 跳转后下个页面 mount 时 useQuery 自己会用 invalidated cache 触发 refetch。
       void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
       void queryClient.invalidateQueries({
         queryKey: ["app-feed-paged", baseUrl],

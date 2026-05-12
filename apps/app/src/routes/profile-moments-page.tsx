@@ -141,12 +141,13 @@ export function ProfileMomentsPage() {
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
     onMutate: optimisticLike.onMutate,
     onError: optimisticLike.onError,
-    onSuccess: async () => {
+    onSuccess: () => {
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
       });
-      await optimisticLike.invalidate();
+      // fire-and-forget：optimistic 已显示心；await refetch 会卡住 isPending。
+      void optimisticLike.invalidate();
     },
   });
 
@@ -180,7 +181,7 @@ export function ProfileMomentsPage() {
         baseUrl,
       );
     },
-    onSuccess: async (_, momentId) => {
+    onSuccess: (_, momentId) => {
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
       setCommentBarTarget(null);
       setDesktopReplyTarget((current) =>
@@ -190,10 +191,11 @@ export function ProfileMomentsPage() {
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
       });
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-moments-paged", baseUrl] }),
-      ]);
+      // fire-and-forget：await 会让"发表"按钮一直 disabled，公网隧道下卡几秒。
+      void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
     },
   });
 
@@ -205,14 +207,18 @@ export function ProfileMomentsPage() {
         videoDraft: composeDraft.videoDraft,
         baseUrl,
       }),
-    onSuccess: () => {
+    onSuccess: (newMoment) => {
       composeDraft.reset();
       setShowCompose(false);
       setNotice({
         tone: "success",
         message: t(msg`朋友圈已发布。`),
       });
-      // fire-and-forget：await refetch 会让"发表中"按钮多卡 600ms+
+      // 立刻 prepend 到 flat cache，本页（按 ownerId 过滤）也能马上看到刚发布的；
+      // 后台 invalidate 再合并服务端最新状态（其它共享 cache 的页面同步）。
+      queryClient.setQueryData<Moment[]>(["app-moments", baseUrl], (current) =>
+        current ? [newMoment, ...current] : current,
+      );
       void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
       void queryClient.invalidateQueries({
         queryKey: ["app-moments-paged", baseUrl],
@@ -243,15 +249,16 @@ export function ProfileMomentsPage() {
         queryClient.setQueryData(key, data);
       });
     },
-    onSuccess: async () => {
+    onSuccess: () => {
       setNotice({
         tone: "success",
         message: t(msg`已删除这条朋友圈。`),
       });
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-moments-paged", baseUrl] }),
-      ]);
+      // fire-and-forget：optimistic 已把该条从 flat cache 抹掉；await 让删除按钮多卡 600ms+。
+      void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
     },
   });
 
