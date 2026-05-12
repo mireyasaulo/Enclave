@@ -2666,25 +2666,33 @@ export class FeedService implements OnModuleInit {
   // 套到所有可见角色身上，结果每个老账号库都囤着 46 条「Paul Graham/张雪峰/...
   // 一个接一个发同一支《晨光海岸》」的假数据，用户在 视频号 里反复滑到同样的
   // 3 支片子，体感就是「全是不能看的东西」。这些帖的文件实际存在能播放（所以
-  // cleanupBrokenChannelPosts 不会管它），但内容上就是 demo 污染。这里按
-  // coverUrl LIKE 'placehold.co' 把它们一次性标 hidden；不动 mediaType=audio 的
-  // 真音乐贴（封面要么是真 jpg 要么干脆没封面，不会命中）。重复执行无副作用。
+  // cleanupBrokenChannelPosts 不会管它），但内容上就是 demo 污染。这里直接
+  // 硬 DELETE：feed_posts 本体 + 子表 feed_comments / feed_post_likes /
+  // user_feed_interactions 一起清掉；不动 mediaType=audio 真音乐贴（封面要么是
+  // 真 jpg 要么干脆没封面，不会命中）。重复执行无副作用。
+  //
+  // 识别条件（任一即认定为 demo）：
+  // 1. coverUrl 指向 placehold.co（早期占位封面）
+  // 2. mediaUrl 指向 3 个已知 legacy 视频文件之一（一份 demo 被多角色复用）
   private async cleanupLegacyDemoChannelPosts() {
     try {
-      const result = await this.postRepo
-        .createQueryBuilder()
-        .update()
-        .set({ publishStatus: 'hidden' })
-        .where('surface = :surface', { surface: 'channels' })
-        .andWhere('publishStatus = :status', { status: 'published' })
-        .andWhere("coverUrl LIKE '%placehold.co%'")
-        .execute();
-      const affected = result.affected ?? 0;
-      if (affected > 0) {
-        this.logger.log(
-          `cleanupLegacyDemoChannelPosts: hid ${affected} demo-era channels post(s) with placehold.co cover`,
-        );
-      }
+      const candidates = await this.postRepo
+        .createQueryBuilder('post')
+        .where('post.surface = :surface', { surface: 'channels' })
+        .andWhere(
+          "(post.coverUrl LIKE '%placehold.co%' OR post.mediaUrl LIKE '%/1778311410821-a746c78f-minimax-video.mp4%' OR post.mediaUrl LIKE '%/1778311950732-f23b70af-minimax-video.mp4%' OR post.mediaUrl LIKE '%/1778311207586-814b332b-minimax-video.mp4%')",
+        )
+        .getMany();
+      if (candidates.length === 0) return;
+
+      const ids = candidates.map((post) => post.id);
+      await this.commentRepo.delete({ postId: In(ids) });
+      await this.likeRepo.delete({ postId: In(ids) });
+      await this.interactionRepo.delete({ postId: In(ids) });
+      await this.postRepo.delete({ id: In(ids) });
+      this.logger.log(
+        `cleanupLegacyDemoChannelPosts: deleted ${ids.length} demo-era channels post(s) + child rows`,
+      );
     } catch (error) {
       this.logger.warn(
         `cleanupLegacyDemoChannelPosts failed: ${(error as Error).message}`,

@@ -121,6 +121,43 @@ export class MomentsService implements OnModuleInit {
     await this.backfillMomentAuthorAvatars();
     await this.backfillUserMomentVisibilityToFriends();
     await this.backfillCharacterMomentsToFeed();
+    await this.cleanupLegacyDemoMomentPosts();
+  }
+
+  // 跟 feed.service 的 cleanupLegacyDemoChannelPosts 对称：May 9 切真生成之前
+  // moments 也用 3 个 legacy 视频文件做兜底，部分账号库还囤着
+  // 「MiniMax M1 拍了一段画面记录今天。」这样的模板朋友圈。这里硬删 post 本体
+  // + 关联 moment_likes / moment_comments。重复执行无副作用。
+  private async cleanupLegacyDemoMomentPosts() {
+    try {
+      const LEGACY_FILES = [
+        '1778311410821-a746c78f-minimax-video.mp4',
+        '1778311950732-f23b70af-minimax-video.mp4',
+        '1778311207586-814b332b-minimax-video.mp4',
+      ];
+      const qb = this.postRepo.createQueryBuilder('post');
+      const orClauses = LEGACY_FILES.map(
+        (file, idx) => `post.mediaPayload LIKE :file${idx}`,
+      ).join(' OR ');
+      const params: Record<string, string> = {};
+      LEGACY_FILES.forEach((file, idx) => {
+        params[`file${idx}`] = `%${file}%`;
+      });
+      const candidates = await qb.where(orClauses, params).getMany();
+      if (candidates.length === 0) return;
+
+      const ids = candidates.map((post) => post.id);
+      await this.commentRepo.delete({ postId: In(ids) });
+      await this.likeRepo.delete({ postId: In(ids) });
+      await this.postRepo.delete({ id: In(ids) });
+      this.logger.log(
+        `cleanupLegacyDemoMomentPosts: deleted ${ids.length} demo-era moment_post(s) + child rows`,
+      );
+    } catch (error) {
+      this.logger.warn(
+        `cleanupLegacyDemoMomentPosts failed: ${(error as Error).message}`,
+      );
+    }
   }
 
   async createUserMoment(input: CreateMomentInput): Promise<Moment> {
