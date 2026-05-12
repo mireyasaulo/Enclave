@@ -347,14 +347,9 @@ export function MomentsPage() {
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`朋友圈互动已更新。`));
-      // fire-and-forget：optimistic 已显示心；await refetch 会卡 isPending，
-      // 连点点赞会被 disabled。同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page 等)。
-      void queryClient.invalidateQueries({
-        queryKey: ["app-moments-paged", baseUrl],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: ["app-moments", baseUrl],
-      });
+      // 点赞 toggle 返回 { liked: boolean }，optimistic 已经把 ownerState 切对；
+      // 服务端不会重算业务字段。完全省掉 invalidate，避免一次 GET /api/moments 全量
+      // refetch 又拉回 30+ media 条件请求。
     },
   });
 
@@ -476,6 +471,7 @@ export function MomentsPage() {
         flatSnapshots,
         pagedSnapshots,
         momentId,
+        tempId,
         savedDraft,
         savedDesktopReply,
         savedMobileReply,
@@ -519,22 +515,46 @@ export function MomentsPage() {
         setCommentBarTarget(context.savedMobileReply);
       }
     },
-    onSuccess: (_data, momentId) => {
+    onSuccess: (realComment, momentId, context) => {
       delete commentSubmitArgsRef.current[momentId];
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`朋友圈互动已更新。`));
-      // fire-and-forget：不 await，否则 isPending 会一直保持到 refetch 完成；
-      // 公网隧道 ~600ms+ 下，用户第二次发评论时 bar 会因 pending=true 卡在"发送中"。
-      // optimistic 临时评论已经在 UI 显示，refetch 在后台把临时 id（optimistic-comment-*）
-      // 替换成真实记录。
-      void queryClient.invalidateQueries({
-        queryKey: ["app-moments-paged", baseUrl],
-      });
-      void queryClient.invalidateQueries({
-        queryKey: ["app-moments", baseUrl],
-      });
+      // 把 optimistic temp（id=optimistic-comment-*）原地换成 server 真实评论。
+      // 这样**完全省掉**一次 invalidate 触发的 GET /api/moments + paged refetch
+      // ——公网隧道下 refetch 还会带回 30+ media 条件请求 RTT，是评论后体感
+      // "页面又卡一下"的主要原因。staleTime 60s (mobile) 期间用户拿不到其他
+      // NPC 同时段写的评论，但 pull-to-refresh / re-mount 都能补；可接受。
+      if (context && !context.skipped) {
+        const { tempId } = context;
+        const replaceComment = (moment: Moment): Moment =>
+          moment.id !== momentId
+            ? moment
+            : {
+                ...moment,
+                comments: moment.comments.map((c) =>
+                  c.id === tempId ? realComment : c,
+                ),
+              };
+        queryClient.setQueriesData<Moment[]>(
+          { queryKey: ["app-moments", baseUrl] },
+          (data) => (data ? data.map(replaceComment) : data),
+        );
+        queryClient.setQueriesData<InfiniteData<MomentsPageResponse>>(
+          { queryKey: ["app-moments-paged", baseUrl] },
+          (data) =>
+            data
+              ? {
+                  ...data,
+                  pages: data.pages.map((page) => ({
+                    ...page,
+                    items: page.items.map(replaceComment),
+                  })),
+                }
+              : data,
+        );
+      }
     },
   });
   const deleteMutation = useMutation({

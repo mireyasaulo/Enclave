@@ -418,9 +418,8 @@ export function DiscoverPage() {
     },
     onSuccess: () => {
       setSuccessNotice(t(msg`广场互动已更新。`));
-      // fire-and-forget：optimistic 已显示心；await 会卡 isPending，连点点赞被 disabled。
-      void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
-      void queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] });
+      // 点赞 toggle 是 boolean，optimistic 已经把 likeCount/hasLiked 切对。
+      // 完全省掉 invalidate，避免拉回 paged 多页 + 30+ media 条件请求 RTT。
     },
   });
 
@@ -445,8 +444,9 @@ export function DiscoverPage() {
         queryKey: ["app-feed", baseUrl],
       });
 
+      const tempId = `optimistic-feed-comment-${ownerId}-${Date.now()}`;
       const tempComment: FeedComment = {
-        id: `optimistic-feed-comment-${ownerId}-${Date.now()}`,
+        id: tempId,
         postId,
         authorId: ownerId,
         authorName: ownerUsername ?? t(msg`我`),
@@ -483,7 +483,7 @@ export function DiscoverPage() {
       const savedDraft = feedCommentDrafts[postId] ?? "";
       setFeedCommentDrafts((current) => ({ ...current, [postId]: "" }));
 
-      return { skipped: false as const, snapshots, postId, savedDraft };
+      return { skipped: false as const, snapshots, postId, tempId, savedDraft };
     },
     mutationFn: (postId: string) => {
       // 从 ref 读 onMutate 已捕获的 text，避免被 setFeedCommentDrafts(clear) 抢跑
@@ -504,17 +504,57 @@ export function DiscoverPage() {
         [context.postId]: context.savedDraft,
       }));
     },
-    onSuccess: (_data, postId) => {
+    onSuccess: (realComment, postId, context) => {
       delete feedCommentSubmitTextRef.current[postId];
       setSuccessNotice(t(msg`广场互动已更新。`));
-      // fire-and-forget：不 await，否则 isPending 会一直保持到 refetch 完成；
-      // 公网隧道下用户第二次发评论时 bar 会因 pending=true 卡在"发送中"。
-      // optimistic 临时评论已经在 UI 显示，refetch 在后台把 optimistic-feed-comment-*
-      // 替换成真实记录。
-      void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
-      void queryClient.invalidateQueries({
-        queryKey: ["app-feed-paged", baseUrl],
-      });
+      // 把 optimistic temp（id=optimistic-feed-comment-*）原地换成 server 真实评论。
+      // 完全省掉一次 invalidate refetch ——公网隧道下 refetch 会带回 paged 多页 +
+      // 30+ media 条件请求 RTT。staleTime 60s 内拿不到其他 NPC 同时评论，但
+      // pull-to-refresh / re-mount 都能补；可接受。
+      if (context && !context.skipped) {
+        const { tempId } = context;
+        queryClient.setQueriesData<FeedListResponse>(
+          { queryKey: ["app-feed", baseUrl] },
+          (data) =>
+            data?.posts
+              ? {
+                  ...data,
+                  posts: data.posts.map((post) =>
+                    post.id !== postId
+                      ? post
+                      : {
+                          ...post,
+                          commentsPreview: (post.commentsPreview ?? []).map(
+                            (c) => (c.id === tempId ? realComment : c),
+                          ),
+                        },
+                  ),
+                }
+              : data,
+        );
+        queryClient.setQueriesData<InfiniteData<FeedListResponse>>(
+          { queryKey: ["app-feed-paged", baseUrl] },
+          (data) =>
+            data
+              ? {
+                  ...data,
+                  pages: data.pages.map((page) => ({
+                    ...page,
+                    posts: page.posts.map((post) =>
+                      post.id !== postId
+                        ? post
+                        : {
+                            ...post,
+                            commentsPreview: (post.commentsPreview ?? []).map(
+                              (c) => (c.id === tempId ? realComment : c),
+                            ),
+                          },
+                    ),
+                  })),
+                }
+              : data,
+        );
+      }
     },
   });
 

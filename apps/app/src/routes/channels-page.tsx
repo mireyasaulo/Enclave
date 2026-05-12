@@ -203,10 +203,8 @@ export function ChannelsPage() {
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`视频号互动已更新。`));
-      // fire-and-forget：optimistic 已显示心；await 会卡 isPending。
-      void queryClient.invalidateQueries({
-        queryKey: ["app-channels-home", baseUrl],
-      });
+      // 点赞 toggle 是 boolean，optimistic 已经切对 hasLiked/likeCount。
+      // 完全省掉 invalidate，避免视频号首页全量 + media 条件请求 RTT。
     },
   });
 

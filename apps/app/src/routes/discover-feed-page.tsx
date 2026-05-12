@@ -348,10 +348,8 @@ export function DiscoverFeedPage() {
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`广场互动已更新。`));
-      // fire-and-forget：optimistic 已显示心；await 会卡 isPending，连点点赞被 disabled。
-      void queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] });
-      void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
-      void queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] });
+      // 点赞 toggle 是 boolean，optimistic 已经把 likeCount/hasLiked 切对。
+      // 完全省掉 invalidate，避免拉回 paged 多页 + 30+ media 条件请求 RTT。
     },
   });
 

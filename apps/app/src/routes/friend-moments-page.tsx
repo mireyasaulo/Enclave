@@ -172,9 +172,8 @@ export function FriendMomentsPage() {
     onError: optimisticLike.onError,
     onSuccess: () => {
       setNotice(t(msg`朋友圈互动已更新。`));
-      // fire-and-forget：optimistic 已显示红心；await refetch 会让 isPending
-      // 一直挂着，公网隧道下连点会卡几秒。
-      void optimisticLike.invalidate();
+      // 点赞 toggle 是 boolean，optimistic 已把 likes 切对。完全省掉 invalidate，
+      // 避免拉回 GET /api/moments 全量 + 30+ media 条件请求 RTT。
     },
   });
   const commentMutation = useMutation({

@@ -131,9 +131,8 @@ export function MobileFriendMomentsPage() {
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
       });
-      // fire-and-forget：optimistic 已让红心立刻生效；await refetch 会让
-      // isPending 一直挂着，公网隧道 RTT 下连点会卡数秒。
-      void optimisticLike.invalidate();
+      // 点赞 toggle 是 boolean，optimistic 已把 likes 切对。完全省掉 invalidate，
+      // 避免拉回 GET /api/moments 全量 + 30+ media 条件请求 RTT。
     },
   });
   const commentMutation = useMutation({
