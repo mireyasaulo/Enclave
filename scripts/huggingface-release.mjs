@@ -23,7 +23,7 @@ const DEFAULT_OWNER = "w9000";
 const DEFAULT_SPACE_REPO = "enclave";
 const DEFAULT_MODEL_REPO = "enclave-character-recipes";
 const DEFAULT_GITHUB_URL = "https://github.com/yuanzui0728/yinjie-app";
-const DEFAULT_SITE_URL = "http://1gw06751dd053.vicp.fun";
+const DEFAULT_SITE_URL = "https://enclaveai.top";
 const DEFAULT_CONTACT_EMAIL = "yuanzui0728@gmail.com";
 
 const EXCLUDED_NAMES = new Set([
