@@ -61,7 +61,7 @@ export function MobileMomentsPublishPage() {
         videoDraft: composeDraft.videoDraft,
         baseUrl,
       }),
-    onSuccess: async () => {
+    onSuccess: () => {
       storeMomentPublishFlash(t(msg`朋友圈已发布。`));
       composeDraft.reset();
       // 发布会让分页边界后移，先把 paged cache 收回到 page 1（避免下次 mount 时边界重复）
@@ -75,11 +75,12 @@ export function MobileMomentsPublishPage() {
               }
             : current,
       );
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] }),
-        // moments-page 用 paged key 走无限分页
-        queryClient.invalidateQueries({ queryKey: ["app-moments-paged", baseUrl] }),
-      ]);
+      // fire-and-forget：原来 await refetch 让"发表中"按钮多卡 600ms+。
+      // 跳转后下个页面 mount 时 useQuery 自己会用 invalidated cache 触发 refetch。
+      void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
       void navigate({
         to: safeReturnPath ?? "/discover/moments",
         ...(safeReturnHash ? { hash: safeReturnHash } : {}),

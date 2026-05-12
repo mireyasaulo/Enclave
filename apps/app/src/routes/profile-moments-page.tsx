@@ -205,17 +205,18 @@ export function ProfileMomentsPage() {
         videoDraft: composeDraft.videoDraft,
         baseUrl,
       }),
-    onSuccess: async () => {
+    onSuccess: () => {
       composeDraft.reset();
       setShowCompose(false);
       setNotice({
         tone: "success",
         message: t(msg`朋友圈已发布。`),
       });
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-moments-paged", baseUrl] }),
-      ]);
+      // fire-and-forget：await refetch 会让"发表中"按钮多卡 600ms+
+      void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
     },
   });
 

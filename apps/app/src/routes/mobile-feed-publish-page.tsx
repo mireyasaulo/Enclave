@@ -58,7 +58,7 @@ export function MobileFeedPublishPage() {
         videoDraft: composeDraft.videoDraft,
         baseUrl,
       }),
-    onSuccess: async () => {
+    onSuccess: () => {
       storeFeedPublishFlash(t(msg`广场动态已发布，世界居民公开可见。`));
       composeDraft.reset();
       // 发布会让分页边界后移：把 paged cache 收回到 page 1，避免下次 mount discover-feed-page
@@ -73,12 +73,13 @@ export function MobileFeedPublishPage() {
               }
             : current,
       );
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
-        // discover-feed-page 用 paged key 走无限分页，要同步刷新
-        queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] }),
-      ]);
+      // fire-and-forget：原来 await refetch 让"发表中"按钮多卡 600ms+。
+      // 跳转后下个页面 mount 时 useQuery 自己会用 invalidated cache 触发 refetch。
+      void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-feed-paged", baseUrl],
+      });
+      void queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] });
       void navigate({
         to: safeReturnPath ?? "/discover/feed",
         ...(safeReturnHash ? { hash: safeReturnHash } : {}),

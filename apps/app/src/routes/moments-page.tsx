@@ -241,7 +241,7 @@ export function MomentsPage() {
         videoDraft: composeDraft.videoDraft,
         baseUrl,
       }),
-    onSuccess: async () => {
+    onSuccess: () => {
       composeDraft.reset();
       setShowCompose(false);
       setNoticeTone("success");
@@ -249,15 +249,14 @@ export function MomentsPage() {
       setNoticeAction(null);
       setNotice(t(msg`朋友圈已发布。`));
       resetMomentsToFirstPage();
+      // fire-and-forget：await refetch 会让"发表中"按钮一直保持 pending；
       // 同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page、search-index 等)
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["app-moments-paged", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-moments", baseUrl],
-        }),
-      ]);
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments", baseUrl],
+      });
     },
   });
 

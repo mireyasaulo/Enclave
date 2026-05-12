@@ -249,7 +249,7 @@ export function DiscoverFeedPage() {
         videoDraft: composeDraft.videoDraft,
         baseUrl,
       }),
-    onSuccess: async () => {
+    onSuccess: () => {
       composeDraft.reset();
       setShowCompose(false);
       setNoticeTone("success");
@@ -259,12 +259,13 @@ export function DiscoverFeedPage() {
       // 发布会让分页边界整体后移：若不先把 cache 收回到 page 1，
       // refetch 多页会让原 page 1 末尾那条同时出现在新 page 1 末尾 + 新 page 2 开头（重复）。
       resetFeedToFirstPage();
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
-        // 同时刷新旧 key，让 discover-page 和 search-index 等共用 cache 的页面也同步
-        queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] }),
-      ]);
+      // fire-and-forget：await refetch 会让"发表中"按钮多卡 600ms+
+      void queryClient.invalidateQueries({
+        queryKey: ["app-feed-paged", baseUrl],
+      });
+      // 同时刷新旧 key，让 discover-page 和 search-index 等共用 cache 的页面也同步
+      void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
+      void queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] });
     },
   });
 
