@@ -1282,6 +1282,132 @@ function MobileChannelMediaSurface({
   );
 }
 
+// 底部进度条 + 拖动 seek：音视频共用。
+// 视觉：贴卡片底部、细线（默认 3px，按下拉宽到 6px + 圆形 thumb），白色填充已播放部分。
+// 交互：pointer events 统一处理鼠标 / 触屏 / 笔。setPointerCapture 让手指滑出条外也跟手。
+// 阻止 touch / click 冒泡，避免触发外层 ChannelAudioPictorial 的 swipe / tap-to-pause。
+function MediaProgressBar({
+  mediaRef,
+  active,
+}: {
+  mediaRef: React.RefObject<HTMLMediaElement | null>;
+  active: boolean;
+}) {
+  const [progress, setProgress] = useState(0);
+  const [scrubbing, setScrubbing] = useState(false);
+  const scrubbingRef = useRef(false);
+  const scrubProgressRef = useRef(0);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const media = mediaRef.current;
+    if (!media) return;
+    const sync = () => {
+      if (scrubbingRef.current) return;
+      const d = media.duration;
+      if (d > 0 && Number.isFinite(d)) {
+        setProgress(media.currentTime / d);
+      }
+    };
+    media.addEventListener("timeupdate", sync);
+    media.addEventListener("loadedmetadata", sync);
+    media.addEventListener("durationchange", sync);
+    sync();
+    return () => {
+      media.removeEventListener("timeupdate", sync);
+      media.removeEventListener("loadedmetadata", sync);
+      media.removeEventListener("durationchange", sync);
+    };
+  }, [mediaRef]);
+
+  // 卡片切走时进度条归零，下次进入避免显示上一首的位置
+  useEffect(() => {
+    if (!active) setProgress(0);
+  }, [active]);
+
+  const computeRatio = (clientX: number) => {
+    const track = trackRef.current;
+    if (!track) return 0;
+    const rect = track.getBoundingClientRect();
+    if (rect.width <= 0) return 0;
+    const r = (clientX - rect.left) / rect.width;
+    return Math.max(0, Math.min(1, r));
+  };
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // 某些环境 setPointerCapture 会抛——忽略即可，仍能通过 move/up 事件继续 scrub
+    }
+    scrubbingRef.current = true;
+    setScrubbing(true);
+    const r = computeRatio(event.clientX);
+    scrubProgressRef.current = r;
+    setProgress(r);
+  };
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!scrubbingRef.current) return;
+    event.stopPropagation();
+    const r = computeRatio(event.clientX);
+    scrubProgressRef.current = r;
+    setProgress(r);
+  };
+
+  const handlePointerEnd = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!scrubbingRef.current) return;
+    event.stopPropagation();
+    scrubbingRef.current = false;
+    setScrubbing(false);
+    const media = mediaRef.current;
+    if (media && media.duration > 0 && Number.isFinite(media.duration)) {
+      media.currentTime = scrubProgressRef.current * media.duration;
+    }
+  };
+
+  // 触屏 / 鼠标 / 合成 click 都要拦下来，避免外层 tap-to-pause / swipe 误触
+  const stopTouch = (event: React.TouchEvent<HTMLDivElement>) =>
+    event.stopPropagation();
+  const stopClick = (event: React.MouseEvent<HTMLDivElement>) =>
+    event.stopPropagation();
+
+  return (
+    <div
+      className="pointer-events-auto absolute inset-x-0 z-20 touch-none px-3 py-2.5"
+      style={{ bottom: "max(env(safe-area-inset-bottom,0px), 0px)" }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerEnd}
+      onPointerCancel={handlePointerEnd}
+      onTouchStart={stopTouch}
+      onTouchMove={stopTouch}
+      onTouchEnd={stopTouch}
+      onClick={stopClick}
+    >
+      <div
+        ref={trackRef}
+        className={cn(
+          "relative w-full rounded-full bg-white/30 transition-[height]",
+          scrubbing ? "h-1.5" : "h-[3px]",
+        )}
+      >
+        <div
+          className="absolute inset-y-0 left-0 rounded-full bg-white"
+          style={{ width: `${progress * 100}%` }}
+        />
+        {scrubbing ? (
+          <div
+            className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow"
+            style={{ left: `${progress * 100}%` }}
+          />
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 // 视频号"图文视频"沉浸式渲染：全卡背景图 + 左右滑切配图 + dots + 音频自动播。
 // 历史音乐帖没有多图（images=[]）时，使用 fallbackPosterUrl 当唯一背景，禁用滑动。
 //
@@ -1515,6 +1641,8 @@ function ChannelAudioPictorial({
         onPause={() => setIsPlaying(false)}
         className="hidden"
       />
+
+      <MediaProgressBar mediaRef={audioRef} active={active} />
     </div>
   );
 }
@@ -1608,6 +1736,8 @@ function ChannelVideoSurface({
           </div>
         </div>
       ) : null}
+
+      <MediaProgressBar mediaRef={videoRef} active={active} />
     </div>
   );
 }
