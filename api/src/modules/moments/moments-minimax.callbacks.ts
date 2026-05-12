@@ -96,9 +96,9 @@ export class MomentsMinimaxCallbacks
           id: cover.fileName,
           kind: 'image',
           url: cover.url,
-          mimeType: 'image/jpeg',
+          mimeType: cover.mimeType,
           fileName: cover.fileName,
-          size: 0,
+          size: cover.size,
         });
       }
       for (const p of pictorials) {
@@ -155,6 +155,8 @@ export class MomentsMinimaxCallbacks
       // 配额不足或生成失败都不影响视频本身已发布。
       try {
         const bgmPrompt = composeVideoBgmPrompt(job);
+        // 直接传 targetId，避免与 enqueue 触发的 setTimeout(processMusicJobs)
+        // 抢跑导致 BGM 任务在 attachTarget 之前就进入处理流程
         const bgmJob = await this.jobs.enqueueMusicJob({
           model: 'music-2.6',
           prompt: bgmPrompt,
@@ -162,9 +164,9 @@ export class MomentsMinimaxCallbacks
           characterName: job.characterName,
           characterAvatar: job.characterAvatar ?? null,
           targetType: 'moment_post_video_bgm',
+          targetId: job.targetId,
         });
         if (bgmJob) {
-          await this.jobs.attachTarget(bgmJob.id, job.targetId);
           this.logger.log(
             `video bgm job ${bgmJob.id} queued for post ${job.targetId}`,
           );

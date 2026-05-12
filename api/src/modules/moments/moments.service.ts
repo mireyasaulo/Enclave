@@ -2133,61 +2133,70 @@ export class MomentsService implements OnModuleInit {
     postId: string,
     bgmFileName: string,
   ): Promise<boolean> {
-    const post = await this.postRepo.findOneBy({ id: postId });
-    if (!post) {
-      this.logger.warn(`applyBgmToVideoMomentPost: post ${postId} missing`);
-      return false;
-    }
-    const media = this.parseMomentMediaPayload(post.mediaPayload);
-    const video = media.find((m): m is MomentVideoAsset => m.kind === 'video');
-    if (!video?.url) {
-      this.logger.warn(
-        `applyBgmToVideoMomentPost: post ${postId} has no video media yet`,
-      );
-      return false;
-    }
-    // 从 publicUrl `/api/moments/media/<file>` 抽 fileName
-    const oldVideoFileName = video.url.split('/').pop();
-    if (!oldVideoFileName) return false;
-    const mixed = await this.minimaxStorage.mixVideoWithAudio({
-      videoFileName: oldVideoFileName,
-      audioFileName: bgmFileName,
-    });
-    if (!mixed) return false;
-    const newVideo: MomentVideoAsset = {
-      ...video,
-      id: mixed.fileName,
-      url: mixed.publicUrl,
-      mimeType: mixed.mimeType,
-      fileName: mixed.fileName,
-      size: mixed.size,
-    };
-    post.mediaPayload = this.serializeMomentMedia([newVideo]);
-    await this.postRepo.save(post);
-    // 清理旧静音视频和 BGM 临时音频
-    await this.minimaxStorage.unlinkIfExists(oldVideoFileName);
-    await this.minimaxStorage.unlinkIfExists(bgmFileName);
-    // 同步刷新视频号那条 post 的 mediaPayload，让视频号也带上 BGM
+    // try/finally 确保 BGM 临时文件在任何返回路径上都被回收，避免磁盘泄漏。
+    // unlinkIfExists 幂等，重复调用安全。
     try {
-      await this.feedService.upsertChannelVideoPostFromMoment({
-        momentPostId: postId,
-        authorId: post.authorId,
-        authorName: post.authorName,
-        authorAvatar: post.authorAvatar,
-        videoUrl: newVideo.url,
-        posterUrl: newVideo.posterUrl ?? null,
-        durationMs: newVideo.durationMs ?? null,
-        mimeType: newVideo.mimeType,
-        fileName: newVideo.fileName,
-        size: newVideo.size,
-        text: `${post.authorName} 拍了一段画面`,
-      });
-    } catch (err) {
-      this.logger.warn(
-        `channel video post refresh after bgm failed for moment ${postId}: ${(err as Error)?.message}`,
+      const post = await this.postRepo.findOneBy({ id: postId });
+      if (!post) {
+        this.logger.warn(`applyBgmToVideoMomentPost: post ${postId} missing`);
+        return false;
+      }
+      const media = this.parseMomentMediaPayload(post.mediaPayload);
+      const video = media.find(
+        (m): m is MomentVideoAsset => m.kind === 'video',
       );
+      if (!video?.url) {
+        this.logger.warn(
+          `applyBgmToVideoMomentPost: post ${postId} has no video media yet`,
+        );
+        return false;
+      }
+      // 从 publicUrl `/api/moments/media/<file>` 抽 fileName
+      const oldVideoFileName = video.url.split('/').pop();
+      if (!oldVideoFileName) return false;
+      const mixed = await this.minimaxStorage.mixVideoWithAudio({
+        videoFileName: oldVideoFileName,
+        audioFileName: bgmFileName,
+      });
+      if (!mixed) return false;
+      const newVideo: MomentVideoAsset = {
+        ...video,
+        id: mixed.fileName,
+        url: mixed.publicUrl,
+        mimeType: mixed.mimeType,
+        fileName: mixed.fileName,
+        size: mixed.size,
+      };
+      post.mediaPayload = this.serializeMomentMedia([newVideo]);
+      await this.postRepo.save(post);
+      // 先把视频号 mediaPayload 指向新文件，再 unlink 旧静音视频；
+      // 否则中间这一段时间视频号那条贴指向已删文件 → 404。
+      try {
+        await this.feedService.upsertChannelVideoPostFromMoment({
+          momentPostId: postId,
+          authorId: post.authorId,
+          authorName: post.authorName,
+          authorAvatar: post.authorAvatar,
+          videoUrl: newVideo.url,
+          posterUrl: newVideo.posterUrl ?? null,
+          durationMs: newVideo.durationMs ?? null,
+          mimeType: newVideo.mimeType,
+          fileName: newVideo.fileName,
+          size: newVideo.size,
+          text: `${post.authorName} 拍了一段画面`,
+        });
+      } catch (err) {
+        this.logger.warn(
+          `channel video post refresh after bgm failed for moment ${postId}: ${(err as Error)?.message}`,
+        );
+      }
+      // 视频号已经指向新文件后，安全回收旧静音视频
+      await this.minimaxStorage.unlinkIfExists(oldVideoFileName);
+      return true;
+    } finally {
+      // BGM 中间产物：成功也好失败也好都不再需要
+      await this.minimaxStorage.unlinkIfExists(bgmFileName);
     }
-    return true;
   }
 
   async deleteMinimaxPlaceholderPost(postId: string): Promise<void> {
@@ -2206,7 +2215,12 @@ export class MomentsService implements OnModuleInit {
   async tryRenderMinimaxMusicCover(
     job: MinimaxJobEntity,
     seedText: string,
-  ): Promise<{ url: string; fileName: string } | null> {
+  ): Promise<{
+    url: string;
+    fileName: string;
+    mimeType: string;
+    size: number;
+  } | null> {
     if (!this.minimaxClient.isConfigured()) return null;
     const reserved = await this.minimaxQuota.tryReserve('image-01');
     if (!reserved) return null;
@@ -2223,7 +2237,12 @@ export class MomentsService implements OnModuleInit {
         suffix: '-cover',
       });
       await this.minimaxQuota.commit('image-01');
-      return { url: persisted.publicUrl, fileName: persisted.fileName };
+      return {
+        url: persisted.publicUrl,
+        fileName: persisted.fileName,
+        mimeType: image.mimeType,
+        size: persisted.size,
+      };
     } catch (err) {
       await this.minimaxQuota.release('image-01');
       this.logger.warn(
