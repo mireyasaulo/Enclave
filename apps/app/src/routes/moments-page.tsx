@@ -331,6 +331,19 @@ export function MomentsPage() {
     },
   });
 
+  // mutationFn 不能再次读 commentDrafts 取文本：onMutate 里的
+  // setCommentDrafts(clear) 会在 onMutate 返回的微任务边界被 React 18 flush 掉，
+  // 等 TanStack Query 调 mutationFn 时闭包里的 commentDrafts[momentId] 已经是 ""。
+  // 在 onMutate 里把 text/target 写进 ref，mutationFn 直接读 ref。
+  const commentSubmitArgsRef = useRef<
+    Record<
+      string,
+      {
+        text: string;
+        target: { commentId: string; authorId: string } | null;
+      }
+    >
+  >({});
   const commentMutation = useMutation({
     // onMutate: optimistic 插入临时评论 + 清输入/回复目标。
     // 公网隧道 ~600ms RTT 下，原 onSuccess 才清 drafts 会让用户看到输入框
@@ -357,6 +370,8 @@ export function MomentsPage() {
             authorId: desktopTarget.authorId,
           }
         : mobileTarget;
+
+      commentSubmitArgsRef.current[momentId] = { text, target };
 
       await Promise.all([
         queryClient.cancelQueries({
@@ -440,37 +455,24 @@ export function MomentsPage() {
       };
     },
     mutationFn: (momentId: string) => {
-      const text = commentDrafts[momentId]?.trim();
-      if (!text) {
+      // 从 ref 读 onMutate 已捕获的 text/target，避免被 setCommentDrafts(clear) 抢跑
+      const args = commentSubmitArgsRef.current[momentId];
+      if (!args?.text) {
         throw new Error(t(msg`请先输入评论内容。`));
       }
-
-      const desktopTarget =
-        desktopReplyTarget && desktopReplyTarget.postId === momentId
-          ? desktopReplyTarget
-          : null;
-      const mobileTarget =
-        commentBarTarget?.momentId === momentId
-          ? commentBarTarget.replyTo
-          : null;
-      const target = desktopTarget
-        ? {
-            commentId: desktopTarget.commentId,
-            authorId: desktopTarget.authorId,
-          }
-        : mobileTarget;
 
       return addMomentComment(
         momentId,
         {
-          text,
-          replyToCommentId: target?.commentId,
-          replyToAuthorId: target?.authorId,
+          text: args.text,
+          replyToCommentId: args.target?.commentId,
+          replyToAuthorId: args.target?.authorId,
         },
         baseUrl,
       );
     },
-    onError: (_err, _momentId, context) => {
+    onError: (_err, momentId, context) => {
+      delete commentSubmitArgsRef.current[momentId];
       if (!context || context.skipped) return;
       context.flatSnapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
@@ -490,7 +492,8 @@ export function MomentsPage() {
         setCommentBarTarget(context.savedMobileReply);
       }
     },
-    onSuccess: async () => {
+    onSuccess: async (_data, momentId) => {
+      delete commentSubmitArgsRef.current[momentId];
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);

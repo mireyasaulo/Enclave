@@ -406,6 +406,11 @@ export function DiscoverPage() {
     },
   });
 
+  // mutationFn 不能再次读 feedCommentDrafts 取文本：onMutate 里的
+  // setFeedCommentDrafts(clear) 会在 onMutate 返回的微任务边界被 React 18 flush 掉，
+  // 等 TanStack Query 调 mutationFn 时闭包里的 feedCommentDrafts[postId] 已经是 ""。
+  // 在 onMutate 里把 text 写进 ref，mutationFn 直接读 ref。
+  const feedCommentSubmitTextRef = useRef<Record<string, string>>({});
   const commentFeedMutation = useMutation({
     // optimistic 插入临时评论 + 立即清输入框，避免公网隧道 ~600ms RTT 期间
     // 用户看到输入框不消失 / 评论不出现。临时 id 形如 optimistic-feed-comment-*，
@@ -413,6 +418,8 @@ export function DiscoverPage() {
     onMutate: async (postId: string) => {
       const text = feedCommentDrafts[postId]?.trim();
       if (!text || !ownerId) return { skipped: true as const };
+
+      feedCommentSubmitTextRef.current[postId] = text;
 
       await queryClient.cancelQueries({ queryKey: ["app-feed", baseUrl] });
 
@@ -460,15 +467,16 @@ export function DiscoverPage() {
 
       return { skipped: false as const, snapshots, postId, savedDraft };
     },
-    mutationFn: (postId: string) =>
-      addFeedComment(
-        postId,
-        {
-          text: feedCommentDrafts[postId].trim(),
-        },
-        baseUrl,
-      ),
-    onError: (_err, _postId, context) => {
+    mutationFn: (postId: string) => {
+      // 从 ref 读 onMutate 已捕获的 text，避免被 setFeedCommentDrafts(clear) 抢跑
+      const text = feedCommentSubmitTextRef.current[postId];
+      if (!text) {
+        throw new Error(t(msg`请先输入评论内容。`));
+      }
+      return addFeedComment(postId, { text }, baseUrl);
+    },
+    onError: (_err, postId, context) => {
+      delete feedCommentSubmitTextRef.current[postId];
       if (!context || context.skipped) return;
       context.snapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
@@ -478,7 +486,8 @@ export function DiscoverPage() {
         [context.postId]: context.savedDraft,
       }));
     },
-    onSuccess: async () => {
+    onSuccess: async (_data, postId) => {
+      delete feedCommentSubmitTextRef.current[postId];
       setSuccessNotice(t(msg`广场互动已更新。`));
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
