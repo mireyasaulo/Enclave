@@ -381,7 +381,7 @@ export function DiscoverFeedPage() {
 
       return addFeedComment(input.postId, { text }, baseUrl);
     },
-    onSuccess: async (_, input) => {
+    onSuccess: (_, input) => {
       setCommentDrafts((current) => ({ ...current, [input.postId]: "" }));
       setDesktopReplyTarget((current) =>
         current?.postId === input.postId ? null : current,
@@ -397,12 +397,10 @@ export function DiscoverFeedPage() {
           ? t(msg`广场回复已发送。`)
           : t(msg`广场互动已更新。`),
       );
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
-        // 同时刷新旧 key，让 discover-page 和 search-index 等共用 cache 的页面也同步
-        queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] }),
-      ]);
+      // fire-and-forget：await 会让"发送"按钮一直 disabled，公网隧道下卡几秒。
+      void queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] });
+      void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
+      void queryClient.invalidateQueries({ queryKey: ["app-feed-post", baseUrl] });
     },
   });
 

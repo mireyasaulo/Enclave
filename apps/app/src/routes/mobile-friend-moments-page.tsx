@@ -126,12 +126,14 @@ export function MobileFriendMomentsPage() {
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
     onMutate: optimisticLike.onMutate,
     onError: optimisticLike.onError,
-    onSuccess: async () => {
+    onSuccess: () => {
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
       });
-      await optimisticLike.invalidate();
+      // fire-and-forget：optimistic 已让红心立刻生效；await refetch 会让
+      // isPending 一直挂着，公网隧道 RTT 下连点会卡数秒。
+      void optimisticLike.invalidate();
     },
   });
   const commentMutation = useMutation({
@@ -156,17 +158,19 @@ export function MobileFriendMomentsPage() {
         baseUrl,
       );
     },
-    onSuccess: async (_, momentId) => {
+    onSuccess: (_, momentId) => {
       setCommentDrafts((current) => ({ ...current, [momentId]: "" }));
       setCommentBarTarget(null);
       setNotice({
         tone: "success",
         message: t(msg`朋友圈互动已更新。`),
       });
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-moments-paged", baseUrl] }),
-      ]);
+      // fire-and-forget：await refetch 会让"发表"按钮一直 disabled，
+      // 公网隧道下感觉评论"卡好几秒"。让 invalidate 在后台跑就行。
+      void queryClient.invalidateQueries({ queryKey: ["app-moments", baseUrl] });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
     },
   });
 

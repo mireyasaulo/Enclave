@@ -416,12 +416,11 @@ export function DiscoverPage() {
         queryClient.setQueryData(key, data);
       });
     },
-    onSuccess: async () => {
+    onSuccess: () => {
       setSuccessNotice(t(msg`广场互动已更新。`));
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
-      ]);
+      // fire-and-forget：optimistic 已显示心；await 会卡 isPending，连点点赞被 disabled。
+      void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
+      void queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] });
     },
   });
 
