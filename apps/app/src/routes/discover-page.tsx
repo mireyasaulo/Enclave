@@ -486,13 +486,17 @@ export function DiscoverPage() {
         [context.postId]: context.savedDraft,
       }));
     },
-    onSuccess: async (_data, postId) => {
+    onSuccess: (_data, postId) => {
       delete feedCommentSubmitTextRef.current[postId];
       setSuccessNotice(t(msg`广场互动已更新。`));
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] }),
-        queryClient.invalidateQueries({ queryKey: ["app-feed-paged", baseUrl] }),
-      ]);
+      // fire-and-forget：不 await，否则 isPending 会一直保持到 refetch 完成；
+      // 公网隧道下用户第二次发评论时 bar 会因 pending=true 卡在"发送中"。
+      // optimistic 临时评论已经在 UI 显示，refetch 在后台把 optimistic-feed-comment-*
+      // 替换成真实记录。
+      void queryClient.invalidateQueries({ queryKey: ["app-feed", baseUrl] });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-feed-paged", baseUrl],
+      });
     },
   });
 

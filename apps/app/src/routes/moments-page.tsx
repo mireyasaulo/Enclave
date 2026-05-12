@@ -503,23 +503,22 @@ export function MomentsPage() {
         setCommentBarTarget(context.savedMobileReply);
       }
     },
-    onSuccess: async (_data, momentId) => {
+    onSuccess: (_data, momentId) => {
       delete commentSubmitArgsRef.current[momentId];
       setNoticeTone("success");
       setNoticeActionLabel(null);
       setNoticeAction(null);
       setNotice(t(msg`朋友圈互动已更新。`));
-      // 同时刷新分页 (moments-page) 和全集 (profile/friend-moments-page、search-index 等)。
-      // optimistic 临时评论被真实数据替换 —— 临时 id 形如 'optimistic-comment-*'，
-      // 服务端返回真实 id 后 refetch 直接覆盖整个 comments 数组。
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["app-moments-paged", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["app-moments", baseUrl],
-        }),
-      ]);
+      // fire-and-forget：不 await，否则 isPending 会一直保持到 refetch 完成；
+      // 公网隧道 ~600ms+ 下，用户第二次发评论时 bar 会因 pending=true 卡在"发送中"。
+      // optimistic 临时评论已经在 UI 显示，refetch 在后台把临时 id（optimistic-comment-*）
+      // 替换成真实记录。
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments-paged", baseUrl],
+      });
+      void queryClient.invalidateQueries({
+        queryKey: ["app-moments", baseUrl],
+      });
     },
   });
   const deleteMutation = useMutation({
