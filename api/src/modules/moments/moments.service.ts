@@ -6,7 +6,8 @@ import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, MoreThanOrEqual, Repository } from 'typeorm';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
-import type { AiMessagePart } from '../ai/ai.types';
+import type { AiMessagePart, PersonalityProfile } from '../ai/ai.types';
+import { pickThemeAndStyle } from './music-theme-catalog';
 import { REMINDER_CHARACTER_ID } from '../characters/reminder-character';
 import { CharactersService } from '../characters/characters.service';
 import { MomentEntity } from './moment.entity';
@@ -1804,34 +1805,81 @@ export class MomentsService implements OnModuleInit {
 
   // ============= MiniMax 音乐贴 / 视频贴 =============
 
-  // 优先调用 MiniMax /v1/lyrics_generation 生成真正的歌词；失败或配额耗尽时
-  // fallback 到本地 composeMusicLyrics（按标点切分 seedText 凑结构）
+  // 主路径：MiniMax /v1/lyrics_generation，强 prompt（主题+风格+禁用模板）
+  // 配额耗尽 / 失败：LLM fallback（ai.generatePlainText）
+  // LLM 也失败：最后才用本地 composeMusicLyrics，且把主题注入 seed 避免雷同
   private async generateLyricsOrFallback(
+    characterId: string,
     characterName: string,
+    profile: PersonalityProfile,
     seedText: string,
   ): Promise<string> {
-    if (!this.minimaxClient.isConfigured()) {
-      return composeMusicLyrics(characterName, seedText);
+    const { theme, style } = pickThemeAndStyle(characterId);
+    const persona = [
+      profile.relationship?.trim(),
+      profile.expertDomains?.slice(0, 3).join('、'),
+    ]
+      .filter(Boolean)
+      .join('；')
+      .slice(0, 120);
+    const prompt = composeLyricsPrompt({
+      name: characterName,
+      persona,
+      theme,
+      style,
+      seedText,
+    });
+
+    if (this.minimaxClient.isConfigured()) {
+      const reserved = await this.minimaxQuota.tryReserve('lyrics');
+      if (reserved) {
+        try {
+          const result = await this.minimaxClient.generateLyrics({ prompt });
+          await this.minimaxQuota.commit('lyrics');
+          this.logger.log(
+            `lyrics via minimax for ${characterName} [theme=${theme}, style=${style}]`,
+          );
+          return result.lyrics;
+        } catch (err) {
+          await this.minimaxQuota.release('lyrics');
+          this.logger.warn(
+            `minimax lyrics failed, fallback LLM: ${(err as Error)?.message}`,
+          );
+        }
+      } else {
+        this.logger.debug('lyrics quota exhausted, fallback LLM');
+      }
     }
-    const reserved = await this.minimaxQuota.tryReserve('lyrics');
-    if (!reserved) {
-      this.logger.debug('lyrics quota exhausted, using local fallback');
-      return composeMusicLyrics(characterName, seedText);
-    }
+
     try {
-      const result = await this.minimaxClient.generateLyrics({
-        prompt: `为 ${characterName} 这一刻心境写一首中文歌词，结构包含 [verse] 和 [chorus]。情绪线索：${seedText.slice(0, 200)}`,
+      const text = await this.ai.generatePlainText({
+        prompt,
+        usageContext: {
+          surface: 'app',
+          scene: 'minimax_music_lyrics_fallback',
+          scopeType: 'character',
+          scopeId: characterId,
+          scopeLabel: characterName,
+          characterId,
+          characterName,
+        },
+        maxTokens: 600,
+        temperature: 0.9,
       });
-      await this.minimaxQuota.commit('lyrics');
-      this.logger.log(`lyrics generated via minimax for ${characterName}`);
-      return result.lyrics;
+      const cleaned = ensureVerseChorus(text);
+      if (cleaned) {
+        this.logger.log(
+          `lyrics via LLM fallback for ${characterName} [theme=${theme}]`,
+        );
+        return cleaned;
+      }
     } catch (err) {
-      await this.minimaxQuota.release('lyrics');
       this.logger.warn(
-        `minimax lyrics gen failed, falling back: ${(err as Error)?.message}`,
+        `LLM lyrics fallback failed: ${(err as Error)?.message}`,
       );
-      return composeMusicLyrics(characterName, seedText);
     }
+
+    return composeMusicLyrics(characterName, `${theme}：${seedText}`);
   }
 
   async scheduleMinimaxMusicMoment(
@@ -1875,10 +1923,16 @@ export class MomentsService implements OnModuleInit {
       );
     }
     if (!seedText) {
-      seedText = `${char.name} 写了一首歌，记录此刻心情。`;
+      const { theme } = pickThemeAndStyle(char.id);
+      seedText = `${char.name} 此刻心境与「${theme}」相关，请围绕这一画面展开。`;
     }
 
-    const lyrics = await this.generateLyricsOrFallback(char.name, seedText);
+    const lyrics = await this.generateLyricsOrFallback(
+      char.id,
+      char.name,
+      profile,
+      seedText,
+    );
     const job = await this.minimaxJobs.enqueueMusicJob({
       model: 'music-2.6',
       prompt: composeMusicPrompt(char.name, seedText),
@@ -2104,6 +2158,60 @@ function composeMusicPrompt(characterName: string, seedText: string): string {
     `情绪线索：${seedText.slice(0, 200)}`,
     '风格：电子流行 + 氛围合成器，节奏适中，情感清晰。',
   ].join(' ');
+}
+
+function composeLyricsPrompt(args: {
+  name: string;
+  persona: string;
+  theme: string;
+  style: string;
+  seedText: string;
+}): string {
+  const personaLine = args.persona
+    ? `角色定位：${args.persona}`
+    : '角色定位：（无额外信息）';
+  const seedLine = args.seedText?.trim()
+    ? `情绪线索（不要照抄，仅作灵感）：${args.seedText.slice(0, 200)}`
+    : '情绪线索：（请围绕主题自由展开）';
+  return [
+    `你正在为 AI 角色「${args.name}」写一首中文歌的歌词。`,
+    '',
+    personaLine,
+    `本次主题：${args.theme}`,
+    `表达风格：${args.style}`,
+    seedLine,
+    '',
+    '硬性要求：',
+    '1. 严格使用 [verse] 与 [chorus] 两个段落标签，可选追加一个 [bridge]。',
+    '2. 每段 4-6 行，每行 7-15 个汉字；verse 与 chorus 内容不得相同或近似。',
+    '3. 禁止出现以下模板套话：「写了一首歌」「记录此刻心情」「在心中回响」「歌声 / 旋律响起」「想要告诉你」。',
+    '4. 围绕主题展开具体画面、动作或细节，避免空泛抒情与口号化句子。',
+    '5. 不要副歌反复 4 遍这种偷懒结构；不要写标题、解释、Markdown、英文翻译。',
+    '',
+    '只输出歌词本体。',
+  ].join('\n');
+}
+
+// LLM 输出有时会丢段标或被多余前后缀污染。这里做最小修复：
+// - 含 [verse] 与 [chorus] → 直接用
+// - 缺段标但有内容 → 把前一半行作 verse、后一半作 chorus 包起来
+// - 完全空 → 返回空字符串（让上层走最终兜底）
+function ensureVerseChorus(raw: string): string {
+  const trimmed = (raw || '').trim();
+  if (!trimmed) return '';
+  const lower = trimmed.toLowerCase();
+  if (lower.includes('[verse]') && lower.includes('[chorus]')) {
+    return trimmed.startsWith('\n') ? trimmed : `\n${trimmed}\n`;
+  }
+  const lines = trimmed
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter((s) => s && !/^\[[a-z]+\]$/i.test(s));
+  if (lines.length < 2) return '';
+  const half = Math.max(1, Math.ceil(lines.length / 2));
+  const verse = lines.slice(0, half).join('\n');
+  const chorus = lines.slice(half).join('\n') || verse;
+  return `\n[verse]\n${verse}\n[chorus]\n${chorus}\n`;
 }
 
 function composeMusicLyrics(_characterName: string, seedText: string): string {
