@@ -17,12 +17,9 @@ import {
   EyeOff,
   MessageCircleMore,
   Music2,
-  Pause,
   Play,
   Share2,
   ThumbsUp,
-  Volume2,
-  VolumeX,
   X,
 } from "lucide-react";
 import {
@@ -1224,12 +1221,12 @@ function MobileChannelMediaSurface({
   post,
   active,
   userUnmuted,
-  onRequestUnmute,
+  onUnlock,
 }: {
   post: FeedPostListItem;
   active: boolean;
   userUnmuted: boolean;
-  onRequestUnmute: () => void;
+  onUnlock: () => void;
 }) {
   const t = useRuntimeTranslator();
   const audioAsset = post.media?.find((asset) => asset.kind === "audio");
@@ -1252,7 +1249,7 @@ function MobileChannelMediaSurface({
         fallbackPosterUrl={fallbackPoster}
         active={active}
         userUnmuted={userUnmuted}
-        onRequestUnmute={onRequestUnmute}
+        onUnlock={onUnlock}
       />
     );
   }
@@ -1266,7 +1263,7 @@ function MobileChannelMediaSurface({
         posterUrl={rawPosterUrl}
         active={active}
         userUnmuted={userUnmuted}
-        onRequestUnmute={onRequestUnmute}
+        onUnlock={onUnlock}
       />
     );
   }
@@ -1287,6 +1284,9 @@ function MobileChannelMediaSurface({
 
 // 视频号"图文视频"沉浸式渲染：全卡背景图 + 左右滑切配图 + dots + 音频自动播。
 // 历史音乐帖没有多图（images=[]）时，使用 fallbackPosterUrl 当唯一背景，禁用滑动。
+//
+// 交互参考抖音 / 微信视频号：无显式静音 / 暂停按钮；首次点击解除静音 + 保持播放，
+// 之后点击切换 play/pause；暂停态显示居中大 Play 图标作为状态提示。
 function ChannelAudioPictorial({
   title,
   audioUrl,
@@ -1294,7 +1294,7 @@ function ChannelAudioPictorial({
   fallbackPosterUrl,
   active,
   userUnmuted,
-  onRequestUnmute,
+  onUnlock,
 }: {
   title: string;
   audioUrl: string;
@@ -1302,7 +1302,7 @@ function ChannelAudioPictorial({
   fallbackPosterUrl: string | null;
   active: boolean;
   userUnmuted: boolean;
-  onRequestUnmute: () => void;
+  onUnlock: () => void;
 }) {
   const t = useRuntimeTranslator();
   const displayImages =
@@ -1362,6 +1362,23 @@ function ChannelAudioPictorial({
     setImageIndex((i) => (i - 1 < 0 ? displayImages.length - 1 : i - 1));
   };
 
+  // 点击屏幕处理：首次点解除静音 + 强制 play；之后切 play/pause。
+  const handleTap = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (!userUnmuted) {
+      onUnlock();
+      audio.muted = false;
+      if (audio.paused) audio.play().catch(() => undefined);
+      return;
+    }
+    if (audio.paused) {
+      audio.play().catch(() => undefined);
+    } else {
+      audio.pause();
+    }
+  };
+
   const handleTouchStart = (event: React.TouchEvent) => {
     const touch = event.touches[0];
     if (!touch) return;
@@ -1385,23 +1402,24 @@ function ChannelAudioPictorial({
     }
   };
   const handleTouchEnd = () => {
+    const wasSwipe = swipeHandledRef.current;
     touchStartXRef.current = null;
     touchStartYRef.current = null;
-  };
-
-  const togglePlay = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (audio.paused) {
-      audio.muted = !userUnmuted;
-      // play() 可能被浏览器策略 reject（用户没解锁手势），这种情况下 audio
-      // 实际并没开始播；不在这里乐观置 isPlaying=true，统一由下方 onPlay
-      // 事件回调来同步状态，保证 UI 和真实播放状态一致。
-      audio.play().catch(() => undefined);
-    } else {
-      audio.pause();
-      // 同理，由 onPause 事件回调统一置 isPlaying=false。
+    if (!wasSwipe) {
+      // 纯点击：切播放/暂停（首次顺带解除静音）
+      handleTap();
     }
+    // swipeHandledRef 不在这里清——下面 onClick 还要看；改在 touchStart 重置
+  };
+  // 桌面鼠标场景兜底：触屏 touchend 后浏览器仍会合成 click，但 swipe
+  // 期间 click 多数浏览器会自动取消；这里只为非触屏鼠标点击服务。
+  const handleClick = (event: React.MouseEvent) => {
+    // touch 设备已在 touchend 中调用 handleTap；这里检测纯鼠标事件
+    if (event.detail === 0) return; // 由键盘等触发的 synthetic click 忽略
+    // touchstart 走过的话 touchEnd 已 handle 过；synthetic click 在 swipe 时浏览器会抑制
+    // 没法 100% 区分 — 简单办法：依据是否有 touchStartXRef 痕迹判断
+    if (touchStartXRef.current !== null || swipeHandledRef.current) return;
+    handleTap();
   };
 
   const currentImage = displayImages[imageIndex];
@@ -1412,6 +1430,10 @@ function ChannelAudioPictorial({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      aria-label={isPlaying ? t(msg`暂停`) : t(msg`播放`)}
     >
       {currentImage ? (
         <img
@@ -1433,7 +1455,10 @@ function ChannelAudioPictorial({
           <button
             type="button"
             aria-label={t(msg`上一张`)}
-            onClick={goPrev}
+            onClick={(event) => {
+              event.stopPropagation();
+              goPrev();
+            }}
             className="group absolute left-2 top-1/2 z-20 hidden -translate-y-1/2 items-center justify-center rounded-full bg-black/30 p-2 text-white/80 backdrop-blur-sm transition hover:bg-black/50 md:flex"
           >
             <ArrowLeft size={20} />
@@ -1441,7 +1466,10 @@ function ChannelAudioPictorial({
           <button
             type="button"
             aria-label={t(msg`下一张`)}
-            onClick={goNext}
+            onClick={(event) => {
+              event.stopPropagation();
+              goNext();
+            }}
             className="group absolute right-2 top-1/2 z-20 hidden -translate-y-1/2 items-center justify-center rounded-full bg-black/30 p-2 text-white/80 backdrop-blur-sm transition hover:bg-black/50 md:flex"
           >
             <ArrowLeft size={20} className="rotate-180" />
@@ -1449,31 +1477,14 @@ function ChannelAudioPictorial({
         </>
       ) : null}
 
-      {/* 顶部右上：静音切换 / 播放暂停 */}
-      <div className="pointer-events-auto absolute right-3.5 top-12 z-20 flex flex-col items-end gap-2">
-        <button
-          type="button"
-          aria-label={userUnmuted ? t(msg`静音`) : t(msg`取消静音`)}
-          onClick={(event) => {
-            event.stopPropagation();
-            onRequestUnmute();
-          }}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-[rgba(15,23,42,0.55)] text-white backdrop-blur"
-        >
-          {userUnmuted ? <Volume2 size={16} /> : <VolumeX size={16} />}
-        </button>
-        <button
-          type="button"
-          aria-label={isPlaying ? t(msg`暂停`) : t(msg`播放`)}
-          onClick={(event) => {
-            event.stopPropagation();
-            togglePlay();
-          }}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-[rgba(15,23,42,0.55)] text-white backdrop-blur"
-        >
-          {isPlaying ? <Pause size={16} /> : <Play size={16} />}
-        </button>
-      </div>
+      {/* 暂停状态指示：居中大 Play 图标 */}
+      {active && userUnmuted && !isPlaying ? (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+          <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-black/45 backdrop-blur-sm">
+            <Play size={32} className="text-white" fill="white" />
+          </div>
+        </div>
+      ) : null}
 
       {/* 底部居中 dots */}
       {canSwipe ? (
@@ -1509,21 +1520,24 @@ function ChannelAudioPictorial({
 }
 
 // 视频沉浸式播放：active 时自动播 + muted 跟 userUnmuted；离开暂停 + 复位。
+// 交互参考抖音 / 微信视频号：无显式静音 / 暂停按钮；首次点击解除静音 + 保持播放，
+// 之后点击切换 play/pause；暂停态显示居中大 Play 图标作为状态提示。
 function ChannelVideoSurface({
   videoUrl,
   posterUrl,
   active,
   userUnmuted,
-  onRequestUnmute,
+  onUnlock,
 }: {
   videoUrl: string | undefined;
   posterUrl: string | undefined;
   active: boolean;
   userUnmuted: boolean;
-  onRequestUnmute: () => void;
+  onUnlock: () => void;
 }) {
   const t = useRuntimeTranslator();
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // 同 audio：userUnmuted 不当依赖，避免用户暂停后被强制 replay。
   useEffect(() => {
@@ -1550,8 +1564,30 @@ function ChannelVideoSurface({
     if (video) video.muted = !userUnmuted;
   }, [userUnmuted]);
 
+  const handleTap = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (!userUnmuted) {
+      onUnlock();
+      video.muted = false;
+      if (video.paused) video.play().catch(() => undefined);
+      return;
+    }
+    if (video.paused) {
+      video.play().catch(() => undefined);
+    } else {
+      video.pause();
+    }
+  };
+
   return (
-    <div className="relative h-full min-h-[calc(100dvh-12rem)] w-full bg-black">
+    <div
+      className="relative h-full min-h-[calc(100dvh-12rem)] w-full bg-black"
+      onClick={handleTap}
+      role="button"
+      tabIndex={0}
+      aria-label={isPlaying ? t(msg`暂停`) : t(msg`播放`)}
+    >
       <video
         ref={videoRef}
         key={videoUrl}
@@ -1561,19 +1597,17 @@ function ChannelVideoSurface({
         loop
         preload="metadata"
         controls={false}
-        className="h-full min-h-[calc(100dvh-12rem)] w-full object-cover"
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        className="pointer-events-none h-full min-h-[calc(100dvh-12rem)] w-full object-cover"
       />
-      <button
-        type="button"
-        aria-label={userUnmuted ? t(msg`静音`) : t(msg`取消静音`)}
-        onClick={(event) => {
-          event.stopPropagation();
-          onRequestUnmute();
-        }}
-        className="absolute right-3.5 top-12 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-[rgba(15,23,42,0.55)] text-white backdrop-blur"
-      >
-        {userUnmuted ? <Volume2 size={16} /> : <VolumeX size={16} />}
-      </button>
+      {active && userUnmuted && !isPlaying ? (
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+          <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-black/45 backdrop-blur-sm">
+            <Play size={32} className="text-white" fill="white" />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -1666,7 +1700,7 @@ function MobileChannelsViewport({
   onVisiblePost,
 }: MobileChannelsViewportProps) {
   const [activePostId, setActivePostId] = useState<string | null>(null);
-  // 抖音风音频静音手势解锁：一旦用户首次点静音图标，整页保持解除静音
+  // 抖音风：用户首次点屏幕解除静音后，整页保持解除静音（单向，不再回到 muted）
   const [userUnmuted, setUserUnmuted] = useState(false);
   const cardRefs = useRef(new Map<string, HTMLElement>());
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -1762,7 +1796,7 @@ function MobileChannelsViewport({
           post={post}
           setCardRef={(node) => registerCardRef(post.id, node)}
           userUnmuted={userUnmuted}
-          onRequestUnmute={() => setUserUnmuted((prev) => !prev)}
+          onUnlock={() => setUserUnmuted(true)}
           onLike={() => onLike(post.id)}
           onOpenAuthor={() => onOpenAuthor(post)}
           onOpenComments={() => onOpenComments(post)}
@@ -1783,7 +1817,7 @@ type MobileChannelsCardProps = {
   post: FeedPostListItem;
   setCardRef: (node: HTMLElement | null) => void;
   userUnmuted: boolean;
-  onRequestUnmute: () => void;
+  onUnlock: () => void;
   onLike: () => void;
   onOpenAuthor: () => void;
   onOpenComments: () => void;
@@ -1800,7 +1834,7 @@ function MobileChannelsCard({
   post,
   setCardRef,
   userUnmuted,
-  onRequestUnmute,
+  onUnlock,
   onLike,
   onOpenAuthor,
   onOpenComments,
@@ -1821,7 +1855,7 @@ function MobileChannelsCard({
           post={post}
           active={active}
           userUnmuted={userUnmuted}
-          onRequestUnmute={onRequestUnmute}
+          onUnlock={onUnlock}
         />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-36 bg-[linear-gradient(180deg,rgba(15,23,42,0.78),rgba(15,23,42,0))]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-[linear-gradient(180deg,rgba(15,23,42,0),rgba(15,23,42,0.88))]" />
