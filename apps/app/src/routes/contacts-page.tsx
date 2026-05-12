@@ -332,12 +332,20 @@ export function ContactsPage() {
   const desktopContactsPath = "/tabs/contacts";
   const normalizedPathname = normalizePathname(pathname);
   const desktopPathMismatch = normalizedPathname !== desktopContactsPath;
+  // 一旦在桌面布局下落到 /tabs/contacts 就锁定；之后 useRouterState 在路由切换瞬间
+  // 反映出新的 pathname 时不再把用户拉回——否则会拦截 + 菜单的 发起群聊 等合法导航
+  // （会在跳出 /tabs/contacts 前被 effect 强制回弹，落到默认 friend 面板，看起来像
+  // 误跳到了好友信息页）。
+  const desktopPathStabilizedRef = useRef(false);
 
   useEffect(() => {
-    if (!isDesktopLayout) {
+    if (!isDesktopLayout || !desktopPathMismatch) {
+      if (!desktopPathMismatch) {
+        desktopPathStabilizedRef.current = true;
+      }
       return;
     }
-    if (!desktopPathMismatch) {
+    if (desktopPathStabilizedRef.current) {
       return;
     }
 
