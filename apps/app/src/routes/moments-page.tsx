@@ -1178,10 +1178,26 @@ export function MomentsPage() {
       }
       onCommentSubmit={(momentId) => commentMutation.mutate(momentId)}
       onRefresh={async () => {
-        // 重置到第 1 页：剔除其余页，让首页 refetch 拉新数据；用户再触底时重新堆。
-        resetMomentsToFirstPage();
+        // 下拉刷新只换头部 page 1，保留已加载的 page 2+：
+        // 1) 旧逻辑把 N 页砍回 1 页 → 列表瞬间变短、撑不满视口 → iOS 上滑橡皮筋反弹
+        //    + IntersectionObserver 串行一页一页 fetchNextPage 把内容堆回来，体感很慢；
+        // 2) 顶部新发布的内容若把老 page 2 起点往下挤，由 momentsData 的 id 去重 useMemo 兜底重复。
+        const key = ["app-moments-paged", baseUrl];
         await Promise.all([
-          momentsQuery.refetch(),
+          getMomentsPage({ page: 1, limit: 20 }, baseUrl).then((freshFirstPage) => {
+            queryClient.setQueryData<InfiniteData<MomentsPageResponse>>(
+              key,
+              (current) => {
+                if (!current || current.pages.length === 0) {
+                  return { pages: [freshFirstPage], pageParams: [1] };
+                }
+                return {
+                  pages: [freshFirstPage, ...current.pages.slice(1)],
+                  pageParams: current.pageParams,
+                };
+              },
+            );
+          }),
           ownerId ? blockedQuery.refetch() : Promise.resolve(null),
         ]);
       }}
