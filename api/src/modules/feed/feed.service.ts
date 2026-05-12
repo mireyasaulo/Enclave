@@ -1335,20 +1335,22 @@ export class FeedService implements OnModuleInit {
     text: string;
     title?: string | null;
     topicTags?: string[];
+    // 视频号图文视频：可附带 N 张配图，前端按抖音风左右滑展示
+    images?: MomentImageAsset[];
   }): Promise<FeedPostEntity> {
-    const media: MomentMediaAsset[] = [
-      {
-        id: `feed-audio-${Date.now()}`,
-        kind: 'audio',
-        url: input.audioUrl,
-        posterUrl: input.posterUrl ?? undefined,
-        mimeType: 'audio/mpeg',
-        fileName: 'feed-audio.mp3',
-        size: 0,
-        durationMs: input.durationMs ?? undefined,
-        title: input.title ?? `${input.authorName}·音乐`,
-      },
-    ];
+    const audioAsset: MomentMediaAsset = {
+      id: `feed-audio-${Date.now()}`,
+      kind: 'audio',
+      url: input.audioUrl,
+      posterUrl: input.posterUrl ?? undefined,
+      mimeType: 'audio/mpeg',
+      fileName: 'feed-audio.mp3',
+      size: 0,
+      durationMs: input.durationMs ?? undefined,
+      title: input.title ?? `${input.authorName}·音乐`,
+    };
+    const images = input.images ?? [];
+    const media: MomentMediaAsset[] = [audioAsset, ...images];
     return this.createPost({
       authorAvatar: input.authorAvatar ?? '',
       authorId: input.authorId,
@@ -1361,7 +1363,7 @@ export class FeedService implements OnModuleInit {
       mediaUrl: input.audioUrl,
       coverUrl: input.posterUrl ?? null,
       durationMs: input.durationMs ?? undefined,
-      aspectRatio: 1,
+      aspectRatio: images.length > 0 ? 9 / 16 : 1,
       topicTags: input.topicTags ?? ['音乐', 'AI世界'],
       sourceKind: 'character_generated',
       recommendationScore: 90,

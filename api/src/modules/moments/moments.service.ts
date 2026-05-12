@@ -1978,6 +1978,19 @@ export class MomentsService implements OnModuleInit {
     }
   }
 
+  // 视频生成上下文用：最近 7 天该角色任意一条朋友圈/Feed 的文本摘要（≤80 字）。
+  // 没有则返回 null，由 LLM 自由发挥。
+  private async pickRecentMomentSummary(charId: string): Promise<string | null> {
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const recent = await this.postRepo.findOne({
+      where: { authorId: charId, postedAt: MoreThanOrEqual(since) },
+      order: { postedAt: 'DESC' },
+    });
+    const text = recent?.text?.replace(/\s+/g, ' ').trim();
+    if (!text) return null;
+    return text.length > 80 ? `${text.slice(0, 80)}…` : text;
+  }
+
   async scheduleMinimaxVideoMoment(
     char: CharacterEntity,
     pickModel: () => Promise<
@@ -1994,12 +2007,17 @@ export class MomentsService implements OnModuleInit {
     const profile = await this.characters.getProfile(char.id);
     if (!profile) return null;
 
+    // 抽最近 7 天该角色发过的一条 moment 文本作为「今天发生的事」喂给 LLM，
+    // 让生成的 seedText 不再凭空抒情、贴角色当下生活。
+    const recentEvent = await this.pickRecentMomentSummary(char.id);
+
     let seedText = '';
     try {
       seedText = (
         await this.ai.generateMoment({
           profile,
           currentTime: new Date(),
+          recentTopics: recentEvent ? [recentEvent] : undefined,
           usageContext: {
             surface: 'app',
             scene: 'minimax_moment_video',
@@ -2018,9 +2036,16 @@ export class MomentsService implements OnModuleInit {
     }
     if (!seedText) seedText = `${char.name} 拍了一段画面记录今天。`;
 
+    const personaBlock = extractPersonaBlock(profile);
     const job = await this.minimaxJobs.enqueueVideoJob({
       model,
-      prompt: composeMomentVideoPrompt(char.name, profile.relationship, seedText),
+      prompt: composeMomentVideoPrompt({
+        characterName: char.name,
+        personaBlock,
+        currentActivity: char.currentActivity,
+        recentEvent,
+        seedText,
+      }),
       resolution: '768P',
       characterId: char.id,
       characterName: char.name,
@@ -2144,6 +2169,63 @@ export class MomentsService implements OnModuleInit {
       return null;
     }
   }
+
+  // 视频号图文视频：再额外渲染 N 张 9:16 配图。配额不够 / 单张失败都不报错，
+  // 调用方按返回数组长度做 fallback（最少 0 张也允许）。
+  async tryRenderMinimaxMusicPictorials(
+    job: MinimaxJobEntity,
+    seedText: string,
+    count = 3,
+  ): Promise<
+    Array<{ url: string; fileName: string; mimeType: string; size: number }>
+  > {
+    if (!this.minimaxClient.isConfigured() || count <= 0) return [];
+    const prompts = composeMusicPictorialPrompts(
+      job.characterName,
+      seedText,
+    ).slice(0, count);
+    const tasks = prompts.map(async (prompt, idx) => {
+      const reserved = await this.minimaxQuota.tryReserve('image-01');
+      if (!reserved) return null;
+      try {
+        const image = await this.minimaxClient.generateImage({
+          model: 'image-01',
+          prompt,
+          aspectRatio: '9:16',
+        });
+        const persisted = await this.minimaxStorage.persist({
+          buffer: image.buffer,
+          mimeType: image.mimeType,
+          kind: 'image',
+          suffix: `-pictorial-${idx + 1}`,
+        });
+        await this.minimaxQuota.commit('image-01');
+        return {
+          url: persisted.publicUrl,
+          fileName: persisted.fileName,
+          mimeType: image.mimeType,
+          size: persisted.size,
+        };
+      } catch (err) {
+        await this.minimaxQuota.release('image-01');
+        this.logger.warn(
+          `music pictorial[${idx}] gen failed for job ${job.id}: ${(err as Error)?.message}`,
+        );
+        return null;
+      }
+    });
+    const settled = await Promise.allSettled(tasks);
+    const out: Array<{
+      url: string;
+      fileName: string;
+      mimeType: string;
+      size: number;
+    }> = [];
+    for (const r of settled) {
+      if (r.status === 'fulfilled' && r.value) out.push(r.value);
+    }
+    return out;
+  }
 }
 
 function composeMusicPrompt(characterName: string, seedText: string): string {
@@ -2264,22 +2346,46 @@ function composeMusicLyrics(_characterName: string, seedText: string): string {
   return `\n[verse]\n${verse}\n[chorus]\n${chorus || verse}\n`;
 }
 
-function composeMomentVideoPrompt(
-  characterName: string,
-  relationship: string | undefined,
-  seedText: string,
-): string {
-  const relSnippet = relationship?.trim()
-    ? `角色定位：${relationship.slice(0, 100)}。`
+// 把角色档案 + 当前活动 + 最近事件 + LLM 情境一起塞进视频 prompt，
+// 让画面物件、视角、场景能反映出角色身份；避免每个角色都拍同款空镜。
+const ACTIVITY_LABELS: Record<string, string> = {
+  working: '正在工作 / 专注做事',
+  eating: '正在吃东西 / 用餐场景',
+  resting: '正在休息 / 放空',
+  commuting: '正在通勤 / 移动中',
+  free: '空闲、随心所欲',
+  sleeping: '准备休息 / 夜深',
+};
+
+function composeMomentVideoPrompt(args: {
+  characterName: string;
+  personaBlock: string;
+  currentActivity?: string;
+  recentEvent: string | null;
+  seedText: string;
+}): string {
+  const activityLabel = args.currentActivity
+    ? ACTIVITY_LABELS[args.currentActivity] ?? args.currentActivity
     : '';
-  return [
-    `${characterName} 朋友圈短片，9:16 竖屏，6 秒。`,
-    relSnippet,
-    `情境：${seedText.slice(0, 200)}。`,
-    '风格：生活感、真实光线、轻微镜头运动。',
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const sections: string[] = [
+    `${args.characterName} 朋友圈短片，9:16 竖屏，6 秒。`,
+    '— 角色档案 —',
+    args.personaBlock,
+  ];
+  if (activityLabel) {
+    sections.push(`此时此刻：${activityLabel}。`);
+  }
+  if (args.recentEvent) {
+    sections.push(`最近发生（仅作上下文）：${args.recentEvent}`);
+  }
+  sections.push(`情境：${args.seedText.slice(0, 200)}。`);
+  sections.push(
+    '硬性要求：',
+    '· 画面里出现的物件、场景、视角必须与角色身份和擅长领域一致——程序员→代码屏 / 键盘 / 工位；厨师→灶台 / 食材 / 刀工；歌手→话筒 / 排练室 / 后台；不要把所有人都拍成奶茶 + 街头空镜。',
+    '· 镜头视角应像角色本人随手举起手机拍下的，第一视角或近景 OK。',
+    '· 风格：生活感、真实光线、轻微镜头运动；6 秒一镜到底，不要快剪。',
+  );
+  return sections.join('\n');
 }
 
 function composeMusicCoverPrompt(
@@ -2287,5 +2393,18 @@ function composeMusicCoverPrompt(
   seedText: string,
 ): string {
   return `音乐封面：${characterName} 视角，${seedText.slice(0, 80)}。极简电影风，柔和色调，正方形海报构图。`;
+}
+
+// 给视频号图文视频准备的 3 张 9:16 配图 prompt：人物特写 / 场景氛围 / 情绪隐喻。
+function composeMusicPictorialPrompts(
+  characterName: string,
+  seedText: string,
+): string[] {
+  const mood = seedText.slice(0, 80);
+  return [
+    `${characterName} 当下心境的人物特写 / 立绘，电影感打光，背景虚化，情绪线索：${mood}。9:16 竖构图，画面留白足以叠加文字。`,
+    `与 ${characterName} 心境呼应的环境画面：街道 / 室内 / 自然景物之一，无人物特写或仅留背影，氛围线索：${mood}。9:16 竖构图，胶片质感。`,
+    `${characterName} 情绪的视觉隐喻：色彩 + 光影 + 几何，少量符号化元素，主题：${mood}。9:16 竖构图，抽象但有故事感。`,
+  ];
 }
 // i18n-ignore-end
