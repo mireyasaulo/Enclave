@@ -2127,6 +2127,69 @@ export class MomentsService implements OnModuleInit {
     void this.scheduleCharacterInteractions(saved);
   }
 
+  // BGM 子任务回调：把已生成的 BGM 音频混入该 moment_post 的视频文件，
+  // 替换 mediaPayload 指向新文件并清理旧文件。失败 → 静默保留静音视频。
+  async applyBgmToVideoMomentPost(
+    postId: string,
+    bgmFileName: string,
+  ): Promise<boolean> {
+    const post = await this.postRepo.findOneBy({ id: postId });
+    if (!post) {
+      this.logger.warn(`applyBgmToVideoMomentPost: post ${postId} missing`);
+      return false;
+    }
+    const media = this.parseMomentMediaPayload(post.mediaPayload);
+    const video = media.find((m): m is MomentVideoAsset => m.kind === 'video');
+    if (!video?.url) {
+      this.logger.warn(
+        `applyBgmToVideoMomentPost: post ${postId} has no video media yet`,
+      );
+      return false;
+    }
+    // 从 publicUrl `/api/moments/media/<file>` 抽 fileName
+    const oldVideoFileName = video.url.split('/').pop();
+    if (!oldVideoFileName) return false;
+    const mixed = await this.minimaxStorage.mixVideoWithAudio({
+      videoFileName: oldVideoFileName,
+      audioFileName: bgmFileName,
+    });
+    if (!mixed) return false;
+    const newVideo: MomentVideoAsset = {
+      ...video,
+      id: mixed.fileName,
+      url: mixed.publicUrl,
+      mimeType: mixed.mimeType,
+      fileName: mixed.fileName,
+      size: mixed.size,
+    };
+    post.mediaPayload = this.serializeMomentMedia([newVideo]);
+    await this.postRepo.save(post);
+    // 清理旧静音视频和 BGM 临时音频
+    await this.minimaxStorage.unlinkIfExists(oldVideoFileName);
+    await this.minimaxStorage.unlinkIfExists(bgmFileName);
+    // 同步刷新视频号那条 post 的 mediaPayload，让视频号也带上 BGM
+    try {
+      await this.feedService.upsertChannelVideoPostFromMoment({
+        momentPostId: postId,
+        authorId: post.authorId,
+        authorName: post.authorName,
+        authorAvatar: post.authorAvatar,
+        videoUrl: newVideo.url,
+        posterUrl: newVideo.posterUrl ?? null,
+        durationMs: newVideo.durationMs ?? null,
+        mimeType: newVideo.mimeType,
+        fileName: newVideo.fileName,
+        size: newVideo.size,
+        text: `${post.authorName} 拍了一段画面`,
+      });
+    } catch (err) {
+      this.logger.warn(
+        `channel video post refresh after bgm failed for moment ${postId}: ${(err as Error)?.message}`,
+      );
+    }
+    return true;
+  }
+
   async deleteMinimaxPlaceholderPost(postId: string): Promise<void> {
     const post = await this.postRepo.findOneBy({ id: postId });
     if (!post) return;

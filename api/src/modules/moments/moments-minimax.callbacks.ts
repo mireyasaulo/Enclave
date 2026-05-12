@@ -25,11 +25,36 @@ export class MomentsMinimaxCallbacks
 
   onModuleInit() {
     this.jobs.registerCallback('moment_post', this);
+    // BGM 子任务复用同一回调，在 onCompleted 头部按 targetType 分流
+    this.jobs.registerCallback('moment_post_video_bgm', this);
   }
 
   async onCompleted(job: MinimaxJobEntity): Promise<void> {
     if (!job.targetId || !job.localUrl) {
       this.logger.warn(`moment_post completed without targetId/localUrl: ${job.id}`);
+      return;
+    }
+
+    // 视频 BGM 子任务：把生成的 BGM 音频混入对应 moment_post 的视频文件。
+    // 失败 → 静默保留静音视频，不影响主流程。
+    if (job.targetType === 'moment_post_video_bgm') {
+      if (job.kind !== 'music' || !job.localFileName) {
+        this.logger.warn(
+          `bgm job ${job.id} unexpected shape (kind=${job.kind}, file=${job.localFileName})`,
+        );
+        return;
+      }
+      const ok = await this.moments
+        .applyBgmToVideoMomentPost(job.targetId, job.localFileName)
+        .catch((err) => {
+          this.logger.warn(
+            `bgm mix failed job=${job.id} post=${job.targetId}: ${(err as Error)?.message}`,
+          );
+          return false;
+        });
+      this.logger.log(
+        `video bgm ${ok ? 'applied' : 'skipped'} for post ${job.targetId} (job ${job.id})`,
+      );
       return;
     }
 
@@ -118,16 +143,92 @@ export class MomentsMinimaxCallbacks
         durationMs: job.localDurationMs ?? undefined,
       };
       await this.moments.applyMinimaxVideoToPost(job.targetId, video);
+
+      // 视频号双发（先发静音版本，BGM 完成后会再次 upsert 更新 mediaPayload）
+      await this.syncVideoMomentToChannels(job, video).catch((err) => {
+        this.logger.warn(
+          `channel dual-publish (silent) failed for video job ${job.id}: ${(err as Error)?.message}`,
+        );
+      });
+
+      // 视频先静音落地，再异步追加 BGM job；BGM 完成后回调里 ffmpeg 混入。
+      // 配额不足或生成失败都不影响视频本身已发布。
+      try {
+        const bgmPrompt = composeVideoBgmPrompt(job);
+        const bgmJob = await this.jobs.enqueueMusicJob({
+          model: 'music-2.6',
+          prompt: bgmPrompt,
+          characterId: job.characterId,
+          characterName: job.characterName,
+          characterAvatar: job.characterAvatar ?? null,
+          targetType: 'moment_post_video_bgm',
+        });
+        if (bgmJob) {
+          await this.jobs.attachTarget(bgmJob.id, job.targetId);
+          this.logger.log(
+            `video bgm job ${bgmJob.id} queued for post ${job.targetId}`,
+          );
+        } else {
+          this.logger.log(
+            `video bgm skipped (no music quota) for post ${job.targetId}`,
+          );
+        }
+      } catch (err) {
+        this.logger.warn(
+          `video bgm enqueue failed for post ${job.targetId}: ${(err as Error)?.message}`,
+        );
+      }
     }
+  }
+
+  // 把 moment_post 的视频同步到视频号，幂等（按 momentPostId 查找已存在的 channel post）。
+  // 既给「BGM 完成前的静音双发」用，也给「BGM 完成后的 mediaPayload 刷新」用。
+  private async syncVideoMomentToChannels(
+    videoJob: MinimaxJobEntity,
+    video: MomentVideoAsset,
+  ): Promise<void> {
+    if (!videoJob.targetId) return;
+    await this.feed.upsertChannelVideoPostFromMoment({
+      momentPostId: videoJob.targetId,
+      authorId: videoJob.characterId,
+      authorName: videoJob.characterName,
+      authorAvatar: videoJob.characterAvatar ?? '',
+      videoUrl: video.url,
+      posterUrl: video.posterUrl ?? null,
+      durationMs: video.durationMs ?? null,
+      mimeType: video.mimeType,
+      fileName: video.fileName,
+      size: video.size,
+      text: `${videoJob.characterName} 拍了一段画面`,
+    });
   }
 
   async onFailed(job: MinimaxJobEntity): Promise<void> {
     if (!job.targetId) return;
+    // BGM 子任务失败不要删主帖（视频本身已发布）
+    if (job.targetType === 'moment_post_video_bgm') {
+      this.logger.warn(
+        `video bgm job ${job.id} failed for post ${job.targetId}; keeping silent video`,
+      );
+      return;
+    }
     await this.moments.deleteMinimaxPlaceholderPost(job.targetId);
     this.logger.warn(
       `moment placeholder ${job.targetId} deleted after job ${job.id} failed`,
     );
   }
+}
+
+// BGM prompt：用角色 + 简短 mood 提示生成 6-30 秒纯器乐。
+// MiniMax 不严格区分有无人声，但 prompt 里强调 instrumental + no vocals 通常能拿到
+// 较纯器乐结果。失败也不影响主流程。
+function composeVideoBgmPrompt(videoJob: MinimaxJobEntity): string {
+  const name = videoJob.characterName || '角色';
+  return [
+    `Short instrumental background music for a 6-second slice-of-life vlog by ${name}.`,
+    'Style: ambient, lofi, gentle synth pads, light percussion, no vocals.',
+    'Mood: warm, intimate, easy to loop under speech-free b-roll.',
+  ].join(' ');
 }
 
 // 从 minimax music job 的 inputPayload 抽取 prompt / lyrics 作为生图 seedText。

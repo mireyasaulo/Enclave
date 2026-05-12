@@ -145,6 +145,7 @@ export class FeedService implements OnModuleInit {
   async onModuleInit() {
     await this.backfillFeedAuthorAvatars();
     await this.cleanupBrokenChannelPosts();
+    await this.cleanupLegacyDemoChannelPosts();
   }
 
   async getFeed(
@@ -1323,6 +1324,81 @@ export class FeedService implements OnModuleInit {
       return;
     }
     await this.postRepo.delete(postId);
+  }
+
+  // 视频朋友圈双发到视频号：根据 momentPostId 幂等地创建或更新 channels 那条
+  // feed_post（用同一段 mp4），让用户在朋友圈和视频号都能看到这条视频。
+  // BGM 完成后会再次调用以更新 mediaPayload 指向带 BGM 的新文件。
+  async upsertChannelVideoPostFromMoment(input: {
+    momentPostId: string;
+    authorId: string;
+    authorName: string;
+    authorAvatar?: string | null;
+    videoUrl: string;
+    posterUrl?: string | null;
+    durationMs?: number | null;
+    mimeType?: string;
+    fileName?: string | null;
+    size?: number;
+    text: string;
+    title?: string | null;
+    topicTags?: string[];
+  }): Promise<FeedPostEntity> {
+    const media: MomentMediaAsset[] = [
+      {
+        id: input.fileName ?? `feed-video-${Date.now()}`,
+        kind: 'video',
+        url: input.videoUrl,
+        posterUrl: input.posterUrl ?? undefined,
+        mimeType: input.mimeType ?? 'video/mp4',
+        fileName: input.fileName ?? 'feed-video.mp4',
+        size: input.size ?? 0,
+        durationMs: input.durationMs ?? undefined,
+      },
+    ];
+
+    const existing = await this.postRepo
+      .createQueryBuilder('post')
+      .where('post.surface = :surface', { surface: 'channels' })
+      .andWhere('post.statsPayload LIKE :marker', {
+        marker: `%\"momentPostId\":\"${input.momentPostId}\"%`,
+      })
+      .orderBy('post.createdAt', 'DESC')
+      .getOne();
+
+    if (existing) {
+      existing.mediaPayload = this.serializeFeedMedia(media);
+      existing.mediaType = 'video';
+      existing.mediaUrl = input.videoUrl;
+      existing.coverUrl = input.posterUrl ?? existing.coverUrl;
+      existing.durationMs = input.durationMs ?? existing.durationMs;
+      const updated = await this.postRepo.save(existing);
+      this.logger.log(
+        `channel video post ${updated.id} mediaPayload refreshed for moment ${input.momentPostId}`,
+      );
+      return updated;
+    }
+
+    return this.createPost({
+      authorAvatar: input.authorAvatar ?? '',
+      authorId: input.authorId,
+      authorName: input.authorName,
+      authorType: 'character',
+      text: input.text,
+      title: input.title ?? undefined,
+      media,
+      mediaType: 'video',
+      mediaUrl: input.videoUrl,
+      coverUrl: input.posterUrl ?? null,
+      durationMs: input.durationMs ?? undefined,
+      aspectRatio: 9 / 16,
+      topicTags: input.topicTags ?? ['日常', 'AI世界'],
+      sourceKind: 'character_generated',
+      recommendationScore: 80,
+      surface: 'channels',
+      publishStatus: 'published',
+      statsPayload: { momentPostId: input.momentPostId, syncedFrom: 'moments' },
+    });
   }
 
   async createChannelAudioPost(input: {
@@ -2581,6 +2657,37 @@ export class FeedService implements OnModuleInit {
     } catch (error) {
       this.logger.warn(
         `cleanupBrokenChannelPosts failed: ${(error as Error).message}`,
+      );
+    }
+  }
+
+  // 切 MiniMax 真生成（17ee2503，May 9）之前，视频号有一段 demo 兜底期：
+  // ensureChannelSeedData / topUp 会把 3 个本地视频文件 + placehold.co 占位封面
+  // 套到所有可见角色身上，结果每个老账号库都囤着 46 条「Paul Graham/张雪峰/...
+  // 一个接一个发同一支《晨光海岸》」的假数据，用户在 视频号 里反复滑到同样的
+  // 3 支片子，体感就是「全是不能看的东西」。这些帖的文件实际存在能播放（所以
+  // cleanupBrokenChannelPosts 不会管它），但内容上就是 demo 污染。这里按
+  // coverUrl LIKE 'placehold.co' 把它们一次性标 hidden；不动 mediaType=audio 的
+  // 真音乐贴（封面要么是真 jpg 要么干脆没封面，不会命中）。重复执行无副作用。
+  private async cleanupLegacyDemoChannelPosts() {
+    try {
+      const result = await this.postRepo
+        .createQueryBuilder()
+        .update()
+        .set({ publishStatus: 'hidden' })
+        .where('surface = :surface', { surface: 'channels' })
+        .andWhere('publishStatus = :status', { status: 'published' })
+        .andWhere("coverUrl LIKE '%placehold.co%'")
+        .execute();
+      const affected = result.affected ?? 0;
+      if (affected > 0) {
+        this.logger.log(
+          `cleanupLegacyDemoChannelPosts: hid ${affected} demo-era channels post(s) with placehold.co cover`,
+        );
+      }
+    } catch (error) {
+      this.logger.warn(
+        `cleanupLegacyDemoChannelPosts failed: ${(error as Error).message}`,
       );
     }
   }
