@@ -1815,16 +1815,10 @@ export class MomentsService implements OnModuleInit {
     seedText: string,
   ): Promise<string> {
     const { theme, style } = pickThemeAndStyle(characterId);
-    const persona = [
-      profile.relationship?.trim(),
-      profile.expertDomains?.slice(0, 3).join('、'),
-    ]
-      .filter(Boolean)
-      .join('；')
-      .slice(0, 120);
+    const personaBlock = extractPersonaBlock(profile);
     const prompt = composeLyricsPrompt({
       name: characterName,
-      persona,
+      personaBlock,
       theme,
       style,
       seedText,
@@ -2160,23 +2154,57 @@ function composeMusicPrompt(characterName: string, seedText: string): string {
   ].join(' ');
 }
 
+// 从 PersonalityProfile 抽取贴歌词最有用的几段：底层逻辑、朋友圈场景设定、
+// 说话方式 / 口头禅 / 情绪基调、记忆摘要。每段独立截断，总长度控制在 ~800 字内
+// 避免 minimax prompt 过长被截断。
+function extractPersonaBlock(profile: PersonalityProfile): string {
+  const segments: string[] = [];
+  const push = (label: string, value: string | undefined, max = 200) => {
+    const cleaned = value?.replace(/\s+/g, ' ').trim();
+    if (cleaned) segments.push(`【${label}】${cleaned.slice(0, max)}`);
+  };
+
+  push('身份关系', profile.relationship);
+  if (profile.expertDomains?.length) {
+    push('擅长领域', profile.expertDomains.slice(0, 4).join('、'), 80);
+  }
+  push('底层逻辑', profile.coreLogic, 240);
+  push('发朋友圈风格', profile.scenePrompts?.moments_post, 180);
+
+  const traits = profile.traits;
+  if (traits) {
+    if (traits.speechPatterns?.length) {
+      push('说话方式', traits.speechPatterns.slice(0, 3).join('；'), 120);
+    }
+    if (traits.catchphrases?.length) {
+      push('口头禅', traits.catchphrases.slice(0, 4).join('、'), 80);
+    }
+    if (traits.emotionalTone) push('情绪基调', traits.emotionalTone, 60);
+    if (traits.topicsOfInterest?.length) {
+      push('关心的话题', traits.topicsOfInterest.slice(0, 4).join('、'), 100);
+    }
+  }
+  push('记忆摘要', profile.memorySummary, 200);
+
+  return segments.join('\n') || '（角色资料较少，请按主题自由发挥但保持一致人格）';
+}
+
 function composeLyricsPrompt(args: {
   name: string;
-  persona: string;
+  personaBlock: string;
   theme: string;
   style: string;
   seedText: string;
 }): string {
-  const personaLine = args.persona
-    ? `角色定位：${args.persona}`
-    : '角色定位：（无额外信息）';
   const seedLine = args.seedText?.trim()
-    ? `情绪线索（不要照抄，仅作灵感）：${args.seedText.slice(0, 200)}`
-    : '情绪线索：（请围绕主题自由展开）';
+    ? `本次心境线索（不要照抄，仅作灵感）：${args.seedText.slice(0, 200)}`
+    : '本次心境线索：（请围绕主题自由展开）';
   return [
-    `你正在为 AI 角色「${args.name}」写一首中文歌的歌词。`,
+    `你正在为 AI 角色「${args.name}」写一首中文歌的歌词。这首歌应当像这个角色亲自写的，而不是一首通用抒情诗。`,
     '',
-    personaLine,
+    '— 角色档案 —',
+    args.personaBlock,
+    '',
     `本次主题：${args.theme}`,
     `表达风格：${args.style}`,
     seedLine,
@@ -2186,7 +2214,11 @@ function composeLyricsPrompt(args: {
     '2. 每段 4-6 行，每行 7-15 个汉字；verse 与 chorus 内容不得相同或近似。',
     '3. 禁止出现以下模板套话：「写了一首歌」「记录此刻心情」「在心中回响」「歌声 / 旋律响起」「想要告诉你」。',
     '4. 围绕主题展开具体画面、动作或细节，避免空泛抒情与口号化句子。',
-    '5. 不要副歌反复 4 遍这种偷懒结构；不要写标题、解释、Markdown、英文翻译。',
+    '5. 用词、比喻、视角、情绪走向必须与上面的角色档案一致：',
+    '   · 该角色擅长什么领域，歌词里就出现该领域的意象（例：程序员→代码/调试/版本号；厨师→火候/刀工/食材）。',
+    '   · 该角色的说话方式、口头禅、情绪基调要在歌词里能听出来。',
+    '   · 不要把所有角色都写成同一种文艺青年。',
+    '6. 不要副歌反复 4 遍这种偷懒结构；不要写标题、解释、Markdown、英文翻译。',
     '',
     '只输出歌词本体。',
   ].join('\n');
