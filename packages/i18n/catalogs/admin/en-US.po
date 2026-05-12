@@ -9681,13 +9681,13 @@ msgid "实验报告"
 msgstr "Experiment Report"
 
 #: apps/admin/src/routes/evals-page.tsx:1142
-msgid "用例聚焦"
-msgstr "Test case focus"
-
-#: apps/admin/src/routes/evals-page.tsx:1142
 #: apps/admin/src/routes/token-usage-page.tsx:1098
 msgid "未聚焦"
 msgstr "Unfocused"
+
+#: apps/admin/src/routes/evals-page.tsx:1142
+msgid "用例聚焦"
+msgstr "Test case focus"
 
 #: apps/admin/src/routes/evals-page.tsx:1143
 msgid "数字人状态"
@@ -13148,12 +13148,6 @@ msgid "当前候选池"
 msgstr "Current candidate pool"
 
 #: apps/admin/src/routes/need-discovery-page.tsx:1078
-#: apps/admin/src/routes/need-discovery-page.tsx:1283
-#: apps/admin/src/routes/need-discovery-page.tsx:1312
-msgid "当前候选"
-msgstr "Current candidates"
-
-#: apps/admin/src/routes/need-discovery-page.tsx:1078
 #: apps/admin/src/routes/need-discovery-page.tsx:1081
 #: apps/admin/src/routes/need-discovery-page.tsx:1275
 #: apps/admin/src/routes/need-discovery-page.tsx:1286
@@ -13167,6 +13161,12 @@ msgstr "Current candidates"
 #: apps/admin/src/routes/token-usage-page.tsx:1561
 msgid "条"
 msgstr "entries"
+
+#: apps/admin/src/routes/need-discovery-page.tsx:1078
+#: apps/admin/src/routes/need-discovery-page.tsx:1283
+#: apps/admin/src/routes/need-discovery-page.tsx:1312
+msgid "当前候选"
+msgstr "Current candidates"
 
 #: apps/admin/src/routes/need-discovery-page.tsx:1081
 #: apps/admin/src/routes/need-discovery-page.tsx:1283
@@ -14162,6 +14162,12 @@ msgstr "Today: {0} adopted · {1} posted"
 msgid "未完成"
 msgstr "Incomplete"
 
+#. placeholder {0}: t(RUN_STATUS_LABELS[item.latestRunStatus ?? "success"] ?? msg`${item.latestRunStatus}`)
+#. placeholder {1}: formatCompactTime(item.latestRunAt)
+#: apps/admin/src/routes/real-world-sync-page.tsx:373
+msgid "最近 {0} · {1}"
+msgstr "Recent {0} · {1}"
+
 #. placeholder {0}: item.latestRunStatus
 #. placeholder {0}: previewResult.action
 #. placeholder {0}: previewResult.parsedTask.category
@@ -14174,12 +14180,6 @@ msgstr "Incomplete"
 #: apps/admin/src/routes/reminder-runtime-page.tsx:1686
 msgid "{0}"
 msgstr "{0}"
-
-#. placeholder {0}: t(RUN_STATUS_LABELS[item.latestRunStatus ?? "success"] ?? msg`${item.latestRunStatus}`)
-#. placeholder {1}: formatCompactTime(item.latestRunAt)
-#: apps/admin/src/routes/real-world-sync-page.tsx:373
-msgid "最近 {0} · {1}"
-msgstr "Recent {0} · {1}"
 
 #: apps/admin/src/routes/real-world-sync-page.tsx:374
 msgid "最近暂无执行记录"
