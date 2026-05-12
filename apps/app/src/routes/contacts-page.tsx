@@ -978,6 +978,14 @@ export function ContactsPage() {
       return;
     }
 
+    // 离开 /tabs/contacts 的瞬间（比如点击 查看详细资料 跳 /character/$id）这条
+    // effect 仍会以新的 hash 重新跑一次。此时 routeState 从空 hash 落到默认
+    // pane=friend，会把 desktopSelection "自愈" 到默认好友，并 replace 回
+    // /tabs/contacts，看起来像点资料按钮跳到了其他好友的详情页。
+    if (desktopPathMismatch) {
+      return;
+    }
+
     if (
       desktopSelection?.kind === "new-friends" ||
       desktopSelection?.kind === "starred-friends" ||
@@ -1044,6 +1052,7 @@ export function ContactsPage() {
   }, [
     commitDesktopRouteState,
     desktopDefaultFriendItem,
+    desktopPathMismatch,
     desktopSelection,
     filteredFriendItems,
     filteredWorldCharacterItems,
