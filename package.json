@@ -45,6 +45,8 @@
     "site:prod:stop": "node ./scripts/dev-services.mjs stop site-prod",
     "site:prod:restart": "node ./scripts/dev-services.mjs restart site-prod",
     "site:prod:status": "node ./scripts/dev-services.mjs status site-prod",
+    "hf:stage": "node ./scripts/huggingface-release.mjs stage",
+    "hf:publish": "node ./scripts/huggingface-release.mjs publish",
     "dev:cloud-api": "node ./scripts/dev-services.mjs start cloud-api",
     "dev:cloud-api:stop": "node ./scripts/dev-services.mjs stop cloud-api",
     "dev:cloud-api:restart": "node ./scripts/dev-services.mjs restart cloud-api",
