@@ -29,6 +29,7 @@ import {
   getFeed,
   likeFeedPost,
   replyFeedComment,
+  type FeedAuthorType,
   type FeedComment,
   type FeedListResponse,
 } from "@yinjie/contracts";
@@ -37,6 +38,7 @@ import { useRuntimeTranslator } from "@yinjie/i18n";
 import { FeedPostShareCardModal } from "../components/feed-post-share-card-modal";
 import { MomentMediaGallery } from "../components/moment-media-gallery";
 import { RouteRedirectState } from "../components/route-redirect-state";
+import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
 import {
   hydrateDesktopFavoritesFromNative,
   readDesktopFavorites,
@@ -74,6 +76,11 @@ import { useWorldOwnerStore } from "../store/world-owner-store";
 const DesktopFeedWorkspace = lazy(async () => {
   const mod = await import("../features/desktop/feed/desktop-feed-workspace");
   return { default: mod.DesktopFeedWorkspace };
+});
+
+const DesktopMessageAvatarPopover = lazy(async () => {
+  const mod = await import("../features/chat/message-avatar-popover-shell");
+  return { default: mod.DesktopMessageAvatarPopover };
 });
 
 export function DiscoverFeedPage() {
@@ -125,6 +132,20 @@ export function DiscoverFeedPage() {
   const [favoriteSourceIds, setFavoriteSourceIds] = useState<string[]>([]);
   // 「分享图卡」目标 post id — 与 link-share 分开存，用户可以两种都点。
   const [shareCardPostId, setShareCardPostId] = useState<string | null>(null);
+  const [desktopAvatarPopover, setDesktopAvatarPopover] = useState<
+    | {
+        anchorElement: HTMLButtonElement;
+        kind: "character";
+        characterId: string;
+        fallbackAvatar?: string | null;
+        fallbackName: string;
+      }
+    | {
+        anchorElement: HTMLButtonElement;
+        kind: "owner";
+      }
+    | null
+  >(null);
   const routeState = parseFeedRouteHash(hash);
   const normalizedDesktopReturnPath =
     isDesktopLayout && routeState.returnPath === "/discover/feed"
@@ -474,6 +495,24 @@ const pendingLikePostId = likeMutation.isPending
     });
   }
 
+  function openCharacterDetail(
+    authorId: string,
+    authorType: FeedAuthorType,
+  ) {
+    if (authorType !== "character" || !authorId) {
+      return;
+    }
+    const currentHash = hash.startsWith("#") ? hash.slice(1) : hash;
+    void navigate({
+      to: "/character/$characterId",
+      params: { characterId: authorId },
+      hash: buildCharacterDetailRouteHash({
+        returnPath: pathname,
+        returnHash: currentHash || undefined,
+      }),
+    });
+  }
+
   function handleEmptyStateAction() {
     if (navigateToRouteStateReturn()) {
       return;
@@ -484,6 +523,10 @@ const pendingLikePostId = likeMutation.isPending
   const interactionActionLabel = safeReturnPath
     ? t(msg`返回上一页`)
     : t(msg`重试读取`);
+
+  useEffect(() => {
+    setDesktopAvatarPopover(null);
+  }, [hash, pathname]);
 
   useEffect(() => {
     resetComposeDraft();
@@ -806,6 +849,22 @@ const pendingLikePostId = likeMutation.isPending
               postId: comment.postId,
             })
           }
+          onSelectCommentAuthor={(event, comment) => {
+            if (comment.authorType === "character") {
+              setDesktopAvatarPopover({
+                anchorElement: event.currentTarget,
+                kind: "character",
+                characterId: comment.authorId,
+                fallbackAvatar: comment.authorAvatar,
+                fallbackName: comment.authorName,
+              });
+            } else if (comment.authorType === "user") {
+              setDesktopAvatarPopover({
+                anchorElement: event.currentTarget,
+                kind: "owner",
+              });
+            }
+          }}
           onCreate={() => createMutation.mutate()}
           onImageFilesSelected={(files) => {
             void handleImageFilesSelected(files);
@@ -836,6 +895,26 @@ const pendingLikePostId = likeMutation.isPending
           ownerDisplayName={ownerUsername?.trim() || t(msg`世界主人`)}
           onClose={() => setShareCardPostId(null)}
         />
+        {desktopAvatarPopover ? (
+          <Suspense fallback={null}>
+            {desktopAvatarPopover.kind === "character" ? (
+              <DesktopMessageAvatarPopover
+                anchorElement={desktopAvatarPopover.anchorElement}
+                kind="character"
+                characterId={desktopAvatarPopover.characterId}
+                fallbackAvatar={desktopAvatarPopover.fallbackAvatar}
+                fallbackName={desktopAvatarPopover.fallbackName}
+                onClose={() => setDesktopAvatarPopover(null)}
+              />
+            ) : (
+              <DesktopMessageAvatarPopover
+                anchorElement={desktopAvatarPopover.anchorElement}
+                kind="owner"
+                onClose={() => setDesktopAvatarPopover(null)}
+              />
+            )}
+          </Suspense>
+        ) : null}
       </Suspense>
     );
   }
@@ -1058,41 +1137,76 @@ const pendingLikePostId = likeMutation.isPending
                     <div className="overflow-hidden rounded-[3px] border border-[#EDEDED] bg-[#F7F7F7]">
                       <div className="space-y-0.5 px-2.5 py-1.5 text-[13px] leading-[22px]">
                         {post.commentsPreview.map((comment) => {
-                          const replyToName = comment.replyToCommentId
-                            ? (post.commentsPreview.find(
+                          const replyToComment = comment.replyToCommentId
+                            ? post.commentsPreview.find(
                                 (item) => item.id === comment.replyToCommentId,
-                              )?.authorName ?? null)
+                              ) ?? null
                             : null;
+                          const replyToName = replyToComment?.authorName ?? null;
+                          const openReply = () => {
+                            if (!post.canInteract) return;
+                            setCommentBarTarget({
+                              postId: post.id,
+                              replyTo: {
+                                authorId: comment.authorId,
+                                authorName: comment.authorName,
+                                commentId: comment.id,
+                              },
+                            });
+                          };
                           return (
-                            <button
+                            <div
                               key={comment.id}
-                              type="button"
-                              onClick={() => {
-                                if (!post.canInteract) return;
-                                setCommentBarTarget({
-                                  postId: post.id,
-                                  replyTo: {
-                                    authorId: comment.authorId,
-                                    authorName: comment.authorName,
-                                    commentId: comment.id,
-                                  },
-                                });
+                              role="button"
+                              tabIndex={0}
+                              onClick={openReply}
+                              onKeyDown={(event) => {
+                                if (event.key === "Enter" || event.key === " ") {
+                                  event.preventDefault();
+                                  openReply();
+                                }
                               }}
-                              className="block w-full text-left text-[#1A1A1A] active:bg-[#EFEFEF]"
+                              className="block w-full cursor-pointer text-left text-[#1A1A1A] active:bg-[#EFEFEF]"
                             >
-                              <span className="text-[#576B95]">
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  openCharacterDetail(
+                                    comment.authorId,
+                                    comment.authorType,
+                                  );
+                                }}
+                                className="text-[#576B95] hover:opacity-80"
+                              >
                                 {comment.authorName}
-                              </span>
+                              </button>
                               {replyToName ? (
                                 <>
                                   <span> {t(msg`回复`)} </span>
-                                  <span className="text-[#576B95]">
-                                    {replyToName}
-                                  </span>
+                                  {replyToComment ? (
+                                    <button
+                                      type="button"
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+                                        openCharacterDetail(
+                                          replyToComment.authorId,
+                                          replyToComment.authorType,
+                                        );
+                                      }}
+                                      className="text-[#576B95] hover:opacity-80"
+                                    >
+                                      {replyToName}
+                                    </button>
+                                  ) : (
+                                    <span className="text-[#576B95]">
+                                      {replyToName}
+                                    </span>
+                                  )}
                                 </>
                               ) : null}
                               <span>：{comment.text}</span>
-                            </button>
+                            </div>
                           );
                         })}
                         {post.commentCount > post.commentsPreview.length ? (
