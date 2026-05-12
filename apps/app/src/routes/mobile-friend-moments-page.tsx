@@ -10,6 +10,7 @@ import {
   getMoments,
   toggleMomentLike,
   type MomentComment,
+  type MomentLike,
 } from "@yinjie/contracts";
 import { getActiveLocale, translateRuntimeMessage } from "@yinjie/i18n";
 import {
@@ -266,6 +267,20 @@ export function MobileFriendMomentsPage() {
       }),
     });
     return true;
+  }
+
+  function openLikerCharacterDetail(like: MomentLike) {
+    if (like.authorType !== "character") {
+      return;
+    }
+    void navigate({
+      to: "/character/$characterId",
+      params: { characterId: like.authorId },
+      hash: buildCharacterDetailRouteHash({
+        returnPath: `/friend-moments/${resolvedCharacterId}`,
+        returnHash: currentRouteHash || undefined,
+      }),
+    });
   }
 
   function handleBack() {
@@ -585,6 +600,7 @@ export function MobileFriendMomentsPage() {
                           onCommentTap={(comment) =>
                             onCommentTap(moment.id, comment)
                           }
+                          onLikeAuthorTap={openLikerCharacterDetail}
                         />
                       </div>
                     </div>

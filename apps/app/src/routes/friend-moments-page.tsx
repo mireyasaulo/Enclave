@@ -92,10 +92,22 @@ export function FriendMomentsPage() {
   const [showCompose, setShowCompose] = useState(false);
   const [notice, setNotice] = useState("");
   const [favoriteSourceIds, setFavoriteSourceIds] = useState<string[]>([]);
-  const [desktopAvatarPopover, setDesktopAvatarPopover] = useState<{
-    anchorElement: HTMLButtonElement;
-    returnHash?: string;
-  } | null>(null);
+  const [desktopAvatarPopover, setDesktopAvatarPopover] = useState<
+    | {
+        anchorElement: HTMLButtonElement;
+        kind: "character";
+        characterId: string;
+        fallbackAvatar?: string | null;
+        fallbackName: string;
+        returnHash?: string;
+      }
+    | {
+        anchorElement: HTMLButtonElement;
+        kind: "owner";
+        returnHash?: string;
+      }
+    | null
+  >(null);
   const routeState = parseDesktopFriendMomentsRouteState(hash);
   const routeSelectedMomentId = routeState.momentId ?? null;
 
@@ -558,11 +570,37 @@ export function FriendMomentsPage() {
         onOpenProfilePopover={({ anchorElement, momentId }) => {
           setDesktopAvatarPopover({
             anchorElement,
+            kind: "character",
+            characterId,
+            fallbackAvatar: character?.avatar,
+            fallbackName: displayName,
             returnHash: buildDesktopFriendMomentsRouteHash({
               ...routeState,
               momentId: momentId ?? routeSelectedMomentId ?? undefined,
             }),
           });
+        }}
+        onOpenLikerPopover={({ anchorElement, momentId, like }) => {
+          const returnHash = buildDesktopFriendMomentsRouteHash({
+            ...routeState,
+            momentId: momentId ?? routeSelectedMomentId ?? undefined,
+          });
+          if (like.authorType === "character") {
+            setDesktopAvatarPopover({
+              anchorElement,
+              kind: "character",
+              characterId: like.authorId,
+              fallbackAvatar: like.authorAvatar,
+              fallbackName: like.authorName,
+              returnHash,
+            });
+          } else if (like.authorType === "user") {
+            setDesktopAvatarPopover({
+              anchorElement,
+              kind: "owner",
+              returnHash,
+            });
+          }
         }}
         onOpenProfile={() => {
           void navigate({
@@ -613,19 +651,27 @@ export function FriendMomentsPage() {
       />
       {desktopAvatarPopover ? (
         <Suspense fallback={null}>
-          <DesktopMessageAvatarPopover
-            anchorElement={desktopAvatarPopover.anchorElement}
-            kind="character"
-            characterId={characterId}
-            fallbackAvatar={character?.avatar}
-            fallbackName={displayName}
-            navigationContext={{
-              hideMomentsAction: true,
-              profileReturnHash: desktopAvatarPopover.returnHash,
-              profileReturnPath: pathname,
-            }}
-            onClose={() => setDesktopAvatarPopover(null)}
-          />
+          {desktopAvatarPopover.kind === "character" ? (
+            <DesktopMessageAvatarPopover
+              anchorElement={desktopAvatarPopover.anchorElement}
+              kind="character"
+              characterId={desktopAvatarPopover.characterId}
+              fallbackAvatar={desktopAvatarPopover.fallbackAvatar}
+              fallbackName={desktopAvatarPopover.fallbackName}
+              navigationContext={{
+                hideMomentsAction: desktopAvatarPopover.characterId === characterId,
+                profileReturnHash: desktopAvatarPopover.returnHash,
+                profileReturnPath: pathname,
+              }}
+              onClose={() => setDesktopAvatarPopover(null)}
+            />
+          ) : (
+            <DesktopMessageAvatarPopover
+              anchorElement={desktopAvatarPopover.anchorElement}
+              kind="owner"
+              onClose={() => setDesktopAvatarPopover(null)}
+            />
+          )}
         </Suspense>
       ) : null}
     </Suspense>

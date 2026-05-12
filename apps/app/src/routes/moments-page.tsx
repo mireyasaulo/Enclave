@@ -25,6 +25,7 @@ import {
   toggleMomentLike,
   type Moment,
   type MomentComment,
+  type MomentLike,
   type MomentsPageResponse,
 } from "@yinjie/contracts";
 import type { MessageDescriptor } from "@lingui/core";
@@ -46,6 +47,7 @@ import {
   removeDesktopFavorite,
   upsertDesktopFavorite,
 } from "../features/favorites/favorites-storage";
+import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
 import { buildDesktopFriendMomentsRouteHash } from "../features/moments/friend-moments-route-state";
 import { buildMobileFriendMomentsRouteHash } from "../features/moments/mobile-friend-moments-route-state";
 import { buildMobileMomentsPublishRouteHash } from "../features/moments/mobile-moments-publish-route-state";
@@ -124,13 +126,22 @@ export function MomentsPage() {
   );
   const [noticeAction, setNoticeAction] = useState<(() => void) | null>(null);
   const [favoriteSourceIds, setFavoriteSourceIds] = useState<string[]>([]);
-  const [desktopAvatarPopover, setDesktopAvatarPopover] = useState<{
-    anchorElement: HTMLButtonElement;
-    characterId: string;
-    fallbackAvatar?: string | null;
-    fallbackName: string;
-    returnHash?: string;
-  } | null>(null);
+  const [desktopAvatarPopover, setDesktopAvatarPopover] = useState<
+    | {
+        anchorElement: HTMLButtonElement;
+        kind: "character";
+        characterId: string;
+        fallbackAvatar?: string | null;
+        fallbackName: string;
+        returnHash?: string;
+      }
+    | {
+        anchorElement: HTMLButtonElement;
+        kind: "owner";
+        returnHash?: string;
+      }
+    | null
+  >(null);
   const normalizedHash = hash.startsWith("#") ? hash.slice(1) : hash;
   const routeState = parseDesktopMomentsRouteState(hash);
   const routeSelectedAuthorId = routeState.authorId ?? null;
@@ -615,6 +626,17 @@ export function MomentsPage() {
     });
   }
 
+  function openCharacterDetail(characterId: string) {
+    void navigate({
+      to: "/character/$characterId",
+      params: { characterId },
+      hash: buildCharacterDetailRouteHash({
+        returnPath: pathname,
+        returnHash: currentRouteHash || undefined,
+      }),
+    });
+  }
+
   function openDesktopFriendMoments(targetMoment: Moment) {
     if (targetMoment?.authorType !== "character") {
       return;
@@ -980,6 +1002,25 @@ export function MomentsPage() {
 
             openDesktopFriendMoments(targetMoment);
           }}
+          onOpenLikerPopover={({ anchorElement, like }) => {
+            const returnHash = currentRouteHash || undefined;
+            if (like.authorType === "character") {
+              setDesktopAvatarPopover({
+                anchorElement,
+                kind: "character",
+                characterId: like.authorId,
+                fallbackAvatar: like.authorAvatar,
+                fallbackName: like.authorName,
+                returnHash,
+              });
+            } else if (like.authorType === "user") {
+              setDesktopAvatarPopover({
+                anchorElement,
+                kind: "owner",
+                returnHash,
+              });
+            }
+          }}
           onToggleFavorite={(momentId) => {
             const moment = visibleMoments.find((item) => item.id === momentId);
             if (!moment) {
@@ -1026,20 +1067,28 @@ export function MomentsPage() {
         />
         {desktopAvatarPopover ? (
           <Suspense fallback={null}>
-            <DesktopMessageAvatarPopover
-              anchorElement={desktopAvatarPopover.anchorElement}
-              kind="character"
-              characterId={desktopAvatarPopover.characterId}
-              fallbackAvatar={desktopAvatarPopover.fallbackAvatar}
-              fallbackName={desktopAvatarPopover.fallbackName}
-              navigationContext={{
-                momentsReturnHash: desktopAvatarPopover.returnHash,
-                momentsReturnPath: pathname,
-                profileReturnHash: desktopAvatarPopover.returnHash,
-                profileReturnPath: pathname,
-              }}
-              onClose={() => setDesktopAvatarPopover(null)}
-            />
+            {desktopAvatarPopover.kind === "character" ? (
+              <DesktopMessageAvatarPopover
+                anchorElement={desktopAvatarPopover.anchorElement}
+                kind="character"
+                characterId={desktopAvatarPopover.characterId}
+                fallbackAvatar={desktopAvatarPopover.fallbackAvatar}
+                fallbackName={desktopAvatarPopover.fallbackName}
+                navigationContext={{
+                  momentsReturnHash: desktopAvatarPopover.returnHash,
+                  momentsReturnPath: pathname,
+                  profileReturnHash: desktopAvatarPopover.returnHash,
+                  profileReturnPath: pathname,
+                }}
+                onClose={() => setDesktopAvatarPopover(null)}
+              />
+            ) : (
+              <DesktopMessageAvatarPopover
+                anchorElement={desktopAvatarPopover.anchorElement}
+                kind="owner"
+                onClose={() => setDesktopAvatarPopover(null)}
+              />
+            )}
           </Suspense>
         ) : null}
       </Suspense>
@@ -1087,6 +1136,11 @@ export function MomentsPage() {
       onAuthorTap={(moment) => {
         if (moment.authorType === "character") {
           openMobileFriendMoments(moment.authorId);
+        }
+      }}
+      onLikeAuthorTap={(like) => {
+        if (like.authorType === "character") {
+          openCharacterDetail(like.authorId);
         }
       }}
       onLikeMoment={(momentId) => likeMutation.mutate(momentId)}
@@ -1181,6 +1235,7 @@ type MobileMomentsViewProps = {
   onBack: () => void;
   onCompose: () => void;
   onAuthorTap: (moment: Moment) => void;
+  onLikeAuthorTap: (like: MomentLike) => void;
   onLikeMoment: (momentId: string) => void;
   onDeleteMoment: (momentId: string) => void;
   onOpenActionMenu: (momentId: string, anchorRect: DOMRect) => void;
@@ -1222,6 +1277,7 @@ function MobileMomentsView({
   onBack,
   onCompose,
   onAuthorTap,
+  onLikeAuthorTap,
   onLikeMoment,
   onDeleteMoment,
   onOpenActionMenu,
@@ -1433,6 +1489,7 @@ function MobileMomentsView({
                 onOpenActionMenu={(rect) => onOpenActionMenu(moment.id, rect)}
                 onDoubleTapLike={() => onLikeMoment(moment.id)}
                 onCommentTap={(comment) => onCommentTap(moment.id, comment)}
+                onLikeAuthorTap={onLikeAuthorTap}
                 onDelete={
                   ownerId &&
                   moment.authorType === "user" &&

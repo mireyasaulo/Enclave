@@ -10,6 +10,7 @@ import {
   toggleMomentLike,
   type Moment,
   type MomentComment,
+  type MomentLike,
 } from "@yinjie/contracts";
 import { getActiveLocale, useRuntimeTranslator } from "@yinjie/i18n";
 import {
@@ -30,6 +31,7 @@ import {
 } from "../components/wechat-comment-bar";
 import { WeChatMomentCard } from "../components/wechat-moment-card";
 import { WeChatMomentsCover } from "../components/wechat-moments-cover";
+import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
 import {
   readDesktopFavorites,
   removeDesktopFavorite,
@@ -55,6 +57,11 @@ const DesktopProfileMomentsWorkspace = lazy(async () => {
     "../features/desktop/moments/desktop-profile-moments-workspace"
   );
   return { default: mod.DesktopProfileMomentsWorkspace };
+});
+
+const DesktopMessageAvatarPopover = lazy(async () => {
+  const mod = await import("../features/chat/message-avatar-popover-shell");
+  return { default: mod.DesktopMessageAvatarPopover };
 });
 
 const PUBLISH_RETURN_HASH = buildMobileMomentsPublishRouteHash({
@@ -94,6 +101,20 @@ export function ProfileMomentsPage() {
     tone: "success" | "info";
     message: string;
   } | null>(null);
+  const [desktopAvatarPopover, setDesktopAvatarPopover] = useState<
+    | {
+        anchorElement: HTMLButtonElement;
+        kind: "character";
+        characterId: string;
+        fallbackAvatar?: string | null;
+        fallbackName: string;
+      }
+    | {
+        anchorElement: HTMLButtonElement;
+        kind: "owner";
+      }
+    | null
+  >(null);
   const composeDraft = useMomentComposeDraft();
 
   const momentsQuery = useQuery({
@@ -268,6 +289,19 @@ export function ProfileMomentsPage() {
       navigate({ to: "/tabs/profile", replace: true }),
     );
 
+  const openLikerCharacterDetail = (like: MomentLike) => {
+    if (like.authorType !== "character") {
+      return;
+    }
+    void navigate({
+      to: "/character/$characterId",
+      params: { characterId: like.authorId },
+      hash: buildCharacterDetailRouteHash({
+        returnPath: "/profile/moments",
+      }),
+    });
+  };
+
   const goPublish = () =>
     navigate({
       to: "/discover/moments/publish",
@@ -374,6 +408,22 @@ export function ProfileMomentsPage() {
             void handleDesktopImageFilesSelected(files);
           }}
           onLike={(momentId) => likeMutation.mutate(momentId)}
+          onOpenLikerPopover={({ anchorElement, like }) => {
+            if (like.authorType === "character") {
+              setDesktopAvatarPopover({
+                anchorElement,
+                kind: "character",
+                characterId: like.authorId,
+                fallbackAvatar: like.authorAvatar,
+                fallbackName: like.authorName,
+              });
+            } else if (like.authorType === "user") {
+              setDesktopAvatarPopover({
+                anchorElement,
+                kind: "owner",
+              });
+            }
+          }}
           onRemoveImage={(id) => composeDraft.removeImageDraft(id)}
           onRemoveVideo={() => composeDraft.clearVideoDraft()}
           onStartCommentReply={({ momentId, comment }) =>
@@ -414,6 +464,26 @@ export function ProfileMomentsPage() {
             void handleDesktopVideoFileSelected(file);
           }}
         />
+        {desktopAvatarPopover ? (
+          <Suspense fallback={null}>
+            {desktopAvatarPopover.kind === "character" ? (
+              <DesktopMessageAvatarPopover
+                anchorElement={desktopAvatarPopover.anchorElement}
+                kind="character"
+                characterId={desktopAvatarPopover.characterId}
+                fallbackAvatar={desktopAvatarPopover.fallbackAvatar}
+                fallbackName={desktopAvatarPopover.fallbackName}
+                onClose={() => setDesktopAvatarPopover(null)}
+              />
+            ) : (
+              <DesktopMessageAvatarPopover
+                anchorElement={desktopAvatarPopover.anchorElement}
+                kind="owner"
+                onClose={() => setDesktopAvatarPopover(null)}
+              />
+            )}
+          </Suspense>
+        ) : null}
       </Suspense>
     );
   }
@@ -563,6 +633,7 @@ export function ProfileMomentsPage() {
                 }
                 onDoubleTapLike={() => likeMutation.mutate(moment.id)}
                 onCommentTap={(comment) => onCommentTap(moment.id, comment)}
+                onLikeAuthorTap={openLikerCharacterDetail}
                 onDelete={() => {
                   if (deleteMutation.isPending) return;
                   if (
@@ -649,6 +720,7 @@ function PersonalAlbumRow({
   onOpenActionMenu,
   onDoubleTapLike,
   onCommentTap,
+  onLikeAuthorTap,
   onDelete,
 }: {
   moment: Moment;
@@ -656,6 +728,7 @@ function PersonalAlbumRow({
   onOpenActionMenu: (rect: DOMRect) => void;
   onDoubleTapLike: () => void;
   onCommentTap: (comment: MomentComment | null) => void;
+  onLikeAuthorTap: (like: MomentLike) => void;
   onDelete?: () => void;
 }) {
   const date = new Date(moment.postedAt);
@@ -689,6 +762,7 @@ function PersonalAlbumRow({
           onOpenActionMenu={onOpenActionMenu}
           onDoubleTapLike={onDoubleTapLike}
           onCommentTap={onCommentTap}
+          onLikeAuthorTap={onLikeAuthorTap}
           onDelete={onDelete}
         />
       </div>
