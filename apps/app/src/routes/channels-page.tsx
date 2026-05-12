@@ -1320,7 +1320,9 @@ function ChannelAudioPictorial({
   const touchStartYRef = useRef<number | null>(null);
   const swipeHandledRef = useRef(false);
 
-  // 进入 active 时播放，离开时暂停 + 复位（保证全局只有一条 audio 在响）
+  // 进入 active 时播放，离开时暂停 + 复位（保证全局只有一条 audio 在响）。
+  // 注意：userUnmuted 不是这里的依赖——否则用户主动暂停后再切静音，会被
+  // 重新强制 play()，违反暂停意图。muted 同步交给下方独立 effect。
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -1329,7 +1331,6 @@ function ChannelAudioPictorial({
       const promise = audio.play();
       if (promise && typeof promise.catch === "function") {
         promise.catch(() => {
-          // 浏览器策略禁止：保持 muted=true 静默播放
           audio.muted = true;
           audio.play().catch(() => undefined);
         });
@@ -1338,7 +1339,14 @@ function ChannelAudioPictorial({
       audio.pause();
       audio.currentTime = 0;
     }
-  }, [active, audioUrl, userUnmuted]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, audioUrl]);
+
+  // mute 切换仅同步 audio.muted，不重新 play
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) audio.muted = !userUnmuted;
+  }, [userUnmuted]);
 
   // 切贴时重置图片索引
   useEffect(() => {
@@ -1517,6 +1525,7 @@ function ChannelVideoSurface({
   const t = useRuntimeTranslator();
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  // 同 audio：userUnmuted 不当依赖，避免用户暂停后被强制 replay。
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -1533,7 +1542,13 @@ function ChannelVideoSurface({
       video.pause();
       video.currentTime = 0;
     }
-  }, [active, videoUrl, userUnmuted]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, videoUrl]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) video.muted = !userUnmuted;
+  }, [userUnmuted]);
 
   return (
     <div className="relative h-full min-h-[calc(100dvh-12rem)] w-full bg-black">
