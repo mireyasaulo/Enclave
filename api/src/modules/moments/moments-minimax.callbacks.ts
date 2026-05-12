@@ -154,7 +154,10 @@ export class MomentsMinimaxCallbacks
       // 视频先静音落地，再异步追加 BGM job；BGM 完成后回调里 ffmpeg 混入。
       // 配额不足或生成失败都不影响视频本身已发布。
       try {
-        const bgmPrompt = composeVideoBgmPrompt(job);
+        const bgmPrompt = await this.moments.resolveVideoBgmPrompt(
+          job.characterId,
+          job.characterName,
+        );
         // 直接传 targetId，避免与 enqueue 触发的 setTimeout(processMusicJobs)
         // 抢跑导致 BGM 任务在 attachTarget 之前就进入处理流程
         const bgmJob = await this.jobs.enqueueMusicJob({
@@ -219,18 +222,6 @@ export class MomentsMinimaxCallbacks
       `moment placeholder ${job.targetId} deleted after job ${job.id} failed`,
     );
   }
-}
-
-// BGM prompt：用角色 + 简短 mood 提示生成 6-30 秒纯器乐。
-// MiniMax 不严格区分有无人声，但 prompt 里强调 instrumental + no vocals 通常能拿到
-// 较纯器乐结果。失败也不影响主流程。
-function composeVideoBgmPrompt(videoJob: MinimaxJobEntity): string {
-  const name = videoJob.characterName || '角色';
-  return [
-    `Short instrumental background music for a 6-second slice-of-life vlog by ${name}.`,
-    'Style: ambient, lofi, gentle synth pads, light percussion, no vocals.',
-    'Mood: warm, intimate, easy to loop under speech-free b-roll.',
-  ].join(' ');
 }
 
 // 从 minimax music job 的 inputPayload 抽取 prompt / lyrics 作为生图 seedText。

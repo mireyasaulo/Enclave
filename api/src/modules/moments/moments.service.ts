@@ -2127,6 +2127,37 @@ export class MomentsService implements OnModuleInit {
     void this.scheduleCharacterInteractions(saved);
   }
 
+  // 拼一段贴角色性格的 BGM prompt：取 emotionalTone / 关心话题 / 擅长领域作 mood
+  // 提示，让不同角色发出来的 BGM 在风格上有区分（程序员→冷峻电子，治愈系→lofi
+  // 钢琴…）。profile 拿不到时回退到中性 ambient。
+  async resolveVideoBgmPrompt(
+    characterId: string,
+    characterName: string,
+  ): Promise<string> {
+    const profile = await this.characters
+      .getProfile(characterId)
+      .catch(() => null);
+    const tone = profile?.traits?.emotionalTone?.replace(/\s+/g, ' ').trim();
+    const interests = profile?.traits?.topicsOfInterest
+      ?.slice(0, 2)
+      .filter(Boolean)
+      .join('、');
+    const domains = profile?.expertDomains?.slice(0, 2).join('、');
+    const moodHints: string[] = [];
+    if (tone) moodHints.push(`情绪基调：${tone.slice(0, 40)}`);
+    if (interests) moodHints.push(`常关心：${interests.slice(0, 40)}`);
+    if (domains) moodHints.push(`擅长领域：${domains.slice(0, 40)}`);
+    if (!moodHints.length) {
+      moodHints.push('情绪基调：温和、生活感、不抢戏');
+    }
+    return [
+      `${characterName} 朋友圈短视频的纯器乐 BGM，时长 30 秒以内，无人声。`,
+      moodHints.join('；') + '。',
+      '风格要贴这个角色——不要把所有人都做成 lofi 咖啡店；该工程感就工程感，该温柔就温柔。',
+      '编曲简洁，可循环，作为 6 秒短片底噪不抢镜头。',
+    ].join(' ');
+  }
+
   // BGM 子任务回调：把已生成的 BGM 音频混入该 moment_post 的视频文件，
   // 替换 mediaPayload 指向新文件并清理旧文件。失败 → 静默保留静音视频。
   async applyBgmToVideoMomentPost(
