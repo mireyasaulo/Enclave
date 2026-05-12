@@ -1396,11 +1396,13 @@ function ChannelAudioPictorial({
     if (!audio) return;
     if (audio.paused) {
       audio.muted = !userUnmuted;
-      void audio.play();
-      setIsPlaying(true);
+      // play() 可能被浏览器策略 reject（用户没解锁手势），这种情况下 audio
+      // 实际并没开始播；不在这里乐观置 isPlaying=true，统一由下方 onPlay
+      // 事件回调来同步状态，保证 UI 和真实播放状态一致。
+      audio.play().catch(() => undefined);
     } else {
       audio.pause();
-      setIsPlaying(false);
+      // 同理，由 onPause 事件回调统一置 isPlaying=false。
     }
   };
 
