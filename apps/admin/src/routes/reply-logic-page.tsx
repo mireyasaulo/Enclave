@@ -34,7 +34,6 @@ import {
   LoadingBlock,
   MetricCard,
   SectionHeading,
-  SnapshotPanel,
   StatusPill,
   ToggleChip,
   useProviderSetup,
@@ -46,7 +45,6 @@ import {
   AdminEmptyState,
   AdminFormSection as ConfigSection,
   AdminInfoRow,
-  AdminInfoRows,
   AdminNoteList,
   AdminPromptSectionList,
   AdminRecordCard,
@@ -54,6 +52,7 @@ import {
   AdminSectionHeader,
   AdminSelectField as SelectFieldBlock,
   AdminSubpanel,
+  AdminTabs,
   AdminTextArea as TextAreaBlock,
   AdminTextField as FieldBlock,
 } from "../components/admin-workbench";
@@ -113,12 +112,56 @@ function readInitialReplyLogicFocus() {
   };
 }
 
+type ReplyLogicTab =
+  | "snapshot"
+  | "edit"
+  | "preview"
+  | "provider"
+  | "rules";
+
+function CollapsibleSection({
+  title,
+  summary,
+  isOpen,
+  onToggle,
+  children,
+}: {
+  title: string;
+  summary?: string;
+  isOpen: boolean;
+  onToggle: (next: boolean) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-[20px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)]">
+      <button
+        type="button"
+        onClick={() => onToggle(!isOpen)}
+        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+      >
+        <span className="text-sm font-semibold text-[color:var(--text-primary)]">
+          {title}
+        </span>
+        <span className="flex items-center gap-2 text-xs text-[color:var(--text-secondary)]">
+          {summary ? <span>{summary}</span> : null}
+          <span aria-hidden>{isOpen ? "▾" : "▸"}</span>
+        </span>
+      </button>
+      {isOpen ? (
+        <div className="space-y-4 border-t border-[color:var(--border-faint)] px-4 py-4">
+          {children}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function ReplyLogicPage() {
   const baseUrl = resolveAdminCoreApiBaseUrl();
   const t = translateRuntimeMessage;
   const queryClient = useQueryClient();
   const initialFocus = useMemo(() => readInitialReplyLogicFocus(), []);
-  const [scope, setScope] = useState<InspectorScope>(initialFocus.scope);
+  const [scope, setScopeState] = useState<InspectorScope>(initialFocus.scope);
   const [selectedCharacterId, setSelectedCharacterId] = useState(
     initialFocus.characterId,
   );
@@ -132,6 +175,18 @@ export function ReplyLogicPage() {
   const [runtimeRulesDraft, setRuntimeRulesDraft] =
     useState<ReplyLogicConstantSummary | null>(null);
   const [previewMessage, setPreviewMessage] = useState("");
+  const [activeTab, setActiveTab] = useState<ReplyLogicTab>("snapshot");
+  const [scenePublishOpen, setScenePublishOpen] = useState(false);
+  const [sceneInteractiveOpen, setSceneInteractiveOpen] = useState(false);
+
+  function setScope(next: InspectorScope) {
+    setScopeState((current) => {
+      if (current !== next) {
+        setActiveTab("snapshot");
+      }
+      return next;
+    });
+  }
 
   const overviewQuery = useQuery({
     queryKey: ["admin-reply-logic-overview", baseUrl],
@@ -469,64 +524,54 @@ export function ReplyLogicPage() {
       ? translateRuntimeMessage(msg`已保存实例级推理服务：${providerSetup.providerSaveMutation.data.model}`)
       : translateRuntimeMessage(msg`这里保存的是实例级兜底推理服务；如果世界主人配置了个人 API 密钥，聊天主链路仍会优先使用个人配置。`));
 
-  const targetSummaryRows =
-    scope === "character" && selectedCharacter
-      ? [
-          { label: t(msg`角色`), value: selectedCharacter.name },
-          {
-            label: t(msg`活动`),
-            value: formatActivity(selectedCharacter.currentActivity),
-          },
-          {
-            label: t(msg`在线`),
-            value: selectedCharacter.isOnline ? t(msg`在线`) : t(msg`离线`),
-          },
-        ]
-      : scope === "conversation" && selectedConversation
-        ? [
-            { label: t(msg`会话`), value: selectedConversation.title },
-            {
-              label: t(msg`来源`),
-              value: formatConversationSource(selectedConversation.source),
-            },
-            {
-              label: t(msg`参与角色`),
-              value: selectedConversation.participantNames.join(" / ") || t(msg`无`),
-            },
-          ]
-        : [{ label: t(msg`当前目标`), value: t(msg`未选择`) }];
-  const providerSummaryRows = [
-    {
-      label: t(msg`模型`),
-      value: `${overview?.provider.model ?? t(msg`未配置`)} (${formatProviderModelSource(overview?.provider.modelSource ?? "")})`,
-    },
-    {
-      label: t(msg`接口地址`),
-      value: `${overview?.provider.endpoint ?? t(msg`未配置`)} (${formatProviderEndpointSource(overview?.provider.endpointSource ?? "")})`,
-    },
-    {
-      label: t(msg`API 密钥`),
-      value: formatProviderApiKeySource(overview?.provider.apiKeySource ?? ""),
-    },
-    {
-      label: t(msg`实例级模型`),
-      value: overview?.provider.configuredProviderModel ?? t(msg`未设置`),
-    },
-    {
-      label: t(msg`实例级接口地址`),
-      value: overview?.provider.configuredProviderEndpoint ?? t(msg`未设置`),
-    },
-  ];
-
-  function jumpToSection(sectionId: string) {
-    if (typeof document === "undefined") {
-      return;
+  const scenePromptFilledCount = (
+    keys: Array<keyof NonNullable<EditableProfile["scenePrompts"]>>,
+  ) => {
+    if (!characterDraft) {
+      return 0;
     }
+    const prompts = characterDraft.profile.scenePrompts ?? {};
+    return keys.filter((key) => {
+      const value = prompts[key];
+      return typeof value === "string" && value.trim().length > 0;
+    }).length;
+  };
+  const activePublishCount = scenePromptFilledCount([
+    "moments_post",
+    "feed_post",
+    "channel_post",
+  ]);
+  const interactiveCount = scenePromptFilledCount([
+    "chat",
+    "moments_comment",
+    "feed_comment",
+    "greeting",
+    "proactive",
+  ]);
 
-    document
-      .getElementById(sectionId)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+  const currentTargetLabel = (() => {
+    if (scope === "character" && selectedCharacter) {
+      return `${selectedCharacter.name} · ${formatActivity(selectedCharacter.currentActivity)}`;
+    }
+    if (scope === "conversation" && selectedConversation) {
+      const participants =
+        selectedConversation.participantNames.join(" / ") || t(msg`无角色`);
+      return `${selectedConversation.title} · ${participants}`;
+    }
+    return t(msg`未选择目标`);
+  })();
+  const currentTargetOnline =
+    scope === "character" && selectedCharacter
+      ? selectedCharacter.isOnline
+      : null;
+
+  const tabItems: Array<{ key: ReplyLogicTab; label: string }> = [
+    { key: "snapshot", label: t(msg`快照`) },
+    { key: "edit", label: t(msg`编辑配置`) },
+    { key: "preview", label: t(msg`候选预演`) },
+    { key: "provider", label: t(msg`推理服务`) },
+    { key: "rules", label: t(msg`运行规则`) },
+  ];
 
   return (
     <div className="space-y-6">
@@ -548,79 +593,64 @@ export function ReplyLogicPage() {
 
       {overview ? (
         <>
-          <div className="grid gap-6 xl:grid-cols-[340px_minmax(0,1fr)_440px]">
-            <div className="space-y-4 xl:sticky xl:top-24 xl:self-start">
-              {/* Quick actions */}
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => void refreshAll()}
-                  variant="secondary"
-                  size="sm"
-                  className="flex-1 justify-center"
-                >
-                  {t(msg`刷新快照`)}
-                </Button>
-                <Button
-                  onClick={saveRuntimeRulesDraft}
-                  variant="primary"
-                  size="sm"
-                  className="flex-1 justify-center"
-                  disabled={
-                    !isRuntimeRulesDraftDirty ||
-                    runtimeRulesSaveMutation.isPending
+          <div className="sticky top-0 z-10 -mx-4 sm:-mx-6 border-b border-[color:var(--border-faint)] bg-[color:var(--surface-app)]/95 px-4 sm:px-6 py-3 backdrop-blur">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="inline-flex rounded-[14px] border border-[color:var(--border-faint)] p-0.5">
+                <button
+                  type="button"
+                  onClick={() => setScope("character")}
+                  className={
+                    scope === "character"
+                      ? "rounded-[12px] bg-[color:var(--brand-soft)] px-3 py-1.5 text-xs font-medium text-[color:var(--brand-primary)]"
+                      : "rounded-[12px] px-3 py-1.5 text-xs text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)]"
                   }
                 >
-                  {runtimeRulesSaveMutation.isPending
-                    ? t(msg`保存中...`)
-                    : t(msg`保存规则`)}
-                </Button>
+                  {t(msg`按角色`)}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setScope("conversation")}
+                  className={
+                    scope === "conversation"
+                      ? "rounded-[12px] bg-[color:var(--brand-soft)] px-3 py-1.5 text-xs font-medium text-[color:var(--brand-primary)]"
+                      : "rounded-[12px] px-3 py-1.5 text-xs text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)]"
+                  }
+                >
+                  {t(msg`按会话`)}
+                </button>
               </div>
-
-              {/* Jump links */}
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { label: t(msg`快照`), id: "reply-logic-inspector" },
-                  { label: t(msg`预演`), id: "reply-logic-preview" },
-                  { label: t(msg`配置`), id: "reply-logic-config" },
-                  { label: t(msg`规则`), id: "reply-logic-rules" },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => jumpToSection(item.id)}
-                    className="rounded-full border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] px-3 py-1 text-xs text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-strong)] hover:text-[color:var(--text-primary)]"
-                  >
-                    {item.label}
-                  </button>
-                ))}
+              <div className="flex min-w-0 flex-1 items-center gap-2 text-sm">
+                <span className="text-[color:var(--text-secondary)]">
+                  {t(msg`当前目标`)}
+                </span>
+                <span className="truncate font-medium text-[color:var(--text-primary)]">
+                  {currentTargetLabel}
+                </span>
+                {currentTargetOnline !== null ? (
+                  <StatusPill tone={currentTargetOnline ? "healthy" : "muted"}>
+                    {currentTargetOnline ? t(msg`在线`) : t(msg`离线`)}
+                  </StatusPill>
+                ) : null}
               </div>
+              <AdminDraftStatusPill
+                ready={Boolean(characterDraft)}
+                dirty={isCharacterDraftDirty}
+                loadingLabel={t(msg`等待目标`)}
+              />
+              <Button
+                onClick={() => void refreshAll()}
+                variant="secondary"
+                size="sm"
+              >
+                {t(msg`刷新快照`)}
+              </Button>
+            </div>
+          </div>
 
+          <div className="grid gap-6 xl:grid-cols-[320px_minmax(0,1fr)]">
+            <div className="space-y-4">
               <Card className="bg-[color:var(--surface-console)]">
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setScope("character")}
-                    className={
-                      scope === "character"
-                        ? "rounded-[16px] border border-[color:var(--border-brand)] bg-[color:var(--brand-soft)] px-3 py-2 text-sm font-medium text-[color:var(--brand-primary)]"
-                        : "rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-3 py-2 text-sm text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-subtle)] hover:text-[color:var(--text-primary)]"
-                    }
-                  >
-                    {t(msg`按角色`)}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setScope("conversation")}
-                    className={
-                      scope === "conversation"
-                        ? "rounded-[16px] border border-[color:var(--border-brand)] bg-[color:var(--brand-soft)] px-3 py-2 text-sm font-medium text-[color:var(--brand-primary)]"
-                        : "rounded-[16px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-3 py-2 text-sm text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-subtle)] hover:text-[color:var(--text-primary)]"
-                    }
-                  >
-                    {t(msg`按会话`)}
-                  </button>
-                </div>
-                <div className="mt-3 space-y-3">
+                <div className="space-y-3">
                   {scope === "character" ? (
                     <TargetListCard
                       title={t(msg`角色列表`)}
@@ -651,13 +681,6 @@ export function ReplyLogicPage() {
                 </div>
               </Card>
 
-              <AdminInfoRows title={t(msg`目标摘要`)} rows={targetSummaryRows} />
-
-              <AdminInfoRows
-                title={t(msg`真实运行推理服务`)}
-                rows={providerSummaryRows}
-              />
-
               {overview.provider.notes.length ? (
                 <Card className="bg-[color:var(--surface-console)]">
                   <SectionHeading>{t(msg`运行备注`)}</SectionHeading>
@@ -670,36 +693,33 @@ export function ReplyLogicPage() {
                   </div>
                 </Card>
               ) : null}
-
-              <Card className="bg-[color:var(--surface-console)]">
-                <SectionHeading>{t(msg`运行时常量`)}</SectionHeading>
-                <SnapshotPanel
-                  className="mt-4"
-                  title={t(msg`当前生效运行时摘要`)}
-                  value={formatRuntimeConstants(overview.constants)}
-                />
-              </Card>
             </div>
 
-            <div id="reply-logic-inspector" className="space-y-6">
-              {scope === "character" ? (
-                <CharacterInspectorPanel
-                  selectedCharacter={selectedCharacter}
-                  query={characterSnapshotQuery}
-                  narrativePresentation={narrativePresentation}
-                />
-              ) : (
-                <ConversationInspectorPanel
-                  selectedConversation={selectedConversation}
-                  query={conversationSnapshotQuery}
-                  baseUrl={baseUrl}
-                  narrativePresentation={narrativePresentation}
-                />
-              )}
-            </div>
+            <div className="space-y-6">
+              <AdminTabs
+                tabs={tabItems}
+                activeKey={activeTab}
+                onChange={(key) => setActiveTab(key as ReplyLogicTab)}
+              />
 
-            <div className="space-y-6 xl:sticky xl:top-24 xl:self-start">
-              <div id="reply-logic-preview">
+              {activeTab === "snapshot" ? (
+                scope === "character" ? (
+                  <CharacterInspectorPanel
+                    selectedCharacter={selectedCharacter}
+                    query={characterSnapshotQuery}
+                    narrativePresentation={narrativePresentation}
+                  />
+                ) : (
+                  <ConversationInspectorPanel
+                    selectedConversation={selectedConversation}
+                    query={conversationSnapshotQuery}
+                    baseUrl={baseUrl}
+                    narrativePresentation={narrativePresentation}
+                  />
+                )
+              ) : null}
+
+              {activeTab === "preview" ? (
                 <ReplyPreviewPanel
                   scope={scope}
                   previewMessage={previewMessage}
@@ -714,39 +734,12 @@ export function ReplyLogicPage() {
                   isPending={previewMutation.isPending}
                   onRunPreview={() => previewMutation.mutate()}
                 />
-              </div>
+              ) : null}
 
-              <div id="reply-logic-config">
-                <Card className="bg-[color:var(--surface-console)]">
-                  <AdminSectionHeader
-                    title={t(msg`配置抽屉`)}
-                    actions={
-                      <AdminDraftStatusPill
-                        ready={Boolean(characterDraft)}
-                        dirty={isCharacterDraftDirty}
-                        loadingLabel={t(msg`等待目标`)}
-                      />
-                    }
-                  />
-                  <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-1">
-                    <MetricCard
-                      label={t(msg`当前范围`)}
-                      value={scope === "character" ? t(msg`角色`) : t(msg`会话`)}
-                    />
-                    <MetricCard
-                      label={t(msg`配置目标`)}
-                      value={
-                        editableCharacterSource?.name ??
-                        (scope === "conversation"
-                          ? t(msg`先选择会话角色`)
-                          : t(msg`先选择角色`))
-                      }
-                    />
-                  </div>
-
+              {activeTab === "edit" ? (
+                <div className="space-y-4">
                   {scope === "conversation" ? (
                     <SelectFieldBlock
-                      className="mt-4"
                       label={t(msg`会话内配置角色`)}
                       value={configuredConversationActorId}
                       onChange={setConfiguredConversationActorId}
@@ -757,13 +750,11 @@ export function ReplyLogicPage() {
                     />
                   ) : null}
 
-                  <InlineNotice className="mt-4" tone="muted">
-                    {t(msg`这里改的是实体字段和 profile 配置对象。本页不会实时重算草稿提示词，保存后会刷新右侧快照，看到真实生效结果。`)}
+                  <InlineNotice tone="muted">
+                    {t(msg`这里改的是实体字段和 profile 配置对象。本页不会实时重算草稿提示词，保存后会刷新「快照」Tab，看到真实生效结果。`)}
                   </InlineNotice>
-                </Card>
-              </div>
 
-              <Card className="bg-[color:var(--surface-console)]">
+                  <Card className="bg-[color:var(--surface-console)]">
                 <AdminSectionHeader
                   title={t(msg`角色配置`)}
                   actions={
@@ -956,7 +947,12 @@ export function ReplyLogicPage() {
                         />
                       </ConfigSection>
 
-                      <ConfigSection title={t(msg`场景提示词 — 主动发布`)}>
+                      <CollapsibleSection
+                        title={t(msg`场景提示词 — 主动发布`)}
+                        summary={t(msg`已填写 ${activePublishCount} / 3`)}
+                        isOpen={scenePublishOpen}
+                        onToggle={setScenePublishOpen}
+                      >
                         <TextAreaBlock
                           label={t(msg`发朋友圈`)}
                           value={
@@ -1016,9 +1012,14 @@ export function ReplyLogicPage() {
                             }))
                           }
                         />
-                      </ConfigSection>
+                      </CollapsibleSection>
 
-                      <ConfigSection title={t(msg`场景提示词 — 互动响应`)}>
+                      <CollapsibleSection
+                        title={t(msg`场景提示词 — 互动响应`)}
+                        summary={t(msg`已填写 ${interactiveCount} / 5`)}
+                        isOpen={sceneInteractiveOpen}
+                        onToggle={setSceneInteractiveOpen}
+                      >
                         <TextAreaBlock
                           label={t(msg`聊天回复`)}
                           value={
@@ -1116,29 +1117,7 @@ export function ReplyLogicPage() {
                             }))
                           }
                         />
-                      </ConfigSection>
-
-                      <ConfigSection title={t(msg`记忆（当前值）`)}>
-                        <p className="text-xs text-[color:var(--text-secondary)]">
-                          {t(msg`核心记忆每周一自动更新，近期摘要每日自动更新。在运行台中可查看和手动覆盖当前值。`)}
-                        </p>
-                        <div className="rounded border border-[color:var(--border-faint)] px-3 py-2 text-xs text-[color:var(--text-secondary)]">
-                          <p>
-                            <span className="font-medium text-[color:var(--text-primary)]">
-                              {t(msg`核心记忆：`)}
-                            </span>
-                            {characterDraft.profile.memory.coreMemory ||
-                              t(msg`（暂无）`)}
-                          </p>
-                          <p className="mt-1">
-                            <span className="font-medium text-[color:var(--text-primary)]">
-                              {t(msg`近期摘要：`)}
-                            </span>
-                            {characterDraft.profile.memory.recentSummary ||
-                              t(msg`（暂无）`)}
-                          </p>
-                        </div>
-                      </ConfigSection>
+                      </CollapsibleSection>
 
                       <div className="flex flex-wrap gap-3 border-t border-[color:var(--border-faint)] pt-5">
                         <Button
@@ -1172,23 +1151,6 @@ export function ReplyLogicPage() {
                           {t(msg`清空所有提示词`)}
                         </Button>
                         <Button
-                          variant="secondary"
-                          onClick={() =>
-                            patchCharacterDraft((current) => ({
-                              ...current,
-                              profile: {
-                                ...current.profile,
-                                memory: {
-                                  ...current.profile.memory,
-                                  recentSummary: "",
-                                },
-                              },
-                            }))
-                          }
-                        >
-                          {t(msg`清空近期摘要`)}
-                        </Button>
-                        <Button
                           variant="primary"
                           onClick={saveCharacterDraft}
                           disabled={
@@ -1205,119 +1167,132 @@ export function ReplyLogicPage() {
                   </>
                 )}
               </Card>
-
-              <Card className="bg-[color:var(--surface-console)]">
-                <AdminSectionHeader
-                  title={t(msg`回复运行配置`)}
-                  actions={
-                    <StatusPill
-                      tone={providerSetup.providerReady ? "healthy" : "warning"}
-                    >
-                      {providerSetup.providerReady ? t(msg`已配置`) : t(msg`待配置`)}
-                    </StatusPill>
-                  }
-                />
-
-                <div className="mt-4 space-y-4">
-                  <FieldBlock
-                    label={t(msg`接口地址`)}
-                    value={providerSetup.providerDraft.endpoint}
-                    placeholder="https://api.openai.com/v1"
-                    onChange={(value) =>
-                      providerSetup.updateProviderDraft("endpoint", value)
-                    }
-                  />
-
-                  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
-                    <SelectFieldBlock
-                      label={t(msg`模式`)}
-                      value={providerSetup.providerDraft.mode}
-                      onChange={(value) =>
-                        providerSetup.updateProviderDraft(
-                          "mode",
-                          value === "cloud" ? "cloud" : "local-compatible",
-                        )
-                      }
-                      options={[
-                        { value: "local-compatible", label: t(msg`本地兼容`) },
-                        { value: "cloud", label: t(msg`云端模式`) },
-                      ]}
-                    />
-                    <FieldBlock
-                      label={t(msg`模型`)}
-                      value={providerSetup.providerDraft.model}
-                      placeholder="gpt-4.1-mini"
-                      list="reply-logic-available-models"
-                      onChange={(value) =>
-                        providerSetup.updateProviderDraft("model", value)
-                      }
-                    />
-                    <datalist id="reply-logic-available-models">
-                      {(
-                        providerSetup.availableModelsQuery.data?.models ?? []
-                      ).map((model) => (
-                        <option key={model} value={model} />
-                      ))}
-                    </datalist>
-                  </div>
-
-                  <FieldBlock
-                    label={t(msg`API 密钥`)}
-                    value={providerSetup.providerDraft.apiKey ?? ""}
-                    type="password"
-                    placeholder={t(msg`输入实例级推理服务 API 密钥`)}
-                    onChange={(value) =>
-                      providerSetup.updateProviderDraft("apiKey", value)
-                    }
-                  />
-
-                  {providerSetup.providerValidationMessage ? (
-                    <InlineNotice tone="warning">
-                      {providerSetup.providerValidationMessage}
-                    </InlineNotice>
-                  ) : null}
-                  {providerLoadError ? (
-                    <ErrorBlock message={providerLoadError} />
-                  ) : null}
-                  {providerActionError ? (
-                    <ErrorBlock message={providerActionError} />
-                  ) : null}
-                  {providerSetup.providerSaveMutation.isSuccess ? (
-                    <AdminActionFeedback
-                      tone="success"
-                      title={t(msg`运行配置已保存`)}
-                      description={t(msg`实例级推理服务已保存，运行时快照正在刷新。`)}
-                    />
-                  ) : null}
-
-                  <div className="flex flex-wrap gap-3">
-                    <Button
-                      variant="secondary"
-                      onClick={providerSetup.submitProviderProbe}
-                      disabled={providerSetup.providerProbeMutation.isPending}
-                    >
-                      {providerSetup.providerProbeMutation.isPending
-                        ? t(msg`测试中...`)
-                        : t(msg`测试连接`)}
-                    </Button>
-                    <Button
-                      variant="primary"
-                      onClick={providerSetup.submitProviderSave}
-                      disabled={providerSetup.providerSaveMutation.isPending}
-                    >
-                      {providerSetup.providerSaveMutation.isPending
-                        ? t(msg`保存中...`)
-                        : t(msg`保存运行配置`)}
-                    </Button>
-                  </div>
-
-                  <div className="rounded-[20px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-3 text-sm leading-7 text-[color:var(--text-secondary)]">
-                    {providerFooterMessage}
-                  </div>
                 </div>
-              </Card>
+              ) : null}
 
-              <div id="reply-logic-rules">
+              {activeTab === "provider" ? (
+                <Card className="bg-[color:var(--surface-console)]">
+                  <AdminSectionHeader
+                    title={t(msg`回复运行配置`)}
+                    actions={
+                      <StatusPill
+                        tone={
+                          providerSetup.providerReady ? "healthy" : "warning"
+                        }
+                      >
+                        {providerSetup.providerReady
+                          ? t(msg`已配置`)
+                          : t(msg`待配置`)}
+                      </StatusPill>
+                    }
+                  />
+
+                  <div className="mt-4 space-y-4">
+                    <FieldBlock
+                      label={t(msg`接口地址`)}
+                      value={providerSetup.providerDraft.endpoint}
+                      placeholder="https://api.openai.com/v1"
+                      onChange={(value) =>
+                        providerSetup.updateProviderDraft("endpoint", value)
+                      }
+                    />
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <SelectFieldBlock
+                        label={t(msg`模式`)}
+                        value={providerSetup.providerDraft.mode}
+                        onChange={(value) =>
+                          providerSetup.updateProviderDraft(
+                            "mode",
+                            value === "cloud" ? "cloud" : "local-compatible",
+                          )
+                        }
+                        options={[
+                          {
+                            value: "local-compatible",
+                            label: t(msg`本地兼容`),
+                          },
+                          { value: "cloud", label: t(msg`云端模式`) },
+                        ]}
+                      />
+                      <FieldBlock
+                        label={t(msg`模型`)}
+                        value={providerSetup.providerDraft.model}
+                        placeholder="gpt-4.1-mini"
+                        list="reply-logic-available-models"
+                        onChange={(value) =>
+                          providerSetup.updateProviderDraft("model", value)
+                        }
+                      />
+                      <datalist id="reply-logic-available-models">
+                        {(
+                          providerSetup.availableModelsQuery.data?.models ?? []
+                        ).map((model) => (
+                          <option key={model} value={model} />
+                        ))}
+                      </datalist>
+                    </div>
+
+                    <FieldBlock
+                      label={t(msg`API 密钥`)}
+                      value={providerSetup.providerDraft.apiKey ?? ""}
+                      type="password"
+                      placeholder={t(msg`输入实例级推理服务 API 密钥`)}
+                      onChange={(value) =>
+                        providerSetup.updateProviderDraft("apiKey", value)
+                      }
+                    />
+
+                    {providerSetup.providerValidationMessage ? (
+                      <InlineNotice tone="warning">
+                        {providerSetup.providerValidationMessage}
+                      </InlineNotice>
+                    ) : null}
+                    {providerLoadError ? (
+                      <ErrorBlock message={providerLoadError} />
+                    ) : null}
+                    {providerActionError ? (
+                      <ErrorBlock message={providerActionError} />
+                    ) : null}
+                    {providerSetup.providerSaveMutation.isSuccess ? (
+                      <AdminActionFeedback
+                        tone="success"
+                        title={t(msg`运行配置已保存`)}
+                        description={t(msg`实例级推理服务已保存，运行时快照正在刷新。`)}
+                      />
+                    ) : null}
+
+                    <div className="flex flex-wrap gap-3">
+                      <Button
+                        variant="secondary"
+                        onClick={providerSetup.submitProviderProbe}
+                        disabled={
+                          providerSetup.providerProbeMutation.isPending
+                        }
+                      >
+                        {providerSetup.providerProbeMutation.isPending
+                          ? t(msg`测试中...`)
+                          : t(msg`测试连接`)}
+                      </Button>
+                      <Button
+                        variant="primary"
+                        onClick={providerSetup.submitProviderSave}
+                        disabled={providerSetup.providerSaveMutation.isPending}
+                      >
+                        {providerSetup.providerSaveMutation.isPending
+                          ? t(msg`保存中...`)
+                          : t(msg`保存运行配置`)}
+                      </Button>
+                    </div>
+
+                    <div className="rounded-[20px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-3 text-sm leading-7 text-[color:var(--text-secondary)]">
+                      {providerFooterMessage}
+                    </div>
+                  </div>
+                </Card>
+              ) : null}
+
+              {activeTab === "rules" ? (
                 <RuntimeRulesEditorCard
                   draft={runtimeRulesDraft}
                   isDirty={isRuntimeRulesDraftDirty}
@@ -1332,7 +1307,7 @@ export function ReplyLogicPage() {
                   onReset={resetRuntimeRulesDraft}
                   onSave={saveRuntimeRulesDraft}
                 />
-              </div>
+              ) : null}
             </div>
           </div>
         </>
@@ -1419,7 +1394,7 @@ function CharacterInspectorPanel({
     <>
       <Card className="bg-[color:var(--surface-console)]">
         <SectionHeading>{t(msg`当前角色`)}</SectionHeading>
-        <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
           <MetricCard label={t(msg`名称`)} value={query.data.character.name} />
           <MetricCard
             label={t(msg`关系`)}
@@ -1582,7 +1557,7 @@ function ConversationInspectorPanel({
     <>
       <Card className="bg-[color:var(--surface-console)]">
         <SectionHeading>{t(msg`会话分支`)}</SectionHeading>
-        <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
           <MetricCard label={t(msg`标题`)} value={query.data.conversation.title} />
           <MetricCard
             label={t(msg`类型`)}
@@ -1923,7 +1898,7 @@ function GroupReplyRuntimeCard({
           </div>
         }
       />
-      <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
         <MetricCard label={t(msg`待执行`)} value={runtime.pendingTaskCount} />
         <MetricCard label={t(msg`处理中`)} value={runtime.processingTaskCount} />
         <MetricCard label={t(msg`失败`)} value={runtime.failedTaskCount} />
@@ -2156,7 +2131,7 @@ function GroupReplyRuntimeCard({
 
             {actorFilter !== "all" && !selectedArchiveActor ? null : (
               <>
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="grid gap-4 md:grid-cols-2">
                   <MetricCard
                     label={t(msg`已归档任务`)}
                     value={
