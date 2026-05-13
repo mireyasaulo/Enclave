@@ -1842,20 +1842,18 @@ export class MomentsService implements OnModuleInit {
 
   // ============= MiniMax 音乐贴 / 视频贴 =============
 
-  // 主路径：MiniMax /v1/lyrics_generation，强 prompt（主题+风格+禁用模板）
-  // 配额耗尽 / 失败：LLM fallback（ai.generatePlainText）
-  // LLM 也失败：最后才用本地 composeMusicLyrics，且把主题注入 seed 避免雷同
+  // 主路径：MiniMax /v1/lyrics_generation（短 prompt，主题 + 风格 + 心境）。
+  // 失败 / 配额耗尽 / 未配置：直接使用本地 composeMusicLyrics 兜底。
+  // 不再走 LLM (n1n) 兜底，避免一首歌 = 一次额外 n1n 调用的放大。
   private async generateLyricsOrFallback(
     characterId: string,
     characterName: string,
-    profile: PersonalityProfile,
+    _profile: PersonalityProfile,
     seedText: string,
   ): Promise<string> {
     const { theme, style } = pickThemeAndStyle(characterId);
-    const personaBlock = extractPersonaBlock(profile);
     const prompt = composeLyricsPrompt({
       name: characterName,
-      personaBlock,
       theme,
       style,
       seedText,
@@ -1874,40 +1872,12 @@ export class MomentsService implements OnModuleInit {
         } catch (err) {
           await this.minimaxQuota.release('lyrics');
           this.logger.warn(
-            `minimax lyrics failed, fallback LLM: ${(err as Error)?.message}`,
+            `minimax lyrics failed, using local fallback: ${(err as Error)?.message}`,
           );
         }
       } else {
-        this.logger.debug('lyrics quota exhausted, fallback LLM');
+        this.logger.debug('lyrics quota exhausted, using local fallback');
       }
-    }
-
-    try {
-      const text = await this.ai.generatePlainText({
-        prompt,
-        usageContext: {
-          surface: 'app',
-          scene: 'minimax_music_lyrics_fallback',
-          scopeType: 'character',
-          scopeId: characterId,
-          scopeLabel: characterName,
-          characterId,
-          characterName,
-        },
-        maxTokens: 600,
-        temperature: 0.9,
-      });
-      const cleaned = ensureVerseChorus(text);
-      if (cleaned) {
-        this.logger.log(
-          `lyrics via LLM fallback for ${characterName} [theme=${theme}]`,
-        );
-        return cleaned;
-      }
-    } catch (err) {
-      this.logger.warn(
-        `LLM lyrics fallback failed: ${(err as Error)?.message}`,
-      );
     }
 
     return composeMusicLyrics(characterName, `${theme}：${seedText}`);
@@ -1931,32 +1901,10 @@ export class MomentsService implements OnModuleInit {
     const profile = await this.characters.getProfile(char.id);
     if (!profile) return null;
 
-    let seedText = '';
-    try {
-      seedText = (
-        await this.ai.generateMoment({
-          profile,
-          currentTime: new Date(),
-          usageContext: {
-            surface: 'app',
-            scene: 'minimax_music_seed',
-            scopeType: 'character',
-            scopeId: char.id,
-            scopeLabel: char.name,
-            characterId: char.id,
-            characterName: char.name,
-          },
-        })
-      ).trim();
-    } catch (err) {
-      this.logger.warn(
-        `music seed text gen failed for ${char.id}: ${(err as Error)?.message}`,
-      );
-    }
-    if (!seedText) {
-      const { theme } = pickThemeAndStyle(char.id);
-      seedText = `${char.name} 此刻心境与「${theme}」相关，请围绕这一画面展开。`;
-    }
+    // 不再调 LLM 生成 music seed text：每首歌都额外打一次 n1n 太贵。
+    // 直接用本地主题模板兜底；minimax 自己会基于歌词 + 歌曲 prompt 出曲。
+    const { theme: seedTheme } = pickThemeAndStyle(char.id);
+    const seedText = `${char.name} 此刻心境与「${seedTheme}」相关，请围绕这一画面展开。`;
 
     const lyrics = await this.generateLyricsOrFallback(
       char.id,
@@ -2421,61 +2369,20 @@ function extractPersonaBlock(profile: PersonalityProfile): string {
   return segments.join('\n') || '（角色资料较少，请按主题自由发挥但保持一致人格）';
 }
 
+// MiniMax /v1/lyrics_generation 的 prompt 字段硬上限 300 字符，超出会回
+// 2013 invalid params。这里只保留主题 / 风格 / 心境线索，输出格式由 minimax
+// 自身保证（会自动产出 [verse]/[chorus] 段标）。
 function composeLyricsPrompt(args: {
   name: string;
-  personaBlock: string;
   theme: string;
   style: string;
   seedText: string;
 }): string {
-  const seedLine = args.seedText?.trim()
-    ? `本次心境线索（不要照抄，仅作灵感）：${args.seedText.slice(0, 200)}`
-    : '本次心境线索：（请围绕主题自由展开）';
-  return [
-    `你正在为 AI 角色「${args.name}」写一首中文歌的歌词。这首歌应当像这个角色亲自写的，而不是一首通用抒情诗。`,
-    '',
-    '— 角色档案 —',
-    args.personaBlock,
-    '',
-    `本次主题：${args.theme}`,
-    `表达风格：${args.style}`,
-    seedLine,
-    '',
-    '硬性要求：',
-    '1. 严格使用 [verse] 与 [chorus] 两个段落标签，可选追加一个 [bridge]。',
-    '2. 每段 4-6 行，每行 7-15 个汉字；verse 与 chorus 内容不得相同或近似。',
-    '3. 禁止出现以下模板套话：「写了一首歌」「记录此刻心情」「在心中回响」「歌声 / 旋律响起」「想要告诉你」。',
-    '4. 围绕主题展开具体画面、动作或细节，避免空泛抒情与口号化句子。',
-    '5. 用词、比喻、视角、情绪走向必须与上面的角色档案一致：',
-    '   · 该角色擅长什么领域，歌词里就出现该领域的意象（例：程序员→代码/调试/版本号；厨师→火候/刀工/食材）。',
-    '   · 该角色的说话方式、口头禅、情绪基调要在歌词里能听出来。',
-    '   · 不要把所有角色都写成同一种文艺青年。',
-    '6. 不要副歌反复 4 遍这种偷懒结构；不要写标题、解释、Markdown、英文翻译。',
-    '',
-    '只输出歌词本体。',
-  ].join('\n');
-}
-
-// LLM 输出有时会丢段标或被多余前后缀污染。这里做最小修复：
-// - 含 [verse] 与 [chorus] → 直接用
-// - 缺段标但有内容 → 把前一半行作 verse、后一半作 chorus 包起来
-// - 完全空 → 返回空字符串（让上层走最终兜底）
-function ensureVerseChorus(raw: string): string {
-  const trimmed = (raw || '').trim();
-  if (!trimmed) return '';
-  const lower = trimmed.toLowerCase();
-  if (lower.includes('[verse]') && lower.includes('[chorus]')) {
-    return trimmed.startsWith('\n') ? trimmed : `\n${trimmed}\n`;
-  }
-  const lines = trimmed
-    .split(/\r?\n/)
-    .map((s) => s.trim())
-    .filter((s) => s && !/^\[[a-z]+\]$/i.test(s));
-  if (lines.length < 2) return '';
-  const half = Math.max(1, Math.ceil(lines.length / 2));
-  const verse = lines.slice(0, half).join('\n');
-  const chorus = lines.slice(half).join('\n') || verse;
-  return `\n[verse]\n${verse}\n[chorus]\n${chorus}\n`;
+  const seed = args.seedText?.replace(/\s+/g, ' ').trim().slice(0, 120) ?? '';
+  const head = `为「${args.name}」写一首中文歌：主题${args.theme}，风格${args.style}。`;
+  const tail = seed ? `心境：${seed}` : '';
+  const full = `${head}${tail}`;
+  return full.length > 290 ? full.slice(0, 290) : full;
 }
 
 function composeMusicLyrics(_characterName: string, seedText: string): string {
