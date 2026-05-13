@@ -580,7 +580,7 @@ export function DashboardPage() {
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="order-2 space-y-6 xl:order-1">
-          <div className="sticky top-[140px] z-10 -mx-1 flex flex-wrap gap-2 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)]/95 px-2 py-2 shadow-[var(--shadow-soft)] backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-card)]/80 lg:top-20">
+          <div className="sticky top-[140px] z-10 -mx-1 flex flex-nowrap items-center gap-2 overflow-x-auto rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)]/95 px-2 py-2 shadow-[var(--shadow-soft)] backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-card)]/80 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:top-20">
             {[
               {
                 label: t(msg`值班总览`),
@@ -607,7 +607,7 @@ export function DashboardPage() {
                 key={String(item.label)}
                 type="button"
                 onClick={() => scrollToDashboardSection(item.ref)}
-                className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-1.5 text-sm font-medium text-[color:var(--text-secondary)] shadow-[var(--shadow-soft)] transition hover:border-[color:var(--border-subtle)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
+                className="shrink-0 whitespace-nowrap rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-1.5 text-sm font-medium text-[color:var(--text-secondary)] shadow-[var(--shadow-soft)] transition hover:border-[color:var(--border-subtle)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
               >
                 {item.label}
               </button>
