@@ -1842,12 +1842,14 @@ export class MomentsService implements OnModuleInit {
 
   // ============= MiniMax 音乐贴 / 视频贴 =============
 
-  // Tier 1: MiniMax /v1/lyrics_generation（tokenplan 已覆盖；短 prompt ≤290 字符）
-  // Tier 2 + 3: ai.generatePlainText —— 由 AiOrchestratorService 内部 provider 链
-  //   primary (tokenplan MiniMax-M2.7) → fallback (n1n) 自动切换
-  // Tier 4: 本地 composeMusicLyrics 模板，作为 generatePlainText 的 fallback 字符串
-  // 调用前提：scheduleMinimaxMusicMoment 已经验证音乐配额非空；音乐配额耗尽时
-  // 不会进到这里，所以这里不重复 gate。
+  // Tier 1: MiniMax /v1/lyrics_generation（专用歌词端点，短 prompt ≤290 字符）
+  //   注意：sk-cp-* tokenplan key 当前对该端点持续回 2013 invalid params，
+  //   失败会自动 fall through 到 Tier 2，保留入口以备 minimax 修好该端点
+  // Tier 2: MiniMax /v1/text/chatcompletion_v2 + MiniMax-M2.7（tokenplan 主推 LLM）
+  //   这就是"tokenplan 里 minimax 正常的 llm"，确认可用
+  // Tier 3: ai.generatePlainText —— AiOrchestrator 走默认 chat provider（通常是 n1n）
+  // Tier 4: 本地 composeMusicLyrics 模板
+  // 前提：调用方 scheduleMinimaxMusicMoment 已经验证音乐配额非空。
   private async generateLyricsOrFallback(
     characterId: string,
     characterName: string,
@@ -1868,6 +1870,7 @@ export class MomentsService implements OnModuleInit {
       `${theme}：${seedText}`,
     );
 
+    // Tier 1: /v1/lyrics_generation
     if (minimaxLyricsEnabled && this.minimaxClient.isConfigured()) {
       const reserved = await this.minimaxQuota.tryReserve('lyrics');
       if (reserved) {
@@ -1881,16 +1884,40 @@ export class MomentsService implements OnModuleInit {
         } catch (err) {
           await this.minimaxQuota.release('lyrics');
           this.logger.warn(
-            `minimax lyrics endpoint failed, falling back to LLM: ${(err as Error)?.message}`,
+            `minimax lyrics endpoint failed, falling back to minimax LLM: ${(err as Error)?.message}`,
           );
         }
       } else {
         this.logger.debug(
-          'minimax lyrics quota exhausted, falling back to LLM',
+          'minimax lyrics quota exhausted, falling back to minimax LLM',
         );
       }
     }
 
+    // Tier 2: minimax chatcompletion_v2 + MiniMax-M2.7（tokenplan LLM）
+    if (this.minimaxClient.isConfigured()) {
+      try {
+        const result = await this.minimaxClient.chatCompletion({
+          model: 'MiniMax-M2.7',
+          messages: [{ role: 'user', content: prompt }],
+          maxTokens: 2000,
+          temperature: 0.9,
+        });
+        const cleaned = ensureVerseChorus(result.content);
+        if (cleaned) {
+          this.logger.log(
+            `lyrics via minimax LLM (M2.7) for ${characterName} [theme=${theme}]`,
+          );
+          return cleaned;
+        }
+      } catch (err) {
+        this.logger.warn(
+          `minimax LLM lyrics failed, falling back to generic LLM: ${(err as Error)?.message}`,
+        );
+      }
+    }
+
+    // Tier 3: 通用 LLM（orchestrator 路由，通常落到 n1n）
     try {
       const text = await this.ai.generatePlainText({
         prompt,
@@ -1910,16 +1937,17 @@ export class MomentsService implements OnModuleInit {
       const cleaned = ensureVerseChorus(text);
       if (cleaned) {
         this.logger.log(
-          `lyrics via LLM fallback for ${characterName} [theme=${theme}]`,
+          `lyrics via generic LLM fallback for ${characterName} [theme=${theme}]`,
         );
         return cleaned;
       }
     } catch (err) {
       this.logger.warn(
-        `LLM lyrics fallback failed: ${(err as Error)?.message}`,
+        `generic LLM lyrics fallback failed: ${(err as Error)?.message}`,
       );
     }
 
+    // Tier 4: 本地模板
     return localFallback;
   }
 

@@ -269,6 +269,37 @@ export class MinimaxClient {
     return { lyrics };
   }
 
+  // MiniMax-M2.7 是 reasoning model：max_tokens 包含 reasoning_tokens，
+  // ≤1000 时几乎全部 token 都被 reasoning 吃掉、content 为空。这里默认 2000，
+  // 实测能稳定拿到完整 [verse]/[chorus] 输出。
+  async chatCompletion(input: {
+    model?: string;
+    messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>;
+    maxTokens?: number;
+    temperature?: number;
+  }): Promise<{ content: string }> {
+    const body = {
+      model: input.model ?? 'MiniMax-M2.7',
+      messages: input.messages,
+      max_tokens: input.maxTokens ?? 2000,
+      temperature: input.temperature ?? 0.9,
+    };
+    const response = await this.postJson<{
+      choices?: Array<{ message?: { content?: string } }>;
+      base_resp?: MinimaxBaseResp;
+    }>('/v1/text/chatcompletion_v2', body);
+    this.assertSuccess(response.base_resp, 'chat completion');
+    const content = response.choices?.[0]?.message?.content?.trim() ?? '';
+    if (!content) {
+      throw new MinimaxClientError(
+        'MINIMAX_CHAT_EMPTY',
+        'chat completion returned empty content',
+        true,
+      );
+    }
+    return { content };
+  }
+
   async downloadBinary(
     url: string,
     opts?: { maxBytes?: number },
