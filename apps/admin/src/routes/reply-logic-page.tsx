@@ -180,12 +180,10 @@ export function ReplyLogicPage() {
   const [sceneInteractiveOpen, setSceneInteractiveOpen] = useState(false);
 
   function setScope(next: InspectorScope) {
-    setScopeState((current) => {
-      if (current !== next) {
-        setActiveTab("snapshot");
-      }
-      return next;
-    });
+    if (scope !== next) {
+      setActiveTab("snapshot");
+    }
+    setScopeState(next);
   }
 
   const overviewQuery = useQuery({
@@ -593,7 +591,7 @@ export function ReplyLogicPage() {
 
       {overview ? (
         <>
-          <div className="sticky top-0 z-10 -mx-4 sm:-mx-6 border-b border-[color:var(--border-faint)] bg-[color:var(--surface-app)]/95 px-4 sm:px-6 py-3 backdrop-blur">
+          <div className="sticky top-20 z-10 -mx-4 sm:-mx-6 lg:-mx-8 border-b border-[color:var(--border-faint)] bg-[color:var(--surface-app)]/95 px-4 sm:px-6 lg:px-8 py-3 backdrop-blur">
             <div className="flex flex-wrap items-center gap-3">
               <div className="inline-flex rounded-[14px] border border-[color:var(--border-faint)] p-0.5">
                 <button
@@ -881,7 +879,7 @@ export function ReplyLogicPage() {
                             { value: "", label: t(msg`未设置 / 交给调度`) },
                             ...ACTIVITY_OPTIONS.map((item) => ({
                               value: item.value,
-                              label: item.label,
+                              label: t(item.label),
                             })),
                           ]}
                         />
@@ -3345,7 +3343,7 @@ function RuntimeRulesEditorCard({
                   }
                   options={ACTIVITY_OPTIONS.map((item) => ({
                     value: item.value,
-                    label: item.label,
+                    label: t(item.label),
                   }))}
                 />
               </div>
