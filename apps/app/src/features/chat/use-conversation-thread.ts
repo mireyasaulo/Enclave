@@ -399,6 +399,19 @@ export function useConversationThread(conversationId: string) {
     },
   });
 
+  // mutationFn 抛错（socket-disconnected 等）后 onError 已把消息标 failed，
+  // 调用方只是用 await 做顺序控制（追踪/滚动），不需要看到 rejection。
+  // 不吞会落到 unhandledrejection → 污染 telemetry errors 列表。
+  const runSendMutation = async (
+    input: Parameters<typeof sendMutation.mutateAsync>[0],
+  ) => {
+    try {
+      await sendMutation.mutateAsync(input);
+    } catch {
+      // onError 已处理
+    }
+  };
+
   const sendTextMessage = async (overrideText?: string) => {
     const trimmed = (overrideText ?? text).trim();
     if (!trimmed || !ownerId) {
@@ -416,7 +429,7 @@ export function useConversationThread(conversationId: string) {
       throw new Error(t(msg`The target character is not ready yet.`));
     }
 
-    await sendMutation.mutateAsync({
+    await runSendMutation({
       payload: {
         conversationId,
         characterId: targetCharacterId,
@@ -444,7 +457,7 @@ export function useConversationThread(conversationId: string) {
       throw new Error(t(msg`The target character is not ready yet.`));
     }
 
-    await sendMutation.mutateAsync({
+    await runSendMutation({
       payload: {
         conversationId,
         characterId: targetCharacterId,
@@ -491,7 +504,7 @@ export function useConversationThread(conversationId: string) {
         throw new Error(t(msg`图片上传结果异常。`));
       }
 
-      await sendMutation.mutateAsync({
+      await runSendMutation({
         payload: {
           conversationId,
           characterId: targetCharacterId,
@@ -512,7 +525,7 @@ export function useConversationThread(conversationId: string) {
         throw new Error(t(msg`文件上传结果异常。`));
       }
 
-      await sendMutation.mutateAsync({
+      await runSendMutation({
         payload: {
           conversationId,
           characterId: targetCharacterId,
@@ -536,7 +549,7 @@ export function useConversationThread(conversationId: string) {
         throw new Error(t(msg`语音上传结果异常。`));
       }
 
-      await sendMutation.mutateAsync({
+      await runSendMutation({
         payload: {
           conversationId,
           characterId: targetCharacterId,
@@ -549,7 +562,7 @@ export function useConversationThread(conversationId: string) {
     }
 
     if (payload.type === "contact_card") {
-      await sendMutation.mutateAsync({
+      await runSendMutation({
         payload: {
           conversationId,
           characterId: targetCharacterId,
@@ -561,7 +574,7 @@ export function useConversationThread(conversationId: string) {
       return;
     }
 
-    await sendMutation.mutateAsync({
+    await runSendMutation({
       payload: {
         conversationId,
         characterId: targetCharacterId,
@@ -601,7 +614,7 @@ export function useConversationThread(conversationId: string) {
         throw new Error(t(msg`这条消息暂时无法重试发送。`));
       }
 
-      await sendMutation.mutateAsync({
+      await runSendMutation({
         payload,
         retryMessageId: messageId,
       });
