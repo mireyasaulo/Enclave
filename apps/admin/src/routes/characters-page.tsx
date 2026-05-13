@@ -1,4 +1,11 @@
-import { useDeferredValue, useEffect, useEffectEvent, useMemo, useState } from "react";
+import {
+  useDeferredValue,
+  useEffect,
+  useEffectEvent,
+  useMemo,
+  useState,
+  type KeyboardEvent,
+} from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { msg } from "@lingui/macro";
@@ -11,7 +18,6 @@ import {
   StatusPill,
 } from "@yinjie/ui";
 import {
-  AdminCallout,
   AdminDangerZone,
   AdminEmptyState,
   AdminErrorState,
@@ -223,7 +229,7 @@ export function CharactersPage() {
     friendFilter !== "all";
 
   const activeFilterLabels = useMemo(() => {
-    const labels = [t(msg`当前结果 ${filteredCharacters.length} 个`)];
+    const labels: string[] = [];
     if (search.trim()) {
       labels.push(t(msg`关键词：${search.trim()}`));
     }
@@ -236,22 +242,9 @@ export function CharactersPage() {
     if (relationshipFilter !== "all") {
       labels.push(t(msg`关系：${formatRelationshipType(relationshipFilter)}`));
     }
-    if (selectedCharacter) {
-      labels.push(t(msg`当前选中：${selectedCharacter.name}`));
-    }
     return labels;
-  }, [
-    filteredCharacters.length,
-    friendFilter,
-    relationshipFilter,
-    search,
-    selectedCharacter,
-    statusFilter,
-  ]);
+  }, [friendFilter, relationshipFilter, search, statusFilter]);
 
-  const leadTone = resolveLeadTone(summary);
-  const leadTitle = resolveLeadTitle(summary);
-  const leadDescription = resolveLeadDescription(summary, filteredCharacters.length);
   const emptyWorld =
     !charactersQuery.isLoading &&
     !charactersQuery.isError &&
@@ -266,6 +259,18 @@ export function CharactersPage() {
 
   function openCharacterInRegistry(characterId: string) {
     setSelectedCharacterId(characterId);
+    setWorkspaceTab("registry");
+  }
+
+  function jumpToRegistryWithFilter(filter: {
+    friend?: FriendFilter;
+    status?: StatusFilter;
+    relationship?: Character["relationshipType"] | "all";
+  }) {
+    setSearch("");
+    setFriendFilter(filter.friend ?? "all");
+    setStatusFilter(filter.status ?? "all");
+    setRelationshipFilter(filter.relationship ?? "all");
     setWorkspaceTab("registry");
   }
 
@@ -325,41 +330,6 @@ export function CharactersPage() {
         ]}
       />
 
-      <AdminCallout
-        title={leadTitle}
-        description={leadDescription}
-        tone={leadTone}
-        actions={
-          emptyWorld ? (
-            <>
-              <Link to="/characters/$characterId" params={{ characterId: "new" }}>
-                <Button variant="primary">{t(msg`新建第一个角色`)}</Button>
-              </Link>
-              <Link to="/characters/wechat-sync">
-                <Button variant="secondary">{t(msg`先从联系人导入`)}</Button>
-              </Link>
-            </>
-          ) : (
-            <>
-              <Button
-                variant="secondary"
-                onClick={() => setWorkspaceTab("registry")}
-              >
-                {t(msg`打开角色名册`)}
-              </Button>
-              {selectedCharacter ? (
-                <Button
-                  variant="primary"
-                  onClick={() => openCharacterInRegistry(selectedCharacter.id)}
-                >
-                  {t(msg`查看当前选中角色`)}
-                </Button>
-              ) : null}
-            </>
-          )
-        }
-      />
-
       <AdminTabs
         tabs={WORKSPACE_TAB_MESSAGES.map((tab) => ({ key: tab.key, label: t(tab.label) }))}
         activeKey={workspaceTab}
@@ -385,81 +355,6 @@ export function CharactersPage() {
         ) : (
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_360px]">
             <div className="space-y-6">
-              <Card className="bg-[color:var(--surface-console)]">
-                <AdminSectionHeader
-                  title={t(msg`角色池结构`)}
-                  actions={
-                    <StatusPill tone={summary.onlineCount > 0 ? "healthy" : "muted"}>
-                      {t(msg`在线 ${summary.onlineCount} / ${summary.totalCount}`)}
-                    </StatusPill>
-                  }
-                />
-                <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                  <MetricCard label={t(msg`世界角色`)} value={summary.worldCount} />
-                  <MetricCard label={t(msg`离线角色`)} value={summary.offlineCount} />
-                  <MetricCard label={t(msg`手动托管`)} value={summary.manualManagedCount} />
-                  <MetricCard label={t(msg`资料待补齐`)} value={summary.incompleteProfileCount} />
-                  <MetricCard label={t(msg`联系人导入`)} value={summary.wechatImportedCount} />
-                  <MetricCard label={t(msg`近 7 天活跃`)} value={summary.recentActiveCount} />
-                </div>
-              </Card>
-
-              <div className="grid gap-6 xl:grid-cols-2">
-                <Card className="bg-[color:var(--surface-console)]">
-                  <AdminSectionHeader title={t(msg`关系分布`)} />
-                  <div className="mt-4 grid gap-3">
-                    {summary.relationshipBreakdown.map((item) => (
-                      <AdminValueCard
-                        key={item.label}
-                        label={item.label}
-                        value={t(msg`${item.count} 个角色`)}
-                      />
-                    ))}
-                  </div>
-                </Card>
-
-                <Card className="bg-[color:var(--surface-console)]">
-                  <AdminSectionHeader title={t(msg`来源分布`)} />
-                  <div className="mt-4 grid gap-3">
-                    {summary.sourceBreakdown.map((item) => (
-                      <AdminValueCard
-                        key={item.label}
-                        label={item.label}
-                        value={t(msg`${item.count} 个角色`)}
-                      />
-                    ))}
-                  </div>
-                </Card>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <Card className="bg-[color:var(--surface-console)]">
-                <AdminSectionHeader title={t(msg`运营动作`)} />
-                <div className="mt-4 space-y-3">
-                  <Link to="/characters/$characterId" params={{ characterId: "new" }}>
-                    <Button variant="primary" className="w-full justify-center">
-                      {t(msg`新建角色`)}
-                    </Button>
-                  </Link>
-                  <Link to="/characters/wechat-sync">
-                    <Button variant="secondary" className="w-full justify-center">
-                      {t(msg`打开微信朋友同步`)}
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="secondary"
-                    className="w-full justify-center"
-                    onClick={() => setWorkspaceTab("registry")}
-                  >
-                    {t(msg`进入角色名册`)}
-                  </Button>
-                </div>
-                <AdminSoftBox className="mt-4 leading-6">
-                  {resolveOpsSuggestion(summary)}
-                </AdminSoftBox>
-              </Card>
-
               <Card className="bg-[color:var(--surface-console)]">
                 <AdminSectionHeader
                   title={t(msg`优先关注角色`)}
@@ -502,6 +397,83 @@ export function CharactersPage() {
                     <AdminSoftBox>{t(msg`当前角色池没有明显的待处理角色，可继续扩充或抽查运行状态。`)}</AdminSoftBox>
                   )}
                 </div>
+              </Card>
+
+              <Card className="bg-[color:var(--surface-console)]">
+                <AdminSectionHeader
+                  title={t(msg`角色池结构`)}
+                  actions={
+                    <StatusPill tone={summary.onlineCount > 0 ? "healthy" : "muted"}>
+                      {t(msg`在线 ${summary.onlineCount} / ${summary.totalCount}`)}
+                    </StatusPill>
+                  }
+                />
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <MetricCard
+                    label={t(msg`世界角色`)}
+                    value={summary.worldCount}
+                    {...buildMetricJumpProps(() =>
+                      jumpToRegistryWithFilter({ friend: "world" }),
+                    )}
+                  />
+                  <MetricCard
+                    label={t(msg`离线角色`)}
+                    value={summary.offlineCount}
+                    {...buildMetricJumpProps(() =>
+                      jumpToRegistryWithFilter({ status: "offline" }),
+                    )}
+                  />
+                  <MetricCard label={t(msg`手动托管`)} value={summary.manualManagedCount} />
+                  <MetricCard label={t(msg`资料待补齐`)} value={summary.incompleteProfileCount} />
+                  <MetricCard label={t(msg`联系人导入`)} value={summary.wechatImportedCount} />
+                  <MetricCard label={t(msg`近 7 天活跃`)} value={summary.recentActiveCount} />
+                </div>
+              </Card>
+
+              <div className="grid gap-6 xl:grid-cols-2">
+                <Card className="bg-[color:var(--surface-console)]">
+                  <AdminSectionHeader title={t(msg`关系分布`)} />
+                  <div className="mt-4 grid gap-3">
+                    {summary.relationshipBreakdown.map((item) => (
+                      <AdminValueCard
+                        key={item.label}
+                        label={item.label}
+                        value={t(msg`${item.count} 个角色`)}
+                      />
+                    ))}
+                  </div>
+                </Card>
+
+                <Card className="bg-[color:var(--surface-console)]">
+                  <AdminSectionHeader title={t(msg`来源分布`)} />
+                  <div className="mt-4 grid gap-3">
+                    {summary.sourceBreakdown.map((item) => (
+                      <AdminValueCard
+                        key={item.label}
+                        label={item.label}
+                        value={t(msg`${item.count} 个角色`)}
+                      />
+                    ))}
+                  </div>
+                </Card>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <Card className="bg-[color:var(--surface-console)]">
+                <AdminSectionHeader title={t(msg`下一步建议`)} />
+                <div className="mt-4">
+                  <Button
+                    variant="primary"
+                    className="w-full justify-center"
+                    onClick={() => setWorkspaceTab("registry")}
+                  >
+                    {t(msg`进入角色名册`)}
+                  </Button>
+                </div>
+                <AdminSoftBox className="mt-4 leading-6">
+                  {resolveOpsSuggestion(summary)}
+                </AdminSoftBox>
               </Card>
             </div>
           </div>
@@ -567,13 +539,15 @@ export function CharactersPage() {
                 <option value="custom">{t(msg`自定义`)}</option>
               </AdminPillSelectField>
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {activeFilterLabels.map((label) => (
-                <StatusPill key={label} tone="muted">
-                  {label}
-                </StatusPill>
-              ))}
-            </div>
+            {activeFilterLabels.length ? (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {activeFilterLabels.map((label) => (
+                  <StatusPill key={label} tone="muted">
+                    {label}
+                  </StatusPill>
+                ))}
+              </div>
+            ) : null}
           </Card>
 
           {!filteredCharacters.length && !charactersQuery.isLoading ? (
@@ -766,12 +740,19 @@ export function CharactersPage() {
                       />
                     </div>
 
-                    <AdminSoftBox className="mt-4 leading-6">
-                      {resolveCharacterDetailHint(
-                        selectedCharacter,
-                        friendIds.has(selectedCharacter.id),
-                      )}
-                    </AdminSoftBox>
+                    <div className="mt-3 space-y-3">
+                      <AdminValueCard
+                        label={t(msg`记忆摘要`)}
+                        value={
+                          selectedCharacter.profile.memorySummary?.trim() ||
+                          t(msg`当前还没有记忆摘要。`)
+                        }
+                      />
+                      <AdminValueCard
+                        label={t(msg`模型绑定`)}
+                        value={formatCharacterModelBinding(selectedCharacter)}
+                      />
+                    </div>
                   </Card>
 
                   <Card className="bg-[color:var(--surface-console)]">
@@ -816,31 +797,6 @@ export function CharactersPage() {
                       >
                         {t(msg`从 Wiki 同步该角色`)}
                       </Button>
-                    </div>
-                  </Card>
-
-                  <Card className="bg-[color:var(--surface-console)]">
-                    <AdminSectionHeader title={t(msg`角色画像与路由摘要`)} />
-                    <div className="mt-4 space-y-3">
-                      <AdminValueCard
-                        label={t(msg`记忆摘要`)}
-                        value={
-                          selectedCharacter.profile.memorySummary?.trim() ||
-                          t(msg`当前还没有记忆摘要。`)
-                        }
-                      />
-                      <AdminValueCard
-                        label={t(msg`领域标签`)}
-                        value={
-                          selectedCharacter.expertDomains.length
-                            ? selectedCharacter.expertDomains.join("、")
-                            : t(msg`当前未填写领域标签。`)
-                        }
-                      />
-                      <AdminValueCard
-                        label={t(msg`模型绑定`)}
-                        value={formatCharacterModelBinding(selectedCharacter)}
-                      />
                     </div>
                   </Card>
 
@@ -977,53 +933,6 @@ function compareCharactersForOps(
   return compareAdminText(left.name, right.name);
 }
 
-function resolveLeadTone(summary: CharacterSummary) {
-  if (summary.totalCount === 0 || summary.incompleteProfileCount > 0) {
-    return "warning" as const;
-  }
-  if (summary.manualManagedCount > 0 || summary.overrideRoutingCount > 0) {
-    return "info" as const;
-  }
-  return "success" as const;
-}
-
-function resolveLeadTitle(summary: CharacterSummary) {
-  const t = translateRuntimeMessage;
-  if (summary.totalCount === 0) {
-    return t(msg`当前世界还没有角色名册`);
-  }
-  if (summary.incompleteProfileCount > 0) {
-    return t(msg`${summary.incompleteProfileCount} 个角色资料仍待补齐`);
-  }
-  if (summary.manualManagedCount > 0) {
-    return t(msg`${summary.manualManagedCount} 个角色处于手动托管状态`);
-  }
-  if (summary.overrideRoutingCount > 0) {
-    return t(msg`${summary.overrideRoutingCount} 个角色启用了独立模型路由`);
-  }
-  return t(msg`角色池结构稳定，可以继续扩充或抽查运行状态`);
-}
-
-function resolveLeadDescription(
-  summary: CharacterSummary,
-  filteredCount: number,
-) {
-  const t = translateRuntimeMessage;
-  if (summary.totalCount === 0) {
-    return t(msg`先创建第一个角色，或者从微信朋友同步一批角色，再开始做角色运营。`);
-  }
-  if (summary.incompleteProfileCount > 0) {
-    return t(msg`建议优先补齐 bio、记忆摘要或领域标签，避免角色进入运行台后缺少稳定画像。当前筛选口径命中 ${filteredCount} 个角色。`);
-  }
-  if (summary.manualManagedCount > 0) {
-    return t(msg`建议确认这些角色是否仍需人工锁定在线/活动模式，避免长期与调度器状态脱节。当前筛选口径命中 ${filteredCount} 个角色。`);
-  }
-  if (summary.overrideRoutingCount > 0) {
-    return t(msg`建议继续抽查独立模型角色的路由绑定和备注，确保角色级覆盖仍然符合当前运营口径。当前筛选口径命中 ${filteredCount} 个角色。`);
-  }
-  return t(msg`当前角色池共 ${summary.totalCount} 个角色，其中 ${summary.friendCount} 个已成为好友，可直接进入名册抽查单角色状态。`);
-}
-
 function resolveOpsSuggestion(summary: CharacterSummary) {
   const t = translateRuntimeMessage;
   if (summary.totalCount === 0) {
@@ -1039,15 +948,6 @@ function resolveOpsSuggestion(summary: CharacterSummary) {
     return t(msg`当前有独立模型角色，建议抽查其绑定模型与备注是否仍符合当前配置。`);
   }
   return t(msg`当前结构比较稳定，可以继续扩充角色池，或抽查重点角色的运行台与工厂配置。`);
-}
-
-function resolveCharacterDetailHint(character: Character, isFriend: boolean) {
-  const t = translateRuntimeMessage;
-  const reasons = resolveCharacterAttentionReasons(character, isFriend);
-  if (!reasons.length) {
-    return t(msg`这个角色当前没有明显待处理项，可以直接进入行为管理、运行台或角色工厂继续操作。`);
-  }
-  return t(msg`当前建议：${reasons.join("；")}。`);
 }
 
 function resolveCharacterAttentionReasons(
@@ -1207,6 +1107,22 @@ function formatSourceType(value?: Character["sourceType"]) {
     default:
       return translateRuntimeMessage(msg`未标记来源`);
   }
+}
+
+function buildMetricJumpProps(onJump: () => void) {
+  return {
+    role: "button" as const,
+    tabIndex: 0,
+    onClick: onJump,
+    onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        onJump();
+      }
+    },
+    className:
+      "cursor-pointer transition hover:border-[color:var(--border-subtle)] hover:bg-[color:var(--surface-card-hover)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[color:var(--brand-primary)]",
+  };
 }
 
 function isProtectedCharacter(character: Character) {

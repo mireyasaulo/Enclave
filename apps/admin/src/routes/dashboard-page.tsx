@@ -539,8 +539,8 @@ export function DashboardPage() {
         msg`当前时间 ${localTime ?? unknownLabel} · 位置 ${worldLocation ?? hangzhouLabel} · 天气 ${worldWeather ?? pendingFetchLabel} · 季节 ${worldSeason ?? unknownLabel} · 节日 ${worldHoliday ?? noneLabel}`,
       )
     : t(msg`最新世界快照暂不可用。`);
-  const inferenceGatewayLastError =
-    statusQuery.data?.inferenceGateway.lastError ?? t(msg`无`);
+  const schedulerModeLabel =
+    schedulerQuery.data?.mode ?? t(msg`待初始化`);
   const worldLanguageOptions =
     worldLanguageQuery.data?.options ?? WORLD_LANGUAGE_OPTIONS;
   const activeWorldLanguage = worldLanguageQuery.data?.language ?? "zh-CN";
@@ -580,7 +580,7 @@ export function DashboardPage() {
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="order-2 space-y-6 xl:order-1">
-          <div className="sticky top-0 z-20 -mx-1 flex flex-wrap gap-2 rounded-2xl bg-[color:var(--surface-page)]/95 px-1 py-2 backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-page)]/80">
+          <div className="sticky top-0 z-20 -mx-1 flex flex-wrap gap-2 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)]/95 px-2 py-2 shadow-[var(--shadow-soft)] backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-card)]/80">
             {[
               {
                 label: t(msg`值班总览`),
@@ -783,7 +783,7 @@ export function DashboardPage() {
                 className={cn(
                   "bg-[color:var(--surface-console)]",
                   dutyIssues.length
-                    ? "border-l-4 border-amber-300"
+                    ? "border-l-4 border-l-amber-300"
                     : undefined,
                 )}
               >
@@ -866,7 +866,7 @@ export function DashboardPage() {
                 className={cn(
                   "bg-[color:var(--surface-console)]",
                   worldLanguageDirty
-                    ? "border-l-4 border-amber-300"
+                    ? "border-l-4 border-l-amber-300"
                     : undefined,
                 )}
               >
@@ -1358,30 +1358,25 @@ export function DashboardPage() {
                     </Link>
                   }
                 />
-                <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                  {t(
-                    msg`${evalOverviewQuery.data?.runCount ?? 0} 次运行 / ${evalOverviewQuery.data?.traceCount ?? 0} 条链路`,
-                  )}
-                </p>
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <MetricCard
-                    label={t(msg`数据集`)}
-                    value={evalOverviewQuery.data?.datasetCount ?? 0}
-                  />
-                  <MetricCard
-                    label={t(msg`失败运行`)}
-                    value={failedEvalCount}
-                  />
-                  <MetricCard
-                    label={t(msg`回退链路`)}
-                    value={evalOverviewQuery.data?.fallbackTraceCount ?? 0}
-                  />
                   <MetricCard
                     label={t(msg`运行总数`)}
                     value={evalOverviewQuery.data?.runCount ?? 0}
                     detail={t(
                       msg`Trace ${evalOverviewQuery.data?.traceCount ?? 0}`,
                     )}
+                  />
+                  <MetricCard
+                    label={t(msg`失败运行`)}
+                    value={failedEvalCount}
+                  />
+                  <MetricCard
+                    label={t(msg`数据集`)}
+                    value={evalOverviewQuery.data?.datasetCount ?? 0}
+                  />
+                  <MetricCard
+                    label={t(msg`回退链路`)}
+                    value={evalOverviewQuery.data?.fallbackTraceCount ?? 0}
                   />
                 </div>
               </Card>
@@ -1430,9 +1425,7 @@ export function DashboardPage() {
                   actions={
                     <div className="flex flex-wrap items-center gap-2">
                       <StatusPill tone="muted">
-                        {t(
-                          msg`模式：${schedulerQuery.data?.mode ?? t(msg`待初始化`)}`,
-                        )}
+                        {t(msg`模式：${schedulerModeLabel}`)}
                       </StatusPill>
                       <StatusPill
                         tone={hasSchedulerIssues ? "warning" : "healthy"}
