@@ -4997,10 +4997,8 @@ function NoteCardMessage({
   const isDesktop = variant === "desktop";
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
-  // 拉最新笔记数据，让卡片缩略图随原笔记编辑而更新。同一 noteId 的所有可见卡片
-  // 共享缓存，编辑器保存路径 invalidate ["favorite-note", baseUrl, noteId] 时
-  // 会自动触发全部卡片重渲染；笔记被删除或 404 时静默回退到 snapshot，不在气泡上
-  // 突然标红，保持历史消息视觉稳定。
+  // 拉最新笔记数据让缩略图跟原笔记编辑实时同步；笔记被删除时静默回退 snapshot，
+  // 不在历史气泡上突然标红。
   const noteQuery = useQuery({
     queryKey: ["favorite-note", baseUrl, attachment.noteId],
     queryFn: () => getFavoriteNote(attachment.noteId, baseUrl),
@@ -5008,11 +5006,12 @@ function NoteCardMessage({
     staleTime: 30_000,
     retry: false,
   });
-  const document = noteQuery.data;
-  const title = (document?.title?.trim() || attachment.title || "").trim();
-  const excerpt = document?.excerpt?.trim() || attachment.excerpt || "";
-  const tags = document?.tags?.length ? document.tags : attachment.tags;
-  const assets = document?.assets ?? attachment.assets;
+  const noteDocument = noteQuery.data;
+  const title =
+    (noteDocument?.title?.trim() || attachment.title || "").trim();
+  const excerpt = noteDocument?.excerpt?.trim() || attachment.excerpt || "";
+  const tags = noteDocument?.tags?.length ? noteDocument.tags : attachment.tags;
+  const assets = noteDocument?.assets ?? attachment.assets;
   const previewImage = assets.find((asset) => asset.kind === "image");
   const fileCount = assets.filter((asset) => asset.kind === "file").length;
   const card = (
@@ -6610,12 +6609,11 @@ function NoteViewerOverlay({
               <Copy size={16} />
             )
           }
-          canEdit={Boolean(attachment.noteId) && !noteMissing}
+          canEdit={
+            Boolean(attachment.noteId) && !noteMissing && !noteQuery.isLoading
+          }
           onEdit={() => {
             setActionMenuOpen(false);
-            // 把卡片落地页当前路径作为 returnPath，编辑完保存后用户能 leaveEditor 回到这里。
-            // 编辑器 hash 里同时传 noteId 与 draftId=noteId，让"按 noteId 查草稿"路径命中
-            // Fix 1 的初始化逻辑，原文从 API 正确填入。
             const currentPath =
               typeof window !== "undefined" ? window.location.pathname : "/";
             const currentHash =

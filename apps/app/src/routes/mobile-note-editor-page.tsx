@@ -67,6 +67,7 @@ import {
   isFavoriteNoteMissingError,
   mergeNoteAssets,
   normalizeEditorHtml,
+  shouldDiscardEmptyDraftForApi,
   removeFavoriteNoteRecord,
   removeFavoriteNoteSummary,
   resolveNoteTitle,
@@ -441,23 +442,12 @@ function MobileNoteEditor({
       const localDraftRaw =
         readDesktopNoteDraftByNoteId(selectedNoteId) ??
         readDesktopNoteDraft(nextDraftId);
-      // 空草稿 + API 有真实内容时忽略草稿，避免旧版本 bug 残留的空草稿盖掉原文
-      const localDraftIsEmpty =
-        !!localDraftRaw &&
-        !localDraftRaw.contentHtml.trim() &&
-        !localDraftRaw.contentText.trim() &&
-        localDraftRaw.tags.length === 0 &&
-        localDraftRaw.assets.length === 0;
-      const apiHasContent =
-        !!noteQuery.data &&
-        Boolean(
-          noteQuery.data.contentHtml?.trim() ||
-            noteQuery.data.contentText?.trim() ||
-            noteQuery.data.tags?.length ||
-            noteQuery.data.assets?.length,
-        );
-      const localDraft =
-        localDraftIsEmpty && apiHasContent ? null : localDraftRaw;
+      const localDraft = shouldDiscardEmptyDraftForApi(
+        localDraftRaw,
+        noteQuery.data,
+      )
+        ? null
+        : localDraftRaw;
       if (localDraft) {
         const treatLocalDraftAsNewNote = Boolean(missingSelectedNote);
         applyNoteSource({

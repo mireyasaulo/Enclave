@@ -54,6 +54,34 @@ export function buildEditorStateFromDraft(
   };
 }
 
+// 共用于 draft / document 的空判定：normalizeEditorHtml 会剥掉 <p></p>、<p><br></p>
+// 这类编辑器留下的空占位，避免被错认为"有内容"。
+type NoteContentLike = {
+  contentHtml: string;
+  contentText: string;
+  tags: string[];
+  assets: FavoriteNoteAsset[];
+};
+
+export function isNoteContentEmpty(content: NoteContentLike): boolean {
+  return (
+    !normalizeEditorHtml(content.contentHtml) &&
+    !content.contentText.trim() &&
+    content.tags.length === 0 &&
+    content.assets.length === 0
+  );
+}
+
+// 初始化编辑器时，若本地草稿是空（旧版 bug 的残留），且 API 笔记里确实有内容，
+// 走 API 分支而非草稿分支，避免空草稿覆盖原文。
+export function shouldDiscardEmptyDraftForApi(
+  localDraft: DesktopNoteDraftRecord | null | undefined,
+  apiDocument: FavoriteNoteDocument | null | undefined,
+): boolean {
+  if (!localDraft || !apiDocument) return false;
+  return isNoteContentEmpty(localDraft) && !isNoteContentEmpty(apiDocument);
+}
+
 export function buildNoteSnapshot(state: NoteEditorState) {
   return JSON.stringify({
     contentHtml: normalizeEditorHtml(state.contentHtml),
