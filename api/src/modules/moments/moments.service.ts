@@ -1842,8 +1842,9 @@ export class MomentsService implements OnModuleInit {
 
   // ============= MiniMax 音乐贴 / 视频贴 =============
 
-  // 主路径：MiniMax /v1/lyrics_generation（短 prompt，主题 + 风格 + 心境）。
-  // 失败 / 配额耗尽 / 未配置：直接使用本地 composeMusicLyrics 兜底。
+  // 当前 minimax token plan 不覆盖 /v1/lyrics_generation，每次必回 2013
+  // invalid params，所以默认直接用本地 composeMusicLyrics。把 minimax 路径
+  // 留在 MINIMAX_LYRICS_ENABLED=true 之后，等升级了 plan 再打开。
   // 不再走 LLM (n1n) 兜底，避免一首歌 = 一次额外 n1n 调用的放大。
   private async generateLyricsOrFallback(
     characterId: string,
@@ -1852,16 +1853,18 @@ export class MomentsService implements OnModuleInit {
     seedText: string,
   ): Promise<string> {
     const { theme, style } = pickThemeAndStyle(characterId);
-    const prompt = composeLyricsPrompt({
-      name: characterName,
-      theme,
-      style,
-      seedText,
-    });
+    const minimaxLyricsEnabled =
+      (process.env.MINIMAX_LYRICS_ENABLED ?? '').toLowerCase() === 'true';
 
-    if (this.minimaxClient.isConfigured()) {
+    if (minimaxLyricsEnabled && this.minimaxClient.isConfigured()) {
       const reserved = await this.minimaxQuota.tryReserve('lyrics');
       if (reserved) {
+        const prompt = composeLyricsPrompt({
+          name: characterName,
+          theme,
+          style,
+          seedText,
+        });
         try {
           const result = await this.minimaxClient.generateLyrics({ prompt });
           await this.minimaxQuota.commit('lyrics');
