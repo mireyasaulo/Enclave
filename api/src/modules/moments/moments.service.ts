@@ -52,6 +52,15 @@ import { WorldLanguageService } from '../config/world-language.service';
 import type { MinimaxJobEntity } from '../minimax/minimax-job.entity';
 import type { CharacterEntity } from '../characters/character.entity';
 
+// minimax Token Plan 在 lyrics 端点撞 2056 时抛此错，调用方应当跳过整条音乐 moment
+// （chat / music / video 共享同一池子，做下去全是浪费）。
+class MusicQuotaExhaustedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'MusicQuotaExhaustedError';
+  }
+}
+
 export interface MomentInteraction {
   characterId: string;
   characterName: string;
@@ -1883,17 +1892,29 @@ export class MomentsService implements OnModuleInit {
           return result.lyrics;
         } catch (err) {
           await this.minimaxQuota.release('lyrics');
-          // 服务端确认今日 lyrics 额度耗尽 → 标本地不再 reserve，剩余 cron tick 全跳过
+          // 服务端 2056 = Token Plan Max 当日整体耗尽：lyrics / chat / music 共享同一池子。
+          // 既然 music 也满了，做歌词等于白调 n1n —— 同时标记 music-2.6 / music-2.5
+          // exhausted，并抛 skip 错让 scheduleMinimaxMusicMoment 整条放弃。
           if (
             err instanceof MinimaxClientError &&
             err.code === 'MINIMAX_QUOTA_EXHAUSTED'
           ) {
             this.minimaxQuota.markExhaustedToday('lyrics');
+            this.minimaxQuota.markExhaustedToday('music-2.6');
+            this.minimaxQuota.markExhaustedToday('music-2.5');
+            throw new MusicQuotaExhaustedError(
+              `token plan exhausted via lyrics 2056; skip music moment for ${characterName}`,
+            );
           }
           this.logger.warn(
             `minimax lyrics endpoint failed, falling back to minimax LLM: ${(err as Error)?.message}`,
           );
         }
+      } else if (this.minimaxQuota.isExhaustedToday('lyrics')) {
+        // 之前已经撞过 2056 被本地标死 → 同 token plan 的 music 也用不了，整条放弃。
+        throw new MusicQuotaExhaustedError(
+          `lyrics quota already exhausted today; skip music moment for ${characterName}`,
+        );
       } else {
         this.logger.debug(
           'minimax lyrics quota exhausted, falling back to minimax LLM',
@@ -1981,12 +2002,23 @@ export class MomentsService implements OnModuleInit {
     const { theme: seedTheme } = pickThemeAndStyle(char.id);
     const seedText = `${char.name} 此刻心境与「${seedTheme}」相关，请围绕这一画面展开。`;
 
-    const lyrics = await this.generateLyricsOrFallback(
-      char.id,
-      char.name,
-      profile,
-      seedText,
-    );
+    let lyrics: string;
+    try {
+      lyrics = await this.generateLyricsOrFallback(
+        char.id,
+        char.name,
+        profile,
+        seedText,
+      );
+    } catch (err) {
+      if (err instanceof MusicQuotaExhaustedError) {
+        this.logger.log(
+          `skip music moment for ${char.name}: ${err.message}`,
+        );
+        return null;
+      }
+      throw err;
+    }
     const job = await this.minimaxJobs.enqueueMusicJob({
       model: 'music-2.6',
       prompt: composeMusicPrompt(char.name, seedText),
