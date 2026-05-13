@@ -484,6 +484,13 @@ export function translateAppErrorCode(
       return translateRuntimeMessage(msg`默认 self 角色尚未落库。`);
     case "WORLD_OWNER_NOT_FOUND":
       return translateRuntimeMessage(msg`世界主人不存在。`);
+    case "WORLD_OWNER_NAME_TOO_SHORT": {
+      const minLength =
+        typeof params.minLength === "number" ? params.minLength : 2;
+      return translateRuntimeMessage(
+        msg`世界主人昵称至少 ${minLength} 个字。`,
+      );
+    }
     case "OFFICIAL_ACCOUNT_FOLLOW_NOT_FOUND":
       return translateRuntimeMessage(msg`公众号关注关系不存在。`);
     case "OFFICIAL_ACCOUNT_PUSH_NOT_FOUND":

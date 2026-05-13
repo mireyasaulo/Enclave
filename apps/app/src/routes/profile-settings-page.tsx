@@ -178,15 +178,19 @@ export function ProfileSettingsPage() {
     setApiBaseDraft(owner.customApiBase ?? "");
   }, [hydrateOwner, ownerQuery.data]);
 
+  // 历史上 username + signature 永远一起提交，导致老的"w"用户哪怕只想改签名，
+  // 后端校验 username 也会把请求一起拒了。这里只发实际改过的字段。
+  const trimmedDraftName = draftName.trim();
+  const trimmedDraftSignature = draftSignature.trim();
+  const nameDirty = trimmedDraftName !== (username ?? "").trim();
+  const signatureDirty = trimmedDraftSignature !== signature.trim();
+
   const saveProfileMutation = useMutation({
     mutationFn: async () => {
-      const owner = await updateWorldOwner(
-        {
-          username: draftName.trim(),
-          signature: draftSignature.trim(),
-        },
-        baseUrl,
-      );
+      const payload: { username?: string; signature?: string } = {};
+      if (nameDirty) payload.username = trimmedDraftName;
+      if (signatureDirty) payload.signature = trimmedDraftSignature;
+      const owner = await updateWorldOwner(payload, baseUrl);
       queryClient.setQueryData(["world-owner", baseUrl], owner);
       hydrateOwner(owner);
       updateOwnerStore({
@@ -225,7 +229,11 @@ export function ProfileSettingsPage() {
 
   // 与 welcome-page / profile-info-name-page 对齐：昵称至少 2 个字，
   // 避免单字"w"这种 placeholder 式名字混过保存。
-  const canSaveProfile = draftName.trim().length >= 2;
+  // 但是没改昵称的话不挡 save——老"w"用户改签名/头像不应该被波及。
+  const MIN_OWNER_NAME_LENGTH = 2;
+  const nameValid = trimmedDraftName.length >= MIN_OWNER_NAME_LENGTH;
+  const canSaveProfile =
+    (nameDirty || signatureDirty) && (!nameDirty || nameValid);
   const aiSettingsBusy =
     saveApiKeyMutation.isPending || clearApiKeyMutation.isPending;
   const desktopSettingsPath = "/desktop/settings";
