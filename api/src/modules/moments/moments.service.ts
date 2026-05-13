@@ -1923,25 +1923,42 @@ export class MomentsService implements OnModuleInit {
     }
 
     // Tier 2: minimax chatcompletion_v2 + MiniMax-M2.7（tokenplan LLM）
+    // 接入 quota service：撞 2056 后 markExhaustedToday，后续 tick 秒进 Tier3。
     if (this.minimaxClient.isConfigured()) {
-      try {
-        const result = await this.minimaxClient.chatCompletion({
-          model: 'MiniMax-M2.7',
-          messages: [{ role: 'user', content: prompt }],
-          maxTokens: 2000,
-          temperature: 0.9,
-        });
-        const cleaned = ensureVerseChorus(result.content);
-        if (cleaned) {
-          this.logger.log(
-            `lyrics via minimax LLM (M2.7) for ${characterName} [theme=${theme}]`,
-          );
-          return cleaned;
-        }
-      } catch (err) {
-        this.logger.warn(
-          `minimax LLM lyrics failed, falling back to generic LLM: ${(err as Error)?.message}`,
+      const m27Reserved = await this.minimaxQuota.tryReserve('MiniMax-M2.7');
+      if (!m27Reserved) {
+        this.logger.debug(
+          'minimax M2.7 lyrics tier skipped (exhausted/pacing), falling to generic LLM',
         );
+      } else {
+        try {
+          const result = await this.minimaxClient.chatCompletion({
+            model: 'MiniMax-M2.7',
+            messages: [{ role: 'user', content: prompt }],
+            maxTokens: 2000,
+            temperature: 0.9,
+          });
+          await this.minimaxQuota.commit('MiniMax-M2.7');
+          const cleaned = ensureVerseChorus(result.content);
+          if (cleaned) {
+            this.logger.log(
+              `lyrics via minimax LLM (M2.7) for ${characterName} [theme=${theme}]`,
+            );
+            return cleaned;
+          }
+        } catch (err) {
+          await this.minimaxQuota.release('MiniMax-M2.7');
+          if (
+            err instanceof MinimaxClientError &&
+            err.code === 'MINIMAX_QUOTA_EXHAUSTED'
+          ) {
+            // M2.7 chat 也走同 Token Plan，2056 一旦发生今天就不要再试了。
+            await this.minimaxQuota.markExhaustedToday('MiniMax-M2.7');
+          }
+          this.logger.warn(
+            `minimax LLM lyrics failed, falling back to generic LLM: ${(err as Error)?.message}`,
+          );
+        }
       }
     }
 
