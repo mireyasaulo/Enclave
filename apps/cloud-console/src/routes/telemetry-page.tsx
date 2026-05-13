@@ -120,10 +120,12 @@ function OverviewTab({
     dir: "desc",
   });
 
-  // range/worldId/排序切换时回到第 1 页，避免显示空页。
+  // range/worldId 切换时回到第 1 页，避免显示空页。
+  // 排序切换不在此处理：放在 onSortChange handler 里和 setWorldsSort 一起 batch，
+  // 否则会先用"新 sort + 旧 page"发一个被立即取消的请求，让表格多闪一下 loading。
   useEffect(() => {
     setWorldsPage(1);
-  }, [range, worldId, worldsSort.by, worldsSort.dir]);
+  }, [range, worldId]);
 
   const overview = useQuery({
     queryKey: ["telemetry", "overview", range, appId ?? "all", worldId ?? "all"],
@@ -208,7 +210,10 @@ function OverviewTab({
             data={topWorlds.data}
             onPageChange={setWorldsPage}
             sort={worldsSort}
-            onSortChange={setWorldsSort}
+            onSortChange={(next) => {
+              setWorldsSort(next);
+              setWorldsPage(1);
+            }}
           />
         ) : null
       ) : null}

@@ -569,7 +569,7 @@ export class TelemetryService {
       .getRawOne<{ total: string | number }>();
     const total = toInt(totalRow?.total ?? 0);
 
-    const rows = await this.events
+    const rowsQb = this.events
       .createQueryBuilder("e")
       .select("e.worldId", "worldId")
       .addSelect("COUNT(*)", "eventCount")
@@ -581,8 +581,10 @@ export class TelemetryService {
       .where("e.worldId IS NOT NULL")
       .andWhere("e.occurredAt >= :start", { start: startIso })
       .groupBy("e.worldId")
-      .orderBy(sortBy, sortDir)
-      .addOrderBy("eventCount", "DESC")
+      .orderBy(sortBy, sortDir);
+    // 非 eventCount 列做 tiebreaker，保证同值时分页稳定。
+    if (sortBy !== "eventCount") rowsQb.addOrderBy("eventCount", "DESC");
+    const rows = await rowsQb
       .limit(pageSize)
       .offset(offset)
       .getRawMany<{

@@ -122,14 +122,6 @@ export function TelemetryTopWorldsTable({
             .replace("{start}", String(rangeStart))
             .replace("{end}", String(rangeEnd))
             .replace("{total}", String(total))}
-          {totalPages > 1 ? (
-            <>
-              {" · "}
-              {t("Page {current} of {total}")
-                .replace("{current}", String(page))
-                .replace("{total}", String(totalPages))}
-            </>
-          ) : null}
         </div>
         {onPageChange ? (
           <Pager
