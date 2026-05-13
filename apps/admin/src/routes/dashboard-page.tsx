@@ -10,7 +10,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import {
-  CHAT_EVENTS,
   CHAT_NAMESPACE,
   exportDiagnostics,
   getAiModel,
@@ -275,8 +274,6 @@ export function DashboardPage() {
   const previewMoments = momentsQuery.data?.slice(0, 3) ?? [];
   const previewFeedPosts = feedQuery.data?.posts.slice(0, 3) ?? [];
   const previewRooms = realtimeQuery.data?.rooms.slice(0, 6) ?? [];
-  const previewRealtimeEvents =
-    realtimeQuery.data?.recentEvents.slice(0, 6) ?? [];
   const previewLogs = logsQuery.data?.slice(0, 6) ?? [];
   const recentSchedulerRuns = schedulerQuery.data?.recentRuns.slice(0, 5) ?? [];
   const runningSchedulerJobId = schedulerRunMutation.isPending
@@ -745,11 +742,6 @@ export function DashboardPage() {
                     value={adminStatsQuery.data?.totalMessages ?? 0}
                     detail={t(msg`含全部单聊历史消息`)}
                   />
-                  <MetricCard
-                    label={t(msg`智能回复`)}
-                    value={adminStatsQuery.data?.aiMessages ?? 0}
-                    detail={t(msg`已落库的 AI 回复条数`)}
-                  />
                 </div>
 
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -1177,22 +1169,27 @@ export function DashboardPage() {
                   />
                 </div>
 
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <AdminSoftBox>
-                    {t(msg`数字人模式`)}：{digitalHumanSummary.modeLabel} ·{" "}
-                    {t(msg`状态`)}：{digitalHumanSummary.statusLabel}
-                  </AdminSoftBox>
-                  <AdminSoftBox>
-                    {t(msg`播放器模板`)}：{digitalHumanSummary.templateStatus}
-                  </AdminSoftBox>
-                  <AdminSoftBox>
-                    {t(msg`回调鉴权`)}：
-                    {digitalHumanSummary.callbackTokenStatus}
-                  </AdminSoftBox>
-                  <AdminSoftBox>
-                    {t(msg`扩展参数`)}：{digitalHumanSummary.paramsStatus}
-                  </AdminSoftBox>
-                </div>
+                <details className="mt-4 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-3">
+                  <summary className="cursor-pointer select-none text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                    {t(msg`数字人配置详情`)}
+                  </summary>
+                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                    <AdminSoftBox>
+                      {t(msg`数字人模式`)}：{digitalHumanSummary.modeLabel} ·{" "}
+                      {t(msg`状态`)}：{digitalHumanSummary.statusLabel}
+                    </AdminSoftBox>
+                    <AdminSoftBox>
+                      {t(msg`播放器模板`)}：{digitalHumanSummary.templateStatus}
+                    </AdminSoftBox>
+                    <AdminSoftBox>
+                      {t(msg`回调鉴权`)}：
+                      {digitalHumanSummary.callbackTokenStatus}
+                    </AdminSoftBox>
+                    <AdminSoftBox>
+                      {t(msg`扩展参数`)}：{digitalHumanSummary.paramsStatus}
+                    </AdminSoftBox>
+                  </div>
+                </details>
 
                 <InlineNotice
                   className="mt-4"
@@ -1267,83 +1264,88 @@ export function DashboardPage() {
 
               <Card className="bg-[color:var(--surface-console)]">
                 <AdminSectionHeader
-                  title={t(msg`朋友圈样本`)}
-                  actions={<AdminMetaText>{t(msg`最近 3 条`)}</AdminMetaText>}
+                  title={t(msg`内容样本`)}
+                  actions={<AdminMetaText>{t(msg`各最近 3 条`)}</AdminMetaText>}
                 />
-                <div className="mt-4 space-y-3">
-                  {previewMoments.length ? (
-                    previewMoments.map((moment) => (
-                      <ListItemCard
-                        key={moment.id}
-                        className="py-3"
-                        title={moment.authorName}
-                        actions={
-                          <AdminMetaText>
-                            {t(
-                              msg`${moment.likeCount} 赞 / ${moment.commentCount} 评论`,
-                            )}
-                          </AdminMetaText>
-                        }
-                        body={
-                          <div className="line-clamp-3 whitespace-pre-wrap">
-                            {moment.text?.trim() || t(msg`暂无正文`)}
-                          </div>
-                        }
-                        footer={<AdminMetaText>{moment.id}</AdminMetaText>}
-                      />
-                    ))
-                  ) : (
-                    <AdminPanelEmpty
-                      message={
-                        momentsQuery.error instanceof Error
-                          ? momentsQuery.error.message
-                          : t(
-                              msg`新核心接口进程启动后，朋友圈兼容路由即可正常使用。`,
-                            )
-                      }
-                    />
-                  )}
-                </div>
-              </Card>
-
-              <Card className="bg-[color:var(--surface-console)]">
-                <AdminSectionHeader
-                  title={t(msg`广场动态样本`)}
-                  actions={<AdminMetaText>{t(msg`最近 3 条`)}</AdminMetaText>}
-                />
-                <div className="mt-4 space-y-3">
-                  {previewFeedPosts.length ? (
-                    previewFeedPosts.map((post) => (
-                      <ListItemCard
-                        key={post.id}
-                        className="py-3"
-                        title={post.authorName}
-                        actions={
-                          <AdminMetaText>
-                            {t(
-                              msg`${post.likeCount} 赞 / ${post.commentCount} 评论`,
-                            )}
-                          </AdminMetaText>
-                        }
-                        body={
-                          <div className="line-clamp-3 whitespace-pre-wrap">
-                            {post.text?.trim() || t(msg`暂无正文`)}
-                          </div>
-                        }
-                        footer={<AdminMetaText>{post.id}</AdminMetaText>}
-                      />
-                    ))
-                  ) : (
-                    <AdminPanelEmpty
-                      message={
-                        feedQuery.error instanceof Error
-                          ? feedQuery.error.message
-                          : t(
-                              msg`新核心接口进程启动后，广场兼容路由即可正常使用。`,
-                            )
-                      }
-                    />
-                  )}
+                <div className="mt-4 space-y-5">
+                  <div>
+                    <div className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                      {t(msg`朋友圈`)}
+                    </div>
+                    <div className="space-y-3">
+                      {previewMoments.length ? (
+                        previewMoments.map((moment) => (
+                          <ListItemCard
+                            key={moment.id}
+                            className="py-3"
+                            title={moment.authorName}
+                            actions={
+                              <AdminMetaText>
+                                {t(
+                                  msg`${moment.likeCount} 赞 / ${moment.commentCount} 评论`,
+                                )}
+                              </AdminMetaText>
+                            }
+                            body={
+                              <div className="line-clamp-3 whitespace-pre-wrap">
+                                {moment.text?.trim() || t(msg`暂无正文`)}
+                              </div>
+                            }
+                            footer={<AdminMetaText>{moment.id}</AdminMetaText>}
+                          />
+                        ))
+                      ) : (
+                        <AdminPanelEmpty
+                          message={
+                            momentsQuery.error instanceof Error
+                              ? momentsQuery.error.message
+                              : t(
+                                  msg`新核心接口进程启动后，朋友圈兼容路由即可正常使用。`,
+                                )
+                          }
+                        />
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                      {t(msg`广场动态`)}
+                    </div>
+                    <div className="space-y-3">
+                      {previewFeedPosts.length ? (
+                        previewFeedPosts.map((post) => (
+                          <ListItemCard
+                            key={post.id}
+                            className="py-3"
+                            title={post.authorName}
+                            actions={
+                              <AdminMetaText>
+                                {t(
+                                  msg`${post.likeCount} 赞 / ${post.commentCount} 评论`,
+                                )}
+                              </AdminMetaText>
+                            }
+                            body={
+                              <div className="line-clamp-3 whitespace-pre-wrap">
+                                {post.text?.trim() || t(msg`暂无正文`)}
+                              </div>
+                            }
+                            footer={<AdminMetaText>{post.id}</AdminMetaText>}
+                          />
+                        ))
+                      ) : (
+                        <AdminPanelEmpty
+                          message={
+                            feedQuery.error instanceof Error
+                              ? feedQuery.error.message
+                              : t(
+                                  msg`新核心接口进程启动后，广场兼容路由即可正常使用。`,
+                                )
+                          }
+                        />
+                      )}
+                    </div>
+                  </div>
                 </div>
               </Card>
 
@@ -1358,25 +1360,20 @@ export function DashboardPage() {
                     </Link>
                   }
                 />
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <MetricCard
-                    label={t(msg`运行总数`)}
-                    value={evalOverviewQuery.data?.runCount ?? 0}
-                    detail={t(
-                      msg`Trace ${evalOverviewQuery.data?.traceCount ?? 0}`,
-                    )}
-                  />
+                <div className="mt-4">
                   <MetricCard
                     label={t(msg`失败运行`)}
                     value={failedEvalCount}
-                  />
-                  <MetricCard
-                    label={t(msg`数据集`)}
-                    value={evalOverviewQuery.data?.datasetCount ?? 0}
-                  />
-                  <MetricCard
-                    label={t(msg`回退链路`)}
-                    value={evalOverviewQuery.data?.fallbackTraceCount ?? 0}
+                    meta={
+                      hasEvalFailures ? (
+                        <StatusPill tone="warning">{t(msg`注意`)}</StatusPill>
+                      ) : (
+                        <StatusPill tone="healthy">{t(msg`无异常`)}</StatusPill>
+                      )
+                    }
+                    detail={t(
+                      msg`其它指标（运行总数 / 数据集 / 回退链路）已收敛到评测页查看。`,
+                    )}
                   />
                 </div>
               </Card>
@@ -1649,33 +1646,6 @@ export function DashboardPage() {
                   )}
                 </div>
 
-                <AdminDetailPanel
-                  className="mt-4"
-                  title={t(msg`最近实时事件`)}
-                  contentClassName="space-y-2"
-                >
-                  {previewRealtimeEvents.length ? (
-                    previewRealtimeEvents.map((event) => (
-                      <ListItemCard
-                        key={event}
-                        className="py-3"
-                        title={event}
-                      />
-                    ))
-                  ) : (
-                    <div>{t(msg`当前还没有实时事件。`)}</div>
-                  )}
-                </AdminDetailPanel>
-
-                <AdminDetailPanel
-                  className="mt-4"
-                  title={t(msg`事件契约`)}
-                  contentClassName="grid gap-2 sm:grid-cols-2"
-                >
-                  {Object.values(CHAT_EVENTS).map((eventName) => (
-                    <AdminSoftBox key={eventName}>{eventName}</AdminSoftBox>
-                  ))}
-                </AdminDetailPanel>
               </Card>
             </div>
           </div>
@@ -1917,37 +1887,6 @@ export function DashboardPage() {
                 description={successNotice}
               />
             ) : null}
-
-            <Card className="bg-[color:var(--surface-console)]">
-              <AdminSectionHeader
-                title={t(msg`当前值班摘要`)}
-                actions={
-                  <StatusPill tone={overallTone}>{overallLabel}</StatusPill>
-                }
-              />
-              <div className="mt-4 grid gap-3 grid-cols-2">
-                <AdminSoftBox>
-                  {t(msg`阻塞项`)}：{blockerCount}
-                </AdminSoftBox>
-                <AdminSoftBox>
-                  {t(msg`关注项`)}：{watchItemCount}
-                </AdminSoftBox>
-                <AdminSoftBox>
-                  {t(msg`最近日志`)}：{logsQuery.data?.length ?? 0}
-                </AdminSoftBox>
-                <AdminSoftBox>
-                  {t(msg`活跃调度任务`)}：{enabledSchedulerJobCount}
-                </AdminSoftBox>
-              </div>
-              <InlineNotice
-                className="mt-4"
-                tone={dutyIssues.length ? "warning" : "success"}
-              >
-                {dutyIssues.length
-                  ? (dutyIssues[0]?.title ?? t(msg`当前存在待处理项。`))
-                  : t(msg`当前首页未发现高优先级阻塞。`)}
-              </InlineNotice>
-            </Card>
 
             <AdminSectionNav
               title={t(msg`页面导航`)}
