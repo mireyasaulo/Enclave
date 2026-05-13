@@ -61,26 +61,50 @@ export class MinimaxClientError extends Error {
 @Injectable()
 export class MinimaxClient {
   private readonly logger = new Logger(MinimaxClient.name);
-  private readonly apiKey: string;
+  // 同进程内的 token plan key 池。:3000 dev-watch 主进程读到根 .env 的
+  // MINIMAX_API_KEYS（多 key）；cloud-api 派的 world child 那边 cloud-api 显式
+  // delete 了 MINIMAX_API_KEYS、只注入单 MINIMAX_API_KEY——所以池子里就 1 个，
+  // 行为与改造前等价。同进程内多 key 时按轮询挑，避免单进程偏置某一把。
+  private readonly apiKeys: readonly string[];
   private readonly baseUrl: string;
+  private callCounter = 0;
 
   constructor(config: ConfigService) {
-    this.apiKey = (config.get<string>('MINIMAX_API_KEY') ?? '').trim();
+    const rawKeys = config.get<string>('MINIMAX_API_KEYS');
+    const rawSingle = config.get<string>('MINIMAX_API_KEY');
+    const fromCsv = (rawKeys ?? '')
+      .split(',')
+      .map((k) => k.trim())
+      .filter((k) => k.length > 0);
+    const single = (rawSingle ?? '').trim();
+    this.apiKeys = fromCsv.length > 0 ? fromCsv : single ? [single] : [];
     this.baseUrl = (
       config.get<string>('MINIMAX_BASE_URL') ?? DEFAULT_BASE_URL
     )
       .replace(/\/+$/, '')
       // 路径都自带 /v1 前缀，base 末尾若也带 /v1 会拼成 /v1/v1/... → 404
       .replace(/\/v1$/, '');
-    if (!this.apiKey) {
+    if (this.apiKeys.length === 0) {
       this.logger.warn(
         'MINIMAX_API_KEY missing — token-plan video/music generation disabled',
+      );
+    } else if (this.apiKeys.length > 1) {
+      const fps = this.apiKeys.map((k) => k.slice(-4)).join(',');
+      this.logger.log(
+        `MinimaxClient using ${this.apiKeys.length} keys round-robin: [${fps}]`,
       );
     }
   }
 
   isConfigured(): boolean {
-    return Boolean(this.apiKey);
+    return this.apiKeys.length > 0;
+  }
+
+  private pickKey(): string {
+    // 轮询：第 1 把、第 2 把、第 1 把… 进程内调用序号 % 池大小。
+    // 单 key 池时永远返回同一把（与改造前等价）。
+    const idx = this.callCounter++ % this.apiKeys.length;
+    return this.apiKeys[idx];
   }
 
   async submitVideo(
@@ -377,13 +401,14 @@ export class MinimaxClient {
     pathname: string,
     body?: unknown,
   ): Promise<T> {
-    if (!this.apiKey) {
+    if (this.apiKeys.length === 0) {
       throw new MinimaxClientError(
         'MINIMAX_API_KEY_MISSING',
         'MINIMAX_API_KEY not configured',
         false,
       );
     }
+    const apiKey = this.pickKey();
     const url = `${this.baseUrl}${pathname}`;
     let response: Response;
     let text: string;
@@ -393,7 +418,7 @@ export class MinimaxClient {
         {
           method,
           headers: {
-            Authorization: `Bearer ${this.apiKey}`,
+            Authorization: `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
           },
           body: method === 'GET' ? undefined : JSON.stringify(body ?? {}),
