@@ -894,9 +894,11 @@ export function ChatRecordsPage() {
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="flex items-center gap-3">
                 <SectionHeading>{t(msg`时间线`)}</SectionHeading>
-                <span className="text-xs text-[color:var(--text-muted)]">
-                  {visibleMessages.length} / {messages.length}
-                </span>
+                {messages.length ? (
+                  <span className="text-xs text-[color:var(--text-muted)]">
+                    {visibleMessages.length} / {messages.length}
+                  </span>
+                ) : null}
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <select
