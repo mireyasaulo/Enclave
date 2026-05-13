@@ -594,6 +594,16 @@ export interface CloudComputeProviderSummary {
   capabilities: CloudComputeProviderCapabilities;
 }
 
+export interface CloudWorldAdminBootstrap {
+  worldId: string;
+  worldName: string;
+  phone: string;
+  email?: string | null;
+  adminFrontendBaseUrl: string;
+  apiBaseUrl: string;
+  adminSecret: string;
+}
+
 export interface CloudWorldBootstrapConfig {
   worldId: string;
   worldName: string;

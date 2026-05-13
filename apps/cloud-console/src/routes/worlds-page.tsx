@@ -436,6 +436,34 @@ export function WorldsPage() {
       showCloudAdminErrorNotice(showNotice, error);
     },
   });
+
+  const enterAdminMutation = useMutation({
+    mutationFn: (worldId: string) =>
+      cloudAdminApi.getWorldAdminBootstrap(worldId),
+    onSuccess: (bootstrap) => {
+      const payload = JSON.stringify({
+        apiBaseUrl: bootstrap.apiBaseUrl,
+        adminSecret: bootstrap.adminSecret,
+        cloudWorldId: bootstrap.worldId,
+        cloudEmail: bootstrap.email ?? undefined,
+      });
+      const encoded =
+        typeof window !== "undefined"
+          ? window
+              .btoa(payload)
+              .replace(/\+/g, "-")
+              .replace(/\//g, "_")
+              .replace(/=+$/, "")
+          : "";
+      const url = `${bootstrap.adminFrontendBaseUrl.replace(/\/+$/, "")}/#yinjie-bootstrap=${encoded}`;
+      if (typeof window !== "undefined") {
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+    },
+    onError: (error) => {
+      showCloudAdminErrorNotice(showNotice, error);
+    },
+  });
   const activeConfirm = confirmAction
     ? createWorldActionConfirmationCopy(
         confirmAction.action,
@@ -725,35 +753,53 @@ export function WorldsPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <WorldLifecycleActionButtons
-                        actions={listAllowedWorldActions(
-                          item.world.status,
-                          WORLDS_PAGE_ACTIONS,
-                        )}
-                        world={item.world}
-                        pendingAction={
-                          quickActionMutation.isPending &&
-                          quickActionMutation.variables?.worldId === item.world.id
-                            ? quickActionMutation.variables.action
-                            : null
-                        }
-                        disabled={quickActionMutation.isPending}
-                        onAction={(action) => {
-                          if (requiresWorldActionConfirmation(action)) {
-                            setConfirmAction({
+                      <div className="flex flex-col gap-2">
+                        <WorldLifecycleActionButtons
+                          actions={listAllowedWorldActions(
+                            item.world.status,
+                            WORLDS_PAGE_ACTIONS,
+                          )}
+                          world={item.world}
+                          pendingAction={
+                            quickActionMutation.isPending &&
+                            quickActionMutation.variables?.worldId === item.world.id
+                              ? quickActionMutation.variables.action
+                              : null
+                          }
+                          disabled={quickActionMutation.isPending}
+                          onAction={(action) => {
+                            if (requiresWorldActionConfirmation(action)) {
+                              setConfirmAction({
+                                worldId: item.world.id,
+                                worldName: item.world.name,
+                                action,
+                              });
+                              return;
+                            }
+
+                            quickActionMutation.mutate({
                               worldId: item.world.id,
-                              worldName: item.world.name,
                               action,
                             });
-                            return;
+                          }}
+                        />
+                        <button
+                          type="button"
+                          disabled={
+                            enterAdminMutation.isPending &&
+                            enterAdminMutation.variables === item.world.id
                           }
-
-                          quickActionMutation.mutate({
-                            worldId: item.world.id,
-                            action,
-                          });
-                        }}
-                      />
+                          onClick={() =>
+                            enterAdminMutation.mutate(item.world.id)
+                          }
+                          className="self-start rounded-lg border border-[color:var(--border-faint)] bg-[color:var(--surface-secondary)] px-3 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--text-primary)] hover:border-[color:var(--border-strong)] disabled:opacity-60"
+                        >
+                          {enterAdminMutation.isPending &&
+                          enterAdminMutation.variables === item.world.id
+                            ? t("Opening admin…")
+                            : t("Enter admin")}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

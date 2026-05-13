@@ -17,6 +17,7 @@ import type {
   CloudWaitingSessionSyncTaskListResponse,
   CloudWorldAlertSummary,
   CloudWorldDriftSummary,
+  CloudWorldAdminBootstrap,
   CloudWorldBootstrapConfig,
   CloudWorldInstanceFleetItem,
   CloudWorldLifecycleJobAggregateSummary,
@@ -981,6 +982,11 @@ export const cloudAdminApi = {
   getWorldBootstrapConfig: (worldId: string) =>
     adminFetch<CloudWorldBootstrapConfig>(
       `/worlds/${worldId}/bootstrap-config`,
+    ),
+
+  getWorldAdminBootstrap: (worldId: string) =>
+    adminFetch<CloudWorldAdminBootstrap>(
+      `/worlds/${worldId}/admin-bootstrap`,
     ),
 
   getWorldRuntimeStatus: (worldId: string) =>

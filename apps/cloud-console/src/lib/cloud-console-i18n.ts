@@ -113,6 +113,8 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
       "当前环境无法复制到剪贴板。",
     "Waiting sync task action failed.": "等待同步任务操作失败。",
     "Admin sessions permalink copied.": "管理会话固定链接已复制。",
+    "Enter admin": "进入后台",
+    "Opening admin…": "正在打开后台…",
 
     "Downloaded admin session audit snapshot for": "已下载管理会话审计快照：",
     "Downloaded focused source snapshot for": "已下载聚焦来源快照：",
