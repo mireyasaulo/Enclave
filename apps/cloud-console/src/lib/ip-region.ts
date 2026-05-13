@@ -108,7 +108,9 @@ async function fetchIpRegion(ip: string): Promise<IpRegionInfo> {
 export function useIpRegion(ip: string | null | undefined) {
   const trimmed = typeof ip === "string" ? ip.trim() : "";
   return useQuery({
-    queryKey: ["ip-region", trimmed],
+    // version key 用于在 provider chain / 翻译规则升级后强制 invalidate 旧 cache，
+    // 否则 staleTime=Infinity 会让浏览器继续吐之前那条英文结果。
+    queryKey: ["ip-region", "v2", trimmed],
     queryFn: () => fetchIpRegion(trimmed),
     enabled: Boolean(trimmed),
     // 同一 IP 解析结果几乎不变（后端也有 7 天缓存），前端长期复用

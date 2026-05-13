@@ -1,5 +1,9 @@
 // i18n-ignore-start: server-side log/admin payloads — not user-facing UI.
 import { Injectable, Logger } from "@nestjs/common";
+import {
+  translateChineseCity,
+  translateChineseRegion,
+} from "./cn-region-i18n";
 
 export interface IpRegionLookup {
   ip: string;
@@ -139,18 +143,26 @@ export class IpRegionService {
       if (data.success === false) {
         throw new Error(data.message ?? "lookup failed");
       }
+      // ipwho.is 国内 region/city 是英文，按 CN 词表回填中文；其它国家保持
+      // 英文原值（map miss 时翻译函数直接返回原 region/city）。
+      const isChina = (data.country_code ?? "").toUpperCase() === "CN";
+      const region = isChina
+        ? translateChineseRegion(data.region)
+        : (data.region ?? null);
+      const city = isChina
+        ? translateChineseCity(data.city)
+        : (data.city ?? null);
       return {
         ip,
         countryCode: data.country_code ?? null,
         country: data.country ?? null,
-        region: data.region ?? null,
-        city: data.city ?? null,
+        region,
+        city,
         source: "ipwho.is",
       };
     } finally {
       clearTimeout(timer);
     }
   }
-
 }
 // i18n-ignore-end
