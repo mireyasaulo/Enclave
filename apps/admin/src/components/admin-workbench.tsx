@@ -43,7 +43,7 @@ type AdminActionFeedbackTone = "busy" | "success" | "warning" | "info";
 type AdminPageHeroProps = {
   eyebrow: ReactNode;
   title: ReactNode;
-  description: ReactNode;
+  description?: ReactNode;
   badges?: ReactNode[];
   actions?: ReactNode;
   metrics?: Array<{ label: ReactNode; value: ReactNode }>;
@@ -89,7 +89,9 @@ export function AdminPageHero({
         <div className="max-w-2xl">
           <div className="text-[12px] uppercase tracking-[0.28em] text-[color:var(--text-muted)]">{eyebrow}</div>
           <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">{title}</h2>
-          <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{description}</p>
+          {description ? (
+            <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{description}</p>
+          ) : null}
           {badges?.length ? (
             <div className="mt-3 flex flex-wrap gap-2">
               {badges.map((badge, index) => (
@@ -213,7 +215,7 @@ export function AdminCallout({
   className,
 }: {
   title: ReactNode;
-  description: ReactNode;
+  description?: ReactNode;
   tone?: AdminCalloutTone;
   actions?: ReactNode;
   className?: string;
@@ -235,7 +237,9 @@ export function AdminCallout({
       <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
         <div>
           <div className="text-sm font-semibold text-[color:var(--text-primary)]">{title}</div>
-          <div className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">{description}</div>
+          {description ? (
+            <div className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">{description}</div>
+          ) : null}
         </div>
         {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
       </div>

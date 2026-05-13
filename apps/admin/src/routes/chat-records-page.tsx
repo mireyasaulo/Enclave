@@ -31,7 +31,6 @@ import {
   ToggleChip,
 } from "@yinjie/ui";
 import {
-  AdminCallout,
   AdminEmptyState,
   AdminErrorState,
   AdminInfoRows,
@@ -390,28 +389,6 @@ export function ChatRecordsPage() {
     ? searchMutation.data?.items ?? []
     : [];
   const searchedTotal = searchContextActive ? searchMutation.data?.total ?? 0 : 0;
-  const operatorSummary = useMemo(
-    () =>
-      buildOperatorSummary({
-        detail,
-        includeClearedHistory,
-        focusedMessageId,
-        reviewDirty,
-        searchedTotal,
-        recentCost: tokenUsageQuery.data?.recent30dOverview.estimatedCost ?? null,
-        recentCostCurrency:
-          tokenUsageQuery.data?.recent30dOverview.currency ?? "CNY",
-      }),
-    [
-      detail,
-      focusedMessageId,
-      includeClearedHistory,
-      reviewDirty,
-      searchedTotal,
-      tokenUsageQuery.data?.recent30dOverview.currency,
-      tokenUsageQuery.data?.recent30dOverview.estimatedCost,
-    ],
-  );
 
   function runSearch() {
     if (!activeConversationId) {
@@ -496,7 +473,6 @@ export function ChatRecordsPage() {
       <AdminPageHero
         eyebrow={t(msg`聊天记录`)}
         title={t(msg`世界样本与会话档案`)}
-        description={t(msg`围绕运营主路径重排成"找会话 -> 看上下文 -> 标样本 -> 跳联动台"的工作台，降低扫读和复盘成本。`)}
         actions={
           <div className="flex flex-wrap gap-2">
             {focusedMessageId ? (
@@ -536,22 +512,11 @@ export function ChatRecordsPage() {
         ]}
       />
 
-      <AdminCallout
-        title={operatorSummary.title}
-        description={operatorSummary.description}
-        tone={operatorSummary.tone}
-      />
-
       <div className="grid gap-5 xl:grid-cols-[340px_minmax(0,1fr)_380px]">
         <div className="space-y-5 xl:sticky xl:top-6 xl:self-start xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto xl:pr-1">
           <Card className="space-y-5 bg-[color:var(--surface-console)]">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <SectionHeading>{t(msg`会话导航`)}</SectionHeading>
-                <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                  {t(msg`先锁定会话范围，再进入中间时间线与右侧复盘操作。`)}
-                </p>
-              </div>
+            <div className="flex items-center justify-between gap-3">
+              <SectionHeading>{t(msg`会话导航`)}</SectionHeading>
               {conversationsQuery.isFetching ? (
                 <StatusPill tone="muted">{t(msg`刷新中`)}</StatusPill>
               ) : null}
@@ -603,6 +568,23 @@ export function ChatRecordsPage() {
               </label>
 
               <div className="flex flex-wrap gap-2">
+                {ACTIVITY_WINDOW_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      setActivityWindow(option.value);
+                      setPage(1);
+                    }}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                      activityWindow === option.value
+                        ? "border-[color:var(--border-brand)] bg-[color:var(--surface-card)] text-[color:var(--text-primary)]"
+                        : "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]"
+                    }`}
+                  >
+                    {t(option.label)}
+                  </button>
+                ))}
                 <ToggleChip
                   label={t(msg`显示隐藏会话`)}
                   checked={includeHidden}
@@ -627,26 +609,6 @@ export function ChatRecordsPage() {
                     clearSearchContextState();
                   }}
                 />
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {ACTIVITY_WINDOW_OPTIONS.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => {
-                      setActivityWindow(option.value);
-                      setPage(1);
-                    }}
-                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                      activityWindow === option.value
-                        ? "border-[color:var(--border-brand)] bg-[color:var(--surface-card)] text-[color:var(--text-primary)]"
-                        : "border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]"
-                    }`}
-                  >
-                    {t(option.label)}
-                  </button>
-                ))}
               </div>
             </div>
 
@@ -677,11 +639,7 @@ export function ChatRecordsPage() {
                     <FilterBadge key={label} label={label} />
                   ))}
                 </div>
-              ) : (
-                <div className="mt-3 text-xs text-[color:var(--text-muted)]">
-                  {t(msg`默认视图：全部角色，按最近活跃排序。`)}
-                </div>
-              )}
+              ) : null}
             </div>
 
             <div className="space-y-3">
@@ -745,19 +703,14 @@ export function ChatRecordsPage() {
           ) : (
             <AdminEmptyState
               title={t(msg`先从左侧选择一个会话`)}
-              description={t(msg`选中角色会话后，中间会进入上下文阅读与定位模式，右侧则同步显示复盘和洞察。`)}
+              description={t(msg`选一个会话后开始查看上下文与复盘。`)}
             />
           )}
 
           <Card className="space-y-5 bg-[color:var(--surface-console)]">
-            <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-              <div>
-                <SectionHeading>{t(msg`检索与定位`)}</SectionHeading>
-                <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                  {t(msg`先用关键词、类型、时间窗锁定片段，再切回完整时间线继续浏览。`)}
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <SectionHeading>{t(msg`检索与定位`)}</SectionHeading>
+              <div className="flex flex-wrap items-center gap-2">
                 <Button
                   variant="primary"
                   size="sm"
@@ -782,22 +735,25 @@ export function ChatRecordsPage() {
                     {t(msg`清除命中`)}
                   </Button>
                 ) : null}
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => exportMutation.mutate("markdown")}
-                  disabled={!activeConversationId || exportMutation.isPending}
-                >
-                  {t(msg`导出 Markdown`)}
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => exportMutation.mutate("json")}
-                  disabled={!activeConversationId || exportMutation.isPending}
-                >
-                  {t(msg`导出 JSON`)}
-                </Button>
+                <span className="ml-1 inline-flex items-center gap-1 text-xs text-[color:var(--text-muted)]">
+                  <span>{t(msg`导出`)}</span>
+                  <button
+                    type="button"
+                    onClick={() => exportMutation.mutate("markdown")}
+                    disabled={!activeConversationId || exportMutation.isPending}
+                    className="rounded-full border border-[color:var(--border-faint)] px-2 py-0.5 hover:border-[color:var(--border-subtle)] hover:text-[color:var(--text-primary)] disabled:opacity-50"
+                  >
+                    MD
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => exportMutation.mutate("json")}
+                    disabled={!activeConversationId || exportMutation.isPending}
+                    className="rounded-full border border-[color:var(--border-faint)] px-2 py-0.5 hover:border-[color:var(--border-subtle)] hover:text-[color:var(--text-primary)] disabled:opacity-50"
+                  >
+                    JSON
+                  </button>
+                </span>
               </div>
             </div>
 
@@ -867,55 +823,10 @@ export function ChatRecordsPage() {
                   <FilterBadge key={label} label={label} />
                 ))}
               </div>
-            ) : (
-              <div className="text-xs text-[color:var(--text-muted)]">
-                {t(msg`支持关键词、消息类型、起止日期组合搜索，命中后可直接定位到上下文。`)}
-              </div>
-            )}
+            ) : null}
 
             {exportMutation.error instanceof Error ? (
               <ErrorBlock message={exportMutation.error.message} />
-            ) : null}
-
-            <div className="flex flex-col gap-3 rounded-[22px] border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4 lg:flex-row lg:items-center lg:justify-between">
-              <div className="space-y-1">
-                <div className="text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                  {t(msg`时间线视角`)}
-                </div>
-                <div className="text-sm text-[color:var(--text-secondary)]">
-                  {t(msg`当前展示 ${visibleMessages.length} / ${messages.length} 条消息`)}
-                  {focusedMessageId ? t(msg`，已进入命中上下文模式`) : t(msg`，默认按最新向前浏览`)}。
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <select
-                  value={timelineMessageType}
-                  onChange={(event) =>
-                    setTimelineMessageType(
-                      event.target
-                        .value as AdminChatRecordConversationSearchQuery["messageType"] | "all",
-                    )
-                  }
-                  className="rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-input)] px-3 py-2 text-sm"
-                >
-                  {TYPE_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {t(option.label)}
-                    </option>
-                  ))}
-                </select>
-                {focusedMessageId ? (
-                  <StatusPill tone="warning">{t(msg`定位上下文`)}</StatusPill>
-                ) : (
-                  <StatusPill tone="muted">{t(msg`最新时间线`)}</StatusPill>
-                )}
-              </div>
-            </div>
-
-            {includeClearedHistory ? (
-              <InlineNotice title={t(msg`当前正在查看清空前历史`)}>
-                {t(msg`这里展示数据库仍保留的完整会话样本，可能包含用户在前台已清空的聊天。`)}
-              </InlineNotice>
             ) : null}
 
             {searchContextActive && searchMutation.isPending ? (
@@ -979,31 +890,42 @@ export function ChatRecordsPage() {
             ) : null}
           </Card>
 
-          <Card className="space-y-5 bg-[color:var(--surface-console)]">
-            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-              <div>
+          <Card className="space-y-4 bg-[color:var(--surface-console)]">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-3">
                 <SectionHeading>{t(msg`时间线`)}</SectionHeading>
-                <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                  {t(msg`阅读和判断都在这里完成。用户消息右对齐，角色回复左对齐，系统消息居中展示。`)}
-                </p>
+                <span className="text-xs text-[color:var(--text-muted)]">
+                  {visibleMessages.length} / {messages.length}
+                </span>
               </div>
-              {!focusedMessageId && messagesQuery.data?.pages.at(-1)?.hasMore ? (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => void messagesQuery.fetchNextPage()}
-                  disabled={messagesQuery.isFetchingNextPage}
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  value={timelineMessageType}
+                  onChange={(event) =>
+                    setTimelineMessageType(
+                      event.target
+                        .value as AdminChatRecordConversationSearchQuery["messageType"] | "all",
+                    )
+                  }
+                  className="rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-input)] px-3 py-1.5 text-sm"
                 >
-                  {messagesQuery.isFetchingNextPage
-                    ? t(msg`正在加载更早消息...`)
-                    : t(msg`加载更早消息`)}
-                </Button>
-              ) : null}
+                  {TYPE_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {t(option.label)}
+                    </option>
+                  ))}
+                </select>
+                {focusedMessageId ? (
+                  <StatusPill tone="warning">{t(msg`定位上下文`)}</StatusPill>
+                ) : (
+                  <StatusPill tone="muted">{t(msg`最新时间线`)}</StatusPill>
+                )}
+              </div>
             </div>
 
-            {focusedMessageId ? (
-              <InlineNotice title={t(msg`当前正在查看命中消息附近上下文`)}>
-                {t(msg`如果已经完成判断，可以点击上方"返回最新消息"回到完整时间线继续浏览。`)}
+            {includeClearedHistory ? (
+              <InlineNotice title={t(msg`当前正在查看清空前历史`)}>
+                {t(msg`这里展示数据库仍保留的完整会话样本，可能包含用户在前台已清空的聊天。`)}
               </InlineNotice>
             ) : null}
 
@@ -1054,18 +976,6 @@ export function ChatRecordsPage() {
             <ErrorBlock message={detailQuery.error.message} />
           ) : detail ? (
             <>
-              <AdminCallout
-                title={t(msg`运营动作区`)}
-                tone={reviewDirty ? "warning" : detail.review ? "success" : "info"}
-                description={
-                  reviewDirty
-                    ? t(msg`右侧复盘草稿尚未保存，保存后这段会话才会进入仅看已标记样本的稳定筛选路径。`)
-                    : detail.review
-                      ? `${t(msg`当前已标记为`)}"${formatReviewStatus(detail.review.status)}"，${t(msg`适合继续补标签、备注或联动到回复逻辑台。`)}`
-                      : t(msg`这段会话还没有进入复盘池，建议先给出状态、标签和备注，方便后续回看。`)
-                }
-              />
-
               <Card className="space-y-4 bg-[color:var(--surface-console)]">
                 <div className="flex items-center justify-between gap-3">
                   <SectionHeading>{t(msg`复盘操作`)}</SectionHeading>
@@ -1142,11 +1052,7 @@ export function ChatRecordsPage() {
                         </span>
                       ))}
                     </div>
-                  ) : (
-                    <div className="text-xs text-[color:var(--text-muted)]">
-                      {t(msg`还没有标签，可用上方快捷标签快速沉淀样本特征。`)}
-                    </div>
-                  )}
+                  ) : null}
 
                   <label className="space-y-1">
                     <span className="text-xs font-medium text-[color:var(--text-muted)]">
@@ -1161,7 +1067,7 @@ export function ChatRecordsPage() {
                         }))
                       }
                       rows={6}
-                      placeholder={t(msg`记录这段对话为什么值得复盘、后续应该如何调策略或 Prompt。`)}
+                      placeholder={t(msg`为什么值得复盘？后续怎么调 Prompt？`)}
                       className="w-full rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-input)] px-3 py-2.5 text-sm"
                     />
                   </label>
@@ -1193,11 +1099,7 @@ export function ChatRecordsPage() {
                       </div>
                     </div>
                   </div>
-                ) : (
-                  <InlineNotice title={t(msg`这段会话还没有进入复盘池`)}>
-                    {t(msg`先打一个状态或写几句备注，后面筛"仅看已标记样本"时就能直接回到它。`)}
-                  </InlineNotice>
-                )}
+                ) : null}
 
                 <div className="flex flex-wrap gap-3">
                   <Button
@@ -1224,20 +1126,6 @@ export function ChatRecordsPage() {
                 {deleteReviewMutation.error instanceof Error ? (
                   <ErrorBlock message={deleteReviewMutation.error.message} />
                 ) : null}
-              </Card>
-
-              <Card className="bg-[color:var(--surface-console)]">
-                <SectionHeading>{t(msg`会话概览`)}</SectionHeading>
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <MetricCard label={t(msg`当前口径消息`)} value={detail.stats.messageCount} />
-                  <MetricCard label={t(msg`可见消息`)} value={detail.stats.visibleMessageCount} />
-                  <MetricCard label={t(msg`留存消息`)} value={detail.stats.storedMessageCount} />
-                  <MetricCard label={t(msg`近 30 天消息`)} value={detail.stats.recentMessageCount30d} />
-                  <MetricCard label={t(msg`角色消息`)} value={detail.stats.characterMessageCount} />
-                  <MetricCard label={t(msg`用户消息`)} value={detail.stats.userMessageCount} />
-                  <MetricCard label={t(msg`主动消息`)} value={detail.stats.proactiveMessageCount} />
-                  <MetricCard label={t(msg`附件消息`)} value={detail.stats.attachmentMessageCount} />
-                </div>
               </Card>
 
               <AdminInfoRows
@@ -1268,6 +1156,20 @@ export function ChatRecordsPage() {
                   },
                 ]}
               />
+
+              <Card className="bg-[color:var(--surface-console)]">
+                <SectionHeading>{t(msg`会话概览`)}</SectionHeading>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <MetricCard label={t(msg`当前口径消息`)} value={detail.stats.messageCount} />
+                  <MetricCard label={t(msg`可见消息`)} value={detail.stats.visibleMessageCount} />
+                  <MetricCard label={t(msg`留存消息`)} value={detail.stats.storedMessageCount} />
+                  <MetricCard label={t(msg`近 30 天消息`)} value={detail.stats.recentMessageCount30d} />
+                  <MetricCard label={t(msg`角色消息`)} value={detail.stats.characterMessageCount} />
+                  <MetricCard label={t(msg`用户消息`)} value={detail.stats.userMessageCount} />
+                  <MetricCard label={t(msg`主动消息`)} value={detail.stats.proactiveMessageCount} />
+                  <MetricCard label={t(msg`附件消息`)} value={detail.stats.attachmentMessageCount} />
+                </div>
+              </Card>
 
               <Card className="space-y-4 bg-[color:var(--surface-console)]">
                 <SectionHeading>{t(msg`产品洞察`)}</SectionHeading>
@@ -1335,54 +1237,6 @@ export function ChatRecordsPage() {
                   ]}
                 />
               </Card>
-
-              {detail.character ? (
-                <Card className="space-y-4 bg-[color:var(--surface-console)]">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <div className="text-base font-semibold text-[color:var(--text-primary)]">
-                        {detail.character.name}
-                      </div>
-                      <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-                        {detail.character.relationship}
-                      </div>
-                    </div>
-                    <StatusPill tone={detail.character.isOnline ? "healthy" : "muted"}>
-                      {detail.character.isOnline ? t(msg`在线`) : t(msg`离线`)}
-                    </StatusPill>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {(
-                      detail.character.expertDomains.length
-                        ? detail.character.expertDomains
-                        : [t(msg`未标注领域`)]
-                    ).map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-2.5 py-1 text-xs text-[color:var(--text-secondary)]"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <MetricCard
-                      label={t(msg`当前活动`)}
-                      value={formatActivity(detail.character.currentActivity)}
-                    />
-                    <MetricCard label={t(msg`亲密度`)} value={detail.character.intimacyLevel} />
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    <Link
-                      to="/characters/$characterId/runtime"
-                      params={{ characterId: detail.character.id }}
-                      className="inline-flex items-center justify-center rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] px-3.5 py-2 text-sm font-medium text-[color:var(--text-primary)]"
-                    >
-                      {t(msg`打开运行逻辑台`)}
-                    </Link>
-                  </div>
-                </Card>
-              ) : null}
 
               <Card className="space-y-4 bg-[color:var(--surface-console)]">
                 <SectionHeading>{t(msg`会话级 Token 成本`)}</SectionHeading>
@@ -1494,6 +1348,54 @@ export function ChatRecordsPage() {
                   </>
                 ) : null}
               </Card>
+
+              {detail.character ? (
+                <Card className="space-y-4 bg-[color:var(--surface-console)]">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <div className="text-base font-semibold text-[color:var(--text-primary)]">
+                        {detail.character.name}
+                      </div>
+                      <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
+                        {detail.character.relationship}
+                      </div>
+                    </div>
+                    <StatusPill tone={detail.character.isOnline ? "healthy" : "muted"}>
+                      {detail.character.isOnline ? t(msg`在线`) : t(msg`离线`)}
+                    </StatusPill>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {(
+                      detail.character.expertDomains.length
+                        ? detail.character.expertDomains
+                        : [t(msg`未标注领域`)]
+                    ).map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-2.5 py-1 text-xs text-[color:var(--text-secondary)]"
+                      >
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    <MetricCard
+                      label={t(msg`当前活动`)}
+                      value={formatActivity(detail.character.currentActivity)}
+                    />
+                    <MetricCard label={t(msg`亲密度`)} value={detail.character.intimacyLevel} />
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <Link
+                      to="/characters/$characterId/runtime"
+                      params={{ characterId: detail.character.id }}
+                      className="inline-flex items-center justify-center rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] px-3.5 py-2 text-sm font-medium text-[color:var(--text-primary)]"
+                    >
+                      {t(msg`打开运行逻辑台`)}
+                    </Link>
+                  </div>
+                </Card>
+              ) : null}
             </>
           ) : (
             <AdminEmptyState
@@ -2249,83 +2151,3 @@ function appendReviewTagValue(currentValue: string, tag: string) {
   return tags.join(", ");
 }
 
-function buildOperatorSummary({
-  detail,
-  includeClearedHistory,
-  focusedMessageId,
-  reviewDirty,
-  searchedTotal,
-  recentCost,
-  recentCostCurrency,
-}: {
-  detail: AdminChatRecordConversationDetail | undefined;
-  includeClearedHistory: boolean;
-  focusedMessageId: string;
-  reviewDirty: boolean;
-  searchedTotal: number;
-  recentCost: number | null;
-  recentCostCurrency: "CNY" | "USD";
-}) {
-  const t = translateRuntimeMessage;
-  if (!detail) {
-    return {
-      title: t(msg`先选择一个会话进入工作区`),
-      description: t(msg`左侧锁定角色样本，中间阅读完整上下文，右侧再完成复盘标记和联动操作。`),
-      tone: "muted" as const,
-    };
-  }
-
-  if (reviewDirty) {
-    return {
-      title: t(msg`复盘草稿未保存`),
-      description: t(msg`右侧的状态、标签或备注已经变更，保存后这段会话才能稳定进入样本池筛选。`),
-      tone: "warning" as const,
-    };
-  }
-
-  if (focusedMessageId) {
-    return {
-      title: t(msg`当前处于命中上下文模式`),
-      description: t(msg`时间线围绕一条命中消息展开，适合快速判断片段质量；处理完后可回到最新消息继续浏览全局。`),
-      tone: "info" as const,
-    };
-  }
-
-  if (!detail.review) {
-    return {
-      title: t(msg`建议先把这段会话纳入复盘池`),
-      description: t(msg`当前尚未标记状态、标签和备注。先做样本归档，后续运营回看和过滤才会稳定可用。`),
-      tone: "info" as const,
-    };
-  }
-
-  if (includeClearedHistory) {
-    return {
-      title: t(msg`当前包含清空前历史`),
-      description: t(msg`适合追溯长期样本，但这部分内容用户前台可能已经不可见，操作时要明确这是后台留存口径。`),
-      tone: "warning" as const,
-    };
-  }
-
-  if (searchedTotal > 0) {
-    return {
-      title: `${t(msg`已命中`)} ${searchedTotal} ${t(msg`条搜索结果`)}`,
-      description: t(msg`可以直接点命中片段进入上下文，再结合右侧洞察判断这段样本应归入哪个复盘状态。`),
-      tone: "success" as const,
-    };
-  }
-
-  if (recentCost != null && recentCost > 0) {
-    return {
-      title: t(msg`当前会话可直接进入成本与质量联动判断`),
-      description: `${t(msg`近 30 天成本`)} ${formatCurrency(recentCost, recentCostCurrency)}，${t(msg`建议结合回复节奏、主动消息占比和复盘状态一起判断是否值得继续优化。`)}`,
-      tone: "success" as const,
-    };
-  }
-
-  return {
-    title: t(msg`当前会话已进入稳定查看状态`),
-    description: t(msg`可以继续查看上下文、补充复盘备注，或者跳转到回复逻辑台和 Token 用量页做进一步分析。`),
-    tone: "muted" as const,
-  };
-}
