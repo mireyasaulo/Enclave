@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import type {
   TelemetryTopWorldsResponse,
   TelemetryTopWorldsSortDir,
@@ -24,6 +24,7 @@ export function TelemetryTopWorldsTable({
   onSortChange: (next: TopWorldsSortState) => void;
 }) {
   const t = useCloudConsoleText();
+  const navigate = useNavigate();
   const { rows, total, page, pageSize } = data;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1;
@@ -81,39 +82,49 @@ export function TelemetryTopWorldsTable({
           </tr>
         </thead>
         <tbody className="divide-y divide-(--border-faint)">
-          {rows.map((row) => (
-            <tr
-              key={row.worldId}
-              className="cursor-pointer transition hover:bg-(--surface-soft)"
-            >
-              <Td className="font-medium text-(--text-primary)">
-                <Link
-                  to="/worlds/$worldId"
-                  params={{ worldId: row.worldId }}
-                  className="block hover:text-(--brand-primary)"
-                >
+          {rows.map((row) => {
+            const goToWorld = () =>
+              navigate({
+                to: "/worlds/$worldId",
+                params: { worldId: row.worldId },
+              });
+            return (
+              <tr
+                key={row.worldId}
+                role="link"
+                tabIndex={0}
+                onClick={goToWorld}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    goToWorld();
+                  }
+                }}
+                className="cursor-pointer transition hover:bg-(--surface-soft) focus:bg-(--surface-soft) focus:outline-none"
+              >
+                <Td className="font-medium text-(--text-primary)">
                   {row.ownerEmail ??
                     row.ownerPhone ??
                     row.worldName ??
                     row.worldId.slice(0, 8)}
-                </Link>
-              </Td>
-              <Td align="right" className="font-semibold text-(--text-primary)">
-                {row.eventCount.toLocaleString()}
-              </Td>
-              <Td align="right">{row.uniqueUsers.toLocaleString()}</Td>
-              <Td
-                align="right"
-                className={
-                  row.errorCount > 0
-                    ? "bg-rose-50 font-semibold text-rose-600"
-                    : "text-(--text-secondary)"
-                }
-              >
-                {row.errorCount.toLocaleString()}
-              </Td>
-            </tr>
-          ))}
+                </Td>
+                <Td align="right" className="font-semibold text-(--text-primary)">
+                  {row.eventCount.toLocaleString()}
+                </Td>
+                <Td align="right">{row.uniqueUsers.toLocaleString()}</Td>
+                <Td
+                  align="right"
+                  className={
+                    row.errorCount > 0
+                      ? "bg-rose-50 font-semibold text-rose-600"
+                      : "text-(--text-secondary)"
+                  }
+                >
+                  {row.errorCount.toLocaleString()}
+                </Td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-(--border-faint) px-4 py-2 text-xs text-(--text-secondary)">
@@ -166,6 +177,9 @@ function Th({
   return (
     <th
       scope="col"
+      aria-sort={
+        isActive ? (activeDir === "asc" ? "ascending" : "descending") : "none"
+      }
       className={`px-3 py-2 text-xs font-semibold uppercase tracking-wider ${alignClass} ${isActive ? "text-(--text-primary)" : "text-(--text-muted)"}`}
     >
       <button
