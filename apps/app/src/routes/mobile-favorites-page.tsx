@@ -56,6 +56,16 @@ const FAVORITE_NOTE_SOURCE_PREFIX = "favorite-note-";
 const LONG_PRESS_DURATION_MS = 480;
 const LONG_PRESS_MOVE_THRESHOLD_PX = 8;
 
+function buildScratchDraftId() {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
+    return crypto.randomUUID();
+  }
+  return `note-draft-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+}
+
 function parseFavoriteNoteIdFromSourceId(sourceId: string) {
   return sourceId.startsWith(FAVORITE_NOTE_SOURCE_PREFIX)
     ? sourceId.slice(FAVORITE_NOTE_SOURCE_PREFIX.length) || null
@@ -255,12 +265,16 @@ export function MobileFavoritesPage({
   function handleOpenFavorite(item: DesktopFavoriteRecord) {
     if (item.category === "notes") {
       const noteId = parseFavoriteNoteIdFromSourceId(item.sourceId);
-      const draft = createDesktopNoteDraft({ noteId: noteId ?? undefined });
+      // 不要在这里预创建草稿。createDesktopNoteDraft 会落地一条空 draft，
+      // 编辑器初始化拿到这条空 draft 后会锁死 sessionKey，
+      // 等服务端 note 内容到达时不会再回填（mobile-note-editor-page.tsx:430-514）。
+      // 只生成一个 draftId 字符串塞进 hash，编辑器自己会按 noteId 拉数据回填。
+      const draftId = buildScratchDraftId();
       const safeReturnPath = isDesktopOnlyPath(pathname)
         ? undefined
         : pathname;
       const nextHash = buildMobileNoteEditorRouteHash({
-        draftId: draft.draftId,
+        draftId,
         noteId: noteId ?? undefined,
         returnPath: safeReturnPath,
       });
