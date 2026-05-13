@@ -26,9 +26,9 @@ import {
   cn,
 } from "@yinjie/ui";
 import { AvatarChip } from "../components/avatar-chip";
-import { DesktopLayoutRequiredState } from "../components/desktop-layout-required-state";
 import { EmptyState } from "../components/empty-state";
 import { RouteRedirectState } from "../components/route-redirect-state";
+import { MobileFavoritesPage } from "./mobile-favorites-page";
 import { DesktopUtilityShell } from "../features/shell/desktop-utility-shell";
 import { buildDesktopNoteWindowRouteHash } from "../features/favorites/note-window-route-state";
 import {
@@ -371,14 +371,7 @@ export function FavoritesPage() {
   );
 
   if (!isDesktopLayout) {
-    return (
-      <DesktopLayoutRequiredState
-        title={t(msg`收藏当前仅提供桌面布局`)}
-        description={t(msg`收藏工作区目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到消息页继续浏览和发送收藏内容。`)}
-        actionLabel={t(msg`返回消息`)}
-        fallbackTo="/tabs/chat"
-      />
-    );
+    return <MobileFavoritesPage />;
   }
 
   function openInlineNoteEditor(input?: {
