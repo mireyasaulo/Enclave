@@ -13,7 +13,6 @@ import type {
   AdminChatRecordConversationExportResponse,
   AdminChatRecordConversationListItem,
   AdminChatRecordConversationListQuery,
-  AdminChatRecordConversationReview,
   AdminChatRecordConversationSearchQuery,
   AdminChatRecordReviewStatus,
   Character,
@@ -33,7 +32,6 @@ import {
 import {
   AdminEmptyState,
   AdminErrorState,
-  AdminInfoRows,
   AdminPageHero,
   AdminSkeletonCard,
 } from "../components/admin-workbench";
@@ -90,24 +88,6 @@ const REVIEW_STATUS_OPTIONS: Array<{
   { value: "resolved", label: msg`已处理` },
 ];
 
-const REVIEW_TAG_SUGGESTIONS: Array<{
-  display: ReturnType<typeof msg>;
-  value: string;
-}> = [
-  { display: msg`高需求`, value: "高需求" },
-  { display: msg`高成本`, value: "高成本" },
-  { display: msg`首响偏慢`, value: "首响偏慢" },
-  { display: msg`可复用`, value: "可复用" },
-  { display: msg`需排查`, value: "需排查" },
-  { display: msg`回复优秀`, value: "回复优秀" },
-];
-
-type ReviewDraft = {
-  status: AdminChatRecordReviewStatus;
-  tags: string;
-  note: string;
-};
-
 function readInitialChatRecordsFocus(search?: string) {
   const raw =
     search ?? (typeof window === "undefined" ? "" : window.location.search);
@@ -141,11 +121,6 @@ export function ChatRecordsPage() {
     initialFocus.conversationId,
   );
   const [focusedMessageId, setFocusedMessageId] = useState("");
-  const [reviewDraft, setReviewDraft] = useState<ReviewDraft>({
-    status: "backlog",
-    tags: "",
-    note: "",
-  });
   const [timelineMessageType, setTimelineMessageType] =
     useState<AdminChatRecordConversationSearchQuery["messageType"] | "all">(
       "all",
@@ -256,37 +231,6 @@ export function ChatRecordsPage() {
       }),
     onSuccess: (file) => downloadExportFile(file),
   });
-  const saveReviewMutation = useMutation({
-    mutationFn: () =>
-      chatRecordsAdminApi.upsertConversationReview(activeConversationId, {
-        status: reviewDraft.status,
-        tags: parseReviewTags(reviewDraft.tags),
-        note: reviewDraft.note.trim() || null,
-      }),
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["admin-chat-records-conversations", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["admin-chat-records-detail", baseUrl, activeConversationId],
-        }),
-      ]);
-    },
-  });
-  const deleteReviewMutation = useMutation({
-    mutationFn: () => chatRecordsAdminApi.deleteConversationReview(activeConversationId),
-    onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: ["admin-chat-records-conversations", baseUrl],
-        }),
-        queryClient.invalidateQueries({
-          queryKey: ["admin-chat-records-detail", baseUrl, activeConversationId],
-        }),
-      ]);
-    },
-  });
   const messagesQuery = useInfiniteQuery({
     queryKey: [
       "admin-chat-records-messages",
@@ -311,7 +255,6 @@ export function ChatRecordsPage() {
   });
 
   const detail = detailQuery.data;
-  const review = detail?.review;
   const selectedConversation =
     detail?.conversation ??
     conversations.find((item) => item.id === activeConversationId) ??
@@ -333,32 +276,6 @@ export function ChatRecordsPage() {
   const visibleMessages = useMemo(
     () => messages.filter((message) => matchesMessageType(message, timelineMessageType)),
     [messages, timelineMessageType],
-  );
-
-  useEffect(() => {
-    if (!review) {
-      setReviewDraft({
-        status: "backlog",
-        tags: "",
-        note: "",
-      });
-      return;
-    }
-
-    setReviewDraft({
-      status: review.status,
-      tags: review.tags.join(", "),
-      note: review.note ?? "",
-    });
-  }, [review]);
-
-  const parsedReviewTags = useMemo(
-    () => parseReviewTags(reviewDraft.tags),
-    [reviewDraft.tags],
-  );
-  const reviewDirty = useMemo(
-    () => isReviewDraftDirty(review ?? null, reviewDraft),
-    [review, reviewDraft],
   );
 
   const filterLabels = useMemo(
@@ -439,13 +356,6 @@ export function ChatRecordsPage() {
     clearSearchContextState();
   }
 
-  function appendReviewTag(tag: string) {
-    setReviewDraft((current) => ({
-      ...current,
-      tags: appendReviewTagValue(current.tags, tag),
-    }));
-  }
-
   if (overviewQuery.isLoading && conversationsQuery.isLoading) {
     return <AdminSkeletonCard rows={5} showAction />;
   }
@@ -512,7 +422,7 @@ export function ChatRecordsPage() {
         ]}
       />
 
-      <div className="grid gap-5 xl:grid-cols-[340px_minmax(0,1fr)_380px]">
+      <div className="grid gap-5 xl:grid-cols-[340px_minmax(0,1fr)]">
         <div className="space-y-5 xl:sticky xl:top-6 xl:self-start xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto xl:pr-1">
           <Card className="space-y-5 bg-[color:var(--surface-console)]">
             <div className="flex items-center justify-between gap-3">
@@ -703,7 +613,7 @@ export function ChatRecordsPage() {
           ) : (
             <AdminEmptyState
               title={t(msg`先从左侧选择一个会话`)}
-              description={t(msg`选一个会话后开始查看上下文与复盘。`)}
+              description={t(msg`选一个会话后开始查看上下文。`)}
             />
           )}
 
@@ -969,442 +879,6 @@ export function ChatRecordsPage() {
               </div>
             ) : null}
           </Card>
-        </div>
-
-        <div className="space-y-4 xl:sticky xl:top-6 xl:self-start xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto xl:pr-1">
-          {detailQuery.isLoading ? (
-            <LoadingBlock label={t(msg`正在整理会话洞察...`)} />
-          ) : detailQuery.error instanceof Error ? (
-            <ErrorBlock message={detailQuery.error.message} />
-          ) : detail ? (
-            <>
-              <Card className="space-y-4 bg-[color:var(--surface-console)]">
-                <div className="flex items-center justify-between gap-3">
-                  <SectionHeading>{t(msg`复盘操作`)}</SectionHeading>
-                  {reviewDirty ? (
-                    <StatusPill tone="warning">{t(msg`未保存`)}</StatusPill>
-                  ) : detail.review ? (
-                    <StatusPill tone="healthy">{t(msg`已入池`)}</StatusPill>
-                  ) : (
-                    <StatusPill tone="muted">{t(msg`未标记`)}</StatusPill>
-                  )}
-                </div>
-
-                <div className="grid gap-3">
-                  <label className="space-y-1">
-                    <span className="text-xs font-medium text-[color:var(--text-muted)]">
-                      {t(msg`标记状态`)}
-                    </span>
-                    <select
-                      value={reviewDraft.status}
-                      onChange={(event) =>
-                        setReviewDraft((current) => ({
-                          ...current,
-                          status: event.target.value as AdminChatRecordReviewStatus,
-                        }))
-                      }
-                      className="w-full rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-input)] px-3 py-2.5 text-sm"
-                    >
-                      {REVIEW_STATUS_OPTIONS.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {t(option.label)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="space-y-1">
-                    <span className="text-xs font-medium text-[color:var(--text-muted)]">
-                      {t(msg`标签`)}
-                    </span>
-                    <input
-                      value={reviewDraft.tags}
-                      onChange={(event) =>
-                        setReviewDraft((current) => ({
-                          ...current,
-                          tags: event.target.value,
-                        }))
-                      }
-                      placeholder={t(msg`如：高需求、高成本、易复用`)}
-                      className="w-full rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-input)] px-3 py-2.5 text-sm"
-                    />
-                  </label>
-
-                  <div className="flex flex-wrap gap-2">
-                    {REVIEW_TAG_SUGGESTIONS.map((tag) => (
-                      <button
-                        key={tag.value}
-                        type="button"
-                        onClick={() => appendReviewTag(tag.value)}
-                        className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-3 py-1.5 text-xs font-medium text-[color:var(--text-secondary)] transition hover:border-[color:var(--border-subtle)] hover:bg-[color:var(--surface-card)] hover:text-[color:var(--text-primary)]"
-                      >
-                        + {t(tag.display)}
-                      </button>
-                    ))}
-                  </div>
-
-                  {parsedReviewTags.length ? (
-                    <div className="flex flex-wrap gap-2">
-                      {parsedReviewTags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="rounded-full border border-[color:var(--border-faint)] bg-white px-2.5 py-1 text-xs text-[color:var(--text-secondary)]"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-
-                  <label className="space-y-1">
-                    <span className="text-xs font-medium text-[color:var(--text-muted)]">
-                      {t(msg`复盘备注`)}
-                    </span>
-                    <textarea
-                      value={reviewDraft.note}
-                      onChange={(event) =>
-                        setReviewDraft((current) => ({
-                          ...current,
-                          note: event.target.value,
-                        }))
-                      }
-                      rows={6}
-                      placeholder={t(msg`为什么值得复盘？后续怎么调 Prompt？`)}
-                      className="w-full rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-input)] px-3 py-2.5 text-sm"
-                    />
-                  </label>
-                </div>
-
-                {detail.review ? (
-                  <div className="rounded-[20px] border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] p-4">
-                    <div className="text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
-                      {t(msg`当前标记`)}
-                    </div>
-                    <div className="mt-3 grid gap-2 text-sm text-[color:var(--text-secondary)]">
-                      <div className="flex items-center justify-between gap-3">
-                        <span>{t(msg`状态`)}</span>
-                        <span className="font-medium text-[color:var(--text-primary)]">
-                          {formatReviewStatus(detail.review.status)}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between gap-3">
-                        <span>{t(msg`最后更新`)}</span>
-                        <span className="font-medium text-[color:var(--text-primary)]">
-                          {formatDateTime(detail.review.updatedAt)}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between gap-3">
-                        <span>{t(msg`标签数`)}</span>
-                        <span className="font-medium text-[color:var(--text-primary)]">
-                          {detail.review.tags.length}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
-
-                <div className="flex flex-wrap gap-3">
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    onClick={() => saveReviewMutation.mutate()}
-                    disabled={!activeConversationId || saveReviewMutation.isPending}
-                  >
-                    {saveReviewMutation.isPending ? t(msg`保存中...`) : t(msg`保存复盘标记`)}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => deleteReviewMutation.mutate()}
-                    disabled={!detail.review || deleteReviewMutation.isPending}
-                  >
-                    {deleteReviewMutation.isPending ? t(msg`清除中...`) : t(msg`清空标记`)}
-                  </Button>
-                </div>
-
-                {saveReviewMutation.error instanceof Error ? (
-                  <ErrorBlock message={saveReviewMutation.error.message} />
-                ) : null}
-                {deleteReviewMutation.error instanceof Error ? (
-                  <ErrorBlock message={deleteReviewMutation.error.message} />
-                ) : null}
-              </Card>
-
-              <AdminInfoRows
-                title={t(msg`会话档案`)}
-                rows={[
-                  { label: t(msg`角色`), value: detail.conversation.characterName },
-                  {
-                    label: t(msg`关系`),
-                    value: detail.conversation.relationship || t(msg`未标注关系`),
-                  },
-                  {
-                    label: t(msg`最后活跃`),
-                    value: formatDateTime(detail.conversation.lastActivityAt),
-                  },
-                  {
-                    label: t(msg`最后清空`),
-                    value: detail.conversation.lastClearedAt
-                      ? formatDateTime(detail.conversation.lastClearedAt)
-                      : t(msg`未清空`),
-                  },
-                  {
-                    label: t(msg`平均首响`),
-                    value: formatDuration(detail.stats.firstResponseAverageMs),
-                  },
-                  {
-                    label: t(msg`中位首响`),
-                    value: formatDuration(detail.stats.firstResponseMedianMs),
-                  },
-                ]}
-              />
-
-              <Card className="bg-[color:var(--surface-console)]">
-                <SectionHeading>{t(msg`会话概览`)}</SectionHeading>
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <MetricCard label={t(msg`当前口径消息`)} value={detail.stats.messageCount} />
-                  <MetricCard label={t(msg`可见消息`)} value={detail.stats.visibleMessageCount} />
-                  <MetricCard label={t(msg`留存消息`)} value={detail.stats.storedMessageCount} />
-                  <MetricCard label={t(msg`近 30 天消息`)} value={detail.stats.recentMessageCount30d} />
-                  <MetricCard label={t(msg`角色消息`)} value={detail.stats.characterMessageCount} />
-                  <MetricCard label={t(msg`用户消息`)} value={detail.stats.userMessageCount} />
-                  <MetricCard label={t(msg`主动消息`)} value={detail.stats.proactiveMessageCount} />
-                  <MetricCard label={t(msg`附件消息`)} value={detail.stats.attachmentMessageCount} />
-                </div>
-              </Card>
-
-              <Card className="space-y-4 bg-[color:var(--surface-console)]">
-                <SectionHeading>{t(msg`产品洞察`)}</SectionHeading>
-                <div className="grid gap-3 md:grid-cols-2">
-                  <MetricCard label={t(msg`近 7 天活跃天数`)} value={detail.insight.activeDays7d} />
-                  <MetricCard label={t(msg`近 30 天活跃天数`)} value={detail.insight.activeDays30d} />
-                  <MetricCard
-                    label={t(msg`活跃日均消息`)}
-                    value={detail.insight.averageMessagesPerActiveDay30d ?? t(msg`暂无`)}
-                  />
-                  <MetricCard
-                    label={t(msg`高峰工作日`)}
-                    value={detail.insight.mostActiveWeekday || t(msg`暂无`)}
-                  />
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <div className="mb-2 text-xs font-medium text-[color:var(--text-muted)]">
-                      {t(msg`近 7 天消息趋势`)}
-                    </div>
-                    <TrendBars items={detail.insight.trend7d} />
-                  </div>
-                  <div>
-                    <div className="mb-2 text-xs font-medium text-[color:var(--text-muted)]">
-                      {t(msg`消息结构占比`)}
-                    </div>
-                    <div className="space-y-2">
-                      <RatioBar label={t(msg`用户消息`)} value={detail.insight.mix.userShare} tone="slate" />
-                      <RatioBar
-                        label={t(msg`角色回复`)}
-                        value={detail.insight.mix.characterShare}
-                        tone="emerald"
-                      />
-                      <RatioBar
-                        label={t(msg`主动消息`)}
-                        value={detail.insight.mix.proactiveShare}
-                        tone="amber"
-                      />
-                      <RatioBar
-                        label={t(msg`附件消息`)}
-                        value={detail.insight.mix.attachmentShare}
-                        tone="sky"
-                      />
-                      <RatioBar
-                        label={t(msg`系统消息`)}
-                        value={detail.insight.mix.systemShare}
-                        tone="violet"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <AdminInfoRows
-                  title={t(msg`最近发言`)}
-                  rows={[
-                    {
-                      label: t(msg`最近一次用户消息`),
-                      value: formatDateTime(detail.insight.lastUserMessageAt),
-                    },
-                    {
-                      label: t(msg`最近一次角色回复`),
-                      value: formatDateTime(detail.insight.lastCharacterMessageAt),
-                    },
-                  ]}
-                />
-              </Card>
-
-              <Card className="space-y-4 bg-[color:var(--surface-console)]">
-                <SectionHeading>{t(msg`会话级 Token 成本`)}</SectionHeading>
-                {tokenUsageQuery.isLoading ? (
-                  <LoadingBlock label={t(msg`正在读取会话成本...`)} />
-                ) : tokenUsageQuery.error instanceof Error ? (
-                  <ErrorBlock message={tokenUsageQuery.error.message} />
-                ) : tokenUsageQuery.data ? (
-                  <>
-                    <div className="grid gap-3 md:grid-cols-2">
-                      <MetricCard
-                        label={t(msg`累计请求`)}
-                        value={tokenUsageQuery.data.allTimeOverview.requestCount}
-                      />
-                      <MetricCard
-                        label={t(msg`累计 Token`)}
-                        value={tokenUsageQuery.data.allTimeOverview.totalTokens}
-                      />
-                      <MetricCard
-                        label={t(msg`累计成本`)}
-                        value={formatCurrency(
-                          tokenUsageQuery.data.allTimeOverview.estimatedCost,
-                          tokenUsageQuery.data.allTimeOverview.currency,
-                        )}
-                      />
-                      <MetricCard
-                        label={t(msg`近 30 天成本`)}
-                        value={formatCurrency(
-                          tokenUsageQuery.data.recent30dOverview.estimatedCost,
-                          tokenUsageQuery.data.recent30dOverview.currency,
-                        )}
-                      />
-                    </div>
-
-                    {tokenUsageQuery.data.recent30dTrend.length ? (
-                      <div>
-                        <div className="mb-2 text-xs font-medium text-[color:var(--text-muted)]">
-                          {t(msg`近 30 天 Token 趋势`)}
-                        </div>
-                        <TokenTrendBars
-                          items={tokenUsageQuery.data.recent30dTrend.slice(-10)}
-                        />
-                      </div>
-                    ) : null}
-
-                    <div className="space-y-3">
-                      <div>
-                        <div className="mb-2 text-xs font-medium text-[color:var(--text-muted)]">
-                          {t(msg`主要模型`)}
-                        </div>
-                        <div className="space-y-2 text-sm text-[color:var(--text-secondary)]">
-                          {tokenUsageQuery.data.recent30dBreakdown.byModel
-                            .slice(0, 3)
-                            .map((item) => (
-                              <div
-                                key={item.key}
-                                className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-3 py-2.5"
-                              >
-                                {item.label} · {t(msg`请求`)} {item.requestCount} · Token{" "}
-                                {compactInteger(item.totalTokens)}
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-
-                      {tokenUsageQuery.data.recent30dBreakdown.byScene.length ? (
-                        <div>
-                          <div className="mb-2 text-xs font-medium text-[color:var(--text-muted)]">
-                            {t(msg`主要场景`)}
-                          </div>
-                          <div className="space-y-2 text-sm text-[color:var(--text-secondary)]">
-                            {tokenUsageQuery.data.recent30dBreakdown.byScene
-                              .slice(0, 2)
-                              .map((item) => (
-                                <div
-                                  key={item.key}
-                                  className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-3 py-2.5"
-                                >
-                                  {item.label} · {t(msg`请求`)} {item.requestCount} · Token{" "}
-                                  {compactInteger(item.totalTokens)}
-                                </div>
-                              ))}
-                          </div>
-                        </div>
-                      ) : null}
-
-                      {tokenUsageQuery.data.recentRecords.items.length ? (
-                        <div>
-                          <div className="mb-2 text-xs font-medium text-[color:var(--text-muted)]">
-                            {t(msg`最近请求`)}
-                          </div>
-                          <div className="space-y-2 text-sm text-[color:var(--text-secondary)]">
-                            {tokenUsageQuery.data.recentRecords.items
-                              .slice(0, 4)
-                              .map((record) => (
-                                <div
-                                  key={record.id}
-                                  className="rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-3 py-2.5"
-                                >
-                                  {formatDateTime(record.occurredAt)} ·{" "}
-                                  {record.model || t(msg`未记录模型`)} · Token{" "}
-                                  {compactInteger(record.totalTokens)}
-                                </div>
-                              ))}
-                          </div>
-                        </div>
-                      ) : null}
-                    </div>
-                  </>
-                ) : null}
-              </Card>
-
-              {detail.character ? (
-                <Card className="space-y-4 bg-[color:var(--surface-console)]">
-                  <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <div className="text-base font-semibold text-[color:var(--text-primary)]">
-                        {detail.character.name}
-                      </div>
-                      <div className="mt-1 text-sm text-[color:var(--text-secondary)]">
-                        {detail.character.relationship}
-                      </div>
-                    </div>
-                    <StatusPill tone={detail.character.isOnline ? "healthy" : "muted"}>
-                      {detail.character.isOnline ? t(msg`在线`) : t(msg`离线`)}
-                    </StatusPill>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {(
-                      detail.character.expertDomains.length
-                        ? detail.character.expertDomains
-                        : [t(msg`未标注领域`)]
-                    ).map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-2.5 py-1 text-xs text-[color:var(--text-secondary)]"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <MetricCard
-                      label={t(msg`当前活动`)}
-                      value={formatActivity(detail.character.currentActivity)}
-                    />
-                    <MetricCard label={t(msg`亲密度`)} value={detail.character.intimacyLevel} />
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    <Link
-                      to="/characters/$characterId/runtime"
-                      params={{ characterId: detail.character.id }}
-                      className="inline-flex items-center justify-center rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] px-3.5 py-2 text-sm font-medium text-[color:var(--text-primary)]"
-                    >
-                      {t(msg`打开运行逻辑台`)}
-                    </Link>
-                  </div>
-                </Card>
-              ) : null}
-            </>
-          ) : (
-            <AdminEmptyState
-              title={t(msg`先选择一个会话`)}
-              description={t(msg`左侧选中角色会话后，这里会展示复盘入口、角色摘要和成本信息。`)}
-            />
-          )}
         </div>
       </div>
     </div>
@@ -1719,115 +1193,8 @@ function MessageCard({
   );
 }
 
-function TrendBars({
-  items,
-}: {
-  items: Array<{
-    date: string;
-    totalMessages: number;
-    userMessages: number;
-    characterMessages: number;
-  }>;
-}) {
-  const maxValue = Math.max(...items.map((item) => item.totalMessages), 1);
 
-  return (
-    <div className="flex items-end gap-2 rounded-[20px] border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-3 py-4">
-      {items.map((item) => (
-        <div key={item.date} className="flex min-w-0 flex-1 flex-col items-center gap-2">
-          <div className="flex h-24 w-full items-end justify-center">
-            <div
-              className="w-full max-w-7 rounded-t-[10px] bg-[linear-gradient(180deg,#0f766e_0%,#34d399_100%)]"
-              style={{
-                height: `${Math.max(8, Math.round((item.totalMessages / maxValue) * 96))}px`,
-              }}
-              title={`${item.date} · 总 ${item.totalMessages} · 用户 ${item.userMessages} · 角色 ${item.characterMessages}`} // i18n-ignore-line: admin metric tooltip
-            />
-          </div>
-          <div className="text-[12px] text-[color:var(--text-muted)]">
-            {item.date.slice(5).replace("-", "/")}
-          </div>
-          <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
-            {item.totalMessages}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
-function RatioBar({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone: "slate" | "emerald" | "amber" | "sky" | "violet";
-}) {
-  const toneClass =
-    tone === "emerald"
-      ? "bg-emerald-500"
-      : tone === "amber"
-        ? "bg-amber-400"
-        : tone === "sky"
-          ? "bg-sky-500"
-          : tone === "violet"
-            ? "bg-violet-500"
-            : "bg-slate-500";
-
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between gap-3 text-xs">
-        <span className="text-[color:var(--text-secondary)]">{label}</span>
-        <span className="font-medium text-[color:var(--text-primary)]">
-          {formatPercent(value)}
-        </span>
-      </div>
-      <div className="h-2 rounded-full bg-[color:var(--surface-soft)]">
-        <div
-          className={`h-2 rounded-full ${toneClass}`}
-          style={{ width: `${Math.max(value * 100, value > 0 ? 4 : 0)}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
-function TokenTrendBars({
-  items,
-}: {
-  items: Array<{
-    bucketStart: string;
-    label: string;
-    totalTokens: number;
-    requestCount: number;
-  }>;
-}) {
-  const maxValue = Math.max(...items.map((item) => item.totalTokens), 1);
-
-  return (
-    <div className="flex items-end gap-2 rounded-[20px] border border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-3 py-4">
-      {items.map((item) => (
-        <div key={item.bucketStart} className="flex min-w-0 flex-1 flex-col items-center gap-2">
-          <div className="flex h-20 w-full items-end justify-center">
-            <div
-              className="w-full max-w-7 rounded-t-[10px] bg-[linear-gradient(180deg,#2563eb_0%,#60a5fa_100%)]"
-              style={{
-                height: `${Math.max(8, Math.round((item.totalTokens / maxValue) * 80))}px`,
-              }}
-              title={`${item.label} · Token ${item.totalTokens} · 请求 ${item.requestCount}`} // i18n-ignore-line: admin metric tooltip
-            />
-          </div>
-          <div className="text-[12px] text-[color:var(--text-muted)]">{item.label}</div>
-          <div className="text-[12px] font-medium text-[color:var(--text-primary)]">
-            {compactInteger(item.totalTokens)}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function FilterBadge({ label }: { label: string }) {
   return (
@@ -1957,47 +1324,9 @@ function formatPercent(value: number) {
   return formatAdminPercent(value, value > 0 && value < 0.1 ? 1 : 0);
 }
 
-function compactInteger(value: number) {
-  if (value >= 10000) {
-    return formatAdminCompactInteger(value);
-  }
-  return String(value);
-}
 
-function formatDuration(value: number | null) {
-  const t = translateRuntimeMessage;
-  if (value == null) {
-    return t(msg`暂无`);
-  }
-  if (value < 1000) {
-    return `${value} ms`;
-  }
-  const seconds = Math.round(value / 1000);
-  if (seconds < 60) {
-    return `${seconds} ${t(msg`秒`)}`;
-  }
-  const minutes = Math.floor(seconds / 60);
-  return `${minutes} ${t(msg`分钟`)}`;
-}
 
-function formatActivity(value?: string | null) {
-  const t = translateRuntimeMessage;
-  if (value === "working") return t(msg`工作中`);
-  if (value === "eating") return t(msg`吃饭中`);
-  if (value === "resting") return t(msg`休息中`);
-  if (value === "commuting") return t(msg`通勤中`);
-  if (value === "sleeping") return t(msg`睡觉中`);
-  if (value === "free") return t(msg`空闲`);
-  return value || t(msg`未标注`);
-}
 
-function parseReviewTags(value: string) {
-  return value
-    .split(/[,\n，]/g)
-    .map((item) => item.trim())
-    .filter(Boolean)
-    .slice(0, 12);
-}
 
 function formatReviewStatus(status: AdminChatRecordReviewStatus) {
   const t = translateRuntimeMessage;
@@ -2125,31 +1454,6 @@ function buildSearchLabels(search: {
   return labels;
 }
 
-function normalizeReviewNote(value?: string | null) {
-  return value?.trim() || "";
-}
 
-function isReviewDraftDirty(
-  review: AdminChatRecordConversationReview | null,
-  draft: ReviewDraft,
-) {
-  const currentStatus = review?.status ?? "backlog";
-  const currentTags = review?.tags ?? [];
-  const currentNote = normalizeReviewNote(review?.note);
-  const draftTags = parseReviewTags(draft.tags);
 
-  return (
-    draft.status !== currentStatus ||
-    draftTags.join("|") !== currentTags.join("|") ||
-    normalizeReviewNote(draft.note) !== currentNote
-  );
-}
-
-function appendReviewTagValue(currentValue: string, tag: string) {
-  const tags = parseReviewTags(currentValue);
-  if (!tags.includes(tag)) {
-    tags.push(tag);
-  }
-  return tags.join(", ");
-}
 
