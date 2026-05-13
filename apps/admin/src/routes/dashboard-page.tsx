@@ -580,7 +580,7 @@ export function DashboardPage() {
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="order-2 space-y-6 xl:order-1">
-          <div className="sticky top-0 z-20 -mx-1 flex flex-wrap gap-2 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)]/95 px-2 py-2 shadow-[var(--shadow-soft)] backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-card)]/80">
+          <div className="sticky top-20 z-10 -mx-1 flex flex-wrap gap-2 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)]/95 px-2 py-2 shadow-[var(--shadow-soft)] backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-card)]/80">
             {[
               {
                 label: t(msg`值班总览`),
