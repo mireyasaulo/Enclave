@@ -1,4 +1,4 @@
-import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
 import {
   type MomentAudioAsset,
@@ -166,6 +166,9 @@ export function MomentMediaGallery({
                 muted
                 playsInline
                 preload="metadata"
+                onError={() => {
+                  // codec/src 不支持时静默；外层已经有 Play 按钮和封面，UI 不会破
+                }}
               />
             )}
 
@@ -574,6 +577,33 @@ function MomentVideoViewerOverlay({
   video: MomentVideoAsset;
   onClose: () => void;
 }) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [needsManualPlay, setNeedsManualPlay] = useState(false);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    const promise = el.play();
+    if (promise && typeof promise.catch === "function") {
+      promise.catch(() => {
+        // iOS / 静音策略 / codec 不支持 → 回退到手动播放按钮
+        setNeedsManualPlay(true);
+      });
+    }
+  }, []);
+
+  const handleManualPlay = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    const el = videoRef.current;
+    if (!el) return;
+    const promise = el.play();
+    if (promise && typeof promise.catch === "function") {
+      promise.catch(() => {
+        // 仍失败时保持按钮可见，不再上报
+      });
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-[rgba(15,23,42,0.94)] backdrop-blur-sm">
       <button
@@ -605,13 +635,27 @@ function MomentVideoViewerOverlay({
 
       <div className="absolute inset-0 flex items-center justify-center px-4 pb-[calc(env(safe-area-inset-bottom,0px)+2rem)] pt-[calc(env(safe-area-inset-top,0px)+4.5rem)]">
         <video
+          ref={videoRef}
           src={resolveAppMediaUrl(video.url)}
           poster={video.posterUrl ? resolveAppMediaUrl(video.posterUrl) : undefined}
           className="max-h-full max-w-full rounded-[20px] bg-black"
           controls
-          autoPlay
           playsInline
+          onError={() => setNeedsManualPlay(true)}
+          onPlay={() => setNeedsManualPlay(false)}
         />
+        {needsManualPlay ? (
+          <button
+            type="button"
+            onClick={handleManualPlay}
+            className="absolute inset-0 z-10 flex items-center justify-center bg-black/30"
+            aria-label={t(msg`播放视频`)}
+          >
+            <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-black/68 text-white">
+              <Play size={28} className="translate-x-[2px] fill-current" />
+            </span>
+          </button>
+        ) : null}
       </div>
     </div>
   );
