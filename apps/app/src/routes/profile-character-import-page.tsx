@@ -52,7 +52,9 @@ export function ProfileCharacterImportPage() {
     });
 
   async function readFile(file: File) {
+    // 清掉之前的预览和结果，避免新文件解析失败时还残留上一张预览卡误导用户
     setResult(null);
+    setPreview(null);
     let text: string;
     try {
       text = await file.text();
@@ -207,7 +209,13 @@ export function ProfileCharacterImportPage() {
               e.preventDefault();
               if (!dragging) setDragging(true);
             }}
-            onDragLeave={() => setDragging(false)}
+            onDragLeave={(e) => {
+              // 防止鼠标拖到子元素时父元素 dragLeave 误触发产生闪烁；
+              // 只有真正离开整个 drop zone 才 setDragging(false)。
+              const next = e.relatedTarget as Node | null;
+              if (next && e.currentTarget.contains(next)) return;
+              setDragging(false);
+            }}
             onDrop={handleDrop}
             className={cn(
               "flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed px-4 py-10 text-center transition-colors",
