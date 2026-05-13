@@ -475,6 +475,9 @@ export class LocalProcessComputeProviderService
     if (minimaxAlloc) {
       env.MINIMAX_API_KEY = minimaxAlloc.key;
     }
+    // 安全：child 只该看到自己分到的那个 key，整个池只属于 cloud-api 层。
+    // 不删的话 ...process.env 会把全部 CSV 池泄露给 child env（/proc/PID/environ 可见）。
+    delete env.MINIMAX_API_KEYS;
 
     // 算 per-world 日配额并注入 env：共享同一 key 的 N 个 world 公平分摊单 key 日限额；
     // 配额 < world 数时 dispatcher 做日轮换，保证每个 world 都能轮到。
