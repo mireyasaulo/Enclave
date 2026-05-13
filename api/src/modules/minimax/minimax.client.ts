@@ -1,6 +1,7 @@
 // i18n-ignore-start: provider adapter — error/log strings only.
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { MinimaxUsageReporterService } from './minimax-usage-reporter.service';
 import {
   type MinimaxBaseResp,
   type MinimaxBinary,
@@ -31,6 +32,14 @@ const QUOTA_EXHAUSTED_CODES = new Set<number>([1008, 1042, 2056]);
 // 1002 触发 RPM 限流 / 2003 模型并发数超限 / 1004 鉴权(可能瞬时网络) /
 // 2062 token plan interactive-use concurrency 限流：可短期重试。
 const RETRIABLE_PROVIDER_CODES = new Set<number>([1002, 1004, 2003, 2062]);
+// 云控台遥测拆两列：
+// - rpm：RPM/模型并发/token plan 并发 → 真节流，短期可恢复
+// - quota：当日/当窗口额度耗尽 → 整天/小时内打过去就是浪费
+// 1008 余额不足、1004 鉴权都不是限流口径，刻意排除。
+const RPM_LIMITED_PROVIDER_CODES = new Set<number>([1002, 2003, 2062]);
+const QUOTA_LIMITED_PROVIDER_CODES = new Set<number>([1042, 2056]);
+
+export type MinimaxRateLimitKind = 'rpm' | 'quota' | null;
 
 // 注意：故意不在 fetch 完成后 clearTimeout。fetch 在收到 headers 时就 resolve，
 // 但 body 读取（response.text / arrayBuffer）是流式的，可能再卡几分钟。让 timer
@@ -69,7 +78,11 @@ export class MinimaxClient {
   private readonly baseUrl: string;
   private callCounter = 0;
 
-  constructor(config: ConfigService) {
+  constructor(
+    config: ConfigService,
+    @Optional()
+    private readonly usageReporter?: MinimaxUsageReporterService,
+  ) {
     const rawKeys = config.get<string>('MINIMAX_API_KEYS');
     const rawSingle = config.get<string>('MINIMAX_API_KEY');
     const fromCsv = (rawKeys ?? '')
@@ -438,10 +451,30 @@ export class MinimaxClient {
         true,
       );
     }
+    // 拿到 HTTP 响应才计 1 次调用；网络/超时不计（没真打到 provider）。
+    // 限流口径拆两列：
+    // - rpm：HTTP 429 || provider code ∈ RPM_LIMITED_PROVIDER_CODES
+    // - quota：provider code ∈ QUOTA_LIMITED_PROVIDER_CODES（1042/2056）
+    // 优先级 quota > rpm（同一次响应都有时把它归到 quota，更接近真问题）。
+    const providerCodeForTelemetry = tryExtractProviderCode(text);
+    let rateLimitKind: MinimaxRateLimitKind = null;
+    if (
+      providerCodeForTelemetry !== null &&
+      QUOTA_LIMITED_PROVIDER_CODES.has(providerCodeForTelemetry)
+    ) {
+      rateLimitKind = 'quota';
+    } else if (
+      response.status === 429 ||
+      (providerCodeForTelemetry !== null &&
+        RPM_LIMITED_PROVIDER_CODES.has(providerCodeForTelemetry))
+    ) {
+      rateLimitKind = 'rpm';
+    }
+    this.usageReporter?.recordCall(rateLimitKind);
     if (!response.ok) {
       // 优先解析 base_resp.status_code，确定性失败（如 1008 余额不足）
       // 不应被无脑标 retriable=true 触发指数退避重试。
-      const providerCode = tryExtractProviderCode(text);
+      const providerCode = providerCodeForTelemetry;
       if (providerCode !== null && QUOTA_EXHAUSTED_CODES.has(providerCode)) {
         this.logger.warn(
           `minimax quota exhausted url=${url} status=${response.status} provider_code=${providerCode}`,
