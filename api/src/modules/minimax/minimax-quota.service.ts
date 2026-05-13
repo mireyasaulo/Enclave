@@ -19,6 +19,19 @@ export function shanghaiDateOf(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
+// Asia/Shanghai 0:00 到现在已经过了多少比例（0..1）。
+// 0:00 时返回 0；正中午返回 0.5；23:59:59 接近 1。
+// 用于 tryReserve 的"全天匀速 gate"：committed + reserved 不应显著超过
+// limit * elapsedRatio，避免凌晨把全天配额一把烧光。
+export function shanghaiDayElapsedRatio(now: Date = new Date()): number {
+  const shifted = new Date(now.getTime() + SHANGHAI_OFFSET_MINUTES * 60 * 1000);
+  const h = shifted.getUTCHours();
+  const m = shifted.getUTCMinutes();
+  const s = shifted.getUTCSeconds();
+  const seconds = h * 3600 + m * 60 + s;
+  return seconds / 86400;
+}
+
 export interface QuotaSnapshot {
   used: number;
   reserved: number;
@@ -28,6 +41,9 @@ export interface QuotaSnapshot {
 }
 
 const EXHAUSTED_CACHE_TTL_MS = 30_000;
+// 全天匀速 gate 的早期缓冲：0:00 起允许直接消耗 N 个，超出按 limit*elapsed 线性配额。
+// 固定 2 个，避免凌晨小流量任务被完全锁死。
+const PACING_EARLY_BURST = 2;
 
 @Injectable()
 export class MinimaxQuotaService {
@@ -155,10 +171,20 @@ export class MinimaxQuotaService {
       return false;
     }
     const usageDate = todayInShanghai();
+    // 全天匀速 gate：按 Shanghai 时间到现在为止"线性预算"应该消费多少。
+    // EARLY_BURST=2 固定缓冲：0:00 起允许直接消费 2 个，避免极小流量任务被锁死。
+    // 例：lyrics 100/天，6:00 (25%) 允许 27 个；12:00 允许 52 个；24:00 前烧完 100。
+    const elapsedRatio = shanghaiDayElapsedRatio();
+    const linearBudget = Math.ceil(limit * elapsedRatio) + PACING_EARLY_BURST;
     const ok = await this.repo.manager.transaction(async (mgr) => {
       const row = await mgr.findOne(MinimaxQuotaEntity, {
         where: { model, usageDate },
       });
+      const usedNow = (row?.reserved ?? 0) + (row?.committed ?? 0);
+      if (usedNow >= linearBudget) {
+        // 已超线性预算：本 tick 跳过，等到时间线再放开。
+        return false;
+      }
       if (!row) {
         const created = mgr.create(MinimaxQuotaEntity, {
           model,
@@ -177,8 +203,8 @@ export class MinimaxQuotaService {
         .update(MinimaxQuotaEntity)
         .set({ reserved: () => 'reserved + 1' })
         .where(
-          'id = :id AND reserved + committed < :limit',
-          { id: row.id, limit },
+          'id = :id AND reserved + committed < :limit AND reserved + committed < :budget',
+          { id: row.id, limit, budget: linearBudget },
         )
         .execute();
       return (result.affected ?? 0) === 1;

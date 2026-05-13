@@ -1076,9 +1076,13 @@ export class SchedulerService {
     let music = 0;
     let video = 0;
 
+    // 不仅看额度，还看是否已经被 minimax 服务端确认今日耗尽（撞过 2056）。
+    // 避免概率门槛 + recent-count 查询白做。
     const musicAvailable =
-      (await this.minimaxQuota.availableToday('music-2.6')) > 0 ||
-      (await this.minimaxQuota.availableToday('music-2.5')) > 0;
+      !(await this.minimaxQuota.isExhaustedToday('music-2.6')) &&
+      !(await this.minimaxQuota.isExhaustedToday('music-2.5')) &&
+      ((await this.minimaxQuota.availableToday('music-2.6')) > 0 ||
+        (await this.minimaxQuota.availableToday('music-2.5')) > 0);
     if (!musicAvailable) {
       // 跳过音乐扫描以省 LLM tokens
     } else {
