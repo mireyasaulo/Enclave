@@ -1,5 +1,9 @@
 // i18n-ignore-start: server-side log/admin payloads — not user-facing UI.
 import { Injectable, Logger } from "@nestjs/common";
+// 用 undici 自带的 fetch（而非 Node 内置的全局 fetch）：dispatcher 是 undici
+// 私有 API，全局 fetch 用 Node 内部的 undici 版本，传入外部 undici 的
+// dispatcher 会因为 onRequestStart 等接口不兼容而 TypeError。
+import { fetch as undiciFetch, ProxyAgent } from "undici";
 import {
   translateChineseCity,
   translateChineseRegion,
@@ -12,7 +16,7 @@ export interface IpRegionLookup {
   country: string | null;
   region: string | null;
   city: string | null;
-  source: "ip-api.com" | "ipwho.is" | "cache" | "unresolved";
+  source: "ip-api.com" | "ipinfo.io" | "cache" | "unresolved";
 }
 
 interface CacheEntry {
@@ -25,6 +29,25 @@ interface CacheEntry {
 const POSITIVE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const NEGATIVE_TTL_MS = 30 * 60 * 1000;
 const FETCH_TIMEOUT_MS = 5000;
+
+// Node 内置 fetch (undici) 默认不走 http_proxy/https_proxy 环境变量；ip-api.com
+// 和 ipwho.is 的直连出口在本机网络环境下连不上（curl 不走代理时也 timeout），
+// 必须通过本机的 Xray HTTP CONNECT 代理（127.0.0.1:10808）才能稳定出网。
+function resolveProxyDispatcher(): ProxyAgent | undefined {
+  const url =
+    process.env.https_proxy ??
+    process.env.HTTPS_PROXY ??
+    process.env.http_proxy ??
+    process.env.HTTP_PROXY;
+  if (!url) return undefined;
+  try {
+    return new ProxyAgent(url);
+  } catch {
+    return undefined;
+  }
+}
+
+const PROXY_DISPATCHER = resolveProxyDispatcher();
 
 @Injectable()
 export class IpRegionService {
@@ -45,12 +68,14 @@ export class IpRegionService {
       }
     }
 
-    // 首选 ip-api.com：lang=zh-CN 直接给中文国家/省/市，免去前端再做一遍翻译；
-    // 但 free tier 是 HTTP only，服务器侧调没问题（浏览器走 HTTPS 会被 mixed-
-    // content 拦）。挂掉再退到 ipwho.is（HTTPS，返回英文，前端 Intl 兜底）。
+    // 首选 ip-api.com：lang=zh-CN 直接给中文国家/省/市，但 free tier 不支持
+    // IPv6（403），fallback 到 ipinfo.io（IPv4 + IPv6 都支持，返回英文，
+    // 由 cn-region-i18n 翻译成中文）。
+    // ipwho.is 试过：Node fetch 即使走代理也固定回 "CORS not supported on
+    // the Free plan"（headers 试遍都没用），所以不再列入 chain。
     const providers = [
       () => this.fetchIpApi(ip),
-      () => this.fetchIpWhoIs(ip),
+      () => this.fetchIpInfoIo(ip),
     ];
 
     for (const provider of providers) {
@@ -93,9 +118,9 @@ export class IpRegionService {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     try {
-      const response = await fetch(
+      const response = await undiciFetch(
         `http://ip-api.com/json/${encodeURIComponent(ip)}?lang=zh-CN&fields=status,message,country,countryCode,regionName,city`,
-        { signal: controller.signal },
+        { signal: controller.signal, dispatcher: PROXY_DISPATCHER },
       );
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = (await response.json()) as {
@@ -123,29 +148,25 @@ export class IpRegionService {
     }
   }
 
-  private async fetchIpWhoIs(ip: string): Promise<IpRegionLookup> {
+  private async fetchIpInfoIo(ip: string): Promise<IpRegionLookup> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     try {
-      const response = await fetch(
-        `https://ipwho.is/${encodeURIComponent(ip)}`,
-        { signal: controller.signal },
+      const response = await undiciFetch(
+        `https://ipinfo.io/${encodeURIComponent(ip)}/json`,
+        { signal: controller.signal, dispatcher: PROXY_DISPATCHER },
       );
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = (await response.json()) as {
-        success?: boolean;
-        message?: string;
-        country?: string;
-        country_code?: string;
+        country?: string; // ipinfo 只回两位 country code
         region?: string;
         city?: string;
+        bogon?: boolean;
       };
-      if (data.success === false) {
-        throw new Error(data.message ?? "lookup failed");
-      }
-      // ipwho.is 国内 region/city 是英文，按 CN 词表回填中文；其它国家保持
-      // 英文原值（map miss 时翻译函数直接返回原 region/city）。
-      const isChina = (data.country_code ?? "").toUpperCase() === "CN";
+      if (data.bogon) throw new Error("bogon IP");
+      // ipinfo.io region/city 永远是英文，国内的按词表翻译；国家保留 code
+      // 让前端用 Intl.DisplayNames 转中文国家名。
+      const isChina = (data.country ?? "").toUpperCase() === "CN";
       const region = isChina
         ? translateChineseRegion(data.region)
         : (data.region ?? null);
@@ -154,11 +175,11 @@ export class IpRegionService {
         : (data.city ?? null);
       return {
         ip,
-        countryCode: data.country_code ?? null,
-        country: data.country ?? null,
+        countryCode: data.country ?? null,
+        country: null,
         region,
         city,
-        source: "ipwho.is",
+        source: "ipinfo.io",
       };
     } finally {
       clearTimeout(timer);

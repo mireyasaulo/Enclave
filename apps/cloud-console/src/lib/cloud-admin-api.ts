@@ -1263,7 +1263,7 @@ export const cloudAdminApi = {
       country: string | null;
       region: string | null;
       city: string | null;
-      source: "ip-api.com" | "ipwho.is" | "cache" | "unresolved";
+      source: "ip-api.com" | "ipinfo.io" | "cache" | "unresolved";
     }>(`/ip-region/${encodeURIComponent(ip)}`),
 
   grantSubscription: (id: string, payload: GrantSubscriptionRequest) =>
