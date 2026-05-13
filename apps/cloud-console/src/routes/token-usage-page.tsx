@@ -233,7 +233,16 @@ function OverviewTab({ range }: { range: { from: string; to: string } }) {
                 stroke="#64748b"
                 fontSize={11}
               />
-              <Tooltip />
+              <Tooltip
+                formatter={(value, name) => {
+                  const num = Number(value);
+                  if (!Number.isFinite(num)) return String(value);
+                  if (name === t("Estimated cost")) {
+                    return formatCost(num, currency);
+                  }
+                  return formatNumber(num);
+                }}
+              />
               <Legend />
               <Line
                 yAxisId="tokens"
@@ -798,7 +807,11 @@ function PricingTab() {
               : t("Sync from n1n.ai")}
           </button>
         </div>
-        {totalItems === 0 ? (
+        {catalogQuery.isLoading ? (
+          <div className="mt-3 rounded-2xl border border-[color:var(--border-subtle)] px-4 py-6 text-center text-sm text-[color:var(--text-muted)]">
+            {t("Loading…")}
+          </div>
+        ) : totalItems === 0 ? (
           <div className="mt-3 rounded-2xl border border-[color:var(--border-subtle)] px-4 py-6 text-center text-sm text-[color:var(--text-muted)]">
             {t("No pricing entries yet.")}
           </div>

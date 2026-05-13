@@ -113,8 +113,6 @@ export function TokenUsageWorldDetailPage() {
             {dailyRows.length > 0 && (
               <p className="mt-1 text-sm text-[color:var(--text-secondary)]">
                 {t("Request count")}: {formatNumber(dailyTotals.requests)}
-                {" · "}
-                {dailyRows.length} {t("days")}
               </p>
             )}
           </div>
@@ -189,7 +187,16 @@ export function TokenUsageWorldDetailPage() {
                   stroke="#64748b"
                   fontSize={11}
                 />
-                <Tooltip />
+                <Tooltip
+                  formatter={(value, name) => {
+                    const num = Number(value);
+                    if (!Number.isFinite(num)) return String(value);
+                    if (name === t("Estimated cost")) {
+                      return formatCost(num, currency);
+                    }
+                    return formatNumber(num);
+                  }}
+                />
                 <Line
                   yAxisId="tokens"
                   type="monotone"
