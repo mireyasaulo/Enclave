@@ -1018,12 +1018,14 @@ function MobileNoteEditor({
         <div className="relative">
           {!editorState.contentText.trim() ? (
             <div className="pointer-events-none absolute left-0 top-0 text-[15px] leading-7 text-[color:var(--text-dim)]">
-              {t(msg`写点什么。支持富文本、待办、图片和文件。`)}
+              {noteQuery.isLoading
+                ? t(msg`加载笔记中…`)
+                : t(msg`写点什么。支持富文本、待办、图片和文件。`)}
             </div>
           ) : null}
           <div
             ref={editorRef}
-            contentEditable
+            contentEditable={!noteQuery.isLoading}
             suppressContentEditableWarning
             onInput={syncEditorStateFromDom}
             onClick={handleEditorClick}
