@@ -271,8 +271,16 @@ export function DigitalHumanPage() {
 
       {summary.ready ? null : (
         <AdminCallout
-          tone="warning"
-          title={t(msg`数字人 Provider 当前未就绪：${summary.statusLabel}`)}
+          tone={
+            statusQuery.data?.digitalHumanGateway.mode === "external_iframe"
+              ? "warning"
+              : "info"
+          }
+          title={
+            statusQuery.data?.digitalHumanGateway.mode === "external_iframe"
+              ? t(msg`数字人 Provider 当前未就绪：${summary.statusLabel}`)
+              : t(msg`当前为模拟模式（${summary.modeLabel}），尚未启用真实数字人。`)
+          }
           description={`${summary.description} ${summary.nextStep}`}
         />
       )}
@@ -406,7 +414,7 @@ export function DigitalHumanPage() {
                 </div>
               ) : paramsValidation.count > 0 ? (
                 <div className="mt-2 text-[12px] leading-5 text-[color:var(--text-secondary)]">
-                  {t(msg`已解析 key：`)}
+                  {t(msg`已解析 Key 列表：`)}
                   {paramsValidation.keys.join(" / ")}
                 </div>
               ) : null}
