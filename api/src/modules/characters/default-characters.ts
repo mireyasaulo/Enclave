@@ -8,25 +8,14 @@ import {
   BAR_EXPERT_CHARACTER_ID,
   buildBarExpertCharacter,
 } from './bar-expert-character';
+import { BUILT_IN_CHARACTER_PRESETS } from './built-in-character-presets';
 import { DEFAULT_CHARACTER_BIOS } from './character-bios';
 import { buildDoctorCharacter, DOCTOR_CHARACTER_ID } from './doctor-character';
-import {
-  buildHotelExpertCharacter,
-  HOTEL_EXPERT_CHARACTER_ID,
-} from './hotel-expert-character';
 import { buildLawyerCharacter, LAWYER_CHARACTER_ID } from './lawyer-character';
 import {
   buildReminderCharacter,
   REMINDER_CHARACTER_ID,
 } from './reminder-character';
-import {
-  buildWeddingPlannerCharacter,
-  WEDDING_PLANNER_CHARACTER_ID,
-} from './wedding-planner-character';
-import {
-  buildWeddingDressExpertCharacter,
-  WEDDING_DRESS_EXPERT_CHARACTER_ID,
-} from './wedding-dress-expert-character';
 import {
   buildWorldNewsDeskCharacter,
   WORLD_NEWS_DESK_CHARACTER_ID,
@@ -34,18 +23,54 @@ import {
 
 export const SELF_CHARACTER_ID = 'char-default-self';
 
-export const DEFAULT_CHARACTER_IDS = [
+// 这些是 2026-05-13 起新加入“默认好友”的预设角色：
+// 林晨 / 林眠（睡眠 + 情绪陪伴）、顾棠（谈判）、灯塔（安全把关）、鹿栀（关系观察）、简宁（恋爱顾问）。
+// 它们本身在 BUILT_IN_CHARACTER_PRESETS 里以 preset_catalog 形式存在，
+// 这里只是把它们一并钉为“新用户默认好友”。
+const ADDITIONAL_DEFAULT_PRESET_KEYS = [
+  'lin_chen_sleep_support',
+  'lin_mian_sleep_support',
+  'council_negotiation_agent_gu_tang',
+  'council_safety_gatekeeper_deng_ta',
+  'council_relationship_observer_lu_zhi',
+  'jian_ning_relationship_expert',
+] as const;
+
+function pickDefaultPresetCharacter(
+  presetKey: string,
+): Partial<CharacterEntity> {
+  const preset = BUILT_IN_CHARACTER_PRESETS.find(
+    (item) => item.presetKey === presetKey,
+  );
+  if (!preset) {
+    throw new Error(
+      `Default preset character not found in BUILT_IN_CHARACTER_PRESETS: ${presetKey}`,
+    );
+  }
+  return preset.character;
+}
+
+const ADDITIONAL_DEFAULT_PRESET_CHARACTERS: Partial<CharacterEntity>[] =
+  ADDITIONAL_DEFAULT_PRESET_KEYS.map(pickDefaultPresetCharacter);
+
+const ADDITIONAL_DEFAULT_PRESET_CHARACTER_IDS: string[] =
+  ADDITIONAL_DEFAULT_PRESET_CHARACTERS.map((character) => {
+    if (!character.id) {
+      throw new Error('Default preset character is missing an id');
+    }
+    return character.id;
+  });
+
+export const DEFAULT_CHARACTER_IDS: readonly string[] = [
   SELF_CHARACTER_ID,
   ACTION_OPERATOR_CHARACTER_ID,
   BAR_EXPERT_CHARACTER_ID,
   DOCTOR_CHARACTER_ID,
-  HOTEL_EXPERT_CHARACTER_ID,
   LAWYER_CHARACTER_ID,
   REMINDER_CHARACTER_ID,
-  WEDDING_PLANNER_CHARACTER_ID,
-  WEDDING_DRESS_EXPERT_CHARACTER_ID,
   WORLD_NEWS_DESK_CHARACTER_ID,
-] as const;
+  ...ADDITIONAL_DEFAULT_PRESET_CHARACTER_IDS,
+];
 
 export function buildDefaultCharacters(): Partial<CharacterEntity>[] {
   return [
@@ -244,12 +269,10 @@ export function buildDefaultCharacters(): Partial<CharacterEntity>[] {
     buildActionOperatorCharacter(),
     buildBarExpertCharacter(),
     buildDoctorCharacter(),
-    buildHotelExpertCharacter(),
     buildLawyerCharacter(),
     buildReminderCharacter(),
-    buildWeddingPlannerCharacter(),
-    buildWeddingDressExpertCharacter(),
     buildWorldNewsDeskCharacter(),
+    ...ADDITIONAL_DEFAULT_PRESET_CHARACTERS,
   ];
 }
 // i18n-ignore-end
