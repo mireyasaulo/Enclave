@@ -339,14 +339,18 @@ export function GameReleaseWorkbench({
                   {t(msg`记录每次创建、编辑、投稿入库、恢复和正式发布的快照。`)}
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <StatusPill tone="muted">
-                  {t(msg`共 ${metrics.revisionCount} 条修订`)}
-                </StatusPill>
-                <StatusPill tone="muted">
-                  {t(msg`已发布 ${metrics.publishedCount} 次`)}
-                </StatusPill>
-              </div>
+              {metrics.revisionCount > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  <StatusPill tone="muted">
+                    {t(msg`共 ${metrics.revisionCount} 条修订`)}
+                  </StatusPill>
+                  {metrics.publishedCount > 0 ? (
+                    <StatusPill tone="healthy">
+                      {t(msg`已发布 ${metrics.publishedCount} 次`)}
+                    </StatusPill>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
 
             {revisionsQuery.isLoading ? (

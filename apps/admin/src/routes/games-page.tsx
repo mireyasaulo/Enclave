@@ -786,36 +786,45 @@ export function GamesPage() {
                 </div>
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-[14px] border border-[color:var(--border-faint)] bg-white/70 px-3.5 py-2.5 text-sm leading-6 text-[color:var(--text-secondary)]">
-                <span className="text-[12px] font-medium uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                  {t(msg`下一步`)}
-                </span>
-                <span className="font-medium text-[color:var(--text-primary)]">
-                  {selectedGame
-                    ? summarizeNextActionLabel(selectedGame)
-                    : isCreating
-                      ? t(msg`补齐草稿字段后保存`)
-                      : t(msg`先选中目录项`)}
-                </span>
-                <span className="text-[color:var(--text-muted)]">·</span>
-                <span className="text-[color:var(--text-muted)]">
-                  {selectedGame
-                    ? summarizeGameNextStep(selectedGame)
-                    : isCreating
-                      ? !draftReady
-                        ? t(msg`优先补齐：${draftIssues.slice(0, 3).join("、")}`)
-                        : t(msg`创建草稿后可流转到发布或策展。`)
-                      : t(msg`左侧队列按优先级排序，可直接进入处理。`)}
-                </span>
-                {selectedGame?.lastPublishedAt ? (
-                  <>
-                    <span className="text-[color:var(--text-muted)]">·</span>
-                    <span className="text-[color:var(--text-muted)]">
-                      {t(msg`上次发布 ${formatTime(selectedGame.lastPublishedAt)}`)}
+              {(() => {
+                const stripLabel = selectedGame
+                  ? summarizeNextActionLabel(selectedGame)
+                  : isCreating
+                    ? t(msg`补齐草稿字段后保存`)
+                    : t(msg`先选中目录项`);
+                const stripHint = selectedGame
+                  ? null
+                  : isCreating
+                    ? !draftReady
+                      ? t(msg`优先补齐：${draftIssues.slice(0, 3).join("、")}`)
+                      : null
+                    : t(msg`左侧队列按优先级排序，可直接进入处理。`);
+                const publishedHint = selectedGame?.lastPublishedAt
+                  ? t(msg`上次发布 ${formatTime(selectedGame.lastPublishedAt)}`)
+                  : null;
+                return (
+                  <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-[14px] border border-[color:var(--border-faint)] bg-white/70 px-3.5 py-2.5 text-sm leading-6 text-[color:var(--text-secondary)]">
+                    <span className="text-[12px] font-medium uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                      {t(msg`下一步`)}
                     </span>
-                  </>
-                ) : null}
-              </div>
+                    <span className="font-medium text-[color:var(--text-primary)]">
+                      {stripLabel}
+                    </span>
+                    {stripHint ? (
+                      <>
+                        <span className="text-[color:var(--text-muted)]">·</span>
+                        <span className="text-[color:var(--text-muted)]">{stripHint}</span>
+                      </>
+                    ) : null}
+                    {publishedHint ? (
+                      <>
+                        <span className="text-[color:var(--text-muted)]">·</span>
+                        <span className="text-[color:var(--text-muted)]">{publishedHint}</span>
+                      </>
+                    ) : null}
+                  </div>
+                );
+              })()}
             </Card>
 
             {workspaceTab === "catalog" ? (
