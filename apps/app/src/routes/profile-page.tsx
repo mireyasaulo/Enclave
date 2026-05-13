@@ -8,6 +8,7 @@ import {
   CreditCard,
   FileText,
   LogOut,
+  MessageSquareText,
   Settings,
   ShieldCheck,
   Star,
@@ -180,6 +181,15 @@ export function ProfilePage() {
             />
           </ProfileEntryGroup>
         ) : null}
+
+        <ProfileEntryGroup className="mt-3">
+          <ProfileEntry
+            icon={MessageSquareText}
+            iconClassName="bg-[rgba(56,189,248,0.12)] text-[#0891b2]"
+            label={t(msg`反馈`)}
+            to="/profile/feedback"
+          />
+        </ProfileEntryGroup>
 
         <ProfileEntryGroup className="mt-3">
           <ProfileEntry
