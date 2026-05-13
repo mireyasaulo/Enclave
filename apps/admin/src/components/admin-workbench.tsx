@@ -47,6 +47,7 @@ type AdminPageHeroProps = {
   badges?: ReactNode[];
   actions?: ReactNode;
   metrics?: Array<{ label: ReactNode; value: ReactNode }>;
+  metricsClassName?: string;
   className?: string;
 };
 
@@ -76,6 +77,7 @@ export function AdminPageHero({
   badges,
   actions,
   metrics,
+  metricsClassName,
   className,
 }: AdminPageHeroProps) {
   return (
@@ -104,7 +106,12 @@ export function AdminPageHero({
       </div>
 
       {metrics?.length ? (
-        <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <div
+          className={cn(
+            "mt-6 grid gap-3",
+            metricsClassName ?? "md:grid-cols-2 xl:grid-cols-4",
+          )}
+        >
           {metrics.map((item, index) => (
             <MetricCard key={index} label={item.label} value={item.value} />
           ))}
