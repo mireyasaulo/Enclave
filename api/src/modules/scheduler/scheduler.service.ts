@@ -46,6 +46,13 @@ import {
   WORLD_NEWS_BULLETIN_GENERATION_KIND,
   WORLD_NEWS_DESK_CHARACTER_ID,
 } from '../characters/world-news-desk-character';
+import { sleepForWorldJitter } from '../../common/cron-jitter.util';
+
+// Default jitter for AI-heavy crons in scheduler.service.ts: 0-60s per world.
+// 把 30 个 world 的整点 burst 抹平，避免 minimax token plan 2062 并发限流。
+const AI_CRON_JITTER_MS = 60_000;
+// 凌晨批量任务 jitter 拉长到 10 分钟：daily/weekly 批跑允许更大错峰。
+const BATCH_CRON_JITTER_MS = 600_000;
 
 type TrackedJobResult = {
   summary: string;
@@ -124,8 +131,10 @@ export class SchedulerService {
     private readonly worldLanguage: WorldLanguageService,
   ) {}
 
-  @Cron('*/5 * * * *')
+  // 提醒触发：5min→10min。reminder 命中窗口最差延迟 +10min，可接受。
+  @Cron('*/10 * * * *')
   async triggerDueReminderTasks() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'trigger_due_reminder_tasks',
       () => this.handleTriggerDueReminderTasks(),
@@ -135,6 +144,7 @@ export class SchedulerService {
 
   @Cron('0 * * * *')
   async triggerReminderCheckins() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'trigger_reminder_checkins',
       () => this.handleTriggerReminderCheckins(),
@@ -144,6 +154,7 @@ export class SchedulerService {
 
   @Cron('*/30 * * * *')
   async updateWorldContext() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'world_context_snapshot',
       () => this.handleUpdateWorldContext(),
@@ -153,6 +164,7 @@ export class SchedulerService {
 
   @Cron('59 23 * * *')
   async expireFriendRequests() {
+    await sleepForWorldJitter(BATCH_CRON_JITTER_MS);
     await this.runScheduledJob(
       'expire_friend_requests',
       () => this.handleExpireFriendRequests(),
@@ -160,6 +172,7 @@ export class SchedulerService {
     );
   }
 
+  // DB-only friend-request 接受，sub-minute polling — 不加 jitter（jitter > 间隔会乱）
   @Cron('*/30 * * * * *')
   async autoAcceptDueFriendRequests() {
     await this.runScheduledJob(
@@ -169,8 +182,10 @@ export class SchedulerService {
     );
   }
 
-  @Cron('*/10 * * * *')
+  // need-discovery short-interval：10min→30min。
+  @Cron('*/30 * * * *')
   async discoverNeedCharactersShortInterval() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'discover_need_characters_short_interval',
       () => this.handleDiscoverNeedCharactersShortInterval(),
@@ -178,8 +193,10 @@ export class SchedulerService {
     );
   }
 
-  @Cron('*/10 * * * *')
+  // need-discovery daily：原 */10 是 BUG（名字叫 daily 却每 10 分钟跑），改为 03:00。
+  @Cron('0 3 * * *')
   async discoverNeedCharactersDaily() {
+    await sleepForWorldJitter(BATCH_CRON_JITTER_MS);
     await this.runScheduledJob(
       'discover_need_characters_daily',
       () => this.handleDiscoverNeedCharactersDaily(),
@@ -187,8 +204,10 @@ export class SchedulerService {
     );
   }
 
-  @Cron('*/10 * * * *')
+  // 在线状态刷新：10min→30min（DB-only，频率宽松）。
+  @Cron('*/30 * * * *')
   async updateAiActiveStatus() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'update_ai_active_status',
       () => this.handleUpdateAiActiveStatus(),
@@ -196,8 +215,10 @@ export class SchedulerService {
     );
   }
 
-  @Cron('*/15 * * * *')
+  // 朋友圈调度：15min→30min（NPC 朋友圈 LLM 重型）。
+  @Cron('*/30 * * * *')
   async checkMomentSchedule() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'check_moment_schedule',
       () => this.handleCheckMomentSchedule(),
@@ -205,8 +226,10 @@ export class SchedulerService {
     );
   }
 
-  @Cron('*/10 * * * *')
+  // followup 推荐：10min→30min。
+  @Cron('*/30 * * * *')
   async triggerFollowupRecommendations() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'trigger_followup_recommendations',
       () => this.handleTriggerFollowupRecommendations(),
@@ -214,8 +237,10 @@ export class SchedulerService {
     );
   }
 
-  @Cron('*/30 * * * *')
+  // self-agent heartbeat：30min→1h。
+  @Cron('0 * * * *')
   async triggerSelfAgentHeartbeat() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'trigger_self_agent_heartbeat',
       () => this.handleTriggerSelfAgentHeartbeat(),
@@ -223,8 +248,10 @@ export class SchedulerService {
     );
   }
 
-  @Cron('*/10 * * * *')
+  // 界闻早午晚报检查：10min→30min。
+  @Cron('*/30 * * * *')
   async checkRealWorldNewsBulletins() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'check_real_world_news_bulletins',
       () => this.handleCheckRealWorldNewsBulletins(),
@@ -339,8 +366,10 @@ export class SchedulerService {
     };
   }
 
+  // 场景化好友推送：保留每天 3 个时间点（用户活跃时段），加 jitter 抹平 burst。
   @Cron('0 10,14,19 * * *')
   async triggerSceneFriendRequests() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'trigger_scene_friend_requests',
       () => this.handleTriggerSceneFriendRequests(),
@@ -348,8 +377,10 @@ export class SchedulerService {
     );
   }
 
-  @Cron('*/5 * * * *')
+  // 待回应的 feed 反馈：5min→15min（NPC 评论回复 LLM 重型）。
+  @Cron('*/15 * * * *')
   async processPendingFeedReactions() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'process_pending_feed_reactions',
       () => this.handleProcessPendingFeedReactions(),
@@ -357,8 +388,10 @@ export class SchedulerService {
     );
   }
 
-  @Cron('*/20 * * * *')
+  // 视频号生成调度：20min→1h（每次 burst 容易把 minimax video 配额打空）。
+  @Cron('0 * * * *')
   async checkChannelsSchedule() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'check_channels_schedule',
       () => this.handleCheckChannelsSchedule(),
@@ -367,13 +400,12 @@ export class SchedulerService {
   }
 
   /**
-   * 视频号角色主动转发 cron：与 process_pending_feed_reactions（5min 节奏的
-   * 互动 cron）和 check_channels_schedule（20min 节奏的内容生成 cron）解耦。
-   * 30min 节奏 + 服务内严格的「每角色每天 1 条 / 每 owner 每天 3 条」上限，
-   * 整体频次远低于互动，避免私聊被卡片刷屏。
+   * 视频号角色主动转发：30min→1h，进一步降低私聊推送频次。
+   * 服务内仍保留「每角色每天 1 条 / 每 owner 每天 3 条」上限作为最后兜底。
    */
-  @Cron('0 */30 * * * *')
+  @Cron('0 0 * * * *')
   async runChannelProactiveForward() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'channel_proactive_forward',
       () => this.handleChannelProactiveForward(),
@@ -383,6 +415,7 @@ export class SchedulerService {
 
   @Cron('0 */2 * * *')
   async updateCharacterStatus() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'update_character_status',
       () => this.handleUpdateCharacterStatus(),
@@ -390,8 +423,10 @@ export class SchedulerService {
     );
   }
 
-  @Cron('0 * * * *')
+  // 记忆主动消息：1h→2h（NPC 主动发消息频率宽松些）。
+  @Cron('0 */2 * * *')
   async triggerMemoryProactiveMessages() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'trigger_memory_proactive_messages',
       () => this.handleTriggerMemoryProactiveMessages(),
@@ -401,6 +436,7 @@ export class SchedulerService {
 
   @Cron('0 3 * * *')
   async updateRecentMemoryDaily() {
+    await sleepForWorldJitter(BATCH_CRON_JITTER_MS);
     await this.runScheduledJob(
       'update_recent_memory_daily',
       () => this.handleUpdateRecentMemoryDaily(),
@@ -410,6 +446,7 @@ export class SchedulerService {
 
   @Cron('0 4 * * 1')
   async updateCoreMemoryWeekly() {
+    await sleepForWorldJitter(BATCH_CRON_JITTER_MS);
     await this.runScheduledJob(
       'update_core_memory_weekly',
       () => this.handleUpdateCoreMemoryWeekly(),
@@ -419,6 +456,7 @@ export class SchedulerService {
 
   @Cron('5 0 * * *')
   async resetExpiredSparks() {
+    await sleepForWorldJitter(BATCH_CRON_JITTER_MS);
     await this.runScheduledJob(
       'reset_expired_sparks',
       () => this.handleResetExpiredSparks(),
@@ -433,8 +471,10 @@ export class SchedulerService {
     };
   }
 
-  @Cron('*/15 * * * *')
+  // NPC 自主行为 tick：15min→30min（LLM 重型，单 tick 跑很多角色）。
+  @Cron('*/30 * * * *')
   async npcAutonomyTick() {
+    await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
       'npc_autonomy_tick',
       () => this.handleNpcAutonomyTick(),
