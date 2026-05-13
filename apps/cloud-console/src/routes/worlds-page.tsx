@@ -243,6 +243,29 @@ type QuickActionConfirmState = {
   action: ConfirmableWorldLifecycleAction;
 };
 
+type WorldsSortField = "lastAccessedAt";
+type WorldsSortDirection = "asc" | "desc";
+type WorldsSortState = {
+  field: WorldsSortField;
+  direction: WorldsSortDirection;
+} | null;
+
+function compareNullableDateString(
+  left: string | null | undefined,
+  right: string | null | undefined,
+  direction: WorldsSortDirection,
+): number {
+  // 始终把 null/undefined 排在最后，避免"未登录过"的世界混进顶部抢眼位置
+  const leftTime = left ? Date.parse(left) : Number.NaN;
+  const rightTime = right ? Date.parse(right) : Number.NaN;
+  const leftMissing = Number.isNaN(leftTime);
+  const rightMissing = Number.isNaN(rightTime);
+  if (leftMissing && rightMissing) return 0;
+  if (leftMissing) return 1;
+  if (rightMissing) return -1;
+  return direction === "asc" ? leftTime - rightTime : rightTime - leftTime;
+}
+
 export function WorldsPage() {
   const t = useCloudConsoleText();
   const { locale } = useAppLocale();
@@ -253,6 +276,7 @@ export function WorldsPage() {
   const [confirmAction, setConfirmAction] =
     useState<QuickActionConfirmState | null>(null);
   const [page, setPage] = useState(1);
+  const [sortState, setSortState] = useState<WorldsSortState>(null);
   const pageSize = 20;
   const statusFilter = filters.status;
   const providerFilter = filters.provider;
@@ -412,19 +436,49 @@ export function WorldsPage() {
     };
   }, [attentionByWorldId, filteredInstanceFleet]);
 
+  const sortedInstanceFleet = useMemo(() => {
+    if (!sortState) {
+      return filteredInstanceFleet;
+    }
+    const next = [...filteredInstanceFleet];
+    if (sortState.field === "lastAccessedAt") {
+      next.sort((left, right) =>
+        compareNullableDateString(
+          left.world.lastAccessedAt,
+          right.world.lastAccessedAt,
+          sortState.direction,
+        ),
+      );
+    }
+    return next;
+  }, [filteredInstanceFleet, sortState]);
+
   const totalPages = Math.max(
     1,
-    Math.ceil(filteredInstanceFleet.length / pageSize),
+    Math.ceil(sortedInstanceFleet.length / pageSize),
   );
   const safePage = Math.min(Math.max(1, page), totalPages);
   const pagedInstanceFleet = useMemo(
     () =>
-      filteredInstanceFleet.slice(
+      sortedInstanceFleet.slice(
         (safePage - 1) * pageSize,
         safePage * pageSize,
       ),
-    [filteredInstanceFleet, safePage, pageSize],
+    [sortedInstanceFleet, safePage, pageSize],
   );
+
+  function toggleSort(field: WorldsSortField) {
+    setPage(1);
+    setSortState((current) => {
+      if (!current || current.field !== field) {
+        return { field, direction: "desc" };
+      }
+      if (current.direction === "desc") {
+        return { field, direction: "asc" };
+      }
+      return null;
+    });
+  }
 
   // 过滤条件变化导致总页数缩小到当前页之外时，把页码拉回最后一页，保持显示稳定
   useEffect(() => {
@@ -708,6 +762,23 @@ export function WorldsPage() {
                 <th className="px-4 py-3">{t("Attention")}</th>
                 <th className="px-4 py-3">{t("Health")}</th>
                 <th className="px-4 py-3">{t("Access")}</th>
+                <th className="px-4 py-3">
+                  <button
+                    type="button"
+                    onClick={() => toggleSort("lastAccessedAt")}
+                    className="-mx-1 inline-flex items-center gap-1 rounded px-1 py-0.5 hover:text-[color:var(--text-primary)]"
+                    aria-label={t("Sort by last login")}
+                  >
+                    <span>{t("Last login")}</span>
+                    <span aria-hidden="true" className="text-[10px]">
+                      {sortState?.field === "lastAccessedAt"
+                        ? sortState.direction === "desc"
+                          ? "▼"
+                          : "▲"
+                        : "↕"}
+                    </span>
+                  </button>
+                </th>
                 <th className="px-4 py-3">{t("Heartbeat")}</th>
                 <th className="px-4 py-3">{t("Actions")}</th>
               </tr>
@@ -783,6 +854,9 @@ export function WorldsPage() {
                       <div className="mt-1 max-w-[16rem] truncate text-xs text-[color:var(--text-muted)]">
                         Admin: {item.world.adminUrl ?? t("Not set")}
                       </div>
+                    </td>
+                    <td className="px-4 py-3 text-[color:var(--text-secondary)]">
+                      {formatDateTime(item.world.lastAccessedAt)}
                     </td>
                     <td className="px-4 py-3 text-[color:var(--text-secondary)]">
                       <div>{formatDateTime(lastHeartbeatAt)}</div>
