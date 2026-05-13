@@ -13,6 +13,18 @@ function emitInternal(
 const EXTENSION_STACK_PATTERN =
   /chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\/|@user-script:/;
 
+// 浏览器对网络瞬断给出的几种等价文案。当 stack 没有任何有用 frame 时（Safari 经常
+// 整批 fetch 同一毫秒失败、stack=null），这条 rejection 没有调试价值，且对应的请求
+// 失败已经被 apiCallObserver 记成 api_call ok=false，没必要再以 unhandled_rejection
+// 双重上报。
+const NETWORK_FAILURE_MESSAGES = new Set([
+  "Load failed",
+  "Failed to fetch",
+  "Network request failed",
+  "fetch failed",
+  "NetworkError when attempting to fetch resource.",
+]);
+
 function isAbortLikeError(reason: unknown, message: string | null): boolean {
   if (
     reason &&
@@ -30,6 +42,24 @@ function isAbortLikeError(reason: unknown, message: string | null): boolean {
   );
 }
 
+function isApiRequestError(reason: unknown): boolean {
+  return Boolean(
+    reason &&
+      typeof reason === "object" &&
+      "name" in reason &&
+      (reason as { name?: unknown }).name === "ApiRequestError",
+  );
+}
+
+function hasUsefulStack(stack: string | null): boolean {
+  if (!stack) return false;
+  // "TypeError: Failed to fetch" 这种只有错误名、没有 frame 的不算有用
+  const lines = stack.split("\n").map((line) => line.trim()).filter(Boolean);
+  if (lines.length <= 1) return false;
+  // 至少要有一行包含 ".js" 或 "at " 或 "@http" 之类的真实 frame 标记
+  return lines.some((line) => /\.js|@http|\sat\s/.test(line));
+}
+
 function shouldDropUnhandled(
   reason: unknown,
   message: string | null,
@@ -37,6 +67,16 @@ function shouldDropUnhandled(
 ): boolean {
   if (isAbortLikeError(reason, message)) return true;
   if (stack && EXTENSION_STACK_PATTERN.test(stack)) return true;
+
+  // ApiRequestError：服务端响应 4xx/5xx 已经被 apiCallObserver 记成 api_call，
+  // 业务侧也有 apiRequestErrorHandler 全局通道；落到 unhandled_rejection 是双重上报。
+  if (isApiRequestError(reason)) return true;
+
+  // 网络瞬断（多浏览器变体）且 stack 没有真实 frame —— 无调试价值、且已被 api_call 覆盖。
+  if (message && NETWORK_FAILURE_MESSAGES.has(message) && !hasUsefulStack(stack)) {
+    return true;
+  }
+
   const trimmed = message?.trim() ?? "";
   if (
     trimmed === "" ||
