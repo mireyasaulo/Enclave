@@ -596,6 +596,11 @@ function TaskQueueListItem({
       tabIndex={0}
       onClick={onSelect}
       onKeyDown={(event) => {
+        if (event.target !== event.currentTarget) {
+          // 焦点在内嵌 <button> 上时不要把 Enter/Space 当作"选中该行"，
+          // 否则点完成/顺延/删除的同时还会顺手把行选中并刷新右侧详情面板。
+          return;
+        }
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
           onSelect();
@@ -2134,7 +2139,7 @@ export function ReminderRuntimePage() {
         description={t(msg`把逾期、即将到点、最近触发与最近输出收敛到同一页，方便运营先判断优先级，再逐条完成、顺延或删除提醒。`)}
         badges={[t(msg`承接角色：小盯`)]}
         metrics={metrics}
-        metricsClassName="grid-cols-2"
+        metricsClassName="md:grid-cols-2"
         actions={
           <>
             <AdminDraftStatusPill ready dirty={dirty} />
