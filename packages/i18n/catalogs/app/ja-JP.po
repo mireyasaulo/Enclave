@@ -68,27 +68,27 @@ msgstr "今回の世界への入場経路を整理中です。すぐに前回滞
 
 #: apps/app/src/components/channels-forward-picker.tsx:107
 msgid "这条视频号还没有可播放的视频/音频，无法转发。"
-msgstr ""
+msgstr "このチャンネル投稿はまだ再生可能な動画／音声がないため、転送できません。"
 
 #: apps/app/src/components/channels-forward-picker.tsx:109
 msgid "只支持转发视频号帖子。"
-msgstr ""
+msgstr "チャンネル投稿のみ転送できます。"
 
 #: apps/app/src/components/channels-forward-picker.tsx:111
 msgid "帖子尚未发布，稍后再试。"
-msgstr ""
+msgstr "この投稿はまだ公開されていません。後ほど再試行してください。"
 
 #: apps/app/src/components/channels-forward-picker.tsx:113
 msgid "转发失败，请稍后重试。"
-msgstr ""
+msgstr "転送に失敗しました。後ほど再試行してください。"
 
 #: apps/app/src/components/channels-forward-picker.tsx:126
 msgid "关闭转发面板"
-msgstr ""
+msgstr "転送パネルを閉じる"
 
 #: apps/app/src/components/channels-forward-picker.tsx:135
 msgid "转发到聊天"
-msgstr ""
+msgstr "チャットに転送"
 
 #: apps/app/src/components/channels-forward-picker.tsx:149
 #: apps/app/src/components/chat-composer.tsx:2747
@@ -141,15 +141,15 @@ msgstr "キャンセル"
 
 #: apps/app/src/components/channels-forward-picker.tsx:162
 msgid "正在加载好友列表…"
-msgstr ""
+msgstr "連絡先を読み込み中…"
 
 #: apps/app/src/components/channels-forward-picker.tsx:166
 msgid "好友列表暂时拉不下来，请稍后重试。"
-msgstr ""
+msgstr "連絡先を取得できませんでした。後ほど再試行してください。"
 
 #: apps/app/src/components/channels-forward-picker.tsx:170
 msgid "还没有可转发的好友。"
-msgstr ""
+msgstr "転送できる連絡先がまだありません。"
 
 #: apps/app/src/components/chat-composer.tsx:176
 #: apps/app/src/components/chat-composer.tsx:4618
@@ -2018,11 +2018,11 @@ msgstr "動画"
 
 #: apps/app/src/components/chat-message-list.tsx:5110
 msgid "音频"
-msgstr ""
+msgstr "音声"
 
 #: apps/app/src/components/chat-message-list.tsx:5111
 msgid "图文"
-msgstr ""
+msgstr "記事"
 
 #: apps/app/src/components/chat-message-list.tsx:5112
 #: apps/app/src/features/shell/desktop-nav-matching.ts:91
@@ -2040,7 +2040,7 @@ msgstr "チャンネル"
 
 #: apps/app/src/components/chat-message-list.tsx:5149
 msgid "视频号动态"
-msgstr ""
+msgstr "チャンネル投稿"
 
 #. placeholder {0}: attachment.authorName
 #. placeholder {0}: formatTimestamp(post.createdAt)
@@ -7696,7 +7696,7 @@ msgstr "まだ表示できるコンテンツがありません。"
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:469
 #: apps/app/src/routes/channels-page.tsx:1209
 msgid "已转发给 {0}。"
-msgstr ""
+msgstr "{0} に転送しました。"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:623
 #: apps/app/src/routes/channels-page.tsx:1275
@@ -7710,11 +7710,11 @@ msgstr "後でまた確認してください"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:712
 msgid "取消静音"
-msgstr ""
+msgstr "ミュート解除"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:712
 msgid "静音"
-msgstr ""
+msgstr "ミュート"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:762
 #: apps/app/src/i18n/static-dom-seed.ts:346
@@ -8851,7 +8851,7 @@ msgstr "ノート {0} を共有しました。"
 #. placeholder {0}: attachment.authorName
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1261
 msgid "转发了 {0} 的视频号。"
-msgstr ""
+msgstr "{0} さんのチャンネル投稿を転送しました。"
 
 #. placeholder {0}: attachment.label
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1267
@@ -10968,7 +10968,7 @@ msgstr "まだコメントがありません。あなたが最初の応答者に
 
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:361
 msgid "正在读取..."
-msgstr ""
+msgstr "読み込み中..."
 
 #. placeholder {0}: post.commentCount
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:362
@@ -21581,7 +21581,7 @@ msgstr "、"
 #. placeholder {0}: attachment.authorName
 #: apps/app/src/lib/message-attachment-semantic.ts:189
 msgid "{0} 的视频号"
-msgstr ""
+msgstr "{0} さんのチャンネル投稿"
 
 #: apps/app/src/lib/message-attachment-semantic.ts:227
 msgid "文档"
@@ -23900,15 +23900,15 @@ msgstr "{0} を連絡先に追加しました：{1}"
 
 #: apps/app/src/routes/discover-encounter-page.tsx:120
 msgid "晃动手机即可开始相遇，也可以直接点下方按钮。每次相遇都会直接加入你的通讯录。"
-msgstr ""
+msgstr "スマホを振ると出会いが始まります。下のボタンをタップしても OK です。出会った相手は自動的に連絡先に追加されます。"
 
 #: apps/app/src/routes/discover-encounter-page.tsx:122
 msgid "首次使用请点下方按钮授权动作传感器，之后晃动手机即可触发相遇。"
-msgstr ""
+msgstr "初回はモーションセンサーを許可するために下のボタンをタップしてください。以降はスマホを振ると出会いが始まります。"
 
 #: apps/app/src/routes/discover-encounter-page.tsx:124
 msgid "已拒绝动作传感器授权，可在系统设置开启，或点下方按钮手动触发相遇。"
-msgstr ""
+msgstr "モーションセンサーの利用が拒否されました。システム設定で許可するか、下のボタンから手動で出会いを開始してください。"
 
 #: apps/app/src/routes/discover-encounter-page.tsx:132
 #: apps/app/src/routes/discover-page.tsx:742
@@ -23917,7 +23917,7 @@ msgstr "探しています..."
 
 #: apps/app/src/routes/discover-encounter-page.tsx:135
 msgid "开启摇一摇"
-msgstr ""
+msgstr "シェイクを有効化"
 
 #: apps/app/src/routes/discover-encounter-page.tsx:137
 #: apps/app/src/routes/discover-encounter-page.tsx:169
@@ -24050,12 +24050,12 @@ msgstr "この投稿要約をコピー"
 #: apps/app/src/routes/discover-feed-page.tsx:1300
 #: apps/app/src/routes/moments-page.tsx:1598
 msgid "正在加载更多…"
-msgstr ""
+msgstr "さらに読み込み中…"
 
 #: apps/app/src/routes/discover-feed-page.tsx:1304
 #: apps/app/src/routes/moments-page.tsx:1602
 msgid "已经到底了"
-msgstr ""
+msgstr "これ以上ありません"
 
 #: apps/app/src/routes/discover-feed-page.tsx:1315
 msgid "还没有新动态"
@@ -26449,46 +26449,46 @@ msgstr "別の名前、略称、またはキーワードで試してみてくだ
 #. placeholder {0}: (err as Error).message
 #: apps/app/src/routes/profile-character-import-page.tsx:53
 msgid "JSON 解析失败：{0}"
-msgstr ""
+msgstr "JSON の解析に失敗しました：{0}"
 
 #. placeholder {0}: result.character.name
 #: apps/app/src/routes/profile-character-import-page.tsx:59
 msgid "已覆盖同名角色：{0}"
-msgstr ""
+msgstr "同名のキャラクターを上書きしました：{0}"
 
 #. placeholder {0}: result.character.name
 #: apps/app/src/routes/profile-character-import-page.tsx:60
 msgid "已导入新角色：{0}"
-msgstr ""
+msgstr "新しいキャラクターをインポートしました：{0}"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:65
 msgid "导入失败，请稍后再试"
-msgstr ""
+msgstr "インポートに失敗しました。後ほど再試行してください。"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:75
 #: apps/app/src/routes/profile-page.tsx:190
 msgid "导入角色"
-msgstr ""
+msgstr "キャラクターをインポート"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:101
 msgid "选择一个从「世界角色管理平台」导出的 JSON 文件，把里面的角色导入到你自己的世界。"
-msgstr ""
+msgstr "「世界キャラクター管理プラットフォーム」からエクスポートした JSON ファイルを選び、含まれるキャラクターを自分の世界にインポートします。"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:106
 msgid "同名角色会被覆盖（保留原 id 和好友关系），不同名则新建并自动加为你的好友。"
-msgstr ""
+msgstr "同名のキャラクターは上書きされます（元の ID とフレンド関係は維持）。新しい名前のキャラクターは新規作成され、自動的にあなたの連絡先に追加されます。"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:116
 msgid "选择一个 .character.json 文件"
-msgstr ""
+msgstr ".character.json ファイルを選択"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:124
 msgid "导入中…"
-msgstr ""
+msgstr "インポート中…"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:124
 msgid "选择文件"
-msgstr ""
+msgstr "ファイルを選択"
 
 #: apps/app/src/routes/profile-favorites-page.tsx:157
 msgid "正在加载收藏…"

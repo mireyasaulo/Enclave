@@ -68,27 +68,27 @@ msgstr "이번 세계 진입 경로를 정리 중입니다. 곧 마지막 머물
 
 #: apps/app/src/components/channels-forward-picker.tsx:107
 msgid "这条视频号还没有可播放的视频/音频，无法转发。"
-msgstr ""
+msgstr "이 채널즈 게시물에는 아직 재생할 수 있는 동영상/오디오가 없어 전달할 수 없습니다."
 
 #: apps/app/src/components/channels-forward-picker.tsx:109
 msgid "只支持转发视频号帖子。"
-msgstr ""
+msgstr "채널즈 게시물만 전달할 수 있습니다."
 
 #: apps/app/src/components/channels-forward-picker.tsx:111
 msgid "帖子尚未发布，稍后再试。"
-msgstr ""
+msgstr "게시물이 아직 게시되지 않았습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/app/src/components/channels-forward-picker.tsx:113
 msgid "转发失败，请稍后重试。"
-msgstr ""
+msgstr "전달에 실패했습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/app/src/components/channels-forward-picker.tsx:126
 msgid "关闭转发面板"
-msgstr ""
+msgstr "전달 패널 닫기"
 
 #: apps/app/src/components/channels-forward-picker.tsx:135
 msgid "转发到聊天"
-msgstr ""
+msgstr "채팅으로 전달"
 
 #: apps/app/src/components/channels-forward-picker.tsx:149
 #: apps/app/src/components/chat-composer.tsx:2747
@@ -141,15 +141,15 @@ msgstr "취소"
 
 #: apps/app/src/components/channels-forward-picker.tsx:162
 msgid "正在加载好友列表…"
-msgstr ""
+msgstr "연락처를 불러오는 중…"
 
 #: apps/app/src/components/channels-forward-picker.tsx:166
 msgid "好友列表暂时拉不下来，请稍后重试。"
-msgstr ""
+msgstr "연락처를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/app/src/components/channels-forward-picker.tsx:170
 msgid "还没有可转发的好友。"
-msgstr ""
+msgstr "전달할 수 있는 연락처가 아직 없습니다."
 
 #: apps/app/src/components/chat-composer.tsx:176
 #: apps/app/src/components/chat-composer.tsx:4618
@@ -2018,11 +2018,11 @@ msgstr "동영상"
 
 #: apps/app/src/components/chat-message-list.tsx:5110
 msgid "音频"
-msgstr ""
+msgstr "오디오"
 
 #: apps/app/src/components/chat-message-list.tsx:5111
 msgid "图文"
-msgstr ""
+msgstr "게시글"
 
 #: apps/app/src/components/chat-message-list.tsx:5112
 #: apps/app/src/features/shell/desktop-nav-matching.ts:91
@@ -2040,7 +2040,7 @@ msgstr "채널"
 
 #: apps/app/src/components/chat-message-list.tsx:5149
 msgid "视频号动态"
-msgstr ""
+msgstr "채널즈 게시물"
 
 #. placeholder {0}: attachment.authorName
 #. placeholder {0}: formatTimestamp(post.createdAt)
@@ -7696,7 +7696,7 @@ msgstr "아직 볼 수 있는 콘텐츠가 없습니다."
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:469
 #: apps/app/src/routes/channels-page.tsx:1209
 msgid "已转发给 {0}。"
-msgstr ""
+msgstr "{0}에게 전달했습니다."
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:623
 #: apps/app/src/routes/channels-page.tsx:1275
@@ -7710,11 +7710,11 @@ msgstr "나중에 다시 확인해 보세요"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:712
 msgid "取消静音"
-msgstr ""
+msgstr "음소거 해제"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:712
 msgid "静音"
-msgstr ""
+msgstr "음소거"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:762
 #: apps/app/src/i18n/static-dom-seed.ts:346
@@ -8851,7 +8851,7 @@ msgstr "노트 {0}을(를) 공유했습니다."
 #. placeholder {0}: attachment.authorName
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1261
 msgid "转发了 {0} 的视频号。"
-msgstr ""
+msgstr "{0}님의 채널즈 게시물을 전달했습니다."
 
 #. placeholder {0}: attachment.label
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1267
@@ -10968,7 +10968,7 @@ msgstr "아직 댓글이 없습니다. 가장 먼저 답글을 달아보세요."
 
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:361
 msgid "正在读取..."
-msgstr ""
+msgstr "불러오는 중..."
 
 #. placeholder {0}: post.commentCount
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:362
@@ -21581,7 +21581,7 @@ msgstr ", "
 #. placeholder {0}: attachment.authorName
 #: apps/app/src/lib/message-attachment-semantic.ts:189
 msgid "{0} 的视频号"
-msgstr ""
+msgstr "{0}님의 채널즈 게시물"
 
 #: apps/app/src/lib/message-attachment-semantic.ts:227
 msgid "文档"
@@ -23900,15 +23900,15 @@ msgstr "{0}이(가) 주소록에 추가되었습니다: {1}"
 
 #: apps/app/src/routes/discover-encounter-page.tsx:120
 msgid "晃动手机即可开始相遇，也可以直接点下方按钮。每次相遇都会直接加入你的通讯录。"
-msgstr ""
+msgstr "휴대전화를 흔들면 만남이 시작됩니다. 아래 버튼을 눌러도 됩니다. 만남 상대는 곧바로 연락처에 추가됩니다."
 
 #: apps/app/src/routes/discover-encounter-page.tsx:122
 msgid "首次使用请点下方按钮授权动作传感器，之后晃动手机即可触发相遇。"
-msgstr ""
+msgstr "처음 사용한다면 아래 버튼을 눌러 모션 센서를 허용해 주세요. 이후 휴대전화를 흔들면 만남이 시작됩니다."
 
 #: apps/app/src/routes/discover-encounter-page.tsx:124
 msgid "已拒绝动作传感器授权，可在系统设置开启，或点下方按钮手动触发相遇。"
-msgstr ""
+msgstr "모션 센서 권한이 거부되었습니다. 시스템 설정에서 허용하거나 아래 버튼으로 직접 만남을 시작해 주세요."
 
 #: apps/app/src/routes/discover-encounter-page.tsx:132
 #: apps/app/src/routes/discover-page.tsx:742
@@ -23917,7 +23917,7 @@ msgstr "찾는 중..."
 
 #: apps/app/src/routes/discover-encounter-page.tsx:135
 msgid "开启摇一摇"
-msgstr ""
+msgstr "흔들기 활성화"
 
 #: apps/app/src/routes/discover-encounter-page.tsx:137
 #: apps/app/src/routes/discover-encounter-page.tsx:169
@@ -24050,12 +24050,12 @@ msgstr "이 게시물 요약 복사"
 #: apps/app/src/routes/discover-feed-page.tsx:1300
 #: apps/app/src/routes/moments-page.tsx:1598
 msgid "正在加载更多…"
-msgstr ""
+msgstr "더 불러오는 중…"
 
 #: apps/app/src/routes/discover-feed-page.tsx:1304
 #: apps/app/src/routes/moments-page.tsx:1602
 msgid "已经到底了"
-msgstr ""
+msgstr "마지막입니다"
 
 #: apps/app/src/routes/discover-feed-page.tsx:1315
 msgid "还没有新动态"
@@ -26449,46 +26449,46 @@ msgstr "다른 이름, 약칭 또는 키워드로 시도해 보세요."
 #. placeholder {0}: (err as Error).message
 #: apps/app/src/routes/profile-character-import-page.tsx:53
 msgid "JSON 解析失败：{0}"
-msgstr ""
+msgstr "JSON 파싱 실패: {0}"
 
 #. placeholder {0}: result.character.name
 #: apps/app/src/routes/profile-character-import-page.tsx:59
 msgid "已覆盖同名角色：{0}"
-msgstr ""
+msgstr "같은 이름의 캐릭터를 덮어썼습니다: {0}"
 
 #. placeholder {0}: result.character.name
 #: apps/app/src/routes/profile-character-import-page.tsx:60
 msgid "已导入新角色：{0}"
-msgstr ""
+msgstr "새 캐릭터를 가져왔습니다: {0}"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:65
 msgid "导入失败，请稍后再试"
-msgstr ""
+msgstr "가져오기에 실패했습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/app/src/routes/profile-character-import-page.tsx:75
 #: apps/app/src/routes/profile-page.tsx:190
 msgid "导入角色"
-msgstr ""
+msgstr "캐릭터 가져오기"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:101
 msgid "选择一个从「世界角色管理平台」导出的 JSON 文件，把里面的角色导入到你自己的世界。"
-msgstr ""
+msgstr "「세계 캐릭터 관리 플랫폼」에서 내보낸 JSON 파일을 선택해 그 안의 캐릭터를 자신의 세계로 가져옵니다."
 
 #: apps/app/src/routes/profile-character-import-page.tsx:106
 msgid "同名角色会被覆盖（保留原 id 和好友关系），不同名则新建并自动加为你的好友。"
-msgstr ""
+msgstr "같은 이름의 캐릭터는 덮어씌워집니다(원래 ID와 친구 관계는 유지). 새로운 이름의 캐릭터는 새로 추가되며 자동으로 친구가 됩니다."
 
 #: apps/app/src/routes/profile-character-import-page.tsx:116
 msgid "选择一个 .character.json 文件"
-msgstr ""
+msgstr ".character.json 파일 선택"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:124
 msgid "导入中…"
-msgstr ""
+msgstr "가져오는 중…"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:124
 msgid "选择文件"
-msgstr ""
+msgstr "파일 선택"
 
 #: apps/app/src/routes/profile-favorites-page.tsx:157
 msgid "正在加载收藏…"

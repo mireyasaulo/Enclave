@@ -68,27 +68,27 @@ msgstr "Plotting your path into the world. Bringing you back to where you left o
 
 #: apps/app/src/components/channels-forward-picker.tsx:107
 msgid "这条视频号还没有可播放的视频/音频，无法转发。"
-msgstr ""
+msgstr "This Channels post has no playable video/audio yet and can't be forwarded."
 
 #: apps/app/src/components/channels-forward-picker.tsx:109
 msgid "只支持转发视频号帖子。"
-msgstr ""
+msgstr "Only Channels posts can be forwarded."
 
 #: apps/app/src/components/channels-forward-picker.tsx:111
 msgid "帖子尚未发布，稍后再试。"
-msgstr ""
+msgstr "This post hasn't been published yet. Try again later."
 
 #: apps/app/src/components/channels-forward-picker.tsx:113
 msgid "转发失败，请稍后重试。"
-msgstr ""
+msgstr "Forwarding failed. Please try again later."
 
 #: apps/app/src/components/channels-forward-picker.tsx:126
 msgid "关闭转发面板"
-msgstr ""
+msgstr "Close forward panel"
 
 #: apps/app/src/components/channels-forward-picker.tsx:135
 msgid "转发到聊天"
-msgstr ""
+msgstr "Forward to chat"
 
 #: apps/app/src/components/channels-forward-picker.tsx:149
 #: apps/app/src/components/chat-composer.tsx:2747
@@ -141,15 +141,15 @@ msgstr "Cancel"
 
 #: apps/app/src/components/channels-forward-picker.tsx:162
 msgid "正在加载好友列表…"
-msgstr ""
+msgstr "Loading contacts…"
 
 #: apps/app/src/components/channels-forward-picker.tsx:166
 msgid "好友列表暂时拉不下来，请稍后重试。"
-msgstr ""
+msgstr "Couldn't load contacts. Please try again later."
 
 #: apps/app/src/components/channels-forward-picker.tsx:170
 msgid "还没有可转发的好友。"
-msgstr ""
+msgstr "No contacts available to forward to yet."
 
 #: apps/app/src/components/chat-composer.tsx:176
 #: apps/app/src/components/chat-composer.tsx:4618
@@ -2018,11 +2018,11 @@ msgstr "Video"
 
 #: apps/app/src/components/chat-message-list.tsx:5110
 msgid "音频"
-msgstr ""
+msgstr "Audio"
 
 #: apps/app/src/components/chat-message-list.tsx:5111
 msgid "图文"
-msgstr ""
+msgstr "Article"
 
 #: apps/app/src/components/chat-message-list.tsx:5112
 #: apps/app/src/features/shell/desktop-nav-matching.ts:91
@@ -2040,7 +2040,7 @@ msgstr "Channels"
 
 #: apps/app/src/components/chat-message-list.tsx:5149
 msgid "视频号动态"
-msgstr ""
+msgstr "Channels post"
 
 #. placeholder {0}: attachment.authorName
 #. placeholder {0}: formatTimestamp(post.createdAt)
@@ -7696,7 +7696,7 @@ msgstr "Nothing to watch yet."
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:469
 #: apps/app/src/routes/channels-page.tsx:1209
 msgid "已转发给 {0}。"
-msgstr ""
+msgstr "Forwarded to {0}."
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:623
 #: apps/app/src/routes/channels-page.tsx:1275
@@ -7710,11 +7710,11 @@ msgstr "Check back later"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:712
 msgid "取消静音"
-msgstr ""
+msgstr "Unmute"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:712
 msgid "静音"
-msgstr ""
+msgstr "Mute"
 
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:762
 #: apps/app/src/i18n/static-dom-seed.ts:346
@@ -8851,7 +8851,7 @@ msgstr "Shared a note: {0}."
 #. placeholder {0}: attachment.authorName
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1261
 msgid "转发了 {0} 的视频号。"
-msgstr ""
+msgstr "Forwarded {0}'s Channels post."
 
 #. placeholder {0}: attachment.label
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1267
@@ -10968,7 +10968,7 @@ msgstr "No comments yet — be the first to respond."
 
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:361
 msgid "正在读取..."
-msgstr ""
+msgstr "Loading..."
 
 #. placeholder {0}: post.commentCount
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:362
@@ -21581,7 +21581,7 @@ msgstr ", "
 #. placeholder {0}: attachment.authorName
 #: apps/app/src/lib/message-attachment-semantic.ts:189
 msgid "{0} 的视频号"
-msgstr ""
+msgstr "{0}'s Channels post"
 
 #: apps/app/src/lib/message-attachment-semantic.ts:227
 msgid "文档"
@@ -23900,15 +23900,15 @@ msgstr "{0} added to Contacts: {1}"
 
 #: apps/app/src/routes/discover-encounter-page.tsx:120
 msgid "晃动手机即可开始相遇，也可以直接点下方按钮。每次相遇都会直接加入你的通讯录。"
-msgstr ""
+msgstr "Shake your phone to start an encounter, or just tap the button below. Every encounter is added directly to your contacts."
 
 #: apps/app/src/routes/discover-encounter-page.tsx:122
 msgid "首次使用请点下方按钮授权动作传感器，之后晃动手机即可触发相遇。"
-msgstr ""
+msgstr "First time here? Tap the button below to grant motion-sensor access, then shake your phone to trigger an encounter."
 
 #: apps/app/src/routes/discover-encounter-page.tsx:124
 msgid "已拒绝动作传感器授权，可在系统设置开启，或点下方按钮手动触发相遇。"
-msgstr ""
+msgstr "Motion-sensor access was denied. Enable it in system settings, or tap the button below to trigger an encounter manually."
 
 #: apps/app/src/routes/discover-encounter-page.tsx:132
 #: apps/app/src/routes/discover-page.tsx:742
@@ -23917,7 +23917,7 @@ msgstr "Searching..."
 
 #: apps/app/src/routes/discover-encounter-page.tsx:135
 msgid "开启摇一摇"
-msgstr ""
+msgstr "Enable Shake"
 
 #: apps/app/src/routes/discover-encounter-page.tsx:137
 #: apps/app/src/routes/discover-encounter-page.tsx:169
@@ -24050,12 +24050,12 @@ msgstr "Copy this post summary"
 #: apps/app/src/routes/discover-feed-page.tsx:1300
 #: apps/app/src/routes/moments-page.tsx:1598
 msgid "正在加载更多…"
-msgstr ""
+msgstr "Loading more…"
 
 #: apps/app/src/routes/discover-feed-page.tsx:1304
 #: apps/app/src/routes/moments-page.tsx:1602
 msgid "已经到底了"
-msgstr ""
+msgstr "You've reached the end"
 
 #: apps/app/src/routes/discover-feed-page.tsx:1315
 msgid "还没有新动态"
@@ -26449,46 +26449,46 @@ msgstr "Try a different name, short name, or keyword."
 #. placeholder {0}: (err as Error).message
 #: apps/app/src/routes/profile-character-import-page.tsx:53
 msgid "JSON 解析失败：{0}"
-msgstr ""
+msgstr "JSON parse failed: {0}"
 
 #. placeholder {0}: result.character.name
 #: apps/app/src/routes/profile-character-import-page.tsx:59
 msgid "已覆盖同名角色：{0}"
-msgstr ""
+msgstr "Overwrote existing character: {0}"
 
 #. placeholder {0}: result.character.name
 #: apps/app/src/routes/profile-character-import-page.tsx:60
 msgid "已导入新角色：{0}"
-msgstr ""
+msgstr "Imported new character: {0}"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:65
 msgid "导入失败，请稍后再试"
-msgstr ""
+msgstr "Import failed. Please try again later."
 
 #: apps/app/src/routes/profile-character-import-page.tsx:75
 #: apps/app/src/routes/profile-page.tsx:190
 msgid "导入角色"
-msgstr ""
+msgstr "Import characters"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:101
 msgid "选择一个从「世界角色管理平台」导出的 JSON 文件，把里面的角色导入到你自己的世界。"
-msgstr ""
+msgstr "Pick a JSON file exported from \"World Character Manager\" to import its characters into your world."
 
 #: apps/app/src/routes/profile-character-import-page.tsx:106
 msgid "同名角色会被覆盖（保留原 id 和好友关系），不同名则新建并自动加为你的好友。"
-msgstr ""
+msgstr "Characters with matching names are overwritten (keeping the original ID and contact links). New names are added as fresh characters and automatically become your contacts."
 
 #: apps/app/src/routes/profile-character-import-page.tsx:116
 msgid "选择一个 .character.json 文件"
-msgstr ""
+msgstr "Pick a .character.json file"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:124
 msgid "导入中…"
-msgstr ""
+msgstr "Importing…"
 
 #: apps/app/src/routes/profile-character-import-page.tsx:124
 msgid "选择文件"
-msgstr ""
+msgstr "Choose file"
 
 #: apps/app/src/routes/profile-favorites-page.tsx:157
 msgid "正在加载收藏…"
