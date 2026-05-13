@@ -656,6 +656,11 @@ export class WorldLifecycleWorkerService implements OnModuleInit, OnModuleDestro
       instance.lastOperationAt = new Date();
       await this.instanceRepo.save(instance);
       suspendApiBaseUrl = suspendResult.apiBaseUrl;
+    } else if (provider.summary.deploymentMode === "local-process") {
+      // instance 行被外部清掉但 world 还在的边角态：local-process child 已经没了，
+      // 那个端口随时可能被下一个新 world 拿去；不清 apiBaseUrl 就会出现串台。
+      // 别的 provider（mock/manual-docker）apiBaseUrl 稳定，不动。
+      suspendApiBaseUrl = null;
     }
 
     await this.sleep(500);
