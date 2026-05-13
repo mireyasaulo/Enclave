@@ -293,6 +293,10 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     entries: "条",
     Previous: "上一页",
     Next: "下一页",
+    "First page": "首页",
+    "Last page": "末页",
+    "Jump to page": "跳至",
+    Go: "跳转",
     "Handler note": "处理备注",
     "Internal note for this feedback. Saved when you change status.":
       "针对该反馈的内部备注，切换状态时一并保存。",
@@ -372,6 +376,7 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Client telemetry, PV/UV, API health and frontend errors.":
       "客户端埋点上报、PV/UV、API 健康度与前端错误。",
     "Page views (by app)": "页面浏览（按端分组）",
+    "Page views": "页面浏览",
     "Failed to load overview": "加载概览失败",
     "Failed to load line chart": "加载折线失败",
     "Failed to load events": "加载事件失败",
@@ -925,6 +930,10 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     entries: "件",
     Previous: "前へ",
     Next: "次へ",
+    "First page": "最初",
+    "Last page": "最後",
+    "Jump to page": "ページへジャンプ",
+    Go: "移動",
     "Handler note": "対応メモ",
     "Internal note for this feedback. Saved when you change status.":
       "このフィードバックに対する社内メモ。ステータス変更時に保存されます。",
@@ -1003,6 +1012,7 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Client telemetry, PV/UV, API health and frontend errors.":
       "クライアント計測（PV/UV）、API ヘルス、フロントエンドエラー。",
     "Page views (by app)": "ページビュー（アプリ別）",
+    "Page views": "ページビュー",
     "Failed to load overview": "概要の読み込みに失敗しました",
     "Failed to load line chart": "折れ線グラフの読み込みに失敗しました",
     "Failed to load events": "イベントの読み込みに失敗しました",
@@ -1562,6 +1572,10 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     entries: "건",
     Previous: "이전",
     Next: "다음",
+    "First page": "처음",
+    "Last page": "마지막",
+    "Jump to page": "페이지 이동",
+    Go: "이동",
     "Handler note": "처리 메모",
     "Internal note for this feedback. Saved when you change status.":
       "이 피드백에 대한 내부 메모입니다. 상태 변경 시 함께 저장됩니다.",
@@ -1640,6 +1654,7 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Client telemetry, PV/UV, API health and frontend errors.":
       "클라이언트 텔레메트리(PV/UV), API 상태 및 프런트엔드 오류.",
     "Page views (by app)": "페이지 조회수(앱별)",
+    "Page views": "페이지 조회수",
     "Failed to load overview": "개요를 불러오지 못했습니다",
     "Failed to load line chart": "라인 차트를 불러오지 못했습니다",
     "Failed to load events": "이벤트를 불러오지 못했습니다",

@@ -71,6 +71,7 @@ import type {
   RevokeCloudAdminSessionsByIdResponse,
   SubscriptionPlanSummary,
   SubscriptionRecordSummary,
+  MinimaxHourlyTelemetryResponse,
   TelemetryApiHealthResponse,
   TelemetryAppId,
   TelemetryErrorsResponse,
@@ -80,6 +81,8 @@ import type {
   TelemetryTimeseriesResponse,
   TelemetryTopEventsResponse,
   TelemetryTopWorldsResponse,
+  TelemetryTopWorldsSortDir,
+  TelemetryTopWorldsSortKey,
   TelemetryWorldRow,
   UpdateRevenueSharingPolicyRequest,
   UpsertCloudConfigRequest,
@@ -1446,14 +1449,33 @@ export const cloudAdminApi = {
       `/telemetry/errors${buildQueryString({ range, appId, worldId })}`,
     ),
 
-  getTelemetryTopWorlds: (range: TelemetryRange) =>
+  getTelemetryTopWorlds: (
+    range: TelemetryRange,
+    params?: {
+      page?: number;
+      pageSize?: number;
+      sortBy?: TelemetryTopWorldsSortKey;
+      sortDir?: TelemetryTopWorldsSortDir;
+    },
+  ) =>
     adminFetch<TelemetryTopWorldsResponse>(
-      `/telemetry/top-worlds${buildQueryString({ range })}`,
+      `/telemetry/top-worlds${buildQueryString({
+        range,
+        page: params?.page,
+        pageSize: params?.pageSize,
+        sortBy: params?.sortBy,
+        sortDir: params?.sortDir,
+      })}`,
     ),
 
   listTelemetryWorlds: (range: TelemetryRange) =>
     adminFetch<TelemetryWorldRow[]>(
       `/telemetry/worlds${buildQueryString({ range })}`,
+    ),
+
+  getTelemetryMinimaxHourly: (range: TelemetryRange, worldId?: string) =>
+    adminFetch<MinimaxHourlyTelemetryResponse>(
+      `/telemetry/minimax-hourly${buildQueryString({ range, worldId })}`,
     ),
 
   getCloudTokenUsageOverview: (filters?: { from?: string; to?: string }) =>

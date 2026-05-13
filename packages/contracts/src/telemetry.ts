@@ -127,12 +127,55 @@ export interface TelemetryErrorsResponse {
 export interface TelemetryWorldRow {
   worldId: string;
   worldName: string | null;
+  ownerEmail: string | null;
+  ownerPhone: string | null;
   eventCount: number;
   uniqueUsers: number;
   errorCount: number;
 }
 
+export type TelemetryTopWorldsSortKey =
+  | "eventCount"
+  | "uniqueUsers"
+  | "errorCount";
+
+export type TelemetryTopWorldsSortDir = "asc" | "desc";
+
 export interface TelemetryTopWorldsResponse {
   range: TelemetryRange;
   rows: TelemetryWorldRow[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface MinimaxUsageHourlyBucketPushItem {
+  /** UTC 整点 ISO 时间戳，例如 "2026-05-13T07:00:00.000Z"。 */
+  hour: string;
+  /** 该 hour bucket 内全部 minimax 出站调用次数（含 4xx/5xx，不含网络/超时）。 */
+  calls: number;
+  /** RPM/并发限流次数：HTTP 429 + provider code 1002/2003/2062。可短期恢复。 */
+  rpmLimited: number;
+  /** 配额耗尽次数：provider code 1042/2056。今日/当窗口确定性额度耗尽。 */
+  quotaLimited: number;
+}
+
+export interface MinimaxUsageHourlyPushPayload {
+  worldId: string;
+  buckets: MinimaxUsageHourlyBucketPushItem[];
+  callbackToken?: string | null;
+}
+
+export interface MinimaxHourlyTelemetryPoint {
+  /** UTC 整点 ISO 时间戳。 */
+  hour: string;
+  callCount: number;
+  rpmLimitedCount: number;
+  quotaLimitedCount: number;
+}
+
+export interface MinimaxHourlyTelemetryResponse {
+  range: TelemetryRange;
+  worldId: string | null;
+  points: MinimaxHourlyTelemetryPoint[];
 }
