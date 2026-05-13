@@ -1783,6 +1783,29 @@ window.alert(t(msg`预设 JSON 无效`));
                   <div className="mt-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                     {selectedReport.createdAt} · {selectedReport.id}
                   </div>
+                  <div className="mt-4 grid gap-2 md:grid-cols-2">
+                    <div>{t(msg`数据集`)}：{selectedReport.datasetId}</div>
+                    <div>{t(msg`标签`)}：{selectedReport.experimentLabel ?? t(msg`无`)}</div>
+                    <div>{t(msg`单次运行`)}：{selectedReport.singleRunId ?? t(msg`无`)}</div>
+                    <div>{t(msg`对比记录`)}：{selectedReport.comparisonId ?? t(msg`无`)}</div>
+                    <div>{t(msg`基线运行`)}：{selectedReport.baselineRunId ?? t(msg`无`)}</div>
+                    <div>{t(msg`候选运行`)}：{selectedReport.candidateRunId ?? t(msg`无`)}</div>
+                    <div>{t(msg`决策`)}：{formatDecisionStatus(selectedReport.decisionStatus)}</div>
+                    <div>{t(msg`动作`)}：{selectedReport.appliedAction ?? t(msg`无`)}</div>
+                    <div>{t(msg`决策时间`)}：{selectedReport.decidedAt ?? t(msg`无`)}</div>
+                    <div>{t(msg`决策人`)}：{selectedReport.decidedBy ?? t(msg`无`)}</div>
+                  </div>
+                  <div className="mt-4">
+                    <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                      {t(msg`决策备注`)}
+                    </div>
+                    <TextAreaField
+                      className="min-h-24"
+                      value={reportDecisionNote}
+                      onChange={(event) => setReportDecisionNote(event.target.value)}
+                      placeholder={t(msg`补一条这次继续测试、采用、回滚或归档的依据。`)}
+                    />
+                  </div>
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Button
                       variant="secondary"
@@ -1841,29 +1864,6 @@ window.alert(t(msg`预设 JSON 无效`));
                       }
                       disabled={reportDecisionBusy}
                     >{t(msg`归档`)}</Button>
-                  </div>
-                  <div className="mt-4 grid gap-2 md:grid-cols-2">
-                    <div>{t(msg`数据集`)}：{selectedReport.datasetId}</div>
-                    <div>{t(msg`标签`)}：{selectedReport.experimentLabel ?? t(msg`无`)}</div>
-                    <div>{t(msg`单次运行`)}：{selectedReport.singleRunId ?? t(msg`无`)}</div>
-                    <div>{t(msg`对比记录`)}：{selectedReport.comparisonId ?? t(msg`无`)}</div>
-                    <div>{t(msg`基线运行`)}：{selectedReport.baselineRunId ?? t(msg`无`)}</div>
-                    <div>{t(msg`候选运行`)}：{selectedReport.candidateRunId ?? t(msg`无`)}</div>
-                    <div>{t(msg`决策`)}：{formatDecisionStatus(selectedReport.decisionStatus)}</div>
-                    <div>{t(msg`动作`)}：{selectedReport.appliedAction ?? t(msg`无`)}</div>
-                    <div>{t(msg`决策时间`)}：{selectedReport.decidedAt ?? t(msg`无`)}</div>
-                    <div>{t(msg`决策人`)}：{selectedReport.decidedBy ?? t(msg`无`)}</div>
-                  </div>
-                  <div className="mt-4">
-                    <div className="mb-2 text-xs uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
-                      {t(msg`决策备注`)}
-                    </div>
-                    <TextAreaField
-                      className="min-h-24"
-                      value={reportDecisionNote}
-                      onChange={(event) => setReportDecisionNote(event.target.value)}
-                      placeholder={t(msg`补一条这次继续测试、采用、回滚或归档的依据。`)}
-                    />
                   </div>
                   <div className="mt-4 flex flex-wrap gap-3">
                     {selectedReport.singleRunId ? (
