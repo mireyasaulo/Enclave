@@ -46,6 +46,22 @@ type RunningChild = {
   startedAt: Date;
 };
 
+// world.apiBaseUrl 形如 http://127.0.0.1:3011 — 抽出端口号，给 allocatePort 兜底使用。
+// 非 127.0.0.1 / 解析失败 / 没端口都返回 null（远端 URL 不影响本地端口分配）。
+function parsePortFromApiBaseUrl(apiBaseUrl: string | null | undefined): number | null {
+  if (!apiBaseUrl) return null;
+  try {
+    const parsed = new URL(apiBaseUrl);
+    if (parsed.hostname !== "127.0.0.1" && parsed.hostname !== "localhost") {
+      return null;
+    }
+    const port = parseInt(parsed.port, 10);
+    return Number.isFinite(port) && port > 0 ? port : null;
+  } catch {
+    return null;
+  }
+}
+
 function findRepoRoot(start: string): string {
   let dir = start;
   for (let i = 0; i < 12; i += 1) {
@@ -99,6 +115,8 @@ export class LocalProcessComputeProviderService
     private readonly configService: ConfigService,
     @InjectRepository(CloudInstanceEntity)
     private readonly instanceRepo: Repository<CloudInstanceEntity>,
+    @InjectRepository(CloudWorldEntity)
+    private readonly worldRepo: Repository<CloudWorldEntity>,
     private readonly minimaxQuotaDispatcher: MinimaxQuotaDispatcherService,
   ) {
     const configured = parseInt(
@@ -254,7 +272,11 @@ export class LocalProcessComputeProviderService
   ): Promise<WorldInstancePowerTransitionResult> {
     const existing = this.running.get(world.id);
     if (existing && this.isAlive(existing)) {
-      return { powerState: "running", providerSnapshotId: null };
+      return {
+        powerState: "running",
+        providerSnapshotId: null,
+        apiBaseUrl: `http://127.0.0.1:${existing.port}`,
+      };
     }
 
     // 先信任持久化的 port — 大部分时候它是空的（创建时就停了）或仍然属于本 world。
@@ -303,7 +325,11 @@ export class LocalProcessComputeProviderService
       accountDir,
     };
 
-    return { powerState: "running", providerSnapshotId: null };
+    return {
+      powerState: "running",
+      providerSnapshotId: null,
+      apiBaseUrl: `http://127.0.0.1:${port}`,
+    };
   }
 
   async stopInstance(
@@ -315,7 +341,9 @@ export class LocalProcessComputeProviderService
       this.running.delete(world.id);
       this.terminateChild(state);
     }
-    return { powerState: "stopped", providerSnapshotId: null };
+    // child 已死，apiBaseUrl 不能继续指着这个被释放的端口——下次别的 world
+    // 复用同一个端口时就会串台（见 worlds-page "Enter admin" 的 bootstrap 路径）。
+    return { powerState: "stopped", providerSnapshotId: null, apiBaseUrl: null };
   }
 
   async inspectInstance(
@@ -385,6 +413,23 @@ export class LocalProcessComputeProviderService
     } catch (err) {
       this.logger.warn(
         `allocatePort: failed to scan persisted ports, falling back to in-memory only: ${(err as Error).message}`,
+      );
+    }
+    // 防御：world.apiBaseUrl 也可能挂着尚未清掉的端口（历史上 sleep 不清 apiBaseUrl，
+    // 导致两条 world 记录指向同一个 child，云控制台"进入后台"会串台）。即使现在
+    // 已经在 sleep/stop 时清了，旧数据 + 其他 provider 写入路径也可能留下脏值，
+    // 这里再扫一遍兜底。
+    try {
+      const allWorlds = await this.worldRepo.find({
+        select: ["apiBaseUrl"],
+      });
+      for (const w of allWorlds) {
+        const p = parsePortFromApiBaseUrl(w.apiBaseUrl);
+        if (p) used.add(p);
+      }
+    } catch (err) {
+      this.logger.warn(
+        `allocatePort: failed to scan world apiBaseUrls: ${(err as Error).message}`,
       );
     }
     let port = this.basePort;

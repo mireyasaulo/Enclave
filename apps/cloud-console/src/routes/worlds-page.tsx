@@ -830,7 +830,9 @@ export function WorldsPage() {
                           }
                           title={
                             !item.world.apiBaseUrl
-                              ? t("World has no apiBaseUrl yet")
+                              ? t(
+                                  "World is sleeping. Wake it up before entering admin.",
+                                )
                               : undefined
                           }
                           onClick={() => handleEnterAdminClick(item.world.id)}
