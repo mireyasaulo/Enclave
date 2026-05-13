@@ -380,6 +380,19 @@ export function WelcomePage() {
       return;
     }
 
+    // cloud 模式下 getWorldOwner 走 /cloud/world-api 代理，缺 cloud access token
+    // 时 cloud-api 会 401 "Missing cloud access token."；这条 rejection 经过 await
+    // → promise chain 后偶发会逃出 .catch() 落到 unhandledrejection。直接在调用前
+    // 短路，不发请求。
+    if (
+      runtimeConfig.worldAccessMode === "cloud" &&
+      !cloudAccessToken
+    ) {
+      setReadyBaseUrl(null);
+      setOwnerSyncing(false);
+      return;
+    }
+
     let active = true;
     setOwnerSyncing(true);
 
@@ -422,6 +435,7 @@ export function WelcomePage() {
       active = false;
     };
   }, [
+    cloudAccessToken,
     hydrateOwner,
     navigate,
     onboardingCompleted,
