@@ -1779,6 +1779,24 @@ export function deleteCharacter(id: string, baseUrl?: string) {
   );
 }
 
+/**
+ * Tenant-facing：从 wiki 导出的 JSON bundle 导入私有角色到当前 world，
+ * 按 name upsert。同名→覆盖；新名→新建并自动建 friendship。
+ */
+export function importPersonalCharacter(
+  bundle: unknown,
+  baseUrl?: string,
+) {
+  return requestLegacyApi<{ character: Character; overwrote: boolean }>(
+    "/characters/import-personal",
+    {
+      method: "POST",
+      body: JSON.stringify(bundle),
+    },
+    baseUrl,
+  );
+}
+
 export function getLatestWorldContext(baseUrl?: string) {
   return requestLegacyApi<WorldContext>("/world/context", undefined, baseUrl);
 }
