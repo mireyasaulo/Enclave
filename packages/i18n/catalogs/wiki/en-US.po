@@ -16,11 +16,13 @@ msgstr ""
 #: apps/wiki/src/components/snapshot-diff.tsx:16
 #: apps/wiki/src/routes/character-page.tsx:613
 #: apps/wiki/src/routes/create-character-page.tsx:130
+#: apps/wiki/src/routes/my-character-edit-page.tsx:307
 msgid "名称"
 msgstr "Name"
 
 #: apps/wiki/src/components/conflict-resolver.tsx:11
 #: apps/wiki/src/components/snapshot-diff.tsx:17
+#: apps/wiki/src/routes/my-character-edit-page.tsx:316
 msgid "头像"
 msgstr "Avatar"
 
@@ -40,6 +42,7 @@ msgstr "Personality"
 #: apps/wiki/src/components/snapshot-diff.tsx:20
 #: apps/wiki/src/routes/character-page.tsx:327
 #: apps/wiki/src/routes/create-character-page.tsx:176
+#: apps/wiki/src/routes/my-character-edit-page.tsx:400
 msgid "专长领域"
 msgstr "Expert domains"
 
@@ -47,6 +50,7 @@ msgstr "Expert domains"
 #: apps/wiki/src/components/snapshot-diff.tsx:21
 #: apps/wiki/src/routes/character-page.tsx:336
 #: apps/wiki/src/routes/create-character-page.tsx:182
+#: apps/wiki/src/routes/my-character-edit-page.tsx:411
 msgid "触发场景"
 msgstr "Trigger scenes"
 
@@ -54,6 +58,7 @@ msgstr "Trigger scenes"
 #: apps/wiki/src/components/snapshot-diff.tsx:22
 #: apps/wiki/src/routes/character-page.tsx:627
 #: apps/wiki/src/routes/create-character-page.tsx:143
+#: apps/wiki/src/routes/my-character-edit-page.tsx:326
 msgid "关系描述"
 msgstr "Relationship"
 
@@ -61,6 +66,7 @@ msgstr "Relationship"
 #: apps/wiki/src/components/snapshot-diff.tsx:23
 #: apps/wiki/src/routes/character-page.tsx:635
 #: apps/wiki/src/routes/create-character-page.tsx:150
+#: apps/wiki/src/routes/my-character-edit-page.tsx:336
 msgid "关系类型"
 msgstr "Relationship type"
 
@@ -186,23 +192,29 @@ msgid "创建角色"
 msgstr "Create character"
 
 #: apps/wiki/src/components/root-layout.tsx:69
+#: apps/wiki/src/routes/my-characters-page.tsx:98
+#: apps/wiki/src/routes/my-characters-page.tsx:119
+msgid "我的私有角色"
+msgstr ""
+
+#: apps/wiki/src/components/root-layout.tsx:76
 #: apps/wiki/src/routes/watchlist-page.tsx:36
 #: apps/wiki/src/routes/watchlist-page.tsx:49
 msgid "我的观察列表"
 msgstr "My watchlist"
 
-#: apps/wiki/src/components/root-layout.tsx:76
+#: apps/wiki/src/components/root-layout.tsx:83
 msgid "巡查"
 msgstr "Patrol"
 
-#: apps/wiki/src/components/root-layout.tsx:80
+#: apps/wiki/src/components/root-layout.tsx:87
 #: apps/wiki/src/routes/pending-reviews-page.tsx:59
 #: apps/wiki/src/routes/pending-reviews-page.tsx:68
 #: apps/wiki/src/routes/pending-reviews-page.tsx:83
 msgid "待审编辑"
 msgstr "Pending reviews"
 
-#: apps/wiki/src/components/root-layout.tsx:87
+#: apps/wiki/src/components/root-layout.tsx:94
 #: apps/wiki/src/routes/admin-abuse-filters-page.tsx:58
 #: apps/wiki/src/routes/admin-blocks-page.tsx:63
 #: apps/wiki/src/routes/admin-protection-page.tsx:86
@@ -212,88 +224,88 @@ msgstr "Pending reviews"
 msgid "管理"
 msgstr "Administration"
 
-#: apps/wiki/src/components/root-layout.tsx:91
+#: apps/wiki/src/components/root-layout.tsx:98
 #: apps/wiki/src/routes/admin-layout.tsx:11
 #: apps/wiki/src/routes/admin-users-page.tsx:49
 msgid "用户与权限"
 msgstr "Users & roles"
 
-#: apps/wiki/src/components/root-layout.tsx:97
+#: apps/wiki/src/components/root-layout.tsx:104
 #: apps/wiki/src/routes/admin-layout.tsx:12
 msgid "封禁"
 msgstr "Blocks"
 
-#: apps/wiki/src/components/root-layout.tsx:103
+#: apps/wiki/src/components/root-layout.tsx:110
 #: apps/wiki/src/routes/admin-layout.tsx:13
 #: apps/wiki/src/routes/admin-protection-page.tsx:87
 msgid "页面保护"
 msgstr "Page protection"
 
-#: apps/wiki/src/components/root-layout.tsx:109
+#: apps/wiki/src/components/root-layout.tsx:116
 #: apps/wiki/src/routes/admin-layout.tsx:14
 #: apps/wiki/src/routes/admin-reports-page.tsx:44
 msgid "举报队列"
 msgstr "Report queue"
 
-#: apps/wiki/src/components/root-layout.tsx:115
+#: apps/wiki/src/components/root-layout.tsx:122
 #: apps/wiki/src/routes/admin-abuse-filters-page.tsx:59
 #: apps/wiki/src/routes/admin-layout.tsx:15
 msgid "反破坏过滤器"
 msgstr "Anti-abuse filters"
 
-#: apps/wiki/src/components/root-layout.tsx:121
+#: apps/wiki/src/components/root-layout.tsx:128
 #: apps/wiki/src/routes/admin-layout.tsx:16
 #: apps/wiki/src/routes/admin-stats-page.tsx:32
 msgid "治理仪表盘"
 msgstr "Governance dashboard"
 
-#: apps/wiki/src/components/root-layout.tsx:166
+#: apps/wiki/src/components/root-layout.tsx:173
 msgid "打开导航"
 msgstr "Open navigation"
 
-#: apps/wiki/src/components/root-layout.tsx:176
+#: apps/wiki/src/components/root-layout.tsx:183
 msgid "隐"
 msgstr "Y"
 
-#: apps/wiki/src/components/root-layout.tsx:179
+#: apps/wiki/src/components/root-layout.tsx:186
 msgid "隐界世界角色管理平台"
 msgstr "Hidden World Character Management"
 
-#: apps/wiki/src/components/root-layout.tsx:182
+#: apps/wiki/src/components/root-layout.tsx:189
 msgid "隐界角色管理"
 msgstr "Hidden World Wiki"
 
-#: apps/wiki/src/components/root-layout.tsx:197
+#: apps/wiki/src/components/root-layout.tsx:204
 msgid "搜索角色词条…（回车）"
 msgstr "Search entries… (enter)"
 
-#: apps/wiki/src/components/root-layout.tsx:222
+#: apps/wiki/src/components/root-layout.tsx:229
 msgid "退出"
 msgstr "Sign out"
 
-#: apps/wiki/src/components/root-layout.tsx:232
+#: apps/wiki/src/components/root-layout.tsx:239
 #: apps/wiki/src/routes/login-page.tsx:41
 #: apps/wiki/src/routes/login-page.tsx:134
 #: apps/wiki/src/routes/register-page.tsx:112
 msgid "登录"
 msgstr "Sign in"
 
-#: apps/wiki/src/components/root-layout.tsx:239
+#: apps/wiki/src/components/root-layout.tsx:246
 #: apps/wiki/src/routes/admin-users-page.tsx:77
 #: apps/wiki/src/routes/register-page.tsx:52
 #: apps/wiki/src/routes/register-page.tsx:103
 msgid "注册"
 msgstr "Register"
 
-#: apps/wiki/src/components/root-layout.tsx:256
+#: apps/wiki/src/components/root-layout.tsx:263
 msgid "搜索词条…"
 msgstr "Search entries…"
 
-#: apps/wiki/src/components/root-layout.tsx:268
+#: apps/wiki/src/components/root-layout.tsx:275
 msgid "关闭导航"
 msgstr "Close navigation"
 
-#: apps/wiki/src/components/root-layout.tsx:290
+#: apps/wiki/src/components/root-layout.tsx:297
 msgid "隐界世界角色管理平台 · 任何登录用户都可以提交角色创建、编辑和生命周期变更，由巡查员审核生效"
 msgstr "Hidden World Character Management · Any signed-in user can submit character creation, edits, and lifecycle changes; patrollers review and approve."
 
@@ -465,6 +477,7 @@ msgstr "Reply"
 #: apps/wiki/src/components/talk-panel.tsx:322
 #: apps/wiki/src/routes/character-page.tsx:106
 #: apps/wiki/src/routes/home-page.tsx:103
+#: apps/wiki/src/routes/my-characters-page.tsx:65
 #: apps/wiki/src/routes/watchlist-page.tsx:86
 msgid "已删除"
 msgstr "Deleted"
@@ -1627,6 +1640,7 @@ msgid "新角色会先进入待创建队列；巡查员通过后才会发布到�
 msgstr "New characters land in the pending-creation queue; once a patroller approves, they ship to the runtime character registry."
 
 #: apps/wiki/src/routes/create-character-page.tsx:120
+#: apps/wiki/src/routes/my-character-edit-page.tsx:298
 msgid "基础信息"
 msgstr "Basic info"
 
@@ -1643,10 +1657,12 @@ msgid "例如 night-archivist"
 msgstr "e.g. night-archivist"
 
 #: apps/wiki/src/routes/create-character-page.tsx:160
+#: apps/wiki/src/routes/my-character-edit-page.tsx:362
 msgid "角色简介"
 msgstr "Character bio"
 
 #: apps/wiki/src/routes/create-character-page.tsx:168
+#: apps/wiki/src/routes/my-character-edit-page.tsx:375
 msgid "性格 / 语气"
 msgstr "Personality / tone"
 
@@ -1696,6 +1712,7 @@ msgid "按维基百科模式管理世界角色：任何登录用户都能创建�
 msgstr "Manage world characters in a Wikipedia-style flow: any signed-in user can create characters, edit their profile and runtime logic, and request deletion or restoration; high-risk changes enter the patrol queue and only ship to the character runtime once approved."
 
 #: apps/wiki/src/routes/home-page.tsx:42
+#: apps/wiki/src/routes/my-character-edit-page.tsx:515
 msgid "✨ 创建角色"
 msgstr "✨ Create character"
 
@@ -1804,16 +1821,273 @@ msgstr "Send code"
 msgid "登录 / 注册"
 msgstr "Sign in / register"
 
+#. placeholder {0}: recordQ.data.name
+#. placeholder {0}: row.name
+#: apps/wiki/src/routes/my-character-edit-page.tsx:208
+#: apps/wiki/src/routes/my-characters-page.tsx:217
+msgid "确认删除「{0}」？此操作无法撤销。"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:217
+#: apps/wiki/src/routes/my-character-edit-page.tsx:227
+#: apps/wiki/src/routes/my-character-edit-page.tsx:234
+#: apps/wiki/src/routes/my-character-edit-page.tsx:286
+#: apps/wiki/src/routes/my-characters-page.tsx:97
+#: apps/wiki/src/routes/my-characters-page.tsx:118
+msgid "我的"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:217
+#: apps/wiki/src/routes/my-character-edit-page.tsx:227
+#: apps/wiki/src/routes/my-character-edit-page.tsx:234
+msgid "私有角色"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:219
+#: apps/wiki/src/routes/pending-reviews-page.tsx:61
+#: apps/wiki/src/routes/watchlist-page.tsx:40
+msgid "请先登录。"
+msgstr "Please sign in first."
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:248
+msgid "← 返回列表"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:265
+#: apps/wiki/src/routes/my-characters-page.tsx:298
+msgid "导出中…"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:267
+msgid "📤 导出 JSON"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:277
+#: apps/wiki/src/routes/my-characters-page.tsx:307
+msgid "🗑 删除"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:287
+msgid "新建私有角色"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:287
+msgid "编辑私有角色"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:289
+msgid "这里保存的内容仅你可见。同名再导入会覆盖。点击「导出」下载 JSON，可在 app 端导入到你的世界。"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:301
+msgid "角色的名字与基本身份；只有「名称」是必填。"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:312
+msgid "例如 苏然"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:317
+msgid "emoji（🦊）或图片 URL；空则用首字母占位"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:327
+msgid "这个角色相对于你的身份"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:332
+msgid "例如 大学室友"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:337
+msgid "friend / family / mentor / custom 等"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:353
+msgid "简介与性格"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:356
+msgid "这两段文字会成为 AI 推理时的基础上下文，决定角色的语气与定位。"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:363
+msgid "一段话介绍角色背景与人设；其他用户可以读到"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:370
+msgid "例如：心理学背景，慢热而锋利。喜欢半夜读书，习惯先观察再回应。"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:376
+msgid "用一两句话描述说话风格，AI 会模仿这种语感"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:383
+msgid "例如：直接但温和。不爱用感叹号，喜欢用反问引导思考。"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:393
+msgid "标签与场景"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:396
+msgid "逗号分隔；用于检索、推荐与触发对话。"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:401
+msgid "例如 编程, 音乐, 心理学"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:406
+msgid "编程, 音乐, 心理学"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:412
+msgid "例如 coffee_shop, gym, library"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:432
+msgid "高级：Recipe & Profile JSON"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:435
+msgid "不需要可直接跳过；给愿意手写 AI prompt 配方的用户使用，会随 bundle 一起导出。"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:442
+msgid "收起 ▴"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:442
+msgid "展开 ▾"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:448
+msgid "Recipe JSON（CharacterBlueprintRecipe）"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:449
+msgid "留空将不写入；填错会阻止保存"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:459
+msgid "Recipe JSON 无效："
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:467
+msgid "PersonalityProfile JSON"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:468
+msgid "app 端导入时会写入 characters.profile 列"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:478
+msgid "Profile JSON 无效："
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:501
+msgid "已保存 ✓"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:513
+msgid "保存中…"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:517
+msgid "💾 保存修改"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:522
+msgid "请填写「名称」才能保存"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:524
+msgid "同名再导入会覆盖此角色"
+msgstr ""
+
+#: apps/wiki/src/routes/my-character-edit-page.tsx:526
+msgid "保存后会跳到编辑页继续完善"
+msgstr ""
+
+#. placeholder {0}: res.record.name
+#: apps/wiki/src/routes/my-characters-page.tsx:54
+msgid "已覆盖同名角色：{0}"
+msgstr ""
+
+#. placeholder {0}: res.record.name
+#: apps/wiki/src/routes/my-characters-page.tsx:55
+msgid "已导入新角色：{0}"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:99
+msgid "登录后即可创建和管理只属于你自己的角色。"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:102
+msgid "请先 <0>登录</0> 后再使用此功能。"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:121
+msgid "这里的角色不会出现在公开词条目录，也不走巡查审核流。你可以创建、编辑、导出 JSON，或上传一个 JSON 文件覆盖同名角色。导出的 JSON 文件可在 app 端直接导入到你的世界。"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:139
+#: apps/wiki/src/routes/my-characters-page.tsx:190
+msgid "导入中…"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:141
+msgid "📥 导入文件"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:149
+msgid "✨ 新建角色"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:168
+msgid "还没有任何私有角色"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:171
+msgid "从零创建一个完全属于你自己的角色，或者上传一份从其它世界导出的 JSON 文件来快速开始。"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:182
+msgid "✨ 新建第一个角色"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:192
+msgid "📥 导入 JSON 文件"
+msgstr ""
+
+#. placeholder {0}: items.length
+#: apps/wiki/src/routes/my-characters-page.tsx:203
+msgid "共 {0} 个角色"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:263
+msgid "更新于"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:295
+msgid "导出此角色 JSON"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:298
+msgid "📤 导出"
+msgstr ""
+
+#: apps/wiki/src/routes/my-characters-page.tsx:304
+msgid "删除此角色"
+msgstr ""
+
 #: apps/wiki/src/routes/pending-reviews-page.tsx:59
 #: apps/wiki/src/routes/pending-reviews-page.tsx:68
 #: apps/wiki/src/routes/pending-reviews-page.tsx:79
 msgid "审核"
 msgstr "Review"
-
-#: apps/wiki/src/routes/pending-reviews-page.tsx:61
-#: apps/wiki/src/routes/watchlist-page.tsx:40
-msgid "请先登录。"
-msgstr "Please sign in first."
 
 #: apps/wiki/src/routes/pending-reviews-page.tsx:70
 msgid "仅巡查员及以上可访问待审编辑队列。"

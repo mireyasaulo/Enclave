@@ -97,9 +97,9 @@ msgstr "채팅으로 전달"
 #: apps/app/src/components/chat-composer.tsx:2778
 #: apps/app/src/components/chat-composer.tsx:3810
 #: apps/app/src/components/chat-composer.tsx:5354
-#: apps/app/src/components/chat-message-list.tsx:2633
-#: apps/app/src/components/chat-message-list.tsx:2702
-#: apps/app/src/components/chat-message-list.tsx:6661
+#: apps/app/src/components/chat-message-list.tsx:2635
+#: apps/app/src/components/chat-message-list.tsx:2704
+#: apps/app/src/components/chat-message-list.tsx:6715
 #: apps/app/src/components/mobile-chat-attachment-preview.tsx:99
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:212
 #: apps/app/src/components/wechat-action-bubble.tsx:122
@@ -120,7 +120,7 @@ msgstr "채팅으로 전달"
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:400
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:469
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:219
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1208
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1227
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:160
 #: apps/app/src/features/desktop/feed/desktop-feed-compose-panel.tsx:174
 #: apps/app/src/features/desktop/moments/desktop-moment-compose-panel.tsx:174
@@ -135,7 +135,7 @@ msgstr "채팅으로 전달"
 #: apps/app/src/routes/mobile-add-friend-page.tsx:794
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:204
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:528
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1216
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1248
 msgid "取消"
 msgstr "취소"
 
@@ -263,7 +263,7 @@ msgid "截图"
 msgstr "스크린샷"
 
 #: apps/app/src/components/chat-composer.tsx:2366
-#: apps/app/src/components/chat-message-list.tsx:1900
+#: apps/app/src/components/chat-message-list.tsx:1902
 #: apps/app/src/routes/desktop-chat-files-page.tsx:388
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:210
 #: apps/app/src/routes/desktop-feedback-page.tsx:768
@@ -280,7 +280,7 @@ msgid "已打开截图所在位置。"
 msgstr "스크린샷 위치를 열었습니다."
 
 #: apps/app/src/components/chat-composer.tsx:2375
-#: apps/app/src/components/chat-message-list.tsx:1913
+#: apps/app/src/components/chat-message-list.tsx:1915
 #: apps/app/src/routes/desktop-chat-files-page.tsx:395
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:218
 #: apps/app/src/routes/desktop-feedback-page.tsx:775
@@ -301,9 +301,9 @@ msgid "图片发送失败，请稍后再试。"
 msgstr "이미지 전송에 실패했습니다. 잠시 후 다시 시도하세요."
 
 #: apps/app/src/components/chat-composer.tsx:2703
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:335
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:337
 #: apps/app/src/i18n/static-dom-seed.ts:1072
-#: apps/app/src/routes/mobile-note-editor-page.tsx:409
+#: apps/app/src/routes/mobile-note-editor-page.tsx:410
 msgid "发送失败，请稍后再试。"
 msgstr "전송에 실패했습니다. 잠시 후 다시 시도하세요."
 
@@ -341,7 +341,7 @@ msgstr "입력창에 삽입"
 
 #: apps/app/src/components/chat-composer.tsx:2797
 #: apps/app/src/components/chat-composer.tsx:5790
-#: apps/app/src/components/chat-message-list.tsx:2141
+#: apps/app/src/components/chat-message-list.tsx:2143
 #: apps/app/src/components/inline-notice-action-button.tsx:24
 #: apps/app/src/routes/chat-details-page.tsx:484
 msgid "去设置"
@@ -373,7 +373,7 @@ msgstr "입력창 펼치기"
 
 #: apps/app/src/components/chat-composer.tsx:3104
 #: apps/app/src/components/chat-composer.tsx:3342
-#: apps/app/src/components/chat-message-list.tsx:4168
+#: apps/app/src/components/chat-message-list.tsx:4170
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:107
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1004
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:621
@@ -386,9 +386,9 @@ msgid "表情"
 msgstr "스티커"
 
 #: apps/app/src/components/chat-composer.tsx:3130
-#: apps/app/src/components/chat-message-list.tsx:2647
-#: apps/app/src/components/chat-message-list.tsx:3235
-#: apps/app/src/components/chat-message-list.tsx:3493
+#: apps/app/src/components/chat-message-list.tsx:2649
+#: apps/app/src/components/chat-message-list.tsx:3237
+#: apps/app/src/components/chat-message-list.tsx:3495
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:173
 #: apps/app/src/components/official-article-card.tsx:123
 #: apps/app/src/components/official-article-viewer.tsx:262
@@ -413,18 +413,18 @@ msgstr "스티커"
 #: apps/app/src/i18n/static-dom-seed.ts:65
 #: apps/app/src/routes/channels-page.tsx:2021
 #: apps/app/src/routes/desktop-chat-files-page.tsx:757
-#: apps/app/src/routes/favorites-page.tsx:416
-#: apps/app/src/routes/profile-favorites-page.tsx:119
+#: apps/app/src/routes/favorites-page.tsx:414
+#: apps/app/src/routes/mobile-favorites-page.tsx:309
 #: apps/app/src/routes/profile-page.tsx:159
 msgid "收藏"
 msgstr "즐겨찾기"
 
 #: apps/app/src/components/chat-composer.tsx:3156
-#: apps/app/src/components/chat-message-list.tsx:1490
-#: apps/app/src/components/chat-message-list.tsx:1559
-#: apps/app/src/components/chat-message-list.tsx:3625
-#: apps/app/src/components/chat-message-list.tsx:3652
-#: apps/app/src/components/chat-message-list.tsx:4144
+#: apps/app/src/components/chat-message-list.tsx:1492
+#: apps/app/src/components/chat-message-list.tsx:1561
+#: apps/app/src/components/chat-message-list.tsx:3627
+#: apps/app/src/components/chat-message-list.tsx:3654
+#: apps/app/src/components/chat-message-list.tsx:4146
 #: apps/app/src/features/chat/chat-image-viewer-route-state.ts:42
 #: apps/app/src/features/chat/chat-image-viewer-route-state.ts:205
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:104
@@ -442,8 +442,8 @@ msgid "图片"
 msgstr "이미지"
 
 #: apps/app/src/components/chat-composer.tsx:3161
-#: apps/app/src/components/chat-message-list.tsx:4148
-#: apps/app/src/components/chat-message-list.tsx:5233
+#: apps/app/src/components/chat-message-list.tsx:4150
+#: apps/app/src/components/chat-message-list.tsx:5248
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:167
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:105
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:133
@@ -496,13 +496,13 @@ msgstr "Enter로 보내기"
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1519
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:370
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:202
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:934
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:951
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:169
 #: apps/app/src/features/notes/mobile-note-send-sheet.tsx:184
 #: apps/app/src/routes/channels-page.tsx:2445
 #: apps/app/src/routes/discover-page.tsx:1038
 #: apps/app/src/routes/mobile-add-friend-page.tsx:810
-#: apps/app/src/routes/mobile-note-editor-page.tsx:924
+#: apps/app/src/routes/mobile-note-editor-page.tsx:954
 msgid "发送"
 msgstr "보내기"
 
@@ -780,14 +780,14 @@ msgstr "원본으로 보내기 (Cmd/Ctrl+Enter)"
 #: apps/app/src/components/mobile-chat-attachment-preview.tsx:109
 #: apps/app/src/components/moment-comment-composer.tsx:33
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1519
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:934
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:951
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:114
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:169
 #: apps/app/src/routes/channels-page.tsx:2445
 #: apps/app/src/routes/character-detail-page.tsx:299
 #: apps/app/src/routes/discover-page.tsx:1037
 #: apps/app/src/routes/mobile-add-friend-page.tsx:705
-#: apps/app/src/routes/welcome-page.tsx:1056
+#: apps/app/src/routes/welcome-page.tsx:1065
 msgid "发送中..."
 msgstr "전송 중..."
 
@@ -855,7 +855,7 @@ msgstr "현재 기기에서 파일 선택기를 열 수 없습니다. 잠시 후
 
 #: apps/app/src/components/chat-composer.tsx:5844
 #: apps/app/src/components/chat-composer.tsx:5855
-#: apps/app/src/components/chat-message-list.tsx:1855
+#: apps/app/src/components/chat-message-list.tsx:1857
 msgid "重试打开文件"
 msgstr "파일 열기 재시도"
 
@@ -897,97 +897,97 @@ msgstr "현재 브라우저는 이미지 처리를 지원하지 않습니다. �
 msgid "图片处理失败，请先裁剪后再发送。"
 msgstr "이미지 처리에 실패했습니다. 먼저 자른 후 보내주세요."
 
-#: apps/app/src/components/chat-message-list.tsx:806
+#: apps/app/src/components/chat-message-list.tsx:808
 msgid "已合并转发到 {conversationTitle}。"
 msgstr "{conversationTitle}(으)로 병합 전달했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:807
+#: apps/app/src/components/chat-message-list.tsx:809
 msgid "已合并转发 {count} 条消息到 {conversationTitle}。"
 msgstr "메시지 {count}건을 {conversationTitle}(으)로 병합 전달했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:809
+#: apps/app/src/components/chat-message-list.tsx:811
 msgid "已转发到 {conversationTitle}。"
 msgstr "{conversationTitle}(으)로 전달했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:810
+#: apps/app/src/components/chat-message-list.tsx:812
 msgid "已转发 {count} 条消息到 {conversationTitle}。"
 msgstr "메시지 {count}건을 {conversationTitle}(으)로 전달했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:825
+#: apps/app/src/components/chat-message-list.tsx:827
 msgid "转发失败，请稍后再试。"
 msgstr "전달에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:827
+#: apps/app/src/components/chat-message-list.tsx:829
 msgid "继续转发消息"
 msgstr "메시지 계속 전달"
 
-#: apps/app/src/components/chat-message-list.tsx:840
+#: apps/app/src/components/chat-message-list.tsx:842
 msgid "当前线程暂不支持撤回消息。"
 msgstr "현재 스레드는 메시지 취소를 지원하지 않습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:898
+#: apps/app/src/components/chat-message-list.tsx:900
 #: apps/app/src/i18n/static-dom-seed.ts:945
 msgid "已撤回这条消息。"
 msgstr "이 메시지를 회수했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:911
+#: apps/app/src/components/chat-message-list.tsx:913
 #: apps/app/src/i18n/static-dom-seed.ts:946
 msgid "撤回失败，请稍后再试。"
 msgstr "회수에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:913
+#: apps/app/src/components/chat-message-list.tsx:915
 msgid "继续撤回"
 msgstr "계속 취소"
 
-#: apps/app/src/components/chat-message-list.tsx:926
+#: apps/app/src/components/chat-message-list.tsx:928
 msgid "当前线程暂不支持删除消息。"
 msgstr "현재 스레드는 메시지 삭제를 지원하지 않습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:970
+#: apps/app/src/components/chat-message-list.tsx:972
 #: apps/app/src/i18n/static-dom-seed.ts:947
 msgid "已删除这条消息。"
 msgstr "이 메시지를 삭제했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:983
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:272
+#: apps/app/src/components/chat-message-list.tsx:985
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:274
 #: apps/app/src/i18n/static-dom-seed.ts:948
-#: apps/app/src/routes/mobile-note-editor-page.tsx:346
+#: apps/app/src/routes/mobile-note-editor-page.tsx:347
 msgid "删除失败，请稍后再试。"
 msgstr "삭제에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:985
+#: apps/app/src/components/chat-message-list.tsx:987
 msgid "继续删除"
 msgstr "계속 삭제"
 
-#: apps/app/src/components/chat-message-list.tsx:1002
+#: apps/app/src/components/chat-message-list.tsx:1004
 #: apps/app/src/lib/error-translate.ts:382
 msgid "当前消息暂不支持添加到表情。"
 msgstr "현재 메시지는 스티커 추가를 지원하지 않습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1018
+#: apps/app/src/components/chat-message-list.tsx:1020
 #: apps/app/src/i18n/static-dom-seed.ts:949
 msgid "已添加到自定义表情。"
 msgstr "사용자 스티커에 추가했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1030
+#: apps/app/src/components/chat-message-list.tsx:1032
 msgid "添加到表情失败，请稍后再试。"
 msgstr "스티커 추가에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:1032
+#: apps/app/src/components/chat-message-list.tsx:1034
 msgid "继续添加到表情"
 msgstr "스티커에 계속 추가"
 
-#: apps/app/src/components/chat-message-list.tsx:1049
+#: apps/app/src/components/chat-message-list.tsx:1051
 #: apps/app/src/i18n/static-dom-seed.ts:950
 msgid "当前环境不支持剪贴板复制。"
 msgstr "현재 환경에서는 클립보드 복사를 지원하지 않습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1063
+#: apps/app/src/components/chat-message-list.tsx:1065
 #: apps/app/src/i18n/static-dom-seed.ts:951
 msgid "复制失败，请稍后再试。"
 msgstr "복사에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:1065
+#: apps/app/src/components/chat-message-list.tsx:1067
 #: apps/app/src/components/mobile-discover-tool-shell.tsx:97
 #: apps/app/src/components/mobile-discover-tool-shell.tsx:119
 #: apps/app/src/components/mobile-document-shell.tsx:80
@@ -1019,13 +1019,13 @@ msgstr "복사에 실패했습니다. 잠시 후 다시 시도하세요."
 msgid "重试复制"
 msgstr "복사 다시 시도"
 
-#: apps/app/src/components/chat-message-list.tsx:1080
+#: apps/app/src/components/chat-message-list.tsx:1082
 msgid "位置内容已复制。"
 msgstr "위치 정보가 복사되었습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1091
-#: apps/app/src/components/chat-message-list.tsx:1158
-#: apps/app/src/components/chat-message-list.tsx:1219
+#: apps/app/src/components/chat-message-list.tsx:1093
+#: apps/app/src/components/chat-message-list.tsx:1160
+#: apps/app/src/components/chat-message-list.tsx:1221
 #: apps/app/src/components/mobile-discover-tool-shell.tsx:81
 #: apps/app/src/components/mobile-document-shell.tsx:64
 #: apps/app/src/components/official-article-viewer.tsx:143
@@ -1045,9 +1045,9 @@ msgstr "위치 정보가 복사되었습니다."
 msgid "已打开系统分享面板。"
 msgstr "시스템 공유 패널을 열었습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1103
-#: apps/app/src/components/chat-message-list.tsx:1170
-#: apps/app/src/components/chat-message-list.tsx:1231
+#: apps/app/src/components/chat-message-list.tsx:1105
+#: apps/app/src/components/chat-message-list.tsx:1172
+#: apps/app/src/components/chat-message-list.tsx:1233
 #: apps/app/src/components/mobile-discover-tool-shell.tsx:95
 #: apps/app/src/components/mobile-document-shell.tsx:78
 #: apps/app/src/components/official-article-viewer.tsx:94
@@ -1069,12 +1069,12 @@ msgstr "시스템 공유 패널을 열었습니다."
 msgid "当前设备暂时无法打开系统分享，请稍后重试。"
 msgstr "이 기기에서는 지금 시스템 공유를 열 수 없습니다. 잠시 후 다시 시도해 주세요."
 
-#: apps/app/src/components/chat-message-list.tsx:1105
-#: apps/app/src/components/chat-message-list.tsx:1125
-#: apps/app/src/components/chat-message-list.tsx:1172
-#: apps/app/src/components/chat-message-list.tsx:1192
-#: apps/app/src/components/chat-message-list.tsx:1233
-#: apps/app/src/components/chat-message-list.tsx:1253
+#: apps/app/src/components/chat-message-list.tsx:1107
+#: apps/app/src/components/chat-message-list.tsx:1127
+#: apps/app/src/components/chat-message-list.tsx:1174
+#: apps/app/src/components/chat-message-list.tsx:1194
+#: apps/app/src/components/chat-message-list.tsx:1235
+#: apps/app/src/components/chat-message-list.tsx:1255
 #: apps/app/src/components/mobile-discover-tool-shell.tsx:97
 #: apps/app/src/components/mobile-discover-tool-shell.tsx:119
 #: apps/app/src/components/mobile-document-shell.tsx:80
@@ -1108,14 +1108,14 @@ msgstr "이 기기에서는 지금 시스템 공유를 열 수 없습니다. 잠
 msgid "重试分享"
 msgstr "공유 다시 시도"
 
-#: apps/app/src/components/chat-message-list.tsx:1118
+#: apps/app/src/components/chat-message-list.tsx:1120
 #: apps/app/src/i18n/static-dom-seed.ts:952
 msgid "系统分享暂时不可用，已复制位置内容。"
 msgstr "시스템 공유를 일시적으로 사용할 수 없어 위치 내용을 복사했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1123
-#: apps/app/src/components/chat-message-list.tsx:1190
-#: apps/app/src/components/chat-message-list.tsx:1251
+#: apps/app/src/components/chat-message-list.tsx:1125
+#: apps/app/src/components/chat-message-list.tsx:1192
+#: apps/app/src/components/chat-message-list.tsx:1253
 #: apps/app/src/components/mobile-discover-tool-shell.tsx:117
 #: apps/app/src/components/mobile-document-shell.tsx:100
 #: apps/app/src/components/official-article-viewer.tsx:118
@@ -1135,34 +1135,34 @@ msgstr "시스템 공유를 일시적으로 사용할 수 없어 위치 내용�
 msgid "系统分享失败，请稍后重试。"
 msgstr "시스템 공유에 실패했습니다. 잠시 후 다시 시도해 주세요."
 
-#: apps/app/src/components/chat-message-list.tsx:1146
+#: apps/app/src/components/chat-message-list.tsx:1148
 #: apps/app/src/routes/character-detail-page.tsx:786
 msgid "名片摘要已复制。"
 msgstr "명함 요약을 복사했습니다."
 
 #. placeholder {0}: attachment.name
-#: apps/app/src/components/chat-message-list.tsx:1151
+#: apps/app/src/components/chat-message-list.tsx:1153
 msgid "{0} 的隐界名片"
 msgstr "{0}의 Yinjie 명함"
 
-#: apps/app/src/components/chat-message-list.tsx:1185
+#: apps/app/src/components/chat-message-list.tsx:1187
 #: apps/app/src/i18n/static-dom-seed.ts:953
 #: apps/app/src/routes/character-detail-page.tsx:785
 msgid "系统分享暂时不可用，已复制名片摘要。"
 msgstr "시스템 공유를 지금은 사용할 수 없어 명함 요약을 복사했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1208
+#: apps/app/src/components/chat-message-list.tsx:1210
 msgid "笔记摘要已复制。"
 msgstr "노트 요약이 복사되었습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1246
+#: apps/app/src/components/chat-message-list.tsx:1248
 #: apps/app/src/i18n/static-dom-seed.ts:954
 msgid "系统分享暂时不可用，已复制笔记摘要。"
 msgstr "시스템 공유를 일시적으로 사용할 수 없어 노트 요약을 복사했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1294
-#: apps/app/src/components/chat-message-list.tsx:3955
-#: apps/app/src/components/chat-message-list.tsx:4025
+#: apps/app/src/components/chat-message-list.tsx:1296
+#: apps/app/src/components/chat-message-list.tsx:3957
+#: apps/app/src/components/chat-message-list.tsx:4027
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:313
 #: apps/app/src/features/games/parking-war/parking-war-engine.ts:499
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:931
@@ -1170,83 +1170,83 @@ msgstr "시스템 공유를 일시적으로 사용할 수 없어 노트 요약�
 msgid "对方"
 msgstr "상대"
 
-#: apps/app/src/components/chat-message-list.tsx:1462
-#: apps/app/src/components/chat-message-list.tsx:4834
+#: apps/app/src/components/chat-message-list.tsx:1464
+#: apps/app/src/components/chat-message-list.tsx:4836
 msgid "[图片]"
 msgstr "[이미지]"
 
-#: apps/app/src/components/chat-message-list.tsx:1501
+#: apps/app/src/components/chat-message-list.tsx:1503
 msgid "以下是 {unreadMarkerCount} 条新消息"
 msgstr "아래는 새 메시지 {unreadMarkerCount}건입니다"
 
-#: apps/app/src/components/chat-message-list.tsx:1502
+#: apps/app/src/components/chat-message-list.tsx:1504
 msgid "以下是新消息"
 msgstr "아래는 새 메시지입니다"
 
-#: apps/app/src/components/chat-message-list.tsx:1572
+#: apps/app/src/components/chat-message-list.tsx:1574
 #: apps/app/src/i18n/static-dom-seed.ts:956
 msgid "浏览器阻止了新窗口，已改为当前页预览。"
 msgstr "브라우저가 새 창을 차단해 현재 페이지에서 미리봅니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1579
+#: apps/app/src/components/chat-message-list.tsx:1581
 #: apps/app/src/i18n/static-dom-seed.ts:955
 msgid "图片预览打开失败，已改为当前页预览。"
 msgstr "이미지 미리보기를 열지 못해 현재 페이지에서 표시합니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1647
-#: apps/app/src/components/chat-message-list.tsx:1678
+#: apps/app/src/components/chat-message-list.tsx:1649
+#: apps/app/src/components/chat-message-list.tsx:1680
 #: apps/app/src/i18n/static-dom-seed.ts:957
 msgid "已取消收藏消息。"
 msgstr "메시지를 즐겨찾기에서 제거했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1668
-#: apps/app/src/components/chat-message-list.tsx:1689
+#: apps/app/src/components/chat-message-list.tsx:1670
+#: apps/app/src/components/chat-message-list.tsx:1691
 #: apps/app/src/i18n/static-dom-seed.ts:958
 msgid "消息已加入收藏。"
 msgstr "메시지를 즐겨찾기에 추가했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1704
-#: apps/app/src/components/chat-message-list.tsx:2341
+#: apps/app/src/components/chat-message-list.tsx:1706
+#: apps/app/src/components/chat-message-list.tsx:2343
 msgid "收藏失败，请稍后再试。"
 msgstr "즐겨찾기에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:1706
+#: apps/app/src/components/chat-message-list.tsx:1708
 msgid "继续取消收藏"
 msgstr "즐겨찾기 해제 계속"
 
-#: apps/app/src/components/chat-message-list.tsx:1706
+#: apps/app/src/components/chat-message-list.tsx:1708
 msgid "继续收藏"
 msgstr "계속 즐겨찾기"
 
-#: apps/app/src/components/chat-message-list.tsx:1774
+#: apps/app/src/components/chat-message-list.tsx:1776
 #: apps/app/src/i18n/static-dom-seed.ts:959
 msgid "打开添加朋友页失败，请稍后重试。"
 msgstr "친구 추가 페이지 열기에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:1815
+#: apps/app/src/components/chat-message-list.tsx:1817
 #: apps/app/src/i18n/static-dom-seed.ts:960
 msgid "打开笔记失败，请稍后重试。"
 msgstr "노트 열기에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:1848
-#: apps/app/src/components/chat-message-list.tsx:4184
-#: apps/app/src/components/chat-message-list.tsx:5247
+#: apps/app/src/components/chat-message-list.tsx:1850
+#: apps/app/src/components/chat-message-list.tsx:4186
+#: apps/app/src/components/chat-message-list.tsx:5262
 #: apps/app/src/runtime/file-runtime-i18n.ts:31
 msgid "打开文件"
 msgstr "파일 열기"
 
-#: apps/app/src/components/chat-message-list.tsx:1876
+#: apps/app/src/components/chat-message-list.tsx:1878
 msgid "重试保存图片"
 msgstr "이미지 저장 재시도"
 
-#: apps/app/src/components/chat-message-list.tsx:1876
+#: apps/app/src/components/chat-message-list.tsx:1878
 msgid "重试保存文件"
 msgstr "파일 저장 재시도"
 
-#: apps/app/src/components/chat-message-list.tsx:1883
-#: apps/app/src/components/chat-message-list.tsx:4224
-#: apps/app/src/components/chat-message-list.tsx:6216
-#: apps/app/src/components/chat-message-list.tsx:6261
+#: apps/app/src/components/chat-message-list.tsx:1885
+#: apps/app/src/components/chat-message-list.tsx:4226
+#: apps/app/src/components/chat-message-list.tsx:6231
+#: apps/app/src/components/chat-message-list.tsx:6276
 #: apps/app/src/i18n/static-dom-seed.ts:923
 #: apps/app/src/routes/desktop-chat-files-page.tsx:375
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1049
@@ -1256,163 +1256,163 @@ msgstr "파일 저장 재시도"
 msgid "保存图片"
 msgstr "이미지 저장"
 
-#: apps/app/src/components/chat-message-list.tsx:1883
-#: apps/app/src/components/chat-message-list.tsx:4228
+#: apps/app/src/components/chat-message-list.tsx:1885
+#: apps/app/src/components/chat-message-list.tsx:4230
 #: apps/app/src/routes/desktop-chat-files-page.tsx:375
 #: apps/app/src/runtime/file-runtime-i18n.ts:35
 msgid "保存文件"
 msgstr "파일 저장"
 
-#: apps/app/src/components/chat-message-list.tsx:1912
+#: apps/app/src/components/chat-message-list.tsx:1914
 #: apps/app/src/routes/desktop-chat-files-page.tsx:394
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:217
 msgid "已打开所在位置。"
 msgstr "위치를 열었습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:1986
-#: apps/app/src/components/chat-message-list.tsx:2000
+#: apps/app/src/components/chat-message-list.tsx:1988
+#: apps/app/src/components/chat-message-list.tsx:2002
 #: apps/app/src/i18n/static-dom-seed.ts:961
 msgid "已从当前设备删除这条消息。"
 msgstr "이 메시지를 현재 기기에서 삭제했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:2013
+#: apps/app/src/components/chat-message-list.tsx:2015
 #: apps/app/src/i18n/static-dom-seed.ts:962
 msgid "已重新尝试发送。"
 msgstr "다시 전송했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:2021
+#: apps/app/src/components/chat-message-list.tsx:2023
 #: apps/app/src/i18n/static-dom-seed.ts:963
 msgid "重试发送失败，请稍后再试。"
 msgstr "재전송에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:2023
+#: apps/app/src/components/chat-message-list.tsx:2025
 msgid "继续重试发送"
 msgstr "전송 계속 재시도"
 
-#: apps/app/src/components/chat-message-list.tsx:2045
+#: apps/app/src/components/chat-message-list.tsx:2047
 #: apps/app/src/i18n/static-dom-seed.ts:964
 msgid "已取消这条消息的提醒。"
 msgstr "이 메시지의 알림을 취소했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:2062
+#: apps/app/src/components/chat-message-list.tsx:2064
 #: apps/app/src/i18n/static-dom-seed.ts:965
 msgid "当前消息暂不支持部分引用。"
 msgstr "현재 메시지는 부분 인용을 아직 지원하지 않습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:2079
+#: apps/app/src/components/chat-message-list.tsx:2081
 #: apps/app/src/i18n/static-dom-seed.ts:966
 msgid "已带入所选文字。"
 msgstr "선택한 텍스트를 삽입했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:2112
+#: apps/app/src/components/chat-message-list.tsx:2114
 #: apps/app/src/i18n/static-dom-seed.ts:967
 msgid "设置提醒失败，请稍后再试。"
 msgstr "알림 설정에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:2114
+#: apps/app/src/components/chat-message-list.tsx:2116
 msgid "继续设置提醒"
 msgstr "알림 계속 설정"
 
-#: apps/app/src/components/chat-message-list.tsx:2129
+#: apps/app/src/components/chat-message-list.tsx:2131
 msgid "已设为消息提醒 · {summary}，系统通知已开启。"
 msgstr "메시지 알림으로 설정되었습니다 · {summary}, 시스템 알림이 켜져 있습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:2138
+#: apps/app/src/components/chat-message-list.tsx:2140
 msgid "已设为消息提醒 · {summary}，系统通知未开启。可前往系统设置继续打开通知。"
 msgstr "메시지 알림으로 설정되었습니다 · {summary}, 시스템 알림이 꺼져 있습니다. 시스템 설정에서 알림을 켤 수 있습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:2139
+#: apps/app/src/components/chat-message-list.tsx:2141
 msgid "已设为消息提醒 · {summary}，系统通知未开启。"
 msgstr "메시지 알림으로 설정되었습니다 · {summary}, 시스템 알림이 꺼져 있습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:2154
+#: apps/app/src/components/chat-message-list.tsx:2156
 msgid "已设为消息提醒 · {summary}。"
 msgstr "메시지 알림으로 설정되었습니다 · {summary}."
 
 #. placeholder {0}: nextSelectedMessageIds.length
-#: apps/app/src/components/chat-message-list.tsx:2274
+#: apps/app/src/components/chat-message-list.tsx:2276
 msgid "已选择到这里，共 {0} 条消息。"
 msgstr "여기까지 선택했으며 총 {0}건의 메시지입니다."
 
-#: apps/app/src/components/chat-message-list.tsx:2332
+#: apps/app/src/components/chat-message-list.tsx:2334
 msgid "已收藏 1 条消息。"
 msgstr "메시지 1건을 즐겨찾기에 추가했습니다."
 
 #. placeholder {0}: messagesToFavorite.length
-#: apps/app/src/components/chat-message-list.tsx:2333
+#: apps/app/src/components/chat-message-list.tsx:2335
 msgid "已收藏 {0} 条消息。"
 msgstr "메시지 {0}건을 즐겨찾기에 추가했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:2343
+#: apps/app/src/components/chat-message-list.tsx:2345
 msgid "继续收藏所选消息"
 msgstr "선택한 메시지 계속 즐겨찾기"
 
-#: apps/app/src/components/chat-message-list.tsx:2438
+#: apps/app/src/components/chat-message-list.tsx:2440
 msgid "已删除 1 条消息。"
 msgstr "메시지 1건을 삭제했습니다."
 
 #. placeholder {0}: messagesToDelete.length
-#: apps/app/src/components/chat-message-list.tsx:2439
+#: apps/app/src/components/chat-message-list.tsx:2441
 msgid "已删除 {0} 条消息。"
 msgstr "메시지 {0}건을 삭제했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:2447
+#: apps/app/src/components/chat-message-list.tsx:2449
 #: apps/app/src/i18n/static-dom-seed.ts:968
 msgid "批量删除失败，请稍后再试。"
 msgstr "일괄 삭제에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:2449
+#: apps/app/src/components/chat-message-list.tsx:2451
 msgid "继续删除所选消息"
 msgstr "선택한 메시지 계속 삭제"
 
 #. placeholder {0}: messagesToRecall.length
-#: apps/app/src/components/chat-message-list.tsx:2513
+#: apps/app/src/components/chat-message-list.tsx:2515
 msgid "已撤回 {0} 条消息，另有 {skippedCount} 条不支持撤回。"
 msgstr "메시지 {0}건을 취소했고, 추가로 {skippedCount}건은 취소를 지원하지 않습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:2515
+#: apps/app/src/components/chat-message-list.tsx:2517
 msgid "已撤回 1 条消息。"
 msgstr "메시지 1건을 취소했습니다."
 
 #. placeholder {0}: messagesToRecall.length
-#: apps/app/src/components/chat-message-list.tsx:2516
+#: apps/app/src/components/chat-message-list.tsx:2518
 msgid "已撤回 {0} 条消息。"
 msgstr "메시지 {0}건을 취소했습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:2528
+#: apps/app/src/components/chat-message-list.tsx:2530
 #: apps/app/src/i18n/static-dom-seed.ts:969
 msgid "批量撤回失败，请稍后再试。"
 msgstr "일괄 회수에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:2530
+#: apps/app/src/components/chat-message-list.tsx:2532
 msgid "继续撤回所选消息"
 msgstr "선택한 메시지 계속 취소"
 
-#: apps/app/src/components/chat-message-list.tsx:2610
+#: apps/app/src/components/chat-message-list.tsx:2612
 #: apps/app/src/routes/desktop-chat-history-page.tsx:522
 msgid "正在加载更早消息..."
 msgstr "이전 메시지를 불러오는 중..."
 
-#: apps/app/src/components/chat-message-list.tsx:2610
+#: apps/app/src/components/chat-message-list.tsx:2612
 #: apps/app/src/i18n/static-dom-seed.ts:718
 msgid "查看更多消息"
 msgstr "메시지 더 보기"
 
 #. placeholder {0}: selectedMessageIds.length
-#: apps/app/src/components/chat-message-list.tsx:2619
+#: apps/app/src/components/chat-message-list.tsx:2621
 msgid "已选择 {0} 条消息"
 msgstr "메시지 {0}건 선택됨"
 
-#: apps/app/src/components/chat-message-list.tsx:2622
+#: apps/app/src/components/chat-message-list.tsx:2624
 msgid "`Shift + 点击` 可连续选择消息"
 msgstr "`Shift + 클릭`으로 메시지를 연속으로 선택할 수 있습니다"
 
-#: apps/app/src/components/chat-message-list.tsx:2646
+#: apps/app/src/components/chat-message-list.tsx:2648
 msgid "收藏中..."
 msgstr "즐겨찾기 중..."
 
-#: apps/app/src/components/chat-message-list.tsx:2658
-#: apps/app/src/components/chat-message-list.tsx:3244
+#: apps/app/src/components/chat-message-list.tsx:2660
+#: apps/app/src/components/chat-message-list.tsx:3246
 #: apps/app/src/features/chat/group-message-context-menu.tsx:143
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:114
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:845
@@ -1421,29 +1421,29 @@ msgstr "즐겨찾기 중..."
 msgid "转发"
 msgstr "전달"
 
-#: apps/app/src/components/chat-message-list.tsx:2674
+#: apps/app/src/components/chat-message-list.tsx:2676
 msgid "撤回中..."
 msgstr "취소 중..."
 
-#: apps/app/src/components/chat-message-list.tsx:2675
-#: apps/app/src/components/chat-message-list.tsx:3255
-#: apps/app/src/components/chat-message-list.tsx:3393
-#: apps/app/src/components/chat-message-list.tsx:3554
+#: apps/app/src/components/chat-message-list.tsx:2677
+#: apps/app/src/components/chat-message-list.tsx:3257
+#: apps/app/src/components/chat-message-list.tsx:3395
+#: apps/app/src/components/chat-message-list.tsx:3556
 #: apps/app/src/features/chat/group-message-context-menu.tsx:74
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:61
 msgid "撤回"
 msgstr "취소"
 
-#: apps/app/src/components/chat-message-list.tsx:2690
+#: apps/app/src/components/chat-message-list.tsx:2692
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:230
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1088
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1120
 msgid "删除中..."
 msgstr "삭제 중..."
 
-#: apps/app/src/components/chat-message-list.tsx:2691
-#: apps/app/src/components/chat-message-list.tsx:3270
-#: apps/app/src/components/chat-message-list.tsx:3398
-#: apps/app/src/components/chat-message-list.tsx:3563
+#: apps/app/src/components/chat-message-list.tsx:2693
+#: apps/app/src/components/chat-message-list.tsx:3272
+#: apps/app/src/components/chat-message-list.tsx:3400
+#: apps/app/src/components/chat-message-list.tsx:3565
 #: apps/app/src/components/wechat-moment-card.tsx:254
 #: apps/app/src/features/chat/group-message-context-menu.tsx:76
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:63
@@ -1451,30 +1451,30 @@ msgstr "삭제 중..."
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:94
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:117
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:244
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:924
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1094
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:941
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1113
 #: apps/app/src/features/search/mobile-search-workspace.tsx:278
 #: apps/app/src/routes/chat-list-page.tsx:1586
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1087
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1119
 msgid "删除"
 msgstr "삭제"
 
 #. placeholder {0}: selectedMessageIds.length
-#: apps/app/src/components/chat-message-list.tsx:2705
+#: apps/app/src/components/chat-message-list.tsx:2707
 msgid "已选 {0} 条"
 msgstr "{0}건 선택됨"
 
-#: apps/app/src/components/chat-message-list.tsx:2715
+#: apps/app/src/components/chat-message-list.tsx:2717
 #: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:140
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:962
 msgid "全选"
 msgstr "전체 선택"
 
-#: apps/app/src/components/chat-message-list.tsx:2715
+#: apps/app/src/components/chat-message-list.tsx:2717
 msgid "全不选"
 msgstr "전체 선택 해제"
 
-#: apps/app/src/components/chat-message-list.tsx:2918
+#: apps/app/src/components/chat-message-list.tsx:2920
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:140
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:284
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:198
@@ -1495,18 +1495,18 @@ msgstr "전체 선택 해제"
 #: apps/app/src/routes/create-group-page.tsx:497
 #: apps/app/src/routes/favorites-page.tsx:69
 #: apps/app/src/routes/group-member-picker-page.tsx:607
-#: apps/app/src/routes/profile-favorites-page.tsx:46
+#: apps/app/src/routes/mobile-favorites-page.tsx:116
 msgid "联系人"
 msgstr "연락처"
 
 #. placeholder {0}: message.senderName?.trim() || t(msg`联系人`)
 #. placeholder {0}: ownerName?.trim() || t(msg`我的`)
-#: apps/app/src/components/chat-message-list.tsx:2918
-#: apps/app/src/components/chat-message-list.tsx:3200
+#: apps/app/src/components/chat-message-list.tsx:2920
+#: apps/app/src/components/chat-message-list.tsx:3202
 msgid "查看{0}资料"
 msgstr "{0} 프로필 보기"
 
-#: apps/app/src/components/chat-message-list.tsx:2948
+#: apps/app/src/components/chat-message-list.tsx:2950
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:590
 #: apps/app/src/features/desktop/chat/desktop-chat-side-panel.tsx:87
 #: apps/app/src/features/search/desktop-search-launcher.tsx:851
@@ -1524,7 +1524,7 @@ msgstr "{0} 프로필 보기"
 msgid "聊天记录"
 msgstr "채팅 기록"
 
-#: apps/app/src/components/chat-message-list.tsx:2971
+#: apps/app/src/components/chat-message-list.tsx:2973
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:234
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:949
 #: apps/app/src/features/chat/group-message-context-menu.tsx:58
@@ -1534,30 +1534,30 @@ msgid "部分引用"
 msgstr "부분 인용"
 
 #. placeholder {0}: formatReminderSummary(t, reminderRecord.remindAt)
-#: apps/app/src/components/chat-message-list.tsx:3166
+#: apps/app/src/components/chat-message-list.tsx:3168
 msgid "已设提醒 · {0}"
 msgstr "알림 설정됨 · {0}"
 
-#: apps/app/src/components/chat-message-list.tsx:3178
+#: apps/app/src/components/chat-message-list.tsx:3180
 msgid "发送失败"
 msgstr "보내기 실패"
 
-#: apps/app/src/components/chat-message-list.tsx:3188
+#: apps/app/src/components/chat-message-list.tsx:3190
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:533
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:619
 #: apps/app/src/routes/contacts-page.tsx:2164
 msgid "重试"
 msgstr "다시 시도"
 
-#: apps/app/src/components/chat-message-list.tsx:3200
+#: apps/app/src/components/chat-message-list.tsx:3202
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:312
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:546
 msgid "我的"
 msgstr "내 정보"
 
-#: apps/app/src/components/chat-message-list.tsx:3203
-#: apps/app/src/components/chat-message-list.tsx:3210
-#: apps/app/src/components/chat-message-list.tsx:4108
+#: apps/app/src/components/chat-message-list.tsx:3205
+#: apps/app/src/components/chat-message-list.tsx:3212
+#: apps/app/src/components/chat-message-list.tsx:4110
 #: apps/app/src/components/mobile-shell.tsx:35
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:312
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:558
@@ -1587,26 +1587,26 @@ msgstr "내 정보"
 msgid "我"
 msgstr "나"
 
-#: apps/app/src/components/chat-message-list.tsx:3234
+#: apps/app/src/components/chat-message-list.tsx:3236
 msgid "收藏中"
 msgstr "즐겨찾기 중"
 
-#: apps/app/src/components/chat-message-list.tsx:3254
+#: apps/app/src/components/chat-message-list.tsx:3256
 msgid "撤回中"
 msgstr "취소 중"
 
-#: apps/app/src/components/chat-message-list.tsx:3269
+#: apps/app/src/components/chat-message-list.tsx:3271
 msgid "删除中"
 msgstr "삭제 중"
 
-#: apps/app/src/components/chat-message-list.tsx:3323
-#: apps/app/src/components/chat-message-list.tsx:3476
+#: apps/app/src/components/chat-message-list.tsx:3325
+#: apps/app/src/components/chat-message-list.tsx:3478
 #: apps/app/src/features/chat/chat-reminder-entries.ts:173
 msgid "取消提醒"
 msgstr "알림 취소"
 
-#: apps/app/src/components/chat-message-list.tsx:3324
-#: apps/app/src/components/chat-message-list.tsx:3477
+#: apps/app/src/components/chat-message-list.tsx:3326
+#: apps/app/src/components/chat-message-list.tsx:3479
 #: apps/app/src/features/chat/group-message-context-menu.tsx:62
 #: apps/app/src/features/chat/group-message-context-menu.tsx:79
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:51
@@ -1615,43 +1615,44 @@ msgstr "알림 취소"
 msgid "提醒"
 msgstr "알림"
 
-#: apps/app/src/components/chat-message-list.tsx:3329
-#: apps/app/src/components/chat-message-list.tsx:3502
+#: apps/app/src/components/chat-message-list.tsx:3331
+#: apps/app/src/components/chat-message-list.tsx:3504
 msgid "消息内容已复制。"
 msgstr "메시지 내용이 복사되었습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:3341
-#: apps/app/src/components/chat-message-list.tsx:3492
+#: apps/app/src/components/chat-message-list.tsx:3343
+#: apps/app/src/components/chat-message-list.tsx:3494
 #: apps/app/src/components/wechat-action-bubble.tsx:155
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:958
 #: apps/app/src/routes/desktop-chat-files-page.tsx:757
-#: apps/app/src/routes/favorites-page.tsx:615
+#: apps/app/src/routes/favorites-page.tsx:613
+#: apps/app/src/routes/mobile-favorites-page.tsx:429
 #: apps/app/src/routes/official-account-detail-page.tsx:522
 msgid "取消收藏"
 msgstr "즐겨찾기 해제"
 
-#: apps/app/src/components/chat-message-list.tsx:3342
+#: apps/app/src/components/chat-message-list.tsx:3344
 #: apps/app/src/features/chat/group-message-context-menu.tsx:81
 #: apps/app/src/features/search/search-quick-links.ts:44
 msgid "收藏消息"
 msgstr "메시지 즐겨찾기"
 
-#: apps/app/src/components/chat-message-list.tsx:3381
-#: apps/app/src/components/chat-message-list.tsx:3513
+#: apps/app/src/components/chat-message-list.tsx:3383
+#: apps/app/src/components/chat-message-list.tsx:3515
 msgid "发送者名称已复制。"
 msgstr "발신자 이름이 복사되었습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:3406
+#: apps/app/src/components/chat-message-list.tsx:3408
 msgid "我的消息"
 msgstr "내 메시지"
 
-#: apps/app/src/components/chat-message-list.tsx:3407
+#: apps/app/src/components/chat-message-list.tsx:3409
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:41
 msgid "消息操作"
 msgstr "메시지 작업"
 
-#: apps/app/src/components/chat-message-list.tsx:3530
-#: apps/app/src/components/chat-message-list.tsx:4199
+#: apps/app/src/components/chat-message-list.tsx:3532
+#: apps/app/src/components/chat-message-list.tsx:4201
 #: apps/app/src/features/chat/group-message-context-menu.tsx:70
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:57
 #: apps/app/src/i18n/static-dom-seed.ts:484
@@ -1659,8 +1660,8 @@ msgstr "메시지 작업"
 msgid "打开附件"
 msgstr "첨부파일 열기"
 
-#: apps/app/src/components/chat-message-list.tsx:3543
-#: apps/app/src/components/chat-message-list.tsx:4231
+#: apps/app/src/components/chat-message-list.tsx:3545
+#: apps/app/src/components/chat-message-list.tsx:4233
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:59
 #: apps/app/src/i18n/static-dom-seed.ts:485
 #: apps/app/src/routes/desktop-chat-files-page.tsx:717
@@ -1668,9 +1669,9 @@ msgstr "첨부파일 열기"
 msgid "保存附件"
 msgstr "첨부파일 저장"
 
-#: apps/app/src/components/chat-message-list.tsx:3582
-#: apps/app/src/components/chat-message-list.tsx:4129
-#: apps/app/src/components/chat-message-list.tsx:4171
+#: apps/app/src/components/chat-message-list.tsx:3584
+#: apps/app/src/components/chat-message-list.tsx:4131
+#: apps/app/src/components/chat-message-list.tsx:4173
 #: apps/app/src/components/mobile-shell.tsx:32
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:177
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:959
@@ -1685,89 +1686,89 @@ msgstr "첨부파일 저장"
 #: apps/app/src/routes/desktop-mobile-page.tsx:119
 #: apps/app/src/routes/desktop-mobile-page.tsx:165
 #: apps/app/src/routes/favorites-page.tsx:67
-#: apps/app/src/routes/profile-favorites-page.tsx:44
+#: apps/app/src/routes/mobile-favorites-page.tsx:114
 msgid "消息"
 msgstr "메시지"
 
-#: apps/app/src/components/chat-message-list.tsx:3633
+#: apps/app/src/components/chat-message-list.tsx:3635
 #: apps/app/src/i18n/static-dom-seed.ts:970
 #: apps/app/src/routes/desktop-chat-files-page.tsx:435
 msgid "已在独立窗口打开图片。"
 msgstr "이미지를 별도 창에서 열었습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:3640
+#: apps/app/src/components/chat-message-list.tsx:3642
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1441
 #: apps/app/src/i18n/static-dom-seed.ts:971
 #: apps/app/src/routes/desktop-chat-files-page.tsx:436
 msgid "浏览器阻止了新窗口，请检查弹窗权限。"
 msgstr "브라우저가 새 창을 차단했습니다. 팝업 권한을 확인하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:3661
+#: apps/app/src/components/chat-message-list.tsx:3663
 #: apps/app/src/i18n/static-dom-seed.ts:972
 msgid "已打开图片打印视图。"
 msgstr "이미지 인쇄 보기를 열었습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:3668
+#: apps/app/src/components/chat-message-list.tsx:3670
 #: apps/app/src/i18n/static-dom-seed.ts:973
 msgid "浏览器阻止了打印窗口，请检查弹窗权限。"
 msgstr "브라우저가 인쇄 창을 차단했습니다. 팝업 권한을 확인하세요."
 
-#: apps/app/src/components/chat-message-list.tsx:3856
+#: apps/app/src/components/chat-message-list.tsx:3858
 msgid "切换为简略时间显示"
 msgstr "간략 시간 표시로 전환"
 
-#: apps/app/src/components/chat-message-list.tsx:3857
+#: apps/app/src/components/chat-message-list.tsx:3859
 #: apps/app/src/i18n/static-dom-seed.ts:733
 msgid "切换为完整日期显示"
 msgstr "전체 날짜 표시로 전환"
 
-#: apps/app/src/components/chat-message-list.tsx:4002
+#: apps/app/src/components/chat-message-list.tsx:4004
 #: apps/app/src/i18n/static-dom-seed.ts:749
 msgid "聊天记录已导入当前群聊"
 msgstr "채팅 기록을 현재 그룹 채팅으로 가져왔습니다"
 
 #. placeholder {0}: summary.participantName
 #. placeholder {1}: summary.count
-#: apps/app/src/components/chat-message-list.tsx:4012
+#: apps/app/src/components/chat-message-list.tsx:4014
 msgid "来自你和 {0} 的 {1} 条消息"
 msgstr "당신과 {0}의 메시지 {1}건"
 
-#: apps/app/src/components/chat-message-list.tsx:4024
+#: apps/app/src/components/chat-message-list.tsx:4026
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:63
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:846
 msgid "你"
 msgstr "나"
 
-#: apps/app/src/components/chat-message-list.tsx:4026
+#: apps/app/src/components/chat-message-list.tsx:4028
 msgid "{actor}撤回了一条消息"
 msgstr "{actor}이(가) 메시지를 취소했습니다"
 
-#: apps/app/src/components/chat-message-list.tsx:4047
+#: apps/app/src/components/chat-message-list.tsx:4049
 msgid "1 小时后"
 msgstr "1시간 후"
 
-#: apps/app/src/components/chat-message-list.tsx:4053
+#: apps/app/src/components/chat-message-list.tsx:4055
 msgid "今晚 20:00"
 msgstr "오늘 밤 20:00"
 
-#: apps/app/src/components/chat-message-list.tsx:4059
+#: apps/app/src/components/chat-message-list.tsx:4061
 msgid "明天上午 09:00"
 msgstr "내일 오전 09:00"
 
-#: apps/app/src/components/chat-message-list.tsx:4069
+#: apps/app/src/components/chat-message-list.tsx:4071
 #: apps/app/src/i18n/static-dom-seed.ts:180
 msgid "稍后"
 msgstr "나중에"
 
-#: apps/app/src/components/chat-message-list.tsx:4090
+#: apps/app/src/components/chat-message-list.tsx:4092
 msgid "今天 {timeLabel}"
 msgstr "오늘 {timeLabel}"
 
-#: apps/app/src/components/chat-message-list.tsx:4094
+#: apps/app/src/components/chat-message-list.tsx:4096
 msgid "明天 {timeLabel}"
 msgstr "내일 {timeLabel}"
 
-#: apps/app/src/components/chat-message-list.tsx:4111
+#: apps/app/src/components/chat-message-list.tsx:4113
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:594
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:981
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1005
@@ -1790,7 +1791,7 @@ msgstr "내일 {timeLabel}"
 msgid "群成员"
 msgstr "그룹 멤버"
 
-#: apps/app/src/components/chat-message-list.tsx:4152
+#: apps/app/src/components/chat-message-list.tsx:4154
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:106
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:988
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:1070
@@ -1802,7 +1803,7 @@ msgstr "그룹 멤버"
 msgid "语音"
 msgstr "음성"
 
-#: apps/app/src/components/chat-message-list.tsx:4156
+#: apps/app/src/components/chat-message-list.tsx:4158
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:143
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:108
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:992
@@ -1813,8 +1814,8 @@ msgstr "음성"
 msgid "名片"
 msgstr "연락처 카드"
 
-#: apps/app/src/components/chat-message-list.tsx:4160
-#: apps/app/src/components/chat-message-list.tsx:5278
+#: apps/app/src/components/chat-message-list.tsx:4162
+#: apps/app/src/components/chat-message-list.tsx:5293
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:149
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:109
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:996
@@ -1826,59 +1827,59 @@ msgstr "연락처 카드"
 msgid "位置"
 msgstr "위치"
 
-#: apps/app/src/components/chat-message-list.tsx:4164
-#: apps/app/src/components/chat-message-list.tsx:5066
-#: apps/app/src/components/chat-message-list.tsx:6476
+#: apps/app/src/components/chat-message-list.tsx:4166
+#: apps/app/src/components/chat-message-list.tsx:5081
+#: apps/app/src/components/chat-message-list.tsx:6492
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:110
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:1000
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1148
 #: apps/app/src/features/desktop/chat/desktop-note-window-route-state.ts:77
-#: apps/app/src/features/favorites/note-editor-helpers.ts:228
+#: apps/app/src/features/favorites/note-editor-helpers.ts:256
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:190
 #: apps/app/src/features/search/search-quick-links.ts:45
 #: apps/app/src/lib/message-attachment-semantic.ts:246
 #: apps/app/src/routes/favorites-page.tsx:68
-#: apps/app/src/routes/profile-favorites-page.tsx:45
+#: apps/app/src/routes/mobile-favorites-page.tsx:115
 msgid "笔记"
 msgstr "노트"
 
-#: apps/app/src/components/chat-message-list.tsx:4180
-#: apps/app/src/components/chat-message-list.tsx:4864
+#: apps/app/src/components/chat-message-list.tsx:4182
+#: apps/app/src/components/chat-message-list.tsx:4866
 #: apps/app/src/i18n/static-dom-seed.ts:488
 #: apps/app/src/routes/desktop-chat-files-page.tsx:684
 msgid "预览图片"
 msgstr "이미지 미리보기"
 
-#: apps/app/src/components/chat-message-list.tsx:4180
-#: apps/app/src/components/chat-message-list.tsx:4864
+#: apps/app/src/components/chat-message-list.tsx:4182
+#: apps/app/src/components/chat-message-list.tsx:4866
 msgid "查看图片"
 msgstr "이미지 보기"
 
-#: apps/app/src/components/chat-message-list.tsx:4188
-#: apps/app/src/components/chat-message-list.tsx:4979
+#: apps/app/src/components/chat-message-list.tsx:4190
+#: apps/app/src/components/chat-message-list.tsx:4981
 msgid "查看名片"
 msgstr "명함 보기"
 
-#: apps/app/src/components/chat-message-list.tsx:4192
-#: apps/app/src/components/chat-message-list.tsx:5310
+#: apps/app/src/components/chat-message-list.tsx:4194
+#: apps/app/src/components/chat-message-list.tsx:5325
 msgid "查看位置"
 msgstr "위치 보기"
 
-#: apps/app/src/components/chat-message-list.tsx:4196
-#: apps/app/src/components/chat-message-list.tsx:5082
-#: apps/app/src/routes/favorites-page.tsx:589
+#: apps/app/src/components/chat-message-list.tsx:4198
+#: apps/app/src/components/chat-message-list.tsx:5097
+#: apps/app/src/routes/favorites-page.tsx:587
 msgid "打开笔记"
 msgstr "노트 열기"
 
-#: apps/app/src/components/chat-message-list.tsx:4196
-#: apps/app/src/components/chat-message-list.tsx:5082
+#: apps/app/src/components/chat-message-list.tsx:4198
+#: apps/app/src/components/chat-message-list.tsx:5097
 msgid "查看笔记摘要"
 msgstr "노트 요약 보기"
 
-#: apps/app/src/components/chat-message-list.tsx:4211
-#: apps/app/src/components/chat-message-list.tsx:4219
-#: apps/app/src/components/chat-message-list.tsx:6407
-#: apps/app/src/components/chat-message-list.tsx:6587
+#: apps/app/src/components/chat-message-list.tsx:4213
+#: apps/app/src/components/chat-message-list.tsx:4221
+#: apps/app/src/components/chat-message-list.tsx:6422
+#: apps/app/src/components/chat-message-list.tsx:6603
 #: apps/app/src/components/official-article-viewer.tsx:278
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:238
 #: apps/app/src/features/games/game-center-session-panel.tsx:70
@@ -1891,60 +1892,60 @@ msgstr "노트 요약 보기"
 msgid "系统分享"
 msgstr "시스템 공유"
 
-#: apps/app/src/components/chat-message-list.tsx:4212
+#: apps/app/src/components/chat-message-list.tsx:4214
 msgid "复制名片"
 msgstr "명함 복사"
 
-#: apps/app/src/components/chat-message-list.tsx:4220
-#: apps/app/src/components/chat-message-list.tsx:6407
+#: apps/app/src/components/chat-message-list.tsx:4222
+#: apps/app/src/components/chat-message-list.tsx:6422
 msgid "复制位置"
 msgstr "위치 복사"
 
-#: apps/app/src/components/chat-message-list.tsx:4224
+#: apps/app/src/components/chat-message-list.tsx:4226
 msgid "另存图片"
 msgstr "이미지 다른 이름으로 저장"
 
-#: apps/app/src/components/chat-message-list.tsx:4228
+#: apps/app/src/components/chat-message-list.tsx:4230
 msgid "另存文件"
 msgstr "파일 다른 이름으로 저장"
 
-#: apps/app/src/components/chat-message-list.tsx:4231
+#: apps/app/src/components/chat-message-list.tsx:4233
 #: apps/app/src/features/chat/group-message-context-menu.tsx:72
 msgid "另存为"
 msgstr "다른 이름으로 저장"
 
-#: apps/app/src/components/chat-message-list.tsx:4268
+#: apps/app/src/components/chat-message-list.tsx:4270
 #: apps/app/src/features/chat/chat-reminder-entries.ts:72
 #: apps/app/src/features/chat/use-message-reminders.ts:36
 msgid "聊天消息"
 msgstr "채팅 메시지"
 
-#: apps/app/src/components/chat-message-list.tsx:4268
+#: apps/app/src/components/chat-message-list.tsx:4270
 msgid "群聊消息"
 msgstr "그룹 채팅 메시지"
 
-#: apps/app/src/components/chat-message-list.tsx:4396
+#: apps/app/src/components/chat-message-list.tsx:4398
 msgid "当前消息暂不支持转发到群聊。"
 msgstr "현재 메시지는 그룹 채팅 전달을 지원하지 않습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:4409
-#: apps/app/src/components/chat-message-list.tsx:4440
+#: apps/app/src/components/chat-message-list.tsx:4411
+#: apps/app/src/components/chat-message-list.tsx:4442
 msgid "这条单聊暂时没有可用的角色目标，无法完成转发。"
 msgstr "이 1:1 채팅에는 현재 사용 가능한 캐릭터 대상이 없어 전달을 완료할 수 없습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:4424
+#: apps/app/src/components/chat-message-list.tsx:4426
 msgid "当前没有可合并转发的消息内容。"
 msgstr "현재 병합 전달할 수 있는 메시지 내용이 없습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:4628
+#: apps/app/src/components/chat-message-list.tsx:4630
 msgid "图片表情"
 msgstr "이미지 스티커"
 
-#: apps/app/src/components/chat-message-list.tsx:4693
+#: apps/app/src/components/chat-message-list.tsx:4695
 msgid "[聊天记录]"
 msgstr "[채팅 기록]"
 
-#: apps/app/src/components/chat-message-list.tsx:4778
+#: apps/app/src/components/chat-message-list.tsx:4780
 #: apps/app/src/components/wechat-moment-card.tsx:334
 #: apps/app/src/features/chat/group-message-context-menu.tsx:129
 #: apps/app/src/features/chat/mobile-message-action-sheet.tsx:107
@@ -1955,21 +1956,21 @@ msgstr "[채팅 기록]"
 msgid "回复"
 msgstr "답장"
 
-#: apps/app/src/components/chat-message-list.tsx:4890
+#: apps/app/src/components/chat-message-list.tsx:4892
 msgid "取消选择消息"
 msgstr "메시지 선택 해제"
 
-#: apps/app/src/components/chat-message-list.tsx:4890
+#: apps/app/src/components/chat-message-list.tsx:4892
 msgid "选择消息"
 msgstr "메시지 선택"
 
-#: apps/app/src/components/chat-message-list.tsx:4922
+#: apps/app/src/components/chat-message-list.tsx:4924
 #: apps/app/src/i18n/static-dom-seed.ts:719
 msgid "继续聊"
 msgstr "계속 대화"
 
-#: apps/app/src/components/chat-message-list.tsx:4944
-#: apps/app/src/components/chat-message-list.tsx:6682
+#: apps/app/src/components/chat-message-list.tsx:4946
+#: apps/app/src/components/chat-message-list.tsx:6736
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:602
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:655
 #: apps/app/src/routes/character-detail-page.tsx:263
@@ -1981,31 +1982,31 @@ msgstr "계속 대화"
 msgid "世界联系人"
 msgstr "세계 연락처"
 
-#: apps/app/src/components/chat-message-list.tsx:4965
+#: apps/app/src/components/chat-message-list.tsx:4967
 #: apps/app/src/i18n/static-dom-seed.ts:720
 msgid "推荐联系人"
 msgstr "추천 연락처"
 
-#: apps/app/src/components/chat-message-list.tsx:4965
+#: apps/app/src/components/chat-message-list.tsx:4967
 #: apps/app/src/i18n/static-dom-seed.ts:721
 msgid "角色名片"
 msgstr "캐릭터 카드"
 
-#: apps/app/src/components/chat-message-list.tsx:5031
+#: apps/app/src/components/chat-message-list.tsx:5046
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:249
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1062
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1079
 msgid "收藏笔记"
 msgstr "즐겨찾기 노트"
 
-#: apps/app/src/components/chat-message-list.tsx:5052
+#: apps/app/src/components/chat-message-list.tsx:5067
 msgid "点击查看完整笔记"
 msgstr "탭하여 전체 메모 보기"
 
-#: apps/app/src/components/chat-message-list.tsx:5066
+#: apps/app/src/components/chat-message-list.tsx:5081
 msgid "个文件"
 msgstr "파일"
 
-#: apps/app/src/components/chat-message-list.tsx:5109
+#: apps/app/src/components/chat-message-list.tsx:5124
 #: apps/app/src/components/moment-compose-media-preview.tsx:119
 #: apps/app/src/components/moment-media-gallery.tsx:180
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1177
@@ -2016,15 +2017,15 @@ msgstr "파일"
 msgid "视频"
 msgstr "동영상"
 
-#: apps/app/src/components/chat-message-list.tsx:5110
+#: apps/app/src/components/chat-message-list.tsx:5125
 msgid "音频"
 msgstr "오디오"
 
-#: apps/app/src/components/chat-message-list.tsx:5111
+#: apps/app/src/components/chat-message-list.tsx:5126
 msgid "图文"
 msgstr "게시글"
 
-#: apps/app/src/components/chat-message-list.tsx:5112
+#: apps/app/src/components/chat-message-list.tsx:5127
 #: apps/app/src/features/shell/desktop-nav-matching.ts:91
 #: apps/app/src/features/shell/desktop-nav-matching.ts:92
 #: apps/app/src/i18n/static-dom-seed.ts:47
@@ -2034,128 +2035,128 @@ msgstr "게시글"
 #: apps/app/src/routes/channels-page.tsx:1102
 #: apps/app/src/routes/discover-page.tsx:173
 #: apps/app/src/routes/favorites-page.tsx:73
-#: apps/app/src/routes/profile-favorites-page.tsx:50
+#: apps/app/src/routes/mobile-favorites-page.tsx:120
 msgid "视频号"
 msgstr "채널"
 
-#: apps/app/src/components/chat-message-list.tsx:5149
+#: apps/app/src/components/chat-message-list.tsx:5164
 msgid "视频号动态"
 msgstr "채널즈 게시물"
 
 #. placeholder {0}: attachment.authorName
 #. placeholder {0}: formatTimestamp(post.createdAt)
-#: apps/app/src/components/chat-message-list.tsx:5157
+#: apps/app/src/components/chat-message-list.tsx:5172
 #: apps/app/src/routes/channels-page.tsx:743
 msgid "视频号 · {0}"
 msgstr "채널 · {0}"
 
-#: apps/app/src/components/chat-message-list.tsx:5160
+#: apps/app/src/components/chat-message-list.tsx:5175
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:1174
 #: apps/app/src/features/chat/mobile-reminder-toast-host.tsx:290
 #: apps/app/src/i18n/static-dom-seed.ts:814
 msgid "查看"
 msgstr "보기"
 
-#: apps/app/src/components/chat-message-list.tsx:5176
+#: apps/app/src/components/chat-message-list.tsx:5191
 #: apps/app/src/i18n/static-dom-seed.ts:603
 #: apps/app/src/routes/live-companion-page.tsx:648
 msgid "打开视频号"
 msgstr "영상 채널 열기"
 
-#: apps/app/src/components/chat-message-list.tsx:5391
+#: apps/app/src/components/chat-message-list.tsx:5406
 #: apps/app/src/i18n/static-dom-seed.ts:743
 msgid "播放语音"
 msgstr "음성 재생"
 
-#: apps/app/src/components/chat-message-list.tsx:5391
+#: apps/app/src/components/chat-message-list.tsx:5406
 msgid "暂停语音"
 msgstr "음성 일시 정지"
 
-#: apps/app/src/components/chat-message-list.tsx:5460
+#: apps/app/src/components/chat-message-list.tsx:5475
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:126
 #: apps/app/src/i18n/static-dom-seed.ts:248
 msgid "群接龙"
 msgstr "그룹 릴레이"
 
-#: apps/app/src/components/chat-message-list.tsx:5470
+#: apps/app/src/components/chat-message-list.tsx:5485
 msgid "手机回填"
 msgstr "모바일에서 작성"
 
-#: apps/app/src/components/chat-message-list.tsx:5470
+#: apps/app/src/components/chat-message-list.tsx:5485
 msgid "桌面回填"
 msgstr "데스크톱에서 작성"
 
-#: apps/app/src/components/chat-message-list.tsx:5477
+#: apps/app/src/components/chat-message-list.tsx:5492
 msgid "手机发起"
 msgstr "모바일에서 시작"
 
-#: apps/app/src/components/chat-message-list.tsx:5477
-#: apps/app/src/components/chat-message-list.tsx:5773
-#: apps/app/src/components/chat-message-list.tsx:5985
+#: apps/app/src/components/chat-message-list.tsx:5492
+#: apps/app/src/components/chat-message-list.tsx:5788
+#: apps/app/src/components/chat-message-list.tsx:6000
 msgid "桌面发起"
 msgstr "데스크톱에서 시작"
 
-#: apps/app/src/components/chat-message-list.tsx:5511
-#: apps/app/src/components/chat-message-list.tsx:5793
-#: apps/app/src/components/chat-message-list.tsx:6000
+#: apps/app/src/components/chat-message-list.tsx:5526
+#: apps/app/src/components/chat-message-list.tsx:5808
+#: apps/app/src/components/chat-message-list.tsx:6015
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:444
 #: apps/app/src/features/chat/chat-message-search-panel.tsx:752
 msgid "时间"
 msgstr "시간"
 
-#: apps/app/src/components/chat-message-list.tsx:5518
+#: apps/app/src/components/chat-message-list.tsx:5533
 msgid "完成时间"
 msgstr "완료 시간"
 
-#: apps/app/src/components/chat-message-list.tsx:5525
-#: apps/app/src/components/chat-message-list.tsx:5800
+#: apps/app/src/components/chat-message-list.tsx:5540
+#: apps/app/src/components/chat-message-list.tsx:5815
 msgid "起止时间"
 msgstr "기간"
 
-#: apps/app/src/components/chat-message-list.tsx:5532
+#: apps/app/src/components/chat-message-list.tsx:5547
 msgid "进行中"
 msgstr "진행 중"
 
-#: apps/app/src/components/chat-message-list.tsx:5539
+#: apps/app/src/components/chat-message-list.tsx:5554
 #: apps/app/src/routes/mini-programs-page.tsx:160
 msgid "待确认"
 msgstr "확인 대기"
 
-#: apps/app/src/components/chat-message-list.tsx:5546
+#: apps/app/src/components/chat-message-list.tsx:5561
 msgid "回填次数"
 msgstr "작성 횟수"
 
-#: apps/app/src/components/chat-message-list.tsx:5553
+#: apps/app/src/components/chat-message-list.tsx:5568
 msgid "结果摘要"
 msgstr "결과 요약"
 
-#: apps/app/src/components/chat-message-list.tsx:5759
+#: apps/app/src/components/chat-message-list.tsx:5774
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:180
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:733
 msgid "群语音通话"
 msgstr "그룹 음성 통화"
 
-#: apps/app/src/components/chat-message-list.tsx:5759
+#: apps/app/src/components/chat-message-list.tsx:5774
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:180
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:732
 msgid "群视频通话"
 msgstr "그룹 영상 통화"
 
-#: apps/app/src/components/chat-message-list.tsx:5770
-#: apps/app/src/components/chat-message-list.tsx:5982
+#: apps/app/src/components/chat-message-list.tsx:5785
+#: apps/app/src/components/chat-message-list.tsx:5997
 #: apps/app/src/features/chat/direct-call-card.ts:14
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:85
 #: apps/app/src/routes/live-companion-page.tsx:741
 msgid "已结束"
 msgstr "종료됨"
 
-#: apps/app/src/components/chat-message-list.tsx:5772
-#: apps/app/src/components/chat-message-list.tsx:5984
+#: apps/app/src/components/chat-message-list.tsx:5787
+#: apps/app/src/components/chat-message-list.tsx:5999
 msgid "发起"
 msgstr "시작자"
 
-#: apps/app/src/components/chat-message-list.tsx:5787
-#: apps/app/src/components/chat-message-list.tsx:5993
+#: apps/app/src/components/chat-message-list.tsx:5802
+#: apps/app/src/components/chat-message-list.tsx:6008
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:458
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:167
 #: apps/app/src/i18n/static-dom-seed.ts:163
@@ -2165,39 +2166,39 @@ msgstr "시작자"
 msgid "当前状态"
 msgstr "현재 상태"
 
-#: apps/app/src/components/chat-message-list.tsx:5810
+#: apps/app/src/components/chat-message-list.tsx:5825
 #: apps/app/src/i18n/static-dom-seed.ts:993
 msgid "本轮时长"
 msgstr "이번 라운드 길이"
 
-#: apps/app/src/components/chat-message-list.tsx:5817
-#: apps/app/src/components/chat-message-list.tsx:6014
+#: apps/app/src/components/chat-message-list.tsx:5832
+#: apps/app/src/components/chat-message-list.tsx:6029
 #: apps/app/src/i18n/static-dom-seed.ts:991
 msgid "发起端"
 msgstr "시작 위치"
 
-#: apps/app/src/components/chat-message-list.tsx:5824
+#: apps/app/src/components/chat-message-list.tsx:5839
 msgid "人数快照"
 msgstr "참가자 스냅샷"
 
-#: apps/app/src/components/chat-message-list.tsx:5836
+#: apps/app/src/components/chat-message-list.tsx:5851
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:830
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:194
 #: apps/app/src/i18n/static-dom-seed.ts:988
 msgid "当前在线"
 msgstr "현재 온라인"
 
-#: apps/app/src/components/chat-message-list.tsx:5841
+#: apps/app/src/components/chat-message-list.tsx:5856
 #: apps/app/src/features/chat/mobile-group-call-screen.tsx:1057
 #: apps/app/src/features/desktop/chat/desktop-group-call-panel.tsx:383
 msgid "待加入"
 msgstr "참가 대기"
 
-#: apps/app/src/components/chat-message-list.tsx:5842
+#: apps/app/src/components/chat-message-list.tsx:5857
 msgid "人"
 msgstr "명"
 
-#: apps/app/src/components/chat-message-list.tsx:5972
+#: apps/app/src/components/chat-message-list.tsx:5987
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:111
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:58
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:495
@@ -2211,7 +2212,7 @@ msgstr "명"
 msgid "视频通话"
 msgstr "영상 통화"
 
-#: apps/app/src/components/chat-message-list.tsx:5972
+#: apps/app/src/components/chat-message-list.tsx:5987
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:155
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:51
 #: apps/app/src/features/chat/conversation-thread-panel.tsx:489
@@ -2226,90 +2227,90 @@ msgstr "영상 통화"
 msgid "语音通话"
 msgstr "음성 통화"
 
-#: apps/app/src/components/chat-message-list.tsx:6007
+#: apps/app/src/components/chat-message-list.tsx:6022
 #: apps/app/src/features/desktop/chat/desktop-direct-call-panel.tsx:472
 #: apps/app/src/i18n/static-dom-seed.ts:992
 msgid "最近一轮"
 msgstr "최근 라운드"
 
-#: apps/app/src/components/chat-message-list.tsx:6093
+#: apps/app/src/components/chat-message-list.tsx:6108
 msgid "[表情包]"
 msgstr "[스티커]"
 
-#: apps/app/src/components/chat-message-list.tsx:6191
-#: apps/app/src/components/chat-message-list.tsx:6222
-#: apps/app/src/components/chat-message-list.tsx:6248
+#: apps/app/src/components/chat-message-list.tsx:6206
+#: apps/app/src/components/chat-message-list.tsx:6237
+#: apps/app/src/components/chat-message-list.tsx:6263
 #: apps/app/src/i18n/static-dom-seed.ts:927
 msgid "关闭图片查看器"
 msgstr "이미지 뷰어 닫기"
 
-#: apps/app/src/components/chat-message-list.tsx:6207
+#: apps/app/src/components/chat-message-list.tsx:6222
 #: apps/app/src/i18n/static-dom-seed.ts:925
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1041
 msgid "新窗口打开"
 msgstr "새 창에서 열기"
 
-#: apps/app/src/components/chat-message-list.tsx:6212
+#: apps/app/src/components/chat-message-list.tsx:6227
 #: apps/app/src/i18n/static-dom-seed.ts:924
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:513
 msgid "打印图片"
 msgstr "이미지 인쇄"
 
-#: apps/app/src/components/chat-message-list.tsx:6219
-#: apps/app/src/components/chat-message-list.tsx:6276
+#: apps/app/src/components/chat-message-list.tsx:6234
+#: apps/app/src/components/chat-message-list.tsx:6291
 #: apps/app/src/features/desktop/chat/desktop-chat-history-panel.tsx:739
 #: apps/app/src/i18n/static-dom-seed.ts:926
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:520
 msgid "定位到聊天位置"
 msgstr "채팅 위치로 이동"
 
-#: apps/app/src/components/chat-message-list.tsx:6231
-#: apps/app/src/components/chat-message-list.tsx:6284
+#: apps/app/src/components/chat-message-list.tsx:6246
+#: apps/app/src/components/chat-message-list.tsx:6299
 #: apps/app/src/i18n/static-dom-seed.ts:928
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:537
 msgid "上一张图片"
 msgstr "이전 이미지"
 
-#: apps/app/src/components/chat-message-list.tsx:6238
-#: apps/app/src/components/chat-message-list.tsx:6291
+#: apps/app/src/components/chat-message-list.tsx:6253
+#: apps/app/src/components/chat-message-list.tsx:6306
 #: apps/app/src/i18n/static-dom-seed.ts:929
 #: apps/app/src/routes/desktop-chat-image-viewer-page.tsx:547
 msgid "下一张图片"
 msgstr "다음 이미지"
 
-#: apps/app/src/components/chat-message-list.tsx:6268
+#: apps/app/src/components/chat-message-list.tsx:6283
 msgid "左右滑动切换图片"
 msgstr "좌우로 스와이프하여 이미지 전환"
 
-#: apps/app/src/components/chat-message-list.tsx:6344
-#: apps/app/src/components/chat-message-list.tsx:6357
+#: apps/app/src/components/chat-message-list.tsx:6359
+#: apps/app/src/components/chat-message-list.tsx:6372
 #: apps/app/src/i18n/static-dom-seed.ts:931
 msgid "关闭位置查看器"
 msgstr "위치 뷰어 닫기"
 
-#: apps/app/src/components/chat-message-list.tsx:6351
+#: apps/app/src/components/chat-message-list.tsx:6366
 msgid "聊天位置"
 msgstr "채팅 위치"
 
-#: apps/app/src/components/chat-message-list.tsx:6375
+#: apps/app/src/components/chat-message-list.tsx:6390
 msgid "来自聊天中的位置卡片"
 msgstr "채팅의 위치 카드"
 
-#: apps/app/src/components/chat-message-list.tsx:6396
+#: apps/app/src/components/chat-message-list.tsx:6411
 msgid "这条位置消息来自当前聊天场景，可继续回到消息定位。"
 msgstr "이 위치 메시지는 현재 채팅에서 온 것입니다. 메시지로 돌아갈 수 있습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:6416
-#: apps/app/src/components/chat-message-list.tsx:6654
+#: apps/app/src/components/chat-message-list.tsx:6431
+#: apps/app/src/components/chat-message-list.tsx:6708
 #: apps/app/src/i18n/static-dom-seed.ts:932
 msgid "定位消息"
 msgstr "메시지 찾기"
 
-#: apps/app/src/components/chat-message-list.tsx:6452
+#: apps/app/src/components/chat-message-list.tsx:6468
 msgid "未命名笔记"
 msgstr "제목 없는 메모"
 
-#: apps/app/src/components/chat-message-list.tsx:6471
+#: apps/app/src/components/chat-message-list.tsx:6487
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:790
 #: apps/app/src/features/chat-details/chat-details-shell.tsx:45
 #: apps/app/src/features/chat/mobile-chat-thread-header.tsx:40
@@ -2322,27 +2323,27 @@ msgstr "제목 없는 메모"
 #: apps/app/src/routes/create-group-page.tsx:335
 #: apps/app/src/routes/group-member-picker-page.tsx:365
 #: apps/app/src/routes/mobile-add-friend-page.tsx:362
-#: apps/app/src/routes/mobile-note-editor-page.tsx:897
-#: apps/app/src/routes/mobile-notes-page.tsx:143
+#: apps/app/src/routes/mobile-favorites-page.tsx:320
+#: apps/app/src/routes/mobile-note-editor-page.tsx:927
+#: apps/app/src/routes/mobile-notes-page.tsx:158
 #: apps/app/src/routes/moments-page.tsx:1411
 #: apps/app/src/routes/official-accounts-page.tsx:354
 #: apps/app/src/routes/official-accounts-page.tsx:381
-#: apps/app/src/routes/profile-character-import-page.tsx:81
-#: apps/app/src/routes/profile-favorites-page.tsx:128
+#: apps/app/src/routes/profile-character-import-page.tsx:172
 #: apps/app/src/routes/profile-feedback-page.tsx:156
 #: apps/app/src/routes/profile-info-avatar-page.tsx:110
-#: apps/app/src/routes/profile-info-name-page.tsx:81
+#: apps/app/src/routes/profile-info-name-page.tsx:82
 #: apps/app/src/routes/profile-info-page.tsx:49
 #: apps/app/src/routes/profile-info-placeholder-page.tsx:51
 #: apps/app/src/routes/profile-info-signature-page.tsx:80
 #: apps/app/src/routes/profile-moments-page.tsx:539
 #: apps/app/src/routes/profile-settings-language-page.tsx:49
 #: apps/app/src/routes/profile-subscription-page.tsx:493
-#: apps/app/src/routes/welcome-page.tsx:1297
+#: apps/app/src/routes/welcome-page.tsx:1310
 msgid "返回"
 msgstr "뒤로"
 
-#: apps/app/src/components/chat-message-list.tsx:6484
+#: apps/app/src/components/chat-message-list.tsx:6500
 #: apps/app/src/components/wechat-moment-card.tsx:264
 #: apps/app/src/features/chat/mobile-chat-thread-header.tsx:26
 #: apps/app/src/features/desktop/moments/desktop-moment-row.tsx:197
@@ -2351,64 +2352,68 @@ msgstr "뒤로"
 msgid "更多操作"
 msgstr "더 많은 작업"
 
-#: apps/app/src/components/chat-message-list.tsx:6494
+#: apps/app/src/components/chat-message-list.tsx:6510
 msgid "笔记已被删除或不可见"
 msgstr "메모가 삭제되었거나 표시할 수 없습니다"
 
-#: apps/app/src/components/chat-message-list.tsx:6497
+#: apps/app/src/components/chat-message-list.tsx:6513
 msgid "该笔记可能已经被发送者删除，或你不再有查看权限。"
 msgstr "이 메모는 발신자가 삭제했거나 더 이상 열람 권한이 없을 수 있습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:6506
+#: apps/app/src/components/chat-message-list.tsx:6522
 msgid "编辑于"
 msgstr "편집 시간"
 
-#: apps/app/src/components/chat-message-list.tsx:6538
+#: apps/app/src/components/chat-message-list.tsx:6554
 msgid "这条笔记暂时没有正文内容。"
 msgstr "이 메모에는 본문 내용이 없습니다."
 
-#: apps/app/src/components/chat-message-list.tsx:6587
+#: apps/app/src/components/chat-message-list.tsx:6603
 msgid "复制摘要"
 msgstr "요약 복사"
 
-#: apps/app/src/components/chat-message-list.tsx:6629
+#: apps/app/src/components/chat-message-list.tsx:6671
 #: apps/app/src/features/chat-details/mobile-details-action-sheet.tsx:42
 msgid "关闭操作菜单"
 msgstr "작업 메뉴 닫기"
 
-#: apps/app/src/components/chat-message-list.tsx:6681
+#: apps/app/src/components/chat-message-list.tsx:6687
+msgid "编辑笔记"
+msgstr ""
+
+#: apps/app/src/components/chat-message-list.tsx:6735
 msgid " 的隐界名片"
 msgstr "의 은계 카드"
 
-#: apps/app/src/components/chat-message-list.tsx:6683
+#: apps/app/src/components/chat-message-list.tsx:6737
 msgid "隐界号："
 msgstr "은계 ID："
 
-#: apps/app/src/components/chat-message-list.tsx:6700
+#: apps/app/src/components/chat-message-list.tsx:6754
 msgid "这是一条来自聊天中的收藏笔记。"
 msgstr "채팅에서 저장된 메모입니다."
 
-#: apps/app/src/components/chat-message-list.tsx:6702
+#: apps/app/src/components/chat-message-list.tsx:6756
 msgid "标签："
 msgstr "태그："
 
-#: apps/app/src/components/chat-message-list.tsx:6704
+#: apps/app/src/components/chat-message-list.tsx:6758
 msgid "图片："
 msgstr "이미지："
 
-#: apps/app/src/components/chat-message-list.tsx:6704
+#: apps/app/src/components/chat-message-list.tsx:6758
 msgid " 张"
 msgstr "장"
 
-#: apps/app/src/components/chat-message-list.tsx:6705
+#: apps/app/src/components/chat-message-list.tsx:6759
 msgid "文件："
 msgstr "파일："
 
-#: apps/app/src/components/chat-message-list.tsx:6705
+#: apps/app/src/components/chat-message-list.tsx:6759
 msgid " 个"
 msgstr "개"
 
-#: apps/app/src/components/chat-message-list.tsx:6706
+#: apps/app/src/components/chat-message-list.tsx:6760
 msgid "更新于"
 msgstr "업데이트 시간"
 
@@ -2666,7 +2671,7 @@ msgid "还没有可以分享的联系人名片。"
 msgstr "아직 공유할 수 있는 연락처 명함이 없습니다."
 
 #: apps/app/src/components/mobile-chat-plus-panel.tsx:628
-#: apps/app/src/routes/favorites-page.tsx:677
+#: apps/app/src/routes/favorites-page.tsx:675
 msgid "正在读取收藏..."
 msgstr "즐겨찾기 읽는 중..."
 
@@ -3227,10 +3232,10 @@ msgstr "팔로우 중"
 #: apps/app/src/routes/desktop-mobile-page.tsx:129
 #: apps/app/src/routes/desktop-mobile-page.tsx:590
 #: apps/app/src/routes/favorites-page.tsx:70
-#: apps/app/src/routes/favorites-page.tsx:484
+#: apps/app/src/routes/favorites-page.tsx:482
+#: apps/app/src/routes/mobile-favorites-page.tsx:117
 #: apps/app/src/routes/official-account-detail-page.tsx:398
 #: apps/app/src/routes/official-accounts-page.tsx:173
-#: apps/app/src/routes/profile-favorites-page.tsx:47
 msgid "公众号"
 msgstr "공식 계정"
 
@@ -3719,7 +3724,7 @@ msgstr "전체 메시지"
 #: apps/app/src/routes/channel-author-page.tsx:254
 #: apps/app/src/routes/desktop-chat-files-page.tsx:498
 #: apps/app/src/routes/desktop-chat-files-page.tsx:524
-#: apps/app/src/routes/profile-favorites-page.tsx:43
+#: apps/app/src/routes/mobile-favorites-page.tsx:113
 msgid "全部"
 msgstr "전체"
 
@@ -4151,7 +4156,7 @@ msgstr "대기 중"
 #: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:1096
 #: apps/app/src/routes/mini-programs-page.tsx:364
 #: apps/app/src/routes/profile-info-avatar-page.tsx:127
-#: apps/app/src/routes/profile-info-name-page.tsx:98
+#: apps/app/src/routes/profile-info-name-page.tsx:99
 #: apps/app/src/routes/profile-info-signature-page.tsx:97
 msgid "完成"
 msgstr "완료"
@@ -6427,10 +6432,10 @@ msgstr "이미지와 GIF를 계속 추가하면 자주 쓰는 스티커를 더 �
 
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:995
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:1377
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1045
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1062
 #: apps/app/src/routes/group-chat-details-page.tsx:467
 #: apps/app/src/routes/mobile-add-friend-page.tsx:705
-#: apps/app/src/routes/mobile-note-editor-page.tsx:999
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1029
 msgid "添加"
 msgstr "추가"
 
@@ -6773,9 +6778,9 @@ msgstr "최근 추가"
 #. placeholder {0}: counts.moments + counts.feed + counts.channels
 #: apps/app/src/features/chat/stickers/sticker-panel.tsx:2726
 #: apps/app/src/routes/desktop-chat-files-page.tsx:595
-#: apps/app/src/routes/favorites-page.tsx:477
-#: apps/app/src/routes/favorites-page.tsx:481
-#: apps/app/src/routes/favorites-page.tsx:485
+#: apps/app/src/routes/favorites-page.tsx:475
+#: apps/app/src/routes/favorites-page.tsx:479
+#: apps/app/src/routes/favorites-page.tsx:483
 msgid "{0} 项"
 msgstr "{0}개"
 
@@ -7267,12 +7272,12 @@ msgstr "출처"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:264
 #: apps/app/src/features/contacts/management/management-root-screen.tsx:42
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:677
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:993
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1010
 #: apps/app/src/features/desktop/contacts/desktop-contacts-tags-pane.tsx:380
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:190
 #: apps/app/src/routes/character-detail-page.tsx:305
 #: apps/app/src/routes/contacts-page.tsx:1388
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1070
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1102
 #: apps/app/src/routes/tags-page.tsx:174
 #: apps/app/src/routes/tags-page.tsx:271
 msgid "标签"
@@ -7309,10 +7314,10 @@ msgstr "소셜 및 콘텐츠"
 #: apps/app/src/routes/discover-page.tsx:669
 #: apps/app/src/routes/favorites-page.tsx:71
 #: apps/app/src/routes/friend-moments-page.tsx:647
+#: apps/app/src/routes/mobile-favorites-page.tsx:118
 #: apps/app/src/routes/mobile-friend-moments-page.tsx:324
 #: apps/app/src/routes/moments-page.tsx:1078
 #: apps/app/src/routes/moments-page.tsx:1401
-#: apps/app/src/routes/profile-favorites-page.tsx:48
 #: apps/app/src/routes/profile-moments-page.tsx:463
 #: apps/app/src/routes/profile-page.tsx:168
 msgid "朋友圈"
@@ -7461,7 +7466,7 @@ msgstr "연락처 삭제"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:393
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:528
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:1089
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1095
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1114
 #: apps/app/src/routes/character-detail-page.tsx:332
 msgid "正在删除..."
 msgstr "삭제 중..."
@@ -7504,10 +7509,10 @@ msgstr "Yinjie ID: {identifier}"
 
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:68
 #: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:75
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:943
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:960
 #: apps/app/src/routes/character-detail-page.tsx:309
 #: apps/app/src/routes/group-chat-edit-page.tsx:423
-#: apps/app/src/routes/mobile-note-editor-page.tsx:938
+#: apps/app/src/routes/mobile-note-editor-page.tsx:968
 msgid "保存"
 msgstr "저장"
 
@@ -8895,13 +8900,14 @@ msgid "添加朋友"
 msgstr "친구 추가"
 
 #: apps/app/src/features/desktop/chat/desktop-chat-workspace.tsx:205
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:911
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:928
 #: apps/app/src/i18n/static-dom-seed.ts:389
 #: apps/app/src/routes/chat-list-page.tsx:125
-#: apps/app/src/routes/favorites-page.tsx:434
-#: apps/app/src/routes/mobile-note-editor-page.tsx:951
-#: apps/app/src/routes/mobile-notes-page.tsx:155
-#: apps/app/src/routes/mobile-notes-page.tsx:225
+#: apps/app/src/routes/favorites-page.tsx:432
+#: apps/app/src/routes/mobile-favorites-page.tsx:333
+#: apps/app/src/routes/mobile-note-editor-page.tsx:981
+#: apps/app/src/routes/mobile-notes-page.tsx:170
+#: apps/app/src/routes/mobile-notes-page.tsx:240
 msgid "新建笔记"
 msgstr "새 노트"
 
@@ -9910,8 +9916,8 @@ msgid "更新于 {0}"
 msgstr "{0}에 업데이트됨"
 
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:265
-#: apps/app/src/routes/favorites-page.tsx:775
-#: apps/app/src/routes/mobile-notes-page.tsx:269
+#: apps/app/src/routes/favorites-page.tsx:773
+#: apps/app/src/routes/mobile-notes-page.tsx:284
 msgid "这条笔记还没有正文摘要。"
 msgstr "이 노트에는 아직 본문 요약이 없습니다."
 
@@ -9928,218 +9934,223 @@ msgstr "파일 {fileCount}개"
 msgid "纯文本笔记"
 msgstr "텍스트 전용 노트"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:179
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:181
 #: apps/app/src/i18n/static-dom-seed.ts:1067
-#: apps/app/src/routes/mobile-note-editor-page.tsx:237
+#: apps/app/src/routes/mobile-note-editor-page.tsx:238
 msgid "笔记已保存到收藏。"
 msgstr "노트를 즐겨찾기에 저장했습니다."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:220
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:222
 #: apps/app/src/i18n/static-dom-seed.ts:1068
-#: apps/app/src/routes/mobile-note-editor-page.tsx:294
+#: apps/app/src/routes/mobile-note-editor-page.tsx:295
 msgid "保存失败，请稍后再试。"
 msgstr "저장에 실패했습니다. 잠시 후 다시 시도하세요."
 
 #. placeholder {0}: attachment.title
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:285
-#: apps/app/src/routes/mobile-note-editor-page.tsx:360
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:287
+#: apps/app/src/routes/mobile-note-editor-page.tsx:361
 msgid "[笔记] {0}"
 msgstr "[노트] {0}"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:319
-#: apps/app/src/routes/mobile-note-editor-page.tsx:393
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:321
+#: apps/app/src/routes/mobile-note-editor-page.tsx:394
 msgid "笔记已发送到 {conversationTitle}。"
 msgstr "노트를 {conversationTitle}에 보냈습니다."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:331
-#: apps/app/src/routes/mobile-note-editor-page.tsx:405
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:333
+#: apps/app/src/routes/mobile-note-editor-page.tsx:406
 msgid "当前没有可发送的笔记。"
 msgstr "지금 보낼 수 있는 노트가 없습니다."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:333
-#: apps/app/src/routes/mobile-note-editor-page.tsx:407
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:335
+#: apps/app/src/routes/mobile-note-editor-page.tsx:408
 msgid "当前会话没有可用的接收目标。"
 msgstr "현재 대화에서 보낼 대상이 없습니다."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:382
-#: apps/app/src/routes/mobile-note-editor-page.tsx:457
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:390
+#: apps/app/src/routes/mobile-note-editor-page.tsx:479
 msgid "原笔记已不存在，当前草稿会按新笔记保存。"
 msgstr "원본 노트가 더 이상 존재하지 않습니다. 현재 작성 중인 내용은 새 노트로 저장됩니다."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:472
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:484
 msgid "{noteTitle} · 未保存"
 msgstr "{noteTitle} · 저장되지 않음"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:645
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:657
 #: apps/app/src/i18n/static-dom-seed.ts:1071
-#: apps/app/src/routes/mobile-note-editor-page.tsx:689
+#: apps/app/src/routes/mobile-note-editor-page.tsx:715
 msgid "附件已插入到笔记。"
 msgstr "첨부파일을 노트에 삽입했습니다."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:653
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:665
 #: apps/app/src/i18n/static-dom-seed.ts:1070
-#: apps/app/src/routes/mobile-note-editor-page.tsx:697
+#: apps/app/src/routes/mobile-note-editor-page.tsx:723
 msgid "附件上传失败，请稍后再试。"
 msgstr "첨부파일 업로드에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:803
-#: apps/app/src/routes/mobile-note-editor-page.tsx:799
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:820
+#: apps/app/src/routes/mobile-note-editor-page.tsx:829
 msgid "先写一点内容，再把这条笔记发送出去。"
 msgstr "내용을 먼저 작성한 후 이 노트를 보내세요."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:828
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:845
 #: apps/app/src/i18n/static-dom-seed.ts:1069
-#: apps/app/src/routes/mobile-note-editor-page.tsx:824
+#: apps/app/src/routes/mobile-note-editor-page.tsx:854
 msgid "笔记还没有保存成功，请稍后再试。"
 msgstr "노트가 아직 저장되지 않았습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:843
-#: apps/app/src/routes/mobile-note-editor-page.tsx:839
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:860
+#: apps/app/src/routes/mobile-note-editor-page.tsx:869
 msgid "正在读取笔记..."
 msgstr "노트 불러오는 중..."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:860
-#: apps/app/src/routes/mobile-note-editor-page.tsx:856
-#: apps/app/src/routes/mobile-notes-page.tsx:172
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:877
+#: apps/app/src/routes/mobile-note-editor-page.tsx:886
+#: apps/app/src/routes/mobile-notes-page.tsx:187
 msgid "读取笔记失败，请稍后再试。"
 msgstr "노트 불러오기에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:869
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:886
 #: apps/app/src/i18n/static-dom-seed.ts:1101
 #: apps/app/src/routes/desktop-official-article-window-page.tsx:330
-#: apps/app/src/routes/mobile-note-editor-page.tsx:865
+#: apps/app/src/routes/mobile-note-editor-page.tsx:895
 msgid "回到来源"
 msgstr "출처로 돌아가기"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:895
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:912
 #: apps/app/src/i18n/static-dom-seed.ts:1073
 msgid "返回收藏"
 msgstr "즐겨찾기로 돌아가기"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:906
-#: apps/app/src/routes/mobile-note-editor-page.tsx:946
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:923
+#: apps/app/src/routes/mobile-note-editor-page.tsx:976
 msgid "正在保存到收藏..."
 msgstr "즐겨찾기에 저장 중..."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:908
-#: apps/app/src/routes/mobile-note-editor-page.tsx:948
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:925
+#: apps/app/src/routes/mobile-note-editor-page.tsx:978
 msgid "存在未保存修改"
 msgstr "저장되지 않은 변경 사항"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:910
-#: apps/app/src/routes/mobile-note-editor-page.tsx:950
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:927
+#: apps/app/src/routes/mobile-note-editor-page.tsx:980
 msgid "已保存到收藏"
 msgstr "즐겨찾기에 저장됨"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:943
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1224
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:960
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1243
 #: apps/app/src/routes/character-detail-page.tsx:308
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1266
-#: apps/app/src/routes/profile-settings-page.tsx:324
-#: apps/app/src/routes/profile-settings-page.tsx:450
-#: apps/app/src/routes/welcome-page.tsx:1306
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1298
+#: apps/app/src/routes/profile-settings-page.tsx:347
+#: apps/app/src/routes/profile-settings-page.tsx:473
+#: apps/app/src/routes/welcome-page.tsx:1322
 msgid "保存中..."
 msgstr "저장 중..."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:950
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:967
 #: apps/app/src/i18n/static-dom-seed.ts:1074
 msgid "关闭笔记窗口"
 msgstr "노트 창 닫기"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:960
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:977
 #: apps/app/src/i18n/static-dom-seed.ts:1077
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1037
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1069
 msgid "附件"
 msgstr "첨부파일"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:966
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:983
 #: apps/app/src/i18n/static-dom-seed.ts:1076
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1043
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1075
 msgid "粗体"
 msgstr "굵게"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:972
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1049
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:989
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1081
 msgid "斜体"
 msgstr "기울임꼴"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:978
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1055
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:995
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1087
 msgid "下划线"
 msgstr "밑줄"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:984
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1061
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1001
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1093
 msgid "列表"
 msgstr "목록"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:989
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1006
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:122
 #: apps/app/src/i18n/static-dom-seed.ts:156
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1066
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1098
 msgid "待办"
 msgstr "할 일"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1001
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1018
 msgid "正在上传附件..."
 msgstr "첨부 파일 업로드 중..."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1018
-#: apps/app/src/routes/mobile-note-editor-page.tsx:973
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1035
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1003
 msgid "移除标签 {tag}"
 msgstr "태그 {tag} 제거"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1037
-#: apps/app/src/routes/mobile-note-editor-page.tsx:991
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1054
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1021
 msgid "输入标签后回车"
 msgstr "태그를 입력하고 Enter 키를 누르세요"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1064
-#: apps/app/src/routes/mobile-notes-page.tsx:180
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1081
+#: apps/app/src/routes/mobile-notes-page.tsx:195
 msgid "未保存草稿"
 msgstr "저장되지 않은 초안"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1064
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1081
 msgid "已保存文稿"
 msgstr "저장된 문서"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1069
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1010
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1087
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1041
+msgid "加载笔记中…"
+msgstr ""
+
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1088
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1042
 msgid "写点什么。支持富文本、待办、图片和文件。"
 msgstr "무엇이든 작성하세요. 서식 텍스트, 할 일, 이미지, 파일을 지원합니다."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1092
-#: apps/app/src/routes/mobile-note-editor-page.tsx:912
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1111
+#: apps/app/src/routes/mobile-note-editor-page.tsx:942
 msgid "删除笔记"
 msgstr "노트 삭제"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1093
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1112
 msgid "删除后，这条收藏笔记会从收藏列表中移除。"
 msgstr "삭제하면 이 즐겨찾기 노트가 즐겨찾기 목록에서 제거됩니다."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1187
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1206
 #: apps/app/src/i18n/static-dom-seed.ts:1075
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1246
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1278
 msgid "关闭未保存提示"
 msgstr "저장되지 않음 안내 닫기"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1195
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1253
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1214
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1285
 msgid "这条笔记还没有保存"
 msgstr "이 노트는 아직 저장되지 않았습니다"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1198
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1256
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1217
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1288
 msgid "保存后会进入收藏；如果直接关闭，当前草稿改动会被丢弃。"
 msgstr "저장하면 즐겨찾기로 이동합니다. 그냥 닫으면 현재 작성 중인 변경 사항이 사라집니다."
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1216
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1274
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1235
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1306
 msgid "不保存"
 msgstr "저장 안 함"
 
-#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1224
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1266
+#: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1243
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1298
 msgid "保存并关闭"
 msgstr "저장하고 닫기"
 
@@ -11009,7 +11020,7 @@ msgstr ": "
 #: apps/app/src/routes/discover-page.tsx:682
 #: apps/app/src/routes/discover-page.tsx:905
 #: apps/app/src/routes/favorites-page.tsx:72
-#: apps/app/src/routes/profile-favorites-page.tsx:49
+#: apps/app/src/routes/mobile-favorites-page.tsx:119
 msgid "广场动态"
 msgstr "광장 피드"
 
@@ -11385,18 +11396,18 @@ msgstr "열기"
 
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
-#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
-#: apps/app/src/i18n/static-dom-seed.ts:195
-msgid "移出常用"
-msgstr "자주 사용에서 제거"
-
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:278
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
 #: apps/app/src/i18n/static-dom-seed.ts:197
 msgid "加入常用"
 msgstr "자주 사용에 추가"
+
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
+#: apps/app/src/i18n/static-dom-seed.ts:195
+msgid "移出常用"
+msgstr "자주 사용에서 제거"
 
 #. placeholder {0}: formatConversationTimestamp(lastOpenedAt)
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:802
@@ -11998,12 +12009,12 @@ msgstr "[즐겨찾기] {0}"
 msgid "来自 {0}"
 msgstr "{0}에서"
 
-#: apps/app/src/features/favorites/note-editor-helpers.ts:135
-#: apps/app/src/routes/mobile-notes-page.tsx:266
+#: apps/app/src/features/favorites/note-editor-helpers.ts:163
+#: apps/app/src/routes/mobile-notes-page.tsx:281
 msgid "无标题笔记"
 msgstr "제목 없는 노트"
 
-#: apps/app/src/features/favorites/note-editor-helpers.ts:285
+#: apps/app/src/features/favorites/note-editor-helpers.ts:313
 msgid "{month}月{day}日 {hours}:{minutes}"
 msgstr "{month}월 {day}일 {hours}:{minutes}"
 
@@ -12529,16 +12540,16 @@ msgid "买了种子"
 msgstr "씨앗 구매 완료"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
-msgid "卖了"
-msgstr "판매 완료"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:240
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:242
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
 msgid "作物"
 msgstr "작물"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
+msgid "卖了"
+msgstr "판매 완료"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -12767,13 +12778,13 @@ msgid "h 成熟"
 msgstr "h 성숙"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
+msgid "/ 包，售价"
+msgstr "/ 봉지, 판매가"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:81
 msgid "/ 个"
 msgstr "/ 개"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
-msgid "/ 包，售价"
-msgstr "/ 봉지, 판매가"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:77
 msgid "已存"
@@ -16196,14 +16207,14 @@ msgid "地点"
 msgstr "장소"
 
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:173
+msgid "地图"
+msgstr "지도"
+
+#: apps/app/src/features/mini-programs/mini-programs-data.ts:173
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:241
 #: apps/app/src/i18n/static-dom-seed.ts:202
 msgid "活动"
 msgstr "이벤트"
-
-#: apps/app/src/features/mini-programs/mini-programs-data.ts:173
-msgid "地图"
-msgstr "지도"
 
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:177
 #: apps/app/src/i18n/static-dom-seed.ts:207
@@ -16969,7 +16980,7 @@ msgid "请选择视频文件。"
 msgstr "동영상 파일을 선택하세요."
 
 #: apps/app/src/features/moments/moment-compose-media.ts:414
-#: apps/app/src/lib/error-translate.ts:520
+#: apps/app/src/lib/error-translate.ts:527
 msgid "视频时长不能超过 5 分钟。"
 msgstr "동영상 길이는 5분을 초과할 수 없습니다."
 
@@ -17046,8 +17057,7 @@ msgstr "서비스 계정 메뉴 닫기"
 #: apps/app/src/routes/desktop-chat-files-page.tsx:447
 #: apps/app/src/routes/desktop-chat-history-page.tsx:260
 #: apps/app/src/routes/desktop-mobile-page.tsx:876
-#: apps/app/src/routes/favorites-page.tsx:378
-#: apps/app/src/routes/profile-settings-page.tsx:222
+#: apps/app/src/routes/profile-settings-page.tsx:245
 msgid "返回消息"
 msgstr "메시지로 돌아가기"
 
@@ -17276,7 +17286,7 @@ msgstr "친구 업데이트와 댓글 일치를 지원합니다."
 #: apps/app/src/features/search/desktop-search-workspace.tsx:149
 #: apps/app/src/features/search/mobile-search-workspace.tsx:84
 #: apps/app/src/i18n/static-dom-seed.ts:335
-#: apps/app/src/routes/favorites-page.tsx:476
+#: apps/app/src/routes/favorites-page.tsx:474
 msgid "内容流"
 msgstr "콘텐츠 피드"
 
@@ -17754,8 +17764,8 @@ msgstr "피드백"
 #: apps/app/src/features/shell/desktop-shell.tsx:646
 #: apps/app/src/routes/desktop-mobile-page.tsx:186
 #: apps/app/src/routes/profile-page.tsx:150
-#: apps/app/src/routes/profile-settings-page.tsx:246
-#: apps/app/src/routes/profile-settings-page.tsx:570
+#: apps/app/src/routes/profile-settings-page.tsx:269
+#: apps/app/src/routes/profile-settings-page.tsx:593
 msgid "设置"
 msgstr "설정"
 
@@ -17782,92 +17792,92 @@ msgstr "게임 센터"
 msgid "手机"
 msgstr "휴대폰"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:195
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:183
 msgid "隐界正在醒来"
 msgstr "Yinjie가 깨어나는 중입니다"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:196
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:184
 #: apps/app/src/i18n/static-dom-seed.ts:8
 msgid "暂时无法进入隐界"
 msgstr "현재 Yinjie에 들어갈 수 없습니다"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:200
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:188
 msgid "当前桌面包里没有找到内置 Core API，宿主端还没法完整启动。"
 msgstr "데스크톱 패키지에서 내장 Core API를 찾지 못해 호스트가 아직 완전히 시작할 수 없습니다."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:202
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:190
 msgid "本地端口似乎已经被占用，桌面壳正在尝试重新接管入口。"
 msgstr "로컬 포트가 이미 사용 중인 것 같습니다. 데스크톱 셸이 진입점을 다시 확보하고 있습니다."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:205
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:193
 msgid "我们正在为你整理入口，稍等片刻后再试一次就好。"
 msgstr "진입점을 준비하고 있습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:209
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:197
 msgid "当前设备还没有配置远程世界地址，请先回到 setup 连接你的实例。"
 msgstr "현재 기기에 원격 세계 주소가 설정되어 있지 않습니다. 먼저 setup으로 돌아가 인스턴스를 연결하세요."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:210
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:198
 #: apps/app/src/i18n/static-dom-seed.ts:9
 msgid "服务器暂时不可用，请稍后再试。"
 msgstr "서버를 일시적으로 사용할 수 없습니다. 나중에 다시 시도하세요."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:212
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:200
 msgid "隐界会继续在后台恢复，你只需要稍候片刻。"
 msgstr "Yinjie가 백그라운드에서 계속 복구됩니다. 잠시만 기다려 주세요."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:213
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:201
 #: apps/app/src/i18n/static-dom-seed.ts:10
 msgid "如果长时间没有恢复，稍后重新打开应用即可。"
 msgstr "오랫동안 복구되지 않으면 나중에 앱을 다시 여세요."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:215
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:203
 msgid "正在唤醒隐界..."
 msgstr "Yinjie를 깨우는 중..."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:216
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:204
 msgid "正在重新检查入口..."
 msgstr "진입점을 다시 확인 중..."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:218
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:206
 msgid "已找到"
 msgstr "찾음"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:219
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:207
 msgid "未找到"
 msgstr "찾을 수 없음"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:221
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:209
 msgid "是"
 msgstr "예"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:222
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:210
 msgid "否"
 msgstr "아니요"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:243
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:231
 #: apps/app/src/i18n/static-dom-seed.ts:7
 msgid "请稍候"
 msgstr "잠시만 기다려 주세요"
 
 #. placeholder {0}: diagnostics.coreApiCommandSource
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:256
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:244
 msgid "命令来源：{0}"
 msgstr "명령 출처: {0}"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:257
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:245
 msgid "内置 Core API：{bundledCoreApiStatusLabel}"
 msgstr "내장 Core API: {bundledCoreApiStatusLabel}"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:258
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:246
 msgid "端口占用：{portOccupiedLabel}"
 msgstr "포트 사용 중: {portOccupiedLabel}"
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:270
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:258
 msgid "请稍候..."
 msgstr "잠시만 기다려 주세요..."
 
-#: apps/app/src/features/shell/desktop-runtime-guard.tsx:270
+#: apps/app/src/features/shell/desktop-runtime-guard.tsx:258
 #: apps/app/src/i18n/static-dom-seed.ts:11
 msgid "再试一次"
 msgstr "다시 시도"
@@ -17984,7 +17994,7 @@ msgid "已复制微信号"
 msgstr "WeChat ID를 복사했습니다"
 
 #: apps/app/src/features/subscription/checkout-contact-dialog.tsx:65
-#: apps/app/src/routes/welcome-page.tsx:999
+#: apps/app/src/routes/welcome-page.tsx:1008
 msgid "邮箱"
 msgstr "이메일"
 
@@ -18147,7 +18157,7 @@ msgstr "구독"
 #: apps/app/src/features/subscription/subscription-panel.tsx:485
 #: apps/app/src/routes/profile-page.tsx:180
 #: apps/app/src/routes/profile-settings-page.tsx:62
-#: apps/app/src/routes/profile-settings-page.tsx:548
+#: apps/app/src/routes/profile-settings-page.tsx:571
 #: apps/app/src/routes/profile-subscription-page.tsx:485
 #: apps/app/src/routes/profile-subscription-page.tsx:508
 msgid "会员中心"
@@ -18155,7 +18165,7 @@ msgstr "멤버십 센터"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:488
 #: apps/app/src/routes/profile-subscription-page.tsx:511
-#: apps/app/src/routes/welcome-page.tsx:981
+#: apps/app/src/routes/welcome-page.tsx:990
 msgid "手机号"
 msgstr "전화번호"
 
@@ -18227,7 +18237,7 @@ msgid "暂无邀请记录。"
 msgstr "아직 초대 기록이 없습니다."
 
 #: apps/app/src/i18n/static-dom-seed.ts:12
-#: apps/app/src/routes/profile-settings-page.tsx:306
+#: apps/app/src/routes/profile-settings-page.tsx:329
 msgid "签名"
 msgstr "서명"
 
@@ -18458,7 +18468,7 @@ msgid "群接"
 msgstr "그룹 릴레이"
 
 #: apps/app/src/i18n/static-dom-seed.ts:178
-#: apps/app/src/routes/welcome-page.tsx:1371
+#: apps/app/src/routes/welcome-page.tsx:1387
 msgid "世界"
 msgstr "세계"
 
@@ -18658,12 +18668,12 @@ msgid "全部收藏"
 msgstr "전체 즐겨찾기"
 
 #: apps/app/src/i18n/static-dom-seed.ts:386
-#: apps/app/src/routes/favorites-page.tsx:472
+#: apps/app/src/routes/favorites-page.tsx:470
 msgid "收藏概览"
 msgstr "즐겨찾기 개요"
 
 #: apps/app/src/i18n/static-dom-seed.ts:387
-#: apps/app/src/routes/favorites-page.tsx:480
+#: apps/app/src/routes/favorites-page.tsx:478
 msgid "消息、笔记与联系人"
 msgstr "메시지, 노트, 연락처"
 
@@ -18672,42 +18682,45 @@ msgid "0 项内容已收进桌面收藏"
 msgstr "데스크톱 즐겨찾기에 저장된 항목 0개"
 
 #: apps/app/src/i18n/static-dom-seed.ts:390
-#: apps/app/src/routes/favorites-page.tsx:684
+#: apps/app/src/routes/favorites-page.tsx:682
+#: apps/app/src/routes/mobile-favorites-page.tsx:388
 msgid "还没有收藏内容"
 msgstr "아직 즐겨찾기 없음"
 
 #: apps/app/src/i18n/static-dom-seed.ts:391
-#: apps/app/src/routes/favorites-page.tsx:691
+#: apps/app/src/routes/favorites-page.tsx:689
+#: apps/app/src/routes/mobile-favorites-page.tsx:395
 msgid "先到聊天、内容流或公众号里把重要内容加入收藏。"
 msgstr "채팅, 콘텐츠 피드, 공식 계정에서 중요한 내용을 먼저 즐겨찾기에 추가하세요."
 
 #: apps/app/src/i18n/static-dom-seed.ts:392
-#: apps/app/src/routes/favorites-page.tsx:690
+#: apps/app/src/routes/favorites-page.tsx:688
 msgid "点击右上角“新建笔记”，把第一条收藏笔记写下来。"
 msgstr "오른쪽 위의 새 노트를 눌러 첫 즐겨찾기 노트를 작성하세요."
 
 #: apps/app/src/i18n/static-dom-seed.ts:393
-#: apps/app/src/routes/favorites-page.tsx:497
+#: apps/app/src/routes/favorites-page.tsx:495
 msgid "收藏详情"
 msgstr "즐겨찾기 상세"
 
 #: apps/app/src/i18n/static-dom-seed.ts:394
-#: apps/app/src/routes/favorites-page.tsx:500
+#: apps/app/src/routes/favorites-page.tsx:498
 msgid "右侧预览当前选中的收藏条目。"
 msgstr "오른쪽에서 선택한 즐겨찾기를 미리 봅니다."
 
 #: apps/app/src/i18n/static-dom-seed.ts:395
-#: apps/app/src/routes/favorites-page.tsx:622
+#: apps/app/src/routes/favorites-page.tsx:620
 msgid "先从中间选择一条收藏"
 msgstr "가운데에서 즐겨찾기 항목을 먼저 선택하세요"
 
 #: apps/app/src/i18n/static-dom-seed.ts:396
-#: apps/app/src/routes/favorites-page.tsx:623
+#: apps/app/src/routes/favorites-page.tsx:621
 msgid "这里会显示摘要、来源和操作入口。"
 msgstr "여기에 요약, 출처, 작업 입구가 표시됩니다."
 
 #: apps/app/src/i18n/static-dom-seed.ts:397
-#: apps/app/src/routes/favorites-page.tsx:443
+#: apps/app/src/routes/favorites-page.tsx:441
+#: apps/app/src/routes/mobile-favorites-page.tsx:344
 msgid "搜索已收藏内容"
 msgstr "저장한 항목 검색"
 
@@ -20122,7 +20135,7 @@ msgid "直接在右栏继续回应当前朋友圈。"
 msgstr "오른쪽 패널에서 이 모멘트에 계속 답글을 남깁니다."
 
 #: apps/app/src/i18n/static-dom-seed.ts:825
-#: apps/app/src/routes/favorites-page.tsx:768
+#: apps/app/src/routes/favorites-page.tsx:766
 msgid "笔记预览"
 msgstr "노트 미리보기"
 
@@ -20700,7 +20713,7 @@ msgid "朋友圈不存在。"
 msgstr "朋友圈不存在。"
 
 #: apps/app/src/lib/error-translate.ts:110
-#: apps/app/src/lib/error-translate.ts:530
+#: apps/app/src/lib/error-translate.ts:537
 msgid "需先加为好友才能互动。"
 msgstr "需先加为好友才能互动。"
 
@@ -21324,223 +21337,227 @@ msgstr "기본 self 캐릭터가 아직 DB에 초기화되지 않았습니다."
 msgid "世界主人不存在。"
 msgstr "World owner를 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:488
+#: apps/app/src/lib/error-translate.ts:491
+msgid "世界主人昵称至少 {minLength} 个字。"
+msgstr ""
+
+#: apps/app/src/lib/error-translate.ts:495
 msgid "公众号关注关系不存在。"
 msgstr "공식 계정 팔로우 관계가 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:490
+#: apps/app/src/lib/error-translate.ts:497
 msgid "推送记录不存在。"
 msgstr "푸시 기록을 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:492
+#: apps/app/src/lib/error-translate.ts:499
 msgid "公众号不存在。"
 msgstr "공식 계정을 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:494
+#: apps/app/src/lib/error-translate.ts:501
 msgid "服务号不存在。"
 msgstr "서비스 계정을 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:496
+#: apps/app/src/lib/error-translate.ts:503
 msgid "文章不存在。"
 msgstr "게시물을 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:498
+#: apps/app/src/lib/error-translate.ts:505
 msgid "不支持的举报对象类型。"
 msgstr "지원되지 않는 신고 대상 유형입니다."
 
-#: apps/app/src/lib/error-translate.ts:500
+#: apps/app/src/lib/error-translate.ts:507
 msgid "请提供举报对象的 ID。"
 msgstr "신고 대상의 ID를 입력하세요."
 
-#: apps/app/src/lib/error-translate.ts:502
+#: apps/app/src/lib/error-translate.ts:509
 msgid "请提供举报理由。"
 msgstr "신고 사유를 입력하세요."
 
-#: apps/app/src/lib/error-translate.ts:504
+#: apps/app/src/lib/error-translate.ts:511
 msgid "不支持的处理状态。"
 msgstr "지원되지 않는 처리 상태입니다."
 
-#: apps/app/src/lib/error-translate.ts:506
+#: apps/app/src/lib/error-translate.ts:513
 msgid "举报记录不存在。"
 msgstr "신고 기록을 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:508
+#: apps/app/src/lib/error-translate.ts:515
 msgid "邮件验证码发送失败，请稍后重试。"
 msgstr "이메일 인증코드 전송에 실패했습니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/lib/error-translate.ts:510
+#: apps/app/src/lib/error-translate.ts:517
 msgid "视频号作者不存在。"
 msgstr "채널 작성자를 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:512
+#: apps/app/src/lib/error-translate.ts:519
 msgid "评论不存在。"
 msgstr "댓글을 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:514
+#: apps/app/src/lib/error-translate.ts:521
 msgid "动态内容和媒体不能同时为空。"
 msgstr "피드 콘텐츠와 미디어는 동시에 비울 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:516
+#: apps/app/src/lib/error-translate.ts:523
 msgid "纯文本动态不能附带图片或视频。"
 msgstr "텍스트 전용 피드는 이미지나 동영상을 첨부할 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:518
+#: apps/app/src/lib/error-translate.ts:525
 msgid "视频动态必须且只能包含 1 条视频。"
 msgstr "동영상 피드는 정확히 1개의 동영상만 포함해야 합니다."
 
 #. placeholder {0}: String(params.max ?? 9)
-#: apps/app/src/lib/error-translate.ts:523
+#: apps/app/src/lib/error-translate.ts:530
 msgid "图片动态最多支持 {0} 张图片。"
 msgstr "이미지 피드는 최대 {0}장입니다."
 
-#: apps/app/src/lib/error-translate.ts:526
+#: apps/app/src/lib/error-translate.ts:533
 msgid "图片动态当前只支持图片资源。"
 msgstr "이미지 피드는 현재 이미지 리소스만 지원합니다."
 
-#: apps/app/src/lib/error-translate.ts:528
+#: apps/app/src/lib/error-translate.ts:535
 msgid "动态不存在。"
 msgstr "게시물을 찾을 수 없습니다."
 
 #. placeholder {0}: String(params.runId ?? "")
-#: apps/app/src/lib/error-translate.ts:533
+#: apps/app/src/lib/error-translate.ts:540
 msgid "赛博分身运行记录不存在：{0}"
 msgstr "사이버 아바타 실행 기록이 없습니다：{0}"
 
-#: apps/app/src/lib/error-translate.ts:536
+#: apps/app/src/lib/error-translate.ts:543
 msgid "不支持的世界语言。"
 msgstr "지원되지 않는 세계 언어입니다."
 
 #. placeholder {0}: String(params.id ?? "")
-#: apps/app/src/lib/error-translate.ts:539
+#: apps/app/src/lib/error-translate.ts:546
 msgid "Connector 不存在：{0}"
 msgstr "Connector를 찾을 수 없습니다：{0}"
 
-#: apps/app/src/lib/error-translate.ts:542
+#: apps/app/src/lib/error-translate.ts:549
 msgid "Action 操作不合法。"
 msgstr "Action 작업이 유효하지 않습니다."
 
 #. placeholder {0}: String(params.id ?? "")
-#: apps/app/src/lib/error-translate.ts:545
+#: apps/app/src/lib/error-translate.ts:552
 msgid "Action 运行记录不存在：{0}"
 msgstr "Action 실행 기록이 없습니다：{0}"
 
-#: apps/app/src/lib/error-translate.ts:548
+#: apps/app/src/lib/error-translate.ts:555
 msgid "该动作缺少 plan 快照，当前无法重试。"
 msgstr "이 액션에는 plan 스냅샷이 없어 재시도할 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:550
+#: apps/app/src/lib/error-translate.ts:557
 msgid "friendRequestId 必填。"
 msgstr "friendRequestId는 필수입니다."
 
-#: apps/app/src/lib/error-translate.ts:552
+#: apps/app/src/lib/error-translate.ts:559
 msgid "Follow-up 不存在。"
 msgstr "Follow-up를 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:554
+#: apps/app/src/lib/error-translate.ts:561
 msgid "词条不存在。"
 msgstr "페이지를 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:556
+#: apps/app/src/lib/error-translate.ts:563
 msgid "该词条已被删除，无法编辑。"
 msgstr "이 페이지는 삭제되어 편집할 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:558
+#: apps/app/src/lib/error-translate.ts:565
 msgid "存在编辑冲突，请基于最新版本重新提交。"
 msgstr "편집 충돌이 발생했습니다. 최신 버전을 기반으로 다시 제출하세요."
 
 #. placeholder {0}: String(params.detail)
-#: apps/app/src/lib/error-translate.ts:562
+#: apps/app/src/lib/error-translate.ts:569
 msgid "Wiki 校验失败：{0}"
 msgstr "Wiki 검증에 실패했습니다：{0}"
 
-#: apps/app/src/lib/error-translate.ts:563
+#: apps/app/src/lib/error-translate.ts:570
 msgid "Wiki 校验失败。"
 msgstr "Wiki 검증에 실패했습니다."
 
 #. placeholder {0}: String(params.reason)
-#: apps/app/src/lib/error-translate.ts:568
+#: apps/app/src/lib/error-translate.ts:575
 msgid "Wiki 操作被拒绝：{0}"
 msgstr "Wiki 작업이 거부되었습니다：{0}"
 
-#: apps/app/src/lib/error-translate.ts:569
+#: apps/app/src/lib/error-translate.ts:576
 msgid "Wiki 操作被拒绝。"
 msgstr "Wiki 작업이 거부되었습니다."
 
 #. placeholder {0}: String(params.detail)
-#: apps/app/src/lib/error-translate.ts:574
+#: apps/app/src/lib/error-translate.ts:581
 msgid "Wiki 冲突：{0}"
 msgstr "Wiki 충돌：{0}"
 
-#: apps/app/src/lib/error-translate.ts:575
+#: apps/app/src/lib/error-translate.ts:582
 msgid "Wiki 冲突。"
 msgstr "Wiki 충돌."
 
-#: apps/app/src/lib/error-translate.ts:578
+#: apps/app/src/lib/error-translate.ts:585
 msgid "Wiki 操作过于频繁，请稍后再试。"
 msgstr "Wiki 작업이 너무 빈번합니다. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/lib/error-translate.ts:580
+#: apps/app/src/lib/error-translate.ts:587
 msgid "Wiki 内容触发过滤规则。"
 msgstr "Wiki 콘텐츠가 필터 규칙에 걸렸습니다."
 
-#: apps/app/src/lib/error-translate.ts:582
+#: apps/app/src/lib/error-translate.ts:589
 msgid "Wiki 审核记录不存在。"
 msgstr "Wiki 검토를 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:584
+#: apps/app/src/lib/error-translate.ts:591
 msgid "Wiki 审核当前状态不允许此操作。"
 msgstr "Wiki 검토의 현재 상태에서는 이 작업이 허용되지 않습니다."
 
-#: apps/app/src/lib/error-translate.ts:586
+#: apps/app/src/lib/error-translate.ts:593
 msgid "Wiki 讨论不存在。"
 msgstr "Wiki 토론을 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:588
+#: apps/app/src/lib/error-translate.ts:595
 msgid "Wiki 讨论当前状态不允许此操作。"
 msgstr "Wiki 토론의 현재 상태에서는 이 작업이 허용되지 않습니다."
 
-#: apps/app/src/lib/error-translate.ts:590
+#: apps/app/src/lib/error-translate.ts:597
 msgid "Wiki 封禁记录不存在。"
 msgstr "Wiki 차단을 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:592
+#: apps/app/src/lib/error-translate.ts:599
 msgid "Wiki 封禁当前状态不允许此操作。"
 msgstr "Wiki 차단의 현재 상태에서는 이 작업이 허용되지 않습니다."
 
-#: apps/app/src/lib/error-translate.ts:594
+#: apps/app/src/lib/error-translate.ts:601
 msgid "Wiki 举报不存在。"
 msgstr "Wiki 신고를 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:596
+#: apps/app/src/lib/error-translate.ts:603
 msgid "Wiki 举报当前状态不允许此操作。"
 msgstr "Wiki 신고의 현재 상태에서는 이 작업이 허용되지 않습니다."
 
-#: apps/app/src/lib/error-translate.ts:598
+#: apps/app/src/lib/error-translate.ts:605
 msgid "游戏不存在。"
 msgstr "게임을 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:600
+#: apps/app/src/lib/error-translate.ts:607
 msgid "游戏修订不存在。"
 msgstr "게임 리비전을 찾을 수 없습니다."
 
-#: apps/app/src/lib/error-translate.ts:602
+#: apps/app/src/lib/error-translate.ts:609
 msgid "游戏投稿不存在。"
 msgstr "게임 제출을 찾을 수 없습니다."
 
 #. placeholder {0}: String(params.detail)
-#: apps/app/src/lib/error-translate.ts:606
+#: apps/app/src/lib/error-translate.ts:613
 msgid "游戏校验失败：{0}"
 msgstr "게임 검증에 실패했습니다：{0}"
 
-#: apps/app/src/lib/error-translate.ts:607
+#: apps/app/src/lib/error-translate.ts:614
 msgid "游戏校验失败。"
 msgstr "게임 검증에 실패했습니다."
 
-#: apps/app/src/lib/error-translate.ts:610
+#: apps/app/src/lib/error-translate.ts:617
 msgid "提交的数据无效，请检查后重试。"
 msgstr "제출된 데이터가 유효하지 않습니다. 확인 후 다시 시도해 주세요."
 
-#: apps/app/src/lib/error-translate.ts:612
+#: apps/app/src/lib/error-translate.ts:619
 msgid "服务暂时不可用，请稍后再试。"
 msgstr "서비스를 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해 주세요."
 
@@ -22740,6 +22757,7 @@ msgid "先处理新的朋友，或者去浏览世界角色。"
 msgstr "먼저 새 친구를 처리하거나 세계 캐릭터를 둘러보세요."
 
 #: apps/app/src/routes/contacts-page.tsx:2221
+#: apps/app/src/routes/profile-character-import-page.tsx:431
 msgid "查看世界角色"
 msgstr "세계 캐릭터 보기"
 
@@ -23198,7 +23216,7 @@ msgid "已打开反馈包所在位置。"
 msgstr "피드백 번들 위치를 열었습니다."
 
 #: apps/app/src/routes/desktop-feedback-page.tsx:835
-#: apps/app/src/routes/favorites-page.tsx:809
+#: apps/app/src/routes/favorites-page.tsx:807
 msgid "未分类"
 msgstr "미분류"
 
@@ -24342,95 +24360,92 @@ msgstr "장면 만남 재시도"
 
 #. placeholder {0}: item.title
 #: apps/app/src/routes/favorites-page.tsx:271
+#: apps/app/src/routes/mobile-favorites-page.tsx:242
 msgid "{0} 已从收藏中移除。"
 msgstr "{0}이(가) 즐겨찾기에서 제거되었습니다."
 
-#: apps/app/src/routes/favorites-page.tsx:376
-msgid "收藏当前仅提供桌面布局"
-msgstr "즐겨찾기는 현재 데스크톱 레이아웃만 제공합니다"
-
-#: apps/app/src/routes/favorites-page.tsx:377
-msgid "收藏工作区目前只在 Web 桌面布局和桌面壳内启用，移动布局先回到消息页继续浏览和发送收藏内容。"
-msgstr "즐겨찾기 워크스페이스는 현재 Web 데스크톱 레이아웃과 데스크톱 쉘 내에서만 활성화됩니다. 모바일 레이아웃에서는 먼저 메시지 페이지로 돌아가 즐겨찾기 콘텐츠를 계속 탐색하고 보내세요."
-
-#: apps/app/src/routes/favorites-page.tsx:420
+#: apps/app/src/routes/favorites-page.tsx:418
 msgid "这条笔记默认属于收藏，保存后会继续留在收藏列表里。"
 msgstr "이 노트는 기본적으로 즐겨찾기에 속하며 저장 후 즐겨찾기 목록에 계속 남아 있습니다."
 
-#: apps/app/src/routes/favorites-page.tsx:421
+#: apps/app/src/routes/favorites-page.tsx:419
 msgid "新建笔记会直接作为收藏内容保存。"
 msgstr "새 노트는 즐겨찾기 콘텐츠로 바로 저장됩니다."
 
 #. placeholder {0}: searchText.trim()
 #. placeholder {1}: filteredFavorites.length
-#: apps/app/src/routes/favorites-page.tsx:423
+#: apps/app/src/routes/favorites-page.tsx:421
 msgid "搜索“{0}”命中 {1} 项"
 msgstr "\"{0}\" 검색에서 {1}건 일치"
 
 #. placeholder {0}: counts.all
-#: apps/app/src/routes/favorites-page.tsx:424
+#: apps/app/src/routes/favorites-page.tsx:422
 msgid "{0} 项内容已收进桌面收藏"
 msgstr "{0}건의 콘텐츠가 데스크톱 즐겨찾기에 저장되었습니다"
 
-#: apps/app/src/routes/favorites-page.tsx:537
+#: apps/app/src/routes/favorites-page.tsx:535
 msgid "内容摘要"
 msgstr "콘텐츠 요약"
 
-#: apps/app/src/routes/favorites-page.tsx:547
+#: apps/app/src/routes/favorites-page.tsx:545
 msgid "收藏信息"
 msgstr "즐겨찾기 정보"
 
-#: apps/app/src/routes/favorites-page.tsx:551
+#: apps/app/src/routes/favorites-page.tsx:549
 msgid "分类"
 msgstr "분류"
 
-#: apps/app/src/routes/favorites-page.tsx:557
+#: apps/app/src/routes/favorites-page.tsx:555
 msgid "收藏时间"
 msgstr "즐겨찾기 시간"
 
-#: apps/app/src/routes/favorites-page.tsx:562
+#: apps/app/src/routes/favorites-page.tsx:560
 msgid "最近修改"
 msgstr "최근 수정"
 
-#: apps/app/src/routes/favorites-page.tsx:598
+#: apps/app/src/routes/favorites-page.tsx:596
 msgid "打开内容"
 msgstr "콘텐츠 열기"
 
-#: apps/app/src/routes/favorites-page.tsx:614
+#: apps/app/src/routes/favorites-page.tsx:612
 msgid "移除中..."
 msgstr "제거 중..."
 
-#: apps/app/src/routes/favorites-page.tsx:639
-#: apps/app/src/routes/mobile-note-editor-page.tsx:125
+#: apps/app/src/routes/favorites-page.tsx:637
+#: apps/app/src/routes/mobile-note-editor-page.tsx:126
 msgid "正在打开桌面笔记"
 msgstr "데스크톱 노트 여는 중"
 
-#: apps/app/src/routes/favorites-page.tsx:640
+#: apps/app/src/routes/favorites-page.tsx:638
 msgid "正在载入桌面笔记工作区，马上恢复当前笔记内容。"
 msgstr "데스크톱 노트 워크스페이스를 로드 중입니다. 곧 현재 노트 콘텐츠를 복원합니다."
 
-#: apps/app/src/routes/favorites-page.tsx:641
+#: apps/app/src/routes/favorites-page.tsx:639
 msgid "载入桌面笔记工作区..."
 msgstr "데스크톱 노트 워크스페이스 로드 중..."
 
-#: apps/app/src/routes/favorites-page.tsx:684
+#: apps/app/src/routes/favorites-page.tsx:682
+#: apps/app/src/routes/mobile-favorites-page.tsx:387
 msgid "没有匹配的收藏"
 msgstr "일치하는 즐겨찾기가 없습니다"
 
-#: apps/app/src/routes/favorites-page.tsx:688
+#: apps/app/src/routes/favorites-page.tsx:686
+#: apps/app/src/routes/mobile-favorites-page.tsx:392
 msgid "换个关键词，或者切回其他分类继续查看。"
 msgstr "다른 키워드로 바꾸거나 다른 분류로 돌아가 계속 확인하세요."
 
-#: apps/app/src/routes/favorites-page.tsx:793
+#: apps/app/src/routes/favorites-page.tsx:791
 msgid "图片 {imageCount}"
 msgstr "이미지 {imageCount}"
 
-#: apps/app/src/routes/favorites-page.tsx:798
+#: apps/app/src/routes/favorites-page.tsx:796
 msgid "文件 {fileCount}"
 msgstr "파일 {fileCount}"
 
+#. placeholder {0}: noteSummary.assets.length
 #. placeholder {0}: summary.assets.length
-#: apps/app/src/routes/favorites-page.tsx:871
+#: apps/app/src/routes/favorites-page.tsx:869
+#: apps/app/src/routes/mobile-favorites-page.tsx:561
 msgid "附件 {0}"
 msgstr "첨부 파일 {0}"
 
@@ -26084,6 +26099,18 @@ msgstr "안녕하세요, {owner}입니다. 연락처에 추가하고 싶습니�
 msgid "发送验证申请，对方通过后即可成为朋友。"
 msgstr "친구 요청을 보냅니다. 상대방이 수락하면 친구가 됩니다."
 
+#: apps/app/src/routes/mobile-favorites-page.tsx:379
+msgid "正在读取收藏…"
+msgstr ""
+
+#: apps/app/src/routes/mobile-favorites-page.tsx:394
+msgid "点击右上角\"新建笔记\"，把第一条收藏笔记写下来。"
+msgstr ""
+
+#: apps/app/src/routes/mobile-favorites-page.tsx:422
+msgid "收藏操作"
+msgstr ""
+
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:47
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:193
 msgid "返回广场"
@@ -26134,7 +26161,7 @@ msgstr "돌아가면 편집한 텍스트와 미디어가 사라집니다. 정말
 
 #: apps/app/src/routes/mobile-feed-publish-page.tsx:343
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:417
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1282
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1314
 msgid "继续编辑"
 msgstr "계속 편집"
 
@@ -26225,63 +26252,63 @@ msgstr "앨범에서 선택"
 msgid "选择视频"
 msgstr "동영상 선택"
 
-#: apps/app/src/routes/mobile-note-editor-page.tsx:126
+#: apps/app/src/routes/mobile-note-editor-page.tsx:127
 msgid "正在跳转到桌面笔记编辑器。"
 msgstr "데스크톱 메모 편집기로 이동 중입니다."
 
-#: apps/app/src/routes/mobile-note-editor-page.tsx:127
+#: apps/app/src/routes/mobile-note-editor-page.tsx:128
 msgid "切换桌面笔记..."
 msgstr "데스크톱 메모로 전환 중…"
 
-#: apps/app/src/routes/mobile-note-editor-page.tsx:938
+#: apps/app/src/routes/mobile-note-editor-page.tsx:968
 #: apps/app/src/routes/profile-info-avatar-page.tsx:127
-#: apps/app/src/routes/profile-info-name-page.tsx:98
+#: apps/app/src/routes/profile-info-name-page.tsx:99
 #: apps/app/src/routes/profile-info-signature-page.tsx:97
 msgid "保存中"
 msgstr "저장 중…"
 
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1078
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1110
 msgid "附件上传中..."
 msgstr "첨부 파일 업로드 중…"
 
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1085
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1117
 msgid "删除这条笔记？"
 msgstr "이 메모를 삭제할까요?"
 
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1086
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1118
 msgid "删除后会从收藏的笔记列表中移除，无法恢复。"
 msgstr "삭제하면 저장된 메모 목록에서 제거되며 복구할 수 없습니다."
 
-#: apps/app/src/routes/mobile-note-editor-page.tsx:1188
+#: apps/app/src/routes/mobile-note-editor-page.tsx:1220
 msgid "关闭确认弹层"
 msgstr "확인 창 닫기"
 
-#: apps/app/src/routes/mobile-notes-page.tsx:133
+#: apps/app/src/routes/mobile-notes-page.tsx:148
 msgid "我的笔记"
 msgstr "내 메모"
 
-#: apps/app/src/routes/mobile-notes-page.tsx:164
+#: apps/app/src/routes/mobile-notes-page.tsx:179
 msgid "正在读取我的笔记..."
 msgstr "내 메모 불러오는 중…"
 
-#: apps/app/src/routes/mobile-notes-page.tsx:197
+#: apps/app/src/routes/mobile-notes-page.tsx:212
 msgid "已收藏笔记"
 msgstr "저장된 메모"
 
-#: apps/app/src/routes/mobile-notes-page.tsx:216
+#: apps/app/src/routes/mobile-notes-page.tsx:231
 msgid "还没有笔记"
 msgstr "메모가 없습니다"
 
-#: apps/app/src/routes/mobile-notes-page.tsx:217
+#: apps/app/src/routes/mobile-notes-page.tsx:232
 msgid "记下灵感、待办、链接和图片，发到聊天里也很方便。"
 msgstr "아이디어, 할 일, 링크, 이미지를 기록하세요. 채팅에서 공유하기도 편합니다."
 
-#: apps/app/src/routes/mobile-notes-page.tsx:303
+#: apps/app/src/routes/mobile-notes-page.tsx:318
 msgid "仅含附件的草稿"
 msgstr "첨부 파일만 있는 임시 저장"
 
 #. placeholder {0}: formatMessageTimestamp(draft.updatedAt)
-#: apps/app/src/routes/mobile-notes-page.tsx:306
+#: apps/app/src/routes/mobile-notes-page.tsx:321
 msgid "草稿 · 更新于 {0}"
 msgstr "임시 저장 · {0}에 업데이트됨"
 
@@ -26446,61 +26473,107 @@ msgstr "일치하는 공식 계정을 찾을 수 없습니다"
 msgid "换个名字、简称或关键词试试。"
 msgstr "다른 이름, 약칭 또는 키워드로 시도해 보세요."
 
+#. placeholder {0}: formatFileSize(file.size)
+#: apps/app/src/routes/profile-character-import-page.tsx:66
+msgid "文件太大（{0}），上限 5 MB。确认是 .character.json 文件后再试。"
+msgstr ""
+
 #. placeholder {0}: (err as Error).message
-#: apps/app/src/routes/profile-character-import-page.tsx:53
-msgid "JSON 解析失败：{0}"
-msgstr "JSON 파싱 실패: {0}"
+#: apps/app/src/routes/profile-character-import-page.tsx:77
+msgid "读取文件失败：{0}"
+msgstr ""
 
-#. placeholder {0}: result.character.name
-#: apps/app/src/routes/profile-character-import-page.tsx:59
-msgid "已覆盖同名角色：{0}"
-msgstr "같은 이름의 캐릭터를 덮어썼습니다: {0}"
+#. placeholder {0}: (err as Error).message
+#: apps/app/src/routes/profile-character-import-page.tsx:88
+msgid "JSON 解析失败，请确认文件没被破坏：{0}"
+msgstr ""
 
-#. placeholder {0}: result.character.name
-#: apps/app/src/routes/profile-character-import-page.tsx:60
-msgid "已导入新角色：{0}"
-msgstr "새 캐릭터를 가져왔습니다: {0}"
+#: apps/app/src/routes/profile-character-import-page.tsx:96
+msgid "文件内容不是有效的 JSON 对象。"
+msgstr ""
 
-#: apps/app/src/routes/profile-character-import-page.tsx:65
+#: apps/app/src/routes/profile-character-import-page.tsx:104
+msgid "文件缺少 name 字段；这不是一个合法的角色 bundle。"
+msgstr ""
+
+#: apps/app/src/routes/profile-character-import-page.tsx:156
 msgid "导入失败，请稍后再试"
 msgstr "가져오기에 실패했습니다. 잠시 후 다시 시도해 주세요."
 
-#: apps/app/src/routes/profile-character-import-page.tsx:75
+#: apps/app/src/routes/profile-character-import-page.tsx:166
 #: apps/app/src/routes/profile-page.tsx:190
 msgid "导入角色"
 msgstr "캐릭터 가져오기"
 
-#: apps/app/src/routes/profile-character-import-page.tsx:101
-msgid "选择一个从「世界角色管理平台」导出的 JSON 文件，把里面的角色导入到你自己的世界。"
-msgstr "「세계 캐릭터 관리 플랫폼」에서 내보낸 JSON 파일을 선택해 그 안의 캐릭터를 자신의 세계로 가져옵니다."
+#: apps/app/src/routes/profile-character-import-page.tsx:197
+msgid "在「世界角色管理平台」编辑或新建角色，点「📤 导出 JSON」下载文件"
+msgstr ""
 
-#: apps/app/src/routes/profile-character-import-page.tsx:106
-msgid "同名角色会被覆盖（保留原 id 和好友关系），不同名则新建并自动加为你的好友。"
-msgstr "같은 이름의 캐릭터는 덮어씌워집니다(원래 ID와 친구 관계는 유지). 새로운 이름의 캐릭터는 새로 추가되며 자동으로 친구가 됩니다."
+#: apps/app/src/routes/profile-character-import-page.tsx:206
+msgid "回到这里，拖入或选择刚才下载的 .character.json 文件"
+msgstr ""
 
-#: apps/app/src/routes/profile-character-import-page.tsx:116
-msgid "选择一个 .character.json 文件"
-msgstr ".character.json 파일 선택"
+#: apps/app/src/routes/profile-character-import-page.tsx:215
+msgid "确认无误后点「导入到我的世界」。同名会覆盖（保留原 id 和好友关系），不同名则新建并加为好友。"
+msgstr ""
 
-#: apps/app/src/routes/profile-character-import-page.tsx:124
-msgid "导入中…"
-msgstr "가져오는 중…"
+#: apps/app/src/routes/profile-character-import-page.tsx:249
+msgid "松手即可读取"
+msgstr ""
 
-#: apps/app/src/routes/profile-character-import-page.tsx:124
+#: apps/app/src/routes/profile-character-import-page.tsx:250
+msgid "拖入文件，或点下面按钮选择"
+msgstr ""
+
+#: apps/app/src/routes/profile-character-import-page.tsx:253
+msgid "仅支持 .character.json / application/json"
+msgstr ""
+
+#: apps/app/src/routes/profile-character-import-page.tsx:262
 msgid "选择文件"
 msgstr "파일 선택"
 
-#: apps/app/src/routes/profile-favorites-page.tsx:157
-msgid "正在加载收藏…"
-msgstr "즐겨찾기를 불러오는 중…"
+#: apps/app/src/routes/profile-character-import-page.tsx:367
+msgid "文件 $schema 是 \"{schema}\"，期望 \"yinjie-private-character/v1\"。仍可尝试导入，但可能字段不完整。"
+msgstr ""
 
-#: apps/app/src/routes/profile-favorites-page.tsx:162
-msgid "还没有收藏任何内容"
-msgstr "즐겨찾기한 항목이 없습니다"
+#: apps/app/src/routes/profile-character-import-page.tsx:370
+msgid "文件缺少 $schema 标识；仍可尝试导入，但建议检查内容是否齐全。"
+msgstr ""
 
-#: apps/app/src/routes/profile-favorites-page.tsx:163
-msgid "在消息、朋友圈或文章里点击收藏，内容会出现在这里。"
-msgstr "채팅·모먼트·게시물에서 즐겨찾기를 누르면 여기에 모입니다."
+#: apps/app/src/routes/profile-character-import-page.tsx:382
+msgid "✅ 导入到我的世界"
+msgstr ""
+
+#: apps/app/src/routes/profile-character-import-page.tsx:382
+msgid "导入中…"
+msgstr "가져오는 중…"
+
+#: apps/app/src/routes/profile-character-import-page.tsx:390
+msgid "换一个文件"
+msgstr ""
+
+#. placeholder {0}: character.name
+#: apps/app/src/routes/profile-character-import-page.tsx:415
+msgid "已覆盖同名角色：{0}"
+msgstr "같은 이름의 캐릭터를 덮어썼습니다: {0}"
+
+#. placeholder {0}: character.name
+#: apps/app/src/routes/profile-character-import-page.tsx:416
+msgid "已导入新角色：{0}"
+msgstr "새 캐릭터를 가져왔습니다: {0}"
+
+#: apps/app/src/routes/profile-character-import-page.tsx:421
+msgid "原有 id 和好友关系都保留了。"
+msgstr ""
+
+#: apps/app/src/routes/profile-character-import-page.tsx:422
+msgid "已自动加为你的好友，可以在世界角色列表里找到。"
+msgstr ""
+
+#: apps/app/src/routes/profile-character-import-page.tsx:440
+msgid "再导入一个"
+msgstr ""
 
 #: apps/app/src/routes/profile-feedback-page.tsx:91
 msgid "请填写标题和详细描述"
@@ -26567,18 +26640,18 @@ msgstr "앨범에서 선택"
 msgid "图片大小不超过 1MB"
 msgstr "이미지는 1MB 이하여야 합니다"
 
-#: apps/app/src/routes/profile-info-name-page.tsx:74
+#: apps/app/src/routes/profile-info-name-page.tsx:75
 #: apps/app/src/routes/profile-info-page.tsx:67
 msgid "名字"
 msgstr "이름"
 
-#: apps/app/src/routes/profile-info-name-page.tsx:109
+#: apps/app/src/routes/profile-info-name-page.tsx:110
 msgid "输入名字"
 msgstr "이름 입력"
 
-#: apps/app/src/routes/profile-info-name-page.tsx:115
-msgid "好名字让朋友更容易找到你，最多 {NAME_MAX_LENGTH} 个字符。"
-msgstr "좋은 이름은 친구들이 나를 찾기 쉽게 해줍니다. 최대 {NAME_MAX_LENGTH}자."
+#: apps/app/src/routes/profile-info-name-page.tsx:117
+msgid "好名字让朋友更容易找到你，至少 {NAME_MIN_LENGTH} 个字、最多 {NAME_MAX_LENGTH} 个字符。"
+msgstr ""
 
 #: apps/app/src/routes/profile-info-page.tsx:38
 msgid "个人信息"
@@ -26622,13 +26695,13 @@ msgid "查看与编辑个人资料"
 msgstr "프로필 보기 및 편집"
 
 #: apps/app/src/routes/profile-page.tsx:227
-#: apps/app/src/routes/profile-settings-page.tsx:560
-#: apps/app/src/routes/profile-settings-page.tsx:630
+#: apps/app/src/routes/profile-settings-page.tsx:583
+#: apps/app/src/routes/profile-settings-page.tsx:653
 msgid "退出登录"
 msgstr "로그아웃"
 
 #: apps/app/src/routes/profile-settings-language-page.tsx:41
-#: apps/app/src/routes/profile-settings-page.tsx:270
+#: apps/app/src/routes/profile-settings-page.tsx:293
 msgid "多语言"
 msgstr "언어"
 
@@ -26637,7 +26710,7 @@ msgid "正在切换语言..."
 msgstr "언어 전환 중…"
 
 #: apps/app/src/routes/profile-settings-page.tsx:57
-#: apps/app/src/routes/profile-settings-page.tsx:292
+#: apps/app/src/routes/profile-settings-page.tsx:315
 msgid "个人资料"
 msgstr "프로필"
 
@@ -26646,7 +26719,7 @@ msgid "快捷键设置"
 msgstr "단축키 설정"
 
 #: apps/app/src/routes/profile-settings-page.tsx:70
-#: apps/app/src/routes/profile-settings-page.tsx:394
+#: apps/app/src/routes/profile-settings-page.tsx:417
 msgid "AI 设置"
 msgstr "AI 설정"
 
@@ -26655,7 +26728,7 @@ msgid "语言"
 msgstr "언어"
 
 #: apps/app/src/routes/profile-settings-page.tsx:72
-#: apps/app/src/routes/profile-settings-page.tsx:499
+#: apps/app/src/routes/profile-settings-page.tsx:522
 msgid "协议与规范"
 msgstr "약관 및 가이드라인"
 
@@ -26679,173 +26752,173 @@ msgstr "Ctrl/Cmd + Enter로 보내기"
 msgid "发送前多一道组合键确认，更接近微信桌面版可切换方式。"
 msgstr "보내기 전에 조합키 확인을 거쳐 WeChat 데스크톱 방식에 더 가깝게 합니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:223
+#: apps/app/src/routes/profile-settings-page.tsx:246
 msgid "返回资料"
 msgstr "프로필로 돌아가기"
 
-#: apps/app/src/routes/profile-settings-page.tsx:255
+#: apps/app/src/routes/profile-settings-page.tsx:278
 msgid "返回资料页"
 msgstr "프로필 페이지로 돌아가기"
 
-#: apps/app/src/routes/profile-settings-page.tsx:294
+#: apps/app/src/routes/profile-settings-page.tsx:317
 msgid "这里的名称和签名会用于移动端资料页和世界主人展示。"
 msgstr "이 이름과 서명은 모바일 프로필 페이지와 세계 주인 표시에 사용됩니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:298
+#: apps/app/src/routes/profile-settings-page.tsx:321
 msgid "显示名称"
 msgstr "표시 이름"
 
-#: apps/app/src/routes/profile-settings-page.tsx:302
+#: apps/app/src/routes/profile-settings-page.tsx:325
 msgid "输入显示名称"
 msgstr "표시 이름 입력"
 
-#: apps/app/src/routes/profile-settings-page.tsx:311
+#: apps/app/src/routes/profile-settings-page.tsx:334
 msgid "介绍一下你自己，或者写一句当前状态"
 msgstr "자기소개나 현재 상태를 적어 주세요"
 
-#: apps/app/src/routes/profile-settings-page.tsx:325
+#: apps/app/src/routes/profile-settings-page.tsx:348
 msgid "保存资料"
 msgstr "프로필 저장"
 
-#: apps/app/src/routes/profile-settings-page.tsx:333
+#: apps/app/src/routes/profile-settings-page.tsx:356
 msgid "资料已更新。"
 msgstr "프로필이 업데이트되었습니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:340
+#: apps/app/src/routes/profile-settings-page.tsx:363
 msgid "聊天快捷键"
 msgstr "채팅 단축키"
 
-#: apps/app/src/routes/profile-settings-page.tsx:341
+#: apps/app/src/routes/profile-settings-page.tsx:364
 msgid "调整桌面和 Web 键盘聊天输入时的发送快捷键。"
 msgstr "데스크톱 및 Web 키보드 채팅 입력 시 보내기 단축키를 조정합니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:386
+#: apps/app/src/routes/profile-settings-page.tsx:409
 msgid "当前仅影响桌面和 Web 的键盘聊天输入，移动端仍以发送按钮和语音入口为主。"
 msgstr "이는 데스크톱 및 Web 키보드 채팅 입력에만 적용됩니다. 모바일은 여전히 보내기 버튼과 음성 입구가 중심입니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:396
+#: apps/app/src/routes/profile-settings-page.tsx:419
 msgid "你可以为当前世界主人单独配置专属 API Key 和兼容 Base URL。"
 msgstr "현재 세계 주인에게 전용 API Key와 호환 Base URL을 별도로 설정할 수 있습니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:402
+#: apps/app/src/routes/profile-settings-page.tsx:425
 msgid "读取配置..."
 msgstr "설정 불러오는 중..."
 
 #. placeholder {0}: ownerQuery.data.customApiBase
-#: apps/app/src/routes/profile-settings-page.tsx:412
+#: apps/app/src/routes/profile-settings-page.tsx:435
 msgid "当前使用专属 API Key，Base URL：{0}。"
 msgstr "전용 API Key 사용 중, Base URL: {0}."
 
-#: apps/app/src/routes/profile-settings-page.tsx:414
+#: apps/app/src/routes/profile-settings-page.tsx:437
 msgid "当前使用专属 API Key。"
 msgstr "전용 API Key 사용 중입니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:419
+#: apps/app/src/routes/profile-settings-page.tsx:442
 msgid "专属 API Key"
 msgstr "전용 API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:426
+#: apps/app/src/routes/profile-settings-page.tsx:449
 msgid "已保存专属 API Key，输入新的值可替换"
 msgstr "전용 API Key가 저장되어 있습니다. 새 값을 입력하면 교체됩니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:427
+#: apps/app/src/routes/profile-settings-page.tsx:450
 msgid "输入你的专属 API Key"
 msgstr "전용 API Key 입력"
 
-#: apps/app/src/routes/profile-settings-page.tsx:432
+#: apps/app/src/routes/profile-settings-page.tsx:455
 msgid "兼容 Base URL"
 msgstr "호환 Base URL"
 
-#: apps/app/src/routes/profile-settings-page.tsx:436
+#: apps/app/src/routes/profile-settings-page.tsx:459
 msgid "可选，例如 https://api.openai.com/v1"
 msgstr "선택 사항, 예: https://api.openai.com/v1"
 
-#: apps/app/src/routes/profile-settings-page.tsx:451
+#: apps/app/src/routes/profile-settings-page.tsx:474
 msgid "保存专属 API Key"
 msgstr "전용 API Key 저장"
 
-#: apps/app/src/routes/profile-settings-page.tsx:460
+#: apps/app/src/routes/profile-settings-page.tsx:483
 msgid "清除中..."
 msgstr "지우는 중..."
 
-#: apps/app/src/routes/profile-settings-page.tsx:461
+#: apps/app/src/routes/profile-settings-page.tsx:484
 msgid "清除专属 API Key"
 msgstr "전용 API Key 지우기"
 
-#: apps/app/src/routes/profile-settings-page.tsx:475
+#: apps/app/src/routes/profile-settings-page.tsx:498
 msgid "专属 API Key 已保存。"
 msgstr "전용 API Key를 저장했습니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:480
+#: apps/app/src/routes/profile-settings-page.tsx:503
 msgid "专属 API Key 已清除。"
 msgstr "전용 API Key를 지웠습니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:488
+#: apps/app/src/routes/profile-settings-page.tsx:511
 msgid "界面语言"
 msgstr "인터페이스 언어"
 
-#: apps/app/src/routes/profile-settings-page.tsx:490
+#: apps/app/src/routes/profile-settings-page.tsx:513
 msgid "切换界面语言，好友回复也会跟随此设置使用对应语言。"
 msgstr "인터페이스 언어를 전환하면 친구의 답장도 이 설정에 맞는 언어로 표시됩니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:500
+#: apps/app/src/routes/profile-settings-page.tsx:523
 msgid "桌面端保留当前文档切换和独立打开入口。"
 msgstr "데스크톱에서는 현재 문서 전환과 독립 열기 진입점을 유지합니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:534
+#: apps/app/src/routes/profile-settings-page.tsx:557
 msgid "打开当前文档"
 msgstr "현재 문서 열기"
 
-#: apps/app/src/routes/profile-settings-page.tsx:538
+#: apps/app/src/routes/profile-settings-page.tsx:561
 msgid "查看世界隐私政策和数据使用说明。"
 msgstr "세계 개인정보 처리방침과 데이터 사용 안내를 확인합니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:540
+#: apps/app/src/routes/profile-settings-page.tsx:563
 msgid "查看世界服务使用协议。"
 msgstr "세계 서비스 이용 약관을 확인합니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:541
+#: apps/app/src/routes/profile-settings-page.tsx:564
 msgid "查看世界社区规范和反馈口径。"
 msgstr "세계 커뮤니티 가이드라인과 피드백 기준을 확인합니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:549
-#: apps/app/src/routes/profile-settings-page.tsx:581
+#: apps/app/src/routes/profile-settings-page.tsx:572
+#: apps/app/src/routes/profile-settings-page.tsx:604
 msgid "查看当前云账号订阅状态、可购套餐与邀请奖励。"
 msgstr "현재 클라우드 계정 구독 상태, 구매 가능한 요금제, 초대 보상을 확인하세요."
 
-#: apps/app/src/routes/profile-settings-page.tsx:556
+#: apps/app/src/routes/profile-settings-page.tsx:579
 msgid "确认退出登录？"
 msgstr "로그아웃하시겠습니까?"
 
-#: apps/app/src/routes/profile-settings-page.tsx:558
+#: apps/app/src/routes/profile-settings-page.tsx:581
 msgid "退出后会回到世界入口，下次需要重新登录云账号。"
 msgstr "로그아웃하면 월드 입구로 돌아가며, 다음에는 클라우드 계정에 다시 로그인해야 합니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:570
+#: apps/app/src/routes/profile-settings-page.tsx:593
 msgid "资料与设置"
 msgstr "프로필 및 설정"
 
-#: apps/app/src/routes/profile-settings-page.tsx:573
+#: apps/app/src/routes/profile-settings-page.tsx:596
 msgid "在桌面工作区里管理世界主人的资料与签名。"
 msgstr "데스크톱 워크스페이스에서 세계 주인의 프로필과 서명을 관리합니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:575
+#: apps/app/src/routes/profile-settings-page.tsx:598
 msgid "调整桌面和 Web 键盘聊天输入的发送快捷键。"
 msgstr "데스크톱 및 Web 키보드 채팅 입력의 전송 단축키를 조정합니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:577
+#: apps/app/src/routes/profile-settings-page.tsx:600
 msgid "管理专属 API Key 和兼容 Base URL。"
 msgstr "전용 API Key와 호환 Base URL을 관리합니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:579
+#: apps/app/src/routes/profile-settings-page.tsx:602
 msgid "切换当前端的界面语言和本地化格式。"
 msgstr "현재 클라이언트의 인터페이스 언어와 현지화 형식을 전환합니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:582
+#: apps/app/src/routes/profile-settings-page.tsx:605
 msgid "查看当前世界相关的协议和社区规范。"
 msgstr "현재 세계와 관련된 약관 및 커뮤니티 가이드라인을 확인합니다."
 
-#: apps/app/src/routes/profile-settings-page.tsx:597
+#: apps/app/src/routes/profile-settings-page.tsx:620
 msgid "设置分类"
 msgstr "설정 분류"
 
@@ -26929,319 +27002,327 @@ msgstr "잠시만 기다려 주세요. 연락처 태그와 그룹을 동기화 �
 msgid "先在联系人资料里补上标签，通讯录标签页就会自动聚合。"
 msgstr "먼저 연락처 프로필에 태그를 추가하면 주소록 태그 페이지가 자동으로 모아 줍니다."
 
-#: apps/app/src/routes/welcome-page.tsx:52
+#: apps/app/src/routes/welcome-page.tsx:55
 msgid "世界缺少可用的 API 地址。"
 msgstr "세계에 사용 가능한 API 주소가 없습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:54
+#: apps/app/src/routes/welcome-page.tsx:57
 msgid "世界已经启动完成，但暂时还没有可用的 API 地址。"
 msgstr "세계 시작은 완료되었지만 사용 가능한 API 주소가 아직 없습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:55
+#: apps/app/src/routes/welcome-page.tsx:58
 msgid "世界已就绪。"
 msgstr "세계가 준비되었습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:56
+#: apps/app/src/routes/welcome-page.tsx:59
 msgid "正在唤醒已有世界。"
 msgstr "기존 세계를 깨우는 중입니다."
 
-#: apps/app/src/routes/welcome-page.tsx:57
+#: apps/app/src/routes/welcome-page.tsx:60
 msgid "世界启动失败。"
 msgstr "세계 시작에 실패했습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:58
+#: apps/app/src/routes/welcome-page.tsx:61
 msgid "世界暂时无法启动。"
 msgstr "지금은 세계를 시작할 수 없습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:59
+#: apps/app/src/routes/welcome-page.tsx:62
 msgid "世界已被停用。"
 msgstr "세계가 비활성화되었습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:60
+#: apps/app/src/routes/welcome-page.tsx:63
 msgid "该世界当前已被运维停用。"
 msgstr "이 세계는 현재 운영팀에 의해 비활성화되었습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:61
+#: apps/app/src/routes/welcome-page.tsx:64
 msgid "世界正在删除中。"
 msgstr "세계를 삭제 중입니다."
 
-#: apps/app/src/routes/welcome-page.tsx:63
+#: apps/app/src/routes/welcome-page.tsx:66
 msgid "世界正在删除，无法恢复。"
 msgstr "세계가 삭제 중이라 다시 시작할 수 없습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:64
+#: apps/app/src/routes/welcome-page.tsx:67
 msgid "正在创建全新的世界。"
 msgstr "새 세계를 생성하는 중입니다."
 
-#: apps/app/src/routes/welcome-page.tsx:65
-#: apps/app/src/routes/welcome-page.tsx:434
+#: apps/app/src/routes/welcome-page.tsx:68
+#: apps/app/src/routes/welcome-page.tsx:437
 msgid "云世界访问会话缺失。"
 msgstr "클라우드 세계 접근 세션이 없습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:164
+#: apps/app/src/routes/welcome-page.tsx:167
 msgid "世界当前不可用。"
 msgstr "현재 이 세계를 사용할 수 없습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:173
+#: apps/app/src/routes/welcome-page.tsx:176
 msgid "请先验证邮箱，以解析你的云世界。"
 msgstr "클라우드 월드를 확인하려면 먼저 이메일을 인증하세요."
 
-#: apps/app/src/routes/welcome-page.tsx:177
+#: apps/app/src/routes/welcome-page.tsx:180
 msgid "世界已就绪，正在连接..."
 msgstr "세계가 준비되었습니다. 연결 중..."
 
 #. placeholder {0}: session.estimatedWaitSeconds
-#: apps/app/src/routes/welcome-page.tsx:188
+#: apps/app/src/routes/welcome-page.tsx:191
 msgid "{translatedDisplayStatus} 预计等待：{0} 秒。"
 msgstr "{translatedDisplayStatus} 예상 대기 시간: {0}초."
 
-#: apps/app/src/routes/welcome-page.tsx:203
-#: apps/app/src/routes/welcome-page.tsx:218
-#: apps/app/src/routes/welcome-page.tsx:1234
+#: apps/app/src/routes/welcome-page.tsx:206
+#: apps/app/src/routes/welcome-page.tsx:221
+#: apps/app/src/routes/welcome-page.tsx:1243
 msgid "连接中..."
 msgstr "연결 중..."
 
-#: apps/app/src/routes/welcome-page.tsx:207
+#: apps/app/src/routes/welcome-page.tsx:210
 msgid "解析中..."
 msgstr "해석 중..."
 
-#: apps/app/src/routes/welcome-page.tsx:211
+#: apps/app/src/routes/welcome-page.tsx:214
 msgid "注册并进入"
 msgstr "회원가입 후 입장"
 
-#: apps/app/src/routes/welcome-page.tsx:211
+#: apps/app/src/routes/welcome-page.tsx:214
 msgid "登录并进入"
 msgstr "로그인 후 입장"
 
-#: apps/app/src/routes/welcome-page.tsx:223
+#: apps/app/src/routes/welcome-page.tsx:226
 msgid "正在唤醒世界..."
 msgstr "세계 깨우는 중..."
 
-#: apps/app/src/routes/welcome-page.tsx:224
+#: apps/app/src/routes/welcome-page.tsx:227
 msgid "正在创建世界..."
 msgstr "세계 생성 중..."
 
-#: apps/app/src/routes/welcome-page.tsx:462
+#: apps/app/src/routes/welcome-page.tsx:465
 msgid "世界已解析完成，但没有可用的 API 地址。"
 msgstr "세계 해석이 완료되었지만 사용 가능한 API 주소가 없습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:488
+#: apps/app/src/routes/welcome-page.tsx:491
 msgid "已连接到云世界。"
 msgstr "클라우드 세계에 연결되었습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:496
+#: apps/app/src/routes/welcome-page.tsx:499
 msgid "世界已就绪，但暂时还无法访问。"
 msgstr "세계는 준비되었지만 아직 접근할 수 없습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:546
+#: apps/app/src/routes/welcome-page.tsx:549
 msgid "验证码已发送。"
 msgstr "인증 코드가 전송되었습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:574
+#: apps/app/src/routes/welcome-page.tsx:577
 msgid "开发模式：验证码已打印到服务端日志。"
 msgstr "개발 모드: 인증 코드가 서버 로그에 출력되었습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:575
+#: apps/app/src/routes/welcome-page.tsx:578
 msgid "验证码已发送，请查收邮箱（含垃圾邮件箱）。"
 msgstr "인증 코드를 보냈습니다. 메일함(스팸 포함)을 확인하세요."
 
-#: apps/app/src/routes/welcome-page.tsx:593
+#: apps/app/src/routes/welcome-page.tsx:596
 msgid "请输入本地世界 API 地址。"
 msgstr "로컬 세계 API 주소를 입력하세요."
 
-#: apps/app/src/routes/welcome-page.tsx:628
+#: apps/app/src/routes/welcome-page.tsx:631
 msgid "已连接到本地世界。"
 msgstr "로컬 세계에 연결되었습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:631
+#: apps/app/src/routes/welcome-page.tsx:634
 msgid "无法连接到本地世界。"
 msgstr "로컬 세계에 연결할 수 없습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:715
-#: apps/app/src/routes/welcome-page.tsx:1082
+#: apps/app/src/routes/welcome-page.tsx:718
+#: apps/app/src/routes/welcome-page.tsx:1091
 msgid "Google 登录失败，请稍后重试。"
 msgstr "Google 로그인 실패. 잠시 후 다시 시도하세요."
 
-#: apps/app/src/routes/welcome-page.tsx:733
+#: apps/app/src/routes/welcome-page.tsx:736
 msgid "请输入手机号。"
 msgstr "전화번호를 입력하세요."
 
-#: apps/app/src/routes/welcome-page.tsx:737
+#: apps/app/src/routes/welcome-page.tsx:740
 msgid "请输入邮箱。"
 msgstr "이메일을 입력하세요."
 
-#: apps/app/src/routes/welcome-page.tsx:742
+#: apps/app/src/routes/welcome-page.tsx:745
 msgid "请输入验证码。"
 msgstr "인증 코드를 입력하세요."
 
-#: apps/app/src/routes/welcome-page.tsx:862
+#: apps/app/src/routes/welcome-page.tsx:865
 msgid "解析云世界访问失败。"
 msgstr "클라우드 세계 접근 해석에 실패했습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:884
+#: apps/app/src/routes/welcome-page.tsx:887
 msgid "请输入世界主人的名字。"
 msgstr "세계 주인의 이름을 입력하세요."
 
-#: apps/app/src/routes/welcome-page.tsx:889
+#: apps/app/src/routes/welcome-page.tsx:892
+msgid "名字至少 {MIN_OWNER_NAME_LENGTH} 个字，请取一个真正的昵称。"
+msgstr ""
+
+#: apps/app/src/routes/welcome-page.tsx:898
 msgid "请先连接世界，再设置世界主人名称。"
 msgstr "먼저 세계에 연결한 뒤 세계 주인 이름을 설정하세요."
 
-#: apps/app/src/routes/welcome-page.tsx:907
+#: apps/app/src/routes/welcome-page.tsx:916
 msgid "保存世界主人资料失败。"
 msgstr "세계 주인 정보 저장에 실패했습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:958
+#: apps/app/src/routes/welcome-page.tsx:967
 msgid "登录"
 msgstr "로그인"
 
-#: apps/app/src/routes/welcome-page.tsx:974
+#: apps/app/src/routes/welcome-page.tsx:983
 msgid "注册"
 msgstr "회원가입"
 
-#: apps/app/src/routes/welcome-page.tsx:993
+#: apps/app/src/routes/welcome-page.tsx:1002
 msgid "请输入手机号"
 msgstr "전화번호 입력"
 
-#: apps/app/src/routes/welcome-page.tsx:1012
+#: apps/app/src/routes/welcome-page.tsx:1021
 msgid "you@example.com"
 msgstr "you@example.com"
 
-#: apps/app/src/routes/welcome-page.tsx:1019
+#: apps/app/src/routes/welcome-page.tsx:1028
 msgid "验证码"
 msgstr "인증 코드"
 
-#: apps/app/src/routes/welcome-page.tsx:1031
+#: apps/app/src/routes/welcome-page.tsx:1040
 msgid "请输入验证码（默认 123456 即可通过）"
 msgstr "인증 코드를 입력하세요 (기본값 123456으로 통과 가능)"
 
-#: apps/app/src/routes/welcome-page.tsx:1032
+#: apps/app/src/routes/welcome-page.tsx:1041
 msgid "请输入邮箱收到的 6 位验证码"
 msgstr "이메일로 받은 6자리 인증 코드를 입력하세요"
 
-#: apps/app/src/routes/welcome-page.tsx:1057
+#: apps/app/src/routes/welcome-page.tsx:1066
 msgid "发送验证码"
 msgstr "코드 보내기"
 
-#: apps/app/src/routes/welcome-page.tsx:1067
+#: apps/app/src/routes/welcome-page.tsx:1076
 msgid "或"
 msgstr "또는"
 
-#: apps/app/src/routes/welcome-page.tsx:1090
+#: apps/app/src/routes/welcome-page.tsx:1099
 msgid "Google 登录失败，请检查网络后重试。"
 msgstr "Google 로그인 실패. 네트워크 연결을 확인한 후 다시 시도하세요."
 
-#: apps/app/src/routes/welcome-page.tsx:1112
+#: apps/app/src/routes/welcome-page.tsx:1121
 msgid "邀请码（选填）"
 msgstr "초대 코드 (선택)"
 
-#: apps/app/src/routes/welcome-page.tsx:1125
+#: apps/app/src/routes/welcome-page.tsx:1134
 msgid "填写邀请人给你的 6 位邀请码"
 msgstr "초대자가 보낸 6자리 초대 코드를 입력하세요"
 
-#: apps/app/src/routes/welcome-page.tsx:1129
+#: apps/app/src/routes/welcome-page.tsx:1138
 msgid "已通过邀请链接自动填入，可手动修改。"
 msgstr "초대 링크로 자동 입력되었습니다. 직접 수정할 수 있습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:1139
+#: apps/app/src/routes/welcome-page.tsx:1148
 msgid "正在解析你的云世界..."
 msgstr "클라우드 세계 해석 중..."
 
-#: apps/app/src/routes/welcome-page.tsx:1143
-#: apps/app/src/routes/welcome-page.tsx:1329
+#: apps/app/src/routes/welcome-page.tsx:1152
+#: apps/app/src/routes/welcome-page.tsx:1345
 msgid "云世界"
 msgstr "클라우드 세계"
 
-#: apps/app/src/routes/welcome-page.tsx:1144
+#: apps/app/src/routes/welcome-page.tsx:1153
 msgid "正在解析你的世界"
 msgstr "세계 해석 중"
 
-#: apps/app/src/routes/welcome-page.tsx:1146
+#: apps/app/src/routes/welcome-page.tsx:1155
 msgid "我们正在判断是为这个邮箱创建新世界，还是唤醒它已拥有的世界。"
 msgstr "이 이메일로 새 월드를 만들지, 이미 있는 월드를 깨울지 확인하고 있습니다."
 
 #. placeholder {0}: currentCloudSession.resolvedApiBaseUrl
-#: apps/app/src/routes/welcome-page.tsx:1168
-#: apps/app/src/routes/welcome-page.tsx:1174
+#: apps/app/src/routes/welcome-page.tsx:1177
+#: apps/app/src/routes/welcome-page.tsx:1183
 msgid "已解析到世界地址：{0}"
 msgstr "해석된 세계 주소: {0}"
 
-#: apps/app/src/routes/welcome-page.tsx:1203
+#: apps/app/src/routes/welcome-page.tsx:1212
 msgid "本地世界地址"
 msgstr "로컬 세계 주소"
 
-#: apps/app/src/routes/welcome-page.tsx:1219
+#: apps/app/src/routes/welcome-page.tsx:1228
 msgid "检测到你输入的是 /api 路径，已自动换算为对应的世界入口地址：{normalizedLocalApiBaseUrl}"
 msgstr "/api 경로가 감지되어 해당 세계 입구 주소로 변환했습니다: {normalizedLocalApiBaseUrl}"
 
-#: apps/app/src/routes/welcome-page.tsx:1222
+#: apps/app/src/routes/welcome-page.tsx:1231
 msgid "检测到你输入的是本机应用地址，已自动换算为对应的 Core API 地址：{normalizedLocalApiBaseUrl}"
 msgstr "로컬 앱 주소가 감지되어 해당 Core API 주소로 변환했습니다: {normalizedLocalApiBaseUrl}"
 
-#: apps/app/src/routes/welcome-page.tsx:1234
+#: apps/app/src/routes/welcome-page.tsx:1243
 msgid "连接本地世界"
 msgstr "로컬 세계 연결"
 
-#: apps/app/src/routes/welcome-page.tsx:1244
+#: apps/app/src/routes/welcome-page.tsx:1253
 msgid "为世界主人命名"
 msgstr "세계 주인 이름 정하기"
 
-#: apps/app/src/routes/welcome-page.tsx:1259
-msgid "为这个世界设置主人的名字"
-msgstr "이 세계의 주인 이름 설정"
+#: apps/app/src/routes/welcome-page.tsx:1268
+msgid "输入你希望被怎么称呼（至少 {MIN_OWNER_NAME_LENGTH} 个字）"
+msgstr ""
 
-#: apps/app/src/routes/welcome-page.tsx:1279
+#: apps/app/src/routes/welcome-page.tsx:1274
+msgid "这是世界里所有 AI 朋友对你的称呼，名字至少 {MIN_OWNER_NAME_LENGTH} 个字。"
+msgstr ""
+
+#: apps/app/src/routes/welcome-page.tsx:1292
 msgid "返回上一步"
 msgstr "이전 단계로 돌아가기"
 
-#: apps/app/src/routes/welcome-page.tsx:1306
+#: apps/app/src/routes/welcome-page.tsx:1322
 msgid "进入世界"
 msgstr "세계 들어가기"
 
-#: apps/app/src/routes/welcome-page.tsx:1333
+#: apps/app/src/routes/welcome-page.tsx:1349
 msgid "通过邮箱登录。新用户会获得一个全新的世界，老用户会唤醒自己已有的世界。"
 msgstr "이메일로 로그인하세요. 신규 사용자는 새 월드를 받고, 기존 사용자는 보유한 월드를 다시 깨울 수 있습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:1348
+#: apps/app/src/routes/welcome-page.tsx:1364
 msgid "本地世界"
 msgstr "로컬 세계"
 
-#: apps/app/src/routes/welcome-page.tsx:1352
+#: apps/app/src/routes/welcome-page.tsx:1368
 msgid "输入世界入口地址并直接连接。若你拿到的是 /api 地址，也可以直接粘贴。"
 msgstr "세계 입구 주소를 입력해 바로 연결합니다. /api 주소가 있다면 그대로 붙여넣을 수 있습니다."
 
-#: apps/app/src/routes/welcome-page.tsx:1367
+#: apps/app/src/routes/welcome-page.tsx:1383
 msgid "正在加载世界主人..."
 msgstr "세계 주인 불러오는 중..."
 
-#: apps/app/src/routes/welcome-page.tsx:1372
+#: apps/app/src/routes/welcome-page.tsx:1388
 msgid "正在加载世界主人"
 msgstr "세계 주인 불러오는 중"
 
-#: apps/app/src/routes/welcome-page.tsx:1374
+#: apps/app/src/routes/welcome-page.tsx:1390
 msgid "世界地址已连通，正在进入应用前同步世界主人资料。"
 msgstr "세계 주소에 연결되었습니다. 앱에 들어가기 전에 세계 주인 정보를 동기화하는 중입니다."
 
-#: apps/app/src/routes/welcome-page.tsx:1399
+#: apps/app/src/routes/welcome-page.tsx:1415
 msgid "重新连接"
 msgstr "다시 연결"
 
-#: apps/app/src/routes/welcome-page.tsx:1399
-#: apps/app/src/routes/welcome-page.tsx:1467
+#: apps/app/src/routes/welcome-page.tsx:1415
+#: apps/app/src/routes/welcome-page.tsx:1483
 msgid "重新解析"
 msgstr "다시 해석"
 
-#: apps/app/src/routes/welcome-page.tsx:1421
-#: apps/app/src/routes/welcome-page.tsx:1443
+#: apps/app/src/routes/welcome-page.tsx:1437
+#: apps/app/src/routes/welcome-page.tsx:1459
 msgid "重试发送"
 msgstr "전송 다시 시도"
 
-#: apps/app/src/routes/welcome-page.tsx:1489
-#: apps/app/src/routes/welcome-page.tsx:1506
+#: apps/app/src/routes/welcome-page.tsx:1505
+#: apps/app/src/routes/welcome-page.tsx:1522
 msgid "世界入口"
 msgstr "세계 입구"
 
-#: apps/app/src/routes/welcome-page.tsx:1492
-#: apps/app/src/routes/welcome-page.tsx:1509
+#: apps/app/src/routes/welcome-page.tsx:1508
+#: apps/app/src/routes/welcome-page.tsx:1525
 msgid "连接你的世界"
 msgstr "세계 연결"
 
