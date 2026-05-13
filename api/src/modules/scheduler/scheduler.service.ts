@@ -1019,15 +1019,11 @@ export class SchedulerService {
     hour: number,
     startOfDay: Date,
   ): Promise<{ music: number; video: number }> {
-    const MUSIC_PER_CHAR_PROB = 0.05;
-    const MUSIC_MAX_PER_TICK = 3;
+    const MUSIC_PER_CHAR_PROB = 0.02;
+    const MUSIC_MAX_PER_TICK = 1;
     const MUSIC_RECENT_DAYS = 14;
-    // 最近 14 天音乐发布数 → 权重倍率
-    // 0 次（很久没发） → 3x，1 次 → 1x，≥2 次 → 完全跳过
-    // 让长尾角色更快被翻牌、避免老熟脸刷屏
     const MUSIC_WEIGHT_BY_RECENT: readonly number[] = [3, 1, 0];
     const VIDEO_MAX_PER_TICK = 1;
-    // 视频窗口比音乐更长（视频生成成本高、频率低）
     const VIDEO_RECENT_DAYS = 21;
     const VIDEO_WEIGHT_BY_RECENT: readonly number[] = [3, 1, 0];
     let music = 0;
@@ -1094,23 +1090,27 @@ export class SchedulerService {
       }
     }
 
-    // 视频号优先：朋友圈视频只在视频额度仍有 ≥3 / 4 时启动，
-    // 保证视频号 cron 至少能再拿到 3 次（每天 4 次总额度）。
-    // 同时朋友圈每天最多 1 条 MiniMax 视频。
+    // 视频号优先：朋友圈视频只在视频额度仍有 ≥1 / 当前剩余时启动。
+    // 朋友圈视频在 MOMENT_VIDEO_COOLDOWN_DAYS 内最多 1 条（不是按自然日，是滚动窗口），
+    // 配合 cloud-api per-world 配额派发，避免单 world 把朋友圈视频用完。
     const remainingVideo =
       (await this.minimaxQuota.availableToday('MiniMax-Hailuo-2.3-Fast')) +
       (await this.minimaxQuota.availableToday('MiniMax-Hailuo-2.3'));
-    const MOMENT_VIDEO_RESERVE_FOR_CHANNELS = 3;
-    const MAX_MOMENT_VIDEOS_PER_DAY = 1;
-    const todayMomentVideos = await this.momentPostRepo.count({
+    const MOMENT_VIDEO_RESERVE_FOR_CHANNELS = 1;
+    const MAX_MOMENT_VIDEOS_PER_COOLDOWN = 1;
+    const MOMENT_VIDEO_COOLDOWN_DAYS = 2;
+    const cooldownSince = new Date(
+      now.getTime() - MOMENT_VIDEO_COOLDOWN_DAYS * 24 * 60 * 60 * 1000,
+    );
+    const recentMomentVideos = await this.momentPostRepo.count({
       where: {
         generationKind: 'minimax_video',
-        postedAt: Between(startOfDay, now),
+        postedAt: MoreThanOrEqual(cooldownSince),
       },
     });
     if (
       remainingVideo > MOMENT_VIDEO_RESERVE_FOR_CHANNELS &&
-      todayMomentVideos < MAX_MOMENT_VIDEOS_PER_DAY
+      recentMomentVideos < MAX_MOMENT_VIDEOS_PER_COOLDOWN
     ) {
       const candidates = chars.filter((char) => {
         const start = char.activeHoursStart ?? 8;
@@ -1164,14 +1164,14 @@ export class SchedulerService {
 
       for (const { char, recent, weight } of orderedCandidates) {
         if (video >= VIDEO_MAX_PER_TICK) break;
-        const todayVideoForChar = await this.momentPostRepo.count({
+        const recentVideoForChar = await this.momentPostRepo.count({
           where: {
             authorId: char.id,
             generationKind: 'minimax_video',
-            postedAt: Between(startOfDay, now),
+            postedAt: MoreThanOrEqual(cooldownSince),
           },
         });
-        if (todayVideoForChar > 0) continue;
+        if (recentVideoForChar > 0) continue;
         const post = await this.momentsService.scheduleMinimaxVideoMoment(
           char,
           () => this.pickMinimaxVideoModel(),
