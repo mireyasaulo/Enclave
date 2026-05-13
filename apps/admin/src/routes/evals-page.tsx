@@ -1253,13 +1253,6 @@ window.alert(t(msg`预设 JSON 无效`));
         <div className="mt-4 text-sm text-[color:var(--text-secondary)]">
           {t(msg`最近运行`)}：{overviewQuery.data?.latestRunAt ?? t(msg`暂无`)}
         </div>
-        {shareViewName.trim() ? (
-          <div className="mt-4">
-            <span className="rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-2 text-sm text-sky-100">
-              {t(msg`视图：${shareViewName.trim()}`)}
-            </span>
-          </div>
-        ) : null}
         <InlineNotice className="mt-4" tone={compactView ? "info" : "muted"}>
           {compactView
             ? t(msg`当前是紧凑模式，只优先展示失败、异常和差异明显的结果。`)
