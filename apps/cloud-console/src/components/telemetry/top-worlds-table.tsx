@@ -30,7 +30,10 @@ export function TelemetryTopWorldsTable({
   const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const rangeEnd = total === 0 ? 0 : Math.min(page * pageSize, total);
 
-  if (rows.length === 0) {
+  // 完全没数据 → 显示空状态卡片，无需 Pager。
+  // rows=[] but total>0 → 用户停留在被压缩掉的页号上（例如 total 缩到不够本页时），
+  // 不能 early-return，否则 Pager 也消失，用户回不去第 1 页。
+  if (total === 0) {
     return (
       <div className="rounded-2xl border border-(--border-subtle) bg-(--surface-card) p-8 text-center text-sm text-(--text-muted)">
         {t("No world activity in the current range.")}
@@ -82,6 +85,16 @@ export function TelemetryTopWorldsTable({
           </tr>
         </thead>
         <tbody className="divide-y divide-(--border-faint)">
+          {rows.length === 0 ? (
+            <tr>
+              <td
+                colSpan={4}
+                className="px-3 py-6 text-center text-xs text-(--text-muted)"
+              >
+                {t("This page is empty. Use the pager to jump back.")}
+              </td>
+            </tr>
+          ) : null}
           {rows.map((row) => {
             const goToWorld = () =>
               navigate({
@@ -93,7 +106,16 @@ export function TelemetryTopWorldsTable({
                 key={row.worldId}
                 role="link"
                 tabIndex={0}
-                onClick={goToWorld}
+                onClick={() => {
+                  // 拖选文字 / 双击选词时不要顺手跳转，否则运营复制单元格里的数字会被甩走。
+                  if (
+                    typeof window !== "undefined" &&
+                    (window.getSelection()?.toString().trim().length ?? 0) > 0
+                  ) {
+                    return;
+                  }
+                  goToWorld();
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
@@ -129,10 +151,14 @@ export function TelemetryTopWorldsTable({
       </table>
       <div className="flex flex-wrap items-center justify-between gap-2 border-t border-(--border-faint) px-4 py-2 text-xs text-(--text-secondary)">
         <div>
-          {t("{start}-{end} of {total}")
-            .replace("{start}", String(rangeStart))
-            .replace("{end}", String(rangeEnd))
-            .replace("{total}", String(total))}
+          {rows.length > 0
+            ? t("{start}-{end} of {total}")
+                .replace("{start}", String(rangeStart))
+                .replace("{end}", String(rangeEnd))
+                .replace("{total}", String(total))
+            : /* rows=[] but total>0：算出来的 rangeStart 会越过 total（例如
+                 "41-20 of 20"），此时只显示总条数，避免给运营看错乱数字。 */
+              t("{total} total").replace("{total}", String(total))}
         </div>
         {onPageChange ? (
           <Pager

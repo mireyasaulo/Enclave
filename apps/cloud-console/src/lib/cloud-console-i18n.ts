@@ -298,6 +298,9 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Last page": "末页",
     "Jump to page": "跳至",
     Go: "跳转",
+    "This page is empty. Use the pager to jump back.":
+      "本页无数据，请通过分页器跳回。",
+    "{total} total": "共 {total} 条",
     "Handler note": "处理备注",
     "Internal note for this feedback. Saved when you change status.":
       "针对该反馈的内部备注，切换状态时一并保存。",
@@ -936,6 +939,9 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Last page": "最後",
     "Jump to page": "ページへジャンプ",
     Go: "移動",
+    "This page is empty. Use the pager to jump back.":
+      "このページにデータはありません。ページャーで前のページに戻ってください。",
+    "{total} total": "全 {total} 件",
     "Handler note": "対応メモ",
     "Internal note for this feedback. Saved when you change status.":
       "このフィードバックに対する社内メモ。ステータス変更時に保存されます。",
@@ -1579,6 +1585,9 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Last page": "마지막",
     "Jump to page": "페이지 이동",
     Go: "이동",
+    "This page is empty. Use the pager to jump back.":
+      "이 페이지에는 데이터가 없습니다. 페이지네이션으로 이전 페이지로 돌아가세요.",
+    "{total} total": "총 {total}개",
     "Handler note": "처리 메모",
     "Internal note for this feedback. Saved when you change status.":
       "이 피드백에 대한 내부 메모입니다. 상태 변경 시 함께 저장됩니다.",
