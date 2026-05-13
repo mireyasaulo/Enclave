@@ -9,9 +9,15 @@ import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import type { CloudComputeProviderSummary } from "@yinjie/contracts";
 import { ChildProcess, spawn } from "node:child_process";
-import { createHash, randomUUID } from "node:crypto";
+import {
+  createCipheriv,
+  createHash,
+  randomBytes,
+  randomUUID,
+} from "node:crypto";
 import { existsSync, mkdirSync, openSync } from "node:fs";
 import path from "node:path";
+import BetterSqlite3 from "better-sqlite3";
 import { Repository } from "typeorm";
 import { CloudInstanceEntity } from "../entities/cloud-instance.entity";
 import { CloudWorldEntity } from "../entities/cloud-world.entity";
@@ -425,6 +431,133 @@ export class LocalProcessComputeProviderService
     }
   }
 
+  // 把 cloud-api 算出的 minimax key 写进 world DB 的 inference_provider_accounts.
+  // 文本生成走 inference.service → providerRepo.findOneBy，读 DB 而不是 env；
+  // 不同步会一直用最初 seed 的那把固定单 key（历史问题：所有 world 都被灌成
+  // process.env.MINIMAX_API_KEY 兜底值）。
+  //
+  // 行为：
+  //   - row 不存在（provider_minimax 还没被 seed）→ 静默跳过，不创建
+  //   - row 已经是同一把 key → 不写（避免无谓改 updatedAt 和触发 WAL 写）
+  //   - 加密 secret 没设置 → fallback 到 plain:<key>（与 api 的 encodeSecret 一致）
+  //
+  // 在 spawn child **之前**调用，此时 child 不持库；后续 child 启动后再读 DB
+  // 拿到的就是新 key。已运行的 child 改库后下次 findOneBy 就能读到（TypeORM
+  // 那条路径无内存缓存）。
+  private syncProviderMinimaxKey(
+    accountDir: string,
+    targetKey: string,
+    worldId: string,
+  ): void {
+    const dbPath = path.join(accountDir, "database.sqlite");
+    if (!existsSync(dbPath)) {
+      return;
+    }
+    let db: BetterSqlite3.Database | null = null;
+    try {
+      db = new BetterSqlite3(dbPath);
+      const hasTable = db
+        .prepare(
+          "SELECT 1 FROM sqlite_master WHERE type='table' AND name='inference_provider_accounts'",
+        )
+        .get();
+      if (!hasTable) return;
+      const row = db
+        .prepare(
+          "SELECT apiKeyEncrypted, ttsApiKeyEncrypted, imageGenerationApiKeyEncrypted FROM inference_provider_accounts WHERE id = 'provider_minimax'",
+        )
+        .get() as
+        | {
+            apiKeyEncrypted: string | null;
+            ttsApiKeyEncrypted: string | null;
+            imageGenerationApiKeyEncrypted: string | null;
+          }
+        | undefined;
+      if (!row) return;
+
+      const decode = (stored: string | null) => {
+        if (!stored) return "";
+        const t = stored.trim();
+        if (t.startsWith("plain:")) return t.slice(6).trim();
+        // enc:<envelope> 无法在不持有 secret 时解；保守视为不同，触发改写。
+        // legacy bare value 直接当明文比对。
+        if (t.startsWith("enc:")) return "__enc_opaque__";
+        return t;
+      };
+
+      const needApi = decode(row.apiKeyEncrypted) !== targetKey;
+      const needTts = decode(row.ttsApiKeyEncrypted) !== targetKey;
+      const needImg = decode(row.imageGenerationApiKeyEncrypted) !== targetKey;
+      if (!needApi && !needTts && !needImg) {
+        return;
+      }
+
+      const sets: string[] = [];
+      const params: Record<string, string> = {
+        now: new Date().toISOString(),
+      };
+      if (needApi) {
+        sets.push("apiKeyEncrypted = @apiEnc");
+        params.apiEnc = this.encodeMinimaxSecret(targetKey);
+      }
+      if (needTts) {
+        sets.push("ttsApiKeyEncrypted = @ttsEnc");
+        params.ttsEnc = this.encodeMinimaxSecret(targetKey);
+      }
+      if (needImg) {
+        sets.push("imageGenerationApiKeyEncrypted = @imgEnc");
+        params.imgEnc = this.encodeMinimaxSecret(targetKey);
+      }
+      sets.push("updatedAt = @now");
+      db.prepare(
+        `UPDATE inference_provider_accounts SET ${sets.join(", ")} WHERE id = 'provider_minimax'`,
+      ).run(params);
+      this.logger.log(
+        `synced provider_minimax apiKey for world=${worldId} → …${targetKey.slice(-4)} cols=[${[
+          needApi ? "api" : null,
+          needTts ? "tts" : null,
+          needImg ? "img" : null,
+        ]
+          .filter(Boolean)
+          .join(",")}]`,
+      );
+    } catch (err) {
+      this.logger.warn(
+        `syncProviderMinimaxKey failed for world=${worldId}: ${(err as Error)?.message}`,
+      );
+    } finally {
+      db?.close();
+    }
+  }
+
+  // 与 api/src/modules/inference/inference.service.ts:encodeSecret + api-key-crypto.ts
+  // 对齐：有 USER_API_KEY_ENCRYPTION_SECRET → AES-256-GCM；没有 → plain:。
+  private encodeMinimaxSecret(value: string): string {
+    const secret = process.env.USER_API_KEY_ENCRYPTION_SECRET?.trim();
+    if (!secret) {
+      return `plain:${value}`;
+    }
+    try {
+      const key = createHash("sha256").update(secret).digest();
+      const iv = randomBytes(12);
+      const cipher = createCipheriv("aes-256-gcm", key, iv);
+      const encrypted = Buffer.concat([
+        cipher.update(value, "utf8"),
+        cipher.final(),
+      ]);
+      const tag = cipher.getAuthTag();
+      const envelope = JSON.stringify({
+        v: 1,
+        iv: iv.toString("base64"),
+        tag: tag.toString("base64"),
+        value: encrypted.toString("base64"),
+      });
+      return `enc:${envelope}`;
+    } catch {
+      return `plain:${value}`;
+    }
+  }
+
   private isAlive(state: RunningChild) {
     if (state.child) {
       if (!state.child.pid) return false;
@@ -473,6 +606,10 @@ export class LocalProcessComputeProviderService
     const minimaxAlloc = pickMinimaxKey(world.id, minimaxPool);
     if (minimaxAlloc) {
       env.MINIMAX_API_KEY = minimaxAlloc.key;
+      // 同步把 world 自己 DB 里 inference_provider_accounts.apiKey 改成本次分配的 key。
+      // 文本生成走 inference.service → providerRepo.findOneBy，读的是 DB 而不是 env，
+      // 不同步就会一直用最初 seed 的那把单 key（参考 scripts/migrate-to-minimax-tokenplan.mjs）。
+      this.syncProviderMinimaxKey(accountDir, minimaxAlloc.key, world.id);
     }
     // 安全：child 只该看到自己分到的那个 key，整个池只属于 cloud-api 层。
     // 不删的话 ...process.env 会把全部 CSV 池泄露给 child env（/proc/PID/environ 可见）。
