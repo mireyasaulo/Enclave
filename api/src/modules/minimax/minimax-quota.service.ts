@@ -153,6 +153,10 @@ export class MinimaxQuotaService {
   async availableToday(model: string): Promise<number> {
     const limit = getDailyLimit(model);
     if (limit <= 0) return 0;
+    // provider 已确认今日耗尽 → 直接 0，让所有"availableToday > 0 ?"门槛失效。
+    // 否则 reserved + committed 远未到 limit 时，feed/scheduler/moments 的提前拦截
+    // 会"假装"还有额度，构建 prompt 后才在 tryReserve 撞墙白费 LLM tokens / DB 查询。
+    if (await this.isExhaustedToday(model)) return 0;
     const row = await this.repo.findOne({
       where: { model, usageDate: todayInShanghai() },
     });
@@ -180,6 +184,13 @@ export class MinimaxQuotaService {
       const row = await mgr.findOne(MinimaxQuotaEntity, {
         where: { model, usageDate },
       });
+      // 事务内再 race-safe 查一次 exhaustedAt：从 isExhaustedToday() 到这里之间，
+      // 同进程的 markExhaustedToday（另一个 async 路径，例如 moments lyrics 2056）
+      // 可能刚把这个 model 标了 exhausted。补上内存 Set 防止重复 DB 查。
+      if (row?.exhaustedAt) {
+        this.exhaustedToday.add(this.exhaustedKey(model));
+        return false;
+      }
       const usedNow = (row?.reserved ?? 0) + (row?.committed ?? 0);
       if (usedNow >= linearBudget) {
         // 已超线性预算：本 tick 跳过，等到时间线再放开。
