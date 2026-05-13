@@ -1856,8 +1856,10 @@ export class MomentsService implements OnModuleInit {
   //   失败会自动 fall through 到 Tier 2，保留入口以备 minimax 修好该端点
   // Tier 2: MiniMax /v1/text/chatcompletion_v2 + MiniMax-M2.7（tokenplan 主推 LLM）
   //   这就是"tokenplan 里 minimax 正常的 llm"，确认可用
-  // Tier 3: ai.generatePlainText —— AiOrchestrator 走默认 chat provider（通常是 n1n）
-  // Tier 4: 本地 composeMusicLyrics 模板
+  // Tier 3: 本地 composeMusicLyrics 模板
+  //   注意：过去这里曾用 ai.generatePlainText 走通用 LLM（会被
+  //   AiOrchestrator 兜底到 n1n.ai）。2026-05-13 撤掉——minimax 容量耗尽时
+  //   每首歌都打一次 n1n 既贵又破坏"歌词全程留在 minimax tokenplan 内"的约束。
   // 前提：调用方 scheduleMinimaxMusicMoment 已经验证音乐配额非空。
   private async generateLyricsOrFallback(
     characterId: string,
@@ -1962,37 +1964,10 @@ export class MomentsService implements OnModuleInit {
       }
     }
 
-    // Tier 3: 通用 LLM（orchestrator 路由，通常落到 n1n）
-    try {
-      const text = await this.ai.generatePlainText({
-        prompt,
-        usageContext: {
-          surface: 'app',
-          scene: 'minimax_music_lyrics_fallback',
-          scopeType: 'character',
-          scopeId: characterId,
-          scopeLabel: characterName,
-          characterId,
-          characterName,
-        },
-        maxTokens: 600,
-        temperature: 0.9,
-        fallback: localFallback,
-      });
-      const cleaned = ensureVerseChorus(text);
-      if (cleaned) {
-        this.logger.log(
-          `lyrics via generic LLM fallback for ${characterName} [theme=${theme}]`,
-        );
-        return cleaned;
-      }
-    } catch (err) {
-      this.logger.warn(
-        `generic LLM lyrics fallback failed: ${(err as Error)?.message}`,
-      );
-    }
-
-    // Tier 4: 本地模板
+    // Tier 3: 本地模板（不再走 ai.generatePlainText，避免 orchestrator 兜底到 n1n）
+    this.logger.log(
+      `lyrics via local template for ${characterName} [theme=${theme}]`,
+    );
     return localFallback;
   }
 
