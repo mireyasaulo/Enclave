@@ -441,24 +441,29 @@ export function WorldsPage() {
     mutationFn: (worldId: string) =>
       cloudAdminApi.getWorldAdminBootstrap(worldId),
     onSuccess: (bootstrap) => {
+      if (typeof window === "undefined") {
+        return;
+      }
       const payload = JSON.stringify({
         apiBaseUrl: bootstrap.apiBaseUrl,
         adminSecret: bootstrap.adminSecret,
         cloudWorldId: bootstrap.worldId,
         cloudEmail: bootstrap.email ?? undefined,
       });
-      const encoded =
-        typeof window !== "undefined"
-          ? window
-              .btoa(payload)
-              .replace(/\+/g, "-")
-              .replace(/\//g, "_")
-              .replace(/=+$/, "")
-          : "";
-      const url = `${bootstrap.adminFrontendBaseUrl.replace(/\/+$/, "")}/#yinjie-bootstrap=${encoded}`;
-      if (typeof window !== "undefined") {
-        window.open(url, "_blank", "noopener,noreferrer");
+      // btoa 只认 Latin-1，payload 里若含 Unicode（email 带中文标签、
+      // 未来加 worldName 等）会抛 InvalidCharacterError。统一 UTF-8 bytes → base64url。
+      const utf8Bytes = new TextEncoder().encode(payload);
+      let binary = "";
+      for (const byte of utf8Bytes) {
+        binary += String.fromCharCode(byte);
       }
+      const encoded = window
+        .btoa(binary)
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+      const url = `${bootstrap.adminFrontendBaseUrl.replace(/\/+$/, "")}/#yinjie-bootstrap=${encoded}`;
+      window.open(url, "_blank", "noopener,noreferrer");
     },
     onError: (error) => {
       showCloudAdminErrorNotice(showNotice, error);
@@ -786,8 +791,14 @@ export function WorldsPage() {
                         <button
                           type="button"
                           disabled={
-                            enterAdminMutation.isPending &&
-                            enterAdminMutation.variables === item.world.id
+                            !item.world.apiBaseUrl ||
+                            (enterAdminMutation.isPending &&
+                              enterAdminMutation.variables === item.world.id)
+                          }
+                          title={
+                            !item.world.apiBaseUrl
+                              ? t("World has no apiBaseUrl yet")
+                              : undefined
                           }
                           onClick={() =>
                             enterAdminMutation.mutate(item.world.id)

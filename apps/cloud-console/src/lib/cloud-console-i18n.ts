@@ -115,6 +115,7 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Admin sessions permalink copied.": "管理会话固定链接已复制。",
     "Enter admin": "进入后台",
     "Opening admin…": "正在打开后台…",
+    "World has no apiBaseUrl yet": "该世界尚未分配 apiBaseUrl，请先启动",
 
     "Downloaded admin session audit snapshot for": "已下载管理会话审计快照：",
     "Downloaded focused source snapshot for": "已下载聚焦来源快照：",

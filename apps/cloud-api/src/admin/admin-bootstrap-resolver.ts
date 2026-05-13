@@ -6,9 +6,29 @@ type ConfigReader = {
   get<T = string>(propertyPath: string): T | undefined;
 };
 
-// cloud-api 在 dev-services.mjs 里 cwd=rootDir 启动；走到这里时 process.cwd() 就是
-// 仓库根。打包后 __dirname 在 dist 子树里深度不固定，用 cwd 兜底最稳。
-const REPO_ROOT = process.cwd();
+// 找 repo 根的两个候选：
+//   1. process.cwd() — dev-services.mjs 用这条
+//   2. __dirname 往上回溯到第一个含 api/.env 的祖先 — 用户手动 cd 子目录起服务时兜底
+// 任一命中就返回；两个都没 api/.env 时还是返回 cwd（让 resolve* 报清楚的错）。
+function findRepoRoot(): string {
+  const cwd = process.cwd();
+  if (existsSync(path.join(cwd, "api", ".env")) || existsSync(path.join(cwd, "api"))) {
+    return cwd;
+  }
+
+  let dir = __dirname;
+  for (let depth = 0; depth < 10; depth += 1) {
+    if (existsSync(path.join(dir, "api", ".env")) || existsSync(path.join(dir, "api"))) {
+      return dir;
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return cwd;
+}
+
+const REPO_ROOT = findRepoRoot();
 
 function trim(value?: string | null) {
   const normalized = value?.trim().replace(/\/+$/, "");

@@ -21,7 +21,11 @@ type BootstrapPayload = {
 function decodeBase64Url(input: string): string {
   const padded = input.replace(/-/g, "+").replace(/_/g, "/");
   const padding = padded.length % 4 === 0 ? "" : "=".repeat(4 - (padded.length % 4));
-  return atob(padded + padding);
+  // atob 返回的是按字节解释的 Latin-1 字符串；payload 是 UTF-8 编码的 JSON，
+  // 要走 TextDecoder 才能拿回原始 Unicode（否则中文/emoji 会变成乱码）。
+  const binary = atob(padded + padding);
+  const bytes = Uint8Array.from(binary, (ch) => ch.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
 }
 
 export function applyAdminHashBootstrap(): boolean {
