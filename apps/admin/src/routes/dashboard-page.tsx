@@ -580,7 +580,7 @@ export function DashboardPage() {
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="order-2 space-y-6 xl:order-1">
-          <div className="sticky top-20 z-10 -mx-1 flex flex-wrap gap-2 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)]/95 px-2 py-2 shadow-[var(--shadow-soft)] backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-card)]/80">
+          <div className="sticky top-[140px] z-10 -mx-1 flex flex-wrap gap-2 rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)]/95 px-2 py-2 shadow-[var(--shadow-soft)] backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-card)]/80 lg:top-20">
             {[
               {
                 label: t(msg`值班总览`),
@@ -614,7 +614,7 @@ export function DashboardPage() {
             ))}
           </div>
 
-          <div ref={overviewSectionRef} className="scroll-mt-24 space-y-4">
+          <div ref={overviewSectionRef} className="scroll-mt-[200px] space-y-4 lg:scroll-mt-[140px]">
             <Card className="overflow-hidden bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(255,247,235,0.92)_45%,rgba(237,250,244,0.96))]">
               <AdminEyebrow>{t(msg`运营值班首页`)}</AdminEyebrow>
               <h2 className="mt-3 text-3xl font-semibold text-[color:var(--text-primary)]">
@@ -999,7 +999,7 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <div ref={runtimeSectionRef} className="scroll-mt-24 space-y-4">
+          <div ref={runtimeSectionRef} className="scroll-mt-[200px] space-y-4 lg:scroll-mt-[140px]">
             <DashboardSectionLead
               eyebrow={t(msg`运行体征`)}
               title={t(
@@ -1210,7 +1210,7 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <div ref={signalsSectionRef} className="scroll-mt-24 space-y-4">
+          <div ref={signalsSectionRef} className="scroll-mt-[200px] space-y-4 lg:scroll-mt-[140px]">
             <DashboardSectionLead
               eyebrow={t(msg`运营信号`)}
               title={t(
@@ -1383,7 +1383,7 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <div ref={schedulerSectionRef} className="scroll-mt-24 space-y-4">
+          <div ref={schedulerSectionRef} className="scroll-mt-[200px] space-y-4 lg:scroll-mt-[140px]">
             <DashboardSectionLead
               eyebrow={t(msg`调度与实时`)}
               title={t(msg`把自动运行风险和前端实时链路放在同一个排障平面。`)}
@@ -1680,7 +1680,7 @@ export function DashboardPage() {
             </div>
           </div>
 
-          <div ref={operationsSectionRef} className="scroll-mt-24 space-y-4">
+          <div ref={operationsSectionRef} className="scroll-mt-[200px] space-y-4 lg:scroll-mt-[140px]">
             <DashboardSectionLead
               eyebrow={t(msg`调试与运维`)}
               title={t(
