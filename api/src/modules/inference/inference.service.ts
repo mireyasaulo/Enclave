@@ -21,7 +21,7 @@ import { MinimaxNativeClient } from '../ai/minimax-native.client';
 import { executeChatCompletion } from '../ai/chat-completion-stream.util';
 
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
-const DEFAULT_TRANSCRIPTION_MODEL = 'gpt-4o-mini-transcribe';
+const DEFAULT_TRANSCRIPTION_MODEL = 'gpt-4o-transcribe';
 const DEFAULT_TTS_MODEL = 'gpt-4o-mini-tts';
 const DEFAULT_TTS_VOICE = 'alloy';
 const DEFAULT_PROVIDER_ID = 'provider_default';
