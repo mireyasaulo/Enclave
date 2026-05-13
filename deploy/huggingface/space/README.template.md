@@ -1,12 +1,12 @@
 ---
 title: Enclave
 emoji: 🪞
-colorFrom: emerald
-colorTo: slate
+colorFrom: green
+colorTo: gray
 sdk: static
 pinned: true
 license: mit
-short_description: Self-hosted AI companion social world — residents, Moments, group chats, schedules, memories. Open-source.
+short_description: Self-hosted AI companion social world. Open-source.
 tags:
   - ai-companion
   - social-simulation

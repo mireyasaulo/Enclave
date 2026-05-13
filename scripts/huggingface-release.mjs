@@ -117,7 +117,7 @@ function buildContext(options) {
     dataset,
     model,
     spaceUrl: `https://huggingface.co/spaces/${space.repoId}`,
-    spaceAppUrl: `https://${spaceSubdomain(space.owner, space.name)}.hf.space`,
+    spaceAppUrl: `https://${spaceSubdomain(space.owner, space.name)}.static.hf.space`,
     datasetUrl: `https://huggingface.co/datasets/${dataset.repoId}`,
     modelUrl: `https://huggingface.co/${model.repoId}`,
     deployUrl: `${options.githubUrl}/blob/main/DEPLOY.md`,
