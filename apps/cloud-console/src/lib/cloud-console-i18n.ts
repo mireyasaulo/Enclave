@@ -348,6 +348,7 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     mobile: "移动端",
     wechat: "微信",
     "(no phone)": "（无手机号）",
+    "(no email)": "（无邮箱）",
     "Code:": "邀请码：",
     "Status:": "状态：",
     "IP:": "IP：",
