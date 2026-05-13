@@ -1842,10 +1842,12 @@ export class MomentsService implements OnModuleInit {
 
   // ============= MiniMax 音乐贴 / 视频贴 =============
 
-  // 当前 minimax token plan 不覆盖 /v1/lyrics_generation，每次必回 2013
-  // invalid params，所以默认直接用本地 composeMusicLyrics。把 minimax 路径
-  // 留在 MINIMAX_LYRICS_ENABLED=true 之后，等升级了 plan 再打开。
-  // 不再走 LLM (n1n) 兜底，避免一首歌 = 一次额外 n1n 调用的放大。
+  // Tier 1: MiniMax /v1/lyrics_generation（tokenplan 已覆盖；短 prompt ≤290 字符）
+  // Tier 2 + 3: ai.generatePlainText —— 由 AiOrchestratorService 内部 provider 链
+  //   primary (tokenplan MiniMax-M2.7) → fallback (n1n) 自动切换
+  // Tier 4: 本地 composeMusicLyrics 模板，作为 generatePlainText 的 fallback 字符串
+  // 调用前提：scheduleMinimaxMusicMoment 已经验证音乐配额非空；音乐配额耗尽时
+  // 不会进到这里，所以这里不重复 gate。
   private async generateLyricsOrFallback(
     characterId: string,
     characterName: string,
@@ -1854,17 +1856,21 @@ export class MomentsService implements OnModuleInit {
   ): Promise<string> {
     const { theme, style } = pickThemeAndStyle(characterId);
     const minimaxLyricsEnabled =
-      (process.env.MINIMAX_LYRICS_ENABLED ?? '').toLowerCase() === 'true';
+      (process.env.MINIMAX_LYRICS_ENABLED ?? 'true').toLowerCase() !== 'false';
+    const prompt = composeLyricsPrompt({
+      name: characterName,
+      theme,
+      style,
+      seedText,
+    });
+    const localFallback = composeMusicLyrics(
+      characterName,
+      `${theme}：${seedText}`,
+    );
 
     if (minimaxLyricsEnabled && this.minimaxClient.isConfigured()) {
       const reserved = await this.minimaxQuota.tryReserve('lyrics');
       if (reserved) {
-        const prompt = composeLyricsPrompt({
-          name: characterName,
-          theme,
-          style,
-          seedText,
-        });
         try {
           const result = await this.minimaxClient.generateLyrics({ prompt });
           await this.minimaxQuota.commit('lyrics');
@@ -1875,15 +1881,46 @@ export class MomentsService implements OnModuleInit {
         } catch (err) {
           await this.minimaxQuota.release('lyrics');
           this.logger.warn(
-            `minimax lyrics failed, using local fallback: ${(err as Error)?.message}`,
+            `minimax lyrics endpoint failed, falling back to LLM: ${(err as Error)?.message}`,
           );
         }
       } else {
-        this.logger.debug('lyrics quota exhausted, using local fallback');
+        this.logger.debug(
+          'minimax lyrics quota exhausted, falling back to LLM',
+        );
       }
     }
 
-    return composeMusicLyrics(characterName, `${theme}：${seedText}`);
+    try {
+      const text = await this.ai.generatePlainText({
+        prompt,
+        usageContext: {
+          surface: 'app',
+          scene: 'minimax_music_lyrics_fallback',
+          scopeType: 'character',
+          scopeId: characterId,
+          scopeLabel: characterName,
+          characterId,
+          characterName,
+        },
+        maxTokens: 600,
+        temperature: 0.9,
+        fallback: localFallback,
+      });
+      const cleaned = ensureVerseChorus(text);
+      if (cleaned) {
+        this.logger.log(
+          `lyrics via LLM fallback for ${characterName} [theme=${theme}]`,
+        );
+        return cleaned;
+      }
+    } catch (err) {
+      this.logger.warn(
+        `LLM lyrics fallback failed: ${(err as Error)?.message}`,
+      );
+    }
+
+    return localFallback;
   }
 
   async scheduleMinimaxMusicMoment(
@@ -2404,6 +2441,28 @@ function composeMusicLyrics(_characterName: string, seedText: string): string {
   const verse = lines.slice(0, Math.ceil(lines.length / 2)).join('\n');
   const chorus = lines.slice(Math.ceil(lines.length / 2)).join('\n');
   return `\n[verse]\n${verse}\n[chorus]\n${chorus || verse}\n`;
+}
+
+// LLM 兜底出的歌词偶尔会缺段标或带多余前后缀。
+// - 含 [verse] + [chorus] 直接用
+// - 缺段标但有内容：前半行包成 verse、后半行包成 chorus
+// - 完全空：返回空串，让上层走 localFallback
+function ensureVerseChorus(raw: string): string {
+  const trimmed = (raw || '').trim();
+  if (!trimmed) return '';
+  const lower = trimmed.toLowerCase();
+  if (lower.includes('[verse]') && lower.includes('[chorus]')) {
+    return trimmed.startsWith('\n') ? trimmed : `\n${trimmed}\n`;
+  }
+  const lines = trimmed
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter((s) => s && !/^\[[a-z]+\]$/i.test(s));
+  if (lines.length < 2) return '';
+  const half = Math.max(1, Math.ceil(lines.length / 2));
+  const verse = lines.slice(0, half).join('\n');
+  const chorus = lines.slice(half).join('\n') || verse;
+  return `\n[verse]\n${verse}\n[chorus]\n${chorus}\n`;
 }
 
 // 把角色档案 + 当前活动 + 最近事件 + LLM 情境一起塞进视频 prompt，
