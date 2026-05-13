@@ -255,12 +255,19 @@ export class MinimaxClient {
   async generateLyrics(
     input: MinimaxLyricsInput,
   ): Promise<MinimaxLyricsResult> {
+    // mode 是必填字段；缺它 minimax 一律回 2013 invalid params。
+    // 顶层字段：lyrics / song_title / style_tags（response 不再嵌在 data 里）。
     const response = await this.postJson<{
-      data?: { lyrics?: string };
+      lyrics?: string;
+      song_title?: string;
+      style_tags?: string;
       base_resp?: MinimaxBaseResp;
-    }>('/v1/lyrics_generation', { prompt: input.prompt });
+    }>('/v1/lyrics_generation', {
+      mode: input.mode ?? 'write_full_song',
+      prompt: input.prompt,
+    });
     this.assertSuccess(response.base_resp, 'lyrics generation');
-    const lyrics = response.data?.lyrics?.trim();
+    const lyrics = response.lyrics?.trim();
     if (!lyrics) {
       throw new MinimaxClientError(
         'MINIMAX_LYRICS_EMPTY',
@@ -268,7 +275,11 @@ export class MinimaxClient {
         true,
       );
     }
-    return { lyrics };
+    return {
+      lyrics,
+      songTitle: response.song_title?.trim() || undefined,
+      styleTags: response.style_tags?.trim() || undefined,
+    };
   }
 
   // MiniMax-M2.7 是 reasoning model：max_tokens 包含 reasoning_tokens，
