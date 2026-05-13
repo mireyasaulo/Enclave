@@ -258,6 +258,10 @@ export function CharactersPage() {
   }
 
   function openCharacterInRegistry(characterId: string) {
+    setSearch("");
+    setFriendFilter("all");
+    setStatusFilter("all");
+    setRelationshipFilter("all");
     setSelectedCharacterId(characterId);
     setWorkspaceTab("registry");
   }
