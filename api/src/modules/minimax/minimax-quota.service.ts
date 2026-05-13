@@ -7,9 +7,12 @@ import { getDailyLimit, TOKEN_PLAN_DAILY_LIMITS } from './minimax-quota.constant
 
 const SHANGHAI_OFFSET_MINUTES = 8 * 60;
 
-function todayInShanghai(): string {
-  const now = new Date();
-  const shifted = new Date(now.getTime() + SHANGHAI_OFFSET_MINUTES * 60 * 1000);
+export function todayInShanghai(): string {
+  return shanghaiDateOf(new Date());
+}
+
+export function shanghaiDateOf(date: Date): string {
+  const shifted = new Date(date.getTime() + SHANGHAI_OFFSET_MINUTES * 60 * 1000);
   const y = shifted.getUTCFullYear();
   const m = String(shifted.getUTCMonth() + 1).padStart(2, '0');
   const d = String(shifted.getUTCDate()).padStart(2, '0');
@@ -24,15 +27,22 @@ export interface QuotaSnapshot {
   remaining: number;
 }
 
+const EXHAUSTED_CACHE_TTL_MS = 30_000;
+
 @Injectable()
 export class MinimaxQuotaService {
   private readonly logger = new Logger(MinimaxQuotaService.name);
   // 当日已经告警过的 "model:date" key，跨日期自然失效（key 含日期）
   private readonly warnedToday = new Set<string>();
-  // minimax 返回 2056 (今日额度已耗尽) 之后，本地把该 model 标记为"今天用完"，
-  // 后续 tryReserve 直接返回 false，避免持续打无效请求。key=model:Shanghai-day，
-  // 跨日自然失效（次日 0:00 后 key 变化）。
+  // 内存层熔断：minimax 返回 2056/1042 后立即写入，避免热路径反复打 DB。
+  // 同时 markExhaustedToday 也持久化到 DB（exhaustedAt 列），跨进程/重启共享。
+  // key=model:Shanghai-day，跨日自然失效。
   private readonly exhaustedToday = new Set<string>();
+  // DB 查询结果缓存：每个 key 最多查一次 / TTL，避免 tryReserve 热路径反复 SELECT。
+  private readonly exhaustedDbCache = new Map<
+    string,
+    { value: boolean; expiresAt: number }
+  >();
 
   constructor(
     @InjectRepository(MinimaxQuotaEntity)
@@ -43,20 +53,73 @@ export class MinimaxQuotaService {
     return `${model}:${todayInShanghai()}`;
   }
 
-  // 当 minimax 真的回 2056（usage limit exceeded）时，调用方在 catch 里调这个，
-  // 把该 model 标记为今日耗尽。set 是进程内 in-memory，重启会丢；丢了的代价是
-  // 下次 cron 会再打一次必败请求验证一遍 — 可接受。
-  markExhaustedToday(model: string): void {
+  // 当 minimax 真的回 2056/1042 时，调用方在 catch 里调这个。
+  // 写两处：1) 进程内 Set；2) DB row.exhaustedAt（让其他 child / 重启后的本进程能看见）。
+  async markExhaustedToday(model: string): Promise<void> {
     const key = this.exhaustedKey(model);
-    if (this.exhaustedToday.has(key)) return;
-    this.exhaustedToday.add(key);
-    this.logger.warn(
-      `minimax model=${model} marked exhausted for ${todayInShanghai()} (Shanghai); skipping all reservations until next-day reset`,
-    );
+    if (!this.exhaustedToday.has(key)) {
+      this.exhaustedToday.add(key);
+      this.logger.warn(
+        `minimax model=${model} marked exhausted for ${todayInShanghai()} (Shanghai); skipping all reservations until next-day reset`,
+      );
+    }
+    // 同步把 DB cache 翻成 true（哪怕 DB 写失败也不影响本进程立刻熔断）
+    this.exhaustedDbCache.set(key, {
+      value: true,
+      expiresAt: Date.now() + EXHAUSTED_CACHE_TTL_MS,
+    });
+
+    const usageDate = todayInShanghai();
+    try {
+      await this.repo.manager.transaction(async (mgr) => {
+        const row = await mgr.findOne(MinimaxQuotaEntity, {
+          where: { model, usageDate },
+        });
+        if (!row) {
+          const created = mgr.create(MinimaxQuotaEntity, {
+            model,
+            usageDate,
+            reserved: 0,
+            committed: 0,
+            exhaustedAt: new Date(),
+          });
+          await mgr.save(created);
+          return;
+        }
+        if (row.exhaustedAt) return;
+        await mgr.update(MinimaxQuotaEntity, row.id, { exhaustedAt: new Date() });
+      });
+    } catch (err) {
+      // DB 写失败仅记日志：内存层已经熔断，重启后还能再撞一次 2056 重置而已。
+      this.logger.warn(
+        `markExhaustedToday DB persist failed model=${model}: ${(err as Error)?.message}`,
+      );
+    }
   }
 
-  isExhaustedToday(model: string): boolean {
-    return this.exhaustedToday.has(this.exhaustedKey(model));
+  async isExhaustedToday(model: string): Promise<boolean> {
+    const key = this.exhaustedKey(model);
+    if (this.exhaustedToday.has(key)) return true;
+    const cached = this.exhaustedDbCache.get(key);
+    if (cached && cached.expiresAt > Date.now()) return cached.value;
+    let value = false;
+    try {
+      const row = await this.repo.findOne({
+        where: { model, usageDate: todayInShanghai() },
+      });
+      value = !!row?.exhaustedAt;
+      if (value) this.exhaustedToday.add(key);
+    } catch (err) {
+      // DB 失败时返回 false：宁可多打一次必败请求，也不让热路径卡住
+      this.logger.warn(
+        `isExhaustedToday DB lookup failed model=${model}: ${(err as Error)?.message}`,
+      );
+    }
+    this.exhaustedDbCache.set(key, {
+      value,
+      expiresAt: Date.now() + EXHAUSTED_CACHE_TTL_MS,
+    });
+    return value;
   }
 
   // 配额耗尽预警：reserve 成功后，如果剩余 ≤ 1，写一次性 warn 日志，
@@ -87,7 +150,7 @@ export class MinimaxQuotaService {
       this.logger.warn(`tryReserve unknown model=${model}`);
       return false;
     }
-    if (this.isExhaustedToday(model)) {
+    if (await this.isExhaustedToday(model)) {
       // 今天已经被 minimax 服务端确认耗尽，直接拒绝，避免再打一次必败请求。
       return false;
     }

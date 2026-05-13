@@ -1899,9 +1899,9 @@ export class MomentsService implements OnModuleInit {
             err instanceof MinimaxClientError &&
             err.code === 'MINIMAX_QUOTA_EXHAUSTED'
           ) {
-            this.minimaxQuota.markExhaustedToday('lyrics');
-            this.minimaxQuota.markExhaustedToday('music-2.6');
-            this.minimaxQuota.markExhaustedToday('music-2.5');
+            await this.minimaxQuota.markExhaustedToday('lyrics');
+            await this.minimaxQuota.markExhaustedToday('music-2.6');
+            await this.minimaxQuota.markExhaustedToday('music-2.5');
             throw new MusicQuotaExhaustedError(
               `token plan exhausted via lyrics 2056; skip music moment for ${characterName}`,
             );
@@ -1910,7 +1910,7 @@ export class MomentsService implements OnModuleInit {
             `minimax lyrics endpoint failed, falling back to minimax LLM: ${(err as Error)?.message}`,
           );
         }
-      } else if (this.minimaxQuota.isExhaustedToday('lyrics')) {
+      } else if (await this.minimaxQuota.isExhaustedToday('lyrics')) {
         // 之前已经撞过 2056 被本地标死 → 同 token plan 的 music 也用不了，整条放弃。
         throw new MusicQuotaExhaustedError(
           `lyrics quota already exhausted today; skip music moment for ${characterName}`,
