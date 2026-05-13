@@ -33,6 +33,7 @@ import {
 import {
   Button,
   Card,
+  cn,
   ErrorBlock,
   InlineNotice,
   ListItemCard,
@@ -579,169 +580,213 @@ export function DashboardPage() {
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="order-2 space-y-6 xl:order-1">
+          <div className="sticky top-0 z-20 -mx-1 flex flex-wrap gap-2 rounded-2xl bg-[color:var(--surface-page)]/95 px-1 py-2 backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-page)]/80">
+            {[
+              {
+                label: t(msg`值班总览`),
+                ref: overviewSectionRef,
+              },
+              {
+                label: t(msg`运行体征`),
+                ref: runtimeSectionRef,
+              },
+              {
+                label: t(msg`运营信号`),
+                ref: signalsSectionRef,
+              },
+              {
+                label: t(msg`调度与实时`),
+                ref: schedulerSectionRef,
+              },
+              {
+                label: t(msg`调试与运维`),
+                ref: operationsSectionRef,
+              },
+            ].map((item) => (
+              <button
+                key={String(item.label)}
+                type="button"
+                onClick={() => scrollToDashboardSection(item.ref)}
+                className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-1.5 text-sm font-medium text-[color:var(--text-secondary)] shadow-[var(--shadow-soft)] transition hover:border-[color:var(--border-subtle)] hover:bg-[color:var(--surface-card-hover)] hover:text-[color:var(--text-primary)]"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
           <div ref={overviewSectionRef} className="scroll-mt-24 space-y-4">
             <Card className="overflow-hidden bg-[linear-gradient(135deg,rgba(255,255,255,0.98),rgba(255,247,235,0.92)_45%,rgba(237,250,244,0.96))]">
-              <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]">
-                <div>
-                  <AdminEyebrow>{t(msg`运营值班首页`)}</AdminEyebrow>
-                  <h2 className="mt-3 text-3xl font-semibold text-[color:var(--text-primary)]">
-                    {heroTitle}
-                  </h2>
-                  <p className="mt-3 max-w-3xl text-sm leading-7 text-[color:var(--text-secondary)]">
-                    {nextActionMessage}
-                  </p>
+              <AdminEyebrow>{t(msg`运营值班首页`)}</AdminEyebrow>
+              <h2 className="mt-3 text-3xl font-semibold text-[color:var(--text-primary)]">
+                {heroTitle}
+              </h2>
+              <p className="mt-3 max-w-3xl text-sm leading-7 text-[color:var(--text-secondary)]">
+                {nextActionMessage}
+              </p>
 
-                  <div className="mt-6 flex flex-wrap gap-3">
-                    <Link to={primaryActionHref}>
-                      <Button
-                        variant="primary"
-                        size="lg"
-                        className="rounded-2xl"
-                      >
-                        {primaryActionLabel}
-                      </Button>
-                    </Link>
-                    <Link to="/characters">
-                      <Button
-                        variant="secondary"
-                        size="lg"
-                        className="rounded-2xl"
-                      >
-                        {t(msg`查看角色中心`)}
-                      </Button>
-                    </Link>
-                    <Link to="/reply-logic">
-                      <Button
-                        variant="secondary"
-                        size="lg"
-                        className="rounded-2xl"
-                      >
-                        {t(msg`排查回复逻辑`)}
-                      </Button>
-                    </Link>
-                  </div>
+              <div className="mt-6 grid gap-3 md:grid-cols-2">
+                <AdminCompactStatusCard
+                  label={t(msg`Core API`)}
+                  value={systemHealthy ? t(msg`健康`) : t(msg`待恢复`)}
+                  tone={systemHealthy ? "healthy" : "warning"}
+                />
+                <AdminCompactStatusCard
+                  label={t(msg`推理服务`)}
+                  value={
+                    providerConfigured ? t(msg`已配置`) : t(msg`待配置`)
+                  }
+                  tone={providerConfigured ? "healthy" : "warning"}
+                />
+                <AdminCompactStatusCard
+                  label={t(msg`数字人`)}
+                  value={
+                    digitalHumanSummary.ready
+                      ? t(msg`正常`)
+                      : t(msg`待补齐`)
+                  }
+                  tone={digitalHumanSummary.ready ? "healthy" : "warning"}
+                />
+                <AdminCompactStatusCard
+                  label={t(msg`世界主人`)}
+                  value={
+                    ownerCount === 1
+                      ? t(msg`单世界`)
+                      : ownerCount === null
+                        ? t(msg`待确认`)
+                        : t(msg`${ownerCount} 个`)
+                  }
+                  tone={ownerCount === 1 ? "healthy" : "warning"}
+                />
+              </div>
+            </Card>
 
-                  <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                    <AdminCompactStatusCard
-                      label={t(msg`Core API`)}
-                      value={systemHealthy ? t(msg`健康`) : t(msg`待恢复`)}
-                      tone={systemHealthy ? "healthy" : "warning"}
-                    />
-                    <AdminCompactStatusCard
-                      label={t(msg`推理服务`)}
-                      value={
-                        providerConfigured ? t(msg`已配置`) : t(msg`待配置`)
-                      }
-                      tone={providerConfigured ? "healthy" : "warning"}
-                    />
-                    <AdminCompactStatusCard
-                      label={t(msg`数字人`)}
-                      value={
-                        digitalHumanSummary.ready
-                          ? t(msg`正常`)
-                          : t(msg`待补齐`)
-                      }
-                      tone={digitalHumanSummary.ready ? "healthy" : "warning"}
-                    />
-                    <AdminCompactStatusCard
-                      label={t(msg`世界主人`)}
-                      value={
-                        ownerCount === 1
-                          ? t(msg`单世界`)
-                          : ownerCount === null
-                            ? t(msg`待确认`)
-                            : t(msg`${ownerCount} 个`)
-                      }
-                      tone={ownerCount === 1 ? "healthy" : "warning"}
-                    />
-                  </div>
-                </div>
-
-                <div className="rounded-[28px] border border-white/80 bg-white/70 p-5 shadow-[var(--shadow-card)]">
-                  <AdminEyebrow>{t(msg`本班结论`)}</AdminEyebrow>
-                  <div className="mt-3 flex items-center gap-3">
-                    <div className="text-3xl font-semibold text-[color:var(--text-primary)]">
-                      {overallLabel}
-                    </div>
+            {/* Row 2: 本班结论 + 实例体征摘要 */}
+            <div className="grid gap-4 xl:grid-cols-2">
+              <Card className="bg-[color:var(--surface-console)]">
+                <AdminSectionHeader
+                  title={t(msg`本班结论`)}
+                  actions={
                     <StatusPill tone={overallTone}>
                       {overallTone === "healthy"
                         ? t(msg`可继续`)
                         : t(msg`待处理`)}
                     </StatusPill>
-                  </div>
-                  <p className="mt-3 text-sm leading-7 text-[color:var(--text-secondary)]">
-                    {overallSummary}
-                  </p>
-
-                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                    <MetricCard
-                      className="border-0 bg-transparent p-0 shadow-none"
-                      label={t(msg`阻塞项`)}
-                      value={blockerCount}
-                      detail={t(msg`优先影响接下来能否继续操作`)}
-                    />
-                    <MetricCard
-                      className="border-0 bg-transparent p-0 shadow-none"
-                      label={t(msg`关注项`)}
-                      value={watchItemCount}
-                      detail={t(msg`建议本班内完成复核`)}
-                    />
-                    <MetricCard
-                      className="border-0 bg-transparent p-0 shadow-none"
-                      label={t(msg`在线角色`)}
-                      value={`${onlineCharacterCount}/${totalCharacters}`}
-                      detail={t(msg`当前抽查到的在线角色占比`)}
-                    />
-                    <MetricCard
-                      className="border-0 bg-transparent p-0 shadow-none"
-                      label={t(msg`内容产出`)}
-                      value={`${momentsQuery.data?.length ?? 0}/${feedQuery.data?.total ?? 0}`}
-                      detail={t(msg`朋友圈 / 广场动态总数`)}
-                    />
-                  </div>
-
-                  <InlineNotice
-                    className="mt-4"
-                    tone={dutyIssues.length ? "warning" : "success"}
-                  >
-                    {dutyIssues.length
-                      ? t(
-                          msg`优先从“待处理队列”第一项开始处理。当前首项为：${pendingIssueTitle}。`,
-                        )
-                      : t(
-                          msg`当前没有高优先级阻塞，建议下一步进入评测页验证最新生成链，或抽查角色与内容样本。`,
-                        )}
-                  </InlineNotice>
+                  }
+                />
+                <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
+                  {overallSummary}
+                </p>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <MetricCard
+                    label={t(msg`阻塞项`)}
+                    value={blockerCount}
+                    detail={t(msg`优先影响接下来能否继续操作`)}
+                  />
+                  <MetricCard
+                    label={t(msg`关注项`)}
+                    value={watchItemCount}
+                    detail={t(msg`建议本班内完成复核`)}
+                  />
+                  <MetricCard
+                    label={t(msg`在线角色`)}
+                    value={`${onlineCharacterCount}/${totalCharacters}`}
+                    detail={t(msg`当前抽查到的在线角色占比`)}
+                  />
+                  <MetricCard
+                    label={t(msg`内容产出`)}
+                    value={`${momentsQuery.data?.length ?? 0}/${feedQuery.data?.total ?? 0}`}
+                    detail={t(msg`朋友圈 / 广场动态总数`)}
+                  />
                 </div>
-              </div>
+                <InlineNotice
+                  className="mt-4"
+                  tone={dutyIssues.length ? "warning" : "success"}
+                >
+                  {dutyIssues.length
+                    ? t(
+                        msg`优先从“待处理队列”第一项开始处理。当前首项为：${pendingIssueTitle}。`,
+                      )
+                    : t(
+                        msg`当前没有高优先级阻塞，建议下一步进入评测页验证最新生成链，或抽查角色与内容样本。`,
+                      )}
+                </InlineNotice>
+              </Card>
 
-              <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                <AdminJumpCard
-                  to={primaryActionHref}
-                  title={primaryActionLabel}
-                  detail={t(msg`优先处理当前实例最关键的阻塞项。`)}
-                  emphasis="primary"
-                />
-                <AdminJumpCard
-                  to="/characters"
-                  title={t(msg`进入角色中心`)}
-                  detail={t(msg`查角色状态、打开工厂或运行逻辑台。`)}
-                />
-                <AdminJumpCard
-                  to="/reply-logic"
-                  title={t(msg`查看回复逻辑`)}
-                  detail={t(msg`排查真实回复链路和全局规则。`)}
-                />
-                <AdminJumpCard
-                  to="/evals"
-                  title={t(msg`查看评测分析`)}
-                  detail={t(msg`进入 runs、compare 和 trace 工作区。`)}
-                />
-              </div>
-            </Card>
-
-            <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
               <Card className="bg-[color:var(--surface-console)]">
+                <AdminSectionHeader
+                  title={t(msg`实例体征摘要`)}
+                  actions={<AdminMetaText>{t(msg`一屏巡检`)}</AdminMetaText>}
+                />
+                <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
+                  {t(
+                    msg`把世界状态与消息体量压缩成一屏摘要，朋友圈与广场总数已合并到本班结论的内容产出格。`,
+                  )}
+                </p>
+
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <MetricCard
+                    label={t(msg`世界主人`)}
+                    value={ownerCount ?? t(msg`待确认`)}
+                    meta={
+                      <StatusPill
+                        tone={ownerCount === 1 ? "healthy" : "warning"}
+                      >
+                        {ownerCount === 1 ? t(msg`单世界`) : t(msg`异常`)}
+                      </StatusPill>
+                    }
+                  />
+                  <MetricCard
+                    label={t(msg`角色总数`)}
+                    value={totalCharacters}
+                    detail={t(msg`在线 ${onlineCharacterCount}`)}
+                  />
+                  <MetricCard
+                    label={t(msg`消息总数`)}
+                    value={adminStatsQuery.data?.totalMessages ?? 0}
+                    detail={t(msg`含全部单聊历史消息`)}
+                  />
+                  <MetricCard
+                    label={t(msg`智能回复`)}
+                    value={adminStatsQuery.data?.aiMessages ?? 0}
+                    detail={t(msg`已落库的 AI 回复条数`)}
+                  />
+                </div>
+
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <AdminSoftBox>
+                    {t(msg`版本`)}{" "}
+                    {adminSystemQuery.data?.version ??
+                      statusQuery.data?.coreApi.version ??
+                      t(msg`待探测`)}{" "}
+                    · {t(msg`运行`)}{" "}
+                    {formatUptime(adminSystemQuery.data?.uptimeSeconds, t)}
+                  </AdminSoftBox>
+                  <AdminSoftBox>
+                    {t(msg`数据库`)}{" "}
+                    {typeof adminSystemQuery.data?.dbSizeBytes === "number"
+                      ? `${(adminSystemQuery.data.dbSizeBytes / 1024 / 1024).toFixed(1)} MB`
+                      : t(msg`待探测`)}{" "}
+                    · Node{" "}
+                    {adminSystemQuery.data?.nodeVersion ?? t(msg`待探测`)}
+                  </AdminSoftBox>
+                </div>
+
+                <AdminDetailPanel className="mt-4" title={t(msg`世界上下文`)}>
+                  {worldContextSummary}
+                </AdminDetailPanel>
+              </Card>
+            </div>
+
+            {/* Row 3: 待处理队列 + 世界语言 */}
+            <div className="grid gap-4 xl:grid-cols-2">
+              <Card
+                className={cn(
+                  "bg-[color:var(--surface-console)]",
+                  dutyIssues.length
+                    ? "border-l-4 border-amber-300"
+                    : undefined,
+                )}
+              >
                 <AdminSectionHeader
                   title={t(msg`待处理队列`)}
                   actions={
@@ -760,10 +805,15 @@ export function DashboardPage() {
 
                 <div className="mt-4 space-y-3">
                   {dutyIssues.length ? (
-                    dutyIssues.map((issue) => (
+                    dutyIssues.map((issue, index) => (
                       <AdminRecordCard
                         key={issue.key}
                         title={issue.title}
+                        className={
+                          index === 0
+                            ? "ring-2 ring-amber-300/70 bg-[color:var(--surface-card-hover)]"
+                            : undefined
+                        }
                         badges={
                           <StatusPill tone={issue.tone}>
                             {issue.statusLabel}
@@ -774,13 +824,16 @@ export function DashboardPage() {
                         actions={
                           issue.to ? (
                             <Link to={issue.to}>
-                              <Button variant="secondary" size="sm">
+                              <Button
+                                variant={index === 0 ? "primary" : "secondary"}
+                                size="sm"
+                              >
                                 {issue.actionLabel ?? t(msg`去处理`)}
                               </Button>
                             </Link>
                           ) : issue.onAction ? (
                             <Button
-                              variant="secondary"
+                              variant={index === 0 ? "primary" : "secondary"}
                               size="sm"
                               onClick={issue.onAction}
                             >
@@ -809,87 +862,14 @@ export function DashboardPage() {
                 </div>
               </Card>
 
-              <Card className="bg-[color:var(--surface-console)]">
-                <AdminSectionHeader
-                  title={t(msg`实例体征摘要`)}
-                  actions={<AdminMetaText>{t(msg`一屏巡检`)}</AdminMetaText>}
-                />
-                <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                  {t(
-                    msg`把世界状态、内容产出、消息体量和运行版本压缩成一屏摘要，避免重复扫读多块卡片。`,
-                  )}
-                </p>
-
-                <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  <MetricCard
-                    label={t(msg`世界主人`)}
-                    value={ownerCount ?? t(msg`待确认`)}
-                    meta={
-                      <StatusPill
-                        tone={ownerCount === 1 ? "healthy" : "warning"}
-                      >
-                        {ownerCount === 1 ? t(msg`单世界`) : t(msg`异常`)}
-                      </StatusPill>
-                    }
-                  />
-                  <MetricCard
-                    label={t(msg`角色总数`)}
-                    value={totalCharacters}
-                    detail={t(msg`在线 ${onlineCharacterCount}`)}
-                  />
-                  <MetricCard
-                    label={t(msg`消息总数`)}
-                    value={adminStatsQuery.data?.totalMessages ?? 0}
-                    detail={t(msg`含全部单聊历史消息`)}
-                  />
-                  <MetricCard
-                    label={t(msg`智能回复`)}
-                    value={adminStatsQuery.data?.aiMessages ?? 0}
-                    detail={t(msg`已落库的 AI 回复条数`)}
-                  />
-                  <MetricCard
-                    label={t(msg`朋友圈`)}
-                    value={momentsQuery.data?.length ?? 0}
-                    detail={t(msg`当前世界动态总数`)}
-                  />
-                  <MetricCard
-                    label={t(msg`广场动态`)}
-                    value={feedQuery.data?.total ?? 0}
-                    detail={t(msg`公开内容总数`)}
-                  />
-                </div>
-
-                <div className="mt-4 grid gap-3 md:grid-cols-2">
-                  <AdminSoftBox>
-                    {t(msg`版本`)}{" "}
-                    {adminSystemQuery.data?.version ??
-                      statusQuery.data?.coreApi.version ??
-                      t(msg`待探测`)}{" "}
-                    · {t(msg`运行`)}{" "}
-                    {formatUptime(adminSystemQuery.data?.uptimeSeconds, t)}
-                  </AdminSoftBox>
-                  <AdminSoftBox>
-                    {t(msg`数据库`)}{" "}
-                    {typeof adminSystemQuery.data?.dbSizeBytes === "number"
-                      ? `${(adminSystemQuery.data.dbSizeBytes / 1024 / 1024).toFixed(1)} MB`
-                      : t(msg`待探测`)}{" "}
-                    · Node{" "}
-                    {adminSystemQuery.data?.nodeVersion ?? t(msg`待探测`)}
-                  </AdminSoftBox>
-                  <AdminSoftBox className="md:col-span-2">
-                    {t(msg`迁移模块`)}：
-                    {statusQuery.data?.worldSurface.migratedModules.join(
-                      "、",
-                    ) ?? t(msg`待迁移`)}
-                  </AdminSoftBox>
-                </div>
-
-                <AdminDetailPanel className="mt-4" title={t(msg`世界上下文`)}>
-                  {worldContextSummary}
-                </AdminDetailPanel>
-              </Card>
-
-              <Card className="bg-[color:var(--surface-console)] xl:col-span-2">
+              <Card
+                className={cn(
+                  "bg-[color:var(--surface-console)]",
+                  worldLanguageDirty
+                    ? "border-l-4 border-amber-300"
+                    : undefined,
+                )}
+              >
                 <AdminSectionHeader
                   title={t(msg`世界语言`)}
                   actions={
@@ -906,7 +886,7 @@ export function DashboardPage() {
                   )}
                 </p>
 
-                <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.75fr)]">
+                <div className="mt-4 grid gap-3">
                   <AdminSelectField
                     label={t(msg`目标世界语言`)}
                     value={worldLanguageDraft}
@@ -919,7 +899,7 @@ export function DashboardPage() {
                       label: `${item.nativeLabel} / ${item.label}`,
                     }))}
                   />
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                  <div className="grid gap-3 md:grid-cols-2">
                     <MetricCard
                       label={t(msg`当前生效`)}
                       value={worldLanguageLabel}
@@ -991,6 +971,31 @@ export function DashboardPage() {
                   )}
                 </InlineNotice>
               </Card>
+            </div>
+
+            {/* Row 4: 快捷跳转 (2x2) */}
+            <div className="grid gap-3 md:grid-cols-2">
+              <AdminJumpCard
+                to={primaryActionHref}
+                title={primaryActionLabel}
+                detail={t(msg`优先处理当前实例最关键的阻塞项。`)}
+                emphasis="primary"
+              />
+              <AdminJumpCard
+                to="/characters"
+                title={t(msg`进入角色中心`)}
+                detail={t(msg`查角色状态、打开工厂或运行逻辑台。`)}
+              />
+              <AdminJumpCard
+                to="/reply-logic"
+                title={t(msg`查看回复逻辑`)}
+                detail={t(msg`排查真实回复链路和全局规则。`)}
+              />
+              <AdminJumpCard
+                to="/evals"
+                title={t(msg`查看评测分析`)}
+                detail={t(msg`进入 runs、compare 和 trace 工作区。`)}
+              />
             </div>
           </div>
 
@@ -1115,23 +1120,6 @@ export function DashboardPage() {
                       : t(msg`正在读取桌面运行时诊断...`)
                     : t(msg`当前不是桌面壳环境，桌面托管诊断不可用。`)}
                 </AdminDetailPanel>
-
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <Link to="/setup">
-                    <Button variant="primary" size="lg" className="rounded-2xl">
-                      {t(msg`打开运行设置`)}
-                    </Button>
-                  </Link>
-                  <Link to="/evals">
-                    <Button
-                      variant="secondary"
-                      size="lg"
-                      className="rounded-2xl"
-                    >
-                      {t(msg`前往评测验证`)}
-                    </Button>
-                  </Link>
-                </div>
               </Card>
 
               <Card className="bg-[color:var(--surface-console)]">
@@ -1218,33 +1206,6 @@ export function DashboardPage() {
                   {digitalHumanSummary.nextStep}
                 </InlineNotice>
 
-                <AdminDetailPanel className="mt-4" title={t(msg`评测运行时`)}>
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="text-2xl font-semibold text-[color:var(--text-primary)]">
-                      {t(
-                        msg`${evalOverviewQuery.data?.runCount ?? 0} 次运行 / ${evalOverviewQuery.data?.traceCount ?? 0} 条链路`,
-                      )}
-                    </div>
-                    <Link to="/evals">
-                      <Button variant="secondary" size="sm">
-                        {t(msg`打开评测页`)}
-                      </Button>
-                    </Link>
-                  </div>
-                  <div className="mt-3 grid gap-2 md:grid-cols-3">
-                    <div>
-                      {t(msg`数据集`)}：
-                      {evalOverviewQuery.data?.datasetCount ?? 0}
-                    </div>
-                    <div>
-                      {t(msg`失败运行`)}：{failedEvalCount}
-                    </div>
-                    <div>
-                      {t(msg`回退链路`)}：
-                      {evalOverviewQuery.data?.fallbackTraceCount ?? 0}
-                    </div>
-                  </div>
-                </AdminDetailPanel>
               </Card>
             </div>
           </div>
@@ -1260,38 +1221,7 @@ export function DashboardPage() {
               )}
             />
 
-            <Card className="bg-[color:var(--surface-console)]">
-              <AdminSectionHeader
-                title={t(msg`角色与内容摘要`)}
-                actions={<AdminMetaText>{t(msg`抽查入口`)}</AdminMetaText>}
-              />
-              <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                <MetricCard
-                  label={t(msg`在线角色`)}
-                  value={onlineCharacterCount}
-                  detail={t(msg`总角色 ${totalCharacters}`)}
-                />
-                <MetricCard
-                  label={t(msg`朋友圈总数`)}
-                  value={momentsQuery.data?.length ?? 0}
-                  detail={t(msg`最新动态已纳入抽查范围`)}
-                />
-                <MetricCard
-                  label={t(msg`广场动态`)}
-                  value={feedQuery.data?.total ?? 0}
-                  detail={t(msg`公开内容样本可直接抽查`)}
-                />
-                <MetricCard
-                  label={t(msg`评测运行`)}
-                  value={evalOverviewQuery.data?.runCount ?? 0}
-                  detail={t(
-                    msg`Trace ${evalOverviewQuery.data?.traceCount ?? 0}`,
-                  )}
-                />
-              </div>
-            </Card>
-
-            <div className="grid gap-6 xl:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2">
               <Card className="bg-[color:var(--surface-console)]">
                 <AdminSectionHeader
                   title={t(msg`角色抽查`)}
@@ -1416,6 +1346,45 @@ export function DashboardPage() {
                   )}
                 </div>
               </Card>
+
+              <Card className="bg-[color:var(--surface-console)]">
+                <AdminSectionHeader
+                  title={t(msg`评测运行时`)}
+                  actions={
+                    <Link to="/evals">
+                      <Button variant="secondary" size="sm">
+                        {t(msg`打开评测页`)}
+                      </Button>
+                    </Link>
+                  }
+                />
+                <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
+                  {t(
+                    msg`${evalOverviewQuery.data?.runCount ?? 0} 次运行 / ${evalOverviewQuery.data?.traceCount ?? 0} 条链路`,
+                  )}
+                </p>
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <MetricCard
+                    label={t(msg`数据集`)}
+                    value={evalOverviewQuery.data?.datasetCount ?? 0}
+                  />
+                  <MetricCard
+                    label={t(msg`失败运行`)}
+                    value={failedEvalCount}
+                  />
+                  <MetricCard
+                    label={t(msg`回退链路`)}
+                    value={evalOverviewQuery.data?.fallbackTraceCount ?? 0}
+                  />
+                  <MetricCard
+                    label={t(msg`运行总数`)}
+                    value={evalOverviewQuery.data?.runCount ?? 0}
+                    detail={t(
+                      msg`Trace ${evalOverviewQuery.data?.traceCount ?? 0}`,
+                    )}
+                  />
+                </div>
+              </Card>
             </div>
           </div>
 
@@ -1459,11 +1428,18 @@ export function DashboardPage() {
                 <AdminSectionHeader
                   title={t(msg`调度工作台`)}
                   actions={
-                    <StatusPill
-                      tone={hasSchedulerIssues ? "warning" : "healthy"}
-                    >
-                      {hasSchedulerIssues ? t(msg`有异常`) : t(msg`稳定`)}
-                    </StatusPill>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <StatusPill tone="muted">
+                        {t(
+                          msg`模式：${schedulerQuery.data?.mode ?? t(msg`待初始化`)}`,
+                        )}
+                      </StatusPill>
+                      <StatusPill
+                        tone={hasSchedulerIssues ? "warning" : "healthy"}
+                      >
+                        {hasSchedulerIssues ? t(msg`有异常`) : t(msg`稳定`)}
+                      </StatusPill>
+                    </div>
                   }
                 />
                 <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
@@ -1472,11 +1448,7 @@ export function DashboardPage() {
                   )}
                 </p>
 
-                <div className="mt-4 grid gap-3 md:grid-cols-3">
-                  <MetricCard
-                    label={t(msg`模式`)}
-                    value={schedulerQuery.data?.mode ?? t(msg`待初始化`)}
-                  />
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
                   <MetricCard
                     label={t(msg`启用任务`)}
                     value={enabledSchedulerJobCount}
@@ -1546,12 +1518,14 @@ export function DashboardPage() {
                               job.id,
                               job.nextRunHint,
                               t,
-                            )}
+                            )}{" "}
+                            · {t(msg`最近执行`)}{" "}
+                            {job.lastRunAt ?? t(msg`尚未执行`)}
                           </AdminMetaText>
                         </>
                       }
                       footer={
-                        <div className="grid gap-2 md:grid-cols-3">
+                        <div className="grid gap-2 md:grid-cols-2">
                           <AdminSoftBox>
                             {t(msg`运行次数`)}：{job.runCount}
                           </AdminSoftBox>
@@ -1560,10 +1534,6 @@ export function DashboardPage() {
                             {job.lastDurationMs
                               ? `${job.lastDurationMs} ms`
                               : t(msg`尚未执行`)}
-                          </AdminSoftBox>
-                          <AdminSoftBox>
-                            {t(msg`最近执行`)}：
-                            {job.lastRunAt ?? t(msg`尚未执行`)}
                           </AdminSoftBox>
                         </div>
                       }
@@ -1744,32 +1714,9 @@ export function DashboardPage() {
                 />
                 <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
                   {t(
-                    msg`这里只是直连当前 provider 的原始调试入口，不走角色运行时，也不是角色 system prompt 的编辑入口。`,
+                    msg`直连当前 provider 的原始调试入口，不走角色运行时；推理状态详情请见"运行体征 / 模型、数字人与验证"。`,
                   )}
                 </p>
-
-                <div className="mt-4 grid gap-3 md:grid-cols-3">
-                  <MetricCard
-                    label={t(msg`当前推理服务`)}
-                    value={
-                      providerConfigQuery.data?.model ??
-                      statusQuery.data?.inferenceGateway.activeProvider ??
-                      t(msg`尚未配置`)
-                    }
-                  />
-                  <MetricCard
-                    label={t(msg`最近成功时间`)}
-                    value={
-                      statusQuery.data?.inferenceGateway.lastSuccessAt ??
-                      t(msg`暂无`)
-                    }
-                  />
-                  <MetricCard
-                    label={t(msg`队列深度`)}
-                    value={statusQuery.data?.inferenceGateway.queueDepth ?? 0}
-                    detail={t(msg`错误：${inferenceGatewayLastError}`)}
-                  />
-                </div>
 
                 <InlineNotice
                   className="mt-4"
@@ -1789,72 +1736,64 @@ export function DashboardPage() {
                           )}
                 </InlineNotice>
 
-                <form
-                  className="mt-4 space-y-4"
-                  onSubmit={previewForm.handleSubmit((values) =>
-                    previewMutation.mutate(values),
-                  )}
+                <AdminDetailPanel
+                  className="mt-4"
+                  title={t(msg`调试输入与输出`)}
                 >
-                  <label className="block text-sm text-[color:var(--text-secondary)]">
-                    {t(msg`附加 System Prompt（调试用，可留空）`)}
-                    <TextAreaField
-                      className="mt-2 min-h-24"
-                      {...previewForm.register("systemPrompt")}
-                    />
-                  </label>
-                  <label className="block text-sm text-[color:var(--text-secondary)]">
-                    {t(msg`输入内容`)}
-                    <TextAreaField
-                      className="mt-2 min-h-32"
-                      {...previewForm.register("prompt")}
-                    />
-                  </label>
-                  <Button
-                    className="w-full rounded-2xl bg-[linear-gradient(135deg,#22c55e,#86efac)] text-slate-950"
-                    type="submit"
-                    disabled={previewMutation.isPending}
+                  <form
+                    className="space-y-4"
+                    onSubmit={previewForm.handleSubmit((values) =>
+                      previewMutation.mutate(values),
+                    )}
                   >
-                    {previewMutation.isPending
-                      ? t(msg`预览执行中...`)
-                      : t(msg`执行推理预览`)}
-                  </Button>
-                </form>
+                    <label className="block text-sm text-[color:var(--text-secondary)]">
+                      {t(msg`附加 System Prompt（调试用，可留空）`)}
+                      <TextAreaField
+                        className="mt-2 min-h-24"
+                        {...previewForm.register("systemPrompt")}
+                      />
+                    </label>
+                    <label className="block text-sm text-[color:var(--text-secondary)]">
+                      {t(msg`输入内容`)}
+                      <TextAreaField
+                        className="mt-2 min-h-32"
+                        {...previewForm.register("prompt")}
+                      />
+                    </label>
+                    <Button
+                      className="w-full rounded-2xl bg-[linear-gradient(135deg,#22c55e,#86efac)] text-slate-950"
+                      type="submit"
+                      disabled={previewMutation.isPending}
+                    >
+                      {previewMutation.isPending
+                        ? t(msg`预览执行中...`)
+                        : t(msg`执行推理预览`)}
+                    </Button>
+                  </form>
 
-                <div className="mt-4 grid gap-3">
-                  <AdminDetailPanel
-                    title={t(msg`结果`)}
-                    contentClassName="whitespace-pre-wrap text-[color:var(--text-primary)]"
-                  >
-                    {previewMutation.data
-                      ? (previewMutation.data.output ??
-                        previewMutation.data.error ??
-                        t(msg`预览未返回任何输出。`))
-                      : previewMutation.isError &&
-                          previewMutation.error instanceof Error
-                        ? previewMutation.error.message
-                        : t(msg`用当前生效的推理服务配置运行一条预览提示词。`)}
-                  </AdminDetailPanel>
-                  <div className="grid gap-3 md:grid-cols-3">
-                    <MetricCard
-                      label={t(msg`模型`)}
-                      value={
-                        previewMutation.data?.model ??
+                  <div className="mt-4 space-y-3">
+                    <AdminSoftBox className="whitespace-pre-wrap text-[color:var(--text-primary)]">
+                      {previewMutation.data
+                        ? (previewMutation.data.output ??
+                          previewMutation.data.error ??
+                          t(msg`预览未返回任何输出。`))
+                        : previewMutation.isError &&
+                            previewMutation.error instanceof Error
+                          ? previewMutation.error.message
+                          : t(msg`用当前生效的推理服务配置运行一条预览提示词。`)}
+                    </AdminSoftBox>
+                    <AdminSoftBox>
+                      {t(msg`模型`)}{" "}
+                      {previewMutation.data?.model ??
                         statusQuery.data?.inferenceGateway.activeProvider ??
-                        t(msg`待执行`)
-                      }
-                    />
-                    <MetricCard
-                      label={t(msg`结束原因`)}
-                      value={
-                        previewMutation.data?.finishReason ?? t(msg`待执行`)
-                      }
-                    />
-                    <MetricCard
-                      label={t(msg`令牌数`)}
-                      value={previewMutation.data?.usage?.totalTokens ?? 0}
-                    />
+                        t(msg`待执行`)}{" "}
+                      · {t(msg`结束原因`)}{" "}
+                      {previewMutation.data?.finishReason ?? t(msg`待执行`)} ·{" "}
+                      {t(msg`令牌数`)}{" "}
+                      {previewMutation.data?.usage?.totalTokens ?? 0}
+                    </AdminSoftBox>
                   </div>
-                </div>
+                </AdminDetailPanel>
               </Card>
 
               <div className="space-y-6">
@@ -1993,7 +1932,7 @@ export function DashboardPage() {
                   <StatusPill tone={overallTone}>{overallLabel}</StatusPill>
                 }
               />
-              <div className="mt-4 grid gap-3">
+              <div className="mt-4 grid gap-3 grid-cols-2">
                 <AdminSoftBox>
                   {t(msg`阻塞项`)}：{blockerCount}
                 </AdminSoftBox>
@@ -2022,17 +1961,19 @@ export function DashboardPage() {
               items={[
                 {
                   label: t(msg`值班总览`),
-                  detail: t(msg`先看当前结论、待处理队列和实例体征摘要。`),
+                  detail: t(
+                    msg`Hero · 本班结论 · 实例体征 · 待处理队列 · 世界语言 · 跳转。`,
+                  ),
                   onClick: () => scrollToDashboardSection(overviewSectionRef),
                 },
                 {
                   label: t(msg`运行体征`),
-                  detail: t(msg`查看 Core API、模型、数字人与评测运行时。`),
+                  detail: t(msg`查看 Core API、模型与数字人链路状态。`),
                   onClick: () => scrollToDashboardSection(runtimeSectionRef),
                 },
                 {
                   label: t(msg`运营信号`),
-                  detail: t(msg`抽查角色、朋友圈和广场动态最新样本。`),
+                  detail: t(msg`抽查角色、朋友圈、广场动态与评测运行时。`),
                   onClick: () => scrollToDashboardSection(signalsSectionRef),
                 },
                 {
@@ -2047,50 +1988,6 @@ export function DashboardPage() {
                 },
               ]}
             />
-
-            <Card className="bg-[color:var(--surface-console)]">
-              <AdminSectionHeader title={t(msg`快捷动作`)} />
-              <div className="mt-4 grid gap-3">
-                <QuickActionLink
-                  to="/setup"
-                  label={t(msg`打开运行设置`)}
-                  detail={t(msg`恢复实例、补齐 Provider、检查数字人参数。`)}
-                  action={t(msg`进入`)}
-                />
-                <QuickActionLink
-                  to="/characters"
-                  label={t(msg`打开角色中心`)}
-                  detail={t(msg`抽查角色在线状态、画像和运行工作区。`)}
-                  action={t(msg`进入`)}
-                />
-                <QuickActionLink
-                  to="/reply-logic"
-                  label={t(msg`打开回复逻辑`)}
-                  detail={t(msg`查看真实回复链路、规则和常量。`)}
-                  action={t(msg`进入`)}
-                />
-                <QuickActionLink
-                  to="/evals"
-                  label={t(msg`打开评测分析`)}
-                  detail={t(msg`验证生成链路质量，定位失败样本。`)}
-                  action={t(msg`进入`)}
-                />
-                <button
-                  type="button"
-                  onClick={() => scrollToDashboardSection(schedulerSectionRef)}
-                  className="rounded-[20px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] px-4 py-3 text-left shadow-[var(--shadow-soft)] transition hover:border-[color:var(--border-subtle)] hover:bg-[color:var(--surface-card-hover)]"
-                >
-                  <div className="font-semibold text-[color:var(--text-primary)]">
-                    {t(msg`跳到调度排查`)}
-                  </div>
-                  <div className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
-                    {t(
-                      msg`当前有调度异常或需要手动触发 job 时，直接回到对应工作区。`,
-                    )}
-                  </div>
-                </button>
-              </div>
-            </Card>
           </div>
         </div>
       </div>
@@ -2116,36 +2013,6 @@ function DashboardSectionLead({
       <p className="mt-2 max-w-3xl text-sm leading-7 text-[color:var(--text-secondary)]">
         {description}
       </p>
-    </div>
-  );
-}
-
-function QuickActionLink({
-  to,
-  label,
-  detail,
-  action,
-}: {
-  to: DashboardRoute;
-  label: ReactNode;
-  detail: ReactNode;
-  action?: ReactNode;
-}) {
-  return (
-    <div className="rounded-[20px] border border-[color:var(--border-faint)] bg-[color:var(--surface-card)] p-4 shadow-[var(--shadow-soft)]">
-      <div className="font-semibold text-[color:var(--text-primary)]">
-        {label}
-      </div>
-      <div className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-        {detail}
-      </div>
-      <div className="mt-4">
-        <Link to={to}>
-          <Button variant="secondary" size="sm">
-            {action}
-          </Button>
-        </Link>
-      </div>
     </div>
   );
 }
