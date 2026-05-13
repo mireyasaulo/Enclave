@@ -65,9 +65,9 @@ import {
   extractNoteTextFromHtml,
   filterAssetsByHtml,
   isFavoriteNoteMissingError,
+  isNoteContentEmpty,
   mergeNoteAssets,
   normalizeEditorHtml,
-  shouldDiscardEmptyDraftForApi,
   removeFavoriteNoteRecord,
   removeFavoriteNoteSummary,
   resolveNoteTitle,
@@ -442,12 +442,27 @@ function MobileNoteEditor({
       const localDraftRaw =
         readDesktopNoteDraftByNoteId(selectedNoteId) ??
         readDesktopNoteDraft(nextDraftId);
-      const localDraft = shouldDiscardEmptyDraftForApi(
-        localDraftRaw,
-        noteQuery.data,
-      )
-        ? null
-        : localDraftRaw;
+      // 空 local draft 不能锁死初始化：旧版预创建 bug 会在 localStorage
+      // 留下空草稿，且 shouldDiscardEmptyDraftForApi 在 noteQuery.data
+      // 还没到的时候直接返回 false。如果这时用空 draft 走 if (localDraft)
+      // 分支，会立刻 setInitializedSessionKeyRef 锁定，noteQuery.data 后续
+      // 到达也不再回填——这就是"第一次点笔记不回填，第二次才回填"。
+      // 规则：
+      //   - 非空 local draft → 用户编辑成果优先
+      //   - 空 local draft + API 有数据 → 丢弃空 draft 走 API 分支
+      //   - 空 local draft + API 还在 loading → 等 API（return）
+      //   - 空 local draft + API 已结束且无数据 → 用空 draft 兜底
+      let localDraft: typeof localDraftRaw = null;
+      if (localDraftRaw) {
+        if (!isNoteContentEmpty(localDraftRaw)) {
+          localDraft = localDraftRaw;
+        } else if (!noteQuery.isLoading && !noteQuery.data) {
+          // API 已结束且无数据 → 用空 draft 兜底，可能后续走 missing-note 流程
+          localDraft = localDraftRaw;
+        }
+        // else: 空 draft + (API loading 中 / API 有数据)
+        // → 让 localDraft 保持 null，下面流程会等 API 或用 API 数据回填
+      }
       if (localDraft) {
         const treatLocalDraftAsNewNote = Boolean(missingSelectedNote);
         applyNoteSource({
