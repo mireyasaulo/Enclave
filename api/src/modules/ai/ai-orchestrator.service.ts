@@ -2746,6 +2746,7 @@ export class AiOrchestratorService {
 
   private toSpeechTranscriptionException(error: unknown) {
     if (
+      error instanceof AppError ||
       error instanceof BadRequestException ||
       error instanceof BadGatewayException ||
       error instanceof ServiceUnavailableException
@@ -2772,6 +2773,7 @@ export class AiOrchestratorService {
 
   private toSpeechSynthesisException(error: unknown) {
     if (
+      error instanceof AppError ||
       error instanceof BadRequestException ||
       error instanceof BadGatewayException ||
       error instanceof ServiceUnavailableException
@@ -2798,6 +2800,7 @@ export class AiOrchestratorService {
 
   private toImageGenerationException(error: unknown) {
     if (
+      error instanceof AppError ||
       error instanceof BadRequestException ||
       error instanceof BadGatewayException ||
       error instanceof ServiceUnavailableException
@@ -3045,6 +3048,11 @@ export class AiOrchestratorService {
       '当前实例未配置可用的 AI Key，暂时无法转写语音。',
     );
 
+    const [transcriptionLanguage, transcriptionPrompt] = await Promise.all([
+      this.worldLanguage.getTranscriptionLanguageCode(),
+      this.worldLanguage.getTranscriptionPrompt(),
+    ]);
+
     for (let index = 0; index < attempts.length; index += 1) {
       const attempt = attempts[index];
       const provider = attempt.provider;
@@ -3053,13 +3061,10 @@ export class AiOrchestratorService {
       }
 
       attemptedProvider = true;
-      const [transcriptionLanguage, transcriptionPrompt] = await Promise.all([
-        this.worldLanguage.getTranscriptionLanguageCode(),
-        this.worldLanguage.getTranscriptionPrompt(),
-      ]);
       const client = new OpenAI({
         apiKey: provider.transcriptionApiKey,
         baseURL: provider.transcriptionEndpoint,
+        maxRetries: 0,
       });
 
       try {
@@ -3212,13 +3217,16 @@ export class AiOrchestratorService {
           apiKey: provider.ttsApiKey,
         });
         const response = await this.retrySpeechRequest('speech synthesis', () =>
-          client.audio.speech.create({
-            model: provider.ttsModel,
-            voice,
-            input: text,
-            response_format: 'mp3',
-            instructions,
-          }),
+          client.audio.speech.create(
+            {
+              model: provider.ttsModel,
+              voice,
+              input: text,
+              response_format: 'mp3',
+              instructions,
+            },
+            { maxRetries: 0 },
+          ),
         );
         const arrayBuffer = await response.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
