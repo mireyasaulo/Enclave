@@ -1090,8 +1090,9 @@ export class SchedulerService {
       }
     }
 
-    // 视频号优先：朋友圈视频只在视频额度仍有 ≥1 / 当前剩余时启动。
-    // 朋友圈视频在 MOMENT_VIDEO_COOLDOWN_DAYS 内最多 1 条（不是按自然日，是滚动窗口），
+    // 视频号优先：朋友圈视频只在剩余视频额度 > MOMENT_VIDEO_RESERVE_FOR_CHANNELS 时启动，
+    // 保证视频号 cron (generateChannelPost) 还能拿到至少 RESERVE 个名额生成视频号独有内容。
+    // 朋友圈视频在 MOMENT_VIDEO_COOLDOWN_DAYS 内最多 1 条（滚动窗口，不是自然日），
     // 配合 cloud-api per-world 配额派发，避免单 world 把朋友圈视频用完。
     const remainingVideo =
       (await this.minimaxQuota.availableToday('MiniMax-Hailuo-2.3-Fast')) +

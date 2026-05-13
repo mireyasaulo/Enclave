@@ -26,7 +26,6 @@ import {
   resolveCloudPlatformBaseUrl,
 } from "./world-bootstrap-config";
 import {
-  MinimaxKeyAllocation,
   parseMinimaxKeyPool,
   pickMinimaxKey,
 } from "./minimax-key-pool";
@@ -481,7 +480,8 @@ export class LocalProcessComputeProviderService
 
     // 算 per-world 日配额并注入 env：共享同一 key 的 N 个 world 公平分摊单 key 日限额；
     // 配额 < world 数时 dispatcher 做日轮换，保证每个 world 都能轮到。
-    // dispatcher 自带兜底，不会抛错。
+    // dispatcher 对 pool=空 / myAlloc=null 有兜底逻辑，但底层 worldRepo.find() 仍可能
+    // 抛 db 错误（连接异常等）—— catch 住后 child 走 fallback 限额。
     try {
       const share = await this.minimaxQuotaDispatcher.computeWorldDailyShare(world.id);
       env.MINIMAX_DAILY_LIMIT_HAILUO_FAST = String(share.hailuoFast);
