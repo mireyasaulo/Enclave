@@ -46,7 +46,7 @@ import {
 } from './moment-media.types';
 import { MinimaxJobService } from '../minimax/minimax-job.service';
 import { MinimaxQuotaService } from '../minimax/minimax-quota.service';
-import { MinimaxClient } from '../minimax/minimax.client';
+import { MinimaxClient, MinimaxClientError } from '../minimax/minimax.client';
 import { MinimaxAssetStorage } from '../minimax/minimax-asset.storage';
 import { WorldLanguageService } from '../config/world-language.service';
 import type { MinimaxJobEntity } from '../minimax/minimax-job.entity';
@@ -1883,6 +1883,13 @@ export class MomentsService implements OnModuleInit {
           return result.lyrics;
         } catch (err) {
           await this.minimaxQuota.release('lyrics');
+          // 服务端确认今日 lyrics 额度耗尽 → 标本地不再 reserve，剩余 cron tick 全跳过
+          if (
+            err instanceof MinimaxClientError &&
+            err.code === 'MINIMAX_QUOTA_EXHAUSTED'
+          ) {
+            this.minimaxQuota.markExhaustedToday('lyrics');
+          }
           this.logger.warn(
             `minimax lyrics endpoint failed, falling back to minimax LLM: ${(err as Error)?.message}`,
           );
