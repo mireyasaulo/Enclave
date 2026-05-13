@@ -47,7 +47,14 @@ function pickDefaultPresetCharacter(
       `Default preset character not found in BUILT_IN_CHARACTER_PRESETS: ${presetKey}`,
     );
   }
-  return preset.character;
+  // 与其他默认角色（self / 行动助理 / 林医生 …）保持一致：deletionPolicy='protected'
+  // 让 admin UI 的 isProtectedCharacter 和 import-by-name 覆盖检查同步识别这 6 个
+  // 为不可删除/不可覆盖。sourceType 仍保留 preset_catalog，让 listCelebrityPresets
+  // 把它们识别为"已安装的预设角色"。
+  return {
+    ...preset.character,
+    deletionPolicy: 'protected',
+  };
 }
 
 const ADDITIONAL_DEFAULT_PRESET_CHARACTERS: Partial<CharacterEntity>[] =

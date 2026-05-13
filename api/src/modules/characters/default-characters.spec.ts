@@ -241,6 +241,15 @@ describe('default characters', () => {
         expect(character).toBeDefined();
         expect(character?.sourceKey).toBe(presetKey);
       });
+
+      // 默认好友必须 deletionPolicy='protected'，admin UI 的 isProtectedCharacter
+      // 才会和后端 delete()/import-overwrite 检查对齐。
+      it('overrides deletionPolicy to "protected"', () => {
+        const character = buildDefaultCharacters().find(
+          (item) => item.id === preset!.id,
+        );
+        expect(character?.deletionPolicy).toBe('protected');
+      });
     },
   );
 });
