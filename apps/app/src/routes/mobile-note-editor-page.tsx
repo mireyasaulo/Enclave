@@ -765,14 +765,18 @@ function MobileNoteEditor({
 
   const leaveEditor = useCallback(async () => {
     navigateBackOrFallback(() => {
+      // 兜底必须用 replace：直接打开 /notes/new#...&returnPath=X 这种 URL 时
+      // history.length=1，push 会把 /notes/new 留在 history 里，用户点浏览器
+      // back 又回到编辑器再 push 再 back → 死循环出不去。
       if (safeReturnPath) {
         void navigate({
           to: safeReturnPath,
           ...(safeReturnHash ? { hash: safeReturnHash } : {}),
+          replace: true,
         });
         return;
       }
-      void navigate({ to: "/tabs/chat" });
+      void navigate({ to: "/tabs/chat", replace: true });
     });
   }, [navigate, safeReturnHash, safeReturnPath]);
 
