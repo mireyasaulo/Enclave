@@ -333,9 +333,9 @@ function FilePreviewCard({
 
       {expertDomains.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
-          {expertDomains.slice(0, 6).map((d) => (
+          {expertDomains.slice(0, 6).map((d, idx) => (
             <span
-              key={d}
+              key={`${d}-${idx}`}
               className="rounded-full bg-[color:var(--surface-soft)] px-2 py-0.5 text-[10px] text-[color:var(--text-secondary)]"
             >
               {d}
