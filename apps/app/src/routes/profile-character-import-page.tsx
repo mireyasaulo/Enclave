@@ -55,6 +55,19 @@ export function ProfileCharacterImportPage() {
     // 清掉之前的预览和结果，避免新文件解析失败时还残留上一张预览卡误导用户
     setResult(null);
     setPreview(null);
+    // 防御性：bundle 实际只有几十 KB，超过 5 MB 几乎一定是用户选错文件
+    // （视频、压缩包等）。早早 reject 避免 file.text() 把上 GB 内容读到
+    // 浏览器内存里把页面卡死。
+    const MAX_BYTES = 5 * 1024 * 1024;
+    if (file.size > MAX_BYTES) {
+      setResult({
+        kind: "danger",
+        message: t(
+          msg`文件太大（${formatFileSize(file.size)}），上限 5 MB。确认是 .character.json 文件后再试。`,
+        ),
+      });
+      return;
+    }
     let text: string;
     try {
       text = await file.text();

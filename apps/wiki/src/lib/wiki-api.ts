@@ -855,7 +855,10 @@ export const wikiApi = {
     document.body.appendChild(a);
     a.click();
     a.remove();
-    URL.revokeObjectURL(url);
+    // 不要同步 revoke：Safari / iOS 上 a.click() 异步派发下载，立即 revoke
+    // 会让下载在真正开始前失效。延迟到下一帧已足够 Chrome / Firefox /
+    // Safari 全平台稳定下载。
+    setTimeout(() => URL.revokeObjectURL(url), 500);
   },
   /** 上传一个 JSON 文件，按 name upsert 到当前用户的私有角色。 */
   async importMyCharacter(
