@@ -5,6 +5,15 @@ import type {
   TokenUsageBreakdownItem,
   TokenUsageBreakdownResponse,
 } from "@yinjie/contracts";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { CloudAdminErrorBlock } from "../components/cloud-admin-error-block";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
 import { useCloudConsoleText } from "../lib/cloud-console-i18n";
@@ -76,7 +85,8 @@ export function TokenUsageWorldDetailPage() {
     ? pickDimension(breakdown, dimension)
     : [];
 
-  const dailyTotals = (dailyQuery.data ?? []).reduce(
+  const dailyRows = dailyQuery.data ?? [];
+  const dailyTotals = dailyRows.reduce(
     (acc, row) => ({
       tokens: acc.tokens + row.totalTokens,
       cost: acc.cost + row.estimatedCost,
@@ -101,9 +111,9 @@ export function TokenUsageWorldDetailPage() {
               {worldId}
             </h1>
             <p className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              {t(
-                "Drill into one world's LLM token consumption by character, model, scene, and conversation.",
-              )}
+              {t("Request count")}: {formatNumber(dailyTotals.requests)}
+              {" · "}
+              {dailyRows.length} {t("days")}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -126,21 +136,70 @@ export function TokenUsageWorldDetailPage() {
       </section>
 
       <section className={SECTION}>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <SmallStat
-            label={t("Total tokens")}
-            value={formatNumber(dailyTotals.tokens)}
-          />
+        <div className="grid gap-3 sm:grid-cols-2">
           <SmallStat
             label={t("Estimated cost")}
             value={formatCost(dailyTotals.cost, currency)}
           />
           <SmallStat
-            label={t("Request count")}
-            value={formatNumber(dailyTotals.requests)}
+            label={t("Total tokens")}
+            value={formatNumber(dailyTotals.tokens)}
           />
         </div>
       </section>
+
+      {dailyRows.length > 0 && (
+        <section className={SECTION}>
+          <div className="text-sm font-semibold text-[color:var(--text-primary)]">
+            {t("Daily trends")}
+          </div>
+          <div className="mt-3" style={{ width: "100%", height: 220 }}>
+            <ResponsiveContainer>
+              <LineChart
+                data={dailyRows.map((row) => ({
+                  date: row.bucketDate,
+                  totalTokens: row.totalTokens,
+                  estimatedCost: Math.round(row.estimatedCost * 100) / 100,
+                }))}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="date" stroke="#64748b" fontSize={11} />
+                <YAxis
+                  yAxisId="tokens"
+                  stroke="#64748b"
+                  fontSize={11}
+                  allowDecimals={false}
+                />
+                <YAxis
+                  yAxisId="cost"
+                  orientation="right"
+                  stroke="#64748b"
+                  fontSize={11}
+                />
+                <Tooltip />
+                <Line
+                  yAxisId="tokens"
+                  type="monotone"
+                  dataKey="totalTokens"
+                  name={t("Total tokens")}
+                  stroke="#0ea5e9"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  yAxisId="cost"
+                  type="monotone"
+                  dataKey="estimatedCost"
+                  name={t("Estimated cost")}
+                  stroke="#f97316"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+      )}
 
       <section className={SECTION}>
         <div className="flex flex-wrap items-center justify-between gap-3">
