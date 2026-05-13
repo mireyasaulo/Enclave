@@ -61,10 +61,15 @@ const MAX_DOCUMENT_EXTRACTED_TEXT_CHARS = 1800;
 const ACCEPTED_AUDIO_MIME_TYPES = new Set([
   'audio/mp4',
   'audio/x-m4a',
+  'audio/aac',
   'audio/mpeg',
+  'audio/mp3',
   'audio/ogg',
   'audio/wav',
+  'audio/wave',
+  'audio/x-wav',
   'audio/webm',
+  'audio/flac',
   'video/mp4',
   'video/quicktime',
   'video/webm',
@@ -3021,7 +3026,11 @@ export class AiOrchestratorService {
       });
     }
 
-    if (file.mimetype && !ACCEPTED_AUDIO_MIME_TYPES.has(file.mimetype)) {
+    const normalizedMimeType = file.mimetype
+      ?.split(';')[0]
+      .trim()
+      .toLowerCase();
+    if (normalizedMimeType && !ACCEPTED_AUDIO_MIME_TYPES.has(normalizedMimeType)) {
       throw new AppError('AI_TRANSCRIBE_FORMAT_INVALID', {
         legacyMessage: '当前录音格式暂不支持，请改用系统默认录音格式。',
       });
