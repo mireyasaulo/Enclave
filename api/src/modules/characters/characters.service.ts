@@ -416,6 +416,9 @@ export class CharactersService implements OnModuleInit {
    * - 按 name 在 characters 表里 upsert（同名→覆盖；不存在→新建）
    * - 自动给 world-owner 建 friendship（已存在则保留 intimacy/status）
    * - sourceType 写 'private_import'，sourceKey 记录原 name
+   *
+   * undefined 字段 = "bundle 里没写"，对已存在角色不动；string '' / [] / {} =
+   * 显式置空。这样保证 round-trip 后未提供的字段不会被意外清空。
    */
   async importPersonalCharacter(input: {
     name: string;
@@ -431,6 +434,7 @@ export class CharactersService implements OnModuleInit {
     const trimmedName = (input.name ?? '').trim();
     if (!trimmedName) {
       throw new AppError('PRIVATE_IMPORT_INVALID', {
+        status: HttpStatus.BAD_REQUEST,
         legacyMessage: '导入文件缺少 name 字段。',
       });
     }
@@ -439,21 +443,41 @@ export class CharactersService implements OnModuleInit {
       where: { name: trimmedName },
     });
 
-    const baseFields: Partial<CharacterEntity> = {
-      name: trimmedName,
-      avatar: input.avatar ?? '',
-      bio: input.bio ?? '',
-      personality: input.personality ?? undefined,
-      relationship: input.relationship ?? trimmedName,
-      relationshipType: input.relationshipType ?? 'friend',
-      expertDomains: input.expertDomains ?? [],
-      triggerScenes: input.triggerScenes ?? undefined,
-      profile: input.profile ?? ({} as PersonalityProfile),
-    };
+    // 不允许覆盖受保护角色（如 default_seed 的「我自己」）— 避免破坏系统角色
+    if (existing && existing.deletionPolicy === 'protected') {
+      throw new AppError('PRIVATE_IMPORT_NAME_RESERVED', {
+        status: HttpStatus.CONFLICT,
+        legacyMessage: `世界里已存在受保护的同名角色 "${trimmedName}"，无法覆盖。请改用其他名字。`,
+      });
+    }
+
+    // Patch：只放 input 里"实际提供"的字段；undefined 表示缺失，跳过。
+    const patch: Partial<CharacterEntity> = {};
+    if (typeof input.avatar === 'string') patch.avatar = input.avatar;
+    if (typeof input.bio === 'string') patch.bio = input.bio;
+    if (input.personality !== undefined) {
+      patch.personality = input.personality ?? undefined;
+    }
+    if (typeof input.relationship === 'string') {
+      patch.relationship = input.relationship;
+    }
+    if (typeof input.relationshipType === 'string') {
+      patch.relationshipType = input.relationshipType;
+    }
+    if (Array.isArray(input.expertDomains)) {
+      patch.expertDomains = input.expertDomains;
+    }
+    if (input.triggerScenes !== undefined) {
+      patch.triggerScenes = input.triggerScenes ?? undefined;
+    }
+    if (input.profile !== undefined && input.profile !== null) {
+      patch.profile = input.profile;
+    }
 
     let saved: CharacterEntity;
     if (existing) {
-      Object.assign(existing, baseFields);
+      Object.assign(existing, patch);
+      existing.name = trimmedName;
       saved = await this.repo.save(existing);
     } else {
       const newId = `private-${Date.now()}-${Math.random()
@@ -462,6 +486,13 @@ export class CharactersService implements OnModuleInit {
       saved = await this.repo.save(
         this.repo.create({
           id: newId,
+          name: trimmedName,
+          avatar: '',
+          bio: '',
+          relationship: trimmedName,
+          relationshipType: 'friend',
+          expertDomains: [],
+          profile: {} as PersonalityProfile,
           sourceType: 'private_import',
           sourceKey: trimmedName,
           deletionPolicy: 'archive_allowed',
@@ -477,7 +508,7 @@ export class CharactersService implements OnModuleInit {
           activityMode: 'auto',
           modelRoutingMode: 'inherit_default',
           allowOwnerKeyOverride: true,
-          ...baseFields,
+          ...patch,
         } as Partial<CharacterEntity>),
       );
     }

@@ -126,25 +126,28 @@ function parsePrivateCharacterImportBody(payload: unknown): {
       legacyMessage: '导入文件缺少 name 字段。',
     });
   }
+  // 缺失字段一律返回 undefined（不返回 null/空），由 service 决定是否跳过。
+  // 这样 round-trip 后 bundle 里没写的字段不会把已存在角色的字段清空。
   return {
     name,
-    avatar: typeof p.avatar === 'string' ? p.avatar : '',
-    bio: typeof p.bio === 'string' ? p.bio : '',
-    personality: typeof p.personality === 'string' ? p.personality : null,
-    relationship: typeof p.relationship === 'string' ? p.relationship : '',
+    avatar: typeof p.avatar === 'string' ? p.avatar : undefined,
+    bio: typeof p.bio === 'string' ? p.bio : undefined,
+    personality: typeof p.personality === 'string' ? p.personality : undefined,
+    relationship:
+      typeof p.relationship === 'string' ? p.relationship : undefined,
     relationshipType:
-      typeof p.relationshipType === 'string' ? p.relationshipType : 'friend',
+      typeof p.relationshipType === 'string' ? p.relationshipType : undefined,
     expertDomains: Array.isArray(p.expertDomains)
       ? (p.expertDomains as unknown[]).filter(
           (x): x is string => typeof x === 'string',
         )
-      : [],
+      : undefined,
     triggerScenes: Array.isArray(p.triggerScenes)
       ? (p.triggerScenes as unknown[]).filter(
           (x): x is string => typeof x === 'string',
         )
-      : null,
+      : undefined,
     profile:
-      p.profile && typeof p.profile === 'object' ? p.profile : null,
+      p.profile && typeof p.profile === 'object' ? p.profile : undefined,
   };
 }

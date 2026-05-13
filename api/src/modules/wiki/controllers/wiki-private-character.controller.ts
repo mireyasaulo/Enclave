@@ -89,9 +89,6 @@ export class WikiPrivateCharacterController {
     @Body() body: unknown,
   ) {
     const dto = this.service.parseImportBundle(body);
-    const before = await this.service.listForOwner(user.id);
-    const overwrote = before.some((r) => r.name === dto.name);
-    const saved = await this.service.upsertByName(user.id, dto);
-    return { record: saved, overwrote };
+    return this.service.upsertByName(user.id, dto);
   }
 }
