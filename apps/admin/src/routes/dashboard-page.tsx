@@ -56,7 +56,6 @@ import {
   AdminPanelEmpty,
   AdminRecordCard,
   AdminSectionHeader,
-  AdminSectionNav,
   AdminSelectField,
   AdminSoftBox,
 } from "../components/admin-workbench";
@@ -575,9 +574,17 @@ export function DashboardPage() {
         />
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="order-2 space-y-6 xl:order-1">
-          <div className="sticky top-[140px] z-10 -mx-1 flex flex-nowrap items-center gap-2 overflow-x-auto rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)]/95 px-2 py-2 shadow-[var(--shadow-soft)] backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-card)]/80 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:top-20">
+      {successNotice ? (
+        <div className="fixed bottom-6 right-6 z-30 max-w-md">
+          <AdminActionFeedback
+            tone="success"
+            title={t(msg`操作已完成`)}
+            description={successNotice}
+          />
+        </div>
+      ) : null}
+
+      <div className="sticky top-[140px] z-10 -mx-1 flex flex-nowrap items-center gap-2 overflow-x-auto rounded-2xl border border-[color:var(--border-faint)] bg-[color:var(--surface-card)]/95 px-2 py-2 shadow-[var(--shadow-soft)] backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-card)]/80 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:top-20">
             {[
               {
                 label: t(msg`值班总览`),
@@ -1876,53 +1883,6 @@ export function DashboardPage() {
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="order-1 xl:order-2">
-          <div className="space-y-4 xl:sticky xl:top-6">
-            {successNotice ? (
-              <AdminActionFeedback
-                tone="success"
-                title={t(msg`操作已完成`)}
-                description={successNotice}
-              />
-            ) : null}
-
-            <AdminSectionNav
-              title={t(msg`页面导航`)}
-              items={[
-                {
-                  label: t(msg`值班总览`),
-                  detail: t(
-                    msg`Hero · 本班结论 · 实例体征 · 待处理队列 · 世界语言 · 跳转。`,
-                  ),
-                  onClick: () => scrollToDashboardSection(overviewSectionRef),
-                },
-                {
-                  label: t(msg`运行体征`),
-                  detail: t(msg`查看 Core API、模型与数字人链路状态。`),
-                  onClick: () => scrollToDashboardSection(runtimeSectionRef),
-                },
-                {
-                  label: t(msg`运营信号`),
-                  detail: t(msg`抽查角色、朋友圈、广场动态与评测运行时。`),
-                  onClick: () => scrollToDashboardSection(signalsSectionRef),
-                },
-                {
-                  label: t(msg`调度与实时`),
-                  detail: t(msg`排查 job 失败、活跃房间和实时事件。`),
-                  onClick: () => scrollToDashboardSection(schedulerSectionRef),
-                },
-                {
-                  label: t(msg`调试与运维`),
-                  detail: t(msg`做推理预览、导出诊断和日志查看。`),
-                  onClick: () => scrollToDashboardSection(operationsSectionRef),
-                },
-              ]}
-            />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
