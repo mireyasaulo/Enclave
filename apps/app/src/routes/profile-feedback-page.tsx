@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -53,12 +53,22 @@ export function ProfileFeedbackPage() {
   const [detail, setDetail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
+  const navTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (isDesktopLayout) {
       void navigate({ to: "/desktop/feedback", replace: true });
     }
   }, [isDesktopLayout, navigate]);
+
+  useEffect(() => {
+    return () => {
+      if (navTimeoutRef.current !== null) {
+        clearTimeout(navTimeoutRef.current);
+        navTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   const categoryOptions = useMemo(
     () =>
@@ -108,7 +118,11 @@ export function ProfileFeedbackPage() {
         tone: "success",
         message: t(msg`反馈已提交，感谢你的支持`),
       });
-      setTimeout(() => {
+      if (navTimeoutRef.current !== null) {
+        clearTimeout(navTimeoutRef.current);
+      }
+      navTimeoutRef.current = setTimeout(() => {
+        navTimeoutRef.current = null;
         void navigate({ to: "/tabs/profile" });
       }, 1500);
     } catch (error) {
@@ -186,7 +200,10 @@ export function ProfileFeedbackPage() {
             type="text"
             value={title}
             maxLength={TITLE_MAX}
-            onChange={(event) => setTitle(event.target.value)}
+            onChange={(event) => {
+              setTitle(event.target.value);
+              if (notice?.tone === "danger") setNotice(null);
+            }}
             placeholder={t(msg`一句话描述问题`)}
             className="w-full rounded-[12px] border border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-[14px] text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-muted)] focus:border-[#15803d]"
           />
@@ -202,7 +219,10 @@ export function ProfileFeedbackPage() {
           <textarea
             value={detail}
             maxLength={DETAIL_MAX}
-            onChange={(event) => setDetail(event.target.value)}
+            onChange={(event) => {
+              setDetail(event.target.value);
+              if (notice?.tone === "danger") setNotice(null);
+            }}
             placeholder={t(
               msg`说说你看到了什么、期望是什么，越具体越好，比如：在哪个页面、怎么复现、希望的结果`,
             )}
