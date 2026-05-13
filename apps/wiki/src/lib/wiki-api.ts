@@ -828,6 +828,19 @@ export const wikiApi = {
       },
     );
     if (!res.ok) {
+      // 401 → 走和 request() 一致的清 session + 跳登录流程，避免用户停在
+      // 一个看不懂的"导出失败 (401)"上。
+      if (res.status === 401) {
+        clearSession();
+        if (
+          typeof window !== "undefined" &&
+          !window.location.pathname.startsWith("/login") &&
+          !window.location.pathname.startsWith("/register")
+        ) {
+          const redirect = window.location.pathname + window.location.search;
+          window.location.href = `/login?redirect=${encodeURIComponent(redirect)}`;
+        }
+      }
       throw new WikiApiError(res.status, null, `导出失败 (${res.status})`);
     }
     const blob = await res.blob();

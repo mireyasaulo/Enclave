@@ -113,6 +113,7 @@ import { WikiProtectionLogEntity } from './modules/wiki/entities/wiki-protection
 import { WikiTalkThreadEntity } from './modules/wiki/entities/wiki-talk-thread.entity';
 import { WikiTalkPostEntity } from './modules/wiki/entities/wiki-talk-post.entity';
 import { WikiWatchlistEntity } from './modules/wiki/entities/wiki-watchlist.entity';
+import { UserPrivateCharacterEntity } from './modules/wiki/entities/user-private-character.entity';
 import { WikiFieldProtectionEntity } from './modules/wiki/entities/wiki-field-protection.entity';
 import { AbuseFilterEntity } from './modules/wiki/entities/abuse-filter.entity';
 import { AbuseFilterHitEntity } from './modules/wiki/entities/abuse-filter-hit.entity';
@@ -227,6 +228,7 @@ import {
           WikiTalkThreadEntity,
           WikiTalkPostEntity,
           WikiWatchlistEntity,
+          UserPrivateCharacterEntity,
           WikiFieldProtectionEntity,
           AbuseFilterEntity,
           AbuseFilterHitEntity,

@@ -3,7 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  Header,
   Param,
   Post,
   Put,
@@ -64,7 +63,6 @@ export class WikiPrivateCharacterController {
   }
 
   @Get(':id/export')
-  @Header('Content-Type', 'application/json; charset=utf-8')
   async exportOne(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
@@ -76,9 +74,15 @@ export class WikiPrivateCharacterController {
       0,
       80,
     );
+    const baseName = safeName || 'character';
+    // ASCII fallback：非 ASCII 字符替换成 '_'，保证老浏览器也能拿到合法 filename。
+    // 同时按 RFC 5987 给 filename*=UTF-8''…，modern 浏览器优先用它，正确显示中文。
+    const asciiName = baseName.replace(/[^\x20-\x7E]/g, '_');
+    const utf8Encoded = encodeURIComponent(baseName);
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename="${encodeURIComponent(safeName || 'character')}.character.json"`,
+      `attachment; filename="${asciiName}.character.json"; filename*=UTF-8''${utf8Encoded}.character.json`,
     );
     res.send(JSON.stringify(bundle, null, 2));
   }
