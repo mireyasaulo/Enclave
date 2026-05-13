@@ -262,6 +262,10 @@ export function WorldsPage() {
   const queryFilter = filters.query;
 
   function updateFilters(next: Partial<WorldsRouteSearch>) {
+    // 任何 filter 变化都把页码拉回第 1 页，否则用户在第 5 页改筛选条件可能
+    // 落到不相关的子集深处；useEffect 里的 clamp 只在 totalPages 缩到当前页之
+    // 外时才会触发
+    setPage(1);
     void navigate({
       replace: true,
       search: (previous) => buildWorldsRouteSearch({ ...previous, ...next }),

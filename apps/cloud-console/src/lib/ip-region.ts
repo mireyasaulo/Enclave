@@ -23,15 +23,24 @@ interface IpWhoIsResponse {
 function classifyLocalIp(ip: string): IpRegionInfo | null {
   const trimmed = ip.trim();
   if (!trimmed) return null;
-  if (trimmed === "127.0.0.1" || trimmed === "::1" || trimmed.startsWith("127."))
-    return makeLocal("本机");
+  if (trimmed === "::1" || trimmed.startsWith("127.")) return makeLocal("本机");
   if (trimmed.startsWith("10.")) return makeLocal("内网 (10/8)");
   if (trimmed.startsWith("192.168.")) return makeLocal("内网 (192.168/16)");
-  const m = trimmed.match(/^172\.(\d{1,3})\./);
-  if (m) {
-    const second = Number(m[1]);
+  if (trimmed.startsWith("169.254.")) return makeLocal("链路本地 (169.254/16)");
+  const m172 = trimmed.match(/^172\.(\d{1,3})\./);
+  if (m172) {
+    const second = Number(m172[1]);
     if (second >= 16 && second <= 31) return makeLocal("内网 (172.16/12)");
   }
+  // CGNAT 100.64.0.0/10：中国移动/联通 4G/5G 客户端常见
+  const m100 = trimmed.match(/^100\.(\d{1,3})\./);
+  if (m100) {
+    const second = Number(m100[1]);
+    if (second >= 64 && second <= 127) return makeLocal("CGNAT (100.64/10)");
+  }
+  // IPv6 link-local fe80::/10, unique-local fc00::/7
+  if (/^fe[89ab][0-9a-f]?:/i.test(trimmed)) return makeLocal("IPv6 链路本地");
+  if (/^f[cd][0-9a-f]{2}:/i.test(trimmed)) return makeLocal("IPv6 ULA");
   if (/^(::ffff:)?(0\.|255\.)/.test(trimmed)) return makeLocal("保留段");
   return null;
 }
@@ -75,20 +84,29 @@ function localizeCountry(
   return fallback?.trim() || null;
 }
 
-function composeDisplay(info: Omit<IpRegionInfo, "display">): string {
+function composeDisplay(
+  info: Omit<IpRegionInfo, "display">,
+  ipFallback: string,
+): string {
   const parts: string[] = [];
   if (info.country) parts.push(info.country);
   if (info.region && info.region !== info.country) parts.push(info.region);
   if (info.city && info.city !== info.region) parts.push(info.city);
-  return parts.length ? parts.join(" · ") : "未知";
+  // API 命中但所有字段都空（bogon / 内网穿透 IP 等），退回展示原始 IP
+  return parts.length ? parts.join(" · ") : ipFallback;
 }
 
-async function fetchIpRegion(ip: string): Promise<IpRegionInfo> {
+async function fetchIpRegion(
+  ip: string,
+  signal?: AbortSignal,
+): Promise<IpRegionInfo> {
   const local = classifyLocalIp(ip);
   if (local) return local;
 
   // ipwho.is 免费无 key，支持 HTTPS + CORS，命中失败也返回 200，依赖 success 字段
-  const response = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}`);
+  const response = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}`, {
+    signal,
+  });
   if (!response.ok) {
     throw new Error(`ipwho.is HTTP ${response.status}`);
   }
@@ -104,14 +122,14 @@ async function fetchIpRegion(ip: string): Promise<IpRegionInfo> {
     region: data.region ?? null,
     city: data.city ?? null,
   };
-  return { ...info, display: composeDisplay(info) };
+  return { ...info, display: composeDisplay(info, ip) };
 }
 
 export function useIpRegion(ip: string | null | undefined) {
   const trimmed = typeof ip === "string" ? ip.trim() : "";
   return useQuery({
     queryKey: ["ip-region", trimmed],
-    queryFn: () => fetchIpRegion(trimmed),
+    queryFn: ({ signal }) => fetchIpRegion(trimmed, signal),
     enabled: Boolean(trimmed),
     // 同一 IP 解析结果几乎不变，长期复用；失败不要狂重试拖慢列表
     staleTime: Infinity,

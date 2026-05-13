@@ -110,11 +110,20 @@ export function UsersPage() {
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
+  // 后端搜索时也 trim，前端这里 normalize 一遍避免 " 138" / "138 " 走出两条 cache key
+  const normalizedQuery = query.trim();
   const usersQuery = useQuery({
-    queryKey: ["cloud-console", "saas-users", query, status, subscriptionStatus, page],
+    queryKey: [
+      "cloud-console",
+      "saas-users",
+      normalizedQuery,
+      status,
+      subscriptionStatus,
+      page,
+    ],
     queryFn: () =>
       cloudAdminApi.listCloudUsers({
-        query: query || undefined,
+        query: normalizedQuery || undefined,
         status: status || undefined,
         subscriptionStatus: subscriptionStatus || undefined,
         page,
@@ -144,6 +153,9 @@ export function UsersPage() {
       setSortField(field);
       setSortDirection("desc");
     }
+    // 切换排序字段 / 方向时回到第 1 页，否则用户在第 5 页点排序看到的是"第 5 页那
+    // 20 条重排"，而不是想象中的"按新字段重新排好的最前面 20 条"
+    setPage(1);
   }
 
   return (
