@@ -147,7 +147,11 @@ function parsePrivateCharacterImportBody(payload: unknown): {
           (x): x is string => typeof x === 'string',
         )
       : undefined,
+    // typeof [] === 'object'，要再排掉 Array；否则 {"profile":[1,2,3]}
+    // 会被存进 characters.profile 列，下游读 profile.xxx 会炸。
     profile:
-      p.profile && typeof p.profile === 'object' ? p.profile : undefined,
+      p.profile && typeof p.profile === 'object' && !Array.isArray(p.profile)
+        ? p.profile
+        : undefined,
   };
 }

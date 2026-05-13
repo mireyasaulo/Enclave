@@ -85,6 +85,9 @@ export class WikiPrivateCharacterService {
     id: string,
     dto: PrivateCharacterDto,
   ): Promise<UserPrivateCharacterEntity> {
+    if (!dto || typeof dto !== 'object') {
+      throw new BadRequestException('请求体格式不正确');
+    }
     const existing = await this.getById(ownerUserId, id);
     const trimmedName = (dto.name ?? existing.name).trim();
     if (!trimmedName) {
@@ -118,6 +121,9 @@ export class WikiPrivateCharacterService {
     ownerUserId: string,
     dto: PrivateCharacterDto,
   ): Promise<{ record: UserPrivateCharacterEntity; overwrote: boolean }> {
+    if (!dto || typeof dto !== 'object') {
+      throw new BadRequestException('请求体格式不正确');
+    }
     const trimmedName = (dto.name ?? '').trim();
     if (!trimmedName) {
       throw new BadRequestException('角色名不能为空');
@@ -196,12 +202,19 @@ export class WikiPrivateCharacterService {
       triggerScenes: Array.isArray(p.triggerScenes)
         ? p.triggerScenes.filter((x): x is string => typeof x === 'string')
         : undefined,
+      // typeof null/array 都是 'object'，要再排掉 Array — 否则
+      // {"recipe":[1,2,3]} 会被误当成合法 recipe 存进去，下游读
+      // recipe.identity 会炸。
       recipe:
-        p.recipe && typeof p.recipe === 'object'
+        p.recipe &&
+        typeof p.recipe === 'object' &&
+        !Array.isArray(p.recipe)
           ? (p.recipe as CharacterBlueprintRecipeValue)
           : undefined,
       profile:
-        p.profile && typeof p.profile === 'object'
+        p.profile &&
+        typeof p.profile === 'object' &&
+        !Array.isArray(p.profile)
           ? (p.profile as PersonalityProfile)
           : undefined,
     };
@@ -211,6 +224,7 @@ export class WikiPrivateCharacterService {
     target: UserPrivateCharacterEntity,
     dto: PrivateCharacterDto,
   ): void {
+    if (!dto || typeof dto !== 'object') return;
     if (typeof dto.name === 'string') target.name = dto.name.trim();
     if (typeof dto.avatar === 'string') target.avatar = dto.avatar;
     if (typeof dto.bio === 'string') target.bio = dto.bio;
@@ -229,7 +243,16 @@ export class WikiPrivateCharacterService {
     if (dto.triggerScenes !== undefined) {
       target.triggerScenes = dto.triggerScenes ?? null;
     }
-    if (dto.recipe !== undefined) target.recipe = dto.recipe ?? null;
-    if (dto.profile !== undefined) target.profile = dto.profile ?? null;
+    // 同样防 PUT body 把 recipe/profile 传成 array 或非 object：
+    if (dto.recipe !== undefined) {
+      const r = dto.recipe;
+      target.recipe =
+        r && typeof r === 'object' && !Array.isArray(r) ? r : null;
+    }
+    if (dto.profile !== undefined) {
+      const pf = dto.profile;
+      target.profile =
+        pf && typeof pf === 'object' && !Array.isArray(pf) ? pf : null;
+    }
   }
 }
