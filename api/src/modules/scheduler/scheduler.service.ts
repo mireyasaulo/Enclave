@@ -204,8 +204,9 @@ export class SchedulerService {
     );
   }
 
-  // 在线状态刷新：10min→30min（DB-only，频率宽松）。
-  @Cron('*/30 * * * *')
+  // 在线状态刷新：handler 内只看 hour bucket，hour 内调几次结果完全一样 →
+  // 改为每小时 :05 跑一次。:05 错开整点 burst。
+  @Cron('5 * * * *')
   async updateAiActiveStatus() {
     await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
@@ -215,8 +216,9 @@ export class SchedulerService {
     );
   }
 
-  // 朋友圈调度：15min→30min（NPC 朋友圈 LLM 重型）。
-  @Cron('*/30 * * * *')
+  // 朋友圈调度：恢复原 */15 频率，但起点错到 :07/:22/:37/:52，避免和
+  // npcAutonomyTick (:13/:28/:43/:58) 共撞 minimax 网关。
+  @Cron('7-59/15 * * * *')
   async checkMomentSchedule() {
     await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
@@ -377,8 +379,10 @@ export class SchedulerService {
     );
   }
 
-  // 待回应的 feed 反馈：5min→15min（NPC 评论回复 LLM 重型）。
-  @Cron('*/15 * * * *')
+  // 广场 NPC autonomy tick：恢复原 */5 频率，但起点错到 :01/:06/:11/...，
+  // 与 cyber-avatar incremental scan (:04/:09/...) 错开 3min，避免两条
+  // 5min cron 同分钟撞 minimax。
+  @Cron('1-59/5 * * * *')
   async processPendingFeedReactions() {
     await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
@@ -388,8 +392,9 @@ export class SchedulerService {
     );
   }
 
-  // 视频号生成调度：20min→1h（每次 burst 容易把 minimax video 配额打空）。
-  @Cron('0 * * * *')
+  // 视频号生成调度：video quota 2/天 — hourly 99% 是空跑。改成每天 4 次（在
+  // 用户活跃时段尝试），handler 内还有 activeHoursStart/End 双重过滤。
+  @Cron('8 9,13,17,21 * * *')
   async checkChannelsSchedule() {
     await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
@@ -400,10 +405,10 @@ export class SchedulerService {
   }
 
   /**
-   * 视频号角色主动转发：30min→1h，进一步降低私聊推送频次。
-   * 服务内仍保留「每角色每天 1 条 / 每 owner 每天 3 条」上限作为最后兜底。
+   * 视频号角色主动转发：服务内本就有「每角色每天 1 条 / 每 owner 每天 3 条」
+   * 硬上限，hourly 调度大多数 tick 都空跑。改成每 3 小时 1 次，配 :11 错开整点。
    */
-  @Cron('0 0 * * * *')
+  @Cron('11 */3 * * *')
   async runChannelProactiveForward() {
     await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
@@ -471,8 +476,10 @@ export class SchedulerService {
     };
   }
 
-  // NPC 自主行为 tick：15min→30min（LLM 重型，单 tick 跑很多角色）。
-  @Cron('*/30 * * * *')
+  // 朋友圈 NPC autonomy tick：恢复原 */15 频率，起点错到 :13/:28/:43/:58，
+  // 与 checkMomentSchedule (:07/:22/:37/:52) 错开 6min — 两条 15min cron
+  // 不再同分钟集中调 LLM。
+  @Cron('13-59/15 * * * *')
   async npcAutonomyTick() {
     await sleepForWorldJitter(AI_CRON_JITTER_MS);
     await this.runScheduledJob(
