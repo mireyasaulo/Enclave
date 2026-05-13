@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useNavigate } from "@tanstack/react-router";
 import {
@@ -137,6 +137,9 @@ export function ProfileCharacterImportPage() {
 
   async function confirmImport() {
     if (!preview) return;
+    // 极快双击「导入」按钮可能在 React 重渲染前两次都触发；用 submitting
+    // 守卫挡掉（虽然 disabled prop 也会挡，但 React 重渲染有微秒级延迟）。
+    if (submitting) return;
     setSubmitting(true);
     setResult(null);
     try {
@@ -445,6 +448,10 @@ function PreviewAvatar({ avatar, name }: { avatar: string; name: string }) {
   const trimmed = (avatar ?? "").trim();
   const isUrl = /^https?:\/\//i.test(trimmed) || trimmed.startsWith("/");
   const [imgFailed, setImgFailed] = useState(false);
+  // 用户切换/换文件预览不同 avatar 时重试加载，否则 imgFailed 状态粘住。
+  useEffect(() => {
+    setImgFailed(false);
+  }, [trimmed]);
   if (isUrl && !imgFailed) {
     return (
       <img
