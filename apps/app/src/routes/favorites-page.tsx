@@ -307,7 +307,11 @@ export function FavoritesPage() {
   }, [filteredFavorites, selectedFavoriteSourceId]);
 
   useEffect(() => {
-    if (normalizedPathname !== desktopFavoritesPath || noteEditorRouteState) {
+    if (
+      !isDesktopLayout ||
+      normalizedPathname !== desktopFavoritesPath ||
+      noteEditorRouteState
+    ) {
       return;
     }
 
@@ -330,6 +334,7 @@ export function FavoritesPage() {
     activeCategory,
     desktopFavoritesPath,
     hash,
+    isDesktopLayout,
     navigate,
     noteEditorRouteState,
     normalizedPathname,

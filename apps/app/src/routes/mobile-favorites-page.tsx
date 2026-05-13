@@ -47,6 +47,7 @@ import {
   isDesktopOnlyPath,
   navigateBackOrFallback,
 } from "../lib/history-back";
+import { searchStringToObject } from "../lib/route-search";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 
 type FilterId = "all" | DesktopFavoriteCategory;
@@ -277,7 +278,7 @@ export function MobileFavoritesPage({
     );
     void navigate({
       to: target.to as never,
-      search: target.search as never,
+      search: searchStringToObject(target.search) as never,
       hash: target.hash,
     });
   }
