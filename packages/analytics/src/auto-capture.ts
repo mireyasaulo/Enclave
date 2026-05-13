@@ -10,11 +10,59 @@ function emitInternal(
   _emitTyped(eventName, eventType, props);
 }
 
+const EXTENSION_STACK_PATTERN =
+  /chrome-extension:\/\/|moz-extension:\/\/|safari-web-extension:\/\/|@user-script:/;
+
+function isAbortLikeError(reason: unknown, message: string | null): boolean {
+  if (
+    reason &&
+    typeof reason === "object" &&
+    "name" in reason &&
+    (reason as { name?: unknown }).name === "AbortError"
+  ) {
+    return true;
+  }
+  if (!message) return false;
+  return (
+    message === "signal is aborted without reason" ||
+    message === "The operation was aborted." ||
+    message === "The user aborted a request."
+  );
+}
+
+function shouldDropUnhandled(
+  reason: unknown,
+  message: string | null,
+  stack: string | null,
+): boolean {
+  if (isAbortLikeError(reason, message)) return true;
+  if (stack && EXTENSION_STACK_PATTERN.test(stack)) return true;
+  const trimmed = message?.trim() ?? "";
+  if (
+    trimmed === "" ||
+    trimmed === "{}" ||
+    trimmed === "null" ||
+    trimmed === "undefined"
+  ) {
+    return true;
+  }
+  return false;
+}
+
+function shouldDropFrontendError(event: ErrorEvent): boolean {
+  if (event.message === "Script error." && !event.filename) return true;
+  const stack = (event.error as Error | undefined)?.stack;
+  if (stack && EXTENSION_STACK_PATTERN.test(stack)) return true;
+  if (event.filename && EXTENSION_STACK_PATTERN.test(event.filename)) return true;
+  return false;
+}
+
 export function attachAutoCapture(): void {
   if (attached || typeof window === "undefined" || !isInitialized()) return;
   attached = true;
 
   window.addEventListener("error", (event) => {
+    if (shouldDropFrontendError(event)) return;
     emitInternal("frontend_error", "error", {
       message: event.message,
       filename: event.filename,
@@ -40,6 +88,7 @@ export function attachAutoCapture(): void {
         message = String(reason).slice(0, 1000);
       }
     }
+    if (shouldDropUnhandled(reason, message, stack)) return;
     emitInternal("unhandled_rejection", "error", { message, stack });
   });
 
