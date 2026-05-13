@@ -1,4 +1,5 @@
 import { HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
 import { AppError } from '../../common/app-error.exception';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
@@ -480,9 +481,8 @@ export class CharactersService implements OnModuleInit {
       existing.name = trimmedName;
       saved = await this.repo.save(existing);
     } else {
-      const newId = `private-${Date.now()}-${Math.random()
-        .toString(36)
-        .slice(2, 8)}`;
+      // randomUUID 比 Date.now()+Math.random 更稳，避免极端情况下 PK 冲突 500。
+      const newId = `private-${randomUUID()}`;
       saved = await this.repo.save(
         this.repo.create({
           id: newId,
@@ -514,7 +514,12 @@ export class CharactersService implements OnModuleInit {
     }
 
     // Ensure friendship with world-owner so the character shows up in the
-    // tenant's friends list. We don't overwrite existing intimacy/status.
+    // tenant's friends list.
+    //   - 无 friendship 行 → 新建（status='friend'）
+    //   - 有 friendship 但 status='removed'（软删除）→ 重新激活成 'friend'，
+    //     否则用户 import 完角色仍然不出现在好友列表里
+    //   - 'blocked' 是用户明确动作，不触碰
+    //   - 其它正常状态（friend/close/best）保留 intimacy/星标
     const owner = await this.worldOwnerService.getOwnerOrThrow();
     const existingFriendship = await this.friendshipRepo.findOne({
       where: { ownerId: owner.id, characterId: saved.id },
@@ -528,6 +533,9 @@ export class CharactersService implements OnModuleInit {
           source: 'private_import',
         }),
       );
+    } else if (existingFriendship.status === 'removed') {
+      existingFriendship.status = 'friend';
+      await this.friendshipRepo.save(existingFriendship);
     }
 
     return { character: saved, overwrote: !!existing };
