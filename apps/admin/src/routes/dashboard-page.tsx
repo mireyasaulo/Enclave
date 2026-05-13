@@ -1272,7 +1272,7 @@ export function DashboardPage() {
               <Card className="bg-[color:var(--surface-console)]">
                 <AdminSectionHeader
                   title={t(msg`内容样本`)}
-                  actions={<AdminMetaText>{t(msg`各最近 3 条`)}</AdminMetaText>}
+                  actions={<AdminMetaText>{t(msg`每类近 3 条`)}</AdminMetaText>}
                 />
                 <div className="mt-4 space-y-5">
                   <div>
@@ -1356,7 +1356,7 @@ export function DashboardPage() {
                 </div>
               </Card>
 
-              <Card className="bg-[color:var(--surface-console)]">
+              <Card className="bg-[color:var(--surface-console)] md:col-span-2">
                 <AdminSectionHeader
                   title={t(msg`评测运行时`)}
                   actions={
@@ -1370,9 +1370,19 @@ export function DashboardPage() {
                 <div className="mt-4">
                   <MetricCard
                     label={t(msg`失败运行`)}
-                    value={failedEvalCount}
+                    value={
+                      evalOverviewQuery.isLoading
+                        ? "…"
+                        : evalOverviewQuery.isError
+                          ? "—"
+                          : failedEvalCount
+                    }
                     meta={
-                      hasEvalFailures ? (
+                      evalOverviewQuery.isLoading ? (
+                        <StatusPill tone="muted">{t(msg`加载中`)}</StatusPill>
+                      ) : evalOverviewQuery.isError ? (
+                        <StatusPill tone="warning">{t(msg`加载失败`)}</StatusPill>
+                      ) : hasEvalFailures ? (
                         <StatusPill tone="warning">{t(msg`注意`)}</StatusPill>
                       ) : (
                         <StatusPill tone="healthy">{t(msg`无异常`)}</StatusPill>
