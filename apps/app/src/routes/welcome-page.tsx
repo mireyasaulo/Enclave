@@ -46,6 +46,9 @@ type WelcomeTranslator = (message: WelcomeMessage) => string;
 
 const LOCAL_APP_DEV_PORT = "5180";
 const LOCAL_CORE_API_PORT = "3000";
+// 历史上只校验 trim() 非空，结果一大批新用户图省事敲个 "w" 就过 onboarding，
+// 世界主人昵称全是 "w"。这里要求 ≥ 2 个字符，逼用户真的写一个名字。
+const MIN_OWNER_NAME_LENGTH = 2;
 const WAITING_CLOUD_SESSION_STATUSES = new Set<WorldAccessSessionSummary["status"]>(["pending", "resolving", "waiting"]);
 const FAILURE_CLOUD_SESSION_STATUSES = new Set<WorldAccessSessionSummary["status"]>(["failed", "disabled", "expired"]);
 const WORLD_ACCESS_MESSAGE_MAP: Record<string, WelcomeMessage> = {
@@ -884,6 +887,12 @@ export function WelcomePage() {
       setOwnerError(t(msg`请输入世界主人的名字。`));
       return;
     }
+    if (username.length < MIN_OWNER_NAME_LENGTH) {
+      setOwnerError(
+        t(msg`名字至少 ${MIN_OWNER_NAME_LENGTH} 个字，请取一个真正的昵称。`),
+      );
+      return;
+    }
 
     if (!readyBaseUrl) {
       setOwnerError(t(msg`请先连接世界，再设置世界主人名称。`));
@@ -1256,10 +1265,14 @@ export function WelcomePage() {
                 void submitOwnerName();
               }
             }}
-            placeholder={t(msg`为这个世界设置主人的名字`)}
+            placeholder={t(msg`输入你希望被怎么称呼（至少 ${MIN_OWNER_NAME_LENGTH} 个字）`)}
             className="text-center text-base"
             autoFocus
           />
+
+          <p className="mt-2 text-center text-xs text-[color:var(--text-muted)]">
+            {t(msg`这是世界里所有 AI 朋友对你的称呼，名字至少 ${MIN_OWNER_NAME_LENGTH} 个字。`)}
+          </p>
 
           {ownerError ? (
             isDesktopLayout ? (
@@ -1298,7 +1311,10 @@ export function WelcomePage() {
             </Button>
             <Button
               onClick={() => void submitOwnerName()}
-              disabled={isContinuing || !ownerName.trim()}
+              disabled={
+                isContinuing ||
+                ownerName.trim().length < MIN_OWNER_NAME_LENGTH
+              }
               variant="primary"
               size="lg"
               className="rounded-2xl bg-[#07c160] text-white shadow-none hover:bg-[#06ad56]"

@@ -13,6 +13,7 @@ import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
 const NAME_MAX_LENGTH = 20;
+const NAME_MIN_LENGTH = 2;
 
 export function ProfileInfoNamePage() {
   const t = useRuntimeTranslator();
@@ -45,7 +46,7 @@ export function ProfileInfoNamePage() {
 
   const trimmed = draft.trim();
   const dirty = trimmed !== (username ?? "").trim();
-  const canSave = trimmed.length > 0 && dirty;
+  const canSave = trimmed.length >= NAME_MIN_LENGTH && dirty;
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -112,7 +113,9 @@ export function ProfileInfoNamePage() {
       </div>
 
       <div className="px-4 pt-2 text-[11px] leading-5 text-[color:var(--text-muted)]">
-        {t(msg`好名字让朋友更容易找到你，最多 ${NAME_MAX_LENGTH} 个字符。`)}
+        {t(
+          msg`好名字让朋友更容易找到你，至少 ${NAME_MIN_LENGTH} 个字、最多 ${NAME_MAX_LENGTH} 个字符。`,
+        )}
       </div>
 
       {errorMessage ? (

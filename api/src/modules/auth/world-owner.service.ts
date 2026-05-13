@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
+import { AppError } from '../../common/app-error.exception';
 import { UserEntity } from './user.entity';
 import { decryptUserApiKey, encryptUserApiKey } from './api-key-crypto';
 import type { AiKeyOverride } from '../ai/ai.types';
@@ -25,6 +26,8 @@ import {
   parseChatBackgroundAsset,
 } from '../chat/chat-background.utils';
 import { WelcomeMessageService } from './welcome-message.service';
+
+const MIN_OWNER_NAME_LENGTH = 2;
 
 type UpdateWorldOwnerInput = {
   username?: string;
@@ -215,6 +218,16 @@ export class WorldOwnerService {
     const nextUsername = input.username?.trim();
     const nextAvatar = input.avatar?.trim();
     const nextSignature = input.signature?.trim();
+
+    // 历史上前端只校验 trim() 非空，导致大量用户用单字 "w" 过 onboarding。
+    // 后端在这里兜底：写入 username 时必须 ≥ 2 个字符，过短直接拒绝。
+    if (nextUsername !== undefined && nextUsername.length < MIN_OWNER_NAME_LENGTH) {
+      throw new AppError('WORLD_OWNER_NAME_TOO_SHORT', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { minLength: MIN_OWNER_NAME_LENGTH },
+        legacyMessage: `世界主人昵称至少 ${MIN_OWNER_NAME_LENGTH} 个字。`,
+      });
+    }
 
     owner.username = nextUsername ?? owner.username;
     owner.avatar = nextAvatar ?? owner.avatar ?? '';

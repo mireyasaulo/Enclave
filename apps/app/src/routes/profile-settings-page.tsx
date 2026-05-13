@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
@@ -150,19 +150,32 @@ export function ProfileSettingsPage() {
     setDraftSignature(signature);
   }, [signature]);
 
+  // 桌面端打开 /desktop/settings 时，hydrateOwner 会写 zustand 触发本组件
+  // 重渲染；若 ownerQuery 还在 staleTime 窗口外，会被 react-query 视为需要
+  // refetch，新拿到的 owner data 拿到新 reference 又再次触发 useEffect →
+  // 死循环（实测每秒打 800-1000 次 /api/world/owner）。
+  // 这里钉死 staleTime=Infinity：mutation 路径已经用 queryClient.setQueryData
+  // 把新 owner 写回缓存，不依赖自动 refetch，加上 hydrateOwner 之后 owner 状态
+  // 同时也在 zustand store，本组件不会"丢"任何东西。
   const ownerQuery = useQuery({
     queryKey: ["world-owner", baseUrl],
     queryFn: () => getWorldOwner(baseUrl),
     enabled: isDesktopLayout,
+    staleTime: Number.POSITIVE_INFINITY,
   });
 
+  const hydratedOwnerKeyRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!ownerQuery.data) {
+    const owner = ownerQuery.data;
+    if (!owner) {
       return;
     }
-
-    hydrateOwner(ownerQuery.data);
-    setApiBaseDraft(ownerQuery.data.customApiBase ?? "");
+    if (hydratedOwnerKeyRef.current === owner.id) {
+      return;
+    }
+    hydratedOwnerKeyRef.current = owner.id;
+    hydrateOwner(owner);
+    setApiBaseDraft(owner.customApiBase ?? "");
   }, [hydrateOwner, ownerQuery.data]);
 
   const saveProfileMutation = useMutation({
@@ -210,7 +223,9 @@ export function ProfileSettingsPage() {
     },
   });
 
-  const canSaveProfile = draftName.trim().length > 0;
+  // 与 welcome-page / profile-info-name-page 对齐：昵称至少 2 个字，
+  // 避免单字"w"这种 placeholder 式名字混过保存。
+  const canSaveProfile = draftName.trim().length >= 2;
   const aiSettingsBusy =
     saveApiKeyMutation.isPending || clearApiKeyMutation.isPending;
   const desktopSettingsPath = "/desktop/settings";
