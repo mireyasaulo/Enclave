@@ -444,19 +444,21 @@ function SuccessCard({
 function PreviewAvatar({ avatar, name }: { avatar: string; name: string }) {
   const trimmed = (avatar ?? "").trim();
   const isUrl = /^https?:\/\//i.test(trimmed) || trimmed.startsWith("/");
-  if (isUrl) {
+  const [imgFailed, setImgFailed] = useState(false);
+  if (isUrl && !imgFailed) {
     return (
       <img
         src={trimmed}
         alt=""
         className="h-12 w-12 shrink-0 rounded-2xl object-cover"
+        onError={() => setImgFailed(true)}
       />
     );
   }
   const display = trimmed.length > 0 ? trimmed.slice(0, 2) : name.slice(0, 1);
   return (
     <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[rgba(139,92,246,0.12)] text-lg text-[#7c3aed]">
-      {display}
+      {display || "🪞"}
     </div>
   );
 }
