@@ -8,7 +8,7 @@ export interface IpRegionLookup {
   country: string | null;
   region: string | null;
   city: string | null;
-  source: "ipwho.is" | "ipinfo.io" | "cache" | "unresolved";
+  source: "ip-api.com" | "ipwho.is" | "cache" | "unresolved";
 }
 
 interface CacheEntry {
@@ -41,11 +41,12 @@ export class IpRegionService {
       }
     }
 
-    // ipwho.is 国内访问偶发超时，挂掉就转 ipinfo.io。两个都是 Cloudflare 系，
-    // 但服务器侧出口比浏览器走得稳很多，所以保持这个顺序。
+    // 首选 ip-api.com：lang=zh-CN 直接给中文国家/省/市，免去前端再做一遍翻译；
+    // 但 free tier 是 HTTP only，服务器侧调没问题（浏览器走 HTTPS 会被 mixed-
+    // content 拦）。挂掉再退到 ipwho.is（HTTPS，返回英文，前端 Intl 兜底）。
     const providers = [
+      () => this.fetchIpApi(ip),
       () => this.fetchIpWhoIs(ip),
-      () => this.fetchIpInfoIo(ip),
     ];
 
     for (const provider of providers) {
@@ -84,6 +85,40 @@ export class IpRegionService {
     };
   }
 
+  private async fetchIpApi(ip: string): Promise<IpRegionLookup> {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    try {
+      const response = await fetch(
+        `http://ip-api.com/json/${encodeURIComponent(ip)}?lang=zh-CN&fields=status,message,country,countryCode,regionName,city`,
+        { signal: controller.signal },
+      );
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = (await response.json()) as {
+        status?: string;
+        message?: string;
+        country?: string;
+        countryCode?: string;
+        // regionName 是省/州的完整名（lang=zh-CN 下是中文），不是 state code
+        regionName?: string;
+        city?: string;
+      };
+      if (data.status !== "success") {
+        throw new Error(data.message ?? "ip-api lookup failed");
+      }
+      return {
+        ip,
+        countryCode: data.countryCode ?? null,
+        country: data.country ?? null,
+        region: data.regionName ?? null,
+        city: data.city ?? null,
+        source: "ip-api.com",
+      };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
   private async fetchIpWhoIs(ip: string): Promise<IpRegionLookup> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -117,32 +152,5 @@ export class IpRegionService {
     }
   }
 
-  private async fetchIpInfoIo(ip: string): Promise<IpRegionLookup> {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    try {
-      const response = await fetch(
-        `https://ipinfo.io/${encodeURIComponent(ip)}/json`,
-        { signal: controller.signal },
-      );
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = (await response.json()) as {
-        country?: string;
-        region?: string;
-        city?: string;
-      };
-      // ipinfo.io 只回 country 两位 code；country full name 留给前端用 Intl 本地化。
-      return {
-        ip,
-        countryCode: data.country ?? null,
-        country: null,
-        region: data.region ?? null,
-        city: data.city ?? null,
-        source: "ipinfo.io",
-      };
-    } finally {
-      clearTimeout(timer);
-    }
-  }
 }
 // i18n-ignore-end
