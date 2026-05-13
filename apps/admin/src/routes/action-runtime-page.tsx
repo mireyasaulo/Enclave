@@ -767,7 +767,7 @@ export function ActionRuntimePage() {
       ) : null}
 
       <div className="space-y-6">
-        <div className="sticky top-0 z-10 -mx-2 bg-[color:var(--surface-app)]/95 px-2 py-2 backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-app)]/80">
+        <div className="sticky top-0 z-10 -mx-2 border-b border-[color:var(--border-faint)] bg-[color:var(--surface-shell)] px-2 py-2 backdrop-blur">
           <AdminTabs
             tabs={WORKSPACE_TABS.map((tab) => ({ ...tab, label: t(tab.label) }))}
             activeKey={workspaceTab}
@@ -1503,7 +1503,7 @@ export function ActionRuntimePage() {
                             ) : null}
                           </div>
                           <div className="flex flex-wrap gap-2">
-                            {selectedConnector.status === "disabled" ? (
+                            {selectedConnector.status !== "ready" ? (
                               <Button
                                 variant="secondary"
                                 disabled={Boolean(selectedConnectorToggling)}
@@ -1520,7 +1520,8 @@ export function ActionRuntimePage() {
                                   ? t(msg`启用中...`)
                                   : t(msg`启用`)}
                               </Button>
-                            ) : (
+                            ) : null}
+                            {selectedConnector.status !== "disabled" ? (
                               <Button
                                 variant="secondary"
                                 disabled={Boolean(selectedConnectorToggling)}
@@ -1537,7 +1538,7 @@ export function ActionRuntimePage() {
                                   ? t(msg`停用中...`)
                                   : t(msg`停用`)}
                               </Button>
-                            )}
+                            ) : null}
                             {(selectedConnector.providerType === "official_api" ||
                               selectedConnector.providerType === "http_bridge") &&
                             selectedConnector.credentialConfigured ? (
