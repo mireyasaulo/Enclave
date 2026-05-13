@@ -110,11 +110,13 @@ export function TokenUsageWorldDetailPage() {
             <h1 className="mt-1 text-2xl font-semibold text-[color:var(--text-primary)]">
               {worldId}
             </h1>
-            <p className="mt-1 text-sm text-[color:var(--text-secondary)]">
-              {t("Request count")}: {formatNumber(dailyTotals.requests)}
-              {" · "}
-              {dailyRows.length} {t("days")}
-            </p>
+            {dailyRows.length > 0 && (
+              <p className="mt-1 text-sm text-[color:var(--text-secondary)]">
+                {t("Request count")}: {formatNumber(dailyTotals.requests)}
+                {" · "}
+                {dailyRows.length} {t("days")}
+              </p>
+            )}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {(["7d", "30d", "90d"] as const).map((option) => (
@@ -137,14 +139,25 @@ export function TokenUsageWorldDetailPage() {
 
       <section className={SECTION}>
         <div className="grid gap-3 sm:grid-cols-2">
-          <SmallStat
-            label={t("Estimated cost")}
-            value={formatCost(dailyTotals.cost, currency)}
-          />
-          <SmallStat
-            label={t("Total tokens")}
-            value={formatNumber(dailyTotals.tokens)}
-          />
+          {dailyQuery.isLoading ? (
+            Array.from({ length: 2 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="h-24 animate-pulse rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-input)]"
+              />
+            ))
+          ) : (
+            <>
+              <SmallStat
+                label={t("Estimated cost")}
+                value={formatCost(dailyTotals.cost, currency)}
+              />
+              <SmallStat
+                label={t("Total tokens")}
+                value={formatNumber(dailyTotals.tokens)}
+              />
+            </>
+          )}
         </div>
       </section>
 
@@ -350,9 +363,9 @@ function BreakdownTable({
 
 function SmallStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-3">
+    <div className="rounded-2xl border border-[color:var(--border-subtle)] bg-[color:var(--surface-card)] p-4">
       <div className="text-xs text-[color:var(--text-muted)]">{label}</div>
-      <div className="mt-1 text-lg font-semibold text-[color:var(--text-primary)]">
+      <div className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)]">
         {value}
       </div>
     </div>

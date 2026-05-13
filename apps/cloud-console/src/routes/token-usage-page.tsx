@@ -762,21 +762,23 @@ function PricingTab() {
     onError: (error: unknown) => showCloudAdminErrorNotice(showNotice, error),
   });
 
-  if (catalogQuery.error) {
-    return <CloudAdminErrorBlock error={catalogQuery.error} />;
-  }
-
-  const items = catalogQuery.data?.items ?? [];
+  const items = catalogQuery.data?.items;
   const groupedItems = useMemo(() => {
     const groups: Record<"CNY" | "USD", CloudTokenPricingItem[]> = {
       CNY: [],
       USD: [],
     };
-    for (const item of items) {
+    for (const item of items ?? []) {
       groups[item.currency]?.push(item);
     }
     return groups;
   }, [items]);
+
+  if (catalogQuery.error) {
+    return <CloudAdminErrorBlock error={catalogQuery.error} />;
+  }
+
+  const totalItems = (items ?? []).length;
 
   return (
     <div className="space-y-6">
@@ -796,7 +798,7 @@ function PricingTab() {
               : t("Sync from n1n.ai")}
           </button>
         </div>
-        {items.length === 0 ? (
+        {totalItems === 0 ? (
           <div className="mt-3 rounded-2xl border border-[color:var(--border-subtle)] px-4 py-6 text-center text-sm text-[color:var(--text-muted)]">
             {t("No pricing entries yet.")}
           </div>
