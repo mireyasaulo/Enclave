@@ -25,6 +25,12 @@ import {
   buildWorldBootstrapConfig,
   resolveCloudPlatformBaseUrl,
 } from "./world-bootstrap-config";
+import {
+  MinimaxKeyAllocation,
+  parseMinimaxKeyPool,
+  pickMinimaxKey,
+} from "./minimax-key-pool";
+import { MinimaxQuotaDispatcherService } from "./minimax-quota-dispatcher.service";
 
 type RunningChild = {
   pid: number;
@@ -50,41 +56,6 @@ function findRepoRoot(start: string): string {
 
 const REPO_ROOT =
   process.env.YINJIE_REPO_ROOT?.trim() || findRepoRoot(__dirname);
-
-// MiniMax token plan key 池：按 worldId 稳定 hash 分配。同一 world 永远命中
-// 同一 key（重启 cloud-api 不变），加 key 时只有少数 world 的 mod 余数变化。
-// 池为空时返回 null，spawn 端不注入，child 自己读 api/.env 的单 key 兜底。
-type MinimaxKeyAllocation = {
-  key: string;
-  index: number; // 1-based，便于日志
-  total: number;
-  fingerprint: string; // 末 4 位
-};
-
-function parseMinimaxKeyPool(
-  rawKeys: string | undefined,
-  rawSingleKey: string | undefined,
-): string[] {
-  const fromCsv = (rawKeys ?? "")
-    .split(",")
-    .map((k) => k.trim())
-    .filter((k) => k.length > 0);
-  if (fromCsv.length > 0) return fromCsv;
-  const single = (rawSingleKey ?? "").trim();
-  return single ? [single] : [];
-}
-
-function pickMinimaxKey(
-  worldId: string,
-  pool: string[],
-): MinimaxKeyAllocation | null {
-  if (pool.length === 0) return null;
-  const digest = createHash("sha1").update(worldId).digest();
-  const h = digest.readUInt32BE(0);
-  const idx = h % pool.length;
-  const key = pool[idx];
-  return { key, index: idx + 1, total: pool.length, fingerprint: key.slice(-4) };
-}
 
 const API_DIST_ENTRY = path.join(REPO_ROOT, "api", "dist", "main.js");
 const ACCOUNTS_ROOT = path.join(REPO_ROOT, "data", "accounts");
@@ -123,6 +94,7 @@ export class LocalProcessComputeProviderService
     private readonly configService: ConfigService,
     @InjectRepository(CloudInstanceEntity)
     private readonly instanceRepo: Repository<CloudInstanceEntity>,
+    private readonly minimaxQuotaDispatcher: MinimaxQuotaDispatcherService,
   ) {
     const configured = parseInt(
       process.env.CLOUD_LOCAL_PROCESS_BASE_PORT?.trim() ?? "",
@@ -504,11 +476,29 @@ export class LocalProcessComputeProviderService
       env.MINIMAX_API_KEY = minimaxAlloc.key;
     }
 
+    // 算 per-world 日配额并注入 env：共享同一 key 的 N 个 world 公平分摊单 key 日限额；
+    // 配额 < world 数时 dispatcher 做日轮换，保证每个 world 都能轮到。
+    // dispatcher 自带兜底，不会抛错。
+    try {
+      const share = await this.minimaxQuotaDispatcher.computeWorldDailyShare(world.id);
+      env.MINIMAX_DAILY_LIMIT_HAILUO_FAST = String(share.hailuoFast);
+      env.MINIMAX_DAILY_LIMIT_HAILUO = String(share.hailuo);
+      env.MINIMAX_DAILY_LIMIT_MUSIC_26 = String(share.music26);
+      env.MINIMAX_DAILY_LIMIT_MUSIC_25 = String(share.music25);
+      env.MINIMAX_DAILY_LIMIT_IMAGE_01 = String(share.image01);
+      env.MINIMAX_DAILY_LIMIT_LYRICS = String(share.lyrics);
+    } catch (err) {
+      this.logger.warn(
+        `compute minimax daily share failed for world=${world.id}: ${(err as Error)?.message}; child uses fallback limits`,
+      );
+    }
+
     this.logger.log(
       `spawning api child for phone=${world.phone} world=${world.id} port=${port} dir=${accountDir}` +
         (minimaxAlloc
           ? ` minimax-key=#${minimaxAlloc.index}/${minimaxAlloc.total} (…${minimaxAlloc.fingerprint})`
-          : " minimax-key=<pool empty, child fallback>"),
+          : " minimax-key=<pool empty, child fallback>") +
+        ` quota=hailuoFast:${env.MINIMAX_DAILY_LIMIT_HAILUO_FAST ?? "-"}/hailuo:${env.MINIMAX_DAILY_LIMIT_HAILUO ?? "-"}/music26:${env.MINIMAX_DAILY_LIMIT_MUSIC_26 ?? "-"}`,
     );
 
     const child = spawn(process.execPath, ["--enable-source-maps", API_DIST_ENTRY], {
