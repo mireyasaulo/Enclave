@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, FileUp } from "lucide-react";
@@ -6,26 +6,22 @@ import { importPersonalCharacter } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, Button, cn } from "@yinjie/ui";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
-import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { navigateBackOrFallback } from "../lib/history-back";
 import { describeRequestError } from "../lib/request-error";
 
 type Notice = { tone: "success" | "danger"; message: string } | null;
 
+// 桌面端 profile-page 直接 redirect 到 /desktop/settings 不渲染入口，所以
+// "导入角色" Link 只在移动布局出现。但桌面用户通过 URL 直接访问这个页面
+// 时不应该被无关 redirect 踢走 — 让它在桌面也可以工作（顶部栏会稍微移动
+// 风格，但功能完整）。
 export function ProfileCharacterImportPage() {
   const t = useRuntimeTranslator();
   const navigate = useNavigate();
-  const isDesktopLayout = useDesktopLayout();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [notice, setNotice] = useState<Notice>(null);
   const [fileName, setFileName] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (isDesktopLayout) {
-      void navigate({ to: "/desktop/settings", replace: true });
-    }
-  }, [isDesktopLayout, navigate]);
 
   const goBack = () =>
     navigateBackOrFallback(() => {
