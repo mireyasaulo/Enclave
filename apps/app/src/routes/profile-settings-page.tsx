@@ -42,6 +42,10 @@ import {
 } from "../store/chat-preferences-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
+// 与 welcome-page / profile-info-name-page 对齐：避免单字"w"这种 placeholder 式
+// 名字混过保存。
+const MIN_OWNER_NAME_LENGTH = 2;
+
 type SettingsTab =
   | "profile"
   | "chat"
@@ -227,10 +231,7 @@ export function ProfileSettingsPage() {
     },
   });
 
-  // 与 welcome-page / profile-info-name-page 对齐：昵称至少 2 个字，
-  // 避免单字"w"这种 placeholder 式名字混过保存。
-  // 但是没改昵称的话不挡 save——老"w"用户改签名/头像不应该被波及。
-  const MIN_OWNER_NAME_LENGTH = 2;
+  // 没改昵称就不挡 save——老"w"用户改签名/头像不应该被 username 校验波及。
   const nameValid = trimmedDraftName.length >= MIN_OWNER_NAME_LENGTH;
   const canSaveProfile =
     (nameDirty || signatureDirty) && (!nameDirty || nameValid);
