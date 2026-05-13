@@ -231,9 +231,18 @@ function fixOne({ phone, dbPath }, phoneToWorld) {
       tts: decodeStored(row.ttsApiKeyEncrypted),
       img: decodeStored(row.imageGenerationApiKeyEncrypted),
     };
-    const needsApi = before.api !== expectedKey; // 若是 enc:__enc_unknown__ 也会触发改写（保守）
-    const needsTts = before.tts !== expectedKey;
-    const needsImg = before.img !== expectedKey;
+    // 触发改写的条件：
+    //   - 值不对（不是当前 hash 应得的 key）
+    //   - 或者 ENCRYPTION_AVAILABLE 但当前还是 plain:（顺手升级到 enc:）
+    //   - 或者 enc:<opaque> 无法解密的（保守视为不一致）
+    const needsUpgrade = (rawStored) =>
+      ENCRYPTION_AVAILABLE && typeof rawStored === 'string' && rawStored.trim().startsWith('plain:');
+    const needsApi =
+      before.api !== expectedKey || needsUpgrade(row.apiKeyEncrypted);
+    const needsTts =
+      before.tts !== expectedKey || needsUpgrade(row.ttsApiKeyEncrypted);
+    const needsImg =
+      before.img !== expectedKey || needsUpgrade(row.imageGenerationApiKeyEncrypted);
 
     const summary = {
       phone,
