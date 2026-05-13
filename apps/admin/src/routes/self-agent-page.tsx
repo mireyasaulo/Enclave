@@ -461,15 +461,16 @@ export function SelfAgentPage() {
                 type="number"
                 min={0}
                 max={23}
-                onChange={(value) =>
+                onChange={(value) => {
+                  const parsed = Number(value);
                   setRulesDraft((current) => ({
                     ...(current ?? overview.rules),
                     heartbeat: {
                       ...(current?.heartbeat ?? overview.rules.heartbeat),
-                      activeHoursEnd: Number(value) || 23,
+                      activeHoursEnd: Number.isFinite(parsed) ? parsed : 23,
                     },
-                  }))
-                }
+                  }));
+                }}
               />
             </div>
           </AdminSoftBox>
@@ -582,7 +583,7 @@ export function SelfAgentPage() {
         <AdminSectionHeader title={t(msg`近期巡检记录`)} />
         {!overview.recentHeartbeatRuns.length ? (
           <AdminEmptyState
-            title={t(msg`还没有 heartbeat 记录`)}
+            title={t(msg`还没有巡检记录`)}
             description={t(msg`先执行一次手动巡检，或等待自动调度跑起来。`)}
           />
         ) : (
