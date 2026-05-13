@@ -357,14 +357,11 @@ export function GamesPage() {
       total: items.length,
       official: items.filter((item) => item.publisherKind === "platform_official")
         .length,
-      thirdParty: items.filter((item) => item.publisherKind === "third_party")
-        .length,
       character: items.filter((item) => item.publisherKind === "character_creator")
         .length,
       pending: items.filter((item) => item.reviewStatus === "pending_review")
         .length,
       unpublished: items.filter((item) => item.hasUnpublishedChanges).length,
-      published: items.filter((item) => item.visibilityScope !== "internal").length,
     };
   }, [gamesQuery.data]);
 
@@ -790,14 +787,16 @@ export function GamesPage() {
                 const stripLabel = selectedGame
                   ? summarizeNextActionLabel(selectedGame)
                   : isCreating
-                    ? t(msg`补齐草稿字段后保存`)
+                    ? draftReady
+                      ? t(msg`点右上角创建草稿`)
+                      : t(msg`先补齐草稿字段`)
                     : t(msg`先选中目录项`);
                 const stripHint = selectedGame
                   ? null
                   : isCreating
-                    ? !draftReady
-                      ? t(msg`优先补齐：${draftIssues.slice(0, 3).join("、")}`)
-                      : null
+                    ? draftReady
+                      ? null
+                      : t(msg`优先补齐：${draftIssues.slice(0, 3).join("、")}`)
                     : t(msg`左侧队列按优先级排序，可直接进入处理。`);
                 const publishedHint = selectedGame?.lastPublishedAt
                   ? t(msg`上次发布 ${formatTime(selectedGame.lastPublishedAt)}`)
