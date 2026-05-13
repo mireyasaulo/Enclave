@@ -438,9 +438,26 @@ function MobileNoteEditor({
     }
 
     if (selectedNoteId) {
-      const localDraft =
+      const localDraftRaw =
         readDesktopNoteDraftByNoteId(selectedNoteId) ??
         readDesktopNoteDraft(nextDraftId);
+      // 空草稿 + API 有真实内容时忽略草稿，避免旧版本 bug 残留的空草稿盖掉原文
+      const localDraftIsEmpty =
+        !!localDraftRaw &&
+        !localDraftRaw.contentHtml.trim() &&
+        !localDraftRaw.contentText.trim() &&
+        localDraftRaw.tags.length === 0 &&
+        localDraftRaw.assets.length === 0;
+      const apiHasContent =
+        !!noteQuery.data &&
+        Boolean(
+          noteQuery.data.contentHtml?.trim() ||
+            noteQuery.data.contentText?.trim() ||
+            noteQuery.data.tags?.length ||
+            noteQuery.data.assets?.length,
+        );
+      const localDraft =
+        localDraftIsEmpty && apiHasContent ? null : localDraftRaw;
       if (localDraft) {
         const treatLocalDraftAsNewNote = Boolean(missingSelectedNote);
         applyNoteSource({
@@ -519,6 +536,10 @@ function MobileNoteEditor({
     if (!activeDraftId) {
       return;
     }
+    // 初始化未完成前禁止自动保存，否则空 editorState 会覆盖掉 API 真实内容
+    if (initializedSessionKeyRef.current !== sessionKey) {
+      return;
+    }
     const timer = window.setTimeout(() => {
       saveDesktopNoteDraft({
         draftId: activeDraftId,
@@ -528,7 +549,7 @@ function MobileNoteEditor({
       });
     }, 220);
     return () => window.clearTimeout(timer);
-  }, [activeDraftId, editorState, noteId]);
+  }, [activeDraftId, editorState, noteId, sessionKey]);
 
   useEffect(() => {
     if (!notice) {

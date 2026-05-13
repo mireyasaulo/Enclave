@@ -29,6 +29,7 @@ import {
   MapPin,
   MoreHorizontal,
   Pause,
+  Pencil,
   Play,
   Printer,
   Share2,
@@ -92,6 +93,7 @@ import {
   upsertDesktopFavorite,
 } from "../features/favorites/favorites-storage";
 import { isFavoriteNoteMissingError } from "../features/favorites/note-editor-helpers";
+import { buildMobileNoteEditorRouteHash } from "../features/notes/mobile-note-editor-route-state";
 import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
 import { buildDesktopChannelsRouteHash } from "../features/channels/channels-route-state";
 import { resolveAppMediaUrl } from "../lib/media-url";
@@ -4993,12 +4995,26 @@ function NoteCardMessage({
   onOpen?: () => void;
 }) {
   const isDesktop = variant === "desktop";
-  const previewImage = attachment.assets.find(
-    (asset) => asset.kind === "image",
-  );
-  const fileCount = attachment.assets.filter(
-    (asset) => asset.kind === "file",
-  ).length;
+  const runtimeConfig = useAppRuntimeConfig();
+  const baseUrl = runtimeConfig.apiBaseUrl;
+  // 拉最新笔记数据，让卡片缩略图随原笔记编辑而更新。同一 noteId 的所有可见卡片
+  // 共享缓存，编辑器保存路径 invalidate ["favorite-note", baseUrl, noteId] 时
+  // 会自动触发全部卡片重渲染；笔记被删除或 404 时静默回退到 snapshot，不在气泡上
+  // 突然标红，保持历史消息视觉稳定。
+  const noteQuery = useQuery({
+    queryKey: ["favorite-note", baseUrl, attachment.noteId],
+    queryFn: () => getFavoriteNote(attachment.noteId, baseUrl),
+    enabled: Boolean(attachment.noteId),
+    staleTime: 30_000,
+    retry: false,
+  });
+  const document = noteQuery.data;
+  const title = (document?.title?.trim() || attachment.title || "").trim();
+  const excerpt = document?.excerpt?.trim() || attachment.excerpt || "";
+  const tags = document?.tags?.length ? document.tags : attachment.tags;
+  const assets = document?.assets ?? attachment.assets;
+  const previewImage = assets.find((asset) => asset.kind === "image");
+  const fileCount = assets.filter((asset) => asset.kind === "file").length;
   const card = (
     <div
       className={`overflow-hidden bg-white shadow-none ${
@@ -5011,7 +5027,7 @@ function NoteCardMessage({
         <div className={isDesktop ? "h-[104px]" : "h-[92px]"}>
           <img
             src={previewImage.url}
-            alt={attachment.title}
+            alt={title}
             className="h-full w-full object-cover"
           />
         </div>
@@ -5042,18 +5058,18 @@ function NoteCardMessage({
             isDesktop ? "text-sm leading-6" : "text-[13px] leading-5"
           }`}
         >
-          {attachment.title}
+          {title}
         </div>
         <div
           className={`line-clamp-3 text-[color:var(--text-muted)] ${
             isDesktop ? "text-xs leading-5" : "text-[11px] leading-[18px]"
           }`}
         >
-          {attachment.excerpt || translateRuntimeMessage(msg`点击查看完整笔记`)}
+          {excerpt || translateRuntimeMessage(msg`点击查看完整笔记`)}
         </div>
         <div className="flex items-center justify-between gap-3 border-t border-[rgba(15,23,42,0.06)] pt-2.5">
           <div className="flex min-w-0 flex-wrap gap-1.5">
-            {attachment.tags.slice(0, 2).map((tag) => (
+            {tags.slice(0, 2).map((tag) => (
               <span
                 key={tag}
                 className="rounded-full bg-[rgba(7,193,96,0.08)] px-2 py-0.5 text-[10px] text-[color:var(--brand-primary)]"
@@ -5079,7 +5095,7 @@ function NoteCardMessage({
       type="button"
       onClick={onOpen}
       className="text-left transition hover:opacity-95"
-      aria-label={`${translateRuntimeMessage(variant === "desktop" ? msg`打开笔记` : msg`查看笔记摘要`)} ${attachment.title}`}
+      aria-label={`${translateRuntimeMessage(variant === "desktop" ? msg`打开笔记` : msg`查看笔记摘要`)} ${title}`}
     >
       {card}
     </button>
@@ -6437,6 +6453,7 @@ function NoteViewerOverlay({
   onLocate: () => void;
   onShareOrCopy: () => void;
 }) {
+  const navigate = useNavigate();
   const nativeMobileShareSupported = isNativeMobileShareSurface();
   const [actionMenuOpen, setActionMenuOpen] = useState(false);
   const noteQuery = useQuery({
@@ -6593,6 +6610,29 @@ function NoteViewerOverlay({
               <Copy size={16} />
             )
           }
+          canEdit={Boolean(attachment.noteId) && !noteMissing}
+          onEdit={() => {
+            setActionMenuOpen(false);
+            // 把卡片落地页当前路径作为 returnPath，编辑完保存后用户能 leaveEditor 回到这里。
+            // 编辑器 hash 里同时传 noteId 与 draftId=noteId，让"按 noteId 查草稿"路径命中
+            // Fix 1 的初始化逻辑，原文从 API 正确填入。
+            const currentPath =
+              typeof window !== "undefined" ? window.location.pathname : "/";
+            const currentHash =
+              typeof window !== "undefined"
+                ? window.location.hash.replace(/^#/, "")
+                : undefined;
+            onClose();
+            void navigate({
+              to: "/notes/new",
+              hash: buildMobileNoteEditorRouteHash({
+                draftId: attachment.noteId,
+                noteId: attachment.noteId,
+                returnPath: currentPath,
+                returnHash: currentHash || undefined,
+              }),
+            });
+          }}
           onShareOrCopy={() => {
             setActionMenuOpen(false);
             onShareOrCopy();
@@ -6611,12 +6651,16 @@ function NoteViewerOverlay({
 function NoteDetailActionSheet({
   shareLabel,
   shareIcon,
+  canEdit,
+  onEdit,
   onShareOrCopy,
   onLocate,
   onClose,
 }: {
   shareLabel: string;
   shareIcon: ReactNode;
+  canEdit: boolean;
+  onEdit: () => void;
   onShareOrCopy: () => void;
   onLocate: () => void;
   onClose: () => void;
@@ -6633,6 +6677,18 @@ function NoteDetailActionSheet({
         <div className="flex justify-center pb-2">
           <div className="h-1 w-10 rounded-full bg-[rgba(148,163,184,0.45)]" />
         </div>
+        {canEdit ? (
+          <button
+            type="button"
+            onClick={onEdit}
+            className="flex items-center gap-3 rounded-[12px] px-4 py-3 text-left text-[15px] text-[color:var(--text-primary)] transition active:bg-black/[0.04]"
+          >
+            <span className="flex h-7 w-7 items-center justify-center text-[color:var(--text-secondary)]">
+              <Pencil size={16} />
+            </span>
+            {translateRuntimeMessage(msg`编辑笔记`)}
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={onShareOrCopy}
