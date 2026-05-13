@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import type {
   CloudInstancePowerState,
+  CloudWorldAdminBootstrap,
   CloudWorldAttentionItem,
   CloudWorldInstanceFleetItem,
 } from "@yinjie/contracts";
@@ -251,6 +252,8 @@ export function WorldsPage() {
   const { showNotice } = useConsoleNotice();
   const [confirmAction, setConfirmAction] =
     useState<QuickActionConfirmState | null>(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 20;
   const statusFilter = filters.status;
   const providerFilter = filters.provider;
   const powerStateFilter = filters.powerState;
@@ -405,6 +408,27 @@ export function WorldsPage() {
     };
   }, [attentionByWorldId, filteredInstanceFleet]);
 
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredInstanceFleet.length / pageSize),
+  );
+  const safePage = Math.min(Math.max(1, page), totalPages);
+  const pagedInstanceFleet = useMemo(
+    () =>
+      filteredInstanceFleet.slice(
+        (safePage - 1) * pageSize,
+        safePage * pageSize,
+      ),
+    [filteredInstanceFleet, safePage, pageSize],
+  );
+
+  // 过滤条件变化导致总页数缩小到当前页之外时，把页码拉回最后一页，保持显示稳定
+  useEffect(() => {
+    if (page !== safePage) {
+      setPage(safePage);
+    }
+  }, [page, safePage]);
+
   const quickActionMutation = useMutation({
     mutationFn: (input: { worldId: string; action: WorldLifecycleAction }) =>
       performWorldLifecycleActionWithMeta(input.worldId, input.action),
@@ -440,35 +464,65 @@ export function WorldsPage() {
   const enterAdminMutation = useMutation({
     mutationFn: (worldId: string) =>
       cloudAdminApi.getWorldAdminBootstrap(worldId),
-    onSuccess: (bootstrap) => {
-      if (typeof window === "undefined") {
-        return;
-      }
-      const payload = JSON.stringify({
-        apiBaseUrl: bootstrap.apiBaseUrl,
-        adminSecret: bootstrap.adminSecret,
-        cloudWorldId: bootstrap.worldId,
-        cloudEmail: bootstrap.email ?? undefined,
-      });
-      // btoa 只认 Latin-1，payload 里若含 Unicode（email 带中文标签、
-      // 未来加 worldName 等）会抛 InvalidCharacterError。统一 UTF-8 bytes → base64url。
-      const utf8Bytes = new TextEncoder().encode(payload);
-      let binary = "";
-      for (const byte of utf8Bytes) {
-        binary += String.fromCharCode(byte);
-      }
-      const encoded = window
-        .btoa(binary)
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/, "");
-      const url = `${bootstrap.adminFrontendBaseUrl.replace(/\/+$/, "")}/#yinjie-bootstrap=${encoded}`;
-      window.open(url, "_blank", "noopener,noreferrer");
-    },
     onError: (error) => {
       showCloudAdminErrorNotice(showNotice, error);
     },
   });
+
+  function buildAdminBootstrapUrl(bootstrap: CloudWorldAdminBootstrap): string {
+    const payload = JSON.stringify({
+      apiBaseUrl: bootstrap.apiBaseUrl,
+      adminSecret: bootstrap.adminSecret,
+      cloudWorldId: bootstrap.worldId,
+      cloudEmail: bootstrap.email ?? undefined,
+    });
+    // btoa 只认 Latin-1；payload 含中文/emoji（email 带中文标签等）会抛
+    // InvalidCharacterError。统一 UTF-8 bytes → base64url。
+    const utf8Bytes = new TextEncoder().encode(payload);
+    let binary = "";
+    for (const byte of utf8Bytes) {
+      binary += String.fromCharCode(byte);
+    }
+    const encoded = window
+      .btoa(binary)
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+    return `${bootstrap.adminFrontendBaseUrl.replace(/\/+$/, "")}/#yinjie-bootstrap=${encoded}`;
+  }
+
+  function handleEnterAdminClick(worldId: string) {
+    if (typeof window === "undefined") {
+      return;
+    }
+    // 同步在 click handler 里占住 about:blank，避免 fetch 异步 resolve 后
+    // user activation 窗口过期被 popup blocker 拦。OAuth 跳转走的也是这个套路。
+    // noopener 会丢掉 window 引用，没法 redirect，所以这里不加；admin 是我们
+    // 自家应用，opener 反向攻击面可控。
+    const placeholder = window.open("about:blank", "_blank");
+    enterAdminMutation.mutate(worldId, {
+      onSuccess: (bootstrap) => {
+        const url = buildAdminBootstrapUrl(bootstrap);
+        if (placeholder && !placeholder.closed) {
+          // replace 而不是赋 href，避免在新 tab 的历史里留下 about:blank 一栏，
+          // 操作员点"后退"就会回到空白页。
+          placeholder.location.replace(url);
+          return;
+        }
+        // placeholder 被关或一开始就被拦，最后再试一次正常 open
+        const retry = window.open(url, "_blank", "noopener,noreferrer");
+        if (!retry) {
+          showNotice(
+            "Browser blocked the popup. Allow popups for this site and retry.",
+            "danger",
+          );
+        }
+      },
+      onError: () => {
+        placeholder?.close();
+      },
+    });
+  }
   const activeConfirm = confirmAction
     ? createWorldActionConfirmationCopy(
         confirmAction.action,
@@ -641,13 +695,11 @@ export function WorldsPage() {
         ) : null}
 
         <div className="mt-5 overflow-x-auto rounded-2xl border border-[color:var(--border-faint)]">
-          <table className="min-w-[96rem] border-collapse text-left text-sm">
+          <table className="min-w-[72rem] border-collapse text-left text-sm">
             <thead className="bg-[color:var(--surface-soft)] text-[color:var(--text-muted)]">
               <tr>
                 <th className="px-4 py-3">{t("World")}</th>
                 <th className="px-4 py-3">{t("Status")}</th>
-                <th className="px-4 py-3">{t("Provider")}</th>
-                <th className="px-4 py-3">{t("Instance")}</th>
                 <th className="px-4 py-3">{t("Power")}</th>
                 <th className="px-4 py-3">{t("Attention")}</th>
                 <th className="px-4 py-3">{t("Health")}</th>
@@ -657,13 +709,9 @@ export function WorldsPage() {
               </tr>
             </thead>
             <tbody>
-              {filteredInstanceFleet.map((item) => {
+              {pagedInstanceFleet.map((item) => {
                 const attention = attentionByWorldId.get(item.world.id) ?? null;
                 const powerState = resolvePowerState(item);
-                const providerLabel = resolveProviderLabel(
-                  item,
-                  providerLabelByKey,
-                );
                 const lastHeartbeatAt =
                   item.instance?.lastHeartbeatAt ?? item.world.lastHeartbeatAt;
 
@@ -691,25 +739,6 @@ export function WorldsPage() {
                     </td>
                     <td className="px-4 py-3 uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
                       {item.world.status}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="text-[color:var(--text-primary)]">
-                        {providerLabel}
-                      </div>
-                      <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                        {resolveProviderKey(item) || "No provider key"}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="text-[color:var(--text-primary)]">
-                        {item.instance?.name ?? "No instance attached"}
-                      </div>
-                      <div className="mt-1 text-xs text-[color:var(--text-secondary)]">
-                        {item.instance?.publicIp ??
-                          item.instance?.privateIp ??
-                          item.instance?.providerInstanceId ??
-                          "No IP / provider instance id"}
-                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <span
@@ -800,9 +829,7 @@ export function WorldsPage() {
                               ? t("World has no apiBaseUrl yet")
                               : undefined
                           }
-                          onClick={() =>
-                            enterAdminMutation.mutate(item.world.id)
-                          }
+                          onClick={() => handleEnterAdminClick(item.world.id)}
                           className="self-start rounded-lg border border-[color:var(--border-faint)] bg-[color:var(--surface-secondary)] px-3 py-2 text-xs uppercase tracking-[0.18em] text-[color:var(--text-primary)] hover:border-[color:var(--border-strong)] disabled:opacity-60"
                         >
                           {enterAdminMutation.isPending &&
@@ -836,6 +863,34 @@ export function WorldsPage() {
           !filteredInstanceFleet.length ? (
             <div className="p-4 text-sm text-[color:var(--text-muted)]">
               {t("No instance rows match the current filter set.")}
+            </div>
+          ) : null}
+
+          {filteredInstanceFleet.length > pageSize ? (
+            <div className="flex items-center justify-between gap-3 border-t border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-4 py-3 text-sm text-[color:var(--text-secondary)]">
+              <div>
+                {t("Page")} {safePage} / {totalPages} · {filteredInstanceFleet.length} {t("entries")}
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  disabled={safePage <= 1}
+                  onClick={() => setPage((current) => Math.max(1, current - 1))}
+                  className="rounded-full border border-[color:var(--border-faint)] px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-[color:var(--text-primary)] hover:border-[color:var(--border-strong)] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {t("Previous")}
+                </button>
+                <button
+                  type="button"
+                  disabled={safePage >= totalPages}
+                  onClick={() =>
+                    setPage((current) => Math.min(totalPages, current + 1))
+                  }
+                  className="rounded-full border border-[color:var(--border-faint)] px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-[color:var(--text-primary)] hover:border-[color:var(--border-strong)] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {t("Next")}
+                </button>
+              </div>
             </div>
           ) : null}
         </div>

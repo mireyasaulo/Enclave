@@ -116,6 +116,8 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Enter admin": "进入后台",
     "Opening admin…": "正在打开后台…",
     "World has no apiBaseUrl yet": "该世界尚未分配 apiBaseUrl，请先启动",
+    "Browser blocked the popup. Allow popups for this site and retry.":
+      "浏览器拦截了弹窗。请在本站允许弹窗后重试。",
 
     "Downloaded admin session audit snapshot for": "已下载管理会话审计快照：",
     "Downloaded focused source snapshot for": "已下载聚焦来源快照：",
