@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
+import { cloudAdminApi } from "./cloud-admin-api";
 
 export interface IpRegionInfo {
-  // 用于直接渲染的人类可读地区文案（已尽量本地化为中文国家名 + 英文省市）
+  // 用于直接渲染的人类可读地区文案（已尽量本地化为中文国家名 + 省市）
   display: string;
   countryCode: string | null;
   country: string | null;
@@ -9,17 +10,7 @@ export interface IpRegionInfo {
   city: string | null;
 }
 
-interface IpWhoIsResponse {
-  success?: boolean;
-  ip?: string;
-  country?: string;
-  country_code?: string;
-  region?: string;
-  city?: string;
-  message?: string;
-}
-
-// 私网/保留段：直接本地判断，省一次外部调用
+// 私网/保留段：直接本地判断，省一次后端调用
 function classifyLocalIp(ip: string): IpRegionInfo | null {
   const trimmed = ip.trim();
   if (!trimmed) return null;
@@ -75,7 +66,8 @@ function localizeCountry(
     if (names) {
       try {
         const localized = names.of(countryCode.toUpperCase());
-        if (localized && localized !== countryCode) return localized;
+        if (localized && localized.toUpperCase() !== countryCode.toUpperCase())
+          return localized;
       } catch {
         // ignore
       }
@@ -92,35 +84,23 @@ function composeDisplay(
   if (info.country) parts.push(info.country);
   if (info.region && info.region !== info.country) parts.push(info.region);
   if (info.city && info.city !== info.region) parts.push(info.city);
-  // API 命中但所有字段都空（bogon / 内网穿透 IP 等），退回展示原始 IP
+  // 后端解析失败 / 所有字段都空时，退回展示原始 IP
   return parts.length ? parts.join(" · ") : ipFallback;
 }
 
-async function fetchIpRegion(
-  ip: string,
-  signal?: AbortSignal,
-): Promise<IpRegionInfo> {
+async function fetchIpRegion(ip: string): Promise<IpRegionInfo> {
   const local = classifyLocalIp(ip);
   if (local) return local;
 
-  // ipwho.is 免费无 key，支持 HTTPS + CORS，命中失败也返回 200，依赖 success 字段
-  const response = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}`, {
-    signal,
-  });
-  if (!response.ok) {
-    throw new Error(`ipwho.is HTTP ${response.status}`);
-  }
-  const data = (await response.json()) as IpWhoIsResponse;
-  if (data.success === false) {
-    throw new Error(data.message ?? "ipwho.is lookup failed");
-  }
-
-  const country = localizeCountry(data.country_code, data.country);
+  // 走 cloud-api 代理：浏览器到 ipwho.is/ipinfo.io 在国内常被墙，
+  // 服务器侧出口更稳；同时缓存集中，避免每个操作员各自命中。
+  const lookup = await cloudAdminApi.lookupIpRegion(ip);
+  const country = localizeCountry(lookup.countryCode, lookup.country);
   const info = {
-    countryCode: data.country_code ?? null,
+    countryCode: lookup.countryCode ?? null,
     country,
-    region: data.region ?? null,
-    city: data.city ?? null,
+    region: lookup.region ?? null,
+    city: lookup.city ?? null,
   };
   return { ...info, display: composeDisplay(info, ip) };
 }
@@ -129,9 +109,9 @@ export function useIpRegion(ip: string | null | undefined) {
   const trimmed = typeof ip === "string" ? ip.trim() : "";
   return useQuery({
     queryKey: ["ip-region", trimmed],
-    queryFn: ({ signal }) => fetchIpRegion(trimmed, signal),
+    queryFn: () => fetchIpRegion(trimmed),
     enabled: Boolean(trimmed),
-    // 同一 IP 解析结果几乎不变，长期复用；失败不要狂重试拖慢列表
+    // 同一 IP 解析结果几乎不变（后端也有 7 天缓存），前端长期复用
     staleTime: Infinity,
     gcTime: Infinity,
     retry: 1,

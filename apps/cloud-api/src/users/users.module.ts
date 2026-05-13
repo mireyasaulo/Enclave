@@ -11,6 +11,8 @@ import { InviteRedemptionEntity } from "../entities/invite-redemption.entity";
 import { UserSubscriptionEntity } from "../entities/user-subscription.entity";
 import { InviteModule } from "../invite/invite.module";
 import { SubscriptionModule } from "../subscription/subscription.module";
+import { IpRegionController } from "./ip-region.controller";
+import { IpRegionService } from "./ip-region.service";
 import { UsersAdminController } from "./users-admin.controller";
 import { UsersService } from "./users.service";
 
@@ -28,8 +30,8 @@ import { UsersService } from "./users.service";
     SubscriptionModule,
     InviteModule,
   ],
-  controllers: [UsersAdminController],
-  providers: [UsersService, AdminGuard, AdminAuthService],
+  controllers: [UsersAdminController, IpRegionController],
+  providers: [UsersService, IpRegionService, AdminGuard, AdminAuthService],
   exports: [UsersService],
 })
 export class UsersModule {}

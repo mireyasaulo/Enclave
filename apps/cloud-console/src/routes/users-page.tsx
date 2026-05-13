@@ -82,7 +82,9 @@ function SortableHeader({
   onToggle: (field: SortField) => void;
 }) {
   const isActive = activeField === field;
-  const indicator = isActive ? (direction === "asc" ? "▲" : "▼") : "↕";
+  // 三档 (asc/desc/inactive) 用同一 family 的字符 + 固定宽度容器，避免 ↕/▲/▼
+  // 切换时撑动列宽
+  const indicator = isActive ? (direction === "asc" ? "▲" : "▼") : "▼";
   return (
     <button
       type="button"
@@ -94,7 +96,13 @@ function SortableHeader({
       } hover:text-[color:var(--text-primary)]`}
     >
       <span>{label}</span>
-      <span className="text-xs">{indicator}</span>
+      <span
+        className={`inline-block w-3 text-center text-[10px] leading-none ${
+          isActive ? "opacity-100" : "opacity-30"
+        }`}
+      >
+        {indicator}
+      </span>
     </button>
   );
 }
@@ -219,13 +227,23 @@ export function UsersPage() {
       ) : null}
 
       {usersQuery.data ? (
-        <div className="overflow-hidden rounded-[24px] border border-[color:var(--border-faint)] bg-white">
-          <table className="min-w-full divide-y divide-[color:var(--border-faint)] text-sm">
+        <div className="overflow-x-auto rounded-[24px] border border-[color:var(--border-faint)] bg-white">
+          {/* table-fixed + 显式宽度：避免排序切换、IP 异步解析导致列宽抖动 */}
+          <table className="w-full table-fixed divide-y divide-[color:var(--border-faint)] text-sm">
+            <colgroup>
+              <col className="w-[18%]" />
+              <col className="w-[12%]" />
+              <col className="w-[12%]" />
+              <col className="w-[12%]" />
+              <col className="w-[12%]" />
+              <col className="w-[12%]" />
+              <col className="w-[8%]" />
+              <col className="w-[8%]" />
+              <col className="w-[6%]" />
+            </colgroup>
             <thead className="bg-[#f8faf8] text-left text-[color:var(--text-muted)]">
               <tr>
                 <th className="px-4 py-3 font-medium">{t("Email")}</th>
-                <th className="px-4 py-3 font-medium">{t("Account")}</th>
-                <th className="px-4 py-3 font-medium">{t("Subscription")}</th>
                 <th className="px-4 py-3 font-medium">
                   <SortableHeader
                     label={t("Expires")}
@@ -263,33 +281,36 @@ export function UsersPage() {
             <tbody className="divide-y divide-[color:var(--border-faint)]">
               {sortedItems.map((user) => (
                 <tr key={user.id} className="align-top">
-                  <td className="px-4 py-3 break-all">
+                  <td className="truncate px-4 py-3">
                     <Link
                       to="/users/$userId"
                       params={{ userId: user.id }}
                       className="font-medium text-[color:var(--brand-primary)]"
+                      title={user.email ?? user.displayName ?? undefined}
                     >
                       {user.email || user.displayName || t("(no email)")}
                     </Link>
                   </td>
-                  <td className="px-4 py-3">{t(user.status)}</td>
-                  <td className="px-4 py-3">{t(user.subscriptionStatus)}</td>
                   <td className="px-4 py-3">
                     {formatTimestamp(user.subscriptionExpiresAt)}
                   </td>
                   <td className="px-4 py-3">{formatTimestamp(user.createdAt)}</td>
-                  <td className="px-4 py-3">
+                  <td className="truncate px-4 py-3">
                     <IpRegionCell ip={user.registrationIp} />
                   </td>
                   <td className="px-4 py-3">{formatTimestamp(user.lastLoginAt)}</td>
-                  <td className="px-4 py-3">
+                  <td className="truncate px-4 py-3">
                     <IpRegionCell ip={user.lastLoginIp} />
                   </td>
-                  <td className="px-4 py-3">{user.inviterPhone || "-"}</td>
-                  <td className="px-4 py-3">
+                  <td className="truncate px-4 py-3">
+                    {user.inviterPhone || "-"}
+                  </td>
+                  <td className="truncate px-4 py-3">
                     {user.worldStatus ? t(user.worldStatus) : "-"}
                   </td>
-                  <td className="px-4 py-3">{user.currentPlanCode || "-"}</td>
+                  <td className="truncate px-4 py-3">
+                    {user.currentPlanCode || "-"}
+                  </td>
                 </tr>
               ))}
             </tbody>

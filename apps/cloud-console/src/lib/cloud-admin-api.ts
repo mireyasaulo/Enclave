@@ -1256,6 +1256,16 @@ export const cloudAdminApi = {
 
   getCloudUser: (id: string) => adminFetch<CloudUserDetail>(`/users/${id}`),
 
+  lookupIpRegion: (ip: string) =>
+    adminFetch<{
+      ip: string;
+      countryCode: string | null;
+      country: string | null;
+      region: string | null;
+      city: string | null;
+      source: "ipwho.is" | "ipinfo.io" | "cache" | "unresolved";
+    }>(`/ip-region/${encodeURIComponent(ip)}`),
+
   grantSubscription: (id: string, payload: GrantSubscriptionRequest) =>
     adminFetch<SubscriptionRecordSummary>(`/users/${id}/subscriptions`, {
       method: "POST",
