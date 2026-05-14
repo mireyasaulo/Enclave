@@ -48,6 +48,8 @@ import {
 } from '../inference/inference.service';
 import { SubscriptionService } from '../subscription/subscription.service';
 import { MinimaxNativeClient } from './minimax-native.client';
+import { MinimaxQuotaService } from '../minimax/minimax-quota.service';
+import { TOKEN_PLAN_DAILY_LIMITS } from '../minimax/minimax-quota.constants';
 import {
   executeChatCompletion,
   type ChatCompletionTaskResult,
@@ -207,6 +209,7 @@ export class AiOrchestratorService {
     private readonly usageLedger: AiUsageLedgerService,
     private readonly momentGenerationContext: MomentGenerationContextService,
     private readonly subscription: SubscriptionService,
+    private readonly minimaxQuota: MinimaxQuotaService,
   ) {
     this.client = new OpenAI({
       apiKey: this.config.get<string>('DEEPSEEK_API_KEY'),
@@ -700,6 +703,17 @@ export class AiOrchestratorService {
     }
 
     return '';
+  }
+
+  private isMinimaxTokenPlanExhausted(error: unknown) {
+    if (error instanceof AppError) {
+      const body = error.getResponse() as { code?: string } | undefined;
+      if (body?.code === 'MINIMAX_TOKEN_PLAN_EXHAUSTED') {
+        return true;
+      }
+    }
+    const msg = this.extractErrorMessage(error);
+    return /\b2056\b/.test(msg);
   }
 
   private extractErrorStatus(error: unknown) {
@@ -3238,27 +3252,55 @@ export class AiOrchestratorService {
 
       try {
         if (MinimaxNativeClient.isMinimaxEndpoint(provider.ttsEndpoint)) {
+          // Token Plan quota gate：仅对已在常量表登记的模型做配额扣减
+          // （目前是 speech-02-hd，11000/天）。未登记的 minimax TTS 模型
+          // 自然 bypass —— 不阻塞历史 provider 配置。
+          const quotaModel = provider.ttsModel;
+          const tracked = quotaModel in TOKEN_PLAN_DAILY_LIMITS;
+          if (tracked) {
+            const reserved = await this.minimaxQuota.tryReserve(quotaModel);
+            if (!reserved) {
+              throw new AppError('AI_TTS_QUOTA_EXHAUSTED', {
+                status: HttpStatus.TOO_MANY_REQUESTS,
+                legacyMessage: '今日语音合成额度已用完，请稍后再试。',
+              });
+            }
+          }
           const minimax = new MinimaxNativeClient(
             provider.ttsEndpoint,
             provider.ttsApiKey,
           );
-          const result = await this.retrySpeechRequest(
-            'speech synthesis',
-            () =>
-              minimax.synthesizeSpeech({
-                model: provider.ttsModel,
-                text,
-                voiceId: voice,
-              }),
-          );
-          return {
-            buffer: result.buffer,
-            mimeType: result.mimeType,
-            fileExtension: 'mp3',
-            durationMs: Date.now() - startedAt,
-            provider: provider.ttsModel,
-            voice,
-          };
+          try {
+            const result = await this.retrySpeechRequest(
+              'speech synthesis',
+              () =>
+                minimax.synthesizeSpeech({
+                  model: provider.ttsModel,
+                  text,
+                  voiceId: voice,
+                }),
+            );
+            if (tracked) {
+              await this.minimaxQuota.commit(quotaModel);
+            }
+            return {
+              buffer: result.buffer,
+              mimeType: result.mimeType,
+              fileExtension: 'mp3',
+              durationMs: Date.now() - startedAt,
+              provider: provider.ttsModel,
+              voice,
+            };
+          } catch (innerErr) {
+            if (tracked) {
+              await this.minimaxQuota.release(quotaModel);
+              // 撞 2056（Token Plan 整体耗尽）就标死，避免本 tick 之后还反复重试
+              if (this.isMinimaxTokenPlanExhausted(innerErr)) {
+                await this.minimaxQuota.markExhaustedToday(quotaModel);
+              }
+            }
+            throw innerErr;
+          }
         }
         const client = this.createProviderClientFromEndpoint({
           endpoint: provider.ttsEndpoint,

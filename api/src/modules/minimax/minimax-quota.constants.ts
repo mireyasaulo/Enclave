@@ -15,6 +15,9 @@ const FALLBACK_TOKEN_PLAN_DAILY_LIMITS: Record<string, number> = {
   // 让 quota service 能用 reserve/commit/release + markExhaustedToday 这套
   // 机制来熔断。撞过 2056 后 isExhaustedToday 会拒绝后续 reserve，无需依赖上限。
   'MiniMax-M2.7': 1000,
+  // 语音合成 · HD（高保真），Token Plan 每日 11000 次。
+  // 撞 2056 / quota 失败时熔断，避免无表消耗。
+  'speech-02-hd': 11000,
 };
 
 const ENV_KEY_BY_MODEL: Record<string, string> = {
@@ -25,6 +28,7 @@ const ENV_KEY_BY_MODEL: Record<string, string> = {
   'image-01': 'MINIMAX_DAILY_LIMIT_IMAGE_01',
   'lyrics': 'MINIMAX_DAILY_LIMIT_LYRICS',
   'MiniMax-M2.7': 'MINIMAX_DAILY_LIMIT_M27',
+  'speech-02-hd': 'MINIMAX_DAILY_LIMIT_SPEECH_HD',
 };
 
 function readLimit(model: string): number {
