@@ -679,7 +679,12 @@ export class WikiReviewService {
 
   /**
    * Wikipedia 3RR 风格规则：
-   *   (A) 同一 patroller 在 24h 内对同一 character revert > 3 次 → 拒绝。admin 例外。
+   *   (A) 同一 patroller 在 24h 内对同一 character revert ≥ 3 次 → 拒绝。
+   *   (B) 同一 patroller 在 24h 内全站 revert ≥ 20 次 → 拒绝。
+   *       (B) 是为了防 patroller 跨角色滥用 revert 把目标作者的
+   *       revertedCount/approvedEditCount 比率推到 0.3+，触发 sweepDegrade
+   *       自动降级 + 7 天 global block。
+   *   admin 例外。
    * 与 maybeAutoLock 配套防编辑战。
    */
   private async assert3RR(
@@ -688,7 +693,7 @@ export class WikiReviewService {
   ): Promise<void> {
     if (rankOf(reviewer.role) >= rankOf('admin')) return;
     const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const count = await this.revisionRepo.count({
+    const sameCharacterCount = await this.revisionRepo.count({
       where: {
         characterId,
         operation: 'revert',
@@ -696,7 +701,7 @@ export class WikiReviewService {
         createdAt: MoreThan(cutoff),
       },
     });
-    if (count >= 3) {
+    if (sameCharacterCount >= 3) {
       throw new AppError('WIKI_FORBIDDEN', {
         status: HttpStatus.FORBIDDEN,
         params: {
@@ -707,10 +712,28 @@ export class WikiReviewService {
           '24 小时内已对该词条回退 3 次（3RR）。请改为讨论页协商或申请管理员介入',
       });
     }
+    const globalCount = await this.revisionRepo.count({
+      where: {
+        operation: 'revert',
+        editorUserId: reviewer.id,
+        createdAt: MoreThan(cutoff),
+      },
+    });
+    if (globalCount >= 20) {
+      throw new AppError('WIKI_FORBIDDEN', {
+        status: HttpStatus.FORBIDDEN,
+        params: {
+          reason:
+            '24 小时内全站回退已达 20 次上限，疑似滥用。请改为申请 admin 介入',
+        },
+        legacyMessage:
+          '24 小时内全站回退已达 20 次上限，疑似滥用。请改为申请 admin 介入',
+      });
+    }
   }
 
   /**
-   * (B) 同一 character 在 24h 内被 revert > 5 次 → 自动 semi 保护 24h。
+   * 同一 character 在 24h 内被 revert ≥ 6 次（即第 6 次触发）→ 自动 semi 保护 24h。
    * 已是 semi/full 的页面不重复升级。
    */
   private async maybeAutoLock(characterId: string): Promise<void> {

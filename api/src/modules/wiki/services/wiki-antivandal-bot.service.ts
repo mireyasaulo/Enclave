@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { sleepForWorldJitter } from '../../../common/cron-jitter.util';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThan, Repository } from 'typeorm';
+import { LessThan, MoreThan, Repository } from 'typeorm';
 import { CharacterRevisionEntity } from '../entities/character-revision.entity';
 import { CharacterPageEntity } from '../entities/character-page.entity';
 import { AbuseFilterHitEntity } from '../entities/abuse-filter-hit.entity';
@@ -137,13 +137,17 @@ export class WikiAntivandalBotService {
         return true;
       }
       if (rev.status === 'approved') {
-        // Find the previous approved revision to revert to
+        // 找上一条 approved revision：以前用 version-1，但 version 序列可能因
+        // rejected/superseded/reverted 状态而存在断号——一旦 v-1 不是 approved
+        // 就 skip，破坏者那条恶意 revision 留在线上不会被回退。
+        // 改成 "version < rev.version AND status='approved' 取最大 version"。
         const previous = await this.revisionRepo.findOne({
           where: {
             characterId: rev.characterId,
             status: 'approved',
-            version: rev.version - 1,
+            version: LessThan(rev.version),
           },
+          order: { version: 'DESC' },
         });
         if (!previous) {
           this.logger.warn(
