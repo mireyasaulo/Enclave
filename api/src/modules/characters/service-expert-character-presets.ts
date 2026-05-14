@@ -12,6 +12,7 @@
 // seed 后 DB 里的状态一致。
 
 import type { CelebrityCharacterPreset } from './celebrity-character-presets';
+import { getCharacterAvatarBySourceKey } from './character-avatar-assets';
 import {
   buildHotelExpertCharacter,
   HOTEL_EXPERT_CHARACTER_ID,
@@ -28,66 +29,56 @@ import {
   WEDDING_PLANNER_SOURCE_KEY,
 } from './wedding-planner-character';
 
-const HOTEL_EXPERT_CHARACTER = buildHotelExpertCharacter();
-const WEDDING_PLANNER_CHARACTER = buildWeddingPlannerCharacter();
-const WEDDING_DRESS_EXPERT_CHARACTER = buildWeddingDressExpertCharacter();
-
+// preset 顶层 metadata 全部 hardcode、不从 character 对象读 ?? fallback
+// —— 跟现有所有 preset 文件 convention 一致，避免 fallback 静默掩盖
+// "build* 函数漏字段" 这类回归。
 export const SERVICE_EXPERT_CHARACTER_PRESETS: CelebrityCharacterPreset[] = [
   {
     presetKey: HOTEL_EXPERT_SOURCE_KEY,
     groupKey: 'business_and_investing',
     id: HOTEL_EXPERT_CHARACTER_ID,
-    name: HOTEL_EXPERT_CHARACTER.name ?? '酒店专家',
-    avatar: HOTEL_EXPERT_CHARACTER.avatar ?? '🏨',
-    relationship:
-      HOTEL_EXPERT_CHARACTER.relationship ??
-      '帮你把酒店、住宿和会务选择看稳的人',
+    name: '酒店专家',
+    avatar: getCharacterAvatarBySourceKey(HOTEL_EXPERT_SOURCE_KEY),
+    relationship: '帮你把酒店、住宿和会务选择看稳的人',
     description:
       '懂订房、入住、权益、服务补救、宴会会务和酒店经营判断的礼宾经理型居民，先看条款和总成本再下判断。',
-    expertDomains: HOTEL_EXPERT_CHARACTER.expertDomains ?? [
-      'travel',
-      'hospitality',
-      'management',
-      'general',
-    ],
-    character: HOTEL_EXPERT_CHARACTER,
+    expertDomains: ['travel', 'hospitality', 'management', 'general'],
+    character: buildHotelExpertCharacter(),
   },
   {
     presetKey: WEDDING_PLANNER_SOURCE_KEY,
     groupKey: 'relationships_and_emotions',
     id: WEDDING_PLANNER_CHARACTER_ID,
-    name: WEDDING_PLANNER_CHARACTER.name ?? '礼序',
-    avatar: WEDDING_PLANNER_CHARACTER.avatar ?? '💍',
-    relationship: WEDDING_PLANNER_CHARACTER.relationship ?? '帮你把婚礼落地的人',
+    name: '礼序',
+    avatar: getCharacterAvatarBySourceKey(WEDDING_PLANNER_SOURCE_KEY),
+    relationship: '帮你把婚礼落地的人',
     description:
       '帮你把婚礼从模糊愿望翻译成预算、档期、流程和分工的婚礼统筹居民，不鼓动超支。',
-    expertDomains: WEDDING_PLANNER_CHARACTER.expertDomains ?? [
+    expertDomains: [
       'management',
       'general',
       'wedding_planning',
       'event_planning',
     ],
-    character: WEDDING_PLANNER_CHARACTER,
+    character: buildWeddingPlannerCharacter(),
   },
   {
     presetKey: WEDDING_DRESS_EXPERT_SOURCE_KEY,
     groupKey: 'relationships_and_emotions',
     id: WEDDING_DRESS_EXPERT_CHARACTER_ID,
-    name: WEDDING_DRESS_EXPERT_CHARACTER.name ?? '纱凝',
-    avatar: WEDDING_DRESS_EXPERT_CHARACTER.avatar ?? '👰',
-    relationship:
-      WEDDING_DRESS_EXPERT_CHARACTER.relationship ??
-      '帮你把婚纱选款、试纱和改衣落到上身效果的人',
+    name: '纱凝',
+    avatar: getCharacterAvatarBySourceKey(WEDDING_DRESS_EXPERT_SOURCE_KEY),
+    relationship: '帮你把婚纱选款、试纱和改衣落到上身效果的人',
     description:
       '懂婚纱版型、面料、试纱、改衣和现场体验的礼服顾问居民，先看上身和场地再下判断。',
-    expertDomains: WEDDING_DRESS_EXPERT_CHARACTER.expertDomains ?? [
+    expertDomains: [
       'fashion',
       'wedding_dress',
       'bridal_styling',
       'wedding_planning',
       'general',
     ],
-    character: WEDDING_DRESS_EXPERT_CHARACTER,
+    character: buildWeddingDressExpertCharacter(),
   },
 ];
 // i18n-ignore-end
