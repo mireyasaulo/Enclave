@@ -681,13 +681,16 @@ export function ChatBackgroundPage() {
       title={conversation?.title ?? t(msg`聊天背景`)}
       subtitle={t(msg`默认背景和好友专属背景`)}
       onBack={() => {
-        navigateBackOrFallback(() => {
-          void navigate({
-            to: "/chat/$conversationId/details",
-            params: { conversationId },
-            ...(currentRouteHash ? { hash: currentRouteHash } : {}),
-          });
-        });
+        navigateBackOrFallback(
+          () => {
+            void navigate({
+              to: "/chat/$conversationId/details",
+              params: { conversationId },
+              ...(currentRouteHash ? { hash: currentRouteHash } : {}),
+            });
+          },
+          `/chat/${conversationId}/details`,
+        );
       }}
     >
       <div className="space-y-3 px-3">{content}</div>

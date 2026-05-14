@@ -673,13 +673,16 @@ export function GroupChatBackgroundPage() {
       title={groupQuery.data?.name ?? t(msg`群聊背景`)}
       subtitle={t(msg`默认背景和群聊专属背景`)}
       onBack={() => {
-        navigateBackOrFallback(() => {
-          void navigate({
-            to: "/group/$groupId/details",
-            params: { groupId },
-            ...(currentRouteHash ? { hash: currentRouteHash } : {}),
-          });
-        });
+        navigateBackOrFallback(
+          () => {
+            void navigate({
+              to: "/group/$groupId/details",
+              params: { groupId },
+              ...(currentRouteHash ? { hash: currentRouteHash } : {}),
+            });
+          },
+          `/group/${groupId}/details`,
+        );
       }}
     >
       <div className="space-y-3 px-3">{content}</div>
