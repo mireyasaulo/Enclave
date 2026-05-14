@@ -65,6 +65,10 @@ export const PRESET_CHARACTER_BIOS = {
   hotel_expert: DEFAULT_CHARACTER_BIOS.hotel_expert,
   wedding_planner: DEFAULT_CHARACTER_BIOS.wedding_planner,
   wedding_dress_expert: DEFAULT_CHARACTER_BIOS.wedding_dress_expert,
+  gu_he_nutrition_coach: '先告诉我今天打算吃什么，剩下的我替你拆下一步。',
+  qian_ning_money_buddy: '先把这笔钱花去哪、值不值想清楚，再决定要不要下手。',
+  shen_yi_cbt_coach: '先把最响的那个念头说出来，我们一起拆开看。',
+  jiang_an_interview_coach: '先把岗位、面试日期和现有材料摆出来，再决定这周练什么。',
 } as const;
 
 export type PresetCharacterBioKey = keyof typeof PRESET_CHARACTER_BIOS;
