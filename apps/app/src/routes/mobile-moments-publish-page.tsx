@@ -121,16 +121,19 @@ export function MobileMomentsPublishPage() {
   }, [toast]);
 
   function performBack() {
-    navigateBackOrFallback(() => {
-      if (safeReturnPath) {
-        void navigate({
-          to: safeReturnPath,
-          ...(safeReturnHash ? { hash: safeReturnHash } : {}),
-        });
-        return;
-      }
-      void navigate({ to: "/discover/moments" });
-    });
+    navigateBackOrFallback(
+      () => {
+        if (safeReturnPath) {
+          void navigate({
+            to: safeReturnPath,
+            ...(safeReturnHash ? { hash: safeReturnHash } : {}),
+          });
+          return;
+        }
+        void navigate({ to: "/discover/moments" });
+      },
+      safeReturnPath ?? "/discover/moments",
+    );
   }
 
   function handleBack() {

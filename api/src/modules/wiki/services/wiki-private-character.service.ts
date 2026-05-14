@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserPrivateCharacterEntity } from '../entities/user-private-character.entity';
 import type { CharacterBlueprintRecipeValue } from '../../characters/character-blueprint.types';
+import { assertPrivateCharacterFieldLimits } from '../../characters/characters.service';
 import type { PersonalityProfile } from '../../ai/ai.types';
 
 export const PRIVATE_CHARACTER_EXPORT_SCHEMA =
@@ -72,12 +73,47 @@ export class WikiPrivateCharacterService {
     return row;
   }
 
+  /**
+   * @deprecated 历史 API：等同 `upsertByName`，会无声覆盖同名旧记录。
+   * 新代码请用 `createStrict`（重名抛 Conflict）或显式 `upsertByName`。
+   * 暂保留是为不破坏其它内部调用方；外部 controller 已经迁移到 createStrict。
+   */
   async create(
     ownerUserId: string,
     dto: PrivateCharacterDto,
   ): Promise<UserPrivateCharacterEntity> {
     const { record } = await this.upsertByName(ownerUserId, dto);
     return record;
+  }
+
+  /**
+   * 严格新建：同名直接抛 Conflict。
+   * `POST /wiki/my-characters` 入口走这里 —— 用户的"创建"语义就是新建一条，
+   * 不要默默覆盖。覆盖语义留给 import 路径（用户上传文件意图明确）。
+   */
+  async createStrict(
+    ownerUserId: string,
+    dto: PrivateCharacterDto,
+  ): Promise<UserPrivateCharacterEntity> {
+    if (!dto || typeof dto !== 'object') {
+      throw new BadRequestException('请求体格式不正确');
+    }
+    const trimmedName = (dto.name ?? '').trim();
+    if (!trimmedName) {
+      throw new BadRequestException('角色名不能为空');
+    }
+    assertPrivateCharacterFieldLimits({ ...dto, name: trimmedName });
+    const clash = await this.repo.findOne({
+      where: { ownerUserId, name: trimmedName },
+    });
+    if (clash) {
+      throw new ConflictException(
+        `已存在同名私有角色 "${trimmedName}"。如需覆盖，请先删除旧角色或改用导入功能。`,
+      );
+    }
+    const created = this.repo.create({ ownerUserId, name: trimmedName });
+    this.applyDto(created, { ...dto, name: trimmedName });
+    return this.repo.save(created);
   }
 
   async update(
@@ -93,6 +129,7 @@ export class WikiPrivateCharacterService {
     if (!trimmedName) {
       throw new BadRequestException('角色名不能为空');
     }
+    assertPrivateCharacterFieldLimits({ ...dto, name: trimmedName });
     // 改名时若与另一行同名 → 拒绝（避免无声丢数据）
     if (trimmedName !== existing.name) {
       const clash = await this.repo.findOne({
@@ -128,6 +165,7 @@ export class WikiPrivateCharacterService {
     if (!trimmedName) {
       throw new BadRequestException('角色名不能为空');
     }
+    assertPrivateCharacterFieldLimits({ ...dto, name: trimmedName });
     const existing = await this.repo.findOne({
       where: { ownerUserId, name: trimmedName },
     });

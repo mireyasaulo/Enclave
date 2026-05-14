@@ -864,6 +864,16 @@ export const wikiApi = {
   async importMyCharacter(
     file: File,
   ): Promise<{ record: PrivateCharacterRecord; overwrote: boolean }> {
+    // 防御性：bundle 实际只有几十 KB，超过 5 MB 几乎一定是选错文件。
+    // 在 file.text() 之前 reject，避免把 GB 级内容读到浏览器内存把页面卡死。
+    const MAX_BYTES = 5 * 1024 * 1024;
+    if (file.size > MAX_BYTES) {
+      throw new WikiApiError(
+        400,
+        null,
+        `文件太大（${(file.size / 1024 / 1024).toFixed(1)} MB），上限 5 MB。确认是 .character.json 文件后再试。`,
+      );
+    }
     const text = await file.text();
     let payload: unknown;
     try {

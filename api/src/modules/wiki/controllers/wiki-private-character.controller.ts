@@ -15,6 +15,7 @@ import {
   JwtAuthGuard,
   type AuthenticatedUser,
 } from '../../auth/jwt-auth.guard';
+import { PrivateCharacterRateLimitGuard } from '../../characters/guards/private-character-rate-limit.guard';
 import { WikiPrivateCharacterService } from '../services/wiki-private-character.service';
 import type { PrivateCharacterDto } from '../services/wiki-private-character.service';
 
@@ -29,11 +30,16 @@ export class WikiPrivateCharacterController {
   }
 
   @Post()
+  @UseGuards(PrivateCharacterRateLimitGuard)
   create(
     @CurrentUser() user: AuthenticatedUser,
     @Body() body: PrivateCharacterDto,
   ) {
-    return this.service.create(user.id, body);
+    // 走 createStrict（重名抛 Conflict）—— 旧的 create 走 upsertByName 会
+    // 把同名旧记录无声覆盖；用户在 /my-characters/new 输入已存在 name 后
+    // 期望"新建"，结果默默盖掉旧角色。createStrict 把 upsert 语义只留给
+    // import 路径，create 路径必须显式新建。
+    return this.service.createStrict(user.id, body);
   }
 
   @Get(':id')
@@ -45,6 +51,7 @@ export class WikiPrivateCharacterController {
   }
 
   @Put(':id')
+  @UseGuards(PrivateCharacterRateLimitGuard)
   update(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
@@ -54,6 +61,7 @@ export class WikiPrivateCharacterController {
   }
 
   @Delete(':id')
+  @UseGuards(PrivateCharacterRateLimitGuard)
   async remove(
     @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
@@ -88,6 +96,7 @@ export class WikiPrivateCharacterController {
   }
 
   @Post('import')
+  @UseGuards(PrivateCharacterRateLimitGuard)
   async importOne(
     @CurrentUser() user: AuthenticatedUser,
     @Body() body: unknown,

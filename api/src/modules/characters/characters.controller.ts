@@ -13,6 +13,8 @@ import { AppError } from '../../common/app-error.exception';
 import { CharactersService } from './characters.service';
 import { CharacterEntity } from './character.entity';
 import { AdminGuard } from '../admin/admin.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { PrivateCharacterRateLimitGuard } from './guards/private-character-rate-limit.guard';
 
 @Controller('characters')
 export class CharactersController {
@@ -78,16 +80,19 @@ export class CharactersController {
   /**
    * Tenant-facing 导入端点：接收 wiki "我的私有角色" 导出 JSON，按 name upsert
    * 到 characters 表，并自动为 world-owner 建 friendship。
-   * 同名→覆盖；不存在→新建。
+   * 同名→覆盖（仅限 sourceType='private_import' 的旧记录）；不存在→新建。
    */
   @Post('import-personal')
+  @UseGuards(JwtAuthGuard, PrivateCharacterRateLimitGuard)
   async importPersonal(@Body() body: unknown) {
     const parsed = parsePrivateCharacterImportBody(body);
+    type ServiceInput = Parameters<
+      CharactersService['importPersonalCharacter']
+    >[0];
     return this.charactersService.importPersonalCharacter({
       ...parsed,
-      profile: parsed.profile as Parameters<
-        CharactersService['importPersonalCharacter']
-      >[0]['profile'],
+      recipe: parsed.recipe as ServiceInput['recipe'],
+      profile: parsed.profile as ServiceInput['profile'],
     });
   }
 }
@@ -103,6 +108,7 @@ function parsePrivateCharacterImportBody(payload: unknown): {
   relationshipType?: string;
   expertDomains?: string[];
   triggerScenes?: string[] | null;
+  recipe?: unknown;
   profile?: unknown;
 } {
   if (!payload || typeof payload !== 'object') {
@@ -147,8 +153,12 @@ function parsePrivateCharacterImportBody(payload: unknown): {
           (x): x is string => typeof x === 'string',
         )
       : undefined,
-    // typeof [] === 'object'，要再排掉 Array；否则 {"profile":[1,2,3]}
-    // 会被存进 characters.profile 列，下游读 profile.xxx 会炸。
+    // typeof [] === 'object'，要再排掉 Array；否则 {"recipe":[1,2,3]} /
+    // {"profile":[1,2,3]} 会被当成合法 object 存进去，下游读 .xxx 会炸。
+    recipe:
+      p.recipe && typeof p.recipe === 'object' && !Array.isArray(p.recipe)
+        ? p.recipe
+        : undefined,
     profile:
       p.profile && typeof p.profile === 'object' && !Array.isArray(p.profile)
         ? p.profile

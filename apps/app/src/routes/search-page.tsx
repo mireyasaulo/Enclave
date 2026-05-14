@@ -413,11 +413,14 @@ export function SearchPage() {
   }
 
   function handleBack() {
-    navigateBackOrFallback(() => {
-      void navigate({
-        to: routeState.source === "contacts" ? "/tabs/contacts" : "/tabs/chat",
-      });
-    });
+    const fallbackTarget =
+      routeState.source === "contacts" ? "/tabs/contacts" : "/tabs/chat";
+    navigateBackOrFallback(
+      () => {
+        void navigate({ to: fallbackTarget });
+      },
+      fallbackTarget,
+    );
   }
 
   if (isDesktopLayout) {

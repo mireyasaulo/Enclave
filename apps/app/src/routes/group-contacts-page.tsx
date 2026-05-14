@@ -134,13 +134,16 @@ function MobileGroupContactsPage() {
             size="icon"
             className="h-9 w-9 rounded-full text-[color:var(--text-primary)] active:bg-black/[0.05]"
             onClick={() =>
-              navigateBackOrFallback(() => {
-                if (navigateToRouteStateReturn()) {
-                  return;
-                }
+              navigateBackOrFallback(
+                () => {
+                  if (navigateToRouteStateReturn()) {
+                    return;
+                  }
 
-                void navigate({ to: "/tabs/contacts" });
-              })
+                  void navigate({ to: "/tabs/contacts" });
+                },
+                safeReturnPath ?? "/tabs/contacts",
+              )
             }
             aria-label={t(msg`返回通讯录`)}
           >

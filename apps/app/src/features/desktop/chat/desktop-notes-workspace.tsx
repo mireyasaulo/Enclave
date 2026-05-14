@@ -741,9 +741,12 @@ export function DesktopNotesWorkspace({
     // 优先走浏览器 history.back，失败再 replace 到 fallbackPath。
     // 必须 replace，否则直接打开 /notes/new#... 的 URL（history.length=1）
     // 走 push 会把编辑器 URL 留在 history 里，浏览器 back → 又回到编辑器 → 再 push → 死循环。
-    navigateBackOrFallback(() => {
-      void navigate({ to: fallbackPath, replace: true });
-    });
+    navigateBackOrFallback(
+      () => {
+        void navigate({ to: fallbackPath, replace: true });
+      },
+      fallbackPath,
+    );
   }, [navigate, returnTo, standaloneWindow]);
 
   async function handleSaveAndClose() {

@@ -16,16 +16,10 @@ import {
 } from "@yinjie/ui";
 import { useAuth } from "../lib/use-auth";
 import { wikiApi, type WikiContentSnapshot } from "../lib/wiki-api";
+import { splitCommaList } from "../lib/string-utils";
 import { LogicEditor, mergeContentIntoRecipe } from "./character-page";
 import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
-
-function splitList(value: string): string[] {
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
 
 export function CreateCharacterPage() {
   const t = useRuntimeTranslator();
@@ -67,8 +61,8 @@ export function CreateCharacterPage() {
         avatar: avatar.trim(),
         bio: bio.trim(),
         personality: personality.trim(),
-        expertDomains: splitList(expertDomains),
-        triggerScenes: splitList(triggerScenes),
+        expertDomains: splitCommaList(expertDomains),
+        triggerScenes: splitCommaList(triggerScenes),
         relationship: relationship.trim(),
         relationshipType: relationshipType.trim(),
       };

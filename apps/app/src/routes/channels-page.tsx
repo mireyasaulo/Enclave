@@ -977,17 +977,20 @@ export function ChannelsPage() {
         leftActions={
           <Button
             onClick={() => {
-              navigateBackOrFallback(() => {
-                if (safeReturnPath) {
-                  void navigate({
-                    to: safeReturnPath,
-                    ...(safeReturnHash ? { hash: safeReturnHash } : {}),
-                  });
-                  return;
-                }
+              navigateBackOrFallback(
+                () => {
+                  if (safeReturnPath) {
+                    void navigate({
+                      to: safeReturnPath,
+                      ...(safeReturnHash ? { hash: safeReturnHash } : {}),
+                    });
+                    return;
+                  }
 
-                void navigate({ to: "/tabs/discover" });
-              });
+                  void navigate({ to: "/tabs/discover" });
+                },
+                safeReturnPath ?? "/tabs/discover",
+              );
             }}
             variant="ghost"
             size="icon"

@@ -17,6 +17,8 @@ import { AIRelationshipEntity } from '../social/ai-relationship.entity';
 import { NarrativeArcEntity } from '../narrative/narrative-arc.entity';
 import { CharacterBlueprintEntity } from './character-blueprint.entity';
 import { CharacterBlueprintRevisionEntity } from './character-blueprint-revision.entity';
+import { CharacterBlueprintService } from './character-blueprint.service';
+import type { CharacterBlueprintRecipeValue } from './character-blueprint.types';
 import { MomentPostEntity } from '../moments/moment-post.entity';
 import { MomentCommentEntity } from '../moments/moment-comment.entity';
 import { MomentLikeEntity } from '../moments/moment-like.entity';
@@ -55,6 +57,7 @@ export class CharactersService implements OnModuleInit {
     private readonly worldOwnerService: WorldOwnerService,
     private readonly dataSource: DataSource,
     private readonly realWorldRuntimeProfile: RealWorldRuntimeProfileService,
+    private readonly blueprintService: CharacterBlueprintService,
   ) {}
 
   async onModuleInit() {
@@ -414,9 +417,13 @@ export class CharactersService implements OnModuleInit {
 
   /**
    * 从 wiki 导出的 JSON bundle 导入私有角色到当前 world：
-   * - 按 name 在 characters 表里 upsert（同名→覆盖；不存在→新建）
-   * - 自动给 world-owner 建 friendship（已存在则保留 intimacy/status）
-   * - sourceType 写 'private_import'，sourceKey 记录原 name
+   * - 按 name 找现存：仅当 sourceType='private_import' 才覆盖；
+   *   命中其他来源（preset/built-in/admin/seed）抛 Conflict，避免静默改写
+   *   全 world 共用的内置角色。
+   * - 不存在→新建；新建始终 sourceType='private_import'，sourceKey=name。
+   * - 有 recipe 但无 profile 时：用 blueprint service 从 recipe 推 profile，
+   *   避免用户写的 prompt 配方被静默丢弃（旧版只取 profile，recipe 直接吃）。
+   * - 自动给 world-owner 建 friendship（已存在保留 intimacy/status，软删则激活）。
    *
    * undefined 字段 = "bundle 里没写"，对已存在角色不动；string '' / [] / {} =
    * 显式置空。这样保证 round-trip 后未提供的字段不会被意外清空。
@@ -430,6 +437,7 @@ export class CharactersService implements OnModuleInit {
     relationshipType?: string;
     expertDomains?: string[];
     triggerScenes?: string[] | null;
+    recipe?: CharacterBlueprintRecipeValue | null;
     profile?: PersonalityProfile | null;
   }): Promise<{ character: CharacterEntity; overwrote: boolean }> {
     const trimmedName = (input.name ?? '').trim();
@@ -439,17 +447,31 @@ export class CharactersService implements OnModuleInit {
         legacyMessage: '导入文件缺少 name 字段。',
       });
     }
+    // 防御性长度校验：DB 是 text 列没硬限，但用户填的 bio/persona 直接拼到
+    // AI prompt 里，过长会撑爆 context cost；同时 60+KB 的 recipe/profile JSON
+    // 几乎一定是误传。在这里挡一道，比上线后被 prompt cost 烧出 P0 强。
+    assertPrivateCharacterFieldLimits(input);
 
     const existing = await this.repo.findOne({
       where: { name: trimmedName },
     });
 
-    // 不允许覆盖受保护角色（如 default_seed 的「我自己」）— 避免破坏系统角色
-    if (existing && existing.deletionPolicy === 'protected') {
-      throw new AppError('PRIVATE_IMPORT_NAME_RESERVED', {
-        status: HttpStatus.CONFLICT,
-        legacyMessage: `世界里已存在受保护的同名角色 "${trimmedName}"，无法覆盖。请改用其他名字。`,
-      });
+    if (existing) {
+      // protected：默认保底角色（"我自己"等），任何情况都不能覆盖
+      if (existing.deletionPolicy === 'protected') {
+        throw new AppError('PRIVATE_IMPORT_NAME_RESERVED', {
+          status: HttpStatus.CONFLICT,
+          legacyMessage: `世界里已存在受保护的同名角色 "${trimmedName}"，无法覆盖。请改用其他名字。`,
+        });
+      }
+      // 非 private_import 来源（preset/built-in/admin 等）：理论上和用户私有
+      // 角色无关，但 name 撞上后旧逻辑会静默覆盖、影响全 world。改为拒绝。
+      if (existing.sourceType !== 'private_import') {
+        throw new AppError('PRIVATE_IMPORT_NAME_RESERVED', {
+          status: HttpStatus.CONFLICT,
+          legacyMessage: `世界里已存在同名角色 "${trimmedName}"（${existing.sourceType}），不能覆盖。请改用其他名字。`,
+        });
+      }
     }
 
     // Patch：只放 input 里"实际提供"的字段；undefined 表示缺失，跳过。
@@ -471,8 +493,14 @@ export class CharactersService implements OnModuleInit {
     if (input.triggerScenes !== undefined) {
       patch.triggerScenes = input.triggerScenes ?? undefined;
     }
+    // profile 优先级最高（用户已经在 wiki 端 finalize 过的 PersonalityProfile）。
+    // 没传 profile 但传了 recipe → 实时用 blueprint service 把 recipe → profile，
+    // 否则用户花几十字段填的 prompt 配方会被静默丢，世界里 AI 完全没人设。
     if (input.profile !== undefined && input.profile !== null) {
       patch.profile = input.profile;
+    } else if (input.recipe) {
+      const derived = this.tryDeriveProfileFromRecipe(input.recipe, trimmedName);
+      if (derived) patch.profile = derived;
     }
 
     let saved: CharacterEntity;
@@ -539,6 +567,30 @@ export class CharactersService implements OnModuleInit {
     }
 
     return { character: saved, overwrote: !!existing };
+  }
+
+  /**
+   * 把 wiki 私有角色 bundle 里的 recipe → PersonalityProfile。
+   * recipe 是用户手填的、可能字段缺失/类型错乱，这里用 try/catch 兜底，
+   * 出错就吞掉（按"recipe 没填"处理），避免一份坏 bundle 直接 500。
+   */
+  private tryDeriveProfileFromRecipe(
+    recipe: CharacterBlueprintRecipeValue,
+    characterIdHint: string,
+  ): PersonalityProfile | null {
+    try {
+      return this.blueprintService.buildProfileFromRecipe(
+        recipe,
+        characterIdHint,
+      ) as PersonalityProfile;
+    } catch (err) {
+      // 不打 ERROR，避免日志噪音；recipe 出错本身就是用户输入问题
+      // i18n-ignore-line: backend log line, not user-facing
+      console.warn(
+        `[importPersonalCharacter] recipe → profile failed for "${characterIdHint}": ${(err as Error).message}`,
+      );
+      return null;
+    }
   }
 
   private normalizeCharacterAvatars(characters: CharacterEntity[]) {
@@ -685,6 +737,106 @@ export class CharactersService implements OnModuleInit {
       ],
     });
     return new Set(friendships.map((item) => item.characterId));
+  }
+}
+
+// 字段长度上限。后端 entity 是 text/json 列没硬限，但用户填的内容直接进
+// AI prompt + 全部存全 world，过长会撑爆 context cost / DB 体积。
+// 数字偏宽松，目的是挡住误传（粘整本小说 / GB 级文件），不卡正常使用。
+const PRIVATE_CHARACTER_FIELD_LIMITS = {
+  name: 80,
+  avatar: 2000,
+  bio: 2000,
+  personality: 2000,
+  relationship: 200,
+  relationshipType: 80,
+  expertDomainItem: 80,
+  expertDomainCount: 50,
+  triggerSceneItem: 80,
+  triggerSceneCount: 50,
+  recipeJsonBytes: 64 * 1024,
+  profileJsonBytes: 64 * 1024,
+} as const;
+
+export function assertPrivateCharacterFieldLimits(input: {
+  name?: string;
+  avatar?: string;
+  bio?: string;
+  personality?: string | null;
+  relationship?: string;
+  relationshipType?: string;
+  expertDomains?: string[];
+  triggerScenes?: string[] | null;
+  recipe?: unknown;
+  profile?: unknown;
+}): void {
+  const L = PRIVATE_CHARACTER_FIELD_LIMITS;
+  const tooLong = (label: string, max: number) =>
+    new AppError('PRIVATE_IMPORT_INVALID', {
+      status: HttpStatus.BAD_REQUEST,
+      legacyMessage: `${label} 超长（上限 ${max}）。`,
+    });
+  if (input.name && input.name.length > L.name) throw tooLong('name', L.name);
+  if (input.avatar && input.avatar.length > L.avatar)
+    throw tooLong('avatar', L.avatar);
+  if (input.bio && input.bio.length > L.bio) throw tooLong('bio', L.bio);
+  if (input.personality && input.personality.length > L.personality)
+    throw tooLong('personality', L.personality);
+  if (input.relationship && input.relationship.length > L.relationship)
+    throw tooLong('relationship', L.relationship);
+  if (
+    input.relationshipType &&
+    input.relationshipType.length > L.relationshipType
+  )
+    throw tooLong('relationshipType', L.relationshipType);
+  if (Array.isArray(input.expertDomains)) {
+    if (input.expertDomains.length > L.expertDomainCount)
+      throw tooLong('expertDomains 个数', L.expertDomainCount);
+    for (const item of input.expertDomains) {
+      if (typeof item === 'string' && item.length > L.expertDomainItem)
+        throw tooLong('expertDomains 元素', L.expertDomainItem);
+    }
+  }
+  if (Array.isArray(input.triggerScenes)) {
+    if (input.triggerScenes.length > L.triggerSceneCount)
+      throw tooLong('triggerScenes 个数', L.triggerSceneCount);
+    for (const item of input.triggerScenes) {
+      if (typeof item === 'string' && item.length > L.triggerSceneItem)
+        throw tooLong('triggerScenes 元素', L.triggerSceneItem);
+    }
+  }
+  // JSON.stringify 可能因循环引用炸；try/catch 兜底，不要因 size check 把请求干 500。
+  if (input.recipe !== undefined && input.recipe !== null) {
+    try {
+      const bytes = Buffer.byteLength(JSON.stringify(input.recipe), 'utf8');
+      if (bytes > L.recipeJsonBytes)
+        throw tooLong(
+          `recipe JSON (${(bytes / 1024).toFixed(1)} KB)`,
+          L.recipeJsonBytes,
+        );
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      throw new AppError('PRIVATE_IMPORT_INVALID', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: `recipe JSON 不可序列化：${(err as Error).message}`,
+      });
+    }
+  }
+  if (input.profile !== undefined && input.profile !== null) {
+    try {
+      const bytes = Buffer.byteLength(JSON.stringify(input.profile), 'utf8');
+      if (bytes > L.profileJsonBytes)
+        throw tooLong(
+          `profile JSON (${(bytes / 1024).toFixed(1)} KB)`,
+          L.profileJsonBytes,
+        );
+    } catch (err) {
+      if (err instanceof AppError) throw err;
+      throw new AppError('PRIVATE_IMPORT_INVALID', {
+        status: HttpStatus.BAD_REQUEST,
+        legacyMessage: `profile JSON 不可序列化：${(err as Error).message}`,
+      });
+    }
   }
 }
 // i18n-ignore-end

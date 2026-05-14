@@ -93,9 +93,12 @@ export function MobileNotesPage() {
   );
 
   function handleBack() {
-    navigateBackOrFallback(() => {
-      void navigate({ to: "/tabs/chat" });
-    });
+    navigateBackOrFallback(
+      () => {
+        void navigate({ to: "/tabs/chat" });
+      },
+      "/tabs/chat",
+    );
   }
 
   function handleCreate() {

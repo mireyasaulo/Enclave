@@ -120,17 +120,20 @@ export function MobileFeedPublishPage() {
   }, [isDesktopLayout, navigate]);
 
   function performBack() {
-    navigateBackOrFallback(() => {
-      if (safeReturnPath) {
-        void navigate({
-          to: safeReturnPath,
-          ...(safeReturnHash ? { hash: safeReturnHash } : {}),
-        });
-        return;
-      }
+    navigateBackOrFallback(
+      () => {
+        if (safeReturnPath) {
+          void navigate({
+            to: safeReturnPath,
+            ...(safeReturnHash ? { hash: safeReturnHash } : {}),
+          });
+          return;
+        }
 
-      void navigate({ to: "/discover/feed" });
-    });
+        void navigate({ to: "/discover/feed" });
+      },
+      safeReturnPath ?? "/discover/feed",
+    );
   }
 
   function handleBack() {

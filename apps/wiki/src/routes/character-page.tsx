@@ -19,6 +19,7 @@ import {
 } from "@yinjie/ui";
 import { hasRole } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
+import { splitCommaList } from "../lib/string-utils";
 import {
   wikiApi,
   type WikiContentSnapshot,
@@ -776,13 +777,6 @@ function cloneRecipe(recipe: CharacterBlueprintRecipe): CharacterBlueprintRecipe
   return JSON.parse(JSON.stringify(recipe)) as CharacterBlueprintRecipe;
 }
 
-function splitList(value: string): string[] {
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
 function parseNonNegativeInt(value: string, fallback: number): number {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? Math.max(0, Math.round(parsed)) : fallback;
@@ -1001,7 +995,7 @@ export function LogicEditor({
                   ...recipe,
                   tone: {
                     ...recipe.tone,
-                    speechPatterns: splitList(event.target.value),
+                    speechPatterns: splitCommaList(event.target.value),
                   },
                 })
               }
@@ -1015,7 +1009,7 @@ export function LogicEditor({
                   ...recipe,
                   tone: {
                     ...recipe.tone,
-                    topicsOfInterest: splitList(event.target.value),
+                    topicsOfInterest: splitCommaList(event.target.value),
                   },
                 })
               }
@@ -1565,7 +1559,7 @@ export function LogicEditor({
                   ...recipe,
                   tone: {
                     ...recipe.tone,
-                    catchphrases: splitList(event.target.value),
+                    catchphrases: splitCommaList(event.target.value),
                   },
                 })
               }
@@ -1579,7 +1573,7 @@ export function LogicEditor({
                   ...recipe,
                   tone: {
                     ...recipe.tone,
-                    taboos: splitList(event.target.value),
+                    taboos: splitCommaList(event.target.value),
                   },
                 })
               }
@@ -1593,7 +1587,7 @@ export function LogicEditor({
                   ...recipe,
                   tone: {
                     ...recipe.tone,
-                    quirks: splitList(event.target.value),
+                    quirks: splitCommaList(event.target.value),
                   },
                 })
               }

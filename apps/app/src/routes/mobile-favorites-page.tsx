@@ -244,9 +244,12 @@ export function MobileFavoritesPage({
   });
 
   function handleBack() {
-    navigateBackOrFallback(() => {
-      void navigate({ to: "/tabs/profile" });
-    });
+    navigateBackOrFallback(
+      () => {
+        void navigate({ to: "/tabs/profile" });
+      },
+      "/tabs/profile",
+    );
   }
 
   function handleCreateNote() {

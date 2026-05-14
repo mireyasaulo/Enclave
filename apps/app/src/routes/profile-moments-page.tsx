@@ -293,8 +293,9 @@ export function ProfileMomentsPage() {
   });
 
   const goBack = () =>
-    navigateBackOrFallback(() =>
-      navigate({ to: "/tabs/profile", replace: true }),
+    navigateBackOrFallback(
+      () => navigate({ to: "/tabs/profile", replace: true }),
+      "/tabs/profile",
     );
 
   const openLikerCharacterDetail = (like: MomentLike) => {
