@@ -2603,6 +2603,45 @@ export class AiOrchestratorService {
     }
   }
 
+  async generateWithMessages(options: {
+    messages: { role: 'system' | 'user' | 'assistant'; content: string }[];
+    usageContext: AiUsageContext;
+    maxTokens?: number;
+    temperature?: number;
+    fallback?: string;
+  }): Promise<string> {
+    await this.subscription.assertCanUseAi('text');
+    try {
+      const reminder = await this.worldLanguage.buildFinalReminder();
+      const messages = reminder
+        ? [
+            ...options.messages.slice(0, -1),
+            {
+              ...options.messages[options.messages.length - 1],
+              content: `${options.messages[options.messages.length - 1].content}\n\n${reminder}`,
+            },
+          ]
+        : options.messages;
+      const response = await this.requestChatTaskWithFallback({
+        usageContext: options.usageContext,
+        characterId: options.usageContext.characterId,
+        label: 'messages generation',
+        request: (client, provider) =>
+          executeChatCompletion(client, {
+            model: provider.model,
+            messages,
+            max_tokens: options.maxTokens ?? 800,
+            temperature: options.temperature ?? 0.4,
+          }),
+      });
+
+      return sanitizeAiText(response.choices[0]?.message?.content ?? '');
+    } catch (error) {
+      this.logger.error('generateWithMessages error', error);
+      return options.fallback ?? '';
+    }
+  }
+
   async compressMemory(
     history: ChatMessage[],
     profile: PersonalityProfile,

@@ -7,7 +7,6 @@ import { ConversationEntity } from '../chat/conversation.entity';
 import { MessageEntity } from '../chat/message.entity';
 import { ChatService } from '../chat/chat.service';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
-import { PromptBuilderService } from '../ai/prompt-builder.service';
 import { SELF_CHARACTER_ID } from '../characters/default-characters';
 import { ACTION_OPERATOR_CHARACTER_ID } from '../characters/action-operator-character';
 import { BAR_EXPERT_CHARACTER_ID } from '../characters/bar-expert-character';
@@ -70,7 +69,6 @@ export class InitialMessageService {
     private readonly messageRepo: Repository<MessageEntity>,
     private readonly chatService: ChatService,
     private readonly ai: AiOrchestratorService,
-    private readonly promptBuilder: PromptBuilderService,
   ) {}
 
   scheduleIfNeeded(ownerId: string, character: CharacterEntity): void {
@@ -178,32 +176,41 @@ export class InitialMessageService {
     const fallback =
       FALLBACK_BY_CHARACTER[character.id] ?? GENERIC_FALLBACK;
     const profile = character.profile;
-    if (!profile) return fallback;
 
-    let systemPrompt: string;
-    try {
-      systemPrompt = await this.promptBuilder.buildSceneSystemPrompt(
-        profile,
-        'greeting',
-      );
-    } catch {
-      return fallback;
-    }
+    const personality = character.personality?.trim() ?? '';
+    const greetingStyle = profile?.scenePrompts?.greeting?.trim() ?? '';
+    const relationship =
+      profile?.relationship?.trim() || character.relationship?.trim() || '';
 
-    const userPrompt = [
-      systemPrompt,
-      '',
-      '【当前任务】',
-      '现在是用户第一次把你加为好友的瞬间。',
-      '按你自己的性格和行为逻辑，给 ta 发一条主动开场消息（不是回复）。',
-      '- 不要自我介绍，不要列举服务清单，不要说"我是 xxx 助手"',
-      '- 不要说"很高兴认识你""欢迎加我"这种客套',
-      '- 一两句话，符合你平时说话的节奏和长度',
-      '- 直接输出消息文本本身，不要带前缀、引号或解释',
-    ].join('\n');
+    const personalityShort = personality.slice(0, 400);
+    const greetingShort = greetingStyle.slice(0, 400);
 
-    const text = await this.ai.generatePlainText({
-      prompt: userPrompt,
+    const messages = [
+      {
+        role: 'system' as const,
+        content: [
+          `你叫${character.name}。`,
+          relationship ? `你和对方的关系：${relationship}。` : '',
+          personalityShort ? `你的性格：${personalityShort}` : '',
+          greetingShort ? `你打招呼时的风格参考：${greetingShort}` : '',
+          `现在你不是 AI，也不是助手，你就是${character.name}。请始终用第一人称、以${character.name}的口吻说话。`,
+        ]
+          .filter(Boolean)
+          .join('\n'),
+      },
+      {
+        role: 'user' as const,
+        content: [
+          `情境：你刚被对方加为好友，这是你主动发的第一条消息。`,
+          `要求：一两句、贴合你的性格；不要"你好我是…""很高兴认识"这种客套；不要自我介绍；不要列你能做什么；只输出要发的那句话本身，不要引号、前缀、说明。`,
+          ``,
+          `直接写出你要发的那一句：`,
+        ].join('\n'),
+      },
+    ];
+
+    const text = await this.ai.generateWithMessages({
+      messages,
       usageContext: {
         surface: 'app',
         scene: 'social_default_friend_initial_message',
@@ -214,13 +221,33 @@ export class InitialMessageService {
         characterId: character.id,
         characterName: character.name,
       },
-      maxTokens: 120,
-      temperature: 0.6,
+      maxTokens: 600,
+      temperature: 0.7,
       fallback,
     });
 
-    const trimmed = text?.trim();
-    return trimmed && trimmed.length > 0 ? trimmed : fallback;
+    const trimmed = text
+      ?.trim()
+      .replace(/^["「『]+/, '')
+      .replace(/["」』]+$/, '')
+      .trim();
+    if (!trimmed) {
+      this.logger.warn(
+        `LLM returned empty for ${character.id}, using fallback. raw="${(text ?? '').slice(0, 200)}"`,
+      );
+      return fallback;
+    }
+    if (
+      /^(用户|根据|作为|首先|好的|以下|让我|我会|这是|根据设定|请允许|我将|我需要|我先|我考虑|我会先|考虑到|按照设定|按设定)/.test(
+        trimmed,
+      )
+    ) {
+      this.logger.warn(
+        `LLM returned meta-narration for ${character.id}, using fallback. raw="${trimmed.slice(0, 120)}"`,
+      );
+      return fallback;
+    }
+    return trimmed;
   }
 }
 // i18n-ignore-end
