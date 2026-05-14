@@ -161,9 +161,23 @@ export class CharactersService implements OnModuleInit {
   }
 
   async listCelebrityPresets() {
+    // 既要看常规 preset_catalog 安装记录，也要看 BUILT_IN 里 autoSeed:false
+    // 但 ID 已经在 DB 里的居民（典型代表：林医生 / 简衡 走 default-characters.ts
+    // 的 protected default_seed 落库，不是 preset_catalog）。否则这些角色在
+    // 目录里会被错误展示成"未安装 + 可安装"按钮。
+    const presetIds = BUILT_IN_CHARACTER_PRESETS.map((preset) => preset.id);
     const installedCharacters = await this.repo.find({
-      where: { sourceType: 'preset_catalog' },
+      where: [
+        { sourceType: 'preset_catalog' },
+        { id: In(presetIds) },
+      ],
     });
+    const installedById = new Map(
+      installedCharacters.map((character) => [
+        character.id,
+        { id: character.id, name: character.name },
+      ]),
+    );
     const installedBySourceKey = new Map(
       installedCharacters
         .filter((character) => character.sourceKey)
@@ -175,7 +189,9 @@ export class CharactersService implements OnModuleInit {
 
     return BUILT_IN_CHARACTER_PRESETS.map((preset) => {
       const group = getCelebrityCharacterPresetGroup(preset.groupKey);
-      const installedCharacter = installedBySourceKey.get(preset.presetKey);
+      const installedCharacter =
+        installedById.get(preset.id) ??
+        installedBySourceKey.get(preset.presetKey);
       return {
         presetKey: preset.presetKey,
         groupKey: group.key,
