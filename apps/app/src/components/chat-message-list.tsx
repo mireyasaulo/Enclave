@@ -508,6 +508,22 @@ export function ChatMessageList({
     setDesktopAvatarPopover(null);
   }, [selectionMode, threadContext?.id]);
 
+  // 卸载组件 / 切换会话时停掉正在播的朗读音频，避免跳路由后还在响
+  useEffect(() => {
+    return () => {
+      speakRequestRef.current += 1;
+      const audio = speakAudioRef.current;
+      if (audio) {
+        try {
+          audio.pause();
+        } catch {
+          // ignore
+        }
+        speakAudioRef.current = null;
+      }
+    };
+  }, [threadContext?.id]);
+
   useEffect(() => {
     if (!contextMenuState) {
       return;
