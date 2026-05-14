@@ -10,12 +10,8 @@ export const HUD_WIDTH = 48;
 export const TILE_SIZE = 16;
 export const HALF = 8;
 export const GRID_W = 13;
-export const GRID_H = 13;
 export const HALF_W = 26;
 export const HALF_H = 26;
-
-export const TANK_SIZE = 16;
-export const BULLET_SIZE = 4;
 
 // speeds in px/frame (60fps target)
 export const PLAYER_SPEED = 0.75;
@@ -47,10 +43,6 @@ export const ENEMY_SPAWN_POINTS = [
 export const P1_SPAWN = { x: 4 * TILE_SIZE, y: 12 * TILE_SIZE };
 export const P2_SPAWN = { x: 8 * TILE_SIZE, y: 12 * TILE_SIZE };
 
-// base centered bottom
-export const BASE_HALF_X = 12; // half-tile col (12,13)
-export const BASE_HALF_Y = 24; // half-tile row (24,25)
-
 // timers
 export const PLAYER_SHIELD_MS = 3000;
 export const ENEMY_SHIELD_MS = 1500;
@@ -77,6 +69,3 @@ export const SCORES: Record<TankKind, number> = {
 export function maxBulletsFor(level: number): number {
   return level >= 2 ? 2 : 1;
 }
-
-// pickup ids that mark bonus
-export const BONUS_KILLS_PER_STAGE = [3, 10]; // enemies #4 and #11 are bonus (1-indexed)

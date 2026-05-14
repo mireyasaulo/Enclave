@@ -11,7 +11,7 @@ import {
   type Direction,
   type Tank,
 } from "./tank-war-types";
-import { createRng, rngInt, rngPick } from "./tank-war-rng";
+import { rngInt, rngPick } from "./tank-war-rng";
 
 const DIRS: Direction[] = [DIR_UP, DIR_RIGHT, DIR_DOWN, DIR_LEFT];
 
@@ -34,7 +34,7 @@ export function dirToward(
 }
 
 export function pickEnemyTarget(
-  t: Tank,
+  _t: Tank,
   baseX: number,
   baseY: number,
   playerX: number | null,
@@ -53,8 +53,4 @@ export function pickEnemyTarget(
     return { x: playerX, y: playerY };
   }
   return { x: baseX, y: baseY };
-}
-
-export function makeAiRng(seed: number) {
-  return createRng(seed);
 }

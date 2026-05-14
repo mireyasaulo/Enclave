@@ -200,7 +200,6 @@ function spawnPlayer(world: GameWorld, who: "p1" | "p2"): void {
     shieldUntilMs: performance.now() + PLAYER_SHIELD_MS,
     spawnAnimUntilMs: performance.now() + 600,
     reloadAtMs: 0,
-    bullets: 0,
     bonus: false,
     frozen: false,
     freezeUntilMs: 0,
@@ -247,7 +246,6 @@ function trySpawnEnemy(world: GameWorld, now: number): void {
     shieldUntilMs: now + ENEMY_SHIELD_MS,
     spawnAnimUntilMs: now + 600,
     reloadAtMs: now + 800,
-    bullets: 0,
     bonus: isBonus,
     frozen: false,
     freezeUntilMs: 0,
@@ -475,7 +473,20 @@ function processAi(world: GameWorld, t: Tank, audio: AudioHook | null): void {
   if (now >= t.nextDecideAt) {
     const baseX = 6 * TILE_SIZE;
     const baseY = 12 * TILE_SIZE;
-    const target = pickEnemyTarget(t, baseX, baseY, null, null, rng);
+    // 找一个玩家作为参考位置（双人时取最近的一个）
+    let playerX: number | null = null;
+    let playerY: number | null = null;
+    let bestD = Infinity;
+    for (const o of world.tanks) {
+      if (o.owner !== "p1" && o.owner !== "p2") continue;
+      const d = Math.abs(o.x - t.x) + Math.abs(o.y - t.y);
+      if (d < bestD) {
+        bestD = d;
+        playerX = o.x;
+        playerY = o.y;
+      }
+    }
+    const target = pickEnemyTarget(t, baseX, baseY, playerX, playerY, rng);
     t.dir = dirToward(t.x, t.y, target.x, target.y, rng);
     t.nextDecideAt = now + rngInt(rng, 1500, 2500);
   }

@@ -45,7 +45,6 @@ export type Tank = {
   shieldUntilMs: number;
   spawnAnimUntilMs: number;
   reloadAtMs: number;
-  bullets: number;
   bonus: boolean;
   frozen: boolean;
   freezeUntilMs: number;
@@ -188,5 +187,4 @@ export type HudSnapshot = {
   scoreP2?: number;
   muted: boolean;
   maxUnlockedStage: number;
-  message?: string;
 };
