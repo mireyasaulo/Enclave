@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FeedService } from './feed.service';
 import { FeedController } from './feed.controller';
+import { FeedImageBudgetService } from './feed-image-budget.service';
 import { FeedPostEntity } from './feed-post.entity';
 import { FeedCommentEntity } from './feed-comment.entity';
 import { FeedPostLikeEntity } from './feed-post-like.entity';
@@ -35,7 +36,7 @@ import { FeedMinimaxCallbacks } from './feed-minimax.callbacks';
     MinimaxModule,
     forwardRef(() => ChatModule),
   ],
-  providers: [FeedService, FeedMinimaxCallbacks],
+  providers: [FeedService, FeedMinimaxCallbacks, FeedImageBudgetService],
   controllers: [FeedController],
   exports: [FeedService],
 })

@@ -674,6 +674,9 @@ export class LocalProcessComputeProviderService
       env.MINIMAX_DAILY_LIMIT_MUSIC_25 = String(share.music25);
       env.MINIMAX_DAILY_LIMIT_IMAGE_01 = String(share.image01);
       env.MINIMAX_DAILY_LIMIT_LYRICS = String(share.lyrics);
+      // "世界角色朋友圈自动配图"专用日上限（用途配额，仍占 image01 总额，
+      // 但额外做"每个 world 不超过这个数"的限制，详见 FeedImageBudgetService）。
+      env.FEED_IMAGE_WORLD_DAILY_SHARE = String(share.feedImage);
     } catch (err) {
       this.logger.warn(
         `compute minimax daily share failed for world=${world.id}: ${(err as Error)?.message}; child uses fallback limits`,

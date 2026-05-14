@@ -19,6 +19,10 @@ const PER_KEY_DAILY_TOTAL = {
   lyrics: 100,
 } as const;
 
+// "世界角色朋友圈自动配图"专用日上限（用途配额，**仍占 image01 model 总额**）。
+// 跨 world 均分到每个 child，避免某个 world 把 50 张全吃了。env 可覆盖。
+const FEED_IMAGE_DAILY_GLOBAL_DEFAULT = 50;
+
 export type WorldDailyShare = {
   hailuoFast: number;
   hailuo: number;
@@ -26,6 +30,7 @@ export type WorldDailyShare = {
   music25: number;
   image01: number;
   lyrics: number;
+  feedImage: number;
 };
 
 @Injectable()
@@ -80,6 +85,8 @@ export class MinimaxQuotaDispatcherService {
     const myIndex = sameKeyWorldIds.indexOf(worldId);
     const dayOfYear = this.dayOfYearShanghai();
 
+    const feedImageGlobal = this.readFeedImageGlobal();
+
     const share: WorldDailyShare = {
       hailuoFast: this.shareFor(PER_KEY_DAILY_TOTAL.hailuoFast, groupSize, myIndex, dayOfYear),
       hailuo:     this.shareFor(PER_KEY_DAILY_TOTAL.hailuo,     groupSize, myIndex, dayOfYear),
@@ -87,6 +94,7 @@ export class MinimaxQuotaDispatcherService {
       music25:    this.shareFor(PER_KEY_DAILY_TOTAL.music25,    groupSize, myIndex, dayOfYear),
       image01:    this.shareFor(PER_KEY_DAILY_TOTAL.image01,    groupSize, myIndex, dayOfYear),
       lyrics:     this.shareFor(PER_KEY_DAILY_TOTAL.lyrics,     groupSize, myIndex, dayOfYear),
+      feedImage:  this.shareFor(feedImageGlobal,                groupSize, myIndex, dayOfYear),
     };
 
     this.logger.log(
@@ -113,6 +121,15 @@ export class MinimaxQuotaDispatcherService {
     // groupTotal < groupSize：日轮换，今天命中的 groupTotal 个 world 各拿 1 次，其余 0
     const slot = ((myIndex - dayOfYear) % groupSize + groupSize) % groupSize;
     return slot < groupTotal ? 1 : 0;
+  }
+
+  private readFeedImageGlobal(): number {
+    const raw = this.config.get<string>("FEED_IMAGE_DAILY_GLOBAL");
+    if (raw !== undefined && raw !== "") {
+      const n = Number(raw);
+      if (Number.isFinite(n) && n >= 0) return Math.floor(n);
+    }
+    return FEED_IMAGE_DAILY_GLOBAL_DEFAULT;
   }
 
   // 按 Asia/Shanghai 时区算 day-of-year（1-366）；用 UTC+8 偏移近似（不处理 DST，上海不夏令时）
