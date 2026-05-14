@@ -609,11 +609,13 @@ export class LocalProcessComputeProviderService
       if (state.child.exitCode !== null) return false;
       return this.isPidAlive(state.child.pid);
     }
-    // reattach 来的 state.pid 是从 launchConfig 拿到的，可能是上一次失败 spawn
-    // 留下的死 pid（端口实际被原孤儿占着，但我们没法分辨真实 listen pid）。
-    // 这里信 in-memory 登记本身，让 inspectInstance 的 pingHealth 在每次反代
-    // 请求前再判端口活否；spawn 失败时 child.on('exit') 会自己清掉登记。
-    return true;
+    // reattach 来的 state.pid 是从 launchConfig 拿到的，正常情况下是真实 listening pid
+    // （onModuleInit 走 pingHealth 校验过 worldId）。如果 pid 已经死了，必须如实返回
+    // false，让 inspectInstance 落到 stopped/missing 分支并触发 reconcile 的 recovery
+    // 任务，否则外部 SIGTERM 之后 cloud-api 会以为它还活着、永远等心跳，被卡住的
+    // world 永远不会被重 spawn。
+    if (!state.pid) return false;
+    return this.isPidAlive(state.pid);
   }
 
   private async spawnChild(
