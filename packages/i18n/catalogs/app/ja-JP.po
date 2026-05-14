@@ -19,17 +19,17 @@ msgid "音乐"
 msgstr "音楽"
 
 #: apps/app/src/components/audio-card.tsx:148
-#: apps/app/src/routes/channels-page.tsx:1562
-#: apps/app/src/routes/channels-page.tsx:1717
-msgid "暂停"
-msgstr "一時停止"
-
-#: apps/app/src/components/audio-card.tsx:148
 #: apps/app/src/i18n/static-dom-seed.ts:349
 #: apps/app/src/routes/channels-page.tsx:1562
 #: apps/app/src/routes/channels-page.tsx:1717
 msgid "播放"
 msgstr "再生"
+
+#: apps/app/src/components/audio-card.tsx:148
+#: apps/app/src/routes/channels-page.tsx:1562
+#: apps/app/src/routes/channels-page.tsx:1717
+msgid "暂停"
+msgstr "一時停止"
 
 #: apps/app/src/components/bootstrap-screen.tsx:43
 #: apps/app/src/routes/splash-page.tsx:181
@@ -779,7 +779,7 @@ msgstr "元画像で送信 (Cmd/Ctrl+Enter)"
 #: apps/app/src/components/chat-composer.tsx:5381
 #: apps/app/src/components/mobile-chat-attachment-preview.tsx:109
 #: apps/app/src/components/moment-comment-composer.tsx:33
-#: apps/app/src/features/account-security/account-security-panel.tsx:175
+#: apps/app/src/features/account-security/account-security-panel.tsx:162
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1519
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:951
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:114
@@ -3494,79 +3494,79 @@ msgstr "{month}月{day}日"
 msgid "{0}年{month}月{day}日"
 msgstr "{0}年{month}月{day}日"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:70
+#: apps/app/src/features/account-security/account-security-panel.tsx:57
 #: apps/app/src/routes/welcome-page.tsx:595
 msgid "开发模式：验证码已打印到服务端日志。"
 msgstr "開発モード：認証コードはサーバーログに出力されます。"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:71
+#: apps/app/src/features/account-security/account-security-panel.tsx:58
 msgid "验证码已发送至绑定邮箱，请查收（含垃圾邮件箱）。"
 msgstr "認証コードをバインドされたメールアドレスに送信しました。受信トレイ（迷惑メールフォルダーも）をご確認ください。"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:81
+#: apps/app/src/features/account-security/account-security-panel.tsx:68
 msgid "发送验证码失败，请稍后重试。"
 msgstr "認証コードの送信に失敗しました。しばらくしてから再試行してください。"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:100
+#: apps/app/src/features/account-security/account-security-panel.tsx:87
 msgid "密码已更新，下次登录可使用新密码。"
 msgstr "パスワードを更新しました。次回ログイン時に新しいパスワードを使用できます。"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:109
+#: apps/app/src/features/account-security/account-security-panel.tsx:96
 msgid "修改密码失败，请稍后重试。"
 msgstr "パスワードの変更に失敗しました。しばらくしてから再試行してください。"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:118
+#: apps/app/src/features/account-security/account-security-panel.tsx:105
 msgid "请输入邮箱收到的 6 位验证码。"
 msgstr "メールに記載された 6 桁の認証コードを入力してください。"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:125
+#: apps/app/src/features/account-security/account-security-panel.tsx:112
 msgid "新密码长度需在 8-32 位之间。"
 msgstr "新しいパスワードは 8〜32 文字で入力してください。"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:132
+#: apps/app/src/features/account-security/account-security-panel.tsx:119
 msgid "两次输入的密码不一致。"
 msgstr "入力された 2 つのパスワードが一致しません。"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:143
+#: apps/app/src/features/account-security/account-security-panel.tsx:130
 msgid "修改密码需要邮箱验证码确认；验证码会发送至当前账号绑定的邮箱。"
 msgstr "パスワードの変更にはメール認証コードによる確認が必要です。コードは現在のアカウントに紐づいたメールアドレスに送信されます。"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:150
+#: apps/app/src/features/account-security/account-security-panel.tsx:137
 msgid "邮箱验证码"
 msgstr "メール認証コード"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:160
+#: apps/app/src/features/account-security/account-security-panel.tsx:147
 #: apps/app/src/routes/welcome-page.tsx:1153
 msgid "请输入邮箱收到的 6 位验证码"
 msgstr "メールに届いた 6 桁の認証コードを入力"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:178
+#: apps/app/src/features/account-security/account-security-panel.tsx:165
 #: apps/app/src/routes/welcome-page.tsx:1178
 msgid "发送验证码"
 msgstr "コードを送信"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:185
+#: apps/app/src/features/account-security/account-security-panel.tsx:172
 msgid "新密码"
 msgstr "新しいパスワード"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:194
+#: apps/app/src/features/account-security/account-security-panel.tsx:181
 #: apps/app/src/routes/welcome-page.tsx:1193
-msgid "8-32 位，包含字母和数字"
-msgstr "8〜32 文字、英字と数字を含めてください"
+msgid "8-32 位，任意字符（不含空格）"
+msgstr "8〜32 文字、任意の文字（スペースは不可）"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:200
+#: apps/app/src/features/account-security/account-security-panel.tsx:187
 msgid "确认新密码"
 msgstr "新しいパスワードを確認"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:209
+#: apps/app/src/features/account-security/account-security-panel.tsx:196
 msgid "再次输入新密码"
 msgstr "新しいパスワードをもう一度入力"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:220
+#: apps/app/src/features/account-security/account-security-panel.tsx:207
 msgid "提交中..."
 msgstr "送信中..."
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:221
+#: apps/app/src/features/account-security/account-security-panel.tsx:208
 msgid "更新密码"
 msgstr "パスワードを更新"
 
@@ -12621,16 +12621,16 @@ msgid "买了种子"
 msgstr "種を購入しました"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
-msgid "卖了"
-msgstr "売りました"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:240
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:242
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
 msgid "作物"
 msgstr "作物"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
+msgid "卖了"
+msgstr "売りました"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -12859,13 +12859,13 @@ msgid "h 成熟"
 msgstr "h で成熟"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
-msgid "/ 包，售价"
-msgstr "/ 袋、価格"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
 #: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:81
 msgid "/ 个"
 msgstr "/ 件"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
+msgid "/ 包，售价"
+msgstr "/ 袋、価格"
 
 #: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:77
 msgid "已存"

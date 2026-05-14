@@ -178,7 +178,7 @@ export function AccountSecurityPanel() {
               setNewPassword(event.target.value);
               setFeedback(null);
             }}
-            placeholder={t(msg`8-32 位，包含字母和数字`)}
+            placeholder={t(msg`8-32 位，任意字符（不含空格）`)}
           />
         </label>
 

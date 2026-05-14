@@ -82,18 +82,21 @@ export class PhoneAuthService {
       throw new BadRequestException("验证码不能为空。");
     }
 
-    let session: PhoneVerificationSessionEntity | null;
+    // 先**只读校验** session，不写 verifiedAt；签 token 全部成功后再 markUsed。
+    // 这样 user banned / hook 失败时 code 仍未消费，用户可重试同一码（仍会被相同
+    // 错误拦截，但不会强制重发码）。
+    let session: PhoneVerificationSessionEntity;
 
     if (normalizedCode === DEV_BYPASS_CODE) {
+      // dev bypass 在内存构造 session，与普通路径一起在末尾 save。
       session = this.sessionRepo.create({
         phone: normalizedPhone,
         code: normalizedCode,
         expiresAt: new Date(Date.now() + this.getCodeTtlSeconds() * 1000),
-        verifiedAt: new Date(),
+        verifiedAt: null,
       });
-      await this.sessionRepo.save(session);
     } else {
-      session = await this.sessionRepo.findOne({
+      const found = await this.sessionRepo.findOne({
         where: {
           phone: normalizedPhone,
           code: normalizedCode,
@@ -103,20 +106,19 @@ export class PhoneAuthService {
         },
       });
 
-      if (!session) {
+      if (!found) {
         throw new UnauthorizedException("验证码错误。");
       }
 
-      if (session.verifiedAt) {
+      if (found.verifiedAt) {
         throw new UnauthorizedException("该验证码已使用。");
       }
 
-      if (session.expiresAt.getTime() < Date.now()) {
+      if (found.expiresAt.getTime() < Date.now()) {
         throw new UnauthorizedException("验证码已过期。");
       }
 
-      session.verifiedAt = new Date();
-      await this.sessionRepo.save(session);
+      session = found;
     }
 
     const existingUser = await this.userRepo.findOne({
@@ -152,6 +154,11 @@ export class PhoneAuthService {
       },
     );
     const expiresAt = new Date(Date.now() + this.getTokenTtlMs()).toISOString();
+
+    // token 已签发，最后一步才把 session 标记成已用。dev bypass 的 in-memory
+    // session 这里第一次落库；普通路径走 update。
+    session.verifiedAt = new Date();
+    await this.sessionRepo.save(session);
 
     return {
       accessToken,

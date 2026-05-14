@@ -105,19 +105,22 @@ export class EmailAuthService {
       throw new BadRequestException("验证码不能为空。");
     }
 
-    let session: EmailVerificationSessionEntity | null;
+    // 先**只读校验** session 状态，不写 verifiedAt；等下面 hook + 签 token 全部
+    // 成功后再 markSessionUsed 作废，避免「校验通过但下游操作失败」时码被白白消费。
+    let session: EmailVerificationSessionEntity;
 
     if (trimmedCode === DEV_BYPASS_CODE) {
+      // dev bypass 不查库；直接 in-memory 构造一条「待写入」session，等末尾跟其他
+      // 路径走同一条 markSessionUsed 路径写库。
       session = this.sessionRepo.create({
         email: normalized,
         code: trimmedCode,
         purpose: "world_access",
         expiresAt: new Date(Date.now() + this.getCodeTtlSeconds() * 1000),
-        verifiedAt: new Date(),
+        verifiedAt: null,
       });
-      await this.sessionRepo.save(session);
     } else {
-      session = await this.sessionRepo.findOne({
+      const found = await this.sessionRepo.findOne({
         where: {
           email: normalized,
           code: trimmedCode,
@@ -125,17 +128,16 @@ export class EmailAuthService {
         },
         order: { createdAt: "DESC" },
       });
-      if (!session) {
+      if (!found) {
         throw new UnauthorizedException("验证码错误。");
       }
-      if (session.verifiedAt) {
+      if (found.verifiedAt) {
         throw new UnauthorizedException("该验证码已使用。");
       }
-      if (session.expiresAt.getTime() < Date.now()) {
+      if (found.expiresAt.getTime() < Date.now()) {
         throw new UnauthorizedException("验证码已过期。");
       }
-      session.verifiedAt = new Date();
-      await this.sessionRepo.save(session);
+      session = found;
     }
 
     const existingUser = await this.userRepo.findOne({
@@ -160,7 +162,7 @@ export class EmailAuthService {
     }
 
     // 邮箱用户在云端用合成 phone 作为身份标识，CloudClientAuthGuard 与下游 by-phone 查询都能命中。
-    const { accessToken, expiresAt } = await issueCloudClientAccessToken({
+    const tokenResult = await issueCloudClientAccessToken({
       jwtService: this.jwtService,
       configService: this.configService,
       sessionId: session.id,
@@ -168,10 +170,15 @@ export class EmailAuthService {
       email: normalized,
     });
 
+    // 所有副作用都完成、token 已签发，最后一步才把 session 标记成已用。
+    // dev bypass 的 in-memory session 这里第一次落库；普通路径走 update。
+    session.verifiedAt = new Date();
+    await this.sessionRepo.save(session);
+
     return {
-      accessToken,
+      accessToken: tokenResult.accessToken,
       email: normalized,
-      expiresAt,
+      expiresAt: tokenResult.expiresAt,
     };
   }
 
@@ -306,13 +313,21 @@ export class EmailAuthService {
     };
   }
 
-  // 仅消费验证码（不签发 JWT、不触发 user-post-verify hook），用于改密码场景。
+  // 改密码场景的「**只读**校验」：检查验证码 + 用户状态，但**不**写 verifiedAt。
   // 与 verifyCode 不同：**故意不接受** DEV_BYPASS_CODE，改密码必须凭真实邮箱
   // 验证码，避免「拿到任意账号 token + 默认码 123456」就能改密的攻击面。
-  async consumeChangePasswordCode(
+  //
+  // 调用方流程：validateChangePasswordCode → 完成密码强度校验 + 写新 hash →
+  // 最后调 markChangePasswordCodeUsed 作废 code。这样如果密码强度校验失败、
+  // hash 写库失败，code 仍可被同一用户重试使用，不会让用户被迫再发一遍码。
+  async validateChangePasswordCode(
     email: string,
     code: string,
-  ): Promise<{ email: string; user: CloudUserEntity }> {
+  ): Promise<{
+    email: string;
+    user: CloudUserEntity;
+    session: EmailVerificationSessionEntity;
+  }> {
     const normalized = this.normalizeEmail(email);
     const trimmedCode = (code ?? "").trim();
     if (!trimmedCode) {
@@ -336,8 +351,6 @@ export class EmailAuthService {
     if (session.expiresAt.getTime() < Date.now()) {
       throw new UnauthorizedException("验证码已过期。");
     }
-    session.verifiedAt = new Date();
-    await this.sessionRepo.save(session);
 
     const user = await this.userRepo.findOne({
       where: { email: normalized },
@@ -353,7 +366,16 @@ export class EmailAuthService {
       );
     }
 
-    return { email: normalized, user };
+    return { email: normalized, user, session };
+  }
+
+  // 真正作废一条 change_password 验证码 session。调用方在所有副作用（密码写库
+  // 等）都成功后才调用，避免「码废了但操作失败」的尴尬。
+  async markChangePasswordCodeUsed(sessionId: string): Promise<void> {
+    await this.sessionRepo.update(
+      { id: sessionId },
+      { verifiedAt: new Date() },
+    );
   }
 
   private parsePositiveInteger(rawValue: string | undefined, fallback: number) {
