@@ -737,13 +737,16 @@ function MobileChatDetailsPage({ conversationId }: { conversationId: string }) {
     <ChatDetailsShell
       title={conversation?.title ?? t(msg`聊天信息`)}
       onBack={() => {
-        navigateBackOrFallback(() => {
-          void navigate({
-            to: "/chat/$conversationId",
-            params: { conversationId },
-            ...(chatRouteHash ? { hash: chatRouteHash } : {}),
-          });
-        });
+        navigateBackOrFallback(
+          () => {
+            void navigate({
+              to: "/chat/$conversationId",
+              params: { conversationId },
+              ...(chatRouteHash ? { hash: chatRouteHash } : {}),
+            });
+          },
+          `/chat/${conversationId}`,
+        );
       }}
     >
       {conversationsQuery.isLoading ? (

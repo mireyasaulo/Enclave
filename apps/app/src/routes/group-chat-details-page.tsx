@@ -543,13 +543,16 @@ function MobileGroupChatDetailsPage({ groupId }: { groupId: string }) {
           : t(msg`群聊信息`)
       }
       onBack={() => {
-        navigateBackOrFallback(() => {
-          void navigate({
-            to: "/group/$groupId",
-            params: { groupId },
-            ...(groupRouteHash ? { hash: groupRouteHash } : {}),
-          });
-        });
+        navigateBackOrFallback(
+          () => {
+            void navigate({
+              to: "/group/$groupId",
+              params: { groupId },
+              ...(groupRouteHash ? { hash: groupRouteHash } : {}),
+            });
+          },
+          `/group/${groupId}`,
+        );
       }}
       rightActions={
         groupSummary ? (
