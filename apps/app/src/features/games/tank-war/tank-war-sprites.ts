@@ -106,9 +106,6 @@ export const PLAYER1_L1_UP_B: Pixels = p([
 function flipV(src: Pixels): Pixels {
   return [...src].reverse();
 }
-function flipH(src: Pixels): Pixels {
-  return src.map((r) => r.split("").reverse().join(""));
-}
 // 90 deg CW
 function rotateCW(src: Pixels): Pixels {
   const n = src.length;
@@ -125,13 +122,6 @@ function rotateCW(src: Pixels): Pixels {
 function rotateCCW(src: Pixels): Pixels {
   return rotateCW(rotateCW(rotateCW(src)));
 }
-
-export const PLAYER1_L1_DOWN_A = flipV(PLAYER1_L1_UP_A);
-export const PLAYER1_L1_DOWN_B = flipV(PLAYER1_L1_UP_B);
-export const PLAYER1_L1_LEFT_A = rotateCCW(PLAYER1_L1_UP_A);
-export const PLAYER1_L1_LEFT_B = rotateCCW(PLAYER1_L1_UP_B);
-export const PLAYER1_L1_RIGHT_A = rotateCW(PLAYER1_L1_UP_A);
-export const PLAYER1_L1_RIGHT_B = rotateCW(PLAYER1_L1_UP_B);
 
 // ============================
 //   Player L2/L3/L4 — 同形状不同颜色细节，简化：基础坦克 + 炮塔加宽
@@ -213,23 +203,7 @@ export const ENEMY_FAST_UP_B = recolor(ENEMY_BASE_UP_B, { G: "W", D: "G" });
 export const ENEMY_ARMOR_UP_A = recolor(ENEMY_BASE_UP_A, { G: "Y", D: "y" });
 export const ENEMY_ARMOR_UP_B = recolor(ENEMY_BASE_UP_B, { G: "Y", D: "y" });
 
-// Power: HP 4 = R(红) -> N(绿) -> Q(蓝) -> G(灰)
-export function powerColorForHp(hp: number): Record<string, string> {
-  switch (hp) {
-    case 4:
-      return { G: "R", D: "r" };
-    case 3:
-      return { G: "N", D: "n" };
-    case 2:
-      return { G: "Q", D: "q" };
-    default:
-      return { G: "G", D: "D" };
-  }
-}
-
-// Bonus enemy (闪烁红白)
-export const ENEMY_BONUS_RED_UP_A = recolor(ENEMY_BASE_UP_A, { G: "R", D: "r" });
-export const ENEMY_BONUS_WHITE_UP_A = recolor(ENEMY_BASE_UP_A, { G: "W", D: "G" });
+// Power tank HP 颜色变化 + Bonus 红白闪烁 — 由 bake-sprites.ts 直接调 recolor 处理
 
 // ============================
 //   BULLET — 4×4 单色
@@ -642,16 +616,4 @@ export const POWERUP_GUN = withFrame(
   ]),
 );
 
-// 全部 sprite 集合，给 baker 使用
-export const ALL_TANK_FRAMES = {
-  PLAYER1_L1_UP_A,
-  PLAYER1_L1_UP_B,
-  PLAYER1_L1_DOWN_A,
-  PLAYER1_L1_DOWN_B,
-  PLAYER1_L1_LEFT_A,
-  PLAYER1_L1_LEFT_B,
-  PLAYER1_L1_RIGHT_A,
-  PLAYER1_L1_RIGHT_B,
-};
-
-export { flipV, flipH, rotateCW, rotateCCW, recolor };
+export { flipV, rotateCW, rotateCCW, recolor };

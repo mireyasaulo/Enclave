@@ -102,12 +102,8 @@ export function useTankWarInput(
       if (handled) e.preventDefault();
     }
 
-    window.addEventListener("keydown", onDown, { passive: false });
-    window.addEventListener("keyup", onUp, { passive: false });
-    return () => {
-      window.removeEventListener("keydown", onDown);
-      window.removeEventListener("keyup", onUp);
-      // 释放所有按键状态
+    // 离开窗口/失去焦点时清空按键，否则 keyup 不触发会导致坦克自动跑
+    function releaseAll() {
       const input = inputRef.current;
       input.p1Up = false;
       input.p1Down = false;
@@ -119,6 +115,16 @@ export function useTankWarInput(
       input.p2Left = false;
       input.p2Right = false;
       input.p2Fire = false;
+    }
+
+    window.addEventListener("keydown", onDown, { passive: false });
+    window.addEventListener("keyup", onUp, { passive: false });
+    window.addEventListener("blur", releaseAll);
+    return () => {
+      window.removeEventListener("keydown", onDown);
+      window.removeEventListener("keyup", onUp);
+      window.removeEventListener("blur", releaseAll);
+      releaseAll();
     };
   }, [inputRef, twoPlayer]);
 }
