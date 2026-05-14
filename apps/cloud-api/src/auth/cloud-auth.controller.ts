@@ -246,7 +246,6 @@ export class CloudAuthController {
       body.identifier,
       body.password,
       {
-        deviceFingerprint: body.deviceFingerprint ?? null,
         ip: extractIp(request, body.clientReportedIp ?? null),
       },
     );

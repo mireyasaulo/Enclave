@@ -307,7 +307,8 @@ export class EmailAuthService {
   }
 
   // 仅消费验证码（不签发 JWT、不触发 user-post-verify hook），用于改密码场景。
-  // 返回正在绑定的 user，调用方负责接下来的写库。
+  // 与 verifyCode 不同：**故意不接受** DEV_BYPASS_CODE，改密码必须凭真实邮箱
+  // 验证码，避免「拿到任意账号 token + 默认码 123456」就能改密的攻击面。
   async consumeChangePasswordCode(
     email: string,
     code: string,
@@ -318,39 +319,25 @@ export class EmailAuthService {
       throw new BadRequestException("验证码不能为空。");
     }
 
-    let session: EmailVerificationSessionEntity | null;
-
-    if (trimmedCode === DEV_BYPASS_CODE) {
-      // 与 verifyCode 行为对齐：dev bypass 不查库直接放行。
-      session = this.sessionRepo.create({
+    const session = await this.sessionRepo.findOne({
+      where: {
         email: normalized,
         code: trimmedCode,
         purpose: "change_password",
-        expiresAt: new Date(Date.now() + this.getCodeTtlSeconds() * 1000),
-        verifiedAt: new Date(),
-      });
-      await this.sessionRepo.save(session);
-    } else {
-      session = await this.sessionRepo.findOne({
-        where: {
-          email: normalized,
-          code: trimmedCode,
-          purpose: "change_password",
-        },
-        order: { createdAt: "DESC" },
-      });
-      if (!session) {
-        throw new UnauthorizedException("验证码错误。");
-      }
-      if (session.verifiedAt) {
-        throw new UnauthorizedException("该验证码已使用。");
-      }
-      if (session.expiresAt.getTime() < Date.now()) {
-        throw new UnauthorizedException("验证码已过期。");
-      }
-      session.verifiedAt = new Date();
-      await this.sessionRepo.save(session);
+      },
+      order: { createdAt: "DESC" },
+    });
+    if (!session) {
+      throw new UnauthorizedException("验证码错误。");
     }
+    if (session.verifiedAt) {
+      throw new UnauthorizedException("该验证码已使用。");
+    }
+    if (session.expiresAt.getTime() < Date.now()) {
+      throw new UnauthorizedException("验证码已过期。");
+    }
+    session.verifiedAt = new Date();
+    await this.sessionRepo.save(session);
 
     const user = await this.userRepo.findOne({
       where: { email: normalized },

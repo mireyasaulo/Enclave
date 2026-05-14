@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -31,26 +31,13 @@ export function AccountSecurityPanel() {
     message: string;
   } | null>(null);
   const [resendCountdown, setResendCountdown] = useState(0);
-  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (resendCountdown <= 0) {
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-        countdownRef.current = null;
-      }
-      return;
-    }
-    if (countdownRef.current) return;
-    countdownRef.current = setInterval(() => {
-      setResendCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    if (resendCountdown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCountdown((prev) => Math.max(0, prev - 1));
     }, 1000);
-    return () => {
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-        countdownRef.current = null;
-      }
-    };
+    return () => clearInterval(timer);
   }, [resendCountdown]);
 
   const sendCodeMutation = useMutation({
