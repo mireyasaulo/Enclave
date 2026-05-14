@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { msg } from "@lingui/macro";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
@@ -17,6 +17,7 @@ import {
 import { AppPage, cn } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../components/avatar-chip";
+import { FeatureComingSoonDialog } from "../components/feature-coming-soon-dialog";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import {
@@ -41,6 +42,7 @@ export function ProfilePage() {
   const hash = useRouterState({
     select: (state) => state.location.hash,
   });
+  const [importComingSoonOpen, setImportComingSoonOpen] = useState(false);
   const username = useWorldOwnerStore((state) => state.username);
   const ownerId = useWorldOwnerStore((state) => state.id);
   const avatar = useWorldOwnerStore((state) => state.avatar);
@@ -184,11 +186,11 @@ export function ProfilePage() {
         ) : null}
 
         <ProfileEntryGroup className="mt-3">
-          <ProfileEntry
+          <ProfileActionEntry
             icon={UserPlus}
             iconClassName="bg-[rgba(139,92,246,0.12)] text-[#7c3aed]"
             label={t(msg`导入角色`)}
-            to="/profile/character-import"
+            onClick={() => setImportComingSoonOpen(true)}
           />
           <ProfileEntry
             icon={MessageSquareText}
@@ -233,6 +235,16 @@ export function ProfilePage() {
           </ProfileEntryGroup>
         ) : null}
       </div>
+
+      <FeatureComingSoonDialog
+        open={importComingSoonOpen}
+        title={t(msg`导入角色功能正在开发中，敬请期待`)}
+        description={t(
+          msg`我们正在打磨更顺手的导入流程。先加运营微信，体验上线后第一时间通知你，也欢迎入群一起聊聊你想怎么用。`,
+        )}
+        wechatId="yuanzui0120"
+        onClose={() => setImportComingSoonOpen(false)}
+      />
     </AppPage>
   );
 }
