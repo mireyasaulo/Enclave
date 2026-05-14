@@ -35,8 +35,14 @@ export const SELF_CHARACTER_ID = 'char-default-self';
  * 最终所有 13 个 ID 由 `DEFAULT_CHARACTER_IDS` 导出，由 social.service.ts 的
  * `ensureDefaultFriendships()` 写入 friendships 表。
  *
- * ⚠️ 加默认好友的代价：每加一个，所有新 world 出厂通讯录都多一格。
- *   只在"普适刚需"角色上用 B 方案；细分领域请保持居民池形态（A 方案）。
+ * ⚠️ 加默认好友的代价远比想象大：
+ *   `ensureDefaultFriendships()` 不只在新 world 启动时跑，`getFriends()` /
+ *   `getFriendCharacterIds()` 每次被调用都会顺手把缺失的默认好友补回来
+ *   （以 status='friend' 直接落 friendships 表，不经用户同意）。
+ *   所以**加一个默认好友 = 所有现有 + 未来 world 下次刷好友列表时通讯录都多一格**。
+ *   只在"普适刚需"角色上用这个方案；细分领域请只加进居民池（BUILT_IN）。
+ *   想下线默认好友更麻烦：从这个数组里移除只是停止再补，已经建好的 friendship
+ *   还得另外迁移。
  */
 
 // 这些是 2026-05-13 起新加入“默认好友”的预设角色：

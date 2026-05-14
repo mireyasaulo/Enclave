@@ -7,8 +7,9 @@
 //
 // 关于 ID：保留历史 `char-default-*` 形态，避免破坏已硬编码的 ID 引用
 // （如 prompt-naturalness.ts 里对 wedding-planner ID 的特殊语气补丁）。
-// 这些 ID 在 seed 时会被 sourceType=preset_catalog / deletionPolicy=archive_allowed
-// 覆盖，行为上是普通居民，不是默认好友。
+// 角色本身 sourceType / deletionPolicy 已经在自身实现里改成 preset 形态
+// （preset_catalog / archive_allowed），listPresetCatalog 给前端的内容跟
+// seed 后 DB 里的状态一致。
 
 import type { CelebrityCharacterPreset } from './celebrity-character-presets';
 import {

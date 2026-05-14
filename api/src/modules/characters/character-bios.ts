@@ -60,6 +60,11 @@ export const PRESET_CHARACTER_BIOS = {
   dating_aide_direct_zhou_jin: '把消息截图发我，直接给你写一句。',
   dating_aide_gentle_signal_reader_he_ling: '他这条不是不在乎，看节奏。',
   dating_aide_data_driven_su_li: '把这段关系拆成数据，给你看清。',
+  // 历史默认角色 → 2026-05-14 重新拉进 BUILT_IN 居民池。
+  // 直接复用 DEFAULT_CHARACTER_BIOS 的同名 entry，避免两边 drift。
+  hotel_expert: DEFAULT_CHARACTER_BIOS.hotel_expert,
+  wedding_planner: DEFAULT_CHARACTER_BIOS.wedding_planner,
+  wedding_dress_expert: DEFAULT_CHARACTER_BIOS.wedding_dress_expert,
 } as const;
 
 export type PresetCharacterBioKey = keyof typeof PRESET_CHARACTER_BIOS;
