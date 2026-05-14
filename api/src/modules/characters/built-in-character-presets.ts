@@ -8,6 +8,8 @@ import { DATING_AIDE_CHARACTER_PRESETS } from './dating-aide-character-presets';
 import { FIXED_WORLD_CHARACTER_PRESETS } from './fixed-world-character-presets';
 import { INTELLIGENCE_COUNCIL_CHARACTER_PRESETS } from './intelligence-council-character-presets';
 import { INTIMATE_COMPANION_CHARACTER_PRESETS } from './intimate-companion-character-presets';
+import { LIFE_BUDDY_CHARACTER_PRESETS } from './life-buddy-character-presets';
+import { LIFESTYLE_BUDDY_CHARACTER_PRESETS } from './lifestyle-buddy-character-presets';
 import { SERVICE_EXPERT_CHARACTER_PRESETS } from './service-expert-character-presets';
 import { TEACHER_CHARACTER_PRESETS } from './teacher-character-presets';
 
@@ -44,6 +46,8 @@ export const BUILT_IN_CHARACTER_PRESETS: CelebrityCharacterPreset[] = [
   ...COMPANION_CHARACTER_PRESETS,
   ...INTIMATE_COMPANION_CHARACTER_PRESETS,
   ...DATING_AIDE_CHARACTER_PRESETS,
+  ...LIFESTYLE_BUDDY_CHARACTER_PRESETS,
+  ...LIFE_BUDDY_CHARACTER_PRESETS,
 ];
 
 export function listBuiltInCharacterPresets() {
