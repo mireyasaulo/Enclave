@@ -1186,6 +1186,10 @@ export function ChatMessageList({
       if (speakRequestRef.current !== requestId) {
         return;
       }
+      // 失败时清掉 ref —— 比如 audio.play() 被浏览器 autoplay policy 拒绝，
+      // 此时 audio 已经赋给了 ref 但实际没在播；不清掉的话下一次 stop
+      // 会去 pause 一个根本没播的 audio，状态错乱
+      speakAudioRef.current = null;
       setSpeakingMessageId((current) =>
         current === message.id ? null : current,
       );

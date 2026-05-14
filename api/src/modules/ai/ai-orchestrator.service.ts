@@ -3259,6 +3259,13 @@ export class AiOrchestratorService {
 
       try {
         if (MinimaxNativeClient.isMinimaxEndpoint(provider.ttsEndpoint)) {
+          // 先 new client —— 它的 constructor 在 apiKey 缺失时会抛
+          // MINIMAX_API_KEY_MISSING；如果先 reserve 再 new，apiKey 缺失就会
+          // 抛在 reserve 之后但 try/release 块之外，留下永远没释放的配额。
+          const minimax = new MinimaxNativeClient(
+            provider.ttsEndpoint,
+            provider.ttsApiKey,
+          );
           // Token Plan quota gate：仅对已在常量表登记的模型做配额扣减
           // （目前是 speech-02-hd，11000/天）。未登记的 minimax TTS 模型
           // 自然 bypass —— 不阻塞历史 provider 配置。
@@ -3273,10 +3280,6 @@ export class AiOrchestratorService {
               });
             }
           }
-          const minimax = new MinimaxNativeClient(
-            provider.ttsEndpoint,
-            provider.ttsApiKey,
-          );
           try {
             const result = await this.retrySpeechRequest(
               'speech synthesis',
