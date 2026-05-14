@@ -497,12 +497,110 @@ export class WikiReviewService {
     });
 
     if (newRev.recipeSnapshot) {
-      await this.edits.applyApprovedRevision(newRev, reviewer.id);
+      try {
+        await this.edits.applyApprovedRevision(newRev, reviewer.id);
+      } catch (err) {
+        // recipe revert 的 blueprint publish 失败时，把 revert revision 标记成
+        // pending（让审核员看见、可重试），把 page.currentRevisionId 还原到原版本，
+        // 并把刚标为 reverted 的 supersededRevs 还原。否则 revert revision 显示已
+        // 通过但 blueprint 还是旧的，跟 wiki 显示矛盾。
+        await this.rollbackRecipeRevert(newRev, page, characterId).catch(
+          () => undefined,
+        );
+        throw err;
+      }
     }
 
     await this.maybeAutoLock(characterId);
 
     return { revisionId: newRev.id, version: newRev.version };
+  }
+
+  /**
+   * recipe revert 第二阶段（blueprint publish）失败时调用：
+   *   - revert revision → pending
+   *   - page.currentRevisionId 还原到 revert 前
+   *   - 之前标为 'reverted' 的 supersededRevs 还原成 'approved'
+   *   - revert revision 的 supersededRevs 受影响作者 revertedCount 减回去
+   *   - reviewer 的 editCount/approvedEditCount/patrolledCount 各 -1
+   * 与 rollbackRuntimeApproval（针对 decide 的两阶段）平行。
+   */
+  private async rollbackRecipeRevert(
+    newRev: CharacterRevisionEntity,
+    pageBeforeRevert: CharacterPageEntity,
+    characterId: string,
+  ): Promise<void> {
+    await this.dataSource.transaction(async (manager) => {
+      const supersededRevs = await manager.find(CharacterRevisionEntity, {
+        where: { revertedByRevisionId: newRev.id },
+      });
+      if (supersededRevs.length > 0) {
+        await manager.update(
+          CharacterRevisionEntity,
+          { id: In(supersededRevs.map((r) => r.id)) },
+          { status: 'approved', revertedByRevisionId: null },
+        );
+        const editorsAffected = Array.from(
+          new Set(supersededRevs.map((r) => r.editorUserId)),
+        );
+        for (const userId of editorsAffected) {
+          const profile = await manager.findOne(UserWikiProfileEntity, {
+            where: { userId },
+          });
+          if (!profile) continue;
+          const dec = supersededRevs.filter(
+            (r) => r.editorUserId === userId,
+          ).length;
+          profile.revertedCount = Math.max(0, profile.revertedCount - dec);
+          await manager.save(profile);
+        }
+      }
+
+      await manager.update(
+        CharacterRevisionEntity,
+        { id: newRev.id },
+        {
+          status: 'pending',
+          isPatrolled: false,
+          patrolledBy: null,
+          patrolledAt: null,
+        },
+      );
+      await manager.update(
+        CharacterPageEntity,
+        { characterId },
+        {
+          currentRevisionId: pageBeforeRevert.currentRevisionId ?? null,
+          latestRevisionId: pageBeforeRevert.latestRevisionId ?? null,
+          title: pageBeforeRevert.title ?? null,
+          lifecycleStatus: pageBeforeRevert.lifecycleStatus,
+        },
+      );
+
+      const reviewerProfile = await manager.findOne(UserWikiProfileEntity, {
+        where: { userId: newRev.editorUserId },
+      });
+      if (reviewerProfile) {
+        reviewerProfile.editCount = Math.max(0, reviewerProfile.editCount - 1);
+        reviewerProfile.approvedEditCount = Math.max(
+          0,
+          reviewerProfile.approvedEditCount - 1,
+        );
+        reviewerProfile.patrolledCount = Math.max(
+          0,
+          reviewerProfile.patrolledCount - 1,
+        );
+        await manager.save(reviewerProfile);
+      }
+
+      // editCount 多加了 1（revert 入事务里自增过），原子减回去。
+      await manager.decrement(
+        CharacterPageEntity,
+        { characterId },
+        'editCount',
+        1,
+      );
+    });
   }
 
   /**

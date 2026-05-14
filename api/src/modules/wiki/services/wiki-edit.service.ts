@@ -431,8 +431,30 @@ export class WikiEditService {
     });
 
     if (autoApprove) {
-      await this.applyApprovedRevision(revision, user.id);
-      void this.roles.checkPromotion(user.id).catch(() => undefined);
+      try {
+        await this.applyApprovedRevision(revision, user.id);
+        void this.roles.checkPromotion(user.id).catch(() => undefined);
+      } catch (err) {
+        // 把页降回 pending_create，让用户的创建请求进入审核队列而不是消失。
+        await this.rollbackAutoApproval({
+          revisionId: revision.id,
+          characterId,
+          submitterId: user.id,
+          operation: 'create',
+          riskLevel: 'high',
+          priority: 10,
+          previousPage: {
+            currentRevisionId: null,
+            latestRevisionId: revision.id,
+            lifecycleStatus: 'pending_create',
+            title: content.name,
+            isDeleted: false,
+            deletedAt: null,
+            deletedBy: null,
+          },
+        }).catch(() => undefined);
+        throw err;
+      }
     }
 
     return {
@@ -535,8 +557,29 @@ export class WikiEditService {
     });
 
     if (autoApprove) {
-      await this.applyApprovedRevision(revision, user.id);
-      void this.roles.checkPromotion(user.id).catch(() => undefined);
+      try {
+        await this.applyApprovedRevision(revision, user.id);
+        void this.roles.checkPromotion(user.id).catch(() => undefined);
+      } catch (err) {
+        await this.rollbackAutoApproval({
+          revisionId: revision.id,
+          characterId,
+          submitterId: user.id,
+          operation,
+          riskLevel: 'high',
+          priority: 20,
+          previousPage: {
+            currentRevisionId: page.currentRevisionId ?? null,
+            latestRevisionId: page.latestRevisionId ?? null,
+            lifecycleStatus: page.lifecycleStatus,
+            title: page.title ?? null,
+            isDeleted: page.isDeleted,
+            deletedAt: page.deletedAt ?? null,
+            deletedBy: page.deletedBy ?? null,
+          },
+        }).catch(() => undefined);
+        throw err;
+      }
     }
 
     return {
@@ -914,8 +957,29 @@ export class WikiEditService {
     });
 
     if (autoApprove) {
-      await this.applyApprovedRevision(revision, user.id);
-      void this.roles.checkPromotion(user.id).catch(() => undefined);
+      try {
+        await this.applyApprovedRevision(revision, user.id);
+        void this.roles.checkPromotion(user.id).catch(() => undefined);
+      } catch (err) {
+        await this.rollbackAutoApproval({
+          revisionId: revision.id,
+          characterId,
+          submitterId: user.id,
+          operation: 'edit',
+          riskLevel,
+          priority: riskLevel === 'high' ? 5 : 0,
+          previousPage: {
+            currentRevisionId: page.currentRevisionId ?? null,
+            latestRevisionId: page.latestRevisionId ?? null,
+            lifecycleStatus: page.lifecycleStatus,
+            title: page.title ?? null,
+            isDeleted: page.isDeleted,
+            deletedAt: page.deletedAt ?? null,
+            deletedBy: page.deletedBy ?? null,
+          },
+        }).catch(() => undefined);
+        throw err;
+      }
     }
 
     return {
@@ -973,6 +1037,86 @@ export class WikiEditService {
     return latest && latest.version > revision.version
       ? page.latestRevisionId
       : revision.id;
+  }
+
+  /**
+   * autoApprove 走 "事务内写 revision=approved + page.currentRevisionId 切到新 →
+   * 事务外调 applyApprovedRevision（写 character / publish blueprint）" 两段式。
+   * 第二段失败时调此函数补偿：
+   *   1. revision 状态降回 pending；
+   *   2. page 回到 autoApprove 前的快照（若是 createPage，则保持页存在但 lifecycle=pending_create）；
+   *   3. 作者 profile.approvedEditCount -= 1（编辑总数 editCount 保留——动作发生过）；
+   *   4. 若没 submission 行就补一条，让用户的修改进入审核队列而不是消失。
+   *
+   * 与 wiki-review.service.ts:rollbackRuntimeApproval 同思路，只是触发场景不同
+   *（这里是首次提交者直接 autoApprove，那个是审核员二次审批）。
+   */
+  private async rollbackAutoApproval(input: {
+    revisionId: string;
+    characterId: string;
+    submitterId: string;
+    operation: string;
+    riskLevel: string;
+    priority: number;
+    previousPage: {
+      currentRevisionId: string | null;
+      latestRevisionId: string | null;
+      lifecycleStatus: string;
+      title: string | null;
+      isDeleted: boolean;
+      deletedAt: Date | null;
+      deletedBy: string | null;
+    };
+  }): Promise<void> {
+    await this.dataSource.transaction(async (manager) => {
+      await manager.update(
+        CharacterRevisionEntity,
+        { id: input.revisionId },
+        {
+          status: 'pending',
+          isPatrolled: false,
+          patrolledBy: null,
+          patrolledAt: null,
+        },
+      );
+      await manager.update(
+        CharacterPageEntity,
+        { characterId: input.characterId },
+        {
+          currentRevisionId: input.previousPage.currentRevisionId,
+          latestRevisionId:
+            input.previousPage.latestRevisionId ?? input.revisionId,
+          lifecycleStatus: input.previousPage.lifecycleStatus,
+          title: input.previousPage.title,
+          isDeleted: input.previousPage.isDeleted,
+          deletedAt: input.previousPage.deletedAt,
+          deletedBy: input.previousPage.deletedBy,
+        },
+      );
+      const existingSubmission = await manager.findOne(EditSubmissionEntity, {
+        where: { revisionId: input.revisionId },
+      });
+      if (!existingSubmission) {
+        await manager.save(
+          manager.create(EditSubmissionEntity, {
+            revisionId: input.revisionId,
+            characterId: input.characterId,
+            submitterId: input.submitterId,
+            operation: input.operation,
+            riskLevel: input.riskLevel,
+            priority: input.priority,
+            decision: null,
+          }),
+        );
+      }
+      const profile = await manager.findOne(UserWikiProfileEntity, {
+        where: { userId: input.submitterId },
+      });
+      if (profile && profile.approvedEditCount > 0) {
+        profile.approvedEditCount -= 1;
+        await manager.save(profile);
+      }
+    });
   }
 
   private async bumpProfile(
