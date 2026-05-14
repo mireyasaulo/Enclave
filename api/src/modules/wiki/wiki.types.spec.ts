@@ -1,5 +1,5 @@
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
-import { BadRequestException } from '@nestjs/common';
+import { AppError } from '../../common/app-error.exception';
 import {
   WIKI_CONTENT_SCHEMA_VERSION,
   WIKI_REJECTED_FIELDS,
@@ -77,7 +77,7 @@ describe('isHighRiskRecipeChange', () => {
 });
 
 describe('pickWikiContent', () => {
-  it('rejects D/E class fields with BadRequestException', () => {
+  it('rejects D/E class fields with AppError', () => {
     for (const field of WIKI_REJECTED_FIELDS) {
       expect(() =>
         pickWikiContent({
@@ -89,7 +89,7 @@ describe('pickWikiContent', () => {
           expertDomains: [],
           [field]: 'leak',
         }),
-      ).toThrow(BadRequestException);
+      ).toThrow(AppError);
     }
   });
 
@@ -155,7 +155,7 @@ describe('assertWikiEditSummary', () => {
         revisionKind: 'recipe',
         summary: '',
       }),
-    ).toThrow(BadRequestException);
+    ).toThrow(AppError);
     expect(() =>
       assertWikiEditSummary({
         operation: 'create',
@@ -163,7 +163,7 @@ describe('assertWikiEditSummary', () => {
         revisionKind: 'recipe',
         summary: '太短',
       }),
-    ).toThrow(BadRequestException);
+    ).toThrow(AppError);
     expect(() =>
       assertWikiEditSummary({
         operation: 'create',
@@ -182,7 +182,7 @@ describe('assertWikiEditSummary', () => {
         revisionKind: 'recipe',
         summary: '',
       }),
-    ).toThrow(BadRequestException);
+    ).toThrow(AppError);
   });
 
   it('requires ≥10 chars for lifecycle ops', () => {
@@ -193,7 +193,7 @@ describe('assertWikiEditSummary', () => {
         revisionKind: 'lifecycle',
         summary: '想删',
       }),
-    ).toThrow(BadRequestException);
+    ).toThrow(AppError);
   });
 
   it('does not require summary for low-risk content edits', () => {
@@ -215,7 +215,7 @@ describe('assertWikiEditSummary', () => {
         revisionKind: 'recipe',
         summary: '          ',
       }),
-    ).toThrow(BadRequestException);
+    ).toThrow(AppError);
   });
 });
 

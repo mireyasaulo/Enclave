@@ -9,10 +9,13 @@ import { CharacterRevisionEntity } from '../entities/character-revision.entity';
 import { EditSubmissionEntity } from '../entities/edit-submission.entity';
 import { UserWikiProfileEntity } from '../entities/user-wiki-profile.entity';
 import { WikiEditService } from './wiki-edit.service';
+import { WikiFieldProtectionService } from './wiki-field-protection.service';
 import { WikiProtectionService } from './wiki-protection.service';
 import { WikiRoleService } from './wiki-role.service';
 import { WikiSystemUserService } from './wiki-system-user.service';
 import { rankOf } from '../guards/wiki-role.guard';
+import { diffFields, diffPaths, snapshotFromCharacter } from '../wiki.types';
+import { CharacterEntity } from '../../characters/character.entity';
 
 export type ReviewDecisionInput = {
   decision: 'approve' | 'reject' | 'request_changes';
@@ -36,6 +39,9 @@ export class WikiReviewService {
     private readonly roles: WikiRoleService,
     private readonly protection: WikiProtectionService,
     private readonly systemUsers: WikiSystemUserService,
+    private readonly fieldProtection: WikiFieldProtectionService,
+    @InjectRepository(CharacterEntity)
+    private readonly characterRepo: Repository<CharacterEntity>,
   ) {}
 
   async listPending(limit?: number): Promise<
@@ -72,35 +78,60 @@ export class WikiReviewService {
   > {
     const opts = typeof input === 'number' ? { limit: input } : input;
     const limit = Math.min(Math.max(opts.limit ?? 50, 1), 200);
+    // SQL JOIN 把 revisionKind / revision.status='pending' 一起进过滤器，避免
+    // 之前 "take(200) → 内存 filter → slice(limit)" 会把分页之后的匹配项静默丢掉。
     const qb = this.submissionRepo
       .createQueryBuilder('s')
+      .innerJoin(
+        CharacterRevisionEntity,
+        'r',
+        'r.id = s.revisionId AND r.status = :status',
+        { status: 'pending' },
+      )
       .where('s.decision IS NULL')
       .orderBy('s.priority', 'DESC')
       .addOrderBy('s.createdAt', 'ASC')
-      .take(opts.revisionKind ? 200 : limit);
+      .take(limit);
     if (opts.operation) {
       qb.andWhere('s.operation = :operation', { operation: opts.operation });
     }
     if (opts.riskLevel) {
       qb.andWhere('s.riskLevel = :riskLevel', { riskLevel: opts.riskLevel });
     }
+    if (opts.revisionKind) {
+      qb.andWhere('r.revisionKind = :revisionKind', {
+        revisionKind: opts.revisionKind,
+      });
+    }
     const submissions = await qb.getMany();
-    const revIds = submissions.map((s) => s.revisionId);
-    if (revIds.length === 0) return [];
-    const revisions = await this.revisionRepo
-      .createQueryBuilder('r')
-      .where('r.id IN (:...ids)', { ids: revIds })
-      .andWhere('r.status = :status', { status: 'pending' })
-      .getMany();
+    if (submissions.length === 0) return [];
+    const revisions = await this.revisionRepo.find({
+      where: { id: In(submissions.map((s) => s.revisionId)) },
+    });
     const revMap = new Map(revisions.map((r) => [r.id, r]));
     return submissions
       .map((s) => ({ submission: s, revision: revMap.get(s.revisionId)! }))
-      .filter((entry) => entry.revision)
-      .filter(
-        (entry) =>
-          !opts.revisionKind || entry.revision.revisionKind === opts.revisionKind,
+      .filter((entry) => entry.revision);
+  }
+
+  /**
+   * 找出 submission.decision=null 但对应 revision.status 已非 pending 的孤儿条目
+   * （历史脏数据 / 直接改 DB 造成）。审核台用它来曝出来手动清理。
+   */
+  async listOrphanSubmissions(limit = 100): Promise<EditSubmissionEntity[]> {
+    const safeLimit = Math.min(Math.max(limit, 1), 500);
+    return this.submissionRepo
+      .createQueryBuilder('s')
+      .innerJoin(
+        CharacterRevisionEntity,
+        'r',
+        'r.id = s.revisionId AND r.status != :pending',
+        { pending: 'pending' },
       )
-      .slice(0, limit);
+      .where('s.decision IS NULL')
+      .orderBy('s.createdAt', 'ASC')
+      .take(safeLimit)
+      .getMany();
   }
 
   async decide(
@@ -378,6 +409,49 @@ export class WikiReviewService {
         params: { reason: '该页面被完全保护，仅管理员可回滚' },
         legacyMessage: '该页面被完全保护，仅管理员可回滚',
       });
+    }
+
+    // 字段级保护：revert 也是写字段，不能绕过保护策略——例如把
+    // prompting.coreLogic 通过 "回滚到旧版" 复原回不合规的旧值。
+    // 计算 revert 会改动的字段集合：与当前 stable revision 比 diff。
+    const currentRev = page.currentRevisionId
+      ? await this.revisionRepo.findOne({
+          where: { id: page.currentRevisionId },
+        })
+      : null;
+    if (currentRev) {
+      if (target.recipeSnapshot && currentRev.recipeSnapshot) {
+        const changedPaths = diffPaths(
+          currentRev.recipeSnapshot,
+          target.recipeSnapshot,
+        );
+        await this.fieldProtection.assertCanEditPaths(
+          reviewer,
+          characterId,
+          changedPaths,
+        );
+      } else {
+        // content 路径（无 recipeSnapshot）：用 diffFields 拿到改动的内容字段名
+        // 当作 path 给 field-protection 做后缀匹配。
+        const character = await this.characterRepo.findOne({
+          where: { id: characterId },
+        });
+        const liveContent =
+          currentRev.contentSnapshot ??
+          (character
+            ? snapshotFromCharacter(
+                character as unknown as Record<string, unknown>,
+              )
+            : null);
+        if (liveContent) {
+          const changedFields = diffFields(liveContent, target.contentSnapshot);
+          await this.fieldProtection.assertCanEditPaths(
+            reviewer,
+            characterId,
+            changedFields,
+          );
+        }
+      }
     }
 
     const newRev = await this.dataSource.transaction(async (manager) => {
