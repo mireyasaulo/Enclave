@@ -31,8 +31,9 @@ export function ProfileSettingsLanguagePage() {
   }
 
   const goBack = () =>
-    navigateBackOrFallback(() =>
-      navigate({ to: "/profile/settings", replace: true }),
+    navigateBackOrFallback(
+      () => navigate({ to: "/profile/settings", replace: true }),
+      "/profile/settings",
     );
 
   return (

@@ -300,17 +300,20 @@ function MobileAddFriend() {
   }
 
   function handleBack() {
-    navigateBackOrFallback(() => {
-      if (safeReturnPath) {
-        void navigate({
-          to: safeReturnPath,
-          ...(safeReturnHash ? { hash: safeReturnHash } : {}),
-        });
-        return;
-      }
+    navigateBackOrFallback(
+      () => {
+        if (safeReturnPath) {
+          void navigate({
+            to: safeReturnPath,
+            ...(safeReturnHash ? { hash: safeReturnHash } : {}),
+          });
+          return;
+        }
 
-      void navigate({ to: "/tabs/chat" });
-    });
+        void navigate({ to: "/tabs/chat" });
+      },
+      safeReturnPath ?? "/tabs/chat",
+    );
   }
 
   function openFriendRequests() {

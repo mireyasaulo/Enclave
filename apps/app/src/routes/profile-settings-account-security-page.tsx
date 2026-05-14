@@ -30,8 +30,9 @@ export function ProfileSettingsAccountSecurityPage() {
   }
 
   const goBack = () =>
-    navigateBackOrFallback(() =>
-      navigate({ to: "/profile/settings", replace: true }),
+    navigateBackOrFallback(
+      () => navigate({ to: "/profile/settings", replace: true }),
+      "/profile/settings",
     );
 
   return (

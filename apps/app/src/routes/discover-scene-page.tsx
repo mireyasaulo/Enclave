@@ -322,13 +322,18 @@ function MobileDiscoverScenePage() {
         ) : null
       }
       onBack={() =>
-        navigateBackOrFallback(() => {
-          if (navigateToRouteStateReturn()) {
-            return;
-          }
+        navigateBackOrFallback(
+          () => {
+            if (navigateToRouteStateReturn()) {
+              return;
+            }
 
-          void navigate({ to: "/tabs/discover" });
-        })
+            void navigate({ to: "/tabs/discover" });
+          },
+          (routeState.returnPath && !isDesktopOnlyPath(routeState.returnPath)
+            ? routeState.returnPath
+            : undefined) ?? "/tabs/discover",
+        )
       }
     >
       <section className="overflow-hidden rounded-[16px] border border-black/5 bg-white">

@@ -176,13 +176,16 @@ function MobileOfficialAccountsPage() {
         leftActions={
           <Button
             onClick={() =>
-              navigateBackOrFallback(() => {
-                if (navigateToRouteStateReturn()) {
-                  return;
-                }
+              navigateBackOrFallback(
+                () => {
+                  if (navigateToRouteStateReturn()) {
+                    return;
+                  }
 
-                void navigate({ to: "/tabs/contacts" });
-              })
+                  void navigate({ to: "/tabs/contacts" });
+                },
+                safeReturnPath ?? "/tabs/contacts",
+              )
             }
             variant="ghost"
             size="icon"
@@ -341,13 +344,16 @@ function MobileOfficialAccountsPage() {
         <Button
           type="button"
           onClick={() =>
-            navigateBackOrFallback(() => {
-              if (navigateToRouteStateReturn()) {
-                return;
-              }
+            navigateBackOrFallback(
+              () => {
+                if (navigateToRouteStateReturn()) {
+                  return;
+                }
 
-              void navigate({ to: "/tabs/contacts" });
-            })
+                void navigate({ to: "/tabs/contacts" });
+              },
+              safeReturnPath ?? "/tabs/contacts",
+            )
           }
           variant="ghost"
           size="icon"
@@ -366,13 +372,16 @@ function MobileOfficialAccountsPage() {
           <Button
             type="button"
             onClick={() =>
-              navigateBackOrFallback(() => {
-                if (navigateToRouteStateReturn()) {
-                  return;
-                }
+              navigateBackOrFallback(
+                () => {
+                  if (navigateToRouteStateReturn()) {
+                    return;
+                  }
 
-                void navigate({ to: "/tabs/contacts" });
-              })
+                  void navigate({ to: "/tabs/contacts" });
+                },
+                safeReturnPath ?? "/tabs/contacts",
+              )
             }
             variant="primary"
             size="md"

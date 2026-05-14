@@ -287,17 +287,25 @@ export function MobileFriendMomentsPage() {
   }
 
   function handleBack() {
-    navigateBackOrFallback(() => {
-      if (navigateToRouteStateReturn()) {
-        return;
-      }
+    const expectedPreviousPath =
+      safeReturnPath ??
+      (resolvedCharacterId
+        ? `/character/${resolvedCharacterId}`
+        : "/discover/moments");
+    navigateBackOrFallback(
+      () => {
+        if (navigateToRouteStateReturn()) {
+          return;
+        }
 
-      if (openCharacterDetail()) {
-        return;
-      }
+        if (openCharacterDetail()) {
+          return;
+        }
 
-      void navigate({ to: "/discover/moments" });
-    });
+        void navigate({ to: "/discover/moments" });
+      },
+      expectedPreviousPath,
+    );
   }
 
   function handleRetryLoad() {

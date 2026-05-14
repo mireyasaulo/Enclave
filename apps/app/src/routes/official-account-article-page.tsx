@@ -305,21 +305,29 @@ function MobileOfficialAccountArticlePage({
         leftActions={
           <Button
             onClick={() => {
-              navigateBackOrFallback(() => {
-                if (navigateToRouteStateReturn()) {
-                  return;
-                }
+              const expectedPreviousPath =
+                safeReturnPath ??
+                (article?.account.id
+                  ? `/official-accounts/${article.account.id}`
+                  : "/contacts/official-accounts");
+              navigateBackOrFallback(
+                () => {
+                  if (navigateToRouteStateReturn()) {
+                    return;
+                  }
 
-                if (article?.account.id) {
-                  void navigate({
-                    to: "/official-accounts/$accountId",
-                    params: { accountId: article.account.id },
-                  });
-                  return;
-                }
+                  if (article?.account.id) {
+                    void navigate({
+                      to: "/official-accounts/$accountId",
+                      params: { accountId: article.account.id },
+                    });
+                    return;
+                  }
 
-                void navigate({ to: "/contacts/official-accounts" });
-              });
+                  void navigate({ to: "/contacts/official-accounts" });
+                },
+                expectedPreviousPath,
+              );
             }}
             variant="ghost"
             size="icon"

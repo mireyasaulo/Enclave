@@ -193,13 +193,18 @@ function MobileDiscoverEncounterPage() {
         ) : null
       }
       onBack={() =>
-        navigateBackOrFallback(() => {
-          if (navigateToRouteStateReturn()) {
-            return;
-          }
+        navigateBackOrFallback(
+          () => {
+            if (navigateToRouteStateReturn()) {
+              return;
+            }
 
-          void navigate({ to: "/tabs/discover" });
-        })
+            void navigate({ to: "/tabs/discover" });
+          },
+          (routeState.returnPath && !isDesktopOnlyPath(routeState.returnPath)
+            ? routeState.returnPath
+            : undefined) ?? "/tabs/discover",
+        )
       }
     >
       {shakeMutation.isError && shakeMutation.error instanceof Error ? (

@@ -115,11 +115,14 @@ export function MobileDocumentShell({
         leftActions={
           <Button
             onClick={() =>
-              navigateBackOrFallback(() => {
-                void navigate({
-                  to: isDesktopLayout ? "/desktop/settings" : "/profile/settings",
-                });
-              })
+              navigateBackOrFallback(
+                () => {
+                  void navigate({
+                    to: isDesktopLayout ? "/desktop/settings" : "/profile/settings",
+                  });
+                },
+                isDesktopLayout ? "/desktop/settings" : "/profile/settings",
+              )
             }
             variant="ghost"
             size="icon"
@@ -163,13 +166,18 @@ export function MobileDocumentShell({
                     <button
                       type="button"
                       onClick={() =>
-                        navigateBackOrFallback(() => {
-                          void navigate({
-                            to: isDesktopLayout
-                              ? "/desktop/settings"
-                              : "/profile/settings",
-                          });
-                        })
+                        navigateBackOrFallback(
+                          () => {
+                            void navigate({
+                              to: isDesktopLayout
+                                ? "/desktop/settings"
+                                : "/profile/settings",
+                            });
+                          },
+                          isDesktopLayout
+                            ? "/desktop/settings"
+                            : "/profile/settings",
+                        )
                       }
                       className="shrink-0 rounded-full border border-[rgba(15,23,42,0.08)] bg-white px-2 py-0.5 text-[10px] font-medium text-[color:var(--text-secondary)]"
                     >

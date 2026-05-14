@@ -40,8 +40,9 @@ export function ProfileInfoNamePage() {
   }, [isDesktopLayout, navigate]);
 
   const goBack = () =>
-    navigateBackOrFallback(() =>
-      navigate({ to: "/profile/info", replace: true }),
+    navigateBackOrFallback(
+      () => navigate({ to: "/profile/info", replace: true }),
+      "/profile/info",
     );
 
   const trimmed = draft.trim();
