@@ -6,7 +6,7 @@ import type { PersonalityProfile } from '../ai/ai.types';
 // 设计目标：画面要符合角色身份和正在发的这条朋友圈内容，**不要**全部生成成
 // 千篇一律的"奶茶 + 街头空镜"。所以塞进角色擅长领域 / 关系角色定位 / 情绪
 // 基调，再把帖子文本前 200 字作为情境线索。
-export function composeFeedPostImagePrompt(
+export function composeMomentImagePrompt(
   characterName: string,
   postText: string,
   profile?: PersonalityProfile | null,

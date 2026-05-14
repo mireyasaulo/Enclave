@@ -85,6 +85,17 @@ export class MinimaxQuotaDispatcherService {
     const myIndex = sameKeyWorldIds.indexOf(worldId);
     const dayOfYear = this.dayOfYearShanghai();
 
+    // feed-image 是"用途配额"（全 world 一天总共 50 张朋友圈配图），跟用哪
+    // 把 API key 无关。如果按 sameKeyWorldIds 均分，多 key 部署时会让总分配
+    // ≈ keyCount × 50，远超 50 这个产品上限。正确做法：按所有 active world
+    // 均分（无视 key fingerprint）。
+    const allActiveWorldIds = peers.map((w) => w.id).sort();
+    if (!allActiveWorldIds.includes(worldId)) {
+      allActiveWorldIds.push(worldId);
+      allActiveWorldIds.sort();
+    }
+    const allWorldsGroupSize = allActiveWorldIds.length;
+    const allWorldsMyIndex = allActiveWorldIds.indexOf(worldId);
     const feedImageGlobal = this.readFeedImageGlobal();
 
     const share: WorldDailyShare = {
@@ -94,11 +105,12 @@ export class MinimaxQuotaDispatcherService {
       music25:    this.shareFor(PER_KEY_DAILY_TOTAL.music25,    groupSize, myIndex, dayOfYear),
       image01:    this.shareFor(PER_KEY_DAILY_TOTAL.image01,    groupSize, myIndex, dayOfYear),
       lyrics:     this.shareFor(PER_KEY_DAILY_TOTAL.lyrics,     groupSize, myIndex, dayOfYear),
-      feedImage:  this.shareFor(feedImageGlobal,                groupSize, myIndex, dayOfYear),
+      feedImage:  this.shareFor(feedImageGlobal, allWorldsGroupSize, allWorldsMyIndex, dayOfYear),
     };
 
     this.logger.log(
-      `world=${worldId} key=${myFingerprint} group=${groupSize} idx=${myIndex} day=${dayOfYear} share=${JSON.stringify(share)}`,
+      `world=${worldId} key=${myFingerprint} group=${groupSize} idx=${myIndex} ` +
+        `allWorlds=${allWorldsGroupSize}/${allWorldsMyIndex} day=${dayOfYear} share=${JSON.stringify(share)}`,
     );
     return share;
   }

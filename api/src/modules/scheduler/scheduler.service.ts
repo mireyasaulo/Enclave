@@ -1899,12 +1899,23 @@ export class SchedulerService {
         }));
       if (!text) return null;
 
+      // 尝试为这条朋友圈配 1 张 AI 方图。3 层约束：world 内角色动态优先级均分
+      // → image-01 三态配额 → API 实时熔断；任何一步失败都安全回退为纯文本。
+      const imageMedia = await this.momentsService.tryGenerateMomentImage(
+        char.id,
+        char.name,
+        text,
+        runtimeProfile,
+      );
+
       const post = this.momentPostRepo.create({
         authorId: char.id,
         authorName: char.name,
         authorAvatar: char.avatar,
         authorType: 'character',
         text,
+        contentType: imageMedia ? 'image_album' : 'text',
+        mediaPayload: imageMedia ? JSON.stringify([imageMedia]) : undefined,
         generationKind:
           options?.generationKind ??
           (runtimeProfile.realWorldContext?.realityMomentBrief

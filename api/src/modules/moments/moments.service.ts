@@ -18,6 +18,10 @@ import { WorldOwnerService } from '../auth/world-owner.service';
 import { SocialService } from '../social/social.service';
 import { CharacterFriendshipService } from '../social/character-friendship.service';
 import {
+  FriendRemarkResolver,
+  type FriendRemarkMap,
+} from '../social/friend-remark-resolver.service';
+import {
   NPC_USER_POST_NEUTRAL_INTIMACY,
   npcIntimacyMultiplier,
   npcPostRecencyMultiplier,
@@ -48,6 +52,8 @@ import { MinimaxJobService } from '../minimax/minimax-job.service';
 import { MinimaxQuotaService } from '../minimax/minimax-quota.service';
 import { MinimaxClient, MinimaxClientError } from '../minimax/minimax.client';
 import { MinimaxAssetStorage } from '../minimax/minimax-asset.storage';
+import { MomentImageBudgetService } from './moment-image-budget.service';
+import { composeMomentImagePrompt } from './moment-image-prompt';
 import { WorldLanguageService } from '../config/world-language.service';
 import type { MinimaxJobEntity } from '../minimax/minimax-job.entity';
 import type { CharacterEntity } from '../characters/character.entity';
@@ -96,6 +102,7 @@ type MomentAvatarContext = {
   visibleCharacterIds: Set<string>;
   ownerFriendCharacterIds: Set<string>;
   characterAvatarById: Map<string, string>;
+  remarkMap: FriendRemarkMap;
 };
 
 @Injectable()
@@ -116,6 +123,8 @@ export class MomentsService implements OnModuleInit {
     private readonly minimaxClient: MinimaxClient,
     private readonly minimaxStorage: MinimaxAssetStorage,
     private readonly worldLanguage: WorldLanguageService,
+    private readonly remarkResolver: FriendRemarkResolver,
+    private readonly imageBudget: MomentImageBudgetService,
     @InjectRepository(MomentEntity)
     private momentRepo: Repository<MomentEntity>,
     @InjectRepository(MomentPostEntity)
@@ -430,6 +439,19 @@ export class MomentsService implements OnModuleInit {
         }));
       if (!text) return null;
 
+      // 尝试为这条朋友圈配 1 张 AI 方图。受 3 层约束控制（任一失败都安全
+      // fallback 为纯文本，不影响发帖本身）：
+      //   1) MomentImageBudgetService —— 全 world 日上限 50 + world 内角色
+      //      动态优先级均分
+      //   2) MinimaxQuotaService.image-01 三态配额 —— 单 key 当日 120 张总额
+      //   3) MiniMax API 实时熔断 —— 1042 / 2056 撞墙时 release 后 fallback
+      const imageMedia = await this.tryGenerateMomentImage(
+        char.id,
+        char.name,
+        text,
+        profile,
+      );
+
       const post = this.postRepo.create({
         authorId: characterId,
         authorName: char.name,
@@ -437,8 +459,8 @@ export class MomentsService implements OnModuleInit {
         authorType: 'character',
         visibility: this.deriveDefaultVisibility(char.socialOpenness),
         text,
-        contentType: 'text',
-        mediaPayload: this.serializeMomentMedia([]),
+        contentType: imageMedia ? 'image_album' : 'text',
+        mediaPayload: this.serializeMomentMedia(imageMedia ? [imageMedia] : []),
         // 把时间戳推到过去 0-15 分钟随机点，避免 cron tick 把分钟卡在 00/15/30/45。
         postedAt: this.jitterPastTimestamp(15 * 60 * 1000),
         generationKind: profile.realWorldContext?.realityMomentBrief
@@ -467,6 +489,53 @@ export class MomentsService implements OnModuleInit {
       return this._enrichPost(post);
     } catch (err) {
       this.logger.error(`Failed to generate moment for ${characterId}`, err);
+      return null;
+    }
+  }
+
+  // 尝试为某条角色朋友圈生成 1 张 AI 配图。任何一步失败都返回 null，让调用方
+  // 安全回退为纯文本 post。三态 image-01 quota 在异常路径上必须 release，
+  // 否则 reserved 不归零会让今日剩余配额计数虚高。
+  async tryGenerateMomentImage(
+    characterId: string,
+    characterName: string,
+    postText: string,
+    profile: PersonalityProfile,
+  ): Promise<MomentImageAsset | null> {
+    if (!this.minimaxClient.isConfigured()) return null;
+
+    const allowed = await this.imageBudget.tryAllocate(characterId);
+    if (!allowed) return null;
+
+    const reserved = await this.minimaxQuota.tryReserve('image-01');
+    if (!reserved) return null;
+
+    try {
+      const image = await this.minimaxClient.generateImage({
+        model: 'image-01',
+        prompt: composeMomentImagePrompt(characterName, postText, profile),
+        aspectRatio: '1:1',
+      });
+      const persisted = await this.minimaxStorage.persist({
+        buffer: image.buffer,
+        mimeType: image.mimeType,
+        kind: 'image',
+        suffix: '-moment',
+      });
+      await this.minimaxQuota.commit('image-01');
+      return {
+        id: randomUUID(),
+        kind: 'image',
+        url: persisted.publicUrl,
+        mimeType: image.mimeType,
+        fileName: persisted.fileName,
+        size: persisted.size,
+      };
+    } catch (err) {
+      await this.minimaxQuota.release('image-01');
+      this.logger.warn(
+        `moment image gen failed for character ${characterId}: ${(err as Error)?.message}`,
+      );
       return null;
     }
   }
@@ -1032,7 +1101,12 @@ export class MomentsService implements OnModuleInit {
     return {
       id: post.id,
       authorId: post.authorId,
-      authorName: post.authorName,
+      authorName: this.remarkResolver.applyCharacterRemark(
+        post.authorType,
+        post.authorId,
+        post.authorName,
+        resolvedAvatarContext.remarkMap,
+      ),
       authorAvatar: this.resolveMomentAuthorAvatar(
         post.authorType,
         post.authorId,
@@ -1079,6 +1153,12 @@ export class MomentsService implements OnModuleInit {
   ): MomentLikeEntity {
     return {
       ...like,
+      authorName: this.remarkResolver.applyCharacterRemark(
+        like.authorType,
+        like.authorId,
+        like.authorName,
+        avatarContext.remarkMap,
+      ),
       authorAvatar: this.resolveMomentAuthorAvatar(
         like.authorType,
         like.authorId,
@@ -1094,6 +1174,12 @@ export class MomentsService implements OnModuleInit {
   ): MomentCommentEntity {
     return {
       ...comment,
+      authorName: this.remarkResolver.applyCharacterRemark(
+        comment.authorType,
+        comment.authorId,
+        comment.authorName,
+        avatarContext.remarkMap,
+      ),
       authorAvatar: this.resolveMomentAuthorAvatar(
         comment.authorType,
         comment.authorId,
@@ -1114,10 +1200,12 @@ export class MomentsService implements OnModuleInit {
             id: input.ownerId,
             avatar: input.ownerAvatar ?? '',
           };
-    const [visibleCharacters, ownerFriendCharacterIds] = await Promise.all([
-      this.characters.findAllVisibleToOwner(owner.id),
-      this.characters.getActiveFriendCharacterIdSet(owner.id),
-    ]);
+    const [visibleCharacters, ownerFriendCharacterIds, remarkMap] =
+      await Promise.all([
+        this.characters.findAllVisibleToOwner(owner.id),
+        this.characters.getActiveFriendCharacterIdSet(owner.id),
+        this.remarkResolver.getOwnerRemarkMap(owner.id),
+      ]);
 
     return {
       ownerAvatar: owner.avatar?.trim() || '',
@@ -1129,6 +1217,7 @@ export class MomentsService implements OnModuleInit {
       characterAvatarById: new Map(
         visibleCharacters.map((character) => [character.id, character.avatar]),
       ),
+      remarkMap,
     };
   }
 
