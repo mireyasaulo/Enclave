@@ -1114,8 +1114,17 @@ export function ChatMessageList({
     setSpeakingMessageId(null);
   };
 
+  const extractSpeakableMessageText = (message: ChatRenderableMessage) => {
+    // 取消息原文，跳过 buildClipboardText 的"消息"占位 fallback ——
+    // 那个 fallback 是给复制按钮用的，朗读"消息"两个字毫无意义
+    const replyContent = extractChatReplyMetadata(message.text);
+    return message.senderType === "user"
+      ? replyContent.body.trim()
+      : sanitizeDisplayedChatText(message.text).trim();
+  };
+
   const speakMessage = async (message: ChatRenderableMessage) => {
-    const text = buildClipboardText(t, message).trim();
+    const text = extractSpeakableMessageText(message);
     if (!text) {
       setActionNotice({
         message: t(msg`此消息没有可朗读的文本。`),
@@ -3510,7 +3519,7 @@ export function ChatMessageList({
             setContextMenuState(null);
           }}
           onSpeakAloud={
-            buildClipboardText(t, contextMenuState.message).trim()
+            extractSpeakableMessageText(contextMenuState.message)
               ? () => {
                   void speakMessage(contextMenuState.message);
                   setContextMenuState(null);
@@ -3658,7 +3667,7 @@ export function ChatMessageList({
         }
         onSpeakAloud={
           mobileActionMessage &&
-          buildClipboardText(t, mobileActionMessage).trim()
+          extractSpeakableMessageText(mobileActionMessage)
             ? () => {
                 void speakMessage(mobileActionMessage);
                 setMobileActionMessage(null);
