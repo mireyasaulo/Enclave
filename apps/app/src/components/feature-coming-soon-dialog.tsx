@@ -53,9 +53,17 @@ export function FeatureComingSoonDialog({
     message: string;
   } | null>(null);
 
+  // 复位 feedback：覆盖两种边界
+  //   - open=true → false：正常关闭，清掉提示，避免下次开还残留
+  //   - open=false → true：上一次 handleCopy 的 await 在弹窗关掉之后才
+  //     resolve 把 feedback 重新设回 success；如果不在 open 时再清一次，
+  //     再次打开会看到一条幽灵的"已复制"。
+  useEffect(() => {
+    setFeedback(null);
+  }, [open]);
+
   useEffect(() => {
     if (!open) {
-      setFeedback(null);
       return;
     }
     const handleKeyDown = (event: KeyboardEvent) => {
