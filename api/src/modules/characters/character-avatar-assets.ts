@@ -61,6 +61,10 @@ const CHARACTER_AVATAR_FILE_BY_SOURCE_KEY = {
   dating_aide_gentle_signal_reader_he_ling:
     'dating-aide-gentle-signal-reader-he-ling.svg',
   dating_aide_data_driven_su_li: 'dating-aide-data-driven-su-li.svg',
+  gu_he_nutrition_coach: 'gu-he-nutrition-coach.svg',
+  qian_ning_money_buddy: 'qian-ning-money-buddy.svg',
+  shen_yi_cbt_coach: 'shen-yi-cbt-coach.svg',
+  jiang_an_interview_coach: 'jiang-an-interview-coach.svg',
 } as const;
 
 export type CharacterAvatarSourceKey =
