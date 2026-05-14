@@ -686,18 +686,22 @@ export function CharacterDetailPage() {
   });
 
   const handleBack = () => {
-    navigateBackOrFallback(() => {
-      if (navigateToRouteStateReturn()) {
-        return;
-      }
+    const expectedPreviousPath = safeMobileReturnPath ?? "/tabs/contacts";
+    navigateBackOrFallback(
+      () => {
+        if (navigateToRouteStateReturn()) {
+          return;
+        }
 
-      if (isDesktopLayout) {
-        navigateToDesktopContactsSelection();
-        return;
-      }
+        if (isDesktopLayout) {
+          navigateToDesktopContactsSelection();
+          return;
+        }
 
-      void navigate({ to: "/tabs/contacts" });
-    });
+        void navigate({ to: "/tabs/contacts" });
+      },
+      expectedPreviousPath,
+    );
   };
 
   const handleSaveProfile = async () => {

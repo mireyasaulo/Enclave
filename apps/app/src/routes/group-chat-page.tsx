@@ -276,15 +276,24 @@ export function GroupChatPage() {
               : undefined)
           }
           onBack={() => {
-            navigateBackOrFallback(() => {
-              if (navigateToRouteStateReturn()) {
-                return;
-              }
+            const expectedPreviousPath =
+              (routeState.returnPath && !isDesktopOnlyPath(routeState.returnPath)
+                ? routeState.returnPath
+                : undefined) ??
+              safeRouteContext?.returnPath ??
+              "/tabs/chat";
+            navigateBackOrFallback(
+              () => {
+                if (navigateToRouteStateReturn()) {
+                  return;
+                }
 
-              void navigate({
-                to: safeRouteContext?.returnPath ?? "/tabs/chat",
-              });
-            });
+                void navigate({
+                  to: safeRouteContext?.returnPath ?? "/tabs/chat",
+                });
+              },
+              expectedPreviousPath,
+            );
           }}
         />
       </div>
