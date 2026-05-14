@@ -214,16 +214,15 @@ export class WikiEditService {
     if (abuse.action === 'tag_high_risk') {
       autoApprove = false;
     }
-    const lastVersion = await this.revisionRepo
-      .createQueryBuilder('r')
-      .where('r.characterId = :id', { id: characterId })
-      .select('MAX(r.version)', 'max')
-      .getRawOne<{ max: number | null }>();
-    const nextVersion = (lastVersion?.max ?? 0) + 1;
+    const contentRiskLevel = abuse.action === 'tag_high_risk' ? 'high' : 'low';
+
+    // 字段级保护：content 路径同样要查。否则 admin 在面板里设字段保护（fieldPath
+    // 落在内容字段上）就完全无效。recipe 路径在下面 submitRecipeEdit 里已有。
+    await this.fieldProtection.assertCanEditPaths(user, characterId, changed);
 
     const result = await this.dataSource.transaction(async (manager) => {
-      const contentRiskLevel =
-        abuse.action === 'tag_high_risk' ? 'high' : 'low';
+      const nextVersion =
+        (await this.getLastVersion(characterId, manager)) + 1;
       const contentDiff: Record<string, unknown> = { changed };
       if (abuse.hits.length > 0) {
         contentDiff.abuseFilterHits = abuse.hits.map((h) => h.filterName);
@@ -254,11 +253,16 @@ export class WikiEditService {
           characterId,
           submitterId: user.id,
           operation: 'edit',
-          riskLevel: 'low',
+          riskLevel: contentRiskLevel,
           decision: null,
-          priority: 0,
+          priority: contentRiskLevel === 'high' ? 5 : 0,
         });
         await manager.save(submission);
+        await manager.update(
+          CharacterPageEntity,
+          { characterId },
+          { latestRevisionId: savedRev.id },
+        );
       } else {
         await manager.update(
           CharacterPageEntity,
@@ -268,35 +272,20 @@ export class WikiEditService {
             latestRevisionId: savedRev.id,
             title: after.name,
             lifecycleStatus: 'active',
-            editCount: page.editCount + 1,
           },
         );
         await this.applySnapshotToCharacter(manager, characterId, after);
       }
 
-      const profile =
-        (await manager.findOne(UserWikiProfileEntity, {
-          where: { userId: user.id },
-        })) ??
-        manager.create(UserWikiProfileEntity, {
-          userId: user.id,
-          editCount: 0,
-          approvedEditCount: 0,
-          revertedCount: 0,
-          patrolledCount: 0,
-        });
-      profile.editCount += 1;
-      profile.lastEditAt = new Date();
-      if (autoApprove) profile.approvedEditCount += 1;
-      await manager.save(profile);
+      // editCount 用原子自增，避免并发提交把同一 page.editCount 读到再 +1 丢更新。
+      await manager.increment(
+        CharacterPageEntity,
+        { characterId },
+        'editCount',
+        1,
+      );
 
-      if (!autoApprove) {
-        await manager.update(
-          CharacterPageEntity,
-          { characterId },
-          { latestRevisionId: savedRev.id, editCount: page.editCount + 1 },
-        );
-      }
+      await this.bumpProfile(manager, user.id, autoApprove);
 
       return savedRev;
     });
@@ -325,24 +314,6 @@ export class WikiEditService {
   ): Promise<SubmitEditResult & { characterId: string }> {
     const characterId = this.resolveNewCharacterId(input.characterId);
     await this.blocks.assertCanEdit(user, characterId);
-    const existing = await this.characterRepo.findOne({ where: { id: characterId } });
-    if (existing) {
-      throw new AppError('WIKI_VALIDATION_FAILED', {
-        params: { detail: '角色 ID 已存在' },
-        legacyMessage: '角色 ID 已存在',
-      });
-    }
-    const existingPage = await this.pageRepo.findOne({ where: { characterId } });
-    if (existingPage) {
-      const detail =
-        existingPage.lifecycleStatus === 'pending_create'
-          ? '该角色已有待审创建请求'
-          : '词条已存在';
-      throw new AppError('WIKI_VALIDATION_FAILED', {
-        params: { detail },
-        legacyMessage: detail,
-      });
-    }
 
     const seedInput =
       input.recipeSnapshot ??
@@ -371,24 +342,45 @@ export class WikiEditService {
     // patroller-only); but persist hits for visibility.
     const autoApprove = rankOf(user.role) >= rankOf('patroller');
     const revision = await this.dataSource.transaction(async (manager) => {
-      const page =
-        existingPage ??
-        manager.create(CharacterPageEntity, {
-          characterId,
-          title: content.name,
-          currentRevisionId: null,
-          latestRevisionId: null,
-          lifecycleStatus: 'pending_create',
-          reviewPolicy: 'open',
-          protectionLevel: 'none',
-          isPatrolled: false,
-          watcherCount: 0,
-          editCount: 0,
-          isDeleted: false,
+      // 存在性检查放进 tx，避免两个并发 createPage 同时通过预检后写出两条 v=1。
+      // CharacterPageEntity.characterId 是主键，第二个 INSERT 自然失败；revision 表
+      // 也有 (characterId, version) unique，双重兜底。
+      const existing = await manager.findOne(CharacterEntity, {
+        where: { id: characterId },
+      });
+      if (existing) {
+        throw new AppError('WIKI_VALIDATION_FAILED', {
+          params: { detail: '角色 ID 已存在' },
+          legacyMessage: '角色 ID 已存在',
         });
-      page.title = content.name;
-      page.lifecycleStatus = autoApprove ? 'active' : 'pending_create';
-      page.isDeleted = false;
+      }
+      const existingPage = await manager.findOne(CharacterPageEntity, {
+        where: { characterId },
+      });
+      if (existingPage) {
+        const detail =
+          existingPage.lifecycleStatus === 'pending_create'
+            ? '该角色已有待审创建请求'
+            : '词条已存在';
+        throw new AppError('WIKI_VALIDATION_FAILED', {
+          params: { detail },
+          legacyMessage: detail,
+        });
+      }
+
+      const page = manager.create(CharacterPageEntity, {
+        characterId,
+        title: content.name,
+        currentRevisionId: null,
+        latestRevisionId: null,
+        lifecycleStatus: autoApprove ? 'active' : 'pending_create',
+        reviewPolicy: 'open',
+        protectionLevel: 'none',
+        isPatrolled: false,
+        watcherCount: 0,
+        editCount: 0,
+        isDeleted: false,
+      });
       await manager.save(page);
 
       const created = manager.create(CharacterRevisionEntity, {
@@ -491,11 +483,12 @@ export class WikiEditService {
       currentRevision?.contentSnapshot ??
       snapshotFromCharacter(character as unknown as Record<string, unknown>);
     const autoApprove = rankOf(user.role) >= rankOf('patroller');
-    const lastVersion = await this.getLastVersion(characterId);
     const revision = await this.dataSource.transaction(async (manager) => {
+      const nextVersion =
+        (await this.getLastVersion(characterId, manager)) + 1;
       const created = manager.create(CharacterRevisionEntity, {
         characterId,
-        version: lastVersion + 1,
+        version: nextVersion,
         parentRevisionId: page.currentRevisionId ?? null,
         baseRevisionId: page.currentRevisionId ?? null,
         contentSnapshot: content,
@@ -529,7 +522,13 @@ export class WikiEditService {
       await manager.update(
         CharacterPageEntity,
         { characterId },
-        { latestRevisionId: saved.id, editCount: page.editCount + 1 },
+        { latestRevisionId: saved.id },
+      );
+      await manager.increment(
+        CharacterPageEntity,
+        { characterId },
+        'editCount',
+        1,
       );
       await this.bumpProfile(manager, user.id, autoApprove);
       return saved;
@@ -584,11 +583,12 @@ export class WikiEditService {
       factorySnapshot.blueprint.publishedRecipe ??
       factorySnapshot.blueprint.draftRecipe ??
       null;
-    const lastVersion = await this.getLastVersion(characterId);
     const saved = await this.dataSource.transaction(async (manager) => {
+      const nextVersion =
+        (await this.getLastVersion(characterId, manager)) + 1;
       const created = manager.create(CharacterRevisionEntity, {
         characterId,
-        version: lastVersion + 1,
+        version: nextVersion,
         parentRevisionId: page.currentRevisionId ?? null,
         baseRevisionId: page.currentRevisionId ?? null,
         contentSnapshot: liveContent,
@@ -615,8 +615,13 @@ export class WikiEditService {
           title: liveContent.name,
           currentRevisionId: savedRev.id,
           latestRevisionId: savedRev.id,
-          editCount: page.editCount + 1,
         },
+      );
+      await manager.increment(
+        CharacterPageEntity,
+        { characterId },
+        'editCount',
+        1,
       );
       return savedRev;
     });
@@ -843,8 +848,9 @@ export class WikiEditService {
         ? false
         : rankOf(user.role) >= rankOf('patroller') ||
           (riskLevel === 'low' && rankOf(user.role) >= rankOf('autoconfirmed'));
-    const lastVersion = await this.getLastVersion(characterId);
     const revision = await this.dataSource.transaction(async (manager) => {
+      const nextVersion =
+        (await this.getLastVersion(characterId, manager)) + 1;
       const recipeDiff: Record<string, unknown> = { changed };
       if (riskReport.highRisk) {
         recipeDiff.highRiskReasons = riskReport.reasons;
@@ -854,7 +860,7 @@ export class WikiEditService {
       }
       const created = manager.create(CharacterRevisionEntity, {
         characterId,
-        version: lastVersion + 1,
+        version: nextVersion,
         parentRevisionId: page.currentRevisionId ?? null,
         baseRevisionId: input.baseRevisionId ?? page.currentRevisionId ?? null,
         contentSnapshot: afterContent,
@@ -890,9 +896,18 @@ export class WikiEditService {
         { characterId },
         {
           title: afterContent.name,
+          // autoApprove 时把 currentRevisionId 立刻在事务内切到新 revision，
+          // 跟 applyApprovedRevision 里 pageRepo.update 形成幂等（重复写同一个 id）。
+          // 这样事务一旦提交，view 端立刻看到正确 stable 版本。
+          ...(autoApprove ? { currentRevisionId: saved.id } : {}),
           latestRevisionId: saved.id,
-          editCount: page.editCount + 1,
         },
+      );
+      await manager.increment(
+        CharacterPageEntity,
+        { characterId },
+        'editCount',
+        1,
       );
       await this.bumpProfile(manager, user.id, autoApprove);
       return saved;
@@ -928,8 +943,14 @@ export class WikiEditService {
     await manager.update(CharacterEntity, { id: characterId }, patch);
   }
 
-  private async getLastVersion(characterId: string): Promise<number> {
-    const lastVersion = await this.revisionRepo
+  private async getLastVersion(
+    characterId: string,
+    manager?: EntityManager,
+  ): Promise<number> {
+    const repo = manager
+      ? manager.getRepository(CharacterRevisionEntity)
+      : this.revisionRepo;
+    const lastVersion = await repo
       .createQueryBuilder('r')
       .where('r.characterId = :id', { id: characterId })
       .select('MAX(r.version)', 'max')

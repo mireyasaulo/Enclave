@@ -380,22 +380,25 @@ export class WikiReviewService {
       });
     }
 
-    const lastVersion = await this.revisionRepo
-      .createQueryBuilder('r')
-      .where('r.characterId = :id', { id: characterId })
-      .select('MAX(r.version)', 'max')
-      .getRawOne<{ max: number | null }>();
-    const nextVersion = (lastVersion?.max ?? 0) + 1;
-
-    const supersededRevs = await this.revisionRepo.find({
-      where: {
-        characterId,
-        version: MoreThan(target.version),
-        status: 'approved',
-      },
-    });
-
     const newRev = await this.dataSource.transaction(async (manager) => {
+      // version + superseded 列表都进 tx，确保不会和其它 revert / 自动通过的 edit
+      // 出现 race。
+      const lastVersionRow = await manager
+        .getRepository(CharacterRevisionEntity)
+        .createQueryBuilder('r')
+        .where('r.characterId = :id', { id: characterId })
+        .select('MAX(r.version)', 'max')
+        .getRawOne<{ max: number | null }>();
+      const nextVersion = (lastVersionRow?.max ?? 0) + 1;
+
+      const supersededRevs = await manager.find(CharacterRevisionEntity, {
+        where: {
+          characterId,
+          version: MoreThan(target.version),
+          status: 'approved',
+        },
+      });
+
       const created = manager.create(CharacterRevisionEntity, {
         characterId,
         version: nextVersion,
@@ -424,10 +427,16 @@ export class WikiReviewService {
         { characterId },
         {
           currentRevisionId: saved.id,
+          latestRevisionId: saved.id,
           title: target.contentSnapshot.name,
           lifecycleStatus: 'active',
-          editCount: page.editCount + 1,
         },
+      );
+      await manager.increment(
+        CharacterPageEntity,
+        { characterId },
+        'editCount',
+        1,
       );
       if (!target.recipeSnapshot) {
         await this.edits.applySnapshotToCharacter(
@@ -465,6 +474,8 @@ export class WikiReviewService {
         }
       }
 
+      // reviewer 自己也算"做了一次写动作"——把 editCount/approvedEditCount 也补上，
+      // 否则 reviewer 永远没有 approvedEditCount，自动晋升/降级算分母漂移。
       const reviewerProfile =
         (await manager.findOne(UserWikiProfileEntity, {
           where: { userId: reviewer.id },
@@ -476,7 +487,10 @@ export class WikiReviewService {
           revertedCount: 0,
           patrolledCount: 0,
         });
+      reviewerProfile.editCount += 1;
+      reviewerProfile.approvedEditCount += 1;
       reviewerProfile.patrolledCount += 1;
+      reviewerProfile.lastEditAt = new Date();
       await manager.save(reviewerProfile);
 
       return saved;
