@@ -279,8 +279,12 @@ export function ProfileCharacterImportPage() {
             character={result.character}
             overwrote={result.overwrote}
             onImportAnother={clearSelection}
+            // 导入会自动加好友（characters.service.ts:importPersonalCharacter
+            // 末尾的 friendship upsert）。"世界角色"目录的过滤是
+            // !friendIds.has(character.id)，导入后的角色已经是好友，
+            // 在那里反而看不到 —— 跳通讯录才是用户真正能找到它的地方。
             onGoCharacters={() =>
-              void navigate({ to: "/contacts/world-characters" as never })
+              void navigate({ to: "/tabs/contacts" as never })
             }
           />
         )}
@@ -419,7 +423,7 @@ function SuccessCard({
       <div className="text-[11px] text-[#047857]/80">
         {overwrote
           ? t(msg`原有 id 和好友关系都保留了。`)
-          : t(msg`已自动加为你的好友，可以在世界角色列表里找到。`)}
+          : t(msg`已自动加为你的好友，可以在通讯录里找到。`)}
       </div>
       <div className="flex flex-wrap items-center gap-2 pt-1">
         <Button
@@ -428,7 +432,7 @@ function SuccessCard({
           size="sm"
           onClick={onGoCharacters}
         >
-          {t(msg`查看世界角色`)}
+          {t(msg`去通讯录`)}
         </Button>
         <Button
           type="button"
