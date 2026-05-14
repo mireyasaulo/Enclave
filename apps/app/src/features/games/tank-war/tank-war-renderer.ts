@@ -350,21 +350,18 @@ export function drawWorld(
     }
   }
 
-  // Game Over 红字从底部滚到中央 (~1.5s)
+  // Game Over 红字从底部滚到中央 (~1.5s 线性，到达后停留)
   if (world.status === "game-over") {
-    const startedAt = world.stageStartedAt || performance.now();
-    // 我们用 transitionUntilMs 重新作为 "game over animation 起点"：使用 stageClearAt 不对，用 pausedAt 也不对，
-    // 简化：每次 game-over 后用 frame 累加估算
-    const fr = Math.min(60, Math.max(0, world.frame % 200));
+    const startedAt = world.stageClearAt ?? performance.now();
+    const dur = 1500;
+    const t = Math.max(0, Math.min(1, (performance.now() - startedAt) / dur));
     const targetY = BATTLEFIELD / 2;
     const fromY = BATTLEFIELD - 8;
-    const t = fr / 60;
-    const y = fromY + (targetY - fromY) * Math.min(1, t);
+    const y = fromY + (targetY - fromY) * t;
     ctx.fillStyle = "#fc0000";
     ctx.font = "16px monospace";
     ctx.fillText("GAME", BATTLEFIELD / 2 - 32, y);
     ctx.fillText("OVER", BATTLEFIELD / 2 - 32, y + 16);
-    void startedAt;
   }
 
   ctx.restore();

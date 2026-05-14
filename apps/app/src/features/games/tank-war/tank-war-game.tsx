@@ -149,7 +149,7 @@ export function TankWarGame({ variant = "fullscreen", onExit }: TankWarGameProps
 function HudSummary({ hud }: { hud: HudSnapshot }) {
   if (hud.status === "boot") return null;
   return (
-    <div className="flex items-center gap-2 text-[11px] text-white/80">
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-white/80">
       <span>
         {t(msg`第 ${hud.stage} 关`)}
       </span>
@@ -158,11 +158,14 @@ function HudSummary({ hud }: { hud: HudSnapshot }) {
       </span>
       {hud.mode === "two-player" ? (
         <>
-          <span>P1 ♥{hud.lives}</span>
-          <span>P2 ♥{hud.livesP2 ?? 0}</span>
+          <span>P1 ♥{hud.lives} · {hud.score}</span>
+          <span>P2 ♥{hud.livesP2 ?? 0} · {hud.scoreP2 ?? 0}</span>
         </>
       ) : (
-        <span>♥{hud.lives}</span>
+        <>
+          <span>♥{hud.lives}</span>
+          <span>{t(msg`得分 ${hud.score}`)}</span>
+        </>
       )}
     </div>
   );

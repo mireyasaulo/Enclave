@@ -179,6 +179,16 @@ function spawnPlayer(world: GameWorld, who: "p1" | "p2"): void {
   if (who === "p2" && world.livesP2 <= 0) return;
   const x = who === "p1" ? world.p1SpawnX : world.p2SpawnX;
   const y = who === "p1" ? world.p1SpawnY : world.p2SpawnY;
+  // FC 经典：复活点被敌坦克占据时，敌坦克被爆掉，让玩家上来
+  const survivors: Tank[] = [];
+  for (const o of world.tanks) {
+    if (o.owner === "enemy" && aabbOverlap(x, y, 16, 16, o.x, o.y, 16, 16)) {
+      addExplosion(world, o.x + 8, o.y + 8, true);
+    } else {
+      survivors.push(o);
+    }
+  }
+  world.tanks = survivors;
   const tank: Tank = {
     id: world.nextId++,
     kind: who === "p1" ? "player1" : "player2",
@@ -349,11 +359,11 @@ function moveTank(
   else if (dir === DIR_RIGHT) dx = speed;
   nx += dx;
   ny += dy;
-  // 对齐：水平移动时 y 对齐 8px；垂直移动时 x 对齐 8px
+  // 对齐：水平移动时 y 对齐 8px；垂直移动时 x 对齐 8px（FC 半砖单位）
   if (dx !== 0) {
-    ny = Math.round(t.y / 4) * 4;
+    ny = Math.round(t.y / HALF) * HALF;
   } else {
-    nx = Math.round(t.x / 4) * 4;
+    nx = Math.round(t.x / HALF) * HALF;
   }
   if (canTankBeAt(world, nx, ny, t.id)) {
     t.x = nx;
@@ -361,16 +371,16 @@ function moveTank(
     t.moving = true;
     return true;
   }
-  // 卡墙时尝试只移动并对齐
+  // 卡墙时尝试仅在主方向轴上推进（让对齐生效，但不勉强通过墙）
   if (dx !== 0) {
-    if (canTankBeAt(world, t.x, ny, t.id)) {
-      t.y = ny;
+    if (canTankBeAt(world, nx, t.y, t.id)) {
+      t.x = nx;
       t.moving = true;
       return true;
     }
   } else {
-    if (canTankBeAt(world, nx, t.y, t.id)) {
-      t.x = nx;
+    if (canTankBeAt(world, t.x, ny, t.id)) {
+      t.y = ny;
       t.moving = true;
       return true;
     }
@@ -433,9 +443,9 @@ function processInputForPlayer(
   } else {
     tank.moving = false;
   }
-  // 冰面滑行
+  // 冰面滑行：FC 经典 ≈4 半砖 (32px) 惯性，~40 帧 × 0.75 = 30px
   if (tank.moving && isOnIce(world, tank.x, tank.y)) {
-    tank.iceSlideRemaining = 8;
+    tank.iceSlideRemaining = 40;
     tank.iceSlideDx =
       tank.dir === DIR_LEFT ? -1 : tank.dir === DIR_RIGHT ? 1 : 0;
     tank.iceSlideDy = tank.dir === DIR_UP ? -1 : tank.dir === DIR_DOWN ? 1 : 0;
@@ -447,13 +457,17 @@ function processInputForPlayer(
       tank.x = nx;
       tank.y = ny;
       tank.iceSlideRemaining--;
+      tank.moving = true;
     } else {
       tank.iceSlideRemaining = 0;
     }
   }
-  if (fire && !lastFire) {
+  // FC 经典：按住开火持续发射（受 reloadAtMs + maxBullets 限制）
+  if (fire) {
     fireBullet(world, tank, audio);
   }
+  // 抑制 lastFire 警告
+  void lastFire;
 }
 
 function processAi(world: GameWorld, t: Tank, audio: AudioHook | null): void {
@@ -579,14 +593,16 @@ function damageBrickAt(world: GameWorld, b: Bullet): void {
   const tc = Math.floor(b.x / HALF);
   const tr = Math.floor(b.y / HALF);
   // 8x8 半砖里再分 4 个 4x4 quadrant，按子弹方向破坏对应一侧
-  const offX = b.x - tc * HALF;
-  const offY = b.y - tr * HALF;
+  // quadrant 索引: q=0 TL, q=1 TR, q=2 BL, q=3 BR
+  // - 子弹 UP (向上飞，撞砖块下沿) → 破坏砖块下半 = BL+BR = q 2,3 = bits 0x4|0x8 = 0xc
+  // - 子弹 DOWN (向下飞，撞砖块上沿) → 破坏砖块上半 = TL+TR = q 0,1 = bits 0x1|0x2 = 0x3
+  // - 子弹 LEFT (向左飞，撞砖块右沿) → 破坏砖块右半 = TR+BR = q 1,3 = bits 0x2|0x8 = 0xa
+  // - 子弹 RIGHT (向右飞，撞砖块左沿) → 破坏砖块左半 = TL+BL = q 0,2 = bits 0x1|0x4 = 0x5
   let mask = 0xf;
-  // 按方向破坏：UP 破下半，DOWN 破上半，LEFT 破右半，RIGHT 破左半
-  if (b.dir === DIR_UP) mask = 0x3; // bottom 2 quadrants? we use bit q where (q>>1) is row
-  if (b.dir === DIR_DOWN) mask = 0xc;
-  if (b.dir === DIR_LEFT) mask = 0xa; // q&1=1 (right)
-  if (b.dir === DIR_RIGHT) mask = 0x5; // q&1=0 (left)
+  if (b.dir === DIR_UP) mask = 0xc;
+  else if (b.dir === DIR_DOWN) mask = 0x3;
+  else if (b.dir === DIR_LEFT) mask = 0xa;
+  else if (b.dir === DIR_RIGHT) mask = 0x5;
   const gc = tc >> 1;
   const gr = tr >> 1;
   const halfIdxInGrid = (tr & 1) * 2 + (tc & 1);
@@ -602,8 +618,6 @@ function damageBrickAt(world: GameWorld, b: Bullet): void {
   if (newNibble === 0xf) {
     world.grid[tr * HALF_W + tc] = TILE_EMPTY;
   }
-  void offX;
-  void offY;
 }
 
 function resolveBulletTank(world: GameWorld, audio: AudioHook | null): void {
@@ -836,9 +850,21 @@ function restoreShovelIfExpired(world: GameWorld): void {
   for (const [hc, hr] of cells) {
     if (world.grid[hr * HALF_W + hc] === TILE_STEEL) {
       world.grid[hr * HALF_W + hc] = TILE_BRICK;
+      // 清零该半砖对应的 quadrant 破损位（恢复成全新砖块）
+      clearBrickDamageAtHalf(world, hc, hr);
     }
   }
   world.shovelRestoreAt = 0;
+}
+
+function clearBrickDamageAtHalf(world: GameWorld, hc: number, hr: number): void {
+  const gc = hc >> 1;
+  const gr = hr >> 1;
+  const halfIdxInGrid = (hr & 1) * 2 + (hc & 1);
+  const byteIdx = (gr * 13 + gc) * 2 + (halfIdxInGrid >= 2 ? 1 : 0);
+  const isHigh = halfIdxInGrid % 2 !== 0;
+  const cur = world.brickDamage[byteIdx] ?? 0;
+  world.brickDamage[byteIdx] = isHigh ? cur & 0x0f : cur & 0xf0;
 }
 
 function thawFrozenEnemies(world: GameWorld): void {
@@ -855,8 +881,12 @@ export function tick(
   input: InputState,
   audio: AudioHook | null,
 ): void {
-  if (world.status !== "playing") return;
+  // frame 始终自增，让 PAUSE 闪烁 / Game Over 红字滚入 / 出生闪烁等动画在非 playing 状态也能继续
   world.frame++;
+  if (world.status !== "playing") {
+    if (audio) audio.setMoveActive(false);
+    return;
+  }
   const now = performance.now();
   // 出生护盾倒计时通过 shieldUntilMs 比较 now，无需 tick
   thawFrozenEnemies(world);
@@ -924,8 +954,14 @@ export function tick(
 }
 
 function triggerGameOver(world: GameWorld, audio: AudioHook | null): void {
+  if (world.status === "game-over") return;
   world.status = "game-over";
-  if (audio) audio.play("gameOver");
+  // 记录 Game Over 起始时间，供 renderer 计算红字滚入动画
+  world.stageClearAt = performance.now();
+  if (audio) {
+    audio.setMoveActive(false);
+    audio.play("gameOver");
+  }
 }
 
 export function togglePause(world: GameWorld, audio: AudioHook | null): void {

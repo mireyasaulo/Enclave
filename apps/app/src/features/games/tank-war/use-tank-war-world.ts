@@ -50,6 +50,7 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
   const persistRef = useRef<TankWarPersist>(loadPersist());
   const rafRef = useRef<number | null>(null);
   const stageClearHandledAt = useRef<number | null>(null);
+  const gameOverSavedRef = useRef(false);
 
   const [hud, setHud] = useState<HudSnapshot>(() =>
     snapshot(worldRef.current, persistRef.current),
@@ -98,15 +99,20 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
       }
 
       if (isGameOver(world)) {
-        persistRef.current.highScoreP1 = Math.max(
-          persistRef.current.highScoreP1,
-          world.scoreP1,
-        );
-        persistRef.current.highScoreP2 = Math.max(
-          persistRef.current.highScoreP2,
-          world.scoreP2,
-        );
-        savePersist(persistRef.current);
+        if (!gameOverSavedRef.current) {
+          persistRef.current.highScoreP1 = Math.max(
+            persistRef.current.highScoreP1,
+            world.scoreP1,
+          );
+          persistRef.current.highScoreP2 = Math.max(
+            persistRef.current.highScoreP2,
+            world.scoreP2,
+          );
+          savePersist(persistRef.current);
+          gameOverSavedRef.current = true;
+        }
+      } else {
+        gameOverSavedRef.current = false;
       }
 
       const canvas = opts.canvasRef.current;

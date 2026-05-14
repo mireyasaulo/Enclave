@@ -19,17 +19,17 @@ msgid "音乐"
 msgstr "音乐"
 
 #: apps/app/src/components/audio-card.tsx:148
+#: apps/app/src/routes/channels-page.tsx:1562
+#: apps/app/src/routes/channels-page.tsx:1717
+msgid "暂停"
+msgstr "暂停"
+
+#: apps/app/src/components/audio-card.tsx:148
 #: apps/app/src/i18n/static-dom-seed.ts:349
 #: apps/app/src/routes/channels-page.tsx:1562
 #: apps/app/src/routes/channels-page.tsx:1717
 msgid "播放"
 msgstr "播放"
-
-#: apps/app/src/components/audio-card.tsx:148
-#: apps/app/src/routes/channels-page.tsx:1562
-#: apps/app/src/routes/channels-page.tsx:1717
-msgid "暂停"
-msgstr "暂停"
 
 #: apps/app/src/components/bootstrap-screen.tsx:43
 #: apps/app/src/routes/splash-page.tsx:181
@@ -11189,7 +11189,7 @@ msgstr "继续玩"
 
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:89
 #: apps/app/src/features/games/game-center-session-panel.tsx:194
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:242
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:245
 #: apps/app/src/i18n/static-dom-seed.ts:84
 msgid "开始游戏"
 msgstr "开始游戏"
@@ -12651,16 +12651,16 @@ msgid "买了种子"
 msgstr "买了种子"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
-msgid "卖了"
-msgstr "卖了"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:240
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:242
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
 msgid "作物"
 msgstr "作物"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
+msgid "卖了"
+msgstr "卖了"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -13977,7 +13977,7 @@ msgstr "互助"
 
 #: apps/app/src/features/games/game-center-data.ts:288
 #: apps/app/src/features/games/tank-war/tank-war-game.tsx:85
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:188
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:191
 msgid "坦克大战"
 msgstr "坦克大战"
 
@@ -14030,17 +14030,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "守住基地，消灭 20 辆敌方坦克。"
 
 #: apps/app/src/features/games/game-center-data.ts:303
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:215
-msgid "双人"
-msgstr "双人"
-
-#: apps/app/src/features/games/game-center-data.ts:303
 msgid "像素"
 msgstr "像素"
 
 #: apps/app/src/features/games/game-center-data.ts:303
 msgid "动作"
 msgstr "动作"
+
+#: apps/app/src/features/games/game-center-data.ts:303
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:218
+msgid "双人"
+msgstr "双人"
 
 #: apps/app/src/features/games/game-center-data.ts:303
 msgid "怀旧"
@@ -15688,7 +15688,7 @@ msgid "赛季徽章 {0} · 团队积分 {1}"
 msgstr "赛季徽章 {0} · 团队积分 {1}"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:379
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:242
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:245
 msgid "再来一局"
 msgstr "再来一局"
 
@@ -15922,28 +15922,33 @@ msgstr "第 {0} 关"
 msgid "敌剩 {0}"
 msgstr "敌剩 {0}"
 
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:190
+#. placeholder {0}: hud.score
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:167
+msgid "得分 {0}"
+msgstr "得分 {0}"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:193
 msgid "Game Over"
 msgstr "Game Over"
 
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:193
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:196
 msgid "恭喜过关，进入下一关"
 msgstr "恭喜过关，进入下一关"
 
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:205
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:208
 msgid "单人"
 msgstr "单人"
 
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:219
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:222
 msgid "选关:"
 msgstr "选关:"
 
 #. placeholder {0}: hud.maxUnlockedStage
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:233
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:236
 msgid "已解锁 {0} / 35"
 msgstr "已解锁 {0} / 35"
 
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:250
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:253
 msgid "下一关"
 msgstr "下一关"
 
