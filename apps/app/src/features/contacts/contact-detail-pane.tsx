@@ -25,6 +25,7 @@ import {
   DesktopContactProfileShell,
   DesktopContactProfileToggleRow,
 } from "./desktop-contact-profile-blocks";
+import { invalidateFriendDisplayQueries } from "./invalidate-friend-display";
 
 type ContactDetailPaneProps = {
   character?: Character | null;
@@ -48,6 +49,9 @@ type ContactDetailPaneProps = {
   isStarred?: boolean;
   starPending?: boolean;
   onToggleStarred?: () => void;
+  defaultVoiceReply?: boolean;
+  defaultVoiceReplyPending?: boolean;
+  onToggleDefaultVoiceReply?: () => void;
   isBlocked?: boolean;
   blockPending?: boolean;
   onToggleBlock?: () => void;
@@ -81,6 +85,9 @@ export function ContactDetailPane({
   isStarred = false,
   starPending = false,
   onToggleStarred,
+  defaultVoiceReply = false,
+  defaultVoiceReplyPending = false,
+  onToggleDefaultVoiceReply,
   isBlocked = false,
   blockPending = false,
   onToggleBlock,
@@ -122,7 +129,7 @@ export function ContactDetailPane({
     },
     onSuccess: async () => {
       setProfileNotice(t(msg`联系人资料已更新。`));
-      await queryClient.invalidateQueries({ queryKey: ["app-friends", baseUrl] });
+      await invalidateFriendDisplayQueries(queryClient, baseUrl);
     },
   });
 
@@ -368,6 +375,14 @@ export function ContactDetailPane({
               disabled={mutePending}
               onToggle={onToggleMuted}
             />
+            {onToggleDefaultVoiceReply ? (
+              <DesktopContactProfileToggleRow
+                label={t(msg`默认用语音回复`)}
+                checked={defaultVoiceReply}
+                disabled={defaultVoiceReplyPending}
+                onToggle={onToggleDefaultVoiceReply}
+              />
+            ) : null}
           </DesktopContactProfileSection>
 
           <DesktopContactProfileSection title={t(msg`管理`)}>

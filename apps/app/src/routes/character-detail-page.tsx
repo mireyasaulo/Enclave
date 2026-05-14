@@ -1147,6 +1147,16 @@ export function CharacterDetailPage() {
                 setNotice(null);
                 setStarredMutation.mutate(!friendship.isStarred);
               }}
+              defaultVoiceReply={character.defaultVoiceReply ?? false}
+              defaultVoiceReplyPending={
+                setDefaultVoiceReplyMutation.isPending
+              }
+              onToggleDefaultVoiceReply={() => {
+                setNotice(null);
+                setDefaultVoiceReplyMutation.mutate(
+                  !(character.defaultVoiceReply ?? false),
+                );
+              }}
               isBlocked={isBlocked}
               blockPending={blockMutation.isPending}
               onToggleBlock={() => {
