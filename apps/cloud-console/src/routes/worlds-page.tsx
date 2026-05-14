@@ -18,6 +18,7 @@ import {
 } from "../components/cloud-admin-error-block";
 import { ConsoleConfirmDialog } from "../components/console-confirm-dialog";
 import { useConsoleNotice } from "../components/console-notice";
+import { Pager } from "../components/pager";
 import { WorldLifecycleActionButtons } from "../components/world-lifecycle-action-buttons";
 import { copyTextToClipboard } from "../lib/clipboard";
 import { cloudAdminApi } from "../lib/cloud-admin-api";
@@ -243,7 +244,7 @@ type QuickActionConfirmState = {
   action: ConfirmableWorldLifecycleAction;
 };
 
-type WorldsSortField = "lastAccessedAt";
+type WorldsSortField = "lastAccessedAt" | "lastUserMessageAt";
 type WorldsSortDirection = "asc" | "desc";
 type WorldsSortState = {
   field: WorldsSortField;
@@ -446,6 +447,14 @@ export function WorldsPage() {
         compareNullableDateString(
           left.world.lastAccessedAt,
           right.world.lastAccessedAt,
+          sortState.direction,
+        ),
+      );
+    } else if (sortState.field === "lastUserMessageAt") {
+      next.sort((left, right) =>
+        compareNullableDateString(
+          left.world.lastUserMessageAt,
+          right.world.lastUserMessageAt,
           sortState.direction,
         ),
       );
@@ -779,6 +788,23 @@ export function WorldsPage() {
                     </span>
                   </button>
                 </th>
+                <th className="px-4 py-3">
+                  <button
+                    type="button"
+                    onClick={() => toggleSort("lastUserMessageAt")}
+                    className="-mx-1 inline-flex items-center gap-1 rounded px-1 py-0.5 hover:text-[color:var(--text-primary)]"
+                    aria-label={t("Sort by last user message")}
+                  >
+                    <span>{t("Last user message")}</span>
+                    <span aria-hidden="true" className="text-[10px]">
+                      {sortState?.field === "lastUserMessageAt"
+                        ? sortState.direction === "desc"
+                          ? "▼"
+                          : "▲"
+                        : "↕"}
+                    </span>
+                  </button>
+                </th>
                 <th className="px-4 py-3">{t("Heartbeat")}</th>
                 <th className="px-4 py-3">{t("Actions")}</th>
               </tr>
@@ -857,6 +883,9 @@ export function WorldsPage() {
                     </td>
                     <td className="px-4 py-3 text-[color:var(--text-secondary)]">
                       {formatDateTime(item.world.lastAccessedAt)}
+                    </td>
+                    <td className="px-4 py-3 text-[color:var(--text-secondary)]">
+                      {formatDateTime(item.world.lastUserMessageAt)}
                     </td>
                     <td className="px-4 py-3 text-[color:var(--text-secondary)]">
                       <div>{formatDateTime(lastHeartbeatAt)}</div>
@@ -949,28 +978,13 @@ export function WorldsPage() {
           {filteredInstanceFleet.length > pageSize ? (
             <div className="flex items-center justify-between gap-3 border-t border-[color:var(--border-faint)] bg-[color:var(--surface-soft)] px-4 py-3 text-sm text-[color:var(--text-secondary)]">
               <div>
-                {t("Page")} {safePage} / {totalPages} · {filteredInstanceFleet.length} {t("entries")}
+                {filteredInstanceFleet.length} {t("entries")}
               </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  disabled={safePage <= 1}
-                  onClick={() => setPage((current) => Math.max(1, current - 1))}
-                  className="rounded-full border border-[color:var(--border-faint)] px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-[color:var(--text-primary)] hover:border-[color:var(--border-strong)] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {t("Previous")}
-                </button>
-                <button
-                  type="button"
-                  disabled={safePage >= totalPages}
-                  onClick={() =>
-                    setPage((current) => Math.min(totalPages, current + 1))
-                  }
-                  className="rounded-full border border-[color:var(--border-faint)] px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-[color:var(--text-primary)] hover:border-[color:var(--border-strong)] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {t("Next")}
-                </button>
-              </div>
+              <Pager
+                page={safePage}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
             </div>
           ) : null}
         </div>

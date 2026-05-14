@@ -3,9 +3,11 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  Index,
 } from 'typeorm';
 
 @Entity('group_messages')
+@Index(['senderType', 'createdAt'])
 export class GroupMessageEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -54,6 +54,7 @@ import { AddCloudUserLastLoginIp1776658200000 } from "./migrations/1776658200000
 import { CreateCloudMinimaxCallHourly1778656680404 } from "./migrations/1778656680404-create-cloud-minimax-call-hourly";
 import { SplitMinimaxRateColumns1778660000000 } from "./migrations/1778660000000-split-minimax-rate-columns";
 import { AddCloudUserPassword1778660500000 } from "./migrations/1778660500000-add-cloud-user-password";
+import { AddCloudWorldLastUserMessageAt1778661000000 } from "./migrations/1778661000000-add-cloud-world-last-user-message-at";
 import { resolveCloudDatabasePath } from "../config/cloud-runtime-config";
 
 type ConfigReader = {
@@ -118,6 +119,7 @@ export const cloudMigrations = [
   CreateCloudMinimaxCallHourly1778656680404,
   SplitMinimaxRateColumns1778660000000,
   AddCloudUserPassword1778660500000,
+  AddCloudWorldLastUserMessageAt1778661000000,
 ];
 
 export function buildCloudDataSourceOptions(config: ConfigReader): DataSourceOptions {

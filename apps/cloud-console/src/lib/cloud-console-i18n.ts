@@ -315,6 +315,8 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Last login": "上次登录时间",
     "Last login IP": "当前 IP",
     "Sort by last login": "按上次登录时间排序",
+    "Last user message": "上次用户消息时间", // i18n-ignore-line: runtime dict value
+    "Sort by last user message": "按上次用户消息时间排序", // i18n-ignore-line: runtime dict value
     Owner: "世界主人",
     "Owner signature": "世界主人签名",
     "App platform": "运行平台",
@@ -956,6 +958,8 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Last login": "最終ログイン日時",
     "Last login IP": "現在の IP",
     "Sort by last login": "最終ログイン日時で並び替え",
+    "Last user message": "最終ユーザーメッセージ日時", // i18n-ignore-line: runtime dict value
+    "Sort by last user message": "最終ユーザーメッセージ日時で並び替え", // i18n-ignore-line: runtime dict value
     Owner: "ワールドオーナー",
     "Owner signature": "オーナーの署名",
     "App platform": "実行プラットフォーム",
@@ -1602,6 +1606,8 @@ const cloudConsoleRuntimeText: CloudConsoleRuntimeDictionary = {
     "Last login": "마지막 로그인 시각",
     "Last login IP": "현재 IP",
     "Sort by last login": "마지막 로그인 시각으로 정렬",
+    "Last user message": "마지막 사용자 메시지 시각",
+    "Sort by last user message": "마지막 사용자 메시지 시각으로 정렬",
     Owner: "월드 오너",
     "Owner signature": "오너 서명",
     "App platform": "실행 플랫폼",

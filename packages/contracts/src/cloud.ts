@@ -553,6 +553,7 @@ export interface CloudWorldSummary {
   failureMessage?: string | null;
   lastAccessedAt?: string | null;
   lastInteractiveAt?: string | null;
+  lastUserMessageAt?: string | null;
   lastBootedAt?: string | null;
   lastHeartbeatAt?: string | null;
   lastSuspendedAt?: string | null;

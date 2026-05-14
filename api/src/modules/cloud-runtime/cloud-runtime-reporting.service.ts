@@ -5,6 +5,8 @@ import { In, Repository } from 'typeorm';
 import { AiUsageLedgerEntity } from '../analytics/ai-usage-ledger.entity';
 import { ConversationEntity } from '../chat/conversation.entity';
 import { GroupEntity } from '../chat/group.entity';
+import { GroupMessageEntity } from '../chat/group-message.entity';
+import { MessageEntity } from '../chat/message.entity';
 import { CharacterRevisionEntity } from '../wiki/entities/character-revision.entity';
 import { EditSubmissionEntity } from '../wiki/entities/edit-submission.entity';
 
@@ -16,6 +18,7 @@ type RuntimeReportPayload = {
   healthMessage?: string | null;
   reportedAt?: string | null;
   lastInteractiveAt?: string | null;
+  lastUserMessageAt?: string | null;
 };
 
 type RevenueUsageEventPayload = {
@@ -75,6 +78,10 @@ export class CloudRuntimeReportingService implements OnModuleInit, OnModuleDestr
     private readonly conversationRepo: Repository<ConversationEntity>,
     @InjectRepository(GroupEntity)
     private readonly groupRepo: Repository<GroupEntity>,
+    @InjectRepository(MessageEntity)
+    private readonly messageRepo: Repository<MessageEntity>,
+    @InjectRepository(GroupMessageEntity)
+    private readonly groupMessageRepo: Repository<GroupMessageEntity>,
     @InjectRepository(CharacterRevisionEntity)
     private readonly characterRevisionRepo: Repository<CharacterRevisionEntity>,
     @InjectRepository(EditSubmissionEntity)
@@ -113,9 +120,13 @@ export class CloudRuntimeReportingService implements OnModuleInit, OnModuleDestr
 
     this.reporting = true;
     try {
-      const latestInteractiveAt = await this.resolveLatestInteractiveAt();
+      const [latestInteractiveAt, latestUserMessageAt] = await Promise.all([
+        this.resolveLatestInteractiveAt(),
+        this.resolveLatestUserMessageAt(),
+      ]);
       const reportedAt = new Date().toISOString();
       const lastInteractiveIso = latestInteractiveAt?.toISOString() ?? null;
+      const lastUserMessageIso = latestUserMessageAt?.toISOString() ?? null;
 
       const basePayload: RuntimeReportPayload = {
         apiBaseUrl: config.publicApiBaseUrl,
@@ -124,6 +135,7 @@ export class CloudRuntimeReportingService implements OnModuleInit, OnModuleDestr
         healthMessage: 'World runtime heartbeat is healthy.',
         reportedAt,
         lastInteractiveAt: lastInteractiveIso,
+        lastUserMessageAt: lastUserMessageIso,
       };
 
       if (!this.bootstrapReported) {
@@ -354,6 +366,37 @@ export class CloudRuntimeReportingService implements OnModuleInit, OnModuleDestr
     return candidates.reduce((latest, current) =>
       current.getTime() > latest.getTime() ? current : latest,
     );
+  }
+
+  private async resolveLatestUserMessageAt(): Promise<Date | null> {
+    try {
+      const [message, groupMessage] = await Promise.all([
+        this.messageRepo.findOne({
+          where: { senderType: 'user' },
+          order: { createdAt: 'DESC' },
+        }),
+        this.groupMessageRepo.findOne({
+          where: { senderType: 'user' },
+          order: { createdAt: 'DESC' },
+        }),
+      ]);
+
+      const candidates = [message?.createdAt, groupMessage?.createdAt].filter(
+        (value): value is Date => Boolean(value),
+      );
+
+      if (!candidates.length) {
+        return null;
+      }
+
+      return candidates.reduce((latest, current) =>
+        current.getTime() > latest.getTime() ? current : latest,
+      );
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Failed to resolve latest user message: ${message}`);
+      return null;
+    }
   }
 
   private async postRuntimeSignal(

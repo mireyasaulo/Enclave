@@ -1262,6 +1262,7 @@ export class CloudService {
         healthMessage: null,
         lastAccessedAt: null,
         lastInteractiveAt: null,
+        lastUserMessageAt: null,
         lastBootedAt: null,
         lastHeartbeatAt: null,
         lastSuspendedAt: null,
@@ -1343,6 +1344,7 @@ export class CloudService {
       failureMessage: world.failureMessage,
       lastAccessedAt: world.lastAccessedAt?.toISOString() ?? null,
       lastInteractiveAt: world.lastInteractiveAt?.toISOString() ?? null,
+      lastUserMessageAt: world.lastUserMessageAt?.toISOString() ?? null,
       lastBootedAt: world.lastBootedAt?.toISOString() ?? null,
       lastHeartbeatAt: world.lastHeartbeatAt?.toISOString() ?? null,
       lastSuspendedAt: world.lastSuspendedAt?.toISOString() ?? null,
@@ -2103,6 +2105,7 @@ export class CloudService {
     world.failureMessage = state.failureReason;
     world.lastAccessedAt = null;
     world.lastInteractiveAt = null;
+    world.lastUserMessageAt = null;
     world.lastBootedAt = null;
     world.lastHeartbeatAt = null;
     world.lastSuspendedAt = null;
