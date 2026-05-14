@@ -39,7 +39,7 @@ export function TankWarGame({ variant = "fullscreen", onExit }: TankWarGameProps
   const [scale, setScale] = useState(1);
   const [isTouch] = useState(detectTouch);
 
-  const { hud, controls, inputRef, audioRef } = useTankWarWorld({
+  const { hud, controls, inputRef } = useTankWarWorld({
     canvasRef,
     getSprites: () => spritesRef.current,
   });
@@ -51,7 +51,10 @@ export function TankWarGame({ variant = "fullscreen", onExit }: TankWarGameProps
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext("2d", { alpha: false });
-      if (ctx) drawWorld(ctx, null, spritesRef.current, null);
+      if (ctx) {
+        ctx.imageSmoothingEnabled = false;
+        drawWorld(ctx, null, spritesRef.current);
+      }
     }
   }, []);
 
@@ -140,8 +143,6 @@ export function TankWarGame({ variant = "fullscreen", onExit }: TankWarGameProps
             : t(msg`方向键 / WASD 移动，J / 空格开火，P 暂停`)}
         </p>
       ) : null}
-
-      <audio ref={audioRef as any} className="hidden" />
     </section>
   );
 }

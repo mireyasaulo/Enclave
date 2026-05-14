@@ -168,9 +168,6 @@ export type GameWorld = {
   rngState: number;
   // for blink/animation
   frame: number;
-  // last input snapshot (for edge detect like fire)
-  lastP1Fire: boolean;
-  lastP2Fire: boolean;
   // mute
   muted: boolean;
   // playerSpawnPoint cache

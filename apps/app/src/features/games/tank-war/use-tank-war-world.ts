@@ -39,14 +39,12 @@ export type UseTankWarWorldResult = {
   hud: HudSnapshot;
   controls: WorldControls;
   inputRef: React.MutableRefObject<InputState>;
-  audioRef: React.MutableRefObject<HTMLAudioElement | null>;
 };
 
 export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
   const worldRef = useRef<GameWorld>(createWorld());
   const inputRef = useRef<InputState>(emptyInput());
   const sfxRef = useRef<Sfx | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const persistRef = useRef<TankWarPersist>(loadPersist());
   const rafRef = useRef<number | null>(null);
   const stageClearHandledAt = useRef<number | null>(null);
@@ -120,7 +118,7 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
         const ctx = canvas.getContext("2d", { alpha: false });
         if (ctx) {
           ctx.imageSmoothingEnabled = false;
-          drawWorld(ctx, world, sheet, null);
+          drawWorld(ctx, world, sheet);
         }
       }
 
@@ -216,7 +214,7 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
     [start, resume, restart, toggleMute, togglePauseCb],
   );
 
-  return { hud, controls, inputRef, audioRef };
+  return { hud, controls, inputRef };
 }
 
 function snapshot(world: GameWorld, persist: TankWarPersist): HudSnapshot {

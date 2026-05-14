@@ -81,12 +81,23 @@ export function useTankWarInput(
       return false;
     }
 
+    function isTextInputFocused(e: KeyboardEvent): boolean {
+      const target = e.target as HTMLElement | null;
+      if (!target) return false;
+      const tag = target.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+      if ((target as HTMLElement).isContentEditable) return true;
+      return false;
+    }
+
     function onDown(e: KeyboardEvent) {
       if (e.repeat) return;
+      if (isTextInputFocused(e)) return;
       const handled = set(e.code, true);
       if (handled) e.preventDefault();
     }
     function onUp(e: KeyboardEvent) {
+      if (isTextInputFocused(e)) return;
       const handled = set(e.code, false);
       if (handled) e.preventDefault();
     }

@@ -313,16 +313,18 @@ export function drawWorld(
   ctx: CanvasRenderingContext2D,
   world: GameWorld | null,
   sheet: SpriteSheet | null,
-  message: string | null,
 ): void {
   // 全局黑底
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, 256, 224);
   if (!sheet) return;
-  if (!world) {
+  if (!world || world.status === "boot") {
     ctx.fillStyle = "#fff";
     ctx.font = "16px monospace";
     ctx.fillText("TANK WAR", 80, 110);
+    ctx.font = "8px monospace";
+    ctx.fillStyle = "#fcfcfc";
+    ctx.fillText("PRESS START", 92, 134);
     return;
   }
   // 战场区
@@ -367,10 +369,4 @@ export function drawWorld(
   ctx.restore();
 
   drawHud(ctx, world, sheet);
-
-  if (message) {
-    ctx.fillStyle = "#fc0000";
-    ctx.font = "14px monospace";
-    ctx.fillText(message, 60, BATTLEFIELD / 2);
-  }
 }

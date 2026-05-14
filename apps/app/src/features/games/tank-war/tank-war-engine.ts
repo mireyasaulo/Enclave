@@ -121,8 +121,6 @@ export function createWorld(): GameWorld {
     freezeUntilMs: 0,
     rngState: 1,
     frame: 0,
-    lastP1Fire: false,
-    lastP2Fire: false,
     muted: false,
     p1SpawnX: P1_SPAWN.x,
     p1SpawnY: P1_SPAWN.y,
@@ -430,7 +428,6 @@ function processInputForPlayer(
   const left = isP1 ? input.p1Left : input.p2Left;
   const right = isP1 ? input.p1Right : input.p2Right;
   const fire = isP1 ? input.p1Fire : input.p2Fire;
-  const lastFire = isP1 ? world.lastP1Fire : world.lastP2Fire;
 
   let dir: Direction | null = null;
   if (up) dir = DIR_UP;
@@ -466,8 +463,6 @@ function processInputForPlayer(
   if (fire) {
     fireBullet(world, tank, audio);
   }
-  // 抑制 lastFire 警告
-  void lastFire;
 }
 
 function processAi(world: GameWorld, t: Tank, audio: AudioHook | null): void {
@@ -622,11 +617,24 @@ function damageBrickAt(world: GameWorld, b: Bullet): void {
 
 function resolveBulletTank(world: GameWorld, audio: AudioHook | null): void {
   const removedBullets: Set<number> = new Set();
+  // 用 Set 而非 Array，确保同 tick 多发子弹击中同一目标只算一次"击毙"
+  const killedTankIds: Set<number> = new Set();
   const killedTanks: Tank[] = [];
   for (const b of world.bullets) {
+    if (removedBullets.has(b.id)) continue;
     for (const t of world.tanks) {
       if (t.id === b.ownerId) continue;
-      // 同阵营不伤害
+      // 已经在本 tick 被击毙的坦克，后续子弹直接消耗但不再加分/扣命
+      if (killedTankIds.has(t.id)) {
+        if (aabbOverlap(b.x - 2, b.y - 2, 4, 4, t.x, t.y, 16, 16)) {
+          removedBullets.add(b.id);
+          addExplosion(world, b.x, b.y, false);
+          if (audio) audio.play("hit");
+          break;
+        }
+        continue;
+      }
+      // 同阵营不伤害（玩家对玩家、敌对敌）
       if (
         (b.owner === "p1" || b.owner === "p2") &&
         (t.owner === "p1" || t.owner === "p2")
@@ -644,15 +652,12 @@ function resolveBulletTank(world: GameWorld, audio: AudioHook | null): void {
         break;
       }
       if (t.owner === "enemy") {
-        // bonus 掉道具
         const dropped = t.bonus;
         t.hp -= 1;
         if (t.hp <= 0) {
           killedTanks.push(t);
-          if (dropped) {
-            spawnRandomPowerUp(world);
-          }
-          // 给玩家加分
+          killedTankIds.add(t.id);
+          if (dropped) spawnRandomPowerUp(world);
           const owner = b.owner;
           const score = SCORES[t.kind];
           if (owner === "p1") {
@@ -677,8 +682,9 @@ function resolveBulletTank(world: GameWorld, audio: AudioHook | null): void {
           if (audio) audio.play("hit");
         }
       } else {
-        // 玩家被击中
+        // 玩家被击中（1 HP，必死）
         killedTanks.push(t);
+        killedTankIds.add(t.id);
         addExplosion(world, t.x + 8, t.y + 8, true);
         if (audio) audio.play("explodeBig");
       }
@@ -689,8 +695,7 @@ function resolveBulletTank(world: GameWorld, audio: AudioHook | null): void {
     world.bullets = world.bullets.filter((b) => !removedBullets.has(b.id));
   }
   if (killedTanks.length > 0) {
-    const killedIds = new Set(killedTanks.map((t) => t.id));
-    world.tanks = world.tanks.filter((t) => !killedIds.has(t.id));
+    world.tanks = world.tanks.filter((t) => !killedTankIds.has(t.id));
     for (const t of killedTanks) {
       if (t.owner === "p1") {
         world.livesP1--;
@@ -925,10 +930,6 @@ export function tick(
     (ex) => now - ex.startedAt < (ex.big ? 480 : 300),
   );
   world.floats = world.floats.filter((f) => now - f.startedAt < 700);
-
-  // 记录 fire 边沿
-  world.lastP1Fire = input.p1Fire;
-  world.lastP2Fire = input.p2Fire;
 
   // 关卡完成 / Game Over 判定
   if (!world.baseAlive) {

@@ -649,42 +649,67 @@ export function decodeStage(stageIdx: number): Uint8Array {
 /**
  * Generate enemy roster for a stage (20 enemies):
  * mix changes with stage difficulty. Light early; more Fast/Armor/Power later.
+ *
+ * 权重在生成前归一化到 ENEMY_QUOTA=20，保证 4 种类型在高难度关卡都不会被截断
+ * （之前的 bug：stage 30+ 时 light+fast+armor 之和 ≥20，power 全被砍掉）。
  */
 export function rosterFor(stageIdx: number): Array<
   "light" | "fast" | "armor" | "power"
 > {
   const tier = Math.min(34, Math.max(0, stageIdx - 1));
-  // weights at stage 1 vs 35
-  const weights = {
-    light: 18 - Math.floor(tier * 0.35),
-    fast: 1 + Math.floor(tier * 0.18),
-    armor: 0 + Math.floor(tier * 0.22),
-    power: 1 + Math.floor(tier * 0.15),
+  const rawWeights = {
+    light: 18 - tier * 0.35,
+    fast: 1 + tier * 0.18,
+    armor: 0 + tier * 0.22,
+    power: 1 + tier * 0.15,
   };
   const total = 20;
-  const list: Array<"light" | "fast" | "armor" | "power"> = [];
   const seq: Array<"light" | "fast" | "armor" | "power"> = [
     "light",
     "fast",
     "armor",
     "power",
   ];
+  const sum = Math.max(
+    0.0001,
+    seq.reduce((acc, k) => acc + Math.max(0, (rawWeights as any)[k]), 0),
+  );
+  // 按比例分配；先 floor，余数按"小数部分由大到小"补 1，直到刚好 total
+  const counts: Record<string, number> = {};
+  const fracs: Array<{ k: string; frac: number }> = [];
+  let used = 0;
   for (const k of seq) {
-    const n = Math.max(0, Math.min(total, (weights as any)[k] as number));
-    for (let i = 0; i < n; i++) list.push(k);
+    const w = Math.max(0, (rawWeights as any)[k] as number);
+    const exact = (w / sum) * total;
+    const n = Math.floor(exact);
+    counts[k] = n;
+    used += n;
+    fracs.push({ k, frac: exact - n });
   }
-  while (list.length < total) list.push("light");
+  fracs.sort((a, b) => b.frac - a.frac);
+  let i = 0;
+  while (used < total) {
+    counts[fracs[i % fracs.length]!.k] = (counts[fracs[i % fracs.length]!.k] ?? 0) + 1;
+    used++;
+    i++;
+  }
+  const list: Array<"light" | "fast" | "armor" | "power"> = [];
+  for (const k of seq) {
+    const n = counts[k] ?? 0;
+    for (let j = 0; j < n; j++) list.push(k);
+  }
+  // 截断容错（理论上 used === total，不需要）
   if (list.length > total) list.length = total;
   // shuffle deterministically by stage idx
   let s = stageIdx * 2654435761;
-  for (let i = list.length - 1; i > 0; i--) {
+  for (let p = list.length - 1; p > 0; p--) {
     s = (s + 0x6d2b79f5) >>> 0;
     let t = s;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    const r = ((t ^ (t >>> 14)) >>> 0) % (i + 1);
-    const tmp = list[i] as any;
-    list[i] = list[r] as any;
+    const r = ((t ^ (t >>> 14)) >>> 0) % (p + 1);
+    const tmp = list[p] as any;
+    list[p] = list[r] as any;
     list[r] = tmp;
   }
   return list;
