@@ -195,7 +195,7 @@ msgstr "Create character"
 #: apps/wiki/src/routes/my-characters-page.tsx:98
 #: apps/wiki/src/routes/my-characters-page.tsx:119
 msgid "我的私有角色"
-msgstr ""
+msgstr "My private characters"
 
 #: apps/wiki/src/components/root-layout.tsx:76
 #: apps/wiki/src/routes/watchlist-page.tsx:36
@@ -1830,7 +1830,7 @@ msgstr "Avatar must be an emoji, an http(s) URL, or a path starting with /"
 #: apps/wiki/src/routes/my-character-edit-page.tsx:212
 #: apps/wiki/src/routes/my-characters-page.tsx:217
 msgid "确认删除「{0}」？此操作无法撤销。"
-msgstr ""
+msgstr "Delete \"{0}\"? This action cannot be undone."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:221
 #: apps/wiki/src/routes/my-character-edit-page.tsx:231
@@ -1839,13 +1839,13 @@ msgstr ""
 #: apps/wiki/src/routes/my-characters-page.tsx:97
 #: apps/wiki/src/routes/my-characters-page.tsx:118
 msgid "我的"
-msgstr ""
+msgstr "Mine"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:221
 #: apps/wiki/src/routes/my-character-edit-page.tsx:231
 #: apps/wiki/src/routes/my-character-edit-page.tsx:238
 msgid "私有角色"
-msgstr ""
+msgstr "Private characters"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:223
 #: apps/wiki/src/routes/pending-reviews-page.tsx:61
@@ -1855,237 +1855,237 @@ msgstr "Please sign in first."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:252
 msgid "← 返回列表"
-msgstr ""
+msgstr "← Back to list"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:269
 #: apps/wiki/src/routes/my-characters-page.tsx:298
 msgid "导出中…"
-msgstr ""
+msgstr "Exporting…"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:271
 msgid "📤 导出 JSON"
-msgstr ""
+msgstr "📤 Export JSON"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:281
 #: apps/wiki/src/routes/my-characters-page.tsx:307
 msgid "🗑 删除"
-msgstr ""
+msgstr "🗑 Delete"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:291
 msgid "新建私有角色"
-msgstr ""
+msgstr "New private character"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:291
 msgid "编辑私有角色"
-msgstr ""
+msgstr "Edit private character"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:293
 msgid "这里保存的内容仅你可见。同名再导入会覆盖。点击「导出」下载 JSON，可在 app 端导入到你的世界。"
-msgstr ""
+msgstr "Content saved here is visible only to you. Re-importing with the same name will overwrite. Click \"Export\" to download JSON, which you can import into your world from the app."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:305
 msgid "角色的名字与基本身份；只有「名称」是必填。"
-msgstr ""
+msgstr "The character's name and basic identity; only \"Name\" is required."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:316
 msgid "例如 苏然"
-msgstr ""
+msgstr "e.g. Su Ran"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:321
 msgid "emoji（🦊）或图片 URL；空则用首字母占位"
-msgstr ""
+msgstr "Emoji (🦊) or image URL; leave blank to fall back to initials"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:331
 msgid "这个角色相对于你的身份"
-msgstr ""
+msgstr "This character's role relative to you"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:336
 msgid "例如 大学室友"
-msgstr ""
+msgstr "e.g. College roommate"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:341
 msgid "friend / family / mentor / custom 等"
-msgstr ""
+msgstr "friend / family / mentor / custom, etc."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:357
 msgid "简介与性格"
-msgstr ""
+msgstr "Bio & personality"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:360
 msgid "这两段文字会成为 AI 推理时的基础上下文，决定角色的语气与定位。"
-msgstr ""
+msgstr "These two passages become the base context for AI inference and shape the character's tone and positioning."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:367
 msgid "一段话介绍角色背景与人设；其他用户可以读到"
-msgstr ""
+msgstr "A short paragraph about the character's background and persona; visible to other users"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:374
 msgid "例如：心理学背景，慢热而锋利。喜欢半夜读书，习惯先观察再回应。"
-msgstr ""
+msgstr "e.g. Psychology background, slow to warm up but sharp. Reads late at night, observes before responding."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:380
 msgid "用一两句话描述说话风格，AI 会模仿这种语感"
-msgstr ""
+msgstr "Describe the speech style in one or two sentences; the AI will mimic this voice"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:387
 msgid "例如：直接但温和。不爱用感叹号，喜欢用反问引导思考。"
-msgstr ""
+msgstr "e.g. Direct but gentle. Avoids exclamation marks, prefers rhetorical questions to guide thinking."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:397
 msgid "标签与场景"
-msgstr ""
+msgstr "Tags & scenarios"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:400
 msgid "逗号分隔；用于检索、推荐与触发对话。"
-msgstr ""
+msgstr "Comma-separated; used for search, recommendations, and conversation triggers."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:405
 msgid "例如 编程, 音乐, 心理学"
-msgstr ""
+msgstr "e.g. coding, music, psychology"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:410
 msgid "编程, 音乐, 心理学"
-msgstr ""
+msgstr "coding, music, psychology"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:416
 msgid "例如 coffee_shop, gym, library"
-msgstr ""
+msgstr "e.g. coffee_shop, gym, library"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:436
 msgid "高级：Recipe & Profile JSON"
-msgstr ""
+msgstr "Advanced: Recipe & Profile JSON"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:439
 msgid "不需要可直接跳过；给愿意手写 AI prompt 配方的用户使用，会随 bundle 一起导出。"
-msgstr ""
+msgstr "Skip if you don't need it; intended for users willing to hand-write AI prompt recipes — these get included in the export bundle."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:446
 msgid "收起 ▴"
-msgstr ""
+msgstr "Collapse ▴"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:446
 msgid "展开 ▾"
-msgstr ""
+msgstr "Expand ▾"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:452
 msgid "Recipe JSON（CharacterBlueprintRecipe）"
-msgstr ""
+msgstr "Recipe JSON (CharacterBlueprintRecipe)"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:453
 msgid "留空将不写入；填错会阻止保存"
-msgstr ""
+msgstr "Leave blank to skip; invalid input will block saving"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:463
 msgid "Recipe JSON 无效："
-msgstr ""
+msgstr "Recipe JSON is invalid:"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:471
 msgid "PersonalityProfile JSON"
-msgstr ""
+msgstr "PersonalityProfile JSON"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:472
 msgid "app 端导入时会写入 characters.profile 列"
-msgstr ""
+msgstr "Written to the characters.profile column when imported in the app"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:482
 msgid "Profile JSON 无效："
-msgstr ""
+msgstr "Profile JSON is invalid:"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:508
 msgid "已保存 ✓"
-msgstr ""
+msgstr "Saved ✓"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:520
 msgid "保存中…"
-msgstr ""
+msgstr "Saving…"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:524
 msgid "💾 保存修改"
-msgstr ""
+msgstr "💾 Save changes"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:529
 msgid "请填写「名称」才能保存"
-msgstr ""
+msgstr "Fill in \"Name\" before saving"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:531
 msgid "同名再导入会覆盖此角色"
-msgstr ""
+msgstr "Re-importing with the same name will overwrite this character"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:533
 msgid "保存后会跳到编辑页继续完善"
-msgstr ""
+msgstr "After saving, you'll be taken to the edit page to keep refining"
 
 #. placeholder {0}: res.record.name
 #: apps/wiki/src/routes/my-characters-page.tsx:54
 msgid "已覆盖同名角色：{0}"
-msgstr ""
+msgstr "Overwrote existing character: {0}"
 
 #. placeholder {0}: res.record.name
 #: apps/wiki/src/routes/my-characters-page.tsx:55
 msgid "已导入新角色：{0}"
-msgstr ""
+msgstr "Imported new character: {0}"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:99
 msgid "登录后即可创建和管理只属于你自己的角色。"
-msgstr ""
+msgstr "Sign in to create and manage characters that belong only to you."
 
 #: apps/wiki/src/routes/my-characters-page.tsx:102
 msgid "请先 <0>登录</0> 后再使用此功能。"
-msgstr ""
+msgstr "Please <0>sign in</0> first to use this feature."
 
 #: apps/wiki/src/routes/my-characters-page.tsx:121
 msgid "这里的角色不会出现在公开词条目录，也不走巡查审核流。你可以创建、编辑、导出 JSON，或上传一个 JSON 文件覆盖同名角色。导出的 JSON 文件可在 app 端直接导入到你的世界。"
-msgstr ""
+msgstr "Characters here don't appear in the public catalog and don't go through patrol review. You can create, edit, export JSON, or upload a JSON file to overwrite a same-named character. Exported JSON files can be imported directly into your world from the app."
 
 #: apps/wiki/src/routes/my-characters-page.tsx:139
 #: apps/wiki/src/routes/my-characters-page.tsx:190
 msgid "导入中…"
-msgstr ""
+msgstr "Importing…"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:141
 msgid "📥 导入文件"
-msgstr ""
+msgstr "📥 Import file"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:149
 msgid "✨ 新建角色"
-msgstr ""
+msgstr "✨ New character"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:168
 msgid "还没有任何私有角色"
-msgstr ""
+msgstr "No private characters yet"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:171
 msgid "从零创建一个完全属于你自己的角色，或者上传一份从其它世界导出的 JSON 文件来快速开始。"
-msgstr ""
+msgstr "Create a character entirely your own from scratch, or upload a JSON file exported from another world to start quickly."
 
 #: apps/wiki/src/routes/my-characters-page.tsx:182
 msgid "✨ 新建第一个角色"
-msgstr ""
+msgstr "✨ Create the first one"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:192
 msgid "📥 导入 JSON 文件"
-msgstr ""
+msgstr "📥 Import JSON file"
 
 #. placeholder {0}: items.length
 #: apps/wiki/src/routes/my-characters-page.tsx:203
 msgid "共 {0} 个角色"
-msgstr ""
+msgstr "{0} characters in total"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:263
 msgid "更新于"
-msgstr ""
+msgstr "Updated"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:295
 msgid "导出此角色 JSON"
-msgstr ""
+msgstr "Export this character's JSON"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:298
 msgid "📤 导出"
-msgstr ""
+msgstr "📤 Export"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:304
 msgid "删除此角色"
-msgstr ""
+msgstr "Delete this character"
 
 #: apps/wiki/src/routes/pending-reviews-page.tsx:59
 #: apps/wiki/src/routes/pending-reviews-page.tsx:68

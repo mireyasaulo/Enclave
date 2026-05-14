@@ -195,7 +195,7 @@ msgstr "캐릭터 생성"
 #: apps/wiki/src/routes/my-characters-page.tsx:98
 #: apps/wiki/src/routes/my-characters-page.tsx:119
 msgid "我的私有角色"
-msgstr ""
+msgstr "내 비공개 캐릭터"
 
 #: apps/wiki/src/components/root-layout.tsx:76
 #: apps/wiki/src/routes/watchlist-page.tsx:36
@@ -1830,7 +1830,7 @@ msgstr "아바타는 이모지, http(s) URL 또는 / 로 시작하는 경로만 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:212
 #: apps/wiki/src/routes/my-characters-page.tsx:217
 msgid "确认删除「{0}」？此操作无法撤销。"
-msgstr ""
+msgstr "\"{0}\"을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:221
 #: apps/wiki/src/routes/my-character-edit-page.tsx:231
@@ -1839,13 +1839,13 @@ msgstr ""
 #: apps/wiki/src/routes/my-characters-page.tsx:97
 #: apps/wiki/src/routes/my-characters-page.tsx:118
 msgid "我的"
-msgstr ""
+msgstr "내"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:221
 #: apps/wiki/src/routes/my-character-edit-page.tsx:231
 #: apps/wiki/src/routes/my-character-edit-page.tsx:238
 msgid "私有角色"
-msgstr ""
+msgstr "비공개 캐릭터"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:223
 #: apps/wiki/src/routes/pending-reviews-page.tsx:61
@@ -1855,237 +1855,237 @@ msgstr "먼저 로그인하세요."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:252
 msgid "← 返回列表"
-msgstr ""
+msgstr "← 목록으로"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:269
 #: apps/wiki/src/routes/my-characters-page.tsx:298
 msgid "导出中…"
-msgstr ""
+msgstr "내보내는 중…"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:271
 msgid "📤 导出 JSON"
-msgstr ""
+msgstr "📤 JSON 내보내기"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:281
 #: apps/wiki/src/routes/my-characters-page.tsx:307
 msgid "🗑 删除"
-msgstr ""
+msgstr "🗑 삭제"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:291
 msgid "新建私有角色"
-msgstr ""
+msgstr "새 비공개 캐릭터"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:291
 msgid "编辑私有角色"
-msgstr ""
+msgstr "비공개 캐릭터 편집"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:293
 msgid "这里保存的内容仅你可见。同名再导入会覆盖。点击「导出」下载 JSON，可在 app 端导入到你的世界。"
-msgstr ""
+msgstr "여기에 저장한 내용은 당신만 볼 수 있습니다. 같은 이름으로 다시 가져오면 덮어씁니다. \"내보내기\"를 누르면 JSON을 다운로드하여 앱에서 당신의 월드로 가져올 수 있습니다."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:305
 msgid "角色的名字与基本身份；只有「名称」是必填。"
-msgstr ""
+msgstr "캐릭터의 이름과 기본 정보. \"이름\"만 필수입니다."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:316
 msgid "例如 苏然"
-msgstr ""
+msgstr "예: 수란"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:321
 msgid "emoji（🦊）或图片 URL；空则用首字母占位"
-msgstr ""
+msgstr "이모지(🦊) 또는 이미지 URL. 비워두면 이니셜로 표시"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:331
 msgid "这个角色相对于你的身份"
-msgstr ""
+msgstr "당신을 기준으로 한 이 캐릭터의 관계"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:336
 msgid "例如 大学室友"
-msgstr ""
+msgstr "예: 대학 룸메이트"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:341
 msgid "friend / family / mentor / custom 等"
-msgstr ""
+msgstr "friend / family / mentor / custom 등"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:357
 msgid "简介与性格"
-msgstr ""
+msgstr "소개와 성격"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:360
 msgid "这两段文字会成为 AI 推理时的基础上下文，决定角色的语气与定位。"
-msgstr ""
+msgstr "이 두 문단은 AI 추론 시 기본 컨텍스트가 되어 캐릭터의 어조와 포지션을 결정합니다."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:367
 msgid "一段话介绍角色背景与人设；其他用户可以读到"
-msgstr ""
+msgstr "캐릭터의 배경과 인물상을 한 문단으로 소개. 다른 사용자도 볼 수 있습니다"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:374
 msgid "例如：心理学背景，慢热而锋利。喜欢半夜读书，习惯先观察再回应。"
-msgstr ""
+msgstr "예: 심리학 전공, 천천히 친해지지만 예리함. 한밤중 독서를 좋아하고 관찰한 뒤 반응하는 편."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:380
 msgid "用一两句话描述说话风格，AI 会模仿这种语感"
-msgstr ""
+msgstr "한두 문장으로 말투를 묘사하세요. AI가 이 어감을 모방합니다"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:387
 msgid "例如：直接但温和。不爱用感叹号，喜欢用反问引导思考。"
-msgstr ""
+msgstr "예: 직설적이지만 부드러움. 느낌표를 잘 쓰지 않고 반문으로 생각을 유도."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:397
 msgid "标签与场景"
-msgstr ""
+msgstr "태그와 시나리오"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:400
 msgid "逗号分隔；用于检索、推荐与触发对话。"
-msgstr ""
+msgstr "쉼표로 구분. 검색, 추천, 대화 트리거에 사용됩니다."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:405
 msgid "例如 编程, 音乐, 心理学"
-msgstr ""
+msgstr "예: 프로그래밍, 음악, 심리학"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:410
 msgid "编程, 音乐, 心理学"
-msgstr ""
+msgstr "프로그래밍, 음악, 심리학"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:416
 msgid "例如 coffee_shop, gym, library"
-msgstr ""
+msgstr "예: coffee_shop, gym, library"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:436
 msgid "高级：Recipe & Profile JSON"
-msgstr ""
+msgstr "고급: Recipe & Profile JSON"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:439
 msgid "不需要可直接跳过；给愿意手写 AI prompt 配方的用户使用，会随 bundle 一起导出。"
-msgstr ""
+msgstr "필요 없으면 건너뛰어도 됩니다. AI 프롬프트 레시피를 직접 작성하려는 사용자용이며, 번들과 함께 내보내집니다."
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:446
 msgid "收起 ▴"
-msgstr ""
+msgstr "접기 ▴"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:446
 msgid "展开 ▾"
-msgstr ""
+msgstr "펼치기 ▾"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:452
 msgid "Recipe JSON（CharacterBlueprintRecipe）"
-msgstr ""
+msgstr "Recipe JSON (CharacterBlueprintRecipe)"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:453
 msgid "留空将不写入；填错会阻止保存"
-msgstr ""
+msgstr "비워두면 건너뜁니다. 잘못된 내용이면 저장되지 않습니다"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:463
 msgid "Recipe JSON 无效："
-msgstr ""
+msgstr "Recipe JSON이 잘못되었습니다:"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:471
 msgid "PersonalityProfile JSON"
-msgstr ""
+msgstr "PersonalityProfile JSON"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:472
 msgid "app 端导入时会写入 characters.profile 列"
-msgstr ""
+msgstr "앱에서 가져올 때 characters.profile 컬럼에 기록됩니다"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:482
 msgid "Profile JSON 无效："
-msgstr ""
+msgstr "Profile JSON이 잘못되었습니다:"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:508
 msgid "已保存 ✓"
-msgstr ""
+msgstr "저장됨 ✓"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:520
 msgid "保存中…"
-msgstr ""
+msgstr "저장 중…"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:524
 msgid "💾 保存修改"
-msgstr ""
+msgstr "💾 변경 사항 저장"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:529
 msgid "请填写「名称」才能保存"
-msgstr ""
+msgstr "\"이름\"을 입력해야 저장할 수 있습니다"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:531
 msgid "同名再导入会覆盖此角色"
-msgstr ""
+msgstr "같은 이름으로 다시 가져오면 이 캐릭터를 덮어씁니다"
 
 #: apps/wiki/src/routes/my-character-edit-page.tsx:533
 msgid "保存后会跳到编辑页继续完善"
-msgstr ""
+msgstr "저장 후 편집 페이지로 이동하여 계속 다듬을 수 있습니다"
 
 #. placeholder {0}: res.record.name
 #: apps/wiki/src/routes/my-characters-page.tsx:54
 msgid "已覆盖同名角色：{0}"
-msgstr ""
+msgstr "같은 이름의 캐릭터를 덮어썼습니다: {0}"
 
 #. placeholder {0}: res.record.name
 #: apps/wiki/src/routes/my-characters-page.tsx:55
 msgid "已导入新角色：{0}"
-msgstr ""
+msgstr "새 캐릭터를 가져왔습니다: {0}"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:99
 msgid "登录后即可创建和管理只属于你自己的角色。"
-msgstr ""
+msgstr "로그인하면 당신만의 캐릭터를 만들고 관리할 수 있습니다."
 
 #: apps/wiki/src/routes/my-characters-page.tsx:102
 msgid "请先 <0>登录</0> 后再使用此功能。"
-msgstr ""
+msgstr "먼저 <0>로그인</0> 후 이 기능을 사용해 주세요."
 
 #: apps/wiki/src/routes/my-characters-page.tsx:121
 msgid "这里的角色不会出现在公开词条目录，也不走巡查审核流。你可以创建、编辑、导出 JSON，或上传一个 JSON 文件覆盖同名角色。导出的 JSON 文件可在 app 端直接导入到你的世界。"
-msgstr ""
+msgstr "여기 캐릭터는 공개 항목 목록에 나타나지 않으며 순찰 심사도 거치지 않습니다. 만들기·편집·JSON 내보내기, 또는 JSON 파일을 업로드해 같은 이름의 캐릭터를 덮어쓸 수 있습니다. 내보낸 JSON 파일은 앱에서 당신의 월드로 직접 가져올 수 있습니다."
 
 #: apps/wiki/src/routes/my-characters-page.tsx:139
 #: apps/wiki/src/routes/my-characters-page.tsx:190
 msgid "导入中…"
-msgstr ""
+msgstr "가져오는 중…"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:141
 msgid "📥 导入文件"
-msgstr ""
+msgstr "📥 파일 가져오기"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:149
 msgid "✨ 新建角色"
-msgstr ""
+msgstr "✨ 새 캐릭터"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:168
 msgid "还没有任何私有角色"
-msgstr ""
+msgstr "아직 비공개 캐릭터가 없습니다"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:171
 msgid "从零创建一个完全属于你自己的角色，或者上传一份从其它世界导出的 JSON 文件来快速开始。"
-msgstr ""
+msgstr "처음부터 완전히 당신만의 캐릭터를 만들거나, 다른 월드에서 내보낸 JSON 파일을 업로드해 빠르게 시작할 수 있습니다."
 
 #: apps/wiki/src/routes/my-characters-page.tsx:182
 msgid "✨ 新建第一个角色"
-msgstr ""
+msgstr "✨ 첫 캐릭터 만들기"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:192
 msgid "📥 导入 JSON 文件"
-msgstr ""
+msgstr "📥 JSON 파일 가져오기"
 
 #. placeholder {0}: items.length
 #: apps/wiki/src/routes/my-characters-page.tsx:203
 msgid "共 {0} 个角色"
-msgstr ""
+msgstr "총 {0}명의 캐릭터"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:263
 msgid "更新于"
-msgstr ""
+msgstr "업데이트"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:295
 msgid "导出此角色 JSON"
-msgstr ""
+msgstr "이 캐릭터의 JSON 내보내기"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:298
 msgid "📤 导出"
-msgstr ""
+msgstr "📤 내보내기"
 
 #: apps/wiki/src/routes/my-characters-page.tsx:304
 msgid "删除此角色"
-msgstr ""
+msgstr "이 캐릭터 삭제"
 
 #: apps/wiki/src/routes/pending-reviews-page.tsx:59
 #: apps/wiki/src/routes/pending-reviews-page.tsx:68
