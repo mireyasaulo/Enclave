@@ -4,6 +4,7 @@ import { ClientTelemetryDailyEntity } from "../entities/client-telemetry-daily.e
 import { ClientTelemetryEventEntity } from "../entities/client-telemetry-event.entity";
 import { CloudAdminSessionEntity } from "../entities/cloud-admin-session.entity";
 import { CloudMinimaxCallHourlyEntity } from "../entities/cloud-minimax-call-hourly.entity";
+import { CloudMinimaxQuotaExhaustionEntity } from "../entities/cloud-minimax-quota-exhaustion.entity";
 import { CloudConfigEntity } from "../entities/cloud-config.entity";
 import { CloudFeedbackEntity } from "../entities/cloud-feedback.entity";
 import { CloudInstanceEntity } from "../entities/cloud-instance.entity";
@@ -55,6 +56,7 @@ import { CreateCloudMinimaxCallHourly1778656680404 } from "./migrations/17786566
 import { SplitMinimaxRateColumns1778660000000 } from "./migrations/1778660000000-split-minimax-rate-columns";
 import { AddCloudUserPassword1778660500000 } from "./migrations/1778660500000-add-cloud-user-password";
 import { AddCloudWorldLastUserMessageAt1778661000000 } from "./migrations/1778661000000-add-cloud-world-last-user-message-at";
+import { CreateCloudMinimaxQuotaExhaustion1778662000000 } from "./migrations/1778662000000-create-cloud-minimax-quota-exhaustion";
 import { resolveCloudDatabasePath } from "../config/cloud-runtime-config";
 
 type ConfigReader = {
@@ -93,6 +95,7 @@ export const cloudEntities = [
   CloudTokenUsageBudgetEntity,
   CloudTokenPricingCatalogEntity,
   CloudMinimaxCallHourlyEntity,
+  CloudMinimaxQuotaExhaustionEntity,
 ] as const;
 
 export const cloudMigrations = [
@@ -120,6 +123,7 @@ export const cloudMigrations = [
   SplitMinimaxRateColumns1778660000000,
   AddCloudUserPassword1778660500000,
   AddCloudWorldLastUserMessageAt1778661000000,
+  CreateCloudMinimaxQuotaExhaustion1778662000000,
 ];
 
 export function buildCloudDataSourceOptions(config: ConfigReader): DataSourceOptions {

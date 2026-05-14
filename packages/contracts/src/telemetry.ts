@@ -179,3 +179,18 @@ export interface MinimaxHourlyTelemetryResponse {
   worldId: string | null;
   points: MinimaxHourlyTelemetryPoint[];
 }
+
+// 跨 world 共享的"今日某 model 配额耗尽"广播：world child 撞 1042/2056 后推给
+// cloud-api；其它 world 启动 / 定时拉取后跳过该 model 的所有提交，避免每个
+// world 各撞一次浪费上游配额。usageDate 用 Asia/Shanghai 的 YYYY-MM-DD。
+export interface MinimaxQuotaExhaustionReportPayload {
+  worldId: string;
+  model: string;
+  usageDate: string;
+  callbackToken?: string | null;
+}
+
+export interface MinimaxQuotaExhaustionTodayResponse {
+  usageDate: string;
+  models: string[];
+}

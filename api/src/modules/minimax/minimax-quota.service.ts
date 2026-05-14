@@ -59,25 +59,67 @@ export class MinimaxQuotaService {
     string,
     { value: boolean; expiresAt: number }
   >();
+  // CloudSync 注册的"上报"回调：markExhaustedToday 时触发，把
+  // 本地撞墙事件 fire-and-forget 推给 cloud-api，让其它共用同把 key 的 world
+  // 提前熔断。设计为可选 setter 而非 DI 依赖，避免与 CloudSync 形成循环。
+  private exhaustedListener: ((model: string) => void) | null = null;
 
   constructor(
     @InjectRepository(MinimaxQuotaEntity)
     private readonly repo: Repository<MinimaxQuotaEntity>,
   ) {}
 
+  // CloudSync 在 onModuleInit 注册；不注册时所有行为与单机一致。
+  setExhaustedListener(cb: (model: string) => void): void {
+    this.exhaustedListener = cb;
+  }
+
+  // CloudSync 定时拉取后调用：把其它 world 报上来的"今日已耗尽" model 合并进
+  // 本地 Set，让 tryReserve / isExhaustedToday 命中。不写 DB（DB 是 per-world，
+  // 跨 world 状态留在 cloud-api 共享表里 + 各自的内存 Set）；不回调 listener
+  // 避免重复推送形成环。
+  addRemoteExhaustedToday(models: readonly string[]): void {
+    if (!models.length) return;
+    const day = todayInShanghai();
+    let added = 0;
+    for (const model of models) {
+      const key = `${model}:${day}`;
+      if (this.exhaustedToday.has(key)) continue;
+      this.exhaustedToday.add(key);
+      added += 1;
+    }
+    if (added > 0) {
+      this.logger.warn(
+        `minimax remote-exhausted merged: +${added} models for ${day} (Shanghai)`,
+      );
+    }
+  }
+
   private exhaustedKey(model: string): string {
     return `${model}:${todayInShanghai()}`;
   }
 
   // 当 minimax 真的回 2056/1042 时，调用方在 catch 里调这个。
-  // 写两处：1) 进程内 Set；2) DB row.exhaustedAt（让其他 child / 重启后的本进程能看见）。
+  // 写三处：1) 进程内 Set；2) DB row.exhaustedAt（让其他 child / 重启后的本进程能看见）；
+  // 3) 通过 listener fire-and-forget 推到 cloud-api 共享表（让全 fleet 同把 key
+  // 的其它 world 提前熔断，避免每个 world 都白撞一次）。
   async markExhaustedToday(model: string): Promise<void> {
     const key = this.exhaustedKey(model);
-    if (!this.exhaustedToday.has(key)) {
+    const firstHitThisProcess = !this.exhaustedToday.has(key);
+    if (firstHitThisProcess) {
       this.exhaustedToday.add(key);
       this.logger.warn(
         `minimax model=${model} marked exhausted for ${todayInShanghai()} (Shanghai); skipping all reservations until next-day reset`,
       );
+      // 只在本进程首次撞墙时上报，避免重复发包；CloudSync 内部也会做
+      // best-effort 网络重试与节流。
+      try {
+        this.exhaustedListener?.(model);
+      } catch (err) {
+        this.logger.warn(
+          `exhausted listener threw model=${model}: ${(err as Error)?.message}`,
+        );
+      }
     }
     // 同步把 DB cache 翻成 true（哪怕 DB 写失败也不影响本进程立刻熔断）
     this.exhaustedDbCache.set(key, {
