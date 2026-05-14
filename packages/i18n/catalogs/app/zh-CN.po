@@ -19,17 +19,17 @@ msgid "音乐"
 msgstr "音乐"
 
 #: apps/app/src/components/audio-card.tsx:148
-#: apps/app/src/routes/channels-page.tsx:1562
-#: apps/app/src/routes/channels-page.tsx:1717
-msgid "暂停"
-msgstr "暂停"
-
-#: apps/app/src/components/audio-card.tsx:148
 #: apps/app/src/i18n/static-dom-seed.ts:349
 #: apps/app/src/routes/channels-page.tsx:1562
 #: apps/app/src/routes/channels-page.tsx:1717
 msgid "播放"
 msgstr "播放"
+
+#: apps/app/src/components/audio-card.tsx:148
+#: apps/app/src/routes/channels-page.tsx:1562
+#: apps/app/src/routes/channels-page.tsx:1717
+msgid "暂停"
+msgstr "暂停"
 
 #: apps/app/src/components/bootstrap-screen.tsx:43
 #: apps/app/src/routes/splash-page.tsx:181
@@ -2441,20 +2441,20 @@ msgstr "展开"
 msgid "收起"
 msgstr "收起"
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:82
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:90
 msgid "已复制微信号，去微信粘贴添加好友吧～"
 msgstr "已复制微信号，去微信粘贴添加好友吧～"
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:83
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:91
 msgid "复制失败，请长按微信号手动复制。"
 msgstr "复制失败，请长按微信号手动复制。"
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:108
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:116
 #: apps/app/src/features/subscription/checkout-contact-dialog.tsx:145
 msgid "关闭弹窗"
 msgstr "关闭弹窗"
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:116
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:124
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:150
 #: apps/app/src/components/share-card-modal.tsx:368
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:111
@@ -2488,19 +2488,19 @@ msgstr "关闭弹窗"
 msgid "关闭"
 msgstr "关闭"
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:138
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:146
 msgid "微信号（点一下选中，也可直接复制）"
 msgstr "微信号（点一下选中，也可直接复制）"
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:163
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:171
 msgid "一键复制"
 msgstr "一键复制"
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:169
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:177
 msgid "加好友时备注「拉群」，运营会拉你进体验群，第一时间通知功能上线～"
 msgstr "加好友时备注「拉群」，运营会拉你进体验群，第一时间通知功能上线～"
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:187
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:195
 #: apps/app/src/components/feature-unavailable-dialog.tsx:23
 #: apps/app/src/features/subscription/checkout-contact-dialog.tsx:226
 msgid "我知道了"
@@ -11179,6 +11179,7 @@ msgstr "当前共 {totalCount} 条动态"
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:92
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:111
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:110
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:102
 msgid "退出游戏"
 msgstr "退出游戏"
 
@@ -11188,6 +11189,7 @@ msgstr "继续玩"
 
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:89
 #: apps/app/src/features/games/game-center-session-panel.tsx:194
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:242
 #: apps/app/src/i18n/static-dom-seed.ts:84
 msgid "开始游戏"
 msgstr "开始游戏"
@@ -13809,7 +13811,7 @@ msgid "格点工坊"
 msgstr "格点工坊"
 
 #: apps/app/src/features/games/game-center-data.ts:235
-#: apps/app/src/features/games/game-center-data.ts:324
+#: apps/app/src/features/games/game-center-data.ts:343
 msgid "好友热玩"
 msgstr "好友热玩"
 
@@ -13974,232 +13976,303 @@ msgid "互助"
 msgstr "互助"
 
 #: apps/app/src/features/games/game-center-data.ts:288
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:85
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:188
+msgid "坦克大战"
+msgstr "坦克大战"
+
+#: apps/app/src/features/games/game-center-data.ts:289
+msgid "一辆小坦克，守护一个老巢。"
+msgstr "一辆小坦克，守护一个老巢。"
+
+#: apps/app/src/features/games/game-center-data.ts:290
+msgid "经典 FC 像素动作完整复刻：35 关原版地图、4 种敌方坦克、7 种道具、4 级武器升级、支持桌面键盘双人本地对战。"
+msgstr "经典 FC 像素动作完整复刻：35 关原版地图、4 种敌方坦克、7 种道具、4 级武器升级、支持桌面键盘双人本地对战。"
+
+#: apps/app/src/features/games/game-center-data.ts:291
+msgid "隐界游戏厅"
+msgstr "隐界游戏厅"
+
+#: apps/app/src/features/games/game-center-data.ts:292
+msgid "怀旧像素"
+msgstr "怀旧像素"
+
+#: apps/app/src/features/games/game-center-data.ts:293
+msgid "即时动作"
+msgstr "即时动作"
+
+#: apps/app/src/features/games/game-center-data.ts:296
+msgid "单人 / 桌面双人"
+msgstr "单人 / 桌面双人"
+
+#: apps/app/src/features/games/game-center-data.ts:297
+msgid "和朋友肩并肩守基地"
+msgstr "和朋友肩并肩守基地"
+
+#: apps/app/src/features/games/game-center-data.ts:298
+msgid "FC 原版 35 关完整还原"
+msgstr "FC 原版 35 关完整还原"
+
+#: apps/app/src/features/games/game-center-data.ts:299
+msgid "复古像素"
+msgstr "复古像素"
+
+#: apps/app/src/features/games/game-center-data.ts:300
+msgid "8-30 分钟一局"
+msgstr "8-30 分钟一局"
+
+#: apps/app/src/features/games/game-center-data.ts:301
+msgid "通关解锁下一关 + 最高分"
+msgstr "通关解锁下一关 + 最高分"
+
+#: apps/app/src/features/games/game-center-data.ts:302
+msgid "守住基地，消灭 20 辆敌方坦克。"
+msgstr "守住基地，消灭 20 辆敌方坦克。"
+
+#: apps/app/src/features/games/game-center-data.ts:303
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:215
+msgid "双人"
+msgstr "双人"
+
+#: apps/app/src/features/games/game-center-data.ts:303
+msgid "像素"
+msgstr "像素"
+
+#: apps/app/src/features/games/game-center-data.ts:303
+msgid "动作"
+msgstr "动作"
+
+#: apps/app/src/features/games/game-center-data.ts:303
+msgid "怀旧"
+msgstr "怀旧"
+
+#: apps/app/src/features/games/game-center-data.ts:307
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:76
 #: apps/app/src/i18n/static-dom-seed.ts:218
 msgid "岛屿演唱会"
 msgstr "岛屿演唱会"
 
-#: apps/app/src/features/games/game-center-data.ts:289
+#: apps/app/src/features/games/game-center-data.ts:308
 msgid "把舞台搭在海边，派对就会变得自然。"
 msgstr "把舞台搭在海边，派对就会变得自然。"
 
-#: apps/app/src/features/games/game-center-data.ts:290
+#: apps/app/src/features/games/game-center-data.ts:309
 msgid "面向朋友聚会和表演互动设计，强调一起装扮舞台、合奏和打卡分享，适合活动位和聚会专题。"
 msgstr "面向朋友聚会和表演互动设计，强调一起装扮舞台、合奏和打卡分享，适合活动位和聚会专题。"
 
-#: apps/app/src/features/games/game-center-data.ts:291
+#: apps/app/src/features/games/game-center-data.ts:310
 msgid "浅海现场"
 msgstr "浅海现场"
 
-#: apps/app/src/features/games/game-center-data.ts:292
+#: apps/app/src/features/games/game-center-data.ts:311
 msgid "周末派对"
 msgstr "周末派对"
 
-#: apps/app/src/features/games/game-center-data.ts:293
+#: apps/app/src/features/games/game-center-data.ts:312
 msgid "海边派对"
 msgstr "海边派对"
 
-#: apps/app/src/features/games/game-center-data.ts:296
+#: apps/app/src/features/games/game-center-data.ts:315
 msgid "8.8 万人在玩"
 msgstr "8.8 万人在玩"
 
-#: apps/app/src/features/games/game-center-data.ts:297
+#: apps/app/src/features/games/game-center-data.ts:316
 msgid "11 位好友准备开场"
 msgstr "11 位好友准备开场"
 
-#: apps/app/src/features/games/game-center-data.ts:298
+#: apps/app/src/features/games/game-center-data.ts:317
 msgid "海风主题舞台返场"
 msgstr "海风主题舞台返场"
 
-#: apps/app/src/features/games/game-center-data.ts:299
+#: apps/app/src/features/games/game-center-data.ts:318
 msgid "派对推荐"
 msgstr "派对推荐"
 
-#: apps/app/src/features/games/game-center-data.ts:300
+#: apps/app/src/features/games/game-center-data.ts:319
 msgid "7 分钟一场演出"
 msgstr "7 分钟一场演出"
 
-#: apps/app/src/features/games/game-center-data.ts:301
+#: apps/app/src/features/games/game-center-data.ts:320
 msgid "舞台海报 + 合奏积分"
 msgstr "舞台海报 + 合奏积分"
 
-#: apps/app/src/features/games/game-center-data.ts:302
+#: apps/app/src/features/games/game-center-data.ts:321
 msgid "今晚先排一场海边合奏，把返场舞台的限定海报拿到手。"
 msgstr "今晚先排一场海边合奏，把返场舞台的限定海报拿到手。"
 
-#: apps/app/src/features/games/game-center-data.ts:303
+#: apps/app/src/features/games/game-center-data.ts:322
 msgid "派对"
 msgstr "派对"
 
-#: apps/app/src/features/games/game-center-data.ts:303
+#: apps/app/src/features/games/game-center-data.ts:322
 msgid "装扮"
 msgstr "装扮"
 
-#: apps/app/src/features/games/game-center-data.ts:303
+#: apps/app/src/features/games/game-center-data.ts:322
 msgid "合奏"
 msgstr "合奏"
 
-#: apps/app/src/features/games/game-center-data.ts:318
+#: apps/app/src/features/games/game-center-data.ts:337
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:288
 #: apps/app/src/i18n/static-dom-seed.ts:102
 msgid "为你推荐"
 msgstr "为你推荐"
 
-#: apps/app/src/features/games/game-center-data.ts:319
+#: apps/app/src/features/games/game-center-data.ts:338
 msgid "按微信游戏中心的节奏，优先摆主推、社交热玩和可回访内容。"
 msgstr "按微信游戏中心的节奏，优先摆主推、社交热玩和可回访内容。"
 
-#: apps/app/src/features/games/game-center-data.ts:325
+#: apps/app/src/features/games/game-center-data.ts:344
 msgid "更强调一起玩和容易转发的项目。"
 msgstr "更强调一起玩和容易转发的项目。"
 
-#: apps/app/src/features/games/game-center-data.ts:330
+#: apps/app/src/features/games/game-center-data.ts:349
 msgid "适合碎片时间继续"
 msgstr "适合碎片时间继续"
 
-#: apps/app/src/features/games/game-center-data.ts:331
+#: apps/app/src/features/games/game-center-data.ts:350
 msgid "放可以随时返回、继续经营或推进的项目。"
 msgstr "放可以随时返回、继续经营或推进的项目。"
 
-#: apps/app/src/features/games/game-center-data.ts:340
+#: apps/app/src/features/games/game-center-data.ts:359
 #: apps/app/src/i18n/static-dom-seed.ts:280
 msgid "极光赛道带动本周冲榜热度。"
 msgstr "极光赛道带动本周冲榜热度。"
 
-#: apps/app/src/features/games/game-center-data.ts:345
+#: apps/app/src/features/games/game-center-data.ts:364
 #: apps/app/src/i18n/static-dom-seed.ts:230
 msgid "赛季任务更新后，小队匹配显著升温。"
 msgstr "赛季任务更新后，小队匹配显著升温。"
 
-#: apps/app/src/features/games/game-center-data.ts:350
+#: apps/app/src/features/games/game-center-data.ts:369
 #: apps/app/src/i18n/static-dom-seed.ts:231
 msgid "双人同屏模式让社交传播继续放大。"
 msgstr "双人同屏模式让社交传播继续放大。"
 
-#: apps/app/src/features/games/game-center-data.ts:358
+#: apps/app/src/features/games/game-center-data.ts:377
 #: apps/app/src/i18n/static-dom-seed.ts:232
 msgid "治愈感和布置玩法带动收藏率。"
 msgstr "治愈感和布置玩法带动收藏率。"
 
-#: apps/app/src/features/games/game-center-data.ts:363
+#: apps/app/src/features/games/game-center-data.ts:382
 #: apps/app/src/i18n/static-dom-seed.ts:233
 msgid "支线站点更新后回访率提升。"
 msgstr "支线站点更新后回访率提升。"
 
-#: apps/app/src/features/games/game-center-data.ts:368
+#: apps/app/src/features/games/game-center-data.ts:387
 #: apps/app/src/i18n/static-dom-seed.ts:234
 msgid "周末派对活动带来新一轮曝光。"
 msgstr "周末派对活动带来新一轮曝光。"
 
-#: apps/app/src/features/games/game-center-data.ts:375
+#: apps/app/src/features/games/game-center-data.ts:394
 #: apps/app/src/i18n/static-dom-seed.ts:688
 msgid "林树"
 msgstr "林树"
 
-#: apps/app/src/features/games/game-center-data.ts:377
+#: apps/app/src/features/games/game-center-data.ts:396
 #: apps/app/src/i18n/static-dom-seed.ts:367
 msgid "刚打完一局晋级赛，正在拉人补位。"
 msgstr "刚打完一局晋级赛，正在拉人补位。"
 
-#: apps/app/src/features/games/game-center-data.ts:382
+#: apps/app/src/features/games/game-center-data.ts:401
 #: apps/app/src/i18n/static-dom-seed.ts:685
 msgid "安澜"
 msgstr "安澜"
 
-#: apps/app/src/features/games/game-center-data.ts:384
+#: apps/app/src/features/games/game-center-data.ts:403
 #: apps/app/src/i18n/static-dom-seed.ts:368
 msgid "夜市摊位升到 5 级，刚开了新的甜品档。"
 msgstr "夜市摊位升到 5 级，刚开了新的甜品档。"
 
-#: apps/app/src/features/games/game-center-data.ts:389
+#: apps/app/src/features/games/game-center-data.ts:408
 #: apps/app/src/i18n/static-dom-seed.ts:686
 msgid "陆回"
 msgstr "陆回"
 
-#: apps/app/src/features/games/game-center-data.ts:391
+#: apps/app/src/features/games/game-center-data.ts:410
 #: apps/app/src/i18n/static-dom-seed.ts:369
 msgid "在约人打双人同屏，已经连胜 6 场。"
 msgstr "在约人打双人同屏，已经连胜 6 场。"
 
-#: apps/app/src/features/games/game-center-data.ts:396
+#: apps/app/src/features/games/game-center-data.ts:415
 #: apps/app/src/i18n/static-dom-seed.ts:687
 msgid "言初"
 msgstr "言初"
 
-#: apps/app/src/features/games/game-center-data.ts:398
+#: apps/app/src/features/games/game-center-data.ts:417
 #: apps/app/src/i18n/static-dom-seed.ts:371
 msgid "刚把春季家具摆完，准备截图发朋友圈。"
 msgstr "刚把春季家具摆完，准备截图发朋友圈。"
 
-#: apps/app/src/features/games/game-center-data.ts:406
+#: apps/app/src/features/games/game-center-data.ts:425
 #: apps/app/src/i18n/static-dom-seed.ts:281
 msgid "信号小队 S2 赛季开启"
 msgstr "信号小队 S2 赛季开启"
 
-#: apps/app/src/features/games/game-center-data.ts:407
+#: apps/app/src/features/games/game-center-data.ts:426
 #: apps/app/src/i18n/static-dom-seed.ts:245
 msgid "完成周任务可解锁全队共享外观和回放徽章。"
 msgstr "完成周任务可解锁全队共享外观和回放徽章。"
 
-#: apps/app/src/features/games/game-center-data.ts:408
+#: apps/app/src/features/games/game-center-data.ts:427
 #: apps/app/src/i18n/static-dom-seed.ts:467
 msgid "今天 20:00 开始"
 msgstr "今天 20:00 开始"
 
-#: apps/app/src/features/games/game-center-data.ts:409
+#: apps/app/src/features/games/game-center-data.ts:428
 #: apps/app/src/i18n/static-dom-seed.ts:246
 msgid "去做任务"
 msgstr "去做任务"
 
-#: apps/app/src/features/games/game-center-data.ts:416
+#: apps/app/src/features/games/game-center-data.ts:435
 #: apps/app/src/i18n/static-dom-seed.ts:282
 msgid "夜市合伙人周末客流翻倍"
 msgstr "夜市合伙人周末客流翻倍"
 
-#: apps/app/src/features/games/game-center-data.ts:417
+#: apps/app/src/features/games/game-center-data.ts:436
 #: apps/app/src/i18n/static-dom-seed.ts:284
 msgid "指定时段营业收益翻倍，适合回流和好友互访。"
 msgstr "指定时段营业收益翻倍，适合回流和好友互访。"
 
-#: apps/app/src/features/games/game-center-data.ts:418
+#: apps/app/src/features/games/game-center-data.ts:437
 #: apps/app/src/i18n/static-dom-seed.ts:285
 msgid "周五 - 周日"
 msgstr "周五 - 周日"
 
-#: apps/app/src/features/games/game-center-data.ts:419
+#: apps/app/src/features/games/game-center-data.ts:438
 msgid "预约提醒"
 msgstr "预约提醒"
 
-#: apps/app/src/features/games/game-center-data.ts:426
+#: apps/app/src/features/games/game-center-data.ts:445
 #: apps/app/src/i18n/static-dom-seed.ts:286
 msgid "岛屿演唱会海风舞台返场"
 msgstr "岛屿演唱会海风舞台返场"
 
-#: apps/app/src/features/games/game-center-data.ts:427
+#: apps/app/src/features/games/game-center-data.ts:446
 #: apps/app/src/i18n/static-dom-seed.ts:287
 msgid "邀请两位好友合奏可解锁限定海报。"
 msgstr "邀请两位好友合奏可解锁限定海报。"
 
-#: apps/app/src/features/games/game-center-data.ts:428
+#: apps/app/src/features/games/game-center-data.ts:447
 #: apps/app/src/i18n/static-dom-seed.ts:288
 msgid "限时 3 天"
 msgstr "限时 3 天"
 
-#: apps/app/src/features/games/game-center-data.ts:429
+#: apps/app/src/features/games/game-center-data.ts:448
 #: apps/app/src/i18n/static-dom-seed.ts:289
 msgid "立即参加"
 msgstr "立即参加"
 
-#: apps/app/src/features/games/game-center-data.ts:514
+#: apps/app/src/features/games/game-center-data.ts:533
 msgid "任务中"
 msgstr "任务中"
 
-#: apps/app/src/features/games/game-center-data.ts:516
+#: apps/app/src/features/games/game-center-data.ts:535
 #: apps/app/src/i18n/static-dom-seed.ts:283
 msgid "已预约"
 msgstr "已预约"
 
-#: apps/app/src/features/games/game-center-data.ts:518
+#: apps/app/src/features/games/game-center-data.ts:537
 msgid "已参加"
 msgstr "已参加"
 
@@ -15615,6 +15688,7 @@ msgid "赛季徽章 {0} · 团队积分 {1}"
 msgstr "赛季徽章 {0} · 团队积分 {1}"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:379
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:242
 msgid "再来一局"
 msgstr "再来一局"
 
@@ -15821,6 +15895,57 @@ msgstr "最佳圈速 {0}"
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:383
 msgid "回到选赛道"
 msgstr "回到选赛道"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:95
+msgid "已静音"
+msgstr "已静音"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:95
+msgid "音效开"
+msgstr "音效开"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:139
+msgid "P1: WASD + J 开火 / P2: 方向键 + / 开火"
+msgstr "P1: WASD + J 开火 / P2: 方向键 + / 开火"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:140
+msgid "方向键 / WASD 移动，J / 空格开火，P 暂停"
+msgstr "方向键 / WASD 移动，J / 空格开火，P 暂停"
+
+#. placeholder {0}: hud.stage
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:154
+msgid "第 {0} 关"
+msgstr "第 {0} 关"
+
+#. placeholder {0}: hud.enemyRemaining
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:157
+msgid "敌剩 {0}"
+msgstr "敌剩 {0}"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:190
+msgid "Game Over"
+msgstr "Game Over"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:193
+msgid "恭喜过关，进入下一关"
+msgstr "恭喜过关，进入下一关"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:205
+msgid "单人"
+msgstr "单人"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:219
+msgid "选关:"
+msgstr "选关:"
+
+#. placeholder {0}: hud.maxUnlockedStage
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:233
+msgid "已解锁 {0} / 35"
+msgstr "已解锁 {0} / 35"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:250
+msgid "下一关"
+msgstr "下一关"
 
 #: apps/app/src/features/mini-programs/group-relay-card.ts:67
 msgid "首次回填"

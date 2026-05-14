@@ -19,17 +19,17 @@ msgid "音乐"
 msgstr "음악"
 
 #: apps/app/src/components/audio-card.tsx:148
-#: apps/app/src/routes/channels-page.tsx:1562
-#: apps/app/src/routes/channels-page.tsx:1717
-msgid "暂停"
-msgstr "일시정지"
-
-#: apps/app/src/components/audio-card.tsx:148
 #: apps/app/src/i18n/static-dom-seed.ts:349
 #: apps/app/src/routes/channels-page.tsx:1562
 #: apps/app/src/routes/channels-page.tsx:1717
 msgid "播放"
 msgstr "재생"
+
+#: apps/app/src/components/audio-card.tsx:148
+#: apps/app/src/routes/channels-page.tsx:1562
+#: apps/app/src/routes/channels-page.tsx:1717
+msgid "暂停"
+msgstr "일시정지"
 
 #: apps/app/src/components/bootstrap-screen.tsx:43
 #: apps/app/src/routes/splash-page.tsx:181
@@ -2441,20 +2441,20 @@ msgstr "펼치기"
 msgid "收起"
 msgstr "닫기"
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:82
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:90
 msgid "已复制微信号，去微信粘贴添加好友吧～"
 msgstr ""
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:83
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:91
 msgid "复制失败，请长按微信号手动复制。"
 msgstr ""
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:108
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:116
 #: apps/app/src/features/subscription/checkout-contact-dialog.tsx:145
 msgid "关闭弹窗"
 msgstr "팝업 닫기"
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:116
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:124
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:150
 #: apps/app/src/components/share-card-modal.tsx:368
 #: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:111
@@ -2488,19 +2488,19 @@ msgstr "팝업 닫기"
 msgid "关闭"
 msgstr "닫기"
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:138
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:146
 msgid "微信号（点一下选中，也可直接复制）"
 msgstr ""
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:163
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:171
 msgid "一键复制"
 msgstr ""
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:169
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:177
 msgid "加好友时备注「拉群」，运营会拉你进体验群，第一时间通知功能上线～"
 msgstr ""
 
-#: apps/app/src/components/feature-coming-soon-dialog.tsx:187
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:195
 #: apps/app/src/components/feature-unavailable-dialog.tsx:23
 #: apps/app/src/features/subscription/checkout-contact-dialog.tsx:226
 msgid "我知道了"
@@ -11179,6 +11179,7 @@ msgstr "현재 게시물 총 {totalCount}건"
 #: apps/app/src/features/games/pixel-arena/pixel-arena-game.tsx:92
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:111
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:110
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:102
 msgid "退出游戏"
 msgstr "게임 종료"
 
@@ -11188,6 +11189,7 @@ msgstr "계속 플레이"
 
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:89
 #: apps/app/src/features/games/game-center-session-panel.tsx:194
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:242
 #: apps/app/src/i18n/static-dom-seed.ts:84
 msgid "开始游戏"
 msgstr "게임 시작"
@@ -13809,7 +13811,7 @@ msgid "格点工坊"
 msgstr "그리드 공방"
 
 #: apps/app/src/features/games/game-center-data.ts:235
-#: apps/app/src/features/games/game-center-data.ts:324
+#: apps/app/src/features/games/game-center-data.ts:343
 msgid "好友热玩"
 msgstr "친구 인기 플레이"
 
@@ -13974,232 +13976,303 @@ msgid "互助"
 msgstr "상호 협력"
 
 #: apps/app/src/features/games/game-center-data.ts:288
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:85
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:188
+msgid "坦克大战"
+msgstr "탱크 대전"
+
+#: apps/app/src/features/games/game-center-data.ts:289
+msgid "一辆小坦克，守护一个老巢。"
+msgstr "작은 탱크 한 대로, 오래된 본진을 지켜라."
+
+#: apps/app/src/features/games/game-center-data.ts:290
+msgid "经典 FC 像素动作完整复刻：35 关原版地图、4 种敌方坦克、7 种道具、4 级武器升级、支持桌面键盘双人本地对战。"
+msgstr "FC 픽셀 액션 완전 복각: 35스테이지 원본 배치, 적 탱크 4종, 아이템 7종, 4단계 무기 강화, 데스크톱 2인 로컬 협력 지원."
+
+#: apps/app/src/features/games/game-center-data.ts:291
+msgid "隐界游戏厅"
+msgstr "은계 게임센터"
+
+#: apps/app/src/features/games/game-center-data.ts:292
+msgid "怀旧像素"
+msgstr "레트로 픽셀"
+
+#: apps/app/src/features/games/game-center-data.ts:293
+msgid "即时动作"
+msgstr "실시간 액션"
+
+#: apps/app/src/features/games/game-center-data.ts:296
+msgid "单人 / 桌面双人"
+msgstr "싱글 / 데스크톱 2P"
+
+#: apps/app/src/features/games/game-center-data.ts:297
+msgid "和朋友肩并肩守基地"
+msgstr "친구와 어깨를 나란히 본진 사수"
+
+#: apps/app/src/features/games/game-center-data.ts:298
+msgid "FC 原版 35 关完整还原"
+msgstr "FC 원작 35스테이지 완전 복원"
+
+#: apps/app/src/features/games/game-center-data.ts:299
+msgid "复古像素"
+msgstr "레트로 픽셀"
+
+#: apps/app/src/features/games/game-center-data.ts:300
+msgid "8-30 分钟一局"
+msgstr "한 판 8~30분"
+
+#: apps/app/src/features/games/game-center-data.ts:301
+msgid "通关解锁下一关 + 最高分"
+msgstr "스테이지 클리어로 다음 면 해금 + 최고 점수"
+
+#: apps/app/src/features/games/game-center-data.ts:302
+msgid "守住基地，消灭 20 辆敌方坦克。"
+msgstr "본진을 지키고 적 탱크 20대를 격파하라."
+
+#: apps/app/src/features/games/game-center-data.ts:303
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:215
+msgid "双人"
+msgstr "2P"
+
+#: apps/app/src/features/games/game-center-data.ts:303
+msgid "像素"
+msgstr "픽셀"
+
+#: apps/app/src/features/games/game-center-data.ts:303
+msgid "动作"
+msgstr "액션"
+
+#: apps/app/src/features/games/game-center-data.ts:303
+msgid "怀旧"
+msgstr "레트로"
+
+#: apps/app/src/features/games/game-center-data.ts:307
 #: apps/app/src/features/games/island-concert/island-concert-game.tsx:76
 #: apps/app/src/i18n/static-dom-seed.ts:218
 msgid "岛屿演唱会"
 msgstr "섬 콘서트"
 
-#: apps/app/src/features/games/game-center-data.ts:289
+#: apps/app/src/features/games/game-center-data.ts:308
 msgid "把舞台搭在海边，派对就会变得自然。"
 msgstr "무대를 해변에 세우면 파티가 자연스러워집니다."
 
-#: apps/app/src/features/games/game-center-data.ts:290
+#: apps/app/src/features/games/game-center-data.ts:309
 msgid "面向朋友聚会和表演互动设计，强调一起装扮舞台、合奏和打卡分享，适合活动位和聚会专题。"
 msgstr "친구 모임과 공연 상호작용을 위해 설계되어 무대 꾸미기, 합주, 체크인 공유를 함께 강조하며 이벤트 자리와 모임 특집에 적합합니다."
 
-#: apps/app/src/features/games/game-center-data.ts:291
+#: apps/app/src/features/games/game-center-data.ts:310
 msgid "浅海现场"
 msgstr "얕은 바다 현장"
 
-#: apps/app/src/features/games/game-center-data.ts:292
+#: apps/app/src/features/games/game-center-data.ts:311
 msgid "周末派对"
 msgstr "주말 파티"
 
-#: apps/app/src/features/games/game-center-data.ts:293
+#: apps/app/src/features/games/game-center-data.ts:312
 msgid "海边派对"
 msgstr "해변 파티"
 
-#: apps/app/src/features/games/game-center-data.ts:296
+#: apps/app/src/features/games/game-center-data.ts:315
 msgid "8.8 万人在玩"
 msgstr "8.8만 명이 플레이 중"
 
-#: apps/app/src/features/games/game-center-data.ts:297
+#: apps/app/src/features/games/game-center-data.ts:316
 msgid "11 位好友准备开场"
 msgstr "친구 11명이 시작 준비 중"
 
-#: apps/app/src/features/games/game-center-data.ts:298
+#: apps/app/src/features/games/game-center-data.ts:317
 msgid "海风主题舞台返场"
 msgstr "해풍 테마 무대 앙코르"
 
-#: apps/app/src/features/games/game-center-data.ts:299
+#: apps/app/src/features/games/game-center-data.ts:318
 msgid "派对推荐"
 msgstr "파티 추천"
 
-#: apps/app/src/features/games/game-center-data.ts:300
+#: apps/app/src/features/games/game-center-data.ts:319
 msgid "7 分钟一场演出"
 msgstr "7분당 한 번의 공연"
 
-#: apps/app/src/features/games/game-center-data.ts:301
+#: apps/app/src/features/games/game-center-data.ts:320
 msgid "舞台海报 + 合奏积分"
 msgstr "무대 포스터 + 합주 포인트"
 
-#: apps/app/src/features/games/game-center-data.ts:302
+#: apps/app/src/features/games/game-center-data.ts:321
 msgid "今晚先排一场海边合奏，把返场舞台的限定海报拿到手。"
 msgstr "오늘 밤 해변 합주 공연을 먼저 잡고, 앙코르 무대의 한정 포스터를 손에 넣으세요."
 
-#: apps/app/src/features/games/game-center-data.ts:303
+#: apps/app/src/features/games/game-center-data.ts:322
 msgid "派对"
 msgstr "파티"
 
-#: apps/app/src/features/games/game-center-data.ts:303
+#: apps/app/src/features/games/game-center-data.ts:322
 msgid "装扮"
 msgstr "꾸미기"
 
-#: apps/app/src/features/games/game-center-data.ts:303
+#: apps/app/src/features/games/game-center-data.ts:322
 msgid "合奏"
 msgstr "합주"
 
-#: apps/app/src/features/games/game-center-data.ts:318
+#: apps/app/src/features/games/game-center-data.ts:337
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:288
 #: apps/app/src/i18n/static-dom-seed.ts:102
 msgid "为你推荐"
 msgstr "추천"
 
-#: apps/app/src/features/games/game-center-data.ts:319
+#: apps/app/src/features/games/game-center-data.ts:338
 msgid "按微信游戏中心的节奏，优先摆主推、社交热玩和可回访内容。"
 msgstr "위챗 게임 센터 리듬에 따라 주요 추천, 소셜 인기 플레이, 재방문 가능 콘텐츠를 우선 배치합니다."
 
-#: apps/app/src/features/games/game-center-data.ts:325
+#: apps/app/src/features/games/game-center-data.ts:344
 msgid "更强调一起玩和容易转发的项目。"
 msgstr "함께 플레이하고 공유하기 쉬운 항목을 강조합니다."
 
-#: apps/app/src/features/games/game-center-data.ts:330
+#: apps/app/src/features/games/game-center-data.ts:349
 msgid "适合碎片时间继续"
 msgstr "짧은 시간 동안 계속하기 적합"
 
-#: apps/app/src/features/games/game-center-data.ts:331
+#: apps/app/src/features/games/game-center-data.ts:350
 msgid "放可以随时返回、继续经营或推进的项目。"
 msgstr "언제든 돌아와 계속 운영하거나 진행할 수 있는 프로젝트를 둡니다."
 
-#: apps/app/src/features/games/game-center-data.ts:340
+#: apps/app/src/features/games/game-center-data.ts:359
 #: apps/app/src/i18n/static-dom-seed.ts:280
 msgid "极光赛道带动本周冲榜热度。"
 msgstr "오로라 트랙이 이번 주 랭킹 열기를 이끌고 있습니다."
 
-#: apps/app/src/features/games/game-center-data.ts:345
+#: apps/app/src/features/games/game-center-data.ts:364
 #: apps/app/src/i18n/static-dom-seed.ts:230
 msgid "赛季任务更新后，小队匹配显著升温。"
 msgstr "시즌 작업 업데이트 후 스쿼드 매칭이 크게 활발해졌습니다."
 
-#: apps/app/src/features/games/game-center-data.ts:350
+#: apps/app/src/features/games/game-center-data.ts:369
 #: apps/app/src/i18n/static-dom-seed.ts:231
 msgid "双人同屏模式让社交传播继续放大。"
 msgstr "2인 동일 화면 모드가 소셜 확산을 더 키웁니다."
 
-#: apps/app/src/features/games/game-center-data.ts:358
+#: apps/app/src/features/games/game-center-data.ts:377
 #: apps/app/src/i18n/static-dom-seed.ts:232
 msgid "治愈感和布置玩法带动收藏率。"
 msgstr "힐링감과 배치 플레이가 저장률을 높입니다."
 
-#: apps/app/src/features/games/game-center-data.ts:363
+#: apps/app/src/features/games/game-center-data.ts:382
 #: apps/app/src/i18n/static-dom-seed.ts:233
 msgid "支线站点更新后回访率提升。"
 msgstr "지선 스테이션 업데이트 후 재방문율이 올랐습니다."
 
-#: apps/app/src/features/games/game-center-data.ts:368
+#: apps/app/src/features/games/game-center-data.ts:387
 #: apps/app/src/i18n/static-dom-seed.ts:234
 msgid "周末派对活动带来新一轮曝光。"
 msgstr "주말 파티 이벤트가 새 노출을 만듭니다."
 
-#: apps/app/src/features/games/game-center-data.ts:375
+#: apps/app/src/features/games/game-center-data.ts:394
 #: apps/app/src/i18n/static-dom-seed.ts:688
 msgid "林树"
 msgstr "Lin Shu"
 
-#: apps/app/src/features/games/game-center-data.ts:377
+#: apps/app/src/features/games/game-center-data.ts:396
 #: apps/app/src/i18n/static-dom-seed.ts:367
 msgid "刚打完一局晋级赛，正在拉人补位。"
 msgstr "방금 랭크전을 끝내고 인원을 보충 중입니다."
 
-#: apps/app/src/features/games/game-center-data.ts:382
+#: apps/app/src/features/games/game-center-data.ts:401
 #: apps/app/src/i18n/static-dom-seed.ts:685
 msgid "安澜"
 msgstr "Anlan"
 
-#: apps/app/src/features/games/game-center-data.ts:384
+#: apps/app/src/features/games/game-center-data.ts:403
 #: apps/app/src/i18n/static-dom-seed.ts:368
 msgid "夜市摊位升到 5 级，刚开了新的甜品档。"
 msgstr "야시장 노점이 5레벨이 되어 새 디저트 코너를 열었습니다."
 
-#: apps/app/src/features/games/game-center-data.ts:389
+#: apps/app/src/features/games/game-center-data.ts:408
 #: apps/app/src/i18n/static-dom-seed.ts:686
 msgid "陆回"
 msgstr "Luhui"
 
-#: apps/app/src/features/games/game-center-data.ts:391
+#: apps/app/src/features/games/game-center-data.ts:410
 #: apps/app/src/i18n/static-dom-seed.ts:369
 msgid "在约人打双人同屏，已经连胜 6 场。"
 msgstr "2인 동일 화면 플레이를 초대 중이며 이미 6연승입니다."
 
-#: apps/app/src/features/games/game-center-data.ts:396
+#: apps/app/src/features/games/game-center-data.ts:415
 #: apps/app/src/i18n/static-dom-seed.ts:687
 msgid "言初"
 msgstr "Yanchu"
 
-#: apps/app/src/features/games/game-center-data.ts:398
+#: apps/app/src/features/games/game-center-data.ts:417
 #: apps/app/src/i18n/static-dom-seed.ts:371
 msgid "刚把春季家具摆完，准备截图发朋友圈。"
 msgstr "봄 가구 배치를 마치고 모멘트에 올릴 스크린샷을 준비 중입니다."
 
-#: apps/app/src/features/games/game-center-data.ts:406
+#: apps/app/src/features/games/game-center-data.ts:425
 #: apps/app/src/i18n/static-dom-seed.ts:281
 msgid "信号小队 S2 赛季开启"
 msgstr "시그널 스쿼드 S2 시즌 시작"
 
-#: apps/app/src/features/games/game-center-data.ts:407
+#: apps/app/src/features/games/game-center-data.ts:426
 #: apps/app/src/i18n/static-dom-seed.ts:245
 msgid "完成周任务可解锁全队共享外观和回放徽章。"
 msgstr "주간 작업을 완료하면 팀 공유 외형과 리플레이 배지를 해제할 수 있습니다."
 
-#: apps/app/src/features/games/game-center-data.ts:408
+#: apps/app/src/features/games/game-center-data.ts:427
 #: apps/app/src/i18n/static-dom-seed.ts:467
 msgid "今天 20:00 开始"
 msgstr "오늘 20:00 시작"
 
-#: apps/app/src/features/games/game-center-data.ts:409
+#: apps/app/src/features/games/game-center-data.ts:428
 #: apps/app/src/i18n/static-dom-seed.ts:246
 msgid "去做任务"
 msgstr "작업하러 가기"
 
-#: apps/app/src/features/games/game-center-data.ts:416
+#: apps/app/src/features/games/game-center-data.ts:435
 #: apps/app/src/i18n/static-dom-seed.ts:282
 msgid "夜市合伙人周末客流翻倍"
 msgstr "야시장 파트너 주말 유입 두 배"
 
-#: apps/app/src/features/games/game-center-data.ts:417
+#: apps/app/src/features/games/game-center-data.ts:436
 #: apps/app/src/i18n/static-dom-seed.ts:284
 msgid "指定时段营业收益翻倍，适合回流和好友互访。"
 msgstr "지정 시간대 매출이 두 배가 되어 복귀와 친구 방문에 좋습니다."
 
-#: apps/app/src/features/games/game-center-data.ts:418
+#: apps/app/src/features/games/game-center-data.ts:437
 #: apps/app/src/i18n/static-dom-seed.ts:285
 msgid "周五 - 周日"
 msgstr "금요일 - 일요일"
 
-#: apps/app/src/features/games/game-center-data.ts:419
+#: apps/app/src/features/games/game-center-data.ts:438
 msgid "预约提醒"
 msgstr "예약 알림"
 
-#: apps/app/src/features/games/game-center-data.ts:426
+#: apps/app/src/features/games/game-center-data.ts:445
 #: apps/app/src/i18n/static-dom-seed.ts:286
 msgid "岛屿演唱会海风舞台返场"
 msgstr "섬 콘서트 바닷바람 무대 복귀"
 
-#: apps/app/src/features/games/game-center-data.ts:427
+#: apps/app/src/features/games/game-center-data.ts:446
 #: apps/app/src/i18n/static-dom-seed.ts:287
 msgid "邀请两位好友合奏可解锁限定海报。"
 msgstr "친구 두 명을 초대해 합주하면 한정 포스터를 해제할 수 있습니다."
 
-#: apps/app/src/features/games/game-center-data.ts:428
+#: apps/app/src/features/games/game-center-data.ts:447
 #: apps/app/src/i18n/static-dom-seed.ts:288
 msgid "限时 3 天"
 msgstr "3일 한정"
 
-#: apps/app/src/features/games/game-center-data.ts:429
+#: apps/app/src/features/games/game-center-data.ts:448
 #: apps/app/src/i18n/static-dom-seed.ts:289
 msgid "立即参加"
 msgstr "지금 참여"
 
-#: apps/app/src/features/games/game-center-data.ts:514
+#: apps/app/src/features/games/game-center-data.ts:533
 msgid "任务中"
 msgstr "작업 중"
 
-#: apps/app/src/features/games/game-center-data.ts:516
+#: apps/app/src/features/games/game-center-data.ts:535
 #: apps/app/src/i18n/static-dom-seed.ts:283
 msgid "已预约"
 msgstr "예약됨"
 
-#: apps/app/src/features/games/game-center-data.ts:518
+#: apps/app/src/features/games/game-center-data.ts:537
 msgid "已参加"
 msgstr "참여 완료"
 
@@ -15615,6 +15688,7 @@ msgid "赛季徽章 {0} · 团队积分 {1}"
 msgstr "赛季徽章 {0} · 团队积分 {1}"
 
 #: apps/app/src/features/games/signal-squad/signal-squad-game.tsx:379
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:242
 msgid "再来一局"
 msgstr "再来一局"
 
@@ -15821,6 +15895,57 @@ msgstr "最佳圈速 {0}"
 #: apps/app/src/features/games/sky-rally/sky-rally-game.tsx:383
 msgid "回到选赛道"
 msgstr "回到选赛道"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:95
+msgid "已静音"
+msgstr "음소거"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:95
+msgid "音效开"
+msgstr "효과음 ON"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:139
+msgid "P1: WASD + J 开火 / P2: 方向键 + / 开火"
+msgstr "P1: WASD + J / P2: 방향키 + /"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:140
+msgid "方向键 / WASD 移动，J / 空格开火，P 暂停"
+msgstr "방향키/WASD 이동, J/스페이스 발사, P 일시정지"
+
+#. placeholder {0}: hud.stage
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:154
+msgid "第 {0} 关"
+msgstr "스테이지 {0}"
+
+#. placeholder {0}: hud.enemyRemaining
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:157
+msgid "敌剩 {0}"
+msgstr "남은 적 {0}"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:190
+msgid "Game Over"
+msgstr "게임 오버"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:193
+msgid "恭喜过关，进入下一关"
+msgstr "스테이지 클리어! 다음으로"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:205
+msgid "单人"
+msgstr "싱글"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:219
+msgid "选关:"
+msgstr "스테이지 선택:"
+
+#. placeholder {0}: hud.maxUnlockedStage
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:233
+msgid "已解锁 {0} / 35"
+msgstr "{0} / 35 해금됨"
+
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:250
+msgid "下一关"
+msgstr "다음 스테이지"
 
 #: apps/app/src/features/mini-programs/group-relay-card.ts:67
 msgid "首次回填"
