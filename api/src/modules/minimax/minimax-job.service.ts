@@ -266,6 +266,17 @@ export class MinimaxJobService {
     }
 
     if (job.status === 'pending') {
+      // Pre-flight：今天该 model 已被 minimax 服务端确认耗尽（前一个 job 撞过 2056），
+      // 直接 markFailed 不再提交。明天 0:00 (Shanghai) usageDate 翻新自然恢复。
+      // 否则同一队列里堆积的 pending job 会逐个撞一次 2056、白白吃 callCount + quotaLimitedCount。
+      if (await this.quota.isExhaustedToday(job.model)) {
+        await this.markFailed(
+          job,
+          'MINIMAX_QUOTA_EXHAUSTED',
+          `${job.model} daily quota exhausted; deferred until next Shanghai day`,
+        );
+        return;
+      }
       try {
         let firstFrameImageUrl: string | undefined =
           payload.firstFrameImageUrl ?? undefined;
@@ -454,6 +465,15 @@ export class MinimaxJobService {
     }
 
     if (job.status === 'pending') {
+      // 同 video：今日已耗尽就直接失败，避免队列里残留 pending 接力撞 2056。
+      if (await this.quota.isExhaustedToday(job.model)) {
+        await this.markFailed(
+          job,
+          'MINIMAX_QUOTA_EXHAUSTED',
+          `${job.model} daily quota exhausted; deferred until next Shanghai day`,
+        );
+        return;
+      }
       try {
         const result = await this.client.generateMusic({
           model: job.model as MinimaxMusicModel,
