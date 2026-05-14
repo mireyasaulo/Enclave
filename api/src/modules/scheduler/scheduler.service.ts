@@ -1901,12 +1901,25 @@ export class SchedulerService {
 
       // 尝试为这条朋友圈配 1 张 AI 方图。3 层约束：world 内角色动态优先级均分
       // → image-01 三态配额 → API 实时熔断；任何一步失败都安全回退为纯文本。
-      const imageMedia = await this.momentsService.tryGenerateMomentImage(
-        char.id,
-        char.name,
-        text,
-        runtimeProfile,
-      );
+      //
+      // 跳过：
+      //   - 提醒角色（reminderMoment）：晚安/喝水/番茄钟类系统消息，配图无意义
+      //   - 新闻简报（options.generationKind）：内容是真实新闻摘要，AI 图会
+      //     乱编画面误导
+      //   - 外部预设文案（options.text）：调用方传入固定文案的特殊路径，
+      //     这种 call site 通常不希望被自动加图
+      const isSpecialMomentKind =
+        Boolean(reminderMoment) ||
+        Boolean(options?.text) ||
+        Boolean(options?.generationKind);
+      const imageMedia = isSpecialMomentKind
+        ? null
+        : await this.momentsService.tryGenerateMomentImage(
+            char.id,
+            char.name,
+            text,
+            runtimeProfile,
+          );
 
       const post = this.momentPostRepo.create({
         authorId: char.id,

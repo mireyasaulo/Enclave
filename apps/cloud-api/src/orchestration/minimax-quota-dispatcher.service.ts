@@ -17,6 +17,7 @@ const PER_KEY_DAILY_TOTAL = {
   music25: 4,
   image01: 120,
   lyrics: 100,
+  speechHd: 11000,
 } as const;
 
 // "世界角色朋友圈自动配图"专用日上限（用途配额，**仍占 image01 model 总额**）。
@@ -30,6 +31,7 @@ export type WorldDailyShare = {
   music25: number;
   image01: number;
   lyrics: number;
+  speechHd: number;
   feedImage: number;
 };
 
@@ -105,6 +107,7 @@ export class MinimaxQuotaDispatcherService {
       music25:    this.shareFor(PER_KEY_DAILY_TOTAL.music25,    groupSize, myIndex, dayOfYear),
       image01:    this.shareFor(PER_KEY_DAILY_TOTAL.image01,    groupSize, myIndex, dayOfYear),
       lyrics:     this.shareFor(PER_KEY_DAILY_TOTAL.lyrics,     groupSize, myIndex, dayOfYear),
+      speechHd:   this.shareFor(PER_KEY_DAILY_TOTAL.speechHd,   groupSize, myIndex, dayOfYear),
       feedImage:  this.shareFor(feedImageGlobal, allWorldsGroupSize, allWorldsMyIndex, dayOfYear),
     };
 
