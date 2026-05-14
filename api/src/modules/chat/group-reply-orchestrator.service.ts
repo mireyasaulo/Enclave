@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { sanitizeAiText } from '../ai/ai-text-sanitizer';
 import { AiOrchestratorService } from '../ai/ai-orchestrator.service';
 import { type ChatMessage } from '../ai/ai.types';
+import { CharactersService } from '../characters/characters.service';
 import { WorldLanguageService } from '../config/world-language.service';
 import {
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
@@ -23,6 +24,7 @@ export class GroupReplyOrchestratorService {
   constructor(
     private readonly ai: AiOrchestratorService,
     private readonly worldLanguage: WorldLanguageService,
+    private readonly characters: CharactersService,
   ) {}
 
   async generateTaskReply(input: {
@@ -191,7 +193,10 @@ export class GroupReplyOrchestratorService {
     characterId: string;
     promptText: string;
   }): Promise<AssistantReplyModalitiesPlan> {
-    const wantsVoice = shouldCreateVoiceReplyFromText(input.promptText);
+    const character = await this.characters.findById(input.characterId);
+    const defaultVoiceReply = character?.defaultVoiceReply === true;
+    const wantsVoice =
+      defaultVoiceReply || shouldCreateVoiceReplyFromText(input.promptText);
     const requestedImagePrompt = extractRequestedImagePrompt({
       type: 'text',
       text: input.promptText,

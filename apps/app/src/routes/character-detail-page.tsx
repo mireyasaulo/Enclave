@@ -15,6 +15,7 @@ import {
   markFollowupRecommendationChatStarted,
   markFollowupRecommendationFriendRequestPending,
   sendFriendRequest,
+  setCharacterDefaultVoiceReply,
   setConversationMuted,
   setConversationPinned,
   setFriendStarred,
@@ -39,6 +40,7 @@ import { buildMobileChatRouteHash } from "../features/chat/mobile-chat-route-sta
 import { useDigitalHumanEntryGuard } from "../features/chat/use-digital-human-entry-guard";
 import { MobileDetailsActionSheet } from "../features/chat-details/mobile-details-action-sheet";
 import { ContactDetailPane } from "../features/contacts/contact-detail-pane";
+import { invalidateFriendDisplayQueries } from "../features/contacts/invalidate-friend-display";
 import {
   buildCharacterDetailRouteHash,
   parseCharacterDetailRouteState,
@@ -574,6 +576,21 @@ export function CharacterDetailPage() {
       });
     },
   });
+  const setDefaultVoiceReplyMutation = useMutation({
+    mutationFn: (enabled: boolean) =>
+      setCharacterDefaultVoiceReply(characterId, enabled, baseUrl),
+    onSuccess: async (_, enabled) => {
+      setNotice({
+        tone: "success",
+        message: enabled
+          ? t(msg`已开启默认语音回复（消耗 token plan 配额）。`)
+          : t(msg`已关闭默认语音回复。`),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["app-character", baseUrl, characterId],
+      });
+    },
+  });
   const pinMutation = useMutation({
     mutationFn: async (pinned: boolean) => {
       const conversationId =
@@ -625,9 +642,7 @@ export function CharacterDetailPage() {
         message: t(msg`朋友资料已更新。`),
       });
       setIsEditingProfile(false);
-      await queryClient.invalidateQueries({
-        queryKey: ["app-friends", baseUrl],
-      });
+      await invalidateFriendDisplayQueries(queryClient, baseUrl);
     },
   });
   const blockMutation = useMutation({
@@ -1793,6 +1808,17 @@ export function CharacterDetailPage() {
                   compact={!isDesktopLayout}
                 />
               ) : null}
+              <ProfileSwitchRow
+                label={t(msg`默认用语音回复`)}
+                checked={character.defaultVoiceReply ?? false}
+                onToggle={() =>
+                  setDefaultVoiceReplyMutation.mutate(
+                    !(character.defaultVoiceReply ?? false),
+                  )
+                }
+                disabled={setDefaultVoiceReplyMutation.isPending}
+                compact={!isDesktopLayout}
+              />
               <ProfileRow
                 label={isBlocked ? t(msg`移出黑名单`) : t(msg`加入黑名单`)}
                 value={

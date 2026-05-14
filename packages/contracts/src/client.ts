@@ -1824,6 +1824,21 @@ export function deleteCharacter(id: string, baseUrl?: string) {
   );
 }
 
+export function setCharacterDefaultVoiceReply(
+  id: string,
+  enabled: boolean,
+  baseUrl?: string,
+) {
+  return requestLegacyApi<{ id: string; defaultVoiceReply: boolean }>(
+    `/characters/${id}/default-voice-reply`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ enabled }),
+    },
+    baseUrl,
+  );
+}
+
 /**
  * Tenant-facing：从 wiki 导出的 JSON bundle 导入私有角色到当前 world，
  * 按 name upsert。同名→覆盖；新名→新建并自动建 friendship。

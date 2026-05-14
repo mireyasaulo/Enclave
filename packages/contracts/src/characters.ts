@@ -311,6 +311,7 @@ export interface Character {
   allowOwnerKeyOverride?: boolean;
   modelRoutingNotes?: string | null;
   region?: string | null;
+  defaultVoiceReply?: boolean;
 }
 
 export interface CharacterPresetSummary {

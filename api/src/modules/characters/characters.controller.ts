@@ -77,6 +77,28 @@ export class CharactersController {
     return { success: true };
   }
 
+  // 用户可切换某角色的"默认用语音回复"开关。
+  // 开启后所有 assistant 回复都自动转 TTS（受 speech-02-hd token plan 配额节流）。
+  // 非 admin 端点：登录用户可以为自己看到的任意角色翻这个开关。
+  @Patch(':id/default-voice-reply')
+  @UseGuards(JwtAuthGuard)
+  async setDefaultVoiceReply(
+    @Param('id') id: string,
+    @Body() body: { enabled: boolean },
+  ) {
+    const existing = await this.charactersService.findById(id);
+    if (!existing) {
+      throw new AppError('CHARACTER_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        params: { id },
+        legacyMessage: `Character ${id} not found`,
+      });
+    }
+    existing.defaultVoiceReply = Boolean(body?.enabled);
+    await this.charactersService.upsert(existing);
+    return { id, defaultVoiceReply: existing.defaultVoiceReply };
+  }
+
   /**
    * Tenant-facing 导入端点：接收 wiki "我的私有角色" 导出 JSON，按 name upsert
    * 到 characters 表，并自动为 world-owner 建 friendship。
