@@ -30,6 +30,7 @@ import { AppEvents, EventBusService } from '../events/event-bus.service';
 import { CyberAvatarService } from '../cyber-avatar/cyber-avatar.service';
 import { WorldLanguageService } from '../config/world-language.service';
 import { addDays, formatLocalDate, getSparkTier } from './spark-utils';
+import { InitialMessageService } from './initial-message.service';
 
 const ACTIVE_FRIENDSHIP_STATUSES = new Set(['friend', 'close', 'best']);
 export const DEFAULT_FRIENDSHIP_CHARACTER_IDS = [...DEFAULT_CHARACTER_IDS];
@@ -55,6 +56,7 @@ export class SocialService {
     private readonly cyberAvatar: CyberAvatarService,
     private readonly eventBus: EventBusService,
     private readonly worldLanguage: WorldLanguageService,
+    private readonly initialMessageService: InitialMessageService,
   ) {}
 
   async getPendingRequests(
@@ -375,6 +377,8 @@ export class SocialService {
       }
 
       await this.narrativeService.ensureArc(character.id, character.name);
+
+      this.initialMessageService.scheduleIfNeeded(resolvedOwnerId, character);
     }
   }
 
