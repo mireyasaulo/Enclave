@@ -7,6 +7,7 @@ import { CloudMinimaxCallHourlyEntity } from "../entities/cloud-minimax-call-hou
 import { CloudConfigEntity } from "../entities/cloud-config.entity";
 import { CloudFeedbackEntity } from "../entities/cloud-feedback.entity";
 import { CloudInstanceEntity } from "../entities/cloud-instance.entity";
+import { CloudLoginAttemptEntity } from "../entities/cloud-login-attempt.entity";
 import { CloudTokenPricingCatalogEntity } from "../entities/cloud-token-pricing-catalog.entity";
 import { CloudTokenUsageBreakdownDailyEntity } from "../entities/cloud-token-usage-breakdown-daily.entity";
 import { CloudTokenUsageBudgetEntity } from "../entities/cloud-token-usage-budget.entity";
@@ -52,6 +53,7 @@ import { CreateCloudUserOAuthIdentities1776657600000 } from "./migrations/177665
 import { AddCloudUserLastLoginIp1776658200000 } from "./migrations/1776658200000-add-cloud-user-last-login-ip";
 import { CreateCloudMinimaxCallHourly1778656680404 } from "./migrations/1778656680404-create-cloud-minimax-call-hourly";
 import { SplitMinimaxRateColumns1778660000000 } from "./migrations/1778660000000-split-minimax-rate-columns";
+import { AddCloudUserPassword1778660500000 } from "./migrations/1778660500000-add-cloud-user-password";
 import { resolveCloudDatabasePath } from "../config/cloud-runtime-config";
 
 type ConfigReader = {
@@ -70,6 +72,7 @@ export const cloudEntities = [
   WorldLifecycleJobEntity,
   CloudUserEntity,
   CloudUserOAuthIdentityEntity,
+  CloudLoginAttemptEntity,
   SubscriptionPlanEntity,
   UserSubscriptionEntity,
   InviteCodeEntity,
@@ -114,6 +117,7 @@ export const cloudMigrations = [
   AddCloudUserLastLoginIp1776658200000,
   CreateCloudMinimaxCallHourly1778656680404,
   SplitMinimaxRateColumns1778660000000,
+  AddCloudUserPassword1778660500000,
 ];
 
 export function buildCloudDataSourceOptions(config: ConfigReader): DataSourceOptions {

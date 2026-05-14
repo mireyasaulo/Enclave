@@ -72,6 +72,7 @@ export class PhoneAuthService {
       inviteCode?: string | null;
       deviceFingerprint?: string | null;
       ip?: string | null;
+      setPasswordOnRegister?: string | null;
     },
   ): Promise<VerifyPhoneCodeResponse> {
     const normalizedPhone = this.normalizePhone(phone);
@@ -160,13 +161,13 @@ export class PhoneAuthService {
   }
 
   private userPostVerifyHook:
-    | ((phone: string, extras: { inviteCode?: string | null; deviceFingerprint?: string | null; ip?: string | null }) => Promise<void>)
+    | ((phone: string, extras: { inviteCode?: string | null; deviceFingerprint?: string | null; ip?: string | null; setPasswordOnRegister?: string | null }) => Promise<void>)
     | null = null;
 
   registerPostVerifyHook(
     hook: (
       phone: string,
-      extras: { inviteCode?: string | null; deviceFingerprint?: string | null; ip?: string | null },
+      extras: { inviteCode?: string | null; deviceFingerprint?: string | null; ip?: string | null; setPasswordOnRegister?: string | null },
     ) => Promise<void>,
   ) {
     this.userPostVerifyHook = hook;

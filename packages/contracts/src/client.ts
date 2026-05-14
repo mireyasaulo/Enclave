@@ -37,6 +37,11 @@ import type {
   CreateCloudWorldRequest,
   ResolveWorldAccessRequest,
   ResolveWorldAccessResponse,
+  ChangePasswordRequest,
+  ChangePasswordResponse,
+  LoginWithPasswordRequest,
+  LoginWithPasswordResponse,
+  SendChangePasswordCodeResponse,
   SendEmailCodeRequest,
   SendEmailCodeResponse,
   SendPhoneCodeRequest,
@@ -1203,6 +1208,46 @@ export function verifyCloudGoogleIdToken(
       method: "POST",
       body: JSON.stringify(payload),
     },
+    baseUrl,
+  );
+}
+
+export function loginCloudWithPassword(
+  payload: LoginWithPasswordRequest,
+  baseUrl?: string,
+) {
+  return requestCloudApi<LoginWithPasswordResponse>(
+    "/cloud/auth/login-with-password",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
+export function sendCloudChangePasswordCode(
+  accessToken: string,
+  baseUrl?: string,
+) {
+  return requestCloudApi<SendChangePasswordCodeResponse>(
+    "/cloud/auth/password/send-change-code",
+    buildCloudAuthHeaders(accessToken, { method: "POST" }),
+    baseUrl,
+  );
+}
+
+export function changeCloudPassword(
+  payload: ChangePasswordRequest,
+  accessToken: string,
+  baseUrl?: string,
+) {
+  return requestCloudApi<ChangePasswordResponse>(
+    "/cloud/auth/password/change",
+    buildCloudAuthHeaders(accessToken, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
     baseUrl,
   );
 }

@@ -198,6 +198,13 @@ export class VerifyCodeDto {
   @IsString({ message: "clientReportedIp 必须是字符串。" })
   @MaxLength(45, { message: "clientReportedIp 不能超过 45 个字符。" })
   clientReportedIp?: string;
+
+  // 仅注册时一并设置初始密码（老用户登录时即便带上也会被后端忽略）。
+  @IsOptional()
+  @IsString({ message: "setPasswordOnRegister 必须是字符串。" })
+  @MinLength(8, { message: "密码长度不能少于 8 位。" })
+  @MaxLength(32, { message: "密码长度不能超过 32 位。" })
+  setPasswordOnRegister?: string;
 }
 
 export class RedeemInviteDto {
@@ -248,6 +255,53 @@ export class VerifyEmailCodeDto {
   @IsString({ message: "clientReportedIp 必须是字符串。" })
   @MaxLength(45, { message: "clientReportedIp 不能超过 45 个字符。" })
   clientReportedIp?: string;
+
+  @IsOptional()
+  @IsString({ message: "setPasswordOnRegister 必须是字符串。" })
+  @MinLength(8, { message: "密码长度不能少于 8 位。" })
+  @MaxLength(32, { message: "密码长度不能超过 32 位。" })
+  setPasswordOnRegister?: string;
+}
+
+export class LoginWithPasswordDto {
+  @Transform(trimString)
+  @IsIn(["phone", "email"], { message: "identifierKind 必须是 phone 或 email。" })
+  identifierKind: "phone" | "email";
+
+  @Transform(trimString)
+  @IsString({ message: "identifier 必须是字符串。" })
+  @MinLength(1, { message: "identifier 不能为空。" })
+  @MaxLength(254, { message: "identifier 不能超过 254 个字符。" })
+  identifier: string;
+
+  @IsString({ message: "password 必须是字符串。" })
+  @MinLength(1, { message: "password 不能为空。" })
+  @MaxLength(64, { message: "password 不能超过 64 个字符。" })
+  password: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString({ message: "deviceFingerprint 必须是字符串。" })
+  @MinLength(1, { message: "deviceFingerprint 不能为空。" })
+  @MaxLength(128, { message: "deviceFingerprint 不能超过 128 个字符。" })
+  deviceFingerprint?: string;
+
+  @Transform(trimString)
+  @IsOptional()
+  @IsString({ message: "clientReportedIp 必须是字符串。" })
+  @MaxLength(45, { message: "clientReportedIp 不能超过 45 个字符。" })
+  clientReportedIp?: string;
+}
+
+export class ChangePasswordDto {
+  @Transform(trimString)
+  @Matches(CODE_PATTERN, { message: "code 格式不正确。" })
+  code: string;
+
+  @IsString({ message: "newPassword 必须是字符串。" })
+  @MinLength(8, { message: "密码长度不能少于 8 位。" })
+  @MaxLength(32, { message: "密码长度不能超过 32 位。" })
+  newPassword: string;
 }
 
 export class VerifyGoogleIdTokenDto {

@@ -15,6 +15,7 @@ import {
   DEFAULT_CORE_API_BASE_URL,
   getMyCloudWorldAccessSession,
   getWorldOwner,
+  loginCloudWithPassword,
   resolveMyCloudWorldAccess,
   sendCloudEmailCode,
   sendCloudPhoneCode,
@@ -281,6 +282,9 @@ export function WelcomePage() {
   const [code, setCode] = useState("");
   const [accountType, setAccountType] = useState<"phone" | "email">("email");
   const [email, setEmail] = useState("");
+  const [authMethod, setAuthMethod] = useState<"code" | "password">("code");
+  const [password, setPassword] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
   const [cloudAccessToken, setCloudAccessToken] = useState(
     !isCloudSessionExpired(savedCloudExpiresAt) ? savedCloudAccessToken ?? "" : "",
   );
@@ -755,9 +759,15 @@ export function WelcomePage() {
       return;
     }
 
-    if (!cloudAccessToken && !code.trim()) {
-      setEntryError(t(msg`请输入验证码。`));
-      return;
+    if (!cloudAccessToken) {
+      if (authMethod === "code" && !code.trim()) {
+        setEntryError(t(msg`请输入验证码。`));
+        return;
+      }
+      if (authMethod === "password" && !password) {
+        setEntryError(t(msg`请输入密码。`));
+        return;
+      }
     }
 
     setIsContinuing(true);
@@ -775,7 +785,57 @@ export function WelcomePage() {
         const inviteCodePayload =
           authMode === "register" && inviteCode ? inviteCode : undefined;
         const clientReportedIp = (await detectClientPublicIp()) ?? undefined;
-        if (accountType === "email") {
+        // 注册时一并设置密码，仅在 code 通道 + register + 用户主动填写时启用。
+        const setPasswordOnRegister =
+          authMethod === "code" &&
+          authMode === "register" &&
+          registerPassword.trim()
+            ? registerPassword
+            : undefined;
+
+        if (authMethod === "password") {
+          const verifyResult = await loginCloudWithPassword(
+            {
+              identifierKind: accountType,
+              identifier:
+                accountType === "email"
+                  ? email.trim().toLowerCase()
+                  : phone.trim(),
+              password,
+              deviceFingerprint: getDeviceFingerprint(),
+              clientReportedIp,
+            },
+            normalizedCloudApiBaseUrl || undefined,
+          );
+          accessToken = verifyResult.accessToken;
+          const identityKey =
+            accountType === "email"
+              ? `email:${verifyResult.email ?? email.trim().toLowerCase()}`
+              : `phone:${verifyResult.phone}`;
+          await assertOwnerIdentity(identityKey, { queryClient });
+          if (accountType === "email") {
+            verifiedPhone = "";
+            setEmail(verifyResult.email ?? email.trim().toLowerCase());
+            saveCloudSession({
+              accessToken: verifyResult.accessToken,
+              expiresAt: verifyResult.expiresAt,
+              phone: null,
+              profile: null,
+            });
+          } else {
+            verifiedPhone = verifyResult.phone;
+            setPhone(verifyResult.phone);
+            saveCloudSession({
+              accessToken: verifyResult.accessToken,
+              expiresAt: verifyResult.expiresAt,
+              phone: verifyResult.phone,
+              profile: null,
+            });
+          }
+          setCloudAccessToken(verifyResult.accessToken);
+          verifySucceeded = true;
+          track("login_success", { method: `${accountType}-password` });
+        } else if (accountType === "email") {
           const verifyResult = await verifyCloudEmailCode(
             {
               email: email.trim().toLowerCase(),
@@ -783,6 +843,7 @@ export function WelcomePage() {
               inviteCode: inviteCodePayload,
               deviceFingerprint: getDeviceFingerprint(),
               clientReportedIp,
+              setPasswordOnRegister,
             },
             normalizedCloudApiBaseUrl || undefined,
           );
@@ -812,6 +873,7 @@ export function WelcomePage() {
               inviteCode: inviteCodePayload,
               deviceFingerprint: getDeviceFingerprint(),
               clientReportedIp,
+              setPasswordOnRegister,
             },
             normalizedCloudApiBaseUrl || undefined,
           );
@@ -1037,50 +1099,121 @@ export function WelcomePage() {
             </label>
           )}
 
-          <div className="space-y-2">
-            <span className="block text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
-              {t(msg`验证码`)}
-            </span>
-            <div className="flex items-center gap-3">
-              <div className="min-w-0 flex-1">
-                <TextField
-                  value={code}
-                  onChange={(event) => {
-                    setCode(event.target.value);
-                    setEntryError("");
-                  }}
-                  placeholder={
-                    accountType === "phone"
-                      ? t(msg`请输入验证码（默认 123456 即可通过）`)
-                      : t(msg`请输入邮箱收到的 6 位验证码`)
-                  }
-                />
-              </div>
-              <Button
-                onClick={() =>
-                  accountType === "phone"
-                    ? sendCodeMutation.mutate()
-                    : sendEmailCodeMutation.mutate()
-                }
-                disabled={
-                  accountType === "phone"
-                    ? !phone.trim() || sendCodeMutation.isPending
-                    : !email.trim() || sendEmailCodeMutation.isPending
-                }
-                variant="secondary"
-                size="lg"
-                className="shrink-0 rounded-2xl border-black/5 bg-[#f5f5f5] px-5 shadow-none hover:border-[rgba(7,193,96,0.16)] hover:bg-white"
-              >
-                {(
-                  accountType === "phone"
-                    ? sendCodeMutation.isPending
-                    : sendEmailCodeMutation.isPending
-                )
-                  ? t(msg`发送中...`)
-                  : t(msg`发送验证码`)}
-              </Button>
-            </div>
+          <div className="flex items-center gap-2 rounded-2xl bg-[#f5f5f5] p-1">
+            <Button
+              onClick={() => {
+                setAuthMethod("code");
+                setEntryError("");
+              }}
+              variant={authMethod === "code" ? "primary" : "ghost"}
+              size="md"
+              className={`flex-1 rounded-xl shadow-none ${
+                authMethod === "code"
+                  ? "bg-white text-[color:var(--text-primary)] hover:bg-white"
+                  : "bg-transparent hover:bg-transparent"
+              }`}
+            >
+              {t(msg`使用验证码登录`)}
+            </Button>
+            <Button
+              onClick={() => {
+                setAuthMethod("password");
+                // 密码登录与注册无关，强制切回 login 模式避免误传 inviteCode。
+                if (authMode !== "login") setAuthMode("login");
+                setEntryError("");
+              }}
+              variant={authMethod === "password" ? "primary" : "ghost"}
+              size="md"
+              className={`flex-1 rounded-xl shadow-none ${
+                authMethod === "password"
+                  ? "bg-white text-[color:var(--text-primary)] hover:bg-white"
+                  : "bg-transparent hover:bg-transparent"
+              }`}
+            >
+              {t(msg`使用密码登录`)}
+            </Button>
           </div>
+
+          {authMethod === "code" ? (
+            <div className="space-y-2">
+              <span className="block text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+                {t(msg`验证码`)}
+              </span>
+              <div className="flex items-center gap-3">
+                <div className="min-w-0 flex-1">
+                  <TextField
+                    value={code}
+                    onChange={(event) => {
+                      setCode(event.target.value);
+                      setEntryError("");
+                    }}
+                    placeholder={
+                      accountType === "phone"
+                        ? t(msg`请输入验证码（默认 123456 即可通过）`)
+                        : t(msg`请输入邮箱收到的 6 位验证码`)
+                    }
+                  />
+                </div>
+                <Button
+                  onClick={() =>
+                    accountType === "phone"
+                      ? sendCodeMutation.mutate()
+                      : sendEmailCodeMutation.mutate()
+                  }
+                  disabled={
+                    accountType === "phone"
+                      ? !phone.trim() || sendCodeMutation.isPending
+                      : !email.trim() || sendEmailCodeMutation.isPending
+                  }
+                  variant="secondary"
+                  size="lg"
+                  className="shrink-0 rounded-2xl border-black/5 bg-[#f5f5f5] px-5 shadow-none hover:border-[rgba(7,193,96,0.16)] hover:bg-white"
+                >
+                  {(
+                    accountType === "phone"
+                      ? sendCodeMutation.isPending
+                      : sendEmailCodeMutation.isPending
+                  )
+                    ? t(msg`发送中...`)
+                    : t(msg`发送验证码`)}
+                </Button>
+              </div>
+              {authMode === "register" ? (
+                <label className="block space-y-2 pt-2">
+                  <span className="text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+                    {t(msg`设置登录密码（选填）`)}
+                  </span>
+                  <TextField
+                    type="password"
+                    value={registerPassword}
+                    onChange={(event) => {
+                      setRegisterPassword(event.target.value);
+                      setEntryError("");
+                    }}
+                    placeholder={t(msg`8-32 位，包含字母和数字`)}
+                  />
+                </label>
+              ) : null}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <span className="block text-xs uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+                {t(msg`密码`)}
+              </span>
+              <TextField
+                type="password"
+                value={password}
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                  setEntryError("");
+                }}
+                placeholder={t(msg`请输入密码`)}
+              />
+              <span className="block pt-1 text-xs text-[color:var(--text-muted)]">
+                {t(msg`忘记密码？请用验证码登录后到设置页修改`)}
+              </span>
+            </div>
+          )}
 
           {showGoogleButton ? (
             <div className="space-y-3">

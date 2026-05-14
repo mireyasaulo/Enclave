@@ -779,6 +779,7 @@ msgstr "Send original (Cmd/Ctrl+Enter)"
 #: apps/app/src/components/chat-composer.tsx:5381
 #: apps/app/src/components/mobile-chat-attachment-preview.tsx:109
 #: apps/app/src/components/moment-comment-composer.tsx:33
+#: apps/app/src/features/account-security/account-security-panel.tsx:175
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1519
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:951
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:114
@@ -787,7 +788,7 @@ msgstr "Send original (Cmd/Ctrl+Enter)"
 #: apps/app/src/routes/character-detail-page.tsx:299
 #: apps/app/src/routes/discover-page.tsx:1037
 #: apps/app/src/routes/mobile-add-friend-page.tsx:705
-#: apps/app/src/routes/welcome-page.tsx:1065
+#: apps/app/src/routes/welcome-page.tsx:1177
 msgid "发送中..."
 msgstr "Sending..."
 
@@ -2008,7 +2009,7 @@ msgstr " file(s)"
 
 #: apps/app/src/components/chat-message-list.tsx:5124
 #: apps/app/src/components/moment-compose-media-preview.tsx:119
-#: apps/app/src/components/moment-media-gallery.tsx:180
+#: apps/app/src/components/moment-media-gallery.tsx:183
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1177
 #: apps/app/src/i18n/static-dom-seed.ts:862
 #: apps/app/src/routes/channel-author-page.tsx:230
@@ -2339,7 +2340,7 @@ msgstr "Untitled note"
 #: apps/app/src/routes/profile-moments-page.tsx:539
 #: apps/app/src/routes/profile-settings-language-page.tsx:49
 #: apps/app/src/routes/profile-subscription-page.tsx:493
-#: apps/app/src/routes/welcome-page.tsx:1310
+#: apps/app/src/routes/welcome-page.tsx:1457
 msgid "返回"
 msgstr "Back"
 
@@ -3077,8 +3078,8 @@ msgstr ", you can add {remainingCount} more."
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:273
 #: apps/app/src/components/moment-compose-media-preview.tsx:276
-#: apps/app/src/components/moment-media-gallery.tsx:518
-#: apps/app/src/components/moment-media-gallery.tsx:525
+#: apps/app/src/components/moment-media-gallery.tsx:521
+#: apps/app/src/components/moment-media-gallery.tsx:528
 #: apps/app/src/i18n/static-dom-seed.ts:866
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1022
 msgid "关闭图片预览"
@@ -3086,17 +3087,17 @@ msgstr "Close image preview"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:281
 #: apps/app/src/components/moment-compose-media-preview.tsx:293
-#: apps/app/src/components/moment-media-gallery.tsx:230
-#: apps/app/src/components/moment-media-gallery.tsx:436
-#: apps/app/src/components/moment-media-gallery.tsx:531
-#: apps/app/src/components/moment-media-gallery.tsx:543
-#: apps/app/src/components/moment-media-gallery.tsx:641
+#: apps/app/src/components/moment-media-gallery.tsx:233
+#: apps/app/src/components/moment-media-gallery.tsx:439
+#: apps/app/src/components/moment-media-gallery.tsx:534
+#: apps/app/src/components/moment-media-gallery.tsx:546
+#: apps/app/src/components/moment-media-gallery.tsx:685
 #: apps/app/src/i18n/static-dom-seed.ts:867
 msgid "朋友圈图片"
 msgstr "Moment image"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:300
-#: apps/app/src/components/moment-media-gallery.tsx:551
+#: apps/app/src/components/moment-media-gallery.tsx:554
 #: apps/app/src/i18n/static-dom-seed.ts:868
 #: apps/app/src/routes/channels-page.tsx:1583
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1069
@@ -3104,7 +3105,7 @@ msgid "上一张"
 msgstr "Previous image"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:309
-#: apps/app/src/components/moment-media-gallery.tsx:560
+#: apps/app/src/components/moment-media-gallery.tsx:563
 #: apps/app/src/i18n/static-dom-seed.ts:869
 #: apps/app/src/routes/channels-page.tsx:1594
 #: apps/app/src/routes/desktop-chat-files-page.tsx:1080
@@ -3113,15 +3114,15 @@ msgstr "Next image"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:333
 #: apps/app/src/components/moment-compose-media-preview.tsx:344
-#: apps/app/src/components/moment-media-gallery.tsx:583
-#: apps/app/src/components/moment-media-gallery.tsx:600
+#: apps/app/src/components/moment-media-gallery.tsx:613
+#: apps/app/src/components/moment-media-gallery.tsx:630
 #: apps/app/src/i18n/static-dom-seed.ts:870
 msgid "关闭视频预览"
 msgstr "Close video preview"
 
 #: apps/app/src/components/moment-compose-media-preview.tsx:338
 #: apps/app/src/components/moment-media-gallery.tsx:145
-#: apps/app/src/components/moment-media-gallery.tsx:588
+#: apps/app/src/components/moment-media-gallery.tsx:618
 #: apps/app/src/i18n/static-dom-seed.ts:871
 msgid "朋友圈视频"
 msgstr "Moment video"
@@ -3129,16 +3130,20 @@ msgstr "Moment video"
 #. placeholder {0}: formatMomentDurationLabel(draft.durationMs)
 #. placeholder {0}: formatMomentDurationLabel(video.durationMs)
 #: apps/app/src/components/moment-compose-media-preview.tsx:341
-#: apps/app/src/components/moment-media-gallery.tsx:592
+#: apps/app/src/components/moment-media-gallery.tsx:622
 msgid "时长 {0}"
 msgstr "Duration {0}"
 
-#: apps/app/src/components/moment-media-gallery.tsx:237
-#: apps/app/src/components/moment-media-gallery.tsx:443
-#: apps/app/src/components/moment-media-gallery.tsx:648
+#: apps/app/src/components/moment-media-gallery.tsx:240
+#: apps/app/src/components/moment-media-gallery.tsx:446
+#: apps/app/src/components/moment-media-gallery.tsx:692
 #: apps/app/src/i18n/static-dom-seed.ts:872
 msgid "实况"
 msgstr "Live"
+
+#: apps/app/src/components/moment-media-gallery.tsx:652
+msgid "播放视频"
+msgstr ""
 
 #: apps/app/src/components/moment-post-card.tsx:126
 #: apps/app/src/features/desktop/feed/desktop-feed-row.tsx:444
@@ -3488,6 +3493,82 @@ msgstr "{month}/{day}"
 #: apps/app/src/components/wechat-moment-card.tsx:441
 msgid "{0}年{month}月{day}日"
 msgstr "{0}/{month}/{day}"
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:70
+#: apps/app/src/routes/welcome-page.tsx:595
+msgid "开发模式：验证码已打印到服务端日志。"
+msgstr "Dev mode: verification code printed to server logs."
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:71
+msgid "验证码已发送至绑定邮箱，请查收（含垃圾邮件箱）。"
+msgstr "Verification code sent to your linked email — check your inbox (including spam)."
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:81
+msgid "发送验证码失败，请稍后重试。"
+msgstr "Failed to send verification code. Please try again later."
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:100
+msgid "密码已更新，下次登录可使用新密码。"
+msgstr "Password updated. Use the new password next time you sign in."
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:109
+msgid "修改密码失败，请稍后重试。"
+msgstr "Failed to change password. Please try again later."
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:118
+msgid "请输入邮箱收到的 6 位验证码。"
+msgstr "Please enter the 6-digit code from your email."
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:125
+msgid "新密码长度需在 8-32 位之间。"
+msgstr "New password must be 8–32 characters."
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:132
+msgid "两次输入的密码不一致。"
+msgstr "The two passwords do not match."
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:143
+msgid "修改密码需要邮箱验证码确认；验证码会发送至当前账号绑定的邮箱。"
+msgstr "Changing your password requires an email verification code, which will be sent to the email linked to your account."
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:150
+msgid "邮箱验证码"
+msgstr "Email verification code"
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:160
+#: apps/app/src/routes/welcome-page.tsx:1153
+msgid "请输入邮箱收到的 6 位验证码"
+msgstr "Enter the 6-digit code from your email"
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:178
+#: apps/app/src/routes/welcome-page.tsx:1178
+msgid "发送验证码"
+msgstr "Send code"
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:185
+msgid "新密码"
+msgstr "New password"
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:194
+#: apps/app/src/routes/welcome-page.tsx:1193
+msgid "8-32 位，包含字母和数字"
+msgstr "8–32 characters, including letters and numbers"
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:200
+msgid "确认新密码"
+msgstr "Confirm new password"
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:209
+msgid "再次输入新密码"
+msgstr "Enter the new password again"
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:220
+msgid "提交中..."
+msgstr "Submitting..."
+
+#: apps/app/src/features/account-security/account-security-panel.tsx:221
+msgid "更新密码"
+msgstr "Update password"
 
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:37
 #: apps/app/src/features/chat-details/chat-call-fallback-section.tsx:38
@@ -4796,22 +4877,22 @@ msgid "群聊 · 免打扰"
 msgstr "Group chat · Do not disturb"
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:719
-#: apps/app/src/features/chat/use-conversation-thread.ts:491
+#: apps/app/src/features/chat/use-conversation-thread.ts:504
 msgid "图片上传结果异常。"
 msgstr "Image upload result was abnormal."
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:738
-#: apps/app/src/features/chat/use-conversation-thread.ts:512
+#: apps/app/src/features/chat/use-conversation-thread.ts:525
 msgid "文件上传结果异常。"
 msgstr "File upload result was abnormal."
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:760
-#: apps/app/src/features/chat/use-conversation-thread.ts:536
+#: apps/app/src/features/chat/use-conversation-thread.ts:549
 msgid "语音上传结果异常。"
 msgstr "Voice upload result was abnormal."
 
 #: apps/app/src/features/chat/group-chat-thread-panel.tsx:843
-#: apps/app/src/features/chat/use-conversation-thread.ts:601
+#: apps/app/src/features/chat/use-conversation-thread.ts:614
 msgid "这条消息暂时无法重试发送。"
 msgstr "This message can't be retried right now."
 
@@ -6811,14 +6892,14 @@ msgstr "Delete custom sticker"
 msgid "自定义"
 msgstr "Custom"
 
-#: apps/app/src/features/chat/use-conversation-thread.ts:416
-#: apps/app/src/features/chat/use-conversation-thread.ts:444
-#: apps/app/src/features/chat/use-conversation-thread.ts:480
+#: apps/app/src/features/chat/use-conversation-thread.ts:429
+#: apps/app/src/features/chat/use-conversation-thread.ts:457
+#: apps/app/src/features/chat/use-conversation-thread.ts:493
 msgid "The target character is not ready yet."
 msgstr "The target character is not ready yet."
 
 #. placeholder {0}: sticker.label ?? sticker.stickerId
-#: apps/app/src/features/chat/use-conversation-thread.ts:453
+#: apps/app/src/features/chat/use-conversation-thread.ts:466
 msgid "[表情包] {0}"
 msgstr "[Stickers] {0}"
 
@@ -10041,9 +10122,9 @@ msgstr "Saved to Favorites"
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1243
 #: apps/app/src/routes/character-detail-page.tsx:308
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1298
-#: apps/app/src/routes/profile-settings-page.tsx:347
-#: apps/app/src/routes/profile-settings-page.tsx:473
-#: apps/app/src/routes/welcome-page.tsx:1322
+#: apps/app/src/routes/profile-settings-page.tsx:355
+#: apps/app/src/routes/profile-settings-page.tsx:481
+#: apps/app/src/routes/welcome-page.tsx:1469
 msgid "保存中..."
 msgstr "Saving..."
 
@@ -11396,18 +11477,18 @@ msgstr "Open"
 
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
+#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
+#: apps/app/src/i18n/static-dom-seed.ts:195
+msgid "移出常用"
+msgstr "Remove from frequent"
+
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
+#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:278
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
 #: apps/app/src/i18n/static-dom-seed.ts:197
 msgid "加入常用"
 msgstr "Add to frequent"
-
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:740
-#: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:831
-#: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:711
-#: apps/app/src/i18n/static-dom-seed.ts:195
-msgid "移出常用"
-msgstr "Remove from frequent"
 
 #. placeholder {0}: formatConversationTimestamp(lastOpenedAt)
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:802
@@ -12540,16 +12621,16 @@ msgid "买了种子"
 msgstr "Bought seeds"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
+msgid "卖了"
+msgstr "Sold"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:240
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:242
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
 msgid "作物"
 msgstr "Crops"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
-msgid "卖了"
-msgstr "Sold"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -16207,14 +16288,14 @@ msgid "地点"
 msgstr "Place"
 
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:173
-msgid "地图"
-msgstr "Map"
-
-#: apps/app/src/features/mini-programs/mini-programs-data.ts:173
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:241
 #: apps/app/src/i18n/static-dom-seed.ts:202
 msgid "活动"
 msgstr "Events"
+
+#: apps/app/src/features/mini-programs/mini-programs-data.ts:173
+msgid "地图"
+msgstr "Map"
 
 #: apps/app/src/features/mini-programs/mini-programs-data.ts:177
 #: apps/app/src/i18n/static-dom-seed.ts:207
@@ -17057,7 +17138,7 @@ msgstr "Close service account menu"
 #: apps/app/src/routes/desktop-chat-files-page.tsx:447
 #: apps/app/src/routes/desktop-chat-history-page.tsx:260
 #: apps/app/src/routes/desktop-mobile-page.tsx:876
-#: apps/app/src/routes/profile-settings-page.tsx:245
+#: apps/app/src/routes/profile-settings-page.tsx:253
 msgid "返回消息"
 msgstr "Back to Messages"
 
@@ -17764,8 +17845,8 @@ msgstr "Feedback"
 #: apps/app/src/features/shell/desktop-shell.tsx:646
 #: apps/app/src/routes/desktop-mobile-page.tsx:186
 #: apps/app/src/routes/profile-page.tsx:150
-#: apps/app/src/routes/profile-settings-page.tsx:269
-#: apps/app/src/routes/profile-settings-page.tsx:593
+#: apps/app/src/routes/profile-settings-page.tsx:277
+#: apps/app/src/routes/profile-settings-page.tsx:609
 msgid "设置"
 msgstr "Settings"
 
@@ -17994,7 +18075,7 @@ msgid "已复制微信号"
 msgstr "WeChat ID copied"
 
 #: apps/app/src/features/subscription/checkout-contact-dialog.tsx:65
-#: apps/app/src/routes/welcome-page.tsx:1008
+#: apps/app/src/routes/welcome-page.tsx:1084
 msgid "邮箱"
 msgstr "Email"
 
@@ -18156,8 +18237,8 @@ msgstr "Subscription"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:485
 #: apps/app/src/routes/profile-page.tsx:180
-#: apps/app/src/routes/profile-settings-page.tsx:62
-#: apps/app/src/routes/profile-settings-page.tsx:571
+#: apps/app/src/routes/profile-settings-page.tsx:68
+#: apps/app/src/routes/profile-settings-page.tsx:579
 #: apps/app/src/routes/profile-subscription-page.tsx:485
 #: apps/app/src/routes/profile-subscription-page.tsx:508
 msgid "会员中心"
@@ -18165,7 +18246,7 @@ msgstr "Membership Center"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:488
 #: apps/app/src/routes/profile-subscription-page.tsx:511
-#: apps/app/src/routes/welcome-page.tsx:990
+#: apps/app/src/routes/welcome-page.tsx:1066
 msgid "手机号"
 msgstr "Phone number"
 
@@ -18237,7 +18318,7 @@ msgid "暂无邀请记录。"
 msgstr "No invite records yet."
 
 #: apps/app/src/i18n/static-dom-seed.ts:12
-#: apps/app/src/routes/profile-settings-page.tsx:329
+#: apps/app/src/routes/profile-settings-page.tsx:337
 msgid "签名"
 msgstr "Signature"
 
@@ -18468,7 +18549,7 @@ msgid "群接"
 msgstr "Group relay"
 
 #: apps/app/src/i18n/static-dom-seed.ts:178
-#: apps/app/src/routes/welcome-page.tsx:1387
+#: apps/app/src/routes/welcome-page.tsx:1534
 msgid "世界"
 msgstr "World"
 
@@ -25835,13 +25916,13 @@ msgstr "Opening character Moments..."
 
 #: apps/app/src/routes/legal-community-page.tsx:10
 #: apps/app/src/routes/profile-page.tsx:217
-#: apps/app/src/routes/profile-settings-page.tsx:78
+#: apps/app/src/routes/profile-settings-page.tsx:89
 msgid "社区规范"
 msgstr "Community Guidelines"
 
 #: apps/app/src/routes/legal-privacy-page.tsx:10
 #: apps/app/src/routes/profile-page.tsx:205
-#: apps/app/src/routes/profile-settings-page.tsx:76
+#: apps/app/src/routes/profile-settings-page.tsx:87
 msgid "隐私政策"
 msgstr "Privacy Policy"
 
@@ -26542,12 +26623,12 @@ msgid "文件缺少 $schema 标识；仍可尝试导入，但建议检查内容�
 msgstr ""
 
 #: apps/app/src/routes/profile-character-import-page.tsx:382
-msgid "✅ 导入到我的世界"
-msgstr ""
-
-#: apps/app/src/routes/profile-character-import-page.tsx:382
 msgid "导入中…"
 msgstr "Importing…"
+
+#: apps/app/src/routes/profile-character-import-page.tsx:382
+msgid "✅ 导入到我的世界"
+msgstr ""
 
 #: apps/app/src/routes/profile-character-import-page.tsx:390
 msgid "换一个文件"
@@ -26695,13 +26776,13 @@ msgid "查看与编辑个人资料"
 msgstr "View and edit profile"
 
 #: apps/app/src/routes/profile-page.tsx:227
-#: apps/app/src/routes/profile-settings-page.tsx:583
-#: apps/app/src/routes/profile-settings-page.tsx:653
+#: apps/app/src/routes/profile-settings-page.tsx:599
+#: apps/app/src/routes/profile-settings-page.tsx:671
 msgid "退出登录"
 msgstr "Sign out"
 
 #: apps/app/src/routes/profile-settings-language-page.tsx:41
-#: apps/app/src/routes/profile-settings-page.tsx:293
+#: apps/app/src/routes/profile-settings-page.tsx:301
 msgid "多语言"
 msgstr "Language"
 
@@ -26709,216 +26790,226 @@ msgstr "Language"
 msgid "正在切换语言..."
 msgstr "Switching language…"
 
-#: apps/app/src/routes/profile-settings-page.tsx:57
-#: apps/app/src/routes/profile-settings-page.tsx:315
+#: apps/app/src/routes/profile-settings-page.tsx:63
+#: apps/app/src/routes/profile-settings-page.tsx:323
 msgid "个人资料"
 msgstr "Profile"
 
-#: apps/app/src/routes/profile-settings-page.tsx:69
+#: apps/app/src/routes/profile-settings-page.tsx:73
+#: apps/app/src/routes/profile-settings-page.tsx:587
+msgid "账号安全"
+msgstr "Account security"
+
+#: apps/app/src/routes/profile-settings-page.tsx:80
 msgid "快捷键设置"
 msgstr "Shortcut settings"
 
-#: apps/app/src/routes/profile-settings-page.tsx:70
-#: apps/app/src/routes/profile-settings-page.tsx:417
+#: apps/app/src/routes/profile-settings-page.tsx:81
+#: apps/app/src/routes/profile-settings-page.tsx:425
 msgid "AI 设置"
 msgstr "AI Settings"
 
-#: apps/app/src/routes/profile-settings-page.tsx:71
+#: apps/app/src/routes/profile-settings-page.tsx:82
 msgid "语言"
 msgstr "Language"
 
-#: apps/app/src/routes/profile-settings-page.tsx:72
-#: apps/app/src/routes/profile-settings-page.tsx:522
+#: apps/app/src/routes/profile-settings-page.tsx:83
+#: apps/app/src/routes/profile-settings-page.tsx:530
 msgid "协议与规范"
 msgstr "Policies and Guidelines"
 
-#: apps/app/src/routes/profile-settings-page.tsx:77
+#: apps/app/src/routes/profile-settings-page.tsx:88
 msgid "用户协议"
 msgstr "User Agreement"
 
-#: apps/app/src/routes/profile-settings-page.tsx:88
+#: apps/app/src/routes/profile-settings-page.tsx:99
 msgid "Enter 发送消息"
 msgstr "Enter to send"
 
-#: apps/app/src/routes/profile-settings-page.tsx:89
+#: apps/app/src/routes/profile-settings-page.tsx:100
 msgid "按回车直接发送，保持当前更顺手的输入节奏。"
 msgstr "Press Enter to send directly and keep a faster typing flow."
 
-#: apps/app/src/routes/profile-settings-page.tsx:93
+#: apps/app/src/routes/profile-settings-page.tsx:104
 msgid "Ctrl/Cmd + Enter 发送消息"
 msgstr "Ctrl/Cmd + Enter to send"
 
-#: apps/app/src/routes/profile-settings-page.tsx:94
+#: apps/app/src/routes/profile-settings-page.tsx:105
 msgid "发送前多一道组合键确认，更接近微信桌面版可切换方式。"
 msgstr "Use an extra shortcut before sending, closer to WeChat desktop behavior."
 
-#: apps/app/src/routes/profile-settings-page.tsx:246
+#: apps/app/src/routes/profile-settings-page.tsx:254
 msgid "返回资料"
 msgstr "Back to profile"
 
-#: apps/app/src/routes/profile-settings-page.tsx:278
+#: apps/app/src/routes/profile-settings-page.tsx:286
 msgid "返回资料页"
 msgstr "Back to profile page"
 
-#: apps/app/src/routes/profile-settings-page.tsx:317
+#: apps/app/src/routes/profile-settings-page.tsx:325
 msgid "这里的名称和签名会用于移动端资料页和世界主人展示。"
 msgstr "This name and signature are used on the mobile profile page and world owner display."
 
-#: apps/app/src/routes/profile-settings-page.tsx:321
+#: apps/app/src/routes/profile-settings-page.tsx:329
 msgid "显示名称"
 msgstr "Display name"
 
-#: apps/app/src/routes/profile-settings-page.tsx:325
+#: apps/app/src/routes/profile-settings-page.tsx:333
 msgid "输入显示名称"
 msgstr "Enter display name"
 
-#: apps/app/src/routes/profile-settings-page.tsx:334
+#: apps/app/src/routes/profile-settings-page.tsx:342
 msgid "介绍一下你自己，或者写一句当前状态"
 msgstr "Introduce yourself, or write your current status"
 
-#: apps/app/src/routes/profile-settings-page.tsx:348
+#: apps/app/src/routes/profile-settings-page.tsx:356
 msgid "保存资料"
 msgstr "Save profile"
 
-#: apps/app/src/routes/profile-settings-page.tsx:356
+#: apps/app/src/routes/profile-settings-page.tsx:364
 msgid "资料已更新。"
 msgstr "Profile updated."
 
-#: apps/app/src/routes/profile-settings-page.tsx:363
+#: apps/app/src/routes/profile-settings-page.tsx:371
 msgid "聊天快捷键"
 msgstr "Chat shortcuts"
 
-#: apps/app/src/routes/profile-settings-page.tsx:364
+#: apps/app/src/routes/profile-settings-page.tsx:372
 msgid "调整桌面和 Web 键盘聊天输入时的发送快捷键。"
 msgstr "Adjust the send shortcut for desktop and web keyboard chat input."
 
-#: apps/app/src/routes/profile-settings-page.tsx:409
+#: apps/app/src/routes/profile-settings-page.tsx:417
 msgid "当前仅影响桌面和 Web 的键盘聊天输入，移动端仍以发送按钮和语音入口为主。"
 msgstr "This only affects desktop and web keyboard chat input. Mobile still uses the send button and voice entry."
 
-#: apps/app/src/routes/profile-settings-page.tsx:419
+#: apps/app/src/routes/profile-settings-page.tsx:427
 msgid "你可以为当前世界主人单独配置专属 API Key 和兼容 Base URL。"
 msgstr "You can configure a dedicated API Key and compatible Base URL for the current world owner."
 
-#: apps/app/src/routes/profile-settings-page.tsx:425
+#: apps/app/src/routes/profile-settings-page.tsx:433
 msgid "读取配置..."
 msgstr "Loading settings..."
 
 #. placeholder {0}: ownerQuery.data.customApiBase
-#: apps/app/src/routes/profile-settings-page.tsx:435
+#: apps/app/src/routes/profile-settings-page.tsx:443
 msgid "当前使用专属 API Key，Base URL：{0}。"
 msgstr "Using dedicated API Key, Base URL: {0}."
 
-#: apps/app/src/routes/profile-settings-page.tsx:437
+#: apps/app/src/routes/profile-settings-page.tsx:445
 msgid "当前使用专属 API Key。"
 msgstr "Using dedicated API Key."
 
-#: apps/app/src/routes/profile-settings-page.tsx:442
+#: apps/app/src/routes/profile-settings-page.tsx:450
 msgid "专属 API Key"
 msgstr "Dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:449
+#: apps/app/src/routes/profile-settings-page.tsx:457
 msgid "已保存专属 API Key，输入新的值可替换"
 msgstr "Dedicated API Key saved. Enter a new value to replace it."
 
-#: apps/app/src/routes/profile-settings-page.tsx:450
+#: apps/app/src/routes/profile-settings-page.tsx:458
 msgid "输入你的专属 API Key"
 msgstr "Enter your dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:455
+#: apps/app/src/routes/profile-settings-page.tsx:463
 msgid "兼容 Base URL"
 msgstr "Compatible Base URL"
 
-#: apps/app/src/routes/profile-settings-page.tsx:459
+#: apps/app/src/routes/profile-settings-page.tsx:467
 msgid "可选，例如 https://api.openai.com/v1"
 msgstr "Optional, e.g. https://api.openai.com/v1"
 
-#: apps/app/src/routes/profile-settings-page.tsx:474
+#: apps/app/src/routes/profile-settings-page.tsx:482
 msgid "保存专属 API Key"
 msgstr "Save dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:483
+#: apps/app/src/routes/profile-settings-page.tsx:491
 msgid "清除中..."
 msgstr "Clearing..."
 
-#: apps/app/src/routes/profile-settings-page.tsx:484
+#: apps/app/src/routes/profile-settings-page.tsx:492
 msgid "清除专属 API Key"
 msgstr "Clear dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:498
+#: apps/app/src/routes/profile-settings-page.tsx:506
 msgid "专属 API Key 已保存。"
 msgstr "Dedicated API Key saved."
 
-#: apps/app/src/routes/profile-settings-page.tsx:503
+#: apps/app/src/routes/profile-settings-page.tsx:511
 msgid "专属 API Key 已清除。"
 msgstr "Dedicated API Key cleared."
 
-#: apps/app/src/routes/profile-settings-page.tsx:511
+#: apps/app/src/routes/profile-settings-page.tsx:519
 msgid "界面语言"
 msgstr "Interface Language"
 
-#: apps/app/src/routes/profile-settings-page.tsx:513
+#: apps/app/src/routes/profile-settings-page.tsx:521
 msgid "切换界面语言，好友回复也会跟随此设置使用对应语言。"
 msgstr "Switch the interface language; friends' replies will follow this setting and use the matching language."
 
-#: apps/app/src/routes/profile-settings-page.tsx:523
+#: apps/app/src/routes/profile-settings-page.tsx:531
 msgid "桌面端保留当前文档切换和独立打开入口。"
 msgstr "Desktop keeps document switching and independent open entry points."
 
-#: apps/app/src/routes/profile-settings-page.tsx:557
+#: apps/app/src/routes/profile-settings-page.tsx:565
 msgid "打开当前文档"
 msgstr "Open Current Document"
 
-#: apps/app/src/routes/profile-settings-page.tsx:561
+#: apps/app/src/routes/profile-settings-page.tsx:569
 msgid "查看世界隐私政策和数据使用说明。"
 msgstr "View the world privacy policy and data usage notes."
 
-#: apps/app/src/routes/profile-settings-page.tsx:563
+#: apps/app/src/routes/profile-settings-page.tsx:571
 msgid "查看世界服务使用协议。"
 msgstr "View the world service terms."
 
-#: apps/app/src/routes/profile-settings-page.tsx:564
+#: apps/app/src/routes/profile-settings-page.tsx:572
 msgid "查看世界社区规范和反馈口径。"
 msgstr "View the world community guidelines and feedback policy."
 
-#: apps/app/src/routes/profile-settings-page.tsx:572
-#: apps/app/src/routes/profile-settings-page.tsx:604
+#: apps/app/src/routes/profile-settings-page.tsx:580
+#: apps/app/src/routes/profile-settings-page.tsx:620
 msgid "查看当前云账号订阅状态、可购套餐与邀请奖励。"
 msgstr "Check current cloud-account subscription status, available plans, and invite rewards."
 
-#: apps/app/src/routes/profile-settings-page.tsx:579
+#: apps/app/src/routes/profile-settings-page.tsx:588
+#: apps/app/src/routes/profile-settings-page.tsx:622
+msgid "修改云账号登录密码，需要邮箱验证码确认。"
+msgstr "Change your cloud account password. Requires email verification."
+
+#: apps/app/src/routes/profile-settings-page.tsx:595
 msgid "确认退出登录？"
 msgstr "Sign out?"
 
-#: apps/app/src/routes/profile-settings-page.tsx:581
+#: apps/app/src/routes/profile-settings-page.tsx:597
 msgid "退出后会回到世界入口，下次需要重新登录云账号。"
 msgstr "Signing out returns you to the world entry; you'll need to sign in to the cloud account again next time."
 
-#: apps/app/src/routes/profile-settings-page.tsx:593
+#: apps/app/src/routes/profile-settings-page.tsx:609
 msgid "资料与设置"
 msgstr "Profile and Settings"
 
-#: apps/app/src/routes/profile-settings-page.tsx:596
+#: apps/app/src/routes/profile-settings-page.tsx:612
 msgid "在桌面工作区里管理世界主人的资料与签名。"
 msgstr "Manage the world owner profile and signature in the desktop workspace."
 
-#: apps/app/src/routes/profile-settings-page.tsx:598
+#: apps/app/src/routes/profile-settings-page.tsx:614
 msgid "调整桌面和 Web 键盘聊天输入的发送快捷键。"
 msgstr "Adjust send shortcuts for desktop and web keyboard chat input."
 
-#: apps/app/src/routes/profile-settings-page.tsx:600
+#: apps/app/src/routes/profile-settings-page.tsx:616
 msgid "管理专属 API Key 和兼容 Base URL。"
 msgstr "Manage your dedicated API Key and compatible Base URL."
 
-#: apps/app/src/routes/profile-settings-page.tsx:602
+#: apps/app/src/routes/profile-settings-page.tsx:618
 msgid "切换当前端的界面语言和本地化格式。"
 msgstr "Switch this client's interface language and localization formats."
 
-#: apps/app/src/routes/profile-settings-page.tsx:605
+#: apps/app/src/routes/profile-settings-page.tsx:623
 msgid "查看当前世界相关的协议和社区规范。"
 msgstr "View policies and community guidelines for this world."
 
-#: apps/app/src/routes/profile-settings-page.tsx:620
+#: apps/app/src/routes/profile-settings-page.tsx:638
 msgid "设置分类"
 msgstr "Settings Categories"
 
@@ -27002,327 +27093,343 @@ msgstr "Hang on — syncing contact tags and groups."
 msgid "先在联系人资料里补上标签，通讯录标签页就会自动聚合。"
 msgstr "Add tags in the contact profile first, and the Contacts Tags tab will aggregate automatically."
 
-#: apps/app/src/routes/welcome-page.tsx:55
+#: apps/app/src/routes/welcome-page.tsx:56
 msgid "世界缺少可用的 API 地址。"
 msgstr "The world is missing an available API address."
 
-#: apps/app/src/routes/welcome-page.tsx:57
+#: apps/app/src/routes/welcome-page.tsx:58
 msgid "世界已经启动完成，但暂时还没有可用的 API 地址。"
 msgstr "The world has finished starting, but no API address is available yet."
 
-#: apps/app/src/routes/welcome-page.tsx:58
+#: apps/app/src/routes/welcome-page.tsx:59
 msgid "世界已就绪。"
 msgstr "World is ready."
 
-#: apps/app/src/routes/welcome-page.tsx:59
+#: apps/app/src/routes/welcome-page.tsx:60
 msgid "正在唤醒已有世界。"
 msgstr "Waking existing world."
 
-#: apps/app/src/routes/welcome-page.tsx:60
+#: apps/app/src/routes/welcome-page.tsx:61
 msgid "世界启动失败。"
 msgstr "World startup failed."
 
-#: apps/app/src/routes/welcome-page.tsx:61
+#: apps/app/src/routes/welcome-page.tsx:62
 msgid "世界暂时无法启动。"
 msgstr "The world cannot be started right now."
 
-#: apps/app/src/routes/welcome-page.tsx:62
+#: apps/app/src/routes/welcome-page.tsx:63
 msgid "世界已被停用。"
 msgstr "The world has been disabled."
 
-#: apps/app/src/routes/welcome-page.tsx:63
+#: apps/app/src/routes/welcome-page.tsx:64
 msgid "该世界当前已被运维停用。"
 msgstr "This world is currently disabled by operations."
 
-#: apps/app/src/routes/welcome-page.tsx:64
+#: apps/app/src/routes/welcome-page.tsx:65
 msgid "世界正在删除中。"
 msgstr "The world is being deleted."
 
-#: apps/app/src/routes/welcome-page.tsx:66
+#: apps/app/src/routes/welcome-page.tsx:67
 msgid "世界正在删除，无法恢复。"
 msgstr "The world is being deleted and cannot be resumed."
 
-#: apps/app/src/routes/welcome-page.tsx:67
+#: apps/app/src/routes/welcome-page.tsx:68
 msgid "正在创建全新的世界。"
 msgstr "Creating a brand-new world."
 
-#: apps/app/src/routes/welcome-page.tsx:68
-#: apps/app/src/routes/welcome-page.tsx:437
+#: apps/app/src/routes/welcome-page.tsx:69
+#: apps/app/src/routes/welcome-page.tsx:455
 msgid "云世界访问会话缺失。"
 msgstr "Cloud world access session is missing."
 
-#: apps/app/src/routes/welcome-page.tsx:167
+#: apps/app/src/routes/welcome-page.tsx:168
 msgid "世界当前不可用。"
 msgstr "This world is currently unavailable."
 
-#: apps/app/src/routes/welcome-page.tsx:176
+#: apps/app/src/routes/welcome-page.tsx:177
 msgid "请先验证邮箱，以解析你的云世界。"
 msgstr "Verify your email first to resolve your cloud world."
 
-#: apps/app/src/routes/welcome-page.tsx:180
+#: apps/app/src/routes/welcome-page.tsx:181
 msgid "世界已就绪，正在连接..."
 msgstr "World is ready. Connecting..."
 
 #. placeholder {0}: session.estimatedWaitSeconds
-#: apps/app/src/routes/welcome-page.tsx:191
+#: apps/app/src/routes/welcome-page.tsx:192
 msgid "{translatedDisplayStatus} 预计等待：{0} 秒。"
 msgstr "{translatedDisplayStatus} Estimated wait: {0} seconds."
 
-#: apps/app/src/routes/welcome-page.tsx:206
-#: apps/app/src/routes/welcome-page.tsx:221
-#: apps/app/src/routes/welcome-page.tsx:1243
+#: apps/app/src/routes/welcome-page.tsx:207
+#: apps/app/src/routes/welcome-page.tsx:222
+#: apps/app/src/routes/welcome-page.tsx:1390
 msgid "连接中..."
 msgstr "Connecting..."
 
-#: apps/app/src/routes/welcome-page.tsx:210
+#: apps/app/src/routes/welcome-page.tsx:211
 msgid "解析中..."
 msgstr "Resolving..."
 
-#: apps/app/src/routes/welcome-page.tsx:214
+#: apps/app/src/routes/welcome-page.tsx:215
 msgid "注册并进入"
 msgstr "Sign up and enter"
 
-#: apps/app/src/routes/welcome-page.tsx:214
+#: apps/app/src/routes/welcome-page.tsx:215
 msgid "登录并进入"
 msgstr "Sign in and enter"
 
-#: apps/app/src/routes/welcome-page.tsx:226
+#: apps/app/src/routes/welcome-page.tsx:227
 msgid "正在唤醒世界..."
 msgstr "Waking world..."
 
-#: apps/app/src/routes/welcome-page.tsx:227
+#: apps/app/src/routes/welcome-page.tsx:228
 msgid "正在创建世界..."
 msgstr "Creating world..."
 
-#: apps/app/src/routes/welcome-page.tsx:465
+#: apps/app/src/routes/welcome-page.tsx:483
 msgid "世界已解析完成，但没有可用的 API 地址。"
 msgstr "The world resolved successfully, but no API address is available."
 
-#: apps/app/src/routes/welcome-page.tsx:491
+#: apps/app/src/routes/welcome-page.tsx:509
 msgid "已连接到云世界。"
 msgstr "Connected to cloud world."
 
-#: apps/app/src/routes/welcome-page.tsx:499
+#: apps/app/src/routes/welcome-page.tsx:517
 msgid "世界已就绪，但暂时还无法访问。"
 msgstr "The world is ready, but it cannot be reached yet."
 
-#: apps/app/src/routes/welcome-page.tsx:549
+#: apps/app/src/routes/welcome-page.tsx:567
 msgid "验证码已发送。"
 msgstr "Verification code sent."
 
-#: apps/app/src/routes/welcome-page.tsx:577
-msgid "开发模式：验证码已打印到服务端日志。"
-msgstr "Dev mode: verification code printed to server logs."
-
-#: apps/app/src/routes/welcome-page.tsx:578
+#: apps/app/src/routes/welcome-page.tsx:596
 msgid "验证码已发送，请查收邮箱（含垃圾邮件箱）。"
 msgstr "Code sent — check your email (including spam)."
 
-#: apps/app/src/routes/welcome-page.tsx:596
+#: apps/app/src/routes/welcome-page.tsx:614
 msgid "请输入本地世界 API 地址。"
 msgstr "Enter the local world API address."
 
-#: apps/app/src/routes/welcome-page.tsx:631
+#: apps/app/src/routes/welcome-page.tsx:649
 msgid "已连接到本地世界。"
 msgstr "Connected to local world."
 
-#: apps/app/src/routes/welcome-page.tsx:634
+#: apps/app/src/routes/welcome-page.tsx:652
 msgid "无法连接到本地世界。"
 msgstr "Unable to connect to the local world."
 
-#: apps/app/src/routes/welcome-page.tsx:718
-#: apps/app/src/routes/welcome-page.tsx:1091
+#: apps/app/src/routes/welcome-page.tsx:736
+#: apps/app/src/routes/welcome-page.tsx:1238
 msgid "Google 登录失败，请稍后重试。"
 msgstr "Google sign-in failed. Please try again later."
 
-#: apps/app/src/routes/welcome-page.tsx:736
+#: apps/app/src/routes/welcome-page.tsx:754
 msgid "请输入手机号。"
 msgstr "Enter phone number."
 
-#: apps/app/src/routes/welcome-page.tsx:740
+#: apps/app/src/routes/welcome-page.tsx:758
 msgid "请输入邮箱。"
 msgstr "Enter your email."
 
-#: apps/app/src/routes/welcome-page.tsx:745
+#: apps/app/src/routes/welcome-page.tsx:764
 msgid "请输入验证码。"
 msgstr "Enter verification code."
 
-#: apps/app/src/routes/welcome-page.tsx:865
+#: apps/app/src/routes/welcome-page.tsx:768
+msgid "请输入密码。"
+msgstr "Please enter your password."
+
+#: apps/app/src/routes/welcome-page.tsx:941
 msgid "解析云世界访问失败。"
 msgstr "Failed to resolve cloud world access."
 
-#: apps/app/src/routes/welcome-page.tsx:887
+#: apps/app/src/routes/welcome-page.tsx:963
 msgid "请输入世界主人的名字。"
 msgstr "Enter the World Owner's name."
 
-#: apps/app/src/routes/welcome-page.tsx:892
+#: apps/app/src/routes/welcome-page.tsx:968
 msgid "名字至少 {MIN_OWNER_NAME_LENGTH} 个字，请取一个真正的昵称。"
 msgstr ""
 
-#: apps/app/src/routes/welcome-page.tsx:898
+#: apps/app/src/routes/welcome-page.tsx:974
 msgid "请先连接世界，再设置世界主人名称。"
 msgstr "Connect to a world first, then set the World Owner name."
 
-#: apps/app/src/routes/welcome-page.tsx:916
+#: apps/app/src/routes/welcome-page.tsx:992
 msgid "保存世界主人资料失败。"
 msgstr "Failed to save world owner profile."
 
-#: apps/app/src/routes/welcome-page.tsx:967
+#: apps/app/src/routes/welcome-page.tsx:1043
 msgid "登录"
 msgstr "Sign in"
 
-#: apps/app/src/routes/welcome-page.tsx:983
+#: apps/app/src/routes/welcome-page.tsx:1059
 msgid "注册"
 msgstr "Sign up"
 
-#: apps/app/src/routes/welcome-page.tsx:1002
+#: apps/app/src/routes/welcome-page.tsx:1078
 msgid "请输入手机号"
 msgstr "Enter phone number"
 
-#: apps/app/src/routes/welcome-page.tsx:1021
+#: apps/app/src/routes/welcome-page.tsx:1097
 msgid "you@example.com"
 msgstr "you@example.com"
 
-#: apps/app/src/routes/welcome-page.tsx:1028
+#: apps/app/src/routes/welcome-page.tsx:1116
+msgid "使用验证码登录"
+msgstr "Sign in with code"
+
+#: apps/app/src/routes/welcome-page.tsx:1133
+msgid "使用密码登录"
+msgstr "Sign in with password"
+
+#: apps/app/src/routes/welcome-page.tsx:1140
 msgid "验证码"
 msgstr "Verification code"
 
-#: apps/app/src/routes/welcome-page.tsx:1040
+#: apps/app/src/routes/welcome-page.tsx:1152
 msgid "请输入验证码（默认 123456 即可通过）"
 msgstr "Enter the verification code (default 123456 works)"
 
-#: apps/app/src/routes/welcome-page.tsx:1041
-msgid "请输入邮箱收到的 6 位验证码"
-msgstr "Enter the 6-digit code from your email"
+#: apps/app/src/routes/welcome-page.tsx:1184
+msgid "设置登录密码（选填）"
+msgstr "Set a login password (optional)"
 
-#: apps/app/src/routes/welcome-page.tsx:1066
-msgid "发送验证码"
-msgstr "Send code"
+#: apps/app/src/routes/welcome-page.tsx:1201
+msgid "密码"
+msgstr "Password"
 
-#: apps/app/src/routes/welcome-page.tsx:1076
+#: apps/app/src/routes/welcome-page.tsx:1210
+msgid "请输入密码"
+msgstr "Please enter your password"
+
+#: apps/app/src/routes/welcome-page.tsx:1213
+msgid "忘记密码？请用验证码登录后到设置页修改"
+msgstr "Forgot password? Sign in with a code first, then change it from Settings."
+
+#: apps/app/src/routes/welcome-page.tsx:1223
 msgid "或"
 msgstr "or"
 
-#: apps/app/src/routes/welcome-page.tsx:1099
+#: apps/app/src/routes/welcome-page.tsx:1246
 msgid "Google 登录失败，请检查网络后重试。"
 msgstr "Google sign-in failed. Please check your connection and try again."
 
-#: apps/app/src/routes/welcome-page.tsx:1121
+#: apps/app/src/routes/welcome-page.tsx:1268
 msgid "邀请码（选填）"
 msgstr "Invite code (optional)"
 
-#: apps/app/src/routes/welcome-page.tsx:1134
+#: apps/app/src/routes/welcome-page.tsx:1281
 msgid "填写邀请人给你的 6 位邀请码"
 msgstr "Enter the 6-digit invite code from your inviter"
 
-#: apps/app/src/routes/welcome-page.tsx:1138
+#: apps/app/src/routes/welcome-page.tsx:1285
 msgid "已通过邀请链接自动填入，可手动修改。"
 msgstr "Auto-filled via invite link; you can edit manually."
 
-#: apps/app/src/routes/welcome-page.tsx:1148
+#: apps/app/src/routes/welcome-page.tsx:1295
 msgid "正在解析你的云世界..."
 msgstr "Resolving your cloud world..."
 
-#: apps/app/src/routes/welcome-page.tsx:1152
-#: apps/app/src/routes/welcome-page.tsx:1345
+#: apps/app/src/routes/welcome-page.tsx:1299
+#: apps/app/src/routes/welcome-page.tsx:1492
 msgid "云世界"
 msgstr "Cloud World"
 
-#: apps/app/src/routes/welcome-page.tsx:1153
+#: apps/app/src/routes/welcome-page.tsx:1300
 msgid "正在解析你的世界"
 msgstr "Resolving your world"
 
-#: apps/app/src/routes/welcome-page.tsx:1155
+#: apps/app/src/routes/welcome-page.tsx:1302
 msgid "我们正在判断是为这个邮箱创建新世界，还是唤醒它已拥有的世界。"
 msgstr "We're checking whether to create a new world for this email or wake up an existing one."
 
 #. placeholder {0}: currentCloudSession.resolvedApiBaseUrl
-#: apps/app/src/routes/welcome-page.tsx:1177
-#: apps/app/src/routes/welcome-page.tsx:1183
+#: apps/app/src/routes/welcome-page.tsx:1324
+#: apps/app/src/routes/welcome-page.tsx:1330
 msgid "已解析到世界地址：{0}"
 msgstr "Resolved world address: {0}"
 
-#: apps/app/src/routes/welcome-page.tsx:1212
+#: apps/app/src/routes/welcome-page.tsx:1359
 msgid "本地世界地址"
 msgstr "Local world address"
 
-#: apps/app/src/routes/welcome-page.tsx:1228
+#: apps/app/src/routes/welcome-page.tsx:1375
 msgid "检测到你输入的是 /api 路径，已自动换算为对应的世界入口地址：{normalizedLocalApiBaseUrl}"
 msgstr "Detected an /api path and converted it to the corresponding world entry address: {normalizedLocalApiBaseUrl}"
 
-#: apps/app/src/routes/welcome-page.tsx:1231
+#: apps/app/src/routes/welcome-page.tsx:1378
 msgid "检测到你输入的是本机应用地址，已自动换算为对应的 Core API 地址：{normalizedLocalApiBaseUrl}"
 msgstr "Detected a local app address and converted it to the corresponding Core API address: {normalizedLocalApiBaseUrl}"
 
-#: apps/app/src/routes/welcome-page.tsx:1243
+#: apps/app/src/routes/welcome-page.tsx:1390
 msgid "连接本地世界"
 msgstr "Connect local world"
 
-#: apps/app/src/routes/welcome-page.tsx:1253
+#: apps/app/src/routes/welcome-page.tsx:1400
 msgid "为世界主人命名"
 msgstr "Name the World Owner"
 
-#: apps/app/src/routes/welcome-page.tsx:1268
+#: apps/app/src/routes/welcome-page.tsx:1415
 msgid "输入你希望被怎么称呼（至少 {MIN_OWNER_NAME_LENGTH} 个字）"
 msgstr ""
 
-#: apps/app/src/routes/welcome-page.tsx:1274
+#: apps/app/src/routes/welcome-page.tsx:1421
 msgid "这是世界里所有 AI 朋友对你的称呼，名字至少 {MIN_OWNER_NAME_LENGTH} 个字。"
 msgstr ""
 
-#: apps/app/src/routes/welcome-page.tsx:1292
+#: apps/app/src/routes/welcome-page.tsx:1439
 msgid "返回上一步"
 msgstr "Back to previous step"
 
-#: apps/app/src/routes/welcome-page.tsx:1322
+#: apps/app/src/routes/welcome-page.tsx:1469
 msgid "进入世界"
 msgstr "Enter world"
 
-#: apps/app/src/routes/welcome-page.tsx:1349
+#: apps/app/src/routes/welcome-page.tsx:1496
 msgid "通过邮箱登录。新用户会获得一个全新的世界，老用户会唤醒自己已有的世界。"
 msgstr "Sign in by email. New users get a brand-new world; existing users wake their existing one."
 
-#: apps/app/src/routes/welcome-page.tsx:1364
+#: apps/app/src/routes/welcome-page.tsx:1511
 msgid "本地世界"
 msgstr "Local World"
 
-#: apps/app/src/routes/welcome-page.tsx:1368
+#: apps/app/src/routes/welcome-page.tsx:1515
 msgid "输入世界入口地址并直接连接。若你拿到的是 /api 地址，也可以直接粘贴。"
 msgstr "Enter the world entry address and connect directly. If you have an /api address, you can paste it as is."
 
-#: apps/app/src/routes/welcome-page.tsx:1383
+#: apps/app/src/routes/welcome-page.tsx:1530
 msgid "正在加载世界主人..."
 msgstr "Loading world owner..."
 
-#: apps/app/src/routes/welcome-page.tsx:1388
+#: apps/app/src/routes/welcome-page.tsx:1535
 msgid "正在加载世界主人"
 msgstr "Loading world owner"
 
-#: apps/app/src/routes/welcome-page.tsx:1390
+#: apps/app/src/routes/welcome-page.tsx:1537
 msgid "世界地址已连通，正在进入应用前同步世界主人资料。"
 msgstr "The world address is reachable. Syncing world owner profile before entering the app."
 
-#: apps/app/src/routes/welcome-page.tsx:1415
+#: apps/app/src/routes/welcome-page.tsx:1562
 msgid "重新连接"
 msgstr "Reconnect"
 
-#: apps/app/src/routes/welcome-page.tsx:1415
-#: apps/app/src/routes/welcome-page.tsx:1483
+#: apps/app/src/routes/welcome-page.tsx:1562
+#: apps/app/src/routes/welcome-page.tsx:1630
 msgid "重新解析"
 msgstr "Resolve again"
 
-#: apps/app/src/routes/welcome-page.tsx:1437
-#: apps/app/src/routes/welcome-page.tsx:1459
+#: apps/app/src/routes/welcome-page.tsx:1584
+#: apps/app/src/routes/welcome-page.tsx:1606
 msgid "重试发送"
 msgstr "Retry sending"
 
-#: apps/app/src/routes/welcome-page.tsx:1505
-#: apps/app/src/routes/welcome-page.tsx:1522
+#: apps/app/src/routes/welcome-page.tsx:1652
+#: apps/app/src/routes/welcome-page.tsx:1669
 msgid "世界入口"
 msgstr "World Entry"
 
-#: apps/app/src/routes/welcome-page.tsx:1508
-#: apps/app/src/routes/welcome-page.tsx:1525
+#: apps/app/src/routes/welcome-page.tsx:1655
+#: apps/app/src/routes/welcome-page.tsx:1672
 msgid "连接你的世界"
 msgstr "Connect your world"
 

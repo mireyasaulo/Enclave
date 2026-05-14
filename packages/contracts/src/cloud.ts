@@ -108,6 +108,9 @@ export interface VerifyPhoneCodeRequest {
   // 让前端探一次公网 IP（ipify 等）作为兜底，后端仅在 server-side 头取不到
   // 公网 IP 时才采纳，否则保留服务器测得值（不可被客户端覆盖）。
   clientReportedIp?: string;
+  // 仅在新建用户那一刻生效：通过校验后立刻 hash 落盘到 cloud_users.passwordHash。
+  // 老用户登录时即使传了也会被后端忽略，避免静默覆盖已有密码。
+  setPasswordOnRegister?: string;
 }
 
 export interface VerifyPhoneCodeResponse {
@@ -132,12 +135,47 @@ export interface VerifyEmailCodeRequest {
   inviteCode?: string;
   deviceFingerprint?: string;
   clientReportedIp?: string;
+  // 见 VerifyPhoneCodeRequest.setPasswordOnRegister 的注释。
+  setPasswordOnRegister?: string;
 }
 
 export interface VerifyEmailCodeResponse {
   accessToken: string;
   email: string;
   expiresAt: string;
+}
+
+export type CloudPasswordIdentifierKind = "phone" | "email";
+
+export interface LoginWithPasswordRequest {
+  identifierKind: CloudPasswordIdentifierKind;
+  identifier: string;
+  password: string;
+  deviceFingerprint?: string;
+  clientReportedIp?: string;
+}
+
+export interface LoginWithPasswordResponse {
+  accessToken: string;
+  phone: string;
+  email?: string | null;
+  expiresAt: string;
+}
+
+export interface SendChangePasswordCodeResponse {
+  email: string;
+  expiresAt: string;
+  debugCode?: string | null;
+}
+
+export interface ChangePasswordRequest {
+  code: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordResponse {
+  ok: true;
+  passwordUpdatedAt: string;
 }
 
 export interface VerifyGoogleIdTokenRequest {

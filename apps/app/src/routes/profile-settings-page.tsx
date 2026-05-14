@@ -29,6 +29,7 @@ import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { DesktopChatConfirmDialog } from "../features/desktop/chat/desktop-chat-confirm-dialog";
 import { DesktopUtilityShell } from "../features/shell/desktop-utility-shell";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
+import { AccountSecurityPanel } from "../features/account-security/account-security-panel";
 import { SubscriptionPanel } from "../features/subscription/subscription-panel";
 import {
   clearCloudRuntimeSession,
@@ -52,7 +53,8 @@ type SettingsTab =
   | "ai"
   | "language"
   | "legal"
-  | "subscription";
+  | "subscription"
+  | "account-security";
 type LegalTab = "privacy" | "terms" | "community";
 type ProfileSettingsMessage = ReturnType<typeof msg>;
 
@@ -64,6 +66,11 @@ const profileTab = {
 const subscriptionTab = {
   id: "subscription",
   label: msg`会员中心`,
+} satisfies { id: SettingsTab; label: ProfileSettingsMessage };
+
+const accountSecurityTab = {
+  id: "account-security",
+  label: msg`账号安全`,
 } satisfies { id: SettingsTab; label: ProfileSettingsMessage };
 
 const restSettingsTabs: Array<{
@@ -143,7 +150,7 @@ export function ProfileSettingsPage() {
   });
 
   const settingsTabs = showCloudAccountEntries
-    ? [profileTab, subscriptionTab, ...restSettingsTabs]
+    ? [profileTab, subscriptionTab, accountSecurityTab, ...restSettingsTabs]
     : [profileTab, ...restSettingsTabs];
 
   useEffect(() => {
@@ -575,6 +582,14 @@ export function ProfileSettingsPage() {
           <SubscriptionPanel embedded />
         </SettingsSection>
       ) : null}
+      {showCloudAccountEntries && activeTab === "account-security" ? (
+        <SettingsSection
+          title={t(msg`账号安全`)}
+          description={t(msg`修改云账号登录密码，需要邮箱验证码确认。`)}
+        >
+          <AccountSecurityPanel />
+        </SettingsSection>
+      ) : null}
       <DesktopChatConfirmDialog
         open={logoutConfirmOpen}
         title={t(msg`确认退出登录？`)}
@@ -603,7 +618,9 @@ export function ProfileSettingsPage() {
                 ? t(msg`切换当前端的界面语言和本地化格式。`)
                 : activeTab === "subscription"
                   ? t(msg`查看当前云账号订阅状态、可购套餐与邀请奖励。`)
-                  : t(msg`查看当前世界相关的协议和社区规范。`)
+                  : activeTab === "account-security"
+                    ? t(msg`修改云账号登录密码，需要邮箱验证码确认。`)
+                    : t(msg`查看当前世界相关的协议和社区规范。`)
       }
       toolbar={
         <Button

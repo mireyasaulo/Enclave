@@ -1,7 +1,18 @@
-import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  NotFoundException,
+  Post,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 import {
+  ChangePasswordDto,
+  LoginWithPasswordDto,
   SendCodeDto,
   SendEmailCodeDto,
   VerifyCodeDto,
@@ -13,10 +24,12 @@ import {
   resolveCloudClientJwtAudience,
   resolveCloudJwtIssuer,
 } from "../config/cloud-runtime-config";
+import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { CLOUD_CLIENT_ACCESS_TOKEN_PURPOSE } from "./cloud-jwt.constants";
 import { CloudClientAuthGuard } from "./cloud-client-auth.guard";
 import { EmailAuthService } from "./email-auth.service";
 import { GoogleAuthService } from "./google-auth.service";
+import { PasswordAuthService } from "./password-auth.service";
 import { PhoneAuthService } from "./phone-auth.service";
 
 function parseTtlMs(ttl: string): number {
@@ -142,6 +155,9 @@ export class CloudAuthController {
     private readonly phoneAuthService: PhoneAuthService,
     private readonly emailAuthService: EmailAuthService,
     private readonly googleAuthService: GoogleAuthService,
+    private readonly passwordAuthService: PasswordAuthService,
+    @InjectRepository(CloudUserEntity)
+    private readonly userRepo: Repository<CloudUserEntity>,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
@@ -190,6 +206,7 @@ export class CloudAuthController {
       inviteCode: body.inviteCode ?? null,
       deviceFingerprint: body.deviceFingerprint ?? null,
       ip: extractIp(request, body.clientReportedIp ?? null),
+      setPasswordOnRegister: body.setPasswordOnRegister ?? null,
     });
   }
 
@@ -211,7 +228,66 @@ export class CloudAuthController {
       inviteCode: body.inviteCode ?? null,
       deviceFingerprint: body.deviceFingerprint ?? null,
       ip: extractIp(request, body.clientReportedIp ?? null),
+      setPasswordOnRegister: body.setPasswordOnRegister ?? null,
     });
+  }
+
+  @Post("login-with-password")
+  loginWithPassword(
+    @Body() body: LoginWithPasswordDto,
+    @Req() request: {
+      headers: Record<string, string | string[] | undefined>;
+      ip?: string;
+      socket?: { remoteAddress?: string | null };
+    },
+  ) {
+    return this.passwordAuthService.loginWithPassword(
+      body.identifierKind,
+      body.identifier,
+      body.password,
+      {
+        deviceFingerprint: body.deviceFingerprint ?? null,
+        ip: extractIp(request, body.clientReportedIp ?? null),
+      },
+    );
+  }
+
+  @Post("password/send-change-code")
+  @UseGuards(CloudClientAuthGuard)
+  async sendChangePasswordCode(@Req() request: { cloudPhone?: string }) {
+    const user = await this.findCloudUserOrFail(request.cloudPhone);
+    if (!user.email) {
+      throw new NotFoundException(
+        "修改密码需要先绑定邮箱。",
+      );
+    }
+    return this.emailAuthService.sendChangePasswordCode(user.email);
+  }
+
+  @Post("password/change")
+  @UseGuards(CloudClientAuthGuard)
+  async changePassword(
+    @Body() body: ChangePasswordDto,
+    @Req() request: { cloudPhone?: string },
+  ) {
+    const user = await this.findCloudUserOrFail(request.cloudPhone);
+    return this.passwordAuthService.changePassword(
+      user.id,
+      body.code,
+      body.newPassword,
+    );
+  }
+
+  private async findCloudUserOrFail(phone: string | undefined) {
+    const value = (phone ?? "").trim();
+    if (!value) {
+      throw new NotFoundException("登录已失效，请重新登录。");
+    }
+    const user = await this.userRepo.findOne({ where: { phone: value } });
+    if (!user) {
+      throw new NotFoundException("登录已失效，请重新登录。");
+    }
+    return user;
   }
 
   @Post("google/verify-id-token")

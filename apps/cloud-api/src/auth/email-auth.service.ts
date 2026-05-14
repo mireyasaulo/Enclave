@@ -12,6 +12,7 @@ import { ConfigService } from "@nestjs/config";
 import { JwtService } from "@nestjs/jwt";
 import { InjectRepository } from "@nestjs/typeorm";
 import type {
+  SendChangePasswordCodeResponse,
   SendEmailCodeResponse,
   VerifyEmailCodeResponse,
 } from "@yinjie/contracts";
@@ -37,6 +38,7 @@ export type EmailVerifyExtras = {
   inviteCode?: string | null;
   deviceFingerprint?: string | null;
   ip?: string | null;
+  setPasswordOnRegister?: string | null;
 };
 
 @Injectable()
@@ -53,7 +55,7 @@ export class EmailAuthService {
 
   async sendCode(email: string): Promise<SendEmailCodeResponse> {
     const normalized = this.normalizeEmail(email);
-    await this.enforceSendCodeRateLimit(normalized);
+    await this.enforceSendCodeRateLimit(normalized, "world_access");
 
     const existing = await this.userRepo.findOne({
       where: { email: normalized },
@@ -66,6 +68,7 @@ export class EmailAuthService {
     const session = this.sessionRepo.create({
       email: normalized,
       code,
+      purpose: "world_access",
       expiresAt,
       verifiedAt: null,
     });
@@ -108,13 +111,18 @@ export class EmailAuthService {
       session = this.sessionRepo.create({
         email: normalized,
         code: trimmedCode,
+        purpose: "world_access",
         expiresAt: new Date(Date.now() + this.getCodeTtlSeconds() * 1000),
         verifiedAt: new Date(),
       });
       await this.sessionRepo.save(session);
     } else {
       session = await this.sessionRepo.findOne({
-        where: { email: normalized, code: trimmedCode },
+        where: {
+          email: normalized,
+          code: trimmedCode,
+          purpose: "world_access",
+        },
         order: { createdAt: "DESC" },
       });
       if (!session) {
@@ -205,7 +213,7 @@ export class EmailAuthService {
     );
   }
 
-  private async enforceSendCodeRateLimit(email: string) {
+  private async enforceSendCodeRateLimit(email: string, purpose: string) {
     const cooldownSeconds = this.parsePositiveInteger(
       this.configService.get<string>("CLOUD_EMAIL_CODE_RESEND_COOLDOWN_SECONDS") ??
         this.configService.get<string>("CLOUD_CODE_RESEND_COOLDOWN_SECONDS"),
@@ -223,7 +231,7 @@ export class EmailAuthService {
     );
 
     const latest = await this.sessionRepo.findOne({
-      where: { email },
+      where: { email, purpose },
       order: { createdAt: "DESC" },
     });
     if (latest) {
@@ -240,7 +248,7 @@ export class EmailAuthService {
 
     const since = new Date(Date.now() - windowSeconds * 1000);
     const count = await this.sessionRepo.count({
-      where: { email, createdAt: MoreThan(since) },
+      where: { email, purpose, createdAt: MoreThan(since) },
     });
     if (count >= maxPerWindow) {
       throw new HttpException(
@@ -248,6 +256,117 @@ export class EmailAuthService {
         HttpStatus.TOO_MANY_REQUESTS,
       );
     }
+  }
+
+  // 改密码场景的发码：要求邮箱必须是已有用户的绑定邮箱（避免「枚举注册邮箱」），
+  // 与 world_access 通道分开走限流计数器，互不影响。
+  async sendChangePasswordCode(
+    email: string,
+  ): Promise<SendChangePasswordCodeResponse> {
+    const normalized = this.normalizeEmail(email);
+
+    const user = await this.userRepo.findOne({
+      where: { email: normalized },
+    });
+    if (!user) {
+      // 不区分「邮箱未注册」和「未绑定」对外报同样错，避免枚举。
+      throw new BadRequestException("邮箱与当前账号不匹配。");
+    }
+
+    await this.enforceSendCodeRateLimit(normalized, "change_password");
+
+    const code = this.generateCode();
+    const expiresAt = new Date(Date.now() + this.getCodeTtlSeconds() * 1000);
+    const session = this.sessionRepo.create({
+      email: normalized,
+      code,
+      purpose: "change_password",
+      expiresAt,
+      verifiedAt: null,
+    });
+    await this.sessionRepo.save(session);
+
+    let result: Awaited<ReturnType<CloudMailService["sendVerificationCode"]>>;
+    try {
+      result = await this.mailService.sendVerificationCode(
+        normalized,
+        code,
+        false,
+      );
+    } catch (error) {
+      await this.sessionRepo.delete({ id: session.id });
+      if (error instanceof ServiceUnavailableException) throw error;
+      throw new ServiceUnavailableException("邮件验证码发送失败，请稍后重试。");
+    }
+
+    return {
+      email: normalized,
+      expiresAt: expiresAt.toISOString(),
+      debugCode: result.debugCode ?? null,
+    };
+  }
+
+  // 仅消费验证码（不签发 JWT、不触发 user-post-verify hook），用于改密码场景。
+  // 返回正在绑定的 user，调用方负责接下来的写库。
+  async consumeChangePasswordCode(
+    email: string,
+    code: string,
+  ): Promise<{ email: string; user: CloudUserEntity }> {
+    const normalized = this.normalizeEmail(email);
+    const trimmedCode = (code ?? "").trim();
+    if (!trimmedCode) {
+      throw new BadRequestException("验证码不能为空。");
+    }
+
+    let session: EmailVerificationSessionEntity | null;
+
+    if (trimmedCode === DEV_BYPASS_CODE) {
+      // 与 verifyCode 行为对齐：dev bypass 不查库直接放行。
+      session = this.sessionRepo.create({
+        email: normalized,
+        code: trimmedCode,
+        purpose: "change_password",
+        expiresAt: new Date(Date.now() + this.getCodeTtlSeconds() * 1000),
+        verifiedAt: new Date(),
+      });
+      await this.sessionRepo.save(session);
+    } else {
+      session = await this.sessionRepo.findOne({
+        where: {
+          email: normalized,
+          code: trimmedCode,
+          purpose: "change_password",
+        },
+        order: { createdAt: "DESC" },
+      });
+      if (!session) {
+        throw new UnauthorizedException("验证码错误。");
+      }
+      if (session.verifiedAt) {
+        throw new UnauthorizedException("该验证码已使用。");
+      }
+      if (session.expiresAt.getTime() < Date.now()) {
+        throw new UnauthorizedException("验证码已过期。");
+      }
+      session.verifiedAt = new Date();
+      await this.sessionRepo.save(session);
+    }
+
+    const user = await this.userRepo.findOne({
+      where: { email: normalized },
+    });
+    if (!user) {
+      throw new BadRequestException("邮箱与当前账号不匹配。");
+    }
+    if (user.status !== "active") {
+      throw new ForbiddenException(
+        user.status === "banned"
+          ? "This cloud account has been banned."
+          : "This cloud account has been archived.",
+      );
+    }
+
+    return { email: normalized, user };
   }
 
   private parsePositiveInteger(rawValue: string | undefined, fallback: number) {

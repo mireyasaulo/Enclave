@@ -57,6 +57,12 @@ export class CloudUserEntity {
   @Column({ type: "text", nullable: true })
   bannedReason: string | null;
 
+  @Column({ type: "text", nullable: true })
+  passwordHash: string | null;
+
+  @Column({ type: "datetime", nullable: true })
+  passwordUpdatedAt: Date | null;
+
   @CreateDateColumn()
   createdAt: Date;
 

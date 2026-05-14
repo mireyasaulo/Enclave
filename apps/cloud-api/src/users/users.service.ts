@@ -1,5 +1,9 @@
 import { Injectable, Logger, NotFoundException, OnModuleInit } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import {
+  assertPasswordStrength,
+  hashPassword,
+} from "../auth/password-policy";
 import type {
 // i18n-ignore-start: data / seed / preset content — not user-facing UI.
   CloudUserDetail,
@@ -27,6 +31,9 @@ export type EnsureUserContext = {
   inviteCode?: string | null;
   ip?: string | null;
   deviceFingerprint?: string | null;
+  // 注册时一并设置的初始登录密码。仅在 isNewUser=true 时落盘；
+  // 老用户即便传了也会被忽略，避免静默覆盖。
+  setPasswordOnRegister?: string | null;
 };
 
 @Injectable()
@@ -58,6 +65,7 @@ export class UsersService implements OnModuleInit {
           inviteCode: extras.inviteCode ?? null,
           ip: extras.ip ?? null,
           deviceFingerprint: extras.deviceFingerprint ?? null,
+          setPasswordOnRegister: extras.setPasswordOnRegister ?? null,
         });
       } catch (error) {
         this.logger.warn(
@@ -72,6 +80,7 @@ export class UsersService implements OnModuleInit {
           inviteCode: extras.inviteCode ?? null,
           ip: extras.ip ?? null,
           deviceFingerprint: extras.deviceFingerprint ?? null,
+          setPasswordOnRegister: extras.setPasswordOnRegister ?? null,
         });
       } catch (error) {
         this.logger.warn(
@@ -113,6 +122,21 @@ export class UsersService implements OnModuleInit {
         user.registrationDeviceFingerprint = context.deviceFingerprint;
       }
       user = await this.userRepo.save(user);
+    }
+
+    if (isNewUser && context.setPasswordOnRegister) {
+      try {
+        const valid = assertPasswordStrength(context.setPasswordOnRegister, [
+          user.phone,
+        ]);
+        user.passwordHash = await hashPassword(valid);
+        user.passwordUpdatedAt = now;
+        user = await this.userRepo.save(user);
+      } catch (error) {
+        this.logger.warn(
+          `setPasswordOnRegister failed for user=${user.id}: ${(error as Error).message}`,
+        );
+      }
     }
 
     const code = await this.invite.ensureCodeForUser(user.id);
@@ -190,6 +214,22 @@ export class UsersService implements OnModuleInit {
         user.registrationDeviceFingerprint = context.deviceFingerprint;
       }
       user = await this.userRepo.save(user);
+    }
+
+    if (isNewUser && context.setPasswordOnRegister) {
+      try {
+        const valid = assertPasswordStrength(context.setPasswordOnRegister, [
+          user.email,
+          user.phone,
+        ]);
+        user.passwordHash = await hashPassword(valid);
+        user.passwordUpdatedAt = now;
+        user = await this.userRepo.save(user);
+      } catch (error) {
+        this.logger.warn(
+          `setPasswordOnRegister failed for user=${user.id}: ${(error as Error).message}`,
+        );
+      }
     }
 
     const code = await this.invite.ensureCodeForUser(user.id);
