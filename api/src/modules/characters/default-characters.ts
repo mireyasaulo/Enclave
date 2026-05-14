@@ -23,6 +23,22 @@ import {
 
 export const SELF_CHARACTER_ID = 'char-default-self';
 
+/**
+ * 默认好友 ≠ 一种独立的角色，而是"居民里被钉为出厂就自动建 friendship"的子集。
+ *
+ * 完整的三层模型见 `built-in-character-presets.ts` 顶部。本文件做两件事：
+ *   1. `buildDefaultCharacters()` 返回 7 个原生默认角色（自身在独立文件里实现，
+ *      seed 时直接落 characters 表且 deletionPolicy='protected'）。
+ *   2. `ADDITIONAL_DEFAULT_PRESET_KEYS` 从 BUILT_IN 居民池里挑出来 6 个，再钉成
+ *      默认好友。挑出来的角色定义不在这里，只引用 presetKey。
+ *
+ * 最终所有 13 个 ID 由 `DEFAULT_CHARACTER_IDS` 导出，由 social.service.ts 的
+ * `ensureDefaultFriendships()` 写入 friendships 表。
+ *
+ * ⚠️ 加默认好友的代价：每加一个，所有新 world 出厂通讯录都多一格。
+ *   只在"普适刚需"角色上用 B 方案；细分领域请保持居民池形态（A 方案）。
+ */
+
 // 这些是 2026-05-13 起新加入“默认好友”的预设角色：
 // 林晨 / 林眠（睡眠 + 情绪陪伴）、顾棠（谈判）、灯塔（安全把关）、鹿栀（关系观察）、简宁（恋爱顾问）。
 // 它们本身在 BUILT_IN_CHARACTER_PRESETS 里以 preset_catalog 形式存在，

@@ -343,6 +343,15 @@ export class SocialService {
     return blocked.map((item) => item.characterId);
   }
 
+  /**
+   * 把 `DEFAULT_FRIENDSHIP_CHARACTER_IDS` 列出的居民钉为该 owner 的好友。
+   *
+   * 这是"居民/默认好友/候选好友"三层模型中**唯一**会无条件建立 friendship 的入口
+   * （三层模型详见 `built-in-character-presets.ts` 顶部）。其它路径（场景匹配、
+   * 摇一摇、雷达）都要走 friend_request 同意流程。
+   *
+   * 幂等：已存在的 friendship 不会被覆盖，只补 region。
+   */
   async ensureDefaultFriendships(ownerId?: string): Promise<void> {
     const resolvedOwnerId =
       ownerId ?? (await this.worldOwnerService.getOwnerOrThrow()).id;
