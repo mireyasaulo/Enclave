@@ -30,11 +30,11 @@ export default defineConfig({
     port: 5184,
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:3010",
+        target: "http://127.0.0.1:3045",
         changeOrigin: true,
       },
       "/health": {
-        target: "http://127.0.0.1:3010",
+        target: "http://127.0.0.1:3045",
         changeOrigin: true,
       },
       "/telemetry": {
