@@ -19,17 +19,17 @@ msgid "音乐"
 msgstr "Music"
 
 #: apps/app/src/components/audio-card.tsx:148
+#: apps/app/src/routes/channels-page.tsx:1562
+#: apps/app/src/routes/channels-page.tsx:1717
+msgid "暂停"
+msgstr "Pause"
+
+#: apps/app/src/components/audio-card.tsx:148
 #: apps/app/src/i18n/static-dom-seed.ts:349
 #: apps/app/src/routes/channels-page.tsx:1562
 #: apps/app/src/routes/channels-page.tsx:1717
 msgid "播放"
 msgstr "Play"
-
-#: apps/app/src/components/audio-card.tsx:148
-#: apps/app/src/routes/channels-page.tsx:1562
-#: apps/app/src/routes/channels-page.tsx:1717
-msgid "暂停"
-msgstr "Pause"
 
 #: apps/app/src/components/bootstrap-screen.tsx:43
 #: apps/app/src/routes/splash-page.tsx:181
@@ -415,7 +415,7 @@ msgstr "Sticker"
 #: apps/app/src/routes/desktop-chat-files-page.tsx:757
 #: apps/app/src/routes/favorites-page.tsx:414
 #: apps/app/src/routes/mobile-favorites-page.tsx:309
-#: apps/app/src/routes/profile-page.tsx:159
+#: apps/app/src/routes/profile-page.tsx:161
 msgid "收藏"
 msgstr "Favorites"
 
@@ -1584,7 +1584,7 @@ msgstr "Me"
 #: apps/app/src/routes/mobile-add-friend-page.tsx:737
 #: apps/app/src/routes/moments-page.tsx:320
 #: apps/app/src/routes/moments-page.tsx:419
-#: apps/app/src/routes/profile-page.tsx:101
+#: apps/app/src/routes/profile-page.tsx:103
 msgid "我"
 msgstr "Me"
 
@@ -2338,6 +2338,7 @@ msgstr "Untitled note"
 #: apps/app/src/routes/profile-info-placeholder-page.tsx:51
 #: apps/app/src/routes/profile-info-signature-page.tsx:80
 #: apps/app/src/routes/profile-moments-page.tsx:539
+#: apps/app/src/routes/profile-settings-account-security-page.tsx:48
 #: apps/app/src/routes/profile-settings-language-page.tsx:49
 #: apps/app/src/routes/profile-subscription-page.tsx:493
 #: apps/app/src/routes/welcome-page.tsx:1457
@@ -2440,6 +2441,66 @@ msgstr "Expand"
 msgid "收起"
 msgstr "Dismiss"
 
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:82
+msgid "已复制微信号，去微信粘贴添加好友吧～"
+msgstr ""
+
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:83
+msgid "复制失败，请长按微信号手动复制。"
+msgstr ""
+
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:108
+#: apps/app/src/features/subscription/checkout-contact-dialog.tsx:145
+msgid "关闭弹窗"
+msgstr "Close dialog"
+
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:116
+#: apps/app/src/components/mobile-speech-input-sheet.tsx:150
+#: apps/app/src/components/share-card-modal.tsx:368
+#: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:111
+#: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:171
+#: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:217
+#: apps/app/src/features/contacts/management/contacts-management-modal.tsx:98
+#: apps/app/src/features/contacts/management/contacts-management-modal.tsx:107
+#: apps/app/src/features/contacts/management/contacts-management-modal.tsx:125
+#: apps/app/src/features/desktop/chat/desktop-chat-confirm-dialog.tsx:83
+#: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2262
+#: apps/app/src/features/desktop/chat/desktop-chat-history-dialog.tsx:96
+#: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:118
+#: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:718
+#: apps/app/src/features/desktop/chat/desktop-group-member-picker.tsx:229
+#: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:166
+#: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:215
+#: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:125
+#: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:109
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:111
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:46
+#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:49
+#: apps/app/src/features/games/game-center-session-panel.tsx:123
+#: apps/app/src/features/games/parking-war/parking-war-game.tsx:793
+#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:148
+#: apps/app/src/features/notes/mobile-note-send-sheet.tsx:103
+#: apps/app/src/i18n/static-dom-seed.ts:855
+#: apps/app/src/routes/desktop-chat-files-page.tsx:1057
+#: apps/app/src/routes/live-companion-page.tsx:873
+#: apps/app/src/routes/mobile-add-friend-page.tsx:777
+#: apps/app/src/routes/mobile-moments-publish-page.tsx:502
+msgid "关闭"
+msgstr "Close"
+
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:138
+msgid "微信号（点一下选中，也可直接复制）"
+msgstr ""
+
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:163
+msgid "一键复制"
+msgstr ""
+
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:169
+msgid "加好友时备注「拉群」，运营会拉你进体验群，第一时间通知功能上线～"
+msgstr ""
+
+#: apps/app/src/components/feature-coming-soon-dialog.tsx:187
 #: apps/app/src/components/feature-unavailable-dialog.tsx:23
 #: apps/app/src/features/subscription/checkout-contact-dialog.tsx:226
 msgid "我知道了"
@@ -2489,9 +2550,9 @@ msgstr "Save it to your photos and post to X / RedNote / Weibo to invite more re
 #: apps/app/src/routes/moments-page.tsx:1385
 #: apps/app/src/routes/profile-info-page.tsx:32
 #: apps/app/src/routes/profile-moments-page.tsx:319
-#: apps/app/src/routes/profile-page.tsx:123
-#: apps/app/src/routes/profile-page.tsx:130
-#: apps/app/src/routes/profile-page.tsx:133
+#: apps/app/src/routes/profile-page.tsx:125
+#: apps/app/src/routes/profile-page.tsx:132
+#: apps/app/src/routes/profile-page.tsx:135
 msgid "世界主人"
 msgstr "World owner"
 
@@ -2972,39 +3033,6 @@ msgstr "The recognition result will stay here until you decide whether to insert
 #: apps/app/src/i18n/static-dom-seed.ts:738
 msgid "关闭语音输入面板"
 msgstr "Close voice input panel"
-
-#: apps/app/src/components/mobile-speech-input-sheet.tsx:150
-#: apps/app/src/components/share-card-modal.tsx:368
-#: apps/app/src/features/contacts/desktop-contact-text-edit-dialog.tsx:111
-#: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:171
-#: apps/app/src/features/contacts/management/contacts-bulk-action-bar.tsx:217
-#: apps/app/src/features/contacts/management/contacts-management-modal.tsx:98
-#: apps/app/src/features/contacts/management/contacts-management-modal.tsx:107
-#: apps/app/src/features/contacts/management/contacts-management-modal.tsx:125
-#: apps/app/src/features/desktop/chat/desktop-chat-confirm-dialog.tsx:83
-#: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:2262
-#: apps/app/src/features/desktop/chat/desktop-chat-history-dialog.tsx:96
-#: apps/app/src/features/desktop/chat/desktop-chat-text-edit-dialog.tsx:118
-#: apps/app/src/features/desktop/chat/desktop-create-group-dialog.tsx:718
-#: apps/app/src/features/desktop/chat/desktop-group-member-picker.tsx:229
-#: apps/app/src/features/desktop/chat/desktop-group-member-removal-picker.tsx:166
-#: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:215
-#: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:125
-#: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:109
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:111
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:46
-#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:49
-#: apps/app/src/features/games/game-center-session-panel.tsx:123
-#: apps/app/src/features/games/parking-war/parking-war-game.tsx:793
-#: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:148
-#: apps/app/src/features/notes/mobile-note-send-sheet.tsx:103
-#: apps/app/src/i18n/static-dom-seed.ts:855
-#: apps/app/src/routes/desktop-chat-files-page.tsx:1057
-#: apps/app/src/routes/live-companion-page.tsx:873
-#: apps/app/src/routes/mobile-add-friend-page.tsx:777
-#: apps/app/src/routes/mobile-moments-publish-page.tsx:502
-msgid "关闭"
-msgstr "Close"
 
 #: apps/app/src/components/mobile-speech-input-sheet.tsx:195
 #: apps/app/src/i18n/static-dom-seed.ts:856
@@ -7400,7 +7428,7 @@ msgstr "Social and Content"
 #: apps/app/src/routes/moments-page.tsx:1078
 #: apps/app/src/routes/moments-page.tsx:1401
 #: apps/app/src/routes/profile-moments-page.tsx:463
-#: apps/app/src/routes/profile-page.tsx:168
+#: apps/app/src/routes/profile-page.tsx:170
 msgid "朋友圈"
 msgstr "Moments"
 
@@ -9784,7 +9812,7 @@ msgid "正在读取资料..."
 msgstr "Loading profile..."
 
 #: apps/app/src/features/desktop/chat/desktop-message-avatar-popover.tsx:461
-#: apps/app/src/routes/profile-page.tsx:107
+#: apps/app/src/routes/profile-page.tsx:109
 msgid "打开设置"
 msgstr "Open settings"
 
@@ -10122,8 +10150,8 @@ msgstr "Saved to Favorites"
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1243
 #: apps/app/src/routes/character-detail-page.tsx:308
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1298
-#: apps/app/src/routes/profile-settings-page.tsx:355
-#: apps/app/src/routes/profile-settings-page.tsx:481
+#: apps/app/src/routes/profile-settings-page.tsx:372
+#: apps/app/src/routes/profile-settings-page.tsx:498
 #: apps/app/src/routes/welcome-page.tsx:1469
 msgid "保存中..."
 msgstr "Saving..."
@@ -12621,16 +12649,16 @@ msgid "买了种子"
 msgstr "Bought seeds"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
+msgid "卖了"
+msgstr "Sold"
+
+#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:240
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:242
 #: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
 msgid "作物"
 msgstr "Crops"
-
-#: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
-msgid "卖了"
-msgstr "Sold"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:84
 msgid "升到 Lv."
@@ -17836,7 +17864,7 @@ msgstr "Feedback"
 
 #: apps/app/src/features/shell/desktop-nav-config.ts:117
 #: apps/app/src/routes/profile-feedback-page.tsx:147
-#: apps/app/src/routes/profile-page.tsx:196
+#: apps/app/src/routes/profile-page.tsx:198
 msgid "反馈"
 msgstr "Feedback"
 
@@ -17844,9 +17872,9 @@ msgstr "Feedback"
 #: apps/app/src/features/shell/desktop-nav-config.ts:124
 #: apps/app/src/features/shell/desktop-shell.tsx:646
 #: apps/app/src/routes/desktop-mobile-page.tsx:186
-#: apps/app/src/routes/profile-page.tsx:150
+#: apps/app/src/routes/profile-page.tsx:152
 #: apps/app/src/routes/profile-settings-page.tsx:277
-#: apps/app/src/routes/profile-settings-page.tsx:609
+#: apps/app/src/routes/profile-settings-page.tsx:626
 msgid "设置"
 msgstr "Settings"
 
@@ -18089,10 +18117,6 @@ msgstr "Email copied"
 msgid "复制失败，请手动选中复制。"
 msgstr "Copy failed. Select and copy manually."
 
-#: apps/app/src/features/subscription/checkout-contact-dialog.tsx:145
-msgid "关闭弹窗"
-msgstr "Close dialog"
-
 #: apps/app/src/features/subscription/checkout-contact-dialog.tsx:153
 #: apps/app/src/features/subscription/subscription-panel.tsx:552
 #: apps/app/src/routes/profile-subscription-page.tsx:583
@@ -18236,9 +18260,9 @@ msgid "订阅"
 msgstr "Subscription"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:485
-#: apps/app/src/routes/profile-page.tsx:180
+#: apps/app/src/routes/profile-page.tsx:182
 #: apps/app/src/routes/profile-settings-page.tsx:68
-#: apps/app/src/routes/profile-settings-page.tsx:579
+#: apps/app/src/routes/profile-settings-page.tsx:596
 #: apps/app/src/routes/profile-subscription-page.tsx:485
 #: apps/app/src/routes/profile-subscription-page.tsx:508
 msgid "会员中心"
@@ -18318,7 +18342,7 @@ msgid "暂无邀请记录。"
 msgstr "No invite records yet."
 
 #: apps/app/src/i18n/static-dom-seed.ts:12
-#: apps/app/src/routes/profile-settings-page.tsx:337
+#: apps/app/src/routes/profile-settings-page.tsx:354
 msgid "签名"
 msgstr "Signature"
 
@@ -25915,19 +25939,19 @@ msgid "正在打开角色朋友圈..."
 msgstr "Opening character Moments..."
 
 #: apps/app/src/routes/legal-community-page.tsx:10
-#: apps/app/src/routes/profile-page.tsx:217
+#: apps/app/src/routes/profile-page.tsx:219
 #: apps/app/src/routes/profile-settings-page.tsx:89
 msgid "社区规范"
 msgstr "Community Guidelines"
 
 #: apps/app/src/routes/legal-privacy-page.tsx:10
-#: apps/app/src/routes/profile-page.tsx:205
+#: apps/app/src/routes/profile-page.tsx:207
 #: apps/app/src/routes/profile-settings-page.tsx:87
 msgid "隐私政策"
 msgstr "Privacy Policy"
 
 #: apps/app/src/routes/legal-terms-page.tsx:10
-#: apps/app/src/routes/profile-page.tsx:211
+#: apps/app/src/routes/profile-page.tsx:213
 msgid "服务条款"
 msgstr "Terms of Service"
 
@@ -26582,7 +26606,7 @@ msgid "导入失败，请稍后再试"
 msgstr "Import failed. Please try again later."
 
 #: apps/app/src/routes/profile-character-import-page.tsx:166
-#: apps/app/src/routes/profile-page.tsx:190
+#: apps/app/src/routes/profile-page.tsx:192
 msgid "导入角色"
 msgstr "Import characters"
 
@@ -26771,15 +26795,30 @@ msgstr "Loading desktop My Moments workspace."
 msgid "载入桌面我的朋友圈..."
 msgstr "Loading desktop My Moments…"
 
-#: apps/app/src/routes/profile-page.tsx:137
+#: apps/app/src/routes/profile-page.tsx:139
 msgid "查看与编辑个人资料"
 msgstr "View and edit profile"
 
-#: apps/app/src/routes/profile-page.tsx:227
-#: apps/app/src/routes/profile-settings-page.tsx:599
-#: apps/app/src/routes/profile-settings-page.tsx:671
+#: apps/app/src/routes/profile-page.tsx:229
+#: apps/app/src/routes/profile-settings-page.tsx:616
+#: apps/app/src/routes/profile-settings-page.tsx:688
 msgid "退出登录"
 msgstr "Sign out"
+
+#: apps/app/src/routes/profile-page.tsx:241
+msgid "导入角色功能正在开发中，敬请期待"
+msgstr ""
+
+#: apps/app/src/routes/profile-page.tsx:243
+msgid "我们正在打磨更顺手的导入流程。先加运营微信，体验上线后第一时间通知你，也欢迎入群一起聊聊你想怎么用。"
+msgstr ""
+
+#: apps/app/src/routes/profile-settings-account-security-page.tsx:40
+#: apps/app/src/routes/profile-settings-page.tsx:73
+#: apps/app/src/routes/profile-settings-page.tsx:323
+#: apps/app/src/routes/profile-settings-page.tsx:604
+msgid "账号安全"
+msgstr "Account security"
 
 #: apps/app/src/routes/profile-settings-language-page.tsx:41
 #: apps/app/src/routes/profile-settings-page.tsx:301
@@ -26791,21 +26830,16 @@ msgid "正在切换语言..."
 msgstr "Switching language…"
 
 #: apps/app/src/routes/profile-settings-page.tsx:63
-#: apps/app/src/routes/profile-settings-page.tsx:323
+#: apps/app/src/routes/profile-settings-page.tsx:340
 msgid "个人资料"
 msgstr "Profile"
-
-#: apps/app/src/routes/profile-settings-page.tsx:73
-#: apps/app/src/routes/profile-settings-page.tsx:587
-msgid "账号安全"
-msgstr "Account security"
 
 #: apps/app/src/routes/profile-settings-page.tsx:80
 msgid "快捷键设置"
 msgstr "Shortcut settings"
 
 #: apps/app/src/routes/profile-settings-page.tsx:81
-#: apps/app/src/routes/profile-settings-page.tsx:425
+#: apps/app/src/routes/profile-settings-page.tsx:442
 msgid "AI 设置"
 msgstr "AI Settings"
 
@@ -26814,7 +26848,7 @@ msgid "语言"
 msgstr "Language"
 
 #: apps/app/src/routes/profile-settings-page.tsx:83
-#: apps/app/src/routes/profile-settings-page.tsx:530
+#: apps/app/src/routes/profile-settings-page.tsx:547
 msgid "协议与规范"
 msgstr "Policies and Guidelines"
 
@@ -26846,170 +26880,170 @@ msgstr "Back to profile"
 msgid "返回资料页"
 msgstr "Back to profile page"
 
-#: apps/app/src/routes/profile-settings-page.tsx:325
+#: apps/app/src/routes/profile-settings-page.tsx:342
 msgid "这里的名称和签名会用于移动端资料页和世界主人展示。"
 msgstr "This name and signature are used on the mobile profile page and world owner display."
 
-#: apps/app/src/routes/profile-settings-page.tsx:329
+#: apps/app/src/routes/profile-settings-page.tsx:346
 msgid "显示名称"
 msgstr "Display name"
 
-#: apps/app/src/routes/profile-settings-page.tsx:333
+#: apps/app/src/routes/profile-settings-page.tsx:350
 msgid "输入显示名称"
 msgstr "Enter display name"
 
-#: apps/app/src/routes/profile-settings-page.tsx:342
+#: apps/app/src/routes/profile-settings-page.tsx:359
 msgid "介绍一下你自己，或者写一句当前状态"
 msgstr "Introduce yourself, or write your current status"
 
-#: apps/app/src/routes/profile-settings-page.tsx:356
+#: apps/app/src/routes/profile-settings-page.tsx:373
 msgid "保存资料"
 msgstr "Save profile"
 
-#: apps/app/src/routes/profile-settings-page.tsx:364
+#: apps/app/src/routes/profile-settings-page.tsx:381
 msgid "资料已更新。"
 msgstr "Profile updated."
 
-#: apps/app/src/routes/profile-settings-page.tsx:371
+#: apps/app/src/routes/profile-settings-page.tsx:388
 msgid "聊天快捷键"
 msgstr "Chat shortcuts"
 
-#: apps/app/src/routes/profile-settings-page.tsx:372
+#: apps/app/src/routes/profile-settings-page.tsx:389
 msgid "调整桌面和 Web 键盘聊天输入时的发送快捷键。"
 msgstr "Adjust the send shortcut for desktop and web keyboard chat input."
 
-#: apps/app/src/routes/profile-settings-page.tsx:417
+#: apps/app/src/routes/profile-settings-page.tsx:434
 msgid "当前仅影响桌面和 Web 的键盘聊天输入，移动端仍以发送按钮和语音入口为主。"
 msgstr "This only affects desktop and web keyboard chat input. Mobile still uses the send button and voice entry."
 
-#: apps/app/src/routes/profile-settings-page.tsx:427
+#: apps/app/src/routes/profile-settings-page.tsx:444
 msgid "你可以为当前世界主人单独配置专属 API Key 和兼容 Base URL。"
 msgstr "You can configure a dedicated API Key and compatible Base URL for the current world owner."
 
-#: apps/app/src/routes/profile-settings-page.tsx:433
+#: apps/app/src/routes/profile-settings-page.tsx:450
 msgid "读取配置..."
 msgstr "Loading settings..."
 
 #. placeholder {0}: ownerQuery.data.customApiBase
-#: apps/app/src/routes/profile-settings-page.tsx:443
+#: apps/app/src/routes/profile-settings-page.tsx:460
 msgid "当前使用专属 API Key，Base URL：{0}。"
 msgstr "Using dedicated API Key, Base URL: {0}."
 
-#: apps/app/src/routes/profile-settings-page.tsx:445
+#: apps/app/src/routes/profile-settings-page.tsx:462
 msgid "当前使用专属 API Key。"
 msgstr "Using dedicated API Key."
 
-#: apps/app/src/routes/profile-settings-page.tsx:450
+#: apps/app/src/routes/profile-settings-page.tsx:467
 msgid "专属 API Key"
 msgstr "Dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:457
+#: apps/app/src/routes/profile-settings-page.tsx:474
 msgid "已保存专属 API Key，输入新的值可替换"
 msgstr "Dedicated API Key saved. Enter a new value to replace it."
 
-#: apps/app/src/routes/profile-settings-page.tsx:458
+#: apps/app/src/routes/profile-settings-page.tsx:475
 msgid "输入你的专属 API Key"
 msgstr "Enter your dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:463
+#: apps/app/src/routes/profile-settings-page.tsx:480
 msgid "兼容 Base URL"
 msgstr "Compatible Base URL"
 
-#: apps/app/src/routes/profile-settings-page.tsx:467
+#: apps/app/src/routes/profile-settings-page.tsx:484
 msgid "可选，例如 https://api.openai.com/v1"
 msgstr "Optional, e.g. https://api.openai.com/v1"
 
-#: apps/app/src/routes/profile-settings-page.tsx:482
+#: apps/app/src/routes/profile-settings-page.tsx:499
 msgid "保存专属 API Key"
 msgstr "Save dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:491
+#: apps/app/src/routes/profile-settings-page.tsx:508
 msgid "清除中..."
 msgstr "Clearing..."
 
-#: apps/app/src/routes/profile-settings-page.tsx:492
+#: apps/app/src/routes/profile-settings-page.tsx:509
 msgid "清除专属 API Key"
 msgstr "Clear dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:506
+#: apps/app/src/routes/profile-settings-page.tsx:523
 msgid "专属 API Key 已保存。"
 msgstr "Dedicated API Key saved."
 
-#: apps/app/src/routes/profile-settings-page.tsx:511
+#: apps/app/src/routes/profile-settings-page.tsx:528
 msgid "专属 API Key 已清除。"
 msgstr "Dedicated API Key cleared."
 
-#: apps/app/src/routes/profile-settings-page.tsx:519
+#: apps/app/src/routes/profile-settings-page.tsx:536
 msgid "界面语言"
 msgstr "Interface Language"
 
-#: apps/app/src/routes/profile-settings-page.tsx:521
+#: apps/app/src/routes/profile-settings-page.tsx:538
 msgid "切换界面语言，好友回复也会跟随此设置使用对应语言。"
 msgstr "Switch the interface language; friends' replies will follow this setting and use the matching language."
 
-#: apps/app/src/routes/profile-settings-page.tsx:531
+#: apps/app/src/routes/profile-settings-page.tsx:548
 msgid "桌面端保留当前文档切换和独立打开入口。"
 msgstr "Desktop keeps document switching and independent open entry points."
 
-#: apps/app/src/routes/profile-settings-page.tsx:565
+#: apps/app/src/routes/profile-settings-page.tsx:582
 msgid "打开当前文档"
 msgstr "Open Current Document"
 
-#: apps/app/src/routes/profile-settings-page.tsx:569
+#: apps/app/src/routes/profile-settings-page.tsx:586
 msgid "查看世界隐私政策和数据使用说明。"
 msgstr "View the world privacy policy and data usage notes."
 
-#: apps/app/src/routes/profile-settings-page.tsx:571
+#: apps/app/src/routes/profile-settings-page.tsx:588
 msgid "查看世界服务使用协议。"
 msgstr "View the world service terms."
 
-#: apps/app/src/routes/profile-settings-page.tsx:572
+#: apps/app/src/routes/profile-settings-page.tsx:589
 msgid "查看世界社区规范和反馈口径。"
 msgstr "View the world community guidelines and feedback policy."
 
-#: apps/app/src/routes/profile-settings-page.tsx:580
-#: apps/app/src/routes/profile-settings-page.tsx:620
+#: apps/app/src/routes/profile-settings-page.tsx:597
+#: apps/app/src/routes/profile-settings-page.tsx:637
 msgid "查看当前云账号订阅状态、可购套餐与邀请奖励。"
 msgstr "Check current cloud-account subscription status, available plans, and invite rewards."
 
-#: apps/app/src/routes/profile-settings-page.tsx:588
-#: apps/app/src/routes/profile-settings-page.tsx:622
+#: apps/app/src/routes/profile-settings-page.tsx:605
+#: apps/app/src/routes/profile-settings-page.tsx:639
 msgid "修改云账号登录密码，需要邮箱验证码确认。"
 msgstr "Change your cloud account password. Requires email verification."
 
-#: apps/app/src/routes/profile-settings-page.tsx:595
+#: apps/app/src/routes/profile-settings-page.tsx:612
 msgid "确认退出登录？"
 msgstr "Sign out?"
 
-#: apps/app/src/routes/profile-settings-page.tsx:597
+#: apps/app/src/routes/profile-settings-page.tsx:614
 msgid "退出后会回到世界入口，下次需要重新登录云账号。"
 msgstr "Signing out returns you to the world entry; you'll need to sign in to the cloud account again next time."
 
-#: apps/app/src/routes/profile-settings-page.tsx:609
+#: apps/app/src/routes/profile-settings-page.tsx:626
 msgid "资料与设置"
 msgstr "Profile and Settings"
 
-#: apps/app/src/routes/profile-settings-page.tsx:612
+#: apps/app/src/routes/profile-settings-page.tsx:629
 msgid "在桌面工作区里管理世界主人的资料与签名。"
 msgstr "Manage the world owner profile and signature in the desktop workspace."
 
-#: apps/app/src/routes/profile-settings-page.tsx:614
+#: apps/app/src/routes/profile-settings-page.tsx:631
 msgid "调整桌面和 Web 键盘聊天输入的发送快捷键。"
 msgstr "Adjust send shortcuts for desktop and web keyboard chat input."
 
-#: apps/app/src/routes/profile-settings-page.tsx:616
+#: apps/app/src/routes/profile-settings-page.tsx:633
 msgid "管理专属 API Key 和兼容 Base URL。"
 msgstr "Manage your dedicated API Key and compatible Base URL."
 
-#: apps/app/src/routes/profile-settings-page.tsx:618
+#: apps/app/src/routes/profile-settings-page.tsx:635
 msgid "切换当前端的界面语言和本地化格式。"
 msgstr "Switch this client's interface language and localization formats."
 
-#: apps/app/src/routes/profile-settings-page.tsx:623
+#: apps/app/src/routes/profile-settings-page.tsx:640
 msgid "查看当前世界相关的协议和社区规范。"
 msgstr "View policies and community guidelines for this world."
 
-#: apps/app/src/routes/profile-settings-page.tsx:638
+#: apps/app/src/routes/profile-settings-page.tsx:655
 msgid "设置分类"
 msgstr "Settings Categories"
 
