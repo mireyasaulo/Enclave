@@ -11,6 +11,7 @@ import {
   Button,
   Card,
   InlineNotice,
+  SelectField,
   TextAreaField,
   TextField,
 } from "@yinjie/ui";
@@ -20,6 +21,14 @@ import { splitCommaList } from "../lib/string-utils";
 import { LogicEditor, mergeContentIntoRecipe } from "./character-page";
 import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
+
+const RELATIONSHIP_TYPE_OPTIONS = [
+  { value: "friend", label: msg`朋友` },
+  { value: "family", label: msg`家人` },
+  { value: "mentor", label: msg`导师` },
+  { value: "expert", label: msg`专家` },
+  { value: "custom", label: msg`自定义` },
+] as const;
 
 export function CreateCharacterPage() {
   const t = useRuntimeTranslator();
@@ -142,13 +151,25 @@ export function CreateCharacterPage() {
               />
             </FormRow>
             <FormRow label={t(msg`关系类型`)} required>
-              <TextField
+              <SelectField
                 required
-                value={relationshipType}
+                value={
+                  RELATIONSHIP_TYPE_OPTIONS.some(
+                    (o) => o.value === relationshipType,
+                  )
+                    ? relationshipType
+                    : "custom"
+                }
                 onChange={(event) =>
                   setRelationshipType(event.target.value)
                 }
-              />
+              >
+                {RELATIONSHIP_TYPE_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {t(opt.label)}
+                  </option>
+                ))}
+              </SelectField>
             </FormRow>
           </div>
           <FormRow label={t(msg`角色简介`)} required>
