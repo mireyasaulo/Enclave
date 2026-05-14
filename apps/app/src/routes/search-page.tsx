@@ -140,12 +140,19 @@ export function SearchPage() {
       return;
     }
 
+    // 用户从搜索页打开结果（如 /character/$id）后，路由 pathname 已经离开
+    // /tabs/search；此时不能再 replace 回 /tabs/search，否则会把已经触发的目标
+    // 导航吞掉，表现为"点击搜索结果没反应"。
+    if (desktopPathMismatch) {
+      return;
+    }
+
     const routeStateApplied =
       searchText === routeState.keyword &&
       activeCategory === routeState.category &&
       committedSearchText === routeState.keyword;
 
-    if (syncingRouteStateRef.current && !desktopPathMismatch) {
+    if (syncingRouteStateRef.current) {
       if (!routeStateApplied) {
         return;
       }
@@ -154,7 +161,7 @@ export function SearchPage() {
     }
 
     const nextHash = currentSearchRouteHash;
-    if (!desktopPathMismatch && normalizedHash === (nextHash ?? "")) {
+    if (normalizedHash === (nextHash ?? "")) {
       return;
     }
 
