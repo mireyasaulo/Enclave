@@ -21,6 +21,7 @@ import { WorldOwnerService } from '../auth/world-owner.service';
 import { WorldLanguageService } from '../config/world-language.service';
 import { REMINDER_CHARACTER_ID } from '../characters/reminder-character';
 import { CharactersService } from '../characters/characters.service';
+import { CharacterEntity } from '../characters/character.entity';
 import { AppEvents, EventBusService } from '../events/event-bus.service';
 import { NarrativeService } from '../narrative/narrative.service';
 import { ReminderRuntimeService } from '../reminder-runtime/reminder-runtime.service';
@@ -1075,6 +1076,8 @@ export class ChatService {
         : { handled: false };
     const replyModalities = await this.planAssistantReplyModalities({
       characterId: charId,
+      // 复用上面行 1031 已经 findById 的 character，避免再来一次 PK lookup
+      character: charEntity ?? null,
       message: {
         type: resolvedInput.type,
         text: resolvedInput.text,
@@ -1297,16 +1300,25 @@ export class ChatService {
 
   private async planAssistantReplyModalities(input: {
     characterId: string;
+    character?: CharacterEntity | null;
     message: AssistantReplyTargetMessage;
   }): Promise<AssistantReplyModalitiesPlan> {
-    // 角色卡可勾选"默认用语音回复" → 所有回复都走 TTS（受 token plan 配额节流）
-    const character = await this.characters.findById(input.characterId);
-    const defaultVoiceReply = character?.defaultVoiceReply === true;
-    const wantsVoice =
-      defaultVoiceReply ||
+    // 先看 message 本身有没有触发 voice/image 的信号，没有再查角色卡的
+    // "默认用语音回复" 开关 —— 避免给每条普通消息加一次 PK lookup。
+    // 调用方如果已经查过 character 可以直接传进来复用。
+    let wantsVoice =
       shouldCreateVoiceReplyFromAttachment(input.message) ||
       shouldCreateVoiceReplyFromText(input.message.text);
     const requestedImagePrompt = extractRequestedImagePrompt(input.message);
+    if (!wantsVoice) {
+      const character =
+        input.character !== undefined
+          ? input.character
+          : await this.characters.findById(input.characterId);
+      if (character?.defaultVoiceReply === true) {
+        wantsVoice = true;
+      }
+    }
     if (!wantsVoice && !requestedImagePrompt) {
       return {
         includeVoice: false,

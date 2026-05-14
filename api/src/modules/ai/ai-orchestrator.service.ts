@@ -815,7 +815,14 @@ export class AiOrchestratorService {
       try {
         return await request();
       } catch (error) {
-        if (attempt >= maxAttempts || !this.isTransientSpeechFailure(error)) {
+        // Token Plan 整体当日额度耗尽（2056）是硬性"已用完"，不是临时
+        // rate-limit；3 次指数 backoff 重试只是干烧 3.6s + 配额计数，
+        // 立刻抛出让上层走 fallback / markExhausted 才对。
+        if (
+          this.isMinimaxTokenPlanExhausted(error) ||
+          attempt >= maxAttempts ||
+          !this.isTransientSpeechFailure(error)
+        ) {
           throw error;
         }
 

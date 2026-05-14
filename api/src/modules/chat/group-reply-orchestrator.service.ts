@@ -193,14 +193,18 @@ export class GroupReplyOrchestratorService {
     characterId: string;
     promptText: string;
   }): Promise<AssistantReplyModalitiesPlan> {
-    const character = await this.characters.findById(input.characterId);
-    const defaultVoiceReply = character?.defaultVoiceReply === true;
-    const wantsVoice =
-      defaultVoiceReply || shouldCreateVoiceReplyFromText(input.promptText);
+    // 先看 prompt 本身有没有触发 voice 关键词；没有再查角色卡的"默认用语音回复"
+    let wantsVoice = shouldCreateVoiceReplyFromText(input.promptText);
     const requestedImagePrompt = extractRequestedImagePrompt({
       type: 'text',
       text: input.promptText,
     });
+    if (!wantsVoice) {
+      const character = await this.characters.findById(input.characterId);
+      if (character?.defaultVoiceReply === true) {
+        wantsVoice = true;
+      }
+    }
     if (!wantsVoice && !requestedImagePrompt) {
       return {
         includeVoice: false,

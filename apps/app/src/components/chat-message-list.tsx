@@ -38,6 +38,7 @@ import {
   X,
 } from "lucide-react";
 import {
+  ApiRequestError,
   createMessageFavorite,
   createSpeechSynthesis,
   deleteConversationMessage,
@@ -445,6 +446,9 @@ export function ChatMessageList({
   const longPressTimerRef = useRef<number | null>(null);
   const longPressStartRef = useRef<{ x: number; y: number } | null>(null);
   const speakAudioRef = useRef<HTMLAudioElement | null>(null);
+  // 每次发起朗读请求自增，await 回来时和当前值比对 —— 用户中途切到别条
+  // 消息（或点了同条停止）时把旧请求的回调彻底作废，避免两条音频抢着播。
+  const speakRequestRef = useRef(0);
   const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
   const contextMenuEnabled = isDesktop && !selectionMode;
   const [favoriteSourceIds, setFavoriteSourceIds] = useState<string[]>([]);
@@ -1078,11 +1082,14 @@ export function ChatMessageList({
   };
 
   const stopSpeakingMessage = () => {
+    // 自增请求号 —— 所有还在 await 的 createSpeechSynthesis 回调走到下面
+    // 时都会发现自己的 requestId 已经过期，直接 return，不再 setSpeakingMessageId
+    // 也不再挂 audio 上去。
+    speakRequestRef.current += 1;
     const audio = speakAudioRef.current;
     if (audio) {
       try {
         audio.pause();
-        audio.src = "";
       } catch {
         // ignore
       }
@@ -1106,6 +1113,7 @@ export function ChatMessageList({
       return;
     }
     stopSpeakingMessage();
+    const requestId = ++speakRequestRef.current;
     setSpeakingMessageId(message.id);
     try {
       const result = await createSpeechSynthesis(
@@ -1120,6 +1128,11 @@ export function ChatMessageList({
         },
         baseUrl,
       );
+      if (speakRequestRef.current !== requestId) {
+        // 在 await 期间用户点了别的消息或同条 stop —— 本次结果作废，
+        // 不要触碰 speakAudioRef / speakingMessageId 状态
+        return;
+      }
       const audioUrl = resolveAppMediaUrl(result.audioUrl);
       const audio = new Audio(audioUrl);
       speakAudioRef.current = audio;
@@ -1145,19 +1158,27 @@ export function ChatMessageList({
       };
       await audio.play();
     } catch (error) {
+      if (speakRequestRef.current !== requestId) {
+        return;
+      }
       setSpeakingMessageId((current) =>
         current === message.id ? null : current,
       );
-      const detail = error instanceof Error ? error.message : "";
+      const isQuotaExhausted =
+        error instanceof ApiRequestError &&
+        (error.errorCode === "AI_TTS_QUOTA_EXHAUSTED" ||
+          error.statusCode === 429);
       setActionNotice({
-        message: detail.includes("QUOTA")
+        message: isQuotaExhausted
           ? t(msg`今日语音合成额度已用完，请稍后再试。`)
           : t(msg`生成语音失败，请稍后再试。`),
         tone: "danger",
-        actionLabel: t(msg`重试`),
-        onAction: () => {
-          void speakMessage(message);
-        },
+        actionLabel: isQuotaExhausted ? undefined : t(msg`重试`),
+        onAction: isQuotaExhausted
+          ? undefined
+          : () => {
+              void speakMessage(message);
+            },
       });
     }
   };

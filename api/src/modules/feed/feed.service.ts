@@ -44,11 +44,7 @@ import { WorldLanguageService } from '../config/world-language.service';
 import { MinimaxJobService } from '../minimax/minimax-job.service';
 import { MinimaxQuotaService } from '../minimax/minimax-quota.service';
 import { MinimaxClient } from '../minimax/minimax.client';
-import { MinimaxAssetStorage } from '../minimax/minimax-asset.storage';
 import type { MinimaxVideoModel } from '../minimax/minimax.types';
-import { FeedImageBudgetService } from './feed-image-budget.service';
-import { composeFeedPostImagePrompt } from './feed-image-prompt';
-import { randomUUID } from 'node:crypto';
 
 type FeedSurface = 'feed' | 'channels';
 type FeedChannelHomeSection = 'recommended' | 'friends' | 'following' | 'live';
@@ -140,8 +136,6 @@ export class FeedService implements OnModuleInit {
     private readonly minimaxJobs: MinimaxJobService,
     private readonly minimaxQuota: MinimaxQuotaService,
     private readonly minimaxClient: MinimaxClient,
-    private readonly minimaxStorage: MinimaxAssetStorage,
-    private readonly feedImageBudget: FeedImageBudgetService,
     @Inject(forwardRef(() => ChatService))
     private readonly chatService: ChatService,
     @Inject(forwardRef(() => ChatGateway))
@@ -1122,19 +1116,6 @@ export class FeedService implements OnModuleInit {
         },
       });
       if (!text) return null;
-
-      // 尝试给这条朋友圈配 1 张 AI 生成的方图。受三层约束控制：
-      //   1) FeedImageBudgetService —— 全 world 日上限 + world 内角色动态优先级均分
-      //   2) MinimaxQuotaService.image-01 三态配额 —— 单 key 当日 120 张总额
-      //   3) MiniMax API 实时熔断 —— 1042 / 2056 撞墙时 release 后 fallback
-      // 任一关失败都自动回退为纯文本 post（不影响发帖本身）。
-      const imageMedia = await this.tryGenerateFeedPostImage(
-        char.id,
-        char.name,
-        text,
-        profile,
-      );
-
       const created = await this.createPost({
         authorAvatar: char.avatar,
         authorId: char.id,
@@ -1143,8 +1124,6 @@ export class FeedService implements OnModuleInit {
         sourceKind: 'character_generated',
         surface: 'feed',
         text,
-        media: imageMedia ? [imageMedia] : undefined,
-        mediaType: imageMedia ? 'image' : 'text',
       });
       // 把广场动态的时间戳推到过去 0-15 分钟随机点，避免 cron tick 集中。
       const jittered = new Date(
@@ -1155,53 +1134,6 @@ export class FeedService implements OnModuleInit {
       return created;
     } catch (err) {
       this.logger.error(`Failed to generate feed post for ${characterId}`, err);
-      return null;
-    }
-  }
-
-  // 尝试为某条角色朋友圈生成 1 张 AI 配图。任何一步失败都返回 null，
-  // 让调用方安全回退为纯文本 post。三态 image-01 quota 在异常路径上必须 release，
-  // 否则 reserved 不归零会让今日剩余配额计数虚高。
-  private async tryGenerateFeedPostImage(
-    characterId: string,
-    characterName: string,
-    postText: string,
-    profile: import('../ai/ai.types').PersonalityProfile,
-  ): Promise<import('../moments/moment-media.types').MomentImageAsset | null> {
-    if (!this.minimaxClient.isConfigured()) return null;
-
-    const allowed = await this.feedImageBudget.tryAllocate(characterId);
-    if (!allowed) return null;
-
-    const reserved = await this.minimaxQuota.tryReserve('image-01');
-    if (!reserved) return null;
-
-    try {
-      const image = await this.minimaxClient.generateImage({
-        model: 'image-01',
-        prompt: composeFeedPostImagePrompt(characterName, postText, profile),
-        aspectRatio: '1:1',
-      });
-      const persisted = await this.minimaxStorage.persist({
-        buffer: image.buffer,
-        mimeType: image.mimeType,
-        kind: 'image',
-        suffix: '-feed',
-      });
-      await this.minimaxQuota.commit('image-01');
-      return {
-        id: randomUUID(),
-        kind: 'image',
-        url: persisted.publicUrl,
-        mimeType: image.mimeType,
-        fileName: persisted.fileName,
-        size: persisted.size,
-      };
-    } catch (err) {
-      await this.minimaxQuota.release('image-01');
-      this.logger.warn(
-        `feed image gen failed for character ${characterId}: ${(err as Error)?.message}`,
-      );
       return null;
     }
   }

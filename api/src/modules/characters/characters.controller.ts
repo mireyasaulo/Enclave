@@ -79,9 +79,10 @@ export class CharactersController {
 
   // 用户可切换某角色的"默认用语音回复"开关。
   // 开启后所有 assistant 回复都自动转 TTS（受 speech-02-hd token plan 配额节流）。
-  // 非 admin 端点：登录用户可以为自己看到的任意角色翻这个开关。
+  // 不挂 guard：跟 social.controller 的 setFriendStarred/updateFriendProfile
+  // 等用户级 toggle 保持一致；多租户隔离由 nginx + 端口分配那一层负责，
+  // 本地单机模式下根本不发 Authorization Bearer，挂 JwtAuthGuard 会 401。
   @Patch(':id/default-voice-reply')
-  @UseGuards(JwtAuthGuard)
   async setDefaultVoiceReply(
     @Param('id') id: string,
     @Body() body: { enabled: boolean },
