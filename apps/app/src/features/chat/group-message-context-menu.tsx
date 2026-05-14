@@ -15,6 +15,7 @@ import {
   Star,
   Trash2,
   UserRound,
+  Volume2,
 } from "lucide-react";
 
 const t = translateRuntimeMessage;
@@ -32,6 +33,8 @@ type GroupMessageContextMenuProps = {
   reminderLabel?: string;
   onCopyText: () => void;
   onCopySender?: () => void;
+  onSpeakAloud?: () => void;
+  speakAloudLabel?: string;
   onToggleFavorite?: () => void;
   favoriteLabel?: string;
   onAddToStickers?: () => void;
@@ -62,6 +65,8 @@ export function GroupMessageContextMenu({
   reminderLabel = t(msg`提醒`),
   onCopyText,
   onCopySender,
+  onSpeakAloud,
+  speakAloudLabel = t(msg`朗读`),
   onToggleFavorite,
   favoriteLabel = t(msg`收藏`),
   onAddToStickers,
@@ -87,6 +92,7 @@ export function GroupMessageContextMenu({
     Number(Boolean(onMultiSelect)) +
     Number(Boolean(onSetReminder)) +
     Number(Boolean(onCopySender)) +
+    Number(Boolean(onSpeakAloud)) +
     Number(Boolean(onToggleFavorite)) +
     Number(Boolean(onAddToStickers)) +
     Number(Boolean(onOpenAttachment)) +
@@ -162,6 +168,13 @@ export function GroupMessageContextMenu({
             label={t(msg`复制发送者`)}
             icon={<UserRound size={15} />}
             onClick={onCopySender}
+          />
+        ) : null}
+        {onSpeakAloud ? (
+          <ContextMenuButton
+            label={speakAloudLabel}
+            icon={<Volume2 size={15} />}
+            onClick={onSpeakAloud}
           />
         ) : null}
         {onReply || onQuoteSelection || onForward || onMultiSelect ? (

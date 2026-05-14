@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import {
   createMessageFavorite,
+  createSpeechSynthesis,
   deleteConversationMessage,
   deleteGroupMessage,
   getFavoriteNote,
@@ -443,6 +444,8 @@ export function ChatMessageList({
   >(null);
   const longPressTimerRef = useRef<number | null>(null);
   const longPressStartRef = useRef<{ x: number; y: number } | null>(null);
+  const speakAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
   const contextMenuEnabled = isDesktop && !selectionMode;
   const [favoriteSourceIds, setFavoriteSourceIds] = useState<string[]>([]);
   const [hiddenMessageIds, setHiddenMessageIds] = useState<string[]>(
@@ -1070,6 +1073,91 @@ export function ChatMessageList({
         },
         secondaryActionLabel: errorActionLabel,
         onSecondaryAction: onErrorAction ?? undefined,
+      });
+    }
+  };
+
+  const stopSpeakingMessage = () => {
+    const audio = speakAudioRef.current;
+    if (audio) {
+      try {
+        audio.pause();
+        audio.src = "";
+      } catch {
+        // ignore
+      }
+      speakAudioRef.current = null;
+    }
+    setSpeakingMessageId(null);
+  };
+
+  const speakMessage = async (message: ChatRenderableMessage) => {
+    const text = buildClipboardText(t, message).trim();
+    if (!text) {
+      setActionNotice({
+        message: t(msg`此消息没有可朗读的文本。`),
+        tone: "warning",
+      });
+      return;
+    }
+    // 同条消息再点 = 停止；不同条消息 = 切换
+    if (speakingMessageId === message.id) {
+      stopSpeakingMessage();
+      return;
+    }
+    stopSpeakingMessage();
+    setSpeakingMessageId(message.id);
+    try {
+      const result = await createSpeechSynthesis(
+        {
+          text,
+          conversationId:
+            threadContext?.type === "direct" ? threadContext.id : undefined,
+          characterId:
+            message.senderType !== "user" && message.senderId
+              ? message.senderId
+              : undefined,
+        },
+        baseUrl,
+      );
+      const audioUrl = resolveAppMediaUrl(result.audioUrl);
+      const audio = new Audio(audioUrl);
+      speakAudioRef.current = audio;
+      audio.onended = () => {
+        if (speakAudioRef.current === audio) {
+          speakAudioRef.current = null;
+          setSpeakingMessageId((current) =>
+            current === message.id ? null : current,
+          );
+        }
+      };
+      audio.onerror = () => {
+        if (speakAudioRef.current === audio) {
+          speakAudioRef.current = null;
+          setSpeakingMessageId((current) =>
+            current === message.id ? null : current,
+          );
+          setActionNotice({
+            message: t(msg`语音播放失败，请稍后再试。`),
+            tone: "danger",
+          });
+        }
+      };
+      await audio.play();
+    } catch (error) {
+      setSpeakingMessageId((current) =>
+        current === message.id ? null : current,
+      );
+      const detail = error instanceof Error ? error.message : "";
+      setActionNotice({
+        message: detail.includes("QUOTA")
+          ? t(msg`今日语音合成额度已用完，请稍后再试。`)
+          : t(msg`生成语音失败，请稍后再试。`),
+        tone: "danger",
+        actionLabel: t(msg`重试`),
+        onAction: () => {
+          void speakMessage(message);
+        },
       });
     }
   };
@@ -3384,6 +3472,19 @@ export function ChatMessageList({
             );
             setContextMenuState(null);
           }}
+          onSpeakAloud={
+            buildClipboardText(t, contextMenuState.message).trim()
+              ? () => {
+                  void speakMessage(contextMenuState.message);
+                  setContextMenuState(null);
+                }
+              : undefined
+          }
+          speakAloudLabel={
+            speakingMessageId === contextMenuState.message.id
+              ? t(msg`停止朗读`)
+              : t(msg`朗读`)
+          }
           onRecall={
             canRecallMessage(contextMenuState.message, threadContext)
               ? () => {
@@ -3517,6 +3618,20 @@ export function ChatMessageList({
                 setMobileActionMessage(null);
               }
             : undefined
+        }
+        onSpeakAloud={
+          mobileActionMessage &&
+          buildClipboardText(t, mobileActionMessage).trim()
+            ? () => {
+                void speakMessage(mobileActionMessage);
+                setMobileActionMessage(null);
+              }
+            : undefined
+        }
+        speakAloudLabel={
+          mobileActionMessage && speakingMessageId === mobileActionMessage.id
+            ? t(msg`停止朗读`)
+            : t(msg`朗读`)
         }
         onOpenAttachment={
           mobileActionMessage && getOpenableAttachment(mobileActionMessage)

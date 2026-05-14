@@ -25,6 +25,8 @@ type MobileMessageActionSheetProps = {
   favoriteLabel?: string;
   onCopy: () => void;
   onCopySender?: () => void;
+  onSpeakAloud?: () => void;
+  speakAloudLabel?: string;
   onOpenAttachment?: () => void;
   openAttachmentLabel?: string;
   onSaveAttachment?: () => void;
@@ -53,6 +55,8 @@ export function MobileMessageActionSheet({
   favoriteLabel = t(msg`收藏`),
   onCopy,
   onCopySender,
+  onSpeakAloud,
+  speakAloudLabel = t(msg`朗读`),
   onOpenAttachment,
   openAttachmentLabel = t(msg`打开附件`),
   onSaveAttachment,
@@ -128,6 +132,9 @@ export function MobileMessageActionSheet({
             <ActionButton label={favoriteLabel} onClick={onToggleFavorite} />
           ) : null}
           <ActionButton label={t(msg`复制`)} onClick={onCopy} />
+          {onSpeakAloud ? (
+            <ActionButton label={speakAloudLabel} onClick={onSpeakAloud} />
+          ) : null}
           {onOpenAttachment ? (
             <ActionButton
               label={openAttachmentLabel}
