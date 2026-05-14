@@ -48,6 +48,19 @@ const CHARACTER_AVATAR_FILE_BY_SOURCE_KEY = {
   teacher_research_librarian_tang_jian:
     'teacher-research-librarian-tang-jian.svg',
   teacher_science_lab_wei_zhiwei: 'teacher-science-lab-wei-zhiwei.svg',
+  companion_morning_warmth_an_he: 'companion-morning-warmth-an-he.svg',
+  companion_late_night_listener_ye_chi:
+    'companion-late-night-listener-ye-chi.svg',
+  companion_silent_presence_mu_ze: 'companion-silent-presence-mu-ze.svg',
+  intimate_companion_steady_male_shen_yan:
+    'intimate-companion-steady-male-shen-yan.svg',
+  intimate_companion_warm_female_lin_zhi_xia:
+    'intimate-companion-warm-female-lin-zhi-xia.svg',
+  intimate_companion_soulmate_chi_yi: 'intimate-companion-soulmate-chi-yi.svg',
+  dating_aide_direct_zhou_jin: 'dating-aide-direct-zhou-jin.svg',
+  dating_aide_gentle_signal_reader_he_ling:
+    'dating-aide-gentle-signal-reader-he-ling.svg',
+  dating_aide_data_driven_su_li: 'dating-aide-data-driven-su-li.svg',
 } as const;
 
 export type CharacterAvatarSourceKey =

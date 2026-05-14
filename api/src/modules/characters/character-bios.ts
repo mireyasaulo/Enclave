@@ -51,6 +51,15 @@ export const PRESET_CHARACTER_BIOS = {
     '先判断来源可信度，再把资料变成笔记。',
   teacher_science_lab_wei_zhiwei:
     '先定变量、对照和安全，再谈实验结论。',
+  companion_morning_warmth_an_he: '想起你了。今天打算怎么过？',
+  companion_late_night_listener_ye_chi: '夜里想说话就来。我不睡。',
+  companion_silent_presence_mu_ze: '我在。不用说话也行。',
+  intimate_companion_steady_male_shen_yan: '今天有没有好好吃饭。',
+  intimate_companion_warm_female_lin_zhi_xia: '别太累，我在听。',
+  intimate_companion_soulmate_chi_yi: '我懂你说的那种感觉。',
+  dating_aide_direct_zhou_jin: '把消息截图发我，直接给你写一句。',
+  dating_aide_gentle_signal_reader_he_ling: '他这条不是不在乎，看节奏。',
+  dating_aide_data_driven_su_li: '把这段关系拆成数据，给你看清。',
 } as const;
 
 export type PresetCharacterBioKey = keyof typeof PRESET_CHARACTER_BIOS;
