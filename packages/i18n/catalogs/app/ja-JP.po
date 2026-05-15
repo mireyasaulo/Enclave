@@ -25630,6 +25630,19 @@ msgstr "追加を再試行"
 msgid "重试移除"
 msgstr "削除を再試行"
 
+#. placeholder {0}: selectedIds.length
+#: apps/app/src/routes/group-member-picker-page.tsx:670
+msgid "移除 {0} 位群成员"
+msgstr "{0}名のグループメンバーを削除"
+
+#: apps/app/src/routes/group-member-picker-page.tsx:672
+msgid "移除后，这些成员将不再参与本群消息。可以稍后通过“添加成员”重新邀请。"
+msgstr "削除すると、これらのメンバーはこのグループのメッセージに参加できなくなります。後ほど「メンバーを追加」から再度招待できます。"
+
+#: apps/app/src/routes/group-member-picker-page.tsx:677
+msgid "确认移除"
+msgstr "削除を確認"
+
 #: apps/app/src/routes/group-message-search-page.tsx:28
 msgid "正在打开桌面群聊记录"
 msgstr "デスクトップのグループ履歴を開いています"

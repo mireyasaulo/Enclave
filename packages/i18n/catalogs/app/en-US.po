@@ -25630,6 +25630,19 @@ msgstr "Retry add"
 msgid "重试移除"
 msgstr "Retry remove"
 
+#. placeholder {0}: selectedIds.length
+#: apps/app/src/routes/group-member-picker-page.tsx:670
+msgid "移除 {0} 位群成员"
+msgstr "Remove {0} group members"
+
+#: apps/app/src/routes/group-member-picker-page.tsx:672
+msgid "移除后，这些成员将不再参与本群消息。可以稍后通过“添加成员”重新邀请。"
+msgstr "Once removed, these members will no longer take part in this group's messages. You can invite them again later via \"Add members\"."
+
+#: apps/app/src/routes/group-member-picker-page.tsx:677
+msgid "确认移除"
+msgstr "Confirm removal"
+
 #: apps/app/src/routes/group-message-search-page.tsx:28
 msgid "正在打开桌面群聊记录"
 msgstr "Opening desktop group history"
