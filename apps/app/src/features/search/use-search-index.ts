@@ -761,8 +761,25 @@ function extractErrorMessage(error: unknown) {
 }
 
 function resolveMessageConversationId(to: string) {
-  const match = to.match(/\/(?:chat|group)\/([^/?#]+)/);
-  return match?.[1] ?? null;
+  // 移动端：/chat/<id> 或 /group/<id>
+  const pathMatch = to.match(/\/(?:chat|group)\/([^/?#]+)/);
+  if (pathMatch?.[1]) {
+    return pathMatch[1];
+  }
+
+  // 桌面端：buildDesktopChatThreadPath 产出 /tabs/chat#conversationId=<id>&messageId=<...>
+  // 之前只匹配 path 段，桌面布局下 messageGroups 永远为空 → 消息命中无法分组到会话卡。
+  const hashIndex = to.indexOf("#");
+  if (hashIndex !== -1) {
+    const hashPart = to.slice(hashIndex + 1);
+    const params = new URLSearchParams(hashPart);
+    const conversationId = params.get("conversationId")?.trim();
+    if (conversationId) {
+      return conversationId;
+    }
+  }
+
+  return null;
 }
 
 function resolveOfficialAccountId(resultId: string) {

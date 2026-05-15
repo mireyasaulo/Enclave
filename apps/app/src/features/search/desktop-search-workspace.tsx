@@ -63,6 +63,7 @@ type DesktopSearchWorkspaceProps = {
   onOpenQuickLink: (item: DesktopSearchQuickLink) => void;
   onOpenResult: (item: SearchResultItem) => void;
   onRemoveHistory: (keyword: string) => void;
+  onRetryLoad: () => void;
   recentFavorites: DesktopSearchQuickLink[];
   recentMiniPrograms: DesktopSearchQuickLink[];
   scopeCounts: SearchScopeCounts;
@@ -171,6 +172,7 @@ export function DesktopSearchWorkspace({
   onOpenQuickLink,
   onOpenResult,
   onRemoveHistory,
+  onRetryLoad,
   recentFavorites,
   recentMiniPrograms,
   scopeCounts,
@@ -1207,6 +1209,14 @@ export function DesktopSearchWorkspace({
           ) : null}
           {error ? (
             <DesktopSearchStatusCard
+              action={
+                <DesktopSearchActionButton
+                  onClick={onRetryLoad}
+                  tone="brand"
+                >
+                  {t(msg`重试加载`)}
+                </DesktopSearchActionButton>
+              }
               description={error}
               status="error"
               title={t(msg`搜索异常`)}

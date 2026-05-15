@@ -462,6 +462,7 @@ export function SearchPage() {
           onOpenQuickLink={handleOpenQuickLink}
           onOpenResult={handleOpenResult}
           onRemoveHistory={handleRemoveHistory}
+          onRetryLoad={retryLoad}
           recentFavorites={recentFavorites}
           recentMiniPrograms={recentMiniPrograms}
           scopeCounts={scopeCounts}
