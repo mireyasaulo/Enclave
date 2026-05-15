@@ -325,10 +325,13 @@ function MobileChatListPage() {
   // optimistic helper: 把单个 conversation 的某些字段就地 patch，遍历所有
   // ["app-conversations", baseUrl, ...] 形态的 cache（含 hash 后缀的变种）。
   // 公网隧道 ~600ms RTT 下，pin/mute 不做 optimistic 会让用户看到 600ms 后
-  // 才有 UI 反应。
+  // 才有 UI 反应。reorder=true 时按后端的排序规则
+  // （isPinned → pinnedAt desc → lastActivityAt desc）就地重排，避免 pin
+  // 之后会话留在原位置 600ms 才跳到顶部。
   const patchConversationCache = async (
     conversationId: string,
     patch: (item: ConversationListItem) => ConversationListItem,
+    options?: { reorder?: boolean },
   ) => {
     await queryClient.cancelQueries({
       queryKey: ["app-conversations", baseUrl],
@@ -338,9 +341,12 @@ function MobileChatListPage() {
     });
     snapshots.forEach(([key, data]) => {
       if (!data) return;
+      const next = data.map((item) =>
+        item.id === conversationId ? patch(item) : item,
+      );
       queryClient.setQueryData<ConversationListItem[]>(
         key,
-        data.map((item) => (item.id === conversationId ? patch(item) : item)),
+        options?.reorder ? sortConversationsByBackendOrder(next) : next,
       );
     });
     return snapshots;
@@ -373,6 +379,7 @@ function MobileChatListPage() {
           isPinned: variables.pinned,
           pinnedAt: variables.pinned ? now : undefined,
         }),
+        { reorder: true },
       );
       return { snapshots };
     },
@@ -1609,6 +1616,32 @@ const ConversationListItemLink = memo(
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
+}
+
+// 与 api/src/modules/chat/chat.service.ts#listConversations 的排序规则保持一致：
+// isPinned → pinnedAt desc → lastActivityAt desc。optimistic pin/取消置顶时本
+// 地按同样的规则重排，避免会话在客户端留在旧位置直到下一次刷新。
+function sortConversationsByBackendOrder<T extends ConversationListItem>(
+  conversations: T[],
+): T[] {
+  const toMillis = (value: string | null | undefined) => {
+    if (!value) return 0;
+    const ms = Date.parse(value);
+    return Number.isNaN(ms) ? 0 : ms;
+  };
+
+  return [...conversations].sort((left, right) => {
+    if (left.isPinned !== right.isPinned) {
+      return left.isPinned ? -1 : 1;
+    }
+
+    const pinnedDelta = toMillis(right.pinnedAt) - toMillis(left.pinnedAt);
+    if (pinnedDelta !== 0) {
+      return pinnedDelta;
+    }
+
+    return toMillis(right.lastActivityAt) - toMillis(left.lastActivityAt);
+  });
 }
 
 function canConversationBeMarkedUnread(conversation: ConversationListEntry) {
