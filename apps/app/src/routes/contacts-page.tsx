@@ -2157,7 +2157,10 @@ export function ContactsPage() {
                 type="button"
                 variant="ghost"
                 size="icon"
-                onClick={() => setManagementOpen(true)}
+                onClick={() => {
+                  setIsQuickMenuOpen(false);
+                  setManagementOpen(true);
+                }}
                 className="h-9 w-9 rounded-full bg-transparent text-[color:var(--text-primary)] shadow-none hover:bg-black/4 active:bg-black/[0.05]"
                 aria-label={t(msg`通讯录管理`)}
               >

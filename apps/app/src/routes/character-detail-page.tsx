@@ -2116,7 +2116,9 @@ function ProfileRow({
       >
         <div
           className={cn(
-            compact ? "w-[5.5rem] shrink-0" : "w-24 shrink-0",
+            compact
+            ? "min-w-[5.5rem] shrink-0 whitespace-nowrap"
+            : "min-w-24 shrink-0 whitespace-nowrap",
             danger ? "text-[#d74b45]" : "text-[color:var(--text-primary)]",
           )}
         >
@@ -2150,7 +2152,9 @@ function ProfileRow({
     >
       <div
         className={cn(
-          compact ? "w-[5.5rem] shrink-0" : "w-24 shrink-0",
+          compact
+            ? "min-w-[5.5rem] shrink-0 whitespace-nowrap"
+            : "min-w-24 shrink-0 whitespace-nowrap",
           danger ? "text-[#d74b45]" : "text-[color:var(--text-primary)]",
         )}
       >
