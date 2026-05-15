@@ -198,18 +198,26 @@ export function MomentsPage() {
   }, [momentsQuery.data]);
   const momentsHasNextPage = momentsQuery.hasNextPage;
   const momentsIsFetchingNextPage = momentsQuery.isFetchingNextPage;
+  const momentsIsFetchNextPageError = momentsQuery.isFetchNextPageError;
   const momentsFetchNextPage = momentsQuery.fetchNextPage;
   // 桌面工作区不挂触底 sentinel：mount 后自动连续 prefetch 把所有页悄悄填上。
   // 移动端用 sentinel + IntersectionObserver 按需触发。
+  // fetchNextPageError 期间停止自动 prefetch——否则 isFetchingNextPage 翻 false
+  // 就会触发 useEffect 重跑，又调一次 fetchNextPage，又失败，死循环烧 RTT。
   useEffect(() => {
     if (!isDesktopLayout) return;
-    if (momentsHasNextPage && !momentsIsFetchingNextPage) {
+    if (
+      momentsHasNextPage &&
+      !momentsIsFetchingNextPage &&
+      !momentsIsFetchNextPageError
+    ) {
       void momentsFetchNextPage();
     }
   }, [
     isDesktopLayout,
     momentsHasNextPage,
     momentsIsFetchingNextPage,
+    momentsIsFetchNextPageError,
     momentsFetchNextPage,
   ]);
   const blockedQuery = useQuery({
@@ -1298,8 +1306,27 @@ export function MomentsPage() {
       }}
       hasNextPage={Boolean(momentsQuery.hasNextPage)}
       isFetchingNextPage={momentsQuery.isFetchingNextPage}
+      // fetchNextPage 失败时 react-query 不会自动 stop——而 useEffect
+      // 里 IntersectionObserver 一看到 isFetchingNextPage 翻 false 就重挂 observer，
+      // sentinel 还在视口 → 立刻 onLoadMore → 又 fetchNextPage → 又失败 → 死循环。
+      // 上层把 fetchNextPageError 透传下去，sentinel 在错误态下不挂，改在错误条
+      // 上挂手动「重试」按钮。
+      fetchNextPageError={
+        momentsQuery.isFetchNextPageError && momentsQuery.error instanceof Error
+          ? momentsQuery.error
+          : null
+      }
       onLoadMore={() => {
-        if (momentsQuery.hasNextPage && !momentsQuery.isFetchingNextPage) {
+        if (
+          momentsQuery.hasNextPage &&
+          !momentsQuery.isFetchingNextPage &&
+          !momentsQuery.isFetchNextPageError
+        ) {
+          void momentsQuery.fetchNextPage();
+        }
+      }}
+      onRetryNextPage={() => {
+        if (!momentsQuery.isFetchingNextPage) {
           void momentsQuery.fetchNextPage();
         }
       }}
@@ -1350,7 +1377,9 @@ type MobileMomentsViewProps = {
   onNoticeBack: () => void;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
+  fetchNextPageError: Error | null;
   onLoadMore: () => void;
+  onRetryNextPage: () => void;
 };
 
 function MobileMomentsView({
@@ -1390,7 +1419,9 @@ function MobileMomentsView({
   onNoticeBack,
   hasNextPage,
   isFetchingNextPage,
+  fetchNextPageError,
   onLoadMore,
+  onRetryNextPage,
 }: MobileMomentsViewProps) {
   const t = tx;
   const { containerRef, state: pullState } = usePullToRefresh({
@@ -1407,7 +1438,10 @@ function MobileMomentsView({
   // 真正的滚动容器是 MobileShell 的 absolute inset-0 viewport pane，对应 root=null
   // （document viewport）的判定是正确的。
   useEffect(() => {
-    if (!hasNextPage || isFetchingNextPage) {
+    // fetchNextPageError 期间不挂 observer：之前 sentinel 一旦还在视口
+    // 就会触发死循环（onLoadMore → fetchNextPage fail → isFetchingNextPage flip false
+    // → effect 重挂 observer → 立刻又 fetch）。错误态下改在错误条上挂手动重试按钮。
+    if (!hasNextPage || isFetchingNextPage || fetchNextPageError) {
       return;
     }
     const sentinel = loadMoreRef.current;
@@ -1424,7 +1458,7 @@ function MobileMomentsView({
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, onLoadMore]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPageError, onLoadMore]);
 
   const activeMoment = actionBubble
     ? visibleMoments.find((moment) => moment.id === actionBubble.momentId) ??
@@ -1621,18 +1655,42 @@ function MobileMomentsView({
               空状态——但其实后面还有非屏蔽的动态。"已经到底了" 标签仅在已经有渲染
               内容时才显示，否则空状态卡更直白。 */}
           {hasNextPage ? (
-            <>
-              <div
-                ref={loadMoreRef}
-                className="h-1 w-full"
-                aria-hidden="true"
-              />
-              {isFetchingNextPage ? (
-                <div className="py-4 text-center text-[12px] text-[#9A9A9A]">
-                  {t(msg`正在加载更多…`)}
+            fetchNextPageError ? (
+              // fetchNextPage 失败时不挂 sentinel（见 useEffect 注释），改在底部
+              // 挂手动「重试」按钮——之前默认 IntersectionObserver 一看到 sentinel
+              // 还在视口就死循环重试，整个页面被几百次失败请求刷爆。
+              <div className="px-4 py-4 text-center">
+                <div className="text-[12px] text-[#9A9A9A]">
+                  {fetchNextPageError.message
+                    ? t(msg`加载更多失败：${fetchNextPageError.message}`)
+                    : t(msg`加载更多失败，请稍后重试。`)}
                 </div>
-              ) : null}
-            </>
+                <div className="mt-2 flex justify-center">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="h-7 rounded-full border-[#E5E5E5] bg-white px-3 text-[11px]"
+                    onClick={onRetryNextPage}
+                  >
+                    {t(msg`重试加载`)}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div
+                  ref={loadMoreRef}
+                  className="h-1 w-full"
+                  aria-hidden="true"
+                />
+                {isFetchingNextPage ? (
+                  <div className="py-4 text-center text-[12px] text-[#9A9A9A]">
+                    {t(msg`正在加载更多…`)}
+                  </div>
+                ) : null}
+              </>
+            )
           ) : visibleMoments.length > 0 ? (
             <div className="py-4 text-center text-[12px] text-[#C0C0C0]">
               {t(msg`已经到底了`)}

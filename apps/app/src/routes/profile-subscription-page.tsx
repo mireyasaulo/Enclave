@@ -45,8 +45,12 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 };
 
 function formatPrice(priceCents: number, currency: string) {
-  const amount = (priceCents / 100).toFixed(1);
+  // toFixed(1) 之前给出 "¥499.0" / "¥49.9" 这种半截小数，年付 49900 cents 应该是
+  // "¥499" 整数，月付 4990 cents 是 "¥49.90" 两位小数。整数就不带小数，否则保留两位。
   const upper = currency.toUpperCase();
+  const yuan = priceCents / 100;
+  const amount =
+    Number.isInteger(yuan) ? String(yuan) : yuan.toFixed(2);
   const symbol = CURRENCY_SYMBOLS[upper];
   return symbol ? `${symbol}${amount}` : `${upper} ${amount}`;
 }
@@ -525,13 +529,19 @@ export function ProfileSubscriptionPage() {
         <AppSection className="overflow-hidden rounded-[28px] border-black/5 bg-[linear-gradient(135deg,#f7fff8,#ffffff)] px-6 py-6 shadow-none">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
-                {t(msg`订阅`)}
-              </div>
-              <h1 className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">
-                {t(msg`会员中心`)}
-              </h1>
-              <p className="mt-2 text-sm leading-7 text-[color:var(--text-secondary)]">
+              {isDesktopLayout ? (
+                // 移动端 TopBar 已经渲染过 "会员中心" 标题，hero 卡里再放 h1 是重复的；
+                // 桌面端没有 TopBar，hero 卡的 h1 + "订阅" eyebrow 是页面唯一标题。
+                <>
+                  <div className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--text-muted)]">
+                    {t(msg`订阅`)}
+                  </div>
+                  <h1 className="mt-2 text-3xl font-semibold text-[color:var(--text-primary)]">
+                    {t(msg`会员中心`)}
+                  </h1>
+                </>
+              ) : null}
+              <p className={`${isDesktopLayout ? "mt-2 " : ""}text-sm leading-7 text-[color:var(--text-secondary)]`}>
                 {isSynthesizedEmailPhone(profile.phone || phone) ? (
                   // 邮箱注册的用户没真手机号，挂上一个 "9xxxxxxxxxxxxx" 合成号
                   // 不如直接展示昵称（cloud_users.displayName，比如 yuanzui0728

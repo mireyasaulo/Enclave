@@ -16,6 +16,44 @@ function maskPhone(phone: string) {
   if (trimmed.length <= 7) return `${trimmed.slice(0, 3)}****`;
   return `${trimmed.slice(0, 3)}****${trimmed.slice(-4)}`;
 }
+
+// email 用户的 cloudUser.phone 是 synthesizePhoneFromEmail 合成出来的 "9" + 13 位
+// 哈希，maskPhone 后形如 "911****2771"，对邀请人来说是个完全没意义的伪手机。
+// 这里把它识别出来，落到邀请人 UI 时改用「displayName / 邮箱本地名（脱敏）/ 兜底文案」，
+// 不再展示伪手机段。检测条件必须和 email-auth.service.ts 的合成规则严格对齐。
+const SYNTHESIZED_EMAIL_PHONE_PATTERN = /^9\d{13}$/;
+
+function maskEmail(email: string) {
+  const trimmed = email.trim();
+  if (!trimmed) return "";
+  const at = trimmed.lastIndexOf("@");
+  if (at <= 0) return trimmed;
+  const local = trimmed.slice(0, at);
+  const domain = trimmed.slice(at);
+  if (local.length <= 2) return `${local[0] ?? ""}***${domain}`;
+  if (local.length <= 4) {
+    return `${local.slice(0, 1)}***${local.slice(-1)}${domain}`;
+  }
+  return `${local.slice(0, 2)}***${local.slice(-1)}${domain}`;
+}
+
+function formatInviteeIdentifier(
+  invitee: { phone: string | null; email: string | null; displayName: string | null } | undefined,
+  fallbackPhone: string,
+) {
+  // 优先用合成手机识别 email 用户（前端 isSynthesizedEmailPhone 同款规则），
+  // 如果没拿到用户实体就只能退化成 maskPhone(fallback)。
+  const phone = invitee?.phone ?? fallbackPhone;
+  const isSynth = phone ? SYNTHESIZED_EMAIL_PHONE_PATTERN.test(phone) : false;
+  if (isSynth) {
+    const email = invitee?.email?.trim();
+    if (email) return maskEmail(email);
+    const name = invitee?.displayName?.trim();
+    if (name) return name;
+    return "邮箱用户";
+  }
+  return maskPhone(phone);
+}
 import { CloudConfigService } from "../cloud-config/cloud-config.service";
 import { CloudUserEntity } from "../entities/cloud-user.entity";
 import { InviteCodeEntity } from "../entities/invite-code.entity";
@@ -233,6 +271,19 @@ export class InviteService {
         ? `${effectiveBaseUrl}/?invite=${encodeURIComponent(code.code)}`
         : null;
 
+    // 客户端 recentRedemptions 要把 email 用户的合成手机替换成邮箱脱敏/昵称，
+    // 一次性 IN 查出所有 invitee，再传给 serializeSummary 用。
+    const inviteeIds = Array.from(
+      new Set(redemptions.map((r) => r.inviteeUserId).filter(Boolean)),
+    );
+    const invitees = inviteeIds.length
+      ? await this.userRepo
+          .createQueryBuilder("user")
+          .whereInIds(inviteeIds)
+          .getMany()
+      : [];
+    const inviteeMap = new Map(invitees.map((u) => [u.id, u]));
+
     return {
       enabled,
       code: code?.code ?? null,
@@ -243,14 +294,19 @@ export class InviteService {
       rewardDays,
       redeemCount: code?.redeemCount ?? 0,
       rewardDaysGranted: code?.rewardDaysGranted ?? 0,
-      recentRedemptions: redemptions.map((record) => this.serializeSummary(record)),
+      recentRedemptions: redemptions.map((record) =>
+        this.serializeSummary(record, inviteeMap.get(record.inviteeUserId)),
+      ),
     };
   }
 
-  serializeSummary(record: InviteRedemptionEntity): InviteRedemptionSummary {
+  serializeSummary(
+    record: InviteRedemptionEntity,
+    invitee?: CloudUserEntity,
+  ): InviteRedemptionSummary {
     return {
       id: record.id,
-      inviteePhoneMasked: maskPhone(record.inviteePhone),
+      inviteePhoneMasked: formatInviteeIdentifier(invitee, record.inviteePhone),
       status: record.status as InviteRedemptionStatus,
       rejectReason: record.rejectReason,
       rewardSubscriptionId: record.rewardSubscriptionId,
