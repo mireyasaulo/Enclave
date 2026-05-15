@@ -148,6 +148,13 @@ export function DesktopChannelsWorkspace({
   const [commentDrawerPostId, setCommentDrawerPostId] = useState<string | null>(
     null,
   );
+  // 视频号的静音状态提升到 workspace：一旦用户在某一条 unmute，再滚到下一条仍保持
+  // 取消静音，对齐移动端 / 微信视频号 / 抖音的体验；否则每张 slide 都是独立 ChannelVideoPlayer
+  // 实例，会从默认 muted=true 重新开始，导致来回切静音。
+  const [unmuted, setUnmuted] = useState(false);
+  const toggleUnmuted = useCallback(() => {
+    setUnmuted((current) => !current);
+  }, []);
 
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const slideRefs = useRef(new Map<string, HTMLDivElement>());
@@ -386,6 +393,8 @@ export function DesktopChannelsWorkspace({
                   registerSlide={registerSlide}
                   isFavorite={isPostFavorite(post.id)}
                   likePending={likePendingPostId === post.id}
+                  unmuted={unmuted}
+                  onToggleUnmuted={toggleUnmuted}
                   onLike={() => onLike(post.id)}
                   onOpenAuthor={() => onOpenAuthor(post.authorId)}
                   onShare={() =>
@@ -566,9 +575,13 @@ function ChannelActionButton({
 function ChannelMediaSurface({
   post,
   isActive,
+  unmuted,
+  onToggleUnmuted,
 }: {
   post: FeedPostListItem;
   isActive: boolean;
+  unmuted: boolean;
+  onToggleUnmuted: () => void;
 }) {
   const t = useRuntimeTranslator();
   const audioAsset = post.media?.find((asset) => asset.kind === "audio");
@@ -612,6 +625,8 @@ function ChannelMediaSurface({
         url={resolveAppMediaUrl(videoAsset?.url ?? post.mediaUrl ?? "")}
         posterUrl={resolvedPoster || undefined}
         isActive={isActive}
+        unmuted={unmuted}
+        onToggleUnmuted={onToggleUnmuted}
       />
     );
   }
@@ -634,14 +649,17 @@ function ChannelVideoPlayer({
   url,
   posterUrl,
   isActive,
+  unmuted,
+  onToggleUnmuted,
 }: {
   url: string;
   posterUrl?: string;
   isActive: boolean;
+  unmuted: boolean;
+  onToggleUnmuted: () => void;
 }) {
   const t = useRuntimeTranslator();
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [muted, setMuted] = useState(true);
 
   // React 的 muted prop 是异步设到 DOM 上的，浏览器评估 autoplay 时可能还没 muted →
   // autoplay 被策略拦截。用 callback ref 在 React 把 element 挂到 DOM 之前就把
@@ -649,6 +667,8 @@ function ChannelVideoPlayer({
   const setVideoNode = (node: HTMLVideoElement | null) => {
     videoRef.current = node;
     if (node) {
+      // 初始挂载阶段强制 muted=true 以确保 autoplay 不被策略拦；下面的 effect 会在
+      // 用户已 unmute 的情况下再切回 unmuted。
       node.muted = true;
       node.defaultMuted = true;
     }
@@ -679,17 +699,17 @@ function ChannelVideoPlayer({
     if (!video) {
       return;
     }
-    video.muted = muted;
-    if (!muted && isActive) {
+    video.muted = !unmuted;
+    if (unmuted && isActive) {
       const playResult = video.play();
       if (playResult && typeof playResult.catch === "function") {
         playResult.catch(() => {
           // 取消静音后若浏览器仍阻断，回退到静音继续播放。
-          setMuted(true);
+          video.muted = true;
         });
       }
     }
-  }, [muted, isActive]);
+  }, [unmuted, isActive]);
 
   return (
     <>
@@ -704,20 +724,20 @@ function ChannelVideoPlayer({
         loop
         playsInline
         preload="auto"
-        onClick={() => setMuted((current) => !current)}
+        onClick={onToggleUnmuted}
         className="absolute inset-0 h-full w-full cursor-pointer bg-black object-contain"
       />
       <button
         type="button"
-        aria-label={muted ? t(msg`取消静音`) : t(msg`静音`)}
-        aria-pressed={!muted}
+        aria-label={unmuted ? t(msg`静音`) : t(msg`取消静音`)}
+        aria-pressed={unmuted}
         onClick={(event) => {
           event.stopPropagation();
-          setMuted((current) => !current);
+          onToggleUnmuted();
         }}
         className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/22 bg-black/45 text-white backdrop-blur-sm transition hover:bg-black/65"
       >
-        {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+        {unmuted ? <Volume2 size={16} /> : <VolumeX size={16} />}
       </button>
     </>
   );
@@ -729,24 +749,28 @@ function ChannelFeedSlide({
   registerSlide,
   isFavorite,
   likePending,
+  unmuted,
   onLike,
   onOpenAuthor,
   onShare,
   onToggleAuthorFollow,
   onToggleCommentDrawer,
   onToggleFavorite,
+  onToggleUnmuted,
 }: {
   post: FeedPostListItem;
   isActive: boolean;
   registerSlide: (postId: string, node: HTMLDivElement | null) => void;
   isFavorite: boolean;
   likePending: boolean;
+  unmuted: boolean;
   onLike: () => void;
   onOpenAuthor: () => void;
   onShare: () => void;
   onToggleAuthorFollow: () => void;
   onToggleCommentDrawer: () => void;
   onToggleFavorite: () => void;
+  onToggleUnmuted: () => void;
 }) {
   const t = useRuntimeTranslator();
   return (
@@ -757,7 +781,12 @@ function ChannelFeedSlide({
     >
       <div className="flex max-h-full items-end gap-4">
         <article className="relative flex aspect-[9/16] h-[min(82vh,800px)] flex-shrink-0 overflow-hidden rounded-[20px] bg-[#0d0e12] shadow-[0_24px_60px_rgba(0,0,0,0.55)]">
-          <ChannelMediaSurface post={post} isActive={isActive} />
+          <ChannelMediaSurface
+            post={post}
+            isActive={isActive}
+            unmuted={unmuted}
+            onToggleUnmuted={onToggleUnmuted}
+          />
           <div className="pointer-events-none absolute left-4 top-4 rounded-md bg-[rgba(15,23,42,0.68)] px-2.5 py-1 text-[11px] font-medium text-white">
             {t(msg`视频号推荐`)}
           </div>

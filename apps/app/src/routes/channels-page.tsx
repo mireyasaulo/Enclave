@@ -1,6 +1,7 @@
 import {
   Suspense,
   lazy,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -526,6 +527,15 @@ export function ChannelsPage() {
     ? (likeCommentMutation.variables?.commentId ?? null)
     : null;
 
+  // useCallback 必要：onViewPost 作为 prop 进 DesktopChannelsWorkspace 的 useEffect 依赖，
+  // 内联箭头函数会导致 effect 在父组件每次 re-render 都重跑，狂刷 viewFeedPost。
+  const handleDesktopViewPost = useCallback(
+    (postId: string) => {
+      void viewFeedPost(postId, { progressSeconds: 3 }, baseUrl);
+    },
+    [baseUrl],
+  );
+
   function navigateToRouteStateReturn() {
     if (!safeReturnPath) {
       return false;
@@ -959,9 +969,7 @@ export function ChannelsPage() {
             })
           }
           onSelectedPostChange={setDesktopSelectedPostId}
-          onViewPost={(postId) => {
-            void viewFeedPost(postId, { progressSeconds: 3 }, baseUrl);
-          }}
+          onViewPost={handleDesktopViewPost}
         />
       </Suspense>
     );
@@ -1923,6 +1931,7 @@ function MobileChannelsViewport({
       {posts.map((post) => (
         <MobileChannelsCard
           key={post.id}
+          activeSection={activeSection}
           active={activePostId === post.id}
           favorite={Boolean(post.ownerState?.hasFavorited)}
           likePending={likePendingPostId === post.id}
