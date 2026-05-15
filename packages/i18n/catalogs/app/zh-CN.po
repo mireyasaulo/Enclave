@@ -28044,3 +28044,7 @@ msgstr "已取消保存。"
 #: apps/app/src/runtime/file-runtime-i18n.ts:62
 msgid "已打开文件。"
 msgstr "已打开文件。"
+
+#: apps/app/src/routes/group-contacts-page.tsx:248
+msgid "清除搜索"
+msgstr "清除搜索"

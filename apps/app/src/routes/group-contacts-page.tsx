@@ -238,23 +238,34 @@ function MobileGroupContactsPage() {
                   : t(msg`先发起一个新的群聊，建好后就会出现在这里。`)
               }
               action={
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
-                  onClick={() => {
-                    void navigate({
-                      to: "/group/new",
-                      hash: buildCreateGroupRouteHash({
-                        source: "group-contacts",
-                        returnPath: pathname,
-                        returnHash: currentRouteHash || undefined,
-                      }),
-                    });
-                  }}
-                >
-                  {t(msg`发起群聊`)}
-                </Button>
+                hasSearchText ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
+                    onClick={() => setSearchText("")}
+                  >
+                    {t(msg`清除搜索`)}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 rounded-full border-[color:var(--border-subtle)] bg-white px-3.5 text-[11px]"
+                    onClick={() => {
+                      void navigate({
+                        to: "/group/new",
+                        hash: buildCreateGroupRouteHash({
+                          source: "group-contacts",
+                          returnPath: pathname,
+                          returnHash: currentRouteHash || undefined,
+                        }),
+                      });
+                    }}
+                  >
+                    {t(msg`发起群聊`)}
+                  </Button>
+                )
               }
             />
           </div>
