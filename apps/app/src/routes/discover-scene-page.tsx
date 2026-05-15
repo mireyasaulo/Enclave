@@ -291,12 +291,13 @@ function MobileDiscoverScenePage() {
   return (
     <MobileDiscoverToolShell
       title={t(msg`场景相遇`)}
+      subtitle={t(msg`在熟悉的场景里偶遇世界居民`)}
       heroTitle={t(msg`选择一个地点`)}
       heroVisual={<MapPin size={28} />}
       heroDescription={
         encounterCount > 0
           ? t(msg`今日已偶遇 ${encounterCount} 人`)
-          : undefined
+          : t(msg`挑一个常去的地方，附近的居民会主动打招呼。`)
       }
       notice={
         message ? (
