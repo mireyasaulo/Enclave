@@ -339,8 +339,14 @@ export function MobileMomentsPublishPage() {
                   <button
                     type="button"
                     onClick={() => composeDraft.removeImageDraft(draft.id)}
+                    disabled={createMutation.isPending}
                     aria-label={t(msg`移除图片`)}
-                    className="absolute right-1 top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-black/45 text-white"
+                    className={cn(
+                      "absolute right-1 top-1 inline-flex h-5 w-5 items-center justify-center rounded-full text-white",
+                      createMutation.isPending
+                        ? "bg-black/20"
+                        : "bg-black/45",
+                    )}
                   >
                     <X size={12} />
                   </button>
@@ -377,8 +383,14 @@ export function MobileMomentsPublishPage() {
                   <button
                     type="button"
                     onClick={() => composeDraft.clearVideoDraft()}
+                    disabled={createMutation.isPending}
                     aria-label={t(msg`移除视频`)}
-                    className="absolute right-1 top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-black/45 text-white"
+                    className={cn(
+                      "absolute right-1 top-1 inline-flex h-5 w-5 items-center justify-center rounded-full text-white",
+                      createMutation.isPending
+                        ? "bg-black/20"
+                        : "bg-black/45",
+                    )}
                   >
                     <X size={12} />
                   </button>
@@ -392,7 +404,8 @@ export function MobileMomentsPublishPage() {
                   // 又因为 !showVideoSlot 排除了纯视频情况，剩下只可能是 imageCount>0，
                   // 用户已经在"图片相册"模式里，再 + 就直接进系统相册，跳过中间 sheet。
                   onClick={() => imageInputRef.current?.click()}
-                  className="flex items-center justify-center bg-[#F7F7F7] text-[#B0B0B0] active:bg-[#EFEFEF]"
+                  disabled={createMutation.isPending}
+                  className="flex items-center justify-center bg-[#F7F7F7] text-[#B0B0B0] disabled:opacity-50 active:bg-[#EFEFEF]"
                   style={{ aspectRatio: "1 / 1" }}
                   aria-label={t(msg`添加图片`)}
                 >
@@ -407,7 +420,8 @@ export function MobileMomentsPublishPage() {
               <button
                 type="button"
                 onClick={() => setMediaPickerOpen(true)}
-                className="flex h-[110px] w-[110px] items-center justify-center bg-[#F2F2F2] text-[#B0B0B0] active:bg-[#EAEAEA]"
+                disabled={createMutation.isPending}
+                className="flex h-[110px] w-[110px] items-center justify-center bg-[#F2F2F2] text-[#B0B0B0] disabled:opacity-50 active:bg-[#EAEAEA]"
                 aria-label={t(msg`添加图片`)}
               >
                 <Plus size={32} strokeWidth={1.4} />
