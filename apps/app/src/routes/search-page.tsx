@@ -60,6 +60,7 @@ import { navigateBackOrFallback } from "../lib/history-back";
 import { normalizePathname } from "../lib/normalize-pathname";
 import { searchStringToObject } from "../lib/route-search";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+import { recordSearchActivity } from "@yinjie/contracts";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 
@@ -231,6 +232,24 @@ export function SearchPage() {
     };
   }, [isDesktopLayout, nativeDesktopSearchHistory]);
 
+  // 后端 POST /search/history 这条端点存在并被 cyber-avatar /
+  // shake-discovery / need-discovery 三个 AI 推荐特性消费，但前端从
+  // 来没调过——这些 AI 看到的搜索行为永远是空的。在 commit / apply
+  // history 两个真正"用户主动定型一次搜索意图"的入口里 fire-and-
+  // forget 上报；失败默默吞掉（埋点，不影响主流程）。
+  function recordSearchActivityFireAndForget(query: string) {
+    if (!query) {
+      return;
+    }
+    void recordSearchActivity(
+      {
+        query,
+        source: isDesktopLayout ? "desktop-search" : "mobile-search",
+      },
+      runtimeConfig.apiBaseUrl,
+    ).catch(() => undefined);
+  }
+
   function handleCommitSearch(keyword: string) {
     const normalizedKeyword = keyword.trim();
     setSearchText(normalizedKeyword);
@@ -241,6 +260,7 @@ export function SearchPage() {
 
     if (normalizedKeyword) {
       setHistory(pushSearchHistory(normalizedKeyword));
+      recordSearchActivityFireAndForget(normalizedKeyword);
     }
   }
 
@@ -250,6 +270,7 @@ export function SearchPage() {
       setCommittedSearchText(keyword);
     }
     setHistory(pushSearchHistory(keyword));
+    recordSearchActivityFireAndForget(keyword.trim());
   }
 
   function handleRemoveHistory(keyword: string) {

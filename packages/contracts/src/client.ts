@@ -2463,6 +2463,34 @@ export function searchGroupMessages(
   }));
 }
 
+export interface RecordSearchActivityResponse {
+  success: true;
+  item: {
+    query: string;
+    usedAt: string;
+    source?: string | null;
+  };
+}
+
+/**
+ * 用户提交一次搜索关键词时上报到后端 owner_search_history_records，
+ * 同时触发 cyber-avatar 的 search_activity 信号——shake-discovery /
+ * need-discovery 这些 AI 推荐特性会从这里取用户兴趣信号。
+ */
+export function recordSearchActivity(
+  payload: { query: string; source?: string | null },
+  baseUrl?: string,
+) {
+  return requestLegacyApi<RecordSearchActivityResponse>(
+    "/search/history",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    },
+    baseUrl,
+  );
+}
+
 export function recallGroupMessage(
   groupId: string,
   messageId: string,

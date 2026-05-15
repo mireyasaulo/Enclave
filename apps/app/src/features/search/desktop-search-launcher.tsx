@@ -17,6 +17,7 @@ import {
   getFriends,
   listOfficialAccounts,
   listCharacters,
+  recordSearchActivity,
   searchConversationMessages,
   searchGroupMessages,
 } from "@yinjie/contracts";
@@ -259,6 +260,12 @@ export function useDesktopSearchLauncher({
 
     if (normalizedKeyword) {
       setHistory(pushSearchHistory(normalizedKeyword));
+      // 跟 search-page.handleCommitSearch 对齐——把搜索行为上报到
+      // cyber-avatar / shake-discovery / need-discovery 的信号源。
+      void recordSearchActivity(
+        { query: normalizedKeyword, source: "desktop-launcher" },
+        runtimeConfig.apiBaseUrl,
+      ).catch(() => undefined);
     }
 
     setIsOpen(false);
