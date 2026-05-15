@@ -8,6 +8,7 @@ import { AvatarChip } from "../components/avatar-chip";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { navigateBackOrFallback } from "../lib/history-back";
+import { buildYinjieId } from "../lib/yinjie-id";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
 export function ProfileInfoPage() {
@@ -77,7 +78,7 @@ export function ProfileInfoPage() {
             label={t(msg`隐界号`)}
             value={
               <span className="truncate text-[13px] text-[color:var(--text-muted)]">
-                {ownerId ?? "—"}
+                {ownerId ? buildYinjieId(ownerId) : "—"}
               </span>
             }
             readOnly

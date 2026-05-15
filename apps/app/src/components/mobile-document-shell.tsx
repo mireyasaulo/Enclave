@@ -118,10 +118,10 @@ export function MobileDocumentShell({
               navigateBackOrFallback(
                 () => {
                   void navigate({
-                    to: isDesktopLayout ? "/desktop/settings" : "/profile/settings",
+                    to: isDesktopLayout ? "/desktop/settings" : "/tabs/profile",
                   });
                 },
-                isDesktopLayout ? "/desktop/settings" : "/profile/settings",
+                isDesktopLayout ? "/desktop/settings" : "/tabs/profile",
               )
             }
             variant="ghost"

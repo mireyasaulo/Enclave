@@ -107,9 +107,6 @@ export function ProfilePage() {
             to={settingsPath as never}
             className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[color:var(--text-primary)] transition-colors active:bg-black/[0.05]"
             aria-label={t(msg`打开设置`)}
-            onClick={() => {
-              void navigate({ to: settingsPath });
-            }}
           >
             <Settings size={17} />
           </Link>
