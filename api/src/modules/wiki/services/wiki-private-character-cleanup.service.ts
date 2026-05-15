@@ -77,11 +77,11 @@ export class WikiPrivateCharacterCleanupService
       if (rows.length < BATCH) break;
     }
 
-    if (scanned > 0) {
-      this.logger.log(
-        `[wiki-private-character-cleanup] scanned=${scanned} recipe_stripped=${recipeStripped} personality_cleared=${personalityCleared}`,
-      );
-    }
+    // 启动总是打一行，便于运维确认 onApplicationBootstrap 钩子是否被 NestJS
+    // 调起；scanned=0 时也打（表空 / 已迁移完）。
+    this.logger.log(
+      `boot scanned=${scanned} recipe_stripped=${recipeStripped} personality_cleared=${personalityCleared}`,
+    );
   }
 }
 // i18n-ignore-end
