@@ -27157,7 +27157,7 @@ msgstr "Signing out returns you to the world entry; you'll need to sign in to th
 #: apps/app/src/routes/profile-settings-page.tsx:333
 #: apps/app/src/routes/profile-settings-page.tsx:614
 msgid "账号安全"
-msgstr "Account security"
+msgstr "Account Security"
 
 #: apps/app/src/routes/profile-settings-language-page.tsx:42
 #: apps/app/src/routes/profile-settings-page.tsx:311
@@ -27175,7 +27175,7 @@ msgstr "Profile"
 
 #: apps/app/src/routes/profile-settings-page.tsx:80
 msgid "快捷键设置"
-msgstr "Shortcut settings"
+msgstr "Shortcut Settings"
 
 #: apps/app/src/routes/profile-settings-page.tsx:81
 #: apps/app/src/routes/profile-settings-page.tsx:452
