@@ -287,32 +287,39 @@ export function ContactDetailPane({
       </DesktopContactProfileSection>
 
       <DesktopContactProfileSection title={t(msg`社交与内容`)}>
-        <DesktopContactProfileActionRow
-          label={t(msg`朋友圈`)}
-          value={
-            onOpenMoments
-              ? t(msg`查看这位角色最近的朋友圈`)
-              : t(msg`查看角色资料`)
-          }
-          onClick={onOpenMoments ?? onOpenProfile}
-          disabled={!onOpenMoments && !onOpenProfile}
-          valueMuted={!onOpenMoments && !onOpenProfile}
-        />
-        <DesktopContactProfileActionRow
-          label={t(msg`共同群聊`)}
-          value={
-            commonGroups.length
-              ? t(msg`${commonGroups.length} 个共同群聊`)
-              : t(msg`暂时没有共同群聊`)
-          }
-          onClick={() => {
-            if (commonGroups[0] && onOpenGroup) {
-              onOpenGroup(commonGroups[0].id);
+        {/* 非好友（世界角色）拿不到对方朋友圈、也不可能有共同群聊；这两行原本
+            会落到 fallback「查看角色资料」/「暂时没有共同群聊」，跟下面的
+            「详细资料」入口完全重复 + 给人一种"信息不全"的错觉。只对好友显示。 */}
+        {isFriend ? (
+          <DesktopContactProfileActionRow
+            label={t(msg`朋友圈`)}
+            value={
+              onOpenMoments
+                ? t(msg`查看这位角色最近的朋友圈`)
+                : t(msg`查看角色资料`)
             }
-          }}
-          disabled={!commonGroups.length || !onOpenGroup}
-          valueMuted={!commonGroups.length}
-        />
+            onClick={onOpenMoments ?? onOpenProfile}
+            disabled={!onOpenMoments && !onOpenProfile}
+            valueMuted={!onOpenMoments && !onOpenProfile}
+          />
+        ) : null}
+        {isFriend ? (
+          <DesktopContactProfileActionRow
+            label={t(msg`共同群聊`)}
+            value={
+              commonGroups.length
+                ? t(msg`${commonGroups.length} 个共同群聊`)
+                : t(msg`暂时没有共同群聊`)
+            }
+            onClick={() => {
+              if (commonGroups[0] && onOpenGroup) {
+                onOpenGroup(commonGroups[0].id);
+              }
+            }}
+            disabled={!commonGroups.length || !onOpenGroup}
+            valueMuted={!commonGroups.length}
+          />
+        ) : null}
         {showProfileEntry ? (
           <DesktopContactProfileActionRow
             label={t(msg`详细资料`)}
