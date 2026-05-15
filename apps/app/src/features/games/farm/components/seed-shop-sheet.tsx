@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import type { FarmCropId, FarmPlayerStateView } from "@yinjie/contracts";
@@ -19,6 +19,15 @@ export function SeedShopSheet({ state, open, onClose }: SeedShopSheetProps) {
   const buyMutation = useBuyFarmSeed();
   const presentations = listCropPresentations();
 
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [open, onClose]);
+
   if (!open) return null;
 
   function handleBuy(cropId: FarmCropId, quantity: number) {
@@ -34,8 +43,14 @@ export function SeedShopSheet({ state, open, onClose }: SeedShopSheetProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-end justify-center bg-stone-900/30 sm:items-center">
-      <div className="flex max-h-[80vh] w-full max-w-md flex-col rounded-t-3xl bg-white shadow-xl sm:rounded-3xl">
+    <div
+      className="fixed inset-0 z-40 flex items-end justify-center bg-stone-900/30 sm:items-center"
+      onClick={onClose}
+    >
+      <div
+        className="flex max-h-[80vh] w-full max-w-md flex-col rounded-t-3xl bg-white shadow-xl sm:rounded-3xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <header className="flex items-center justify-between border-b border-stone-100 px-4 py-3">
           <h2 className="text-base font-semibold">{t(msg`种子商店`)}</h2>
           <button
