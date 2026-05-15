@@ -359,10 +359,13 @@ export function MobileMomentsPublishPage() {
                       className="h-full w-full object-cover"
                     />
                   ) : (
+                    // 封面生成失败时退到 <video> 显示首帧。preload="metadata" 必须
+                    // 显式给——移动端 Safari 默认 "none"，啥都不加载就是一片黑。
                     <video
                       src={composeDraft.videoDraft.previewUrl}
                       muted
                       playsInline
+                      preload="metadata"
                       className="h-full w-full object-cover"
                     />
                   )}
