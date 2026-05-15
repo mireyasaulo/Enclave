@@ -32,6 +32,7 @@ import {
 } from "../chat/local-chat-message-actions";
 import { buildDesktopContactsRouteHash } from "../contacts/contacts-route-state";
 import { getFriendDisplayName } from "../contacts/contact-utils";
+import { translateExpertDomain } from "../../lib/character-i18n";
 import { buildDesktopChatThreadPath } from "../desktop/chat/desktop-chat-route-state";
 import {
   emptySearchScopeCounts,
@@ -319,18 +320,34 @@ export function useSearchIndex(
           ? getFriendDisplayName(friend)
           : character.name;
         const tagText = friend?.friendship.tags?.join(" ") ?? "";
+        // expertDomains 既有英文 token（reasoning / vision / medicine 等）也有
+        // 中文条目（中文互联网、阿里云 等）。raw token 用于英文搜索，translated
+        // 形式用于中文搜索——只覆盖默认 locale，但能挡掉大部分「设了擅长领域
+        // 但搜不到」的尴尬。
+        const expertDomainText = character.expertDomains
+          ?.map((token) => `${token} ${translateExpertDomain(t, token)}`)
+          .join(" ") ?? "";
+        // 有备注名时原 description 只显示「昵称：[原名]」——一旦命中的是 bio /
+        // currentActivity / 擅长领域等 keywords 字段，用户在卡片上根本看不出
+        // 为什么这个联系人出现在结果里。把内容快照拼到昵称后面，让命中原因可
+        // 视化。
+        const contentSnippet =
+          character.bio ||
+          character.currentActivity ||
+          character.relationship ||
+          "";
+        const description =
+          displayName !== character.name
+            ? contentSnippet
+              ? t(msg`昵称：${character.name} · ${contentSnippet}`)
+              : t(msg`昵称：${character.name}`)
+            : contentSnippet || t(msg`查看联系人资料与聊天入口。`);
 
         return {
           id: `contact-${character.id}`,
           category: "contacts",
           title: displayName,
-          description:
-            displayName !== character.name
-              ? t(msg`昵称：${character.name}`)
-              : character.bio ||
-                character.currentActivity ||
-                character.relationship ||
-                t(msg`查看联系人资料与聊天入口。`),
+          description,
           meta: friend
             ? t(msg`通讯录联系人 · ${character.relationship}`)
             : t(msg`世界角色 · ${character.relationship}`),
@@ -342,6 +359,9 @@ export function useSearchIndex(
             character.bio,
             character.currentActivity,
             character.currentStatus,
+            character.personality,
+            character.region,
+            expertDomainText,
             tagText,
             friend?.friendship.region,
             friend?.friendship.source,
