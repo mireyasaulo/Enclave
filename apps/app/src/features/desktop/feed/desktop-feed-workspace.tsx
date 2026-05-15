@@ -141,6 +141,13 @@ export function DesktopFeedWorkspace({
       return;
     }
 
+    // posts 还没拉到时（首屏 query 在路上）别清 selectedPostId——清了 parent
+    // 的 desktopSelectedPostId 会被同步抹掉，URL 上的 #post=<id> hash 跟着没，
+    // 滚动定位失败。posts 有内容后还找不到才说明那条真的不在列表里。
+    if (posts.length === 0) {
+      return;
+    }
+
     if (!posts.some((post) => post.id === selectedPostId)) {
       setSelectedPostId(null);
     }
@@ -150,17 +157,37 @@ export function DesktopFeedWorkspace({
     onSelectedPostChange?.(selectedPostId);
   }, [onSelectedPostChange, selectedPostId]);
 
+  // 已经为当前 selectedPostId 滚过一次后就不再重滚——避免 posts 增量加载时
+  // (infinite-scroll 又拼了一页) 还活在同一个 selectedPostId 上又被弹回顶部。
+  const scrolledForPostIdRef = useRef<string | null>(null);
   useEffect(() => {
     if (!selectedPostId || typeof document === "undefined") {
       return;
     }
-
+    if (scrolledForPostIdRef.current === selectedPostId) {
+      return;
+    }
+    // posts 刚拉到第 1 帧时元素可能还没渲染，依赖 posts 让这个 effect 跟着
+    // 列表增量重新触发，直到该 id 的节点真出现在 DOM 里再 scrollIntoView。
+    const target = document.getElementById(
+      `desktop-feed-post-${selectedPostId}`,
+    );
+    if (!target) {
+      return;
+    }
     const frame = window.requestAnimationFrame(() => {
-      document
-        .getElementById(`desktop-feed-post-${selectedPostId}`)
-        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
     });
+    scrolledForPostIdRef.current = selectedPostId;
     return () => window.cancelAnimationFrame(frame);
+  }, [selectedPostId, posts]);
+
+  useEffect(() => {
+    // selectedPostId 一变就放开锁，下次进来同一个 id 也能再触发一次滚动
+    // （比如先选 A 再切 B 再回 A）。
+    if (scrolledForPostIdRef.current !== selectedPostId) {
+      scrolledForPostIdRef.current = null;
+    }
   }, [selectedPostId]);
 
   return (
