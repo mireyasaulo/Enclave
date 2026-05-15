@@ -589,13 +589,18 @@ export function ProfileSettingsPage() {
       ) : null}
 
       {activeTab === "language" ? (
+        // 这一段之前 SettingsSection 描述与 LanguageSwitcher 自带描述基本同义，
+        // 加上 LanguageSwitcher panel 里又有个 "界面语言" 的 select label，渲染出来
+        // 是「标题 界面语言 / 描述 切换界面语言... / 内卡片标签 界面语言 / 内卡片描述
+        // 语言偏好...」四行重复。与 cloud-console / wiki / admin 用 compact + description={null}
+        // 的口径对齐：把更有信息量的描述合并到 SettingsSection，里层 description 关掉。
         <SettingsSection
           title={t(msg`界面语言`)}
           description={t(
-            msg`切换界面语言，好友回复也会跟随此设置使用对应语言。`,
+            msg`语言偏好保存在当前设备并立即生效，同时决定好友回复使用的语言。`,
           )}
         >
-          <LanguageSwitcher />
+          <LanguageSwitcher description={null} />
         </SettingsSection>
       ) : null}
 
