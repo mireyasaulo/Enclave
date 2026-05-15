@@ -75,18 +75,15 @@ function MobileGroupContactsPage() {
       ? routeState.returnPath
       : undefined;
   const safeReturnHash = safeReturnPath ? routeState.returnHash : undefined;
+  // 群聊列表页不需要 highlightedMessageId（那是 /group/\$id 聊天页用的）。
+  // 不要把它带到 currentRouteHash 里，避免 deep-link 进来时把它泄到子页 returnHash。
   const currentRouteHash = useMemo(
     () =>
       buildMobileGroupRouteHash({
-        highlightedMessageId: routeState.highlightedMessageId,
         returnPath: safeReturnPath,
         returnHash: safeReturnHash,
       }),
-    [
-      routeState.highlightedMessageId,
-      safeReturnHash,
-      safeReturnPath,
-    ],
+    [safeReturnHash, safeReturnPath],
   );
 
   const groupsQuery = useQuery({
@@ -298,6 +295,13 @@ function MobileGroupContactsPage() {
                       )}
                     </div>
                   </div>
+                  {!group.savedToContacts ? (
+                    <div className="mt-0.5 flex items-center gap-2 text-[10px] text-[color:var(--text-dim)]">
+                      <span className="inline-flex items-center rounded-full bg-[rgba(15,23,42,0.04)] px-1.5 py-0.5 text-[9px] text-[color:var(--text-muted)]">
+                        {t(msg`未保存到通讯录`)}
+                      </span>
+                    </div>
+                  ) : null}
                 </div>
               </button>
             ))}
