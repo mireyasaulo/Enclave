@@ -311,8 +311,10 @@ function normalizeBioPersonality(
   >;
 
   // bio / personality 是 sacred：即便 optimize=true 也保留"非空才填"语义。
-  // 前端 bioPersonality 节"已填满"会走到"sacred 提示，不发请求"的特例分支；
-  // 这里是即便前端漏拦也保住 sacred 的兜底。
+  // bioPersonality 节里含两类字段——sacred (bio / personality) + 非-sacred
+  // (motivation / worldview)。优化模式下 motivation / worldview 会被 AI 覆盖，
+  // 而 bio / personality 由这里的 sacred 兜底保住（即便前端 applyUpdatesOverwrite
+  // 已经跳过它们，后端再过一道）。
   const bio = trimStr(raw.bio);
   if (bio && !current.bio?.trim()) out.bio = bio;
 
