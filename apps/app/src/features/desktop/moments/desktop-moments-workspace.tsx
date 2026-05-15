@@ -25,6 +25,8 @@ type DesktopMomentsWorkspaceProps = {
   commentReplyTarget?: MomentCommentReplyTarget | null;
   composeErrorMessage?: string | null;
   createPending: boolean;
+  deletePendingMomentId?: string | null;
+  deleteErrorMessage?: string | null;
   errors?: string[];
   imageDrafts: MomentImageDraft[];
   isLoading: boolean;
@@ -45,6 +47,7 @@ type DesktopMomentsWorkspaceProps = {
   onCommentChange: (momentId: string, value: string) => void;
   onCommentSubmit: (momentId: string) => void;
   onCreate: () => void;
+  onDeleteMoment?: (momentId: string) => void;
   onImageFilesSelected: (files: FileList | null) => void;
   onLike: (momentId: string) => void;
   onOpenAuthorPopover?: (input: {
@@ -75,6 +78,8 @@ export function DesktopMomentsWorkspace({
   commentReplyTarget = null,
   composeErrorMessage,
   createPending,
+  deletePendingMomentId = null,
+  deleteErrorMessage,
   errors = [],
   imageDrafts,
   isLoading,
@@ -95,6 +100,7 @@ export function DesktopMomentsWorkspace({
   onCommentChange,
   onCommentSubmit,
   onCreate,
+  onDeleteMoment,
   onImageFilesSelected,
   onLike,
   onOpenAuthorPopover,
@@ -143,6 +149,7 @@ export function DesktopMomentsWorkspace({
         <div className="flex h-full min-h-0 flex-col">
           <DesktopMomentsToolbar
             commentErrorMessage={commentErrorMessage}
+            deleteErrorMessage={deleteErrorMessage}
             errors={errors}
             likeErrorMessage={likeErrorMessage}
             successNotice={successNotice}
@@ -166,6 +173,7 @@ export function DesktopMomentsWorkspace({
                 commentDrafts={commentDrafts}
                 commentPendingMomentId={commentPendingMomentId}
                 commentReplyTarget={commentReplyTarget}
+                deletePendingMomentId={deletePendingMomentId}
                 isLoading={isLoading}
                 likePendingMomentId={likePendingMomentId}
                 moments={moments}
@@ -174,6 +182,7 @@ export function DesktopMomentsWorkspace({
                 onCancelCommentReply={onCancelCommentReply}
                 onCommentChange={onCommentChange}
                 onCommentSubmit={onCommentSubmit}
+                onDeleteMoment={onDeleteMoment}
                 onLike={onLike}
                 onShare={(momentId) => setShareMomentId(momentId)}
                 onStartCommentReply={

@@ -28,6 +28,7 @@ import {
 import { AvatarChip } from "../../../components/avatar-chip";
 import { MomentCommentComposer } from "../../../components/moment-comment-composer";
 import { MomentMediaGallery } from "../../../components/moment-media-gallery";
+import { stripToolCallSyntax } from "../../moments/moment-content";
 import { formatTimestamp } from "../../../lib/format";
 
 export type MomentCommentReplyTarget = {
@@ -143,7 +144,8 @@ export function DesktopMomentRow({
   const likedByOwner = Boolean(
     ownerId && moment.likes.some((like) => like.authorId === ownerId),
   );
-  const hasText = Boolean(moment.text.trim());
+  const displayText = stripToolCallSyntax(moment.text);
+  const hasText = Boolean(displayText);
   const canSelectAuthor = Boolean(onSelectAuthor);
   const canReply = Boolean(onStartCommentReply);
   const activeReply =
@@ -305,7 +307,7 @@ export function DesktopMomentRow({
 
           {hasText ? (
             <div className="mt-3 text-[15px] leading-7 text-[color:var(--text-primary)]">
-              {moment.text}
+              {displayText}
             </div>
           ) : null}
 
@@ -487,7 +489,7 @@ export function DesktopMomentRow({
                       </div>
                       {replyTargetComment ? (
                         <div className="truncate text-[color:var(--text-muted)]">
-                          {t(msg`「${replyTargetComment.text}」`)}
+                          {t(msg`「${stripToolCallSyntax(replyTargetComment.text)}」`)}
                         </div>
                       ) : null}
                     </div>
@@ -545,6 +547,7 @@ function CommentLine({
   text: string;
 }) {
   const translate = useRuntimeTranslator();
+  const displayText = stripToolCallSyntax(text);
   return (
     <span>
       <span className="font-medium text-[#07c160]">{authorName}</span>
@@ -559,7 +562,7 @@ function CommentLine({
       <span className="text-[color:var(--text-secondary)]">
         {translate(msg`：`)}
       </span>
-      <span className="text-[color:var(--text-primary)]">{text}</span>
+      <span className="text-[color:var(--text-primary)]">{displayText}</span>
     </span>
   );
 }

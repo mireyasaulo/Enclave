@@ -21,11 +21,27 @@ type DesktopContactsStarredFriendsPaneProps = {
   notice?: string | null;
   startChatPendingId?: string | null;
   starPendingId?: string | null;
+  commonGroupsByCharacterId?: Record<
+    string,
+    Array<{ id: string; name: string }>
+  >;
+  isPinnedByCharacterId?: Record<string, boolean>;
+  isMutedByCharacterId?: Record<string, boolean>;
+  blockedCharacterIds?: ReadonlySet<string>;
+  pinPendingCharacterId?: string | null;
+  mutePendingCharacterId?: string | null;
+  blockPendingCharacterId?: string | null;
+  deletePendingCharacterId?: string | null;
   onSelectCharacter: (characterId: string | null) => void;
   onStartChat: (characterId: string) => void;
   onToggleStarred: (characterId: string, starred: boolean) => void;
   onOpenProfile: (characterId: string) => void;
   onOpenMoments: (characterId: string) => void;
+  onOpenGroup?: (groupId: string) => void;
+  onTogglePinned?: (characterId: string, pinned: boolean) => void;
+  onToggleMuted?: (characterId: string, muted: boolean) => void;
+  onToggleBlock?: (characterId: string, blocked: boolean) => void;
+  onDeleteFriend?: (characterId: string) => void;
 };
 
 export function DesktopContactsStarredFriendsPane({
@@ -37,11 +53,24 @@ export function DesktopContactsStarredFriendsPane({
   notice = null,
   startChatPendingId = null,
   starPendingId = null,
+  commonGroupsByCharacterId,
+  isPinnedByCharacterId,
+  isMutedByCharacterId,
+  blockedCharacterIds,
+  pinPendingCharacterId = null,
+  mutePendingCharacterId = null,
+  blockPendingCharacterId = null,
+  deletePendingCharacterId = null,
   onSelectCharacter,
   onStartChat,
   onToggleStarred,
   onOpenProfile,
   onOpenMoments,
+  onOpenGroup,
+  onTogglePinned,
+  onToggleMuted,
+  onToggleBlock,
+  onDeleteFriend,
 }: DesktopContactsStarredFriendsPaneProps) {
   const t = useRuntimeTranslator();
   const [searchText, setSearchText] = useState("");
@@ -184,6 +213,12 @@ export function DesktopContactsStarredFriendsPane({
         <ContactDetailPane
           character={selectedFriend?.character ?? null}
           friendship={selectedFriend?.friendship ?? null}
+          commonGroups={
+            selectedFriend
+              ? (commonGroupsByCharacterId?.[selectedFriend.character.id] ?? [])
+              : []
+          }
+          onOpenGroup={onOpenGroup}
           onStartChat={
             selectedFriend
               ? () => onStartChat(selectedFriend.character.id)
@@ -199,6 +234,65 @@ export function DesktopContactsStarredFriendsPane({
                     selectedFriend.character.id,
                     !selectedFriend.friendship.isStarred,
                   )
+              : undefined
+          }
+          isPinned={
+            selectedFriend
+              ? Boolean(isPinnedByCharacterId?.[selectedFriend.character.id])
+              : false
+          }
+          pinPending={pinPendingCharacterId === selectedFriend?.character.id}
+          onTogglePinned={
+            selectedFriend && onTogglePinned
+              ? () =>
+                  onTogglePinned(
+                    selectedFriend.character.id,
+                    !Boolean(
+                      isPinnedByCharacterId?.[selectedFriend.character.id],
+                    ),
+                  )
+              : undefined
+          }
+          isMuted={
+            selectedFriend
+              ? Boolean(isMutedByCharacterId?.[selectedFriend.character.id])
+              : false
+          }
+          mutePending={mutePendingCharacterId === selectedFriend?.character.id}
+          onToggleMuted={
+            selectedFriend && onToggleMuted
+              ? () =>
+                  onToggleMuted(
+                    selectedFriend.character.id,
+                    !Boolean(
+                      isMutedByCharacterId?.[selectedFriend.character.id],
+                    ),
+                  )
+              : undefined
+          }
+          isBlocked={
+            selectedFriend
+              ? Boolean(blockedCharacterIds?.has(selectedFriend.character.id))
+              : false
+          }
+          blockPending={blockPendingCharacterId === selectedFriend?.character.id}
+          onToggleBlock={
+            selectedFriend && onToggleBlock
+              ? () =>
+                  onToggleBlock(
+                    selectedFriend.character.id,
+                    Boolean(
+                      blockedCharacterIds?.has(selectedFriend.character.id),
+                    ),
+                  )
+              : undefined
+          }
+          deletePending={
+            deletePendingCharacterId === selectedFriend?.character.id
+          }
+          onDeleteFriend={
+            selectedFriend && onDeleteFriend
+              ? () => onDeleteFriend(selectedFriend.character.id)
               : undefined
           }
           onOpenProfile={() => {

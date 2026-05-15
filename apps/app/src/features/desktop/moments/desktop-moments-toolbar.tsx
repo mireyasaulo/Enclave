@@ -5,6 +5,7 @@ import { ArrowUp, PenSquare, RefreshCcw } from "lucide-react";
 
 type DesktopMomentsToolbarProps = {
   commentErrorMessage?: string | null;
+  deleteErrorMessage?: string | null;
   errors?: string[];
   likeErrorMessage?: string | null;
   successNotice?: string;
@@ -16,6 +17,7 @@ type DesktopMomentsToolbarProps = {
 
 export function DesktopMomentsToolbar({
   commentErrorMessage,
+  deleteErrorMessage,
   errors = [],
   likeErrorMessage,
   successNotice,
@@ -85,6 +87,12 @@ export function DesktopMomentsToolbar({
         {commentErrorMessage ? (
           <div className="mt-4">
             <ErrorBlock message={commentErrorMessage} />
+          </div>
+        ) : null}
+
+        {deleteErrorMessage ? (
+          <div className="mt-4">
+            <ErrorBlock message={deleteErrorMessage} />
           </div>
         ) : null}
       </div>

@@ -604,6 +604,67 @@ export function ContactsPage() {
     () => (friendsQuery.data ?? []).filter((item) => item.friendship.isStarred),
     [friendsQuery.data],
   );
+  const starredCommonGroupsByCharacterId = useMemo(() => {
+    const map: Record<string, Array<{ id: string; name: string }>> = {};
+    const conversations = conversationsQuery.data ?? [];
+    for (const item of starredFriends) {
+      map[item.character.id] = conversations
+        .filter(
+          (conversation) =>
+            isPersistedGroupConversation(conversation) &&
+            conversation.participants.includes(item.character.id),
+        )
+        .map((conversation) => ({
+          id: conversation.id,
+          name: conversation.title,
+        }));
+    }
+    return map;
+  }, [conversationsQuery.data, starredFriends]);
+  const starredDirectConversationByCharacterId = useMemo(() => {
+    const map: Record<string, { id: string; isPinned: boolean; isMuted: boolean }> = {};
+    const conversations = conversationsQuery.data ?? [];
+    for (const item of starredFriends) {
+      const conversation = conversations.find(
+        (entry) =>
+          !isPersistedGroupConversation(entry) &&
+          entry.participants.includes(item.character.id),
+      );
+      if (conversation) {
+        map[item.character.id] = {
+          id: conversation.id,
+          isPinned: Boolean(conversation.isPinned),
+          isMuted: Boolean(conversation.isMuted),
+        };
+      }
+    }
+    return map;
+  }, [conversationsQuery.data, starredFriends]);
+  const starredIsPinnedByCharacterId = useMemo(() => {
+    const map: Record<string, boolean> = {};
+    for (const [characterId, conversation] of Object.entries(
+      starredDirectConversationByCharacterId,
+    )) {
+      map[characterId] = conversation.isPinned;
+    }
+    return map;
+  }, [starredDirectConversationByCharacterId]);
+  const starredIsMutedByCharacterId = useMemo(() => {
+    const map: Record<string, boolean> = {};
+    for (const [characterId, conversation] of Object.entries(
+      starredDirectConversationByCharacterId,
+    )) {
+      map[characterId] = conversation.isMuted;
+    }
+    return map;
+  }, [starredDirectConversationByCharacterId]);
+  const blockedCharacterIdSet = useMemo(
+    () =>
+      new Set(
+        (blockedCharactersQuery.data ?? []).map((item) => item.characterId),
+      ),
+    [blockedCharactersQuery.data],
+  );
   const tagGroupCount = useMemo(
     () => buildContactTagGroups(friendsQuery.data ?? [], "").length,
     [friendsQuery.data],
@@ -1736,6 +1797,30 @@ export function ContactsPage() {
                     ? (setStarredMutation.variables?.characterId ?? null)
                     : null
                 }
+                commonGroupsByCharacterId={starredCommonGroupsByCharacterId}
+                isPinnedByCharacterId={starredIsPinnedByCharacterId}
+                isMutedByCharacterId={starredIsMutedByCharacterId}
+                blockedCharacterIds={blockedCharacterIdSet}
+                pinPendingCharacterId={
+                  pinMutation.isPending
+                    ? (pinMutation.variables?.characterId ?? null)
+                    : null
+                }
+                mutePendingCharacterId={
+                  muteMutation.isPending
+                    ? (muteMutation.variables?.characterId ?? null)
+                    : null
+                }
+                blockPendingCharacterId={
+                  blockMutation.isPending
+                    ? (blockMutation.variables?.characterId ?? null)
+                    : null
+                }
+                deletePendingCharacterId={
+                  deleteFriendMutation.isPending
+                    ? (deleteFriendMutation.variables ?? null)
+                    : null
+                }
                 onSelectCharacter={(characterId) => {
                   const nextSelection = {
                     kind: "starred-friends",
@@ -1754,6 +1839,26 @@ export function ContactsPage() {
                     characterId,
                     starred,
                   });
+                }}
+                onOpenGroup={(groupId) => {
+                  void navigate({
+                    to: buildDesktopChatThreadPath({
+                      conversationId: groupId,
+                    }),
+                  });
+                }}
+                onTogglePinned={(characterId, pinned) => {
+                  pinMutation.mutate({ characterId, pinned });
+                }}
+                onToggleMuted={(characterId, muted) => {
+                  muteMutation.mutate({ characterId, muted });
+                }}
+                onToggleBlock={(characterId, blocked) => {
+                  setNotice(null);
+                  blockMutation.mutate({ characterId, blocked });
+                }}
+                onDeleteFriend={(characterId) => {
+                  deleteFriendMutation.mutate(characterId);
                 }}
                 onOpenProfile={handleOpenProfile}
                 onOpenMoments={(characterId) => {

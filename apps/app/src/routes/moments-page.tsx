@@ -606,6 +606,9 @@ export function MomentsPage() {
   const pendingCommentMomentId = commentMutation.isPending
     ? commentMutation.variables
     : null;
+  const pendingDeleteMomentId = deleteMutation.isPending
+    ? deleteMutation.variables
+    : null;
   const blockedCharacterIds = new Set(
     (blockedQuery.data ?? []).map((item) => item.characterId),
   );
@@ -984,6 +987,12 @@ export function MomentsPage() {
               : null)
           }
           createPending={createMutation.isPending}
+          deletePendingMomentId={pendingDeleteMomentId}
+          deleteErrorMessage={
+            deleteMutation.isError && deleteMutation.error instanceof Error
+              ? deleteMutation.error.message
+              : null
+          }
           errors={errors}
           imageDrafts={composeDraft.imageDrafts}
           isLoading={momentsQuery.isLoading}
@@ -1024,6 +1033,11 @@ export function MomentsPage() {
             })
           }
           onCreate={() => createMutation.mutate()}
+          onDeleteMoment={(momentId) => {
+            // 行内 DesktopMomentRow 已经有 window.confirm；这里直接走 mutation。
+            if (deleteMutation.isPending) return;
+            deleteMutation.mutate(momentId);
+          }}
           onImageFilesSelected={(files) => {
             void handleImageFilesSelected(files);
           }}

@@ -16,6 +16,7 @@ type DesktopMomentsFeedProps = {
   commentDrafts: Record<string, string>;
   commentPendingMomentId: string | null;
   commentReplyTarget?: MomentCommentReplyTarget | null;
+  deletePendingMomentId?: string | null;
   isLoading: boolean;
   likePendingMomentId: string | null;
   moments: Moment[];
@@ -24,6 +25,8 @@ type DesktopMomentsFeedProps = {
   onCancelCommentReply?: () => void;
   onCommentChange: (momentId: string, value: string) => void;
   onCommentSubmit: (momentId: string) => void;
+  /** 删除自己的朋友圈；只有 moment.authorType==='user' && moment.authorId===ownerId 时 feed 会把它接到行内菜单。 */
+  onDeleteMoment?: (momentId: string) => void;
   onLike: (momentId: string) => void;
   /** 可选：点击行内「分享」时上抛，由调用方弹出分享图卡。 */
   onShare?: (momentId: string) => void;
@@ -45,6 +48,7 @@ export function DesktopMomentsFeed({
   commentDrafts,
   commentPendingMomentId,
   commentReplyTarget = null,
+  deletePendingMomentId = null,
   isLoading,
   likePendingMomentId,
   moments,
@@ -53,6 +57,7 @@ export function DesktopMomentsFeed({
   onCancelCommentReply,
   onCommentChange,
   onCommentSubmit,
+  onDeleteMoment,
   onLike,
   onShare,
   onStartCommentReply,
@@ -83,6 +88,7 @@ export function DesktopMomentsFeed({
                   ? commentReplyTarget
                   : null
               }
+              deleteLoading={deletePendingMomentId === moment.id}
               likeLoading={likePendingMomentId === moment.id}
               moment={moment}
               ownerId={ownerId}
@@ -90,6 +96,14 @@ export function DesktopMomentsFeed({
               onCancelCommentReply={onCancelCommentReply}
               onCommentChange={(value) => onCommentChange(moment.id, value)}
               onCommentSubmit={() => onCommentSubmit(moment.id)}
+              onDelete={
+                onDeleteMoment &&
+                ownerId &&
+                moment.authorType === "user" &&
+                moment.authorId === ownerId
+                  ? () => onDeleteMoment(moment.id)
+                  : undefined
+              }
               onLike={() => onLike(moment.id)}
               onShare={onShare ? () => onShare(moment.id) : undefined}
               onStartCommentReply={onStartCommentReply}
