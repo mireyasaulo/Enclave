@@ -41,6 +41,7 @@ import { formatTimestamp } from "../lib/format";
 import { revealSavedFile } from "../runtime/reveal-saved-file";
 import { saveGeneratedFile } from "../runtime/save-generated-file";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+import { useCloudSessionStore } from "../store/cloud-session-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 import { translateRuntimeMessage, useAppLocale } from "@yinjie/i18n";
 
@@ -113,6 +114,9 @@ export function DesktopFeedbackPage() {
   const nativeDesktopFeedback = runtimeConfig.appPlatform === "desktop";
   const ownerName = useWorldOwnerStore((state) => state.username);
   const ownerSignature = useWorldOwnerStore((state) => state.signature);
+  // cloud 登录身份带过去，邮箱用户走 cloudEmail，手机号用户走 cloudPhone。
+  const cloudPhone = useCloudSessionStore((state) => state.phone);
+  const cloudEmail = useCloudSessionStore((state) => state.email);
   const baseUrl = runtimeConfig.apiBaseUrl;
   const cloudApiBaseUrl = runtimeConfig.cloudApiBaseUrl;
   const worldOwnerLabel = t(msg`世界主人`);
@@ -652,6 +656,8 @@ export function DesktopFeedbackPage() {
           apiBaseUrl: baseUrl || null,
           ownerName: ownerName || null,
           ownerSignature: ownerSignature || null,
+          submitterPhone: cloudPhone || null,
+          submitterEmail: cloudEmail || null,
         },
         cloudApiBaseUrl || undefined,
       );

@@ -687,6 +687,7 @@ export function WelcomePage() {
         accessToken,
         expiresAt: verifyResult.expiresAt,
         phone: null,
+        email: verifyResult.email,
         profile: null,
       });
       verifySucceeded = true;
@@ -815,11 +816,14 @@ export function WelcomePage() {
           await assertOwnerIdentity(identityKey, { queryClient });
           if (accountType === "email") {
             verifiedPhone = "";
-            setEmail(verifyResult.email ?? email.trim().toLowerCase());
+            const verifiedEmail =
+              verifyResult.email ?? email.trim().toLowerCase();
+            setEmail(verifiedEmail);
             saveCloudSession({
               accessToken: verifyResult.accessToken,
               expiresAt: verifyResult.expiresAt,
               phone: null,
+              email: verifiedEmail,
               profile: null,
             });
           } else {
@@ -829,6 +833,7 @@ export function WelcomePage() {
               accessToken: verifyResult.accessToken,
               expiresAt: verifyResult.expiresAt,
               phone: verifyResult.phone,
+              email: null,
               profile: null,
             });
           }
@@ -858,6 +863,7 @@ export function WelcomePage() {
             accessToken: verifyResult.accessToken,
             expiresAt: verifyResult.expiresAt,
             phone: null,
+            email: verifyResult.email,
             profile: null,
           });
           verifySucceeded = true;
@@ -889,6 +895,7 @@ export function WelcomePage() {
             accessToken: verifyResult.accessToken,
             expiresAt: verifyResult.expiresAt,
             phone: verifyResult.phone,
+            email: null,
             profile: null,
           });
           verifySucceeded = true;

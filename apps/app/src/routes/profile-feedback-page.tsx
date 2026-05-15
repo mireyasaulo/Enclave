@@ -48,9 +48,10 @@ export function ProfileFeedbackPage() {
   const cloudApiBaseUrl = runtimeConfig.cloudApiBaseUrl;
   const username = useWorldOwnerStore((state) => state.username);
   const signature = useWorldOwnerStore((state) => state.signature);
-  // 用户走 cloud 登录时（含邮箱用户合成的 9xxxxxxxxxxxxx 占位号）把这个挂上来，
-  // admin 反馈台至少能凭这串号去 cloud_users 表里反查邮箱回联。
+  // 手机号登录走这一路；邮箱/Google 登录走 cloudEmail。两者互斥但都可能为空
+  // （未登录 cloud），交给 admin 凭 ownerName 兜底。
   const cloudPhone = useCloudSessionStore((state) => state.phone);
+  const cloudEmail = useCloudSessionStore((state) => state.email);
 
   const [category, setCategory] = useState<CloudFeedbackCategory>("bug");
   const [title, setTitle] = useState("");
@@ -125,6 +126,7 @@ export function ProfileFeedbackPage() {
           ownerName: username || null,
           ownerSignature: signature || null,
           submitterPhone: cloudPhone || null,
+          submitterEmail: cloudEmail || null,
         },
         cloudApiBaseUrl || undefined,
       );
