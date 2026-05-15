@@ -732,13 +732,25 @@ export function DesktopNotesWorkspace({
   }
 
   const handleSave = useCallback(async () => {
+    // 不挡空保存的话，用户点保存按钮 / Ctrl+S，后端就会落一条
+    // title=无标题笔记 contentText="" 的废笔记。挡的标准跟下方 requestSend
+    // 的 hasSendableContent 对齐——只看正文或附件，标签无法独立成笔记。
+    const hasContent =
+      Boolean(editorState.contentText.trim()) || editorState.assets.length > 0;
+    if (!hasContent) {
+      setNotice({
+        tone: "danger",
+        message: t(msg`先写点内容或加个附件再保存。`),
+      });
+      return null;
+    }
     try {
       const savedNote = await saveMutation.mutateAsync();
       return savedNote;
     } catch {
       return null;
     }
-  }, [saveMutation]);
+  }, [editorState, saveMutation, t]);
 
   const handleClose = useCallback(async () => {
     const fallbackPath = returnTo || "/tabs/favorites";
