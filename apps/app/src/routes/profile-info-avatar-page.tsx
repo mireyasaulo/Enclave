@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
@@ -6,6 +6,7 @@ import { ArrowLeft, ImagePlus } from "lucide-react";
 import { updateWorldOwner } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AppPage, TextField, cn } from "@yinjie/ui";
+import defaultOwnerAvatar from "../assets/default-owner-avatar.svg";
 import { AvatarChip } from "../components/avatar-chip";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
@@ -28,13 +29,22 @@ export function ProfileInfoAvatarPage() {
   const hydrateOwner = useWorldOwnerStore((state) => state.hydrateOwner);
   const updateOwnerStore = useWorldOwnerStore((state) => state.updateOwner);
 
-  const [draft, setDraft] = useState(avatar);
+  // 用户没自定义过头像时 store.avatar 是打包出来的 default-owner-avatar.svg
+  // 资源路径（类似 /assets/default-owner-avatar-xxx.svg）。直接当成"当前 URL"
+  // 灌进输入框，用户会看到一串完全无意义的本地资源路径，所以把"等于默认"等
+  // 同没设置。
+  const hasCustomAvatar = useMemo(
+    () => Boolean(avatar) && avatar !== defaultOwnerAvatar,
+    [avatar],
+  );
+  const initialDraft = hasCustomAvatar ? avatar : "";
+  const [draft, setDraft] = useState(initialDraft);
   const [localError, setLocalError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    setDraft(avatar);
-  }, [avatar]);
+    setDraft(initialDraft);
+  }, [initialDraft]);
 
   useEffect(() => {
     if (isDesktopLayout) {
@@ -48,8 +58,9 @@ export function ProfileInfoAvatarPage() {
     );
 
   const trimmed = draft.trim();
-  const dirty = trimmed !== avatar.trim();
+  const dirty = trimmed !== (hasCustomAvatar ? avatar.trim() : "");
   const canSave = trimmed.length > 0 && dirty;
+  const previewSrc = trimmed || (hasCustomAvatar ? avatar : defaultOwnerAvatar);
 
   const saveMutation = useMutation({
     mutationFn: async () => {
@@ -130,7 +141,7 @@ export function ProfileInfoAvatarPage() {
       />
 
       <div className="mt-1 flex flex-col items-center gap-2 border-y border-[color:var(--border-faint)] bg-[color:var(--bg-canvas-elevated)] px-4 py-6">
-        <AvatarChip name={username ?? "avatar"} src={draft} size="xl" />
+        <AvatarChip name={username ?? "avatar"} src={previewSrc} size="xl" />
         <div className="text-[11px] text-[color:var(--text-muted)]">
           {t(msg`点击下方更换`)}
         </div>
