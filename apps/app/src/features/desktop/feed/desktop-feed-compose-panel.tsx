@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { msg } from "@lingui/macro";
 import { useRuntimeTranslator } from "@yinjie/i18n";
-import { Button, ErrorBlock, TextAreaField } from "@yinjie/ui";
+import { Button, ErrorBlock, TextAreaField, cn } from "@yinjie/ui";
 import { ImagePlus, Video, X } from "lucide-react";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { MomentComposeMediaPreview } from "../../../components/moment-compose-media-preview";
@@ -9,6 +9,10 @@ import {
   type MomentImageDraft,
   type MomentVideoDraft,
 } from "../../moments/moment-compose-media";
+
+// 跟 DesktopMomentComposePanel 对齐：UI 写 N/600 就得把它执行起来，
+// 否则用户能看到 1000/600 然后正常发出去——服务端也不卡，UI 自己在撒谎。
+const FEED_TEXT_MAX_LENGTH = 600;
 
 type DesktopFeedComposePanelProps = {
   createPending: boolean;
@@ -50,6 +54,7 @@ export function DesktopFeedComposePanel({
   const t = useRuntimeTranslator();
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const videoInputRef = useRef<HTMLInputElement | null>(null);
+  const trimmedTextLength = text.trim().length;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -116,6 +121,7 @@ export function DesktopFeedComposePanel({
               onChange={(event) => onTextChange(event.target.value)}
               placeholder={t(msg`写点想让世界居民都能看到的内容...`)}
               className="mt-5 min-h-[220px] resize-none rounded-[18px] border-[color:var(--border-faint)] bg-white px-4 py-4 leading-7 shadow-none hover:bg-[color:var(--surface-console)] focus:border-[rgba(7,193,96,0.14)] focus:bg-white focus:shadow-none"
+              maxLength={FEED_TEXT_MAX_LENGTH}
               autoFocus
             />
 
@@ -160,8 +166,15 @@ export function DesktopFeedComposePanel({
             <div className="mt-5 border-t border-[color:var(--border-faint)] pt-4">
               <div className="flex items-center justify-between gap-3 text-[12px] text-[color:var(--text-muted)]">
                 <span>{t(msg`发布后会直接插入到公开流顶部。`)}</span>
-                <span className="rounded-full border border-[color:var(--border-faint)] bg-[color:var(--surface-console)] px-2.5 py-1 text-[11px]">
-                  {text.trim().length}/600
+                <span
+                  className={cn(
+                    "rounded-full border px-2.5 py-1 text-[11px]",
+                    trimmedTextLength > FEED_TEXT_MAX_LENGTH
+                      ? "border-[#fdb6b6] bg-[#fff2f2] text-[#d23535]"
+                      : "border-[color:var(--border-faint)] bg-[color:var(--surface-console)]",
+                  )}
+                >
+                  {trimmedTextLength}/{FEED_TEXT_MAX_LENGTH}
                 </span>
               </div>
 
@@ -177,6 +190,7 @@ export function DesktopFeedComposePanel({
                   variant="primary"
                   disabled={
                     (!text.trim() && !imageDrafts.length && !videoDraft) ||
+                    trimmedTextLength > FEED_TEXT_MAX_LENGTH ||
                     createPending
                   }
                   onClick={onCreate}

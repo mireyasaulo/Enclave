@@ -23,6 +23,7 @@ import {
   getFeedSummaryText,
   resolveFeedMomentContentType,
 } from "../../feed/feed-media";
+import { stripToolCallSyntax } from "../../moments/moment-content";
 import { formatTimestamp } from "../../../lib/format";
 import { type FeedCommentReplyTarget } from "./feed-types";
 
@@ -74,9 +75,14 @@ export function DesktopFeedRow({
 }: DesktopFeedRowProps) {
   const t = useRuntimeTranslator();
   const composerInputRef = useRef<HTMLTextAreaElement>(null);
-  const hasText = Boolean(post.text.trim());
+  const displayText = stripToolCallSyntax(post.text);
+  const hasText = Boolean(displayText);
   const hasMedia = post.media.length > 0;
   const mediaSummaryText = hasText ? "" : getFeedSummaryText(post);
+  // 服务端 /feed/:id/like 只支持加，没有取消（跟 moments 不一样），所以已点赞
+  // 之后按钮要么 disabled 要么强标"已赞"——之前一直显示"点赞"，用户根本不
+  // 知道自己点没点过。
+  const liked = Boolean(post.ownerState?.hasLiked);
 
   const commentsForDisplay = useMemo(() => {
     if (detailPost) {
@@ -187,7 +193,7 @@ export function DesktopFeedRow({
 
           {hasText ? (
             <div className="mt-3 text-[15px] leading-7 text-[color:var(--text-primary)]">
-              {post.text}
+              {displayText}
             </div>
           ) : null}
 
@@ -209,12 +215,22 @@ export function DesktopFeedRow({
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
-                disabled={likeLoading}
+                disabled={likeLoading || liked}
                 onClick={onLike}
-                className="inline-flex h-8 items-center gap-1.5 rounded-xl border border-[color:var(--border-faint)] px-2.5 text-[12px] text-[color:var(--text-secondary)] transition-[background-color,color,border-color] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)] disabled:opacity-55"
+                title={liked ? t(msg`你已经为这条动态点过赞`) : undefined}
+                className={cn(
+                  "inline-flex h-8 items-center gap-1.5 rounded-xl border px-2.5 text-[12px] transition-[background-color,color,border-color] disabled:opacity-55",
+                  liked
+                    ? "border-[rgba(7,193,96,0.18)] bg-[rgba(7,193,96,0.06)] text-[color:var(--brand-primary)]"
+                    : "border-[color:var(--border-faint)] text-[color:var(--text-secondary)] hover:bg-[color:var(--surface-console)] hover:text-[color:var(--text-primary)]",
+                )}
               >
-                <Heart size={14} />
-                {likeLoading ? t(msg`处理中...`) : t(msg`点赞`)}
+                <Heart size={14} className={liked ? "fill-current" : ""} />
+                {likeLoading
+                  ? t(msg`处理中...`)
+                  : liked
+                    ? t(msg`已赞`)
+                    : t(msg`点赞`)}
               </button>
               <button
                 type="button"
@@ -371,7 +387,7 @@ export function DesktopFeedRow({
                   </div>
                   {replyTargetComment ? (
                     <div className="truncate text-[color:var(--text-muted)]">
-                      {t(msg`「${replyTargetComment.text}」`)}
+                      {t(msg`「${stripToolCallSyntax(replyTargetComment.text)}」`)}
                     </div>
                   ) : null}
                 </div>
@@ -459,7 +475,9 @@ function CommentLine({
       <span className="text-[color:var(--text-secondary)]">
         {t(msg`：`)}
       </span>
-      <span className="text-[color:var(--text-primary)]">{text}</span>
+      <span className="text-[color:var(--text-primary)]">
+        {stripToolCallSyntax(text)}
+      </span>
     </span>
   );
 }

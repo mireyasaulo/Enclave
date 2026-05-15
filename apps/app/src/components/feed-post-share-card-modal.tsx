@@ -4,6 +4,7 @@ import { translateRuntimeMessage } from "@yinjie/i18n";
 import { AvatarChip } from "./avatar-chip";
 import { MomentMediaGallery } from "./moment-media-gallery";
 import { ShareCardModal } from "./share-card-modal";
+import { stripToolCallSyntax } from "../features/moments/moment-content";
 
 const t = translateRuntimeMessage;
 
@@ -48,7 +49,7 @@ export function FeedPostShareCardModal({
  * 不接受互动 props — 纯静态展示。
  */
 function FeedPostExportCard({ post }: { post: FeedPost }) {
-  const trimmedText = post.text.trim();
+  const trimmedText = stripToolCallSyntax(post.text);
   const trimmedTitle = post.title?.trim() ?? "";
   const tags = (post.topicTags ?? []).filter((tag) => tag.trim());
   const isUserAuthor = post.authorType === "user";
