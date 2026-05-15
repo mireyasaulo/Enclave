@@ -312,7 +312,11 @@ export function MobileMomentsPublishPage() {
             onChange={(event) => composeDraft.setText(event.target.value)}
             placeholder={t(msg`这一刻的想法...`)}
             rows={4}
-            className="block w-full resize-none border-0 bg-transparent text-[17px] leading-[26px] text-[#1A1A1A] outline-none placeholder:text-[#B0B0B0]"
+            // outline-none 干掉浏览器原生轮廓；focus/focus-visible:shadow-none 干掉
+            // tokens.css 里 :focus-visible 的全局 3px 绿光 box-shadow——autoFocus
+            // 一进页面就吃这一圈、看起来像微信里冒出来一个绿色描边的输入框，
+            // 实际 WeChat compose 没有这层 ring。
+            className="block w-full resize-none border-0 bg-transparent text-[17px] leading-[26px] text-[#1A1A1A] outline-none placeholder:text-[#B0B0B0] focus:shadow-none focus-visible:shadow-none"
             style={{ minHeight: "104px" }}
             autoFocus
           />
