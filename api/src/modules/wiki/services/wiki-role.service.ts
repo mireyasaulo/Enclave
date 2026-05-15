@@ -125,6 +125,28 @@ export class WikiRoleService {
     return user;
   }
 
+  // 解析 userId → 公开展示信息（username / role）。recent-changes、pending-reviews、
+  // character-page 的修订卡都需要把 editorUserId UUID 换成可读用户名展示。
+  // 仅返回非敏感字段；email / passwordHash 等不下发。
+  async lookupPublic(ids: string[]): Promise<
+    Array<{ id: string; username: string; role: string }>
+  > {
+    const dedup = Array.from(new Set(ids.filter((s) => typeof s === 'string' && s.length > 0)));
+    if (dedup.length === 0) return [];
+    if (dedup.length > 200) {
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { detail: '一次最多解析 200 个 userId' },
+        legacyMessage: '一次最多解析 200 个 userId',
+      });
+    }
+    const users = await this.userRepo.find({
+      where: dedup.map((id) => ({ id })),
+      select: ['id', 'username', 'role'],
+    });
+    return users.map((u) => ({ id: u.id, username: u.username, role: u.role }));
+  }
+
   async listUsers(): Promise<
     Array<{
       id: string;

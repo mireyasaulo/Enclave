@@ -18,6 +18,7 @@ import {
 import { hasRole } from "../lib/auth-store";
 import { useAuth } from "../lib/use-auth";
 import { wikiApi, type PendingReviewItem } from "../lib/wiki-api";
+import { useUsernameMap } from "../lib/use-username-map";
 import { SnapshotDiff } from "../components/snapshot-diff";
 import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
@@ -74,6 +75,9 @@ export function PendingReviewsPage() {
   }
 
   const items = pendingQ.data ?? [];
+  const { resolve: resolveUsername } = useUsernameMap(
+    items.map((it) => it.revision.editorUserId),
+  );
   return (
     <PageShell
       eyebrow={t(msg`审核`)}
@@ -139,6 +143,7 @@ export function PendingReviewsPage() {
           <li key={item.submission.id}>
             <ReviewCard
               item={item}
+              editorName={resolveUsername(item.revision.editorUserId)}
               onDecide={(decision, note) =>
                 decideMut.mutate({
                   revisionId: item.revision.id,
@@ -187,10 +192,12 @@ function FilterSelect({
 
 function ReviewCard({
   item,
+  editorName,
   onDecide,
   loading,
 }: {
   item: PendingReviewItem;
+  editorName: string;
   onDecide: (
     decision: "approve" | "reject" | "request_changes",
     note?: string,
@@ -227,7 +234,7 @@ function ReviewCard({
         )}
         <span className="ml-auto text-xs text-[color:var(--text-muted)]">
           <Trans>
-            由 {rev.editorUserId}（{rev.editorRoleAtTime}）提交于{" "}
+            由 {editorName}（{rev.editorRoleAtTime}）提交于{" "}
             {formatDateTime(rev.createdAt)}
           </Trans>
         </span>

@@ -242,6 +242,8 @@ export type WikiTalkPost = {
 
 export type WatchlistEntry = {
   characterId: string;
+  // 来自 page.title，便于 UI 显示。空时回落到 characterId。
+  title: string;
   notifyOnEdit: boolean;
   notifyOnTalk: boolean;
   addedAt: string;
@@ -251,8 +253,8 @@ export type WatchlistEntry = {
 };
 
 export type WatchlistFeedItem =
-  | { kind: "revision"; characterId: string; revision: WikiRevisionSummary }
-  | { kind: "talk"; characterId: string; thread: WikiTalkThread };
+  | { kind: "revision"; characterId: string; title: string; revision: WikiRevisionSummary }
+  | { kind: "talk"; characterId: string; title: string; thread: WikiTalkThread };
 
 export type ModerationReport = {
   id: string;
@@ -453,6 +455,15 @@ export const wikiApi = {
   },
   listUsers() {
     return request<WikiUserRow[]>("/wiki/users");
+  },
+  // 批量把 userId 解析成 username/role 用于显示。recent-changes、pending-reviews、
+  // character-page 历史卡都得用这个把 editorUserId UUID 替换成用户名。
+  // 不要求 admin 权限；任何登录用户都可调用，返回的字段是非敏感的。
+  lookupUsers(ids: string[]) {
+    return request<Array<{ id: string; username: string; role: string }>>(
+      "/wiki/users/lookup",
+      { method: "POST", body: JSON.stringify({ ids }) },
+    );
   },
   setUserRole(
     userId: string,
@@ -861,6 +872,23 @@ export const wikiApi = {
     optimize?: boolean;
   }) {
     return request<AiGeneratedDraft>("/wiki/my-characters/ai-generate", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  },
+  /**
+   * AI 生成角色字段（与 generateMyCharacterFields 走同一套 service，但路由是
+   * 世界角色编辑可用的通用入口；rate-limit 桶按 user.id 共享，所以两个入口共
+   * 用同一份 15/h 配额）。世界角色 / 私有角色编辑器需要不同 URL 主要是为了
+   * 让请求语义可追踪：私有 → /wiki/my-characters/ai-generate；世界 → /wiki/
+   * ai-generate-character-fields。
+   */
+  generateCharacterFields(input: {
+    section: AiGenerateSection;
+    currentDraft: PrivateCharacterDto;
+    optimize?: boolean;
+  }) {
+    return request<AiGeneratedDraft>("/wiki/ai-generate-character-fields", {
       method: "POST",
       body: JSON.stringify(input),
     });
