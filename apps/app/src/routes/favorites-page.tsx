@@ -430,7 +430,9 @@ export function FavoritesPage() {
             : t(msg`新建笔记会直接作为收藏内容保存。`)
           : normalizedSearchText
             ? t(msg`搜索“${searchText.trim()}”命中 ${filteredFavorites.length} 项`)
-            : t(msg`${counts.all} 项内容已收进桌面收藏`)
+            : activeCategory === "all"
+              ? t(msg`${counts.all} 项内容已收进桌面收藏`)
+              : t(msg`${resolveFavoriteCategoryLabel(activeCategory)} · ${counts[activeCategory]} 项`)
       }
       toolbar={
         <Button
