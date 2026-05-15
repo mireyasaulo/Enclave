@@ -391,7 +391,14 @@ export function MobileSearchWorkspace({
           </InlineNotice>
         ) : null}
 
-        {!loading && !error && hasKeyword && !visibleResults.length ? (
+        {/* 「无结果」卡片只在「确实没东西可看」时出：消息索引还在补全时
+            （searchingMessages）继续展示下面的局部结果 + 上面的补全 banner，
+            避免用户先看到「没有找到相关内容」、过两秒消息又冒出来的反复。
+            只有当前分类的命中受消息索引影响（全部 / 聊天记录）时才等；contacts/
+            moments 这种分类下，消息还在 loading 也不该挡掉「无结果」反馈。 */}
+        {!loading && !error && hasKeyword && !visibleResults.length && !(
+          searchingMessages && (activeCategory === "all" || activeCategory === "messages")
+        ) ? (
           <div className="pt-3">
             <MobileSearchStatusCard
               badge={t(msg`无结果`)}
@@ -440,7 +447,11 @@ export function MobileSearchWorkspace({
                 );
               })}
             </div>
-          ) : (
+          ) : visibleResults.length || activeCategory === "miniPrograms" ? (
+            // 非「全部」分类、0 命中时不再渲染「{分类} · 0 条」空表头：
+            // 上面的「无结果」卡片已经把"没找到"说清楚了，再叠一行 0 条只会
+            // 让信息密度变重。miniPrograms 是例外——chip 命中就要让
+            // ComingSoonOverlay 出来，告知"功能开发中"，比"无结果"更准确。
             <div className="space-y-2.5">
               <div className="text-[14px] font-medium text-[color:var(--text-primary)]">
                 {getCategoryTitle(activeCategory)} · {visibleResults.length}{" "}
@@ -461,7 +472,7 @@ export function MobileSearchWorkspace({
                 ) : null}
               </div>
             </div>
-          )
+          ) : null
         ) : null}
       </div>
     </div>

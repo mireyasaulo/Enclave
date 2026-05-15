@@ -1,5 +1,5 @@
 import { msg } from "@lingui/macro";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   FileText,
   Image as ImageIcon,
@@ -168,6 +168,13 @@ export function ChatMessageSearchPanel({
   const [specificDate, setSpecificDate] = useState("");
   const localMessageActionState = useLocalChatMessageActionState();
   const { reminders } = useMessageReminders();
+  const keywordInputRef = useRef<HTMLInputElement | null>(null);
+
+  // 进入「查找聊天记录」时直接 focus 关键词输入框——跟全局搜一搜
+  // (mobile-search-workspace) 行为一致，少一次戳屏幕的动作。
+  useEffect(() => {
+    keywordInputRef.current?.focus();
+  }, []);
   const searchDateFilters = useMemo(() => getSearchDateFilters(), [locale]);
   const searchMessageTypeFilters = useMemo(
     () => getSearchMessageTypeFilters(),
@@ -389,6 +396,7 @@ export function ChatMessageSearchPanel({
               className="shrink-0 text-[color:var(--text-dim)]"
             />
             <input
+              ref={keywordInputRef}
               type="search"
               value={keyword}
               onChange={(event) => setKeyword(event.target.value)}
