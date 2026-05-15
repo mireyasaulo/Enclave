@@ -113,6 +113,15 @@ export function AccountSecurityPanel() {
       });
       return;
     }
+    // 后端 password-policy 也会拦空格，但跑到 cloud-api 才报让 UX 一坨。
+    // 这里先在客户端拦掉，配合 placeholder 「8-32 位，任意字符（不含空格）」一致。
+    if (/\s/.test(newPassword)) {
+      setFeedback({
+        tone: "danger",
+        message: t(msg`新密码不能包含空格。`),
+      });
+      return;
+    }
     if (newPassword !== confirmPassword) {
       setFeedback({
         tone: "danger",
@@ -122,6 +131,14 @@ export function AccountSecurityPanel() {
     }
     changePasswordMutation.mutate();
   }
+
+  // 把核心提交条件统一到一个 flag 上，避免 disabled / 视觉态各走各的。
+  const submitDisabled =
+    changePasswordMutation.isPending ||
+    !accessToken ||
+    !code.trim() ||
+    !newPassword ||
+    !confirmPassword;
 
   return (
     <div className="space-y-4">
@@ -141,10 +158,19 @@ export function AccountSecurityPanel() {
               <TextField
                 value={code}
                 onChange={(event) => {
-                  setCode(event.target.value);
+                  // 后端验证码硬是 6 位数字（email-auth.service.ts generateCode），
+                  // 移动端给一个 numeric 键盘 + 长度截断，少一次"输错位数才报错"的来回。
+                  const next = event.target.value
+                    .replace(/\D+/g, "")
+                    .slice(0, 6);
+                  setCode(next);
                   setFeedback(null);
                 }}
                 placeholder={t(msg`请输入邮箱收到的 6 位验证码`)}
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={6}
+                pattern="\d{6}"
               />
             </div>
             <Button
@@ -179,6 +205,8 @@ export function AccountSecurityPanel() {
               setFeedback(null);
             }}
             placeholder={t(msg`8-32 位，任意字符（不含空格）`)}
+            autoComplete="new-password"
+            maxLength={32}
           />
         </label>
 
@@ -194,12 +222,14 @@ export function AccountSecurityPanel() {
               setFeedback(null);
             }}
             placeholder={t(msg`再次输入新密码`)}
+            autoComplete="new-password"
+            maxLength={32}
           />
         </label>
 
         <Button
           onClick={handleSubmit}
-          disabled={changePasswordMutation.isPending || !accessToken}
+          disabled={submitDisabled}
           size="lg"
           className="w-full rounded-2xl"
         >
