@@ -280,7 +280,9 @@ export function MobileMomentsPublishPage() {
             }}
             disabled={!canSubmit}
             className={cn(
-              "h-7 rounded-[3px] px-3 text-[14px] font-medium transition",
+              // min-w 让"发表"(2 字) → "发表中"(3 字) 的状态切换不再撑大按钮，
+              // 避免顶栏右上角看起来抖一下；按住够装下 isPending 文案。
+              "h-7 min-w-[3.75rem] rounded-[3px] px-3 text-[14px] font-medium transition",
               canSubmit
                 ? "bg-[#07C160] text-white active:bg-[#06AD56]"
                 : "bg-[#9DD9B0] text-white",
@@ -422,7 +424,10 @@ export function MobileMomentsPublishPage() {
                 onClick={() => setMediaPickerOpen(true)}
                 disabled={createMutation.isPending}
                 className="flex h-[110px] w-[110px] items-center justify-center bg-[#F2F2F2] text-[#B0B0B0] disabled:opacity-50 active:bg-[#EAEAEA]"
-                aria-label={t(msg`添加图片`)}
+                // aria-label 要描述真实行为：这个入口走的是 picker sheet（图片
+                // 和视频两路都开），不是 grid 内的纯图片 +。错描述会让无障碍
+                // 用户以为没法发视频。
+                aria-label={t(msg`添加图片或视频`)}
               >
                 <Plus size={32} strokeWidth={1.4} />
               </button>
