@@ -15,6 +15,8 @@ type Translator = ReturnType<typeof useRuntimeTranslator>;
 import { AvatarChip } from "../components/avatar-chip";
 import { RouteRedirectState } from "../components/route-redirect-state";
 import { TabPageTopBar } from "../components/tab-page-top-bar";
+import { buildCharacterDetailRouteHash } from "../features/contacts/character-detail-route-state";
+import { getFriendRequestSourceLabel } from "../features/contacts/friend-request-scene-label";
 import {
   buildMobileFriendRequestsRouteHash,
   parseMobileFriendRequestsRouteState,
@@ -144,6 +146,17 @@ function MobileFriendRequestsPage() {
       to: "/contacts/world-characters",
       hash: buildWorldCharactersRouteHash({
         keyword: "",
+        returnPath: pathname,
+        returnHash: currentRouteHash || undefined,
+      }),
+    });
+  }
+
+  function openCharacterProfile(characterId: string) {
+    void navigate({
+      to: "/character/$characterId",
+      params: { characterId },
+      hash: buildCharacterDetailRouteHash({
         returnPath: pathname,
         returnHash: currentRouteHash || undefined,
       }),
@@ -290,25 +303,37 @@ function MobileFriendRequestsPage() {
                 )}
               >
                 <div className="flex items-start gap-3">
-                  <AvatarChip
-                    name={request.characterName}
-                    src={request.characterAvatar}
-                    size="wechat"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => openCharacterProfile(request.characterId)}
+                    className="shrink-0 rounded-[8px] active:opacity-70"
+                    aria-label={t(msg`查看 ${request.characterName} 的资料`)}
+                  >
+                    <AvatarChip
+                      name={request.characterName}
+                      src={request.characterAvatar}
+                      size="wechat"
+                    />
+                  </button>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => openCharacterProfile(request.characterId)}
+                      className="flex w-full items-start justify-between gap-3 text-left active:opacity-70"
+                      aria-label={t(msg`查看 ${request.characterName} 的资料`)}
+                    >
                       <div className="min-w-0">
                         <div className="truncate text-[14px] text-[color:var(--text-primary)]">
                           {request.characterName}
                         </div>
                         <div className="mt-0.5 text-[11px] text-[color:var(--text-muted)]">
-                          {getFriendRequestSourceLabel(t, request.triggerScene)}
+                          {t(getFriendRequestSourceLabel(request.triggerScene))}
                         </div>
                       </div>
                       <div className="shrink-0 text-[10px] text-[color:var(--text-dim)]">
                         {formatFriendRequestDate(t, request.createdAt)}
                       </div>
-                    </div>
+                    </button>
 
                     <div className="mt-2 rounded-[12px] bg-[color:var(--surface-card-hover)] px-3 py-2 text-[13px] leading-5 text-[color:var(--text-secondary)]">
                       {request.greeting || t(msg`想认识你。`)}
@@ -455,58 +480,6 @@ function MobileFriendRequestsPage() {
       </div>
     </AppPage>
   );
-}
-
-function getFriendRequestSourceLabel(t: Translator, triggerScene?: string) {
-  if (!triggerScene) {
-    return t(msg`新的朋友`);
-  }
-
-  if (triggerScene === "shake") {
-    return t(msg`来自摇一摇`);
-  }
-
-  const localizedScene = getSceneLabelById(t, triggerScene);
-  return t(msg`来自${localizedScene}`);
-}
-
-function getSceneLabelById(t: Translator, sceneId: string): string {
-  switch (sceneId) {
-    case "coffee_shop":
-      return t(msg`咖啡馆`);
-    case "gym":
-      return t(msg`健身房`);
-    case "library":
-      return t(msg`图书馆`);
-    case "park":
-      return t(msg`公园`);
-    case "classroom":
-      return t(msg`教室`);
-    case "lab":
-      return t(msg`实验室`);
-    case "office":
-      return t(msg`办公室`);
-    case "coworking":
-      return t(msg`联合办公空间`);
-    case "study_room":
-      return t(msg`自习室`);
-    case "restaurant":
-      return t(msg`餐厅`);
-    case "museum":
-      return t(msg`博物馆`);
-    case "bookstore":
-      return t(msg`书店`);
-    case "travel":
-      return t(msg`旅途`);
-    case "night_walk":
-      return t(msg`夜晚的街道`);
-    case "theater":
-      return t(msg`剧场`);
-    case "home":
-      return t(msg`居家场景`);
-    default:
-      return sceneId; // i18n-ignore-line: unknown scene id passthrough
-  }
 }
 
 function formatFriendRequestDate(t: Translator, createdAt: string) {

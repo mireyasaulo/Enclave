@@ -5,6 +5,7 @@ import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
+import { getFriendRequestSourceLabel } from "../../contacts/friend-request-scene-label";
 
 type DesktopContactsFriendRequestsPaneProps = {
   requests: FriendRequest[];
@@ -167,53 +168,6 @@ export function DesktopContactsFriendRequestsPane({
       </div>
     </div>
   );
-}
-
-function getFriendRequestSourceLabel(triggerScene?: string): MessageDescriptor {
-  if (!triggerScene) {
-    return msg`新的朋友`;
-  }
-
-  if (triggerScene === "shake") {
-    return msg`来自摇一摇`;
-  }
-
-  switch (triggerScene) {
-    case "coffee_shop":
-      return msg`来自咖啡馆`;
-    case "gym":
-      return msg`来自健身房`;
-    case "library":
-      return msg`来自图书馆`;
-    case "park":
-      return msg`来自公园`;
-    case "classroom":
-      return msg`来自教室`;
-    case "lab":
-      return msg`来自实验室`;
-    case "office":
-      return msg`来自办公室`;
-    case "coworking":
-      return msg`来自联合办公空间`;
-    case "study_room":
-      return msg`来自自习室`;
-    case "restaurant":
-      return msg`来自餐厅`;
-    case "museum":
-      return msg`来自博物馆`;
-    case "bookstore":
-      return msg`来自书店`;
-    case "travel":
-      return msg`来自旅途`;
-    case "night_walk":
-      return msg`来自夜晚的街道`;
-    case "theater":
-      return msg`来自剧场`;
-    case "home":
-      return msg`来自居家场景`;
-    default:
-      return msg`来自 ${triggerScene}`;
-  }
 }
 
 function formatFriendRequestDate(

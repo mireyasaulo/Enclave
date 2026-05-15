@@ -6,6 +6,7 @@ import { Button, ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
+import { getFriendRequestSourceLabel } from "../../contacts/friend-request-scene-label";
 import { DesktopUtilityShell } from "../desktop-utility-shell";
 
 type DesktopFriendRequestsWorkspaceProps = {
@@ -284,22 +285,6 @@ function SourceHint({
       </div>
     </div>
   );
-}
-
-function getFriendRequestSourceLabel(triggerScene?: string): MessageDescriptor {
-  if (!triggerScene) {
-    return msg`新的朋友`;
-  }
-
-  if (triggerScene === "shake") {
-    return msg`来自摇一摇`;
-  }
-
-  if (triggerScene === "manual_add") {
-    return msg`来自搜索添加`;
-  }
-
-  return msg`来自 ${triggerScene}`;
 }
 
 function formatFriendRequestDate(
