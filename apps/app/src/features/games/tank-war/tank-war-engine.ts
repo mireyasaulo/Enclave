@@ -233,6 +233,9 @@ function trySpawnEnemy(world: GameWorld, now: number): void {
   const kind = world.enemyQueue[world.spawnCursor] as TankKind;
   const isBonus = world.bonusFlags[world.spawnCursor] === true;
   const hp = kind === "power" ? 4 : 1;
+  // 若 timer 道具 freeze 还没过期，新出生的敌坦克也要被冻住；FC 原版表现是一只
+  // 蓝色冰冻坦克在 spawn 点 — 不能让它从队列里跳出来照常走动/开火。
+  const frozenNow = now < world.freezeUntilMs;
   const tank: Tank = {
     id: world.nextId++,
     kind,
@@ -247,8 +250,8 @@ function trySpawnEnemy(world: GameWorld, now: number): void {
     spawnAnimUntilMs: now + 600,
     reloadAtMs: now + 800,
     bonus: isBonus,
-    frozen: false,
-    freezeUntilMs: 0,
+    frozen: frozenNow,
+    freezeUntilMs: frozenNow ? world.freezeUntilMs : 0,
     iceSlideDx: 0,
     iceSlideDy: 0,
     iceSlideRemaining: 0,

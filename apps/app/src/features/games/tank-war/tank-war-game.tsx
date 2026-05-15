@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { msg } from "@lingui/macro";
 import { translateRuntimeMessage } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
-import { X } from "lucide-react";
+import { Pause, Play, X } from "lucide-react";
 
 import {
   LOGIC_HEIGHT,
@@ -90,6 +90,19 @@ export function TankWarGame({ variant = "fullscreen", onExit }: TankWarGameProps
           <HudSummary hud={hud} />
         </div>
         <div className="flex items-center gap-1">
+          {hud.status === "playing" || hud.status === "paused" ? (
+            <button
+              type="button"
+              onClick={() => controls.togglePause()}
+              className="flex h-8 items-center gap-1 rounded-full bg-white/10 px-2.5 text-[11px] font-medium text-white"
+              aria-label={
+                hud.status === "paused" ? t(msg`继续游戏`) : t(msg`暂停游戏`)
+              }
+            >
+              {hud.status === "paused" ? <Play size={12} /> : <Pause size={12} />}
+              {hud.status === "paused" ? t(msg`继续`) : t(msg`暂停`)}
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={() => controls.toggleMute()}
@@ -132,6 +145,10 @@ export function TankWarGame({ variant = "fullscreen", onExit }: TankWarGameProps
         <MenuOverlay hud={hud} controls={controls} />
       ) : null}
 
+      {hud.status === "paused" ? (
+        <PausedOverlay onResume={() => controls.togglePause()} />
+      ) : null}
+
       {isTouch && hud.status === "playing" ? (
         <TankWarTouchControls inputRef={inputRef} />
       ) : null}
@@ -172,6 +189,21 @@ function HudSummary({ hud }: { hud: HudSnapshot }) {
   );
 }
 
+function PausedOverlay({ onResume }: { onResume: () => void }) {
+  return (
+    <div className="flex w-full max-w-[520px] items-center justify-center rounded-lg bg-white/5 p-3">
+      <button
+        type="button"
+        onClick={onResume}
+        className="flex items-center gap-2 rounded-full bg-amber-400 px-5 py-2 text-[14px] font-semibold text-black"
+      >
+        <Play size={16} />
+        {t(msg`继续游戏`)}
+      </button>
+    </div>
+  );
+}
+
 function MenuOverlay({
   hud,
   controls,
@@ -184,8 +216,14 @@ function MenuOverlay({
     toggleMute: () => void;
   };
 }) {
-  const [mode, setMode] = useState<PlayerMode>("one-player");
-  const [stage, setStage] = useState<number>(1);
+  // 默认值跟随当前 world 状态：mode 跟上一局，stage 在 boot/game-over 时取已解锁
+  // 最高关；stage-clear 时定位到刚通关的关卡，方便点 "再来一局" 复刷同一关。
+  const [mode, setMode] = useState<PlayerMode>(() => hud.mode);
+  const [stage, setStage] = useState<number>(() => {
+    if (hud.status === "boot") return 1;
+    if (hud.status === "stage-clear") return hud.stage;
+    return Math.max(1, Math.min(hud.maxUnlockedStage, hud.stage));
+  });
   return (
     <div className="flex w-full max-w-[520px] flex-col gap-2 rounded-lg bg-white/5 p-3 text-white">
       {hud.status === "boot" ? (
