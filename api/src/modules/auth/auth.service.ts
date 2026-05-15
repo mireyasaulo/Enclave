@@ -40,6 +40,8 @@ export type AuthProfile = {
 };
 
 const MIN_PASSWORD_LENGTH = 6;
+const MIN_USERNAME_LENGTH = 2;
+const MAX_USERNAME_LENGTH = 32;
 
 @Injectable()
 export class AuthService {
@@ -53,11 +55,35 @@ export class AuthService {
   ) {}
 
   async register(username: string, password: string): Promise<AuthSession> {
-    const trimmed = username.trim();
-    if (!trimmed || !password) {
+    // 不要直接 .trim() —— 入参可能是 undefined（前端漏传 / 直接 POST {}），
+    // 否则会抛 'Cannot read properties of undefined (reading 'trim')' → 500。
+    const trimmed = (username ?? '').trim();
+    const rawPassword = password ?? '';
+    if (!trimmed || !rawPassword) {
       throw new AppError('AUTH_USERNAME_PASSWORD_REQUIRED', {
-        status: HttpStatus.UNAUTHORIZED,
+        status: HttpStatus.BAD_REQUEST,
         legacyMessage: '用户名与密码不能为空',
+      });
+    }
+    if (trimmed.length < MIN_USERNAME_LENGTH) {
+      throw new AppError('AUTH_USERNAME_TOO_SHORT', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { min: MIN_USERNAME_LENGTH },
+        legacyMessage: `用户名至少 ${MIN_USERNAME_LENGTH} 个字符。`,
+      });
+    }
+    if (trimmed.length > MAX_USERNAME_LENGTH) {
+      throw new AppError('AUTH_USERNAME_TOO_LONG', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { max: MAX_USERNAME_LENGTH },
+        legacyMessage: `用户名不能超过 ${MAX_USERNAME_LENGTH} 个字符。`,
+      });
+    }
+    if (rawPassword.length < MIN_PASSWORD_LENGTH) {
+      throw new AppError('AUTH_PASSWORD_TOO_SHORT', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { min: MIN_PASSWORD_LENGTH },
+        legacyMessage: `密码至少 ${MIN_PASSWORD_LENGTH} 位。`,
       });
     }
     const exists = await this.userRepo.findOne({ where: { username: trimmed } });
@@ -68,7 +94,7 @@ export class AuthService {
       });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(rawPassword, 10);
     const adminCount = await this.userRepo.count({ where: { role: 'admin' } });
     const bootstrapAsAdmin = adminCount === 0;
     const user = this.userRepo.create({
@@ -91,7 +117,15 @@ export class AuthService {
   }
 
   async login(username: string, password: string): Promise<AuthSession> {
-    const trimmed = username.trim();
+    // 入参可能是 undefined（直接 POST {} 走过来），不要直接 .trim()。
+    const trimmed = (username ?? '').trim();
+    const rawPassword = password ?? '';
+    if (!trimmed || !rawPassword) {
+      throw new AppError('AUTH_INVALID_CREDENTIALS', {
+        status: HttpStatus.UNAUTHORIZED,
+        legacyMessage: '账号或密码错误',
+      });
+    }
     const user = await this.userRepo.findOne({ where: { username: trimmed } });
     if (!user) {
       throw new AppError('AUTH_INVALID_CREDENTIALS', {
@@ -105,7 +139,7 @@ export class AuthService {
         legacyMessage: '该账号通过邮箱验证码注册，请使用邮箱验证码登录。',
       });
     }
-    const ok = await bcrypt.compare(password, user.passwordHash);
+    const ok = await bcrypt.compare(rawPassword, user.passwordHash);
     if (!ok) {
       throw new AppError('AUTH_INVALID_CREDENTIALS', {
         status: HttpStatus.UNAUTHORIZED,

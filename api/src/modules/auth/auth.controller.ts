@@ -18,23 +18,23 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  register(@Body() body: { username: string; password: string }) {
-    return this.auth.register(body.username, body.password);
+  register(@Body() body?: { username?: string; password?: string }) {
+    return this.auth.register(body?.username ?? '', body?.password ?? '');
   }
 
   @Post('login')
-  login(@Body() body: { username: string; password: string }) {
-    return this.auth.login(body.username, body.password);
+  login(@Body() body?: { username?: string; password?: string }) {
+    return this.auth.login(body?.username ?? '', body?.password ?? '');
   }
 
   @Post('email/send-code')
-  sendEmailCode(@Body() body: { email: string }) {
-    return this.emailAuth.sendCode(body?.email);
+  sendEmailCode(@Body() body?: { email?: string }) {
+    return this.emailAuth.sendCode(body?.email ?? '');
   }
 
   @Post('email/verify-code')
-  verifyEmailCode(@Body() body: { email: string; code: string }) {
-    return this.emailAuth.verifyCode(body?.email, body?.code);
+  verifyEmailCode(@Body() body?: { email?: string; code?: string }) {
+    return this.emailAuth.verifyCode(body?.email ?? '', body?.code ?? '');
   }
 
   @Get('me')
@@ -53,8 +53,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   changePassword(
     @CurrentUser() user: AuthenticatedUser,
-    @Body() body: { code: string; newPassword: string },
+    @Body() body?: { code?: string; newPassword?: string },
   ) {
-    return this.auth.changePassword(user.id, body?.code, body?.newPassword);
+    return this.auth.changePassword(
+      user.id,
+      body?.code ?? '',
+      body?.newPassword ?? '',
+    );
   }
 }
