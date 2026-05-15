@@ -63,11 +63,13 @@ function getCategoryLabels(): Array<{
   id: "all" | DesktopFavoriteCategory;
   label: string;
 }> {
+  // 注意：contacts 暂未在 UI 任何位置接入 upsertDesktopFavorite，永远 0；
+  // 先不在侧栏暴露，免得用户误以为漏配置/坏掉。FavoriteCategory.contacts
+  // 类型保留以便日后接入"收藏联系人"时不破坏老数据/契约。
   return [
     { id: "all", label: t(msg`全部收藏`) },
     { id: "messages", label: t(msg`消息`) },
     { id: "notes", label: t(msg`笔记`) },
-    { id: "contacts", label: t(msg`联系人`) },
     { id: "officialAccounts", label: t(msg`公众号`) },
     { id: "moments", label: t(msg`朋友圈`) },
     { id: "feed", label: t(msg`广场动态`) },
@@ -488,8 +490,8 @@ export function FavoritesPage() {
                   value={t(msg`${counts.moments + counts.feed + counts.channels} 项`)}
                 />
                 <FavoriteMetric
-                  label={t(msg`消息、笔记与联系人`)}
-                  value={t(msg`${counts.messages + counts.notes + counts.contacts} 项`)}
+                  label={t(msg`消息与笔记`)}
+                  value={t(msg`${counts.messages + counts.notes} 项`)}
                 />
                 <FavoriteMetric
                   label={t(msg`公众号`)}
