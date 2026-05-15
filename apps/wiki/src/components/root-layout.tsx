@@ -145,8 +145,21 @@ export function RootLayout() {
   const roleLabel = useRoleLabel();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const [q, setQ] = useState("");
+  const urlSearchQ = useRouterState({
+    select: (s) => {
+      if (s.location.pathname !== "/search") return "";
+      const raw = (s.location.search as { q?: unknown } | undefined)?.q;
+      return typeof raw === "string" ? raw : "";
+    },
+  });
+  const [q, setQ] = useState(urlSearchQ);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  // Keep the top-bar input synced with /search?q= so reload / back / forward
+  // and direct deep links don't leave the box visually empty.
+  useEffect(() => {
+    setQ(urlSearchQ);
+  }, [urlSearchQ]);
 
   // Close mobile nav on route change.
   useEffect(() => {

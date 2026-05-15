@@ -397,7 +397,7 @@ export class WikiPageService {
       )
       .where('(p.isDeleted = 0 OR p.isDeleted IS NULL)')
       .andWhere(
-        '(c.name LIKE :like ESCAPE \'\\\' OR c.bio LIKE :like ESCAPE \'\\\' OR c.personality LIKE :like ESCAPE \'\\\' OR c.expertDomains LIKE :like ESCAPE \'\\\')',
+        '(c.name LIKE :like ESCAPE \'\\\' OR c.bio LIKE :like ESCAPE \'\\\' OR c.relationship LIKE :like ESCAPE \'\\\' OR c.personality LIKE :like ESCAPE \'\\\' OR c.expertDomains LIKE :like ESCAPE \'\\\')',
         { like },
       )
       .select([
@@ -423,9 +423,10 @@ export class WikiPageService {
       .map((r) => {
         let score = 0;
         if (r.name?.toLowerCase().includes(lower)) score += 10;
+        if (r.relationship?.toLowerCase().includes(lower)) score += 6;
+        if (r.expertDomains?.toLowerCase().includes(lower)) score += 5;
         if (r.bio?.toLowerCase().includes(lower)) score += 3;
         if (r.personality?.toLowerCase().includes(lower)) score += 2;
-        if (r.expertDomains?.toLowerCase().includes(lower)) score += 5;
         return {
           characterId: r.id,
           name: r.name,
