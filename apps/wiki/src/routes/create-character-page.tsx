@@ -209,7 +209,16 @@ export function CreateCharacterPage() {
         scope="world"
         sessionKey={sessionKey}
         initialDto={draftId ? draftQ.data?.payload ?? null : null}
-        hydrationToken={draftId ? `draft:${draftId}` : "new"}
+        // draftId 命中时，必须等 draftQ.data 真的拿到再切到 `draft:<id>` token —
+        // 否则 form 第一次会用 initialDto=null 锁住 hydratedTokenRef，等 query
+        // 完成 token 不变就不再重 hydrate，导致草稿恢复后 name 输入框是空的。
+        hydrationToken={
+          draftId
+            ? draftQ.data
+              ? `draft:${draftId}`
+              : `draft-loading:${draftId}`
+            : "new"
+        }
         generator={(input) =>
           wikiApi.generateCharacterFields({ ...input, persistAsDraft: true })
         }
