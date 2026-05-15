@@ -1655,10 +1655,12 @@ function MobileMomentsView({
               空状态——但其实后面还有非屏蔽的动态。"已经到底了" 标签仅在已经有渲染
               内容时才显示，否则空状态卡更直白。 */}
           {hasNextPage ? (
-            fetchNextPageError ? (
+            fetchNextPageError && !isFetchingNextPage ? (
               // fetchNextPage 失败时不挂 sentinel（见 useEffect 注释），改在底部
               // 挂手动「重试」按钮——之前默认 IntersectionObserver 一看到 sentinel
               // 还在视口就死循环重试，整个页面被几百次失败请求刷爆。
+              // 用户点重试后 isFetchingNextPage 翻 true，错误条让位给下方的
+              // 「正在加载更多…」loading 态，跟成功流的反馈节奏一致。
               <div className="px-4 py-4 text-center">
                 <div className="text-[12px] text-[#9A9A9A]">
                   {fetchNextPageError.message
