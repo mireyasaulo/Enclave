@@ -24,6 +24,12 @@ import {
   mergeDirectMessageWindow,
   upsertIncomingDirectMessage,
 } from "./chat-message-delivery";
+import {
+  loadPendingDirectMessages,
+  reconcilePendingDirectMessages,
+  updatePendingDirectMessageStatus,
+  upsertPendingDirectMessage,
+} from "./pending-direct-message-store";
 import { useScrollAnchor } from "../../hooks/use-scroll-anchor";
 import {
   emitChatMessage,
@@ -48,7 +54,12 @@ export function useConversationThread(conversationId: string) {
   const runtimeConfig = useAppRuntimeConfig();
   const baseUrl = runtimeConfig.apiBaseUrl;
   const [text, setText] = useState("");
-  const [messages, setMessages] = useState<DirectThreadMessage[]>([]);
+  // 用 lazy initial 把 sleeping/busy 角色那段 8-22s 延迟里"消息消失"的
+  // 乐观消息恢复出来——再进入聊天时不至于看到空白。组件 unmount 时模块级
+  // store 留着这些 pending 消息，等真消息（refetch 或 socket）回声后 dedup。
+  const [messages, setMessages] = useState<DirectThreadMessage[]>(() =>
+    loadPendingDirectMessages(conversationId),
+  );
   const [typingState, setTypingState] = useState<{
     characterId: string;
     stage?: TypingPayload["stage"];
@@ -157,6 +168,15 @@ export function useConversationThread(conversationId: string) {
       mergeDirectMessageWindow(current, messagesQuery.data ?? []),
     );
   }, [messagesQuery.data]);
+
+  // messages 里还活着的乐观消息（local_* id）才需要留在 store 里；被服务端
+  // 真消息 dedup 掉的就该从 store 移除，否则下次进入会重复出现。
+  useEffect(() => {
+    reconcilePendingDirectMessages(
+      conversationId,
+      messages.filter((message) => message.id.startsWith("local_")),
+    );
+  }, [conversationId, messages]);
 
   useEffect(() => {
     setMessageLimit(INITIAL_MESSAGE_LIMIT);
@@ -283,6 +303,7 @@ export function useConversationThread(conversationId: string) {
 
     const offError = onChatError((payload) => {
       setMessages((current) => markThreadMessagesFailed(current));
+      updatePendingDirectMessageStatus(conversationId, null, "failed");
       handleSocketSubscriptionExpiredError(payload);
       setSocketError(payload.message);
     });
@@ -362,6 +383,11 @@ export function useConversationThread(conversationId: string) {
         setMessages((current) =>
           markThreadMessageSending(current, input.retryMessageId!),
         );
+        updatePendingDirectMessageStatus(
+          conversationId,
+          [input.retryMessageId],
+          "sending",
+        );
       } else {
         const optimistic = buildOptimisticDirectMessage({
           payload: input.payload,
@@ -370,6 +396,7 @@ export function useConversationThread(conversationId: string) {
         });
         messageId = optimistic.id;
         setMessages((current) => [...current, optimistic]);
+        upsertPendingDirectMessage(conversationId, optimistic);
       }
 
       if (!input.retryMessageId && input.payload.type !== "sticker") {
@@ -398,6 +425,7 @@ export function useConversationThread(conversationId: string) {
       setMessages((current) =>
         markThreadMessagesFailed(current, [messageId]),
       );
+      updatePendingDirectMessageStatus(conversationId, [messageId], "failed");
     },
   });
 
