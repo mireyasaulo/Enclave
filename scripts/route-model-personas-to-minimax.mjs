@@ -1,7 +1,12 @@
 #!/usr/bin/env node
-// 2026-05-15：把 model_persona 角色按"OpenAI vs 其它"重新路由
-//   - sourceKey == 'model_persona:gpt-*' → provider_default (n1n) + 原 gpt-* 模型 id（保 GPT 风味）
-//   - 其余非 family 的 model_persona → provider_minimax (Token Plan) + MiniMax-M2.7（不再按 persona 名走 n1n 真实费率，免得 o1/Opus/QVQ 这种黑洞继续烧钱）
+// 2026-05-15 二次调整：再把 GPT 系收紧到"只剩 gpt-4o 一个走 n1n"，其余全部塞 MiniMax Token Plan
+//   - sourceKey == 'model_persona:gpt-4o' (精确匹配，不含 mini) → provider_default (n1n) + gpt-4o
+//   - 其余非 family 的 model_persona → provider_minimax (Token Plan) + MiniMax-M2.7
+//
+// 历史：
+//   - v1 (commit 7b1a5359)：所有 gpt-* (4o/4o-mini/4.1/4.1-mini) 留 n1n，gpt-5 + 其它全去 MiniMax
+//   - v2 (本次)：用户原话"除了 gt4o 以外全部都实际调用 minimaxtokenplan，不要走 n1n 了太贵了"
+//     → gpt-4o-mini / gpt-4.1 / gpt-4.1-mini 一并塞 MiniMax，只 gpt-4o 留 n1n 当真身样本
 //
 // 注意：
 //   - 只动 modelRoutingMode/inferenceProviderAccountId/inferenceModelId/modelRoutingNotes，
@@ -35,9 +40,9 @@ const MINIMAX_PROVIDER_ID = 'provider_minimax';
 const MINIMAX_MODEL_ID = 'MiniMax-M2.7';
 const OPENAI_PROVIDER_ID = 'provider_default'; // n1n openai-compatible
 const ROUTING_NOTE_MINIMAX =
-  '2026-05-15 全网降配：非 GPT 系 persona 全部走 MiniMax Token Plan，避免 n1n 实费率。';
+  '2026-05-15 全网降配 v2：除 gpt-4o 外，全部 persona 走 MiniMax Token Plan，避免 n1n 实费率。';
 const ROUTING_NOTE_GPT =
-  '2026-05-15 保留 GPT 真身：通过 n1n provider_default 调用 OpenAI 系列。';
+  '2026-05-15 v2：仅 gpt-4o 保留 OpenAI 真身（通过 n1n provider_default 调用），其它 GPT 系一并塞 MiniMax。';
 
 function discoverDatabases() {
   if (EXPLICIT_DB) return [path.resolve(EXPLICIT_DB)];
@@ -78,12 +83,9 @@ function extractRealModelId(sourceKey) {
 
 function classify(realModelId) {
   if (!realModelId) return null;
-  // 用户原话："除了 gpt4o 以及 gpt 相关的模型" —— 就当 gpt-* 前缀算"gpt 相关"，
-  // o-series（o1/o3/o4-mini-all）虽然也是 OpenAI 但叫"o"不叫"gpt"，且 n1n 价目里要么贵要么是黑洞，一并塞去 minimax。
-  // 例外：gpt-5 在 n1n 上是 pure reasoning 模型，普通 chat max_tokens (200~600) 全被 reasoning_tokens 吃光、content=""，
-  //   表现就是"角色不说话"。它和 o-series 同类，统一塞 minimax；其余 gpt-* (gpt-4o / 4o-mini / 4.1 / 4.1-mini) 保留 OpenAI 真身。
-  if (/^gpt-5(\b|$|-)/i.test(realModelId)) return 'minimax';
-  if (/^gpt-/i.test(realModelId)) return 'gpt';
+  // 用户 2026-05-15 v2 原话："所有的世界除了 gt4o 以外全部都实际调用 minimaxtokenplan，不要走 n1n 了太贵了"
+  // → 只 gpt-4o（精确匹配，不含 mini / 4.1 / 4.1-mini / 5 / o-series）留 n1n 当真身样本，其余统一 MiniMax。
+  if (/^gpt-4o$/i.test(realModelId)) return 'gpt';
   return 'minimax';
 }
 
