@@ -1835,23 +1835,6 @@ type MobileChannelsViewportProps = {
   onVisiblePost: (postId: string) => void;
 };
 
-function getChannelsSectionBadge(
-  section: FeedChannelHomeSection,
-  t: ReturnType<typeof useRuntimeTranslator>,
-) {
-  switch (section) {
-    case "friends":
-      return t(msg`朋友视频号`);
-    case "following":
-      return t(msg`关注视频号`);
-    case "live":
-      return t(msg`视频号直播`);
-    case "recommended":
-    default:
-      return t(msg`视频号推荐`);
-  }
-}
-
 function MobileChannelsViewport({
   activeSection,
   likePendingPostId,

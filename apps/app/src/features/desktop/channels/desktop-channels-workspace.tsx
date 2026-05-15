@@ -42,6 +42,8 @@ import { AvatarChip } from "../../../components/avatar-chip";
 import { AudioCard } from "../../../components/audio-card";
 import { ChannelsForwardPicker } from "../../../components/channels-forward-picker";
 import { EmptyState } from "../../../components/empty-state";
+import { getChannelsSectionBadge } from "../../channels/channels-section-badge";
+import { stripToolCallSyntax } from "../../moments/moment-content";
 import { formatTimestamp } from "../../../lib/format";
 import { resolveAppMediaUrl } from "../../../lib/media-url";
 import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
@@ -67,6 +69,7 @@ type DesktopChannelsWorkspaceProps = {
   isLoading: boolean;
   likePendingPostId: string | null;
   posts: FeedPostListItem[];
+  refreshPending?: boolean;
   routeSelectedAuthorId?: string | null;
   routeSelectedPostId?: string | null;
   successNotice?: string;
@@ -112,6 +115,7 @@ export function DesktopChannelsWorkspace({
   isLoading,
   likePendingPostId,
   posts,
+  refreshPending = false,
   routeSelectedAuthorId = null,
   routeSelectedPostId = null,
   successNotice,
@@ -331,9 +335,14 @@ export function DesktopChannelsWorkspace({
             })}
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="secondary" size="sm" onClick={onRefresh}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onRefresh}
+              disabled={refreshPending}
+            >
               <RefreshCcw size={14} />
-              {t(msg`换一批`)}
+              {refreshPending ? t(msg`生成中...`) : t(msg`换一批`)}
             </Button>
             <Button
               variant="primary"
@@ -390,6 +399,7 @@ export function DesktopChannelsWorkspace({
                   key={post.id}
                   post={post}
                   isActive={post.id === selectedPost?.id}
+                  sectionBadge={getChannelsSectionBadge(activeSection, t)}
                   registerSlide={registerSlide}
                   isFavorite={isPostFavorite(post.id)}
                   likePending={likePendingPostId === post.id}
@@ -610,6 +620,7 @@ function ChannelMediaSurface({
             }
             durationMs={audioAsset?.durationMs ?? post.durationMs ?? undefined}
             variant="feed"
+            isActive={isActive}
           />
         </div>
       </div>
@@ -746,6 +757,7 @@ function ChannelVideoPlayer({
 function ChannelFeedSlide({
   post,
   isActive,
+  sectionBadge,
   registerSlide,
   isFavorite,
   likePending,
@@ -760,6 +772,7 @@ function ChannelFeedSlide({
 }: {
   post: FeedPostListItem;
   isActive: boolean;
+  sectionBadge: string;
   registerSlide: (postId: string, node: HTMLDivElement | null) => void;
   isFavorite: boolean;
   likePending: boolean;
@@ -788,7 +801,7 @@ function ChannelFeedSlide({
             onToggleUnmuted={onToggleUnmuted}
           />
           <div className="pointer-events-none absolute left-4 top-4 rounded-md bg-[rgba(15,23,42,0.68)] px-2.5 py-1 text-[11px] font-medium text-white">
-            {t(msg`视频号推荐`)}
+            {sectionBadge}
           </div>
 
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[rgba(0,0,0,0.82)] via-[rgba(0,0,0,0.36)] to-transparent px-5 pb-5 pt-14">
@@ -833,11 +846,20 @@ function ChannelFeedSlide({
                 {post.title}
               </div>
             ) : null}
-            {post.text ? (
-              <div className="mt-2 line-clamp-3 text-[13px] leading-6 text-white/82">
-                {post.text}
-              </div>
-            ) : null}
+            {(() => {
+              // 视频号 audio post 后端常把 title 和 text 都填成 "X·音乐"，
+              // 标题和正文重复出现没意义；只在两者不一致时才渲染正文。和移动端
+              // MobileChannelsCard 里的处理保持一致。
+              const cleanText = stripToolCallSyntax(post.text ?? "");
+              if (!cleanText || cleanText === post.title) {
+                return null;
+              }
+              return (
+                <div className="mt-2 line-clamp-3 text-[13px] leading-6 text-white/82">
+                  {cleanText}
+                </div>
+              );
+            })()}
             {post.topicTags?.length ? (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {post.topicTags.slice(0, 4).map((tag) => (

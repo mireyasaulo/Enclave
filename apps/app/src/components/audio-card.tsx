@@ -11,6 +11,10 @@ type AudioCardProps = {
   title?: string;
   durationMs?: number;
   variant?: "moment" | "feed";
+  // 视频号桌面工作区把多张 slide 同时挂在 DOM 里；离开当前 slide 时把音频暂停 + 复位，
+  // 否则下一张 slide 已经显示出来、上一张的音乐还在背景里继续放。undefined = 不做处理，
+  // 兼容 moments 这类不在 snap-scroll 容器里的用法。
+  isActive?: boolean;
 };
 
 const audioRegistry = new Set<HTMLAudioElement>();
@@ -37,6 +41,7 @@ export function AudioCard({
   title,
   durationMs,
   variant = "moment",
+  isActive,
 }: AudioCardProps) {
   const t = useRuntimeTranslator();
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -54,6 +59,16 @@ export function AudioCard({
       audioRegistry.delete(el);
     };
   }, []);
+
+  // 仅当 isActive 明确为 false 时才介入：调用方主动声明"我这张 slide 已经不可见了"。
+  // isActive===undefined 的旧用法（moments 等）行为不变。
+  useEffect(() => {
+    if (isActive !== false) return;
+    const el = audioRef.current;
+    if (!el) return;
+    if (!el.paused) el.pause();
+    if (el.currentTime !== 0) el.currentTime = 0;
+  }, [isActive]);
 
   useEffect(() => {
     const el = audioRef.current;
