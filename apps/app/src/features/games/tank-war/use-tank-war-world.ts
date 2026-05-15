@@ -11,7 +11,6 @@ import {
   tick,
   togglePause,
 } from "./tank-war-engine";
-import { STAGE_CLEAR_MS } from "./tank-war-data";
 import type {
   GameWorld,
   HudSnapshot,
@@ -75,22 +74,18 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
       // tick when playing
       tick(world, inputRef.current, sfxRef.current);
 
-      // 关卡通关后等待若干 ms 再切到下一关菜单
+      // 关卡通关：立即写解锁记录。原版用 STAGE_CLEAR_MS (2.2s) 延迟才 savePersist，
+      // 但用户在 stage-clear 动画里点 "下一关" / "再来一局" 会让 status 跳出
+      // stage-clear，下一帧落进 else 分支把 ref 清零、unlock 永远不会触发——
+      // 进度回滚 bug。STAGE_CLEAR_MS 现在只是 UI 转场时长，跟存档无关。
       if (isStageBeaten(world)) {
         if (stageClearHandledAt.current === null) {
           stageClearHandledAt.current = world.stageClearAt ?? performance.now();
-        } else if (
-          performance.now() - (stageClearHandledAt.current ?? 0) >
-          STAGE_CLEAR_MS
-        ) {
-          // 解锁下一关
           const next = Math.min(35, world.stage + 1);
-          persistRef.current.maxUnlockedStage = Math.max(
-            persistRef.current.maxUnlockedStage,
-            next,
-          );
-          savePersist(persistRef.current);
-          stageClearHandledAt.current = null;
+          if (next > persistRef.current.maxUnlockedStage) {
+            persistRef.current.maxUnlockedStage = next;
+            savePersist(persistRef.current);
+          }
         }
       } else {
         stageClearHandledAt.current = null;
