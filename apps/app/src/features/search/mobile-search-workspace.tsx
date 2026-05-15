@@ -455,12 +455,16 @@ export function MobileSearchWorkspace({
             // 非「全部」分类、0 命中时不再渲染「{分类} · 0 条」空表头：
             // 上面的「无结果」卡片已经把"没找到"说清楚了，再叠一行 0 条只会
             // 让信息密度变重。miniPrograms 是例外——chip 命中就要让
-            // ComingSoonOverlay 出来，告知"功能开发中"，比"无结果"更准确。
+            // ComingSoonOverlay 出来，告知"功能开发中"，比"无结果"更准确；
+            // 此时也别再叠「小程序 · 0 条」，否则跟 overlay 的"功能开发中"
+            // 互相矛盾（一边说在搜了 0 条，一边说功能还没开）。
             <div className="space-y-2.5">
-              <div className="text-[14px] font-medium text-[color:var(--text-primary)]">
-                {getCategoryTitle(activeCategory)} · {visibleResults.length}{" "}
-                {t(msg`条`)}
-              </div>
+              {activeCategory === "miniPrograms" && !visibleResults.length ? null : (
+                <div className="text-[14px] font-medium text-[color:var(--text-primary)]">
+                  {getCategoryTitle(activeCategory)} · {visibleResults.length}{" "}
+                  {t(msg`条`)}
+                </div>
+              )}
               {/* miniPrograms 命中 0 时下面 visibleResults 是空数组，relative
                   容器没高度，absolute inset-0 的 overlay 退化到 0×0 浮在角落
                   上——给一个 min-height 让 overlay 有地方撑开居中。其它分类

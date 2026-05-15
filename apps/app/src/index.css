@@ -333,3 +333,12 @@ body.yj-mobile::after {
 .yj-mobile-shell textarea {
   font-size: 16px;
 }
+
+/* type="search" 在 Chromium/WebKit 上会渲染原生 "x" 清除按钮，叠在我们自己
+ * 写的「清空」按钮上看起来像两个清除控件。全局藏掉原生按钮，统一走我们
+ * 自己的 clear UI。 */
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
