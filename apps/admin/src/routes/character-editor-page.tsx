@@ -247,6 +247,17 @@ function listToCsv(items?: string[] | null) {
   return items?.join(", ") ?? "";
 }
 
+function clampInt(
+  value: number | null | undefined,
+  fallback: number,
+  min: number,
+  max?: number,
+) {
+  const n = Number.isFinite(value) ? Math.trunc(value as number) : fallback;
+  const lower = Math.max(min, n);
+  return max == null ? lower : Math.min(max, lower);
+}
+
 export function CharacterEditorPage() {
   const t = translateRuntimeMessage;
   const TABS = [
@@ -1191,6 +1202,11 @@ function normalizeDraft(
     ? draft.expertDomains
     : ["general"];
 
+  const activeHoursStart = clampInt(draft.activeHoursStart, 8, 0, 23);
+  const activeHoursEndRaw = clampInt(draft.activeHoursEnd, 23, 0, 23);
+  // 活跃结束小时若小于开始小时，向上抬到开始小时（区间退化为空也比反向更容易理解）
+  const activeHoursEnd = Math.max(activeHoursStart, activeHoursEndRaw);
+
   return {
     ...draft,
     id: normalizedId,
@@ -1204,10 +1220,10 @@ function normalizeDraft(
     activityMode: draft.activityMode ?? "auto",
     currentActivity: draft.currentActivity ?? "free",
     activityFrequency: draft.activityFrequency ?? "normal",
-    momentsFrequency: draft.momentsFrequency ?? 1,
-    feedFrequency: draft.feedFrequency ?? 1,
-    activeHoursStart: draft.activeHoursStart ?? 8,
-    activeHoursEnd: draft.activeHoursEnd ?? 23,
+    momentsFrequency: clampInt(draft.momentsFrequency, 1, 0),
+    feedFrequency: clampInt(draft.feedFrequency, 1, 0),
+    activeHoursStart,
+    activeHoursEnd,
     modelRoutingMode: draft.modelRoutingMode ?? "inherit_default",
     inferenceProviderAccountId:
       draft.inferenceProviderAccountId?.trim() || null,
@@ -1239,7 +1255,7 @@ function normalizeDraft(
       memory: {
         coreMemory: profile.memory?.coreMemory?.trim() ?? "",
         recentSummary: profile.memory?.recentSummary?.trim() ?? "",
-        forgettingCurve: profile.memory?.forgettingCurve ?? 70,
+        forgettingCurve: clampInt(profile.memory?.forgettingCurve, 70, 0, 100),
         recentSummaryPrompt: profile.memory?.recentSummaryPrompt?.trim() ?? "",
         coreMemoryPrompt: profile.memory?.coreMemoryPrompt?.trim() ?? "",
       },
