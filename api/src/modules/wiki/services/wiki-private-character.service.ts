@@ -99,15 +99,12 @@ export type PrivateCharacterDto = {
   triggerScenes?: string[] | null;
   recipe?: CharacterBlueprintRecipeValue | null;
   profile?: PersonalityProfile | null;
-  // —— 2026-05-15 起对齐 admin character editor 的字段 ——
-  isOnline?: boolean;
+  // —— 2026-05-15 起对齐 admin character editor 的字段（不含 isOnline /
+  // isTemplate / sourceType / sourceKey / deletionPolicy —— 这 5 个 admin-only，
+  // wiki 写入路径不接受） ——
   onlineMode?: string;
   activityMode?: string;
   currentActivity?: string | null;
-  sourceType?: string;
-  sourceKey?: string | null;
-  deletionPolicy?: string;
-  isTemplate?: boolean;
   socialOpenness?: string;
   proactiveBrowseChance?: number;
   intimacyLevel?: number;
@@ -126,14 +123,10 @@ export type PrivateCharacterExportBundle = {
   triggerScenes?: string[] | null;
   recipe?: CharacterBlueprintRecipeValue | null;
   profile?: PersonalityProfile | null;
-  isOnline?: boolean;
+  // export bundle 跟着 DTO 走，admin-only 字段不写出。
   onlineMode?: string;
   activityMode?: string;
   currentActivity?: string | null;
-  sourceType?: string;
-  sourceKey?: string | null;
-  deletionPolicy?: string;
-  isTemplate?: boolean;
   socialOpenness?: string;
   proactiveBrowseChance?: number;
   intimacyLevel?: number;
@@ -318,14 +311,12 @@ export class WikiPrivateCharacterService {
       triggerScenes: record.triggerScenes ?? null,
       recipe: stripRejectedRecipeFields(record.recipe),
       profile: record.profile ?? null,
-      isOnline: record.isOnline,
+      // admin-only 字段（isOnline / isTemplate / sourceType / sourceKey /
+      // deletionPolicy）不进 bundle，避免来回 export → import 把 wiki 用户其实
+      // 不该碰的字段往 CharacterEntity 上传。
       onlineMode: record.onlineMode,
       activityMode: record.activityMode,
       currentActivity: record.currentActivity ?? null,
-      sourceType: record.sourceType,
-      sourceKey: record.sourceKey ?? null,
-      deletionPolicy: record.deletionPolicy,
-      isTemplate: record.isTemplate,
       socialOpenness: record.socialOpenness,
       proactiveBrowseChance: record.proactiveBrowseChance,
       intimacyLevel: record.intimacyLevel,
@@ -389,18 +380,13 @@ export class WikiPrivateCharacterService {
         !Array.isArray(p.profile)
           ? (p.profile as PersonalityProfile)
           : undefined,
-      isOnline: typeof p.isOnline === 'boolean' ? p.isOnline : undefined,
+      // admin-only 字段（isOnline / isTemplate / sourceType / sourceKey /
+      // deletionPolicy）就算上传文件里有也忽略：wiki 用户没权限设它们。
       onlineMode: typeof p.onlineMode === 'string' ? p.onlineMode : undefined,
       activityMode:
         typeof p.activityMode === 'string' ? p.activityMode : undefined,
       currentActivity:
         typeof p.currentActivity === 'string' ? p.currentActivity : undefined,
-      sourceType: typeof p.sourceType === 'string' ? p.sourceType : undefined,
-      sourceKey: typeof p.sourceKey === 'string' ? p.sourceKey : undefined,
-      deletionPolicy:
-        typeof p.deletionPolicy === 'string' ? p.deletionPolicy : undefined,
-      isTemplate:
-        typeof p.isTemplate === 'boolean' ? p.isTemplate : undefined,
       socialOpenness:
         typeof p.socialOpenness === 'string' ? p.socialOpenness : undefined,
       proactiveBrowseChance:
@@ -454,7 +440,8 @@ export class WikiPrivateCharacterService {
       target.profile =
         pf && typeof pf === 'object' && !Array.isArray(pf) ? pf : null;
     }
-    if (typeof dto.isOnline === 'boolean') target.isOnline = dto.isOnline;
+    // admin-only 字段（isOnline / isTemplate / sourceType / sourceKey /
+    // deletionPolicy）不在这里 apply：即便 PUT body 强塞，也以 entity 默认 / 已有值为准。
     if (typeof dto.onlineMode === 'string') target.onlineMode = dto.onlineMode;
     if (typeof dto.activityMode === 'string') {
       target.activityMode = dto.activityMode;
@@ -462,14 +449,6 @@ export class WikiPrivateCharacterService {
     if (dto.currentActivity !== undefined) {
       target.currentActivity = dto.currentActivity ?? null;
     }
-    if (typeof dto.sourceType === 'string') target.sourceType = dto.sourceType;
-    if (dto.sourceKey !== undefined) {
-      target.sourceKey = dto.sourceKey ?? null;
-    }
-    if (typeof dto.deletionPolicy === 'string') {
-      target.deletionPolicy = dto.deletionPolicy;
-    }
-    if (typeof dto.isTemplate === 'boolean') target.isTemplate = dto.isTemplate;
     if (typeof dto.socialOpenness === 'string') {
       target.socialOpenness = dto.socialOpenness;
     }

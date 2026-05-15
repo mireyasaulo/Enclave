@@ -20,17 +20,26 @@ export const WIKI_CONTENT_FIELDS = [
 export type WikiContentField = (typeof WIKI_CONTENT_FIELDS)[number];
 
 /**
- * 永远不允许通过 wiki 通道写入的字段。范围比早期版本收窄：
- * - 5 个 model routing 字段：wiki 用户不能选自己的推理账户/模型（用户明确保留 admin-only）
- * - 2 个真正的纯运行时态：currentStatus / lastActiveAt 由 world 内部 tick 更新，不该被人工 seed
+ * 永远不允许通过 wiki 通道写入的字段：
+ * - 5 个 model routing 字段：wiki 用户不能选自己的推理账户/模型
+ * - 5 个 admin-only 系统字段：isOnline / isTemplate / sourceType / sourceKey /
+ *   deletionPolicy —— 这几个是平台维护的角色身份/生命周期标识，wiki 用户编辑后
+ *   会把 sourceType 校验、protected 删除等逻辑搞乱（2026-05-15 短暂放开过，验收时
+ *   用户当天确认不要放在 wiki UI 里）
+ * - 2 个真正的纯运行时态：currentStatus / lastActiveAt 由 world 内部 tick 更新
  *
- * 注：isOnline / onlineMode / activityMode / currentActivity / intimacyLevel / aiRelationships /
- * sourceType / sourceKey / deletionPolicy / isTemplate 这 10 个字段在 2026-05-15 之后被允许
- * 通过 wiki 私有角色编辑页写入，与隐界后台 character editor 一一对应（除了 model routing）。
+ * 注：onlineMode / activityMode / currentActivity / socialOpenness /
+ * proactiveBrowseChance / intimacyLevel / aiRelationships 这 7 个字段 wiki 私有
+ * 角色编辑页可以填，与隐界后台 character editor 对齐。
  */
 export const WIKI_REJECTED_FIELDS = [
   'currentStatus',
   'lastActiveAt',
+  'isOnline',
+  'isTemplate',
+  'sourceType',
+  'sourceKey',
+  'deletionPolicy',
   'modelRoutingMode',
   'inferenceProviderAccountId',
   'inferenceModelId',

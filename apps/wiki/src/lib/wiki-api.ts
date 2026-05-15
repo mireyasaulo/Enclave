@@ -1032,14 +1032,11 @@ export type PrivateCharacterDto = {
   triggerScenes?: string[] | null;
   recipe?: CharacterBlueprintRecipe | null;
   profile?: unknown | null;
-  isOnline?: boolean;
+  // —— admin 对齐字段（不含 isOnline / isTemplate / sourceType / sourceKey /
+  // deletionPolicy —— 这 5 个 admin-only，wiki 不接受写入） ——
   onlineMode?: string;
   activityMode?: string;
   currentActivity?: string | null;
-  sourceType?: string;
-  sourceKey?: string | null;
-  deletionPolicy?: string;
-  isTemplate?: boolean;
   socialOpenness?: string;
   proactiveBrowseChance?: number;
   intimacyLevel?: number;
