@@ -465,9 +465,13 @@ function MobileGroupAnnouncementPage({ groupId }: { groupId: string }) {
               type="button"
               variant="primary"
               size="lg"
-              disabled={saveMutation.isPending}
+              disabled={
+                saveMutation.isPending ||
+                draft.trim() ===
+                  (groupQuery.data.announcement?.trim() ?? "")
+              }
               onClick={() => saveMutation.mutate()}
-              className="h-10 w-full rounded-[10px] bg-[color:var(--brand-primary)] text-white hover:opacity-95"
+              className="h-10 w-full rounded-[10px] bg-[color:var(--brand-primary)] text-white hover:opacity-95 disabled:opacity-50"
             >
               {saveMutation.isPending ? t(msg`正在保存...`) : t(msg`保存群公告`)}
             </Button>
