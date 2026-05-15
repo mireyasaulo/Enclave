@@ -483,6 +483,22 @@ export class WikiEditService {
     await this.blocks.assertCanEdit(user, characterId);
     const page = await this.pages.getOrInitPage(characterId);
     this.assertProtection(page.protectionLevel, user.role);
+    // 防止"重复 lifecycle"——已经 deleted 还能再 delete、active 还能再 restore，
+    // 会在 history 里堆出冗余 v9/v10 同操作 lifecycle 修订，2026-05-16 走查发现。
+    if (operation === 'soft_delete' && page.lifecycleStatus === 'deleted') {
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { detail: '该角色已是删除状态，无需再次删除' },
+        legacyMessage: '该角色已是删除状态，无需再次删除',
+      });
+    }
+    if (operation === 'restore' && page.lifecycleStatus === 'active') {
+      throw new AppError('WIKI_VALIDATION_FAILED', {
+        status: HttpStatus.BAD_REQUEST,
+        params: { detail: '该角色未处于删除状态，无需恢复' },
+        legacyMessage: '该角色未处于删除状态，无需恢复',
+      });
+    }
     this.assertEditSummary({
       operation,
       riskLevel: 'high',
