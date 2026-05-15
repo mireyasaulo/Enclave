@@ -20,6 +20,7 @@ import {
   getFriendDisplayName,
   matchesFriendSearch,
 } from "../features/contacts/contact-utils";
+import { MobileDetailsActionSheet } from "../features/chat-details/mobile-details-action-sheet";
 import { DesktopChatRouteRedirectShell } from "../features/chat/chat-route-redirect-shell";
 import {
   buildMobileGroupRouteHash,
@@ -103,6 +104,7 @@ function MobileGroupMemberPickerPage({
   const baseUrl = runtimeConfig.apiBaseUrl;
   const [keyword, setKeyword] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [removeConfirmOpen, setRemoveConfirmOpen] = useState(false);
   const routeState = parseMobileGroupRouteState(hash);
   const safeReturnPath =
     routeState.returnPath && !isDesktopOnlyPath(routeState.returnPath)
@@ -301,6 +303,7 @@ function MobileGroupMemberPickerPage({
       );
     },
     onSuccess: async () => {
+      setRemoveConfirmOpen(false);
       await Promise.all([
         queryClient.invalidateQueries({
           queryKey: ["app-group", baseUrl, groupId],
@@ -319,7 +322,21 @@ function MobileGroupMemberPickerPage({
         replace: true,
       });
     },
+    onError: () => {
+      setRemoveConfirmOpen(false);
+    },
   });
+
+  function handleSubmit() {
+    if (!selectedIds.length || submitMutation.isPending) {
+      return;
+    }
+    if (mode === "remove") {
+      setRemoveConfirmOpen(true);
+      return;
+    }
+    submitMutation.mutate();
+  }
 
   const pageTitle = mode === "add" ? t(msg`添加成员`) : t(msg`移除成员`);
   const emptyStateTitle =
@@ -370,7 +387,7 @@ function MobileGroupMemberPickerPage({
         rightActions={
           <button
             type="button"
-            onClick={() => submitMutation.mutate()}
+            onClick={handleSubmit}
             disabled={!selectedIds.length || submitMutation.isPending}
             className={cn(
               "h-9 rounded-full px-3 text-[15px] font-medium transition",
@@ -647,6 +664,35 @@ function MobileGroupMemberPickerPage({
           </div>
         ) : null}
       </div>
+      {mode === "remove" ? (
+        <MobileDetailsActionSheet
+          open={removeConfirmOpen}
+          title={t(msg`移除 ${selectedIds.length} 位群成员`)}
+          description={t(
+            msg`移除后，这些成员将不再参与本群消息。可以稍后通过“添加成员”重新邀请。`,
+          )}
+          actions={[
+            {
+              key: "confirm-remove",
+              label: t(msg`确认移除`),
+              danger: true,
+              disabled: submitMutation.isPending,
+              onClick: () => {
+                if (submitMutation.isPending) {
+                  return;
+                }
+                submitMutation.mutate();
+              },
+            },
+          ]}
+          onClose={() => {
+            if (submitMutation.isPending) {
+              return;
+            }
+            setRemoveConfirmOpen(false);
+          }}
+        />
+      ) : null}
     </AppPage>
   );
 }
