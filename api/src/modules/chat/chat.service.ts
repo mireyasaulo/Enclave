@@ -1735,10 +1735,19 @@ export class ChatService {
     ];
     const primaryCharacterId = normalizedParticipants[0];
     const normalizedTitle = entity.title?.trim() ?? '';
+    // 历史上一批被孤立的 direct 会话 title 直接落了 character id（角色已删
+    // 但 conversation 没被清掉），桌面消息列表会渲染出 "char-preset-..." 这
+    // 种原始 id 给用户看。把"title === primaryCharacterId"也算成 legacy 形
+    // 态，再次进入下面的 fallback 流程，从 character 表 / system "你已添加
+    // 了 X" 消息里捞回真实姓名；都没有就降级到「未知联系人」而不是原始 id。
+    const titleIsRawCharacterId = Boolean(
+      primaryCharacterId && normalizedTitle === primaryCharacterId,
+    );
     const needsNormalization =
       entity.type !== 'direct' ||
       normalizedParticipants.length !== 1 ||
-      !normalizedTitle;
+      !normalizedTitle ||
+      titleIsRawCharacterId;
 
     if (!needsNormalization) {
       return entity;
@@ -1747,11 +1756,15 @@ export class ChatService {
     const primaryCharacter = primaryCharacterId
       ? await this.characters.findById(primaryCharacterId)
       : null;
+    const fallbackFromMessage = primaryCharacterId
+      ? await this.resolveDirectTitleFromMessages(entity.id, primaryCharacterId)
+      : null;
+    const usableExistingTitle = titleIsRawCharacterId ? '' : normalizedTitle;
     const nextTitle =
       primaryCharacter?.name?.trim() ||
-      normalizedTitle ||
-      primaryCharacterId ||
-      'Direct conversation';
+      usableExistingTitle ||
+      fallbackFromMessage ||
+      (primaryCharacterId ? '未知联系人' : 'Direct conversation');
 
     this.conversationHistory.delete(entity.id);
 
@@ -1761,6 +1774,37 @@ export class ChatService {
       participants: primaryCharacterId ? [primaryCharacterId] : [],
       title: nextTitle,
     });
+  }
+
+  /**
+   * 从历史消息里捞角色的人类可读名：character 自己发过的最近一条消息里
+   * senderName 是当时落库的角色名；character 已删但系统 "你已添加了 X" 提示
+   * 也能把 X 抠出来兜底。两个都没有就返回 null。
+   */
+  private async resolveDirectTitleFromMessages(
+    conversationId: string,
+    characterId: string,
+  ): Promise<string | null> {
+    const characterMessage = await this.msgRepo.findOne({
+      where: { conversationId, senderType: 'character', senderId: characterId },
+      order: { createdAt: 'DESC' },
+    });
+    const characterName = characterMessage?.senderName?.trim();
+    if (characterName && characterName !== characterId) {
+      return characterName;
+    }
+    const systemMessage = await this.msgRepo.findOne({
+      where: { conversationId, senderType: 'system' },
+      order: { createdAt: 'ASC' },
+    });
+    const fromSystem = systemMessage?.text?.match(/你已添加了(.+?)[，,。.\s]*现在/);
+    if (fromSystem?.[1]) {
+      const trimmed = fromSystem[1].trim();
+      if (trimmed && trimmed !== characterId) {
+        return trimmed;
+      }
+    }
+    return null;
   }
 
   private _entityToMessage(
