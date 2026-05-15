@@ -20,6 +20,7 @@ import { useDesktopLayout } from "../features/shell/use-desktop-layout";
 import { navigateBackOrFallback } from "../lib/history-back";
 import { describeRequestError } from "../lib/request-error";
 import { useAppRuntimeConfig } from "../runtime/runtime-config-store";
+import { useCloudSessionStore } from "../store/cloud-session-store";
 import { useWorldOwnerStore } from "../store/world-owner-store";
 
 const TITLE_MAX = 100;
@@ -47,6 +48,9 @@ export function ProfileFeedbackPage() {
   const cloudApiBaseUrl = runtimeConfig.cloudApiBaseUrl;
   const username = useWorldOwnerStore((state) => state.username);
   const signature = useWorldOwnerStore((state) => state.signature);
+  // 用户走 cloud 登录时（含邮箱用户合成的 9xxxxxxxxxxxxx 占位号）把这个挂上来，
+  // admin 反馈台至少能凭这串号去 cloud_users 表里反查邮箱回联。
+  const cloudPhone = useCloudSessionStore((state) => state.phone);
 
   const [category, setCategory] = useState<CloudFeedbackCategory>("bug");
   const [title, setTitle] = useState("");
@@ -60,6 +64,12 @@ export function ProfileFeedbackPage() {
       void navigate({ to: "/desktop/feedback", replace: true });
     }
   }, [isDesktopLayout, navigate]);
+
+  // 桌面布局先 render mobile 表单再被 effect 推到 /desktop/feedback 会有一帧闪烁，
+  // 跟其它 profile-info 子页一致：早 return null 让 redirect 一拍内完成。
+  if (isDesktopLayout) {
+    return null;
+  }
 
   useEffect(() => {
     return () => {
@@ -77,9 +87,12 @@ export function ProfileFeedbackPage() {
   );
 
   const goBack = () =>
-    navigateBackOrFallback(() => {
-      void navigate({ to: "/tabs/profile" });
-    });
+    navigateBackOrFallback(
+      () => {
+        void navigate({ to: "/tabs/profile" });
+      },
+      "/tabs/profile",
+    );
 
   const handleSubmit = async () => {
     if (submitting) return;
@@ -109,6 +122,7 @@ export function ProfileFeedbackPage() {
           apiBaseUrl: runtimeConfig.apiBaseUrl || null,
           ownerName: username || null,
           ownerSignature: signature || null,
+          submitterPhone: cloudPhone || null,
         },
         cloudApiBaseUrl || undefined,
       );
