@@ -98,7 +98,7 @@ export function ProfileMomentsPage() {
   const [showCompose, setShowCompose] = useState(false);
   const [favoriteSourceIds, setFavoriteSourceIds] = useState<string[]>([]);
   const [notice, setNotice] = useState<{
-    tone: "success" | "info";
+    tone: "success" | "info" | "danger";
     message: string;
   } | null>(null);
   const [desktopAvatarPopover, setDesktopAvatarPopover] = useState<
@@ -140,7 +140,15 @@ export function ProfileMomentsPage() {
   const likeMutation = useMutation({
     mutationFn: (momentId: string) => toggleMomentLike(momentId, baseUrl),
     onMutate: optimisticLike.onMutate,
-    onError: optimisticLike.onError,
+    onError: (error, momentId, context) => {
+      // 先回滚 optimistic（cache 写回原状态），再把失败原因抛到 toast，
+      // 否则用户看到的只是"心标闪了一下又弹回去"。
+      optimisticLike.onError(error, momentId, context);
+      setNotice({
+        tone: "danger",
+        message: describeRequestError(error, t(msg`点赞失败，请稍后重试。`)),
+      });
+    },
     onSuccess: () => {
       setNotice({
         tone: "success",
@@ -197,6 +205,15 @@ export function ProfileMomentsPage() {
         queryKey: ["app-moments-paged", baseUrl],
       });
     },
+    onError: (error) => {
+      // 评论失败：先把 sheet 关掉（草稿留在 commentDrafts 里，下次打开还在），
+      // 再让 danger toast 在 backdrop 关掉后能被看见。
+      setCommentBarTarget(null);
+      setNotice({
+        tone: "danger",
+        message: describeRequestError(error, t(msg`评论失败，请稍后重试。`)),
+      });
+    },
   });
 
   const createMutation = useMutation({
@@ -244,9 +261,16 @@ export function ProfileMomentsPage() {
       });
       return { snapshots };
     },
-    onError: (_error, _momentId, context) => {
+    onError: (error, _momentId, context) => {
+      // 先回滚 optimistic（被删的 moment 在 flat cache 里恢复），再给用户一个
+      // 红条提示——否则用户只会看到"删过的 moment 又自己冒出来"，没法判断
+      // 是网络 / 权限 / 还是被服务端拒了。
       context?.snapshots.forEach(([key, data]) => {
         queryClient.setQueryData(key, data);
+      });
+      setNotice({
+        tone: "danger",
+        message: describeRequestError(error, t(msg`删除失败，请稍后重试。`)),
       });
     },
     onSuccess: () => {
