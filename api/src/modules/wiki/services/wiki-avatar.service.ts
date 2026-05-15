@@ -80,7 +80,15 @@ export class WikiAvatarService {
 
   normalizeFileName(fileName: string) {
     const normalized = path.basename(fileName).trim();
-    if (!normalized) {
+    // path.basename('..') 还是 '..'，path.basename('.') 还是 '.'。这两个值
+    // join 进 storageDir 会指到目录本身或父级——express sendFile 对目录会报错，
+    // 但我们仍然显式拒掉，免得 5xx 日志被噪声塞满。同时挡 NUL 字节。
+    if (
+      !normalized ||
+      normalized === '.' ||
+      normalized === '..' ||
+      normalized.includes('\0')
+    ) {
       throw new AppError('WIKI_AVATAR_NOT_FOUND', {
         status: HttpStatus.NOT_FOUND,
         legacyMessage: 'Avatar not found',
