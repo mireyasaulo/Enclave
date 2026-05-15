@@ -1059,14 +1059,13 @@ export type AiGeneratedDraft = {
   relationship?: string;
   relationshipType?: string;
   expertDomains?: string[];
-  triggerScenes?: string[];
+  // life / lifeStrategy / triggerScenes 都随 2026-05-15「生活策略」下线被移除。
   recipe?: {
     identity?: Partial<CharacterBlueprintRecipe["identity"]>;
     expertise?: Partial<CharacterBlueprintRecipe["expertise"]>;
     tone?: Partial<CharacterBlueprintRecipe["tone"]>;
     prompting?: Partial<CharacterBlueprintRecipe["prompting"]>;
     memorySeed?: Partial<CharacterBlueprintRecipe["memorySeed"]>;
-    lifeStrategy?: Partial<CharacterBlueprintRecipe["lifeStrategy"]>;
   };
 };
 
