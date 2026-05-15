@@ -42,7 +42,6 @@ import {
 import { createDesktopNoteDraft } from "../features/favorites/note-drafts-storage";
 import { buildMobileNoteEditorRouteHash } from "../features/notes/mobile-note-editor-route-state";
 import { resolveSearchNavigationTarget } from "../features/search/search-navigation";
-import { formatTimestamp } from "../lib/format";
 import {
   isDesktopOnlyPath,
   navigateBackOrFallback,
@@ -544,15 +543,16 @@ function FavoriteRow({
             </span>
           ) : null}
         </div>
-        {item.description ? (
+        {item.description && item.description !== item.title ? (
           <div className="mt-0.5 line-clamp-2 text-[12px] leading-5 text-[color:var(--text-secondary)]">
             {item.description}
           </div>
         ) : null}
-        <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-[color:var(--text-muted)]">
-          <span className="truncate">{item.meta}</span>
-          <span className="shrink-0">{formatTimestamp(item.collectedAt)}</span>
-        </div>
+        {item.meta ? (
+          <div className="mt-1 truncate text-[11px] text-[color:var(--text-muted)]">
+            {item.meta}
+          </div>
+        ) : null}
 
         {noteSummary &&
         (noteSummary.tags.length || noteSummary.assets.length) ? (
