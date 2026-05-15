@@ -525,6 +525,10 @@ function readVideoMetadata(url: string) {
   });
 }
 
+// 封面用的最大边长——4K (3840x2160) 视频直接铺满 canvas 是 33MB RAM + 几 MB JPEG
+// blob，低内存机型可能 OOM。封面只是个缩略图，1280 足够清晰，把比例算回来即可。
+const MAX_POSTER_DIMENSION = 1280;
+
 async function buildMomentVideoPoster(
   url: string,
   width: number,
@@ -533,16 +537,24 @@ async function buildMomentVideoPoster(
   fileName: string,
 ) {
   try {
+    const longestSide = Math.max(width, height);
+    const scale =
+      longestSide > MAX_POSTER_DIMENSION
+        ? MAX_POSTER_DIMENSION / longestSide
+        : 1;
+    const posterWidth = Math.max(1, Math.round(width * scale));
+    const posterHeight = Math.max(1, Math.round(height * scale));
+
     const canvas = document.createElement("canvas");
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = posterWidth;
+    canvas.height = posterHeight;
     const context = canvas.getContext("2d");
     if (!context) {
       return null;
     }
 
     const video = await createPosterCaptureVideo(url, durationMs);
-    context.drawImage(video, 0, 0, width, height);
+    context.drawImage(video, 0, 0, posterWidth, posterHeight);
     const blob = await canvasToBlob(canvas, {
       mimeType: "image/jpeg",
       quality: 0.88,
