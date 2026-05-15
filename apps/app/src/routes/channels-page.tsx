@@ -2511,15 +2511,13 @@ function formatChannelMeta(
   post: FeedPostListItem,
   t: ReturnType<typeof useRuntimeTranslator>,
 ) {
+  // 注意：不要在这里拼 topicTags——上面已经把 tags 渲染成圆角小标签，
+  // 再在 meta 行里追加 "#音乐" 会和最上面的 chip 重复。
   const pieces = [t(msg`${post.viewCount ?? 0} 播放`)];
 
   if (typeof post.durationMs === "number" && post.durationMs > 0) {
     const seconds = Math.max(1, Math.round(post.durationMs / 1000));
     pieces.push(t(msg`${seconds} 秒`));
-  }
-
-  if (post.topicTags?.length) {
-    pieces.push(`#${post.topicTags[0]}`);
   }
 
   return pieces.join(" · ");

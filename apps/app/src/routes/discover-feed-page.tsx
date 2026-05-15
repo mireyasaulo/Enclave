@@ -904,6 +904,24 @@ const pendingLikePostId = likeMutation.isPending
               });
             }
           }}
+          onSelectPostAuthor={({ anchorElement, post }) => {
+            // 跟 desktop-moments-feed 对齐：post 作者头像/名字也得能点；之前
+            // 只评论里的作者可点，post 头部却只有 div，找居民资料只能去通讯录。
+            if (post.authorType === "character") {
+              setDesktopAvatarPopover({
+                anchorElement,
+                kind: "character",
+                characterId: post.authorId,
+                fallbackAvatar: post.authorAvatar,
+                fallbackName: post.authorName,
+              });
+            } else if (post.authorType === "user") {
+              setDesktopAvatarPopover({
+                anchorElement,
+                kind: "owner",
+              });
+            }
+          }}
           onCreate={() => createMutation.mutate()}
           onImageFilesSelected={(files) => {
             void handleImageFilesSelected(files);

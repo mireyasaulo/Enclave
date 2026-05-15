@@ -36,6 +36,10 @@ type DesktopFeedListProps = {
     event: ReactMouseEvent<HTMLButtonElement>,
     comment: FeedComment,
   ) => void;
+  onSelectPostAuthor?: (input: {
+    anchorElement: HTMLButtonElement;
+    post: FeedPostListItem;
+  }) => void;
   onToggleFavorite: (postId: string) => void;
 };
 
@@ -60,6 +64,7 @@ export function DesktopFeedList({
   onShare,
   onStartCommentReply,
   onSelectCommentAuthor,
+  onSelectPostAuthor,
   onToggleFavorite,
 }: DesktopFeedListProps) {
   const t = useRuntimeTranslator();
@@ -106,6 +111,15 @@ export function DesktopFeedList({
                 onShare={onShare ? () => onShare(post.id) : undefined}
                 onStartCommentReply={onStartCommentReply}
                 onSelectCommentAuthor={onSelectCommentAuthor}
+                onSelectAuthor={
+                  onSelectPostAuthor
+                    ? (event) =>
+                        onSelectPostAuthor({
+                          anchorElement: event.currentTarget,
+                          post,
+                        })
+                    : undefined
+                }
                 onToggleFavorite={() => onToggleFavorite(post.id)}
               />
             );

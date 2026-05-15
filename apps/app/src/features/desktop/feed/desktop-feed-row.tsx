@@ -50,6 +50,10 @@ type DesktopFeedRowProps = {
     event: ReactMouseEvent<HTMLButtonElement>,
     comment: FeedComment,
   ) => void;
+  /** 点击 post 作者头像/名字 → 打开对应居民/世界主人卡片。 */
+  onSelectAuthor?: (
+    event: ReactMouseEvent<HTMLButtonElement>,
+  ) => void;
   onToggleFavorite: () => void;
 };
 
@@ -71,6 +75,7 @@ export function DesktopFeedRow({
   onShare,
   onStartCommentReply,
   onSelectCommentAuthor,
+  onSelectAuthor,
   onToggleFavorite,
 }: DesktopFeedRowProps) {
   const t = useRuntimeTranslator();
@@ -153,20 +158,45 @@ export function DesktopFeedRow({
       className="rounded-[16px] border border-[color:var(--border-faint)] bg-white px-4 py-4 shadow-[var(--shadow-section)]"
     >
       <div className="flex items-start gap-3">
-        <div className="shrink-0 rounded-[18px]">
-          <AvatarChip
-            name={post.authorName}
-            src={post.authorAvatar}
-            size="wechat"
-          />
-        </div>
+        {onSelectAuthor ? (
+          <button
+            type="button"
+            onClick={(event) => onSelectAuthor(event)}
+            className="shrink-0 rounded-[18px] transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(7,193,96,0.34)] focus-visible:ring-offset-1"
+            aria-label={t(msg`查看 ${post.authorName} 的资料`)}
+          >
+            <AvatarChip
+              name={post.authorName}
+              src={post.authorAvatar}
+              size="wechat"
+            />
+          </button>
+        ) : (
+          <div className="shrink-0 rounded-[18px]">
+            <AvatarChip
+              name={post.authorName}
+              src={post.authorAvatar}
+              size="wechat"
+            />
+          </div>
+        )}
 
         <div className="min-w-0 flex-1">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <div className="truncate text-[15px] font-semibold text-[color:var(--text-primary)]">
-                {post.authorName}
-              </div>
+              {onSelectAuthor ? (
+                <button
+                  type="button"
+                  onClick={(event) => onSelectAuthor(event)}
+                  className="truncate text-left text-[15px] font-semibold text-[color:var(--text-primary)] hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgba(7,193,96,0.34)] focus-visible:ring-offset-1"
+                >
+                  {post.authorName}
+                </button>
+              ) : (
+                <div className="truncate text-[15px] font-semibold text-[color:var(--text-primary)]">
+                  {post.authorName}
+                </div>
+              )}
               <span
                 className={cn(
                   "inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-medium",

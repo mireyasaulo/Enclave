@@ -54,6 +54,10 @@ type DesktopFeedWorkspaceProps = {
     event: ReactMouseEvent<HTMLButtonElement>,
     comment: FeedComment,
   ) => void;
+  onSelectPostAuthor?: (input: {
+    anchorElement: HTMLButtonElement;
+    post: FeedPostListItem;
+  }) => void;
   onImageFilesSelected: (files: FileList | null) => void;
   onLike: (postId: string) => void;
   onRemoveImage: (id: string) => void;
@@ -99,6 +103,7 @@ export function DesktopFeedWorkspace({
   onImageFilesSelected,
   onStartCommentReply,
   onSelectCommentAuthor,
+  onSelectPostAuthor,
   onLike,
   onRemoveImage,
   onRemoveVideo,
@@ -208,6 +213,7 @@ export function DesktopFeedWorkspace({
                 onShare={onShare}
                 onStartCommentReply={onStartCommentReply}
                 onSelectCommentAuthor={onSelectCommentAuthor}
+                onSelectPostAuthor={onSelectPostAuthor}
                 onToggleFavorite={onToggleFavorite}
               />
             </div>
