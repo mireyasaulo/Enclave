@@ -24,6 +24,7 @@ import {
 import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
 import { formatDateTime } from "../lib/format";
+import { useUsernameMap } from "../lib/use-username-map";
 
 export function AdminAbuseFiltersPage() {
   const t = translateRuntimeMessage;
@@ -36,6 +37,9 @@ export function AdminAbuseFiltersPage() {
     queryKey: ["wiki", "abuse-filter-hits"],
     queryFn: () => wikiApi.listAbuseFilterHits({ limit: 50 }),
   });
+  const { resolve: resolveUsername } = useUsernameMap(
+    (hitsQ.data ?? []).map((h) => h.userId),
+  );
   const toggleMut = useMutation({
     mutationFn: (input: { id: string; enabled: boolean }) =>
       wikiApi.updateAbuseFilter(input.id, { enabled: input.enabled }),
@@ -114,7 +118,7 @@ export function AdminAbuseFiltersPage() {
             >
               <div className="flex flex-wrap items-center gap-2">
                 <ActionPill action={h.actionTaken} />
-                <span className="font-mono text-xs">{h.userId}</span>
+                <span className="text-xs">{resolveUsername(h.userId)}</span>
                 <span className="text-xs text-[color:var(--text-muted)]">
                   {formatDateTime(h.createdAt)}
                 </span>

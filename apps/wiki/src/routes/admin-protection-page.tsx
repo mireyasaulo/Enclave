@@ -17,6 +17,7 @@ import { wikiApi } from "../lib/wiki-api";
 import { PageShell } from "../components/page-shell";
 import { FormRow } from "../components/form-row";
 import { formatDateTime } from "../lib/format";
+import { useUsernameMap } from "../lib/use-username-map";
 
 export function AdminProtectionPage() {
   const t = translateRuntimeMessage;
@@ -36,6 +37,9 @@ export function AdminProtectionPage() {
     queryFn: () => wikiApi.protectionLog(characterId),
     enabled: !!characterId,
   });
+  const { resolve: resolveUsername } = useUsernameMap(
+    (logQ.data ?? []).map((row) => row.changedBy),
+  );
 
   const [form, setForm] = useState<{
     level: "none" | "semi" | "full";
@@ -232,7 +236,7 @@ export function AdminProtectionPage() {
                   <div className="mt-1 text-xs text-[color:var(--text-muted)]">
                     <Trans>
                       {formatDateTime(row.createdAt)} · 由{" "}
-                      {row.changedBy}
+                      {resolveUsername(row.changedBy)}
                     </Trans>
                     {row.expiresAt &&
                       ` · ${t(msg`到期 ${formatDateTime(row.expiresAt)}`)}`}
