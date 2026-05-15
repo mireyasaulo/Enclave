@@ -1793,7 +1793,6 @@ export function ContactsPage() {
                       ? setStarredMutation.error.message
                       : null
                 }
-                notice={notice}
                 startChatPendingId={pendingCharacterId}
                 starPendingId={
                   setStarredMutation.isPending

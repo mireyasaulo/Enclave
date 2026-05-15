@@ -58,7 +58,15 @@ export function DesktopContactsGroupsPane({
       return;
     }
 
-    onSelectGroup(filteredGroups[0]?.id ?? null);
+    // 父组件的 onSelectGroup 回调每渲染都是新引用 + 不做 idempotent 比较，
+    // 搜了个匹配 0 条的关键词后 selectedGroupId 已经为 null 时如果再调一次
+    // onSelectGroup(null)，父端 setDesktopSelection 总是新对象 → 无限循环
+    // → "Maximum update depth exceeded"。
+    const nextId = filteredGroups[0]?.id ?? null;
+    if (nextId === selectedGroupId) {
+      return;
+    }
+    onSelectGroup(nextId);
   }, [filteredGroups, onSelectGroup, selectedGroupId]);
 
   return (

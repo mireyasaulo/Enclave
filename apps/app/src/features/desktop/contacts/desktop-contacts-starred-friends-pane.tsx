@@ -3,7 +3,7 @@ import { msg } from "@lingui/macro";
 import { Search, Star } from "lucide-react";
 import type { FriendListItem } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
-import { ErrorBlock, InlineNotice, LoadingBlock, cn } from "@yinjie/ui";
+import { ErrorBlock, LoadingBlock, cn } from "@yinjie/ui";
 import { AvatarChip } from "../../../components/avatar-chip";
 import { EmptyState } from "../../../components/empty-state";
 import { ContactDetailPane } from "../../contacts/contact-detail-pane";
@@ -18,7 +18,6 @@ type DesktopContactsStarredFriendsPaneProps = {
   loading: boolean;
   error?: string | null;
   actionError?: string | null;
-  notice?: string | null;
   startChatPendingId?: string | null;
   starPendingId?: string | null;
   commonGroupsByCharacterId?: Record<
@@ -50,7 +49,6 @@ export function DesktopContactsStarredFriendsPane({
   loading,
   error = null,
   actionError = null,
-  notice = null,
   startChatPendingId = null,
   starPendingId = null,
   commonGroupsByCharacterId,
@@ -97,7 +95,17 @@ export function DesktopContactsStarredFriendsPane({
       return;
     }
 
-    onSelectCharacter(filteredFriends[0]?.character.id ?? null);
+    // 搜了个匹配 0 条的关键词时，selectedCharacterId 会被切到 null；下一轮 render
+    // 仍然不满足上面的 early-return（selectedCharacterId 已经 null），如果直接再次
+    // onSelectCharacter(null)，父组件每次 setDesktopSelection 都是新对象引用，会
+    // 触发新的渲染、新的 onSelectCharacter 闭包 → 这个 effect 反复 fire，浏览器
+    // 报「Maximum update depth exceeded」。这里显式比较 nextId 与当前值，相等就
+    // 不再回写，把循环掐断。
+    const nextId = filteredFriends[0]?.character.id ?? null;
+    if (nextId === selectedCharacterId) {
+      return;
+    }
+    onSelectCharacter(nextId);
   }, [filteredFriends, onSelectCharacter, selectedCharacterId]);
 
   return (
@@ -108,7 +116,7 @@ export function DesktopContactsStarredFriendsPane({
             {t(msg`星标朋友`)}
           </div>
           <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-            {t(msg`${friends.length} 位联系人`)}
+            {t(msg`${friends.length} 位星标朋友`)}
           </div>
 
           <label className="mt-3 flex items-center gap-2 rounded-[16px] border border-[color:var(--border-faint)] bg-white px-3 py-2.5 text-sm text-[color:var(--text-dim)] shadow-none">
@@ -124,12 +132,6 @@ export function DesktopContactsStarredFriendsPane({
         </div>
 
         <div className="min-h-0 flex-1 overflow-auto bg-[rgba(242,246,245,0.76)] pb-4">
-          {notice ? (
-            <div className="px-3 pt-3">
-              <InlineNotice tone="success">{notice}</InlineNotice>
-            </div>
-          ) : null}
-
           {actionError ? (
             <div className="px-3 pt-3">
               <ErrorBlock message={actionError} />
