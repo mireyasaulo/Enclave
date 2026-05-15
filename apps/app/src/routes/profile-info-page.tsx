@@ -78,7 +78,7 @@ export function ProfileInfoPage() {
             label={t(msg`隐界号`)}
             value={
               <span className="truncate text-[13px] text-[color:var(--text-muted)]">
-                {ownerId ? buildYinjieId(ownerId) : "—"}
+                {ownerId ? buildYinjieId(ownerId) : t(msg`未生成`)}
               </span>
             }
             readOnly
@@ -86,6 +86,11 @@ export function ProfileInfoPage() {
           <InfoRow
             label={t(msg`更多信息`)}
             to="/profile/info/more"
+            value={
+              <span className="truncate text-[12px] text-[color:var(--text-dim)]">
+                {t(msg`敬请期待`)}
+              </span>
+            }
           />
         </InfoRowGroup>
 
@@ -94,11 +99,16 @@ export function ProfileInfoPage() {
             label={t(msg`我的二维码名片`)}
             to="/profile/info/qr"
             value={
-              <QrCode
-                size={16}
-                className="text-[color:var(--text-muted)]"
-                aria-hidden="true"
-              />
+              <span className="flex items-center gap-1.5">
+                <span className="text-[12px] text-[color:var(--text-dim)]">
+                  {t(msg`敬请期待`)}
+                </span>
+                <QrCode
+                  size={16}
+                  className="text-[color:var(--text-muted)]"
+                  aria-hidden="true"
+                />
+              </span>
             }
           />
         </InfoRowGroup>

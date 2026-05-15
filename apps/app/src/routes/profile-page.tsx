@@ -130,9 +130,11 @@ export function ProfilePage() {
               <div className="truncate text-[17px] font-medium text-[color:var(--text-primary)]">
                 {username ?? t(msg`世界主人`)}
               </div>
-              <div className="rounded-full bg-[rgba(7,193,96,0.08)] px-1.25 py-0.5 text-[8px] font-medium tracking-[0.04em] text-[#15803d]">
-                {t(msg`世界主人`)}
-              </div>
+              {username ? (
+                <div className="rounded-full bg-[rgba(7,193,96,0.08)] px-1.5 py-0.5 text-[10px] font-medium tracking-[0.04em] text-[#15803d]">
+                  {t(msg`世界主人`)}
+                </div>
+              ) : null}
             </div>
             <div className="mt-0.5 line-clamp-1 text-[11px] text-[color:var(--text-secondary)]">
               {signature?.trim() || t(msg`查看与编辑个人资料`)}

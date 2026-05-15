@@ -419,7 +419,7 @@ msgstr "Sticker"
 #: apps/app/src/routes/desktop-chat-files-page.tsx:767
 #: apps/app/src/routes/favorites-page.tsx:427
 #: apps/app/src/routes/mobile-favorites-page.tsx:313
-#: apps/app/src/routes/profile-page.tsx:160
+#: apps/app/src/routes/profile-page.tsx:162
 msgid "收藏"
 msgstr "Favorites"
 
@@ -783,7 +783,7 @@ msgstr "Send original (Cmd/Ctrl+Enter)"
 #: apps/app/src/components/chat-composer.tsx:5381
 #: apps/app/src/components/mobile-chat-attachment-preview.tsx:109
 #: apps/app/src/components/moment-comment-composer.tsx:33
-#: apps/app/src/features/account-security/account-security-panel.tsx:188
+#: apps/app/src/features/account-security/account-security-panel.tsx:217
 #: apps/app/src/features/desktop/channels/desktop-channels-workspace.tsx:1632
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:990
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-result-card.tsx:114
@@ -2459,7 +2459,7 @@ msgid "更新于"
 msgstr "Updated at"
 
 #: apps/app/src/components/empty-state.tsx:20
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:178
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:192
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:190
 msgid "空"
 msgstr "Empty"
@@ -2513,9 +2513,9 @@ msgstr "Close dialog"
 #: apps/app/src/features/desktop/chat/desktop-message-forward-dialog.tsx:215
 #: apps/app/src/features/desktop/chat/desktop-note-send-dialog.tsx:125
 #: apps/app/src/features/desktop/contacts/desktop-add-friend-send-dialog.tsx:109
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:123
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:46
-#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:49
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:137
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:61
+#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:64
 #: apps/app/src/features/games/game-center-session-panel.tsx:123
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:793
 #: apps/app/src/features/mini-programs/mini-program-open-panel.tsx:148
@@ -2593,7 +2593,7 @@ msgstr "Save it to your photos and post to X / RedNote / Weibo to invite more re
 #: apps/app/src/routes/profile-moments-page.tsx:344
 #: apps/app/src/routes/profile-page.tsx:124
 #: apps/app/src/routes/profile-page.tsx:131
-#: apps/app/src/routes/profile-page.tsx:134
+#: apps/app/src/routes/profile-page.tsx:135
 msgid "世界主人"
 msgstr "World owner"
 
@@ -2858,7 +2858,7 @@ msgstr "Share tool"
 #: apps/app/src/routes/chat-background-page.tsx:475
 #: apps/app/src/routes/chat-details-page.tsx:190
 #: apps/app/src/routes/create-group-page.tsx:270
-#: apps/app/src/routes/discover-encounter-page.tsx:231
+#: apps/app/src/routes/discover-encounter-page.tsx:235
 #: apps/app/src/routes/discover-feed-page.tsx:545
 #: apps/app/src/routes/discover-feed-page.tsx:1056
 #: apps/app/src/routes/discover-feed-page.tsx:1095
@@ -3566,83 +3566,83 @@ msgstr "{month}/{day}"
 msgid "{0}年{month}月{day}日"
 msgstr "{0}/{month}/{day}"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:57
+#: apps/app/src/features/account-security/account-security-panel.tsx:74
 #: apps/app/src/routes/welcome-page.tsx:595
 msgid "开发模式：验证码已打印到服务端日志。"
 msgstr "Dev mode: verification code printed to server logs."
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:58
+#: apps/app/src/features/account-security/account-security-panel.tsx:75
 msgid "验证码已发送至绑定邮箱，请查收（含垃圾邮件箱）。"
 msgstr "Verification code sent to your linked email — check your inbox (including spam)."
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:68
+#: apps/app/src/features/account-security/account-security-panel.tsx:85
 msgid "发送验证码失败，请稍后重试。"
 msgstr "Failed to send verification code. Please try again later."
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:87
+#: apps/app/src/features/account-security/account-security-panel.tsx:109
 msgid "密码已更新，下次登录可使用新密码。"
 msgstr "Password updated. Use the new password next time you sign in."
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:96
+#: apps/app/src/features/account-security/account-security-panel.tsx:118
 msgid "修改密码失败，请稍后重试。"
 msgstr "Failed to change password. Please try again later."
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:105
+#: apps/app/src/features/account-security/account-security-panel.tsx:127
 msgid "请输入邮箱收到的 6 位验证码。"
 msgstr "Please enter the 6-digit code from your email."
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:112
+#: apps/app/src/features/account-security/account-security-panel.tsx:134
 msgid "新密码长度需在 8-32 位之间。"
 msgstr "New password must be 8–32 characters."
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:121
+#: apps/app/src/features/account-security/account-security-panel.tsx:143
 msgid "新密码不能包含空格。"
 msgstr ""
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:128
+#: apps/app/src/features/account-security/account-security-panel.tsx:150
 msgid "两次输入的密码不一致。"
 msgstr "The two passwords do not match."
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:147
+#: apps/app/src/features/account-security/account-security-panel.tsx:169
 msgid "修改密码需要邮箱验证码确认；验证码会发送至当前账号绑定的邮箱。"
 msgstr "Changing your password requires an email verification code, which will be sent to the email linked to your account."
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:154
+#: apps/app/src/features/account-security/account-security-panel.tsx:183
 msgid "邮箱验证码"
 msgstr "Email verification code"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:169
+#: apps/app/src/features/account-security/account-security-panel.tsx:198
 #: apps/app/src/routes/welcome-page.tsx:1153
 msgid "请输入邮箱收到的 6 位验证码"
 msgstr "Enter the 6-digit code from your email"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:191
+#: apps/app/src/features/account-security/account-security-panel.tsx:220
 #: apps/app/src/routes/welcome-page.tsx:1178
 msgid "发送验证码"
 msgstr "Send code"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:198
+#: apps/app/src/features/account-security/account-security-panel.tsx:227
 msgid "新密码"
 msgstr "New password"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:207
+#: apps/app/src/features/account-security/account-security-panel.tsx:236
 #: apps/app/src/routes/welcome-page.tsx:1193
 msgid "8-32 位，任意字符（不含空格）"
 msgstr "8–32 characters, any characters (no spaces)"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:215
+#: apps/app/src/features/account-security/account-security-panel.tsx:244
 msgid "确认新密码"
 msgstr "Confirm new password"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:224
+#: apps/app/src/features/account-security/account-security-panel.tsx:253
 msgid "再次输入新密码"
 msgstr "Enter the new password again"
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:237
+#: apps/app/src/features/account-security/account-security-panel.tsx:266
 msgid "提交中..."
 msgstr "Submitting..."
 
-#: apps/app/src/features/account-security/account-security-panel.tsx:238
+#: apps/app/src/features/account-security/account-security-panel.tsx:267
 msgid "更新密码"
 msgstr "Update password"
 
@@ -7347,6 +7347,7 @@ msgstr "Nickname: {0}"
 #: apps/app/src/features/search/desktop-search-launcher.tsx:882
 #: apps/app/src/routes/character-detail-page.tsx:266
 #: apps/app/src/routes/contacts-page.tsx:1430
+#: apps/app/src/routes/discover-encounter-page.tsx:86
 #: apps/app/src/routes/discover-page.tsx:323
 #: apps/app/src/routes/world-characters-page.tsx:302
 #: apps/app/src/routes/world-characters-page.tsx:448
@@ -7520,7 +7521,7 @@ msgstr "Social and Content"
 #: apps/app/src/routes/moments-page.tsx:1092
 #: apps/app/src/routes/moments-page.tsx:1420
 #: apps/app/src/routes/profile-moments-page.tsx:486
-#: apps/app/src/routes/profile-page.tsx:169
+#: apps/app/src/routes/profile-page.tsx:171
 msgid "朋友圈"
 msgstr "Moments"
 
@@ -7581,7 +7582,7 @@ msgstr "More info"
 #: apps/app/src/features/contacts/contact-detail-pane.tsx:340
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:645
 #: apps/app/src/features/desktop/chat/desktop-chat-details-panel.tsx:693
-#: apps/app/src/routes/profile-info-page.tsx:108
+#: apps/app/src/routes/profile-info-page.tsx:118
 #: apps/app/src/routes/profile-info-signature-page.tsx:73
 msgid "个性签名"
 msgstr "Signature"
@@ -10375,8 +10376,8 @@ msgstr "Saved to Favorites"
 #: apps/app/src/features/desktop/chat/desktop-notes-workspace.tsx:1282
 #: apps/app/src/routes/character-detail-page.tsx:310
 #: apps/app/src/routes/mobile-note-editor-page.tsx:1325
-#: apps/app/src/routes/profile-settings-page.tsx:402
-#: apps/app/src/routes/profile-settings-page.tsx:534
+#: apps/app/src/routes/profile-settings-page.tsx:423
+#: apps/app/src/routes/profile-settings-page.tsx:555
 #: apps/app/src/routes/welcome-page.tsx:1469
 msgid "保存中..."
 msgstr "Saving..."
@@ -11437,12 +11438,12 @@ msgstr "Playing {0}"
 
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:560
 #: apps/app/src/i18n/static-dom-seed.ts:98
-#: apps/app/src/routes/games-page.tsx:925
+#: apps/app/src/routes/games-page.tsx:928
 msgid "已邀约"
 msgstr "Invited"
 
 #: apps/app/src/features/desktop/games/desktop-games-workspace.tsx:560
-#: apps/app/src/routes/games-page.tsx:925
+#: apps/app/src/routes/games-page.tsx:928
 msgid "邀请"
 msgstr "Invite"
 
@@ -11641,7 +11642,7 @@ msgstr "Try another keyword, or switch back to all categories."
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:583
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:1150
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:518
-#: apps/app/src/features/search/mobile-search-workspace.tsx:542
+#: apps/app/src/features/search/mobile-search-workspace.tsx:553
 #: apps/app/src/routes/desktop-mobile-page.tsx:2014
 #: apps/app/src/routes/live-companion-page.tsx:790
 #: apps/app/src/routes/official-accounts-page.tsx:367
@@ -11651,13 +11652,15 @@ msgstr "Feature in development"
 #: apps/app/src/features/desktop/mini-programs/desktop-mini-programs-workspace.tsx:586
 #: apps/app/src/features/desktop/official-accounts/desktop-official-accounts-workspace.tsx:1153
 #: apps/app/src/features/mini-programs/mobile-mini-programs-workspace.tsx:521
-#: apps/app/src/features/search/mobile-search-workspace.tsx:545
+#: apps/app/src/features/search/mobile-search-workspace.tsx:556
 #: apps/app/src/routes/desktop-mobile-page.tsx:2017
 #: apps/app/src/routes/live-companion-page.tsx:793
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:352
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:357
 #: apps/app/src/routes/mobile-moments-publish-page.tsx:362
 #: apps/app/src/routes/official-accounts-page.tsx:370
+#: apps/app/src/routes/profile-info-page.tsx:91
+#: apps/app/src/routes/profile-info-page.tsx:104
 #: apps/app/src/routes/profile-info-placeholder-page.tsx:64
 msgid "敬请期待"
 msgstr "Stay tuned"
@@ -12604,7 +12607,7 @@ msgstr "Cloud Farm"
 #. placeholder {1}: nextLevelXp - currentLevelXp
 #. placeholder {1}: state.level * 30
 #: apps/app/src/features/games/cloud-farm/cloud-farm-game.tsx:95
-#: apps/app/src/features/games/farm/components/coin-display.tsx:41
+#: apps/app/src/features/games/farm/components/coin-display.tsx:49
 msgid "经验 {0} / {1}"
 msgstr "EXP {0} / {1}"
 
@@ -12744,8 +12747,13 @@ msgstr "互访冷却中，再等 {left}s。"
 msgid "帮邻居浇了一次水（+{NEIGHBOR_HELP_REWARD} 花圃币）。"
 msgstr "帮邻居浇了一次水（+{NEIGHBOR_HELP_REWARD} 花圃币）。"
 
+#. placeholder {0}: state.experience
+#: apps/app/src/features/games/farm/components/coin-display.tsx:47
+msgid "经验 {0}（已满级）"
+msgstr ""
+
 #. placeholder {0}: state.plotCount
-#: apps/app/src/features/games/farm/components/coin-display.tsx:44
+#: apps/app/src/features/games/farm/components/coin-display.tsx:52
 msgid "田块 {0}"
 msgstr "Plot {0}"
 
@@ -12766,7 +12774,7 @@ msgid "世界还没有动静。"
 msgstr "Nothing's happening in the world yet."
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:66
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:250
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:264
 msgid "种了"
 msgstr "Planted"
 
@@ -12779,22 +12787,22 @@ msgid "顺走了你家的"
 msgstr "Stole from your"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:72
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:254
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:268
 msgid "顺走了"
 msgstr "Stolen"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:74
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:256
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:270
 msgid "浇了水"
 msgstr "Watered"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:76
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:258
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:272
 msgid "除了草"
 msgstr "Cleared weeds"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:78
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:260
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:274
 msgid "除了虫"
 msgstr "Cleared bugs"
 
@@ -12803,14 +12811,14 @@ msgid "买了种子"
 msgstr "Bought seeds"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:254
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:264
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:266
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:268
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
 msgid "作物"
 msgstr "Crops"
 
 #: apps/app/src/features/games/farm/components/event-log-panel.tsx:82
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:264
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:278
 msgid "卖了"
 msgstr "Sold"
 
@@ -12827,7 +12835,7 @@ msgid "与对方好感度变化"
 msgstr "Affinity change with the other party"
 
 #: apps/app/src/features/games/farm/components/farm-iso-tile.tsx:74
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:180
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:194
 msgid "腐烂"
 msgstr "Rotted"
 
@@ -12855,100 +12863,100 @@ msgstr "Tap for a new line"
 msgid "管家"
 msgstr "Steward"
 
-#: apps/app/src/features/games/farm/components/farm-mascot.tsx:77
+#: apps/app/src/features/games/farm/components/farm-mascot.tsx:82
 msgid "喵——有 {ripeCount} 块田熟了，趁热收吧。"
 msgstr "Meow~ {ripeCount} plots are ripe — harvest while they're fresh."
 
-#: apps/app/src/features/games/farm/components/farm-mascot.tsx:80
+#: apps/app/src/features/games/farm/components/farm-mascot.tsx:85
 msgid "糟糕，{rottenCount} 块田已经坏掉了，铲了重种？"
 msgstr "Uh oh — {rottenCount} plots have rotted. Clear and replant?"
 
-#: apps/app/src/features/games/farm/components/farm-mascot.tsx:83
+#: apps/app/src/features/games/farm/components/farm-mascot.tsx:88
 msgid "田里 {weedCount} 处杂草、{bugCount} 只虫子，记得清一下。"
 msgstr "{weedCount} weeds and {bugCount} bugs in the field — remember to clear them."
 
-#: apps/app/src/features/games/farm/components/farm-mascot.tsx:85
+#: apps/app/src/features/games/farm/components/farm-mascot.tsx:90
 msgid "田里 {weedCount} 处杂草，记得清一下。"
 msgstr "{weedCount} weeds in the field — remember to clear them."
 
-#: apps/app/src/features/games/farm/components/farm-mascot.tsx:87
+#: apps/app/src/features/games/farm/components/farm-mascot.tsx:92
 msgid "田里 {bugCount} 只虫子，记得清一下。"
 msgstr "{bugCount} bugs in the field — remember to clear them."
 
-#: apps/app/src/features/games/farm/components/farm-mascot.tsx:92
+#: apps/app/src/features/games/farm/components/farm-mascot.tsx:97
 msgid "提醒一下：{thiefName} 今天来顺过你的菜。"
 msgstr "Heads up: {thiefName} stole your crops today."
 
-#: apps/app/src/features/games/farm/components/farm-mascot.tsx:97
+#: apps/app/src/features/games/farm/components/farm-mascot.tsx:102
 msgid "夜深了，作物也在睡觉，浇个水就回去歇会儿吧。"
 msgstr "It's late — the crops are sleeping too. Water them and go rest."
 
-#: apps/app/src/features/games/farm/components/farm-mascot.tsx:99
+#: apps/app/src/features/games/farm/components/farm-mascot.tsx:104
 msgid "早上阳光好，正适合浇水。"
 msgstr "Morning sun is great — perfect for watering."
 
-#: apps/app/src/features/games/farm/components/farm-mascot.tsx:101
+#: apps/app/src/features/games/farm/components/farm-mascot.tsx:106
 msgid "中午阳光毒，浇水容易蒸发，等下午吧。"
 msgstr "The midday sun is harsh — watering evaporates quickly. Wait for the afternoon."
 
-#: apps/app/src/features/games/farm/components/farm-mascot.tsx:103
+#: apps/app/src/features/games/farm/components/farm-mascot.tsx:108
 msgid "下午是好时候，串串门、看看邻居？"
 msgstr "Afternoon is a good time. How about visiting the neighbors?"
 
-#: apps/app/src/features/games/farm/components/farm-mascot.tsx:105
+#: apps/app/src/features/games/farm/components/farm-mascot.tsx:110
 msgid "入夜啦，记得防一下夜里来串门的人。"
 msgstr "Night has fallen — watch out for nighttime visitors."
 
-#: apps/app/src/features/games/farm/components/farm-mascot.tsx:110
+#: apps/app/src/features/games/farm/components/farm-mascot.tsx:115
 msgid "今天没啥事儿，世界角色们各自忙各自的。"
 msgstr "Nothing going on today — world characters are each doing their own thing."
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:78
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:92
 msgid "正在串门……"
 msgstr "Visiting neighbors..."
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:106
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:120
 msgid "的农场"
 msgstr "'s farm"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:109
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:232
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:123
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:246
 msgid "好感"
 msgstr "Affinity"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:183
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:197
 msgid "已偷过"
 msgstr "Already stolen"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:184
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:198
 msgid "可顺"
 msgstr "Steal-able"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:199
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:213
 msgid "点击成熟（金边）田块即可顺走一份。每天最多 10 次，对方对你的好感度会降。"
 msgstr "Tap a ripe (gold-bordered) plot to steal a share. Max 10 times per day; their affinity for you will drop."
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:205
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:219
 msgid "近期动向"
 msgstr "Recent activity"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:231
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:245
 msgid "顺走"
 msgstr "Steal"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:252
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:266
 msgid "收了"
 msgstr "Harvested"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:262
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:276
 msgid "进了种子"
 msgstr "Got seeds"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:266
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:280
 msgid "升级了"
 msgstr "Leveled up"
 
-#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:268
+#: apps/app/src/features/games/farm/components/neighbor-farm-modal.tsx:282
 msgid "好感度变化"
 msgstr "Affinity change"
 
@@ -13032,66 +13040,66 @@ msgstr "Clear weeds"
 msgid "除虫"
 msgstr "Clear bugs"
 
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:40
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:55
 msgid "种子商店"
 msgstr "Seed shop"
 
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:70
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:85
 msgid "h 成熟"
 msgstr "h to ripen"
 
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
-msgid "/ 包，售价"
-msgstr "/ pack, price"
-
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:75
-#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:81
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
+#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:96
 msgid "/ 个"
 msgstr "/ each"
 
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:77
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:90
+msgid "/ 包，售价"
+msgstr "/ pack, price"
+
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:92
 msgid "已存"
 msgstr "Saved"
 
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:81
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:96
 #: apps/app/src/features/games/parking-war/parking-war-game.tsx:967
 msgid "解锁"
 msgstr "Unlock"
 
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:96
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:111
 msgid "购买中"
 msgstr "Purchasing"
 
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:96
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:111
 msgid "未解锁"
 msgstr "Locked"
 
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:96
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:111
 msgid "金币不足"
 msgstr "Not enough coins"
 
-#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:96
+#: apps/app/src/features/games/farm/components/seed-shop-sheet.tsx:111
 msgid "购买 1"
 msgstr "Buy 1"
 
-#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:43
+#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:58
 #: apps/app/src/features/games/farm/farm-page.tsx:158
 msgid "仓库"
 msgstr "Warehouse"
 
-#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:60
+#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:75
 msgid "仓库还是空的，先去种点东西吧"
 msgstr "The warehouse is empty — go plant something first"
 
-#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:77
+#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:92
 msgid "存量"
 msgstr "Inventory"
 
-#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:91
+#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:106
 msgid "卖 1"
 msgstr "Sell 1"
 
-#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:100
+#: apps/app/src/features/games/farm/components/warehouse-sheet.tsx:115
 msgid "全卖"
 msgstr "Sell all"
 
@@ -14185,17 +14193,17 @@ msgid "守住基地，消灭 20 辆敌方坦克。"
 msgstr "Hold the base and wipe out 20 enemy tanks."
 
 #: apps/app/src/features/games/game-center-data.ts:307
+#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
+msgid "双人"
+msgstr "Co-op"
+
+#: apps/app/src/features/games/game-center-data.ts:307
 msgid "像素"
 msgstr "Pixel"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "动作"
 msgstr "Action"
-
-#: apps/app/src/features/games/game-center-data.ts:307
-#: apps/app/src/features/games/tank-war/tank-war-game.tsx:257
-msgid "双人"
-msgstr "Co-op"
 
 #: apps/app/src/features/games/game-center-data.ts:307
 msgid "怀旧"
@@ -17466,7 +17474,7 @@ msgstr "Close service account menu"
 #: apps/app/src/routes/desktop-chat-files-page.tsx:457
 #: apps/app/src/routes/desktop-chat-history-page.tsx:263
 #: apps/app/src/routes/desktop-mobile-page.tsx:876
-#: apps/app/src/routes/profile-settings-page.tsx:258
+#: apps/app/src/routes/profile-settings-page.tsx:279
 msgid "返回消息"
 msgstr "Back to Messages"
 
@@ -18215,7 +18223,7 @@ msgstr "Feedback"
 
 #: apps/app/src/features/shell/desktop-nav-config.ts:117
 #: apps/app/src/routes/profile-feedback-page.tsx:163
-#: apps/app/src/routes/profile-page.tsx:195
+#: apps/app/src/routes/profile-page.tsx:197
 msgid "反馈"
 msgstr "Feedback"
 
@@ -18223,9 +18231,9 @@ msgstr "Feedback"
 #: apps/app/src/features/shell/desktop-nav-config.ts:124
 #: apps/app/src/features/shell/desktop-shell.tsx:646
 #: apps/app/src/routes/desktop-mobile-page.tsx:186
-#: apps/app/src/routes/profile-page.tsx:151
-#: apps/app/src/routes/profile-settings-page.tsx:292
-#: apps/app/src/routes/profile-settings-page.tsx:662
+#: apps/app/src/routes/profile-page.tsx:153
+#: apps/app/src/routes/profile-settings-page.tsx:313
+#: apps/app/src/routes/profile-settings-page.tsx:703
 msgid "设置"
 msgstr "Settings"
 
@@ -18611,9 +18619,9 @@ msgid "订阅"
 msgstr "Subscription"
 
 #: apps/app/src/features/subscription/subscription-panel.tsx:517
-#: apps/app/src/routes/profile-page.tsx:179
+#: apps/app/src/routes/profile-page.tsx:181
 #: apps/app/src/routes/profile-settings-page.tsx:73
-#: apps/app/src/routes/profile-settings-page.tsx:632
+#: apps/app/src/routes/profile-settings-page.tsx:673
 #: apps/app/src/routes/profile-subscription-page.tsx:509
 #: apps/app/src/routes/profile-subscription-page.tsx:532
 msgid "会员中心"
@@ -18703,7 +18711,7 @@ msgid "暂无邀请记录。"
 msgstr "No invite records yet."
 
 #: apps/app/src/i18n/static-dom-seed.ts:12
-#: apps/app/src/routes/profile-settings-page.tsx:380
+#: apps/app/src/routes/profile-settings-page.tsx:401
 msgid "签名"
 msgstr "Signature"
 
@@ -18943,7 +18951,7 @@ msgid "灵感"
 msgstr "Ideas"
 
 #: apps/app/src/i18n/static-dom-seed.ts:238
-#: apps/app/src/routes/games-page.tsx:911
+#: apps/app/src/routes/games-page.tsx:914
 msgid "正在玩"
 msgstr "Playing now"
 
@@ -19331,17 +19339,17 @@ msgid "这一刻的想法..."
 msgstr "Thoughts for this moment..."
 
 #: apps/app/src/i18n/static-dom-seed.ts:441
-#: apps/app/src/routes/discover-encounter-page.tsx:170
+#: apps/app/src/routes/discover-encounter-page.tsx:174
 msgid "随机遇见新的世界居民"
 msgstr "Randomly meet new world residents"
 
 #: apps/app/src/i18n/static-dom-seed.ts:443
-#: apps/app/src/routes/discover-encounter-page.tsx:171
+#: apps/app/src/routes/discover-encounter-page.tsx:175
 msgid "随机相遇"
 msgstr "Random encounter"
 
 #: apps/app/src/i18n/static-dom-seed.ts:444
-#: apps/app/src/routes/discover-encounter-page.tsx:126
+#: apps/app/src/routes/discover-encounter-page.tsx:129
 msgid "每次摇一摇都会先生成一个新的相遇结果；当前页面会直接保留这次结果，并把对方加入你的通讯录。"
 msgstr "Each shake creates a new encounter result. This page keeps the result directly and adds the person to your contacts."
 
@@ -23678,7 +23686,7 @@ msgstr ""
 #: apps/app/src/routes/desktop-feedback-page.tsx:707
 #: apps/app/src/routes/desktop-feedback-page.tsx:708
 #: apps/app/src/routes/desktop-feedback-page.tsx:709
-#: apps/app/src/routes/profile-info-page.tsx:119
+#: apps/app/src/routes/profile-info-page.tsx:129
 msgid "未填写"
 msgstr "Not specified"
 
@@ -24427,55 +24435,54 @@ msgstr "The desktop Discover entry has consolidated into the desktop Discover wo
 msgid "正在切换到桌面发现页..."
 msgstr "Switching to desktop Discover..."
 
-#: apps/app/src/routes/discover-encounter-page.tsx:80
+#: apps/app/src/routes/discover-encounter-page.tsx:82
 #: apps/app/src/routes/discover-page.tsx:318
 msgid "附近暂时没有新的相遇。"
 msgstr "No new encounters nearby for now."
 
-#. placeholder {0}: result.character.name ?? ""
-#. placeholder {1}: result.greeting ?? ""
-#: apps/app/src/routes/discover-encounter-page.tsx:86
-msgid "{0} 已加入通讯录：{1}"
-msgstr "{0} added to Contacts: {1}"
+#: apps/app/src/routes/discover-encounter-page.tsx:87
+#: apps/app/src/routes/discover-page.tsx:324
+msgid "刚刚和你打了招呼。"
+msgstr "just greeted you."
 
-#: apps/app/src/routes/discover-encounter-page.tsx:120
+#: apps/app/src/routes/discover-encounter-page.tsx:90
+#: apps/app/src/routes/discover-page.tsx:325
+msgid "{characterName} 已加入通讯录：{greeting}"
+msgstr "{characterName} has been added to Contacts: {greeting}"
+
+#: apps/app/src/routes/discover-encounter-page.tsx:123
 msgid "晃动手机即可开始相遇，也可以直接点下方按钮。每次相遇都会直接加入你的通讯录。"
 msgstr "Shake your phone to start an encounter, or just tap the button below. Every encounter is added directly to your contacts."
 
-#: apps/app/src/routes/discover-encounter-page.tsx:122
+#: apps/app/src/routes/discover-encounter-page.tsx:125
 msgid "首次使用请点下方按钮授权动作传感器，之后晃动手机即可触发相遇。"
 msgstr "First time here? Tap the button below to grant motion-sensor access, then shake your phone to trigger an encounter."
 
-#: apps/app/src/routes/discover-encounter-page.tsx:124
+#: apps/app/src/routes/discover-encounter-page.tsx:127
 msgid "已拒绝动作传感器授权，可在系统设置开启，或点下方按钮手动触发相遇。"
 msgstr "Motion-sensor access was denied. Enable it in system settings, or tap the button below to trigger an encounter manually."
 
-#: apps/app/src/routes/discover-encounter-page.tsx:132
+#: apps/app/src/routes/discover-encounter-page.tsx:135
 #: apps/app/src/routes/discover-page.tsx:757
 msgid "正在寻找..."
 msgstr "Searching..."
 
-#: apps/app/src/routes/discover-encounter-page.tsx:135
+#: apps/app/src/routes/discover-encounter-page.tsx:138
 msgid "开启摇一摇"
 msgstr "Enable Shake"
 
-#: apps/app/src/routes/discover-encounter-page.tsx:137
-#: apps/app/src/routes/discover-encounter-page.tsx:169
+#: apps/app/src/routes/discover-encounter-page.tsx:140
+#: apps/app/src/routes/discover-encounter-page.tsx:173
 #: apps/app/src/routes/discover-page.tsx:130
 #: apps/app/src/routes/discover-page.tsx:758
 msgid "摇一摇"
 msgstr "Shake"
 
-#: apps/app/src/routes/discover-encounter-page.tsx:189
-#: apps/app/src/routes/mobile-add-friend-page.tsx:815
-msgid "好友申请"
-msgstr "Friend requests"
-
-#: apps/app/src/routes/discover-encounter-page.tsx:223
+#: apps/app/src/routes/discover-encounter-page.tsx:227
 msgid "重试摇一摇"
 msgstr "Retry shake"
 
-#: apps/app/src/routes/discover-encounter-page.tsx:232
+#: apps/app/src/routes/discover-encounter-page.tsx:236
 #: apps/app/src/routes/discover-scene-page.tsx:402
 msgid "回发现页"
 msgstr "Back to Discover"
@@ -24622,14 +24629,6 @@ msgstr "Entertainment"
 #: apps/app/src/routes/discover-page.tsx:322
 msgid "随机相遇已写入通讯录。"
 msgstr "Random encounter was added to Contacts."
-
-#: apps/app/src/routes/discover-page.tsx:324
-msgid "刚刚和你打了招呼。"
-msgstr "just greeted you."
-
-#: apps/app/src/routes/discover-page.tsx:325
-msgid "{characterName} 已加入通讯录：{greeting}"
-msgstr "{characterName} has been added to Contacts: {greeting}"
 
 #: apps/app/src/routes/discover-page.tsx:355
 msgid "{translatedSceneLabel}里和别处都暂时没有新的相遇了。"
@@ -25126,8 +25125,8 @@ msgstr "Loading the desktop Game Center."
 msgid "载入桌面游戏中心..."
 msgstr "Loading desktop Game Center..."
 
-#: apps/app/src/routes/games-page.tsx:821
-#: apps/app/src/routes/games-page.tsx:840
+#: apps/app/src/routes/games-page.tsx:824
+#: apps/app/src/routes/games-page.tsx:843
 msgid "开始"
 msgstr "Start"
 
@@ -26352,19 +26351,19 @@ msgid "正在打开角色朋友圈..."
 msgstr "Opening character Moments..."
 
 #: apps/app/src/routes/legal-community-page.tsx:10
-#: apps/app/src/routes/profile-page.tsx:216
+#: apps/app/src/routes/profile-page.tsx:218
 #: apps/app/src/routes/profile-settings-page.tsx:94
 msgid "社区规范"
 msgstr "Community Guidelines"
 
 #: apps/app/src/routes/legal-privacy-page.tsx:10
-#: apps/app/src/routes/profile-page.tsx:204
+#: apps/app/src/routes/profile-page.tsx:206
 #: apps/app/src/routes/profile-settings-page.tsx:92
 msgid "隐私政策"
 msgstr "Privacy Policy"
 
 #: apps/app/src/routes/legal-terms-page.tsx:10
-#: apps/app/src/routes/profile-page.tsx:210
+#: apps/app/src/routes/profile-page.tsx:212
 msgid "服务条款"
 msgstr "Terms of Service"
 
@@ -26612,6 +26611,10 @@ msgstr "Make sure the Yinjie ID is complete, or try a different keyword."
 #: apps/app/src/routes/mobile-add-friend-page.tsx:756
 msgid "你好，我是{owner}，想把你添加到通讯录里。"
 msgstr "Hi, I'm {owner}. I'd like to add you to my contacts."
+
+#: apps/app/src/routes/mobile-add-friend-page.tsx:815
+msgid "好友申请"
+msgstr "Friend requests"
 
 #: apps/app/src/routes/mobile-add-friend-page.tsx:850
 msgid "发送验证申请，对方通过后即可成为朋友。"
@@ -27028,7 +27031,7 @@ msgid "导入失败，请稍后再试"
 msgstr "Import failed. Please try again later."
 
 #: apps/app/src/routes/profile-character-import-page.tsx:166
-#: apps/app/src/routes/profile-page.tsx:189
+#: apps/app/src/routes/profile-page.tsx:191
 msgid "导入角色"
 msgstr "Import characters"
 
@@ -27192,7 +27195,11 @@ msgstr "Profile"
 msgid "头像"
 msgstr "Avatar"
 
-#: apps/app/src/routes/profile-info-page.tsx:94
+#: apps/app/src/routes/profile-info-page.tsx:81
+msgid "未生成"
+msgstr "Not generated"
+
+#: apps/app/src/routes/profile-info-page.tsx:99
 #: apps/app/src/routes/profile-info-placeholder-page.tsx:30
 msgid "我的二维码名片"
 msgstr "My QR Card"
@@ -27233,44 +27240,44 @@ msgstr "Loading desktop My Moments workspace."
 msgid "载入桌面我的朋友圈..."
 msgstr "Loading desktop My Moments…"
 
-#: apps/app/src/routes/profile-page.tsx:138
+#: apps/app/src/routes/profile-page.tsx:140
 msgid "查看与编辑个人资料"
 msgstr "View and edit profile"
 
-#: apps/app/src/routes/profile-page.tsx:226
-#: apps/app/src/routes/profile-page.tsx:249
-#: apps/app/src/routes/profile-settings-page.tsx:652
-#: apps/app/src/routes/profile-settings-page.tsx:724
+#: apps/app/src/routes/profile-page.tsx:228
+#: apps/app/src/routes/profile-page.tsx:251
+#: apps/app/src/routes/profile-settings-page.tsx:693
+#: apps/app/src/routes/profile-settings-page.tsx:765
 msgid "退出登录"
 msgstr "Sign out"
 
-#: apps/app/src/routes/profile-page.tsx:235
+#: apps/app/src/routes/profile-page.tsx:237
 msgid "导入角色功能正在开发中，敬请期待"
 msgstr ""
 
-#: apps/app/src/routes/profile-page.tsx:237
+#: apps/app/src/routes/profile-page.tsx:239
 msgid "我们正在打磨更顺手的导入流程。先加运营微信，体验上线后第一时间通知你，也欢迎入群一起聊聊你想怎么用。"
 msgstr ""
 
-#: apps/app/src/routes/profile-page.tsx:245
-#: apps/app/src/routes/profile-settings-page.tsx:648
+#: apps/app/src/routes/profile-page.tsx:247
+#: apps/app/src/routes/profile-settings-page.tsx:689
 msgid "确认退出登录？"
 msgstr "Sign out?"
 
-#: apps/app/src/routes/profile-page.tsx:247
-#: apps/app/src/routes/profile-settings-page.tsx:650
+#: apps/app/src/routes/profile-page.tsx:249
+#: apps/app/src/routes/profile-settings-page.tsx:691
 msgid "退出后会回到世界入口，下次需要重新登录云账号。"
 msgstr "Signing out returns you to the world entry; you'll need to sign in to the cloud account again next time."
 
 #: apps/app/src/routes/profile-settings-account-security-page.tsx:41
 #: apps/app/src/routes/profile-settings-page.tsx:78
-#: apps/app/src/routes/profile-settings-page.tsx:338
-#: apps/app/src/routes/profile-settings-page.tsx:640
+#: apps/app/src/routes/profile-settings-page.tsx:359
+#: apps/app/src/routes/profile-settings-page.tsx:681
 msgid "账号安全"
 msgstr "Account Security"
 
 #: apps/app/src/routes/profile-settings-language-page.tsx:42
-#: apps/app/src/routes/profile-settings-page.tsx:316
+#: apps/app/src/routes/profile-settings-page.tsx:337
 msgid "多语言"
 msgstr "Language"
 
@@ -27279,7 +27286,7 @@ msgid "正在切换语言..."
 msgstr "Switching language…"
 
 #: apps/app/src/routes/profile-settings-page.tsx:68
-#: apps/app/src/routes/profile-settings-page.tsx:355
+#: apps/app/src/routes/profile-settings-page.tsx:376
 msgid "个人资料"
 msgstr "Profile"
 
@@ -27288,7 +27295,7 @@ msgid "快捷键设置"
 msgstr "Shortcut Settings"
 
 #: apps/app/src/routes/profile-settings-page.tsx:86
-#: apps/app/src/routes/profile-settings-page.tsx:478
+#: apps/app/src/routes/profile-settings-page.tsx:499
 msgid "AI 设置"
 msgstr "AI Settings"
 
@@ -27297,7 +27304,7 @@ msgid "语言"
 msgstr "Language"
 
 #: apps/app/src/routes/profile-settings-page.tsx:88
-#: apps/app/src/routes/profile-settings-page.tsx:583
+#: apps/app/src/routes/profile-settings-page.tsx:609
 msgid "协议与规范"
 msgstr "Policies and Guidelines"
 
@@ -27321,178 +27328,194 @@ msgstr "Ctrl/Cmd + Enter to send"
 msgid "发送前多一道组合键确认，更接近微信桌面版可切换方式。"
 msgstr "Use an extra shortcut before sending, closer to WeChat desktop behavior."
 
-#: apps/app/src/routes/profile-settings-page.tsx:259
+#: apps/app/src/routes/profile-settings-page.tsx:235
+msgid "Base URL 必须是合法的 http/https 地址，例如 https://api.openai.com/v1。"
+msgstr ""
+
+#: apps/app/src/routes/profile-settings-page.tsx:280
 msgid "返回资料"
 msgstr "Back to profile"
 
-#: apps/app/src/routes/profile-settings-page.tsx:301
+#: apps/app/src/routes/profile-settings-page.tsx:322
 msgid "返回资料页"
 msgstr "Back to profile page"
 
-#: apps/app/src/routes/profile-settings-page.tsx:357
+#: apps/app/src/routes/profile-settings-page.tsx:378
 msgid "这里的名称和签名会用于移动端资料页和世界主人展示。"
 msgstr "This name and signature are used on the mobile profile page and world owner display."
 
-#: apps/app/src/routes/profile-settings-page.tsx:361
+#: apps/app/src/routes/profile-settings-page.tsx:382
 msgid "显示名称"
 msgstr "Display name"
 
-#: apps/app/src/routes/profile-settings-page.tsx:366
+#: apps/app/src/routes/profile-settings-page.tsx:387
 msgid "输入显示名称"
 msgstr "Enter display name"
 
-#: apps/app/src/routes/profile-settings-page.tsx:372
+#: apps/app/src/routes/profile-settings-page.tsx:393
 msgid "至少 {MIN_OWNER_NAME_LENGTH} 个字、最多 {MAX_OWNER_NAME_LENGTH} 个字符。"
 msgstr ""
 
-#: apps/app/src/routes/profile-settings-page.tsx:386
+#: apps/app/src/routes/profile-settings-page.tsx:407
 msgid "介绍一下你自己，或者写一句当前状态"
 msgstr "Introduce yourself, or write your current status"
 
-#: apps/app/src/routes/profile-settings-page.tsx:403
+#: apps/app/src/routes/profile-settings-page.tsx:424
 msgid "保存资料"
 msgstr "Save profile"
 
-#: apps/app/src/routes/profile-settings-page.tsx:411
+#: apps/app/src/routes/profile-settings-page.tsx:432
 msgid "资料已更新。"
 msgstr "Profile updated."
 
-#: apps/app/src/routes/profile-settings-page.tsx:418
+#: apps/app/src/routes/profile-settings-page.tsx:439
 msgid "聊天快捷键"
 msgstr "Chat shortcuts"
 
-#: apps/app/src/routes/profile-settings-page.tsx:419
+#: apps/app/src/routes/profile-settings-page.tsx:440
 msgid "调整桌面和 Web 键盘聊天输入时的发送快捷键。"
 msgstr "Adjust the send shortcut for desktop and web keyboard chat input."
 
-#: apps/app/src/routes/profile-settings-page.tsx:423
+#: apps/app/src/routes/profile-settings-page.tsx:444
 msgid "发送消息的快捷键"
 msgstr ""
 
-#: apps/app/src/routes/profile-settings-page.tsx:470
+#: apps/app/src/routes/profile-settings-page.tsx:491
 msgid "当前仅影响桌面和 Web 的键盘聊天输入，移动端仍以发送按钮和语音入口为主。"
 msgstr "This only affects desktop and web keyboard chat input. Mobile still uses the send button and voice entry."
 
-#: apps/app/src/routes/profile-settings-page.tsx:480
+#: apps/app/src/routes/profile-settings-page.tsx:501
 msgid "你可以为当前世界主人单独配置专属 API Key 和兼容 Base URL。"
 msgstr "You can configure a dedicated API Key and compatible Base URL for the current world owner."
 
-#: apps/app/src/routes/profile-settings-page.tsx:486
+#: apps/app/src/routes/profile-settings-page.tsx:507
 msgid "读取配置..."
 msgstr "Loading settings..."
 
 #. placeholder {0}: ownerQuery.data.customApiBase
-#: apps/app/src/routes/profile-settings-page.tsx:496
+#: apps/app/src/routes/profile-settings-page.tsx:517
 msgid "当前使用专属 API Key，Base URL：{0}。"
 msgstr "Using dedicated API Key, Base URL: {0}."
 
-#: apps/app/src/routes/profile-settings-page.tsx:498
+#: apps/app/src/routes/profile-settings-page.tsx:519
 msgid "当前使用专属 API Key。"
 msgstr "Using dedicated API Key."
 
-#: apps/app/src/routes/profile-settings-page.tsx:503
+#: apps/app/src/routes/profile-settings-page.tsx:524
 msgid "专属 API Key"
 msgstr "Dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:510
+#: apps/app/src/routes/profile-settings-page.tsx:531
 msgid "已保存专属 API Key，输入新的值可替换"
 msgstr "Dedicated API Key saved. Enter a new value to replace it."
 
-#: apps/app/src/routes/profile-settings-page.tsx:511
+#: apps/app/src/routes/profile-settings-page.tsx:532
 msgid "输入你的专属 API Key"
 msgstr "Enter your dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:516
+#: apps/app/src/routes/profile-settings-page.tsx:537
 msgid "兼容 Base URL"
 msgstr "Compatible Base URL"
 
-#: apps/app/src/routes/profile-settings-page.tsx:520
+#: apps/app/src/routes/profile-settings-page.tsx:541
 msgid "可选，例如 https://api.openai.com/v1"
 msgstr "Optional, e.g. https://api.openai.com/v1"
 
-#: apps/app/src/routes/profile-settings-page.tsx:535
+#: apps/app/src/routes/profile-settings-page.tsx:556
 msgid "保存专属 API Key"
 msgstr "Save dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:544
+#: apps/app/src/routes/profile-settings-page.tsx:565
 msgid "清除中..."
 msgstr "Clearing..."
 
-#: apps/app/src/routes/profile-settings-page.tsx:545
+#: apps/app/src/routes/profile-settings-page.tsx:566
 msgid "清除专属 API Key"
 msgstr "Clear dedicated API Key"
 
-#: apps/app/src/routes/profile-settings-page.tsx:559
+#: apps/app/src/routes/profile-settings-page.tsx:580
 msgid "专属 API Key 已保存。"
 msgstr "Dedicated API Key saved."
 
-#: apps/app/src/routes/profile-settings-page.tsx:564
+#: apps/app/src/routes/profile-settings-page.tsx:585
 msgid "专属 API Key 已清除。"
 msgstr "Dedicated API Key cleared."
 
-#: apps/app/src/routes/profile-settings-page.tsx:572
+#: apps/app/src/routes/profile-settings-page.tsx:598
 msgid "界面语言"
 msgstr "Interface Language"
 
-#: apps/app/src/routes/profile-settings-page.tsx:574
-msgid "切换界面语言，好友回复也会跟随此设置使用对应语言。"
-msgstr "Switch the interface language; friends' replies will follow this setting and use the matching language."
+#: apps/app/src/routes/profile-settings-page.tsx:600
+msgid "语言偏好保存在当前设备并立即生效，同时决定好友回复使用的语言。"
+msgstr ""
 
-#: apps/app/src/routes/profile-settings-page.tsx:584
-msgid "桌面端保留当前文档切换和独立打开入口。"
-msgstr "Desktop keeps document switching and independent open entry points."
+#: apps/app/src/routes/profile-settings-page.tsx:611
+msgid "查看本世界的隐私政策、用户协议与社区规范，选中后可打开完整文档。"
+msgstr ""
 
-#: apps/app/src/routes/profile-settings-page.tsx:618
-msgid "打开当前文档"
-msgstr "Open Current Document"
+#: apps/app/src/routes/profile-settings-page.tsx:616
+msgid "协议与规范文档"
+msgstr ""
 
-#: apps/app/src/routes/profile-settings-page.tsx:622
+#: apps/app/src/routes/profile-settings-page.tsx:656
+msgid "打开隐私政策"
+msgstr ""
+
+#: apps/app/src/routes/profile-settings-page.tsx:658
+msgid "打开用户协议"
+msgstr ""
+
+#: apps/app/src/routes/profile-settings-page.tsx:659
+msgid "打开社区规范"
+msgstr ""
+
+#: apps/app/src/routes/profile-settings-page.tsx:663
 msgid "查看世界隐私政策和数据使用说明。"
 msgstr "View the world privacy policy and data usage notes."
 
-#: apps/app/src/routes/profile-settings-page.tsx:624
+#: apps/app/src/routes/profile-settings-page.tsx:665
 msgid "查看世界服务使用协议。"
 msgstr "View the world service terms."
 
-#: apps/app/src/routes/profile-settings-page.tsx:625
+#: apps/app/src/routes/profile-settings-page.tsx:666
 msgid "查看世界社区规范和反馈口径。"
 msgstr "View the world community guidelines and feedback policy."
 
-#: apps/app/src/routes/profile-settings-page.tsx:633
-#: apps/app/src/routes/profile-settings-page.tsx:673
+#: apps/app/src/routes/profile-settings-page.tsx:674
+#: apps/app/src/routes/profile-settings-page.tsx:714
 msgid "查看当前云账号订阅状态、可购套餐与邀请奖励。"
 msgstr "Check current cloud-account subscription status, available plans, and invite rewards."
 
-#: apps/app/src/routes/profile-settings-page.tsx:641
-#: apps/app/src/routes/profile-settings-page.tsx:675
+#: apps/app/src/routes/profile-settings-page.tsx:682
+#: apps/app/src/routes/profile-settings-page.tsx:716
 msgid "修改云账号登录密码，需要邮箱验证码确认。"
 msgstr "Change your cloud account password. Requires email verification."
 
-#: apps/app/src/routes/profile-settings-page.tsx:662
+#: apps/app/src/routes/profile-settings-page.tsx:703
 msgid "资料与设置"
 msgstr "Profile and Settings"
 
-#: apps/app/src/routes/profile-settings-page.tsx:665
+#: apps/app/src/routes/profile-settings-page.tsx:706
 msgid "在桌面工作区里管理世界主人的资料与签名。"
 msgstr "Manage the world owner profile and signature in the desktop workspace."
 
-#: apps/app/src/routes/profile-settings-page.tsx:667
+#: apps/app/src/routes/profile-settings-page.tsx:708
 msgid "调整桌面和 Web 键盘聊天输入的发送快捷键。"
 msgstr "Adjust send shortcuts for desktop and web keyboard chat input."
 
-#: apps/app/src/routes/profile-settings-page.tsx:669
+#: apps/app/src/routes/profile-settings-page.tsx:710
 msgid "管理专属 API Key 和兼容 Base URL。"
 msgstr "Manage your dedicated API Key and compatible Base URL."
 
-#: apps/app/src/routes/profile-settings-page.tsx:671
+#: apps/app/src/routes/profile-settings-page.tsx:712
 msgid "切换当前端的界面语言和本地化格式。"
 msgstr "Switch this client's interface language and localization formats."
 
-#: apps/app/src/routes/profile-settings-page.tsx:676
+#: apps/app/src/routes/profile-settings-page.tsx:717
 msgid "查看当前世界相关的协议和社区规范。"
 msgstr "View policies and community guidelines for this world."
 
-#: apps/app/src/routes/profile-settings-page.tsx:691
+#: apps/app/src/routes/profile-settings-page.tsx:732
 msgid "设置分类"
 msgstr "Settings Categories"
 
