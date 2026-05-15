@@ -781,6 +781,10 @@ export function ContactsPage() {
         (friendRequestsQuery.data ?? []).find(
           (request) => request.id === requestId,
         ) ?? null;
+      // 用户在「新的朋友」面板里多半是在批量处理；接受一条就强制跳到该好友详情
+      // 等于把人甩出列表，下一条还得手动回来。这里只在用户原本就不在 new-friends
+      // 面板（例如通知/路由直跳进来 accept）时才跳，避免打断批量流。
+      const wasOnNewFriendsPane = desktopSelection?.kind === "new-friends";
 
       setNotice(t(msg`已通过好友申请。`));
       await Promise.all([
@@ -799,7 +803,7 @@ export function ContactsPage() {
         }),
       ]);
 
-      if (acceptedRequest?.characterId) {
+      if (!wasOnNewFriendsPane && acceptedRequest?.characterId) {
         const nextSelection = {
           kind: "friend",
           id: acceptedRequest.characterId,
@@ -1755,7 +1759,6 @@ export function ContactsPage() {
                       ? declineFriendRequestMutation.error.message
                       : null
                 }
-                notice={notice}
                 acceptPendingId={
                   acceptFriendRequestMutation.isPending
                     ? (acceptFriendRequestMutation.variables ?? null)

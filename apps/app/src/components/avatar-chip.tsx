@@ -33,15 +33,41 @@ export function AvatarChip({
             ? "h-14 w-14 rounded-full text-xl"
             : "h-11 w-11 rounded-full text-base";
   const trimmedSrc = src?.trim() ?? "";
+
+  useEffect(() => {
+    setLoadFailed(false);
+  }, [trimmedSrc]);
+
+  // 角色 / 好友请求里 avatar 经常被存成单 emoji（比如 🌙 / 💬 / ☀️），
+  // 之前 isLikelyImageSource 直接 false → 全部回落到默认渐变头像，导致「新的朋友」
+  // 里 4/5 张头像都长得一样、看不出谁是谁。这里把 emoji 直接当文字 glyph 渲染，
+  // 背景仍然走稳定 hash 出的渐变色，肉眼能立刻区分。
+  if (!isLikelyImageSource(trimmedSrc) && isEmojiAvatar(trimmedSrc)) {
+    const emojiTextSize =
+      size === "sm"
+        ? "text-[18px]"
+        : size === "xl"
+          ? "text-[34px]"
+          : size === "wechat"
+            ? "text-[24px]"
+            : size === "lg"
+              ? "text-[28px]"
+              : "text-[22px]";
+    return (
+      <span
+        aria-label={name ?? "avatar"}
+        className={`${classes} ${emojiTextSize} yj-no-callout flex items-center justify-center border border-white/80 bg-[color:var(--surface-console,#f5f5f5)] leading-none shadow-[var(--shadow-soft)]`}
+      >
+        <span aria-hidden="true">{trimmedSrc}</span>
+      </span>
+    );
+  }
+
   const fallbackSrc = pickFallbackAvatar(name, trimmedSrc);
   const resolvedSrc =
     !loadFailed && isLikelyImageSource(trimmedSrc)
       ? resolveAvatarSource(trimmedSrc)
       : fallbackSrc;
-
-  useEffect(() => {
-    setLoadFailed(false);
-  }, [trimmedSrc]);
 
   return (
     <img
@@ -58,6 +84,21 @@ export function AvatarChip({
       className={`${classes} yj-no-callout border border-white/80 object-cover shadow-[var(--shadow-soft)]`}
     />
   );
+}
+
+const EMOJI_PICTOGRAPHIC = /\p{Extended_Pictographic}/u;
+
+function isEmojiAvatar(value: string) {
+  if (!value) {
+    return false;
+  }
+  // 限定到「短串 + 含 emoji code point」：避免把名字里有 emoji 的长字符串当 emoji
+  // 头像渲染（那种应该走文字 fallback）。一个复合 emoji（带 ZWJ / 修饰符）大概
+  // 6~8 个 UTF-16 code unit，这里给 12 留点余地。
+  if (value.length > 12) {
+    return false;
+  }
+  return EMOJI_PICTOGRAPHIC.test(value);
 }
 
 function isLikelyImageSource(value: string) {
