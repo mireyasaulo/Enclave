@@ -5,6 +5,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import type { AuthenticatedUser } from '../../auth/jwt-auth.guard';
 import { ModerationReportEntity } from '../../moderation/moderation-report.entity';
+import { CharacterPageEntity } from '../entities/character-page.entity';
+import { CharacterRevisionEntity } from '../entities/character-revision.entity';
+import { WikiTalkPostEntity } from '../entities/wiki-talk-post.entity';
 
 const WIKI_TARGET_TYPES = new Set([
   'wiki_revision',
@@ -19,6 +22,12 @@ export class WikiReportService {
   constructor(
     @InjectRepository(ModerationReportEntity)
     private readonly reportRepo: Repository<ModerationReportEntity>,
+    @InjectRepository(CharacterPageEntity)
+    private readonly pageRepo: Repository<CharacterPageEntity>,
+    @InjectRepository(CharacterRevisionEntity)
+    private readonly revisionRepo: Repository<CharacterRevisionEntity>,
+    @InjectRepository(WikiTalkPostEntity)
+    private readonly talkPostRepo: Repository<WikiTalkPostEntity>,
   ) {}
 
   async create(
@@ -50,6 +59,9 @@ export class WikiReportService {
         params: { detail: '举报原因必填' },
         legacyMessage: '举报原因必填',
       });
+    // 目标必须真存在再允许举报；否则任何字符串都能塞进 moderation 队列，
+    // patroller 看到一堆指向不存在 id 的 open report（2026-05-16 R2 走查）。
+    await this.assertTargetExists(targetType, targetId);
     return this.reportRepo.save(
       this.reportRepo.create({
         ownerId: reporter.id,
@@ -80,6 +92,33 @@ export class WikiReportService {
       qb.andWhere('r.status = :status', { status: filter.status });
     }
     return qb.getMany();
+  }
+
+  private async assertTargetExists(
+    targetType: string,
+    targetId: string,
+  ): Promise<void> {
+    let exists = false;
+    if (targetType === 'wiki_page') {
+      const page = await this.pageRepo.findOne({
+        where: { characterId: targetId },
+      });
+      exists = Boolean(page);
+    } else if (targetType === 'wiki_revision') {
+      const rev = await this.revisionRepo.findOne({ where: { id: targetId } });
+      exists = Boolean(rev);
+    } else if (targetType === 'wiki_talk_post') {
+      const post = await this.talkPostRepo.findOne({
+        where: { id: targetId },
+      });
+      exists = Boolean(post);
+    }
+    if (!exists) {
+      throw new AppError('WIKI_PAGE_NOT_FOUND', {
+        status: HttpStatus.NOT_FOUND,
+        legacyMessage: `被举报对象不存在：${targetType} ${targetId}`,
+      });
+    }
   }
 
   async setStatus(id: string, status: string): Promise<ModerationReportEntity> {
