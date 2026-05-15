@@ -312,6 +312,11 @@ export function MobileMomentsPublishPage() {
             onChange={(event) => composeDraft.setText(event.target.value)}
             placeholder={t(msg`这一刻的想法...`)}
             rows={4}
+            // 2000 字软上限，配合后端 MOMENTS_TEXT_TOO_LONG（同上限）形成双保险——
+            // 之前没有任何上限，粘贴一段 50K 字符的全文会让 createUserMoment 通过、
+            // 然后列表渲染那条卡片把整段 whitespace-pre-wrap 一次性绘出来，
+            // 移动 Safari 直接卡顿，且 DB 里 moment_posts.text 持续膨胀。
+            maxLength={2000}
             // outline-none 干掉浏览器原生轮廓；focus/focus-visible:shadow-none 干掉
             // tokens.css 里 :focus-visible 的全局 3px 绿光 box-shadow——autoFocus
             // 一进页面就吃这一圈、看起来像微信里冒出来一个绿色描边的输入框，

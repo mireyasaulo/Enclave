@@ -141,6 +141,9 @@ export function WeChatCommentBar({
               onChange={(event) => onChange(event.target.value)}
               placeholder={placeholder}
               rows={1}
+              // 500 字软上限，跟后端 MOMENT_COMMENT_TOO_LONG 对齐——之前没有任何
+              // 上限，长文评论会把整段 footer 撑开把卡片正文挤压到看不见。
+              maxLength={500}
               className="block w-full resize-none border-0 bg-transparent text-[15px] leading-[22px] outline-none placeholder:text-[#B0B0B0]"
               onKeyDown={(event) => {
                 if (

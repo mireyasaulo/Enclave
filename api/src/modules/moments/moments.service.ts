@@ -67,6 +67,23 @@ class MusicQuotaExhaustedError extends Error {
   }
 }
 
+// 朋友圈正文 / 评论的服务端硬上限。前端 maxLength 是软约束（粘贴长字符串被
+// 截断），但 curl / 第三方端可以绕过；服务端再卡一层避免 DB 爆 + 列表死渲染。
+// 数值参照微信：正文 ~2000 字符（含媒体时其实更短，这里给统一上限），评论 ~500。
+const MAX_MOMENT_TEXT_LENGTH = 2000;
+const MAX_COMMENT_TEXT_LENGTH = 500;
+
+// trim 后再剥掉零宽字符（U+200B–U+200D / U+FEFF / U+2060）和**内部空白**。
+// 用来判定 text 是不是"视觉为空"——纯 ZWS / ZWS+内部空格混排的正文/评论会让
+// 卡片渲染出一行空白，但 likes/comments footer 依然挂着，看着像幽灵帖。
+// wiki 的 isNameVisuallyEmpty 只剥 ZWS 不剥内部空白，对 "  ​​   ​   " 这种
+// 漏判；这里也把 \s 剥掉，保证 "可见字符总数 = 0" 时拒收。
+function isMomentTextVisuallyEmpty(raw: string): boolean {
+  const trimmed = raw.trim();
+  if (!trimmed) return true;
+  return trimmed.replace(/[​-‍﻿⁠\s]/g, '').length === 0;
+}
+
 export interface MomentInteraction {
   characterId: string;
   characterName: string;
@@ -291,10 +308,19 @@ export class MomentsService implements OnModuleInit {
     // 前端 WeChatCommentBar 已经用 value.trim().length>0 拦过空提交，但 curl /
     // 第三方客户端直接 POST 仍能写入空字符串或纯空白，DB 里会出现"w："这种渲染
     // 不出正文的脏评论。在服务端再拦一次，统一入口。
+    // trim 后再判 ZWS：之前能写一条纯零宽字符的评论，footer 上挂个 "w：" 但
+    // 正文区是空——视觉跟空评论一样，但走 "empty" 校验是通过的。
     const trimmedText = typeof text === 'string' ? text.trim() : '';
-    if (!trimmedText) {
+    if (!trimmedText || isMomentTextVisuallyEmpty(trimmedText)) {
       throw new AppError('MOMENT_COMMENT_EMPTY', {
         legacyMessage: '评论内容不能为空。',
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+    if (trimmedText.length > MAX_COMMENT_TEXT_LENGTH) {
+      throw new AppError('MOMENT_COMMENT_TOO_LONG', {
+        params: { max: MAX_COMMENT_TEXT_LENGTH },
+        legacyMessage: `评论最多 ${MAX_COMMENT_TEXT_LENGTH} 字。`,
         status: HttpStatus.BAD_REQUEST,
       });
     }
@@ -1416,9 +1442,19 @@ export class MomentsService implements OnModuleInit {
     );
     const visibility = this.normalizeUserMomentVisibility(input.visibility);
 
-    if (!text && media.length === 0) {
+    // 视觉为空（纯空白 / 纯 ZWS）且没附媒体 → 拒收。trim 后纯零宽字符在
+    // `!text` 判定里是 truthy，会落库成一条无正文 + 无媒体的"幽灵帖"，列表
+    // 卡片里只剩头像/时间，看起来像渲染挂了。
+    if (media.length === 0 && (!text || isMomentTextVisuallyEmpty(text))) {
       throw new AppError('MOMENTS_EMPTY', {
         legacyMessage: '朋友圈内容和媒体不能同时为空。',
+      });
+    }
+
+    if (text.length > MAX_MOMENT_TEXT_LENGTH) {
+      throw new AppError('MOMENTS_TEXT_TOO_LONG', {
+        params: { max: MAX_MOMENT_TEXT_LENGTH },
+        legacyMessage: `朋友圈正文最多 ${MAX_MOMENT_TEXT_LENGTH} 字。`,
       });
     }
 
