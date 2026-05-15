@@ -418,7 +418,17 @@ export function CharacterEditorPage() {
   const profile = draft.profile ?? emptyCharacterDraft.profile!;
   const providerAccounts = inferenceOverviewQuery.data?.providerAccounts ?? [];
   const modelCatalog = inferenceOverviewQuery.data?.modelCatalog ?? [];
-  const canSave = Boolean(draft.name?.trim() && draft.relationship?.trim());
+  // 选了「自定义」关系类型但没填字符串（或停留在字面 "custom" 哨兵值）→ 禁止保存
+  const relationshipTypeValid = (() => {
+    const v = draft.relationshipType ?? "";
+    if (!isCustomRelationshipType(v)) return true;
+    return v !== "" && v !== "custom";
+  })();
+  const canSave = Boolean(
+    draft.name?.trim() &&
+      draft.relationship?.trim() &&
+      relationshipTypeValid,
+  );
 
   return (
     <div className="space-y-6">
@@ -463,7 +473,9 @@ export function CharacterEditorPage() {
       ) : null}
       {!canSave ? (
         <InlineNotice tone="warning">
-          {t(msg`保存角色前，名称和关系描述为必填项。`)}
+          {!relationshipTypeValid
+            ? t(msg`选择「自定义」关系类型时需要填入具体值（≤ 15 字）。`)
+            : t(msg`保存角色前，名称和关系描述为必填项。`)}
         </InlineNotice>
       ) : null}
       {saveMutation.isError && saveMutation.error instanceof Error ? (
@@ -594,7 +606,7 @@ export function CharacterEditorPage() {
                   { value: "custom", label: t(msg`自定义`) },
                 ]}
               />
-              {isCustomRelationshipType(draft.relationshipType ?? "") && (
+              {isCustomRelationshipType(draft.relationshipType ?? "expert") && (
                 <Field
                   label={t(msg`自定义关系类型`)}
                   placeholder={t(msg`例如 师傅 / 房东 / 邻居`)}

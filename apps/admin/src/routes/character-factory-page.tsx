@@ -150,6 +150,13 @@ export function CharacterFactoryPage() {
     return JSON.stringify(draft) !== seedSignature;
   }, [draft, seedSignature]);
 
+  // 选了「自定义」关系类型但没填字符串（或停留在字面 "custom" 哨兵值）→ 禁止保存
+  const relationshipTypeValid = (() => {
+    const v = draft?.identity.relationshipType ?? "";
+    if (!isCustomRelationshipType(v)) return true;
+    return v !== "" && v !== "custom";
+  })();
+
   async function invalidateFactory() {
     await Promise.all([
       queryClient.invalidateQueries({
@@ -284,7 +291,16 @@ export function CharacterFactoryPage() {
                 variant="primary"
                 size="lg"
                 onClick={() => draft && saveMutation.mutate(draft)}
-                disabled={!isDirty || saveMutation.isPending}
+                disabled={
+                  !isDirty || !relationshipTypeValid || saveMutation.isPending
+                }
+                title={
+                  !relationshipTypeValid
+                    ? t(
+                        msg`选择「自定义」关系类型时需要填入具体值（≤ 15 字）`,
+                      )
+                    : undefined
+                }
               >
                 {saveMutation.isPending ? t(msg`保存中...`) : t(msg`保存草稿`)}
               </Button>
