@@ -68,8 +68,13 @@ function buildMessages(state: FarmPlayerStateView, nowMs: number): string[] {
   ).length;
   const weedCount = state.plots.reduce((acc, p) => acc + (p.weeds || 0), 0);
   const bugCount = state.plots.reduce((acc, p) => acc + (p.bugs || 0), 0);
+  // weeklyStolenLog 同时记两边：玩家自己偷 NPC（thiefCharacterId='owner'）和 NPC
+  // 偷玩家（thiefCharacterId=NPC_id）。提醒"今天来顺过你的菜"显然只该说后者，
+  // 否则管家会冒出"我 今天来顺过你的菜"这种自言自语。
   const stolenRecently = state.weeklyStolenLog.filter(
-    (entry) => nowMs - entry.atMs < 12 * 3600 * 1000,
+    (entry) =>
+      entry.thiefCharacterId !== "owner" &&
+      nowMs - entry.atMs < 12 * 3600 * 1000,
   );
   const hour = new Date(nowMs).getHours();
 
