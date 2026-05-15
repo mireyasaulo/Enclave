@@ -55,7 +55,11 @@ export function useTankWarInput(
     function set(code: string, down: boolean) {
       const input = inputRef.current;
       if (PAUSE_KEYS.includes(code)) {
-        if (down) input.pauseToggle = !input.pauseToggle;
+        // pauseToggle 是一次性"请求"信号，由 use-tank-war-world 的 50ms 轮询
+        // 消费后清零。这里只在 keydown 时置 true；不要写成 `!pauseToggle` 翻转，
+        // 否则第二次按 P/Esc 会把信号翻回 false，poller 看到的是下降沿，
+        // 直接被吞掉 —— 用户连按两下 P 还是停在 paused，要按第三下才能恢复。
+        if (down) input.pauseToggle = true;
         return true;
       }
       const m1 = matches(p1, code);

@@ -155,15 +155,15 @@ export function useTankWarWorld(opts: Options): UseTankWarWorldResult {
     return () => document.removeEventListener("visibilitychange", handler);
   }, []);
 
-  // pauseToggle 边沿
-  const lastPauseRef = useRef(false);
+  // pauseToggle 是 keydown 置 true 的一次性请求信号；这里轮询消费并立刻清零，
+  // 让下一次按 P/Esc 又能触发一次 togglePause。不要用边沿检测——前一版用 cur && !last
+  // 配合 keydown 翻转 pauseToggle，第二次按下相当于把信号写成下降沿，被 poller 吞掉。
   useEffect(() => {
     const id = window.setInterval(() => {
-      const cur = inputRef.current.pauseToggle;
-      if (cur && !lastPauseRef.current) {
+      if (inputRef.current.pauseToggle) {
+        inputRef.current.pauseToggle = false;
         togglePause(worldRef.current, sfxRef.current);
       }
-      lastPauseRef.current = cur;
     }, 50);
     return () => window.clearInterval(id);
   }, []);
