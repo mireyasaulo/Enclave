@@ -23,6 +23,7 @@ import {
   parseDesktopChatHistoryRouteState,
 } from "../features/desktop/chat/desktop-chat-history-route-state";
 import { buildDesktopChatThreadPath } from "../features/desktop/chat/desktop-chat-route-state";
+import { DesktopChatConfirmDialog } from "../features/desktop/chat/desktop-chat-confirm-dialog";
 import {
   filterSearchableChatMessages,
   useLocalChatMessageActionState,
@@ -30,7 +31,6 @@ import {
 import { useMessageReminders } from "../features/chat/use-message-reminders";
 import { DesktopUtilityShell } from "../features/desktop/desktop-utility-shell";
 import { useDesktopLayout } from "../features/shell/use-desktop-layout";
-import { sanitizeDisplayedChatText } from "../lib/chat-text";
 import {
   getConversationThreadLabel,
   getConversationThreadType,
@@ -63,6 +63,7 @@ export function DesktopChatHistoryPage() {
   >(routeState.conversationId ?? null);
   const [notice, setNotice] = useState<string | null>(null);
   const [historyLimit, setHistoryLimit] = useState(INITIAL_HISTORY_LIMIT);
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
 
   const conversationsQuery = useQuery({
     queryKey: ["app-conversations", baseUrl],
@@ -224,8 +225,10 @@ export function DesktopChatHistoryPage() {
       ),
     [localMessageActionState, messagesQuery.data, reminders, t],
   );
+  const rawMessageCount = messagesQuery.data?.length ?? 0;
+  // 本地隐藏/撤回会让 historyRows.length < rawMessageCount，按过滤后长度判断会误判"已全部加载"
   const mayHaveEarlierMessages =
-    historyRows.length > 0 && historyRows.length >= historyLimit;
+    rawMessageCount > 0 && rawMessageCount >= historyLimit;
 
   const navigateToHistoryMessage = (
     conversation: ConversationListItem,
@@ -279,7 +282,7 @@ export function DesktopChatHistoryPage() {
               size="sm"
               onClick={() => {
                 void messagesQuery.refetch();
-                setNotice(t(msg`已刷新当前会话最近 ${historyRows.length} 条记录。`));
+                setNotice(t(msg`已刷新当前会话最近的记录。`));
               }}
               className="h-8 rounded-[10px] border-[color:var(--border-faint)] bg-white px-3 text-[12px] shadow-none hover:bg-[#f5f7f7]"
             >
@@ -308,7 +311,7 @@ export function DesktopChatHistoryPage() {
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => clearMutation.mutate(selectedConversation)}
+              onClick={() => setClearConfirmOpen(true)}
               disabled={clearMutation.isPending}
               className="h-8 rounded-[10px] border-[rgba(239,68,68,0.18)] bg-[rgba(254,242,242,0.92)] px-3 text-[12px] text-[color:var(--state-danger-text)] shadow-none hover:bg-[rgba(254,226,226,0.95)]"
             >
@@ -526,6 +529,33 @@ export function DesktopChatHistoryPage() {
           ) : null}
         </div>
       </div>
+      <DesktopChatConfirmDialog
+        open={clearConfirmOpen && Boolean(selectedConversation)}
+        title={t(msg`清空聊天记录`)}
+        description={
+          selectedConversation && isPersistedGroupConversation(selectedConversation)
+            ? t(msg`确认清空这个群聊的聊天记录吗？`)
+            : t(msg`确认清空这段聊天记录吗？`)
+        }
+        confirmLabel={t(msg`清空记录`)}
+        pendingLabel={t(msg`正在清空...`)}
+        danger
+        pending={clearMutation.isPending}
+        onClose={() => {
+          if (clearMutation.isPending) {
+            return;
+          }
+          setClearConfirmOpen(false);
+        }}
+        onConfirm={() => {
+          if (!selectedConversation || clearMutation.isPending) {
+            return;
+          }
+          clearMutation.mutate(selectedConversation, {
+            onSettled: () => setClearConfirmOpen(false),
+          });
+        }}
+      />
     </DesktopUtilityShell>
   );
 }
@@ -582,6 +612,14 @@ function resolveMessageTypeLabel(
 
   if (type === "location_card") {
     return t(msg`位置`);
+  }
+
+  if (type === "note_card") {
+    return t(msg`笔记`);
+  }
+
+  if (type === "feed_post_card") {
+    return t(msg`视频号动态`);
   }
 
   if (type === "sticker") {
