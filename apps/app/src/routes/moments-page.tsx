@@ -1353,13 +1353,18 @@ function MobileMomentsView({
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   // 触底加载：观察列表底部 sentinel；进入视野且还有下一页 → 自动触发 fetchNextPage。
+  // root 必须留 null（document viewport）。原来传 containerRef.current 是错的：
+  // 这个 div 上 `flex-1 overflow-y-auto` 没生效（父级 AppPage 不是 flex 容器），
+  // 它的 clientHeight 直接撑成 content 全高（≈28k px），IntersectionObserver
+  // 一上来就把 sentinel 判成"在视口里"——结果初始挂载就把所有 4 页一次性串行拉完。
+  // 真正的滚动容器是 MobileShell 的 absolute inset-0 viewport pane，对应 root=null
+  // （document viewport）的判定是正确的。
   useEffect(() => {
     if (!hasNextPage || isFetchingNextPage) {
       return;
     }
     const sentinel = loadMoreRef.current;
-    const root = containerRef.current;
-    if (!sentinel || !root) {
+    if (!sentinel) {
       return;
     }
     const observer = new IntersectionObserver(
@@ -1368,11 +1373,11 @@ function MobileMomentsView({
           onLoadMore();
         }
       },
-      { root, rootMargin: "240px 0px" },
+      { rootMargin: "240px 0px" },
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [containerRef, hasNextPage, isFetchingNextPage, onLoadMore]);
+  }, [hasNextPage, isFetchingNextPage, onLoadMore]);
 
   const activeMoment = actionBubble
     ? visibleMoments.find((moment) => moment.id === actionBubble.momentId) ??

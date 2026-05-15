@@ -19,6 +19,7 @@ import { Heart, MapPin } from "lucide-react";
 import { cn } from "@yinjie/ui";
 import { AvatarChip } from "./avatar-chip";
 import { MomentMediaGallery } from "./moment-media-gallery";
+import { stripToolCallSyntax } from "../features/moments/moment-content";
 
 const t = translateRuntimeMessage;
 
@@ -140,7 +141,8 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
       onOpenActionMenu(rect);
     };
 
-    const hasText = Boolean(moment.text.trim());
+    const displayText = stripToolCallSyntax(moment.text);
+    const hasText = Boolean(displayText);
     const hasMedia = moment.media.length > 0;
     const hasLikes = moment.likes.length > 0;
     const hasComments = moment.comments.length > 0;
@@ -199,7 +201,7 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
               )}
               style={{ color: WECHAT_TEXT_COLOR }}
             >
-              {moment.text}
+              {displayText}
             </div>
           ) : null}
 
@@ -314,6 +316,7 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
                           (item) => item.id === comment.replyToCommentId,
                         )?.authorName ?? null
                       : null;
+                    const cleanCommentText = stripToolCallSyntax(comment.text);
                     return (
                       <button
                         key={comment.id}
@@ -337,7 +340,7 @@ export const WeChatMomentCard = memo(forwardRef<HTMLElement, WeChatMomentCardPro
                             </span>
                           </>
                         ) : null}
-                        <span>：{comment.text}</span>
+                        <span>：{cleanCommentText}</span>
                       </button>
                     );
                   })}
