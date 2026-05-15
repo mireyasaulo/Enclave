@@ -139,21 +139,41 @@ export function renderHighlightedText(text: string, keyword: string): ReactNode 
   }
 
   const normalized = text.toLowerCase();
-  const start = normalized.indexOf(keyword);
-  if (start === -1) {
+  if (normalized.indexOf(keyword) === -1) {
     return text;
   }
 
-  const end = start + keyword.length;
-  return (
-    <>
-      {text.slice(0, start)}
-      <mark className="rounded bg-[#e6f4ea] px-0.5 text-current">
-        {text.slice(start, end)}
-      </mark>
-      {text.slice(end)}
-    </>
-  );
+  // 命中可能出现多次（例如搜「我」匹配「我自己 · 我等你」），原先只染第一处，
+  // 后面那些跟黑色正文混在一起——用户看着像"高亮 bug"。逐个找出所有 occurrence
+  // 拼成 fragment 节点序列，每个 <mark> 都给独立 key（起始位置就足够稳定）。
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+  while (cursor <= text.length) {
+    const matchStart = normalized.indexOf(keyword, cursor);
+    if (matchStart === -1) {
+      if (cursor < text.length) {
+        parts.push(text.slice(cursor));
+      }
+      break;
+    }
+
+    if (matchStart > cursor) {
+      parts.push(text.slice(cursor, matchStart));
+    }
+
+    const matchEnd = matchStart + keyword.length;
+    parts.push(
+      <mark
+        key={`m-${matchStart}`}
+        className="rounded bg-[#e6f4ea] px-0.5 text-current"
+      >
+        {text.slice(matchStart, matchEnd)}
+      </mark>,
+    );
+    cursor = matchEnd;
+  }
+
+  return <>{parts}</>;
 }
 
 export function filterSearchResults(

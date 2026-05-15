@@ -590,6 +590,11 @@ export function ChatMessageSearchPanel({
             </div>
           ) : null}
 
+          {/* 分类浏览那一列在 0 条消息时 4 个分类全是 0/全部消息/图片与视频/...，
+              点了也只会跳到空列表，留着只是徒增信息密度——直接和上面的空态卡片
+              二选一。下面那些按筛选器分支的空态都自带 indexedMessages.length>0
+              的 guard，不会跟空消息打架。 */}
+          {indexedMessages.length ? (
           <ChatDetailsSection title={t(msg`分类浏览`)} variant="wechat">
             <div className="divide-y divide-[color:var(--border-faint)]">
               {searchCategories.map((category) => {
@@ -647,6 +652,7 @@ export function ChatMessageSearchPanel({
               })}
             </div>
           </ChatDetailsSection>
+          ) : null}
 
           {!trimmedKeyword &&
           indexedMessages.length > 0 &&
@@ -1057,21 +1063,40 @@ function buildResultSectionTitle(
 
 function renderHighlightedText(text: string, keyword: string) {
   const normalized = text.toLowerCase();
-  const start = normalized.indexOf(keyword);
-  if (start === -1) {
+  if (normalized.indexOf(keyword) === -1) {
     return text;
   }
 
-  const end = start + keyword.length;
-  return (
-    <>
-      {text.slice(0, start)}
-      <mark className="rounded-[4px] bg-[rgba(250,204,21,0.28)] px-0.5 text-current">
-        {text.slice(start, end)}
-      </mark>
-      {text.slice(end)}
-    </>
-  );
+  // 跟 search-utils 的 renderHighlightedText 同步——多次命中全染色，
+  // 不留下半路变黑的"高亮 bug"观感。
+  const parts: ReactNode[] = [];
+  let cursor = 0;
+  while (cursor <= text.length) {
+    const matchStart = normalized.indexOf(keyword, cursor);
+    if (matchStart === -1) {
+      if (cursor < text.length) {
+        parts.push(text.slice(cursor));
+      }
+      break;
+    }
+
+    if (matchStart > cursor) {
+      parts.push(text.slice(cursor, matchStart));
+    }
+
+    const matchEnd = matchStart + keyword.length;
+    parts.push(
+      <mark
+        key={`m-${matchStart}`}
+        className="rounded-[4px] bg-[rgba(250,204,21,0.28)] px-0.5 text-current"
+      >
+        {text.slice(matchStart, matchEnd)}
+      </mark>,
+    );
+    cursor = matchEnd;
+  }
+
+  return <>{parts}</>;
 }
 
 function buildSearchPreview(text: string, keyword: string) {
