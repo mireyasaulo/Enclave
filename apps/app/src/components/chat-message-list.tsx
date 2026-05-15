@@ -4207,9 +4207,15 @@ function buildReminderOptions(
   const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
   const tonight = new Date(now);
   tonight.setHours(20, 0, 0, 0);
-  if (tonight.getTime() <= now.getTime()) {
+  // 20:00 已过的话推到第二天，并把 label 改成「明晚 20:00」——
+  // 否则用户会看到 label「今晚 20:00」、副标题却写「明天 20:00」，前后矛盾。
+  const tonightPassed = tonight.getTime() <= now.getTime();
+  if (tonightPassed) {
     tonight.setDate(tonight.getDate() + 1);
   }
+  const tonightLabel = tonightPassed
+    ? t(msg`明晚 20:00`)
+    : t(msg`今晚 20:00`);
 
   const tomorrowMorning = new Date(now);
   tomorrowMorning.setDate(tomorrowMorning.getDate() + 1);
@@ -4224,7 +4230,7 @@ function buildReminderOptions(
     },
     {
       id: "tonight",
-      label: t(msg`今晚 20:00`),
+      label: tonightLabel,
       detail: formatReminderSummary(t, tonight.toISOString()),
       remindAt: tonight.toISOString(),
     },
