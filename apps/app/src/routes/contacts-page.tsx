@@ -2182,7 +2182,9 @@ export function ContactsPage() {
               </Button>
 
               {isQuickMenuOpen && !bulkMode ? (
-                <div className="absolute right-0 top-[calc(100%+0.3rem)] z-40 w-[10rem] overflow-hidden rounded-[11px] bg-[rgba(44,44,44,0.96)] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.2)]">
+                // bg 必须完全不透明：rgba(44,44,44,0.96) 时 “新的朋友” 的红色 6 badge
+                // 会从下层穿透到 “添加朋友” 行的右侧，看着像 + 菜单自己有红点。
+                <div className="absolute right-0 top-[calc(100%+0.3rem)] z-40 w-[10rem] overflow-hidden rounded-[11px] bg-[#2c2c2c] p-1 shadow-[0_12px_32px_rgba(15,23,42,0.2)]">
                   {mobileQuickActionItems.map((item) => {
                     const Icon = item.icon;
 

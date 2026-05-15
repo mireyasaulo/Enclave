@@ -1,8 +1,11 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import { msg } from "@lingui/macro";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, X } from "lucide-react";
+import { getFriends, listCharacters } from "@yinjie/contracts";
 import { useRuntimeTranslator } from "@yinjie/i18n";
 import { cn } from "@yinjie/ui";
+import { useAppRuntimeConfig } from "../../../runtime/runtime-config-store";
 import { useDesktopLayout } from "../../shell/use-desktop-layout";
 import { useManagementScreenStack } from "./contacts-management-state";
 import { ManagementRootScreen } from "./management-root-screen";
@@ -26,6 +29,35 @@ export function ContactsManagementModal({
   const t = useRuntimeTranslator();
   const isDesktop = useDesktopLayout();
   const { current, canGoBack, push, pop } = useManagementScreenStack(open);
+
+  const runtimeConfig = useAppRuntimeConfig();
+  const baseUrl = runtimeConfig.apiBaseUrl;
+  // 仅在打开 permissions-detail 时才查（弹窗未打开时 useQuery 不订阅）。
+  const detailCharacterId =
+    current.type === "permissions-detail" ? current.characterId : null;
+  const friendsQuery = useQuery({
+    queryKey: ["app-friends", baseUrl],
+    queryFn: () => getFriends(baseUrl),
+    enabled: Boolean(open && detailCharacterId),
+  });
+  const charactersQuery = useQuery({
+    queryKey: ["app-characters", baseUrl],
+    queryFn: () => listCharacters(baseUrl),
+    enabled: Boolean(open && detailCharacterId),
+  });
+  const detailFriendName = useMemo(() => {
+    if (!detailCharacterId) return null;
+    const friend = (friendsQuery.data ?? []).find(
+      (f) => f.character.id === detailCharacterId,
+    );
+    const remark = friend?.friendship?.remarkName?.trim();
+    if (remark) return remark;
+    if (friend?.character?.name) return friend.character.name;
+    const char = (charactersQuery.data ?? []).find(
+      (c) => c.id === detailCharacterId,
+    );
+    return char?.name ?? null;
+  }, [detailCharacterId, friendsQuery.data, charactersQuery.data]);
 
   useEffect(() => {
     if (!open) return;
@@ -52,7 +84,8 @@ export function ContactsManagementModal({
       case "permissions":
         return t(msg`朋友权限`);
       case "permissions-detail":
-        return t(msg`朋友权限`);
+        // 列表与详情都叫 “朋友权限” 时用户来回切看不出在改谁；详情页头部回退到好友显示名。
+        return detailFriendName ?? t(msg`朋友权限`);
       case "root":
       default:
         return t(msg`通讯录管理`);
