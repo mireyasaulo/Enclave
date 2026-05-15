@@ -19,6 +19,7 @@ import { WikiTalkThreadEntity } from './entities/wiki-talk-thread.entity';
 import { WikiTalkPostEntity } from './entities/wiki-talk-post.entity';
 import { WikiWatchlistEntity } from './entities/wiki-watchlist.entity';
 import { UserPrivateCharacterEntity } from './entities/user-private-character.entity';
+import { WikiAiGenerateRateLimitGuard } from './guards/wiki-ai-generate-rate-limit.guard';
 import { WikiRateLimitGuard } from './guards/wiki-rate-limit.guard';
 import { WikiRoleGuard } from './guards/wiki-role.guard';
 import { AbuseFilterService } from './services/abuse-filter.service';
@@ -38,6 +39,7 @@ import { WikiRoleService } from './services/wiki-role.service';
 import { WikiTalkService } from './services/wiki-talk.service';
 import { WikiWatchlistService } from './services/wiki-watchlist.service';
 import { WikiPrivateCharacterService } from './services/wiki-private-character.service';
+import { WikiPrivateCharacterAiService } from './services/wiki-private-character-ai.service';
 import { WikiReportService } from './services/wiki-report.service';
 import { WikiPageController } from './controllers/wiki-page.controller';
 import { WikiReviewController } from './controllers/wiki-review.controller';
@@ -107,8 +109,10 @@ import { WikiReportController } from './controllers/wiki-report.controller';
     WikiAntivandalBotService,
     WikiStatsService,
     WikiPrivateCharacterService,
+    WikiPrivateCharacterAiService,
     WikiRoleGuard,
     WikiRateLimitGuard,
+    WikiAiGenerateRateLimitGuard,
   ],
   exports: [
     WikiPageService,

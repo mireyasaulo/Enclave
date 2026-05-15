@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -16,13 +17,22 @@ import {
   type AuthenticatedUser,
 } from '../../auth/jwt-auth.guard';
 import { PrivateCharacterRateLimitGuard } from '../../characters/guards/private-character-rate-limit.guard';
+import { WikiAiGenerateRateLimitGuard } from '../guards/wiki-ai-generate-rate-limit.guard';
 import { WikiPrivateCharacterService } from '../services/wiki-private-character.service';
 import type { PrivateCharacterDto } from '../services/wiki-private-character.service';
+import { WikiPrivateCharacterAiService } from '../services/wiki-private-character-ai.service';
+import {
+  SECTION_KEYS,
+  type SectionKey,
+} from '../services/wiki-private-character-ai.prompts';
 
 @Controller('wiki/my-characters')
 @UseGuards(JwtAuthGuard)
 export class WikiPrivateCharacterController {
-  constructor(private readonly service: WikiPrivateCharacterService) {}
+  constructor(
+    private readonly service: WikiPrivateCharacterService,
+    private readonly aiService: WikiPrivateCharacterAiService,
+  ) {}
 
   @Get()
   list(@CurrentUser() user: AuthenticatedUser) {
@@ -103,5 +113,47 @@ export class WikiPrivateCharacterController {
   ) {
     const dto = this.service.parseImportBundle(body);
     return this.service.upsertByName(user.id, dto);
+  }
+
+  // AI 自动生成：根据当前已填字段调一次 LLM，返回需要补全的字段。
+  // 7 个 section 各自路由 + 1 个 'all' 整体生成。
+  // 单独的 rate limit（15/h/user），与 CRUD 桶（60/h）分开。
+  @Post('ai-generate')
+  @UseGuards(WikiAiGenerateRateLimitGuard)
+  async aiGenerate(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() body: { section?: string; currentDraft?: PrivateCharacterDto },
+  ) {
+    const section = body?.section as SectionKey | undefined;
+    if (!section || !SECTION_KEYS.includes(section)) {
+      throw new BadRequestException(
+        `section must be one of: ${SECTION_KEYS.join(', ')}`,
+      );
+    }
+    const draft = body?.currentDraft;
+    if (!draft || typeof draft !== 'object') {
+      throw new BadRequestException('currentDraft required');
+    }
+    if (!draft.name?.trim()) {
+      throw new BadRequestException(
+        '请先在表单顶部填写"名称"再使用 AI 生成。',
+      );
+    }
+    if (section === 'all') {
+      const missing: string[] = [];
+      if (!draft.bio?.trim()) missing.push('角色简介');
+      if (!draft.relationship?.trim()) missing.push('关系描述');
+      if (!draft.personality?.trim()) missing.push('性格语气');
+      if (missing.length > 0) {
+        throw new BadRequestException(
+          `顶部一键生成需要先填写：${missing.join('、')}。`,
+        );
+      }
+    }
+    return this.aiService.generateForSection({
+      section,
+      currentDraft: draft,
+      ownerId: user.id,
+    });
   }
 }
